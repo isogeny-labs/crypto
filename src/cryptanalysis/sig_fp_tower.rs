@@ -91,7 +91,8 @@ use rayon::prelude::*;
 
 use super::f4_fp_tower::{
     coprime, degree_of, free_of, lcm, mask_of, mono, quotient, staircase_at_most, Acc, Fp, Mono,
-    MonoHasher, MonoMap, RPoly, Row, TowerF4Options, TowerF4Report, TowerRing, MAX_FREE, NONE, ONE,
+    MonoHasher, MonoMap, Pivot, RPoly, Row, TowerF4Options, TowerF4Report, TowerRing, MAX_FREE,
+    NONE, ONE,
 };
 
 // ── Signatures ───────────────────────────────────────────────────────
@@ -897,8 +898,8 @@ pub fn sig_f4_tower_with(
         // Signature-ordered elimination.
         let reduce_started = Instant::now();
         let mut pivot_of = vec![NONE; n_cols];
-        let mut pivots: Vec<(Row, PSig)> = Vec::new();
-        let mut acc = Acc::new(n_cols);
+        let mut pivots: Vec<(Pivot, PSig)> = Vec::new();
+        let mut acc = Acc::new(fp, n_cols);
         // (row, reduced row) of the rows that give new elements.
         let mut fresh: Vec<(usize, Row)> = Vec::new();
         let mut muladds = 0u64;
@@ -927,7 +928,7 @@ pub fn sig_f4_tower_with(
                     if is_new {
                         fresh.push((k, r.clone()));
                     }
-                    pivots.push((r, sig));
+                    pivots.push((Pivot::new(r), sig));
                 }
             }
         }
@@ -1098,7 +1099,7 @@ fn reduce_row(
     row: Row,
     sig: PSig,
     pivot_of: &[u32],
-    pivots: &[(Row, PSig)],
+    pivots: &[(Pivot, PSig)],
     muladds: &mut u64,
 ) -> Reduced {
     let p0 = pivot_of[row.cols[0] as usize];
@@ -1126,8 +1127,7 @@ fn reduce_row(
             let b = word.trailing_zeros() as usize;
             word &= word - 1;
             let c = w * 64 + b;
-            let v = acc.vals[c];
-            acc.vals[c] = 0;
+            let v = acc.take(fp, c);
             if v == 0 {
                 continue;
             }
@@ -1136,8 +1136,7 @@ fn reduce_row(
                 if pivots[p as usize].1 == sig {
                     // Singular: clear what is left and drop the row.
                     acc.bits[w] = word;
-                    let mut sink = Row::default();
-                    acc.drain_from(fp, w, 1, &mut sink);
+                    acc.clear_from(w);
                     return Reduced::Singular;
                 }
                 *muladds += acc.sub_tail(fp, v, &pivots[p as usize].0, w, &mut word);
@@ -1322,6 +1321,50 @@ mod tests {
         assert!(
             refuted > 5 && refuted < 115,
             "a mix of refuted and solvable systems: {refuted}"
+        );
+    }
+
+    /// The accumulator holds entries unreduced below a width that depends on
+    /// `p` (`Acc::new`). For `p = 7·2²⁶ + 1` that width is 83 columns, so a
+    /// run has steps on both sides of it: the basis is the one `f4_fp_tower`
+    /// finds either way.
+    #[test]
+    fn the_basis_matches_f4_across_the_accumulator_guard() {
+        use rand::SeedableRng;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(53);
+        let p = 469_762_049u64;
+        let (mut lazy_steps, mut eager_steps, mut refuted) = (0, 0, 0);
+        for trial in 0..20 {
+            let t = 2 + trial % 3;
+            let (r0, _) = kummer_block(p, t, 0);
+            let (r1, _) = kummer_block(p, t, t);
+            let ring = TowerRing {
+                p,
+                rules: [r0, r1].concat(),
+                n_free: trial % 2,
+            };
+            let k = 1 + trial % 3;
+            let input: Vec<RPoly> = (0..k).map(|_| random_poly(&mut rng, &ring, 4, 3)).collect();
+            let opts = TowerF4Options::new(40);
+            let a = f4_tower(&input, &ring, &opts);
+            let b = sig_f4_tower(&input, &ring, &opts);
+            assert!(!a.timed_out && !b.report.timed_out);
+            assert_eq!(a.inconsistent, b.report.inconsistent, "trial {trial}");
+            refuted += usize::from(a.inconsistent);
+            let la: Vec<Mono> = a.basis.iter().filter_map(RPoly::lm).collect();
+            let lb: Vec<Mono> = b.report.basis.iter().filter_map(RPoly::lm).collect();
+            assert_eq!(minimal(&la), minimal(&lb), "trial {trial}");
+            for step in &b.steps {
+                if step.cols <= 83 {
+                    lazy_steps += 1;
+                } else {
+                    eager_steps += 1;
+                }
+            }
+        }
+        assert!(
+            lazy_steps > 5 && eager_steps > 5,
+            "steps on each side of the guard: {lazy_steps} {eager_steps} ({refuted} refuted)"
         );
     }
 

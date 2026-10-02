@@ -55,7 +55,9 @@
 //!   full echelon (note §15).
 //! - **Rows are formed on demand.** A row is kept as the product that makes
 //!   it and formed again, a block at a time, when it is eliminated, so a
-//!   step's memory is `B'` rather than the matrix.
+//!   step's memory is `B'` rather than the matrix. The scan keeps the
+//!   products it forms for the elimination to read back, up to `2²²` terms a
+//!   step (80 MiB); the rest of a larger step is formed again.
 //! - **The basis keeps the echelon's rows.** A new element is the pivot row
 //!   the elimination leaves, dense over the step's columns without a divisor
 //!   from its lead on, and the elements a step adds share that column list:
@@ -347,6 +349,13 @@ fn merge_masks(fp: Fp, terms: &mut Vec<(u64, u64)>) {
     terms.truncate(out);
 }
 
+/// The two working lists of [`TowerRing::mask_product_into`].
+#[derive(Default)]
+struct MaskScratch {
+    cur: Vec<(u64, u64)>,
+    next: Vec<(u64, u64)>,
+}
+
 /// `F_p[y_0, …, y_{n−1}, u_0, …] / (y_j² − rule_j)`. The tower variables
 /// come first; the free variables follow, at global indices
 /// `n_tower .. n_tower + n_free`.
@@ -424,30 +433,40 @@ impl TowerRing {
     }
 
     /// `coef · y^ma · y^mb` in normal form (tower parts only), pushed onto
-    /// `out` with repeats allowed.
-    fn mask_product_into(&self, fp: Fp, ma: u64, mb: u64, coef: u64, out: &mut Vec<(u64, u64)>) {
+    /// `out` with repeats allowed. `scratch` holds the working lists, so a
+    /// caller that forms many products allocates them once.
+    fn mask_product_into(
+        &self,
+        fp: Fp,
+        ma: u64,
+        mb: u64,
+        coef: u64,
+        out: &mut Vec<(u64, u64)>,
+        scratch: &mut MaskScratch,
+    ) {
         let common = ma & mb;
         if common == 0 {
             out.push((ma | mb, coef));
             return;
         }
         // y^ma · y^mb = y^(ma ∪ mb) · Π_{j ∈ ma ∩ mb} y_j.
-        let mut cur = vec![(ma | mb, coef)];
-        let mut next = Vec::new();
+        let MaskScratch { cur, next } = scratch;
+        cur.clear();
+        cur.push((ma | mb, coef));
         let mut bits = common;
         while bits != 0 {
             let j = bits.trailing_zeros() as usize;
             bits &= bits - 1;
             next.clear();
-            for &(m, c) in &cur {
-                self.mul_var_into(fp, m, j, c, &mut next);
+            for &(m, c) in cur.iter() {
+                self.mul_var_into(fp, m, j, c, next);
             }
             // Without merging, a chain of rewrites repeats monomials and
             // the list grows exponentially in the number of common bits.
-            merge_masks(fp, &mut next);
-            std::mem::swap(&mut cur, &mut next);
+            merge_masks(fp, next);
+            std::mem::swap(cur, next);
         }
-        out.extend(cur);
+        out.extend_from_slice(cur);
     }
 
     /// `u · g` in normal form.
@@ -475,33 +494,61 @@ impl TowerRing {
         u: Mono,
     ) -> RPoly {
         let (mu, fu) = (mask_of(u), free_of(u));
-        let mut terms: Vec<(Mono, u64)> = Vec::with_capacity(len);
-        let mut carried = false;
+        // A term that shares no tower variable with `u` is a plain product,
+        // injective and order-preserving: those terms stay distinct and
+        // descending, and go straight into the result. Only the terms that
+        // rewrite (`carried`) come out in no order, and only they are sorted.
+        let mut monos: Vec<Mono> = Vec::with_capacity(len);
+        let mut coefs: Vec<u32> = Vec::with_capacity(len);
+        let mut carried: Vec<(Mono, u64)> = Vec::new();
         let mut tmp: Vec<(u64, u64)> = Vec::new();
+        let mut scratch = MaskScratch::default();
         for (m, c) in g {
             let mm = mask_of(m);
             let f = add_free(free_of(m), fu);
             if mm & mu == 0 {
-                terms.push((mono(mm | mu, f), u64::from(c)));
+                monos.push(mono(mm | mu, f));
+                coefs.push(c);
             } else {
-                carried = true;
                 tmp.clear();
-                self.mask_product_into(fp, mm, mu, u64::from(c), &mut tmp);
-                for &(x, cc) in &tmp {
-                    terms.push((mono(x, f), cc));
-                }
+                self.mask_product_into(fp, mm, mu, u64::from(c), &mut tmp, &mut scratch);
+                carried.extend(tmp.iter().map(|&(x, cc)| (mono(x, f), cc)));
             }
         }
-        if carried {
-            RPoly::from_terms(fp, terms)
-        } else {
-            // A product by a monomial without carries is injective and
-            // order-preserving: the terms are distinct and still descending.
-            RPoly {
-                monos: terms.iter().map(|t| t.0).collect(),
-                coefs: terms.iter().map(|t| t.1 as u32).collect(),
+        if carried.is_empty() {
+            return RPoly { monos, coefs };
+        }
+        carried.sort_unstable_by_key(|t| std::cmp::Reverse(t.0));
+        // Merge the two descending lists, adding the coefficients of a
+        // repeated monomial and dropping a zero sum: what `from_terms` does
+        // to the concatenation. Both lists hold coefficients below `p`.
+        let mut out = RPoly {
+            monos: Vec::with_capacity(monos.len() + carried.len()),
+            coefs: Vec::with_capacity(monos.len() + carried.len()),
+        };
+        let (mut i, mut j) = (0, 0);
+        loop {
+            let m = match (monos.get(i), carried.get(j)) {
+                (Some(&a), Some(&(b, _))) => a.max(b),
+                (Some(&a), None) => a,
+                (None, Some(&(b, _))) => b,
+                (None, None) => break,
+            };
+            let mut c = 0u64;
+            if i < monos.len() && monos[i] == m {
+                c = u64::from(coefs[i]);
+                i += 1;
+            }
+            while j < carried.len() && carried[j].0 == m {
+                c = fp.add(c, carried[j].1);
+                j += 1;
+            }
+            if c != 0 {
+                out.monos.push(m);
+                out.coefs.push(c as u32);
             }
         }
+        out
     }
 
     /// The normal form of a polynomial given by arbitrary exponent vectors
@@ -586,7 +633,7 @@ impl RPoly {
             let m = terms[i].0;
             let mut c = 0u64;
             while i < terms.len() && terms[i].0 == m {
-                c = fp.add(c, terms[i].1 % fp.p);
+                c = fp.add(c, fp.reduce(terms[i].1));
                 i += 1;
             }
             if c != 0 {
@@ -867,22 +914,70 @@ pub(crate) struct Row {
 
 pub(crate) const NONE: u32 = u32::MAX;
 
+/// A pivot row prepared for [`Acc::sub_tail`]: the row, lead first and
+/// columns ascending, and the words of the accumulator's bitset that its tail
+/// has columns in, with the bits to set in each.
+///
+/// Setting the bits of a long row one entry at a time makes the entries that
+/// share a word wait, each for the store of the one before it. The words a
+/// row touches do not change, so the list is made once with the pivot and
+/// read every time the pivot is subtracted.
+pub(crate) struct Pivot {
+    row: Row,
+    /// `(word, bits)`, in the order of the tail's columns.
+    runs: Vec<(u32, u64)>,
+}
+
+impl Pivot {
+    pub(crate) fn new(row: Row) -> Self {
+        let mut runs: Vec<(u32, u64)> = Vec::new();
+        for &c in &row.cols[1..] {
+            let (w, b) = (c / 64, 1u64 << (c % 64));
+            match runs.last_mut() {
+                Some(r) if r.0 == w => r.1 |= b,
+                _ => runs.push((w, b)),
+            }
+        }
+        Pivot { row, runs }
+    }
+
+    pub(crate) fn into_row(self) -> Row {
+        self.row
+    }
+}
+
 /// A dense accumulator with a bitset of the columns it may be non-zero
 /// in, scanned in ascending order while rows are subtracted. `hi` is the
 /// last bitset word anything was written to, so a scan stops there instead
 /// of at the end of the matrix.
+///
+/// While the matrix is narrow enough that no entry can reach `2⁶⁴`, an entry
+/// is held unreduced (`lazy`): a subtraction adds its product and leaves the
+/// reduction to the read, which goes through [`take`](Acc::take). A column
+/// left holding a multiple of `p` reads as zero there, as it did when every
+/// subtraction reduced.
 pub(crate) struct Acc {
     pub(crate) vals: Vec<u64>,
     pub(crate) bits: Vec<u64>,
     pub(crate) hi: usize,
+    lazy: bool,
 }
 
 impl Acc {
-    pub(crate) fn new(n_cols: usize) -> Self {
+    /// An accumulator for rows of `n_cols` columns over `fp`.
+    ///
+    /// A column starts below `p` and gains at most one product `(p − 1)²`
+    /// from each pivot row subtracted, and a scan meets each column's pivot
+    /// once, at a lead to the left of it: fewer than `n_cols` products. Their
+    /// sum stays below `2⁶⁴` when `n_cols · (p − 1)² + p` does, and any wider
+    /// matrix reduces at every subtraction.
+    pub(crate) fn new(fp: Fp, n_cols: usize) -> Self {
+        let worst = n_cols as u128 * u128::from(fp.p - 1).pow(2) + u128::from(fp.p);
         Acc {
             vals: vec![0; n_cols],
             bits: vec![0; n_cols.div_ceil(64).max(1)],
             hi: 0,
+            lazy: worst < 1 << 64,
         }
     }
 
@@ -895,34 +990,51 @@ impl Acc {
         self.hi = row.cols.last().map_or(0, |&c| c as usize / 64);
     }
 
-    /// Subtract `f · row` (without its lead, which the caller zeroes). New
-    /// columns are always to the right of the lead, so a scan standing on
-    /// the lead's word sees those in its own word through `word`.
+    /// Column `c`, reduced, leaving it zero.
+    #[inline(always)]
+    pub(crate) fn take(&mut self, fp: Fp, c: usize) -> u64 {
+        let v = std::mem::take(&mut self.vals[c]);
+        if self.lazy {
+            fp.reduce(v)
+        } else {
+            v
+        }
+    }
+
+    /// Subtract `f · pivot` (without its lead, which the caller zeroes), for
+    /// `f < p`. The columns written are to the right of the lead, so those
+    /// in the lead's own word, which the caller holds in `word` with the
+    /// accumulator's copy cleared, are collected from the accumulator once
+    /// the row is done.
     #[inline]
     pub(crate) fn sub_tail(
         &mut self,
         fp: Fp,
         f: u64,
-        row: &Row,
+        piv: &Pivot,
         cur_word: usize,
         word: &mut u64,
     ) -> u64 {
         let nf = fp.neg(f);
-        for (&c, &v) in row.cols[1..].iter().zip(&row.vals[1..]) {
-            let ci = c as usize;
-            let x = self.vals[ci] + nf * u64::from(v);
-            self.vals[ci] = fp.reduce(x);
-            let (w, b) = (ci / 64, 1u64 << (ci % 64));
-            if w == cur_word {
-                *word |= b;
-            } else {
-                self.bits[w] |= b;
+        let (cols, vals) = (&piv.row.cols[1..], &piv.row.vals[1..]);
+        if self.lazy {
+            for (&c, &v) in cols.iter().zip(vals) {
+                self.vals[c as usize] += nf * u64::from(v);
+            }
+        } else {
+            for (&c, &v) in cols.iter().zip(vals) {
+                let x = &mut self.vals[c as usize];
+                *x = fp.reduce(*x + nf * u64::from(v));
             }
         }
-        if let Some(&c) = row.cols.last() {
+        for &(w, b) in &piv.runs {
+            self.bits[w as usize] |= b;
+        }
+        *word |= std::mem::take(&mut self.bits[cur_word]);
+        if let Some(&c) = piv.row.cols.last() {
             self.hi = self.hi.max(c as usize / 64);
         }
-        row.cols.len() as u64 - 1
+        cols.len() as u64
     }
 
     /// Move every non-zero entry from word `w` on into `out`, scaled by
@@ -936,12 +1048,26 @@ impl Acc {
                 let b = word.trailing_zeros() as usize;
                 word &= word - 1;
                 let c = w * 64 + b;
-                let v = self.vals[c];
-                self.vals[c] = 0;
+                let v = self.take(fp, c);
                 if v != 0 {
                     out.cols.push(c as u32);
                     out.vals.push(fp.mul(v, scale) as u32);
                 }
+            }
+            w += 1;
+        }
+    }
+
+    /// Leave the accumulator clean from word `w` on, discarding what it
+    /// holds there.
+    pub(crate) fn clear_from(&mut self, w: usize) {
+        let mut w = w;
+        while w <= self.hi {
+            let mut word = std::mem::take(&mut self.bits[w]);
+            while word != 0 {
+                let b = word.trailing_zeros() as usize;
+                word &= word - 1;
+                self.vals[w * 64 + b] = 0;
             }
             w += 1;
         }
@@ -962,8 +1088,8 @@ fn echelon(
     rows.retain(|r| !r.cols.is_empty());
     rows.sort_by_key(|r| (r.cols[0], r.cols.len()));
     let mut pivot_of = vec![NONE; n_cols];
-    let mut pivots: Vec<Row> = Vec::new();
-    let mut acc = Acc::new(n_cols);
+    let mut pivots: Vec<Pivot> = Vec::new();
+    let mut acc = Acc::new(fp, n_cols);
     for (k, row) in rows.into_iter().enumerate() {
         if k % 256 == 0 && deadline.is_some_and(|d| Instant::now() >= d) {
             return None;
@@ -977,10 +1103,10 @@ fn echelon(
                 .map(|&v| fp.mul(u64::from(v), inv) as u32)
                 .collect();
             pivot_of[row.cols[0] as usize] = pivots.len() as u32;
-            pivots.push(Row {
+            pivots.push(Pivot::new(Row {
                 cols: row.cols,
                 vals,
-            });
+            }));
             continue;
         }
         acc.load(&row);
@@ -993,8 +1119,7 @@ fn echelon(
                 let b = word.trailing_zeros() as usize;
                 word &= word - 1;
                 let c = w * 64 + b;
-                let v = acc.vals[c];
-                acc.vals[c] = 0;
+                let v = acc.take(fp, c);
                 if v == 0 {
                     continue;
                 }
@@ -1018,10 +1143,10 @@ fn echelon(
         }
         if let Some(out) = found {
             pivot_of[out.cols[0] as usize] = pivots.len() as u32;
-            pivots.push(out);
+            pivots.push(Pivot::new(out));
         }
     }
-    Some(pivots)
+    Some(pivots.into_iter().map(Pivot::into_row).collect())
 }
 
 /// `acc += a · b` with lazy reduction: every entry stays below `2⁶³`
@@ -1756,12 +1881,58 @@ struct RowDesc {
     /// The product's leading monomial and number of terms.
     lead: Mono,
     len: u32,
+    /// Where the product itself is held in the step's [`ProductCache`], or
+    /// [`NONE`] when it is not and must be formed again.
+    at: u32,
+}
+
+/// The most terms a step keeps of the products its symbolic preprocessing
+/// forms. A term costs twenty bytes (a `u128` monomial and a `u32`
+/// coefficient), so the cache is at most 80 MiB however large the step,
+/// small beside the working set of the steps whose products do not fit in
+/// memory together, which is why a row is formed on demand at all. A product
+/// that would pass the limit is not kept and is formed again when its row is
+/// eliminated.
+const PRODUCT_CACHE_TERMS: usize = 1 << 22;
+
+/// The products a step's scan has formed, one after another, so that the
+/// elimination reads each row back instead of multiplying again. A row is
+/// eliminated once, and the products are deterministic: a cached row is the
+/// row the product would give.
+#[derive(Default)]
+struct ProductCache {
+    monos: Vec<Mono>,
+    coefs: Vec<u32>,
+    /// Terms this cache may hold.
+    limit: usize,
+}
+
+impl ProductCache {
+    fn new(limit: usize) -> Self {
+        ProductCache {
+            // A position is a `u32` below `NONE`.
+            limit: limit.min(NONE as usize - 1),
+            ..Default::default()
+        }
+    }
+
+    /// Keeps `p` if the cache has room for it: its position, else [`NONE`].
+    fn keep(&mut self, p: &RPoly) -> u32 {
+        if self.monos.len() + p.len() > self.limit {
+            return NONE;
+        }
+        let at = self.monos.len() as u32;
+        self.monos.extend_from_slice(&p.monos);
+        self.coefs.extend_from_slice(&p.coefs);
+        at
+    }
 }
 
 /// Forms the products `mult · polys[g]` of `todo` a batch at a time and
 /// records each non-empty one in `out`. Every monomial of a product, past
-/// its first `skip`, that `examined` has not seen joins `frontier`. The
-/// products themselves are dropped. Returns the number of terms formed.
+/// its first `skip`, that `examined` has not seen joins `frontier`. A product
+/// is kept in `cache` while it has room and dropped otherwise. Returns the
+/// number of terms formed.
 #[allow(clippy::too_many_arguments)]
 fn scan_products(
     ring: &TowerRing,
@@ -1772,6 +1943,7 @@ fn scan_products(
     out: &mut Vec<RowDesc>,
     examined: &mut MonoMap<()>,
     frontier: &mut Vec<Mono>,
+    cache: &mut ProductCache,
 ) -> u64 {
     let mut terms = 0u64;
     for batch in todo.chunks(1024) {
@@ -1787,6 +1959,7 @@ fn scan_products(
                 g,
                 lead,
                 len: p.len() as u32,
+                at: cache.keep(p),
             });
             for &m in p.monos.iter().skip(skip) {
                 if examined.insert(m, ()).is_none() {
@@ -1803,6 +1976,17 @@ fn scan_products(
 /// **F4 on `R`** for the ideal generated by `input` (tower normal forms),
 /// with the normal selection strategy. See the module notes.
 pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> TowerF4Report {
+    f4_tower_cached(input, ring, opts, PRODUCT_CACHE_TERMS)
+}
+
+/// [`f4_tower`] with a step keeping at most `cache_terms` terms of its
+/// products (see [`ProductCache`]). The result does not depend on it.
+fn f4_tower_cached(
+    input: &[RPoly],
+    ring: &TowerRing,
+    opts: &TowerF4Options,
+    cache_terms: usize,
+) -> TowerF4Report {
     ring.check();
     let started = Instant::now();
     let fp = Fp::new(ring.p);
@@ -1955,11 +2139,13 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
         // Symbolic preprocessing, one frontier at a time. A row is kept as
         // the product that makes it and formed again when it is eliminated:
         // the products of a large step do not fit in memory together, their
-        // monomials do.
+        // monomials do. The first `cache_terms` terms of products are kept
+        // as well, and the elimination reads those back.
         let mut examined: MonoMap<()> = lcm_cols.clone();
         let mut no_divisor: MonoMap<()> = MonoMap::default();
         let mut frontier: Vec<Mono> = Vec::new();
         let mut s_desc: Vec<RowDesc> = Vec::with_capacity(jobs.len());
+        let mut cache = ProductCache::new(cache_terms);
         let mut nnz = scan_products(
             ring,
             fp,
@@ -1969,6 +2155,7 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
             &mut s_desc,
             &mut examined,
             &mut frontier,
+            &mut cache,
         );
         let mut r_desc: Vec<RowDesc> = Vec::new();
         let mut aborted = false;
@@ -2001,6 +2188,7 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
                 &mut r_desc,
                 &mut examined,
                 &mut frontier,
+                &mut cache,
             );
             debug_assert!(
                 r_desc[before..]
@@ -2083,6 +2271,13 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
         );
         let polys = &s.polys;
         let form = |d: &RowDesc| -> Row {
+            if d.at != NONE {
+                let at = d.at as usize..d.at as usize + d.len as usize;
+                return Row {
+                    cols: cache.monos[at.clone()].iter().map(|m| col_of[m]).collect(),
+                    vals: cache.coefs[at].to_vec(),
+                };
+            }
             let p = ring.mul_elem(fp, &polys[d.g as usize], d.mult);
             debug_assert_eq!(
                 p.len(),
@@ -2123,6 +2318,8 @@ pub fn f4_tower(input: &[RPoly], ring: &TowerRing, opts: &TowerF4Options) -> Tow
             opts.full_rank_exit,
             &mut st,
         );
+        // Nothing reads the cached products past the elimination.
+        drop(cache);
         tr.muladds = st.muladds;
         rep.muladds += st.muladds;
         tr.residual_rows = st.residual_rows;
@@ -3223,5 +3420,536 @@ mod tests {
             STOPS.load(AtomicOrdering::Relaxed),
             in_elimination + in_preprocessing + dense_only
         );
+    }
+
+    /// `Fp::reduce` is the remainder for every `x < 2⁶⁴`, at the edges of
+    /// each multiple of `p` as well as at random.
+    #[test]
+    fn reduce_is_the_remainder() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(61);
+        for &p in &[
+            3u64,
+            5,
+            97,
+            786433,
+            (1 << 31) - 1,
+            (1 << 31) + 11,
+            4294967291,
+            4294967295,
+        ] {
+            let f = fp(p);
+            let mut xs = vec![0, 1, p - 1, p, p + 1, u64::MAX, u64::MAX - 1, u64::MAX - p];
+            for _ in 0..2000 {
+                let k = rng.gen_range(0..=u64::MAX / p);
+                xs.extend([k * p, (k * p).saturating_sub(1), rng.gen::<u64>()]);
+            }
+            for x in xs {
+                assert_eq!(f.reduce(x), x % p, "p = {p}, x = {x}");
+            }
+        }
+    }
+
+    /// The product of a polynomial and a monomial, formed by sorting every
+    /// term's product together, as it was before the terms that carry were
+    /// told from the ones that do not.
+    fn product_by_full_sort(ring: &TowerRing, f: Fp, g: &RPoly, u: Mono) -> (RPoly, usize) {
+        let (mu, fu) = (mask_of(u), free_of(u));
+        let mut terms = Vec::new();
+        let mut tmp = Vec::new();
+        for (&m, &c) in g.monos.iter().zip(&g.coefs) {
+            let free = add_free(free_of(m), fu);
+            tmp.clear();
+            ring.mask_product_into(
+                f,
+                mask_of(m),
+                mu,
+                u64::from(c),
+                &mut tmp,
+                &mut MaskScratch::default(),
+            );
+            terms.extend(tmp.iter().map(|&(x, cc)| (mono(x, free), cc)));
+        }
+        let before = terms.len();
+        (RPoly::from_terms(f, terms), before)
+    }
+
+    /// Merging the plain terms with the sorted carried ones is `from_terms`
+    /// of all of them: on general and Kummer towers, over small and large
+    /// primes, with repeated monomials and cancelling sums.
+    #[test]
+    fn a_product_merges_plain_and_carried_terms_like_a_full_sort() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(31);
+        let (mut mixed, mut merged, mut cancelled) = (0, 0, 0);
+        for &p in &[3u64, 7, 97, 1_000_003, 4294967291] {
+            let f = fp(p);
+            for trial in 0..120 {
+                let ring = random_ring(&mut rng, p, 2, 4, 2, trial % 2 == 0);
+                let (n, nt) = (ring.n_vars(), ring.n_tower());
+                let exps = |rng: &mut rand::rngs::StdRng, density: f64| -> Vec<u32> {
+                    (0..n)
+                        .map(|i| {
+                            if !rng.gen_bool(density) {
+                                0
+                            } else if i < nt {
+                                1
+                            } else {
+                                rng.gen_range(1..3)
+                            }
+                        })
+                        .collect()
+                };
+                let raw: Vec<(Vec<u32>, u64)> = (0..rng.gen_range(1..16))
+                    .map(|_| (exps(&mut rng, 0.4), rng.gen_range(1..p)))
+                    .collect();
+                let g = ring.from_raw(&raw);
+                let density = rng.gen_range(0.05..0.8);
+                let u = key_of(&exps(&mut rng, density), nt);
+                let (want, before) = product_by_full_sort(&ring, f, &g, u);
+                assert_eq!(ring.mul_mono(&g, u), want, "p = {p}, trial {trial}");
+                let carries = g.monos.iter().any(|&m| mask_of(m) & mask_of(u) != 0);
+                let plain = g.monos.iter().any(|&m| mask_of(m) & mask_of(u) == 0);
+                mixed += usize::from(carries && plain);
+                merged += usize::from(want.len() < before);
+                cancelled += usize::from(want.len() + 2 <= before);
+            }
+        }
+        assert!(
+            mixed > 100 && merged > 100 && cancelled > 50,
+            "the cases that merge were not reached: {mixed} {merged} {cancelled}"
+        );
+    }
+
+    /// The counters and basis of a run, and its trace without the timings.
+    fn the_run(r: &TowerF4Report) -> (Vec<RPoly>, Vec<u64>, serde_json::Value) {
+        let mut trace = serde_json::to_value(&r.trace).unwrap();
+        for step in trace.as_array_mut().unwrap() {
+            step.as_object_mut()
+                .unwrap()
+                .retain(|k, _| !k.starts_with("ms"));
+        }
+        let counters = vec![
+            u64::from(r.inconsistent),
+            u64::from(r.degree_reached),
+            u64::from(r.solving_degree_max),
+            u64::from(r.last_productive_degree),
+            r.max_cols_to_solution as u64,
+            r.steps_to_solution as u64,
+            r.steps as u64,
+            r.max_rows as u64,
+            r.max_cols as u64,
+            r.max_nnz,
+            r.max_residual_rows as u64,
+            r.max_dense_entries,
+            r.muladds,
+            r.critical_pairs_reduced,
+            r.tower_pairs_reduced,
+            r.pairs_product_skipped,
+            r.pairs_chain_skipped,
+            r.reducer_rows,
+            r.pairs_above_bound as u64,
+            r.staircase_at_stop.map_or(u64::MAX, |c| c as u64),
+            u64::from(r.timed_out),
+            u64::from(r.oversize),
+        ];
+        (r.basis.clone(), counters, trace)
+    }
+
+    /// A step keeps the products it formed while they fit the cache and
+    /// forms the rest again: with no room, with room for some rows only and
+    /// with room for all, the run is the same, to the last counter.
+    #[test]
+    fn the_run_does_not_depend_on_the_product_cache() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(73);
+        let limits = [0, 1, 25, 400, 6000, 100_000, usize::MAX];
+        let mut big_runs = 0;
+        for trial in 0..14 {
+            let (ring, input, max_degree) = if trial % 2 == 0 {
+                // Two Kummer towers and a biquadratic in their first levels.
+                let p = 97u64;
+                let t = 3 + trial / 8;
+                let (r0, pts) = kummer_block(p, t, 0);
+                let (r1, _) = kummer_block(p, t, t);
+                let ring = TowerRing {
+                    p,
+                    rules: [r0, r1].concat(),
+                    n_free: 0,
+                };
+                let x = [pts[rng.gen_range(0..pts.len())].clone(), pts[0].clone()].concat();
+                let plant = (trial % 4 == 0).then_some(&x[..]);
+                let g = biquadratic(&mut rng, &ring, t, plant);
+                (ring, vec![g], 64)
+            } else {
+                // A general tower, a free variable and several generators.
+                let p = 1_000_003u64;
+                let ring = random_ring(&mut rng, p, 2, 2 + trial % 3, trial % 3, true);
+                let n = ring.n_vars();
+                let input: Vec<RPoly> = (0..1 + trial % 3)
+                    .map(|_| {
+                        let raw: Vec<(Vec<u32>, u64)> = (0..5)
+                            .map(|_| {
+                                let mut left = 3u32;
+                                let e: Vec<u32> = (0..n)
+                                    .map(|_| {
+                                        if left > 0 && rng.gen_range(0..3) == 0 {
+                                            left -= 1;
+                                            1
+                                        } else {
+                                            0
+                                        }
+                                    })
+                                    .collect();
+                                (e, rng.gen_range(1..p))
+                            })
+                            .collect();
+                        ring.from_raw(&raw)
+                    })
+                    .collect();
+                (ring, input, 40)
+            };
+            let opts = TowerF4Options::new(max_degree);
+            let want = the_run(&f4_tower_cached(&input, &ring, &opts, usize::MAX));
+            for &limit in &limits {
+                let got = the_run(&f4_tower_cached(&input, &ring, &opts, limit));
+                assert_eq!(got, want, "trial {trial}, cache of {limit} terms");
+            }
+            let full = f4_tower_cached(&input, &ring, &opts, usize::MAX);
+            big_runs += usize::from(full.max_nnz > 400);
+        }
+        assert!(
+            big_runs >= 4,
+            "too few runs have steps larger than the small caches: {big_runs}"
+        );
+    }
+
+    #[test]
+    fn the_product_cache_keeps_what_fits_and_nothing_else() {
+        let poly = |k: usize| RPoly {
+            monos: (0..k).map(|i| mono(0, [(k - i) as u8, 0, 0, 0])).collect(),
+            coefs: vec![1; k],
+        };
+        let mut c = ProductCache::new(10);
+        assert_eq!(c.keep(&poly(4)), 0);
+        assert_eq!(c.keep(&poly(7)), NONE, "one past the room left");
+        assert_eq!(c.keep(&poly(6)), 4, "an exact fit");
+        assert_eq!(c.keep(&poly(1)), NONE, "full");
+        assert_eq!(
+            c.keep(&RPoly::default()),
+            10,
+            "an empty product always fits"
+        );
+        assert_eq!(c.monos.len(), 10);
+        assert_eq!(c.coefs.len(), 10);
+        assert_eq!(c.monos[4..6], poly(6).monos[..2]);
+        // No limit still leaves `NONE` unused as a position.
+        assert_eq!(ProductCache::new(usize::MAX).limit, NONE as usize - 1);
+        assert_eq!(ProductCache::new(0).keep(&poly(1)), NONE);
+    }
+
+    /// Every sparse row ascending, with entries below `p`, over `n_cols`
+    /// columns: `lead` first, then each later column with probability
+    /// `density`.
+    fn random_sparse_row(
+        rng: &mut rand::rngs::StdRng,
+        p: u64,
+        n_cols: usize,
+        lead: usize,
+        density: f64,
+    ) -> Row {
+        use rand::Rng;
+        let mut row = Row {
+            cols: vec![lead as u32],
+            vals: vec![rng.gen_range(1..p) as u32],
+        };
+        for c in lead + 1..n_cols {
+            if rng.gen_bool(density) {
+                row.cols.push(c as u32);
+                row.vals.push(rng.gen_range(1..p) as u32);
+            }
+        }
+        row
+    }
+
+    /// [`echelon`] by dense, exact arithmetic: the same rows in the same
+    /// order, each reduced at its lead and kept as it stands past a new one.
+    /// Returns the pivots and the multiply-adds.
+    fn dense_echelon(p: u64, mut rows: Vec<Row>, n_cols: usize) -> (Vec<Row>, u64) {
+        let f = fp(p);
+        rows.retain(|r| !r.cols.is_empty());
+        rows.sort_by_key(|r| (r.cols[0], r.cols.len()));
+        let mut pivot_of = vec![NONE; n_cols];
+        let mut pivots: Vec<Row> = Vec::new();
+        let mut work = 0u64;
+        for row in rows {
+            let mut v = vec![0u64; n_cols];
+            for (&c, &x) in row.cols.iter().zip(&row.vals) {
+                v[c as usize] = u64::from(x);
+            }
+            for c in row.cols[0] as usize..n_cols {
+                if v[c] == 0 {
+                    continue;
+                }
+                let q = pivot_of[c];
+                if q != NONE {
+                    let a = v[c];
+                    v[c] = 0;
+                    let piv = &pivots[q as usize];
+                    for (&cc, &x) in piv.cols[1..].iter().zip(&piv.vals[1..]) {
+                        let sub = a * u64::from(x) % p;
+                        v[cc as usize] = (v[cc as usize] + p - sub) % p;
+                    }
+                    work += piv.cols.len() as u64 - 1;
+                    continue;
+                }
+                let inv = f.inv(v[c]);
+                let mut out = Row {
+                    cols: vec![c as u32],
+                    vals: vec![1],
+                };
+                for (cc, &x) in v.iter().enumerate().skip(c + 1) {
+                    if x != 0 {
+                        out.cols.push(cc as u32);
+                        out.vals
+                            .push((u128::from(x) * u128::from(inv) % u128::from(p)) as u32);
+                    }
+                }
+                pivot_of[c] = pivots.len() as u32;
+                pivots.push(out);
+                break;
+            }
+        }
+        (pivots, work)
+    }
+
+    /// A pivot lists exactly the bitset words its tail has columns in, with
+    /// the bits of those columns, whatever the order and the density.
+    #[test]
+    fn a_pivot_lists_the_words_its_tail_touches() {
+        use rand::seq::SliceRandom;
+        use rand::{Rng, SeedableRng};
+        use std::collections::BTreeMap;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(83);
+        for _ in 0..300 {
+            let n = rng.gen_range(1..700usize);
+            let density = rng.gen_range(0.01..1.0);
+            let mut row = random_sparse_row(&mut rng, 97, n, 0, density);
+            if rng.gen_bool(0.3) {
+                // The list does not rely on the columns being ascending.
+                row.cols[1..].shuffle(&mut rng);
+            }
+            let mut want: BTreeMap<u32, u64> = BTreeMap::new();
+            for &c in &row.cols[1..] {
+                *want.entry(c / 64).or_insert(0) |= 1u64 << (c % 64);
+            }
+            let piv = Pivot::new(row);
+            let mut got: BTreeMap<u32, u64> = BTreeMap::new();
+            for &(w, b) in &piv.runs {
+                *got.entry(w).or_insert(0) |= b;
+            }
+            assert_eq!(got, want);
+            assert!(piv.runs.iter().all(|&(_, b)| b != 0));
+        }
+    }
+
+    /// The columns at which the accumulator turns lazy: `n_cols · (p − 1)² +
+    /// p < 2⁶⁴`, at the last width that holds and the first that does not.
+    #[test]
+    fn the_lazy_accumulator_guard_is_exact() {
+        for &p in &[
+            3u64, 97, 786433, 469762049, 998244353, 2013265921, 4294967291,
+        ] {
+            let f = fp(p);
+            let sq = u128::from(p - 1).pow(2);
+            let n_max = ((1u128 << 64) - 1 - u128::from(p)) / sq;
+            if n_max > 4096 {
+                assert!(Acc::new(f, 4096).lazy, "p = {p}");
+                continue;
+            }
+            let n = n_max as usize;
+            assert!(n as u128 * sq + u128::from(p) < 1 << 64);
+            assert!((n as u128 + 1) * sq + u128::from(p) >= 1 << 64);
+            assert!(Acc::new(f, n).lazy, "p = {p}, {n} columns");
+            assert!(!Acc::new(f, n + 1).lazy, "p = {p}, {} columns", n + 1);
+        }
+    }
+
+    /// The largest value a column can reach: every pivot row full of `p − 1`,
+    /// every multiplier `p − 1`, at the widest lazy matrix. The sum is held
+    /// exactly, and reads as its remainder.
+    #[test]
+    fn a_lazy_column_at_the_guard_holds_the_exact_sum() {
+        for &p in &[786433u64, 469762049, 998244353, 2013265921, 4294967291] {
+            let f = fp(p);
+            let sq = u128::from(p - 1).pow(2);
+            let n = (((1u128 << 64) - 1 - u128::from(p)) / sq).min(700) as usize;
+            let mut acc = Acc::new(f, n);
+            assert!(acc.lazy, "p = {p}");
+            let start = Row {
+                cols: (0..n as u32).collect(),
+                vals: vec![(p - 1) as u32; n],
+            };
+            acc.load(&start);
+            let mut want = vec![u128::from(p - 1); n];
+            for lead in 0..n {
+                let row = Row {
+                    cols: (lead as u32..n as u32).collect(),
+                    vals: vec![(p - 1) as u32; n - lead],
+                };
+                let mut word = 0u64;
+                acc.sub_tail(f, 1, &Pivot::new(row), lead / 64, &mut word);
+                for w in &mut want[lead + 1..] {
+                    *w += sq;
+                }
+            }
+            let top = *want.iter().max().unwrap();
+            assert!(top < 1 << 64, "p = {p}: the guard let a sum pass 2^64");
+            for (c, &w) in want.iter().enumerate() {
+                assert_eq!(u128::from(acc.vals[c]), w, "p = {p}, column {c}");
+                assert_eq!(
+                    u128::from(acc.take(f, c)),
+                    w % u128::from(p),
+                    "p = {p}, column {c}"
+                );
+            }
+        }
+    }
+
+    /// A column that holds a multiple of `p` reads as zero: not pushed out
+    /// by a drain, and not a pivot candidate for a scan.
+    #[test]
+    fn a_multiple_of_p_in_a_lazy_column_reads_as_zero() {
+        let p = 786433u64;
+        let f = fp(p);
+        let mut acc = Acc::new(f, 3);
+        assert!(acc.lazy);
+        // Column 1 starts at 5; subtracting 7 · row[1] with v chosen so that
+        // 5 + (p − 7)·v ≡ 0 leaves the raw value 5 + (p − 7)·v, a multiple of
+        // p that is not zero.
+        let v = f.mul(p - 5, f.inv(p - 7));
+        let lead = Row {
+            cols: vec![0, 1, 2],
+            vals: vec![1, v as u32, 3],
+        };
+        acc.load(&Row {
+            cols: vec![0, 1],
+            vals: vec![7, 5],
+        });
+        let mut word = 0;
+        acc.take(f, 0);
+        acc.bits[0] = 0;
+        acc.sub_tail(f, 7, &Pivot::new(lead), 0, &mut word);
+        assert_ne!(acc.vals[1], 0, "the raw value is a multiple of p, not 0");
+        assert_eq!(acc.vals[1] % p, 0);
+        assert_eq!(word, 0b110);
+        acc.bits[0] = word;
+        let mut out = Row::default();
+        acc.drain_from(f, 0, 1, &mut out);
+        assert_eq!(out.cols, vec![2], "column 1 reads as zero");
+        assert_eq!(out.vals, vec![f.mul(3, p - 7) as u32]);
+        assert!(acc.vals.iter().all(|&x| x == 0) && acc.bits.iter().all(|&b| b == 0));
+    }
+
+    /// [`Acc::clear_from`] leaves the accumulator as a drain does.
+    #[test]
+    fn clearing_the_accumulator_leaves_it_clean() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(81);
+        for &p in &[97u64, 4294967291] {
+            let f = fp(p);
+            for _ in 0..30 {
+                let n = rng.gen_range(1..400usize);
+                let mut acc = Acc::new(f, n);
+                let row = random_sparse_row(&mut rng, p, n, 0, 0.3);
+                acc.load(&row);
+                for _ in 0..4 {
+                    let lead = rng.gen_range(0..n);
+                    let pivot = random_sparse_row(&mut rng, p, n, lead, 0.3);
+                    let mut word = 0;
+                    acc.sub_tail(
+                        f,
+                        rng.gen_range(1..p),
+                        &Pivot::new(pivot),
+                        lead / 64,
+                        &mut word,
+                    );
+                    acc.bits[lead / 64] |= word;
+                }
+                acc.clear_from(0);
+                assert!(acc.vals.iter().all(|&x| x == 0), "p = {p}");
+                assert!(acc.bits.iter().all(|&b| b == 0), "p = {p}");
+            }
+        }
+    }
+
+    /// The accumulator, lazy or not, echelonizes as exact arithmetic does:
+    /// the same pivots, entry for entry, and the same count of multiply-adds,
+    /// at widths on both sides of the guard.
+    #[test]
+    fn an_accumulator_echelon_matches_dense_exact_arithmetic() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(97);
+        let (mut lazy_runs, mut eager_runs, mut cancelled) = (0, 0, 0u64);
+        for (p, widths) in [
+            (3u64, vec![150usize, 330]),
+            (5, vec![200]),
+            (97, vec![64, 301]),
+            (786433, vec![190, 400]),
+            (469762049, vec![83, 84, 130]),
+            (998244353, vec![18, 19, 70]),
+            (2013265921, vec![4, 5, 90]),
+            (4294967291, vec![1, 2, 60]),
+        ] {
+            let f = fp(p);
+            for &n_cols in &widths {
+                for round in 0..5 {
+                    let density = [0.9, 0.5, 0.2, 0.05, 1.0][round];
+                    let n_rows = rng.gen_range(n_cols / 2 + 1..2 * n_cols + 2);
+                    let mut rows: Vec<Row> = Vec::new();
+                    for _ in 0..n_rows {
+                        let lead = rng.gen_range(0..n_cols);
+                        rows.push(random_sparse_row(&mut rng, p, n_cols, lead, density));
+                    }
+                    // Rows that are sums of earlier ones: cancellations.
+                    for _ in 0..n_rows / 4 {
+                        let (a, b) = (rng.gen_range(0..rows.len()), rng.gen_range(0..rows.len()));
+                        let mut v = vec![0u64; n_cols];
+                        for r in [&rows[a], &rows[b]] {
+                            for (&c, &x) in r.cols.iter().zip(&r.vals) {
+                                v[c as usize] = (v[c as usize] + u64::from(x)) % p;
+                            }
+                        }
+                        let sum = Row {
+                            cols: (0..n_cols as u32).filter(|&c| v[c as usize] != 0).collect(),
+                            vals: v.iter().filter(|&&x| x != 0).map(|&x| x as u32).collect(),
+                        };
+                        if !sum.cols.is_empty() {
+                            rows.push(sum);
+                        }
+                    }
+                    let (want, want_work) = dense_echelon(p, rows.clone(), n_cols);
+                    let mut work = 0u64;
+                    let got = echelon(f, rows, n_cols, &mut work, None).unwrap();
+                    assert_eq!(work, want_work, "p = {p}, {n_cols} columns, round {round}");
+                    assert_eq!(
+                        got.len(),
+                        want.len(),
+                        "p = {p}, {n_cols} columns, round {round}"
+                    );
+                    for (g, w) in got.iter().zip(&want) {
+                        assert_eq!(g.cols, w.cols, "p = {p}, {n_cols} columns, round {round}");
+                        assert_eq!(g.vals, w.vals, "p = {p}, {n_cols} columns, round {round}");
+                    }
+                    cancelled += (n_rows as u64).saturating_sub(want.len() as u64);
+                    if Acc::new(f, n_cols).lazy {
+                        lazy_runs += 1;
+                    } else {
+                        eager_runs += 1;
+                    }
+                }
+            }
+        }
+        assert!(lazy_runs > 20 && eager_runs > 20 && cancelled > 100);
     }
 }
