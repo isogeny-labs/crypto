@@ -56,8 +56,8 @@
 //! - **Rows are formed on demand.** A row is kept as the product that makes
 //!   it and formed again, a block at a time, when it is eliminated, so a
 //!   step's memory is `B'` rather than the matrix. The scan keeps the
-//!   products it forms for the elimination to read back, up to `2²²` terms a
-//!   step (80 MiB); the rest of a larger step is formed again.
+//!   products it forms for the elimination to read back, up to `2²³` terms a
+//!   step (64 MiB); the rest of a larger step is formed again.
 //! - **The basis keeps the echelon's rows.** A new element is the pivot row
 //!   the elimination leaves, dense over the step's columns without a divisor
 //!   from its lead on, and the elements a step adds share that column list:
@@ -494,6 +494,12 @@ impl TowerRing {
         u: Mono,
     ) -> RPoly {
         let (mu, fu) = (mask_of(u), free_of(u));
+        // When `u` has no free variable, the key of a plain product is the
+        // key of the term plus a constant: the degree rises by that of `u`,
+        // the complemented mask loses `mu` (the masks are disjoint, so those
+        // bits are set in it and nothing borrows) and the free bytes stay.
+        let plain_shift =
+            (fu == [0; MAX_FREE]).then(|| (u128::from(degree_of(u)) << DEG_SHIFT) - u128::from(mu));
         // A term that shares no tower variable with `u` is a plain product,
         // injective and order-preserving: those terms stay distinct and
         // descending, and go straight into the result. Only the terms that
@@ -505,11 +511,14 @@ impl TowerRing {
         let mut scratch = MaskScratch::default();
         for (m, c) in g {
             let mm = mask_of(m);
-            let f = add_free(free_of(m), fu);
             if mm & mu == 0 {
-                monos.push(mono(mm | mu, f));
+                monos.push(match plain_shift {
+                    Some(shift) => m + shift,
+                    None => mono(mm | mu, add_free(free_of(m), fu)),
+                });
                 coefs.push(c);
             } else {
+                let f = add_free(free_of(m), fu);
                 tmp.clear();
                 self.mask_product_into(fp, mm, mu, u64::from(c), &mut tmp, &mut scratch);
                 carried.extend(tmp.iter().map(|&(x, cc)| (mono(x, f), cc)));
@@ -1887,21 +1896,26 @@ struct RowDesc {
 }
 
 /// The most terms a step keeps of the products its symbolic preprocessing
-/// forms. A term costs twenty bytes (a `u128` monomial and a `u32`
-/// coefficient), so the cache is at most 80 MiB however large the step,
+/// forms. A term costs eight bytes (a `u32` column number and a `u32`
+/// coefficient), so the cache is at most 64 MiB however large the step,
 /// small beside the working set of the steps whose products do not fit in
 /// memory together, which is why a row is formed on demand at all. A product
 /// that would pass the limit is not kept and is formed again when its row is
 /// eliminated.
-const PRODUCT_CACHE_TERMS: usize = 1 << 22;
+const PRODUCT_CACHE_TERMS: usize = 1 << 23;
 
 /// The products a step's scan has formed, one after another, so that the
 /// elimination reads each row back instead of multiplying again. A row is
 /// eliminated once, and the products are deterministic: a cached row is the
 /// row the product would give.
+///
+/// A term is kept as the number its monomial was given when the scan first
+/// met it (the value of `examined`), not as the monomial: the columns are
+/// not known until the scan is over, and a number is turned into its column
+/// by an array read where a monomial needs a hash lookup.
 #[derive(Default)]
 struct ProductCache {
-    monos: Vec<Mono>,
+    ids: Vec<u32>,
     coefs: Vec<u32>,
     /// Terms this cache may hold.
     limit: usize,
@@ -1916,23 +1930,55 @@ impl ProductCache {
         }
     }
 
-    /// Keeps `p` if the cache has room for it: its position, else [`NONE`].
-    fn keep(&mut self, p: &RPoly) -> u32 {
-        if self.monos.len() + p.len() > self.limit {
-            return NONE;
-        }
-        let at = self.monos.len() as u32;
-        self.monos.extend_from_slice(&p.monos);
-        self.coefs.extend_from_slice(&p.coefs);
+    /// Whether a product of `terms` terms fits.
+    fn has_room(&self, terms: usize) -> bool {
+        self.ids.len() + terms <= self.limit
+    }
+
+    /// Keeps a product, which must fit: its position.
+    fn keep(&mut self, ids: &[u32], coefs: &[u32]) -> u32 {
+        debug_assert!(self.has_room(ids.len()) && ids.len() == coefs.len());
+        let at = self.ids.len() as u32;
+        self.ids.extend_from_slice(ids);
+        self.coefs.extend_from_slice(coefs);
         at
     }
 }
 
+/// The number `examined` holds for `m`: a monomial is numbered when it is
+/// first met, in order of arrival, and then joins `frontier`.
+#[inline]
+pub(crate) fn number_of(examined: &mut MonoMap<u32>, frontier: &mut Vec<Mono>, m: Mono) -> u32 {
+    let next = examined.len() as u32;
+    *examined.entry(m).or_insert_with(|| {
+        frontier.push(m);
+        next
+    })
+}
+
+/// The columns of a matrix over the monomials of `examined`, numbered as
+/// [`number_of`] does: the monomials, descending (column `i` is `cols[i]`),
+/// and the column of each number.
+pub(crate) fn order_columns(examined: &MonoMap<u32>) -> (Vec<Mono>, Vec<u32>) {
+    let mut numbered: Vec<(Mono, u32)> = examined.iter().map(|(&m, &n)| (m, n)).collect();
+    numbered.par_sort_unstable_by(|a, b| b.0.cmp(&a.0));
+    let mut col_of_number = vec![0u32; numbered.len()];
+    for (i, &(_, n)) in numbered.iter().enumerate() {
+        col_of_number[n as usize] = i as u32;
+    }
+    (
+        numbered.into_iter().map(|(m, _)| m).collect(),
+        col_of_number,
+    )
+}
+
 /// Forms the products `mult · polys[g]` of `todo` a batch at a time and
 /// records each non-empty one in `out`. Every monomial of a product, past
-/// its first `skip`, that `examined` has not seen joins `frontier`. A product
-/// is kept in `cache` while it has room and dropped otherwise. Returns the
-/// number of terms formed.
+/// its first `skip`, that `examined` has not seen joins `frontier` and is
+/// numbered there, in order of arrival. A product is kept in `cache` while it
+/// has room and dropped otherwise. Returns the number of terms formed.
+///
+/// The first `skip` monomials are ones `examined` has seen.
 #[allow(clippy::too_many_arguments)]
 fn scan_products(
     ring: &TowerRing,
@@ -1941,11 +1987,12 @@ fn scan_products(
     todo: &[(Mono, u32)],
     skip: usize,
     out: &mut Vec<RowDesc>,
-    examined: &mut MonoMap<()>,
+    examined: &mut MonoMap<u32>,
     frontier: &mut Vec<Mono>,
     cache: &mut ProductCache,
 ) -> u64 {
     let mut terms = 0u64;
+    let mut ids: Vec<u32> = Vec::new();
     for batch in todo.chunks(1024) {
         let prods: Vec<RPoly> = batch
             .par_iter()
@@ -1954,18 +2001,28 @@ fn scan_products(
         for (&(mult, g), p) in batch.iter().zip(&prods) {
             let Some(lead) = p.lm() else { continue };
             terms += p.len() as u64;
+            let keep = cache.has_room(p.len());
+            ids.clear();
+            if keep {
+                ids.extend(p.monos.iter().take(skip).map(|m| examined[m]));
+            }
+            for &m in p.monos.iter().skip(skip) {
+                let id = number_of(examined, frontier, m);
+                if keep {
+                    ids.push(id);
+                }
+            }
             out.push(RowDesc {
                 mult,
                 g,
                 lead,
                 len: p.len() as u32,
-                at: cache.keep(p),
+                at: if keep {
+                    cache.keep(&ids, &p.coefs)
+                } else {
+                    NONE
+                },
             });
-            for &m in p.monos.iter().skip(skip) {
-                if examined.insert(m, ()).is_none() {
-                    frontier.push(m);
-                }
-            }
         }
     }
     terms
@@ -2141,7 +2198,13 @@ fn f4_tower_cached(
         // the products of a large step do not fit in memory together, their
         // monomials do. The first `cache_terms` terms of products are kept
         // as well, and the elimination reads those back.
-        let mut examined: MonoMap<()> = lcm_cols.clone();
+        // Every monomial the matrix will have a column for, each with the
+        // number it was first met under: the lcm columns first.
+        let mut examined: MonoMap<u32> = lcm_cols
+            .keys()
+            .enumerate()
+            .map(|(i, &m)| (m, i as u32))
+            .collect();
         let mut no_divisor: MonoMap<()> = MonoMap::default();
         let mut frontier: Vec<Mono> = Vec::new();
         let mut s_desc: Vec<RowDesc> = Vec::with_capacity(jobs.len());
@@ -2220,14 +2283,14 @@ fn f4_tower_cached(
         rep.reducer_rows += r_desc.len() as u64;
 
         // Columns, descending.
-        let mut cols: Vec<Mono> = examined.keys().copied().collect();
-        drop(examined);
-        cols.par_sort_unstable_by(|a, b| b.cmp(a));
-        let col_of: MonoMap<u32> = cols
-            .iter()
-            .enumerate()
-            .map(|(i, &m)| (m, i as u32))
-            .collect();
+        let (cols, col_of_id) = order_columns(&examined);
+        // The map of the scan becomes the column map: each monomial's number
+        // is replaced by its column. The numbers kept in the cache are turned
+        // into columns by `col_of_id`.
+        let mut col_of = examined;
+        for c in col_of.values_mut() {
+            *c = col_of_id[*c as usize];
+        }
         let n_cols = cols.len();
         let mut pivot_of = vec![NONE; n_cols];
         let mut piv: Vec<RowDesc> = r_desc;
@@ -2274,7 +2337,10 @@ fn f4_tower_cached(
             if d.at != NONE {
                 let at = d.at as usize..d.at as usize + d.len as usize;
                 return Row {
-                    cols: cache.monos[at.clone()].iter().map(|m| col_of[m]).collect(),
+                    cols: cache.ids[at.clone()]
+                        .iter()
+                        .map(|&id| col_of_id[id as usize])
+                        .collect(),
                     vals: cache.coefs[at].to_vec(),
                 };
             }
@@ -2320,6 +2386,7 @@ fn f4_tower_cached(
         );
         // Nothing reads the cached products past the elimination.
         drop(cache);
+        drop(col_of_id);
         tr.muladds = st.muladds;
         rep.muladds += st.muladds;
         tr.residual_rows = st.residual_rows;
@@ -3482,6 +3549,9 @@ mod tests {
         use rand::{Rng, SeedableRng};
         let mut rng = rand::rngs::StdRng::seed_from_u64(31);
         let (mut mixed, mut merged, mut cancelled) = (0, 0, 0);
+        // Products with plain terms, by whether `u` has a free variable: the
+        // key sum or `mono` forms their keys.
+        let (mut by_sum, mut by_mono) = (0, 0);
         for &p in &[3u64, 7, 97, 1_000_003, 4294967291] {
             let f = fp(p);
             for trial in 0..120 {
@@ -3513,12 +3583,44 @@ mod tests {
                 mixed += usize::from(carries && plain);
                 merged += usize::from(want.len() < before);
                 cancelled += usize::from(want.len() + 2 <= before);
+                by_sum += usize::from(plain && free_of(u) == [0; MAX_FREE]);
+                by_mono += usize::from(plain && free_of(u) != [0; MAX_FREE]);
             }
         }
         assert!(
             mixed > 100 && merged > 100 && cancelled > 50,
             "the cases that merge were not reached: {mixed} {merged} {cancelled}"
         );
+        assert!(
+            by_sum > 100 && by_mono > 100,
+            "both ways to key a plain product are to be reached: {by_sum} {by_mono}"
+        );
+    }
+
+    /// The key of a plain product, one without a tower variable in common,
+    /// is the term's key plus the constant `mul_terms_fp` adds when the
+    /// multiplier has no free variable: at the edges of the mask (bit 63,
+    /// the empty mask) and of the free bytes.
+    #[test]
+    fn a_plain_product_key_is_the_term_key_plus_a_constant() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(17);
+        for _ in 0..20_000 {
+            let (mm, mu) = match rng.gen_range(0..4) {
+                0 => (rng.gen::<u64>(), 0),
+                1 => (0, rng.gen::<u64>()),
+                2 => (1 << 63, rng.gen::<u64>() >> 1),
+                _ => {
+                    let a = rng.gen::<u64>();
+                    (a, !a & rng.gen::<u64>())
+                }
+            };
+            let free: [u8; MAX_FREE] = std::array::from_fn(|_| rng.gen_range(0..=255));
+            let (m, u) = (mono(mm, free), mono(mu, [0; MAX_FREE]));
+            let shift = (u128::from(degree_of(u)) << DEG_SHIFT) - u128::from(mask_of(u));
+            assert_eq!(mask_of(m) & mask_of(u), 0);
+            assert_eq!(m + shift, mono(mm | mu, free), "mask {mm:#x} by {mu:#x}");
+        }
     }
 
     /// The counters and basis of a run, and its trace without the timings.
@@ -3624,28 +3726,63 @@ mod tests {
         );
     }
 
+    /// Monomials are numbered in order of arrival, once each, and
+    /// `order_columns` turns the numbers into the descending order of the
+    /// monomials.
+    #[test]
+    fn monomials_are_numbered_by_arrival_and_ordered_into_columns() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(5);
+        let mut examined: MonoMap<u32> = MonoMap::default();
+        let mut frontier = Vec::new();
+        let mut seen: Vec<Mono> = Vec::new();
+        for _ in 0..3000 {
+            let m = mono(rng.gen_range(0..64u64), [rng.gen_range(0..3), 0, 0, 0]);
+            let n = number_of(&mut examined, &mut frontier, m);
+            match seen.iter().position(|&x| x == m) {
+                Some(k) => assert_eq!(n as usize, k, "a repeat keeps its number"),
+                None => {
+                    assert_eq!(n as usize, seen.len(), "a new one takes the next");
+                    assert_eq!(frontier.last(), Some(&m));
+                    seen.push(m);
+                }
+            }
+        }
+        assert_eq!(frontier, seen, "the frontier is the new monomials in order");
+        assert!(seen.len() > 100);
+        let (cols, col_of_number) = order_columns(&examined);
+        let mut want = seen.clone();
+        want.sort_unstable_by(|a, b| b.cmp(a));
+        assert_eq!(cols, want);
+        for (k, m) in seen.iter().enumerate() {
+            assert_eq!(cols[col_of_number[k] as usize], *m);
+        }
+    }
+
     #[test]
     fn the_product_cache_keeps_what_fits_and_nothing_else() {
-        let poly = |k: usize| RPoly {
-            monos: (0..k).map(|i| mono(0, [(k - i) as u8, 0, 0, 0])).collect(),
-            coefs: vec![1; k],
+        // A product of `k` terms, numbered from `from`, with coefficient `from`.
+        let keep = |c: &mut ProductCache, k: usize, from: u32| -> u32 {
+            if !c.has_room(k) {
+                return NONE;
+            }
+            let ids: Vec<u32> = (from..from + k as u32).collect();
+            c.keep(&ids, &vec![from; k])
         };
         let mut c = ProductCache::new(10);
-        assert_eq!(c.keep(&poly(4)), 0);
-        assert_eq!(c.keep(&poly(7)), NONE, "one past the room left");
-        assert_eq!(c.keep(&poly(6)), 4, "an exact fit");
-        assert_eq!(c.keep(&poly(1)), NONE, "full");
-        assert_eq!(
-            c.keep(&RPoly::default()),
-            10,
-            "an empty product always fits"
-        );
-        assert_eq!(c.monos.len(), 10);
+        assert_eq!(keep(&mut c, 4, 100), 0);
+        assert_eq!(keep(&mut c, 7, 200), NONE, "one past the room left");
+        assert_eq!(keep(&mut c, 6, 300), 4, "an exact fit");
+        assert_eq!(keep(&mut c, 1, 400), NONE, "full");
+        assert_eq!(keep(&mut c, 0, 500), 10, "an empty product always fits");
+        assert_eq!(c.ids.len(), 10);
         assert_eq!(c.coefs.len(), 10);
-        assert_eq!(c.monos[4..6], poly(6).monos[..2]);
+        assert_eq!(c.ids[4..10], [300, 301, 302, 303, 304, 305]);
+        assert_eq!(c.coefs[..4], [100; 4]);
+        assert_eq!(c.coefs[4..], [300; 6]);
         // No limit still leaves `NONE` unused as a position.
         assert_eq!(ProductCache::new(usize::MAX).limit, NONE as usize - 1);
-        assert_eq!(ProductCache::new(0).keep(&poly(1)), NONE);
+        assert!(!ProductCache::new(0).has_room(1));
     }
 
     /// Every sparse row ascending, with entries below `p`, over `n_cols`
