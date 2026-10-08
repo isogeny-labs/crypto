@@ -3597,6 +3597,75 @@ mod tests {
         );
     }
 
+    /// The same on the widest towers, 63 and 64 tower variables as one chain,
+    /// as blocks of three or four and as one block each: terms and multipliers
+    /// with `y_63`, the top bit of the mask, in the key sum and in the merge.
+    #[test]
+    fn a_product_on_a_64_variable_tower_merges_like_a_full_sort() {
+        use rand::{Rng, SeedableRng};
+        let mut rng = rand::rngs::StdRng::seed_from_u64(43);
+        let (mut mixed, mut top_bit, mut by_sum, mut by_mono) = (0, 0, 0, 0);
+        for &p in &[3u64, 97, 1_000_003, 4294967291] {
+            let f = fp(p);
+            for &(blocks, t) in &[(1usize, 64usize), (1, 63), (16, 4), (21, 3), (64, 1)] {
+                for n_free in [0, 1, 4] {
+                    for _ in 0..12 {
+                        let ring = random_ring(&mut rng, p, blocks, t, n_free, true);
+                        ring.check();
+                        let (n, nt) = (ring.n_vars(), ring.n_tower());
+                        // Terms spread over the whole mask; a few common bits
+                        // with the multiplier, so that the rewrites stay small.
+                        let raw: Vec<(Vec<u32>, u64)> = (0..rng.gen_range(1..20))
+                            .map(|_| {
+                                let density = rng.gen_range(0.02..0.25);
+                                let mut e: Vec<u32> = (0..n)
+                                    .map(|i| {
+                                        if i < nt {
+                                            u32::from(rng.gen_bool(density))
+                                        } else {
+                                            rng.gen_range(0..4)
+                                        }
+                                    })
+                                    .collect();
+                                if nt == 64 && rng.gen_bool(0.3) {
+                                    e[63] = 1;
+                                }
+                                (e, rng.gen_range(1..p))
+                            })
+                            .collect();
+                        let g = ring.from_raw(&raw);
+                        let mut mask = 0u64;
+                        for _ in 0..rng.gen_range(0..6) {
+                            mask |= 1 << rng.gen_range(0..nt);
+                        }
+                        if nt == 64 && rng.gen_bool(0.4) {
+                            mask |= 1 << 63;
+                        }
+                        let mut free = [0u8; MAX_FREE];
+                        if rng.gen_bool(0.5) {
+                            for e in free.iter_mut().take(n_free) {
+                                *e = rng.gen_range(0..3);
+                            }
+                        }
+                        let u = mono(mask, free);
+                        let (want, _) = product_by_full_sort(&ring, f, &g, u);
+                        assert_eq!(ring.mul_mono(&g, u), want, "p = {p}, {blocks} x {t}");
+                        let carries = g.monos.iter().any(|&m| mask_of(m) & mask != 0);
+                        let plain = g.monos.iter().any(|&m| mask_of(m) & mask == 0);
+                        mixed += usize::from(carries && plain);
+                        top_bit += usize::from(mask >> 63 == 1 && nt == 64);
+                        by_sum += usize::from(plain && free == [0; MAX_FREE]);
+                        by_mono += usize::from(plain && free != [0; MAX_FREE]);
+                    }
+                }
+            }
+        }
+        assert!(
+            mixed > 50 && top_bit > 20 && by_sum > 50 && by_mono > 20,
+            "{mixed} {top_bit} {by_sum} {by_mono}"
+        );
+    }
+
     /// The key of a plain product, one without a tower variable in common,
     /// is the term's key plus the constant `mul_terms_fp` adds when the
     /// multiplier has no free variable: at the edges of the mask (bit 63,
