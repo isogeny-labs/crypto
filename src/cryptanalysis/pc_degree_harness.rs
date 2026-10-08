@@ -709,6 +709,103 @@ mod tests {
         );
     }
 
+    /// The same comparison at the shapes the random test above does not
+    /// reach: widths one either side of a word boundary, a single row, a
+    /// zero matrix, rows that are all `e₀`, duplicated rows, and row counts
+    /// below, at and above the width.  Empty inputs keep their early return.
+    #[test]
+    fn rank_and_refute_agrees_with_the_column_loop_at_word_boundaries() {
+        use rand::Rng;
+        let mut rng = StdRng::seed_from_u64(0xB0DA_5);
+        assert_eq!(rank_and_refute(&mut [], 5), (0, false));
+        assert_eq!(rank_and_refute(&mut [vec![0u64; 1]], 0), (0, false));
+        let (mut refuting, mut non_refuting, mut deficient) = (0, 0, 0);
+        for &cols in &[1usize, 2, 63, 64, 65, 127, 128, 129, 191, 192, 193] {
+            let words = cols.div_ceil(64);
+            for &n_rows in &[1usize, 2, 3, 10, 64, 65, 130, 200] {
+                for kind in 0..6 {
+                    for _ in 0..4 {
+                        let density = [0.01, 0.1, 0.5, 0.95][rng.gen_range(0..4)];
+                        let random_row = |rng: &mut StdRng| {
+                            let mut row = vec![0u64; words];
+                            for c in 0..cols {
+                                if rng.gen_bool(density) {
+                                    row[c / 64] |= 1 << (c % 64);
+                                }
+                            }
+                            row
+                        };
+                        let e0 = {
+                            let mut row = vec![0u64; words];
+                            row[0] = 1;
+                            row
+                        };
+                        let m: Vec<Vec<u64>> = match kind {
+                            0 => (0..n_rows).map(|_| random_row(&mut rng)).collect(),
+                            1 => vec![vec![0u64; words]; n_rows],
+                            2 => vec![e0.clone(); n_rows],
+                            3 => {
+                                let one = random_row(&mut rng);
+                                vec![one; n_rows]
+                            }
+                            4 => {
+                                // each row is a random sum of a few random rows
+                                // and, half the time, of e₀
+                                let basis: Vec<Vec<u64>> =
+                                    (0..3).map(|_| random_row(&mut rng)).collect();
+                                (0..n_rows)
+                                    .map(|_| {
+                                        let mut row = vec![0u64; words];
+                                        for b in basis.iter().chain(std::iter::once(&e0)) {
+                                            if rng.gen_bool(0.5) {
+                                                for (r, x) in row.iter_mut().zip(b) {
+                                                    *r ^= x;
+                                                }
+                                            }
+                                        }
+                                        row
+                                    })
+                                    .collect()
+                            }
+                            _ => {
+                                // e₀ among otherwise random rows
+                                let mut m: Vec<Vec<u64>> =
+                                    (0..n_rows).map(|_| random_row(&mut rng)).collect();
+                                let at = rng.gen_range(0..n_rows);
+                                m[at] = e0.clone();
+                                m
+                            }
+                        };
+                        let mut want = m.clone();
+                        let (rank, refuted, pivots) = rank_and_refute_by_columns(&mut want, cols);
+                        let mut got = m;
+                        assert_eq!(
+                            rank_and_refute(&mut got, cols),
+                            (rank, refuted),
+                            "{n_rows}x{cols} kind {kind}"
+                        );
+                        let leads: Vec<usize> = got[..rank]
+                            .iter()
+                            .map(|row| {
+                                let k = row.iter().position(|&x| x != 0).unwrap();
+                                k * 64 + row[k].trailing_zeros() as usize
+                            })
+                            .collect();
+                        assert_eq!(leads, pivots, "{n_rows}x{cols} kind {kind}");
+                        assert!(got[rank..].iter().all(|r| r.iter().all(|&x| x == 0)));
+                        refuting += refuted as u32;
+                        non_refuting += !refuted as u32;
+                        deficient += (rank < n_rows.min(cols)) as u32;
+                    }
+                }
+            }
+        }
+        assert!(
+            refuting > 50 && non_refuting > 50 && deficient > 50,
+            "{refuting} / {non_refuting} / {deficient}"
+        );
+    }
+
     /// The sparse backend (`build_macaulay_rows_sparse` +
     /// `sparse_rank_and_refute`) must produce exactly the same `(rank,
     /// refuted)` as the dense path on real Macaulay matrices, across degrees
