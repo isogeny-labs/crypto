@@ -403,6 +403,11 @@ pub struct PkmTowerOracle<'i> {
     totals: SolverTotals,
     tally: Tally,
     shape: Option<SystemShape>,
+    /// A one-thread pool the tower engines run in: `f4_fp_tower` sizes its
+    /// elimination chunks by `rayon::current_num_threads()`, so its counted
+    /// multiply-adds would otherwise depend on the CPUs a run is given, and
+    /// a replay on another CPU set would not reproduce them.
+    pool: Option<rayon::ThreadPool>,
 }
 
 impl<'i> PkmTowerOracle<'i> {
@@ -419,6 +424,7 @@ impl<'i> PkmTowerOracle<'i> {
             totals: SolverTotals::default(),
             tally: Tally::default(),
             shape: None,
+            pool: None,
         }
     }
 
@@ -460,10 +466,15 @@ impl<'i> PkmTowerOracle<'i> {
         if let Some(b) = self.budget {
             opts = opts.with_budget(b);
         }
-        let start = Instant::now();
-        let rep = match self.engine {
+        let engine = self.engine;
+        let solve = || match engine {
             Engine::SigF5 => sig_fp_tower::sig_f4_tower_with(&input, ring, &opts, SigOptions::default()).report,
             _ => f4_fp_tower::f4_tower(&input, ring, &opts),
+        };
+        let start = Instant::now();
+        let rep = match &self.pool {
+            Some(pool) => pool.install(solve),
+            None => solve(),
         };
         let wall_ns = start.elapsed().as_nanos() as u64;
         let shape = SystemShape {
@@ -725,6 +736,12 @@ impl DecompositionOracle<PrimeCurve> for PkmTowerOracle<'_> {
         }
         self.tower = Some(tower);
         self.ring = Some(ring);
+        self.pool = Some(
+            rayon::ThreadPoolBuilder::new()
+                .num_threads(1)
+                .build()
+                .map_err(|e| format!("tower engine pool: {e}"))?,
+        );
         self.totals = SolverTotals {
             solver: format!("pkm-tower {} (degree {})", params.get("engine").unwrap_or("f4"), self.max_degree),
             op_unit: MULADD_UNIT.into(),
@@ -817,6 +834,45 @@ mod tests {
                 );
             }
         }
+    }
+
+    /// The counted work must not depend on the threads the caller has:
+    /// `f4_fp_tower` alone does (its chunks scale with the pool), and the
+    /// oracle, which runs it in its own one-thread pool, must not.
+    #[test]
+    fn counted_work_is_independent_of_the_callers_threads() {
+        let inst = find_prime_order_curve(11, 20);
+        let mut base_ops = GroupOps::default();
+        let ctx = InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target: inst.generator_point(),
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: "test".into(),
+            field_degree: None,
+        };
+        let params = Params::parse_spec("x:t=6,seed=1,engine=f4").unwrap().1;
+        let fb = PrimeTowerBase { instance: &inst }.build(&ctx, &params, &mut base_ops).unwrap();
+        let run = |threads: usize| -> u64 {
+            let pool = rayon::ThreadPoolBuilder::new().num_threads(threads).build().unwrap();
+            pool.install(|| {
+                let mut o = PkmTowerOracle::new(2, &inst);
+                o.prepare(&ctx, &fb, &params, &mut GroupOps::default()).unwrap();
+                // Whole decompositions: deep nodes reduce enough rows for
+                // the chunking to matter (the shallow ones do not).
+                let mut ops = GroupOps::default();
+                let mut counters = OracleCounters::default();
+                let mut pt = inst.generator_point();
+                for _ in 0..6 {
+                    let _ = o.decompose(&ctx, &fb, &mut ops, &mut counters, pt);
+                    pt = inst.curve.add(&mut ops, pt, pt);
+                }
+                o.totals.ops
+            })
+        };
+        assert_eq!(run(1), run(4), "the oracle's count depends on the caller's threads");
     }
 
     #[test]
