@@ -29,6 +29,8 @@
 
 #[path = "ecbench/pdp3_koblitz.rs"]
 mod pdp3_koblitz;
+#[path = "ecbench/pkm_tower.rs"]
+mod pkm_tower;
 
 use std::io::Write as _;
 use std::path::{Path, PathBuf};
@@ -464,6 +466,7 @@ fn main() -> ExitCode {
     // Oracles this binary links that the library cannot name (see
     // `pdp3_koblitz`); registered before any run, child or replay.
     crypto_lib::cryptanalysis::ecbench::methods::register_binary_plugins(pdp3_koblitz::plugins());
+    crypto_lib::cryptanalysis::ecbench::methods::register_prime_plugins(pkm_tower::plugins());
     match run(Cli::parse()) {
         Ok(code) => code,
         Err(e) => {
