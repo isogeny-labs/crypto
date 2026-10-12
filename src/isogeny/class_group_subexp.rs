@@ -574,7 +574,9 @@ fn trial_batch(
     let disc = &fb.disc;
     let mut rels = Vec::new();
     let mut partials = Vec::new();
-    let k_base = 3.min(n);
+    // a varying number of base terms: with a fixed count every relation of a
+    // class-number-one discriminant would have an even coefficient sum
+    let k_max = 3.min(n);
     let inner = 16;
     let mut done = 0usize;
     let mut count = 0u64;
@@ -582,6 +584,7 @@ fn trial_batch(
         // base product F = prod g_i^{±1}
         let mut exps: Vec<(u32, i64)> = Vec::new();
         let mut base: Option<Bqf> = None;
+        let k_base = rng.gen_range(1..=k_max);
         for _ in 0..k_base {
             let i = rng.gen_range(0..n);
             let s: i64 = if rng.gen_bool(0.5) { 1 } else { -1 };
