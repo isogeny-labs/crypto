@@ -1024,33 +1024,146 @@ pub struct Structure {
     pub eliminated: usize,
 }
 
+/// Does the relation map to zero under the discrete logs of `s`?
+pub fn relation_in_lattice(s: &Structure, rel: &[(u32, i64)]) -> bool {
+    (0..s.invariants.len()).all(|t| {
+        let mut acc = BigInt::zero();
+        for &(c, v) in rel {
+            acc += &s.dlogs[c as usize][t] * v;
+        }
+        acc.mod_floor(&s.invariants[t]).is_zero()
+    })
+}
+
 /// Compute the structure of `Z^ncols / L` where `L` is spanned by `rels`.
+///
+/// Linear algebra runs on a primary subset of about `1.1·ncols` relations;
+/// every other relation is then checked against the resulting discrete logs
+/// and any relation outside the lattice is moved into the primary set and
+/// the computation repeated, so the returned structure is that of the
+/// lattice spanned by **all** relations.
 pub fn structure_from_relations(
     ncols: usize,
     rels: &[Relation],
     markowitz_limit: usize,
 ) -> Option<Structure> {
+    let cap = ncols + ncols / 10 + 64;
+    let mut primary: Vec<Relation> = Vec::new();
+    let mut rest: Vec<Relation> = Vec::new();
+    for (i, r) in rels.iter().enumerate() {
+        if i < cap {
+            primary.push(r.clone());
+        } else {
+            rest.push(r.clone());
+        }
+    }
+    loop {
+        let s = match structure_core(ncols, &primary, markowitz_limit) {
+            Some(s) => s,
+            None => {
+                if rest.is_empty() {
+                    return None;
+                }
+                // rank deficient: move a block of further relations in
+                let k = rest.len().min(ncols / 4 + 16);
+                primary.extend(rest.drain(..k));
+                continue;
+            }
+        };
+        let (bad, good): (Vec<Relation>, Vec<Relation>) =
+            rest.into_iter().partition(|r| !relation_in_lattice(&s, r));
+        if bad.is_empty() {
+            return Some(s);
+        }
+        primary.extend(bad);
+        rest = good;
+    }
+}
+
+fn structure_core(
+    ncols: usize,
+    rels: &[Relation],
+    markowitz_limit: usize,
+) -> Option<Structure> {
+    let t_e = Instant::now();
     let el = eliminate(ncols, rels, markowitz_limit);
+    let t_el = t_e.elapsed().as_secs_f64();
+    let t_h = Instant::now();
     let nd = el.alive.len();
     let pos: HashMap<u32, usize> = el.alive.iter().enumerate().map(|(i, &c)| (c, i)).collect();
-    let mut hnf = Hnf::new(nd);
-    for r in &el.rows {
+    let dense: Vec<Vec<(usize, i64)>> = el
+        .rows
+        .iter()
+        .map(|r| r.iter().map(|&(c, x)| (pos[&c], x)).collect())
+        .collect();
+    let to_vec = |r: &[(usize, i64)]| -> Vec<BigInt> {
         let mut v = vec![BigInt::zero(); nd];
         for &(c, x) in r {
-            v[pos[&c]] = BigInt::from(x);
+            v[c] = BigInt::from(x);
         }
-        hnf.insert(v);
+        v
+    };
+    // Insert dense rows until full rank plus a margin; the remaining rows are
+    // then *checked* against the resulting discrete logs and only the rows
+    // that are not already in the lattice are inserted (repeat until every
+    // row maps to zero).  The final lattice therefore contains every row.
+    let mut hnf = Hnf::new(nd);
+    let mut inserted = vec![false; dense.len()];
+    let mut next = 0usize;
+    let margin = 24usize;
+    let mut after_full = 0usize;
+    while next < dense.len() && after_full < margin {
+        hnf.insert(to_vec(&dense[next]));
+        inserted[next] = true;
+        next += 1;
+        if hnf.full_rank() {
+            after_full += 1;
+        }
     }
+    let t_hnf = t_h.elapsed().as_secs_f64();
     if !hnf.full_rank() {
         return None;
     }
-    hnf.finish();
-    let h = hnf.det().unwrap();
-    let mat: Vec<Vec<BigInt>> = hnf.rows.into_iter().map(|r| r.unwrap()).collect();
-    let (s, v) = if nd > 0 {
-        smith_with_v(mat, &h)
-    } else {
-        (Vec::new(), Vec::new())
+    let (h, s, v) = loop {
+        hnf.finish();
+        let h = hnf.det().unwrap();
+        let mat: Vec<Vec<BigInt>> = hnf.rows.iter().map(|r| r.clone().unwrap()).collect();
+        let t_s = Instant::now();
+        let (s, v) = if nd > 0 {
+            smith_with_v(mat, &h)
+        } else {
+            (Vec::new(), Vec::new())
+        };
+        // check the rows not yet inserted
+        let mut failing = Vec::new();
+        for (i, r) in dense.iter().enumerate() {
+            if inserted[i] {
+                continue;
+            }
+            let bad = (0..nd).any(|k| {
+                if s[k].is_one() {
+                    return false;
+                }
+                let mut acc = BigInt::zero();
+                for &(c, x) in r {
+                    acc += &v[c][k] * x;
+                }
+                !acc.mod_floor(&s[k]).is_zero()
+            });
+            if bad {
+                failing.push(i);
+            }
+        }
+        if std::env::var_os("CG_TIMING").is_some() {
+            eprintln!("    [linalg] elim {:.2}s hnf {:.2}s snf+check {:.2}s nd {} rows {} failing {}", t_el, t_hnf, t_s.elapsed().as_secs_f64(), nd, dense.len(), failing.len());
+        }
+        if failing.is_empty() {
+            break (h, s, v);
+        }
+        for i in failing {
+            hnf.insert(to_vec(&dense[i]));
+            inserted[i] = true;
+        }
     };
     // invariant positions (s > 1), ascending in s; output descending
     let inv_pos: Vec<usize> = (0..nd).filter(|&k| s[k] > BigInt::one()).rev().collect();
@@ -1296,10 +1409,9 @@ pub fn compute_class_group(disc: &BigInt, params: &SubexpParams) -> Result<Subex
     } else {
         (n / 20).max(8)
     };
-    let mut target_count = n + 16;
+    let mut target_count = n + n / 8 + 16;
     let mut history: Vec<BigInt> = Vec::new();
-    let mut stable = 0usize;
-    let mut last: Option<Structure> = None;
+    let mut last: Option<Structure>;
     let euler_primes = primes_up_to(params.euler_bound);
     let log_h_approx = analytic_log_h(disc, &euler_primes);
     let tol = std::f64::consts::SQRT_2.ln();
@@ -1410,37 +1522,78 @@ pub fn compute_class_group(disc: &BigInt, params: &SubexpParams) -> Result<Subex
         t_lin += tl.elapsed().as_secs_f64();
         match st {
             None => {
-                target_count = rels.len() + batch_extra;
+                target_count = rels.len() + batch_extra.max(rels.len() / 4);
                 if params.verbose {
                     eprintln!("  [classgroup] rank deficient with {} relations", rels.len());
                 }
             }
             Some(s) => {
-                let changed = last.as_ref().is_none_or(|l| l.h != s.h);
                 history.push(s.h.clone());
-                let log_ratio = s.h.to_f64().map(|x| x.ln()).unwrap_or_else(|| {
-                    s.h.bits() as f64 * std::f64::consts::LN_2
-                }) - log_h_approx;
+                let log_ratio = ln_bigint(&s.h) - log_h_approx;
                 if params.verbose {
                     eprintln!(
-                        "  [classgroup] h* = {} cyc {:?} dense {} log(h*/h_approx) = {:.4}",
+                        "  [classgroup] h* = {} cyc {:?} dense {} log(h*/h_approx) = {:.4} ({} relations, linalg so far {:.2} s)",
                         s.h,
                         s.invariants.iter().map(|x| x.to_string()).collect::<Vec<_>>(),
                         s.dense_dim,
-                        log_ratio
+                        log_ratio,
+                        rels.len(),
+                        t_lin
                     );
-                }
-                if changed {
-                    stable = 0;
-                } else {
-                    stable += 1;
                 }
                 let analytic_ok = log_ratio.abs() < tol;
                 last = Some(s);
-                if stable >= params.stable_rounds && analytic_ok {
+                // Verification without recomputation: fresh relations must all
+                // lie in the current lattice (zero discrete-log sum).  A
+                // relation outside it would map to a nonzero element.
+                let mut stable = 0usize;
+                let mut failed = false;
+                while stable < params.stable_rounds {
+                    rounds_done += 1;
+                    if rounds_done > params.max_rounds {
+                        return Err(format!(
+                            "no stable class group after {} rounds (h* history {:?})",
+                            params.max_rounds,
+                            history.iter().map(|h| h.to_string()).collect::<Vec<_>>()
+                        ));
+                    }
+                    let before = rels.len();
+                    let tr = Instant::now();
+                    collect(
+                        &mut rels,
+                        before + batch_extra,
+                        &mut partial_map,
+                        &mut full_found,
+                        &mut combined,
+                        &mut trials,
+                        &mut round,
+                    )?;
+                    t_rel += tr.elapsed().as_secs_f64();
+                    let cur = last.as_ref().unwrap();
+                    if rels[before..].iter().any(|r| !relation_in_lattice(cur, r)) {
+                        failed = true;
+                        break;
+                    }
+                    stable += 1;
+                }
+                if !failed && analytic_ok {
                     break;
                 }
-                target_count = rels.len() + batch_extra;
+                target_count = if failed {
+                    rels.len()
+                } else {
+                    rels.len() + 4 * batch_extra
+                };
+                if params.verbose {
+                    eprintln!(
+                        "  [classgroup] verification {}; recomputing",
+                        if failed {
+                            "found a relation outside the lattice"
+                        } else {
+                            "passed but the analytic check did not"
+                        }
+                    );
+                }
             }
         }
     }
