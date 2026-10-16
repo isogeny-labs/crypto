@@ -1641,6 +1641,8 @@ fn run_grid(
         .wrapping_add(round.wrapping_mul(0x9e37_79b9))
         .wrapping_add(((position + 64) as u64).wrapping_mul(0x0123_4567));
     let query_cpu_start = thread_cpu_ns();
+    let mut row_cpu_ns = 0u64;
+    let mut recovery_cpu_ns = 0u64;
     let mut query_ops = GroupOps::default();
     let mut stats = Stats::default();
     let mut witnesses = Vec::new();
@@ -1684,6 +1686,7 @@ fn run_grid(
                 out
             };
             if let Some(&(i, j)) = pairs.first() {
+                let row_cpu_start = thread_cpu_ns();
                 let mut row = vec![0u64; columns + 2];
                 for index in [i, j] {
                     let column = index / 2;
@@ -1697,12 +1700,15 @@ fn run_grid(
                 if insert_relation_grid(&mut pivots, row, columns) {
                     rank += 1;
                 }
+                row_cpu_ns += thread_cpu_ns() - row_cpu_start;
                 if rank == columns + 1 {
                     break;
                 }
             }
         }
+        let recovery_cpu_start = thread_cpu_ns();
         recovered = recover_grid(&pivots, columns).map(|solution| solution[columns]);
+        recovery_cpu_ns = thread_cpu_ns() - recovery_cpu_start;
     } else if arm == "source-bsgs" {
         let mut cursor = target;
         for giant in 0..15u64 {
@@ -1728,17 +1734,24 @@ fn run_grid(
         }
     }
     let query_cpu_ns = thread_cpu_ns() - query_cpu_start;
+    assert!(query_cpu_ns >= row_cpu_ns + recovery_cpu_ns);
+    let relation_cpu_ns = query_cpu_ns - row_cpu_ns - recovery_cpu_ns;
     let query_fp = take_field_counters();
+    let verify_cpu_start = thread_cpu_ns();
     let mut verify_ops = GroupOps::default();
     let verified = recovered.is_some_and(|scalar| {
         source.mul(&mut verify_ops, generator, scalar) == target
             && destination.mul(&mut verify_ops, mapped_generator, scalar) == mapped_target
     });
+    let verify_cpu_ns = thread_cpu_ns() - verify_cpu_start;
     let verify_fp = take_field_counters();
     let peak_rss = peak_rss_bytes();
+    let total_cpu_ns = thread_cpu_ns() - cpu;
+    assert!(total_cpu_ns >= setup_cpu_ns + query_cpu_ns + verify_cpu_ns);
+    let other_cpu_ns = total_cpu_ns - setup_cpu_ns - query_cpu_ns - verify_cpu_ns;
     println!(
         "{}",
-        json!({"schema":"isogeny_fiber_base_grid_run/v1",
+        json!({"schema":"isogeny_fiber_base_grid_run/v2",
             "base_public_sha256":base_sha,"heldout_public_sha256":heldout_sha,
             "round":round,"arm":arm,"columns":columns,"position":position,"seed":seed,
             "target":target,"mapped_target":mapped_target,
@@ -1751,12 +1764,16 @@ fn run_grid(
             "query_fp_muls":query_fp.0,"query_fp_invs":query_fp.1,
             "verify_fp_muls":verify_fp.0,"verify_fp_invs":verify_fp.1,
             "setup_cpu_ns":setup_cpu_ns,"query_cpu_ns":query_cpu_ns,
-            "total_cpu_ns":thread_cpu_ns()-cpu,"total_wall_ns":wall.elapsed().as_nanos(),
+            "relation_cpu_ns":relation_cpu_ns,"row_cpu_ns":row_cpu_ns,
+            "recovery_cpu_ns":recovery_cpu_ns,"verify_cpu_ns":verify_cpu_ns,
+            "other_cpu_ns":other_cpu_ns,
+            "total_cpu_ns":total_cpu_ns,"total_wall_ns":wall.elapsed().as_nanos(),
             "peak_rss_bytes":peak_rss,"trials":trials,"relations":relations,
             "rank":rank,"recovered":recovered,"verified":verified,
             "relation_witnesses":witnesses,"rho_attempts":rho_attempts,
             "chi_stats":{"resultants":stats.resultants,"gcds":stats.gcds,
                 "split_attempts":stats.split_attempts,
+                "exhaustive_fallback_evaluations":stats.exhaustive_fallback_evaluations,
                 "root_candidates":stats.root_candidates,
                 "chi_lift_scans":stats.chi_lift_scans,
                 "exact_checks":stats.exact_checks,
@@ -1924,8 +1941,147 @@ fn summarize_grid(run_dir: &str, svg_path: &str) {
     println!("{}", serde_json::to_string_pretty(&result).unwrap());
 }
 
+fn audit_grid_v2(v1_dir: &str, v2_dir: &str) {
+    let mut mismatches = Vec::new();
+    let mut compared = 0u64;
+    let mut witnesses = 0u64;
+    let mut fallback_evaluations = 0u64;
+    let v1_plan = fs::read(format!("{v1_dir}/RUN_PLAN_V1.tsv")).unwrap();
+    let v2_plan = fs::read(format!("{v2_dir}/RUN_PLAN_V2.tsv")).unwrap();
+    if v1_plan != v2_plan {
+        mismatches.push("run plan differs".to_string());
+    }
+    if fs::read(format!("{v1_dir}/BASE_PUBLIC_V1.json")).unwrap()
+        != fs::read(format!("{v2_dir}/BASE_PUBLIC_V1.json")).unwrap()
+    {
+        mismatches.push("frozen public base differs".to_string());
+    }
+    for columns in [8, 16, 32, 64] {
+        let path = format!("exhaustive/b{columns}.jsonl");
+        let read_rows = |dir: &str| -> Vec<Value> {
+            fs::read_to_string(format!("{dir}/{path}"))
+                .unwrap()
+                .lines()
+                .map(|line| {
+                    let mut value: Value = serde_json::from_str(line).unwrap();
+                    value.as_object_mut().unwrap().remove("wall_ns");
+                    value
+                })
+                .collect()
+        };
+        if read_rows(v1_dir) != read_rows(v2_dir) {
+            mismatches.push(format!("{path}: exhaustive records differ"));
+        }
+    }
+    for line in String::from_utf8(v1_plan).unwrap().lines() {
+        let parts: Vec<_> = line.split('\t').collect();
+        assert_eq!(parts.len(), 4);
+        let label = format!("r{}-b{}-t{}-{}", parts[0], parts[1], parts[2], parts[3]);
+        let a = format!("{v1_dir}/children/{label}");
+        let b = format!("{v2_dir}/children/{label}");
+        if [
+            format!("{a}.exit"),
+            format!("{a}.replay.exit"),
+            format!("{b}.exit"),
+            format!("{b}.replay.exit"),
+        ]
+        .iter()
+        .any(|path| fs::read_to_string(path).unwrap().trim() != "0")
+        {
+            mismatches.push(format!("{label}: child or replay exit nonzero"));
+            continue;
+        }
+        let old: Value = serde_json::from_slice(&fs::read(format!("{a}.json")).unwrap()).unwrap();
+        let new: Value = serde_json::from_slice(&fs::read(format!("{b}.json")).unwrap()).unwrap();
+        if old["schema"] != "isogeny_fiber_base_grid_run/v1"
+            || new["schema"] != "isogeny_fiber_base_grid_run/v2"
+        {
+            mismatches.push(format!("{label}: run schema differs"));
+        }
+        for key in [
+            "arm",
+            "columns",
+            "position",
+            "round",
+            "seed",
+            "target",
+            "mapped_target",
+            "base_public_sha256",
+            "heldout_public_sha256",
+            "candidate_count",
+            "positive_base",
+            "base_matches_frozen",
+            "setup_group_ops",
+            "query_group_ops",
+            "verify_group_ops",
+            "setup_fp_muls",
+            "setup_fp_invs",
+            "query_fp_muls",
+            "query_fp_invs",
+            "verify_fp_muls",
+            "verify_fp_invs",
+            "trials",
+            "relations",
+            "rank",
+            "recovered",
+            "verified",
+            "relation_witnesses",
+            "rho_attempts",
+            "inverse_stats",
+        ] {
+            if old[key] != new[key] {
+                mismatches.push(format!("{label}: {key} differs"));
+            }
+        }
+        for (key, old_value) in old["chi_stats"].as_object().unwrap() {
+            if old_value != &new["chi_stats"][key.as_str()] {
+                mismatches.push(format!("{label}: chi_stats.{key} differs"));
+            }
+        }
+        let setup = new["setup_cpu_ns"].as_u64().unwrap();
+        let relation = new["relation_cpu_ns"].as_u64().unwrap();
+        let row = new["row_cpu_ns"].as_u64().unwrap();
+        let recovery = new["recovery_cpu_ns"].as_u64().unwrap();
+        let verify = new["verify_cpu_ns"].as_u64().unwrap();
+        let other = new["other_cpu_ns"].as_u64().unwrap();
+        if relation + row + recovery != new["query_cpu_ns"].as_u64().unwrap()
+            || setup + relation + row + recovery + verify + other
+                != new["total_cpu_ns"].as_u64().unwrap()
+        {
+            mismatches.push(format!("{label}: CPU phase ledger does not sum"));
+        }
+        witnesses += new["relation_witnesses"].as_array().unwrap().len() as u64;
+        fallback_evaluations += new["chi_stats"]["exhaustive_fallback_evaluations"]
+            .as_u64()
+            .unwrap();
+        compared += 1;
+    }
+    let passed = mismatches.is_empty() && compared == 384;
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&json!({
+            "schema":"isogeny_fiber_base_grid_v2_audit/v1",
+            "v1_plan_sha256":sha256_hex(&fs::read(format!("{v1_dir}/RUN_PLAN_V1.tsv")).unwrap()),
+            "v2_plan_sha256":sha256_hex(&v2_plan),
+            "compared_children":compared,"expected_children":384,
+            "relation_witnesses":witnesses,
+            "fallback_evaluations":fallback_evaluations,
+            "mismatches":mismatches,"status":if passed {"pass"} else {"fail"}
+        }))
+        .unwrap()
+    );
+    if !passed {
+        std::process::exit(1);
+    }
+}
+
 fn main() {
     let args: Vec<_> = std::env::args().collect();
+    if args.get(1).map(String::as_str) == Some("audit-grid-v2") {
+        assert_eq!(args.len(), 4);
+        audit_grid_v2(&args[2], &args[3]);
+        return;
+    }
     if args.get(1).map(String::as_str) == Some("summarize-grid") {
         assert_eq!(args.len(), 4);
         summarize_grid(&args[2], &args[3]);

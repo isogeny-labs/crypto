@@ -269,7 +269,7 @@ fn check_run(base_path: &str, heldout_path: &str, checker_path: &str, run_path: 
     let heldout: Value = serde_json::from_slice(&heldout_bytes).unwrap();
     let checker: Value = serde_json::from_slice(&checker_bytes).unwrap();
     let run: Value = serde_json::from_slice(&run_bytes).unwrap();
-    assert_eq!(run["schema"], "isogeny_fiber_base_grid_run/v1");
+    assert_eq!(run["schema"], "isogeny_fiber_base_grid_run/v2");
     assert_eq!(run["base_public_sha256"], sha256_hex(&base_bytes));
     assert_eq!(run["heldout_public_sha256"], sha256_hex(&heldout_bytes));
     assert_eq!(checker["public_sha256"], sha256_hex(&heldout_bytes));
@@ -411,16 +411,31 @@ fn check_run(base_path: &str, heldout_path: &str, checker_path: &str, run_path: 
     }
     let setup_cpu = run["setup_cpu_ns"].as_u64().unwrap();
     let query_cpu = run["query_cpu_ns"].as_u64().unwrap();
-    assert!(run["total_cpu_ns"].as_u64().unwrap() >= setup_cpu + query_cpu);
+    let relation_cpu = run["relation_cpu_ns"].as_u64().unwrap();
+    let row_cpu = run["row_cpu_ns"].as_u64().unwrap();
+    let recovery_cpu = run["recovery_cpu_ns"].as_u64().unwrap();
+    let verify_cpu = run["verify_cpu_ns"].as_u64().unwrap();
+    let other_cpu = run["other_cpu_ns"].as_u64().unwrap();
+    assert_eq!(relation_cpu + row_cpu + recovery_cpu, query_cpu);
+    assert_eq!(
+        setup_cpu + query_cpu + verify_cpu + other_cpu,
+        run["total_cpu_ns"].as_u64().unwrap()
+    );
+    if !relation_arm {
+        assert_eq!(row_cpu + recovery_cpu, 0);
+    }
+    assert!(run["chi_stats"]["exhaustive_fallback_evaluations"]
+        .as_u64()
+        .is_some());
     assert!(run["total_wall_ns"].as_u64().unwrap() > 0);
     assert!(run["peak_rss_bytes"].as_u64().unwrap() <= 512 * 1024 * 1024);
     println!(
         "{}",
-        json!({"schema":"isogeny_fiber_base_grid_run_replay/v1",
+        json!({"schema":"isogeny_fiber_base_grid_run_replay/v2",
             "run_sha256":sha256_hex(&run_bytes),
             "columns":columns,"position":position,"arm":arm,
             "scalar_checks":2,"relation_witnesses":rows.len(),
-            "rank":run["rank"],"status":"pass"})
+            "rank":run["rank"],"phase_cpu_sum_checked":true,"status":"pass"})
     );
 }
 
