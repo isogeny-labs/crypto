@@ -123,4 +123,9 @@ while IFS=$'\t' read -r round columns position arm; do
   fi
 done < "$run_dir/RUN_PLAN_V1.tsv"
 
+timeout 300 "$runner" summarize-grid "$run_dir" "$run_dir/GRID_GRAPH_V1.svg" \
+  > "$run_dir/SUMMARY_V1.json" 2> "$run_dir/SUMMARY_V1.stderr"
+summary_rc=$?
+echo "$summary_rc" > "$run_dir/SUMMARY_V1.exit"
+if [[ $summary_rc -ne 0 ]]; then failed=1; fi
 exit "$failed"

@@ -1780,8 +1780,157 @@ fn run_grid(
     assert!(verified && peak_rss <= 512 * 1024 * 1024);
 }
 
+fn group_count(value: &Value) -> u64 {
+    value["adds"].as_u64().unwrap() + value["doubles"].as_u64().unwrap()
+}
+
+fn summarize_grid(run_dir: &str, svg_path: &str) {
+    let arms = [
+        "chi-inverse",
+        "chi-full",
+        "direct-inverse",
+        "direct-full",
+        "destination-direct",
+        "source-bsgs",
+        "rho-negation",
+        "rho-negation-aa",
+    ];
+    let mut rows = Vec::new();
+    let mut supports = Vec::new();
+    let mut incomplete = Vec::new();
+    for columns in [8usize, 16, 32, 64] {
+        let exact_path = format!("{run_dir}/exhaustive/b{columns}.jsonl");
+        let exact_bytes = fs::read(&exact_path).unwrap();
+        let exact_summary: Value = exact_bytes
+            .split(|&byte| byte == b'\n')
+            .filter(|row| !row.is_empty())
+            .last()
+            .map(|row| serde_json::from_slice(row).unwrap())
+            .unwrap();
+        assert_eq!(
+            exact_summary["schema"],
+            "isogeny_fiber_base_grid_exhaustive/v1"
+        );
+        assert_eq!(exact_summary["columns"], columns);
+        assert_eq!(
+            fs::read_to_string(format!("{run_dir}/exhaustive/b{columns}.replay.exit"))
+                .unwrap()
+                .trim(),
+            "0"
+        );
+        supports.push(json!({"columns":columns,
+            "supported_residues":exact_summary["supported_residues"],
+            "zero_residues":exact_summary["zero_residues"],
+            "unordered_pairs":exact_summary["unordered_pairs"]}));
+        for arm in arms {
+            let mut group_s = Vec::new();
+            let mut cpu_ms = Vec::new();
+            let mut trials = Vec::new();
+            let mut relations = Vec::new();
+            let mut ranks = Vec::new();
+            let mut matched_bases = 0usize;
+            for round in 0..3 {
+                for position in 0..4 {
+                    let prefix =
+                        format!("{run_dir}/children/r{round}-b{columns}-t{position}-{arm}");
+                    let exit = fs::read_to_string(format!("{prefix}.exit")).unwrap();
+                    let replay_exit = fs::read_to_string(format!("{prefix}.replay.exit")).unwrap();
+                    if exit.trim() != "0" || replay_exit.trim() != "0" {
+                        incomplete.push(json!({"columns":columns,"arm":arm,
+                            "round":round,"position":position,
+                            "exit":exit.trim(),"replay_exit":replay_exit.trim()}));
+                        continue;
+                    }
+                    let child: Value =
+                        serde_json::from_slice(&fs::read(format!("{prefix}.json")).unwrap())
+                            .unwrap();
+                    assert_eq!(child["verified"], true);
+                    assert_eq!(child["arm"], arm);
+                    assert_eq!(child["columns"], columns);
+                    let operations = group_count(&child["setup_group_ops"])
+                        + group_count(&child["query_group_ops"])
+                        + group_count(&child["verify_group_ops"]);
+                    group_s.push(operations as f64 / (229f64).sqrt());
+                    cpu_ms.push(child["total_cpu_ns"].as_u64().unwrap() as f64 / 1e6);
+                    trials.push(child["trials"].as_u64().unwrap() as f64);
+                    relations.push(child["relations"].as_u64().unwrap() as f64);
+                    ranks.push(child["rank"].as_u64().unwrap() as f64);
+                    matched_bases += usize::from(child["base_matches_frozen"] == true);
+                }
+            }
+            let mean = |values: &[f64]| -> Option<f64> {
+                if values.len() == 12 {
+                    Some(values.iter().sum::<f64>() / 12.0)
+                } else {
+                    None
+                }
+            };
+            rows.push(
+                json!({"columns":columns,"arm":arm,"completed":group_s.len(),
+                "expected":12,"mean_s_group":mean(&group_s),
+                "mean_cpu_ms":mean(&cpu_ms),"mean_trials":mean(&trials),
+                "mean_relations":mean(&relations),"mean_rank":mean(&ranks),
+                "matched_base_children":matched_bases,
+                "complete_portable_s":Value::Null}),
+            );
+        }
+    }
+    let result = json!({"schema":"isogeny_fiber_base_grid_summary/v1",
+        "r":229,"generic_two_class_floor_s":(std::f64::consts::PI/4.0).sqrt(),
+        "supports":supports,"rows":rows,"incomplete_children":incomplete,
+        "complete_portable_s":Value::Null,
+        "cost_scope":"whole-child counted group additions and doublings only; field and other native work unpriced"});
+    let mut svg = String::from(
+        "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1100\" height=\"760\" viewBox=\"0 0 1100 760\"><rect width=\"1100\" height=\"760\" fill=\"white\"/><text x=\"24\" y=\"32\" font-size=\"22\">Factor-base grid: cold counted-group work</text><text x=\"24\" y=\"54\" font-size=\"14\">S_group = whole-child adds and doubles / sqrt(229); portable field price remains open</text>",
+    );
+    for (base_index, support) in result["supports"].as_array().unwrap().iter().enumerate() {
+        let columns = support["columns"].as_u64().unwrap();
+        let supported = support["supported_residues"].as_u64().unwrap();
+        let header_y = 82 + 168 * base_index;
+        svg.push_str(&format!(
+            "<text x=\"24\" y=\"{header_y}\" font-size=\"16\" font-weight=\"bold\">B={columns}, pair support {supported}/229</text>"
+        ));
+        for (arm_index, arm) in arms.iter().enumerate() {
+            let row = &result["rows"][8 * base_index + arm_index];
+            let y = header_y + 9 + 17 * (arm_index + 1);
+            let color = if arm.starts_with("chi") {
+                "#ea580c"
+            } else if arm.contains("inverse") {
+                "#0891b2"
+            } else if arm == &"rho-negation" || arm == &"rho-negation-aa" {
+                "#16a34a"
+            } else {
+                "#2563eb"
+            };
+            svg.push_str(&format!(
+                "<text x=\"40\" y=\"{y}\" font-size=\"12\">{arm}</text>"
+            ));
+            if let Some(s) = row["mean_s_group"].as_f64() {
+                let width = 140.0 * (1.0 + s).log10();
+                svg.push_str(&format!(
+                    "<rect x=\"220\" y=\"{}\" width=\"{width:.2}\" height=\"10\" fill=\"{color}\"/><text x=\"{:.2}\" y=\"{y}\" font-size=\"12\">{s:.3}</text>",
+                    y - 10,
+                    226.0 + width
+                ));
+            } else {
+                svg.push_str(&format!(
+                    "<text x=\"226\" y=\"{y}\" font-size=\"12\" fill=\"#6b7280\">incomplete or censored</text>"
+                ));
+            }
+        }
+    }
+    svg.push_str("</svg>");
+    fs::write(svg_path, svg).unwrap();
+    println!("{}", serde_json::to_string_pretty(&result).unwrap());
+}
+
 fn main() {
     let args: Vec<_> = std::env::args().collect();
+    if args.get(1).map(String::as_str) == Some("summarize-grid") {
+        assert_eq!(args.len(), 4);
+        summarize_grid(&args[2], &args[3]);
+        return;
+    }
     if args.get(1).map(String::as_str) == Some("run-grid") {
         assert_eq!(args.len(), 8);
         run_grid(
