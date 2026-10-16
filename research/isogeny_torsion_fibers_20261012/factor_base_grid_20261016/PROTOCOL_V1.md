@@ -54,15 +54,16 @@ in a checker-only file and never enter a run process.
 
 ## Exactness gate
 
-For each base, independently enumerate all unordered signed pairs
-and their sums for all 229 subgroup residues, including zero hits and
-repeated-summand multiplicities. Compare the complete returned pair
-multiset from the χ chord-resultant root procedure with this enumerator
-for every residue. Record exceptional χ values, vertical and tangent
-cases, repeated roots, failed splits, false candidates, table probes,
-polynomial calls, field calls, and exact additions. Any mismatch stops
-that base's solve panel. Use a 300-second and 512 MiB hard cap per
-exhaustive child; time or memory censorship is not pair-set equality.
+For each base, independently enumerate the set of all unordered signed
+index pairs and their sums for all 229 subgroup residues, including zero
+hits and repeated summands (i=j). Compare the complete returned pair
+set from the χ chord-resultant root procedure with this enumerator for
+every residue. Count repeated polynomial roots separately from index
+pairs. Record exceptional χ values, vertical and tangent cases, failed
+splits, false candidates, table probes, polynomial calls, field calls,
+and exact additions. Any mismatch stops that base's solve panel. Use a
+300-second and 512 MiB hard cap per exhaustive child; time or memory
+censorship is not pair-set equality.
 
 ## Complete-solve panel
 
@@ -70,15 +71,19 @@ Run four targets in three domain-separated rotated rounds at each
 base size. The five relation arms are χ with inverse-Vélu base
 construction, χ with full-image construction, direct pair table with
 inverse-Vélu construction, direct pair table with full-image
-construction, and destination-direct pair table. Recompute and verify
-the same frozen projected columns in every child, charging each
-construction and rejected candidate. For the source arms, source
+construction, and destination-direct pair table. The four source
+relation arms must recompute and verify the same frozen projected
+columns, charging each construction and rejected candidate; source
 subgroup preimages must be derived, not supplied as free witness data.
-All relation arms use the same signed base, seed, trial stream, first
-verified pair rule, and cap of 8r=1,832 trials per target. The
-destination arm uses the mapped subgroup and the same scalar stream.
-If a construction cannot produce the frozen base, retain that failure
-and do not claim paired relation yield.
+The destination-direct arm scans rational destination points in
+ascending point-key order, projects by [195], and takes its first B
+distinct signed orbits. It records its own public base. If that base
+differs from the full-image prefix, report its yield as an unpaired
+base-selection control. All relation arms use the same seed, scalar
+trial stream, first verified pair rule, and cap of 8r=1,832 trials
+per target. The destination arm uses the mapped subgroup. If a
+source construction cannot produce the frozen base, retain that
+failure and do not claim paired relation yield.
 
 For each relation child, collect until rank B+1, solve the modular row
 system, recover the target scalar, and independently check [k]G=Q and
