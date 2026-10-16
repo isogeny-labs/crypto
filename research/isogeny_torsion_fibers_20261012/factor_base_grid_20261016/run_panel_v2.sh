@@ -32,11 +32,16 @@ answers=research/isogeny_torsion_fibers_20261012/chi_polynomial_20261015/differe
 base="$run_dir/BASE_PUBLIC_V1.json"
 cp examples/isogeny_fiber_base_grid.rs "$run_dir/RUNNER_SOURCE_V2.rs.txt"
 cp examples/isogeny_fiber_base_grid_check.rs "$run_dir/CHECKER_SOURCE_V2.rs.txt"
+cp "$runner" "$run_dir/RUNNER_BINARY_V2"
+cp "$checker" "$run_dir/CHECKER_BINARY_V2"
 sha256sum "$runner" "$checker" "$parent" "$heldout" "$answers" \
   "$run_dir/RUNNER_SOURCE_V2.rs.txt" "$run_dir/CHECKER_SOURCE_V2.rs.txt" \
+  "$run_dir/RUNNER_BINARY_V2" "$run_dir/CHECKER_BINARY_V2" \
   research/isogeny_torsion_fibers_20261012/factor_base_grid_20261016/PROTOCOL_V1.md \
   research/isogeny_torsion_fibers_20261012/factor_base_grid_20261016/PROTOCOL_V2.md \
   > "$run_dir/INPUTS.sha256"
+runner="$run_dir/RUNNER_BINARY_V2"
+checker="$run_dir/CHECKER_BINARY_V2"
 {
   date -u '+started_utc=%Y-%m-%dT%H:%M:%SZ'
   uname -a
