@@ -1842,10 +1842,18 @@ fn summarize_grid(run_dir: &str, svg_path: &str) {
         for arm in arms {
             let mut group_s = Vec::new();
             let mut cpu_ms = Vec::new();
+            let mut setup_cpu_ms = Vec::new();
+            let mut relation_cpu_ms = Vec::new();
+            let mut row_cpu_ms = Vec::new();
+            let mut recovery_cpu_ms = Vec::new();
+            let mut verify_cpu_ms = Vec::new();
+            let mut other_cpu_ms = Vec::new();
             let mut trials = Vec::new();
             let mut relations = Vec::new();
             let mut ranks = Vec::new();
             let mut matched_bases = 0usize;
+            let mut group_total = 0u64;
+            let mut rho_group_total = 0u64;
             for round in 0..3 {
                 for position in 0..4 {
                     let prefix =
@@ -1867,8 +1875,28 @@ fn summarize_grid(run_dir: &str, svg_path: &str) {
                     let operations = group_count(&child["setup_group_ops"])
                         + group_count(&child["query_group_ops"])
                         + group_count(&child["verify_group_ops"]);
+                    let rho_prefix =
+                        format!("{run_dir}/children/r{round}-b{columns}-t{position}-rho-negation");
+                    let rho: Value =
+                        serde_json::from_slice(&fs::read(format!("{rho_prefix}.json")).unwrap())
+                            .unwrap();
+                    let rho_operations = group_count(&rho["setup_group_ops"])
+                        + group_count(&rho["query_group_ops"])
+                        + group_count(&rho["verify_group_ops"]);
+                    group_total += operations;
+                    rho_group_total += rho_operations;
                     group_s.push(operations as f64 / (229f64).sqrt());
                     cpu_ms.push(child["total_cpu_ns"].as_u64().unwrap() as f64 / 1e6);
+                    for (field, destination) in [
+                        ("setup_cpu_ns", &mut setup_cpu_ms),
+                        ("relation_cpu_ns", &mut relation_cpu_ms),
+                        ("row_cpu_ns", &mut row_cpu_ms),
+                        ("recovery_cpu_ns", &mut recovery_cpu_ms),
+                        ("verify_cpu_ns", &mut verify_cpu_ms),
+                        ("other_cpu_ns", &mut other_cpu_ms),
+                    ] {
+                        destination.push(child[field].as_u64().unwrap() as f64 / 1e6);
+                    }
                     trials.push(child["trials"].as_u64().unwrap() as f64);
                     relations.push(child["relations"].as_u64().unwrap() as f64);
                     ranks.push(child["rank"].as_u64().unwrap() as f64);
@@ -1882,10 +1910,31 @@ fn summarize_grid(run_dir: &str, svg_path: &str) {
                     None
                 }
             };
+            let spread = |values: &[f64]| -> Option<[f64; 2]> {
+                if values.len() == 12 {
+                    Some([
+                        values.iter().copied().fold(f64::INFINITY, f64::min),
+                        values.iter().copied().fold(f64::NEG_INFINITY, f64::max),
+                    ])
+                } else {
+                    None
+                }
+            };
             rows.push(
                 json!({"columns":columns,"arm":arm,"completed":group_s.len(),
                 "expected":12,"mean_s_group":mean(&group_s),
-                "mean_cpu_ms":mean(&cpu_ms),"mean_trials":mean(&trials),
+                "range_s_group":spread(&group_s),
+                "counted_group_ratio_rho_over_arm":if group_s.len()==12 {
+                    Some(rho_group_total as f64 / group_total as f64)
+                } else {None},
+                "mean_cpu_ms":mean(&cpu_ms),"range_cpu_ms":spread(&cpu_ms),
+                "mean_setup_cpu_ms":mean(&setup_cpu_ms),
+                "mean_relation_cpu_ms":mean(&relation_cpu_ms),
+                "mean_row_cpu_ms":mean(&row_cpu_ms),
+                "mean_recovery_cpu_ms":mean(&recovery_cpu_ms),
+                "mean_verify_cpu_ms":mean(&verify_cpu_ms),
+                "mean_other_cpu_ms":mean(&other_cpu_ms),
+                "mean_trials":mean(&trials),
                 "mean_relations":mean(&relations),"mean_rank":mean(&ranks),
                 "matched_base_children":matched_bases,
                 "complete_portable_s":Value::Null}),
@@ -1898,7 +1947,7 @@ fn summarize_grid(run_dir: &str, svg_path: &str) {
         "complete_portable_s":Value::Null,
         "cost_scope":"whole-child counted group additions and doublings only; field and other native work unpriced"});
     let mut svg = String::from(
-        "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1100\" height=\"760\" viewBox=\"0 0 1100 760\"><rect width=\"1100\" height=\"760\" fill=\"white\"/><text x=\"24\" y=\"32\" font-size=\"22\">Factor-base grid: cold counted-group work</text><text x=\"24\" y=\"54\" font-size=\"14\">S_group = whole-child adds and doubles / sqrt(229); portable field price remains open</text>",
+        "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1100\" height=\"760\" viewBox=\"0 0 1100 760\"><rect width=\"1100\" height=\"760\" fill=\"white\"/><text x=\"24\" y=\"32\" font-size=\"22\">Factor-base grid: cold counted-group work</text><text x=\"24\" y=\"54\" font-size=\"14\">Mean (range), 12 paired children per arm and B. S_group = adds + doubles per sqrt(229); portable price open.</text>",
     );
     for (base_index, support) in result["supports"].as_array().unwrap().iter().enumerate() {
         let columns = support["columns"].as_u64().unwrap();
@@ -1924,8 +1973,10 @@ fn summarize_grid(run_dir: &str, svg_path: &str) {
             ));
             if let Some(s) = row["mean_s_group"].as_f64() {
                 let width = 140.0 * (1.0 + s).log10();
+                let low = row["range_s_group"][0].as_f64().unwrap();
+                let high = row["range_s_group"][1].as_f64().unwrap();
                 svg.push_str(&format!(
-                    "<rect x=\"220\" y=\"{}\" width=\"{width:.2}\" height=\"10\" fill=\"{color}\"/><text x=\"{:.2}\" y=\"{y}\" font-size=\"12\">{s:.3}</text>",
+                    "<rect x=\"220\" y=\"{}\" width=\"{width:.2}\" height=\"10\" fill=\"{color}\"/><text x=\"{:.2}\" y=\"{y}\" font-size=\"12\">{s:.1} ({low:.1}-{high:.1})</text>",
                     y - 10,
                     226.0 + width
                 ));
