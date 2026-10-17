@@ -63,7 +63,8 @@ def run(binary, output):
     prior.parent.write_json(output / "host.json", prior.parent.host_receipt(group))
     for name, k in ARMS:
         folder = output / "runs" / name
-        environment = prior.ic_environment(folder, "root11_dynamic")
+        environment = prior.ic_environment(folder, "root11_dynamic",
+                                            "parallel_cancel")
         if (environment["KIC_TARGET_THREADS"] != "2" or
                 environment["KIC_TARGET_CANCEL"] != "1"):
             raise ValueError("cancellation flags differ")
