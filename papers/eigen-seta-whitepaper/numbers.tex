@@ -26,3 +26,35 @@ $\times$ 3, Q5 1 $\times$ 3, and single-core L1 2 $\times$ 5, L3 and L5 1
 $\times$ 3. The Q sets use \texttt{jobs}=4 for key generation; every other
 row uses \texttt{jobs}=1. Medians are reported with the range, because the
 samples are few and the host is noisy.}
+\newcommand{\QFiveSummary}{Q5 key generation is the slowest operation of the
+scheme (\S\ref{sec:perf}).}
+\newcommand{\PerfDiscussion}{%
+\paragraph{Reading the numbers.}
+\begin{itemize}[nosep]
+\item \emph{Decapsulation dominates online cost.} It is a $(2^E,2^E)$
+  theta chain plus pairings and a re-encryption. At L1 it is about six
+  times the cost of encapsulation, a 3-isogeny chain of length $F$. Across
+  sets it scales roughly as $E\cdot M(p)$, where $M(p)$ is the
+  $\F_{p^2}$ multiplication time of Table~\ref{tab:field}.
+\item \emph{Threads.} Decapsulation runs four independent ladders and the
+  chain's two Montgomery conversions in parallel. On one core it is about
+  1.6 times slower at L1 and 1.7 times at L3 and L5
+  (Table~\ref{tab:onecore}). Encapsulation barely changes.
+\item \emph{Key generation is a rejection search.} Its time per key varies
+  by up to a factor of two within a set, so medians over five keys are
+  rough. With \texttt{jobs}=4, Q3 used 2.4--2.8\,ks of CPU per key, finished
+  in 11.5--15.7 minutes of wall time, and used the four cores at about 75\%.
+  L5 key generation is faster than L3 at the median. The rejection rate,
+  not the field size, sets the cost, and five samples cannot resolve the
+  difference.
+\item \emph{PKE} adds one ChaCha20-Poly1305 pass to the KEM. For a 1\,KiB
+  message it is indistinguishable from the KEM times.
+\item \emph{Comparison with the historical build.} Revision~1 of the
+  companion paper measured decapsulation with a Mumford-coordinate chain:
+  13.4--15.0\,s at L1, 51.8--53.9\,s at L3 and 120--124\,s at L5, on a
+  2.80\,GHz VM. The theta build is roughly 10 times faster at every L set.
+  Those are different hosts, so treat this as an order of magnitude, not a
+  measured speedup.
+\item \emph{No external comparison.} No other implementation of this
+  scheme exists, so there is no external tool to compare against.
+\end{itemize}}

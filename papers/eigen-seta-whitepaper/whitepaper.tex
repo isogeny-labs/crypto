@@ -155,8 +155,8 @@ the quantum-hardened level-1 set.
 \caption{Parameters and object sizes in bytes. Public key and ciphertext are
 four $\F_{p^2}$ elements each. Files add an 8-byte header. A PKE ciphertext
 is the KEM ciphertext, a 12-byte nonce, the message and a 16-byte tag.
-Sizes measured by the benchmark (\art{sizes} rows); parameters from
-\art{eigenx:src/params_generated.rs}.}
+Sizes measured by the benchmark (\texttt{sizes} rows); parameters from
+\texttt{eigenx:src/params\_generated.rs}.}
 \label{tab:params}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lrrrrrrrrrrr}
@@ -187,7 +187,7 @@ $7d^2f^2$. Two half-chains would cut this to about $d^3$
 four vCPUs available (the KEM uses scoped threads inside decapsulation and
 encapsulation). Key generation is one attempt loop per key
 (\texttt{jobs}=1 for L, \texttt{jobs}=4 for Q). Every decapsulation and PKE
-decryption returned the right value. Run \art{\BenchRunId}.}
+decryption returned the right value. Run \texttt{\BenchRunId}.}
 \label{tab:perf}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lrrrrr}
@@ -202,7 +202,7 @@ set & keygen wall & keygen CPU & encaps & decaps & PKE enc / dec (1\,KiB)\\
 \begin{table}[h]
 \centering
 \caption{The same operations restricted to one core (\texttt{taskset -c 0}).
-Median [min--max]. Run \art{\BenchRunId}.}
+Median [min--max]. Run \texttt{\BenchRunId}.}
 \label{tab:onecore}
 \begin{tabular}{lrrr}
 \toprule
@@ -217,7 +217,7 @@ set & keygen & encaps & decaps\\
 \centering
 \includegraphics[width=\textwidth]{figures/perf.pdf}
 \caption{Every sample of every operation, log scale, all cores. Measured;
-run \art{\BenchRunId}.}
+run \texttt{\BenchRunId}.}
 \label{fig:perf}
 \end{figure}
 
@@ -273,7 +273,7 @@ than that except where noted.
 \caption{Measured cost of the attacker's chain step: one public-key degree
 test of length $e$ for the true $f$ of each key (accepted in every case).
 ``Mult.-equiv.'' is wall time per step divided by $\F_{p^2}$ multiplication
-time. Median over keys. Run \art{\BenchRunId}.}
+time. Median over keys. Run \texttt{\BenchRunId}.}
 \label{tab:chain}
 \begin{tabular}{lrrrr}
 \toprule
