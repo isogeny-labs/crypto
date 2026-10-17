@@ -42,6 +42,9 @@ Both result PDFs and the import PDF were rendered from their Typst sources
 and visually inspected. The two diagram PNGs were rendered at 150 dpi from
 their SVG sources through the checked Typst render files. The same files
 were copied into `benchmarks/20261017-n83-structured-m4/` from this study.
+The PNG metadata was set to 150 dpi with `sips`; `sips -g dpiWidth -g
+dpiHeight` reports 150/150 for both study copies, and `cmp` confirms each
+benchmark copy is byte-identical.
 No canonical IC progress graph changed because neither capped arm supplied a
 verified relation/rank increment or a complete-cost result.
 
