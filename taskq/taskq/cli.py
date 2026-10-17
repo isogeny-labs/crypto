@@ -77,6 +77,7 @@ def cmd_worker(args) -> None:
                labels=_labels(args.label),
                artifact_dir=Path(args.artifact_dir) if args.artifact_dir else None,
                result_dir=Path(args.result_dir) if args.result_dir else None,
+               checkpoint_dir=Path(args.checkpoint_dir) if args.checkpoint_dir else None,
                lease_seconds=args.lease_seconds, cpus=cpus)
     install_signal_handlers(w)
     w.run_forever(max_tasks=args.max_tasks)
@@ -134,6 +135,7 @@ def main(argv: list[str] | None = None) -> None:
     w.add_argument("--repos", help="repo allowlist file (default: TASKQ_REPOS or built-in)")
     w.add_argument("--cache-dir", default=os.environ.get("TASKQ_CACHE_DIR", "/var/cache/taskq"))
     w.add_argument("--artifact-dir", default=os.environ.get("TASKQ_ARTIFACT_DIR"))
+    w.add_argument("--checkpoint-dir", default=os.environ.get("TASKQ_CHECKPOINT_DIR"))
     w.add_argument("--result-dir", default=os.environ.get("TASKQ_RESULT_DIR"))
     w.add_argument("--max-trees", type=int, default=8, help="cached checkouts per repo")
     w.add_argument("--lease-seconds", type=float, default=60)
@@ -143,6 +145,12 @@ def main(argv: list[str] | None = None) -> None:
 
     m = sub.add_parser("mcp", help="serve the MCP tools over stdio")
     m.set_defaults(fn=lambda a: __import__("taskq.mcp_server", fromlist=["main"]).main())
+
+    c = sub.add_parser("checkpoint", help="publish a durable application checkpoint")
+    c.add_argument("action", choices=["save"])
+    c.add_argument("file")
+    c.set_defaults(fn=lambda a: __import__("taskq.checkpoint", fromlist=["main"]).main(
+        [a.action, a.file]))
 
     args = ap.parse_args(argv)
     if getattr(args, "argv", None) and args.argv[:1] == ["--"]:

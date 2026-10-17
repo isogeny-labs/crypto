@@ -30,12 +30,14 @@ class Worker:
     def __init__(self, store: Store, queues: list[str], repos: RepoCache,
                  worker_id: str, labels: dict[str, str] | None = None,
                  artifact_dir: Path | None = None, result_dir: Path | None = None,
+                 checkpoint_dir: Path | None = None,
                  lease_seconds: float = 60.0, block_seconds: float = 5.0,
                  cpus: list[int] | None = None):
         self.store, self.queues, self.repos = store, queues, repos
         self.id = worker_id
         self.labels = labels or {}
         self.artifact_dir, self.result_dir = artifact_dir, result_dir
+        self.checkpoint_dir = checkpoint_dir
         self.lease_ms = int(lease_seconds * 1000)
         self.block_ms = int(block_seconds * 1000)
         self.cpus = cpus
@@ -130,7 +132,8 @@ class Worker:
         log.info("%s: running (attempt %d, fence %d)", task_id, attempt, fence)
         try:
             body = execute(spec, task_id, attempt, self.repos, self.artifact_dir,
-                           stop=stop, worker_cpus=self.cpus)
+                           stop=stop, worker_cpus=self.cpus,
+                           checkpoint_root=self.checkpoint_dir)
         except Fenced:
             log.warning("%s: fenced mid-run; abandoning without writing", task_id)
             return

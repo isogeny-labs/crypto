@@ -23,7 +23,7 @@ variable "vpc_cidr" {
 
 variable "cluster_version" {
   type    = string
-  default = "1.31"
+  default = "1.36"
 }
 
 variable "cluster_endpoint_public_access_cidrs" {
@@ -32,32 +32,28 @@ variable "cluster_endpoint_public_access_cidrs" {
   default     = ["0.0.0.0/0"]
 }
 
-# ---- node groups ------------------------------------------------------------
-# One worker pod per node: size nodes for one pool's resources plus reserved.
-# EKS managed node groups ignore desired_size after creation (the module keeps
-# it out of the diff so autoscalers can own it); change a running group's size
-# with `aws eks update-nodegroup-config` or install an autoscaler.
+# ---- Karpenter Spot worker pools -------------------------------------------
 
-variable "cpu_node" {
-  type = object({
-    instance_type = string
-    min_size      = number
-    desired_size  = number
-    max_size      = number
-  })
-  default = { instance_type = "c7i.2xlarge", min_size = 0, desired_size = 2, max_size = 20 }
+variable "cpu_spot_instance_types" {
+  description = "Multiple eligible shapes improve Spot availability; every one is Spot."
+  type        = list(string)
+  default     = ["c7i.2xlarge", "c7a.2xlarge", "c6i.2xlarge", "m7i.2xlarge"]
+  validation {
+    condition     = length(var.cpu_spot_instance_types) > 0
+    error_message = "At least one CPU Spot instance type is required."
+  }
 }
 
-variable "gpu_node" {
-  description = "g7e = RTX PRO 6000 Blackwell (sm_120). desired_size 0: a GPU costs money while idle."
-  type = object({
-    enabled       = bool
-    instance_type = string
-    min_size      = number
-    desired_size  = number
-    max_size      = number
-  })
-  default = { enabled = true, instance_type = "g7e.2xlarge", min_size = 0, desired_size = 0, max_size = 4 }
+variable "gpu_spot_instance_types" {
+  description = "GPU Spot shapes. Empty disables the GPU NodePool and device plugin."
+  type        = list(string)
+  default     = []
+}
+
+variable "karpenter_ami_alias" {
+  description = "Pin an EKS AL2023 AMI release before production use, for example al2023@vYYYYMMDD."
+  type        = string
+  default     = "al2023@latest"
 }
 
 # ---- Redis ------------------------------------------------------------------
@@ -116,8 +112,9 @@ variable "pools" {
     }))
   }))
   default = [
-    { name = "cpu", queues = ["cpu"], replicas = 2, node_group = "cpu",
-    cpu = "6", memory = "12Gi", labels = { pool = "cpu-c7i" } },
+    { name = "cpu", queues = ["cpu"], replicas = 0, node_group = "cpu",
+      cpu  = "6", memory = "12Gi", labels = { pool = "cpu-spot" },
+    keda = { min_replicas = 0, max_replicas = 20, lag_count = 1 } },
   ]
   validation {
     condition     = alltrue([for p in var.pools : contains(["cpu", "gpu"], p.node_group)])
@@ -131,9 +128,9 @@ variable "namespace" {
 }
 
 variable "enable_keda" {
-  description = "KEDA redis-streams scalers. Pods only; without a node autoscaler extra pods sit Pending."
+  description = "KEDA scales worker pods from zero; Karpenter scales Spot nodes for Pending pods."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "results_storage" {

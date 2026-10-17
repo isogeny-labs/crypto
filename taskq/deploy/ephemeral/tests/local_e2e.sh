@@ -110,6 +110,20 @@ check "deadline timer was armed first" grep -q 'on-active=' "$FAKE_AWS"/ec2/*.ti
 check "instance terminated itself" wait_state "$id" terminated 30
 check "shutdown was called" bash -c "cat '$FAKE_AWS'/ec2/*.shutdown | grep -q 'shutdown -h now'"
 check "deadline tag set at launch" grep -q "ephemeral:deadline,Value=" "$FAKE_AWS/calls.log"
+check "launch explicitly requested Spot" grep -q -- '--instance-market-options MarketType=spot' "$FAKE_AWS/calls.log"
+
+echo "== resume from prior S3 output"
+prior=$id
+set +e
+"$CLI" run --toolchain none --ttl 30m --no-source --resume "$prior" --name e2e-resume -- \
+    'test -s "$EPHEMERAL_RESUME_DIR/nproc.txt" && cp "$EPHEMERAL_RESUME_DIR/nproc.txt" "$EPHEMERAL_OUT/resumed.txt"'
+rc=$?
+set -e
+id=$(last)
+out=$XDG_CACHE_HOME/ephemeral/runs/$id
+check "resumed run exits 0" test "$rc" -eq 0
+check "prior output was restored" test -s "$out/out/resumed.txt"
+check "resumed run still requested Spot" bash -c "grep 'ec2 run-instances' '$FAKE_AWS/calls.log' | tail -1 | grep -q -- '--instance-market-options MarketType=spot'"
 
 echo "== failing command, argv form, capacity retry"
 rm -f "$FAKE_AWS/capacity-fails"

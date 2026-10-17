@@ -454,6 +454,10 @@ class PermanentUploadRejection(RuntimeError):
     pass
 
 
+class PendingUpload(RuntimeError):
+    pass
+
+
 class ApiStore:
     """Credential-free worker store backed by the authenticated upload API."""
 
@@ -528,7 +532,7 @@ class ApiStore:
             # lease.  The worker owns heartbeat processing, so waiting here
             # would silently let that lease expire.  Keep the durable spool
             # entry and let the next upload cycle observe the terminal state.
-            raise RuntimeError("upload validation is still pending")
+            raise PendingUpload("upload validation is still pending")
         if ticket.get("status") != "UPLOADING" or not ticket.get("uploadUrl"):
             raise RuntimeError("upload API did not issue an uploadable ticket")
         command = ["curl", "--fail", "--silent", "--show-error", "--location",
@@ -550,7 +554,7 @@ class ApiStore:
             raise PermanentUploadRejection(
                 "upload validator rejected the object: %s"
                 % state.get("reason", "unspecified validation failure"))
-        raise RuntimeError("upload validation is still pending")
+        raise PendingUpload("upload validation is still pending")
 
     def seedRead(self, key):
         result = self._request("/v1/seeds/read", {"key": key})
@@ -1629,6 +1633,29 @@ class Worker:
         return dropped
 
     # ---- durable copies ---------------------------------------------------
+    def publishSnapshot(self, slot, snap):
+        """Commit a snapshot only after all earlier DP bytes reached the store."""
+        it = checkpointIter(snap)
+        if it < 0 or it == self.state.get("ckptIter", -1):
+            return
+        if self.contract:
+            key = "ckpt/slot-%05d/%s.ck" % (slot, sha256File(snap))
+            writeJson(snap + ".json", envelope(snap, self.contract, "checkpoint", iteration=it))
+            if hasattr(self.store, "putValidated"):
+                self.store.putValidated(snap, key, snap + ".json")
+            else:
+                self.store.put(snap, key)
+                self.store.put(snap + ".json", key + ".json")
+            if not self.slots.heartbeat(slot, self.owner, {"checkpointKey": key, "ckptIter": it}):
+                self.leaseLost = True
+                self.stopping = True
+                raise RuntimeError("lease lost: checkpoint pointer not committed")
+            self.lastBeatSuccess = time.monotonic()
+        else:
+            self.store.put(snap, self.ckptKey(slot))
+        self.state["ckptIter"] = it
+        self.saveState()
+
     def uploadCycle(self, slot):
         """Copy new points, then the checkpoint that follows them, to the store.
 
@@ -1661,9 +1688,18 @@ class Worker:
                                % self.spoolBytes())
         snap = self.ckptPath + ".snap"
         if os.path.exists(snap):
-            os.remove(snap)
+            # A prior delta was still validating when this snapshot was cut.
+            # The spool has now drained, so publish its checkpoint before
+            # cutting another delta that may itself remain pending.  Otherwise
+            # every cycle discards the old snapshot and starves checkpoints.
+            try:
+                self.publishSnapshot(slot, snap)
+            except PendingUpload:
+                log("checkpoint validation pending; continuing DP uploads")
+            else:
+                os.remove(snap)
         haveSnap = False
-        if os.path.exists(self.ckptPath):
+        if not os.path.exists(snap) and os.path.exists(self.ckptPath):
             os.link(self.ckptPath, snap)
             haveSnap = True
         size = os.path.getsize(self.dpPath) if os.path.exists(self.dpPath) else 0
@@ -1710,26 +1746,12 @@ class Worker:
                     if os.path.exists(path):
                         os.remove(path)
         if haveSnap:
-            it = checkpointIter(snap)
-            if it >= 0 and it != self.state.get("ckptIter", -1):
-                if self.contract:
-                    key = "ckpt/slot-%05d/%s.ck" % (slot, sha256File(snap))
-                    writeJson(snap + ".json", envelope(snap, self.contract, "checkpoint", iteration=it))
-                    if hasattr(self.store, "putValidated"):
-                        self.store.putValidated(snap, key, snap + ".json")
-                    else:
-                        self.store.put(snap, key)
-                        self.store.put(snap + ".json", key + ".json")
-                    if not self.slots.heartbeat(slot, self.owner, {"checkpointKey": key, "ckptIter": it}):
-                        self.leaseLost = True
-                        self.stopping = True
-                        raise RuntimeError("lease lost: checkpoint pointer not committed")
-                    self.lastBeatSuccess = time.monotonic()
-                else:
-                    self.store.put(snap, self.ckptKey(slot))
-                self.state["ckptIter"] = it
-                self.saveState()
-            os.remove(snap)
+            try:
+                self.publishSnapshot(slot, snap)
+            except PendingUpload:
+                log("checkpoint validation pending; retaining snapshot")
+            else:
+                os.remove(snap)
 
     def reportRds(self, deltaPath, slot):
         """Copy new GPU records into rho-dp, including each walk's starting seed.

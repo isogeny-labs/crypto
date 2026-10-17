@@ -65,7 +65,9 @@ $E cache                            # list the git and cargo cache entries
 | option | default | |
 |---|---|---|
 | `--type T` | `c7i.4xlarge` | GPU types (`g*`, `p*`) boot the NVIDIA Deep Learning Base AMI (AL2023); Graviton types boot arm64 AL2023 |
-| `--spot` | on-demand | one-time spot request; cheaper, can be reclaimed |
+| `--spot` | Spot only | accepted for compatibility; launches always request Spot and fail when unavailable |
+| `--resume ID` | none | restore the prior job's `out/` from S3 into `$EPHEMERAL_RESUME_DIR` before setup |
+
 | `--ttl SPAN` | `4h` | `90m`, `6h`, `2d`; 15 min to `max_ttl_hours` (48 h) |
 | `--disk GB` | 100 | encrypted gp3 root |
 | `--toolchain P` | `rust` | `none`, `build` (Development Tools, cmake, clang, gmp, mpfr, openssl), `rust` (build + rustup stable). `build` and `rust` boot the baked image when there is one |
@@ -80,6 +82,17 @@ $E cache                            # list the git and cargo cache entries
 | `--no-source` | | no checkout at all |
 | `--keep` | | leave the box up after the job, until the TTL (debugging with `shell`) |
 | `--name`, `--out`, `--ami` | | job label, output dir, explicit AMI |
+
+Every `ephemeral run` now uses a one-time Spot request. If all configured
+zones lack Spot capacity, the launch fails and creates no On-Demand instance.
+The command should write a complete checkpoint periodically into
+`$EPHEMERAL_OUT` and save one on SIGTERM. On a Spot interruption notice, the
+runner signals the command's process group, allows 60 seconds for its handler,
+then uploads `out/` to S3. To resume, rerun the same command with
+`--resume <interrupted-job-id>`; the application reads the prior checkpoint
+from `$EPHEMERAL_RESUME_DIR`. The previous S3 output is kept separate from the
+new job's `$EPHEMERAL_OUT`. The direct runner requires this explicit relaunch;
+taskq automatically requeues and resumes a checkpoint-enabled command.
 
 The job sees `EPHEMERAL_JOB_ID`, `EPHEMERAL_OUT` (write results here) and
 `EPHEMERAL_SRC` (the checkout, also the working directory).
@@ -358,7 +371,7 @@ in the region; as of 2026-10-16 it exists in no region of account
 **Spot capacity:** on 2026-10-16, us-east-1 had no spot capacity for
 `c7i.4xlarge` or `c6i.4xlarge` in any zone, while 2- and 4-vCPU spot types
 launched at once. When every zone refuses, `run` prints each zone's reason;
-drop `--spot` or pick another type.
+pick another Spot eligible type or retry later.
 
 The machine running the CLI needs `aws` (v2), `jq` and `git`, plus the
 `ephemeral-launcher` policy. Set `EPHEMERAL_REGION` if the stack is not in
