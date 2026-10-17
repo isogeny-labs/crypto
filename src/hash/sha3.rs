@@ -130,10 +130,20 @@ fn keccak_sponge(msg: &[u8], rate: usize, output_len: usize, suffix: u8) -> Vec<
 
 // ── Public API ───────────────────────────────────────────────────────────────
 
+/// SHA3-224: rate=144 bytes, output=28 bytes, domain suffix=0x06.
+pub fn sha3_224(data: &[u8]) -> [u8; 28] {
+    keccak_sponge(data, 144, 28, 0x06).try_into().unwrap()
+}
+
 /// SHA3-256: rate=136 bytes, output=32 bytes, domain suffix=0x06.
 pub fn sha3_256(data: &[u8]) -> [u8; 32] {
     let v = keccak_sponge(data, 136, 32, 0x06);
     v.try_into().unwrap()
+}
+
+/// SHA3-384: rate=104 bytes, output=48 bytes, domain suffix=0x06.
+pub fn sha3_384(data: &[u8]) -> [u8; 48] {
+    keccak_sponge(data, 104, 48, 0x06).try_into().unwrap()
 }
 
 /// SHA3-512: rate=72 bytes, output=64 bytes.
@@ -158,6 +168,15 @@ mod tests {
 
     fn h(s: &str) -> Vec<u8> {
         hex::decode(s).unwrap()
+    }
+
+    #[test]
+    fn sha3_224_and_384_abc() {
+        assert_eq!(
+            sha3_224(b"abc").as_slice(),
+            h("e642824c3f8cf24ad09234ee7d3c766fc9a3a5168d0c94ad73b46fdf")
+        );
+        assert_eq!(sha3_384(b"abc").as_slice(), h("ec01498288516fc926459f58e2c6ad8df9b473cb0fc08c2596da7cf0e49be4b298d88cea927ac7f539f1edf228376d25"));
     }
 
     #[test]

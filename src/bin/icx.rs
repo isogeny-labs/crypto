@@ -1,6 +1,6 @@
-//! # `icx` — index calculus across every standardized curve.
+//! # `icx` — curve catalog, IC estimates, and bounded analogue runs.
 //!
-//! One command that accepts any standardized elliptic curve by name and, per
+//! This command accepts names in its curve catalog and, per
 //! `docs/ic/ENGINE_AUDIT_AND_DESIGN.md`:
 //!
 //! - `icx list` — enumerate the catalog (filter by `--family`);
@@ -9,13 +9,12 @@
 //!   picture for this size, with heuristics named;
 //! - `icx <curve>` — shorthand for `inspect`.
 //!
-//! `icx run` (execute the pipeline on an in-envelope curve or a same-family
-//! analogue) is layered on top of this in the same crate and lands with the
-//! solver wiring; this binary is the catalog-and-estimate front door and never
-//! claims to solve what it has not.
+//! - `icx run <curve>` — execute a bounded analogue for a prime, binary, or
+//!   Koblitz catalog curve. Extension and characteristic-three runs are not
+//!   connected, and exact named-curve execution is unavailable.
 //!
-//! Every subcommand supports `--json` for a machine-readable report carrying a
-//! provenance block (binary hash, git commit, host, dispatched field backend).
+//! Every subcommand supports `--json`. Its provenance block records the package
+//! version, OS, architecture, and host field-backend capability label.
 
 use std::process::ExitCode;
 
@@ -32,12 +31,12 @@ use crypto_lib::cryptanalysis::ic_engine;
 #[command(
     name = "icx",
     version,
-    about = "Index calculus across every standardized elliptic curve",
-    long_about = "Inspect, estimate and (where feasible) run index calculus on \
-                  any standardized curve — prime, binary, Koblitz, extension \
-                  field, or characteristic three — selected by name. See \
-                  `icx list` for the catalog and \
-                  docs/ic/ENGINE_AUDIT_AND_DESIGN.md for the honest scope."
+    about = "Inspect catalog curves, estimate IC costs, and run bounded analogues",
+    long_about = "Inspect and estimate curves in the catalog. `icx run` executes \
+                  bounded prime, binary, or Koblitz analogues; extension and \
+                  characteristic-three families are estimate-only. Exact \
+                  named-curve runs are not connected. Use `icx list` for names \
+                  and docs/ic/ENGINE_AUDIT_AND_DESIGN.md for the run scope."
 )]
 struct Cli {
     #[command(subcommand)]
@@ -60,7 +59,7 @@ enum Action {
     Validate(CurveArg),
     /// Report the generic-attack cost and the IC picture for this curve.
     Estimate(EstimateArgs),
-    /// Run the index-calculus pipeline on the curve (or a same-family analogue).
+    /// Run a bounded same-family analogue for a prime, binary, or Koblitz curve.
     Run(RunArgs),
     /// Solve a quadratic Boolean system with the FES kernel (CPU or GPU worker).
     Fes(FesArgs),
@@ -121,7 +120,7 @@ struct RunArgs {
     /// Counted Pollard-rho reference runs to average (0 to skip).
     #[arg(long, default_value_t = 8)]
     rho_runs: usize,
-    /// End-to-end envelope in subgroup-order bits.
+    /// Reference envelope in subgroup-order bits for the regime report.
     #[arg(long, default_value_t = ic_engine::ATTACK_ENVELOPE_BITS)]
     envelope: u64,
     /// Per-solver-call budget in seconds (0 for none).

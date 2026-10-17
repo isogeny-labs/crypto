@@ -30,7 +30,10 @@ use crypto_lib::{
         keys::{EccKeyPair, EccPublicKey},
         point::Point,
     },
-    hash::{blake3_hash, sha256, sha3_256},
+    hash::{
+        blake3_hash, sha224, sha256, sha384, sha3_224, sha3_256, sha3_384, sha3_512, sha512,
+        sha512_224, sha512_256, shake128, shake256,
+    },
     kdf::hkdf::hkdf,
     pqc::kyber::{kyber_decapsulate, kyber_encapsulate, kyber_keygen},
     pqc::ml_dsa::{ml_dsa_65_keygen, ml_dsa_65_sign, ml_dsa_65_verify},
@@ -60,8 +63,14 @@ struct Cli {
 #[derive(Subcommand)]
 #[allow(clippy::large_enum_variant)]
 enum Cmd {
-    /// Hash a message with the given algorithm (sha256 | sha3 | blake3)
-    Hash { algorithm: String, message: String },
+    /// Hash a message with SHA-2, SHA-3, SHAKE, or BLAKE3.
+    Hash {
+        algorithm: String,
+        message: String,
+        /// Required output length in bytes for SHAKE128 and SHAKE256.
+        #[arg(long)]
+        output_bytes: Option<usize>,
+    },
     /// ECC operations (keygen)
     Ecc {
         #[command(subcommand)]
@@ -278,17 +287,16 @@ enum CryptanalysisOp {
     /// (Equivalent to `cargo test --lib --release bench_demo --
     /// --ignored --nocapture` but accessible from the CLI.)
     Bench,
-    /// Auto-run every applicable hash-function attack (length
-    /// extension, birthday collision, Joux multicollision,
-    /// differential bias) against the named hash.  Targets: md4, md5, sha1.
+    /// Run applicable length-extension, truncated birthday, and
+    /// differential-bias checks for md4, md5, sha1, sha256, or sha3-256.
     HashAuto {
-        /// Hash identifier: `md4`, `md5`, or `sha1`.
+        /// Hash identifier: md4, md5, sha1, sha256, or sha3-256.
         #[arg(long)]
         hash: String,
     },
     /// Length-extension attack demo against a Merkle-Damgård hash.
     LengthExtension {
-        /// Hash identifier: `md4`, `md5`, or `sha1`.
+        /// Hash identifier: md4, md5, sha1, or sha256.
         #[arg(long)]
         hash: String,
         /// Length (in bytes) of the unknown secret prefix.
@@ -516,7 +524,17 @@ fn main() {
     }
 
     match cli.command {
-        Cmd::Hash { algorithm, message } => cmd_hash(&algorithm, &message),
+        Cmd::Hash {
+            algorithm,
+            message,
+            output_bytes,
+        } => match cmd_hash(&algorithm, &message, output_bytes) {
+            Ok(digest) => println!("{digest}"),
+            Err(error) => {
+                eprintln!("hash: {error}");
+                std::process::exit(2);
+            }
+        },
         Cmd::Ecc { op: EccOp::Keygen } => cmd_ecc_keygen(),
         Cmd::Ecdsa { op } => cmd_ecdsa(op),
         Cmd::Ecdh => cmd_ecdh(),
@@ -1525,12 +1543,21 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
             digest_hex,
         } => {
             use crypto_lib::cryptanalysis::hash_attacks::{
-                length_extension_attack, Md4, Md5, MerkleDamgardHash, Sha1,
+                length_extension_attack, Md4, Md5, MerkleDamgardHash, Sha1, Sha256,
             };
-            let message = from_hex(&message_hex).expect("bad message hex");
-            let suffix = from_hex(&suffix_hex).expect("bad suffix hex");
-            let digest = from_hex(&digest_hex).expect("bad digest hex");
-            let prefix_len = secret_len + message.len();
+            let parse = |label: &str, value: &str| {
+                from_hex(value).unwrap_or_else(|e| {
+                    eprintln!("length-extension: invalid {label} hex: {e}");
+                    std::process::exit(2);
+                })
+            };
+            let message = parse("message", &message_hex);
+            let suffix = parse("suffix", &suffix_hex);
+            let digest = parse("digest", &digest_hex);
+            let prefix_len = secret_len.checked_add(message.len()).unwrap_or_else(|| {
+                eprintln!("length-extension: secret and message lengths overflow");
+                std::process::exit(2);
+            });
             fn report_lex<H: MerkleDamgardHash>(
                 hash: &H,
                 digest: &[u8],
@@ -1538,6 +1565,15 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
                 message: &[u8],
                 suffix: &[u8],
             ) {
+                if digest.len() != hash.output_bytes() {
+                    eprintln!(
+                        "length-extension: {} requires a {}-byte digest, got {} bytes",
+                        hash.name(),
+                        hash.output_bytes(),
+                        digest.len()
+                    );
+                    std::process::exit(2);
+                }
                 let (forged, glue) = length_extension_attack(hash, digest, prefix_len, suffix);
                 println!("# Length-extension attack on `{}`", hash.name());
                 println!();
@@ -1561,8 +1597,12 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
                 "md4" => report_lex(&Md4, &digest, prefix_len, &message, &suffix),
                 "md5" => report_lex(&Md5, &digest, prefix_len, &message, &suffix),
                 "sha1" => report_lex(&Sha1, &digest, prefix_len, &message, &suffix),
+                "sha256" | "sha-256" => report_lex(&Sha256, &digest, prefix_len, &message, &suffix),
                 other => {
-                    eprintln!("error: unknown hash '{}' (try md4, md5, sha1)", other);
+                    eprintln!(
+                        "error: unknown hash '{}' (try md4, md5, sha1, sha256)",
+                        other
+                    );
                     std::process::exit(1);
                 }
             }
@@ -1746,13 +1786,37 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
 
 // ── Command implementations ───────────────────────────────────────────────────
 
-fn cmd_hash(alg: &str, msg: &str) {
-    match alg {
-        "sha256" => println!("{}", to_hex(&sha256(msg.as_bytes()))),
-        "sha3" => println!("{}", to_hex(&sha3_256(msg.as_bytes()))),
-        "blake3" => println!("{}", to_hex(&blake3_hash(msg.as_bytes()))),
-        _ => eprintln!("Unknown algorithm. Use: sha256, sha3, blake3"),
-    }
+fn cmd_hash(alg: &str, msg: &str, output_bytes: Option<usize>) -> Result<String, String> {
+    let is_xof = matches!(alg, "shake128" | "shake256");
+    let length = if is_xof {
+        match output_bytes {
+            Some(length @ 1..=1_048_576) => length,
+            _ => return Err("SHAKE requires --output-bytes in 1..=1048576".into()),
+        }
+    } else {
+        if output_bytes.is_some() {
+            return Err("--output-bytes applies only to SHAKE128 and SHAKE256".into());
+        }
+        0
+    };
+    let bytes = msg.as_bytes();
+    let digest = match alg {
+        "sha224" | "sha-224" => to_hex(&sha224(bytes)),
+        "sha256" | "sha-256" => to_hex(&sha256(bytes)),
+        "sha384" | "sha-384" => to_hex(&sha384(bytes)),
+        "sha512" | "sha-512" => to_hex(&sha512(bytes)),
+        "sha512-224" | "sha-512-224" => to_hex(&sha512_224(bytes)),
+        "sha512-256" | "sha-512-256" => to_hex(&sha512_256(bytes)),
+        "sha3-224" => to_hex(&sha3_224(bytes)),
+        "sha3" | "sha3-256" => to_hex(&sha3_256(bytes)),
+        "sha3-384" => to_hex(&sha3_384(bytes)),
+        "sha3-512" => to_hex(&sha3_512(bytes)),
+        "shake128" => to_hex(&shake128(bytes, length)),
+        "shake256" => to_hex(&shake256(bytes, length)),
+        "blake3" => to_hex(&blake3_hash(bytes)),
+        _ => return Err(format!("unknown algorithm {alg:?}; use sha224, sha256, sha384, sha512, sha512-224, sha512-256, sha3-224, sha3-256, sha3-384, sha3-512, shake128, shake256, or blake3")),
+    };
+    Ok(digest)
 }
 
 fn cmd_ecc_keygen() {
@@ -2160,5 +2224,45 @@ fn cmd_visual(op: VisualOp) {
             println!("\n\n========================================\n\n");
             println!("{}", ecc_v::run_all_ecc_demos());
         }
+    }
+}
+
+#[cfg(test)]
+mod hash_cli_tests {
+    use super::cmd_hash;
+
+    #[test]
+    fn sha_variants_match_independent_abc_vectors() {
+        let vectors = [
+            ("sha224", "23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7"),
+            ("sha256", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"),
+            ("sha384", "cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7"),
+            ("sha512", "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f"),
+            ("sha512-224", "4634270f707b6a54daae7530460842e20e37ed265ceee9a43e8924aa"),
+            ("sha512-256", "53048e2681941ef99b2e29b76b4c7dabe4c2d0c634fc6d46e0e2f13107e7af23"),
+            ("sha3-224", "e642824c3f8cf24ad09234ee7d3c766fc9a3a5168d0c94ad73b46fdf"),
+            ("sha3", "3a985da74fe225b2045c172d6bd390bd855f086e3e9d525b46bfe24511431532"),
+            ("sha3-384", "ec01498288516fc926459f58e2c6ad8df9b473cb0fc08c2596da7cf0e49be4b298d88cea927ac7f539f1edf228376d25"),
+            ("sha3-512", "b751850b1a57168a5693cd924b6b096e08f621827444f70d884f5d0240d2712e10e116e9192af3c91a7ec57647e3934057340b4cf408d5a56592f8274eec53f0"),
+        ];
+        for (name, expected) in vectors {
+            assert_eq!(cmd_hash(name, "abc", None).unwrap(), expected, "{name}");
+        }
+        assert_eq!(
+            cmd_hash("shake128", "abc", Some(16)).unwrap(),
+            "5881092dd818bf5cf8a3ddb793fbcba7"
+        );
+        assert_eq!(
+            cmd_hash("shake256", "abc", Some(16)).unwrap(),
+            "483366601360a8771c6863080cc4114d"
+        );
+    }
+
+    #[test]
+    fn output_length_and_name_errors_are_explicit() {
+        assert!(cmd_hash("shake128", "abc", None).is_err());
+        assert!(cmd_hash("shake128", "abc", Some(0)).is_err());
+        assert!(cmd_hash("sha256", "abc", Some(32)).is_err());
+        assert!(cmd_hash("unknown", "abc", None).is_err());
     }
 }
