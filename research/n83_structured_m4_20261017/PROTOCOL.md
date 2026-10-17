@@ -35,6 +35,9 @@ tamper tests. Build a Linux worker from the checked commit and run `run4`
 inside a 4 GiB hard-memory, zero-swap cgroup. The outer supervisor uses thin
 shell orchestration and a hard wall deadline. Do not use the historical Python
 supervisor for this new research run.
+Each query container has one CPU, no network, all capabilities dropped,
+`no-new-privileges`, a 900-second worker budget and a 960-second outer cap.
+The input mounts are read-only and the output directory is new and writable.
 
 The Linux build uses the local `rust:1.93.1-bookworm` image pinned to
 `sha256:7c4ae649a84014c467d79319bbf17ce2632ae8b8be123ac2fb2ea5be46823f31`
