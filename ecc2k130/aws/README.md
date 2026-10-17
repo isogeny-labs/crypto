@@ -656,7 +656,49 @@ Or from the Modal tree: `./run.sh ingest` (same script; sets
 Set `DATABASE_URL` to skip Secrets Manager, or `RHO_DB_HOST` plus the
 `rho/dp-rds` secret (connections use `sslmode=require` by default). Requires
 the same IAM scope as the ingest instance profile: read `dp/`, read the
-secret, write the status bucket. Multiple ingesters at once are safe.
+secret, write the status bucket.
+
+**Concurrent replicas.** Stop every older `dp_ingest.py` process before the
+first replica deployment; the old process does not take cross-host object
+locks. New builds take them by default and use the hostname as a fallback id.
+Set a stable, distinct `RHO_INGEST_REPLICA_ID` for each process (1–80 ASCII
+letters, digits, dot, underscore, or hyphen). Run one designated status
+publisher and any number of additional workers:
+
+```bash
+RHO_INGEST_REPLICA_ID=ingest-a ./ingest.sh
+RHO_INGEST_REPLICA_ID=ingest-b RHO_INGEST_WORKER_ONLY=1 ./ingest.sh
+```
+
+The publisher runs the same ingestion work; `RHO_INGEST_WORKER_ONLY=1` only
+disables its status and CloudWatch writes. Keep the publisher under systemd or
+another restart manager. If it is down, the other replicas continue ingesting
+but the public status feed stops advancing until it returns or one is
+explicitly promoted. Do not run two publishers: their local backlog summaries
+can race in `status.json`.
+
+Each replica takes a transaction-scoped PostgreSQL advisory lock for an S3
+object before downloading it. It rereads the progress row under that lock and
+skips an object another replica completed. The lock releases on commit,
+rollback, or connection loss, so a replacement replica can retry a crashed
+one. Replica-specific ordering spreads a bounded oldest window without a
+fixed fleet roster. This is a cooperative lock: **every** live ingester must
+run the replica code. The status publisher remains a separate designated role.
+
+The committed `dp_ingest_progress` row now records `ingester_id`, SHA-256 of
+the exact S3 bytes, their byte length, and S3 `VersionId` when available. The
+row and point insert share one transaction. Earlier rows have null metadata;
+do not infer an ingestion-time hash for them. Cairn's audited service-period
+receipt can identify the replica that committed each object and compare its
+stored digest with a later read of that exact S3 version. A digest in private
+RDS is still not independent public proof of the bytes or every inserted point.
+
+After each completed S3 pass, including one that found no new objects, the
+replica writes a row in `dp_ingest_polls` with its id, database timestamp,
+objects processed, and rows added. The period auditor counts these rows for
+idle-service payment. A started pass that crashed before completion has no
+poll row. The record is evidence of a pass by a process with database write
+access; it is not a remote proof that every S3 key was inspected.
 
 From outside the VPC, `rho-dp` must be publicly reachable (`ensure-access`
 enables that and opens the RDS security group). Hosts with unstable egress
