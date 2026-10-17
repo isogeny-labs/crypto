@@ -21,16 +21,14 @@ use crate::cryptanalysis::ecbench::canonical::{bare_id, compat_u128, derive_u128
 use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
 use crate::cryptanalysis::ecbench::fp4::Fp4Instance;
 use crate::cryptanalysis::ecbench_large_prime::binary_explicit_instance;
-use crate::cryptanalysis::gaudry_quartic::Pt4;
-use crate::cryptanalysis::gaudry_quartic_bin::{find_bin_curve, BinCurve, PtB, TowerBasis};
-use crate::cryptanalysis::gaudry_quartic_d4::{find_d4_curve, pack_e4, unpack_e4, D4Curve};
+use crate::cryptanalysis::gaudry_quartic_bin::{find_bin_curve, BinCurve, TowerBasis};
+use crate::cryptanalysis::gaudry_quartic_d4::{find_d4_curve, pack_e4, D4Curve};
 use crate::cryptanalysis::ic_boundary::{
     find_prime_order_curve, koblitz_instance, random_binary_instance, roster_prime_instance,
     BinaryGroup, BinaryInstance, CountedGroup, GroupOps, PrimeCurve, PrimeInstance, PrimePoint,
 };
 use crate::cryptanalysis::koblitz_strong_rho::{RawPointG, WideStrongRho};
 use crate::cryptanalysis::koblitz_wide::WideKoblitz;
-use crate::cryptanalysis::residual_walk::is_prime_u64;
 
 /// How to build the curve.  Each variant is a constructor the repository
 /// already has, so the registry's `generator_call` names the same curve.
@@ -77,6 +75,19 @@ pub enum CurveSpec {
         r: u64,
         gx: u64,
         gy: u64,
+    },
+    /// A validated external public target on a prime-order curve. Unlike
+    /// planted workloads, the target's logarithm is never supplied.
+    PrimePublicFixture {
+        p: u64,
+        a: u64,
+        b: u64,
+        group_order: u64,
+        r: u64,
+        gx: u64,
+        gy: u64,
+        qx: u64,
+        qy: u64,
     },
     /// `gaudry_quartic_d4::find_d4_curve(p, seed, max_cofactor)`: a curve
     /// over `F_{p⁴} = F_p[t]/(t⁴ − c)` with a rational 2-torsion point
@@ -289,8 +300,18 @@ impl CurveSpec {
             } => binary_explicit_instance(n, modulus, a, b, group_order, r, gx, gy)
                 .map(|i| Instance::Binary(Box::new(i))),
             CurveSpec::Fp4Translation { p, seed } => {
-                Fp4Instance::build(p, seed).map(|i| Instance::Fp4(Box::new(i)))
+                Fp4Instance::build(p, seed).map(|i| Instance::Fp4Translation(Box::new(i)))
             }
+            CurveSpec::Fp4Torsion {
+                p,
+                seed,
+                max_cofactor,
+            } => find_d4_curve(p, seed, max_cofactor).map(|i| Instance::Fp4(Box::new(i))),
+            CurveSpec::F2m4Torsion {
+                m,
+                seed,
+                max_cofactor,
+            } => find_bin_curve(m, seed, max_cofactor).map(|i| Instance::F2m4(Box::new(i))),
         }
     }
 
@@ -327,7 +348,11 @@ impl CurveSpec {
             // Preserve the original Koblitz constructor: it carries the
             // certified Frobenius action and endomorphism identity that a
             // generic explicit binary instance intentionally does not claim.
-            Instance::Binary(_) | Instance::Wide(_) | Instance::Fp4(_) => None,
+            Instance::Binary(_)
+            | Instance::Wide(_)
+            | Instance::Fp4(_)
+            | Instance::F2m4(_)
+            | Instance::Fp4Translation(_) => None,
         }
     }
 
@@ -366,6 +391,16 @@ impl CurveSpec {
             CurveSpec::Fp4Translation { p, seed } => {
                 format!("quartic_folds::generate_translation_instance({p}, {seed}, 16)")
             }
+            CurveSpec::Fp4Torsion {
+                p,
+                seed,
+                max_cofactor,
+            } => format!("find_d4_curve({p}, {seed}, {max_cofactor})"),
+            CurveSpec::F2m4Torsion {
+                m,
+                seed,
+                max_cofactor,
+            } => format!("find_bin_curve({m}, {seed}, {max_cofactor})"),
         }
     }
 }
@@ -382,7 +417,7 @@ pub enum Instance {
     Wide(Box<WideInstance>),
     /// A curve over `F_{p⁴}` (`ecbench::fp4`); a point is one 64-bit word
     /// per coordinate, four 16-bit limbs.
-    Fp4(Box<Fp4Instance>),
+    Fp4Translation(Box<Fp4Instance>),
 }
 
 /// A wide Koblitz curve and the strong reference's arithmetic on it, which
@@ -494,11 +529,13 @@ impl Instance {
             Instance::Binary(i) => u128::from(i.r),
             Instance::Wide(i) => i.kc.r,
             Instance::Fp4(i) => u128::from(i.r),
+            Instance::F2m4(i) => u128::from(i.r),
+            Instance::Fp4Translation(i) => u128::from(i.r),
         }
     }
 
     pub fn facts(&self, spec: &CurveSpec) -> CurveFacts {
-        if let Instance::Fp4(i) = self {
+        if let Instance::Fp4Translation(i) = self {
             let (icv1, slug) = i.names();
             let g = Fp4Instance::encode(&i.g).unwrap_or_default();
             return CurveFacts {
@@ -547,7 +584,7 @@ impl Instance {
                 u128::from(i.generator.y),
                 if i.koblitz.is_some() { 2 * i.n } else { 2 },
             ),
-            Instance::Fp4(_) => unreachable!("returned above"),
+            Instance::Fp4Translation(_) => unreachable!("returned above"),
             Instance::Wide(i) => (
                 i.kc.curve_id(),
                 "koblitz",
@@ -650,7 +687,7 @@ impl Instance {
         // A one-word instance's subgroup order fits a word, so a reduced
         // scalar does too.
         let k = u64::try_from(k % self.r()).ok()?;
-        if let Instance::Fp4(i) = self {
+        if let Instance::Fp4Translation(i) = self {
             return i.mul_generator_hex(k);
         }
         match self {
@@ -663,7 +700,25 @@ impl Instance {
                 let p = g.mul(&mut scratch, i.generator, k);
                 (!p.infinity).then(|| [format!("0x{:x}", p.x), format!("0x{:x}", p.y)])
             }
-            Instance::Wide(_) | Instance::Fp4(_) => unreachable!("returned above"),
+            Instance::Fp4(i) => {
+                let p = CountedGroup::mul(&i.inst.curve, &mut scratch, i.generator, k);
+                (!p.inf).then(|| {
+                    [
+                        format!("0x{:x}", pack_e4(i.p(), &p.x)),
+                        format!("0x{:x}", pack_e4(i.p(), &p.y)),
+                    ]
+                })
+            }
+            Instance::F2m4(i) => {
+                let p = CountedGroup::mul(&i.curve, &mut scratch, i.generator, k);
+                (!p.inf).then(|| {
+                    [
+                        format!("0x{:x}", i.curve.f.pack(&p.x)),
+                        format!("0x{:x}", i.curve.f.pack(&p.y)),
+                    ]
+                })
+            }
+            Instance::Wide(_) | Instance::Fp4Translation(_) => unreachable!("returned above"),
         }
     }
 }
@@ -683,7 +738,10 @@ impl Instance {
     ) -> Option<([String; 2], u64)> {
         let model = model_hash(curve);
         let mut scratch = GroupOps::default();
-        if let Instance::Fp4(_) = self {
+        if matches!(
+            self,
+            Instance::Fp4(_) | Instance::F2m4(_) | Instance::Fp4Translation(_)
+        ) {
             // Planted targets only on E(F_{p⁴}): no public-target law yet.
             return None;
         }
@@ -732,7 +790,10 @@ impl Instance {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
                 }
-                Instance::Wide(_) | Instance::Fp4(_) => unreachable!("handled above"),
+                Instance::Wide(_)
+                | Instance::Fp4(_)
+                | Instance::F2m4(_)
+                | Instance::Fp4Translation(_) => unreachable!("handled above"),
                 Instance::Binary(i) => {
                     let mask = if i.n >= 64 {
                         u64::MAX

@@ -43,14 +43,14 @@ use crate::cryptanalysis::ic_boundary::{
     BinaryInstance, Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses,
     PhaseCost, PointClasses, PrimeInstance, PrimePoint, QuarticClasses, RhoResult, RhoWalk,
 };
-use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
 use crate::cryptanalysis::ic_framework::fiber::{
     FiberDescentOracle, FiberFrobeniusMitmOracle, FiberMitmOracle,
 };
 use crate::cryptanalysis::ic_framework::plugins::{
     BinarySubspaceBase, CompactOrbitScanBase, CyclotomicBase, DescentAlgebraicOracle,
-    FrobeniusMitmOracle, GlvOrbitBase, KoblitzOrbitBase, MitmOracle, PrimeAbscissaBase,
-    PrimeBatchMitmOracle, PrimeProjectedAbscissaBase, RootfindSubtractOracle, SubtractOracle,
+    FrobeniusMitmOracle, GlvOrbitBase, KoblitzOrbitBase, MitmOracle, OnbWeightBase,
+    PrimeAbscissaBase, PrimeBatchMitmOracle, PrimeProjectedAbscissaBase, RootfindSubtractOracle,
+    SubtractOracle,
 };
 use crate::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crate::cryptanalysis::ic_framework::rootfind::{RootfindMitmOracle, RootfindPairsOracle};
@@ -1166,7 +1166,7 @@ fn solve_inner(
     if let Instance::Wide(_) = inst {
         return Err("a wide instance goes through solve_wide".into());
     }
-    if let Instance::Fp4(i) = inst {
+    if let Instance::Fp4Translation(i) = inst {
         return solve_fp4(m, i, tx, ty, seed);
     }
     if m.id == "ic.k4_gaudry" {
@@ -1304,7 +1304,31 @@ fn solve_inner(
             let g = BinaryGroup(&i.fast);
             solve_generic(m, &g, i.generator, FastPoint::affine(tx, ty), i.r, seed)
         }
-        (Instance::Wide(_), _) | (Instance::Fp4(_), _) => unreachable!("returned above"),
+        (Instance::Fp4(i), _) => solve_generic(
+            m,
+            &i.inst.curve,
+            i.generator,
+            Pt4 {
+                x: unpack_e4(i.p(), tx),
+                y: unpack_e4(i.p(), ty),
+                inf: false,
+            },
+            i.r,
+            seed,
+        ),
+        (Instance::F2m4(i), _) => solve_generic(
+            m,
+            &i.curve,
+            i.generator,
+            PtB {
+                x: i.curve.f.unpack(tx),
+                y: i.curve.f.unpack(ty),
+                inf: false,
+            },
+            i.r,
+            seed,
+        ),
+        (Instance::Wide(_), _) | (Instance::Fp4Translation(_), _) => unreachable!("returned above"),
     }
 }
 
@@ -2821,7 +2845,7 @@ pub fn dump_factor_base(
     if let Instance::Wide(_) = &inst {
         return Err("no factor-base plug-in runs on a wide (n > 62) curve yet".into());
     }
-    if let Instance::Fp4(_) = &inst {
+    if let Instance::Fp4Translation(_) = &inst {
         return Err("no factor-base plug-in runs on E(F_p⁴); ic.k4_gaudry builds its own".into());
     }
     match &inst {
@@ -2920,7 +2944,9 @@ pub fn dump_factor_base(
                 build_doubles: total.doubles,
             })
         }
-        Instance::Wide(_) | Instance::Fp4(_) => unreachable!("returned above"),
+        Instance::Fp4(_) | Instance::F2m4(_) => Err(
+            "extension-field factor-base export is not implemented; run ic.pipeline for its FB1 facts".into()),
+        Instance::Wide(_) | Instance::Fp4Translation(_) => unreachable!("returned above"),
     }
 }
 
