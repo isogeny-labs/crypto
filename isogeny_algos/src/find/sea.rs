@@ -626,6 +626,55 @@ pub const CYCLE_DEGREE: usize = 40;
 /// lambda/mu has larger order are left as candidate sets). Bounds the cost per Atkin prime.
 pub const ATKIN_TOWER_MAX_DEGREE: usize = 6;
 
+/// All k in [0, count) with base = [k]step. A low-order step can repeat within
+/// the baby table: every index must survive, including repeated infinity.
+fn progression_bsgs<F: Field>(
+    f: &F,
+    e: &Curve<F::E>,
+    base: Pt<F::E>,
+    step: Pt<F::E>,
+    count: u128,
+    mut visit: impl FnMut(u128),
+) -> u64 {
+    if count == 0 {
+        return 0;
+    }
+    let bs = (count - 1).isqrt() + 1;
+    let mut baby: HashMap<Pt<F::E>, Vec<u128>> = HashMap::new();
+    let mut cur = Pt::Inf;
+    for j in 0..bs {
+        baby.entry(cur).or_default().push(j);
+        cur = padd(f, e, &cur, &step);
+    }
+    let ngiant = neg(f, &cur);
+    let mut g = base;
+    let giants = count.div_ceil(bs);
+    for i in 0..giants {
+        let start = i * bs;
+        if let Some(indices) = baby.get(&g) {
+            for &j in indices {
+                if j < count - start {
+                    visit(start + j);
+                }
+            }
+        }
+        g = padd(f, e, &g, &ngiant);
+    }
+    u64::try_from(giants).unwrap_or(u64::MAX)
+}
+
+/// A conservative point-addition estimate: scalar tests take at most two
+/// additions per bit; a fresh search costs a walk or both halves of BSGS.
+fn refine_is_cheaper(count: u128, survivors: usize, scalar_bits: usize) -> bool {
+    let search = if count <= SEA_WALK_MAX {
+        count
+    } else {
+        let bs = (count - 1).isqrt() + 1;
+        bs + count.div_ceil(bs)
+    };
+    (survivors as u128).saturating_mul(2 * scalar_bits as u128 + 2) <= search
+}
+
 /// SEA with an explicit bound on the isogeny-cycle polynomial degree (0: no cycles; t mod l
 /// only). An Elkies prime with two rational l-isogenies contributes t mod l^k for the largest k
 /// with l^(k-1)(l-1)/2 <= cycle_degree.
@@ -770,53 +819,31 @@ pub fn sea_resolved<F: Field>(
     let count = (&(&k_hi - &k_lo) + &Int::one()).to_i128()? as u128;
     st.candidates = count;
     let q1 = &q + &Int::one();
+    let scalar_bits = (&q1 + &hasse).bits();
     let to_big = |v: &Int| -> Big { v.mag().clone() };
     let ok_atkin = |t: &Int| atkin_sets.iter().all(|(l, s)| s.contains(&t.mod_u64(*l)));
-    let neg = |p: Pt<F::E>| match p {
-        Pt::Inf => Pt::Inf,
-        Pt::Aff(x, y) => Pt::Aff(x, f.neg(y)),
-    };
-    // the Atkin primes the search enumerates: candidates t = t0 + k m, k = r + M_A j with r
-    // one of the residues mod M_A (the product of those primes) that the Atkin sets allow
-    let t0 = &te + &(&k_lo * &m);
-    let (_, used) = search_plan(count as f64, &atkin_sets);
-    let mut ma = 1u64;
-    let mut residues = vec![0u64];
-    for &i in &used {
-        let (l, ref set) = atkin_sets[i];
-        let minv = m.inv_mod(&Int::from(l as i64)).unwrap().mod_u64(l);
-        let t0l = t0.mod_u64(l);
-        // k mod l for each allowed t mod l: k = (t - t0) / m mod l
-        let ks: Vec<u64> = set
-            .iter()
-            .map(|&tl| ((tl + l - t0l) % l) * minv % l)
-            .collect();
-        // CRT: residues mod ma x l
-        let ma_inv = Int::from(ma as i64)
-            .inv_mod(&Int::from(l as i64))
-            .unwrap()
-            .mod_u64(l);
-        let mut next = Vec::with_capacity(residues.len() * ks.len());
-        for &r in &residues {
-            for &kl in &ks {
-                let c = ((kl + l - r % l) % l) * ma_inv % l;
-                next.push(r + ma * c);
-            }
-        }
-        residues = next;
-        ma *= l;
-    }
-    residues.sort_unstable();
     // t with [q + 1 - t] P = 0 for every sampled P (intersection over points)
     let mut cands: Option<Vec<Int>> = None;
     for _attempt in 0..12 {
         let p = random_point_f(f, e, rng);
         let mut hits = vec![];
-        if count <= SEA_WALK_MAX {
+        let t0 = &te + &(&k_lo * &m);
+        if cands
+            .as_ref()
+            .is_some_and(|c| refine_is_cheaper(count, c.len(), scalar_bits))
+        {
+            // A second full BSGS is unnecessary once only a few traces remain.
+            for t in cands.take().unwrap() {
+                if pmul_big(f, e, &p, &to_big(&(&q1 - &t))) == Pt::Inf {
+                    hits.push(t);
+                }
+                st.tested += 1;
+            }
+        } else if count <= SEA_WALK_MAX {
             // walk R_k = [q + 1 - t_k] P, t_k = t0 + k m: R_{k+1} = R_k - [m] P
             let mut r = pmul_big(f, e, &p, &to_big(&(&q1 - &t0)));
-            let neg_mp = neg(pmul_big(f, e, &p, &to_big(&m)));
-            let mut t = t0.clone();
+            let neg_mp = neg(f, &pmul_big(f, e, &p, &to_big(&m)));
+            let mut t = t0;
             for _ in 0..count {
                 if r == Pt::Inf && ok_atkin(&t) {
                     hits.push(t.clone());
@@ -831,42 +858,27 @@ pub fn sea_resolved<F: Field>(
             // all residues
             let base = pmul_big(f, e, &p, &to_big(&(&q1 - &t0)));
             let mp = pmul_big(f, e, &p, &to_big(&m));
-            let step = pmul(f, e, &mp, ma as u128);
-            let nj = count.div_ceil(ma as u128);
-            let bs = ((residues.len() as f64 * nj as f64).sqrt().ceil() as u128).clamp(1, nj);
-            let mut baby: HashMap<Pt<F::E>, u128> = HashMap::new();
-            let mut cur = Pt::Inf;
-            for jj in 0..bs {
-                baby.entry(cur).or_insert(jj);
-                cur = padd(f, e, &cur, &step);
-            }
-            let ngiant = neg(cur);
-            for &r in &residues {
-                let mut g = padd(f, e, &base, &neg(pmul(f, e, &mp, r as u128)));
-                let mut i = 0u128;
-                while i * bs < nj {
-                    if let Some(&jj) = baby.get(&g) {
-                        let kp = r as u128 + (i * bs + jj) * ma as u128;
-                        if kp < count {
-                            let t = &t0 + &(&Int::from(kp as i128) * &m);
-                            if ok_atkin(&t) {
-                                hits.push(t);
-                            }
-                        }
-                    }
-                    g = padd(f, e, &g, &ngiant);
-                    i += 1;
-                    st.tested += 1;
+            st.tested += progression_bsgs(f, e, base, mp, count, |kp| {
+                let t = &t0 + &(&Int::from(kp as i128) * &m);
+                if ok_atkin(&t) {
+                    hits.push(t);
                 }
-            }
+            });
         }
         let next: Vec<Int> = match cands {
             None => hits,
-            Some(c) => c.into_iter().filter(|t| hits.contains(t)).collect(),
+            // Both searches visit increasing progression indices, so hits is sorted.
+            Some(c) => c
+                .into_iter()
+                .filter(|t| hits.binary_search(t).is_ok())
+                .collect(),
         };
         if next.len() == 1 {
             cands = Some(next);
             break;
+        }
+        if next.is_empty() {
+            return None;
         }
         cands = Some(next);
     }
@@ -878,4 +890,47 @@ pub fn sea_resolved<F: Field>(
     };
     let t = found?;
     Some(((&q1 - &t).mag().clone(), st))
+}
+
+#[cfg(test)]
+mod recombination_tests {
+    use super::*;
+    use crate::field::Zp;
+
+    #[test]
+    fn progression_bsgs_matches_exhaustive_search_including_low_order_steps() {
+        for p in [5, 7, 11] {
+            let f = Zp::new(p);
+            let e = Curve::new(1, 1);
+            let mut points = vec![Pt::Inf];
+            for x in 0..p {
+                for y in 0..p {
+                    let pt = Pt::Aff(x, y);
+                    if on_curve(&f, &e, &pt) {
+                        points.push(pt);
+                    }
+                }
+            }
+            for &step in &points {
+                for &base in &points {
+                    for count in [0, 1, 2, 5, 16, 33, 1025] {
+                        let mut expected = vec![];
+                        let mut cur = Pt::Inf;
+                        for k in 0..count {
+                            if cur == base {
+                                expected.push(k);
+                            }
+                            cur = padd(&f, &e, &cur, &step);
+                        }
+                        let mut actual = vec![];
+                        progression_bsgs(&f, &e, base, step, count, |k| actual.push(k));
+                        assert_eq!(
+                            actual, expected,
+                            "p={p}, step={step:?}, base={base:?}, count={count}"
+                        );
+                    }
+                }
+            }
+        }
+    }
 }
