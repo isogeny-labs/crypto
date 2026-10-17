@@ -246,7 +246,7 @@ fn precompute_thread(
         || {
             starts += 1;
             if let Some(deadline) = deadline {
-                if starts % 64 == 0 && Instant::now() >= deadline {
+                if starts.is_multiple_of(64) && Instant::now() >= deadline {
                     return None;
                 }
             }
