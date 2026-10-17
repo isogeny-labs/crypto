@@ -15,6 +15,7 @@ def read(path):
 
 def verify(output):
     source = read(output / "source.json")
+    host = read(output / "host.json")
     expected = pilot.preflight(output / "executed_bin")
     if (source.get("schema") != "n83.highk-cancel-pilot-source/v1" or
             any(source.get(key) != value for key, value in expected.items()) or
@@ -46,6 +47,9 @@ def verify(output):
             "source_sha256": source["source_sha256"],
             "target_sha256": source["target_sha256"],
             "binary_sha256": source["binary_sha256"],
+            "resource_telemetry_status": (
+                "UNVERIFIED_MAC_RSS" if host.get("platform", "").startswith("macOS")
+                else "REVIEW_HOST_RECEIPT"),
             "arms": rows,
             "status": "PASS_INDEPENDENT_REPLAY" if all(
                 row["status"] == "PASS_INDEPENDENT_REPLAY" for row in rows)
