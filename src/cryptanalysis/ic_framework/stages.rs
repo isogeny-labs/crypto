@@ -42,9 +42,13 @@ use std::time::Duration;
 use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
-    CountedGroup, FactorBase, GroupOps, OracleCounters, Relation, RowStatus,
+    CompletionRule, CountedGroup, FactorBase, GroupOps, OracleCounters, Relation, RowStatus,
 };
 use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+
+/// The matrix contract consumed by the collector and [`RelationSolverFactory`].
+/// The older [`RelationSolver`] interface below additionally carries metadata.
+pub use crate::cryptanalysis::ic_boundary::RelationSolver as RelationMatrix;
 
 /// Free-form parameters a plug-in reads its configuration from.
 ///
@@ -101,6 +105,9 @@ impl Params {
     /// silently build a different factor base.
     pub fn parse_spec(spec: &str) -> Result<(String, Params), String> {
         let (name, rest) = spec.split_once(':').unwrap_or((spec, ""));
+        if name.is_empty() || name.chars().any(char::is_whitespace) {
+            return Err(format!("invalid plug-in name `{name}`"));
+        }
         let mut params = Params::default();
         let mut previous: Option<&str> = None;
         for kv in rest.split(',').filter(|s| !s.is_empty()) {
@@ -114,7 +121,16 @@ impl Params {
                     None => format!("parameter `{kv}` is not key=value"),
                 });
             };
-            params.set(k.trim(), v.trim());
+            let key = k.trim();
+            if key.is_empty() {
+                return Err(format!("empty parameter name in plug-in spec `{spec}`"));
+            }
+            if params.get(key).is_some() {
+                return Err(format!(
+                    "duplicate parameter `{key}` in plug-in spec `{spec}`"
+                ));
+            }
+            params.set(key, v.trim());
             previous = Some(kv);
         }
         Ok((name.to_string(), params))
@@ -174,6 +190,36 @@ pub trait FactorBaseBuilder<G: CountedGroup> {
         params: &Params,
         ops: &mut GroupOps,
     ) -> Result<FactorBase<G::Elt>, String>;
+}
+
+/// Constructs a fresh relation matrix after the factor base fixes its width.
+///
+/// A factory may borrow application state. It receives no planted logarithm.
+/// Completion and verification policy belong to this contract rather than to
+/// a hard-coded string comparison in the runner. Returned matrices must start
+/// empty and obey [`RelationMatrix`]'s accounting and incremental-query rules.
+pub trait RelationSolverFactory {
+    fn name(&self) -> &str;
+
+    fn create(&self, columns: usize, modulus: u64) -> Result<Box<dyn RelationMatrix + '_>, String>;
+
+    fn completion_rule(&self) -> CompletionRule {
+        CompletionRule::TargetPinned
+    }
+
+    /// Check a representative of every factor-base column after recovery.
+    /// Requires [`CompletionRule::FullRank`].
+    fn verify_base_columns(&self) -> bool {
+        false
+    }
+}
+
+/// All replaceable stages needed by the runner. The caller owns the plug-ins;
+/// there is no global registry, required allocator scheme, or thread model.
+pub struct PipelineStages<'a, G: CountedGroup> {
+    pub factor_base: &'a dyn FactorBaseBuilder<G>,
+    pub oracle: &'a mut dyn DecompositionOracle<G>,
+    pub matrix: &'a dyn RelationSolverFactory,
 }
 
 /// The shape of an algebraic system, for the report's degree columns.
@@ -592,6 +638,19 @@ impl Targets {
 #[cfg(test)]
 mod tests {
     use super::Params;
+
+    #[test]
+    fn ambiguous_plugin_parameters_are_rejected() {
+        for spec in [
+            "",
+            ":x=1",
+            "two words:x=1",
+            "engine:=1",
+            "engine:size=1, size=2",
+        ] {
+            assert!(Params::parse_spec(spec).is_err(), "accepted {spec:?}");
+        }
+    }
 
     #[test]
     fn a_plugin_spec_splits_into_name_and_parameters() {

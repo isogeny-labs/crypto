@@ -68,6 +68,7 @@ pub mod large_prime;
 pub mod linalg;
 pub mod plugins;
 pub mod prime_tower;
+pub mod registry;
 pub mod residual;
 pub mod rootfind;
 pub mod shared_rank;
@@ -85,8 +86,11 @@ use crate::cryptanalysis::ic_boundary::{
 };
 use crate::cryptanalysis::ic_framework::residual as residual_mod;
 use crate::cryptanalysis::ic_measurement as measurement;
-use linalg::matrix_by_name;
-use stages::{DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, SystemShape, Targets};
+use linalg::BuiltinMatrix;
+use stages::{
+    DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, PipelineStages,
+    RelationSolverFactory, SystemShape, Targets,
+};
 
 /// One configuration: a choice at each stage, with its parameters.
 #[derive(Clone, Debug, Default, Serialize)]
@@ -345,7 +349,17 @@ pub fn run_pipeline<G: CountedGroup>(
     calib: &Calibration,
     rho_s: Option<f64>,
 ) -> Result<RunReport, String> {
-    run_pipeline_observed(ctx, spec, base_builder, oracle, planted, calib, rho_s, None)
+    run_pipeline_observed(
+        ctx,
+        spec,
+        base_builder,
+        oracle,
+        Some(planted),
+        calib,
+        rho_s,
+        None,
+        None,
+    )
 }
 
 /// [`run_pipeline`] with live setup and query notifications. Callbacks borrow
@@ -366,10 +380,43 @@ pub fn run_pipeline_with_progress<G: CountedGroup>(
         spec,
         base_builder,
         oracle,
-        planted,
+        Some(planted),
         calib,
         rho_s,
         Some(progress),
+        None,
+    )
+}
+
+/// Run with application-supplied factor-base, decomposition and matrix stages.
+/// The optional observer sees the actual queries and borrowed witnesses. The
+/// matrix's completion/verification contract is independent of `spec.linalg`;
+/// reports use the injected factory's name. No registry or CLI changes needed.
+/// `expected` is optional: with `None`, the recovered logarithm is verified
+/// solely by its group equation, so consumers need not know it beforehand.
+///
+/// These are variable-time research APIs for public fixtures, not secret-key
+/// arithmetic. Plug-ins run in process as trusted code; this is not a sandbox.
+#[allow(clippy::too_many_arguments)]
+pub fn run_pipeline_with_stages<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    stages: PipelineStages<'_, G>,
+    expected: Option<u64>,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+    progress: Option<&mut dyn FnMut(PipelineEvent<'_, G::Elt>)>,
+) -> Result<RunReport, String> {
+    run_pipeline_observed(
+        ctx,
+        spec,
+        stages.factor_base,
+        stages.oracle,
+        expected,
+        calib,
+        rho_s,
+        progress,
+        Some(stages.matrix),
     )
 }
 
@@ -379,11 +426,15 @@ fn run_pipeline_observed<G: CountedGroup>(
     spec: &PipelineSpec,
     base_builder: &dyn FactorBaseBuilder<G>,
     oracle: &mut dyn DecompositionOracle<G>,
-    planted: u64,
+    planted: Option<u64>,
     calib: &Calibration,
     rho_s: Option<f64>,
     mut progress: Option<&mut dyn FnMut(PipelineEvent<'_, G::Elt>)>,
+    matrix_factory: Option<&dyn RelationSolverFactory>,
 ) -> Result<RunReport, String> {
+    if ctx.r < 2 || ctx.cofactor.is_multiple_of(ctx.r) {
+        return Err("pipeline requires r >= 2 and a cofactor nonzero modulo r".into());
+    }
     let started = Instant::now();
 
     // ── Stage 1: the factor base ───────────────────────────────────
@@ -400,6 +451,23 @@ fn run_pipeline_observed<G: CountedGroup>(
     }
     let fb_started = Instant::now();
     let fb = base_builder.build(ctx, &spec.factor_base_params, &mut fb_ops)?;
+    if fb.points.len() != fb.col_of.len()
+        || fb.points.len() != fb.coef_of.len()
+        || fb.points.len() != fb.neg_index.len()
+        || fb.col_of.iter().any(|&column| column >= fb.columns)
+        || fb.neg_index.iter().any(|&index| index >= fb.points.len())
+        || fb
+            .point_index
+            .values()
+            .any(|&index| index >= fb.points.len())
+        || fb
+            .x_index
+            .values()
+            .flatten()
+            .any(|&index| index >= fb.points.len())
+    {
+        return Err("factor-base plug-in returned inconsistent point/column indexes".into());
+    }
     let mut fb_cost = fb.cost.clone();
     fb_cost.group_ops.merge(fb_ops);
     fb_cost.wall_ns = fb_cost.wall_ns.max(fb_started.elapsed().as_nanos() as u64);
@@ -435,12 +503,23 @@ fn run_pipeline_observed<G: CountedGroup>(
     // the collision guards and the verification are the audited ones,
     // so a framework row is comparable with a ledger row rather than
     // merely similar to it.
-    let linalg_name = if spec.linalg.is_empty() {
-        "incremental-gauss"
+    let builtin = if matrix_factory.is_none() {
+        Some(BuiltinMatrix::new(&spec.linalg)?)
     } else {
-        spec.linalg.as_str()
+        None
     };
-    let mut matrix: Box<dyn RelationSolver> = matrix_by_name(linalg_name, fb.columns + 1, ctx.r)?;
+    let factory = matrix_factory.unwrap_or_else(|| builtin.as_ref().unwrap());
+    let linalg_name = factory.name();
+    let completion = factory.completion_rule();
+    let checked_full_rank = factory.verify_base_columns();
+    if checked_full_rank && completion != CompletionRule::FullRank {
+        return Err("base-column verification requires full-rank completion".into());
+    }
+    let columns = fb
+        .columns
+        .checked_add(1)
+        .ok_or("factor-base column count overflow")?;
+    let mut matrix = factory.create(columns, ctx.r)?;
     let source = match spec.targets {
         Targets::Random => TargetSource::Random,
         Targets::Stride => TargetSource::Stride,
@@ -481,17 +560,6 @@ fn run_pipeline_observed<G: CountedGroup>(
         return Err("walk-prime-serial/batch requires a prime curve with p < 2^62".into());
     }
     measurement::begin_online(measurement::Phase::TargetQuery);
-    let checked_full_rank = linalg_name == "incremental-gauss-full-rank-checked";
-    // `sparse-cado` is a batch solver that answers only at full column
-    // rank, so it runs under the full-rank rule.
-    let completion = if linalg_name == "incremental-gauss-full-rank"
-        || checked_full_rank
-        || linalg_name == "sparse-cado"
-    {
-        CompletionRule::FullRank
-    } else {
-        CompletionRule::TargetPinned
-    };
     let mut outcome: PipelineOutcome = if spec.targets == Targets::Residual {
         if completion != CompletionRule::TargetPinned {
             return Err(
@@ -559,12 +627,14 @@ fn run_pipeline_observed<G: CountedGroup>(
             check_full_rank_base_columns(ctx, &fb, matrix.as_ref(), &mut outcome.verify);
     }
     measurement::end_online();
+    let verified =
+        outcome.verified && planted.is_none_or(|expected| outcome.recovered == Some(expected));
     if let Some(progress) = &mut progress {
         progress(PipelineEvent::Finished {
             trials: outcome.trials,
             relations: outcome.relations_found,
             rank: outcome.rank,
-            verified: outcome.verified,
+            verified,
         });
     }
 
@@ -665,14 +735,19 @@ fn run_pipeline_observed<G: CountedGroup>(
     let s = total_gae / sqrt_r;
 
     let (work, work_unit) = matrix.work();
+    let mut effective_spec = spec.clone();
+    if matrix_factory.is_some() {
+        effective_spec.linalg = linalg_name.into();
+    }
+    let label = effective_spec.label();
 
     Ok(RunReport {
         instance: ctx.name.clone(),
         log2_r: (ctx.r as f64).log2(),
         r: ctx.r,
         group_order: ctx.group_order,
-        spec: spec.clone(),
-        label: spec.label(),
+        spec: effective_spec,
+        label,
         factor_base: FactorBaseReport {
             name: base_builder.name().to_string(),
             description: base_builder.describe(&spec.factor_base_params),
@@ -706,7 +781,7 @@ fn run_pipeline_observed<G: CountedGroup>(
         },
         verify: ver,
         recovered: outcome.recovered,
-        verified: outcome.verified && outcome.recovered == Some(planted),
+        verified,
         total_gae,
         s,
         rho_s,

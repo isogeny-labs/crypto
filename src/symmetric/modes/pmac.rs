@@ -39,48 +39,15 @@
 //! - Reference C and test vectors: https://web.cs.ucdavis.edu/~rogaway/ocb/pmac.htm
 
 use super::cipher::BlockCipher128;
+use crate::symmetric::gf128::{double_be as double, halve_be as half};
 
 const BLOCK: usize = 16;
 
 #[inline]
-fn enc<C: BlockCipher128>(cipher: &C, block: &[u8; 16]) -> [u8; 16] {
+fn enc<C: BlockCipher128 + ?Sized>(cipher: &C, block: &[u8; 16]) -> [u8; 16] {
     let mut b = *block;
     cipher.encrypt_block(&mut b);
     b
-}
-
-/// `double(X) = X · x` in GF(2^128) under reduction `x^128 + x^7 + x^2 + x + 1`.
-/// Byte 0 is the high-order byte.
-fn double(x: &[u8; 16]) -> [u8; 16] {
-    let mut out = [0u8; 16];
-    let mut carry = 0u8;
-    for i in (0..16).rev() {
-        let new_carry = x[i] >> 7;
-        out[i] = (x[i] << 1) | carry;
-        carry = new_carry;
-    }
-    if carry != 0 {
-        out[15] ^= 0x87;
-    }
-    out
-}
-
-/// `half(X) = X · x^{-1}` in the same field.  Used for the last-full-
-/// block offset, as `L_{-1} = half(L)`.
-fn half(x: &[u8; 16]) -> [u8; 16] {
-    let mut out = [0u8; 16];
-    let lsb = x[15] & 1;
-    let mut borrow = 0u8;
-    for i in 0..16 {
-        let new_borrow = x[i] & 1;
-        out[i] = (x[i] >> 1) | (borrow << 7);
-        borrow = new_borrow;
-    }
-    if lsb == 1 {
-        out[0] ^= 0x80;
-        out[15] ^= 0x43; // 0x87 >> 1
-    }
-    out
 }
 
 #[inline]
@@ -97,7 +64,7 @@ fn ntz(n: u64) -> u32 {
 }
 
 /// **PMAC tag** of `message` under the given block cipher.  Returns 16 bytes.
-pub fn pmac<C: BlockCipher128>(cipher: &C, message: &[u8]) -> [u8; 16] {
+pub fn pmac<C: BlockCipher128 + ?Sized>(cipher: &C, message: &[u8]) -> [u8; 16] {
     let l = enc(cipher, &[0u8; 16]);
     let l_inv = half(&l);
 
@@ -109,7 +76,7 @@ pub fn pmac<C: BlockCipher128>(cipher: &C, message: &[u8]) -> [u8; 16] {
         message.len().div_ceil(BLOCK)
     };
     let max_log = if m > 1 {
-        (usize::BITS - (m as u32 - 1).leading_zeros()) as usize
+        (usize::BITS - (m - 1).leading_zeros()) as usize
     } else {
         1
     };

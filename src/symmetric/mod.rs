@@ -72,6 +72,7 @@ pub mod cmac;
 pub mod des;
 pub mod des3;
 pub mod feal;
+pub mod gf128;
 pub mod gift;
 pub mod gost_magma;
 pub mod grain;

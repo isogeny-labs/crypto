@@ -38,7 +38,10 @@ use std::cell::RefCell;
 
 use num_bigint::BigUint;
 
-use crate::cryptanalysis::ic_boundary::{IncrementalGauss, RelationSolver, RowStatus};
+use super::stages::RelationSolverFactory;
+use crate::cryptanalysis::ic_boundary::{
+    CompletionRule, IncrementalGauss, RelationSolver, RowStatus,
+};
 use crate::cryptanalysis::koblitz_sparse_la::{
     FilterOptions, SparseRows, SparseSolveOptions, SparseSolveOutcome,
 };
@@ -484,6 +487,50 @@ pub fn matrix_by_name(
                 .collect::<Vec<_>>()
                 .join(", ")
         )),
+    }
+}
+
+/// Adapter for the shipped matrices. Downstream factories implement
+/// [`RelationSolverFactory`] directly and need no entry in this list.
+pub struct BuiltinMatrix {
+    name: &'static str,
+}
+
+impl BuiltinMatrix {
+    pub fn new(name: &str) -> Result<Self, String> {
+        let name = if name.is_empty() {
+            "incremental-gauss"
+        } else {
+            name
+        };
+        MATRIX_NAMES
+            .iter()
+            .find(|(n, _)| *n == name)
+            .map(|(name, _)| Self { name })
+            .ok_or_else(|| format!("unknown relation matrix `{name}`"))
+    }
+}
+
+impl RelationSolverFactory for BuiltinMatrix {
+    fn name(&self) -> &str {
+        self.name
+    }
+
+    fn create(&self, columns: usize, modulus: u64) -> Result<Box<dyn RelationSolver + '_>, String> {
+        matrix_by_name(self.name, columns, modulus)
+    }
+
+    fn completion_rule(&self) -> CompletionRule {
+        match self.name {
+            "incremental-gauss-full-rank"
+            | "incremental-gauss-full-rank-checked"
+            | "sparse-cado" => CompletionRule::FullRank,
+            _ => CompletionRule::TargetPinned,
+        }
+    }
+
+    fn verify_base_columns(&self) -> bool {
+        self.name == "incremental-gauss-full-rank-checked"
     }
 }
 

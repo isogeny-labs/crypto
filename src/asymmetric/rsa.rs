@@ -97,14 +97,12 @@ fn rsa_mod_pow_ct_sized<const LIMBS: usize>(base: &BigUint, exp: &BigUint, n: &B
 // - `mont_mul` over `p` performs the recombination's multiplicative
 //   step in CT.  The final `m_q + q · h` is a single `mul_wide` plus
 //   `adc`, both branchless.
-// - `MontgomeryContext::new` itself uses `BigUint` to compute
-//   `R mod p` and `R² mod p`.  This *does* leak limb-level timing
-//   on `p` and `q` — but `MontgomeryContext` setup happens once per
-//   key load, not once per message, and an attacker with that level
-//   of access could simply read `key.p` from memory.  The setup
-//   leakage is structurally unavoidable here without a CT modular
-//   reduction, which would itself need division-free hardware support
-//   we don't have on stable Rust.
+// - `MontgomeryContext::new` computes R mod p and R² mod p with
+//   fixed-width modular doubling, including when contexts are rebuilt
+//   per private operation. It does not divide by the secret primes.
+// These are source-level properties of the fixed-width arithmetic,
+// not a constant-time claim for key import/export: the surrounding
+// BigUint conversions still depend on their inputs' representation.
 fn rsa_mod_pow_ct_crt(c: &BigUint, key: &RsaPrivateKey) -> BigUint {
     let bits = key.bits as usize;
     match bits {
@@ -377,10 +375,11 @@ pub struct RsaPublicKey {
 /// as two half-width exponentiations against `p` and `q`, which is
 /// roughly 4× faster than the single full-width form and — once the
 /// half-width pieces go through `crate::ct_bignum::mont_pow_ct` —
-/// fully constant-time.
+/// fixed-width at the arithmetic layer. BigUint import/export and key
+/// generation do not have an end-to-end constant-time guarantee.
 ///
 /// Convention: `p > q` so that `qinv = q^(-1) mod p` lies in `[1, p)`.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct RsaPrivateKey {
     pub n: BigUint,
     pub e: BigUint,
@@ -395,6 +394,15 @@ pub struct RsaPrivateKey {
     /// `q^(-1) mod p` — the CRT recombination coefficient.
     pub qinv: BigUint,
     pub bits: u64,
+}
+
+impl std::fmt::Debug for RsaPrivateKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("RsaPrivateKey")
+            .field("bits", &self.bits)
+            .field("secret", &"[REDACTED]")
+            .finish_non_exhaustive()
+    }
 }
 
 impl Drop for RsaPrivateKey {
@@ -499,7 +507,8 @@ pub(crate) fn rsa_encrypt_raw(msg: &BigUint, key: &RsaPublicKey) -> BigUint {
 ///
 /// Routed through [`rsa_mod_pow_ct_crt`] because the exponent `d` is
 /// the private key.  For supported modulus sizes (1024/1536/2048/3072/
-/// 4096 bits), this is a limb-level constant-time CRT computation
+/// 4096 bits), this uses fixed-width CRT arithmetic (with variable-time
+/// BigUint import/export boundaries)
 /// built on the `crate::ct_bignum::Uint<LIMBS>` Montgomery stack —
 /// roughly 4× faster than the direct form.  For other sizes the
 /// dispatcher falls through to the non-CRT `rsa_mod_pow_ct`, and from
