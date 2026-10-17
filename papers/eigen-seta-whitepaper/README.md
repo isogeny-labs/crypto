@@ -27,8 +27,9 @@ isolation level L0 and are not reference-platform numbers.
 * Nothing about attacks we have not thought of. The hidden-orientation
   question (risk R1) is open and would break every set if answered the
   wrong way.
-* No comparison with other KEMs. No external implementation of this scheme
-  exists to compare against.
+* No comparison with another implementation of Eigen-Séta (none exists).
+  The comparison with other KEMs (§5) uses liboqs on the same host; HQC
+  there is the portable implementation.
 * No constant-time claim for the current theta build.
 
 ## Building
@@ -50,6 +51,7 @@ benchmark records into `numbers_data.tex` and `figures/perf.*`.
 | records, host, run report, graphs | `crypto:research/eigen_seta_whitepaper_20261017/` |
 | benchmark copies | `crypto:benchmarks/20261017-eigen-seta-whitepaper/` |
 | security levels | `eigenx: cargo run --release --example security_estimate` |
+| same-host comparison (liboqs 0.13.0) | `crypto:research/eigen_seta_whitepaper_20261017/tools/pqkem_bench/`, records `records/pqkem_same_host/` |
 
 ## Before any submission
 

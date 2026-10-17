@@ -150,3 +150,111 @@ for d in (os.path.join(PAPER, "figures"), os.path.join(STUDY, "figures")):
         fig.savefig(os.path.join(d, f"perf.{ext}"))
     fig.savefig(os.path.join(d, "perf.png"), dpi=150)
 print("present:", present, "one-core:", [s for s in one if one[s]])
+
+# --- same-host comparison with liboqs KEMs --------------------------------
+PQ = os.path.join(REC, "pqkem_same_host")
+reps = sorted(f for f in os.listdir(PQ) if f.startswith("rep") and f.endswith(".tsv")) if os.path.isdir(PQ) else []
+pq = {}
+for f in reps:
+    for line in open(os.path.join(PQ, f)):
+        x = line.rstrip("\n").split("\t")
+        if len(x) < 3 or x[0] != "kem" or "enabled=false" in line:
+            continue
+        d = dict(y.split("=", 1) for y in x[2:] if "=" in y)
+        pq.setdefault(x[1], []).append(d)
+
+
+def pqmean(name, key):
+    v = [float(d[key]) for d in pq.get(name, [])]
+    return sum(v) / len(v) if v else None
+
+
+def sig2(x):
+    from math import floor, log10
+    if x <= 0:
+        return "0"
+    d = 10 ** (floor(log10(x)) - 1)
+    return f"{round(x / d) * d:,.0f}"
+
+
+def fmt_t(us):
+    if us is None:
+        return "---"
+    if us >= 1e6:
+        return f"{us/1e6:.2f}\\,s"
+    if us >= 1e3:
+        return f"{us/1e3:.1f}\\,ms"
+    return f"{us:.0f}\\,$\\mu$s"
+
+
+def fmt_b(b):
+    b = int(b)
+    return f"{b/1000:.0f}\\,k" if b >= 100000 else f"{b:,}"
+
+
+cmp_rows = []
+groups = [(1, ["ML-KEM-512", "BIKE-L1", "HQC-128", "FrodoKEM-640-AES", "Classic-McEliece-348864"], ["L1"]),
+          (3, ["ML-KEM-768", "BIKE-L3", "HQC-192", "FrodoKEM-976-AES", "Classic-McEliece-460896"], ["L3", "Q3"]),
+          (5, ["ML-KEM-1024", "BIKE-L5", "HQC-256", "FrodoKEM-1344-AES", "Classic-McEliece-6688128"], ["L5", "Q5"])]
+ratio = {}
+for cat, names, ours in groups:
+    cmp_rows.append(f"\\multicolumn{{6}}{{l}}{{\\emph{{Category {cat}}}}}\\\\")
+    for n in names:
+        if n not in pq:
+            continue
+        d0 = pq[n][0]
+        star = "$^\\dagger$" if n.startswith("HQC") else ""
+        cmp_rows.append(f"{n.replace('Classic-McEliece', 'McEliece')}{star} & {fmt_t(pqmean(n,'keygen_med_us'))} & {fmt_t(pqmean(n,'encaps_med_us'))} & {fmt_t(pqmean(n,'decaps_med_us'))} & {fmt_b(d0['pk_bytes'])} & {fmt_b(d0['ct_bytes'])}\\\\")
+    for s in ours:
+        r = data[s]
+        if not r:
+            continue
+        kg, en, de = col(r, "keygen", "wall_s"), col(r, "op", "encaps_s"), col(r, "op", "decaps_s")
+        sz = next(x for x in r if x["_kind"] == "sizes")
+        cmp_rows.append(f"\\textbf{{Eigen-S\\'eta {s}}} & {fmt_t(statistics.median(kg)*1e6)} & {fmt_t(statistics.median(en)*1e6)} & {fmt_t(statistics.median(de)*1e6)} & {fmt_b(sz['pk'])} & {fmt_b(sz['ct'])}\\\\")
+        mk = names[0]
+        ratio[s] = (statistics.median(en) * 1e6 / pqmean(mk, "encaps_med_us"), statistics.median(de) * 1e6 / pqmean(mk, "decaps_med_us"))
+    cmp_rows.append("\\midrule")
+if cmp_rows and cmp_rows[-1] == "\\midrule":
+    cmp_rows.pop()
+extra = []
+extra.append("\\newcommand{\\CompareRows}{%\n" + "\n".join(cmp_rows) + "}")
+if "L1" in ratio:
+    extra.append(f"\\newcommand{{\\RatioEncLOne}}{{{sig2(ratio['L1'][0])}}}")
+    extra.append(f"\\newcommand{{\\RatioDecLOne}}{{{sig2(ratio['L1'][1])}}}")
+qrat = ", ".join(f"{s} {sig2(ratio[s][1])}" for s in ["L1", "L3", "L5", "Q3", "Q5"] if s in ratio)
+extra.append(f"\\newcommand{{\\RatioDecAll}}{{{qrat}}}")
+q5 = data["Q5"]
+if q5 and col(q5, "keygen", "wall_s"):
+    extra.append(f"\\newcommand{{\\KgQFive}}{{{tfmt(statistics.median(col(q5, 'keygen', 'wall_s')))}}}")
+with open(os.path.join(PAPER, "numbers_data.tex"), "a") as fh:
+    fh.write("\n".join(extra) + "\n")
+print("ratios (enc, dec) vs ML-KEM same level:", {k: (round(a), round(b)) for k, (a, b) in ratio.items()})
+
+# --- comparison graph: decapsulation per KEM, by category, log scale ------
+fig, axes = plt.subplots(1, 3, figsize=(9.6, 3.6), sharey=True)
+for ax, (cat, names, ours) in zip(axes, groups):
+    labs, vals, cols = [], [], []
+    for n in names:
+        if n in pq:
+            labs.append(n.replace("Classic-McEliece", "McE").replace("FrodoKEM", "Frodo").replace("-AES", ""))
+            vals.append(pqmean(n, "decaps_med_us") / 1e6)
+            cols.append("#9aa5b1")
+    for s in ours:
+        if data[s]:
+            labs.append(f"Eigen-Séta {s}")
+            vals.append(statistics.median(col(data[s], "op", "decaps_s")))
+            cols.append("#2f6db5")
+    ax.bar(range(len(vals)), vals, color=cols)
+    ax.set_yscale("log")
+    ax.set_xticks(range(len(vals)))
+    ax.set_xticklabels(labs, rotation=60, ha="right", fontsize=7)
+    ax.set_title(f"category {cat}", fontsize=9)
+    ax.grid(True, which="both", axis="y", alpha=0.3)
+axes[0].set_ylabel("decapsulation [s], log")
+fig.suptitle(f"same host; liboqs 0.13.0 (HQC portable) vs Eigen-Séta run {RID}", fontsize=8)
+fig.tight_layout()
+for d in (os.path.join(PAPER, "figures"), os.path.join(STUDY, "figures")):
+    for ext in ("pdf", "svg"):
+        fig.savefig(os.path.join(d, f"compare.{ext}"))
+    fig.savefig(os.path.join(d, "compare.png"), dpi=150)

@@ -3,10 +3,10 @@
 \input{numbers_data.tex}
 \newcommand{\EigenxCommit}{d89d790}
 \newcommand{\MethodText}{%
-One campaign, run \art{\BenchRunId}, measured every operation on one host: a
+One campaign, run \texttt{\BenchRunId}, measured every operation on one host: a
 shared cloud VM with 4 vCPUs (Intel Xeon at 2.10\,GHz, one thread per core),
 Linux 6.18, rustc~1.97.0, release profile, \art{eigenx} commit
-\art{\EigenxCommit}. Isolation is the lowest level (L0): no core pinning
+\texttt{\EigenxCommit}. Isolation is the lowest level (L0): no core pinning
 for the all-core rows, and \texttt{taskset -c 0} for the single-core rows.
 Other tenants' load is not controlled. The harness is
 \art{eigenx:examples/bench_kem.rs}.
@@ -26,8 +26,6 @@ $\times$ 3, Q5 1 $\times$ 3, and single-core L1 2 $\times$ 5, L3 and L5 1
 $\times$ 3. The Q sets use \texttt{jobs}=4 for key generation; every other
 row uses \texttt{jobs}=1. Medians are reported with the range, because the
 samples are few and the host is noisy.}
-\newcommand{\QFiveSummary}{Q5 key generation is the slowest operation of the
-scheme (\S\ref{sec:perf}).}
 \newcommand{\PerfDiscussion}{%
 \paragraph{Reading the numbers.}
 \begin{itemize}[nosep]
@@ -58,10 +56,3 @@ scheme (\S\ref{sec:perf}).}
 \item \emph{No external comparison.} No other implementation of this
   scheme exists, so there is no external tool to compare against.
 \end{itemize}}
-% ML-KEM-512 on the same host (records/mlkem_same_host/mlkem.tsv, median of
-% three repetitions) and the ratios to Eigen-Seta L1 medians.
-\newcommand{\MlkemEnc}{37}
-\newcommand{\MlkemDec}{47}
-\newcommand{\RatioEnc}{5,600}
-\newcommand{\RatioDec}{26,000}
-\newcommand{\RatioKg}{100,000}
