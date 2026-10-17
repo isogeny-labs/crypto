@@ -19,6 +19,14 @@ The [CI follow-up](../docs/ecbench/backend-frontier-report/validation/ci-2026101
 retains decoded job logs, commands, file hashes and exact base/head Git object
 comparisons for head `9f286da9f813359bdae4151cfc2a79667fac47f1`.
 
+The [blobless Cargo follow-up](../docs/ecbench/backend-frontier-report/validation/ci-20261017-cargo/README.md)
+adds current-head logs and the same 19 object comparisons for `28bb1f67`.
+That hosted leaderboard job reached Cargo and exposed a second change-caused
+checkout defect: the root `.gitignore` blob was absent. A fresh shallow,
+blobless negative control reproduced exit 101; selecting only `/.gitignore`
+then passed all three workflow blocks, 20 tests and the unchanged 115/five
+hash contract. Its correction still requires hosted CI on its own final head.
+
 - **Observed:** `.github/scripts/ci-scope.mjs:50` redeclares `root`. The exact
   base file also fails `node --check` with `Identifier 'root' has already
   been declared`. This blocks scope/materialization and downstream Rust and
@@ -69,3 +77,8 @@ CI changes. No solver campaign is needed to distinguish these CI failures.
 
 2026-10-17: identified from completed PR #2103 checks. The PR's sparse-checkout
 defect is corrected and locally validated; the inherited gates remain open.
+
+2026-10-17, second check-in: the next hosted run exposed the omitted root
+ignore blob. The initial sparse selection now includes it, with a fresh
+blobless negative/positive control. The inherited failures and absent
+current-head review remain open; no gate is waived.
