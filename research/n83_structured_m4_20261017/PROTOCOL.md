@@ -36,6 +36,15 @@ inside a 4 GiB hard-memory, zero-swap cgroup. The outer supervisor uses thin
 shell orchestration and a hard wall deadline. Do not use the historical Python
 supervisor for this new research run.
 
+The Linux build uses the local `rust:1.93.1-bookworm` image pinned to
+`sha256:7c4ae649a84014c467d79319bbf17ce2632ae8b8be123ac2fb2ea5be46823f31`
+on arm64, `cargo build --release --offline --locked --no-default-features
+--example koblitz_n83_structured_orbit_worker`, a read-only source and Cargo
+registry mount, no network, four CPUs, 8 GiB memory with zero swap, and a
+600-second outer build cap. Record the binary SHA-256 and Docker exit/OOM
+state. A build cap or missing offline dependency blocks the run and is
+preserved as an infrastructure outcome.
+
 | Parameter | Frozen value |
 |---|---:|
 | Summands | 4 |
