@@ -61,6 +61,23 @@ fn pin_block(enc: &mut ChainedS3Encoding, block: usize, value: &BigUint) {
     }
 }
 
+fn decoded_x_blocks(enc: &ChainedS3Encoding) -> Result<Vec<BigUint>> {
+    let model = enc.solver.model();
+    if model.len() < 11 * 83 {
+        return Err("SAT model is shorter than the eleven x blocks".into());
+    }
+    Ok((0..11)
+        .map(|block| {
+            (0..83).fold(BigUint::from(0u8), |mut value, bit| {
+                if model[block * 83 + bit] {
+                    value |= BigUint::from(1u8) << bit;
+                }
+                value
+            })
+        })
+        .collect())
+}
+
 fn run(role: &str, stage: &str, conflict_cap: u64) -> Result<Value> {
     if !["gray_pool", "hash_pool"].contains(&role)
         || !["all_x", "summand_x", "open"].contains(&stage)
@@ -200,8 +217,16 @@ fn run(role: &str, stage: &str, conflict_cap: u64) -> Result<Value> {
     );
     enc.solver.conflict_budget = conflict_cap;
     let outcome = enc.solver.solve();
+    let decoded = if outcome == SolveResult::Sat {
+        Some(decoded_x_blocks(&enc)?)
+    } else {
+        None
+    };
     let model_verified = if outcome == SolveResult::Sat {
+        let blocks = decoded.as_ref().ok_or("SAT model blocks missing")?;
         enc.verify_model()
+            && blocks[10] == target_x
+            && (stage != "all_x" || blocks[6..10] == partial_xs[..])
             && (stage == "open"
                 || enc
                     .decode_summands()
@@ -228,6 +253,7 @@ fn run(role: &str, stage: &str, conflict_cap: u64) -> Result<Value> {
         "variables":enc.solver.n_vars(), "clauses":enc.solver.n_clauses(),
         "xors":enc.solver.n_xors(), "conflict_cap":conflict_cap,
         "conflicts":enc.solver.conflicts(), "model_verified":model_verified,
+        "decoded_x_blocks":decoded.map(|blocks| blocks.iter().map(ToString::to_string).collect::<Vec<_>>()),
         "elapsed_wall_ms_L0":started.elapsed().as_secs_f64()*1000.0,
         "natural_relations":Value::Null, "total_index_calculus_runtime_ms":Value::Null,
         "selected_best_total_runtime":Value::Null,

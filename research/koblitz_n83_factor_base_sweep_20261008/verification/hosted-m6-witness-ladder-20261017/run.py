@@ -109,6 +109,22 @@ def stage_run(role: str, stage: str, wall_cap: int, conflict_cap: int,
                     "worker status differs")
             require(not status.startswith("SAT_") or result["model_verified"] is True,
                     "SAT result lacks model verification")
+            decoded = result.get("decoded_x_blocks")
+            if status.startswith("SAT_"):
+                require(isinstance(decoded, list) and len(decoded) == 11
+                        and all(isinstance(value, str) and value.isascii()
+                                and value.isdecimal() and value == str(int(value))
+                                and 0 <= int(value) < (1 << 83) for value in decoded),
+                        "SAT x blocks missing or malformed")
+                fixture = json.loads(FIXTURE.read_text())
+                arm = next((row for row in fixture["arms"] if row["role"] == role), None)
+                require(arm is not None, "SAT role missing from frozen fixture")
+                require(decoded[10] == arm["target_x"]
+                        and (stage == "open" or decoded[:6] == arm["ordered_xs"])
+                        and (stage != "all_x" or decoded[6:10] == arm["partial_xs"]),
+                        "SAT x blocks differ from frozen constraints")
+            elif status == "UNKNOWN_conflict_cap":
+                require(decoded is None, "capped receipt has decoded x blocks")
         except (ValueError, KeyError, TypeError, json.JSONDecodeError):
             status = "PRODUCER_FAILURE_receipt"
     receipt = {

@@ -16,6 +16,14 @@ The two arms run sequentially on one GitHub ARM runner. Each solve is isolated i
 
 `SAT_verified_planted_x` demonstrates the solver reached the pinned summand x tuple in a fixed stage after native field-model verification. `SAT_verified_field_model` in the open stage is only a native field-model result; group lifting would be required to call it a partial relation. `UNKNOWN_conflict_cap` and outer wall caps are censored. `PRODUCER_FAILURE_*` marks an encoding, identity, receipt, or infrastructure failure. The planted tuple mathematically satisfies every stage, so an UNSAT solver verdict is a producer failure, not a refutation of a random target. If either arm fails before a stage, later stages are absent and separately classified.
 
+The updated worker retains all eleven decoded x blocks for every SAT model:
+six summands, four intermediate sums and the target. The outer runner checks
+their canonical encoding and the fixed blocks. An independent audit must
+re-evaluate the original S3 nodes and use the archived full point sets to
+attempt a group lift before promoting an open-stage SAT model to a partial
+relation. Earlier runs pinned to a source commit without these blocks remain
+field-access controls only.
+
 The sweep winner and total index-calculus runtime remain null. Even a positive open-stage planted target does not measure random-target relation probability, large-prime graph closure, useful rank, linear algebra, or an individual logarithm. Its purpose is to distinguish an inaccessible six-summand encoding from an accessible encoding whose natural-search call reached its cap.
 
 To check the fixture against fresh S3 downloads named by compressed BLAKE3 digest:
