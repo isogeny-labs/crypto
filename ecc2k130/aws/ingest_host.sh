@@ -112,8 +112,13 @@ fi
 
 case "${1:-up}" in
 preflight)
+    VERSIONING=$(aws s3api get-bucket-versioning --bucket "$BUCKET" --query Status --output text)
     echo "account=$ACCOUNT region=$REGION role=$ROLE instance_type=$TYPE security_group=$SG subnet=$SUBNET"
     echo "source=s3://$BUCKET/dp/ status=s3://$STATUS_BUCKET/status.json"
+    echo "source_versioning=$VERSIONING"
+    if [ "$VERSIONING" != Enabled ]; then
+        echo "source bucket versioning is disabled; later receipt replay requires immutable object keys" >&2
+    fi
     # JMESPath uses literal backticks for its string values.
     # shellcheck disable=SC2016
     aws ec2 describe-instances \

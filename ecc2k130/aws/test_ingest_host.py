@@ -35,6 +35,7 @@ case "$1 $2" in
     if [ "${TEST_NO_PROFILE:-0}" = 1 ]; then exit 254; fi
     echo '{}' ;;
   'rds describe-db-instances') echo db.example ;;
+  's3api get-bucket-versioning') echo None ;;
   's3 cp') exit 0 ;;
   'ec2 run-instances')
     printf '%s\\n' "$@" > "$TEST_RUN_ARGS"
@@ -71,6 +72,8 @@ esac
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("role=worker", result.stdout)
         self.assertIn("security_group=sg-existing subnet=subnet-existing", result.stdout)
+        self.assertIn("source_versioning=None", result.stdout)
+        self.assertIn("later receipt replay requires immutable object keys", result.stderr)
         self.assertFalse((self.root / "user-data").exists())
 
     def test_each_role_reaches_systemd_and_instance_tags(self):

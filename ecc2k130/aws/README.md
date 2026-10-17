@@ -719,7 +719,9 @@ quiet, from a stopped ingest host. It creates nothing. On the Mac that has the
 copy whose digest differs from the source being deployed; this catches the
 otherwise invisible old publisher before any S3 upload or EC2 launch. It also
 refuses a second publisher when a local LaunchAgent or tagged EC2 publisher
-is active. After **every** old
+is active. Preflight reports source-bucket versioning as well. If it is
+disabled, the receipt records a content digest but an auditor can replay those
+bytes later only while the object key still names the same content. After **every** old
 ingester copy has stopped, launch exactly one publisher with
 `INGEST_ROLE=publisher ./ingest_host.sh up`, then launch additional replicas
 with `INGEST_ROLE=worker ./ingest_host.sh up`. Each EC2 hostname is the stable
