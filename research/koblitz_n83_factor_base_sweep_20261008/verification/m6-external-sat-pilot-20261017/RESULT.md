@@ -15,3 +15,9 @@ The stronger satisfiability control passed. The native worker found the known x 
 As a corruption check, flipping the first model bit made the independent checker reject the exported formula at DIMACS line 4. The unmodified model and all three clean external-call artifacts replayed successfully.
 
 The conservative charge for the five external attempts, including two producer failures, plus the native model call is six full 600-second envelopes, **3,600 seconds**. The full release-library validation took another 265.59 seconds and passed 4,084 tests with 117 ignored; the touched example release test and 63 N83 Python tests passed. The raw formula, solver logs and model bits remain in local research scratch, bound by tree and file hashes in `audit.json`; the three factor-base objects are already in the requested S3 prefix. This pilot does not show external-solver superiority, natural-target relation yield, useful rank, linear algebra, individual-log extraction, or fully charged index-calculus runtime. `selected_best_total_runtime` remains null.
+
+The subsequent [complete-model CryptoMiniSat control](MODEL_PIN_RESULT.md) added
+every native assignment bit as a unit clause to the byte-identical original
+export and returned SAT; flipping only the first added unit returned UNSAT.
+Its independent audit passed. The control incurred another conservative 600
+seconds across one infrastructure-failed sandbox pair and one valid local pair.
