@@ -1,0 +1,69 @@
+{
+  "calls": [
+    {
+      "conflict_multiplier": 1,
+      "full_wall_seconds_L0": 13.118818375000046,
+      "peak_rss_bytes_L0": 53411840,
+      "raw_file_count": 6,
+      "raw_tree_sha256": "cb4524136b57a143661ec33270d8e2389a4adb8ec4006c27da8a04e6937a5630",
+      "solver_conflict_cap": 5000,
+      "solver_disposition": "INDETERMINATE",
+      "solver_wall_seconds_L0": 0.2325565840001218
+    },
+    {
+      "conflict_multiplier": 20,
+      "full_wall_seconds_L0": 18.44505404099982,
+      "peak_rss_bytes_L0": 100827136,
+      "raw_file_count": 6,
+      "raw_tree_sha256": "a8b0c42d543c328819a63c2928919e76c7b06ddc1344ae9ce89ac3c547192ac6",
+      "solver_conflict_cap": 100000,
+      "solver_disposition": "INDETERMINATE",
+      "solver_wall_seconds_L0": 5.949002082999868
+    },
+    {
+      "conflict_multiplier": 200,
+      "full_wall_seconds_L0": 70.74035616699985,
+      "peak_rss_bytes_L0": 143491072,
+      "raw_file_count": 6,
+      "raw_tree_sha256": "5f2ad84b5a7fb00652b353c2cba3dd894ab8c6d82ffa93594b5cbcc55cc7f41f",
+      "solver_conflict_cap": 1000000,
+      "solver_disposition": "INDETERMINATE",
+      "solver_wall_seconds_L0": 57.66146183300043
+    }
+  ],
+  "conservative_six_call_envelope_seconds": 3600,
+  "dimacs_blake3": "9e5c9d22ef57ba4640d2d67d02fbdb39501f0de9f2b779bb818a919207031e6f",
+  "dimacs_sha256": "c62fe682879435e8f1ee30a80ac7830f2aef81dd4f600d10a004ac45a4f914b8",
+  "native_assignment_audit": {
+    "clauses_checked": 548445,
+    "dimacs_blake3": "9e5c9d22ef57ba4640d2d67d02fbdb39501f0de9f2b779bb818a919207031e6f",
+    "dimacs_sha256": "c62fe682879435e8f1ee30a80ac7830f2aef81dd4f600d10a004ac45a4f914b8",
+    "full_group_witness_replayed": true,
+    "model_bits_blake3": "cb8cc942a2b345326f7836d00574ec949a98bfd1213fed8a487a3cd4059ee4a4",
+    "model_bits_sha256": "ad95e05e171740aa08efb39bf2b28fd9c7c501f3f5ee4e7c5cced3c9a1c725d9",
+    "original_s3_nodes_checked": 5,
+    "schema": "n83.m6-native-export-audit/v1",
+    "selected_best_total_runtime": null,
+    "status": "PASS_NATIVE_MODEL_SATISFIES_EXPORTED_XOR_DIMACS",
+    "variables": 118684,
+    "xor_rows_checked": 6059
+  },
+  "retained_producer_failures": [
+    {
+      "raw_file_count": 6,
+      "raw_tree_sha256": "e873a38db35c2530bd5b8f7758246e236ca818bea285baa88bd5b295ab7fb218",
+      "reason": "missing or repeated solver disposition"
+    },
+    {
+      "raw_file_count": 6,
+      "raw_tree_sha256": "8f08bb0650fc1ef1d0c70b46a378087e0b11e6bf3539967566f0008882b8278c",
+      "reason": "solver exit and disposition differ"
+    }
+  ],
+  "role": "gray_pool",
+  "schema": "n83.m6-external-sat-local-audit/v1",
+  "selected_best_total_runtime": null,
+  "source_commit": "73ee5686a62c9e75cd8d29acd5e73fd3410bb494",
+  "stage": "all_x",
+  "status": "PASS_CENSORED_EXTERNAL_CALLS_AND_NATIVE_SAT_EXPORT"
+}
