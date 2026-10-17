@@ -191,7 +191,7 @@ def run(worker: Path, bases: Path, role: str, stage: str,
         (output / "solver.stderr").write_text(stderr)
         disposition, model = model_from_stdout(stdout, receipt["variables"])
         require(solver.returncode == {"SATISFIABLE": 10, "UNSATISFIABLE": 20,
-                                      "UNKNOWN": 0, "INDETERMINATE": 0}[disposition],
+                                      "UNKNOWN": 0, "INDETERMINATE": 15}[disposition],
                 "solver exit and disposition differ")
     except subprocess.TimeoutExpired:
         try:
