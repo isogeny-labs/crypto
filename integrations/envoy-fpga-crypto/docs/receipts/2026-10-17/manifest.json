@@ -1,0 +1,305 @@
+{
+  "date": "2026-10-17",
+  "repository": "aburan28/crypto",
+  "base_commit": "c6d64436a33359320ad9d5b42c4acebee2968b9a",
+  "import_path": "integrations/envoy-fpga-crypto",
+  "source_archive_sha256": "f2267c211fa647ec9ce995b79aea909c4f1ddab11498cd043e4759c642592174",
+  "source_files": [
+    {
+      "path": ".gitignore",
+      "bytes": 30,
+      "sha256": "de5200857beacc0a3634e9cfedb0c2a52105ea4266c90d09356a0a070fef4629"
+    },
+    {
+      "path": "BUILD",
+      "bytes": 1325,
+      "sha256": "86a952cae7203f1af7f0e5cd82c98c6ca6cc7b889258bee60ec5a714ab1de6de"
+    },
+    {
+      "path": "Makefile",
+      "bytes": 4352,
+      "sha256": "7fc9f7bf03c079ce916b6306bf8bcefdd4b7048a0aea2670f994d0a1c842e5e0"
+    },
+    {
+      "path": "README.md",
+      "bytes": 9708,
+      "sha256": "ef75408425a5f71a7ece3063c005b2c3908e63c587958cbab339aa082736db1e"
+    },
+    {
+      "path": "docs/fpga-abi.md",
+      "bytes": 11234,
+      "sha256": "a8cbaa759da731a056fb6eab9ba07cfbc6c391b0aa50ce3e95838bdee12bc81e"
+    },
+    {
+      "path": "docs/post-quantum.md",
+      "bytes": 11060,
+      "sha256": "a515fd779e99156ba5fea1de059c48c289cf563044feaa28fe006a3453a813b4"
+    },
+    {
+      "path": "docs/validation.md",
+      "bytes": 5788,
+      "sha256": "a05e0eb22dafdeafb8183da6bd542e1d671363946517014e60a82cd743006c6f"
+    },
+    {
+      "path": "envoy/extension.cc",
+      "bytes": 14721,
+      "sha256": "5ca622d437ceb975b1adf3a649069c70976818a3d788dc90c0c77346e2af8029"
+    },
+    {
+      "path": "envoy/pq_filter.cc",
+      "bytes": 14926,
+      "sha256": "4d231f504beb70c4663907f4e4a9c8518bed480904899fd6c574991b75873814"
+    },
+    {
+      "path": "examples/envoy.yaml",
+      "bytes": 3178,
+      "sha256": "1086bc8c55bc0039fcad9472d4a8d7e1d04c93da8f2a0027e61dee0bdddb9826"
+    },
+    {
+      "path": "examples/pq-software.yaml",
+      "bytes": 2556,
+      "sha256": "0171ace75be3d0b99d15f48fc94a97b2e1c88d9f818f6fb590fd107823163070"
+    },
+    {
+      "path": "include/fpga/boringssl.h",
+      "bytes": 1676,
+      "sha256": "542f8b7d1f11a7fee2fc497c236894d3c6c6ff8def5043ffce2aef9c4c95a0f9"
+    },
+    {
+      "path": "include/fpga/crypto.h",
+      "bytes": 3976,
+      "sha256": "0cf59c54fbe226e7e2ef793a24ced85005e3336f45a2b03e343d30e543944831"
+    },
+    {
+      "path": "include/fpga/mailbox.h",
+      "bytes": 1949,
+      "sha256": "4e1c9795366e56b8daa48ce0424fef0b9f101a8f0d0698f58b1398c873bcaa1f"
+    },
+    {
+      "path": "include/fpga/pq.h",
+      "bytes": 1653,
+      "sha256": "e94817338ee4747b8122e75d30013327c3ba893dceebc8b2481742ad13d46c1f"
+    },
+    {
+      "path": "include/fpga/pq_plugin.h",
+      "bytes": 819,
+      "sha256": "39492b53648d079ba7f324ddae808ebeedfc0788978623afff7722a9fd9e55c3"
+    },
+    {
+      "path": "pq/oqs_plugin.cc",
+      "bytes": 10481,
+      "sha256": "ddd2aa52e69fd2c3c4a16f6d7fe302b8bdfa652047e3d285dc1f37a1971e5948"
+    },
+    {
+      "path": "pq/plugin.map",
+      "bytes": 46,
+      "sha256": "2f2e8d6ff9e9f9a5f5b60e7f81cf50411ee63e7e992bda5e4030aca251eeb16f"
+    },
+    {
+      "path": "src/aws_pci.cc",
+      "bytes": 3507,
+      "sha256": "e1767d6d18d3c75fb0161a1c875a2abb6184814c8b481e793647059ddad54c71"
+    },
+    {
+      "path": "src/boringssl_private_key.cc",
+      "bytes": 3634,
+      "sha256": "904254b9b23e9645dff28a88535bbd20ff4c846b80012a6bd10965ce00f23a9b"
+    },
+    {
+      "path": "src/boringssl_records.cc",
+      "bytes": 8176,
+      "sha256": "31ef524c98092ee81c410392faad7f4cd99a39ce80616b4ba627d1e815333182"
+    },
+    {
+      "path": "src/crypto.cc",
+      "bytes": 9089,
+      "sha256": "c55eb047045527c9fb25278fbc0e4e724edf156ed10653e22041d1cc8b1ab46c"
+    },
+    {
+      "path": "src/mailbox.cc",
+      "bytes": 9588,
+      "sha256": "0246445d3493aee8c199816ef37bcc9dedfc894975befb6298d74be8b3753e49"
+    },
+    {
+      "path": "src/pq_codec.cc",
+      "bytes": 7988,
+      "sha256": "cb271d501ce90962b99f890108dcbd68c8dd0d32d298f6f2b81489f073dd0c67"
+    },
+    {
+      "path": "src/pq_loader.cc",
+      "bytes": 3099,
+      "sha256": "1a83567525a3982a8099b8894bbbbd7f3036faa88d877ac9fcb5376222e6a19b"
+    },
+    {
+      "path": "tests/core_test.cc",
+      "bytes": 8773,
+      "sha256": "129d0f7b9861368a60ffc42f97b9b66cb5e000d56c7173502896696a12cf945f"
+    },
+    {
+      "path": "tests/emulated_registers.h",
+      "bytes": 5665,
+      "sha256": "0c2380261dc84bbd7cc39b5fb972d9edc30b701e94519c1f3a1bbd9b8047720e"
+    },
+    {
+      "path": "tests/pq_test.cc",
+      "bytes": 11163,
+      "sha256": "7ef26209dfb6b221997f5ed5fba65ac389ac7b1231d6f88591734ef00d304255"
+    },
+    {
+      "path": "tests/pq_tls_test.cc",
+      "bytes": 7563,
+      "sha256": "14e3349a53971a9d98aea621ca1dc3ce982ca0048081d65834f4c70f4bc4580d"
+    },
+    {
+      "path": "tests/software_backend.cc",
+      "bytes": 5134,
+      "sha256": "e8e0b1cdc14a0dabb8b44f79839f285127cc3b950600cfd70a88c65def77f8bb"
+    },
+    {
+      "path": "tests/software_backend.h",
+      "bytes": 682,
+      "sha256": "f214361d56ce36e89b02056ec981b27903e7996e25201c16c9f5f19bc9afcef0"
+    },
+    {
+      "path": "tests/test.h",
+      "bytes": 1029,
+      "sha256": "33ae848c5539d548c780151632ae5088a3494b21a8ea83186ec5a6c1b0c65426"
+    },
+    {
+      "path": "tests/tls_test.cc",
+      "bytes": 10123,
+      "sha256": "b66c9aef86df7e1e6a46382f66fc05b91e579f37b802f0377b8aaaee66ada0f6"
+    },
+    {
+      "path": "tools/build_pq.py",
+      "bytes": 2319,
+      "sha256": "ae869a37b91258341dcf730cb1815f051e94265fd871cd76e2969b0c46dcd1ae"
+    },
+    {
+      "path": "tools/install_envoy.py",
+      "bytes": 1904,
+      "sha256": "cb2d70c71f6dbb6c48723c9f734044c9bb8cd814527368576b090c3ff43a8aea"
+    },
+    {
+      "path": "tools/test_boringssl.py",
+      "bytes": 1877,
+      "sha256": "0ab0bc99e3911a7563c34b7d86cc624263097b68ddfb91ee103f824bff3635b4"
+    }
+  ],
+  "validation": [
+    {
+      "name": "extension functional suites",
+      "result": "passed",
+      "groups": 36,
+      "exit_code": 0,
+      "log": "runs/extension-tests.log",
+      "command": "make test test-pq test-boringssl test-pq-boringssl OQS_BUILD=/workspace/scratch/liboqs-build BORINGSSL_SRC=/tmp/fpga-references/boringssl-0.20260929.0 BORINGSSL_BUILD=/tmp/fpga-boringssl-build",
+      "working_directory": "/workspace/scratch/crypto-upload/integrations/envoy-fpga-crypto"
+    },
+    {
+      "name": "exhaustive enabled PQ catalog",
+      "result": "passed",
+      "modes": 262,
+      "exit_code": 0,
+      "log": "runs/all-pq-modes.log",
+      "command": "PQ_TEST_ALL=1 ./build/pq_test /workspace/scratch/crypto-upload/integrations/envoy-fpga-crypto/build/libfpga_pq_oqs.so",
+      "working_directory": "/workspace/scratch/crypto-upload/integrations/envoy-fpga-crypto"
+    },
+    {
+      "name": "PQ wrapper sanitizers",
+      "result": "passed",
+      "groups": 8,
+      "exit_code": 0,
+      "log": "runs/pq-sanitizers.log",
+      "command": "make sanitize-pq ASAN_OPTIONS=detect_leaks=0 OQS_BUILD=/workspace/scratch/liboqs-build",
+      "working_directory": "/workspace/envoy-fpga-crypto"
+    },
+    {
+      "name": "classical core and TLS sanitizers",
+      "result": "passed",
+      "groups": 24,
+      "exit_code": 0,
+      "log": "runs/classical-sanitizers.log",
+      "command": "make sanitize sanitize-boringssl ASAN_OPTIONS=detect_leaks=0 BORINGSSL_SRC=/tmp/fpga-references/boringssl-0.20260929.0 BORINGSSL_BUILD=/tmp/fpga-boringssl-build",
+      "working_directory": "/workspace/envoy-fpga-crypto"
+    },
+    {
+      "name": "native Envoy production object compilation",
+      "result": "passed",
+      "exit_code": 0,
+      "log": "runs/envoy-object-build.log",
+      "scope": "Seven core/bridge and two Envoy adapter translation units against Envoy v1.39.3; no full Envoy linking or live listener test"
+    },
+    {
+      "name": "required repository Rust library regression",
+      "result": "failed before tests",
+      "exit_code": 101,
+      "log": "runs/repository-cargo-test.log",
+      "command": "PATH=/workspace/scratch/fpga-cargo/bin:$PATH RUSTUP_HOME=/workspace/scratch/fpga-rustup CARGO_HOME=/workspace/scratch/fpga-cargo CARGO_TARGET_DIR=/workspace/scratch/crypto-upload-target CARGO_BUILD_JOBS=4 cargo test --release --lib --locked",
+      "working_directory": "/workspace/scratch/crypto-upload",
+      "classification": "Pre-existing compilation errors in unchanged base files",
+      "example": "Duplicate Fp4 variants in src/cryptanalysis/ecbench/workload.rs:377 and :385",
+      "unchanged_base_file_git_blob": "0433fa620596bd24cdf1dbfd06c1ae67e841b2e1"
+    }
+  ],
+  "environment": {
+    "platform": "Linux x86_64",
+    "compiler": "GCC 14.2.0",
+    "native_envoy_compiler": "Clang 18.1.8 / libc++",
+    "rustc": "1.99.1 (58cf8f9c3 2026-10-13)",
+    "liboqs": "0.16.0, OQS_USE_OPENSSL=OFF",
+    "boringssl": "0.20260929.0",
+    "envoy": "1.39.3",
+    "sanitizer_scope": "Owned code and plugin wrappers instrumented; liboqs and BoringSSL static libraries are normal Release builds; LeakSanitizer disabled for the ptrace environment"
+  },
+  "not_validated": [
+    "FPGA cryptographic RTL",
+    "synthesized AFI",
+    "physical F2 operation",
+    "fully linked Envoy executable",
+    "live Envoy HTTP listener",
+    "TLS KEM offload",
+    "final FN-DSA implementation"
+  ],
+  "coordination": {
+    "conductor_check_exit_code": 127,
+    "reason": "Conductor executable absent; repository docs/CONDUCTOR.md documents the non-blocking fallback"
+  },
+  "logs": [
+    {
+      "path": "runs/all-pq-modes.log",
+      "bytes": 10420,
+      "sha256": "3017e3c89d6a7525a851887998baf504d205835e7d4f446ca3c462c0c5607c5b"
+    },
+    {
+      "path": "runs/classical-sanitizers.log",
+      "bytes": 2425,
+      "sha256": "eec88d3a7647466c114d2e9b9c5128f6f7496752e88bb314287b0b5e4f52fe33"
+    },
+    {
+      "path": "runs/envoy-object-build.log",
+      "bytes": 1763,
+      "sha256": "22e094622907108d04d65823c8c3a2bf0d2d5ef7c613911e48e35d1c0e9a01ec"
+    },
+    {
+      "path": "runs/extension-tests.log",
+      "bytes": 4825,
+      "sha256": "0433b7b94486fb850d5516340ef2c1b24d9647a6bd16ad0ff80733a20010ffe6"
+    },
+    {
+      "path": "runs/pq-sanitizers.log",
+      "bytes": 1922,
+      "sha256": "532a1b995d30fd1539d268932baba30f770be86ea0bf8735410246d38f89be8b"
+    },
+    {
+      "path": "runs/repository-cargo-test.log",
+      "bytes": 21553,
+      "sha256": "7ad0cf2274a501902c08b8c59891a07338a70e1c3bbf0615c47b9cef7148079e"
+    },
+    {
+      "path": "runs/repository-checkout-attempt.log",
+      "bytes": 378,
+      "sha256": "a89716993e0998001a677c03089e2d61e12c9b32605f47ec76858cbb5ca507bb"
+    }
+  ]
+}
