@@ -36,7 +36,7 @@ use crate::cryptanalysis::ecbench::record::{
 };
 use crate::cryptanalysis::ecbench::runner::{read_record_lines, read_session, PlanDoc};
 use crate::cryptanalysis::ecbench::spec::{plan, Arm, Spec};
-use crate::cryptanalysis::ecbench::workload::{CurveSpec, Workload};
+use crate::cryptanalysis::ecbench::workload::Workload;
 
 /// Replay every measured deterministic run.
 pub const REPLAY_ALL: usize = usize::MAX;
@@ -143,6 +143,19 @@ pub struct AuditReport {
     /// (the runner was killed before it could mark the session).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub interruption: Option<String>,
+    /// Whether `records.jsonl` was checked against the whole-file hash
+    /// the runner wrote (`session.records_sha256`) when it finalised the
+    /// session.  `false` for a never-finalised session
+    /// (`interruption: never_finalised`): the runner never wrote that
+    /// hash, so nothing binds the file as a whole.  Its records carry
+    /// only their own per-record seals, which are unkeyed hashes, so a
+    /// truncated file, or one with valid-looking records appended, is not
+    /// detected by any whole-file check.  **An unbound session must not
+    /// be cited as complete**: cite it, if at all, as an interrupted,
+    /// unbound prefix of its plan.  `None` only in receipts written
+    /// before this field existed.
+    #[serde(default)]
+    pub records_bound: Option<bool>,
     pub ok: bool,
     pub problems: Vec<String>,
     pub checks: BTreeMap<String, bool>,
@@ -208,8 +221,12 @@ pub fn never_finalised(session: &crate::cryptanalysis::ecbench::runner::Session)
 /// ([`never_finalised`]) is accepted as interrupted too, held to every
 /// per-record check (seals, sequence, plan, answers, derived figures,
 /// grading) with no records hash or count to compare against; it is
-/// reported as `interrupted` with `interruption: never_finalised`.  A
-/// session that claims `complete` gets no such relaxation.
+/// reported as `interrupted` with `interruption: never_finalised` and
+/// `records_bound: false` (explicitly unbound: no whole-file hash ties
+/// `records.jsonl` together, so truncation or appended records are seen
+/// only through the unkeyed per-record seals).  Such a session must not
+/// be cited as complete.  A session that claims `complete` gets no such
+/// relaxation.
 pub fn audit_with(
     dir: &Path,
     replay: usize,
@@ -484,8 +501,7 @@ pub fn audit_with(
             let w = &p.workloads[ex.workload];
             let input = ChildInput {
                 schema: CHILD_INPUT_SCHEMA.into(),
-                curve: CurveSpec::explicit(p.instance(ex.workload))
-                    .unwrap_or_else(|| w.curve_spec.clone()),
+                curve: w.curve_spec.for_child(p.instance(ex.workload)),
                 target_seed: w.target_seed,
                 target_index: w.target_index,
                 target_kind: w.kind(),
@@ -610,6 +626,11 @@ pub fn audit_with(
             session.status.clone()
         },
         interruption: killed.then(|| NEVER_FINALISED.to_string()),
+        // The records hash binds the file only when the runner wrote one
+        // and it was compared (`records_hash` above).
+        records_bound: Some(
+            !killed && session.records_sha256.is_some() && rec_sha == session.records_sha256,
+        ),
         session_id: session.session_id,
         ok: problems.is_empty(),
         problems,
@@ -715,13 +736,49 @@ mod tests {
         assert_eq!(strict.checks.get("session_complete"), Some(&false));
         assert_eq!(strict.session_status, "running");
         assert_eq!(strict.interruption, None);
+        assert_eq!(strict.records_bound, Some(false));
 
         let lenient = audit_with(&dir, 0, true).unwrap();
         assert!(lenient.ok, "{:?}", lenient.problems);
         assert_eq!(lenient.session_status, "interrupted");
         assert_eq!(lenient.interruption.as_deref(), Some(NEVER_FINALISED));
+        // Accepted, but explicitly unbound: no records hash was compared.
+        assert_eq!(lenient.records_bound, Some(false));
+        let text = serde_json::to_string(&lenient).unwrap();
+        assert!(
+            text.contains("\"interruption\":\"never_finalised\""),
+            "{text}"
+        );
+        assert!(text.contains("\"records_bound\":false"), "{text}");
         assert_eq!(lenient.records, 4);
         assert_eq!(lenient.checks.get("records"), Some(&true));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn a_finalised_interrupted_session_is_records_bound() {
+        // The same records, finalised the way the runner marks an
+        // interruption: now the whole-file hash binds them.
+        let dir = killed_copy("finalised");
+        let records = std::fs::read(dir.join("records.jsonl")).unwrap();
+        let text = std::fs::read_to_string(dir.join("session.json")).unwrap();
+        let mut v: serde_json::Value = serde_json::from_str(&text).unwrap();
+        v["status"] = json!("interrupted");
+        v["finished_unix_ms"] = json!(1791170600000u64);
+        v["records_written"] = json!(4);
+        v["records_sha256"] = json!(sha256_hex(&records));
+        std::fs::write(dir.join("session.json"), v.to_string()).unwrap();
+        let rep = audit_with(&dir, 0, true).unwrap();
+        assert_eq!(rep.interruption, None);
+        assert_eq!(rep.checks.get("records_hash"), Some(&true));
+        assert_eq!(rep.records_bound, Some(true));
+        // Appending a byte breaks the binding (and the audit).
+        let mut longer = records.clone();
+        longer.extend_from_slice(b"\n");
+        std::fs::write(dir.join("records.jsonl"), longer).unwrap();
+        let rep = audit_with(&dir, 0, true).unwrap();
+        assert_eq!(rep.records_bound, Some(false));
+        assert_eq!(rep.checks.get("records_hash"), Some(&false));
         let _ = std::fs::remove_dir_all(&dir);
     }
 
