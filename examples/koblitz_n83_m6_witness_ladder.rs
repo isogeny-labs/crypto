@@ -4,10 +4,13 @@
 use crypto_lib::binary_ecc::{BinaryPoint, F2mElement};
 use crypto_lib::cryptanalysis::binary_semaev_chain_sat::ChainedS3Encoding;
 use crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
-use crypto_lib::cryptanalysis::sat::SolveResult;
+use crypto_lib::cryptanalysis::sat::{to_dimacs_xor, SolveResult};
 use num_bigint::BigUint;
 use serde_json::{json, Value};
 use std::error::Error;
+use std::fs::OpenOptions;
+use std::io::Write;
+use std::path::Path;
 use std::time::Instant;
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
@@ -78,7 +81,7 @@ fn decoded_x_blocks(enc: &ChainedS3Encoding) -> Result<Vec<BigUint>> {
         .collect())
 }
 
-fn run(role: &str, stage: &str, conflict_cap: u64) -> Result<Value> {
+fn run(role: &str, stage: &str, conflict_cap: u64, export: Option<&Path>) -> Result<Value> {
     if !["gray_pool", "hash_pool"].contains(&role)
         || !["all_x", "summand_x", "open"].contains(&stage)
         || !(1..=20_000).contains(&conflict_cap)
@@ -215,6 +218,26 @@ fn run(role: &str, stage: &str, conflict_cap: u64) -> Result<Value> {
         "fixed_x_blocks":fixed_x_blocks, "variables":enc.solver.n_vars(),
         "clauses":enc.solver.n_clauses(), "xors":enc.solver.n_xors()})
     );
+    if let Some(path) = export {
+        let dimacs = to_dimacs_xor(&enc.solver);
+        let mut file = OpenOptions::new().write(true).create_new(true).open(path)?;
+        file.write_all(dimacs.as_bytes())?;
+        file.sync_all()?;
+        return Ok(json!({
+            "schema":"n83.m6-xor-dimacs-export/v1", "status":"EXPORTED_XOR_DIMACS",
+            "role":role, "stage":stage, "fixture_blake3":FIXTURE_BLAKE3,
+            "base_object_blake3":arm["base_object_blake3"],
+            "pool_object_blake3":arm["pool_object_blake3"],
+            "target":arm["target"], "identity_mask":0,
+            "fixed_x_blocks":fixed_x_blocks, "domain_clauses":domain_size.clauses,
+            "variables":enc.solver.n_vars(), "clauses":enc.solver.n_original_clauses(),
+            "xors":enc.solver.n_xors(), "dimacs_bytes":dimacs.len(),
+            "dimacs_blake3":blake3::hash(dimacs.as_bytes()).to_hex().to_string(),
+            "elapsed_wall_ms_L0":started.elapsed().as_secs_f64()*1000.0,
+            "natural_relations":Value::Null, "total_index_calculus_runtime_ms":Value::Null,
+            "selected_best_total_runtime":Value::Null,
+        }));
+    }
     enc.solver.conflict_budget = conflict_cap;
     let outcome = enc.solver.solve();
     let decoded = if outcome == SolveResult::Sat {
@@ -262,12 +285,14 @@ fn run(role: &str, stage: &str, conflict_cap: u64) -> Result<Value> {
 
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
-    if args.len() != 4 {
-        return Err("usage: koblitz_n83_m6_witness_ladder ROLE STAGE CONFLICT_CAP".into());
-    }
+    let export = match args.as_slice() {
+        [_, _, _, _] => None,
+        [_, _, _, _, flag, path] if flag == "--export-xor-dimacs" => Some(Path::new(path)),
+        _ => return Err("usage: koblitz_n83_m6_witness_ladder ROLE STAGE CONFLICT_CAP [--export-xor-dimacs NEW_PATH]".into()),
+    };
     println!(
         "{}",
-        serde_json::to_string(&run(&args[1], &args[2], args[3].parse()?)?)?
+        serde_json::to_string(&run(&args[1], &args[2], args[3].parse()?, export)?)?
     );
     Ok(())
 }
