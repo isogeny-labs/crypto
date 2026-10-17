@@ -26,7 +26,10 @@ Run four independent Tier 1 cloud instances, each on six public points:
 indices 0–5, 6–11, 12–17, and 18–23. Every candidate-point execution starts
 with empty factor-base, index, and log caches. Rotate the four-arm order by
 point index; alternate IC then same-point rho and rho then IC by point and
-fixed arm index. For each pair, run three independent solves of the same
+fixed arm index. The paired rho seed is
+`2026110500 + 4*point_index + fixed_arm_index`, where fixed arm indices
+0–3 are K2816 join, K2816 cancel, K3072 join, K3072 cancel. For each pair,
+run three independent solves of the same
 frozen calibration rho point before and three after. Compare the two medians;
 the absolute difference divided by their mean must be at most 10%. Every
 calibration and same-point rho answer must independently replay.
