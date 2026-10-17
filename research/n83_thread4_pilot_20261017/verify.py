@@ -33,6 +33,11 @@ def verify(output):
             source["target_threads"] != 4 or
             source["target_cancel"] is not True):
         raise ValueError("source, input, binary or candidate identity differs")
+    # The imported arithmetic verifier was frozen against an older IC source.
+    # Bind its input check to this pilot's exact current-source receipt.
+    dynamic.coldver.runner.parent.EXPECTED[
+        dynamic.coldver.runner.parent.SOURCE] = parent_pilot.EXPECTED[
+            parent_pilot.SOURCE]
     _, point, scalar = dynamic.coldver.frozen_point()
     result = dynamic.verify_ic(output, "k2816_thread4", 2816,
                                "root11_dynamic", point, scalar)
