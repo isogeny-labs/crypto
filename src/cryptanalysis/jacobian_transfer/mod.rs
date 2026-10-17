@@ -1180,13 +1180,15 @@ mod tests {
             );
         }
         // c2pnb304w1's 288-bit subgroup does not fit in a 256-bit Jacobian;
-        // its best route is the n = 4 descent over GF(2^76).
+        // its best route is the n = 4 descent over GF(2^76). The calibrated
+        // genus-8 operation costs consume the former 2.001-bit formula margin:
+        // total 160.259 bits versus 160.226 for source rho (see the cost test).
         let r = screen(
             &by_name("c2pnb304w1"),
             &CostModel::default(),
             DEFAULT_FACTOR_BUDGET,
         );
-        assert_eq!(r.verdict, RouteClass::FormulaMarginal);
+        assert_eq!(r.verdict, RouteClass::Boundary);
         assert_eq!(
             r.routes[r.best_route.unwrap()].invariants["base_degree"],
             76
@@ -1227,6 +1229,55 @@ mod tests {
         // n = 4: x^4 - 1 = (x - 1)^4, so every curve is type II and m = 4
         // gives genus 8 (7 under the pre-2026-10-13 orbit-length rule).
         assert_eq!(g7[0].destination.genus, "8");
+    }
+
+    #[test]
+    fn calibrated_genus_eight_cost_consumes_the_c2pnb304w1_margin() {
+        let c = by_name("c2pnb304w1");
+        let model = CostModel::default();
+        let current = screen(&c, &model, DEFAULT_FACTOR_BUDGET);
+        let best = &current.routes[current.best_route.unwrap()];
+        assert_eq!(best.invariants["base_degree"], 76);
+        assert_eq!(best.destination.genus, "8");
+        assert_eq!(best.transport, Transport::SizeAdmits);
+        assert_eq!(
+            best.cost.destination.solver,
+            DestinationSolver::HyperellipticIndexCalculus
+        );
+        assert_eq!(best.class, RouteClass::Boundary);
+        assert!((current.reference_log2 - 160.226).abs() < 0.001);
+        assert!((best.cost.log2_total - 160.259).abs() < 0.001);
+        assert!((best.cost.ratio_log2 + 0.033).abs() < 0.001);
+
+        // Replay the superseded 10*g^2 price at this genus alone. Geometry,
+        // subgroup, solver and every other model parameter stay identical.
+        // The measured 2620.9 versus 640 multiplications adds 2.034 bits,
+        // explaining why the old 2.001-bit margin disappears.
+        let mut legacy = model;
+        legacy
+            .jacobian_group_op_mults_measured
+            .iter_mut()
+            .find(|(g, _)| *g == 8)
+            .unwrap()
+            .1 = 640.0;
+        let old = screen(&c, &legacy, DEFAULT_FACTOR_BUDGET);
+        let old_route = old
+            .routes
+            .iter()
+            .find(|r| r.kind == best.kind && r.invariants == best.invariants)
+            .unwrap();
+        assert_eq!(old_route.destination, best.destination);
+        assert_eq!(old_route.transport, best.transport);
+        assert_eq!(
+            old_route.cost.destination.solver,
+            best.cost.destination.solver
+        );
+        assert_eq!(old_route.class, RouteClass::FormulaMarginal);
+        assert!((old_route.cost.ratio_log2 - 2.001).abs() < 0.001);
+        assert!(
+            (best.cost.log2_total - old_route.cost.log2_total - (2620.9_f64 / 640.0).log2()).abs()
+                < 0.001
+        );
     }
 
     #[test]

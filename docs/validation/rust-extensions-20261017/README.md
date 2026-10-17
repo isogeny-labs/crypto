@@ -5,6 +5,12 @@ This record accompanies PR #2101's Rust extension/hardening update on parent
 correctness and integration checks, not timing, performance or cryptanalytic
 experiments. No research campaign or paid worker was launched.
 
+This is the historical record for that extension update. The later
+[regression repair record](../rust-regression-repairs-20261017/README.md)
+tracks the follow-up repairs to its four library failures, two lint findings
+and stale derived catalogs. The logs and hashes below still identify the
+earlier source and outcomes; they are not replaced with later passing runs.
+
 The environment is Linux 6.18.55 x86_64, with `CARGO_BUILD_JOBS=2` and the
 repository's locked dependency graph. Toolchains:
 

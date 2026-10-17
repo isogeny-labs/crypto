@@ -96,3 +96,12 @@ findings are documented with raw logs in the successor and
 The PMAC bit-width expression is also corrected as part of shared, branchless
 field-offset arithmetic; changed-target strict Clippy now passes on Rust 1.98
 and 1.99. The crate remains unaudited; these are scoped correctness checks.
+
+2026-10-17 requested regression repairs: the complete local release library
+gate now passes 4,393 tests (117 existing ignored), all 53 selected consumers
+pass, full maintained strict Clippy passes on Rust 1.98.0 and 1.99.1, and
+workspace all-target checks pass. Current trait/transfer catalogs and the
+calibrated classification expectation are reconciled without weakening
+schemas or changing cost-model inputs. The successor remains open for the
+shared research CI and final-head review gates; see the
+[follow-up evidence](../docs/validation/rust-regression-repairs-20261017/README.md).

@@ -11,7 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
-| [Current-main research regression gates](current-main-research-regressions.md) | open | passing full release library/maintained lint gates and merging the Rust/IC changes | reconcile curve-traits data, justify/repair the Jacobian classification and address the two unchanged research-target lint findings |
+| [Current-main research regression gates](current-main-research-regressions.md) | open; library/lint repairs validated | merging the Rust/IC changes with passing final-head CI/review | local release library, 53 consumers, full maintained Clippy and workspace types pass; shared frozen-lock, checkout, registry, leaderboard and backlog gates remain |
 | [Secret-key Rust API timing coverage](rust-secret-api-timing-coverage.md) | open | an end-to-end side-channel resistance claim for the whole crate | complete secret-data-flow coverage, fixed-width API boundaries and independent target-specific timing/code review |
 | [IC live-trace baseline compilation](ic-live-trace-main-compile.md) | superseded; build wiring repaired | the original build obstruction is removed; integrated validation remains blocked by the [successor](current-main-research-regressions.md) | all binaries now type-check; the successor tracks the remaining full-library/lint gates |
 | [Photographed-volcano checkpoints unavailable](photo-volcano-checkpoints-unavailable.md) | open | resuming and independently auditing the original 46-curve, 100-problem-per-curve campaign | exact original archives, manifest and checkpoint verification, durable immutable readback, then resume-path validation |

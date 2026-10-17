@@ -179,15 +179,17 @@ handling and timing behavior; the trait alone does not certify their security.
 | Side-channel hardening | Verified arithmetic and source changes; timing resistance partial | Montgomery cross-checks, GF basis/vectors, redaction and zeroization integration pass. No end-to-end timing proof is established. |
 | Entire codebase is “ironclad” / end-to-end side-channel resistant | Partial; not established | Variable-time boundaries, legacy fallbacks, BigUint allocations, target-specific timing and independent audit remain open. |
 
-On the integrated source, the release library suite reports **4,387 passed,
-4 failed, 117 ignored**. All four failures are in unchanged curve-traits /
-Jacobian-transfer tests. The selected release suite passes **49/49**: 10 IC
-binary, 25 IC CLI, 5 progress, 7 extension/security and 2 embedding-example
-tests. All binaries type-check. Changed-target strict Clippy passes on Rust
-1.98.0 and 1.99.1, and CI-pinned formatting passes. The full maintained-target
-lint script flags unchanged research-driver/example code; no finding was
-suppressed. See [the validation record and raw logs](validation/rust-extensions-20261017/README.md)
-and [the open regression gates](../problems/current-main-research-regressions.md).
+The follow-up integrated release library suite passes **4,393 tests, with
+0 failures and the existing 117 ignored**. The IC, progress, extension and
+embedding tests pass **49/49**; four N83 example tests bring the selected
+consumer suite to **53/53**. Full maintained-target strict Clippy passes on
+Rust 1.98.0 and 1.99.1, all workspace targets type-check on 1.99.1, and pinned
+formatting passes. Native catalog refreshes and a calibrated-cost regression
+repair the earlier four library failures; the two lint sites are repaired
+without exceptions. See the [follow-up results and raw logs](validation/rust-regression-repairs-20261017/README.md).
+The [original results](validation/rust-extensions-20261017/README.md) remain
+historical evidence. Shared research metadata and frozen-workflow failures
+still block the [required final-head gates](../problems/current-main-research-regressions.md).
 
 The PR remains open until the integrated required checks and review gates pass.
 No algorithmic speedup, new cryptanalytic result or whole-crate security
