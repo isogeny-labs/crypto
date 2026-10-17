@@ -2074,3 +2074,146 @@ extrapolated.  The measured rows are **`10⁶`–`10⁷×` slower than rho**: th
 reported as such, with no speed claimed.  Under the 2026-10-15 success criterion, E19 is a
 **measurement** of the current `k = 4` baseline, not an improvement of it.  **Class:
 accounting** for the method's first measured `S`, and engineering for nothing.
+
+### 9.7 Pre-registration of E20–E23: the four directions after E19
+
+*Added 2026-10-17, while E19 runs (5 of 10 curves in), before any E20–E23 code exists.  Owner
+request: pre-register the double-large-prime run and pursue all four directions named in the
+session's review of where `k = 4` cost lives.*
+
+**Where the cost is (E19, five curves so far).**  The weighted `D₄` solve is `100.0 %` of `S`
+on every curve; generation, Weil restriction, lift-back, group checks and the linear algebra
+together are `≤ 0.001 %`.  With the full base the relation phase grows as `p` and the linear
+algebra as `p²`, a fixed share `r` of rho (`0.34` on this family, E18), so the full-base method
+is at best `1/r` faster than rho, past the handover; it shares rho's exponent.  Four
+directions follow, each registered below with its prediction and what would falsify it.
+
+**A structural cost of translation folds, stated before E22 relies on it.**  A translation by
+rational torsion preserves the sum `P₁ + … + P₄`, so a target's decompositions arrive in orbits:
+`8` for `⟨τ_T⟩` (`T` added to an even number of summands), `64` for the full 2-torsion group
+`V₄ = {O, T₁, T₂, T₃}` (tuples in `V₄⁴` summing to `O`).  One row per target survives the fold,
+so the fold halves the columns per factor 2 of the group while the orbit grows by the cube of
+that factor: E18's `106` residuals per relation against `22.5` on `j = 0` is this effect.  The
+automorphism `ψ` does not cluster (`ψ` moves the target).  Derived, to be measured in E22: going
+from `⟨τ_T⟩` to `V₄` costs up to `4×` more targets for the same matrix.
+
+#### E20 — double large primes at `k = 4` on the `τ_T`-folded base (direction 1)
+
+The only lever here that changes the exponent: Gaudry/Diem's double-large-prime variation gives
+`Õ(q^{2−2/n})`, `N^{3/8}` at `n = 4` against rho's `N^{1/2}`; the repository has it at `k = 3`
+(`RESEARCH_RESIDUAL_WALKS.md` §11.7, `N^{4/9}`, `2,599×` rho at `2^{33.1}`) and not at `k = 4`.
+
+- **Protocol.**  On E18/E19's 2-torsion instances (`h ≤ 4`) and `τ_T`-folded base `F`
+  (columns = `τ_T`-classes), a small base `F' ⊂ F` of `⌈|F|^{3/4}⌉` columns (Gaudry's
+  `|F|^{1−1/n}`), chosen uniformly; a relation may carry at most two columns of `F \ F'`; large
+  primes eliminated by §11.7's pivot reduction (one pivot per large prime; cycles in the graph
+  give full relations); filtering and Wiedemann on `F'` until `[d]G = Q` verifies.  Every
+  combined relation is re-added in the group before the solve.
+- **Oracle substitution, declared.**  The decomposition sets come from E18's exact
+  meet-in-the-middle oracle (`mitm_signed`), which returns the same decompositions as the
+  weighted solve (d4-s5's brute-force and meet-in-the-middle agreement; E19's G2.9).  Every
+  target is charged **one weighted solve at E19's pooled per-call `C`** (flat in `p`,
+  `1.37`–`1.40·10⁹` median so far), plus the lift-back and checks at E19's measured shares.
+  This lets E20 reach `p` where the large-prime graph has cycles, which the solve itself cannot
+  reach in this container's budget.  The full-base arm runs on the same stream and the same
+  pricing, so the comparison is paired.
+- **Sizes.**  `p = 269, 521, 1033, 2053`, two curves each; `16` negation walks per curve.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.14 | correctness | every curve's log recovered; every combined relation re-adds to `O` | any failure |
+| G2.15 | at measured sizes | `S_DLP > S_full` at every `p` (the linear algebra is `≈ 0 %` of `S_full`, so shrinking it buys nothing while the targets per full relation rise) | `S_DLP ≤ S_full` at any measured `p` |
+| G2.16 | targets per full relation | `y_DLP / y_full` grows with `p`; fitted exponent in `p` within `[0.25, 1.0]` | outside the band |
+| G2.17 | the crossovers, derived from E20's own constants | `S_DLP = S_full` only past `n ≈ 2^{200}`; DLP below rho only past `2^{200}` | either below `2^{160}` |
+
+**What it would say.**  If G2.15–G2.17 hold, double large primes are the right exponent and the
+wrong constant: at `C ≈ 1.4·10⁹` the solve, not the matrix, decides every size anyone can run,
+and the exponent lever waits on `C`.  That is the reason E21 and E22 exist.  **Class:
+measurement** (a constant and an exponent of a known variant, not an improvement).
+
+#### E21 — the solve's repeated structure: trace replay on the weighted solve (direction 2a, 2c)
+
+Every target's system has the same monomial support; only the coefficients (polynomials in
+`Y_R`) change.  F4Remake's idea, already built for the unweighted solve
+(`gaudry_quartic::solve_system4_traced`, rows reducing to zero skipped; `RESEARCH_COVER_DECOMPOSITION_LEDGER.md`
+§12 measured `2.44×` on an F4 there), is not wired into the weighted `D₄` solve.  E21 adds a
+shape trace to `d4_weighted_s5::solve_weighted`: recorded on a curve's first target, it skips
+the input rows that reduced to zero (`291` of `3,979` at degree 26) and checks leading
+monomials, pivots and quotient dimension on every replay, falling back to the full solve (charged)
+on any mismatch.  It also records which pivots the normal forms reach (`2,877` of `3,688`) as the
+ceiling measurement for direction 2c (the normal forms are the largest phase, `7.4·10⁸` of
+`1.41·10⁹`).
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.18 | agreement | replayed and full solves return identical decomposition sets on every target (`p = 53, 101`, `≥ 200` targets each) | any disagreement |
+| G2.19 | per-call `C`, replayed / full | `÷ 1.03`–`1.20` (zero rows are `7 %` of the rows; the elimination is `34 %` of `C`) | outside the band |
+| G2.20 | fallback rate | `≤ 5 %` of targets at `p ≥ 101` | more |
+| G2.21 | 2c ceiling | the share of echelon pivots the normal forms never reach, measured; registered only as a ceiling on what a reached-pivot-only elimination could save | — (measurement) |
+
+**Class: engineering** (a constant on one phase), and named as such if it holds.
+
+#### E22 — the full 2-torsion symmetry `V₄` on a stable line (direction 2b, with direction 3)
+
+The successor of what `D₄` gave (`48×` over C8's form, `854×` with the weighted solve): with
+three rational 2-torsion points, the group acting on decompositions is `V₄⁴_0 ⋊ S₄` of order
+`64 · 24 = 1536` against `D₄`'s `192`, and the weighted Bézout number would fall from `512` by up
+to `8`.  Two facts, derived before any code, decide its form:
+
+1. **A `V₄`-stable `F_p`-line through `x(O) = ∞` is confined.**  If the base line is
+   `x ∈ a + b·F_p` (any line containing `∞`), `V₄` moves `∞` to the three 2-torsion abscissas,
+   so all three lie on the line: `f(a + bu) = b³·g(u)` with `g ∈ F_p[u]`.  Base points have
+   `y² = b³·g(u)` with `g(u) ∈ F_p ⊂ (F_{p⁴}^*)²`: if `b³` is a square, `E` is isomorphic over
+   `F_{p⁴}` to a curve over `F_p` and every base point lies in the image of its `F_{p²}`-points
+   (order `≈ p²`, no large prime); if not, the base is empty.  E19's `x₀ + F_p` escapes this only
+   because a single `T` is used: the other two roots are off the line.
+2. **A `V₄`-stable line avoiding `∞` exists and is not confined by this argument.**  Conjugate
+   `V₄` into `PGL₂(F_p)` as `⟨z ↦ −z, z ↦ κ/z⟩`, `κ ∈ F_p^*`: the invariant binary quartics are the
+   pencil `z⁴ + μz² + κ²`, so the curve is `v² = λ(z⁴ + μz² + κ²)` with `μ ∈ F_{p⁴}` free.  With
+   `μ ∉ F_p` the base `z ∈ F_p` is not all-or-nothing.  Whether both involutions are translations
+   by rational 2-torsion (and not negations about a point), and what the base density is, is
+   Stage A.
+
+- **Stage A (gate).**  Construct such curves over `F_{p⁴}` (a quartic model with a rational
+  point, mapped to Weierstrass), with three rational 2-torsion points whose translations induce
+  `z ↦ −z` and `z ↦ κ/z`; verify on points that the base `z ∈ F_p` is stable, that the folds are
+  translations (coefficient `1`), its density, and that relations reach the large subgroup (a
+  meet-in-the-middle stream recovers a logarithm at `p ≈ 101`).  Gate: all four hold.
+- **Stage B (only after A).**  `S₅` written in invariants of `V₄⁴_0 ⋊ S₄`, Weil-restricted,
+  solved with a weighted Macaulay solve on the invariant ring's generators; brute-force agreement
+  on tiny fields; per-call `C` at `p = 101, 269` against `C_w`.
+- **Direction 3 inside E22.**  Targets per relation `y` and decompositions per target measured
+  on the `V₄` base against E19's on the same `p`.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.22 | Stage A | such curves exist at every registered `p`; base density `≈ 1/2`; the folds are translations; a log is recovered | any of the four fails (then E22 stops at A, recorded as a negative) |
+| G2.23 | Stage B, `C_V₄` | `C_w / C_V₄` in `[4, 30]` | outside |
+| G2.24 | direction 3 | decompositions per decomposed target `≈ 64` (against E19's `≈ 8`); `y_V₄ / y_E19` in `[3, 10]` at matched `p` | outside |
+| G2.25 | net | the relation phase moves by `(C_w / C_V₄) / (targets ratio)`: a gain only if `C` falls by more than the target penalty (derived above, up to `4×`) | reported either way; a gain below `1` is a negative |
+
+**Class:** engineering if it holds (a constant), recorded as a negative if Stage A fails.
+
+#### E23 — `ψ` and `τ_T` together on `j = 0` (direction 4): closed by derivation, confirmed on points
+
+§9.4 closed `ψ` on the system.  The remaining question was a base stable under both folds.
+On `j = 0`, `E : y² = x³ + b`, a rational 2-torsion point `T = (x₀, 0)` forces `b = −x₀³`, and
+since `ω ∈ F_p` all three roots `x₀, ωx₀, ω²x₀` are rational.  The line `x ∈ x₀·F_p` **is**
+stable under the whole group `⟨−1, ψ, τ_{T₁}, τ_{T₂}⟩` of order `24`: `ψ(x₀t) = x₀(ωt)`, and
+translation by `(ω^i x₀, 0)` maps `x₀t ↦ x₀(ω^i + 3ω^{2i}/(t − ω^i))` (`f′(x) = 3x²`).  But it
+passes through `∞`, so fact 1 above applies: `y² = x₀³(t³ − 1)`, and either `x₀³` is a square,
+`E ≅ v² = t³ − 1` (defined over `F_p`) and every base point lies in its `F_{p²}`-points, or the
+base is empty.  The line `x₀ + F_p` (E19) is not `ψ`-stable (`(ω − 1)x₀ ∈ F_p` would force
+`x₀ ∈ F_p`).  **Registered result, before the check:** no base on a `j = 0` curve carries both
+folds without confinement.  **Confirmation (a unit test, cheap):** on `j = 0` curves over
+`F_{p⁴}` with rational 2-torsion at small `p`, build the `x₀·F_p` base, verify the order-24
+stability on points, and verify that every base point is killed by `#C(F_{p²})` (or that the base
+is empty).
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.26 | E23 | on every tested curve: the base is stable under the order-24 group, and either empty or killed by `#C(F_{p²})` | any non-confined base point |
+
+**Order of work.**  E23 (a test), E21 (a trace on one solver), E20 (a stream reprocessed with
+priced solves), E22 Stage A, then Stage B if the gate passes.  E19 finishes first in the
+background; none of these change E19's registered protocol.
