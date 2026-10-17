@@ -236,8 +236,8 @@ pub struct ChainedS3Encoding {
     b: F2mElement,
     irr: IrreduciblePoly,
     domain_installed: bool,
-    first_pair_exchangeable: bool,
-    first_pair_ordered: bool,
+    adjacent_domains_equal: Vec<bool>,
+    adjacent_ordered: Vec<bool>,
 }
 
 impl ChainedS3Encoding {
@@ -329,8 +329,8 @@ impl ChainedS3Encoding {
             b: b.clone(),
             irr: irr.clone(),
             domain_installed: false,
-            first_pair_exchangeable: false,
-            first_pair_ordered: false,
+            adjacent_domains_equal: vec![false; m - 1],
+            adjacent_ordered: vec![false; m - 1],
         })
     }
 
@@ -359,7 +359,7 @@ impl ChainedS3Encoding {
             add_coordinate_domain(&mut self.solver, block, &codes, self.n as usize);
         }
         self.domain_installed = true;
-        self.first_pair_exchangeable = true;
+        self.adjacent_domains_equal.fill(true);
         Ok(required)
     }
 
@@ -403,7 +403,7 @@ impl ChainedS3Encoding {
             add_frobenius_orbit_domain(&mut self.solver, block, &sorted, &self.irr);
         }
         self.domain_installed = true;
-        self.first_pair_exchangeable = true;
+        self.adjacent_domains_equal.fill(true);
         Ok(required)
     }
 
@@ -467,7 +467,10 @@ impl ChainedS3Encoding {
                 maximum: max_domain_clauses,
             });
         }
-        self.first_pair_exchangeable = sorted_domains[0] == sorted_domains[1];
+        self.adjacent_domains_equal = sorted_domains
+            .windows(2)
+            .map(|pair| pair[0] == pair[1])
+            .collect();
         for (block, representatives) in self.blocks[..self.m].iter().zip(&sorted_domains) {
             add_frobenius_orbit_domain(&mut self.solver, block, representatives, &self.irr);
         }
@@ -480,7 +483,7 @@ impl ChainedS3Encoding {
     /// node depends only on its output. This is optional so ordered and
     /// unrestricted searches remain separate sweep arms.
     pub fn order_first_pair(&mut self, max_variables: u32) -> Result<(), ChainBuildError> {
-        if self.first_pair_ordered || !self.first_pair_exchangeable {
+        if self.adjacent_ordered[0] || !self.adjacent_domains_equal[0] {
             return Err(ChainBuildError::Unsupported);
         }
         let extra = self.n - 1;
@@ -492,8 +495,44 @@ impl ChainedS3Encoding {
             });
         }
         add_lex_leq(&mut self.solver, &self.blocks[0], &self.blocks[1]);
-        self.first_pair_ordered = true;
+        self.adjacent_ordered[0] = true;
         Ok(())
+    }
+
+    /// Canonically order every still-unordered adjacent pair with identical
+    /// exact x-domains. The caller must also establish that each pair has the
+    /// same allowed *full-point* set and position semantics. This is a complete
+    /// symmetry arm only when all intermediate-identity patterns are searched:
+    /// reordering exchangeable points preserves the group sum, but may change
+    /// which chain prefix is the identity. Preflight the full auxiliary-variable
+    /// addition before mutation. An earlier `order_first_pair` call is retained.
+    pub fn order_equal_adjacent_summands(
+        &mut self,
+        max_variables: u32,
+    ) -> Result<usize, ChainBuildError> {
+        let edges: Vec<_> = (0..self.m - 1)
+            .filter(|&edge| self.adjacent_domains_equal[edge] && !self.adjacent_ordered[edge])
+            .collect();
+        if edges.is_empty() {
+            return Err(ChainBuildError::Unsupported);
+        }
+        let extra = (self.n as u64 - 1) * edges.len() as u64;
+        let required = u64::from(self.solver.n_vars()) + extra;
+        if required > u64::from(max_variables) || required > i32::MAX as u64 {
+            return Err(ChainBuildError::VariableCap {
+                required,
+                maximum: max_variables,
+            });
+        }
+        for edge in &edges {
+            add_lex_leq(
+                &mut self.solver,
+                &self.blocks[*edge],
+                &self.blocks[*edge + 1],
+            );
+            self.adjacent_ordered[*edge] = true;
+        }
+        Ok(edges.len())
     }
 
     fn decode_block(&self, block: &[u32], model: &[bool]) -> F2mElement {
@@ -1183,5 +1222,59 @@ mod tests {
         equal.order_first_pair(2_000).unwrap();
         assert_eq!(equal.solver.solve(), SolveResult::Sat);
         assert!(equal.verify_model());
+    }
+
+    #[test]
+    fn equal_domain_run_ordering_preserves_first_pair_and_preflights_all_edges() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let small = vec![BigUint::from(1u8), BigUint::from(2u8)];
+        let residual = vec![BigUint::from(3u8), BigUint::from(4u8), BigUint::from(5u8)];
+        let domains = vec![
+            small.clone(),
+            small.iter().rev().cloned().collect(),
+            small.clone(),
+            small,
+            residual.clone(),
+            residual.iter().rev().cloned().collect(),
+        ];
+        let mut enc =
+            ChainedS3Encoding::build(6, &kc.curve.irreducible, &kc.curve.b, None, 0, 2_000)
+                .unwrap();
+        enc.constrain_frobenius_orbit_domains(&domains, 2_000, 1_000_000)
+            .unwrap();
+        assert_eq!(enc.adjacent_domains_equal, [true, true, true, false, true]);
+        enc.order_first_pair(2_000).unwrap();
+        let before = (
+            enc.solver.n_vars(),
+            enc.solver.n_clauses(),
+            enc.solver.n_xors(),
+        );
+        let required = u64::from(before.0) + 3 * 6;
+        assert_eq!(
+            enc.order_equal_adjacent_summands((required - 1) as u32),
+            Err(ChainBuildError::VariableCap {
+                required,
+                maximum: (required - 1) as u32,
+            })
+        );
+        assert_eq!(
+            (
+                enc.solver.n_vars(),
+                enc.solver.n_clauses(),
+                enc.solver.n_xors()
+            ),
+            before
+        );
+        assert_eq!(enc.order_equal_adjacent_summands(required as u32), Ok(3));
+        assert_eq!(u64::from(enc.solver.n_vars()), required);
+        assert_eq!(enc.adjacent_ordered, [true, true, true, false, true]);
+        assert_eq!(
+            enc.order_equal_adjacent_summands(2_000),
+            Err(ChainBuildError::Unsupported)
+        );
+        assert_eq!(
+            enc.order_first_pair(2_000),
+            Err(ChainBuildError::Unsupported)
+        );
     }
 }

@@ -53,6 +53,16 @@ pub struct MixedOrbitDomains<'a> {
     residual_index: HashMap<PointKey, usize>,
 }
 
+/// Optional symmetry constraint for a mixed-orbit chained-S3 search.
+/// Equal-domain runs use the same full-point base at every position in the
+/// run, so permuting those summands preserves the allowed group equations.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum MixedOrbitOrdering {
+    Unordered,
+    FirstPair,
+    EqualDomainRuns,
+}
+
 /// Materialise the residual signed-orbit suffix of two replayed, ordered bases.
 ///
 /// The smaller point record and both of its orbit maps must be exact prefixes
@@ -380,6 +390,36 @@ impl<'a> MixedOrbitDomains<'a> {
         limits: ChainS3Limits,
         order_first_pair: bool,
     ) -> (Option<PartialCandidate>, ChainS3Stats) {
+        self.search_with_ordering(
+            source_id,
+            coef_a,
+            coef_b,
+            public_target,
+            small_summands,
+            residual_summands,
+            limits,
+            if order_first_pair {
+                MixedOrbitOrdering::FirstPair
+            } else {
+                MixedOrbitOrdering::Unordered
+            },
+        )
+    }
+
+    /// Search with an explicit, replayable summand-ordering arm. The
+    /// `EqualDomainRuns` arm is complete only across the full identity-pattern
+    /// loop below; a cap remains inconclusive for either ordering.
+    pub fn search_with_ordering(
+        &self,
+        source_id: u64,
+        coef_a: &BigUint,
+        coef_b: &BigUint,
+        public_target: &BinaryPoint,
+        small_summands: usize,
+        residual_summands: usize,
+        limits: ChainS3Limits,
+        ordering: MixedOrbitOrdering,
+    ) -> (Option<PartialCandidate>, ChainS3Stats) {
         let mut stats = ChainS3Stats::default();
         let Some(m) = small_summands.checked_add(residual_summands) else {
             stats.exhausted = true;
@@ -463,7 +503,15 @@ impl<'a> MixedOrbitDomains<'a> {
                 )
                 .map(|size| size.clauses)
                 != Ok(domain_clauses)
-                || (order_first_pair && enc.order_first_pair(limits.max_variables).is_err())
+                || match ordering {
+                    MixedOrbitOrdering::Unordered => false,
+                    MixedOrbitOrdering::FirstPair => {
+                        enc.order_first_pair(limits.max_variables).is_err()
+                    }
+                    MixedOrbitOrdering::EqualDomainRuns => enc
+                        .order_equal_adjacent_summands(limits.max_variables)
+                        .is_err(),
+                }
             {
                 stats.exhausted = true;
                 return (None, stats);
@@ -1244,6 +1292,21 @@ mod tests {
             graph.feed(candidate.unwrap()).unwrap(),
             FeedOutcome::PivotStored { .. }
         ));
+        let (canonical, canonical_stats) = domains.search_with_ordering(
+            6,
+            &a,
+            &BigUint::zero(),
+            &target,
+            4,
+            1,
+            bounded,
+            MixedOrbitOrdering::EqualDomainRuns,
+        );
+        assert!(
+            canonical.is_some(),
+            "canonical one-residual search: {canonical_stats:?}"
+        );
+        assert!(canonical_stats.peak_variables > stats.peak_variables);
 
         let double_a =
             BigUint::from(selected[0].0 * 2 + selected[1].0 + selected[2].0 + selected[3].0);
@@ -1275,6 +1338,31 @@ mod tests {
         assert_eq!(candidate.small_point_indices.len(), 3);
         assert_eq!(candidate.residual_points.len(), 2);
         graph.feed(candidate).unwrap();
+
+        let six_a =
+            BigUint::from(selected[0].0 * 2 + selected[1].0 * 2 + selected[2].0 + selected[3].0);
+        let (canonical, canonical_stats) = domains.search_with_ordering(
+            7,
+            &six_a,
+            &BigUint::zero(),
+            &target,
+            4,
+            2,
+            bounded,
+            MixedOrbitOrdering::EqualDomainRuns,
+        );
+        let canonical = canonical
+            .unwrap_or_else(|| panic!("canonical six-summand search: {canonical_stats:?}"));
+        assert_eq!(canonical.small_point_indices.len(), 4);
+        assert_eq!(canonical.residual_points.len(), 2);
+        let mut replay = BinaryPoint::Infinity;
+        for index in canonical.small_point_indices {
+            replay = curve.add(&replay, &small.points[index]);
+        }
+        for point in canonical.residual_points {
+            replay = curve.add(&replay, &point);
+        }
+        assert_eq!(replay, curve.mul(curve.generator(), &six_a));
     }
 
     #[test]

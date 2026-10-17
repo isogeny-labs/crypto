@@ -1,8 +1,9 @@
 //! Replay two pinned N83 bases and collect bounded one/two-residual relations.
 //!
 //! `verify` and `verify-alt` import pinned S3 objects and check their exact
-//! orbit-labelled prefix. `run` and `run-alt` additionally require a 4 GiB, zero-swap Linux cgroup and
-//! an external budget supervisor. Neither mode downloads an object.
+//! orbit-labelled prefix. `run`, `run-alt`, and the opt-in cross-pilot canonical
+//! arm additionally require a 4 GiB, zero-swap Linux cgroup and an external
+//! budget supervisor. Neither mode downloads an object.
 //! `verify-control` and `control-run` use a pinned known-answer witness only;
 //! their outcomes are not natural-target relation-yield measurements.
 
@@ -13,7 +14,7 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::{
 };
 use crypto_lib::cryptanalysis::koblitz_large_prime::{
     build_exact_residual_difference_factor_base, build_exact_residual_suffix_factor_base,
-    FeedOutcome, LargePrimeLimits, MixedOrbitDomains, WideLargePrimeEliminator,
+    FeedOutcome, LargePrimeLimits, MixedOrbitDomains, MixedOrbitOrdering, WideLargePrimeEliminator,
 };
 use flate2::read::GzDecoder;
 use num_bigint::BigUint;
@@ -861,8 +862,12 @@ fn require_distinct_pilot_streams(base_row: &Value, pool_row: &Value) -> Result<
 /// One bounded natural-target call after exact replay of two different pilot streams.
 /// A separate supervisor must supply the local archive bytes and account for the run.
 fn run_cross_pilot(args: &[String]) -> Result<()> {
+    run_cross_pilot_with_ordering(args, MixedOrbitOrdering::FirstPair)
+}
+
+fn run_cross_pilot_with_ordering(args: &[String], ordering: MixedOrbitOrdering) -> Result<()> {
     if args.len() != 14 {
-        return Err("usage: run-cross-pilot BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS BASE_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR".into());
+        return Err("usage: run-cross-pilot|run-cross-pilot-canonical BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS BASE_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR".into());
     }
     let budget: u64 = args[8].parse()?;
     let conflicts: u64 = args[9].parse()?;
@@ -885,22 +890,26 @@ fn run_cross_pilot(args: &[String]) -> Result<()> {
     let start = Instant::now();
     let output = Path::new(&args[13]);
     fs::create_dir(output)?;
-    write_new(
-        &output.join("config.json"),
-        &json!({
-            "schema":"n83.cross-stream-pilot-partial-config/v1", "study":STUDY,
-            "base_object_blake3":args[1], "pool_object_blake3":args[4],
-            "pilot_manifest_blake3":blake3::hash(SMALL_600_MANIFEST).to_hex().to_string(),
-            "source_blake3":blake3::hash(include_bytes!("koblitz_n83_mixed_orbit_worker.rs")).to_hex().to_string(),
-            "public_corpus_path":args[7], "public_corpus_canonical_json_blake3":PUBLIC_CORPUS_HASH,
-            "budget_seconds":budget, "conflict_budget":conflicts,
-            "max_models":models, "base_summands":base_summands,
-            "residual_summands":residual_summands, "order_first_pair":true,
-            "max_variables":150000, "max_domain_clauses":12000000,
-            "memory_cgroup_limit_bytes":4294967296u64,
-            "memory_cgroup_swap_limit_bytes":0
-        }),
-    )?;
+    let canonical = ordering == MixedOrbitOrdering::EqualDomainRuns;
+    let mut config = json!({
+        "schema":"n83.cross-stream-pilot-partial-config/v1", "study":STUDY,
+        "base_object_blake3":args[1], "pool_object_blake3":args[4],
+        "pilot_manifest_blake3":blake3::hash(SMALL_600_MANIFEST).to_hex().to_string(),
+        "source_blake3":blake3::hash(include_bytes!("koblitz_n83_mixed_orbit_worker.rs")).to_hex().to_string(),
+        "public_corpus_path":args[7], "public_corpus_canonical_json_blake3":PUBLIC_CORPUS_HASH,
+        "budget_seconds":budget, "conflict_budget":conflicts,
+        "max_models":models, "base_summands":base_summands,
+        "residual_summands":residual_summands, "order_first_pair":true,
+        "max_variables":150000, "max_domain_clauses":12000000,
+        "memory_cgroup_limit_bytes":4294967296u64,
+        "memory_cgroup_swap_limit_bytes":0
+    });
+    if canonical {
+        config["schema"] = json!("n83.cross-stream-pilot-partial-config/v2");
+        config["ordering"] = json!("equal_domain_runs");
+        config.as_object_mut().unwrap().remove("order_first_pair");
+    }
+    write_new(&output.join("config.json"), &config)?;
     let cap_path = output.join("cap.json");
     std::thread::spawn(move || {
         std::thread::sleep(Duration::from_secs(budget));
@@ -940,7 +949,7 @@ fn run_cross_pilot(args: &[String]) -> Result<()> {
         max_models: models,
         conflict_budget: conflicts,
     };
-    let (candidate, stats) = domains.search(
+    let (candidate, stats) = domains.search_with_ordering(
         1,
         &a,
         &b,
@@ -948,7 +957,7 @@ fn run_cross_pilot(args: &[String]) -> Result<()> {
         base_summands,
         residual_summands,
         limits,
-        true,
+        ordering,
     );
     let candidate_record = candidate.as_ref().map(|row| -> Result<Value> {
         if row.source_id != 1 || row.coef_a != a || row.coef_b != b {
@@ -987,29 +996,31 @@ fn run_cross_pilot(args: &[String]) -> Result<()> {
     } else {
         "PRODUCER_FAILURE_unclassified_solver_result"
     };
-    write_new(
-        &output.join("result.json"),
-        &json!({
-            "schema":"n83.cross-stream-pilot-partial-result/v1", "study":STUDY,
-            "status":status, "base_object_blake3":args[1],
-            "pool_object_blake3":args[4],
-            "base_policy":base_row["policy"], "base_seed":base_row["seed"],
-            "pool_policy":pool_row["policy"], "pool_seed":pool_row["seed"],
-            "public_corpus_canonical_json_blake3":corpus_hash,
-            "base_signed_orbits":base.signed_orbits.len(),
-            "pool_signed_orbits":pool.signed_orbits.len(),
-            "shared_signed_orbits":shared_orbits,
-            "residual_signed_orbits":residual.signed_orbits.len(),
-            "base_import_elapsed_ms_L0":import_ms,
-            "worker_wall_ms_L0":start.elapsed().as_secs_f64()*1000.0,
-            "memory_cgroup_peak_bytes":cgroup_peak_bytes()?,
-            "trial":0, "a":a.to_string(), "b":b.to_string(),
-            "search":stats, "candidate":candidate_record,
-            "graph_rows":Value::Null, "matrix_rank":Value::Null,
-            "total_index_calculus_runtime_ms":Value::Null,
-            "selected_best_total_runtime":Value::Null
-        }),
-    )?;
+    let mut result = json!({
+        "schema":"n83.cross-stream-pilot-partial-result/v1", "study":STUDY,
+        "status":status, "base_object_blake3":args[1],
+        "pool_object_blake3":args[4],
+        "base_policy":base_row["policy"], "base_seed":base_row["seed"],
+        "pool_policy":pool_row["policy"], "pool_seed":pool_row["seed"],
+        "public_corpus_canonical_json_blake3":corpus_hash,
+        "base_signed_orbits":base.signed_orbits.len(),
+        "pool_signed_orbits":pool.signed_orbits.len(),
+        "shared_signed_orbits":shared_orbits,
+        "residual_signed_orbits":residual.signed_orbits.len(),
+        "base_import_elapsed_ms_L0":import_ms,
+        "worker_wall_ms_L0":start.elapsed().as_secs_f64()*1000.0,
+        "memory_cgroup_peak_bytes":cgroup_peak_bytes()?,
+        "trial":0, "a":a.to_string(), "b":b.to_string(),
+        "search":stats, "candidate":candidate_record,
+        "graph_rows":Value::Null, "matrix_rank":Value::Null,
+        "total_index_calculus_runtime_ms":Value::Null,
+        "selected_best_total_runtime":Value::Null
+    });
+    if canonical {
+        result["schema"] = json!("n83.cross-stream-pilot-partial-result/v2");
+        result["ordering"] = json!("equal_domain_runs");
+    }
+    write_new(&output.join("result.json"), &result)?;
     Ok(())
 }
 
@@ -1070,6 +1081,9 @@ fn main() -> Result<()> {
         Some("run") => run(&args, &SMALL),
         Some("run-alt") => run(&args, &SMALL_600),
         Some("run-cross-pilot") => run_cross_pilot(&args),
+        Some("run-cross-pilot-canonical") => {
+            run_cross_pilot_with_ordering(&args, MixedOrbitOrdering::EqualDomainRuns)
+        }
         Some("verify-control") if args.len() == 6 => {
             let (curve, small, residual) = import_pair(&args, &SMALL)?;
             let target = control_target(Path::new(&args[5]), &curve, &small, &residual)?;
@@ -1079,7 +1093,7 @@ fn main() -> Result<()> {
             Ok(())
         }
         Some("control-run") => control_run(&args),
-        _ => Err("usage: verify|verify-alt SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT | verify-cross-pilot BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT | verify-control SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT FIXTURE | run|run-alt SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT CORPUS BUDGET_SECONDS MAX_TRIALS CONFLICT_BUDGET MAX_MODELS SMALL_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR | run-cross-pilot BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS BASE_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR | control-run SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT FIXTURE BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS OUTPUT_DIR".into()),
+        _ => Err("usage: verify|verify-alt SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT | verify-cross-pilot BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT | verify-control SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT FIXTURE | run|run-alt SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT CORPUS BUDGET_SECONDS MAX_TRIALS CONFLICT_BUDGET MAX_MODELS SMALL_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR | run-cross-pilot|run-cross-pilot-canonical BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS BASE_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR | control-run SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT FIXTURE BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS OUTPUT_DIR".into()),
     }
 }
 
@@ -1179,6 +1193,12 @@ mod tests {
             .unwrap_err()
             .to_string()
             .contains("distinct policy or seed"));
+        assert!(
+            run_cross_pilot_with_ordering(&args, MixedOrbitOrdering::EqualDomainRuns)
+                .unwrap_err()
+                .to_string()
+                .contains("distinct policy or seed")
+        );
         let mut invalid = args;
         invalid[8] = "0".into();
         assert!(run_cross_pilot(&invalid)
