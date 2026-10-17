@@ -549,7 +549,7 @@ pub(super) fn chain_capacity_cli(
     order_first_pair: bool,
 ) -> Result<Value> {
     if !([64, 256, 600].contains(&columns) || V2_SIZES.contains(&columns))
-        || !(5..=6).contains(&m)
+        || !(4..=6).contains(&m)
         || identity_mask >= (1u32 << (m - 2))
         || max_variables == 0
         || max_domain_clauses == 0
@@ -1025,7 +1025,7 @@ pub(super) fn run_chain_cli(
         ]
         .contains(&policy)
         || !SEEDS.contains(&seed)
-        || !(5..=6).contains(&m)
+        || !(4..=6).contains(&m)
         || max_trials > 1000
         || limits.max_variables == 0
         || limits.max_variables > i32::MAX as u32
@@ -1098,11 +1098,11 @@ fn run_with_config(
                     .into(),
             )
         }
-        "chain-s3" if chain.is_some() && (5..=6).contains(&m) => DecompositionStrategy::ChainedS3,
-        "orbit-chain-s3" if chain.is_some() && (5..=6).contains(&m) => {
+        "chain-s3" if chain.is_some() && (4..=6).contains(&m) => DecompositionStrategy::ChainedS3,
+        "orbit-chain-s3" if chain.is_some() && (4..=6).contains(&m) => {
             DecompositionStrategy::ChainedS3FrobeniusOrbit
         }
-        "ordered-orbit-chain-s3" if chain.is_some() && (5..=6).contains(&m) => {
+        "ordered-orbit-chain-s3" if chain.is_some() && (4..=6).contains(&m) => {
             DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
         }
         _ => return Err("unsupported or unguarded primary strategy".into()),
