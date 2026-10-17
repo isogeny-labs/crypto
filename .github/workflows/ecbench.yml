@@ -91,6 +91,53 @@ jobs:
           CI_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
         run: node .github/scripts/ci-scope.mjs
 
+  factor-base-sweep:
+    name: factor-base sweep CLI
+    needs: scope
+    if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      CARGO_BUILD_JOBS: 2
+      RAYON_NUM_THREADS: 2
+    steps:
+      - name: Require successful scope classification
+        if: needs.scope.result != 'success'
+        run: |
+          echo '::error::CI scope classification failed; refusing to skip CLI validation.'
+          exit 1
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /Cargo.toml
+            /Cargo.lock
+            /.cargo/
+            /.github/scripts/
+            /rust-toolchain*
+            /rustfmt.toml
+            /clippy.toml
+            /src/
+            /tests/
+            /examples/
+            /benches/
+            /tools/volcano-cli/
+            /isogeny_algos/
+            /docs/
+            /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
+            /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+      - name: Materialize native fixture inputs
+        run: node .github/scripts/ci-scope.mjs --materialize
+      - uses: dtolnay/rust-toolchain@1.98
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ecbench
+      - name: Native shape, polynomial and progress comparison unit tests
+        run: cargo test --locked --release --bin factor-base-sweep
+      - name: Actual CLI witnesses, caps, interruption, resume and corruption
+        run: cargo test --locked --release --test factor_base_sweep_cli -- --test-threads=1
+
   harness:
     if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
     needs: scope
