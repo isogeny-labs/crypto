@@ -319,7 +319,27 @@ lost in its own paired run (CHEAPER-SELECTION.md).
 
 | change | class | evidence |
 |---|---|---|
-| `PACKED_L2_PERSIST=1 PACKED_TAIL_LAYOUT=1` on the sigma-table walk | engineering, +6.55% in the sweep's final bench | 5/5 pairs; 300/300; identical DPs; headline protocol: §6.4 |
+| `PACKED_L2_PERSIST=1 PACKED_TAIL_LAYOUT=1` on the sigma-table walk, automatic workers | **engineering, promoted**: 1.0661 under the headline protocol | `PROMOTE_ENGINEERING`, §6.4 |
+| the same at the campaign's 385,024 workers | engineering that did not pay | 1.0032, `DO_NOT_PROMOTE`, §6.4 |
 | 576 × 1 on the v3 table walk | engineering, +8.5%, not selected | 5/5 pairs in two independent runs; 300/300; identical DPs; no A/A panel |
 | `PACKED_CLMAD_SELF=1` on the sigma-table walk | engineering that did not pay | headline protocol `DO_NOT_PROMOTE`, median 0.9947 |
 | the other sigma-table arms | engineering that did not pay | §6.1 star |
+
+### 6.4 The sigma-table winner under the headline protocol
+
+[`benchmarks/sigma-table-tuned/`](benchmarks/sigma-table-tuned/README.md)
+runs the sigma-fused headline protocol (A/A panel, five A/B pairs of 64
+launches, device arithmetic, replay and corpus gates, the frozen summarizer)
+with the sigma-table build as control at the campaign's 385,024 workers.
+
+| candidate | candidate workers | median B/s, control / candidate | median ratio | verdict |
+|---|---:|---|---:|---|
+| + L2 persist + tail layout | 385,024 | 15.788 / 15.833 | 1.0032 | `DO_NOT_PROMOTE` |
+| **+ L2 persist + tail layout** | **96,256** | **16.029 / 17.088** | **1.0661** | **`PROMOTE_ENGINEERING`** |
+
+The 80 MiB persisting window covers 80% of the field state at 96,256 workers
+and 20% at 385,024, which is why the knobs pay only at the smaller
+population. The promoted row compares two worker populations, so it bundles
+the knobs with a 4x smaller walk count; it is a device-local rate for the
+same walk, and the campaign preset is unchanged (`make
+gpu-rtx-pro6000-sigma-table-l2` builds it).

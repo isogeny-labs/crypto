@@ -9,6 +9,21 @@ DP corpora; see [SIGMA-TABLE.md](SIGMA-TABLE.md). Modal's image records these
 flags and bakes that exact geometry. Existing campaign run IDs retain their
 385,024-worker, batch-16 checkpoint shape when a pass resumes.
 
+**2026-10-17.** The sigma-table build with `PACKED_L2_PERSIST=1
+PACKED_TAIL_LAYOUT=1` at the automatic 96,256 workers measured **17.088 B/s**
+against **16.029 B/s** for the campaign build at 385,024 workers under the
+headline protocol: paired ratios 1.0652-1.0673, median 1.0661, A/A drift
+0.52%, `PROMOTE_ENGINEERING`, with replay and identical DP corpora. At
+385,024 workers the same knobs gain 0.32% (`DO_NOT_PROMOTE`): the 80 MiB
+persisting window covers 20% of that state. `make
+gpu-rtx-pro6000-sigma-table-l2` builds it; moving the campaign's worker count
+and checkpoint shape is the campaign owner's decision. The CLMAD self-addend
+form (`PACKED_CLMAD_SELF`) lost 0.53% on this walk, which the carry-less unit
+does not bind. See [AUTOSWEEP.md](AUTOSWEEP.md) section 6,
+[benchmarks/sigma-table-tuned/](benchmarks/sigma-table-tuned/README.md),
+[benchmarks/clmad-self/](benchmarks/clmad-self/README.md) and
+[benchmarks/clmad-pairs/](benchmarks/clmad-pairs/README.md).
+
 The historical `bench-rtx-pro6000` and `audit-rtx-pro6000` targets below
 still select their original build. Benchmark rates are device-local and do
 not by themselves establish a campaign-level gain.

@@ -850,6 +850,16 @@ gpu-rtx-pro6000-sigma-fused:
 PRO6000_SIGMA_TABLE_KNOBS = $(PRO6000_SIGMA_FUSED_KNOBS) THREADS=512 MINBLOCKS=1 PACKED_SIGMA_TABLE=1
 gpu-rtx-pro6000-sigma-table:
 	$(MAKE) -B ecc2k130 ARCH="$(PRO6000_ARCH)" $(PRO6000_SIGMA_TABLE_KNOBS)
+# The sigma-table build with the persisting L2 window and tail layout, promoted
+# by benchmarks/sigma-table-tuned at the automatic worker count (17.088 vs
+# 16.029 B/s against the 385,024-worker campaign shape).  Run it without
+# --threads: at 385,024 workers the window covers 20% of the state and the
+# gain is 0.3%.  The campaign preset is unchanged.
+PRO6000_SIGMA_TABLE_L2_KNOBS = $(PRO6000_SIGMA_TABLE_KNOBS) PACKED_L2_PERSIST=1 PACKED_TAIL_LAYOUT=1
+gpu-rtx-pro6000-sigma-table-l2:
+	$(MAKE) -B ecc2k130 ARCH="$(PRO6000_ARCH)" $(PRO6000_SIGMA_TABLE_L2_KNOBS)
+.PHONY: gpu-rtx-pro6000-sigma-table-l2
+
 # The sigma-table preset plus explicit overrides (last assignment wins), for
 # sweeps around the campaign walk: make gpu-preset-sigma KNOBS="THREADS=576".
 gpu-preset-sigma:
