@@ -1492,3 +1492,89 @@ mod pipeline_tests {
         assert!(rep.rho.iter().all(|w| w.correct));
     }
 }
+
+#[cfg(test)]
+mod e23_tests {
+    use super::*;
+
+    /// E23 (§9.7, G2.26): on `j = 0` curves `y² = x³ − x₀³` over `F_{p⁴}`
+    /// the line `x ∈ x₀·F_p` is stable under `⟨−1, ψ, τ_{T₁}, τ_{T₂}⟩`
+    /// (order 24), and its points are either absent or killed by
+    /// `#C(F_{p²})`, `C : v² = t³ − 1`: the base never reaches a large prime.
+    #[test]
+    fn psi_and_translations_share_only_a_confined_base_on_j0() {
+        let (mut empty, mut confined) = (0, 0);
+        for p in [37u64, 61, 73, 97] {
+            // #C(F_p) by counting, then #C(F_{p²}) = p² + 1 − (a² − 2p).
+            let mut cp = 1i64; // the point at infinity
+            for t in 0..p {
+                let r = (pow_mod(t, 3, p) + p - 1) % p;
+                cp += if r == 0 {
+                    1
+                } else if pow_mod(r, (p - 1) / 2, p) == 1 {
+                    2
+                } else {
+                    0
+                };
+            }
+            let a = p as i64 + 1 - cp;
+            let c2 = (p * p + 1) as i64 - (a * a - 2 * p as i64);
+            let omega = (2..p)
+                .map(|g| pow_mod(g, (p - 1) / 3, p))
+                .find(|&w| w != 1)
+                .unwrap();
+            let mut rng = StdRng::seed_from_u64(p);
+            for _ in 0..6 {
+                let probe = Curve4::with_params(p, E4::ZERO, E4::ZERO);
+                let f = &probe.f;
+                let x0 = f.random(&mut rng);
+                if x0.in_fp() {
+                    continue;
+                }
+                let b = f.neg(&f.mul(&f.sq(&x0), &x0));
+                let curve = Curve4::with_params(p, E4::ZERO, b);
+                let f = &curve.f;
+                let ts: Vec<Pt4> = (0..3)
+                    .map(|i| Pt4 {
+                        x: f.scale(&x0, pow_mod(omega, i, p)),
+                        y: E4::ZERO,
+                        inf: false,
+                    })
+                    .collect();
+                assert!(ts.iter().all(|t| curve.on_curve(t)));
+                let on_line = |x: &E4| -> bool {
+                    // x = x₀·t with t ∈ F_p.
+                    f.mul(x, &f.inv(&x0)).in_fp()
+                };
+                let base: Vec<Pt4> = (0..p)
+                    .filter_map(|t| curve.lift_x(&f.scale(&x0, t), &mut rng))
+                    .filter(|pt| !pt.y.is_zero())
+                    .collect();
+                if base.is_empty() {
+                    empty += 1;
+                    continue;
+                }
+                confined += 1;
+                for pt in &base {
+                    let psi = f.scale(&pt.x, omega);
+                    assert!(on_line(&psi), "ψ leaves the line");
+                    for t in &ts {
+                        assert!(
+                            on_line(&curve.add(pt, t).x),
+                            "a translation leaves the line"
+                        );
+                    }
+                    assert!(
+                        curve.mul(pt, c2 as u64).inf,
+                        "a base point outside the F_{{p²}}-points of v² = t³ − 1"
+                    );
+                }
+            }
+        }
+        // Both branches occur over the tested curves.
+        assert!(
+            empty > 0 && confined > 0,
+            "empty {empty}, confined {confined}"
+        );
+    }
+}

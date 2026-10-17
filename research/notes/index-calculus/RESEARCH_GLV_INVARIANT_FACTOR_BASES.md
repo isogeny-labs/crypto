@@ -2217,3 +2217,13 @@ is empty).
 **Order of work.**  E23 (a test), E21 (a trace on one solver), E20 (a stream reprocessed with
 priced solves), E22 Stage A, then Stage B if the gate passes.  E19 finishes first in the
 background; none of these change E19's registered protocol.
+
+### 9.8 E23 measured: `ψ` and `τ_T` share no useful base on `j = 0`
+
+*2026-10-17.*  `quartic_folds::e23_tests::psi_and_translations_share_only_a_confined_base_on_j0`:
+`p = 37, 61, 73, 97`, six random `x₀ ∈ F_{p⁴} \ F_p` each, `E : y² = x³ − x₀³`.  On every curve
+the three 2-torsion points are on `E`; where the `x₀·F_p` base is non-empty, every base point's
+`ψ`-image and all three translates stay on the line, and every base point is killed by
+`#C(F_{p²})`, `C : v² = t³ − 1`; the other curves have an empty base.  Both branches occur.
+**G2.26 holds: direction 4 is closed** — the order-24 group exists on that line, and the line
+carries no point of the large subgroup.  Class: a negative, by derivation, confirmed on points.
