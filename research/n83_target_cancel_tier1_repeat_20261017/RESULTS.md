@@ -47,7 +47,8 @@ GitHub Actions run
 [`39055982074`](https://github.com/aburan28/crypto/actions/runs/39055982074),
 attempt 1, ran at commit
 `389abba5dbbe6b0c112e25096eceadb516d4e724` on four distinct,
-overlapping runners. The provider-jobs snapshot has SHA-256
+overlapping runners. The versioned
+[provider-jobs snapshot](results/panel_39055982074/provider_jobs.json) has SHA-256
 `368895594c4f993c77691d055bbdf10b5055f0c7e01a5a5e6db9755e15f98f9e`.
 
 | Stratum | Public indices | Artifact ID | Raw ZIP SHA-256 | Local replay exit |
