@@ -21,3 +21,9 @@ every native assignment bit as a unit clause to the byte-identical original
 export and returned SAT; flipping only the first added unit returned UNSAT.
 Its independent audit passed. The control incurred another conservative 600
 seconds across one infrastructure-failed sandbox pair and one valid local pair.
+
+A [four-arm configuration screen](CONFIG_SCREEN_RESULT.md) crossed default or
+VSIDS branching with default or widened Gaussian limits on the same known-answer
+export. Both default-limit arms remained indeterminate; both widened-limit arms
+hit the outer timeout. Its independent audit passed, and another conservative
+600 seconds is charged. No arm advances to a hosted natural-search comparison.
