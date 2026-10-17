@@ -34,10 +34,26 @@ does not change this conclusion.
 
 ### What this library now does
 
-- **Entropy** — All secret material is drawn from `OsRng` (OS CSPRNG via
+- **Entropy** — Default secret-material generation uses `OsRng` (OS CSPRNG via
   the `getrandom` crate: `getrandom(2)` on Linux, `BCryptGenRandom` on
   Windows, `getentropy(2)` on Darwin).  No user-space PRNG is used for
-  long-term keys.
+  long-term keys. The fallible `try_random_*_with_rng` helpers and
+  `EccKeyPair::try_generate_with_rng` accept caller-owned
+  `rand::RngCore + rand::CryptoRng` providers. Callers must supply a correctly
+  seeded CSPRNG; the marker trait cannot establish that a provider is secure.
+  Entropy errors propagate, and partially written random-byte outputs are
+  scrubbed before returning an error. BigUint scalar sampling is variable-time.
+- **Secret diagnostics** — ECC, RSA, Kyber and McEliece private-key `Debug`
+  implementations redact secrets, as does `MontgomeryContext` (whose modulus
+  may be a CRT prime). `KeyBundle::summary` and `write_summary` emit public
+  metadata only. Explicit private-key export remains available; redaction
+  cannot protect a caller that formats the public secret fields directly.
+- **Shared field-offset arithmetic** — CMAC, SIV, OCB3, PMAC and XTS use
+  `symmetric::gf128` for doubling (and PMAC halving), with fixed-width loops
+  and `subtle` selection instead of branches on key-derived carry bits.
+  Both big-endian and XTS little-endian conventions are explicit. This
+  removes those source-level branches; it does not establish constant-time
+  behavior of an entire mode or of a caller-supplied block-cipher provider.
 - **Constant-time MAC verification** — `aes_gcm_decrypt` and
   `chacha20_poly1305_decrypt` compare authentication tags using
   `subtle::ConstantTimeEq`.  A public `hmac_sha256_verify` is exposed for
@@ -181,8 +197,8 @@ does not change this conclusion.
     - Builds a runtime `MontgomeryContext<LIMBS>` from `n` (the public
       modulus) — `m' = -n^(-1) mod 2^64` via the const-callable
       Newton-iteration `compute_minv64`, plus `R mod n` and `R² mod n`
-      via one-time `BigUint` reductions.  Setup leaks no secret-
-      dependent timing because `n` is public.
+      via exactly `128 * LIMBS` branchless modular doublings. Setup uses no
+      `BigUint` division and also supports secret moduli such as CRT primes.
     - Runs a square-and-multiply ladder over Montgomery form for
       *exactly* `64 · LIMBS` iterations — high zero bits of `d` are
       still scanned, so the iteration count is a function of the
@@ -223,13 +239,13 @@ does not change this conclusion.
     - The recombination's multiplicative step uses one `mont_mul`
       against `p`; the final additive step uses `mul_wide` + `adc`
       over `Uint<FULL>`.  Both are limb-level branchless.
-    - `MontgomeryContext::new(p)` and `MontgomeryContext::new(q)`
-      perform the per-prime setup using `BigUint` for `R mod p` and
-      `R² mod p`.  This setup runs once per loaded key, not once per
-      message, and an attacker positioned to observe per-key setup
-      timing already has the in-memory `key.p` available.  The
-      setup leakage is structurally unavoidable without a CT
-      modular reduction we don't have on stable Rust.
+    - `MontgomeryContext::new(p)` and `MontgomeryContext::new(q)` use
+      fixed-width modular doubling, including when rebuilt per private
+      operation. This replaces secret-modulus `BigUint` reductions; the
+      earlier documentation incorrectly called that leakage unavoidable
+      and described the contexts as cached per key. Surrounding `BigUint`
+      import/export conversions remain variable-time. These arithmetic
+      properties do not establish end-to-end constant-time RSA.
   Cross-checked at 1024 bits (CRT result equals direct
   `rsa_mod_pow_ct`); 2048-bit equivalent has a slow `#[ignore]`d
   test that runs under `cargo test -- --ignored`.  Sizes outside
@@ -1182,14 +1198,15 @@ does not change this conclusion.
 
 ### What this library does NOT protect against
 
-These are structural — they cannot be fixed by configuration or by
-patches that don't fundamentally re-architect the crate:
+These limits remain after the targeted hardening. See
+[the Rust extension and hardening record](docs/rust-extension-hardening.md)
+for its verified scope and the remaining audit requirements.
 
-- **Timing side-channels in big-integer arithmetic — closed for
-  every supported secret-key path on both ECC and RSA.**
-  Every secret-scalar / secret-exponent path in this codebase now
-  routes through `ct_bignum::Uint<LIMBS>`-backed Montgomery
-  arithmetic:
+- **Timing side-channels in big-integer arithmetic — partially hardened.**
+  The following paths use `ct_bignum::Uint<LIMBS>`-backed arithmetic
+  internally; their surrounding `BigUint` conversions, key generation,
+  protocol logic and import/export require separate review. This is not
+  an end-to-end constant-time guarantee for every ECC or RSA operation:
     - **ECC** (secp256k1 + P-256): keypair generation, ECDH, and the
       ECDSA signer's `k·G` use `ecc::ct::scalar_mul_secret` over the
       Renes–Costello–Batina projective ladder.  The ECDSA verifier's
@@ -1204,8 +1221,8 @@ patches that don't fundamentally re-architect the crate:
       set fall back to the non-CRT `rsa_mod_pow_ct`, and thence to
       the legacy `BigUint`-backed `mod_pow_ct`, which has uniform
       per-bit op count but is not limb-level constant-time.
-  The remaining caveats are about *micro-architectural* timing
-  channels rather than the source-level operation count:
+  In addition to the remaining variable-time boundaries, there are
+  *micro-architectural* timing caveats:
     - The variable-time multiplication-or-not behaviour of `*` on
       Cortex-A53, ARM7, and a few older Intel CPUs is not addressed —
       we use a fixed-cycle `mul` instruction on x86-64 / aarch64 in
@@ -1216,9 +1233,9 @@ patches that don't fundamentally re-architect the crate:
       target/CPU/compiler combination.
     - Cache, port-contention, and speculative-execution channels
       are out of scope — see the AES entry below for a related case.
-  None of these can be addressed at the Rust source level; closing
-  them requires a verified-CT compiler backend, hardware crypto
-  intrinsics, or both.
+  Fixed source-level operation counts alone cannot establish timing
+  resistance on a particular target; generated-code and hardware analysis
+  are still required.
 - **Cache-timing side-channels in AES — partially mitigated.**
   The S-box is now scanned in full on every byte substitution
   (see "What this library now does"), which closes the cache-line

@@ -1,12 +1,17 @@
-# IC live-trace integration is blocked by existing main compilation failures
+# IC compilation restored; integration gates tracked in the successor record
 
-- **Status:** `open`
+- **Status:** `superseded` by [current-main research regression gates](current-main-research-regressions.md)
 - **Kind:** implementation gap in the integration baseline
 - **Affected work:** [IC live relation output](../docs/ic/README.md#reports-and-resource-accounting)
 - **Next action owner:** unassigned; recent quartic/ecbench integration maintainers
 - **Last updated:** 2026-10-17
 
 ## Problem
+
+The original compile obstruction below is repaired by the Rust extension update
+in PR #2101. Library and all-binary type checks now pass; release integration
+still has the unrelated regression/lint gates recorded in the successor. The
+original requirement for passing integrated checks remains unmet.
 
 The live relation/verbosity change cannot complete validation on main
 `c6d64436` because the unchanged library already fails to compile outside
@@ -37,7 +42,7 @@ results, query streams, counters and JSON reports preserved.
 
 ## What would unblock it
 
-- [ ] Restore the intended quartic types, imports, dispatcher cases and
+- [x] Restore the intended quartic types, imports, dispatcher cases and
   elimination entry points on main without dropping supported methods.
 - [ ] Apply the live-trace change and pass
   `cargo test --release --lib --bin ic --test ic_framework --test ic_progress`
@@ -61,9 +66,9 @@ performance improvement or a security result. Trace I/O has no speed claim.
 
 ## Resolution and history
 
-Unresolved. Creating or merging the feature PR does not satisfy the current-main
-validation condition. Its PR description records the exact checks completed
-on the separate control revision and any remaining failures.
+Compilation restored; the complete integrated-validation condition remains
+unresolved in the successor record. Creating or merging the feature PR does
+not satisfy that condition. Historical control evidence is retained below.
 
 2026-10-17: with the feature patch on the #1880 control revision, the release
 library suite passed 4,297 tests (117 ignored). The IC binary unit tests
@@ -79,3 +84,15 @@ Strict Clippy for the library, IC binary and both integration targets also
 passes on CI's pinned Rust 1.98.0. Rust 1.99's new
 `mismatched_bit_width_type` lint instead stops in unchanged
 `src/symmetric/modes/pmac.rs:112`; no lint was suppressed for this feature.
+
+2026-10-17 Rust extension update: restore the distinct D4 / translation quartic
+instances, constructors and dispatcher cases, missing FBM / ONB imports and
+elimination wrapper, plus the IC `prime` module and ecbench's FBM import. The
+all-binary type check passes. On the integrated code, the release library gate
+reports 4,387 passed, 4 failed and 117 ignored; all 49 selected IC, extension
+and embedding-example tests pass. The four failures and full maintained-lint
+findings are documented with raw logs in the successor and
+[validation record](../docs/validation/rust-extensions-20261017/README.md).
+The PMAC bit-width expression is also corrected as part of shared, branchless
+field-offset arithmetic; changed-target strict Clippy now passes on Rust 1.98
+and 1.99. The crate remains unaudited; these are scoped correctness checks.

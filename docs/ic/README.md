@@ -26,6 +26,11 @@ reports, and launches the public-synthetic `koblitz_rank_fixture` /
 
 ## Commands
 
+For embedding and downstream Rust plug-ins, see the
+[extension and hardening guide](../rust-extension-hardening.md) and
+[`ic_custom_pipeline`](../../examples/ic_custom_pipeline.rs). Its application-owned
+registries and matrix factory require no edits to this executable.
+
 Factor-base generation is a plug-in stage: `ic bench --list` lists the
 compiled-in builders and their parameters. Choose one with, for example,
 `ic bench --bits 16 --factor-base prime-abscissa:size=24 --oracle mitm -v`.
