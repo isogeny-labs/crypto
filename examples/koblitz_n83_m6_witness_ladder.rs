@@ -81,7 +81,13 @@ fn decoded_x_blocks(enc: &ChainedS3Encoding) -> Result<Vec<BigUint>> {
         .collect())
 }
 
-fn run(role: &str, stage: &str, conflict_cap: u64, export: Option<&Path>) -> Result<Value> {
+fn run(
+    role: &str,
+    stage: &str,
+    conflict_cap: u64,
+    export: Option<&Path>,
+    model_bits: Option<&Path>,
+) -> Result<Value> {
     if !["gray_pool", "hash_pool"].contains(&role)
         || !["all_x", "summand_x", "open"].contains(&stage)
         || !(1..=20_000).contains(&conflict_cap)
@@ -259,7 +265,7 @@ fn run(role: &str, stage: &str, conflict_cap: u64, export: Option<&Path>) -> Res
     } else {
         false
     };
-    Ok(json!({
+    let mut result = json!({
         "schema":"n83.m6-planted-witness-control/v1", "scope":"known_answer_solver_access_only",
         "role":role, "stage":stage,
         "status":match outcome {
@@ -280,19 +286,53 @@ fn run(role: &str, stage: &str, conflict_cap: u64, export: Option<&Path>) -> Res
         "elapsed_wall_ms_L0":started.elapsed().as_secs_f64()*1000.0,
         "natural_relations":Value::Null, "total_index_calculus_runtime_ms":Value::Null,
         "selected_best_total_runtime":Value::Null,
-    }))
+    });
+    if let Some(path) = model_bits {
+        if !model_verified {
+            return Err("native model export requires a verified SAT witness".into());
+        }
+        let assignment = enc.solver.model();
+        let mut bits: Vec<u8> = assignment
+            .iter()
+            .map(|value| if *value { b'1' } else { b'0' })
+            .collect();
+        bits.push(b'\n');
+        let dimacs = to_dimacs_xor(&enc.solver);
+        let mut file = OpenOptions::new().write(true).create_new(true).open(path)?;
+        file.write_all(&bits)?;
+        file.sync_all()?;
+        result["native_model_export"] = json!({
+            "schema":"n83.m6-native-model-export/v1",
+            "model_bytes":bits.len(),
+            "model_blake3":blake3::hash(&bits).to_hex().to_string(),
+            "dimacs_bytes":dimacs.len(),
+            "dimacs_blake3":blake3::hash(dimacs.as_bytes()).to_hex().to_string(),
+        });
+    }
+    Ok(result)
 }
 
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
-    let export = match args.as_slice() {
-        [_, _, _, _] => None,
-        [_, _, _, _, flag, path] if flag == "--export-xor-dimacs" => Some(Path::new(path)),
-        _ => return Err("usage: koblitz_n83_m6_witness_ladder ROLE STAGE CONFLICT_CAP [--export-xor-dimacs NEW_PATH]".into()),
+    let (export, model_bits) = match args.as_slice() {
+        [_, _, _, _] => (None, None),
+        [_, _, _, _, flag, path] if flag == "--export-xor-dimacs" => {
+            (Some(Path::new(path)), None)
+        }
+        [_, _, _, _, flag, path] if flag == "--native-model-bits" => {
+            (None, Some(Path::new(path)))
+        }
+        _ => return Err("usage: koblitz_n83_m6_witness_ladder ROLE STAGE CONFLICT_CAP [--export-xor-dimacs NEW_PATH | --native-model-bits NEW_PATH]".into()),
     };
     println!(
         "{}",
-        serde_json::to_string(&run(&args[1], &args[2], args[3].parse()?, export)?)?
+        serde_json::to_string(&run(
+            &args[1],
+            &args[2],
+            args[3].parse()?,
+            export,
+            model_bits,
+        )?)?
     );
     Ok(())
 }
