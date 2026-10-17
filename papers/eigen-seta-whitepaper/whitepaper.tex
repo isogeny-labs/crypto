@@ -238,6 +238,69 @@ set & limbs & $\F_p$ mul & $\F_{p^2}$ mul & $\F_p$ inversion\\
 
 \PerfDiscussion
 
+
+%------------------------------------------------------------------
+\section{How far off: comparison with other KEMs}\label{sec:compare}
+
+Table~\ref{tab:compare} puts the level-1 set next to the standardised
+lattice KEM and the closest isogeny-based encryption schemes. Only the
+ML-KEM row was measured on our host, with the portable RustCrypto crate
+(\art{ml-kem} 0.2.3, no AVX2 assembly; record
+\art{crypto:research/eigen_seta_whitepaper_20261017/records/mlkem_same_host/}).
+Q5 key generation was running on all four vCPUs at the time, so these
+timings are an upper bound. The other rows are as published, on other
+hardware and in other languages. Read them as orders of magnitude.
+
+\begin{table}[h]
+\centering
+\caption{Level-1 comparison. Eigen-S\'eta L1 meets category~1 only in the
+gate-count metric (\S\ref{sec:security}). FESTA's figures are from a
+SageMath proof of concept on an Apple M1 Pro at 3.2\,GHz. PIKE's are from C
+on an Intel i7 at 2.3\,GHz. POKÉ's sizes and key generation are as listed
+by the PIKE paper. CSIDH-512 is one constant-time group action (CTIDH, 125.5
+Mcycles on Skylake, about 42\,ms at 3\,GHz). ``---'' means not reported in
+the source we read.}
+\label{tab:compare}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllrrrrr}
+\toprule
+scheme & type & implementation & $\log_2p$ & pk (B) & ct (B) & encaps/enc & decaps/dec\\
+\midrule
+ML-KEM-512 & lattice KEM & Rust, this host & --- & 800 & 768 & \MlkemEnc\,$\mu$s & \MlkemDec\,$\mu$s\\
+Eigen-S\'eta L1 & isogeny KEM & Rust, this host & 1341 & 1344 & 1344 & \EncLOne\,s & \DecLOne\,s\\
+PIKE (NIST I)~\cite{PIKE} & isogeny PKE & C, i7 2.3\,GHz & --- & --- & --- & 23\,ms & 15\,ms\\
+POKÉ (NIST I)~\cite{POKE} & isogeny PKE & SageMath & 431 & 324 & 648 & $\approx$100\,ms & $\approx$100\,ms\\
+FESTA ($\lambda=128$)~\cite{BMP23} & isogeny PKE & SageMath, M1 Pro & 1292 & 561 & 1122 & 3.09\,s & 9.14\,s\\
+CSIDH-512 (CTIDH)~\cite{CTIDH} & isogeny group action & C, Skylake & 511 & 64 & --- & \multicolumn{2}{c}{$\approx$42\,ms per action}\\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\paragraph{What the table says.}
+\begin{itemize}[nosep]
+\item \emph{Against ML-KEM} on the same machine, Eigen-S\'eta L1 is about
+  \RatioEnc\ times slower to encapsulate, \RatioDec\ times slower to
+  decapsulate, and about \RatioKg\ times slower to generate a key. Its keys
+  and ciphertexts are 1.7 times larger. Lattice KEMs are in a different
+  league. No isogeny scheme is close to them on speed.
+\item \emph{Against the best isogeny PKE we know,} PIKE in C, decryption is
+  about 80 times slower and encryption about 9 times slower. That compares
+  across hosts, so take the order of magnitude only. The structural reason
+  is the prime: POKÉ and PIKE work over a field of about $10\lambda/3$ bits,
+  431 bits at level~1, where we use $10.5\lambda$ bits. Field multiplication
+  grows roughly quadratically with size. Their public keys and ciphertexts
+  are 2 to 4 times smaller.
+\item \emph{Against FESTA,} whose structure is closest to ours, sizes are
+  similar. The published FESTA timings are from SageMath, so no fair speed
+  comparison exists.
+\item \emph{What would close the gap.} Two half-chains would bring the prime
+  to about $d^3$, roughly 800 bits at L1 (\S\ref{sec:open}). Engineering on
+  the chain step, which measures 2--3 times above the cost model's
+  constant, and on field arithmetic would help further. Our estimate for
+  all of these together is about one order of magnitude. That would put
+  Eigen-S\'eta level with POKÉ and PIKE, and still three to four orders of
+  magnitude behind ML-KEM.
+\end{itemize}
 %------------------------------------------------------------------
 \section{Security level}\label{sec:security}
 
