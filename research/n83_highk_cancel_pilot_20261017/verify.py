@@ -30,17 +30,27 @@ def verify(output):
     for name, k in pilot.ARMS:
         folder = output / "runs" / name
         launch = read(folder / "launch.json")
-        summary = read(folder / "stdout.jsonl") if (folder / "stdout.jsonl").is_file() else {}
+        usage = read(folder / "usage.json")
         flags = launch["environment_flags"]
         if (launch["command"][1:] !=
                 [f"construct:83:1:{k}", str(pilot.TARGET), "29",
                  str(folder / "targets_result.jsonl")] or
                 launch["cap_seconds"] != pilot.CAP_SECONDS or
                 flags.get("KIC_TARGET_THREADS") != "2" or
-                flags.get("KIC_TARGET_CANCEL") != "1" or
-                summary.get("target_threads") != 2 or
-                summary.get("target_cancel") is not True):
+                flags.get("KIC_TARGET_CANCEL") != "1"):
             raise ValueError(f"{name}: executed cancellation policy differs")
+        if usage["status"] != "PASS_PRODUCER":
+            rows.append({"arm": name, "k": k, "status": usage["status"],
+                         "cap_seconds": launch["cap_seconds"],
+                         "wall_seconds": usage["wall_seconds"],
+                         "exit_status": usage["exit_status"],
+                         "stop_reason": usage["stop_reason"],
+                         "resource_status": "UNVERIFIED_MAC_RSS"})
+            continue
+        summary = read(folder / "stdout.jsonl")
+        if (summary.get("target_threads") != 2 or
+                summary.get("target_cancel") is not True):
+            raise ValueError(f"{name}: producer worker policy differs")
         rows.append(dynamic.verify_ic(output, name, k, "root11_dynamic",
                                       point, answer))
     return {"schema": "n83.highk-cancel-pilot-analysis/v1",

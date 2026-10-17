@@ -23,6 +23,9 @@ def main():
             dispatch['point_count'] != 24 or
             dispatch['host_strata'] != 4 or
             dispatch['points_per_host'] != 6 or
+            dispatch['producer_cap_seconds'] != run.GLOBAL_PRODUCER_CAP_SECONDS or
+            dispatch['job_cap_minutes'] != 350 or
+            dispatch['status'] != 'SEALED_FOR_DISPATCH' or
             dispatch['source_sha256'] != run.SOURCE_SHA256 or
             dispatch['targets_sha256'] != run.TARGETS_SHA256 or
             dispatch['answers_sha256'] != run.ANSWERS_SHA256 or
