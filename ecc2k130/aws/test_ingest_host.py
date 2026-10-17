@@ -31,7 +31,9 @@ case "$1 $2" in
       echo i-existing
     fi ;;
   'ec2 describe-images') echo ami-test ;;
-  'iam get-instance-profile') echo '{}' ;;
+  'iam get-instance-profile')
+    if [ "${TEST_NO_PROFILE:-0}" = 1 ]; then exit 254; fi
+    echo '{}' ;;
   'rds describe-db-instances') echo db.example ;;
   's3 cp') exit 0 ;;
   'ec2 run-instances')
@@ -80,6 +82,8 @@ esac
                 args = (self.root / "run-args").read_text()
                 self.assertIn(f"Environment=RHO_INGEST_WORKER_ONLY={worker_only}", unit)
                 self.assertIn(f"IngestRole,Value={role}", args)
+                self.assertIn("Name=ecc2k130-ingest", args)
+                self.assertNotIn("aws_access_key_id", unit)
                 self.assertIn("sg-existing", args)
                 self.assertIn("subnet-existing", args)
 
@@ -102,6 +106,12 @@ esac
         result = self.run_launcher("publisher", "preflight", TEST_EXISTING_PUBLISHER="1")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("EC2 publisher i-existing already exists", result.stderr)
+        self.assertFalse((self.root / "user-data").exists())
+
+    def test_missing_instance_profile_never_writes_static_keys(self):
+        result = self.run_launcher("worker", "up", TEST_NO_PROFILE="1")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("refusing to put static credentials in user-data", result.stderr)
         self.assertFalse((self.root / "user-data").exists())
 
 

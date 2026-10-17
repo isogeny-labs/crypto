@@ -726,7 +726,9 @@ with `INGEST_ROLE=worker ./ingest_host.sh up`. Each EC2 hostname is the stable
 replica id used in committed progress and poll rows; the instance has an
 `IngestRole` tag, and `status` displays that role. Workers ingest and record
 polls but do not race the publisher's status or CloudWatch writes. Launches
-are billable EC2 operations, so preflight alone is the read-only check.
+are billable EC2 operations, so preflight alone is the read-only check. `up`
+requires the `ecc2k130-ingest` instance profile and fails before upload or
+launch if it is unavailable; it never places AWS static keys in user-data.
 
 **Scheduled Lambda (no host).** `./ingest_lambda.sh up` deploys the same
 program as a Lambda on a two-minute EventBridge schedule, running one
