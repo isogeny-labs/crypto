@@ -70,7 +70,7 @@ factor-base choice. Stage diagnostics include actual base sizes, folded
 columns, exact index entries and allocation, setup/rank costs, target probe
 counts, verified relation yield, online phases, and final scalar replay.
 
-The fixture and decision rule are frozen here before dispatch. A later
-versioned runner, independent verifier, provider binder, and dispatch file
-must pass their own preflight before any of these 24 public points are sent
-to a producer.
+The fixture and decision rule are frozen here before dispatch. The versioned
+runner and independent verifier bind the exact source and workload. The
+provider binder and dispatch file must pass their own preflight before any
+of these 24 public points are sent to a producer.
