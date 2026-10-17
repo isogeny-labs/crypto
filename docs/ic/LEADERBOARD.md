@@ -272,6 +272,7 @@ Copied from native analysis: eight independent one-target workloads per fixed cu
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `765f6e8d05ebbf75…`
+- `docs/curves/registry.json` — sha256 `b2ef8d0684b676a5…`
 - `research/n83_matched_20261014/records/postprocess-20261015T0018Z/statistics.json` — sha256 `1ba0dd87653daf73…`
 - `research/n83_matched_20261014/records/postprocess-20261015T0018Z/independent_replay_v3_receipt.json` — sha256 `94891f01e158a3a3…`
 - `research/n83_matched_20261014/records/postprocess-20261015T0018Z/presentation_supplement.json` — sha256 `4804814de5e0fbb7…`

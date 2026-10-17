@@ -15,7 +15,7 @@ description: Select, run, and interpret elliptic-curve surface and genus-2+ Jaco
 | Check the repository's n=83 binary Koblitz variants | `binary_surface_check` | Uses the pinned GF(2^83) basis and subgroups, classifies the binary pencil analytically, verifies quartic transfers, and checks the same/opposite products. |
 | Construct or replay a supported genus-2 or genus-3 cover | `hyperelliptic-cover construct` / `verify` in `crypto` | Checks the fixed cover's equation, smoothness, genus, degree, and field; subgroup preservation is a separate obligation. |
 | Compute with supported genus-2+ divisor classes | `hyperelliptic-cover arithmetic`, or the native Jacobian APIs | Checks Mumford arithmetic in the declared curve and infinity model; it does not construct an elliptic-subgroup map. |
-| Transfer into the binary genus-3 Jacobian | `OrdinaryBinaryCover` Rust API in both repositories | Constructs rational-point-class pullbacks and typed degree-three composition witnesses; injectivity requires an independently verified exact subgroup order coprime to three. |
+| Transfer into the binary genus-3 Jacobian | `OrdinaryBinaryCover` Rust API | Both repositories construct rational-point-class pullbacks and typed degree-three composition witnesses; injectivity requires an independently verified exact subgroup order coprime to three. Current `crypto` source alone adds all-class norm support for one exact polynomial-basis GF(8) fixture (`a=1`, `b=3`, `d=7`); the retained `cryptanalysis` parity receipt predates it. This is same-implementation fixture evidence, not catalog-general support or an independent norm oracle. |
 | Check a supplied CM genus-2 polarization candidate | `jacobian-certificate` in `crypto` | Certifies bounded Hermitian-lattice findings; genus-2 existence remains conditional on independently audited geometric hypotheses. |
 | Search for genus-2 gluing or other higher-genus targets | [Higher-genus workflow](references/higher-genus.md) | Routes construction, map, kernel, arithmetic, and cost checks; a search proposal is not an executable transfer. |
 
@@ -199,6 +199,33 @@ kernel checks, unsupported operations, and complete solver-cost accounting.
   destination, curve construction, Jacobian arithmetic, subgroup transfer, and
   a faster target solver with complete transport costs are separate claims.
   The point arithmetic is variable-time demonstration code.
+
+## Hand off to transfer and solver measurement
+
+Use the checked construction as input to
+[`docs/transfer-assessment/METHODOLOGY.md`](../../../docs/transfer-assessment/METHODOLOGY.md),
+not as an advantage claim. Use the `transfer` assessment profile to type the
+correspondence, bind the source subgroup, prove recovery, and record open
+obligations. The matching machine record requires a named
+`solver_assessment`; “higher genus,” “surface,” “lattice,” or “index calculus”
+alone is not a solver.
+
+After the transfer is executable and the destination solver has a checked
+adapter for the image subgroup, follow
+[`MEASUREMENT.md`](../../../docs/transfer-assessment/MEASUREMENT.md): compare
+the strongest direct source solver, the destination generic control, and the
+specialized destination pipeline on identical one-target workloads. Use the
+`ecbench-measure` skill for the native matched run. Use `ecbench-bounds` only
+after a replayable end-to-end session exists to determine whether the result
+moves an exponent, constant, primitive-operation axis, or only makes a trade.
+Stage-only relation, arithmetic, or map improvements do not establish net
+transfer advantage.
+
+Use `curve-algebra` when the route or baseline depends on CM,
+endomorphisms, GLV/GLS, Frobenius, or automorphism actions. Apply
+`report-evidence` to every implementation and experiment, and
+`research-visuals` to each search round, run, or result PR. The skills route
+work; they do not replace certificates, replay, or cost accounting.
 
 ## Validate and hand off
 
