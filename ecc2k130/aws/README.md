@@ -709,8 +709,24 @@ VPC ingest host avoids that.
 `Name=rho-dp-ingest` inside the VPC as a systemd unit with `Restart=always`,
 publishing `status.json` to the status bucket and its journal to
 `s3://$BUCKET/logs/rho-ingest-<instance>/ingest.log` every two minutes.
-Use this when EC2 is available and you prefer a private RDS endpoint with no
-public IP allowlisting.
+Use this when EC2 is available and you prefer VPC access to RDS without
+adding public egress addresses to its allowlist.
+
+Run `AWS_PROFILE=ecc2k130 ./ingest_host.sh preflight` first. It resolves the
+security group and subnet from a running walker or, when the walker fleet is
+quiet, from a stopped ingest host. It creates nothing. On the Mac that has the
+`com.adamburan.ecc2k130-dp-ingest` LaunchAgent, preflight refuses an active
+copy whose digest differs from the source being deployed; this catches the
+otherwise invisible old publisher before any S3 upload or EC2 launch. It also
+refuses a second publisher when a local LaunchAgent or tagged EC2 publisher
+is active. After **every** old
+ingester copy has stopped, launch exactly one publisher with
+`INGEST_ROLE=publisher ./ingest_host.sh up`, then launch additional replicas
+with `INGEST_ROLE=worker ./ingest_host.sh up`. Each EC2 hostname is the stable
+replica id used in committed progress and poll rows; the instance has an
+`IngestRole` tag, and `status` displays that role. Workers ingest and record
+polls but do not race the publisher's status or CloudWatch writes. Launches
+are billable EC2 operations, so preflight alone is the read-only check.
 
 **Scheduled Lambda (no host).** `./ingest_lambda.sh up` deploys the same
 program as a Lambda on a two-minute EventBridge schedule, running one
@@ -734,11 +750,12 @@ got there by living in the VPC with an instance profile. It reports what is
 missing and what to add; setting `DATABASE_URL` removes the Secrets Manager
 leg entirely.
 
-Cut over with both running — concurrent ingesters are safe, so overlapping
-proves the new path before the old one goes away — then
-`./ingest_host.sh retire <id>`. Rollback is `./ingest_lambda.sh down &&
-./ingest_host.sh up`, with no code revert, because neither `ingest.sh` nor
-`ingest_host.sh` changed.
+Do not overlap a Lambda or host still running an older `dp_ingest.py` with
+the replica build. Its writes bypass the advisory object lock and can leave
+the rollups or source receipts inconsistent. Stop it first, then start the
+replica publisher; use `./ingest_host.sh retire <id>` only for hosts confirmed
+to be superseded. A rollback to an older build requires stopping every new
+replica and recounting the store afterward.
 
 Reserved concurrency is 1 and the schedule retries 0 times. A trigger that
 arrives mid-pass is therefore dropped rather than queued, which is harmless —
@@ -751,13 +768,12 @@ quiet unless something is watching the number itself.
 
 **The store is a derived view.** `dp/` is the corpus, `merge.py` is what
 searches it for collisions, and `distinguished_points` can be dropped and
-rebuilt from S3 without losing anything. That is what makes the deployment
-mechanism acceptable: the ingest host has no key pair, no instance profile
-and no SSM agent, so the way to change its code is
-`./ingest_host.sh up` — launch a replacement, watch it drain, then
-`./ingest_host.sh retire <old-id>`. Two ingesters at once are safe; every
-insert is `ON CONFLICT DO NOTHING` on `(campaign_id, point_key)` and progress
-is committed in the same transaction as the points.
+rebuilt from S3 without losing anything. The new launcher publishes a digest
+identified code copy and uses the `ecc2k130-ingest` instance profile when it
+exists. Multiple **new** replicas are safe together because they take the
+same per-object database lock; point insertion and progress commit share one
+transaction. Idempotent point insertion alone does not make a mixed-version
+cutover safe.
 
 **Two object-key shapes are points, and reading only one is how the store
 stopped for five hours on 2026-09-17:**
