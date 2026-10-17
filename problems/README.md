@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Photographed-volcano checkpoints unavailable](photo-volcano-checkpoints-unavailable.md) | open | resuming and independently auditing the original 46-curve, 100-problem-per-curve campaign | exact original archives, manifest and checkpoint verification, durable immutable readback, then resume-path validation |
 | [Generalized rootfinding complete all-roots8x qualification](generalized-rootfinding-all-roots-8x.md) | open | novel qualified8x over matched genuine all-roots F4/F5/F6 across requested fields | native complete-output integration, independent replay, strongest external references and the unchanged hard gate |
 | [Prime61 exhaustive horizontal class memory](prime61-horizontal-class-memory.md) | open; disk-backed pilot verified | certified full-class coverage and all-class workload execution; retained-vector requirement removed on the new path | certified degree-set coverage, provisioned disk/compute envelope and replayed remaining workloads |
 | [Screenshot candidate driver is not located](screenshot-factor-base-driver-unlocated.md) | open | faithful 1,000/2,000-candidate isogeny benchmark at a requested large field | original file/branch/PR or source bundle, native fixture replay and validated larger-field map |
@@ -23,6 +24,7 @@ Keep resolved and superseded records in the index.
 | [Full large-volcano class storage and execution](full-volcano-class-storage-and-execution.md) | open | complete fixed five-class datasets and graph-wide multi-method ECDLP/IC measurements | durable full-run storage, complete generation/map replay, and matched ecbench workloads with all requested targets and statistics |
 | [Parallel release-suite Joux–Vitse wall budget](release-suite-jv-nagao-wall-budget.md) | investigating | complete release-suite validation | serial suite passes (4,236/0/117); reproduce/instrument the base parallel failure without weakening assertions or budgets |
 | [SEA Rust-to-group refinement proof](sea-rust-group-refinement-proof.md) | open | complete formal verification of the Rust SEA/counting implementation | connect concrete field/point operations and congruences to the checked abstract search and uniqueness proofs |
+| [Upper conductor-gap floors and complete native costs](conductor-gap-upper-floor-and-cost.md) | investigating | remaining upper floors, complete IC/rho costs and full CM formalization; one 96-bit floor is now certified | compatible kernel methods for the remaining candidates, complete work pricing and checked CM bridges |
 | [cairn certificate checkers are Python-only](cairn-certificate-checker-python-only.md) | open | objective mode for backlog cards with native checkers (the upgrade path of `XP-20261015-p192-isogeny-aux-search-t48`, which runs as lab tasks meanwhile) | cairn accepting a pinned native checker, or the `workspace` verifier running a zero-dependency Rust checker under its jail |
 | [ECC arithmetic cross-platform performance](ecc-arithmetic-platform-measurement.md) | open | controlled multi-platform and worldwide arithmetic comparisons | identified isolated ARM/x86 hosts with A/A controls, validated backend implementations and matched comparators; new X25519 Modal bundle awaits explicit source-export approval |
 | [ECC arithmetic PR merge gates](ecc-arithmetic-pr-merge-gates.md) | investigating | delivery of ECC arithmetic PR #1798 with a passing current-head check suite | resolve the recorded registry, evidence, lint and workflow failures; obtain final-head review and checks before a merge commit |
@@ -84,3 +86,4 @@ Preserve historical evidence and append dated updates explaining corrections.
 A resolution cites its evidence and the criteria met; a supersession cites its
 successor and the reason for replacing the record. Follow the repository's
 existing review, archival, and claim-promotion rules.
+
