@@ -82,6 +82,14 @@ measurement was substituted by these software checks.
 
 ## Validation and limits
 
+The [completed CI follow-up](validation/ci-20261017/README.md) records the
+change-caused sparse-checkout command correction and the independently
+identified inherited gates. The corrected workflow's actual shell stages
+pass in an isolated sparse checkout, including 20 tests and locked report
+reproduction. Hosted CI on the correction's final head is still required;
+the [baseline CI blocker](../../../problems/backend-frontier-baseline-ci-gates.md)
+is not waived by that local pass.
+
 The standalone Rust producer deliberately avoids a root-library dependency.
 It directly shares the harness's pricing-band, bootstrap and identity-codec
 source and extracts its native-unit vocabulary at build time. Admission needs

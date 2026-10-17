@@ -41,7 +41,7 @@ jobs:
       - name: Materialize the manifest's sealed inputs
         run: |
           jq -r '.sessions[] | "/" + .dir + "/", (select(.replay_receipt != null) | "/" + .replay_receipt)' docs/backend-leaderboard/manifest.json > /tmp/backend-sources.txt
-          git sparse-checkout add --no-cone --stdin < /tmp/backend-sources.txt
+          git sparse-checkout add --stdin < /tmp/backend-sources.txt
       - name: Format, admission tests and lint
         run: |
           cargo +1.99.1 fmt --manifest-path tools/backend-leaderboard/Cargo.toml --check
