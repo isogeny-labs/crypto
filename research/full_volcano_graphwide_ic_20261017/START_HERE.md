@@ -1,5 +1,7 @@
 # Volcano experiment downloads, 17 October 2026
 
+[Download guide v4](https://drive.google.com/file/d/1We8r_TMO00hXcGUdTJhrFOHYOHF61kXd/view) includes all new artifacts, exact scopes and the actual local resume receipt.
+
 Latest measured addition (17 October 2026): **full selected-point-order C**.
 Both EC PH/BSGS and k=1 Tate/Miller → multiplicative PH / projected-prime
 factor-base relations verify all 3,738 public one-target workloads over the
@@ -139,3 +141,5 @@ This is local certification, not complete original class populations. S3
 access was rechecked and still lacks a runtime AWS identity.
 
 Recovery resume **PID 8973 launched 2026-10-17T16:14:06.513686+00:00**, verified live at 2026-10-17T16:15:21.322908+00:00. The unchanged frozen queue/solver/driver retry the preserved interruption in attempt 2, under the same 24-hour / 2-GiB guard. This is a new runtime epoch; wall times remain unqualified. See `execution/recovery-20261017T1450Z/resumed-launch-verified.json` for actual native progress. The Drive archive and explorer remain the frozen 2,935-vertex checkpoint, not live uploads.
+
+Current local resume: PID 97646, launched 2026-10-17T20:13:41.722914+00:00, verified live 2026-10-17T20:13:55.172771+00:00 with newly audited progress. [Actual receipt](execution/resume-after-4037/verified.json) and [outer envelope](execution/resume-after-4037/envelope.json). Outer guards changed from 24 h / 2 GiB to 72 h / 6 GiB; frozen mathematical/child budgets and queue are unchanged. Multiple runtime epochs remain unqualified; no host-survival or unattended-upload guarantee. Frozen Drive snapshots remain 4,037 vertices.

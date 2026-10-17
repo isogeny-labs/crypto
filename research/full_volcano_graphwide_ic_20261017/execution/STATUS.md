@@ -33,3 +33,5 @@ remains open. A complete graph, a sampled benchmark and a full benchmark
 matrix have separate completion criteria.
 
 See [full-order C evidence](full_point_order/README.md) and [4,037 checkpoint](checkpoint-4037/README.md). New clocks are unqualified, all replay populations separate, no external fastest comparison or speedup claim. The full original matrix and large-k backends remain open.
+
+Active local resume: PID 97646; [verified live progress](resume-after-4037/verified.json), [new 72-hour/6-GiB outer envelope](resume-after-4037/envelope.json). Mathematical budgets unchanged. This is actual launch/progress, not completion or a live Drive upload.
