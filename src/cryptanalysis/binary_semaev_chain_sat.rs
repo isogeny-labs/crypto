@@ -918,6 +918,7 @@ mod tests {
 
     #[test]
     fn source_bound_covers_degree_83_without_constructing_a_model() {
+        assert_eq!(chain_s3_max_variables(83, 4), Some(63_578));
         assert_eq!(chain_s3_max_variables(83, 5), Some(84_743));
         assert_eq!(chain_s3_max_variables(83, 6), Some(105_908));
         assert_eq!(chain_s3_max_variables(83, 7), None);
@@ -1027,6 +1028,14 @@ mod tests {
 
     #[test]
     fn frobenius_orbit_preflight_caps_before_mutation_and_counts_n83() {
+        assert_eq!(
+            frobenius_orbit_domain_size(83, 4, 2_001),
+            Some(FrobeniusOrbitDomainSize {
+                variables: 21_012,
+                clauses: 697_808,
+                xor_rows: 2_656,
+            })
+        );
         assert_eq!(
             frobenius_orbit_domain_size(83, 5, 2_001),
             Some(FrobeniusOrbitDomainSize {
