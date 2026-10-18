@@ -51,6 +51,7 @@ counting ceiling.
 - [x] Remove phase pins while retaining four known representative selectors under one source revision, with A1/B/A2 constructed controls and separate relation replay. The [selector-only run](../research/n83_k16627_m4_selector_only_20261018/RUN_REPORT.md) passed; its B SAT call took 6,487.732878 ms versus 10.045541 and 17.313917 ms for the fully pinned controls. This is a constructed stage measurement, not natural yield or a pipeline improvement.
 - [ ] Remove the known selectors and x blocks for natural public queries under a separately frozen protocol.
 - [ ] Measure base import, root/index preparation, failed and successful query work, rank/linear algebra, target extraction and verification on matched instances and resources; include A/A controls, current IC baseline and same-point rho before claiming a pipeline improvement.
+- [ ] Compare prebuilding and reusing the retained signed-Frobenius base against generating the same accepted point set on demand under one native source revision, identical query corpus and membership policy. Charge construction, serialization, loading, indexing, failed queries and memory in a cold run, then report setup and per-query cost separately for each explicit reuse count.
 - [ ] If m=2 or m=3 is promoted as a candidate despite the small-base support bounds, freeze its accepted relation event and resource-feasible base or partial-relation policy and independently measure natural yield and rank.
 
 A completed matched relation/rank experiment would establish behavior for
