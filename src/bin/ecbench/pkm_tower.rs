@@ -78,6 +78,7 @@ use crypto_lib::cryptanalysis::ic_boundary::{
     lift_abscissae, semaev_s3_quadratic, CountedGroup, FactorBase, GroupOps, OracleCounters,
     PrimeCurve, PrimeInstance, PrimePoint,
 };
+use crypto_lib::cryptanalysis::ic_framework::prime_tower::{primitive_two_power_root, PrimeKummerBase};
 use crypto_lib::cryptanalysis::ic_framework::stages::{
     DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, SolverCost, SolverTotals,
     SystemShape,
@@ -152,6 +153,31 @@ impl Kummer {
         let g = rng.gen_range(2..p);
         let v = (0..1u64 << t).map(|k| mulm(g, powm(zeta, k, p), p)).collect();
         Ok(Kummer { t, g, v })
+    }
+
+    /// The tower `prime-kummer:t,g` builds: `ζ` is `main`'s
+    /// `primitive_two_power_root`, so `V` is the same set and in the same
+    /// order as that base's.
+    fn with_g(p: u64, t: u32, g: u64) -> Result<Self, String> {
+        let g = g % p;
+        if g == 0 {
+            return Err("g must be non-zero".into());
+        }
+        let zeta = primitive_two_power_root(p, t)
+            .ok_or_else(|| format!("2^{t} does not divide p − 1 = {}", p - 1))?;
+        let v = (0..1u64 << t).map(|k| mulm(g, powm(zeta, k, p), p)).collect();
+        Ok(Kummer { t, g, v })
+    }
+
+    /// The tower an oracle's parameters name: `g` when given (the
+    /// `prime-kummer` base's), otherwise the seeded tower of the original
+    /// `prime-tower` base (`seed`, default 1).
+    fn from_params(p: u64, params: &Params) -> Result<Self, String> {
+        let t = params.u64("t")? as u32;
+        match params.get("g") {
+            Some(_) => Kummer::with_g(p, t, params.u64("g")?),
+            None => Kummer::new(p, t, params.u64_or("seed", 1)?),
+        }
     }
 
     /// The square rules of the tower ring: block `b`'s variables are
@@ -274,13 +300,11 @@ fn s3(x1: &Pol, x2: &Pol, x3: &Pol, curve: &PrimeCurve) -> Pol {
 
 // ── The base ───────────────────────────────────────────────────────
 
-/// `prime-tower`: the points above a Kummer tower's abscissae.
+/// `prime-tower:t,seed`: the first round's name for the Kummer base. It is
+/// `main`'s `prime-kummer` with the coset representative `g` drawn from
+/// `seed`, so the points are the same and only one builder exists.
 pub struct PrimeTowerBase<'i> {
     instance: &'i PrimeInstance,
-}
-
-fn tower_params(params: &Params) -> Result<(u32, u64), String> {
-    Ok((params.u64("t")? as u32, params.u64_or("seed", 1)?))
 }
 
 impl FactorBaseBuilder<PrimeCurve> for PrimeTowerBase<'_> {
@@ -290,69 +314,29 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeTowerBase<'_> {
 
     fn describe(&self, params: &Params) -> String {
         format!(
-            "points above a Kummer tower V = g·μ_(2^t), t = {}, seed {}; negation fold",
-            params.get("t").unwrap_or("?"),
-            params.get("seed").unwrap_or("1")
+            "prime-kummer with g drawn from seed {} (t = {})",
+            params.get("seed").unwrap_or("1"),
+            params.get("t").unwrap_or("?")
         )
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
         &[
             ("t", "tower height: |V| = 2^t abscissae, needs 2^t | p − 1"),
-            ("seed", "draws ζ and the coset representative g (default 1)"),
+            ("seed", "draws the coset representative g (default 1)"),
         ]
     }
 
     fn build(
         &self,
-        _ctx: &InstanceCtx<PrimeCurve>,
+        ctx: &InstanceCtx<PrimeCurve>,
         params: &Params,
-        _ops: &mut GroupOps,
+        ops: &mut GroupOps,
     ) -> Result<FactorBase<PrimePoint>, String> {
-        let start = Instant::now();
-        let (t, seed) = tower_params(params)?;
-        let curve = &self.instance.curve;
-        let r = self.instance.r;
-        let tower = Kummer::new(curve.p, t, seed)?;
-        let mut xs: Vec<u64> = tower.v.clone();
-        xs.sort_unstable();
-        let (mut points, mut col_of, mut coef_of) = (Vec::new(), Vec::new(), Vec::new());
-        let mut columns = 0usize;
-        let mut sqrts = 0u64;
-        for &x in &xs {
-            let rhs = curve.rhs(x);
-            if curve.legendre(rhs) < 0 {
-                continue;
-            }
-            sqrts += 1;
-            let Some(y) = curve.sqrt(rhs) else { continue };
-            let y = y.min(curve.p - y);
-            let pt = PrimePoint::affine(x, y);
-            points.push(pt);
-            col_of.push(columns);
-            coef_of.push(1);
-            if y != 0 {
-                points.push(curve.neg(pt));
-                col_of.push(columns);
-                coef_of.push(r - 1);
-            }
-            columns += 1;
-        }
-        let mut fb = FactorBase::from_column_map(
-            format!("Kummer tower t = {t}, seed {seed}: {columns} abscissae of 2^{t}"),
-            points,
-            col_of,
-            coef_of,
-            columns,
-            |p| curve.key(p),
-            |p| curve.key(&curve.neg(*p)),
-            |p| p.x,
-        )?;
-        fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
-        fb.cost.count("abscissae_scanned", xs.len() as u64);
-        fb.cost.count("legendre_symbols", xs.len() as u64);
-        fb.cost.count("sqrt_solves", sqrts);
-        Ok(fb)
+        let t = params.u64("t")? as u32;
+        let g = Kummer::new(self.instance.curve.p, t, params.u64_or("seed", 1)?)?.g;
+        let (_, kp) = Params::parse_spec(&format!("prime-kummer:t={t},g={g}"))?;
+        PrimeKummerBase { instance: self.instance }.build(ctx, &kp, ops)
     }
 }
 
@@ -680,7 +664,8 @@ impl DecompositionOracle<PrimeCurve> for PkmTowerOracle<'_> {
     fn parameters(&self) -> &[(&str, &str)] {
         &[
             ("t", "tower height, as the base's"),
-            ("seed", "tower seed, as the base's (default 1)"),
+            ("g", "the coset representative, as prime-kummer's; or"),
+            ("seed", "the seed of a prime-tower base (default 1)"),
             ("engine", "f4, sig-f5, f6 or enum (default f4)"),
             ("degree", "tower engines' degree cap (default 20)"),
             ("cap", "f6: close a node with at most this many candidates (default 4)"),
@@ -710,15 +695,15 @@ impl DecompositionOracle<PrimeCurve> for PkmTowerOracle<'_> {
         }
         let ms = params.u64_or("budget_ms", 0)?;
         self.budget = (ms > 0).then(|| Duration::from_millis(ms));
-        let (t, seed) = tower_params(params)?;
         let p = self.curve().p;
-        let tower = Kummer::new(p, t, seed)?;
+        let tower = Kummer::from_params(p, params)?;
+        let t = tower.t;
         // The base must be this tower's: every abscissa of it in V.
         let mut v = tower.v.clone();
         v.sort_unstable();
         if let Some(x) = fb.abscissa_list.iter().find(|x| v.binary_search(x).is_err()) {
             return Err(format!(
-                "base abscissa {x} is not in the oracle's tower (t = {t}, seed {seed}): use prime-tower with the same t and seed"
+                "base abscissa {x} is not in the oracle's tower (t = {t}, g = {}): pass the base's t and g (prime-kummer) or seed (prime-tower)", tower.g
             ));
         }
         let ring = tower.ring(p);
