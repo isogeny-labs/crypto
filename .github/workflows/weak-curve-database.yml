@@ -286,6 +286,46 @@ jobs:
         run: |
           python3 -B research/p192_extension_cover_20261012/verify_residual_pivot002_cross.py
           python3 -B research/p192_extension_cover_20261012/verify_three_pivot_union.py
+  p192-cross-pivot-lean-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: research/p192_extension_cover_20261012/lean
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build cross-pivot and grid theorems
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: research/p192_extension_cover_20261012/lean
+          auto-config: false
+          use-mathlib-cache: true
+          build: true
+          build-args: 'AdditiveGrid CrossPivotRectangles FullFanCycleArithmetic'
+          test: false
+          lint: false
+          leanchecker: true
+          leanchecker-args: '--fresh --verbose CrossPivotRectangles'
+      - name: Fresh-check remaining modules and audit axioms
+        run: |
+          lake env leanchecker --fresh --verbose AdditiveGrid
+          lake env leanchecker --fresh --verbose FullFanCycleArithmetic
+          lake env lean AdditiveGrid.lean
+          lake env lean CrossPivotRectangles.lean
+          lake env lean FullFanCycleArithmetic.lean
+  p192-cross-pivot-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replay complete-fan rank, reduced rectangles, and grid support
+        run: |
+          python3 -B research/p192_extension_cover_20261012/line_full_cross_pivot_cycle_rank.py
+          python3 -B research/p192_extension_cover_20261012/verify_full_cross_pivot_cycle_rank.py
+          python3 -B research/p192_extension_cover_20261012/line_cross_pivot_rectangles.py
+          python3 -B research/p192_extension_cover_20261012/analyze_additive_grid_rank.py
+          python3 -B research/p192_extension_cover_20261012/verify_additive_grid.py
+          python3 -B research/p192_extension_cover_20261012/verify_full_rectangle_query_law.py
           python3 -B research/p192_extension_cover_20261012/verify_pivot002_reduced_receipt.py
           python3 -B research/p192_extension_cover_20261012/verify_three_pivot_guided_coverage.py
           sha256sum -c research/p192_extension_cover_20261012/reports/run-20261017T2055Z/ARTIFACTS.sha256
