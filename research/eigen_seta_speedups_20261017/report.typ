@@ -21,4 +21,4 @@ Callgrind, all threads, identical inputs written by the main build: secret-phase
 Hand-written asm field multiply (needs `unsafe`; no faster than a native build). Half-length chains on a smaller prime: feasibility unproven, speed-up 1×–2.6×, torsion margin over log#sub[2] (d·f) would fall from about 540 to about 6 bits (ITEM7_HALF_CHAINS.md).
 
 = Distance to practicality
-L1 decapsulation is 0.95–1.07 s; a practical PKE needs tens of milliseconds. Next: the theta chain step (618–670 F#sub[p²] multiplications measured vs about 256 modelled), native builds, an AVX-512 IFMA multiplier in safe Rust, Karatsuba and lazy reduction.
+L1 decapsulation is 0.95–1.07 s; a practical PKE needs tens of milliseconds. Next: the theta chain step (wall-time 618–670 F#sub[p²] mult.-equivalents; exact counts later showed 188.9 per theta step, already at formula cost: aburan28/eigenx\#7), native builds, an AVX-512 IFMA multiplier in safe Rust, Karatsuba and lazy reduction.

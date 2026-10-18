@@ -323,9 +323,9 @@ here.
 
 \subsection{What would close the gap}
 Two half-chains would bring the prime to about $d^3$, roughly 800 bits at L1
-(\S\ref{sec:open}). The chain step currently costs 2--3 times the cost
-model's constant, and field arithmetic is portable Rust; both can be
-improved. Our estimate for all of this together is about one order of
+(\S\ref{sec:open}). Field arithmetic was portable Rust and can be improved (it since has
+been: aburan28/eigenx\#6). The theta step itself is already at the cost of
+its formulas, so the chain gains little from step-level work. Our estimate for all of this together is about one order of
 magnitude. That would put Eigen-S\'eta level with POKÉ and PIKE, and still
 three to four orders of magnitude behind ML-KEM and the code-based KEMs at
 decapsulation.
@@ -344,28 +344,40 @@ oracle queries, and quantum gates under NIST's MAXDEPTH. The gate count uses
 the parallel-Grover accounting: a search over $2^n$ items with an oracle of
 $2^g$ gates and depth $2^{g-4}$ costs $2^{n/2+g}$ gates if serial Grover fits
 the depth limit, and $2^{n+(g-4)+g-\mathrm{MAXDEPTH}}$ otherwise. The model
-favours the attacker: it ignores memory, uses $p^{1/3}$ for path finding,
-and charges $2^8$ $\F_{p^2}$ multiplications of Karatsuba cost per
-$(2,2)$-step.
+favours the attacker in that it ignores memory and uses $p^{1/3}$ for path
+finding. The tables in this section charge $2^8$ $\F_{p^2}$ multiplications
+of Karatsuba cost per $(2,2)$-step, which the next paragraph corrects to
+$2^{7.5}$.
 
-\paragraph{What we measured.} One input of the model can be checked. That
-is the cost of an isogeny-chain step, which is the Grover oracle's inner
-loop. The benchmark times the attacker's public-key degree test, a theta
-chain of $e$ steps, and divides by $e$ and by the $\F_{p^2}$ multiplication
-time of the same binary. The result is \StepMults\ multiplication-equivalents
-per step in this implementation (Table~\ref{tab:chain}), against the
-model's $2^8=256$. Two things follow. The model's oracle is cheaper than the
-best implementation we have, by a factor of about \StepFactor, so it errs on
-the attacker's side. And no tier depends on that constant: changing it by a
-few bits moves gate counts by the same few bits, and the margins are larger
-than that except where noted.
+\paragraph{What we measured, and a correction.} One input of the model can
+be checked: the cost of an isogeny-chain step, the Grover oracle's inner
+loop. Table~\ref{tab:chain} times the attacker's public-key degree test and
+divides by its length $e$ and by the $\F_{p^2}$ multiplication time, giving
+\StepMults\ ``multiplication-equivalents'' per step. That figure is not a
+step cost. It includes the work before the chain (about half of the test,
+mostly ladders) and every field addition. An earlier version of this
+section read it as showing that the model's $2^8$ errs on the attacker's
+side. That reading was wrong.
+
+Exact operation counts settle it (\art{eigenx:examples/chain_opcount.rs},
+feature \texttt{opcount}; aburan28/eigenx\#7). A theta $(2,2)$-step of the
+same test costs 566.6 $\F_p$ products, which is 188.9 $\F_{p^2}$
+multiplications, or $2^{7.56}$. The model's $2^8$ therefore overcharged the
+attacker. eigenx\#7 lowers the constant to $2^{7.5}$, the measured cost
+rounded down. That lowers every quantum-gate column of the mask-guess and
+degree-search rows by 1.0 bit at MAXDEPTH $2^{40}$ and $2^{64}$, and by
+0.5 bit at $2^{96}$. The classical and quantum-query floors are unchanged.
+Table~\ref{tab:attacks} and Fig.~\ref{fig:margins} still show the $2^8$
+model; with the correction the L1 gate floor is $2^{150.2}/2^{126.2}/2^{97.1}$
+against AES-128's $2^{130}/2^{106}/2^{74}$. Tier~A still holds for L1, L3
+and L5, with margins of about 20 bits.
 
 \begin{table}[h]
 \centering
 \caption{Measured cost of the attacker's chain step: one public-key degree
 test of length $e$ for the true $f$ of each key (accepted in every case).
 ``Mult.-equiv.'' is wall time per step divided by $\F_{p^2}$ multiplication
-time. Median over keys. Run \texttt{\BenchRunId}.}
+time; it includes setup and additions, so it is not a step cost (see text). Median over keys. Run \texttt{\BenchRunId}.}
 \label{tab:chain}
 \begin{tabular}{lrrrr}
 \toprule
@@ -559,9 +571,10 @@ Ranked by how much would fall if each went wrong.
   observed $\delta=0$ in every run but have no proof for the fixed chain
   schedule.
 \item \emph{The Grover-oracle constant.} The gate-count tier rests on an
-  oracle cost model. It is conservative by our own measurement
-  (\S\ref{sec:security}), but has had no external review. Tier~B does not
-  depend on it.
+  oracle cost model. Its chain-step constant now matches our exact count,
+  rounded down (\S\ref{sec:security}); it was $2^8$, which overcharged the
+  attacker by 0.5--1.0 bit in gates. It has had no external review. Tier~B
+  does not depend on it.
 \item \emph{Implementation.} Constant-time behaviour has not been
   re-verified on the theta build. Key generation is variable time. There is
   no second implementation and no independent check of the known-answer

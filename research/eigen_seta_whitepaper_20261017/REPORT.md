@@ -35,9 +35,13 @@ the other post-quantum KEMs?
   * On one core, decaps is 1.6–1.7 times slower.
 * **Sizes (exact).** pk = ct = 1344 / 1992 / 2632 / 3904 / 5192 bytes;
   sk = 1855–7050 bytes; shared secret 32 bytes.
-* **Chain-step cost.** 618–670 F_p² multiplication-equivalents per
-  (2,2)-step at every set, against the cost model's 256. The model is
-  conservative by about 2.4–2.6 times (about 1.3 bits).
+* **Chain-step cost (corrected 2026-10-18).** 618–670 F_p²
+  multiplication-equivalents per (2,2)-step by wall time. That figure
+  includes the setup before the chain and all additions, so it is not a
+  step cost. Exact counts (aburan28/eigenx#7) give 566.6 F_p products, i.e.
+  188.9 F_p² multiplications (2^7.56), per theta step. The model's 256 was
+  therefore *not* conservative: it overcharged the attacker by 0.5–1.0 bit
+  in the gate columns, and eigenx#7 lowers it to 2^7.5.
 * **Against ML-KEM on the same host,** Eigen-Séta decapsulates about 89,000
   times slower at L1, rising to about 3.5 million times at Q5.
 * **Against BIKE, FrodoKEM and Classic McEliece,** it decapsulates

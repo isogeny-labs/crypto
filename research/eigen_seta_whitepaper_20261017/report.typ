@@ -12,7 +12,7 @@ Evidence for `crypto:papers/eigen-seta-whitepaper/`. Measured on a shared 4-vCPU
   [Q3], [14 min (4 jobs)], [5.9 s], [37 s], [3904 B], [5311 B],
   [Q5], [33 min (4 jobs, 1 key)], [13.7 s], [89 s], [5192 B], [7050 B],
 )
-Run run-20261017T2022Z-kem-bench, eigenx `d89d790`; every result checked. The attacker's chain step costs 618–670 F#sub[p²] multiplications per step, against the cost model's 256.
+Run run-20261017T2022Z-kem-bench, eigenx `d89d790`; every result checked. The attacker's chain test costs 618–670 F#sub[p²] multiplication-equivalents per step by wall time, which includes setup and additions; exact counts give 188.9 F#sub[p²] multiplications per theta step (aburan28/eigenx\#7), below the model's 256, which therefore overcharged the attacker (corrected to 2#super[7.5]).
 
 #figure(image("figures/perf.svg", width: 90%), caption: [Every sample, log scale; measured.])
 

@@ -18,4 +18,4 @@ dudect on L1 decapsulation, 1,000 samples per class: IFMA max |t| 0.87, portable
 #figure(image("figures/dudect.svg", width: 75%), caption: [Welch t per crop; measured.])
 
 = Distance to practicality
-L1 decapsulation 0.635 s; a practical PKE needs tens of milliseconds. Next: the theta chain step (618–670 F#sub[p²] mults measured vs about 256 modelled), F#sub[p] add/sub (about 16%), the public 3#super[F3] basis (about 9%), multi-core chains.
+L1 decapsulation 0.635 s; a practical PKE needs tens of milliseconds. Next: the work around the theta chain (the step itself is at formula cost, aburan28/eigenx\#7), F#sub[p] add/sub (about 16%), the public 3#super[F3] basis (about 9%), multi-core chains.

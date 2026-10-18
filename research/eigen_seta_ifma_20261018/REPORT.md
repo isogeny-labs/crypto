@@ -92,8 +92,10 @@ L1 decapsulation is 0.635 s on this host (main at d89d790: 1.20 s). A
 practical PKE needs tens of milliseconds. Remaining levers that change
 nothing about security:
 
-- the theta chain step, measured at 618–670 F_p² multiplications per step
-  against about 256 in the cost model;
+- the work around the theta chain: exact counts (aburan28/eigenx#7) show the
+  theta step itself at formula cost (188.9 F_p² multiplications), with
+  `sign_pattern` (16.5%), re-encryption (9.8%), splitting and elliptic
+  doublings (15%) around it;
 - F_p add/sub, about 16% after this PR;
 - the public canonical 3^F3 basis of E_C, about 9%;
 - multi-core chain evaluation.

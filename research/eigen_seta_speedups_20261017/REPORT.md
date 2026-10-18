@@ -96,7 +96,9 @@ L1 decapsulation is now 0.95–1.07 s depending on the build. A practical PKE
 needs tens of milliseconds at most. Next levers, none of which changes
 security:
 
-1. **The theta chain step.** The attacker-side step measured 618–670 F_p²
+1. **The theta chain step.** (Later measured exactly, aburan28/eigenx#7: the
+   theta step is already at formula cost, 188.9 F_p² multiplications; the
+   618–670 below was wall time including setup and additions.) The attacker-side step measured 618–670 F_p²
    multiplications, against about 256 in the cost model.
 2. **Shipping native builds.** Measured here at 1.29–1.72× over the default
    build.
