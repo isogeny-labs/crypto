@@ -445,7 +445,11 @@ fn run_prime(fam: Family, m: usize, p: u64, t0: u32, seed: u64) -> Vec<Row> {
             fp.push(c.neg(q));
             q = c.add(q, g);
         }
-        for (arm, f, vsize) in [(fam.name(), &fv, v.len()), ("null", &fn_, vx.len()), ("positive", &fp, v.len())] {
+        for (arm, f, vsize) in [
+            (fam.name(), &fv, v.len()),
+            ("null", &fn_, vx.len()),
+            ("positive", &fp, v.len()),
+        ] {
             let (distinct, total) = coverage(&c, f, m);
             let heuristic = (vsize as f64).powi(m as i32) / (mfact * r as f64);
             let lambda = total as f64 / r as f64;
@@ -475,8 +479,14 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     let out = Path::new(args.get(1).expect("usage: pkm_coverage <out-dir>"));
     std::fs::create_dir_all(out).unwrap();
-    let threads: usize = std::env::var("PKM_THREADS").ok().and_then(|s| s.parse().ok()).unwrap_or(4);
-    let scale: f64 = std::env::var("PKM_SCALE").ok().and_then(|s| s.parse().ok()).unwrap_or(1.0);
+    let threads: usize = std::env::var("PKM_THREADS")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(4);
+    let scale: f64 = std::env::var("PKM_SCALE")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(1.0);
     let mut log = File::create(out.join("tool_log.txt")).unwrap();
     let t0 = Instant::now();
     let mut rng = 0x5eed_0f_9a11_c0de_u64;
@@ -507,7 +517,11 @@ fn main() {
     rows.sort_by_key(|(i, _)| *i);
     let rows: Vec<Row> = rows.into_iter().flat_map(|(_, r)| r).collect();
     let mut f = File::create(out.join("pkm_coverage.csv")).unwrap();
-    writeln!(f, "family,m,p,r,log2r,t,t_offset,arm,V,F,heuristic,lambda,poisson,distinct,multisets,pi").unwrap();
+    writeln!(
+        f,
+        "family,m,p,r,log2r,t,t_offset,arm,V,F,heuristic,lambda,poisson,distinct,multisets,pi"
+    )
+    .unwrap();
     for r in &rows {
         writeln!(
             f,
@@ -537,7 +551,9 @@ fn main() {
     type Cell = (Option<(f64, f64)>, Option<(f64, f64)>, Option<(f64, f64)>);
     let mut idx: BTreeMap<(Family, usize, u64, i32), Cell> = BTreeMap::new();
     for r in &rows {
-        let e = idx.entry((r.family, r.m, r.p, r.t_offset)).or_insert((None, None, None));
+        let e = idx
+            .entry((r.family, r.m, r.p, r.t_offset))
+            .or_insert((None, None, None));
         let v = Some((r.pi, r.pi - r.poisson));
         match r.arm {
             "null" => e.1 = v,
@@ -548,7 +564,9 @@ fn main() {
     let mut sum: BTreeMap<(Family, usize, i32), Vec<[f64; 6]>> = BTreeMap::new();
     for ((fam, m, _p, off), (a, n, pos)) in idx {
         if let (Some(a), Some(n), Some(pos)) = (a, n, pos) {
-            sum.entry((fam, m, off)).or_default().push([a.0, n.0, pos.0, a.1, n.1, pos.1]);
+            sum.entry((fam, m, off))
+                .or_default()
+                .push([a.0, n.0, pos.0, a.1, n.1, pos.1]);
         }
     }
     let mut checks = String::new();
@@ -562,7 +580,8 @@ fn main() {
         let k = v.len() as f64;
         let mean = |i: usize| v.iter().map(|x| x[i]).sum::<f64>() / k;
         let md = v.iter().map(|x| x[3] - x[4]).sum::<f64>() / k;
-        let sd = (v.iter().map(|x| (x[3] - x[4] - md).powi(2)).sum::<f64>() / (k - 1.0).max(1.0)).sqrt();
+        let sd =
+            (v.iter().map(|x| (x[3] - x[4] - md).powi(2)).sum::<f64>() / (k - 1.0).max(1.0)).sqrt();
         let z = if sd > 0.0 { md / (sd / k.sqrt()) } else { 0.0 };
         writeln!(
             sf,
