@@ -1,0 +1,19 @@
+digraph sweep {
+  graph [rankdir=TB, bgcolor="white", pad="0.3", nodesep="0.35", ranksep="0.45", label="Native factor-base sweep: measured probes, explicit limits", labelloc=t, fontsize=18, fontname="DejaVu Sans"];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3fb", color="#41658b", fontname="DejaVu Sans", fontsize=11, margin="0.16,0.12"];
+  edge [color="#41658b", fontname="DejaVu Sans", fontsize=10];
+  plan [label="Versioned plan + executable SHA256\ncurves / shapes / seeds / train + holdout / budgets"];
+  supervisor [label="Supervisor: one CLI launch\nexclusive run lock / deadline / heartbeat / checkpoints"];
+  base [label="Native worker: shape + curve constructors\nexact ordered inventory / FB1 / signed lookup / order root"];
+  solver [label="Positive control, then matched public probes\nS3 + exact membership / degree-bounded F4\noriginal-equation and actual point-witness checks"];
+  training [label="Training only\nverified rows / projected prime-modulus rank"];
+  holdout [label="Holdout kept separate\nverified yield / refutations / exhaustion"];
+  telemetry [label="Flushed human lines + durable JSONL\nF4 matrices / verified and independent rates\nrolling rate / provisional ETA / matched rate ratios", fillcolor="#e9f4ee", color="#347a54"];
+  storage [label="Immutable numbered attempts\nrecipes + systems + results + SHA256 manifests\nresume verifies hashes; verify reconstructs + replays"];
+  limits [label="No certified regularity / no total-cost winner\nNo end-to-end or wide-curve speed claim\nFunctional fixtures are not a research campaign", fillcolor="#fff3dc", color="#9b6c16"];
+  plan -> supervisor -> base -> solver;
+  solver -> training; solver -> holdout;
+  training -> telemetry; holdout -> telemetry;
+  telemetry -> storage -> limits;
+  supervisor -> telemetry [style=dashed, label="live activity"];
+}

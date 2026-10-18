@@ -1,5 +1,9 @@
 # One-command native factor-base sweeper
 
+See the [validation receipt](VALIDATION.md) and [four-page report](report.pdf)
+for tested scope and current upstream integration blockers. Native validation
+uses Rust 1.98.0.
+
 Build once, then launch a bounded search with live CADO-style stderr lines:
 
 ```sh
