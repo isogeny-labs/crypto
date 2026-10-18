@@ -326,3 +326,93 @@ for arm b at cell 4) and the cell is recorded BLOCKED with the exact reason. A
 card whose instrument rows show `skipped-timebudget` leaves those targets
 unmeasured (BLOCKED(time)); they are not retried. Card 20 is relayed last in
 every case.
+
+## Deviation 10 (repair pass, 2026-10-18): the draw-search cap of `Draw::new`
+
+Found by the first run. Card 02 stopped at command 6 (`aa-cell4`, cell
+(15,3,4), `--draw 1`): `Draw::new` panicked "no factor base with enough
+rational elements" (stack: `Draw::new`, `mode_cell`, `main`), so the A/A
+control had 3 measured cells instead of 5 and the frozen rule returned
+INCONCLUSIVE.
+
+Cause (reproduced in a scratch build with a debug print, not committed): the
+search for a factor base tried at most 2000 seeded bases per draw. For `l = 3,
+m = 4` a basis passes only if at least 5 of its 7 non-zero elements carry
+rational points in all three frames; the W frame leaves a minority of the
+values with points (the debug print shows 1 to 3 of 7 for the bases that pass
+the X and U frames), so the first passing basis can lie beyond attempt 2000.
+Observed first passing attempt on cell (15,3,4): draw 0 at 192, draw 1 at 2050,
+draw 2 at 3102. It is a defect of the cap, not of the arithmetic, the arms or
+the measured quantity.
+
+Fix (one file, +6 -1 lines, `examples/blindspots_04_presentation_search.rs`):
+
+```text
+-        for attempt in 0..2000u64 {
++        for attempt in 0..2_000_000u64 {
+```
+
+plus an explanatory comment. The attempts are a fixed seeded sequence and the
+first passing basis is returned, so **every draw that passed under the old cap
+returns the identical basis and the identical rows**: the bug could not affect
+any number of the first run, and no completed card is re-run on its account.
+Checked in `smoke/smoke_r2.log` (part 2: draw 0 on all five cells and draw 1 on
+cells 1 to 3 equal the first run's bases from `raw/card-01-*.log` and
+`raw/card-02-aa-cell[123].log`; deterministic `D` of arm a also equal). The fix
+is committed with its smoke test (`smoke/smoke_r2.sh`, output
+`smoke/smoke_r2.log`: one invocation on every cell at the smallest draw count
+for every arm and control the revision cards use, and the regression on the
+failing draw). The instrument sha256 changes, so the revision cards bind the
+new hash; the first run's cards stay bound to the old one.
+
+## Amendment 2 (repair pass, 2026-10-18): revision cards for the cards that did not complete
+
+Question, arms, cells, metric, controls and decision rule are untouched.
+
+First-run status of the 20 cards (from `raw/receipt-card-*.json` and the
+cards' outputs):
+
+| status | cards |
+|---|---|
+| completed (receipt `status: completed`) | 01, 03, 05, 08, 09, 10, 11, 13, 14, 15, 17, 18, 20 |
+| failed | 02 (stopped at command 6, exit 101: the panic above; commands 7 to 16 not run, `aa-cell4.jsonl` is empty, `aa-cell5` never ran) |
+| refused | none |
+| never ran to a receipt (killed by the executor's shell timeout; the executor reported "task killed before completion") | 04 (only `e-cell3-second` left rows, 4 rows for targets 4 to 7; `e-cell4-first`, cell 4 random 0 to 3, never ran), 06, 07, 12, 16, 19 (no output at all) |
+
+Revision cards `card-NN-r2.yaml`, `card_id` suffix `-r2`, outputs under
+`raw/card-NN-r2-*`, receipts `raw/receipt-card-NN-r2.json`; no first-run output
+or receipt is overwritten. Arguments are the first run's, except where noted:
+
+| card | content | first-run card | expected wall |
+|---|---|---|---|
+| 02-r2 | A/A control (arm a, draw 1) at cells 1 to 5 (all five, on the fixed instrument), then the linear and nonlinear recodings of arm a at cells 1 to 4; command timeouts raised from 30 to 60 s, instrument limits unchanged | 02 | 1 min |
+| 04-r2 | arm e: cell 3 random 4 to 7, cell 4 random 0 to 3 | 04 | 3 min |
+| 06-r2 | arm e: cell 5, one random target (limit 380 s) | 06 | at most 6.5 min |
+| 07-r2 | arm b: cell 1 random 0 to 3, cell 1 planted 0 and 1 (planted limit raised from 90 to 140 s: a planted target takes 44 to 57 s on this host, so 90 s could skip the second) | 07 (split) | 4.5 min |
+| 07b-r2 | arm b: cell 1 random 4 to 7 | 07 (split) | 3.5 min |
+| 12-r2 | arm b: cell 4 random target 0, cell 4 planted 0 and 1 (degree cap 2) | 12 | 4.5 min, at most 6.4 |
+| 16-r2 | arm b: cell 4 random target 4 | 16 | 4.2 min |
+| 19-r2 | arm b: cell 4 random target 7 | 19 | 4.2 min |
+
+Card 07 is split in two (07-r2, 07b-r2) because the first card ran 8 random
+targets at about 40 s each against a 300 s limit and a 90 s planted run, which
+the shell timeout killed and which could not finish inside 8 minutes with
+margin. The targets, the degree caps and the per-target limits (`--job-time`)
+are the frozen ones; only whole-invocation limits and command timeouts moved,
+and they bound cost, not the measured value. The cards touch no other card's
+output, read no file from an earlier card and run only the binary they build.
+
+The operational stop rule of Amendment 1 stays: if 12-r2's target ends on
+`timelimit` or `memcap`, 16-r2 and 19-r2 are not relayed and the cell is
+recorded BLOCKED with the exact reason; likewise 06-r2 ending on `timelimit` or
+`memcap` is the BLOCKED record of arm e at cell 5, not a reason to retry.
+Run order: 02-r2, 04-r2, 07-r2, 07b-r2, 12-r2, 16-r2, 19-r2, 06-r2 (the long
+single-target cards last); any two may run at once, none depends on another.
+
+Not repaired here: card 20 (completed) wrote `raw/summary.txt` and
+`summary.tsv` from the first run's rows. After the revision cards the assess
+stage regenerates the summary with `b04 summarize` into new files. The
+summariser takes the first match in file-name order, so where a first-run row
+and a revision row cover the same (cell, arm, draw, target) the first-run row
+is read: for arm a, e and b these rows are deterministic in `D` and identical;
+the assess stage names the files it passes if it needs the revision rows only.

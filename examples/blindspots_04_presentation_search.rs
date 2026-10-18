@@ -1353,7 +1353,12 @@ impl Draw {
     fn new(cell: &Cell, draw: u64) -> Draw {
         let cv = &cell.cv;
         let g = &cv.gf;
-        for attempt in 0..2000u64 {
+        // Attempt cap: 2_000_000 (the first run capped it at 2000, which draw 1
+        // of cell (15,3,4) needs 2051 attempts to pass; see PROTOCOL.md,
+        // Deviation 10).  The attempts are a fixed seeded sequence and the first
+        // basis that passes is returned, so every draw that already passed
+        // under the old cap returns the identical basis.
+        for attempt in 0..2_000_000u64 {
             let basis = cell.basis(draw, attempt);
             let span = span_of(&basis);
             let pts_of_x = |x: u64| -> Vec<Pt> {
