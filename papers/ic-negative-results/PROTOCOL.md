@@ -125,3 +125,71 @@ Address-space cap for any run: `prlimit --as=4294967296`.
    time of writing; the paper lists it as pending and cites no number from it.
    The older `research/cyclotomic_falsifier_20261015/` result carries the
    yield-neutral statement.
+
+---
+
+# Addendum B (2026-10-18, second pass; written before the paper text is touched)
+
+The first pass delivered the paper while campaign items 15 and 17 had run cards
+but no verdict, and while item 10's README was a stage-1 assessment. By the
+second pass the campaign directory holds READMEs with verdicts for items 01
+to 17 (item 18 and item 20 are other lanes' and have none). The director's
+task for this pass: "include the campaign results that exist on disk under
+`research/blindspots_20261018/` where they bear on the stated negative
+results". This addendum only widens what is cited; it changes no label, no
+decision rule and no frozen statement (S1 to S6 keep the tiers in the table
+above).
+
+## Which campaign results bear on which statement (decided here, before the edit)
+
+A campaign item bears on a statement only if its own README names the object of
+that statement: the compact-orbit Koblitz decomposition oracle and its distance
+to rho (S1), the base-geometry or yield claim (S3), or the closure degree
+`D` of the Semaev-type descent system at the cells Assumption 1 speaks of (S6).
+S2, S4 and S5 are proofs and exact finite arithmetic; no campaign item can bear
+on them.
+
+| item | on disk (verdict line, quoted by the paper) | bears on | reason |
+|:--|:--|:--|:--|
+| 01 | REGRESSES (constant), INCONCLUSIVE (exponent) | S1 context | distance to matched rho |
+| 02 | ADVANCES (derived, model level), conditional | S6 | constant-degree hypothesis |
+| 04 | ADVANCES (primitive, stage diagnostic) | S6 context | closure degree `D` of the incumbent presentation, arm e `D = 4` |
+| 05 | ADVANCES (constant, `wdeg`); `D_mat` never below 4 | S6 context | closure degree of grevlex is 4 on the four countable cells |
+| 07 | BLOCKED at (15,5,4) | S6 | the deciding cell |
+| 10 | INCONCLUSIVE; the conservation check has not run (README now at stage 2, all seven searches complete) | S3 | planned yield check not run |
+| 14 | REGRESSES (primitive) | S1 context | first measured `m = 4` cells |
+| 17 | TRADES (constant); solving-degree leg BLOCKED | S1 context, S3 context | cyclotomic base cost at `n = 83`; base-dependent part of `S_ready` is small next to the pair table |
+
+Items 03, 06, 08, 09, 11, 12, 13, 15 and 16 concern solver, learned-policy,
+model or rho-walk engineering (genus-3 linear algebra for 15, the negation
+walk for 13, an equivariant oracle at toy sizes for 16) and name none of the
+objects above, so the paper lists them as not bearing and cites no number from
+them. Item 17 measures cost, not yield, so it is cited as S3 context only and
+does not upgrade S3.
+
+## Rules for the edit
+
+1. A campaign row quotes the item's own verdict, level and caveat, with the
+   README's sha256 in the evidence ledger; the paper adds no reading.
+2. If a README is later edited, the ledger digest for the version read here
+   stays the citation (item 10's README changed after the first pass and is
+   re-hashed).
+3. No label of S1 to S6 changes. A campaign result that is a regression or an
+   open block is reported as such; none is promoted.
+
+## Lean (re-checked for this pass, no card)
+
+`lean`, `lake` and `elan` are not installed, and the host has 1.5 GB free
+(`df`), below what the pinned toolchain plus a Mathlib build needs. A Lean build
+card therefore cannot be written for this host; the modules stay "written, not
+yet kernel-checked" and the CI proof gate (`tools/lean/proof-gate.sh`,
+`.github/workflows/lean-proof-gate.yml`) is the first kernel check.
+
+## Smoke test, budget and cards
+
+The native instrument `examples/blindspots_19_checks.rs` is unchanged. This pass
+recompiles it and re-runs `all` once under `prlimit --as=4294967296`; the
+positive control (X, X+1: `d_F = d'_F = 1`) must pass and the output must match
+`evidence/checks.txt` line for line. Measured budget: 0 cards, 0 CPU-hours.
+Deviation 8: LaTeX is installed again for the rebuild and purged afterwards.
+Deviation 5 (no Conductor) still holds: `conductor` is not installed.
