@@ -35,9 +35,16 @@ the run.
     closure, a chance of about 0.4%, and so reads 2.
 
   That is noise in the control, not structure in `T2`.
-- **What closes.** Removing every subfield-contained `V` (`frob2`) removes all six of
+- **What closes.** Removing every subfield-contained `V` (`frob2`) removes all five of
   round 1's −1 cells. Every `frob2` gap is 0, so round 1's post-hoc reading (subfield
   leakage) holds.
+- **Correction (2026-10-18).** This file first said "six" −1 cells, copying round 1's
+  miscount. Round 1's readout has **five** `frob` cells at −1. Six cells have
+  `V ⊂ GF(2^7)`, and one of them is degenerate (`|T2| = 1`) at gap 0. The audit correction
+  is on `main` (sheriff cases SHF-20261016-3caa6f and SHF-20261017-e4d7f6).
+  [PREREGISTRATION.md](PREREGISTRATION.md) §1 repeats the same miscount. It is not edited,
+  because it is frozen at registration; this note supersedes it. Nothing in this round's
+  rule, cells or verdict depends on the count.
 
 **What this closes.** Subfield-free Frobenius kernels, normal-basis windows and the
 polynomial window up to n = 25 give no low-degree description of `T2`. Neither does `Z` on
