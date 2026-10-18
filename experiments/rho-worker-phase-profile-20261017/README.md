@@ -281,3 +281,13 @@ one out-of-range A/A control and one missing raw stdout each force
 [self-check script](validate_worker_batch_auditor.py) regenerates these
 cases in a temporary directory. Its synthetic times are never performance
 measurements.
+
+The [first hosted Tier 1 attempt](tier1-pod-20261018/README.md) completed
+384 exact-output pairs but failed three frozen A/A controls. A
+[second attempt with Pod process pinning](tier1-pod-20261018-r2/README.md)
+completed another 384 exact-output pairs with one A/A failure. Both
+independent audits retain `unknown_gate_failed` and leave aggregate speedup
+and interval null. The full raw archives and source/binary hashes are retained
+in their respective evidence directories. Process pinning inside this Pod did
+not satisfy the A/A gate, so this panel does not authorize changing the
+default worker batch width.
