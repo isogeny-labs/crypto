@@ -73,6 +73,13 @@ production, natural rank and fully charged cold comparison remain required.
 The versioned S3 destination is
 `s3://crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/v2-size-frontier/`.
 
+The later [K4096 primary result](verification/k4096-primary-20261018/RESULT.md)
+adds a third constructed and hash-verified S3 object to this size frontier.
+Its full generic replay and independent fresh-object sign/Frobenius scan
+passed. Its SAT-model count is source-derived only; natural relation yield,
+rank and a complete cold comparison remain open. K8192 and K16627 are still
+unconstructed in this frontier.
+
 The exporter now has a one-object path for the five added sizes. It accepts
 only the two pinned curve arms, the three public-x policies, the three frozen
 seeds and signed-Frobenius closure. Construction requires a clean committed

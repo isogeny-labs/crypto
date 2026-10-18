@@ -1,5 +1,14 @@
 # Degree-83 factor-base sweep: observed evidence
 
+The [primary K4096 size-frontier candidate](verification/k4096-primary-20261018/RESULT.md)
+is now constructed, generically replayed and stored at a content-addressed
+S3 key. The frozen `a=0` hash-policy object contains 679,936 distinct points
+in 4,096 signed-Frobenius columns. A fresh S3 GET and independent full-row
+sign/Frobenius audit passed; a forged replay receipt was rejected. Its
+source-derived five-summand model would have 131,958 variables and 2,021,197
+clauses, but model construction and natural relation search remain unexecuted.
+No total-runtime factor-base selection follows from object construction.
+
 The [retained primary K2048 high-cap search](verification/k2048-natural-highcap-20261018/RESULT.md)
 used a fresh hash-verified GET of the exact S3 factor base and the frozen
 public `a=0` point. Its single five-summand orbit-phase SAT call reached
@@ -137,16 +146,16 @@ Started 2026-10-08. Public known-answer research. The requested minimum **comple
 | Review repository prior art | Complete source/literature inventory in PRIOR_ART.md, with inspected main revision pinned |
 | Every combination | The 45,360,000 frozen v1 tuples, 11,664,000-case v2 size extension, 461,894,400-case v3 same-stream extension and 26,420,359,680-case v4 cross-stream extension have reproducible ordinals and dispositions: 26,939,278,080 declared cases total. Choices outside these finite grids and most adapter combinations remain unexecuted |
 | Splitting, symmetry, WDSat, Gray, FES, double large primes, Frobenius | Included in the design; all finite tuple dispositions are audited. Signed-Frobenius construction and Gray-prefix policies are executed. Retained N83 SAT construction gates pass for selected K=64/K=256 cells; most backend adapters and complete runtime remain unvalidated |
-| Empirical factor-base panel | 57 constructions complete, containing 45 distinct point sets; exact scan counts, all points and labels retained |
-| Arithmetic replay | PASS: 57 bases, 3,617,306 point-record entries and 21,791 representatives checked with generic multi-limb arithmetic on the same host/repository |
+| Empirical factor-base panel | 58 constructions complete, containing 46 distinct point sets; exact scan counts, all points and labels retained |
+| Arithmetic replay | PASS: 58 bases, 4,297,242 point-record entries and 25,887 representatives checked with generic multi-limb arithmetic on the same host/repository |
 | Relation-stage experiments | 1,728 fixed public two-summand probes on the original 54-object panel, 87,966,720 exact complement lookups, zero relations. A separate structured-orbit five-summand trial reached 10,000 SAT conflicts with zero models or relations and `UNKNOWN_solver_cap`. The K=2,048 v2 object has one ordered and one unrestricted five-summand trial, each capped at 1,000 conflicts with zero models or relations. The matched K=1,182/K=2,048 one-trial searches both reached 5,000 conflicts without a model or relation. A later exact-S3 K2048 one-trial search reached 100,000 conflicts with zero models or relations and `UNKNOWN_solver_cap`. The two retained nested 3+2 mixed-orbit trials, K=1,182 and K=600 inside K=2,048, and the first cross-stream K600 hash/sequential trial each reached 5,000 conflicts with zero models and `UNKNOWN_search_cap`. The cross-stream import found zero shared signed orbits. Useful natural yield remains unknown |
 | Exact support screen | 30 original-panel base-size/arity cases and a later six-cell K=1,182/K=2,048 mixed-orbit screen derived from audited point counts and subgroup order. Every later five/six-summand Markov ceiling is vacuous; no solver or fixed-fixture yield follows |
-| Size frontier extension | Exact v2 design has 57,024,000 addressable tuples, preserving all v1 ordinals and adding K=1,182/2,048/4,096/8,192/16,627; K=1,182 and K=2,048 objects constructed and stored, with no v2 runtime ranking |
+| Size frontier extension | Exact v2 design has 57,024,000 addressable tuples, preserving all v1 ordinals and adding K=1,182/2,048/4,096/8,192/16,627; K=1,182, K=2,048 and K=4,096 objects constructed and stored, with no v2 runtime ranking |
 | Paired frontier extension | Exact v3 design preserves v2 ordinals and appends 461,894,400 same-stream small/envelope cases with zero, one or two residual summands; only eight have a bounded partial worker, and no complete-runtime ranking follows |
 | Cross-stream frontier extension | Exact v4 design preserves every v3 ordinal and appends 26,420,359,680 solver-setting addresses across 169,884 ordered distinct-stream pairs. Only the first K600 hash/sequential pair has a retained exact import and bounded partial call; no complete-runtime ranking follows |
-| Larger-base producer path | The bounded one-object constructor, generic replay and hash-verified S3 publication path passed for primary a=0, hash-policy K=1,182 and K=2,048, seed 2026100801; larger v2 sizes remain unconstructed |
+| Larger-base producer path | The bounded one-object constructor, generic replay and hash-verified S3 publication path passed for primary a=0, hash-policy K=1,182, K=2,048 and K=4,096, seed 2026100801; K=8,192 and K=16,627 remain unconstructed |
 | Structured-orbit candidate | The versioned dimension-12 source closure produced 332,166 points in 2,001 signed-Frobenius columns; its historical set hash, generic source/point/label replay and S3 round-trip passed. The exact phase-aware five-summand SAT model built under the frozen 4 GiB cap: 111,008 variables, 1,120,347 clauses, 4,980 XOR rows and 189,661,184-byte cgroup peak. A separate compact-domain strategy passed degree-7 decomposition, rank and verified-target controls. The N83 archive import passed and one solver trial returned `UNKNOWN_solver_cap`; zero relations and rank 0 under that cap do not resolve natural yield or usable rank |
-| S3 storage | PASS: 57 compressed objects uploaded, downloaded and byte-hash matched; content-addressed receipts retained |
+| S3 storage | PASS: 58 compressed objects uploaded, downloaded and byte-hash matched; content-addressed receipts retained |
 | Primary base to generic solver adapter | PASS: replay-bound K=64 S3 object reconstructed as generic ordinary and signed Frobenius orbits; solver stage unexecuted |
 | Primary cold runner | K=64, m=2 exact-enumeration preflight PASS; one trial returned `UNKNOWN_trial_cap` with zero relations. K=64 m=3 and K=256 m=2 attempts reached `UNKNOWN_budget` caps. All retain null total runtime and winner |
 | Existing four-summand source transfer | Balanced-S5 SAT is admitted only through n=53; the upstream wide compact-orbit n=83 runner uses a different polynomial basis/base schema and u64 rank. The study-local adapter pins the study field. A primary compact probe accepts a replayed base, checks a state/cgroup cap, verifies any witness in the generic group and converts a hit to a full-width signed-orbit row. Frozen primary K64 and K256 retained-base Docker probes each completed their exact index and returned a one-query `MISS` under live-inspected 4-GiB caps; both independent audits passed. Natural rank and a complete cold run remain unmeasured; see `S5_CAPACITY.md` and the K64/K256 results under `verification/` |
