@@ -1,0 +1,582 @@
+{
+  "schema": "lean-retrospective.inventory.v1",
+  "revision": "abee07ee7337d04a7e734333669ca1bacd6c763a",
+  "scope": "Tracked Lean source paths, Lake projects and frozen formal target specs at this revision. Not an extraction of every prose claim, not a build or semantic-fidelity audit, and not a review of earlier Git revisions.",
+  "counts": {
+    "lean_sources_excluding_selftests": 98,
+    "lake_projects": 19,
+    "formal_target_specs": 0,
+    "targets_without_source": 0
+  },
+  "lean_sources": [
+    {
+      "path": "papers/rootfinding-decomposition/lean/AxiomAudit.lean",
+      "blob": "a5769eced944f8fdc0da09a78097d773c63533f1",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "papers/rootfinding-decomposition/lean/S3Roots.lean",
+      "blob": "e15a9737cf13e0d0e6cc3aac1a7a2b508968bab2",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/conductor_gap_cm_orbits_20261015/lean/OrbitControls.lean",
+      "blob": "4a9d6b903b7e8542aeea4bc07922d13e7bc2b50b",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/conductor_gap_cm_pairs_20261010/lean/AxiomAudit.lean",
+      "blob": "72e8c1a9aa3086c10b30c20179adaefd5a5bd643",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/conductor_gap_cm_pairs_20261010/lean/GenericInvariance.lean",
+      "blob": "e7efdabb0b1f403893b28944595a13feec00686d",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/conductor_gap_cm_pairs_20261010/lean/TransferBound.lean",
+      "blob": "b9632b6ba0b1c2868f02b66f08e2abfd2e9fb7e1",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/cover_transfer_assessment_20261013/lean/AxiomAudit.lean",
+      "blob": "3b714e6a1c83f62c481ff309d7ac7a6e6b84a820",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/cover_transfer_assessment_20261013/lean/CoverTransfer.lean",
+      "blob": "9a8e173a0e053324b3db3c78a72444d0a6097342",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/eigen_seta_assessment_20261017/lean/EigenSetaPkTest.lean",
+      "blob": "e168630a2885ecf99c6b4101aba4c0c9f3a48598",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/factor_base_designs_20261015/lean/AxiomAudit.lean",
+      "blob": "4690f24c19382b566de19eff57003913678819fe",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/factor_base_designs_20261015/lean/FactorBaseDesigns.lean",
+      "blob": "a27d5821c8424c18096a8f3d8d229b2af25cd363",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/factor_base_designs_20261015/lean/FactorBaseDesigns/BreakEven.lean",
+      "blob": "4578fc0b60d68cf6fcd505c8361732c2865976d0",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/factor_base_designs_20261015/lean/FactorBaseDesigns/CyclicMul.lean",
+      "blob": "8a9cea5996a09eebec0468ecc965f7e2816d42a5",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/factor_base_designs_20261015/lean/FactorBaseDesigns/Dickson.lean",
+      "blob": "6311df952846a755bdc33df47380d8015d10c0c1",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/factor_base_designs_20261015/lean/FactorBaseDesigns/Encodings.lean",
+      "blob": "f1e9ae1ad6c08852a780b12c65151b191980c23e",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/factor_base_designs_20261015/lean/FactorBaseDesigns/NumberFacts.lean",
+      "blob": "14753d0dad27cbb551a32bf43261c0d262caabce",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/factor_base_designs_20261015/lean/FactorBaseDesigns/Yield.lean",
+      "blob": "6af190d315f6f310b187894a19f93d6d9742ba69",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/ghs_cover_census_n5_20261013/lean/CoverCensusN5.lean",
+      "blob": "6c67d1eddec869d61b03d5c7eb7dc6d6599276df",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/ghs_cubic_cover_census_20261012/lean/OrbitNine.lean",
+      "blob": "cd0d742f49759aad908cbbc78446353b57c10d3f",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/ghs_cubic_genus3_build_20261012/lean/DescentCycle.lean",
+      "blob": "f408c20937100d1ea487c3ef8edbe78bf2176da7",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/ghs_cubic_hyperelliptic_genus3_20261013/lean/HyperGenus3.lean",
+      "blob": "ad3c5b949af0efd890f2121e6b2b65b6c0a8043f",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/ic_tree_split_structured_v_20261011/lean/AxiomAudit.lean",
+      "blob": "57d776758bba1c76c3139633ec534ef2ff114fd0",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/ic_tree_split_structured_v_20261011/lean/TreeSplit/Data.lean",
+      "blob": "5299d0aab8fd371254937f05f5819f489abb2bcd",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/ic_tree_split_structured_v_20261011/lean/TreeSplit/Leak.lean",
+      "blob": "e538c981bdee4d7cb92ca3ba4bf0fd22b86779bc",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/ic_tree_split_structured_v_20261011/lean/TreeSplit/Replay.lean",
+      "blob": "edd4b532822d3320544cf5ac83f452b1bcabfc7e",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/ic_tree_split_structured_v_20261011/lean/TreeSplit/Rule.lean",
+      "blob": "59de55b48c25eaf21e3ce194aca360d8bfd0ef22",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/ic_tree_split_structured_v_20261011/lean/TreeSplit/Verdict.lean",
+      "blob": "187d84f137cf7cf075347ed2c39a7a72c315845f",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_dense_root_20261013/DenseCapacity.lean",
+      "blob": "4623139ee7c8fad2bd69e15475e272352f2368b0",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_dense_root_20261013/Load75Capacity.lean",
+      "blob": "ee468d4d20116f2a32161b8ef2bb81d718435af9",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_indexed5_20261013/Capacity.lean",
+      "blob": "fbb0e0df70eb9fc55d04b60e3fd5860e643f47e0",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_indexed5_id30_20261016/StateId30Capacity.lean",
+      "blob": "d5bb5c25a0a546f248e66368dc0f3ff105b064f8",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_indexed5_load75_20261013/DenseCapacity.lean",
+      "blob": "aede4d204d7c5e65e7ea662907112dd55cb74325",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_indexed5_tier1_results_20261013/Capacity16G.lean",
+      "blob": "8ec78c28ca1a6a76bc7171c223ceb009ff5e2bb7",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_online_finegrid_20261016/Capacity.lean",
+      "blob": "551978de6ba05c9d7e76fd98927aa7081d274f4e",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_online_range_20261016/OnlineRangeCapacity.lean",
+      "blob": "861c838c248b179b0de5e16eea3f673c9341fe1c",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_root11_20261014/RootSum.lean",
+      "blob": "ffb5c1ef3c9363e809df9f860746daf44aed2a9b",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_root11_dynamic_20261016/Root11DynamicCapacity.lean",
+      "blob": "57f4495da4ac8c1b57e3544f3f86a11bad3f1cfb",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_root21_20261014/RootPair.lean",
+      "blob": "2e815b61558a0900c0ed43664a8525b6b5b07aa7",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_root4_20261014/RootFour.lean",
+      "blob": "a9c48f7d106123c64559edbbcca0a412be39030a",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_root4_highk_results_20261015/Capacity.lean",
+      "blob": "5d0a557cfd98bdda8d40db9b603da7fddad1fbf3",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_root_only_20261014/RootOrdinal.lean",
+      "blob": "98e4cfbca48bcd3ba3d53ba97250ce390cb8b228",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_state26_20261014/State26.lean",
+      "blob": "82399db9dd82f97b7a6d71c2537abb23e3a53379",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_state28_20261013/StateCapacity.lean",
+      "blob": "5d06b0533bd75f538f23c79cec20d15d6ba9bc31",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/n83_symmetric_root_20261013/S3Symmetry.lean",
+      "blob": "235c716dff8792bd8053cd7b891225db537b7224",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/AdaptiveBase.lean",
+      "blob": "c73f7bcfb89c283bca4a03a150c8f3c1c96a745d",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/CrossRatio.lean",
+      "blob": "b07b7a85571740d18d6f7200b665060ad626afba",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/CubicCoefficientRows.lean",
+      "blob": "242c7272d72bb80203eb9fed302470ba7420338b",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/DivisorSupport.lean",
+      "blob": "e56fac9524332c0c06cadffd39fb75fb16b1e02c",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/FourCellDensity.lean",
+      "blob": "09762741dac8c4e181985c41651a49a115afd3ce",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/FullCollinearity.lean",
+      "blob": "7c52b0ce20e6e9fd9044b1f85519e6e87265c20a",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/FullLineCapacity.lean",
+      "blob": "e51265cc5cde4b4fad05fe2478aa942bd3cae098",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/LineCenter.lean",
+      "blob": "526b46a43cc06145b84426add312c5faca2904a3",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/LineClosure.lean",
+      "blob": "72de947180eda64256828617c93eafd8d9b3c440",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/LineFiberDescent.lean",
+      "blob": "cd14709d7b0d7e0d7b3ef5d84afbf2c943f4a095",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/LineLeafRank.lean",
+      "blob": "7ad0f36967785cff284561910af94b42fdd7561e",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/LinePointInverse.lean",
+      "blob": "ef012f82fd55432200619b354884c6a4d5a6b263",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/LineSupport.lean",
+      "blob": "47f5293d0e97f0c273d81be769e007b6bae0de74",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/NonspecialSupport.lean",
+      "blob": "7ffebcb6881a0485558e5e67153244363e1f86dc",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/PencilThreeSum.lean",
+      "blob": "2de185eff78f8c370513e84255efea97e81b71a0",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/PivotGuided.lean",
+      "blob": "141f60b1242e516db84467a8a300dae6b052c0cc",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/ResidualDiscriminant.lean",
+      "blob": "b2fc51b5ff177690c26954b469d393143a16d628",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/ScalarAnchor.lean",
+      "blob": "b8a8e62ac79ebb6ab7e1cd3b0a48ecc77b272bb9",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/ShortSums.lean",
+      "blob": "48acbc522964f88177906ac29ca08de4a818fff8",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/SignedBase.lean",
+      "blob": "3b68430bd5abc411e507b18d8aecd46bfa827e0a",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/ThreeSumCapacity.lean",
+      "blob": "a93b94a3e3c8506899dafd782ab84cba70d3ffcc",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/TraceProjection.lean",
+      "blob": "4d04c84abf3be6a0cc837ffb2e0d0352a7203b98",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/TraceThree.lean",
+      "blob": "3e6a8ed9d555f9483c30edc262f8260c59590ce9",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/UnorderedSupport.lean",
+      "blob": "15d5db92b4b5f463c84dab5ce55a25e29a4248f4",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/rho_assurance_20261016/lean/RhoFormal.lean",
+      "blob": "e0ec160b3444f86919c1a6bc51b1d3578f877b8d",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/rho_assurance_20261016/lean/RhoFormal/Axioms.lean",
+      "blob": "8ecf28a68dfe608f596684900d76e7274c6b6fac",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/rho_assurance_20261016/lean/RhoFormal/BatchInv.lean",
+      "blob": "ded2a71e3391aa3b6ed32b8e7bdb57b53924f139",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/rho_assurance_20261016/lean/RhoFormal/LeastRotation.lean",
+      "blob": "1ee48526fc8e1d473e8e1d28d175fdd02de6646a",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/rho_assurance_20261016/lean/RhoFormal/RhoWalk.lean",
+      "blob": "903a45f5eb97206b40672bf1b7fa7b8080f849b4",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/rho_assurance_20261016/lean/RhoFormal/RotationBits.lean",
+      "blob": "20a88e178538e42706afd9421b291aa91523b6c7",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/sea_point_count_20261016/lean/SeaProofs.lean",
+      "blob": "19211502610a16e1892d180d92fc6cb23c3bca18",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_case_index_20261012/lean/AxiomAudit.lean",
+      "blob": "ac70baf5d2bfe11306d638156842e54195315362",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_case_index_20261012/lean/PublishedCases.lean",
+      "blob": "0b3ffdd57bb804a3c4ab183d15c45642370cbc43",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_conjectures_20261012/AxiomAudit.lean",
+      "blob": "0a4e98cb2c9087019d37df0ccd2681d8f5ef4866",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_conjectures_20261012/CensusCounting.lean",
+      "blob": "a51861c4540c5061e61bec6e252a3452b9e7f60d",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_database_20261012/lean/AxiomAudit.lean",
+      "blob": "eebb4b220f6e52a718ad5f381d90e8722e309c6d",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_database_20261012/lean/WeakCurveDatabase.lean",
+      "blob": "8ecd4c2b6972c23292b165b470fcd37b12344ebc",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_leaderboard_20261012/lean/AxiomAudit.lean",
+      "blob": "2a85ad76bbfca3a6c49e73bccc5479e39ec92625",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_leaderboard_20261012/lean/MinimalPairingField.lean",
+      "blob": "365284c3fe2397b98fe9880e13f75f8c403b4c08",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_leaderboard_20261012/lean/OakleyOrders.lean",
+      "blob": "fe3758ff7baf62bb0ec99e9fbca4c707c0e77859",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_leaderboard_20261012/lean/PrimeExamples.lean",
+      "blob": "285b5a8a4ed6e41ac48e5b01df3ea5876afb0819",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_leaderboard_20261012/lean/RelationSupport.lean",
+      "blob": "94d286a828991f304a2e128e9c123fcdf90f1942",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_properties_lean_20261011/AxiomAudit.lean",
+      "blob": "1194157a6d1739e1041d8c893fda96f2e0d40ba4",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_properties_lean_20261011/WeakCurveProperties.lean",
+      "blob": "85efd55be887bb6ed33df3e342b3292c03c63e6f",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_properties_lean_20261011/WeakCurveProperties/Algebra.lean",
+      "blob": "4860c783350cbf51b17f18cfe5c23a23dd042958",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_properties_lean_20261011/WeakCurveProperties/Application.lean",
+      "blob": "c860be493725d1269cf238a5e1c065814d06341e",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_properties_lean_20261011/WeakCurveProperties/Conductor.lean",
+      "blob": "63d9e4a64ff30e5caa7fb21abb312cc828f323ae",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_properties_lean_20261011/WeakCurveProperties/CyclicTwists.lean",
+      "blob": "1d7191ae928ce4a40d7431d43900fe45f1efcef0",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_properties_lean_20261011/WeakCurveProperties/FiniteFields.lean",
+      "blob": "e26389a2fa369133921ba67d10179a2fdfe6b44f",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_properties_lean_20261011/WeakCurveProperties/Torsion.lean",
+      "blob": "bf8621ade2f622543b220f32778d7dc95d45cd96",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_curve_properties_lean_20261011/WeakCurveProperties/WeierstrassTwists.lean",
+      "blob": "af1f30c4a7aa2c68ab48d2a37df5e779479e3471",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_line_7_4_followup_20261013/lean/InvolutionNorm.lean",
+      "blob": "9cc2e04c83e39c8de83d98949c5d9d01519eb277",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "research/weak_subfield_hyperelliptic_decomposition_20261012/lean/SubfieldCollapse.lean",
+      "blob": "09dedd060e54d4483d663d47c023d8024d37a203",
+      "status": "not_rechecked_by_inventory"
+    },
+    {
+      "path": "tools/lean/AuditAxioms.lean",
+      "blob": "577f1fac5d75cbe016bd0e95d621a8c9de9f62a6",
+      "status": "not_rechecked_by_inventory"
+    }
+  ],
+  "lake_projects": [
+    {
+      "path": "papers/rootfinding-decomposition/lean/lakefile.toml",
+      "blob": "d9bb54cc61c5aa06b7b1fd9c3aeb42f8414b1c64"
+    },
+    {
+      "path": "research/conductor_gap_cm_pairs_20261010/lean/lakefile.toml",
+      "blob": "c4e9c62daf7a846d6340aeab147b06db3b392c18"
+    },
+    {
+      "path": "research/cover_transfer_assessment_20261013/lean/lakefile.toml",
+      "blob": "6e8d67bf6d6bb2a2edcacab89c2b0cf9846a1267"
+    },
+    {
+      "path": "research/factor_base_designs_20261015/lean/lakefile.toml",
+      "blob": "dffcbbfd7ee7009701a4e45155cb70850169ff0f"
+    },
+    {
+      "path": "research/ghs_cover_census_n5_20261013/lean/lakefile.toml",
+      "blob": "f446828a54d821c1661e0179e4702fada30bd122"
+    },
+    {
+      "path": "research/ghs_cubic_cover_census_20261012/lean/lakefile.toml",
+      "blob": "47cc5a6f382aa6fb87c92b4d3530c39a20429494"
+    },
+    {
+      "path": "research/ghs_cubic_genus3_build_20261012/lean/lakefile.toml",
+      "blob": "2d3e80fbcaf12a46540a9cdadd6a9e4437b0f8cf"
+    },
+    {
+      "path": "research/ghs_cubic_hyperelliptic_genus3_20261013/lean/lakefile.toml",
+      "blob": "6b5ca9b98f8af3d12d7b135c0e9dcb68e2b46dcf"
+    },
+    {
+      "path": "research/ic_tree_split_structured_v_20261011/lean/lakefile.toml",
+      "blob": "d04d5dc5f80042cb5d6c8d688eee54032db548d8"
+    },
+    {
+      "path": "research/p192_extension_cover_20261012/lean/lakefile.toml",
+      "blob": "d64209e6665e6dfb096117acd68cc25ec39a8c2e"
+    },
+    {
+      "path": "research/rho_assurance_20261016/lean/lakefile.toml",
+      "blob": "4bb4797fc22d9fb1000972f41a106da58942e619"
+    },
+    {
+      "path": "research/sea_point_count_20261016/lean/lakefile.toml",
+      "blob": "5166488fcec09c41c2792d39420b20486382d13a"
+    },
+    {
+      "path": "research/weak_curve_case_index_20261012/lean/lakefile.toml",
+      "blob": "33b61dd4dda518e8c33ea34f939147f242a1520f"
+    },
+    {
+      "path": "research/weak_curve_conjectures_20261012/lakefile.toml",
+      "blob": "90d78ddcdc1699214f0b970b97e6bbda44f332bf"
+    },
+    {
+      "path": "research/weak_curve_database_20261012/lean/lakefile.toml",
+      "blob": "42e4a373ea862365cc8e5b39937503e045fabfb7"
+    },
+    {
+      "path": "research/weak_curve_leaderboard_20261012/lean/lakefile.toml",
+      "blob": "ab9a8411a7ed1ff550f7191e67bca905add86d5d"
+    },
+    {
+      "path": "research/weak_curve_properties_lean_20261011/lakefile.toml",
+      "blob": "edc84348a067ed3fd7faeaa372fc8439d3c05df3"
+    },
+    {
+      "path": "research/weak_line_7_4_followup_20261013/lean/lakefile.toml",
+      "blob": "ee2c7ed829b76270f016ee3e0d799f9152766b40"
+    },
+    {
+      "path": "research/weak_subfield_hyperelliptic_decomposition_20261012/lean/lakefile.toml",
+      "blob": "67d2d72916ce64eadfc5ac823b7c6ad8b94b5b81"
+    }
+  ],
+  "targets": []
+}

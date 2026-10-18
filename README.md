@@ -5,6 +5,10 @@ plus a substantial **cryptanalysis suite** for studying how those algorithms bre
 Every algorithm is documented with the underlying mathematics, making this a study
 companion as much as a working library.
 
+[Lean retrospective, 2026-10-18](research/lean_retrospective_20261018/README.md):
+checked subgroup-transport and factor-base lemmas, exact proof scope, and
+remaining historical-coverage obligations.
+
 > ## ⚠️ DO NOT USE IN PRODUCTION
 >
 > This library is **not safe** for any real use case where confidentiality,
