@@ -127,6 +127,9 @@ release library suite still awaits the final repaired source.
 
 ## Next gates
 
+The recurring hosted-access and measurement obligation is tracked in
+[the Tier 1 worker problem record](../../problems/rho-worker-tier1-host-access.md).
+
 1. Rebuild this worker-profiler source on a qualified Linux allocation and
    freeze its job spec, 32 public Q points, CPU and memory envelope, host
    counters, and A/A controls. The requested source transfer to RunPod was
