@@ -2510,10 +2510,10 @@ fn mode_run(a: &Args) {
     let need_x = arms.iter().find(|x| x.starts_with("f4rx")).cloned();
     let mut traces = Traces { f4: None, sig: None, f4x: None };
     let sig_job: f64 = a.num("--sig-time-limit", per_job);
-    let job_lim = |t_start: &Instant, cap: u64| {
+    let job_lim = |t_start: &Instant, cap: u64, sigfam: bool| {
         let mut lim = limits_from(a);
-        // a signature arm (it has a touch cap) gets the signature limit
-        let per_job = if cap > 0 { sig_job } else { per_job };
+        // a signature arm gets the signature time limit
+        let per_job = if sigfam { sig_job } else { per_job };
         if per_job > 0.0 {
             let mut secs = per_job;
             if total_limit > 0.0 {
@@ -2530,19 +2530,23 @@ fn mode_run(a: &Args) {
         let (eqs, nv) = system_of(d);
         let mut f4_touches = 0u64;
         for (arm, kind, slot) in [("f4", Kind::F4, 0), ("sig", Kind::Sig(FULL), 1)] {
-            let wanted = if slot == 0 {
+            let print = if slot == 0 {
                 want_f4_trace || arms.iter().any(|x| x == "f4")
             } else {
                 want_sig_trace || arms.iter().any(|x| x == "sig")
             };
+            // f4 on the held-out target is also run (unprinted) to cap the signature trace
+            let wanted = print || (slot == 0 && want_sig_trace);
             if !wanted {
                 continue;
             }
             let cap = if slot == 1 && trace_ratio > 0.0 && f4_touches > 0 { (trace_ratio * f4_touches as f64) as u64 } else { 0 };
-            let lim = job_lim(&t_start, cap);
+            let lim = job_lim(&t_start, cap, slot == 1);
             let j = exec(kind, &eqs, nv, &lim, true, None);
-            println!("{}", json_job(&label, &d.cell, tt, arm, d.solutions, &j, ",\"trace\":1"));
-            eprintln!("{label} t{tt} {arm} (trace): {} touches={} {:.1}s", j.status.name(), j.t.touches(), j.ms / 1000.0);
+            if print {
+                println!("{}", json_job(&label, &d.cell, tt, arm, d.solutions, &j, ",\"trace\":1"));
+                eprintln!("{label} t{tt} {arm} (trace): {} touches={} {:.1}s", j.status.name(), j.t.touches(), j.ms / 1000.0);
+            }
             if slot == 0 {
                 f4_touches = j.t.touches();
                 if j.status != Status::Refuted && d.solutions == 0 {
@@ -2561,7 +2565,7 @@ fn mode_run(a: &Args) {
         let tt = trace_target.unwrap_or(xd.len() - 1);
         let d = xd.iter().find(|d| d.idx == tt).expect("cross trace target");
         let (eqs, nv) = system_of(d);
-        let lim = job_lim(&t_start, 0);
+        let lim = job_lim(&t_start, 0, false);
         let j = exec(Kind::F4, &eqs, nv, &lim, true, None);
         eprintln!("{xcell} t{tt} f4 (cross trace): {} touches={}", j.status.name(), j.t.touches());
         traces.f4x = j.trace;
@@ -2577,12 +2581,18 @@ fn mode_run(a: &Args) {
                 println!("{{\"cell\":\"{}\",\"target\":{},\"arm\":\"{}\",\"status\":\"skipped\"}}", label, ti, arm);
                 continue;
             }
-            let cap = if is_sig_arm(arm) && touch_ratio > 0.0 && f4_touches > 0 { (touch_ratio * f4_touches as f64) as u64 } else { 0 };
+            let sigfam = is_sig_arm(arm);
+            let no_trace = (arm == "sigr" || arm == "sign") && traces.sig.is_none();
+            if sigfam && touch_ratio > 0.0 && f4_touches == 0 && !no_trace {
+                // the f4 reading of this target (unprinted) fixes the cap of the signature arm
+                f4_touches = exec(Kind::F4, &eqs, nv, &job_lim(&t_start, 0, false), false, None).t.touches();
+            }
+            let cap = if sigfam && touch_ratio > 0.0 && f4_touches > 0 { (touch_ratio * f4_touches as f64) as u64 } else { 0 };
             if arm == "f4rs" {
-                own.f4 = exec(Kind::F4, &eqs, nv, &job_lim(&t_start, 0), true, None).trace;
+                own.f4 = exec(Kind::F4, &eqs, nv, &job_lim(&t_start, 0, false), true, None).trace;
             }
             if arm == "sigrs" {
-                let r = exec(Kind::Sig(FULL), &eqs, nv, &job_lim(&t_start, cap), true, None);
+                let r = exec(Kind::Sig(FULL), &eqs, nv, &job_lim(&t_start, cap, true), true, None);
                 if r.status == Status::Refuted {
                     own.sig = r.trace;
                 }
@@ -2592,7 +2602,7 @@ fn mode_run(a: &Args) {
                 eprintln!("{label} t{ti} {arm}: no valid trace (the recording run did not refute)");
                 continue;
             }
-            let lim = job_lim(&t_start, cap);
+            let lim = job_lim(&t_start, cap, sigfam);
             let j = run_arm(arm, &eqs, nv, &lim, &traces, &own);
             if arm == "f4" {
                 f4_touches = j.t.touches();
