@@ -5,7 +5,7 @@
 //!   harvest   --manifest M --raw D verify sha256 of every source, write D/data.tsv
 //!   evaluate  --manifest M --raw D leave-one-family-out arms (a) (b) (c1) (c2) (e)
 //!   planted   --manifest M --raw D positive control on the real covariates
-//!   null      --manifest M --raw D label-permutation negative control
+//!   nullperm  --manifest M --raw D label-permutation negative control
 //!   t3        --manifest M --raw D measured F4 matrix size (descriptive)
 //!   rank      --manifest M --raw D next five cells to buy
 //!   verdict   --raw D              frozen rule applied to the written key=value files
@@ -1865,11 +1865,11 @@ fn main() {
         "harvest" => cmd_harvest(&args),
         "evaluate" => cmd_evaluate(&args),
         "planted" => cmd_planted(&args),
-        "null" => cmd_null(&args),
+        "nullperm" => cmd_null(&args),
         "t3" => cmd_t3(&args),
         "rank" => cmd_rank(&args),
         "verdict" => cmd_verdict(&args),
-        _ => Err("usage: selftest|harvest|evaluate|planted|null|t3|rank|verdict".to_string()),
+        _ => Err("usage: selftest|harvest|evaluate|planted|nullperm|t3|rank|verdict".to_string()),
     };
     if let Err(e) = r {
         eprintln!("ERROR {}", e);

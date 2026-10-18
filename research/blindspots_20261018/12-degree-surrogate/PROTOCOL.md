@@ -178,7 +178,7 @@ runs, leave-one-family-out over `f4-m3` and `f4-m4`; arms: (a) `log2 C(N, <= D_r
 
 ## Controls
 
-All run by `selftest` (cheap, first card) and the null/planted runs (card 3).
+All run by `selftest` (cheap, first card) and the `nullperm`/`planted` runs (card 2).
 
 * **Known answers.** `D_reg(m, n, l)` must equal the committed reference values
   (`dreg_degree7_ell5_20260930/RESULTS.md`, `dreg_m4_chain_20261006/RESULTS.md`):
@@ -293,6 +293,6 @@ Three cards, all `kind: frozen_command`, each building its own binary under
    the 194 sha256s, writes `raw/data.tsv`, prints the per-source audit and the
    per-family counts).
 2. `card-02`: build, `planted` (`raw/planted.kv`), `evaluate`
-   (`raw/eval.kv`), `null` (`raw/null.kv`).
+   (`raw/eval.kv`), `nullperm` (`raw/null.kv`).
 3. `card-03`: build, `t3` (`raw/t3.kv`), `rank` (`raw/rank.txt`), `verdict`
    (applies the frozen rule to the `*.kv` files in `raw/` and prints one line).
