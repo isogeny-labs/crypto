@@ -1,5 +1,22 @@
 # Degree-83 factor-base sweep: observed evidence
 
+The [retained primary K64 compact-root capacity probe](verification/compact-retained-k64-20261018/RESULT.md)
+made a fresh exact S3 GET, imported the replayed base under a hard 4-GiB
+cgroup, completed all 172,640 unordered index states, and returned `MISS`
+for one public point in 39.627 seconds of supervised wall time. Independent
+source, input, Docker-limit and raw-receipt audit plus a mutation-rejection
+control passed. This is one-query capacity evidence, not a relation-yield,
+rank, or complete-runtime comparison; `selected_best_total_runtime` remains
+`null`.
+
+The [retained K256 companion](verification/compact-retained-k256-20261018/RESULT.md)
+used the same exact S3-backed primary policy and frozen public-point query.
+It completed all 2,730,368 unordered states, returned a one-query `MISS`,
+and used 676.903 seconds of supervised wall time and 723,492,864 bytes of
+peak cgroup memory. Its independent input/source/container audit and a
+mutated-receipt rejection passed. These two capacity observations do not
+estimate repeated natural relation yield or select a total-runtime winner.
+
 The [first-pattern external XOR-SAT Gray/hash pair](verification/m6-external-natural-20261018/RESULT.md)
 reimported the exact primary K600 S3 bases and exported the same public
 six-summand query as the hosted native worker. Both XOR-DIMACS circuit shapes
@@ -122,7 +139,7 @@ Started 2026-10-08. Public known-answer research. The requested minimum **comple
 | S3 storage | PASS: 57 compressed objects uploaded, downloaded and byte-hash matched; content-addressed receipts retained |
 | Primary base to generic solver adapter | PASS: replay-bound K=64 S3 object reconstructed as generic ordinary and signed Frobenius orbits; solver stage unexecuted |
 | Primary cold runner | K=64, m=2 exact-enumeration preflight PASS; one trial returned `UNKNOWN_trial_cap` with zero relations. K=64 m=3 and K=256 m=2 attempts reached `UNKNOWN_budget` caps. All retain null total runtime and winner |
-| Existing four-summand source transfer | Balanced-S5 SAT is admitted only through n=53; the upstream wide compact-orbit n=83 runner uses a different polynomial basis/base schema and u64 rank. The study-local adapter pins the study field. A primary compact probe accepts a replayed base, checks a state/cgroup cap, verifies any witness in the generic group and converts a hit to a full-width signed-orbit row. A new outer supervisor freezes compiled sources from a clean commit and classifies bounded probe outcomes; synthetic process tests pass, but no retained primary four-summand probe, natural rank or cold run followed; see `S5_CAPACITY.md` |
+| Existing four-summand source transfer | Balanced-S5 SAT is admitted only through n=53; the upstream wide compact-orbit n=83 runner uses a different polynomial basis/base schema and u64 rank. The study-local adapter pins the study field. A primary compact probe accepts a replayed base, checks a state/cgroup cap, verifies any witness in the generic group and converts a hit to a full-width signed-orbit row. Frozen primary K64 and K256 retained-base Docker probes each completed their exact index and returned a one-query `MISS` under live-inspected 4-GiB caps; both independent audits passed. Natural rank and a complete cold run remain unmeasured; see `S5_CAPACITY.md` and the K64/K256 results under `verification/` |
 | Compact Linux worker startup | Static x86-64 Linux worker rebuilt from source commit `2742a0989`; two guarded empty/invalid public-panel Docker starts retained expected producer-failure receipts. The second reached panel validation after cgroup and compiled-source checks; no retained base was imported. See `verification/compact-probe-linux-startup/` |
 | Best total runtime | Unresolved: full relation collection, rank, linear algebra and individual-log phases have not completed the comparison gate; the later [23,100-second cumulative local allowance](verification/known-witness-stage-native-900-20261014/RESULT.md) is fully charged |
 

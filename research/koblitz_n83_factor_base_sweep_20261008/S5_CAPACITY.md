@@ -47,8 +47,9 @@ retained primary policy/seed/size through `primary_adapter.rs`. It
 constructs the same wide compact index under a state cap and a mandatory
 Linux cgroup memory cap,
 and independently re-adds any returned witness in the generic curve
-group. It has not been run on a retained N83 base. An outer wall supervisor
-is now source-ready for that experiment.
+group. Retained primary K=64 and K=256 runs have now completed under the
+outer supervisor; both results are one-query capacity receipts, not relation
+yield or complete-runtime estimates.
 
 The current study branch has a separate exact wide relation-rank and
 factor-log gate. A checked compact hit now yields a full-width signed-orbit
@@ -67,8 +68,13 @@ not container behavior, N83 yield or index capacity. A static Linux worker
 was then rebuilt from commit `2742a0989`; two empty/invalid-panel Docker
 starts retained expected negative-control receipts. The invalid-panel error
 is downstream of the cgroup and compiled-source checks, as documented in
-`verification/compact-probe-linux-startup/`. A retained K=64
-probe under the guard and a natural relation/rank receipt are later gates.
+`verification/compact-probe-linux-startup/`. The retained K64 and K256 runs
+each imported an exact S3-backed primary base, completed all 172,640 and
+2,730,368 unordered states respectively, and returned one `MISS` under a
+guarded 4-GiB cgroup. Independent source/input/container audits and
+mutated-receipt rejections passed; see the two `compact-retained-k*`
+verification directories. A natural relation/rank receipt remains a later
+gate.
 A full cold comparison comes
 only after all phases, including failed work and I/O, are charged.
 
@@ -86,8 +92,9 @@ Thus the two vectors have at least `48S + 32C` bytes of final payload;
 This excludes temporary arrays, point/label maps, rank rows and the process
 runtime. Root-key deduplication does not shrink the allocated table. The
 slot-count formula is exact for a realized `S`, while the byte formula is a
-lower bound on those two final vectors; `S` is unmeasured on the retained
-N83 bases.
+lower bound on those two final vectors. The unordered retained K64 and K256
+runs measured `S=172640` and `S=2730368`, respectively; larger retained
+sizes remain unmeasured here.
 
 The table below is reproducible with integer arithmetic. For each listed
 `K`, calculate `T=83*K*K`, `S=T//2`,
@@ -128,7 +135,11 @@ and independently replays the resulting row on the original curve. A small
 public fixture verifies sign, phase, high-limb coefficients, malformed labels,
 and insertion into the exact wide rank tracker. This is a correctness gate;
 it has not produced a retained N83 relation or measured natural rank.
-The guarded retained K=64 primary probe is a capacity and correctness gate.
+The guarded retained K64 and K256 primary probes passed their one-query
+capacity and input-custody gates with misses; neither exercised the
+relation-row path. On the emulated x86-64 worker, K256 took 676.903 seconds
+for a single query, versus 39.627 seconds for K64; those are capacity
+observations, not native-hardware or complete-runtime rankings.
 Under the separate uniform-query, one-full-smooth-row model in
 `RANK_QUERY_SCREEN.md`, an m=4 K=64 oracle needs at least 145,677,800,576
 queries before its first-moment bound can even permit a 50% full-rank chance.
