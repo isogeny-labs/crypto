@@ -2086,8 +2086,33 @@ mod wide {
                 2445342385696756367155238,
                 5959927424489161220022208,
             ];
-            let full = build_index128_with_symmetry(&gf, &basis, &solver, &reps, false, false);
-            let quotient = build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false);
+            let full =
+                build_index128_with_symmetry(&gf, &basis, &solver, &reps, false, false, false);
+            let quotient =
+                build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false, false);
+            let batched =
+                build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false, true);
+            assert_eq!(batched.states.len(), quotient.states.len());
+            assert_eq!(batched.table.len, quotient.table.len);
+            for index in 0..quotient.states.len() {
+                let scalar = quotient.states.get(index);
+                let batch = batched.states.get(index);
+                assert_eq!(
+                    (batch.left, batch.right, batch.relative),
+                    (scalar.left, scalar.right, scalar.relative)
+                );
+                assert_eq!(batch.normal_roots, scalar.normal_roots);
+                for root in scalar.normal_roots {
+                    let key = basis.canonical_selected(root).0;
+                    assert_eq!(
+                        batched.table.get_with_context(key, &batched.states, &basis),
+                        quotient
+                            .table
+                            .get_with_context(key, &quotient.states, &basis),
+                        "batched index changed the first witness for key {key}",
+                    );
+                }
+            }
             assert!(quotient.states.len() < full.states.len());
             assert_eq!(quotient.table.len, full.table.len);
             assert_eq!(
@@ -3327,7 +3352,16 @@ mod wide {
     ) -> Index128 {
         let symmetric_states = std::env::var("KIC_SYMMETRIC_S3").as_deref() == Ok("1");
         let indexed5_load75 = std::env::var("KIC_INDEXED5_LOAD75").as_deref() == Ok("1");
-        build_index128_with_symmetry(gf, basis, solver, reps, symmetric_states, indexed5_load75)
+        let batch_roots = std::env::var("KIC_INDEX_ROOT_BATCH").as_deref() == Ok("1");
+        build_index128_with_symmetry(
+            gf,
+            basis,
+            solver,
+            reps,
+            symmetric_states,
+            indexed5_load75,
+            batch_roots,
+        )
     }
 
     fn build_index128_with_symmetry(
@@ -3337,6 +3371,7 @@ mod wide {
         reps: &[u128],
         symmetric_states: bool,
         indexed5_load75: bool,
+        batch_roots: bool,
     ) -> Index128 {
         let n = gf.n as usize;
         assert!(
@@ -3488,13 +3523,31 @@ mod wide {
             Vec::new()
         };
         let mut states_wide = Vec::new();
+        let mut root_batch = RootBatch128::with_capacity(n);
+        let mut root_inputs = Vec::with_capacity(n);
         for left in 0..reps.len() {
             for right in 0..reps.len() {
-                for relative in 0..n {
-                    if symmetric_states && (left > right || (left == right && relative > n / 2)) {
-                        continue;
+                if symmetric_states && left > right {
+                    continue;
+                }
+                let relative_count = if symmetric_states && left == right {
+                    n / 2 + 1
+                } else {
+                    n
+                };
+                if batch_roots {
+                    root_inputs.clear();
+                    for relative in 0..relative_count {
+                        root_inputs.push((shifted[left][0], shifted[right][relative]));
                     }
-                    let roots = solver.roots(gf, basis, shifted[left][0], shifted[right][relative]);
+                    root_batch.solve(gf, basis, solver, &root_inputs);
+                }
+                for relative in 0..relative_count {
+                    let roots = if batch_roots {
+                        root_batch.results[relative]
+                    } else {
+                        solver.roots(gf, basis, shifted[left][0], shifted[right][relative])
+                    };
                     if root_only83 || root_only21 || root_only11 {
                         assert!(
                             roots.is_some(),
@@ -4120,6 +4173,49 @@ mod wide {
         let index = build_index128(&gf, &basis, &solver, &reps);
         let index_ms = index_started.elapsed().as_secs_f64() * 1000.0;
         let setup_ms = setup_started.elapsed().as_secs_f64() * 1000.0;
+        if std::env::var("KIC_INDEX_BUILD_ONLY").as_deref() == Ok("1") {
+            let state_digest = match &index.states {
+                StateStore128::RootOnly11 { states, .. } => {
+                    let mut hasher = blake3::Hasher::new();
+                    for state in states {
+                        hasher.update(&state.root0);
+                    }
+                    Some(hasher.finalize().to_hex().to_string())
+                }
+                _ => None,
+            };
+            let table_digest = match &index.table.slots {
+                RootSlots128::Indexed83(slots) => {
+                    let mut hasher = blake3::Hasher::new();
+                    for slot in slots {
+                        hasher.update(slot);
+                    }
+                    Some(hasher.finalize().to_hex().to_string())
+                }
+                _ => None,
+            };
+            println!(
+                "{}",
+                json!({
+                    "kind": "compact_orbit_index_stage",
+                    "status": "STAGE_DIAGNOSTIC_ONLY",
+                    "n": gf.n,
+                    "base_hash": base_hash,
+                    "orbit_columns": base.columns,
+                    "factor_base_points": base.points.len(),
+                    "regular_states": index.states.len(),
+                    "root_table_entries": index.table.len,
+                    "state_digest_blake3": state_digest,
+                    "table_digest_blake3": table_digest,
+                    "batch_roots": std::env::var("KIC_INDEX_ROOT_BATCH").as_deref() == Ok("1"),
+                    "base_load_ms": base_load_ms,
+                    "normal_basis_and_selftest_ms": basis_ms,
+                    "index_build_ms": index_ms,
+                    "setup_total_ms": setup_ms,
+                })
+            );
+            std::process::exit(0);
+        }
 
         let rank_started = Instant::now();
         let mut echelon = super::Echelon {
