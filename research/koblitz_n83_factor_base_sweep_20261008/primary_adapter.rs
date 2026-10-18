@@ -668,7 +668,7 @@ pub(super) fn chain_capacity_cli(
     let cgroup_peak_bytes: u64 = fs::read_to_string("/sys/fs/cgroup/memory.peak")?
         .trim()
         .parse()?;
-    let mut receipt = json!({
+    let receipt = json!({
         "schema":"n83.chain-s3-capacity-worker/v1", "study":STUDY, "status":status,
         "curve_a":0, "fixture":0, "orbit_columns":columns, "policy":policy, "seed":seed,
         "summands":m, "identity_mask":identity_mask, "object":row["object"],
@@ -1098,7 +1098,7 @@ fn chain_witness_impl(
     let memory_cgroup_peak_bytes: u64 = fs::read_to_string("/sys/fs/cgroup/memory.peak")?
         .trim()
         .parse()?;
-    let receipt = json!({
+    let mut receipt = json!({
         "schema":if checkpoint_root {"n83.k16627-m4-root-phase/v1"} else {"n83.k16627-m4-witness/v1"},
         "status":status,
         "curve_a":0, "orbit_columns":16_627, "summands":4, "identity_mask":0,
@@ -1112,7 +1112,6 @@ fn chain_witness_impl(
         "source_chain_blake3":blake3::hash(include_bytes!("../../src/cryptanalysis/binary_semaev_chain_sat.rs")).to_hex().to_string(),
         "source_index_calculus_blake3":blake3::hash(include_bytes!("../../src/cryptanalysis/koblitz_index_calculus.rs")).to_hex().to_string(),
         "phase_file":phases.path.to_string_lossy(),
-        "source_sat_blake3":blake3::hash(include_bytes!("../../src/cryptanalysis/sat.rs")).to_hex().to_string(),
         "point_indices":indices, "x_decimal":planted_xs.iter().map(|x| x.to_biguint().to_string()).collect::<Vec<_>>(),
         "relation":relation,
         "max_variables":250_000, "max_domain_clauses":6_000_000,
@@ -1120,7 +1119,6 @@ fn chain_witness_impl(
         "sat_variables":enc.solver.n_vars(), "sat_clauses":enc.solver.n_clauses(),
         "sat_xor_rows":enc.solver.n_xors(), "solver_models":models,
         "solver_conflicts":enc.solver.conflicts(),
-        "root_propagation_result":root_result.map(|result| format!("{result:?}")),
         "base_import_ms":base_import_ms, "model_domain_ms":model_domain_ms,
         "solver_ms":solver_ms, "process_wall_ms":start.elapsed().as_secs_f64()*1000.0,
         "memory_cgroup_limit_bytes":memory_limit_bytes,
@@ -1130,6 +1128,16 @@ fn chain_witness_impl(
         "total_index_calculus_runtime_ms":Value::Null,
         "selected_best_total_runtime":Value::Null,
     });
+    if checkpoint_root {
+        receipt["source_sat_blake3"] = Value::String(
+            blake3::hash(include_bytes!("../../src/cryptanalysis/sat.rs"))
+                .to_hex()
+                .to_string(),
+        );
+        receipt["root_propagation_result"] = root_result
+            .map(|result| Value::String(format!("{result:?}")))
+            .unwrap_or(Value::Null);
+    }
     write_new_json(output, &receipt)?;
     Ok(receipt)
 }
