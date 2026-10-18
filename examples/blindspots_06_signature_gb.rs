@@ -742,8 +742,8 @@ fn xor_merge(a: &[u64], b: &[u64]) -> Vec<u64> {
 
 // ---------------------------------------------------------------- common engine types
 
-/// Criteria K1-K4 on (K5, bit 4 = 16, is an experimental rewritable test, off), generators in ascending degree.  Bit 5 (32) keeps the construction order.
-const FULL: u32 = 15;
+/// Criteria K1-K5 on (bits 0-4), generators in ascending degree.  Bit 5 (32) keeps the construction order.
+const FULL: u32 = 31;
 const NONE: u32 = u32::MAX;
 const NOPIV: u32 = u32::MAX;
 
@@ -769,6 +769,7 @@ struct Limits {
     deadline: Option<Instant>,
     max_cols: usize,
     vm_cap: u64, // bytes of virtual size at which a run stops, 0 = none
+    touch_cap: u64, // stop (status touchcap) when the touches exceed this, 0 = none
 }
 
 #[derive(Clone, Copy, PartialEq, Debug)]
@@ -778,6 +779,7 @@ enum Status {
     TimeLimit,
     MemCap,
     ColsCap,
+    TouchCap,
 }
 impl Status {
     fn name(self) -> &'static str {
@@ -787,6 +789,7 @@ impl Status {
             Status::TimeLimit => "timelimit",
             Status::MemCap => "memcap",
             Status::ColsCap => "colscap",
+            Status::TouchCap => "touchcap",
         }
     }
 }
@@ -830,6 +833,11 @@ struct Totals {
     ms_back: f64,
     ms_add: f64,
     ms_pairs: f64,
+    log_d: Vec<u32>,
+    log_rows: Vec<u64>,
+    log_touch: Vec<u64>,
+    log_zero: Vec<u64>,
+    log_new: Vec<u64>,
 }
 impl Totals {
     fn touches(&self) -> u64 {
@@ -845,7 +853,7 @@ impl Totals {
 #[derive(Default, Clone)]
 struct Trace {
     useful: FxSet<u64>,
-    red: FxMap<u64, u64>,
+    red: Vec<FxMap<u64, u64>>, // per matrix step: monomial -> reducer key
 }
 
 #[inline]
@@ -885,6 +893,7 @@ struct F4<'a> {
     lm_idx: FxMap<u64, u32>,
     pairs: Vec<Pair>,
     g_terms: u64,
+    step_no: usize,
     t: Totals,
     rec: Option<Trace>,
     rep: Option<&'a Trace>,
@@ -899,6 +908,7 @@ impl<'a> F4<'a> {
             lm_idx: FxMap::default(),
             pairs: Vec::new(),
             g_terms: 0,
+            step_no: 0,
             t: Totals::default(),
             rec: None,
             rep: None,
@@ -1052,6 +1062,17 @@ impl<'a> F4<'a> {
         self.t.rows_s += srows.len() as u64;
         self.t.d_sel = d_sel;
         self.t.zero_build += zero_at_build;
+        if srows.is_empty() && self.rep.is_some() {
+            return Ok(false);
+        }
+        let sno = self.step_no;
+        let mut used_any = false;
+        if !srows.is_empty() {
+            self.step_no += 1;
+            if let Some(rec) = self.rec.as_mut() {
+                rec.red.push(FxMap::default());
+            }
+        }
         // symbolic preprocessing
         let t_sym = Instant::now();
         let mut idx: FxMap<u64, u32> = FxMap::default();
@@ -1071,11 +1092,10 @@ impl<'a> F4<'a> {
             qi += 1;
             let mut best = usize::MAX;
             if let Some(rep) = self.rep {
-                if let Some(&l) = rep.red.get(&m) {
-                    if let Some(&gi) = self.lm_idx.get(&l) {
-                        if self.lm[gi as usize] & !m == 0 {
-                            best = gi as usize;
-                        }
+                if let Some(&gi) = rep.red.get(sno).and_then(|mp| mp.get(&m)) {
+                    let gi = gi as usize;
+                    if gi < self.lm.len() && self.lm[gi] & !m == 0 {
+                        best = gi;
                     }
                 }
                 self.t.sym_tests += 1;
@@ -1095,7 +1115,7 @@ impl<'a> F4<'a> {
             }
             if best != usize::MAX {
                 if let Some(rec) = self.rec.as_mut() {
-                    rec.red.insert(m, self.lm[best]);
+                    rec.red.last_mut().unwrap().insert(m, best as u64);
                 }
                 let t = m & !self.lm[best];
                 let row = mul_mono(&self.g[best], t);
@@ -1141,6 +1161,7 @@ impl<'a> F4<'a> {
         let t_elim = Instant::now();
         let rows = (reducers.len() + srows.len()) as u64;
         let mut nnz = 0u64;
+        let single = false;
         let mut pivot: Vec<u32> = vec![NOPIV; c];
         let mut store: Vec<Vec<u32>> = Vec::with_capacity(reducers.len() + 64);
         for (m, row) in reducers.drain(..) {
@@ -1185,6 +1206,7 @@ impl<'a> F4<'a> {
                 nnz += kept.len() as u64;
                 if let Some(rec) = self.rec.as_mut() {
                     rec.useful.insert(skeys[ri]);
+                    used_any = true;
                 }
                 pivot[kept[0] as usize] = store.len() as u32;
                 newp.push(store.len() as u32);
@@ -1248,6 +1270,12 @@ impl<'a> F4<'a> {
         self.t.back += back;
         self.t.zero_elim += zero_red;
         self.t.steps += 1;
+        if !used_any && !srows.is_empty() {
+            if let Some(rec) = self.rec.as_mut() {
+                rec.red.pop();
+                self.step_no -= 1;
+            }
+        }
         self.t.rows_max = self.t.rows_max.max(rows);
         self.t.cols_max = self.t.cols_max.max(c as u64);
         self.t.nnz_max = self.t.nnz_max.max(nnz);
@@ -1276,6 +1304,11 @@ impl<'a> F4<'a> {
         if std::env::var("B06_VERBOSE").is_ok() {
             eprintln!("  f4 step sel={min_sel} rows={rows} cols={c} s_rows={} new={} zero_elim={} zero_build={} G={} touches={}", self.t.rows_s, self.t.new_elems, self.t.zero_elim, self.t.zero_build, self.g.len() + 0, self.t.touches());
         }
+        self.t.log_d.push(min_sel);
+        self.t.log_rows.push(rows);
+        self.t.log_touch.push(self.t.touches());
+        self.t.log_zero.push(self.t.zero_red());
+        self.t.log_new.push(self.t.new_elems);
         Ok(refuted)
     }
 
@@ -1423,6 +1456,7 @@ struct Sig<'a> {
     ekey_idx: FxMap<u64, u32>,
     seen: FxSet<u64>,
     g_terms: u64,
+    step_no: usize,
     t: Totals,
     rec: Option<Trace>,
     rep: Option<&'a Trace>,
@@ -1448,6 +1482,7 @@ impl<'a> Sig<'a> {
             ekey_idx: FxMap::default(),
             seen: FxSet::default(),
             g_terms: 0,
+            step_no: 0,
             t: Totals::default(),
             rec: None,
             rep: None,
@@ -1738,6 +1773,14 @@ impl<'a> Sig<'a> {
         if srows.is_empty() {
             return Ok(false);
         }
+        // matrix steps that contribute no new element are not numbered in a trace, so that a
+        // replay (which skips such steps) stays aligned with its trace
+        let sno = self.step_no;
+        self.step_no += 1;
+        let mut used_any = false;
+        if let Some(rec) = self.rec.as_mut() {
+            rec.red.push(FxMap::default());
+        }
         let nv = self.nv;
         // symbolic preprocessing: the reducer of a monomial is the divisor of least label
         let t_sym = Instant::now();
@@ -1759,7 +1802,7 @@ impl<'a> Sig<'a> {
             qi += 1;
             let mut best = usize::MAX;
             if let Some(rep) = self.rep {
-                if let Some(&ek) = rep.red.get(&m) {
+                if let Some(&ek) = rep.red.get(sno).and_then(|mp| mp.get(&m)) {
                     if let Some(&gi) = self.ekey_idx.get(&ek) {
                         if self.g[gi as usize].lm & !m == 0 {
                             best = gi as usize;
@@ -1785,7 +1828,7 @@ impl<'a> Sig<'a> {
             if best != usize::MAX {
                 let e = &self.g[best];
                 if let Some(rec) = self.rec.as_mut() {
-                    rec.red.insert(m, ekey(e.idx, e.sig, e.lm));
+                    rec.red.last_mut().unwrap().insert(m, ekey(e.idx, e.sig, e.lm));
                 }
                 let t = m & !e.lm;
                 let row = mul_mono(&e.poly, t);
@@ -1864,6 +1907,7 @@ impl<'a> Sig<'a> {
         let mut acc = vec![0u64; words];
         // pivots: several per column are allowed (a raw reducer and a reduced S-row can
         // share a leading column); a row uses the sparsest pivot of strictly smaller label
+        let single = false;
         let mut pivot: Vec<u32> = vec![NOPIV; c];
         let mut chain: Vec<u32> = Vec::with_capacity(mrows.len());
         let mut store: Vec<Vec<u32>> = Vec::with_capacity(mrows.len());
@@ -1876,6 +1920,9 @@ impl<'a> Sig<'a> {
             let lab = (row.idx, row.rk);
             let r: Vec<u32> = row.poly.iter().map(|x| cidx[x]).collect();
             if row.kind == 0 {
+                if single && pivot[r[0] as usize] != NOPIV {
+                    continue;
+                }
                 nnz += r.len() as u64;
                 let col = r[0] as usize;
                 chain.push(pivot[col]);
@@ -1908,7 +1955,7 @@ impl<'a> Sig<'a> {
                             best = p;
                         }
                     }
-                    p = chain[p as usize];
+                    p = if single { NOPIV } else { chain[p as usize] };
                 }
                 if best != NOPIV {
                     let prow = &store[best as usize];
@@ -1939,6 +1986,7 @@ impl<'a> Sig<'a> {
                 newp.push((store.len() as u32, row.idx, row.sig, row.rk, row.seq));
                 if let Some(rec) = self.rec.as_mut() {
                     rec.useful.insert(row.pk);
+                    used_any = true;
                 }
                 store.push(kept);
                 slab.push(lab);
@@ -1949,6 +1997,9 @@ impl<'a> Sig<'a> {
                 }
                 if self.over_mem() {
                     return Err(Status::MemCap);
+                }
+                if self.lim.touch_cap != 0 && self.t.touches() + build + elim > self.lim.touch_cap {
+                    return Err(Status::TouchCap);
                 }
             }
         }
@@ -2000,6 +2051,12 @@ impl<'a> Sig<'a> {
         self.t.elim += elim;
         self.t.back += back;
         self.t.steps += 1;
+        if !used_any {
+            if let Some(rec) = self.rec.as_mut() {
+                rec.red.pop();
+                self.step_no -= 1;
+            }
+        }
         self.t.rows_max = self.t.rows_max.max(rows);
         self.t.cols_max = self.t.cols_max.max(c as u64);
         self.t.nnz_max = self.t.nnz_max.max(nnz);
@@ -2025,6 +2082,11 @@ impl<'a> Sig<'a> {
         if std::env::var("B06_VERBOSE").is_ok() {
             eprintln!("  sig step d={d} rows={rows} cols={c} s_rows={} new={} zero_elim={} zero_build={} super={} G={} touches={} k0={} k1={} k2={} k3={} k4={} sing={}", self.t.rows_s, newp.len(), self.t.zero_elim, self.t.zero_build, self.t.super_top, self.g.len(), self.t.touches(), self.t.d_k0, self.t.d_k1, self.t.d_k2, self.t.d_k3, self.t.d_k4, self.t.d_sing);
         }
+        self.t.log_d.push(d);
+        self.t.log_rows.push(rows);
+        self.t.log_touch.push(self.t.touches());
+        self.t.log_zero.push(self.t.zero_red());
+        self.t.log_new.push(self.t.new_elems);
         Ok(refuted)
     }
 
@@ -2057,6 +2119,9 @@ impl<'a> Sig<'a> {
             loop {
                 if self.over_time() {
                     break Status::TimeLimit;
+                }
+                if self.lim.touch_cap != 0 && self.t.touches() > self.lim.touch_cap {
+                    break Status::TouchCap;
                 }
                 let d = match self.min_degree() {
                     Some(d) => d,
@@ -2188,6 +2253,8 @@ fn run_arm(arm: &str, eqs: &[Poly], nv: usize, lim: &Limits, tr: &Traces, own: &
         "f4" => exec(Kind::F4, eqs, nv, lim, false, None),
         "sig" => exec(Kind::Sig(FULL), eqs, nv, lim, false, None),
         "sig0" => exec(Kind::Sig(0), eqs, nv, lim, false, None),
+        "sig4" => exec(Kind::Sig(15), eqs, nv, lim, false, None),
+        "sigc" => exec(Kind::Sig(FULL | 32), eqs, nv, lim, false, None),
         "f4r" => exec_replay(Kind::F4, eqs, nv, lim, tr.f4.as_ref().expect("f4 trace")),
         "sigr" => exec_replay(Kind::Sig(FULL), eqs, nv, lim, tr.sig.as_ref().expect("sig trace")),
         "f4rs" => exec_replay(Kind::F4, eqs, nv, lim, own.f4.as_ref().expect("own f4 trace")),
@@ -2241,17 +2308,22 @@ fn reduced_gb(g: &[Vec<u64>]) -> Vec<Vec<u64>> {
 
 // ---------------------------------------------------------------- output
 
+fn arr_u(v: &[u64]) -> String {
+    format!("[{}]", v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(","))
+}
+
 fn json_job(label: &str, cell: &Cell, target: usize, arm: &str, solutions: u64, j: &JobOut, extra: &str) -> String {
     let t = &j.t;
     format!(
-        "{{\"cell\":\"{}\",\"m\":{},\"n\":{},\"ell\":{},\"nv\":{},\"target\":{},\"arm\":\"{}\",\"solutions\":{},\"status\":\"{}\",\"d_mat\":{},\"d_sel\":{},\"steps\":{},\"pairs_cand\":{},\"pairs_sel\":{},\"pairs_gen\":{},\"pairs_drop\":{},\"d_k0\":{},\"d_sing\":{},\"d_dup\":{},\"d_k1\":{},\"d_k2\":{},\"d_k3\":{},\"d_k4\":{},\"d_k5\":{},\"rows_s\":{},\"zero_build\":{},\"zero_elim\":{},\"zero_red\":{},\"super_top\":{},\"rows_max\":{},\"cols_max\":{},\"rc_max\":{},\"nnz_max\":{},\"cols_sum\":{},\"rows_sum\":{},\"touches\":{},\"build\":{},\"elim\":{},\"back\":{},\"new_elems\":{},\"g_size\":{},\"sym_tests\":{},\"replay\":\"{}\",\"replay_touches\":{},\"fb_touches\":{},\"ms\":{:.1},\"ms_pairs\":{:.1},\"ms_sym\":{:.1},\"ms_elim\":{:.1},\"ms_back\":{:.1},\"ms_add\":{:.1},\"rss_kb\":{},\"hwm_reset\":{},\"mem_est_kb\":{}{}}}",
+        "{{\"cell\":\"{}\",\"m\":{},\"n\":{},\"ell\":{},\"nv\":{},\"target\":{},\"arm\":\"{}\",\"solutions\":{},\"status\":\"{}\",\"d_mat\":{},\"d_sel\":{},\"steps\":{},\"pairs_cand\":{},\"pairs_sel\":{},\"pairs_gen\":{},\"pairs_drop\":{},\"d_k0\":{},\"d_sing\":{},\"d_dup\":{},\"d_k1\":{},\"d_k2\":{},\"d_k3\":{},\"d_k4\":{},\"d_k5\":{},\"rows_s\":{},\"zero_build\":{},\"zero_elim\":{},\"zero_red\":{},\"super_top\":{},\"rows_max\":{},\"cols_max\":{},\"rc_max\":{},\"nnz_max\":{},\"cols_sum\":{},\"rows_sum\":{},\"touches\":{},\"build\":{},\"elim\":{},\"back\":{},\"new_elems\":{},\"g_size\":{},\"sym_tests\":{},\"replay\":\"{}\",\"replay_touches\":{},\"fb_touches\":{},\"ms\":{:.1},\"ms_pairs\":{:.1},\"ms_sym\":{:.1},\"ms_elim\":{:.1},\"ms_back\":{:.1},\"ms_add\":{:.1},\"rss_kb\":{},\"hwm_reset\":{},\"mem_est_kb\":{},\"log_d\":{},\"log_rows\":{},\"log_touch\":{},\"log_zero\":{},\"log_new\":{}{}}}",
         label, cell.m, cell.n, cell.l, cell.nv(), target, arm, solutions, j.status.name(),
         t.d_mat, t.d_sel, t.steps, t.pairs_cand, t.pairs_sel, t.pairs_gen, j.dropped,
         t.d_k0, t.d_sing, t.d_dup, t.d_k1, t.d_k2, t.d_k3, t.d_k4, t.d_k5, t.rows_s, t.zero_build, t.zero_elim, t.zero_red(), t.super_top,
         t.rows_max, t.cols_max, t.rc_max, t.nnz_max, t.cols_sum, t.rows_sum,
         j.charged(), t.build, t.elim, t.back, t.new_elems, t.g_size, t.sym_tests,
         j.replay, j.replay_touches, j.fb_touches,
-        j.ms, t.ms_pairs, t.ms_sym, t.ms_elim, t.ms_back, t.ms_add, j.rss_kb, j.hwm_ok, t.mem_est_kb, extra
+        j.ms, t.ms_pairs, t.ms_sym, t.ms_elim, t.ms_back, t.ms_add, j.rss_kb, j.hwm_ok, t.mem_est_kb,
+        arr_u(&t.log_d.iter().map(|x| *x as u64).collect::<Vec<_>>()), arr_u(&t.log_rows), arr_u(&t.log_touch), arr_u(&t.log_zero), arr_u(&t.log_new), extra
     )
 }
 
@@ -2266,6 +2338,7 @@ fn limits_from(a: &Args) -> Limits {
         },
         max_cols: a.num("--max-cols", 400_000usize),
         vm_cap: cap,
+        touch_cap: 0,
     }
 }
 
@@ -2284,17 +2357,13 @@ fn cell_draws<'a>(draws: &'a [Draw], label: &str) -> Vec<&'a Draw> {
 
 fn system_of(d: &Draw) -> (Vec<Poly>, usize) {
     let gf = Gf::new(d.cell.n);
-    let (mut eqs, nv) = build_system(&gf, d.cell.m, &d.basis, d.xr);
-    if let Ok(mode) = std::env::var("B06_ORDER") {
-        match mode.as_str() {
-            "rev" => eqs.reverse(),
-            "deg" => eqs.sort_by_key(|p| poly_degree(p)),
-            "degrev" => eqs.sort_by_key(|p| std::cmp::Reverse(poly_degree(p))),
-            _ => {}
-        }
-    }
+    let (eqs, nv) = build_system(&gf, d.cell.m, &d.basis, d.xr);
     assert_eq!(nv, d.cell.nv());
     (eqs, nv)
+}
+
+fn is_sig_arm(arm: &str) -> bool {
+    arm.starts_with("sig")
 }
 
 fn mode_run(a: &Args) {
@@ -2302,22 +2371,26 @@ fn mode_run(a: &Args) {
     let label = a.flag("--cell").expect("--cell");
     let cd = cell_draws(&draws, &label);
     let tgts = parse_targets(&a.flag("--targets").unwrap_or("all".into()), cd.len());
-    let arms: Vec<String> = a
+    let mut arms: Vec<String> = a
         .flag("--arms")
         .unwrap_or_else(|| "f4".into())
         .split(',')
         .map(|s| s.to_string())
         .collect();
+    // f4 first: the signature arms are capped relative to its touches on the same target
+    arms.sort_by_key(|x| if x == "f4" { 0 } else { 1 });
     let trace_target: Option<usize> = a.flag("--trace-target").map(|s| s.parse().unwrap());
     let total_limit: f64 = a.num("--total-limit", 0.0);
     let per_job: f64 = a.num("--time-limit", 0.0);
+    let touch_ratio: f64 = a.num("--touch-ratio", 0.0);
+    let trace_ratio: f64 = a.num("--trace-ratio", touch_ratio);
     let t_start = Instant::now();
     let mut bad = false;
-    let need_f4 = arms.iter().any(|x| x == "f4r");
-    let need_sig = arms.iter().any(|x| x == "sigr");
+    let want_f4_trace = arms.iter().any(|x| x == "f4r");
+    let want_sig_trace = arms.iter().any(|x| x == "sigr");
     let need_x = arms.iter().find(|x| x.starts_with("f4rx")).cloned();
     let mut traces = Traces { f4: None, sig: None, f4x: None };
-    let job_lim = |t_start: &Instant| {
+    let job_lim = |t_start: &Instant, cap: u64| {
         let mut lim = limits_from(a);
         if per_job > 0.0 {
             let mut secs = per_job;
@@ -2326,30 +2399,37 @@ fn mode_run(a: &Args) {
             }
             lim.deadline = Some(Instant::now() + std::time::Duration::from_secs_f64(secs));
         }
+        lim.touch_cap = cap;
         lim
     };
-    // the held-out target: record the traces (and print their cost: they are charged)
+    // the held-out target: record the traces and print their cost (they are charged)
     if let Some(tt) = trace_target {
-        if need_f4 || need_sig || arms.iter().any(|x| x == "f4" || x == "sig") {
-            let d = cd.iter().find(|d| d.idx == tt).expect("trace target idx");
-            let (eqs, nv) = system_of(d);
-            for (arm, kind, slot) in [("f4", Kind::F4, 0), ("sig", Kind::Sig(FULL), 1)] {
-                if (slot == 0 && !(need_f4 || arms.iter().any(|x| x == "f4"))) || (slot == 1 && !(need_sig || arms.iter().any(|x| x == "sig"))) {
-                    continue;
-                }
-                let lim = job_lim(&t_start);
-                let j = exec(kind, &eqs, nv, &lim, true, None);
-                println!("{}", json_job(&label, &d.cell, tt, arm, d.solutions, &j, ",\"trace\":1"));
-                eprintln!("{label} t{tt} {arm} (trace): {} touches={} {:.1}s", j.status.name(), j.t.touches(), j.ms / 1000.0);
+        let d = cd.iter().find(|d| d.idx == tt).expect("trace target idx");
+        let (eqs, nv) = system_of(d);
+        let mut f4_touches = 0u64;
+        for (arm, kind, slot) in [("f4", Kind::F4, 0), ("sig", Kind::Sig(FULL), 1)] {
+            let wanted = if slot == 0 {
+                want_f4_trace || arms.iter().any(|x| x == "f4")
+            } else {
+                want_sig_trace || arms.iter().any(|x| x == "sig")
+            };
+            if !wanted {
+                continue;
+            }
+            let cap = if slot == 1 && trace_ratio > 0.0 && f4_touches > 0 { (trace_ratio * f4_touches as f64) as u64 } else { 0 };
+            let lim = job_lim(&t_start, cap);
+            let j = exec(kind, &eqs, nv, &lim, true, None);
+            println!("{}", json_job(&label, &d.cell, tt, arm, d.solutions, &j, ",\"trace\":1"));
+            eprintln!("{label} t{tt} {arm} (trace): {} touches={} {:.1}s", j.status.name(), j.t.touches(), j.ms / 1000.0);
+            if slot == 0 {
+                f4_touches = j.t.touches();
                 if j.status != Status::Refuted && d.solutions == 0 {
-                    eprintln!("trace run did not refute: {}", j.status.name());
+                    eprintln!("f4 trace run did not refute: {}", j.status.name());
                     bad = true;
                 }
-                if slot == 0 {
-                    traces.f4 = j.trace;
-                } else {
-                    traces.sig = j.trace;
-                }
+                traces.f4 = j.trace;
+            } else if j.status == Status::Refuted {
+                traces.sig = j.trace;
             }
         }
     }
@@ -2359,7 +2439,7 @@ fn mode_run(a: &Args) {
         let tt = trace_target.unwrap_or(xd.len() - 1);
         let d = xd.iter().find(|d| d.idx == tt).expect("cross trace target");
         let (eqs, nv) = system_of(d);
-        let lim = job_lim(&t_start);
+        let lim = job_lim(&t_start, 0);
         let j = exec(Kind::F4, &eqs, nv, &lim, true, None);
         eprintln!("{xcell} t{tt} f4 (cross trace): {} touches={}", j.status.name(), j.t.touches());
         traces.f4x = j.trace;
@@ -2369,19 +2449,32 @@ fn mode_run(a: &Args) {
         let (eqs, nv) = system_of(d);
         let sols = d.solutions;
         let mut own = Traces { f4: None, sig: None, f4x: None };
-        if arms.iter().any(|x| x == "f4rs") {
-            own.f4 = exec(Kind::F4, &eqs, nv, &job_lim(&t_start), true, None).trace;
-        }
-        if arms.iter().any(|x| x == "sigrs") {
-            own.sig = exec(Kind::Sig(FULL), &eqs, nv, &job_lim(&t_start), true, None).trace;
-        }
+        let mut f4_touches = 0u64;
         for arm in &arms {
             if total_limit > 0.0 && t_start.elapsed().as_secs_f64() > total_limit {
                 println!("{{\"cell\":\"{}\",\"target\":{},\"arm\":\"{}\",\"status\":\"skipped\"}}", label, ti, arm);
                 continue;
             }
-            let lim = job_lim(&t_start);
+            let cap = if is_sig_arm(arm) && touch_ratio > 0.0 && f4_touches > 0 { (touch_ratio * f4_touches as f64) as u64 } else { 0 };
+            if arm == "f4rs" {
+                own.f4 = exec(Kind::F4, &eqs, nv, &job_lim(&t_start, 0), true, None).trace;
+            }
+            if arm == "sigrs" {
+                let r = exec(Kind::Sig(FULL), &eqs, nv, &job_lim(&t_start, cap), true, None);
+                if r.status == Status::Refuted {
+                    own.sig = r.trace;
+                }
+            }
+            if (arm == "sigr" && traces.sig.is_none()) || (arm == "sigrs" && own.sig.is_none()) {
+                println!("{{\"cell\":\"{}\",\"target\":{},\"arm\":\"{}\",\"status\":\"notrace\"}}", label, ti, arm);
+                eprintln!("{label} t{ti} {arm}: no valid trace (the recording run did not refute)");
+                continue;
+            }
+            let lim = job_lim(&t_start, cap);
             let j = run_arm(arm, &eqs, nv, &lim, &traces, &own);
+            if arm == "f4" {
+                f4_touches = j.t.touches();
+            }
             let consistent = match j.status {
                 Status::Refuted => sols == 0,
                 Status::Gb => sols > 0,
@@ -2503,8 +2596,12 @@ fn check_system(name: &str, eqs: &[Poly], nv: usize, cross: &Traces, st: &mut Sy
     } else {
         st.sat += 1;
     }
-    let lim = Limits { deadline: None, max_cols: 1 << 22, vm_cap: 0 };
-    let kinds = [Kind::F4, Kind::Sig(FULL), Kind::Sig(0), Kind::Sig(1), Kind::Sig(2), Kind::Sig(4), Kind::Sig(8), Kind::Sig(3), Kind::Sig(12)];
+    let lim = Limits { deadline: None, max_cols: 1 << 22, vm_cap: 0, touch_cap: 0 };
+    let kinds: Vec<Kind> = if nv <= 10 {
+        vec![Kind::F4, Kind::Sig(FULL), Kind::Sig(0), Kind::Sig(1), Kind::Sig(2), Kind::Sig(4), Kind::Sig(8), Kind::Sig(16), Kind::Sig(3), Kind::Sig(12), Kind::Sig(15), Kind::Sig(FULL | 32)]
+    } else {
+        vec![Kind::F4, Kind::Sig(FULL), Kind::Sig(15)]
+    };
     let mut ref_gb: Option<Vec<Vec<u64>>> = None;
     let mut own = Traces { f4: None, sig: None, f4x: None };
     for kind in kinds {
@@ -2574,6 +2671,11 @@ fn check_system(name: &str, eqs: &[Poly], nv: usize, cross: &Traces, st: &mut Sy
                 }
                 if lab == "own" {
                     if j.replay != "ok" {
+                        std::env::set_var("B06_VERBOSE", "1");
+                        eprintln!("--- record");
+                        let _ = exec(kind, eqs, nv, &lim, true, None);
+                        eprintln!("--- replay");
+                        let _ = exec_replay(kind, eqs, nv, &lim, tr);
                         fail(&format!("{name}: {kind:?} replay of its own trace fell back"));
                     }
                     st.self_ok += 1;
@@ -2610,7 +2712,7 @@ fn selftest_systems() {
         Cell { m: 2, n: 9, l: 5 },
     ];
     let mut cross = Traces { f4: None, sig: None, f4x: None };
-    let lim = Limits { deadline: None, max_cols: 1 << 22, vm_cap: 0 };
+    let lim = Limits { deadline: None, max_cols: 1 << 22, vm_cap: 0, touch_cap: 0 };
     for c in toys {
         let gf = Gf::new(c.n);
         let mut rng = Rng(1000 + c.n as u64);
@@ -2696,7 +2798,7 @@ fn mode_xcheck(a: &Args) {
         let ti = jnum_f(line, "target").unwrap() as usize;
         let d = cd.iter().find(|d| d.idx == ti).expect("target");
         let (eqs, nv) = system_of(d);
-        let lim = Limits { deadline: None, max_cols: 400_000, vm_cap: 0 };
+        let lim = Limits { deadline: None, max_cols: 400_000, vm_cap: 0, touch_cap: 0 };
         let j = exec(Kind::F4, &eqs, nv, &lim, false, None);
         let mine = [
             ("touches", j.t.touches()),
