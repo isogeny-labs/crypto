@@ -362,3 +362,70 @@ The comparison is Part C's satisfiable Semaev draws, where `d_last = 4` on all 6
 | **"Semaev-specific"** | every shape has control median `d_last ≥ 5` |
 | **"generic at toy size"** | every shape has control median `d_last ≤ 4` |
 | **mixed** | otherwise |
+
+## Amendment 7 (2026-10-18, before any E7 draw is generated): E7, `d_F` at `m ≥ 5` and `N` up to 60
+
+**Why.** E6 reached `N = 40` at `m = 5` and only `ℓ = 2`. Every draw so far has `d_F ≤ 4`.
+The HKYY conditional needs `d_F = ω(m²)` eventually. So the question is whether `d_F`
+starts to move once `m ≥ 5` and `ℓ ≥ 3`, and as `N` grows toward the limit of dense
+linear algebra.
+
+**Engine.** `examples/hky_par.rs`. It computes the same mutant closure as
+`hky_last_fall_degree` (Amendment 2), with different mechanics:
+- columns are ranked by the combinatorial number system;
+- candidates are reduced against the basis in parallel, chunk by chunk;
+- the residues are eliminated against each other in parallel.
+
+**Gate (must pass on the exact binary that runs E7, before any E7 draw):**
+1. `e7/validate.sh` reproduces `d_F` and every per-degree closure dimension of the
+   validated engine. That covers 24 committed draws: `m = 3` cells (5,2), (7,3), (11,4),
+   (13,4), (13,5), and `m = 4` (9,3). Required: `AGREE 24 DISAGREE 0`.
+2. `newcells --cells 5:10:2 --seed 20261012 --keep 4 --cmax 4` must reproduce
+   `e6/B_5-10-2.rerun.jsonl`: the same four draws, the same `d_F` (4, 3, 4, 4) and the same
+   closure dimensions.
+
+If either check fails, E7 does not run.
+
+**E6 Part B completion.** The m = 4 (13, 4) cell was lost to two container restarts. It
+is rerun with this engine. The cell, seed, `keep` and `cmax` are as in Amendment 4, and
+the output goes to `e6/B_4-13-4.par.jsonl`. It is scored under Amendment 4's rule.
+
+**E7 cells.** Draws are made as in E6 Part B:
+- `ladder_sample` with `cell_seed(20261012, n, ℓ, m)`;
+- keep the first 4 draws with no solutions;
+- `cmax = 4`, and a draw not refuted by degree 4 is reported as `d_F ≥ 5`.
+
+Unknowns: `N = (m − 2)·n + m·ℓ`. Memory is dominated by the degree-4 echelon basis, about
+`(#columns)²/16` bytes.
+
+| tier | `m` | `(n, ℓ)` | `N` | columns `≤ 4` | basis memory |
+|:--|--:|:--|--:|--:|--:|
+| local (4 cores, 15 GB) | 6 | (8, 2) | 44 | 150 026 | ≈ 1.4 GB |
+| local | 5 | (11, 3) | 48 | 213 053 | ≈ 2.8 GB |
+| local | 6 | (9, 2) | 48 | 213 053 | ≈ 2.8 GB |
+| large host (≥ 64 GB) | 5 | (13, 3) | 54 | 342 811 | ≈ 7.3 GB |
+| large host | 6 | (10, 3) | 58 | 456 838 | ≈ 13 GB |
+| large host | 5 | (15, 3) | 60 | 523 686 | ≈ 17 GB |
+
+- The local tier runs now.
+- The large-host tier runs only on a host with at least 64 GB of RAM, using the same
+  binary build and the same gate.
+- If no such host is available, the large tier is reported as **not run**. It is not
+  extrapolated.
+- `N ≈ 100` is out of reach of a dense degree-4 closure: about 4.1 million columns and a
+  ≈ 1 TB basis. It is not registered here, and would need a sparse or structured method.
+
+**Reading rule (fixed now; exploratory, like E6).**
+
+| reading | condition |
+|:--|:--|
+| **`d_F` bounded through `m = 6`** | every E7 draw that ran has `d_F ≤ 4` |
+| **`d_F` grows** | some E7 cell has median `d_F ≥ 5` |
+| **mixed** | otherwise |
+
+- Each tier is read separately, and so is the pooled set.
+- "Bounded" here is still evidence at toy size, for the same reason as in E6. A bounded
+  reading does not contradict the HKYY conditional, which constrains asymptotics only.
+- Wall time and per-degree closure dimensions are recorded. They are not scored.
+
+Nothing from any E7 cell has been computed, and no E7 draw has been generated.
