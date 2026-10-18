@@ -38,11 +38,35 @@ TYPE=${INGEST_TYPE:-c7g.large}
 THREADS=${INGEST_THREADS:-6}
 NAME=rho-dp-ingest
 ROLE=${INGEST_ROLE:-publisher}
+PAID_SERVICE=${INGEST_CAIRN_SERVICE:-0}
+PERIOD_SECONDS=${INGEST_PERIOD_SECONDS:-600}
 case "$ROLE" in
 publisher) WORKER_ONLY=0 ;;
 worker) WORKER_ONLY=1 ;;
 *) echo "INGEST_ROLE must be publisher or worker" >&2; exit 2 ;;
 esac
+case "$PAID_SERVICE" in
+0|1) ;;
+*) echo "INGEST_CAIRN_SERVICE must be 0 or 1" >&2; exit 2 ;;
+esac
+
+check_paid_service() {
+    [ "$PAID_SERVICE" = 1 ] || return 0
+    if [ ! -f "${INGEST_OPERATOR_PATH:-}" ]; then
+        echo "INGEST_CAIRN_SERVICE=1 requires INGEST_OPERATOR_PATH to Cairn operator.py" >&2
+        return 1
+    fi
+    if ! [[ "$PERIOD_SECONDS" =~ ^[0-9]+$ ]] || [ "$PERIOD_SECONDS" -lt 2 ]; then
+        echo "INGEST_PERIOD_SECONDS must be an integer >= 2" >&2
+        return 1
+    fi
+    local versioning
+    versioning=$(aws s3api get-bucket-versioning --bucket "$BUCKET" --query Status --output text)
+    if [ "$versioning" != Enabled ]; then
+        echo "paid-service receipts require source bucket versioning; $BUCKET is $versioning" >&2
+        return 1
+    fi
+}
 
 # A quiet walker fleet has no running walker to copy network placement from.
 # The last stopped ingest host is still an authoritative template for the
@@ -108,6 +132,7 @@ check_ec2_publisher() {
 if [ "${1:-up}" = preflight ] || [ "${1:-up}" = up ]; then
     check_local_ingester
     check_ec2_publisher
+    check_paid_service
 fi
 
 case "${1:-up}" in
@@ -115,6 +140,7 @@ preflight)
     VERSIONING=$(aws s3api get-bucket-versioning --bucket "$BUCKET" --query Status --output text)
     echo "account=$ACCOUNT region=$REGION role=$ROLE instance_type=$TYPE security_group=$SG subnet=$SUBNET"
     echo "source=s3://$BUCKET/dp/ status=s3://$STATUS_BUCKET/status.json"
+    echo "cairn_service=$PAID_SERVICE period_seconds=$PERIOD_SECONDS"
     echo "source_versioning=$VERSIONING"
     if [ "$VERSIONING" != Enabled ]; then
         echo "source bucket versioning is disabled; later receipt replay requires immutable object keys" >&2
@@ -170,6 +196,19 @@ SHA=$(sha256sum dp_ingest.py | cut -c1-16)
 aws s3 cp dp_ingest.py "s3://$BUCKET/ingest/$SHA/dp_ingest.py" --only-show-errors
 echo "published ingest $SHA"
 
+EXEC_START="/opt/rho-ingest/venv/bin/python3 /opt/rho-ingest/dp_ingest.py --bucket $BUCKET --status-bucket $STATUS_BUCKET --threads $THREADS --metric-namespace ECC2K130/Ingest"
+STOP_POST=
+EVIDENCE_SHIP=
+OPERATOR_SHA=
+if [ "$PAID_SERVICE" = 1 ]; then
+    OPERATOR_SHA=$(sha256sum "$INGEST_OPERATOR_PATH" | cut -c1-16)
+    aws s3 cp "$INGEST_OPERATOR_PATH" "s3://$BUCKET/ingest/$SHA/operator-$OPERATOR_SHA.py" --only-show-errors
+    EXEC_START="/opt/rho-ingest/venv/bin/python3 /opt/rho-ingest/operator.py --replica-id %H --evidence-dir /var/lib/rho-ingest/evidence --status-url https://$STATUS_BUCKET.s3.$REGION.amazonaws.com/status.json --period-seconds $PERIOD_SECONDS -- /opt/rho-ingest/venv/bin/python3 /opt/rho-ingest/dp_ingest.py --replica-id %H --bucket $BUCKET --status-bucket $STATUS_BUCKET --threads $THREADS --metric-namespace ECC2K130/Ingest"
+    STOP_POST=ExecStopPost=/usr/local/bin/rho-ingest-logship
+    EVIDENCE_SHIP="aws s3 sync /var/lib/rho-ingest/evidence/ s3://$BUCKET/logs/rho-ingest-\${IID}/evidence/ --exclude current-period.json --exclude operator.lock --only-show-errors"
+    echo "published Cairn operator $OPERATOR_SHA; period ${PERIOD_SECONDS}s"
+fi
+
 USERDATA=$(mktemp)
 trap 'rm -f "$USERDATA"' EXIT
 cat > "$USERDATA" <<EOF
@@ -192,6 +231,13 @@ aws s3 cp "s3://$BUCKET/ingest/$SHA/dp_ingest.py" /opt/rho-ingest/dp_ingest.py
 got=\$(sha256sum /opt/rho-ingest/dp_ingest.py | cut -c1-16)
 [ "\$got" = "$SHA" ] || { echo "ingest digest \$got != $SHA; refusing to run"; exit 1; }
 
+if [ "$PAID_SERVICE" = 1 ]; then
+    aws s3 cp "s3://$BUCKET/ingest/$SHA/operator-$OPERATOR_SHA.py" /opt/rho-ingest/operator.py
+    got=\$(sha256sum /opt/rho-ingest/operator.py | cut -c1-16)
+    [ "\$got" = "$OPERATOR_SHA" ] || { echo "Cairn operator digest \$got != $OPERATOR_SHA; refusing to run"; exit 1; }
+    install -d -m 700 /var/lib/rho-ingest/evidence
+fi
+
 cat > /etc/systemd/system/rho-ingest.service <<'UNIT'
 [Unit]
 Description=ECC2K-130 distinguished-point ingest
@@ -205,9 +251,8 @@ Environment=RHO_CAMPAIGN=ecc2k-130
 Environment=RHO_DB_HOST=$(aws rds describe-db-instances --db-instance-identifier rho-dp --query 'DBInstances[0].Endpoint.Address' --output text)
 Environment=RHO_DB_SECRET=rho/dp-rds
 Environment=RHO_INGEST_WORKER_ONLY=$WORKER_ONLY
-ExecStart=/opt/rho-ingest/venv/bin/python3 /opt/rho-ingest/dp_ingest.py \\
-    --bucket $BUCKET --status-bucket $STATUS_BUCKET \\
-    --threads $THREADS --metric-namespace ECC2K130/Ingest
+ExecStart=$EXEC_START
+$STOP_POST
 Restart=always
 RestartSec=15
 
@@ -220,6 +265,7 @@ cat > /usr/local/bin/rho-ingest-logship <<'SHIP'
 IID=\$(curl -s -m 2 -H "X-aws-ec2-metadata-token: \$(curl -s -m 2 -X PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 120')" http://169.254.169.254/latest/meta-data/instance-id)
 journalctl -u rho-ingest -n 4000 --no-pager > /tmp/ingest.log 2>/dev/null
 aws s3 cp /tmp/ingest.log "s3://$BUCKET/logs/rho-ingest-\${IID}/ingest.log" --only-show-errors
+$EVIDENCE_SHIP
 SHIP
 chmod +x /usr/local/bin/rho-ingest-logship
 cat > /etc/systemd/system/rho-ingest-logship.service <<'UNIT'
@@ -252,7 +298,7 @@ IID=$(aws ec2 run-instances --image-id "$AMI" --instance-type "$TYPE" \
     --block-device-mappings 'DeviceName=/dev/sda1,Ebs={VolumeSize=30,VolumeType=gp3,DeleteOnTermination=true}' \
     --metadata-options 'HttpTokens=required,HttpEndpoint=enabled' \
     --user-data "file://$USERDATA" \
-    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$NAME},{Key=Project,Value=ecc2k-130},{Key=Role,Value=rho-ingest},{Key=IngestRole,Value=$ROLE},{Key=IngestVersion,Value=$SHA},{Key=CostGuardExempt,Value=true}]" \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$NAME},{Key=Project,Value=ecc2k-130},{Key=Role,Value=rho-ingest},{Key=IngestRole,Value=$ROLE},{Key=IngestVersion,Value=$SHA},{Key=CairnService,Value=$PAID_SERVICE},{Key=CostGuardExempt,Value=true}]" \
     --query 'Instances[0].InstanceId' --output text)
 echo "launched $IID ($TYPE, $ROLE replica, ingest $SHA)"
 echo "watch: aws s3 cp s3://$BUCKET/logs/rho-ingest-$IID/ingest.log - | tail"

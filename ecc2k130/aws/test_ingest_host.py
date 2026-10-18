@@ -35,7 +35,7 @@ case "$1 $2" in
     if [ "${TEST_NO_PROFILE:-0}" = 1 ]; then exit 254; fi
     echo '{}' ;;
   'rds describe-db-instances') echo db.example ;;
-  's3api get-bucket-versioning') echo None ;;
+  's3api get-bucket-versioning') echo "${TEST_VERSIONING:-None}" ;;
   's3 cp') exit 0 ;;
   'ec2 run-instances')
     printf '%s\\n' "$@" > "$TEST_RUN_ARGS"
@@ -89,6 +89,9 @@ esac
                 self.assertNotIn("aws_access_key_id", unit)
                 self.assertIn("sg-existing", args)
                 self.assertIn("subnet-existing", args)
+                self.assertEqual(subprocess.run(
+                    ["bash", "-n", str(self.root / "user-data")],
+                    capture_output=True, text=True).returncode, 0)
 
     def test_invalid_role_never_launches(self):
         result = self.run_launcher("unspecified", "up")
@@ -115,6 +118,53 @@ esac
         result = self.run_launcher("worker", "up", TEST_NO_PROFILE="1")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("refusing to put static credentials in user-data", result.stderr)
+        self.assertFalse((self.root / "user-data").exists())
+
+    def test_paid_service_requires_operator_and_versioned_inputs(self):
+        missing = self.run_launcher("worker", "preflight", INGEST_CAIRN_SERVICE="1")
+        self.assertNotEqual(missing.returncode, 0)
+        self.assertIn("requires INGEST_OPERATOR_PATH", missing.stderr)
+        operator = self.root / "operator.py"
+        operator.write_text("# pinned Cairn operator\n")
+        unversioned = self.run_launcher(
+            "worker", "preflight", INGEST_CAIRN_SERVICE="1",
+            INGEST_OPERATOR_PATH=str(operator))
+        self.assertNotEqual(unversioned.returncode, 0)
+        self.assertIn("receipts require source bucket versioning", unversioned.stderr)
+        self.assertFalse((self.root / "user-data").exists())
+
+    def test_paid_service_runs_supervisor_and_ships_closed_periods(self):
+        operator = self.root / "operator.py"
+        operator.write_text("# pinned Cairn operator\n")
+        result = self.run_launcher(
+            "worker", "up", INGEST_CAIRN_SERVICE="1",
+            INGEST_OPERATOR_PATH=str(operator), INGEST_PERIOD_SECONDS="600",
+            TEST_VERSIONING="Enabled")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        unit = (self.root / "user-data").read_text()
+        args = (self.root / "run-args").read_text()
+        self.assertIn("/opt/rho-ingest/operator.py --replica-id %H", unit)
+        self.assertIn("--period-seconds 600 --", unit)
+        self.assertIn("dp_ingest.py --replica-id %H", unit)
+        self.assertIn("ExecStopPost=/usr/local/bin/rho-ingest-logship", unit)
+        self.assertIn("aws s3 sync /var/lib/rho-ingest/evidence/", unit)
+        self.assertIn("rho-ingest-${IID}/evidence/", unit)
+        self.assertIn("--exclude current-period.json --exclude operator.lock", unit)
+        self.assertIn("CairnService,Value=1", args)
+        self.assertNotIn("aws_access_key_id", unit)
+        syntax = subprocess.run(["bash", "-n", str(self.root / "user-data")],
+                                capture_output=True, text=True)
+        self.assertEqual(syntax.returncode, 0, syntax.stderr)
+
+    def test_paid_service_rejects_invalid_period_before_upload(self):
+        operator = self.root / "operator.py"
+        operator.write_text("# pinned Cairn operator\n")
+        result = self.run_launcher(
+            "worker", "up", INGEST_CAIRN_SERVICE="1",
+            INGEST_OPERATOR_PATH=str(operator), INGEST_PERIOD_SECONDS="zero",
+            TEST_VERSIONING="Enabled")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("INGEST_PERIOD_SECONDS must be an integer", result.stderr)
         self.assertFalse((self.root / "user-data").exists())
 
 

@@ -732,6 +732,34 @@ are billable EC2 operations, so preflight alone is the read-only check. `up`
 requires the `ecc2k130-ingest` instance profile and fails before upload or
 launch if it is unavailable; it never places AWS static keys in user-data.
 
+For Cairn operating-period payment, point `INGEST_OPERATOR_PATH` at the
+reviewed `examples/ecc2k-ingest-service/operator.py` in the Cairn checkout and
+enable the paid-service mode on **each** replica:
+
+```sh
+export INGEST_CAIRN_SERVICE=1
+export INGEST_OPERATOR_PATH=/absolute/path/to/cairn/examples/ecc2k-ingest-service/operator.py
+export INGEST_PERIOD_SECONDS=600
+AWS_PROFILE=ecc2k130 INGEST_ROLE=worker ./ingest_host.sh preflight
+# After cutover approval and the old writer's stop:
+AWS_PROFILE=ecc2k130 INGEST_ROLE=publisher ./ingest_host.sh up
+AWS_PROFILE=ecc2k130 INGEST_ROLE=worker ./ingest_host.sh up
+```
+
+Paid-service preflight requires source-bucket versioning so an auditor can
+retrieve the exact ingested object version later. It also requires the local
+operator file before any upload. `up` uploads that file by digest and checks
+its digest again on the host. The host runs the Cairn supervisor around its
+ingester, using its EC2 hostname as the shared replica id. Completed
+`period-N.json` journals and exact content-addressed status snapshots are
+copied to private `s3://$BUCKET/logs/rho-ingest-<instance>/evidence/` every
+two minutes and when the service stops. The in-progress journal is excluded;
+it cannot certify a complete period. The existing instance profile has bucket
+list/read access and write access to `logs/`, so this path needs no new static
+credential. An auditor still reviews the S3/RDS receipts and health gaps
+before signing a Cairn claim; a running supervisor alone does not authorize
+payment.
+
 **Scheduled Lambda (no host).** `./ingest_lambda.sh up` deploys the same
 program as a Lambda on a two-minute EventBridge schedule, running one
 `--once` pass per invocation. The ingest loop never needed a resident
