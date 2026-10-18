@@ -4,6 +4,11 @@ Source and tests live here. Download the complete private deployment bundle,
 compiled runtime and workstation installer using [ARTIFACTS.md](ARTIFACTS.md)
 and its SHA-256 manifest. Publication checks are in [VALIDATION.md](VALIDATION.md).
 
+[Checkpoint discovery](CHECKPOINT_DISCOVERY.md) inventories live experiments and
+checkpoint candidates. New manifest-contract jobs validate generation checksums
+and automatically select the newest valid state before resuming. A read-only
+timer writes the durable inventory every minute.
+
 This deployment targets one logical x86_64 host with 32 vCPUs and 128 GiB RAM
 in us-east-2. It uses Spot only, with capacity gaps accepted. It preserves
 the existing SSH endpoint `3.134.144.201` by moving its existing Elastic IP
@@ -73,7 +78,9 @@ New workers fetch a deterministic runtime archive from a private, encrypted,
 versioned S3 bucket and verify its SHA-256 before installation. The archive
 includes the node binaries and supervisor/idle services. `NodeProject` selects
 the durable project directory. Scientific dependencies still need migration.
-After a runtime change, run `python3 package_runtime.py`, upload it as
+Build the native checkpoint-discovery binary as described in its runbook and
+install it beside the node executables before packaging. After a runtime change,
+run `python3 package_runtime.py`, upload it as
 `runtime/<digest>.tar.gz` in the stack bucket, and explicitly update the
 `RuntimeDigest` stack parameter. Keep old versions for rollback.
 
@@ -257,7 +264,8 @@ Retained EFS and the original volume need explicit retention/cost management.
 
 ## Validation status
 
-37 tests passed locally; 35 also passed with temporary state on the actual
+38 system tests and 20 native discovery tests passed locally; 35 earlier system
+tests also passed with temporary state on the actual
 mounted EFS before the final short-job timer and user-process guard cases. Tests include idle threshold boundaries, wake
 races, missing/stale activity, failed probes, draining-worker admission,
 hook merging and existing checkpoint tests,
@@ -271,6 +279,13 @@ release against the deployed Lambda and received the expected staged response.
 Both node endpoints passed checks and a node-service restart preserved the
 database identity. No live idle termination, new-worker cold boot, or workstation
 hook event has been exercised.
+
+The native discovery timer is installed on the original host and refreshes
+`/srv/experiments/discovery/current-host.json`. It identified the five existing
+factor-base workers without checkpoint interfaces. Full archive coverage is
+partial and explicitly reported; see `validation/current-host-discovery.json`.
+Discovery's native kill/restore fixture proves generation selection and supervisor
+integration, not recovery of these non-checkpointed live workers.
 
 The current host successfully mounted `fs-001b57936c90979ed` at `/srv/experiments`
 using TLS and IAM. amazon-efs-utils was installed on the host for that check.

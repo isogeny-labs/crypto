@@ -13,6 +13,7 @@ from types import SimpleNamespace
 from build_template import build
 from controller import handler, reconcile
 from runner import read_jobs
+from install_services import discovery_units
 
 
 class AddressTests(unittest.TestCase):
@@ -174,6 +175,15 @@ class ResumeTests(unittest.TestCase):
 
 
 class DeploymentTests(unittest.TestCase):
+    def test_discovery_timer_only_runs_read_only_inventory(self):
+        units = discovery_units(Path('/opt/spot'), [Path('/work/with spaces')])
+        service = units['spot-checkpoint-discovery.service']
+        self.assertIn('User=ec2-user', service)
+        self.assertIn('--search-root "/work/with spaces"', service)
+        self.assertIn('--output /srv/experiments/discovery/current-host.json', service)
+        self.assertIn('OnUnitInactiveSec=60', units['spot-checkpoint-discovery.timer'])
+        self.assertNotIn('runner.py', service)
+
     def test_safe_staging_and_durable_storage(self):
         t = build()
         self.assertEqual(t['Parameters']['Capacity']['Default'], 0)

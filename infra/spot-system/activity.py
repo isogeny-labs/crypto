@@ -47,6 +47,9 @@ def collect(root, nodes, proc=Path('/proc')):
                                 'cairn','conductord'}:
                         continue
                     command = (p/'cmdline').read_bytes().split(b'\0')
+                    discovery = Path(__file__).with_name('bin') / 'checkpoint-discovery'
+                    if (p/'exe').is_symlink() and (p/'exe').resolve() == discovery.resolve():
+                        continue
                     own_scripts = {str(Path(__file__).with_name(n)).encode() for n in
                                    ['activity.py','node_service.py','runner.py']}
                     if name.startswith('python') and len(command)>1 and command[1] in own_scripts:

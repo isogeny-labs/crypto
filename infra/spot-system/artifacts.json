@@ -4,10 +4,10 @@
   "region": "us-east-2",
   "staged": true,
   "deployment_bundle": {
-    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/releases/e9d59db4b1a3387a0c99b4fce270c41e2a59a7d3de639711e1492dcd08fab72e/spot-system.tar.gz",
-    "sha256": "e9d59db4b1a3387a0c99b4fce270c41e2a59a7d3de639711e1492dcd08fab72e",
-    "bytes": 68144696,
-    "description": "Complete private deployment bundle, including observed live state and compiled runtime"
+    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/releases/39db4b059a4d6f05695cc91418fb0b152232bf2a6df5556a28f0c6bd84740adc/spot-system.tar.gz",
+    "sha256": "39db4b059a4d6f05695cc91418fb0b152232bf2a6df5556a28f0c6bd84740adc",
+    "bytes": 68553996,
+    "description": "Private deployment bundle with native checkpoint discovery and observed staged state"
   },
   "client_installer": {
     "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/clients/8c3756b6408d6fde4255f515d225b311c19048dd3a28d83d1ecdb000d8b4ada9/spot-client.tar.gz",
@@ -15,8 +15,14 @@
     "bytes": 3069
   },
   "runtime": {
-    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/runtime/9950125d713a873f20aed48cf5274d54ab98e80fc7e4df9dd0c7ce4ad77ac9be.tar.gz",
-    "sha256": "9950125d713a873f20aed48cf5274d54ab98e80fc7e4df9dd0c7ce4ad77ac9be",
-    "bytes": 68557897
+    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/runtime/bba0eb5c6133263bbbeeb5de6f664d1658fd7d4f92239d77f8486a6a7f042974.tar.gz",
+    "sha256": "bba0eb5c6133263bbbeeb5de6f664d1658fd7d4f92239d77f8486a6a7f042974",
+    "bytes": 68948053
+  },
+  "checkpoint_discovery": {
+    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/tools/9c6a9fc1291c95ccee2c402fdeafbbaa8b94a84d4dd21a6b70a22df7af242cee/checkpoint-discovery",
+    "sha256": "9c6a9fc1291c95ccee2c402fdeafbbaa8b94a84d4dd21a6b70a22df7af242cee",
+    "bytes": 862232,
+    "target": "x86_64-unknown-linux-gnu, target-cpu=x86-64, AL2023"
   }
 }

@@ -13,6 +13,11 @@ identity keys, Conductor credentials, or database files are in these artifacts.
   `python3 setup.py` in `spot-client/` on the machine running the coding clients.
 - `runtime`: the digest-pinned worker bundle containing the supervisor, activity
   reporter, node services and pinned node executables.
+- `checkpoint_discovery`: the portable native scanner executable, also included
+  in the runtime. Its runbook is `CHECKPOINT_DISCOVERY.md`.
+
+The release's `artifacts.json` sits beside the deployment bundle and is also
+committed here. It is excluded from the bundle to avoid a circular self-hash.
 
 These objects require an authenticated AWS identity with `s3:GetObject` access.
 Their bucket blocks public access, uses server-side encryption and versioning,
@@ -52,6 +57,12 @@ research result generation. Run them from the repository root:
 python3 -m unittest discover -s infra/spot-system -p 'test_*.py' -v
 python3 -m py_compile infra/spot-system/*.py
 cfn-lint infra/spot-system/template.json
+```
+
+Native discovery and its supervisor restore tests run with:
+
+```bash
+cargo test --locked --manifest-path infra/spot-system/checkpoint-discovery/Cargo.toml
 ```
 
 See `VALIDATION.md` for the publication checks and their precise scope.

@@ -47,7 +47,7 @@ def read_jobs(root):
         if name in seen:
             raise ValueError("Duplicate job id")
         seen.add(name)
-        if j.get("checkpoint_contract") != "atomic-files-and-sigterm-v1":
+        if j.get("checkpoint_contract") not in {"atomic-files-and-sigterm-v1", "manifest-sha256-v1"}:
             raise ValueError(f"{name}: explicit checkpoint contract required")
         if not isinstance(j.get("argv"), list) or not j["argv"] or not all(
                 isinstance(a, str) for a in j["argv"]):
@@ -85,18 +85,38 @@ def run_job(root, job, stop):
         raise RuntimeError(f"{job['id']}: specification changed; use a new job id")
     atomic_json(identity, {"sha256": fingerprint, "spec": job})
     if (state / "complete.json").exists():
+        if json.loads((state / 'complete.json').read_text()).get('sha256') != fingerprint:
+            raise RuntimeError(f"{job['id']}: completion marker does not match the job")
         return
     checkpoint = state / "checkpoint"
     checkpoint.mkdir(exist_ok=True)
+    selected = None
+    if job['checkpoint_contract'] == 'manifest-sha256-v1':
+        binary = os.environ.get('SPOT_CHECKPOINT_DISCOVERY_BIN',
+                                str(Path(__file__).with_name('bin') / 'checkpoint-discovery'))
+        discovery = subprocess.run([binary, '--root', str(root), '--job', job['id'],
+                                    '--require-valid'], capture_output=True, text=True, timeout=120)
+        if discovery.returncode:
+            raise RuntimeError(f"{job['id']}: checkpoint discovery rejected recovery; inspect the inventory")
+        report = json.loads(discovery.stdout)
+        selected = report['jobs'][0]['selected']
     env = dict(os.environ, SPOT_CHECKPOINT_DIR=str(checkpoint),
-               SPOT_RESUMED="1" if any(checkpoint.iterdir()) else "0",
+               SPOT_RESUMED="1" if (selected if job['checkpoint_contract'] == 'manifest-sha256-v1'
+                                    else any(checkpoint.iterdir())) else "0",
                SPOT_OUTPUT_DIR=str(state / "output"))
+    # Clear inherited selections: only the current job's validated generation
+    # may be passed to an application implementing the new manifest contract.
+    env.pop('SPOT_CHECKPOINT_MANIFEST', None)
+    if selected:
+        env['SPOT_CHECKPOINT_MANIFEST'] = selected['manifest']
     (state / "output").mkdir(exist_ok=True)
     with (state / "stdout.log").open("ab", buffering=0) as out, \
             (state / "stderr.log").open("ab", buffering=0) as err:
         if os.environ.get('SPOT_ACTIVITY_TABLE'):
             from worker_state import admit
             admit(root)
+        if job['checkpoint_contract'] == 'manifest-sha256-v1':
+            atomic_json(state / 'attempt.json', {'sha256': fingerprint, 'started': time.time()})
         child = subprocess.Popen(job["argv"], cwd=root / job["cwd"], env=env,
                                  stdout=out, stderr=err, start_new_session=True)
         while child.poll() is None:
