@@ -120,6 +120,7 @@ crypto cryptanalysis aes-distinguisher --technique yoyo --samples 4096
 crypto cryptanalysis aes-distinguisher --technique mixture --samples 4096
 crypto cryptanalysis aes-distinguisher --technique zero-correlation
 crypto cryptanalysis aes-cpa --input traces.json
+crypto cryptanalysis aes-dfa --input fault-pairs.json
 crypto cryptanalysis aes-dfa-schedule --last-round-key-hex 13111d7fe3944a17f307a78b4d2b30c5
 ```
 
@@ -161,10 +162,29 @@ The input JSON SHA-256 is
 `81b50a60c0361b33d7df6fe73cf5827942ce8dd10ff6284e931c97172a9ed2d8`.
 The known-answer ciphertext is `69c4e0d86a7b0430d8cdb78070b4c55a`.
 
-`aes-dfa-schedule` reverses an already established AES-128 round-10 key to
-the master key and checks that the forward schedule reproduces the supplied
-round key. The example round key maps to master key
-`000102030405060708090a0b0c0d0e0f`. Fault-pair equation solving is a
-separate stage; this command does not infer a last-round key from ciphertexts.
-The release command output is frozen in
+`aes-dfa` accepts 1–64 correct/faulted ciphertext pairs under a single-byte
+fault at the start of AES-128 round 9, before SubBytes. The input is a JSON
+object with a `pairs` array. Every entry has `plaintext_hex`,
+`correct_ciphertext_hex`, and `faulted_ciphertext_hex`, each exactly 16 bytes
+in hex. The command checks that each pair has the expected four-byte
+diffusion pattern, intersects round-10 key candidates by affected column,
+reverses the key schedule when every column has one survivor, and verifies
+the master key by encrypting every supplied plaintext. An unresolved set of
+candidates is reported as `bounded_ambiguous` with a nonzero exit status;
+contradictory or malformed pairs also fail. The input may be a file path or
+a `store:`/`sha256:` artifact reference. The reproducible public input and
+result are
+[`aes_dfa_round9_public_input.json`](fixtures/aes_dfa_round9_public_input.json)
+and
+[`aes_dfa_round9_public_report_20261018.json`](fixtures/aes_dfa_round9_public_report_20261018.json).
+The input SHA-256 is
+`1b1eb355e4c71ed6b5b194987ce03f4a887c2648e7f42dc688c2739edbfee8a1`.
+Its 16 correct ciphertexts also match independent OpenSSL AES-128-ECB
+encryption under the recovered key. The corpus varies all four injected
+source rows in each of the four MixColumns columns; every column has one
+surviving round-key tuple.
+
+`aes-dfa-schedule` reverses a supplied AES-128 round-10 key to the master
+key and checks that forward expansion reproduces it. The example round key
+maps to master key `000102030405060708090a0b0c0d0e0f`. The output is in
 [`aes_dfa_schedule_public_report_20261018.json`](fixtures/aes_dfa_schedule_public_report_20261018.json).

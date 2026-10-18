@@ -341,6 +341,12 @@ enum CryptanalysisOp {
         #[arg(long)]
         last_round_key_hex: String,
     },
+    /// Recover AES-128 from observed single-byte start-of-round-9 fault pairs.
+    AesDfa {
+        /// JSON file or checked store reference containing plaintext/ciphertext fault pairs.
+        #[arg(long)]
+        input: PathBuf,
+    },
     /// Run the full research bench and emit the Markdown report.
     /// (Equivalent to `cargo test --lib --release bench_demo --
     /// --ignored --nocapture` but accessible from the CLI.)
@@ -1416,6 +1422,78 @@ fn cmd_isogeny(op: IsogenyOp) {
 
 // ── Cryptanalysis subcommands ─────────────────────────────────────────────────
 
+fn cmd_aes_dfa(input: &Path) -> Result<(), String> {
+    use crypto_lib::cryptanalysis::aes::dfa::{dfa_full_recovery, DfaFaultPair};
+    use serde::Deserialize;
+
+    #[derive(Deserialize)]
+    #[serde(deny_unknown_fields)]
+    struct PairInput {
+        plaintext_hex: String,
+        correct_ciphertext_hex: String,
+        faulted_ciphertext_hex: String,
+    }
+    #[derive(Deserialize)]
+    #[serde(deny_unknown_fields)]
+    struct DfaInput {
+        pairs: Vec<PairInput>,
+    }
+
+    let resolved = crypto_lib::store::resolve_path(input)?;
+    let bytes =
+        std::fs::read(&resolved).map_err(|e| format!("cannot read {}: {e}", input.display()))?;
+    let data: DfaInput =
+        serde_json::from_slice(&bytes).map_err(|e| format!("invalid AES DFA input JSON: {e}"))?;
+    if !(1..=64).contains(&data.pairs.len()) {
+        return Err("AES DFA requires 1..=64 fault pairs".into());
+    }
+    let parse_block = |text: &str, label: &str| -> Result<[u8; 16], String> {
+        let bytes = from_hex(text).map_err(|e| format!("invalid {label} hex: {e}"))?;
+        bytes
+            .try_into()
+            .map_err(|_| format!("{label} must be exactly 16 bytes"))
+    };
+    let pairs: Vec<DfaFaultPair> = data
+        .pairs
+        .iter()
+        .enumerate()
+        .map(|(index, pair)| {
+            Ok(DfaFaultPair {
+                plaintext: parse_block(&pair.plaintext_hex, &format!("pair {index} plaintext"))?,
+                correct_ciphertext: parse_block(
+                    &pair.correct_ciphertext_hex,
+                    &format!("pair {index} correct ciphertext"),
+                )?,
+                faulted_ciphertext: parse_block(
+                    &pair.faulted_ciphertext_hex,
+                    &format!("pair {index} faulted ciphertext"),
+                )?,
+            })
+        })
+        .collect::<Result<_, String>>()?;
+    let report = dfa_full_recovery(&pairs)?;
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&serde_json::json!({
+            "schema_version": 1,
+            "operation": "aes-dfa",
+            "fault_model": "single-byte-before-round-9-subbytes",
+            "pairs_used": report.pairs_used,
+            "pairs_by_column": report.pairs_by_column,
+            "candidate_tuples_by_column": report.candidates_by_column,
+            "last_round_key_hex": report.last_round_key.map(|key| to_hex(&key)),
+            "master_key_hex": report.master_key.map(|key| to_hex(&key)),
+            "verified": report.verified,
+            "status": if report.verified { "complete" } else { "bounded_ambiguous" },
+        }))
+        .map_err(|e| e.to_string())?
+    );
+    if !report.verified {
+        return Err("AES DFA fault pairs did not determine a unique verified key".into());
+    }
+    Ok(())
+}
+
 fn cmd_aes_dfa_schedule(last_round_key_hex: &str) -> Result<(), String> {
     use crypto_lib::cryptanalysis::aes::{dfa, ReducedAes128};
 
@@ -1939,6 +2017,12 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
         }
         CryptanalysisOp::AesDfaSchedule { last_round_key_hex } => {
             if let Err(e) = cmd_aes_dfa_schedule(&last_round_key_hex) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesDfa { input } => {
+            if let Err(e) = cmd_aes_dfa(&input) {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }
