@@ -1149,6 +1149,14 @@ fn mode_closure(a: &Args) {
             std::process::exit(4);
         }
     }
+    if let Some(expect) = a.flag("--expect-rank") {
+        let want: usize = expect.parse().unwrap();
+        let got = res.last().map(|r| r.rank);
+        if got != Some(want) || last.map(|r| r.outcome) != Some("saturated") {
+            eprintln!("saturated rank {got:?} != expected {want}");
+            std::process::exit(7);
+        }
+    }
     if a.has("--expect-no-refutation") && found.is_some() {
         eprintln!("a satisfiable system was refuted");
         std::process::exit(5);
