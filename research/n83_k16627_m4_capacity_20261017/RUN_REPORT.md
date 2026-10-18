@@ -3,8 +3,8 @@
 **Date:** 2026-10-17 UTC. **Protocol:** [PROTOCOL.md](PROTOCOL.md),
 committed as `791bcf70ed` before code changes or a worker run; the
 [pre-run control clarification](CONTROL_ADDENDUM.md) was committed as
-`f74f6bc43a`. **Status:** model-capacity result, pending final branch-wide
-release-suite validation and PR review. This report does not promote an IC
+`f74f6bc43a`. **Status:** model-capacity result; pre-stack release-suite
+validation passed, with stacked-head validation and PR review pending. This report does not promote an IC
 scoreboard row.
 
 ## Exact input and checked worker

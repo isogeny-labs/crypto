@@ -5,6 +5,9 @@
 
 *Status:* Native solver integration and small-degree correctness validation.
 Degree-83 natural relation yield, useful rank, and runtime remain unmeasured.
+The pre-merge release suite passed, but inherited ecbench and quartic compile
+errors block validation after merging the current PR #2100 head. The merged
+head remains unverified pending a base fix and rerun.
 
 The full-width chained-S3 circuit supports four summands, but the index-calculus
 decomposition and dispatch guards previously admitted only five or six. This
