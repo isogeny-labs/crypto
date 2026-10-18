@@ -140,11 +140,11 @@ updated in this table as commits land.
 | T07 | equivariant F4 as a library module with inverse DFT and row-space agreement test | `src/cryptanalysis/equivariant_f4.rs` | pending |
 | T08 | Joux–Vitse trace record/replay in `matrix_f4_f2` | `src/cryptanalysis/koblitz_groebner.rs` | pending |
 | T09 | three-limb `GF(2ⁿ)` field for `n ≤ 191` with the ECC2K-130 polynomial pinned | `src/cryptanalysis/wide_gf2m.rs` | pending |
-| T10 | leaderboard: precomputed-rho reference on retained-setup rows; unpinned-calibration flag | `scripts/build_ic_leaderboard.py`, `docs/ic/` | pending |
-| T11 | `curves.yaml` records for the 24 board curves | `docs/curves/ic/curves.yaml` | pending |
-| T12 | hook that blocks a session stop with unpushed worktree commits | `.claude/hooks/`, `.claude/settings.json` | pending |
+| T10 | leaderboard: precomputed-rho reference on retained-setup rows; unpinned-calibration flag | `scripts/build_ic_leaderboard.py`, `docs/ic/` | landed (def0e266f, f5cfe6e1d, ec11047cd): precomputed-rho control block beside the retained-setup rows (n61 and K1798 cells "not run"; K3300/K600 control 3.74–395×), GAE-unpinned flag path with tests, slug-regex fix |
+| T11 | `curves.yaml` records for the 24 board curves | `docs/curves/ic/curves.yaml` | landed (7832011a9, d019bfdd1, 1aea01552): 24 of 24 board curves have a record, 0 reconciled; validator accepts the registry's decimal-string integers; peer mirror is `aburan28/cryptanalysis#959`, which must merge first for the `ic-semantic-metadata` job |
+| T12 | hook that blocks a session stop with unpushed worktree commits | `.claude/hooks/`, `.claude/settings.json` | blocked: the auto-mode classifier refuses an agent editing `.claude/settings.json`; needs the owner to run it |
 | T13 | divergence report of the 154 shared solver files against `cryptanalysis/suite` | `docs/ic/STACK_DIVERGENCE_20261018.md` | pending |
 | T14 | port the suite's `f4_gf2` rank-indexed kernel with a same-binary comparison | `src/cryptanalysis/f4_gf2.rs` | pending |
-| T15 | closure-degree predictor experiment from the committed draws | `ml-cryptanalysis/experiments/closure-degree-predictor/` | pending |
+| T15 | closure-degree predictor experiment from the committed draws | `ml-cryptanalysis/experiments/closure-degree-predictor/` | landed as `aburan28/ml-cryptanalysis#30`: only `ℓ` and `m·ℓ` are sufficient (148 draws, 37 cells, p = 1/666); the two rules are separated only by the cell m = 4, ℓ = 6 (2–5 unsatisfiable draws suffice); null result |
 | T16 | autoresearcher ledger corrections (artefact rejections, `s4_expr` propagation, corpus contradictions) | needs `/coordinate`; not delegated here | pending |
 | T17 | external Gröbner baselines (msolve, M4RI) wired as optional arms | `performance/`, `groebner_compare/` | pending; neither binary is installed here |
