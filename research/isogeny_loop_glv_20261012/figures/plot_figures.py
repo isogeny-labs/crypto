@@ -164,8 +164,84 @@ def fig_status():
     plt.close(fig)
 
 
+# ---- 5. native sweeper: scan ratio distributions per cost model (recorded values only)
+def fig_sweeper_scan():
+    import numpy as np
+
+    files = [("scan_bits128.json", "128-bit r (saving 512 M)"), ("scan_bits256.json", "256-bit r (saving 1024 M)"),
+             ("scan_bits128_char2.json", "char. 2, D = 1 mod 8, 128-bit r")]
+    fig, axes = plt.subplots(1, 3, figsize=(8.0, 2.8), sharey=True)
+    colors = {"projective": "#b4442c", "affine": "#d08a2c", "xonly": "#2a6fb0"}
+    for ax, (fn, title) in zip(axes, files):
+        path = os.path.join(STUDY, "sweeper_native", fn)
+        if not os.path.exists(path):
+            ax.set_title(f"{fn}: missing", fontsize=7)
+            continue
+        rec = json.load(open(path))
+        models = rec["cost_models"].split(",")
+        for m in models:
+            ratios = sorted(r["models"][m]["cheapest"]["ratio_to_saving"] for r in rec["rows"]
+                            if r["models"].get(m, {}).get("cheapest", {}).get("ratio_to_saving") is not None)
+            ys = np.arange(1, len(ratios) + 1) / len(ratios)
+            ax.step(ratios, ys, where="post", color=colors[m], lw=1.1, label=f"{m} (n = {len(ratios)})")
+        ax.axvline(1.0, color=GRID, lw=0.8)
+        ax.set_xscale("log")
+        ax.set_xlabel("cheapest loop cost / doublings saved")
+        ax.set_title(title, fontsize=7.5)
+        ax.grid(color=GRID, lw=0.4)
+        ax.legend(fontsize=6, frameon=False, loc="lower right")
+    axes[0].set_ylabel("fraction of fundamental D in [-3000, -3]")
+    fig.tight_layout()
+    fig.savefig(os.path.join(HERE, "sweeper_scan.svg"))
+    plt.close(fig)
+
+
+# ---- 6. native sweeper: challenge curves, cheapest non-Frobenius loop per model
+def fig_sweeper_curves():
+    import numpy as np
+
+    rows = []
+    for fn in ("groups_ad.json", "groups_bc.json"):
+        path = os.path.join(STUDY, "sweeper_native", fn)
+        if not os.path.exists(path):
+            continue
+        rec = json.load(open(path))
+        for r in rec["results"]:
+            if "models" not in r:
+                continue
+            rows.append((r["curve"]["name"], r["curve"]["family"], r["models"]))
+    if not rows:
+        return
+    models = ["projective", "affine", "xonly"]
+    colors = {"projective": "#b4442c", "affine": "#d08a2c", "xonly": "#2a6fb0"}
+    fig, ax = plt.subplots(figsize=(8.0, 3.4))
+    xs = np.arange(len(rows))
+    for i, m in enumerate(models):
+        vals, hatch = [], []
+        for _, _, mo in rows:
+            g = mo.get(m, {}).get("cheapest_non_frobenius_loop") or {}
+            vals.append(g.get("ratio_to_saving", np.nan))
+            hatch.append(g.get("within_radius", False))
+        bars = ax.bar(xs + (i - 1) * 0.27, vals, width=0.26, color=colors[m], label=m)
+        for b, w in zip(bars, hatch):
+            if not w:
+                b.set_hatch("//")
+                b.set_alpha(0.6)
+    ax.axhline(1.0, color=INK, lw=0.8)
+    ax.set_yscale("log")
+    ax.set_xticks(xs, [n if len(n) < 22 else n[:20] + "…" for n, _, _ in rows], rotation=60, ha="right", fontsize=6.5)
+    ax.set_ylabel("cheapest non-Frobenius loop\ncost / doublings saved (log)")
+    ax.grid(axis="y", color=GRID, lw=0.4)
+    ax.legend(fontsize=7, frameon=False, title="hatched: above the exhaustive radius (LLL upper bound)", title_fontsize=6.5)
+    fig.tight_layout()
+    fig.savefig(os.path.join(HERE, "sweeper_curves.svg"))
+    plt.close(fig)
+
+
 if __name__ == "__main__":
     fig_bench_arms()
     fig_bench_trend()
     fig_binary()
     fig_status()
+    fig_sweeper_scan()
+    fig_sweeper_curves()
