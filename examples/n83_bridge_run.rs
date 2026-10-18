@@ -63,12 +63,30 @@ fn read_lines(path: &Path) -> Result<Vec<String>> {
 }
 
 fn system_receipt() -> Value {
+    let cgroup_member = fs::read_to_string("/proc/self/cgroup")
+        .ok()
+        .and_then(|contents| {
+            contents.lines().find_map(|line| {
+                line.strip_prefix("0::")
+                    .filter(|member| member.starts_with('/'))
+                    .map(str::to_owned)
+            })
+        });
+    let cgroup_root = cgroup_member
+        .as_ref()
+        .map(|member| Path::new("/sys/fs/cgroup").join(member.trim_start_matches('/')));
+    let cgroup_file = |name: &str| {
+        cgroup_root
+            .as_ref()
+            .and_then(|root| fs::read_to_string(root.join(name)).ok())
+    };
     let file = |path: &str| fs::read_to_string(path).ok();
     json!({
-        "cpu_stat":file("/sys/fs/cgroup/cpu.stat"),
-        "cpu_max":file("/sys/fs/cgroup/cpu.max"),
-        "memory_max":file("/sys/fs/cgroup/memory.max"),
-        "memory_events":file("/sys/fs/cgroup/memory.events"),
+        "cgroup_member":cgroup_member,
+        "cpu_stat":cgroup_file("cpu.stat"),
+        "cpu_max":cgroup_file("cpu.max"),
+        "memory_max":cgroup_file("memory.max"),
+        "memory_events":cgroup_file("memory.events"),
         "proc_stat":file("/proc/stat"),
         "self_status":file("/proc/self/status"),
         "pressure_cpu":file("/proc/pressure/cpu"),

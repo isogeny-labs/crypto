@@ -16,3 +16,13 @@ absent. The analyzer runs only when the producer wrote its complete event
 ledger. A rejected runner remains an infrastructure result and does not
 enter a timing aggregate. The frozen public points, candidate definitions,
 IC source digest, caps, and same-point pairing remain as in `protocol.json`.
+
+The next [cloud attempt](https://github.com/aburan28/crypto/actions/runs/39094407077)
+exposed a narrower infrastructure issue in stratum 2. Its recorded
+`/proc/self/cgroup` member was
+`/system.slice/hosted-compute-agent.service`; the revised probe still read
+only the cgroup mount root, where `memory.max` and `memory.events` were absent.
+Its `preflight.json` correctly recorded `REJECTED_CGROUP_TELEMETRY`, with zero
+completed pairs in that stratum. The producer now resolves the process's
+actual cgroup member before reading CPU and memory counters. The other
+strata's first-attempt receipts remain attached to the cloud run.
