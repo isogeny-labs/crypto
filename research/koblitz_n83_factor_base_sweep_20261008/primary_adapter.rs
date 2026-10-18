@@ -30,21 +30,46 @@ use serde_json::{json, Value};
 use std::collections::{BTreeMap, HashSet};
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Write};
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::sync::{mpsc, Arc};
 use std::thread;
 use std::time::{Duration, Instant};
+
+fn cgroup_v2_root_from_membership(membership: &str) -> io::Result<PathBuf> {
+    let path = membership
+        .lines()
+        .find_map(|line| line.strip_prefix("0::"))
+        .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "cgroup v2 membership missing"))?;
+    let relative = path.strip_prefix('/').ok_or_else(|| {
+        io::Error::new(io::ErrorKind::InvalidData, "cgroup v2 path is not absolute")
+    })?;
+    if Path::new(relative)
+        .components()
+        .any(|component| matches!(component, Component::ParentDir | Component::Prefix(_)))
+    {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "cgroup v2 path traverses above the mount",
+        ));
+    }
+    Ok(Path::new("/sys/fs/cgroup").join(relative))
+}
+
+fn cgroup_v2_file(name: &str) -> io::Result<PathBuf> {
+    let membership = fs::read_to_string("/proc/self/cgroup")?;
+    Ok(cgroup_v2_root_from_membership(&membership)?.join(name))
+}
 
 fn checked_cgroup_memory_limit(memory_mib: u64) -> Result<u64> {
     let bytes = memory_mib
         .checked_mul(1024 * 1024)
         .filter(|&value| value > 0)
         .ok_or("invalid capacity memory limit")?;
-    let actual: u64 = fs::read_to_string("/sys/fs/cgroup/memory.max")?
+    let actual: u64 = fs::read_to_string(cgroup_v2_file("memory.max")?)?
         .trim()
         .parse()
         .map_err(|_| "capacity worker requires a finite cgroup memory.max")?;
-    let swap: u64 = fs::read_to_string("/sys/fs/cgroup/memory.swap.max")?
+    let swap: u64 = fs::read_to_string(cgroup_v2_file("memory.swap.max")?)?
         .trim()
         .parse()
         .map_err(|_| "capacity worker requires a finite cgroup memory.swap.max")?;
@@ -669,7 +694,7 @@ pub(super) fn chain_capacity_cli(
         "PASS_model_construction_only"
     };
     let model_construction_ms = model_start.elapsed().as_secs_f64() * 1000.0;
-    let cgroup_peak_bytes: u64 = fs::read_to_string("/sys/fs/cgroup/memory.peak")?
+    let cgroup_peak_bytes: u64 = fs::read_to_string(cgroup_v2_file("memory.peak")?)?
         .trim()
         .parse()?;
     let mut receipt = json!({
@@ -817,7 +842,7 @@ impl WitnessPhases {
     }
 
     fn mark(&mut self, phase: &str, details: Value) -> Result<()> {
-        let memory_current_bytes: u64 = fs::read_to_string("/sys/fs/cgroup/memory.current")?
+        let memory_current_bytes: u64 = fs::read_to_string(cgroup_v2_file("memory.current")?)?
             .trim()
             .parse()?;
         let record = json!({
@@ -864,7 +889,7 @@ fn write_progress_sample(
     progress: &SolverProgress,
     sample_kind: &str,
 ) -> io::Result<()> {
-    let memory_current_bytes: u64 = fs::read_to_string("/sys/fs/cgroup/memory.current")?
+    let memory_current_bytes: u64 = fs::read_to_string(cgroup_v2_file("memory.current")?)?
         .trim()
         .parse()
         .map_err(io::Error::other)?;
@@ -1407,7 +1432,7 @@ fn chain_witness_impl(
             }
         }
     };
-    let memory_cgroup_peak_bytes: u64 = fs::read_to_string("/sys/fs/cgroup/memory.peak")?
+    let memory_cgroup_peak_bytes: u64 = fs::read_to_string(cgroup_v2_file("memory.peak")?)?
         .trim()
         .parse()?;
     let mut receipt = json!({
@@ -1670,7 +1695,7 @@ pub(super) fn chain_planted_cli(
         }
     };
     let solver_ms = solver_start.elapsed().as_secs_f64() * 1000.0;
-    let memory_cgroup_peak_bytes: u64 = fs::read_to_string("/sys/fs/cgroup/memory.peak")?
+    let memory_cgroup_peak_bytes: u64 = fs::read_to_string(cgroup_v2_file("memory.peak")?)?
         .trim()
         .parse()?;
     let receipt = json!({
@@ -1786,7 +1811,7 @@ pub(super) fn s3_probe_cli(
     };
     let relation_row_stage_executed = relation_row.is_some();
     let relation_row_ms = row_started.elapsed().as_secs_f64() * 1000.0;
-    let cgroup_peak_bytes: u64 = fs::read_to_string("/sys/fs/cgroup/memory.peak")?
+    let cgroup_peak_bytes: u64 = fs::read_to_string(cgroup_v2_file("memory.peak")?)?
         .trim()
         .parse()
         .map_err(|_| "S3 probe requires a numeric cgroup memory.peak")?;
@@ -1859,7 +1884,7 @@ pub(super) fn build_capacity_cli(
         },
     )?;
     let model_construction_ms = model_start.elapsed().as_secs_f64() * 1000.0;
-    let cgroup_peak_bytes: u64 = fs::read_to_string("/sys/fs/cgroup/memory.peak")?
+    let cgroup_peak_bytes: u64 = fs::read_to_string(cgroup_v2_file("memory.peak")?)?
         .trim()
         .parse()
         .map_err(|_| "capacity worker requires a numeric cgroup memory.peak")?;
@@ -2221,7 +2246,7 @@ fn run_with_config(
     let post_solver_validation_ms = verification_start.elapsed().as_secs_f64() * 1000.0;
     let memory_cgroup_peak_bytes = if chain.is_some() {
         Some(
-            fs::read_to_string("/sys/fs/cgroup/memory.peak")?
+            fs::read_to_string(cgroup_v2_file("memory.peak")?)?
                 .trim()
                 .parse::<u64>()?,
         )
@@ -2371,6 +2396,23 @@ mod tests {
     use crypto_lib::cryptanalysis::koblitz_relation_solver::WideRankTracker;
     use std::collections::HashMap;
     use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+
+    #[test]
+    fn cgroup_v2_membership_resolves_container_and_native_scope() {
+        assert_eq!(
+            cgroup_v2_root_from_membership("0::/\n").unwrap(),
+            Path::new("/sys/fs/cgroup")
+        );
+        assert_eq!(
+            cgroup_v2_root_from_membership(
+                "8:cpu:/legacy\n0::/user.slice/user-1000.slice/app.slice/run.scope\n"
+            )
+            .unwrap(),
+            Path::new("/sys/fs/cgroup/user.slice/user-1000.slice/app.slice/run.scope")
+        );
+        assert!(cgroup_v2_root_from_membership("8:cpu:/legacy\n").is_err());
+        assert!(cgroup_v2_root_from_membership("0::/../escape\n").is_err());
+    }
 
     #[test]
     fn selector_and_phase_modes_preserve_small_chain_model_and_group_lift() {
