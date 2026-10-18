@@ -80,12 +80,16 @@ transfer receipts are separate. Other panel objects are not claimed migrated.
 The later [K4096 primary result](verification/k4096-primary-20261018/RESULT.md)
 adds a third constructed and hash-verified S3 object to this size frontier.
 Its full generic replay and independent fresh-object sign/Frobenius scan
-passed. Its initial SAT-model count was source-derived only. The subsequent
-[native guarded continuation](verification/cloud-matched-k2048-k4096-20261018/RESULT.md)
-installed and audited the projected 131,958-variable, 2,021,197-clause model.
-Its 600-second natural attempt and separate 180-second short control were
-wall-censored with unknown final counters; natural relation yield, rank and
-a complete cold comparison remain open. K8192 and K16627 are still
+passed. The [guarded K4096 follow-on](verification/k4096-orbit-model-20261018/RESULT.md)
+constructed the predicted 131,958-variable, 2,021,197-clause five-summand
+orbit model after retaining and correcting a missing-corpus producer failure.
+One public search ended `UNKNOWN_solver_cap` at 5,000 conflicts with zero
+models, relations and rank inside the cap on an emulated host. The separate
+[native-worker continuation](verification/cloud-matched-k2048-k4096-20261018/RESULT.md)
+confirmed the same installed model counts. Its 600-second natural attempt
+and 180-second short control were wall-censored with unknown final counters.
+Those host/source observations remain separate; natural yield, useful rank
+and a complete cold comparison remain open. K8192 and K16627 are still
 unconstructed in this frontier.
 
 The exporter now has a one-object path for the five added sizes. It accepts

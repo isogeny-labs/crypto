@@ -8,7 +8,7 @@
 
 ## Problem
 
-The retained primary a=0, GF(2^83), K4096 five-summand path has no terminal
+This native host/worker's primary a=0, GF(2^83), K4096 five-summand path has no terminal
 solver-counter receipt within either the 100000-conflict/600-second attempt
 or the separate 1000-conflict/180-second control. This prevents a completed
 matched-query comparison with the K2048 short control and does not identify
@@ -35,6 +35,10 @@ which internal phase consumed the budget.
 - **Unknown:** final conflicts, models, relation count, rank and worker peak
   memory for each wall-censored attempt. SAT entry on those attempts is not
   independently established by the retained events alone.
+- **Separate upstream evidence:** the [emulated K4096 gate](../research/koblitz_n83_factor_base_sweep_20261008/verification/k4096-orbit-model-20261018/RESULT.md)
+  returned a 5,000-conflict solver-cap receipt in 373.290 seconds with zero
+  models, relations and rank. This native-host gap does not invalidate that
+  result or establish a cross-host throughput comparison.
 - **Not established:** UNSAT, absent decompositions, a mathematical
   obstruction, the fastest base, or a complete IC-vs-rho comparison.
 
@@ -56,7 +60,10 @@ select a factor base.
 
 ## Next discriminating step
 
-Add opt-in phase receipts to the decomposition path, test on the existing
+Use the repository's now-required native harness for further comparisons.
+The present receipts preserve a historical Python supervisor around a Rust
+worker; they are not a supported future execution path. Add opt-in native
+phase receipts to the decomposition path, test on the existing
 small-field verified solve and a public known-witness control, then freeze
 one retained K4096 diagnostic with its exact source, inputs and resource
 limits. Stop at the declared wall/memory/conflict bounds. A trace that stops
