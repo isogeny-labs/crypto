@@ -8,7 +8,7 @@ def rows(pat):
     for f in sorted(glob.glob(os.path.join(D, pat))):
         out += [json.loads(l) for l in open(f) if l.strip().startswith('{')]
     return out
-fig, (a1, a2) = plt.subplots(1, 2, figsize=(13, 4.6))
+fig, (a1, a2, a3) = plt.subplots(1, 3, figsize=(19, 4.8))
 # panel 1: m = 2, d_F against n (Sage TABLE.md n <= 16 medians; native E3 draws)
 sage = {8: 3, 10: 3, 12: 3, 14: 3, 16: 3}  # TABLE.md / RESULTS.md E2 Semaev medians (random base)
 dreg = {8: 3, 10: 4, 12: 4, 14: 4, 16: 5, 18: 5, 20: 5, 22: 5}
@@ -28,7 +28,7 @@ a1.set_xlabel('n (m = 2, ℓ = n/2, N = n)'); a1.set_ylabel('degree'); a1.set_yl
 a1.set_title('E3: last fall degree d_F of descended S₃, m = 2', fontsize=9); a1.legend(fontsize=7)
 # panel 2: m >= 3, against N: Semaev d_F, recorded plain D*, control d_last
 lad = rows('e4/m3_*.jsonl') + rows('e4/x_*.jsonl') + rows('e6/A_*.jsonl')
-cols = {3: '#2b6cb0', 4: '#2f855a', 5: '#6b46c1'}
+cols = {3: '#2b6cb0', 4: '#2f855a', 5: '#6b46c1', 6: '#b83280'}
 for r in lad:
     a2.scatter(r['n_vars'], r['d_f'], color=cols[r['m']], s=28, zorder=3)
     d = r['d_star'].get('degree')
@@ -37,6 +37,10 @@ for r in lad:
 for r in rows('e6/B_*.jsonl'):
     v = r['d_f'] if r['d_f'] is not None else r['d_f_at_least']
     a2.scatter(r['n_vars'], v, color=cols[r['m']], s=28, edgecolor='k', zorder=4)
+e7 = rows('e7/E7_*.jsonl')
+for r in e7:
+    v = r['d_f'] if r['d_f'] is not None else r['d_f_at_least']
+    a2.scatter(r['n_vars'], v, marker='*', color=cols[r['m']], s=110, edgecolor='k', zorder=5)
 for r in rows('e6/C_*.jsonl'):
     a2.scatter(r['n_vars'], r['d_last'], marker='D', facecolor='none', edgecolor='#2b6cb0', s=30)
 ctl = {}
@@ -47,10 +51,26 @@ for r in ctl.values():
     a2.scatter(r['n_vars'], v, marker='^' if r['d_last'] is None else 's', color='#c05621', s=34)
 for m, c in cols.items():
     a2.scatter([], [], color=c, label=f'Semaev m = {m}: d_F (unsat; black edge = new Part B draws)')
+a2.scatter([], [], marker='*', color='gray', s=90, edgecolor='k', label='E7 draws (m = 5, 6; Amendment 7)')
 a2.scatter([], [], marker='x', color='gray', label='ladder plain D* (recorded; ▲ = lower bound)')
 a2.scatter([], [], marker='D', facecolor='none', edgecolor='#2b6cb0', label='Semaev m = 3 sat: d_last')
 a2.scatter([], [], marker='s', color='#c05621', label='random control (same shape): d_last (▲ = lower bound)')
 a2.set_xlabel('N (Boolean unknowns)'); a2.set_ylim(1.5, 8.5); a2.grid(alpha=0.3); a2.legend(fontsize=6.5, loc='upper left')
-a2.set_title('E4/E6: d_F stays at 3–4 while plain D* and controls rise', fontsize=9)
+a2.set_title('E4/E6/E7: d_F stays at 3–4 while plain D* and controls rise', fontsize=9)
+# panel 3: engine cost of the degree-4 closure (recorded wall time) against N
+par = rows('e6/B_*.par.jsonl') + rows('e7/gate_*.jsonl') + e7
+for r in par:
+    c4 = r['per_degree'].get('4')
+    if c4:
+        a3.scatter(r['n_vars'], max(c4['secs'], 0.1), color=cols[r['m']], marker='*' if r in e7 else 'o', s=60 if r in e7 else 28, edgecolor='k' if r in e7 else 'none', zorder=3)
+from math import comb
+ax4 = a3.twinx()
+Ns = list(range(30, 101, 2))
+ax4.plot(Ns, [sum(comb(N, k) for k in range(5)) ** 2 / 16 / 2**30 for N in Ns], '--', color='#718096', label='dense degree-4 basis, GiB (cols²/16 bytes)')
+ax4.axhline(15, color='#c05621', lw=0.8); ax4.text(31, 17, 'this host: 15 GB', fontsize=7, color='#c05621')
+ax4.axhline(64, color='#2f855a', lw=0.8); ax4.text(31, 72, 'large-host tier: ≥ 64 GB', fontsize=7, color='#2f855a')
+ax4.set_yscale('log'); ax4.set_ylabel('GiB'); ax4.legend(fontsize=7, loc='lower right')
+a3.set_yscale('log'); a3.set_xlabel('N (Boolean unknowns)'); a3.set_ylabel('degree-4 closure wall time, s (4 threads)'); a3.grid(alpha=0.3)
+a3.set_title('hky_par: recorded closure time (points) and dense-memory wall (dashed)', fontsize=9)
 fig.suptitle('Huang–Kosters–Yeo last fall degree of Weil-descended Semaev systems (research/fall_degree_bounds_20261008)', fontsize=10)
 fig.tight_layout(); fig.savefig(sys.argv[2])
