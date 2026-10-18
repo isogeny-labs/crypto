@@ -114,6 +114,15 @@ asymptotics beyond k = 16, or ECC2K-130.
 
 ## Order and provenance
 
+**Execution units (registered with the protocol, before any run).** Round 2
+lost three sessions to container reclaims (its amendments 1–3), so this
+round runs as restartable units (`run_after_round2.sh`). Each ecbench
+session is one unit, ordered shortest first: n = 13, n = 19, n = 15, n = 17.
+Each ladder cell and each g-step of the ℓ = 7 series is its own stage file,
+so the ℓ-series and g-series share no output. A complete unit is skipped
+on restart. An incomplete one is moved aside as `-interrupted-<k>` (kept as
+evidence) and rerun. ℓ = 9 runs last.
+
 Round 3 runs after round 2's resumed runs finish (`run_after_round2.sh`
 waits for `all done` in round 2's `progress.txt`), on the same release
 binaries (`BINARIES.sha256` of round 2; this round adds only the
