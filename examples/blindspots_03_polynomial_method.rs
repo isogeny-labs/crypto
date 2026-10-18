@@ -2188,7 +2188,7 @@ fn mode_summarize(a: &Args) {
     if !control_fail.is_empty() {
         println!("FAILED CONTROLS: {:?}", control_fail);
     }
-    let odd_needed = 200.0;
+    let odd_needed = 400.0; // 200 odd hashed systems, each checked by both polynomial-method arms
     let controls_ok = selftest_ok && sens_ok && asym_ok && control_fail.is_empty() && par_bad == 0.0 && par_odd >= odd_needed;
     println!("controls pass: {controls_ok} (odd-parity real calls {par_odd} of {odd_needed} required)");
 
