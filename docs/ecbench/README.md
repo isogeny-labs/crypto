@@ -676,6 +676,15 @@ and its own SHA-256 is the replay certificate a claim cites. CI
 re-audits every committed session under `research/ecbench_*/sessions`
 on a Linux x86-64 runner with every run replayed.
 
+Four historical `pilot/scratch-session*` directories contain `session.json`,
+`plan.json`, and `records.jsonl` but lack `spec.json` and `host.json`. Their
+session headers say `complete`, yet the missing capsules prevent an integrity
+audit or independent replay. [INCOMPLETE_SESSIONS.tsv](INCOMPLETE_SESSIONS.tsv)
+pins the three existing files in each directory by SHA-256. CI verifies those
+pins and reports the four directories as incomplete; it audits every other
+committed ecbench session. An exception stops applying if its bytes change or
+either missing capsule appears, so the directory must be reviewed again.
+
 **A method's counts are frozen by its id.** Changing what a registered
 method counts breaks the replay of every committed session that used it,
 and CI fails. That is by design: register a new method id

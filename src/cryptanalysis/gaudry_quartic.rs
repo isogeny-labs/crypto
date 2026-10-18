@@ -1100,7 +1100,12 @@ pub(crate) fn echelon_by_lead(rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug
     echelon_by_lead_with(rows, p, muls, debug, false)
 }
 
-/// Forward elimination with an optional sparsest-row pivot within each bucket.
+/// [`echelon_by_lead`], optionally with sparsest pivots.
+///
+/// With `sparsest`, each column's pivot is instead the row of its bucket
+/// with the fewest nonzero entries (lowest index on a tie), which cuts the
+/// work and the fill; the row space and the pivot columns are the same
+/// either way.
 pub(crate) fn echelon_by_lead_with(
     mut rows: Vec<Vec<u16>>,
     p: u32,

@@ -1180,9 +1180,9 @@ mod tests {
             );
         }
         // c2pnb304w1's 288-bit subgroup does not fit in a 256-bit Jacobian;
-        // its best route is the n = 4 descent over GF(2^76). The calibrated
-        // genus-8 operation costs consume the former 2.001-bit formula margin:
-        // total 160.259 bits versus 160.226 for source rho (see the cost test).
+        // its best route is the n = 4 descent over GF(2^76). Priced with the
+        // measured Jacobian operation counts (#1983) it costs 2^160.259
+        // against matched rho's 2^160.226, so it is no longer below rho.
         let r = screen(
             &by_name("c2pnb304w1"),
             &CostModel::default(),

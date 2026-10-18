@@ -105,7 +105,8 @@ pub struct PipelineSpec {
     pub targets: Targets,
     /// The matrix and stop rule: `incremental-gauss`,
     /// `incremental-gauss-full-rank`, its `-checked` variant,
-    /// `structured-gauss`, or `sparse-cado` (full-rank rule).
+    /// `structured-gauss`, or a deferred sparse solver (`sparse-cado`,
+    /// `filter+wiedemann`, `filter+lanczos`, `wiedemann`, `lanczos`; full-rank rule).
     pub linalg: String,
     /// Cap on targets drawn before the run gives up.
     pub max_trials: u64,
@@ -560,6 +561,17 @@ fn run_pipeline_observed<G: CountedGroup>(
         return Err("walk-prime-serial/batch requires a prime curve with p < 2^62".into());
     }
     measurement::begin_online(measurement::Phase::TargetQuery);
+    let checked_full_rank = linalg_name == "incremental-gauss-full-rank-checked";
+    // `sparse-cado` is a batch solver that answers only at full column
+    // rank, so it runs under the full-rank rule.
+    let completion = if linalg_name == "incremental-gauss-full-rank"
+        || checked_full_rank
+        || linalg::is_deferred_sparse(linalg_name)
+    {
+        CompletionRule::FullRank
+    } else {
+        CompletionRule::TargetPinned
+    };
     let mut outcome: PipelineOutcome = if spec.targets == Targets::Residual {
         if completion != CompletionRule::TargetPinned {
             return Err(
@@ -1676,6 +1688,14 @@ mod tests {
             .unwrap()
         };
         let dense = run(&spec);
+        for name in ["wiedemann", "lanczos", "filter+lanczos", "filter+wiedemann"] {
+            spec.linalg = name.into();
+            let other = run(&spec);
+            assert!(other.verified, "{name}");
+            assert_eq!(other.recovered, dense.recovered, "{name}");
+            assert_eq!(other.linear_algebra.work_unit, "row_ops", "{name}");
+            assert!(other.linear_algebra.work > 0, "{name}");
+        }
         spec.linalg = "sparse-cado".into();
         let sparse = run(&spec);
         assert!(dense.verified && sparse.verified);
