@@ -4,7 +4,8 @@
 #
 # For every Lean target in the repository:
 #   * a Lake project (a directory with lakefile.toml / lakefile.lean): `lake build`,
-#     then audit every module the project itself built;
+#     explicitly build every tracked source owned by it (not only default
+#     targets), then audit every module the project itself built;
 #   * a standalone .lean file outside any Lake project: compile it with `lean -o`
 #     against the core library, then audit that module.
 # The audit (AuditAxioms.lean, next to this script) fails any theorem whose transitive
@@ -45,7 +46,7 @@ done
 discover() {
   cd "$root" || exit 3
   # Lake projects: every lakefile outside build output and vendored packages.
-  git ls-files -- '*lakefile.toml' '*lakefile.lean' | xargs -r -n1 dirname | sort -u
+  git ls-files -- '*lakefile.toml' '*lakefile.lean' | grep -vE '(^|/)tools/(lean/)?selftest/' | xargs -r -n1 dirname | sort -u
   # Standalone files: tracked .lean files with no lakefile in any parent directory.
   git ls-files -- '*.lean' | grep -vE '^tools/(lean|selftest)/' | while read -r f; do
     d=$(dirname "$f")
@@ -82,10 +83,38 @@ run_target() {
     if ! (cd "$root/$t" && lake build) > "$log/build.log" 2>&1; then
       status=FAIL_build
     else
+      # A default target can omit a tracked proof entirely. Force each source
+      # through Lake's source-path target resolver; unknown/unconfigured source
+      # targets fail closed. Tool code and deliberate gate fixtures are outside
+      # the proof inventory. Nested Lake projects are owned by their own gate.
+      local source rel owner
+      : > "$log/sources.log"
+      while IFS= read -r -d '' source; do
+        case "$source" in tools/selftest/*|*/tools/selftest/*|tools/lean/*|*/tools/lean/*|tools/AuditAxioms.lean|*/tools/AuditAxioms.lean|*/.lake/*|lakefile.lean|*/lakefile.lean) continue ;; esac
+        owner=$(dirname "$source")
+        while [ "$owner" != . ] && [ ! -f "$root/$owner/lakefile.toml" ] && [ ! -f "$root/$owner/lakefile.lean" ]; do
+          owner=$(dirname "$owner")
+        done
+        [ "$owner" = "$t" ] || { [ "$owner" = . ] && [ "$t" = . ]; } || continue
+        rel=${source#"$t"/}
+        [ "$t" = . ] && rel=$source
+        printf '%s\n' "$rel" >> "$log/sources.log"
+        if ! (cd "$root/$t" && lake build "$rel") >> "$log/build.log" 2>&1; then
+          status=FAIL_build_source
+          printf 'error: tracked source not built: %s\n' "$source" >> "$log/build.log"
+          break
+        fi
+      done < <(cd "$root" && git ls-files -z -- '*.lean')
+      if [ "$status" = PASS ] && [ ! -s "$log/sources.log" ]; then
+        status=FAIL_no_sources
+        echo 'error: no tracked project proof sources' >> "$log/build.log"
+      fi
       local mods
       mods=$(cd "$root/$t/.lake/build/lib/lean" 2>/dev/null && find . -name '*.olean' \
         | sed 's|^\./||; s|\.olean$||; s|/|.|g' | sort | tr '\n' ' ')
-      if [ -z "$mods" ]; then
+      if [ "$status" != PASS ]; then
+        : # Do not turn an omitted/unbuildable source into an audit success.
+      elif [ -z "$mods" ]; then
         status=FAIL_no_modules
       elif ! (cd "$root/$t" && lake env lean --run "$audit" "${trust_args[@]}" $mods) > "$log/audit.log" 2>&1; then
         status=FAIL_audit
