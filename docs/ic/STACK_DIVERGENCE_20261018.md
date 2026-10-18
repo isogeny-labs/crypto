@@ -625,7 +625,7 @@ sed -n 14p $R/experiments/f4-gpu-runpod-20261006/RESULT.md      # inherited engi
 sed -n 48,49p $R/experiments/f4-gpu-runpod-20261006/RESULT.md   # 425.8 s to 5.70 s (74.7x); 25.5x
 sed -n 76,77p $R/experiments/f4-gpu-runpod-20261006/RESULT.md   # dreg_sweep 18.8 s to 8.2 s
 sed -n 100,110p $R/experiments/f4-gpu-runpod-20261006/RESULT.md # 6.64 / 8.47 / 5.57 / 1.25 s; 127,356 vs 114,584 decisions/s
-grep -n "0.28 s with the" $R/experiments/f4-gpu-runpod-20261006/RESULT.md   # F4 oracle 0.28 s vs mq-fes 0.05 s at K_1/2^23
+grep -n "0.28 s with the" $R/experiments/f4-gpu-runpod-20261006/RESULT.md   # F4 oracle 0.28 s vs mq-fes 0.05 s at icv1-f2m23-tm5197-1f85e9e1
 git -C $R show -s --format=%B 0ea8931 | grep -n "Ir 2,618\|0.17x\|0.91x\|constant-factor\|1.85"   # 36.2x, 61.3x, tensor 0.17-0.80x, symmetrised 0.91x, crossbred
 git -C $D/cryptanalysis-full.git show -s --format=%B 8fd4429 | sed -n 1,20p   # #957: fes_chain cap 2^28; s5 winning regime
 git -C $R show 0ea8931:suite/src/cryptanalysis/semaev_sat_s5.rs | sed -n 78,92p      # Ir and wall table
