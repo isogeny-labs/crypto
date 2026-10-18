@@ -522,7 +522,10 @@ mod tests {
                 assert_eq!(sys.offset, offset);
                 for v in 0u64..(1u64 << sys.n_vars) {
                     let xs = sys.lift(v);
-                    assert!(xs.iter().all(|&x| x & offset == offset), "lift adds the offset");
+                    assert!(
+                        xs.iter().all(|&x| x & offset == offset),
+                        "lift adds the offset"
+                    );
                     let word = if summands == 2 {
                         semaev_s3_word(gf, inst.b, xs[0], xs[1], x_r)
                     } else {

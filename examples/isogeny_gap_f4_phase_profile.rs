@@ -119,15 +119,17 @@ fn main() {
                         let nv = sys.n_vars;
                         let (gb, full) = groebner_basis_f4(eqs.clone(), nv, None);
                         let mut full_tests = 0u64;
-                        let mut full_sol = solutions_from_reduced_basis(&gb, nv, 24, &mut full_tests)
-                            .expect("reduced basis");
+                        let mut full_sol =
+                            solutions_from_reduced_basis(&gb, nv, 24, &mut full_tests)
+                                .expect("reduced basis");
                         full_sol.retain(|&v| {
                             eqs.iter().all(|e| {
                                 full_tests += e.terms.len() as u64;
                                 e.eval(v) == 0
                             })
                         });
-                        let (part, early) = groebner_basis_f4_until(eqs.clone(), nv, None, Some(FREE));
+                        let (part, early) =
+                            groebner_basis_f4_until(eqs.clone(), nv, None, Some(FREE));
                         let (mut early_tests, mut early_xors) = (0u64, 0u64);
                         let early_sol = solutions_from_linear_part(
                             &part,
@@ -141,7 +143,10 @@ fn main() {
                         let (mut a_s, mut b_s) = (full_sol.clone(), early_sol.clone());
                         a_s.sort_unstable();
                         b_s.sort_unstable();
-                        assert_eq!(a_s, b_s, "P-E8b: solution sets differ on {config}, target {t}");
+                        assert_eq!(
+                            a_s, b_s,
+                            "P-E8b: solution sets differ on {config}, target {t}"
+                        );
                         let lifted = full_sol
                             .iter()
                             .filter(|&&v| {

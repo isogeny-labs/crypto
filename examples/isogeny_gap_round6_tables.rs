@@ -140,13 +140,16 @@ fn main() {
             continue;
         }
         let target = r["target"].as_u64().unwrap();
-        by_target.insert((config, target), Sys {
-            solvable: r["solutions"].as_u64().unwrap() > 0,
-            lifted: r["lifted"].as_f64().unwrap(),
-            full: work_full(&r),
-            early: work_early(&r),
-            stopped: r["early"]["early_stopped"].as_bool().unwrap(),
-        });
+        by_target.insert(
+            (config, target),
+            Sys {
+                solvable: r["solutions"].as_u64().unwrap() > 0,
+                lifted: r["lifted"].as_f64().unwrap(),
+                full: work_full(&r),
+                early: work_early(&r),
+                stopped: r["early"]["early_stopped"].as_bool().unwrap(),
+            },
+        );
     }
     let mut systems: BTreeMap<String, Vec<Sys>> = BTreeMap::new();
     for ((config, _), sys) in by_target {
@@ -258,11 +261,13 @@ fn main() {
             f(per_rel)
         )
         .unwrap();
-        e9.push(json!({"curve": cfg["curve"], "a": cfg["a"], "n": cfg["n"], "d": cfg["d"],
+        e9.push(
+            json!({"curve": cfg["curve"], "a": cfg["a"], "n": cfg["n"], "d": cfg["d"],
             "f2_default": f2, "yield_default": yd, "yield_coset": yc,
             "yield_ratio": [y.0, y.1, y.2], "within_20pct_of_inverse_f2": within,
             "full_work_per_system_coset_over_default": [w.0, w.1, w.2],
-            "full_work_per_relation_default_over_coset": per_rel}));
+            "full_work_per_relation_default_over_coset": per_rel}),
+        );
     }
     std::fs::write(arg(&args, "--out"), &md).unwrap();
     std::fs::write(

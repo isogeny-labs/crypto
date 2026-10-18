@@ -2247,7 +2247,10 @@ mod tests {
                     if rng.gen_bool(0.5) {
                         masks.push(0);
                     }
-                    let mut p = F2BoolPoly::from_monos(masks.iter().map(|&m| F2BoolMono::from_mask(m)).collect(), n);
+                    let mut p = F2BoolPoly::from_monos(
+                        masks.iter().map(|&m| F2BoolMono::from_mask(m)).collect(),
+                        n,
+                    );
                     if let Some(x) = planted {
                         if p.eval(x) == 1 {
                             p = p.add(&F2BoolPoly::one(n));
@@ -2270,7 +2273,11 @@ mod tests {
                 let mut got = solutions_from_linear_part(&part, &eqs, n, 24, &mut tests, &mut xors)
                     .expect("at most 24 free variables");
                 got.sort_unstable();
-                assert_eq!(got, full, "case {case}, free {k}, early {}", st.early_stopped);
+                assert_eq!(
+                    got, full,
+                    "case {case}, free {k}, early {}",
+                    st.early_stopped
+                );
             }
         }
     }

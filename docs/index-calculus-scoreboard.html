@@ -739,6 +739,21 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
     </table></div>
     <p class="dash-footnote">The best cell, S = 14.58 against rho at 2.00 on <code>icv1-fp22-tm1504-967cbbde</code> (7.29&times;), replaces round 4&rsquo;s 8.43&times;. IC S is a lower bound (native work unpriced); every audit replayed 12 runs exactly. The cleared base dominates rounds 1&ndash;2&rsquo;s fiber-closed and partial-fiber configurations. <a href="https://github.com/aburan28/crypto/blob/main/research/isogeny_conductor_gap_round5_20261012/README.md">Note, sessions, tables and run reports</a></p>
   </section></div></details>
+<details class="dash-details"><summary>Conductor gap round 6: early-stopping F4 and the trace coset on every Koblitz curve · 18 October 2026</summary><div class="dash-detail-body"><section class="dash-section" id="isogeny-conductor-gap-round6-20261018" aria-labelledby="isogeny-gap-r6-title">
+    <div class="dash-section-head"><div><p class="dash-kicker">Stage diagnostic and whole-method cold cost · 18 October 2026</p><h2 id="isogeny-gap-r6-title">Stopping F4 at its affine part saves up to 43&nbsp;% only when most systems are solvable; the trace coset&rsquo;s yield gain is 1/f<sub>2</sub>, and rho stays ahead.</h2>
+<p class="panel-summary">6,000 S<sub>3</sub> descent systems on five Koblitz curves, each solved by full and early-stopped F4 with identical solution sets, and one audited ecbench session (168 records) on the a = 1 curves with the new affine trace-coset base.</p></div><span class="status">12.7&times; rho &middot; round best</span></div>
+    <div class="table-scroll"><table>
+      <caption>From <code>TABLES.md</code> and <code>sessions/e9b_a1</code>; E9b orders hold across the 0 / 0.1 / 1 GAE pricing band.</caption>
+      <thead><tr><th>Lead</th><th>Comparison</th><th>Measured</th><th>Class</th></tr></thead>
+      <tbody>
+        <tr><td>E8 early stop</td><td><code>f4-f2-early</code> &divide; <code>f4-f2</code>, 30 configurations</td><td>saving &minus;37&nbsp;% to +43&nbsp;%, never above the solvable share; solvable &divide; unsolvable 1.0&ndash;2.3&times; (not 3&ndash;10&times;)</td><td><span class="chip">stage</span> mixed</td></tr>
+        <tr><td>E9a yield</td><td>trace coset &divide; default base</td><td>tracks 1/f<sub>2</sub> (7 of 9 rows); f<sub>2</sub> = 0.45 at F<sub>2</sub><sup>19</sup></td><td><span class="chip">stage</span> mechanism</td></tr>
+        <tr><td>E9a F4 cost</td><td>coset &divide; default work per system</td><td>1.1&ndash;45&times;; large where the solving degree rises 3 &rarr; 4</td><td><span class="chip">stage</span> negative</td></tr>
+        <tr><td>E9b MITM</td><td>coset vs default, a = 1, F<sub>2</sub><sup>17,19,23</sup></td><td>coset lower at n = 19, 23 (S 28.4 vs 31.2; 14.1 vs 17.3), higher at n = 17</td><td><span class="chip">engineering</span> improvement on 2 of 3</td></tr>
+      </tbody>
+    </table></div>
+    <p class="dash-footnote">Distance remaining: the round&rsquo;s best cell is coset MITM on <code>icv1-f2m23-tm5197-1f85e9e1</code>, S = 14.1 against rho 1.11 (12.7&times;); the study&rsquo;s best stays 7.29&times; (round 5). Session ECBS1hb4ef3b5d1409: 168 of 168 verified, 12 replays reproduced. <a href="https://github.com/aburan28/crypto/blob/main/research/isogeny_conductor_gap_round6_20261018/README.md">Note, records, session and run reports</a></p>
+  </section></div></details>
 <details class="dash-details"><summary>Large-prime conductor gap: IC measured at ell = 131101 · 12 October 2026</summary><div class="dash-detail-body"><section class="panel" id="conductor-gap-ic37-20261012">
 <h2>Large-prime conductor gap: IC measured at ell = 131101 <span class="chip">accounting</span></h2>
 <p class="panel-summary">Native MITM-based IC on two fixed D = -19 CM pairs, eight independent targets per curve; both 99% floor/crater count intervals include one, and every measured execution replayed exactly.</p>

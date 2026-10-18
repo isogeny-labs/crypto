@@ -353,7 +353,8 @@ impl SystemSolver for F4F2Early {
         cost.op_unit = "word XORs (elimination, plus extraction monomial tests and affine elimination counted one each)".into();
         cost.extra.insert("extraction_tests".into(), tests);
         cost.extra.insert("extraction_xors".into(), xors);
-        cost.extra.insert("early_stopped".into(), st.early_stopped as u64);
+        cost.extra
+            .insert("early_stopped".into(), st.early_stopped as u64);
         cost.extra.insert("free_at_stop".into(), st.free_at_stop);
         cost.wall_ns = started.elapsed().as_nanos() as u64;
         (verdict, cost)

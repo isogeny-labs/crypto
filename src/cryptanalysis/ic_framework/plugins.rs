@@ -52,10 +52,11 @@ use super::stages::{
 use crate::cryptanalysis::gls_fp2::{gls_line_base, Fp2Curve, Fp2Point, GlsInstance};
 use crate::cryptanalysis::glv_invariant_base::{glv_orbit_base, AutomorphismGroup};
 use crate::cryptanalysis::ic_boundary::{
-    binary_affine_subspace_factor_base, binary_subspace_factor_base, decompose_mitm, decompose_mitm_frobenius, koblitz_factor_base,
-    prime_factor_base, prime_factor_base_cleared, prime_factor_base_strided, BinaryGroup,
-    BinaryInstance, ColumnFold, CountedGroup, FactorBase, FrobeniusPairTable, GroupOps,
-    OracleCounters, PairTable, PrimeCurve, PrimeInstance, PrimePoint, Relation,
+    binary_affine_subspace_factor_base, binary_subspace_factor_base, decompose_mitm,
+    decompose_mitm_frobenius, koblitz_factor_base, prime_factor_base, prime_factor_base_cleared,
+    prime_factor_base_strided, BinaryGroup, BinaryInstance, ColumnFold, CountedGroup, FactorBase,
+    FrobeniusPairTable, GroupOps, OracleCounters, PairTable, PrimeCurve, PrimeInstance, PrimePoint,
+    Relation,
 };
 use crate::cryptanalysis::koblitz_factor_base_search::subspace_is_trace_zero;
 use crate::cryptanalysis::koblitz_fast::FastPoint;
@@ -2285,17 +2286,16 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for DescentAlgebraicOracle<'_> {
                 self.summands
             ));
         }
-        let (basis, offset) = match (&fb.subspace_basis, &fb.affine_subspace) {
-            (Some(basis), _) => (basis, 0),
-            (None, Some((basis, offset))) => (basis, *offset),
-            (None, None) => {
-                return Err(
+        let (basis, offset) =
+            match (&fb.subspace_basis, &fb.affine_subspace) {
+                (Some(basis), _) => (basis, 0),
+                (None, Some((basis, offset))) => (basis, *offset),
+                (None, None) => return Err(
                     "descent-algebraic needs a factor base whose abscissae form an F_2-subspace \
                      or an affine one; use binary-subspace or koblitz-orbit"
                         .into(),
-                )
-            }
-        };
+                ),
+            };
         if offset != 0 && self.slot_rotations.is_some() {
             return Err("slots take a linear subspace, not an affine one".into());
         }
@@ -2879,7 +2879,10 @@ mod tests {
         assert!(fb.points.iter().all(|&p| g.mul(&mut ops, p, half).infinity));
         let (b0, o0) = trace_coset_basis(&koblitz_instance(0, 13).unwrap(), 6).unwrap();
         assert_eq!(o0, 0);
-        assert_eq!(b0, trace_kernel_basis(&koblitz_instance(0, 13).unwrap(), 6).unwrap());
+        assert_eq!(
+            b0,
+            trace_kernel_basis(&koblitz_instance(0, 13).unwrap(), 6).unwrap()
+        );
     }
 
     /// The command-line form of a multi-factor divisor, end to end from

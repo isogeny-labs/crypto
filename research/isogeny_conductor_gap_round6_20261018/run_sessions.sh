@@ -31,8 +31,7 @@ for name in $order; do
     $B verify --dir "$out" --replay 12 --out "$D/sessions/$name.audit.json" > "$D/sessions/$name.verify.log" 2>&1
     echo "   verify exit $?: $(tail -n 1 "$D/sessions/$name.verify.log")"
     $B table --dir "$out" > "$D/sessions/$name.table.md" 2>&1
-    $B band --dir "$out" --weights 0,0.1,1 --json --ranks > "$D/sessions/$name.band.json" 2>&1
-    $B band --dir "$out" --weights 0,0.1,1 > "$D/sessions/$name.band.md" 2>&1
+    $B band --dir "$out" --weights 0,0.1,1 --json "$D/sessions/$name.band.json" --ranks > "$D/sessions/$name.band.md" 2>&1
   fi
 done
 echo "== all done $(date -u +%FT%TZ)"
