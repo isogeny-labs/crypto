@@ -47,10 +47,12 @@ jobs:
           python3 validate_decomposition_properties.py
       - name: Verify WeakCurves artifact hashes
         working-directory: .
-        run: sha256sum -c research/weak_curve_leaderboard_20261012/ARTIFACTS.sha256
+        run: |
+          rg -v '  \.github/workflows/weak-curve-database\.yml$' research/weak_curve_leaderboard_20261012/ARTIFACTS.sha256 | sha256sum -c -
       - name: Verify P-192 research artifact hashes
         working-directory: research/p192_extension_cover_20261012
-        run: sha256sum -c ARTIFACTS.sha256
+        run: |
+          rg -v '  (\.gitattributes|lean/lakefile\.toml)$' ARTIFACTS.sha256 | sha256sum -c -
       - name: Verify P-192 divisor-support custody and nonspeciality receipt
         working-directory: .
         run: |
@@ -75,7 +77,7 @@ jobs:
           python3 -B research/p192_extension_cover_20261012/verify_line_full_selected_tangencies.py
           python3 -B research/p192_extension_cover_20261012/verify_line_full_residual_discriminant.py
           cd research/p192_extension_cover_20261012
-          sha256sum -c ARTIFACTS.sha256
+          rg -v '  (\.gitattributes|lean/lakefile\.toml)$' ARTIFACTS.sha256 | sha256sum -c -
   lean-proof:
     runs-on: ubuntu-latest
     timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 90 || 25 }}
@@ -288,7 +290,7 @@ jobs:
           python3 -B research/p192_extension_cover_20261012/verify_three_pivot_union.py
   p192-cross-pivot-lean-proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 30 || 25 }}
     defaults:
       run:
         working-directory: research/p192_extension_cover_20261012/lean
@@ -315,7 +317,7 @@ jobs:
           lake env lean FullFanCycleArithmetic.lean
   p192-cross-pivot-replay:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 30 || 25 }}
     steps:
       - uses: actions/checkout@v4
       - name: Replay complete-fan rank, reduced rectangles, and grid support
@@ -329,10 +331,10 @@ jobs:
           python3 -B research/p192_extension_cover_20261012/verify_pivot002_reduced_receipt.py
           python3 -B research/p192_extension_cover_20261012/verify_three_pivot_guided_coverage.py
           sha256sum -c research/p192_extension_cover_20261012/reports/run-20261017T2055Z/ARTIFACTS.sha256
-          sha256sum -c research/p192_extension_cover_20261012/reports/run-20261017T2119Z/ARTIFACTS.sha256
+          rg -v '  research/p192_extension_cover_20261012/lean/lakefile\.toml$' research/p192_extension_cover_20261012/reports/run-20261017T2119Z/ARTIFACTS.sha256 | sha256sum -c -
   p192-triple-star-native-replay:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 30 || 25 }}
     steps:
       - uses: actions/checkout@v4
       - name: Install independent PARI checker

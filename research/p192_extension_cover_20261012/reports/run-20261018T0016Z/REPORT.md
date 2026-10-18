@@ -113,6 +113,12 @@ Python and PARI; a Lean encoding of that concrete 48-edge certificate
 and its reduction to the generic private-column theorem remains open.
 The focused CI job reruns the selection, GP cuts, and independent rank;
 the existing proof job runs fresh checks on the Lean module.
+Older frozen manifests still retain their original hashes for the
+repository workflow, `.gitattributes`, and Lean package list. The CI
+replays omit only those superseded entries when checking historical
+manifests; this run's [artifact manifest](ARTIFACTS.sha256) pins the
+current workflow, package list, and P-192 attributes alongside the new
+evidence.
 
 The relation policy remains `candidate_id: null`: the 443.678-second
 interval measures fixed-origin construction on an unisolated local host,
