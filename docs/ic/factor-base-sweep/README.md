@@ -113,7 +113,15 @@ and dimension at most 8. Extension fields, wide 83/130-bit targets, arbitrary
 nonlinear binary inventories and `m>2` are not supported by this solver path.
 Unsupported requests fail explicitly; no smaller substitute is run.
 
-Each candidate must first solve a known decomposable positive control. Random
+Each candidate must first solve a known decomposable positive control **in
+the target prime subgroup**, checked by multiplying its point by the recorded
+prime order. A base whose finite two-point sums never reach that subgroup is
+retained as an unqualified failure. The finite search is counted in setup
+point operations and remains under the candidate deadline; it is not free.
+Completed records declare `positive_control_scope: target-prime-subgroup`.
+The earlier source snapshot used any finite curve-point sum for its control;
+its sealed records keep that historical scope. Upgrading changes executable
+bytes, so resume requires the original binary as documented below. Random
 train/holdout probes record independently checked finite-inventory truth.
 Every accepted F4 root satisfies the original system; every reported
 decomposition must pass actual point addition using the recorded inventory.

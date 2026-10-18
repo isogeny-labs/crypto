@@ -7,6 +7,8 @@ use std::{
     path::Path,
 };
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
+type PointSet = BTreeSet<(String, String)>;
+type Measurement = (Value, PointSet, String);
 fn read(p: &Path) -> Result<Value> {
     Ok(serde_json::from_slice(&fs::read(p)?)?)
 }
@@ -122,7 +124,7 @@ fn failed_row(
 fn audit(root: &Path, panels: &[String]) -> Result<Value> {
     let mut rows = Vec::new();
     let mut identities: BTreeMap<(String, BTreeSet<(String, String)>), String> = BTreeMap::new();
-    let mut measurements: Vec<(Value, BTreeSet<(String, String)>, String)> = Vec::new();
+    let mut measurements: Vec<Measurement> = Vec::new();
     let (mut sealed, mut witnesses, mut trials) = (0, 0, 0);
     for panel in panels {
         let verify = read(&root.join(format!("{panel}.verify.json")))?;

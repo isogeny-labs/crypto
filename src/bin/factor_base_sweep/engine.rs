@@ -226,6 +226,28 @@ pub fn run(request: &Request, dir: &Path) -> Result<Value> {
     }
 }
 
+fn subgroup_positive_control<G: CountedGroup>(
+    group: &G,
+    points: &[G::Elt],
+    r: u64,
+    xy: &impl Fn(G::Elt) -> [u64; 2],
+    setup: &mut GroupOps,
+) -> Result<G::Elt> {
+    let mut checked = BTreeSet::new();
+    for &a in points {
+        for &b in points {
+            let q = group.add(setup, a, b);
+            if !group.is_identity(&q)
+                && checked.insert(xy(q))
+                && group.is_identity(&group.mul(setup, q, r))
+            {
+                return Ok(q);
+            }
+        }
+    }
+    Err("no finite two-point positive control in target prime subgroup".into())
+}
+
 #[allow(clippy::too_many_arguments)]
 fn execute<G: CountedGroup>(
     req: &Request,
@@ -244,19 +266,7 @@ fn execute<G: CountedGroup>(
     decode: impl Fn(&[u64]) -> [u64; 2],
 ) -> Result<Value> {
     let mut setup = GroupOps::default();
-    let mut positives = Vec::new();
-    'outer: for &a in points {
-        for &b in points {
-            let q = group.add(&mut setup, a, b);
-            if !group.is_identity(&q) {
-                positives.push(q);
-                break 'outer;
-            }
-        }
-    }
-    if positives.is_empty() {
-        return Err("base has no finite two-point positive control".into());
-    }
+    let positive = subgroup_positive_control(group, points, r, &xy, &mut setup)?;
     let mut rows = IncrementalGauss::new(dump.factor_base.columns as usize, r);
     let mut records = Vec::new();
     let mut total_ops = 0;
@@ -282,7 +292,7 @@ fn execute<G: CountedGroup>(
             ) % (r - 1);
             let mut query_ops = GroupOps::default();
             let target = if phase == "positive_control" {
-                positives[0]
+                positive
             } else {
                 group.mul(&mut query_ops, generator, scalar)
             };
@@ -447,7 +457,7 @@ fn execute<G: CountedGroup>(
         }
         stats.insert(phase,json!({"trials":count,"verified":hits,"exhausted":exhausted,"refuted":refutations,"observed_verified_per_second":hits as f64/phase_start.elapsed().as_secs_f64().max(1e-9)}));
     }
-    let result = json!({"schema":"factor_base_sweep.candidate_result/v1","candidate":req.candidate,"fb_id":dump.factor_base.fb_id,"phase_summary":stats,"best_observed_successful_solving_degree":best_degree,"certified_degree_of_regularity":null,"field_reduction_multiplications":total_ops,"training_independent_rank":rows.rank(),"relation_row_operations":rows.row_ops,"columns":rows.columns(),"trials":records,"setup_point_ops":setup,"unpriced_native_operations_complete":false,"missing_native_pricing":["system construction","root extraction","inventory construction and lookups","verification overhead"],"total_cost_winner":null,"full_pipeline_speedup":null,"elapsed_seconds_operational":started.elapsed().as_secs_f64()});
+    let result = json!({"schema":"factor_base_sweep.candidate_result/v1","candidate":req.candidate,"fb_id":dump.factor_base.fb_id,"phase_summary":stats,"positive_control_scope":"target-prime-subgroup","positive_control_subgroup_order":r,"best_observed_successful_solving_degree":best_degree,"certified_degree_of_regularity":null,"field_reduction_multiplications":total_ops,"training_independent_rank":rows.rank(),"relation_row_operations":rows.row_ops,"columns":rows.columns(),"trials":records,"setup_point_ops":setup,"unpriced_native_operations_complete":false,"missing_native_pricing":["system construction","root extraction","inventory construction and lookups","verification overhead"],"total_cost_winner":null,"full_pipeline_speedup":null,"elapsed_seconds_operational":started.elapsed().as_secs_f64()});
     write_new(&dir.join("result.json"), &result)?;
     emit(
         "candidate_complete",
@@ -459,6 +469,41 @@ fn execute<G: CountedGroup>(
 #[cfg(test)]
 mod identity_tests {
     use super::*;
+    #[test]
+    fn a_proper_subfield_control_cannot_qualify_an_unreachable_prime_subgroup() {
+        let i = crypto_lib::cryptanalysis::ic_boundary::koblitz_instance(1, 9).unwrap();
+        let basis = shapes::basis(&i, "subfield", 3, 17).unwrap();
+        let mut points = Vec::new();
+        for mask in 1..8 {
+            let x = basis
+                .iter()
+                .enumerate()
+                .filter(|(j, _)| mask & (1 << j) != 0)
+                .fold(0, |a, (_, b)| a ^ b);
+            points.extend(i.points_with_x(x));
+        }
+        assert!(!points.is_empty());
+        let err = subgroup_positive_control(
+            &BinaryGroup(&i.fast),
+            &points,
+            i.r,
+            &|p| [p.x, p.y],
+            &mut GroupOps::default(),
+        )
+        .unwrap_err();
+        assert!(err.contains("target prime subgroup"));
+    }
+    #[test]
+    fn accepted_control_is_finite_and_annihilated_by_the_recorded_prime_order() {
+        let i = crypto_lib::cryptanalysis::ic_boundary::koblitz_instance(1, 7).unwrap();
+        let points: Vec<_> = (1..8).flat_map(|x| i.points_with_x(x)).collect();
+        let group = BinaryGroup(&i.fast);
+        let mut ops = GroupOps::default();
+        let q = subgroup_positive_control(&group, &points, i.r, &|p| [p.x, p.y], &mut ops).unwrap();
+        assert!(!group.is_identity(&q));
+        assert!(group.is_identity(&group.mul(&mut ops, q, i.r)));
+        assert!(ops.scalar_mults > 0);
+    }
     #[test]
     fn a_prime_orbit_constructor_keeps_the_prime_formulation_identity() {
         let spec = "glv-orbit:size=4";

@@ -103,7 +103,10 @@ fn hex(s: &str) -> Result<u64> {
     Ok(u64::from_str_radix(s.trim_start_matches("0x"), 16)?)
 }
 fn prime(r: u64) -> bool {
-    r >= 2 && (2..).take_while(|d| d <= &(r / d)).all(|d| r % d != 0)
+    r >= 2
+        && (2..)
+            .take_while(|d| d <= &(r / d))
+            .all(|d| !r.is_multiple_of(d))
 }
 pub fn coverage(root: &Path, registry: &Path, panels: &[String]) -> Result<Value> {
     let registry = read(registry)?;
@@ -141,8 +144,7 @@ pub fn coverage(root: &Path, registry: &Path, panels: &[String]) -> Result<Value
                 .ok_or("unregistered model")?;
             let n = num(&model["params"], "n")? as u32;
             let a = num(&model["params"], "a")?;
-            if n > 31
-                || n < 2
+            if !(2..=31).contains(&n)
                 || a > 1
                 || item["measurement"]["candidate"]["curve"]["a"] != a
                 || item["measurement"]["candidate"]["curve"]["n"] != n
@@ -215,7 +217,10 @@ pub fn coverage(root: &Path, registry: &Path, panels: &[String]) -> Result<Value
                 if sums.contains(&target) != (t["ground_truth_decomposable"] == true) {
                     return Err("independent pair census contradicts native truth".into());
                 }
-                if t["phase"] != "positive_control" && c.scale(target, r)? != O {
+                if (t["phase"] != "positive_control"
+                    || item["measurement"]["positive_control_scope"] == "target-prime-subgroup")
+                    && c.scale(target, r)? != O
+                {
                     return Err("random probe outside subgroup".into());
                 }
                 if t["witness_verified"] == true {
