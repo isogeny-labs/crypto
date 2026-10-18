@@ -90,3 +90,10 @@ arm exited, with the same SSD Cargo target directory:
 ```sh
 cargo test --release --lib -- --test-threads=2
 ```
+
+The first full suite ran inside the sandbox and exited 101 because nine
+`pollard_collab` tests were denied loopback socket binds. The same test
+binary's `the_client_speaks_enough_http` case passed outside the sandbox.
+The identical full-suite command then ran with loopback socket access and
+exited 0: 4,219 passed, 0 failed, 117 ignored. Both full raw logs and the
+single-test control log are retained beside this command record.

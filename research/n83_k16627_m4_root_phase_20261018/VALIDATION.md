@@ -13,7 +13,7 @@
 | Visual report and benchmark copy | accepted run receipts | two one-page PDFs; 2500×1292 graph PNG at 150 dpi; SVG/PNG/PDF copies byte-identical | [report](RUN_REPORT.md), [benchmark copy](../../benchmarks/20261018-n83-k16627-m4-root-phase/) |
 | Full release library suite, sandboxed attempt | pre-stack source | 4,210 passed, 9 failed on loopback socket bind with `Operation not permitted`, 117 ignored; exit 101 | [raw log](cargo-release-lib-prestack.log) |
 | Loopback socket control, outside sandbox | pre-stack source | 1 passed, 0 failed | [raw log](socket-control-unsandboxed.log) |
-| Full release library suite, outside sandbox | pre-stack source | running | [raw log](cargo-release-lib-prestack-unsandboxed.log) |
+| Full release library suite, outside sandbox | pre-stack source | 4,219 passed, 0 failed, 117 ignored; exit 0, including all nine loopback tests that failed in the sandboxed attempt | [raw log](cargo-release-lib-prestack-unsandboxed.log) |
 | Final stacked-head release and example checks | review branch | pending | pending raw logs |
 
 The root-phase degree-83 arm was launched only after the source/input
