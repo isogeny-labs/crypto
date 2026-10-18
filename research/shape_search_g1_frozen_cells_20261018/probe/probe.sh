@@ -5,9 +5,9 @@
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
 bin=$here/../../../target/release/examples/factor_base_shape_ladder
-export RAYON_NUM_THREADS=1 F4_F2_MAX_ROWS=50000000 F4_F2_MAX_COLS=50000000 KIC_SPARSE_DENSE_FINISH=1 KIC_SPARSE_F5=1 KIC_SPARSE_DENSE_BUDGET_MB=1200
-cell=$1; cap_gb=${2:-64}; wall=${3:-14400}
-name=probe-${cell//:/-}
+export RAYON_NUM_THREADS=${4:-1} F4_F2_MAX_ROWS=50000000 F4_F2_MAX_COLS=50000000 KIC_SPARSE_DENSE_FINISH=1 KIC_SPARSE_F5=1 KIC_SPARSE_DENSE_BUDGET_MB=1200
+cell=$1; cap_gb=${2:-64}; wall=${3:-14400}; threads=${4:-1}
+name=probe-${cell//:/-}-th$threads
 echo "$(date -u +%FT%TZ) start $name cap=${cap_gb}GB wall=${wall}s" >> "$here/progress.txt"
 start=$(date +%s)
 ( prlimit --as=$((cap_gb*1024*1024*1024)) -- timeout --signal=KILL "$wall" "$bin" g1 --cell "$cell" --shapes random --instances 1 --targets 1 --seed 1 > "$here/$name.jsonl" 2> "$here/$name.err" ) &
