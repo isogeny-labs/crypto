@@ -389,6 +389,30 @@ pub fn cmd_summary(args: &[String]) {
         );
     }
 
+    {
+        let tot = |f: &dyn Fn(&Row) -> u64| rows.values().map(f).sum::<u64>();
+        let t = tot(&|r| r.ntargets);
+        let d = tot(&|r| r.decomposable);
+        println!(
+            "\n**Totals over the {} settings ({t} targets).** Oracle: {d} decomposable, {} not. Panel compared on {} targets: x_R equal {}, verdict equal {}, `ref_count` equal {}. Unreduced kernel = oracle: unordered {}/{t}, ordered {}/{}. Reduced loop subset of oracle {}/{t}, equal to the predicted set {}/{t}. Reduced verdict equals the unreduced one on {}/{t} targets; on the {d} decomposable targets the reduced loop alone answered no on {}. Closure over conjugates equals the unreduced set on {}/{}.\n",
+            rows.len(),
+            t - d,
+            tot(&|r| r.panel_n),
+            tot(&|r| r.panel_x_ok),
+            tot(&|r| r.panel_verdict_ok),
+            tot(&|r| r.panel_count_ok),
+            tot(&|r| r.u_unord_eq),
+            tot(&|r| r.u_ord_eq),
+            tot(&|r| r.u_ord_n),
+            tot(&|r| r.rep_subset),
+            tot(&|r| r.rep_pred),
+            tot(&|r| r.verdict_same),
+            tot(&|r| r.dec_r_says_no),
+            tot(&|r| r.closure_eq),
+            tot(&|r| r.closure_n)
+        );
+    }
+
     println!("\n### Table 5. What the orbit-complete reading costs, and the yield per candidate\n");
     println!("`closure pairs` = pairs the reduced loop visits over all conjugates of the target (what the closure check ran); compared with the ordered unreduced loop on the one target. `hits/third` = raw hits per candidate third, pooled over the setting's targets (the stage yield per candidate).\n");
     println!("| n | w | closure pairs / U-ord pairs | closure M / U-ord M | closure M / U-unord M | hits U-unord | thirds U-unord | hits R | thirds R | hits per third U-unord | hits per third R | R / U-unord |");
