@@ -27,7 +27,9 @@
 
 use std::collections::{BTreeSet, HashMap};
 
+mod genus4;
 mod quartic;
+mod screen;
 
 // ---------- F_2[x] as u64 bit polynomials ----------
 fn deg(p: u64) -> i32 {
@@ -1087,9 +1089,31 @@ fn summary(g: i32, family: &str, st: &Stats) {
     );
 }
 
-/// Arguments: genera of the hyperelliptic search (default `2 3`), or `q` for plane quartics.
+/// Arguments: genera of the hyperelliptic search (default `2 3`), `q` for plane quartics, or
+/// `s4` for the genus-4 necessary-condition screen at n = 283, 409, 571.
 fn main() {
     let args: Vec<String> = std::env::args().collect();
+    if args.get(1).map(String::as_str) == Some("s4") {
+        // genus-4 bases: g0 - 1 = 3 bounds the twist order; n = 283, 409, 571 allow g0 = 4
+        let hyp = screen::run_hyperelliptic(4, &[283, 409, 571], 3);
+        let mut st = Stats::default();
+        let can = genus4::run(&[283, 409, 571], 3, &mut st);
+        // every genus-4 curve over F_2: the union of the two families
+        let union: BTreeSet<&Vec<i64>> = hyp.keys().chain(can.keys()).collect();
+        println!(
+            "{{\"kind\":\"genus4_all\",\"distinct_L\":{},\"shared_L\":{},\"max_L1\":{},\"max_abs_Lm1\":{},\"max_N1\":{}}}",
+            union.len(),
+            hyp.keys().filter(|lp| can.contains_key(*lp)).count(),
+            union.iter().map(|lp| lp.iter().sum::<i64>()).max().unwrap_or(0),
+            union
+                .iter()
+                .map(|lp| screen::l_at_minus_one(lp).abs())
+                .max()
+                .unwrap_or(0),
+            union.iter().map(|lp| 3 + lp[1]).max().unwrap_or(0)
+        );
+        return;
+    }
     if args.get(1).map(String::as_str) == Some("q") {
         let mut st = Stats::default();
         let fallback = quartic::run(&mut st);
