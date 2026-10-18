@@ -13,7 +13,8 @@ for cell in 16:4 18:4 20:5 24:6; do
       if [ -s "$name.jsonl" ]; then echo "skip $name"; continue; fi
       echo "$(date -u +%FT%TZ) start $name" | tee -a "$OUT/queue.log"
       (cd "$REPO" && prlimit --as=12000000000 timeout 7200 "$BIN" --cells "$cell" --basis "$basis" --twists "$tw" --draws "$draws" --seed 20261018 --budget-secs 1200 --target --no-count) > "$name.jsonl" 2> "$name.log"
-      echo "$(date -u +%FT%TZ) exit $? $name" | tee -a "$OUT/queue.log"
+  rc=$?  # read before any command substitution: the queue logs of run-20261018T1645Z record date's status, not this one
+      echo "$(date -u +%FT%TZ) exit $rc $name" | tee -a "$OUT/queue.log"
     done
   done
 done

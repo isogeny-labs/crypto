@@ -23,8 +23,13 @@ if [ -n "${SCORE_BIN:-}" ]; then
 else
   cargo run --release --example dreg_score -- target_free $STUDY/runs/cell-*.jsonl > "$HERE/score-output.txt"
 fi
+# Deviation (raised cap, RESULTS.md): scored separately, never pooled with runs/.
+if ls $STUDY/runs_highcap/cell-*.jsonl >/dev/null 2>&1; then
+  HC=$(for f in $STUDY/runs_highcap/cell-*.jsonl; do [ -s "$f" ] && echo "$f"; done)
+  if [ -n "${SCORE_BIN:-}" ]; then "$SCORE_BIN" target_free $HC; else cargo run --release --example dreg_score -- target_free $HC; fi > "$HERE/score-output-highcap.txt"
+fi
 cp "$HERE/plot.py" "$OUT/plot.py"
-"$PY" "$HERE/plot.py" "$HERE/runs" "$OUT" "$RUN_ID"
+"$PY" "$HERE/plot.py" "$HERE/runs" "$OUT" "$RUN_ID" "$HERE/runs_highcap"
 
 COMMIT=$(git rev-parse --short HEAD)
 "$PY" - "$HERE" "$OUT" "$RUN_ID" "$COMMIT" <<'PYEOF'
@@ -53,6 +58,12 @@ for ln in score + [""]:
         tables.append(cur); cur = []
 score_table = typst_table(tables[0]) if tables else "_No table in score-output.txt._"
 verdict = next((l for l in score if l.startswith("Registered verdict")), "")
+hcp = os.path.join(here, "score-output-highcap.txt")
+hc = open(hcp).read().splitlines() if os.path.exists(hcp) else []
+hc_rows = [l for l in hc if l.startswith("|")]
+hc_table = typst_table(hc_rows) if hc_rows else "_No raised-cap records._"
+hq = os.path.join(here, "runs_highcap", "queue.log")
+hc_queue = open(hq).read().strip().replace("/home/user/crypto/", "") if os.path.exists(hq) else "none"
 plines = [l for l in score if re.match(r"^P[1-4]\b", l)]
 
 recs = []
@@ -74,13 +85,13 @@ q = open(qlog).read().splitlines() if os.path.exists(qlog) else []
 stamps = [l.split()[0] for l in q if l[:2] == "20"]
 start, end = (stamps[0], stamps[-1]) if stamps else ("unrecorded", "unrecorded")
 exits = [l for l in q if " exit " in l]
-nonzero = [l for l in exits if not re.search(r" exit 0 ", l)]
+nonzero = [l for l in exits if not re.search(r" exit 0 ", l)]  # unreliable for run-20261018T1645Z: see the hand note in queue.log
 m = re.match(r"run-(\d{4})(\d\d)(\d\d)T(\d\d)(\d\d)Z", run_id)
 run_date = "%s-%s-%s %s:%s UTC" % m.groups() if m else run_id
 subs = {
  "RUN_ID": run_id, "COMMIT": commit, "RUN_DATE": run_date,
  "QUEUE_START": start, "QUEUE_END": end,
- "SCORE_TABLE": score_table, "VERDICT_LINE": verdict, "P_LINES": "\n".join(plines),
+ "SCORE_TABLE": score_table, "HC_TABLE": hc_table, "HC_QUEUE": hc_queue, "VERDICT_LINE": verdict, "P_LINES": "\n".join(plines),
  "N_FILES": str(len(files)), "N_NONEMPTY": str(len(nonempty)),
  "N_TF": str(len(tf)), "N_TF_FIN": str(fin(tf)), "N_TF_OVER": str(over(tf)), "N_TF_TOUT": str(tout(tf)),
  "N_TG": str(len(tg)), "N_TG_FIN": str(fin(tg)), "N_TG_OVER": str(over(tg)), "N_TG_TOUT": str(tout(tg)),
