@@ -283,6 +283,45 @@ no seed 7 or seed 1 instance is in a card.
 10. **Held-out means disjoint instances and larger `n`** (`n = 31..37` vs training
     `n = 23..29`, different targets, field and base); the base is the same
     polynomial base for a given `l`, so what is held out is `n`, not `l`.
+11. **Repair pass (`-r2` cards), 2026-10-18; question, arms, cells, metric and
+    decision rule unchanged, no instrument change.** First-run status: cards 01 to 04
+    completed (receipts `completed`; card 02's relay text said "not completed" but its
+    receipt and outputs show it finished); cards 05 to 09 were **refused at lint** (each
+    argv names `raw/model.txt`, written by card 04, which `binds` did not pin; no receipt,
+    no output); card 10 **failed** (its `summarize` found no `raw/test-n31.jsonl`, because
+    its inputs come from cards 05 to 08). The first run proved no instrument bug, so
+    `examples/blindspots_08_learned_branching.rs` is unchanged (sha256 `02478185...a280a`,
+    bound as before). `raw/model.txt` (sha256 `00f0d29d...b60809`, committed) is now pinned in
+    `binds` of every card that reads it: the model is the one card 04 fitted, not refit.
+    Revision cards `card-05-r2`, `card-06-r2` (test cells `n = 31, 33` and `35, 37`),
+    `card-07-r2`, `card-08-r2` (secondary `l = 6`, `n = 31` and `37`), `card-09-r2` and
+    `card-09b-r2` (arm (e), CryptoMiniSat) and `card-10-r2` (the three `summarize` calls).
+    Outputs go to new `-r2` paths (`raw/test-nNN-r2.jsonl`, `raw/sec-l6-nNN-r2.jsonl`,
+    `raw/cms-n31-{planted,random}-r2.jsonl`, `raw/summary-*-r2.txt`, `raw/receipt-card-NN-r2.json`);
+    no first-run file is overwritten. Same commands, seeds (`20261018`), roles, draw counts
+    and caps as the frozen cards 05 to 10; only the paths, `binds` and timeouts differ.
+    Two changes in how work is carved up, neither a change of design: (i) **arm (e)** was
+    run from a CMS 5.11.21 binary built outside any card and pinned by sha256; a card may
+    run only binaries it builds, so each CMS card now clones tag `5.11.21`, checks out
+    revision `4c9a6b6b...1794b` (the card fails if the tag moved), configures with the same
+    flags as `cms-build.txt` (`-DSTATS=OFF -DNOZLIB=ON -DNOM4RI=ON -DSTATICCOMPILE=ON`, Release,
+    `make -j2 cryptominisat5-bin`) and runs it; the build takes 35 to 50 s. The CMS arm is
+    split in two cards so each stays under eight minutes in the worst case (`--cms-maxtime 40`
+    times three targets): `card-09-r2` the planted targets (`--only 0,1,2`), `card-09b-r2` the
+    random targets (`--only 16,17,18`), which together are the frozen 3 P + 3 R at `n = 31`.
+    The rebuilt CMS binary is byte-different from the earlier one (build paths) but the same
+    source revision and flags. (ii) **`summarize` is staged**: it reads the outputs of cards 05
+    to 09b, and a card may read an earlier card's output only if that file is committed and
+    bound by sha256, so `card-10-r2` cannot be frozen before they exist.
+    `make_card_10_r2.py` writes it after those outputs and receipts are committed (it refuses an
+    uncommitted input and omits a summary group whose receipts did not complete, printing
+    what it omitted). Per-card timeouts now sum to at most 455 s. Smoke test before freezing
+    (seed 1, `--np 1 --nr 1`, not a measured run, nothing enters the rule): the rebuilt
+    instrument ran every cell shape (`l = 5` at `n = 31, 33, 35, 37`, `l = 6` at `n = 31, 37`)
+    with `--truth` and `model.txt`, all arms agreed and no panic; the CMS card's command chain ran
+    end to end (clone, pin, cmake, make, version, build, cell, cleanup: 86 s); the three
+    `summarize` argument sets ran on those outputs (including `--cands none --controls e`).
+    `make_cards_r2.py` regenerates the stage-1 cards.
 
 ## Outputs
 
