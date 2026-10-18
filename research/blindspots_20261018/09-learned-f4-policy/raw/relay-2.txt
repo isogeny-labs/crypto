@@ -1,0 +1,26 @@
+**Result: completed.** Exit status was 0 (the run did not return 2 or 3). No command line ends with FAILED and no output line ends with MISSING.
+
+The full output is 63.4KB, mostly JSON trace lines, so I have not pasted it all. The complete verbatim output is saved at `/root/.claude/projects/-home-user/951b9d53-71db-5f5b-bd55-a96a0c084c58/tool-results/bp18usayg.txt`.
+
+Verbatim summary lines:
+
+```
+card: CARD-BLINDSPOT-09-01b-r2 (sha256 e35238bef1b0be35f6924fda99c1ddc3ca2baa3dd88651bca4bf3d9b60934edf)
+commit: dd1ea54247445d2de35861dee69a0efb152f6d1b
+receipt: research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-01b-r2.json sha256 d0a6a82d519ca963890b6b6e8019ab233e255d98eef84bf79feaca0a7947fb5b
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-09/card-01b-r2"] exit 0 (0.003 s) succeeded
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-09/card-01b-r2/b09", "examples/blindspots_09_learned_f4.rs"] exit 0 (8.937 s) succeeded
+command 3 (train-p3-8-3-3): ["prlimit", "--as=4294967296", "target/blindspots-09/card-01b-r2/b09", "train", "--n", "8", "--ell", "3", "--m", "3", "--seed", "20261018", "--from", "0", "--to", "32", "--cap", "3000000000", "--out", "research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3-r2"] exit 0 (0.285 s) succeeded
+command 4 (fit-p3-8-3-3): ["prlimit", "--as=4294967296", "target/blindspots-09/card-01b-r2/b09", "fit", "--n", "8", "--ell", "3", "--m", "3", "--seed", "20261018", "--out", "research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3-r2", "--samples", "research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3-r2.samples.0"] exit 0 (0.063 s) succeeded
+command 5 (eval-p3-8-3-3-test): ["prlimit", "--as=4294967296", "target/blindspots-09/card-01b-r2/b09", "eval", "--n", "8", "--ell", "3", "--m", "3", "--seed", "20261018", "--role", "test", "--from", "0", "--to", "32", "--arms", "a,b50,b25,c,d,p,r50,r25,o", "--model", "research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3-r2.model", "--trace", "research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3-r2.trace.0", "--cap", "3000000000", "--rel-cap", "1000"] exit 0 (2.879 s) succeeded
+command 6 (eval-p3-8-3-3-planted): ["prlimit", "--as=4294967296", "target/blindspots-09/card-01b-r2/b09", "eval", "--n", "8", "--ell", "3", "--m", "3", "--seed", "20261018", "--role", "planted", "--from", "0", "--to", "8", "--arms", "a,b50,b25,c,d,p,r50,r25,o", "--model", "research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3-r2.model", "--trace", "research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3-r2.trace.0", "--cap", "3000000000", "--rel-cap", "1000"] exit 0 (1.676 s) succeeded
+command 7 (train-p3-8-2-4): ["prlimit", "--as=4294967296", "target/blindspots-09/card-01b-r2/b09", "train", "--n", "8", "--ell", "2", "--m", "4", "--seed", "20261018", "--from", "0", "--to", "32", "--cap", "3000000000", "--out", "research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4-r2"] exit 0 (2.812 s) succeeded
+command 8 (fit-p3-8-2-4): ["prlimit", "--as=4294967296", "target/blindspots-09/card-01b-r2/b09", "fit", "--n", "8", "--ell", "2", "--m", "4", "--seed", "20261018", "--out", "research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4-r2", "--samples", "research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4-r2.samples.0"] exit 0 (0.112 s) succeeded
+command 9 (eval-p3-8-2-4-test): ["prlimit", "--as=4294967296", "target/blindspots-09/card-01b-r2/b09", "eval", "--n", "8", "--ell", "2", "--m", "4", "--seed", "20261018", "--role", "test", "--from", "0", "--to", "32", "--arms", "a,b50,b25,c,d,p,r50,r25,o", "--model", "research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4-r2.model", "--trace", "research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4-r2.trace.0", "--cap", "3000000000", "--rel-cap", "1000"] exit 0 (16.379 s) succeeded
+command 10 (eval-p3-8-2-4-planted): ["prlimit", "--as=4294967296", "target/blindspots-09/card-01b-r2/b09", "eval", "--n", "8", "--ell", "2", "--m", "4", "--seed", "20261018", "--role", "planted", "--from", "0", "--to", "8", "--arms", "a,b50,b25,c,d,p,r50,r25,o", "--model", "research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4-r2.model", "--trace", "research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4-r2.trace.0", "--cap", "3000000000", "--rel-cap", "1000"] exit 0 (13.317 s) succeeded
+command 11 (remove-bin): ["rm", "-f", "target/blindspots-09/card-01b-r2/b09"] exit 0 (0.005 s) succeeded
+command 12 (remove-bin-dir): ["rmdir", "target/blindspots-09/card-01b-r2"] exit 0 (0.002 s) succeeded
+```
+
+Each command's stdout sha256 is `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` (empty) except commands 3, 4, 7, 8 and 9 to 10, which have stdout sha256 values listed in the full output file. The `train` and `fit` stdout lines were not all copied here, and the JSON trace lines are only in the saved file.
