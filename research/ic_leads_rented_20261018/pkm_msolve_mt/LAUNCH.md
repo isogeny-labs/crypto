@@ -44,4 +44,4 @@ python3 $P terminate ID
 
 ## Tested before launch (authoring container, 4 vCPU, msolve 0.6.5 from the Ubuntu package)
 
-`job.sh` ran end to end locally with `MSOLVE_SYSTEMS` set to a small m = 2 system: host record, the control m3_t5 at `-t 4` under the gate (`cmp` against the committed `.out`), then the measured system. The result is in `test_local/`.
+`job.sh` ran end to end locally with `MSOLVE_SYSTEMS` set to a small m = 2 system: host record, the control m3_t5 at `-t 4` under the gate (`cmp` against the committed `.out`), then the measured system. The control agreed (its `.out` is identical to the committed one) in 1,917 s at `-t 4` on a contended 4 vCPU box, which is not a speed-up figure. The m2 system then ran (exit 0), and `MSOLVE_MT_DONE` followed. Records are in `test_local/`.
