@@ -70,14 +70,22 @@ matching BLAKE3 digest. Its exact receipt and resource limits are in
 `verification/two-hour-extension-20261010/REPORT.md`. No single-target cold
 timing claim follows. Other larger K choices, source-pinned relation
 production, natural rank and fully charged cold comparison remain required.
-The versioned S3 destination is
+The original versioned S3 destination is
 `s3://crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/v2-size-frontier/`.
+Exact K2048 and K4096 mirrors now have verified fresh round trips in the
+user-selected `setec-astronomy-artifacts` bucket under the same versioned
+prefix. Historical sidecars retain their original destination; current
+transfer receipts are separate. Other panel objects are not claimed migrated.
 
 The later [K4096 primary result](verification/k4096-primary-20261018/RESULT.md)
 adds a third constructed and hash-verified S3 object to this size frontier.
 Its full generic replay and independent fresh-object sign/Frobenius scan
-passed. Its SAT-model count is source-derived only; natural relation yield,
-rank and a complete cold comparison remain open. K8192 and K16627 are still
+passed. Its initial SAT-model count was source-derived only. The subsequent
+[native guarded continuation](verification/cloud-matched-k2048-k4096-20261018/RESULT.md)
+installed and audited the projected 131,958-variable, 2,021,197-clause model.
+Its 600-second natural attempt and separate 180-second short control were
+wall-censored with unknown final counters; natural relation yield, rank and
+a complete cold comparison remain open. K8192 and K16627 are still
 unconstructed in this frontier.
 
 The exporter now has a one-object path for the five added sizes. It accepts

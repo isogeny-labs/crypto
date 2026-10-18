@@ -1,5 +1,16 @@
 # Degree-83 factor-base sweep: observed evidence
 
+The [restored native Docker continuation](verification/cloud-matched-k2048-k4096-20261018/RESULT.md)
+verified one CPU, 4 GiB, zero swap and networkless execution, mirrored K4096
+to `setec-astronomy-artifacts`, and passed both model-construction audits.
+K4096's installed model has 131,958 variables and 2,021,197 clauses. Both
+100,000-conflict attempts were outer-wall censored at 600 seconds. A separate
+1,000-conflict control returned a complete K2048 receipt with zero models,
+zero relations and rank zero; K4096's short control was wall-censored at
+180 seconds. Censored final counters remain unknown. The
+[K4096 observability gate](../../problems/n83-native-k4096-terminal-observability.md)
+and full cold-runtime selection remain unresolved.
+
 The [user-selected S3 publication](verification/setec-publication-20261018/RESULT.md)
 uploaded the exact reconstructed primary K2048 archive and compact public
 receipts to `setec-astronomy-artifacts` in `us-east-2`. Fresh downloads matched

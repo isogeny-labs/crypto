@@ -1,17 +1,18 @@
-# N83 resume evidence and execution access
+# N83 resume evidence, execution access and historical accounting
 
 - **Status:** open
-- **Kind:** access/tool limit; missing run evidence
+- **Kind:** resolved execution/storage access; historical accounting gap
 - **Affected work:** [primary factor-base sweep](../research/koblitz_n83_factor_base_sweep_20261008/RESULT.md)
 - **Next action owner:** N83 sweep maintainer
 - **Last updated:** 2026-10-18
 
 ## Problem
 
-The resumed primary `a=0` GF(2^83), 81-bit-subgroup study cannot rerun the
-complete K2048 high-cap audit or continue its original guarded search
-because the original binary and required execution/access capabilities
-are unavailable on the current executor.
+The resumed primary `a=0` GF(2^83), 81-bit-subgroup study now has working
+guarded Docker execution and user-selected S3 storage. The historical
+campaign charge ledger has not been fully reconciled here, so a whole-
+campaign balance or complete cold-runtime total is not asserted. Fresh
+bounded continuation is recorded separately from prior allowances.
 
 ## Evidence and uncertainty
 
@@ -42,8 +43,10 @@ are unavailable on the current executor.
 - Original static-binary and live-cleanup rechecks remain unavailable here.
   The retained earlier full audit remains evidence; repeating it is not a
   prerequisite for a new experiment with its own verified worker.
-- [ ] Restore the retained supervisor's one-CPU, 4-GiB, zero-swap,
-  networkless execution environment and verify it live.
+- [x] Restore the retained supervisor's one-CPU, 4-GiB, zero-swap,
+  networkless execution environment and verify it live. The packaged
+  Docker service was started through authorized sudo, and all six retained
+  stages have live filtered Docker inspection and cleanup evidence.
 - [x] Verify authorized storage access: the user-selected
   `setec-astronomy-artifacts` destination passed conditional PUT and fresh
   HEAD/GET checks for the exact K2048 archive and compact receipt bundle.
@@ -55,15 +58,14 @@ cold accounting remain separate requirements.
 
 ## Next discriminating step
 
-Restore and live-check the guarded execution environment, then freeze the
-next retained-base capacity/yield test using a verified worker and exact
-public inputs. K4096 model construction remains unexecuted upstream; its
-source projection exceeds the earlier one-million-domain-clause cap and
-needs a declared admissible cap before launch. The exact K2048 reconstruction
-can be reused with explicit reconstructed-input provenance; it is not a fresh
-S3 GET. Reconcile the capacity ledger before spending further search time.
-If runtime/access checks fail, retain the infrastructure failure without
-launching the dependent search. Recheck when executor capabilities change.
+The [native continuation](../research/koblitz_n83_factor_base_sweep_20261008/verification/cloud-matched-k2048-k4096-20261018/RESULT.md)
+has now frozen and executed K2048/K4096 construction, natural-query and short
+control cells. Its separate accounting records the declared 2040-second main
+and 360-second short-control worker envelopes, observed stage intervals and
+unknown ancillary/global totals; no unused historical allowance was inferred.
+Reconcile older charged intervals before asserting a campaign-wide total.
+The next execution diagnostic is the
+[native K4096 terminal-observability gate](n83-native-k4096-terminal-observability.md).
 
 ## Resolution and history
 
@@ -79,3 +81,11 @@ scope check. Docker's client is available, but its explicitly selected
 managed daemon is unreachable and no dockerd process was observed. UID 1000
 cannot start the managed daemon under the runtime guidance; environment
 recovery remains necessary for the retained container protocol.
+
+2026-10-18 Docker continuation update: authorized sudo is available outside
+the sandbox. The installed systemd service was inactive and was started
+successfully. Task-local sudo Docker access preserves global socket/group
+permissions. Live container controls and cleanup now pass, and K4096 is also
+stored and freshly verified in the user-selected bucket. The previous
+startup/access obstruction is resolved; historical accounting and the new
+native K4096 counter-observability gap remain separate open obligations.

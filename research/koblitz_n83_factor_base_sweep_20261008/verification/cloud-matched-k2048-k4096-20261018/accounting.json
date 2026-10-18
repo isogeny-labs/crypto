@@ -1,0 +1,60 @@
+{
+  "schema": "n83.cloud-matched-accounting/v1",
+  "declared_main_worker_envelope_seconds": 2040,
+  "declared_additional_short_control_seconds": 360,
+  "observed_supervised_stage_wall_seconds_sum": 1603.999884279001,
+  "stages": [
+    {
+      "stage": "capacity",
+      "columns": 2048,
+      "observed_supervisor_wall_seconds": 23.314246807000018,
+      "guard_seconds": 180
+    },
+    {
+      "stage": "capacity",
+      "columns": 4096,
+      "observed_supervisor_wall_seconds": 12.53925328600053,
+      "guard_seconds": 180
+    },
+    {
+      "stage": "search",
+      "columns": 2048,
+      "observed_supervisor_wall_seconds": 600.6122280159998,
+      "guard_seconds": 600
+    },
+    {
+      "stage": "search",
+      "columns": 4096,
+      "observed_supervisor_wall_seconds": 601.2146951769992,
+      "guard_seconds": 600
+    },
+    {
+      "stage": "control",
+      "columns": 2048,
+      "observed_supervisor_wall_seconds": 162.6304918810001,
+      "guard_seconds": 180
+    },
+    {
+      "stage": "control",
+      "columns": 4096,
+      "observed_supervisor_wall_seconds": 181.095333452,
+      "guard_seconds": 180
+    },
+    {
+      "stage": "construct-k4096",
+      "observed_supervisor_wall_seconds": 13.839507050000975,
+      "guard_seconds": 240
+    },
+    {
+      "stage": "replay-k4096",
+      "observed_supervisor_wall_seconds": 8.754128610000407,
+      "guard_seconds": 240
+    }
+  ],
+  "whole_rung_wall_seconds": null,
+  "total_cold_index_calculus_runtime_ms": null,
+  "selected_best_total_runtime": null,
+  "ancillary_costs": "Docker/service/image preparation, storage IO, audits and validation are separate; no complete aggregate interval was recorded. Native build reused from earlier recovery.",
+  "historical_allowance_remaining": null,
+  "authorization_scope": "fresh bounded continuation explicitly requested by the user; no unused prior budget is inferred"
+}

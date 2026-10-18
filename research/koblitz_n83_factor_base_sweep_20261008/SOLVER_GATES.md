@@ -1,5 +1,19 @@
 # N83 solver availability and capacity gates
 
+## Native guarded continuation, 2026-10-18
+
+The [restored Docker gate](verification/cloud-matched-k2048-k4096-20261018/RESULT.md)
+installed the retained K4096 all-affine five-summand model with 131,958
+variables and 2,021,197 clauses under one CPU, 4 GiB, zero swap and no
+network. The two 100,000-conflict attempts were outer-wall censored at
+600 seconds; final counters are unknown. A separate K2048 short control
+completed at 1,000 conflicts with zero models, relations and rank. K4096's
+short control was wall-censored at 180 seconds. The remaining discriminating
+step is [K4096 phase/counter observability](../../problems/n83-native-k4096-terminal-observability.md),
+not a completed natural-yield or full-runtime factor-base ranking.
+
+## Historical source inventory
+
 This is a source audit, not a timed solver result. The backend-availability comparison distinguishes the inspected main snapshot `c70c32d486a3ac7531fe27f7193d9f09caa58344` from the isolated study branch at `001acc47870e935a17f4d8155c2cb934ace58284`. The latter builds the retained primary base and exact enumeration runner; subsequent study-branch code adds a wide-word enumeration path. The inspected main snapshot contained additional backends absent from that pinned study revision. Reproduce this historical distinction with `git ls-tree -r --name-only REV -- src/cryptanalysis` at each pinned revision; `verification/solver-gates-source-check.log` records the corresponding blob identities and source-width assertions. The current integrated-source status is recorded at the end of this document. A path in the prior-art inventory is not proof that an N83 run can execute it.
 
 | Backend | Pinned source fact | N83 consequence |
