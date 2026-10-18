@@ -5,6 +5,8 @@ mod bench;
 mod boundary;
 #[path = "ic/corpus.rs"]
 mod corpus;
+#[path = "icx/cubic_external.rs"]
+mod cubic_external;
 #[path = "ic/descent.rs"]
 mod descent;
 #[path = "ic/experiment.rs"]
@@ -17,6 +19,10 @@ mod large_prime;
 mod params;
 #[path = "ic/price.rs"]
 mod price;
+#[path = "ic/prime.rs"]
+mod prime;
+#[path = "icx/prime_external.rs"]
+mod prime_external;
 #[path = "ic/progress.rs"]
 mod progress;
 #[path = "ic/rho.rs"]
@@ -38,10 +44,10 @@ use std::{
 #[command(
     name = "ic",
     version,
-    about = "Curve inspection and synthetic index-calculus research"
+    about = "Curve inspection and index-calculus research, including explicit public EC targets"
 )]
 #[command(
-    long_about = "Inspect named/custom curves, generate reproducible known-answer fixtures, run the toy index-calculus pipeline, compare factor-base candidates, or search for high-yield factor bases. Bare ic runs the default synthetic example. A bare curve name (for example ic ecc2k-130) performs inspection only. The fixed subcommand accepts explicit K_0 parameters and points with full-width coordinates."
+    long_about = "Inspect named/custom curves, generate reproducible known-answer fixtures, run index-calculus pipelines, compare factor-base candidates, or search for high-yield factor bases. Solve-prime and solve-cubic accept caller-supplied public EC targets. Bare ic runs the default synthetic example. A bare curve name (for example ic ecc2k-130) performs inspection only. The fixed subcommand accepts explicit K_0 parameters and points with full-width coordinates."
 )]
 struct Cli {
     #[command(subcommand)]
@@ -101,8 +107,12 @@ enum Action {
     /// n−1 index calculus with the zero/single/double-large-prime variation.
     LargePrime(large_prime::LargePrimeArgs),
     /// Measure the exact pair-sum yield of a small-x factor base on a
-    /// prime-field curve (NIST P-192, or toy primes where hits are common).
+    /// prime-field curve (NIST P-192 or small prime fixtures with common hits).
     Prime(prime::PrimeArgs),
+    /// Run bounded EC index calculus on an explicit prime-field public target.
+    SolvePrime(prime_external::PrimeArgs),
+    /// Run bounded EC index calculus on an explicit cubic-field public target.
+    SolveCubic(cubic_external::CubicArgs),
 }
 #[derive(Args)]
 #[group(required = true, multiple = false)]
@@ -157,6 +167,8 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Price(args)) => price::run(args.clone(), cli.json),
         Some(Action::LargePrime(args)) => large_prime::run(args.clone()),
         Some(Action::Prime(args)) => prime::run(args.clone()),
+        Some(Action::SolvePrime(args)) => prime_external::solve(args),
+        Some(Action::SolveCubic(args)) => cubic_external::solve(args),
         Some(Action::Run(args)) => experiment::run(args.clone(), cli.json),
         None => {
             if let Some(name) = &cli.profile {

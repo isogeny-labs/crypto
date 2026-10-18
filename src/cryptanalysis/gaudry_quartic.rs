@@ -1096,11 +1096,16 @@ pub(crate) struct Echelon {
 /// elimination, without scanning rows that are already zero there;
 /// `muls` counts the nonzero entries of each pivot row once per row it is
 /// subtracted from, and once for its normalisation.
-pub(crate) fn echelon_by_lead(
+pub(crate) fn echelon_by_lead(rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool) -> Echelon {
+    echelon_by_lead_with(rows, p, muls, debug, false)
+}
+
+pub(crate) fn echelon_by_lead_with(
     mut rows: Vec<Vec<u16>>,
     p: u32,
     muls: &mut u64,
     debug: bool,
+    sparsest: bool,
 ) -> Echelon {
     let ncols = rows.first().map_or(0, |r| r.len());
     let mut buckets: Vec<Vec<u32>> = vec![Vec::new(); ncols];

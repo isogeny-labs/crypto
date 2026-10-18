@@ -21,8 +21,12 @@ use std::process::ExitCode;
 use clap::{Args, Parser, Subcommand};
 use serde_json::{json, Value};
 
+#[path = "icx/cubic_external.rs"]
+mod cubic_external;
 #[path = "icx/parameters.rs"]
 mod parameters;
+#[path = "icx/prime_external.rs"]
+mod prime_external;
 
 use crypto_lib::cryptanalysis::curve_catalog::{self, CatalogCurve, Family};
 use crypto_lib::cryptanalysis::ic_engine;
@@ -61,6 +65,10 @@ enum Action {
     Estimate(EstimateArgs),
     /// Run a bounded same-family analogue for a prime, binary, or Koblitz curve.
     Run(RunArgs),
+    /// Solve a specified public target on a bounded prime-field curve.
+    SolvePrime(prime_external::PrimeArgs),
+    /// Solve a specified public target over a bounded cubic extension field.
+    SolveCubic(cubic_external::CubicArgs),
     /// Solve a quadratic Boolean system with the FES kernel (CPU or GPU worker).
     Fes(FesArgs),
 }
@@ -604,6 +612,8 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         }
         Some(Action::Estimate(a)) => estimate(a),
         Some(Action::Run(a)) => run_cmd(a, cli.json),
+        Some(Action::SolvePrime(a)) => prime_external::solve(a),
+        Some(Action::SolveCubic(a)) => cubic_external::solve(a),
         Some(Action::Fes(a)) => fes_cmd(a),
         None => {
             let name = cli

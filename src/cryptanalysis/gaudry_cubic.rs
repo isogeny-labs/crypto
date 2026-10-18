@@ -2961,6 +2961,8 @@ pub struct GaudryReport {
     pub relations_independent: u64,
     pub rank: usize,
     pub solved: bool,
+    /// Candidate logarithm, accepted only after independent group replay.
+    pub recovered_scalar: Option<u64>,
     pub correct: Option<bool>,
     /// Affine additions in `E(F_{p³})` (sampling, neighbours, verification).
     pub group_ops: u64,
@@ -3641,6 +3643,7 @@ pub fn run_gaudry_opts(
         relations_independent: 0,
         rank: 0,
         solved: false,
+        recovered_scalar: None,
         correct: None,
         group_ops: 0,
         oracle_fp_muls: 0,
@@ -3831,6 +3834,7 @@ pub fn run_gaudry_opts(
                             let dd = x.map(|x| x[map[small]]);
                             if dd.is_some_and(|dd| curve.mul(&curve.g, dd) == inst.q) {
                                 rep.solved = true;
+                                rep.recovered_scalar = dd;
                                 rep.correct = Some(dd == Some(inst.d));
                             } else {
                                 next_attempt = full_rels.len() + (sel.len() / 20).max(1);
@@ -3847,7 +3851,8 @@ pub fn run_gaudry_opts(
                     if system.insert(row, full.rhs) {
                         rep.relations_independent += 1;
                         if let Some(dd) = system.solved(small) {
-                            rep.solved = true;
+                            rep.solved = curve.mul(&curve.g, dd) == inst.q;
+                            rep.recovered_scalar = rep.solved.then_some(dd);
                             rep.correct = Some(dd == inst.d);
                         }
                     }
@@ -3906,6 +3911,8 @@ pub struct RhoReport3 {
     pub steps: u64,
     pub group_ops: u64,
     pub solved: bool,
+    /// Candidate logarithm, independently checked by callers using G and Q.
+    pub recovered_scalar: Option<u64>,
     pub correct: Option<bool>,
     pub s: f64,
     pub wall_ms: f64,
@@ -3965,6 +3972,7 @@ pub fn run_rho3(inst: &Instance3, seed: u64) -> RhoReport3 {
         steps,
         group_ops: curve.ops(),
         solved: solved.is_some(),
+        recovered_scalar: solved,
         correct: solved.map(|d| d == inst.d),
         s: curve.ops() as f64 / (n as f64).sqrt(),
         wall_ms: start.elapsed().as_secs_f64() * 1e3,

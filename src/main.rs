@@ -283,6 +283,23 @@ enum CryptanalysisOp {
         #[arg(long)]
         cipher: String,
     },
+    /// Run a bounded AES-128 differential, linear, or integral recovery.
+    AesAttack {
+        /// `differential` (2 rounds), `linear` (1 round), or `square` (4 rounds).
+        #[arg(long)]
+        technique: String,
+        /// 16-byte analysis key as 32 hex digits.
+        #[arg(long, default_value = "914f6da1c78305bb2957ee104d826cfa")]
+        key_hex: String,
+        /// Chosen pairs for differential, known pairs for linear.
+        #[arg(long, default_value_t = 24)]
+        samples: usize,
+        #[arg(long, default_value_t = 0xdead_beef_cafe)]
+        seed: u64,
+        /// Input difference at plaintext byte zero (differential only).
+        #[arg(long, default_value_t = 0x73)]
+        alpha: u8,
+    },
     /// Run the full research bench and emit the Markdown report.
     /// (Equivalent to `cargo test --lib --release bench_demo --
     /// --ignored --nocapture` but accessible from the CLI.)
@@ -1354,6 +1371,95 @@ fn cmd_isogeny(op: IsogenyOp) {
 
 // ── Cryptanalysis subcommands ─────────────────────────────────────────────────
 
+fn cmd_aes_attack(
+    technique: &str,
+    key_hex: &str,
+    samples: usize,
+    seed: u64,
+    alpha: u8,
+) -> Result<(), String> {
+    use crypto_lib::cryptanalysis::aes::{differential, linear, square, ReducedAes128};
+
+    let key_vec = from_hex(key_hex).map_err(|e| format!("invalid AES key hex: {e}"))?;
+    let key: [u8; 16] = key_vec
+        .try_into()
+        .map_err(|_| "AES-128 key must be exactly 16 bytes".to_string())?;
+    if !(1..=1_000_000).contains(&samples) {
+        return Err("samples must be in 1..=1000000".into());
+    }
+    match technique {
+        "differential" => {
+            if alpha == 0 {
+                return Err("alpha must be nonzero".into());
+            }
+            let cipher = ReducedAes128::new(&key, 2, false);
+            let pairs = differential::build_pairs(&cipher, alpha, samples, seed);
+            let ddt = differential::aes_sbox_ddt();
+            let report = differential::key_recovery_two_round(alpha, &pairs, &ddt)
+                .map_err(|e| format!("bounded differential recovery: {e}"))?;
+            let actual = cipher.round_key(2);
+            let verified = report
+                .key_bytes
+                .iter()
+                .all(|&(pos, byte)| actual[pos / 4][pos % 4] == byte);
+            println!("# AES-128 two-round differential recovery");
+            println!(
+                "pairs: {}; trials: {}",
+                report.pairs_used, report.trial_count
+            );
+            for (pos, byte) in report.key_bytes {
+                println!("last-round key byte {pos}: {byte:02x}");
+            }
+            println!("verified against supplied analysis key: {verified}");
+            if !verified {
+                return Err("recovered bytes failed key-schedule verification".into());
+            }
+        }
+        "linear" => {
+            let cipher = ReducedAes128::new(&key, 1, false);
+            let pairs = linear::known_plaintext_corpus(&cipher, samples, seed);
+            let lat = linear::aes_sbox_lat();
+            let mut recovered = [0u8; 16];
+            for c in 0..4 {
+                for r in 0..4 {
+                    let byte = linear::recover_key_byte_one_round(&pairs, (c, r), &lat)
+                        .ok_or_else(|| format!("bounded linear recovery at ({c},{r})"))?;
+                    recovered[4 * ((c + r) % 4) + r] = byte;
+                }
+            }
+            let verified = recovered == key;
+            println!("# AES-128 one-round linear recovery");
+            println!("known pairs: {samples}");
+            println!("recovered input key: {}", to_hex(&recovered));
+            println!("verified against supplied analysis key: {verified}");
+            if !verified {
+                return Err("recovered key failed verification".into());
+            }
+        }
+        "square" => {
+            let cipher = ReducedAes128::new(&key, 4, false);
+            let report = square::key_recovery_four_round(|p| cipher.encrypt(p));
+            let verified = report.master_key == key;
+            println!("# AES-128 four-round integral recovery");
+            println!(
+                "lambda sets: {}; S-box lookups: {}",
+                report.lambda_sets_used, report.sbox_lookups
+            );
+            println!("recovered master key: {}", to_hex(&report.master_key));
+            println!("verified against supplied analysis key: {verified}");
+            if !verified {
+                return Err("recovered key failed verification".into());
+            }
+        }
+        other => {
+            return Err(format!(
+                "unknown AES technique '{other}'; use differential, linear, or square"
+            ))
+        }
+    }
+    Ok(())
+}
+
 fn cmd_cryptanalysis(op: CryptanalysisOp) {
     use crypto_lib::cryptanalysis::auto_attack::{auto_attack_with, AutoAttackOptions};
     use crypto_lib::cryptanalysis::boomerang::{boomerang_distinguisher, rectangle_attack};
@@ -1517,6 +1623,18 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
                     eprintln!("error: cipher {} has no exposed S-box", cipher);
                     std::process::exit(1);
                 }
+            }
+        }
+        CryptanalysisOp::AesAttack {
+            technique,
+            key_hex,
+            samples,
+            seed,
+            alpha,
+        } => {
+            if let Err(e) = cmd_aes_attack(&technique, &key_hex, samples, seed, alpha) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
             }
         }
         CryptanalysisOp::Bench => {

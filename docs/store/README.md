@@ -137,6 +137,45 @@ evidence/<topic>_<date>/<file>
 Do not rename frozen evidence to fit: the store name is a pointer to the
 bytes, the committed file keeps the name it was written with.
 
+### Setec bucket layout
+
+For new IC artifact collections in `setec-astronomy-artifacts`, use the remote
+root `s3://setec-astronomy-artifacts/ic/v1`. The store appends
+`sha256/<first-two-hex-digits>/<full-sha256>` to this root; logical names and
+provenance live in the checked-in index. Reserve these name forms:
+
+```
+factor-bases/<icv1-curve-slug>/<fb1-id>.<ext>
+relations/<icv1-curve-slug>/<run-id>/<stage>.<ext>
+isogeny-routes/<icv1-curve-slug>/<graph-id>/<route-id>.json
+evidence/<campaign-id>/<run-id>/<file>
+```
+
+Use a UTC timestamp plus a random identifier for `run-id`, and record the
+curve identity, producing command, source commit, SHA-256 and byte count in
+the index entry. An acceptance run uses a separate remote root at
+`s3://setec-astronomy-artifacts/ic/v1/acceptance/<run-id>` and an isolated
+index and cache, so its cleanup cannot affect a research artifact.
+
+The current committed index and config refer to an existing remote. Switching
+that index to the Setec root requires copying and verifying every indexed
+object first. New Setec runs can use `CRYPTO_STORE_REMOTE` and a separate
+`CRYPTO_STORE_INDEX` without changing the existing index's resolution.
+The bucket is in `us-east-2`; the configured `ecc-challenges-new` AWS profile
+passed a live push, HEAD, remote verify, fresh-cache pull, SHA-256 comparison,
+and cleanup on 2026-10-18.
+The exact key, checksums and cleanup outcome are recorded in
+[`S3_ACCEPTANCE_20261018.json`](S3_ACCEPTANCE_20261018.json).
+The separate isogeny-walk `publish`/`fetch` path was exercised on a public
+three-curve route; its marker, three downloaded hashes, route verification,
+and cleanup are in
+[`ISOGENY_S3_ACCEPTANCE_20261018.json`](ISOGENY_S3_ACCEPTANCE_20261018.json).
+An actual verified `icx solve-prime` report was also pushed through the
+content store, checked with S3 HEAD and `store verify --remote`, pulled into
+a fresh cache with matching SHA-256, and removed from its unique acceptance
+prefix. Its receipt is
+[`IC_REPORT_S3_ACCEPTANCE_20261018.json`](IC_REPORT_S3_ACCEPTANCE_20261018.json).
+
 ## For evidence
 
 When a result's raw output is too large for Git, push it and commit the
@@ -147,12 +186,13 @@ reproduces the bytes with `crypto store pull sha256:<digest>`.
 
 ## What this does not do
 
-* **Not tested against live S3 from the session that wrote it.** The
-  argument vectors are unit-tested, and the whole flow runs end to end
-  through the real subprocess boundary against a stand-in `aws` that models
-  404s, `If-None-Match` and checksum rejection (`tests/store_cli.rs`). The
-  first push to the real bucket is the first live check; `store status`
-  reports whether the remote answers.
+* **Live S3 scope is small artifacts.** The argument vectors are unit-tested,
+  and the whole flow also runs through a stand-in `aws` that models 404s,
+  `If-None-Match` and checksum rejection (`tests/store_cli.rs`). A 79-byte
+  single-PUT round trip and a three-file isogeny-walk publish/fetch on
+  `setec-astronomy-artifacts` passed; the receipts above record the exact
+  keys, checksums, fresh downloads and cleanup.
+  Multipart upload and large-object recovery remain unverified on live S3.
 * **No migration of existing large files.** Files already in Git history stay
   there; moving them out is a separate, history-visible decision.
 * **No remote deletion, versioning policy or lifecycle rules.** Those belong
