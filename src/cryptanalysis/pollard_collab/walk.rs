@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 
 use super::job::{hex_of, parse_hex, JobContext};
 use crate::cryptanalysis::ecdlp_variants::{add_mod, neg_mod};
+use crate::ecc::field::FieldElement;
 use crate::ecc::point::Point;
 
 /// A distinguished point reached by one walker, as shipped in a
@@ -149,6 +150,109 @@ fn x_le(p: &Point, q: &Point) -> bool {
         (Point::Infinity, _) => true,
         (_, Point::Infinity) => false,
     }
+}
+
+/// One independently selected walk state for a synchronous batch step.
+///
+/// The branch selector and distinguished-point rule still see the same
+/// affine point as the serial walker. A caller may choose any batch width;
+/// this function does not change the job's walk or protocol.
+pub struct BatchStepInput<'a> {
+    pub point: &'a Point,
+    pub a: &'a BigUint,
+    pub b: &'a BigUint,
+    pub last: Option<&'a Point>,
+}
+
+/// Advance independent walkers with one field inversion for all ordinary
+/// affine additions. Exceptional additions use the existing point routine.
+///
+/// This is an opt-in arithmetic primitive. The caller must keep the walkers'
+/// scheduling and distinguished-point checks identical to the serial path.
+pub fn step_batch(
+    ctx: &JobContext,
+    inputs: &[BatchStepInput<'_>],
+) -> Vec<(Point, BigUint, BigUint)> {
+    let p = &ctx.p;
+    let mut selected = Vec::with_capacity(inputs.len());
+    let mut denominators = Vec::new();
+    let mut numerators = Vec::new();
+    let mut ordinary_index = Vec::with_capacity(inputs.len());
+    for input in inputs {
+        let branch = &ctx.branches[branch_index(input.point, ctx.branches.len())];
+        selected.push(branch);
+        match (input.point, &branch.point) {
+            (Point::Affine { x: x1, y: y1 }, Point::Affine { x: x2, y: y2 }) if x1 != x2 => {
+                ordinary_index.push(Some(denominators.len()));
+                denominators.push(x2.sub(x1));
+                numerators.push(y2.sub(y1));
+            }
+            _ => ordinary_index.push(None),
+        }
+    }
+
+    let mut inverse_denominators = vec![FieldElement::zero(p.clone()); denominators.len()];
+    if !denominators.is_empty() {
+        let mut prefixes = Vec::with_capacity(denominators.len());
+        let mut product = FieldElement::one(p.clone());
+        for denominator in &denominators {
+            prefixes.push(product.clone());
+            product = product.mul(denominator);
+        }
+        let mut inverse = product
+            .inv_vartime()
+            .expect("ordinary denominators are nonzero");
+        for index in (0..denominators.len()).rev() {
+            inverse_denominators[index] = inverse.mul(&prefixes[index]);
+            inverse = inverse.mul(&denominators[index]);
+        }
+    }
+
+    inputs
+        .iter()
+        .zip(selected.iter())
+        .zip(ordinary_index.iter())
+        .map(|((input, branch), ordinary)| {
+            let mut next = if let Some(index) = ordinary {
+                let (Point::Affine { x: x1, y: y1 }, Point::Affine { x: x2, .. }) =
+                    (input.point, &branch.point)
+                else {
+                    unreachable!("ordinary index requires two affine points")
+                };
+                let lambda = numerators[*index].mul(&inverse_denominators[*index]);
+                let x3 = lambda.mul(&lambda).sub(x1).sub(x2);
+                let y3 = lambda.mul(&x1.sub(&x3)).sub(y1);
+                Point::Affine { x: x3, y: y3 }
+            } else {
+                input.point.add_vartime(&branch.point, &ctx.a)
+            };
+            let mut next_a = add_mod(input.a, &branch.u, &ctx.n);
+            let mut next_b = add_mod(input.b, &branch.v, &ctx.n);
+            if ctx.spec.negation_map {
+                if needs_flip(&next, &ctx.half_p) {
+                    next = next.neg_vartime();
+                    next_a = neg_mod(&next_a, &ctx.n);
+                    next_b = neg_mod(&next_b, &ctx.n);
+                }
+                if input.last == Some(&next) {
+                    let (member, member_a, member_b) = if x_le(input.point, &next) {
+                        (input.point.clone(), input.a.clone(), input.b.clone())
+                    } else {
+                        (next, next_a, next_b)
+                    };
+                    next = member.double_vartime(&ctx.a);
+                    next_a = (member_a << 1) % &ctx.n;
+                    next_b = (member_b << 1) % &ctx.n;
+                    if needs_flip(&next, &ctx.half_p) {
+                        next = next.neg_vartime();
+                        next_a = neg_mod(&next_a, &ctx.n);
+                        next_b = neg_mod(&next_b, &ctx.n);
+                    }
+                }
+            }
+            (next, next_a, next_b)
+        })
+        .collect()
 }
 
 /// Run walker `i` from its derived start until a DP or the step cap.
@@ -290,6 +394,70 @@ mod tests {
             assert_eq!(c.combine(&a3, &b3), r2_other);
         }
         assert!(cycles >= 4, "only {cycles} 2-cycles among 1024 starts");
+    }
+
+    #[test]
+    fn batched_steps_replay_serial_states_in_both_modes() {
+        for negation in [false, true] {
+            let mut c = ctx(negation);
+            let mut states = (0..16u64)
+                .map(|i| {
+                    let (a, b, point) = c.walker_start(i);
+                    (point, a, b, None::<Point>)
+                })
+                .collect::<Vec<_>>();
+            c.branches[0].point = Point::Infinity;
+            states[0].0 = Point::Infinity;
+            for round in 0..12 {
+                let inputs = states
+                    .iter()
+                    .map(|(point, a, b, last)| BatchStepInput {
+                        point,
+                        a,
+                        b,
+                        last: last.as_ref(),
+                    })
+                    .collect::<Vec<_>>();
+                let batched = step_batch(&c, &inputs);
+                let serial = inputs
+                    .iter()
+                    .map(|input| step(&c, input.point, input.a, input.b, input.last))
+                    .collect::<Vec<_>>();
+                assert_eq!(batched, serial, "negation={negation}, round={round}");
+                for (state, (next, a, b)) in states.iter_mut().zip(batched) {
+                    state.3 = Some(std::mem::replace(&mut state.0, next));
+                    state.1 = a;
+                    state.2 = b;
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn batched_step_replays_doubling_and_cancellation() {
+        let mut c = ctx(false);
+        let point = c.branches[0].point.clone();
+        let a = BigUint::from(3u32);
+        let b = BigUint::from(5u32);
+        for cancellation in [false, true] {
+            let input_point = if cancellation {
+                point.neg()
+            } else {
+                point.clone()
+            };
+            let index = branch_index(&input_point, c.branches.len());
+            c.branches[index].point = point.clone();
+            let input = BatchStepInput {
+                point: &input_point,
+                a: &a,
+                b: &b,
+                last: None,
+            };
+            assert_eq!(
+                step_batch(&c, &[input]).pop().unwrap(),
+                step(&c, &input_point, &a, &b, None)
+            );
+        }
     }
 
     #[test]

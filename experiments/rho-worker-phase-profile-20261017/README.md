@@ -41,17 +41,49 @@ extrapolation, not a production timing result. It motivates a qualified
 longer trace and a walk-addition profile before selecting a joint-scalar
 kernel for the worker.
 
+A full-worker improvement above 1.05x requires the optimized phase to occupy
+more than `1 - 1/1.05 = 4.76%` of baseline time even if that phase could be
+removed entirely. The 0.09% projection is well below that threshold, but
+its phase share still needs a qualified long-worker trace.
+
+## Batched walk-addition candidate
+
+The existing worker keeps affine points and performs a field inversion in
+each ordinary walk addition. `walk::step_batch` advances independent walker
+states synchronously: it collects each nonzero affine denominator, inverts
+their product once, and recovers the individual inverses with prefix products.
+The branch selector, coefficients, optional negation map, and exceptional
+point additions follow the existing serial step. This reduces the ordinary
+inversion count for a batch of `k` walks from `k` to one; it adds field
+multiplications and requires a lockstep scheduler to use in the live worker.
+Exact-state tests compare multiple rounds with `walk::step`, including
+identity, doubling, cancellation, and both negation modes. A full-worker
+throughput result requires a frozen host panel and exact trail replay before
+changing scheduling or the default path.
+
+The [local validation receipt](batch-step-local-validation.json) binds the
+batch-step source hash and release test logs. The focused tests passed 2/2.
+The first full-library run passed 2,242 tests and hit two loopback
+`PermissionDenied` failures in existing network tests under sandboxing.
+Those three network tests passed with loopback access, and a full rerun in
+that environment passed 2,244 tests with 94 ignored.
+
 ## Next gates
 
-1. Rebuild the exact source on the isolated Linux runner. Freeze source,
-   binary, job spec, workload, CPU, host counters, A/A controls, and a
-   second independently verified `Q` point before Tier 1 timing.
-2. Measure complete target-charged one-restart times for fixed radix-81,
-   mixed-76, and warmed OpenSSL. Exclude only Q-independent initialization.
-3. Measure 1, 8, 32, and 128 starts per Q separately, including Q-table
-   preparation, peak memory, and total time.
-4. Replay identical branch points and walk states after any secp256k1
-   specialization. The generic C rho path has a 64-bit group order and is
-   not the integration target for this full-size curve.
+1. Rebuild this worker-profiler source on a qualified Linux allocation and
+   freeze its job spec, two public Q points, CPU and memory envelope, host
+   counters, and A/A controls. The requested source transfer to RunPod was
+   rejected by automatic approval review pending explicit authorization.
+2. The separate [rho arithmetic closeout in PR #920](https://github.com/aburan28/cryptanalysis/pull/920)
+   measured complete target-charged one-restart times for radix-81,
+   mixed-76, and generator-only-warmed OpenSSL across 32 Q points. Two full
+   panels failed their A/A noise gates. Its separate reuse panel passed the
+   Tier 1 gate at 32 and 128 restarts per Q; 1 and 8 failed A/A gates.
+3. Build a lockstep scheduler around `step_batch`, refill lanes after a DP,
+   and replay each walker's entire affine state sequence against the serial
+   worker. Compare paired full-worker throughput on the same Q points.
+   Require a 95% lower speedup bound above 1.05 and a frozen peak-memory
+   cap before changing the default path. The generic C rho path has a
+   64-bit group order; the full-size worker is this Rust implementation.
 
 No worker routing changes are made by this profiler.
