@@ -1547,3 +1547,32 @@ mixed-hash walk (the folded one, if H2 holds). If H1 fails, the
 reference stays and the walk structure is examined next.
 
 **Expected class: accounting**, against index calculus.
+
+## Round ten: measured — the hash is not the cause
+
+Registered run: card `CARD-HEIC-ROUND10-1`, receipt
+`research/notes/index-calculus/round10/run1/receipt.json` (completed),
+output `run1/R10.txt`, isolation record uncontended on reserved CPU 3
+(1016 s). Four arms × 18 instances × 40 seeds, every `k` verified. The
+two old-hash arms reproduce round nine's columns exactly (pinned).
+
+| | registered test | result |
+|--|--|--|
+| H1 | mixed plain `S_walk`: median ≤ 1.45 at `N ≥ 10⁵` **and** each of the two largest rows ≤ 1.55 | **falsified**: median 1.406, but the two largest rows are 2.240 and 1.696 |
+| H2 | mixed fold/plain ≤ 0.80 at `N ≥ 10⁵` | **falsified**: 0.960 |
+| H3 | control, `N ≤ 6·10⁴`: mixing moves median plain `S_walk` by < 0.15 | holds: 0.023 |
+| H4 | every run verified | holds |
+
+Largest rows, `S_walk` (ideal 1.2533 plain, 0.8862 folded):
+
+| g | `p` | `N` | plain | fold | plain + mix | fold + mix |
+|--:|--:|--:|--:|--:|--:|--:|
+| 3 | 211 | 4620611 | 1.820 | 2.148 | 1.696 | 1.951 |
+| 4 | 61 | 16790591 | 2.100 | 2.162 | 2.240 | 3.112 |
+
+**Reading it.** Mixing the hash does not repair the largest rows; on the
+largest the folded walk gets worse. The degradation is structural, not
+the hash. Next: a per-seed profile, to see whether every seed walks long
+or a few seeds blow up — the latter would point at a pathological event
+(stuck walks, repeated escapes) rather than a slow walk. Class: none; the
+reference is unchanged, and so is every ratio.
