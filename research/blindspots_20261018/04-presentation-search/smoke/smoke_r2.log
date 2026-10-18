@@ -23,3 +23,14 @@ PASS  aa-cell4 exit 0, 8 rows, [1, 14002, 648]
 == 4. controls: linear and nonlinear recodings of arm a on cells 1 to 4 (never reached in the first run)
 PASS  recode linear cell (17,4,3): 6 rows
 PASS  recode nonlinear cell (17,4,3): 6 rows
+PASS  recode linear cell (19,4,3): 6 rows
+PASS  recode nonlinear cell (19,4,3): 6 rows
+PASS  recode linear cell (13,3,4): 6 rows
+PASS  recode nonlinear cell (13,3,4): 6 rows
+PASS  recode linear cell (15,3,4): 6 rows
+PASS  recode nonlinear cell (15,3,4): 6 rows
+== 5. arm e, smallest count: cell 3 (--first 4), cell 4 (--first 0), cell 5 (10 s cap)
+PASS  e cell 3 t4
+PASS  e cell 4 t0
+PASS  e cell 5 t0 (10 s cap)
+== 6. arm b, smallest count: cell 1 (random and planted), cell 4 (random t0 20 s cap, planted)
