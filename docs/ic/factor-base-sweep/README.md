@@ -106,6 +106,9 @@ degree over that solve's substitution tree. Refutations, successful
 decompositions and exhausted solves are distinct. The best successful degree
 uses training probes only. These are bounded procedural diagnostics, **not
 certified degree of regularity**. No algebraic-closure certificate is produced.
+Negative verdicts can use finite-field substitution/enumeration as well as F4;
+their observed negative solving degree is not a certified algebraic refutation
+degree. `certified_refutation_degree` stays null too.
 `--max-degree` limits F4 critical-pair degree; it does not reduce the degree of
 the original membership equations, which is retained in the observed diagnostic.
 `certified_degree_of_regularity`, `total_cost_winner` and

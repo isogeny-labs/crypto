@@ -449,8 +449,10 @@ fn execute<G: CountedGroup>(
             record["phase_elapsed_seconds_operational"] = json!(phase_elapsed);
             record["cumulative_verified"] = json!(hits);
             record["observed_verified_per_second"] = json!(rate);
-            record["observed_bounded_refutation_degree"] =
+            record["observed_negative_solving_degree"] =
                 json!((status == "refuted").then_some(root_degree).flatten());
+            record["certified_refutation_degree"] = Value::Null;
+            record["negative_verdict_method"]=json!("degree-bounded F4 plus finite-field substitution/enumeration; the observed procedure degree is not an algebraic refutation certificate");
             record["summands"] = json!(2);
             write_new(&dir.join(format!("{stem}.result.json")), &record)?;
             records.push(record);
