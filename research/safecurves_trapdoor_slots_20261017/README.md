@@ -13,6 +13,8 @@ criteria), and where they would live.
 | `slots.svg` | diagram: criteria levels vs slots, round-A/B numbers | editable source |
 | `rho_costs.svg` | round-A quantitative graph: rho cost per sextic class | editable source |
 | `report.typ`, `PROTOCOL.pdf` | rendered report (Typst; protocol + diagram + graph + rounds) | rendered |
+| `round_c/REPORT.md` + JSON/SVG | round C (executed, native Rust): CM census cross-check (all 18 orders match SEA), certified grinds at 96 (3 primes, same prime as round B) and 128 (40 = 2^5.3 primes, inside the 2^12 bound) bits, 256-bit bounded probe (12 primes, 7 uncertifiable, no certified triple — rho-only certification binds; round D = native ECM registered) | **executed** |
+| `examples/safecurves_orbit_census.rs` | the native round-C tool (CM orbits, certified factoring, grinds; unit tests pin the CM fixtures) | code |
 
 Headline facts (measured):
 

@@ -102,19 +102,44 @@ for SafeCurves-grade criteria reduces to T1 (representation) and T3
 S1 conclusion: the only slot with no public check at either criteria level
 is the representation itself.
 
-#figure(image("slots.svg", width: 100%), caption: [Criteria levels vs slots, with round-A/B numbers.])
+== Round C (executed, native): CM census cross-check and certified grinds
+
+`examples/safecurves_orbit_census` (Rust) replaces the round-A/B SageMath
+execution paths.  Every orbit is derived from CM alone: for `j = 0` over
+`p = 1 mod 6`, `4p = L^2 + 27M^2` (Cornacchia, sqrt(-27) seed lifted to
+`mod 4p`) gives traces `{+-|L|, +-|L+9M|/2, +-|9M-L|/2}`; for `j = 1728` over
+`p = 1 mod 4`, `p = a^2 + b^2` gives traces `{+-2a, +-2b}`.  Results:
+
+- *Census cross-check:* all 18 CM-derived orders equal the 18 SEA orders of
+  round A bit-for-bit; published orders in orbit; `j = 1728` formula
+  pinned by unit test.
+- *96-bit grind:* certified pair after 3 scanned primes - the same prime as
+  round B's SageMath run (`p = 79228162514264337593543950963`).
+- *128-bit grind:* certified pair after 40 = `2^5.3` scanned primes
+  (published 103 bits, twist 107, weak sibling 51), inside the registered
+  `2^12` bound.
+- *256-bit bounded probe:* 12 primes scanned, 7 with uncertifiable orbits,
+  no certified triple: rho-only certification is the binding constraint at
+  256 bits, so the 256-bit prediction stays open until round D (native ECM).
+
+#figure(image("round_c/grind128_classes.svg", width: 100%), caption: [Round C: the certified 128-bit grind hit, per-class largest prime factors.])
+
+#figure(image("slots.svg", width: 100%), caption: [Criteria levels vs slots, with round-A/B numbers (unchanged by round C; round C makes the census native and certifies the grinds).])
 
 == Registered follow-ups
 
-- *R1 (round C, native).* Rewrite rounds A and B in Rust (SEA or the CM
-  trace derivation `4p = L^2 + 27M^2`, repository factoring tools); run the
-  256-bit grind prediction; register the full twist-orbit check as a public
-  rigidity-adjacent criterion candidate.
-- *R2.* Quartic analogue at `j = 1728` (`y^2 = x^3 + b`, `p = 1 mod 4`):
-  census and grind on the four-class orbit; criteria-completion only.
-- *R3.* Reachability experiment: instrumented x-only ladder and a
-  y-accepting implementation on the round-B 96-bit curve, measuring which
-  classes each can be pushed onto.
+- *R1/round C (executed, see above).* The full twist-orbit check (largest
+  prime factor of all six classes at a scaled bar) is now unblocked as a
+  public criterion candidate.
+- *R1b/round D (pending):* native ECM, then the full 256-bit grind
+  prediction (`< 2^12` scanned primes expected; falsified if none in
+  `2^13`).
+- *R2 (partly executed):* quartic `j = 1728` census formula native and
+  unit-tested (`y^2 = x^3 + a x`, `p = 1 mod 4`); the quartic grind remains
+  criteria-completion only.
+- *R3 (pending):* instrumented x-only ladder and a y-accepting
+  implementation on the round-B/C 96-bit curve, measuring which classes
+  each can be pushed onto.
 
 == Claim hygiene
 

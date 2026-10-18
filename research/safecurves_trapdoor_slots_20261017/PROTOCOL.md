@@ -118,18 +118,32 @@ public check at either criteria level is the representation itself.
 
 ## 5. Registered follow-ups
 
-- **R1 (round C, native).** Rewrite rounds A and B in Rust (SEA or the CM
-  trace derivation `4p = L^2 + 27M^2`, repository factoring tools), run the
-  256-bit grind prediction of §3, and register the full twist-orbit check
+- **R1 (round C, native).** ~~Rewrite rounds A and B in Rust~~ — **executed
+  2026-10-17**: `examples/safecurves_orbit_census` derives every orbit from
+  CM alone (`4p = L^2 + 27M^2` with the sqrt(-27) seed lifted to `mod 4p`;
+  j=1728: `p = a^2 + b^2`, traces `{+-2a, +-2b}`), reproduces all 18 SEA
+  orders of round A bit-for-bit and the round-B 96-bit hit on the same
+  prime, and certifies a fresh pair at 128 bits in 40 = `2^5.3` scanned
+  primes (inside the `2^12` bound).  The 256-bit bounded probe found no
+  certified triple in 12 primes with 7 uncertifiable orbits: rho-only
+  certification is the binding constraint at that size, so the 256-bit
+  prediction stays open.  Evidence: `round_c/REPORT.md` and its JSON.
+  The remaining part of R1 — registering the full twist-orbit check
   (`largest prime factor of all six classes >= 2^{100/2}`-scaled) as a
-  public rigidity-adjacent criterion candidate.
-- **R2.** Quartic analogue at `j = 1728` (`y^2 = x^3 + b`, `p = 1 mod 4`):
-  same census and grind on the four-class orbit; no deployed `j = 1728`
-  curve is known to us, so this is criteria-completion only.
+  public criterion candidate — is now unblocked by the native census.
+- **R1b (round D, native ECM).** Add ECM to the native factoring path so
+  256-bit orbits are certifiable, then run the full 256-bit grind
+  prediction (`< 2^12` scanned primes expected; falsified if none in
+  `2^13`).
+- **R2.** Quartic analogue at `j = 1728` (`y^2 = x^3 + a x`, `p = 1 mod 4`):
+  the census formula is now native and unit-tested
+  (`cornacchia_j0_secp192k1_and_224k1`, `j1728_fixture`); the quartic
+  *grind* remains criteria-completion only (no deployed `j = 1728` curve
+  is known to us).
 - **R3.** Reachability experiment: an instrumented x-only ladder and a
-  y-accepting implementation on the round-B 96-bit curve, confirming which
-  classes each can be pushed onto, so §2's reachability note is measured
-  rather than argued.
+  y-accepting implementation on the round-B/C 96-bit curve, confirming
+  which classes each can be pushed onto, so §2's reachability note is
+  measured rather than argued.
 
 ## 6. Claim hygiene
 
