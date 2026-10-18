@@ -1189,13 +1189,26 @@ fn mult_main(out: &Path) {
     let mut bcsv = String::from("m,curve,order,m1_pairs,m1_violations,x3_total,solvable,nonpow2_cosets,kdim0,kdim1,kdim2,kdim3,kdim4plus,valid0,valid1,valid2,valid3,valid4,valid5,valid6,valid7,valid8plus,distinct_subfield,distinct_from_cosets\n");
     let mut checks = String::new();
     let mut disp: BTreeMap<(u8, &'static str), Vec<f64>> = BTreeMap::new();
-    let mut emit = |csv: &mut String, ch: u8, q: u64, ci: usize, ord: u64, arm: &'static str, f: usize, distinct: u64, total: u64, dsp: f64, h: [u64; 9]| {
+    let mut emit = |csv: &mut String,
+                    ch: u8,
+                    q: u64,
+                    ci: usize,
+                    ord: u64,
+                    arm: &'static str,
+                    f: usize,
+                    distinct: u64,
+                    total: u64,
+                    dsp: f64,
+                    h: [u64; 9]| {
         let lam = total as f64 / ord as f64;
         csv.push_str(&format!(
             "{ch},{q},{ci},{ord},{arm},{f},{lam:.6},{:.6},{:.6},{dsp:.5},{}\n",
             1.0 - (-lam).exp(),
             distinct as f64 / ord as f64,
-            h.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(",")
+            h.iter()
+                .map(|v| v.to_string())
+                .collect::<Vec<_>>()
+                .join(",")
         ));
         disp.entry((ch, arm)).or_default().push(dsp);
     };
@@ -1211,7 +1224,19 @@ fn mult_main(out: &Path) {
                 if *arm == "subfield" {
                     dsub = dd;
                 }
-                emit(&mut csv, 2, 1 << mm, ci, c.order, arm, f.len(), dd, tt, dsp, h);
+                emit(
+                    &mut csv,
+                    2,
+                    1 << mm,
+                    ci,
+                    c.order,
+                    arm,
+                    f.len(),
+                    dd,
+                    tt,
+                    dsp,
+                    h,
+                );
             }
             let d = bin_diag(&c);
             m1v += d.m1_viol;
@@ -1231,11 +1256,18 @@ fn mult_main(out: &Path) {
                 k[2],
                 k[3],
                 k[4..].iter().sum::<u64>(),
-                d.valid_hist.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(","),
+                d.valid_hist
+                    .iter()
+                    .map(|v| v.to_string())
+                    .collect::<Vec<_>>()
+                    .join(","),
                 dsub,
                 d.distinct_from_cosets
             ));
-            eprintln!("mult binary m={mm} curve {ci}: kdim {:?} solvable {}/{} valid {:?}", d.kdim_hist, d.solvable, d.x3_total, d.valid_hist);
+            eprintln!(
+                "mult binary m={mm} curve {ci}: kdim {:?} solvable {}/{} valid {:?}",
+                d.kdim_hist, d.solvable, d.x3_total, d.valid_hist
+            );
         }
     }
     for p in [53u32, 101, 211, 401, 809] {
@@ -1245,18 +1277,37 @@ fn mult_main(out: &Path) {
             for (arm, _xs, f) in &arms[..2] {
                 let (dd, tt) = coverage(&c, f, 2);
                 let (dsp, h) = multiplicity(&c, f);
-                emit(&mut csv, 0, p as u64, ci, c.order, arm, f.len(), dd, tt, dsp, h);
+                emit(
+                    &mut csv,
+                    0,
+                    p as u64,
+                    ci,
+                    c.order,
+                    arm,
+                    f.len(),
+                    dd,
+                    tt,
+                    dsp,
+                    h,
+                );
             }
         }
     }
-    checks.push_str(&format!("M1 identity x(P+Q)+x(P-Q) = x1x2/(x1+x2)^2 violations: {m1v}\n"));
+    checks.push_str(&format!(
+        "M1 identity x(P+Q)+x(P-Q) = x1x2/(x1+x2)^2 violations: {m1v}\n"
+    ));
     checks.push_str(&format!("M2 solution cosets not a power of 2: {npw}\n"));
-    checks.push_str(&format!("M3 cross-check distinct(subfield) != distinct from cosets: {xchk} curves\n"));
+    checks.push_str(&format!(
+        "M3 cross-check distinct(subfield) != distinct from cosets: {xchk} curves\n"
+    ));
     for ((ch, arm), v) in &disp {
         let k = v.len() as f64;
         let mean = v.iter().sum::<f64>() / k;
         let sd = (v.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / (k - 1.0)).sqrt();
-        checks.push_str(&format!("M3 dispersion char {ch} {arm}: mean {mean:.4} sd {sd:.4} over {} curves\n", v.len()));
+        checks.push_str(&format!(
+            "M3 dispersion char {ch} {arm}: mean {mean:.4} sd {sd:.4} over {} curves\n",
+            v.len()
+        ));
     }
     std::fs::write(out.join("mult.csv"), csv).unwrap();
     std::fs::write(out.join("binary_cosets.csv"), bcsv).unwrap();
@@ -1489,7 +1540,9 @@ mod tests {
         let (p, k) = f2_solve(&[1, 2, 3], 3);
         assert_eq!(k.len(), 1);
         let pc = p.unwrap();
-        let img = (0..3).filter(|j| pc >> j & 1 == 1).fold(0u32, |a, j| a ^ [1u32, 2, 3][j]);
+        let img = (0..3)
+            .filter(|j| pc >> j & 1 == 1)
+            .fold(0u32, |a, j| a ^ [1u32, 2, 3][j]);
         assert_eq!(img, 3);
         assert!(f2_solve(&[1, 1], 2).0.is_none());
     }

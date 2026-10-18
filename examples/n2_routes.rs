@@ -254,7 +254,11 @@ impl Fld for Fp {
     #[inline]
     fn sub(self, o: Self) -> Self {
         let p = pp();
-        Fp(if self.0 >= o.0 { self.0 - o.0 } else { self.0 + p - o.0 })
+        Fp(if self.0 >= o.0 {
+            self.0 - o.0
+        } else {
+            self.0 + p - o.0
+        })
     }
     fn neg(self) -> Self {
         Fp(if self.0 == 0 { 0 } else { pp() - self.0 })
@@ -920,7 +924,9 @@ impl Instance {
                     break c;
                 }
             };
-            let kappa = (2..p).find(|&k| powmod(k, (p - 1) / 2, p) == p - 1).unwrap();
+            let kappa = (2..p)
+                .find(|&k| powmod(k, (p - 1) / 2, p) == p - 1)
+                .unwrap();
             set_field(p, kappa);
             for _ in 0..400 {
                 if let Some(inst) = Instance::try_new(p, kappa, rng) {
@@ -961,7 +967,10 @@ impl Instance {
         let hl = lift(&hh);
         let h0 = peval(&hl, u0);
         let h1 = peval(&pderiv(&hl), u0);
-        let h2 = Fp2::from_fp(f[6]).mul(u0).mul(Fp2::from_u64(3)).add(Fp2::from_fp(f[5]));
+        let h2 = Fp2::from_fp(f[6])
+            .mul(u0)
+            .mul(Fp2::from_u64(3))
+            .add(Fp2::from_fp(f[5]));
         if h0.is_zero() {
             return None;
         }
@@ -977,7 +986,11 @@ impl Instance {
             .mul(Fp2::from_u64(27).inv())
             .sub(c2.mul(c4).mul(i3))
             .add(c6);
-        let disc = a.sqr().mul(a).mul(Fp2::from_u64(4)).add(b.sqr().mul(Fp2::from_u64(27)));
+        let disc = a
+            .sqr()
+            .mul(a)
+            .mul(Fp2::from_u64(4))
+            .add(b.sqr().mul(Fp2::from_u64(27)));
         if disc.is_zero() {
             return None;
         }
@@ -1073,11 +1086,7 @@ impl Instance {
             return None;
         }
         let di = d.inv();
-        let uq = vec![
-            l.sqr().mul(di),
-            l.mul(u1.add(r).add(r)).mul(di),
-            Fp2::one(),
-        ];
+        let uq = vec![l.sqr().mul(di), l.mul(u1.add(r).add(r)).mul(di), Fp2::one()];
         let v0 = v.first().copied().unwrap_or(Fp2::zero());
         let v1 = v.get(1).copied().unwrap_or(Fp2::zero());
         let li = l.inv();
@@ -1191,7 +1200,11 @@ impl Lin {
     fn push(&mut self, mut row: Row) -> Option<u64> {
         loop {
             cnt_n(row.lp.len() as u64);
-            let hit = row.lp.iter().find(|(k, _)| self.pivots.contains_key(k)).copied();
+            let hit = row
+                .lp
+                .iter()
+                .find(|(k, _)| self.pivots.contains_key(k))
+                .copied();
             match hit {
                 Some((k, c)) => {
                     let piv = self.pivots.get(&k).unwrap();
@@ -1206,7 +1219,11 @@ impl Lin {
             let ell = self.ell;
             let norm = |v: &[(u64, u64)]| v.iter().map(|&(x, y)| (x, mm(y, ci, ell))).collect();
             let nr = Row {
-                bcols: row.bcols.iter().map(|&(x, y)| (x, mm(y, ci, ell))).collect(),
+                bcols: row
+                    .bcols
+                    .iter()
+                    .map(|&(x, y)| (x, mm(y, ci, ell)))
+                    .collect(),
                 lp: norm(&row.lp),
                 a: mm(row.a, ci, ell),
                 b: mm(row.b, ci, ell),
@@ -1398,7 +1415,11 @@ fn arm_rho(inst: &Instance, pt: EP, q: EP, rng: &mut u64) -> ArmResult {
                 let key = (x.0, x.1);
                 if let Some(&(a2, b2)) = table.get(&key) {
                     if b2 != b {
-                        let k = mm((a + ell - a2) % ell, inv_mod((b2 + ell - b) % ell, ell), ell);
+                        let k = mm(
+                            (a + ell - a2) % ell,
+                            inv_mod((b2 + ell - b) % ell, ell),
+                            ell,
+                        );
                         if e.mul(pt, k) == q {
                             res.k = k;
                             res.ok = true;
@@ -1415,7 +1436,11 @@ fn arm_rho(inst: &Instance, pt: EP, q: EP, rng: &mut u64) -> ArmResult {
             len += 1;
             if nw == prev.0 {
                 // fruitless 2-cycle: double the smaller of the two points
-                let sel = if key_ep(w) < key_ep(nw) { (w, a, b) } else { (nw, na, nb) };
+                let sel = if key_ep(w) < key_ep(nw) {
+                    (w, a, b)
+                } else {
+                    (nw, na, nb)
+                };
                 (w, a, b) = double(sel.0, sel.1, sel.2, &mut steps);
                 prev = (EP::O, 0, 0);
                 continue;
@@ -1581,7 +1606,11 @@ fn arm_jac_impl(
                     let sign = if w <= p - w || w == 0 { 1 } else { ell - 1 };
                     let coef = if double { 2 * sign % ell } else { sign };
                     let bi = bidx[xi as usize];
-                    entries.push((bi != u32::MAX, if bi != u32::MAX { bi as u64 } else { xi }, coef));
+                    entries.push((
+                        bi != u32::MAX,
+                        if bi != u32::MAX { bi as u64 } else { xi },
+                        coef,
+                    ));
                 }
                 for (isb, key, coef) in entries {
                     if isb {
@@ -1634,9 +1663,11 @@ fn arm_jac_impl(
                 }
             }
             cnt_n(1);
-            let hx = d.u.iter().chain(d.v.iter()).fold(0u64, |h, c| {
-                (h ^ c.0).wrapping_mul(0x9e37_79b9_7f4a_7c15)
-            }) >> 40;
+            let hx =
+                d.u.iter()
+                    .chain(d.v.iter())
+                    .fold(0u64, |h, c| (h ^ c.0).wrapping_mul(0x9e37_79b9_7f4a_7c15))
+                    >> 40;
             if indep {
                 a = xorshift(rng) % ell;
                 b = xorshift(rng) % ell;
@@ -1698,7 +1729,11 @@ fn roots_fp(a: &[Fp], rng: &mut u64) -> Vec<Fp> {
         }
     }
     let xp_x = psub(&r, &[Fp(0), Fp(1)]);
-    let g = if xp_x.is_empty() { a.clone() } else { pxgcd(&a, &xp_x).0 };
+    let g = if xp_x.is_empty() {
+        a.clone()
+    } else {
+        pxgcd(&a, &xp_x).0
+    };
     let mut out = Vec::new();
     split_roots(&g, rng, &mut out);
     out
@@ -1772,7 +1807,10 @@ fn decompose_x(e: &Ell, x3: Fp2, rng: &mut u64) -> Vec<(Fp, Fp)> {
     let m0: Vec<Fp> = trim(lin.iter().map(|c| Fp(c.0)).collect());
     let n0: Vec<Fp> = trim(con.iter().map(|c| Fp(c.0)).collect());
     // e2 = -n1/m1 ; G0 = e2^2 + m0 e2 + n0 = 0  => n1^2 - m0 n1 m1 + n0 m1^2 = 0
-    let quart = padd(&psub(&pmul(&n1, &n1), &pmul(&pmul(&m0, &n1), &m1)), &pmul(&n0, &pmul(&m1, &m1)));
+    let quart = padd(
+        &psub(&pmul(&n1, &n1), &pmul(&pmul(&m0, &n1), &m1)),
+        &pmul(&n0, &pmul(&m1, &m1)),
+    );
     let mut out = Vec::new();
     let mut e1s = roots_fp(&quart, rng);
     // m1(e1) = 0 roots need separate handling (e2 free in G1): rare, check them too
@@ -2053,10 +2091,14 @@ fn run_checks(out: &Path) {
                 loop {
                     let x = Fp(xorshift(&mut rng) % inst.p);
                     if let Some(w) = sqrt_p(peval(fq, x).0) {
-                        rd = jadd(fq, &rd, &Div {
-                            u: vec![x.neg(), Fp(1)],
-                            v: trim(vec![Fp(w)]),
-                        });
+                        rd = jadd(
+                            fq,
+                            &rd,
+                            &Div {
+                                u: vec![x.neg(), Fp(1)],
+                                v: trim(vec![Fp(w)]),
+                            },
+                        );
                         break;
                     }
                 }
@@ -2080,8 +2122,12 @@ fn run_checks(out: &Path) {
             })
             .collect();
         let mut agree = true;
-        let (mut cf, mut cc, mut df, mut dc) =
-            (Counts::default(), Counts::default(), Counts::default(), Counts::default());
+        let (mut cf, mut cc, mut df, mut dc) = (
+            Counts::default(),
+            Counts::default(),
+            Counts::default(),
+            Counts::default(),
+        );
         for w in pts.windows(2) {
             let s0 = Counts::now();
             let x = jadd_fast(f, &w[0], &w[1]);
@@ -2219,11 +2265,20 @@ fn summarize(csv: &str) -> (String, String, String) {
     let mut bits: Vec<u64> = rows.iter().map(|(m, _)| m["bits"] as u64).collect();
     bits.sort_unstable();
     bits.dedup();
-    let arms = [("J", 1.0), ("J", 2.0), ("J", 4.0), ("D", 1.0), ("D", 2.0), ("D", 4.0)];
+    let arms = [
+        ("J", 1.0),
+        ("J", 2.0),
+        ("J", 4.0),
+        ("D", 1.0),
+        ("D", 2.0),
+        ("D", 4.0),
+    ];
     let mut out = String::from(
         "bits,arm,c,ipr,jac_pricing,native_w,runs,verified,mean_p,mean_cost,mean_rho_cost,ratio_to_rho,mean_steps_over_p,rho_steps_over_p\n",
     );
-    let mut rank = String::from("bits,arm,c,cells,ic_cheaper_cells,rho_cheaper_cells,min_ratio,max_ratio,verdict\n");
+    let mut rank = String::from(
+        "bits,arm,c,cells,ic_cheaper_cells,rho_cheaper_cells,min_ratio,max_ratio,verdict\n",
+    );
     let mut txt = String::new();
     let mut verified_all = true;
     for &b in &bits {
@@ -2253,9 +2308,23 @@ fn summarize(csv: &str) -> (String, String, String) {
                     }
                     for w in [0.0, 0.1, 1.0] {
                         // per-run inversion price uses that run's p
-                        let ipr_of = |m: &HashMap<&str, f64>| if ipr_kind == 0 { 3.0 } else { 2.0 * m["p"].log2() };
-                        let ic_c = ic.iter().map(|m| row_cost(m, ipr_of(m), jp, w)).sum::<f64>() / ic.len() as f64;
-                        let rho_c = rho.iter().map(|m| row_cost(m, ipr_of(m), false, w)).sum::<f64>() / rho.len() as f64;
+                        let ipr_of = |m: &HashMap<&str, f64>| {
+                            if ipr_kind == 0 {
+                                3.0
+                            } else {
+                                2.0 * m["p"].log2()
+                            }
+                        };
+                        let ic_c = ic
+                            .iter()
+                            .map(|m| row_cost(m, ipr_of(m), jp, w))
+                            .sum::<f64>()
+                            / ic.len() as f64;
+                        let rho_c = rho
+                            .iter()
+                            .map(|m| row_cost(m, ipr_of(m), false, w))
+                            .sum::<f64>()
+                            / rho.len() as f64;
                         let ratio = ic_c / rho_c;
                         lo = lo.min(ratio);
                         hi = hi.max(ratio);
@@ -2282,7 +2351,9 @@ fn summarize(csv: &str) -> (String, String, String) {
             } else {
                 "unresolved"
             };
-            rank.push_str(&format!("{b},{arm},{c},{cells},{icw},{rw},{lo:.4},{hi:.4},{verdict}\n"));
+            rank.push_str(&format!(
+                "{b},{arm},{c},{cells},{icw},{rw},{lo:.4},{hi:.4},{verdict}\n"
+            ));
             txt.push_str(&format!(
                 "O/J bits {b} arm {arm} c {c}: IC/rho ratio in [{lo:.3}, {hi:.3}] over {cells} cells -> {verdict}; steps/p {steps:.3} (rho {rho_steps:.3})\n"
             ));
@@ -2305,7 +2376,11 @@ fn summarize(csv: &str) -> (String, String, String) {
                 continue;
             }
             let mp = sel.iter().map(|m| m["p"]).sum::<f64>() / sel.len() as f64;
-            let mc = sel.iter().map(|m| row_cost(m, 3.0, false, 0.1)).sum::<f64>() / sel.len() as f64;
+            let mc = sel
+                .iter()
+                .map(|m| row_cost(m, 3.0, false, 0.1))
+                .sum::<f64>()
+                / sel.len() as f64;
             xs.push(mp.ln());
             ys.push(mc.ln());
         }
@@ -2315,7 +2390,10 @@ fn summarize(csv: &str) -> (String, String, String) {
             let my = ys.iter().sum::<f64>() / n;
             let sxy: f64 = xs.iter().zip(&ys).map(|(x, y)| (x - mx) * (y - my)).sum();
             let sxx: f64 = xs.iter().map(|x| (x - mx).powi(2)).sum();
-            txt.push_str(&format!("O/J scaling arm {arm} c {c}: cost ~ p^{:.3}\n", sxy / sxx));
+            txt.push_str(&format!(
+                "O/J scaling arm {arm} c {c}: cost ~ p^{:.3}\n",
+                sxy / sxx
+            ));
         }
     }
     // K6: rho positive control, mean steps/p against 0.886/sqrt(h) per size
@@ -2327,7 +2405,10 @@ fn summarize(csv: &str) -> (String, String, String) {
             .collect();
         let n = rho.len() as f64;
         let obs: Vec<f64> = rho.iter().map(|m| m["steps"] / m["p"]).collect();
-        let th: Vec<f64> = rho.iter().map(|m| 0.886 * (m["ell"] / (m["p"] * m["p"])).sqrt()).collect();
+        let th: Vec<f64> = rho
+            .iter()
+            .map(|m| 0.886 * (m["ell"] / (m["p"] * m["p"])).sqrt())
+            .collect();
         let mo = obs.iter().sum::<f64>() / n;
         let mt = th.iter().sum::<f64>() / n;
         let sd = (obs.iter().map(|x| (x - mo).powi(2)).sum::<f64>() / (n - 1.0).max(1.0)).sqrt();
@@ -2374,13 +2455,17 @@ fn control_job(job: &Job) -> Vec<String> {
                 u8::from(ok)
             ));
         }
-        eprintln!("control bits {} inst {} target {} done", job.bits, job.inst_id, tgt);
+        eprintln!(
+            "control bits {} inst {} target {} done",
+            job.bits, job.inst_id, tgt
+        );
     }
     rows
 }
 
 fn summarize_control(csv: &str) -> String {
-    let mut by: std::collections::BTreeMap<(u64, String), Vec<(f64, f64, f64, f64)>> = Default::default();
+    let mut by: std::collections::BTreeMap<(u64, String), Vec<(f64, f64, f64, f64)>> =
+        Default::default();
     let mut byh: std::collections::BTreeMap<(String, u64), Vec<f64>> = Default::default();
     let mut all_ok = true;
     for l in csv.lines().skip(1) {
@@ -2392,8 +2477,12 @@ fn summarize_control(csv: &str) -> String {
         let dups: f64 = v[9].parse().unwrap();
         let sbd: f64 = v[10].parse().unwrap();
         all_ok &= v[11] == "1";
-        by.entry((bits, v[6].to_string())).or_default().push((steps / p, dups, sbd, 1.0));
-        byh.entry((v[6].to_string(), h)).or_default().push(steps / p);
+        by.entry((bits, v[6].to_string()))
+            .or_default()
+            .push((steps / p, dups, sbd, 1.0));
+        byh.entry((v[6].to_string(), h))
+            .or_default()
+            .push(steps / p);
     }
     let mut t = String::new();
     for ((bits, arm), v) in &by {
@@ -2410,7 +2499,10 @@ fn summarize_control(csv: &str) -> String {
         let n = v.len() as f64;
         let m = v.iter().sum::<f64>() / n;
         let sd = (v.iter().map(|x| (x - m).powi(2)).sum::<f64>() / (n - 1.0).max(1.0)).sqrt();
-        t.push_str(&format!("F by cofactor {arm} h={h}: runs {n} steps/p mean {m:.4} sd {sd:.4} (s.e. {:.4})\n", sd / n.sqrt()));
+        t.push_str(&format!(
+            "F by cofactor {arm} h={h}: runs {n} steps/p mean {m:.4} sd {sd:.4} (s.e. {:.4})\n",
+            sd / n.sqrt()
+        ));
     }
     t.push_str(&format!("F all answers verified: {all_ok}\n"));
     t
@@ -2463,7 +2555,11 @@ fn main() {
             s.spawn(|| loop {
                 let j = queue.lock().unwrap().pop();
                 let Some((i, job)) = j else { break };
-                let r = if control { control_job(&job) } else { run_job(&job) };
+                let r = if control {
+                    control_job(&job)
+                } else {
+                    run_job(&job)
+                };
                 results.lock().unwrap().push((i, r));
             });
         }
@@ -2553,7 +2649,14 @@ mod tests {
                 loop {
                     let x = Fp(xorshift(rng) % inst.p);
                     if let Some(w) = sqrt_p(peval(f, x).0) {
-                        d = jadd(f, &d, &Div { u: vec![x.neg(), Fp(1)], v: trim(vec![Fp(w)]) });
+                        d = jadd(
+                            f,
+                            &d,
+                            &Div {
+                                u: vec![x.neg(), Fp(1)],
+                                v: trim(vec![Fp(w)]),
+                            },
+                        );
                         break;
                     }
                 }
