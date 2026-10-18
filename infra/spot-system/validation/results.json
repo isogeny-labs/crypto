@@ -1,0 +1,40 @@
+{
+  "python": "3.9.25",
+  "system_tests": {
+    "command": "python3 -m unittest discover -s infra/spot-system -p 'test_*.py' -v",
+    "passed": 37,
+    "result": "passed"
+  },
+  "python_compile": "passed",
+  "cfn_lint": {
+    "version": "1.46.0",
+    "result": "passed"
+  },
+  "cargo_release_library": {
+    "command": "cargo test --release --lib",
+    "result": "passed",
+    "passed": 4396,
+    "failed": 0,
+    "ignored": 118,
+    "duration_seconds": 78.37
+  },
+  "s3_download_sha256": "passed",
+  "files": {
+    "activity.py": "0c6f90889c8b665b1d2fb85d256a94c03660faf3be6e06b4a4589aaf35dccf0e",
+    "build_client.py": "5aa065eaf99233dc3a2540d6f0a954d7df45d7046157db269d38a9830af83122",
+    "build_template.py": "1124945061f0a598095c4cea9c52b0cf10e0c2a17a2c875454e411bf7e4d0706",
+    "controller.py": "ac6b8b029cc08d91bbd3f719c93ed73adaf0992a96c17dbf362d53be1ba99792",
+    "install_hooks.py": "37c58155b5f0989ea72815f844c48fa4edd4c6434f35799a9d7702931b63d115",
+    "install_services.py": "cd34332021b8e338cede7359279ee5cd4a01c46cb24554bed91568f591e3bf19",
+    "lifecycle.py": "2dd19db6f40f3d78d4fb720238c44d48ea6c07ccc7d980cf33db1899dadf44ad",
+    "node_service.py": "be0d8740852066c8fc3a8e43a037631a11e65fdb8260b4045210b414722ce73a",
+    "package_runtime.py": "ba4c8c0f36602fa88719476d532c61b1385bddc21d6e530d930ef37ec8619655",
+    "prices.py": "42614be936e747efbd9af78e057117797a823dc67549aa79be36162376b74ea6",
+    "runner.py": "c58a5ab569b0f7ccff49162d053e412c2fd419e12ee237654e8aef975cbf14a9",
+    "test_activity.py": "d20c6517ed491acf7169278e0585f8f48290a3ada6dec53c0173f065bd0972d7",
+    "test_lifecycle.py": "2fe58521703f265cc58d35d01d8c2988151b063c342aeb3f74c4fe85510bb864",
+    "test_system.py": "ebc907fe6cc7059e29a2156ac31c62ed527651340f850bd2dec4a6271de39de3",
+    "wake.py": "7531a30115452e754040948659e46432cd961b9edea5acd934f45efbd7acce40",
+    "worker_state.py": "3218ba2f9627f80e9afb076efae9abe7acf35cb073eb1fe63e7b5a2b6e0e8329"
+  }
+}
