@@ -1171,7 +1171,6 @@ impl<'a> F4<'a> {
         let t_elim = Instant::now();
         let rows = (reducers.len() + srows.len()) as u64;
         let mut nnz = 0u64;
-        let single = false;
         let mut pivot: Vec<u32> = vec![NOPIV; c];
         let mut store: Vec<Vec<u32>> = Vec::with_capacity(reducers.len() + 64);
         for (m, row) in reducers.drain(..) {
@@ -1981,7 +1980,6 @@ impl<'a> Sig<'a> {
         let mut acc = vec![0u64; words];
         // pivots: several per column are allowed (a raw reducer and a reduced S-row can
         // share a leading column); a row uses the sparsest pivot of strictly smaller label
-        let single = false;
         let mut pivot: Vec<u32> = vec![NOPIV; c];
         let mut chain: Vec<u32> = Vec::with_capacity(mrows.len());
         let mut store: Vec<Vec<u32>> = Vec::with_capacity(mrows.len());
@@ -1994,9 +1992,6 @@ impl<'a> Sig<'a> {
             let lab = (row.idx, row.rk);
             let r: Vec<u32> = row.poly.iter().map(|x| cidx[x]).collect();
             if row.kind == 0 {
-                if single && pivot[r[0] as usize] != NOPIV {
-                    continue;
-                }
                 nnz += r.len() as u64;
                 let col = r[0] as usize;
                 chain.push(pivot[col]);
@@ -2029,7 +2024,7 @@ impl<'a> Sig<'a> {
                             best = p;
                         }
                     }
-                    p = if single { NOPIV } else { chain[p as usize] };
+                    p = chain[p as usize];
                 }
                 if best != NOPIV {
                     let prow = &store[best as usize];
@@ -2349,6 +2344,7 @@ fn run_arm(arm: &str, eqs: &[Poly], nv: usize, lim: &Limits, tr: &Traces, own: &
         "f4r" => exec_replay(Kind::F4, eqs, nv, lim, tr.f4.as_ref().expect("f4 trace")),
         "f4n" => exec_replay_n(Kind::F4, eqs, nv, lim, tr.f4.as_ref().expect("f4 trace"), true),
         "sigr" => exec_replay(Kind::Sig(FULL), eqs, nv, lim, tr.sig.as_ref().expect("sig trace")),
+        "sign" => exec_replay_n(Kind::Sig(FULL), eqs, nv, lim, tr.sig.as_ref().expect("sig trace"), true),
         "f4rs" => exec_replay(Kind::F4, eqs, nv, lim, own.f4.as_ref().expect("own f4 trace")),
         "sigrs" => exec_replay(Kind::Sig(FULL), eqs, nv, lim, own.sig.as_ref().expect("own sig trace")),
         a if a.starts_with("f4rx") => exec_replay(Kind::F4, eqs, nv, lim, tr.f4x.as_ref().expect("cross trace")),
@@ -2479,7 +2475,7 @@ fn mode_run(a: &Args) {
     let t_start = Instant::now();
     let mut bad = false;
     let want_f4_trace = arms.iter().any(|x| x == "f4r" || x == "f4n");
-    let want_sig_trace = arms.iter().any(|x| x == "sigr");
+    let want_sig_trace = arms.iter().any(|x| x == "sigr" || x == "sign");
     let need_x = arms.iter().find(|x| x.starts_with("f4rx")).cloned();
     let mut traces = Traces { f4: None, sig: None, f4x: None };
     let job_lim = |t_start: &Instant, cap: u64| {
@@ -2557,7 +2553,7 @@ fn mode_run(a: &Args) {
                     own.sig = r.trace;
                 }
             }
-            if (arm == "sigr" && traces.sig.is_none()) || (arm == "sigrs" && own.sig.is_none()) {
+            if ((arm == "sigr" || arm == "sign") && traces.sig.is_none()) || (arm == "sigrs" && own.sig.is_none()) {
                 println!("{{\"cell\":\"{}\",\"target\":{},\"arm\":\"{}\",\"status\":\"notrace\"}}", label, ti, arm);
                 eprintln!("{label} t{ti} {arm}: no valid trace (the recording run did not refute)");
                 continue;
@@ -2955,6 +2951,21 @@ struct Rec {
     ms: f64,
     replay: String,
     d_mat: f64,
+    log_d: Vec<u64>,
+    log_touch: Vec<u64>,
+    log_zero: Vec<u64>,
+}
+
+fn jarr(line: &str, key: &str) -> Vec<u64> {
+    let pat = format!("\"{key}\":[");
+    match line.find(&pat) {
+        None => Vec::new(),
+        Some(i) => {
+            let rest = &line[i + pat.len()..];
+            let end = rest.find(']').unwrap_or(rest.len());
+            rest[..end].split(',').filter(|x| !x.is_empty()).filter_map(|x| x.parse().ok()).collect()
+        }
+    }
 }
 
 fn gmean(v: &[f64]) -> f64 {
@@ -2962,6 +2973,26 @@ fn gmean(v: &[f64]) -> f64 {
         return f64::NAN;
     }
     (v.iter().map(|x| x.ln()).sum::<f64>() / v.len() as f64).exp()
+}
+
+fn is_cap(status: &str) -> bool {
+    matches!(status, "timelimit" | "memcap" | "colscap" | "touchcap")
+}
+
+struct ArmCell {
+    n_both: usize,
+    n_cens: usize,
+    ratios: Vec<f64>, // exact ratios (both refuted)
+    bounds: Vec<f64>, // upper bounds for the censored targets
+    gmean_exact: f64,
+    gmean_incl: f64,
+    n_ge: usize,
+    zero_r: f64,
+    rc_r: f64,
+    mem_r: f64,
+    sym_r: f64,
+    nc_r: f64,
+    fb: usize,
 }
 
 /// `summarize --dir <raw dir>`: read every `*.stdout.log`, pair each arm with
@@ -2974,9 +3005,10 @@ fn mode_summarize(a: &Args) {
         .split(',')
         .map(|s| s.to_string())
         .collect();
-    let ntargets: usize = a.num("--targets", 16);
+    let nt: usize = a.num("--targets", 16);
     let min_ge: usize = a.num("--min-ge", 12);
     let mut recs: HashMap<(String, usize, String), Rec> = HashMap::new();
+    let mut notrace: Vec<(String, String)> = Vec::new();
     let mut files: Vec<_> = std::fs::read_dir(&dir)
         .expect("dir")
         .filter_map(|e| e.ok())
@@ -2994,6 +3026,10 @@ fn mode_summarize(a: &Args) {
                 (Some(c), Some(a), Some(s)) => (c, a, s),
                 _ => continue,
             };
+            if status == "notrace" {
+                notrace.push((cell, arm));
+                continue;
+            }
             if status == "skipped" || status == "na" {
                 continue;
             }
@@ -3006,117 +3042,175 @@ fn mode_summarize(a: &Args) {
                     rc_max: jnum_f(line, "rc_max").unwrap_or(0.0),
                     zero_red: jnum_f(line, "zero_red").unwrap_or(0.0),
                     sym_tests: jnum_f(line, "sym_tests").unwrap_or(0.0),
-                    rss_kb: jnum_f(line, "rss_kb").unwrap_or(0.0),
+                    rss_kb: if line.contains("\"hwm_reset\":true") { jnum_f(line, "rss_kb").unwrap_or(0.0) } else { 0.0 },
                     mem_est: jnum_f(line, "mem_est_kb").unwrap_or(0.0),
                     ms: jnum_f(line, "ms").unwrap_or(0.0),
                     replay: jstr_f(line, "replay").unwrap_or_default(),
                     d_mat: jnum_f(line, "d_mat").unwrap_or(0.0),
+                    log_d: jarr(line, "log_d"),
+                    log_touch: jarr(line, "log_touch"),
+                    log_zero: jarr(line, "log_zero"),
                 },
             );
         }
     }
-    println!("# item 06 summary: arm X against f4, paired by target (targets 0..{})", ntargets - 1);
-    println!("# cost(sigr) = touches + touches(sig, held-out)/{ntargets}; cost(f4r) = touches + touches(f4, held-out)/{ntargets}; fallbacks are inside touches");
-    println!("cell      arm    refuted  gmean_R  n>=1.5  gmean_R(no trace charge)  zero_red(f4/X)  rc_max(f4/X)  mem(f4/X)  sym_tests(f4/X)  fallbacks");
-    struct CellRes {
-        qual: bool,
-        guard: bool,
-        countable: bool,
-        gmean: f64,
-    }
-    let arms_all = ["sig", "sig0", "f4r", "sigr", "f4rs", "sigrs", "f4rx"];
-    let mut res: HashMap<(String, String), CellRes> = HashMap::new();
+    println!("# item 06 summary: arm X against f4, paired by target (targets 0..{})", nt - 1);
+    println!("# cost(sigr,sign) = touches + touches(sig, held-out)/{nt}; cost(f4r,f4n) = touches + touches(f4, held-out)/{nt}; fallbacks are inside touches");
+    println!("# R = touches(f4)/cost(X); a capped X (touchcap/timelimit) gives only the bound R <= touches(f4)/touches(X at the cap)");
+    println!("cell      arm    refuted capped  gmean_R(exact)  gmean_R(<=,incl.caps)  n>=1.5  R(no trace charge)  zero(f4/X)  rc_max(f4/X)  mem(f4/X)  sym(f4/X)  fallbacks");
+    let arms_all = ["sig", "sig4", "sig0", "sigc", "f4r", "f4n", "sigr", "sign", "f4rs", "sigrs", "f4rx"];
+    let mut res: HashMap<(String, String), ArmCell> = HashMap::new();
     for cell in &cells {
-        let trace_f4 = recs.get(&(cell.clone(), ntargets, "f4".into())).map(|r| r.touches);
-        let trace_sig = recs.get(&(cell.clone(), ntargets, "sig".into())).map(|r| r.touches);
+        let trace_f4 = recs.get(&(cell.clone(), nt, "f4".into())).map(|r| r.touches);
+        let trace_sig = recs.get(&(cell.clone(), nt, "sig".into())).map(|r| r.touches);
         for arm in arms_all {
             let charge = match arm {
-                "f4r" => trace_f4.unwrap_or(f64::NAN) / ntargets as f64,
-                "sigr" => trace_sig.unwrap_or(f64::NAN) / ntargets as f64,
+                "f4r" | "f4n" => trace_f4.unwrap_or(f64::NAN) / nt as f64,
+                "sigr" | "sign" => trace_sig.unwrap_or(f64::NAN) / nt as f64,
                 _ => 0.0,
             };
-            let (mut rs, mut rs_nc, mut zr, mut rc, mut me, mut sy) = (vec![], vec![], vec![], vec![], vec![], vec![]);
-            let mut n_ref_f4 = 0;
-            let mut n_ref_both = 0;
+            let (mut rs, mut rs_nc, mut ubs) = (vec![], vec![], vec![]);
+            let (mut zr, mut rc, mut me, mut sy) = (vec![], vec![], vec![], vec![]);
             let mut n_present = 0;
             let mut fb = 0;
-            for t in 0..ntargets {
+            for t in 0..nt {
                 let f = match recs.get(&(cell.clone(), t, "f4".into())) {
-                    Some(f) => f,
-                    None => continue,
+                    Some(f) if f.status == "refuted" => f,
+                    _ => continue,
                 };
-                if f.status == "refuted" {
-                    n_ref_f4 += 1;
-                }
                 let x = match recs.get(&(cell.clone(), t, arm.to_string())) {
                     Some(x) => x,
-                    None => {
-                        if arm == "f4rx" {
-                            recs.get(&(cell.clone(), t, "f4rx:c13-3-4".to_string())).unwrap_or(f)
-                        } else {
-                            continue;
-                        }
-                    }
+                    None => match arm {
+                        "f4rx" => match recs.get(&(cell.clone(), t, "f4rx:c13-3-4".to_string())) {
+                            Some(x) => x,
+                            None => continue,
+                        },
+                        _ => continue,
+                    },
                 };
                 n_present += 1;
                 if x.replay == "fallback" {
                     fb += 1;
                 }
-                if f.status == "refuted" && x.status == "refuted" {
-                    n_ref_both += 1;
+                if x.status == "refuted" {
                     rs.push(f.touches / (x.touches + charge));
                     rs_nc.push(f.touches / x.touches);
-                    zr.push((f.zero_red.max(1.0)) / (x.zero_red.max(1.0)));
+                    zr.push(f.zero_red.max(1.0) / x.zero_red.max(1.0));
                     rc.push(f.rc_max / x.rc_max.max(1.0));
                     let (mf, mx) = if f.rss_kb > 0.0 && x.rss_kb > 0.0 { (f.rss_kb, x.rss_kb) } else { (f.mem_est, x.mem_est) };
                     me.push(mf / mx.max(1.0));
                     sy.push(f.sym_tests.max(1.0) / x.sym_tests.max(1.0));
+                } else if is_cap(&x.status) {
+                    ubs.push(f.touches / (x.touches + charge).max(1.0));
                 }
             }
             if n_present == 0 {
                 continue;
             }
             let ge = rs.iter().filter(|&&r| r >= 1.5).count();
-            let g = gmean(&rs);
+            let all: Vec<f64> = rs.iter().chain(ubs.iter()).cloned().collect();
             println!(
-                "{:<9} {:<6} {:>2}/{:<2}    {:>7.3}  {:>2}/{:<2}   {:>8.3}                   {:>8.3}        {:>8.3}      {:>8.3}   {:>8.3}         {}",
-                cell, arm, n_ref_both, ntargets, g, ge, rs.len(), gmean(&rs_nc), gmean(&zr), gmean(&rc), gmean(&me), gmean(&sy), fb
+                "{:<9} {:<6} {:>2}/{:<2}   {:>2}      {:>10.3}      {:>12.3}{}        {:>2}/{:<2}   {:>10.3}          {:>8.3}   {:>8.3}      {:>8.3}   {:>8.3}      {}",
+                cell, arm, rs.len(), nt, ubs.len(), gmean(&rs), gmean(&all), if ubs.is_empty() { " " } else { "*" },
+                ge, rs.len(), gmean(&rs_nc), gmean(&zr), gmean(&rc), gmean(&me), gmean(&sy), fb
             );
-            let countable = n_ref_both >= min_ge;
-            let qual = n_ref_both == ntargets && n_ref_f4 == ntargets && g >= 1.5 && ge >= min_ge;
-            // the guard: largest matrix and peak memory not more than 1.5x larger than f4's
-            let guard = gmean(&rc) >= 1.0 / 1.5 && gmean(&me) >= 1.0 / 1.5;
-            res.insert((cell.clone(), arm.to_string()), CellRes { qual, guard, countable, gmean: g });
+            res.insert(
+                (cell.clone(), arm.to_string()),
+                ArmCell {
+                    n_both: rs.len(),
+                    n_cens: ubs.len(),
+                    gmean_exact: gmean(&rs),
+                    gmean_incl: gmean(&all),
+                    n_ge: ge,
+                    zero_r: gmean(&zr),
+                    rc_r: gmean(&rc),
+                    mem_r: gmean(&me),
+                    sym_r: gmean(&sy),
+                    nc_r: gmean(&rs_nc),
+                    fb,
+                    ratios: rs,
+                    bounds: ubs,
+                },
+            );
+        }
+    }
+    // the first degree-4 matrix: touches and zero reductions up to its end
+    println!("# first matrix with selection degree 4 (cumulative touches, cumulative zero reductions at its end)");
+    println!("cell      target arm    touches_at_first_d4  zero_at_first_d4  (stage not reached: -)");
+    for cell in &cells {
+        let (mut tr, mut zr) = (vec![], vec![]);
+        for t in 0..nt {
+            let line = |arm: &str| {
+                recs.get(&(cell.clone(), t, arm.to_string())).map(|r| {
+                    r.log_d.iter().position(|&d| d == 4).map(|i| (r.log_touch[i] as f64, r.log_zero[i] as f64))
+                })
+            };
+            let (f, g) = (line("f4").flatten(), line("sig").flatten());
+            match (f, g) {
+                (Some(f), Some(g)) => {
+                    tr.push(f.0 / g.0.max(1.0));
+                    zr.push(f.1.max(1.0) / g.1.max(1.0));
+                    if t < 3 {
+                        println!("{:<9} {:>4}   f4     {:>14.0}      {:>10.0}", cell, t, f.0, f.1);
+                        println!("{:<9} {:>4}   sig    {:>14.0}      {:>10.0}", cell, t, g.0, g.1);
+                    }
+                }
+                _ => {}
+            }
+        }
+        if !tr.is_empty() {
+            println!("{:<9} first-d4-step gmean ratio f4/sig over {} targets: touches {:.3}, zero reductions {:.3}", cell, tr.len(), gmean(&tr), gmean(&zr));
+        } else {
+            println!("{:<9} the first degree-4 matrix was not reached by both f4 and sig", cell);
         }
     }
     // the verdict
     let mut verdict = String::new();
     let mut detail = Vec::new();
+    let qualifies = |cell: &String, arm: &str| -> (bool, bool) {
+        match res.get(&(cell.clone(), arm.to_string())) {
+            Some(r) => {
+                let q = r.n_both == nt && r.n_cens == 0 && r.gmean_exact >= 1.5 && r.n_ge >= min_ge;
+                let g = r.rc_r >= 1.0 / 1.5 && r.mem_r >= 1.0 / 1.5;
+                (q, g)
+            }
+            None => (false, false),
+        }
+    };
     for arm in ["sig", "sigr"] {
-        let q: Vec<&String> = cells.iter().filter(|c| res.get(&((*c).clone(), arm.to_string())).map_or(false, |r| r.qual)).collect();
-        let qg: Vec<&String> = q.iter().cloned().filter(|c| res.get(&((*c).clone(), arm.to_string())).map_or(false, |r| r.guard)).collect();
-        detail.push(format!("{arm}: qualifies on {} of {} cells ({:?}); with the matrix and memory guard {}", q.len(), cells.len(), q, qg.len()));
+        let q: Vec<&String> = cells.iter().filter(|c| qualifies(c, arm).0).collect();
+        let qg: Vec<&String> = q.iter().cloned().filter(|c| qualifies(c, arm).1).collect();
+        detail.push(format!("{arm}: qualifies on {} of {} cells {:?}; with the matrix and memory guard {}", q.len(), cells.len(), q, qg.len()));
         if qg.len() >= 3 && verdict.is_empty() {
             verdict = format!("ADVANCES (constant) by {arm}");
         } else if q.len() >= 3 && verdict.is_empty() {
             verdict = format!("TRADES (constant, but the largest matrix or the peak memory is more than 1.5x larger) by {arm}");
         }
     }
-    let countable_sig = cells.iter().filter(|c| res.get(&((*c).clone(), "sig".to_string())).map_or(false, |r| r.countable)).count();
-    let regress = cells.iter().filter(|c| res.get(&((*c).clone(), "sig".to_string())).map_or(false, |r| r.countable && r.gmean < 1.0 / 1.5)).count();
+    let countable = |cell: &String, arm: &str| res.get(&(cell.clone(), arm.to_string())).map_or(false, |r| r.n_both + r.n_cens >= min_ge);
+    let regress_cells: Vec<&String> = cells
+        .iter()
+        .filter(|c| res.get(&((*c).clone(), "sig".to_string())).map_or(false, |r| r.n_both + r.n_cens == nt && r.gmean_incl <= 1.0 / 1.5))
+        .collect();
+    let exact_all = cells.iter().all(|c| res.get(&(c.clone(), "sig".to_string())).map_or(false, |r| r.n_both == nt));
+    let countable_n = cells.iter().filter(|c| countable(c, "sig")).count();
+    detail.push(format!("sig: R <= 1/1.5 certain (all {nt} targets exact or bounded) on {} of {} cells {:?}", regress_cells.len(), cells.len(), regress_cells));
     if verdict.is_empty() {
-        verdict = if countable_sig < 3 {
+        verdict = if countable_n < 3 {
             "INCONCLUSIVE (fewer than 3 countable cells for sig)".to_string()
-        } else if regress >= 3 {
-            "REGRESSES (constant): sig is at least 1.5x worse than f4 in at least 3 cells".to_string()
-        } else if countable_sig == cells.len() {
+        } else if regress_cells.len() >= 3 {
+            "REGRESSES (constant): sig is at least 1.5x worse than f4 in at least 3 cells (censored targets bound the ratio from above)".to_string()
+        } else if exact_all {
             "MATCHES (constant)".to_string()
         } else {
-            "INCONCLUSIVE (a cell is not countable)".to_string()
+            "INCONCLUSIVE (a cell has capped targets that do not bound the ratio below 1/1.5)".to_string()
         };
     }
     for d in detail {
         println!("# {d}");
+    }
+    for (c, arm) in &notrace {
+        println!("# {arm} on {c}: BLOCKED for at least one target: the recording run of the trace did not refute (no trace)");
     }
     println!("# arm (e) msolve: BLOCKED (not installed; no GMP/FLINT/MPFR headers; 3.8 GB disk free); would be unblocked by an msolve build with a matrix-entry counter");
     println!("VERDICT: {verdict}");
