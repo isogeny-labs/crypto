@@ -302,3 +302,36 @@ estimated run time of 4 to 6.5 minutes. Card 01: build, `selftest`, (17,2,U)
 (29,3,S). Card 06: (29,2,U) (29,2,S). Card 07: `verdict --dir raw` only.
 Every card builds its own binary (`target/blindspots-11/card-NN/b11`) and
 removes it at the end. Total measured about 27 CPU-minutes.
+
+## Repair pass (appended 2026-10-18, after the first run; no change to the question, arms, cells, metric or decision rule)
+
+First-run outcome: cards 01, 02, 04, 06, 07 completed with receipts. Cards 03 and 05 returned
+early (the executor used the 2-minute shell timeout and moved the run to the background), so
+neither has a receipt; of their five cells, only the first command of each finished
+(`raw/n19-m3-U.jsonl`, `raw/n29-m3-U.jsonl`, complete but unreceipted). Cells (19,3,S), (23,2,U)
+and (29,3,S) were never measured. Card 07 completed but saw 13 files, so its `verdict.txt` is
+stale. There were no refused cards. No instrument bug was shown by the first run: the instrument
+is unchanged (sha256 e6f23662...), no deviation to the instrument is made, and every
+completed card's numbers stand.
+
+Revision cards (same arguments as the frozen cells, outputs at new `-r2` paths so nothing from
+the first run is overwritten; every card builds and removes its own binary and has the explicit
+10-minute shell timeout in its notes):
+
+| card | contents | expected wall time |
+| --- | --- | --- |
+| `card-03-r2` | build, (19,3,S), (23,2,U): two never-measured cells | about 4 min |
+| `card-05-r2` | build, (29,3,S) never measured, (29,3,U) re-run | about 5 min |
+| `card-03b-r2` | build, (19,3,U) re-run | about 2.5 min |
+| `card-07-r2` | staged: frozen by `make_card_07_r2.py` only after the three cards above have run and their outputs are committed; builds, copies the sixteen cell files into a throwaway directory, runs `verdict` there | about 1 min |
+
+The two re-runs (19,3,U) and (29,3,U) are not new cells: they have the same arguments and seeds,
+so the run is deterministic and should reproduce the unreceipted first-run files; they exist to
+give those cells a hash-attested receipt, and the `-r2` files replace the unreceipted first-run
+files in the verdict (the assess step reports whether the numbers are identical to the first-run
+files; this is not interpreted here). `card-07-r2` copies exactly sixteen files (eleven receipted
+first-run files plus the five `-r2` files) because `verdict` reads every `*.jsonl` of a directory
+and would otherwise count the two re-run cells twice. The 13-file `raw/verdict.txt` is kept as
+history. Smoke test of the unchanged instrument at the smallest draw count (`--per-base 100 --perms 1
+--pilot 40`) on all five re-run cells: exit 0, one `done` line, no panic, 69 MiB peak at n = 29.
+Cards that run from the same host should not overlap more than two at a time.
