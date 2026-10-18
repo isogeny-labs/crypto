@@ -513,6 +513,44 @@ impl ChainedS3Encoding {
             .collect()
     }
 
+    /// Fix one named x-coordinate block: summands `0..m`, intermediate
+    /// outputs `m..2m-2`, and the final target at `2m-2`. The target is
+    /// fixed by `build`, so this only checks that its value agrees.
+    pub fn pin_x_block(
+        &mut self,
+        block_index: usize,
+        value: &F2mElement,
+    ) -> Result<(), ChainBuildError> {
+        if value.m_value() != self.n || block_index >= self.blocks.len() {
+            return Err(ChainBuildError::Unsupported);
+        }
+        if block_index == self.blocks.len() - 1 {
+            return if self.target_x.as_ref() == Some(value) {
+                Ok(())
+            } else {
+                Err(ChainBuildError::Unsupported)
+            };
+        }
+        let bits = value.to_biguint();
+        for (bit, &wire) in self.blocks[block_index].iter().enumerate() {
+            self.solver.add_clause(vec![if bits.bit(bit as u64) {
+                wire as Lit
+            } else {
+                -(wire as Lit)
+            }]);
+        }
+        Ok(())
+    }
+
+    /// Decode every x block of a SAT model in the same named order.
+    pub fn decode_x_blocks(&self) -> Vec<F2mElement> {
+        let model = self.solver.model();
+        self.blocks
+            .iter()
+            .map(|block| self.decode_block(block, &model))
+            .collect()
+    }
+
     /// Re-evaluate every active S3 over the original field and each
     /// intermediate-identity equality. Call this after a SAT result.
     pub fn verify_model(&self) -> bool {
@@ -922,6 +960,55 @@ mod tests {
         assert_eq!(chain_s3_max_variables(83, 5), Some(84_743));
         assert_eq!(chain_s3_max_variables(83, 6), Some(105_908));
         assert_eq!(chain_s3_max_variables(83, 7), None);
+    }
+
+    #[test]
+    fn named_complete_witness_pins_all_four_summand_chain_blocks() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let generator = kc.generator();
+        let xs: Vec<_> = (1..=4u32)
+            .map(
+                |multiple| match kc.mul(generator, &BigUint::from(multiple)) {
+                    BinaryPoint::Affine { x, .. } => x,
+                    BinaryPoint::Infinity => panic!("complete witness must be affine"),
+                },
+            )
+            .collect();
+        let expected = vec![
+            xs[0].clone(),
+            xs[0].clone(),
+            xs[0].clone(),
+            xs[0].clone(),
+            xs[1].clone(),
+            xs[2].clone(),
+            xs[3].clone(),
+        ];
+        let mut enc = ChainedS3Encoding::build(
+            4,
+            &kc.curve.irreducible,
+            &kc.curve.b,
+            Some(&xs[3]),
+            0,
+            2_000,
+        )
+        .unwrap();
+        let clauses_before_target = enc.solver.n_clauses();
+        enc.pin_x_block(6, &xs[3]).unwrap();
+        assert_eq!(enc.solver.n_clauses(), clauses_before_target);
+        assert_eq!(
+            enc.pin_x_block(6, &xs[2]),
+            Err(ChainBuildError::Unsupported)
+        );
+        assert_eq!(
+            enc.pin_x_block(7, &xs[3]),
+            Err(ChainBuildError::Unsupported)
+        );
+        for (block, value) in expected.iter().enumerate() {
+            enc.pin_x_block(block, value).unwrap();
+        }
+        assert_eq!(enc.solver.solve(), SolveResult::Sat);
+        assert!(enc.verify_model());
+        assert_eq!(enc.decode_x_blocks(), expected);
     }
 
     #[test]
