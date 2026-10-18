@@ -1,0 +1,52 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h997ff8aee43b",
+  "label": "conductor gap ell=1138019 (2^20..), D=-19, hard kernel, q 45 bits: crater vs 3 floors, 128 shared targets",
+  "spec_id": "ECS1h544555e68970",
+  "spec_sha256": "544555e68970c79111e05e7a84d98384f1c6d3d05fb3e9aa140695e9de6c2922",
+  "env_class_id": "ECBENV2ha8c679da3835",
+  "host_sha256": "538cefe24bd0e90b1d875c2eaa0ea527c0b982f52fae6f30c4bc3f6d16de40c0",
+  "plan_sha256": "264566c4464b026c45b6caa7a48ec7bc32aa464e25944b36819bdf246162e71a",
+  "binary_sha256": "ee0af723cf6c10647215265dd3ffa21b64c056a1ad31b66f192f5f271fe29549",
+  "git_commit": "d290558b2657bd320ea2a9964a91238924619763",
+  "git_dirty": false,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/cg-large-sample-m2-ell1138019-q45.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "af0d585ae08fb680ec4527ef148c313c9315a5e173d189f3b4072650ff44870d",
+  "child_env": {
+    "HOME": "/home/ec2-user",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/home/ec2-user/.local/bin:/home/ec2-user/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792314788748,
+  "finished_unix_ms": 1792316612351,
+  "status": "complete",
+  "executions_planned": 1024,
+  "records_written": 1024,
+  "records_sha256": "b56fcdbfdf5e7688a05c21c5686669e6ecbd07caf7ac8c4fe682f4670c3cf582",
+  "status_counts": {
+    "verified": 1024
+  }
+}
