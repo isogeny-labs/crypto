@@ -38,6 +38,33 @@ theorem full_rectangle_accepted_capacity_bound :
       1569275433846670190958947353987675545133315652035359680560 := by
   norm_num
 
+/-- Three pivot fans and sixteen shared endpoints give 48 cuts and 360
+presentations; the connected incidence graph has thirty cycle rows. -/
+theorem triple_star_16_cut_count : 3 * 16 = 48 := by
+  norm_num
+
+theorem triple_star_16_rectangle_count :
+    3 * Nat.choose 16 2 = 360 := by
+  norm_num [Nat.choose_two_right]
+
+theorem triple_star_16_cycle_dimension_arithmetic :
+    (48 : ℕ) - (3 + 16) + 1 = 30 := by
+  norm_num
+
+/-- With 48 cuts, at most three edges per endpoint, and one connected
+incidence component, the graph cycle rank cannot exceed thirty. -/
+theorem connected_48_cut_three_pivot_cycle_upper_bound
+    {endpoints rank : ℕ}
+    (hcapacity : 48 ≤ 3 * endpoints)
+    (hcycle : rank + (3 + endpoints) = 49) :
+    rank ≤ 30 := by
+  omega
+
+theorem triple_star_ideal_uniform_support_bound :
+    360 * (2 ^ 181 : ℕ) <
+      1569275433846670190958947353987675545133315652035359680560 := by
+  norm_num
+
 #print axioms full_fan_cycle_dimension_arithmetic
 #print axioms full_fan_implicit_rectangle_count
 #print axioms full_fan_active_edge_count
@@ -45,5 +72,10 @@ theorem full_rectangle_accepted_capacity_bound :
 #print axioms non_source_implicit_rectangle_count
 #print axioms non_source_active_edge_count
 #print axioms full_rectangle_accepted_capacity_bound
+#print axioms triple_star_16_cut_count
+#print axioms triple_star_16_rectangle_count
+#print axioms triple_star_16_cycle_dimension_arithmetic
+#print axioms connected_48_cut_three_pivot_cycle_upper_bound
+#print axioms triple_star_ideal_uniform_support_bound
 
 end P192ExtensionCover

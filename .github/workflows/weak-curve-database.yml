@@ -330,6 +330,22 @@ jobs:
           python3 -B research/p192_extension_cover_20261012/verify_three_pivot_guided_coverage.py
           sha256sum -c research/p192_extension_cover_20261012/reports/run-20261017T2055Z/ARTIFACTS.sha256
           sha256sum -c research/p192_extension_cover_20261012/reports/run-20261017T2119Z/ARTIFACTS.sha256
+  p192-triple-star-native-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install independent PARI checker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pari-gp
+      - name: Replay 16-endpoint selection, cubic cuts, and matrix rank
+        run: |
+          python3 -B research/p192_extension_cover_20261012/line_triple_star_screen.py
+          python3 -B research/p192_extension_cover_20261012/prepare_triple_star_gp.py
+          gp -s 256000000 -q research/p192_extension_cover_20261012/verify_triple_star_reduced_native.gp > research/p192_extension_cover_20261012/type_i_triple_star_reduced96_native.log
+          python3 -B research/p192_extension_cover_20261012/verify_triple_star_rank.py
+          sha256sum -c research/p192_extension_cover_20261012/reports/run-20261018T0016Z/ARTIFACTS.sha256
   leaderboard-lean-proof:
     runs-on: ubuntu-latest
     timeout-minutes: 25
