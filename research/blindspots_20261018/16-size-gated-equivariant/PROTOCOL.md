@@ -209,13 +209,34 @@ finish in under 8 minutes of wall time.
 
 ## Smoke test (not measured data, kept out of every fit)
 
-Run once before freezing, at the smallest cells and every cell once
-(`--targets 2..4`): `n = 5, 7` four targets, `n = 11, 13` two targets, plus
-`--mode feas` on all eight sizes. Results: all gates true; `x_R`, root counts
-and incumbent splits equal item 02's on all 12 compared targets (splits
-equal to within 3, solver word XORs of I 10 % lower at `n = 11`); the
-training controls and the two `--force-n0` negative controls behaved as the
-rule requires on the 12-row smoke set.
+Run before the cards were frozen, at the smallest draw counts. What was run:
+
+* `--mode feas` on all eight sizes (arithmetic only).
+* `--mode oracle`: `n = 5, 7, 11` at `t = 0..3` (training targets) and at
+  `t = 12..15` (**held-out targets**), `n = 11` and `n = 13` at `t = 0, 1`, and
+  `n = 13` at `t = 12`. Every row: all gates true (I, C, I2 and F).
+* The analysis tool on the 24 rows at `n = 5, 7, 11`, including its two
+  `--force-n0` negative controls (threshold at the smallest `sym_vars` gives
+  TRADES; a threshold above every size gives MATCHES).
+* Replication of item 02 on its `t = 0..3` targets at `n = 5, 7, 11`: `x_R` and
+  root counts equal on 12 of 12; incumbent splits equal on 8, within 1 on 3 and
+  within 3 on 1 (arm C); solver word XORs of I 10 % lower at `n = 11` than
+  item 02's rows (the solver change above).
+
+**Disclosure.** (1) The smoke set included held-out targets `t = 12..15` at
+`n = 5, 7, 11` and `t = 12` at `n = 13`; the cards re-run all of them and
+nothing was tuned on them, but the author saw their smoke ratios. (2) **Amendment
+A1, made after the first smoke analysis and before this file was committed or
+any card ran:** the first analysis tool defined the gated arm's cost below `N0`
+as the *second* incumbent run I2, so the A/A order noise (a/a2 = 0.984 with CI
+[0.970, 0.997] at `n = 7` on four targets) was scored as a regression of the
+gate and gave TRADES. A gated arm that is the incumbent's code below `N0` has
+the incumbent's cost, so the definition became "cost = I's own measurement"
+(ratio 1 by construction), with the A/A ratio reported beside it as the noise
+floor. This only affects sizes below `N0`, where the arms are identical code;
+it can not move the gated-on sizes or the pooled ratio's direction there. It
+is the reason the Arms section says the per-size a/c at a gated-off size is
+exactly 1.
 
 ## Deviations from the design (every one listed)
 
