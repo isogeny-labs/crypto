@@ -55,7 +55,15 @@
 
 set -euo pipefail
 
-HERE=$(cd "$(dirname "$(readlink -f "$0")")" && pwd)
+self=$0
+while [ -L "$self" ]; do
+    link=$(readlink "$self")
+    case $link in
+    /*) self=$link ;;
+    *) self=$(dirname "$self")/$link ;;
+    esac
+done
+HERE=$(cd -P "$(dirname "$self")" && pwd)
 CACHE=${XDG_CACHE_HOME:-$HOME/.cache}/ephemeral
 REGION=${EPHEMERAL_REGION:-${AWS_REGION:-${AWS_DEFAULT_REGION:-us-east-1}}}
 export AWS_REGION=$REGION AWS_DEFAULT_REGION=$REGION
@@ -69,6 +77,9 @@ need() { command -v "$1" >/dev/null || die "$1 is required"; }
 
 need aws
 need jq
+
+file_size() { stat -c %s -- "$1" 2>/dev/null || stat -f %z -- "$1"; }
+utc_epoch() { date -u -d "@$1" +%FT%TZ 2>/dev/null || date -u -r "$1" +%FT%TZ; }
 
 CONFIG=
 load_config() {
@@ -167,8 +178,8 @@ worktree_patch() {
                 case /$f in
                 */.venv/* | */venv/* | */node_modules/* | */__pycache__/*) continue ;;
                 esac
-                if [ "$(stat -c %s -- "$f")" -gt $((5 << 20)) ]; then
-                    echo "ephemeral: not shipping untracked $f ($(($(stat -c %s -- "$f") >> 20)) MiB); commit it or use --artifact on the box" >&2
+                if [ "$(file_size "$f")" -gt $((5 << 20)) ]; then
+                    echo "ephemeral: not shipping untracked $f ($(($(file_size "$f") >> 20)) MiB); commit it or use --artifact on the box" >&2
                     continue
                 fi
                 printf '%s\0' "$f"
@@ -363,7 +374,12 @@ EOF
 
     # Try each configured subnet (one per AZ) until one has capacity.
     local subnets iid='' err subnet
-    mapfile -t subnets < <(cfg '.subnet_ids[]' | shuf)
+    subnets=()
+    if command -v shuf >/dev/null; then
+        while IFS= read -r subnet; do subnets+=("$subnet"); done < <(cfg '.subnet_ids[]' | shuf)
+    else
+        while IFS= read -r subnet; do subnets+=("$subnet"); done < <(cfg '.subnet_ids[]')
+    fi
     for subnet in "${subnets[@]}"; do
         if iid=$(aws ec2 run-instances \
             --launch-template "LaunchTemplateId=$(cfg .launch_template),Version=\$Default" \
@@ -388,7 +404,7 @@ EOF
     [ -n "$iid" ] || launch_failed "no Spot capacity for $type in the configured zones; try another type or later"
 
     info "job $id"
-    info "  $type$($spot && echo ' spot') $iid ($ami_ref), ttl $ttl (terminates by $(date -u -d "@$deadline" +%FT%TZ))"
+    info "  $type$($spot && echo ' spot') $iid ($ami_ref), ttl $ttl (terminates by $(utc_epoch "$deadline"))"
     info "  ${commit:+source ${commit:0:12}$($patch && echo ' + local patch'), }command: $display"
     info "  s3://$BUCKET/jobs/$id/"
     if $detach; then
