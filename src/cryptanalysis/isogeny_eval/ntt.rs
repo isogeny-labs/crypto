@@ -123,7 +123,7 @@ impl Mont {
     }
 
     /// `a·R mod q`.
-    fn to_mont(&self, a: u64) -> u64 {
+    fn enter_mont(&self, a: u64) -> u64 {
         self.mul(a % self.q, self.r2)
     }
 
@@ -177,7 +177,7 @@ impl Tables {
             let k = self.scale.len() as u32;
             // scale[k] = R²·2^{−k}
             let inv2k = m.pow_plain(m.pow_plain(2, k as u64), m.q - 2);
-            self.scale.push(m.to_mont(m.to_mont(inv2k)));
+            self.scale.push(m.enter_mont(m.enter_mont(inv2k)));
         }
         while self.fwd.len() < log2n as usize {
             let s = self.fwd.len() as u32;
@@ -188,8 +188,8 @@ impl Tables {
             let (mut f, mut i) = (1u64, 1u64);
             let (mut fv, mut iv) = (Vec::with_capacity(h), Vec::with_capacity(h));
             for _ in 0..h {
-                fv.push(m.to_mont(f));
-                iv.push(m.to_mont(i));
+                fv.push(m.enter_mont(f));
+                iv.push(m.enter_mont(i));
                 f = ((f as u128 * w as u128) % m.q as u128) as u64;
                 i = ((i as u128 * wi as u128) % m.q as u128) as u64;
             }
@@ -340,9 +340,9 @@ pub fn mul_ntt<C: OpCounter>(f: &PrimeField<C>, a: &[u64], b: &[u64]) -> Vec<u64
     let (q1, q2) = (m1.q, m2.q);
     let [c12, c13, c23] = *GARNER.get_or_init(|| {
         [
-            m2.to_mont(m2.pow_plain(q1, m2.q - 2)), // q1^{-1} mod q2
-            m3.to_mont(m3.pow_plain(q1, m3.q - 2)), // q1^{-1} mod q3
-            m3.to_mont(m3.pow_plain(q2, m3.q - 2)), // q2^{-1} mod q3
+            m2.enter_mont(m2.pow_plain(q1, m2.q - 2)), // q1^{-1} mod q2
+            m3.enter_mont(m3.pow_plain(q1, m3.q - 2)), // q1^{-1} mod q3
+            m3.enter_mont(m3.pow_plain(q2, m3.q - 2)), // q2^{-1} mod q3
         ]
     });
     let p = f.p() as u128;

@@ -220,9 +220,8 @@ fn poly_mul_follows_the_field_choice() {
     let mut rng = StdRng::seed_from_u64(0x5e4);
     let p = random_prime(&mut rng, 61);
     let a: Vec<u64> = (0..1200).map(|_| rng.gen_range(0..p)).collect();
-    let b: Vec<u64> = (0..poly::NTT_THRESHOLD + 3)
-        .map(|_| rng.gen_range(0..p))
-        .collect();
+    // 1200 × 800: the NTT's count is the smaller (ratio 0.58).
+    let b: Vec<u64> = (0..800).map(|_| rng.gen_range(0..p)).collect();
     let small: Vec<u64> = (0..poly::NTT_THRESHOLD - 1)
         .map(|_| rng.gen_range(0..p))
         .collect();
@@ -243,6 +242,20 @@ fn poly_mul_follows_the_field_choice() {
     }
     assert_eq!(PrimeField::new(p).unwrap().poly_mul(), PolyMul::Auto);
     assert!(outs.windows(2).all(|w| w[0] == w[1]));
+    // Above the length threshold, Auto still takes Karatsuba when its count
+    // is the smaller for the shape (1200 × 259: ratio 1.13 from padding).
+    let mid: Vec<u64> = (0..poly::NTT_THRESHOLD + 3)
+        .map(|_| rng.gen_range(0..p))
+        .collect();
+    let f = PrimeField::counted(p).unwrap();
+    let c = poly::mul(&f, &a, &mid);
+    assert_eq!(f.tally().word, 0);
+    assert_eq!(
+        f.tally().mul,
+        poly::karatsuba_cost(a.len(), mid.len()),
+        "Auto chose Karatsuba"
+    );
+    assert_eq!(c, poly::mul_karatsuba(&f, &a, &mid));
     // Karatsuba under `PolyMul::Karatsuba` counts exactly what
     // `mul_karatsuba` counts.
     let f = PrimeField::counted(p)
@@ -714,4 +727,37 @@ fn small_degree_counts_are_deterministic() {
         }
     );
     assert!(phi.codomain().contains(&f, img));
+}
+
+#[test]
+fn karatsuba_cost_is_the_counted_cost() {
+    let mut rng = StdRng::seed_from_u64(0x5e5);
+    let p = random_prime(&mut rng, 61);
+    let f = PrimeField::counted(p).unwrap();
+    let mut shapes = vec![
+        (0usize, 5usize),
+        (1, 1),
+        (24, 24),
+        (25, 24),
+        (25, 25),
+        (49, 24),
+    ];
+    for _ in 0..60 {
+        shapes.push((rng.gen_range(1..1500), rng.gen_range(1..1500)));
+    }
+    shapes.extend([
+        (512, 512),
+        (513, 257),
+        (1024, 1023),
+        (4096, 300),
+        (2047, 2048),
+    ]);
+    for (la, lb) in shapes {
+        let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+        let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+        f.reset_counts();
+        let _ = poly::mul_karatsuba(&f, &a, &b);
+        assert_eq!(f.tally().mul, poly::karatsuba_cost(la, lb), "{la}x{lb}");
+        assert_eq!(poly::karatsuba_cost(la, lb), poly::karatsuba_cost(lb, la));
+    }
 }

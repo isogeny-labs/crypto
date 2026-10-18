@@ -18,7 +18,7 @@
 //! remainder trees) goes through [`mul`].
 
 use super::counted_fp::{OpCounter, PolyMul, PrimeField};
-use super::ntt::mul_ntt;
+use super::ntt::{mul_ntt, ntt_mul_cost, NTT_WORD_COST_IN_M};
 
 /// Below this length of the shorter operand, [`mul`] uses the schoolbook
 /// product (the round-4 threshold).
@@ -28,17 +28,54 @@ pub const KARATSUBA_THRESHOLD: usize = 24;
 /// classical long division instead of a Newton reciprocal.
 pub const NEWTON_DIVISION_THRESHOLD: usize = 32;
 
-/// With [`PolyMul::Auto`], [`mul`] uses the NTT when the shorter operand has
-/// at least this many coefficients.  Measured: the smallest balanced length
-/// from which the NTT's counted cost (`W + M`, `W` at one `M`) stays below
-/// Karatsuba's (`research/isogeny_fibers_20261010/round5/r5_3_ntt_sqrt_velu`,
-/// `threshold.json`: 512 at 61 and 63 bits; NTT/Karatsuba count ratio 0.92
-/// at 512, 1.27 at 256).  For `8n × n` products the counts cross later
-/// (ratio ≤ 1 for every `n ≥ 768`, 1.09 at `n = 512`, from power-of-two
-/// padding).  In contended wall time this implementation's NTT is slower
-/// per counted unit than the lazily reduced schoolbook products; its wall
-/// crossover is near 4096 (see the same file).
-pub const NTT_THRESHOLD: usize = 512;
+/// With [`PolyMul::Auto`], [`mul`] considers the NTT only when the shorter
+/// operand has at least this many coefficients, and then takes whichever of
+/// Karatsuba and NTT has the smaller counted cost for that exact shape
+/// ([`karatsuba_cost`] against [`ntt_mul_cost`], `W` at one `M`).  Measured
+/// (`research/isogeny_fibers_20261010/round5/r5_3_ntt_sqrt_velu`,
+/// `threshold.json`): for balanced products the NTT count first wins at
+/// length 512 (ratio 0.92; 1.27 at 256), for `8n × n` at `n = 768`, and
+/// for the `2n × n` shapes of Newton iteration only from `n ≈ 2048`
+/// (power-of-two padding), so a single length threshold would be wrong for
+/// some shape; the per-shape comparison is exact for the counted unit.  In
+/// contended wall time this implementation's NTT is slower per counted unit
+/// than the lazily reduced schoolbook products (wall crossover near 4096,
+/// same file).
+pub const NTT_THRESHOLD: usize = 256;
+
+/// The exact number of `M` [`mul_karatsuba`] counts for operand lengths
+/// `la`, `lb` (it mirrors the recursion; memoised on the operand shapes,
+/// of which a balanced recursion has `O(log n)`).
+pub fn karatsuba_cost(la: usize, lb: usize) -> u64 {
+    fn go(la: usize, lb: usize, memo: &mut std::collections::HashMap<(usize, usize), u64>) -> u64 {
+        if la == 0 || lb == 0 {
+            return 0;
+        }
+        let (la, lb) = if la >= lb { (la, lb) } else { (lb, la) };
+        if lb <= KARATSUBA_THRESHOLD {
+            return (la * lb) as u64;
+        }
+        if let Some(&c) = memo.get(&(la, lb)) {
+            return c;
+        }
+        let c = if la >= 2 * lb {
+            let full = la / lb;
+            let rest = la % lb;
+            full as u64 * go(lb, lb, memo) + go(rest, lb, memo)
+        } else {
+            let m = la / 2;
+            if lb <= m {
+                go(m, lb, memo) + go(la - m, lb, memo)
+            } else {
+                // z0 = a0·b0, z2 = a1·b1, z1 = (a0 + a1)(b0 + b1).
+                go(m, m, memo) + go(la - m, lb - m, memo) + go(la - m, m.max(lb - m), memo)
+            }
+        };
+        memo.insert((la, lb), c);
+        c
+    }
+    go(la, lb, &mut std::collections::HashMap::new())
+}
 
 /// Drop trailing zero coefficients.
 pub fn trim(a: &mut Vec<u64>) {
@@ -109,16 +146,22 @@ pub fn mul_schoolbook<C: OpCounter>(f: &PrimeField<C>, a: &[u64], b: &[u64]) -> 
 }
 
 /// `a·b` by the field's [`PolyMul`] choice: Karatsuba
-/// ([`mul_karatsuba`]) or the NTT ([`mul_ntt`], under
-/// [`PolyMul::Auto`] only when the shorter operand has at least
-/// [`NTT_THRESHOLD`] coefficients).  The result has length
+/// ([`mul_karatsuba`]) or the NTT ([`mul_ntt`]; under [`PolyMul::Auto`]
+/// only when the shorter operand has at least [`NTT_THRESHOLD`]
+/// coefficients and the NTT's counted cost is the smaller one for this
+/// shape).  The result has length
 /// `len(a) + len(b) − 1` (empty if either is empty) and does not depend on
 /// the choice; the counts do.
 pub fn mul<C: OpCounter>(f: &PrimeField<C>, a: &[u64], b: &[u64]) -> Vec<u64> {
     let use_ntt = match f.poly_mul() {
         PolyMul::Karatsuba => false,
         PolyMul::Ntt => true,
-        PolyMul::Auto => a.len().min(b.len()) >= NTT_THRESHOLD,
+        PolyMul::Auto => {
+            a.len().min(b.len()) >= NTT_THRESHOLD && {
+                let (w, m) = ntt_mul_cost(a.len(), b.len(), std::ptr::eq(a, b));
+                w * NTT_WORD_COST_IN_M + m <= karatsuba_cost(a.len(), b.len())
+            }
+        }
     };
     if use_ntt {
         mul_ntt(f, a, b)
