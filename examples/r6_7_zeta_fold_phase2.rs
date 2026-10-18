@@ -386,7 +386,6 @@ struct Bases {
     cz: Fb,          // E', F'' ⊂ ⟨G'⟩, ⟨−1, ζ'⟩
     cn: Fb,          // E', F'', ⟨−1⟩
     c18: Option<Fb>, // E, F_c = φ⁻¹(F''), ⟨−1, ζ, τ_T⟩
-    c6: Option<Fb>,  // E, F_c, ⟨−1, τ_T⟩
     info: Value,
 }
 
@@ -514,7 +513,6 @@ fn build_bases(inst: &Inst, with_fc_on_e: bool) -> Bases {
         cz,
         cn,
         c18,
-        c6,
         info,
     }
 }
