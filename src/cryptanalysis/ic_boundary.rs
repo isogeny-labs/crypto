@@ -4336,6 +4336,11 @@ pub struct FactorBase<E> {
     pub cost: PhaseCost,
     /// Subspace basis (single words) when the base is a linear subspace.
     pub subspace_basis: Option<Vec<u64>>,
+    /// `(basis, offset)` when the abscissae form the affine subspace
+    /// `offset + span(basis)`, `offset` outside the span.  Such a base
+    /// has no `subspace_basis`, so only consumers that read this field
+    /// (the algebraic descent) accept it.
+    pub affine_subspace: Option<(Vec<u64>, u64)>,
 }
 
 impl<E: Copy> FactorBase<E> {
@@ -4361,6 +4366,7 @@ impl<E: Copy> FactorBase<E> {
             point_index: fast_map(0),
             cost: PhaseCost::default(),
             subspace_basis: None,
+            affine_subspace: None,
         }
     }
 
@@ -4618,12 +4624,28 @@ pub fn prime_factor_base_strided(
 /// A binary base over the span of `basis` (single words), every point
 /// above every non-zero element, columns by abscissa.
 pub fn binary_subspace_factor_base(inst: &BinaryInstance, basis: &[u64]) -> FactorBase<FastPoint> {
+    binary_affine_subspace_factor_base(inst, basis, 0)
+}
+
+/// The points above `offset + span(basis)`; `offset = 0` is
+/// [`binary_subspace_factor_base`].  With `offset ≠ 0` (outside the span)
+/// the base records `affine_subspace` instead of `subspace_basis`.
+pub fn binary_affine_subspace_factor_base(
+    inst: &BinaryInstance,
+    basis: &[u64],
+    offset: u64,
+) -> FactorBase<FastPoint> {
     let start = Instant::now();
     let l = basis.len() as u32;
-    let mut fb = FactorBase::empty(format!("subspace of dimension {l}"));
+    let mut fb = FactorBase::empty(if offset == 0 {
+        format!("subspace of dimension {l}")
+    } else {
+        format!("affine subspace of dimension {l}")
+    });
     let mut solves = 0u64;
-    for idx in 1..(1u64 << l) {
-        let mut x = 0u64;
+    let first = if offset == 0 { 1 } else { 0 };
+    for idx in first..(1u64 << l) {
+        let mut x = offset;
         for (j, &e) in basis.iter().enumerate() {
             if (idx >> j) & 1 == 1 {
                 x ^= e;
@@ -4654,14 +4676,18 @@ pub fn binary_subspace_factor_base(inst: &BinaryInstance, basis: &[u64]) -> Fact
     }
     fb.columns = fb.abscissae;
     fb.dimension = Some(l);
-    fb.subspace_basis = Some(basis.to_vec());
+    if offset == 0 {
+        fb.subspace_basis = Some(basis.to_vec());
+    } else {
+        fb.affine_subspace = Some((basis.to_vec(), offset));
+    }
     for (i, p) in fb.points.iter().enumerate() {
         fb.point_index.insert(p.pack(), i);
     }
     fb.abscissa_list = fb.x_index.keys().copied().collect();
     fb.abscissa_list.sort_unstable();
     fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
-    fb.cost.count("abscissae_scanned", (1u64 << l) - 1);
+    fb.cost.count("abscissae_scanned", (1u64 << l) - first);
     fb.cost.count("as_solves", solves);
     fb
 }

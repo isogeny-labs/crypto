@@ -52,7 +52,7 @@ use super::stages::{
 use crate::cryptanalysis::gls_fp2::{gls_line_base, Fp2Curve, Fp2Point, GlsInstance};
 use crate::cryptanalysis::glv_invariant_base::{glv_orbit_base, AutomorphismGroup};
 use crate::cryptanalysis::ic_boundary::{
-    binary_subspace_factor_base, decompose_mitm, decompose_mitm_frobenius, koblitz_factor_base,
+    binary_affine_subspace_factor_base, binary_subspace_factor_base, decompose_mitm, decompose_mitm_frobenius, koblitz_factor_base,
     prime_factor_base, prime_factor_base_cleared, prime_factor_base_strided, BinaryGroup,
     BinaryInstance, ColumnFold, CountedGroup, FactorBase, FrobeniusPairTable, GroupOps,
     OracleCounters, PairTable, PrimeCurve, PrimeInstance, PrimePoint, Relation,
@@ -409,7 +409,7 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
             ),
             (
                 "trace_kernel",
-                "1 to span the subspace inside ker Tr (needs Tr(a) = 0): every base point is then in 2E, so pair sums land in the index-2 subgroup holding the targets; default 0",
+                "1 to put every base point in 2E, so pair sums land in the index-2 subgroup holding the targets: the span of a basis inside ker Tr when Tr(a) = 0, and that span shifted by an element of trace 1 (an affine subspace, algebraic descent only) when Tr(a) = 1; default 0",
             ),
         ]
     }
@@ -424,12 +424,16 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
         if dim == 0 || dim > 30 {
             return Err(format!("subspace dimension {dim} outside 1..=30"));
         }
-        let basis: Vec<u64> = if params.flag("trace_kernel") {
-            trace_kernel_basis(self.instance, dim)?
-        } else {
-            (0..dim).map(|k| 1u64 << k).collect()
-        };
-        Ok(binary_subspace_factor_base(self.instance, &basis))
+        if !params.flag("trace_kernel") {
+            let basis: Vec<u64> = (0..dim).map(|k| 1u64 << k).collect();
+            return Ok(binary_subspace_factor_base(self.instance, &basis));
+        }
+        let (basis, offset) = trace_coset_basis(self.instance, dim)?;
+        Ok(binary_affine_subspace_factor_base(
+            self.instance,
+            &basis,
+            offset,
+        ))
     }
 }
 
@@ -440,10 +444,19 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
 /// `2E` (`research/isogeny_conductor_gap_round5_20261012/`, E7b; the
 /// trace-zero bases of `koblitz_factor_base_search` use the same fact).
 pub fn trace_kernel_basis(inst: &BinaryInstance, dim: u32) -> Result<Vec<u64>, String> {
-    let tr = |v: u64| inst.artin_schreier.trace(v);
-    if tr(inst.a) != 0 {
+    if inst.artin_schreier.trace(inst.a) != 0 {
         return Err("trace_kernel needs Tr(a) = 0: with Tr(a) = 1 the points of 2E lie over an affine hyperplane".into());
     }
+    trace_coset_basis(inst, dim).map(|(basis, _)| basis)
+}
+
+/// The coset of `ker Tr` holding the abscissae of `2E`, as `(basis,
+/// offset)`: `dim` independent elements of `ker Tr` (see
+/// [`trace_kernel_basis`]) and `offset = 0` when `Tr(a) = 0`, or a
+/// monomial of trace 1 when `Tr(a) = 1`.  Every point above
+/// `offset + span(basis)` then has `Tr(x) = Tr(a)`, so lies in `2E`.
+pub fn trace_coset_basis(inst: &BinaryInstance, dim: u32) -> Result<(Vec<u64>, u64), String> {
+    let tr = |v: u64| inst.artin_schreier.trace(v);
     let t0 = (0..inst.n)
         .map(|k| 1u64 << k)
         .find(|&e| tr(e) == 1)
@@ -457,7 +470,7 @@ pub fn trace_kernel_basis(inst: &BinaryInstance, dim: u32) -> Result<Vec<u64>, S
     if basis.len() < dim as usize {
         return Err(format!("ker Tr has dimension {} < {dim}", inst.n - 1));
     }
-    Ok(basis)
+    Ok((basis, if tr(inst.a) == 0 { 0 } else { t0 }))
 }
 
 /// **The Frobenius closure of a prefix subspace** (lead L5, the ordered
@@ -2119,6 +2132,8 @@ pub struct DescentAlgebraicOracle<'i> {
     summands: u32,
     instance: &'i BinaryInstance,
     v_basis: Vec<u64>,
+    /// The base's affine offset (0 for a linear subspace).
+    v_offset: u64,
     /// Ordered τ-slots (lead L5): `None` is the plain descent (every
     /// summand over `V`); `Some(n)` tries, per target, the systems with
     /// summand 2 over `σ^{j}(V)` for `j = 0, …, n−1` (and summand 3 over
@@ -2153,6 +2168,7 @@ impl<'i> DescentAlgebraicOracle<'i> {
             summands,
             instance,
             v_basis: Vec::new(),
+            v_offset: 0,
             slot_rotations: None,
             harness: SolverHarness::new(solver, solver_params, budget),
             totals,
@@ -2188,6 +2204,17 @@ impl<'i> DescentAlgebraicOracle<'i> {
     /// The descended system for a target abscissa; its `lift` maps a
     /// solution back to abscissae.  `prepare` must have run.
     fn descend(&self, x_r: u64) -> SymbolicDescent {
+        if self.v_offset != 0 {
+            let bases: Vec<Vec<u64>> = (0..self.summands).map(|_| self.v_basis.clone()).collect();
+            return crate::cryptanalysis::pq_descent_symbolic::descend_affine(
+                &self.instance.gf,
+                self.instance.b,
+                x_r,
+                &bases,
+                self.v_offset,
+            )
+            .expect("prepare checked the dimension");
+        }
         descend(
             &self.instance.gf,
             self.instance.b,
@@ -2258,10 +2285,21 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for DescentAlgebraicOracle<'_> {
                 self.summands
             ));
         }
-        let basis = fb.subspace_basis.as_ref().ok_or(
-            "descent-algebraic needs a factor base whose abscissae form an F_2-subspace; \
-             use binary-subspace or koblitz-orbit",
-        )?;
+        let (basis, offset) = match (&fb.subspace_basis, &fb.affine_subspace) {
+            (Some(basis), _) => (basis, 0),
+            (None, Some((basis, offset))) => (basis, *offset),
+            (None, None) => {
+                return Err(
+                    "descent-algebraic needs a factor base whose abscissae form an F_2-subspace \
+                     or an affine one; use binary-subspace or koblitz-orbit"
+                        .into(),
+                )
+            }
+        };
+        if offset != 0 && self.slot_rotations.is_some() {
+            return Err("slots take a linear subspace, not an affine one".into());
+        }
+        self.v_offset = offset;
         let cap = max_n_prime(self.summands);
         if basis.len() as u32 > cap {
             return Err(format!(
@@ -2818,6 +2856,30 @@ mod tests {
         assert!(in_two_e(&d, &mut ops) < d.points.len());
         let ko = koblitz_instance(1, 17).expect("a = 1 over F_2^17");
         assert!(trace_kernel_basis(&ko, 6).is_err(), "Tr(a) = 1 is refused");
+    }
+
+    /// **With `Tr(a) = 1` the trace coset is affine and still in `2E`**:
+    /// the a = 1 Koblitz curve's base sits over `t₀ + ker Tr`, records
+    /// itself as affine (so linear-subspace consumers refuse it), and
+    /// every point has order dividing `#E / 2`.
+    #[test]
+    fn the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e() {
+        let ko = koblitz_instance(1, 17).expect("a = 1 over F_2^17");
+        let (basis, offset) = trace_coset_basis(&ko, 6).unwrap();
+        let tr = |v: u64| ko.artin_schreier.trace(v);
+        assert_eq!(tr(offset), 1);
+        assert!(basis.iter().all(|&v| tr(v) == 0));
+        let fb = binary_affine_subspace_factor_base(&ko, &basis, offset);
+        assert!(fb.subspace_basis.is_none());
+        assert_eq!(fb.affine_subspace, Some((basis.clone(), offset)));
+        assert!(!fb.points.is_empty());
+        let g = BinaryGroup(&ko.fast);
+        let mut ops = GroupOps::default();
+        let half = ko.r * ko.cofactor / 2;
+        assert!(fb.points.iter().all(|&p| g.mul(&mut ops, p, half).infinity));
+        let (b0, o0) = trace_coset_basis(&koblitz_instance(0, 13).unwrap(), 6).unwrap();
+        assert_eq!(o0, 0);
+        assert_eq!(b0, trace_kernel_basis(&koblitz_instance(0, 13).unwrap(), 6).unwrap());
     }
 
     /// The command-line form of a multi-factor divisor, end to end from

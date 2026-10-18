@@ -233,6 +233,9 @@ pub struct SymbolicDescent {
     /// ranges over the span of `summand_bases[i]`.  Equal to `v_basis`
     /// repeated when the descent is the plain one.
     pub summand_bases: Vec<Vec<u64>>,
+    /// Every summand ranges over `offset + span(its basis)`; 0 for the
+    /// linear descent.
+    pub offset: u64,
     /// Monomials of the polynomial over `F_{2^n}` before it was split
     /// into coordinates: the size of the symbolic object.
     pub field_monomials: usize,
@@ -248,7 +251,7 @@ impl SymbolicDescent {
                 let basis = &self.summand_bases[i];
                 (0..np)
                     .filter(|&k| (v >> (i * np + k)) & 1 == 1)
-                    .fold(0u64, |acc, k| acc ^ basis[k])
+                    .fold(self.offset, |acc, k| acc ^ basis[k])
             })
             .collect()
     }
@@ -281,6 +284,21 @@ pub fn descend_with_bases(
     x_r: u64,
     bases: &[Vec<u64>],
 ) -> Result<SymbolicDescent, String> {
+    descend_affine(gf, b, x_r, bases, 0)
+}
+
+/// [`descend_with_bases`] with every summand over the affine subspace
+/// `offset + span(bases[i])`: the linear forms gain the constant
+/// `offset`, so the degree and the unknowns are unchanged.  On a curve
+/// with `Tr(a) = 1`, `offset` of trace 1 over a basis inside `ker Tr`
+/// puts every base point in `2E`.
+pub fn descend_affine(
+    gf: &Gf2,
+    b: u64,
+    x_r: u64,
+    bases: &[Vec<u64>],
+    offset: u64,
+) -> Result<SymbolicDescent, String> {
     let summands = bases.len() as u32;
     let n_prime = bases.first().map_or(0, |v| v.len()) as u32;
     if bases.iter().any(|v| v.len() as u32 != n_prime) {
@@ -300,9 +318,10 @@ pub fn descend_with_bases(
         ));
     }
     let n_vars = (summands * n_prime) as usize;
+    let x_r = FieldBoolPoly::constant(x_r);
     let poly = match summands {
-        2 => s3_symbolic(gf, b, x_r, &bases[0], &bases[1]),
-        _ => s4_symbolic(gf, b, x_r, &bases[0], &bases[1], &bases[2]),
+        2 => s3_symbolic_poly_affine(gf, b, &x_r, &bases[0], &bases[1], offset),
+        _ => s4_symbolic_poly_affine(gf, b, &x_r, &bases[0], &bases[1], &bases[2], offset),
     };
     Ok(SymbolicDescent {
         n: gf.n,
@@ -312,6 +331,7 @@ pub fn descend_with_bases(
         equations: poly.split(gf.n, n_vars),
         v_basis,
         summand_bases: bases.to_vec(),
+        offset,
         field_monomials: poly.len(),
     })
 }
@@ -374,6 +394,7 @@ pub fn descend_fiber(
         equations,
         v_basis: v_basis.to_vec(),
         summand_bases: (0..summands).map(|_| v_basis.to_vec()).collect(),
+        offset: 0,
         field_monomials: poly.len() + g.len(),
     })
 }
@@ -385,12 +406,6 @@ impl SymbolicDescent {
         let base = self.summands * self.n_prime;
         (0..self.n).fold(0u64, |acc, k| acc | (((v >> (base + k)) & 1) << k))
     }
-}
-
-/// `S_3(x_1, x_2, x_R)` with `x_1`, `x_2` linear forms, term for term
-/// the formula [`semaev_s3_word`] evaluates.
-fn s3_symbolic(gf: &Gf2, b: u64, x_r: u64, b1: &[u64], b2: &[u64]) -> FieldBoolPoly {
-    s3_symbolic_poly(gf, b, &FieldBoolPoly::constant(x_r), b1, b2)
 }
 
 /// `S_3(x_1, x_2, X)` with `X` any polynomial in the boolean variables:
@@ -406,21 +421,33 @@ fn s3_symbolic_poly(
     b1: &[u64],
     b2: &[u64],
 ) -> FieldBoolPoly {
+    s3_symbolic_poly_affine(gf, b, x_r, b1, b2, 0)
+}
+
+/// `offset + Σ_k v_{var + k} · basis[k]`.
+fn affine_form(var: u32, basis: &[u64], offset: u64) -> FieldBoolPoly {
+    FieldBoolPoly::linear(var, basis).add(&FieldBoolPoly::constant(offset))
+}
+
+/// `S_3(x_1, x_2, X)` with `x_i = offset + Σ_k v_k b_i[k]`, term for
+/// term the formula [`semaev_s3_word`] evaluates.
+fn s3_symbolic_poly_affine(
+    gf: &Gf2,
+    b: u64,
+    x_r: &FieldBoolPoly,
+    b1: &[u64],
+    b2: &[u64],
+    offset: u64,
+) -> FieldBoolPoly {
     let np = b1.len() as u32;
-    let x1 = FieldBoolPoly::linear(0, b1);
-    let x2 = FieldBoolPoly::linear(np, b2);
+    let x1 = affine_form(0, b1, offset);
+    let x2 = affine_form(np, b2, offset);
     let sum12_sq = x1.add(&x2).sqr(gf);
     let prod12 = x1.mul(&x2, gf);
     let t1 = sum12_sq.mul(&x_r.sqr(gf), gf);
     let t2 = prod12.mul(x_r, gf);
     let t3 = prod12.sqr(gf).add(&FieldBoolPoly::constant(b));
     t1.add(&t2).add(&t3)
-}
-
-/// `S_4(x_1, x_2, x_3, x_R)` with `x_1`, `x_2`, `x_3` linear forms,
-/// term for term the resultant [`semaev_s4_word`] evaluates.
-fn s4_symbolic(gf: &Gf2, b: u64, x_r: u64, b1: &[u64], b2: &[u64], b3: &[u64]) -> FieldBoolPoly {
-    s4_symbolic_poly(gf, b, &FieldBoolPoly::constant(x_r), b1, b2, b3)
 }
 
 /// `S_4(x_1, x_2, x_3, X)` with `X` any polynomial in the boolean
@@ -433,10 +460,24 @@ fn s4_symbolic_poly(
     b2: &[u64],
     b3: &[u64],
 ) -> FieldBoolPoly {
+    s4_symbolic_poly_affine(gf, b, x_r, b1, b2, b3, 0)
+}
+
+/// `S_4(x_1, x_2, x_3, X)` with `x_i = offset + Σ_k v_k b_i[k]`, term
+/// for term the resultant [`semaev_s4_word`] evaluates.
+fn s4_symbolic_poly_affine(
+    gf: &Gf2,
+    b: u64,
+    x_r: &FieldBoolPoly,
+    b1: &[u64],
+    b2: &[u64],
+    b3: &[u64],
+    offset: u64,
+) -> FieldBoolPoly {
     let np = b1.len() as u32;
-    let x1 = FieldBoolPoly::linear(0, b1);
-    let x2 = FieldBoolPoly::linear(np, b2);
-    let x3 = FieldBoolPoly::linear(2 * np, b3);
+    let x1 = affine_form(0, b1, offset);
+    let x2 = affine_form(np, b2, offset);
+    let x3 = affine_form(2 * np, b3, offset);
     let x4 = x_r.clone();
     let bconst = FieldBoolPoly::constant(b);
     let s3_in_x3 = |p: &FieldBoolPoly, q: &FieldBoolPoly| {
@@ -463,6 +504,36 @@ mod tests {
     use crate::cryptanalysis::pq_descent::{weil_descend_s3, weil_descend_s4};
     use rand::rngs::StdRng;
     use rand::{Rng, SeedableRng};
+
+    /// **The affine descent's zeros are exactly the affine pairs and
+    /// triples whose summation polynomial vanishes**, by enumeration.
+    #[test]
+    fn the_affine_descent_vanishes_exactly_on_its_affine_decompositions() {
+        let inst = random_binary_instance(11, 5, 1 << 20).expect("a curve at n = 11");
+        let gf = &inst.gf;
+        let mut rng = StdRng::seed_from_u64(17);
+        let basis = standard_basis(4);
+        let offset = 1u64 << 7;
+        for summands in [2u32, 3] {
+            for _ in 0..4 {
+                let x_r = rng.gen::<u64>() & gf.mask;
+                let bases: Vec<Vec<u64>> = (0..summands).map(|_| basis.clone()).collect();
+                let sys = descend_affine(gf, inst.b, x_r, &bases, offset).unwrap();
+                assert_eq!(sys.offset, offset);
+                for v in 0u64..(1u64 << sys.n_vars) {
+                    let xs = sys.lift(v);
+                    assert!(xs.iter().all(|&x| x & offset == offset), "lift adds the offset");
+                    let word = if summands == 2 {
+                        semaev_s3_word(gf, inst.b, xs[0], xs[1], x_r)
+                    } else {
+                        semaev_s4_word(gf, inst.b, xs[0], xs[1], xs[2], x_r)
+                    };
+                    let zero = sys.equations.iter().all(|e| e.eval(v) == 0);
+                    assert_eq!(zero, word == 0, "summands {summands}, v = {v:#x}");
+                }
+            }
+        }
+    }
 
     fn standard_basis(n_prime: u32) -> Vec<u64> {
         (0..n_prime).map(|k| 1u64 << k).collect()
