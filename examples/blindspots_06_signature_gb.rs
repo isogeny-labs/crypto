@@ -1459,6 +1459,7 @@ struct Sig<'a> {
     lm_ys: Vec<FxMap<u64, Vec<u32>>>,
     sig_ys: Vec<FxMap<u64, Vec<u32>>>,
     ekey_idx: FxMap<u64, u32>,
+    lm_all: FxMap<u64, Vec<u32>>,
     seen: FxSet<u64>,
     g_terms: u64,
     step_no: usize,
@@ -1490,6 +1491,7 @@ impl<'a> Sig<'a> {
             lm_ys: Vec::new(),
             sig_ys: Vec::new(),
             ekey_idx: FxMap::default(),
+            lm_all: FxMap::default(),
             seen: FxSet::default(),
             g_terms: 0,
             step_no: 0,
@@ -1545,6 +1547,7 @@ impl<'a> Sig<'a> {
         let r = &mut self.sig_pc[idx as usize];
         *r = (r.0.min(sp), r.1.max(sp));
         self.ekey_idx.insert(ekey(idx, sig, lm), h as u32);
+        self.lm_all.entry(lm).or_default().push(h as u32);
     }
 
     fn add_syz(&mut self, i: usize, s: u64) {
@@ -1859,15 +1862,19 @@ impl<'a> Sig<'a> {
                 self.t.sym_tests += 1;
             }
             if best == usize::MAX {
-                self.t.sym_tests += self.g.len() as u64;
+                // every divisor of m among the leading monomials: look up the submasks of m
                 let mut bl: (u32, u128, usize) = (u32::MAX, u128::MAX, usize::MAX);
-                for (gi, e) in self.g.iter().enumerate() {
-                    if e.lm & !m == 0 {
-                        let t = m & !e.lm;
-                        let cand = (e.idx, rk(e.sig, t, nv), e.poly.len());
-                        if cand < bl {
-                            bl = cand;
-                            best = gi;
+                for u in Subs::new(m) {
+                    self.t.sym_tests += 1;
+                    if let Some(gs) = self.lm_all.get(&u) {
+                        for &gi in gs {
+                            let e = &self.g[gi as usize];
+                            let t = m & !e.lm;
+                            let cand = (e.idx, rk(e.sig, t, nv), e.poly.len());
+                            if cand < bl {
+                                bl = cand;
+                                best = gi as usize;
+                            }
                         }
                     }
                 }
