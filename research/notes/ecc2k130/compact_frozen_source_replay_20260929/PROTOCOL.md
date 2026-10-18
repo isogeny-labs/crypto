@@ -110,7 +110,7 @@ from the Actions history of `main` and of pull requests after it merged
 | `compact-ir-ledger` | success on recent pull requests |
 | `ecc2k130-disjoint-cold-v2` | success on recent pull requests |
 | `compact-ir-cold-gap` | failed, for a reason unrelated to the materializer; see below |
-| `ecc2k130-disjoint-cold-q` | no run since the fix |
+| `ecc2k130-disjoint-cold-q` | retired by the owner on 2026-10-11 (manual dispatch only, to stop it fanning out across shared runners), so it has no hosted run since the fix; it uses the same tool and freeze as the passing ledger, cold-gap and v2 workflows |
 
 **`compact-ir-cold-gap`.** Its `validate` job analyzes the archived cold-gap
 evidence before it reaches the materializer, and that archive was invalid JSON
