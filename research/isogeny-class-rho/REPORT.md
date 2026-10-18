@@ -17,7 +17,7 @@ check are in it. Run: [`runs/run-20261018T0857Z/`](runs/run-20261018T0857Z/)
 record and log). Tool: `isoclass-rho` (`src/bin/isoclass_rho/`).
 
 **Headline (measured; the per-rule verdicts are in "Reading").** Four
-classes, 77,900 rho solves on 189 curves plus controls, every solve
+classes, 85,425 rho solves on 200 curves plus controls, every solve
 returning the planted `k`, every isogeny edge verified on points:
 
 - **The curve does not matter to a generic walk.** Across 104 curves of a

@@ -44,7 +44,7 @@ speed-up measured, not a new one.
   planted effects (negation fold 0.707, 4-adding walk 1.137), structural
   folds as positive controls, a generator sweep (100 or 64 generators per
   curve, same secret) and a source×target shift matrix.
-- **Results** (§6): 77,900 solves, every answer verified; 200 curves over
+- **Results** (§6): 85,425 solves, every answer verified; 200 curves over
   all reachable endomorphism-ring strata; no curve, stratum, level, degree,
   kernel field, generator or source left the band and no heterogeneity
   test fired; every plant detected; the $j=0$ fold cost 0.439 [0.401, 0.481]
@@ -63,8 +63,11 @@ speed-up measured, not a new one.
   the known automorphism and Frobenius equivalence classes.
 - Not a proof that no isogeny-dependent structure exists at any size; it
   is a bounded, preregistered search that found none where the theorem
-  says there should be none, with the sensitivity the plants measure
-  (effects of 4–13 % on the mean detected at 100 seeds per curve).
+  says there should be none, with the sensitivity of Section 5: at 100 seeds
+  per curve a per-curve effect of about 18 %, a stratum effect of about
+  6.5 % and a class-wide shift of about 2 % are resolved; the 29 % plant and
+  the 14 % plant were both detected in every class. Smaller per-curve effects
+  are not excluded.
 
 ## How to build
 
@@ -109,14 +112,22 @@ Owed, in order:
    author block, anonymous page 1, no email), and the abstract, title,
    keywords and page size passed. `eprint-abstract.txt` is the paste-ready
    abstract from that run.
-3. **Novelty audit.** Not yet done. The claims most in need of a literature
-   check: that this is the first *measured* whole-class rho comparison with
-   explicit isogenies (the theorem itself is folklore; Jao–Miller–Venkatesan
-   is the random-reducibility statement); the $\pm 1 \bmod 8$ proposition
-   (elementary, probably known in some form); the characteristic-two Vélu
-   map on points (Vélu's formula is characteristic-free, but an explicit
-   normalised point map for ordinary binary curves should be compared with
-   the literature before being described as new).
+3. **Novelty audit.** A first pass was done on 2026-10-18 by web search only
+   (four queries: random self-reducibility and isogeny experiments; measured
+   rho across an isogeny class; the mod-8 condition on conductors of binary
+   curves; Vélu point maps in characteristic two). Findings: Jao–Miller–
+   Venkatesan (random reducibility) and Galbraith (1999 and the 2024 ePrint
+   "Climbing and descending tall isogeny volcanos") are reductions and
+   algorithms for moving an instance, with no measurement found; no earlier
+   measured whole-class rho comparison was found; no source stating the mod-8
+   proposition was found; Vélu's formulas are characteristic-free, so the
+   characteristic-two map is a specialisation, not new theory (one
+   unreviewed arXiv listing, 2608.01675, writes a binary-curve Vélu map and
+   was not checked). The paper states these limits in its related-work
+   paragraph and claims nothing as "first". Still owed: a proper literature
+   review by an author (Sutherland, Galbraith, Kohel and Lercier–Sirvent
+   style isogeny-class computations, and Koblitz-curve isogeny papers),
+   before any priority claim.
 4. **Measurements still owed.** None for the claims made. Optional
    strengthening: a second independent host for the wall-time rows of §6.4,
    and a larger-$n$ replica (45–50 bits) of one class to show the null is

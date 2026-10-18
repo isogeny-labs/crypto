@@ -25,7 +25,7 @@ card #link("runs/run-20261018T0857Z/COMMANDS.md")[`COMMANDS.md`], every
 record and log). Tool: `isoclass-rho` (`src/bin/isoclass_rho/`).
 
 #strong[Headline (measured; the per-rule verdicts are in "Reading").]
-Four classes, 77,900 rho solves on 189 curves plus controls, every solve
+Four classes, 85,425 rho solves on 200 curves plus controls, every solve
 returning the planted `k`, every isogeny edge verified on points:
 
 - #strong[The curve does not matter to a generic walk.] Across 104

@@ -56,7 +56,7 @@ measured, spread over all $12$ endomorphism-ring strata and reached through
 isogenies of degree $3$ to $61$), a $j = 0$ class ($45$ curves), a class of
 $327{,}080$ curves over $\FF_{2^{37}}$ ($40$ curves) and the class of the
 Koblitz curve $y^2 + xy = x^3 + 1$ over $\FF_{2^{41}}$ ($708{,}153$ curves,
-$11$ measured over all four strata). In $77{,}900$ solves, every one returning
+$11$ measured over all four strata). In $85{,}425$ solves, every one returning
 the planted logarithm, no curve, endomorphism-ring stratum, volcano level,
 isogeny degree, kernel-field degree, choice of generator ($100$ or $64$ per
 curve with the same secret) or source curve of the instance left the
@@ -104,6 +104,24 @@ is random self-reducible across an isogeny class under a rapid-mixing
 assumption on the isogeny graph, so an easier curve, if one existed, would
 make the whole class easy.
 
+\paragraph{Related work, and what is and is not new.} Galbraith~\cite{Galbraith1999}
+showed how to construct isogenies between ordinary curves of the same order
+and so transport a discrete logarithm between them; its cost for the worst
+pair of curves was improved recently~\cite{Galbraith2024}, and Jao, Miller and
+Venkatesan~\cite{JaoMillerVenkatesan2005} proved random self-reducibility
+under conditions on the endomorphism rings. These are reductions and
+algorithms for \emph{moving} an instance; they do not measure what a generic
+solver costs on the far side, which is the question here. In a literature
+search we found no earlier measured whole-class comparison of rho with
+explicit isogenies; that is a statement about our search, not a proof that
+none exists. The null itself is a short consequence of the group law and is
+not offered as new. The V\'elu map on points in characteristic two
+(Appendix~\ref{app:char2}) is a specialisation of V\'elu's characteristic-free
+formulas~\cite{Velu1971} to one model, and we make no claim that it was
+unknown; the mod-$8$ proposition of Section~\ref{sec:torsion} is elementary
+and may well appear in the literature on isogenies of binary curves, where we
+did not find it stated.
+
 None of this says what a measurement would show, and a measurement is what a
 claim of the form ``curve $X$ solves faster'' or ``no curve solves faster''
 needs. Such claims are comparative: one number on one curve has no reference.
@@ -128,7 +146,7 @@ every arm, and verdicts fixed by preregistered decision rules.
   endomorphism-ring conductor, and runs Pollard rho with negation,
   automorphism and Frobenius folds (Section~\ref{sec:tool}).
 \item A preregistered controlled experiment on four isogeny classes: prime,
-  $j = 0$, generic binary and Koblitz, $189$ measured curves and $77{,}900$
+  $j = 0$, generic binary and Koblitz, $200$ measured curves and $85{,}425$
   solves, with isomorphic and field-basis controls, an A/A replica, two
   planted effects and three structural folds (Sections~\ref{sec:design}
   and~\ref{sec:results}).
