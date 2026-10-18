@@ -2320,3 +2320,83 @@ vanish are `7 %` of the matrix and not the same rows from one target to the next
 elimination work they carry is small.  Unlike F4's pair selection (§12 of the cover ledger,
 `2.44×`), a Macaulay matrix at its bound wastes little.  Direction 2a is closed for this solver;
 direction 2c's ceiling is `≤ 1.08×`.  **Class: engineering, negative.**
+
+### 9.12 E22 measured: the `V₄` line exists, its solve is `≈ 820×` cheaper, its yield `≈ 10×` worse
+
+*2026-10-18.*  **Stage A** (`examples/klein_stage_a.rs`, `experiments/28_e22_stage_a/`):
+`generate_klein_instance(p, seed, 16)`, `p = 53, 101, 149, 197, 269`, seeds 1–2.  **Stage B**
+(`examples/klein_stage_b.rs`, `experiments/28_e22_stage_b/`): the `klein_v4` solve on 6 planted
+(signed sums of four base points) and 6 uniform (`aG + bQ`) targets per size, `p = 37, 41, 53,
+101, 269`, against brute force (`p ≤ 37`) or the exact meet-in-the-middle oracle.  Two
+corrections, stated: Stage A ran with the base before the fixed points `z ∈ {0, ±1, ±i}` were
+excluded (they are order-4 points, logarithm `0` in `⟨G⟩`, harmless to the solve and at most five
+points), and its `τ_T` comparison column divides all residuals by the folded arm's relations
+although its loop runs until the unfolded control also solves — it overstates `τ_T`'s `y`, so
+E19 (the same `τ_T` construction, folded arm only, exact oracle) is the comparator below.
+
+**Stage A** (eight curves through `p = 197` so far; `p = 269` running):
+
+| p | seed | base (density) | cols (pts/col) | `z(O) ∈ F_p` | residuals | y | decompositions per decomposed target | log | E19 residuals, same p and seed |
+|--:|--:|:--|:--|:--|--:|--:|:--|:--|--:|
+| 53 | 1 | 32 (0.60) | 8 (4.00) | no | 10,733 | 1,192.6 | 64 (×4), 24 (×5) | yes | 1,498 |
+| 53 | 2 | 36 (0.68) | 9 (4.00) | no | 2,086 | 208.6 | — | yes | 1,926 |
+| 101 | 1 | 36 (0.36) | 9 (4.00) | no | 55,508 | 5,550.8 | — | yes | 2,608 |
+| 101 | 2 | 52 (0.52) | 13 (4.00) | no | 14,840 | 1,060.0 | — | yes | 2,701 |
+| 149 | 1 | 64 (0.43) | 16 (4.00) | no | 48,795 | 2,870.3 | 64 (×11), 24 (×5) | yes | 3,525 |
+| 149 | 2 | 60 (0.40) | 15 (4.00) | no | 37,444 | 2,340.2 | 64 (×12), 24, 12, 4 | yes | 2,868 |
+| 197 | 1 | 76 (0.39) | 19 (4.00) | no | 81,149 | 4,057.4 | 64 (×16), 24 (×4) | yes | — |
+| 197 | 2 | 84 (0.43) | 21 (4.00) | no | 68,741 | 3,124.6 | 64 (×18), 24 (×4) | yes | — |
+
+**Stage B:**
+
+| p | targets | agree | unsolved | planted agree | uniform solved | `C` median | precompute |
+|--:|--:|--:|--:|--:|--:|--:|--:|
+| 37 | 12 | 11 | 1 | 5 / 6 | 6 / 6 | `1.59·10⁶` | `1.7·10⁶` |
+| 41 | 12 | 10 | 2 | 4 / 6 | 6 / 6 | `1.56·10⁶` | `1.7·10⁶` |
+| 53 | 12 | 9 | 3 | 3 / 6 | 6 / 6 | `1.55·10⁶` | `1.7·10⁶` |
+| 101 | 12 | 10 | 2 | 4 / 6 | 6 / 6 | `1.65·10⁶` | `1.7·10⁶` |
+| 269 | 12 | 11 | 1 | 5 / 6 | 6 / 6 | `1.72·10⁶` | `1.7·10⁶` |
+
+The precompute's span check passed on every curve: `H` is invariant under `V₄⁴_0 ⋊ S₄` and lies in
+the 30-function span.  Every solve that solved returned exactly the true decomposition set
+(64 or 128 sorted quadruples); the quotient is exactly `64` on every one, as derived.  **All nine
+failures are planted targets of one kind**: quotient `66`, "border unreachable" at degree 11,
+true decomposition counts not divisible by 64 (`56`–`752`).  Derived: a planted sum containing two
+points of one translation orbit has `P_a + P_b = T_i`, so `R − T_i = P_c + P_d` and `R` has the
+one-parameter family `{P, T_i − P, P_c, P_d}` of decompositions — a positive-dimensional system no
+degree resolves.  A uniform target `R ∈ ⟨G⟩` meets this only if `R − T_i` has a two-point
+decomposition (probability `≈ cols²/n`); all 30 uniform targets solved.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.22 | curves exist at every registered `p`; the pole is never in `F_p`; every fold checked on points as a translation (4 points per column); every log recovered; density `0.36`–`0.68`, pooled `0.45` | **holds** (density: `≈ 1/2` within the orbit-correlated spread, 4 points share one liftability) |
+| G2.23 | `C_w / C_V₄ ≈ 1.40·10⁹ / 1.7·10⁶ ≈ 820` | **falsified high** (band `[4, 30]`; §9.10 anticipated it) |
+| G2.24 | decompositions per decomposed target `64` (`24` and smaller on orbits with coincidences) — holds; `y_V₄ / y_E19` at matched `p`: `1.5`–`51`, median `≈ 13`; total targets `1.1`–`21×`, median `≈ 10×` | **half falsified** (`y` ratio band `[3, 10]`): the yield penalty is larger than the orbit factor alone, the lower base density (`≈ 0.45`, a fourth power in the decomposition count) adding the rest |
+| G2.25 | net on the relation phase: `≈ 820 / 10 ≈ 80×` cheaper per relation than E19, *derived from per-call and per-target measurements in separate harnesses* | a gain, **not yet measured end to end** — E24 below |
+
+### 9.13 E24 pre-registration: the `k = 4` index calculus end to end on the `V₄` line
+
+*Registered 2026-10-18, after Stage A and Stage B above and before any E24 code.*  The same
+protocol as E19 (§9.5), with the `V₄` line and solve: on `generate_klein_instance(p, seed, 16)`,
+uniform targets `R = aG + bQ`, each decomposed by `klein_v4::v4_system` → `solve_weighted_traced`
+(no trace) at weighted degree 11 → `lift_back_v4`; every lifted quadruple mapped to base points
+with exact signs by a charged group check; one decomposition per target drawn uniformly as a
+`V₄`-folded row; Wiedemann until `[d]G = Q` verifies; every phase charged in `F_p`
+multiplications (precompute, base, generation, Weil restriction, solves, lift-back, checks,
+linear algebra at `16` per mod-`n` multiplication); `16` negation walks and `16` unfolded walks
+on the same curve; unpriced native work at `0, 0.1, 1` GAE (Macaulay entries; one per walk step).
+Sizes `p = 101, 149, 197, 269, 397, 521`, two curves each.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.27 | correctness | every log recovered; every row re-added in the group; no lifted quadruple without an exact sign vector | any failure |
+| G2.28 | the solve in the pipeline | per-call `C` median in `[1.3, 2.2]·10⁶` at every `p`; unsolved `≤ 1 %` of targets | outside, or more |
+| G2.29 | end to end against E19 | `S_V₄ / rho` below E19's `S / rho` at matched `p` (`101`–`269`) by a factor in `[20, 300]` | outside the band |
+| G2.30 | slope | fitted exponent of `S / rho` in `n` in `[−0.35, −0.15]`; the solves `≥ 90 %` of `S` | outside, or less |
+| G2.31 | the handover, from E24's own constants (§11.16's model, the theory exponents) | `n* ∈ [2^{86}, 2^{98}]`, against E19's `2^{119}` | outside |
+
+**What it would say.**  If G2.27–G2.31 hold, the `k = 4` baseline moves by two orders of magnitude
+at every measured size and its modelled handover by `≈ 2^{20}`–`2^{30}` in `n`: a verified,
+measured improvement of the index-calculus baseline under the 2026-10-15 success criterion
+(**class: engineering** — a constant; the exponents are unchanged), and the rows stay
+`10⁴`–`10⁵×` slower than rho: the distance remaining, reported as such.
