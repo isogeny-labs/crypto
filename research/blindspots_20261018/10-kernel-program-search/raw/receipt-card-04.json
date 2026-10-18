@@ -1,0 +1,331 @@
+{
+  "card_id": "CARD-BLINDSPOT-10-04",
+  "card_path": "research/blindspots_20261018/10-kernel-program-search/card-04.yaml",
+  "card_sha256": "75cdfeaee44d23b016b18a643bbd97beb09aac535555b130a5851410bf4fb241",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-10/card-04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-10/card-04/b10",
+        "examples/blindspots_10_kernel_search.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 6.52,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 6.52,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-10/card-04/b10",
+        "search",
+        "--n",
+        "31",
+        "--ell",
+        "9",
+        "--arm",
+        "b",
+        "--state",
+        "research/blindspots_20261018/10-kernel-program-search/raw/state",
+        "--budget",
+        "256",
+        "--max-new",
+        "64"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 76.659,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "search-n31-b-c0",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/10-kernel-program-search/raw/state/n31-b.jsonl": "4216f56334ef373cd656b819f2f1e450ff51d6ea0352c657df8966329aee77ea"
+      },
+      "seconds": 76.659,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0a6b324a40798b87554a3b85abb6729c7c413e3a397056a557150f18668fc50e",
+      "stdout_tail": [
+        "eval  45 coset2-s1|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc1        q01=  7.8892e2 phi=0.938 dom=false 849ms",
+        "eval  46 coset2-s1|lift1|stop0|root0|q1|sqt1|pm0|ab1|bt1|gc0        q01=  8.3992e2 phi=1.000 dom=false 900ms",
+        "eval  47 coset2-s1|lift0|stop0|root0|q1|sqt1|pm0|ab3|bt0|gc0        q01=  2.3361e3 phi=0.594 dom=false 2224ms",
+        "eval  48 coset4-s1|lift1|stop0|root0|q1|sqt1|pm0|ab3|bt1|gc0        q01=  7.9404e2 phi=0.625 dom=false 645ms",
+        "eval  49 affine-anti|lift1|stop0|root0|q0|sqt1|pm0|ab3|bt1|gc0      q01=       inf phi=0.000 dom=false 0ms",
+        "eval  50 coset2-s1|lift1|stop1|root0|q1|sqt1|pm0|ab0|bt1|gc0        q01=  8.9651e2 phi=1.000 dom=false 880ms",
+        "eval  51 coset2-s1|lift0|stop0|root0|q1|sqt1|pm0|ab3|bt1|gc1        q01=  2.5711e3 phi=0.594 dom=false 2288ms",
+        "eval  52 coset2-s1|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0        q01=  7.1665e2 phi=0.938 dom=false 898ms",
+        "eval  53 coset2-s4|lift1|stop0|root0|q1|sqt1|pm0|ab3|bt1|gc0        q01=  5.1091e2 phi=0.719 dom=false 412ms",
+        "eval  54 coset2-s4|lift1|stop0|root0|q1|sqt1|pm0|ab3|bt0|gc0        q01=  5.1053e2 phi=0.719 dom=false 423ms",
+        "eval  55 sub-rand3|lift1|stop0|root0|q1|sqt1|pm0|ab3|bt0|gc0        q01=  5.3528e2 phi=0.719 dom=false 501ms",
+        "eval  56 sub-rand3|lift1|stop0|root0|q1|sqt1|pm0|ab1|bt0|gc0        q01=  8.1924e2 phi=1.000 dom=false 598ms",
+        "eval  57 coset2-s4|lift1|stop0|root0|q1|sqt1|pm0|ab0|bt0|gc0        q01=  7.8840e2 phi=1.000 dom=false 639ms",
+        "eval  58 coset2-s4|lift1|stop0|root0|q1|sqt1|pm1|ab3|bt0|gc0        q01=  5.7871e2 phi=0.719 dom=false 458ms",
+        "eval  59 sub-rand3|lift0|stop0|root0|q1|sqt1|pm0|ab3|bt0|gc0        q01=  2.0867e3 phi=0.719 dom=false 1834ms",
+        "eval  60 coset2-s1|lift0|stop1|root0|q1|sqt1|pm0|ab3|bt0|gc0        q01=  2.3361e3 phi=0.594 dom=false 2116ms",
+        "eval  61 coset2-s4|lift1|stop0|root0|q1|sqt1|pm0|ab3|bt0|gc1        q01=  5.6033e2 phi=0.719 dom=false 427ms",
+        "eval  62 coset2-s4|lift1|stop0|root0|q1|sqt0|pm0|ab3|bt0|gc0        q01=  5.1358e2 phi=0.719 dom=false 454ms",
+        "eval  63 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab3|bt1|gc0 q01=  3.4348e2 phi=0.531 dom=false 549ms",
+        "best so far idx 63 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab3|bt1|gc0 q01=3.4348e2 (64 of 256 evaluations done)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-10/card-04/b10",
+        "search",
+        "--n",
+        "31",
+        "--ell",
+        "9",
+        "--arm",
+        "b",
+        "--state",
+        "research/blindspots_20261018/10-kernel-program-search/raw/state",
+        "--budget",
+        "256",
+        "--max-new",
+        "64"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 103.922,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "search-n31-b-c1",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/10-kernel-program-search/raw/state/n31-b.jsonl": "19eae2e9cacdc1aec1f810de43e2c59408d23b1f17e2008e026775ea6c83f8c4"
+      },
+      "seconds": 103.922,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "fc219547ad804dbd5899d7218dcc39a393ee31c2843a7b1d1616d8eb97d35e38",
+      "stdout_tail": [
+        "eval 109 affine-aligned-s2|lift1|stop1|root0|q1|sqt1|pm0|ab2|bt0|gc0 q01=  3.1454e2 phi=0.938 dom=false 774ms",
+        "eval 110 affine-aligned-s2|lift1|stop0|root0|q1|sqt0|pm0|ab0|bt1|gc0 q01=  3.8815e2 phi=1.000 dom=false 834ms",
+        "eval 111 affine-aligned-s2|lift1|stop1|root0|q1|sqt1|pm0|ab2|bt1|gc0 q01=  3.1435e2 phi=0.938 dom=false 810ms",
+        "eval 112 affine-aligned-s2|lift1|stop0|root0|q2|sqt0|pm0|ab2|bt2|gc0 q01=  4.1750e2 phi=0.938 dom=false 1097ms",
+        "eval 113 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm1|ab2|bt2|gc0 q01=  5.0783e2 phi=0.938 dom=false 1197ms",
+        "eval 114 sub-rand4|lift1|stop1|root0|q1|sqt1|pm0|ab3|bt1|gc0        q01=  6.4331e2 phi=0.594 dom=false 494ms",
+        "eval 115 affine-aligned-s2|lift1|stop0|root0|q2|sqt0|pm0|ab2|bt1|gc0 q01=  3.4481e2 phi=0.938 dom=false 682ms",
+        "eval 116 sub-rand1|lift0|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0        q01=  3.7428e3 phi=0.719 dom=false 3510ms",
+        "eval 117 affine-aligned-s2|lift1|stop0|root0|q0|sqt1|pm0|ab2|bt1|gc0 q01=  3.1867e2 phi=0.938 dom=false 743ms",
+        "eval 118 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc1 q01=  3.4786e2 phi=0.938 dom=false 862ms",
+        "eval 119 affine-rand-s2|lift1|stop0|root2|q1|sqt1|pm0|ab2|bt0|gc0   q01=  5.2547e3 phi=0.906 dom=false 5130ms",
+        "eval 120 coset4-s2|lift1|stop0|root0|q1|sqt1|pm1|ab2|bt1|gc0        q01=  1.2929e3 phi=0.875 dom=false 1182ms",
+        "eval 121 coset4-s2|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0        q01=  9.7111e2 phi=0.875 dom=false 1013ms",
+        "eval 122 affine-aligned-s2|lift1|stop0|root1|q1|sqt0|pm0|ab2|bt1|gc0 q01=  4.9825e2 phi=0.938 dom=false 1175ms",
+        "eval 123 affine-aligned-s2|lift1|stop0|root0|q1|sqt0|pm0|ab2|bt1|gc0 q01=  3.1629e2 phi=0.938 dom=false 842ms",
+        "eval 124 affine-aligned-s2|lift1|stop0|root0|q1|sqt0|pm1|ab2|bt1|gc1 q01=  4.5878e2 phi=0.938 dom=false 1511ms",
+        "eval 125 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab1|bt1|gc0 q01=  3.6316e2 phi=1.000 dom=false 838ms",
+        "eval 126 affine-aligned-s2|lift1|stop1|root0|q1|sqt1|pm0|ab3|bt1|gc1 q01=  3.8009e2 phi=0.531 dom=false 729ms",
+        "eval 127 coset2-s4|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0        q01=  6.4025e2 phi=0.938 dom=false 579ms",
+        "best so far idx 94 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0 q01=3.1435e2 (128 of 256 evaluations done)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-10/card-04/b10",
+        "search",
+        "--n",
+        "31",
+        "--ell",
+        "9",
+        "--arm",
+        "b",
+        "--state",
+        "research/blindspots_20261018/10-kernel-program-search/raw/state",
+        "--budget",
+        "256",
+        "--max-new",
+        "64"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 98.908,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "search-n31-b-c2",
+      "index": 5,
+      "outputs": {
+        "research/blindspots_20261018/10-kernel-program-search/raw/state/n31-b.jsonl": "23792d0b4b0cc11492b12120c9f1c3f6570cfa13bb58b5add51f441e7ec1f52d"
+      },
+      "seconds": 98.908,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a13310d3322cce844212bcfeba6402f2fa62ae152dfdb46d4d55edebafecdf3d",
+      "stdout_tail": [
+        "eval 173 sub-rand5|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0        q01=  7.2039e2 phi=0.906 dom=false 632ms",
+        "eval 174 affine-aligned-s2|lift1|stop0|root0|q1|sqt0|pm0|ab2|bt1|gc1 q01=  3.4980e2 phi=0.938 dom=false 839ms",
+        "eval 175 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt0|gc1 q01=  3.4806e2 phi=0.938 dom=false 880ms",
+        "eval 176 sub-rand2|lift1|stop1|root0|q1|sqt1|pm0|ab2|bt1|gc0        q01=  7.4592e2 phi=0.875 dom=false 828ms",
+        "eval 177 affine-aligned-s2|lift1|stop0|root0|q1|sqt0|pm0|ab2|bt2|gc0 q01=  3.8911e2 phi=0.938 dom=false 1077ms",
+        "eval 178 affine-aligned-s2|lift0|stop0|root0|q1|sqt1|pm1|ab2|bt1|gc0 q01=  1.6427e3 phi=0.938 dom=false 4108ms",
+        "eval 179 affine-aligned-s2|lift1|stop0|root1|q1|sqt1|pm0|ab2|bt0|gc0 q01=  4.9651e2 phi=0.938 dom=false 1035ms",
+        "eval 180 affine-aligned-s2|lift1|stop1|root0|q1|sqt0|pm0|ab2|bt1|gc0 q01=  3.1629e2 phi=0.938 dom=false 795ms",
+        "eval 181 affine-aligned-s2|lift0|stop0|root2|q1|sqt1|pm0|ab2|bt0|gc0 q01=       inf phi=0.000 dom=true 391ms",
+        "eval 182 coset2-s4|lift1|stop0|root2|q1|sqt1|pm0|ab2|bt0|gc0        q01=  4.4542e3 phi=0.938 dom=false 3661ms",
+        "eval 183 affine-aligned-s2|lift1|stop1|root0|q0|sqt1|pm0|ab2|bt1|gc0 q01=  3.1867e2 phi=0.938 dom=false 843ms",
+        "eval 184 sub-rand4|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0        q01=  7.4740e2 phi=0.875 dom=false 644ms",
+        "eval 185 sub-rand2|lift1|stop0|root0|q1|sqt1|pm1|ab2|bt1|gc0        q01=  9.9222e2 phi=0.875 dom=false 1028ms",
+        "eval 186 affine-aligned-s2|lift1|stop1|root0|q1|sqt1|pm0|ab1|bt1|gc0 q01=  3.6316e2 phi=1.000 dom=false 823ms",
+        "eval 187 affine-aligned-s2|lift1|stop1|root0|q1|sqt1|pm1|ab2|bt1|gc0 q01=  4.1227e2 phi=0.938 dom=false 874ms",
+        "eval 188 affine-anti|lift1|stop0|root0|q1|sqt1|pm1|ab2|bt1|gc0      q01=       inf phi=0.000 dom=false 0ms",
+        "eval 189 affine-aligned-s2|lift1|stop1|root0|q1|sqt0|pm0|ab2|bt0|gc0 q01=  3.1648e2 phi=0.938 dom=false 764ms",
+        "eval 190 affine-rand-s1|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0   q01=  7.7366e2 phi=0.844 dom=false 818ms",
+        "eval 191 affine-aligned-s2|lift1|stop1|root2|q1|sqt0|pm0|ab2|bt0|gc0 q01=  2.4670e3 phi=0.938 dom=false 5703ms",
+        "best so far idx 94 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0 q01=3.1435e2 (192 of 256 evaluations done)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-10/card-04/b10"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-10/card-04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 7,
+  "commit": "a904203ad6277d1b3ef2022ace0ab418fcb6dadb",
+  "dirty_after": [
+    "examples/blindspots_13_rho_negation.rs",
+    "research/blindspots_20261018/10-kernel-program-search/raw/search-n31-b-c2.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw/search-n31-b-c2.stdout.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw/state/n31-b.jsonl"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.samples.18",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.18",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-12.json",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-21-5-3-18-24.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/raw/train-21-5-3-18-24.stderr.log"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
