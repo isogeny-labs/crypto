@@ -151,8 +151,8 @@ STATE_FILES = [f"{ST}/n31-b.jsonl", f"{ST}/n31-c.jsonl", f"{ST}/n31-p.jsonl",
                f"{ST}/n37-b.jsonl", f"{ST}/n37-c.jsonl", f"{ST}/n41-b.jsonl", f"{ST}/n41-c.jsonl"]
 
 
-def finalists(c, capture):
-    for n in (31, 37, 41):
+def finalists(c, capture, ns=(31, 37, 41)):
+    for n in ns:
         if capture:
             c.run(f"finalists-n{n}", ["finalists", "--n", str(n), "--state", ST], 10,
                   stdout=f"{RAW2}/finalists-n{n}.json", outputs=[f"{ST}/finalists-n{n}.json"])
@@ -167,12 +167,17 @@ def heldout(c, n, timeout):
           timeout, stdout=f"{RAW2}/heldout-n{n}.log", outputs=[f"{RAW2}/heldout-n{n}.jsonl"])
 
 
+ABLATE_TIMEOUT = {31: 300, 37: 300, 41: 400}  # full-size smoke alone: 143, 120, 216 s
+
+
 def ablate(nn, n):
-    c = Card(nn, binds=STATE_FILES)
-    finalists(c, False)
+    # an ablation reads only its own cell's archives and finalists
+    binds = [f"{ST}/n{n}-{arm}.jsonl" for arm in ("b", "c", "p") if f"{ST}/n{n}-{arm}.jsonl" in STATE_FILES]
+    c = Card(nn, binds=binds)
+    finalists(c, False, (n,))
     c.run(f"ablate-n{n}", ["ablate", "--n", str(n), "--ell", "9", "--state", ST,
                            "--out", f"{RAW2}/ablate-n{n}.jsonl"],
-          380, stdout=f"{RAW2}/ablate-n{n}.log", outputs=[f"{RAW2}/ablate-n{n}.jsonl"])
+          ABLATE_TIMEOUT[n], stdout=f"{RAW2}/ablate-n{n}.log", outputs=[f"{RAW2}/ablate-n{n}.jsonl"])
     return c
 
 

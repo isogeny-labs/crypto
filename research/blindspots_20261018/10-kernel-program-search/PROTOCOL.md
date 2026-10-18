@@ -461,3 +461,25 @@ Instrument unchanged (sha256 `f69bbce4...`, no bug proved by the first run). Res
 before freezing: each of the six chains resumed from its committed 128-line archive for one
 evaluation (index 128) in a scratch directory, exit 0. Stages 3 and 4 are frozen only after
 stage 2 has run and its archives are committed (`make_r2_cards.py 3`, then `4`).
+
+### R2 stage 3 (2026-10-18; execution plan only, nothing above changes)
+
+Stage 2 completed: all seven archives (`raw-r2/state/n{31,37,41}-b`, `n{31,37,41}-c`, `n31-p`) hold 256 lines and
+are committed. Receipts exist for cards 01, 04, 02-r2, 03-r2, 05-r2, 06-r2, 07-r2, 08-r2, 09-r2, 10-r2, 11-r2,
+12-r2, 13-r2, 19-r2, 20-r2 (all completed); nothing is re-run. The cards without a receipt are the first-run
+cards 14..18 (never run) and the not-yet-frozen 21-r2 and 22-r2. Stage 3 writes `card-14-r2` (finalists, held-out
+n31 and n37), `card-15-r2` (held-out n41, conservation 17/6), `card-16-r2`, `card-17-r2`, `card-18-r2` (ablation, one
+cell each) and `card-21-r2` (conservation 19/7), each binding the committed archives it reads by sha256 and
+recomputing `finalists` inside the card. Instrument unchanged (sha256 `f69bbce4...`); no bug has been proved, so
+no instrument change. One change to the card text against the stage plan: an ablation card runs `finalists` and
+binds archives for its own cell only, and the ablate command's timeout is set from the full-size smoke below
+(`make_r2_cards.py`, `ABLATE_TIMEOUT`).
+
+Full-size smoke before freezing (scratch copy of the final archives, one process at a time, not a result, nothing
+copied back): `finalists` n = 31, 37, 41 exit 0; `heldout` n31 53 s, n37 32 s, n41 46 s; `ablate` n31 143 s, n37 120 s,
+n41 216 s; `conserve` 17/6 53 s, 19/7 102 s; `summarize` (2000 resamples) under 1 s; all exit 0, no panic. Timeouts
+in the cards are 1.8 to 3.5 times these. Cards 14, 15 and 21 (and 16, 17, 18 for their own cell) all rewrite
+`raw-r2/state/finalists-n<N>.json` with identical bytes before reading it, so they must not run at the same time as
+a card that reads the same cell's file; run 14, 15, 21 one after another, then 16, 17, 18.
+Stage 4 (`card-22-r2`, summarize) binds the held-out files, `conserve-17-6.jsonl` and the finalists files, which do
+not exist yet; it is frozen only after stage 3 has run and its outputs are committed (`make_r2_cards.py 4`).
