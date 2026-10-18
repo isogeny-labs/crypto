@@ -4227,6 +4227,14 @@ pub(crate) fn echelon_f2_counted(
 #[path = "f4_rref_tests.rs"]
 mod rref_tests;
 
+#[path = "f4_trace.rs"]
+mod f4_trace;
+pub use f4_trace::{
+    matrix_f4_f2_record, matrix_f4_f2_record_counted, matrix_f4_f2_replay,
+    matrix_f4_f2_replay_checked, matrix_f4_f2_replay_counted, F4Trace, F4TraceStep, ReplayReject,
+    DEFAULT_AUDIT,
+};
+
 // ── Macaulay profile / first fall degree ───────────────────────────
 
 /// Rank measurement of one Macaulay matrix.
