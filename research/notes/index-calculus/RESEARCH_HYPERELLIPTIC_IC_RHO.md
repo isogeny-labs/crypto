@@ -1500,3 +1500,50 @@ registered as round ten; if the plain walk returns to ≈ 1.25 at large
 must be re-measured. (b) Add a native word-arithmetic Jacobian
 `CountedGroup` to `ecbench`, so that `rho.negation` and the IC can be
 measured under the repository's current rules.
+
+## Round ten: is the reference walk's hash the problem? — protocol, written before measuring
+
+**Hypothesis.** Round nine measured the plain DP rho at `S_walk` 1.82
+and 2.10 on the two largest rows, against an ideal of 1.2533, and the
+folded walk losing its whole advantage there. `divisor_hash` is
+`acc ← acc·C + limb` over the Mumford coefficients, ending in `·C + 1`.
+Its low `θ` bits, which decide whether a point is distinguished, depend
+only on the low `θ` bits of each coefficient. The branch bits are
+`(h ≫ 32) mod 16`, reached through one multiply per limb, with limbs that
+are coefficients below `p ≤ 251`. A branch function that is not close to
+a random function of the point makes an `r`-adding walk correlated with
+its position, which costs steps, and more of them as `N` grows.
+
+**The change.** One variable only: the same walks with the hash passed
+through the SplitMix64 finaliser (`z ^= z ≫ 30; z *= 0xbf58476d1ce4e5b9;
+z ^= z ≫ 27; z *= 0x94d049bb133111eb; z ^= z ≫ 31`) before it is used for
+the branch choice, the distinguished-point test and the look-ahead.
+Same branches, seeds, `θ`, gap limit, look-ahead and accounting. Four
+arms on round seven's 18 instances, 40 seeds each: plain and folded,
+each with the old and the mixed hash. The old-hash arms must reproduce
+round nine exactly (pinned output).
+
+**Registered hypotheses** (counted operations; means of 40 seeds,
+whose standard error is about 0.08 in `S_walk`):
+
+- **H1 (the hash is the cause).** On the rows with `N ≥ 10⁵`, the median
+  plain `S_walk` with the mixed hash is at most **1.45**, and on the two
+  largest rows each is at most 1.55. Falsified otherwise: then the hash
+  is not the cause, and the next suspect is the walk structure itself
+  (`r = 16` branches, 8-bit branch coefficients) or the escape logic.
+- **H2 (the fold recovers).** With the mixed hash, the median
+  folded/plain walk-operation ratio on the rows with `N ≥ 10⁵` is at most
+  **0.80**, which is round nine's R1 re-tested.
+- **H3 (control).** On the rows with `N ≤ 6·10⁴`, where round nine's
+  plain walk was already near ideal (1.05 – 1.42), the mixed hash moves
+  the median plain `S_walk` by less than 0.15. A large move there would
+  mean the change does something other than fix mixing.
+- **H4.** Every run verified.
+
+**What follows.** If H1 holds, every IC/rho ratio in this thread was
+flattered by the broken reference, by up to the ratio of the two plain
+`S_walk` columns, and the round-seven table is re-measured against the
+mixed-hash walk (the folded one, if H2 holds). If H1 fails, the
+reference stays and the walk structure is examined next.
+
+**Expected class: accounting**, against index calculus.
