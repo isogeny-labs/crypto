@@ -28,7 +28,7 @@ for ax, bits in zip(axs, (40, 44, 48)):
         ax.plot(xs, bmin, "v", ms=4, color=cols[a], alpha=.45)
     for y, s, ls in ((1.0, "1.0 (un-quotiented Teske walk)", "-"), (1.35, "1.35 (preregistered reach)", "--"), (1.414, "sqrt 2 (ideal)", ":")):
         ax.axhline(y, color="k", lw=.8, ls=ls)
-        if bits == 48: ax.text(3.45, y + .01, s, ha="right", va="bottom", fontsize=6.5)
+        if bits == 44: ax.text(-0.45, y + .01, s, ha="left", va="bottom", fontsize=6.5)
     ax.set_xticks(range(4)); ax.set_xticklabels([str(r) for r in rs])
     ax.set_xlabel("jump-table size r"); ax.set_title(f"N ~ 2^{bits}, 64 targets, DP bits {bits//4}", fontsize=10)
     ax.grid(alpha=.25); ax.set_ylim(0.15, 1.95)
