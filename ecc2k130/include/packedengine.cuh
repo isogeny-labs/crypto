@@ -470,11 +470,14 @@ struct PackedCudaEngine : CudaEngine<CfgF131> {
         printf("packed sigma fused late y: %d\n", ECC_SIGMA_FUSED_LATE_Y);
         printf("packed sigma fused shared slots: %d\n", ECC_SIGMA_FUSED_SHARED_SLOTS);
         printf("packed witness: %d\n", ECC_WITNESS);
+        printf("packed sigma sign: %d\n", ECC_SIGMA_SIGN);
         printf("packed L2 persist: %d\n", ECC_PACKED_L2_PERSIST);
+        printf("packed tail layout: %d\n", ECC_PACKED_TAIL_LAYOUT);
         printf("packed direct reduction: %d\n", ECC_PACKED_DIRECT_REDUCE);
         printf("packed add combine: %d\n", ECC_PACKED_ADD_COMBINE);
         printf("packed generated product: %d\n", ECC_PACKED_GENERATED_PRODUCT);
         printf("packed native carryless multiply: %d\n", ECC_PACKED_CLMAD);
+        printf("packed clmad self-addend: %d\n", ECC_PACKED_CLMAD_SELF);
         printf("packed native full product: %d\n", ECC_PACKED_NATIVE_PRODUCT);
         printf("packed native reduction: %d\n", ECC_PACKED_NATIVE_REDUCE);
         printf("packed fused sigma: %d\n", ECC_PACKED_FUSED_SIGMA);
