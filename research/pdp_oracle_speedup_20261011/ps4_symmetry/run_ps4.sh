@@ -6,7 +6,7 @@
 # pinning) and is a note, not a result.
 #
 # STAGES (space separated, default: all):
-#   build checks panel run torsion control summary
+#   build checks panel run torsion control summary figures pdf
 # A stage skips what its marker file in raw/done/ says is finished, so an interrupted run is
 # resumed without overwriting any record; a re-run of a finished stage needs its marker removed.
 set -euo pipefail
@@ -18,7 +18,7 @@ C=$S/baseline_v1/corpus
 BIN=target/release/examples/pdp_ps4
 OPC=target/opcount/release/examples/pdp_ps4
 PANEL=target/release/examples/hamming_nb_sat_panel
-STAGES=${STAGES:-"build checks panel run torsion control summary"}
+STAGES=${STAGES:-"build checks panel run torsion control summary figures pdf"}
 SEED=20261011
 BUSY="python3 tools/isolated_bench.py busy --wait --"
 mkdir -p "$OUT/done" "$OUT/panel_work"
@@ -28,7 +28,7 @@ DEGREES="11 23 29 33 35 39 41"
 # The panel's own exact oracle (pair table on the library's inversion) runs in bounded time for
 # every w = 2 setting and for w = 3 at n = 11, 23 and 29; at the larger w = 3 bases it needs
 # hours per target (see README), and the pair-table oracle of the example stands alone there.
-PANEL_SETTINGS="11:2 11:3 23:2 23:3 29:2 29:3 33:2 33:3 35:2 39:2 41:2"
+PANEL_SETTINGS="11:2 11:3 23:2 23:3 29:2 29:3 33:2 33:3 35:2 35:3 39:2 41:2"
 # Torsion test targets: all eight, except at the three largest w = 3 bases (time): targets 0
 # (uniform) and 6 (planted).
 torsion_only() { if [ "$2" = 3 ] && [ "$1" -ge 35 ]; then echo "--only 0,6"; fi; }
@@ -141,6 +141,22 @@ if stage control; then
 fi
 
 if stage summary; then
-  "$BIN" summary --raw "$OUT" > "$OUT/summary.md"
-  echo "wrote $OUT/summary.md"
+  # The summary subcommand was extended after the measurements (host attribution of the wall notes,
+  # totals, the plotting data); manifest_summary.txt hashes the sources it was built from.  The
+  # measurement subcommands (check-*, run, torsion, control) are byte-identical to the build stage's.
+  SUMBIN=target/ps4_summary/release/examples/pdp_ps4
+  CARGO_TARGET_DIR=target/ps4_summary $BUSY cargo build --release --example pdp_ps4
+  sha256sum "$SUMBIN" examples/pdp_ps4/*.rs > "$OUT/manifest_summary.txt"
+  "$SUMBIN" summary --raw "$OUT" --data "$OUT/plot_data.json" > "$OUT/summary.md"
+  echo "wrote $OUT/summary.md and $OUT/plot_data.json"
+fi
+
+# The run report (research-visuals): figures from the recorded values, then the Typst PDF.
+REPORT=$S/reports/run-20261011T2346Z
+if stage figures; then
+  mkdir -p "$REPORT"
+  /tmp/report-venv/bin/python "$D/plot_ps4.py" "$OUT/plot_data.json" "$REPORT"
+fi
+if stage pdf; then
+  /tmp/report-venv/bin/python -c "import typst; typst.compile('$REPORT/ps4_report.typ', output='$REPORT/ps4_report.pdf')"
 fi
