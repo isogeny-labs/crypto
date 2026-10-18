@@ -53,7 +53,7 @@ pub fn class_number(d: i64) -> u64 {
     let d_abs = (-d) as u64;
     let bmax = ((d_abs as f64 / 3.0).sqrt() as u64) + 1;
     let mut h = 0u64;
-    let mut b = if d_abs % 2 == 0 { 0u64 } else { 1u64 };
+    let mut b = if d_abs.is_multiple_of(2) { 0u64 } else { 1u64 };
     while b <= bmax {
         let n = (b * b + d_abs) / 4; // = ac
         if n == 0 {
@@ -114,7 +114,10 @@ pub fn class_number_order(h_k: u64, dk: i64, d: u64) -> u64 {
         num *= (q as i128 - chi as i128) as u128;
         den *= q as u128;
     }
-    assert!(num % den == 0, "class number formula is not integral");
+    assert!(
+        num.is_multiple_of(den),
+        "class number formula is not integral"
+    );
     (num / den) as u64
 }
 
@@ -139,7 +142,10 @@ pub fn class_summary(t: i64, q_big: f64, d_abs: u64, h_full_check: bool) -> serd
             })
         })
         .collect();
-    let total: u64 = strata.iter().map(|s| s["class_number"].as_u64().unwrap()).sum();
+    let total: u64 = strata
+        .iter()
+        .map(|s| s["class_number"].as_u64().unwrap())
+        .sum();
     let h_full = if h_full_check && d_abs < 1 << 44 {
         Some(class_number(-(d_abs as i64)))
     } else {
@@ -147,9 +153,7 @@ pub fn class_summary(t: i64, q_big: f64, d_abs: u64, h_full_check: bool) -> serd
     };
     let primes: Vec<serde_json::Value> = factor(f)
         .iter()
-        .map(|&(ell, e)| {
-            json!({"ell": ell, "depth": e, "crater": crater_kind(kronecker(dk, ell))})
-        })
+        .map(|&(ell, e)| json!({"ell": ell, "depth": e, "crater": crater_kind(kronecker(dk, ell))}))
         .collect();
     json!({
         "trace": t, "q": q_big, "disc": -(d_abs as i64), "fundamental_disc": dk,

@@ -57,13 +57,17 @@ pub struct Arm {
 }
 
 fn vget(v: &Value, k: &str) -> u64 {
-    v[k].as_u64().unwrap_or_else(|| panic!("walk.json: missing {k}"))
+    v[k].as_u64()
+        .unwrap_or_else(|| panic!("walk.json: missing {k}"))
 }
 
 /// Parse an instance `[Px, Py, Qx, Qy]`.
 fn inst_of(v: &Value) -> Option<((u64, u64), (u64, u64))> {
     let a = v.as_array()?;
-    Some(((a[0].as_u64()?, a[1].as_u64()?), (a[2].as_u64()?, a[3].as_u64()?)))
+    Some((
+        (a[0].as_u64()?, a[1].as_u64()?),
+        (a[2].as_u64()?, a[3].as_u64()?),
+    ))
 }
 
 pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Path) {
@@ -76,7 +80,12 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
         a: vget(root, "a"),
         b: vget(root, "b"),
     };
-    let measured: Vec<usize> = walk["measured"].as_array().unwrap().iter().map(|v| v.as_u64().unwrap() as usize).collect();
+    let measured: Vec<usize> = walk["measured"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| v.as_u64().unwrap() as usize)
+        .collect();
     let verts = walk["vertices"].as_array().unwrap();
     let n_src = walk["sources"].as_array().unwrap().len();
     let dp_bits = params
@@ -91,7 +100,9 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
         a: vget(&verts[v], "a"),
         b: vget(&verts[v], "b"),
     };
-    let inst_at = |v: usize, s: usize| inst_of(&verts[v]["inst"][s]).unwrap_or_else(|| panic!("no instance of source {s} at v{v}"));
+    let inst_at = |v: usize, s: usize| {
+        inst_of(&verts[v]["inst"][s]).unwrap_or_else(|| panic!("no instance of source {s} at v{v}"))
+    };
     let transport = |v: usize| verts[v]["transport"]["ms"].as_f64().unwrap_or(0.0);
     let meta_of = |v: usize| {
         json!({"levels": verts[v]["levels"], "conductor": verts[v]["conductor"], "dist": verts[v]["dist"],
@@ -101,10 +112,23 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
     };
     let is_prime = !f.char2();
     let is_koblitz = f.char2() && e0.b == 1 && e0.a <= 1;
-    let j0 = is_prime && (walk["root"]["j"].as_u64() == Some(0) || walk["root"]["j"].as_u64() == Some(1728 % ((f as &dyn std::any::Any).downcast_ref::<Fp>().unwrap().p)));
+    let j0 = is_prime
+        && (walk["root"]["j"].as_u64() == Some(0)
+            || walk["root"]["j"].as_u64()
+                == Some(1728 % ((f as &dyn std::any::Any).downcast_ref::<Fp>().unwrap().p)));
 
     let mut arms: Vec<Arm> = Vec::new();
-    let mk = |label: String, kind: &str, vertex: Option<usize>, source: usize, curve: Curve, inst: ((u64, u64), (u64, u64)), cfg: RhoCfg, folder: Folder, seed_offset: u64, transport_ms: f64, meta: Value| Arm {
+    let mk = |label: String,
+              kind: &str,
+              vertex: Option<usize>,
+              source: usize,
+              curve: Curve,
+              inst: ((u64, u64), (u64, u64)),
+              cfg: RhoCfg,
+              folder: Folder,
+              seed_offset: u64,
+              transport_ms: f64,
+              meta: Value| Arm {
         label,
         kind: kind.into(),
         vertex,
@@ -126,7 +150,19 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
     match params.mode.as_str() {
         "class" => {
             for &v in &measured {
-                arms.push(mk(format!("v{v}"), "isogenous", Some(v), 0, curve_of(v), inst_at(v, 0), base_cfg, Folder::none(), 0, transport(v), meta_of(v)));
+                arms.push(mk(
+                    format!("v{v}"),
+                    "isogenous",
+                    Some(v),
+                    0,
+                    curve_of(v),
+                    inst_at(v, 0),
+                    base_cfg,
+                    Folder::none(),
+                    0,
+                    transport(v),
+                    meta_of(v),
+                ));
             }
         }
         "generators" => {
@@ -142,7 +178,19 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
                     let pg = f.ec_mul(&c, Some(p), r).unwrap();
                     let qg = f.ec_mul(&c, Some(q), r).unwrap();
                     assert_eq!(f.ec_mul(&c, Some(pg), k_secret), Some(qg));
-                    let mut arm = mk(format!("v{v}g{g}"), "generator", Some(v), 0, c, (pg, qg), base_cfg, Folder::none(), 0, transport(v), meta_of(v));
+                    let mut arm = mk(
+                        format!("v{v}g{g}"),
+                        "generator",
+                        Some(v),
+                        0,
+                        c,
+                        (pg, qg),
+                        base_cfg,
+                        Folder::none(),
+                        0,
+                        transport(v),
+                        meta_of(v),
+                    );
                     arm.generator = Some((g, r));
                     arm.meta["generator"] = json!({"index": g, "r": r, "r_bits": 64 - r.leading_zeros(), "r_popcount": r.count_ones(), "Px": pg.0});
                     arms.push(arm);
@@ -152,8 +200,22 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
         "shift" => {
             for s in 0..n_src {
                 for &v in &measured {
-                    let Some(inst) = inst_of(&verts[v]["inst"][s]) else { continue };
-                    let mut arm = mk(format!("s{s}v{v}"), "shift", Some(v), s, curve_of(v), inst, base_cfg, Folder::none(), 0, transport(v), meta_of(v));
+                    let Some(inst) = inst_of(&verts[v]["inst"][s]) else {
+                        continue;
+                    };
+                    let mut arm = mk(
+                        format!("s{s}v{v}"),
+                        "shift",
+                        Some(v),
+                        s,
+                        curve_of(v),
+                        inst,
+                        base_cfg,
+                        Folder::none(),
+                        0,
+                        transport(v),
+                        meta_of(v),
+                    );
                     arm.meta["source_vertex"] = walk["sources"][s]["vertex"].clone();
                     arms.push(arm);
                 }
@@ -170,7 +232,19 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
                 let (m, map) = fp.ec_iso_model(&e0, &mut rng);
                 let (cp, cq) = (map(root_inst.0), map(root_inst.1));
                 assert!(fp.ec_on(&m, Some(cp)) && fp.ec_on(&m, Some(cq)));
-                arms.push(mk(format!("iso{c}"), "iso-control", None, 0, m, (cp, cq), base_cfg, Folder::none(), 0, 0.0, json!({"u_model": [m.a, m.b]})));
+                arms.push(mk(
+                    format!("iso{c}"),
+                    "iso-control",
+                    None,
+                    0,
+                    m,
+                    (cp, cq),
+                    base_cfg,
+                    Folder::none(),
+                    0,
+                    0.0,
+                    json!({"u_model": [m.a, m.b]}),
+                ));
             } else if let Some(f2) = (f as &dyn std::any::Any).downcast_ref::<F2m>() {
                 // the same curve in F_2[z]/(poly_{c+1}) via a root of poly_0 there
                 let alt = F2m::new(f2.m, F2m::irreducible_poly(f2.m, c + 1));
@@ -178,18 +252,45 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
                 let rs = poly::roots(&alt, &poly0, &mut rng);
                 let root_el = rs[0];
                 let emb = |a: u64| f2.embed(&alt, root_el, a);
-                let m = Curve { a: emb(e0.a), b: emb(e0.b) };
+                let m = Curve {
+                    a: emb(e0.a),
+                    b: emb(e0.b),
+                };
                 let cp = (emb(root_inst.0 .0), emb(root_inst.0 .1));
                 let cq = (emb(root_inst.1 .0), emb(root_inst.1 .1));
                 assert!(alt.ec_on(&m, Some(cp)) && alt.ec_on(&m, Some(cq)));
                 assert_eq!(alt.ec_mul(&m, Some(cp), k_secret), Some(cq));
-                let mut arm = mk(format!("rep{c}"), "iso-control", None, 0, m, (cp, cq), base_cfg, Folder::none(), 0, 0.0, json!({"alt_poly": format!("{:#x}", alt.poly)}));
+                let mut arm = mk(
+                    format!("rep{c}"),
+                    "iso-control",
+                    None,
+                    0,
+                    m,
+                    (cp, cq),
+                    base_cfg,
+                    Folder::none(),
+                    0,
+                    0.0,
+                    json!({"alt_poly": format!("{:#x}", alt.poly)}),
+                );
                 arm.alt_field = Some(alt);
                 arms.push(arm);
             }
         }
         if params.plants {
-            arms.push(mk("aa".into(), "aa-replica", Some(0), 0, e0, root_inst, base_cfg, Folder::none(), 0x9999, 0.0, json!({"note": "root under an independent seed set"})));
+            arms.push(mk(
+                "aa".into(),
+                "aa-replica",
+                Some(0),
+                0,
+                e0,
+                root_inst,
+                base_cfg,
+                Folder::none(),
+                0x9999,
+                0.0,
+                json!({"note": "root under an independent seed set"}),
+            ));
             arms.push(mk("plant-neg".into(), "plant", Some(0), 0, e0, root_inst, base_cfg, Folder { fold: Fold::Neg, ..Folder::none() }, 0, 0.0, json!({"expected_ratio": 1.0 / 2f64.sqrt(), "note": "negation map: expected 1/√2 of the unfolded mean"})));
             let cfg4 = RhoCfg { r: 4, ..base_cfg };
             arms.push(mk("plant-r4".into(), "plant", Some(0), 0, e0, root_inst, cfg4, Folder::none(), 0, 0.0, json!({"expected_ratio": (1.0 / (1.0 - 1.0 / 4.0f64)).sqrt() / (1.0 / (1.0 - 1.0 / params.r as f64)).sqrt(), "note": "4-adding walk: Teske's 1/sqrt(1 − 1/r) relative to the r used"})));
@@ -226,7 +327,14 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
         .collect();
     jobs.shuffle(&mut rng);
     let seed_base = params.seed.wrapping_mul(0x1000_0000_01b3);
-    eprintln!("rho: {} arms x {} trials = {} solves (dp_bits {}, r {})", arms.len(), params.trials, jobs.len(), dp_bits, params.r);
+    eprintln!(
+        "rho: {} arms x {} trials = {} solves (dp_bits {}, r {})",
+        arms.len(),
+        params.trials,
+        jobs.len(),
+        dp_bits,
+        params.r
+    );
     let t_rho = Instant::now();
     let results: Vec<(usize, u64, Solve)> = jobs
         .par_iter()
@@ -249,7 +357,8 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
 
     // records
     fs::create_dir_all(out).unwrap();
-    let mut csv = String::from("arm,kind,vertex,source,generator,seed,iters,restarts,dps,escapes,ns\n");
+    let mut csv =
+        String::from("arm,kind,vertex,source,generator,seed,iters,restarts,dps,escapes,ns\n");
     let mut by_arm: Vec<Vec<Solve>> = vec![Vec::new(); arms.len()];
     let mut sorted: Vec<&(usize, u64, Solve)> = results.iter().collect();
     sorted.sort_by_key(|r| (r.0, r.1));
@@ -293,8 +402,13 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
         "generators" => "generator",
         _ => "shift",
     };
-    let main_idx: Vec<usize> = (0..arms.len()).filter(|&i| arms[i].kind == main_kind).collect();
-    let pooled: Vec<f64> = main_idx.iter().flat_map(|&i| iters_of(&by_arm[i])).collect();
+    let main_idx: Vec<usize> = (0..arms.len())
+        .filter(|&i| arms[i].kind == main_kind)
+        .collect();
+    let pooled: Vec<f64> = main_idx
+        .iter()
+        .flat_map(|&i| iters_of(&by_arm[i]))
+        .collect();
     let pooled_mean = stats::mean(&pooled);
     let pooled_var = stats::var(&pooled);
     let m_tests = main_idx.len().max(1);
@@ -346,15 +460,24 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
         }
         if let Some(lv) = m["levels"].as_object() {
             for (l, v) in lv {
-                groups.entry(format!("ell{l}:level{v}")).or_default().push(i);
+                groups
+                    .entry(format!("ell{l}:level{v}"))
+                    .or_default()
+                    .push(i);
             }
         }
         if let Some(d) = m["dist"].as_u64() {
             groups.entry(format!("dist:{d}")).or_default().push(i);
         }
         if let Some(e) = m["edge"].as_object() {
-            groups.entry(format!("parent_ell:{}", e["ell"])).or_default().push(i);
-            groups.entry(format!("field_degree:{}", e["field_degree"])).or_default().push(i);
+            groups
+                .entry(format!("parent_ell:{}", e["ell"]))
+                .or_default()
+                .push(i);
+            groups
+                .entry(format!("field_degree:{}", e["field_degree"]))
+                .or_default()
+                .push(i);
         }
         if let Some(s) = m["source_vertex"].as_u64() {
             groups.entry(format!("source:{s}")).or_default().push(i);
@@ -365,7 +488,10 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
             }
         }
         if let Some(g) = a.generator {
-            groups.entry(format!("generator:{}", g.0)).or_default().push(i);
+            groups
+                .entry(format!("generator:{}", g.0))
+                .or_default()
+                .push(i);
         }
     }
     let mut group_json: Vec<Value> = groups
@@ -387,8 +513,16 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
 
     // across-arm tests
     let main_groups: Vec<Vec<f64>> = main_idx.iter().map(|&i| iters_of(&by_arm[i])).collect();
-    let (h, df, p_kw) = if main_groups.len() > 1 { stats::kruskal_wallis(&main_groups) } else { (0.0, 0, 1.0) };
-    let (fstat, p_f, vratio) = if main_groups.len() > 1 { stats::anova(&main_groups) } else { (0.0, 1.0, 1.0) };
+    let (h, df, p_kw) = if main_groups.len() > 1 {
+        stats::kruskal_wallis(&main_groups)
+    } else {
+        (0.0, 0, 1.0)
+    };
+    let (fstat, p_f, vratio) = if main_groups.len() > 1 {
+        stats::anova(&main_groups)
+    } else {
+        (0.0, 1.0, 1.0)
+    };
     let arm_means: Vec<f64> = main_groups.iter().map(|g| stats::mean(g)).collect();
     let expected_sd_of_mean = (pooled_var / params.trials as f64).sqrt();
     let flagged: Vec<String> = arm_json
@@ -414,8 +548,16 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
         for v in keys {
             let idx = &by_v[&v];
             let gs: Vec<Vec<f64>> = idx.iter().map(|&i| iters_of(&by_arm[i])).collect();
-            let (h, df, p) = if gs.len() > 1 { stats::kruskal_wallis(&gs) } else { (0.0, 0, 1.0) };
-            let (fs, pf, vr) = if gs.len() > 1 { stats::anova(&gs) } else { (0.0, 1.0, 1.0) };
+            let (h, df, p) = if gs.len() > 1 {
+                stats::kruskal_wallis(&gs)
+            } else {
+                (0.0, 0, 1.0)
+            };
+            let (fs, pf, vr) = if gs.len() > 1 {
+                stats::anova(&gs)
+            } else {
+                (0.0, 1.0, 1.0)
+            };
             let means: Vec<f64> = gs.iter().map(|g| stats::mean(g)).collect();
             let all: Vec<f64> = gs.iter().flatten().copied().collect();
             // Spearman correlations of the generator means with generator features
@@ -423,8 +565,12 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
             let corr: serde_json::Map<String, Value> = feats
                 .iter()
                 .filter_map(|&ft| {
-                    let xs: Vec<f64> = idx.iter().filter_map(|&i| arms[i].meta["generator"][ft].as_u64().map(|x| x as f64)).collect();
-                    (xs.len() == means.len() && xs.len() > 2).then(|| (ft.to_string(), json!(spearman(&xs, &means))))
+                    let xs: Vec<f64> = idx
+                        .iter()
+                        .filter_map(|&i| arms[i].meta["generator"][ft].as_u64().map(|x| x as f64))
+                        .collect();
+                    (xs.len() == means.len() && xs.len() > 2)
+                        .then(|| (ft.to_string(), json!(spearman(&xs, &means))))
                 })
                 .collect();
             per_vertex.push(json!({
@@ -450,23 +596,43 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
         let mut by_t: HashMap<usize, Vec<f64>> = HashMap::new();
         let mut by_s: HashMap<usize, Vec<f64>> = HashMap::new();
         for &i in &main_idx {
-            by_t.entry(arms[i].vertex.unwrap()).or_default().extend(iters_of(&by_arm[i]));
-            by_s.entry(arms[i].source).or_default().extend(iters_of(&by_arm[i]));
+            by_t.entry(arms[i].vertex.unwrap())
+                .or_default()
+                .extend(iters_of(&by_arm[i]));
+            by_s.entry(arms[i].source)
+                .or_default()
+                .extend(iters_of(&by_arm[i]));
         }
         let sst: f64 = pooled.iter().map(|x| (x - grand).powi(2)).sum();
-        let eta = |m: &HashMap<usize, Vec<f64>>| m.values().map(|g| g.len() as f64 * (stats::mean(g) - grand).powi(2)).sum::<f64>() / sst;
+        let eta = |m: &HashMap<usize, Vec<f64>>| {
+            m.values()
+                .map(|g| g.len() as f64 * (stats::mean(g) - grand).powi(2))
+                .sum::<f64>()
+                / sst
+        };
         let tgroups: Vec<Vec<f64>> = by_t.values().cloned().collect();
         let sgroups: Vec<Vec<f64>> = by_s.values().cloned().collect();
         let (ht, dft, pt) = stats::kruskal_wallis(&tgroups);
-        let (hs, dfs, ps) = if sgroups.len() > 1 { stats::kruskal_wallis(&sgroups) } else { (0.0, 0, 1.0) };
+        let (hs, dfs, ps) = if sgroups.len() > 1 {
+            stats::kruskal_wallis(&sgroups)
+        } else {
+            (0.0, 0, 1.0)
+        };
         per_vertex.push(json!({"two_way": {"eta2_target": eta(&by_t), "eta2_source": eta(&by_s),
                                             "kw_target": {"H": ht, "df": dft, "p": pt}, "kw_source": {"H": hs, "df": dfs, "p": ps}}}));
     }
 
     let host = fs::read_to_string("/proc/cpuinfo").ok().and_then(|c| {
-        c.lines().find(|l| l.starts_with("model name")).map(|l| l.split(':').nth(1).unwrap().trim().to_string())
+        c.lines()
+            .find(|l| l.starts_with("model name"))
+            .map(|l| l.split(':').nth(1).unwrap().trim().to_string())
     });
-    let controls: Vec<Solve> = arms.iter().enumerate().filter(|(_, a)| a.kind == "iso-control").flat_map(|(i, _)| by_arm[i].iter().copied()).collect();
+    let controls: Vec<Solve> = arms
+        .iter()
+        .enumerate()
+        .filter(|(_, a)| a.kind == "iso-control")
+        .flat_map(|(i, _)| by_arm[i].iter().copied())
+        .collect();
     let out_json = json!({
         "schema": "isoclass-rho/v1",
         "command": params.command,
@@ -491,10 +657,17 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
         "per_vertex": per_vertex,
         "shift_matrix": matrix,
     });
-    fs::write(out.join("results.json"), serde_json::to_string_pretty(&out_json).unwrap()).unwrap();
+    fs::write(
+        out.join("results.json"),
+        serde_json::to_string_pretty(&out_json).unwrap(),
+    )
+    .unwrap();
 
     println!("\n{} mode: {} arms, {} solves, all correct (k = {k_secret}, n = {n}); expected sqrt(pi n/2) = {expected:.0}", params.mode, arms.len(), results.len());
-    println!("{:<14}{:<13}{:>12}{:>12}{:>12}{:>9}{:>9}{:>8}{:>7}", "arm", "kind", "min it", "mean it", "max it", "mean ms", "ns/op", "ratio", "z");
+    println!(
+        "{:<14}{:<13}{:>12}{:>12}{:>12}{:>9}{:>9}{:>8}{:>7}",
+        "arm", "kind", "min it", "mean it", "max it", "mean ms", "ns/op", "ratio", "z"
+    );
     for a in &arm_json {
         let s = &a["summary"];
         println!(
@@ -535,7 +708,9 @@ fn spearman(x: &[f64], y: &[f64]) -> f64 {
     let (rx, ry) = (rank(x), rank(y));
     let (mx, my) = (stats::mean(&rx), stats::mean(&ry));
     let num: f64 = rx.iter().zip(&ry).map(|(a, b)| (a - mx) * (b - my)).sum();
-    let den = (rx.iter().map(|a| (a - mx).powi(2)).sum::<f64>() * ry.iter().map(|b| (b - my).powi(2)).sum::<f64>()).sqrt();
+    let den = (rx.iter().map(|a| (a - mx).powi(2)).sum::<f64>()
+        * ry.iter().map(|b| (b - my).powi(2)).sum::<f64>())
+    .sqrt();
     if den == 0.0 {
         0.0
     } else {

@@ -24,7 +24,6 @@ pub type Pt = Option<(u64, u64)>;
 /// extension field that contains them.
 pub trait Ring {
     type El: Clone + PartialEq + std::fmt::Debug;
-    fn char2(&self) -> bool;
     fn zero(&self) -> Self::El;
     fn one(&self) -> Self::El;
     /// The integer `k` as a ring element (`k·1`).
@@ -34,7 +33,6 @@ pub trait Ring {
     fn is_zero(&self, a: &Self::El) -> bool;
     fn add(&self, a: &Self::El, b: &Self::El) -> Self::El;
     fn sub(&self, a: &Self::El, b: &Self::El) -> Self::El;
-    fn neg(&self, a: &Self::El) -> Self::El;
     fn mul(&self, a: &Self::El, b: &Self::El) -> Self::El;
     fn sqr(&self, a: &Self::El) -> Self::El {
         self.mul(a, a)
@@ -45,8 +43,6 @@ pub trait Ring {
 /// A base field on `u64` words, with the curve form that lives over it.
 pub trait Fq: Copy + Send + Sync + 'static {
     fn char2(&self) -> bool;
-    /// `q` as a decimal string (for records).
-    fn q_string(&self) -> String;
     /// `⌊log₂ q⌋ + 1`.
     fn bits(&self) -> u32;
     /// `q` in base-2 digits, least significant first, for powering by `q`.
@@ -73,10 +69,6 @@ pub trait Fq: Copy + Send + Sync + 'static {
     /// The integer `k` as a field element.
     fn fsmall(&self, k: u64) -> u64;
     fn frandom(&self, rng: &mut SmallRng) -> u64;
-    /// `a^q`-Frobenius of an element of `F_q[y]/(m)`: `y ↦ y^q` applied to
-    /// `a` (coefficients are fixed).  Implemented in `poly` through
-    /// [`Fq::q_bits`] (odd `q`) or `m` squarings (`q = 2^m`).
-    fn fname(&self) -> String;
 
     // ----- the curve form over this field
     fn ec_j(&self, c: &Curve) -> Option<u64>;
@@ -101,11 +93,16 @@ pub trait Fq: Copy + Send + Sync + 'static {
     fn ec_random(&self, c: &Curve, rng: &mut SmallRng) -> (u64, u64);
     /// An isomorphic model drawn from `rng` with the map on points: a
     /// change of coordinates, the same curve.
-    fn ec_iso_model(&self, c: &Curve, rng: &mut SmallRng) -> (Curve, Box<dyn Fn((u64, u64)) -> (u64, u64) + Send + Sync>);
+    fn ec_iso_model(
+        &self,
+        c: &Curve,
+        rng: &mut SmallRng,
+    ) -> (Curve, Box<dyn Fn((u64, u64)) -> (u64, u64) + Send + Sync>);
     /// `x(2P)` from `x(P)` in any ring over this field; `None` if `2P = O`.
     fn x_dbl<R: Ring>(&self, r: &R, c: &Curve, x: &R::El) -> Option<R::El>;
     /// `x(P + Q)` from `x(P)`, `x(Q)` and `x(P − Q)`; `None` if `x(P) = x(Q)`.
-    fn x_sum<R: Ring>(&self, r: &R, c: &Curve, x1: &R::El, x2: &R::El, xd: &R::El) -> Option<R::El>;
+    fn x_sum<R: Ring>(&self, r: &R, c: &Curve, x1: &R::El, x2: &R::El, xd: &R::El)
+        -> Option<R::El>;
     /// `x(P)` as a packed word used by the rho walk's partition and
     /// distinguished-point test.
     fn hash_x(&self, x: u64) -> u64 {
@@ -153,7 +150,7 @@ pub fn is_prime(n: u64) -> bool {
         return false;
     }
     for q in [2u64, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
-        if n % q == 0 {
+        if n.is_multiple_of(q) {
             return n == q;
         }
     }
@@ -183,7 +180,7 @@ pub fn gcd(mut a: u64, mut b: u64) -> u64 {
 }
 
 fn brent(n: u64) -> u64 {
-    if n % 2 == 0 {
+    if n.is_multiple_of(2) {
         return 2;
     }
     let mut c = 1u64;
@@ -232,7 +229,7 @@ pub fn factor(mut n: u64) -> Vec<(u64, u32)> {
         None => out.push((q, 1)),
     };
     for q in [2u64, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47] {
-        while n % q == 0 {
+        while n.is_multiple_of(q) {
             push(q);
             n /= q;
         }
@@ -291,14 +288,76 @@ impl Fp {
     pub fn rhs(&self, c: &Curve, x: u64) -> u64 {
         self.fadd(self.fmul(self.fadd(self.fmul(x, x), c.a), x), c.b)
     }
+    /// A `k`-th root of `c` for a prime `k` (Adleman–Manders–Miller), or
+    /// `None` if `c` is not a `k`-th power (or the Sylow subgroup is too
+    /// large to search).
+    pub fn kth_root(&self, c: u64, k: u64) -> Option<u64> {
+        let p = self.p;
+        if c == 0 {
+            return Some(0);
+        }
+        let (mut t, mut s) = (p - 1, 0u32);
+        while t.is_multiple_of(k) {
+            t /= k;
+            s += 1;
+        }
+        if s == 0 {
+            return Some(powmod(c, inv_mod(k % (p - 1), p - 1), p));
+        }
+        if powmod(c, (p - 1) / k, p) != 1 {
+            return None;
+        }
+        let mut g = 2u64;
+        while powmod(g, (p - 1) / k, p) == 1 {
+            g += 1;
+        }
+        let rho = powmod(g, t, p); // order k^s
+        let ks = k.pow(s);
+        if ks > 1 << 22 {
+            return None;
+        }
+        let (x, w) = if t == 1 {
+            (1u64, c)
+        } else {
+            let alpha = inv_mod(k % t, t);
+            // k·alpha = 1 + m·t
+            let m = ((k as u128 * alpha as u128 - 1) / t as u128) as u64;
+            (powmod(c, alpha, p), powmod(powmod(c, t, p), m, p))
+        };
+        // w = rho^j in the Sylow subgroup; x^k = c·w
+        let mut pw = 1u64;
+        for j in 0..ks {
+            if pw == w {
+                if j % k != 0 {
+                    return None;
+                }
+                let r = mulmod(x, inv_mod(powmod(rho, j / k, p), p), p);
+                debug_assert_eq!(powmod(r, k, p), c);
+                return Some(r);
+            }
+            pw = mulmod(pw, rho, p);
+        }
+        None
+    }
+    /// `u` with `u^6 = c`, if any.
+    pub fn sixth_root(&self, c: u64) -> Option<u64> {
+        let z = self.kth_root(c, 3)?;
+        let s3 = self.sqrt(self.fneg(3))?;
+        let omega = self.fmul(self.fsub(s3, 1), self.finv(2));
+        let mut zz = z;
+        for _ in 0..3 {
+            if let Some(u) = self.sqrt(zz) {
+                return Some(u);
+            }
+            zz = self.fmul(zz, omega);
+        }
+        None
+    }
 }
 
 impl Fq for Fp {
     fn char2(&self) -> bool {
         false
-    }
-    fn q_string(&self) -> String {
-        self.p.to_string()
     }
     fn bits(&self) -> u32 {
         64 - self.p.leading_zeros()
@@ -340,11 +399,10 @@ impl Fq for Fp {
     fn frandom(&self, rng: &mut SmallRng) -> u64 {
         rng.gen_range(0..self.p)
     }
-    fn fname(&self) -> String {
-        format!("F_p, p = {}", self.p)
-    }
     fn ec_j(&self, c: &Curve) -> Option<u64> {
-        let a3 = self.fsmall(4).pipe(|k| self.fmul(k, self.fmul(self.fmul(c.a, c.a), c.a)));
+        let a3 = self
+            .fsmall(4)
+            .pipe(|k| self.fmul(k, self.fmul(self.fmul(c.a, c.a), c.a)));
         let den = self.fadd(a3, self.fmul(self.fsmall(27), self.fmul(c.b, c.b)));
         (den != 0).then(|| self.fmul(self.fmul(self.fsmall(1728), a3), self.finv(den)))
     }
@@ -382,7 +440,11 @@ impl Fq for Fp {
             }
         }
     }
-    fn ec_iso_model(&self, c: &Curve, rng: &mut SmallRng) -> (Curve, Box<dyn Fn((u64, u64)) -> (u64, u64) + Send + Sync>) {
+    fn ec_iso_model(
+        &self,
+        c: &Curve,
+        rng: &mut SmallRng,
+    ) -> (Curve, Box<dyn Fn((u64, u64)) -> (u64, u64) + Send + Sync>) {
         // (u⁴a, u⁶b), (x, y) ↦ (u²x, u³y).
         let u = rng.gen_range(2..self.p);
         let (u2, u3) = (self.fmul(u, u), self.fmul(self.fmul(u, u), u));
@@ -402,14 +464,24 @@ impl Fq for Fp {
         let den = r.inv(&r.mul(&r.small(4), &f))?;
         Some(r.mul(&num, &den))
     }
-    fn x_sum<R: Ring>(&self, r: &R, c: &Curve, x1: &R::El, x2: &R::El, xd: &R::El) -> Option<R::El> {
+    fn x_sum<R: Ring>(
+        &self,
+        r: &R,
+        c: &Curve,
+        x1: &R::El,
+        x2: &R::El,
+        xd: &R::El,
+    ) -> Option<R::El> {
         // x(P+Q) + x(P−Q) = 2[(x1x2 + a)(x1 + x2) + 2b] / (x1 − x2)²
         let (a, b) = (r.lift(c.a), r.lift(c.b));
         let d = r.sub(x1, x2);
         let inv = r.inv(&r.sqr(&d))?;
         let num = r.mul(
             &r.small(2),
-            &r.add(&r.mul(&r.add(&r.mul(x1, x2), &a), &r.add(x1, x2)), &r.mul(&r.small(2), &b)),
+            &r.add(
+                &r.mul(&r.add(&r.mul(x1, x2), &a), &r.add(x1, x2)),
+                &r.mul(&r.small(2), &b),
+            ),
         );
         Some(r.sub(&r.mul(&num, &inv), xd))
     }
@@ -424,9 +496,6 @@ impl Pipe for u64 {}
 
 impl Ring for Fp {
     type El = u64;
-    fn char2(&self) -> bool {
-        false
-    }
     fn zero(&self) -> u64 {
         0
     }
@@ -447,9 +516,6 @@ impl Ring for Fp {
     }
     fn sub(&self, a: &u64, b: &u64) -> u64 {
         self.fsub(*a, *b)
-    }
-    fn neg(&self, a: &u64) -> u64 {
-        self.fneg(*a)
     }
     fn mul(&self, a: &u64, b: &u64) -> u64 {
         self.fmul(*a, *b)
@@ -521,7 +587,10 @@ fn pgcd(mut a: u128, mut b: u128) -> u128 {
 
 impl F2m {
     pub fn new(m: u32, poly: u64) -> Self {
-        assert!((3..=62).contains(&m) && poly >> m == 1, "F2m: need 3 <= m <= 62 and a degree-m polynomial");
+        assert!(
+            (3..=62).contains(&m) && poly >> m == 1,
+            "F2m: need 3 <= m <= 62 and a degree-m polynomial"
+        );
         #[cfg(target_arch = "x86_64")]
         let clmul = is_x86_feature_detected!("pclmulqdq");
         #[cfg(not(target_arch = "x86_64"))]
@@ -657,9 +726,6 @@ impl Fq for F2m {
     fn char2(&self) -> bool {
         true
     }
-    fn q_string(&self) -> String {
-        format!("2^{}", self.m)
-    }
     fn bits(&self) -> u32 {
         self.m + 1
     }
@@ -703,9 +769,6 @@ impl Fq for F2m {
     fn frandom(&self, rng: &mut SmallRng) -> u64 {
         rng.gen::<u64>() & self.mask
     }
-    fn fname(&self) -> String {
-        format!("F_2^{}, modulus {:#x}", self.m, self.poly)
-    }
     fn ec_j(&self, c: &Curve) -> Option<u64> {
         (c.b != 0).then(|| self.finv(c.b))
     }
@@ -745,7 +808,11 @@ impl Fq for F2m {
             }
         }
     }
-    fn ec_iso_model(&self, c: &Curve, rng: &mut SmallRng) -> (Curve, Box<dyn Fn((u64, u64)) -> (u64, u64) + Send + Sync>) {
+    fn ec_iso_model(
+        &self,
+        c: &Curve,
+        rng: &mut SmallRng,
+    ) -> (Curve, Box<dyn Fn((u64, u64)) -> (u64, u64) + Send + Sync>) {
         // (x, y) ↦ (x, y + sx) sends y² + xy = x³ + ax² + b to a' = a + s + s².
         let s = self.frandom(rng);
         let m = Curve {
@@ -761,7 +828,14 @@ impl Fq for F2m {
         let inv = r.inv(&x2)?;
         Some(r.add(&x2, &r.mul(&r.lift(c.b), &inv)))
     }
-    fn x_sum<R: Ring>(&self, r: &R, _c: &Curve, x1: &R::El, x2: &R::El, xd: &R::El) -> Option<R::El> {
+    fn x_sum<R: Ring>(
+        &self,
+        r: &R,
+        _c: &Curve,
+        x1: &R::El,
+        x2: &R::El,
+        xd: &R::El,
+    ) -> Option<R::El> {
         // x(P+Q) + x(P−Q) = x1x2 / (x1 + x2)²
         let s = r.add(x1, x2);
         let inv = r.inv(&r.sqr(&s))?;
@@ -771,9 +845,6 @@ impl Fq for F2m {
 
 impl Ring for F2m {
     type El = u64;
-    fn char2(&self) -> bool {
-        true
-    }
     fn zero(&self) -> u64 {
         0
     }
@@ -794,9 +865,6 @@ impl Ring for F2m {
     }
     fn sub(&self, a: &u64, b: &u64) -> u64 {
         a ^ b
-    }
-    fn neg(&self, a: &u64) -> u64 {
-        *a
     }
     fn mul(&self, a: &u64, b: &u64) -> u64 {
         self.fmul(*a, *b)

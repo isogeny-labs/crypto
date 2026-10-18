@@ -156,4 +156,21 @@ for c in CLASSES:
         t2 = tw[0]["two_way"]
         P(f"\nTwo-way decomposition of the {Sm['rho']['solves']} solves: η² (target curve) = {t2['eta2_target']:.4f}, η² (source curve) = {t2['eta2_source']:.4f}; Kruskal–Wallis by target p = {t2['kw_target']['p']:.3f} (df {t2['kw_target']['df']}), by source p = {t2['kw_source']['p']:.3f} (df {t2['kw_source']['df']}); flagged cells (family {Sm['tests']['family_size']}): {Sm['tests']['flagged_arms'] or 'none'}; all solves correct.\n")
 
+# ---------------------------------------------------------------- figures
+P("### Figures\n")
+P("Every figure draws recorded values only (`plot.py`). The standard volcano diagrams (`tools/volcano-diagram`) place each measured curve at its level in one ℓ-volcano with every walked edge drawn; the 3D heat maps stack the endomorphism-ring strata (rings, crater on top) and colour each measured curve by its mean operations or its mean end-to-end time (transport + solve).\n")
+rel = run.as_posix()
+for c in CLASSES:
+    d = run / c
+    if not (d / "class" / "results.json").exists():
+        continue
+    P(f"#### {c}\n")
+    for name, cap in [("volcano3d-ops", "3D class heat map, mean group operations per solve"), ("volcano3d-e2e", "3D class heat map, mean end-to-end ms (transport + solve)")]:
+        if (d / f"{name}.svg").exists():
+            P(f"![{c} {cap}]({rel}/{c}/{name}.svg)\n")
+    for f in sorted(d.glob("volcano-ell*.svg")):
+        P(f"![{c} {f.stem}: standard volcano diagram]({rel}/{c}/{f.name})\n")
+    for name, cap in [("per_curve", "every solve, min–max, mean ± CI per arm"), ("per_group", "pooled groups"), ("z_scores", "each arm against the pooled isogenous solves"), ("generators", "generator sweep per curve"), ("generator_means", "distribution of generator means"), ("shift_matrix", "source × target matrix")]:
+        if (d / f"{name}.svg").exists():
+            P(f"![{c} {cap}]({rel}/{c}/{name}.svg)\n")
 print("\n".join(out))

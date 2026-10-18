@@ -45,10 +45,18 @@ pub fn bootstrap_ci(v: &[f64], reps: usize, seed: u64) -> (f64, f64) {
     }
     let mut rng = SmallRng::seed_from_u64(seed);
     let mut means: Vec<f64> = (0..reps)
-        .map(|_| (0..v.len()).map(|_| v[rng.gen_range(0..v.len())]).sum::<f64>() / v.len() as f64)
+        .map(|_| {
+            (0..v.len())
+                .map(|_| v[rng.gen_range(0..v.len())])
+                .sum::<f64>()
+                / v.len() as f64
+        })
         .collect();
     means.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    (means[(reps as f64 * 0.025) as usize], means[(reps as f64 * 0.975) as usize])
+    (
+        means[(reps as f64 * 0.025) as usize],
+        means[(reps as f64 * 0.975) as usize],
+    )
 }
 
 /// Two-sample Kolmogorov–Smirnov `D` and its asymptotic two-sided p-value.
@@ -78,7 +86,11 @@ pub fn ks(a: &[f64], b: &[f64]) -> (f64, f64) {
 /// Mann–Whitney U of `a` against `b`: the normal-approximated `z` of `a`'s
 /// rank sum (positive when `a` tends to be larger).
 pub fn mann_whitney_z(a: &[f64], b: &[f64]) -> f64 {
-    let mut all: Vec<(f64, u8)> = a.iter().map(|&v| (v, 0)).chain(b.iter().map(|&v| (v, 1))).collect();
+    let mut all: Vec<(f64, u8)> = a
+        .iter()
+        .map(|&v| (v, 0))
+        .chain(b.iter().map(|&v| (v, 1)))
+        .collect();
     all.sort_by(|p, q| p.0.partial_cmp(&q.0).unwrap());
     let mut ranks = vec![0f64; all.len()];
     let mut i = 0;
@@ -93,7 +105,12 @@ pub fn mann_whitney_z(a: &[f64], b: &[f64]) -> f64 {
         }
         i = j + 1;
     }
-    let ra: f64 = all.iter().zip(&ranks).filter(|(v, _)| v.1 == 0).map(|(_, r)| r).sum();
+    let ra: f64 = all
+        .iter()
+        .zip(&ranks)
+        .filter(|(v, _)| v.1 == 0)
+        .map(|(_, r)| r)
+        .sum();
     let (na, nb) = (a.len() as f64, b.len() as f64);
     let u = ra - na * (na + 1.0) / 2.0;
     let mu = na * nb / 2.0;
@@ -141,8 +158,14 @@ pub fn anova(groups: &[Vec<f64>]) -> (f64, f64, f64) {
     let k = groups.len() as f64;
     let n: f64 = groups.iter().map(|g| g.len() as f64).sum();
     let grand = groups.iter().flatten().sum::<f64>() / n;
-    let ssb: f64 = groups.iter().map(|g| g.len() as f64 * (mean(g) - grand).powi(2)).sum();
-    let ssw: f64 = groups.iter().map(|g| g.iter().map(|x| (x - mean(g)).powi(2)).sum::<f64>()).sum();
+    let ssb: f64 = groups
+        .iter()
+        .map(|g| g.len() as f64 * (mean(g) - grand).powi(2))
+        .sum();
+    let ssw: f64 = groups
+        .iter()
+        .map(|g| g.iter().map(|x| (x - mean(g)).powi(2)).sum::<f64>())
+        .sum();
     let f = (ssb / (k - 1.0)) / (ssw / (n - k));
     let p = f_sf(f, k - 1.0, n - k);
     let means: Vec<f64> = groups.iter().map(|g| mean(g)).collect();
@@ -295,14 +318,16 @@ pub fn normal_two_sided(z: f64) -> f64 {
     // erfc(|z|/√2)
     let x = z.abs() / std::f64::consts::SQRT_2;
     let t = 1.0 / (1.0 + 0.5 * x);
-    let y = t * (-x * x - 1.265_512_23
-        + t * (1.000_023_68
-            + t * (0.374_091_96
-                + t * (0.096_784_18
-                    + t * (-0.186_288_06
-                        + t * (0.278_868_07
-                            + t * (-1.135_203_98
-                                + t * (1.488_515_87 + t * (-0.822_152_23 + t * 0.170_872_77)))))))))
-        .exp();
+    let y = t
+        * (-x * x - 1.265_512_23
+            + t * (1.000_023_68
+                + t * (0.374_091_96
+                    + t * (0.096_784_18
+                        + t * (-0.186_288_06
+                            + t * (0.278_868_07
+                                + t * (-1.135_203_98
+                                    + t * (1.488_515_87
+                                        + t * (-0.822_152_23 + t * 0.170_872_77)))))))))
+            .exp();
     y.min(1.0)
 }

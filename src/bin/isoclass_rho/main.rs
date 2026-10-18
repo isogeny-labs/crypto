@@ -62,12 +62,17 @@ impl Opts {
     }
     fn get<T: std::str::FromStr>(&self, k: &str, default: T) -> T {
         match self.map.get(k) {
-            Some(v) => v.parse().unwrap_or_else(|_| die(&format!("--{k} takes a value like {v}?"))),
+            Some(v) => v
+                .parse()
+                .unwrap_or_else(|_| die(&format!("--{k} takes a value like {v}?"))),
             None => default,
         }
     }
     fn str(&self, k: &str, default: &str) -> String {
-        self.map.get(k).cloned().unwrap_or_else(|| default.to_string())
+        self.map
+            .get(k)
+            .cloned()
+            .unwrap_or_else(|| default.to_string())
     }
     fn flag(&self, k: &str) -> bool {
         self.flags.iter().any(|f| f == k) || self.map.get(k).map(|v| v == "true").unwrap_or(false)
@@ -76,7 +81,11 @@ impl Opts {
         self.str(k, default)
             .split(',')
             .filter(|s| !s.trim().is_empty())
-            .map(|s| s.trim().parse().unwrap_or_else(|_| die(&format!("--{k} takes a comma list"))))
+            .map(|s| {
+                s.trim()
+                    .parse()
+                    .unwrap_or_else(|_| die(&format!("--{k} takes a comma list")))
+            })
             .collect()
     }
 }
@@ -189,7 +198,7 @@ fn cmd_walk(o: &Opts, command: String) {
     let mut rng = SmallRng::seed_from_u64(params.seed);
     if o.flag("binary") {
         let m = cv[0] as u32;
-        if m % 2 == 0 || !(5..=62).contains(&m) {
+        if m.is_multiple_of(2) || !(5..=62).contains(&m) {
             die("binary fields: M odd, 5 <= M <= 62");
         }
         let poly = F2m::irreducible_poly(m, o.get("poly-index", 0));
@@ -201,7 +210,8 @@ fn cmd_walk(o: &Opts, command: String) {
         let q = 2f64.powi(m as i32);
         let order = match o.map.get("order") {
             Some(v) => v.parse().unwrap(),
-            None => search::group_order(&f, q, &e, &mut rng).unwrap_or_else(|| die("point counting did not converge; pass --order")),
+            None => search::group_order(&f, q, &e, &mut rng)
+                .unwrap_or_else(|| die("point counting did not converge; pass --order")),
         };
         if !search::order_holds(&f, &e, order, &mut rng) {
             die("--order is not #E");
@@ -224,14 +234,17 @@ fn cmd_walk(o: &Opts, command: String) {
         }
         let order = match o.map.get("order") {
             Some(v) => v.parse().unwrap(),
-            None => search::group_order(&f, p as f64, &e, &mut rng).unwrap_or_else(|| die("point counting did not converge; pass --order")),
+            None => search::group_order(&f, p as f64, &e, &mut rng)
+                .unwrap_or_else(|| die("point counting did not converge; pass --order")),
         };
         if !search::order_holds(&f, &e, order, &mut rng) {
             die("--order is not #E");
         }
         let found = search::describe(&f, p as f64, e, order, 0);
-        eprintln!("curve: p={} a={} b={} #E={} n={} h={} t={} D=-{} = {}^2 * {}",
-            p, e.a, e.b, order, found.n, found.cofactor, found.t, found.d_abs, found.f, found.dk);
+        eprintln!(
+            "curve: p={} a={} b={} #E={} n={} h={} t={} D=-{} = {}^2 * {}",
+            p, e.a, e.b, order, found.n, found.cofactor, found.t, found.d_abs, found.f, found.dk
+        );
         let fj = json!({"kind": "prime", "p": p});
         walk::run_walk(&f, p as f64, found, &params, fj, &out);
     }
@@ -239,13 +252,18 @@ fn cmd_walk(o: &Opts, command: String) {
 
 fn cmd_measure(o: &Opts, command: String) {
     let path = o.str("walk", "");
-    let text = fs::read_to_string(&path).unwrap_or_else(|e| die(&format!("cannot read {path}: {e}")));
-    let w: serde_json::Value = serde_json::from_str(&text).unwrap_or_else(|e| die(&format!("{path}: {e}")));
+    let text =
+        fs::read_to_string(&path).unwrap_or_else(|e| die(&format!("cannot read {path}: {e}")));
+    let w: serde_json::Value =
+        serde_json::from_str(&text).unwrap_or_else(|e| die(&format!("{path}: {e}")));
     let params = measure::MeasureParams {
         mode: o.str("mode", "class"),
         trials: o.get("trials", 100),
         generators: o.get("generators", 64),
-        vertices: o.map.get("vertices").map(|_| o.list("vertices", "").iter().map(|&v| v as usize).collect()),
+        vertices: o
+            .map
+            .get("vertices")
+            .map(|_| o.list("vertices", "").iter().map(|&v| v as usize).collect()),
         max_vertices: o.get("max-vertices", 8),
         controls: o.get("controls", 3),
         plants: o.flag("plants"),
@@ -262,11 +280,15 @@ fn cmd_measure(o: &Opts, command: String) {
     let field = &w["field"];
     if field["kind"] == "binary" {
         let m = field["m"].as_u64().unwrap() as u32;
-        let poly = u64::from_str_radix(field["poly"].as_str().unwrap().trim_start_matches("0x"), 16).unwrap();
+        let poly =
+            u64::from_str_radix(field["poly"].as_str().unwrap().trim_start_matches("0x"), 16)
+                .unwrap();
         let f = F2m::new(m, poly);
         measure::run_measure(&f, &w, &params, &out);
     } else {
-        let f = Fp { p: field["p"].as_u64().unwrap() };
+        let f = Fp {
+            p: field["p"].as_u64().unwrap(),
+        };
         measure::run_measure(&f, &w, &params, &out);
     }
 }
@@ -292,37 +314,65 @@ fn selftest(seed: u64) {
     check("h(-47) = 5", classno::class_number(-47) == 5, &mut fails);
     check("h(-163) = 1", classno::class_number(-163) == 1, &mut fails);
     check("h(-199) = 9", classno::class_number(-199) == 9, &mut fails);
-    check("h(-1000004) = 1 ... skip; h(-4·23) = h(-92) = 3", classno::class_number(-92) == 3, &mut fails);
-    check("h(-9·(-23)) formula: h(-207) = 3·3·(1 − (−23/3)/3)... = 9", classno::class_number_order(3, -23, 3) == classno::class_number(-207), &mut fails);
+    check(
+        "h(-1000004) = 1 ... skip; h(-4·23) = h(-92) = 3",
+        classno::class_number(-92) == 3,
+        &mut fails,
+    );
+    check(
+        "h(-9·(-23)) formula: h(-207) = 3·3·(1 − (−23/3)/3)... = 9",
+        classno::class_number_order(3, -23, 3) == classno::class_number(-207),
+        &mut fails,
+    );
     check("Koblitz K-163 trace: #E = 2·5846006549323611672814741753598448348329118574063 (m = 163 overflows u64: check m = 31 against BSGS below)", true, &mut fails);
 
     // ---- prime field
     let p: u64 = 1090993606999;
     let f = Fp { p };
-    let c = Curve { a: 690282649366, b: 1050606678233 };
+    let c = Curve {
+        a: 690282649366,
+        b: 1050606678233,
+    };
     let order = search::group_order(&f, p as f64, &c, &mut rng).unwrap();
-    check("prime: #E of volcano-rho curve A = 1090993806052", order == 1090993806052, &mut fails);
+    check(
+        "prime: #E of volcano-rho curve A = 1090993806052",
+        order == 1090993806052,
+        &mut fails,
+    );
     // x-only formulas against the group law
     let pt = f.ec_random(&c, &mut rng);
     let qt = f.ec_random(&c, &mut rng);
     let x2 = f.x_dbl(&f, &c, &pt.0).unwrap();
-    check("prime: x(2P) formula", Some(x2) == f.ec_dbl(&c, Some(pt)).map(|r| r.0), &mut fails);
+    check(
+        "prime: x(2P) formula",
+        Some(x2) == f.ec_dbl(&c, Some(pt)).map(|r| r.0),
+        &mut fails,
+    );
     let pq = f.ec_add(&c, Some(pt), Some(qt)).unwrap();
     let pmq = f.ec_add(&c, Some(pt), f.ec_neg(&c, Some(qt))).unwrap();
     let xs = f.x_sum(&f, &c, &pt.0, &qt.0, &pmq.0).unwrap();
     check("prime: x(P+Q) from x(P−Q)", xs == pq.0, &mut fails);
     let lad = isogeny::x_ladder(&f, &f, &c, &pt.0, 7).unwrap();
-    check("prime: ladder x(kP), k ≤ 7", (1..=7).all(|k| f.ec_mul(&c, Some(pt), k).map(|r| r.0) == Some(lad[k as usize - 1])), &mut fails);
+    check(
+        "prime: ladder x(kP), k ≤ 7",
+        (1..=7).all(|k| f.ec_mul(&c, Some(pt), k).map(|r| r.0) == Some(lad[k as usize - 1])),
+        &mut fails,
+    );
     // division polynomial: roots of f_ℓ are ℓ-torsion (via n-multiples: ψ_3 check with rational torsion is rare; check f_k structure by x(kP) identity)
     for ell in [3u64, 5, 7] {
         let psi = isogeny::division_poly(&f, &c, ell);
-        check(&format!("prime: deg f_{ell} = (ℓ²−1)/2"), poly::degree(&psi) == Some(((ell * ell - 1) / 2) as usize), &mut fails);
+        check(
+            &format!("prime: deg f_{ell} = (ℓ²−1)/2"),
+            poly::degree(&psi) == Some(((ell * ell - 1) / 2) as usize),
+            &mut fails,
+        );
     }
     // kernels by both routes on curve A (ℓ = 3: f = 54 = 2·27, so 4 kernels at a non-floor vertex)
     let found = search::describe(&f, p as f64, c, order, 0);
     let ks3 = isogeny::kernels_division(&f, &c, 3, &mut rng);
     let lf = isogeny::lib_field(p);
-    let phi3 = crypto_lib::cryptanalysis::isogeny_walk::modpoly::modular_polynomial(&lf, 3).unwrap();
+    let phi3 =
+        crypto_lib::cryptanalysis::isogeny_walk::modpoly::modular_polynomial(&lf, 3).unwrap();
     let ke3 = isogeny::kernels_elkies(&f, &lf, &phi3, &c, 7);
     let n = found.n;
     let p0 = loop {
@@ -335,42 +385,113 @@ fn selftest(seed: u64) {
     check(&format!("prime: ℓ = 3 division route finds {} kernels (volcano-rho found 4 at the root of curve A: level 3 = floor? no: root has 4)", ks3.len()), !ks3.is_empty(), &mut fails);
     match &ke3 {
         Ok(ke) => {
-            let same = ks3.len() == ke.len() && ks3.iter().all(|k| ke.iter().any(|e| e.h == k.h && e.codomain == k.codomain));
-            check("prime: ℓ = 3 Elkies and division routes agree (kernels and codomains)", same, &mut fails);
+            let same = ks3.len() == ke.len()
+                && ks3
+                    .iter()
+                    .all(|k| ke.iter().any(|e| e.h == k.h && e.codomain == k.codomain));
+            check(
+                "prime: ℓ = 3 Elkies and division routes agree (kernels and codomains)",
+                same,
+                &mut fails,
+            );
         }
         Err(e) => check(&format!("prime: Elkies ℓ = 3 ({e})"), false, &mut fails),
     }
     for k in &ks3 {
-        check(&format!("prime: ℓ = 3 map verified (x0 = {})", f.fneg(k.h[0])), isogeny::verify_map(&f, &c, k, &[p0, q0], n).is_ok(), &mut fails);
+        check(
+            &format!("prime: ℓ = 3 map verified (x0 = {})", f.fneg(k.h[0])),
+            isogeny::verify_map(&f, &c, k, &[p0, q0], n).is_ok(),
+            &mut fails,
+        );
     }
     for ell in [5u64, 7, 11, 13] {
         let ks = isogeny::kernels_division(&f, &c, ell, &mut rng);
-        let phi = crypto_lib::cryptanalysis::isogeny_walk::modpoly::modular_polynomial(&lf, ell).unwrap();
+        let phi =
+            crypto_lib::cryptanalysis::isogeny_walk::modpoly::modular_polynomial(&lf, ell).unwrap();
         let ke = isogeny::kernels_elkies(&f, &lf, &phi, &c, 9);
         let kr = classno::kronecker(found.dk, ell);
-        let expect = if found.f % ell == 0 { ell + 1 } else if kr == 1 { 2 } else if kr == 0 { 1 } else { 0 };
+        let expect = if found.f % ell == 0 {
+            ell + 1
+        } else if kr == 1 {
+            2
+        } else if kr == 0 {
+            1
+        } else {
+            0
+        };
         check(&format!("prime: ℓ = {ell} division route finds {} kernels (expected {expect}, (D_K/ℓ) = {kr})", ks.len()), ks.len() as u64 == expect, &mut fails);
         if let Ok(ke) = &ke {
-            let same = ks.len() == ke.len() && ks.iter().all(|k| ke.iter().any(|e| e.h == k.h && e.codomain == k.codomain));
-            check(&format!("prime: ℓ = {ell} Elkies agrees with division route"), same, &mut fails);
+            let same = ks.len() == ke.len()
+                && ks
+                    .iter()
+                    .all(|k| ke.iter().any(|e| e.h == k.h && e.codomain == k.codomain));
+            check(
+                &format!("prime: ℓ = {ell} Elkies agrees with division route"),
+                same,
+                &mut fails,
+            );
         } else if expect > 0 {
-            check(&format!("prime: ℓ = {ell} Elkies route ({:?})", ke.err()), false, &mut fails);
+            check(
+                &format!("prime: ℓ = {ell} Elkies route ({:?})", ke.err()),
+                false,
+                &mut fails,
+            );
         }
         for k in &ks {
-            check(&format!("prime: ℓ = {ell} map verified (field degree {})", k.field_degree), isogeny::verify_map(&f, &c, k, &[p0, q0], n).is_ok(), &mut fails);
+            check(
+                &format!(
+                    "prime: ℓ = {ell} map verified (field degree {})",
+                    k.field_degree
+                ),
+                isogeny::verify_map(&f, &c, k, &[p0, q0], n).is_ok(),
+                &mut fails,
+            );
         }
     }
     let k2 = isogeny::kernels_two(&f, &c, &mut rng);
     for k in &k2 {
-        check("prime: ℓ = 2 map verified", isogeny::verify_map(&f, &c, k, &[p0, q0], n).is_ok(), &mut fails);
+        check(
+            "prime: ℓ = 2 map verified",
+            isogeny::verify_map(&f, &c, k, &[p0, q0], n).is_ok(),
+            &mut fails,
+        );
     }
     // rho on curve A's subgroup with folds none / neg (small trials)
-    let inst = rho::Instance { curve: c, p: p0, q: q0 };
-    let cfg = rho::RhoCfg { r: 32, dp_bits: 6, max_run_factor: 40 };
+    let inst = rho::Instance {
+        curve: c,
+        p: p0,
+        q: q0,
+    };
+    let cfg = rho::RhoCfg {
+        r: 32,
+        dp_bits: 6,
+        max_run_factor: 40,
+    };
     let s = rho::rho(&f, &inst, n, 5, &cfg, &rho::Folder::none());
-    check(&format!("prime: rho (no fold) solves k ({} iters)", s.iters), s.k == Some(k0), &mut fails);
-    let s = rho::rho(&f, &inst, n, 5, &cfg, &rho::Folder { fold: rho::Fold::Neg, ..rho::Folder::none() });
-    check(&format!("prime: rho (neg fold) solves k ({} iters, {} escapes)", s.iters, s.escapes), s.k == Some(k0), &mut fails);
+    check(
+        &format!("prime: rho (no fold) solves k ({} iters)", s.iters),
+        s.k == Some(k0),
+        &mut fails,
+    );
+    let s = rho::rho(
+        &f,
+        &inst,
+        n,
+        5,
+        &cfg,
+        &rho::Folder {
+            fold: rho::Fold::Neg,
+            ..rho::Folder::none()
+        },
+    );
+    check(
+        &format!(
+            "prime: rho (neg fold) solves k ({} iters, {} escapes)",
+            s.iters, s.escapes
+        ),
+        s.k == Some(k0),
+        &mut fails,
+    );
     // j = 0 curve with aut fold: p ≡ 1 mod 3
     let (fj, fnd) = search::search_prime(30, &[], 64, true, &mut rng);
     let cj = fnd.curve;
@@ -390,9 +511,31 @@ fn selftest(seed: u64) {
                 let (cr, lam) = folder.canon(&fj, &cj, fnd.n, r);
                 fj.ec_mul(&cj, Some(r), lam) == Some(cr)
             });
-            check("prime j=0: canon(R) = [λ]R for the automorphism fold", ok, &mut fails);
-            let s = rho::rho(&fj, &rho::Instance { curve: cj, p: pj, q: qj }, fnd.n, 3, &cfg, &folder);
-            check(&format!("prime j=0: rho (aut fold) solves k ({} iters, {} escapes, orbit {})", s.iters, s.escapes, folder.orbit), s.k == Some(kj), &mut fails);
+            check(
+                "prime j=0: canon(R) = [λ]R for the automorphism fold",
+                ok,
+                &mut fails,
+            );
+            let s = rho::rho(
+                &fj,
+                &rho::Instance {
+                    curve: cj,
+                    p: pj,
+                    q: qj,
+                },
+                fnd.n,
+                3,
+                &cfg,
+                &folder,
+            );
+            check(
+                &format!(
+                    "prime j=0: rho (aut fold) solves k ({} iters, {} escapes, orbit {})",
+                    s.iters, s.escapes, folder.orbit
+                ),
+                s.k == Some(kj),
+                &mut fails,
+            );
         }
         Err(e) => check(&format!("prime j=0: folder ({e})"), false, &mut fails),
     }
@@ -401,29 +544,64 @@ fn selftest(seed: u64) {
     let m = 31u32;
     let poly = F2m::irreducible_poly(m, 0);
     let f2 = F2m::new(m, poly);
-    check(&format!("binary: irreducible poly of degree {m}: {poly:#x}"), F2m::irreducible(poly), &mut fails);
+    check(
+        &format!("binary: irreducible poly of degree {m}: {poly:#x}"),
+        F2m::irreducible(poly),
+        &mut fails,
+    );
     let a = f2.frandom(&mut rng);
     let b = f2.frandom(&mut rng);
     check("binary: a·a⁻¹ = 1", f2.fmul(a, f2.finv(a)) == 1, &mut fails);
-    check("binary: (a+b)² = a² + b²", f2.fsqr(a ^ b) == f2.fsqr(a) ^ f2.fsqr(b), &mut fails);
-    check("binary: a^(2^m) = a", (0..m).fold(a, |x, _| f2.fsqr(x)) == a, &mut fails);
+    check(
+        "binary: (a+b)² = a² + b²",
+        f2.fsqr(a ^ b) == f2.fsqr(a) ^ f2.fsqr(b),
+        &mut fails,
+    );
+    check(
+        "binary: a^(2^m) = a",
+        (0..m).fold(a, |x, _| f2.fsqr(x)) == a,
+        &mut fails,
+    );
     // Koblitz curve over F_2^31
     let ck = Curve { a: 1, b: 1 };
     let ok_order = search::group_order(&f2, 2f64.powi(31), &ck, &mut rng).unwrap();
     let tk = classno::koblitz_trace(1, 31);
-    check(&format!("binary: Koblitz E_1/F_2^31 order by BSGS = {ok_order} = 2^31 + 1 − t_31 ({})", (1i128 << 31) + 1 - tk), ok_order as i128 == (1i128 << 31) + 1 - tk, &mut fails);
+    check(
+        &format!(
+            "binary: Koblitz E_1/F_2^31 order by BSGS = {ok_order} = 2^31 + 1 − t_31 ({})",
+            (1i128 << 31) + 1 - tk
+        ),
+        ok_order as i128 == (1i128 << 31) + 1 - tk,
+        &mut fails,
+    );
     let pt = f2.ec_random(&ck, &mut rng);
     let qt = f2.ec_random(&ck, &mut rng);
-    check("binary: random point is on the curve", f2.ec_on(&ck, Some(pt)) && f2.ec_on(&ck, Some(qt)), &mut fails);
-    check("binary: [#E]P = O", f2.ec_mul(&ck, Some(pt), ok_order).is_none(), &mut fails);
+    check(
+        "binary: random point is on the curve",
+        f2.ec_on(&ck, Some(pt)) && f2.ec_on(&ck, Some(qt)),
+        &mut fails,
+    );
+    check(
+        "binary: [#E]P = O",
+        f2.ec_mul(&ck, Some(pt), ok_order).is_none(),
+        &mut fails,
+    );
     let x2 = f2.x_dbl(&f2, &ck, &pt.0).unwrap();
-    check("binary: x(2P) formula", Some(x2) == f2.ec_dbl(&ck, Some(pt)).map(|r| r.0), &mut fails);
+    check(
+        "binary: x(2P) formula",
+        Some(x2) == f2.ec_dbl(&ck, Some(pt)).map(|r| r.0),
+        &mut fails,
+    );
     let pq = f2.ec_add(&ck, Some(pt), Some(qt)).unwrap();
     let pmq = f2.ec_add(&ck, Some(pt), f2.ec_neg(&ck, Some(qt))).unwrap();
     let xs = f2.x_sum(&f2, &ck, &pt.0, &qt.0, &pmq.0).unwrap();
     check("binary: x(P+Q) from x(P−Q)", xs == pq.0, &mut fails);
     let lad = isogeny::x_ladder(&f2, &f2, &ck, &pt.0, 7).unwrap();
-    check("binary: ladder x(kP), k ≤ 7", (1..=7).all(|k| f2.ec_mul(&ck, Some(pt), k).map(|r| r.0) == Some(lad[k as usize - 1])), &mut fails);
+    check(
+        "binary: ladder x(kP), k ≤ 7",
+        (1..=7).all(|k| f2.ec_mul(&ck, Some(pt), k).map(|r| r.0) == Some(lad[k as usize - 1])),
+        &mut fails,
+    );
     // division polynomial x(kP) = x + f_{k−1} f_{k+1} / f_k² for k = 3 (needs f_2..f_4)
     {
         let f3 = isogeny::division_poly(&f2, &ck, 3);
@@ -433,10 +611,17 @@ fn selftest(seed: u64) {
         let f2x = x;
         let f4x = f2.fadd(f2.fmul(f2.fpow(x, 6), 1), f2.fmul(ck.b, f2.fsqr(x)));
         let x3 = f2.fadd(x, f2.fmul(f2.fmul(f2x, f4x), f2.finv(f2.fsqr(f3x))));
-        check("binary: x(3P) = x + f_2 f_4 / f_3²", f2.ec_mul(&ck, Some(pt), 3).map(|r| r.0) == Some(x3), &mut fails);
+        check(
+            "binary: x(3P) = x + f_2 f_4 / f_3²",
+            f2.ec_mul(&ck, Some(pt), 3).map(|r| r.0) == Some(x3),
+            &mut fails,
+        );
     }
     let kf = search::describe(&f2, 2f64.powi(31), ck, ok_order, 0);
-    println!("     Koblitz E_1/F_2^31: #E = {}, n = {}, t = {}, D = -{} = {}² · {}", kf.order, kf.n, kf.t, kf.d_abs, kf.f, kf.dk);
+    println!(
+        "     Koblitz E_1/F_2^31: #E = {}, n = {}, t = {}, D = -{} = {}² · {}",
+        kf.order, kf.n, kf.t, kf.d_abs, kf.f, kf.dk
+    );
     let pk = loop {
         if let Some(pt) = f2.ec_mul(&ck, Some(f2.ec_random(&ck, &mut rng)), kf.cofactor) {
             break pt;
@@ -447,7 +632,15 @@ fn selftest(seed: u64) {
     for ell in [3u64, 5, 7, 11, 13] {
         let ks = isogeny::kernels_division(&f2, &ck, ell, &mut rng);
         let kr = classno::kronecker(kf.dk, ell);
-        let expect = if kf.f % ell == 0 { ell + 1 } else if kr == 1 { 2 } else if kr == 0 { 1 } else { 0 };
+        let expect = if kf.f % ell == 0 {
+            ell + 1
+        } else if kr == 1 {
+            2
+        } else if kr == 0 {
+            1
+        } else {
+            0
+        };
         check(&format!("binary Koblitz: ℓ = {ell} division route finds {} kernels (expected {expect}, (−7/ℓ) = {kr})", ks.len()), ks.len() as u64 == expect, &mut fails);
         for k in &ks {
             let v = isogeny::verify_map(&f2, &ck, k, &[pk, qk], kf.n);
@@ -455,10 +648,16 @@ fn selftest(seed: u64) {
         }
     }
     // a generic binary curve: random a, b
-    let cg = Curve { a: f2.frandom(&mut rng), b: f2.frandom(&mut rng) };
+    let cg = Curve {
+        a: f2.frandom(&mut rng),
+        b: f2.frandom(&mut rng),
+    };
     let og = search::group_order(&f2, 2f64.powi(31), &cg, &mut rng).unwrap();
     let gf = search::describe(&f2, 2f64.powi(31), cg, og, 0);
-    println!("     generic E/F_2^31: #E = {}, n = {}, t = {}, D = -{} = {}² · {}", gf.order, gf.n, gf.t, gf.d_abs, gf.f, gf.dk);
+    println!(
+        "     generic E/F_2^31: #E = {}, n = {}, t = {}, D = -{} = {}² · {}",
+        gf.order, gf.n, gf.t, gf.d_abs, gf.f, gf.dk
+    );
     let pg = loop {
         if let Some(pt) = f2.ec_mul(&cg, Some(f2.ec_random(&cg, &mut rng)), gf.cofactor) {
             break pt;
@@ -471,16 +670,54 @@ fn selftest(seed: u64) {
         }
         let ks = isogeny::kernels_division(&f2, &cg, ell, &mut rng);
         let kr = classno::kronecker(gf.dk, ell);
-        let expect = if gf.f % ell == 0 { ell + 1 } else if kr == 1 { 2 } else if kr == 0 { 1 } else { 0 };
-        check(&format!("binary generic: ℓ = {ell} finds {} kernels (expected {expect})", ks.len()), ks.len() as u64 == expect, &mut fails);
+        let expect = if gf.f % ell == 0 {
+            ell + 1
+        } else if kr == 1 {
+            2
+        } else if kr == 0 {
+            1
+        } else {
+            0
+        };
+        check(
+            &format!(
+                "binary generic: ℓ = {ell} finds {} kernels (expected {expect})",
+                ks.len()
+            ),
+            ks.len() as u64 == expect,
+            &mut fails,
+        );
         for k in &ks {
-            check(&format!("binary generic: ℓ = {ell} map verified"), isogeny::verify_map(&f2, &cg, k, &[pg, qg], gf.n).is_ok(), &mut fails);
+            check(
+                &format!("binary generic: ℓ = {ell} map verified"),
+                isogeny::verify_map(&f2, &cg, k, &[pg, qg], gf.n).is_ok(),
+                &mut fails,
+            );
         }
     }
     // Frobenius fold on the Koblitz curve
-    let cfg2 = rho::RhoCfg { r: 32, dp_bits: 4, max_run_factor: 40 };
-    let s = rho::rho(&f2, &rho::Instance { curve: ck, p: pk, q: qk }, kf.n, 11, &cfg2, &rho::Folder::none());
-    check(&format!("binary Koblitz: rho (no fold) solves k ({} iters)", s.iters), s.k == Some(kk), &mut fails);
+    let cfg2 = rho::RhoCfg {
+        r: 32,
+        dp_bits: 4,
+        max_run_factor: 40,
+    };
+    let s = rho::rho(
+        &f2,
+        &rho::Instance {
+            curve: ck,
+            p: pk,
+            q: qk,
+        },
+        kf.n,
+        11,
+        &cfg2,
+        &rho::Folder::none(),
+    );
+    check(
+        &format!("binary Koblitz: rho (no fold) solves k ({} iters)", s.iters),
+        s.k == Some(kk),
+        &mut fails,
+    );
     for with_neg in [false, true] {
         match rho::folder_frob(&f2, &ck, pk, kf.n, with_neg) {
             Ok(folder) => {
@@ -490,8 +727,25 @@ fn selftest(seed: u64) {
                     let (cr, lam) = folder.canon(&f2, &ck, kf.n, r);
                     f2.ec_mul(&ck, Some(r), lam) == Some(cr)
                 });
-                check(&format!("binary Koblitz: canon(R) = [λ]R for the Frobenius fold (neg {with_neg})"), ok, &mut fails);
-                let s = rho::rho(&f2, &rho::Instance { curve: ck, p: pk, q: qk }, kf.n, 11, &cfg2, &folder);
+                check(
+                    &format!(
+                        "binary Koblitz: canon(R) = [λ]R for the Frobenius fold (neg {with_neg})"
+                    ),
+                    ok,
+                    &mut fails,
+                );
+                let s = rho::rho(
+                    &f2,
+                    &rho::Instance {
+                        curve: ck,
+                        p: pk,
+                        q: qk,
+                    },
+                    kf.n,
+                    11,
+                    &cfg2,
+                    &folder,
+                );
                 check(&format!("binary Koblitz: rho (frob fold, neg {with_neg}) solves k ({} iters, {} escapes, orbit {})", s.iters, s.escapes, folder.orbit), s.k == Some(kk), &mut fails);
             }
             Err(e) => check(&format!("binary Koblitz: folder ({e})"), false, &mut fails),
@@ -500,7 +754,14 @@ fn selftest(seed: u64) {
     // torsion route against the division route (Koblitz, ℓ = 11, d = 5) and ℓ = 7193 (the conductor!)
     {
         let (me, mt) = isogeny::extension_orders(1u64 << 31, kf.t, 1);
-        check(&format!("torsion: #E(F_q) by the recurrence = {me} (BSGS {})", kf.order), me == num_bigint::BigInt::from(kf.order), &mut fails);
+        check(
+            &format!(
+                "torsion: #E(F_q) by the recurrence = {me} (BSGS {})",
+                kf.order
+            ),
+            me == num_bigint::BigInt::from(kf.order),
+            &mut fails,
+        );
         let _ = mt;
         let d11 = isogeny::eigen_orbit(kf.t, 1u64 << 31, 11);
         let (kt, ctx) = isogeny::kernels_torsion(&f2, &ck, 11, kf.t, 1u64 << 31, d11, 2, &mut rng);
@@ -513,25 +774,64 @@ fn selftest(seed: u64) {
                     let iq = kt[0].map(&f2, &ck, Some(qk)).unwrap();
                     let back_ok = isogeny::verify_map(&f2, &cod, &dual, &[ip, iq], kf.n).is_ok();
                     let bp = dual.map(&f2, &cod, Some(ip)).unwrap();
-                    let is_mult = f2.ec_mul(&ck, Some(pk), 11) == Some(bp) || f2.ec_neg(&ck, f2.ec_mul(&ck, Some(pk), 11)) == Some(bp);
+                    let is_mult = f2.ec_mul(&ck, Some(pk), 11) == Some(bp)
+                        || f2.ec_neg(&ck, f2.ec_mul(&ck, Some(pk), 11)) == Some(bp);
                     check(&format!("torsion: dual of the ℓ = 11 edge verified, φ̂φ = ±[11] (codomain b = {:#x}): {back_ok} {is_mult}", dual.codomain.b), back_ok && is_mult, &mut fails);
                 }
                 Err(e) => check(&format!("torsion: dual ({e})"), false, &mut fails),
             }
         }
-        check(&format!("torsion: ℓ = 11 (d = {d11}) finds {} kernels, all among the division route's {}", kt.len(), kd.len()), !kt.is_empty() && kt.iter().all(|k| kd.iter().any(|e| e.h == k.h && e.codomain == k.codomain)), &mut fails);
+        check(
+            &format!(
+                "torsion: ℓ = 11 (d = {d11}) finds {} kernels, all among the division route's {}",
+                kt.len(),
+                kd.len()
+            ),
+            !kt.is_empty()
+                && kt
+                    .iter()
+                    .all(|k| kd.iter().any(|e| e.h == k.h && e.codomain == k.codomain)),
+            &mut fails,
+        );
         for k in &kt {
-            check(&format!("torsion: ℓ = 11 map verified ({:.1} ms)", k.find_ms), isogeny::verify_map(&f2, &ck, k, &[pk, qk], kf.n).is_ok(), &mut fails);
+            check(
+                &format!("torsion: ℓ = 11 map verified ({:.1} ms)", k.find_ms),
+                isogeny::verify_map(&f2, &ck, k, &[pk, qk], kf.n).is_ok(),
+                &mut fails,
+            );
         }
         if kf.f == 7193 {
             let d = isogeny::eigen_orbit(kf.t, 1u64 << 31, 7193);
-            println!("     torsion route for ℓ = 7193 would need F_q^{d}: {}", if d <= 40 { "trying one kernel" } else { "skipped (too large for the self-test)" });
+            println!(
+                "     torsion route for ℓ = 7193 would need F_q^{d}: {}",
+                if d <= 40 {
+                    "trying one kernel"
+                } else {
+                    "skipped (too large for the self-test)"
+                }
+            );
             if d <= 40 {
                 let t1 = std::time::Instant::now();
-                let (kt, _) = isogeny::kernels_torsion(&f2, &ck, 7193, kf.t, 1u64 << 31, d, 1, &mut rng);
-                check(&format!("torsion: ℓ = 7193 found {} kernel(s) in {:.1}s", kt.len(), t1.elapsed().as_secs_f64()), !kt.is_empty(), &mut fails);
+                let (kt, _) =
+                    isogeny::kernels_torsion(&f2, &ck, 7193, kf.t, 1u64 << 31, d, 1, &mut rng);
+                check(
+                    &format!(
+                        "torsion: ℓ = 7193 found {} kernel(s) in {:.1}s",
+                        kt.len(),
+                        t1.elapsed().as_secs_f64()
+                    ),
+                    !kt.is_empty(),
+                    &mut fails,
+                );
                 for k in &kt {
-                    check(&format!("torsion: ℓ = 7193 map verified (codomain b = {:#x}, field degree {})", k.codomain.b, k.field_degree), isogeny::verify_map(&f2, &ck, k, &[pk, qk], kf.n).is_ok(), &mut fails);
+                    check(
+                        &format!(
+                            "torsion: ℓ = 7193 map verified (codomain b = {:#x}, field degree {})",
+                            k.codomain.b, k.field_degree
+                        ),
+                        isogeny::verify_map(&f2, &ck, k, &[pk, qk], kf.n).is_ok(),
+                        &mut fails,
+                    );
                 }
             }
         }
@@ -540,11 +840,22 @@ fn selftest(seed: u64) {
     let alt = F2m::new(m, F2m::irreducible_poly(m, 1));
     let poly0: poly::Poly = (0..=m).map(|i| (poly >> i) & 1).collect();
     let rs = poly::roots(&alt, &poly0, &mut rng);
-    check(&format!("binary: poly_0 has {} roots in F_2[z]/(poly_1) (expect {m})", rs.len()), rs.len() == m as usize, &mut fails);
+    check(
+        &format!(
+            "binary: poly_0 has {} roots in F_2[z]/(poly_1) (expect {m})",
+            rs.len()
+        ),
+        rs.len() == m as usize,
+        &mut fails,
+    );
     if !rs.is_empty() {
         let emb = |v: u64| f2.embed(&alt, rs[0], v);
         let (x, y) = (f2.frandom(&mut rng), f2.frandom(&mut rng));
-        check("binary: embedding is a field homomorphism", emb(f2.fmul(x, y)) == alt.fmul(emb(x), emb(y)) && emb(x ^ y) == emb(x) ^ emb(y), &mut fails);
+        check(
+            "binary: embedding is a field homomorphism",
+            emb(f2.fmul(x, y)) == alt.fmul(emb(x), emb(y)) && emb(x ^ y) == emb(x) ^ emb(y),
+            &mut fails,
+        );
     }
     println!("\nselftest: {} failure(s)", fails);
     let _ = rng.gen::<u64>();

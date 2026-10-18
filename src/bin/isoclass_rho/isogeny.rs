@@ -82,7 +82,10 @@ pub fn division_poly<F: Fq>(f: &F, c: &Curve, ell: u64) -> Poly {
                 let t2 = poly::mul(f, &d[k - 2], &poly::mul(f, &d[k + 1], &d[k + 1]));
                 let s = poly::mul(f, &d[k], &poly::add(f, &t1, &t2));
                 let (q, r) = poly::divrem(f, &s, &vec![0, 1]);
-                assert!(r.is_empty(), "char-2 division polynomial recursion: f_{{2k}} not divisible by x");
+                assert!(
+                    r.is_empty(),
+                    "char-2 division polynomial recursion: f_{{2k}} not divisible by x"
+                );
                 q
             };
             d.push(v);
@@ -101,7 +104,13 @@ pub fn division_poly<F: Fq>(f: &F, c: &Curve, ell: u64) -> Poly {
         d.push(vec![1]);
         d.push(vec![1]);
         // f₃ = 3x⁴ + 6ax² + 12bx − a²
-        d.push(poly::trim(vec![f.fneg(a2), s(12, b), s(6, a), 0, f.fsmall(3)]));
+        d.push(poly::trim(vec![
+            f.fneg(a2),
+            s(12, b),
+            s(6, a),
+            0,
+            f.fsmall(3),
+        ]));
         // f₄ = 2(x⁶ + 5ax⁴ + 20bx³ − 5a²x² − 4abx − 8b² − a³)
         d.push(poly::trim(vec![
             s(2, f.fneg(f.fadd(s(8, b2), a3))),
@@ -140,7 +149,13 @@ fn cube<F: Fq>(f: &F, a: &Poly) -> Poly {
 
 /// `x(kP)` from `x(P)` by the x-only ladder in any ring; `None` if some
 /// multiple hit `O` or a coincidence stopped the ladder.
-pub fn x_ladder<F: Fq, R: Ring>(f: &F, r: &R, c: &Curve, x1: &R::El, k: usize) -> Option<Vec<R::El>> {
+pub fn x_ladder<F: Fq, R: Ring>(
+    f: &F,
+    r: &R,
+    c: &Curve,
+    x1: &R::El,
+    k: usize,
+) -> Option<Vec<R::El>> {
     // xs[i] = x((i+1)P)
     let mut xs = vec![x1.clone()];
     if k >= 2 {
@@ -154,7 +169,14 @@ pub fn x_ladder<F: Fq, R: Ring>(f: &F, r: &R, c: &Curve, x1: &R::El, k: usize) -
 }
 
 /// Vélu's codomain and the derivative data from a kernel polynomial.
-pub fn finish_kernel<F: Fq>(f: &F, c: &Curve, ell: u64, h: &Poly, route: &'static str, find_ms: f64) -> Kernel {
+pub fn finish_kernel<F: Fq>(
+    f: &F,
+    c: &Curve,
+    ell: u64,
+    h: &Poly,
+    route: &'static str,
+    find_ms: f64,
+) -> Kernel {
     let h = poly::monic(f, h);
     let d = poly::degree(&h).expect("kernel polynomial");
     let sigma = if d == 0 { 0 } else { f.fneg(h[d - 1]) }; // sum of roots
@@ -174,14 +196,22 @@ pub fn finish_kernel<F: Fq>(f: &F, c: &Curve, ell: u64, h: &Poly, route: &'stati
         velu_codomain_odd(f, c, &h)
     };
     let dh = if f.char2() {
-        [poly::hasse(f, &h, 1), poly::hasse(f, &h, 2), poly::hasse(f, &h, 3)]
+        [
+            poly::hasse(f, &h, 1),
+            poly::hasse(f, &h, 2),
+            poly::hasse(f, &h, 3),
+        ]
     } else {
         let h1 = poly::derivative(f, &h);
         let h2 = poly::derivative(f, &h1);
         let h3 = poly::derivative(f, &h2);
         [h1, h2, h3]
     };
-    let field_degree = if d == 0 { 1 } else { poly::min_factor_degree(f, &h) };
+    let field_degree = if d == 0 {
+        1
+    } else {
+        poly::min_factor_degree(f, &h)
+    };
     Kernel {
         ell,
         h,
@@ -273,7 +303,10 @@ impl Kernel {
         }
         let l = d1;
         let lp = f.fsub(d2, f.fmul(l, l));
-        let lpp = f.fsub(f.fsub(d3, f.fmul(l, d2)), f.fmul(f.fsmall(2), f.fmul(l, lp)));
+        let lpp = f.fsub(
+            f.fsub(d3, f.fmul(l, d2)),
+            f.fmul(f.fsmall(2), f.fmul(l, lp)),
+        );
         let x2 = f.fmul(x, x);
         let big_f = f.fadd(f.fmul(f.fadd(x2, c.a), x), c.b);
         let fp = f.fadd(f.fmul(f.fsmall(3), x2), c.a);
@@ -302,12 +335,15 @@ impl Kernel {
 pub fn kernels_division<F: Fq>(f: &F, c: &Curve, ell: u64, rng: &mut SmallRng) -> Vec<Kernel> {
     let t0 = Instant::now();
     let psi = division_poly(f, c, ell);
-    assert!(poly::is_squarefree(f, &psi), "division polynomial not squarefree");
+    assert!(
+        poly::is_squarefree(f, &psi),
+        "division polynomial not squarefree"
+    );
     let half = (ell as usize - 1) / 2;
     let (parts, _) = poly::ddf(f, &psi, half);
     let mut found: Vec<Poly> = Vec::new();
     for (d, g) in parts {
-        if half % d != 0 {
+        if !half.is_multiple_of(d) {
             continue;
         }
         let mut irr = Vec::new();
@@ -397,7 +433,13 @@ pub fn phi_neighbours(f: &Fp, lf: &LibField, phi: &ModPoly, j: u64, seed: u64) -
 /// Rational `ℓ`-kernels over `F_p` by the Elkies route.  `Err` when the
 /// construction declines (special `j`, a multiple root): the caller falls
 /// back to the division route.
-pub fn kernels_elkies(f: &Fp, lf: &LibField, phi: &ModPoly, c: &Curve, seed: u64) -> Result<Vec<Kernel>, String> {
+pub fn kernels_elkies(
+    f: &Fp,
+    lf: &LibField,
+    phi: &ModPoly,
+    c: &Curve,
+    seed: u64,
+) -> Result<Vec<Kernel>, String> {
     let t0 = Instant::now();
     let j = f.ec_j(c).ok_or("singular")?;
     let model = Model {
@@ -426,14 +468,23 @@ pub fn kernels_elkies(f: &Fp, lf: &LibField, phi: &ModPoly, c: &Curve, seed: u64
     // separate them, so the division route must
     let with_mult = phi_neighbours(f, lf, phi, j, seed).len();
     if with_mult != out.len() {
-        return Err(format!("{with_mult} neighbours with multiplicity, {} simple roots", out.len()));
+        return Err(format!(
+            "{with_mult} neighbours with multiplicity, {} simple roots",
+            out.len()
+        ));
     }
     Ok(out)
 }
 
 /// Check an isogeny on points: images on the codomain, additive, and
 /// `n·φ(P) = O ≠ φ(P)`.  Returns an error string on the first failure.
-pub fn verify_map<F: Fq>(f: &F, c: &Curve, k: &Kernel, pts: &[(u64, u64)], n: u64) -> Result<(), String> {
+pub fn verify_map<F: Fq>(
+    f: &F,
+    c: &Curve,
+    k: &Kernel,
+    pts: &[(u64, u64)],
+    n: u64,
+) -> Result<(), String> {
     let cod = k.codomain;
     if f.ec_j(&cod).is_none() {
         return Err("codomain is singular".into());
@@ -511,8 +562,6 @@ fn big_bits(n: &BigInt) -> Vec<bool> {
 #[derive(Clone, Debug)]
 pub struct TorsionCtx {
     pub g: Poly,
-    pub d: usize,
-    pub ell: u64,
     pub xs: Vec<Poly>,
 }
 
@@ -554,14 +603,26 @@ fn kernel_from_orbits<F: Fq>(f: &F, ext: &Ext<F>, xs: &[Poly], ell: u64, lam: u6
     Some(poly::trim(h))
 }
 
-pub fn kernels_torsion<F: Fq>(f: &F, c: &Curve, ell: u64, t: i64, q: u64, d: usize, count: usize, rng: &mut SmallRng) -> (Vec<Kernel>, TorsionCtx) {
+pub fn kernels_torsion<F: Fq>(
+    f: &F,
+    c: &Curve,
+    ell: u64,
+    t: i64,
+    q: u64,
+    d: usize,
+    count: usize,
+    rng: &mut SmallRng,
+) -> (Vec<Kernel>, TorsionCtx) {
     let t0 = Instant::now();
     let gcoef = poly::irreducible_f2(d);
     let g: Poly = poly::trim(gcoef.iter().map(|&b| f.fsmall(b)).collect());
     let ext = Ext::new(f, &g);
     let (m_e, m_tw) = extension_orders(q, t, d);
     let lam = frobenius_scalar(t, q, ell);
-    eprintln!("    torsion ℓ = {ell}: F_q^{d} built in {:.2}s (λ = {lam})", t0.elapsed().as_secs_f64());
+    eprintln!(
+        "    torsion ℓ = {ell}: F_q^{d} built in {:.2}s (λ = {lam})",
+        t0.elapsed().as_secs_f64()
+    );
     let ellb = BigInt::from(ell);
     let half = (ell as usize - 1) / 2;
     let mut found: Vec<Poly> = Vec::new();
@@ -584,8 +645,14 @@ pub fn kernels_torsion<F: Fq>(f: &F, c: &Curve, ell: u64, t: i64, q: u64, d: usi
                 continue;
             }
             let t1 = Instant::now();
-            let Some(mut y) = poly::x_mul_bits(f, &ext, c, &x, &big_bits(&cof)) else { continue };
-            eprintln!("    torsion ℓ = {ell}: ladder of {} bits in {:.2}s (attempt {attempts}, v = {v})", big_bits(&cof).len(), t1.elapsed().as_secs_f64());
+            let Some(mut y) = poly::x_mul_bits(f, &ext, c, &x, &big_bits(&cof)) else {
+                continue;
+            };
+            eprintln!(
+                "    torsion ℓ = {ell}: ladder of {} bits in {:.2}s (attempt {attempts}, v = {v})",
+                big_bits(&cof).len(),
+                t1.elapsed().as_secs_f64()
+            );
             for _ in 0..v {
                 // ℓ-torsion test: x(((ℓ+1)/2)T) = x(((ℓ−1)/2)T)
                 if let Some(xs) = x_ladder(f, &ext, c, &y, half + 1) {
@@ -614,7 +681,7 @@ pub fn kernels_torsion<F: Fq>(f: &F, c: &Curve, ell: u64, t: i64, q: u64, d: usi
         .into_iter()
         .map(|h| finish_kernel(f, c, ell, &h, "torsion", ms))
         .collect();
-    (ks, TorsionCtx { g, d, ell, xs: found_x })
+    (ks, TorsionCtx { g, xs: found_x })
 }
 
 /// Evaluate an `F_q[x]` polynomial at a ring element.
@@ -644,7 +711,10 @@ fn x_map_in<F: Fq, R: Ring>(f: &F, r: &R, c: &Curve, k: &Kernel, x: &R::El) -> O
         let fp = r.add(&r.mul(&r.small(3), &x2), &r.lift(c.a));
         let ell = r.small(k.ell);
         Some(r.sub(
-            &r.sub(&r.sub(&r.mul(&ell, x), &r.mul(&r.small(2), &r.lift(k.sigma))), &r.mul(&r.small(2), &r.mul(&fp, &l))),
+            &r.sub(
+                &r.sub(&r.mul(&ell, x), &r.mul(&r.small(2), &r.lift(k.sigma))),
+                &r.mul(&r.small(2), &r.mul(&fp, &l)),
+            ),
             &r.mul(&r.small(4), &r.mul(&big_f, &lp)),
         ))
     }
@@ -654,7 +724,14 @@ fn x_map_in<F: Fq, R: Ring>(f: &F, r: &R, c: &Curve, k: &Kernel, x: &R::El) -> O
 /// ℓ-torsion abscissa of `E` outside `ker φ` through `φ`; its image
 /// generates `ker φ̂`, and the Frobenius-orbit product gives the kernel
 /// polynomial on `E'`.  Needs a second sampled kernel in `ctx`.
-pub fn dual_torsion<F: Fq>(f: &F, c: &Curve, k: &Kernel, ctx: &TorsionCtx, t: i64, q: u64) -> Result<Kernel, String> {
+pub fn dual_torsion<F: Fq>(
+    f: &F,
+    c: &Curve,
+    k: &Kernel,
+    ctx: &TorsionCtx,
+    t: i64,
+    q: u64,
+) -> Result<Kernel, String> {
     let t0 = Instant::now();
     let ell = k.ell;
     let ext = Ext::new(f, &ctx.g);
@@ -671,7 +748,8 @@ pub fn dual_torsion<F: Fq>(f: &F, c: &Curve, k: &Kernel, ctx: &TorsionCtx, t: i6
     if xs[half] != xs[half - 1] {
         return Err("image of the torsion abscissa is not ℓ-torsion".into());
     }
-    let h = kernel_from_orbits(f, &ext, &xs[..half], ell, lam).ok_or("dual kernel polynomial is not over F_q")?;
+    let h = kernel_from_orbits(f, &ext, &xs[..half], ell, lam)
+        .ok_or("dual kernel polynomial is not over F_q")?;
     let ms = t0.elapsed().as_secs_f64() * 1e3;
     Ok(finish_kernel(f, &cod, ell, &h, "torsion-dual", ms))
 }
@@ -716,5 +794,9 @@ pub fn eigen_orbit(t: i64, q: u64, ell: u64) -> usize {
         }
         ell as usize - 1
     };
-    roots.iter().map(|&r| ord_pm(r)).max().unwrap_or(ell as usize - 1)
+    roots
+        .iter()
+        .map(|&r| ord_pm(r))
+        .max()
+        .unwrap_or(ell as usize - 1)
 }

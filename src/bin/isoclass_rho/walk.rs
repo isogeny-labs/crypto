@@ -124,7 +124,7 @@ impl<'a, F: Fq> Walker<'a, F> {
             let v = {
                 let mut e = 0;
                 let mut x = found.f;
-                while x % ell == 0 {
+                while x.is_multiple_of(ell) {
                     x /= ell;
                     e += 1;
                 }
@@ -133,7 +133,7 @@ impl<'a, F: Fq> Walker<'a, F> {
             info.depth = v;
             let kr = classno::kronecker(found.dk, ell);
             info.crater = classno::crater_kind(kr);
-            if found.n % ell == 0 {
+            if found.n.is_multiple_of(ell) {
                 info.active = false;
                 info.reason = "ℓ divides n".into();
             } else if f.char2() && ell == 2 {
@@ -180,7 +180,11 @@ impl<'a, F: Fq> Walker<'a, F> {
     }
 
     fn active_ells(&self) -> Vec<u64> {
-        self.ells.iter().filter(|e| e.active).map(|e| e.ell).collect()
+        self.ells
+            .iter()
+            .filter(|e| e.active)
+            .map(|e| e.ell)
+            .collect()
     }
 
     fn phi(&mut self, ell: u64) -> &ModPoly {
@@ -221,7 +225,9 @@ impl<'a, F: Fq> Walker<'a, F> {
         let c = self.vs[v].curve.expect("kernels of an unrealised vertex");
         let t0 = Instant::now();
         let ks = if ell == 2 {
-            let fp = (self.f as &dyn Any).downcast_ref::<Fp>().expect("ℓ = 2 needs F_p");
+            let fp = (self.f as &dyn Any)
+                .downcast_ref::<Fp>()
+                .expect("ℓ = 2 needs F_p");
             isogeny::kernels_two(fp, &c, &mut self.rng)
         } else if self.lib.is_some() {
             let fp = *(self.f as &dyn Any).downcast_ref::<Fp>().unwrap();
@@ -240,11 +246,23 @@ impl<'a, F: Fq> Walker<'a, F> {
             // ℓ-torsion abscissae in F_{q^d}
             let q = self.q as u64;
             let d = isogeny::eigen_orbit(self.found.t, q, ell);
-            eprintln!("  torsion route at v{v}, ℓ = {ell}: F_q^{d}, {} kernels wanted", self.sample_kernels);
+            eprintln!(
+                "  torsion route at v{v}, ℓ = {ell}: F_q^{d}, {} kernels wanted",
+                self.sample_kernels
+            );
             if !self.sampled.contains(&ell) {
                 self.sampled.push(ell);
             }
-            let (ks, ctx) = isogeny::kernels_torsion(self.f, &c, ell, self.found.t, q, d, self.sample_kernels, &mut self.rng);
+            let (ks, ctx) = isogeny::kernels_torsion(
+                self.f,
+                &c,
+                ell,
+                self.found.t,
+                q,
+                d,
+                self.sample_kernels,
+                &mut self.rng,
+            );
             self.torsion_ctx.insert((v, ell), ctx);
             ks
         } else {
@@ -261,8 +279,14 @@ impl<'a, F: Fq> Walker<'a, F> {
     /// cheapest available route.
     fn neighbours(&mut self, v: usize, ell: u64) -> Vec<u64> {
         let j = self.vs[v].j;
-        if self.lib.is_some() {
+        // at j = 0 or 1728 the automorphisms identify quotients of
+        // non-rational subgroups, so Φ_ℓ(j, Y) over-counts: enumerate kernels
+        if self.lib.is_some() && !self.is_special_j(j) {
             return self.neighbours_by_phi(j, ell);
+        }
+        if self.vs[v].curve.is_none() {
+            let n_src = self.vs[0].inst.len();
+            self.realize(v, n_src);
         }
         self.kernels_at(v, ell)
             .iter()
@@ -279,7 +303,14 @@ impl<'a, F: Fq> Walker<'a, F> {
         c
     }
 
-    fn add_vertex(&mut self, j: u64, dist: u32, parent: Option<usize>, ell: u64, n_src: usize) -> usize {
+    fn add_vertex(
+        &mut self,
+        j: u64,
+        dist: u32,
+        parent: Option<usize>,
+        ell: u64,
+        n_src: usize,
+    ) -> usize {
         let id = self.vs.len();
         self.vs.push(Vertex {
             j,
@@ -392,9 +423,8 @@ impl<'a, F: Fq> Walker<'a, F> {
         let mut carried = Vec::new();
         for s in 0..n_src {
             if let Some((p, q)) = self.vs[par].inst[s] {
-                isogeny::verify_map(self.f, &pc, &k, &[p, q], n).unwrap_or_else(|e| {
-                    panic!("edge v{par} → v{v} (ℓ = {ell}, {}): {e}", k.route)
-                });
+                isogeny::verify_map(self.f, &pc, &k, &[p, q], n)
+                    .unwrap_or_else(|e| panic!("edge v{par} → v{v} (ℓ = {ell}, {}): {e}", k.route));
                 let ip = k.map(self.f, &pc, Some(p)).unwrap();
                 let iq = k.map(self.f, &pc, Some(q)).unwrap();
                 carried.push((s, (ip, iq)));
@@ -404,7 +434,10 @@ impl<'a, F: Fq> Walker<'a, F> {
             // verify on a fresh point of order n anyway
             let cof = self.found.cofactor;
             let r = loop {
-                if let Some(pt) = self.f.ec_mul(&pc, Some(self.f.ec_random(&pc, &mut self.rng)), cof) {
+                if let Some(pt) =
+                    self.f
+                        .ec_mul(&pc, Some(self.f.ec_random(&pc, &mut self.rng)), cof)
+                {
                     break pt;
                 }
             };
@@ -433,7 +466,9 @@ impl<'a, F: Fq> Walker<'a, F> {
         let depth = info.depth;
         let lvl = if depth == 0 {
             0
-        } else if self.sampled.contains(&ell) || ((ell * ell - 1) / 2) as usize > self.max_psi_degree && self.lib.is_none() {
+        } else if self.sampled.contains(&ell)
+            || ((ell * ell - 1) / 2) as usize > self.max_psi_degree && self.lib.is_none()
+        {
             // sampled kernels cannot be counted: a non-loop ℓ-edge from a
             // vertex above the floor is taken as descending (exact when the
             // crater has one vertex, as on a Koblitz curve)
@@ -441,7 +476,8 @@ impl<'a, F: Fq> Walker<'a, F> {
                 None => 0,
                 Some(par) => {
                     let pl = self.level_of(par, ell);
-                    if self.vs[v].parent_ell == ell && self.vs[v].j != self.vs[par].j && pl < depth {
+                    if self.vs[v].parent_ell == ell && self.vs[v].j != self.vs[par].j && pl < depth
+                    {
                         pl + 1
                     } else {
                         pl
@@ -451,7 +487,8 @@ impl<'a, F: Fq> Walker<'a, F> {
         } else if self.kernel_count(v, ell) == 1 {
             depth
         } else {
-            let nb = self.neighbours(v, ell);
+            let jv = self.vs[v].j;
+            let nb = self.neighbours_at_j(jv, ell);
             let mut distinct: Vec<u64> = Vec::new();
             for j in nb {
                 if j != u64::MAX && !distinct.contains(&j) && !self.is_special_j(j) {
@@ -472,7 +509,11 @@ impl<'a, F: Fq> Walker<'a, F> {
                         break;
                     }
                     let nxt = self.neighbours_at_j(cur, ell);
-                    let Some(next) = nxt.iter().copied().find(|&j| j != prev && j != u64::MAX && !self.is_special_j(j)) else {
+                    let Some(next) = nxt
+                        .iter()
+                        .copied()
+                        .find(|&j| j != prev && j != u64::MAX && !self.is_special_j(j))
+                    else {
                         break;
                     };
                     prev = cur;
@@ -495,15 +536,29 @@ impl<'a, F: Fq> Walker<'a, F> {
     /// Neighbour `j`'s of the curve with invariant `j`, creating a
     /// level-only vertex when the model is needed (binary fields).
     fn neighbours_at_j(&mut self, j: u64, ell: u64) -> Vec<u64> {
-        if self.lib.is_some() {
+        if self.lib.is_some() && !self.is_special_j(j) {
             return self.neighbours_by_phi(j, ell);
         }
         let v = self.vertex_for_j(j);
-        self.neighbours(v, ell)
+        let nb = self.neighbours(v, ell);
+        let n_src = self.vs[0].inst.len();
+        for &j2 in &nb {
+            if j2 != u64::MAX && !self.is_special_j(j2) && !self.by_j.contains_key(&j2) {
+                let w = self.add_vertex(j2, self.vs[v].dist + 1, Some(v), ell, n_src);
+                self.vs[w].level_only = true;
+            }
+            if let Some(&w) = self.by_j.get(&j2) {
+                if w != v && !self.vs[v].nbrs.contains(&(w, ell)) {
+                    self.vs[v].nbrs.push((w, ell));
+                    self.vs[w].nbrs.push((v, ell));
+                }
+            }
+        }
+        nb
     }
 
     fn count_at_j(&mut self, j: u64, ell: u64) -> usize {
-        if self.lib.is_some() {
+        if self.lib.is_some() && !self.is_special_j(j) {
             return self.neighbours_by_phi(j, ell).len();
         }
         let v = self.vertex_for_j(j);
@@ -527,6 +582,9 @@ impl<'a, F: Fq> Walker<'a, F> {
     /// Make sure the neighbours of `v` for `ℓ` exist as vertices (so a
     /// level walk can continue through them).
     fn ensure_neighbours(&mut self, v: usize, ell: u64, n_src: usize) {
+        if self.vs[v].curve.is_none() {
+            self.realize(v, n_src);
+        }
         let nb = self.neighbours(v, ell);
         for j2 in nb {
             if j2 == u64::MAX || self.is_special_j(j2) {
@@ -546,7 +604,12 @@ impl<'a, F: Fq> Walker<'a, F> {
 
     /// Levels of `v` in every volcano prime, extending the graph as needed.
     pub fn levels(&mut self, v: usize, n_src: usize) -> HashMap<u64, u32> {
-        let vol: Vec<(u64, u32)> = self.ells.iter().filter(|e| e.active && e.depth > 0).map(|e| (e.ell, e.depth)).collect();
+        let vol: Vec<(u64, u32)> = self
+            .ells
+            .iter()
+            .filter(|e| e.active && e.depth > 0)
+            .map(|e| (e.ell, e.depth))
+            .collect();
         for &(ell, depth) in &vol {
             let sampled = ((ell * ell - 1) / 2) as usize > self.max_psi_degree;
             if self.lib.is_none() && !sampled {
@@ -594,9 +657,15 @@ impl<'a, F: Fq> Walker<'a, F> {
             // the dual of a sampled edge: push another ℓ-torsion abscissa of
             // the parent through the edge; its image generates ker φ̂
             let edge = self.vs[v].edge.clone().unwrap();
-            let ctx = self.torsion_ctx.get(&(par, ell)).expect("torsion context of a sampled edge").clone();
+            let ctx = self
+                .torsion_ctx
+                .get(&(par, ell))
+                .expect("torsion context of a sampled edge")
+                .clone();
             isogeny::dual_torsion(self.f, &pc, &edge, &ctx, self.found.t, self.q as u64)
-                .unwrap_or_else(|e| panic!("dual of the sampled edge v{par} → v{v} (ℓ = {ell}): {e}"))
+                .unwrap_or_else(|e| {
+                    panic!("dual of the sampled edge v{par} → v{v} (ℓ = {ell}): {e}")
+                })
         } else {
             let ks = self.kernels_at(v, ell);
             ks.into_iter()
@@ -610,8 +679,24 @@ impl<'a, F: Fq> Walker<'a, F> {
             Box::new(move |f: &F, p| k.map(f, &cv, Some(p)).expect("order-n point maps to O"))
         } else {
             let fp = *(self.f as &dyn Any).downcast_ref::<Fp>().unwrap();
-            let u2 = fp.fmul(fp.fmul(pc.b, cod.a), fp.finv(fp.fmul(cod.b, pc.a)));
-            let u = fp.sqrt(u2).expect("dual codomain is the twist of the parent model");
+            // (u⁴a, u⁶b) = (a_par, b_par): u² from a and b, a sixth root when
+            // a = 0 (j = 0), a fourth root when b = 0 (j = 1728)
+            let u = if pc.a == 0 {
+                fp.sixth_root(fp.fmul(pc.b, fp.finv(cod.b)))
+                    .expect("dual codomain is not isomorphic to the j = 0 parent model")
+            } else if pc.b == 0 {
+                let r = fp.fmul(pc.a, fp.finv(cod.a));
+                let u2 = fp
+                    .sqrt(r)
+                    .expect("dual codomain is not isomorphic to the j = 1728 parent model");
+                fp.sqrt(u2)
+                    .or_else(|| fp.sqrt(fp.fneg(u2)))
+                    .expect("dual codomain is the twist of the parent model")
+            } else {
+                let u2 = fp.fmul(fp.fmul(pc.b, cod.a), fp.finv(fp.fmul(cod.b, pc.a)));
+                fp.sqrt(u2)
+                    .expect("dual codomain is the twist of the parent model")
+            };
             let (u2, u3) = (fp.fmul(u, u), fp.fmul(fp.fmul(u, u), u));
             assert_eq!(fp.fmul(fp.fmul(u2, u2), cod.a), pc.a);
             assert_eq!(fp.fmul(fp.fmul(u3, u3), cod.b), pc.b);
@@ -624,7 +709,14 @@ impl<'a, F: Fq> Walker<'a, F> {
 }
 
 /// Run the whole walk and write `walk.json`.
-pub fn run_walk<F: Fq>(f: &F, q: f64, found: Found, params: &WalkParams, field_json: serde_json::Value, out: &Path) {
+pub fn run_walk<F: Fq>(
+    f: &F,
+    q: f64,
+    found: Found,
+    params: &WalkParams,
+    field_json: serde_json::Value,
+    out: &Path,
+) {
     let t_all = Instant::now();
     let mut rng = SmallRng::seed_from_u64(params.seed);
     let n = found.n;
@@ -669,7 +761,11 @@ pub fn run_walk<F: Fq>(f: &F, q: f64, found: Found, params: &WalkParams, field_j
     let t_explore = Instant::now();
     w.explore(params.radius, params.max_vertices, n_src);
     let explored = w.vs.len();
-    eprintln!("explored {} vertices in {:.1}s", explored, t_explore.elapsed().as_secs_f64());
+    eprintln!(
+        "explored {} vertices in {:.1}s",
+        explored,
+        t_explore.elapsed().as_secs_f64()
+    );
 
     // levels and conductor of every explored vertex within the radius
     let t_lv = Instant::now();
@@ -677,7 +773,12 @@ pub fn run_walk<F: Fq>(f: &F, q: f64, found: Found, params: &WalkParams, field_j
     for &v in &ids {
         w.levels(v, n_src);
     }
-    eprintln!("levels of {} vertices in {:.1}s ({} vertices now)", explored, t_lv.elapsed().as_secs_f64(), w.vs.len());
+    eprintln!(
+        "levels of {} vertices in {:.1}s ({} vertices now)",
+        explored,
+        t_lv.elapsed().as_secs_f64(),
+        w.vs.len()
+    );
 
     // measured set: per conductor stratum, spread over the BFS order; the
     // root; the `hard` vertices reached through the largest ℓ
@@ -706,7 +807,10 @@ pub fn run_walk<F: Fq>(f: &F, q: f64, found: Found, params: &WalkParams, field_j
     let hard: Vec<usize> = ids
         .iter()
         .copied()
-        .filter(|&v| v != root && (w.vs[v].parent_ell == max_ell || params.hard_ells.contains(&w.vs[v].parent_ell)))
+        .filter(|&v| {
+            v != root
+                && (w.vs[v].parent_ell == max_ell || params.hard_ells.contains(&w.vs[v].parent_ell))
+        })
         .take(params.hard)
         .collect();
     for v in hard {
@@ -719,11 +823,16 @@ pub fn run_walk<F: Fq>(f: &F, q: f64, found: Found, params: &WalkParams, field_j
         w.realize(v, n_src);
         w.vs[v].measured = true;
     }
-    eprintln!("realised the tree to {} measured vertices; {} edges verified", measured.len(), w.edges_verified);
+    eprintln!(
+        "realised the tree to {} measured vertices; {} edges verified",
+        measured.len(),
+        w.edges_verified
+    );
 
     // shifted instances: sources among the measured vertices, carried up to
     // the root and down to every measured vertex
-    let mut sources = vec![json!({"index": 0, "vertex": root, "P": [p0.0, p0.1], "Q": [q0.0, q0.1]})];
+    let mut sources =
+        vec![json!({"index": 0, "vertex": root, "P": [p0.0, p0.1], "Q": [q0.0, q0.1]})];
     let mut src_vertices: Vec<usize> = measured.iter().copied().filter(|&v| v != root).collect();
     // spread the sources over the measured list
     let mut chosen = Vec::new();
@@ -754,13 +863,19 @@ pub fn run_walk<F: Fq>(f: &F, q: f64, found: Found, params: &WalkParams, field_j
             let pc = w.vs[par].curve.unwrap();
             assert!(f.ec_on(&pc, Some(p)) && f.ec_on(&pc, Some(qq)));
             assert!(f.ec_mul(&pc, Some(p), n).is_none() && f.ec_mul(&pc, Some(qq), n).is_none());
-            assert_eq!(f.ec_mul(&pc, Some(p), k_secret), Some(qq), "shifted instance lost its logarithm on the way up");
+            assert_eq!(
+                f.ec_mul(&pc, Some(p), k_secret),
+                Some(qq),
+                "shifted instance lost its logarithm on the way up"
+            );
             w.vs[par].inst[s] = Some((p, qq));
             cur = par;
         }
         // down the tree to every measured vertex (and the vertices on the way)
         let order: Vec<usize> = {
-            let mut o: Vec<usize> = (0..w.vs.len()).filter(|&v| w.vs[v].curve.is_some()).collect();
+            let mut o: Vec<usize> = (0..w.vs.len())
+                .filter(|&v| w.vs[v].curve.is_some())
+                .collect();
             o.sort_by_key(|&v| w.vs[v].dist);
             o
         };
@@ -769,7 +884,9 @@ pub fn run_walk<F: Fq>(f: &F, q: f64, found: Found, params: &WalkParams, field_j
                 continue;
             }
             let Some(par) = w.vs[v].parent else { continue };
-            let Some((pp, pq)) = w.vs[par].inst[s] else { continue };
+            let Some((pp, pq)) = w.vs[par].inst[s] else {
+                continue;
+            };
             let k = w.vs[v].edge.clone().unwrap();
             let pc = w.vs[par].curve.unwrap();
             let ip = k.map(f, &pc, Some(pp)).unwrap();
@@ -850,14 +967,13 @@ pub fn run_walk<F: Fq>(f: &F, q: f64, found: Found, params: &WalkParams, field_j
                    "sampled": w.sampled.contains(&e.ell), "eigen_orbit_degree": isogeny::eigen_orbit(found.t, q as u64, e.ell)})
         })
         .collect();
-    let per_ell_edges: HashMap<String, u64> = w
-        .vs
-        .iter()
-        .filter(|v| v.edge.is_some())
-        .fold(HashMap::new(), |mut m, v| {
-            *m.entry(v.parent_ell.to_string()).or_insert(0) += 1;
-            m
-        });
+    let per_ell_edges: HashMap<String, u64> =
+        w.vs.iter()
+            .filter(|v| v.edge.is_some())
+            .fold(HashMap::new(), |mut m, v| {
+                *m.entry(v.parent_ell.to_string()).or_insert(0) += 1;
+                m
+            });
     let out_json = json!({
         "schema": "isoclass-walk/v1",
         "command": params.command,
@@ -880,7 +996,11 @@ pub fn run_walk<F: Fq>(f: &F, q: f64, found: Found, params: &WalkParams, field_j
         "vertices": vertices,
     });
     fs::create_dir_all(out).unwrap();
-    fs::write(out.join("walk.json"), serde_json::to_string_pretty(&out_json).unwrap()).unwrap();
+    fs::write(
+        out.join("walk.json"),
+        serde_json::to_string_pretty(&out_json).unwrap(),
+    )
+    .unwrap();
     eprintln!("wrote {}", out.join("walk.json").display());
     let _ = F2m::irreducible;
 }

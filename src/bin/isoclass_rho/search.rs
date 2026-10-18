@@ -103,12 +103,19 @@ fn wanted(found: &Found, want: &[(u64, u32)], max_cofactor: u64, min_n_bits: u32
     if found.cofactor > max_cofactor || found.n < (1u64 << min_n_bits) {
         return false;
     }
-    want.iter().all(|&(l, e)| found.f % l.pow(e) == 0 && found.n % l != 0)
+    want.iter()
+        .all(|&(l, e)| found.f.is_multiple_of(l.pow(e)) && !found.n.is_multiple_of(l))
 }
 
 /// Random prime-field curves over random `bits`-bit primes until the
 /// conductor has the wanted prime powers.  `j0` restricts to `y² = x³ + b`.
-pub fn search_prime(bits: u32, want: &[(u64, u32)], max_cofactor: u64, j0: bool, rng: &mut SmallRng) -> (Fp, Found) {
+pub fn search_prime(
+    bits: u32,
+    want: &[(u64, u32)],
+    max_cofactor: u64,
+    j0: bool,
+    rng: &mut SmallRng,
+) -> (Fp, Found) {
     let mut tried = 0u64;
     let want2 = want.iter().any(|&(l, _)| l == 2);
     loop {
@@ -146,7 +153,12 @@ pub fn search_prime(bits: u32, want: &[(u64, u32)], max_cofactor: u64, j0: bool,
 /// Random binary curves `y² + xy = x³ + ax² + b` over `F_{2^m}` (with the
 /// first irreducible polynomial of degree `m`) until the conductor has the
 /// wanted odd prime powers.
-pub fn search_binary(m: u32, want: &[(u64, u32)], max_cofactor: u64, rng: &mut SmallRng) -> (F2m, Found) {
+pub fn search_binary(
+    m: u32,
+    want: &[(u64, u32)],
+    max_cofactor: u64,
+    rng: &mut SmallRng,
+) -> (F2m, Found) {
     let f = F2m::new(m, F2m::irreducible_poly(m, 0));
     let q = 2f64.powi(m as i32);
     let mut tried = 0u64;

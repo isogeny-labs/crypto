@@ -3,7 +3,6 @@
 //! both characteristics, and Hasse derivatives.
 
 use rand::rngs::SmallRng;
-use rand::Rng;
 
 use super::field::{Fq, Ring};
 
@@ -30,16 +29,20 @@ pub fn x_poly() -> Poly {
 
 pub fn add<F: Fq>(f: &F, a: &Poly, b: &Poly) -> Poly {
     let n = a.len().max(b.len());
-    trim((0..n)
-        .map(|i| f.fadd(*a.get(i).unwrap_or(&0), *b.get(i).unwrap_or(&0)))
-        .collect())
+    trim(
+        (0..n)
+            .map(|i| f.fadd(*a.get(i).unwrap_or(&0), *b.get(i).unwrap_or(&0)))
+            .collect(),
+    )
 }
 
 pub fn sub<F: Fq>(f: &F, a: &Poly, b: &Poly) -> Poly {
     let n = a.len().max(b.len());
-    trim((0..n)
-        .map(|i| f.fsub(*a.get(i).unwrap_or(&0), *b.get(i).unwrap_or(&0)))
-        .collect())
+    trim(
+        (0..n)
+            .map(|i| f.fsub(*a.get(i).unwrap_or(&0), *b.get(i).unwrap_or(&0)))
+            .collect(),
+    )
 }
 
 pub fn scale<F: Fq>(f: &F, a: &Poly, c: u64) -> Poly {
@@ -144,11 +147,6 @@ pub fn powmod_bits<F: Fq>(f: &F, base: &Poly, bits: &[bool], m: &Poly) -> Poly {
     r
 }
 
-pub fn powmod_u64<F: Fq>(f: &F, base: &Poly, e: u64, m: &Poly) -> Poly {
-    let bits: Vec<bool> = (0..64).map(|i| (e >> i) & 1 == 1).collect();
-    powmod_bits(f, base, &bits, m)
-}
-
 /// `a^q mod m`: the Frobenius of `F_q[x]/(m)` applied to `a`.
 pub fn frob<F: Fq>(f: &F, a: &Poly, m: &Poly) -> Poly {
     if f.char2() {
@@ -163,7 +161,13 @@ pub fn frob<F: Fq>(f: &F, a: &Poly, m: &Poly) -> Poly {
 }
 
 pub fn derivative<F: Fq>(f: &F, a: &Poly) -> Poly {
-    trim(a.iter().enumerate().skip(1).map(|(i, &c)| f.fmul(f.fsmall(i as u64), c)).collect())
+    trim(
+        a.iter()
+            .enumerate()
+            .skip(1)
+            .map(|(i, &c)| f.fmul(f.fsmall(i as u64), c))
+            .collect(),
+    )
 }
 
 /// The `k`-th Hasse derivative `Σ_i C(i, k) a_i x^{i−k}`.
@@ -171,9 +175,11 @@ pub fn hasse<F: Fq>(f: &F, a: &Poly, k: usize) -> Poly {
     if a.len() <= k {
         return Vec::new();
     }
-    trim((k..a.len())
-        .map(|i| f.fmul(f.fsmall(binom_mod(i as u64, k as u64, f.char2())), a[i]))
-        .collect())
+    trim(
+        (k..a.len())
+            .map(|i| f.fmul(f.fsmall(binom_mod(i as u64, k as u64, f.char2())), a[i]))
+            .collect(),
+    )
 }
 
 /// `C(n, k)`, exactly for the small `k` used here (`k ≤ 3`); reduced mod 2
@@ -319,18 +325,6 @@ fn big_half_minus_one(n: &[bool]) -> Vec<bool> {
     v
 }
 
-/// The irreducible factors of degree exactly `d` of a squarefree `a`.
-pub fn factors_of_degree<F: Fq>(f: &F, a: &Poly, d: usize, rng: &mut SmallRng) -> Vec<Poly> {
-    let (parts, _) = ddf(f, a, d);
-    let mut out = Vec::new();
-    for (dd, g) in parts {
-        if dd == d {
-            edf(f, &g, d, rng, &mut out);
-        }
-    }
-    out
-}
-
 /// All roots in `F_q` of `a` (distinct).
 pub fn roots<F: Fq>(f: &F, a: &Poly, rng: &mut SmallRng) -> Vec<u64> {
     let a = monic(f, a);
@@ -344,24 +338,6 @@ pub fn roots<F: Fq>(f: &F, a: &Poly, rng: &mut SmallRng) -> Vec<u64> {
     let mut r: Vec<u64> = lin.iter().map(|l| f.fneg(l[0])).collect();
     r.sort();
     r
-}
-
-/// Roots with multiplicity: each root repeated as often as it divides `a`.
-pub fn roots_with_multiplicity<F: Fq>(f: &F, a: &Poly, rng: &mut SmallRng) -> Vec<u64> {
-    let mut out = Vec::new();
-    for r in roots(f, a, rng) {
-        let lin = vec![f.fneg(r), 1];
-        let mut cur = a.clone();
-        loop {
-            let (q, rm) = divrem(f, &cur, &lin);
-            if !rm.is_empty() {
-                break;
-            }
-            out.push(r);
-            cur = q;
-        }
-    }
-    out
 }
 
 /// The degree of the smallest irreducible factor of a squarefree `a` (the
@@ -384,21 +360,17 @@ pub fn min_factor_degree<F: Fq>(f: &F, a: &Poly) -> usize {
 pub struct Ext<'a, F: Fq> {
     pub f: &'a F,
     pub g: Poly,
-    pub d: usize,
 }
 
 impl<'a, F: Fq> Ext<'a, F> {
     pub fn new(f: &'a F, g: &Poly) -> Self {
         let g = monic(f, g);
-        let d = degree(&g).expect("extension modulus");
-        Ext { f, g, d }
+        degree(&g).expect("extension modulus");
+        Ext { f, g }
     }
     /// The class of `y`.
     pub fn gen(&self) -> Poly {
         rem(self.f, &x_poly(), &self.g)
-    }
-    pub fn frob(&self, a: &Poly) -> Poly {
-        frob(self.f, a, &self.g)
     }
     /// The base-field element `a` is, if it lies in `F_q`.
     pub fn to_base(&self, a: &Poly) -> Option<u64> {
@@ -413,9 +385,6 @@ impl<'a, F: Fq> Ext<'a, F> {
 
 impl<F: Fq> Ring for Ext<'_, F> {
     type El = Poly;
-    fn char2(&self) -> bool {
-        self.f.char2()
-    }
     fn zero(&self) -> Poly {
         Vec::new()
     }
@@ -436,9 +405,6 @@ impl<F: Fq> Ring for Ext<'_, F> {
     }
     fn sub(&self, a: &Poly, b: &Poly) -> Poly {
         sub(self.f, a, b)
-    }
-    fn neg(&self, a: &Poly) -> Poly {
-        scale(self.f, a, self.f.fneg(1))
     }
     fn mul(&self, a: &Poly, b: &Poly) -> Poly {
         mulmod(self.f, a, b, &self.g)
@@ -464,13 +430,6 @@ pub fn product_of_linear<R: Ring>(r: &R, rs: &[R::El]) -> Vec<R::El> {
     p
 }
 
-pub fn random_poly<F: Fq>(f: &F, deg: usize, rng: &mut SmallRng) -> Poly {
-    let mut v: Poly = (0..deg).map(|_| f.frandom(rng)).collect();
-    v.push(1);
-    let _ = rng.gen::<u64>();
-    v
-}
-
 // ================================================================== F_2[y] bit-packed
 
 /// Bit-packed `F_2[y]` polynomial helpers for finding an irreducible of
@@ -487,7 +446,7 @@ mod f2 {
         None
     }
     pub fn bit(a: &P, i: usize) -> bool {
-        a.get(i / 64).map_or(false, |w| (w >> (i % 64)) & 1 == 1)
+        a.get(i / 64).is_some_and(|w| (w >> (i % 64)) & 1 == 1)
     }
     pub fn set(a: &mut P, i: usize) {
         if a.len() <= i / 64 {
@@ -504,6 +463,9 @@ mod f2 {
                 r[i + w + 1] |= x >> (64 - b);
             }
         }
+        while r.last() == Some(&0) {
+            r.pop();
+        }
         r
     }
     pub fn xor_into(a: &mut P, b: &P) {
@@ -512,6 +474,9 @@ mod f2 {
         }
         for (x, y) in a.iter_mut().zip(b) {
             *x ^= y;
+        }
+        while a.last() == Some(&0) {
+            a.pop();
         }
     }
     pub fn rem(a: &P, m: &P) -> P {
@@ -600,7 +565,13 @@ pub use f2::find_irreducible as irreducible_f2;
 /// `x(kP)` from `x(P)` by the Montgomery ladder in any ring, `k` given as
 /// big-endian bits; `None` when a multiple is `O` or two ladder legs
 /// coincide.
-pub fn x_mul_bits<F: Fq, R: Ring>(f: &F, r: &R, c: &super::field::Curve, x1: &R::El, bits: &[bool]) -> Option<R::El> {
+pub fn x_mul_bits<F: Fq, R: Ring>(
+    f: &F,
+    r: &R,
+    c: &super::field::Curve,
+    x1: &R::El,
+    bits: &[bool],
+) -> Option<R::El> {
     // (x_n, x_{n+1}) starting at n = 1
     let mut a = x1.clone();
     let mut b = f.x_dbl(r, c, x1)?;

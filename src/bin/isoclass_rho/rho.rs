@@ -30,16 +30,6 @@ pub enum Fold {
 }
 
 impl Fold {
-    pub fn parse(s: &str) -> Option<Fold> {
-        Some(match s {
-            "none" => Fold::None,
-            "neg" => Fold::Neg,
-            "aut" => Fold::Aut,
-            "frob" => Fold::Frob,
-            "frobneg" => Fold::FrobNeg,
-            _ => return None,
-        })
-    }
     pub fn name(&self) -> &'static str {
         match self {
             Fold::None => "none",
@@ -281,7 +271,11 @@ pub fn rho<F: Fq>(f: &F, inst: &Instance, n: u64, seed: u64, cfg: &RhoCfg, fold:
                                     jj2 = (jj2 + 1) % r;
                                     continue;
                                 }
-                                nxt = Some((cy, mulmod((ca + steps[jj2].0) % n, lam, n), mulmod((cb + steps[jj2].1) % n, lam, n)));
+                                nxt = Some((
+                                    cy,
+                                    mulmod((ca + steps[jj2].0) % n, lam, n),
+                                    mulmod((cb + steps[jj2].1) % n, lam, n),
+                                ));
                             }
                             let (cy, a2, b2) = nxt.unwrap();
                             iters += 1;
@@ -309,7 +303,7 @@ pub fn rho<F: Fq>(f: &F, inst: &Instance, n: u64, seed: u64, cfg: &RhoCfg, fold:
                     }
                     _ => {}
                 }
-                if step_no % CYCLE_BETA == 0 {
+                if step_no.is_multiple_of(CYCLE_BETA) {
                     saved = Some((x, step_no));
                 }
             }
@@ -323,7 +317,13 @@ pub fn rho<F: Fq>(f: &F, inst: &Instance, n: u64, seed: u64, cfg: &RhoCfg, fold:
 
 /// Verify that `(zx, zy)` acts on `P` as multiplication by `lam`: find the
 /// scalar among the candidates.
-pub fn eigenvalue<F: Fq>(f: &F, c: &Curve, p: (u64, u64), image: (u64, u64), cands: &[u64]) -> Option<u64> {
+pub fn eigenvalue<F: Fq>(
+    f: &F,
+    c: &Curve,
+    p: (u64, u64),
+    image: (u64, u64),
+    cands: &[u64],
+) -> Option<u64> {
     cands
         .iter()
         .copied()
@@ -332,7 +332,12 @@ pub fn eigenvalue<F: Fq>(f: &F, c: &Curve, p: (u64, u64), image: (u64, u64), can
 
 /// Build the automorphism folder of a `j = 0` or `j = 1728` curve over
 /// `F_p`, with its scalars on `⟨P⟩` of order `n`.
-pub fn folder_aut(fp: &super::field::Fp, c: &Curve, p: (u64, u64), n: u64) -> Result<Folder, String> {
+pub fn folder_aut(
+    fp: &super::field::Fp,
+    c: &Curve,
+    p: (u64, u64),
+    n: u64,
+) -> Result<Folder, String> {
     let f = *fp;
     let nf = super::field::Fp { p: n };
     let j = f.ec_j(c).ok_or("singular")?;
@@ -377,7 +382,13 @@ pub fn folder_aut(fp: &super::field::Fp, c: &Curve, p: (u64, u64), n: u64) -> Re
 
 /// Build the Frobenius folder of a Koblitz curve (`a, b ∈ F_2`) over
 /// `F_{2^m}`: `τ(P) = [λ_τ]P` with `λ_τ² − μλ_τ + 2 ≡ 0 (mod n)`.
-pub fn folder_frob(f2: &super::field::F2m, c: &Curve, p: (u64, u64), n: u64, with_neg: bool) -> Result<Folder, String> {
+pub fn folder_frob(
+    f2: &super::field::F2m,
+    c: &Curve,
+    p: (u64, u64),
+    n: u64,
+    with_neg: bool,
+) -> Result<Folder, String> {
     let f = *f2;
     if c.a > 1 || c.b != 1 {
         return Err("fold frob needs a Koblitz curve y² + xy = x³ + ax² + 1, a ∈ {0, 1}".into());
