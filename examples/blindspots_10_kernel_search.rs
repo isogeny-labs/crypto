@@ -3137,7 +3137,9 @@ fn cmd_summarize(args: &Args) {
         }
     }
     // yield-model check of the finalists' families against the conservation cell
-    if let Some(cons) = args.flag("--conserve") {
+    {
+        // the conservation cell's output sits next to the held-out files
+        let cons = format!("{dir}/conserve-17-6.jsonl");
         if let Ok(text) = std::fs::read_to_string(&cons) {
             let mut sub: Vec<f64> = vec![];
             let mut by_label: HashMap<String, f64> = HashMap::new();
