@@ -110,3 +110,48 @@ decomposition problem.
 
 **Next test:** ICC of |F| against volcano depth and cofactor-torsion type, and the same
 arm on an n = 31 class with a small cofactor, if one exists.
+
+## Follow-up (2026-10-18): the |F| effect and the work H1 do not replicate
+
+This is an additive amendment. The results above stand as recorded; this section
+records two replications that were run after them.
+
+**Grouping is uninformative.** In the sample, only K_a sits at volcano depth 0, and all
+32 curves have Tr(a₆) = 1. So neither depth nor trace can explain a curve effect here
+(`KOBLITZ_ICC_DIAG=1`, field `diag_F_by_group`).
+
+**|F| replication.** The same 32 curves were crossed with 32 fresh geometric V (seeds
+101–132). Each cell has 0 probes, so only the factor base is measured.
+
+| class | ICC(\|F\|) | data |
+|---|---|---|
+| n = 31, a₂ = 0, l = 10 | 0.000 [0, 0.007] | `pres_31_0_l10_geom_F_rep_s101-132.jsonl` |
+| n = 19, a₂ = 1, l = 6 | 0.000 [0, 0.009] | `pres_19_1_l6_geom_F_rep_s101-132.jsonl` |
+
+At n = 31, the residual variance of |F| is about 282, which is roughly binomial.
+
+**Full-arm replication.** The pre-registered arm was re-run unchanged except for the
+seeds: 32 curves × geometric V with seeds 5–8, 2000 probes per cell, PinX3. Data is in
+`pres_31_0_l10_geom_m3pin_rep_s5-8.jsonl`, and the ICCs are in
+`icc_n31_m3_geom_rep_s5-8.json`.
+
+| metric | original (seeds 1–4) | replication (seeds 5–8) |
+|---|---|---|
+| work_per_call | 0.228 [0.032, 0.403] | 0.000 [0, 0.043] |
+| yield per \|F\|³ | 0.000 [0, 0.116] | 0.075 [0, 0.243] |
+| log µs/call | 0.048 [0, 0.216] | 0.017 [0, 0.170] |
+| log projected solve | 0.067 [0, 0.219] | 0.094 [0, 0.253] |
+| \|F\| (diag) | 0.239 [0.025, 0.437] | 0.000 [0, 0.033] |
+
+**Reading.** The H1 on work_per_call, and the |F| effect that explained it, do not
+replicate on fresh subspaces. With only four V per curve, the original estimate most
+likely picked up chance alignment between particular curves and particular V; the
+bootstrap over curves does not capture that. The m = 3, n = 31 result is therefore
+**not H1**. It is inconclusive: no point estimate reaches 0.10 with a positive lower
+bound, but the upper bounds on yield and projected solve stay above 0.05. The earlier
+"factor-base-size effect" reading is withdrawn. The plausible cause discussed above
+(cofactor-torsion structure) is moot.
+
+Lesson for the design: with four subspaces, a curve × V interaction can masquerade as
+a curve effect. Future arms should either use more V per curve or require
+replication on fresh seeds before calling H1.

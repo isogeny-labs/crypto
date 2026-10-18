@@ -14,6 +14,8 @@
 //!
 //! Run: `cargo run --release --example koblitz_presentation_icc <pres.jsonl>...`
 
+use crypto_lib::binary_ecc::F2mElement;
+use crypto_lib::cryptanalysis::koblitz_isogeny_cost::field_for;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use serde_json::{json, Value};
@@ -85,6 +87,73 @@ fn icc(grid: &[Vec<f64>]) -> (f64, f64, f64, f64) {
     (if tot > 0.0 { su / tot } else { 0.0 }, su, sw, ms_e)
 }
 
+/// Absolute trace `Tr(a) = Σ a^{2^i}` of a one-word element of `F_{2^n}`.
+fn abs_trace(a: u64, n: u32) -> u64 {
+    let irr = field_for(n).expect("field");
+    let bits: Vec<u32> = (0..n).filter(|i| (a >> i) & 1 == 1).collect();
+    let mut x = F2mElement::from_bit_positions(&bits, n);
+    let mut t = F2mElement::zero(n);
+    for _ in 0..n {
+        t = t.add(&x);
+        x = x.square(&irr);
+    }
+    t.raw_bits().first().copied().unwrap_or(0)
+}
+
+/// Post-hoc: curve-mean `factor_base_points` grouped by volcano depth and by
+/// `Tr(a₆)`, with a curve-bootstrap 95 % interval for the group difference.
+fn f_by_group(n: u32, curves: &[u64], by: &BTreeMap<u64, BTreeMap<u64, &Value>>) -> Value {
+    let mean_f = |c: &u64| {
+        let v: Vec<f64> = by[c].values().map(|r| f(r, "factor_base_points")).collect();
+        v.iter().sum::<f64>() / v.len() as f64
+    };
+    let keys: [(&str, Box<dyn Fn(&u64) -> u64>); 2] = [
+        (
+            "depth",
+            Box::new(|c| by[c].values().next().unwrap()["depth"].as_u64().unwrap()),
+        ),
+        ("trace_a6", Box::new(|c| abs_trace(*c, n))),
+    ];
+    let mut out = serde_json::Map::new();
+    for (name, key) in keys {
+        let mut groups: BTreeMap<u64, Vec<f64>> = BTreeMap::new();
+        for c in curves {
+            groups.entry(key(c)).or_default().push(mean_f(c));
+        }
+        let summary: Vec<Value> = groups
+            .iter()
+            .map(|(k, v)| {
+                let m = v.iter().sum::<f64>() / v.len() as f64;
+                let sd = (v.iter().map(|x| (x - m).powi(2)).sum::<f64>()
+                    / (v.len().max(2) - 1) as f64)
+                    .sqrt();
+                json!({"key": k, "curves": v.len(), "mean_F": m, "sd_F": sd})
+            })
+            .collect();
+        let diff = if groups.len() == 2 {
+            let g: Vec<&Vec<f64>> = groups.values().collect();
+            let mean = |v: &[f64]| v.iter().sum::<f64>() / v.len() as f64;
+            let point = mean(g[1]) - mean(g[0]);
+            let mut rng = StdRng::seed_from_u64(11);
+            let mut boots: Vec<f64> = (0..2000)
+                .map(|_| {
+                    let rs = |v: &Vec<f64>, rng: &mut StdRng| -> Vec<f64> {
+                        (0..v.len()).map(|_| v[rng.gen_range(0..v.len())]).collect()
+                    };
+                    let (a, b) = (rs(g[0], &mut rng), rs(g[1], &mut rng));
+                    mean(&b) - mean(&a)
+                })
+                .collect();
+            boots.sort_by(f64::total_cmp);
+            json!({"key1_minus_key0": point, "ci95": [boots[50], boots[1949]]})
+        } else {
+            Value::Null
+        };
+        out.insert(name.into(), json!({"groups": summary, "difference": diff}));
+    }
+    Value::Object(out)
+}
+
 fn main() {
     let mut groups: BTreeMap<(u64, u64, u64, i64), Vec<Value>> = BTreeMap::new();
     for path in std::env::args().skip(1) {
@@ -154,6 +223,9 @@ fn main() {
                        "var_curve": su, "var_subspace": sw, "var_residual": se,
                        "share_subspace": if tot > 0.0 { sw / tot } else { 0.0 }}),
             );
+        }
+        if std::env::var("KOBLITZ_ICC_DIAG").is_ok_and(|v| v == "1") {
+            res.insert("diag_F_by_group".into(), f_by_group(n as u32, &curves, &by));
         }
         out.insert(format!("n={n} a2={a2} l={l} m={m}"), Value::Object(res));
     }
