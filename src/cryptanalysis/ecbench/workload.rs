@@ -78,6 +78,19 @@ pub enum CurveSpec {
         gx: u64,
         gy: u64,
     },
+    /// Explicit cofactor-one curve with a fixed external public target.
+    /// Build validates its order witness and subgroup membership.
+    PrimePublicFixture {
+        p: u64,
+        a: u64,
+        b: u64,
+        group_order: u64,
+        r: u64,
+        gx: u64,
+        gy: u64,
+        qx: u64,
+        qy: u64,
+    },
     /// `gaudry_quartic_d4::find_d4_curve(p, seed, max_cofactor)`: a curve
     /// over `F_{p⁴} = F_p[t]/(t⁴ − c)` with a rational 2-torsion point
     /// `T = (x₀, 0)`, `f'(x₀)` a square in `F_p`, `#E = h·r`, `r` prime,
@@ -288,6 +301,26 @@ impl CurveSpec {
                 gy,
             } => binary_explicit_instance(n, modulus, a, b, group_order, r, gx, gy)
                 .map(|i| Instance::Binary(Box::new(i))),
+            CurveSpec::Fp4Torsion {
+                p,
+                seed,
+                max_cofactor,
+            } => {
+                if !(5..=1021).contains(&p) || p % 4 != 1 || !is_prime_u64(p) {
+                    return Err("fp4_torsion requires a prime p = 1 mod 4 in 5..=1021".into());
+                }
+                find_d4_curve(p, seed, max_cofactor).map(|i| Instance::Fp4Torsion(Box::new(i)))
+            }
+            CurveSpec::F2m4Torsion {
+                m,
+                seed,
+                max_cofactor,
+            } => {
+                if !(4..=15).contains(&m) {
+                    return Err("f2m4_torsion requires 4 <= m <= 15".into());
+                }
+                find_bin_curve(m, seed, max_cofactor).map(|i| Instance::F2m4(Box::new(i)))
+            }
             CurveSpec::Fp4Translation { p, seed } => {
                 Fp4Instance::build(p, seed).map(|i| Instance::Fp4(Box::new(i)))
             }
@@ -327,7 +360,11 @@ impl CurveSpec {
             // Preserve the original Koblitz constructor: it carries the
             // certified Frobenius action and endomorphism identity that a
             // generic explicit binary instance intentionally does not claim.
-            Instance::Binary(_) | Instance::Wide(_) | Instance::Fp4(_) => None,
+            Instance::Binary(_)
+            | Instance::Wide(_)
+            | Instance::Fp4(_)
+            | Instance::Fp4Torsion(_)
+            | Instance::F2m4(_) => None,
         }
     }
 
@@ -366,6 +403,16 @@ impl CurveSpec {
             CurveSpec::Fp4Translation { p, seed } => {
                 format!("quartic_folds::generate_translation_instance({p}, {seed}, 16)")
             }
+            CurveSpec::Fp4Torsion {
+                p,
+                seed,
+                max_cofactor,
+            } => format!("find_d4_curve({p}, {seed}, {max_cofactor})"),
+            CurveSpec::F2m4Torsion {
+                m,
+                seed,
+                max_cofactor,
+            } => format!("find_bin_curve({m}, {seed}, {max_cofactor})"),
         }
     }
 }
@@ -374,7 +421,7 @@ impl CurveSpec {
 pub enum Instance {
     Prime(PrimeInstance),
     /// A curve over `F_{p⁴}` with rational 2-torsion (`fp4_torsion`).
-    Fp4(Box<D4Curve>),
+    Fp4Torsion(Box<D4Curve>),
     /// A curve over the tower `F_{(2^m)⁴}` (`f2m4_torsion`).
     F2m4(Box<BinCurve>),
     Binary(Box<BinaryInstance>),
@@ -494,6 +541,8 @@ impl Instance {
             Instance::Binary(i) => u128::from(i.r),
             Instance::Wide(i) => i.kc.r,
             Instance::Fp4(i) => u128::from(i.r),
+            Instance::Fp4Torsion(i) => u128::from(i.r),
+            Instance::F2m4(i) => u128::from(i.r),
         }
     }
 
@@ -560,7 +609,7 @@ impl Instance {
                 i.kc.generator.1,
                 2 * i.kc.n,
             ),
-            Instance::Fp4(i) => {
+            Instance::Fp4Torsion(i) => {
                 let f = &i.inst.curve.f;
                 let p = f.p;
                 let id = crate::cryptanalysis::curve_id::extension(
@@ -663,6 +712,24 @@ impl Instance {
                 let p = g.mul(&mut scratch, i.generator, k);
                 (!p.infinity).then(|| [format!("0x{:x}", p.x), format!("0x{:x}", p.y)])
             }
+            Instance::Fp4Torsion(i) => {
+                let p = i.inst.curve.mul(&i.generator, k);
+                (!p.inf).then(|| {
+                    [
+                        format!("0x{:x}", pack_e4(i.p(), &p.x)),
+                        format!("0x{:x}", pack_e4(i.p(), &p.y)),
+                    ]
+                })
+            }
+            Instance::F2m4(i) => {
+                let p = i.curve.mul(&i.generator, k);
+                (!p.inf).then(|| {
+                    [
+                        format!("0x{:x}", i.curve.f.pack(&p.x)),
+                        format!("0x{:x}", i.curve.f.pack(&p.y)),
+                    ]
+                })
+            }
             Instance::Wide(_) | Instance::Fp4(_) => unreachable!("returned above"),
         }
     }
@@ -683,7 +750,10 @@ impl Instance {
     ) -> Option<([String; 2], u64)> {
         let model = model_hash(curve);
         let mut scratch = GroupOps::default();
-        if let Instance::Fp4(_) = self {
+        if matches!(
+            self,
+            Instance::Fp4(_) | Instance::Fp4Torsion(_) | Instance::F2m4(_)
+        ) {
             // Planted targets only on E(F_{p⁴}): no public-target law yet.
             return None;
         }
@@ -732,7 +802,10 @@ impl Instance {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
                 }
-                Instance::Wide(_) | Instance::Fp4(_) => unreachable!("handled above"),
+                Instance::Wide(_)
+                | Instance::Fp4(_)
+                | Instance::Fp4Torsion(_)
+                | Instance::F2m4(_) => unreachable!("handled above"),
                 Instance::Binary(i) => {
                     let mask = if i.n >= 64 {
                         u64::MAX
@@ -1031,6 +1104,51 @@ impl Workload {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn extension_variants_have_distinct_constructors_and_subgroup_arithmetic() {
+        for spec in [
+            CurveSpec::Fp4Torsion {
+                p: 13,
+                seed: 1,
+                max_cofactor: 16,
+            },
+            CurveSpec::F2m4Torsion {
+                m: 4,
+                seed: 1,
+                max_cofactor: 16,
+            },
+            CurveSpec::Fp4Translation { p: 13, seed: 1 },
+        ] {
+            let encoded = serde_json::to_string(&spec).unwrap();
+            assert_eq!(serde_json::from_str::<CurveSpec>(&encoded).unwrap(), spec);
+            let inst = spec.build().unwrap();
+            let facts = inst.facts(&spec);
+            assert_eq!(inst.r(), facts.r);
+            assert_eq!(inst.mul_generator_hex(1).unwrap(), facts.generator);
+            assert!(inst.mul_generator_hex(0).is_none());
+            assert!(inst.mul_generator_hex(inst.r()).is_none());
+            assert!(inst.mul_generator_hex(2).is_some());
+            assert!(
+                inst.hash_to_subgroup(&facts, 1, 0).is_none(),
+                "extension public-target law remains explicitly unavailable"
+            );
+        }
+        assert!(CurveSpec::Fp4Torsion {
+            p: 9,
+            seed: 1,
+            max_cofactor: 16
+        }
+        .build()
+        .is_err());
+        assert!(CurveSpec::F2m4Torsion {
+            m: 3,
+            seed: 1,
+            max_cofactor: 16
+        }
+        .build()
+        .is_err());
+    }
 
     fn public_fixture() -> CurveSpec {
         CurveSpec::PrimePublicFixture {

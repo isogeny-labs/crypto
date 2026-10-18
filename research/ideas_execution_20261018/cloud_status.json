@@ -1,0 +1,19 @@
+{
+  "schema":"ideas-cloud-readiness/v1",
+  "items":[7,13],
+  "local_host":{"cpu_cores":4,"memory_bytes":17179869184,"gpu":false},
+  "local_credential_presence":{"RUNPOD_API_KEY":false,"MODAL_TOKEN_ID":false,"MODAL_TOKEN_SECRET":false,"AWS_ACCESS_KEY_ID":false,"AWS_SECRET_ACCESS_KEY":false},
+  "attempts":[
+    {"command":"python3 cloud/fleet.py status (cryptanalysis)","result":"RUNPOD_API_KEY missing"},
+    {"command":"gh secret list --repo aburan28/cryptanalysis","result":"403 Resource not accessible by integration; repository-held credentials remain unknown"},
+    {"command":"gh workflow run cloud-ecc2k130.yml --repo aburan28/cryptanalysis --ref claude/cryptanalysis-repo-setup-p59kek -f action=doctor","result":"422 workflow is disabled"},
+    {"command":"gh api repos/aburan28/cryptanalysis/actions/workflows/367505054","result":{"state":"disabled_manually","path":".github/workflows/cloud-ecc2k130.yml"}}
+  ],
+  "updates":[{"event":"User supplied RunPod access and selected RunPod route","credential_value_retained":false},{"event":"Authenticated status and GPU catalogue/availability queries succeeded"},{"event":"First allocation refused HTTP400 for unsupported provider CUDA13.3 enum; no pod created"},{"event":"Amended provider family13.0 request created dedicated ddklh0efbq99mv at2.49USD/hour with2hourcap; SSH readiness pending; actualdriver/nativegatesnotyetpassed"}],
+  "cloud_provisioning_executed":true,
+  "workflow_enable_executed":false,
+  "challenge_logarithm_recovered":false,
+  "blocked_scope":"Full multi-year public ECC2K-130 completion remains unfulfilled; bounded device/frontier campaign is provisioning through RunPod",
+  "next_concrete_route":"Run the existing doctor action after an authorized workflow/access configuration; verify DP ingestion/restart, matched device rate, memory/driver availability and bounded shutdown before launching billed workers.",
+  "interpretation":"Access/infrastructure limit only; not a mathematical negative. The ten-GPU-year audit figure was not independently measured in this round."
+}

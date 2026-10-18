@@ -1,0 +1,35 @@
+warning: unused import: `crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase`
+  --> src/cryptanalysis/ecbench/methods.rs:46:5
+   |
+46 | use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `crate::cryptanalysis::gaudry_quartic::Pt4`
+  --> src/cryptanalysis/ecbench/workload.rs:24:5
+   |
+24 | use crate::cryptanalysis::gaudry_quartic::Pt4;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `PtB`
+  --> src/cryptanalysis/ecbench/workload.rs:25:74
+   |
+25 | use crate::cryptanalysis::gaudry_quartic_bin::{find_bin_curve, BinCurve, PtB, TowerBasis};
+   |                                                                          ^^^
+
+warning: unused import: `unpack_e4`
+  --> src/cryptanalysis/ecbench/workload.rs:26:71
+   |
+26 | use crate::cryptanalysis::gaudry_quartic_d4::{find_d4_curve, pack_e4, unpack_e4, D4Curve};
+   |                                                                       ^^^^^^^^^
+
+warning: `crypto` (lib test) generated 4 warnings (run `cargo fix --lib -p crypto --tests` to apply 4 suggestions)
+    Finished `release` profile [optimized] target(s) in 0.25s
+     Running unittests src/lib.rs (target/release/deps/crypto_lib-565bcb20cb4d5bb4)
+
+running 1 test
+test cryptanalysis::jacobian_transfer::tests::trace_of_a_decides_whether_the_descent_exists ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4498 filtered out; finished in 0.46s
+

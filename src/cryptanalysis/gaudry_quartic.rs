@@ -1096,11 +1096,16 @@ pub(crate) struct Echelon {
 /// elimination, without scanning rows that are already zero there;
 /// `muls` counts the nonzero entries of each pivot row once per row it is
 /// subtracted from, and once for its normalisation.
-pub(crate) fn echelon_by_lead(
+pub(crate) fn echelon_by_lead(rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool) -> Echelon {
+    echelon_by_lead_with(rows, p, muls, debug, false)
+}
+
+pub(crate) fn echelon_by_lead_with(
     mut rows: Vec<Vec<u16>>,
     p: u32,
     muls: &mut u64,
     debug: bool,
+    sparsest: bool,
 ) -> Echelon {
     let ncols = rows.first().map_or(0, |r| r.len());
     let mut buckets: Vec<Vec<u32>> = vec![Vec::new(); ncols];
@@ -2933,6 +2938,40 @@ pub fn run_k4_la(p: u64, seed: u64, rho_runs: usize) -> K4LaReport {
 mod tests {
     use super::*;
     use rand::SeedableRng;
+
+    #[test]
+    fn both_echelon_pivot_policies_preserve_the_exact_small_row_space() {
+        fn span(rows: &[Vec<u16>], p: u16) -> std::collections::BTreeSet<Vec<u16>> {
+            let width = rows.first().map_or(0, Vec::len);
+            let mut result = std::collections::BTreeSet::new();
+            for mut code in 0..u64::from(p).pow(rows.len() as u32) {
+                let mut sum = vec![0; width];
+                for row in rows {
+                    let coefficient = (code % u64::from(p)) as u16;
+                    code /= u64::from(p);
+                    for (out, value) in sum.iter_mut().zip(row) {
+                        *out = (*out + coefficient * value) % p;
+                    }
+                }
+                result.insert(sum);
+            }
+            result
+        }
+        let rows = vec![
+            vec![1, 1, 1, 1],
+            vec![1, 0, 0, 1],
+            vec![0, 1, 1, 0],
+            vec![0, 0, 0, 0],
+        ];
+        let expected = span(&rows, 3);
+        for sparsest in [false, true] {
+            let mut work = 0;
+            let echelon = echelon_by_lead_with(rows.clone(), 3, &mut work, false, sparsest);
+            assert_eq!(span(&echelon.rows, 3), expected);
+            assert_eq!(echelon.zero_rows, 2);
+            assert!(work > 0);
+        }
+    }
 
     #[test]
     fn u16_kernels_match_the_reference_routines() {

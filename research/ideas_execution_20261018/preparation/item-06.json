@@ -1,0 +1,76 @@
+{
+  "item": 6,
+  "title": "Signature solvers plus trace replay",
+  "original_requirement": "Build/complete signature F5 or GVW and Joux-Vitse trace replay on Boolean descended systems, particularly degree4 m4 cells.",
+  "acceptance_criteria": [
+    "Compare existing Python/native/M4RI F5 with row filter and external F4/F5 on same inputs/host.",
+    "Independent generator/S-pair/root/group-law certificates; charge learning, divergence/fallback, reductions to zero and memory.",
+    "Replay across distinct targets of same shape, separating reuse and cold total cost."
+  ],
+  "source_bindings": [
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/boolean_f5b.py"
+    },
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/boolean_f5b_native.cpp"
+    },
+    {
+      "repository": "cryptanalysis",
+      "path": "experiments/pdp-scaling/boolean_f5b_m4ri.cpp"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/matrix_f5_f2.rs"
+    },
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "experiments/EXP-CERTBIN-4e92d7/specification.yaml"
+    },
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "experiments/EXP-CERTBIN-4e92d7/impl/driver.py"
+    },
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "experiments/EXP-CERTBIN-4e92d7/runs/RUN-CERTBIN-3b7e05/run-report.md"
+    }
+  ],
+  "source_supported_commands": [
+    {
+      "repo": "cryptanalysis",
+      "argv": [
+        "python3",
+        "experiments/pdp-scaling/solve.py",
+        "--engine",
+        "boolean-f5b",
+        "--n",
+        "17",
+        "--m",
+        "4",
+        "--l",
+        "3",
+        "--seed",
+        "1",
+        "--timeout",
+        "3600"
+      ],
+      "purpose": "Existing F5 cell with native independent output verification; example cell is a diagnostic, not full requested grid.",
+      "kind": "scientific_diagnostic"
+    }
+  ],
+  "remaining_gaps": [
+    "Prior CERTBIN replay run exists: inspect receipt and coverage before selecting distinct rerun trials.",
+    "Complete m4 degree4 comparison including external fastest baseline and charged trace learning/fallback still needs a frozen trial grid.",
+    "Native F5 caps at12variables; m4 ell4 needs backend extension or other existing engine."
+  ],
+  "dependencies": [],
+  "existing_evidence_notes": [
+    "Signature solvers already exist; original not-built premise is not current."
+  ],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "A signature-based F5 or GVW engine plus Joux–Vitse trace replay. The framework doc calls it \"the obvious next engine\" and it was never built. Reductions to zero matter exactly at degree 4, where the m = 4 route lives."
+}

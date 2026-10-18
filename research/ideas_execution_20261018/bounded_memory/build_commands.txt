@@ -1,0 +1,6 @@
+# Executed from /workspace/crypto. Direct exporter build avoids the shared Cargo lock.
+g++ -O2 -std=c++17 -Wall -Wextra -Wpedantic research/ideas_execution_20261018/bounded_memory/src/disk_macaulay.cpp -lcrypto -o /tmp/ideas-disk-macaulay
+g++ -O2 -std=c++17 -Wall -Wextra -Wpedantic research/ideas_execution_20261018/bounded_memory/src/resource_probe.cpp -o /tmp/ideas-resource-probe
+/workspace/toolchains/rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc --edition=2021 -C opt-level=2 examples/ideas_bounded_memory_export.rs -L dependency=target/release/deps -L native=target/release/build/blake3-6d304e0d8c3c3997/out -L native=target/release/build/libsqlite3-sys-b838caf68ed61ad3/out --extern crypto_lib=target/release/deps/libcrypto_lib-3e0b38c24aa5646f.rlib --extern num_bigint=target/release/deps/libnum_bigint-55328cacea398f24.rlib --extern serde_json=target/release/deps/libserde_json-458049281485fb75.rlib -o /tmp/ideas-bounded-memory-export
+# Library names above are the shell-expanded first matching paths selected
+# by the executed direct build. The direct compiler exited 0 with empty stderr.

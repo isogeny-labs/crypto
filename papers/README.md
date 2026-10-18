@@ -11,6 +11,8 @@ directory per paper.
 | [`rootfinding-decomposition/`](rootfinding-decomposition/) | Point Decomposition by Root Finding: Replacing Gröbner-Basis Solvers in Elliptic-Curve Index Calculus, with Measurements on Prime and Binary Curves up to NIST P-521 | research draft, anonymized, not submitted, not cleared; engineering-class stage result, no security claim; Markdown twin in `RESEARCH_SEMAEV_ROOTFIND_VS_GROEBNER.md`; Prop. 1 machine-checked in `rootfinding-decomposition/lean/` |
 | [`ecdlp-index-calculus-program/`](ecdlp-index-calculus-program/) | Index Calculus for the Elliptic-Curve Discrete Logarithm, Measured: a fourteen-week programme record (July–October 2026) | research draft, anonymized, not submitted; synthesis of committed evidence, no new measurement; proposes a split into five papers (README) |
 
+| [`ecdlp-boundaries-20261018/`](ecdlp-boundaries-20261018/) | Scoped Boundaries for Elliptic-Curve Index Calculus: Counterexamples, Conservation, and Oracle Models | source-bound research draft, anonymized, not independently reviewed, not submitted or published; six-result scope audit and two-target Lean inventory, no new trials |
+
 Markdown drafts that are not yet typeset stay with their notes and are listed
 here so they are not lost: `research/ecdlp_autolab/PAPER_DRAFT.md` (An Empirical
 Resistance Map for Prime-Field ECDLP) and `research/iso1_weak_classes_20261007/REPORT.tex`

@@ -1,0 +1,25 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Ideas execution item15: diagnostic k4 D4 by double-large-prime factorial",
+  "description": "Prospective toy correctness and operation-count factorial. Four arms use identical workload/target seeds and LP exponent0.95. Include the current eager D4 incumbent, null A/A, rho.negation and preprocessing rho reference where supported. Historical algebraic c4 charges: S4=1.213e12 and D4=2.54e10 Fp multiplications,97 per GAE. Exact-enumeration oracle and bookkeeping are counted uncharged: all IC costs remain lower bounds; no end-to-end speedup or scaling claim. Four-size panel is separate from, and does not replace, historical p101..1301 experiments. Protocol: research/ideas_execution_20261018/oracle_integration/PROTOCOL.md.",
+  "workloads": {
+    "curves": [
+      {"kind":"fp4_translation","p":13,"seed":1},
+      {"kind":"fp4_translation","p":17,"seed":1},
+      {"kind":"fp4_translation","p":29,"seed":1},
+      {"kind":"fp4_translation","p":37,"seed":1}
+    ],
+    "targets_per_curve":8,
+    "target_seed":20261018
+  },
+  "arms":[
+    {"name":"neither","role":"baseline","method":{"id":"ic.k4_gaudry","params":{"base":"xline","large_primes":"0","c4":"1.213e12","lp_exponent":"0.95"}}},
+    {"name":"2lp-only","role":"candidate","method":{"id":"ic.k4_gaudry","params":{"base":"xline","large_primes":"2","c4":"1.213e12","lp_exponent":"0.95"}}},
+    {"name":"d4-only","role":"candidate","method":{"id":"ic.k4_gaudry","params":{"base":"yline-d4","large_primes":"0","c4":"2.54e10","lp_exponent":"0.95"}}},
+    {"name":"d4-2lp","role":"candidate","method":{"id":"ic.k4_gaudry","params":{"base":"yline-d4-lp","large_primes":"2","c4":"2.54e10","lp_exponent":"0.95"}}},
+    {"name":"d4-eager-incumbent","role":"candidate","method":{"id":"ic.k4_gaudry","params":{"base":"yline-d4-ed","large_primes":"0","c4":"2.54e10","lp_exponent":"0.95"}}},
+    {"name":"d4-aa","role":"control","method":{"id":"ic.k4_gaudry","params":{"base":"yline-d4","large_primes":"0","c4":"2.54e10","lp_exponent":"0.95"}}},
+    {"name":"rho-negation","role":"reference","method":{"id":"rho.negation"}}
+  ],
+  "measurement":{"rounds":1,"warmup":0,"order":"alternate","seed":1,"isolation_required":"L0","timeout_seconds":300}
+}

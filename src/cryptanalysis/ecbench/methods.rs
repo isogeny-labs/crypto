@@ -49,8 +49,9 @@ use crate::cryptanalysis::ic_framework::fiber::{
 };
 use crate::cryptanalysis::ic_framework::plugins::{
     BinarySubspaceBase, CompactOrbitScanBase, CyclotomicBase, DescentAlgebraicOracle,
-    FrobeniusMitmOracle, GlvOrbitBase, KoblitzOrbitBase, MitmOracle, PrimeAbscissaBase,
-    PrimeBatchMitmOracle, PrimeProjectedAbscissaBase, RootfindSubtractOracle, SubtractOracle,
+    FrobeniusMitmOracle, GlvOrbitBase, KoblitzOrbitBase, MitmOracle, OnbWeightBase,
+    PrimeAbscissaBase, PrimeBatchMitmOracle, PrimeProjectedAbscissaBase, RootfindSubtractOracle,
+    SubtractOracle,
 };
 use crate::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crate::cryptanalysis::ic_framework::rootfind::{RootfindMitmOracle, RootfindPairsOracle};
@@ -1190,7 +1191,7 @@ fn solve_inner(
             super::cm_folded::solve(m, i, PrimePoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), "ic") => solve_ic_prime(m, i, curve, PrimePoint::affine(tx, ty), seed),
-        (Instance::Fp4(i), "ic") if m.id == "ic.pipeline" => {
+        (Instance::Fp4Torsion(i), "ic") if m.id == "ic.pipeline" => {
             let p = i.p();
             let target = Pt4 {
                 x: unpack_e4(p, tx),
@@ -1199,7 +1200,7 @@ fn solve_inner(
             };
             solve_ic_fp4(m, i, curve, target, seed)
         }
-        (Instance::Fp4(_), "ic") => Err(format!(
+        (Instance::Fp4Torsion(_), "ic") => Err(format!(
             "`{}` does not run on a curve over F_(p^4); ic.pipeline does",
             m.id
         )),
@@ -1304,6 +1305,30 @@ fn solve_inner(
             let g = BinaryGroup(&i.fast);
             solve_generic(m, &g, i.generator, FastPoint::affine(tx, ty), i.r, seed)
         }
+        (Instance::Fp4Torsion(i), _) => solve_generic(
+            m,
+            &i.inst.curve,
+            i.generator,
+            Pt4 {
+                x: unpack_e4(i.p(), tx),
+                y: unpack_e4(i.p(), ty),
+                inf: false,
+            },
+            i.r,
+            seed,
+        ),
+        (Instance::F2m4(i), _) => solve_generic(
+            m,
+            &i.curve,
+            i.generator,
+            PtB {
+                x: i.curve.f.unpack(tx),
+                y: i.curve.f.unpack(ty),
+                inf: false,
+            },
+            i.r,
+            seed,
+        ),
         (Instance::Wide(_), _) | (Instance::Fp4(_), _) => unreachable!("returned above"),
     }
 }
@@ -2821,8 +2846,11 @@ pub fn dump_factor_base(
     if let Instance::Wide(_) = &inst {
         return Err("no factor-base plug-in runs on a wide (n > 62) curve yet".into());
     }
-    if let Instance::Fp4(_) = &inst {
-        return Err("no factor-base plug-in runs on E(F_p⁴); ic.k4_gaudry builds its own".into());
+    if matches!(
+        &inst,
+        Instance::Fp4(_) | Instance::Fp4Torsion(_) | Instance::F2m4(_)
+    ) {
+        return Err("extension-field IC methods build their own factor bases; no standalone dump plug-in is available".into());
     }
     match &inst {
         Instance::Prime(i) => {
@@ -2920,7 +2948,9 @@ pub fn dump_factor_base(
                 build_doubles: total.doubles,
             })
         }
-        Instance::Wide(_) | Instance::Fp4(_) => unreachable!("returned above"),
+        Instance::Wide(_) | Instance::Fp4(_) | Instance::Fp4Torsion(_) | Instance::F2m4(_) => {
+            unreachable!("returned above")
+        }
     }
 }
 

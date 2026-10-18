@@ -1,0 +1,22 @@
+{
+  "schema":"ideas-execution-native-run/v1",
+  "item":17,
+  "source_base":"e063d98475589d9aba7ae265a8cba830927e3156",
+  "working_revision":"b3a3321c with exact core build-repair patch retained",
+  "source_binary_sha256":"input-sha256.txt",
+  "build_patch":"build-repairs.patch",
+  "build_provenance_limit":"The retained repair patch captures the working tree after the initial build began, including later test/constructor-validation edits. It is not asserted to be a bit-for-bit build-source snapshot. The executed binary digest is exact; scientific a2/cyclotomic/solver source files were unchanged at the pinned base revision.",
+  "argv":["target/release/examples/a2_cyclotomic_base","--out","research/ideas_execution_20261018/runs/a2-n23-20261018","--targets","16","--yield-targets","64","--seed","20261012","--cell-timeout-secs","150","--wdsat-timeout-secs","20","--node-budget","1024","--macaulay-extra","1","--engine","inherited","--cells","n23","--label","execution-20261018"],
+  "exit_status":0,
+  "reported_whole_run_seconds":1069.9,
+  "isolation":"L0 shared four-CPU host; concurrent builds/trials; wall times are descriptive and not comparative",
+  "memory_limit_bytes":17179869184,
+  "WDSAT_BINARY":null,
+  "WDSAT_SRC":null,
+  "solver_cells":{"declared":5,"timed_out_before_target_record":2,"completed_with_16_target_records":2,"unsupported_encoding":1,"completed_target_records":32,"resolved_solving_degrees":0,"verified_lifted_decompositions":0},
+  "initial_failed_attempt":{"argv_prefix":"/usr/bin/time -v","exit_status":127,"reason":"/usr/bin/time absent; no scientific trial launched","stderr":"stderr.log"},
+  "successful_launch":{"wrapper":"bash time -p","stdout":"stdout-run.log","stderr":"stderr-run.log","note":"Shell timing was returned in tool output, not separately captured; runner itself records elapsed whole-run time."},
+  "result":"a2_results_execution-20261018.json",
+  "classification":"bounded actual native solver attempt; unresolved degree is not negative mathematics",
+  "complete_against_item17":false
+}

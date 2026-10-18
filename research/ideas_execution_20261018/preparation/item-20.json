@@ -1,0 +1,40 @@
+{
+  "item": 20,
+  "title": "Classical pre/post processing for quantum ECDLP",
+  "original_requirement": "Execute the quantum ECDLP resource-estimate track, including classical setup and postprocessing, coherent computation, recovery and verification.",
+  "acceptance_criteria": [
+    "Use common algorithm and architecture assumptions for qubits, depth, gates, classical work, memory and reuse.",
+    "Reproduce primary-source formulas and compare complete algorithms without mixing headline estimates.",
+    "Produce a draft with explicit model scope and uncertainty; quantum conclusions remain separate from classical ECDLP measurements."
+  ],
+  "source_bindings": [
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/quantum_estimator.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "quantum_circuit_secp256k1/README.md"
+    },
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "experiments/EXP-ICEX-a54be2/specification.yaml"
+    },
+    {
+      "repository": "crypto-autoresearcher",
+      "path": "ledger/proposals/IDEA-20260815-f4c398.yaml"
+    }
+  ],
+  "source_supported_commands": [],
+  "remaining_gaps": [
+    "quantum_estimator.rs traces abstract ECPM circuit construction; it does not implement a complete Shor resource model with classical pre- and postprocessing.",
+    "Bind the exact algorithm, primary sources, assumptions and stages. The related ICEX-a54be2 draft has its own literature gate and is not an approved instance of this requested task.",
+    "No complete common-assumption resource pipeline or draft is provided by this preparation."
+  ],
+  "dependencies": [],
+  "existing_evidence_notes": [],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "Adjacent and off-thesis: classical pre- and post-processing for quantum ECDLP. The resource-estimate goal is a draft only."
+}
