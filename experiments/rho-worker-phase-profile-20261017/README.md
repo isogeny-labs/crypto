@@ -177,3 +177,17 @@ the 96-case plan expansion, reproducible provisional source archive, and
 fail-closed non-Linux preflight. Rebuild and hash the archive on the final
 merged source before dispatch; the provisional archive is not a hosted
 measurement artifact.
+
+The [long all-Q replay](local-all32-long-worker-replay/summary.json) used
+the hosted panel's `dp_bits=12` and 8,192-step cap. It completed 64/64 arms
+and 32/32 serial/batch exact-output pairs with zero failures. The raw
+ledger and its digest are retained. This remains a local correctness result;
+the shared host's elapsed times are excluded from the speed decision.
+The [32-walker phase trace](local-long-32x8192-dp12.json) independently
+replayed 106,327 walk steps and 32 starts after constructing 32 branch
+points. Setup plus starts occupied 3.61% of its locally observed profiled
+interval; host load was high, so that percentage is a diagnostic, not a
+Tier 1 estimate. The trace strengthens the case for measuring walk-step
+arithmetic in the full-worker panel. The [long validation receipt](worker-batch-long-validation.json)
+pins the replay and trace hashes and records the fail-closed local host
+preflight.

@@ -1,0 +1,38 @@
+{
+  "schema": "rho-worker-batch-long-validation-v1",
+  "date_utc": "2026-10-18",
+  "correctness": {
+    "receipt": "local-all32-long-worker-replay/summary.json",
+    "arms": 64,
+    "pairs": 32,
+    "failures": 0,
+    "dp_bits": 12,
+    "step_cap": 8192,
+    "arms_jsonl_sha256": "d5d8dbf50dbd667e54364896132eb9df3d8c7649b632a81a50b8f46fbbdf4e93",
+    "binary_sha256": "4abb042cf481fb880127718943f6ccbb704a5a4e646927a5ceecb0d3f6025e59",
+    "temporary_upstream_repair_commit": "0e1aeeebd8c104c453e8d82f02ccf0e85f7dc014"
+  },
+  "long_phase_diagnostic": {
+    "receipt": "local-long-32x8192-dp12.json",
+    "receipt_sha256": "dc0d6ab4598fad17c9b92e30682d7365388ec91152fa2bfbec2d690eafe346a3",
+    "binary_sha256": "9d94ed7b1ea318769ece8ab158fa5f2bc7d9dc2202208e7d4c3d199fba56218c",
+    "branch_points": 32,
+    "walker_starts": 32,
+    "walk_steps": 106327,
+    "transcript_blake3": "8abc16ee2b29b7531d2fcbf9c1bce660061464c2b36deecca095d13234f22dc2",
+    "independent_replay": "passed_for_every_walker",
+    "local_setup_and_start_fraction": 0.03608392129589697,
+    "measurement_tier": "local_diagnostic"
+  },
+  "tier1_plan": {
+    "q_manifest_sha256": "f46ad43788b7f9241927904541cbeb03ea70a96ca95aa84d527a9b22ba8d12b8",
+    "cases": 96,
+    "arms": 768,
+    "provisional_source_bundle_sha256": "b03c7fabe6a70df08cb0102f5e185e3798d9e9e3ffde93dc0656312f83a16e68",
+    "source_bundle_rebuilt_identically": true,
+    "preflight_on_non_linux_host": "rejected_zero_arms",
+    "independent_audit_on_non_linux_host": "unknown_gate_failed",
+    "hosted_measurement_started": false
+  },
+  "performance_result": null
+}

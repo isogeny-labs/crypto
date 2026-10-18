@@ -21,6 +21,7 @@ EXPLICIT = [
     'experiments/rho-worker-phase-profile-20261017/build_worker_batch_plan.py',
     'experiments/rho-worker-phase-profile-20261017/analyze_tier1_worker_batch.py',
     'experiments/rho-worker-phase-profile-20261017/validate_worker_batch_fixtures.py',
+    'experiments/rho-worker-phase-profile-20261017/make_worker_source_bundle.py',
 ]
 
 
@@ -36,7 +37,8 @@ def paths():
         else:
             result.add(path)
     files = sorted(path for path in result if path.is_file())
-    if not files or any(not path.is_relative_to(ROOT) for path in files):
+    if not files or any(not path.is_relative_to(ROOT) or path.is_symlink()
+                        for path in files):
         raise ValueError('source selection escaped repository')
     if any(not path.is_file() for path in (ROOT / name for name in EXPLICIT)):
         raise ValueError('required source file missing')
