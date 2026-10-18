@@ -21,6 +21,10 @@ _research/isogeny_conductor_gap_round5_20261012. E6 2026-10-12 (stage diagnostic
   [e7b_k0 (ECBS1heff1e81e9e36)], [80], [ok, 12 replays], [L2 44, L1 36])
 E6 records: e6/records.jsonl (not an ecbench session; exact counts). Run reports under reports/.
 
+== §5a pricing band (weights 0, 0.1, 1 GAE per op)
+- E7a: cleared base cheaper than the best fiber-closed arm on every curve at every weight (ratio 0.18 to 0.97). Cleared over rho spans 7.1 to 27; best cell 7.06 to 7.29 times rho. Rho is cheaper than every IC arm at every weight.
+- E7b: trace-kernel MITM beats default MITM on both curves at every weight. Trace-kernel F4 beats default F4 over F#sub[2]#super[23]; over F#sub[2]#super[19] the pair is unresolved. Priced F4 arms trail rho by 10#super[4] to 10#super[6].
+
 == Leads, ranked
 + Solvable systems cost 3–10× more to solve; every yield lever moves work there. Measure where (basis completion or solution extraction) and decide consistency first.
 + Affine trace-kernel subspaces for Tr(a) = 1 (a = 1 Koblitz, h = 2) need an offset in the descent.

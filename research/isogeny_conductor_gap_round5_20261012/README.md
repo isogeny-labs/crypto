@@ -152,6 +152,27 @@ candidate is that the default base already leans toward `2E`.  Point
 existence over `x` (`Tr(x + a + b/x²) = 0`) is not independent of `Tr(x)`.
 The fraction of default base points in `2E` was not measured.
 
+## §5a pricing band
+
+Every E7 session was priced with `ecbench band --weights 0,0.1,1`
+(unpriced native work at 0, 0.1 and 1 GAE per operation, rho included).
+Outputs: `sessions/<name>.band.{json,md}`, and the per-curve E7a rows in
+[`TABLES_E7.md`](TABLES_E7.md).
+
+- **E7a.** The cleared base is cheaper than the best fiber-closed arm on
+  every curve at every weight (cleared ÷ closed 0.18–0.97).  Cleared ÷ rho
+  spans 7.1–27 across the band; the best cell is 7.06–7.29× rho on
+  `icv1-fp22-tm1504-967cbbde`.  Rho is cheaper than every IC arm at every
+  weight.
+- **E7b.**
+  - Trace-kernel MITM is cheaper than default MITM on both curves at every
+    weight.
+  - Trace-kernel F4 is cheaper than default F4 over F_2^23.  Over F_2^19 the
+    pair is unresolved inside the band.
+  - Once the solver's field operations are priced, every F4 arm is far
+    behind rho (by a factor 10⁴–10⁶ at w = 0.1 and 1).  The F4 rows are a
+    relation-phase stage measurement, not a competitive method.
+
 ## Leads, ranked by the evidence
 
 1. **Solvable systems cost 3–10× more to solve than unsolvable ones.**
