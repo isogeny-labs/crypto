@@ -2294,3 +2294,29 @@ order, as `512 = 98,304 / 192` for `D₄`); weighted Macaulay bound `16 − 6 + 
 coordinate fixed by `P₁, P₂` and a group check.  **Derived expectation, not a prediction:** with
 an eighth of the quotient and a fifth of the columns, `C_V₄` could fall below `C_w / 30`, past
 G2.23's band, which would then be falsified on the high side.
+
+### 9.11 E21 measured: trace replay on the weighted solve is a net loss
+
+*2026-10-18.*  `examples/d4_replay.rs --sizes 53,101 --seed 1 --targets 201`, two threads, on the
+`τ_T` instances (`generate_translation_instance(p, 1, 4)`); raw
+`experiments/28_e21_replay/e21.json` (per target: both costs, rows, degrees, outcome), log
+`e21.log`.  The trace is recorded on each curve's first target; 200 more targets are solved in
+full and by replay.
+
+| p | agree | fell back | `C` full / replayed, median | total `C` full / replayed | zero rows skipped | pivots reached by the normal forms |
+|--:|--:|--:|--:|--:|--:|--:|
+| 53 | 200 / 200 | 47 (23.5 %) | 1.016× | 0.951× | 291 of 3,979 | 2,877 of 3,688 |
+| 101 | 200 / 200 | 26 (13 %) | 1.021× | 0.980× | 291 of 3,979 | 2,877 of 3,688 |
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.18 | identical decomposition sets on all 400 targets | **holds** |
+| G2.19 | replayed targets save `6.3 %` of the elimination, `1.02×` of `C` (median); with fallbacks charged the total is `0.95`–`0.98×` | **falsified** (band `1.03`–`1.20`) |
+| G2.20 | `13 %` fallbacks at `p = 101` (`23.5 %` at `53`): which rows reduce to zero is not stable across targets of one curve | **falsified** (`≤ 5 %`) |
+| G2.21 | `22 %` of the echelon's pivots are never reached by the normal forms — the ceiling on what a reached-pivots-only elimination could save on the elimination (`34 %` of `C`), i.e. `≤ 1.08×` of `C` | measured |
+
+**What it says.**  The weighted solve has little repeated structure to exploit: the rows that
+vanish are `7 %` of the matrix and not the same rows from one target to the next, and the
+elimination work they carry is small.  Unlike F4's pair selection (§12 of the cover ledger,
+`2.44×`), a Macaulay matrix at its bound wastes little.  Direction 2a is closed for this solver;
+direction 2c's ceiling is `≤ 1.08×`.  **Class: engineering, negative.**
