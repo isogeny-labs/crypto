@@ -324,8 +324,8 @@ pub fn run_walkers_batch(
                     .checked_add(assigned as u64)
                     .expect("walker index overflow");
                 let (mut a, mut b, mut point) = ctx.walker_start(walker);
-                if ctx.spec.negation_map && needs_flip(&point, &ctx.p) {
-                    point = point.neg();
+                if ctx.spec.negation_map && needs_flip(&point, &ctx.half_p) {
+                    point = point.neg_vartime();
                     a = neg_mod(&a, &ctx.n);
                     b = neg_mod(&b, &ctx.n);
                 }

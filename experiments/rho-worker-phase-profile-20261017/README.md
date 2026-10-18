@@ -73,9 +73,9 @@ ranges stop at check-in and walker-budget boundaries, and the lane test
 compares ordered check-ins and counters with the serial lane. An external
 stop request can discard already computed, unpublished walkers in the
 current batch.
-The [batch walker validation receipt](batch-walker-validation.json) binds the
-final source hash and complete release-suite log; 2,246 tests passed, 94
-were ignored, and none failed.
+The [batch walker validation receipt](batch-walker-validation.json) binds its
+pre-rebase source hash and complete release-suite log; 2,246 tests passed,
+94 were ignored, and none failed.
 The [live lane validation receipt](batch-lane-validation.json) binds the
 opt-in worker source and both full-suite attempts. The first attempt was
 interrupted after 2,247 passes while an unrelated random curve-search test
@@ -83,11 +83,40 @@ remained CPU-active; the retry passed 2,248 tests with 94 ignored. Neither
 receipt is a throughput measurement.
 
 The [local validation receipt](batch-step-local-validation.json) binds the
-batch-step source hash and release test logs. The focused tests passed 2/2.
+pre-rebase batch-step source hash and release test logs. The focused tests passed 2/2.
 The first full-library run passed 2,242 tests and hit two loopback
 `PermissionDenied` failures in existing network tests under sandboxing.
 Those three network tests passed with loopback access, and a full rerun in
 that environment passed 2,244 tests with 94 ignored.
+
+## Current-main reconciliation
+
+Current main changed the serial walk to use variable-time point arithmetic,
+normalize before escaping a two-cycle, and select the smaller-x cycle member
+for the escape. The batched addition now follows that order and uses the
+context's precomputed `half_p` for start normalization. The earlier batch
+validation receipts above remain tied to their original source hashes.
+
+The [rebase validation receipt](rebased-validation.json) pins the current
+rho source and every local test log. On a temporary combination of rho
+commit `9069bd688b` and the existing
+[main build repair PR #2135](https://github.com/aburan28/crypto/pull/2135)
+at `37bcf08a`, all 44 collaborative rho release tests passed, including
+the new batch state, outcome, and check-in replays. The temporary repair
+merge is excluded from this rho branch's diff. The refreshed
+[local profile](local-rebased-4x8192-dp12.json) independently replayed all
+four walkers and reproduced the 10,152-step transcript digest. Its observed
+setup/start share was 35.6% on the contended host; the previous local
+receipt recorded 75.6% on the same inputs.
+
+The [first combined-source full-suite log](rebased-full-censored.log) records
+one `jv_cover` F4 replay failure under concurrent load and one long test
+still active when the run was interrupted. That `jv_cover` test passed alone
+in 36.74 seconds; see its [focused log](rebased-jv-replay.log). A clean
+full-suite result on current main still depends on the build repair. A
+four-thread retry passed 1,089 tests before it was stopped after the repair
+branch advanced; its [partial log](rebased-full-fourthreads-censored.log)
+is retained. No throughput result has been measured for the batch lane.
 
 ## Next gates
 
@@ -107,4 +136,4 @@ that environment passed 2,244 tests with 94 ignored.
    cap before changing the default path. The generic C rho path has a
    64-bit group order; the full-size worker is this Rust implementation.
 
-No worker routing changes are made by this profiler.
+The default worker routing remains serial.
