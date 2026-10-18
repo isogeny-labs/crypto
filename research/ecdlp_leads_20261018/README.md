@@ -1,12 +1,18 @@
 # Non-generic ECDLP leads for prime, binary and Koblitz curves
 
 **Date.** 2026-10-18. **Kind.** Search round (theory, literature and repository
-search). **Status.** Proposals and derivations only. Nothing here is a
-measurement, and no security claim about any deployed curve is made or
-withdrawn. Every statement carries one of four labels: *sourced* (a cited
-fact), *derived* (follows from sourced facts by the argument shown here; prose,
-no `IDC1` certificate yet), *computed* (shell arithmetic of a stated formula,
-values in `cover-genus-budget.csv`), or *proposed* (open).
+search, plus two exhaustive enumerations for lead L8). **Status.** Proposals
+and derivations, and one measured lead: L8, with run reports under
+[`reports/`](reports/). No security claim about any deployed curve is made or
+withdrawn. Every statement carries one of five labels:
+
+- *sourced*: a cited fact;
+- *derived*: follows from sourced facts by the argument shown here (prose, no
+  `IDC1` certificate yet);
+- *computed*: shell arithmetic of a stated formula, values in
+  `cover-genus-budget.csv`;
+- *measured*: exact enumeration by `etale_search`, recorded in a run report;
+- *proposed*: open.
 
 PDF: [`report.pdf`](report.pdf). Figures: [`lead-map.svg`](lead-map.svg) and
 [`cover-genus-budget.svg`](cover-genus-budget.svg), with data in
@@ -101,6 +107,12 @@ listed so that nobody spends budget on them.
    is subexponential. A covering curve of genus at most c(n)·n would beat
    rho, where c(n) runs from 1.9 at n = 131 to 6.1 at n = 571 *(computed)*.
    The open question is the minimal genus (L6–L9).
+   - The L8 étale search now covers every base curve of genus ≤ 3 over F₂
+     *(measured)*. A T_n factor appears only at n = 3 and at n = 5, the
+     latter from one plane quartic with a genus-11 cover carrying T₅ for
+     a = 0.
+   - The route is closed for ECC2K-130, K-163 and K-233. K-283, K-409 and
+     K-571 need bases of genus 4 or more.
 3. **Random-b binary curves: only the cover question is new here.** A
    random-b curve does not lift to a curve over Q, so the modular mechanism
    behind the Koblitz leads is unavailable *(derived sketch)*. The one new
@@ -114,7 +126,7 @@ defined above.
 
 | # | family | lead | status | first experiment | kill criterion | if it works |
 |:--|:--|:--|:--|:--|:--|:--|
-| L8 | Koblitz | Étale route: curve D/F₂ with an order-n automorphism and an F₂-map to E; its twist contains E × T_n, genus 1 + n(g₀ − 1) | **measured (partial):** hits only at n = 3; none for any n from 5 to 37 over genus-2 and hyperelliptic genus-3 B | next: plane-quartic genus-3 B (#J up to 198, which reaches n = 131, 163), then genus 4 | no hit for plane quartics | the only structured family inside the L(1/2) budget for K-163, K-283, K-409 and K-571, with explicit maps |
+| L8 | Koblitz | Étale route: curve D/F₂ with an order-n automorphism and an F₂-map to E; its twist contains E × T_n, genus 1 + n(g₀ − 1) | **measured, every base of genus ≤ 3:** hits at n = 3 and n = 5 only (one plane quartic gives a genus-11 cover carrying T₅, a = 0); **closed for ECC2K-130, K-163 and K-233** | next: genus-4 bases with 283 ∣ L_B(λ), ord λ ≤ 3, for K-283 | no hit for genus-4 B at n = 283 | the only structured family left inside the L(1/2) budget for K-283, K-409 and K-571, with explicit maps |
 | L6 | Koblitz | Modular twists: (f_E ⊗ χ) mod 2 ≅ T_n up to isogeny, for every n | derived | find the smallest curve whose Jacobian contains A_{f⊗χ} for n = 3, 5, 7, 11 (modular quotients, Fermat quotients of level 7ℓ, Ekedahl–Serre curves) | minimal genus grows faster than c(n)·n | an explicit, computable transfer of T_n into a Jacobian over F₂ |
 | L10 | random-b binary | Genus-n Jacobians realising Res(E), beyond GHS | proposed | n = 3: all genus-3 curves over F₂, which traces t₃ are realised. n = 5: genus-5 curves with point counts 3, 5, 9, 17, 33 − 5t₅ | no genus-5 realisation for any t₅ | a genus-O(n) family would make prime-degree binary curves subexponential |
 | L9 | Koblitz and binary | Certified lower bounds on the cover genus | derived (partial) | Howe's principal-polarisability test on T_n for deployed n; the manypoints (q = 32, g = 5) bound; point-count positivity | (produces bounds) | closes deployed sizes for good where the bound exceeds the budget |
@@ -289,7 +301,9 @@ every branch place, which gives three options:
 - quotient genus 0: g ≥ (n−1)(ord_n(2) − 2)/2;
 - quotient genus 1, ramified: g ≥ 1 + ord_n(2)(n−1)/2 (this is L7);
 - quotient genus g₀ ≥ 2, étale: g = 1 + n(g₀ − 1), which needs
-  n ∣ #J_B(F₂), where B = D/⟨ρ⟩ covers E.
+  n ∣ #J_B(F₂), where B = D/⟨ρ⟩ covers E. More generally, Frobenius may act
+  on the Galois group by some λ of order k. Then the condition is
+  n ∣ L_B(λ), and T_n in the Prym forces k ≤ g₀ − 1 (second run report).
 
 Only the étale option is linear in n. Taking the smallest g₀ that the Weil
 bound (1+√2)^{2g₀} allows *(optimistic)*:
@@ -304,35 +318,61 @@ bound (1+√2)^{2g₀} allows *(optimistic)*:
 | ECC2K-130 | 3 | 263 | 245 |
 
 The first four are inside the budget. K-233 and ECC2K-130 are just outside.
+The second run then closed K-163 too: no genus-3 curve over F₂ has 163 ∣ L(±1).
+That leaves K-283, K-409 and K-571.
 
 **Test.** For unramified χ of order n, D's χ-part has L-polynomial
 L(B, χ, X), of degree 2g₀ − 2. It must be divisible by (1 − cπX)(1 − cπ̄X) for
 some c ∈ μ_n. With c = 1 the twist of D carries T_n; with c primitive, D
 itself does.
 
-**Result** *(measured, exact enumeration; run report
-[`reports/run-20261018T2043Z`](reports/run-20261018T2043Z/README.md), crate
-[`etale_search`](etale_search/src/main.rs))*. Covered: every smooth genus-2
-curve over F₂ (768 models) and every smooth hyperelliptic genus-3 curve
-(6,144 models).
+**Result** *(measured, exact enumeration; crate
+[`etale_search`](etale_search/src/main.rs))*. Two runs together cover every
+curve of genus 2 and 3 over F₂. The first,
+[`run-20261018T2043Z`](reports/run-20261018T2043Z/README.md), took genus 2
+(768 models) and hyperelliptic genus 3 (6,144). The second,
+[`run-20261018T2129Z`](reports/run-20261018T2129Z/README.md), added every
+smooth plane quartic (10,920 models, 78 isomorphism classes). The model
+counts match the known masses of M₂, H₃ and M₃ − H₃ over F₂ *(sourced,
+Bergström)*.
 
 - **Validation.** Every Jacobian group was computed from relations and passed
-  the check (free rank 1, torsion = L_B(1)). No twisted L-function failed the
-  Riemann-hypothesis check.
-- **n = 3 only.** Characters with the T_n factor exist only for n = 3: 192 in
-  genus 2 and 576 in genus 3, in six isogeny classes of B, for both a = 0 and
-  a = 1. So T₃ sits in the Jacobian of an explicit genus-4 étale cover
-  for a = 0. That case cannot occur at genus 3, by point counts.
-- **Nothing for n ≥ 5.** Characters tested: 2,304 in genus 2 for n ∈ {5, 7,
-  11, 13, 19}, and 25,536 in genus 3 for n from 5 to 37. Not one has the
-  factor.
-- **Genus 2, n = 5 and 7.** The counting argument predicted that only four
-  L-polynomials could work. One occurs over F₂, 1 + X + 2X² + 2X³ + 4X⁴, on
-  48 models, and fails the character condition. The other three do not occur.
-  The genus-2 étale route is closed for n ≥ 5.
-- **Deployed sizes untouched.** Over F₂, hyperelliptic genus-3 Jacobians never
-  exceed 56 points, so n = 131 and 163 cannot arise from them. Those sizes
-  need plane-quartic B, which is next, and genus 4 is needed for n ≥ 233.
+  the check (free rank 1, torsion = L_B(1)). Places of degree ≤ 3 generate
+  Pic, so this check proves the group *(derived)*. Every twisted L-function
+  passed:
+  - the Riemann hypothesis and the full functional equation;
+  - for quartics, 76,440 out-of-sample N₆ predictions;
+  - the factor test run exactly in Z[ζ_n], which agreed with the
+    floating-point test every time.
+- **n = 3.** 192 characters in genus 2 and 576 in hyperelliptic genus 3, in
+  six isogeny classes of B, for both a = 0 and a = 1. So T₃ sits in an
+  explicit genus-4 étale cover for a = 0. That case cannot occur at genus 3,
+  by point counts.
+- **n = 5: one plane quartic.** 672 characters, all on one curve up to
+  isomorphism, with trivial automorphism group:
+  - B: x³y + x²z² + xy²z + xz³ + y³z = 0;
+  - L_B = 1 + X + 2X² + 5X³ + 4X⁴ + 4X⁵ + 8X⁶, J_B(F₂) ≅ Z/25.
+
+  All four characters of J_B/5 carry T₅ of the a = 0 Koblitz curve. So a
+  genus-11 unramified Z/5 cover of B over F₂ has T₅ in its Prym, up to
+  isogeny. L_B itself has no factor L_E. These are the only hits for n ≥ 5.
+- **Nothing else.** No other n has a hit: genus 2 for n ∈ {5, 7, 11, 13, 19},
+  hyperelliptic genus 3 for n up to 37, plane quartics for n up to 71. In
+  genus 2, one of the four L-polynomials the counting argument allows,
+  1 + X + 2X² + 2X³ + 4X⁴, occurs over F₂ (48 models) and fails the character
+  condition. The genus-2 étale route is closed for n ≥ 5.
+- **Twisted covers** *(derived)*. If Frobenius acts on Z/n by λ of order k,
+  then T_n in the Prym needs k ≤ g₀ − 1, and the cover exists only if
+  n ∣ L_B(λ). The largest odd primes dividing L(1) are 19 (genus 2), 37
+  (hyperelliptic genus 3) and 71 (plane quartics). For L(−1) they are 19,
+  37 and 29.
+- **Deployed sizes** (budget from `cover-genus-budget.csv`):
+  - ECC2K-130 (g₀ ≤ 2) is closed by the Weil bound 34 *(derived)*.
+  - K-233 (g₀ ≤ 3) is closed by the Weil bound 198 *(derived)*.
+  - K-163 (g₀ ≤ 3) is closed because no genus-≤3 curve over F₂ has
+    163 ∣ L(±1) *(measured, exhaustive)*.
+  - K-283 (g₀ ≤ 4), K-409 (≤ 5) and K-571 (≤ 7) stay open. They need
+    genus-4 or larger bases.
 
 Caveats:
 
@@ -446,6 +486,12 @@ restriction beyond n = 3.
   - étale genus = 1 + n(g₀ − 1), with g₀ the least genus whose Weil bound
     (1+√2)^{2g₀} reaches n;
   - Klein genus = 1 + ord_n(2)·(n − 1)/2.
+- Run graphs, recorded values:
+  - `reports/run-20261018T2043Z/hits-by-n.svg`: the first L8 run.
+  - `reports/run-20261018T2129Z/hits-by-n.svg`: characters tested and
+    T_n hits per n, over every genus-2 and genus-3 curve.
+  - `reports/run-20261018T2129Z/reach.svg`: the odd primes dividing L(±1)
+    against the deployed sizes and their allowed g₀.
 
 ## Unresolved checks and owed certificates
 
@@ -459,9 +505,16 @@ restriction beyond n = 3.
   trace-zero classes in dimension 6, and `3.2.a_a_af` were blocked by a
   captcha. The other n = 3 classes are in the table under "Method and
   sources".
-- L8 is only partly run: plane-quartic genus-3 curves and genus 4 are not
-  covered by the étale search.
-- The manypoints entry for (q = 32, g = 5) has not been checked.
+- L8 covers bases of genus ≤ 3 only. Still not run:
+  - genus-4 and larger bases, needed for K-283, K-409 and K-571;
+  - the twisted λ = −1 genus-3 covers, which were checked only for
+    existence (n ∣ L(−1), never 163) and not for small-n hits;
+  - ramified covers (L7) and non-cyclic covers.
+- The n = 5 genus-11 cover is derived from the measured factor. Its equations
+  have not been written down, and it has no identity certificate.
+- The manypoints entry for (q = 32, g = 5) has not been checked. It decides
+  whether (a = 0, n = 5) can be realised at genus 5. The étale route gives
+  genus 11.
 - Novelty audit: not done against the cover-attack literature. Check Diem and
   Scholten's trace-zero cover reports, Hess's generalised GHS, Ekedahl–Serre,
   and Elkies's Klein-quartic survey before any of L6–L10 is called new.
@@ -470,9 +523,9 @@ restriction beyond n = 3.
 
 ## Graphs checked and left unchanged
 
-These were checked and left unchanged. The only measured item, the L8
-enumeration, is a lead-level search with no cost or index-calculus result, and
-nothing here is certified:
+These were checked and left unchanged. The only measured items, the two L8
+enumerations, are lead-level searches with no cost or index-calculus result,
+and nothing here is certified:
 
 - `docs/index-calculus-scoreboard.html`
 - `docs/ic/progress-timeline.json`
@@ -490,6 +543,11 @@ cite L7 once its certificate exists.
 awk -f cover-genus-budget.calc.awk > cover-genus-budget.csv
 awk -f cover-genus-budget.plot.awk cover-genus-budget.csv > cover-genus-budget.svg
 # report.pdf: Typst, rendered from report.typ (see research-visuals skill, "Rendering")
+# L8 étale search (native Rust; each run report's README gives the exact commands)
+cargo build --release --manifest-path etale_search/Cargo.toml
+etale_search/target/release/etale-search 2      # genus 2
+etale_search/target/release/etale-search 3      # hyperelliptic genus 3
+etale_search/target/release/etale-search q      # plane quartics
 ```
 
 ## References
@@ -503,6 +561,8 @@ awk -f cover-genus-budget.plot.awk cover-genus-budget.csv > cover-genus-budget.s
 - Jacobson, Koblitz, Silverman, Stein, Teske. Analysis of the xedni calculus attack. DCC 20, 2000.
 - Shimura. Introduction to the Arithmetic Theory of Automorphic Functions, §7 (Eichler–Shimura).
 - Tate. Endomorphisms of abelian varieties over finite fields. Invent. Math. 2, 1966.
+- Bergström. Cohomology of moduli spaces of curves of genus three via point counts. J. reine angew. Math. 622, 2008.
+- Bergström. Equivariant counts of points of the moduli spaces of pointed hyperelliptic curves. Doc. Math. 14, 2009.
 - Ekedahl, Serre. Exemples de courbes algébriques à jacobienne complètement décomposable. C. R. Acad. Sci. 317, 1993.
 - Galbraith, Granger, Merz, Petit. On index calculus algorithms for subfield curves. ePrint 2020/1315.
 - LMFDB, abelian varieties over finite fields, https://www.lmfdb.org/Variety/Abelian/Fq/ (queried 2026-10-18).

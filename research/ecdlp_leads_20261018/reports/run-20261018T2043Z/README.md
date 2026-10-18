@@ -7,6 +7,10 @@
 Intel Xeon @ 2.80 GHz, Linux 6.18, rustc 1.97.0. Isolation L0. Wall time is
 recorded in `RUN.txt` but is not a result.
 
+**Follow-up.** [`run-20261018T2129Z`](../run-20261018T2129Z/README.md)
+re-ran both families with stronger checks (hit records byte-identical) and
+added every plane quartic, which completes genus 3.
+
 ## What ran
 
 ```sh

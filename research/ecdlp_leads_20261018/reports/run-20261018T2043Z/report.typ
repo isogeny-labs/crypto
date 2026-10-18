@@ -7,9 +7,9 @@
 measurement. Host: shared cloud container (Xeon 2.80 GHz, rustc 1.97.0), isolation L0.
 
 *What ran.* Every smooth curve $B: y^2 + h(x) y = f(x)$ over $FF_2$ of genus 2, and every smooth
-hyperelliptic curve of genus 3. For each, $J_B(FF_2)$ was computed from relations among places of
+hyperelliptic curve of genus 3. For each, $J_B (FF_2)$ was computed from relations among places of
 degree at most 4, validated by free rank 1 and torsion $= L_B (1)$. Then, for every odd prime
-$n | \#J_B(FF_2)$ and every character $chi$ of $J_B(FF_2)\/n$, $L(B, chi, X)$ was built and tested
+$n | \#J_B (FF_2)$ and every character $chi$ of $J_B (FF_2)\/n$, $L(B, chi, X)$ was built and tested
 for the factor $(1 - c pi X)(1 - c overline(pi) X)$, with $c in mu_n$ and $pi = (t plus.minus i sqrt(7))\/2$,
 $t = plus.minus 1$.
 
@@ -19,7 +19,7 @@ $t = plus.minus 1$.
   [validated, with an odd prime dividing $\#J$], [520], [4,128],
   [failed validation], [0], [0],
   [failed the RH check], [0], [0],
-  [largest $\#J_B(FF_2)$ among them], [19], [56],
+  [largest $\#J_B (FF_2)$ among them], [19], [56],
   [characters with a $T_n$ factor], [192, all $n = 3$], [576, all $n = 3$],
 )
 
