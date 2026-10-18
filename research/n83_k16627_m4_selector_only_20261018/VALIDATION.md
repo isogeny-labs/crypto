@@ -7,7 +7,7 @@
 | Full/selector-only/phase-only small SAT and contradiction fixture | one release test passed; direct/observed complete-model parity, original-field group lift and contradictory UNSAT checked in all modes | [focused release test](focused-test.log) |
 | Capped metadata filter | synthetic selector-only and phase-only fixtures accepted; decreasing XOR row scans and wrong-arm identity rejected with exit 5 | [deriver controls](DERIVER_CHECK.md) |
 | Five retained panel inputs | SHA-256 checks passed before build | [input manifest](inputs-before-run.sha256), [check](input-check.log) |
-| Exact source and Linux worker | pending freeze after tests | source commit, six-file manifest, read-only snapshot, offline binary digest |
+| Exact source and Linux worker | six source files and five inputs checked; offline Linux build exited 0 without OOM | [build receipt](BUILD_RECEIPT.md), [source](source-files.sha256), [inputs](inputs-before-run.sha256), [binary](worker-binary.sha256) |
 | A1/B/A2 and conditional C | not attempted | fresh per-arm output directories and resource receipts pending |
 | Separate native relation replay | code updated, unverified | positive and changed-x/row controls pending for returned SAT arms |
 | Touched exporter example suite | 20 passed, 0 failed in release mode | [raw log](exporter-example-tests.log) |
