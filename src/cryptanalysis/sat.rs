@@ -151,6 +151,13 @@ pub enum SolveResult {
     Unknown,
 }
 
+/// Outcome of a level-zero propagation pass before CDCL search.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RootPropagationResult {
+    Fixpoint,
+    Unsat,
+}
+
 /// Reason a literal was assigned: a free decision, a unit-propagation
 /// source clause, or a parity row.
 #[derive(Debug, Clone, Copy)]
@@ -1743,6 +1750,23 @@ impl Solver {
         }
     }
 
+    /// Propagate at decision level zero and retain the trail, watches and XOR
+    /// matrix for a later [`Self::solve`] call. This deliberately has no
+    /// internal wall check: callers that need a hard limit must provide an
+    /// outer process cap and preserve a checkpoint before entering it.
+    pub fn propagate_root(&mut self) -> RootPropagationResult {
+        assert!(
+            self.trail_lim.is_empty(),
+            "root propagation requires decision level zero"
+        );
+        if self.is_unsat || self.propagate().is_some() {
+            self.is_unsat = true;
+            RootPropagationResult::Unsat
+        } else {
+            RootPropagationResult::Fixpoint
+        }
+    }
+
     /// Main solve loop. Runs until SAT/UNSAT or conflict budget hits.
     pub fn solve(&mut self) -> SolveResult {
         let mut no_theory = |_: &[Option<bool>]| None;
@@ -2269,6 +2293,42 @@ mod tests {
         let m = s.model();
         assert_eq!((m[0], m[1], m[2]), (true, true, false));
         assert!(s.check_xors(&m));
+    }
+
+    #[test]
+    fn root_propagation_keeps_sat_state_for_solve() {
+        fn instance() -> Solver {
+            let mut s = Solver::new(3);
+            s.add_xor(&[1, 2], false);
+            s.add_xor(&[2, 3], true);
+            s.add_clause(vec![1]);
+            s
+        }
+        let mut direct = instance();
+        assert_eq!(direct.solve(), SolveResult::Sat);
+        let expected = direct.model();
+        let mut staged = instance();
+        assert_eq!(staged.propagate_root(), RootPropagationResult::Fixpoint);
+        assert_eq!(staged.stats.decisions, 0);
+        assert_eq!(staged.solve(), SolveResult::Sat);
+        assert_eq!(staged.model(), expected);
+        assert!(staged.check_xors(&staged.model()));
+    }
+
+    #[test]
+    fn root_propagation_keeps_unsat_state_for_solve() {
+        fn instance() -> Solver {
+            let mut s = Solver::new(3);
+            assert!(s.add_xor(&[1, 2], true));
+            assert!(s.add_xor(&[2, 3], true));
+            assert!(s.add_xor(&[1, 3], true));
+            s
+        }
+        let mut direct = instance();
+        assert_eq!(direct.solve(), SolveResult::Unsat);
+        let mut staged = instance();
+        assert_eq!(staged.propagate_root(), RootPropagationResult::Unsat);
+        assert_eq!(staged.solve(), SolveResult::Unsat);
     }
 
     /// Duplicated variables inside one row must cancel: `x ⊕ x ⊕ y = 1`

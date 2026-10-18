@@ -752,7 +752,7 @@ mod tests {
     use super::*;
     use crate::binary_ecc::BinaryPoint;
     use crate::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
-    use crate::cryptanalysis::sat::SolveResult;
+    use crate::cryptanalysis::sat::{RootPropagationResult, SolveResult};
 
     #[test]
     fn first_pair_lex_constraint_keeps_exactly_one_swap_orientation() {
@@ -1006,6 +1006,7 @@ mod tests {
         for (block, value) in expected.iter().enumerate() {
             enc.pin_x_block(block, value).unwrap();
         }
+        assert_eq!(enc.solver.propagate_root(), RootPropagationResult::Fixpoint);
         assert_eq!(enc.solver.solve(), SolveResult::Sat);
         assert!(enc.verify_model());
         assert_eq!(enc.decode_x_blocks(), expected);

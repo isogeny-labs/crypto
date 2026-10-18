@@ -21,7 +21,7 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     SatDecompositionOptions,
 };
 use crypto_lib::cryptanalysis::koblitz_relation_solver::WideRankTracker;
-use crypto_lib::cryptanalysis::sat::SolveResult;
+use crypto_lib::cryptanalysis::sat::{RootPropagationResult, SolveResult, SolverStats};
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use serde_json::{json, Value};
@@ -481,7 +481,7 @@ fn frozen_primary_probe_source() -> Result<(String, &'static str)> {
 /// The outer guard freezes these sources at a clean commit before launching
 /// the Linux worker. The worker compares the snapshot to its compiled bytes.
 fn frozen_chain_source() -> Result<(String, &'static str)> {
-    let files: [(&str, &[u8]); 5] = [
+    let files: [(&str, &[u8]); 6] = [
         (
             "examples/koblitz_n83_factor_base_export.rs",
             include_bytes!("../../examples/koblitz_n83_factor_base_export.rs"),
@@ -493,6 +493,10 @@ fn frozen_chain_source() -> Result<(String, &'static str)> {
         (
             "src/cryptanalysis/binary_semaev_chain_sat.rs",
             include_bytes!("../../src/cryptanalysis/binary_semaev_chain_sat.rs"),
+        ),
+        (
+            "src/cryptanalysis/sat.rs",
+            include_bytes!("../../src/cryptanalysis/sat.rs"),
         ),
         (
             "src/cryptanalysis/koblitz_index_calculus.rs",
@@ -778,10 +782,16 @@ struct WitnessPhases {
     start: Instant,
     next_sequence: u32,
     source_commit: String,
+    schema: &'static str,
 }
 
 impl WitnessPhases {
-    fn create(output: &Path, start: Instant, source_commit: String) -> Result<Self> {
+    fn create(
+        output: &Path,
+        start: Instant,
+        source_commit: String,
+        schema: &'static str,
+    ) -> Result<Self> {
         if output.exists() {
             return Err("complete-witness output already exists".into());
         }
@@ -798,6 +808,7 @@ impl WitnessPhases {
             start,
             next_sequence: 0,
             source_commit,
+            schema,
         })
     }
 
@@ -806,7 +817,7 @@ impl WitnessPhases {
             .trim()
             .parse()?;
         let record = json!({
-            "schema":"n83.k16627-m4-witness-phase/v1",
+            "schema":self.schema,
             "sequence":self.next_sequence,
             "phase":phase,
             "elapsed_wall_ms":self.start.elapsed().as_secs_f64()*1000.0,
@@ -825,17 +836,51 @@ impl WitnessPhases {
     }
 }
 
+fn root_phase_stats(stats: &SolverStats) -> Value {
+    json!({
+        "decisions":stats.decisions,
+        "conflicts":stats.conflicts,
+        "propagations":stats.propagations,
+        "clause_visits":stats.clause_visits,
+        "xor_passes":stats.xor_passes,
+        "xor_repivots":stats.xor_repivots,
+        "xor_row_ops":stats.xor_row_ops,
+        "xor_row_scans":stats.xor_row_scans,
+        "ns_propagate_clauses":stats.ns_propagate_clauses,
+        "ns_propagate_xors":stats.ns_propagate_xors,
+    })
+}
+
 /// Phase-observable complete x-chain witness on the exact retained primary
 /// object. The seven blocks are fixed only after the full orbit domain is
 /// installed, and a SAT answer is checked against the original group law.
 pub(super) fn chain_witness_cli(root: &Path, memory_mib: u64, output: &Path) -> Result<Value> {
+    chain_witness_impl(root, memory_mib, output, false)
+}
+
+/// The same complete witness, with a separate durable root-propagation gate.
+pub(super) fn chain_root_phase_cli(root: &Path, memory_mib: u64, output: &Path) -> Result<Value> {
+    chain_witness_impl(root, memory_mib, output, true)
+}
+
+fn chain_witness_impl(
+    root: &Path,
+    memory_mib: u64,
+    output: &Path,
+    checkpoint_root: bool,
+) -> Result<Value> {
     if memory_mib != 4096 {
         return Err("complete-witness control requires the frozen 4096 MiB cap".into());
     }
     let memory_limit_bytes = checked_cgroup_memory_limit(memory_mib)?;
     let (source_commit, source_attestation_mode) = frozen_chain_source()?;
     let start = Instant::now();
-    let mut phases = WitnessPhases::create(output, start, source_commit.clone())?;
+    let phase_schema = if checkpoint_root {
+        "n83.k16627-m4-root-phase/v1"
+    } else {
+        "n83.k16627-m4-witness-phase/v1"
+    };
+    let mut phases = WitnessPhases::create(output, start, source_commit.clone(), phase_schema)?;
     let (base, base_row, manifest_hash) =
         load_panel_selected(root, 16_627, "public_x_hash", 2026100801)?;
     if base_row["object"] != format!("objects/{K16627_OBJECT_BLAKE3}.jsonl.gz")
@@ -949,6 +994,13 @@ pub(super) fn chain_witness_cli(root: &Path, memory_mib: u64, output: &Path) -> 
     .map_err(|_| "complete-witness chained-S3 model build failed")?;
     enc.constrain_frobenius_orbit_summands(&representatives, 250_000, 6_000_000)
         .map_err(|_| "complete-witness orbit-domain install failed")?;
+    if checkpoint_root
+        && (enc.solver.n_vars() != 201_598
+            || enc.solver.n_clauses() != 5_915_238
+            || enc.solver.n_xors() != 3_901)
+    {
+        return Err("root-phase control constructed a different full orbit model".into());
+    }
     let model_domain_ms = model_start.elapsed().as_secs_f64() * 1000.0;
     phases.mark(
         "model_domain_done",
@@ -966,10 +1018,33 @@ pub(super) fn chain_witness_cli(root: &Path, memory_mib: u64, output: &Path) -> 
     phases.mark("seven_blocks_pinned", json!({"x_blocks":7}))?;
     enc.solver.conflict_budget = 100_000;
     enc.solver.deadline = Some(start + Duration::from_secs(1800));
-    phases.mark("sat_entered", json!({"conflict_budget":100_000}))?;
-    let solver_start = Instant::now();
-    let answer = enc.solver.solve();
-    let solver_ms = solver_start.elapsed().as_secs_f64() * 1000.0;
+    let root_result = if checkpoint_root {
+        phases.mark(
+            "root_propagation_entered",
+            json!({"stats":root_phase_stats(&enc.solver.stats)}),
+        )?;
+        let root_start = Instant::now();
+        let result = enc.solver.propagate_root();
+        phases.mark(
+            "root_propagation_returned",
+            json!({
+                "result":format!("{result:?}"),
+                "root_propagation_ms":root_start.elapsed().as_secs_f64()*1000.0,
+                "stats":root_phase_stats(&enc.solver.stats),
+            }),
+        )?;
+        Some(result)
+    } else {
+        None
+    };
+    let (answer, solver_ms) = if root_result == Some(RootPropagationResult::Unsat) {
+        (SolveResult::Unsat, 0.0)
+    } else {
+        phases.mark("sat_entered", json!({"conflict_budget":100_000}))?;
+        let solver_start = Instant::now();
+        let answer = enc.solver.solve();
+        (answer, solver_start.elapsed().as_secs_f64() * 1000.0)
+    };
     let models = usize::from(answer == SolveResult::Sat);
     phases.mark(
         "sat_returned",
@@ -1024,7 +1099,8 @@ pub(super) fn chain_witness_cli(root: &Path, memory_mib: u64, output: &Path) -> 
         .trim()
         .parse()?;
     let receipt = json!({
-        "schema":"n83.k16627-m4-witness/v1", "status":status,
+        "schema":if checkpoint_root {"n83.k16627-m4-root-phase/v1"} else {"n83.k16627-m4-witness/v1"},
+        "status":status,
         "curve_a":0, "orbit_columns":16_627, "summands":4, "identity_mask":0,
         "policy":"public_x_hash", "seed":2026100801u64,
         "object_blake3":K16627_OBJECT_BLAKE3,
@@ -1036,6 +1112,7 @@ pub(super) fn chain_witness_cli(root: &Path, memory_mib: u64, output: &Path) -> 
         "source_chain_blake3":blake3::hash(include_bytes!("../../src/cryptanalysis/binary_semaev_chain_sat.rs")).to_hex().to_string(),
         "source_index_calculus_blake3":blake3::hash(include_bytes!("../../src/cryptanalysis/koblitz_index_calculus.rs")).to_hex().to_string(),
         "phase_file":phases.path.to_string_lossy(),
+        "source_sat_blake3":blake3::hash(include_bytes!("../../src/cryptanalysis/sat.rs")).to_hex().to_string(),
         "point_indices":indices, "x_decimal":planted_xs.iter().map(|x| x.to_biguint().to_string()).collect::<Vec<_>>(),
         "relation":relation,
         "max_variables":250_000, "max_domain_clauses":6_000_000,
@@ -1043,6 +1120,7 @@ pub(super) fn chain_witness_cli(root: &Path, memory_mib: u64, output: &Path) -> 
         "sat_variables":enc.solver.n_vars(), "sat_clauses":enc.solver.n_clauses(),
         "sat_xor_rows":enc.solver.n_xors(), "solver_models":models,
         "solver_conflicts":enc.solver.conflicts(),
+        "root_propagation_result":root_result.map(|result| format!("{result:?}")),
         "base_import_ms":base_import_ms, "model_domain_ms":model_domain_ms,
         "solver_ms":solver_ms, "process_wall_ms":start.elapsed().as_secs_f64()*1000.0,
         "memory_cgroup_limit_bytes":memory_limit_bytes,
