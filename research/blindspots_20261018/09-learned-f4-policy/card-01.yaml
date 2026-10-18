@@ -1,0 +1,105 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-09-01
+experiment_id: BLINDSPOT-09
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-01.json
+binds:
+  - {path: examples/blindspots_09_learned_f4.rs, sha256: 7e46e27eaf9f5901f74772e9fd2a5f95457ab3182cda7ffcad320fcd820e5743}
+  - {path: research/blindspots_20261018/07-blocked-f4-degree-cells/controls.tsv, sha256: 9bde3abe294c509b14825436f94f282eab6759012a99c1036333fd905d4c8d54}
+commands:
+  - id: make-bin-dir
+    argv: [mkdir, -p, target/blindspots-09/card-01]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: build
+    argv: [prlimit, "--as=4294967296", rustc, --edition, "2021", -C, "opt-level=3", -C, "codegen-units=1", -C, "target-cpu=native", -o, target/blindspots-09/card-01/b09, examples/blindspots_09_learned_f4.rs]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/card-01-build.stdout.log
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/card-01-build.stderr.log
+  - id: selftest
+    argv: [prlimit, "--as=4294967296", target/blindspots-09/card-01/b09, selftest]
+    timeout_seconds: 62
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/selftest.txt
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/selftest.stderr.log
+  - id: control-p1
+    argv: [prlimit, "--as=4294967296", target/blindspots-09/card-01/b09, control, --table, research/blindspots_20261018/07-blocked-f4-degree-cells/controls.tsv, --max-vars, "34", --wall, "20", --cap, "3000000000"]
+    timeout_seconds: 88
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/control-p1.jsonl
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/control-p1.stderr.log
+  - id: train-p3-8-3-3
+    argv: [prlimit, "--as=4294967296", target/blindspots-09/card-01/b09, train, --n, "8", --ell, "3", --m, "3", --seed, "20261018", --from, "0", --to, "32", --cap, "3000000000", --out, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3]
+    timeout_seconds: 20
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/train-p3-8-3-3.jsonl
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/train-p3-8-3-3.stderr.log
+    outputs: [research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3.samples.0, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3.trace.0]
+  - id: fit-p3-8-3-3
+    argv: [prlimit, "--as=4294967296", target/blindspots-09/card-01/b09, fit, --n, "8", --ell, "3", --m, "3", --seed, "20261018", --out, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3, --samples, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3.samples.0]
+    timeout_seconds: 16
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/fit-p3-8-3-3.json
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/fit-p3-8-3-3.stderr.log
+    outputs: [research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3.model]
+  - id: eval-p3-8-3-3-test
+    argv: [prlimit, "--as=4294967296", target/blindspots-09/card-01/b09, eval, --n, "8", --ell, "3", --m, "3", --seed, "20261018", --role, test, --from, "0", --to, "32", --arms, "a,b50,b25,c,d,p,r50,r25,o", --model, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3.model, --trace, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3.trace.0, --cap, "3000000000", --rel-cap, "1000"]
+    timeout_seconds: 23
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/eval-p3-8-3-3-test.jsonl
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/eval-p3-8-3-3-test.stderr.log
+  - id: eval-p3-8-3-3-planted
+    argv: [prlimit, "--as=4294967296", target/blindspots-09/card-01/b09, eval, --n, "8", --ell, "3", --m, "3", --seed, "20261018", --role, planted, --from, "0", --to, "8", --arms, "a,b50,b25,c,d,p,r50,r25,o", --model, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3.model, --trace, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-3-3.trace.0, --cap, "3000000000", --rel-cap, "1000"]
+    timeout_seconds: 23
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/eval-p3-8-3-3-planted.jsonl
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/eval-p3-8-3-3-planted.stderr.log
+  - id: train-p3-8-2-4
+    argv: [prlimit, "--as=4294967296", target/blindspots-09/card-01/b09, train, --n, "8", --ell, "2", --m, "4", --seed, "20261018", --from, "0", --to, "32", --cap, "3000000000", --out, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4]
+    timeout_seconds: 20
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/train-p3-8-2-4.jsonl
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/train-p3-8-2-4.stderr.log
+    outputs: [research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4.samples.0, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4.trace.0]
+  - id: fit-p3-8-2-4
+    argv: [prlimit, "--as=4294967296", target/blindspots-09/card-01/b09, fit, --n, "8", --ell, "2", --m, "4", --seed, "20261018", --out, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4, --samples, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4.samples.0]
+    timeout_seconds: 16
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/fit-p3-8-2-4.json
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/fit-p3-8-2-4.stderr.log
+    outputs: [research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4.model]
+  - id: eval-p3-8-2-4-test
+    argv: [prlimit, "--as=4294967296", target/blindspots-09/card-01/b09, eval, --n, "8", --ell, "2", --m, "4", --seed, "20261018", --role, test, --from, "0", --to, "32", --arms, "a,b50,b25,c,d,p,r50,r25,o", --model, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4.model, --trace, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4.trace.0, --cap, "3000000000", --rel-cap, "1000"]
+    timeout_seconds: 23
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/eval-p3-8-2-4-test.jsonl
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/eval-p3-8-2-4-test.stderr.log
+  - id: eval-p3-8-2-4-planted
+    argv: [prlimit, "--as=4294967296", target/blindspots-09/card-01/b09, eval, --n, "8", --ell, "2", --m, "4", --seed, "20261018", --role, planted, --from, "0", --to, "8", --arms, "a,b50,b25,c,d,p,r50,r25,o", --model, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4.model, --trace, research/blindspots_20261018/09-learned-f4-policy/raw/model-p3-8-2-4.trace.0, --cap, "3000000000", --rel-cap, "1000"]
+    timeout_seconds: 23
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/eval-p3-8-2-4-planted.jsonl
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/eval-p3-8-2-4-planted.stderr.log
+  - id: remove-bin
+    argv: [rm, -f, target/blindspots-09/card-01/b09]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: [rmdir, target/blindspots-09/card-01]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-09
+background: false
+write_scope:
+  - research/blindspots_20261018/09-learned-f4-policy/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto."
