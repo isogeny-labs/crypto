@@ -155,3 +155,42 @@ bound, but the upper bounds on yield and projected solve stay above 0.05. The ea
 Lesson for the design: with four subspaces, a curve × V interaction can masquerade as
 a curve effect. Future arms should either use more V per curve or require
 replication on fresh seeds before calling H1.
+
+## Power of the design (2026-10-18)
+
+Additive. `KOBLITZ_ICC_POWER=1` in `koblitz_presentation_icc` simulates curves ×
+subspaces grids from the fitted additive model (observed σ²_w and σ²_e, a planted
+curve share ρ, normal draws) and counts how often the pre-registered rules fire. On the
+pooled n = 31 data (seeds 1–8, `icc_n31_m3_geom_s1-8_power.json`), 200 simulations
+per cell, 32 curves:
+
+| V per curve | P(H0) at ρ = 0 | P(H1) at ρ = 0 | P(H1) at ρ = 0.10 | P(H1) at ρ = 0.20 |
+|---|---|---|---|---|
+| 4 | 0.22–0.36 | 0.01–0.02 | 0.19–0.49 | 0.58–0.92 |
+| 8 | 0.39–0.75 | 0.00 | 0.43–0.52 | 0.92–0.97 |
+| 32 | 0.99–1.00 | 0.00 | 0.42–0.49 | 0.98–1.00 |
+
+Ranges are across the four pre-registered metrics.
+
+**Reading.**
+- Four subspaces per curve cannot reach H0 even when there is no curve effect: the
+  rule fires at most a third of the time. That is why the n = 19 and n = 31 m = 3 arms,
+  and the earlier m = 2 arms at n = 19 and 23 (also 4 V), came out "inconclusive". The
+  verdict was built into the design, not into the data.
+- The per-metric false-H1 rate at 4 V is 1–2 %. The rule declares H1 if *any* of the
+  four cost metrics qualifies, so the arm-level rate is about 5–8 %. The withdrawn
+  n = 31 H1 is consistent with this.
+- H1 at a true ρ = 0.10 is a coin flip at every grid size, because the rule's point
+  threshold sits exactly at 0.10. A true ρ = 0.20 is found almost surely from 8 V up.
+- With 32 V per curve, H0 is reached almost surely when there is no effect. That is the
+  arm now running (seeds 9–32 added to 1–8).
+
+**Limits.** The simulation is parametric (normal, additive). A curve × V interaction
+that is not additive is counted in σ²_e here, as in the fit; heavy-tailed cells would
+raise the false-H1 rate above the figures above.
+
+**Pooled 8-V result** (seeds 1–8, `icc_n31_m3_geom_s1-8_power.json`): work per call
+0.005 [0, 0.064], yield 0.000 [0, 0.030], log µs/call 0.019 [0, 0.058], projected solve
+0.014 [0, 0.044]. Yield and projected solve are already under the H0 line. The
+subspace share of the time metrics (≈ 0.49) is a load artefact: the two 4-V batches
+ran at different times and the batch is confounded with the subspace.
