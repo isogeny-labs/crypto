@@ -1351,3 +1351,71 @@ large prime variation (Gaudry–Thomé–Thériault–Diem) has the same
 problem in sharper form: it trades even more relation-stage work and
 denser rows for a smaller solve. **At reachable sizes the lever is the
 oracle and the per-trial cost of the walk, not the factor base.**
+
+## Round nine: the reference has no negation map — protocol, written before measuring
+
+**The asymmetry.** Index calculus here folds every place with its
+negative: the factor base keeps one of `±P`, so it already uses the
+hyperelliptic involution `D ↦ −D`, which every Jacobian has and which
+costs one negation of `v`. The rho reference
+(`src/cryptanalysis/hyperelliptic_ic_bench.rs`, `rho_dp`) does not. It
+walks on divisors, not on `±` classes, and pays the full
+`sqrt(πN/2) ≈ 1.2533·sqrt(N)` expected steps. Walking on classes cuts
+that to `sqrt(πN/4) ≈ 0.8862·sqrt(N)`, a factor of `√2` (Wiener and
+Zuccherato, SAC 1998; Duursma, Gaudry and Morain, ASIACRYPT 1999 — the
+same prior art `src/cryptanalysis/aut_folded_rho.rs` cites for elliptic
+`j = 0` curves). A reference that leaves out a standard `√2` flatters
+the method it is compared against, and in this thread that is index
+calculus, so every `S_ic/S_rho` reported so far is optimistic by up to
+`√2`. These curves are generic; the involution is the only cheap
+automorphism, so `√2` is the whole of what folding can give.
+
+**The change.** A third rho variant, `DistinguishedPointsNegation`, on
+the same branches, hash, distinguished-point rule, seeds and step
+accounting as the current default. After every step the position is
+replaced by a canonical representative of `{D, −D}`, and `(a, b)` is
+negated with it, so the walk position stays exactly `a·D₁ + b·D₂`.
+Folding creates fruitless cycles. The two-cycle (step by `S_j`, land on
+the negation, select `S_j` again) happens with probability about
+`1/(2r)` per step at `r = 16` branches, and is removed by the standard
+look-ahead: when the next position would select the same branch, take
+the next branch instead (Wiener–Zuccherato; Bos, Kleinjung and
+Lenstra). Longer cycles are left to the existing distinguished-point
+gap escape. **Every look-ahead trial and every escape is a counted
+group operation.**
+
+**Boundary.** Unchanged for index calculus. The reference moves: the
+ideal walk is now `0.8862·sqrt(N)`, and the walk-renormalised ratios
+renormalise to that.
+
+**Pinned output.** Index calculus is untouched, so its counted work
+(relation stage, oracle and solve mul-mods, `k`) must be identical to
+round seven's frozen rows. The plain DP rho must also be identical to
+round seven's: its operation counts are deterministic in the seed. The
+new variant must return a verified `k` on every run.
+
+**Registered hypotheses.** On round seven's harness
+(`examples/hyperelliptic_ic_vs_rho.rs`, all 18 instances, 40 rho seeds
+per row), reading counted operations, which do not depend on the host:
+
+- **R1 (the fold pays).** On rows with `N ≥ 10⁵`, where the walk
+  dominates rho's precomputation, the median of
+  `walk_ops(negation) / walk_ops(plain)` is at most **0.80** (ideal
+  0.707). Falsified above 0.80.
+- **R2 (fruitless cycles are contained).** Look-ahead trials plus
+  escapes are at most 10% of the folded walk's operations on every
+  row.
+- **R3 (correctness).** Every folded-rho run returns a verified `k`.
+
+If R1 holds, the folded rho becomes the reference: the round-seven
+sweep is re-run three times on one host with it, and the note and the
+scoreboard re-derive every `S_ic/S_rho`, the walk-renormalised ratios
+and the genus exponent fits. If R1 fails, the variant is recorded as
+built and measured, and the reference stays as it is until the cause is
+understood.
+
+**Expected class: accounting**, against index calculus. No algorithm
+under study changes; the comparison does. Predicted direction: every
+ratio rises, by up to `√2` where the walk dominates, by less at toy `N`
+where rho's precomputation does. The genus-4 headline (0.24 walk-
+renormalised) should move to about 0.34.
