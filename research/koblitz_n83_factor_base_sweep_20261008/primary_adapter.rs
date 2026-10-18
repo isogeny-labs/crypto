@@ -20,6 +20,8 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     ChainS3Limits, DecompositionStrategy, FrobeniusFactorBase, KoblitzCurve, KoblitzIcOptions,
     SatDecompositionOptions,
 };
+use crypto_lib::cryptanalysis::koblitz_relation_solver::WideRankTracker;
+use crypto_lib::cryptanalysis::sat::SolveResult;
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use serde_json::{json, Value};
@@ -704,6 +706,298 @@ pub(super) fn chain_capacity_cli(
                 .ok_or("invalid chained-S3 measurements")?
                 .clone(),
         );
+    write_new_json(output, &receipt)?;
+    Ok(receipt)
+}
+
+fn planted_point_json(point: &BinaryPoint) -> Value {
+    match point {
+        BinaryPoint::Infinity => json!({"infinity": true}),
+        BinaryPoint::Affine { x, y } => json!({
+            "x_decimal": x.to_biguint().to_string(),
+            "y_decimal": y.to_biguint().to_string(),
+        }),
+    }
+}
+
+/// Find the at-most-two stored point lifts for each x coordinate without
+/// allocating a second multi-million-point index. Check the complete group
+/// equation before treating an x-coordinate model as a relation.
+fn checked_four_x_lift(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    xs: &[F2mElement],
+    target: &BinaryPoint,
+) -> Result<Option<([usize; 4], Vec<BigUint>)>> {
+    if xs.len() != 4 {
+        return Err("four-summand model has the wrong x count".into());
+    }
+    let mut choices: [Vec<usize>; 4] = std::array::from_fn(|_| Vec::new());
+    for (index, point) in fb.points.iter().enumerate() {
+        if let BinaryPoint::Affine { x, .. } = point {
+            for (slot, wanted) in xs.iter().enumerate() {
+                if x == wanted {
+                    choices[slot].push(index);
+                    if choices[slot].len() > 2 {
+                        return Err("stored base has more than two lifts of an x coordinate".into());
+                    }
+                }
+            }
+        }
+    }
+    if choices.iter().any(Vec::is_empty) {
+        return Ok(None);
+    }
+    for &a in &choices[0] {
+        for &b in &choices[1] {
+            for &c in &choices[2] {
+                for &d in &choices[3] {
+                    let indices = [a, b, c, d];
+                    let sum = indices.iter().fold(BinaryPoint::Infinity, |acc, &index| {
+                        kc.add(&acc, &fb.points[index])
+                    });
+                    if sum == *target {
+                        let row = checked_primary_relation_row(kc, fb, &indices, target)?;
+                        return Ok(Some((indices, row)));
+                    }
+                }
+            }
+        }
+    }
+    Ok(None)
+}
+
+/// Bound a constructed-target SAT control to the exact replayed K=16,627
+/// primary object. The pinned arm fixes four x wires only after the complete
+/// orbit-domain model is installed. The unpinned arm uses the same target and
+/// model, with no access to those fixed values in its solver clauses.
+pub(super) fn chain_planted_cli(
+    root: &Path,
+    pinned: bool,
+    memory_mib: u64,
+    output: &Path,
+) -> Result<Value> {
+    if memory_mib != 4096 {
+        return Err("planted control requires the frozen 4096 MiB cap".into());
+    }
+    let memory_limit_bytes = checked_cgroup_memory_limit(memory_mib)?;
+    let (source_commit, source_attestation_mode) = frozen_chain_source()?;
+    let start = Instant::now();
+    let (base, base_row, manifest_hash) =
+        load_panel_selected(root, 16_627, "public_x_hash", 2026100801)?;
+    let base_import_ms = start.elapsed().as_secs_f64() * 1000.0;
+    let fb = &base.factor_base;
+    if fb.signed_orbits.len() != 16_627 || fb.points.len() != 2_760_082 {
+        return Err("planted control imported the wrong retained base size".into());
+    }
+    let planted_indices: [usize; 4] = std::array::from_fn(|column| fb.signed_orbits[column][0]);
+    let planted_points: [&BinaryPoint; 4] = planted_indices.map(|index| &fb.points[index]);
+    let planted_xs: Vec<F2mElement> = planted_points
+        .iter()
+        .map(|point| match point {
+            BinaryPoint::Affine { x, .. } => Ok(x.clone()),
+            BinaryPoint::Infinity => Err("planted orbit representative is infinity"),
+        })
+        .collect::<std::result::Result<_, _>>()?;
+    let mut partial = BinaryPoint::Infinity;
+    let mut sums = Vec::with_capacity(4);
+    for point in planted_points {
+        partial = base.curve.add(&partial, point);
+        sums.push(partial.clone());
+    }
+    let target = partial;
+    let control_valid = planted_xs
+        .iter()
+        .map(F2mElement::to_biguint)
+        .collect::<HashSet<_>>()
+        .len()
+        == 4
+        && sums
+            .iter()
+            .all(|point| matches!(point, BinaryPoint::Affine { .. }));
+    let target_json = json!({
+        "columns": [0,1,2,3],
+        "point_indices": planted_indices,
+        "points": planted_points.map(|point| planted_point_json(point)),
+        "partial_sums": sums.iter().map(planted_point_json).collect::<Vec<_>>(),
+        "target": planted_point_json(&target),
+    });
+    if !control_valid {
+        let receipt = json!({
+            "schema":"n83.k16627-m4-planted/v1", "status":"INVALID_PLANTED_CONTROL",
+            "arm":if pinned {"pinned"} else {"unpinned"},
+            "object":base_row["object"], "point_set_blake3":base_row["point_set_blake3"],
+            "source_commit":source_commit, "planted":target_json,
+            "base_import_ms":base_import_ms,
+            "solver_search_executed":false,
+            "selected_best_total_runtime":Value::Null,
+        });
+        write_new_json(output, &receipt)?;
+        return Ok(receipt);
+    }
+    let mut codes: Vec<BigUint> = fb.subspace.iter().map(F2mElement::to_biguint).collect();
+    codes.sort_unstable();
+    codes.dedup();
+    if codes.len() != 83 * 16_627 {
+        return Err("planted control coordinate closure mismatch".into());
+    }
+    let representatives: Vec<BigUint> = fb
+        .signed_orbits
+        .iter()
+        .map(|orbit| match &fb.points[orbit[0]] {
+            BinaryPoint::Affine { x, .. } => Ok(x.to_biguint()),
+            BinaryPoint::Infinity => Err("planted orbit domain has infinity"),
+        })
+        .collect::<std::result::Result<_, _>>()?;
+    let target_x = match &target {
+        BinaryPoint::Affine { x, .. } => x,
+        BinaryPoint::Infinity => return Err("invalid planted target".into()),
+    };
+    let model_start = Instant::now();
+    let mut enc = ChainedS3Encoding::build(
+        4,
+        &base.curve.curve.irreducible,
+        &base.curve.curve.b,
+        Some(target_x),
+        0,
+        250_000,
+    )
+    .map_err(|_| "planted chained-S3 model build failed")?;
+    enc.constrain_frobenius_orbit_summands(&representatives, 250_000, 6_000_000)
+        .map_err(|_| "planted orbit-domain install failed")?;
+    if pinned {
+        // The chained-S3 builder allocates the first m*n wires for the
+        // summand x blocks; the core's own model blocker uses this layout.
+        for (slot, x) in planted_xs.iter().enumerate() {
+            let value = x.to_biguint();
+            for bit in 0..83usize {
+                let wire = (slot * 83 + bit + 1) as i32;
+                enc.solver
+                    .add_clause(vec![if value.bit(bit as u64) { wire } else { -wire }]);
+            }
+        }
+    }
+    let model_construction_ms = model_start.elapsed().as_secs_f64() * 1000.0;
+    let conflict_budget = if pinned { 100_000 } else { 5_000 };
+    let max_models = if pinned { 1 } else { 8 };
+    enc.solver.conflict_budget = conflict_budget;
+    enc.solver.deadline = Some(start + Duration::from_secs(if pinned { 1800 } else { 900 }));
+    let solver_start = Instant::now();
+    let mut models = 0usize;
+    let mut invalid_models = 0usize;
+    let mut group_rejected_models = 0usize;
+    let (status, relation) = loop {
+        match enc.solver.solve() {
+            SolveResult::Unknown => break ("UNKNOWN_search_cap", None),
+            // The frozen four points are a witness for this exact target
+            // and all-affine identity pattern in either arm.
+            SolveResult::Unsat => break ("INVALID_UNSAT_PLANTED", None),
+            SolveResult::Sat => {
+                models += 1;
+                let xs = enc.decode_summands();
+                if !enc.verify_model()
+                    || xs.len() != 4
+                    || xs
+                        .iter()
+                        .any(|x| codes.binary_search(&x.to_biguint()).is_err())
+                    || (pinned && xs != planted_xs)
+                {
+                    invalid_models += 1;
+                    break ("INVALID_MODEL", None);
+                }
+                if let Some((indices, row)) = checked_four_x_lift(&base.curve, fb, &xs, &target)? {
+                    let mut rank = WideRankTracker::new(&base.curve.subgroup_order, fb.unknowns());
+                    let rank_after_insert = rank.insert(row.clone());
+                    let tamper_rejected = !pinned
+                        || checked_primary_relation_row(
+                            &base.curve,
+                            fb,
+                            &indices,
+                            &base.curve.add(&target, base.curve.generator()),
+                        )
+                        .is_err();
+                    if rank_after_insert != 1 || !tamper_rejected {
+                        break ("INVALID_RELATION_CONTROL", None);
+                    }
+                    let nonzero: Vec<_> = row
+                        .iter()
+                        .enumerate()
+                        .filter(|(_, coefficient)| !coefficient.is_zero())
+                        .map(|(column, coefficient)| {
+                            json!({
+                                "column":column, "coefficient_decimal":coefficient.to_string(),
+                            })
+                        })
+                        .collect();
+                    let dense: Vec<_> = row.iter().map(ToString::to_string).collect();
+                    break (
+                        if pinned {
+                            "PASS_PLANTED_RELATION"
+                        } else {
+                            "HIT_UNPINNED_PLANTED_TARGET"
+                        },
+                        Some(json!({
+                            "point_indices":indices, "nonzero":nonzero,
+                            "dense_decimal_blake3":blake3::hash(&serde_json::to_vec(&dense)?).to_hex().to_string(),
+                            "rank_after_insert":rank_after_insert,
+                            "tamper_rejected":if pinned { Some(tamper_rejected) } else { None },
+                            "group_verified":true,
+                        })),
+                    );
+                }
+                group_rejected_models += 1;
+                if models >= max_models {
+                    break ("UNKNOWN_model_cap", None);
+                }
+                let model = enc.solver.model();
+                enc.solver.reset_search();
+                enc.solver.add_clause(
+                    (0..4 * 83usize)
+                        .map(|i| {
+                            let wire = (i + 1) as i32;
+                            if model[i] {
+                                -wire
+                            } else {
+                                wire
+                            }
+                        })
+                        .collect(),
+                );
+            }
+        }
+    };
+    let solver_ms = solver_start.elapsed().as_secs_f64() * 1000.0;
+    let memory_cgroup_peak_bytes: u64 = fs::read_to_string("/sys/fs/cgroup/memory.peak")?
+        .trim()
+        .parse()?;
+    let receipt = json!({
+        "schema":"n83.k16627-m4-planted/v1", "status":status,
+        "arm":if pinned {"pinned"} else {"unpinned"},
+        "curve_a":0, "orbit_columns":16_627, "summands":4, "identity_mask":0,
+        "policy":"public_x_hash", "seed":2026100801u64,
+        "object":base_row["object"], "point_set_blake3":base_row["point_set_blake3"],
+        "panel_manifest_blake3":manifest_hash,
+        "source_commit":source_commit, "source_attestation_mode":source_attestation_mode,
+        "source_exporter_blake3":blake3::hash(include_bytes!("../../examples/koblitz_n83_factor_base_export.rs")).to_hex().to_string(),
+        "source_adapter_blake3":blake3::hash(include_bytes!("primary_adapter.rs")).to_hex().to_string(),
+        "source_chain_blake3":blake3::hash(include_bytes!("../../src/cryptanalysis/binary_semaev_chain_sat.rs")).to_hex().to_string(),
+        "source_index_calculus_blake3":blake3::hash(include_bytes!("../../src/cryptanalysis/koblitz_index_calculus.rs")).to_hex().to_string(),
+        "planted":target_json, "relation":relation,
+        "max_variables":250_000, "max_domain_clauses":6_000_000,
+        "conflict_budget":conflict_budget, "max_models":max_models,
+        "sat_variables":enc.solver.n_vars(), "sat_clauses":enc.solver.n_clauses(),
+        "sat_xor_rows":enc.solver.n_xors(), "solver_models":models,
+        "invalid_models":invalid_models, "group_rejected_models":group_rejected_models,
+        "solver_conflicts":enc.solver.conflicts(),
+        "base_import_ms":base_import_ms, "model_construction_ms":model_construction_ms,
+        "solver_ms":solver_ms, "process_wall_ms":start.elapsed().as_secs_f64()*1000.0,
+        "memory_cgroup_limit_bytes":memory_limit_bytes,
+        "memory_cgroup_swap_limit_bytes":0,
+        "memory_cgroup_peak_bytes":memory_cgroup_peak_bytes,
+        "process_usage":process_usage(),
+        "total_index_calculus_runtime_ms":Value::Null,
+        "selected_best_total_runtime":Value::Null,
+    });
     write_new_json(output, &receipt)?;
     Ok(receipt)
 }
@@ -1438,6 +1732,25 @@ mod tests {
             kc.add(&sum, &fb.points[index])
         });
         let relation = checked_primary_relation_row(kc, fb, &indices, &target).unwrap();
+        let xs: Vec<_> = indices
+            .iter()
+            .map(|&index| match &fb.points[index] {
+                BinaryPoint::Affine { x, .. } => x.clone(),
+                BinaryPoint::Infinity => panic!("primary point is infinity"),
+            })
+            .collect();
+        let (lifted_indices, lifted_row) = checked_four_x_lift(kc, fb, &xs, &target)
+            .unwrap()
+            .expect("constructed four-point target has a stored group lift");
+        assert_eq!(lifted_row, relation);
+        assert_eq!(
+            lifted_indices
+                .iter()
+                .fold(BinaryPoint::Infinity, |sum, &index| {
+                    kc.add(&sum, &fb.points[index])
+                }),
+            target
+        );
         let lambda_82 = kc.lambda.modpow(&BigUint::from(82u32), &kc.subgroup_order);
         assert_eq!(
             relation[0],
