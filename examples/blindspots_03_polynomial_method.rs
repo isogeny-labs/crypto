@@ -1676,7 +1676,7 @@ fn mode_fes(a: &Args) {
 }
 
 /// `poly --draws F --cell C --targets 0-7 [--rand K] [--real] [--real-targets 8-11]
-///  [--sched a,b,c] [--t T] [--max-ops X] [--hash-max H]`
+///  [--sched a,b,c] [--t T] [--max-ops X] [--hash-max H] [--real-rand K] [--seed S] [--no-model]`
 fn mode_poly(a: &Args) {
     let draws = read_draws(&a.flag("--draws").expect("--draws"));
     let label = a.flag("--cell").expect("--cell");
@@ -1722,13 +1722,16 @@ fn mode_poly(a: &Args) {
             rows("fes-floor", fes_model_log2(sys.n, sys.m), f64::NAN, &[], "-");
         }
     };
-    for &ti in &tgts {
-        let d = cell.iter().find(|d| d.idx == ti).expect("target");
-        emit("desc", ti, &sys_of_draw(d));
-    }
-    let mut rng = Rng(seed ^ (n as u64) << 24 ^ 0x55);
-    for r in 0..nrand {
-        emit("rand", r, &Sys::random(n, dd, e, &mut rng));
+    let no_model = a.has("--no-model");
+    if !no_model {
+        for &ti in &tgts {
+            let d = cell.iter().find(|d| d.idx == ti).expect("target");
+            emit("desc", ti, &sys_of_draw(d));
+        }
+        let mut rng = Rng(seed ^ (n as u64) << 24 ^ 0x55);
+        for r in 0..nrand {
+            emit("rand", r, &Sys::random(n, dd, e, &mut rng));
+        }
     }
     if !a.has("--real") {
         return;
