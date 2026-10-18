@@ -69,6 +69,14 @@ pub struct FrobeniusOrbitDomainSize {
     pub xor_rows: usize,
 }
 
+/// SAT wires allocated for one exact Frobenius-orbit x-domain. Selectors
+/// follow the sorted representative order used by the domain builder.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FrobeniusOrbitChoiceWires {
+    pub selectors: Vec<u32>,
+    pub phase: Vec<u32>,
+}
+
 pub fn frobenius_orbit_domain_size(
     n: u32,
     m: usize,
@@ -236,6 +244,7 @@ pub struct ChainedS3Encoding {
     b: F2mElement,
     irr: IrreduciblePoly,
     domain_installed: bool,
+    orbit_choice_wires: Vec<FrobeniusOrbitChoiceWires>,
     first_pair_exchangeable: bool,
     first_pair_ordered: bool,
 }
@@ -329,6 +338,7 @@ impl ChainedS3Encoding {
             b: b.clone(),
             irr: irr.clone(),
             domain_installed: false,
+            orbit_choice_wires: Vec::new(),
             first_pair_exchangeable: false,
             first_pair_ordered: false,
         })
@@ -400,7 +410,12 @@ impl ChainedS3Encoding {
             });
         }
         for block in &self.blocks[..self.m] {
-            add_frobenius_orbit_domain(&mut self.solver, block, &sorted, &self.irr);
+            self.orbit_choice_wires.push(add_frobenius_orbit_domain(
+                &mut self.solver,
+                block,
+                &sorted,
+                &self.irr,
+            ));
         }
         self.domain_installed = true;
         self.first_pair_exchangeable = true;
@@ -469,10 +484,21 @@ impl ChainedS3Encoding {
         }
         self.first_pair_exchangeable = sorted_domains[0] == sorted_domains[1];
         for (block, representatives) in self.blocks[..self.m].iter().zip(&sorted_domains) {
-            add_frobenius_orbit_domain(&mut self.solver, block, representatives, &self.irr);
+            self.orbit_choice_wires.push(add_frobenius_orbit_domain(
+                &mut self.solver,
+                block,
+                representatives,
+                &self.irr,
+            ));
         }
         self.domain_installed = true;
         Ok(required)
+    }
+
+    /// Return exact selector/phase wires after an orbit-domain installation.
+    /// Coordinate-only domains have no such wires.
+    pub fn orbit_choice_wires(&self) -> Option<&[FrobeniusOrbitChoiceWires]> {
+        (!self.orbit_choice_wires.is_empty()).then_some(&self.orbit_choice_wires)
     }
 
     /// Keep one representative of the first summand-pair swap. The first
@@ -600,7 +626,7 @@ fn add_frobenius_orbit_domain(
     block: &[u32],
     representatives: &[BigUint],
     irr: &IrreduciblePoly,
-) {
+) -> FrobeniusOrbitChoiceWires {
     fn take(next: &mut u32, count: usize) -> Vec<u32> {
         let start = *next;
         *next += count as u32;
@@ -688,6 +714,7 @@ fn add_frobenius_orbit_domain(
         solver.add_xor(&[output, summand], false);
     }
     debug_assert_eq!(next - 1, *allocated.end());
+    FrobeniusOrbitChoiceWires { selectors, phase }
 }
 
 /// Enforce unsigned `a <= b`, with the highest field bit most significant.
@@ -752,7 +779,9 @@ mod tests {
     use super::*;
     use crate::binary_ecc::BinaryPoint;
     use crate::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
-    use crate::cryptanalysis::sat::{RootPropagationResult, SolveResult};
+    use crate::cryptanalysis::sat::{RootPropagationResult, SolveResult, SolverProgress};
+    use std::sync::Arc;
+    use std::time::Instant;
 
     #[test]
     fn first_pair_lex_constraint_keeps_exactly_one_swap_orientation() {
@@ -1010,6 +1039,145 @@ mod tests {
         assert_eq!(enc.solver.solve(), SolveResult::Sat);
         assert!(enc.verify_model());
         assert_eq!(enc.decode_x_blocks(), expected);
+    }
+
+    #[test]
+    fn orbit_choice_observer_preserves_small_chain_group_lift_and_records_overhead() {
+        fn affine_x(point: &BinaryPoint) -> F2mElement {
+            match point {
+                BinaryPoint::Affine { x, .. } => x.clone(),
+                BinaryPoint::Infinity => panic!("small control point is infinity"),
+            }
+        }
+
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let generator = kc.generator();
+        let p = kc.mul(generator, &BigUint::from(1u32));
+        let q = kc.mul(generator, &BigUint::from(2u32));
+        let three = kc.mul(generator, &BigUint::from(3u32));
+        let target = kc.mul(generator, &BigUint::from(5u32));
+        let (xp, xq, x3, xt) = (
+            affine_x(&p),
+            affine_x(&q),
+            affine_x(&three),
+            affine_x(&target),
+        );
+        assert_ne!(xp, xq);
+        let expected = vec![
+            xp.clone(),
+            xp.clone(),
+            xp.clone(),
+            xq.clone(),
+            xq.clone(),
+            x3,
+            xt.clone(),
+        ];
+        let representatives = vec![xp.to_biguint(), xq.to_biguint()];
+        let mut sorted_representatives = representatives.clone();
+        sorted_representatives.sort_unstable();
+
+        let make = || {
+            let mut enc = ChainedS3Encoding::build(
+                4,
+                &kc.curve.irreducible,
+                &kc.curve.b,
+                Some(&xt),
+                0,
+                2_000,
+            )
+            .unwrap();
+            enc.constrain_frobenius_orbit_summands(&representatives, 2_000, 10_000)
+                .unwrap();
+            for (block, x) in expected.iter().enumerate() {
+                enc.pin_x_block(block, x).unwrap();
+            }
+            let handles = enc.orbit_choice_wires().unwrap().to_vec();
+            assert_eq!(handles.len(), 4);
+            for (slot, x) in expected[..4].iter().enumerate() {
+                let index = sorted_representatives
+                    .binary_search(&x.to_biguint())
+                    .unwrap();
+                assert_eq!(handles[slot].selectors.len(), 2);
+                assert_eq!(handles[slot].phase.len(), 3);
+                assert!(enc
+                    .solver
+                    .add_clause(vec![handles[slot].selectors[index] as Lit]));
+                for &wire in &handles[slot].phase {
+                    assert!(enc.solver.add_clause(vec![-(wire as Lit)]));
+                }
+            }
+            enc
+        };
+
+        let run = |mut enc: ChainedS3Encoding, observed: bool, contradiction: bool| {
+            if contradiction {
+                let wrong = if xp.to_biguint().bit(0) { -1 } else { 1 };
+                enc.solver.add_clause(vec![wrong]);
+            }
+            let progress = observed.then(|| Arc::new(SolverProgress::default()));
+            if let Some(progress) = &progress {
+                enc.solver.set_progress_observer(Arc::clone(progress));
+            }
+            let result = enc.solver.solve();
+            let model = if result == SolveResult::Sat {
+                assert!(!contradiction);
+                assert!(enc.verify_model());
+                assert_eq!(enc.decode_x_blocks(), expected);
+                let mut lifted_sum = BinaryPoint::Infinity;
+                for x in enc.decode_summands() {
+                    let lifted = if x == xp {
+                        &p
+                    } else if x == xq {
+                        &q
+                    } else {
+                        panic!("decoded x was not in the checked lift table")
+                    };
+                    lifted_sum = kc.add(&lifted_sum, lifted);
+                }
+                assert_eq!(lifted_sum, target);
+                Some(enc.solver.model())
+            } else {
+                assert_eq!(result, SolveResult::Unsat);
+                None
+            };
+            if let Some(progress) = progress {
+                let snapshot = progress.snapshot();
+                assert_eq!(snapshot.xor_passes, enc.solver.stats.xor_passes);
+                assert_eq!(snapshot.xor_nanoseconds, enc.solver.stats.ns_propagate_xors);
+                assert_eq!(snapshot.xor_row_scans, enc.solver.stats.xor_row_scans);
+                assert_eq!(snapshot.xor_repivots, enc.solver.stats.xor_repivots);
+                assert_eq!(snapshot.xor_row_ops, enc.solver.stats.xor_row_ops);
+            }
+            (result, model)
+        };
+
+        for contradiction in [false, true] {
+            assert_eq!(
+                run(make(), false, contradiction),
+                run(make(), true, contradiction)
+            );
+        }
+
+        // One-thread, release-mode descriptive overhead control. Preparation
+        // is outside each timed interval; both arms verify every answer.
+        for repetition in 0..20 {
+            let order = if repetition % 2 == 0 { [0, 1] } else { [1, 0] };
+            let mut elapsed = [0u128; 2];
+            for arm in order {
+                let cases: Vec<_> = (0..100).map(|_| make()).collect();
+                let start = Instant::now();
+                for enc in cases {
+                    assert_eq!(run(enc, arm == 1, false).0, SolveResult::Sat);
+                }
+                elapsed[arm] = start.elapsed().as_nanos();
+            }
+            println!(
+                "{{\"schema\":\"n83.selector-small-observer-overhead/v1\",\"repetition\":{repetition},\"order\":\"{}\",\"direct_ns\":{},\"observed_ns\":{}}}",
+                if repetition % 2 == 0 { "AB" } else { "BA" },
+                elapsed[0],
+                elapsed[1],
+            );
+        }
     }
 
     #[test]

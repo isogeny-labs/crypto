@@ -195,6 +195,11 @@ pub struct SolverProgressSnapshot {
     pub decisions: u64,
     pub conflicts: u64,
     pub restarts: u64,
+    pub xor_passes: u64,
+    pub xor_nanoseconds: u64,
+    pub xor_row_scans: u64,
+    pub xor_repivots: u64,
+    pub xor_row_ops: u64,
 }
 
 /// Optional diagnostic counters. Relaxed atomics provide observational
@@ -205,6 +210,11 @@ pub struct SolverProgress {
     decisions: AtomicU64,
     conflicts: AtomicU64,
     restarts: AtomicU64,
+    xor_passes: AtomicU64,
+    xor_nanoseconds: AtomicU64,
+    xor_row_scans: AtomicU64,
+    xor_repivots: AtomicU64,
+    xor_row_ops: AtomicU64,
 }
 
 impl SolverProgress {
@@ -214,6 +224,11 @@ impl SolverProgress {
             decisions: self.decisions.load(Ordering::Relaxed),
             conflicts: self.conflicts.load(Ordering::Relaxed),
             restarts: self.restarts.load(Ordering::Relaxed),
+            xor_passes: self.xor_passes.load(Ordering::Relaxed),
+            xor_nanoseconds: self.xor_nanoseconds.load(Ordering::Relaxed),
+            xor_row_scans: self.xor_row_scans.load(Ordering::Relaxed),
+            xor_repivots: self.xor_repivots.load(Ordering::Relaxed),
+            xor_row_ops: self.xor_row_ops.load(Ordering::Relaxed),
         }
     }
 }
@@ -725,6 +740,21 @@ impl Solver {
             .restarts
             .store(self.stats.restarts, Ordering::Relaxed);
         progress
+            .xor_passes
+            .store(self.stats.xor_passes, Ordering::Relaxed);
+        progress
+            .xor_nanoseconds
+            .store(self.stats.ns_propagate_xors, Ordering::Relaxed);
+        progress
+            .xor_row_scans
+            .store(self.stats.xor_row_scans, Ordering::Relaxed);
+        progress
+            .xor_repivots
+            .store(self.stats.xor_repivots, Ordering::Relaxed);
+        progress
+            .xor_row_ops
+            .store(self.stats.xor_row_ops, Ordering::Relaxed);
+        progress
             .phase
             .store(SolverProgressPhase::Idle as u8, Ordering::Relaxed);
         self.progress = Some(progress);
@@ -1175,6 +1205,23 @@ impl Solver {
             let t = std::time::Instant::now();
             let step = self.propagate_xors();
             self.stats.ns_propagate_xors += t.elapsed().as_nanos() as u64;
+            if let Some(progress) = &self.progress {
+                progress
+                    .xor_passes
+                    .store(self.stats.xor_passes, Ordering::Relaxed);
+                progress
+                    .xor_nanoseconds
+                    .store(self.stats.ns_propagate_xors, Ordering::Relaxed);
+                progress
+                    .xor_row_scans
+                    .store(self.stats.xor_row_scans, Ordering::Relaxed);
+                progress
+                    .xor_repivots
+                    .store(self.stats.xor_repivots, Ordering::Relaxed);
+                progress
+                    .xor_row_ops
+                    .store(self.stats.xor_row_ops, Ordering::Relaxed);
+            }
             self.progress_phase(SolverProgressPhase::Idle);
             match step {
                 XorStep::Conflict => return Some(Conflict::Xor),
@@ -2446,6 +2493,11 @@ mod tests {
             assert_eq!(snapshot.decisions, observed.stats.decisions);
             assert_eq!(snapshot.conflicts, observed.stats.conflicts);
             assert_eq!(snapshot.restarts, observed.stats.restarts);
+            assert_eq!(snapshot.xor_passes, observed.stats.xor_passes);
+            assert_eq!(snapshot.xor_nanoseconds, observed.stats.ns_propagate_xors);
+            assert_eq!(snapshot.xor_row_scans, observed.stats.xor_row_scans);
+            assert_eq!(snapshot.xor_repivots, observed.stats.xor_repivots);
+            assert_eq!(snapshot.xor_row_ops, observed.stats.xor_row_ops);
         }
     }
 

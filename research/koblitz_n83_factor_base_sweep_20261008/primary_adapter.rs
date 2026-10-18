@@ -859,6 +859,7 @@ fn write_progress_sample(
     file: &mut File,
     sequence: &mut u64,
     start: Instant,
+    schema: &str,
     source_commit: &str,
     progress: &SolverProgress,
     sample_kind: &str,
@@ -869,7 +870,7 @@ fn write_progress_sample(
         .map_err(io::Error::other)?;
     let snapshot = progress.snapshot();
     let record = json!({
-        "schema":"n83.k16627-m4-search-progress/v1",
+        "schema":schema,
         "sequence":*sequence,
         "sample_kind":sample_kind,
         "elapsed_wall_ms":start.elapsed().as_secs_f64()*1000.0,
@@ -881,6 +882,11 @@ fn write_progress_sample(
         "completed_decisions":snapshot.decisions,
         "completed_conflicts":snapshot.conflicts,
         "completed_restarts":snapshot.restarts,
+        "completed_xor_passes":snapshot.xor_passes,
+        "completed_xor_nanoseconds":snapshot.xor_nanoseconds,
+        "completed_xor_row_scans":snapshot.xor_row_scans,
+        "completed_xor_repivots":snapshot.xor_repivots,
+        "completed_xor_row_ops":snapshot.xor_row_ops,
     });
     serde_json::to_writer(&mut *file, &record).map_err(io::Error::other)?;
     file.write_all(b"\n")?;
@@ -899,6 +905,7 @@ impl ProgressSampler {
     fn start(
         output: &Path,
         start: Instant,
+        schema: &'static str,
         source_commit: String,
         progress: Arc<SolverProgress>,
     ) -> Result<Self> {
@@ -913,6 +920,7 @@ impl ProgressSampler {
             &mut file,
             &mut sequence,
             start,
+            schema,
             &source_commit,
             &progress,
             "entered",
@@ -924,6 +932,7 @@ impl ProgressSampler {
                     &mut file,
                     &mut sequence,
                     start,
+                    schema,
                     &source_commit,
                     &progress,
                     "periodic",
@@ -933,6 +942,7 @@ impl ProgressSampler {
                         &mut file,
                         &mut sequence,
                         start,
+                        schema,
                         &source_commit,
                         &progress,
                         "returned",
@@ -957,12 +967,12 @@ impl ProgressSampler {
 /// object. The seven blocks are fixed only after the full orbit domain is
 /// installed, and a SAT answer is checked against the original group law.
 pub(super) fn chain_witness_cli(root: &Path, memory_mib: u64, output: &Path) -> Result<Value> {
-    chain_witness_impl(root, memory_mib, output, false, false)
+    chain_witness_impl(root, memory_mib, output, false, false, false)
 }
 
 /// The same complete witness, with a separate durable root-propagation gate.
 pub(super) fn chain_root_phase_cli(root: &Path, memory_mib: u64, output: &Path) -> Result<Value> {
-    chain_witness_impl(root, memory_mib, output, true, false)
+    chain_witness_impl(root, memory_mib, output, true, false, false)
 }
 
 /// The exact root-phase workload with separately fsynced search-progress
@@ -972,7 +982,18 @@ pub(super) fn chain_search_progress_cli(
     memory_mib: u64,
     output: &Path,
 ) -> Result<Value> {
-    chain_witness_impl(root, memory_mib, output, true, true)
+    chain_witness_impl(root, memory_mib, output, true, true, false)
+}
+
+/// The full m=4 orbit model with exact planted representative selectors and
+/// phase-zero bits fixed after the seven x blocks. This remains a positive
+/// control; the original orbit-domain search is unchanged.
+pub(super) fn chain_selector_positive_cli(
+    root: &Path,
+    memory_mib: u64,
+    output: &Path,
+) -> Result<Value> {
+    chain_witness_impl(root, memory_mib, output, true, true, true)
 }
 
 fn chain_witness_impl(
@@ -981,6 +1002,7 @@ fn chain_witness_impl(
     output: &Path,
     checkpoint_root: bool,
     sample_progress: bool,
+    pin_orbit_choices: bool,
 ) -> Result<Value> {
     if memory_mib != 4096 {
         return Err("complete-witness control requires the frozen 4096 MiB cap".into());
@@ -988,7 +1010,9 @@ fn chain_witness_impl(
     let memory_limit_bytes = checked_cgroup_memory_limit(memory_mib)?;
     let (source_commit, source_attestation_mode) = frozen_chain_source()?;
     let start = Instant::now();
-    let phase_schema = if sample_progress {
+    let phase_schema = if pin_orbit_choices {
+        "n83.k16627-m4-selector-positive-phase/v1"
+    } else if sample_progress {
         "n83.k16627-m4-search-progress-phase/v1"
     } else if checkpoint_root {
         "n83.k16627-m4-root-phase/v1"
@@ -1036,7 +1060,8 @@ fn chain_witness_impl(
         == 4;
     if !affine || !distinct {
         let receipt = json!({
-            "schema":if sample_progress {"n83.k16627-m4-search-progress/v1"}
+            "schema":if pin_orbit_choices {"n83.k16627-m4-selector-positive/v1"}
+                else if sample_progress {"n83.k16627-m4-search-progress/v1"}
                 else if checkpoint_root {"n83.k16627-m4-root-phase/v1"}
                 else {"n83.k16627-m4-witness/v1"},
             "status":"INVALID_PLANTED_CONTROL",
@@ -1134,6 +1159,65 @@ fn chain_witness_impl(
             .map_err(|_| "complete-witness x-block pin failed")?;
     }
     phases.mark("seven_blocks_pinned", json!({"x_blocks":7}))?;
+    let mut orbit_choice_receipt = Value::Null;
+    if pin_orbit_choices {
+        let mut sorted_representatives = representatives.clone();
+        sorted_representatives.sort_unstable();
+        if sorted_representatives
+            .windows(2)
+            .any(|pair| pair[0] == pair[1])
+        {
+            return Err("selector control has duplicate representatives".into());
+        }
+        let wires = enc
+            .orbit_choice_wires()
+            .ok_or("selector control has no installed orbit-choice wires")?;
+        if wires.len() != 4 {
+            return Err("selector control has the wrong summand count".into());
+        }
+        let mut choices = Vec::with_capacity(4);
+        for (slot, x) in summand_xs.iter().enumerate() {
+            let value = x.to_biguint();
+            let representative_index = sorted_representatives
+                .binary_search(&value)
+                .map_err(|_| "selector control planted x is not a representative")?;
+            let handle = &wires[slot];
+            if handle.selectors.len() != sorted_representatives.len() || handle.phase.len() != 7 {
+                return Err("selector control allocated unexpected choice wires".into());
+            }
+            choices.push((
+                slot,
+                representative_index,
+                handle.selectors[representative_index],
+                handle.phase.clone(),
+                value,
+            ));
+        }
+        for (_, _, selector, phase, _) in &choices {
+            if !enc.solver.add_clause(vec![*selector as i32]) {
+                return Err("selector control selector unit contradicted model".into());
+            }
+            for &wire in phase {
+                if !enc.solver.add_clause(vec![-(wire as i32)]) {
+                    return Err("selector control phase-zero unit contradicted model".into());
+                }
+            }
+        }
+        orbit_choice_receipt = json!(choices
+            .iter()
+            .map(|(slot, index, selector, phase, value)| {
+                json!({
+                    "slot":slot,
+                    "sorted_representative_index":index,
+                    "selector_wire":selector,
+                    "phase_wires":phase,
+                    "phase":0,
+                    "representative_x_decimal":value.to_string(),
+                })
+            })
+            .collect::<Vec<_>>());
+        phases.mark("orbit_choices_pinned", orbit_choice_receipt.clone())?;
+    }
     enc.solver.conflict_budget = 100_000;
     enc.solver.deadline = Some(start + Duration::from_secs(1800));
     let root_result = if checkpoint_root {
@@ -1165,6 +1249,11 @@ fn chain_witness_impl(
             Some(ProgressSampler::start(
                 output,
                 start,
+                if pin_orbit_choices {
+                    "n83.k16627-m4-selector-positive/v1"
+                } else {
+                    "n83.k16627-m4-search-progress/v1"
+                },
                 source_commit.clone(),
                 progress,
             )?)
@@ -1221,7 +1310,11 @@ fn chain_witness_impl(
                         "tamper_rejected":tamper_rejected,
                         "group_verified":true,
                     });
-                    "PASS_COMPLETE_WITNESS"
+                    if pin_orbit_choices {
+                        "PASS_SELECTOR_PINNED_WITNESS"
+                    } else {
+                        "PASS_COMPLETE_WITNESS"
+                    }
                 }
             } else {
                 "INVALID_GROUP_LIFT"
@@ -1232,7 +1325,8 @@ fn chain_witness_impl(
         .trim()
         .parse()?;
     let mut receipt = json!({
-        "schema":if sample_progress {"n83.k16627-m4-search-progress/v1"}
+        "schema":if pin_orbit_choices {"n83.k16627-m4-selector-positive/v1"}
+            else if sample_progress {"n83.k16627-m4-search-progress/v1"}
             else if checkpoint_root {"n83.k16627-m4-root-phase/v1"}
             else {"n83.k16627-m4-witness/v1"},
         "status":status,
@@ -1266,6 +1360,9 @@ fn chain_witness_impl(
         "total_index_calculus_runtime_ms":Value::Null,
         "selected_best_total_runtime":Value::Null,
     });
+    if pin_orbit_choices {
+        receipt["orbit_choice_pins"] = orbit_choice_receipt;
+    }
     if checkpoint_root {
         receipt["source_sat_blake3"] = Value::String(
             blake3::hash(include_bytes!("../../src/cryptanalysis/sat.rs"))
