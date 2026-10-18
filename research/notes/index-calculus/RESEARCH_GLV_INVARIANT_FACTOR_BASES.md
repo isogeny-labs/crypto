@@ -2560,3 +2560,76 @@ Against E24's rows at matched `p` the comparison crosses curve families (and E24
 spans `1,099`–`7,796`), so it is reported, not gated.  **Class if G2.32–G2.37 hold:** engineering
 (a constant, `√2` against the matched rho), on GLS twists over `F_{p⁴}` with the split 2-torsion
 above only.  The exponents do not move.
+
+### 9.16 E25 measured: the GLS fold halves the `k = 4` cost on its own curves, a constant
+
+*2026-10-18.*  **Stage A:** `examples/gls_stage_a.rs --sizes 29,37,41,53,61,89,97,101,109,113,149,197,269,397
+--seeds 4` (`experiments/30_gls_v4/stage_a.{json,log}`).  **End to end:**
+`experiments/30_gls_v4/run_all.sh` (one curve per invocation, both arms, `--rho-runs 16`), binary
+`46202dc97`; raw `p{101,149,197,269,397}s{1,2}.json`, log `run.log`, tables `tables.md`
+(`glv_invariant_experiment_tables`, `e25`).  Host: the 4-vCPU container (operation counts only; no
+wall-time claim).
+
+**Stage A (56 curves).**  Every `(p, seed)` gave a curve; `ψ² = −1`, `ψ(G) = [λ]G` with `λ² ≡ −1`,
+and `ψ` fixing `T₁` and swapping `T₂, T₃` were checked on points on every one.  Every non-empty
+base has exactly `8.00` points a column under `⟨V₄, ψ⟩` (`4.00` under `V₄`), and the two arms hold
+the same points.  `ν² ∉ F_p` on all 56 (fact 3), and wherever logarithms were computed (`n ≤ 2^{26}`,
+`p ≤ 149`) the number of distinct column logarithms equals the number of columns: no base is
+confined.  Density pooled over all 56: `0.49` (`0.52` at `p ≥ 149`); per curve `0`–`0.75`, 14 of 56
+outside `[0.3, 0.7]`, all but one at `p ≤ 113`, where a base is `3`–`13` orbits of `8` points that
+lift together (two `p = 41` curves have no base at all).  **Two facts the derivation did not
+predict:** every curve has `h = 16`, never `4` (the construction forces `4 | t`; E24's curves had
+`h = 4`), and the unit test confirms the fold coefficients against true logarithms at `p = 37, 41`.
+
+**End to end (10 curves, both arms, `h = 16` throughout).**  Every logarithm recovered on both
+arms; every kept row re-added to `O`; no lifted quadruple off the base or without a sign vector;
+all `960` walks correct; `198` unsolved of `1.15·10⁶` targets (`0.017 %`, "border unreachable",
+charged).  `C` median `1.62`–`1.66·10⁶` on every arm.
+
+| p | seed | log₂ n | cols A / B | y A | y B | `S_A` | `S_B` | `S_A / S_B` | neg / `±ψ` steps | `S_A` / rho neg | `S_B` / rho `±ψ` | improvement |
+|--:|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 101 | 1 | 22.6 | 10 / 5 | 3,731 | 3,528 | `6.76·10¹⁰` | `3.48·10¹⁰` | 1.94 | 1.03 | `1.53·10⁵` | `6.77·10⁴` | 2.26 |
+| 101 | 2 | 22.6 | 14 / 7 | 1,001 | 888 | `2.47·10¹⁰` | `1.17·10¹⁰` | 2.11 | 1.49 | `6.02·10⁴` | `2.93·10⁴` | 2.05 |
+| 149 | 1 | 24.9 | 10 / 5 | 32,013 | 22,006 | `5.83·10¹¹` | `2.19·10¹¹` | 2.67 | 1.09 | `8.31·10⁵` | `2.65·10⁵` | 3.13 |
+| 149 | 2 | 24.9 | 14 / 7 | 4,039 | 4,272 | `1.01·10¹¹` | `5.67·10¹⁰` | 1.77 | 0.96 | `1.58·10⁵` | `7.01·10⁴` | 2.25 |
+| 197 | 1 | 26.5 | 22 / 11 | 2,218 | 3,150 | `8.53·10¹⁰` | `6.32·10¹⁰` | 1.35 | 1.52 | `7.71·10⁴` | `6.11·10⁴` | 1.26 |
+| 197 | 2 | 26.5 | 30 / 15 | 846 | 969 | `4.39·10¹⁰` | `2.59·10¹⁰` | 1.69 | 1.62 | `3.97·10⁴` | `2.62·10⁴` | 1.51 |
+| 269 | 1 | 28.3 | 30 / 15 | 2,645 | 2,950 | `1.37·10¹¹` | `7.88·10¹⁰` | 1.74 | 1.61 | `7.45·10⁴` | `4.84·10⁴` | 1.54 |
+| 269 | 2 | 28.3 | 40 / 20 | 744 | 718 | `5.10·10¹⁰` | `2.52·10¹⁰` | 2.02 | 2.08 | `2.24·10⁴` | `1.56·10⁴` | 1.44 |
+| 397 | 1 | 30.5 | 60 / 30 | 700 | 800 | `7.19·10¹⁰` | `4.17·10¹⁰` | 1.72 | 1.36 | `1.99·10⁴` | `1.13·10⁴` | 1.76 |
+| 397 | 2 | 30.5 | 48 / 24 | 1,600 | 1,349 | `1.31·10¹¹` | `5.65·10¹⁰` | 2.32 | 1.67 | `3.38·10⁴` | `1.71·10⁴` | 1.97 |
+
+"Improvement" is `(S_A / rho_neg) / (S_B / rho_±ψ)`: the ψ arm against its matched walk over the
+control against the negation walk, on one curve.  Handover by §11.16's model from arm B's own
+constants (`y = 2,474` pooled, `cols / p = 0.060`, `C = 1.66·10⁶`, `h = 16`, `S_rho = 121.7` for the
+`±ψ` walk, `r = 0.045`): **`n* = 2^{88.0}`** (from `p = 397` alone, `2^{85.7}`); arm A on the same
+curves and against the same walk: `2^{93.2}` (`2^{91.1}`).  Fitted exponent of `S / rho` in `n`:
+`−0.29` (B), `−0.30` (A).  Unpriced native work at `0, 0.1, 1` GAE never reverses the order: rho is
+ahead on every row of both arms across the band.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.32 | curves at every `p`; `ψ` verified on points; `ψ`-image of every base point in the base; `8.00` points a column; coefficients equal true logarithms; logs recovered; density `0.49` pooled, `14` of `56` curves outside `[0.3, 0.7]` (all small `p` but one) | **holds** on everything but per-curve density, which the band did not specify; pooled it holds |
+| G2.33 | `cols_A / cols_B = 2.00` on every curve | **holds** |
+| G2.34 | `y_B / y_A` `0.69`–`1.42` (two curves outside `[0.8, 1.25]`); pooled `2,474 / 2,707 = 0.91` | **falsified** per curve: with `5`–`60` relations a curve, `y` is a ratio of small counts and the band was narrower than its noise |
+| G2.35 | `S_A / S_B` `1.35`–`2.67`, median `1.86` (the same two curves outside `[1.6, 2.4]`, tracking their `y`) | **falsified** per curve (8 of 10 in band) |
+| G2.36 | steps ratio mean `1.44` (in `[1.2, 1.6]`); improvement `1.26`–`3.13`, median `1.87`: in `[1.1, 2.0]` on all six curves at `p ≥ 197`, above it on all four at `p ≤ 149` | steps **hold**; improvement **falsified high** at `p ≤ 149`: below `n ≈ 2^{25}` a walk is `≤ 3,000` steps, its set-up dominates and the `±ψ` walk costs more multiplications than the negation walk (`5.1` against `4.4·10⁵` at `p = 101` seed 1), which flatters arm B's ratio |
+| G2.37 | `n* = 2^{88.0}` (`2^{85.7}` from the largest `p`) | **holds** (band `[2^{84}, 2^{92}]`) |
+
+**What it says.**  On GLS twists over `F_{p⁴}` with the split 2-torsion of §9.15, `ψ` keeps E24's
+`V₄` line and acts on it as `z ↦ ±i/z`, so the base folds by `⟨V₄, ψ⟩` with `8` points a column.
+Measured end to end on the same curve, base and target stream, **the fold cuts the `k = 4` index
+calculus by `1.35`–`2.67×` (median `1.86×`), and against the matched `⟨±ψ⟩` walk the ψ arm gains
+`1.26`–`1.97×` over the control at every `p ≥ 197`**; the modelled handover on these curves moves
+from `2^{93.2}` to `2^{88.0}`.  **Class: engineering**, a constant: the exponent is unchanged
+(`−0.29` against `−0.30`), and the per-curve spread is the relation count's (`5`–`60` relations).
+Under the 2026-10-15 criterion this is a verified, measured improvement of the baseline *on this
+family*.  **What it does not say.**  It does not move E24's rows: these curves have `h = 16`, which
+makes rho `2×` cheaper at a given `p` than on E24's `h = 4` curves and absorbs most of the fold at
+matched `n` (arm B's handover `2^{88.0}` against E24's own `2^{90.1}`, two bits, from different
+curve families).  **Distance remaining:** every row is still `1.1·10⁴`–`2.7·10⁵×` slower than the
+matched rho (`1.13·10⁴×` at `p = 397` seed 1, the best), and the handover is a model extrapolation,
+not a measured crossing.  **Scope:** GLS twists over `F_{p⁴}` of curves over `F_{p²}` with one root
+there, the halves condition of E24, `p ≡ 1 (mod 4)`, `p ≤ 397` (`n ≤ 2^{30.5}`).  The next lever on
+this family is the cofactor, not the fold: a GLS construction with the `V₄` line and `h = 4` would
+keep the fold and give back the `2×` that `h = 16` costs against rho.

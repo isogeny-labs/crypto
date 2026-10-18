@@ -73,6 +73,7 @@ SOURCES = {
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
     "glv_k4": "research/glv_k4_pipeline_d4_20261017/summary.json",
+    "glv_gls": "research/glv_gls_v4_20261018/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -631,8 +632,15 @@ def k4_v4_component() -> dict:
             or sm.get("all_verified") is not True
             or sm.get("class") != "engineering"):
         raise SystemExit("review the k = 4 V4-line summary before updating the leaderboard")
+    gls = load(SOURCES["glv_gls"])
+    if (gls.get("schema") != "crypto.glv_gls_v4_summary/v1"
+            or gls.get("all_verified") is not True
+            or gls.get("class") != "engineering"):
+        raise SystemExit("review the E25 GLS summary before updating the leaderboard")
     return {**sm, "source": SOURCES["glv_k4"],
-            "report": "research/glv_k4_pipeline_d4_20261017/REPORT.pdf"}
+            "report": "research/glv_k4_pipeline_d4_20261017/REPORT.pdf",
+            "gls": {**gls, "source": SOURCES["glv_gls"],
+                    "report": "research/glv_gls_v4_20261018/REPORT.pdf"}}
 
 
 def latest_frontier_audit() -> dict:
@@ -1449,6 +1457,18 @@ def markdown(doc: dict) -> str:
         L.append(f"| {z['p']} | {z['log2_n']:.1f} | {rr(z['e19_s_over_rho'])} | {rr(z['e24_s_over_rho'])} | "
                  f"{rr(z['e19_over_e24_by_seed'], '{:.0f}')} | {rr(z['e19_c_median'])} | {rr(z['e24_c_median'])} |")
     L.append("")
+    g = k["gls"]
+    L += [f"**The GLS endomorphism on the V₄ line (E25).** Before: {g['before']}. After: {g['after']}. "
+          f"Same curve, base and target stream ({g['curves']} GLS curves, h = 16, every logarithm verified); "
+          f"handover from each arm's own constants 2^{g['handover_log2_n_a']:.1f} → 2^{g['handover_log2_n_b']:.1f} "
+          f"(extrapolated). Class: {g['class']}, a constant, on this family only. "
+          f"Read the [report](../../{g['report']}) and [summary](../../{g['source']}).", "",
+          "| p | seed | log2 n | cols A / B | S_A / S_B | S_A / rho (negation) | S_B / rho (±ψ) |",
+          "|--:|--:|--:|:--|--:|--:|--:|"]
+    for z in g["rows"]:
+        L.append(f"| {z['p']} | {z['seed']} | {z['log2_n']:.1f} | {z['columns'][0]} / {z['columns'][1]} | "
+                 f"{z['s_a_over_s_b']:.2f} | {z['s_a_over_rho_negation']:.2e} | {z['s_b_over_rho_psi']:.2e} |")
+    L.append("")
     return "\n".join(L) + "\n"
 
 
@@ -2120,7 +2140,20 @@ def page(doc: dict, standalone: bool) -> str:
         P.append(f'<tr><td>{z["p"]}</td><td>{z["log2_n"]:.1f}</td><td>{rh(z["e19_s_over_rho"])}</td>'
                  f'<td>{rh(z["e24_s_over_rho"])}</td><td>{rh(z["e19_over_e24_by_seed"], "{:.0f}")}</td>'
                  f'<td>{rh(z["e19_c_median"])}</td><td>{rh(z["e24_c_median"])}</td></tr>')
-    P.append('</tbody></table></div>' + gh(k["source"], 'Frozen study summary') + '</section>')
+    g = k["gls"]
+    P.append('</tbody></table></div>' + gh(k["source"], 'Frozen study summary')
+             + f'<h3>The GLS endomorphism on the V₄ line (E25)</h3><p>Before: {esc(g["before"])}. '
+             f'After: {esc(g["after"])}. Same curve, base and target stream ({g["curves"]} GLS curves, '
+             f'h = 16, every logarithm verified); handover from each arm&rsquo;s own constants '
+             f'2<sup>{g["handover_log2_n_a"]:.1f}</sup> &rarr; 2<sup>{g["handover_log2_n_b"]:.1f}</sup> '
+             f'(extrapolated). Class: {esc(g["class"])}, a constant, on this family only.</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>seed</th><th>log2 n</th><th>cols A / B</th>'
+             '<th>S_A / S_B</th><th>S_A / rho (negation)</th><th>S_B / rho (±ψ)</th></tr></thead><tbody>')
+    for z in g["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["seed"]}</td><td>{z["log2_n"]:.1f}</td>'
+                 f'<td>{z["columns"][0]} / {z["columns"][1]}</td><td>{z["s_a_over_s_b"]:.2f}</td>'
+                 f'<td>{z["s_a_over_rho_negation"]:.2e}</td><td>{z["s_b_over_rho_psi"]:.2e}</td></tr>')
+    P.append('</tbody></table></div>' + gh(g["source"], 'Frozen study summary') + '</section>')
 
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '

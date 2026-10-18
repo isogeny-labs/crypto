@@ -2912,7 +2912,81 @@ fn k4_summary(args: &[String]) {
     fs::write(out, serde_json::to_string_pretty(&summary).unwrap() + "\n").expect("write summary");
 }
 
+/// E25's study summary for the leaderboard: per curve, both arms on one GLS
+/// curve, and the handover from arm B's own constants.  Usage:
+/// `glv_invariant_experiment_tables --gls-summary OUT.json E25_FILES…`.
+fn gls_summary(args: &[String]) {
+    let rows: Vec<Value> = args[1..]
+        .iter()
+        .flat_map(|f| {
+            let v: Value = serde_json::from_str(&fs::read_to_string(f).unwrap()).unwrap();
+            v.as_array().cloned().unwrap_or_default()
+        })
+        .collect();
+    let arm = |a: &str| -> Vec<&Value> {
+        rows.iter()
+            .filter(|r| r["arm"].as_str() == Some(a))
+            .collect()
+    };
+    let (a, b) = (arm("A"), arm("B"));
+    let handover = |set: &[&Value]| -> f64 {
+        let m = |f: &dyn Fn(&Value) -> f64| mean(&set.iter().map(|r| f(r)).collect::<Vec<_>>());
+        let y = set.iter().map(|r| fl(r, "residuals")).sum::<f64>()
+            / set.iter().map(|r| fl(r, "folded.relations")).sum::<f64>();
+        let cols_p = m(&|r| fl(r, "folded.columns") / fl(r, "p"));
+        let h = m(&|r| fl(r, "cofactor"));
+        let s_rho = m(&|r| fl(r, "rho_matched_muls") / fl(r, "n").sqrt());
+        let r_la = m(&|r| fl(r, "la_fp_muls") / fl(r, "rho_matched_muls"));
+        let p_star = y * cols_p * m(&|r| fl(r, "call.mean")) * h.sqrt() / (s_rho * (1.0 - r_la));
+        (p_star.powi(4) / h).log2()
+    };
+    let curves: Vec<Value> = sorted(&b, &["bits", "seed"])
+        .into_iter()
+        .filter_map(|rb| {
+            let ra = a.iter().find(|r| r["p"] == rb["p"] && r["seed"] == rb["seed"])?;
+            Some(json!({
+                "p": rb["p"], "seed": rb["seed"], "log2_n": fl(rb, "bits"), "cofactor": rb["cofactor"],
+                "columns": [ra["folded"]["columns"], rb["folded"]["columns"]],
+                "s_a_over_s_b": fl(ra, "total_muls") / fl(rb, "total_muls"),
+                "s_a_over_rho_negation": fl(ra, "total_muls") / fl(ra, "rho_negation_muls"),
+                "s_b_over_rho_psi": fl(rb, "ratio"),
+                "negation_over_psi_steps": fl(rb, "rho_negation_steps") / fl(rb, "rho_matched_steps"),
+            }))
+        })
+        .collect();
+    let all_verified = rows.iter().all(|r| {
+        bool_at(r, "folded.correct")
+            && fl(r, "check_failures") == 0.0
+            && fl(r, "rows_readd_failures") == 0.0
+            && r["rho"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|w| bool_at(w, "correct"))
+    });
+    let summary = json!({
+        "schema": "crypto.glv_gls_v4_summary/v1",
+        "study": "research/glv_gls_v4_20261018/",
+        "note": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.15, §9.16",
+        "class": "engineering",
+        "before": "arm A: the V4-folded base on the same GLS curve (4 points a column)",
+        "after": "arm B: the same points folded by <V4, psi> (8 points a column), against the matched <±psi> walk",
+        "curves": curves.len(), "all_verified": all_verified,
+        "handover_log2_n_a": handover(&a), "handover_log2_n_b": handover(&b),
+        "rows": curves,
+    });
+    fs::write(
+        &args[0],
+        serde_json::to_string_pretty(&summary).unwrap() + "\n",
+    )
+    .expect("write summary");
+}
+
 fn main() {
+    if env::args().nth(1).as_deref() == Some("--gls-summary") {
+        gls_summary(&env::args().skip(2).collect::<Vec<_>>());
+        return;
+    }
     if env::args().nth(1).as_deref() == Some("--k4-summary") {
         k4_summary(&env::args().skip(2).collect::<Vec<_>>());
         return;
