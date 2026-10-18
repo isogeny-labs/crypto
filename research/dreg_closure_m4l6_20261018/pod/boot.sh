@@ -22,6 +22,8 @@ git clone -q --branch "$BRANCH" https://github.com/aburan28/crypto src >> "$OUT/
 cd src
 ln -sfn /workspace/src/research/dreg_closure_m4l6_20261018 "$OUT/closure"
 ln -sfn /workspace/src/research/pkm_lead1_m3n21_20261016 "$OUT/pkm"
+ln -sfn /workspace/src/research/pkm_m3_n21_msolve_20261018 "$OUT/pkm-msolve"
+ln -sfn /workspace/src "$OUT/src"
 { echo "cgroup memory.max: $(cat /sys/fs/cgroup/memory.max 2>/dev/null || cat /sys/fs/cgroup/memory/memory.limit_in_bytes 2>/dev/null)"
   grep MemTotal /proc/meminfo; nproc; } > "$OUT/host-quick.txt"
 status BUILDING
