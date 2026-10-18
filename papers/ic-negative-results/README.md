@@ -14,7 +14,7 @@ integer counts from one deterministic run, so there are no intervals: census of 
 pairs (d_F > d'_F in 6138 outside / 4830 inside; d_F < d'_F in 0 / 224), witnesses A, B
 (d_F 3, d'_F 2), witness C (3 outside, 2 inside, 2 fake). Controls passed: positive
 (X, X+1), negative (Z/8, Z/9), yield mirror. Caveats: host is shared, L0 isolation, toy
-scale; Lean not kernel-checked. Graph: `reports/lemma4_census.svg` / `.png` (source
+scale; Lean not kernel-checked. Second-pass re-run (this assessment) again matched `evidence/checks.txt` (20 PASS, source sha256 751277a8). The campaign-item table (items 01, 02, 04, 05, 07, 10, 14, 17) is in `reports/report.typ` and section 8 of the paper; none changes a label. Item 10's README may still change after the digest in the ledger. Graph: `reports/lemma4_census.svg` / `.png` (source
 `reports/plot_census.py`); report: `REPORT.pdf` (source `reports/report.typ`). No
 `benchmarks/` copy: not a speed result. Lean gate: pending CI (`lean-proof-gate.yml`).
 
