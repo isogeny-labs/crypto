@@ -201,7 +201,7 @@ fn main() {
     std::fs::write(
         arg(&args, "--json"),
         serde_json::to_string_pretty(
-            &json!({"rows": rows, "pooled": pooled_json, "lift_failures": lift_failures}),
+            &json!({"rows": rows, "pooled": pooled_json, "lift_failures": lift_failures, "exponent_fit": {"slope": slope, "slope_half_width_95": 1.96 * slope_se, "ratio_at_h1": intercept.exp()}}),
         )
         .unwrap()
             + "\n",
