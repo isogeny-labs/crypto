@@ -178,6 +178,17 @@ Matrix F4, matrix F5, inherited F4 and F6-IC through `pdp3-binary` on eight publ
 | koblitz | 19 | `icv1-f2m19-t797-b6cf2467` | 139 | 1.310 | 3.090 | 5.106 | 6483.443 | — | — | 0.359 |
 | binary | 19 | `icv1-f2m19-tm649-a9133fe6` | 129 | 1.387 | — | 3.405 | 4714.506 | — | — | 0.372 |
 
+## Tower F4, signature F5 and an F6 analogue on prime curves, outside tables A–C
+
+The `pkm-tower` oracle (S₃ on a PKM Kummer tower, a splitting tree decided by tower F4 or signature F5, small nodes closed geometrically by F6, `enum` with no algebra) on four prime-order curves, beside same-target rho-negation. Tower-arm `S` is a lower bound (F_p multiply-adds unpriced). Read the [analysis](../../research/pkm_tower_ecbench_20261011/ANALYSIS.json).
+
+| bits | curve | r | rho-negation S | F4 S | enum S | W sig-F5/F4 | log2(W F4/W F6) | F4 S/rho | enum S/rho |
+|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|
+| 9 | `icv1-fp9-t25-33fa1ca2` | 233 | 5.503 | 25.845 | 29.743 | 0.227 | 0.00590 | 4.638 | 5.422 |
+| 11 | `icv1-fp11-t43-4d73e7f7` | 1367 | 2.786 | 15.552 | 38.812 | 0.277 | 0.00047 | 5.389 | 11.997 |
+| 13 | `icv1-fp13-tm41-756f569a` | 7723 | 2.014 | 9.365 | 45.892 | 0.307 | 0.00007 | 4.768 | 21.709 |
+| 15 | `icv1-fp15-t181-50ff72d2` | 18253 | 1.984 | 7.483 | 60.616 | 0.326 | 0.00001 | 3.910 | 29.005 |
+
 ## n41/n53 shared-rank counted panel, outside tables A–C
 
 The four n37 arms (strong signed-Frobenius rho, K8, K16 and an identical K16 control, method parameters unchanged) ran on 16 new public one-target workloads on each of the next two registered sizes, five paired rounds each, on macOS at L0. Counted cold IC/rho is a quotient of two lower bounds (native work unpriced); a cell whose arm never verifies under the frozen parameters is unknown, not a cost. 206 of 640 measured runs verified; decision `frozen_parameters_do_not_transfer`; the L2 host run is pending. Read the [frozen decision](../../research/ecbench_n41_n53_shared_rank_20261005/DECISION.json).
@@ -218,7 +229,8 @@ The four n37 arms (strong signed-Frobenius rho, K8, K16 and an identical K16 con
 - `research/f6_ic_geometric_closure_20261003/small_cold/replay-certificate.json` — sha256 `307f02ce84e5cb46…`
 - `research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json` — sha256 `69ca54385c62a50e…`
 - `research/f4_f5_f6_cross_family_20261011/ANALYSIS.json` — sha256 `143247c6b81d3539…`
+- `research/pkm_tower_ecbench_20261011/ANALYSIS.json` — sha256 `f229006fc05cf40b…`
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
-- `docs/curves/registry.json` — sha256 `0bdcfb2c7a497a35…`
+- `docs/curves/registry.json` — sha256 `f3490385dbdfcac7…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `566ed698a961aae8…`

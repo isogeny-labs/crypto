@@ -69,6 +69,7 @@ SOURCES = {
     "f6_small_cold_replay": "research/f6_ic_geometric_closure_20261003/small_cold/replay-certificate.json",
     "f6_ecbench_ladder": "research/f6_ic_ecbench_ladder_20261005/ANALYSIS.json",
     "f4_f5_f6_cross_family": "research/f4_f5_f6_cross_family_20261011/ANALYSIS.json",
+    "pkm_tower_prime": "research/pkm_tower_ecbench_20261011/ANALYSIS.json",
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "registry": "docs/curves/registry.json",
     "curves_schema": "docs/curves/ic/curves.schema.json",
@@ -682,6 +683,33 @@ def build() -> dict:
         "online_speedup": None,
         "fully_priced_cold_speedup": None,
     }
+    prime = load(SOURCES["pkm_tower_prime"])
+    if prime["schema"] != "pkm-tower-prime-analysis/v1":
+        raise SystemExit("review the PKM tower prime analysis before updating the leaderboard")
+    prime_rows = []
+    for key in ("P5", "P6", "P7", "P8"):
+        for c in prime["sessions"][key]["cells"]:
+            q = c["questions"]
+            prime_rows.append({
+                "session": key,
+                "bits": c["bits"],
+                "curve": names(c["slug"])["slug"],
+                "r": c["r"],
+                "rho_negation_s": med(c["arms"], "rho-negation", "s"),
+                "f4_s": med(c["arms"], "f4", "s"),
+                "enum_s": med(c["arms"], "enum", "s"),
+                "sig_f5_over_f4_w": q["q1_sig_f5_over_f4_muladds"]["ratio"]["median"],
+                "log2_f4_over_f6_w": q["q2_log2_f4_over_f6_muladds"]["log2_ratio"]["median"],
+                "f4_over_rho": q["q3_s_over_rho_negation"]["f4"]["s_ratio"]["median"],
+                "enum_over_rho": q["q3_s_over_rho_negation"]["enum"]["s_ratio"]["median"],
+            })
+    prime_diagnostic = {
+        "source": SOURCES["pkm_tower_prime"],
+        "class": "accounting; stage diagnostic with tower F_p multiply-adds unpriced (S is a lower bound)",
+        "rows": prime_rows,
+        "online_speedup": None,
+        "fully_priced_cold_speedup": None,
+    }
     rank_columns = load(SOURCES["n37_rank_columns"])
     if (rank_columns["status"] != "independently_replayed_l0_bounded_diagnostic"
             or rank_columns["selection"]["decision"] != "COUNTED_ENGINEERING_LEAD"
@@ -885,6 +913,7 @@ def build() -> dict:
         "f6_small_cold_diagnostic": small_cold_diagnostic,
         "f6_ecbench_ladder_diagnostic": ladder_diagnostic,
         "f4_f5_f6_cross_family_diagnostic": cross_diagnostic,
+        "pkm_tower_prime_diagnostic": prime_diagnostic,
         "curve_records": {
             "registry": SOURCES["registry"], "schema": SOURCES["curves_schema"], "yaml": SOURCES["curves_yaml"],
             "yaml_records": n_records,
@@ -1127,6 +1156,20 @@ def markdown(doc: dict) -> str:
                  f"{f3(z['rho_negation_s'])} | {f3(z['rho_strong_s'])} | {f3(z['inherited_s'])} | "
                  f"{f3(z['f6_s'])} | {f3(z['f5_over_f4_w'])} | {f3(z['matrix_f4_over_inherited_w'])} | "
                  f"{f3(z['log2_inherited_over_f6_w'])} |")
+    L.append("")
+    y = doc["pkm_tower_prime_diagnostic"]
+    L += ["## Tower F4, signature F5 and an F6 analogue on prime curves, outside tables A–C", "",
+          "The `pkm-tower` oracle (S₃ on a PKM Kummer tower, a splitting tree decided by "
+          "tower F4 or signature F5, small nodes closed geometrically by F6, `enum` with no "
+          "algebra) on four prime-order curves, beside same-target rho-negation. Tower-arm "
+          "`S` is a lower bound (F_p multiply-adds unpriced). "
+          f"Read the [analysis](../../{y['source']}).", "",
+          "| bits | curve | r | rho-negation S | F4 S | enum S | W sig-F5/F4 | log2(W F4/W F6) | F4 S/rho | enum S/rho |",
+          "|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|"]
+    for z in y["rows"]:
+        L.append(f"| {z['bits']} | `{z['curve']}` | {int(z['r'])} | {f3(z['rho_negation_s'])} | "
+                 f"{f3(z['f4_s'])} | {f3(z['enum_s'])} | {f3(z['sig_f5_over_f4_w'])} | "
+                 f"{z['log2_f4_over_f6_w']:.5f} | {f3(z['f4_over_rho'])} | {f3(z['enum_over_rho'])} |")
     L.append("")
     v = doc["n41_n53_counted_diagnostic"]
 
@@ -1449,6 +1492,20 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{z["base_points"]}</td><td>{h3(z["rho_negation_s"])}</td><td>{h3(z["rho_strong_s"])}</td>'
                  f'<td>{h3(z["inherited_s"])}</td><td>{h3(z["f6_s"])}</td><td>{h3(z["f5_over_f4_w"])}</td>'
                  f'<td>{h3(z["matrix_f4_over_inherited_w"])}</td><td>{h3(z["log2_inherited_over_f6_w"])}</td></tr>')
+    P.append('</tbody></table></section>')
+    y = doc["pkm_tower_prime_diagnostic"]
+    P.append(f'<section class="card" id="bounded-pkm-tower-prime"><h2>Tower F4, signature F5 and an F6 analogue on prime curves, outside the priced tables</h2>'
+             '<p>The <code>pkm-tower</code> oracle (S₃ on a PKM Kummer tower, a splitting tree decided by tower F4 '
+             'or signature F5, small nodes closed geometrically by F6, <code>enum</code> with no algebra) on four '
+             'prime-order curves, beside same-target rho-negation. Tower-arm S is a lower bound (F_p multiply-adds unpriced). '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(y["source"])}">Analysis</a>.</p>')
+    P.append('<table><thead><tr><th>Bits</th><th>Curve</th><th>r</th><th>Rho-negation S</th><th>F4 S</th><th>enum S</th>'
+             '<th>W sig-F5/F4</th><th>log₂(W F4/W F6)</th><th>F4 S/rho</th><th>enum S/rho</th></tr></thead><tbody>')
+    for z in y["rows"]:
+        P.append(f'<tr><td>{z["bits"]}</td><td><code>{esc(z["curve"])}</code></td><td>{int(z["r"])}</td>'
+                 f'<td>{h3(z["rho_negation_s"])}</td><td>{h3(z["f4_s"])}</td><td>{h3(z["enum_s"])}</td>'
+                 f'<td>{h3(z["sig_f5_over_f4_w"])}</td><td>{z["log2_f4_over_f6_w"]:.5f}</td>'
+                 f'<td>{h3(z["f4_over_rho"])}</td><td>{h3(z["enum_over_rho"])}</td></tr>')
     P.append('</tbody></table></section>')
     v = doc["n41_n53_counted_diagnostic"]
 

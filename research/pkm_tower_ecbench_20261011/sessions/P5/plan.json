@@ -1,0 +1,720 @@
+{
+  "schema": "ecbench.plan/v1",
+  "spec_id": "ECS1hc0c6bce085c1",
+  "arms": [
+    {
+      "name": "rho-negation",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation",
+        "family": "rho",
+        "params": {
+          "cap_multiple": "64"
+        },
+        "method_id": "ECM1hefea4e0ebe79",
+        "method_sha256": "efea4e0ebe79dadfedeb75106dab92e25fc26bfe282155ee0326380d4184e995",
+        "entry": "ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())"
+      }
+    },
+    {
+      "name": "f4",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "prime-tower:t=5,seed=1",
+          "linalg": "incremental-gauss",
+          "max_trials": "200000",
+          "oracle": "pkm-tower:m=2,t=5,seed=1,engine=f4,degree=20",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1h202d04163f61",
+        "method_sha256": "202d04163f61ee26972d6ba37cd5de5c34b254d0b169fc824b3e1b5b48d32b79",
+        "entry": "ic_framework::run_pipeline"
+      }
+    },
+    {
+      "name": "sig-f5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "prime-tower:t=5,seed=1",
+          "linalg": "incremental-gauss",
+          "max_trials": "200000",
+          "oracle": "pkm-tower:m=2,t=5,seed=1,engine=sig-f5,degree=20",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1h0b7a3df7b73b",
+        "method_sha256": "0b7a3df7b73b5a3cdc4177584eb2609cab85767be0ac201d0584867d2c80757a",
+        "entry": "ic_framework::run_pipeline"
+      }
+    },
+    {
+      "name": "f6",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "prime-tower:t=5,seed=1",
+          "linalg": "incremental-gauss",
+          "max_trials": "200000",
+          "oracle": "pkm-tower:m=2,t=5,seed=1,engine=f6,degree=20,cap=4",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1h107b8c3f4334",
+        "method_sha256": "107b8c3f43346af1ce5ea032a269b68766aec3a7af831d372c85e695c56fc84a",
+        "entry": "ic_framework::run_pipeline"
+      }
+    },
+    {
+      "name": "enum",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "family": "ic",
+        "params": {
+          "factor_base": "prime-tower:t=5,seed=1",
+          "linalg": "incremental-gauss",
+          "max_trials": "200000",
+          "oracle": "pkm-tower:m=2,t=5,seed=1,engine=enum,degree=20",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "walk"
+        },
+        "method_id": "ECM1h2a8d39d7d48c",
+        "method_sha256": "2a8d39d7d48cf56682958cb27484b82439379ef32838abf120002fb79cab515a",
+        "entry": "ic_framework::run_pipeline"
+      }
+    }
+  ],
+  "workloads": [
+    {
+      "workload_id": "Wd75d4625eec4",
+      "workload_sha256": "d75d4625eec4a7d166ae35f5ee0160bed573e13580ab96efe506d534f3560ddf",
+      "curve_spec": {
+        "kind": "prime_search",
+        "bits": 9,
+        "seed": 17
+      },
+      "curve": {
+        "slug": "icv1-fp9-t25-33fa1ca2",
+        "icv1": "ICV1:fp-257:25:233:155:unk:unk:r:33fa1ca26328",
+        "family": "prime",
+        "construction": "find_prime_order_curve(9, 17)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 233,
+        "r": 233,
+        "cofactor": 1,
+        "generator": [
+          "0xa2",
+          "0xcb"
+        ],
+        "automorphisms_available": 2,
+        "registered": true,
+        "ec1": "EC1P9Cfph45ab75b5d9ef",
+        "curve_uid": "urn:ec-record:1:sha256:45ab75b5d9eff96350887fd3af2ec4cd110dab1111e29465b39afe07b0fc692a"
+      },
+      "target_law": "hash_to_subgroup_v1",
+      "target_seed": 202610112301,
+      "target_index": 0,
+      "target": [
+        "0x7f",
+        "0xb4"
+      ],
+      "planted": null,
+      "target_counter": 5
+    },
+    {
+      "workload_id": "Weeb39c00ccfd",
+      "workload_sha256": "eeb39c00ccfd54bed58a6fdb8a265cf36060f35a8aad7a781d8a96dee674c2a6",
+      "curve_spec": {
+        "kind": "prime_search",
+        "bits": 9,
+        "seed": 17
+      },
+      "curve": {
+        "slug": "icv1-fp9-t25-33fa1ca2",
+        "icv1": "ICV1:fp-257:25:233:155:unk:unk:r:33fa1ca26328",
+        "family": "prime",
+        "construction": "find_prime_order_curve(9, 17)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 233,
+        "r": 233,
+        "cofactor": 1,
+        "generator": [
+          "0xa2",
+          "0xcb"
+        ],
+        "automorphisms_available": 2,
+        "registered": true,
+        "ec1": "EC1P9Cfph45ab75b5d9ef",
+        "curve_uid": "urn:ec-record:1:sha256:45ab75b5d9eff96350887fd3af2ec4cd110dab1111e29465b39afe07b0fc692a"
+      },
+      "target_law": "hash_to_subgroup_v1",
+      "target_seed": 202610112301,
+      "target_index": 1,
+      "target": [
+        "0xd3",
+        "0x9"
+      ],
+      "planted": null,
+      "target_counter": 5
+    },
+    {
+      "workload_id": "W0bc6107d0acf",
+      "workload_sha256": "0bc6107d0acf181afe91527797fcc4c3769872f78a51d93f4cb2911d4a454d20",
+      "curve_spec": {
+        "kind": "prime_search",
+        "bits": 9,
+        "seed": 17
+      },
+      "curve": {
+        "slug": "icv1-fp9-t25-33fa1ca2",
+        "icv1": "ICV1:fp-257:25:233:155:unk:unk:r:33fa1ca26328",
+        "family": "prime",
+        "construction": "find_prime_order_curve(9, 17)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 233,
+        "r": 233,
+        "cofactor": 1,
+        "generator": [
+          "0xa2",
+          "0xcb"
+        ],
+        "automorphisms_available": 2,
+        "registered": true,
+        "ec1": "EC1P9Cfph45ab75b5d9ef",
+        "curve_uid": "urn:ec-record:1:sha256:45ab75b5d9eff96350887fd3af2ec4cd110dab1111e29465b39afe07b0fc692a"
+      },
+      "target_law": "hash_to_subgroup_v1",
+      "target_seed": 202610112301,
+      "target_index": 2,
+      "target": [
+        "0xf8",
+        "0x35"
+      ],
+      "planted": null,
+      "target_counter": 2
+    },
+    {
+      "workload_id": "W49f482c73794",
+      "workload_sha256": "49f482c7379468fb93e9213eea326eda11b66e59338056aab21a489b8b55a1b7",
+      "curve_spec": {
+        "kind": "prime_search",
+        "bits": 9,
+        "seed": 17
+      },
+      "curve": {
+        "slug": "icv1-fp9-t25-33fa1ca2",
+        "icv1": "ICV1:fp-257:25:233:155:unk:unk:r:33fa1ca26328",
+        "family": "prime",
+        "construction": "find_prime_order_curve(9, 17)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 233,
+        "r": 233,
+        "cofactor": 1,
+        "generator": [
+          "0xa2",
+          "0xcb"
+        ],
+        "automorphisms_available": 2,
+        "registered": true,
+        "ec1": "EC1P9Cfph45ab75b5d9ef",
+        "curve_uid": "urn:ec-record:1:sha256:45ab75b5d9eff96350887fd3af2ec4cd110dab1111e29465b39afe07b0fc692a"
+      },
+      "target_law": "hash_to_subgroup_v1",
+      "target_seed": 202610112301,
+      "target_index": 3,
+      "target": [
+        "0x67",
+        "0x81"
+      ],
+      "planted": null,
+      "target_counter": 0
+    },
+    {
+      "workload_id": "W80bfe3587f66",
+      "workload_sha256": "80bfe3587f6684b6eba74334b2ef1ee4cbc0798cd1615cb0312a825b315c2cab",
+      "curve_spec": {
+        "kind": "prime_search",
+        "bits": 9,
+        "seed": 17
+      },
+      "curve": {
+        "slug": "icv1-fp9-t25-33fa1ca2",
+        "icv1": "ICV1:fp-257:25:233:155:unk:unk:r:33fa1ca26328",
+        "family": "prime",
+        "construction": "find_prime_order_curve(9, 17)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 233,
+        "r": 233,
+        "cofactor": 1,
+        "generator": [
+          "0xa2",
+          "0xcb"
+        ],
+        "automorphisms_available": 2,
+        "registered": true,
+        "ec1": "EC1P9Cfph45ab75b5d9ef",
+        "curve_uid": "urn:ec-record:1:sha256:45ab75b5d9eff96350887fd3af2ec4cd110dab1111e29465b39afe07b0fc692a"
+      },
+      "target_law": "hash_to_subgroup_v1",
+      "target_seed": 202610112301,
+      "target_index": 4,
+      "target": [
+        "0x70",
+        "0xf6"
+      ],
+      "planted": null,
+      "target_counter": 0
+    },
+    {
+      "workload_id": "W284cd7028c0d",
+      "workload_sha256": "284cd7028c0dcf60d8338f257ccd4761e70b6303cd790c69b43e05b322f6cb4b",
+      "curve_spec": {
+        "kind": "prime_search",
+        "bits": 9,
+        "seed": 17
+      },
+      "curve": {
+        "slug": "icv1-fp9-t25-33fa1ca2",
+        "icv1": "ICV1:fp-257:25:233:155:unk:unk:r:33fa1ca26328",
+        "family": "prime",
+        "construction": "find_prime_order_curve(9, 17)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 233,
+        "r": 233,
+        "cofactor": 1,
+        "generator": [
+          "0xa2",
+          "0xcb"
+        ],
+        "automorphisms_available": 2,
+        "registered": true,
+        "ec1": "EC1P9Cfph45ab75b5d9ef",
+        "curve_uid": "urn:ec-record:1:sha256:45ab75b5d9eff96350887fd3af2ec4cd110dab1111e29465b39afe07b0fc692a"
+      },
+      "target_law": "hash_to_subgroup_v1",
+      "target_seed": 202610112301,
+      "target_index": 5,
+      "target": [
+        "0xbf",
+        "0x96"
+      ],
+      "planted": null,
+      "target_counter": 0
+    },
+    {
+      "workload_id": "W4a0e93d18c31",
+      "workload_sha256": "4a0e93d18c317a1a54d08062be6b17c05c4c77453be2db28767cb07449e624fc",
+      "curve_spec": {
+        "kind": "prime_search",
+        "bits": 9,
+        "seed": 17
+      },
+      "curve": {
+        "slug": "icv1-fp9-t25-33fa1ca2",
+        "icv1": "ICV1:fp-257:25:233:155:unk:unk:r:33fa1ca26328",
+        "family": "prime",
+        "construction": "find_prime_order_curve(9, 17)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 233,
+        "r": 233,
+        "cofactor": 1,
+        "generator": [
+          "0xa2",
+          "0xcb"
+        ],
+        "automorphisms_available": 2,
+        "registered": true,
+        "ec1": "EC1P9Cfph45ab75b5d9ef",
+        "curve_uid": "urn:ec-record:1:sha256:45ab75b5d9eff96350887fd3af2ec4cd110dab1111e29465b39afe07b0fc692a"
+      },
+      "target_law": "hash_to_subgroup_v1",
+      "target_seed": 202610112301,
+      "target_index": 6,
+      "target": [
+        "0x12",
+        "0xf9"
+      ],
+      "planted": null,
+      "target_counter": 0
+    },
+    {
+      "workload_id": "W93c1b5ae0529",
+      "workload_sha256": "93c1b5ae0529707d02f82ca77664d2c03884f5c7557d92857662bf6694e0ffa7",
+      "curve_spec": {
+        "kind": "prime_search",
+        "bits": 9,
+        "seed": 17
+      },
+      "curve": {
+        "slug": "icv1-fp9-t25-33fa1ca2",
+        "icv1": "ICV1:fp-257:25:233:155:unk:unk:r:33fa1ca26328",
+        "family": "prime",
+        "construction": "find_prime_order_curve(9, 17)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 233,
+        "r": 233,
+        "cofactor": 1,
+        "generator": [
+          "0xa2",
+          "0xcb"
+        ],
+        "automorphisms_available": 2,
+        "registered": true,
+        "ec1": "EC1P9Cfph45ab75b5d9ef",
+        "curve_uid": "urn:ec-record:1:sha256:45ab75b5d9eff96350887fd3af2ec4cd110dab1111e29465b39afe07b0fc692a"
+      },
+      "target_law": "hash_to_subgroup_v1",
+      "target_seed": 202610112301,
+      "target_index": 7,
+      "target": [
+        "0x3",
+        "0x56"
+      ],
+      "planted": null,
+      "target_counter": 0
+    }
+  ],
+  "executions": [
+    {
+      "seq": 0,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 0,
+      "algorithm_seed": 16310244388160683005
+    },
+    {
+      "seq": 1,
+      "round": 0,
+      "warmup": false,
+      "arm": 1,
+      "workload": 0,
+      "algorithm_seed": 16310244388160683005
+    },
+    {
+      "seq": 2,
+      "round": 0,
+      "warmup": false,
+      "arm": 2,
+      "workload": 0,
+      "algorithm_seed": 16310244388160683005
+    },
+    {
+      "seq": 3,
+      "round": 0,
+      "warmup": false,
+      "arm": 3,
+      "workload": 0,
+      "algorithm_seed": 16310244388160683005
+    },
+    {
+      "seq": 4,
+      "round": 0,
+      "warmup": false,
+      "arm": 4,
+      "workload": 0,
+      "algorithm_seed": 16310244388160683005
+    },
+    {
+      "seq": 5,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 1,
+      "algorithm_seed": 16840154510855067881
+    },
+    {
+      "seq": 6,
+      "round": 0,
+      "warmup": false,
+      "arm": 1,
+      "workload": 1,
+      "algorithm_seed": 16840154510855067881
+    },
+    {
+      "seq": 7,
+      "round": 0,
+      "warmup": false,
+      "arm": 2,
+      "workload": 1,
+      "algorithm_seed": 16840154510855067881
+    },
+    {
+      "seq": 8,
+      "round": 0,
+      "warmup": false,
+      "arm": 3,
+      "workload": 1,
+      "algorithm_seed": 16840154510855067881
+    },
+    {
+      "seq": 9,
+      "round": 0,
+      "warmup": false,
+      "arm": 4,
+      "workload": 1,
+      "algorithm_seed": 16840154510855067881
+    },
+    {
+      "seq": 10,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 2,
+      "algorithm_seed": 6775346816062019907
+    },
+    {
+      "seq": 11,
+      "round": 0,
+      "warmup": false,
+      "arm": 1,
+      "workload": 2,
+      "algorithm_seed": 6775346816062019907
+    },
+    {
+      "seq": 12,
+      "round": 0,
+      "warmup": false,
+      "arm": 2,
+      "workload": 2,
+      "algorithm_seed": 6775346816062019907
+    },
+    {
+      "seq": 13,
+      "round": 0,
+      "warmup": false,
+      "arm": 3,
+      "workload": 2,
+      "algorithm_seed": 6775346816062019907
+    },
+    {
+      "seq": 14,
+      "round": 0,
+      "warmup": false,
+      "arm": 4,
+      "workload": 2,
+      "algorithm_seed": 6775346816062019907
+    },
+    {
+      "seq": 15,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 3,
+      "algorithm_seed": 12292751362321072926
+    },
+    {
+      "seq": 16,
+      "round": 0,
+      "warmup": false,
+      "arm": 1,
+      "workload": 3,
+      "algorithm_seed": 12292751362321072926
+    },
+    {
+      "seq": 17,
+      "round": 0,
+      "warmup": false,
+      "arm": 2,
+      "workload": 3,
+      "algorithm_seed": 12292751362321072926
+    },
+    {
+      "seq": 18,
+      "round": 0,
+      "warmup": false,
+      "arm": 3,
+      "workload": 3,
+      "algorithm_seed": 12292751362321072926
+    },
+    {
+      "seq": 19,
+      "round": 0,
+      "warmup": false,
+      "arm": 4,
+      "workload": 3,
+      "algorithm_seed": 12292751362321072926
+    },
+    {
+      "seq": 20,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 4,
+      "algorithm_seed": 5807831825103472100
+    },
+    {
+      "seq": 21,
+      "round": 0,
+      "warmup": false,
+      "arm": 1,
+      "workload": 4,
+      "algorithm_seed": 5807831825103472100
+    },
+    {
+      "seq": 22,
+      "round": 0,
+      "warmup": false,
+      "arm": 2,
+      "workload": 4,
+      "algorithm_seed": 5807831825103472100
+    },
+    {
+      "seq": 23,
+      "round": 0,
+      "warmup": false,
+      "arm": 3,
+      "workload": 4,
+      "algorithm_seed": 5807831825103472100
+    },
+    {
+      "seq": 24,
+      "round": 0,
+      "warmup": false,
+      "arm": 4,
+      "workload": 4,
+      "algorithm_seed": 5807831825103472100
+    },
+    {
+      "seq": 25,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 5,
+      "algorithm_seed": 3148503023521972975
+    },
+    {
+      "seq": 26,
+      "round": 0,
+      "warmup": false,
+      "arm": 1,
+      "workload": 5,
+      "algorithm_seed": 3148503023521972975
+    },
+    {
+      "seq": 27,
+      "round": 0,
+      "warmup": false,
+      "arm": 2,
+      "workload": 5,
+      "algorithm_seed": 3148503023521972975
+    },
+    {
+      "seq": 28,
+      "round": 0,
+      "warmup": false,
+      "arm": 3,
+      "workload": 5,
+      "algorithm_seed": 3148503023521972975
+    },
+    {
+      "seq": 29,
+      "round": 0,
+      "warmup": false,
+      "arm": 4,
+      "workload": 5,
+      "algorithm_seed": 3148503023521972975
+    },
+    {
+      "seq": 30,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 6,
+      "algorithm_seed": 7616904414109286957
+    },
+    {
+      "seq": 31,
+      "round": 0,
+      "warmup": false,
+      "arm": 1,
+      "workload": 6,
+      "algorithm_seed": 7616904414109286957
+    },
+    {
+      "seq": 32,
+      "round": 0,
+      "warmup": false,
+      "arm": 2,
+      "workload": 6,
+      "algorithm_seed": 7616904414109286957
+    },
+    {
+      "seq": 33,
+      "round": 0,
+      "warmup": false,
+      "arm": 3,
+      "workload": 6,
+      "algorithm_seed": 7616904414109286957
+    },
+    {
+      "seq": 34,
+      "round": 0,
+      "warmup": false,
+      "arm": 4,
+      "workload": 6,
+      "algorithm_seed": 7616904414109286957
+    },
+    {
+      "seq": 35,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 7,
+      "algorithm_seed": 4490727754452038526
+    },
+    {
+      "seq": 36,
+      "round": 0,
+      "warmup": false,
+      "arm": 1,
+      "workload": 7,
+      "algorithm_seed": 4490727754452038526
+    },
+    {
+      "seq": 37,
+      "round": 0,
+      "warmup": false,
+      "arm": 2,
+      "workload": 7,
+      "algorithm_seed": 4490727754452038526
+    },
+    {
+      "seq": 38,
+      "round": 0,
+      "warmup": false,
+      "arm": 3,
+      "workload": 7,
+      "algorithm_seed": 4490727754452038526
+    },
+    {
+      "seq": 39,
+      "round": 0,
+      "warmup": false,
+      "arm": 4,
+      "workload": 7,
+      "algorithm_seed": 4490727754452038526
+    }
+  ]
+}
