@@ -49,3 +49,4 @@ Per probe (`2|B|` per target) the table costs about 43 ns at `l = 11` (derived: 
 * One host class only (host B); no second host.  No multi-threaded build or probe, no prefetching, no vector build of the table (leads L2, L9 of [`../LEADS.md`](../LEADS.md)).
 * The repository's own `Oracle::Mitm` was not run on this corpus; PS-6 prices both in the counted unit.
 * Wall figures are exploratory in the repository's isolation vocabulary (shared container with the benchmark lock, not the receipt service).
+* After the recorded run, `mitm.rs` was reformatted with `rustfmt` and an unused struct field (`l`) was removed to satisfy clippy; no behaviour changed.  The recorded binary (`raw/binary_hashes.txt`) is the one built before that edit; the arm was re-verified (`verify-arm --arm mitm`, `l = 8…12`, 0 mismatches) after it.

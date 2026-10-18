@@ -15,7 +15,6 @@ const EMPTY: u64 = u64::MAX;
 
 pub struct MitmTable<'a> {
     pub gf: &'a Gf2,
-    pub l: u32,
     /// Rational base points `(x, y)`, `x` ascending (the same `B` as the group kernels).
     pub base: Vec<(u64, u64)>,
     keys: Vec<u64>,
@@ -43,7 +42,6 @@ impl<'a> MitmTable<'a> {
         let size = 1usize << bits;
         let mut t = Self {
             gf,
-            l,
             base,
             keys: vec![EMPTY; size],
             vals: vec![0; size],
@@ -184,7 +182,14 @@ impl<'a> MitmTable<'a> {
 
     /// Exact confirmation of a table hit: `x(P_k)` must be one of the four thirds of `(P_i, P_j)`.
     #[cold]
-    fn confirm(&self, i: usize, j: usize, k: usize, r: (u64, u64), out: &mut Vec<[u64; 3]>) -> bool {
+    fn confirm(
+        &self,
+        i: usize,
+        j: usize,
+        k: usize,
+        r: (u64, u64),
+        out: &mut Vec<[u64; 3]>,
+    ) -> bool {
         let xk = self.base[k].0;
         let ok = thirds(self.gf, self.base[i], self.base[j], r)
             .into_iter()
