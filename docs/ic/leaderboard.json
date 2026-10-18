@@ -102,6 +102,10 @@
    "path": "research/la_engines_20261014/summary.json",
    "sha256": "b34650a95c5f106c8302dc5311194d8e1ffb798dff59b2669cda59818712f533"
   },
+  "s4_oracle_cost": {
+   "path": "research/s4_oracle_cost_20261018/score-output.txt",
+   "sha256": "2acd3111dae9b8143fbf32838941447eaf20b4402096cd418893d82c0e720cd7"
+  },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
    "sha256": "765f6e8d05ebbf75e7a3dddcbb886015274311589352b9107746976fb2a670d7"
@@ -47765,6 +47769,100 @@
   "study": "research/la_engines_20261014/",
   "report": "research/la_engines_20261014/REPORT.pdf",
   "class": "engineering"
+ },
+ "decomposition_oracle_component": {
+  "rows": [
+   {
+    "cell": "(12,3)",
+    "arm": "chained",
+    "draws": "4",
+    "measured": "4",
+    "verified": "4",
+    "solving_degree": "3,4,4,4",
+    "median_word_xors": "1.9761e6",
+    "largest_matrix": "3249 x 3088"
+   },
+   {
+    "cell": "(12,3)",
+    "arm": "eliminated",
+    "draws": "4",
+    "measured": "4",
+    "verified": "4",
+    "solving_degree": "7,7,7,7",
+    "median_word_xors": "3.6171e5",
+    "largest_matrix": "240 x 478"
+   },
+   {
+    "cell": "(13,4)",
+    "arm": "chained",
+    "draws": "4",
+    "measured": "3",
+    "verified": "3",
+    "solving_degree": "4,4,4",
+    "median_word_xors": "2.5856e8",
+    "largest_matrix": "14994 x 14833"
+   },
+   {
+    "cell": "(13,4)",
+    "arm": "eliminated",
+    "draws": "4",
+    "measured": "4",
+    "verified": "4",
+    "solving_degree": "7,7,7,7",
+    "median_word_xors": "5.4011e7",
+    "largest_matrix": "3104 x 2426"
+   },
+   {
+    "cell": "(16,5)",
+    "arm": "chained",
+    "draws": "4",
+    "measured": "2",
+    "verified": "2",
+    "solving_degree": "4,4",
+    "median_word_xors": "2.4635e10",
+    "largest_matrix": "42644 x 35501"
+   },
+   {
+    "cell": "(16,5)",
+    "arm": "eliminated",
+    "draws": "4",
+    "measured": "4",
+    "verified": "4",
+    "solving_degree": "7,7,7,7",
+    "median_word_xors": "2.3193e10",
+    "largest_matrix": "39487 x 16382"
+   },
+   {
+    "cell": "(18,6)",
+    "arm": "chained",
+    "draws": "2",
+    "measured": "0",
+    "verified": "0",
+    "solving_degree": "",
+    "median_word_xors": "unmeasured",
+    "largest_matrix": "-"
+   },
+   {
+    "cell": "(18,6)",
+    "arm": "eliminated",
+    "draws": "2",
+    "measured": "0",
+    "verified": "0",
+    "solving_degree": "",
+    "median_word_xors": "unmeasured",
+    "largest_matrix": "-"
+   }
+  ],
+  "verdicts": [
+   "Verdict (12,3): STAGE IMPROVEMENT on 4 paired draws. w=0: chained 1.976e6 / elim 3.617e5 = 5.5x; w=0.1: chained 2.013e6 / elim 3.737e5 = 5.4x; w=1: chained 2.342e6 / elim 4.818e5 = 4.9x",
+   "Verdict (13,4): STAGE IMPROVEMENT on 3 paired draws. w=0: chained 2.586e8 / elim 4.048e7 = 6.4x; w=0.1: chained 2.597e8 / elim 4.074e7 = 6.4x; w=1: chained 2.697e8 / elim 4.306e7 = 6.3x",
+   "Verdict (16,5): no verdict, 2 paired verified draws (< 3)",
+   "Verdict (18,6): no verdict, 0 paired verified draws (< 3)"
+  ],
+  "trend": "Trend: not determined (2 cells with a verdict)",
+  "study": "research/s4_oracle_cost_20261018/",
+  "report": "research/s4_oracle_cost_20261018/reports/run-20261018T2059Z/report.pdf",
+  "class": "engineering (stage improvement at (12,3) and (13,4); toy sizes)"
  },
  "phases": [
   {

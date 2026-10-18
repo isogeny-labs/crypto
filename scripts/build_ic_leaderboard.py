@@ -72,6 +72,7 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "s4_oracle_cost": "research/s4_oracle_cost_20261018/score-output.txt",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -617,6 +618,29 @@ def la_component() -> dict:
             "class": "engineering"}
 
 
+def oracle_component() -> dict:
+    """The m = 3 decomposition oracle on its own: eliminated S4 against chained
+    S3 on the same instances (research/s4_oracle_cost_20261018), copied from the
+    native scorer's score-output.txt (examples/s4_oracle_cost_score.rs computes
+    every median and ratio; this only splits its lines). A component speed-up at
+    toy sizes: it moves no row of tables A-C and no end-to-end S."""
+    text = (REPO / SOURCES["s4_oracle_cost"]).read_text().splitlines()
+    rows = []
+    for line in text:
+        if not line.startswith("| (") or line.startswith("| (n,l)"):
+            continue
+        c = [x.strip() for x in line.strip().strip("|").split("|")]
+        rows.append({"cell": c[0], "arm": c[1], "draws": c[2], "measured": c[3],
+                     "verified": c[4], "solving_degree": c[5], "median_word_xors": c[6],
+                     "largest_matrix": c[7]})
+    verdicts = [l for l in text if l.startswith("Verdict (")]
+    trend = next((l for l in text if l.startswith("Trend:")), "")
+    return {"rows": rows, "verdicts": verdicts, "trend": trend,
+            "study": "research/s4_oracle_cost_20261018/",
+            "report": "research/s4_oracle_cost_20261018/reports/run-20261018T2059Z/report.pdf",
+            "class": "engineering (stage improvement at (12,3) and (13,4); toy sizes)"}
+
+
 def latest_frontier_audit() -> dict:
     """Copy the latest performance handoff into the generated board.
 
@@ -1069,6 +1093,7 @@ def build() -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "decomposition_oracle_component": oracle_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -1372,6 +1397,19 @@ def markdown(doc: dict) -> str:
         observed = session["arms"]["ic-mitm"]["cross_curve"]
         L.append(f"| {session['ell']} | {observed['ratio_floor_over_crater']:.6f} | "
                  f"{observed['ci99'][0]:.6f} to {observed['ci99'][1]:.6f} |")
+    oc = doc["decomposition_oracle_component"]
+    L += ["", "## Decomposition oracle component (m = 3), outside tables A–C", "",
+          "Eliminated Semaev S4 against the chained S3 system as the m = 3 decomposition oracle, "
+          "on the same bases and targets, every finished answer verified against exhaustive "
+          "enumeration; counted F4 word XORs. A stage improvement at toy sizes: it moves no "
+          "row of tables A–C and no end-to-end S; the distance to rho is unchanged. "
+          f"Read the [results](../../{oc['study']}RESULTS.md) and the [run report](../../{oc['report']}).", "",
+          "| (n, ℓ) | arm | draws | measured | verified | solving degree | median word XORs | largest matrix |",
+          "|:--|:--|--:|--:|--:|:--|--:|:--|"]
+    for r in oc["rows"]:
+        L.append(f"| {r['cell']} | {r['arm']} | {r['draws']} | {r['measured']} | {r['verified']} | "
+                 f"{r['solving_degree']} | {r['median_word_xors']} | {r['largest_matrix']} |")
+    L += [""] + [f"- {v}" for v in oc["verdicts"]] + [f"- {oc['trend']}", ""]
     n83 = doc["n83_tier1_cold_holdout"]
     ab = n83["paired_intervals"]["k1120|k1152"]
     close = n83["paired_intervals"]["k1120|k1104"]
@@ -2024,6 +2062,22 @@ def page(doc: dict, standalone: bool) -> str:
         P.append(f'<tr><td>{session["ell"]}</td><td>{observed["ratio_floor_over_crater"]:.6f}</td>'
                  f'<td>{observed["ci99"][0]:.6f} to {observed["ci99"][1]:.6f}</td></tr>')
     P.append('</tbody></table>' + gh(SOURCES["conductor_gap_counts"], 'Native analysis and source records') + '</section>')
+
+    oc = doc["decomposition_oracle_component"]
+    P.append('<section id="decomposition-oracle-component"><h2>Decomposition oracle component (m = 3)</h2>'
+             '<p>Eliminated Semaev S4 against the chained S3 system on the same bases and targets, '
+             'every finished answer verified; counted F4 word XORs. A stage improvement at toy '
+             'sizes, outside tables A–C: no end-to-end S moves and the distance to rho is '
+             'unchanged.</p><div class="scroll"><table><thead><tr><th>(n, ℓ)</th><th>Arm</th>'
+             '<th>Draws</th><th>Measured</th><th>Verified</th><th>Solving degree</th>'
+             '<th>Median word XORs</th><th>Largest matrix</th></tr></thead><tbody>')
+    for r in oc["rows"]:
+        P.append(f'<tr><td>{esc(r["cell"])}</td><td>{esc(r["arm"])}</td><td>{esc(r["draws"])}</td>'
+                 f'<td>{esc(r["measured"])}</td><td>{esc(r["verified"])}</td>'
+                 f'<td>{esc(r["solving_degree"])}</td><td>{esc(r["median_word_xors"])}</td>'
+                 f'<td>{esc(r["largest_matrix"])}</td></tr>')
+    P.append('</tbody></table></div><ul>' + "".join(f'<li>{esc(v)}</li>' for v in oc["verdicts"] + [oc["trend"]])
+             + '</ul>' + gh(oc["study"] + "RESULTS.md", 'Study results') + '</section>')
 
     n83 = doc["n83_tier1_cold_holdout"]
     baseline = n83["paired_intervals"]["k1120|k1152"]

@@ -218,6 +218,28 @@ Copied from native analysis: eight independent one-target workloads per fixed cu
 | 8209 | 0.975242 | 0.603463 to 1.450934 |
 | 131101 | 1.127134 | 0.922471 to 1.341694 |
 
+## Decomposition oracle component (m = 3), outside tables A–C
+
+Eliminated Semaev S4 against the chained S3 system as the m = 3 decomposition oracle, on the same bases and targets, every finished answer verified against exhaustive enumeration; counted F4 word XORs. A stage improvement at toy sizes: it moves no row of tables A–C and no end-to-end S; the distance to rho is unchanged. Read the [results](../../research/s4_oracle_cost_20261018/RESULTS.md) and the [run report](../../research/s4_oracle_cost_20261018/reports/run-20261018T2059Z/report.pdf).
+
+| (n, ℓ) | arm | draws | measured | verified | solving degree | median word XORs | largest matrix |
+|:--|:--|--:|--:|--:|:--|--:|:--|
+| (12,3) | chained | 4 | 4 | 4 | 3,4,4,4 | 1.9761e6 | 3249 x 3088 |
+| (12,3) | eliminated | 4 | 4 | 4 | 7,7,7,7 | 3.6171e5 | 240 x 478 |
+| (13,4) | chained | 4 | 3 | 3 | 4,4,4 | 2.5856e8 | 14994 x 14833 |
+| (13,4) | eliminated | 4 | 4 | 4 | 7,7,7,7 | 5.4011e7 | 3104 x 2426 |
+| (16,5) | chained | 4 | 2 | 2 | 4,4 | 2.4635e10 | 42644 x 35501 |
+| (16,5) | eliminated | 4 | 4 | 4 | 7,7,7,7 | 2.3193e10 | 39487 x 16382 |
+| (18,6) | chained | 2 | 0 | 0 |  | unmeasured | - |
+| (18,6) | eliminated | 2 | 0 | 0 |  | unmeasured | - |
+
+- Verdict (12,3): STAGE IMPROVEMENT on 4 paired draws. w=0: chained 1.976e6 / elim 3.617e5 = 5.5x; w=0.1: chained 2.013e6 / elim 3.737e5 = 5.4x; w=1: chained 2.342e6 / elim 4.818e5 = 4.9x
+- Verdict (13,4): STAGE IMPROVEMENT on 3 paired draws. w=0: chained 2.586e8 / elim 4.048e7 = 6.4x; w=0.1: chained 2.597e8 / elim 4.074e7 = 6.4x; w=1: chained 2.697e8 / elim 4.306e7 = 6.3x
+- Verdict (16,5): no verdict, 2 paired verified draws (< 3)
+- Verdict (18,6): no verdict, 0 paired verified draws (< 3)
+- Trend: not determined (2 cells with a verdict)
+
+
 ## N83 Tier 1 one-target cold factor-base holdout
 
 Five sealed public points, one fresh process per IC arm, and a same-point rho solve per point completed on one GitHub-hosted cloud instance. Each of the 25 IC arms and five rho arms passed independent replay. K1152 ran twice per point as the local A/A control. The selected candidate is `null`; the frozen decision is `BOUNDED_UNKNOWN`.
@@ -259,6 +281,7 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
+- `research/s4_oracle_cost_20261018/score-output.txt` — sha256 `2acd3111dae9b814…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `765f6e8d05ebbf75…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
