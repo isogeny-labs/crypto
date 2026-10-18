@@ -1,0 +1,72 @@
+#set page(paper: "a4", margin: 2cm)
+#set text(size: 10pt)
+#set par(justify: true)
+#show table: set text(size: 8pt)
+#show table: set par(justify: false)
+
+= Run report: eliminated target-free S₄ against the S₄ target system (lead L1, lemma presentation)
+
+*Study* `research/target_free_s4_20261018/`, pre-registered in
+`PREREGISTRATION.md`. *Run* {{RUN_ID}} ({{RUN_DATE}}; queue log
+{{QUEUE_START}} to {{QUEUE_END}}). *Commit* `{{COMMIT}}`. *Class:* stage
+diagnostic, with no `S`, no rho ratio and no speed claim.
+
+== What ran
+
+- *Command.* `run.sh`: cells (13,3), (16,4), (17,4), (18,4), (19,4), (20,5),
+  (24,6) in that order, arms gp `[0,0,0,0]`, gp `[0,1,2,3]` and random
+  `[0,0,0,0]`, one process each:
+  `prlimit --as=12000000000 timeout 10800 dreg_eliminated_s4 --cells n:ℓ --basis B --twists T --draws 4 --seed 20261018 --budget-secs 1800`,
+  with `F4_F2_MAX_MATRIX_WORDS = 2^29` (4 GiB step matrices) and 3 rayon
+  threads. The queue stops at the first cell with no finished target-free
+  record.
+- *Arms.* `target_free_s4`: `build_eliminated_s4_system(basis, 1, None, twists)`,
+  `4ℓ` unknowns, `n` equations, solved once on gp (deterministic) and on
+  4 draws on random. `target_s4`: the same with `x₄ = x_R` (random per
+  draw), `3ℓ` unknowns, 4 draws.
+- *Measure.* F4 solving degree (field equations included), degree reached,
+  and the top-form deficiency `top_forms − top_rank`, computed before F4.
+- *Host.* The 4-core, 15 GB container, which is not isolated (`AGENTS.md`
+  §10). Wall times are practicality notes only.
+- *Scorer.* `dreg_score s4_free runs/cell-*.jsonl`, output in
+  `score-output.txt`.
+
+== Completion
+
+{{N_NONEMPTY}} of {{N_FILES}} `runs/cell-*.jsonl` records non-empty;
+{{N_EXITS}} processes exited, {{N_NONZERO}} with a non-zero status
+({{NONZERO_LINES}}). Target-free arm: {{N_TF}} records, {{N_TF_FIN}}
+finished, {{N_TF_OVER}} oversize, {{N_TF_TOUT}} timed out. Target arm:
+{{N_TG}} records, {{N_TG_FIN}} finished, {{N_TG_OVER}} oversize,
+{{N_TG_TOUT}} timed out. Longest single F4 run {{MAX_SECS}} s; largest
+recorded step matrix {{PEAK_MATRIX_GIB}} GiB. Peak RSS was not recorded.
+
+Queue log (`runs/queue.log`):
+
+```
+{{QUEUE}}
+```
+
+== Measured values
+
+#figure(image("s4_degrees.svg", width: 100%),
+  caption: [Recorded values from `runs/cell-*.jsonl`, run {{RUN_ID}}. Left:
+  F4 solving degree per draw and arm. Right: top-form dependencies of the
+  target-free arm. Source: `plot.py` (layout only).])
+
+=== Per (cell, basis, twists) readings
+
+{{SCORE_TABLE}}
+
+=== Registered readings (from `dreg_score s4_free`)
+
+```
+{{VERDICT_LINE}}
+{{SECONDARY_LINE}}
+{{P_LINES}}
+```
+
+== Observations (no interpretation)
+
+See `RESULTS.md` for the reading against the registered rules; this report
+records what ran and what was measured.
