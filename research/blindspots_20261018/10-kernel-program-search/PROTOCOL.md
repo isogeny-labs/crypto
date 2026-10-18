@@ -395,3 +395,56 @@ written after the cards run), the graph (`Q` ratios with intervals per cell and
 the running-best curves) and `REPORT.pdf` follow the `research-visuals` skill;
 the speed result also goes to `benchmarks/20261018-blindspots-kernel-search/`
 at integration.
+
+## Repair pass R2 (2026-10-18; execution plan only, nothing above changes)
+
+The first run was stopped inside the card sequence. Receipts exist for card 01
+(selftest, completed) and card 04 (`n=31`, arm `b`, evaluations 0..191, completed);
+they are kept and not repeated. Card 02 and card 03 have no receipt: their
+commands were cut off by the executor's 2-minute shell timeout and left a partial
+`raw/state/n31-p.jsonl` (151 evaluations) that no receipt covers. It is not used.
+Cards 05..18 never ran. The first run proved no instrument bug, so the instrument
+(`examples/blindspots_10_kernel_search.rs`, sha256 `f69bbce4...`) is unchanged, and
+the question, arms, cells, metric and decision rule are unchanged.
+
+What the repair changes is the card layout, nothing else:
+
+* Every output of a revision card sits under `raw-r2/` (receipts
+  `raw-r2/receipt-card-NN-r2.json`); nothing under `raw/` is touched.
+* A search is deterministic given its archive (`resume_at` recomputes the same
+  programs; the smoke test showed a card boundary changes nothing apart from
+  `wall_ms`), so re-running card 02 and 03 work from index 0 reproduces the same
+  program sequence. The `b`, `n=31` archive continues from card 04's committed
+  archive: card 05-r2 binds it by sha256, copies it to `raw-r2/state/n31-b.jsonl`
+  and appends evaluations 192..255 there.
+* Chains of 256 evaluations are cut into two pieces of 128 (about 4 to 4.5 minutes
+  each, measured at 1.8 to 2.1 s per evaluation with two lanes running); the sum of
+  the commands' timeouts of every card is at most 475 s, so no card can exceed
+  eight minutes. The first piece writes `raw-r2/state-1/`, the second binds that
+  file, copies it to `raw-r2/state/` and continues there; `raw-r2/state/` holds
+  the final archives that finalists, held-out, ablation and conservation read.
+* Cards are written in stages, each only once the files it binds exist and are
+  committed (`make_r2_cards.py STAGE` writes and lints a stage):
+
+| stage | cards | work |
+|:--|:--|:--|
+| 1 | 02, 05, 06, 07, 08, 10, 12 | `p` n31 [0,128); `b` n31 [192,256) from card 04's archive; `b` n37, n41 [0,128); `c` n31, n37, n41 [0,128) |
+| 2 | 03, 19, 20, 09, 11, 13 | the second 128 of `p` n31, `b` n37, `b` n41, `c` n31, n37, n41 |
+| 3 | 14, 15, 16, 17, 18, 21 | finalists and held-out n31, n37 (14); held-out n41 and conservation 17/6 (15); ablation n31, n37, n41 (16, 17, 18); conservation 19/7 (21) |
+| 4 | 22 | summarize |
+
+| first-run card | revised as |
+|:--|:--|
+| 01, 04 | completed, kept |
+| 02 | 02-r2 (and 03-r2 for the second half of the `p` chain; first-run 03 held the same work) |
+| 05, 06, 07 | 05-r2, 06-r2, 07-r2, 19-r2, 20-r2 (the `b` chains, re-cut) |
+| 08, 09, 10, 11, 12, 13 | 08-r2, 09-r2, 10-r2, 11-r2, 12-r2, 13-r2 |
+| 14, 15 | 14-r2, 15-r2 |
+| 16, 17, 18 | 16-r2, 17-r2, 18-r2, 21-r2, 22-r2 (ablation one cell per card; summarize last) |
+
+The finalists, held-out and conservation files are the same objects as in the
+first design; `summarize` reads `raw-r2/` instead of `raw/` (`--dir`, `--state`).
+Smoke test before freezing (not a result): every arm (`b`, `c`, `p`) at each of
+n = 31, 37, 41 for 24 evaluations, the resume from card 04's 192-line archive, and
+full-size `finalists`, `heldout`, `ablate`, `conserve` (17/6, 19/7) and `summarize`
+on those archives ran to completion with exit 0.
