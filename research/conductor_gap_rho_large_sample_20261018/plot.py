@@ -20,7 +20,7 @@ def roles_of(spec):
     return [r.strip() for r in spec["description"].split("Curve roles, in order:")[1].rstrip(".").split(",")]
 
 def save(fig, name):
-    fig.savefig(os.path.join(FIG, name + ".svg")); fig.savefig(os.path.join(FIG, name + ".png"), dpi=150); plt.close(fig)
+    fig.savefig(os.path.join(FIG, name + ".svg")); fig.savefig(os.path.join(FIG, name + ".png"), dpi=150); fig.savefig(os.path.join(FIG, name + ".pdf")); plt.close(fig)
 
 # ---- Figure 1: every floor/crater and twin/original ratio with 95% bootstrap interval, arm rho-neg
 rows = []
