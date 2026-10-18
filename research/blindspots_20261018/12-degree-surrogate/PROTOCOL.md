@@ -136,7 +136,12 @@ rule is tighter, not looser.
 ## Evaluation (arm (d) and the metric)
 
 **Folds.** Every family with at least 3 cells holding an exact label is held
-out in turn; the models see every other family's exact records.
+out in turn; the models see every other family's exact records **except
+those whose `(m, n, l)` shape occurs anywhere in the held-out family** (the
+shape-disjoint rule). Without it, holding out `cl-m4` would leave the same
+`(m, n, l)` draws measured by `xl-m4` and `f4-m4` in training, and the
+held-out cells would not be unmeasured. The same folds without the rule are
+reported as a sensitivity (`leaky_*`), outside the verdict.
 
 **Split conformal, per fold, repeated.** For `r = 0..19` (seed `20261018 + r`),
 the training cells are shuffled and split 70 / 30 by **cell**. All arms are
@@ -190,9 +195,10 @@ All run by `selftest` (cheap, first card) and the null/planted runs (card 3).
   nonlinear function, split conformal at 90 %), mean coverage must lie in
   [0.87, 0.93].
 * **Negative control (label-permutation null).** 100 permutations of the
-  training labels **within engine** (marginal of `D` kept, covariate link
-  broken), pipeline run with arm (c1) and 3 splits each; gives the null band of
-  macro `MAE_D`. The real macro `MAE_D(c1)`, taken over the same 3 splits, must
+  exact labels **within engine**, across all families at once (marginal of `D`
+  per engine kept, covariate link broken; censored labels untouched), the whole
+  pipeline run with arm (c1) and 3 splits each; gives the null band of macro
+  `MAE_D`. The real macro `MAE_D(c1)`, taken over the same 3 splits, must
   fall below the band's 2.5 % quantile for the rule to count it as a signal.
 * **Validity.** If the known answers, the positive, or the conformal control
   fail, the verdict is INCONCLUSIVE regardless of the rule.
@@ -223,7 +229,8 @@ already present (any record, exact or censored) in that engine, and predicted
 size `size(N, round(y_hat)) <= 22`. Score = `|y_hat_c1 - D_reg|` (degrees by
 which the fitted model and the semi-regular reading disagree: the cell that
 best separates "levelled" from "growing"); ties by smaller predicted size;
-at most one cell per `(engine, m, l)`; the top five are the list. This list is
+at most one cell per `(m, l)` (ties between the two engines go to `cl`);
+the top five are the list. This list is
 a model output, not a measurement, and is ranked without peeking at any
 future label.
 
@@ -233,6 +240,25 @@ One thread per job. Every job runs under `prlimit --as=4294967296`. The whole
 item is a few CPU-minutes (`harvest` is milliseconds; the heaviest card, the
 permutation null, is bounded by 100 x folds x 3 gradient-boosted fits). Cap: at
 most 2 CPU-hours (far above need); every card is under 9 minutes wall.
+
+## Implementation clarifications (fixed before the first measured run)
+
+* `rho` is the Spearman correlation of the split-averaged prediction (mean of
+  `y_hat` over the 20 splits) with the cell mean `D`; `MAE`, `cover` and the
+  size error are means over the 20 splits.
+* Gradient-boosted trees are fitted on records aggregated by identical feature
+  vector (count, mean label), which is the same fit as on the records.
+* A cell's coverage is the mean over its draws; a fold's, the mean over its
+  cells; the macro value, the mean over evaluable folds (at least 3 exact
+  cells).
+* `T3` uses the same splits and rules (shape-disjoint folds `f4-m3`, `f4-m4`;
+  `cols` is the log2 of the largest matrix's column count of a finished run).
+* `selftest` and `planted` are the smoke test. A hidden switch `--plant`
+  replaces every label by the planted law so every subcommand can be exercised
+  without reading a real result; no card uses it.
+* Hyperparameters are constants in the source (rounds 200, depth 3, rate 0.1,
+  minimum leaf weight 5, ridge 1e-3, 20 splits, 2000 bootstrap resamples,
+  seeds from 20261018).
 
 ## Deviations from the design (each a tightening or a clarification)
 
@@ -253,13 +279,20 @@ most 2 CPU-hours (far above need); every card is under 9 minutes wall.
    removes it (the pattern items 07 and 11 use). No per-item `CARGO_TARGET_DIR`.
 7. **Language.** Rust, std only. The data are read by the instrument itself;
    there is no Python in the path.
+8. **Shape-disjoint training** inside each leave-one-family-out fold, so the
+   held-out cells are unseen in every engine, not only in their own (see
+   Evaluation). A tightening: it removes training rows.
 
-## Card plan (to be appended with the exact argv once cards are compiled)
+## Card plan
 
-1. Build, `selftest` (all control checks on synthetic data and known answers),
-   `harvest` (verify the 194 sha256s, write `data.tsv` and the drop audit).
-2. `evaluate` the leave-one-family-out arms: records for (a), (b), (c1), (c2), (e),
-   bootstrap, coverage, rho, censored consistency, `MAE_size`.
-3. `null` (100 permutations) and `planted` (positive control on real covariates).
-4. `t3` (measured F4 matrix size), `rank` (next five cells) and `verdict`
-   (applies the frozen rule to the printed numbers; prints one line).
+Three cards, all `kind: frozen_command`, each building its own binary under
+`target/blindspots-12/card-NN/` and removing it. The exact argv are in
+`card-01.yaml` to `card-03.yaml`.
+
+1. `card-01`: build, `selftest` (writes `raw/selftest.kv`), `harvest` (verifies
+   the 194 sha256s, writes `raw/data.tsv`, prints the per-source audit and the
+   per-family counts).
+2. `card-02`: build, `planted` (`raw/planted.kv`), `evaluate`
+   (`raw/eval.kv`), `null` (`raw/null.kv`).
+3. `card-03`: build, `t3` (`raw/t3.kv`), `rank` (`raw/rank.txt`), `verdict`
+   (applies the frozen rule to the `*.kv` files in `raw/` and prints one line).
