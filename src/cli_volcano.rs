@@ -16,7 +16,7 @@ use clap::Subcommand;
 use crypto_lib::binary_ecc::f2m::F2mElement;
 use crypto_lib::cryptanalysis::volcano::{arith::Rng, binary, f2poly, fp, level1, profile};
 use num_bigint::{BigInt, BigUint};
-use num_traits::{One, ToPrimitive, Zero};
+use num_traits::{One, Zero};
 use rayon::prelude::*;
 use std::time::Instant;
 
@@ -553,7 +553,7 @@ fn cmd_koblitz_step(
     batch: usize,
 ) {
     set_threads(threads);
-    if n % 2 == 0 {
+    if n.is_multiple_of(2) {
         die("odd n only (half-trace is used to build points)");
     }
     let t_all = Instant::now();
@@ -718,7 +718,7 @@ fn cmd_ecbench_spec(
 ) {
     use crypto_lib::binary_ecc::curve::{scalar_mul, BinaryPoint};
     set_threads(threads);
-    if !(3..=62).contains(&n) || n % 2 == 0 {
+    if !(3..=62).contains(&n) || n.is_multiple_of(2) {
         die("ecbench binary_explicit takes odd 3 <= n <= 62");
     }
     let (t, u) = binary::koblitz_trace(n, a2);
@@ -743,7 +743,7 @@ fn cmd_ecbench_spec(
     let facs: Vec<&f2poly::F2Poly> = rf
         .factors
         .iter()
-        .filter(|(g, _, _)| !(g.deg() == Some(1)))
+        .filter(|(g, _, _)| g.deg() != Some(1))
         .map(|(g, _, _)| g)
         .collect();
     let js: Vec<F2mElement> = facs
@@ -1244,7 +1244,7 @@ fn cmd_sample(
             inst.p
         );
         let measurement = serde_json::json!({"rounds": rounds, "warmup": warmup, "order": "alternate", "seed": seed % 1000, "isolation_required": "L0", "timeout_seconds": 3600});
-        let mut write = |name: &str, v: &serde_json::Value| {
+        let write = |name: &str, v: &serde_json::Value| {
             let path = format!("{dir}/{name}");
             std::fs::write(&path, serde_json::to_string_pretty(v).unwrap() + "\n")
                 .unwrap_or_else(|e| die(&format!("{path}: {e}")));
