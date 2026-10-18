@@ -2779,7 +2779,7 @@ fn check_system(name: &str, eqs: &[Poly], nv: usize, cross: &Traces, st: &mut Sy
                 if j.status != Status::Refuted {
                     fail(&format!("{name}: {kind:?} {lab}-trace replay did not refute an unsat system: {}", j.status.name()));
                 }
-                if lab == "own" {
+                if lab == "own" && !neg {
                     if j.replay != "ok" {
                         std::env::set_var("B06_VERBOSE", "1");
                         eprintln!("--- record");
