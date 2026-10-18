@@ -15,7 +15,7 @@ experiment was attempted. The user assesses implications for IC.
 | Experiment | Result | Scope limit |
 |---|---|---|
 | Q1 | 14 explicit quotient bases, integral principal alternating forms and Frobenius matrices | Prime-to-2 polarization presentations; equations for individual nonnatural quotients remain missing |
-| Q1 short vectors | Both distinct determinant-19 Hermitian forms have global minimum 3, with ten vectors of norm 3 each | Minimum on A5, not an indecomposability theorem for the glued fivefold |
+| Q1 short vectors | The two determinant-19 forms admitting a tested elliptic gluing have global minimum 3, with ten vectors of norm 3 each | Minimum on A5, not an indecomposability theorem for the glued fivefold |
 | Q2 | Natural quotient A5(E) x E -> Res(E), affine F2 equations and rational inverse for both signs | Target is a principally polarized fivefold; mixed projective charts use the abstract Weil-restriction gluing |
 | Q2 kernel | All 25 geometric kernel points per sign over F_(2^24); 2,420 F2 rational additions checked | No curve/Jacobian realization follows |
 | M1/M2 | Actual X0(49) coordinates, two degeneracy maps and degree-11 j-correspondence through extension degree 10 | A compatible j-pair alone is not transported level structure |
@@ -44,7 +44,7 @@ The separate checker repeats these checks with BigInt matrices. The elliptic
 Frobenius must be its signed integer companion, not positive modular residues;
 the first failed run exposed that distinction.
 
-The determinant-19 short-vector result is now global. For the doubled real
+For the two forms admitting a tested elliptic gluing, the short-vector result is now global. For the doubled real
 Gram matrix S, every norm-at-most-three vector satisfies
 z_i^2 <= 6*(S inverse)_ii. Exact inverse cofactors force every coordinate
 into [-1,1]. Rational LDL enumeration gives ten norm-three vectors and no

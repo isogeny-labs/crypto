@@ -201,3 +201,9 @@ and structural Lean statements are not presented as those full theorems.
 | [Integral modular change](identity-modular49-change.json) | `IDC1h5c93d35226502b13` | Direct universal statement, `modular49_integral_change` |
 | [Polarization pullback](identity-polarization-pullback.json) | `IDC1h7a01e3d29f1f37ab` | Direct universal statement, `natural_polarization_pullback` |
 | [Velu integer lift](identity-velu-integer-lift.json) | `IDC1h5d4af0a173c60eeb` | No direct Lean attachment; residual 2*(y*T+T squared) is explicit |
+
+Q2 specifies its diagonal graph geometrically. An identification with a
+particular stored Q1 first-anti-isometry basis is not included. The global
+minimum computations cover the two distinct determinant-19 forms admitting
+the tested elliptic cofactor gluing (four sign-specific cases), not all
+seven determinant-19 forms retained before that compatibility test.

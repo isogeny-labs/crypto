@@ -21,7 +21,7 @@ table.header(
 [#text("14 explicit quotient bases, integral principal alternating forms and Frobenius matrices")],
 [#text("Prime-to-2 polarization presentations; equations for individual nonnatural quotients remain missing")],
 [#text("Q1 short vectors")],
-[#text("Both distinct determinant-19 Hermitian forms have global minimum 3, with ten vectors of norm 3 each")],
+[#text("The two determinant-19 forms admitting a tested elliptic gluing have global minimum 3, with ten vectors of norm 3 each")],
 [#text("Minimum on A5, not an indecomposability theorem for the glued fivefold")],
 [#text("Q2")],
 [#text("Natural quotient A5(E) x E -> Res(E), affine F2 equations and rational inverse for both signs")],
@@ -58,7 +58,7 @@ table.header(
 
 #text("For every retained graph, write its integer top block as G=K*M and set B=[[ell*I8,G],[0,I2]]. The quotient lattice has basis B/ell. The inclusion matrix is Q=[[I8,-G],[0,ell*I2]]. Native exact checks give integral J'=B^t*diag(J_A,ell*J_E)*B/ell^2, determinant one, integral quotient Frobenius, and both polarization-pullback and Frobenius identities. The separate checker repeats these checks with BigInt matrices. The elliptic Frobenius must be its signed integer companion, not positive modular residues; the first failed run exposed that distinction.")
 
-#text("The determinant-19 short-vector result is now global. For the doubled real Gram matrix S, every norm-at-most-three vector satisfies z_i^2 <= 6*(S inverse)_ii. Exact inverse cofactors force every coordinate into [-1,1]. Rational LDL enumeration gives ten norm-three vectors and no norm-one or norm-two vectors for each distinct form. A separate exhaustive box check, positive-minor checks and BigInt cofactors agree. The earlier round's bounded statement remains unchanged as historical evidence.")
+#text("For the two forms admitting a tested elliptic gluing, the short-vector result is now global. For the doubled real Gram matrix S, every norm-at-most-three vector satisfies z_i^2 <= 6*(S inverse)_ii. Exact inverse cofactors force every coordinate into [-1,1]. Rational LDL enumeration gives ten norm-three vectors and no norm-one or norm-two vectors for each distinct form. A separate exhaustive box check, positive-minor checks and BigInt cofactors agree. The earlier round's bounded statement remains unchanged as historical evidence.")
 
 #text("The natural determinant-five graph has actual quotient equations: q(a,Q)=a-diag(Q) maps A5(E) x E onto R=Res_(F32/F2)(E). Its kernel is (diag(T),T), T in E[5]. Over the algebraic closure the target is E^5 with its product principal polarization. Restriction to the augmentation lattice gives H=I4+ones4, while the diagonal block is 5 and mixed terms vanish. The report's universal pairing identity is proved in Lean.")
 
@@ -199,3 +199,5 @@ table.header(
 [#text("IDC1h5d4af0a173c60eeb")],
 [#text("No direct Lean attachment; residual 2*(y*T+T squared) is explicit")],
 )
+
+#text("Q2 specifies its diagonal graph geometrically. An identification with a particular stored Q1 first-anti-isometry basis is not included. The global minimum computations cover the two distinct determinant-19 forms admitting the tested elliptic cofactor gluing (four sign-specific cases), not all seven determinant-19 forms retained before that compatibility test.")

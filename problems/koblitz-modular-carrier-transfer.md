@@ -161,7 +161,7 @@ finite gluing presentations now have explicit integral quotient bases and
 principal alternating forms with compatible Frobenius. This latter evidence
 is prime-to-two polarization data; it is not coordinate equations for every
 individual graph, particularly those with supersingular elliptic cofactor.
-Both distinct determinant-19 A5 forms now have certified global minimum 3.
+The two determinant-19 A5 forms admitting the tested cofactor gluing now have certified global minimum 3.
 Decomposition and explicit equations for their glued fivefolds remain open.
 
 The n=5 modular track now transports both cyclic-seven stages through actual
