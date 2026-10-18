@@ -72,7 +72,7 @@ fig.text(0.02, 0.985, "Chain-free (m = 2) against one-link (m = 3) Koblitz index
          ha="left", va="top", fontsize=11, color=INK, fontweight="bold")
 fig.text(0.02, 0.945, "icv1-f2m23-t5197-69e76b73 and icv1-f2m31-tm90707-c95f16f5; mean of the verified measured runs, bars = min…max; "
          "bands = the rho reference's range", ha="left", va="top", fontsize=8, color=INK2)
-fig.text(0.01, 0.005, "Counted group operations (ecbench, L0). The m = 2 cost is the folded pair table, "
+fig.text(0.01, 0.005, "Counted group operations (ecbench, L0). The m = 2 cost is the negation-folded pair table, "
          "×14–16 per +2 in dimension. Neither curve is on the IC leaderboard.", fontsize=7.2, color=MUTED, va="bottom")
 fig.tight_layout(rect=(0, 0.03, 1, 0.92))
 fig.savefig(os.path.join(HERE, "s_vs_dimension.svg"), format="svg")

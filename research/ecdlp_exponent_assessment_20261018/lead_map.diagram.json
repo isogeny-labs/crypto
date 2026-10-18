@@ -17,7 +17,7 @@
    "level": "exponent",
    "effort_weeks": 2.0,
    "blocked": false,
-   "note": "representation test"
+   "note": "measured: 17\u00d7 rho at n = 23"
   },
   {
    "id": "L3",
@@ -26,7 +26,7 @@
    "level": "exponent",
    "effort_weeks": 1.0,
    "blocked": false,
-   "note": "low probability, bounded"
+   "note": "closed (this PR)"
   },
   {
    "id": "L4",
@@ -34,8 +34,8 @@
    "tier": 1,
    "level": "exponent",
    "effort_weeks": 0.5,
-   "blocked": false,
-   "note": "6 h wall on the present host"
+   "blocked": true,
+   "note": "D \u2265 7 at 4.3 h (#2175); needs -t 8 or 192 GB"
   },
   {
    "id": "L5",
@@ -44,7 +44,7 @@
    "level": "exponent",
    "effort_weeks": 3.0,
    "blocked": false,
-   "note": "cofactor \u2265 4 curves only"
+   "note": "measured \u2113^2.5: not an IC (\u2192 N4)"
   },
   {
    "id": "L6",
@@ -171,6 +171,51 @@
    "effort_weeks": 1.0,
    "blocked": false,
    "note": "T17"
+  },
+  {
+   "id": "N1",
+   "label": "m = 2 relation graph: does a cycle suffice? (\u03b1 2/3 vs 4/7)",
+   "tier": 5,
+   "level": "exponent",
+   "effort_weeks": 0.5,
+   "blocked": false,
+   "note": "2\u20133 days; reading, not a win"
+  },
+  {
+   "id": "N2",
+   "label": "Frobenius-fold the m = 2 pair table; optimum dimension",
+   "tier": 5,
+   "level": "constant",
+   "effort_weeks": 0.3,
+   "blocked": false,
+   "note": "\u22482\u20133\u00d7 on L2's rows"
+  },
+  {
+   "id": "N3",
+   "label": "m = 2 on near-prime Koblitz curves (n = 17, 19, 23, 41)",
+   "tier": 5,
+   "level": "accounting",
+   "effort_weeks": 0.2,
+   "blocked": false,
+   "note": "removes the cofactor confound"
+  },
+  {
+   "id": "N4",
+   "label": "relation solve for the plane-quartic cover IC",
+   "tier": 5,
+   "level": "exponent",
+   "effort_weeks": 1.5,
+   "blocked": false,
+   "note": "tests q^{4/3} for real"
+  },
+  {
+   "id": "N5",
+   "label": "curve-names --diff and ecbench report agree on slugs",
+   "tier": 5,
+   "level": "machine",
+   "effort_weeks": 0.1,
+   "blocked": false,
+   "note": "hours"
   }
  ]
 }

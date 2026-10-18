@@ -87,23 +87,34 @@ the inherited-F4 decomposition did not finish one target in 2 400 s.
   there is no frozen baseline row for it to ratchet.
 - **The half-dimension base is the wrong regime for `m = 2`.** Cost falls
   as the dimension falls, down to the smallest dimension measured at each
-  size (d8 at `n = 23`, d10 at `n = 31`). The pair table costs
-  `≈ |F|²/(4n)` additions and grows ×14–16 per +2 in dimension; the
-  relation phase shrinks as the base grows, but only from 41% of the cost
-  at d8 to under 0.1% at d12. At `dim ≈ n/2` the table alone is `≈ r/(4n)`,
-  which exceeds the whole rho solve `≈ √r` for every `r > 16n²`. The
-  LEADS.md premise (a half-dimension base removes the chaining term) holds;
-  its cost is a table that is itself `r/n`-sized, so the route measures the
-  orbit saving without being a candidate to beat rho.
-- **Distance to rho grows with `n`.** Best measured IC `S` is 17× the
-  matched rho at `n = 23` and 256× at `n = 31`. The `n = 31` session did
-  not include d8, so its best-dimension figure is an upper bound on the
-  gap at that size, not the optimum.
-- **What would change the reading.** An `m = 2` oracle whose set-up is not
-  the full pair table (implicit membership, as LEADS.md L2 named: "implicit
-  past `n ≈ 40`"), so that the cost is the relation phase alone, which at
-  `n = 23`, d8 is `S ≈ 9.4` (13 655 gae over `√r`). That is still 7× rho at
-  this size; it is the next measurement, with d6–d8 added at `n = 31`.
+  size (d8 at `n = 23`, d10 at `n = 31`). The pair table is folded by
+  negation only: its build costs `|F|²/4` additions to within 0.3% in every
+  cell (68.1 M at `|F| = 16 507`), not `|F|²/(4n)`; there is no Frobenius
+  fold. The relation phase shrinks as the base grows, from 41% of the cost
+  at d8 to under 0.1% at d12. At `dim ≈ n/2` the table alone is
+  `≈ 2^n/4 ≈ #E/4`, which exceeds the whole rho solve `≈ √(r/n)` at every
+  size that matters. The LEADS.md premise (a half-dimension base removes the
+  chaining term) holds; its cost is a table of the size of the group, so the
+  route measures the orbit saving without being a candidate to beat rho.
+- **The `n = 31` curve's cofactor confounds the size trend.** Trials per
+  relation track `2·#E/|F|²` with `#E` the whole curve, not `r`: the base
+  is a subspace of abscissae on the full group (`n = 23`, d8: 244 trials
+  per relation against 222 predicted; `n = 31`, d10: 5 195 against 3 873).
+  `icv1-f2m31-tm90707-c95f16f5` has cofactor 1 492, `icv1-f2m23-t5197-69e76b73`
+  has 4, so most of the growth in the distance to rho (17× at `n = 23`,
+  256× at `n = 31`) is the cofactor, not `n`. The best measured IC `S` at
+  `n = 31` is also an upper bound because d8 was not run there.
+- **The `m = 3` comparison is a floor.** The inherited-F4 oracle's counted
+  cost is a lower bound (its symbolic work is not emitted;
+  `research/ecbench_rootfind_engine_20261012`), so the 18× (d10) and 433×
+  (d8) advantage of `m = 2` is at least that.
+- **What would change the reading.** LEADS.md §7 (second pass) takes this
+  up: a Frobenius-folded pair table (÷ n), the optimum dimension
+  (`|F|³ ≈ #E` under the full-rank model), the near-prime Koblitz curves
+  (`n = 17, 19, 23, 41`, cofactor 2 or 4), and the number of relations the
+  pipeline actually needs, which is far below the column count at
+  `n = 31` (11 relations for 527 columns at d10), as it would be if a cycle
+  in the two-element relation graph suffices.
 
 Classification: measurement (engineering-class comparison of two existing
 oracles). No `S` on any leaderboard changes. No security claim.

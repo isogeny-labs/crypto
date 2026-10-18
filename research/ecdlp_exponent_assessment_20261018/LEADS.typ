@@ -4,7 +4,7 @@ Companion of #link("REPORT.md")[`REPORT.md`] §4, which ranks four leads (Koblit
 `lead_map.svg` (from `lead_map.py`, values in `lead_map.diagram.json`) plots the leads by effort and level; `LEADS.pdf` embeds it.
 
 == 1. Where an exponent can still move (five leads, each with a decisive test)
-#strong[Outcomes so far (2026-10-18, this PR).] L3 closed (#link("../s5_small_roots_variants_20261018/README.md")[`../s5_small_roots_variants_20261018/`]): no sublattice gain at levels 1–3, multi-polynomial variants not applicable. L5 measured (#link("../ghs_cubic_quartic_ic_20261012/SCALING_20261018.md")[`../ghs_cubic_quartic_ic_20261012/SCALING_20261018.md`]): the counted cost scales as `ℓ^{2.50}` against rho\'s `ℓ^{0.50}`, because the recorded \"pure IC\" recovery is a transfer enumeration of the subgroup, not a relation solve; the class-arithmetic problem card is reopened. L2 measured (#link("../koblitz_halfdim_base_20261018/README.md")[`../koblitz_halfdim_base_20261018/`]): chain-free `m = 2` is 18× cheaper than the one-link `m = 3` chain at matched dimension on `icv1-f2m23-t5197-69e76b73`, but its best `S` is 17× rho there and 256× at `n = 31`, with the pair table, not the chaining term, as the cost. L1 (closure degree at `m = 4`) and L4 (msolve at `m = 3, N = 21`) are running; first L1 draw at `(13, 5)`: closure degree 4.
+#strong[Outcomes so far (2026-10-18, this PR).] L3 closed (#link("../s5_small_roots_variants_20261018/README.md")[`../s5_small_roots_variants_20261018/`]): no sublattice gain at levels 1–3, multi-polynomial variants not applicable. L5 measured (#link("../ghs_cubic_quartic_ic_20261012/SCALING_20261018.md")[`../ghs_cubic_quartic_ic_20261012/SCALING_20261018.md`]): the counted cost scales as `ℓ^{2.50}` against rho\'s `ℓ^{0.50}`, because the recorded \"pure IC\" recovery is a transfer enumeration of the subgroup, not a relation solve; the class-arithmetic problem card is reopened. L2 measured (#link("../koblitz_halfdim_base_20261018/README.md")[`../koblitz_halfdim_base_20261018/`]): chain-free `m = 2` is at least 18× cheaper than the one-link `m = 3` chain at matched dimension on `icv1-f2m23-t5197-69e76b73`; its best `S` is 17× rho there, the pair table (negation-folded only) is the cost, and the `n = 31` reading is confounded by that curve\'s cofactor 1 492. L4 was run on `main` in parallel (`research/pkm_m3_n21_msolve_20261018`, \#2175, 27 GB host): inconclusive at `D ≥ 7` after 4.3 h; this PR\'s run on the same system reproduced its per-round new-element counts (2 354, 4 269, 5 421) with msolve 0.11 against 0.6.5 and was stopped as superseded. L1: `main`\'s `(m, ℓ) = (4, 6)` cell at `n = 15` refuted at degree 4 on 2 draws (`research/dreg_closure_m4l6_20261018`); this PR\'s `(13, 5)` draws 18 and 19 give closure degree 4, the rest are running. Section 7 lists the leads these results opened.
 
 These are the only leads with a mechanism that could change `α`; each is low-probability and bounded in cost, which is why they rank first.
 
@@ -121,3 +121,50 @@ Each of these is recorded as negative, closed on paper, or superseded, with the 
 Three readers covered: this repository\'s research notes, `docs/ic`, `docs/bounds` and the October research directories (about 75 of 290 read for their limits and next-step sections; the rest by heading); the open PRs \#2156, \#2152, \#2163 and \#1888 by body; `crypto-autoresearcher`\'s `knowledge/open-problems` (64), the ECDLP frontier rows (52), hypotheses by status (2,125), decisions filtered to pause and inconclusive (3,435) and the idea registries; `cryptanalysis`\'s October experiment reports (about 247, those carrying a decision read in full) and `ml-cryptanalysis`\'s plan and reports. Not read: the 2,679 ledger proposals and 774 pending ideas, `RESEARCH_GLV_INVARIANT_FACTOR_BASES.md` (not in the checkout), and the research directories listed as unread in the readers\' notes. A lead absent here may be in those.
 
 No number above was re-derived from raw artefacts in this pass; each is quoted as its source states it, and the source is the place to check.
+
+== 7. Second pass (2026-10-18, evening): leads opened by today\'s measurements
+Built from this PR\'s L2, L3 and L5 records and from what landed on `main` today: the IC leads review (`research/ic_leads_review_20261018`, \#2150), the K conversion (\#2164), the PKM msolve rerun (\#2175), the `(4, 6)` closure cell, sparse linear algebra in `ic.pipeline` (\#2162) and the inherited-F4 determinism pin (\#2171). Items the review already ranks (one large-memory node; co-measured equal-advice rho; block Wiedemann; stacked D₄ + 2LP on `E(F_{p⁴})`; Crossbred and last fall degree; the symmetry arms) are not repeated; nor is measuring K at larger matrices, which \#2164 names as its next step.
+
+=== N1. The `m = 2` relation graph: does a cycle suffice? (exponent reading; 2–3 days)
+- #strong[Mechanism.] With `m = 2` each relation `aG + bQ = ±P₁ ± P₂` is an edge between two factor-base orbits. A cycle in that graph cancels the base and yields the logarithm, so the pipeline may need about `√(columns)` relations, not `columns`.
+- #strong[Evidence.] At `n = 31` the pipeline finished with 11, 26 and 78 relations against 527, 2 123 and 8 254 columns (d10, d12, d14); at `n = 23` with 68, 192 and 949 against 138, 527 and 2 076. The two sizes disagree, so the stopping rule needs reading before any model is fitted.
+- #strong[What it decides.] Cost model with table `|F|²/(4n)` (Frobenius-folded, N2) and `2·#E/|F|²` trials per relation: if relations ≈ columns the optimum is `|F|³ ≈ #E` and the cost `≈ #E^{2/3}/n` (`α = 2/3`); if a cycle suffices the optimum is `|F|^{7/2} ∝ #E·√n` and the cost `∝ #E^{4/7} n^{-5/7}` (`α = 4/7`). Against rho `≈ √(r/n)` the second leaves a ratio growing only as `#E^{1/14}` (×2 per 14 bits of group). Neither beats rho asymptotically; the second makes the distance a constant question over the sizes this repository measures.
+- #strong[Test.] Record relations-at-stop against `|F|` over d5–d14 at `n = 17, 19, 23` and fit the exponent; read `ic.pipeline`\'s stopping rule against it.
+
+=== N2. Frobenius-fold the `m = 2` pair table and move to the optimum dimension (constant; 1–2 days)
+- #strong[Mechanism.] The measured table is `|F|²/4` (negation fold only). Storing sums with `P₁` over Frobenius-orbit representatives and looking up the `n` Frobenius images of each target (squarings, not group operations) divides it by `n`.
+- #strong[Expected.] From the recorded phases: `n = 23`, d8 from `S = 22.7` to about 10; `n = 31`, d10 from 318 to about 93. The optimum dimension under the full-rank model is near `log₂(2·#E)/3`: about 8 at `n = 23` (the smallest measured there) and about 11 at `n = 31`; the folded table moves it up by `log₂(n)/3 ≈ 1.6`. d6–d12 at both sizes cover it.
+- #strong[Classification.] Engineering, a measured improvement over the L2 in-session baseline if it lands; the distance to rho stays 7× or more.
+
+=== N3. Rerun the `m = 2` comparison on near-prime-order Koblitz curves (accounting of the confound; 1 day)
+- #strong[Why.] Trials per relation follow `2·#E/|F|²` with `#E` the full group; L2\'s `n = 31` curve has cofactor 1 492, which inflates every relation ×373 against a cofactor-4 curve.
+- #strong[Curves.] Only four Koblitz curves between `n = 17` and `n = 63` have cofactor 2 or 4: `K_1` at `n = 17, 19, 23` (`icv1-f2m17-tm101-00378d4e`, `icv1-f2m19-tm797-9c54981b`, `icv1-f2m23-tm5197-1f85e9e1`, cofactor 2) and `K_0` at `n = 41` (cofactor 4, `r ≈ 2^{39}`). The `n = 41` curve is the one large point; rho there is about `2^{17}` steps; the IC at the N2 optimum (`|F| ≈ 2^{14}`) is about `2^{22}` group operations under the full-rank model with L2\'s measured 0.82 gae per trial (the same model gives 44 k against the measured 33 k at `n = 23`, d8). Both are runnable, and the ≈ 32× gap is the number N1 and N2 would move.
+
+=== N4. A relation solve for the genus-3 plane-quartic cover (exponent, on paper `q^{4/3}`; 1–2 weeks)
+- #strong[Why.] L5 showed the recorded quartic IC recovers the scalar by a table of `φ(nG)` over the whole subgroup and discards its relation rows. The relation phase it does run scales as `ℓ^{0.97}` because line points are enumerated in `O(q)` per pair.
+- #strong[Work.] Replace the table with an elimination over the line relations (λ-projection of point differences, target descent), enumerate line points in `O(1)` per pair, and measure the relation phase against `q^{4/3}` from `q = 23`; the relation count reaches the column count near `q ≈ 25–30` on the recorded instances (extrapolated).
+- #strong[Kill.] Relation-phase slope above 3/2 in `log₂ q` once the system is determined.
+
+=== N5. Make the curve-names lint and `ecbench report` agree (tooling; hours)
+- `ecbench report` copies the spec label into `report.md`, so a label in a retired spelling fails `check_curve_names.py --diff` although the full check passes: diff mode ignores hash pins. Print the registry slug in the report header, and give diff mode the same pin exemption.
+
+=== Closed or answered in this pass
+#align(center)[#table(
+  columns: 3,
+  align: (col, row) => (left,left,left,).at(col),
+  inset: 6pt,
+  [idea], [reading], [record],
+  [An implicit `m = 2` membership oracle (no table) past `n ≈ 40`],
+  [Scanning \`],
+  [F],
+  [Another IC recovery that skips its relation solve, like L5\'s],
+  [None found: the only other discarded-rows site (`examples/pdp_bench.rs`) drops output rows. A grep, not a proof],
+  [this pass],
+  [msolve version as a variable in the PKM `N = 21` reading],
+  [0.11 reproduces 0.6.5\'s per-round counts on the same system],
+  [`research/pkm_m3_n21_20261018/progress.txt`; \#2175],
+  [The `m = 3` arm as the fair chained baseline in L2],
+  [Its inherited-F4 count is a lower bound, so the `m = 2` advantage is a floor, not inflated],
+  [L2 README],
+)
+]
