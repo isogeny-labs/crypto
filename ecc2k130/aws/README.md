@@ -733,12 +733,12 @@ requires the `ecc2k130-ingest` instance profile and fails before upload or
 launch if it is unavailable; it never places AWS static keys in user-data.
 
 For Cairn operating-period payment, point `INGEST_OPERATOR_PATH` at the
-reviewed `examples/ecc2k-ingest-service/operator.py` in the Cairn checkout and
+reviewed `examples/ecc2k-ingest-service/cairn_ingest_operator.py` in the Cairn checkout and
 enable the paid-service mode on **each** replica:
 
 ```sh
 export INGEST_CAIRN_SERVICE=1
-export INGEST_OPERATOR_PATH=/absolute/path/to/cairn/examples/ecc2k-ingest-service/operator.py
+export INGEST_OPERATOR_PATH=/absolute/path/to/cairn/examples/ecc2k-ingest-service/cairn_ingest_operator.py
 export INGEST_PERIOD_SECONDS=600
 AWS_PROFILE=ecc2k130 INGEST_ROLE=worker ./ingest_host.sh preflight
 # After cutover approval and the old writer's stop:
