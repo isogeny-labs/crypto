@@ -2389,7 +2389,7 @@ fn selftest(a: &Args) {
     check("monomial-order", agree, "mkey vs grevlex_greater on 20000 pairs".into());
     // 2. small cells: every arm against exhaustive enumeration
     let caps = Caps { max_touch: 1 << 40, max_matrix_words: 1 << 27, wall_s: 120.0, train_clone_words: 1 << 25 };
-    let cells = [(7u32, 3usize, 3usize), (8, 3, 3), (7, 2, 4)];
+    let cells = [(7u32, 3usize, 3usize), (8, 3, 3), (8, 2, 4)];
     let ntrain: usize = a.num("--ntrain", 8);
     for &(n, l, m) in &cells {
         let cell = make_cell(n, l, m, 424242);
@@ -2404,7 +2404,7 @@ fn selftest(a: &Args) {
             .collect();
         let (mut n_sat, mut n_unsat, mut bad, mut hash_diff, mut nchk) = (0, 0, 0, 0, 0);
         let mut targets: Vec<(String, usize)> = (0..N_TRAIN).map(|i| ("train".to_string(), i)).collect();
-        targets.extend((0..N_PLANTED).map(|i| ("planted".to_string(), i)));
+        targets.extend((0..cell.planted.len()).map(|i| ("planted".to_string(), i)));
         for (role, i) in &targets {
             let xr = cell_target(&cell, role, *i);
             let draw = draw_for(&cell, xr);
