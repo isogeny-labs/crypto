@@ -191,3 +191,14 @@ Tier 1 estimate. The trace strengthens the case for measuring walk-step
 arithmetic in the full-worker panel. The [long validation receipt](worker-batch-long-validation.json)
 pins the replay and trace hashes and records the fail-closed local host
 preflight.
+
+The [source archive validation](worker-source-archive-validation.json)
+preserves two failed extracted-build attempts: the first omitted the local
+`isogeny_algos` Cargo dependency and the second omitted five Rust
+compile-time data files. The archive builder now follows local Cargo path
+dependencies and literal `include_str!`/`include_bytes!` paths. An archive
+made from a temporary combination with build-repair PR #2135 then built the
+release benchmark from a clean extraction, and its extracted executable
+passed a serial/batch q00 exact-output replay. The temporary repair merge
+was removed from this branch afterward. Rebuild the archive once the final
+repair source lands before hosted dispatch.

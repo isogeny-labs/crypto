@@ -1,0 +1,44 @@
+{
+  "schema": "rho-worker-source-archive-validation-v1",
+  "date_utc": "2026-10-18",
+  "command": "CARGO_TARGET_DIR=/Volumes/SSD990/llm/tmp/rho-worker-profile-20261017/target cargo build --offline --release --example rho_worker_batch_benchmark",
+  "temporary_upstream_repair_commit": "b11d1948a9af825f9306214b150b2d67904c6205",
+  "rho_branch_commit_before_bundle_fix": "ed051391b6",
+  "build_checks": [
+    {
+      "archive_sha256": "3d89eaafa6b32ccb3aa22486fa743c7a0044eb7d5aff1cf77643ee3b664c6645",
+      "status": "failed_missing_path_dependency",
+      "missing": ["isogeny_algos/Cargo.toml"]
+    },
+    {
+      "archive_sha256": "967916fa2e36607ab2f6bc96bd4181601cb3d0c2150ab9cc18f05fa60081ffba",
+      "status": "failed_missing_rust_include_files",
+      "missing": [
+        "docs/ic/boundary_targets.json",
+        "docs/ecbench/schema.sql",
+        "docs/curves/registry.json",
+        "docs/ic/calibration.json",
+        "docs/curves/standards/parameters.json"
+      ]
+    },
+    {
+      "archive_sha256": "9ec7f36b9c39e39b43f04f2147d635d078341208de2fa4b06d77f8ea13b6bbb6",
+      "file_count": 1224,
+      "status": "extracted_release_example_build_passed",
+      "binary_sha256": "4abb042cf481fb880127718943f6ccbb704a5a4e646927a5ceecb0d3f6025e59",
+      "q00_serial_batch_replay": {
+        "status": "pass",
+        "walkers": 32,
+        "walk_steps": 5919,
+        "distinguished_points": 32,
+        "checkins": 5,
+        "exact_ordered_checkins": true,
+        "independent_dp_replay": true
+      }
+    }
+  ],
+  "current_unmerged_branch_archive_sha256": "4935d7c13e57e8cba2d944ca6b62ddec856b302e7044be065e4d90d169b0ecd2",
+  "current_archive_rebuilt_identically": true,
+  "final_merged_source_archive_sha256": null,
+  "hosted_performance_result": null
+}

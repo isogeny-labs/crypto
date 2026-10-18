@@ -29,13 +29,34 @@ def paths():
     result = {ROOT / name for name in EXPLICIT}
     result.update((ROOT / 'src').rglob('*'))
     result.update((ROOT / 'tools' / 'volcano-cli').rglob('*'))
-    manifest = (ROOT / 'Cargo.toml').read_text()
-    for name in re.findall(r'path\s*=\s*"([^"]+)"', manifest):
-        path = ROOT / name
-        if path.is_dir():
-            result.update(path.rglob('*'))
-        else:
-            result.add(path)
+    pending = [ROOT / 'Cargo.toml']
+    scanned = set()
+    while pending:
+        manifest_path = pending.pop()
+        if manifest_path in scanned:
+            continue
+        scanned.add(manifest_path)
+        for name in re.findall(r'path\s*=\s*"([^"]+)"',
+                               manifest_path.read_text()):
+            path = (manifest_path.parent / name).resolve()
+            if not path.is_relative_to(ROOT):
+                raise ValueError('Cargo path escaped repository')
+            if path.is_dir():
+                result.update(path.rglob('*'))
+                if (path / 'Cargo.toml').is_file():
+                    pending.append(path / 'Cargo.toml')
+            else:
+                result.add(path)
+    for source in tuple(result):
+        if source.suffix != '.rs' or not source.is_file():
+            continue
+        for name in re.findall(r'include_(?:str|bytes)!\s*\(\s*"([^"]+)"',
+                               source.read_text()):
+            included = (source.parent / name).resolve()
+            if not included.is_relative_to(ROOT):
+                raise ValueError('Rust include escaped repository')
+            if included.is_file():
+                result.add(included)
     files = sorted(path for path in result if path.is_file())
     if not files or any(not path.is_relative_to(ROOT) or path.is_symlink()
                         for path in files):
