@@ -5,22 +5,30 @@ Run batch: `envoy-fpga-20261018-rtl-live`. This receipt extends the original
 remain unchanged. The user requested continuation of the Envoy FPGA crypto
 extension, including classical and post-quantum operations for AWS F2.
 
-`manifest.json` publishes the parent revision, final project-file hashes,
-aggregate validation outcomes and remaining gaps. The detailed run manifest
-and `runs.tar.xz` are retained locally pending explicit owner approval for
-upload; **the raw archive is not included in this commit**. Its checksum is
-provided in `runs.tar.xz.sha256` for identification. Reproduction commands are
-in the validation and kernel guides.
+The [summary manifest](manifest.json) publishes the parent revision, current
+project-file hashes, aggregate validation outcomes and remaining gaps. The
+owner explicitly approved publication of the [raw archive](runs.tar.xz) and
+[detailed run manifest](run-manifest.json). Both are preserved byte for byte
+from the original validation batch. Their SHA-256 checksums are in
+`runs.tar.xz.sha256` and `run-manifest.json.sha256`.
 
-The local archive preserves unsuccessful intermediate attempts and successful
+The detailed manifest records commands, tool versions, attempts and hashes
+for all 66 raw records. Its project-file hashes identify the execution-era
+snapshot, before the publication wording and report PDF were updated. Use
+the summary manifest for the current documentation hashes; the production
+code and test sources have not changed. Reproduction commands are in the
+validation and kernel guides.
+
+The archive preserves unsuccessful intermediate attempts and successful
 validation logs. Intermediate source snapshots and exact initial standalone
 lint command lines were not frozen, so those failures cannot be exactly
 replayed from the final source snapshot.
 
-After the raw archive has been approved and obtained, verify and extract it:
+Verify the downloaded files and extract the archive:
 
 ```sh
 sha256sum -c runs.tar.xz.sha256
+sha256sum -c run-manifest.json.sha256
 tar -xJf runs.tar.xz
 ```
 

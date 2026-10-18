@@ -5,8 +5,12 @@ report, with no throughput or CPU/FPGA speed comparison. It extends the source
 import in commit `3c81607c87c4b896e78a49eb6b7f252c0131a96e` on PR
 [#2122](https://github.com/aburan28/crypto/pull/2122). The
 [receipt manifest](../../receipts/2026-10-18/manifest.json) identifies the final
-source files and aggregate outcomes. Raw logs and the detailed run manifest
-remain local pending explicit owner approval for upload.
+source files and aggregate outcomes. The owner-approved
+[raw archive](../../receipts/2026-10-18/runs.tar.xz) and
+[detailed run manifest](../../receipts/2026-10-18/run-manifest.json) preserve
+the original validation batch exactly. The detailed manifest identifies the
+execution-era snapshot; the summary manifest includes the subsequent
+documentation and PDF publication updates.
 
 ![Implementation boundaries](architecture.svg)
 
