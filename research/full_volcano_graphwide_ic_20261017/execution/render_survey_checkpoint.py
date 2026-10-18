@@ -72,10 +72,10 @@ These pooled counts span different subgroups/bases and are accounting totals,
 not a common success probability. Multiple outcomes and all missing/censored
 observations remain distinct. Stratum samples are not complete populations.
 
-The environment returned without the previous worker. One in-flight attempt
-was preserved and marked interrupted by the unchanged driver's zero-job stop;
-it is excluded from accepted means. Exact termination cause was not observed.
-No sealed session, binary, queue or mathematical budget was changed.
+Earlier interrupted attempts remain preserved and excluded from accepted
+means; their termination causes were not observed. The current checkpoint's
+context note identifies its stop or recovery. No sealed session, binary,
+queue or mathematical budget was changed.
 
 The native inventory checks record seals, receipt/file hashes, ledger/queue
 identities and exact existing successful/exhausted replay coverage. This is

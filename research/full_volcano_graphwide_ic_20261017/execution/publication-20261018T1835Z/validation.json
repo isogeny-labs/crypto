@@ -1,0 +1,37 @@
+{
+  "schema": "volcano-byte-preserving-publication/v1",
+  "verified_utc": "2026-10-18T18:52:22.095649+00:00",
+  "archive": {
+    "path": "/workspace/volcano_REPAIRED_6137vertices_all51strata_20261018.tar.xz",
+    "bytes": 61650744,
+    "sha256": "1fc05eba3d271be69af41880e96634e151f8ed83b3398e2e06853c0a7581efc8",
+    "staging": {
+      "mode": "link-sessions",
+      "linked_files": 30695,
+      "linked_payload_bytes": 770860614,
+      "omitted_empty_wal_reader_caches": [
+        "ledger.sqlite-wal",
+        "ledger.sqlite-shm"
+      ],
+      "scope": "File payload bytes, not measured filesystem allocation."
+    }
+  },
+  "fresh_extraction": "PASS",
+  "every_manifest_entry": "PASS",
+  "exact_manifest_file_population": "PASS",
+  "only_directories_and_regular_archive_members": "PASS",
+  "outer_repack_byte_identical": "PASS",
+  "manifest_sha256": "2e77b509fd306a9dc161a1372034b682ff1bed036b19753f2b2bfe4b28b97a23",
+  "manifest_check_log_sha256": "e85bbd9708e1b1446ce73ff2890d03d5ba386deb062f00a504ed7ef497839a7a",
+  "manifest_entries": 61466,
+  "scope": "Byte/file handling and native receipt binding, not fresh or independent solver replay; no speed claim.",
+  "native_checkpoint": "PASS; existing seal/hash/receipt/replay coverage, not fresh independent solver replay",
+  "native_summary": "PASS; outcome counts agree with inventory; 98,192 accepted records",
+  "packaging_tests": "7 passed, including actual CLI in copy/link modes with identical fixture archive bytes",
+  "report": "All3 pages visually inspected, no clipping; benchmark PNG150dpi",
+  "viewer": "Native hashes/populations, Node UI, real Chromium desktop/floor/mobile pass; all3 screenshots visually inspected",
+  "source_changes": "File handling/presentation only; frozen mathematical source, solver, driver, queue and child budgets unchanged",
+  "root_library": "No Rust/Cargo changes or new root-library run; earlier unchanged-source validation and its initial failures remain in recovery-20261017T1450Z/validation.json",
+  "failed_attempts": "First packager reader-cache rejection and failed relative test-runner-path invocation retained with successful corrected attempts",
+  "remote_verification": "Metadata name/size/parent readbacks only; no remote whole-file content hash"
+}

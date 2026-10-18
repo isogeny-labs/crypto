@@ -6,7 +6,7 @@
 - **Affected work:** [fixed five-class protocol](../research/full_volcano_classes_20261016/PROTOCOL.md)
 - **Next action owner:** current implementation session for code and controls;
   full-run infrastructure owner unassigned
-- **Last updated:** 2026-10-17
+- **Last updated:** 2026-10-18
 
 ## Problem
 
@@ -180,3 +180,14 @@ preserved and marked interrupted by the unchanged native zero-job stop; cause
 unknown. S3 credential discovery still finds no signing identity. Frozen graph,
 solver and child budgets are unchanged; original full classes, original matrix,
 independent arithmetic and large-k implementation gaps remain open.
+
+18 October clean publication pause: the native-verified checkpoint now reaches
+6,137 audited vertices / 98,192 accepted records across all 51 strata
+(63,182 verified / 30,553 exhausted / 4,457 timeout), with 3,181,542 relations
+and 149,275,746 actual decomposition calls. PID 3298 stopped at a vertex boundary;
+no new attempt was interrupted. [Publication evidence](../research/full_volcano_graphwide_ic_20261017/execution/publication-20261018T1835Z/README.md)
+retains the old failures and validates file staging that links only immutable
+snapshot session payloads. This removes one redundant packaging payload copy,
+not the native snapshot or original-class storage/implementation requirements.
+No mathematical source, binary, queue or child budget changed. All larger
+completion gaps and the unavailable S3 runtime identity remain open.

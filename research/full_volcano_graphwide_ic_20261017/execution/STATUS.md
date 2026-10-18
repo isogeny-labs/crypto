@@ -5,7 +5,7 @@
 | Original A–E full classes | Partial / blocked | 7,833,658,967 expected vertices, 515 strata. Historical B is complete; A/C/D/E are not. Current SQLite working volume and connected large-run compute are missing. Object archives alone are not its random-access working volume. |
 | Three additional selected-degree classes | Verified complete | 24,823 vertices, 51 strata, 69,300 directed maps; exact DB hashes and replay receipts. This is not all primes/compositions or the original five classes. |
 | Graph CLI / build-resume-verify / maps | Implemented and tested | `crypto isogeny class`; ordinary prime fields 3<p<2^61, supported CM bounds and finite selected degrees. It is not a universal arbitrary-field solver. |
-| Direct EC IC across whole available graphs | Partial | Recovered repaired checkpoint: 5,533 / 24,823 audited vertices, all 51 strata sampled, 88,528 accepted records (56,959 verified / 27,545 exhausted / 4,024 timeout). An interrupted attempt is retained and excluded. Dev99 and stopped release70 remain separate. No snapshot implies all-vertex completion. |
+| Direct EC IC across whole available graphs | Partial | Latest stopped checkpoint: 6,137 / 24,823 audited vertices, all 51 strata sampled, 98,192 accepted records (63,182 verified / 30,553 exhausted / 4,457 timeout). Current pause is clean; earlier interrupted attempts remain retained and excluded. Dev99 and stopped release70 remain separate. No snapshot implies all-vertex completion. |
 | Original full method matrix | Open | 8 targets, 5 rounds, warmup, four base sizes, million trials, qualified timing and exact representation registration are not discharged by a 2-target/1-round/4096-trial survey. |
 | Finite-field reduction / relations | Partial, measured | Genuine k=1 Tate/Miller plus projected-prime two-summand relations: Both EC PH and finite-field PH/relations verify all 3,738 selected-full-order targets at all 1,869 C-prefix models; 7,476 primary records match a separate non-clock replay. All 2/3/7 prime-power parts included; largest prime 7. Not NFS/integer-smoothness IC or support for the other large embedding degrees. |
 | Original C large End(E) conductor / strata | Locally certified subset | Source conductor 967,458,816. Conservative bounds identify 517 vertices in 24 strata (2,985,984–967,458,816); 1,352 unknown. Full C still has 1,934,901,248 expected vertices / 165 strata. |
@@ -39,3 +39,10 @@ Active local resume: PID 97646; [verified live progress](resume-after-4037/verif
 18 October recovery: earlier PID97646 is absent, not live. The retained stale attempt was marked interrupted with the unchanged zero-job driver; [native-checked checkpoint](recovery-20261018T1647Z/README.md) advances coverage to5,533 vertices. A later actual launch receipt controls current status. Older launch/download receipts remain historical.
 
 Latest actual resume overrides historical absent-PID notes: PID3298, verified live 2026-10-18T17:07:52.044044+00:00; [receipt](recovery-20261018T1647Z/resumed-verified.json). Original72h deadline preserved,6GiB cap and frozen child budgets unchanged; bounded continuation rearmed.
+
+18 October publication supersedes the historical PID3298 live-status note above:
+PID3298 stopped cleanly on STOP at18:29:49UTC. The [6,137-vertex delivery](publication-20261018T1835Z/README.md)
+passes native inventory/summary, every archive manifest entry and byte-identical
+outer repacking. A later actual launch/process/progress receipt controls resumed
+status; no historical PID or ledger row implies current execution. All frozen
+mathematical inputs and original outer guards remain unchanged.

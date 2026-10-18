@@ -1,5 +1,17 @@
 # Volcano experiment downloads, 17 October 2026
 
+Latest immutable publication, 18 October: **6,137 / 24,823 audited vertices**,
+all 51 strata sampled, 98,192 accepted records (63,182 verified / 30,553
+exhausted / 4,457 timeout), 3,181,542 relations / 149,275,746 actual calls.
+[Archive, CSV, report, viewer and byte-verification receipts](execution/publication-20261018T1835Z/README.md).
+This snapshot follows a clean vertex-boundary stop for file-staging validation;
+no new attempt was interrupted. Earlier failed/interrupted attempts are retained.
+All 61,466 manifest entries and a byte-identical outer repack pass. Downloads
+remain fixed while a separate verified runtime epoch may advance the campaign.
+Original A/C/D/E, full matrix, independent arithmetic and large-k IC remain open.
+
+The entries below retain earlier immutable deliveries and execution history.
+
 [Download guide v5: 5,533-vertex checkpoint and actual bounded resume](https://drive.google.com/file/d/1MC0v3MQpCbWTZpa6oWtrQO7EfOYbW_vq/view).
 
 Latest stopped checkpoint, 18 October 2026: **5,533 / 24,823 audited vertices**,
