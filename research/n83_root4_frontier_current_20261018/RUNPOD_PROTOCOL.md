@@ -25,7 +25,10 @@ receipt into the raw result directory. `runpod_provider.py` independently
 checks allocation hashes, source and adapter identity, distinct machines,
 and overlapping benchmark intervals. The existing `verify.py` replays each
 base, relation, rank, scalar, phase total, resource cap, calibration, and
-same-point rho record. Only a complete two-stratum independent replay may
+same-point rho record. `aggregate_runpod.py` binds every extracted file to
+its retained raw archive, reruns both independent verifiers, checks the
+provider proof, and applies the unchanged exact selector. Only a complete
+two-stratum independent replay may
 enter the existing exact selector; a partial or noisy result remains
 unselected.
 

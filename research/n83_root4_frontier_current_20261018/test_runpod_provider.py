@@ -1,18 +1,35 @@
 """Exercise Pod identity, allocation binding, and overlap gates."""
 
 import json
+import tarfile
 import tempfile
 import unittest
 from pathlib import Path
 
 from research.n83_root4_frontier_current_20261018 import runpod_provider
 from research.n83_root4_frontier_current_20261018 import runpod_runner
+from research.n83_root4_frontier_current_20261018 import aggregate_runpod
 
 
 HEAD = 'a' * 40
 
 
 class RunPodProviderTests(unittest.TestCase):
+    def test_raw_archive_byte_binding_rejects_tamper(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            results = root / 'results'
+            results.mkdir()
+            (results / 'receipt.json').write_text('{"status":"PASS"}\n')
+            archive = root / 'raw.tar.gz'
+            with tarfile.open(archive, 'w:gz') as bundle:
+                bundle.add(results, arcname='results')
+            self.assertEqual(aggregate_runpod.bind_archive(
+                archive, results)['file_count'], 1)
+            (results / 'receipt.json').write_text('{"status":"ALTERED"}\n')
+            with self.assertRaisesRegex(ValueError, 'differ'):
+                aggregate_runpod.bind_archive(archive, results)
+
     def test_adapter_writes_honest_host_and_source_identity(self):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / 'allocation.json'
