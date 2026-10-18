@@ -97,10 +97,10 @@ for the escape. The batched addition now follows that order and uses the
 context's precomputed `half_p` for start normalization. The earlier batch
 validation receipts above remain tied to their original source hashes.
 
-The [rebase validation receipt](rebased-validation.json) pins the current
+The [historical rebase validation receipt](rebased-validation.json) pins its
 rho source and every local test log. On a temporary combination of rho
 commit `9069bd688b` and the existing
-[main build repair PR #2135](https://github.com/aburan28/crypto/pull/2135)
+[then-active build repair PR #2135](https://github.com/aburan28/crypto/pull/2135)
 at `37bcf08a`, all 44 collaborative rho release tests passed, including
 the new batch state, outcome, and check-in replays. The temporary repair
 merge is excluded from this rho branch's diff. The refreshed
@@ -113,7 +113,7 @@ The [first combined-source full-suite log](rebased-full-censored.log) records
 one `jv_cover` F4 replay failure under concurrent load and one long test
 still active when the run was interrupted. That `jv_cover` test passed alone
 in 36.74 seconds; see its [focused log](rebased-jv-replay.log). A clean
-full-suite result on current main still depends on the build repair. A
+full-suite result at that revision depended on the build repair. A
 four-thread retry passed 1,089 tests before it was stopped after the repair
 branch advanced; its [partial log](rebased-full-fourthreads-censored.log)
 is retained. No throughput result has been measured for the batch lane.
@@ -123,7 +123,29 @@ complete-checkout [focused rho test log](rebased-latest-rho-44.log) records
 attempt compiled and passed 35 tests; nine network tests encountered socket
 `PermissionDenied`. The [latest validation receipt](rebased-latest-rho-validation.json)
 binds the retry log and records the temporary merge removal. The complete
-release library suite still awaits the final repaired source.
+release library suite at that revision awaited the final repaired source.
+
+The worker branch has since been rebased onto repaired main
+`abee07ee7337d04a7e734333669ca1bacd6c763a`, after #2128 landed the
+compile repair. The rebased release benchmark built, and the
+[32-Q long replay](local-all32-rebased-main-worker-replay/summary.json)
+matched all 64 arms and 32 serial/batch exact-output pairs with zero
+failures. Its binary SHA-256 is
+`b8b79be216e453a4c7f50713ea642d7e87911519254a3e3dc91bbed5ccca849c`;
+the raw ledger SHA-256 is
+`0866a7181e457b6c122e49cfbc4d608d2865b460f56a4733a0c6e0debc298a17`.
+The source archive reproduced twice at SHA-256
+`abd7a2eaeebca050dcf0a9f2290c02b116dbdd4b0bfb43cb45bf4be1ca5f7025`.
+It built from a clean extraction with a fresh Cargo target; that executable
+was byte-identical to the checkout binary and passed the long q00
+serial/batch replay. The complete `cargo test --offline --release --lib`
+suite passed 4,396 tests with zero failures and 118 ignored. The
+[rebased-main validation receipt](rebased-main-validation.json) pins the
+source components, archive, binary, raw arms, fresh build, complete test
+log, and auditor self-check. The 96-case plan expands to 768 arms, and the
+auditor policy self-check passed on the rebased binary. These are local
+build and correctness checks;
+the full-worker speed decision still awaits the Tier 1 host panel.
 
 ## Next gates
 
@@ -213,8 +235,9 @@ passed a serial/batch q00 exact-output replay. The temporary repair merge
 was removed from this branch afterward. The archive is scoped to the
 release benchmark; a library-test attempt from it found test-only research
 fixtures outside that bundle and was recorded as censored. Run repository
-tests from the full checkout. Rebuild the archive once the final repair
-source lands before hosted dispatch.
+tests from the full checkout. The archive rebuilt from the repaired main
+base passed its separate clean-extraction build and q00 replay; see the
+rebased-main validation receipt above.
 
 The [auditor policy self-check](worker-auditor-policy-selfcheck.json) uses
 synthetic host and timing fields around the committed long-replay outputs.
