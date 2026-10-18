@@ -40,7 +40,19 @@
       "method": {
         "id": "ic.pipeline",
         "params": {
-          "factor_base": "koblitz-orbit:divisor=1",
+          "factor_base": "koblitz-orbit:divisor=3",
+          "oracle": "pdp-split:m=3,plan=3,guess=4,slots=one,max_free=24",
+          "max_trials": "2000"
+        }
+      }
+    },
+    {
+      "name": "inv4b-g4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=4",
           "oracle": "pdp-split:m=3,plan=3,guess=4,slots=one,max_free=24",
           "max_trials": "2000"
         }
@@ -52,7 +64,7 @@
       "method": {
         "id": "ic.pipeline",
         "params": {
-          "factor_base": "koblitz-orbit:divisor=0;1",
+          "factor_base": "koblitz-orbit:divisor=0;4",
           "oracle": "pdp-split:m=3,plan=3,guess=4,slots=one,max_free=24",
           "max_trials": "2000"
         }
@@ -100,7 +112,19 @@
       "method": {
         "id": "ic.pipeline",
         "params": {
-          "factor_base": "koblitz-orbit:divisor=1",
+          "factor_base": "koblitz-orbit:divisor=3",
+          "oracle": "pdp-split:m=3,plan=3,guess=8,slots=one,max_free=24",
+          "max_trials": "2000"
+        }
+      }
+    },
+    {
+      "name": "inv4b-g8",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=4",
           "oracle": "pdp-split:m=3,plan=3,guess=8,slots=one,max_free=24",
           "max_trials": "2000"
         }
@@ -112,7 +136,7 @@
       "method": {
         "id": "ic.pipeline",
         "params": {
-          "factor_base": "koblitz-orbit:divisor=0;1",
+          "factor_base": "koblitz-orbit:divisor=0;4",
           "oracle": "pdp-split:m=3,plan=3,guess=8,slots=one,max_free=24",
           "max_trials": "2000"
         }
@@ -172,7 +196,7 @@
       "method": {
         "id": "ic.pipeline",
         "params": {
-          "factor_base": "koblitz-orbit:divisor=0;1",
+          "factor_base": "koblitz-orbit:divisor=0;4",
           "oracle": "mitm-frobenius:m=3",
           "max_trials": "2000"
         }

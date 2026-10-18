@@ -1,6 +1,6 @@
 # Protocol: the hybrid optimum, a fully charged bracket, and F4's cost per unknown
 
-**DRAFT until the registration commit replaces this line.** Conductor task
+**Registered 2026-10-18, before any measured run of this round.** Conductor task
 `T-3`. Round 3 of the split/hybrid PDP study (round 1: PR #1709,
 `research/pdp_split_dreg_20261011`; round 2: `research/pdp_split_slots_20261012`).
 
@@ -78,11 +78,16 @@ exploration's ℓ = 8 point took 7 min per target; ℓ = 9 is expected at
 Koblitz size ecbench builds that has Frobenius-invariant subspaces of
 dimension 4 and 5 (2-cyclotomic cosets of 15 have sizes 1, 4, 4, 2, 4).
 Four public targets, `max_trials = 2000` (the bases are tiny), seeds
-`202610181301` / `202610181302`. Arms: `pdp-split` unsplit at g = 4 and 8
-on `koblitz-orbit:divisor=1` (dim 4), `koblitz-orbit:divisor=0;1` (dim 5),
-`koblitz-closure:dimension=4`, and the standard subspace at ℓ = 4 and 5;
-`mitm-frobenius:m=3` on the dim-5 invariant base and on the closure; both
-rho arms. **rho is degenerate at this size** (its setup dominates), so
+`202610181301` / `202610181302`. `koblitz-orbit`'s divisor indexes the factorisation
+`x^15 − 1 = (x+1)(x²+x+1)(x⁴+x+1)(x⁴+x³+1)(x⁴+x³+x²+x+1)`; `ecbench fb`
+gives, for dimension 4, 1 / 31 / 21 points (indices 2 / 3 / 4) and, for
+dimension 5, 3 / 33 / 43 points (`0;2` / `0;3` / `0;4`). Arms: `pdp-split`
+unsplit at g = 4 and 8 on `koblitz-orbit:divisor=3` (dim 4, 31 points,
+2 columns), `divisor=4` (dim 4, 21 points, 3 columns), `divisor=0;4`
+(dim 5, 43 points, 6 columns), `koblitz-closure:dimension=4` (122 points,
+5 columns), and the standard subspace at ℓ = 4 (11 points, 6 columns) and
+5; `mitm-frobenius:m=3` on `divisor=0;4` and on the closure; both rho
+arms. **rho is degenerate at this size** (its setup dominates), so
 Part C compares systems per relation, F4 cost per system and recorded S
 across bases, not S against rho. Spec `SPEC-C-n15.json`.
 
