@@ -448,3 +448,16 @@ Smoke test before freezing (not a result): every arm (`b`, `c`, `p`) at each of
 n = 31, 37, 41 for 24 evaluations, the resume from card 04's 192-line archive, and
 full-size `finalists`, `heldout`, `ablate`, `conserve` (17/6, 19/7) and `summarize`
 on those archives ran to completion with exit 0.
+
+### R2 stage 2 (2026-10-18; execution plan only, nothing above changes)
+
+Stage 1 (cards 02, 05, 06, 07, 08, 10, 12-r2) completed and its archives are committed. Stage 2
+(cards 03, 19, 20, 09, 11, 13-r2) is written now, each binding its stage-1 archive
+(`raw-r2/state-1/n<N>-<arm>.jsonl`) by sha256. One change from the stage-1 layout, to the card
+text only: the copy into `raw-r2/state/` is `cp -t raw-r2/state <bound file>` instead of
+`cp <bound file> <destination file>`, so that no argv names a file the card creates and the
+after-the-fact lint of `check-relay` passes (card 05-r2 failed that lint, not the run).
+Instrument unchanged (sha256 `f69bbce4...`, no bug proved by the first run). Resume smoke
+before freezing: each of the six chains resumed from its committed 128-line archive for one
+evaluation (index 128) in a scratch directory, exit 0. Stages 3 and 4 are frozen only after
+stage 2 has run and its archives are committed (`make_r2_cards.py 3`, then `4`).

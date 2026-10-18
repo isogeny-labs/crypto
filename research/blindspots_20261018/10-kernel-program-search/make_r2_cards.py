@@ -140,7 +140,9 @@ def second_half(nn, n, arm):
     f = f"n{n}-{arm}.jsonl"
     c = Card(nn, binds=[f"{S1}/{f}"])
     c.add("make-state-dir", ["mkdir", "-p", ST], 5)
-    c.add("copy-first-half", ["cp", f"{S1}/{f}", f"{ST}/{f}"], 10)
+    # `cp -t DIR SRC`: no argv token names the destination file, so a lint run after the
+    # card has run (check-relay) does not see an unpinned repository file (card 05-r2 did).
+    c.add("copy-first-half", ["cp", "-t", ST, f"{S1}/{f}"], 10)
     search(c, f"n{n}-{arm}-b", n, arm, ST, 128, 380)
     return c
 
