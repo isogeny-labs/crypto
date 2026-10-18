@@ -6,8 +6,7 @@ and the pinned pairing roster,
 and **36 published odd-characteristic covering cases**. The named roster
 includes Oakley Groups 3 and 4, with exact GHS invariant candidates and
 separate WID1 finding IDs. It adds three exhaustively checked prime-field
-examples and a twenty-eight-criterion
-examples and a twenty-four-criterion
+examples and a thirty-two-criterion
 registry for anomalous, smooth-order, MOV, Frey–Rück, supersingular,
 binary-GHS, odd-characteristic GHS, cubic norm-one, quadratic-torus and
 proper-subfield mechanisms, plus direct extension-field decomposition,
