@@ -23,9 +23,10 @@ PAIR_RHO_SEED_BASE = 2026111900
 IC_CAP_SECONDS = {"k992_root11": 600, "k1024_root11": 600,
                   "k1107_root11": 600, "k2304_root11": 900,
                   "k2816_root11": 900, "k3072_root11": 900,
-                  "k3450_wide3": 1200, "k3500_root4": 1200}
+                  "k3300_wide3": 1200, "k3450_wide3": 1200,
+                  "k3500_root4": 1200}
 RHO_CAP_SECONDS = 120
-GLOBAL_PRODUCER_CAP_SECONDS = 240 * 60
+GLOBAL_PRODUCER_CAP_SECONDS = 330 * 60
 
 
 def module(name, path):
@@ -103,10 +104,10 @@ def fixture():
 
 
 def schedule(stratum, arms):
-    if (stratum not in range(2) or len(arms) not in (3, 4) or
+    if (stratum not in range(2) or len(arms) not in (4, 5) or
             len({arm[3] for arm in arms}) != len(arms) or
             len({arm[0] for arm in arms}) != len(arms)):
-        raise ValueError('three or four distinct frozen arms and stratum 0..1 required')
+        raise ValueError('four or five distinct frozen arms and stratum 0..1 required')
     events = []
     for local in range(8):
         index = stratum * 8 + local

@@ -41,7 +41,7 @@ def main():
         'host_strata': 2,
         'points_per_host': 8,
         'producer_cap_seconds': run.GLOBAL_PRODUCER_CAP_SECONDS,
-        'job_cap_minutes': 270,
+        'job_cap_minutes': 360,
         'source_sha256': run.SOURCE_SHA256,
         'targets_sha256': run.TARGETS_SHA256,
         'answers_sha256': run.ANSWERS_SHA256,

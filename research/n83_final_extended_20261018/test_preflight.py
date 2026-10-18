@@ -14,10 +14,19 @@ def main():
     hashes, lines = run.fixture()
     assert len(lines) == 16 and len({line for line in lines}) == 16
     with TemporaryDirectory() as temporary:
-        arms, choice = run.choose(*files(Path(temporary), fixture()))
-    assert len(arms) == 3 and len(choice["ordered_candidate_ids"]) == 3
+        directory = Path(temporary)
+        arms, choice = run.choose(*files(directory, fixture()))
+        mixed = fixture()
+        for point in mixed["points"]:
+            for index, arm in enumerate(point["arms"]):
+                arm["cold_process_ms"] = 70_000 + 10_000 * index
+        five_arms, _ = run.choose(*files(directory, mixed))
+    assert len(arms) == 4 and len(choice["ordered_candidate_ids"]) == 4
+    assert len(five_arms) == 5
     events = [run.schedule(stratum, arms) for stratum in range(2)]
+    five_events = [run.schedule(stratum, five_arms) for stratum in range(2)]
     assert all(len(part) == 8 * len(arms) * 8 for part in events)
+    assert sum(map(len, five_events)) == 640
     assert {row["point_index"] for part in events for row in part} == set(range(16))
     for part in events:
         for index in sorted({row["point_index"] for row in part}):
@@ -30,6 +39,7 @@ def main():
     print(json.dumps({"status": "PASS_FINAL_EXTENDED_PREFLIGHT",
                       "points": len(lines), "arms": len(arms),
                       "events": sum(map(len, events)),
+                      "five_arm_events": sum(map(len, five_events)),
                       "frozen_input_groups": len(hashes)}, sort_keys=True))
 
 

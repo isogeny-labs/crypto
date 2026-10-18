@@ -26,7 +26,8 @@ def main():
         directory = Path(temporary)
         chosen, choice = arms.choose(*files(directory, fixture()))
         assert [arm[3] for arm in chosen] == [
-            arms.SMALL[0][3], arms.SMALL[1][3], six_select.IDS[5]]
+            arms.SMALL[0][3], arms.SMALL[1][3], arms.MID[0][3],
+            six_select.IDS[5]]
         assert not choice["online_fallback_used"]
         assert not choice["cold_fallback_used"]
         for candidate in choice["ordered_candidate_ids"]:
@@ -38,7 +39,7 @@ def main():
                 arm["cold_process_ms"] = 70_000 + 10_000 * index
         chosen, choice = arms.choose(*files(directory, mixed))
         assert [arm[3] for arm in chosen] == [
-            arms.SMALL[0][3], arms.SMALL[1][3],
+            arms.SMALL[0][3], arms.SMALL[1][3], arms.MID[0][3],
             six_select.IDS[5], six_select.IDS[0]]
         assert not choice["online_fallback_used"]
         assert not choice["cold_fallback_used"]
@@ -50,7 +51,7 @@ def main():
                 arm["cold_process_ms"] = 100_000.0
         chosen, choice = arms.choose(*files(directory, fallback))
         assert [arm[3] for arm in chosen] == [
-            arms.SMALL[0][3], arms.SMALL[1][3],
+            arms.SMALL[0][3], arms.SMALL[1][3], arms.MID[0][3],
             arms.ONLINE_FALLBACK, arms.COLD_FALLBACK]
         assert choice["online_fallback_used"] and choice["cold_fallback_used"]
 
@@ -59,7 +60,7 @@ def main():
         chosen, choice = arms.choose(*files(directory, noisy))
         assert choice["upstream_admission_status"] == "HOST_STRATA_GATE"
         assert [arm[3] for arm in chosen] == [
-            arms.SMALL[0][3], arms.SMALL[1][3],
+            arms.SMALL[0][3], arms.SMALL[1][3], arms.MID[0][3],
             arms.ONLINE_FALLBACK, arms.COLD_FALLBACK]
 
         bad = copy.deepcopy(fallback)

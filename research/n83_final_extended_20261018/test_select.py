@@ -8,14 +8,14 @@ from research.n83_final_extended_20261018 import select as subject
 
 
 def fixture():
-    ids = [*subject.SMALL_IDS, subject.SIX_IDS[5]]
+    ids = [*subject.SMALL_IDS, subject.MID_ID, subject.SIX_IDS[5]]
     points = []
     for index in range(16):
         points.append({
             'point_index': index,
             'arms': [
                 {'candidate_id': candidate, 'status': 'PASS_INDEPENDENT_REPLAY',
-                 'resource_status': 'PASS', 'one_target_online_ms': 30 - 10 * arm,
+                 'resource_status': 'PASS', 'one_target_online_ms': 50 - 10 * arm,
                  'cold_process_ms': 120_000 - 10_000 * arm}
                 for arm, candidate in enumerate(ids)],
             'rho_by_candidate': {
@@ -56,6 +56,24 @@ def main():
     assert result['cold']['selected_candidate_id'] == subject.SIX_IDS[5]
     assert all(item['two_sided_sign_flip_p'] == minimum
                for item in result['online']['comparisons'])
+    five = copy.deepcopy(data)
+    fifth = subject.SIX_IDS[0]
+    five['candidate_ids'].append(fifth)
+    five['choice']['ordered_candidate_ids'] = list(five['candidate_ids'])
+    for point in five['points']:
+        point['arms'].append({
+            'candidate_id': fifth, 'status': 'PASS_INDEPENDENT_REPLAY',
+            'resource_status': 'PASS', 'one_target_online_ms': 25,
+            'cold_process_ms': 95_000})
+        point['rho_by_candidate'][fifth] = {
+            'status': 'PASS_INDEPENDENT_REPLAY', 'resource_status': 'PASS',
+            'online_ms': 100.0}
+        point['calibration_by_candidate'][fifth] = {'status': 'PASS_10_PERCENT'}
+    five_result = subject.select(five)
+    assert five_result['online']['selected_candidate_id'] == subject.SIX_IDS[5]
+    assert five_result['cold']['selected_candidate_id'] == subject.SIX_IDS[5]
+    assert len(five_result['online']['comparisons']) == 10
+    assert five_result['online']['bonferroni_alpha_per_pair'] == 0.005
     noisy = copy.deepcopy(data)
     noisy['host_strata'][0]['aa_status'] = 'NOISY_OR_INCOMPLETE'
     assert subject.select(noisy)['online']['selected_candidate_id'] is None
@@ -78,7 +96,7 @@ def main():
     finally:
         subject.sign_flip_p = original
     print(json.dumps({'status': 'PASS_FINAL_EXTENDED_SELECTOR',
-                      'cases': 8, 'exact_minimum_p': minimum}, sort_keys=True))
+                      'cases': 9, 'exact_minimum_p': minimum}, sort_keys=True))
 
 
 if __name__ == '__main__':

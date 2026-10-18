@@ -16,6 +16,10 @@ SMALL = (
     ("k1024_root11", 1024, "root11_dynamic",
      "IC1N83Ckb1a1fb169984PDP4rootRCguidedLAgaussTDdirectISO0h644bda8bfc36"),
 )
+MID = (
+    ("k3300_wide3", 3300, "root11_wide3",
+     "IC1N83Ckb1a1fb547800PDP4rootRCguidedLAgaussTDdirectISO0h8d1e886f8586"),
+)
 ONLINE_FALLBACK = six_run.ARMS[1][3]  # K2304
 COLD_FALLBACK = six_run.ARMS[0][3]    # K1107
 
@@ -25,7 +29,8 @@ def digest(path):
 
 
 def manifest(candidate_id):
-    directory = HERE if candidate_id in {arm[3] for arm in SMALL} else six_run.HERE
+    directory = (HERE if candidate_id in {arm[3] for arm in (*SMALL, *MID)}
+                 else six_run.HERE)
     path = directory / f"candidate_{candidate_id}.json"
     record = json.loads(path.read_text())
     stripped = {key: value for key, value in record.items()
@@ -58,12 +63,12 @@ def choose(validated_path, selection_path):
     if (online is not None and online not in six_select.IDS or
             cold is not None and cold not in six_select.IDS):
         raise ValueError("selected six-arm ID is absent")
-    requested = (*[arm[3] for arm in SMALL],
+    requested = (*[arm[3] for arm in (*SMALL, *MID)],
                  online or ONLINE_FALLBACK, cold or COLD_FALLBACK)
-    by_id = {arm[3]: arm for arm in (*SMALL, *six_run.ARMS)}
+    by_id = {arm[3]: arm for arm in (*SMALL, *MID, *six_run.ARMS)}
     arms = tuple(by_id[item] for item in dict.fromkeys(requested))
-    if len(arms) not in (3, 4):
-        raise ValueError("extended holdout requires three or four unique arms")
+    if len(arms) not in (4, 5):
+        raise ValueError("extended holdout requires four or five unique arms")
     manifest_hashes = {arm[3]: digest(manifest(arm[3])[0]) for arm in arms}
     choice = {
         "schema": "n83.final-extended-choice/v1",

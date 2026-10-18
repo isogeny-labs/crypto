@@ -16,6 +16,7 @@ SMALL_IDS = (
     'IC1N83Ckb1a1fb164672PDP4rootRCguidedLAgaussTDdirectISO0ha6a31a64b52b',
     'IC1N83Ckb1a1fb169984PDP4rootRCguidedLAgaussTDdirectISO0h644bda8bfc36',
 )
+MID_ID = 'IC1N83Ckb1a1fb547800PDP4rootRCguidedLAgaussTDdirectISO0h8d1e886f8586'
 SIX_IDS = (
     'IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0he423fcbc5668',
     'IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h00a0a52d463c',
@@ -76,13 +77,13 @@ def admitted_matrix(data):
         return None, 'SOURCE_TARGET_OR_REPLAY_GATE'
     ids = data.get('candidate_ids')
     choice = data.get('choice')
-    if (not isinstance(ids, list) or len(ids) not in (3, 4) or
+    if (not isinstance(ids, list) or len(ids) not in (4, 5) or
             len(ids) != len(set(ids)) or
             not isinstance(choice, dict) or
             choice.get('schema') != 'n83.final-extended-choice/v1' or
             choice.get('ordered_candidate_ids') != ids or
-            ids[:2] != list(SMALL_IDS) or
-            any(candidate not in SIX_IDS for candidate in ids[2:])):
+            ids[:3] != [*SMALL_IDS, MID_ID] or
+            any(candidate not in SIX_IDS for candidate in ids[3:])):
         return None, 'CANDIDATE_ID_OR_CHOICE_GATE'
     hosts = data.get('host_strata')
     if (not isinstance(hosts, list) or len(hosts) != 2 or

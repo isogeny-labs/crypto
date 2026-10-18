@@ -21,7 +21,7 @@ jobs:
       matrix:
         stratum: [0, 1]
     runs-on: ubuntu-24.04
-    timeout-minutes: 270
+    timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
 
@@ -45,6 +45,12 @@ jobs:
             "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/provider-test.json"
           python3 research/n83_final_extended_20261018/check_dispatch.py > \
             "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/dispatch-check.json"
+          mkdir -p "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/k3300-pilot"
+          tar -xzf research/n83_final_extended_20261018/pilots/k3300.tar.gz \
+            -C "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/k3300-pilot"
+          python3 -m research.n83_final_extended_20261018.verify_mid \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/k3300-pilot/n83-k3300-current-pilot-20261018" > \
+            "$RUNNER_TEMP/n83-final-extended-stratum-${{ matrix.stratum }}/k3300-pilot-check.json"
           python3 research/n83_final_extended_20261018/run.py \
             --preflight --stratum "${{ matrix.stratum }}" \
             --validated research/n83_final_extended_20261018/upstream_validated.json \
