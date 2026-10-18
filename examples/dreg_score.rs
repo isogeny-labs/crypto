@@ -1255,6 +1255,250 @@ fn target_free(paths: &[String]) {
     );
 }
 
+/// `s4_free FILES…`: the registered reading of the eliminated target-free
+/// `S₄` study (`research/target_free_s4_20261018/PREREGISTRATION.md`) from
+/// `dreg_eliminated_s4` records.  A record is measured when F4 finished.
+/// Per (cell, basis, twists): the target-free value is the single
+/// deterministic draw on `gp` and the median of ≥ 3 measured draws on
+/// `random`; the target value is the median of ≥ 3 measured target draws;
+/// lower / equal / higher, else unmeasured (with the bounded reading beside
+/// it).  Also the top-form deficiency (`top_forms − top_rank`) per arm and
+/// the within-target-free shape reading (gp against the random median).
+fn s4_free(paths: &[String]) {
+    // (n, ℓ, basis, twists) → arm → draw → (measured, solving, deficiency, top_degree)
+    type Rec = (bool, u64, u64, u64);
+    let mut cells: BTreeMap<(u64, u64, String, String), BTreeMap<String, BTreeMap<u64, Rec>>> =
+        BTreeMap::new();
+    for path in paths {
+        let text = std::fs::read_to_string(path).unwrap_or_default();
+        for line in text.lines().filter(|l| !l.trim().is_empty()) {
+            let v: Value = serde_json::from_str(line).expect("json");
+            let tw = v["twists"]
+                .as_array()
+                .expect("twists")
+                .iter()
+                .map(|t| t.as_u64().unwrap().to_string())
+                .collect::<Vec<_>>()
+                .join("");
+            let key = (
+                v["n"].as_u64().expect("n"),
+                v["ell"].as_u64().expect("ell"),
+                v["basis"].as_str().expect("basis").to_string(),
+                tw,
+            );
+            let measured = !v["timed_out"].as_bool().unwrap_or(false)
+                && !v["oversize"].as_bool().unwrap_or(false);
+            let rec: Rec = (
+                measured,
+                v["solving_degree"].as_u64().unwrap_or(0),
+                v["top_forms"].as_u64().unwrap_or(0) - v["top_rank"].as_u64().unwrap_or(0),
+                v["top_degree"].as_u64().unwrap_or(0),
+            );
+            cells
+                .entry(key)
+                .or_default()
+                .entry(v["arm"].as_str().expect("arm").to_string())
+                .or_default()
+                .insert(v["draw"].as_u64().expect("draw"), rec);
+        }
+    }
+    let median = |xs: &[u64]| -> Option<u64> {
+        let mut v = xs.to_vec();
+        v.sort_unstable();
+        v.get(v.len() / 2).copied()
+    };
+    let cmp = |a: u64, b: u64| -> &'static str {
+        if a < b {
+            "lower"
+        } else if a == b {
+            "equal"
+        } else {
+            "higher"
+        }
+    };
+    let list = |rs: &BTreeMap<u64, Rec>, f: &dyn Fn(&Rec) -> u64| -> String {
+        let s: Vec<String> = rs
+            .values()
+            .map(|r| {
+                if r.0 {
+                    f(r).to_string()
+                } else {
+                    format!("≥{}", r.1)
+                }
+            })
+            .collect();
+        if s.is_empty() {
+            "—".into()
+        } else {
+            s.join(", ")
+        }
+    };
+    println!("| (n, ℓ) | basis | twists | target-free solving (≥ = unfinished) | target-free top deficiency | target solving | target top deficiency | target-free value | target median | registered reading | bounded reading |");
+    println!("|---|---|---|---|---|---|---|--:|--:|---|---|");
+    // (n, ℓ, twists) → basis → (registered reading, target-free value)
+    let mut by_cell: BTreeMap<
+        (u64, u64, String),
+        BTreeMap<String, (String, Option<u64>, Vec<u64>)>,
+    > = BTreeMap::new();
+    for ((n, ell, basis, tw), arms) in &cells {
+        let empty = BTreeMap::new();
+        let tf = arms.get("target_free_s4").unwrap_or(&empty);
+        let tg = arms.get("target_s4").unwrap_or(&empty);
+        let tf_meas: Vec<u64> = tf.values().filter(|r| r.0).map(|r| r.1).collect();
+        let tg_meas: Vec<u64> = tg.values().filter(|r| r.0).map(|r| r.1).collect();
+        let need = if basis == "gp" { 1 } else { 3 };
+        let tf_val = (tf_meas.len() >= need).then(|| median(&tf_meas)).flatten();
+        let tg_val = (tg_meas.len() >= 3).then(|| median(&tg_meas)).flatten();
+        let reading = match (tf_val, tg_val) {
+            (Some(a), Some(b)) => cmp(a, b).to_string(),
+            _ => "unmeasured".to_string(),
+        };
+        let bounded = match median(&tg_meas) {
+            Some(b) if !tf.is_empty() && tf.values().all(|r| r.1 >= b) => "not lower".to_string(),
+            Some(_) if tf.is_empty() => "—".to_string(),
+            Some(_) => "open".to_string(),
+            None => "—".to_string(),
+        };
+        let defs: Vec<u64> = tf.values().map(|r| r.2).collect();
+        println!(
+            "| ({n}, {ell}) | {basis} | [{}] | {} | {} | {} | {} | {} | {} | {reading} | {bounded} |",
+            tw.chars().map(|c| c.to_string()).collect::<Vec<_>>().join(","),
+            list(tf, &|r| r.1),
+            if defs.is_empty() { "—".into() } else { defs.iter().map(u64::to_string).collect::<Vec<_>>().join(", ") },
+            list(tg, &|r| r.1),
+            tg.values().map(|r| r.2.to_string()).collect::<Vec<_>>().join(", "),
+            tf_val.map_or("—".into(), |v| v.to_string()),
+            tg_val.map_or("—".into(), |v| v.to_string()),
+        );
+        by_cell
+            .entry((*n, *ell, tw.clone()))
+            .or_default()
+            .insert(basis.clone(), (reading, tf_val, defs));
+    }
+    println!();
+    let lower = |basis: &str| -> Vec<(u64, u64, String)> {
+        by_cell
+            .iter()
+            .filter(|(_, b)| b.get(basis).is_some_and(|x| x.0 == "lower"))
+            .map(|(k, _)| k.clone())
+            .collect()
+    };
+    let (gl, rl) = (lower("gp"), lower("random"));
+    let gp_read = by_cell
+        .values()
+        .filter(|b| b.get("gp").is_some_and(|x| x.0 != "unmeasured"))
+        .count();
+    let survives = gl.iter().filter(|c| !rl.contains(c)).count() >= 2;
+    let verdict = if survives {
+        "lead survives"
+    } else if gl.is_empty() && gp_read > 0 {
+        "killed"
+    } else {
+        "undecided"
+    };
+    println!("Registered verdict (primary): {verdict}. gp (cell, twists) reading lower: {gl:?}; random reading lower: {rl:?}; gp readings measured: {gp_read}.");
+    // Secondary: shape effect inside the target-free arm (gp value one below the random median).
+    let mut shape = Vec::new();
+    for ((n, ell, tw), b) in &by_cell {
+        if let (Some((_, Some(g), _)), Some((_, Some(r), _))) = (b.get("gp"), b.get("random")) {
+            shape.push(format!(
+                "({n},{ell})[{tw}]: gp {g} vs random {r} → {}",
+                if g < r { "shape lower" } else { cmp(*g, *r) }
+            ));
+        }
+    }
+    let shape_lower = shape.iter().filter(|s| s.ends_with("shape lower")).count();
+    println!(
+        "Secondary (shape inside target-free): {} — {}",
+        if shape_lower >= 2 {
+            "shape effect at ≥ 2 cells"
+        } else if shape.is_empty() {
+            "unmeasured"
+        } else {
+            "fewer than 2 cells"
+        },
+        if shape.is_empty() {
+            "no cell with both values".into()
+        } else {
+            shape.join("; ")
+        }
+    );
+    // Predictions.
+    let mut p1 = (0, 0);
+    let mut p2 = (0, 0, 0);
+    for b in by_cell.values() {
+        for (basis, (r, _, _)) in b {
+            let _ = basis;
+            if r != "unmeasured" {
+                p1.0 += 1;
+                p1.1 += (r == "higher") as usize;
+            }
+        }
+        if let (Some((_, _, g)), Some((_, _, r))) = (b.get("gp"), b.get("random")) {
+            if let (Some(gd), Some(rd)) = (g.first(), median(r)) {
+                p2.0 += 1;
+                p2.1 += (*gd > rd) as usize;
+                p2.2 += (*gd == rd) as usize;
+            }
+        }
+    }
+    println!(
+        "P1 (target-free reads higher than target at every measured (cell, basis, twists)): {} — {} of {} higher",
+        if p1.0 == 0 { "unmeasured" } else if p1.1 == p1.0 { "holds" } else { "fails" },
+        p1.1,
+        p1.0
+    );
+    println!(
+        "P2 (gp target-free top deficiency above the random median at every cell with both): {} — {} of {} above, {} equal",
+        if p2.0 == 0 { "unmeasured" } else if p2.1 == p2.0 { "holds" } else { "fails" },
+        p2.1,
+        p2.0,
+        p2.2
+    );
+    println!(
+        "P3 (secondary shape effect at ≥ 2 cells): {}",
+        if shape_lower >= 2 {
+            "holds"
+        } else if shape.is_empty() {
+            "unmeasured"
+        } else {
+            "fails"
+        }
+    );
+    let twisted: Vec<String> = by_cell
+        .iter()
+        .filter(|((_, _, tw), _)| tw == "0123")
+        .filter_map(|((n, ell, _), b)| {
+            let g = b.get("gp")?.2.first()?;
+            let plain = by_cell.get(&(*n, *ell, "0000".to_string()))?;
+            let r = median(&plain.get("random")?.2)?;
+            Some(format!(
+                "({n},{ell}): gp twisted deficiency {g} vs random plain median {r} → {}",
+                if *g <= r {
+                    "at or below random"
+                } else {
+                    "above random"
+                }
+            ))
+        })
+        .collect();
+    println!(
+        "P4 (twisting [0,1,2,3] brings the gp deficiency to the random level or below): {} — {}",
+        if twisted.is_empty() {
+            "unmeasured"
+        } else if twisted.iter().all(|t| t.ends_with("at or below random")) {
+            "holds"
+        } else {
+            "fails"
+        },
+        if twisted.is_empty() {
+            "no twisted gp record".into()
+        } else {
+            twisted.join("; ")
+        }
+    );
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     match args.first().map(String::as_str) {
@@ -1267,9 +1511,10 @@ fn main() {
         Some("specialise") => specialise(&args[1..]),
         Some("slope") => slope(&args[1..]),
         Some("target_free") => target_free(&args[1..]),
+        Some("s4_free") => s4_free(&args[1..]),
         _ => {
             eprintln!(
-                "usage: dreg_score score FILES… | compare REF RERUN | semireg M n:ℓ… | shape M n:ℓ:D… | closure FILES… | scale FILES… | specialise FILES… | slope FILES… | target_free FILES…"
+                "usage: dreg_score score FILES… | compare REF RERUN | semireg M n:ℓ… | shape M n:ℓ:D… | closure FILES… | scale FILES… | specialise FILES… | slope FILES… | target_free FILES… | s4_free FILES…"
             );
             std::process::exit(2);
         }
