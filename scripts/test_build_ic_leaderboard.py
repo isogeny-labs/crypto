@@ -72,5 +72,35 @@ class Leaders(unittest.TestCase):
         self.assertEqual(lead["koblitz_batch"]["slug"], "kb")
 
 
+YAML = """schema_version: 1
+curves:
+  rec_a:
+    icv1_identity:
+      slug: icv1-fp12-t19-d4a315df
+    factor_base_refs: []
+    factor_base_link_status: none
+  rec_b:
+    icv1_identity:
+      slug: null
+    factor_base_refs:
+    - fb/one.json
+    factor_base_link_status: linked
+""".splitlines()
+
+
+class CurveRecords(unittest.TestCase):
+    def test_digit_in_icv1_identity_key_is_read(self):
+        # `icv1_identity:` has a digit; its slug was never read when 4-space keys excluded digits.
+        recs, n = b.parse_curve_records(YAML)
+        self.assertEqual(n, 2)
+        self.assertEqual(list(recs), ["icv1-fp12-t19-d4a315df"])
+        self.assertEqual(recs["icv1-fp12-t19-d4a315df"]["key"], "rec_a")
+
+    def test_committed_records_resolve_a_slug(self):
+        recs, n = b.curve_records()
+        self.assertGreaterEqual(len(recs), 1)
+        self.assertLessEqual(len(recs), n)
+
+
 if __name__ == "__main__":
     unittest.main()
