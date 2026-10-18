@@ -521,6 +521,9 @@ struct MRow {
     bits: Vec<u64>,
     start: usize,
     end: usize,
+    /// Pivots whose non-zero words are few are stored as (word, value)
+    /// lists: the same row, XORed faster; the counted unit is unchanged.
+    sp: Option<(Vec<u32>, Vec<u64>)>,
 }
 impl MRow {
     fn lead(&mut self) -> Option<usize> {
@@ -541,6 +544,7 @@ impl MRow {
             bits: self.bits.clone(),
             start: self.start,
             end: self.end,
+            sp: self.sp.clone(),
         }
     }
 }
@@ -577,16 +581,24 @@ impl Columns {
             lo = 0;
             hi = 0;
         }
-        MRow { bits, start: lo, end: hi }
+        MRow { bits, start: lo, end: hi, sp: None }
     }
     fn unpack(&self, r: &MRow) -> KPoly {
         let mut out = Vec::new();
-        for w in r.start..r.end {
-            let mut b = r.bits[w];
+        let mut emit = |w: usize, mut b: u64| {
             while b != 0 {
                 let k = b.trailing_zeros() as usize;
                 b &= b - 1;
                 out.push(self.monos[w * 64 + k]);
+            }
+        };
+        if let Some((ix, vs)) = &r.sp {
+            for (i, v) in ix.iter().zip(vs) {
+                emit(*i as usize, *v);
+            }
+        } else {
+            for w in r.start..r.end {
+                emit(w, r.bits[w]);
             }
         }
         out
@@ -628,6 +640,19 @@ impl Elim {
                 while r.end > r.start && r.bits[r.end - 1] == 0 {
                     r.end -= 1;
                 }
+                let nzw = r.bits[r.start..r.end].iter().filter(|&&w| w != 0).count();
+                if nzw * 4 < r.end - r.start {
+                    let mut ix = Vec::with_capacity(nzw);
+                    let mut vs = Vec::with_capacity(nzw);
+                    for w in r.start..r.end {
+                        if r.bits[w] != 0 {
+                            ix.push(w as u32);
+                            vs.push(r.bits[w]);
+                        }
+                    }
+                    r.sp = Some((ix, vs));
+                    r.bits = Vec::new();
+                }
                 self.piv[lead] = self.rows.len() as u32;
                 self.rows.push(r);
                 self.leads.push(lead);
@@ -635,7 +660,11 @@ impl Elim {
             }
             let p = &self.rows[pi as usize];
             let (ps, pe) = (p.start, p.end);
-            {
+            if let Some((ix, vs)) = &p.sp {
+                for (i, v) in ix.iter().zip(vs.iter()) {
+                    r.bits[*i as usize] ^= *v;
+                }
+            } else {
                 let dst = &mut r.bits[ps..pe];
                 let src = &p.bits[ps..pe];
                 for (d, s) in dst.iter_mut().zip(src.iter()) {
@@ -2178,7 +2207,7 @@ fn selftest(a: &Args) {
     check("monomial-order", agree, "mkey vs grevlex_greater on 20000 pairs".into());
     // 2. small cells: every arm against exhaustive enumeration
     let caps = Caps { max_touch: 1 << 40, max_matrix_words: 1 << 27, wall_s: 120.0, train_clone_words: 1 << 25 };
-    let cells = [(7u32, 3usize, 3usize), (8, 3, 3), (6, 2, 4)];
+    let cells = [(7u32, 3usize, 3usize), (8, 3, 3), (7, 2, 4)];
     let ntrain: usize = a.num("--ntrain", 8);
     for &(n, l, m) in &cells {
         let cell = make_cell(n, l, m, 424242);
