@@ -52,20 +52,31 @@ gen)
     log "gen m$m-$n-$ell: exit $? ($(grep -vc '"satisfiable"' "$DRAWS/m$m-$n-$ell.jsonl") unsat)"
   done; sha256sum "$DRAWS"/*.jsonl > "$DRAWS/sha256.txt" ;;
 measure)
-  for c in $FRESH; do IFS=: read -r m n ell <<< "$c"
-    f=research/dreg_closure_m4l6_20261018/draws/m$m-$n-$ell.jsonl
-    for k in $(grep -v '"satisfiable"' "$REPO/$f" | grep -o '"draw":[0-9]*' | cut -d: -f2); do
-      one "fresh-m$m-$n-$ell" "$f" "$k" 4 43200; done; done ;;
+  # Budget order (PROTOCOL.md §8): the A cells first, two draws each, the two
+  # cells side by side (44 + 59 GB projected); then the remaining A draws the
+  # same way. B cells only through `FRESH` including them (not in the budget run).
+  TMO4=${TMO4:-14400}
+  pair() { # cell1 cell2 draw-index
+    local c1=$1 c2=$2 i=$3
+    for c in $c1 $c2; do IFS=: read -r m n ell <<< "$c"
+      f=research/dreg_closure_m4l6_20261018/draws/m$m-$n-$ell.jsonl
+      k=$(grep -v '"satisfiable"' "$REPO/$f" | grep -o '"draw":[0-9]*' | cut -d: -f2 | sed -n "$((i+1))p")
+      [ -n "$k" ] && one "fresh-m$m-$n-$ell" "$f" "$k" 4 "$TMO4" &
+    done; wait; }
+  set -- $FRESH
+  for i in 0 1 2 3; do pair "$1" "${2:-}" "$i"; done ;;
 control)
   for c in $FRESH; do IFS=: read -r m n ell <<< "$c"
     f=research/dreg_closure_m4l6_20261018/draws/m$m-$n-$ell.jsonl
     for k in $(grep '"satisfiable"' "$REPO/$f" | grep -o '"draw":[0-9]*' | cut -d: -f2 | head -1); do
       one "control-m$m-$n-$ell" "$f" "$k" 4 43200 --satisfiable; done; done ;;
 deg5)
+  # C1 first draw only unless DEG5_DRAWS says otherwise (budget run).
+  TMO5=${TMO5:-144000}; NDRAWS=${DEG5_DRAWS:-4}
   cells="19"; [ "${4:-}" = C2 ] && cells="19 21"
   for n in $cells; do
     if [ "$n" = 21 ] && [ "$LIMIT" -lt 420000000000 ]; then log "C2 (21,7): host limit $LIMIT < 420 GB, not attempted"; continue; fi
     f=$SCALE/m3-$n-7.jsonl
-    for k in $(grep -v '"satisfiable"' "$REPO/$f" | grep -o '"draw":[0-9]*' | cut -d: -f2); do
-      one "deg5-m3-$n-7" "$f" "$k" 5 144000; done; done ;;
+    for k in $(grep -v '"satisfiable"' "$REPO/$f" | grep -o '"draw":[0-9]*' | cut -d: -f2 | head -n "$NDRAWS"); do
+      one "deg5-m3-$n-7" "$f" "$k" 5 "$TMO5"; done; done ;;
 esac

@@ -6,6 +6,8 @@
 #   boot.sh closure|pkm|both     (env: BRANCH; PKM_SHARE=1|2 runs the two PKM targets one after the other or at once)
 set -u
 JOB=$1; BRANCH=${BRANCH:?BRANCH}
+T0=$(date +%s); CAPS=${POD_MAX_SECONDS:-36000}
+remaining() { echo $(( CAPS - ($(date +%s) - T0) )); }
 OUT=/workspace/out; mkdir -p "$OUT"; ln -sf /root/boot.log "$OUT/boot.log"
 status() { echo "$(date -u +%FT%TZ) $1" >> "$OUT/STATUS"; }
 status BOOT
@@ -27,11 +29,14 @@ run_closure() {
   cargo build --release --example dreg_ladder --example dreg_closure > "$OUT/build.log" 2>&1 || { status BUILD_FAILED; return 1; }
   L=target/release/examples/dreg_ladder; C=target/release/examples/dreg_closure
   S=research/dreg_closure_m4l6_20261018/run.sh
+  export FRESH="4:15:6 4:16:6" TMO4=14400 DEG5_DRAWS=1
   $S $L $C host; status GENERATING; $S $L $C gen; status GEN_DONE
   # The draws are committed before any closure measurement: wait for the tag.
   until git ls-remote --tags origin 2>/dev/null | grep -q 'refs/tags/draws-m4l6-20261018$'; do sleep 120; done
   status MEASURING
-  $S $L $C control; $S $L $C measure; $S $L $C deg5 C2; status CLOSURE_DONE
+  $S $L $C measure; status A_DONE
+  export TMO5=$(( $(remaining) - 2400 )); [ "$TMO5" -gt 600 ] && $S $L $C deg5
+  $S $L $C control; status CLOSURE_DONE
 }
 run_pkm() {
   cargo build --release --example pkm_tower_pilot --example pkm_tower_check > "$OUT/build-pkm.log" 2>&1 || { status BUILD_FAILED; return 1; }
@@ -71,14 +76,32 @@ PY
   done
   status VERIFY; $S verify; status PKM_DONE
 }
+run_pkm_msolve() {
+  apt-get install -y -qq msolve >> "$OUT/apt.log" 2>&1 || {
+    apt-get install -y -qq autoconf automake libtool libgmp-dev libmpfr-dev libflint-dev >> "$OUT/apt.log" 2>&1
+    (cd /workspace && git clone -q --depth 1 --branch v0.6.5 https://github.com/algebraic-solving/msolve && cd msolve \
+       && ./autogen.sh && ./configure && make -j"$(nproc)" && make install) > "$OUT/msolve-build.log" 2>&1; }
+  D=research/pkm_m3_n21_msolve_20261018; mkdir -p "$D/runs"
+  { echo "date: $(date -u +%FT%TZ)"; echo "commit: $(git rev-parse HEAD)"; echo "msolve: $(command -v msolve) $(msolve -h 2>&1 | head -2 | tr '\n' ' ')"
+    echo "msolve sha256: $(sha256sum "$(command -v msolve)" | cut -d' ' -f1)"; cat "$OUT/host-quick.txt"; lscpu; } > "$D/runs/host.txt"
+  LIM=$(cat /sys/fs/cgroup/memory.max 2>/dev/null || echo max); [ "$LIM" = max ] && LIM=$(( $(awk '/^MemTotal:/ {print $2}' /proc/meminfo) * 1024 ))
+  export CAP=$(( LIM * 85 / 100 ))
+  status "MSOLVE control m3_t5"; WALL=2700 "$D/run.sh" pkm_kummer_p2013265921_m3_t5_x1289903598
+  for s in pkm_kummer_p2013265921_m3_t7_x221026520 pkm_kummer_p2013265921_m3_t7_x704078485; do
+    export WALL=$(( ($(remaining) - 3600) / 2 )); [ "$WALL" -gt 600 ] || break
+    status "MSOLVE $s wall=$WALL"; "$D/run.sh" "$s"; done
+  export WALL=$(( $(remaining) - 3000 )); [ "$WALL" -gt 1800 ] && { status "MSOLVE m3_t8 wall=$WALL"; "$D/run.sh" pkm_kummer_p2013265921_m3_t8_x1227422598; }
+  status PKM_MSOLVE_DONE
+}
 case $JOB in
   closure) run_closure ;;
+  pkm-msolve) run_pkm_msolve ;;
   pkm) run_pkm ;;
   both) run_closure; run_pkm ;;
 esac
 status DONE
-# Keep serving results for a day, then end the container (the session that
-# launched the pod terminates it; no API key lives on the pod).
-sleep 86400
+# Keep serving results for 45 minutes, then end the container (budget); the
+# launching session also terminates the pod. No API key lives on the pod.
+sleep 2700
 echo "$(date -u +%FT%TZ) serving window over" >> "$OUT/STATUS"
 kill -TERM 1

@@ -119,3 +119,43 @@ A RunPod CPU pod (memory-optimised flavour, 32 vCPU, 256 GB) launched by
 limit. Isolation: a shared cloud host, level L0 by the repository's tiers;
 wall times are descriptive, the counted fields (`columns`, `closure_products`,
 `closure_word_ops`) are the measurement.
+
+## 8. Amendment before any run (2026-10-18, owner budget: 50 dollars total)
+
+Registered before any cell ran. The owner capped total spend at 50 dollars,
+which buys about 11.5 hours of the cheapest 256 GB host (cpu3m, 32 vCPU,
+3.52 dollars per hour) plus a small host for the PKM msolve cell (§9). The
+dense closure is single-threaded (`inherited_f4.rs` uses no rayon), so the
+32 vCPU buy only the memory. Measured closure times at 124k and 150k columns
+were 200–730 s (*recorded*, scale and driver studies); at the work exponent
+2.2–2.3 in columns (*recorded*, scale RESULTS.md Q6) the projections are:
+A1 ≈ 1 h and A2 ≈ 1.5 h per draw, B1 ≈ 4 h, B2 ≈ 5 h, C1 ≈ 7 h or more.
+
+Within that budget the run order is fixed as:
+
+1. `gen` for the A cells only (`FRESH="4:15:6 4:16:6"`), `--max-draws 4096`.
+2. `measure`: A1 and A2 side by side (103 GB projected), draws 0 and 1 first,
+   then draws 2 and 3; each process under `timeout 14400` (4 h).
+3. `deg5`: C1, draw 0 only, under `timeout` set to the host's remaining
+   lifetime minus 40 minutes; C2 is not attempted (257 GB host).
+4. The B cells are **not run** in this budget; they stay registered in §2 and
+   §4 for a later run with their own host record.
+5. The host ends itself 45 minutes after its last run so results can be
+   fetched, and in any case at its lifetime cap (11.5 h). A process the
+   lifetime cap ends is recorded as a host loss, not as evidence.
+
+The decision rule of §4 is unchanged; a cell read on fewer than four draws
+says so in its row. The predictions of §5 stand.
+
+## 9. PKM m = 3, N = 21 under the same budget
+
+The frozen f4_fp_tower protocol (`research/pkm_lead1_m3n21_20261016/PROTOCOL.md`)
+needs a 192 GB host for 14–60 h on 32 threads (*derived* there), beyond this
+budget. It is **not run** here. Instead the msolve instrument of
+`research/ic_next10_20261014/03-pkm-degree/` (positive control 16/16; stopped
+at `m = 3`, `N = 21` by its 45-minute wall inside the second degree-7 step at
+2.6 GB) is rerun on the committed `m3_t7` systems with a long wall, in
+`research/pkm_m3_n21_msolve_20261018/` under its own protocol note. Its
+reading follows item 3's rule: a productive degree-8 step is H0 (growth
+resumes) from a lower bound; a finished run gives `D`; a wall stop with no
+degree-8 step is inconclusive. It does not replace the f4_fp_tower cell.
