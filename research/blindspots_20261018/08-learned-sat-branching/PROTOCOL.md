@@ -240,7 +240,11 @@ to full for satisfiable targets, depending on where the first model lies;
 identity, structural and random orders differ by 2% on unsatisfiable trees; the
 first-variable rollout labels at a root span 0.06 bit (4%). Dynamic scoring
 costs about 450 `W` per decision. A smoke pipeline (`smoke/`) ran the whole
-chain at `n = 23` on 2 P + 2 R targets with seed 1.
+chain at `n = 23` on 2 P + 2 R targets with seed 1. A timing dry run of the same
+chain on seed 7 (6 sampling instances at `n = 23`: 59 s; a fit with 4 validation
+instances: 14 s; one 32-target primary cell at `n = 31`: 66 s; CMS 5.11.21 on one
+`l = 5` target: 12 to 30 s) set the card timeouts; its outputs are discarded and
+no seed 7 or seed 1 instance is in a card.
 
 ## Deviations from the frozen design
 
