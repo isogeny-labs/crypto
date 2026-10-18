@@ -2334,7 +2334,7 @@ points), and its `τ_T` comparison column divides all residuals by the folded ar
 although its loop runs until the unfolded control also solves — it overstates `τ_T`'s `y`, so
 E19 (the same `τ_T` construction, folded arm only, exact oracle) is the comparator below.
 
-**Stage A** (eight curves through `p = 197` so far; `p = 269` running):
+**Stage A** (all ten curves):
 
 | p | seed | base (density) | cols (pts/col) | `z(O) ∈ F_p` | residuals | y | decompositions per decomposed target | log | E19 residuals, same p and seed |
 |--:|--:|:--|:--|:--|--:|--:|:--|:--|--:|
@@ -2346,6 +2346,8 @@ E19 (the same `τ_T` construction, folded arm only, exact oracle) is the compara
 | 149 | 2 | 60 (0.40) | 15 (4.00) | no | 37,444 | 2,340.2 | 64 (×12), 24, 12, 4 | yes | 2,868 |
 | 197 | 1 | 76 (0.39) | 19 (4.00) | no | 81,149 | 4,057.4 | 64 (×16), 24 (×4) | yes | — |
 | 197 | 2 | 84 (0.43) | 21 (4.00) | no | 68,741 | 3,124.6 | 64 (×18), 24 (×4) | yes | — |
+| 269 | 1 | 132 (0.49) | 33 (4.00) | no | 59,115 | 1,738.7 | 64 (×27), 24 (×6), 4 | yes | — |
+| 269 | 2 | 148 (0.55) | 37 (4.00) | no | 44,751 | 1,177.7 | 64 (×31), 24 (×7) | yes | — |
 
 **Stage B:**
 
@@ -2369,7 +2371,7 @@ decomposition (probability `≈ cols²/n`); all 30 uniform targets solved.
 
 | id | result | verdict |
 |:--|:--|:--|
-| G2.22 | curves exist at every registered `p`; the pole is never in `F_p`; every fold checked on points as a translation (4 points per column); every log recovered; density `0.36`–`0.68`, pooled `0.45` | **holds** (density: `≈ 1/2` within the orbit-correlated spread, 4 points share one liftability) |
+| G2.22 | curves exist at every registered `p`; the pole is never in `F_p`; every fold checked on points as a translation (4 points per column); every log recovered; density `0.36`–`0.68`, pooled `0.46` | **holds** (density: `≈ 1/2` within the orbit-correlated spread, 4 points share one liftability) |
 | G2.23 | `C_w / C_V₄ ≈ 1.40·10⁹ / 1.7·10⁶ ≈ 820` | **falsified high** (band `[4, 30]`; §9.10 anticipated it) |
 | G2.24 | decompositions per decomposed target `64` (`24` and smaller on orbits with coincidences) — holds; `y_V₄ / y_E19` at matched `p`: `1.5`–`51`, median `≈ 13`; total targets `1.1`–`21×`, median `≈ 10×` | **half falsified** (`y` ratio band `[3, 10]`): the yield penalty is larger than the orbit factor alone, the lower base density (`≈ 0.45`, a fourth power in the decomposition count) adding the rest |
 | G2.25 | net on the relation phase: `≈ 820 / 10 ≈ 80×` cheaper per relation than E19, *derived from per-call and per-target measurements in separate harnesses* | a gain, **not yet measured end to end** — E24 below |

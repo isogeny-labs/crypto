@@ -1990,8 +1990,17 @@ fn e18(o: &mut String, rows: &[&Value]) {
 /// negation-folded walks; the handover re-derived from E19's own constants
 /// by §11.16's `p* = y·(cols/p)·C·√h / (S_rho·(1 − r))`, `n* = p*⁴/h`.
 fn e19(o: &mut String, rows: &[&Value]) {
+    pipeline_tables(o, rows, "E19", "the weighted D₄ solve");
+}
+
+/// E24 (§9.13): E19's tables on the `V₄` line.
+fn e24(o: &mut String, rows: &[&Value]) {
+    pipeline_tables(o, rows, "E24", "the V₄-invariant solve on the V₄ line");
+}
+
+fn pipeline_tables(o: &mut String, rows: &[&Value], id: &str, what: &str) {
     let rows = sorted(rows, &["bits", "seed"]);
-    o.push_str("### E19 — the k = 4 index calculus end to end with the weighted D₄ solve\n\n");
+    let _ = writeln!(o, "### {id} — the k = 4 index calculus end to end with {what}\n");
     o.push_str("| p | seed | log2 n | h | base | cols | targets | unsolved | reruns | decompositions (off base, check failures) | rows | y | core (φ) | C median | C mean | correct (log, walks) |\n");
     o.push_str("|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|--:|--:|:--|\n");
     for r in &rows {
@@ -2025,7 +2034,7 @@ fn e19(o: &mut String, rows: &[&Value]) {
                 .all(|w| bool_at(w, "correct"))),
         );
     }
-    o.push_str("\n#### E19 — where the multiplications go, and the distance to rho\n\n");
+    let _ = writeln!(o, "\n#### {id} — where the multiplications go, and the distance to rho\n");
     o.push_str("| p | seed | precompute | base | generation | Weil | solves | lift-back | checks | LA ×16 | solves share | other than solves | S total | rho (negation) | S / rho | registered 0.584·C/p, C = 1.3e9 | measured / registered | 0.584·C/p at this curve's mean C | measured / that |\n");
     o.push_str("|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|\n");
     let mut fit: Vec<(f64, f64)> = Vec::new();
@@ -2065,7 +2074,7 @@ fn e19(o: &mut String, rows: &[&Value]) {
         fmt_f(fit_exponent(&fit)),
         fit.len()
     );
-    o.push_str("#### E19 — unpriced native work at 0, 0.1 and 1 GAE (AGENTS.md §5a)\n\n");
+    let _ = writeln!(o, "#### {id} — unpriced native work at 0, 0.1 and 1 GAE (AGENTS.md §5a)\n");
     o.push_str("Native work: one operation per Macaulay-matrix entry (rows · cols of each call's last degree) for the index calculus, one per step for each walk; a GAE is one affine addition in E(F_{p⁴}) at the curve's measured F_p multiplications.\n\n");
     o.push_str("| p | seed | GAE (F_p mults) | S / rho at 0 | at 0.1 | at 1 | order holds |\n|--:|--:|--:|--:|--:|--:|:--|\n");
     for r in &rows {
@@ -2090,7 +2099,7 @@ fn e19(o: &mut String, rows: &[&Value]) {
     // §11.16's handover from E19's own constants: pooled over every curve
     // (the registered G2.13), and over the largest p only, where rho's
     // set-up is the smallest share of its cost.
-    o.push_str("\n#### E19 — the handover from E19's own constants\n\n| curves | y (pooled) | cols / p | C (mean of means) | h | S_rho (negation) | r = LA / rho | p* | log2 n* |\n|:--|--:|--:|--:|--:|--:|--:|--:|--:|\n");
+    let _ = write!(o, "\n#### {id} — the handover from {id}'s own constants\n\n| curves | y (pooled) | cols / p | C (mean of means) | h | S_rho (negation) | r = LA / rho | p* | log2 n* |\n|:--|--:|--:|--:|--:|--:|--:|--:|--:|\n");
     let pmax = rows.iter().map(|r| fl(r, "p")).fold(0.0, f64::max);
     let largest: Vec<&Value> = rows
         .iter()
@@ -2736,7 +2745,7 @@ fn main() {
     }
     let mut o = String::new();
     type Printer = fn(&mut String, &[&Value]);
-    let printers: [(&str, Printer); 20] = [
+    let printers: [(&str, Printer); 21] = [
         ("e1", e1),
         ("e2", e2),
         ("e3", e3),
@@ -2755,6 +2764,7 @@ fn main() {
         ("e18", e18),
         ("e19", e19),
         ("e20", e20),
+        ("e24", e24),
         ("e14", e14),
         ("e15", e15),
     ];
