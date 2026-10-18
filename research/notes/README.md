@@ -15,6 +15,7 @@ its old name still identify it.
 
 | note | subject |
 |:--|:--|
+| [`RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md`](ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md) | Proposed eight-workstream charter for an authorized audit of elliptic-curve private-key recovery: exact units, five-lane taxonomy, E0–E7 evidence, complete cost accounting, literature/incidents, cover-transfer closure, and independent governance. Planning artifact; no completion or attack claim |
 | [`RESEARCH_ECDLP_STATE_OF_THE_ART.md`](ecdlp-general/RESEARCH_ECDLP_STATE_OF_THE_ART.md) | The ECDLP: state of the art, 2025–2026 |
 | [`RESEARCH_TORSION_AUXILIARY_INPUTS.md`](ecdlp-general/RESEARCH_TORSION_AUXILIARY_INPUTS.md) | Auxiliary inputs (Cheon) and torsion points against rho and index calculus |
 | [`RESEARCH_SRS_CHEON_CENSUS.md`](ecdlp-general/RESEARCH_SRS_CHEON_CENSUS.md) | Cheon's attack on deployed powers-of-tau setups: EIP-4844, Sapling, Filecoin, Ignition, PPoT |
@@ -81,7 +82,7 @@ its old name still identify it.
 | [`PAPER_STRUCTURAL_COMPLETENESS.md`](cm-isogeny/PAPER_STRUCTURAL_COMPLETENESS.md) | Structural completeness of prime-field curves against isogeny-graph cryptanalysis |
 | [`RESEARCH_P256.md`](cm-isogeny/RESEARCH_P256.md) / [`RESEARCH_P256_ISOGENY_COVER.md`](cm-isogeny/RESEARCH_P256_ISOGENY_COVER.md) | P-256 structural findings and the `(N, N)`-split-Jacobian cover search (PDF reports alongside) |
 | [`RESEARCH_NIST_SOLINAS_STRUCTURE.md`](cm-isogeny/RESEARCH_NIST_SOLINAS_STRUCTURE.md) / [`_EXPERIMENTS.md`](cm-isogeny/RESEARCH_NIST_SOLINAS_EXPERIMENTS.md) | Cyclotomic structure in NIST Solinas primes |
-| [`RESEARCH_NIST_CYCLOTOMIC_POINT_HEIGHTS.md`](cm-isogeny/RESEARCH_NIST_CYCLOTOMIC_POINT_HEIGHTS.md) | P-192/224/256 at full size: algebraic factorisation of `p ± 1` (P-256's `p + 1` included), exact embedding degrees, Cheon cost from `n ∓ 1`, cyclotomic norms of `#E(F_{p^k})`, and heights of lifted points (no small points; `ĥ(G̃) ≈ log p`) |
+| [`RESEARCH_NIST_CYCLOTOMIC_POINT_HEIGHTS.md`](cm-isogeny/RESEARCH_NIST_CYCLOTOMIC_POINT_HEIGHTS.md) | P-192/224/256 at full size: algebraic factorisation of `p ± 1` (P-256's `p + 1` included), exact embedding degrees, Cheon cost from `n ∓ 1`, cyclotomic norms of `#E(F_{p^k})`, and heights of lifted points (none in the census box; `ĥ(G̃) ≈ log p`, typical of lifted random points); comparative claims re-tested with controls in [`nist_cyclotomic_controls_20261011`](../nist_cyclotomic_controls_20261011/REPORT.md) (P-256 `n − 1` not an outlier at the corrected level) |
 | [`RESEARCH_PKM_CRITERION.md`](cm-isogeny/RESEARCH_PKM_CRITERION.md) | PKM-resistance audit across standardised curves |
 | [`RESEARCH_EDS_RESIDUE.md`](cm-isogeny/RESEARCH_EDS_RESIDUE.md) | Elliptic divisibility sequences and elliptic nets |
 
