@@ -28,8 +28,20 @@ not a performance claim; no `S` on any leaderboard changes.
   is the interruption, signal 15/9, not a failure of the arm) and is kept
   as evidence of the materialisation wall. The spec's own description
   says "timed out"; this README is the correction: it was the allocation.
-- [`sessions/n31/`](sessions/n31/): the rerun without dimension 16, same
-  spec otherwise.
+- [`sessions/n31-m3-timeout/`](sessions/n31-m3-timeout/): the rerun
+  without dimension 16. Its `ic-m3-d10-f4` warm-up on the first target
+  **timed out at 2400 s** (watchdog, 34 MiB resident: no table, the
+  per-trial F4 decompositions are the cost), while the five other arms
+  completed their first two warm-up passes. The inherited-F4 `m = 3`
+  oracle has only ever completed at `n ≤ 23`
+  (`research/pdp_root_finder_ecbench_20261013`), so twelve more timeouts
+  would have said nothing; the session was stopped and the arm moved.
+- [`sessions/n31/`](sessions/n31/): the `n = 31` session with the `m = 2`
+  arms only ([`spec.json`](spec.json), rerun).
+- [`spec_n23.json`](spec_n23.json), [`sessions/n23/`](sessions/n23/): the
+  chained comparison at `n = 23` (`icv1-f2m23-t5197-69e76b73`), where the
+  `m = 3` one-link chain completes: `ic-m2-d{8,10,12}` against
+  `ic-m3-d{8,10}-f4`, with the rho reference and control, 1 800 s per run.
 
 ## Warm-up readings (both attempts agree to the digit; counts, not wall)
 
