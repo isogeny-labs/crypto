@@ -1130,6 +1130,13 @@ impl PlaneQuartic {
     /// `2 D_inf`: the reduction core of `add`. `z6` must generate the ideal of
     /// `Z` (e.g. a product of two degree-3 generating spaces).
     pub fn reduce_deg6(&self, z6: &Gen) -> PicClass {
+        self.reduce_deg6_aux(z6, 0)
+    }
+
+    /// [`reduce_deg6`](Self::reduce_deg6) using the `aux`-th (0, 1 or 2) echelon
+    /// cubic through `E7` as the auxiliary cubic (the result does not depend on
+    /// it; exposed so that the independence is tested).
+    pub fn reduce_deg6_aux(&self, z6: &Gen, aux: usize) -> PicClass {
         self.bump(|s| s.ops += 1);
         let (k, w) = self.complete(z6.clone(), 6);
         let u4 = self.forms_through(&w, k, 3);
@@ -1185,8 +1192,8 @@ impl PlaneQuartic {
             return PicClass::Exc(p);
         }
         assert_eq!(conics.len(), 0, "more than one conic through E7");
-        let c = v3q.rows[0].clone();
-        let others: Vec<Vec<u32>> = v3q.rows[1..].to_vec();
+        let c = v3q.rows[aux].clone();
+        let others: Vec<Vec<u32>> = (0..3).filter(|&i| i != aux).map(|i| v3q.rows[i].clone()).collect();
         let qp = self.colon(&c, 3, &others, 3, 2);
         assert_eq!(qp.len(), 1, "conic through R5");
         let q1 = qp[0].clone();
@@ -2453,6 +2460,13 @@ pub(crate) mod tests {
                 assert_eq!(c.neg_with(&a, vx), na, "{}: neg representative independence", name);
                 if matches!(a, PicClass::Exc(_)) || matches!(b, PicClass::Exc(_)) {
                     n_exc_ops += 1;
+                }
+                // auxiliary cubic independence (all three echelon cubics give the same class)
+                if !c.is_zero(&a) && !c.is_zero(&b) {
+                    let z6 = c.gen_mul(&c.gen_of_with(&a, 0), &c.gen_of_with(&b, 0));
+                    for aux in 1..3 {
+                        assert_eq!(c.reduce_deg6_aux(&z6, aux), ab, "{}: auxiliary cubic {} changes the class", name, aux);
+                    }
                 }
                 // second reduction path
                 match add_second_path(c, &a, &b) {
