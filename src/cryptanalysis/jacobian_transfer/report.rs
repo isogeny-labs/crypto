@@ -31,7 +31,7 @@ pub fn markdown_table(file: &TransferFile) -> String {
             .then_with(|| a.slug.cmp(&b.slug))
     });
     let mut s = String::new();
-    s.push_str("| curve | field | r bits | rho log2 | best conditionally carried route | genus | total log2 | exponent ratio | ratio log2 | class |\n");
+    s.push_str("| curve | field | r bits | rho log2 | best carried route | genus | total log2 | exponent ratio | ratio log2 | class |\n");
     s.push_str("|:--|:--|--:|--:|:--|--:|--:|--:|--:|:--|\n");
     for c in rows {
         let name = c

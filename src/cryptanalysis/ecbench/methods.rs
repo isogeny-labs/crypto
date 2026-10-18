@@ -43,6 +43,7 @@ use crate::cryptanalysis::ic_boundary::{
     BinaryInstance, Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses,
     PhaseCost, PointClasses, PrimeInstance, PrimePoint, QuarticClasses, RhoResult, RhoWalk,
 };
+use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
 use crate::cryptanalysis::ic_framework::fiber::{
     FiberDescentOracle, FiberFrobeniusMitmOracle, FiberMitmOracle,
 };
@@ -1166,7 +1167,7 @@ fn solve_inner(
     if let Instance::Wide(_) = inst {
         return Err("a wide instance goes through solve_wide".into());
     }
-    if let Instance::Fp4Translation(i) = inst {
+    if let Instance::Fp4(i) = inst {
         return solve_fp4(m, i, tx, ty, seed);
     }
     if m.id == "ic.k4_gaudry" {
@@ -1190,7 +1191,7 @@ fn solve_inner(
             super::cm_folded::solve(m, i, PrimePoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), "ic") => solve_ic_prime(m, i, curve, PrimePoint::affine(tx, ty), seed),
-        (Instance::Fp4(i), "ic") if m.id == "ic.pipeline" => {
+        (Instance::Fp4Torsion(i), "ic") if m.id == "ic.pipeline" => {
             let p = i.p();
             let target = Pt4 {
                 x: unpack_e4(p, tx),
@@ -1199,7 +1200,7 @@ fn solve_inner(
             };
             solve_ic_fp4(m, i, curve, target, seed)
         }
-        (Instance::Fp4(_), "ic") => Err(format!(
+        (Instance::Fp4Torsion(_), "ic") => Err(format!(
             "`{}` does not run on a curve over F_(p^4); ic.pipeline does",
             m.id
         )),
@@ -1304,7 +1305,7 @@ fn solve_inner(
             let g = BinaryGroup(&i.fast);
             solve_generic(m, &g, i.generator, FastPoint::affine(tx, ty), i.r, seed)
         }
-        (Instance::Fp4(i), _) => {
+        (Instance::Fp4Torsion(i), _) => {
             let p = i.p();
             let target = Pt4 {
                 x: unpack_e4(p, tx),
@@ -1322,7 +1323,7 @@ fn solve_inner(
             };
             solve_generic(m, &i.curve, i.generator, target, i.r, seed)
         }
-        (Instance::Wide(_), _) | (Instance::Fp4Translation(_), _) => unreachable!("returned above"),
+        (Instance::Wide(_), _) | (Instance::Fp4(_), _) => unreachable!("returned above"),
     }
 }
 
@@ -2120,12 +2121,14 @@ fn solve_ic_prime(
     let orbit = GlvOrbitBase { instance: inst };
     let kummer = PrimeKummerBase { instance: inst };
     let isogeny = PrimeIsogenyBase { instance: inst };
+    let cm_orbit = CmOrbitBase { instance: inst };
     let base: &dyn FactorBaseBuilder<_> = match fb_name.as_str() {
         "prime-abscissa" => &abscissa,
         "prime-projected-abscissa" => &projected,
         "glv-orbit" => &orbit,
         "prime-kummer" => &kummer,
         "prime-isogeny" => &isogeny,
+        "cm-scalar-orbit" => &cm_orbit,
         other => {
             return Err(format!(
                 "factor base `{other}` does not run on a prime curve"
@@ -2839,11 +2842,11 @@ pub fn dump_factor_base(
     if let Instance::Wide(_) = &inst {
         return Err("no factor-base plug-in runs on a wide (n > 62) curve yet".into());
     }
-    if let Instance::Fp4(_) | Instance::F2m4(_) = &inst {
-        return Err("factor-base dumps cover prime and binary curves".into());
-    }
-    if let Instance::Fp4Translation(_) = &inst {
+    if let Instance::Fp4(_) = &inst {
         return Err("no factor-base plug-in runs on E(F_p⁴); ic.k4_gaudry builds its own".into());
+    }
+    if let Instance::Fp4Torsion(_) | Instance::F2m4(_) = &inst {
+        return Err("factor-base dumps cover prime and binary curves".into());
     }
     match &inst {
         Instance::Prime(i) => {
@@ -2941,7 +2944,7 @@ pub fn dump_factor_base(
                 build_doubles: total.doubles,
             })
         }
-        Instance::Wide(_) | Instance::Fp4(_) | Instance::F2m4(_) | Instance::Fp4Translation(_) => {
+        Instance::Wide(_) | Instance::Fp4(_) | Instance::Fp4Torsion(_) | Instance::F2m4(_) => {
             unreachable!("returned above")
         }
     }

@@ -313,7 +313,7 @@ impl CurveSpec {
                         "fp4_torsion takes a prime p ≡ 1 (mod 4) from 5 to 1021, not {p}"
                     ));
                 }
-                find_d4_curve(p, seed, max_cofactor).map(|c| Instance::Fp4(Box::new(c)))
+                find_d4_curve(p, seed, max_cofactor).map(|c| Instance::Fp4Torsion(Box::new(c)))
             }
             CurveSpec::F2m4Torsion {
                 m,
@@ -328,7 +328,7 @@ impl CurveSpec {
                 find_bin_curve(m, seed, max_cofactor).map(|c| Instance::F2m4(Box::new(c)))
             }
             CurveSpec::Fp4Translation { p, seed } => {
-                Fp4Instance::build(p, seed).map(|i| Instance::Fp4Translation(Box::new(i)))
+                Fp4Instance::build(p, seed).map(|i| Instance::Fp4(Box::new(i)))
             }
         }
     }
@@ -366,9 +366,12 @@ impl CurveSpec {
             // Preserve the original Koblitz constructor: it carries the
             // certified Frobenius action and endomorphism identity that a
             // generic explicit binary instance intentionally does not claim.
-            Instance::Binary(_) | Instance::Wide(_) => None,
             // The search is the constructor (cheap and deterministic).
-            Instance::Fp4(_) | Instance::F2m4(_) | Instance::Fp4Translation(_) => None,
+            Instance::Binary(_)
+            | Instance::Wide(_)
+            | Instance::Fp4(_)
+            | Instance::Fp4Torsion(_)
+            | Instance::F2m4(_) => None,
         }
     }
 
@@ -425,7 +428,7 @@ impl CurveSpec {
 pub enum Instance {
     Prime(PrimeInstance),
     /// A curve over `F_{p⁴}` with rational 2-torsion (`fp4_torsion`).
-    Fp4(Box<D4Curve>),
+    Fp4Torsion(Box<D4Curve>),
     /// A curve over the tower `F_{(2^m)⁴}` (`f2m4_torsion`).
     F2m4(Box<BinCurve>),
     Binary(Box<BinaryInstance>),
@@ -433,7 +436,7 @@ pub enum Instance {
     Wide(Box<WideInstance>),
     /// A curve over `F_{p⁴}` (`ecbench::fp4`); a point is one 64-bit word
     /// per coordinate, four 16-bit limbs.
-    Fp4Translation(Box<Fp4Instance>),
+    Fp4(Box<Fp4Instance>),
 }
 
 /// A wide Koblitz curve and the strong reference's arithmetic on it, which
@@ -545,13 +548,13 @@ impl Instance {
             Instance::Binary(i) => u128::from(i.r),
             Instance::Wide(i) => i.kc.r,
             Instance::Fp4(i) => u128::from(i.r),
+            Instance::Fp4Torsion(i) => u128::from(i.r),
             Instance::F2m4(i) => u128::from(i.r),
-            Instance::Fp4Translation(i) => u128::from(i.r),
         }
     }
 
     pub fn facts(&self, spec: &CurveSpec) -> CurveFacts {
-        if let Instance::Fp4Translation(i) = self {
+        if let Instance::Fp4(i) = self {
             let (icv1, slug) = i.names();
             let g = Fp4Instance::encode(&i.g).unwrap_or_default();
             return CurveFacts {
@@ -600,7 +603,7 @@ impl Instance {
                 u128::from(i.generator.y),
                 if i.koblitz.is_some() { 2 * i.n } else { 2 },
             ),
-            Instance::Fp4Translation(_) => unreachable!("returned above"),
+            Instance::Fp4(_) => unreachable!("returned above"),
             Instance::Wide(i) => (
                 i.kc.curve_id(),
                 "koblitz",
@@ -613,7 +616,7 @@ impl Instance {
                 i.kc.generator.1,
                 2 * i.kc.n,
             ),
-            Instance::Fp4(i) => {
+            Instance::Fp4Torsion(i) => {
                 let f = &i.inst.curve.f;
                 let p = f.p;
                 let id = crate::cryptanalysis::curve_id::extension(
@@ -703,7 +706,7 @@ impl Instance {
         // A one-word instance's subgroup order fits a word, so a reduced
         // scalar does too.
         let k = u64::try_from(k % self.r()).ok()?;
-        if let Instance::Fp4Translation(i) = self {
+        if let Instance::Fp4(i) = self {
             return i.mul_generator_hex(k);
         }
         match self {
@@ -716,8 +719,7 @@ impl Instance {
                 let p = g.mul(&mut scratch, i.generator, k);
                 (!p.infinity).then(|| [format!("0x{:x}", p.x), format!("0x{:x}", p.y)])
             }
-            Instance::Wide(_) | Instance::Fp4Translation(_) => unreachable!("returned above"),
-            Instance::Fp4(i) => {
+            Instance::Fp4Torsion(i) => {
                 let c = &i.inst.curve;
                 let pt = CountedGroup::mul(c, &mut scratch, i.generator, k);
                 let p = c.f.p;
@@ -738,6 +740,7 @@ impl Instance {
                     ]
                 })
             }
+            Instance::Wide(_) | Instance::Fp4(_) => unreachable!("returned above"),
         }
     }
 }
@@ -757,7 +760,7 @@ impl Instance {
     ) -> Option<([String; 2], u64)> {
         let model = model_hash(curve);
         let mut scratch = GroupOps::default();
-        if let Instance::Fp4Translation(_) = self {
+        if let Instance::Fp4(_) = self {
             // Planted targets only on E(F_{p⁴}): no public-target law yet.
             return None;
         }
@@ -806,8 +809,8 @@ impl Instance {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
                 }
-                Instance::Wide(_) | Instance::Fp4Translation(_) => unreachable!("handled above"),
-                Instance::Fp4(i) => {
+                Instance::Wide(_) | Instance::Fp4(_) => unreachable!("handled above"),
+                Instance::Fp4Torsion(i) => {
                     let c = &i.inst.curve;
                     let p = c.f.p;
                     let x = unpack_e4(p, h % p.pow(4));
