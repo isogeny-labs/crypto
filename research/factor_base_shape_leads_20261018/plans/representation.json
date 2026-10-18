@@ -1,0 +1,86 @@
+{
+  "schema": "factor_base_sweep/v1",
+  "seed": 2026101802,
+  "train": 32,
+  "holdout": 64,
+  "max_degree": 8,
+  "candidate_seconds": 20,
+  "max_abscissae": 64,
+  "max_matrix_cells": 2000000,
+  "memory_mib": 2048,
+  "threads": 1,
+  "candidates": [
+    {
+      "label": "representation-a1-n7-d4-natural",
+      "curve": {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 7
+      },
+      "factor_base": "binary-subspace:dimension=4,basis=0x1;0x2;0x4;0x8",
+      "shape": null,
+      "dimension": 4,
+      "seed": 17
+    },
+    {
+      "label": "representation-a1-n7-d4-reversed",
+      "curve": {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 7
+      },
+      "factor_base": "binary-subspace:dimension=4,basis=0x8;0x4;0x2;0x1",
+      "shape": null,
+      "dimension": 4,
+      "seed": 17
+    },
+    {
+      "label": "representation-a1-n7-d4-triangular",
+      "curve": {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 7
+      },
+      "factor_base": "binary-subspace:dimension=4,basis=0x1;0x3;0x7;0xf",
+      "shape": null,
+      "dimension": 4,
+      "seed": 17
+    },
+    {
+      "label": "representation-a0-n13-d5-natural",
+      "curve": {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      },
+      "factor_base": "binary-subspace:dimension=5,basis=0x1;0x2;0x4;0x8;0x10",
+      "shape": null,
+      "dimension": 5,
+      "seed": 17
+    },
+    {
+      "label": "representation-a0-n13-d5-reversed",
+      "curve": {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      },
+      "factor_base": "binary-subspace:dimension=5,basis=0x10;0x8;0x4;0x2;0x1",
+      "shape": null,
+      "dimension": 5,
+      "seed": 17
+    },
+    {
+      "label": "representation-a0-n13-d5-triangular",
+      "curve": {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      },
+      "factor_base": "binary-subspace:dimension=5,basis=0x1;0x3;0x7;0xf;0x1f",
+      "shape": null,
+      "dimension": 5,
+      "seed": 17
+    }
+  ]
+}
