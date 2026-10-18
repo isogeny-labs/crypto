@@ -1,0 +1,207 @@
+{
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "closed-b32",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "mitm-fiber:fiber=closed,negation_folded=1,fiber_gen=coset"
+        }
+      }
+    },
+    {
+      "name": "closed-b64",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "oracle": "mitm-fiber:fiber=closed,negation_folded=1,fiber_gen=coset"
+        }
+      }
+    },
+    {
+      "name": "closed-b128",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=128",
+          "oracle": "mitm-fiber:fiber=closed,negation_folded=1,fiber_gen=coset"
+        }
+      }
+    },
+    {
+      "name": "closed-b256",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256",
+          "oracle": "mitm-fiber:fiber=closed,negation_folded=1,fiber_gen=coset"
+        }
+      }
+    },
+    {
+      "name": "subgroup-b16",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=16,subgroup=1",
+          "oracle": "mitm-fiber:fiber=blind,negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "subgroup-b32",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32,subgroup=1",
+          "oracle": "mitm-fiber:fiber=blind,negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "subgroup-b64",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64,subgroup=1",
+          "oracle": "mitm-fiber:fiber=blind,negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "subgroup-b128",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=128,subgroup=1",
+          "oracle": "mitm-fiber:fiber=blind,negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "subgroup-b256",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256,subgroup=1",
+          "oracle": "mitm-fiber:fiber=blind,negation_folded=1"
+        }
+      }
+    }
+  ],
+  "description": "research/isogeny_conductor_gap_round5_20261012/PROTOCOL.md E7a: the round-4 curves with #E = 4\u00b7r; rho, the coset fiber-closed MITM over the raw small-abscissa base at B = [32, 64, 128, 256], and the blind MITM over the cofactor-cleared base ([h]P, every point in E[r]) at B = [16, 32, 64, 128, 256].",
+  "label": "round 5 E7a: cofactor-cleared base against the fiber-closed table, cofactor 4",
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "alternate",
+    "rounds": 2,
+    "seed": 1,
+    "timeout_seconds": 900,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 164607,
+        "b": 94287,
+        "group_order": 195476,
+        "gx": 3192,
+        "gy": 128974,
+        "kind": "prime_explicit",
+        "p": 195809,
+        "r": 48869
+      },
+      {
+        "a": 132404,
+        "b": 49808,
+        "group_order": 232772,
+        "gx": 109158,
+        "gy": 192726,
+        "kind": "prime_explicit",
+        "p": 232567,
+        "r": 58193
+      },
+      {
+        "a": 2063683,
+        "b": 2379919,
+        "group_order": 2655892,
+        "gx": 215537,
+        "gy": 1617863,
+        "kind": "prime_explicit",
+        "p": 2654677,
+        "r": 663973
+      },
+      {
+        "a": 2007230,
+        "b": 645620,
+        "group_order": 2220884,
+        "gx": 731905,
+        "gy": 2126497,
+        "kind": "prime_explicit",
+        "p": 2218057,
+        "r": 555221
+      },
+      {
+        "a": 32209946,
+        "b": 16484923,
+        "group_order": 43269748,
+        "gx": 3027609,
+        "gy": 28636013,
+        "kind": "prime_explicit",
+        "p": 43270121,
+        "r": 10817437
+      },
+      {
+        "a": 46806758,
+        "b": 44139131,
+        "group_order": 58404308,
+        "gx": 10536805,
+        "gy": 9945924,
+        "kind": "prime_explicit",
+        "p": 58396643,
+        "r": 14601077
+      },
+      {
+        "a": 88213311,
+        "b": 477410590,
+        "group_order": 742452772,
+        "gx": 78080583,
+        "gy": 133722341,
+        "kind": "prime_explicit",
+        "p": 742423369,
+        "r": 185613193
+      },
+      {
+        "a": 200232922,
+        "b": 71738869,
+        "group_order": 680874748,
+        "gx": 91433622,
+        "gy": 476914977,
+        "kind": "prime_explicit",
+        "p": 680883517,
+        "r": 170218687
+      }
+    ],
+    "target_seed": 20261018,
+    "targets_per_curve": 3
+  }
+}
