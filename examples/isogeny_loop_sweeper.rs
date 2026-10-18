@@ -51,6 +51,7 @@ struct Args {
     top: usize,
     max_disc_bits: u64,
     fb_factor: f64,
+    markowitz: usize,
     seed: u64,
     node_cap: u64,
     certify: bool,
@@ -73,6 +74,7 @@ fn parse_args() -> Args {
         top: 6,
         max_disc_bits: 140,
         fb_factor: 1.0,
+        markowitz: 20_000,
         seed: 0x5eed_c1a5_5600_0001,
         node_cap: 2_000_000_000,
         certify: false,
@@ -94,6 +96,7 @@ fn parse_args() -> Args {
             "--top" => a.top = val().parse().unwrap(),
             "--max-disc-bits" => a.max_disc_bits = val().parse().unwrap(),
             "--fb-factor" => a.fb_factor = val().parse().unwrap(),
+            "--markowitz" => a.markowitz = val().parse().unwrap(),
             "--seed" => a.seed = val().parse().unwrap(),
             "--node-cap" => a.node_cap = val().parse().unwrap(),
             "--certify-minimum" => a.certify = true,
@@ -242,6 +245,7 @@ fn analyse(rec: &Value, args: &Args, md: &mut Vec<String>) -> Value {
     }
     let params = SubexpParams {
         fb_factor: args.fb_factor,
+        markowitz_limit: args.markowitz,
         min_fb_bound: args.prime_bound,
         seed: args.seed,
         verbose: args.verbose,
@@ -480,6 +484,7 @@ fn main() {
             let dk = BigInt::from_str(d).expect("discriminant");
             let params = SubexpParams {
                 fb_factor: args.fb_factor,
+                markowitz_limit: args.markowitz,
                 min_fb_bound: args.prime_bound,
                 seed: args.seed,
                 verbose: args.verbose,

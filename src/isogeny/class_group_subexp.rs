@@ -899,6 +899,275 @@ impl Hnf {
     }
 }
 
+// ── modular determinant and modular HNF ──
+
+fn is_prime_u32(n: u64) -> bool {
+    if n < 2 {
+        return false;
+    }
+    for p in [2u64, 3, 5, 7, 11, 13] {
+        if n % p == 0 {
+            return n == p;
+        }
+    }
+    let mut d = n - 1;
+    let mut s = 0;
+    while d % 2 == 0 {
+        d /= 2;
+        s += 1;
+    }
+    // deterministic for n < 4_759_123_141
+    'outer: for a in [2u64, 7, 61] {
+        if a % n == 0 {
+            continue;
+        }
+        let mut x = powmod(a, d, n);
+        if x == 1 || x == n - 1 {
+            continue;
+        }
+        for _ in 1..s {
+            x = mulmod(x, x, n);
+            if x == n - 1 {
+                continue 'outer;
+            }
+        }
+        return false;
+    }
+    true
+}
+
+/// Primes just below `2^31`, descending.
+fn crt_primes(count: usize) -> Vec<u64> {
+    let mut out = Vec::with_capacity(count);
+    let mut c = (1u64 << 31) - 1;
+    while out.len() < count {
+        if is_prime_u32(c) {
+            out.push(c);
+        }
+        c -= 2;
+    }
+    out
+}
+
+fn residue(x: i64, p: u64) -> u64 {
+    x.rem_euclid(p as i64) as u64
+}
+
+/// Indices of `n` rows that are linearly independent modulo `p` (greedy, in
+/// order), or `None` when the rows have rank `< n` modulo `p`.
+fn select_independent_rows(rows: &[Vec<(usize, i64)>], n: usize, p: u64) -> Option<Vec<usize>> {
+    if n == 0 {
+        return Some(Vec::new());
+    }
+    let mut piv: Vec<Option<Vec<u64>>> = vec![None; n]; // pivot row normalised to 1 at its column
+    let mut chosen = Vec::new();
+    for (ri, r) in rows.iter().enumerate() {
+        let mut v = vec![0u64; n];
+        for &(c, x) in r {
+            v[c] = residue(x, p);
+        }
+        for c in 0..n {
+            if v[c] == 0 {
+                continue;
+            }
+            match &piv[c] {
+                Some(pr) => {
+                    let f = v[c];
+                    for k in c..n {
+                        if pr[k] != 0 {
+                            v[k] = (v[k] + p - mulmod(f, pr[k], p)) % p;
+                        }
+                    }
+                }
+                None => {
+                    let inv = powmod(v[c], p - 2, p);
+                    for x in v.iter_mut().skip(c) {
+                        *x = mulmod(*x, inv, p);
+                    }
+                    piv[c] = Some(v);
+                    chosen.push(ri);
+                    break;
+                }
+            }
+        }
+        if chosen.len() == n {
+            return Some(chosen);
+        }
+    }
+    None
+}
+
+fn det_mod_p(mat: &[Vec<u64>], p: u64) -> u64 {
+    let n = mat.len();
+    let mut a: Vec<Vec<u64>> = mat.iter().map(|r| r.iter().map(|x| x % p).collect()).collect();
+    let mut det = 1u64;
+    for c in 0..n {
+        let Some(pr) = (c..n).find(|&r| a[r][c] != 0) else {
+            return 0;
+        };
+        if pr != c {
+            a.swap(pr, c);
+            det = (p - det) % p;
+        }
+        det = mulmod(det, a[c][c], p);
+        let inv = powmod(a[c][c], p - 2, p);
+        let (top, bottom) = a.split_at_mut(c + 1);
+        let prow = &top[c];
+        for row in bottom.iter_mut() {
+            if row[c] == 0 {
+                continue;
+            }
+            let f = mulmod(row[c], inv, p);
+            for k in c..n {
+                if prow[k] != 0 {
+                    row[k] = (row[k] + p - mulmod(f, prow[k], p)) % p;
+                }
+            }
+        }
+    }
+    det
+}
+
+/// `|det|` of the square matrix formed by `rows[idx]`, by CRT over 31-bit
+/// primes up to twice the Hadamard bound.
+fn exact_abs_det(rows: &[Vec<(usize, i64)>], idx: &[usize], n: usize) -> BigInt {
+    let mut log2_bound = 1.0f64;
+    for &i in idx {
+        let s: f64 = rows[i].iter().map(|&(_, x)| (x as f64) * (x as f64)).sum();
+        log2_bound += 0.5 * s.max(1.0).log2();
+    }
+    let count = (log2_bound / 30.0).ceil() as usize + 2;
+    let primes = crt_primes(count);
+    let residues: Vec<u64> = primes
+        .par_iter()
+        .map(|&p| {
+            let mat: Vec<Vec<u64>> = idx
+                .iter()
+                .map(|&i| {
+                    let mut v = vec![0u64; n];
+                    for &(c, x) in &rows[i] {
+                        v[c] = residue(x, p);
+                    }
+                    v
+                })
+                .collect();
+            det_mod_p(&mat, p)
+        })
+        .collect();
+    // CRT
+    let mut acc = BigInt::zero();
+    let mut modulus = BigInt::one();
+    for (&p, &r) in primes.iter().zip(&residues) {
+        let pb = BigInt::from(p);
+        let m_mod_p = mod_u64(&modulus, p);
+        let a_mod_p = mod_u64(&acc, p);
+        let diff = (r + p - a_mod_p) % p;
+        let t = mulmod(diff, powmod(m_mod_p, p - 2, p), p);
+        acc += &modulus * t;
+        modulus *= pb;
+    }
+    let half = &modulus / 2;
+    if acc > half {
+        acc -= &modulus;
+    }
+    acc.abs()
+}
+
+/// Hermite basis (row `i` has its pivot at column `i`, zeros before it,
+/// entries after it reduced modulo the later pivots) of the lattice spanned
+/// by `gens` **plus** `D·Z^n`, where `D` must be a multiple of the
+/// determinant of the lattice spanned by `gens` (which has full rank).
+/// Arithmetic is modulo a shrinking `R` (Domich–Kannan–Trotter; Cohen,
+/// GTM 138, Algorithm 2.4.8): if `L ⊇ R·Z^n` and `det L | R` and the
+/// projection of `L` to the current column is `dZ`, then
+/// `L = Z w ⊕ L'` with `det L' | R/d`, so `L' ⊇ (R/d)·Z^{n−i−1}`.
+fn hnf_modular(mut gens: Vec<Vec<BigInt>>, n: usize, d_mod: &BigInt) -> Vec<Vec<BigInt>> {
+    let mut r = d_mod.clone();
+    let mut w_rows: Vec<Vec<BigInt>> = Vec::with_capacity(n);
+    for g in gens.iter_mut() {
+        for x in g.iter_mut() {
+            *x = x.mod_floor(&r);
+        }
+    }
+    for i in 0..n {
+        let mut acc: Option<Vec<BigInt>> = None;
+        for g in gens.iter_mut() {
+            if g[i].is_zero() {
+                continue;
+            }
+            match acc.as_mut() {
+                None => {
+                    acc = Some(std::mem::replace(g, vec![BigInt::zero(); n]));
+                }
+                Some(a) => {
+                    let (gg, x, y) = ext_gcd(&a[i], &g[i]);
+                    let ai = &a[i] / &gg;
+                    let gi = &g[i] / &gg;
+                    for k in i..n {
+                        let na = (&x * &a[k] + &y * &g[k]).mod_floor(&r);
+                        let ng = (&ai * &g[k] - &gi * &a[k]).mod_floor(&r);
+                        a[k] = na;
+                        g[k] = ng;
+                    }
+                }
+            }
+        }
+        gens.retain(|g| g.iter().any(|x| !x.is_zero()));
+        let (d, w) = match acc {
+            None => {
+                let mut w = vec![BigInt::zero(); n];
+                w[i] = r.clone();
+                (r.clone(), w)
+            }
+            Some(a) => {
+                let (d, u, _) = ext_gcd(&a[i], &r);
+                let mut w: Vec<BigInt> = a.iter().map(|x| (&u * x).mod_floor(&r)).collect();
+                w[i] = d.clone();
+                // a - (a_i/d) w has zero in column i and lies in the lattice
+                let q = &a[i] / &d;
+                let extra: Vec<BigInt> = a
+                    .iter()
+                    .zip(&w)
+                    .map(|(x, y)| (x - &q * y).mod_floor(&r))
+                    .collect();
+                if extra.iter().any(|x| !x.is_zero()) {
+                    gens.push(extra);
+                }
+                (d, w)
+            }
+        };
+        w_rows.push(w);
+        r = &r / &d;
+        if r.is_one() {
+            // the rest of the lattice is Z^{n-i-1}
+            for j in i + 1..n {
+                let mut e = vec![BigInt::zero(); n];
+                e[j] = BigInt::one();
+                w_rows.push(e);
+            }
+            break;
+        }
+        for g in gens.iter_mut() {
+            for x in g.iter_mut().skip(i + 1) {
+                *x = x.mod_floor(&r);
+            }
+        }
+    }
+    // exact size reduction (unimodular, lattice unchanged)
+    for i in (0..n).rev() {
+        for j in i + 1..n {
+            let q = w_rows[i][j].div_floor(&w_rows[j][j]);
+            if !q.is_zero() {
+                let wj = w_rows[j].clone();
+                for k in j..n {
+                    w_rows[i][k] -= &q * &wj[k];
+                }
+            }
+        }
+    }
+    w_rows
+}
+
 /// Smith normal form of a square nonsingular integer matrix `a` (rows are
 /// lattice generators).  Returns the diagonal `s_1 | s_2 | …` and the column
 /// transform `V` (reduced modulo `modulus`) with `U a V = diag(s)`.
@@ -1103,38 +1372,81 @@ fn structure_core(
         }
         v
     };
-    // Insert dense rows until full rank plus a margin; the remaining rows are
-    // then *checked* against the resulting discrete logs and only the rows
-    // that are not already in the lattice are inserted (repeat until every
-    // row maps to zero).  The final lattice therefore contains every row.
-    let mut hnf = Hnf::new(nd);
-    let mut inserted = vec![false; dense.len()];
-    let mut next = 0usize;
-    let margin = 24usize;
-    let mut after_full = 0usize;
-    while next < dense.len() && after_full < margin {
-        hnf.insert(to_vec(&dense[next]));
-        inserted[next] = true;
-        next += 1;
-        if hnf.full_rank() {
-            after_full += 1;
-        }
-    }
-    let t_hnf = t_h.elapsed().as_secs_f64();
-    if !hnf.full_rank() {
+    // Choose `nd` rows independent modulo a 31-bit prime (two primes, so a
+    // prime dividing the determinant cannot fake rank deficiency), take the
+    // exact |det| D of that square block by CRT, and compute the HNF of the
+    // generators modulo D (valid: D·Z^nd lies in the lattice of the block).
+    // The remaining rows are then *checked* against the discrete logs and
+    // only rows outside the lattice are added (with the previous h* as the
+    // modulus, which the enlarged lattice's determinant divides).
+    let primes = crt_primes(2);
+    let sel = select_independent_rows(&dense, nd, primes[0])
+        .or_else(|| select_independent_rows(&dense, nd, primes[1]))?;
+    let mut d_mod = exact_abs_det(&dense, &sel, nd);
+    if d_mod.is_zero() {
         return None;
     }
+    let mut inserted = vec![false; dense.len()];
+    let mut gens: Vec<Vec<BigInt>> = Vec::new();
+    for &i in &sel {
+        inserted[i] = true;
+        gens.push(to_vec(&dense[i]));
+    }
+    // Further independent blocks from shuffled row orders: the lattice of all
+    // their rows has a determinant dividing every block determinant, so the
+    // gcd is a valid (and usually much smaller) modulus.
+    let mut rng = SmallRng::seed_from_u64(0xb10c ^ dense.len() as u64);
+    for _ in 0..3 {
+        if d_mod.bits() <= 2 * (nd as u64 + 64) / 4 {
+            break;
+        }
+        let mut order: Vec<usize> = (0..dense.len()).collect();
+        for k in (1..order.len()).rev() {
+            order.swap(k, rng.gen_range(0..=k));
+        }
+        let shuffled: Vec<Vec<(usize, i64)>> = order.iter().map(|&i| dense[i].clone()).collect();
+        let Some(sel2) = select_independent_rows(&shuffled, nd, primes[0]) else {
+            break;
+        };
+        let d2 = exact_abs_det(&shuffled, &sel2, nd);
+        let g = d_mod.gcd(&d2);
+        if g < d_mod {
+            d_mod = g;
+            for &j in &sel2 {
+                let i = order[j];
+                if !inserted[i] {
+                    inserted[i] = true;
+                    gens.push(to_vec(&dense[i]));
+                }
+            }
+        }
+    }
+    let mut extra_added = 0usize;
+    for i in 0..dense.len() {
+        if extra_added >= 24 {
+            break;
+        }
+        if !inserted[i] {
+            inserted[i] = true;
+            gens.push(to_vec(&dense[i]));
+            extra_added += 1;
+        }
+    }
+    let mut modulus = d_mod.clone();
+    let mut basis = hnf_modular(gens, nd, &modulus);
+    let t_hnf = t_h.elapsed().as_secs_f64();
     let (h, s, v) = loop {
-        hnf.finish();
-        let h = hnf.det().unwrap();
-        let mat: Vec<Vec<BigInt>> = hnf.rows.iter().map(|r| r.clone().unwrap()).collect();
+        let mut h = BigInt::one();
+        for (i, row) in basis.iter().enumerate() {
+            h *= &row[i];
+        }
         let t_s = Instant::now();
         let (s, v) = if nd > 0 {
-            smith_with_v(mat, &h)
+            smith_with_v(basis.clone(), &h)
         } else {
             (Vec::new(), Vec::new())
         };
-        // check the rows not yet inserted
+        // check the rows not yet used
         let mut failing = Vec::new();
         for (i, r) in dense.iter().enumerate() {
             if inserted[i] {
@@ -1155,15 +1467,28 @@ fn structure_core(
             }
         }
         if std::env::var_os("CG_TIMING").is_some() {
-            eprintln!("    [linalg] elim {:.2}s hnf {:.2}s snf+check {:.2}s nd {} rows {} failing {}", t_el, t_hnf, t_s.elapsed().as_secs_f64(), nd, dense.len(), failing.len());
+            eprintln!(
+                "    [linalg] elim {:.2}s hnf {:.2}s snf+check {:.2}s nd {} rows {} |det block| {} bits, h* {} bits, failing {}",
+                t_el,
+                t_hnf,
+                t_s.elapsed().as_secs_f64(),
+                nd,
+                dense.len(),
+                d_mod.bits(),
+                h.bits(),
+                failing.len()
+            );
         }
         if failing.is_empty() {
             break (h, s, v);
         }
+        modulus = h.clone();
+        let mut gens = basis.clone();
         for i in failing {
-            hnf.insert(to_vec(&dense[i]));
             inserted[i] = true;
+            gens.push(to_vec(&dense[i]));
         }
+        basis = hnf_modular(gens, nd, &modulus);
     };
     // invariant positions (s > 1), ascending in s; output descending
     let inv_pos: Vec<usize> = (0..nd).filter(|&k| s[k] > BigInt::one()).rev().collect();
