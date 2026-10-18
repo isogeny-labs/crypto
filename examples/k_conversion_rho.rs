@@ -57,8 +57,8 @@ fn main() {
             let rho = StrongRho::new(&kc);
             let g = rho.generator();
             let secret = 0x0123_4567_89ab_cdefu64 % rho.modulus();
-            let q = rho.scalar_mul(g, secret ^ seed.wrapping_mul(0x9e37_79b9) % rho.modulus());
-            let want = secret ^ seed.wrapping_mul(0x9e37_79b9) % rho.modulus();
+            let q = rho.scalar_mul(g, secret ^ (seed.wrapping_mul(0x9e37_79b9) % rho.modulus()));
+            let want = secret ^ (seed.wrapping_mul(0x9e37_79b9) % rho.modulus());
             let params = StrongRhoParams::default();
             let mut charges = StrongRhoCharges::default();
             let jumps = rho.jumps(seed, &mut charges);
