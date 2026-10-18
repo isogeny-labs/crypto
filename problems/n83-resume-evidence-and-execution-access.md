@@ -44,8 +44,10 @@ are unavailable on the current executor.
   prerequisite for a new experiment with its own verified worker.
 - [ ] Restore the retained supervisor's one-CPU, 4-GiB, zero-swap,
   networkless execution environment and verify it live.
-- [ ] Recheck authorized S3 access with HEAD/GET and exact hashes before
-  claiming fresh S3 provenance; reconcile the campaign capacity ledger.
+- [x] Verify authorized storage access: the user-selected
+  `setec-astronomy-artifacts` destination passed conditional PUT and fresh
+  HEAD/GET checks for the exact K2048 archive and compact receipt bundle.
+- [ ] Reconcile the campaign capacity ledger before further search work.
 
 These gates permit audited continuation. They do not establish a winner;
 natural rank, column logs, target recovery, matched references and full
@@ -69,3 +71,11 @@ launching the dependent search. Recheck when executor capabilities change.
 retained receipts were subsequently published upstream and passed hash/source/
 query replay. Full original-binary audit, execution access and full-runtime
 selection remain unresolved.
+
+2026-10-18 publication update: [verified new-bucket custody](../research/koblitz_n83_factor_base_sweep_20261008/verification/setec-publication-20261018/RESULT.md)
+resolves S3 storage access for the user-selected destination. The earlier
+403 on the old bucket remains historical. Conductor now returns a clear
+scope check. Docker's client is available, but its explicitly selected
+managed daemon is unreachable and no dockerd process was observed. UID 1000
+cannot start the managed daemon under the runtime guidance; environment
+recovery remains necessary for the retained container protocol.

@@ -1,5 +1,13 @@
 # Degree-83 factor-base sweep: observed evidence
 
+The [user-selected S3 publication](verification/setec-publication-20261018/RESULT.md)
+uploaded the exact reconstructed primary K2048 archive and compact public
+receipts to `setec-astronomy-artifacts` in `us-east-2`. Fresh downloads matched
+SHA-256, archive BLAKE3, lengths and ETags; encryption and overwrite protection
+were verified. Storage access for this destination is resolved. The Docker
+client is now present, but its managed daemon is unreachable, so no new
+guarded solver trial ran.
+
 The [cloud resume input recovery](verification/cloud-input-reconstruction-20261018/RESULT.md)
 reconstructed the primary K2048 archive byte-for-byte and passed generic
 replay of all 339,968 points plus rejection of a forged orbit coefficient
