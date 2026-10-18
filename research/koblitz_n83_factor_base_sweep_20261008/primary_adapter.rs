@@ -963,16 +963,59 @@ impl ProgressSampler {
     }
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum OrbitChoicePins {
+    None,
+    SelectorAndPhase,
+    SelectorOnly,
+    PhaseOnly,
+}
+
+impl OrbitChoicePins {
+    fn selector(self) -> bool {
+        matches!(self, Self::SelectorAndPhase | Self::SelectorOnly)
+    }
+
+    fn phase(self) -> bool {
+        matches!(self, Self::SelectorAndPhase | Self::PhaseOnly)
+    }
+
+    fn schema(self) -> &'static str {
+        match self {
+            Self::SelectorAndPhase => "n83.k16627-m4-selector-positive/v1",
+            Self::SelectorOnly => "n83.k16627-m4-selector-only/v1",
+            Self::PhaseOnly => "n83.k16627-m4-phase-only/v1",
+            Self::None => "n83.k16627-m4-search-progress/v1",
+        }
+    }
+
+    fn phase_schema(self) -> &'static str {
+        match self {
+            Self::SelectorAndPhase => "n83.k16627-m4-selector-positive-phase/v1",
+            Self::SelectorOnly => "n83.k16627-m4-selector-only-phase/v1",
+            Self::PhaseOnly => "n83.k16627-m4-phase-only-phase/v1",
+            Self::None => "n83.k16627-m4-search-progress-phase/v1",
+        }
+    }
+}
+
 /// Phase-observable complete x-chain witness on the exact retained primary
 /// object. The seven blocks are fixed only after the full orbit domain is
 /// installed, and a SAT answer is checked against the original group law.
 pub(super) fn chain_witness_cli(root: &Path, memory_mib: u64, output: &Path) -> Result<Value> {
-    chain_witness_impl(root, memory_mib, output, false, false, false)
+    chain_witness_impl(
+        root,
+        memory_mib,
+        output,
+        false,
+        false,
+        OrbitChoicePins::None,
+    )
 }
 
 /// The same complete witness, with a separate durable root-propagation gate.
 pub(super) fn chain_root_phase_cli(root: &Path, memory_mib: u64, output: &Path) -> Result<Value> {
-    chain_witness_impl(root, memory_mib, output, true, false, false)
+    chain_witness_impl(root, memory_mib, output, true, false, OrbitChoicePins::None)
 }
 
 /// The exact root-phase workload with separately fsynced search-progress
@@ -982,7 +1025,7 @@ pub(super) fn chain_search_progress_cli(
     memory_mib: u64,
     output: &Path,
 ) -> Result<Value> {
-    chain_witness_impl(root, memory_mib, output, true, true, false)
+    chain_witness_impl(root, memory_mib, output, true, true, OrbitChoicePins::None)
 }
 
 /// The full m=4 orbit model with exact planted representative selectors and
@@ -993,7 +1036,44 @@ pub(super) fn chain_selector_positive_cli(
     memory_mib: u64,
     output: &Path,
 ) -> Result<Value> {
-    chain_witness_impl(root, memory_mib, output, true, true, true)
+    chain_witness_impl(
+        root,
+        memory_mib,
+        output,
+        true,
+        true,
+        OrbitChoicePins::SelectorAndPhase,
+    )
+}
+
+/// The same exact witness with representative selectors fixed but all
+/// Frobenius phase wires free.
+pub(super) fn chain_selector_only_cli(
+    root: &Path,
+    memory_mib: u64,
+    output: &Path,
+) -> Result<Value> {
+    chain_witness_impl(
+        root,
+        memory_mib,
+        output,
+        true,
+        true,
+        OrbitChoicePins::SelectorOnly,
+    )
+}
+
+/// The same exact witness with phase-zero units fixed but representative
+/// selector wires free. Run only under the preregistered conditional arm.
+pub(super) fn chain_phase_only_cli(root: &Path, memory_mib: u64, output: &Path) -> Result<Value> {
+    chain_witness_impl(
+        root,
+        memory_mib,
+        output,
+        true,
+        true,
+        OrbitChoicePins::PhaseOnly,
+    )
 }
 
 fn chain_witness_impl(
@@ -1002,7 +1082,7 @@ fn chain_witness_impl(
     output: &Path,
     checkpoint_root: bool,
     sample_progress: bool,
-    pin_orbit_choices: bool,
+    pins: OrbitChoicePins,
 ) -> Result<Value> {
     if memory_mib != 4096 {
         return Err("complete-witness control requires the frozen 4096 MiB cap".into());
@@ -1010,8 +1090,8 @@ fn chain_witness_impl(
     let memory_limit_bytes = checked_cgroup_memory_limit(memory_mib)?;
     let (source_commit, source_attestation_mode) = frozen_chain_source()?;
     let start = Instant::now();
-    let phase_schema = if pin_orbit_choices {
-        "n83.k16627-m4-selector-positive-phase/v1"
+    let phase_schema = if pins != OrbitChoicePins::None {
+        pins.phase_schema()
     } else if sample_progress {
         "n83.k16627-m4-search-progress-phase/v1"
     } else if checkpoint_root {
@@ -1060,7 +1140,7 @@ fn chain_witness_impl(
         == 4;
     if !affine || !distinct {
         let receipt = json!({
-            "schema":if pin_orbit_choices {"n83.k16627-m4-selector-positive/v1"}
+            "schema":if pins != OrbitChoicePins::None {pins.schema()}
                 else if sample_progress {"n83.k16627-m4-search-progress/v1"}
                 else if checkpoint_root {"n83.k16627-m4-root-phase/v1"}
                 else {"n83.k16627-m4-witness/v1"},
@@ -1160,7 +1240,7 @@ fn chain_witness_impl(
     }
     phases.mark("seven_blocks_pinned", json!({"x_blocks":7}))?;
     let mut orbit_choice_receipt = Value::Null;
-    if pin_orbit_choices {
+    if pins != OrbitChoicePins::None {
         let mut sorted_representatives = representatives.clone();
         sorted_representatives.sort_unstable();
         if sorted_representatives
@@ -1194,12 +1274,14 @@ fn chain_witness_impl(
             ));
         }
         for (_, _, selector, phase, _) in &choices {
-            if !enc.solver.add_clause(vec![*selector as i32]) {
-                return Err("selector control selector unit contradicted model".into());
+            if pins.selector() && !enc.solver.add_clause(vec![*selector as i32]) {
+                return Err("orbit-choice selector unit contradicted model".into());
             }
-            for &wire in phase {
-                if !enc.solver.add_clause(vec![-(wire as i32)]) {
-                    return Err("selector control phase-zero unit contradicted model".into());
+            if pins.phase() {
+                for &wire in phase {
+                    if !enc.solver.add_clause(vec![-(wire as i32)]) {
+                        return Err("orbit-choice phase-zero unit contradicted model".into());
+                    }
                 }
             }
         }
@@ -1212,6 +1294,8 @@ fn chain_witness_impl(
                     "selector_wire":selector,
                     "phase_wires":phase,
                     "phase":0,
+                    "selector_pinned":pins.selector(),
+                    "phase_pinned":pins.phase(),
                     "representative_x_decimal":value.to_string(),
                 })
             })
@@ -1249,8 +1333,8 @@ fn chain_witness_impl(
             Some(ProgressSampler::start(
                 output,
                 start,
-                if pin_orbit_choices {
-                    "n83.k16627-m4-selector-positive/v1"
+                if pins != OrbitChoicePins::None {
+                    pins.schema()
                 } else {
                     "n83.k16627-m4-search-progress/v1"
                 },
@@ -1298,22 +1382,24 @@ fn chain_witness_impl(
                 let mut rank = WideRankTracker::new(&base.curve.subgroup_order, fb.unknowns());
                 let rank_after_insert = rank.insert(lifted_row.clone());
                 phases.mark("rank_done", json!({"rank_after_insert":rank_after_insert}))?;
-                if rank_after_insert != 1 {
+                let matches_preflight_row = lifted_row == preflight_row;
+                let dense: Vec<_> = lifted_row.iter().map(ToString::to_string).collect();
+                relation = json!({
+                    "point_indices":lifted_indices,
+                    "dense_decimal_blake3":blake3::hash(&serde_json::to_vec(&dense)?).to_hex().to_string(),
+                    "matches_preflight_row":matches_preflight_row,
+                    "rank_after_insert":rank_after_insert,
+                    "tamper_rejected":tamper_rejected,
+                    "group_verified":true,
+                });
+                if rank_after_insert != 1 || !matches_preflight_row {
                     "INVALID_RELATION_CONTROL"
                 } else {
-                    let dense: Vec<_> = lifted_row.iter().map(ToString::to_string).collect();
-                    relation = json!({
-                        "point_indices":lifted_indices,
-                        "dense_decimal_blake3":blake3::hash(&serde_json::to_vec(&dense)?).to_hex().to_string(),
-                        "matches_preflight_row":lifted_row == preflight_row,
-                        "rank_after_insert":rank_after_insert,
-                        "tamper_rejected":tamper_rejected,
-                        "group_verified":true,
-                    });
-                    if pin_orbit_choices {
-                        "PASS_SELECTOR_PINNED_WITNESS"
-                    } else {
-                        "PASS_COMPLETE_WITNESS"
+                    match pins {
+                        OrbitChoicePins::SelectorAndPhase => "PASS_SELECTOR_PINNED_WITNESS",
+                        OrbitChoicePins::SelectorOnly => "PASS_SELECTOR_ONLY_WITNESS",
+                        OrbitChoicePins::PhaseOnly => "PASS_PHASE_ONLY_WITNESS",
+                        OrbitChoicePins::None => "PASS_COMPLETE_WITNESS",
                     }
                 }
             } else {
@@ -1325,7 +1411,7 @@ fn chain_witness_impl(
         .trim()
         .parse()?;
     let mut receipt = json!({
-        "schema":if pin_orbit_choices {"n83.k16627-m4-selector-positive/v1"}
+        "schema":if pins != OrbitChoicePins::None {pins.schema()}
             else if sample_progress {"n83.k16627-m4-search-progress/v1"}
             else if checkpoint_root {"n83.k16627-m4-root-phase/v1"}
             else {"n83.k16627-m4-witness/v1"},
@@ -1360,7 +1446,7 @@ fn chain_witness_impl(
         "total_index_calculus_runtime_ms":Value::Null,
         "selected_best_total_runtime":Value::Null,
     });
-    if pin_orbit_choices {
+    if pins != OrbitChoicePins::None {
         receipt["orbit_choice_pins"] = orbit_choice_receipt;
     }
     if checkpoint_root {
@@ -2285,6 +2371,110 @@ mod tests {
     use crypto_lib::cryptanalysis::koblitz_relation_solver::WideRankTracker;
     use std::collections::HashMap;
     use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+
+    #[test]
+    fn selector_and_phase_modes_preserve_small_chain_model_and_group_lift() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let p = kc.generator().clone();
+        let q = kc.mul(&p, &BigUint::from(2u32));
+        let three = kc.mul(&p, &BigUint::from(3u32));
+        let target = kc.mul(&p, &BigUint::from(5u32));
+        let x = |point: &BinaryPoint| match point {
+            BinaryPoint::Affine { x, .. } => x.clone(),
+            BinaryPoint::Infinity => panic!("small control point is infinity"),
+        };
+        let (xp, xq) = (x(&p), x(&q));
+        assert_ne!(xp, xq);
+        let expected = [
+            xp.clone(),
+            xp.clone(),
+            xp.clone(),
+            xq.clone(),
+            xq.clone(),
+            x(&three),
+            x(&target),
+        ];
+        // P+P=2P, then +P=3P; +2P=5P.
+        let mut representatives = vec![xp.to_biguint(), xq.to_biguint()];
+        representatives.sort_unstable();
+
+        let run = |mode: OrbitChoicePins, observed: bool, contradict: bool| {
+            let mut enc = ChainedS3Encoding::build(
+                4,
+                &kc.curve.irreducible,
+                &kc.curve.b,
+                Some(&expected[6]),
+                0,
+                2_000,
+            )
+            .unwrap();
+            enc.constrain_frobenius_orbit_summands(&representatives, 2_000, 10_000)
+                .unwrap();
+            for (block, value) in expected.iter().enumerate() {
+                enc.pin_x_block(block, value).unwrap();
+            }
+            let handles = enc.orbit_choice_wires().unwrap().to_vec();
+            for (slot, value) in expected[..4].iter().enumerate() {
+                let index = representatives.binary_search(&value.to_biguint()).unwrap();
+                if mode.selector() {
+                    assert!(enc
+                        .solver
+                        .add_clause(vec![handles[slot].selectors[index] as i32]));
+                }
+                if mode.phase() {
+                    for &wire in &handles[slot].phase {
+                        assert!(enc.solver.add_clause(vec![-(wire as i32)]));
+                    }
+                }
+            }
+            if contradict {
+                let first_index = representatives.binary_search(&xp.to_biguint()).unwrap();
+                let opposite = if mode.selector() {
+                    -(handles[0].selectors[first_index] as i32)
+                } else {
+                    handles[0].phase[0] as i32
+                };
+                enc.solver.add_clause(vec![opposite]);
+            }
+            let progress = observed.then(|| Arc::new(SolverProgress::default()));
+            if let Some(progress) = &progress {
+                enc.solver.set_progress_observer(Arc::clone(progress));
+            }
+            let answer = enc.solver.solve();
+            if contradict {
+                assert_eq!(answer, SolveResult::Unsat);
+                return (answer, None);
+            }
+            assert_eq!(answer, SolveResult::Sat);
+            assert!(enc.verify_model());
+            assert_eq!(enc.decode_x_blocks(), expected);
+            let mut sum = BinaryPoint::Infinity;
+            for value in enc.decode_summands() {
+                let point = if value == xp {
+                    &p
+                } else if value == xq {
+                    &q
+                } else {
+                    panic!("unknown small summand x")
+                };
+                sum = kc.add(&sum, point);
+            }
+            assert_eq!(sum, target);
+            if let Some(progress) = progress {
+                assert_eq!(progress.snapshot().xor_passes, enc.solver.stats.xor_passes);
+            }
+            (answer, Some(enc.solver.model()))
+        };
+        for mode in [
+            OrbitChoicePins::SelectorAndPhase,
+            OrbitChoicePins::SelectorOnly,
+            OrbitChoicePins::PhaseOnly,
+        ] {
+            for contradict in [false, true] {
+                assert_eq!(run(mode, false, contradict), run(mode, true, contradict));
+            }
+        }
+    }
 
     #[test]
     fn supervised_source_snapshot_rejects_a_changed_compiled_file() {

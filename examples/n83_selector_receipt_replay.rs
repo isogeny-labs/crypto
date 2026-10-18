@@ -11,7 +11,6 @@ use std::path::Path;
 
 const OBJECT: &str = "1aa70cc1571f4cb25af42936699378329128a869f2ae8ad35efb375663d4e59d";
 const POINT_SET: &str = "564c6bb72b346b73112240bb0bddc4ef68b7525f7ef2556d6046e52c32f976e0";
-const SOURCE: &str = "b4beefcb55f05713d1d63468fcbcd21e4339fa50";
 const CURVE: &str = "icv1-f2m83-tm6151469093347-debefd74";
 const INDICES: [usize; 4] = [0, 166, 332, 498];
 
@@ -41,11 +40,29 @@ fn object_hash(path: &Path) -> Result<String, Box<dyn std::error::Error>> {
     Ok(hasher.finalize().to_hex().to_string())
 }
 
-fn replay(object: &Path, receipt: &Path) -> Result<Value, Box<dyn std::error::Error>> {
+fn replay(
+    expected_source: &str,
+    arm: &str,
+    object: &Path,
+    receipt: &Path,
+) -> Result<Value, Box<dyn std::error::Error>> {
+    let (schema, success) = match arm {
+        "full" => (
+            "n83.k16627-m4-selector-positive/v1",
+            "PASS_SELECTOR_PINNED_WITNESS",
+        ),
+        "selector-only" => (
+            "n83.k16627-m4-selector-only/v1",
+            "PASS_SELECTOR_ONLY_WITNESS",
+        ),
+        "phase-only" => ("n83.k16627-m4-phase-only/v1", "PASS_PHASE_ONLY_WITNESS"),
+        _ => return Err("unknown selector-control arm".into()),
+    };
     let worker: Value = serde_json::from_reader(File::open(receipt)?)?;
-    if worker["schema"] != "n83.k16627-m4-selector-positive/v1"
-        || worker["status"] != "PASS_SELECTOR_PINNED_WITNESS"
-        || worker["source_commit"] != SOURCE
+    if worker["schema"] != schema
+        || worker["status"] != success
+        || worker["source_commit"] != expected_source
+        || worker["source_attestation_mode"] != "supervised_snapshot"
         || worker["object_blake3"] != OBJECT
         || worker["point_set_blake3"] != POINT_SET
         || worker["point_indices"] != json!(INDICES)
@@ -178,6 +195,8 @@ fn replay(object: &Path, receipt: &Path) -> Result<Value, Box<dyn std::error::Er
         if choice["slot"] != slot
             || choice["phase"] != 0
             || choice["phase_wires"].as_array().map(Vec::len) != Some(7)
+            || choice["selector_pinned"] != (arm != "phase-only")
+            || choice["phase_pinned"] != (arm != "selector-only")
             || decimal(&choice["representative_x_decimal"])? != group_x[slot].to_biguint()
         {
             return Err("orbit pin differs from selected representative".into());
@@ -188,7 +207,8 @@ fn replay(object: &Path, receipt: &Path) -> Result<Value, Box<dyn std::error::Er
         "schema":"n83.selector-relation-replay/v1",
         "status":"PASS_RELATION_REPLAY",
         "curve_id":CURVE,
-        "source_commit":SOURCE,
+        "source_commit":expected_source,
+        "arm":arm,
         "object_blake3":OBJECT,
         "worker_receipt_blake3":receipt_hash,
         "point_indices":INDICES,
@@ -199,16 +219,19 @@ fn replay(object: &Path, receipt: &Path) -> Result<Value, Box<dyn std::error::Er
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args().collect();
-    if args.len() != 4 {
+    if args.len() != 6
+        || args[1].len() != 40
+        || !args[1].bytes().all(|byte| byte.is_ascii_hexdigit())
+    {
         return Err(
-            "usage: n83_selector_receipt_replay OBJECT_JSONL_GZ WORKER_JSON NEW_OUTPUT_JSON".into(),
+            "usage: n83_selector_receipt_replay EXPECTED_SOURCE_COMMIT full|selector-only|phase-only OBJECT_JSONL_GZ WORKER_JSON NEW_OUTPUT_JSON".into(),
         );
     }
-    let result = replay(Path::new(&args[1]), Path::new(&args[2]))?;
+    let result = replay(&args[1], &args[2], Path::new(&args[3]), Path::new(&args[4]))?;
     let output = OpenOptions::new()
         .write(true)
         .create_new(true)
-        .open(&args[3])?;
+        .open(&args[5])?;
     serde_json::to_writer_pretty(output, &result)?;
     println!("{}", result);
     Ok(())
