@@ -273,3 +273,29 @@ therefore each arm's **residual from its own Poisson value**,
 `π − (1 − e^{−λ})` with `λ` the arm's own multiset count over `#E`, paired per
 field between the structured arm and the null arm, with a z-score over the
 fields. The raw `π` are still reported. Nothing else changes.
+
+## Amendment C (Parts O/J pricing and parameters), before any code of `n2_routes.rs` ran
+
+- **Factor-base size**: `|B| = ⌈c·√p⌉` with `c ∈ {1, 2, 4}`; every `c` is
+  run and reported; the IC arm's best `c` per size is reported **and** flagged
+  as a post-hoc minimum (it favours IC).
+- **Walks**: r-adding walks with `r = 32` (IC arms) and `r = 64` plus the
+  negation map (rho), IC walks restarted from a fresh random combination every
+  4096 steps (the restart's scalar multiplications are counted).
+- **Pricing of an `F_p` inversion**: `I ∈ {3M, 2·log2(p)·M}` (batched
+  Montgomery inversion; Fermat-style), both arms.
+- **Pricing of a genus-2 Jacobian operation (Arm J)**: (a) the measured
+  `F_p` operation count of this tool's Cantor implementation; (b) the
+  IC-favourable bound "one Jacobian operation costs the same as one measured
+  affine addition in `E(F_{p^2})`". No literature constant is used (a search
+  for Lange's explicit-formula table did not return it; recalled values are
+  not admissible).
+- **Native operations** (linear algebra mod `ℓ`, hashing, table lookups,
+  sorting) priced at `0`, `0.1`, `1` `M`.
+- **Ranking rule**: an IC arm is ranked against rho at a size only if the
+  order holds in every cell of {I pricing} × {Jacobian pricing} × {native
+  weight}; otherwise "unresolved".
+- **Linear algebra**: large-prime columns are eliminated by sparse merging
+  mod `ℓ` (no sign bookkeeping), then dense elimination on the factor-base
+  columns with the `(a, b)` combination tracked; the answer `k` is accepted
+  only if `k·P = Q` verifies.
