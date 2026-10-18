@@ -1,5 +1,15 @@
 # Degree-83 factor-base sweep: observed evidence
 
+The [hosted canonical six-summand 100,000-conflict pair](verification/hosted-m6-highcap-20261018/RESULT.md)
+completed on two distinct Linux ARM runners. Exact input and provider audits,
+both write-once raw-artifact S3 round trips, and the paired receipt audit
+passed. Gray-prefix and hash-derived K600 residual pools each made one
+same-public-target solver call and reached `UNKNOWN_search_cap` after 100,000
+conflicts with zero models. The full conservative two-job charge is **21,600
+seconds**. These censored one-pattern observations do not measure natural
+yield, useful rank, or complete cold IC runtime; the primary
+`selected_best_total_runtime` remains `null`.
+
 The [credential-free hosted K600 Gray/hash first pair](verification/hosted-paired-run-38983406418/RESULT.md)
 ran both natural searches on Linux ARM after reproducing the frozen S3 base
 bytes. Independent retained replay passed for all 51 artifact files, three
