@@ -400,10 +400,10 @@ Unknowns: `N = (m − 2)·n + m·ℓ`. Memory is dominated by the degree-4 echel
 
 | tier | `m` | `(n, ℓ)` | `N` | columns `≤ 4` | basis memory |
 |:--|--:|:--|--:|--:|--:|
-| local (4 cores, 15 GB) | 6 | (8, 2) | 44 | 150 026 | ≈ 1.4 GB |
+| local (4 cores, 15 GB) | 6 | (8, 2) | 44 | 149 986 | ≈ 1.4 GB |
 | local | 5 | (11, 3) | 48 | 213 053 | ≈ 2.8 GB |
 | local | 6 | (9, 2) | 48 | 213 053 | ≈ 2.8 GB |
-| large host (≥ 64 GB) | 5 | (13, 3) | 54 | 342 811 | ≈ 7.3 GB |
+| large host (≥ 64 GB) | 5 | (13, 3) | 54 | 342 541 | ≈ 7.3 GB |
 | large host | 6 | (10, 3) | 58 | 456 838 | ≈ 13 GB |
 | large host | 5 | (15, 3) | 60 | 523 686 | ≈ 17 GB |
 
