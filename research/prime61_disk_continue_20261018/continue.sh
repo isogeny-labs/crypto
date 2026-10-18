@@ -7,7 +7,7 @@ restored=${2:?}
 archived=${3:?}
 mkdir "$out"
 spec=research/prime61_disk_continue_20261018/spec.json
-worker=target/release/examples/isogeny_disk_walk
+worker=${WORKER:-target/release/examples/isogeny_disk_walk}
 cp "$restored" "$out/walk.db"
 run() {
     local name=$1
