@@ -66,12 +66,21 @@ consecutive walker range. It keeps completed outcomes in walker-index order,
 checks the distinguished-point rule and step cap at the same point in each
 trail as `run_walker`, and assigns the next walker when a lane becomes free.
 The replay tests cover widths 1, 2, 7, 32, and 128, both negation modes,
-short and longer step caps, and a secp256k1 job. The production `run_lane` still calls the serial
-walker; the next integration gate must establish check-in and stop behavior
-when batched ranges are used there.
+short and longer step caps, and a secp256k1 job. `run_lane` now accepts an
+opt-in `batch_width`; its default remains one. Widths above one require the
+exact secp256k1 field, coefficients, subgroup order, and generator. Batched
+ranges stop at check-in and walker-budget boundaries, and the lane test
+compares ordered check-ins and counters with the serial lane. An external
+stop request can discard already computed, unpublished walkers in the
+current batch.
 The [batch walker validation receipt](batch-walker-validation.json) binds the
 final source hash and complete release-suite log; 2,246 tests passed, 94
 were ignored, and none failed.
+The [live lane validation receipt](batch-lane-validation.json) binds the
+opt-in worker source and both full-suite attempts. The first attempt was
+interrupted after 2,247 passes while an unrelated random curve-search test
+remained CPU-active; the retry passed 2,248 tests with 94 ignored. Neither
+receipt is a throughput measurement.
 
 The [local validation receipt](batch-step-local-validation.json) binds the
 batch-step source hash and release test logs. The focused tests passed 2/2.
@@ -91,9 +100,9 @@ that environment passed 2,244 tests with 94 ignored.
    mixed-76, and generator-only-warmed OpenSSL across 32 Q points. Two full
    panels failed their A/A noise gates. Its separate reuse panel passed the
    Tier 1 gate at 32 and 128 restarts per Q; 1 and 8 failed A/A gates.
-3. Connect the opt-in lane-refill scheduler to `run_lane`, preserve check-in
-   and stop behavior, and replay each walker's entire affine state sequence
-   against the serial worker. Compare paired full-worker throughput on the same Q points.
+3. Replay the opt-in lane on longer secp256k1 traces, including check-ins,
+   stop behavior, and each walker's affine states. Compare paired full-worker
+   throughput on the same Q points.
    Require a 95% lower speedup bound above 1.05 and a frozen peak-memory
    cap before changing the default path. The generic C rho path has a
    64-bit group order; the full-size worker is this Rust implementation.
