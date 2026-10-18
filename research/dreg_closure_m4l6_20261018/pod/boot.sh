@@ -3,7 +3,7 @@
 # PKM m = 3, N = 21 cell (research/pkm_lead1_m3n21_20261016/PROTOCOL.md).
 # Plumbing only: installs a toolchain, clones the pinned branch, builds the
 # two examples, runs the frozen run.sh, serves the study directory on :8000.
-#   boot.sh closure|pkm     (env: BRANCH)
+#   boot.sh closure|pkm|both     (env: BRANCH; PKM_SHARE=1|2 runs the two PKM targets one after the other or at once)
 set -u
 JOB=$1; BRANCH=${BRANCH:?BRANCH}
 OUT=/workspace/out; mkdir -p "$OUT"; ln -sf /root/boot.log "$OUT/boot.log"
@@ -23,18 +23,18 @@ ln -sfn /workspace/src/research/pkm_lead1_m3n21_20261016 "$OUT/pkm"
 { echo "cgroup memory.max: $(cat /sys/fs/cgroup/memory.max 2>/dev/null || cat /sys/fs/cgroup/memory/memory.limit_in_bytes 2>/dev/null)"
   grep MemTotal /proc/meminfo; nproc; } > "$OUT/host-quick.txt"
 status BUILDING
-case $JOB in
-closure)
-  cargo build --release --example dreg_ladder --example dreg_closure > "$OUT/build.log" 2>&1 || { status BUILD_FAILED; exit 1; }
+run_closure() {
+  cargo build --release --example dreg_ladder --example dreg_closure > "$OUT/build.log" 2>&1 || { status BUILD_FAILED; return 1; }
   L=target/release/examples/dreg_ladder; C=target/release/examples/dreg_closure
   S=research/dreg_closure_m4l6_20261018/run.sh
   $S $L $C host; status GENERATING; $S $L $C gen; status GEN_DONE
   # The draws are committed before any closure measurement: wait for the tag.
   until git ls-remote --tags origin 2>/dev/null | grep -q 'refs/tags/draws-m4l6-20261018$'; do sleep 120; done
   status MEASURING
-  $S $L $C control; $S $L $C measure; $S $L $C deg5 C2; status DONE ;;
-pkm)
-  cargo build --release --example pkm_tower_pilot --example pkm_tower_check > "$OUT/build.log" 2>&1 || { status BUILD_FAILED; exit 1; }
+  $S $L $C control; $S $L $C measure; $S $L $C deg5 C2; status CLOSURE_DONE
+}
+run_pkm() {
+  cargo build --release --example pkm_tower_pilot --example pkm_tower_check > "$OUT/build-pkm.log" 2>&1 || { status BUILD_FAILED; return 1; }
   S=research/pkm_lead1_m3n21_20261016/run.sh
   LIM=$(cat /sys/fs/cgroup/memory.max 2>/dev/null || cat /sys/fs/cgroup/memory/memory.limit_in_bytes 2>/dev/null || echo max)
   MT=$(( $(awk '/^MemTotal:/ {print $2}' /proc/meminfo) * 1024 ))
@@ -46,7 +46,13 @@ pkm)
     sed -i "s|^mem_kib=.*|mem_kib=$(( LIM / 1024 ))  # cgroup memory limit, set by pod/boot.sh; /proc/meminfo MemTotal was $(( MT / 1024 )) KiB|" "${S%.sh}-cgroup.sh"
     S="${S%.sh}-cgroup.sh"
   fi
-  $S host; status IDENTITY; $S identity; status MAIN0; $S main 0; status MAIN1; $S main 1
+  export SHARE=${PKM_SHARE:-1}
+  $S host; status IDENTITY; $S identity
+  if [ "$SHARE" = 2 ]; then
+    status "MAIN0+MAIN1 (SHARE=2)"; $S main 0 & p0=$!; sleep 60; $S main 1 & p1=$!; wait $p0 $p1
+  else
+    status MAIN0; $S main 0; status MAIN1; $S main 1
+  fi
   for t in 0 1; do
     D=$(python3 - "$t" <<'PY'
 import json, sys
@@ -63,8 +69,14 @@ PY
 )
     [ -n "$D" ] && { status "CONFIRM$t D=$D"; $S confirm "$t" "$D"; }
   done
-  status VERIFY; $S verify; status DONE ;;
+  status VERIFY; $S verify; status PKM_DONE
+}
+case $JOB in
+  closure) run_closure ;;
+  pkm) run_pkm ;;
+  both) run_closure; run_pkm ;;
 esac
+status DONE
 # Keep serving results for a day, then end the container (the session that
 # launched the pod terminates it; no API key lives on the pod).
 sleep 86400
