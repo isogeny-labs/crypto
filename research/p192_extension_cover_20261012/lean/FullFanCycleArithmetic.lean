@@ -65,6 +65,13 @@ theorem triple_star_ideal_uniform_support_bound :
       1569275433846670190958947353987675545133315652035359680560 := by
   norm_num
 
+/-- The character-selected 128 admitted targets occupy less than a
+`2⁻¹⁸²` share of the accepted-set lower bound under an ideal-uniform law. -/
+theorem character_star_ideal_uniform_support_bound :
+    128 * (2 ^ 182 : ℕ) <
+      1569275433846670190958947353987675545133315652035359680560 := by
+  norm_num
+
 #print axioms full_fan_cycle_dimension_arithmetic
 #print axioms full_fan_implicit_rectangle_count
 #print axioms full_fan_active_edge_count
@@ -77,5 +84,6 @@ theorem triple_star_ideal_uniform_support_bound :
 #print axioms triple_star_16_cycle_dimension_arithmetic
 #print axioms connected_48_cut_three_pivot_cycle_upper_bound
 #print axioms triple_star_ideal_uniform_support_bound
+#print axioms character_star_ideal_uniform_support_bound
 
 end P192ExtensionCover

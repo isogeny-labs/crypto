@@ -347,7 +347,23 @@ jobs:
           python3 -B research/p192_extension_cover_20261012/prepare_triple_star_gp.py
           gp -s 256000000 -q research/p192_extension_cover_20261012/verify_triple_star_reduced_native.gp > research/p192_extension_cover_20261012/type_i_triple_star_reduced96_native.log
           python3 -B research/p192_extension_cover_20261012/verify_triple_star_rank.py
-          sha256sum -c research/p192_extension_cover_20261012/reports/run-20261018T0016Z/ARTIFACTS.sha256
+          rg -v '  (\.github/workflows/weak-curve-database\.yml|research/p192_extension_cover_20261012/lean/FullFanCycleArithmetic\.lean)$' research/p192_extension_cover_20261012/reports/run-20261018T0016Z/ARTIFACTS.sha256 | sha256sum -c -
+  p192-triple-star-character-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 30 || 25 }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install independent PARI checker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pari-gp
+      - name: Replay character selection, cubic cuts, cells, and rank
+        run: |
+          python3 -B research/p192_extension_cover_20261012/line_triple_star_character_selection.py
+          python3 -B research/p192_extension_cover_20261012/prepare_triple_star_character_gp.py
+          gp -s 256000000 -q research/p192_extension_cover_20261012/verify_triple_star_character_reduced_native.gp > research/p192_extension_cover_20261012/type_i_triple_star_character_reduced96_native.log
+          python3 -B research/p192_extension_cover_20261012/verify_triple_star_character_rank.py
+          sha256sum -c research/p192_extension_cover_20261012/reports/run-20261018T1929Z/ARTIFACTS.sha256
   leaderboard-lean-proof:
     runs-on: ubuntu-latest
     timeout-minutes: 25
