@@ -760,6 +760,36 @@ credential. An auditor still reviews the S3/RDS receipts and health gaps
 before signing a Cairn claim; a running supervisor alone does not authorize
 payment.
 
+**Existing EC2 host.** When account-level instance creation is unavailable,
+`install_existing_ingest_worker.sh` installs an isolated worker-only service
+on a host that already exists. It never starts a second status publisher. The
+host must have the `ecc2k130-ingest` instance profile, IMDSv2, network access
+to `rho-dp`, and `/opt/rho-ingest/venv` containing `boto3`, `psycopg[binary]`,
+and `awscli`. Place the reviewed `dp_ingest.py` and Cairn's
+`cairn_ingest_operator.py` in `/opt/rho-ingest/` and pass their full SHA-256
+digests at installation. The installer checks those bytes and pins them for
+every subsequent systemd restart. It creates a dedicated `rho-ingest` user,
+ships completed journals and exact status snapshots every two minutes to
+private versioned S3, and excludes the in-progress journal. For example, on
+the existing us-east-1 host, with the reviewed scripts already staged:
+
+```sh
+sudo env RHO_REPLICA_ID=useast1-i-0ef27108cc01acb2c \
+  RHO_DB_HOST=rho-dp.cxqyicswioh8.us-west-2.rds.amazonaws.com \
+  RHO_BUCKET=ecc2k130-590183823895 \
+  RHO_STATUS_BUCKET=ecc2k130-status-590183823895 \
+  RHO_DP_SHA256="$(sha256sum /opt/rho-ingest/dp_ingest.py | cut -d' ' -f1)" \
+  RHO_OPERATOR_SHA256="$(sha256sum /opt/rho-ingest/cairn_ingest_operator.py | cut -d' ' -f1)" \
+  ./install_existing_ingest_worker.sh
+```
+
+For a deployment review, compare those two digests to the approved source
+commit **before** running the installer; computing both from the staged files
+alone proves only internal consistency. The worker's stable replica id appears
+in `dp_ingest_polls` and the private evidence prefix. A completed period still
+needs independent S3, RDS, and host corroboration before an auditor signs a
+Cairn payment receipt. Cross-region S3 and RDS traffic is billable.
+
 **Scheduled Lambda (no host).** `./ingest_lambda.sh up` deploys the same
 program as a Lambda on a two-minute EventBridge schedule, running one
 `--once` pass per invocation. The ingest loop never needed a resident
