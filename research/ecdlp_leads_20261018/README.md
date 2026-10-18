@@ -44,18 +44,27 @@ listed so that nobody spends budget on them.
   `docs/ECDLP_ATTACK_MATRIX.md`,
   `research_notes/Index calculus leads next steps/literature_frontier.md`,
   and `crypto-autoresearcher:ideas/idea_registry.tsv` (ECDLP-IDEA-002 to -436).
-- **LMFDB** (`av_fq_isog` API, 2026-10-18). Four isogeny classes over F₂
-  returned data:
+- **LMFDB** (`av_fq_isog` API, 2026-10-18). Nine isogeny classes over F₂
+  returned data. The first four came from the API; the five `3.2.*` rows came
+  through a second fetch after the API served a captcha. Every row reports the
+  expected number of F₂-points: 2 or 4 for T₃ and T₅, and 3 for each Res(E).
 
-  | label | object | simple | principally polarisable | Jacobian |
-  |:--|:--|:--|:--|:--|
-  | `2.2.ab_ab` | T₃, Koblitz a = 0 | yes | no | no |
-  | `2.2.b_ab` | T₃, Koblitz a = 1 | yes | no | no |
-  | `4.2.ab_ab_d_ab` | T₅, Koblitz a = 0 | yes | no | no |
-  | `4.2.b_ab_ad_ab` | T₅, Koblitz a = 1 | yes | no | no |
+  | label | object | simple | principally polarisable | Jacobians |
+  |:--|:--|:--|:--|--:|
+  | `2.2.ab_ab` | T₃, Koblitz a = 0 | yes | no | 0 |
+  | `2.2.b_ab` | T₃, Koblitz a = 1 | yes | no | 0 |
+  | `4.2.ab_ab_d_ab` | T₅, Koblitz a = 0 | yes | no | 0 |
+  | `4.2.b_ab_ad_ab` | T₅, Koblitz a = 1 | yes | no | 0 |
+  | `3.2.a_a_f` | Res_{F₈/F₂}(E), t₃ = −5 (Koblitz a = 1) | no | yes | 1 (Klein) |
+  | `3.2.a_a_d` | Res_{F₈/F₂}(E), t₃ = −3 | yes | yes | 2 |
+  | `3.2.a_a_b` | Res_{F₈/F₂}(E), t₃ = −1 | yes | yes | 2 |
+  | `3.2.a_a_ab` | Res_{F₈/F₂}(E), t₃ = 1 | yes | yes | 1 |
+  | `3.2.a_a_ad` | Res_{F₈/F₂}(E), t₃ = 3 | yes | yes | 0 |
 
-  The API then returned a captcha. Queries for dimension 3, 5 and 6 classes
-  (`3.2.a_a_*`, `5.2.a_a_a_a_*`, `6.2.*`) are owed.
+  Still owed, all blocked by the captcha: `3.2.a_a_af` (t₃ = 5, the a = 0
+  Koblitz curve, already excluded by point counts), the nine
+  `5.2.a_a_a_a_*` classes that point counts allow (odd t₅ ≤ 5), and the n = 7 trace-zero classes
+  `6.2.ab_ab_d_ab_af_h` and `6.2.b_ab_ad_ab_f_h`.
 - **Computed.** Frobenius cyclotomic-coset sizes, `ord_n(2)`. Trace-zero
   L-polynomials for n = 3, 5, 7. The rho and L(1/2) budget arithmetic in
   `cover-genus-budget.csv`, via the awk lines in the "Reproduce" section.
@@ -250,7 +259,7 @@ F₂ and F₄ counts are checked by hand in this note. So L_Klein(X) =
 
 For the a = 1 Koblitz curve, t₁ = 1, t₂ = −3 and t₃ = −5, so
 L(Res_{F₈/F₂}E) = 1 − t₃X³ + 8X⁶ = 1 + 5X³ + 8X⁶. By Tate's theorem,
-**J(Klein)/F₂ ≅ Res_{F₈/F₂}(E_{a=1}) up to isogeny** *(derived)*. That is a
+**J(Klein)/F₂ ≅ Res_{F₈/F₂}(E_{a=1}) up to isogeny** *(derived)*. LMFDB confirms that its isogeny class `3.2.a_a_f` contains exactly one Jacobian *(sourced)*. That is a
 genus-n curve for n = 3, where GHS gives nothing.
 
 The structure behind it: the order-3 automorphism (x:y:z) ↦ (y:z:x) is defined
@@ -351,11 +360,16 @@ and has no modular-curve parametrisation.
 
 **Lead.**
 
-- n = 3: enumerate every genus-3 curve over F₂ (32,768 plane quartic forms
-  plus hyperelliptics) and tabulate which traces t₃ ∈ {±1, ±3, ±5} are
-  realised. The a = 1 Koblitz value t₃ = −5 is the control (Klein).
-- n = 5: search genus-5 curves (all hyperelliptic, sampled trigonal and
-  canonical) for point counts 3, 5, 9, 17, 33 − 5t₅.
+- n = 3 (*sourced, LMFDB*). Res_{F₈/F₂}(E) is the Jacobian of a genus-3
+  curve for t₃ ∈ {−5, −3, −1, 1}, and for no other trace. That is exactly the
+  set the point counts allow: 9 − 3t₃ ≥ 3 points over F₈. At n = 3, genus-n
+  covers therefore exist for every curve the counts permit, random-b curves
+  included. GHS already gives genus 3 or 4 there, so n = 3 cannot separate
+  the two routes. The lead lives at n ≥ 5.
+- n = 5: positivity allows t₅ ≤ 5 (33 − 5t₅ ≥ 3). Query `5.2.a_a_a_a_*`
+  for each odd t₅ in that range. Then search genus-5 curves (all
+  hyperelliptic, sampled trigonal and canonical) for point counts
+  3, 5, 9, 17, 33 − 5t₅.
 
 A genus-5 hit would be the first known genus-n cover of a random-b Weil
 restriction beyond n = 3.
@@ -415,8 +429,10 @@ restriction beyond n = 3.
   2. L_Klein = L(Res_{F₈/F₂} E_{a=1});
   3. the Eichler–Shimura twist identity (L6);
   4. the a = 1 point-count obstruction (L9).
-- LMFDB queries for `3.2.a_a_*`, `5.2.a_a_a_a_*` and dimension-6 classes were
-  blocked by a captcha.
+- LMFDB queries for the nine admissible `5.2.a_a_a_a_*` classes, the two n = 7
+  trace-zero classes in dimension 6, and `3.2.a_a_af` were blocked by a
+  captcha. The other n = 3 classes are in the table under "Method and
+  sources".
 - The manypoints entry for (q = 32, g = 5) has not been checked.
 - Novelty audit: not done against the cover-attack literature. Check Diem and
   Scholten's trace-zero cover reports, Hess's generalised GHS, Ekedahl–Serre,

@@ -127,9 +127,13 @@ $FF_2$ but 2 over $FF_4$, which is impossible.
 
 - `identity.certificate/v1` records are owed for four claims: the L1/L2 counts, the Klein
   L-polynomial identity, the Eichler–Shimura twist, and the $a = 1$ obstruction.
-- LMFDB queries for dimension 3, 5 and 6 classes were blocked by a captcha. The four classes that
-  returned data were $T_3$ and $T_5$ for $a = 0$ and $a = 1$: all simple, none principally
-  polarisable, none a Jacobian.
+- LMFDB returned nine classes. $T_3$ and $T_5$, for $a = 0$ and $a = 1$, are simple, not
+  principally polarisable, and contain no Jacobian. At $n = 3$, $op("Res")_(FF_8\/FF_2)(E)$ contains
+  a genus-3 Jacobian exactly for $t_3 in {-5, -3, -1, 1}$, the traces the point counts allow. The
+  class for $t_3 = -5$ ($a = 1$ Koblitz) contains one Jacobian, the Klein quartic. So $n = 3$
+  cannot separate covers from GHS, and L10 starts at $n = 5$.
+- Still blocked by a captcha: the nine admissible $n = 5$ classes, the two $n = 7$ trace-zero
+  classes, and $t_3 = 5$ (already excluded by point counts).
 - The manypoints bound for $(q, g) = (32, 5)$ is unchecked. It decides whether $(a = 0, n = 5)$ can
   be realised at genus 5.
 - The novelty audit against the cover-attack literature (Diem, Scholten, Hess, Ekedahl–Serre,
