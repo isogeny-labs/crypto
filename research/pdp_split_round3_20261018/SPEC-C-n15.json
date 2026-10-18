@@ -1,0 +1,190 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "pdp_split_round3_20261018 Part C, n=15 invariant vs closure vs standard",
+  "description": "Preregistered (PROTOCOL.md Part C): on K_0/GF(2^15), the only size with Frobenius-invariant subspaces of dimension 4-5, the same oracle on the invariant base, the closure and the standard subspace. r is about 2^9.6: rho is degenerate here and the comparison is per-system cost and yield, not S against rho.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 15
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 202610181301,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-strong",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong",
+        "params": {
+          "lanes": "32",
+          "dp_bits": "4",
+          "step_cap_factor": "2000"
+        }
+      }
+    },
+    {
+      "name": "rho-frob",
+      "role": "baseline",
+      "method": {
+        "id": "rho.signed_frobenius"
+      }
+    },
+    {
+      "name": "inv4-g4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=1",
+          "oracle": "pdp-split:m=3,plan=3,guess=4,slots=one,max_free=24",
+          "max_trials": "2000"
+        }
+      }
+    },
+    {
+      "name": "inv5-g4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "pdp-split:m=3,plan=3,guess=4,slots=one,max_free=24",
+          "max_trials": "2000"
+        }
+      }
+    },
+    {
+      "name": "clo4-g4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-closure:dimension=4",
+          "oracle": "pdp-split:m=3,plan=3,guess=4,slots=all,max_free=24",
+          "max_trials": "2000"
+        }
+      }
+    },
+    {
+      "name": "std4-g4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=4",
+          "oracle": "pdp-split:m=3,plan=3,guess=4,slots=one,max_free=24",
+          "max_trials": "2000"
+        }
+      }
+    },
+    {
+      "name": "std5-g4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "pdp-split:m=3,plan=3,guess=4,slots=one,max_free=24",
+          "max_trials": "2000"
+        }
+      }
+    },
+    {
+      "name": "inv4-g8",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=1",
+          "oracle": "pdp-split:m=3,plan=3,guess=8,slots=one,max_free=24",
+          "max_trials": "2000"
+        }
+      }
+    },
+    {
+      "name": "inv5-g8",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "pdp-split:m=3,plan=3,guess=8,slots=one,max_free=24",
+          "max_trials": "2000"
+        }
+      }
+    },
+    {
+      "name": "clo4-g8",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-closure:dimension=4",
+          "oracle": "pdp-split:m=3,plan=3,guess=8,slots=all,max_free=24",
+          "max_trials": "2000"
+        }
+      }
+    },
+    {
+      "name": "std4-g8",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=4",
+          "oracle": "pdp-split:m=3,plan=3,guess=8,slots=one,max_free=24",
+          "max_trials": "2000"
+        }
+      }
+    },
+    {
+      "name": "std5-g8",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-standard-subspace:dimension=5",
+          "oracle": "pdp-split:m=3,plan=3,guess=8,slots=one,max_free=24",
+          "max_trials": "2000"
+        }
+      }
+    },
+    {
+      "name": "clo4-mitm3",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-closure:dimension=4",
+          "oracle": "mitm-frobenius:m=3",
+          "max_trials": "2000"
+        }
+      }
+    },
+    {
+      "name": "inv5-mitm3",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "mitm-frobenius:m=3",
+          "max_trials": "2000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 202610181302,
+    "isolation_required": "L0",
+    "timeout_seconds": 1800
+  }
+}
