@@ -96,7 +96,11 @@ use crate::prime_hyperelliptic::FpPoly;
 /// - genus 2: `y² = x⁵ + 3x³ + 2x² + x + c`,
 /// - genus 3: `y² = x⁷ + x³ + c·x + 1`,
 /// - genus 4: `y² = x⁹ + x³ + c·x + 1`.
-pub fn thread_curve(p: u64, c: u64, genus: u32) -> HyperellipticCurveP {
+///
+/// Returns `None` for a `c` whose model is not a valid curve (`f` not
+/// squarefree): the instance rule skips those, and `HyperellipticCurveP::
+/// new` now refuses them by panicking, which the frozen examples predate.
+pub fn thread_curve(p: u64, c: u64, genus: u32) -> Option<HyperellipticCurveP> {
     let p = BigUint::from(p);
     let one = BigUint::one;
     let zero = BigUint::zero;
@@ -125,7 +129,7 @@ pub fn thread_curve(p: u64, c: u64, genus: u32) -> HyperellipticCurveP {
         ],
         g => panic!("no thread curve for genus {g}"),
     };
-    HyperellipticCurveP::new(p.clone(), FpPoly::from_coeffs(coeffs, p), genus)
+    HyperellipticCurveP::try_new(p.clone(), FpPoly::from_coeffs(coeffs, p), genus).ok()
 }
 
 fn thread_curve_is_squarefree(curve: &HyperellipticCurveP) -> bool {
@@ -152,7 +156,9 @@ pub fn thread_instance(
     genus: u32,
 ) -> Option<(HyperellipticCurveP, MumfordDivisorP, BigUint, u64)> {
     for c in 1..p.min(60) {
-        let curve = thread_curve(p, c, genus);
+        let Some(curve) = thread_curve(p, c, genus) else {
+            continue;
+        };
         if !thread_curve_is_squarefree(&curve) {
             continue;
         }
@@ -1131,6 +1137,7 @@ mod tests {
         for (genus, p, n) in [
             (2u32, 41u64, 1321u64),
             (3, 23, 6299),
+            (3, 31, 7333),
             (4, 31, 239753),
             (4, 61, 16790591),
         ] {
