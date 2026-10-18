@@ -29,6 +29,10 @@
 
 #[path = "ecbench/pdp3_koblitz.rs"]
 mod pdp3_koblitz;
+#[path = "ecbench/ps6_charge.rs"]
+mod ps6_charge;
+#[path = "ecbench/ps6_kernel.rs"]
+mod ps6_kernel;
 
 use std::io::Write as _;
 use std::path::{Path, PathBuf};
@@ -462,8 +466,12 @@ enum DbCmd {
 
 fn main() -> ExitCode {
     // Oracles this binary links that the library cannot name (see
-    // `pdp3_koblitz`); registered before any run, child or replay.
-    crypto_lib::cryptanalysis::ecbench::methods::register_binary_plugins(pdp3_koblitz::plugins());
+    // `pdp3_koblitz`, and `ps6_charge` for the PS-6 pairs-and-solve oracles);
+    // registered before any run, child or replay.  Only the first
+    // registration counts, so the two tables are merged.
+    crypto_lib::cryptanalysis::ecbench::methods::register_binary_plugins(ps6_charge::plugins(
+        pdp3_koblitz::plugins(),
+    ));
     match run(Cli::parse()) {
         Ok(code) => code,
         Err(e) => {
