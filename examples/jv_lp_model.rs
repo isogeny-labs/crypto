@@ -500,7 +500,9 @@ fn cmd_curves(args: &[String]) {
         }
         i += 1;
     }
-    let grid: Vec<f64> = vec![0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95];
+    let grid: Vec<f64> = vec![
+        0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 0.99,
+    ];
     let mut res = vec![];
     for &n in &ns {
         let reps = (24000 / n).clamp(6, 400);
@@ -598,11 +600,16 @@ fn cmd_cost(args: &[String]) {
     }
     // constants from recorded dlp runs
     let (mut resid, mut decs) = (0f64, 0f64);
+    // the same (p, seed) appears in several record sets with identical relation counts; count it once
+    let mut seen: std::collections::HashSet<(u64, u64)> = std::collections::HashSet::new();
     let (mut c_test_sum, mut c_test_n, mut la_ops_sum, mut u2_sum) = (0f64, 0f64, 0f64, 0f64);
     for path in &dlps {
         let v: Value = serde_json::from_str(&fs::read_to_string(path).unwrap()).unwrap();
         for r in v.as_array().unwrap() {
             if r["correct"] != json!(true) {
+                continue;
+            }
+            if !seen.insert((r["p"].as_u64().unwrap(), r["seed"].as_u64().unwrap())) {
                 continue;
             }
             resid += r["residuals"].as_f64().unwrap();
@@ -664,6 +671,8 @@ fn cmd_cost(args: &[String]) {
             .filter_map(|r| r[scheme]["mean"].as_f64().map(|m| (r["f"].as_f64().unwrap(), m)))
             .collect();
         rows.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+        // f = 1 is the method as run: N + 1 solutions
+        rows.push((1.0, (c["N"].as_f64().unwrap() + 1.0) / c["N"].as_f64().unwrap()));
         (rows, c["plain"]["mean"].as_f64().unwrap(), c["N"].as_u64().unwrap() as usize)
     };
 
@@ -682,13 +691,15 @@ fn cmd_cost(args: &[String]) {
             let mut best_s = s_full;
             let mut best_x = 0.0;
             let mut sweep = vec![];
+            let mut step_no = 0usize;
             // search f in (0.001, 1)
             let mut f = 0.001f64;
             while f < 1.0 {
                 let x = interp(&rows, f) * n;
                 let u = f * n;
                 let s = x * rel_unit + la_const * u * u;
-                if (f * 100.0).ln().rem_euclid(0.15) < 0.0101 {
+                step_no += 1;
+                if step_no % 4 == 0 {
                     sweep.push(json!({"f": f, "alpha": (u.max(1.0)).ln() / n.ln(), "X_over_N": x / n, "S_over_Sfull": s / s_full}));
                 }
                 if s < best_s {

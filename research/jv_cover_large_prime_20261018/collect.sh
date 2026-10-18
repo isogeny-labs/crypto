@@ -15,4 +15,4 @@ run() { # p seed
   echo "p=$p seed=$s exit $? wall_ms $(( $(now_ms) - a ))" >> "$RAW/walls.txt"
 }
 for s in 1 2 3 4 5 6; do run 101 "$s"; done
-for s in 1 2 3; do run 251 "$s"; done
+for s in 1 2; do run 251 "$s"; done   # a third seed was started and stopped for time
