@@ -40,7 +40,7 @@ outputs match the earlier standalone native selector byte-for-byte after
 removing the new provenance fields.
 
 The [resource replayer](../../examples/n83_crossfamily_native_resource_replay.rs)
-(source SHA-256 `7e09e9cdb2ab97730c1c25a44434304b249531266d7daf7a6151256408a05a5f`)
+(source SHA-256 `7501c3a17812d6ac14f135d36505222597ee36728991322ced16978c739effe3`)
 checks the 768 raw event receipts: 96 IC runs, 96 paired rho runs, and 576
 calibration runs. It checks frozen launch caps and process RSS, cgroup CPU and
 memory envelopes and per-event throttling/OOM deltas, steal-time deltas,

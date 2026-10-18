@@ -238,12 +238,9 @@ fn run(root: &Path) -> Result<Value> {
         }
         let host = zip_json(&zip, "results/host.json")?;
         let host_after = zip_json(&zip, "results/host_telemetry_after.json")?;
-        let affinity = host["visible_affinity"]
-            .as_array()
-            .ok_or("affinity absent")?;
         if host["schema"] != "n83.crossfamily-cancel-host/v1"
             || host["stratum"] != stratum
-            || affinity.len() != 4
+            || host["visible_affinity"] != json!([0, 1, 2, 3])
             || host["topology"]["cgroup_effective_cpus"] != "0-3"
             || host["cpu_telemetry_before"]["steal_jiffies"] != host_after["steal_jiffies"]
         {
