@@ -176,3 +176,29 @@ Budget: 30 minutes wall for Part H at all five `q`.
 - Characteristic 2 base fields are not in Part H (the field tables of the
   tool are odd-characteristic); Part G is characteristic-free.
 - `ℓ = p` is excluded (the `p`-torsion has rank ≤ 1).
+
+## Amendment 1 (before any run; commit follows the freeze commit)
+
+Two errors found while writing the tool, before any run was started:
+
+1. **P1 and the "graph" type.** A Tian kernel has dimension `n`, and `V_0`
+   has dimension 2, so for `n = 3` no kernel can be a graph over one factor
+   and P1 as first written is void. Corrected statements: for **`n = 2`**
+   every Tian kernel is a graph `Λ = {(v, ψv)}` (the projection to `V_0` is
+   injective because `Λ ∩ V_1 = 0`, hence bijective), and it is isotropic iff
+   `1 + q̄ det ψ ≡ 0 (mod ℓ)` and `π`-stable iff `φ = ψ^{−2}`; so **at
+   `n = 2` a Tian kernel exists iff `φ^{−1}` has a square root `ψ` with
+   `det ψ ≡ −q̄^{−1}`**, and the tool extracts `ψ` from every `n = 2` Tian
+   kernel and asserts both conditions (this replaces check 2). For `n = 3`
+   and `n = 4` the type recorded is `d_01 = dim Λ ∩ (V_0 ⊕ V_1)`; no
+   prediction is made about it. P2–P4 are unchanged.
+2. **Check 5, the class count.** The number of `F_{q^3}`-isomorphism classes
+   for `p ≥ 5` is `2(q^3 − 2) + gcd(4, q^3 − 1) + gcd(6, q^3 − 1)`, not
+   `2(q^3 − 2) + 10`; for `p = 3` it is `2(q^3 − 1)` for `j ≠ 0` plus the
+   number of orbits computed for `j = 0`.
+
+Also made explicit: for `ℓ = 2` the polynomial whose roots are the
+`x`-coordinates of `E[2] ∖ 0` is the cubic `x^3 + a_2 x^2 + a_4 x + a_6`, not
+`ψ_2 = 2y`; the class types at `ℓ = 2` are `I` (cubic splits), Jordan (one
+rational root) and nonsplit (irreducible cubic), and no split class exists
+over `F_2`.
