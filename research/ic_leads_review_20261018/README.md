@@ -219,11 +219,17 @@ These are cheap, and each one can flip the sign of a headline row.
 ### 3.3 Measure the linear algebra as an object, and make the good engine reachable
 
 The relation matrix has never been measured (REVIEW-UNADDRESSED §4.1 #6;
-H-ICEX-5666b2). Checked today: ecbench `ic.pipeline` still offers only dense
-or structured Gauss (`src/cryptanalysis/ic_framework/linalg.rs:250-279`; the
-test at `:379` asserts that `"wiedemann"` is rejected), while block Wiedemann
-and block Lanczos with CADO-style filtering sit unreachable in
-`koblitz_sparse_la.rs`. This matters in exactly the two regimes where IC has a
+H-ICEX-5666b2). **Correction (2026-10-18, later the same day):** the check
+below was made on the PR base `f85012683`; `main` already carried
+`sparse-cado` (CADO-style filter followed by block Wiedemann inside
+`ic.pipeline`, PR #1874, merge `ae8ac7df9`). What was unreachable from the
+pipeline was block Lanczos and the unfiltered Krylov cores; PR #2162 wires
+`wiedemann`, `lanczos`, `filter+lanczos` and `filter+wiedemann` under the
+full-rank completion rule. Original text: at `f85012683`, ecbench
+`ic.pipeline` offered only dense or structured Gauss
+(`src/cryptanalysis/ic_framework/linalg.rs:250-279`; the test at `:379`
+asserted that `"wiedemann"` is rejected), while block Wiedemann and block
+Lanczos with CADO-style filtering sat in `koblitz_sparse_la.rs`. This matters in exactly the two regimes where IC has a
 sub-rho exponent: the E(F_{p⁴}) ladder (LA is 0.495 of the exponent plain,
 0.420 with large primes) and genus-3 after cubic GHS (LA local exponent
 q^1.52 is the named next lever). H-BINSTD-dcc004 is already approved. Glue
@@ -298,7 +304,10 @@ factor-base censuses (0.93–1.03×); further Kummer spectra (0/31).
 
 ## 5. What this review does not establish
 
-It does not show that any IC variant beats rho, cold or online. It does not
+It does not show that any IC variant beats rho, cold or online. One
+statement was corrected after publication: §3.3's "sparse solvers
+unreachable" was true of the PR base but not of `main`, which already had
+`sparse-cado` (see the correction there). It does not
 rerun or re-derive any number; two of the anchor note's own calculations
 (free-relation count, 60× high; the C ≈ D^3.1 symmetry rule, 13× high) are a
 reminder that calculations here are not measurements. The costs in §4 are

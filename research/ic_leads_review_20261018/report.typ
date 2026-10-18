@@ -3,7 +3,6 @@
 #show table: set text(size: 7.5pt)
 #set table(stroke: 0.4pt + gray, inset: 4pt)
 #show table: it => { show raw.where(block: false): r => text(font: "DejaVu Sans Mono", size: 6.3pt, r.text.replace("_", "_\u{200b}").replace("/", "/\u{200b}")); it }
-
 = Index-calculus leads: status review and missed opportunities
 (2026-10-18)
 <index-calculus-leads-status-review-and-missed-opportunities-2026-10-18>
@@ -378,11 +377,17 @@ These are cheap, and each one can flip the sign of a headline row.
 engine reachable
 <33-measure-the-linear-algebra-as-an-object-and-make-the-good-engine-reachable>
 The relation matrix has never been measured (REVIEW-UNADDRESSED §4.1
-\#6; H-ICEX-5666b2). Checked today: ecbench `ic.pipeline` still offers
-only dense or structured Gauss
-(`src/cryptanalysis/ic_framework/linalg.rs:250-279`; the test at `:379`
-asserts that `"wiedemann"` is rejected), while block Wiedemann and block
-Lanczos with CADO-style filtering sit unreachable in
+\#6; H-ICEX-5666b2). #strong[Correction (2026-10-18, later the same
+day):] the check below was made on the PR base `f85012683`; `main`
+already carried `sparse-cado` (CADO-style filter followed by block
+Wiedemann inside `ic.pipeline`, PR \#1874, merge `ae8ac7df9`). What was
+unreachable from the pipeline was block Lanczos and the unfiltered
+Krylov cores; PR \#2162 wires `wiedemann`, `lanczos`, `filter+lanczos`
+and `filter+wiedemann` under the full-rank completion rule. Original
+text: at `f85012683`, ecbench `ic.pipeline` offered only dense or
+structured Gauss (`src/cryptanalysis/ic_framework/linalg.rs:250-279`;
+the test at `:379` asserted that `"wiedemann"` is rejected), while block
+Wiedemann and block Lanczos with CADO-style filtering sat in
 `koblitz_sparse_la.rs`. This matters in exactly the two regimes where IC
 has a sub-rho exponent: the E(F\_{p⁴}) ladder (LA is 0.495 of the
 exponent plain, 0.420 with large primes) and genus-3 after cubic GHS (LA
@@ -505,15 +510,17 @@ further Kummer spectra (0/31).
 
 == 5. What this review does not establish
 <5-what-this-review-does-not-establish>
-It does not show that any IC variant beats rho, cold or online. It does
-not rerun or re-derive any number; two of the anchor note\'s own
-calculations (free-relation count, 60× high; the C ≈ D^3.1 symmetry
-rule, 13× high) are a reminder that calculations here are not
-measurements. The costs in §4 are estimates. The sweeps could not see
-uncommitted worktrees or open PRs, so each action should start with a
-five-minute check of those places. No canonical graph changes: the
-leaderboard, scoreboard and progress timeline were checked and carry no
-new value from this review.
+It does not show that any IC variant beats rho, cold or online. One
+statement was corrected after publication: §3.3\'s \"sparse solvers
+unreachable\" was true of the PR base but not of `main`, which already
+had `sparse-cado` (see the correction there). It does not rerun or
+re-derive any number; two of the anchor note\'s own calculations
+(free-relation count, 60× high; the C ≈ D^3.1 symmetry rule, 13× high)
+are a reminder that calculations here are not measurements. The costs in
+§4 are estimates. The sweeps could not see uncommitted worktrees or open
+PRs, so each action should start with a five-minute check of those
+places. No canonical graph changes: the leaderboard, scoreboard and
+progress timeline were checked and carry no new value from this review.
 
 == Files
 <files>
