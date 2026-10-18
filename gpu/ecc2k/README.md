@@ -99,6 +99,14 @@ pass `selftest`; the native product runs `mul` at 127.3 against 97.3 Gop/s
 Gstep/s (1.19x), three repetitions each. Receipts:
 [`ecc2k130/benchmarks/ecc2k-clmad/RESULTS.md`](../../ecc2k130/benchmarks/ecc2k-clmad/RESULTS.md).
 
+Launch geometry was then swept on the same card: 256-thread blocks, the
+register variant and W = 4 run the walk at 2.022 Gstep/s against 1.775 for
+the previous 128-thread, lowmem, W = 8 default, 1.139x with every paired
+repetition above 1, after a device selftest at each width. `make bench
+ARCH=sm_120` and `./bench rho` now use those settings on compute capability
+12.0 and keep the old ones elsewhere. Receipts:
+[`ecc2k130/benchmarks/ecc2k-geometry/RESULTS.md`](../../ecc2k130/benchmarks/ecc2k-geometry/RESULTS.md).
+
 | Suite | Curve | Subgroup | What it covers |
 |---|---|---|---|
 | `test_ecc2k95` | F(2^97), a = 0 | 95-bit | the challenge curve |
