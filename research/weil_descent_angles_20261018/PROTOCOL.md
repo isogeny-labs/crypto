@@ -380,3 +380,29 @@ extension declared now, so the per-`p` constants can be read where the
 fixed setup (r scalar multiplications) is amortised. Every other parameter
 of Addendum A and Amendment C stands. The added prediction **P8b** is
 `steps/p → 1/3` for Arm J at every `h`, against `0.886/√h` for rho.
+
+## Amendment F (control for Arm J), after the recorded Part O/J run and before this control ran
+
+The recorded run (`results/itemOJ-run-20261018T2132Z`) gives Arm J
+`steps/p ≈ 0.24–0.39` at every size. Cofactors there are `h ∈ {4, 8}`,
+and the pricing band is unresolved at every size. Arm J's r-adding walk
+can collide with itself (a rho collision), and a repeated divisor appears
+as a duplicate relation. That is a 2-cycle in the large-prime graph. Part
+of Arm J's success could therefore be rho inside the IC walk rather than
+the large-prime-graph mechanism (P8b).
+
+Control (`n2_routes <out> control`): the same instances as the recorded
+run, three fresh targets each, `c = 2`. Two arms are measured:
+
+- **Jwalk**: the recorded Arm J walk. It records every relation whose
+  divisor repeats an earlier one, and whether the solving relation was
+  such a repeat.
+- **Jind**: every trial is a fresh `a τP + b τQ` from scalar
+  multiplications, with no walk. A repeat then has only birthday
+  probability on the `ℓ`-subgroup.
+
+Only `steps/p` and the repeat statistics are read; Jind's cost is not
+compared with rho. Prediction **P8c**: Jind `steps/p ≈ 1/3`, not larger
+than Jwalk's within sampling spread, with few solves by repeats.
+Otherwise the measured Arm J advantage in group operations is partly a
+rho effect, and the report says so.

@@ -19,7 +19,7 @@
 //! separately and priced afterwards at 0, 0.1 and 1 M.
 //!
 //! std-only; `rustc --edition 2021 -O examples/n2_routes.rs`.
-//! Usage: `n2_routes <out-dir> [run|check]`; env `N2_THREADS`, `N2_SIZES`
+//! Usage: `n2_routes <out-dir> [run|check|control]`; env `N2_THREADS`, `N2_SIZES`
 //! (comma-separated `log2 #E` targets, default `20,24,28,32,36,40`).
 #![allow(dead_code)]
 #![allow(clippy::needless_range_loop)]
@@ -1303,6 +1303,10 @@ struct ArmResult {
     k: u64,
     ok: bool,
     secs: f64,
+    /// Amendment F control: divisors that recurred among relation rows, and
+    /// whether the solving row's divisor was such a repeat
+    dup_events: u64,
+    solved_by_dup: bool,
 }
 
 fn canon_e(pt: EP) -> (EP, bool) {
@@ -1433,6 +1437,21 @@ const IC_RESTART: u64 = 4096;
 
 /// Arm J: genus-2 index calculus in Jac(C)(F_p) on τ(P), τ(Q).
 fn arm_jac(inst: &Instance, pt: EP, q: EP, c: u32, rng: &mut u64) -> ArmResult {
+    arm_jac_impl(inst, pt, q, c, rng, false, false)
+}
+
+/// `track`: record repeated divisors (Amendment F); `indep`: every trial is a
+/// fresh `a τP + b τQ` (no walk), so no walk can collide with itself.
+fn arm_jac_impl(
+    inst: &Instance,
+    pt: EP,
+    q: EP,
+    c: u32,
+    rng: &mut u64,
+    track: bool,
+    indep: bool,
+) -> ArmResult {
+    let mut seen: HashMap<Vec<u64>, ()> = HashMap::new();
     let t0 = Instant::now();
     let c0 = Counts::now();
     let p = inst.p;
@@ -1542,10 +1561,17 @@ fn arm_jac(inst: &Instance, pt: EP, q: EP, c: u32, rng: &mut u64) -> ArmResult {
                     }
                 }
                 res.rels += 1;
+                let mut is_dup = false;
+                if track {
+                    let key: Vec<u64> = d.u.iter().chain(d.v.iter()).map(|c| c.0).collect();
+                    is_dup = seen.insert(key, ()).is_some();
+                    res.dup_events += u64::from(is_dup);
+                }
                 let s = Counts::now();
                 let cand = lin.push(row);
                 res.la = res.la.add(s.since());
                 if let Some(k) = cand.filter(|&k| inst.e.mul(pt, k) == q) {
+                    res.solved_by_dup = is_dup;
                     res.k = k;
                     res.ok = true;
                     res.steps = steps;
@@ -1581,10 +1607,16 @@ fn arm_jac(inst: &Instance, pt: EP, q: EP, c: u32, rng: &mut u64) -> ArmResult {
             let hx = d.u.iter().chain(d.v.iter()).fold(0u64, |h, c| {
                 (h ^ c.0).wrapping_mul(0x9e37_79b9_7f4a_7c15)
             }) >> 40;
-            let (m, ma, mb) = &mults[(hx as usize) % IC_R];
-            d = jop!(jadd_fast(f, &d, m));
-            a = (a + ma) % ell;
-            b = (b + mb) % ell;
+            if indep {
+                a = xorshift(rng) % ell;
+                b = xorshift(rng) % ell;
+                d = jop!(jadd_fast(f, &jmul_fast(f, &tp, a), &jmul_fast(f, &tq, b)));
+            } else {
+                let (m, ma, mb) = &mults[(hx as usize) % IC_R];
+                d = jop!(jadd_fast(f, &d, m));
+                a = (a + ma) % ell;
+                b = (b + mb) % ell;
+            }
             steps += 1;
         }
     }
@@ -2260,6 +2292,82 @@ fn summarize(csv: &str) -> (String, String, String) {
     (out, rank, txt)
 }
 
+/// Amendment F control: Arm J with its walk (repeat tracking) and Arm J with
+/// independent random trials, c = 2, same instance generator as the run.
+fn control_job(job: &Job) -> Vec<String> {
+    let mut rng = job.seed | 1;
+    let inst = Instance::new(job.bits, &mut rng);
+    let pt = loop {
+        let v = inst.e.mul(inst.e.random_point(&mut rng), inst.h);
+        if v != EP::O {
+            break v;
+        }
+    };
+    let mut rows = Vec::new();
+    for tgt in 0..3 {
+        let k = 1 + xorshift(&mut rng) % (inst.ell - 1);
+        let q = inst.e.mul(pt, k);
+        for (name, indep) in [("Jwalk", false), ("Jind", true)] {
+            let r = arm_jac_impl(&inst, pt, q, 2, &mut rng, true, indep);
+            let ok = r.ok && r.k == k && inst.e.mul(pt, r.k) == q;
+            rows.push(format!(
+                "{},{},{},{},{},{},{},{},{},{},{},{}",
+                job.bits,
+                job.inst_id,
+                inst.p,
+                inst.h,
+                inst.ell,
+                tgt,
+                name,
+                r.steps,
+                r.rels,
+                r.dup_events,
+                u8::from(r.solved_by_dup),
+                u8::from(ok)
+            ));
+        }
+        eprintln!("control bits {} inst {} target {} done", job.bits, job.inst_id, tgt);
+    }
+    rows
+}
+
+fn summarize_control(csv: &str) -> String {
+    let mut by: std::collections::BTreeMap<(u64, String), Vec<(f64, f64, f64, f64)>> = Default::default();
+    let mut byh: std::collections::BTreeMap<(String, u64), Vec<f64>> = Default::default();
+    let mut all_ok = true;
+    for l in csv.lines().skip(1) {
+        let v: Vec<&str> = l.split(',').collect();
+        let bits: u64 = v[0].parse().unwrap();
+        let p: f64 = v[2].parse().unwrap();
+        let h: u64 = v[3].parse().unwrap();
+        let steps: f64 = v[7].parse().unwrap();
+        let dups: f64 = v[9].parse().unwrap();
+        let sbd: f64 = v[10].parse().unwrap();
+        all_ok &= v[11] == "1";
+        by.entry((bits, v[6].to_string())).or_default().push((steps / p, dups, sbd, 1.0));
+        byh.entry((v[6].to_string(), h)).or_default().push(steps / p);
+    }
+    let mut t = String::new();
+    for ((bits, arm), v) in &by {
+        let n = v.len() as f64;
+        let m = v.iter().map(|x| x.0).sum::<f64>() / n;
+        let sd = (v.iter().map(|x| (x.0 - m).powi(2)).sum::<f64>() / (n - 1.0)).sqrt();
+        let dup = v.iter().map(|x| x.1).sum::<f64>() / n;
+        let sbd = v.iter().map(|x| x.2).sum::<f64>();
+        t.push_str(&format!(
+            "F bits {bits} {arm}: runs {n} steps/p mean {m:.4} sd {sd:.4} | repeated divisors per run {dup:.2} | solved by a repeat {sbd}/{n}\n"
+        ));
+    }
+    for ((arm, h), v) in &byh {
+        let n = v.len() as f64;
+        let m = v.iter().sum::<f64>() / n;
+        let sd = (v.iter().map(|x| (x - m).powi(2)).sum::<f64>() / (n - 1.0).max(1.0)).sqrt();
+        t.push_str(&format!("F by cofactor {arm} h={h}: runs {n} steps/p mean {m:.4} sd {sd:.4} (s.e. {:.4})\n", sd / n.sqrt()));
+    }
+    t.push_str(&format!("F all answers verified: {all_ok}\n"));
+    t
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let out = Path::new(args.get(1).expect("usage: n2_routes <out-dir> [run|check]"));
@@ -2269,6 +2377,7 @@ fn main() {
         run_checks(out);
         return;
     }
+    let control = mode == "control";
     let threads: usize = std::env::var("N2_THREADS")
         .ok()
         .and_then(|s| s.parse().ok())
@@ -2297,13 +2406,28 @@ fn main() {
             s.spawn(|| loop {
                 let j = queue.lock().unwrap().pop();
                 let Some((i, job)) = j else { break };
-                let r = run_job(&job);
+                let r = if control { control_job(&job) } else { run_job(&job) };
                 results.lock().unwrap().push((i, r));
             });
         }
     });
     let mut res = results.into_inner().unwrap();
     res.sort_by_key(|(i, _)| *i);
+    if control {
+        let mut csv = String::from("bits,instance,p,h,ell,target,arm,steps,relations,repeat_events,solved_by_repeat,verified\n");
+        for (_, rows) in res {
+            for r in rows {
+                csv.push_str(&r);
+                csv.push('\n');
+            }
+        }
+        std::fs::write(out.join("control.csv"), &csv).unwrap();
+        let t = summarize_control(&csv);
+        std::fs::write(out.join("control_summary.txt"), &t).unwrap();
+        eprint!("{t}");
+        eprintln!("done in {:.1}s", t0.elapsed().as_secs_f64());
+        return;
+    }
     let mut f = File::create(out.join("routes.csv")).unwrap();
     writeln!(
         f,
