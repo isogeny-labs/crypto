@@ -92,16 +92,23 @@ def audit(provider_root: Path, downloads: Path, build_receipt: Path) -> dict:
                 f"S3 object address differs: {arm['role']}")
         packed = downloads / f"{digest}.jsonl.gz"
         get = json.loads((downloads / f"{digest}.get.json").read_text())
-        raw = gzip.decompress(packed.read_bytes())
+        packed_bytes = packed.read_bytes()
         require(packed.stat().st_size == receipt["compressed_bytes"]
                 and file_digest(packed, "sha256") == receipt["compressed_sha256"]
-                and blake3.blake3(packed.read_bytes()).hexdigest() == digest
+                and blake3.blake3(packed_bytes).hexdigest() == digest
                 and file_digest(packed, "md5") == receipt["etag_expected"].strip('"')
                 and get["ETag"] == receipt["etag_expected"]
                 and get["ContentLength"] == receipt["compressed_bytes"]
-                and len(raw) == arm["raw_bytes"]
+                and get["ContentType"] == "application/gzip"
+                and get["Metadata"] == {
+                    "role": arm["role"], "base-hash": arm["base_hash"],
+                    "raw-sha256": arm["raw_sha256"],
+                },
+                f"compressed S3 object differs: {arm['role']}")
+        raw = gzip.decompress(packed_bytes)
+        require(len(raw) == arm["raw_bytes"]
                 and hashlib.sha256(raw).hexdigest() == arm["raw_sha256"],
-                f"fresh S3 round-trip differs: {arm['role']}")
+                f"decompressed S3 base differs: {arm['role']}")
         row = json.loads(raw)
         curve = plan["curve"]
         require(row["a"] == curve["a"] and row["n"] == curve["n"]
