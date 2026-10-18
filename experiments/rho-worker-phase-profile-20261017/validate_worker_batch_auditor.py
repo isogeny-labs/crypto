@@ -101,6 +101,9 @@ def make_complete(folder, plan, outputs):
     write_rows(folder / 'pairs.jsonl', pairs)
     write_json(folder / 'summary.json', {
         'status': 'completed',
+        'queue_root': str(folder.parent),
+        'lock_path': str(folder.parent / '.rho-worker-panel.lock'),
+        'lock_scope': 'shared_queue_root_mount',
         'manifest_sha256': digest(folder / 'manifest.json'),
         'runner_sha256': digest(HERE / 'run_tier1_worker_batch.py'),
         'artifacts_stable': True,
@@ -168,6 +171,18 @@ def main():
                 missing_result['paired_ratio_descriptive'] is not None):
             raise AssertionError('missing raw output did not suppress aggregate')
 
+        bad_lock = root / 'bad_lock'
+        shutil.copytree(good, bad_lock)
+        lock_summary = json.loads((bad_lock / 'summary.json').read_text())
+        lock_summary['lock_path'] = '/run/lock/container-local.lock'
+        write_json(bad_lock / 'summary.json', lock_summary)
+        lock_result = audit(bad_lock)
+        if (lock_result['decision'] != 'unknown_gate_failed' or
+                'shared queue lock receipt mismatch' not in
+                lock_result['structural_issues'] or
+                lock_result['q_cluster_bootstrap95'] is not None):
+            raise AssertionError('container-local lock receipt did not suppress aggregate')
+
     result = {
         'schema': 'rho-worker-auditor-policy-selfcheck-v1',
         'data_kind': 'synthetic_policy_validation_only',
@@ -180,6 +195,7 @@ def main():
         'complete_panel_bootstrap95': passed['q_cluster_bootstrap95'],
         'one_aa_failure': aa_result['decision'],
         'missing_raw_stdout': missing_result['decision'],
+        'container_local_lock': lock_result['decision'],
         'synthetic_performance_result': None,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)

@@ -3,7 +3,8 @@
 
 The child executable owns total_charged_ns. This runner records the allocation,
 affinity, cgroup-v1/v2 counters, per-CPU counters, full stdout/stderr, and
-every failed pair. A single host-wide flock excludes concurrent panels.
+every failed pair. A flock in the shared queue root excludes concurrent
+panels launched against the same persistent Pod workspace.
 """
 
 import argparse
@@ -19,7 +20,7 @@ import subprocess
 import time
 import uuid
 
-LOCK = Path('/run/lock/cryptanalysis-isolated-bench.lock')
+LOCK_NAME = '.rho-worker-panel.lock'
 
 
 def digest(path):
@@ -262,7 +263,7 @@ def arm(manifest, case, repeat, variant, serial, folder):
     }
 
 
-def run(manifest, folder):
+def run(manifest, folder, lock_path):
     if manifest.get('schema') != 1 or manifest.get('measurement_tier') != 'tier1_instance':
         raise ValueError('expected frozen Tier 1 manifest')
     if manifest.get('outer_repeats') != 1:
@@ -343,6 +344,9 @@ def run(manifest, folder):
         complete = health['ok'] and rows == 2 * expected and pairs == expected and error is None
         summary = {'status': 'completed' if complete else 'rejected',
                    'measurement_tier': 'tier1_instance', 'expected_pairs': expected,
+                   'queue_root': str(lock_path.parent),
+                   'lock_path': str(lock_path),
+                   'lock_scope': 'shared_queue_root_mount',
                    'completed_arms': rows, 'completed_pairs': pairs,
                    'error': error, 'valid_pairs': valid_pairs,
                    'artifact_sha256': artifacts_before,
@@ -361,11 +365,12 @@ def main():
     args = parser.parse_args()
     manifest = json.loads(args.manifest.read_text())
     args.queue_root.mkdir(parents=True, exist_ok=True)
-    with LOCK.open('a+') as stream:
+    lock_path = args.queue_root.resolve() / LOCK_NAME
+    with lock_path.open('a+') as stream:
         fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
         job = uuid.uuid4().hex
         folder = args.queue_root / 'results' / job
-        result = run(manifest, folder)
+        result = run(manifest, folder, lock_path)
         print(json.dumps({'job_id': job, 'output': str(folder),
                           'status': result['status'], 'valid_pairs': result['valid_pairs']}))
         if result['status'] != 'completed':

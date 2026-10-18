@@ -147,6 +147,21 @@ auditor policy self-check passed on the rebased binary. These are local
 build and correctness checks;
 the full-worker speed decision still awaits the Tier 1 host panel.
 
+The runner now locks a persistent queue root that benchmark requests to the
+same Pod can share. The [shared-lock validation](shared-lock-source-validation.json)
+pins the revised runner and auditor, the two-process lock check, and a
+synthetic auditor case that rejects a container-local lock receipt. The
+current source bundle rebuilt identically twice at SHA-256
+`ccc4c83128510e145bed6e8c04b26eb9a63f617bb2d3665826856ccd91902904`.
+It built from a clean extraction with a fresh Cargo target, producing the
+same release benchmark binary SHA-256 as above. The extracted binary passed
+the q00 serial/batch exact-output replay: 120,070 steps, 26 verified
+distinguished points, and five matching check-ins. These checks establish
+archive completeness and same-root process serialization behavior; they do
+not prove physical-host exclusivity or a throughput gain. The revised runner's
+[non-Linux preflight](shared-lock-nonlinux-preflight.json) rejected the local
+host before any arm and the auditor left its result unknown.
+
 The [repaired-main phase trace](rebased-main-phase-32x8192-dp12.json)
 replayed the same 106,327 steps and terminal transcript as the earlier
 32-walker trace. Its local setup-plus-start share was 7.01%, compared with
@@ -197,8 +212,13 @@ all emitted check-ins.
 On a Linux allocation, build a release example from the frozen source and
 use `build_worker_batch_plan.py` to bind the binary, Q manifest, source
 bundle, allocation receipt, and selected CPU before any arm runs. The
-[Tier 1 runner](run_tier1_worker_batch.py) takes a host-wide lock and pins
-one child at a time. Its 32-Q plan has four alternating repetitions of a
+[Tier 1 runner](run_tier1_worker_batch.py) takes a lock in the persistent
+queue root and pins one child at a time. Run all benchmark requests for the
+Pod against the same mounted queue root so the lock serializes them, including
+requests from separate containers that share that mount. This lock does not
+establish exclusivity against unrelated workloads on the physical host; the
+host receipt records that boundary. Its 32-Q plan has four alternating
+repetitions of a
 serial/batch pair and serial/serial and batch/batch A/A controls: 384 pairs,
 768 arms. It retains stdout, stderr, topology, cgroup, CPU, and failure
 receipts. The [independent auditor](analyze_tier1_worker_batch.py) requires

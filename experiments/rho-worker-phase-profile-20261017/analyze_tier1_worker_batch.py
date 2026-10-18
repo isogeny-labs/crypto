@@ -71,6 +71,12 @@ def audit(folder):
                     structural.append('case Q mismatch: ' + case['id'])
     if summary.get('manifest_sha256') != digest(manifest_path):
         structural.append('manifest receipt mismatch')
+    queue_root = summary.get('queue_root')
+    lock_path = summary.get('lock_path')
+    if (summary.get('lock_scope') != 'shared_queue_root_mount' or
+            not isinstance(queue_root, str) or not isinstance(lock_path, str) or
+            lock_path != str(Path(queue_root) / '.rho-worker-panel.lock')):
+        structural.append('shared queue lock receipt mismatch')
     runner = Path(__file__).with_name('run_tier1_worker_batch.py')
     if summary.get('runner_sha256') != digest(runner):
         structural.append('runner source mismatch')
