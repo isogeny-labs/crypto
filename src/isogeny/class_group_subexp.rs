@@ -574,9 +574,14 @@ fn trial_batch(
     let disc = &fb.disc;
     let mut rels = Vec::new();
     let mut partials = Vec::new();
-    // a varying number of base terms: with a fixed count every relation of a
-    // class-number-one discriminant would have an even coefficient sum
-    let k_max = 3.min(n);
+    // The base product must be *larger than a reduced form* before it is
+    // reduced, or reduction does nothing and the trial factors back into the
+    // primes it was built from (a zero relation).  Reduced forms have
+    // a ≤ sqrt(|D|/3), so keep multiplying random factor-base forms until
+    // the product of their norms passes sqrt|D| by a margin.  A varying
+    // number of extra terms: with a fixed count every relation of a
+    // class-number-one discriminant would have an even coefficient sum.
+    let target_bits = disc.bits() as f64 / 2.0 + 12.0;
     let inner = 16;
     let mut done = 0usize;
     let mut count = 0u64;
@@ -584,8 +589,14 @@ fn trial_batch(
         // base product F = prod g_i^{±1}
         let mut exps: Vec<(u32, i64)> = Vec::new();
         let mut base: Option<Bqf> = None;
-        let k_base = rng.gen_range(1..=k_max);
-        for _ in 0..k_base {
+        let extra = rng.gen_range(0..=2);
+        let mut acc_bits = 0.0f64;
+        let mut k_base = 0usize;
+        while acc_bits < target_bits || k_base < 1 + extra {
+            k_base += 1;
+            if k_base > 4096 {
+                break;
+            }
             let i = rng.gen_range(0..n);
             let s: i64 = if rng.gen_bool(0.5) { 1 } else { -1 };
             let g = if s > 0 {
@@ -598,7 +609,9 @@ fn trial_batch(
                 Some(f) => compose_reduce(&f, g, disc),
             });
             exps.push((i as u32, s));
+            acc_bits += (fb.primes[i].p as f64).log2();
         }
+        let exps = normalize_relation(exps);
         let base = base.expect("nonempty factor base");
         for _ in 0..inner {
             done += 1;
@@ -623,12 +636,23 @@ fn trial_batch(
             }
             let mut rel = exps.clone();
             rel.push((j as u32, s));
-            for (c, v) in fac {
+            for &(c, v) in &fac {
                 rel.push((c, -v));
             }
             let rel = normalize_relation(rel);
             if cof == 1 {
                 if !rel.is_empty() {
+                    if rels.len() < 2 && std::env::var_os("CLASSGROUP_DEBUG").is_some() {
+                        eprintln!(
+                            "  [classgroup:debug] relation {:?} (primes {:?}) from base {:?} exps {:?} times j={} s={} -> f=({}, {}, {}) fac {:?}",
+                            rel,
+                            rel.iter().map(|&(c, v)| (fb.primes[c as usize].p, v)).collect::<Vec<_>>(),
+                            (base.a.to_string(), base.b.to_string()),
+                            exps.iter().map(|&(c, v)| (fb.primes[c as usize].p, v)).collect::<Vec<_>>(),
+                            fb.primes[j].p, s, f.a, f.b, f.c,
+                            fac.iter().map(|&(c, v)| (fb.primes[c as usize].p, v)).collect::<Vec<_>>()
+                        );
+                    }
                     rels.push(rel);
                 }
             } else {
@@ -1381,7 +1405,23 @@ fn structure_core(
     // modulus, which the enlarged lattice's determinant divides).
     let primes = crt_primes(2);
     let sel = select_independent_rows(&dense, nd, primes[0])
-        .or_else(|| select_independent_rows(&dense, nd, primes[1]))?;
+        .or_else(|| select_independent_rows(&dense, nd, primes[1]));
+    if sel.is_none() && std::env::var_os("CLASSGROUP_DEBUG").is_some() {
+        let occ_cols = {
+            let mut occ = vec![0u32; nd];
+            for r in &dense {
+                for &(c, _) in r {
+                    occ[c] += 1;
+                }
+            }
+            occ.iter().filter(|&&o| o == 0).count()
+        };
+        eprintln!(
+            "  [classgroup:debug] dense block {} rows x {} cols (eliminated {}, input rows {}), empty dense columns {}, elimination {:.2}s: rank < {} mod both primes",
+            dense.len(), nd, el.log.len(), rels.len(), occ_cols, t_el, nd
+        );
+    }
+    let sel = sel?;
     let mut d_mod = exact_abs_det(&dense, &sel, nd);
     if d_mod.is_zero() {
         return None;
@@ -1849,7 +1889,21 @@ pub fn compute_class_group(disc: &BigInt, params: &SubexpParams) -> Result<Subex
             None => {
                 target_count = rels.len() + batch_extra.max(rels.len() / 4);
                 if params.verbose {
-                    eprintln!("  [classgroup] rank deficient with {} relations", rels.len());
+                    let mut occ = vec![0u32; n];
+                    for r in rels.iter() {
+                        for &(c, _) in r {
+                            occ[c as usize] += 1;
+                        }
+                    }
+                    let zero: Vec<u64> = (0..n).filter(|&c| occ[c] == 0).map(|c| fb.primes[c].p).collect();
+                    let one = (0..n).filter(|&c| occ[c] == 1).count();
+                    eprintln!(
+                        "  [classgroup] rank deficient with {} relations (FB {} primes; {} columns never hit{}{}; {} hit once)",
+                        rels.len(), n, zero.len(),
+                        if zero.is_empty() { "" } else { ": " },
+                        zero.iter().take(12).map(|p| p.to_string()).collect::<Vec<_>>().join(","),
+                        one
+                    );
                 }
             }
             Some(s) => {
