@@ -44,9 +44,9 @@ obligation as well as the counting ceiling.
 - [ ] Measure base import, root/index preparation, failed and successful query work, rank/linear algebra, target extraction and verification on matched instances and resources; include A/A controls, current IC baseline and same-point rho before claiming a pipeline improvement.
 - [ ] If m=2 or m=3 is promoted as a candidate despite the small-base support bounds, freeze its accepted relation event and resource-feasible base or partial-relation policy and independently measure natural yield and rank.
 
-The first condition would establish comparative relation and rank behavior for
-two specific bases under a specific oracle. The second would determine a
-complete cost ordering at that workload. It would not establish a universal
+A completed matched relation/rank experiment would establish behavior for
+the named bases under that oracle. The separate full-cost gate would determine
+their cost ordering at that workload. Neither would establish a universal
 best base, asymptotic crossover or transfer to a different curve.
 
 ## Next discriminating step

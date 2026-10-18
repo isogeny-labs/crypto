@@ -8,8 +8,9 @@ The exact primary curve is `icv1-f2m83-tm6151469093347-debefd74`, `a=0`, `b=1`, 
 
 The preregistered target was the group sum of the first stored representatives of signed-orbit columns 0, 1, 2 and 3, contingent on all intermediate sums being affine and the x values distinct. The worker intended to pin those four x values only after installing the complete K=16,627 Frobenius-orbit SAT domain. Its source snapshot was bound to clean commit `1322cb5681d31849a2f33a6b47e16f9e3d598e0a`; [all five source files](source-files.sha256) and [all five staged inputs](inputs-before-run.sha256) passed SHA-256 checks. The native Linux release worker built in the pinned offline image, with binary SHA-256 `ad476db700089d5c62864fff945e5f6d573cfabbd2fe9cef617bda415632685d`. The touched exporter example passed 19/19 tests. Details and logs are in [BUILD_RECEIPT.md](BUILD_RECEIPT.md).
 
-The pre-stack release library suite passed 4,216 tests with 117 ignored; its
-complete log and the pending stacked-head gate are tracked in
+The pre-stack release library suite passed 4,216 tests with 117 ignored; the
+stacked-head run stopped at inherited compilation errors before tests ran. Both
+complete logs and the formatting checks are tracked in
 [VALIDATION.md](VALIDATION.md).
 
 ## Observed run
