@@ -1,12 +1,135 @@
 # Item 06: signature-based Boolean Groebner engine and Joux-Vitse trace replay
 
+**Verdict: REGRESSES** (frozen rule, `b06 summarize` over `raw/` with the repaired instrument; output
+`raw/assess-r2-summarize.stdout.log`, last line: "sig is at least 1.5x worse than f4 in at least 3 cells").
+Level: **constant** (a multiplicative factor on the oracle term of item 02's model; no exponent or primitive claim).
+Class: stage diagnostic. No `S`, no rho ratio, no GAE is computed, so the section 5a 0/0.1/1 GAE band does not
+apply to these rows. **The gap to matched rho is unchanged by this item** (distance remaining, not moved). No
+improvement over the index-calculus baseline was found; this is a loss for the signature engine, reported as a loss.
+The first-run verdict (INCONCLUSIVE) is kept below under "First run (superseded)".
+
+## What changed since the first run
+
+The repair pass (PROTOCOL.md Amendment 2) re-ran cards 03, 04, 05, 08, 12: nine r2 cards, all receipts
+`status: completed` (checked on disk, `raw/receipt-card-*-r2.json`, `check-relay` `verify_findings: []`), so every
+cell now has 16 targets for `f4` and `sig` (except one `f4` timelimit, below) and `c15-3-4` has `f4r`/`f4n` rows.
+The decisive change: `c15-5-3` now has all 16 `sig` targets (8 more in card 05-r2), all stopped by the 2x touch cap, so
+the cell is regress-certain. That makes 3 of 4 cells regress-certain, which is the REGRESSES condition.
+
+## Numbers (measured by the instrument; ranges are per-target min-max, derived from the raw rows)
+
+R = touches(f4) / cost(X), geometric mean over targets, paired by target. `sig` rows are upper bounds (`<=`):
+a stopped job's work so far is a lower bound on its cost.
+
+| cell | sig: stops (of 16) | sig R (bound) | per-target bound range | regress-certain (<= 1/1.5) |
+|---|---|--:|---|---|
+| c13-3-4 | 16 touchcap | <= 0.494 | 0.475 to 0.500 | yes |
+| c15-3-4 | 5 touchcap, 4 colscap, 4 timelimit, 3 memcap | <= 1.677 | 0.495 to 8.66 | **no** (non-touch stops do not bound) |
+| c15-5-3 | 16 touchcap | <= 0.497 | 0.491 to 0.500 | yes |
+| c17-4-3 | 16 touchcap | <= 0.492 | 0.463 to 0.500 | yes |
+
+`sig` refuted 0 of 64 targets; it qualifies (R >= 1.5 on 12 of 16, all refuted) in 0 of 4 cells, so ADVANCES and
+TRADES are excluded. Because REGRESSES needs only 3 certain cells, the unsettled `c15-3-4` does not change the verdict.
+The touch-cap bound is not an artefact of the cap: a job that is still unfinished at 2x F4's touches costs more than 2x,
+so R < 0.5 is true for those targets (the cap fixes how tight the bound is, not its sign). Descriptive long run (card
+03-r2, `--touch-ratio 100`, `c17-4-3` t0): `sig` ended `memcap` at 9.33e9 touches (29x F4's 3.19e8) with 3907 steps, still
+not refuted: R <= 0.034, one target, outside the rule.
+
+| cell | f4r R (exact-key replay, trace charged) | range | f4n R (descriptive) | range | n >= 1.5 (f4n) | targets paired |
+|---|--:|---|--:|---|--:|--:|
+| c13-3-4 | 0.885 | 0.85 to 0.93 | 1.120 | 0.56 to 2.82 | 2/16 | 16 |
+| c15-3-4 | 0.630 | 0.41 to 0.91 | 1.026 | 0.42 to 2.54 | 7/15 | 15 |
+| c15-5-3 | 0.741 | 0.64 to 0.84 | 1.413 | 1.30 to 1.52 | 2/16 | 16 |
+| c17-4-3 | 0.587 | 0.50 to 0.77 | 1.160 | 0.92 to 1.46 | 0/16 | 16 |
+
+`f4r` fell back on every target in every cell (16, 15, 16, 16 fallbacks): the exact key filter does not transfer
+between targets, so replay costs more than a fresh `f4` once the trace is charged. `f4n` is a descriptive extra arm: it
+never reaches the 1.5 bar in a cell; its zero reductions fall 1.5x to 2.6x (f4/f4n 1.548, 1.989, 2.402, 2.626) and its
+largest matrix is 0.32x to 1.53x of F4's, but touches do not fall enough. `f4rs` (descriptive, 1 to 4 targets per
+cell): R 2.09, 1.98 (1 target), 3.02, 2.60 with 245x to 343x fewer zero reductions. Four-target leads outside the rule,
+not results; what it counts is in PROTOCOL.md "Counted quantities".
+
+Zero reductions at the first degree-4 matrix, f4/sig geometric mean (touches at that point in brackets):
+c13-3-4 719x (0.456), c15-3-4 873x (0.403), c15-5-3 480x (10.67), c17-4-3 1519x (4.17). The criteria remove the zero
+reductions they target, but the engine pays for it at later degrees (selection degree 5, thousands of steps) and never
+reaches `1` within 2x of F4. The ablations (`sig4`, `sig0`, `sigc`, 2 targets per cell, now in all four cells except
+`c15-3-4` t1 skipped) all stop at the cap too: bounds 0.50, 0.50, 0.57 (c13-3-4), 0.50, 0.50, 0.49 (c15-5-3), 0.498,
+0.499, 0.499 (c17-4-3), and 0.687, 0.679, 1.859 (c15-3-4, 1 target). No criterion subset reaches F4 within the caps.
+
+Gap to matched rho: unchanged; this item moves no ECDLP row. Pricing at 0, 0.1 and 1 GAE per unpriced native operation:
+not applicable (no cross-method row; item 02's band prices an oracle factor, and the factor found is a loss).
+
+## Method
+
+Four cells (n, l, m): `c13-3-4`, `c15-3-4`, `c15-5-3`, `c17-4-3`; 17 unsatisfiable targets each (`draws.tsv`, seed
+20261020), indices 0-15 measured, 16 held out as the trace. Arms: `f4` (item 05's F4, the incumbent), `sig` (GVW/F5-style
+criteria over the Boolean ring), `f4r`/`sigr` (exact-key replay), plus `f4n`, `f4rs`, ablations `sig0`/`sig4`/`sigc`, and
+fallback control `f4rx`. Metric: matrix entries touched, paired by target. Frozen in `PROTOCOL.md` (Amendment 1 before
+any card, Amendment 2 before any r2 card). Instrument `examples/blindspots_06_signature_gb.rs` single-threaded under
+`prlimit --as=4 GiB`: sha256 `d9d7ffc3...` for the first-run cards, `48a39c34...` (Amendment 2, deviations 15 to 17) for the r2 cards.
+
+## Controls
+
+| control | result |
+|---|---|
+| selftest (card 01): 132 systems, f4/sig/sig0/each criterion identical reduced bases, brute-force count | SELFTEST OK (first-run card; instrument fix does not touch it; r2 smoke test also OK, `smoke-test-r2.txt`) |
+| code identity (xcheck): f4 vs item 05 `c17-4-3` grevlex rows, 8 targets | 8/8 IDENTICAL |
+| fallback control `f4rx` (c17-4-3, trace of c13-3-4) | ratio 0.9989, 4 of 4 fallbacks: no free lunch, OK |
+| ablation `sig4`/`sig0`/`sigc` | see above; all stopped, bounds only |
+| old vs new instrument | identical on 33 of 36 held-out rows (other 3 are 25 s time-limit stops, `smoke-test-r2.txt`) |
+| `f4` identical across cards | trace row (target 16) is identical in cards 12-r2, 12b-r2, 12c-r2 (touches 11088230851) |
+
+## Deviations (all of them)
+
+* The first-run card list in PROTOCOL.md Amendment 2 stands. Cards 03, 04, 05, 08, 12 were re-run as r2 cards; first-run
+  rows of the same (cell, target, arm) are replaced by r2 rows in `summarize` (read last), and `-long-` files are skipped.
+* **Summarize was run by the assess stage, not by a card.** Rule 4 forbade freezing card-14-r2 before the r2 outputs were
+  committed; the assessor built the instrument (sha256 `48a39c34...`, verified) into the scratchpad and ran
+  `b06 summarize --dir raw` once, saving the output as `raw/assess-r2-summarize.stdout.log`. No card-14-r2 exists, so this
+  output is not sha-bound by a receipt; it is reproducible from the committed `raw/` and the committed instrument.
+  First-run `raw/card-14-summarize.stdout.log` is unchanged and stale.
+* **Relay files are abbreviated.** `raw/relay-r2-1..9.txt` hold the receipt-derived status lines, not the executors'
+  full text (output bodies were not retyped; named `-r2-` so as not to overwrite the first-run `relay-1..9.txt`).
+  `check-relay` therefore reports missing lines; the receipts (all `completed`, `verify_findings: []`) and `raw/` are the evidence.
+* `--total-limit` raised only where the first-run value would have skipped rows (Amendment 2 C). Still skipped in the
+  first-run cards that were not re-run: `f4rs` on `c15-3-4` (2 targets skipped, 1 timelimit) and ablation rows for t1 of
+  `c15-3-4`. `f4` itself hit `timelimit` on `c15-3-4` target 1 (card 11), so that cell has 15 paired `f4r`/`f4n` targets
+  and cannot satisfy "every target refuted by f4".
+* `sigr`/`sign` BLOCKED in all cells (the recording run of the trace did not refute): the replay-of-signature
+  question is untested, not refuted. Arm (e) msolve BLOCKED (not installed, no GMP/FLINT headers).
+* Design departures (PROTOCOL deviations 10-14): ascending-degree generator order, multiple pivots, K5; stopped at 2x F4
+  touches; K5 completeness checked, not proved. `sig` may lose partly because of these choices.
+* A concurrent clippy/rustfmt task would change the instrument sha; the instrument sha was verified unchanged at assessment.
+
+## Caveats
+
+* Toy scale (n = 13 to 17), shared 4-vCPU cloud container, host level L0, no isolation level earned, no hardware PMU. The
+  unit is matrix entries touched, not wall time; wall times are descriptive.
+* The verdict is about this engine (as built, with the stated design departures) on these four cells and orders. It says
+  nothing about production signature codes (msolve, F5, magma) or other orders and row selections.
+* The REGRESSES line follows from the 2x touch cap on three cells; the true factor is unknown (only R < 0.5 there).
+  Per-target ranges are min-max, not confidence intervals; the rule is deterministic over the recorded rows.
+* Not a speed result: nothing was shown faster, so no `benchmarks/` copy.
+
+## Files
+
+* Graph: `figures/ratio-by-cell.svg`, `.png`, source `figures/make_graph.py`. PDF: `REPORT.pdf` (source `REPORT.typ`).
+* Raw logs and receipts: `raw/` (first run and `*-r2-*`). Protocol: `PROTOCOL.md`. Cards: `card-*.yaml`, `card-*-r2.yaml`,
+  generator `make_cards_r2.py`. Summary: `raw/assess-r2-summarize.stdout.log`.
+
+# First run (superseded)
+
+The text below is the first-run README, kept verbatim except that its headings are demoted one level. Its verdict
+(INCONCLUSIVE) was computed with missing cards 03 (partly), 04, 05, 08 and 12; it is superseded by the verdict above.
+
+
 **Verdict: INCONCLUSIVE** (frozen rule, applied mechanically by `b06 summarize`, `raw/card-14-summarize.stdout.log`).
 Level: **constant** (a multiplicative factor on the oracle term of item 02's model; no exponent or primitive claim).
 Class: stage diagnostic. No `S`, no rho ratio, no GAE is computed here, so the section 5a 0/0.1/1 GAE band
 does not apply to these rows. The **gap to matched rho is unchanged by this item** (distance remaining, not moved).
 No improvement over the index-calculus baseline was found; no relabelling is claimed as one.
 
-## What the evidence says, and does not say
+### What the evidence says, and does not say
 
 * **The signature engine `sig` did not refute any of the 56 targets that ran (64 planned)** within its stop rules (touch cap 2x of
   `f4`, time, column and memory caps). It qualifies on 0 of 4 cells, so ADVANCES and TRADES are excluded for
@@ -36,7 +159,7 @@ No improvement over the index-calculus baseline was found; no relabelling is cla
   zero reductions. These are 1 to 4 targets per cell, outside the frozen rule, and are reported as leads, not results.
   What `f4rs` counts is defined in PROTOCOL.md "Counted quantities"; this README does not re-derive it.
 
-## Method
+### Method
 
 Four cells (n, l, m): `c13-3-4`, `c15-3-4`, `c15-5-3`, `c17-4-3`; 17 unsatisfiable targets each (`draws.tsv`, seed
 20261020), indices 0-15 measured and 16 held out as the trace. Arms: `f4` (item 05's F4, the incumbent),
@@ -45,7 +168,7 @@ Four cells (n, l, m): `c13-3-4`, `c15-3-4`, `c15-5-3`, `c17-4-3`; 17 unsatisfiab
 `PROTOCOL.md` (commit before the instrument; Amendment 1 before any card). Instrument
 `examples/blindspots_06_signature_gb.rs` (sha256 d9d7ffc3...), single-threaded, `prlimit --as=4 GiB`.
 
-## Controls
+### Controls
 
 | control | result |
 |---|---|
@@ -55,7 +178,7 @@ Four cells (n, l, m): `c13-3-4`, `c15-3-4`, `c15-5-3`, `c17-4-3`; 17 unsatisfiab
 | ablation `sig4`/`sig0`/`sigc` (card 03: `c17-4-3` t0-1; card 11: `c15-3-4` t0 only, t1 skipped) | all stopped, so bounds only: R <= 0.498 / 0.499 / 0.499 on `c17-4-3` and 0.687 / 0.679 / 1.859 on `c15-3-4` (`sig`: 0.492 / 1.677). No criterion subset reaches F4 within the caps. Zero reductions at the c15-3-4 t0 stop: sig0 592,325, sig4 15,517, sigc 488, so the criteria remove zeros as intended. `c13-3-4` ablation never ran |
 | memory sanity | descriptive; `mem(f4/X)` columns in the summary |
 
-## Execution record and deviations (all of them)
+### Execution record and deviations (all of them)
 
 * **Cards 03, 04, 05, 08, 12 did not complete as planned.** The executor relays for 04, 05, 08 and 12 report background
   jobs with no output and no receipt; their processes were no longer running when this assessment started. No card
@@ -80,7 +203,7 @@ Four cells (n, l, m): `c13-3-4`, `c15-3-4`, `c15-5-3`, `c17-4-3`; 17 unsatisfiab
   `sig` may lose partly because of these choices.
 * **Development exposure:** disclosed in PROTOCOL Amendment 1.C; none of the 16 measured targets had been run.
 
-## Caveats
+### Caveats
 
 * Toy scale: n = 13-17, a 4-vCPU shared cloud container (host L0, no isolation level earned, no hardware PMU). The unit is
   matrix entries touched, not wall time; wall times in the logs are descriptive only.
@@ -92,7 +215,7 @@ Four cells (n, l, m): `c13-3-4`, `c15-3-4`, `c15-5-3`, `c17-4-3`; 17 unsatisfiab
 * Conclusion scope: on these 4 cells and this engine, signature criteria cut zero reductions by 3 orders of magnitude and
   did not cut touches. This says nothing about other orders, row selection, or a production signature code (msolve, F5).
 
-## Files
+### Files
 
 * Graph: `figures/ratio-by-cell.svg`, `figures/ratio-by-cell.png`, source `figures/make_graph.py` (lays out the values
   copied from `raw/card-14-summarize.stdout.log`). PDF: `REPORT.pdf`.
