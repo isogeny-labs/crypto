@@ -55,6 +55,9 @@ pub enum Family4 {
     Psi,
     /// A rational 2-torsion point `T` whose translation keeps the base.
     Translation,
+    /// A GLS twist over `F_{p⁴}` of a curve over `F_{p²}`, full 2-torsion,
+    /// `ψ² = −1` (E25).
+    Gls,
 }
 
 impl Family4 {
@@ -62,6 +65,7 @@ impl Family4 {
         match self {
             Self::Psi => "j0-psi",
             Self::Translation => "2torsion-tau",
+            Self::Gls => "gls-v4",
         }
     }
 }
@@ -85,12 +89,28 @@ pub struct FoldInstance4 {
     /// `T = (x₀, 0)`, `f'(x₀) = c²` (`Translation`).
     pub x0: E4,
     pub c: u64,
+    /// `(c_x, c_y)` with `ψ(x, y) = (c_x·x^{p²}, c_y·y^{p²})` (`Gls`).
+    pub gls: Option<(E4, E4)>,
 }
 
 impl FoldInstance4 {
     /// A fresh curve with its own counters.
     pub fn curve(&self) -> Curve4 {
         Curve4::with_params(self.p, self.a, self.b)
+    }
+
+    /// The GLS endomorphism (E25); `x^{p²}` is free in `F_p[t]/(t⁴ − c)`,
+    /// the two scalings are charged.
+    pub fn psi_gls(&self, curve: &Curve4, pt: &Pt4) -> Pt4 {
+        let (cx, cy) = self.gls.expect("a GLS instance");
+        if pt.inf {
+            return *pt;
+        }
+        Pt4 {
+            x: curve.f.mul(&cx, &sigma(curve.f.p, &pt.x)),
+            y: curve.f.mul(&cy, &sigma(curve.f.p, &pt.y)),
+            inf: false,
+        }
     }
 
     pub fn psi(&self, curve: &Curve4, pt: &Pt4, k: u32) -> Pt4 {
@@ -160,6 +180,12 @@ fn hasse_multiple(curve: &Curve4, rng: &mut StdRng) -> Option<u64> {
     found
 }
 
+/// The `p²`-power map on `F_p[t]/(t⁴ − c)`: `t ↦ −t`.
+fn sigma(p: u64, a: &E4) -> E4 {
+    let neg = |v: u64| if v == 0 { 0 } else { p - v };
+    E4([a.0[0], neg(a.0[1]), a.0[2], neg(a.0[3])])
+}
+
 fn not_in_fp2(a: &E4) -> bool {
     a.0[1] != 0 || a.0[3] != 0
 }
@@ -212,6 +238,7 @@ pub fn generate_psi_instance(p: u64, seed: u64) -> Result<FoldInstance4, String>
             lambda: 0,
             x0: E4::ZERO,
             c: 0,
+            gls: None,
         };
         let psi_g = inst.psi(&curve, &g, 1);
         if !curve.on_curve(&psi_g) {
@@ -312,6 +339,7 @@ pub fn generate_translation_instance(
             lambda: 0,
             x0,
             c,
+            gls: None,
         };
         if h == 2 {
             return Ok(inst);
@@ -346,7 +374,11 @@ pub fn folded_base(inst: &FoldInstance4, rng: &mut StdRng) -> Result<FoldedBase4
     let n = inst.n;
     let mut points = Vec::new();
     let mut key: Vec<u64> = Vec::new(); // the F_p parameter of each point
+    if inst.family == Family4::Gls {
+        return Err("a GLS instance's base is klein_base_with".into());
+    }
     match inst.family {
+        Family4::Gls => unreachable!("refused above"),
         Family4::Psi => {
             for x in 1..p {
                 if let Some(pt) = curve.lift_x(&f.from_fp(x), rng) {
@@ -381,6 +413,7 @@ pub fn folded_base(inst: &FoldInstance4, rng: &mut StdRng) -> Result<FoldedBase4
         col[i] = columns;
         coef[i] = 1;
         let images: Vec<(u64, Pt4, u64)> = match inst.family {
+            Family4::Gls => unreachable!("refused above"),
             Family4::Psi => (1..3u32)
                 .map(|k| {
                     let w = pow_mod(inst.omega, k as u64, p);
@@ -554,6 +587,8 @@ pub enum RhoFold {
     Negation,
     /// `{±ψ^k P}` (`j = 0` instances only).
     Psi,
+    /// `{±P, ±ψP}`, `ψ` the GLS endomorphism (`Gls` instances only).
+    Gls,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -578,6 +613,7 @@ pub struct RhoRun4F {
 /// multiplication is charged, set-up included.
 pub fn rho4_folded(inst: &FoldInstance4, fold: RhoFold, seed: u64) -> RhoRun4F {
     assert!(fold != RhoFold::Psi || inst.family == Family4::Psi);
+    assert!(fold != RhoFold::Gls || inst.gls.is_some());
     let curve = inst.curve();
     let f = &curve.f;
     let n = inst.n;
@@ -593,6 +629,20 @@ pub fn rho4_folded(inst: &FoldInstance4, fold: RhoFold, seed: u64) -> RhoRun4F {
                     (Pt4 { y: ny, ..pt }, n - 1)
                 } else {
                     (pt, 1)
+                }
+            }
+            RhoFold::Gls => {
+                let img = inst.psi_gls(&curve, &pt);
+                let best = if img.x < pt.x {
+                    (img, inst.lambda % n)
+                } else {
+                    (pt, 1)
+                };
+                let ny = f.neg(&best.0.y);
+                if ny < best.0.y {
+                    (Pt4 { y: ny, ..best.0 }, (n - best.1) % n)
+                } else {
+                    best
                 }
             }
             RhoFold::Psi => {
@@ -719,6 +769,7 @@ pub fn run_k4_folds(
     let inst = match family {
         Family4::Psi => generate_psi_instance(p, seed)?,
         Family4::Translation => generate_translation_instance(p, seed, 4)?,
+        Family4::Gls => return Err("E18 has no GLS arm; E25 is run_k4_gls_pipeline".into()),
     };
     let curve = inst.curve();
     let n = inst.n;
@@ -937,9 +988,13 @@ pub struct K4PipelineReport {
     pub solve_ms: f64,
     pub folded: ArmReport,
     pub rho: Vec<RhoRun4F>,
-    /// Mean `F_p` multiplications of the negation-folded walks (matched).
+    /// Mean `F_p` multiplications of the matched walks (`matched_fold`).
     pub rho_matched_muls: f64,
     pub rho_matched_steps: f64,
+    /// The negation walk, or the `⟨±ψ⟩` walk on a GLS curve (E25).
+    pub matched_fold: RhoFold,
+    pub rho_negation_muls: f64,
+    pub rho_negation_steps: f64,
     pub rho_unfolded_muls: f64,
     /// `total_muls / rho_matched_muls`.
     pub ratio: f64,
@@ -1127,6 +1182,7 @@ pub fn run_k4_d4_pipeline(
             base_muls,
             fp_muls_per_add,
             start,
+            matched: RhoFold::Negation,
         },
         &|r: &Pt4, tseed: u64| d4_decompose(&inst, &pre, base, &by_y, r, tseed),
     )
@@ -1138,6 +1194,9 @@ struct Setup {
     base_muls: u64,
     fp_muls_per_add: f64,
     start: Instant,
+    /// The walk `ratio` is quoted against: the negation walk, or on a GLS
+    /// curve the `⟨±ψ⟩` walk (E25).
+    matched: RhoFold,
 }
 
 /// The relation phase, the solve and the walks shared by E19 and E24: targets
@@ -1164,6 +1223,7 @@ fn collect_and_solve(
         base_muls,
         fp_muls_per_add,
         start,
+        matched,
     } = setup;
     let mut folded = Arm::new(arm, fb.columns);
     let mut unsolved_outcomes = std::collections::BTreeMap::new();
@@ -1268,7 +1328,11 @@ fn collect_and_solve(
             "p = {p} seed {seed}: no solve within {max_residuals} residuals"
         ));
     }
-    let jobs: Vec<(RhoFold, u64)> = [RhoFold::None, RhoFold::Negation]
+    let mut folds = vec![RhoFold::None, RhoFold::Negation];
+    if !folds.contains(&matched) {
+        folds.push(matched);
+    }
+    let jobs: Vec<(RhoFold, u64)> = folds
         .iter()
         .flat_map(|&f| (0..rho_runs as u64).map(move |k| (f, seed * 1000 + k)))
         .collect();
@@ -1283,7 +1347,7 @@ fn collect_and_solve(
             .sum::<f64>()
             / w.len().max(1) as f64
     };
-    let rho_matched_muls = mean(RhoFold::Negation, false);
+    let rho_matched_muls = mean(matched, false);
     let la_fp_muls = 16 * folded.rep.la_ops;
     let total_muls = precompute_muls
         + base_muls
@@ -1330,7 +1394,10 @@ fn collect_and_solve(
         solve_ms,
         folded: folded.rep,
         rho_matched_muls,
-        rho_matched_steps: mean(RhoFold::Negation, true),
+        rho_matched_steps: mean(matched, true),
+        matched_fold: matched,
+        rho_negation_muls: mean(RhoFold::Negation, false),
+        rho_negation_steps: mean(RhoFold::Negation, true),
         rho_unfolded_muls: mean(RhoFold::None, false),
         ratio: total_muls as f64 / rho_matched_muls,
         rho,
@@ -1461,6 +1528,7 @@ pub fn generate_klein_instance(
                 lambda: 0,
                 x0: x1,
                 c: 0,
+                gls: None,
             },
             roots: [x1, x2, x3],
             a1,
@@ -1477,11 +1545,163 @@ pub fn generate_klein_instance(
     fallback.ok_or_else(|| format!("no full-2-torsion instance with h ≤ {max_cofactor} at p = {p}"))
 }
 
+/// E25 (§9.15): a GLS twist with the `V₄` line.  `e₂ ∈ F_{p⁴} ∖ F_{p²}`,
+/// `e₃ = e₂^{p²}`, `e₁ = −e₂ − e₃`; the roots are `μe_i` with `μ` a non-square,
+/// so `E` is the quadratic twist over `F_{p⁴}` of `Π(x − e_i)` over `F_{p²}`,
+/// of order `(p² − 1)² + t²` (checked).  `ψ(x, y) = (μ^{1−p²}x^{p²},
+/// μ^{3(1−p²)/2}y^{p²})`, verified on points: `ψ² = −1`, `ψ(G) = [λ]G`,
+/// `ψ` fixes `T₁` and swaps `T₂, T₃`.  The Möbius coordinate is E24's.  The
+/// first curve with `h ≤ max_cofactor` is returned: unlike E24's curves these
+/// never showed `h = 4` (§9.16), so no smaller cofactor is searched for.
+pub fn generate_gls_klein_instance(
+    p: u64,
+    seed: u64,
+    max_cofactor: u64,
+) -> Result<KleinInstance, String> {
+    if p % 4 != 1 || !is_prime_u64(p) {
+        return Err(format!("p = {p} must be a prime ≡ 1 (mod 4)"));
+    }
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x6C5E_2B25);
+    let q2 = p as u128 * p as u128;
+    for _ in 0..20_000u32 {
+        let probe = Curve4::with_params(p, E4::ZERO, E4::ZERO);
+        let f = &probe.f;
+        let e2 = f.random(&mut rng);
+        if !not_in_fp2(&e2) {
+            continue;
+        }
+        let e3 = sigma(p, &e2);
+        let e1 = f.neg(&f.add(&e2, &e3));
+        let mu = f.random(&mut rng);
+        if mu.is_zero() || f.is_square(&mu) {
+            continue;
+        }
+        let (x1, x2, x3) = (f.mul(&mu, &e1), f.mul(&mu, &e2), f.mul(&mu, &e3));
+        if x1 == x2 || x1 == x3 || x2 == x3 {
+            continue;
+        }
+        let a = f.add(&f.add(&f.mul(&x1, &x2), &f.mul(&x1, &x3)), &f.mul(&x2, &x3));
+        let b = f.neg(&f.mul(&f.mul(&x1, &x2), &x3));
+        let a3x4 = f.scale(&f.mul(&f.sq(&a), &a), 4);
+        let disc = f.add(&a3x4, &f.scale(&f.sq(&b), 27));
+        if disc.is_zero() {
+            continue;
+        }
+        let d1 = f.mul(&f.sub(&x1, &x2), &f.sub(&x1, &x3));
+        let d2 = f.mul(&f.sub(&x2, &x1), &f.sub(&x2, &x3));
+        let (Some(s1), Some(s2)) = (f.sqrt(&d1, &mut rng), f.sqrt(&d2, &mut rng)) else {
+            continue;
+        };
+        let (a1, b1, a2) = (f.add(&x1, &s1), f.sub(&x1, &s1), f.add(&x2, &s2));
+        let c = f.mul(&f.sub(&a2, &a1), &f.inv(&f.sub(&b1, &a2)));
+        if c.is_zero() {
+            continue;
+        }
+        let curve = Curve4::with_params(p, a, b);
+        let Some(order) = hasse_multiple(&curve, &mut rng) else {
+            continue;
+        };
+        let dq = (q2 - 1) * (q2 - 1);
+        let t2 = (order as u128)
+            .checked_sub(dq)
+            .ok_or("#E below (p² − 1)²: not a GLS twist")?;
+        let t = (t2 as f64).sqrt().round() as u128;
+        if t * t != t2 {
+            return Err(format!(
+                "#E − (p² − 1)² = {t2} is not a square: not a GLS twist"
+            ));
+        }
+        let Some(&(n, _)) = factor_u64(order).last() else {
+            continue;
+        };
+        let h = order / n;
+        if h > max_cofactor || order % (n * n) == 0 || n <= p * p * p {
+            continue;
+        }
+        let g = loop {
+            let g = curve.mul(&random_point(&curve, &mut rng), h);
+            if !g.inf {
+                break g;
+            }
+        };
+        if !curve.mul(&g, n).inf {
+            return Err("n·G ≠ O: the order is wrong".into());
+        }
+        let tp = f.pow(&mu, (q2 - 1) / 2);
+        let cx = f.inv(&f.sq(&tp));
+        let cy = f.inv(&f.mul(&f.sq(&tp), &tp));
+        let d = rng.gen_range(1..n);
+        let mut inst = FoldInstance4 {
+            family: Family4::Gls,
+            p,
+            a,
+            b,
+            group_order: order,
+            n,
+            cofactor: h,
+            g,
+            d,
+            q: curve.mul(&g, d),
+            omega: 0,
+            lambda: 0,
+            x0: x1,
+            c: 0,
+            gls: Some((cx, cy)),
+        };
+        let pg = inst.psi_gls(&curve, &g);
+        if !curve.on_curve(&pg) || inst.psi_gls(&curve, &pg) != curve.neg(&g) {
+            return Err("ψ² ≠ −1 on G".into());
+        }
+        let r = random_point(&curve, &mut rng);
+        if inst.psi_gls(&curve, &inst.psi_gls(&curve, &r)) != curve.neg(&r) {
+            return Err("ψ² ≠ −1 on the full group".into());
+        }
+        let l = sqrt_mod(n - 1, n).ok_or("−1 is not a square mod n")?;
+        inst.lambda = if curve.mul(&g, l) == pg {
+            l
+        } else if curve.mul(&g, n - l) == pg {
+            n - l
+        } else {
+            return Err("ψ(G) ∉ {[±√−1]G}".into());
+        };
+        let px = |x: &E4| f.mul(&cx, &sigma(p, x));
+        if px(&x1) != x1 || px(&x2) != x3 || px(&x3) != x2 {
+            return Err("ψ does not fix T₁ and swap T₂, T₃".into());
+        }
+        return Ok(KleinInstance {
+            inst,
+            roots: [x1, x2, x3],
+            a1,
+            b1,
+            c,
+        });
+    }
+    Err(format!(
+        "no GLS full-2-torsion instance with h ≤ {max_cofactor} at p = {p}"
+    ))
+}
+
 /// The base `{P : z(P) ∈ F_p}` (2-torsion excluded) and its columns, the
 /// orbits under the three translations, every coefficient checked on points
 /// (`Err` if a translate leaves the base).
 pub fn klein_base(ki: &KleinInstance, rng: &mut StdRng) -> Result<FoldedBase4, String> {
+    klein_base_with(ki, false, rng)
+}
+
+/// [`klein_base`], on a GLS curve also folded by `ψ` when `fold_psi` (E25):
+/// columns are the orbits under `⟨V₄, ψ⟩`, `ψ`'s coefficient `±λ` checked on
+/// points like the translations' `±1`.  On a GLS curve both arms exclude
+/// `z⁴ = −1` (fixed by `ψ` up to sign, so `⟨G⟩`-component `0`), so the two
+/// arms hold the same points.
+pub fn klein_base_with(
+    ki: &KleinInstance,
+    fold_psi: bool,
+    rng: &mut StdRng,
+) -> Result<FoldedBase4, String> {
     let inst = &ki.inst;
+    if fold_psi && inst.gls.is_none() {
+        return Err("the ψ fold needs a GLS instance".into());
+    }
     let curve = inst.curve();
     let f = &curve.f;
     let (p, n) = (inst.p, inst.n);
@@ -1502,7 +1722,7 @@ pub fn klein_base(ki: &KleinInstance, rng: &mut StdRng) -> Result<FoldedBase4, S
     let i = sqrt_mod(p - 1, p).ok_or("p ≢ 1 (mod 4)")?;
     let special = [0, 1, p - 1, i, p - i];
     for z in 0..p {
-        if special.contains(&z) {
+        if special.contains(&z) || (inst.gls.is_some() && pow_mod(z, 4, p) == p - 1) {
             continue;
         }
         let Some(x) = ki.x_of_z(f, &f.from_fp(z)) else {
@@ -1526,23 +1746,33 @@ pub fn klein_base(ki: &KleinInstance, rng: &mut StdRng) -> Result<FoldedBase4, S
         }
         col[i] = columns;
         coef[i] = 1;
-        for t in &ts {
-            let img = curve.add(&points[i], t);
+        let mut images: Vec<(Pt4, u64)> =
+            ts.iter().map(|t| (curve.add(&points[i], t), 1)).collect();
+        if fold_psi {
+            let q = inst.psi_gls(&curve, &points[i]);
+            let lam = inst.lambda % n;
+            images.push((q, lam));
+            images.extend(ts.iter().map(|t| (curve.add(&q, t), lam)));
+        }
+        for (img, ce) in images {
             let z2 = ki
                 .z_of_x(f, &img.x)
                 .filter(|z| z.in_fp())
                 .ok_or("a translate leaves the line")?;
             let &j = index.get(&z2.0[0]).ok_or("a translate leaves the base")?;
-            if j == i {
-                continue;
-            }
             let s = if points[j].y == img.y {
-                1
+                ce
             } else if points[j].y == f.neg(&img.y) {
-                n - 1
+                (n - ce) % n
             } else {
                 return Err("a translate is neither P nor −P".into());
             };
+            if j == i && s != 1 {
+                return Err("an image of P is −P or ψ-fixed".into());
+            }
+            if j == i {
+                continue;
+            }
             if col[j] != usize::MAX && (col[j] != columns || coef[j] != s) {
                 return Err("an orbit closes inconsistently".into());
             }
@@ -1850,6 +2080,160 @@ pub fn run_k4_v4_pipeline(
             base_muls,
             fp_muls_per_add,
             start,
+            matched: RhoFold::Negation,
+        },
+        &|r: &Pt4, tseed: u64| v4_decompose(&ki, &pre, base, &by_z, r, tseed),
+    )
+}
+
+/// E25 Stage A (G2.32) on one curve: the base both arms hold, the `ψ` fold,
+/// the confinement test (`ν² ∉ F_p`, `ν = −(w² + w⁻²)`, `w = z(O)`), and for
+/// `n ≤ 2^{26}` the number of distinct column logarithms (classes under
+/// `±λ^e`) by baby-step giant-step: a confined base would show `1`.
+#[derive(Clone, Debug, Serialize)]
+pub struct GlsStageA {
+    pub p: u64,
+    pub seed: u64,
+    pub n: u64,
+    pub bits: f64,
+    pub cofactor: u64,
+    pub lambda: u64,
+    /// `z ∈ F_p` not excluded (`0, ±1, ±i`, `z⁴ = −1`).
+    pub eligible: u64,
+    pub base_points: usize,
+    pub density: f64,
+    pub columns_v4: usize,
+    pub columns_psi: usize,
+    pub points_per_column_v4: f64,
+    pub points_per_column_psi: f64,
+    pub nu2_in_fp: bool,
+    pub nu2_in_fp2: bool,
+    pub distinct_column_logs: Option<usize>,
+}
+
+pub fn run_gls_stage_a(p: u64, seed: u64) -> Result<GlsStageA, String> {
+    let ki = generate_gls_klein_instance(p, seed, 16)?;
+    let inst = ki.inst;
+    let curve = inst.curve();
+    let f = &curve.f;
+    let n = inst.n;
+    let a = klein_base_with(&ki, false, &mut StdRng::seed_from_u64(seed ^ 0xE25A_6175))?;
+    let b = klein_base_with(&ki, true, &mut StdRng::seed_from_u64(seed ^ 0xE25A_6175))?;
+    if a.points != b.points {
+        return Err("the two arms hold different points".into());
+    }
+    let w2 = f.sq(&ki.pole(f));
+    let nu2 = f.sq(&f.add(&w2, &f.inv(&w2)));
+    let distinct = (n <= 1 << 26).then(|| {
+        let m = (n as f64).sqrt() as u64 + 1;
+        let mut baby: HashMap<Pt4, u64> = HashMap::new();
+        let mut cur = Pt4::INF;
+        for j in 0..m {
+            baby.entry(cur).or_insert(j);
+            cur = curve.add(&cur, &inst.g);
+        }
+        let giant = curve.neg(&curve.mul(&inst.g, m));
+        let hinv = inv_mod(inst.cofactor % n, n);
+        let mut classes = std::collections::BTreeSet::new();
+        for (i, pt) in b.points.iter().enumerate() {
+            if b.coef[i] != 1 {
+                continue;
+            }
+            let mut t = curve.mul(pt, inst.cofactor);
+            let mut l = None;
+            for k in 0..=m {
+                if let Some(&j) = baby.get(&t) {
+                    l = Some(mulm((k * m + j) % n, hinv, n));
+                    break;
+                }
+                t = curve.add(&t, &giant);
+            }
+            let l = l.expect("a logarithm in ⟨G⟩");
+            let ll = mulm(l, inst.lambda, n);
+            classes.insert(*[l, (n - l) % n, ll, (n - ll) % n].iter().min().unwrap());
+        }
+        classes.len()
+    });
+    let i = sqrt_mod(p - 1, p).ok_or("p ≢ 1 (mod 4)")?;
+    let eligible = (0..p)
+        .filter(|&z| ![0, 1, p - 1, i, p - i].contains(&z) && pow_mod(z, 4, p) != p - 1)
+        .count() as u64;
+    Ok(GlsStageA {
+        p,
+        seed,
+        n,
+        bits: (n as f64).log2(),
+        cofactor: inst.cofactor,
+        lambda: inst.lambda,
+        eligible,
+        base_points: b.points.len(),
+        density: b.points.len() as f64 / eligible as f64,
+        columns_v4: a.columns,
+        columns_psi: b.columns,
+        points_per_column_v4: a.points_per_column,
+        points_per_column_psi: b.points_per_column,
+        nu2_in_fp: nu2.in_fp(),
+        nu2_in_fp2: !not_in_fp2(&nu2),
+        distinct_column_logs: distinct,
+    })
+}
+
+/// E25 (§9.15): E24's pipeline on a GLS curve, one arm: the `V₄`-folded base
+/// (`fold_psi = false`, the control) or the same points folded by `⟨V₄, ψ⟩`.
+/// Both arms of one `(p, seed)` hold one curve, one base and one target
+/// stream; the matched walk is the `⟨±ψ⟩` walk.
+pub fn run_k4_gls_pipeline(
+    p: u64,
+    seed: u64,
+    rho_runs: usize,
+    max_residuals: u64,
+    fold_psi: bool,
+) -> Result<K4PipelineReport, String> {
+    let start = Instant::now();
+    let ki = generate_gls_klein_instance(p, seed, 16)?;
+    let inst = ki.inst;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xE25A_6175);
+    let fb = klein_base_with(&ki, fold_psi, &mut rng)?;
+    let base = &fb.points;
+    let pcurve = inst.curve();
+    let pre = super::klein_v4::SymmetrisedV4::precompute(&ki, &pcurve, &mut rng, 8)?;
+    let zc = inst.curve();
+    let mut by_z: HashMap<u64, usize> = HashMap::new();
+    for (i, pt) in base.iter().enumerate() {
+        let z = ki
+            .z_of_x(&zc.f, &pt.x)
+            .filter(|z| z.in_fp())
+            .ok_or("a base point's z is not in F_p")?;
+        by_z.insert(z.0[0], i);
+    }
+    let base_muls = fb.build_muls + zc.f.muls();
+    let fp_muls_per_add = {
+        let c = inst.curve();
+        let mut acc = base[0];
+        for _ in 0..64 {
+            acc = c.add(&acc, &base[1]);
+        }
+        c.f.muls() as f64 / 64.0
+    };
+    collect_and_solve(
+        &inst,
+        &fb,
+        seed,
+        rho_runs,
+        max_residuals,
+        &mut rng,
+        super::klein_v4::MACAULAY_BOUND,
+        if fold_psi {
+            "v4-psi-folded"
+        } else {
+            "v4-folded"
+        },
+        Setup {
+            precompute_muls: pre.precompute_muls,
+            base_muls,
+            fp_muls_per_add,
+            start,
+            matched: RhoFold::Gls,
         },
         &|r: &Pt4, tseed: u64| v4_decompose(&ki, &pre, base, &by_z, r, tseed),
     )
@@ -1917,6 +2301,78 @@ mod log_tests {
             t = curve.add(&t, &giant);
         }
         panic!("no logarithm");
+    }
+
+    /// E25, G2.32: on GLS curves (`p ≡ 5` and `p ≡ 1 (mod 8)`, the second
+    /// with `z⁴ = −1` points to exclude) `ψ` keeps the `V₄` line, the two
+    /// arms hold the same points, the `ψ`-folded columns hold `8`, and every
+    /// coefficient is the true logarithm ratio.
+    #[test]
+    fn gls_psi_folds_the_v4_line_with_true_coefficients() {
+        for (p, seed) in [(37, 1), (41, 2)] {
+            let ki = generate_gls_klein_instance(p, seed, 16).unwrap();
+            let inst = ki.inst;
+            let curve = inst.curve();
+            let n = inst.n;
+            assert_eq!(mulm(inst.lambda, inst.lambda, n), n - 1);
+            let a = klein_base_with(&ki, false, &mut StdRng::seed_from_u64(5)).unwrap();
+            let b = klein_base_with(&ki, true, &mut StdRng::seed_from_u64(5)).unwrap();
+            assert_eq!(a.points, b.points, "p = {p}: the arms hold one base");
+            assert!(a.points_per_column <= 4.0);
+            assert!(
+                b.points_per_column >= 7.8,
+                "p = {p}: {}",
+                b.points_per_column
+            );
+            let hinv = inv_mod(inst.cofactor % n, n);
+            let logs: Vec<u64> = b
+                .points
+                .iter()
+                .map(|q| {
+                    mulm(
+                        dlog(&curve, &inst.g, &curve.mul(q, inst.cofactor), n),
+                        hinv,
+                        n,
+                    )
+                })
+                .collect();
+            let mut rep = vec![usize::MAX; b.columns];
+            for i in 0..b.points.len() {
+                if b.coef[i] == 1 && rep[b.col[i]] == usize::MAX {
+                    rep[b.col[i]] = i;
+                }
+            }
+            for i in 0..b.points.len() {
+                assert_eq!(
+                    mulm(b.coef[i], logs[rep[b.col[i]]], n),
+                    logs[i],
+                    "p = {p} point {i}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn gls_walk_takes_the_steps_its_class_predicts() {
+        let ki = generate_gls_klein_instance(37, 1, 16).unwrap();
+        for s in 0..4 {
+            let w = rho4_folded(&ki.inst, RhoFold::Gls, s);
+            assert!(w.correct, "seed {s}");
+        }
+    }
+
+    /// E25 end to end at `p = 37`, both arms on one curve.
+    #[test]
+    #[ignore = "thousands of solves: run with --ignored --release"]
+    fn the_gls_pipeline_recovers_the_logarithm_on_both_arms() {
+        for fold in [false, true] {
+            let rep = run_k4_gls_pipeline(37, 1, 2, 200_000, fold).unwrap();
+            assert!(rep.folded.solved && rep.folded.correct, "fold_psi = {fold}");
+            assert_eq!(rep.check_failures, 0);
+            assert_eq!(rep.rows_readd_failures, 0);
+            assert!(rep.rho.iter().all(|w| w.correct));
+            assert_eq!(rep.matched_fold, RhoFold::Gls);
+        }
     }
 
     /// Every base point's logarithm (of its `⟨G⟩`-component, `h⁻¹·log(hP)`)
