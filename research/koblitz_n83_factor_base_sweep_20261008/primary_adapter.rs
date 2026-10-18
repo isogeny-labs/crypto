@@ -668,7 +668,7 @@ pub(super) fn chain_capacity_cli(
     let cgroup_peak_bytes: u64 = fs::read_to_string("/sys/fs/cgroup/memory.peak")?
         .trim()
         .parse()?;
-    let receipt = json!({
+    let mut receipt = json!({
         "schema":"n83.chain-s3-capacity-worker/v1", "study":STUDY, "status":status,
         "curve_a":0, "fixture":0, "orbit_columns":columns, "policy":policy, "seed":seed,
         "summands":m, "identity_mask":identity_mask, "object":row["object"],
