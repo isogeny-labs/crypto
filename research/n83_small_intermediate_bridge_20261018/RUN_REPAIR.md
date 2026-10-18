@@ -23,6 +23,8 @@ exposed a narrower infrastructure issue in stratum 2. Its recorded
 `/system.slice/hosted-compute-agent.service`; the revised probe still read
 only the cgroup mount root, where `memory.max` and `memory.events` were absent.
 Its `preflight.json` correctly recorded `REJECTED_CGROUP_TELEMETRY`, with zero
-completed pairs in that stratum. The producer now resolves the process's
-actual cgroup member before reading CPU and memory counters. The other
-strata's first-attempt receipts remain attached to the cloud run.
+completed pairs in that stratum. Strata 0 and 3 later recorded the same
+rejection, and stratum 1 was cancelled before runner allocation to release
+the matrix's concurrency slot. The [second-attempt receipt](second_run_39094407077.json)
+pins all three preflight hashes and artifact names. The producer now resolves
+the process's actual cgroup member before reading CPU and memory counters.
