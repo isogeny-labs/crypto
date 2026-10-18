@@ -36,7 +36,7 @@ See [the unresolved evidence record](../../problems/three-leads-original-evidenc
 | Solves at first large-prime cycle | False as a general graph assertion. A usable signed dependence and nonzero target coefficient are necessary. Original implementation may already enforce them. |
 | Independent trials rule out rho hiding in a walk | Useful control for walk dependence; birthday-order collisions remain possible, and uniform-trial generation has a cost. |
 | 41M+I versus 12M+I | Formula/backend-dependent claim; field, coordinate, squaring and inversion units must match. |
-| Ratio .51–2.83; rho wins 10/12 cells at 40 bits | If accurately computed, the band crosses 1 and the overall ranking remains unresolved. Twelve selected prices are scenarios, not probabilities. |
+| Ratio .51–2.83; rho wins 10/12 cells at 40 bits | Band crosses 1; overall ranking remains unresolved. The .51 endpoint also needs reconciliation with the simplified counts and costs below. Selected prices are scenarios, not probabilities. |
 
 ## 1. Subfield decomposition
 
@@ -310,6 +310,18 @@ Coordinate-dependent formulas also change the price. The
 [Explicit-Formulas Database](https://www.hyperelliptic.org/EFD/g1p/auto-shortw.html)
 provides examples of this dependence; its formulas are not measurements
 of these two implementations.
+
+There is an internal consistency test before any rerun. If the stated
+operation intervals apply to the same p, both formulas use the same
+positive M and nonnegative I, and these operations are the whole charged
+cost, then with t=I/M the ratio obeys
+`IC/rho >= (0.27/0.44)*(41+t)/(12+t) >= 27/44`, approximately 0.614.
+The reported 0.51 endpoint cannot follow from that simplified model.
+Different inversion units, additional rho costs, confidence bounds or
+different underlying run populations could change the conclusion;
+the missing pricing table must identify which explanation applies.
+This is a conditional arithmetic bound, not a finding that the original
+unlocated implementation is incorrect.
 
 The correct ratio is the complete charged IC total divided by complete
 charged rho total on the same curve/subgroup, targets, hardware and

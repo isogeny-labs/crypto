@@ -51,7 +51,7 @@
 [#text("41M+I versus 12M+I")],
 [#text("Formula/backend-dependent claim; field, coordinate, squaring and inversion units must match.")],
 [#text("Ratio .51–2.83; rho wins 10/12 cells at 40 bits")],
-[#text("If accurately computed, the band crosses 1 and the overall ranking remains unresolved. Twelve selected prices are scenarios, not probabilities.")])
+[#text("Band crosses 1; overall ranking remains unresolved. The .51 endpoint also needs reconciliation with the simplified counts and costs below. Selected prices are scenarios, not probabilities.")])
 
 #heading(level: 2)[#text("1. Subfield decomposition")]
 
@@ -195,6 +195,9 @@
 
 
 #text("The quoted 41M+I and 12M+I need common base-field units. An F_(p^2) multiplication is not an F_p multiplication. Count squarings, extension reduction, batched inversions, coefficient updates, polynomial factoring, factor-base construction, graph/hash operations, memory and map costs. Coordinate-dependent formulas also change the price. The ")#link("https://www.hyperelliptic.org/EFD/g1p/auto-shortw.html")[#text("Explicit-Formulas Database")]#text(" provides examples of this dependence; its formulas are not measurements of these two implementations.")
+
+
+#text("There is an internal consistency test before any rerun. If the stated operation intervals apply to the same p, both formulas use the same positive M and nonnegative I, and these operations are the whole charged cost, then with t=I/M the ratio obeys ")#text(font: "DejaVu Sans Mono", size: 8.1pt, "IC/rho >= (0.27/0.44)*(41+t)/(12+t) >= 27/44")#text(", approximately 0.614. The reported 0.51 endpoint cannot follow from that simplified model. Different inversion units, additional rho costs, confidence bounds or different underlying run populations could change the conclusion; the missing pricing table must identify which explanation applies. This is a conditional arithmetic bound, not a finding that the original unlocated implementation is incorrect.")
 
 
 #text("The correct ratio is the complete charged IC total divided by complete charged rho total on the same curve/subgroup, targets, hardware and memory policy. Separate one-target online time from setup; if setup is amortized over many targets, give rho the same preprocessing allowance. Use the strongest applicable rho walk, with negation, automorphisms and collision-detection overhead accounted for. Replace p by actual sqrt(r) where appropriate; cofactors affect constants materially. For missing native-operation prices, apply the repository's 0, 0.1 and 1 group-add-equivalent sensitivity charges to both arms. A band that changes the winner remains unresolved.")
