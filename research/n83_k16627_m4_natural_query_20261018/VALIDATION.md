@@ -7,7 +7,7 @@
 | Five retained panel inputs | SHA-256 check passes, including review-head recheck | [panel manifest](panel-inputs.sha256), [check](panel-check.log), [recheck](panel-recheck-final.log) |
 | Public target and validation sidecar | SHA-256 check passes, including review-head recheck | [fixture manifest](fixture-inputs.sha256), [check](fixture-check.log), [recheck](fixture-recheck-final.log) |
 | Natural-query container wrapper | shell syntax checked; no degree-83 invocation yet | [run-natural.sh](run-natural.sh) |
-| P/A1/B/A2 sequence | pending other library suites and a quiet measurement host | fresh outputs, control replays and outcome still owed |
+| P/A1/B/A2 sequence | pending a quiet measurement host; no arm invoked | [timestamped host-availability record](HOST_AVAILABILITY.md); fresh outputs, control replays and outcome still owed |
 | Full release library on final stacked review head | blocked before tests: exit 101, 26 inherited ecbench/quartic source errors after tracked local dependencies and fixtures were materialized | [final stacked log](cargo-release-lib-stacked.log), [initial sparse-checkout diagnostic](cargo-release-lib-stacked-sparse.log), [open build problem](../../problems/current-main-library-build-20261017.md) |
 | Touched examples on natural-query delta | none; the delta adds a shell wrapper, manifests and protocol, with no Rust source changes | [base PR #2202 validation](../n83_k16627_m4_selector_only_20261018/VALIDATION.md) |
 | CI scope syntax on stacked review head | blocked by the inherited duplicate `root` declaration | [raw log](ci-scope-stacked.log) |
