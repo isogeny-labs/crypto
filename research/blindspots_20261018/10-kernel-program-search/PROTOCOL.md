@@ -219,9 +219,10 @@ pairs with the same operations.
 **Evaluation.** Training set per cell: 6 natural targets (shared by all
 programs) and 32 planted targets per base (seeded per base, so each program is
 planted against its own base). Fitness for the search is `Q` at `w = 0.1`. An
-evaluation is cut off when one target exceeds 3 times the start program's mean
-priced-at-1 cost (15 times for (p), whose start is the handicapped program); the
-program is then recorded with `Q = +inf` ("dominated"). Both (b) and (c) use the
+evaluation is cut off when one target exceeds 3 times the mean priced-at-1 cost
+per target of the arm's start program on the training natural targets (the
+incumbent for (b) and (c); the handicapped incumbent for (p), about 15 times the
+incumbent); the program is then recorded with `Q = +inf` ("dominated"). Both (b) and (c) use the
 same cap. Held-out set per cell (different seeds, never used by a search): **128
 natural targets and 128 planted targets per base**, no cap.
 
@@ -232,7 +233,7 @@ chooses it.
 ## Controls
 
 * **Brute-force equality (instrument correctness).** At `n = 17, l = 6`, for 400
-  random valid programs and 12 targets each (6 natural, 4 planted, from the
+  random valid programs and 10 targets each (6 natural, 4 planted, from the
   program's own base), (i) every accepted witness satisfies `S_4 = 0` with all
   three abscissae rational base members; (ii) for every exact program
   (`stop = 1`, `abort = 1`) the decision equals brute-force existence of a
@@ -251,21 +252,25 @@ chooses it.
   rational points all have `delta = 0` (`affine-aligned`) must show the doubled
   yield the model predicts (below).
 * **Yield conservation and the yield model (cells with common relations).** At
-  `(n, l) = (17, 6)`, `(19, 7)` and `(13, 5)` (all `2^n - 1` prime, so no family
-  degenerates), on 3000 to 4000 natural targets, every family with its exact
-  program (`lift = 1, stop = 1, quartic = b1`; `eval` for `ham*`, `geom*`) reports
-  the found rate, `T_eff` and rate / `T_eff`. KN-FIND-007 and the yield model
-  predict rate / `T_eff` constant across families; the check passes for a
-  family if its value is within 25% of the median over the sub-low and
-  sub-rand families (3000 targets give about 3% at a rate of 0.3). The finalists
-  and the incumbent are run on the same targets, and their cost per relation
-  times `B_r` (`W`) is reported at the three weights. A finalist whose family
-  violates the yield model cannot support a verdict (INCONCLUSIVE).
-  (Development at `(17, 6)` already gave rate / `T_eff` of 8.1e-5 to 1.1e-4 over
-  all non-trap families, `affine-aligned` at 8.1e-5 and 8.6e-5 against the median
-  9.0e-5, and found the same number of relations for the incumbent and the exact
-  lifted program: a raw witness with a non-rational abscissa essentially needs a
-  conjugate pair or `x_R` in the base. These numbers are not used for the rule.)
+  `(n, l) = (17, 6)` (all 24 families, 4000 natural targets) and `(19, 7)` (the
+  families that use a root finder other than `eval`, 3000 natural targets); both
+  have `2^n - 1` prime, so no family degenerates (`(13, 5)` is too dense, its
+  rates saturate). Every family runs its exact program (`lift = 1, stop = 1,
+  quartic = b1`; `eval` for `ham*`, `geom*`) and reports the found rate, `T_eff`
+  and the Poisson-corrected yield per feasible triple `kappa = -ln(1 - rate) /
+  T_eff`. KN-FIND-007 and the yield model predict `kappa` constant across
+  families; the check passes for a family if its `kappa` is within 25% of the
+  median over the `sub-*` families. The finalists and the incumbent are run on
+  the same targets, and their counted cost per relation found times `B_r` (`W`)
+  is reported at the three weights; `W` at these cells is a natural-yield
+  measurement with no planting and carries no verdict weight. A finalist whose
+  family violates the yield model cannot support a verdict (INCONCLUSIVE).
+  (Development at `(19, 7)` gave `kappa` between 2.74e-5 and 3.06e-5 over all
+  22 non-trap families, including the `affine-aligned` ones whose found rate is
+  about twice that of a balanced base, and found the same number of relations
+  for the incumbent as for the exact lifted program: a raw witness with a
+  non-rational abscissa essentially needs a conjugate pair or `x_R` in the base.
+  These numbers are not used for the rule.)
 * **Ablation.** For each finalist, per differing gene: the finalist with that gene
   reverted to the incumbent value, and the incumbent with only that gene changed,
   on 48 natural and 48 planted held-out targets. It attributes the gain; it
@@ -284,14 +289,20 @@ chooses it.
   directory (`--state`) that holds the append-only archive; a chunk boundary
   changes nothing (pure functions of the evaluation index).
 * Planned measured CPU, one thread, one process at a time, address space capped
-  at 4 GB (`prlimit --as`; the instrument uses a few MB): searches about
-  {SEARCH_MIN} minutes in total, held-out about {HELD_MIN}, ablations about
-  {ABL_MIN}, conservation about {CONS_MIN}, summaries seconds. The total is
-  under the 2 CPU-hour item limit; no command exceeds 45 minutes (the longest is
-  about three).
+  at 4 GB (`prlimit --as`; the instrument uses a few MB): searches 25 to 35
+  minutes in total (seven searches; (b) about 3, (c) about 5 and (p) about 4
+  minutes each when alone, up to twice that on the loaded shared host), held-out
+  evaluation about 5 minutes, ablations about 5, conservation cells about 3,
+  summaries seconds. About 45 minutes alone and under 1.5 hours at the loaded
+  rates seen in development, inside the 2 CPU-hour item limit; no single command
+  exceeds 10 minutes.
 * Cards are `kind: frozen_command`, `experiment_id: BLINDSPOT-10`, none longer
-  than 9 minutes; the first card builds the binary and runs the selftest. All
-  outputs are under `research/blindspots_20261018/10-kernel-program-search/raw/`.
+  than 9 minutes (the timeouts of a card's commands sum to at most 540 seconds).
+  The first card builds the binary and runs the selftest; every later card
+  rebuilds its own private copy from the bound source (about 4 seconds) and
+  removes it, as items 09 and 11 do, so that no card depends on a file another
+  card produced except the search state directory. All outputs are under
+  `research/blindspots_20261018/10-kernel-program-search/raw/`.
 
 ## Decision rule (frozen)
 
