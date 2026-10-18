@@ -2,10 +2,11 @@
 
 The initial source and capacity audit used study-branch revision
 `c26ae1e3953823436cb0143d8eb77261cd784783`, after the one-hour pilot.
-This file also records the subsequent point-only adapter on the study branch.
-It includes no retained N83 index construction, relation search, rank run,
-or cold comparison. The primary objective remains the complete single-target
-cold runtime on the pinned `a=0` curve.
+This file also records the subsequent point-only adapter and retained K64/K256
+capacity runs on the study branch. The runs construct an N83 compact index
+and make one public-point query each. Natural relation search, rank, and cold
+comparison remain unmeasured. The primary objective remains the complete
+single-target cold runtime on the pinned `a=0` curve.
 
 ## Existing implementations and the exact mismatch
 
@@ -128,7 +129,7 @@ context for the source audit, not an observation for a study candidate.
 
 The frozen v1/v2 `compact_s3_four_sum` dispositions remain recipes. Do not
 rank the stored 54 bases by the historical n=83 online result, by the S5
-half-regular illustration, or by construction speed. The source-ready primary
+half-regular illustration, or by construction speed. The executed primary
 probe now checks a four-point hit against its public target, converts its
 signed-Frobenius labels into full-width coefficients modulo the 81-bit order,
 and independently replays the resulting row on the original curve. A small
