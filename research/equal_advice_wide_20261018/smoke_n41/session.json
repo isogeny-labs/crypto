@@ -1,0 +1,25 @@
+{
+  "schema": "ic_equal_advice_session/v1",
+  "session_id": "n41smoke-20261018T0627Z-pg32423", "rung": "n41smoke", "n": 41, "a": 0, "K": 100, "ic_states": 410000,
+  "curve_id": "", "targets": "/tmp/ea-smoke/n41smoke/points.txt", "target_label": "equal-advice-wide-20261018-v1",
+  "input_law": "ic_equal_advice.public_hash_target",
+  "ic_rank_seed": 7, "bl_seed": "v1", "bl_online_threads": 1,
+  "candidate_manifest": null, "expected_base_hash": null,
+  "ic_binary_sha256": "b0ab3cf4f759bf16dfa609240449e8616e408a6efda12ab110762b5c858033e2", "bl_binary_sha256": "4add65fabd2b95f588d5f566f0ed2f87f80b1e8305b1d9508f4b20f1be4b3c91",
+  "runs": [
+    {"run": 1, "ic_jsonl": "/tmp/ea-smoke/n41smoke/ic_run1.jsonl", "bl_jsonl": "/tmp/ea-smoke/n41smoke/bl.jsonl", "bl_pass": 1},
+    {"run": 2, "ic_jsonl": "/tmp/ea-smoke/n41smoke/ic_run2.jsonl", "bl_jsonl": "/tmp/ea-smoke/n41smoke/bl.jsonl", "bl_pass": 2}
+  ],
+  "levels": [
+    {"level": 0, "tier": "B", "bl_bytes": 60000000},
+    {"level": 1, "tier": "A", "bl_bytes": 43689632}
+  ],
+  "resource_envelope": {"session_id":"n41smoke-20261018T0627Z-pg32423","process_group_id":32423,"cpuset":"0-3","online_threads":1,"setup_threads":2,"address_space_cap_bytes":4294967296,"nice":0,"kernel":"6.18.44-fc-v139","cpu_model":"Intel(R) Xeon(R) Processor @ 2.10GHz","mem_total_kib":16479424,"isolation_receipt":null},
+  "isolation": {"required": "L2", "ic": "L0", "rho": "L0"},
+  "co_measured": {"same_process_group": true, "process_group_id": 32423,
+                  "order": ["IC#1", "BL#1", "BL#2", "IC#2"], "bl_process_resident_throughout": true},
+  "host": {"id": "vm"},
+  "independent_validation": false, "independent_replay_pointer": null,
+  "a_a_tolerance": 0.25,
+  "claim_boundary": "Equal-advice diagnostic on public synthetic Koblitz points: BL preprocessing rho with Frobenius folding against compact-orbit IC at the IC table's byte budget. Not a deployed-curve claim, not an asymptotic claim, not end-to-end S; precomputation of both arms is reported apart from the online intervals."
+}

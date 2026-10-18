@@ -42,7 +42,7 @@ use std::process::ExitCode;
 use clap::{Parser, Subcommand};
 
 use crypto_lib::cryptanalysis::ecbench::{
-    audit, bounds, calibration, callgrind, canonical, challenge, claim, compare, db, frontier,
+    audit, bounds, calibration, callgrind, canonical, challenge, claim, compare, db, fbm, frontier,
     full_price, gpu, host, isolab, isolation, methods, record, resources, runner, signals, spec,
     stats, trend, workload,
 };
