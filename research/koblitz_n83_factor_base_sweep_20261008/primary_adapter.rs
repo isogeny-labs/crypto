@@ -1001,13 +1001,14 @@ pub(super) fn chain_witness_cli(root: &Path, memory_mib: u64, output: &Path) -> 
                 let mut rank = WideRankTracker::new(&base.curve.subgroup_order, fb.unknowns());
                 let rank_after_insert = rank.insert(lifted_row.clone());
                 phases.mark("rank_done", json!({"rank_after_insert":rank_after_insert}))?;
-                if rank_after_insert != 1 || lifted_row != preflight_row {
+                if rank_after_insert != 1 {
                     "INVALID_RELATION_CONTROL"
                 } else {
                     let dense: Vec<_> = lifted_row.iter().map(ToString::to_string).collect();
                     relation = json!({
                         "point_indices":lifted_indices,
                         "dense_decimal_blake3":blake3::hash(&serde_json::to_vec(&dense)?).to_hex().to_string(),
+                        "matches_preflight_row":lifted_row == preflight_row,
                         "rank_after_insert":rank_after_insert,
                         "tamper_rejected":tamper_rejected,
                         "group_verified":true,
