@@ -1,4 +1,5 @@
 CXX ?= g++
+.DELETE_ON_ERROR:
 CPPFLAGS += -Iinclude -Itests
 CXXFLAGS ?= -O2 -g
 CXXFLAGS += -std=c++17 -Wall -Wextra -Wpedantic -Werror -pthread
@@ -65,3 +66,50 @@ build/pq_test_sanitize: $(CORE) tests/pq_test.cc $(HEADERS) | build
 .PHONY: sanitize-pq
 sanitize-pq: build/pq_test_sanitize build/libfpga_pq_oqs_sanitize.so
 	ASAN_OPTIONS=$(ASAN_OPTIONS) ./build/pq_test_sanitize $(abspath build/libfpga_pq_oqs_sanitize.so)
+
+# Optional SystemVerilog kernel simulation. No AWS SDK, Vivado, or device needed.
+VERILATOR ?= verilator
+RTL_SOURCES = rtl/keccak_f1600.sv rtl/shake_stream.sv rtl/lattice_modmul.sv rtl/lattice_ntt.sv
+RTL_TOP = tests/rtl/crypto_kernels_top.sv
+RTL_FLAGS = --assert -Wall --x-initial unique --x-assign unique --top-module crypto_kernels_top
+.PHONY: lint-rtl test-rtl
+lint-rtl:
+	$(VERILATOR) --lint-only $(RTL_FLAGS) $(RTL_SOURCES) $(RTL_TOP)
+build/rtl/Vcrypto_kernels_top: $(RTL_SOURCES) $(RTL_TOP) tests/rtl_test.cc tests/test.h Makefile | build
+	$(VERILATOR) --cc --exe --build -j 2 $(RTL_FLAGS) --Mdir $(abspath build/rtl) \
+	    -CFLAGS '-std=c++17 -O2 -Wall -Wextra -I$(abspath tests)' \
+	    -LDFLAGS '-lcrypto' $(RTL_SOURCES) $(RTL_TOP) $(abspath tests/rtl_test.cc)
+test-rtl: build/rtl/Vcrypto_kernels_top
+	./build/rtl/Vcrypto_kernels_top
+
+# Optional second frontend: lower the RTL, run generic synthesis, then replay
+# the same external correctness tests against the resulting Verilog model.
+SV2V ?= sv2v
+YOSYS ?= yosys
+.PHONY: synth-rtl test-rtl-synth
+build/rtl/synth.v: $(RTL_SOURCES) $(RTL_TOP) | build
+	mkdir -p build/rtl
+	$(SV2V) -DSYNTHESIS --top=crypto_kernels_top $(RTL_SOURCES) $(RTL_TOP) > $@.tmp
+	mv $@.tmp $@
+build/rtl/synth_checked.v: build/rtl/synth.v tools/check_rtl_synth.ys
+	cp tools/check_rtl_synth.ys build/rtl/synthesis-check.ys
+	$(YOSYS) -Q -q -l build/rtl/synthesis.log -s build/rtl/synthesis-check.ys
+synth-rtl: build/rtl/synth_checked.v
+build/rtl-synth/Vcrypto_kernels_top: build/rtl/synth_checked.v tests/rtl_test.cc tests/test.h Makefile
+	$(VERILATOR) --cc --exe --build -j 2 --top-module crypto_kernels_top \
+	    --Mdir $(abspath build/rtl-synth) \
+	    -CFLAGS '-std=c++17 -O2 -Wall -Wextra -I$(abspath tests)' \
+	    -LDFLAGS '-lcrypto' build/rtl/synth_checked.v $(abspath tests/rtl_test.cc)
+test-rtl-synth: build/rtl-synth/Vcrypto_kernels_top
+	./build/rtl-synth/Vcrypto_kernels_top
+
+# Runs an actual linked Envoy process on ephemeral loopback/admin ports.
+ENVOY_BIN ?=
+build/envoy_http_test: $(CORE) tests/envoy_http_test.cc $(HEADERS) $(BORINGSSL_LIBS) | build
+	test -n "$(BORINGSSL_SRC)" && test -n "$(BORINGSSL_BUILD)"
+	$(CXX) $(CPPFLAGS) -isystem $(BORINGSSL_SRC)/include $(CXXFLAGS) $(CORE) \
+	    tests/envoy_http_test.cc -o $@ $(BORINGSSL_LIBS) -ldl -pthread
+.PHONY: test-envoy
+test-envoy: build/envoy_http_test pq-plugin
+	test -n "$(ENVOY_BIN)"
+	./build/envoy_http_test $(abspath $(ENVOY_BIN)) $(PQ_PLUGIN) $(abspath build/envoy-http)

@@ -10,6 +10,7 @@
 #include "envoy/server/filter_config.h"
 
 #include "source/common/protobuf/protobuf.h"
+#include "source/extensions/fpga_crypto/config.pb.h"
 
 #include "fpga/mailbox.h"
 #include "fpga/pq.h"
@@ -18,26 +19,26 @@ namespace Envoy::Extensions::PqCrypto {
 namespace {
 using Struct = Protobuf::Struct;
 using Value = Protobuf::Value;
-const Value* field(const Struct& s, const std::string& key) {
+const Value *field(const Struct &s, const std::string &key) {
   const auto it = s.fields().find(key);
   return it == s.fields().end() ? nullptr : &it->second;
 }
-void allowed(const Struct& s, const std::set<std::string>& keys) {
-  for (const auto& p : s.fields())
+void allowed(const Struct &s, const std::set<std::string> &keys) {
+  for (const auto &p : s.fields())
     if (!keys.count(p.first))
       throw EnvoyException("unknown PQ field: " + p.first);
 }
-std::string text(const Struct& s, const std::string& key, const std::string& fallback = "") {
-  const auto* v = field(s, key);
+std::string text(const Struct &s, const std::string &key, const std::string &fallback = "") {
+  const auto *v = field(s, key);
   if (!v)
     return fallback;
   if (v->kind_case() != Value::kStringValue || v->string_value().empty())
     throw EnvoyException("invalid PQ string: " + key);
   return v->string_value();
 }
-uint32_t number(const Struct& s, const std::string& key, uint32_t fallback, uint32_t low,
+uint32_t number(const Struct &s, const std::string &key, uint32_t fallback, uint32_t low,
                 uint32_t high) {
-  const auto* v = field(s, key);
+  const auto *v = field(s, key);
   if (!v)
     return fallback;
   if (v->kind_case() != Value::kNumberValue || !std::isfinite(v->number_value()) ||
@@ -46,8 +47,8 @@ uint32_t number(const Struct& s, const std::string& key, uint32_t fallback, uint
     throw EnvoyException("invalid PQ number: " + key);
   return static_cast<uint32_t>(v->number_value());
 }
-bool boolean(const Struct& s, const std::string& key) {
-  const auto* v = field(s, key);
+bool boolean(const Struct &s, const std::string &key) {
+  const auto *v = field(s, key);
   if (!v)
     return false;
   if (v->kind_case() != Value::kBoolValue)
@@ -73,7 +74,7 @@ struct Config {
   std::chrono::milliseconds timeout;
   std::map<std::string, Route> routes;
   bool experimental;
-  explicit Config(const Struct& s) {
+  explicit Config(const Struct &s) {
     allowed(s, {"backend", "plugin_library", "allow_experimental", "max_keys", "queue_capacity",
                 "timeout_ms", "path_prefix", "routes", "slot_id", "sdk_library", "lock_directory"});
     backend = text(s, "backend", "aws-fpga");
@@ -85,7 +86,7 @@ struct Config {
     experimental = boolean(s, "allow_experimental");
     const auto capacity = number(s, "queue_capacity", 128, 1, 65536);
     if (backend == "software-liboqs") {
-      for (const auto* key : {"slot_id", "sdk_library", "lock_directory"})
+      for (const auto *key : {"slot_id", "sdk_library", "lock_directory"})
         if (field(s, key))
           throw EnvoyException("AWS fields are invalid for the software PQ backend");
       fpga::OqsOptions o;
@@ -112,25 +113,25 @@ struct Config {
     if (!catalog)
       throw EnvoyException("selected backend does not provide a valid PQ catalog");
     routes.emplace(prefix + "algorithms", Route{fpga::Operation::PqCatalog, "", 0});
-    const auto* routes_value = field(s, "routes");
+    const auto *routes_value = field(s, "routes");
     if (!routes_value)
       return;
     if (routes_value->kind_case() != Value::kStructValue)
       throw EnvoyException("PQ routes must be an object");
     std::map<uint32_t, std::string> bindings;
-    for (const auto& p : routes_value->struct_value().fields()) {
+    for (const auto &p : routes_value->struct_value().fields()) {
       if (p.first.empty() || p.first == "algorithms" || p.first.front() == '/' ||
           p.first.back() == '/' || p.first.find_first_of("?#%") != std::string::npos ||
           p.first.find("..") != std::string::npos || p.second.kind_case() != Value::kStructValue)
         throw EnvoyException("invalid PQ route name");
-      const auto& route = p.second.struct_value();
+      const auto &route = p.second.struct_value();
       allowed(route, {"operation", "algorithm", "key_slot"});
       const auto op = operations.find(text(route, "operation"));
       if (op == operations.end())
         throw EnvoyException("unknown PQ operation");
       const auto name = text(route, "algorithm");
-      const fpga::PqAlgorithm* algorithm = nullptr;
-      for (const auto& a : *catalog)
+      const fpga::PqAlgorithm *algorithm = nullptr;
+      for (const auto &a : *catalog)
         if (a.name == name)
           algorithm = &a;
       if (!algorithm ||
@@ -160,14 +161,14 @@ struct Config {
 class Filter final : public Http::StreamDecoderFilter {
 public:
   explicit Filter(std::shared_ptr<const Config> config) : config_(std::move(config)) {}
-  void setDecoderFilterCallbacks(Http::StreamDecoderFilterCallbacks& callbacks) override {
+  void setDecoderFilterCallbacks(Http::StreamDecoderFilterCallbacks &callbacks) override {
     callbacks_ = &callbacks;
   }
   void onDestroy() override {
     ticket_.cancel();
     timer_.reset();
   }
-  Http::FilterHeadersStatus decodeHeaders(Http::RequestHeaderMap& h, bool end_stream) override {
+  Http::FilterHeadersStatus decodeHeaders(Http::RequestHeaderMap &h, bool end_stream) override {
     const std::string path(h.getPathValue());
     if (path.compare(0, config_->prefix.size(), config_->prefix))
       return Http::FilterHeadersStatus::Continue;
@@ -201,7 +202,7 @@ public:
       start();
     return Http::FilterHeadersStatus::StopIteration;
   }
-  Http::FilterDataStatus decodeData(Buffer::Instance& data, bool end_stream) override {
+  Http::FilterDataStatus decodeData(Buffer::Instance &data, bool end_stream) override {
     if (!active_)
       return Http::FilterDataStatus::Continue;
     if (!submitted_ && !replied_) {
@@ -222,7 +223,7 @@ public:
       start();
     return Http::FilterDataStatus::StopIterationNoBuffer;
   }
-  Http::FilterTrailersStatus decodeTrailers(Http::RequestTrailerMap&) override {
+  Http::FilterTrailersStatus decodeTrailers(Http::RequestTrailerMap &) override {
     if (!active_)
       return Http::FilterTrailersStatus::Continue;
     if (!submitted_ && !replied_)
@@ -231,7 +232,7 @@ public:
   }
 
 private:
-  void fail(Http::Code code, const std::string& message) {
+  void fail(Http::Code code, const std::string &message) {
     replied_ = true;
     callbacks_->sendLocalReply(code, message, nullptr, absl::nullopt, "pq_crypto_error");
   }
@@ -281,9 +282,9 @@ private:
     }
     std::string body;
     struct BodyWiper {
-      std::string& body;
+      std::string &body;
       ~BodyWiper() {
-        volatile char* p = body.data();
+        volatile char *p = body.data();
         for (size_t i = 0; i < body.size(); ++i)
           p[i] = 0;
       }
@@ -295,7 +296,7 @@ private:
         return;
       }
       std::vector<fpga::PqAlgorithm> visible;
-      for (const auto& a : *algorithms)
+      for (const auto &a : *algorithms)
         if ((a.standardized && fpga::pqDefaultAllowed(a.name)) || config_->experimental)
           visible.push_back(a);
       body = fpga::catalogJson(visible, config_->backend);
@@ -307,7 +308,7 @@ private:
     const bool json = catalog_;
     callbacks_->sendLocalReply(
         Http::Code::OK, body,
-        [backend, json](Http::ResponseHeaderMap& h) {
+        [backend, json](Http::ResponseHeaderMap &h) {
           h.setContentType(json ? "application/json" : "application/octet-stream");
           h.setCopy(Http::LowerCaseString("cache-control"), "no-store");
           h.setCopy(Http::LowerCaseString("x-crypto-backend"), backend);
@@ -315,7 +316,7 @@ private:
         absl::nullopt, "pq_crypto_success");
   }
   std::shared_ptr<const Config> config_;
-  Http::StreamDecoderFilterCallbacks* callbacks_{nullptr};
+  Http::StreamDecoderFilterCallbacks *callbacks_{nullptr};
   fpga::Request request_;
   fpga::Ticket ticket_;
   Event::TimerPtr timer_;
@@ -325,31 +326,34 @@ private:
 class Factory final : public Server::Configuration::NamedHttpFilterConfigFactory {
 public:
   std::string name() const override { return "envoy.filters.http.pq_crypto"; }
-  ProtobufTypes::MessagePtr createEmptyConfigProto() override { return std::make_unique<Struct>(); }
+  ProtobufTypes::MessagePtr createEmptyConfigProto() override {
+    return std::make_unique<envoy::extensions::fpga_crypto::v3::PqHttp>();
+  }
   ProtobufTypes::MessagePtr createEmptyRouteConfigProto() override { return nullptr; }
   absl::StatusOr<Http::FilterFactoryCb>
-  createFilterFactoryFromProto(const Protobuf::Message& s, const std::string&,
-                               Server::Configuration::FactoryContext&) override {
+  createFilterFactoryFromProto(const Protobuf::Message &s, const std::string &,
+                               Server::Configuration::FactoryContext &) override {
     return create(s);
   }
   absl::StatusOr<Http::FilterFactoryCb>
-  createHttpFilterFactoryFromProto(const Protobuf::Message& s, const std::string&,
-                                   Server::Configuration::ServerFactoryContext&) override {
+  createHttpFilterFactoryFromProto(const Protobuf::Message &s, const std::string &,
+                                   Server::Configuration::ServerFactoryContext &) override {
     return create(s);
   }
 
 private:
-  static Http::FilterFactoryCb create(const Protobuf::Message& s) {
-    const auto* typed = Protobuf::DynamicCastMessage<Struct>(&s);
-    if (!typed)
-      throw EnvoyException("PQ filter expects google.protobuf.Struct");
+  static Http::FilterFactoryCb create(const Protobuf::Message &s) {
+    const auto *typed =
+        Protobuf::DynamicCastMessage<envoy::extensions::fpga_crypto::v3::PqHttp>(&s);
+    if (!typed || !typed->has_value())
+      throw EnvoyException("PQ filter requires PqHttp.value");
     std::shared_ptr<Config> config;
     try {
-      config = std::make_shared<Config>(*typed);
-    } catch (const std::exception& e) {
+      config = std::make_shared<Config>(typed->value());
+    } catch (const std::exception &e) {
       throw EnvoyException(e.what());
     }
-    return [config](Http::FilterChainFactoryCallbacks& c) {
+    return [config](Http::FilterChainFactoryCallbacks &c) {
       c.addStreamDecoderFilter(std::make_shared<Filter>(config));
     };
   }

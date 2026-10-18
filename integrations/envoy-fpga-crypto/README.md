@@ -14,15 +14,17 @@ categories:
 **Hardware prerequisite:** F2 does not expose generic crypto commands by
 default. Load an AFI implementing [the FPC1 BAR0 ABI](docs/fpga-abi.md), backed
 by crypto IP, and provision its key slots. This repository includes the host
-implementation and a CPU behavioral emulator, **not an FPGA bitstream**.
+implementation, a CPU behavioral emulator, and independently simulated
+[FPGA hash/arithmetic kernels](docs/rtl-kernels.md), **not an FPGA bitstream**.
 There is no F2 device or AWS account attached to this workspace; real hardware
 performance and interoperability have not been measured.
 
 See [post-quantum coverage, build, API and TLS boundaries](docs/post-quantum.md).
 The CPU plugin supports 262 enabled algorithm/parameter modes in the pinned
-build, including experimental Falcon. Final FN-DSA remains a separate,
-unfinished standard and is not claimed as implemented. No PQ FPGA crypto
-logic is included.
+build, including experimental Falcon. This pinned backend does not implement
+final FN-DSA; experimental Falcon is not claimed as final FN-DSA. The RTL includes
+Keccak/SHAKE and ML-KEM/ML-DSA NTT building blocks; complete hardware
+signature/KEM engines and their F2 shell/mailbox integration remain unfinished.
 
 ## Run the tests
 
@@ -56,12 +58,25 @@ scatter buffers, TLS 1.3 KeyUpdate, certificate verification, disconnects
 during signing and failure without a CPU fallback.
 
 See [validation results and exact test scope](docs/validation.md).
+The [implementation report and diagram](docs/reports/2026-10-18/README.md)
+show the verified components and remaining F2 integration work.
 
 To build and test the optional PQ plugin:
 
 ```sh
 python3 tools/build_pq.py --test
 ```
+
+The optional hardware-kernel checks need Verilator and OpenSSL development
+libraries; the additional generic synthesis check needs sv2v and Yosys:
+
+```sh
+make lint-rtl test-rtl
+make test-rtl-synth
+```
+
+These simulate the actual RTL, including backpressure, cancellation and
+erasure. They do not run an AFI or establish FPGA performance.
 
 ## Build Envoy
 
@@ -78,11 +93,37 @@ bazel build --config=clang -c opt --jobs=6 //source/exe:envoy-static
 
 The installer copies the production source to `source/extensions/fpga_crypto`
 and adds its registration target to Envoy's extension map. It can be run
-again after editing this repository. To compile only the extension:
+again after editing this repository. HTTP configurations use the distinct
+`envoy.extensions.fpga_crypto.v3.FpgaHttp` and `PqHttp` messages from
+`config.proto`. When upgrading the original Struct-based examples, replace
+the HTTP `@type` URL and retain the fields under `value`; the TLS private-key
+provider's configuration is unchanged. To compile only the extension:
 
 ```sh
 bazel build --config=clang //source/extensions/fpga_crypto:config
 ```
+
+A smaller extension selection is included for linked HTTP integration tests:
+
+```sh
+bazel build --config=clang --define=google_grpc=disabled --//bazel:http3=false \
+    --override_repository=envoy_build_config=/absolute/path/to/this/project/envoy/minimal_build_config \
+    //source/exe:envoy-static
+```
+
+After building that binary and the PQ plugin, run from this project's root:
+
+```sh
+make test-envoy ENVOY_BIN=/path/to/envoy/bazel-bin/source/exe/envoy-static \
+    OQS_BUILD=/path/to/liboqs-build \
+    BORINGSSL_SRC=/path/to/boringssl-0.20260929.0 BORINGSSL_BUILD=/path/to/boringssl-build
+```
+
+The native C++ harness launches Envoy with the software example on ephemeral
+loopback ports. It checks HTTP routing, ML-DSA signatures, ML-KEM interoperability,
+contexts, malformed requests and key erasure. Per-process startup logs and
+rendered configurations remain under `build/envoy-http/`. This exercises the
+explicit CPU plugin; it does not substitute software for an unavailable FPGA.
 
 Use the default non-FIPS BoringSSL build. OpenSSL, AWS-LC, symbol-prefixing,
 LTO and shared BoringSSL builds are outside this bridge's supported build

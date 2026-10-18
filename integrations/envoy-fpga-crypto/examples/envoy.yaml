@@ -53,7 +53,7 @@ static_resources:
                 http_filters:
                   - name: envoy.filters.http.fpga_crypto
                     typed_config:
-                      "@type": type.googleapis.com/google.protobuf.Struct
+                      "@type": type.googleapis.com/envoy.extensions.fpga_crypto.v3.FpgaHttp
                       value:
                         slot_id: 0
                         queue_capacity: 128

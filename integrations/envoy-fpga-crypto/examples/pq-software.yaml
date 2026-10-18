@@ -23,7 +23,7 @@ static_resources:
                 http_filters:
                   - name: envoy.filters.http.pq_crypto
                     typed_config:
-                      "@type": type.googleapis.com/google.protobuf.Struct
+                      "@type": type.googleapis.com/envoy.extensions.fpga_crypto.v3.PqHttp
                       value:
                         backend: software-liboqs
                         plugin_library: /opt/envoy/lib/libfpga_pq_oqs.so

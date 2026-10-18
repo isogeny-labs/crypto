@@ -18,7 +18,8 @@ def install(checkout: Path):
     destination.mkdir(parents=True, exist_ok=True)
     for name in ("include", "src", "envoy"):
         shutil.copytree(ROOT / name, destination / name, dirs_exist_ok=True)
-    shutil.copy2(ROOT / "BUILD", destination / "BUILD")
+    for name in ("BUILD", "config.proto"):
+        shutil.copy2(ROOT / name, destination / name)
     config = checkout / "source/extensions/extensions_build_config.bzl"
     text = config.read_text()
     for name in ("fpga_crypto", "pq_crypto"):

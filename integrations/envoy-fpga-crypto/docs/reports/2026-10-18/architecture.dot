@@ -1,0 +1,41 @@
+digraph architecture {
+  graph [rankdir=TB, bgcolor="white", pad=0.2, nodesep=0.35, ranksep=0.45,
+         fontname="DejaVu Sans", fontsize=12, labelloc=t,
+         label="Envoy FPGA crypto: implementation boundaries (2026-10-18)"];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11,
+        color="#435363", fillcolor="#edf2f7", margin="0.15,0.10"];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#435363"];
+
+  subgraph cluster_host {
+    label="Host integration"; color="#bac8d3";
+    envoy [label="Native Envoy extensions\nHTTP filters + TLS adapters"];
+    engine [label="Bounded asynchronous engine\nDeadlines, cancellation, key slots"];
+    plugin [label="Explicit CPU backend\nliboqs signature / KEM operations", fillcolor="#e6f3ec"];
+    mailbox [label="FPC1 PCIe host transport\nBehavioral device tested"];
+    envoy -> engine;
+    engine -> plugin [label="software-liboqs"];
+    engine -> mailbox [label="aws-fpga"];
+  }
+
+  subgraph cluster_rtl {
+    label="Actual RTL: 15 groups pass directly and after generic synthesis";
+    labelloc=b;
+    color="#609b7b";
+    shake [label="SHAKE128 / SHAKE256\nByte-stream sponge", fillcolor="#e6f3ec"];
+    keccak [label="Keccak-f[1600]\n24 rounds", fillcolor="#e6f3ec"];
+    ntt [label="256-coefficient NTT / inverse NTT\nML-KEM and ML-DSA fields", fillcolor="#e6f3ec"];
+    mul [label="Canonical modular multiplication\nq = 3329 or 8380417", fillcolor="#e6f3ec"];
+    shake -> keccak;
+    ntt -> mul;
+    {rank=same; shake; ntt;}
+  }
+
+  missing [label="REMAINING IMPLEMENTATION\nFull algorithm controllers, sampling and packing\nEntropy, key custody, FPC1 dispatch, F2 shell",
+           color="#ae6d29", fillcolor="#fff1df", style="rounded,filled,dashed"];
+  device [label="REMAINING DEPLOYMENT VALIDATION\nVivado timing / resources, AFI and physical F2\nEnd-to-end workload and CPU comparisons",
+          color="#ae6d29", fillcolor="#fff1df", style="rounded,filled,dashed"];
+  mailbox -> missing [style=dashed, label="not connected"];
+  missing -> shake [style=dashed];
+  missing -> ntt [style=dashed];
+  missing -> device [style=dashed];
+}

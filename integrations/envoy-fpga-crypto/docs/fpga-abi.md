@@ -107,6 +107,11 @@ available, but never retries them in software.
 
 ## Hardware integration and performance
 
+The repository now includes [Keccak/SHAKE and NTT RTL kernels](rtl-kernels.md).
+They are not connected to this mailbox and do not implement complete signing
+or KEM commands. An AFI must expose only complete, validated operations in its
+capabilities/catalog; these kernels alone do not satisfy that contract.
+
 Connect this register/memory interface to reviewed crypto IP behind the F2
 shell's application AXI interface, then simulate it against the host sequence
 above. `tests/emulated_registers.h` is an executable behavioral reference.

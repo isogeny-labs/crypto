@@ -1,7 +1,20 @@
 load("//bazel:envoy_build_system.bzl", "envoy_cc_extension", "envoy_cc_library", "envoy_extension_package")
+load("@com_google_protobuf//bazel:cc_proto_library.bzl", "cc_proto_library")
+load("@com_google_protobuf//bazel:proto_library.bzl", "proto_library")
 
 licenses(["notice"])
 envoy_extension_package()
+
+proto_library(
+    name = "config_proto",
+    srcs = ["config.proto"],
+    deps = ["@com_google_protobuf//:struct_proto"],
+)
+
+cc_proto_library(
+    name = "config_cc_proto",
+    deps = [":config_proto"],
+)
 
 envoy_cc_library(
     name = "core",
@@ -23,6 +36,7 @@ envoy_cc_extension(
     srcs = ["envoy/extension.cc", "envoy/pq_filter.cc"],
     deps = [
         ":core",
+        ":config_cc_proto",
         "//envoy/event:dispatcher_interface",
         "//envoy/http:filter_interface",
         "//envoy/http:header_map_interface",

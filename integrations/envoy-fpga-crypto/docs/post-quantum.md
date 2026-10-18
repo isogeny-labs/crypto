@@ -81,7 +81,13 @@ binary. This plugin does not make the extension loadable by stock Envoy.
 
 [pq-software.yaml](../examples/pq-software.yaml) is a loopback CPU demo.
 Set `plugin_library` to the installed absolute path. The filter name is
-`envoy.filters.http.pq_crypto`; it uses a strict `google.protobuf.Struct`.
+`envoy.filters.http.pq_crypto`; its typed configuration is
+`type.googleapis.com/envoy.extensions.fpga_crypto.v3.PqHttp`, with the validated
+configuration fields under `value`. The classical HTTP filter uses the distinct
+`FpgaHttp` message from `config.proto`. Using the same generic Struct type for
+both factories would collide in Envoy's factory-by-type registry. The TLS
+private-key provider keeps its existing Struct configuration in its separate
+factory category.
 
 `backend: software-liboqs` explicitly selects CPU operation. For actual
 hardware, use `backend: aws-fpga` (the default), remove `plugin_library` and
@@ -117,6 +123,10 @@ the selected liboqs variant performs its specified prehash.
 | `encapsulate` | Raw public key | Framed ciphertext, shared secret |
 | `decapsulate` | Raw ciphertext | Raw shared secret |
 | `erase` | Empty | Empty, HTTP 200 |
+
+Envoy omits `Content-Type` on empty local replies, including successful
+`verify` and `erase` acknowledgments. Nonempty binary responses use
+`application/octet-stream`; the catalog uses `application/json`.
 
 Binary framing is little-endian: `u32 version=1`, `u32 part_count`, one
 `u32 byte_length` per part, then the parts concatenated in table order,
