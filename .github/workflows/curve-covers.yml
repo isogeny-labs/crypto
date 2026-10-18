@@ -91,8 +91,6 @@ concurrency:
 jobs:
   certificates:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
