@@ -197,6 +197,11 @@ attempt used the shell's default AWS profile and failed at preflight HEAD
 with 403 before upload; the recorded `ecc-challenges-new` profile completed
 the test. The receipt is
 [`CUBIC_TARGET_S3_ACCEPTANCE_20261018.json`](CUBIC_TARGET_S3_ACCEPTANCE_20261018.json).
+The final binary after merging current `main` repeated the isolated push,
+matching repeat skip, S3 HEAD, remote verification, fresh-cache download,
+SHA-256 check, exact-object deletion, and final HEAD 404. Its binary hash and
+unique key are in
+[`FINAL_MERGED_S3_ACCEPTANCE_20261018.json`](FINAL_MERGED_S3_ACCEPTANCE_20261018.json).
 
 ## For evidence
 
