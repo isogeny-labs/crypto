@@ -551,7 +551,7 @@ type V8 = [u8; DMAX];
 
 #[inline]
 fn fl_inv(l: u8, a: u8) -> u8 {
-    debug_assert!(a % l != 0);
+    debug_assert!(!a.is_multiple_of(l));
     (1..l)
         .find(|&b| (a as u16 * b as u16) % l as u16 == 1)
         .expect("inverse mod a prime")
@@ -679,7 +679,7 @@ struct Class {
 impl Class {
     /// Whether 1 is an eigenvalue (`ℓ | #E` for the curve's Frobenius).
     fn has_eigenvalue_one(&self, l: u8) -> bool {
-        (1 + l as u16 + self.det as u16 - self.tr as u16) % l as u16 == 0
+        (1 + l as u16 + self.det as u16 - self.tr as u16).is_multiple_of(l as u16)
     }
 }
 
@@ -695,8 +695,7 @@ fn classes_with_det(l: u8, d: u8) -> Vec<Class> {
         let roots: Vec<u8> = (0..l)
             .filter(|&x| {
                 (x as u16 * x as u16 + d as u16 + l as u16 * l as u16 - tr as u16 * x as u16)
-                    % l as u16
-                    == 0
+                    .is_multiple_of(l as u16)
             })
             .collect();
         match roots.len() {
@@ -780,7 +779,7 @@ fn apply_pi(l: u8, n: usize, phi: M2, v: &V8) -> V8 {
 fn rref(l: u8, ncols: usize, rows: &mut Vec<V8>) -> usize {
     let mut r = 0usize;
     for c in 0..ncols {
-        let Some(piv) = (r..rows.len()).find(|&i| rows[i][c] % l != 0) else {
+        let Some(piv) = (r..rows.len()).find(|&i| !rows[i][c].is_multiple_of(l)) else {
             continue;
         };
         rows.swap(r, piv);
@@ -791,9 +790,9 @@ fn rref(l: u8, ncols: usize, rows: &mut Vec<V8>) -> usize {
         for i in 0..rows.len() {
             if i != r && rows[i][c] != 0 {
                 let f = rows[i][c];
-                for k in 0..ncols {
-                    let s = fl_mul(l, f, rows[r][k]);
-                    rows[i][k] = fl_sub(l, rows[i][k], s);
+                let prow = rows[r];
+                for (x, &pv) in rows[i][..ncols].iter_mut().zip(prow[..ncols].iter()) {
+                    *x = fl_sub(l, *x, fl_mul(l, f, pv));
                 }
             }
         }
@@ -1249,7 +1248,7 @@ fn ddf_pattern(g: &Gf, f: &[u32]) -> (Vec<usize>, bool) {
     let mut pattern = Vec::new();
     let mut xp = x.clone();
     let mut d = 1usize;
-    while f.len() > 1 && f.len() - 1 >= 2 * d {
+    while f.len() > 2 * d {
         xp = gfp_powmod(g, &xp, q, &f);
         let h = gfp_sub_poly(g, &xp, &x);
         let h = if h.is_empty() { vec![g.zero()] } else { h };
@@ -1523,6 +1522,9 @@ fn class_from_pattern(l: u8, tr: u8, det: u8, pattern: &[usize]) -> Option<Class
     }
 }
 
+type ByClassKey = (u32, u8, u8, String, u8, u8);
+type ByClassVal = (usize, usize, usize, bool);
+
 #[derive(Default, Clone)]
 struct QSummary {
     classes: usize,
@@ -1548,8 +1550,7 @@ fn part_h(out: &Path, log: &mut File, gmap: &HashMap<GKey, (usize, usize)>, qs: 
         "q,classes,prime_order,cofactor_2,full_2_torsion,ell,with_tian,prime_with_tian,cof2_with_tian,prime_any_odd_ell,all_any_odd_ell,seconds"
     )
     .unwrap();
-    let mut byclass: BTreeMap<(u32, u8, u8, String, u8, u8), (usize, usize, usize, bool)> =
-        BTreeMap::new();
+    let mut byclass: BTreeMap<ByClassKey, ByClassVal> = BTreeMap::new();
     let mut checks = String::new();
     for &q in qs {
         let tq = Instant::now();
@@ -1587,7 +1588,7 @@ fn part_h(out: &Path, log: &mut File, gmap: &HashMap<GKey, (usize, usize)>, qs: 
             }
             let order_class = if is_prime(num) {
                 "prime"
-            } else if num % 2 == 0 && is_prime(num / 2) {
+            } else if num.is_multiple_of(2) && is_prime(num / 2) {
                 "cof2"
             } else {
                 "other"
@@ -1633,7 +1634,7 @@ fn part_h(out: &Path, log: &mut File, gmap: &HashMap<GKey, (usize, usize)>, qs: 
                 if l == 2 {
                     let full = cls.typ == ClassType::Scalar;
                     let splits = pattern == [1, 1, 1];
-                    if full != splits || (full && num % 4 != 0) {
+                    if full != splits || (full && !num.is_multiple_of(4)) {
                         c7_bad += 1;
                     }
                     if full {
@@ -1893,7 +1894,7 @@ mod tests {
             let rational = p3.iter().filter(|&&d| d == 1).count();
             // Rational x-roots come in whole subgroups only if the points are
             // rational; a rational subgroup contributes 1 root. #E[3](F) ∈ {1,3,9}.
-            if num % 3 != 0 {
+            if !num.is_multiple_of(3) {
                 assert_eq!(rational, 0);
             }
             if rational == 4 {
@@ -1910,7 +1911,7 @@ mod tests {
             let num = count_points(&g, c);
             let (p2, _) = ddf_pattern(&g, &torsion_x_poly(&g, c, 2));
             let roots = p2.iter().filter(|&&d| d == 1).count();
-            assert_eq!((num % 2 == 0), roots >= 1);
+            assert_eq!(num.is_multiple_of(2), roots >= 1);
             if roots == 3 {
                 assert_eq!(num % 4, 0);
             }
@@ -1926,5 +1927,39 @@ mod tests {
             curves.len(),
             2 * (q3 as usize - 2) + gcd_u64(4, q3 - 1) as usize + gcd_u64(6, q3 - 1) as usize
         );
+    }
+}
+
+#[cfg(test)]
+mod module_theory_tests {
+    use super::*;
+
+    /// `n = 3`, `ℓ = 7`, `φ = J(1)`: `V ≅ F_7[T]/((T^3 − 1)^2)` is cyclic and
+    /// `T^3 − 1` splits, so the submodules of dimension 3 are the seven
+    /// degree-3 divisors; three of them are isotropic and two meet no factor.
+    #[test]
+    fn jordan_seven_divisors() {
+        let phi = M2 {
+            a: [[1, 1], [0, 1]],
+        };
+        let (n_sub, n_ker, n_tian, _, _) = kernel_census(7, 3, 1, phi);
+        assert_eq!((n_sub, n_ker, n_tian), (7, 3, 2));
+    }
+
+    /// Nonsplit `φ`: `χ_φ(T^3)` has no factor of odd degree, so no submodule
+    /// of dimension 3 exists at all (`n = 3`, every `ℓ ≤ 7`).
+    #[test]
+    fn nonsplit_has_no_dim3_submodule() {
+        for l in [3u8, 5, 7] {
+            for qbar in 1..l {
+                let d = fl_mul(l, fl_mul(l, qbar, qbar), qbar);
+                for cls in classes_with_det(l, d) {
+                    if cls.typ == ClassType::Nonsplit {
+                        let (n_sub, _, _, _, _) = kernel_census(l, 3, qbar, cls.rep);
+                        assert_eq!(n_sub, 0, "l={l} qbar={qbar} tr={}", cls.tr);
+                    }
+                }
+            }
+        }
     }
 }
