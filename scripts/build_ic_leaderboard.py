@@ -72,6 +72,7 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -617,6 +618,19 @@ def la_component() -> dict:
             "class": "engineering"}
 
 
+def lazy_members_component() -> dict:
+    """The lazy orbit-member index of research/ecbench_lazy_orbit_members_20261018:
+    ratios copied from the study's saved ecbench comparisons (figures/ratios.json).
+    A component improvement of the Frobenius-folded pair table's set-up. The
+    ranked tables A-C keep the oracle each row was measured with."""
+    d = load(SOURCES["lazy_members"])
+    if d.get("schema") != "crypto.lazy_orbit_members/v1" or d.get("class") != "engineering":
+        raise SystemExit(f"{SOURCES['lazy_members']}: unexpected schema or class")
+    return {"rows": d["rows"], "unit": d["unit"], "class": d["class"], "note": d["note"],
+            "study": d["study"] + "/", "report": d["study"] + "/REPORT.pdf",
+            "source": SOURCES["lazy_members"]}
+
+
 def latest_frontier_audit() -> dict:
     """Copy the latest performance handoff into the generated board.
 
@@ -1069,6 +1083,7 @@ def build() -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "lazy_members_component": lazy_members_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -1165,6 +1180,23 @@ def markdown(doc: dict) -> str:
           "stage counters blocked from promotion |", "",
           f"[Latest result data](../../{audit['source']}); "
           f"[prior full synthesis](../../{audit['previous_source']}). {audit['reason']}", ""]
+    lz = doc["lazy_members_component"]
+    L += ["## Component improvement: lazy orbit-member index (2026-10-18, engineering)", "",
+          "The Frobenius-folded pair table no longer names `σ^t(P_i)` for every base point at build; "
+          "a hitting probe names its two summands when it happens. Same table, relations, rank and "
+          "recovered logarithm (856/856 run pairs identical); it moves no row of tables A–C, which keep "
+          f"the oracle each was measured with. {lz['unit']}; 95 % intervals; below 1 the numerator is "
+          "cheaper.", "",
+          "| curve | log₂ r | eager ÷ lazy (before ÷ after) | eager ÷ rho-strong (was) | lazy ÷ rho-strong (now) |",
+          "|:--|--:|:--|:--|:--|"]
+    for r in lz["rows"]:
+        def ci(x):
+            return f"{x['ratio']:.3f} [{x['ci95'][0]:.3f}, {x['ci95'][1]:.3f}]"
+        L.append(f"| `{r['curve']}` | {r['log2_r']:.1f} | **{ci(r['eager_over_lazy'])}** | "
+                 f"{ci(r['eager_over_rho_strong'])} | {ci(r['lazy_over_rho_strong'])} |")
+    L += ["", f"[Report]({'../../' + lz['report']}) · [study](../../{lz['study']}) · "
+              f"[data](../../{lz['source']}). Distance to rho is reported, not a gate; no ranking against "
+              "rho is claimed.", ""]
     for code in ("A", "B", "C"):
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
@@ -1629,6 +1661,24 @@ def page(doc: dict, standalone: bool) -> str:
              '</tbody></table></div>'
              f'<p>{esc(audit["reason"])} {gh(audit["source"], "Latest result data")} · '
              f'{gh(audit["previous_source"], "prior full synthesis")}.</p></section>')
+    lz = doc["lazy_members_component"]
+    P.append('<section class="panel" id="lazy-orbit-members"><h2>Component improvement · lazy orbit-member '
+             'index <span class="chip">engineering</span></h2>'
+             '<p>The Frobenius-folded pair table no longer names <code>σ^t(P_i)</code> for every base point at '
+             'build; a hitting probe names its two summands when it happens. Same table, relations, rank and '
+             'recovered logarithm (856/856 run pairs identical). It moves no row of tables A–C. '
+             f'{esc(lz["unit"])}; below 1 the numerator is cheaper.</p>'
+             '<div class="scroll"><table><thead><tr><th>Curve</th><th>log₂ r</th><th>eager ÷ lazy</th>'
+             '<th>eager ÷ rho-strong (was)</th><th>lazy ÷ rho-strong (now)</th></tr></thead><tbody>')
+    for r in lz["rows"]:
+        def ci(x):
+            return f'{x["ratio"]:.3f} [{x["ci95"][0]:.3f}, {x["ci95"][1]:.3f}]'
+        P.append(f'<tr><td><code>{esc(r["curve"])}</code></td><td>{r["log2_r"]:.1f}</td>'
+                 f'<td><b>{ci(r["eager_over_lazy"])}</b></td><td>{ci(r["eager_over_rho_strong"])}</td>'
+                 f'<td>{ci(r["lazy_over_rho_strong"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>{gh(lz["report"], "Report")} · {gh(lz["study"], "study")} · {gh(lz["source"], "data")}. '
+             'Distance to rho is reported, not a gate; no ranking against rho is claimed.</p></section>')
     d = doc["bounded_diagnostics"][0]
     P.append(f'<section class="card" id="bounded-n37-diagnostic"><h2>New n37 counted diagnostic, outside the priced tables</h2>'
              f'<p>On <code>{esc(d["curve"])}</code>, shared-rank K16 has {d["usable_points"]:,} actual usable '

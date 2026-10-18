@@ -5062,11 +5062,7 @@ impl FrobeniusPairTable {
             return None;
         }
         let canon = FrobeniusCanon::new(&inst.gf, inst.n)?;
-        let mut member_of = if lazy {
-            Vec::new()
-        } else {
-            vec![0u32; f * n]
-        };
+        let mut member_of = if lazy { Vec::new() } else { vec![0u32; f * n] };
         let (mut frob, mut lookups) = (0u64, 0u64);
         for i in 0..if lazy { 0 } else { f } {
             let mut p = fb.points[i];
@@ -10281,7 +10277,10 @@ mod tests {
         }
         assert!(hits > 0);
         assert_eq!(cl.frobfold_mismatches, 0);
-        assert_eq!(ce.frobenius_maps, 0, "the eager table charges its maps at build");
+        assert_eq!(
+            ce.frobenius_maps, 0,
+            "the eager table charges its maps at build"
+        );
         assert!(cl.frobenius_maps > 0);
         // Resolution costs at most 2 maps-and-lookups per hit.
         assert!(cl.lookups <= ce.lookups + 2 * hits);
