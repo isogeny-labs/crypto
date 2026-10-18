@@ -2,7 +2,7 @@
 use crate::{gf2k::SmallField, lpoly, weil};
 use serde_json::json;
 type P = [u16; 3];
-fn plane(q: usize) -> Vec<P> {
+pub(super) fn plane(q: usize) -> Vec<P> {
     (0..q)
         .flat_map(|x| (0..q).map(move |y| [1, x as u16, y as u16]))
         .chain((0..q).map(|y| [0, 1, y as u16]))
@@ -67,7 +67,7 @@ fn monomials() -> Vec<[usize; 3]> {
         .flat_map(|i| (0..=6 - i).map(move |j| [i, j, 6 - i - j]))
         .collect()
 }
-fn jet(f: &SmallField, p: P, m: [usize; 3], dx: usize, dy: usize) -> u16 {
+pub(super) fn jet(f: &SmallField, p: P, m: [usize; 3], dx: usize, dy: usize) -> u16 {
     let fixed = p.iter().position(|x| *x != 0).unwrap();
     let vars: Vec<_> = (0..3).filter(|i| *i != fixed).collect();
     let (a, b) = (m[vars[0]], m[vars[1]]);
@@ -143,7 +143,12 @@ fn embedding(fd: &SmallField, f: &SmallField) -> Vec<u16> {
         })
         .collect()
 }
-fn coordinates(fd: &SmallField, f: &SmallField, pts: &[P], partition: &[usize]) -> Vec<P> {
+pub(super) fn coordinates(
+    fd: &SmallField,
+    f: &SmallField,
+    pts: &[P],
+    partition: &[usize],
+) -> Vec<P> {
     let mut rational = Vec::new();
     let mut pos = 0;
     for degree in partition {
@@ -216,7 +221,7 @@ fn surface_values(
     assert_eq!(values.len(), f.q * f.q + f.q + 1 + points.len() * f.q);
     values
 }
-fn counts(f: &SmallField, values: &[Vec<u16>]) -> Vec<i16> {
+pub(super) fn counts(f: &SmallField, values: &[Vec<u16>]) -> Vec<i16> {
     let mut hist = vec![0i64; 1 << 16];
     for val in values {
         for u in 0..f.q as u16 {

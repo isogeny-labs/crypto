@@ -4,6 +4,28 @@ use num_integer::Integer;
 use num_traits::{One, Zero};
 use serde_json::json;
 
+#[path = "../../../../src/binary_ecc/mod.rs"]
+#[allow(unused_imports)]
+mod binary_ecc;
+// Link the existing library's optional rho helper; experiments below use
+// geometric relations, not this helper.
+mod utils {
+    pub fn mod_inverse(
+        a: &num_bigint::BigUint,
+        modulus: &num_bigint::BigUint,
+    ) -> Option<num_bigint::BigUint> {
+        use num_integer::Integer;
+        use num_traits::One;
+        let m = num_bigint::BigInt::from(modulus.clone());
+        let witness = num_bigint::BigInt::from(a.clone()).extended_gcd(&m);
+        if witness.gcd.is_one() {
+            witness.x.mod_floor(&m).to_biguint()
+        } else {
+            None
+        }
+    }
+}
+
 #[path = "../../../../src/cryptanalysis/curve_construction/gf2k.rs"]
 mod gf2k;
 #[path = "../../../../src/cryptanalysis/curve_construction/modular.rs"]
@@ -17,14 +39,20 @@ mod hash {
         pub use crate::sha256_impl::*;
     }
 }
+mod census;
 mod delpezzo;
+mod delpezzo_conic;
 mod gluing;
 #[path = "../../../../src/cryptanalysis/identity_certificate.rs"]
 mod identity_certificate;
 mod klein_transfer;
 #[path = "../../../../src/cryptanalysis/curve_construction/lpoly.rs"]
 mod lpoly;
+mod modular_screen;
+mod n5_relations;
+mod polarized;
 mod round02;
+mod round03_record;
 mod round_record;
 
 fn pow(mut a: u64, mut k: u64, p: u64) -> u64 {
@@ -302,6 +330,94 @@ fn run(out: &std::path::Path) {
 }
 fn main() {
     let args: Vec<_> = std::env::args().collect();
+    if args.get(1).map(String::as_str) == Some("--genus4-bounds") {
+        census::genus_four_bounds(std::path::Path::new(
+            args.get(2).expect("round output directory"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--record-round03") {
+        round03_record::record(std::path::Path::new(args.get(2).expect("round directory")));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--verify-n5") {
+        n5_relations::verify(std::path::Path::new(
+            args.get(2).expect("n5 relation record"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--polarization-vectors") {
+        polarized::short_vectors(std::path::Path::new(
+            args.get(2).expect("round output directory"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--verify-polarized") {
+        polarized::verify(std::path::Path::new(
+            args.get(2).expect("polarization record"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--n5-hermite-relations") {
+        n5_relations::run_hermite(std::path::Path::new(
+            args.get(2).expect("round output directory"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--n5-quartic-relations") {
+        n5_relations::run_quartic(std::path::Path::new(
+            args.get(2).expect("round output directory"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--genus6-census") {
+        census::run_six(std::path::Path::new(
+            args.get(2).expect("round output directory"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--n5-vertical-relations") {
+        n5_relations::run_vertical(std::path::Path::new(
+            args.get(2).expect("round output directory"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--n5-relations") {
+        n5_relations::run(std::path::Path::new(
+            args.get(2).expect("round output directory"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--genus5-census") {
+        census::run(std::path::Path::new(
+            args.get(2).expect("round output directory"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--determinant-screen") {
+        modular_screen::run(std::path::Path::new(
+            args.get(2).expect("round output directory"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--polarized-extended") {
+        polarized::run_extended(std::path::Path::new(
+            args.get(2).expect("round output directory"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--polarized") {
+        polarized::run(std::path::Path::new(
+            args.get(2).expect("round output directory"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--conic-twists") {
+        delpezzo_conic::run(std::path::Path::new(
+            args.get(2).expect("round output directory"),
+        ));
+        return;
+    }
     if args.get(1).map(String::as_str) == Some("--record-round") {
         round_record::record(std::path::Path::new(args.get(2).expect("round directory")));
         return;

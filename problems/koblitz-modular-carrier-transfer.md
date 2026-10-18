@@ -101,3 +101,52 @@ Next discriminating constructions are the remaining del Pezzo twists,
 Rosati-compatible integral gluing lattices, an evaluated n=5 map, and interior
 principal-function relations on its modular factor. The user determines IC
 speed assessment; this round contains no timing comparison.
+
+## Round 03: completed searches, finite gluing, and n=5 controls
+
+[Round 03](../research/koblitz_modular_ic_20261018/rounds/03/REPORT.md)
+tests the remaining del Pezzo types (5) and (3,2) using five conic points,
+131,070 anticanonical-square sections, six extension counts, and separate
+conic-restriction controls. No A5 candidate appears in these systems.
+Published genus-5 and genus-6 censuses also have no matching polynomial:
+7,829 genus-5 records and 38,327 genus-6 classes representing 72,227 curves.
+Together with the genus-4 count tests, this conditionally excludes F2
+Jacobian carriers containing the full A5 factor through genus 6. The census
+classifications and genus-4 maximum are external assumptions, not independent
+Lean classification proofs. Finite-subgroup representations are a separate
+question.
+
+The integral invariant-Hermitian search now checks all five congruence cosets
+within its frozen coefficient box: 12,005 forms, 29 positive, 24 retained
+sign-specific candidates of determinants 5 and 19. Separate integer,
+kernel-pairing and exhaustive matrix checks verify 14 gluing cases with
+140 anti-isometries. These specify finite polarization data and, under the
+written polarization/descent bridge, principally polarized quotients. No
+quotient equations or Jacobian realization are implemented. Four determinant-19
+cases have no norm-one vector in the tested coordinate box; no global
+indecomposability claim follows.
+
+Both n=5 order-11 subgroups now have evaluated augmentation tuples and
+cubic pullbacks to genus-3 covers over F32. Geometric functions yield 1,770
+rows of rank 42 on 43 columns for a=0, and 81 rows of rank 20 on 21 columns
+for a=1. All 22 public fixture scalars are recovered and checked. Separate
+verification reconstructs every principal row, both ranks, 64 projected
+classes and all target descents. The initial deficient a=1 collections and
+one corrected metadata count remain frozen. This is a same-field control;
+the actual F2 modular-Jacobian evaluator and direct interior modular
+relations remain missing.
+
+Thirteen new named Lean lemmas cover determinant compatibility, norm and
+alternating identities, graph isotropy/intersections/injectivity, cubic
+substitution, conic intersections, conditional adjunction and count
+obstructions. Their kernel build and transitive axiom audit pass. Full
+geometry and census completeness remain explicit bridges in the
+[proof map](../research/koblitz_modular_ic_20261018/rounds/03/PROOF_MAP.md).
+
+The next discriminating work is a complete short-vector search using exact
+inverse-Hermitian coordinate bounds, explicit quotient/polarization geometry,
+and an actual divisor projector/evaluator on the specified n=5 modular factor.
+Acceptance requires divisor inputs/outputs, exceptional cases, a nonzero
+prime-subgroup image, and relations generated on that destination. The
+same-field control does not discharge this obligation. No timing experiment
+or efficiency assessment is part of this round.

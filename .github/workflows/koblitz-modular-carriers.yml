@@ -7,6 +7,7 @@ on:
       - 'src/cryptanalysis/curve_construction/modular.rs'
       - 'src/cryptanalysis/curve_construction/gf2k.rs'
       - 'src/cryptanalysis/curve_construction/lpoly.rs'
+      - 'src/binary_ecc/**'
       - 'src/cryptanalysis/identity_certificate.rs'
       - 'src/hash/sha256.rs'
       - '.github/workflows/koblitz-modular-carriers.yml'
@@ -46,6 +47,13 @@ jobs:
         run: |
           set -euo pipefail
           round=research/koblitz_modular_ic_20261018/rounds/02
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
+      - name: Replay round 03 twists, polarization kernels and n5 relations
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/03
           (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
           "$round/REPLAY.sh"
       - name: Install pinned Lean
