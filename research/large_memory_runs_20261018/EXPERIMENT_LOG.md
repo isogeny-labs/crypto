@@ -35,7 +35,10 @@ checkout `/home/ec2-user/crypto`, and are committed to branch
 | 11 | `XP-20261015-shape-g1-frozen-cells`, **stage A** (PROTOCOL.md §3, frozen in `ad6c224f6`): (13, 5) d_max = 6, shapes random, random2, gp, fp, coord, 2 × 2, seed 20261015, one process per shape, 16 GB cap, 24 h wall | `research/shape_search_g1_frozen_cells_20261018/run.sh stage A` | 11:50:03 | ~18:50 | **lost to a host reboot** after ~7 h, no end lines; 11 draws committed by 17:18Z, all `at_least 7` (random 2, random2 2, gp 3, fp 2, coord 2); kept in `runs/attempt1-lost-host-reboot-20261018T1850Z/` |
 | 12 | same, stage A **repeat** (same flags and binary, deterministic seeds) | `run.sh stage A` | 19:03:30 | — | running (5 processes); must reproduce attempt 1's draws line for line | `runs/g1-13-5-d6-<shape>.{jsonl,err,meta}` | `runs/g1-13-5-d6-<shape>.{jsonl,err,meta}`, `progress.txt` |
 
-Planned, not started: stage B ((13, 5) d_max = 7, at most 2 processes at a time) after stage A; stage C is not run (its d_max = 6 probes did not finish within 4 h, PROTOCOL.md §3).
+| 13 | `XP-20261015-kummer-p224-depth`, stage 0 (PROTOCOL.md frozen in `679acac3a`): identity `m = 4, N = 12` target 0 at `p_40` and P-224, 2 threads | `research/pkm_kummer_wide_field_depth_20261018/run.sh stage0` | 20:47:56 | 20:52:56 | done: **identity holds at both primes** (every field equals the study's row; checkers agree); trace peaks 315 MB and 1,138 MB give memory multiples 1.84 and 6.65 | `research/pkm_kummer_wide_field_depth_20261018/STAGE0.md`, `runs/S0-*` |
+| 14 | same card, stage 1: `m = 2, N = 20`, `m = 3, N = 15` (targets 0, 1) and `m = 4, N = 12` (target 1) at `p_40` and P-224; 10 processes, 2 threads each, 32 GB cap, 48 h budget | `run.sh stage1` | 20:55 | — | running | `runs/S1-*`, `progress.txt` |
+
+Planned, not started: P-224 card stage 2 (`m = 4, N = 16` and `m = 3, N = 18` at both primes, under the protocol's memory admission rule); shape stage B ((13, 5) d_max = 7, at most 2 processes at a time) after stage A; stage C is not run (its d_max = 6 probes did not finish within 4 h, PROTOCOL.md §3).
 
 ## Reports
 
