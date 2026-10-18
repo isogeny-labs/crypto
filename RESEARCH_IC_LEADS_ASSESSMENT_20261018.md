@@ -148,3 +148,126 @@ updated in this table as commits land.
 | T15 | closure-degree predictor experiment from the committed draws | `ml-cryptanalysis/experiments/closure-degree-predictor/` | landed as `aburan28/ml-cryptanalysis#30`: only `ℓ` and `m·ℓ` are sufficient (148 draws, 37 cells, p = 1/666); the two rules are separated only by the cell m = 4, ℓ = 6 (2–5 unsatisfiable draws suffice); null result |
 | T16 | autoresearcher ledger corrections (artefact rejections, `s4_expr` propagation, corpus contradictions) | needs `/coordinate`; not delegated here | pending |
 | T17 | external Gröbner baselines (msolve, M4RI) wired as optional arms | `performance/`, `groebner_compare/` | pending; neither binary is installed here |
+| T18 | wire `f4_gf2` as `SolverEngine::RankIndexed` and A/B it on the relation search; controlled A/B of the default engine's 24-variable build switch | `src/cryptanalysis/koblitz_groebner.rs`, `f4_gf2.rs` | pending |
+| T19 | lift the equivariant F4 field cap (`d <= 40`) with `WideGf2x3` so the character blocks reach the (4,6), ℓ ≥ 7 and n = 131 cells; add the hyperoctahedral flips | `src/cryptanalysis/equivariant_f4.rs`, `wide_gf2m.rs` | pending |
+| T20 | re-run the landed n = 73, K = 600 rank stage with the T01/T02 defaults under the frozen protocol, A/A control, replay certificate; move the row's `S` | `examples/koblitz_orbit_dlp_fast.rs`, `docs/ic/` | pending |
+| T21 | wide producer arithmetic: basis-aware root solve (drop the per-probe `to_normal`/`to_poly` maps), n = 73 and 83 modulus-specialised reduction, closed-form Koblitz order in `KoblitzCurve::new` | `examples/koblitz_orbit_dlp_fast.rs`, `src/cryptanalysis/wide_gf2m.rs` | pending |
+| T22 | rank-indexed elimination inside the equivariant blocks (T14 kernel per T07 block), counted against both | `src/cryptanalysis/equivariant_f4.rs` | pending |
+| T23 | δ-census: for every IC arm on the board, the fraction of group elements whose structure the arm exploits, against the Ω(min(√q, 1/δ)) bound of ePrint 2026/384; a per-row theory floor beside the matched rho | `docs/ic/`, `scripts/build_ic_leaderboard.py` | pending |
+| T24 | fall-space closure-degree predictor (the T06 next step): degree-3 fall space per multidegree block, frozen before `compare.py`, on the same 148 draws plus the (4,6) draws | `research/closure_degree_predictor_20261018/` | pending |
+| T25 | B2 kernel end to end on the ladder rows only (n = 41, 53): relations per second with the resolvent solver against the 4-sum, same binary; stop at that measurement | `src/cryptanalysis/koblitz_sixsum_extract.rs` | pending |
+| T26 | Joux–Vitse replay: cheap refusal by sketch rank before elimination; keep only if the generic-family total drops below always-full, else close | `src/cryptanalysis/f4_trace.rs` | pending |
+| T27 | CI and worktree debt: refresh or retire the four frozen-lock workflows, pin research verifiers to their own `catalog_commit`, per-worktree Cargo targets in the agent rules, archive the 965 MB of unreferenced `research/boolean_*` data | `.github/workflows/`, `research/cover_transfer_assessment_20261013/`, `AGENTS.md` | pending |
+
+## 5. Leads from the follow-up wave (2026-10-18, evening)
+
+What changed since §2: fourteen of the seventeen follow-ups landed on this
+branch (§4), and the owner's review of the same day
+(`research/ic_leads_review_20261018/`, PR #2150) merged on `main` with its own
+ranked opportunities (§3 there: the large-memory node for the (4,6) and ℓ ≥ 7
+cells and the PKM tower; the baseline and bookkeeping debt; the linear algebra
+as an object; the stacked D₄ + 2LP arm; the symmetry arms at m = 4; crossbred,
+last-fall-degree and learned orderings; the ML and code loops). The leads
+below are the ones the wave's own measurements opened and that review does
+not list. Two external results frame them: ePrint 2026/384 (structure must
+be exploited on at least a 1/√q fraction of elements to beat rho) and
+ePrint 2025/783 (table-lookup hybrids are non-adaptive, hence Ω(√N) below
+√N advice), so every wide-producer item here is engineering on the ladder
+rows, never a route to ECC2K-130, and is labelled so.
+
+Ranked by what each can move, then by cost.
+
+1. **Make the ported kernel the engine (T18).** `f4_gf2` reproduces the
+   crate kernel's rows bit for bit on 160 Koblitz comparisons and is 5.6×
+   faster than the full-readback path and about 10× faster than the path the
+   default engine actually calls, at the n = 15, m = 3, ℓ = 5, degree-4 cell
+   (`docs/ic/perf/F4_GF2_PORT_COMPARISON_20261018.md`). Nothing on the board
+   uses it yet. The same comparison found the default engine's own 24-variable
+   build switch (`KIC_F4_*`) running 2× slower than its full path at 30
+   variables on 3-draw probes: a possible regression in the default that a
+   frozen A/B at 22–32 variables settles in an hour. Expected: a constant on
+   every PDP-stage row that goes through F4; the first `S`-moving change from
+   this wave if the relation search is kernel-bound at those widths.
+   Kill: the search is not kernel-bound, or the engine variant changes a
+   verdict on the agreement families.
+
+2. **Reach the cells that matter with the equivariant blocks (T19, T22).**
+   The (4,6) A1 cell refuted at degree 4 on both unsatisfiable draws today
+   (`research/dreg_closure_m4l6_20261018/RESULTS.md`), so "degree 5 holds" is
+   alive and the review's §3.5 symmetry arms are conditional no longer on
+   that cell. T07's blocks give 95× fewer row operations on the n = 11
+   barrel at the 1-word price (27× at d words) but stop at d ≤ 40, which
+   excludes n = 131 (d = 130) and every cell with a large ord_n(2). T09's
+   three-limb field removes the arithmetic reason for the cap. Lift it, add
+   the (Z/2)ᵐ ⋊ Sₘ flips the note's §2 item 3 names, and run the rank-indexed
+   elimination inside each block (T22): the 5.6× and the 95× are on
+   different axes and should stack. Kill: the F_{2^d} multiply-add at
+   d = 130 costs more than the rows it removes (measure at d words, not 1).
+
+3. **Move one real row (T20).** The landed n = 73, K = 600 run spent
+   18,398 s in the rank stage; the probe loop now costs 0.38× per probe at
+   that K with the defaults T02 turned on, and the index build 0.44×
+   (`docs/ic/perf/WIDE_PRODUCER_ENGINEERING_20261018.md`). Re-running that
+   row under its frozen protocol with an A/A control and a replay certificate
+   is the one measurement in this wave that can move an end-to-end `S` on the
+   board rather than a component, and it is cheap (about two hours on this
+   host). It stays engineering: the distance to the matched rho is reported,
+   not closed.
+
+4. **The next 2× in the probe loop (T21).** With canonicalisation gone, the
+   per-probe cost is arithmetic: the root solve (5.5 field multiplications
+   at 159 Ir each plus the batch-inversion control, 39% of the old scan) and
+   the two byte-table basis maps `to_normal`/`to_poly` (13.7%). Three
+   concrete cuts, each a same-binary A/B: a root solver that works in one
+   basis so the maps leave the loop; a modulus-specialised reduction for the
+   n = 73 and 83 pentanomials as T09 did for ECC2K-130 (the hand-folded path
+   is the cheap part of that type); and the closed-form Koblitz group order
+   in `KoblitzCurve::new`, whose trial-division `factorise` is 67% of every
+   short run and about 9 s of every process start. Kill for the first two:
+   under 1.2× on the scan at K = 600.
+
+5. **A theory floor on every row (T23).** 2026/384 bounds any algorithm that
+   exploits structure on a δ-fraction of elements by Ω(min(√q, 1/δ)). No row
+   on the board states its δ. For each IC arm the fraction is computable
+   from the committed relation records (decomposable targets over sampled
+   targets, or the factor-base density the arm actually hits); placing
+   1/δ beside the matched rho turns the "distance to rho" column into a
+   two-sided statement and gives a kill test that needs no run: an arm
+   whose 1/δ exceeds √q cannot beat rho in-model. Python over committed
+   artefacts; a day.
+
+6. **Fall-space predictor (T24).** The multigraded Hilbert-series rule is a
+   recorded negative (8 of 148 draws, the same as a semi-regular control,
+   no ℓ = 7 step; `research/closure_degree_predictor_20261018/REPORT.md`).
+   Its own next step is a fall-space model (degree-3 fall space per
+   multidegree block), frozen before comparison; the (4,6) draws now give
+   it an out-of-sample cell. Cheap, and it is the only instrument that could
+   say in advance which cells the large-memory node should buy.
+
+7. **B2 once, then stop (T25).** The resolvent solver made one S₄ root solve
+   1.7 S₃ instead of 27 (`resolvent_summary.json`), and on the n = 41 ladder
+   B2 is now below the 4-sum at K = 10 and 20 on solver cost alone. The
+   end-to-end relation rate was not measured. Measure it once on the ladder
+   rows (n = 41, 53) with the same binary; the review's §3.8 and 2025/783
+   close 6-sum designs at ECC2K-130, so this lead ends at that table.
+
+8. **Replay only if refusal is free (T26).** Joux–Vitse replay is sound
+   with the audit and a net loss because refused replays pay the full
+   elimination first (`f4_trace` module docs). A sketch-rank refusal
+   (random projection of the dropped rows before elimination) would make the
+   generic family net positive if it costs under 10% of a full run; the
+   Koblitz families gained 0.3–3.3% on accepted draws, so unless refusal
+   becomes free the lead closes.
+
+9. **Pay the CI and worktree debt (T27).** Four workflows copy a 2026-09-25
+   `Cargo.lock` and build `--locked`, red for every PR since `main` added
+   dependencies; one research verifier pins the 2,100-row catalog against a
+   live 2,572-row registry; two parallel worktrees sharing one Cargo target
+   overwrite each other's test binary (observed in this wave); and 965 MB of
+   `research/boolean_*` data that no code embeds sits in every checkout.
+   None of this is science, and all of it cost this wave hours.
+
+Not leads: another pair-table or k-sum rung at n = 85–89 (2025/783), a
+GPU IC kernel in this container (no device), and any claim from the (4,6)
+cell before A2 and C1 run (`RESULTS.md` there: A2 deferred, C1 capped at
+169 GB).
