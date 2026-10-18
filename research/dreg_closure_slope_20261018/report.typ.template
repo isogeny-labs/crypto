@@ -1,0 +1,96 @@
+#set page(paper: "a4", margin: 2cm)
+#set text(size: 10pt)
+#set par(justify: true)
+
+= Run report: MutantXL closure degree against m·ℓ, up to m·ℓ = 30
+
+*Study* `research/dreg_closure_slope_20261018/`, pre-registered in
+`PREREGISTRATION.md`. *Run* {{RUN_ID}} ({{RUN_DATE}}; queue log
+{{QUEUE_START}} to {{QUEUE_END}}). *Commit* `{{COMMIT}}`. *Class:* stage
+diagnostic, with no `S`, no rho ratio and no speed claim.
+
+== What ran
+
+- *Draws.* `run.sh LADDER CLOSURE gen` generated the draws with seed
+  20261018 (exact solution count; XL built to degree 3 only), committed
+  before any closure ran. Files: `draws/*.jsonl`.
+- *Instrument check (P4).* `run.sh … check` replayed committed dense
+  degree-4 refutations on the sparse engine: {{N_CHECK_NONEMPTY}} of
+  {{N_CHECK_FILES}} `runs/check-*` records non-empty.
+- *Measurement.* `run.sh … measure` ran one process per (draw, degree), as
+  `prlimit --as=7000000000 timeout 10800 dreg_closure --sparse D --max-entries 350000000 --draw K`,
+  degrees 4, 5, 6 in turn (5, 6 for the committed m·ℓ = 21 cells), each
+  draw stopping at its first refutation. {{N_MEAS_NONEMPTY}} of
+  {{N_MEAS_FILES}} `runs/*.D*.jsonl` measurement records are non-empty;
+  {{N_REFUTED}} record a closure refutation and {{N_CAPPED}} hit the entry
+  cap.
+- *Control (P5).* `run.sh … control`: {{N_CONTROL_NONEMPTY}} of
+  {{N_CONTROL_FILES}} `runs/control-*` records non-empty.
+- *Cells.* The frozen table in `PREREGISTRATION.md`: committed anchors at
+  m·ℓ = 12–18, fresh cells at 20, 24, 27, 30, and the two committed
+  m·ℓ = 21 cells.
+- *Host.* The 4-core, 15 GB container, which is not isolated (`AGENTS.md`
+  §10). Wall times are practicality notes only.
+- *Scorer.* `cargo run --release --example dreg_score -- slope
+  research/dreg_closure_slope_20261018/runs/*.D*.jsonl`, output in
+  `score-output.txt`.
+
+== Completion
+
+// TODO-INTERPRETATION-COMPLETION: per-process exit status from
+// runs/queue.log, any kill or cap and its reason, peak RSS from
+// runs/*.log, slowest draw. State missing data as missing.
+
+== Measured values
+
+#figure(image("closure_slope.svg", width: 100%),
+  caption: [Recorded values from `runs/*.D*.jsonl`, run {{RUN_ID}}. Closure
+  degree per draw against $m dot ell$; squares are the committed anchors,
+  circles exact degrees, triangles lower bounds. The solid line has the
+  least-squares slope read from `dreg_score slope`, drawn through (18, 4)
+  for display (not the fitted intercept); dashed lines are the two
+  registered thresholds, drawn the same way. Source: `plot.py` (layout only).])
+
+=== Per-cell, per-draw degrees (measured)
+
+{{SCORE_TABLE}}
+
+=== Registered readings (from `dreg_score slope`)
+
+```
+{{SLOPE_LINE}}
+{{VERDICT_LINE}}
+```
+
+=== Prediction outcomes P1 to P5
+
+```
+{{P_LINES}}
+```
+
+=== Distance remaining (derived)
+
+{{DERIVED_HEAD}}
+
+{{DERIVED_TABLE}}
+
+This table is *derived* from the stated cost model and the fitted slope. It
+is not a measurement, and it is not extrapolated beyond m·ℓ = 30 as a law.
+
+== Control
+
+Soundness, as registered: the first satisfiable draw of each fresh cell,
+replayed with `--satisfiable --sparse 4` and `--sparse 5`. Outcome is the P5
+line above. Records: `runs/control-*.d*.D*.{jsonl,log}`.
+
+// TODO-INTERPRETATION-CONTROL: number of controls run, any not run and why.
+
+== Raw records
+
+- `runs/*.D*.jsonl`: one line per (draw, degree), with rank, falls,
+  products, maximum row weight, seconds and the `capped` flag.
+- `runs/check-*`: P4 instrument check. `runs/control-*`: P5 soundness control.
+- `runs/*.log`: peak VmHWM per process; `runs/queue.log`; `draws/*.jsonl`.
+- `score-output.txt` (native `dreg_score slope`); `plot.py` and the graph
+  sources beside this report.
+- The interpretation is in `../../RESULTS.md`.

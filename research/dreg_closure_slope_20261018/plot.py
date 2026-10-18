@@ -74,9 +74,9 @@ for x, y, m in bounds:
     ax.annotate("≥", (x + 0.35, y), fontsize=8, color=colors[m])
 # Fit line and the two registered thresholds, anchored at (18, 4)
 xs = [10, 32]
-ax.plot(xs, [4 + slope * (x - 18) for x in xs], color="black", lw=1.5, label=f"least-squares fit, s = {slope:.3f}")
-ax.plot(xs, [4 + 0.03 * (x - 18) for x in xs], color="green", ls="--", lw=1, label="s = 0.03 (grows slowly)")
-ax.plot(xs, [4 + 0.10 * (x - 18) for x in xs], color="orange", ls="--", lw=1, label="s = 0.10 (closed at every size)")
+ax.plot(xs, [4 + slope * (x - 18) for x in xs], color="black", lw=1.5, label=f"slope of the least-squares fit, s = {slope:.3f} (line drawn through (18, 4))")
+ax.plot(xs, [4 + 0.03 * (x - 18) for x in xs], color="green", ls="--", lw=1, label="s = 0.03 (grows slowly), through (18, 4)")
+ax.plot(xs, [4 + 0.10 * (x - 18) for x in xs], color="orange", ls="--", lw=1, label="s = 0.10 (closed at every size), through (18, 4)")
 ax.scatter([], [], marker="s", facecolors="none", edgecolors="gray", label="committed anchors, dense closure 4")
 ax.scatter([], [], marker="o", color="gray", label="this study, exact degree (one point per draw)")
 ax.scatter([], [], marker="^", color="gray", label="this study, lower bound only")

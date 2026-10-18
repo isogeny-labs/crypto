@@ -1,0 +1,41 @@
+#set page(paper: "a4", margin: 2cm)
+#set text(size: 10pt)
+#set par(justify: true)
+
+= TODO-INTERPRETATION: one-line headline (what the slope is, over which range)
+
+These are the results of `research/dreg_closure_slope_20261018/`. The full
+text is `RESULTS.md`, and the run report is `reports/{{RUN_ID}}/`. Commit
+`{{COMMIT}}`. *Class:* stage diagnostic. The "distance remaining" rows are
+*derived* from the cost model, not measured.
+
+#figure(image("reports/{{RUN_ID}}/closure_slope.svg", width: 100%),
+  caption: [Closure degree per draw against $m dot ell$, run {{RUN_ID}}.])
+
+=== Registered outcomes
+
+```
+{{SLOPE_LINE}}
+{{VERDICT_LINE}}
+{{P_LINES}}
+```
+
+=== Per-cell degrees (measured)
+
+{{SCORE_TABLE}}
+
+// TODO-INTERPRETATION: table of P1 to P5 (prediction, outcome, confidence,
+// evidence) as in the previous study; then
+// - Registered verdict, quoted.
+// - Descriptive reading (not registered), labelled so.
+// - Soundness control, and how thin it is.
+// - Scope: the slope is the growth over m·ℓ <= 30, not a law beyond it.
+
+== Distance remaining (derived)
+
+{{DERIVED_HEAD}}
+
+{{DERIVED_TABLE}}
+
+// TODO-INTERPRETATION: which rows fit, which do not, the next cell to
+// measure, and the next improvement to try (AGENTS.md "Keep going").
