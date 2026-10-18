@@ -169,6 +169,12 @@ pub fn crater_j(inst: &Instance) -> u64 {
 }
 
 pub fn explore(inst: &Instance, ctx: &Ctx, max_vertices: usize) -> Result<Volcano, String> {
+    explore_to(inst, ctx, u32::MAX, max_vertices)
+}
+
+/// Breadth-first search from the crater that does not expand vertices at `max_level`: every
+/// vertex of levels `0..=max_level` is found, and `totals` holds only the expanded ones.
+pub fn explore_to(inst: &Instance, ctx: &Ctx, max_level: u32, max_vertices: usize) -> Result<Volcano, String> {
     let j0 = crater_j(inst);
     let mut level = HashMap::new();
     let mut totals = HashMap::new();
@@ -177,6 +183,9 @@ pub fn explore(inst: &Instance, ctx: &Ctx, max_vertices: usize) -> Result<Volcan
     level.insert(j0, 0u32);
     let mut dq = VecDeque::from([j0]);
     while let Some(j) = dq.pop_front() {
+        if level[&j] >= max_level {
+            continue;
+        }
         let (nb, tot) = ctx.neighbors(j);
         totals.insert(j, tot);
         for (r, e) in nb {
@@ -362,6 +371,43 @@ pub fn blind_descent(ctx: &Ctx, k: u32, j0: u64, rng: &mut Rng) -> Result<Descen
     Ok(Descent { path, start_level, k })
 }
 
+/// A random descent from the crater `j0` of a volcano whose crater is one vertex (class
+/// number one): leave the crater along a uniformly chosen non-loop kernel, then take a uniformly
+/// chosen kernel other than the one back to the parent, `depth` steps in all.  Returns the path
+/// with each vertex's rational-kernel count, checked against the degree rule (ℓ + 1 above the
+/// floor, 1 on it); a violation is an error, never a silent skip.
+pub fn random_descent(ctx: &Ctx, j0: u64, depth: u32, rng: &mut Rng) -> Result<Vec<(u64, u32)>, String> {
+    let want = |l: u32| if l < depth { ctx.ell as u32 + 1 } else { 1 };
+    let (nb, tot) = ctx.neighbors(j0);
+    if tot != want(0) {
+        return Err(format!("crater has {tot} rational kernels, expected {}", want(0)));
+    }
+    let mut path = vec![(j0, tot)];
+    let mut av: Vec<(u64, u32)> = nb.into_iter().filter(|&(r, _)| r != j0).collect();
+    for l in 1..=depth {
+        let total: u32 = av.iter().map(|x| x.1).sum();
+        if total == 0 {
+            return Err(format!("dead end at level {}", l - 1));
+        }
+        let mut pick = (rng.next() % total as u64) as u32;
+        let mut next = av[0].0;
+        for &(r, e) in &av {
+            if pick < e {
+                next = r;
+                break;
+            }
+            pick -= e;
+        }
+        let (nb, tot) = ctx.neighbors(next);
+        if tot != want(l) {
+            return Err(format!("vertex {next} at level {l} has {tot} rational kernels, expected {}", want(l)));
+        }
+        path.push((next, tot));
+        av = avail(&nb, Some(path[path.len() - 2].0));
+    }
+    Ok(path)
+}
+
 // ---------------------------------------------------------------- ecbench curves
 #[derive(Clone, Debug)]
 pub struct VertexCurve {
@@ -463,6 +509,24 @@ mod tests {
                 assert_eq!(dsc.path.len() as u32 - 1, k - v.level[&j]);
             }
             let _ = inst;
+        }
+    }
+
+    #[test]
+    fn truncated_search_and_random_descents_agree_with_full_exploration() {
+        for (ell, d, k, m, bits) in [(2u64, -7i64, 7u32, 0u32, 36u32), (2, -3, 6, 0, 36), (2, -4, 6, 0, 36), (3, -3, 4, 0, 36), (3, -11, 4, 0, 36), (5, -19, 3, 0, 40)] {
+            let (inst, ctx, v) = run(ell, d, k, m, bits);
+            let top = k / 2;
+            let t = explore_to(&inst, &ctx, top, 1_000_000).unwrap();
+            assert_eq!(level_sizes(&t, top), level_sizes(&v, k)[..=top as usize].to_vec(), "ell={ell} D={d}");
+            let mut rng = Rng(3);
+            for _ in 0..8 {
+                let path = random_descent(&ctx, crater_j(&inst), k, &mut rng).unwrap();
+                assert_eq!(path.len() as u32, k + 1);
+                for (l, (j, _)) in path.iter().enumerate() {
+                    assert_eq!(v.level[j], l as u32, "ell={ell} D={d}");
+                }
+            }
         }
     }
 

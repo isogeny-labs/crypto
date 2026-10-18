@@ -155,6 +155,54 @@ pub enum VolcanoOp {
         #[arg(long, default_value_t = 3)]
         rounds: usize,
     },
+    /// Prime fields, tall volcanoes: build a volcano by CM, verify its top levels by
+    /// breadth-first search and its lower levels by random descents from the crater (degree rule
+    /// at every step, blind descent from every sampled vertex, group structure of every sampled
+    /// curve), and write ecbench specs with a set number of solves per level.
+    Sample {
+        /// Class-number-one fundamental discriminant of the crater.
+        #[arg(long, allow_hyphen_values = true, default_value_t = -7)]
+        d: i64,
+        #[arg(long)]
+        ell: u64,
+        /// Volcano depth k = v_ℓ(f).
+        #[arg(long)]
+        depth: u32,
+        /// Lower bound on v_ℓ(A) (group structure varies with the level when m > 0).
+        #[arg(long, default_value_t = 0)]
+        m: u32,
+        #[arg(long, default_value_t = 46)]
+        bits: u32,
+        #[arg(long, default_value_t = 20261018)]
+        seed: u64,
+        /// Require #E = (smooth part below 2^S) × (one prime).
+        #[arg(long)]
+        slack: Option<u32>,
+        /// Levels 0..=B are found completely by breadth-first search and their sizes checked
+        /// against the class numbers.
+        #[arg(long, default_value_t = 10)]
+        bfs_levels: u32,
+        /// Curves sampled per level (all of them on levels that have fewer).
+        #[arg(long, default_value_t = 4)]
+        per_level: usize,
+        /// Solves (targets × rounds, summed over the level's curves) at the crater and the floor.
+        #[arg(long, default_value_t = 300)]
+        end_solves: usize,
+        /// Solves at every other level.
+        #[arg(long, default_value_t = 80)]
+        level_solves: usize,
+        /// Solves of each arm in the paired rho.negation / rho.plain control (floor curves).
+        #[arg(long, default_value_t = 0)]
+        control_solves: usize,
+        /// Measured rounds per workload (each round is an independent walk).
+        #[arg(long, default_value_t = 2)]
+        rounds: usize,
+        #[arg(long, default_value_t = 1)]
+        warmup: usize,
+        /// Directory for the specs (`spec_t<T>.json`, `control.json`) and `vertices.json`.
+        #[arg(long)]
+        spec_dir: Option<String>,
+    },
     /// Blind descent to the floor of the ℓ-volcano: needs only p, the trace, ℓ and a start j.
     Descend {
         #[arg(long)]
@@ -185,6 +233,9 @@ pub fn run(op: VolcanoOp) {
             cmd_explore(d, ell, depth, m, bits, seed, slack, verify, vertices_out, spec_dir, per_level, targets, rounds)
         }
         VolcanoOp::Descend { p, trace, ell, j, seed } => cmd_descend(p, trace, ell, j, seed),
+        VolcanoOp::Sample { d, ell, depth, m, bits, seed, slack, bfs_levels, per_level, end_solves, level_solves, control_solves, rounds, warmup, spec_dir } => {
+            cmd_sample(d, ell, depth, m, bits, seed, slack, bfs_levels, per_level, end_solves, level_solves, control_solves, rounds, warmup, spec_dir)
+        }
         VolcanoOp::EcbenchSpec { n, ell, a2, neighbors, targets, rounds, seed, out, threads, batch } => {
             cmd_ecbench_spec(n, ell, a2, neighbors, targets, rounds, seed, out, threads, batch)
         }
@@ -654,6 +705,192 @@ fn cmd_explore(d: i64, ell: u64, depth: u32, m: u32, bits: u32, seed: u64, slack
         }
     }
     let ok = ok_levels && viol == 0 && bad_group == 0 && bad_desc == 0;
+    println!("\ntotal {:.1} s — {}", t0.elapsed().as_secs_f64(), if ok { "ALL CHECKS PASS" } else { "A CHECK FAILED" });
+    if !ok {
+        std::process::exit(1);
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn cmd_sample(
+    d: i64,
+    ell: u64,
+    depth: u32,
+    m: u32,
+    bits: u32,
+    seed: u64,
+    slack: Option<u32>,
+    bfs_levels: u32,
+    per_level: usize,
+    end_solves: usize,
+    level_solves: usize,
+    control_solves: usize,
+    rounds: usize,
+    warmup: usize,
+    spec_dir: Option<String>,
+) {
+    use std::collections::{BTreeMap, BTreeSet};
+    let t0 = Instant::now();
+    if rounds == 0 || per_level == 0 {
+        die("--rounds and --per-level must be positive");
+    }
+    let inst = fp::find_instance(ell, d, depth, m, bits, seed, slack).unwrap_or_else(|e| die(&e));
+    let n = inst.order();
+    let (nf, _) = profile::factor(&BigUint::from(n));
+    let nfs: Vec<String> = nf.iter().map(|(l, e)| if *e > 1 { format!("{l}^{e}") } else { l.to_string() }).collect();
+    println!("# Prime-field volcano (sampled): D = {d}, ℓ = {ell}, depth {depth}, m = {m}");
+    println!("p = {} ({} bits), trace t = {}, #E = {} = {}", inst.p, 64 - inst.p.leading_zeros(), inst.t, n, nfs.join(" · "));
+    println!("t² − 4p = {} · ({})²,  f = ℓ^k", d, inst.conductor());
+    let ctx = fp::Ctx::new(inst.p, ell).unwrap_or_else(|e| die(&e));
+    let want = fp::expected_level_sizes(&inst);
+    let top = bfs_levels.min(depth);
+    let vol = fp::explore_to(&inst, &ctx, top, 20_000_000).unwrap_or_else(|e| die(&e));
+    let got = fp::level_sizes(&vol, top);
+    let mut ok = true;
+    println!("\nlevels 0..={top} by breadth-first search, against the class numbers h(O_(ℓ^i)):");
+    for i in 0..=top as usize {
+        let eq = BigUint::from(got[i]) == want[i];
+        ok &= eq;
+        println!("  level {i:>2}: {:>10}   expected {:>10}  {}", got[i], want[i], if eq { "ok" } else { "MISMATCH" });
+    }
+    let viol = vol.totals.iter().filter(|(j, &t)| t != if vol.level[*j] < depth { ell as u32 + 1 } else { 1 }).count();
+    ok &= viol == 0;
+    println!("degree rule at the {} expanded vertices: {viol} violations", vol.totals.len());
+    for i in top as usize + 1..=depth as usize {
+        println!("  level {i:>2}: (sampled)  expected {:>10}", want[i]);
+    }
+    // sample vertices: from the BFS sets above `top`, by random descents below it
+    let mut rng = Rng(seed ^ 0x5A3B1E);
+    let mut levels: BTreeMap<u32, Vec<u64>> = BTreeMap::new();
+    for &j in &vol.order {
+        levels.entry(vol.level[&j]).or_default().push(j);
+    }
+    let mut chosen: BTreeMap<u32, Vec<u64>> = BTreeMap::new();
+    for (&l, js) in &levels {
+        let mut pool = js.clone();
+        let take = per_level.min(pool.len());
+        let mut pick = Vec::new();
+        for _ in 0..take {
+            let i = (rng.next() as usize) % pool.len();
+            pick.push(pool.swap_remove(i));
+        }
+        chosen.insert(l, pick);
+    }
+    let j0 = fp::crater_j(&inst);
+    let mut descents = 0usize;
+    let mut bad_descent = 0usize;
+    if depth > top {
+        let mut seen: BTreeMap<u32, BTreeSet<u64>> = BTreeMap::new();
+        while (top + 1..=depth).any(|l| seen.get(&l).map_or(0, |s| s.len()) < per_level) {
+            descents += 1;
+            if descents > 50 * per_level + 50 {
+                die("random descents keep revisiting the same vertices");
+            }
+            match fp::random_descent(&ctx, j0, depth, &mut rng) {
+                Ok(path) => {
+                    for (l, &(j, _)) in path.iter().enumerate() {
+                        let l = l as u32;
+                        if l <= top {
+                            if vol.level.get(&j) != Some(&l) {
+                                bad_descent += 1;
+                            }
+                            continue;
+                        }
+                        let s = seen.entry(l).or_default();
+                        if s.len() < per_level && s.insert(j) {
+                            chosen.entry(l).or_default().push(j);
+                        }
+                    }
+                }
+                Err(e) => {
+                    println!("  descent failed: {e}");
+                    bad_descent += 1;
+                }
+            }
+        }
+    }
+    ok &= bad_descent == 0;
+    println!("random descents from the crater: {descents} (degree rule at every step; levels inside the BFS range agree): {bad_descent} failures");
+    // independent level check: blind descent from every sampled vertex below the crater
+    let mut bad_blind = 0usize;
+    let mut blind = 0usize;
+    for (&l, js) in &chosen {
+        for &j in js {
+            if l == 0 {
+                continue;
+            }
+            blind += 1;
+            match fp::blind_descent(&ctx, depth, j, &mut rng) {
+                Ok(ds) if ds.start_level == l && ds.path.len() as u32 - 1 == depth - l => {}
+                _ => bad_blind += 1,
+            }
+        }
+    }
+    ok &= bad_blind == 0;
+    println!("blind descent (p, t, ℓ and j only) from {blind} sampled vertices: {bad_blind} give a level other than the sampled one");
+    // curves, group structures, specs
+    let mut metas = Vec::new();
+    let mut by_targets: BTreeMap<usize, Vec<(serde_json::Value, usize)>> = BTreeMap::new();
+    let mut bad_group = 0usize;
+    let mut floor_curves = Vec::new();
+    let mut r_all = BTreeSet::new();
+    for (&l, js) in &chosen {
+        let solves = if l == 0 || l == depth { end_solves } else { level_solves };
+        let targets = solves.div_ceil(js.len() * rounds).max(1);
+        for &j in js {
+            let vc = fp::vertex_curve(&inst, l, j, &mut rng).unwrap_or_else(|e| die(&e));
+            let pred = fp::predicted_structure(&inst, l).unwrap_or_else(|e| die(&e));
+            if (vc.n1, vc.n2) != pred {
+                bad_group += 1;
+                println!("  group mismatch at level {l}: measured ({}, {}), predicted {pred:?}", vc.n1, vc.n2);
+            }
+            r_all.insert(vc.r);
+            let cs = serde_json::json!({"kind": "prime_explicit", "p": inst.p, "a": vc.a, "b": vc.b, "group_order": vc.group_order, "r": vc.r, "gx": vc.gx, "gy": vc.gy});
+            if l == depth {
+                floor_curves.push(cs.clone());
+            }
+            metas.push(serde_json::json!({"level": l, "j": j, "a": vc.a, "b": vc.b, "n1": vc.n1, "n2": vc.n2, "r": vc.r, "cofactor": vc.group_order / vc.r, "spec": format!("spec_t{targets}.json")}));
+            by_targets.entry(targets).or_default().push((cs, l as usize));
+        }
+    }
+    ok &= bad_group == 0 && r_all.len() == 1;
+    let r = *r_all.iter().next().unwrap();
+    println!("group structure of {} sampled curves (from point orders) against O_d/(π−1): {bad_group} differ; prime subgroup r = {r} ({:.1} bits), common to all: {}", metas.len(), (r as f64).log2(), r_all.len() == 1);
+    if let Some(dir) = spec_dir {
+        std::fs::create_dir_all(&dir).unwrap_or_else(|e| die(&format!("{dir}: {e}")));
+        let label = format!("{ell}-volcano, D = {d}, depth {depth}, m = {m}, p = {}", inst.p);
+        let measurement = serde_json::json!({"rounds": rounds, "warmup": warmup, "order": "alternate", "seed": seed % 1000, "isolation_required": "L0", "timeout_seconds": 3600});
+        let mut write = |name: &str, v: &serde_json::Value| {
+            let path = format!("{dir}/{name}");
+            std::fs::write(&path, serde_json::to_string_pretty(v).unwrap() + "\n").unwrap_or_else(|e| die(&format!("{path}: {e}")));
+            println!("wrote {path}");
+        };
+        for (t, cs) in &by_targets {
+            let levels: BTreeSet<usize> = cs.iter().map(|x| x.1).collect();
+            let spec = serde_json::json!({
+                "schema": "ecbench.spec/v1",
+                "label": format!("{label}: levels {levels:?}, {t} targets per curve"),
+                "description": "Sampled vertices of the levels named in the label, built and verified by `crypto volcano sample`; counted operations only.",
+                "workloads": {"curves": cs.iter().map(|x| x.0.clone()).collect::<Vec<_>>(), "targets_per_curve": t, "target_seed": seed},
+                "arms": [{"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}}],
+                "measurement": measurement
+            });
+            write(&format!("spec_t{t}.json"), &spec);
+        }
+        if control_solves > 0 && !floor_curves.is_empty() {
+            let t = control_solves.div_ceil(floor_curves.len() * rounds).max(1);
+            let spec = serde_json::json!({
+                "schema": "ecbench.spec/v1",
+                "label": format!("{label}: positive control on the floor curves, {t} targets per curve"),
+                "description": "rho.negation against rho.plain on the same workloads and seeds: the difference the level study must be able to see.",
+                "workloads": {"curves": floor_curves, "targets_per_curve": t, "target_seed": seed ^ 0xC0},
+                "arms": [{"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}}, {"name": "rho-plain", "role": "baseline", "method": {"id": "rho.plain"}}],
+                "measurement": measurement
+            });
+            write("control.json", &spec);
+        }
+        write("vertices.json", &serde_json::json!({"p": inst.p, "t": inst.t, "ell": ell, "d": d, "depth": depth, "m": m, "r": r, "bfs_levels": top, "level_sizes": want.iter().map(|w| w.to_string()).collect::<Vec<_>>(), "vertices": metas}));
+    }
     println!("\ntotal {:.1} s — {}", t0.elapsed().as_secs_f64(), if ok { "ALL CHECKS PASS" } else { "A CHECK FAILED" });
     if !ok {
         std::process::exit(1);

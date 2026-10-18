@@ -14,6 +14,9 @@ cargo build --release --bin crypto --bin ecbench
 | `volcano profile` | Frobenius discriminant `t² − 4q = D_K f²`, conductor `f` and its factors, volcano depth per prime, class numbers, `E(F_q)` structure at every level, for every crater conductor | milliseconds |
 | `volcano level1` | `Φ_ℓ(X, j₀)` over `ℤ` for a class-number-one crater, by CRT | seconds to hours, `≈ ℓ³` |
 | `volcano koblitz-step` | the level-1 neighbours of a Koblitz curve over `F_(2^n)`, as j-invariants in the field, grouped into Frobenius orbits, with a verification | `level1` plus seconds |
+| `volcano explore` | prime fields: builds a tall volcano by CM, explores it completely, checks level sizes, degrees, group structures and blind descent, writes ecbench specs | seconds (≲ 10⁶ vertices) |
+| `volcano sample` | prime fields, very tall volcanoes: BFS over the top levels, random descents below, every sampled vertex checked; specs with a fixed number of solves per level | seconds |
+| `volcano descend` | blind descent to the floor from `p`, `t`, `ℓ` and one `j` | milliseconds |
 | `volcano ecbench-spec` | writes ecbench specs for the Koblitz crater and a sample of verified level-1 neighbours, so the layers can be measured in ecbench's one unit | `level1` plus seconds |
 
 ## The picture
@@ -108,6 +111,30 @@ prime-order subgroup included) and `curves.json` (j-invariant, twist, order,
 generator of every neighbour). `n ≤ 62` and a cofactor below `2^24`. The
 neighbour curves are not in `docs/curves/registry.json`; register them before
 citing their slugs in prose (AGENTS.md §11).
+
+## `sample` (tall prime-field volcanoes)
+
+```bash
+crypto volcano sample --d -7 --ell 2 --depth 20 --bits 47 --slack 4 --bfs-levels 10 \
+  --per-level 4 --end-solves 300 --level-solves 80 --control-solves 60 --rounds 2 --warmup 0 \
+  --spec-dir specs/a1
+for s in specs/a1/spec_t*.json specs/a1/control.json; do
+  ecbench run --allow-busy --cpus none --spec "$s" --out "sessions/a1__$(basename "$s" .json)"
+done
+cargo run --release --example volcano_tall_analyze -- --study . --margin 0.05
+```
+
+Finds `p` with `t² − 4p = D·(ℓ^k)²` (and, with `--slack S`, `#E` = smooth part below
+`2^S` × one prime). Levels `0..=bfs-levels` are found completely and their sizes checked
+against `h(O_(ℓ^i))`. Below that, vertices come from random non-backtracking descents from
+the crater, with the degree rule (ℓ + 1 rational kernels above the floor, 1 on it) checked at
+every step. A blind descent from every sampled vertex must give the sampled level, and every
+sampled curve's group structure, measured from point orders, must equal the `O_d/(π−1)`
+prediction. Each level gets `--level-solves` (crater and floor `--end-solves`) solves split
+over its curves; since ecbench has one `targets_per_curve` per spec, the curves are grouped
+into `spec_t<T>.json` files by target count. `control.json` pairs `rho.negation` with
+`rho.plain` on the floor curves as a positive control. Study:
+`research/volcano_tall_layers_20261018`.
 
 ## Verification
 
