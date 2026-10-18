@@ -1,0 +1,74 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-11-07-r2
+experiment_id: BLINDSPOT-11
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/11-learned-prefilter/raw/receipt-card-07-r2.json
+binds:
+  - {path: examples/blindspots_11_learned_prefilter.rs, sha256: e6f23662c89f4ed99dc9407817c61a8aa58412c276cccb023af46371c7bc0d66}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-U.jsonl, sha256: f89061440e6b2e7c511d1cba164c00a59c718436bbe634c054720a360f050f10}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-S.jsonl, sha256: 9c60218f2b8b8a2ab05796caba4b9bf0b9d8ed2348b0f62ec72ce696abf03d90}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n17-m3-U.jsonl, sha256: 905f99028638a3bac3cad4b592aca49969735cf9e2b8b1fa0db840a51863de9f}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n17-m3-S.jsonl, sha256: 96eefa36986422845515a94c5693c9ae6833ba1f7f34515e213b43fb4166bcdd}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n19-m2-U.jsonl, sha256: 07a511f530a0a7cb38a55f648305050a5ccfc778f0ae7c764d5fb75b5aad014d}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n19-m2-S.jsonl, sha256: ec4f4db5c769c3b39b51c659299b13625609deff518d4b1a05d1aa0d0101a152}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n19-m3-U-r2.jsonl, sha256: 9cb094c02c59f6b6d7dc771617895dde86aa446aa4a625dc270e74e2694dff66}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n19-m3-S-r2.jsonl, sha256: fcb268481905dce15a8f20e5f5d6c63a72d0bc0ffde96cba9b4f75d4d0f42578}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n23-m2-U-r2.jsonl, sha256: 9e8599274945d958562836a35e7e5196c527529bc5b9145aa3cb72c6d57996bf}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n23-m2-S.jsonl, sha256: 99bf9d95e3ec1fdc6d21b6c49360967574fc5dc48ecac8f7f9a94741d2c62c41}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n23-m3-U.jsonl, sha256: 47060fe96e58e3f466ad4a1f2aa9912499c411c883d885e18d1019bf59202122}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n23-m3-S.jsonl, sha256: 6062dfdf969a59312edf78ce6411db3e6d84d38416c86d276065b4ad8f7e33eb}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n29-m2-U.jsonl, sha256: c394bb47f0174cfbcf2c81cb0bcbafedf9f753f446db6e122090a3662c629ef1}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n29-m2-S.jsonl, sha256: 0c50fd1081453789d82e3d8d4e1a783ce98b7b1f00b2aaabf1c43b8c040eb288}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n29-m3-U-r2.jsonl, sha256: 127ec65e534736d6a92723b7d450223e44e8d08a488fa7c00319088b6de3fdba}
+  - {path: research/blindspots_20261018/11-learned-prefilter/raw/n29-m3-S-r2.jsonl, sha256: 7fb5a89bddfb8d6f325a375892aa694a75b1696887d64b29b3fe261ae2fda528}
+commands:
+  - id: make-bin-dir
+    argv: [mkdir, -p, target/blindspots-11/card-07-r2/in]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: build
+    argv: [prlimit, --as=4294967296, rustc, --edition, "2021", -C, opt-level=3, -C, codegen-units=1, -C, target-cpu=native, -o, target/blindspots-11/card-07-r2/b11, examples/blindspots_11_learned_prefilter.rs]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/11-learned-prefilter/raw/card-07-r2-build.stdout.log
+    stderr: research/blindspots_20261018/11-learned-prefilter/raw/card-07-r2-build.stderr.log
+  - id: stage-inputs
+    argv: [cp, research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-U.jsonl, research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-S.jsonl, research/blindspots_20261018/11-learned-prefilter/raw/n17-m3-U.jsonl, research/blindspots_20261018/11-learned-prefilter/raw/n17-m3-S.jsonl, research/blindspots_20261018/11-learned-prefilter/raw/n19-m2-U.jsonl, research/blindspots_20261018/11-learned-prefilter/raw/n19-m2-S.jsonl, research/blindspots_20261018/11-learned-prefilter/raw/n19-m3-U-r2.jsonl, research/blindspots_20261018/11-learned-prefilter/raw/n19-m3-S-r2.jsonl, research/blindspots_20261018/11-learned-prefilter/raw/n23-m2-U-r2.jsonl, research/blindspots_20261018/11-learned-prefilter/raw/n23-m2-S.jsonl, research/blindspots_20261018/11-learned-prefilter/raw/n23-m3-U.jsonl, research/blindspots_20261018/11-learned-prefilter/raw/n23-m3-S.jsonl, research/blindspots_20261018/11-learned-prefilter/raw/n29-m2-U.jsonl, research/blindspots_20261018/11-learned-prefilter/raw/n29-m2-S.jsonl, research/blindspots_20261018/11-learned-prefilter/raw/n29-m3-U-r2.jsonl, research/blindspots_20261018/11-learned-prefilter/raw/n29-m3-S-r2.jsonl, target/blindspots-11/card-07-r2/in]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+  - id: verdict
+    argv: [prlimit, --as=4294967296, target/blindspots-11/card-07-r2/b11, verdict, --dir, target/blindspots-11/card-07-r2/in]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/11-learned-prefilter/raw/verdict-r2.txt
+    stderr: research/blindspots_20261018/11-learned-prefilter/raw/verdict-r2.stderr.log
+  - id: remove-staged
+    argv: [rm, -f, target/blindspots-11/card-07-r2/in/n17-m2-U.jsonl, target/blindspots-11/card-07-r2/in/n17-m2-S.jsonl, target/blindspots-11/card-07-r2/in/n17-m3-U.jsonl, target/blindspots-11/card-07-r2/in/n17-m3-S.jsonl, target/blindspots-11/card-07-r2/in/n19-m2-U.jsonl, target/blindspots-11/card-07-r2/in/n19-m2-S.jsonl, target/blindspots-11/card-07-r2/in/n19-m3-U-r2.jsonl, target/blindspots-11/card-07-r2/in/n19-m3-S-r2.jsonl, target/blindspots-11/card-07-r2/in/n23-m2-U-r2.jsonl, target/blindspots-11/card-07-r2/in/n23-m2-S.jsonl, target/blindspots-11/card-07-r2/in/n23-m3-U.jsonl, target/blindspots-11/card-07-r2/in/n23-m3-S.jsonl, target/blindspots-11/card-07-r2/in/n29-m2-U.jsonl, target/blindspots-11/card-07-r2/in/n29-m2-S.jsonl, target/blindspots-11/card-07-r2/in/n29-m3-U-r2.jsonl, target/blindspots-11/card-07-r2/in/n29-m3-S-r2.jsonl]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: remove-in-dir
+    argv: [rmdir, target/blindspots-11/card-07-r2/in]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: remove-bin
+    argv: [rm, -f, target/blindspots-11/card-07-r2/b11]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: [rmdir, target/blindspots-11/card-07-r2]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-11
+background: false
+write_scope:
+  - research/blindspots_20261018/11-learned-prefilter/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000."
