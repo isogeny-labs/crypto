@@ -78,7 +78,8 @@ theorem badSecrets_card_le (S : Finset F) (P : Finset (F × F)) :
     obtain ⟨hxS, p, hp, q, hq, hpq, hxe⟩ := hx
     refine Finset.mem_biUnion.mpr ⟨(p, q), ?_, ?_⟩
     · exact Finset.mem_offDiag.mpr ⟨hp, hq, hpq⟩
-    · exact Finset.mem_filter.mpr ⟨hxS, hxe⟩
+    · unfold agreeSet
+      exact Finset.mem_filter.mpr ⟨hxS, hxe⟩
   have hle : ∀ pq ∈ P.offDiag, (agreeSet S pq).card ≤ 1 := by
     intro pq hpq
     rw [Finset.mem_offDiag] at hpq
