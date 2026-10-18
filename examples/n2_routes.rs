@@ -19,7 +19,7 @@
 //! separately and priced afterwards at 0, 0.1 and 1 M.
 //!
 //! std-only; `rustc --edition 2021 -O examples/n2_routes.rs`.
-//! Usage: `n2_routes <out-dir> [run|check|control|summarize|hsweep|memsweep|hsummarize]`; env `N2_THREADS`, `N2_SIZES`
+//! Usage: `n2_routes <out-dir> [run|check|control|summarize|hsweep|memsweep|hsummarize|gluecheck|glue]`; env `N2_THREADS`, `N2_SIZES`
 //! (comma-separated `log2 #E` targets, default `20,24,28,32,36,40`).
 #![allow(dead_code)]
 #![allow(clippy::needless_range_loop)]
@@ -692,6 +692,99 @@ fn jadd_fast<F: Fld>(f: &[F], a: &Div<F>, b: &Div<F>) -> Div<F> {
         u: vec![up0, up1, F::one()],
         v: trim(vec![x0.neg(), x1.neg()]),
     }
+}
+
+/// Real-model (monic sextic `f`) version of `jadd_fast`: same composition; the
+/// reduction keeps the `f6`, `f5` terms. Falls back to `radd` in every other case.
+fn radd_fast<F: Fld>(f: &[F], a: &Div<F>, b: &Div<F>) -> Option<Div<F>> {
+    if a.u.len() != 3 || b.u.len() != 3 {
+        return radd(f, a, b);
+    }
+    let g = |v: &Vec<F>, i: usize| v.get(i).copied().unwrap_or(F::zero());
+    let (u11, u10, v11, v10) = (a.u[1], a.u[0], g(&a.v, 1), g(&a.v, 0));
+    let dbl = a == b;
+    // modulus m = x^2 + m1 x + m0 for the inverse, and the numerator w
+    let (m1, m0, al, be, w1, w0, big3, big2);
+    if dbl {
+        // k = (f - v^2)/u mod u, then s = k / (2v) mod u
+        // k = (f − v²)/u for the monic sextic, then k mod u
+        let k3 = f[5].sub(u11);
+        let k2 = f[4].sub(u10).sub(u11.mul(k3));
+        let k1 = f[3].sub(u10.mul(k3)).sub(u11.mul(k2));
+        let k0 = f[2].sub(v11.sqr()).sub(u10.mul(k2)).sub(u11.mul(k1));
+        // reduce x⁴ + k3 x³ + k2 x² + k1 x + k0 mod x² + u11 x + u10
+        let c3r = k3.sub(u11);
+        let c2r = k2.sub(u10).sub(c3r.mul(u11));
+        let c1r = k1.sub(c3r.mul(u10)).sub(c2r.mul(u11));
+        let c0r = k0.sub(c2r.mul(u10));
+        let u11s = u11.sqr();
+        w1 = c1r;
+        w0 = c0r;
+        m1 = u11;
+        m0 = u10;
+        al = v11.add(v11);
+        be = v10.add(v10);
+        big3 = u11.add(u11);
+        big2 = u11s.add(u10).add(u10);
+    } else {
+        let (u21, u20, v21, v20) = (b.u[1], b.u[0], g(&b.v, 1), g(&b.v, 0));
+        m1 = u21;
+        m0 = u20;
+        al = u11.sub(u21);
+        be = u10.sub(u20);
+        w1 = v21.sub(v11);
+        w0 = v20.sub(v10);
+        big3 = u11.add(u21);
+        big2 = u10.add(u20).add(u11.mul(u21));
+    }
+    // r = Res(al x + be, m); inverse numerator (ga x + de)
+    let alm1 = al.mul(m1);
+    let r = be.sqr().sub(be.mul(alm1)).add(al.sqr().mul(m0));
+    if r.is_zero() {
+        return radd(f, a, b);
+    }
+    let ga = al.neg();
+    let de = be.sub(alm1);
+    let w1ga = w1.mul(ga);
+    let st1 = w1.mul(de).add(w0.mul(ga)).sub(w1ga.mul(m1));
+    let st0 = w0.mul(de).sub(w1ga.mul(m0));
+    if st1.is_zero() {
+        return radd(f, a, b);
+    }
+    // q2 = f6 − s1² = (r² − s̃1²)/r²: one inversion for 1/r and 1/q2
+    let st1s = st1.sqr();
+    let r2 = r.sqr();
+    let dq = r2.sub(st1s);
+    if dq.is_zero() {
+        return radd(f, a, b);
+    }
+    CJ.with(|c| c.set(c.get() + 1));
+    let iall = r.mul(dq).inv();
+    let rinv = dq.mul(iall);
+    let s1 = st1.mul(rinv);
+    let s0 = st0.mul(rinv);
+    let q2inv = r2.mul(r).mul(iall);
+    // v = v1 + u1 s = c3 x^3 + c2 x^2 + c1 x + c0
+    let c3 = s1;
+    let c2 = s0.add(u11.mul(s1));
+    let c1 = v11.add(u11.mul(s0)).add(u10.mul(s1));
+    let c0 = v10.add(u10.mul(s0));
+    // q = (f - v^2) / (u1 u2), top three coefficients
+    let q2 = F::one().sub(c3.sqr());
+    let n5 = f[5].sub(c3.mul(c2).add(c3.mul(c2)));
+    let n4 = f[4].sub(c2.sqr()).sub(c3.mul(c1).add(c3.mul(c1)));
+    let q1 = n5.sub(q2.mul(big3));
+    let q0 = n4.sub(q2.mul(big2)).sub(q1.mul(big3));
+    let up1 = q1.mul(q2inv);
+    let up0 = q0.mul(q2inv);
+    // v' = -(v mod u')
+    let up1s = up1.sqr();
+    let x1 = c3.mul(up1s.sub(up0)).sub(c2.mul(up1)).add(c1);
+    let x0 = c3.mul(up1).mul(up0).sub(c2.mul(up0)).add(c0);
+    Some(Div {
+        u: vec![up0, up1, F::one()],
+        v: trim(vec![x0.neg(), x1.neg()]),
+    })
 }
 
 fn jmul_fast<F: Fld>(f: &[F], a: &Div<F>, mut k: u64) -> Div<F> {
@@ -2883,6 +2976,798 @@ fn summarize_hsweep(csv: &str) -> String {
     out
 }
 
+// ---------------------------------------------------------------------------
+// Addendum H2: the general gluing E ~ E^σ along Frobenius on E[2], for any
+// E/F_{p²} with j ∉ F_p, and genus-2 arithmetic on a sextic (real) model.
+// ---------------------------------------------------------------------------
+
+/// Class [D − D∞] on y² = f(x), deg f = 6, with D effective of degree 2 and
+/// finite (u monic quadratic), or the zero class (u = 1). `None` marks a
+/// degenerate case (a point at infinity in the unique effective
+/// representative), which happens with probability O(1/p) per operation.
+fn radd<F: Fld>(f: &[F], a: &Div<F>, b: &Div<F>) -> Option<Div<F>> {
+    CJ.with(|c| c.set(c.get() + 1));
+    if a.is_zero() {
+        return Some(b.clone());
+    }
+    if b.is_zero() {
+        return Some(a.clone());
+    }
+    if a.u.len() != 3 || b.u.len() != 3 {
+        return None;
+    }
+    let (d1, e1, e2) = pxgcd(&a.u, &b.u);
+    let (d, s1, s2, s3) = if d1.len() == 1 {
+        (vec![F::one()], e1, e2, Vec::new())
+    } else {
+        let vs = padd(&a.v, &b.v);
+        let (d, c1, c2) = pxgcd(&d1, &vs);
+        (d, pmul(&c1, &e1), pmul(&c1, &e2), c2)
+    };
+    let mut u = pmul(&a.u, &b.u);
+    let mut num = padd(&pmul(&pmul(&s1, &a.u), &b.v), &pmul(&pmul(&s2, &b.u), &a.v));
+    if !s3.is_empty() {
+        num = padd(&num, &pmul(&s3, &padd(&pmul(&a.v, &b.v), f)));
+    }
+    if d.len() > 1 {
+        u = pdivrem(&u, &pmul(&d, &d)).0;
+        num = pdivrem(&num, &d).0;
+    }
+    match deg(&u) {
+        0 => Some(Div::zero()),
+        2 => {
+            let v = prem(&num, &u);
+            Some(Div { u, v })
+        }
+        4 => {
+            // y − v vanishes on D1 + D2; its other two zeros give ι(D3)
+            let v = prem(&num, &u);
+            let w = psub(f, &pmul(&v, &v));
+            if deg(&w) != 6 {
+                return None;
+            }
+            let u2 = pmonic(&pdivrem(&w, &u).0);
+            let v2 = prem(&pneg(&v), &u2);
+            Some(Div { u: u2, v: v2 })
+        }
+        _ => None,
+    }
+}
+
+fn rmul<F: Fld>(f: &[F], a: &Div<F>, mut k: u64) -> Option<Div<F>> {
+    let mut r = Div::zero();
+    let mut b = a.clone();
+    while k > 0 {
+        if k & 1 == 1 {
+            r = radd(f, &r, &b)?;
+        }
+        k >>= 1;
+        if k > 0 {
+            b = radd(f, &b, &b)?;
+        }
+    }
+    Some(r)
+}
+
+fn rmul_fast<F: Fld>(f: &[F], a: &Div<F>, mut k: u64) -> Option<Div<F>> {
+    let mut r = Div::zero();
+    let mut b = a.clone();
+    while k > 0 {
+        if k & 1 == 1 {
+            r = radd_fast(f, &r, &b)?;
+        }
+        k >>= 1;
+        if k > 0 {
+            b = radd_fast(f, &b, &b)?;
+        }
+    }
+    Some(r)
+}
+
+fn conj_div(d: &Div<Fp2>) -> Div<Fp2> {
+    Div {
+        u: d.u.iter().map(|c| c.conj()).collect(),
+        v: d.v.iter().map(|c| c.conj()).collect(),
+    }
+}
+
+fn to_fp_div(d: &Div<Fp2>) -> Option<Div<Fp>> {
+    let mut u = Vec::new();
+    for c in &d.u {
+        if c.1 != 0 {
+            return None;
+        }
+        u.push(Fp(c.0));
+    }
+    let mut v = Vec::new();
+    for c in &d.v {
+        if c.1 != 0 {
+            return None;
+        }
+        v.push(Fp(c.0));
+    }
+    Some(Div { u, v })
+}
+
+/// Solve a 3×3 linear system over F_{p²} (Gauss); None if singular.
+fn solve3(mut m: [[Fp2; 4]; 3]) -> Option<[Fp2; 3]> {
+    for col in 0..3 {
+        let piv = (col..3).find(|&r| !m[r][col].is_zero())?;
+        m.swap(col, piv);
+        let inv = m[col][col].inv();
+        for j in col..4 {
+            m[col][j] = m[col][j].mul(inv);
+        }
+        for r in 0..3 {
+            if r != col && !m[r][col].is_zero() {
+                let c = m[r][col];
+                for j in col..4 {
+                    m[r][j] = m[r][j].sub(c.mul(m[col][j]));
+                }
+            }
+        }
+    }
+    Some([m[0][3], m[1][3], m[2][3]])
+}
+
+#[derive(Clone, Debug)]
+struct Glue {
+    p: u64,
+    e: Ell,
+    n: u64,
+    h: u64,
+    ell: u64,
+    s1: Fp2,
+    s2: Fp2,
+    /// Möbius x ↦ W = (a x + b)/(c x + d) from the bielliptic model to the F_p model
+    mob: [Fp2; 4],
+    /// y-scaling: y_F = y · (−cW + a)³ · yscale
+    yscale: Fp2,
+    /// the F_p model y² = hf(W), deg 6
+    hf: Vec<Fp>,
+    /// diagnostics: t2 = σ(s2), λ² ∈ F_p, λ ∈ F_p, the model is F_p-rational, twist used
+    diag: [bool; 4],
+    twist: bool,
+}
+
+impl Glue {
+    /// One attempt at a glued instance with exact cofactor `want_h` over a field already set.
+    fn try_new(p: u64, want_h: u64, rng: &mut u64, twist: bool) -> Option<Glue> {
+        let a = Fp2(xorshift(rng) % p, xorshift(rng) % p);
+        let b = Fp2(xorshift(rng) % p, xorshift(rng) % p);
+        if a.is_zero() || b.is_zero() {
+            return None;
+        }
+        // j ∉ F_p  <=>  a³/b² ∉ F_p
+        let jr = a.sqr().mul(a).mul(b.sqr().inv());
+        if jr.1 == 0 {
+            return None;
+        }
+        let disc = a
+            .sqr()
+            .mul(a)
+            .mul(Fp2::from_u64(4))
+            .add(b.sqr().mul(Fp2::from_u64(27)));
+        if disc.is_zero() {
+            return None;
+        }
+        let e = Ell { a, b };
+        let n = ec_order(&e, p, rng)?;
+        if n % want_h != 0 || !is_prime(n / want_h) || n / want_h <= 8 {
+            return None;
+        }
+        let g = vec![b, a, Fp2::zero(), Fp2::one()];
+        // w = z^{p³} in F_{p²}[z]/(g): the gluing ψ(a) = a^{p³} satisfies the
+        // descent cocycle ψ^σ ∘ ψ = id on the roots of an irreducible or split g
+        // (a^{p⁶} = a); with exactly one rational root no Galois-equivariant ψ does
+        let mut w = vec![Fp2::zero(), Fp2::one()];
+        for _ in 0..3 {
+            let mut acc = vec![Fp2::one()];
+            let mut base = w.clone();
+            let mut ex = p;
+            while ex > 0 {
+                if ex & 1 == 1 {
+                    acc = prem(&pmul(&acc, &base), &g);
+                }
+                ex >>= 1;
+                if ex > 0 {
+                    base = prem(&pmul(&base, &base), &g);
+                }
+            }
+            w = acc;
+        }
+        let zw = prem(&pmul(&[Fp2::zero(), Fp2::one()], &w), &g);
+        let co = |v: &Vec<Fp2>, i: usize| v.get(i).copied().unwrap_or(Fp2::zero());
+        let z = vec![Fp2::zero(), Fp2::one()];
+        let mut m = [[Fp2::zero(); 4]; 3];
+        for j in 0..3 {
+            m[j] = [
+                co(&zw, j),
+                co(&z, j),
+                co(&w, j),
+                if j == 0 { Fp2::one() } else { Fp2::zero() },
+            ];
+        }
+        let [r, s, t] = solve3(m)?;
+        if r.is_zero() {
+            return None;
+        }
+        let ri = r.inv();
+        let s2 = t.mul(ri).neg();
+        let t2 = s.mul(ri).neg();
+        let k = s2.mul(t2).add(ri);
+        let gs2 = s2.sqr().mul(s2).add(a.mul(s2)).add(b);
+        let s1 = k.mul(gs2);
+        if s1.is_zero() {
+            return None;
+        }
+        // bielliptic sextic h(x) = g(s1 x² + s2)/s1²
+        let q = vec![s2, Fp2::zero(), s1];
+        let gq = padd(&padd(&pmul(&pmul(&q, &q), &q), &pscale(&q, a)), &[b]);
+        let hb = pscale(&gq, s1.sqr().inv());
+        // descent datum x ↦ λ/x^σ with λ² = k/N(s1)
+        let ns1 = s1.mul(s1.conj());
+        let lam2 = k.mul(ns1.inv());
+        let d_t2 = t2 == s2.conj();
+        let d_lam2 = lam2.1 == 0;
+        if !d_lam2 {
+            return None;
+        }
+        let lam = Fp(lam2.0);
+        let lsq = sqrt_p(lam.0);
+        let d_lam = lsq.is_some();
+        let lam = Fp(lsq?);
+        // three points on the Baer subline N(x) = λ
+        let mut cs: Vec<Fp2> = Vec::new();
+        while cs.len() < 3 {
+            let u = Fp2(xorshift(rng) % p, xorshift(rng) % p);
+            if u.is_zero() {
+                continue;
+            }
+            let nu = u.mul(u.conj()).0;
+            if let Some(r) = sqrt_p(lam.0 * inv_mod(nu, p) % p) {
+                let c = u.mul_fp(Fp(r));
+                if !cs.contains(&c) {
+                    cs.push(c);
+                }
+            }
+        }
+        let (c1, c2, c3) = (cs[0], cs[1], cs[2]);
+        let (ma, mb, mc, md) = (
+            c2.sub(c3),
+            c1.mul(c2.sub(c3)).neg(),
+            c2.sub(c1),
+            c3.mul(c2.sub(c1)).neg(),
+        );
+        // pick w0 ∈ F_p whose point lies over a square of h, then W = 1/(M(x) − w0)
+        for _ in 0..64 {
+            let w0 = Fp2(xorshift(rng) % p, 0);
+            let (na, nb, nc, nd) = (mc, md, ma.sub(w0.mul(mc)), mb.sub(w0.mul(md)));
+            // x = (d W − b)/(−c W + a)
+            let num = vec![nb.neg(), nd];
+            let den = vec![na, nc.neg()];
+            let mut hraw: Vec<Fp2> = Vec::new();
+            let mut npow = vec![Fp2::one()];
+            for j in 0..7 {
+                let mut term = pscale(&npow, co(&hb, j));
+                for _ in j..6 {
+                    term = pmul(&term, &den);
+                }
+                hraw = padd(&hraw, &term);
+                npow = pmul(&npow, &num);
+            }
+            if hraw.len() != 7 {
+                continue;
+            }
+            let mu = hraw[6];
+            let Some(smu) = mu.sqrt() else { continue };
+            let hf2 = pscale(&hraw, mu.inv());
+            if hf2.iter().any(|c| c.1 != 0) {
+                return None; // the x-map did not descend: recorded as a failed G0
+            }
+            let mut hf: Vec<Fp> = hf2.iter().map(|c| Fp(c.0)).collect();
+            let mut yscale = smu.inv();
+            if twist {
+                // quadratic twist over F_p: y_tw = y·sqrt(ν), ν = κ
+                let nu = Fp(kap());
+                hf = pscale(&hf, nu);
+                yscale = yscale.mul(Fp2::s());
+            }
+            return Some(Glue {
+                p,
+                e,
+                n,
+                h: want_h,
+                ell: n / want_h,
+                s1,
+                s2,
+                mob: [na, nb, nc, nd],
+                yscale,
+                hf,
+                diag: [d_t2, d_lam2, d_lam, true],
+                twist,
+            });
+        }
+        None
+    }
+
+    fn new(bits: u32, want_h: u64, rng: &mut u64) -> Glue {
+        loop {
+            let base = 1u64 << (bits / 2);
+            let p = loop {
+                let c = base + xorshift(rng) % (base / 8).max(8);
+                if c > 5 && is_prime(c) {
+                    break c;
+                }
+            };
+            let kappa = (2..p)
+                .find(|&k| powmod(k, (p - 1) / 2, p) == p - 1)
+                .unwrap();
+            set_field(p, kappa);
+            for _ in 0..4000 {
+                if let Some(g0) = Glue::try_new(p, want_h, rng, false) {
+                    // choose the F_p form on which the trace is nonzero on the ℓ-part
+                    let pt = loop {
+                        let v = g0.e.mul(g0.e.random_point(rng), g0.h);
+                        if v != EP::O {
+                            break v;
+                        }
+                    };
+                    for tw in [false, true] {
+                        let mut g1 = g0.clone();
+                        if tw {
+                            g1.hf = pscale(&g1.hf, Fp(kap()));
+                            g1.yscale = g1.yscale.mul(Fp2::s());
+                            g1.twist = true;
+                        }
+                        if let Some(t) = g1.transfer(pt) {
+                            if !t.is_zero() && rmul(&g1.hf, &t, g1.ell).is_some_and(|z| z.is_zero())
+                            {
+                                return g1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// φ₁^*P as a degree-2 divisor on the F_p model, over F_{p²}.
+    fn pullback(&self, pt: EP) -> Option<Div<Fp2>> {
+        let EP::A(x, y) = pt else { return None };
+        let [a, b, c, d] = self.mob;
+        let r0 = x.sub(self.s2).mul(self.s1.inv());
+        let num = vec![b.neg(), d];
+        let den = vec![a, c.neg()];
+        let u = psub(&pmul(&num, &num), &pscale(&pmul(&den, &den), r0));
+        if u.len() != 3 {
+            return None;
+        }
+        let u = pmonic(&u);
+        let yv = y.mul(self.s1.inv()).mul(self.yscale);
+        let v = prem(&pscale(&pmul(&pmul(&den, &den), &den), yv), &u);
+        Some(Div { u, v })
+    }
+
+    /// τ(P) = [φ₁^*P − D∞] + its conjugate, in Jac(C_F)(F_p).
+    fn transfer(&self, pt: EP) -> Option<Div<Fp>> {
+        let d = self.pullback(pt)?;
+        let f2 = lift(&self.hf);
+        if !jvalid(&f2, &d) {
+            return None;
+        }
+        let t = radd(&f2, &d, &conj_div(&d))?;
+        to_fp_div(&t)
+    }
+
+    fn as_instance(&self) -> Instance {
+        Instance {
+            p: self.p,
+            kappa: kap(),
+            f: Vec::new(),
+            r: Fp(0),
+            big_l: Fp(0),
+            fq: Vec::new(),
+            u0: Fp2::zero(),
+            h0: Fp2::zero(),
+            c2: Fp2::zero(),
+            e: self.e,
+            n: self.n,
+            h: self.h,
+            ell: self.ell,
+        }
+    }
+
+    /// #C_F(F_p) on the sextic model (points at infinity: 2 if lc is a square)
+    fn count_c(&self) -> u64 {
+        let mut c = 0u64;
+        for x in 0..self.p {
+            let v = peval(&self.hf, Fp(x)).0;
+            c += if v == 0 {
+                1
+            } else if sqrt_p(v).is_some() {
+                2
+            } else {
+                0
+            };
+        }
+        c + if sqrt_p(self.hf[6].0).is_some() { 2 } else { 0 }
+    }
+}
+
+/// Arm J on the glued sextic model: first-cycle large-prime IC with columns
+/// x_P = [2P − D∞] (so [P + Q − D∞] = (x_P + x_Q)/2 and x_{ιP} = −x_P).
+fn arm_glue(g: &Glue, pt: EP, q: EP, rng: &mut u64) -> ArmResult {
+    let t0 = Instant::now();
+    let c0 = Counts::now();
+    let p = g.p;
+    let ell = g.ell;
+    let f = &g.hf;
+    let inv2 = (ell + 1) / 2;
+    let mut res = ArmResult {
+        arm: "Jglue".into(),
+        c: 0,
+        ..Default::default()
+    };
+    let mut jac = Counts::default();
+    let s = Counts::now();
+    let (tp, tq) = loop {
+        if let (Some(a), Some(b)) = (g.transfer(pt), g.transfer(q)) {
+            break (a, b);
+        }
+    };
+    jac = jac.add(s.since());
+    let mut lin = Lin::new(ell, 0);
+    let mut mults = Vec::new();
+    while mults.len() < IC_R {
+        let (a, b) = (xorshift(rng) % ell, xorshift(rng) % ell);
+        let s = Counts::now();
+        let d = rmul_fast(f, &tp, a)
+            .and_then(|x| rmul_fast(f, &tq, b).and_then(|y| radd_fast(f, &x, &y)));
+        jac = jac.add(s.since());
+        if let Some(d) = d {
+            mults.push((d, a, b));
+        }
+    }
+    let half = Fp((p + 1) / 2);
+    let mut steps = 0u64;
+    'walk: loop {
+        let (mut a, mut b) = (xorshift(rng) % ell, xorshift(rng) % ell);
+        let s = Counts::now();
+        let d0 = rmul_fast(f, &tp, a)
+            .and_then(|x| rmul_fast(f, &tq, b).and_then(|y| radd_fast(f, &x, &y)));
+        jac = jac.add(s.since());
+        let Some(mut d) = d0 else { continue };
+        for _ in 0..IC_RESTART {
+            if d.u.len() == 3 {
+                let (u0, u1) = (d.u[0], d.u[1]);
+                let disc = u1.sqr().sub(u0.mul(Fp(4)));
+                if let Some(sq) = sqrt_p(disc.0) {
+                    let v0 = d.v.first().copied().unwrap_or(Fp(0));
+                    let v1 = d.v.get(1).copied().unwrap_or(Fp(0));
+                    let mut row = Row {
+                        a,
+                        b,
+                        ..Default::default()
+                    };
+                    let roots = if sq == 0 {
+                        vec![Fp(sq)]
+                    } else {
+                        vec![Fp(sq), Fp(sq).neg()]
+                    };
+                    let mult = if sq == 0 { 2 } else { 1 };
+                    for sgn in roots {
+                        cnt_n(1);
+                        let xi = u1.neg().add(sgn).mul(half);
+                        let w = v1.mul(xi).add(v0).0;
+                        let pos = w <= p - w;
+                        let coef = mm(inv2, mult, ell);
+                        add_entry(
+                            &mut row.lp,
+                            xi.0,
+                            if pos { coef } else { (ell - coef) % ell },
+                            ell,
+                        );
+                    }
+                    res.rels += 1;
+                    let s = Counts::now();
+                    let cand = lin.push(row);
+                    res.la = res.la.add(s.since());
+                    if let Some(k) = cand.filter(|&k| g.e.mul(pt, k) == q) {
+                        res.k = k;
+                        res.ok = true;
+                        res.steps = steps;
+                        res.jac = jac;
+                        res.jac_ops = jac.j;
+                        res.mem = lin.pivots.len() as u64;
+                        res.walk = c0.since().minus(res.la);
+                        res.secs = t0.elapsed().as_secs_f64();
+                        return res;
+                    }
+                }
+            }
+            cnt_n(1);
+            let hx =
+                d.u.iter()
+                    .chain(d.v.iter())
+                    .fold(0u64, |h, c| (h ^ c.0).wrapping_mul(0x9e37_79b9_7f4a_7c15))
+                    >> 40;
+            let (m, ma, mb) = &mults[(hx as usize) % IC_R];
+            let s = Counts::now();
+            let nd = radd_fast(f, &d, m);
+            jac = jac.add(s.since());
+            steps += 1;
+            match nd {
+                Some(x) => d = x,
+                None => continue 'walk,
+            }
+            a = (a + ma) % ell;
+            b = (b + mb) % ell;
+        }
+    }
+}
+
+fn glue_checks(out: &Path) {
+    let mut rng = 0x6c75_6500_u64;
+    let mut log = String::new();
+    for &bits in &[14u32, 16, 20, 24] {
+        for &h in &[1u64, 4] {
+            for _ in 0..2 {
+                let g = Glue::new(bits, h, &mut rng);
+                let f = &g.hf;
+                let t = g.p * g.p + 1 - g.n;
+                let nc = g.count_c();
+                // #C(F_{p²}) on the F_p model, brute force for small p
+                let nc2 = if g.p < 400 {
+                    let f2 = lift(f);
+                    let mut c = 0u64;
+                    for x0 in 0..g.p {
+                        for x1 in 0..g.p {
+                            let v = peval(&f2, Fp2(x0, x1));
+                            c += if v.is_zero() {
+                                1
+                            } else if v.sqrt().is_some() {
+                                2
+                            } else {
+                                0
+                            };
+                        }
+                    }
+                    let lc = Fp2::from_fp(f[6]);
+                    c += if lc.sqrt().is_some() { 2 } else { 0 };
+                    Some(c)
+                } else {
+                    None
+                };
+                // G2/G3 on transfers of random ℓ-part points
+                let mut pts = Vec::new();
+                while pts.len() < 3 {
+                    let v = g.e.mul(g.e.random_point(&mut rng), g.h);
+                    if v != EP::O {
+                        pts.push(v);
+                    }
+                }
+                let ts: Vec<Option<Div<Fp>>> = pts.iter().map(|&x| g.transfer(x)).collect();
+                let tsum = g.transfer(g.e.add(pts[0], pts[1]));
+                // tri-state: true / false / "degenerate" (a point at infinity met on the way)
+                let tri = |o: Option<bool>| match o {
+                    Some(true) => "true",
+                    Some(false) => "FALSE",
+                    None => "degenerate",
+                };
+                let (hom, assoc, inv, ordl, nz, ordn) = match (&ts[0], &ts[1], &ts[2], &tsum) {
+                    (Some(a), Some(b), Some(c), Some(sab)) => {
+                        let ab = radd(f, a, b);
+                        let hom = ab.as_ref().map(|x| x == sab);
+                        let l = ab.clone().and_then(|ab| radd(f, &ab, c));
+                        let r = radd(f, b, c).and_then(|bc| radd(f, a, &bc));
+                        let assoc = l.and_then(|l| r.map(|r| l == r));
+                        let inv = radd(f, a, &a.neg()).map(|z| z.is_zero());
+                        let ordl = rmul(f, a, g.ell).map(|z| z.is_zero());
+                        let ordn = rmul(f, c, g.n).map(|z| z.is_zero());
+                        (
+                            tri(hom),
+                            tri(assoc),
+                            tri(inv),
+                            tri(ordl),
+                            tri(Some(!a.is_zero())),
+                            tri(ordn),
+                        )
+                    }
+                    _ => (
+                        "degenerate",
+                        "degenerate",
+                        "degenerate",
+                        "degenerate",
+                        "degenerate",
+                        "degenerate",
+                    ),
+                };
+                log.push_str(&format!(
+                    "G p={} N={} h={} ell={} t={}: t2=sigma(s2) {} lambda^2 in F_p {} lambda in F_p {} | twist {} | G1 #C(F_p)={} (p+1={}) #C(F_p2)={} (p^2+1-2t={}) | G2 assoc {} inverse {} N*A=0 {} | G3 hom {} nonzero {} ell*tau=0 {}\n",
+                    g.p, g.n, g.h, g.ell, t as i64 - 0, g.diag[0], g.diag[1], g.diag[2], g.twist, nc, g.p + 1,
+                    nc2.map(|c| c.to_string()).unwrap_or("-".into()),
+                    (g.p * g.p + 1) as i64 - 2 * (t as i64), assoc, inv, ordn, hom, nz, ordl
+                ));
+            }
+        }
+    }
+    // G5: reduced real-model formulas against the generic real-model law, and per-op cost
+    for &bits in &[20u32, 28, 36] {
+        let g = Glue::new(bits, 1, &mut rng);
+        let f = &g.hf;
+        let mut ds: Vec<Div<Fp>> = Vec::new();
+        while ds.len() < 401 {
+            let v = g.e.mul(g.e.random_point(&mut rng), g.h);
+            if let Some(t) = g.transfer(v) {
+                ds.push(t);
+            }
+        }
+        let (mut agree, mut cmp, mut degen) = (0u64, 0u64, 0u64);
+        let (mut cf, mut cg, mut df, mut dg) = (
+            Counts::default(),
+            Counts::default(),
+            Counts::default(),
+            Counts::default(),
+        );
+        for w in ds.windows(2) {
+            for (x, y, is_dbl) in [(&w[0], &w[1], false), (&w[0], &w[0], true)] {
+                let s0 = Counts::now();
+                let a = radd_fast(f, x, y);
+                let c1 = s0.since();
+                let s0 = Counts::now();
+                let b = radd(f, x, y);
+                let c2 = s0.since();
+                match (a, b) {
+                    (Some(a), Some(b)) => {
+                        cmp += 1;
+                        agree += u64::from(a == b);
+                    }
+                    _ => degen += 1,
+                }
+                if is_dbl {
+                    df = df.add(c1);
+                    dg = dg.add(c2);
+                } else {
+                    cf = cf.add(c1);
+                    cg = cg.add(c2);
+                }
+            }
+        }
+        let k = 400.0;
+        log.push_str(&format!(
+            "G5 p={}: fast = generic on {agree}/{cmp} pairs ({degen} degenerate) | add fast {:.1}M+{:.2}I generic {:.1}M+{:.2}I | double fast {:.1}M+{:.2}I generic {:.1}M+{:.2}I\n",
+            g.p, cf.m as f64 / k, cf.i as f64 / k, cg.m as f64 / k, cg.i as f64 / k,
+            df.m as f64 / k, df.i as f64 / k, dg.m as f64 / k, dg.i as f64 / k
+        ));
+    }
+    std::fs::write(out.join("glue_checks.txt"), &log).unwrap();
+    eprint!("{log}");
+}
+
+fn glue_job(job: &HJob) -> Vec<String> {
+    let mut rng = job.seed | 1;
+    let g = Glue::new(job.bits, job.h, &mut rng);
+    let inst = g.as_instance();
+    let pt = loop {
+        let v = g.e.mul(g.e.random_point(&mut rng), g.h);
+        if v != EP::O {
+            break v;
+        }
+    };
+    let (pa, pb) = (g.e.random_point(&mut rng), g.e.random_point(&mut rng));
+    let s = Counts::now();
+    let _ = g.e.add(pa, pb);
+    let eadd = s.since();
+    let mut rows = Vec::new();
+    for tgt in 0..TARGETS {
+        let k = 1 + xorshift(&mut rng) % (g.ell - 1);
+        let q = g.e.mul(pt, k);
+        for (name, r) in [
+            ("R", arm_rho(&inst, pt, q, &mut rng)),
+            ("Jglue", arm_glue(&g, pt, q, &mut rng)),
+        ] {
+            let ok = r.ok && r.k == k && g.e.mul(pt, r.k) == q;
+            rows.push(format!(
+                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{:.3}",
+                job.bits,
+                g.h,
+                job.inst_id,
+                g.p,
+                g.n,
+                g.ell,
+                u8::from(g.twist),
+                tgt,
+                name,
+                r.steps,
+                r.rels,
+                r.jac_ops,
+                r.walk.m,
+                r.walk.i,
+                r.walk.n,
+                r.jac.m,
+                r.jac.i,
+                r.la.n,
+                eadd.m,
+                eadd.i,
+                u8::from(ok),
+                r.secs
+            ));
+        }
+    }
+    eprintln!(
+        "glue bits {} h {} inst {} done",
+        job.bits, job.h, job.inst_id
+    );
+    rows
+}
+
+fn summarize_glue(csv: &str) -> String {
+    use std::collections::BTreeMap;
+    let mut cells: BTreeMap<(u32, u64, String), Vec<(f64, f64)>> = BTreeMap::new();
+    let mut all_ok = true;
+    let mut per_op: BTreeMap<String, (f64, f64, f64)> = BTreeMap::new();
+    for l in csv.lines().skip(1) {
+        let v: Vec<&str> = l.split(',').collect();
+        let bits: u32 = v[0].parse().unwrap();
+        let h: u64 = v[1].parse().unwrap();
+        let p: f64 = v[3].parse().unwrap();
+        let arm = v[8].to_string();
+        let steps: f64 = v[9].parse().unwrap();
+        let jops: f64 = v[11].parse().unwrap();
+        let (wm, wi): (f64, f64) = (v[12].parse().unwrap(), v[13].parse().unwrap());
+        let (jm, ji): (f64, f64) = (v[15].parse().unwrap(), v[16].parse().unwrap());
+        all_ok &= v[20] == "1";
+        // cost at I = 3M, native 0: total and per step
+        let cost = wm + 3.0 * wi;
+        cells
+            .entry((bits, h, arm.clone()))
+            .or_default()
+            .push((steps / p, cost));
+        if arm == "Jglue" && jops > 0.0 {
+            let e = per_op.entry(arm).or_insert((0.0, 0.0, 0.0));
+            e.0 += jm;
+            e.1 += ji;
+            e.2 += jops;
+        }
+    }
+    let mut out = String::new();
+    for ((bits, h, arm), v) in &cells {
+        let n = v.len() as f64;
+        let m = v.iter().map(|x| x.0).sum::<f64>() / n;
+        let sd = (v.iter().map(|x| (x.0 - m).powi(2)).sum::<f64>() / (n - 1.0).max(1.0)).sqrt();
+        let c = v.iter().map(|x| x.1).sum::<f64>() / n;
+        out.push_str(&format!(
+            "H2 bits {bits} h {h} {arm}: steps/p {m:.4} (s.e. {:.4}, {} runs) | mean cost (I=3M, w=0) {c:.4e} | rho theory {:.4}\n",
+            sd / n.sqrt(),
+            v.len(),
+            0.886 / (*h as f64).sqrt()
+        ));
+    }
+    for ((bits, h, arm), v) in &cells {
+        if arm != "Jglue" {
+            continue;
+        }
+        if let Some(r) = cells.get(&(*bits, *h, "R".to_string())) {
+            let c = v.iter().map(|x| x.1).sum::<f64>() / v.len() as f64;
+            let cr = r.iter().map(|x| x.1).sum::<f64>() / r.len() as f64;
+            out.push_str(&format!(
+                "H2 bits {bits} h {h}: Jglue/rho cost ratio (measured, I=3M, w=0) {:.3}\n",
+                c / cr
+            ));
+        }
+    }
+    for (arm, (m, i, j)) in &per_op {
+        out.push_str(&format!(
+            "H2 {arm}: measured per Jacobian op {:.1}M + {:.2}I\n",
+            m / j,
+            i / j
+        ));
+    }
+    out.push_str(&format!("H2 all answers verified: {all_ok}\n"));
+    out
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let out = Path::new(args.get(1).expect("usage: n2_routes <out-dir> [run|check]"));
@@ -2899,6 +3784,64 @@ fn main() {
         std::fs::write(out.join("ranking.csv"), &summary.1).unwrap();
         std::fs::write(out.join("summary.txt"), &summary.2).unwrap();
         eprint!("{}", summary.2);
+        return;
+    }
+    if mode == "gluecheck" {
+        glue_checks(out);
+        return;
+    }
+    if mode == "glue" {
+        let threads: usize = std::env::var("N2_THREADS")
+            .ok()
+            .and_then(|s| s.parse().ok())
+            .unwrap_or(4);
+        let env_list = |k: &str, d: &str| -> Vec<u64> {
+            std::env::var(k)
+                .unwrap_or_else(|_| d.into())
+                .split(',')
+                .map(|x| x.trim().parse().unwrap())
+                .collect()
+        };
+        let mut jobs = Vec::new();
+        for &bits in &env_list("N2_SIZES", "28,32,36,40") {
+            for &h in &env_list("N2_HS", "1,4") {
+                for inst_id in 0..4 {
+                    jobs.push(HJob {
+                        bits: bits as u32,
+                        h,
+                        inst_id,
+                        seed: splitmix(0x6c75_0000 ^ (bits << 40) ^ (h << 8) ^ inst_id as u64),
+                        theta: 1.0,
+                    });
+                }
+            }
+        }
+        jobs.sort_by_key(|j| (j.bits, j.h));
+        let t0 = Instant::now();
+        let queue = std::sync::Mutex::new(jobs);
+        let results = std::sync::Mutex::new(Vec::<String>::new());
+        std::thread::scope(|s| {
+            for _ in 0..threads {
+                s.spawn(|| loop {
+                    let j = queue.lock().unwrap().pop();
+                    let Some(job) = j else { break };
+                    let r = glue_job(&job);
+                    results.lock().unwrap().extend(r);
+                });
+            }
+        });
+        let mut rows = results.into_inner().unwrap();
+        rows.sort();
+        let mut csv = String::from("bits,h,instance,p,N,ell,twist,target,arm,steps,relations,jac_ops,walk_M,walk_I,walk_native,jac_M,jac_I,la_native,eadd_M,eadd_I,verified,seconds\n");
+        for r in &rows {
+            csv.push_str(r);
+            csv.push('\n');
+        }
+        std::fs::write(out.join("glue.csv"), &csv).unwrap();
+        let t = summarize_glue(&csv);
+        std::fs::write(out.join("glue_summary.txt"), &t).unwrap();
+        eprint!("{t}");
+        eprintln!("done in {:.1}s", t0.elapsed().as_secs_f64());
         return;
     }
     if mode == "hsweep" || mode == "memsweep" || mode == "hsummarize" {

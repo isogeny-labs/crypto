@@ -1,0 +1,25 @@
+{
+ "id": "vv1r308vkkoewx",
+ "name": "h6-large-sizes",
+ "sha": "6083c58aa45e04e4d3194689b3b3e6ef5c7be115",
+ "files": [
+  "examples/n2_routes.rs"
+ ],
+ "cmd": "rustc --edition 2021 -O examples/n2_routes.rs -o n2 && N2_THREADS=16 N2_SIZES=44,48 N2_CS=2 ./n2 \"$OUT\" run",
+ "vcpu": 16,
+ "flavor": "cpu5c,cpu3c",
+ "image": "rust:1-bookworm",
+ "launched_utc": "2026-10-18T22:09:01Z",
+ "cost_per_hr": 0.56,
+ "machine": {
+  "dataCenterId": "EUR-IS-1",
+  "diskThroughputMBps": 4697,
+  "gpuTypeId": "unknown",
+  "location": "IS",
+  "maxDownloadSpeedMbps": 19631,
+  "maxUploadSpeedMbps": 65466,
+  "secureCloud": true,
+  "supportPublicIp": true,
+  "reservedCountVersion": 228085
+ }
+}

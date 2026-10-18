@@ -637,3 +637,37 @@ experiment. Each recorded run follows the research-visuals rule.
   first `|F_q|/2` elements of `d·F_q` in a fixed random order. That gives
   as many points as the null arm, so the comparison isolates the coset
   confinement from the density.
+
+### Amendment H-b (H2 and H3 tools), after scratch checks and before the recorded H2 run
+
+**Gluing map.** Gluing along `ψ(a) = a^p` on the 2-torsion roots does not
+descend unless `E[2]` is split: in 117 of 117 scratch attempts with odd
+`#E`, `t_2 ≠ σ(s_2)`. The descent cocycle needs `ψ^σ ∘ ψ = id` on the
+roots. `ψ(a) = a^{p³}` satisfies it whenever the 2-torsion cubic is
+irreducible over `F_{p²}` (roots in `F_{p⁶}`, so `a^{p⁶} = a`) or split.
+With exactly one rational root, no Galois-equivariant `ψ` satisfies it.
+So `h ≡ 2 (mod 4)` is not reached this way, consistent with the Scholten
+family's `4 | #E`. H2 therefore uses `h ∈ {1, 4}`, not `{1, 2}`.
+
+**Scratch checks** (`n2_routes <dir> gluecheck`).
+- 16 instances, `p` = 131 … 4549.
+- Descent holds in every instance: `t_2 = σ(s_2)` and `λ² ∈ F_p`.
+  `λ ∈ F_p` holds in about half of the attempts; the others are discarded
+  and redrawn.
+- G1: `#C(F_p) = p + 1` everywhere, and `#C(F_{p²}) = p² + 1 − 2t` where
+  counted (`p < 400`).
+- G2 and G3 (associativity, inverse, `N·A = 0`, homomorphism, `τ ≠ 0`,
+  `ℓ·τ = 0`) all hold. The only exceptions are three checks reported as
+  "degenerate": a point at infinity was met at `p ≤ 277`, and no
+  inequality was found.
+
+**H3 (folded in): reduced real-model formulas.** These agree with the
+generic real-model law on 2,400 of 2,400 pairs. They cost 41 M + 1 I per
+addition and 51 M + 1 I per doubling; the generic law costs 113 M + 4 I and
+123 M + 4 I. The recorded H2 run uses them; this is pricing (a).
+
+**Break-even, stated before the run.** With trials `T_J·p` and rho steps
+`0.886·p/√h`, the IC needs `(c_J + c_split)·T_J < 0.886·c_E/√h`, where
+`c_E = 12 M + I` and `c_split = 2 M + 1 Legendre` (priced as one `I`).
+At `h = 1`, with `T_J ≈ 0.44` from the scratch run and `I = 3M`, that
+requires `c_J ≤ 22 M + I`.

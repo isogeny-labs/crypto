@@ -64,7 +64,7 @@ def api(method, path, body=None):
     req = urllib.request.Request(API + path, method=method,
                                  data=None if body is None else json.dumps(body).encode(),
                                  headers={"Authorization": "Bearer " + os.environ["RUNPOD_API_KEY"],
-                                          "Content-Type": "application/json"})
+                                          "Content-Type": "application/json", "User-Agent": "podrun/1"})
     with urllib.request.urlopen(req, timeout=60) as r:
         t = r.read()
         return json.loads(t) if t else {}
@@ -72,7 +72,8 @@ def api(method, path, body=None):
 
 def proxy(pod, token, name):
     url = "https://%s-8000.proxy.runpod.net/%s/%s" % (pod, token, name)
-    with urllib.request.urlopen(url, timeout=300) as r:
+    req = urllib.request.Request(url, headers={"User-Agent": "podrun/1"})
+    with urllib.request.urlopen(req, timeout=300) as r:
         return r.read()
 
 
