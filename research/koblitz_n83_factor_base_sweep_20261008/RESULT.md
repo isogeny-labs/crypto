@@ -1,5 +1,9 @@
 # Degree-83 factor-base sweep: observed evidence
 
+The [visual run report and inspected PDF](reports/run-20261018T2130Z/REPORT.md)
+qualify historical supervision tooling and separate frozen-source validation
+from post-merge native integration checks.
+
 The [restored native Docker continuation](verification/cloud-matched-k2048-k4096-20261018/RESULT.md)
 verified one CPU, 4 GiB, zero swap and networkless execution, mirrored K4096
 to `setec-astronomy-artifacts`, and passed both model-construction audits.
