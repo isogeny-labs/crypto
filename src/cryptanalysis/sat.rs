@@ -79,6 +79,9 @@
 //!   cryptographic problems*, SAT 2009 — XOR-native reasoning.
 //! - **A. Urquhart**, *Hard examples for resolution*, JACM 1987.
 
+use std::sync::atomic::{AtomicU64, AtomicU8, Ordering};
+use std::sync::Arc;
+
 /// Standard SAT literal encoding: positive integer = positive
 /// literal, negative integer = negated literal, `|lit| - 1` = variable
 /// index (0-based internally; 1-based in DIMACS).
@@ -156,6 +159,63 @@ pub enum SolveResult {
 pub enum RootPropagationResult {
     Fixpoint,
     Unsat,
+}
+
+/// Coarse location of an instrumented solver. A concurrent observer can see
+/// this and the counters at slightly different instants.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum SolverProgressPhase {
+    Idle = 0,
+    ClausePropagation = 1,
+    XorPropagation = 2,
+    ConflictAnalysis = 3,
+    Restart = 4,
+    BranchSelection = 5,
+    Complete = 6,
+}
+
+impl SolverProgressPhase {
+    fn from_code(code: u8) -> Self {
+        match code {
+            1 => Self::ClausePropagation,
+            2 => Self::XorPropagation,
+            3 => Self::ConflictAnalysis,
+            4 => Self::Restart,
+            5 => Self::BranchSelection,
+            6 => Self::Complete,
+            _ => Self::Idle,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SolverProgressSnapshot {
+    pub phase: SolverProgressPhase,
+    pub decisions: u64,
+    pub conflicts: u64,
+    pub restarts: u64,
+}
+
+/// Optional diagnostic counters. Relaxed atomics provide observational
+/// samples; they do not synchronize or change the solver's search.
+#[derive(Debug, Default)]
+pub struct SolverProgress {
+    phase: AtomicU8,
+    decisions: AtomicU64,
+    conflicts: AtomicU64,
+    restarts: AtomicU64,
+}
+
+impl SolverProgress {
+    pub fn snapshot(&self) -> SolverProgressSnapshot {
+        SolverProgressSnapshot {
+            phase: SolverProgressPhase::from_code(self.phase.load(Ordering::Relaxed)),
+            decisions: self.decisions.load(Ordering::Relaxed),
+            conflicts: self.conflicts.load(Ordering::Relaxed),
+            restarts: self.restarts.load(Ordering::Relaxed),
+        }
+    }
 }
 
 /// Reason a literal was assigned: a free decision, a unit-propagation
@@ -372,6 +432,7 @@ impl VarHeap {
 
 /// CDCL SAT solver.
 pub struct Solver {
+    progress: Option<Arc<SolverProgress>>,
     /// Number of variables (1-indexed externally).
     n_vars: u32,
     /// Centre of the literal-indexed tables `values` and `watches`:
@@ -605,6 +666,7 @@ impl Solver {
     pub fn new(n_vars: u32) -> Self {
         let n = n_vars as usize;
         Solver {
+            progress: None,
             n_vars,
             lit_base: n_vars,
             arena: Vec::new(),
@@ -647,6 +709,31 @@ impl Solver {
             detached: Vec::new(),
             max_learnts: 0,
             stats: SolverStats::default(),
+        }
+    }
+
+    /// Install an observer before search. Existing counters are copied so a
+    /// staged root pass or incremental solve starts from its actual totals.
+    pub fn set_progress_observer(&mut self, progress: Arc<SolverProgress>) {
+        progress
+            .decisions
+            .store(self.stats.decisions, Ordering::Relaxed);
+        progress
+            .conflicts
+            .store(self.stats.conflicts, Ordering::Relaxed);
+        progress
+            .restarts
+            .store(self.stats.restarts, Ordering::Relaxed);
+        progress
+            .phase
+            .store(SolverProgressPhase::Idle as u8, Ordering::Relaxed);
+        self.progress = Some(progress);
+    }
+
+    #[inline]
+    fn progress_phase(&self, phase: SolverProgressPhase) {
+        if let Some(progress) = &self.progress {
+            progress.phase.store(phase as u8, Ordering::Relaxed);
         }
     }
 
@@ -1071,9 +1158,11 @@ impl Solver {
     /// no special-casing.
     fn propagate(&mut self) -> Option<Conflict> {
         loop {
+            self.progress_phase(SolverProgressPhase::ClausePropagation);
             let t = std::time::Instant::now();
             let cnf = self.propagate_clauses();
             self.stats.ns_propagate_clauses += t.elapsed().as_nanos() as u64;
+            self.progress_phase(SolverProgressPhase::Idle);
             if let Some(c) = cnf {
                 return Some(Conflict::Clause(c));
             }
@@ -1082,9 +1171,11 @@ impl Solver {
                 return None;
             }
             self.xor_epoch = self.epoch;
+            self.progress_phase(SolverProgressPhase::XorPropagation);
             let t = std::time::Instant::now();
             let step = self.propagate_xors();
             self.stats.ns_propagate_xors += t.elapsed().as_nanos() as u64;
+            self.progress_phase(SolverProgressPhase::Idle);
             match step {
                 XorStep::Conflict => return Some(Conflict::Xor),
                 XorStep::Propagated => continue,
@@ -1770,7 +1861,9 @@ impl Solver {
     /// Main solve loop. Runs until SAT/UNSAT or conflict budget hits.
     pub fn solve(&mut self) -> SolveResult {
         let mut no_theory = |_: &[Option<bool>]| None;
-        self.solve_with_lazy_clauses(&[], &mut no_theory)
+        let result = self.solve_with_lazy_clauses(&[], &mut no_theory);
+        self.progress_phase(SolverProgressPhase::Complete);
+        result
     }
 
     /// Solve while allowing a theory callback to install globally valid lazy
@@ -1814,6 +1907,11 @@ impl Solver {
             if let Some(conflict_idx) = pending_conflict.take().or_else(|| self.propagate()) {
                 self.conflicts += 1;
                 self.stats.conflicts += 1;
+                if let Some(progress) = &self.progress {
+                    progress
+                        .conflicts
+                        .store(self.stats.conflicts, Ordering::Relaxed);
+                }
                 let lvl = self.trail_lim.len() as u64;
                 self.stats.conflict_level_sum += lvl;
                 self.stats.max_level = self.stats.max_level.max(lvl);
@@ -1828,10 +1926,12 @@ impl Solver {
                 if self.trail_lim.is_empty() {
                     return SolveResult::Unsat;
                 }
+                self.progress_phase(SolverProgressPhase::ConflictAnalysis);
                 let t = std::time::Instant::now();
                 let (learnt, bj_level) = self.analyze(conflict_idx);
                 self.stats.ns_analyze += t.elapsed().as_nanos() as u64;
                 self.backjump(bj_level);
+                self.progress_phase(SolverProgressPhase::Idle);
                 // Install the learnt clause.
                 if learnt.len() == 1 {
                     // It's a unit at the backjump level (which is 0).
@@ -1857,6 +1957,7 @@ impl Solver {
                 }
                 // Restart?
                 if self.conflicts_since_restart >= restart_limit {
+                    self.progress_phase(SolverProgressPhase::Restart);
                     self.backjump(0);
                     self.stats.restarts += 1;
                     self.conflicts_since_restart = 0;
@@ -1877,6 +1978,12 @@ impl Solver {
                     }
                     luby_index += 1;
                     restart_limit = 100u64 * luby(luby_index);
+                    if let Some(progress) = &self.progress {
+                        progress
+                            .restarts
+                            .store(self.stats.restarts, Ordering::Relaxed);
+                    }
+                    self.progress_phase(SolverProgressPhase::Idle);
                 }
             } else {
                 // Through the `n_vars`-long assignment, so a trigger past the
@@ -1925,6 +2032,7 @@ impl Solver {
                     }
                 }
                 // No conflict — pick a new variable.
+                self.progress_phase(SolverProgressPhase::BranchSelection);
                 match self.pick_branching_variable() {
                     None => return SolveResult::Sat,
                     Some(v) => {
@@ -1936,6 +2044,12 @@ impl Solver {
                             -((v + 1) as i32)
                         };
                         self.assign(lit, Reason::Decision);
+                        if let Some(progress) = &self.progress {
+                            progress
+                                .decisions
+                                .store(self.stats.decisions, Ordering::Relaxed);
+                        }
+                        self.progress_phase(SolverProgressPhase::Idle);
                     }
                 }
             }
@@ -2293,6 +2407,46 @@ mod tests {
         let m = s.model();
         assert_eq!((m[0], m[1], m[2]), (true, true, false));
         assert!(s.check_xors(&m));
+    }
+
+    #[test]
+    fn optional_progress_observer_preserves_sat_and_unsat_search() {
+        fn instance(contradictory: bool) -> Solver {
+            let mut solver = Solver::new(3);
+            solver.add_xor(&[1, 2], false);
+            solver.add_clause(vec![1, 2]);
+            if contradictory {
+                solver.add_clause(vec![-1, -2]);
+            } else {
+                solver.add_clause(vec![2, 3]);
+            }
+            solver
+        }
+        for contradictory in [false, true] {
+            let mut direct = instance(contradictory);
+            let direct_result = direct.solve();
+            assert!(direct.stats.decisions > 0);
+            if contradictory {
+                assert!(direct.stats.conflicts > 0);
+            }
+            let direct_model = (direct_result == SolveResult::Sat).then(|| direct.model());
+
+            let mut observed = instance(contradictory);
+            let progress = Arc::new(SolverProgress::default());
+            observed.set_progress_observer(Arc::clone(&progress));
+            let observed_result = observed.solve();
+            let observed_model = (observed_result == SolveResult::Sat).then(|| observed.model());
+            assert_eq!(observed_result, direct_result);
+            assert_eq!(observed_model, direct_model);
+            if let Some(model) = observed_model {
+                assert!(observed.check_xors(&model));
+            }
+            let snapshot = progress.snapshot();
+            assert_eq!(snapshot.phase, SolverProgressPhase::Complete);
+            assert_eq!(snapshot.decisions, observed.stats.decisions);
+            assert_eq!(snapshot.conflicts, observed.stats.conflicts);
+            assert_eq!(snapshot.restarts, observed.stats.restarts);
+        }
     }
 
     #[test]
