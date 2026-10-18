@@ -39,6 +39,9 @@ def when(iso):
 LEGACY = "dp/slot-00002/1789311001-0000000000000000.bin"
 ORBIT = ("dp/slot-00140/a8b4133d5c5f414ebd1337f15603588d-0000000000791392-"
          "9c6a7dae1862f8393fe196b0c4f890e5e01f7f45615be019252b86ca3e429914.bin")
+HASH_SPAN_BODY = bytes(range(32)) * 2
+HASH_SPAN = ("dp/slot-00002/" + hashlib.sha256(HASH_SPAN_BODY).hexdigest()
+             + "-0000000000000000-0000000000000064.bin")
 
 
 class FakeS3:
@@ -70,6 +73,16 @@ class KeyShapes(unittest.TestCase):
         # object with no found_at was skipped without a word.
         self.assertIsNotNone(dp_ingest.foundAt(ORBIT, when("2026-09-17T18:47:34")))
 
+    def test_hash_span_key_uses_last_modified_and_checks_body(self):
+        t = when("2026-10-10T00:00:00")
+        self.assertEqual(dp_ingest.foundAt(HASH_SPAN, t), int(t.timestamp()))
+        self.assertTrue(dp_ingest.hashSpan(HASH_SPAN, len(HASH_SPAN_BODY),
+                                           hashlib.sha256(HASH_SPAN_BODY).hexdigest()))
+        with self.assertRaisesRegex(ValueError, "sha256"):
+            dp_ingest.hashSpan(HASH_SPAN, len(HASH_SPAN_BODY), "00" * 32)
+        with self.assertRaisesRegex(ValueError, "extent"):
+            dp_ingest.hashSpan(HASH_SPAN, len(HASH_SPAN_BODY) - 32)
+
     def test_envelopes_and_foreign_keys_are_not_points(self):
         for key in (ORBIT + ".json", "dp/slot-00002/notes.txt", "ckpt/slot-00002.ck"):
             self.assertIsNone(dp_ingest.foundAt(key, when("2026-09-17T18:47:34")), key)
@@ -87,6 +100,16 @@ class Listing(unittest.TestCase):
         self.assertEqual([o[0] for o in objects], [LEGACY, ORBIT])
         self.assertEqual([o[1] for o in objects], [200, 100])
         self.assertEqual(unrecognised, [])
+
+    def test_hash_span_listing_quarantines_bad_extent(self):
+        objects, unrecognised = self.objects([
+            (HASH_SPAN, len(HASH_SPAN_BODY), when("2026-10-10T00:00:00")),
+            (HASH_SPAN.replace("0000000000000064", "0000000000000096"),
+             len(HASH_SPAN_BODY), when("2026-10-10T00:00:00")),
+        ])
+        self.assertEqual([o[0] for o in objects], [HASH_SPAN])
+        self.assertEqual(unrecognised, [HASH_SPAN.replace("0000000000000064",
+                                                      "0000000000000096")])
 
     def test_an_unreadable_key_is_reported_not_skipped(self):
         objects, unrecognised = self.objects([

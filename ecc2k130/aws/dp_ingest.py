@@ -132,6 +132,9 @@ LEGACY_KEY_RE = re.compile(r"^dp/(slot-\d+)/(\d+)-(\d+)\.bin$")
 # ecc2k-seed-orbit-v1 naming.  It carries a content hash instead of a clock, so
 # found_at is the object's own LastModified.
 ORBIT_KEY_RE = re.compile(r"^dp/(slot-\d+)/([0-9a-f]{32})-(\d+)-([0-9a-f]{64})\.bin$")
+# An older uploader put the body digest first and bounded its byte span with
+# decimal offsets. Verify both claims before accepting any of its raw DP32 rows.
+HASH_SPAN_KEY_RE = re.compile(r"^dp/(slot-\d+)/([0-9a-f]{64})-(\d{16})-(\d{16})\.bin$")
 # Written beside a record object by the contract path; metadata, not points.
 ENVELOPE_SUFFIX = ".bin.json"
 # Objects one pass will take before it stops to publish what it knows. Sized
@@ -158,7 +161,7 @@ def workerId(key):
 def foundAt(key, lastModified=None):
     """Upload time of one dp object, or None if the key is not a dp object.
 
-    The two key shapes carry it differently and the difference is the whole
+    The key shapes carry it differently and the difference is the whole
     reason this function exists: the legacy name has the uploader's clock in
     it, the orbit name has a content hash instead, and reading only the first
     shape is how five hours of a 133-worker fleet went into `dp/` without a
@@ -167,9 +170,22 @@ def foundAt(key, lastModified=None):
     m = LEGACY_KEY_RE.match(key)
     if m:
         return int(m.group(2))
-    if ORBIT_KEY_RE.match(key) and lastModified is not None:
+    if (ORBIT_KEY_RE.match(key) or HASH_SPAN_KEY_RE.match(key)) and lastModified is not None:
         return int(lastModified.timestamp())
     return None
+
+
+def hashSpan(key, size, digest=None):
+    """Validate a hash-span object's declared byte extent and optional body digest."""
+    m = HASH_SPAN_KEY_RE.match(key)
+    if m is None:
+        return False
+    start, end = int(m.group(3)), int(m.group(4))
+    if end <= start or end - start != size or size % RECORD_BYTES:
+        raise ValueError("%s: hash-span extent does not match whole DP32 records" % key)
+    if digest is not None and digest != m.group(2):
+        raise ValueError("%s: body does not match hash-span sha256" % key)
+    return True
 
 
 def decode(record):
@@ -228,6 +244,11 @@ def s3Objects(s3, bucket, prefix="dp/"):
             if when is None:
                 if not key.endswith(ENVELOPE_SUFFIX):
                     unrecognised.append(key)
+                continue
+            try:
+                hashSpan(key, item["Size"])
+            except ValueError:
+                unrecognised.append(key)
                 continue
             records = item["Size"] // RECORD_BYTES
             if records:
@@ -846,6 +867,7 @@ def ingestObject(conn, s3, bucket, key, found_at, *, replica_id=None,
         stream.close()
     object_bytes = len(body)
     object_sha256 = hashlib.sha256(body).hexdigest()
+    hashSpan(key, object_bytes, object_sha256)
     object_version_id = response.get("VersionId")
     if body[:len(DP_MAGIC_V2)] == DP_MAGIC_V2:
         # Read as 32-byte records its header would be stored as a point and
