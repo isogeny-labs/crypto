@@ -432,9 +432,19 @@ in the subgroup.  `fiber_scale=d` (coset only) uses the subgroup
 `prime-abscissa:size=B,subgroup=1` clears the cofactor: the base is
 `[h]P` for the smallest-abscissa points (the clearing is charged), so every
 base point lies in `E[r]`.  `binary-subspace:dimension=d,trace_kernel=1`
-spans the subspace inside `ker Tr`, which needs `Tr(a) = 0`; every base point
-is then in `2E`.  Both keep the targets' subgroup closed under pair sums,
-which a raw base does not (`research/isogeny_conductor_gap_round5_20261012/`).
+spans the subspace inside `ker Tr` when `Tr(a) = 0`.  When `Tr(a) = 1` it
+builds the affine coset `t₀ + span(ker Tr basis)` with `Tr(t₀) = 1`.  Either
+way every base point is in `2E`.  An affine base has no `subspace_basis`: only
+`descent-algebraic` (plain, not `slots`) and the pair-table oracles take it.
+Both options keep the targets' subgroup closed under pair sums, which a raw
+base does not (`research/isogeny_conductor_gap_round5_20261012/`,
+`research/isogeny_conductor_gap_round6_20261018/`).
+
+Solver `f4-f2-early` (parameter `free`, default 8) runs `f4-f2` until the
+basis's degree-1 elements leave at most `free` variables unpinned.  It then
+enumerates that affine space and checks every point against the system.  It
+finds the same solutions as `f4-f2`, and its `ops` include the extraction
+work.
 
 `koblitz-standard-subspace:dimension=d` with
 `pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N` runs
