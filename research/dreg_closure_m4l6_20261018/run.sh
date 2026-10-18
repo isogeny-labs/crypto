@@ -75,6 +75,7 @@ deg5)
   TMO5=${TMO5:-144000}; NDRAWS=${DEG5_DRAWS:-4}
   cells="19"; [ "${4:-}" = C2 ] && cells="19 21"
   for n in $cells; do
+    if [ "$n" = 19 ] && [ "$LIMIT" -lt 200000000000 ]; then log "C1 (19,7): host limit $LIMIT < 200 GB, not attempted"; continue; fi
     if [ "$n" = 21 ] && [ "$LIMIT" -lt 420000000000 ]; then log "C2 (21,7): host limit $LIMIT < 420 GB, not attempted"; continue; fi
     f=$SCALE/m3-$n-7.jsonl
     for k in $(grep -v '"satisfiable"' "$REPO/$f" | grep -o '"draw":[0-9]*' | cut -d: -f2 | head -n "$NDRAWS"); do
