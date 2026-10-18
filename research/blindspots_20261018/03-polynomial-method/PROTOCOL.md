@@ -324,3 +324,57 @@ and PDF (research-visuals skill) are written by the assessing stage.
 8. **Tightenings** beyond the design: the 1.5 margin on ADVANCES; the 8
    random-dense null per cell; the sensitivity control; the published-exponent
    band; the `t = 11N+1` sensitivity row as descriptive only.
+
+## Card plan (committed before any measured run)
+
+Filled from development timings on this host (shared 4-vCPU, one lane at a
+time on the instrument); the development runs used the committed draws and
+the instrument at `9cb0ba30...` (sha256 of the source, bound in every card) and
+are not measurements: the cards re-run everything and write `raw/`.
+Binaries: `target/blindspots-03/bin/b03` and `.../b05`, built by card 01,
+removed by card 09.
+
+`draws.tsv` check (before the cards): 10 cells x 12 rows (6 `S_3`, 4 `S_4`),
+`idx` 0-7 have `solutions` 0 and `idx` 8-11 have `solutions` > 0 in every cell;
+the FES full scan reproduces `solutions` 0 on all 48 unsatisfiable `S_3`
+targets (the `fes` mode exits 2 on a mismatch) and the parity of the recorded
+`solutions` of the satisfiable targets equals the instrument's `k = 0` truth in
+`s3-12`, `s3-16`, `s4-13`.
+
+| card | content | development time | timeouts (sum) |
+|---|---|---|---|
+| 01 | build `b03`, `b05`; selftest, `asym`, `sens`; counted model rows (`poly`, no `--real`) for all 10 cells | 4 s build, < 2 s per cell | 365 s |
+| 02 | FES full scans (8 descended + 8 random dense each) on `s3-12 .. s3-28`; `crossover` to N = 400 | < 11 s; 99 s | 340 s |
+| 03 | FES full scans on `s3-32` | 160 s | 420 s |
+| 04 | F4 (item 05 `grevlex`) on `s3-12 .. s3-24` (8 targets), `s3-28` (targets 0-1, 80 s cap per job) | < 100 s; cap | 480 s |
+| 05 | F4 on `s3-32` (target 0, 90 s cap) and on the four `S_4` cells (8 targets) | cap; < 45 s | 410 s |
+| 06 | positive control 1 (real `dinur`, `lptwy`, paper `t`, hash sizes k = 0..N) on `s3-16` | 230 s | 450 s |
+| 07 | positive control 1 on `s4-13`; on `s3-12` seeds 1 to 9 | 40 s; 12 s per seed | 370 s |
+| 08 | positive control 1 on `s3-12`, seeds 10 to 18 | 12 s per seed | 270 s |
+| 09 | positive control 1 on `s3-12`, seeds 19 to 26; `b03 summarize --dir raw`; remove binaries | 12 s per seed | 280 s |
+
+Estimated CPU total about 20 minutes against the 2 CPU-hour budget; every card
+sums to under 9 minutes of timeouts. The F4 jobs carry the same caps and
+status words as item 05 (`timelimit`, `memcap`, `colscap`); a capped cell is a
+named row, not a failure of the card.
+
+Details that tighten or clarify the frozen text (none loosens it):
+
+9. **Positive control 1 sample.** The odd-parity requirement is read as 200
+   hashed systems, each checked by both polynomial-method arms: `summarize`
+   requires 400 odd real calls (it printed 200 in the first version). The
+   instrument's `--real-rand 8` gives the protocol's eight random dense
+   systems per cell on `s3-16` and `s4-13`; on `s3-12` the control is repeated
+   over 26 seeds (`--seed`, which changes the random systems and the
+   Valiant-Vazirani hash equations; the four satisfiable targets are the same)
+   because the descended satisfiable targets have mostly an even number of
+   solutions (the odd share is about 7%), and 200 odd hashed systems cannot be
+   reached otherwise within the budget. `--no-model` suppresses the duplicate
+   counted-model rows in those runs (the model rows come from card 01 only).
+10. **Cell labels.** `s4-13` is the cell `c7-2-3` (`N = 3l + n = 13`); the
+    cell `c13-4-3` has `N = 25`.
+11. **F4 caps.** `s3-28` and `s3-32` are expected to hit the item 05 time cap
+    (item 05 recorded the same for `c31-15-2`); they are reported with the cap
+    named, and BLOCKED applies to F4 at those cells.
+12. **No use of the F4 interior.** The F4 arm is the committed instrument
+    unchanged (source sha256 `f21a761b...`).
