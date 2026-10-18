@@ -1,0 +1,49 @@
+name: Fall-degree bounds Lean checks
+# Re-derives the E3/E4/E6 scoring in Lean on every change to the study:
+# Data.lean must be what examples/fall_degree_lean_data.rs generates from the
+# committed records, the E5 replay must still match the Sage records, and
+# Verdict.lean must close by kernel `decide`. See
+# research/fall_degree_bounds_20261008/RESULTS.md.
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/fall-degree-bounds-lean.yml'
+      - 'examples/fall_degree_lean_data.rs'
+      - 'examples/hky_last_fall_degree.rs'
+      - 'research/fall_degree_bounds_20261008/**'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fall-degree-bounds-lean.yml'
+      - 'examples/fall_degree_lean_data.rs'
+      - 'examples/hky_last_fall_degree.rs'
+      - 'research/fall_degree_bounds_20261008/**'
+  workflow_dispatch:
+
+jobs:
+  lean:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: research/fall_degree_bounds_20261008
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install Lean (toolchain pinned by lean/lean-toolchain)
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o /tmp/elan-init.sh
+          sh /tmp/elan-init.sh -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Data.lean regenerated from the records; E5 replay against Sage
+        run: |
+          cargo build --release --example fall_degree_lean_data --example hky_last_fall_degree
+          ../../target/release/examples/fall_degree_lean_data . /tmp/Data.lean
+          diff -u lean/FallDegree/Data.lean /tmp/Data.lean
+          for f in runs/n{8,10,12,14}_subfield_*.jsonl; do
+            ../../target/release/examples/hky_last_fall_degree replay "$f"
+          done | grep -c '"agree":true' | grep -qx 32
+      - name: lake build (Rule, Verdict by decide)
+        working-directory: research/fall_degree_bounds_20261008/lean
+        run: lake build
