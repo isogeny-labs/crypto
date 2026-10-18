@@ -48,7 +48,9 @@ closed on paper while drafting.
   plus a point-count lemma closes K-283 as well. The route is now closed for ECC2K-130, K-163, K-233
   and K-283. K-409 and K-571 need bases of genus $>= 5$.
 + *Random-b binary curves: only the cover question is new here.* A random-b curve does not lift to
-  a Q-curve, so the Koblitz mechanisms do not transfer (derived sketch).
+  a Q-curve, so the Koblitz mechanisms do not transfer (derived sketch). LMFDB shows genus-5
+  Jacobians realising $op("Res")_(FF_32\/FF_2)(E)$ for $t_5 in {-9, -7, -5, -3}$, where GHS gives
+  genus 16 (sourced). Whether an explicit map makes them usable is open (L10).
 
 = The ten leads
 
@@ -60,8 +62,8 @@ closed on paper while drafting.
   [*\#*], [*family*], [*lead*], [*status*], [*first experiment*], [*kill criterion*],
   [L8], [Koblitz], [Étale route: $D\/FF_2$ with an order-$n$ automorphism and an $FF_2$-map to $E$; its twist contains $E times T_n$, genus $1 + n(g_0 - 1)$], [measured ($g_0 <= 3$; genus 4 screened): hits at $n = 3, 5$; closed for ECC2K-130, K-163, K-233, K-283], [genus-5 bases with $409 | P_B (lambda)$, $op("ord") lambda <= 3$, for K-409], [no genus-5 $B$ passes at $n = 409$],
   [L6], [Koblitz], [Modular twists: $(f_E ⊗ chi) mod 2 ∼ T_n$ for every $n$], [derived], [smallest curve containing $A_(f ⊗ chi)$ for $n = 3, 5, 7, 11$], [genus grows faster than $c(n) n$],
-  [L10], [binary], [Genus-$n$ Jacobians realising $op("Res")(E)$, beyond GHS], [proposed], [all genus-3 curves over $FF_2$, which traces $t_3$; genus-5 search for point counts $3, 5, 9, 17, 33 - 5 t_5$], [no genus-5 realisation],
-  [L9], [Koblitz and binary], [Certified lower bounds on the cover genus], [derived (partial)], [Howe's test on $T_n$; manypoints (32, 5); point-count positivity], [(produces bounds)],
+  [L10], [binary], [Genus-$n$ Jacobians realising $op("Res")(E)$, beyond GHS], [sourced at $n = 3, 5$ (LMFDB: genus-5 Jacobians for $t_5 in {-9, -7, -5, -3}$)], [explicit map $C -> E$ over $FF_32$ from the genus-5 census; then $n = 7$], [no explicit map, or none at $n = 7$],
+  [L9], [Koblitz and binary], [Certified lower bounds on the cover genus], [derived (partial); $(a = 0, n = 5)$ at genus 5 excluded (LMFDB)], [Howe's test on $T_n$; point-count positivity], [(produces bounds)],
   [L1], [prime], [Coefficient collapse plus Farey bases], [derived], [Probes B/C with the collapsed and Farey lattices, $m = 2, 3, 4$, against random-coefficient controls], [gain under $1.25 times$ at $m = 4$],
   [L2], [prime], [Eisenstein–Farey bases for $j = 0$], [derived], [same harness, secp256k1-shaped toys], [invariance lost under shifts],
   [L7], [Koblitz], [Klein family: $ZZ\/n$ covers of $E$ ramified at one place of degree $op("ord")_n (2)$], [derived ($n = 3$)], [$L(E, chi, X)$ for $n = 7, 31, 73, 127$], [no hit at 7 or 31],
@@ -180,18 +182,22 @@ time.
 
 - `identity.certificate/v1` records are owed for four claims: the L1/L2 counts, the Klein
   L-polynomial identity, the Eichler–Shimura twist, and the $a = 1$ obstruction.
-- LMFDB returned nine classes. $T_3$ and $T_5$, for $a = 0$ and $a = 1$, are simple, not
-  principally polarisable, and contain no Jacobian. At $n = 3$, $op("Res")_(FF_8\/FF_2)(E)$ contains
-  a genus-3 Jacobian exactly for $t_3 in {-5, -3, -1, 1}$, the traces the point counts allow. The
-  class for $t_3 = -5$ ($a = 1$ Koblitz) contains one Jacobian, the Klein quartic. So $n = 3$
-  cannot separate covers from GHS, and L10 starts at $n = 5$.
-- Still blocked by a captcha: the nine admissible $n = 5$ classes, the two $n = 7$ trace-zero
-  classes, and $t_3 = 5$ (already excluded by point counts).
+- LMFDB returned fourteen classes.
+  - $T_3$ and $T_5$, for $a = 0$ and $a = 1$, are simple, not principally polarisable, and contain
+    no Jacobian.
+  - At $n = 3$, $op("Res")_(FF_8\/FF_2)(E)$ contains a genus-3 Jacobian exactly for
+    $t_3 in {-5, -3, -1, 1}$, the traces the point counts allow. The class for $t_3 = -5$ ($a = 1$
+    Koblitz) contains one Jacobian, the Klein quartic.
+  - At $n = 5$, $op("Res")_(FF_32\/FF_2)(E)$ contains genus-5 Jacobians for
+    $t_5 in {-9, -7, -5, -3}$ (1, 1, 1 and 4 of them), so L10's realisations exist at $n = 5$, where
+    GHS gives genus 16. It contains none for $t_5 = -11$, the $a = 0$ Koblitz curve: $(a = 0, n = 5)$
+    is not realisable at genus 5. The open step for L10 is an explicit map $C -> E$ (Dragutinović's
+    genus-5 census).
+- Still blocked by a captcha: $t_5 in {-1, 1, 3, 5}$, the two $n = 7$ trace-zero classes, and
+  $t_3 = 5$ (already excluded by point counts).
 - L8 covers bases of genus $<= 3$, and genus 4 by the screen. Not yet run: genus-5 and larger bases
   (K-409, K-571); small-$n$ hits of twisted ($lambda = -1$) genus-3 covers; ramified and non-cyclic covers. The
   $n = 5$ genus-11 cover has no equations or certificate yet.
-- The manypoints bound for $(q, g) = (32, 5)$ is unchecked. It decides whether $(a = 0, n = 5)$ can
-  be realised at genus 5; the étale route gives genus 11.
 - The novelty audit against the cover-attack literature (Diem, Scholten, Hess, Ekedahl–Serre,
   Elkies) is owed before any of L6–L10 is called new.
 - The L(1/2) budget is optimistic: it uses the hyperelliptic constant and drops o(1). General curves

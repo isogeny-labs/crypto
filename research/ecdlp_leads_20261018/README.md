@@ -50,10 +50,10 @@ listed so that nobody spends budget on them.
   `docs/ECDLP_ATTACK_MATRIX.md`,
   `research_notes/Index calculus leads next steps/literature_frontier.md`,
   and `crypto-autoresearcher:ideas/idea_registry.tsv` (ECDLP-IDEA-002 to -436).
-- **LMFDB** (`av_fq_isog` API, 2026-10-18). Nine isogeny classes over F₂
-  returned data. The first four came from the API; the five `3.2.*` rows came
-  through a second fetch after the API served a captcha. Every row reports the
-  expected number of F₂-points: 2 or 4 for T₃ and T₅, and 3 for each Res(E).
+- **LMFDB** (`av_fq_isog` API, 2026-10-18). Fourteen isogeny classes over F₂
+  returned data, across three sessions of fetching with captchas in between.
+  Every row reports the expected number of F₂-points: 2 or 4 for T₃ and T₅,
+  and 3 for each Res(E).
 
   | label | object | simple | principally polarisable | Jacobians |
   |:--|:--|:--|:--|--:|
@@ -66,11 +66,19 @@ listed so that nobody spends budget on them.
   | `3.2.a_a_b` | Res_{F₈/F₂}(E), t₃ = −1 | yes | yes | 2 |
   | `3.2.a_a_ab` | Res_{F₈/F₂}(E), t₃ = 1 | yes | yes | 1 |
   | `3.2.a_a_ad` | Res_{F₈/F₂}(E), t₃ = 3 | yes | yes | 0 |
+  | `5.2.a_a_a_a_l` | Res_{F₃₂/F₂}(E), t₅ = −11 (Koblitz a = 0) | no | yes | 0 |
+  | `5.2.a_a_a_a_j` | Res_{F₃₂/F₂}(E), t₅ = −9 | yes | yes | 1 |
+  | `5.2.a_a_a_a_h` | Res_{F₃₂/F₂}(E), t₅ = −7 | yes | yes | 1 |
+  | `5.2.a_a_a_a_f` | Res_{F₃₂/F₂}(E), t₅ = −5 | yes | yes | 1 |
+  | `5.2.a_a_a_a_d` | Res_{F₃₂/F₂}(E), t₅ = −3 | yes | yes | 4 |
 
-  Still owed, all blocked by the captcha: `3.2.a_a_af` (t₃ = 5, the a = 0
-  Koblitz curve, already excluded by point counts), the nine
-  `5.2.a_a_a_a_*` classes that point counts allow (odd t₅ ≤ 5), and the n = 7 trace-zero classes
-  `6.2.ab_ab_d_ab_af_h` and `6.2.b_ab_ad_ab_f_h`.
+  The `5.2.*` rows came from the scheduled retry at 21:00 UTC. Still owed,
+  blocked by the captcha after those five:
+  - `3.2.a_a_af` (t₃ = 5, the a = 0 Koblitz curve, already excluded by point
+    counts);
+  - `5.2.a_a_a_a_{b,ab,ad,af}` (t₅ = −1, 1, 3, 5);
+  - the n = 7 trace-zero classes `6.2.ab_ab_d_ab_af_h` and
+    `6.2.b_ab_ad_ab_f_h`.
 - **Computed.** Frobenius cyclotomic-coset sizes, `ord_n(2)`. Trace-zero
   L-polynomials for n = 3, 5, 7. The rho and L(1/2) budget arithmetic in
   `cover-genus-budget.csv`, via the awk lines in the "Reproduce" section.
@@ -118,8 +126,10 @@ listed so that nobody spends budget on them.
 3. **Random-b binary curves: only the cover question is new here.** A
    random-b curve does not lift to a curve over Q, so the modular mechanism
    behind the Koblitz leads is unavailable *(derived sketch)*. The one new
-   binary lead (L10) asks whether a genus-n Jacobian ever realises the Weil
-   restriction beyond the n = 3 cases that GHS already covers.
+   binary lead (L10) asks whether a genus-n Jacobian realises the Weil
+   restriction beyond the n = 3 cases that GHS already covers. LMFDB says
+   yes at n = 5 for t₅ ∈ {−9, −7, −5, −3}, where GHS gives genus 16
+   *(sourced)*. Whether an explicit map makes them usable is open.
 
 ## The ten leads
 
@@ -128,10 +138,10 @@ defined above.
 
 | # | family | lead | status | first experiment | kill criterion | if it works |
 |:--|:--|:--|:--|:--|:--|:--|
-| L8 | Koblitz | Étale route: curve D/F₂ with an order-n automorphism and an F₂-map to E; its twist contains E × T_n, genus 1 + n(g₀ − 1) | **measured, every base of genus ≤ 3; genus 4 screened:** hits at n = 3 and n = 5 only (one plane quartic gives a genus-11 cover carrying T₅, a = 0); **closed for ECC2K-130, K-163, K-233 and K-283** | next: genus-5 bases with 409 ∣ P_B(λ), ord λ ≤ 3, for K-409 | no genus-5 B passes the screen at n = 409 | the only structured family left inside the L(1/2) budget for K-409 and K-571, with explicit maps |
+| L8 | Koblitz | Étale route: curve D/F₂ with an order-n automorphism and an F₂-map to E; its twist contains E × T_n, genus 1 + n(g₀ − 1) | **measured, every base of genus ≤ 3; genus 4 screened:** hits at n = 3 and n = 5 only (one plane quartic gives a genus-11 cover carrying T₅, a = 0); **closed for ECC2K-130, K-163, K-233 and K-283** | next: genus-5 bases with 409 ∣ P_B(λ), ord λ ≤ 3, for K-409 (Dragutinović's genus-5 census) | no genus-5 B passes the screen at n = 409 | the only structured family left inside the L(1/2) budget for K-409 and K-571, with explicit maps |
 | L6 | Koblitz | Modular twists: (f_E ⊗ χ) mod 2 ≅ T_n up to isogeny, for every n | derived | find the smallest curve whose Jacobian contains A_{f⊗χ} for n = 3, 5, 7, 11 (modular quotients, Fermat quotients of level 7ℓ, Ekedahl–Serre curves) | minimal genus grows faster than c(n)·n | an explicit, computable transfer of T_n into a Jacobian over F₂ |
-| L10 | random-b binary | Genus-n Jacobians realising Res(E), beyond GHS | proposed | n = 3: all genus-3 curves over F₂, which traces t₃ are realised. n = 5: genus-5 curves with point counts 3, 5, 9, 17, 33 − 5t₅ | no genus-5 realisation for any t₅ | a genus-O(n) family would make prime-degree binary curves subexponential |
-| L9 | Koblitz and binary | Certified lower bounds on the cover genus | derived (partial) | Howe's principal-polarisability test on T_n for deployed n; the manypoints (q = 32, g = 5) bound; point-count positivity | (produces bounds) | closes deployed sizes for good where the bound exceeds the budget |
+| L10 | random-b binary | Genus-n Jacobians realising Res(E), beyond GHS | **sourced at n = 3 and 5:** genus-5 Jacobians realise Res(E) for t₅ ∈ {−9, −7, −5, −3} (LMFDB) | take the genus-5 curves (Dragutinović census) and compute an explicit map C → E over F₃₂; then n = 7 | no explicit map; or no realisation at n = 7 | a genus-O(n) family would make prime-degree binary curves subexponential |
+| L9 | Koblitz and binary | Certified lower bounds on the cover genus | derived (partial); (a = 0, n = 5) at genus 5 excluded by LMFDB | Howe's principal-polarisability test on T_n for deployed n; point-count positivity | (produces bounds) | closes deployed sizes for good where the bound exceeds the budget |
 | L1 | prime | Coefficient collapse plus Farey bases | derived | extend Probes B/C with the 3-term collapsed lattice and Farey parametrisation, m = 2, 3, 4, against random-coefficient controls | reach gain under 1.25× at m = 4 | a curve-specific improvement to the prime decomposition oracle |
 | L2 | prime | Eisenstein–Farey bases for j = 0 | derived | same harness on secp256k1-shaped toys | invariance lost under shifts | 3× fewer columns and 9× less linear algebra at equal reach |
 | L7 | Koblitz | Klein-quartic family: Z/n covers of E ramified at one place of degree ord_n(2) | derived (n = 3) | Hecke L-functions L(E, χ, X) for n = 7, 31, 73, 127 | no hit at n = 7 or 31 | structural; over budget for deployed n |
@@ -409,7 +419,7 @@ These are the facts so far *(derived)*:
   | (0, 3) | −6 | impossible |
   | (1, 3) | 24 | realised by Klein |
   | (1, 5) | −22 | impossible |
-  | (0, 5) | 88 | the Serre bound for (q = 32, g = 5); open |
+  | (0, 5) | 88 | impossible: the Serre bound for (q = 32, g = 5), and LMFDB lists no Jacobian in `5.2.a_a_a_a_l` *(sourced)* |
   | (0, 7) | 38 | open |
   | (1, 7) | 220 | open |
 
@@ -445,13 +455,21 @@ and has no modular-curve parametrisation.
   covers therefore exist for every curve the counts permit, random-b curves
   included. GHS already gives genus 3 or 4 there, so n = 3 cannot separate
   the two routes. The lead lives at n ≥ 5.
-- n = 5: positivity allows t₅ ≤ 5 (33 − 5t₅ ≥ 3). Query `5.2.a_a_a_a_*`
-  for each odd t₅ in that range. Then search genus-5 curves (all
-  hyperelliptic, sampled trigonal and canonical) for point counts
-  3, 5, 9, 17, 33 − 5t₅.
-
-A genus-5 hit would be the first known genus-n cover of a random-b Weil
-restriction beyond n = 3.
+- n = 5 (*sourced, LMFDB*). Positivity allows odd t₅ ≤ 5 (33 − 5t₅ ≥ 3).
+  - Res_{F₃₂/F₂}(E) is isogenous to the Jacobian of a genus-5 curve over F₂
+    for t₅ ∈ {−9, −7, −5, −3}: one, one, one and four Jacobians.
+  - It is not for t₅ = −11, the a = 0 Koblitz curve, whose Res is not
+    simple.
+  - t₅ ∈ {−1, 1, 3, 5} is still blocked by the captcha.
+  - So genus-n realisations of random-b Weil restrictions exist at n = 5,
+    where GHS gives genus 2^(m−1) = 16.
+- What is still open is whether they are usable. The isogeny is known only
+  to exist (Tate). An attack needs the genus-5 curve, an explicit map
+  C → E over F₃₂, and its push-forward on divisors. The next steps are:
+  - pull the genus-5 curves from Dragutinović's census of genus-5 curves
+    over F₂ (arXiv:2202.07809) or from LMFDB, and compute the map;
+  - then ask whether the realised traces form a family that continues at
+    n = 7.
 
 ## Closed on paper while drafting
 
@@ -516,10 +534,13 @@ restriction beyond n = 3.
   2. L_Klein = L(Res_{F₈/F₂} E_{a=1});
   3. the Eichler–Shimura twist identity (L6);
   4. the a = 1 point-count obstruction (L9).
-- LMFDB queries for the nine admissible `5.2.a_a_a_a_*` classes, the two n = 7
-  trace-zero classes in dimension 6, and `3.2.a_a_af` were blocked by a
-  captcha. The other n = 3 classes are in the table under "Method and
-  sources".
+- LMFDB queries still blocked by the captcha:
+  - `5.2.a_a_a_a_{b,ab,ad,af}` (t₅ = −1, 1, 3, 5);
+  - the two n = 7 trace-zero classes in dimension 6;
+  - `3.2.a_a_af`.
+
+  Five `5.2.*` classes returned data on the scheduled retry. They are in the
+  table under "Method and sources".
 - L8 covers bases of genus ≤ 3, and genus 4 by the screen. Still not run:
   - genus-5 and larger bases, needed for K-409 and K-571;
   - the twisted λ = −1 genus-3 covers, which were checked only for
@@ -527,9 +548,9 @@ restriction beyond n = 3.
   - ramified covers (L7) and non-cyclic covers.
 - The n = 5 genus-11 cover is derived from the measured factor. Its equations
   have not been written down, and it has no identity certificate.
-- The manypoints entry for (q = 32, g = 5) has not been checked. It decides
-  whether (a = 0, n = 5) can be realised at genus 5. The étale route gives
-  genus 11.
+- (a = 0, n = 5) at genus 5 is settled. LMFDB lists no Jacobian in
+  `5.2.a_a_a_a_l` *(sourced)*, so the smallest known realisation of T₅ for
+  a = 0 is the genus-11 étale cover.
 - Novelty audit: not done against the cover-attack literature. Check Diem and
   Scholten's trace-zero cover reports, Hess's generalised GHS, Ekedahl–Serre,
   and Elkies's Klein-quartic survey before any of L6–L10 is called new.
@@ -582,4 +603,5 @@ etale_search/target/release/etale-search s4     # genus-4 screen at n = 283, 409
 - Ekedahl, Serre. Exemples de courbes algébriques à jacobienne complètement décomposable. C. R. Acad. Sci. 317, 1993.
 - Galbraith, Granger, Merz, Petit. On index calculus algorithms for subfield curves. ePrint 2020/1315.
 - Xarles. A census of all genus 4 curves over the field with 2 elements. arXiv:2007.07822, 2020.
+- Dragutinović. Computing binary curves of genus five. J. Pure Appl. Algebra 228(4), 2024; arXiv:2202.07809.
 - LMFDB, abelian varieties over finite fields, https://www.lmfdb.org/Variety/Abelian/Fq/ (queried 2026-10-18).
