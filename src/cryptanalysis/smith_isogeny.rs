@@ -940,6 +940,1734 @@ impl SmithData {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Mumford divisors on the imaginary model `y^2 = F(x)`, `deg F = 7`.
+
+/// Reduced divisor `(u, v)`: `u` monic, `deg u <= 3`, `deg v < deg u`,
+/// `v^2 = F mod u`; it stands for the class `[D - deg(u) infinity]`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Mum {
+    pub u: Poly,
+    pub v: Poly,
+}
+
+/// The curve `H: y^2 = F(x)` with `deg F = 7` (genus 3, `infinity` a
+/// rational Weierstrass point) and Cantor's arithmetic on `J_H(F_p)`.
+#[derive(Clone, Debug)]
+pub struct Hyp {
+    pub p: u64,
+    pub f: Poly,
+}
+
+impl Hyp {
+    pub fn new(f: &[u64], p: u64) -> Hyp {
+        let mut f = f.to_vec();
+        ptrim(&mut f);
+        assert_eq!(pdeg(&f), 7, "Hyp is the imaginary model deg F = 7");
+        Hyp { p, f }
+    }
+    pub fn zero(&self) -> Mum {
+        Mum {
+            u: vec![1],
+            v: Vec::new(),
+        }
+    }
+    pub fn is_valid(&self, d: &Mum) -> bool {
+        let p = self.p;
+        pdeg(&d.u) <= 3
+            && d.u.last() == Some(&1)
+            && pdeg(&d.v) < pdeg(&d.u)
+            && prem(&psub(&pmul(&d.v, &d.v, p), &self.f, p), &d.u, p).is_empty()
+    }
+    pub fn neg(&self, d: &Mum) -> Mum {
+        Mum {
+            u: d.u.clone(),
+            v: pscale(&d.v, self.p - 1, self.p),
+        }
+    }
+    /// Cantor addition (composition and reduction).
+    pub fn add(&self, a: &Mum, b: &Mum) -> Mum {
+        let p = self.p;
+        let (d1, e1, e2) = pxgcd(&a.u, &b.u, p);
+        let (d, c1, c2) = pxgcd(&d1, &padd(&a.v, &b.v, p), p);
+        let s1 = pmul(&c1, &e1, p);
+        let s2 = pmul(&c1, &e2, p);
+        let s3 = c2;
+        let dd = pmul(&d, &d, p);
+        let u = pdivrem(&pmul(&a.u, &b.u, p), &dd, p).0;
+        let t1 = pmul(&pmul(&s1, &a.u, p), &b.v, p);
+        let t2 = pmul(&pmul(&s2, &b.u, p), &a.v, p);
+        let t3 = pmul(&s3, &padd(&pmul(&a.v, &b.v, p), &self.f, p), p);
+        let vv = pdivrem(&padd(&padd(&t1, &t2, p), &t3, p), &d, p).0;
+        let mut u = pmonic(&u, p);
+        let mut v = prem(&vv, &u, p);
+        while pdeg(&u) > 3 {
+            let num = psub(&self.f, &pmul(&v, &v, p), p);
+            let un = pmonic(&pdivrem(&num, &u, p).0, p);
+            let vn = prem(&pscale(&v, p - 1, p), &un, p);
+            u = un;
+            v = vn;
+        }
+        Mum { u, v }
+    }
+    pub fn sub(&self, a: &Mum, b: &Mum) -> Mum {
+        self.add(a, &self.neg(b))
+    }
+    pub fn mul(&self, mut n: u64, a: &Mum) -> Mum {
+        let mut r = self.zero();
+        let mut b = a.clone();
+        while n > 0 {
+            if n & 1 == 1 {
+                r = self.add(&r, &b);
+            }
+            b = self.add(&b, &b);
+            n >>= 1;
+        }
+        r
+    }
+    /// A random reduced divisor from `n` random points of `H` over `F_{p^j}`
+    /// (shape: the degrees `j` of the closed points, `sum j <= 3`).
+    pub fn random_shape(&self, shape: &[usize], rng: &mut SplitMix64) -> Option<Mum> {
+        let p = self.p;
+        let mut u: Poly = vec![1];
+        let mut v: Poly = Vec::new();
+        for &j in shape {
+            let mut r;
+            let mut tries = 0;
+            loop {
+                tries += 1;
+                if tries > 500 {
+                    return None;
+                }
+                let mut c: Poly = (0..j).map(|_| rng.below(p)).collect();
+                c.push(1);
+                if j == 1 {
+                    r = c;
+                    break;
+                }
+                if let Some(fs) = factor_squarefree(&c, p, rng) {
+                    if fs.len() == 1 {
+                        r = c;
+                        break;
+                    }
+                }
+            }
+            if pdeg(&pgcd(&r, &u, p)) > 0 {
+                return None;
+            }
+            let k = Fld::with_modulus(p, &if j == 1 { vec![0, 1] } else { r.clone() });
+            // x0 = z (j >= 2) or the rational root (j == 1)
+            let (x0, vr_of): (El, Box<dyn Fn(&El) -> Poly>) = if j == 1 {
+                (k.c(ng(r[0], p)), Box::new(|y: &El| vec![y[0]]))
+            } else {
+                (k.z(), Box::new(move |y: &El| y[..j].to_vec()))
+            };
+            let fx = k.eval(&self.f, &x0);
+            let y0 = k.sqrt(&fx)?;
+            if k.is_zero(&y0) {
+                return None;
+            }
+            let mut vr = vr_of(&y0);
+            ptrim(&mut vr);
+            // CRT: v = v (mod u), v = vr (mod r)
+            let (_, s, t) = pxgcd(&u, &r, p);
+            // s u + t r = 1
+            let num = padd(
+                &pmul(&pmul(&s, &u, p), &vr, p),
+                &pmul(&pmul(&t, &r, p), &v, p),
+                p,
+            );
+            let un = pmul(&u, &r, p);
+            v = prem(&num, &un, p);
+            u = un;
+        }
+        let d = Mum { u, v };
+        debug_assert!(self.is_valid(&d), "random_shape built an invalid divisor");
+        Some(d)
+    }
+    /// A random degree-3 divisor of a random closed-point shape.
+    pub fn random_generic3(&self, rng: &mut SplitMix64) -> Mum {
+        loop {
+            let shape: &[usize] = match rng.below(6) {
+                0 | 1 => &[3],
+                2 | 3 => &[2, 1],
+                _ => &[1, 1, 1],
+            };
+            if let Some(d) = self.random_shape(shape, rng) {
+                return d;
+            }
+        }
+    }
+    /// A random element of the Jacobian (sum of two random generic divisors).
+    pub fn random_class(&self, rng: &mut SplitMix64) -> Mum {
+        let a = self.random_generic3(rng);
+        let b = self.random_generic3(rng);
+        self.sub(&a, &b)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Closed points of P^2 and Galois-stable effective divisors.
+
+/// A closed point of `P^2` over `F_p` of degree `m`, stored without any
+/// choice of field: the projective coordinates (first nonzero one equal to 1)
+/// are polynomials of degree `< m` in a generator `c` of the residue field
+/// whose minimal polynomial is `mu`.  `c = kappa_1 + lambda kappa_2` with the
+/// least `lambda` that generates; the data is the same for every Frobenius
+/// conjugate, so equality of keys is equality of closed points.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct ClosedPt {
+    pub mu: Poly,
+    pub co: [Poly; 3],
+}
+
+impl ClosedPt {
+    pub fn degree(&self) -> usize {
+        self.mu.len() - 1
+    }
+}
+
+/// An effective `F_p`-rational divisor: closed point -> multiplicity.
+pub type Div = BTreeMap<ClosedPt, u32>;
+
+pub fn div_degree(d: &Div) -> usize {
+    d.iter().map(|(c, &m)| c.degree() * m as usize).sum()
+}
+
+pub fn div_add(a: &Div, b: &Div) -> Div {
+    let mut r = a.clone();
+    for (c, &m) in b {
+        *r.entry(c.clone()).or_insert(0) += m;
+    }
+    r
+}
+
+pub fn div_is_reduced(d: &Div) -> bool {
+    d.values().all(|&m| m == 1)
+}
+
+fn norm_pt3(k: &Fld, kap: &[El; 3]) -> Option<[El; 3]> {
+    normalize_proj(k, kap)
+}
+
+fn frob_pt(k: &Fld, kap: &[El; 3]) -> [El; 3] {
+    [k.frob(&kap[0]), k.frob(&kap[1]), k.frob(&kap[2])]
+}
+
+fn pt_eq(k: &Fld, a: &[El; 3], b: &[El; 3]) -> bool {
+    (0..3).all(|i| k.eq(&a[i], &b[i]))
+}
+
+/// Orbit length of a normalised point under the `p`-Frobenius.
+fn orbit_len(k: &Fld, kap: &[El; 3]) -> usize {
+    let mut cur = frob_pt(k, kap);
+    let mut m = 1;
+    while !pt_eq(k, &cur, kap) {
+        cur = frob_pt(k, &cur);
+        m += 1;
+        assert!(m <= 8, "Frobenius orbit longer than the field");
+    }
+    m
+}
+
+/// Coordinates of `target` in the `F_p`-basis `1, c, .., c^{m-1}`.
+fn solve_in_powers(k: &Fld, c: &El, m: usize, target: &El) -> Poly {
+    let p = k.p;
+    let d = k.d;
+    let mut cols: Vec<El> = Vec::with_capacity(m);
+    let mut pw_ = k.one();
+    for _ in 0..m {
+        cols.push(pw_);
+        pw_ = k.mul(&pw_, c);
+    }
+    let mut mat: Vec<Vec<u64>> = (0..d)
+        .map(|r| {
+            let mut row: Vec<u64> = cols.iter().map(|cc| cc[r]).collect();
+            row.push(target[r]);
+            row
+        })
+        .collect();
+    let piv = rref(&mut mat, p);
+    assert!(
+        !piv.contains(&m) && piv.len() == m,
+        "coordinate not in the F_p-span of the powers of c"
+    );
+    let mut out = vec![0u64; m];
+    for (ri, &pc) in piv.iter().enumerate() {
+        out[pc] = mat[ri][m];
+    }
+    ptrim(&mut out);
+    out
+}
+
+/// The closed point of a point `kappa` of `P^2(k)`.
+pub fn closed_pt_from(k: &Fld, kap: &[El; 3]) -> ClosedPt {
+    let p = k.p;
+    let kap = norm_pt3(k, kap).expect("zero point");
+    let m = orbit_len(k, &kap);
+    if m == 1 {
+        let co = [0, 1, 2].map(|a| {
+            let mut v = vec![kap[a][0]];
+            ptrim(&mut v);
+            v
+        });
+        return ClosedPt { mu: vec![0, 1], co };
+    }
+    // generator c = kappa_1 + lambda kappa_2 (kappa_0 = 1 or 0 as normalised)
+    let (a1, a2) = if k.is_zero(&kap[0]) && k.is_zero(&kap[1]) {
+        (2usize, 2usize)
+    } else {
+        (1usize, 2usize)
+    };
+    let mut c = k.zero();
+    let mut found = false;
+    for lam in 0..p {
+        let cand = k.add(&kap[a1], &k.scale(&kap[a2], lam));
+        // order of cand under Frobenius
+        let mut cur = k.frob(&cand);
+        let mut n = 1;
+        while !k.eq(&cur, &cand) && n <= 8 {
+            cur = k.frob(&cur);
+            n += 1;
+        }
+        if n == m {
+            c = cand;
+            found = true;
+            break;
+        }
+    }
+    assert!(found, "no generator of the residue field among kappa_1 + lambda kappa_2");
+    // mu = prod (Z - c^{p^i})
+    let mut mu: Vec<El> = vec![k.one()];
+    let mut ci = c;
+    for _ in 0..m {
+        let mut nm = vec![k.zero(); mu.len() + 1];
+        for (i, co) in mu.iter().enumerate() {
+            nm[i + 1] = k.add(&nm[i + 1], co);
+            nm[i] = k.sub(&nm[i], &k.mul(co, &ci));
+        }
+        mu = nm;
+        ci = k.frob(&ci);
+    }
+    let mu_fp: Poly = mu
+        .iter()
+        .map(|e| {
+            assert!(
+                (1..k.d).all(|t| e[t] == 0),
+                "minimal polynomial not over F_p"
+            );
+            e[0]
+        })
+        .collect();
+    let co = [0, 1, 2].map(|a| solve_in_powers(k, &c, m, &kap[a]));
+    ClosedPt { mu: mu_fp, co }
+}
+
+/// Group a Frobenius-stable multiset of points of `P^2(k)` into closed points.
+fn group_orbits(k: &Fld, pts: &[[El; 3]]) -> Result<Div, String> {
+    let mut left: Vec<([El; 3], u32)> = Vec::new();
+    for pt in pts {
+        let Some(n) = norm_pt3(k, pt) else {
+            return Err("zero point".into());
+        };
+        if let Some(e) = left.iter_mut().find(|e| pt_eq(k, &e.0, &n)) {
+            e.1 += 1;
+        } else {
+            left.push((n, 1));
+        }
+    }
+    let mut out = Div::new();
+    while let Some((pt, cnt)) = left.pop() {
+        let mut cur = frob_pt(k, &pt);
+        let mut m = 1u32;
+        while !pt_eq(k, &cur, &pt) {
+            let Some(i) = left.iter().position(|e| pt_eq(k, &e.0, &cur)) else {
+                return Err("multiset is not Frobenius stable".into());
+            };
+            if left[i].1 != cnt {
+                return Err("orbit multiplicities differ".into());
+            }
+            left.swap_remove(i);
+            cur = frob_pt(k, &cur);
+            m += 1;
+        }
+        let _ = m;
+        *out.entry(closed_pt_from(k, &pt)).or_insert(0) += cnt;
+    }
+    Ok(out)
+}
+
+// ---------------------------------------------------------------------------
+// psi on effective divisors and on classes.
+
+/// The image of a class: `psi(x) = [plus] - [minus]` in `Pic^0(C)`, both
+/// effective of degree 6.
+#[derive(Clone, Debug)]
+pub struct PsiImage {
+    pub plus: Div,
+    pub minus: Div,
+}
+
+/// Smith's map on `H: y^2 = F(x)` (`deg F = 7`) for one `(S, g)`.
+pub struct Smith {
+    pub sd: SmithData,
+    pub h: Hyp,
+    fields: std::cell::RefCell<HashMap<usize, Fld>>,
+    seed: u64,
+}
+
+impl Smith {
+    pub fn new(sd: SmithData) -> Smith {
+        assert!(sd.rational(), "Prop. 4 fails: no F_p-rational isogeny");
+        let h = Hyp::new(&sd.f, sd.p);
+        Smith {
+            sd,
+            h,
+            fields: Default::default(),
+            seed: 0x5EED_1018,
+        }
+    }
+    fn with_field<R>(&self, d: usize, f: impl FnOnce(&Fld) -> R) -> R {
+        let mut m = self.fields.borrow_mut();
+        let k = m
+            .entry(d)
+            .or_insert_with(|| Fld::new(self.sd.p, d, self.seed));
+        f(k)
+    }
+    /// `(F_p multiplications, inversions)` spent so far in all fields.
+    pub fn counters(&self) -> (u64, u64) {
+        let m = self.fields.borrow();
+        m.values().fold((0, 0), |a, k| {
+            let c = k.counters();
+            (a.0 + c.0, a.1 + c.1)
+        })
+    }
+    pub fn reset_counters(&self) {
+        for k in self.fields.borrow().values() {
+            k.reset_counters();
+        }
+    }
+    /// `psi(D)` for an effective squarefree affine divisor `(u, v)`.
+    pub fn psi_effective(&self, d: &Mum, rng: &mut SplitMix64) -> Result<Div, Degenerate> {
+        let p = self.sd.p;
+        let Some(factors) = factor_squarefree(&d.u, p, rng) else {
+            return Err(Degenerate::Inconsistent("u not squarefree".into()));
+        };
+        let mut out = Div::new();
+        for r in factors {
+            let j = r.len() - 1;
+            let res: Result<Div, Degenerate> = self.with_field(2 * j, |k| {
+                let x0 = one_root(k, &r, rng);
+                let y0 = k.eval(&d.v, &x0);
+                let pts = self.sd.psi_point(k, &x0, &y0)?;
+                let mut ms: Vec<[El; 3]> = Vec::new();
+                for q in &pts {
+                    let mut cur = q.kappa;
+                    for _ in 0..j {
+                        ms.push(cur);
+                        cur = frob_pt(k, &cur);
+                    }
+                }
+                group_orbits(k, &ms).map_err(Degenerate::Inconsistent)
+            });
+            out = div_add(&out, &res?);
+        }
+        Ok(out)
+    }
+    /// `Psi_A(x) = [psi(D')] - [psi(A)]` with `D' ~ x + A` of degree 3.
+    pub fn psi_class(
+        &self,
+        x: &Mum,
+        base: &Mum,
+        rng: &mut SplitMix64,
+    ) -> Result<PsiImage, Degenerate> {
+        let dp = self.h.add(x, base);
+        if pdeg(&dp.u) != 3 {
+            return Err(Degenerate::Inconsistent("D' has degree < 3".into()));
+        }
+        Ok(PsiImage {
+            plus: self.psi_effective(&dp, rng)?,
+            minus: self.psi_effective(base, rng)?,
+        })
+    }
+    /// As [`Self::psi_class`] with random generic bases until it works;
+    /// returns the base used.
+    pub fn psi_class_auto(
+        &self,
+        x: &Mum,
+        rng: &mut SplitMix64,
+    ) -> (PsiImage, Mum) {
+        for _ in 0..2000 {
+            let a = self.h.random_generic3(rng);
+            if let Ok(im) = self.psi_class(x, &a, rng) {
+                return (im, a);
+            }
+        }
+        panic!("no generic base divisor found");
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Plane forms, frames, resultants.
+
+/// A homogeneous form in `X, Y, Z` over `F_p`, as a monomial -> coefficient map.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Form {
+    pub d: usize,
+    pub c: BTreeMap<[u8; 3], u64>,
+}
+
+/// Monomials `X^i Y^j Z^k` of degree `d`, in a fixed order.
+pub fn monomials(d: usize) -> Vec<[u8; 3]> {
+    let mut v = Vec::new();
+    for i in (0..=d).rev() {
+        for j in (0..=d - i).rev() {
+            v.push([i as u8, j as u8, (d - i - j) as u8]);
+        }
+    }
+    v
+}
+
+impl Form {
+    pub fn from_coeffs(d: usize, coef: &[u64]) -> Form {
+        let mons = monomials(d);
+        assert_eq!(mons.len(), coef.len());
+        let c = mons
+            .iter()
+            .zip(coef)
+            .filter(|(_, &c)| c != 0)
+            .map(|(m, &c)| (*m, c))
+            .collect();
+        Form { d, c }
+    }
+    pub fn coeffs(&self) -> Vec<u64> {
+        monomials(self.d)
+            .iter()
+            .map(|m| *self.c.get(m).unwrap_or(&0))
+            .collect()
+    }
+    pub fn mul(&self, o: &Form, p: u64) -> Form {
+        let mut c: BTreeMap<[u8; 3], u64> = BTreeMap::new();
+        for (m1, &a) in &self.c {
+            for (m2, &b) in &o.c {
+                let m = [m1[0] + m2[0], m1[1] + m2[1], m1[2] + m2[2]];
+                let e = c.entry(m).or_insert(0);
+                *e = ad(*e, md(a, b, p), p);
+            }
+        }
+        c.retain(|_, v| *v != 0);
+        Form {
+            d: self.d + o.d,
+            c,
+        }
+    }
+    /// `f(M (x, y, w)^T)`: the form in the new coordinates.
+    pub fn subst(&self, m: &[[u64; 3]; 3], p: u64) -> Form {
+        let lin: Vec<Form> = (0..3)
+            .map(|a| Form {
+                d: 1,
+                c: [[1u8, 0, 0], [0, 1, 0], [0, 0, 1]]
+                    .iter()
+                    .enumerate()
+                    .filter(|(b, _)| m[a][*b] != 0)
+                    .map(|(b, mm)| (*mm, m[a][b]))
+                    .collect(),
+            })
+            .collect();
+        let mut res = Form {
+            d: self.d,
+            c: BTreeMap::new(),
+        };
+        for (mon, &coef) in &self.c {
+            let mut t = Form {
+                d: 0,
+                c: [([0u8, 0, 0], coef)].into_iter().collect(),
+            };
+            for a in 0..3 {
+                for _ in 0..mon[a] {
+                    t = t.mul(&lin[a], p);
+                }
+            }
+            for (mm, v) in t.c {
+                let e = res.c.entry(mm).or_insert(0);
+                *e = ad(*e, v, p);
+            }
+        }
+        res.c.retain(|_, v| *v != 0);
+        res
+    }
+    /// Partial derivative in variable `v` (0 = X, 1 = Y, 2 = Z).
+    pub fn deriv(&self, v: usize, p: u64) -> Form {
+        let mut c = BTreeMap::new();
+        for (m, &a) in &self.c {
+            if m[v] > 0 {
+                let mut mm = *m;
+                mm[v] -= 1;
+                let cf = md(a, m[v] as u64 % p, p);
+                if cf != 0 {
+                    c.insert(mm, cf);
+                }
+            }
+        }
+        Form {
+            d: self.d.saturating_sub(1),
+            c,
+        }
+    }
+    /// `w = 1`: coefficients by power of `y`, each a polynomial in `x`.
+    pub fn to_biv(&self) -> Vec<Poly> {
+        let mut out: Vec<Poly> = vec![Vec::new(); self.d + 1];
+        for (m, &a) in &self.c {
+            let (i, j) = (m[0] as usize, m[1] as usize);
+            if out[j].len() <= i {
+                out[j].resize(i + 1, 0);
+            }
+            out[j][i] = a;
+        }
+        for q in out.iter_mut() {
+            ptrim(q);
+        }
+        out
+    }
+    pub fn eval_prime(&self, pt: [u64; 3], p: u64) -> u64 {
+        let mut s = 0;
+        for (m, &a) in &self.c {
+            let mut t = a;
+            for v in 0..3 {
+                t = md(t, pw(pt[v], m[v] as u64, p), p);
+            }
+            s = ad(s, t, p);
+        }
+        s
+    }
+}
+
+fn mat3_inv(m: &[[u64; 3]; 3], p: u64) -> Option<[[u64; 3]; 3]> {
+    let det = |a: &[[u64; 3]; 3]| -> u64 {
+        let t1 = md(a[0][0], sb(md(a[1][1], a[2][2], p), md(a[1][2], a[2][1], p), p), p);
+        let t2 = md(a[0][1], sb(md(a[1][0], a[2][2], p), md(a[1][2], a[2][0], p), p), p);
+        let t3 = md(a[0][2], sb(md(a[1][0], a[2][1], p), md(a[1][1], a[2][0], p), p), p);
+        ad(sb(t1, t2, p), t3, p)
+    };
+    let d = det(m);
+    if d == 0 {
+        return None;
+    }
+    let di = inv(d, p);
+    let mut r = [[0u64; 3]; 3];
+    for i in 0..3 {
+        for j in 0..3 {
+            // cofactor (j, i)
+            let (r0, r1) = ((j + 1) % 3, (j + 2) % 3);
+            let (c0, c1) = ((i + 1) % 3, (i + 2) % 3);
+            let cof = sb(md(m[r0][c0], m[r1][c1], p), md(m[r0][c1], m[r1][c0], p), p);
+            r[i][j] = md(cof, di, p);
+        }
+    }
+    Some(r)
+}
+
+fn mat3_vec(m: &[[u64; 3]; 3], v: &[u64; 3], p: u64) -> [u64; 3] {
+    let mut r = [0u64; 3];
+    for i in 0..3 {
+        for j in 0..3 {
+            r[i] = ad(r[i], md(m[i][j], v[j], p), p);
+        }
+    }
+    r
+}
+
+/// Resultant in `y` of two polynomials in `y` with coefficients in `F_p[x]`
+/// (Bareiss on the Sylvester matrix, formal degrees = `len - 1`).
+pub fn res_y(a: &[Poly], b: &[Poly], p: u64) -> Poly {
+    let (da, db) = (a.len() - 1, b.len() - 1);
+    let n = da + db;
+    if n == 0 {
+        return vec![1];
+    }
+    let mut mat: Vec<Vec<Poly>> = vec![vec![Vec::new(); n]; n];
+    for i in 0..db {
+        for (j, c) in a.iter().rev().enumerate() {
+            mat[i][i + j] = c.clone();
+        }
+    }
+    for i in 0..da {
+        for (j, c) in b.iter().rev().enumerate() {
+            mat[db + i][i + j] = c.clone();
+        }
+    }
+    let mut prev: Poly = vec![1];
+    let mut sign = 1u64;
+    for k in 0..n - 1 {
+        if mat[k][k].is_empty() {
+            let Some(i) = (k + 1..n).find(|&i| !mat[i][k].is_empty()) else {
+                return Vec::new();
+            };
+            mat.swap(k, i);
+            sign = p - sign;
+        }
+        let pivot = mat[k][k].clone();
+        for i in k + 1..n {
+            for j in k + 1..n {
+                let t = psub(
+                    &pmul(&mat[i][j], &pivot, p),
+                    &pmul(&mat[i][k], &mat[k][j], p),
+                    p,
+                );
+                let (q, r) = pdivrem(&t, &prev, p);
+                debug_assert!(r.is_empty(), "Bareiss division not exact");
+                mat[i][j] = q;
+            }
+        }
+        prev = pivot;
+    }
+    let det = mat[n - 1][n - 1].clone();
+    pscale(&det, sign % p, p)
+}
+
+// ---------------------------------------------------------------------------
+// The plane quartic: fitting, smoothness, point counts, L-polynomial.
+
+/// Rows of the linear conditions "a form with monomials `mons` vanishes at the
+/// closed point": `m` rows over `F_p` (coefficients of the reduction mod `mu`).
+pub fn cond_rows(cp: &ClosedPt, mons: &[[u8; 3]], p: u64) -> Vec<Vec<u64>> {
+    let m = cp.degree();
+    let mut pws: [Vec<Poly>; 3] = [vec![vec![1]], vec![vec![1]], vec![vec![1]]];
+    let maxd = mons.iter().map(|x| x.iter().map(|&e| e as usize).sum::<usize>()).max().unwrap_or(0);
+    for a in 0..3 {
+        for e in 1..=maxd {
+            let nx = prem(&pmul(&pws[a][e - 1], &cp.co[a], p), &cp.mu, p);
+            pws[a].push(nx);
+        }
+    }
+    let vals: Vec<Poly> = mons
+        .iter()
+        .map(|mo| {
+            let t = pmul(&pws[0][mo[0] as usize], &pws[1][mo[1] as usize], p);
+            let t = pmul(&t, &pws[2][mo[2] as usize], p);
+            prem(&t, &cp.mu, p)
+        })
+        .collect();
+    (0..m)
+        .map(|t| vals.iter().map(|v| *v.get(t).unwrap_or(&0)).collect())
+        .collect()
+}
+
+/// Rows for a whole divisor (reduced).
+pub fn div_rows(dv: &Div, mons: &[[u8; 3]], p: u64) -> Vec<Vec<u64>> {
+    let mut rows = Vec::new();
+    for (cp, &mult) in dv {
+        assert_eq!(mult, 1, "div_rows needs a multiplicity-free divisor");
+        rows.extend(cond_rows(cp, mons, p));
+    }
+    rows
+}
+
+/// A smooth (to be checked) plane quartic over `F_p`.
+#[derive(Clone, Debug)]
+pub struct Quartic {
+    pub p: u64,
+    pub f: Form,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct FitStats {
+    pub divisors_used: usize,
+    pub holdout_points: usize,
+    pub holdout_failures: usize,
+    pub nullity: usize,
+    pub conic_through: bool,
+    pub degenerate: usize,
+}
+
+impl Smith {
+    /// Fit the plane quartic through the images `psi(D)` of random divisors.
+    /// `Err` carries a reason (nullity > 1: `X` hyperelliptic or too few points).
+    pub fn fit_quartic(
+        &self,
+        rng: &mut SplitMix64,
+        n_holdout: usize,
+    ) -> Result<(Quartic, FitStats), (String, FitStats)> {
+        let p = self.sd.p;
+        let mons4 = monomials(4);
+        let mons2 = monomials(2);
+        let mut st = FitStats::default();
+        let mut rows: Vec<Vec<u64>> = Vec::new();
+        let mut rows2: Vec<Vec<u64>> = Vec::new();
+        let mut seen: std::collections::BTreeSet<ClosedPt> = Default::default();
+        let mut mat = Vec::new();
+        for it in 0..400 {
+            let d = self.h.random_generic3(rng);
+            let Ok(img) = self.psi_effective(&d, rng) else {
+                st.degenerate += 1;
+                continue;
+            };
+            for cp in img.keys() {
+                if seen.insert(cp.clone()) {
+                    rows.extend(cond_rows(cp, &mons4, p));
+                    rows2.extend(cond_rows(cp, &mons2, p));
+                }
+            }
+            st.divisors_used = it + 1;
+            if it >= 8 && it % 4 == 0 && rows.len() >= 14 {
+                mat = rows.clone();
+                let ns = nullspace(&mat, 15, p);
+                st.nullity = ns.len();
+                if ns.len() == 1 {
+                    break;
+                }
+            }
+        }
+        let ns = nullspace(&rows, 15, p);
+        st.nullity = ns.len();
+        st.conic_through = !nullspace(&rows2, 6, p).is_empty();
+        if ns.len() != 1 {
+            return Err((
+                if st.conic_through {
+                    "images lie on a conic: X hyperelliptic".into()
+                } else {
+                    format!("quartic nullspace has dimension {}", ns.len())
+                },
+                st,
+            ));
+        }
+        let mut c = ns[0].clone();
+        let lead = c.iter().position(|&x| x != 0).unwrap();
+        let li = inv(c[lead], p);
+        for x in c.iter_mut() {
+            *x = md(*x, li, p);
+        }
+        let q = Quartic {
+            p,
+            f: Form::from_coeffs(4, &c),
+        };
+        // hold-out: images of fresh divisors must lie on the quartic
+        let mut got = 0;
+        let mut tries = 0;
+        while got < n_holdout && tries < 20 * n_holdout + 50 {
+            tries += 1;
+            let d = self.h.random_generic3(rng);
+            let Ok(img) = self.psi_effective(&d, rng) else {
+                continue;
+            };
+            for cp in img.keys() {
+                if seen.contains(cp) {
+                    continue;
+                }
+                st.holdout_points += 1;
+                let r = cond_rows(cp, &mons4, p);
+                let ok = r.iter().all(|row| {
+                    row.iter()
+                        .zip(&c)
+                        .fold(0, |a, (&x, &y)| ad(a, md(x, y, p), p))
+                        == 0
+                });
+                if !ok {
+                    st.holdout_failures += 1;
+                }
+            }
+            got += 1;
+        }
+        Ok((q, st))
+    }
+}
+
+impl Quartic {
+    /// Certify smoothness.  In a random frame the affine singular points are
+    /// common roots of `Res_y(f, f_y)` and `Res_y(f, f_x)`; a frame with
+    /// `gcd = 1` has no affine singular point.  Two certifying frames leave only
+    /// the intersection point of their lines at infinity to check directly.
+    /// Returns the number of frames tried.
+    pub fn certify_smooth(&self, rng: &mut SplitMix64, max_frames: usize) -> Option<usize> {
+        let p = self.p;
+        let mut good: Vec<[[u64; 3]; 3]> = Vec::new();
+        for t in 1..=max_frames {
+            let m = random_frame(p, rng);
+            let g = self.f.subst(&m, p);
+            let trim_tail = |mut v: Vec<Poly>| {
+                while v.last().is_some_and(|c| c.is_empty()) {
+                    v.pop();
+                }
+                v
+            };
+            let bg = g.to_biv();
+            let bfy = trim_tail(g.deriv(1, p).to_biv());
+            let bfx = trim_tail(g.deriv(0, p).to_biv());
+            if bg.len() != 5 || bg[4].len() != 1 || bfy.len() != 4 || bfx.is_empty() {
+                continue;
+            }
+            let r1 = res_y(&bg, &bfy, p);
+            let r2 = res_y(&bg, &bfx, p);
+            if r1.is_empty() || r2.is_empty() {
+                continue;
+            }
+            if pdeg(&pgcd(&r1, &r2, p)) == 0 {
+                good.push(m);
+                if good.len() == 2 {
+                    let (i1, i2) = (mat3_inv(&good[0], p)?, mat3_inv(&good[1], p)?);
+                    let s0 = cross(&i1[2], &i2[2], p);
+                    if s0 == [0, 0, 0] {
+                        good.pop();
+                        continue;
+                    }
+                    let sing = self.f.eval_prime(s0, p) == 0
+                        && (0..3).all(|v| self.f.deriv(v, p).eval_prime(s0, p) == 0);
+                    return if sing { None } else { Some(t) };
+                }
+            }
+        }
+        None
+    }
+
+    /// `#C(F_{p^k})`, projective points, by enumeration.
+    pub fn count_points(&self, k: usize) -> u64 {
+        let p = self.p;
+        let fld = Fld::new(p, k, 0xC0DE);
+        let size = p.pow(k as u32);
+        let bf = self.f.to_biv(); // z = 1 chart via symmetric roles below
+        let _ = bf;
+        // chart w = 1: poly in y for each x
+        let mons = monomials(4);
+        let coef = self.f.coeffs();
+        let eval_poly_y = |x: &El, z: &El| -> Vec<El> {
+            // coefficients in y of f(x, y, z)
+            let mut out = vec![fld.zero(); 5];
+            for (mo, &c) in mons.iter().zip(&coef) {
+                if c == 0 {
+                    continue;
+                }
+                let t = fld.mul(
+                    &fld.pow_u64(x, mo[0] as u64),
+                    &fld.pow_u64(z, mo[2] as u64),
+                );
+                out[mo[1] as usize] = fld.add(&out[mo[1] as usize], &fld.scale(&t, c));
+            }
+            out
+        };
+        let nroots = |poly: &[El]| -> u64 {
+            let mut g: KP = poly.to_vec();
+            ktrim(&fld, &mut g);
+            if g.is_empty() {
+                return u64::MAX; // identically zero (should not happen)
+            }
+            if g.len() == 1 {
+                return 0;
+            }
+            // y^size mod g
+            let mut r: KP = vec![fld.one()];
+            let mut b: KP = kdivrem(&fld, &[fld.zero(), fld.one()], &g).1;
+            let mut e = size;
+            while e > 0 {
+                if e & 1 == 1 {
+                    r = kmulmod(&fld, &r, &b, &g);
+                }
+                b = kmulmod(&fld, &b, &b, &g);
+                e >>= 1;
+            }
+            // r - y
+            let mut ry = r;
+            if ry.len() < 2 {
+                ry.resize(2, fld.zero());
+            }
+            ry[1] = fld.sub(&ry[1], &fld.one());
+            ktrim(&fld, &mut ry);
+            if ry.is_empty() {
+                return (g.len() - 1) as u64;
+            }
+            let gg = kgcd(&fld, &g, &ry);
+            (gg.len() - 1) as u64
+        };
+        let mut total = 0u64;
+        let one = fld.one();
+        // enumerate field elements
+        let elems: Vec<El> = (0..size)
+            .map(|mut i| {
+                let mut cs = vec![0u64; k];
+                for c in cs.iter_mut() {
+                    *c = i % p;
+                    i /= p;
+                }
+                fld.from_u64s(&cs)
+            })
+            .collect();
+        for x in &elems {
+            total += nroots(&eval_poly_y(x, &one));
+        }
+        // line w = 0: (1 : y : 0) and (0 : 1 : 0)
+        total += nroots(&eval_poly_y(&one, &fld.zero()));
+        if self.f.eval_prime([0, 1, 0], p) == 0 {
+            total += 1;
+        }
+        total
+    }
+
+    /// All `F_p`-rational points.
+    pub fn rational_points(&self) -> Vec<[u64; 3]> {
+        let p = self.p;
+        let mut v = Vec::new();
+        for x in 0..p {
+            for y in 0..p {
+                if self.f.eval_prime([x, y, 1], p) == 0 {
+                    v.push([x, y, 1]);
+                }
+            }
+        }
+        for y in 0..p {
+            if self.f.eval_prime([1, y, 0], p) == 0 {
+                v.push([1, y, 0]);
+            }
+        }
+        if self.f.eval_prime([0, 1, 0], p) == 0 {
+            v.push([0, 1, 0]);
+        }
+        v
+    }
+}
+
+pub fn random_frame(p: u64, rng: &mut SplitMix64) -> [[u64; 3]; 3] {
+    loop {
+        let mut m = [[0u64; 3]; 3];
+        for r in m.iter_mut() {
+            for c in r.iter_mut() {
+                *c = rng.below(p);
+            }
+        }
+        if mat3_inv(&m, p).is_some() {
+            return m;
+        }
+    }
+}
+
+/// `#H(F_{p^k})` for `y^2 = F(x)`, `deg F` 7 or 8.
+pub fn h_count_ext(f: &[u64], p: u64, k: usize) -> u64 {
+    let fld = Fld::new(p, k, 0xC0DE);
+    let size = p.pow(k as u32);
+    let mut total = 0i64;
+    for mut i in 0..size {
+        let mut cs = vec![0u64; k];
+        for c in cs.iter_mut() {
+            *c = i % p;
+            i /= p;
+        }
+        let x = fld.from_u64s(&cs);
+        let fx = fld.eval(f, &x);
+        total += if fld.is_zero(&fx) {
+            1
+        } else if fld.is_square(&fx) {
+            2
+        } else {
+            0
+        };
+    }
+    let d = pdeg(f);
+    total += if d == 8 {
+        let lc = fld.c(*f.last().unwrap());
+        if fld.is_square(&lc) {
+            2
+        } else {
+            0
+        }
+    } else {
+        1
+    };
+    total as u64
+}
+
+/// `L(T) = 1 + c1 T + ... + p^3 T^6` coefficients `[c0..c6]` from `N1, N2, N3`
+/// of a genus-3 curve over `F_p`; and `#J(F_p) = L(1)`.
+pub fn lpoly_from_counts(p: u64, n: [u64; 3]) -> ([i128; 7], i128) {
+    let pp = p as i128;
+    let s: [i128; 3] = [
+        pp + 1 - n[0] as i128,
+        pp * pp + 1 - n[1] as i128,
+        pp * pp * pp + 1 - n[2] as i128,
+    ];
+    let e1 = s[0];
+    let e2 = (s[0] * s[0] - s[1]) / 2;
+    let e3 = (s[0] * s[0] * s[0] - 3 * s[0] * s[1] + 2 * s[2]) / 6;
+    // prod (1 - a_i T) = 1 - e1 T + e2 T^2 - e3 T^3 + p e2 T^4 - p^2 e1 T^5 + p^3 T^6
+    let c = [1, -e1, e2, -e3, pp * e2, -pp * pp * e1, pp * pp * pp];
+    let order: i128 = c.iter().sum();
+    (c, order)
+}
+
+// ---------------------------------------------------------------------------
+// Linear equivalence and group law on Pic^0(C)(F_p) by adjoint (cubic)
+// reduction.  A class `x` is represented by the effective degree-3 divisor
+// `a` with `a ~ x + Omega`, `Omega = H - P0` (the residual of a rational line
+// through a rational point `P0`); `a` is unique unless `h^0(a) = 2`.
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum PicErr {
+    /// No frame with all intersection points affine and separated by `x`.
+    NoFrame,
+    /// `h^0 = 2`: the degree-3 representative is not unique.
+    Exceptional,
+    /// A residual divisor has a repeated point (not supported).
+    NonReduced,
+    /// Supports overlap in a way the method cannot handle.
+    Overlap,
+    NoPoint,
+    Other(String),
+}
+
+pub struct Pic {
+    pub q: Quartic,
+    pub p0: ClosedPt,
+    pub omega: Div,
+    tangent: [u64; 3],
+    rng: std::cell::RefCell<SplitMix64>,
+    pub n_intersections: std::cell::Cell<u64>,
+    pub n_frames: std::cell::Cell<u64>,
+}
+
+fn ring_minpoly(mu: &[u64], a: &[u64], p: u64) -> Poly {
+    // smallest dependency among 1, a, a^2, ... modulo mu
+    let m = mu.len() - 1;
+    let mut vecs: Vec<Vec<u64>> = Vec::new();
+    let mut cur: Poly = vec![1];
+    for t in 0..=m {
+        let mut v = cur.clone();
+        v.resize(m, 0);
+        // solve v = sum_{s<t} lam_s vecs[s]
+        let cols = t;
+        let mut mat: Vec<Vec<u64>> = (0..m)
+            .map(|r| {
+                let mut row: Vec<u64> = (0..cols).map(|s| vecs[s][r]).collect();
+                row.push(v[r]);
+                row
+            })
+            .collect();
+        let piv = rref(&mut mat, p);
+        if !piv.contains(&cols) {
+            // v in span: a^t = sum lam_s a^s
+            let mut lam = vec![0u64; t];
+            for (ri, &pc) in piv.iter().enumerate() {
+                lam[pc] = mat[ri][cols];
+            }
+            let mut mp: Poly = lam.iter().map(|&l| ng(l, p)).collect();
+            mp.push(1);
+            return mp;
+        }
+        vecs.push(v);
+        cur = prem(&pmul(&cur, a, p), mu, p);
+    }
+    unreachable!("minimal polynomial must have degree <= m")
+}
+
+fn poly_inv_mod(a: &[u64], mu: &[u64], p: u64) -> Option<Poly> {
+    let (g, s, _) = pxgcd(a, mu, p);
+    (pdeg(&g) == 0).then(|| prem(&s, mu, p))
+}
+
+fn cross(a: &[u64; 3], b: &[u64; 3], p: u64) -> [u64; 3] {
+    [
+        sb(md(a[1], b[2], p), md(a[2], b[1], p), p),
+        sb(md(a[2], b[0], p), md(a[0], b[2], p), p),
+        sb(md(a[0], b[1], p), md(a[1], b[0], p), p),
+    ]
+}
+
+fn ring_mul(a: &[u64], b: &[u64], mu: &[u64], p: u64) -> Poly {
+    prem(&pmul(a, b, p), mu, p)
+}
+
+/// Value of a form at a point with coordinates in the ring `F_p[c]/mu`.
+fn eval_form_ring(f: &Form, co: &[Poly; 3], mu: &[u64], p: u64) -> Poly {
+    let mut acc: Poly = Vec::new();
+    for (m, &a) in &f.c {
+        let mut t: Poly = vec![a];
+        for v in 0..3 {
+            for _ in 0..m[v] {
+                t = ring_mul(&t, &co[v], mu, p);
+            }
+        }
+        acc = padd(&acc, &t, p);
+    }
+    prem(&acc, mu, p)
+}
+
+/// Squarefree decomposition `f = prod g_e^e` (Yun; needs `p > deg f`).
+fn sqfree_decomp(f: &[u64], p: u64) -> Vec<(Poly, u32)> {
+    let f = pmonic(f, p);
+    let mut out = Vec::new();
+    if pdeg(&f) <= 0 {
+        return out;
+    }
+    let fd = pderiv(&f, p);
+    let c = pgcd(&f, &fd, p);
+    let mut w = pdivrem(&f, &c, p).0;
+    let mut y = pdivrem(&fd, &c, p).0;
+    let mut z = psub(&y, &pderiv(&w, p), p);
+    let mut i = 1u32;
+    while pdeg(&w) > 0 {
+        let g = pgcd(&w, &z, p);
+        if pdeg(&g) > 0 {
+            out.push((g.clone(), i));
+        }
+        w = pdivrem(&w, &g, p).0;
+        y = pdivrem(&z, &g, p).0;
+        z = psub(&y, &pderiv(&w, p), p);
+        i += 1;
+    }
+    out
+}
+
+pub fn div_max_mult(d: &Div) -> u32 {
+    d.values().copied().max().unwrap_or(0)
+}
+
+
+impl Pic {
+    pub fn new(q: Quartic, seed: u64) -> Result<Pic, PicErr> {
+        let p = q.p;
+        let pts = q.rational_points();
+        let Some(&pt) = pts.first() else {
+            return Err(PicErr::NoPoint);
+        };
+        let co = [0, 1, 2].map(|a| {
+            let mut v = vec![pt[a]];
+            ptrim(&mut v);
+            v
+        });
+        // normalise the first nonzero coordinate to 1
+        let lead = pt.iter().position(|&x| x != 0).unwrap();
+        let li = inv(pt[lead], p);
+        let ptn = [md(pt[0], li, p), md(pt[1], li, p), md(pt[2], li, p)];
+        let _ = co;
+        let p0 = ClosedPt {
+            mu: vec![0, 1],
+            co: [0, 1, 2].map(|a| {
+                let mut v = vec![ptn[a]];
+                ptrim(&mut v);
+                v
+            }),
+        };
+        // tangent direction: n = grad f(P0); t in ker n, not proportional to P0
+        let n: [u64; 3] = [0, 1, 2].map(|v| q.f.deriv(v, p).eval_prime(ptn, p));
+        if n == [0, 0, 0] {
+            return Err(PicErr::Other("P0 singular".into()));
+        }
+        let mut tangent = None;
+        for cand in [[1u64, 0, 0], [0, 1, 0], [0, 0, 1]] {
+            let t = cross(&n, &cand, p);
+            if t != [0, 0, 0] && cross(&t, &ptn, p) != [0, 0, 0] {
+                tangent = Some(t);
+                break;
+            }
+        }
+        let tangent = tangent.ok_or(PicErr::Other("no tangent direction".into()))?;
+        let pic = Pic {
+            q,
+            p0,
+            omega: Div::new(),
+            tangent,
+            rng: std::cell::RefCell::new(SplitMix64(seed)),
+            n_intersections: Default::default(),
+            n_frames: Default::default(),
+        };
+        // Omega: residual of a random rational line through P0
+        let mut pic = pic;
+        for _ in 0..400 {
+            let qq = [
+                pic.rnd(p),
+                pic.rnd(p),
+                pic.rnd(p),
+            ];
+            let l = cross(&ptn, &qq, p);
+            if l == [0, 0, 0] {
+                continue;
+            }
+            let form = Form::from_coeffs(1, &l);
+            let Ok(r) = pic.intersect_residual(&form, &[(&pic.p0, 1)]) else {
+                continue;
+            };
+            if div_degree(&r) == 3 && div_is_reduced(&r) && !r.contains_key(&pic.p0) {
+                pic.omega = r;
+                return Ok(pic);
+            }
+        }
+        Err(PicErr::Other("no suitable line for Omega".into()))
+    }
+
+    fn x_min_poly(&self, cp: &ClosedPt, minv: &[[u64; 3]; 3]) -> Option<Poly> {
+        let p = self.q.p;
+        let mu = &cp.mu;
+        let comp = |r: usize| -> Poly {
+            let mut acc: Poly = Vec::new();
+            for c in 0..3 {
+                acc = padd(&acc, &pscale(&cp.co[c], minv[r][c], p), p);
+            }
+            prem(&acc, mu, p)
+        };
+        let (xx, ww) = (comp(0), comp(2));
+        let wi = poly_inv_mod(&ww, mu, p)?;
+        let x = prem(&pmul(&xx, &wi, p), mu, p);
+        let mp = ring_minpoly(mu, &x, p);
+        (mp.len() == mu.len()).then_some(mp)
+    }
+
+    /// Conditions "g vanishes to order >= 2 along C at the closed point".
+    fn tangent_rows(&self, cp: &ClosedPt, mons: &[[u8; 3]]) -> Vec<Vec<u64>> {
+        let p = self.q.p;
+        let mu = &cp.mu;
+        let m = cp.degree();
+        let n: Vec<Poly> = (0..3)
+            .map(|v| eval_form_ring(&self.q.f.deriv(v, p), &cp.co, mu, p))
+            .collect();
+        let crs = |a: &[Poly], b: &[Poly]| -> Vec<Poly> {
+            (0..3)
+                .map(|i| {
+                    let (j, k) = ((i + 1) % 3, (i + 2) % 3);
+                    psub(
+                        &ring_mul(&a[j], &b[k], mu, p),
+                        &ring_mul(&a[k], &b[j], mu, p),
+                        p,
+                    )
+                })
+                .collect()
+        };
+        let mut tvec: Option<Vec<Poly>> = None;
+        for e in 0..3 {
+            let mut ev: Vec<Poly> = vec![Vec::new(); 3];
+            ev[e] = vec![1];
+            let t = crs(&n, &ev);
+            if t.iter().any(|x| !x.is_empty()) {
+                let c = crs(&t, &cp.co);
+                if c.iter().any(|x| !x.is_empty()) {
+                    tvec = Some(t);
+                    break;
+                }
+            }
+        }
+        let t = tvec.expect("no tangent direction at a smooth point");
+        // value of D_t mon = sum_v t_v * d mon/dX_v at P
+        let vals: Vec<Poly> = mons
+            .iter()
+            .map(|mo| {
+                let mut acc: Poly = Vec::new();
+                for v in 0..3 {
+                    if mo[v] == 0 {
+                        continue;
+                    }
+                    let mut term: Poly = vec![mo[v] as u64 % p];
+                    for w in 0..3 {
+                        let e = if w == v { mo[w] - 1 } else { mo[w] };
+                        for _ in 0..e {
+                            term = ring_mul(&term, &cp.co[w], mu, p);
+                        }
+                    }
+                    term = ring_mul(&term, &t[v], mu, p);
+                    acc = padd(&acc, &term, p);
+                }
+                prem(&acc, mu, p)
+            })
+            .collect();
+        (0..m)
+            .map(|t_| vals.iter().map(|v| *v.get(t_).unwrap_or(&0)).collect())
+            .collect()
+    }
+
+    /// Vanishing conditions of a divisor with multiplicities up to 2.
+    pub fn rows_for(&self, dv: &Div, mons: &[[u8; 3]]) -> Result<Vec<Vec<u64>>, PicErr> {
+        let p = self.q.p;
+        let mut rows = Vec::new();
+        for (cp, &mult) in dv {
+            rows.extend(cond_rows(cp, mons, p));
+            match mult {
+                1 => {}
+                2 => rows.extend(self.tangent_rows(cp, mons)),
+                _ => return Err(PicErr::NonReduced),
+            }
+        }
+        Ok(rows)
+    }
+
+    /// The residual of `V(g) cap C` after removing `known` (with multiplicities).
+    pub fn intersect_residual(
+        &self,
+        g: &Form,
+        known: &[(&ClosedPt, u32)],
+    ) -> Result<Div, PicErr> {
+        let p = self.q.p;
+        self.n_intersections.set(self.n_intersections.get() + 1);
+        let d = g.d;
+        let mut nonsf = 0;
+        'frames: for _ in 0..400 {
+            self.n_frames.set(self.n_frames.get() + 1);
+            let m = random_frame(p, &mut self.rng.borrow_mut());
+            let minv = mat3_inv(&m, p).unwrap();
+            let f2 = self.q.f.subst(&m, p);
+            let g2 = g.subst(&m, p);
+            let (bf, bg) = (f2.to_biv(), g2.to_biv());
+            if bf[4].len() != 1 || bg.len() != d + 1 || bg[d].len() != 1 {
+                continue;
+            }
+            let r = res_y(&bf, &bg, p);
+            if pdeg(&r) != 4 * d as isize {
+                continue;
+            }
+            let mut rem = r;
+            for (cp, mult) in known {
+                let Some(xp) = self.x_min_poly(cp, &minv) else {
+                    continue 'frames;
+                };
+                for _ in 0..*mult {
+                    let (qq, rr) = pdivrem(&rem, &xp, p);
+                    if !rr.is_empty() {
+                        return Err(PicErr::Other("known point not on the intersection".into()));
+                    }
+                    rem = qq;
+                }
+            }
+            if pdeg(&rem) <= 0 {
+                return Ok(Div::new());
+            }
+            let mut rng = SplitMix64(0xFAC7 ^ rem.len() as u64);
+            let mut factors: Vec<(Poly, u32)> = Vec::new();
+            for (sq, e) in sqfree_decomp(&rem, p) {
+                if e > 2 {
+                    return Err(PicErr::NonReduced);
+                }
+                let Some(fs) = factor_squarefree(&sq, p, &mut rng) else {
+                    nonsf += 1;
+                    continue 'frames;
+                };
+                for f in fs {
+                    factors.push((f, e));
+                }
+            }
+            let mut out = Div::new();
+            for (fr, mult) in &factors {
+                let mr = fr.len() - 1;
+                if mr > 8 {
+                    continue 'frames;
+                }
+                let k = Fld::with_modulus(p, fr);
+                let x0 = if mr == 1 { k.c(ng(fr[0], p)) } else { k.z() };
+                let fy: KP = bf.iter().map(|c| k.eval(c, &x0)).collect();
+                let gy: KP = bg.iter().map(|c| k.eval(c, &x0)).collect();
+                let gc = kgcd(&k, &fy, &gy);
+                if gc.len() != 2 {
+                    continue 'frames;
+                }
+                let y0 = k.neg(&gc[0]);
+                let v = [x0, y0, k.one()];
+                let mut kap = [k.zero(), k.zero(), k.zero()];
+                for a in 0..3 {
+                    for b in 0..3 {
+                        kap[a] = k.add(&kap[a], &k.scale(&v[b], m[a][b]));
+                    }
+                }
+                let _ = minv;
+                *out.entry(closed_pt_from(&k, &kap)).or_insert(0) += *mult;
+            }
+            return Ok(out);
+        }
+        if nonsf > 100 {
+            Err(PicErr::NonReduced)
+        } else {
+            Err(PicErr::NoFrame)
+        }
+    }
+
+    fn rnd(&self, p: u64) -> u64 {
+        self.rng.borrow_mut().below(p)
+    }
+
+    fn random_combo(&self, basis: &[Vec<u64>]) -> Vec<u64> {
+        let p = self.q.p;
+        let n = basis[0].len();
+        let mut r = vec![0u64; n];
+        loop {
+            for b in basis {
+                let c = self.rnd(p);
+                for i in 0..n {
+                    r[i] = ad(r[i], md(c, b[i], p), p);
+                }
+            }
+            if r.iter().any(|&x| x != 0) {
+                return r;
+            }
+        }
+    }
+
+    /// Elements are `Div`s: a reduced degree-3 divisor `a` (not collinear) for
+    /// the class `[a - Omega]`, or a rational point `Q` (degree 1) for the
+    /// exceptional class `[P0 - Q] = [(H - Q) - Omega]`, whose degree-3
+    /// representatives form a pencil.  `zero` is `{P0}`.
+    pub fn zero(&self) -> Div {
+        [(self.p0.clone(), 1)].into_iter().collect()
+    }
+    pub fn is_zero(&self, a: &Div) -> bool {
+        *a == self.zero()
+    }
+
+    /// Turn an effective degree-3 divisor into an element: a collinear
+    /// divisor `a = ell.C - Q` becomes `Q`.
+    pub fn finish(&self, a: Div) -> Result<Div, PicErr> {
+        let p = self.q.p;
+        if div_degree(&a) != 3 || div_max_mult(&a) > 2 {
+            return Err(PicErr::Other("finish: need a divisor of degree 3, multiplicities <= 2".into()));
+        }
+        let mons1 = monomials(1);
+        let ns = nullspace(&self.rows_for(&a, &mons1)?, 3, p);
+        if ns.is_empty() {
+            return Ok(a);
+        }
+        let ell = Form::from_coeffs(1, &ns[0]);
+        let kn: Vec<(&ClosedPt, u32)> = a.iter().map(|(c, &m)| (c, m)).collect();
+        let q = self.intersect_residual(&ell, &kn)?;
+        if div_degree(&q) != 1 {
+            return Err(PicErr::Other("finish: residual of a line is not a point".into()));
+        }
+        Ok(q)
+    }
+
+    /// A degree-3 representative of the class (`x + Omega`), avoiding `avoid`.
+    fn to_rep(&self, x: &Div, avoid: &Div) -> Result<Div, PicErr> {
+        let p = self.q.p;
+        if div_degree(x) == 3 {
+            return Ok(x.clone());
+        }
+        let q = x.keys().next().unwrap();
+        let qc: [u64; 3] = [0, 1, 2].map(|i| *q.co[i].first().unwrap_or(&0));
+        for _ in 0..200 {
+            let r = [self.rnd(p), self.rnd(p), self.rnd(p)];
+            let l = cross(&qc, &r, p);
+            if l == [0, 0, 0] {
+                continue;
+            }
+            let Ok(res) = self.intersect_residual(&Form::from_coeffs(1, &l), &[(q, 1)]) else {
+                continue;
+            };
+            if div_degree(&res) == 3
+                && div_is_reduced(&res)
+                && !res.keys().any(|c| avoid.contains_key(c))
+            {
+                return Ok(res);
+            }
+        }
+        Err(PicErr::Other("to_rep failed".into()))
+    }
+
+    /// Element of the class of an effective, reduced divisor `E` of degree 6:
+    /// the unique `A` (degree 3) with `E ~ A + Omega`, or the exceptional `Q`.
+    pub fn canon6(&self, e: &Div) -> Result<Div, PicErr> {
+        let p = self.q.p;
+        if div_degree(e) != 6 || div_max_mult(e) > 2 {
+            return Err(PicErr::Other("canon6 needs a divisor of degree 6, multiplicities <= 2".into()));
+        }
+        let mons3 = monomials(3);
+        let rows = self.rows_for(e, &mons3)?;
+        let ns = nullspace(&rows, 10, p);
+        if ns.len() != 4 {
+            return Err(PicErr::Other(format!("cubics through E: dim {}", ns.len())));
+        }
+        let mut last = PicErr::NoFrame;
+        for _ in 0..40 {
+            let g = Form::from_coeffs(3, &self.random_combo(&ns));
+            let kn: Vec<(&ClosedPt, u32)> = e.iter().map(|(c, &m)| (c, m)).collect();
+            let r = match self.intersect_residual(&g, &kn) {
+                Ok(r) => r,
+                Err(er) => {
+                    last = er;
+                    continue;
+                }
+            };
+            if div_degree(&r) != 6 {
+                last = PicErr::Other("canon6: residual of wrong degree".into());
+                continue;
+            }
+            let ro = div_add(&r, &self.omega);
+            if div_max_mult(&ro) > 2 {
+                last = PicErr::NonReduced;
+                continue;
+            }
+            let rows2 = match self.rows_for(&ro, &mons3) {
+                Ok(r) => r,
+                Err(er) => {
+                    last = er;
+                    continue;
+                }
+            };
+            let ns2 = nullspace(&rows2, 10, p);
+            if ns2.is_empty() || ns2.len() > 2 {
+                return Err(PicErr::Other(format!("cubics through R + Omega: dim {}", ns2.len())));
+            }
+            let h = Form::from_coeffs(3, &self.random_combo(&ns2));
+            let kn2: Vec<(&ClosedPt, u32)> = ro.iter().map(|(c, &m)| (c, m)).collect();
+            match self.intersect_residual(&h, &kn2) {
+                Ok(a) => {
+                    if div_degree(&a) != 3 {
+                        return Err(PicErr::Other("canon6: residual of wrong degree".into()));
+                    }
+                    return self.finish(a);
+                }
+                Err(er) => {
+                    last = er;
+                }
+            }
+        }
+        Err(last)
+    }
+
+    /// `-x`: the residual of the conic through `a + 2 P0` for a degree-3
+    /// representative `a` of `x + Omega`.
+    pub fn neg(&self, x: &Div) -> Result<Div, PicErr> {
+        self.neg_depth(x, 0)
+    }
+    fn neg_depth(&self, x: &Div, depth: usize) -> Result<Div, PicErr> {
+        let p = self.q.p;
+        if self.is_zero(x) {
+            return Ok(x.clone());
+        }
+        let mut avoid = Div::new();
+        avoid.insert(self.p0.clone(), 1);
+        let a = self.to_rep(x, &avoid)?;
+        if a.contains_key(&self.p0) {
+            // -x = z - (x + z)
+            if depth > 4 {
+                return Err(PicErr::Overlap);
+            }
+            let z = self.random_elem()?;
+            let w = self.add(x, &z)?;
+            let nw = self.neg_depth(&w, depth + 1)?;
+            return self.add(&nw, &z);
+        }
+        let mons2 = monomials(2);
+        let mut rows = self.rows_for(&a, &mons2)?;
+        rows.extend(cond_rows(&self.p0, &mons2, p));
+        let p0c: [u64; 3] = [0, 1, 2].map(|i| *self.p0.co[i].first().unwrap_or(&0));
+        let trow: Vec<u64> = mons2
+            .iter()
+            .map(|mo| {
+                let mut s = 0;
+                for v in 0..3 {
+                    if mo[v] == 0 {
+                        continue;
+                    }
+                    let mut t = md(mo[v] as u64 % p, self.tangent[v], p);
+                    for w in 0..3 {
+                        let e = if w == v { mo[w] - 1 } else { mo[w] };
+                        t = md(t, pw(p0c[w], e as u64, p), p);
+                    }
+                    s = ad(s, t, p);
+                }
+                s
+            })
+            .collect();
+        rows.push(trow);
+        let ns = nullspace(&rows, 6, p);
+        if ns.len() != 1 {
+            return Err(PicErr::Other(format!("conic through a + 2P0: dim {}", ns.len())));
+        }
+        let qf = Form::from_coeffs(2, &ns[0]);
+        let mut kn: Vec<(&ClosedPt, u32)> = a.iter().map(|(c, &m)| (c, m)).collect();
+        kn.push((&self.p0, 2));
+        let r = self.intersect_residual(&qf, &kn)?;
+        if div_degree(&r) != 3 {
+            return Err(PicErr::Other("neg: residual of wrong degree".into()));
+        }
+        self.finish(r)
+    }
+
+    /// `x + y`.  Overlapping supports are separated with a random translate:
+    /// `x + y = (x + z) + (y - z)`.
+    pub fn add(&self, a: &Div, b: &Div) -> Result<Div, PicErr> {
+        self.add_depth(a, b, 0)
+    }
+    fn add_depth(&self, a: &Div, b: &Div, depth: usize) -> Result<Div, PicErr> {
+        if self.is_zero(a) {
+            return Ok(b.clone());
+        }
+        if self.is_zero(b) {
+            return Ok(a.clone());
+        }
+        let ra = self.to_rep(a, &Div::new())?;
+        let rb = self.to_rep(b, &ra)?;
+        let overlap = ra.keys().any(|c| rb.contains_key(c));
+        if !overlap {
+            return self.canon6(&div_add(&ra, &rb));
+        }
+        if depth > 6 {
+            return Err(PicErr::Overlap);
+        }
+        let z = self.random_elem()?;
+        let nz = self.neg(&z)?;
+        let az = self.add_depth(a, &z, depth + 1)?;
+        let bz = self.add_depth(b, &nz, depth + 1)?;
+        self.add_depth(&az, &bz, depth + 1)
+    }
+    pub fn sub(&self, a: &Div, b: &Div) -> Result<Div, PicErr> {
+        let nb = self.neg(b)?;
+        self.add(a, &nb)
+    }
+    pub fn mul(&self, mut n: u64, a: &Div) -> Result<Div, PicErr> {
+        let mut r = self.zero();
+        let mut b = a.clone();
+        while n > 0 {
+            if n & 1 == 1 {
+                r = self.add(&r, &b)?;
+            }
+            n >>= 1;
+            if n > 0 {
+                b = self.add(&b, &b)?;
+            }
+        }
+        Ok(r)
+    }
+    /// The class `[E1 - E2]` for effective reduced degree-6 divisors.
+    pub fn class_of_diff(&self, plus: &Div, minus: &Div) -> Result<Div, PicErr> {
+        let ap = self.canon6(plus)?;
+        let am = self.canon6(minus)?;
+        self.sub(&ap, &am)
+    }
+    /// A random element: a degree-3 sub-divisor of a random cubic section.
+    pub fn random_elem(&self) -> Result<Div, PicErr> {
+        let p = self.q.p;
+        for _ in 0..200 {
+            let coef: Vec<u64> = (0..10).map(|_| self.rnd(p)).collect();
+            if coef.iter().all(|&c| c == 0) {
+                continue;
+            }
+            let Ok(sec) = self.intersect_residual(&Form::from_coeffs(3, &coef), &[]) else {
+                continue;
+            };
+            let cps: Vec<(&ClosedPt, u32)> = sec.iter().map(|(c, &m)| (c, m)).collect();
+            let mut chosen = Vec::new();
+            'subset: for mask in 1u32..(1 << cps.len()) {
+                let mut deg = 0;
+                chosen.clear();
+                for (i, (c, m)) in cps.iter().enumerate() {
+                    if mask >> i & 1 == 1 {
+                        if *m != 1 {
+                            continue 'subset;
+                        }
+                        deg += c.degree();
+                        chosen.push((*c).clone());
+                    }
+                }
+                if deg == 3 {
+                    break;
+                }
+                chosen.clear();
+            }
+            if chosen.is_empty() {
+                continue;
+            }
+            let a: Div = chosen.into_iter().map(|c| (c, 1)).collect();
+            if a.keys().any(|c| self.omega.contains_key(c)) {
+                continue;
+            }
+            // class of a: [a - Omega]; normalise through canon6(a + Omega)
+            if let Ok(r) = self.canon6(&div_add(&a, &self.omega)) {
+                return Ok(r);
+            }
+        }
+        Err(PicErr::Other("random_elem failed".into()))
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -954,29 +2682,129 @@ mod tests {
             .expect("Smith's Example 1 map")
     }
 
-    #[test]
-    fn spike_example1() {
+    fn example_smith() -> Smith {
         let (f, p) = example1();
         let mut rng = SplitMix64(1);
         let sds = smith_data_for_curve(&f, p, &mut rng);
-        println!("maps: {}", sds.len());
-        for s in &sds {
-            println!("{:?} rational={}", (s.n1, s.n0, s.d1, s.d0), s.rational());
+        Smith::new(find_example_map(&sds).clone())
+    }
+
+    #[test]
+    fn example1_quartic_and_counts() {
+        let sm = example_smith();
+        let mut rng = SplitMix64(7);
+        let (q, st) = sm.fit_quartic(&mut rng, 20).expect("fit");
+        println!("fit stats {:?}", st);
+        println!("quartic {:?}", q.f.coeffs());
+        assert_eq!(st.holdout_failures, 0);
+        assert!(st.holdout_points > 20);
+        let fr = q.certify_smooth(&mut rng, 50);
+        println!("smooth certified in {:?} frames", fr);
+        assert!(fr.is_some());
+        let p = sm.sd.p;
+        let nh = [1, 2, 3].map(|k| h_count_ext(&sm.sd.f, p, k));
+        let nc = [1, 2, 3].map(|k| q.count_points(k));
+        println!("H counts {:?}  C counts {:?}", nh, nc);
+        assert_eq!(nh, nc);
+        let (lc, ord) = lpoly_from_counts(p, nc);
+        println!("L = {:?}, #J = {}", lc, ord);
+        // Smith's Example 1: Z numerator 37^3 T^6 + 4*37^2 T^5 - 6*37 T^4 - 240 T^3 - 6 T^2 + 4 T + 1
+        assert_eq!(lc, [1, 4, -6, -240, -222, 5476, 50653]);
+    }
+
+    fn example_pic() -> (Smith, Quartic, Pic) {
+        let sm = example_smith();
+        let mut rng = SplitMix64(7);
+        let (q, _) = sm.fit_quartic(&mut rng, 5).expect("fit");
+        let pic = Pic::new(q.clone(), 99).expect("pic");
+        (sm, q, pic)
+    }
+
+    #[test]
+    fn example1_pic_group_law() {
+        let (_sm, _q, pic) = example_pic();
+        println!("P0 = {:?}\nOmega = {:?}", pic.p0, pic.omega);
+        let mut errs: BTreeMap<String, u32> = BTreeMap::new();
+        let mut ok = 0;
+        let mut note = |e: PicErr| *errs.entry(format!("{:?}", e)).or_insert(0) += 1;
+        for _ in 0..6 {
+            let (Ok(a), Ok(b), Ok(c)) = (pic.random_elem(), pic.random_elem(), pic.random_elem()) else {
+                continue;
+            };
+            let ab = pic.add(&a, &b);
+            let ba = pic.add(&b, &a);
+            match (&ab, &ba) {
+                (Ok(x), Ok(y)) => assert_eq!(x, y, "commutativity"),
+                (Err(e), _) | (_, Err(e)) => {
+                    note(e.clone());
+                    continue;
+                }
+            }
+            let na = match pic.neg(&a) {
+                Ok(x) => x,
+                Err(e) => {
+                    note(e);
+                    continue;
+                }
+            };
+            match pic.add(&a, &na) {
+                Ok(z) => assert!(pic.is_zero(&z), "a + (-a) = 0"),
+                Err(e) => note(e),
+            }
+            if let Ok(nn) = pic.neg(&na) {
+                assert_eq!(nn, a, "-(-a) = a");
+            }
+            let l = pic.add(&ab.clone().unwrap(), &c);
+            let bc = pic.add(&b, &c);
+            let r = bc.clone().and_then(|bc| pic.add(&a, &bc));
+            match (l, r) {
+                (Ok(l), Ok(r)) => {
+                    if l != r {
+                        println!("ASSOC FAIL a={:?}\n b={:?}\n c={:?}", a, b, c);
+                    }
+                    assert_eq!(l, r, "associativity");
+                    ok += 1;
+                }
+                (Err(e), _) | (_, Err(e)) => note(e),
+            }
+            match pic.mul(55666, &a) {
+                Ok(z) => assert!(pic.is_zero(&z), "#J * a = 0"),
+                Err(e) => note(e),
+            }
         }
-        let sd = find_example_map(&sds);
-        println!("sigma = {:?}", sd.sigma);
-        println!("deltas = {:?}", sd.deltas);
-        let l = Fld::new(p, 2, 7);
-        let mut cnt = 0;
-        for x in 0..p {
-            let fx = peval(&f, x, p);
-            let Some(y) = crate::cryptanalysis::smith_prop24::sqrt_mod(fx, p) else { continue };
-            if y == 0 { continue; }
-            let r = sd.psi_point(&l, &l.c(x), &l.c(y));
-            println!("P=({x},{y}) -> {:?}", r.as_ref().map(|v| v.len()).map_err(|e| e.clone()));
-            if let Ok(v) = r { for q in v { println!("   kappa = {:?}", &q.kappa.iter().map(|c| c[..2].to_vec()).collect::<Vec<_>>()); } }
-            cnt += 1;
+        println!("assoc ok {ok}, errors {:?}", errs);
+        println!("intersections {} frames {}", pic.n_intersections.get(), pic.n_frames.get());
+        assert!(ok >= 2);
+    }
+
+    #[test]
+    fn debug_canon() {
+        let (_sm, _q, pic) = example_pic();
+        let mut n = 0;
+        for t in 0..60u64 {
+            let l = [1 + t, 2 * t + 3, 5 + t * t];
+            let Ok(sec) = pic.intersect_residual(&Form::from_coeffs(1, &l), &[]) else { continue };
+            let cps: Vec<&ClosedPt> = sec.keys().collect();
+            let degs: Vec<usize> = cps.iter().map(|c| c.degree()).collect();
+            // find subset of degree 3
+            let mut chosen = Div::new();
+            for mask in 1u32..(1 << cps.len()) {
+                let d: usize = (0..cps.len()).filter(|i| mask >> i & 1 == 1).map(|i| degs[i]).sum();
+                if d == 3 {
+                    for i in 0..cps.len() { if mask >> i & 1 == 1 { chosen.insert(cps[i].clone(), 1); } }
+                    break;
+                }
+            }
+            if chosen.is_empty() { continue; }
+            n += 1;
+            let e = div_add(&chosen, &pic.omega);
+            let r = pic.canon6(&e);
+            println!("line {:?} degs {:?}: canon6 -> {:?}", l, degs, r.as_ref().map(|d| div_degree(d)));
+            if let Ok(a) = &r {
+                // a should equal chosen's class: canon6(a + omega) == canon6(chosen + omega)
+                println!("   same as chosen? {}", a == &chosen);
+            }
+            if n >= 6 { break; }
         }
-        assert!(cnt > 0);
     }
 }
