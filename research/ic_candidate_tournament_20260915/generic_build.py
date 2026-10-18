@@ -19,10 +19,6 @@ from oracle import require
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKER = 'examples/ic_tournament_worker.rs'
-# In-repository path crates admitted as build inputs (#2001 made the
-# library depend on them). Every file under each is hashed, build outputs
-# excepted; any other path or git dependency is still refused.
-ADMITTED_PATH_CRATES = {'tools/volcano-cli', 'isogeny_algos'}
 
 
 def digest(path):
@@ -77,24 +73,14 @@ def source_manifest(root, metadata):
         directory = Path(package['manifest_path']).parent
         if directory == root:
             continue
-        if package['source'] is None:
-            require(directory.resolve().is_relative_to(root)
-                    and directory.resolve().relative_to(root).as_posix() in ADMITTED_PATH_CRATES,
-                    'path/git dependency needs explicit build admission')
-            source = 'path+' + directory.resolve().relative_to(root).as_posix()
-            skip = directory / 'target'
-        else:
-            require(package['source'].startswith('registry+'),
-                    'path/git dependency needs explicit build admission')
-            source = package['source']
-            skip = None
+        require(package['source'] is not None and package['source'].startswith('registry+'),
+                'path/git dependency needs explicit build admission')
         # Include native headers/build scripts/data, not only Rust modules.
         files = sorted(path for path in directory.rglob('*') if path.is_file()
-                       and path.name not in {'.cargo-ok', '.cargo_vcs_info.json'}
-                       and not (skip is not None and path.is_relative_to(skip)))
+                       and path.name not in {'.cargo-ok', '.cargo_vcs_info.json'})
         require(not any(path.is_symlink() for path in files), 'symlinked dependency input')
         dependencies.append(dict(package=package['name'], version=package['version'],
-                                 source=source,
+                                 source=package['source'],
                                  files={path.relative_to(directory).as_posix(): digest(path) for path in files}))
     dependencies.sort(key=lambda p: (p['package'], p['version']))
     return dict(schema_version=1, root_files=root_files, dependencies=dependencies)
