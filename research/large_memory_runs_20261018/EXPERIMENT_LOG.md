@@ -22,7 +22,8 @@ checkout `/home/ec2-user/crypto`, and are committed to branch
 |:--|:--|:--|:--|:--|:--|:--|
 | 1 | `XP-20261015-pkm-m3-n21-m4-n20`, `run.sh host` | `research/pkm_lead1_m3n21_20261016/run.sh host` | 05:54:06 | 05:54:06 | done | `research/pkm_lead1_m3n21_20261016/runs/host-ip-172-31-35-131.us-east-2.compute.internal.txt` (A = 119,416,658 KiB, C = 2.03e10, SHARE = 1; host-size deviation recorded) |
 | 2 | same, `run.sh identity` (N = 15, target 0) | `research/pkm_lead1_m3n21_20261016/run.sh identity` | 05:54:06 | 05:54:58 | done, exit 0, **identity passes** (all 7 compared fields equal round 6; `pkm_tower_check verify`: 1 row, 1 agrees) | `runs/identity-N15-t0-ip-172-31-35-131….{jsonl,log}` |
-| 3 | same, `run.sh main 0` (N = 21, target 0, 32 threads, budget 345,600 s, `--max-dense 20300000000`) | `research/pkm_lead1_m3n21_20261016/run.sh main 0` | 06:11:43 | — | running | `runs/M3-N21-t0.log` (step trace, live), `runs/M3-N21-t0.jsonl` (row, written at the end), `progress.txt` |
+| 3 | same, `run.sh main 0` (N = 21, target 0, 32 threads, budget 345,600 s, `--max-dense 20300000000`) | `research/pkm_lead1_m3n21_20261016/run.sh main 0` | 06:11:43 | 07:59:09 | done, exit 0; **no verdict**: stopped in step 27 by the protocol's `--max-dense C` cap (B' would need 7.93e10 entries ≈ 317 GB against C = 2.03e10; the trace prints the generic `oversize: --max-nnz`) on entering degree 8 after every degree-7 pair was reduced without refuting (`last_productive_degree` 7, `degree_reached` 8, `inconsistent` false); peak resident 68.7 GB before the stop; 27 steps, 667,444 cols, 1.56e14 muladds, 6,445 s wall | `runs/M3-N21-t0.log`, `runs/M3-N21-t0.jsonl`, `progress.txt` |
+| 5 | same, `run.sh main 1` (N = 21, target 1, same flags) | `research/pkm_lead1_m3n21_20261016/run.sh main 1` | 08:42:41 | — | running | `runs/M3-N21-t1.{log,jsonl}` |
 | 4 | `XP-20261015-shape-g1-frozen-cells`, sizing probe (13, 5), d_max = 7, random, 1 × 1, seed 1, 1 thread, 64 GB address cap, 4 h wall cap | `research/shape_search_g1_frozen_cells_20261018/probe/probe.sh 13:5:7 64 14400` | 06:11:00 | — | running (disclosed smoke run, not a result) | `probe/probe-13-5-7.{jsonl,err,meta}`, `probe/progress.txt` |
 
 Planned, not started: PKM `main 1`, `confirm T D` for each finished target,
@@ -36,5 +37,6 @@ cells `13:5:7`, `17:6:7`, `19:7:7` as the card's shards.
   file before stage 2.
 - 2026-10-18 06:05–06:13: the first autocommit loop failed silently on a
   missing pathspec; replaced. First commit `67e221167` at 06:13.
+- 2026-10-18 07:59: target 0 stopped at the protocol's `--max-dense C` cap (engine source: `f4_fp_tower.rs` stops as oversize when `dense_entries > max_dense`; the trace's `oversize: --max-nnz` wording is generic). The degree-8 step needs a B' of 7.93e10 entries (≈ 317 GB, ≈ 460 GB at round 7's 1.45 peak ratio): the card's 133–146 GB projection assumed D stays at 7 and is too low, as PROTOCOL.md §4.4 warned. Under §5 the reading is for the coordinator: the degree-7 closure was exhausted without refuting, and the degree-8 step did no productive reduction before the cap (`muladds` 0). Target 1 runs with identical flags, as §5 requires.
 - A swap file was not created (permission denied by the session's policy),
   so there is no cushion beyond the protocol's `ulimit -v`.
