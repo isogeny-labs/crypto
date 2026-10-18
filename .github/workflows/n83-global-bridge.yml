@@ -1,0 +1,87 @@
+name: N83 selected-finalist global bridge Tier 1
+
+on:
+  push:
+    branches: [codex/n83-global-bridge-20261018]
+    paths:
+      - research/n83_global_bridge_20261018/dispatch.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n83-global-bridge-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  global-bridge-stratum:
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-global-bridge-20261018'
+    strategy:
+      fail-fast: false
+      matrix:
+        stratum: [0, 1]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Replay frozen points and selected-finalist dispatch
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PYTHONDONTWRITEBYTECODE=1
+          root="$RUNNER_TEMP/n83-global-bridge-stratum-${{ matrix.stratum }}"
+          mkdir -p "$root"
+          python3 research/n83_global_bridge_20261018/generate_fresh.py > "$root/fixture-check.json"
+          python3 research/n83_global_bridge_20261018/audit_fresh.py > "$root/exclusion-check.json"
+          python3 -m research.n83_global_bridge_20261018.test_arms > "$root/arms-test.json"
+          python3 -m research.n83_global_bridge_20261018.test_select > "$root/selector-test.json"
+          python3 -m research.n83_global_bridge_20261018.test_provider_jobs > "$root/provider-test.json"
+          python3 -m research.n83_global_bridge_20261018.check_dispatch > "$root/dispatch-check.json"
+          python3 research/n83_global_bridge_20261018/run.py --preflight --stratum "${{ matrix.stratum }}" > "$root/schedule-preflight.json"
+          rustc --version > "$root/rustc-version.txt"
+          cargo --version > "$root/cargo-version.txt"
+
+      - name: Build and test exact IC and same-point rho producers
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/n83-global-bridge-stratum-${{ matrix.stratum }}"
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-global-bridge-stratum-${{ matrix.stratum }}-target"
+          export CARGO_BUILD_JOBS=2
+          cargo test --release --locked --example koblitz_orbit_dlp_fast > "$root/ic-example-tests.log" 2>&1
+          cargo test --release --locked --example n83_rho_optimization_eval > "$root/rho-example-tests.log" 2>&1
+          cargo build --release --locked --example koblitz_orbit_dlp_fast > "$root/ic-build.log" 2>&1
+          cargo build --release --locked --example n83_rho_optimization_eval > "$root/rho-build.log" 2>&1
+
+      - name: Run selected factor bases with calibrated same-point rho
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/n83-global-bridge-stratum-${{ matrix.stratum }}"
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-global-bridge-stratum-${{ matrix.stratum }}-target"
+          python3 research/n83_global_bridge_20261018/run.py \
+            --stratum "${{ matrix.stratum }}" \
+            --binary "$CARGO_TARGET_DIR/release/examples/koblitz_orbit_dlp_fast" \
+            --rho-binary "$CARGO_TARGET_DIR/release/examples/n83_rho_optimization_eval" \
+            --output "$root/results" 2>&1 | tee "$root/run.log"
+
+      - name: Independently replay bases relations scalars and resources
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/n83-global-bridge-stratum-${{ matrix.stratum }}"
+          if [ -d "$root/results" ]; then
+            python3 research/n83_global_bridge_20261018/verify.py \
+              "$root/results" --stratum "${{ matrix.stratum }}" 2>&1 | tee "$root/verify.log"
+          fi
+
+      - name: Preserve all raw receipts and failed pairs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-global-bridge-stratum-${{ matrix.stratum }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/n83-global-bridge-stratum-${{ matrix.stratum }}/
+          if-no-files-found: error
+          retention-days: 14
