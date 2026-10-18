@@ -19,7 +19,12 @@ Every curve is named by its ICV1 slug (docs/curves/ICV1.md) through the
 curve registry.  Every number is read from a frozen file named in
 `SOURCES`; the only arithmetic here is averaging the repetitions a report
 already holds, dividing a phase's operations by sqrt(r) to express it in S,
-and taking a phase's share of its row's total.
+taking a phase's share of its row's total, and, for the retained-setup online
+rows of the frontier audit, the generic-bound distance
+log2(S*T^2) - log2(r/|Aut|) from the advice states S and online probes T the
+row's frozen file records (RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md
+sections 2 and 4); a row whose frozen files do not record S and T reads
+"not recorded".
 """
 from __future__ import annotations
 
@@ -73,6 +78,7 @@ SOURCES = {
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
+    "n83_dense_root_primary": "research/n83_dense_root_20261013/analysis_primary.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
     "registry": "docs/curves/registry.json",
@@ -617,6 +623,77 @@ def la_component() -> dict:
             "class": "engineering"}
 
 
+N83_SUBGROUP_ORDER = 8569786107849059   # research/n83_dense_root_20261013/REPORT.md; checked against the registry
+
+
+def n83_generic_bound(n83: dict) -> dict:
+    """log2(S*T^2) - log2(r/|Aut|) for the n83 dense K1798 online row.
+
+    S is the primary run's `regular_states` (advice states), T its
+    `mean_target_probes` over the one public target, r the subgroup order,
+    |Aut| = 2n (negation and the n-fold Frobenius).  The inputs are the
+    frozen primary analysis and the registry; nothing is estimated.
+    """
+    dense = load(SOURCES["n83_dense_root_primary"])
+    arm = next((a for a in dense.get("arms", []) if a.get("arm") == "k1798_dense"), {})
+    same = next((c for c in dense.get("rho_same_point", {}).get("comparisons", [])
+                 if c.get("arm") == "k1798_dense"), {})
+    registry = json.dumps(load(SOURCES["registry"]))
+    if (dense.get("schema") != "n83.dense-root-analysis/v1"
+            or arm.get("status") != "PASS_INDEPENDENT_REPLAY"
+            or arm.get("targets") != 1
+            or arm.get("orbit_columns") != 1798
+            or abs(same.get("rho_over_ic_online_ratio_exploratory", 0)
+                   - n83["online_rho_over_ic"]) > 1e-6
+            or f'"subgroup_order": "{N83_SUBGROUP_ORDER}"' not in registry):
+        raise SystemExit("review the n83 dense-root primary analysis before updating the leaderboard")
+    states, probes = arm["regular_states"], arm["mean_target_probes"]
+    aut = 2 * 83
+    log_st2 = math.log2(states) + 2 * math.log2(probes)
+    log_n = math.log2(N83_SUBGROUP_ORDER / aut)
+    return {
+        "status": "computed",
+        "states": states, "probes": probes, "subgroup_order": N83_SUBGROUP_ORDER,
+        "aut": aut, "log2_s_t2": log_st2, "log2_r_over_aut": log_n,
+        "distance_bits": log_st2 - log_n,
+        "source": SOURCES["n83_dense_root_primary"],
+        "note": "S = regular_states, T = the one target's probes (`mean_target_probes`, targets = 1) "
+                "in the frozen primary analysis; derived, not measured here",
+    }
+
+
+def n61_generic_bound(n61: dict) -> dict:
+    """The n61 compact-orbit online row records no S or T in a committed file."""
+    return {
+        "status": "not recorded",
+        "source": SOURCES["frontier_audit"],
+        "note": "S and T are in no committed file. The row's evidence directory "
+                "`research/sat_factor_base_review_20260908/autolab/runs/20261012T173628Z-3fd988ea23/` "
+                "(`docs/ic/BOUNDARY_TARGETS.md`, `vs_rho` row) is not in the repository, and "
+                f"`{SOURCES['frontier_audit']}` holds only the ratio, interval, target count and setup "
+                "seconds. That run's record would have to carry the advice-state count and the mean "
+                "online probes",
+    }
+
+
+def bound_cell_md(b: dict) -> str:
+    if b["status"] != "computed":
+        return f"not recorded ({b['note']})"
+    return (f"**{b['distance_bits']:+.2f}** bits: `S` = {b['states']:,} states, `T` = {b['probes']:,.0f} "
+            f"probes, `r` = {b['subgroup_order']}, `|Aut|` = {b['aut']}; log₂(S·T²) = "
+            f"{b['log2_s_t2']:.2f}, log₂(r/|Aut|) = {b['log2_r_over_aut']:.2f}; "
+            f"[`{b['source']}`](../../{b['source']}). {b['note']}")
+
+
+def bound_cell_html(b: dict) -> str:
+    if b["status"] != "computed":
+        return f"not recorded<br><span class=\"muted\">{esc(b['note'])}</span>"
+    return (f"<strong>{b['distance_bits']:+.2f}</strong> bits<br><span class=\"muted\">"
+            f"S = {b['states']:,} states, T = {b['probes']:,.0f} probes, r = {b['subgroup_order']}, "
+            f"|Aut| = {b['aut']}; log₂(S·T²) = {b['log2_s_t2']:.2f}, log₂(r/|Aut|) = "
+            f"{b['log2_r_over_aut']:.2f}; {gh(b['source'])}. {esc(b['note'])}</span>")
+
+
 def latest_frontier_audit() -> dict:
     """Copy the latest performance handoff into the generated board.
 
@@ -708,6 +785,7 @@ def latest_frontier_audit() -> dict:
             "label": n61["label"], "rho_over_ic": n61["online_rho_over_ic"],
             "ci95": n61["online_ci95"], "targets": n61["targets"],
             "setup_seconds_approx": n61["setup_seconds_approx"], "status": n61["status"],
+            "generic_bound": n61_generic_bound(n61),
         },
         "exploratory_online": {
             "label": n83["label"], "rho_over_ic": n83["online_rho_over_ic"],
@@ -715,6 +793,7 @@ def latest_frontier_audit() -> dict:
             "setup_inclusive_class": n83["setup_inclusive_class"],
             "first_integer_break_even_under_model": n83["first_integer_break_even_under_model"],
             "status": n83["status"],
+            "generic_bound": n83_generic_bound(n83),
         },
         "replay_block": {
             "identical": failed["replays_identical"], "total": failed["replays_total"],
@@ -1138,31 +1217,40 @@ def markdown(doc: dict) -> str:
     L += [f"## Latest frontier audit ({audit['date']})", "",
           "This performance handoff is published beside the curve-by-curve tables. The standing rho "
           "implementation improved, while its mathematical work and every ranked IC row stayed fixed.", "",
-          "| boundary | observed result | leaderboard treatment |",
-          "|:--|:--|:--|",
+          "| boundary | observed result | leaderboard treatment | generic-bound distance `log₂(S·T²) − log₂(r/\\|Aut\\|)` |",
+          "|:--|:--|:--|:--|",
           f"| Standing strong-rho implementation | complete-solve Callgrind: optimized / archived "
           f"baseline {rho['optimized_over_archived_baseline']:.6f}× and optimized / same-binary legacy "
           f"{rho['optimized_over_same_binary_legacy']:.6f}×; GAE {rho['ops_ratio']:.3f} "
           f"[{rho['ops_ci95'][0]:.3f}, {rho['ops_ci95'][1]:.3f}] over {rho['ops_pairs']} pairs; "
           f"{rho['replays_identical']}/{rho['measured_replays']} measured replays identical | "
           f"Implementation win; operation boundary unchanged. Native wall remained {rho['wall_level']} "
-          "and is not admitted |",
+          "and is not admitted | n/a (not an online IC row) |",
           f"| Canonical medium-tier Koblitz cold operations | `{cold['method']}` / "
           f"`{cold['bound_id']}`: {cold['ops_over_floor']:.3f}× floor "
           f"[{cold['ops_ci95'][0]:.3f}, {cold['ops_ci95'][1]:.3f}], "
-          f"{cold['runs']} runs at {cold['sizes']} sizes | Standing rho boundary; not an IC row |",
+          f"{cold['runs']} runs at {cold['sizes']} sizes | Standing rho boundary; not an IC row | n/a (not an online IC row) |",
           f"| Retained-setup online, `{admitted['label']}` | rho/IC "
           f"{admitted['rho_over_ic']:.1f}× [{admitted['ci95'][0]:.1f}, "
           f"{admitted['ci95'][1]:.1f}], {admitted['targets']} unseen targets; about "
           f"{admitted['setup_seconds_approx']:.0f} s setup excluded | Admitted online result; "
-          "kept separate from cold ranked rows |",
+          "kept separate from cold ranked rows | "
+          f"{bound_cell_md(admitted['generic_bound'])} |",
           f"| Retained-setup online, `{exploratory['label']}` | rho/IC "
           f"{exploratory['rho_over_ic']:.6f}× on {exploratory['targets']} public point; complete IC "
           f"process {exploratory['complete_process_seconds']:.3f} s | Exploratory shared-host result; "
-          "no matched cold ratio and no rank promotion |",
+          "no matched cold ratio and no rank promotion | "
+          f"{bound_cell_md(exploratory['generic_bound'])} |",
           f"| Current-binary root-finder replay-all | {replay['identical']}/{replay['total']} identical; "
           f"{replay['failures']} inherited-F4 counter mismatches | Failed replay retained; affected "
-          "stage counters blocked from promotion |", "",
+          "stage counters blocked from promotion | n/a (not an online IC row) |", "",
+          "The last column is the generic bound of "
+          "[`RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md`](../../RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md) "
+          "§2 and §4: `S` advice states, `T` online probes, `|Aut| = 2n`, `r` the subgroup order. A distance "
+          "of 0 is the line preprocessing rho sits on, and a row at or below it would be the first "
+          "non-generic signal. It is derived from the frozen file named in the cell, never measured here, "
+          "and a row whose frozen files do not record `S` and `T` reads \"not recorded\". "
+          "Online rows only; no cold row is priced this way.", "",
           f"[Latest result data](../../{audit['source']}); "
           f"[prior full synthesis](../../{audit['previous_source']}). {audit['reason']}", ""]
     for code in ("A", "B", "C"):
@@ -1600,7 +1688,8 @@ def page(doc: dict, standalone: bool) -> str:
              '<p>The standing rho implementation improved while its mathematical work and every ranked IC '
              'row stayed fixed. Cold, retained-setup online, exploratory and failed-replay evidence remain separate.</p>'
              '<div class="scroll"><table><thead><tr><th>Boundary</th><th>Observed result</th>'
-             '<th>Leaderboard treatment</th></tr></thead><tbody>'
+             '<th>Leaderboard treatment</th><th>Generic-bound distance '
+             'log₂(S·T²) − log₂(r/|Aut|)</th></tr></thead><tbody>'
              '<tr><td>Standing strong-rho implementation</td>'
              f'<td>complete-solve Callgrind: optimized / archived baseline '
              f'{rho["optimized_over_archived_baseline"]:.6f}× and optimized / same-binary legacy '
@@ -1608,25 +1697,34 @@ def page(doc: dict, standalone: bool) -> str:
              f'[{rho["ops_ci95"][0]:.3f}, {rho["ops_ci95"][1]:.3f}] over {rho["ops_pairs"]} pairs; '
              f'{rho["replays_identical"]}/{rho["measured_replays"]} measured replays identical</td>'
              f'<td>Implementation win; operation boundary unchanged. Native wall remained '
-             f'{esc(rho["wall_level"])} and is not admitted</td></tr>'
+             f'{esc(rho["wall_level"])} and is not admitted</td><td>n/a (not an online IC row)</td></tr>'
              '<tr><td>Canonical medium-tier Koblitz cold operations</td>'
              f'<td><code>{esc(acold["method"])}</code> / <code>{esc(acold["bound_id"])}</code>: '
              f'{acold["ops_over_floor"]:.3f}× floor [{acold["ops_ci95"][0]:.3f}, '
              f'{acold["ops_ci95"][1]:.3f}], {acold["runs"]} runs at {acold["sizes"]} sizes</td>'
-             '<td>Standing rho boundary; not an IC row</td></tr>'
+             '<td>Standing rho boundary; not an IC row</td><td>n/a (not an online IC row)</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(admitted["label"])}</code></td>'
              f'<td>rho/IC {admitted["rho_over_ic"]:.1f}× [{admitted["ci95"][0]:.1f}, '
              f'{admitted["ci95"][1]:.1f}], {admitted["targets"]} unseen targets; about '
              f'{admitted["setup_seconds_approx"]:.0f} s setup excluded</td>'
-             '<td>Admitted online result; separate from cold ranked rows</td></tr>'
+             '<td>Admitted online result; separate from cold ranked rows</td>'
+             f'<td>{bound_cell_html(admitted["generic_bound"])}</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(exploratory["label"])}</code></td>'
              f'<td>rho/IC {exploratory["rho_over_ic"]:.6f}× on {exploratory["targets"]} public point; '
              f'complete IC process {exploratory["complete_process_seconds"]:.3f} s</td>'
-             '<td>Exploratory shared-host result; no matched cold ratio and no rank promotion</td></tr>'
+             '<td>Exploratory shared-host result; no matched cold ratio and no rank promotion</td>'
+             f'<td>{bound_cell_html(exploratory["generic_bound"])}</td></tr>'
              f'<tr><td>Current-binary root-finder replay-all</td><td>{replay["identical"]}/'
              f'{replay["total"]} identical; {replay["failures"]} inherited-F4 counter mismatches</td>'
-             '<td>Failed replay retained; affected stage counters blocked from promotion</td></tr>'
+             '<td>Failed replay retained; affected stage counters blocked from promotion</td>'
+             '<td>n/a (not an online IC row)</td></tr>'
              '</tbody></table></div>'
+             '<p>The last column is the generic bound of '
+             f'{gh("RESEARCH_IC_LEADS_AND_CONNECTIONS_20261010.md")} §2 and §4: <code>S</code> advice states, '
+             '<code>T</code> online probes, <code>|Aut| = 2n</code>, <code>r</code> the subgroup order. A distance '
+             'of 0 is the line preprocessing rho sits on; a row at or below it would be the first non-generic '
+             'signal. It is derived from the frozen file named in the cell, never measured here, and a row whose '
+             'frozen files do not record <code>S</code> and <code>T</code> reads "not recorded". Online rows only.</p>'
              f'<p>{esc(audit["reason"])} {gh(audit["source"], "Latest result data")} · '
              f'{gh(audit["previous_source"], "prior full synthesis")}.</p></section>')
     d = doc["bounded_diagnostics"][0]
