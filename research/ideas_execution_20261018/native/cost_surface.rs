@@ -191,7 +191,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         for m in [3, 4, 5, 6] {
             for model in models {
                 for w in [1.0, 2.0, 2.2] {
-                    for conversion in [0.1, 1.0, 10.0] {
+                    for conversion in [0.0, 0.1, 1.0, 10.0] {
                         let mut x = optimum(n, r, a, m, model, w, conversion);
                         x.curve = name.into();
                         x.subgroup_order_hex = order.clone();
@@ -205,6 +205,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "schema":"deployed-binary-descent-cost/v1", "item":2,
         "classification":"derived model; no timing or security claim",
         "protocol":"research/ideas_execution_20261018/cost_protocol.json",
+        "amendment":"research/ideas_execution_20261018/cost_protocol_amendment_01.json",
         "rows":rows,
         "calibration":"unmeasured; conversion is sensitivity only",
         "degree4_status":"counterfactual sensitivity, not a validated deployed-size model"
@@ -244,6 +245,8 @@ mod tests {
         let x = row(131, 129.0, 262, 4, 33, Model::GuessLinear, 2.0, 1.0);
         assert_eq!(x.guessed_variables, 108);
         assert!(x.oracle_column_work_log2 >= 108.0);
+        let zero = row(131, 129.0, 262, 4, 33, Model::Constant(4), 2.0, 0.0);
+        assert_eq!(zero.modeled_partial_cost_log2, zero.relation_algebra_group_equivalents_log2);
     }
     #[test]
     fn constructor_orders_are_bound_and_have_expected_sizes() {
