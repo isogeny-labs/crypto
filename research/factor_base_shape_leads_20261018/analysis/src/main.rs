@@ -1,4 +1,5 @@
 use serde_json::{json, Value};
+mod coverage;
 use std::{
     collections::{BTreeMap, BTreeSet},
     error::Error,
@@ -102,6 +103,22 @@ fn representation_comparison(a: &Value, b: &Value) -> Result<Value> {
       "positive_controls_in_cost_comparison":false,"full_pipeline_speedup":null}),
     )
 }
+fn failed_row(
+    panel: &str,
+    item: &Value,
+    base: &Value,
+    request: &Value,
+    complete: &Value,
+    first: &str,
+) -> Value {
+    json!({"panel":panel,"id":item["id"],"label":item["label"],"outcome":item["outcome"],
+      "curve":base["curve"],"configuration":request["candidate"],
+      "columns":base["factor_base"]["columns"],"signed_points":base["factor_base"]["signed_points"],
+      "ordered_points_sha256":base["factor_base"]["points_sha256"],
+      "exact_point_set_group":first,"same_point_set_as_earlier":Some(first)!=item["label"].as_str(),
+      "failure":complete["fatal"],"train":null,"holdout":null,"positive_control":null,
+      "training_independent_rank":null,"certified_degree_of_regularity":null,"full_pipeline_speedup":null})
+}
 fn audit(root: &Path, panels: &[String]) -> Result<Value> {
     let mut rows = Vec::new();
     let mut identities: BTreeMap<(String, BTreeSet<(String, String)>), String> = BTreeMap::new();
@@ -133,13 +150,7 @@ fn audit(root: &Path, panels: &[String]) -> Result<Value> {
             if item["outcome"] != "completed" {
                 let request = read(&dir.join("request.json"))?;
                 let complete = read(&dir.join("complete.json"))?;
-                rows.push(json!({"panel":panel,"id":id,"label":label,"outcome":item["outcome"],
-                  "curve":base["curve"],"configuration":request["candidate"],
-                  "columns":base["factor_base"]["columns"],"signed_points":base["factor_base"]["signed_points"],
-                  "ordered_points_sha256":base["factor_base"]["points_sha256"],
-                  "exact_point_set_group":first,"same_point_set_as_earlier":first!=label,
-                  "failure":complete["fatal"],"train":null,"holdout":null,"positive_control":null,
-                  "training_independent_rank":null,"certified_degree_of_regularity":null,"full_pipeline_speedup":null}));
+                rows.push(failed_row(panel, item, &base, &request, &complete, &first));
                 continue;
             }
             let m = &item["measurement"];
@@ -180,15 +191,16 @@ fn audit(root: &Path, panels: &[String]) -> Result<Value> {
             }
         }
     }
-    let mut groups: BTreeMap<(String, u64, String), Vec<&Value>> = BTreeMap::new();
+    let mut groups: BTreeMap<(String, String, u64, String), Vec<&Value>> = BTreeMap::new();
     for row in &rows {
-        if row["panel"] != "secondary" {
+        if row["panel"] != "secondary" && row["panel"] != "confirmation" {
             continue;
         }
         let Some(shape) = row["configuration"]["shape"].as_str() else {
             continue;
         };
         let key = (
+            text(row, "panel")?.to_owned(),
             text(&row["curve"], "slug")?.to_owned(),
             num(&row["configuration"], "dimension")?,
             shape.to_owned(),
@@ -196,7 +208,7 @@ fn audit(root: &Path, panels: &[String]) -> Result<Value> {
         groups.entry(key).or_default().push(row);
     }
     let mut filters = Vec::new();
-    for ((curve, dimension, shape), members) in groups {
+    for ((panel, curve, dimension, shape), members) in groups {
         let qualifying: Vec<_> = members
             .iter()
             .filter(|r| {
@@ -213,9 +225,15 @@ fn audit(root: &Path, panels: &[String]) -> Result<Value> {
             .iter()
             .filter_map(|r| r["exact_point_set_group"].as_str())
             .collect();
-        filters.push(json!({"curve":curve,"dimension":dimension,"shape":shape,"qualifying_cases":qualifying.len(),
+        let required = if panel == "confirmation" && shape == "tracezero-gp" {
+            3
+        } else {
+            2
+        };
+        filters.push(json!({"panel":panel,"curve":curve,"dimension":dimension,"shape":shape,"qualifying_cases":qualifying.len(),
           "qualifying_seeds":seeds,"distinct_qualifying_point_sets":sets.len(),
-          "exploration_filter_pass":seeds.len()>=2&&sets.len()>=2,
+          "required_distinct_constructor_seeds":required,
+          "exploration_filter_pass":seeds.len()>=required&&sets.len()>=required,
           "selection_status":"predeclared exploration filter; not a cost ranking or significance test"}));
     }
     Ok(
@@ -228,6 +246,16 @@ fn audit(root: &Path, panels: &[String]) -> Result<Value> {
 }
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().skip(1).collect();
+    if args.first().is_some_and(|s| s == "--coverage") {
+        if args.len() < 4 {
+            return Err(
+                "usage: factor-base-lead-audit --coverage RUNS_ROOT REGISTRY PANEL...".into(),
+            );
+        }
+        let v = coverage::coverage(Path::new(&args[1]), Path::new(&args[2]), &args[3..])?;
+        println!("{}", serde_json::to_string_pretty(&v)?);
+        return Ok(());
+    }
     if args.len() < 2 {
         return Err("usage: factor-base-lead-audit RUNS_ROOT PANEL...".into());
     }
@@ -238,6 +266,21 @@ fn main() -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn failed_inventory_is_missing_yield_rather_than_a_zero_yield_completion() {
+        let row = failed_row(
+            "secondary",
+            &json!({"id":"id","label":"bad","outcome":"failed"}),
+            &json!({"factor_base":{"columns":0}}),
+            &json!({"candidate":{}}),
+            &json!({"fatal":{"message":"empty inventory"}}),
+            "bad",
+        );
+        assert!(row["holdout"].is_null());
+        assert!(row["training_independent_rank"].is_null());
+        assert_eq!(row["failure"]["message"], "empty inventory");
+        assert_eq!(row["outcome"], "failed");
+    }
     #[test]
     fn distinct_targets_do_not_count_repeated_draws_as_new_evidence() {
         let t = json!({"phase":"holdout","target":[1,2],"ground_truth_decomposable":true,
