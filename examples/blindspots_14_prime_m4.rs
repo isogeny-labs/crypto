@@ -35,6 +35,17 @@
 //! equivalent (GAE).  Everything else is a *native* operation, counted by name
 //! and priced by the reader at 0, 0.1 and 1 GAE (AGENTS.md section 5a).
 
+#![allow(
+    clippy::needless_range_loop,
+    clippy::manual_is_multiple_of,
+    clippy::neg_cmp_op_on_partial_ord,
+    clippy::unusual_byte_groupings,
+    clippy::unnecessary_cast,
+    clippy::collapsible_if,
+    clippy::useless_vec,
+    clippy::unnecessary_sort_by
+)]
+
 use std::collections::{HashMap, HashSet};
 use std::io::Write as _;
 use std::sync::atomic::{AtomicU64, Ordering as AO};
@@ -256,7 +267,11 @@ struct Pt {
     y: u64,
     inf: bool,
 }
-const INF: Pt = Pt { x: 0, y: 0, inf: true };
+const INF: Pt = Pt {
+    x: 0,
+    y: 0,
+    inf: true,
+};
 /// Partition of the r-adding walk: a multiplicative hash of the abscissa.
 fn part(x: u64) -> usize {
     ((x.wrapping_mul(0x9E37_79B1) >> 9) % 16) as usize
@@ -285,7 +300,11 @@ impl Curve {
         if q.inf {
             q
         } else {
-            Pt { x: q.x, y: self.f.neg(q.y), inf: false }
+            Pt {
+                x: q.x,
+                y: self.f.neg(q.y),
+                inf: false,
+            }
         }
     }
     /// One group addition (doubling and `P + (-P)` included); counted as one GAE
@@ -318,7 +337,11 @@ impl Curve {
         }
         let x3 = f.sub(f.sub(f.mul(lam, lam), p.x), q.x);
         let y3 = f.sub(f.mul(lam, f.sub(p.x, x3)), p.y);
-        Pt { x: x3, y: y3, inf: false }
+        Pt {
+            x: x3,
+            y: y3,
+            inf: false,
+        }
     }
     fn mul(&self, mut k: u64, p: Pt) -> Pt {
         let mut acc = INF;
@@ -398,20 +421,60 @@ struct Cell {
 }
 impl Cell {
     fn curve(&self) -> Curve {
-        Curve { f: Fp { p: self.p }, a: self.a, b: self.b }
+        Curve {
+            f: Fp { p: self.p },
+            a: self.a,
+            b: self.b,
+        }
     }
     fn g(&self) -> Pt {
-        Pt { x: self.gx, y: self.gy, inf: false }
+        Pt {
+            x: self.gx,
+            y: self.gy,
+            inf: false,
+        }
     }
 }
 
 /// Frozen instances (`find-curve --bits B --seed 20261018`), each of prime order.
 /// Recounted by `selftest`.
 const CELLS: [Cell; 4] = [
-    Cell { bits: 16, p: 48479, a: 25392, b: 20877, n: 48383, gx: 3, gy: 19437 },
-    Cell { bits: 20, p: 661603, a: 422772, b: 346249, n: 660917, gx: 9, gy: 268107 },
-    Cell { bits: 24, p: 10539323, a: 7836717, b: 8828358, n: 10542893, gx: 3, gy: 2623236 },
-    Cell { bits: 28, p: 248685287, a: 49054657, b: 177851102, n: 248685841, gx: 1, gy: 65256793 },
+    Cell {
+        bits: 16,
+        p: 48479,
+        a: 25392,
+        b: 20877,
+        n: 48383,
+        gx: 3,
+        gy: 19437,
+    },
+    Cell {
+        bits: 20,
+        p: 661603,
+        a: 422772,
+        b: 346249,
+        n: 660917,
+        gx: 9,
+        gy: 268107,
+    },
+    Cell {
+        bits: 24,
+        p: 10539323,
+        a: 7836717,
+        b: 8828358,
+        n: 10542893,
+        gx: 3,
+        gy: 2623236,
+    },
+    Cell {
+        bits: 28,
+        p: 248685287,
+        a: 49054657,
+        b: 177851102,
+        n: 248685841,
+        gx: 1,
+        gy: 65256793,
+    },
 ];
 
 fn cell_for(bits: u32) -> Cell {
@@ -437,10 +500,7 @@ fn find_curve(bits: u32, seed: u64) -> Cell {
             let b = 1 + rng.below(p - 1);
             let f = Fp { p };
             // non-singular
-            let disc = f.add(
-                f.mul(4, f.mul(a, f.mul(a, a))),
-                f.mul(27, f.mul(b, b)),
-            );
+            let disc = f.add(f.mul(4, f.mul(a, f.mul(a, a))), f.mul(27, f.mul(b, b)));
             if disc == 0 {
                 continue;
             }
@@ -453,11 +513,23 @@ fn find_curve(bits: u32, seed: u64) -> Cell {
                     let r = cv.rhs(x);
                     if r != 0 && cv.f.pow(r, (p - 1) / 2) == 1 {
                         let y = cv.f.pow(r, (p + 1) / 4);
-                        break Pt { x, y: y.min(p - y), inf: false };
+                        break Pt {
+                            x,
+                            y: y.min(p - y),
+                            inf: false,
+                        };
                     }
                     x += 1;
                 };
-                return Cell { bits, p, a, b, n, gx: g.x, gy: g.y };
+                return Cell {
+                    bits,
+                    p,
+                    a,
+                    b,
+                    n,
+                    gx: g.x,
+                    gy: g.y,
+                };
             }
         }
     }
@@ -466,10 +538,15 @@ fn find_curve(bits: u32, seed: u64) -> Cell {
 // ───────────────────────── small helpers ─────────────────────────
 
 fn arg<'a>(args: &'a [String], name: &str) -> Option<&'a str> {
-    args.iter().position(|a| a == name).and_then(|i| args.get(i + 1)).map(|s| s.as_str())
+    args.iter()
+        .position(|a| a == name)
+        .and_then(|i| args.get(i + 1))
+        .map(|s| s.as_str())
 }
 fn arg_u64(args: &[String], name: &str, default: u64) -> u64 {
-    arg(args, name).map(|s| s.parse().expect("number")).unwrap_or(default)
+    arg(args, name)
+        .map(|s| s.parse().expect("number"))
+        .unwrap_or(default)
 }
 fn flag(args: &[String], name: &str) -> bool {
     args.iter().any(|a| a == name)
@@ -479,7 +556,9 @@ struct Out {
 }
 impl Out {
     fn new(path: Option<&str>) -> Self {
-        Out { f: path.map(|p| std::fs::File::create(p).expect("create out")) }
+        Out {
+            f: path.map(|p| std::fs::File::create(p).expect("create out")),
+        }
     }
     fn line(&mut self, s: &str) {
         println!("{s}");
@@ -493,8 +572,8 @@ impl Out {
 
 /// `F = {P : x(P) in [1, B]}`, both signs.  Signed index `2c` is `+P_c`, `2c+1` is `-P_c`.
 struct Base {
-    xs: Vec<u64>,    // valid abscissae, ascending
-    pts: Vec<Pt>,    // signed points
+    xs: Vec<u64>, // valid abscissae, ascending
+    pts: Vec<Pt>, // signed points
     bound: u64,
 }
 impl Base {
@@ -511,7 +590,11 @@ impl Base {
             }
             x += 1;
         }
-        Base { xs, pts, bound: x - 1 }
+        Base {
+            xs,
+            pts,
+            bound: x - 1,
+        }
     }
     fn nsigned(&self) -> usize {
         self.pts.len()
@@ -540,7 +623,8 @@ impl TripleTable {
                 for k in j..f {
                     let s3 = cv.add(s2, base.pts[k]);
                     bump(INSERT, 1);
-                    map.entry(key(&s3)).or_insert([i as u16, j as u16, k as u16]);
+                    map.entry(key(&s3))
+                        .or_insert([i as u16, j as u16, k as u16]);
                 }
             }
         }
@@ -642,13 +726,18 @@ fn brute_grid_roots(cv: &Curve, base: &Base, r: Pt) -> u64 {
 
 struct Matrix {
     n: u64,
-    cols: usize, // unknowns: b_x base logs and d
+    cols: usize,                          // unknowns: b_x base logs and d
     pivots: Vec<Option<(Vec<u64>, u64)>>, // pivot row per column: (coeffs normalised to 1 at the pivot, rhs)
     rank: usize,
 }
 impl Matrix {
     fn new(n: u64, cols: usize) -> Self {
-        Matrix { n, cols, pivots: vec![None; cols], rank: 0 }
+        Matrix {
+            n,
+            cols,
+            pivots: vec![None; cols],
+            rank: 0,
+        }
     }
     fn modinv(&self, a: u64) -> u64 {
         Fp { p: self.n }.inv(a)
@@ -722,7 +811,9 @@ mod s5 {
 
     fn psub(f: &Fp, p: &[u64], q: &[u64]) -> Vec<u64> {
         let n = p.len().max(q.len());
-        (0..n).map(|i| f.sub(*p.get(i).unwrap_or(&0), *q.get(i).unwrap_or(&0))).collect()
+        (0..n)
+            .map(|i| f.sub(*p.get(i).unwrap_or(&0), *q.get(i).unwrap_or(&0)))
+            .collect()
     }
     fn pmul(f: &Fp, p: &[u64], q: &[u64]) -> Vec<u64> {
         let mut r = vec![0u64; p.len() + q.len() - 1];
@@ -798,7 +889,7 @@ mod s5 {
     pub fn s5_eval(f: &Fp, a: u64, b: u64, x: [u64; 5]) -> u64 {
         let g = s4_in_x(f, a, b, x[0], x[1], x[2]); // g[0..=4]
         let h = s3_in_z(f, a, b, x[3], x[4]); // h[0..=2]
-        // Sylvester matrix, 6 x 6: 2 rows of g (descending coefficients), 4 rows of h.
+                                              // Sylvester matrix, 6 x 6: 2 rows of g (descending coefficients), 4 rows of h.
         let gd = [g[4], g[3], g[2], g[1], g[0]];
         let hd = [h[2], h[1], h[0]];
         let mut m = vec![vec![0u64; 6]; 6];
@@ -853,7 +944,9 @@ mod s5 {
             vm[i][D + i] = 1;
         }
         for c in 0..D {
-            let r = (c..D).find(|&r| vm[r][c] != 0).expect("vandermonde invertible (p > 8)");
+            let r = (c..D)
+                .find(|&r| vm[r][c] != 0)
+                .expect("vandermonde invertible (p > 8)");
             vm.swap(r, c);
             let inv = f.inv(vm[c][c]);
             for k in 0..2 * D {
@@ -995,7 +1088,10 @@ mod f4 {
     }
     impl Bar {
         pub fn new(p: u64) -> Bar {
-            Bar { p, m: ((1u128 << 64) / p as u128) as u64 }
+            Bar {
+                p,
+                m: ((1u128 << 64) / p as u128) as u64,
+            }
         }
         #[inline]
         pub fn red(&self, x: u64) -> u64 {
@@ -1126,7 +1222,8 @@ mod f4 {
             let d = pairs.iter().map(|pr| deg(pr.l)).min().unwrap();
             rep.max_deg = rep.max_deg.max(d);
             rep.last_deg = d;
-            let (sel, rest): (Vec<Pair>, Vec<Pair>) = pairs.drain(..).partition(|pr| deg(pr.l) == d);
+            let (sel, rest): (Vec<Pair>, Vec<Pair>) =
+                pairs.drain(..).partition(|pr| deg(pr.l) == d);
             pairs = rest;
             rep.steps += 1;
             // rows: (multiplier, basis index)
@@ -1171,14 +1268,20 @@ mod f4 {
             // columns
             let mut cols: Vec<Mono> = mono_seen.into_iter().collect();
             cols.sort_by(|a, b| gkey(*b).cmp(&gkey(*a)));
-            let colidx: HashMap<Mono, u32> =
-                cols.iter().enumerate().map(|(i, &m)| (m, i as u32)).collect();
+            let colidx: HashMap<Mono, u32> = cols
+                .iter()
+                .enumerate()
+                .map(|(i, &m)| (m, i as u32))
+                .collect();
             let ncols = cols.len();
             rep.max_cols = rep.max_cols.max(ncols);
             rep.max_rows = rep.max_rows.max(row_spec.len());
             // build sparse rows
             let build = |mult: Mono, g: usize| -> Vec<(u32, u32)> {
-                basis[g].iter().map(|t| (colidx[&(t.0 + mult)], t.1)).collect()
+                basis[g]
+                    .iter()
+                    .map(|t| (colidx[&(t.0 + mult)], t.1))
+                    .collect()
             };
             let mut pivots: Vec<Option<Vec<(u32, u32)>>> = vec![None; ncols];
             let mut nnz = 0usize;
@@ -1633,7 +1736,13 @@ fn rho_run(cell: &Cell, d: u64, seed: u64) -> RhoResult {
         }
     }
     let counts = dsnap(&s0, &snap());
-    RhoResult { setup_gadd, ok: found == Some(d), counts, walks, ms: t0.elapsed().as_secs_f64() * 1e3 }
+    RhoResult {
+        setup_gadd,
+        ok: found == Some(d),
+        counts,
+        walks,
+        ms: t0.elapsed().as_secs_f64() * 1e3,
+    }
 }
 
 // ───────────────────────── full index calculus ─────────────────────────
@@ -1684,7 +1793,11 @@ fn full_ic(
     let base = Base::build_k(&cv, bxk);
     let bx = base.xs.len();
     let cols = bx + 1;
-    let table = if arm == 'a' { Some(TripleTable::build(&cv, &base)) } else { None };
+    let table = if arm == 'a' {
+        Some(TripleTable::build(&cv, &base))
+    } else {
+        None
+    };
     const J: usize = 16;
     let jumps = make_jumps(&cv, cell, q, &mut rng);
     let (mut a, mut b) = (1 + rng.below(n - 1), 1 + rng.below(n - 1));
@@ -1731,7 +1844,11 @@ fn full_ic(
             for &i in &dd {
                 let c = i / 2;
                 let sgn = sign_of(i);
-                row[c] = if sgn > 0 { (row[c] + 1) % n } else { (row[c] + n - 1) % n };
+                row[c] = if sgn > 0 {
+                    (row[c] + 1) % n
+                } else {
+                    (row[c] + n - 1) % n
+                };
             }
             row[bx] = (n - b) % n;
             if m.add_row(row, a % n) {
@@ -1807,7 +1924,8 @@ fn run_arm_b_extract(
                                 for mask in 0..8u32 {
                                     let mut idx = [0usize; 4];
                                     for t in 0..4 {
-                                        let neg = if t == 0 { 0 } else { (mask >> (t - 1)) & 1 } as usize;
+                                        let neg =
+                                            if t == 0 { 0 } else { (mask >> (t - 1)) & 1 } as usize;
                                         idx[t] = 2 * cs[t] + neg;
                                     }
                                     let mut s = INF;
@@ -1975,7 +2093,11 @@ fn cmd_tdec(args: &[String]) {
         let (r, idx) = planted_target(&cv, &base, &mut rng);
         tg.push((r, Some(idx), "planted"));
     }
-    let pairt = if check { Some(PairTable::build(&cv, &base)) } else { None };
+    let pairt = if check {
+        Some(PairTable::build(&cv, &base))
+    } else {
+        None
+    };
     let t1i = arg_u64(args, "--t1", tg.len() as u64) as usize;
     for arm in arms.split(',') {
         match arm {
@@ -1998,7 +2120,9 @@ fn cmd_tdec(args: &[String]) {
                     let d = dsnap(&s0, &snap());
                     let ms = t0.elapsed().as_secs_f64() * 1e3;
                     let valid = res.map(|dd| verify_decomposition(&cv, &base, &dd, *r));
-                    let cross = pairt.as_ref().map(|pt| !pt.decompositions(&cv, *r).is_empty());
+                    let cross = pairt
+                        .as_ref()
+                        .map(|pt| !pt.decompositions(&cv, *r).is_empty());
                     out.line(&format!(
                         "{{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":{bits},\"B\":{bound},\"bx\":{bx},\"target\":{ti},\"tkind\":\"{kind}\",\"hit\":{},\"valid\":{},\"crosscheck_decomposable\":{},\"planted\":{},\"counts\":{},\"native\":{},\"ms\":{ms:.4}}}",
                         res.is_some(),
@@ -2072,15 +2196,30 @@ fn cmd_fullic(args: &[String]) {
     let bcap = arg_u64(args, "--bcap-madds", 2_000_000_000);
     let bdead = arg_u64(args, "--bdeadline-s", 120);
     let mut out = Out::new(arg(args, "--out"));
-    let s5c = if arm == 'b' { Some(s5::s5_poly(&cv.f, cell.a, cell.b)) } else { None };
+    let s5c = if arm == 'b' {
+        Some(s5::s5_poly(&cv.f, cell.a, cell.b))
+    } else {
+        None
+    };
     for run in run0..run0 + runs {
-        let planted = 1 + Rng(seed ^ ((bits as u64) << 32) ^ 0xF011_1C ^ run.wrapping_mul(0x9E37_79B9)).below(cell.n - 1);
+        let planted =
+            1 + Rng(seed ^ ((bits as u64) << 32) ^ 0xF011_1C ^ run.wrapping_mul(0x9E37_79B9))
+                .below(cell.n - 1);
         let lim = f4::Limits {
             madds: bcap,
             nnz: 120_000_000,
             deadline: Some(Instant::now() + std::time::Duration::from_secs(bdead)),
         };
-        let res = full_ic(&cell, bxk, arm, planted, seed + run * 7919 + 1, s5c.as_deref(), &lim, max_att);
+        let res = full_ic(
+            &cell,
+            bxk,
+            arm,
+            planted,
+            seed + run * 7919 + 1,
+            s5c.as_deref(),
+            &lim,
+            max_att,
+        );
         let tot = |a: &[u64; NC], b: &[u64; NC], c: &[u64; NC]| {
             let mut t = [0u64; NC];
             for i in 0..NC {
@@ -2105,7 +2244,8 @@ fn cmd_rho(args: &[String]) {
     let seed = arg_u64(args, "--seed", 20261018);
     let mut out = Out::new(arg(args, "--out"));
     for run in 0..runs {
-        let d = 1 + Rng(seed ^ ((bits as u64) << 32) ^ 0x4410 ^ run.wrapping_mul(0x9E37_79B9)).below(cell.n - 1);
+        let d = 1 + Rng(seed ^ ((bits as u64) << 32) ^ 0x4410 ^ run.wrapping_mul(0x9E37_79B9))
+            .below(cell.n - 1);
         let res = rho_run(&cell, d, seed + run * 104729 + 3);
         out.line(&format!(
             "{{\"kind\":\"rho\",\"bits\":{bits},\"run\":{run},\"ok\":{},\"setup_gadd\":{},\"walks\":{},\"counts\":{},\"gae\":{},\"native\":{},\"n\":{},\"sqrt_pi_n_over_2\":{:.1},\"ms\":{:.1}}}",
@@ -2122,7 +2262,14 @@ fn cmd_find_curve(args: &[String]) {
     let c = find_curve(bits, seed);
     println!(
         "    Cell {{ bits: {}, p: {}, a: {}, b: {}, n: {}, gx: {}, gy: {} }}, // {:.1}s",
-        c.bits, c.p, c.a, c.b, c.n, c.gx, c.gy, t0.elapsed().as_secs_f64()
+        c.bits,
+        c.p,
+        c.a,
+        c.b,
+        c.n,
+        c.gx,
+        c.gy,
+        t0.elapsed().as_secs_f64()
     );
 }
 
@@ -2177,9 +2324,15 @@ fn ols(xs: &[f64], ys: &[f64]) -> Option<(f64, f64, f64)> {
     let sxy: f64 = xs.iter().zip(ys).map(|(x, y)| (x - mx) * (y - my)).sum();
     let slope = sxy / sxx;
     let icpt = my - slope * mx;
-    let sse: f64 = xs.iter().zip(ys).map(|(x, y)| (y - icpt - slope * x).powi(2)).sum();
+    let sse: f64 = xs
+        .iter()
+        .zip(ys)
+        .map(|(x, y)| (y - icpt - slope * x).powi(2))
+        .sum();
     let se = (sse / (n as f64 - 2.0) / sxx).sqrt();
-    const T: [f64; 10] = [12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228];
+    const T: [f64; 10] = [
+        12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228,
+    ];
     let t = if n - 2 <= 10 { T[n - 3] } else { 2.0 };
     Some((slope, slope - t * se, slope + t * se))
 }
@@ -2188,7 +2341,11 @@ fn cmd_summarize(args: &[String]) {
     let dir = arg(args, "--dir").unwrap_or("research/blindspots_20261018/14-prime-m4-cells/raw");
     let mut out = Out::new(arg(args, "--out"));
     let mut lines: Vec<String> = Vec::new();
-    let mut names: Vec<_> = std::fs::read_dir(dir).expect("read dir").filter_map(|e| e.ok()).map(|e| e.path()).collect();
+    let mut names: Vec<_> = std::fs::read_dir(dir)
+        .expect("read dir")
+        .filter_map(|e| e.ok())
+        .map(|e| e.path())
+        .collect();
     names.sort();
     for pth in names {
         if pth.extension().map(|e| e == "jsonl").unwrap_or(false) {
@@ -2209,13 +2366,19 @@ fn cmd_summarize(args: &[String]) {
     out.line("|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|");
     let mut rho_w: HashMap<u32, [f64; 3]> = HashMap::new();
     for bits in [16u32, 20, 24, 28] {
-        let r: Vec<&String> = lines.iter().filter(|l| jstr(l, "kind") == Some("rho") && jnum(l, "bits") == Some(bits as f64)).collect();
+        let r: Vec<&String> = lines
+            .iter()
+            .filter(|l| jstr(l, "kind") == Some("rho") && jnum(l, "bits") == Some(bits as f64))
+            .collect();
         if r.is_empty() {
             continue;
         }
         let gae: Vec<f64> = r.iter().map(|l| jnum(l, "gae").unwrap()).collect();
         let nat: Vec<f64> = r.iter().map(|l| jnum(l, "native").unwrap()).collect();
-        let setup: Vec<f64> = r.iter().map(|l| jnum(l, "setup_gadd").unwrap_or(0.0)).collect();
+        let setup: Vec<f64> = r
+            .iter()
+            .map(|l| jnum(l, "setup_gadd").unwrap_or(0.0))
+            .collect();
         let ok = r.iter().filter(|l| jbool(l, "ok") == Some(true)).count();
         let sq = (std::f64::consts::PI * cellp(bits).n as f64 / 2.0).sqrt();
         let rw = [0, 1, 2].map(|i| mean(&gae) + ws[i] * mean(&nat));
@@ -2230,7 +2393,10 @@ fn cmd_summarize(args: &[String]) {
     let mut keys: Vec<(u32, u32)> = Vec::new();
     for l in &lines {
         if jstr(l, "kind") == Some("tdec") && jstr(l, "arm") == Some("a") {
-            let k = (jnum(l, "bits").unwrap() as u32, jnum(l, "bx").unwrap() as u32);
+            let k = (
+                jnum(l, "bits").unwrap() as u32,
+                jnum(l, "bx").unwrap() as u32,
+            );
             if !keys.contains(&k) {
                 keys.push(k);
             }
@@ -2239,22 +2405,52 @@ fn cmd_summarize(args: &[String]) {
     keys.sort();
     for (bits, bx) in keys {
         let sel = |tk: &str| -> Vec<&String> {
-            lines.iter().filter(|l| jstr(l, "kind") == Some("tdec") && jstr(l, "arm") == Some("a") && jnum(l, "bits") == Some(bits as f64) && jnum(l, "bx") == Some(bx as f64) && jstr(l, "tkind") == Some(tk)).collect()
+            lines
+                .iter()
+                .filter(|l| {
+                    jstr(l, "kind") == Some("tdec")
+                        && jstr(l, "arm") == Some("a")
+                        && jnum(l, "bits") == Some(bits as f64)
+                        && jnum(l, "bx") == Some(bx as f64)
+                        && jstr(l, "tkind") == Some(tk)
+                })
+                .collect()
         };
         let rnd = sel("random");
         let pl = sel("planted");
-        let gadd: Vec<f64> = rnd.iter().map(|l| jnum(jsec(l, "counts").unwrap(), "gadd").unwrap()).collect();
-        let look: Vec<f64> = rnd.iter().map(|l| jnum(jsec(l, "counts").unwrap(), "lookup").unwrap()).collect();
+        let gadd: Vec<f64> = rnd
+            .iter()
+            .map(|l| jnum(jsec(l, "counts").unwrap(), "gadd").unwrap())
+            .collect();
+        let look: Vec<f64> = rnd
+            .iter()
+            .map(|l| jnum(jsec(l, "counts").unwrap(), "lookup").unwrap())
+            .collect();
         let nat: Vec<f64> = rnd.iter().map(|l| jnum(l, "native").unwrap()).collect();
         let hit = rnd.iter().filter(|l| jbool(l, "hit") == Some(true)).count();
         let found = pl.iter().filter(|l| jbool(l, "hit") == Some(true)).count();
-        let mism = rnd.iter().chain(pl.iter()).filter(|l| match (jbool(l, "hit"), jbool(l, "crosscheck_decomposable")) {
-            (Some(a), Some(b)) => a != b,
-            _ => false,
-        }).count();
-        let setup = lines.iter().find(|l| jstr(l, "kind") == Some("setup") && jstr(l, "arm") == Some("a") && jnum(l, "bits") == Some(bits as f64) && jnum(l, "bx") == Some(bx as f64));
+        let mism = rnd
+            .iter()
+            .chain(pl.iter())
+            .filter(
+                |l| match (jbool(l, "hit"), jbool(l, "crosscheck_decomposable")) {
+                    (Some(a), Some(b)) => a != b,
+                    _ => false,
+                },
+            )
+            .count();
+        let setup = lines.iter().find(|l| {
+            jstr(l, "kind") == Some("setup")
+                && jstr(l, "arm") == Some("a")
+                && jnum(l, "bits") == Some(bits as f64)
+                && jnum(l, "bx") == Some(bx as f64)
+        });
         let (ent, tg, ti) = match setup {
-            Some(l) => (jnum(l, "entries").unwrap_or(f64::NAN), jnum(jsec(l, "counts").unwrap(), "gadd").unwrap_or(f64::NAN), jnum(jsec(l, "counts").unwrap(), "insert").unwrap_or(f64::NAN)),
+            Some(l) => (
+                jnum(l, "entries").unwrap_or(f64::NAN),
+                jnum(jsec(l, "counts").unwrap(), "gadd").unwrap_or(f64::NAN),
+                jnum(jsec(l, "counts").unwrap(), "insert").unwrap_or(f64::NAN),
+            ),
             None => (f64::NAN, f64::NAN, f64::NAN),
         };
         let t = [0, 1, 2].map(|i| mean(&gadd) + ws[i] * mean(&nat));
@@ -2266,12 +2462,17 @@ fn cmd_summarize(args: &[String]) {
             fit_a.push(((cell.p as f64).log2(), t));
         }
     }
-    out.line("\nFit of log2 T_dec(a) on log2 p over the design cells (OLS slope, 95% t interval):\n");
+    out.line(
+        "\nFit of log2 T_dec(a) on log2 p over the design cells (OLS slope, 95% t interval):\n",
+    );
     for (i, w) in ws.iter().enumerate() {
         let xs: Vec<f64> = fit_a.iter().map(|v| v.0).collect();
         let ys: Vec<f64> = fit_a.iter().map(|v| v.1[i].log2()).collect();
         match ols(&xs, &ys) {
-            Some((m, lo, hi)) => out.line(&format!("- w = {w}: exponent {m:.4} [{lo:.4}, {hi:.4}] over {} cells (threshold 0.25)", xs.len())),
+            Some((m, lo, hi)) => out.line(&format!(
+                "- w = {w}: exponent {m:.4} [{lo:.4}, {hi:.4}] over {} cells (threshold 0.25)",
+                xs.len()
+            )),
             None => out.line(&format!("- w = {w}: fewer than three cells")),
         }
     }
@@ -2283,7 +2484,10 @@ fn cmd_summarize(args: &[String]) {
         let mut ks: Vec<(u32, u32)> = Vec::new();
         for l in &lines {
             if jstr(l, "kind") == Some("fullic") && jstr(l, "arm") == Some(arm) {
-                let k = (jnum(l, "bits").unwrap() as u32, jnum(l, "bx").unwrap() as u32);
+                let k = (
+                    jnum(l, "bits").unwrap() as u32,
+                    jnum(l, "bx").unwrap() as u32,
+                );
                 if !ks.contains(&k) {
                     ks.push(k);
                 }
@@ -2291,14 +2495,28 @@ fn cmd_summarize(args: &[String]) {
         }
         ks.sort();
         for (bits, bx) in ks {
-            let r: Vec<&String> = lines.iter().filter(|l| jstr(l, "kind") == Some("fullic") && jstr(l, "arm") == Some(arm) && jnum(l, "bits") == Some(bits as f64) && jnum(l, "bx") == Some(bx as f64)).collect();
+            let r: Vec<&String> = lines
+                .iter()
+                .filter(|l| {
+                    jstr(l, "kind") == Some("fullic")
+                        && jstr(l, "arm") == Some(arm)
+                        && jnum(l, "bits") == Some(bits as f64)
+                        && jnum(l, "bx") == Some(bx as f64)
+                })
+                .collect();
             let ok = r.iter().filter(|l| jbool(l, "ok") == Some(true)).count();
             let att: Vec<f64> = r.iter().map(|l| jnum(l, "attempts").unwrap()).collect();
             let hits: f64 = r.iter().map(|l| jnum(l, "hits").unwrap()).sum();
             let gae: Vec<f64> = r.iter().map(|l| jnum(l, "gae_total").unwrap()).collect();
             let nat: Vec<f64> = r.iter().map(|l| jnum(l, "native_total").unwrap()).collect();
-            let sg: Vec<f64> = r.iter().map(|l| jnum(jsec(l, "setup").unwrap(), "gadd").unwrap()).collect();
-            let og: Vec<f64> = r.iter().map(|l| jnum(jsec(l, "online").unwrap(), "gadd").unwrap()).collect();
+            let sg: Vec<f64> = r
+                .iter()
+                .map(|l| jnum(jsec(l, "setup").unwrap(), "gadd").unwrap())
+                .collect();
+            let og: Vec<f64> = r
+                .iter()
+                .map(|l| jnum(jsec(l, "online").unwrap(), "gadd").unwrap())
+                .collect();
             let sw = [0, 1, 2].map(|i| mean(&gae) + ws[i] * mean(&nat));
             let rw = rho_w.get(&bits).copied().unwrap_or([f64::NAN; 3]);
             out.line(&format!("| {bits} | {bx} | {} | {ok} | {:.1} | {:.4} | {:.1} | {:.3e} | {:.1} | {:.1} | {:.3e} | {:.1} | {:.1} | {:.1} | {:.2} | {:.2} | {:.3e} | {:.1} | {:.1} |", r.len(), mean(&att), hits / att.iter().sum::<f64>(), mean(&gae), mean(&nat), sw[0], sw[1], sw[2], rw[0], rw[1], rw[2], sw[0] / rw[0], sw[1] / rw[1], sw[2] / rw[2], mean(&sg), mean(&og)));
@@ -2311,7 +2529,10 @@ fn cmd_summarize(args: &[String]) {
     let mut kb: Vec<(u32, u32)> = Vec::new();
     for l in &lines {
         if jstr(l, "kind") == Some("tdec") && jstr(l, "arm") == Some("b") {
-            let k = (jnum(l, "bits").unwrap() as u32, jnum(l, "bx").unwrap() as u32);
+            let k = (
+                jnum(l, "bits").unwrap() as u32,
+                jnum(l, "bx").unwrap() as u32,
+            );
             if !kb.contains(&k) {
                 kb.push(k);
             }
@@ -2320,9 +2541,23 @@ fn cmd_summarize(args: &[String]) {
     kb.sort();
     let mut ladder: Vec<(f64, f64)> = Vec::new();
     for (bits, bx) in kb {
-        let r: Vec<&String> = lines.iter().filter(|l| jstr(l, "kind") == Some("tdec") && jstr(l, "arm") == Some("b") && jnum(l, "bits") == Some(bits as f64) && jnum(l, "bx") == Some(bx as f64)).collect();
-        let done: Vec<&&String> = r.iter().filter(|l| jstr(l, "status") == Some("done")).collect();
-        let madds: Vec<f64> = done.iter().map(|l| jnum(jsec(l, "counts").unwrap(), "madd").unwrap()).collect();
+        let r: Vec<&String> = lines
+            .iter()
+            .filter(|l| {
+                jstr(l, "kind") == Some("tdec")
+                    && jstr(l, "arm") == Some("b")
+                    && jnum(l, "bits") == Some(bits as f64)
+                    && jnum(l, "bx") == Some(bx as f64)
+            })
+            .collect();
+        let done: Vec<&&String> = r
+            .iter()
+            .filter(|l| jstr(l, "status") == Some("done"))
+            .collect();
+        let madds: Vec<f64> = done
+            .iter()
+            .map(|l| jnum(jsec(l, "counts").unwrap(), "madd").unwrap())
+            .collect();
         let ms: Vec<f64> = done.iter().map(|l| jnum(l, "ms").unwrap()).collect();
         let mut agree = 0;
         let mut checked = 0;
@@ -2334,12 +2569,21 @@ fn cmd_summarize(args: &[String]) {
                 }
             }
         }
-        let pv_t = r.iter().filter(|l| jbool(l, "planted_vanishes") == Some(true)).count();
-        let pv_n = r.iter().filter(|l| jbool(l, "planted_vanishes").is_some()).count();
+        let pv_t = r
+            .iter()
+            .filter(|l| jbool(l, "planted_vanishes") == Some(true))
+            .count();
+        let pv_n = r
+            .iter()
+            .filter(|l| jbool(l, "planted_vanishes").is_some())
+            .count();
         let mx = |k: &str| r.iter().filter_map(|l| jnum(l, k)).fold(0.0f64, f64::max);
         let st: Vec<f64> = r.iter().filter_map(|l| jnum(l, "steps")).collect();
         let zr: Vec<f64> = r.iter().filter_map(|l| jnum(l, "zero_rows")).collect();
-        let (lo, hi) = (madds.iter().cloned().fold(f64::INFINITY, f64::min), madds.iter().cloned().fold(0.0f64, f64::max));
+        let (lo, hi) = (
+            madds.iter().cloned().fold(f64::INFINITY, f64::min),
+            madds.iter().cloned().fold(0.0f64, f64::max),
+        );
         out.line(&format!("| {bits} | {bx} | {} | {} | {} | {agree}/{checked} | {pv_t}/{pv_n} | {:.4e} | {:.4e}..{:.4e} | {:.1} | {} | {} | {} | {} | {:.0} | {:.0} | {:.4e} | {:.4e} |", r.len(), done.len(), r.len() - done.len(), mean(&madds), lo, hi, mean(&st), mx("max_degree"), mx("max_cols"), mx("max_rows"), mx("peak_nnz"), mean(&zr), mean(&ms), 0.1 * mean(&madds), mean(&madds)));
         if bits == 16 && !madds.is_empty() && r.len() == done.len() {
             ladder.push((((2 * bx) as f64).log2(), mean(&madds).log2()));
@@ -2356,10 +2600,22 @@ fn cmd_summarize(args: &[String]) {
     out.line("|--|--:|--:|--:|--:|--:|--:|--:|--:|");
     let mut cx = Vec::new();
     let mut cy = Vec::new();
-    for l in lines.iter().filter(|l| jstr(l, "kind") == Some("reused-pkm")) {
+    for l in lines
+        .iter()
+        .filter(|l| jstr(l, "kind") == Some("reused-pkm"))
+    {
         let src = jstr(l, "source").unwrap();
         let t = jnum(l, "t").unwrap();
-        out.line(&format!("| {src} | {} | {t} | {} | {} | {:.4e} | {} | {} | {} |", jnum(l, "N").unwrap(), 2f64.powf(t), jnum(l, "p").unwrap(), jnum(l, "muladds").unwrap_or(f64::NAN), jnum(l, "degree").unwrap_or(f64::NAN), jnum(l, "steps").unwrap_or(f64::NAN), jnum(l, "max_cols").unwrap_or(f64::NAN)));
+        out.line(&format!(
+            "| {src} | {} | {t} | {} | {} | {:.4e} | {} | {} | {} |",
+            jnum(l, "N").unwrap(),
+            2f64.powf(t),
+            jnum(l, "p").unwrap(),
+            jnum(l, "muladds").unwrap_or(f64::NAN),
+            jnum(l, "degree").unwrap_or(f64::NAN),
+            jnum(l, "steps").unwrap_or(f64::NAN),
+            jnum(l, "max_cols").unwrap_or(f64::NAN)
+        ));
         if src.contains("round2") || src.contains("round3") {
             if jnum(l, "target_index") == Some(0.0) {
                 cx.push(t); // log2 |V| = t
@@ -2376,16 +2632,54 @@ fn cmd_summarize(args: &[String]) {
     out.line("relation-phase oracle cost = attempts x T_dec, with attempts = mean attempts to full rank measured by the arm (a) full IC at the same (bits, bx); the setup, matrix and verification costs are left out, so each row is a lower bound on that arm's whole S.\n");
     out.line("| bits | bx | arm | attempts | T_dec native (madds) | status | oracle cost w=0 (GAE, attempts) | oracle cost w=0.1 | oracle cost w=1 | rho(0.1) | rho(1) |");
     out.line("|--:|--:|--|--:|--:|--|--:|--:|--:|--:|--:|");
-    for (bits, bx) in [(16u32, 8u32), (20, 15), (24, 29), (28, 63), (16, 3), (16, 4), (16, 5), (16, 6), (16, 7)] {
-        let fa: Vec<&String> = lines.iter().filter(|l| jstr(l, "kind") == Some("fullic") && jstr(l, "arm") == Some("a") && jnum(l, "bits") == Some(bits as f64) && jnum(l, "bx") == Some(bx as f64)).collect();
-        let rb: Vec<&String> = lines.iter().filter(|l| jstr(l, "kind") == Some("tdec") && jstr(l, "arm") == Some("b") && jnum(l, "bits") == Some(bits as f64) && jnum(l, "bx") == Some(bx as f64)).collect();
+    for (bits, bx) in [
+        (16u32, 8u32),
+        (20, 15),
+        (24, 29),
+        (28, 63),
+        (16, 3),
+        (16, 4),
+        (16, 5),
+        (16, 6),
+        (16, 7),
+    ] {
+        let fa: Vec<&String> = lines
+            .iter()
+            .filter(|l| {
+                jstr(l, "kind") == Some("fullic")
+                    && jstr(l, "arm") == Some("a")
+                    && jnum(l, "bits") == Some(bits as f64)
+                    && jnum(l, "bx") == Some(bx as f64)
+            })
+            .collect();
+        let rb: Vec<&String> = lines
+            .iter()
+            .filter(|l| {
+                jstr(l, "kind") == Some("tdec")
+                    && jstr(l, "arm") == Some("b")
+                    && jnum(l, "bits") == Some(bits as f64)
+                    && jnum(l, "bx") == Some(bx as f64)
+            })
+            .collect();
         if fa.is_empty() || rb.is_empty() {
             continue;
         }
-        let att = mean(&fa.iter().map(|l| jnum(l, "attempts").unwrap()).collect::<Vec<_>>());
+        let att = mean(
+            &fa.iter()
+                .map(|l| jnum(l, "attempts").unwrap())
+                .collect::<Vec<_>>(),
+        );
         let done = rb.iter().all(|l| jstr(l, "status") == Some("done"));
-        let madds = mean(&rb.iter().map(|l| jnum(jsec(l, "counts").unwrap(), "madd").unwrap()).collect::<Vec<_>>());
-        let status = if done { "measured" } else { "LOWER BOUND (F4 stopped at its cap)" };
+        let madds = mean(
+            &rb.iter()
+                .map(|l| jnum(jsec(l, "counts").unwrap(), "madd").unwrap())
+                .collect::<Vec<_>>(),
+        );
+        let status = if done {
+            "measured"
+        } else {
+            "LOWER BOUND (F4 stopped at its cap)"
+        };
         let rw = rho_w.get(&bits).copied().unwrap_or([f64::NAN; 3]);
         out.line(&format!("| {bits} | {bx} | b | {att:.1} | {madds:.4e} | {status} | {:.1} | {:.4e} | {:.4e} | {:.1} | {:.4e} |", att, att * madds * 0.1 + att, att * madds + att, rw[1], rw[2]));
     }
@@ -2393,7 +2687,13 @@ fn cmd_summarize(args: &[String]) {
     let p1 = 2013265921f64;
     out.line("\n| t | |V| | signed points (at most) | hit prob (at most) | attempts (at least) | muladds per attempt | oracle phase muladds (at least) | rho GAE |");
     out.line("|--:|--:|--:|--:|--:|--:|--:|");
-    for l in lines.iter().filter(|l| jstr(l, "kind") == Some("reused-pkm") && jnum(l, "target_index") == Some(0.0) && jstr(l, "source").map(|s| s.contains("round2") || s.contains("round3")).unwrap_or(false)) {
+    for l in lines.iter().filter(|l| {
+        jstr(l, "kind") == Some("reused-pkm")
+            && jnum(l, "target_index") == Some(0.0)
+            && jstr(l, "source")
+                .map(|s| s.contains("round2") || s.contains("round3"))
+                .unwrap_or(false)
+    }) {
         let t = jnum(l, "t").unwrap();
         let f = 2f64.powf(t);
         let k = f + 3.0;
@@ -2401,7 +2701,11 @@ fn cmd_summarize(args: &[String]) {
         let hp = c4 / p1;
         let att = (f / 2.0 + 1.0) / hp;
         let m = jnum(l, "muladds").unwrap_or(f64::NAN);
-        out.line(&format!("| {t} | {f} | {f} | {hp:.3e} | {att:.3e} | {m:.4e} | {:.3e} | {:.1} |", att * m, 1.2533 * p1.sqrt()));
+        out.line(&format!(
+            "| {t} | {f} | {f} | {hp:.3e} | {att:.3e} | {m:.4e} | {:.3e} | {:.1} |",
+            att * m,
+            1.2533 * p1.sqrt()
+        ));
     }
     // ---- reach
     out.line("\n## Arm (d): ideal determinant reach\n");
@@ -2410,11 +2714,28 @@ fn cmd_summarize(args: &[String]) {
     for l in lines.iter().filter(|l| jstr(l, "kind") == Some("reach")) {
         let lvl = jnum(l, "level").unwrap();
         let m = jnum(l, "m").unwrap();
-        if !(lvl <= 3.0 || (m == 4.0 && lvl >= 5.0) || (m == 3.0 && lvl == 12.0) || (m == 2.0 && lvl == 40.0)) {
+        if !(lvl <= 3.0
+            || (m == 4.0 && lvl >= 5.0)
+            || (m == 3.0 && lvl == 12.0)
+            || (m == 2.0 && lvl == 40.0))
+        {
             continue;
         }
         let b = jsec(l, "bmax").unwrap();
-        out.line(&format!("| {} | {} | {} | {} | {:.6} | {:.6} | {:.4} | {:.4} | {:.4} | {:.4} | {:.1} |", jstr(l, "poly").unwrap(), jnum(l, "d").unwrap(), lvl, jnum(l, "dim").unwrap(), jnum(l, "delta_max").unwrap(), jnum(l, "delta_asymptote").unwrap(), jnum(b, "16").unwrap(), jnum(b, "20").unwrap(), jnum(b, "24").unwrap(), jnum(b, "28").unwrap(), jnum(l, "log2p_for_b2").unwrap()));
+        out.line(&format!(
+            "| {} | {} | {} | {} | {:.6} | {:.6} | {:.4} | {:.4} | {:.4} | {:.4} | {:.1} |",
+            jstr(l, "poly").unwrap(),
+            jnum(l, "d").unwrap(),
+            lvl,
+            jnum(l, "dim").unwrap(),
+            jnum(l, "delta_max").unwrap(),
+            jnum(l, "delta_asymptote").unwrap(),
+            jnum(b, "16").unwrap(),
+            jnum(b, "20").unwrap(),
+            jnum(b, "24").unwrap(),
+            jnum(b, "28").unwrap(),
+            jnum(l, "log2p_for_b2").unwrap()
+        ));
     }
 }
 
@@ -2433,25 +2754,49 @@ fn cmd_selftest(args: &[String]) {
     let deep = flag(args, "--deep");
     let t0 = Instant::now();
     // number theory
-    check!(is_prime(2013265921) && !is_prime(2013265923) && is_prime(65521), "is_prime");
+    check!(
+        is_prime(2013265921) && !is_prime(2013265923) && is_prime(65521),
+        "is_prime"
+    );
     let f = Fp { p: 65519 };
-    check!(is_prime(65519) && 65519 % 4 == 3, "test prime");
+    let tp = 65519u64;
+    check!(is_prime(tp) && tp % 4 == 3, "test prime");
     check!(f.mul(f.inv(12345), 12345) == 1, "inv");
-    check!({ let r = f.sqrt(f.mul(777, 777)); r == 777 || r == f.neg(777) }, "sqrt");
+    check!(
+        {
+            let r = f.sqrt(f.mul(777, 777));
+            r == 777 || r == f.neg(777)
+        },
+        "sqrt"
+    );
     println!("selftest: number theory ok");
     // cells: recount, prime order, generator
     for c in CELLS.iter() {
         check!(c.p > 0, "cell {} not frozen", c.bits);
-        check!(c.p >> (c.bits - 1) == 1 && c.p % 4 == 3 && is_prime(c.p), "cell {} p", c.bits);
+        check!(
+            c.p >> (c.bits - 1) == 1 && c.p % 4 == 3 && is_prime(c.p),
+            "cell {} p",
+            c.bits
+        );
         check!(is_prime(c.n), "cell {} n prime", c.bits);
         let cv = c.curve();
         check!(cv.on_curve(c.g()), "cell {} G on curve", c.bits);
         if c.bits <= 24 || deep {
-            check!(count_points(c.p, c.a, c.b) == c.n, "cell {} recount", c.bits);
+            check!(
+                count_points(c.p, c.a, c.b) == c.n,
+                "cell {} recount",
+                c.bits
+            );
         }
         check!(cv.mul(c.n, c.g()).inf, "cell {} n G = O", c.bits);
         check!(!cv.mul(c.n - 1, c.g()).inf, "cell {} (n-1) G != O", c.bits);
-        println!("selftest: cell {} ok (p={}, n={}, bx={})", c.bits, c.p, c.n, cell_bx(c));
+        println!(
+            "selftest: cell {} ok (p={}, n={}, bx={})",
+            c.bits,
+            c.p,
+            c.n,
+            cell_bx(c)
+        );
     }
     // S3 and S5 controls on the 16-bit cell
     let cell = cell_for(16);
@@ -2477,9 +2822,17 @@ fn cmd_selftest(args: &[String]) {
     println!("selftest: S3 ok");
     let t1 = Instant::now();
     let s5c = s5::s5_poly(&f, cell.a, cell.b);
-    println!("selftest: S5 interpolated in {:.2}s", t1.elapsed().as_secs_f64());
+    println!(
+        "selftest: S5 interpolated in {:.2}s",
+        t1.elapsed().as_secs_f64()
+    );
     for _ in 0..40 {
-        let ps = [rand_pt(&mut rng), rand_pt(&mut rng), rand_pt(&mut rng), rand_pt(&mut rng)];
+        let ps = [
+            rand_pt(&mut rng),
+            rand_pt(&mut rng),
+            rand_pt(&mut rng),
+            rand_pt(&mut rng),
+        ];
         let mut s = INF;
         for p in &ps {
             s = cv.add(s, *p);
@@ -2488,13 +2841,25 @@ fn cmd_selftest(args: &[String]) {
             continue;
         }
         let xs = [ps[0].x, ps[1].x, ps[2].x, ps[3].x, s.x];
-        check!(s5::s5_eval(&f, cell.a, cell.b, xs) == 0, "S5 direct eval vanishes on a 4-sum");
-        check!(s5::poly_eval(&f, &s5c, xs) == 0, "S5 interpolated vanishes on a 4-sum");
+        check!(
+            s5::s5_eval(&f, cell.a, cell.b, xs) == 0,
+            "S5 direct eval vanishes on a 4-sum"
+        );
+        check!(
+            s5::poly_eval(&f, &s5c, xs) == 0,
+            "S5 interpolated vanishes on a 4-sum"
+        );
         let mut ys = xs;
         ys[4] = f.add(ys[4], 1);
         let a = s5::s5_eval(&f, cell.a, cell.b, ys);
-        check!(a == s5::poly_eval(&f, &s5c, ys), "interpolated S5 equals direct S5 off the variety");
-        check!(a != 0, "S5 does not vanish off the variety (probability 1/p of a false alarm)");
+        check!(
+            a == s5::poly_eval(&f, &s5c, ys),
+            "interpolated S5 equals direct S5 off the variety"
+        );
+        check!(
+            a != 0,
+            "S5 does not vanish off the variety (probability 1/p of a false alarm)"
+        );
     }
     println!("selftest: S5 ok (vanishes on planted sums, interpolation exact)");
     // arm (a) vs the pair-table cross-check, planted and random targets, three cells
@@ -2510,9 +2875,15 @@ fn cmd_selftest(args: &[String]) {
             let r = random_target(&cell, &base, &mut rng);
             let a = table.decompose(&cv, &base, r);
             let b = pairt.decompositions(&cv, r);
-            check!(a.is_some() == !b.is_empty(), "arm a vs pair table agree on decomposability");
+            check!(
+                a.is_some() == !b.is_empty(),
+                "arm a vs pair table agree on decomposability"
+            );
             if let Some(dd) = a {
-                check!(verify_decomposition(&cv, &base, &dd, r), "decomposition verifies");
+                check!(
+                    verify_decomposition(&cv, &base, &dd, r),
+                    "decomposition verifies"
+                );
                 hits += 1;
             }
             agree += 1;
@@ -2520,8 +2891,14 @@ fn cmd_selftest(args: &[String]) {
         for _ in 0..20 {
             let (r, _) = planted_target(&cv, &base, &mut rng);
             let a = table.decompose(&cv, &base, r);
-            check!(a.is_some(), "positive control: planted target found by arm a");
-            check!(verify_decomposition(&cv, &base, &a.unwrap(), r), "planted decomposition verifies");
+            check!(
+                a.is_some(),
+                "positive control: planted target found by arm a"
+            );
+            check!(
+                verify_decomposition(&cv, &base, &a.unwrap(), r),
+                "planted decomposition verifies"
+            );
         }
         println!("selftest: arm a, {} bits: {agree} targets agree with the pair table ({hits} decomposable); 20 planted found", bits);
     }
@@ -2546,7 +2923,12 @@ fn cmd_selftest(args: &[String]) {
                         continue;
                     }
                     let i0 = 2 * c[0] + rng.below(2) as usize;
-                    let idx = [i0, i0, 2 * c[1] + rng.below(2) as usize, 2 * c[2] + rng.below(2) as usize];
+                    let idx = [
+                        i0,
+                        i0,
+                        2 * c[1] + rng.below(2) as usize,
+                        2 * c[2] + rng.below(2) as usize,
+                    ];
                     let mut s = INF;
                     for &i in &idx {
                         s = cv.add(s, base.pts[i]);
@@ -2559,8 +2941,19 @@ fn cmd_selftest(args: &[String]) {
             } else {
                 (random_target(&cell, &base, &mut rng), None)
             };
-            let lim = f4::Limits { madds: 4_000_000_000, nnz: 100_000_000, deadline: Some(Instant::now() + std::time::Duration::from_secs(60)) };
-            let px = pl.map(|idx| [base.pts[idx[0]].x, base.pts[idx[1]].x, base.pts[idx[2]].x, base.pts[idx[3]].x]);
+            let lim = f4::Limits {
+                madds: 4_000_000_000,
+                nnz: 100_000_000,
+                deadline: Some(Instant::now() + std::time::Duration::from_secs(60)),
+            };
+            let px = pl.map(|idx| {
+                [
+                    base.pts[idx[0]].x,
+                    base.pts[idx[1]].x,
+                    base.pts[idx[2]].x,
+                    base.pts[idx[3]].x,
+                ]
+            });
             let o = run_arm_b(&f, &s5c, &base, r.x, &lim, px);
             if o.dim.is_none() {
                 println!("selftest: arm b bx={bx}: {} (skipped comparison)", o.status);
@@ -2570,7 +2963,10 @@ fn cmd_selftest(args: &[String]) {
             check!(o.dim == Some(brute), "F4 quotient dimension {:?} equals brute-force root count {} (bx={bx}, planted={planted})", o.dim, brute);
             if planted {
                 check!(brute >= 1, "positive control has a root");
-                check!(o.planted_ok == Some(true), "planted tuple is in the variety");
+                check!(
+                    o.planted_ok == Some(true),
+                    "planted tuple is in the variety"
+                );
             }
             println!("selftest: arm b bx={bx} planted={planted}: dim {:?} = brute {} (madds {}, steps {}, {:.0} ms)", o.dim, brute, o.madds, o.steps, o.ms);
         }
@@ -2578,17 +2974,36 @@ fn cmd_selftest(args: &[String]) {
     // matrix and full IC (arm a) at 16 bits, rho
     {
         let cell = cell_for(16);
-        let lim = f4::Limits { madds: u64::MAX, nnz: usize::MAX, deadline: None };
+        let lim = f4::Limits {
+            madds: u64::MAX,
+            nnz: usize::MAX,
+            deadline: None,
+        };
         for run in 0..3u64 {
             let planted = 12345 + 7777 * run;
-            let res = full_ic(&cell, cell_bx(&cell), 'a', planted, 31 + run, None, &lim, 1_000_000);
+            let res = full_ic(
+                &cell,
+                cell_bx(&cell),
+                'a',
+                planted,
+                31 + run,
+                None,
+                &lim,
+                1_000_000,
+            );
             check!(res.ok, "full IC (arm a) recovers the planted logarithm: run {run}, attempts {}, rank {}/{}", res.attempts, res.rank, res.cols);
-            println!("selftest: full IC arm a, 16 bits, run {run}: ok, {} attempts, {} hits, rank {}", res.attempts, res.hits, res.rank);
+            println!(
+                "selftest: full IC arm a, 16 bits, run {run}: ok, {} attempts, {} hits, rank {}",
+                res.attempts, res.hits, res.rank
+            );
         }
         for run in 0..3u64 {
             let r = rho_run(&cell, 4321 + 999 * run, 77 + run);
             check!(r.ok, "rho recovers the planted logarithm");
-            println!("selftest: rho 16 bits run {run}: ok, {} adds, {} walks", r.counts[GADD], r.walks);
+            println!(
+                "selftest: rho 16 bits run {run}: ok, {} adds, {} walks",
+                r.counts[GADD], r.walks
+            );
         }
     }
     // reach control: S3 levels
