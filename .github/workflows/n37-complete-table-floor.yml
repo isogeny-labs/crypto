@@ -64,8 +64,32 @@ jobs:
         run: |
           cp research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock Cargo.lock
           rustfmt --edition 2021 --check examples/n37_complete_table_floor.rs examples/n37_complete_table_floor_analyze.rs
+      # The frozen lockfile predates dependencies the root manifest has gained
+      # since (path crates such as tools/volcano-cli pull in new registry
+      # packages), so `--locked` refuses it.  Let cargo add only what is
+      # missing, then require every registry version the frozen lockfile pins
+      # to be unchanged: the replay still builds on its frozen versions.
       - name: Build native counter, decision auditor, and ecbench
-        run: cargo build --release --locked --example n37_complete_table_floor --example n37_complete_table_floor_analyze --bin ecbench
+        run: cargo build --release --example n37_complete_table_floor --example n37_complete_table_floor_analyze --bin ecbench
+      - name: Require every frozen registry version to be unchanged
+        run: |
+          python3 - research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock Cargo.lock <<'PYCHECK'
+          import re, sys
+          def registry(path):
+              text = open(path).read()
+              out = set()
+              for block in text.split("[[package]]")[1:]:
+                  name = re.search(r'^name = "([^"]+)"', block, re.M)
+                  ver = re.search(r'^version = "([^"]+)"', block, re.M)
+                  if name and ver and re.search(r'^source = "registry\+', block, re.M):
+                      out.add((name.group(1), ver.group(1)))
+              return out
+          frozen, used = registry(sys.argv[1]), registry(sys.argv[2])
+          changed = sorted(frozen - used)
+          if changed:
+              sys.exit("frozen registry versions changed: " + ", ".join("%s %s" % c for c in changed))
+          print("%d frozen registry versions unchanged; %d added" % (len(frozen), len(used - frozen)))
+          PYCHECK
       - name: Recompute all four pair-sum streams and the decision
         run: |
           note=research/notes/ecc2k130/n37_complete_table_floor_20261003
