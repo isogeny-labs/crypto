@@ -368,3 +368,170 @@ MATCHES, REGRESSES, INCONCLUSIVE, BLOCKED, with its level), an SVG and a PNG
 graph and `REPORT.pdf` (research-visuals skill). The speed result, if any, is
 copied to `benchmarks/20261018-blindspots-signature-gb-trace-replay/` by the
 integration step.
+
+
+---
+
+## Amendment 1: the engine as built, censoring, development exposure and the card plan
+
+Written after the instrument and before any card ran. It supersedes the text above
+where they differ (the superseded sentences are named). Nothing in it loosens the
+rule; the changes that touch the rule only make ADVANCES harder or make a verdict
+decidable when a job is stopped.
+
+### A. The engine as built (supersedes "The instrument" where it differs)
+
+`examples/blindspots_06_signature_gb.rs` (sha256 `d9d7ffc3...a6d1`, bound by every
+card). Arm (a) `f4` is bit-identical to item 05's `grevlex` (control 2, passed in
+the smoke test on all eight committed `c17-4-3` rows; `smoke-test.txt`).
+
+Arm (b) `sig`:
+
+* **Row = the larger multiple.** The F5/GVW formulation: a pair `(a, b)` contributes
+  the single row `t_x * X` of the larger-signature side (the polynomial ring order
+  on `t * sig`, exponents add; position over term, higher index larger), not the
+  S-polynomial. The smaller multiple is cancelled in elimination by the reducer of
+  least label for the lcm. Two pairs with the same `(X, t_x)` in one batch give one
+  row. (This replaces "the S-row carries the larger label" above.)
+* **Criteria.** K0 (square), K1 (Frobenius), K2 (lower-index Koszul), K3 (principal
+  syzygy of the pair's elements with an element of the same index; with the other
+  element of the pair it is the product criterion) and K4 (discovered syzygies) are
+  as defined above. **K5, the rewritable criterion, is added**: a pair with label
+  `(i, s)` is dropped when an element of index `i` that is *newer* than the larger
+  side `X` has a signature dividing `s` (F5's rewritten criterion with the
+  "newest representative" rule). This supersedes Deviation 4's "no rewritten
+  criterion" (the design asks for one).
+* **Soundness of K5 is not proved here.** The proof of the rewritten criterion
+  assumes pairs are processed in increasing signature order; a batch by lcm degree
+  (the normal strategy, kept so that the comparison isolates the signature
+  machinery) does not give that order. Completeness is therefore *checked*: the
+  selftest runs `f4`, `sig`, `sig` without each criterion, each criterion alone and
+  the construction-order variant on 132 systems (60 unsatisfiable, 72 satisfiable;
+  the toy cells of item 05 and random Boolean systems of 6-11 unknowns, under- and
+  over-determined) and requires identical reduced Groebner bases, brute-force
+  standard-monomial counts and vanishing on every solution, and every measured
+  target must end `refuted`. A wrong prune that lost completeness would show as a
+  `gb` status on an unsatisfiable system.
+* **Generators** are taken in ascending degree (stable): the signature index of an
+  equation is its rank by degree. This is a pre-registered convention (F5 engines
+  are order sensitive); `sigc` keeps the construction order and is a descriptive
+  arm. `f4` keeps the construction order (as item 05).
+* **Elimination.** Rows are processed in increasing label; a column may hold
+  several pivots (a raw reducer and a reduced S-row can share a leading column);
+  a row is reduced by the sparsest pivot of strictly smaller label; raw reducers
+  are installed at their label position and are never reduced; a row whose leading
+  column holds only a pivot of equal label is super-top-reducible and is dropped.
+  Back-substitution among the new pivots obeys the same label rule.
+* **Symbolic preprocessing** takes, for each monomial, the divisor of least label
+  (fewest terms on a tie), found by looking up the submasks of the monomial among
+  the leading monomials. `sym_tests` therefore counts lookups for `sig` and basis
+  scans for `f4`: it is comparable inside an engine (replay against none), not
+  between engines.
+* **Ablations** (descriptive, same engine): `sig4` = K0-K4 (no rewritable
+  criterion), `sig0` = K0 and singular pairs only (labels exact, no pruning),
+  `sigc` = construction order. They supersede the "`sig0` = K1-K4 off" sentence.
+
+Arms (c) and (d), replay. Two filters on the same trace, both sound (a replay only
+adds rows of the ideal; a replay that runs out of pairs without `1` falls back to
+the full run, both charged):
+
+* the **exact** F4Remake filter (`f4r`, `sigr`): process only the pairs the trace
+  found useful, and take the reducers the trace chose, per matrix step, by basis
+  index; this is the arm of the design and the arm of the rule's replay ratio;
+* the **negative** filter (`f4n`, `sign`): drop only the pairs the trace found to
+  reduce to zero and keep every other pair, the reading of the survey lead
+  (`research/pdp_shape_replay_20261015`: "drop the dependent rows"). Descriptive.
+
+Pair keys are the unordered pair of leading monomials plus the variable (`f4`) or
+of `(index, signature, leading monomial)` triples (`sig`). Matrix steps that
+contribute no new element are not numbered, so a replay that skips them stays
+aligned with its trace. `f4rs`/`sigrs` replay the target's own trace (the
+ceiling); `f4rx:c13-3-4` replays another cell's trace (control 4).
+
+### B. Stopping a signature job, and what a stopped job says (tightens the rule)
+
+Development readings on the held-out targets and on separate development draws
+(below) showed that `sig` does not finish in any practical multiple of the work of
+`f4` on these systems (it reached selection degree 5 on `c13-3-4`, `c15-5-3`, and
+exceeded 20,000 basis elements without reaching `1` on a `c17-4-3` target). A
+signature job is therefore stopped when its touches exceed **2 times those of `f4`
+on the same target** (`--touch-ratio 2`; status `touchcap`), or at its time limit
+(`--sig-time-limit`), the 400,000-column cap or the memory cap. The stopped job's
+touches include the unfinished matrix. Because the work done so far is a lower
+bound on the work needed, **R = touches(f4) / touches(X) is bounded above by
+touches(f4) / touches(X at the stop)**. The rule is applied with these bounds:
+
+* a cell **qualifies** only if all 16 targets finished (`refuted`) for `f4` and
+  `X` (unchanged), so a stopped target can never help ADVANCES;
+* a cell is **regress-certain** for `sig` when all 16 targets are either exact or
+  bounded and the geometric mean of the exact ratios and the bounds is `<= 1/1.5`
+  (the mean of upper bounds bounds the true mean from above);
+* **REGRESSES** is `sig` regress-certain in at least 3 cells (not ADVANCES or
+  TRADES); **MATCHES** needs all four cells exact; otherwise INCONCLUSIVE or
+  BLOCKED as before. `summarize` prints the bound with a `*` and never an exact
+  ratio for a stopped job.
+* the trace of arm (d) is recorded with a looser stop (6 times, `--trace-ratio 6`).
+  If the recording run does not refute there is no trace, the target is recorded
+  `notrace`, and arm (d) is **BLOCKED** for the cell with that reason.
+
+### C. Development exposure (disclosed)
+
+Before this protocol was extended, the instrument was run on: item 05's committed
+`c17-4-3` draws (target 0 only, to find why `sig` did not terminate and to compare
+three generator orders), two development draw files (seeds 31337 and 777; cells
+`c17-4-3`, `c13-3-4`, `c15-3-4`, `c15-5-3`, 2-3 targets each) and the held-out
+target 16 of each frozen cell (to size the cards: `f4` 0.6-21 s, `sig` stopped at
+the 2x cap). None of the 16 measured targets of `draws.tsv` has been run. What the
+development readings decided: the ascending-degree generator order (about 5x
+fewer touches than the construction order on one target of item 05's draws), the
+multi-pivot elimination, adding K5, the 2x stop, and dropping selection by
+signature degree (it needs degree-5 matrices, 52,717 x 107,919 on the first
+`c17-4-3` target tried; not measured). They did not set a threshold of the rule.
+Item 05's committed draws are shared with this item only through control 2.
+
+### D. Card plan (14 cards, run in order; card 01 is the gate)
+
+Each card compiles the instrument itself with `rustc` into
+`target/blindspots-06/card-NN/` and removes it (a later card cannot read a file an
+earlier card made: the card lint refuses a repository file that `binds` does not
+pin). All runs are `prlimit --as=4294967296`, one thread. `--time-limit 90` bounds
+an `f4` job, `--sig-time-limit` a signature job (20-25 s), `--total-limit` stops
+a command from starting a job it cannot finish (recorded `skipped`).
+The sum of `timeout_seconds` per card is below 540 s (the column is that sum with
+75 s of build and clean-up); over all cards it is 5,720 s = 1.59 CPU-hours, below
+the 2 allowed. The expected use is under one hour (`f4` takes 0.5-20 s a target,
+a stopped `sig` 2-25 s).
+
+| card | commands (cell, targets, arms) | sum of timeouts (s) |
+|--:|---|--:|
+| 01 | `target/blindspots-06/card-01/b06` selftest (timeout 240 s); `target/blindspots-06/card-01/b06` xcheck (timeout 40 s) | 355 |
+| 02 | `c17-4-3` t0-15 `f4,sig` (limit 100 s, timeout 140 s); `c17-4-3` t0-15 `f4r,f4n` (limit 40 s, timeout 80 s); `c17-4-3` t0-3 `f4rs` (limit 20 s, timeout 60 s); `c17-4-3` t0-3 `f4rx:c13-3-4` (limit 30 s, timeout 70 s) | 425 |
+| 03 | `c17-4-3` t0-15 `sigr,sign` (limit 80 s, timeout 120 s); `c17-4-3` t0-1 `f4,sig4,sig0,sigc` (limit 60 s, timeout 100 s); `c17-4-3` t0 `f4,sig` (limit 120 s, timeout 170 s) | 465 |
+| 04 | `c15-5-3` t0-7 `f4,sig` (limit 220 s, timeout 260 s); `c15-5-3` t0-3 `f4rs` (limit 30 s, timeout 70 s) | 405 |
+| 05 | `c15-5-3` t8-15 `f4,sig` (limit 220 s, timeout 260 s); `c15-5-3` t0-1 `f4,sig4,sig0,sigc` (limit 120 s, timeout 160 s) | 495 |
+| 06 | `c15-5-3` t0-15 `f4r,f4n` (limit 150 s, timeout 190 s); `c15-5-3` t0-15 `sigr,sign` (limit 100 s, timeout 140 s) | 405 |
+| 07 | `c13-3-4` t0-7 `f4,sig` (limit 200 s, timeout 240 s); `c13-3-4` t0-3 `f4rs` (limit 40 s, timeout 80 s) | 395 |
+| 08 | `c13-3-4` t8-15 `f4,sig` (limit 200 s, timeout 240 s); `c13-3-4` t0-1 `f4,sig4,sig0,sigc` (limit 100 s, timeout 140 s) | 455 |
+| 09 | `c13-3-4` t0-15 `f4r,f4n` (limit 250 s, timeout 290 s); `c13-3-4` t0-15 `sigr,sign` (limit 100 s, timeout 140 s) | 505 |
+| 10 | `c15-3-4` t0-7 `f4,sig` (limit 250 s, timeout 290 s); `c15-3-4` t0-3 `f4rs` (limit 60 s, timeout 100 s) | 465 |
+| 11 | `c15-3-4` t8-15 `f4,sig` (limit 250 s, timeout 290 s); `c15-3-4` t0-1 `f4,sig4,sig0,sigc` (limit 100 s, timeout 140 s) | 505 |
+| 12 | `c15-3-4` t0-7 `f4r,f4n` (limit 170 s, timeout 210 s); `c15-3-4` t8-15 `f4r,f4n` (limit 170 s, timeout 210 s) | 495 |
+| 13 | `c15-3-4` t0-15 `sigr,sign` (limit 100 s, timeout 140 s) | 215 |
+| 14 | `target/blindspots-06/card-14/b06` summarize (timeout 60 s) | 135 |
+
+Card 01 also runs the selftest and control 2. Card 14 runs `b06 summarize --dir raw`
+(the rule applied mechanically, the first-degree-4-matrix table, control 4); the
+README, graph and PDF are written by the assessing stage from `raw/`.
+
+### E. Deviations added
+
+10. **Row = larger multiple, K5 and the order of generators** (A above) are choices of the
+    engine; `sig` may lose because of them. Reported as limits of the result.
+11. **Two replay filters.** The design's replay is the exact filter; the negative filter is
+    added because the exact one cannot transfer between targets whose leading-monomial
+    structure differs (shown on development draws: it fell back), and the survey lead was
+    the negative one. Only the exact one is arm (c)/(d) of the rule's replay ratio.
+12. **A signature job is stopped at 2 times the touches of `f4`** (B above).
+13. **Peak memory** is the resident high-water mark after a reset before each solve
+    (`/proc/self/clear_refs`); a stopped job's peak is not comparable with a finished one.
+14. **Per-card build** instead of one build in the first card (cards cannot share a file).
