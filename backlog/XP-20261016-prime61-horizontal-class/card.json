@@ -7,19 +7,22 @@
     "native research lane"
   ],
   "status": "blocked",
-  "status_note": "The Drive-restored continuation has 1344 discovered curves, 256 expanded sources, 3840 verified maps and 512 measured curves (6144 streams, 614400000 target trials, zero relations/solves). All inherited rows and three new checkpoint round trips pass. Full class/degree-set coverage, all-class workloads and a sized full-run disk/compute envelope remain open.",
+  "status_note": "The larger verified continuation has 4184 discovered curves, 1024 expanded/measured sources, 15360 verified maps and 12288 streams (1228800000 target trials, zero relations/solves). Explicit exact-form relations certify the selected subgroup has 545296208 classes; standard CM transfers this to its curve component. Whole-class equality, exhaustive workloads and a full-run disk/compute envelope remain open.",
   "blocked_on": [
     "problem:problems/prime61-horizontal-class-memory.md"
   ],
   "links": {
-    "lead": "research/prime61_disk_continue_20261018/README.md",
+    "lead": "research/prime61_disk_extend_20261018/README.md",
     "notes": [
       "problems/prime61-horizontal-class-memory.md",
       "research/prime61_disk_walk_20261017/README.md",
-      "research/prime61_isogeny_20261016/README.md"
+      "research/prime61_isogeny_20261016/README.md",
+      "research/prime61_disk_continue_20261018/README.md",
+      "research/prime61_disk_extend_20261018/COMPONENT-CERTIFICATE.md"
     ],
     "prs": [
-      1977
+      1977,
+      2144
     ]
   },
   "question": "What are the factor-base results over every base-field isomorphism class in the fixed ordinary prime61 trace class?",
@@ -41,7 +44,7 @@
     "gpu": null,
     "est_core_hours": null,
     "est_wall_hours": null,
-    "notes": "Bounded-prefix envelope only: worker peak RSS 18396 KiB and final live database 3387392 bytes at 1344 curves/3840 maps/6144 streams; 1088 sources remain pending. SQLite cache is bounded; full-class disk, CPU and runtime sizing remain unknown. Drive round trips pass for three additional small archives, not full quota. Current main fails unrelated compilation; continuation pins validated b68341cd. Freeze a complete envelope before readiness; no remote compute is provisioned."
+    "notes": "Bounded-prefix envelope only: worker peak RSS 20044 KiB; final live database 11173888 bytes at 4184 curves/15360 maps/12288 streams; 3160 sources remain pending. Both new Drive archive round trips pass. Exact selected-component coordinates enable a proposed index-free walker, not yet implemented/tested; validate complete small-class coordinate and degree-97/113 controls first. Whole-class upper certificate and full-run disk/CPU/runtime sizing remain open. Source pins validated b68341cd; no remote compute is provisioned."
   },
   "run": {
     "argv": [

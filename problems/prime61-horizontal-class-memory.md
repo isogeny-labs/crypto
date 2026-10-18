@@ -107,3 +107,44 @@ remain recorded. No class-count, selected-prime generation, full-run
 provisioning or class-wide ranking obligation is closed. Next freeze a
 larger envelope from this checkpoint while separately certifying class
 coverage; a larger prefix alone still cannot discharge the full request.
+
+2026-10-18, larger frozen extension:
+[the additive study](../research/prime61_disk_extend_20261018/README.md)
+reaches 4,184 discovered curves, 1,024 expanded sources, 15,360 verified maps
+and 1,024 measured curves. Its 12,288 committed streams perform
+1,228,800,000 target trials with zero relations/solves. All 11,330 inherited
+immutable logical rows match. Both new Drive checkpoint round trips pass;
+the final restored database reproduces the native logical dump exactly.
+Worker peak RSS across the native phases is 20,044 KiB; the final live
+database occupies 11,173,888 bytes. There are 3,160 pending sources.
+This is another bounded prefix; the growing disk index and full workloads
+remain unresolved.
+
+The separate [explicit class-relation certificate](../research/prime61_disk_extend_20261018/COMPONENT-CERTIFICATE.md)
+now establishes that the eight selected prime classes generate exactly
+545,296,208 proper ideal classes, with structure C68162026 × C2^3.
+An odd prime-order generator, four independent involutions, sixteen
+canonical products and eight exact generator relations supply this result
+without a whole-class-number oracle. A separate witness checker using the
+same PARI library rejects two corruptions. Under standard ordinary
+maximal-order CM theory, the selected curve component has this size.
+**This settles the selected subgroup size, not its equality with the whole
+class group or the requested enumeration.** The entire class number still
+needs a rigorous upper certificate. Earlier conditional whole-class values
+remain conditional; earlier frozen evidence is not rewritten.
+
+The Lean project checks fourteen explicit finite/arithmetic theorems;
+the axiom gate audits sixteen including two generated equation lemmas,
+with no extra trusted axioms. Coordinate encoding and its inverse are
+formalized. Proper ideal classes, native exact-form arithmetic, the group
+cardinality argument and CM bridges remain outside Lean, as the proof maps
+state. No full formalization claim is made.
+
+The next discriminating implementation step is a coordinate-based streaming
+walker using the certified C68162026 × C2^3 structure. It is not implemented
+or tested. First validate complete small-class coordinate/orientation sets
+and transported targets, plus degree-97/113 involution-map controls; then
+freeze full-run storage and compute. Separately certify a whole-class upper
+bound, so the chosen component can be equated with the entire horizontal
+class. Existing vertical-edge exclusion remains valid. No full-class ranking,
+full-cost gain, paid remote run or scheduled unattended continuation is claimed.
