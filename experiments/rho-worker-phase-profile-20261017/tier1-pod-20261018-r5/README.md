@@ -34,3 +34,31 @@ The independent auditor retains exact-output, host-counter, every-pair A/A
 `[0.90, 1.11]`, both memory limits, and Q-cluster bootstrap 95% lower
 charged-time ratio above 1.05 as the default-routing gates. Every stopped,
 failed, noisy, and successful arm remains in the evidence.
+
+## Measured-interval host failure
+
+The [barrier self-check](attempt5-barrier-selfcheck.json) passed both a
+deliberate CPU-5 violation and a clear-core completion. In the live attempt,
+the [ready](attempt5-affinity-ready.json) and
+[release](attempt5-barrier-release.json) receipts show that five quiet
+seconds elapsed before the runner began. No new Pod SSH session was opened
+by this agent during its timed arms. The [observer](attempt5-affinity-watch.json)
+then recorded a `runc` task with parent `0` and affinity including CPUs `5`
+and `29` about 701 seconds after release. It sent `SIGINT` to the runner.
+
+The [runner summary](attempt5-summary.json) records `rejected` after 96 arms
+and 48 exact-output pairs; the [independent audit](attempt5-audit.json)
+returns `unknown_gate_failed`. The aggregate ratio and interval remain
+unknown. The process that started `runc` cannot be identified from Pod
+visibility, so this record establishes observed interference eligibility,
+not a claim about its origin or exact time on CPU `5`.
+
+The [complete partial archive](attempt5-partial.tar.gz) retains 213 entries:
+all completed arm stdout/stderr files and ledgers, frozen source and
+executable, allocation and plan, observer and barrier receipts, logs, and
+independent audit. SHA-256:
+`1767593ddf875cbb1c2a77e3800068191a57a43a4a33c0f9de0ee4080f4457c0`.
+The transfer copy was rehashed locally against the Pod archive. A new Pod
+run on this allocation would still lack control over the observed host-level
+task, so further default-routing timing requires an allocation with auditable
+host-level CPU and IRQ isolation or a separately justified Tier 1 host gate.
