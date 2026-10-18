@@ -1,0 +1,383 @@
+diff --git a/src/cryptanalysis/ecbench/methods.rs b/src/cryptanalysis/ecbench/methods.rs
+index d950790e0..69e251ec6 100644
+--- a/src/cryptanalysis/ecbench/methods.rs
++++ b/src/cryptanalysis/ecbench/methods.rs
+@@ -1305,6 +1305,32 @@ fn solve_inner(
+             let g = BinaryGroup(&i.fast);
+             solve_generic(m, &g, i.generator, FastPoint::affine(tx, ty), i.r, seed)
+         }
++<<<<<<< HEAD
++        (Instance::Fp4Torsion(i), _) => solve_generic(
++            m,
++            &i.inst.curve,
++            i.generator,
++            Pt4 {
++                x: unpack_e4(i.p(), tx),
++                y: unpack_e4(i.p(), ty),
++                inf: false,
++            },
++            i.r,
++            seed,
++        ),
++        (Instance::F2m4(i), _) => solve_generic(
++            m,
++            &i.curve,
++            i.generator,
++            PtB {
++                x: i.curve.f.unpack(tx),
++                y: i.curve.f.unpack(ty),
++                inf: false,
++            },
++            i.r,
++            seed,
++        ),
++=======
+         (Instance::Fp4Torsion(i), _) => {
+             let p = i.p();
+             let target = Pt4 {
+@@ -1323,6 +1349,7 @@ fn solve_inner(
+             };
+             solve_generic(m, &i.curve, i.generator, target, i.r, seed)
+         }
++>>>>>>> origin/main
+         (Instance::Wide(_), _) | (Instance::Fp4(_), _) => unreachable!("returned above"),
+     }
+ }
+@@ -2842,8 +2869,11 @@ pub fn dump_factor_base(
+     if let Instance::Wide(_) = &inst {
+         return Err("no factor-base plug-in runs on a wide (n > 62) curve yet".into());
+     }
+-    if let Instance::Fp4(_) = &inst {
+-        return Err("no factor-base plug-in runs on E(F_p⁴); ic.k4_gaudry builds its own".into());
++    if matches!(
++        &inst,
++        Instance::Fp4(_) | Instance::Fp4Torsion(_) | Instance::F2m4(_)
++    ) {
++        return Err("extension-field IC methods build their own factor bases; no standalone dump plug-in is available".into());
+     }
+     if let Instance::Fp4Torsion(_) | Instance::F2m4(_) = &inst {
+         return Err("factor-base dumps cover prime and binary curves".into());
+diff --git a/src/cryptanalysis/ecbench/workload.rs b/src/cryptanalysis/ecbench/workload.rs
+index 69036ebbd..8f3a3e56f 100644
+--- a/src/cryptanalysis/ecbench/workload.rs
++++ b/src/cryptanalysis/ecbench/workload.rs
+@@ -78,9 +78,14 @@ pub enum CurveSpec {
+         gx: u64,
+         gy: u64,
+     },
++<<<<<<< HEAD
++    /// Explicit cofactor-one curve with a fixed external public target.
++    /// Build validates its order witness and subgroup membership.
++=======
+     /// An externally supplied public point, with no logarithm in the fixture.
+     /// Restricted to cofactor-one prime-order regression cohorts. Primality
+     /// and point-count certificates accompany the input catalog.
++>>>>>>> origin/main
+     PrimePublicFixture {
+         p: u64,
+         a: u64,
+@@ -307,6 +312,12 @@ impl CurveSpec {
+                 seed,
+                 max_cofactor,
+             } => {
++<<<<<<< HEAD
++                if !(5..=1021).contains(&p) || p % 4 != 1 || !is_prime_u64(p) {
++                    return Err("fp4_torsion requires a prime p = 1 mod 4 in 5..=1021".into());
++                }
++                find_d4_curve(p, seed, max_cofactor).map(|i| Instance::Fp4Torsion(Box::new(i)))
++=======
+                 // The order search walks the Hasse window of 4p² + 1 points.
+                 if p % 4 != 1 || !(5..=1021).contains(&p) || !is_prime_u64(p) {
+                     return Err(format!(
+@@ -314,18 +325,26 @@ impl CurveSpec {
+                     ));
+                 }
+                 find_d4_curve(p, seed, max_cofactor).map(|c| Instance::Fp4Torsion(Box::new(c)))
++>>>>>>> origin/main
+             }
+             CurveSpec::F2m4Torsion {
+                 m,
+                 seed,
+                 max_cofactor,
+             } => {
++<<<<<<< HEAD
++                if !(4..=15).contains(&m) {
++                    return Err("f2m4_torsion requires 4 <= m <= 15".into());
++                }
++                find_bin_curve(m, seed, max_cofactor).map(|i| Instance::F2m4(Box::new(i)))
++=======
+                 // Points pack into 4m ≤ 60 bits; the order search takes
+                 // ≈ 2q baby and giant steps per point.
+                 if !(4..=15).contains(&m) {
+                     return Err(format!("f2m4_torsion takes m from 4 to 15, not {m}"));
+                 }
+                 find_bin_curve(m, seed, max_cofactor).map(|c| Instance::F2m4(Box::new(c)))
++>>>>>>> origin/main
+             }
+             CurveSpec::Fp4Translation { p, seed } => {
+                 Fp4Instance::build(p, seed).map(|i| Instance::Fp4(Box::new(i)))
+@@ -366,7 +385,10 @@ impl CurveSpec {
+             // Preserve the original Koblitz constructor: it carries the
+             // certified Frobenius action and endomorphism identity that a
+             // generic explicit binary instance intentionally does not claim.
++<<<<<<< HEAD
++=======
+             // The search is the constructor (cheap and deterministic).
++>>>>>>> origin/main
+             Instance::Binary(_)
+             | Instance::Wide(_)
+             | Instance::Fp4(_)
+@@ -420,6 +442,16 @@ impl CurveSpec {
+             CurveSpec::Fp4Translation { p, seed } => {
+                 format!("quartic_folds::generate_translation_instance({p}, {seed}, 16)")
+             }
++            CurveSpec::Fp4Torsion {
++                p,
++                seed,
++                max_cofactor,
++            } => format!("find_d4_curve({p}, {seed}, {max_cofactor})"),
++            CurveSpec::F2m4Torsion {
++                m,
++                seed,
++                max_cofactor,
++            } => format!("find_bin_curve({m}, {seed}, {max_cofactor})"),
+         }
+     }
+ }
+@@ -720,6 +752,13 @@ impl Instance {
+                 (!p.infinity).then(|| [format!("0x{:x}", p.x), format!("0x{:x}", p.y)])
+             }
+             Instance::Fp4Torsion(i) => {
++<<<<<<< HEAD
++                let p = i.inst.curve.mul(&i.generator, k);
++                (!p.inf).then(|| {
++                    [
++                        format!("0x{:x}", pack_e4(i.p(), &p.x)),
++                        format!("0x{:x}", pack_e4(i.p(), &p.y)),
++=======
+                 let c = &i.inst.curve;
+                 let pt = CountedGroup::mul(c, &mut scratch, i.generator, k);
+                 let p = c.f.p;
+@@ -727,16 +766,25 @@ impl Instance {
+                     [
+                         format!("0x{:x}", pack_e4(p, &pt.x)),
+                         format!("0x{:x}", pack_e4(p, &pt.y)),
++>>>>>>> origin/main
+                     ]
+                 })
+             }
+             Instance::F2m4(i) => {
++<<<<<<< HEAD
++                let p = i.curve.mul(&i.generator, k);
++                (!p.inf).then(|| {
++                    [
++                        format!("0x{:x}", i.curve.f.pack(&p.x)),
++                        format!("0x{:x}", i.curve.f.pack(&p.y)),
++=======
+                 let c = &i.curve;
+                 let pt = CountedGroup::mul(c, &mut scratch, i.generator, k);
+                 (!pt.inf).then(|| {
+                     [
+                         format!("0x{:x}", c.f.pack(&pt.x)),
+                         format!("0x{:x}", c.f.pack(&pt.y)),
++>>>>>>> origin/main
+                     ]
+                 })
+             }
+@@ -760,7 +808,10 @@ impl Instance {
+     ) -> Option<([String; 2], u64)> {
+         let model = model_hash(curve);
+         let mut scratch = GroupOps::default();
+-        if let Instance::Fp4(_) = self {
++        if matches!(
++            self,
++            Instance::Fp4(_) | Instance::Fp4Torsion(_) | Instance::F2m4(_)
++        ) {
+             // Planted targets only on E(F_{p⁴}): no public-target law yet.
+             return None;
+         }
+@@ -809,6 +860,12 @@ impl Instance {
+                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
+                     }
+                 }
++<<<<<<< HEAD
++                Instance::Wide(_)
++                | Instance::Fp4(_)
++                | Instance::Fp4Torsion(_)
++                | Instance::F2m4(_) => unreachable!("handled above"),
++=======
+                 Instance::Wide(_) | Instance::Fp4(_) => unreachable!("handled above"),
+                 Instance::Fp4Torsion(i) => {
+                     let c = &i.inst.curve;
+@@ -854,6 +911,7 @@ impl Instance {
+                         ));
+                     }
+                 }
++>>>>>>> origin/main
+                 Instance::Binary(i) => {
+                     let mask = if i.n >= 64 {
+                         u64::MAX
+@@ -1153,6 +1211,51 @@ impl Workload {
+ mod tests {
+     use super::*;
+ 
++    #[test]
++    fn extension_variants_have_distinct_constructors_and_subgroup_arithmetic() {
++        for spec in [
++            CurveSpec::Fp4Torsion {
++                p: 13,
++                seed: 1,
++                max_cofactor: 16,
++            },
++            CurveSpec::F2m4Torsion {
++                m: 4,
++                seed: 1,
++                max_cofactor: 16,
++            },
++            CurveSpec::Fp4Translation { p: 13, seed: 1 },
++        ] {
++            let encoded = serde_json::to_string(&spec).unwrap();
++            assert_eq!(serde_json::from_str::<CurveSpec>(&encoded).unwrap(), spec);
++            let inst = spec.build().unwrap();
++            let facts = inst.facts(&spec);
++            assert_eq!(inst.r(), facts.r);
++            assert_eq!(inst.mul_generator_hex(1).unwrap(), facts.generator);
++            assert!(inst.mul_generator_hex(0).is_none());
++            assert!(inst.mul_generator_hex(inst.r()).is_none());
++            assert!(inst.mul_generator_hex(2).is_some());
++            assert!(
++                inst.hash_to_subgroup(&facts, 1, 0).is_none(),
++                "extension public-target law remains explicitly unavailable"
++            );
++        }
++        assert!(CurveSpec::Fp4Torsion {
++            p: 9,
++            seed: 1,
++            max_cofactor: 16
++        }
++        .build()
++        .is_err());
++        assert!(CurveSpec::F2m4Torsion {
++            m: 3,
++            seed: 1,
++            max_cofactor: 16
++        }
++        .build()
++        .is_err());
++    }
++
+     fn public_fixture() -> CurveSpec {
+         CurveSpec::PrimePublicFixture {
+             p: 343073,
+diff --git a/src/cryptanalysis/gaudry_quartic.rs b/src/cryptanalysis/gaudry_quartic.rs
+index 824ef733f..287c26011 100644
+--- a/src/cryptanalysis/gaudry_quartic.rs
++++ b/src/cryptanalysis/gaudry_quartic.rs
+@@ -1100,12 +1100,15 @@ pub(crate) fn echelon_by_lead(rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug
+     echelon_by_lead_with(rows, p, muls, debug, false)
+ }
+ 
++<<<<<<< HEAD
++=======
+ /// [`echelon_by_lead`], optionally with sparsest pivots.
+ ///
+ /// With `sparsest`, each column's pivot is instead the row of its bucket
+ /// with the fewest nonzero entries (lowest index on a tie), which cuts the
+ /// work and the fill; the row space and the pivot columns are the same
+ /// either way.
++>>>>>>> origin/main
+ pub(crate) fn echelon_by_lead_with(
+     mut rows: Vec<Vec<u16>>,
+     p: u32,
+@@ -2945,6 +2948,40 @@ mod tests {
+     use super::*;
+     use rand::SeedableRng;
+ 
++    #[test]
++    fn both_echelon_pivot_policies_preserve_the_exact_small_row_space() {
++        fn span(rows: &[Vec<u16>], p: u16) -> std::collections::BTreeSet<Vec<u16>> {
++            let width = rows.first().map_or(0, Vec::len);
++            let mut result = std::collections::BTreeSet::new();
++            for mut code in 0..u64::from(p).pow(rows.len() as u32) {
++                let mut sum = vec![0; width];
++                for row in rows {
++                    let coefficient = (code % u64::from(p)) as u16;
++                    code /= u64::from(p);
++                    for (out, value) in sum.iter_mut().zip(row) {
++                        *out = (*out + coefficient * value) % p;
++                    }
++                }
++                result.insert(sum);
++            }
++            result
++        }
++        let rows = vec![
++            vec![1, 1, 1, 1],
++            vec![1, 0, 0, 1],
++            vec![0, 1, 1, 0],
++            vec![0, 0, 0, 0],
++        ];
++        let expected = span(&rows, 3);
++        for sparsest in [false, true] {
++            let mut work = 0;
++            let echelon = echelon_by_lead_with(rows.clone(), 3, &mut work, false, sparsest);
++            assert_eq!(span(&echelon.rows, 3), expected);
++            assert_eq!(echelon.zero_rows, 2);
++            assert!(work > 0);
++        }
++    }
++
+     #[test]
+     fn u16_kernels_match_the_reference_routines() {
+         use super::super::gaudry_cubic::{charpoly_mod_p, eigenvectors_mod_p};
+diff --git a/src/cryptanalysis/jacobian_transfer/mod.rs b/src/cryptanalysis/jacobian_transfer/mod.rs
+index 313ecd064..a0d1e5a6e 100644
+--- a/src/cryptanalysis/jacobian_transfer/mod.rs
++++ b/src/cryptanalysis/jacobian_transfer/mod.rs
+@@ -1180,6 +1180,38 @@ mod tests {
+             );
+         }
+         // c2pnb304w1's 288-bit subgroup does not fit in a 256-bit Jacobian;
++<<<<<<< HEAD
++        // its best route is the n = 4, genus-8 descent over GF(2^76).
++        // The earlier 10*g^2 Jacobian price put that route 2.001 bits below
++        // rho. The measured Cantor price (2620.9, rather than 640, at g=8)
++        // moves it 0.033 bits above rho without changing its exact geometry.
++        let model = CostModel::default();
++        let r = screen(&by_name("c2pnb304w1"), &model, DEFAULT_FACTOR_BUDGET);
++        let best = &r.routes[r.best_route.unwrap()];
++        assert_eq!(r.verdict, RouteClass::Boundary);
++        assert_eq!(best.invariants["base_degree"], 76);
++        assert_eq!(best.destination.genus, "8");
++        assert!(best.cost.ratio_log2 < 0.0);
++        assert!(best.cost.exponent_ratio_log2 > 0.0);
++
++        // Preserve the historical model's conclusion as an explicit control:
++        // do not recover it by weakening the measured production price.
++        let mut legacy = model.clone();
++        legacy.jacobian_group_op_mults_measured = model
++            .jacobian_group_op_mults_measured
++            .iter()
++            .map(|&(g, _)| (g, 10.0 * f64::from(g).powi(2)))
++            .collect();
++        legacy.jacobian_group_op_extrapolation_exponent = 2.0;
++        let old = screen(&by_name("c2pnb304w1"), &legacy, DEFAULT_FACTOR_BUDGET);
++        let old_best = &old.routes[old.best_route.unwrap()];
++        assert_eq!(old.verdict, RouteClass::FormulaMarginal);
++        assert_eq!(old_best.invariants, best.invariants);
++        assert_eq!(old_best.destination, best.destination);
++        let measured_price_delta = (2620.9_f64 / 640.0).log2();
++        assert!(
++            (old_best.cost.ratio_log2 - best.cost.ratio_log2 - measured_price_delta).abs() < 0.003
++=======
+         // its best route is the n = 4 descent over GF(2^76). Priced with the
+         // measured Jacobian operation counts (#1983) it costs 2^160.259
+         // against matched rho's 2^160.226, so it is no longer below rho.
+@@ -1192,6 +1224,7 @@ mod tests {
+         assert_eq!(
+             r.routes[r.best_route.unwrap()].invariants["base_degree"],
+             76
++>>>>>>> origin/main
+         );
+         // A registry curve where (8) fails: b in F_2, Tr(a) = 1, N = 18.
+         let r = screen(

@@ -1305,30 +1305,24 @@ fn solve_inner(
             let g = BinaryGroup(&i.fast);
             solve_generic(m, &g, i.generator, FastPoint::affine(tx, ty), i.r, seed)
         }
-        (Instance::Fp4Torsion(i), _) => solve_generic(
-            m,
-            &i.inst.curve,
-            i.generator,
-            Pt4 {
-                x: unpack_e4(i.p(), tx),
-                y: unpack_e4(i.p(), ty),
+        (Instance::Fp4Torsion(i), _) => {
+            let p = i.p();
+            let target = Pt4 {
+                x: unpack_e4(p, tx),
+                y: unpack_e4(p, ty),
                 inf: false,
-            },
-            i.r,
-            seed,
-        ),
-        (Instance::F2m4(i), _) => solve_generic(
-            m,
-            &i.curve,
-            i.generator,
-            PtB {
-                x: i.curve.f.unpack(tx),
-                y: i.curve.f.unpack(ty),
+            };
+            solve_generic(m, &i.inst.curve, i.generator, target, i.r, seed)
+        }
+        (Instance::F2m4(i), _) => {
+            let f = &i.curve.f;
+            let target = PtB {
+                x: f.unpack(tx),
+                y: f.unpack(ty),
                 inf: false,
-            },
-            i.r,
-            seed,
-        ),
+            };
+            solve_generic(m, &i.curve, i.generator, target, i.r, seed)
+        }
         (Instance::Wide(_), _) | (Instance::Fp4(_), _) => unreachable!("returned above"),
     }
 }
@@ -2127,12 +2121,14 @@ fn solve_ic_prime(
     let orbit = GlvOrbitBase { instance: inst };
     let kummer = PrimeKummerBase { instance: inst };
     let isogeny = PrimeIsogenyBase { instance: inst };
+    let cm_orbit = CmOrbitBase { instance: inst };
     let base: &dyn FactorBaseBuilder<_> = match fb_name.as_str() {
         "prime-abscissa" => &abscissa,
         "prime-projected-abscissa" => &projected,
         "glv-orbit" => &orbit,
         "prime-kummer" => &kummer,
         "prime-isogeny" => &isogeny,
+        "cm-scalar-orbit" => &cm_orbit,
         other => {
             return Err(format!(
                 "factor base `{other}` does not run on a prime curve"
@@ -2846,11 +2842,11 @@ pub fn dump_factor_base(
     if let Instance::Wide(_) = &inst {
         return Err("no factor-base plug-in runs on a wide (n > 62) curve yet".into());
     }
-    if matches!(
-        &inst,
-        Instance::Fp4(_) | Instance::Fp4Torsion(_) | Instance::F2m4(_)
-    ) {
-        return Err("extension-field IC methods build their own factor bases; no standalone dump plug-in is available".into());
+    if let Instance::Fp4(_) = &inst {
+        return Err("no factor-base plug-in runs on E(F_p⁴); ic.k4_gaudry builds its own".into());
+    }
+    if let Instance::Fp4Torsion(_) | Instance::F2m4(_) = &inst {
+        return Err("factor-base dumps cover prime and binary curves".into());
     }
     match &inst {
         Instance::Prime(i) => {

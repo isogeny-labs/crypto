@@ -1,0 +1,37 @@
+   Compiling crypto v0.1.0 (/workspace/crypto)
+warning: unreachable pattern
+   --> src/cryptanalysis/ecbench/workload.rs:423:13
+    |
+410 | /             CurveSpec::Fp4Torsion {
+411 | |                 p,
+412 | |                 seed,
+413 | |                 max_cofactor,
+414 | |             } => format!("gaudry_quartic_d4::find_d4_curve({p}, {seed}, {max_cofactor})"),
+    | |_____________- matches all the relevant values
+...
+423 | /             CurveSpec::Fp4Torsion {
+424 | |                 p,
+425 | |                 seed,
+426 | |                 max_cofactor,
+427 | |             } => format!("find_d4_curve({p}, {seed}, {max_cofactor})"),
+    | |_____________^ no value can reach this
+    |
+    = note: `#[warn(unreachable_patterns)]` (part of `#[warn(unused)]`) on by default
+
+warning: unreachable pattern
+   --> src/cryptanalysis/ecbench/workload.rs:428:13
+    |
+415 | /             CurveSpec::F2m4Torsion {
+416 | |                 m,
+417 | |                 seed,
+418 | |                 max_cofactor,
+419 | |             } => format!("gaudry_quartic_bin::find_bin_curve({m}, {seed}, {max_cofactor})"),
+    | |_____________- matches all the relevant values
+...
+428 | /             CurveSpec::F2m4Torsion {
+429 | |                 m,
+430 | |                 seed,
+431 | |                 max_cofactor,
+432 | |             } => format!("find_bin_curve({m}, {seed}, {max_cofactor})"),
+    | |_____________^ no value can reach this
+
