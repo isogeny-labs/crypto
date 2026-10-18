@@ -1,0 +1,52 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1hff4c8e911501",
+  "label": "Round315 transported-log amortized holdout n37 T16",
+  "spec_id": "ECS1hc77604c1a34b",
+  "spec_sha256": "c77604c1a34b0dce4fcb45b4a7c9ef3d6003802617f5baea283d3729648305be",
+  "env_class_id": "ECBENV2h59034d4cd61b",
+  "host_sha256": "bca9de0856424859dee072cb2c94e8ae6df294b7f4376cf396a8dc4414b95f69",
+  "plan_sha256": "9772bfd4a5853ec59c804048f7c0482c01a1e55e01c9f1b08358b60372d0d299",
+  "binary_sha256": "5fe36b20f7d79c590e02d5c7553268fe9ee3ee079bf505b174b4ba856e7bc4d5",
+  "git_commit": "0d4441e107fc68d36c6a271adf03aeb4e72e7171",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": false,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/Volumes/SSD990-2/wt-round315-amortize-20261017/target/release/ecbench"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "fad8af4073a6328914b987fe1b33c29f27ce0a2f306d623d0a0f868161e14594",
+  "child_env": {
+    "HOME": "/Users/adamburan",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/Users/adamburan/.atuin/bin:/Users/adamburan/.pyenv/shims:/Users/adamburan/.pyenv/bin:/Users/adamburan/.elan/bin:/Users/adamburan/.local/bin:/Users/adamburan/.local/share/solana/install/active_release/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/Applications/Wireshark.app/Contents/MacOS:/usr/local/go/bin:/Users/adamburan/.cargo/bin:/Applications/iTerm.app/Contents/Resources/utilities:/Users/adamburan/.docker/bin:/Users/adamburan/go/bin:/Users/adamburan/istio-1.24.0/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792265137745,
+  "finished_unix_ms": 1792265252043,
+  "status": "complete",
+  "executions_planned": 144,
+  "records_written": 144,
+  "records_sha256": "b5cd5de81e9ca48536b7dc23f8403cf8d41e6762f75f7eaeff7979a216b9a688",
+  "status_counts": {
+    "verified": 144
+  }
+}

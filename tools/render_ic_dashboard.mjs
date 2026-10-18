@@ -294,6 +294,7 @@ const retainedPanels = [
   ['lab-ecbench-all','Cross-method evidence · every measured candidate'],
   ['lab-pair-claw','Pair claw of cryptanalysis#175 · same-target strong rho'],
   ['known-log-transport-round314-20261014','Round 314 exact-log transport · same-target strong rho'],
+  ['transport-amortize-round315-20261017','Round 315 amortized multi-target transport · same-target strong rho'],
   ['lab-progress','Research progress over time · separate regimes and references'],
   ['lab-currency','How new results update this dashboard']
 ].map(([id,label])=>{
