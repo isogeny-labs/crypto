@@ -43,6 +43,7 @@ useful rank. A cap is an unresolved bounded outcome; this run supplies no
 factor-base winner, complete index-calculus cost or matched-rho ratio.
 
 *Raw source:* `positive/worker.json.phases.jsonl`,
-`positive/container-state.json` and `positive/outcome.json`.
+`positive/container-state.json`, `positive/outcome.json` and
+`positive-files.sha256`.
 Stdout/stderr, cgroup peak and the exact UTC interval are retained
 beside them. Failed worker builds remain linked from `BUILD_RECEIPT.md`.

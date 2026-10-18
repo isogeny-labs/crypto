@@ -21,5 +21,5 @@ change or comparing factor-base quality. This result selects no m=2,
 m=3 or m=4 factor base and supplies no full index-calculus cost ratio.
 
 *Audit:* `PROTOCOL.md`, `RUN_REPORT.md`, `positive/outcome.json`,
-`positive/worker.json.phases.jsonl`, `source-files.sha256`,
+`positive/worker.json.phases.jsonl`, `positive-files.sha256`, `source-files.sha256`,
 `inputs-before-run.sha256`, `VALIDATION.md` and `COMMANDS.md`.

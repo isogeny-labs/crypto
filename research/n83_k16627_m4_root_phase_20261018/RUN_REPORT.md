@@ -67,7 +67,9 @@ file, the [container state](positive/container-state.json),
 [host configuration](positive/host-config.json), exact UTC stamps and
 cgroup peak by [derive-outcome.jq](derive-outcome.jq). The worker did not
 write `worker.json`; stdout and stderr were empty. The [PDF report](RUN_REPORT.pdf)
-is a rendered summary of this source-linked account.
+is a rendered summary of this source-linked account. The raw and derived
+files are pinned by [SHA-256 manifest](positive-files.sha256) with a
+[successful check](positive-files-check.log).
 
 ## Interpretation and open obligations
 
