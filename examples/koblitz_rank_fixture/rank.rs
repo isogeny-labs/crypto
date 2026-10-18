@@ -3776,7 +3776,7 @@ pub(super) fn run() {
         assert_eq!(
             (a, n),
             (0, 53),
-            "normal quotient mode requires the registered k0n53 curve"
+            "normal quotient mode requires the registered icv1-f2m53-tm56619371-dac20a85 curve"
         );
     }
     let curve_setup_ms = curve_setup_started.elapsed().as_secs_f64() * 1000.0;
