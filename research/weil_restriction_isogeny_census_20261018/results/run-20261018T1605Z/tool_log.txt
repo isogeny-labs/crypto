@@ -1,0 +1,36 @@
+part G cell n=2 l=2: 0.00s
+part G cell n=2 l=3: 0.00s
+part G cell n=2 l=5: 0.02s
+part G cell n=2 l=7: 0.13s
+part G cell n=3 l=2: 0.00s
+part G cell n=3 l=3: 0.01s
+part G cell n=3 l=5: 0.92s
+part G cell n=3 l=7: 15.25s
+part G cell n=4 l=2: 0.00s
+part G cell n=4 l=3: 0.28s
+part G cell n=4 l=5: 55.55s
+check1 (n=3, l=2: Tian kernels only for phi = I): violations=0
+check2 (n=2: every Tian kernel is a graph with det psi = -qbar^-1 and phi psi^2 = I): violations=0
+check3 (P2: at (n,l,qbar)=(3,3,1) a class without eigenvalue 1 has a Tian kernel): classes=1
+check4 (representative independence): mismatches=0
+part H q=3: 56 curves, 0.0s
+part H q=5: 252 curves, 0.2s
+part H q=7: 690 curves, 0.2s
+part H q=11: 2662 curves, 2.2s
+part H q=13: 4400 curves, 5.6s
+q=3 check5 classes=56 expected=56 ok
+q=3 hasse_violations=0 class_not_found=0 check6_violations=0 check7_violations=0 check8_violations=0
+q=3 check9 prime_order=8 prime_with_tian_some_odd_ell=0 all=56 all_with_tian_some_odd_ell=28
+q=5 check5 classes=252 expected=252 ok
+q=5 hasse_violations=0 class_not_found=0 check6_violations=0 check7_violations=0 check8_violations=0
+q=5 check9 prime_order=18 prime_with_tian_some_odd_ell=0 all=252 all_with_tian_some_odd_ell=156
+q=7 check5 classes=690 expected=690 ok
+q=7 hasse_violations=0 class_not_found=0 check6_violations=0 check7_violations=0 check8_violations=0
+q=7 check9 prime_order=61 prime_with_tian_some_odd_ell=24 all=690 all_with_tian_some_odd_ell=372
+q=11 check5 classes=2662 expected=2662 ok
+q=11 hasse_violations=0 class_not_found=0 check6_violations=0 check7_violations=0 check8_violations=0
+q=11 check9 prime_order=150 prime_with_tian_some_odd_ell=57 all=2662 all_with_tian_some_odd_ell=1984
+q=13 check5 classes=4400 expected=4400 ok
+q=13 hasse_violations=0 class_not_found=0 check6_violations=0 check7_violations=0 check8_violations=0
+q=13 check9 prime_order=323 prime_with_tian_some_odd_ell=144 all=4400 all_with_tian_some_odd_ell=2714
+total 80.4s
