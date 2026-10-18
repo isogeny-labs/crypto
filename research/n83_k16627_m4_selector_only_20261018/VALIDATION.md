@@ -8,10 +8,11 @@
 | Capped metadata filter | synthetic selector-only and phase-only fixtures accepted; decreasing XOR row scans and wrong-arm identity rejected with exit 5 | [deriver controls](DERIVER_CHECK.md) |
 | Five retained panel inputs | SHA-256 checks passed before build | [input manifest](inputs-before-run.sha256), [check](input-check.log) |
 | Exact source and Linux worker | six source files and five inputs checked; offline Linux build exited 0 without OOM | [build receipt](BUILD_RECEIPT.md), [source](source-files.sha256), [inputs](inputs-before-run.sha256), [binary](worker-binary.sha256) |
-| A1/B/A2 and conditional C | not attempted | fresh per-arm output directories and resource receipts pending |
-| Separate native relation replay | code updated, unverified | positive and changed-x/row controls pending for returned SAT arms |
+| A1/B/A2 and conditional C | A1, B and A2 passed with one checked rank-one relation each; B returned before its cap, so C omitted by protocol | [run report](RUN_REPORT.md), [summary](summary.json), [raw arms](arms/), [hash manifest](raw-files.sha256) |
+| Separate native relation replay | all three positives passed; six changed-x/row receipts rejected with exit 1 | [replay receipts and negative checks](replay/NEGATIVE_CHECKS.md), [verifier source](replay-source.sha256), [binary](replay-binary.sha256) |
 | Touched exporter example suite | 20 passed, 0 failed in release mode | [raw log](exporter-example-tests.log) |
 | Replay example compile | passed in release mode; the example has no embedded tests | [raw build log](replay-example-build.log) |
-| Full release library suite | pending | raw log required before push |
+| Full release library suite on follow-on execution branch | pending | raw log required before push |
+| Raw, visual and benchmark copies | 70 raw/replay files rehashed; SVG and 150-dpi PNG inspected; result and run PDFs rendered and inspected; benchmark copies byte-equal | [hash check](raw-files-check.log), [renderer log](report-generation.log), [run PDF](RUN_REPORT.pdf), [result PDF](RESULT.pdf) |
 
-No degree-83 outcome or performance ratio is established by the protocol, synthetic deriver fixtures or unverified code. The predecessor's checked positive run remains separate evidence on its own source revision.
+The initial report-renderer call failed because its replay receipt names did not match the actual `a1.json`, `b.json` and `a2.json` paths; [the raw error](report-generation-first.log) is retained. The renderer was corrected before generating the accepted report from the same frozen worker and verifier receipts. The degree-83 arms used worker source commit `48ebe3b370810e6da2d48e5234e42ba92bba259b`; reporting-source edits after the arms did not change any of the six compiled worker files. These single constructed-witness arms establish a checked stage result, not natural relation yield or a complete IC performance ratio.
