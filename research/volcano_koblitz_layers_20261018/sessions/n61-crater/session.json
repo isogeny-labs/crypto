@@ -1,0 +1,52 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1ha6afec2c007a",
+  "label": "crater: Koblitz K_0 over F_2^61 and its 6 level-1 neighbours (ℓ = 1951)",
+  "spec_id": "ECS1h22c1e916b340",
+  "spec_sha256": "22c1e916b34062da2c5481c8038ebe13985b882beaf05e7b4f9802b37bad5fba",
+  "env_class_id": "ECBENV2h792378109273",
+  "host_sha256": "9d442f49a2a8ec4617eeea6a743173fc81b733d1ec0363b06ed76c00452e088f",
+  "plan_sha256": "62a3a0c5b2d865549351a368ab6b9f13d15c8c51546a3460f95fb1297bca6ab3",
+  "binary_sha256": "47407f2b47fd5c73553a47c4b57ab1e0a165ca8dfa286965bf1f218ee9d41005",
+  "git_commit": "a8194d616ed8c04489ec46177d369f1b1670360a",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792341940111,
+  "finished_unix_ms": 1792342675121,
+  "status": "complete",
+  "executions_planned": 192,
+  "records_written": 192,
+  "records_sha256": "988030f078cd332cde8c46a335dbec9406bd7c4423b4dc11f8c025552895bffe",
+  "status_counts": {
+    "verified": 192
+  }
+}

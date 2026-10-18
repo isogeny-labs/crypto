@@ -235,6 +235,7 @@ pub mod ml_kem_pco;
 pub mod ml_rho_walks;
 pub mod mlwe;
 pub mod modular_polynomial;
+pub mod volcano;
 pub mod mov_attack;
 pub mod mq_fes;
 pub mod mq_monica;

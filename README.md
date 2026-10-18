@@ -192,6 +192,10 @@ Generic attacks over the `HashFunction` / `MerkleDamgardHash` trait:
 CLI:
 
 ```bash
+# Isogeny-volcano tools (docs/volcano/README.md)
+crypto volcano profile --koblitz-n 83 --ell 6473        # conductor, depth, level tables
+crypto volcano koblitz-step --n 131 --ell 263          # ECC2K-130: the 262 level-1 neighbours over F_(2^131)
+
 # Auto-run every applicable hash attack
 crypto cryptanalysis hash-auto --hash md5
 crypto cryptanalysis hash-auto --hash md4

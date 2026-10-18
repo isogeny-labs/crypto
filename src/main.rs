@@ -14,10 +14,12 @@
 //!   pqc                                — PQC demos (ML-KEM, ML-DSA, SQIsign, toy Kyber)
 //!   pqc-fast <module> --op ...         — the speed-oriented implementations
 //!   mlwe    <attack>  ...              — ML-KEM / ML-DSA cryptanalysis
+//!   volcano <profile|level1|koblitz-step> — isogeny-volcano descent tools
 
 mod cli_mlwe;
 mod cli_pqc;
 mod cli_pqc_fast;
+mod cli_volcano;
 
 use clap::{Parser, Subcommand};
 use crypto_lib::{
@@ -129,6 +131,12 @@ enum Cmd {
     Mlwe {
         #[command(subcommand)]
         op: cli_mlwe::MlweOp,
+    },
+    /// Isogeny-volcano tools: conductor and level tables, Φ_ℓ(X, j₀) by CRT, and the
+    /// first descending step of a Koblitz curve's volcano over F_(2^n).
+    Volcano {
+        #[command(subcommand)]
+        op: cli_volcano::VolcanoOp,
     },
     /// Large files (factor bases, relation tables): push to, pull from, and index
     /// the object store. See docs/store/README.md.
@@ -525,6 +533,7 @@ fn main() {
         Cmd::Cryptopals { challenge } => cmd_cryptopals(&challenge),
         Cmd::PqcFast { op } => cli_pqc_fast::run(op),
         Cmd::Mlwe { op } => cli_mlwe::run(op),
+        Cmd::Volcano { op } => cli_volcano::run(op),
         Cmd::Store(args) => {
             if let Err(e) = crypto_lib::store::cli::run(&args) {
                 eprintln!("store: {e}");
