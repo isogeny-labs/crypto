@@ -1,37 +1,32 @@
-# Lays out recorded values from raw/card-14-summarize.stdout.log (no computation of results).
-data = {  # cell: (sig bound*, f4r, f4n, labels n_refuted sig/f4r/f4n)
- "c13-3-4": (0.494, 0.885, 1.120, "sig 0/16; f4r,f4n 16/16"),
- "c15-3-4": (1.677, None, None, "sig 0/16 (15 capped); no replay rows"),
- "c15-5-3": (0.498, 0.727, 1.405, "sig 0/16 (8 capped); f4r,f4n 8/16"),
- "c17-4-3": (0.492, 0.587, 1.160, "sig 0/16; f4r,f4n 16/16"),
-}
-cols = {"sig":"#b2182b","f4r":"#2166ac","f4n":"#4d9221"}
-W,H=760,430; x0,y0,pw,ph=70,60,660,270
-ymax=2.0
-def Y(v): return y0+ph-ph*v/ymax
-o=[f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" font-family="sans-serif" font-size="12">',
- '<rect width="100%" height="100%" fill="#ffffff"/>',
- '<text x="70" y="22" font-size="15" font-weight="bold">Item 06: R = touches(f4) / cost(X), geometric mean by cell</text>',
- '<text x="70" y="40" fill="#444">Recorded values, raw/card-14-summarize.stdout.log. sig bars are upper bounds (stopped jobs), not measurements of R.</text>']
-for v in (0,0.5,1,1.5,2):
-    o.append(f'<line x1="{x0}" x2="{x0+pw}" y1="{Y(v)}" y2="{Y(v)}" stroke="#ddd"/><text x="{x0-8}" y="{Y(v)+4}" text-anchor="end">{v}</text>')
-o.append(f'<line x1="{x0}" x2="{x0+pw}" y1="{Y(1.5)}" y2="{Y(1.5)}" stroke="#000" stroke-dasharray="6 4"/><text x="{x0+pw-4}" y="{Y(1.5)-4}" text-anchor="end">qualify threshold 1.5</text>')
-o.append(f'<line x1="{x0}" x2="{x0+pw}" y1="{Y(1/1.5)}" y2="{Y(1/1.5)}" stroke="#888" stroke-dasharray="2 3"/><text x="{x0+4}" y="{Y(1/1.5)-4}" text-anchor="start" fill="#555">regress line 1/1.5</text>')
-gw=pw/4
-for i,(c,(s,r,n,lab)) in enumerate(data.items()):
-    gx=x0+i*gw+20
-    for j,(k,v) in enumerate((("sig",s),("f4r",r),("f4n",n))):
-        bx=gx+j*48
-        if v is None:
-            o.append(f'<text x="{bx+20}" y="{Y(0)-6}" text-anchor="middle" fill="#777">n/a</text>')
-        else:
-            o.append(f'<rect x="{bx}" y="{Y(v)}" width="40" height="{Y(0)-Y(v)}" fill="{cols[k]}"/>')
-            o.append(f'<text x="{bx+20}" y="{Y(v)-4}" text-anchor="middle">{"&#8804;" if k=="sig" else ""}{v:.2f}</text>')
-    o.append(f'<text x="{gx+70}" y="{y0+ph+18}" text-anchor="middle" font-weight="bold">{c}</text>')
-    o.append(f'<text x="{gx+70}" y="{y0+ph+34}" text-anchor="middle" font-size="9" fill="#444">{lab}</text>')
-for k,(t,x) in enumerate((("sig (upper bound)",70),("f4r exact replay",230),("f4n negative-filter replay",390))):
-    kk=["sig","f4r","f4n"][k]
-    o.append(f'<rect x="{x}" y="395" width="12" height="12" fill="{cols[kk]}"/><text x="{x+18}" y="405">{t}</text>')
-o.append('<text x="70" y="424" font-size="10" fill="#444">Paired by target against f4; replay cost includes the held-out trace amortised over 16 targets. Frozen rule: PROTOCOL.md. Verdict INCONCLUSIVE.</text>')
-o.append('</svg>')
-open('figures/ratio-by-cell.svg','w').write("\n".join(o))
+# Lays out recorded values from raw/assess-r2-summarize.stdout.log (b06 summarize over raw/, repaired instrument);
+# per-target ranges from the same raw rows. No result is computed here.
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+cells = ["c13-3-4", "c15-3-4", "c15-5-3", "c17-4-3"]
+sig = [0.494, 1.677, 0.497, 0.492]          # upper bounds (stopped jobs)
+f4r = [0.885, 0.630, 0.741, 0.587]
+f4n = [1.120, 1.026, 1.413, 1.160]
+lab = ["sig 16/16 touchcap\nf4r,f4n 16/16", "sig mixed caps (5/4/4/3)\nf4r,f4n 15/16 (f4 t1 timelimit)",
+       "sig 16/16 touchcap\nf4r,f4n 16/16", "sig 16/16 touchcap\nf4r,f4n 16/16"]
+fig, ax = plt.subplots(figsize=(9, 5))
+w = 0.26
+for j, (name, v, col) in enumerate((("sig (upper bound, stopped jobs)", sig, "#b2182b"),
+                                    ("f4r exact-key replay", f4r, "#2166ac"),
+                                    ("f4n negative-filter replay (descriptive)", f4n, "#4d9221"))):
+    xs = [i + (j - 1) * w for i in range(4)]
+    bars = ax.bar(xs, v, w, color=col, label=name)
+    for x, y in zip(xs, v):
+        ax.text(x, y + 0.03, ("<=" if j == 0 else "") + f"{y:.2f}", ha="center", fontsize=8)
+bars = ax.patches
+bars[1].set_hatch("//")  # c15-3-4 sig: bound does not certify regression
+ax.axhline(1.5, color="k", ls="--", lw=1); ax.text(3.45, 1.53, "qualify 1.5", ha="right", fontsize=8)
+ax.axhline(1 / 1.5, color="#777", ls=":", lw=1); ax.text(-0.45, 0.69, "regress line 1/1.5", fontsize=8, color="#555")
+ax.set_xticks(range(4)); ax.set_xticklabels([f"{c}\n{l}" for c, l in zip(cells, lab)], fontsize=7.5)
+ax.set_ylabel("R = touches(f4) / cost(X), geometric mean over targets"); ax.set_ylim(0, 2.0)
+ax.set_title("Item 06 (repair pass): paired touch ratio vs F4, by cell. Verdict REGRESSES (constant)", fontsize=10)
+ax.legend(fontsize=8, loc="upper right")
+fig.text(0.01, 0.005, "Hatched sig bar: c15-3-4 bound 1.68 is not below 1/1.5 (time/mem/column stops), so that cell is not regress-certain. "
+         "Replay cost includes the held-out trace /16. Toy scale n=13-17.", fontsize=6.5)
+fig.tight_layout(rect=(0, 0.03, 1, 1))
+fig.savefig("figures/ratio-by-cell.svg"); fig.savefig("figures/ratio-by-cell.png", dpi=150)
