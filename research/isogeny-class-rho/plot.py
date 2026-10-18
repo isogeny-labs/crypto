@@ -222,7 +222,7 @@ if G:
         ax.set_title(f"v{v}: {len(gs)} generators\nKW p = {p['kruskal_wallis']['p']:.2f}, var ratio {p['anova']['variance_ratio']:.2f}", fontsize=8)
         ax.set_xlabel("generator index")
     axes[0][0].set_ylabel("mean group operations ± 95 % CI")
-    fig.suptitle(f"Generator sweep: P_i = r_i·P, same secret k · {rid} · {G['params']['trials']} seeds per generator", fontsize=9)
+    fig.suptitle(f"Generator sweep: P_i = r_i·P, same secret k · {rid} · {G['params']['trials']} seeds per generator", fontsize=9, y=1.04)
     save(fig, "generators")
     # distribution of generator means vs expected spread
     fig, ax = plt.subplots(figsize=(6, 3.6))
