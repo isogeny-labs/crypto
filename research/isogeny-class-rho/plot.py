@@ -15,7 +15,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib import cm, colors  # noqa: E402
+from matplotlib import colors  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools" / "volcano-diagram"))
 from volcano_diagram import render  # noqa: E402
@@ -101,7 +101,7 @@ if R:
         vals = {v["id"]: (arms[v["id"]]["summary"]["iters"]["mean"] if key == "ops" else arms[v["id"]]["e2e_ms_mean"]) for v in measured}
         vmin, vmax = min(vals.values()), max(vals.values())
         norm = colors.Normalize(vmin=vmin, vmax=vmax)
-        cmap = cm.get_cmap("YlOrRd")
+        cmap = matplotlib.colormaps["YlOrRd"]
         pos = {}
         # each stratum (conductor) is a ring at z = −(total level); vertices spread by angle in BFS order
         by_cond = defaultdict(list)
@@ -120,7 +120,7 @@ if R:
                 pos[v["id"]] = (r * math.cos(ang), r * math.sin(ang), -h)
             th = [2 * math.pi * k / 200 for k in range(201)]
             ax.plot([r * math.cos(t) for t in th], [r * math.sin(t) for t in th], [-h] * len(th), color="#888", lw=0.6, alpha=0.6)
-            ax.text(r * 1.05, 0, -h, f"f={c} ({n} walked, h={by_cond[c][0]['stratum_class_number']})", fontsize=7, color="#444")
+            ax.text(r * 1.05, 0.15 * (i % 2), -h, f"f={c}: {n} walked, h={by_cond[c][0]['stratum_class_number']:,}", fontsize=6, color="#444")
         for v in verts:
             if v["id"] not in pos:
                 continue
@@ -136,8 +136,9 @@ if R:
         my = [pos[i][1] for i in vals]
         mz = [pos[i][2] for i in vals]
         sc = ax.scatter(mx, my, mz, c=[vals[i] for i in vals], cmap=cmap, norm=norm, s=60, edgecolor="k", linewidth=0.4, depthshade=False)
-        for i in vals:
-            ax.text(pos[i][0], pos[i][1], pos[i][2] + 0.08, f"v{i}", fontsize=6)
+        if len(vals) <= 40:
+            for i in vals:
+                ax.text(pos[i][0], pos[i][1], pos[i][2] + 0.08, f"v{i}", fontsize=6)
         ax.set_zlabel("− total volcano level (crater on top)")
         ax.set_xticks([])
         ax.set_yticks([])
