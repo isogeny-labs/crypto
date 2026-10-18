@@ -71,6 +71,7 @@ SOURCES = {
     "f4_f5_f6_cross_family": "research/f4_f5_f6_cross_family_20261011/ANALYSIS.json",
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
+    "conductor_gap_instructions": "research/ecbench_conductor_gap_ir_20261014/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
@@ -726,6 +727,15 @@ def latest_frontier_audit() -> dict:
 def build() -> dict:
     names = Names()
     frontier_audit = latest_frontier_audit()
+    conductor_gap_ir = load(SOURCES["conductor_gap_instructions"])
+    if (conductor_gap_ir["schema"] != "conductor_gap.callgrind_analysis/v1"
+            or conductor_gap_ir["unit"] != "callgrind.Ir"
+            or not conductor_gap_ir["all_profiles_verified"]
+            or conductor_gap_ir["verified_profiles"] != conductor_gap_ir["expected_profiles"]
+            or conductor_gap_ir["expected_profiles"] != 100
+            or conductor_gap_ir["comparison_status"] != "admissible_implementation_diagnostic"
+            or len(conductor_gap_ir["comparisons"]) != 6):
+        raise ValueError("Conductor-gap instruction census source is incomplete")
     n83_holdout = load(SOURCES["n83_tier1_cold_holdout"])
     if (n83_holdout["schema"] != "n83.e2e-holdout-ic1/v1"
             or n83_holdout["evidence_status"] != "PASS_INDEPENDENT_REPLAY"
@@ -1068,6 +1078,7 @@ def build() -> dict:
         # Native analysis computes these observations; this view only copies
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
+        "conductor_gap_instruction_diagnostic": conductor_gap_ir,
         "linear_algebra_component": la_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
