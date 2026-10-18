@@ -1,6 +1,12 @@
 # Two statements the index-calculus programme keeps using without writing them down (L6, L7)
 
 **Status.** Proposed statements with proofs or proof sketches, 2026-10-18.
+**Lean (2026-10-18):** the core of both lemmas is machine-checked in
+`lean/ICLemmas.lean` (core Lean 4 v4.34.1, proof gate PASS, standard axioms
+only). Lemma 1's independence statement (`lemma1_no_dependency`) and Lemma 2's
+inequality (`lemma2_relation_phase`, `lemma2_budget`) are proved; the bridges to
+Boolean degree, to `F_{2^n}` via Mathlib, and the `(Ne/D)^D` estimate are open
+(`lean/README.md`, proof map).
 Nothing here is measured; the evidence cited is the committed data the
 statements explain. They are offered for the FFD defensive programme
 (`research/notes/index-calculus/RESEARCH_FALL_DEGREE_BOUNDS.md`), which
