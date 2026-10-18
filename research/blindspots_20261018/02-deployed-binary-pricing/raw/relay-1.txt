@@ -1,0 +1,50 @@
+The tool completed with status `completed`. No command line ends with FAILED and no output line ends with MISSING, so nothing triggered a refusal. Output verbatim:
+
+```
+card: CARD-BLINDSPOT-02-01 (sha256 96f35c67b8a00e5f8d61bc6888455eebf3572d4f568e8b97bad9e2fe76fad429)
+commit: 973b8af37c631c0749752e62b55da998a37c8678
+receipt: research/blindspots_20261018/02-deployed-binary-pricing/raw/receipt-card-01.json sha256 67c614b04eca1440fc7c52fb947c0f112a327068bf594fbbe467318ef5a0c7cd
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-02/card-01"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-o", "target/blindspots-02/card-01/b02", "examples/blindspots_02_deployed_binary_pricing.rs"] exit 0 (1.493 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (control): ["prlimit", "--as=4294967296", "target/blindspots-02/card-01/b02", "control", "--scale-ref", "research/notes/ecc2k130/descent_degree_cost-output-20261016-scale.txt", "--d4-ref", "research/ic_next10_20261014/06-equivariant-f4-m4/cost_d4-output.txt", "--out-dir", "research/blindspots_20261018/02-deployed-binary-pricing/raw"] exit 0 (0.348 s) succeeded
+  stdout sha256 3b837bc934290706982bf44c70b67a79419a04771ab8172315d55ea790d63a93; last 9 lines:
+    wrote research/blindspots_20261018/02-deployed-binary-pricing/raw/control.txt (751 bytes)
+    positive control A (descent_degree_cost-output-20261016-scale.txt, n = 131, l in 4..70, rho 60.81): 30/30 rows identical
+    positive control B (06-equivariant-f4-m4/cost_d4-output.txt, n = 131, l in 4..=70, rho 60.81): 16/16 rows identical
+    headline rows: m=4 D=6 w=1 -> 2^76.31 (committed 2^76.31); m=3 D=6 w=1 -> 2^88.05 (committed 2^88.05): identical
+    rho reference: ECC2K-130 log2 r = 129.000000, h = 4, A = 262, rho = 60.8090 (committed 60.8090): identical
+    range check (constant-D rows, n = 131, 4..70 vs 1..=131): minimiser unchanged
+    negative control (m = 2, all cells x models x w x K): minimum gap to rho = +24.50 bits at sect131r1 floor w=1 K=1 l=43: never crosses rho
+    internal monotonicity (w, K, D): 1392 checks, 0 violations: pass
+    CONTROL PASS
+  output research/blindspots_20261018/02-deployed-binary-pricing/raw/control.txt: 96633aa8e3c0497f82947a51b0680ad8577dfc9029ca0644f4edac52c6171ea5
+command 4 (cells): ["prlimit", "--as=4294967296", "target/blindspots-02/card-01/b02", "cells", "--out-dir", "research/blindspots_20261018/02-deployed-binary-pricing/raw"] exit 0 (0.251 s) succeeded
+  stdout sha256 6d04339aa7e1473b74962f71fbd5c6cd65185e369080659c782469356b928820; last 20 lines:
+      FLIP k1 D=4 (design) m=4 w=1 K=16 at n=571: gap -33.48
+      FLIP k1 D=4 (design) m=4 w=1 K=256 at n=571: gap -35.26
+      FLIP k1 D=4 (design) m=4 w=2 K=1 at n=571: gap -16.75
+      FLIP k1 D=4 (design) m=4 w=2 K=10 at n=571: gap -17.70
+      FLIP k1 D=4 (design) m=4 w=2 K=16 at n=571: gap -18.18
+      FLIP k1 D=4 (design) m=4 w=2 K=256 at n=571: gap -19.58
+      FLIP k1 D=4 (design) m=5 w=1 K=1 at n=571: gap -71.19
+      FLIP k1 D=4 (design) m=5 w=1 K=10 at n=571: gap -72.35
+      FLIP k1 D=4 (design) m=5 w=1 K=16 at n=571: gap -72.67
+      FLIP k1 D=4 (design) m=5 w=1 K=256 at n=571: gap -73.52
+      FLIP k1 D=4 (design) m=5 w=2 K=1 at n=571: gap -57.46
+      FLIP k1 D=4 (design) m=5 w=2 K=10 at n=571: gap -59.06
+      FLIP k1 D=4 (design) m=5 w=2 K=16 at n=571: gap -59.18
+      FLIP k1 D=4 (design) m=5 w=2 K=256 at n=571: gap -60.65
+      FLIP k1 D=6 (design) m=4 w=1 K=1 at n=571: gap -25.38
+      FLIP k1 D=6 (design) m=4 w=1 K=10 at n=571: gap -26.82
+      FLIP k1 D=6 (design) m=4 w=1 K=16 at n=571: gap -27.10
+      FLIP k1 D=6 (design) m=4 w=1 K=256 at n=571: gap -28.67
+      FLIP k1 D=6 (design) m=4 w=2 K=1 at n=571: gap -3.37
+      FLIP k1 D=6 (design) m=4 w=2 K=10 at n=571: gap -4.80
+  output research/blindspots_20261018/02-deployed-binary-pricing/raw/cells.tsv: e99f40c92620b73438915f0427693e4ac2a5d3c560af9636107290031bce7e82
+  output research/blindspots_20261018/02-deployed-binary-pricing/raw/cells.md: 0e1c73f14258231bd3893971599ea88383affe01737f235c1f531e79a2a3aacf
+command 5 (remove-bin): ["rm", "-f", "target/blindspots-02/card-01/b02"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+```
