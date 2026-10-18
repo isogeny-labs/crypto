@@ -351,3 +351,34 @@ committed:
 
 The cards re-run all of these from the committed code; the probe numbers are
 not used in any table.
+
+## Addendum A: final card split (written before any measured card run; changes no cell, rule or threshold)
+
+The card plan above was an estimate. After the instrument was final
+(`examples/blindspots_14_prime_m4.rs`, sha256
+`f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376`, `rustfmt` and
+`clippy-driver` clean, `selftest` passing) the cards were split by measured time
+so that each finishes well under 8 minutes on the shared host. Every card builds
+its own binary, runs only that binary, and writes only under `raw/`.
+
+| card | content |
+|--|--|
+| 01 | `selftest --deep`; `reach`; `reuse` (the three PKM files, bound by sha256); rho x16 at the four sizes; arm (a) T_dec (16 random + 4 planted, pair-table cross-check) at the four design cells and the 16-bit ladder `b_x = 3..7`; full IC arm (a), 16 runs, at the same nine bases |
+| 02 | arm (b), 16-bit ladder `b_x = 3, 4, 5, 6` (16 random + 2 planted, brute-force root count) and `b_x = 7` targets 0-8 |
+| 03 | arm (b) `b_x = 7` targets 9-17; p-ladder `b_x = 5, 6` on the 20-, 24- and 28-bit curves |
+| 04 to 07 | arm (b) at the 16-bit design cell `b_x = 8`, target indices 0-4, 5-9, 10-14, 15-17 (16 and 17 are the planted controls) |
+| 08 | arm (b) at the 20- and 24-bit design cells (`b_x = 15, 29`), cap 3e9 multiply-adds or 2.5e7 nonzeros (60 s safety), 16 targets |
+| 09 | arm (b) at the 28-bit design cell (`b_x = 63`), same cap; full IC arm (b), `b_x = 3`, 16 runs |
+| 10 to 12 | full IC arm (b), `b_x = 4`, runs 0-5, 6-10, 11-15 |
+
+The target indices of a split cell are the indices of the same deterministic
+sequence (seed 20261018), so the union of the cards is the 16 random plus 2 planted
+targets of Cells, controls and targets. The assess stage runs
+`<bin> summarize --dir research/blindspots_20261018/14-prime-m4-cells/raw`, which
+prints the tables and the exponent fits that Decision rules 1 to 3 name (numbers
+only, no verdict), and applies the rule text of this protocol to them. Arm (a)'s
+fitted slope in that output is a check on the base sizes, not an arm verdict
+(Decision rule 1). The summary's MODEL rows multiply the arm-(a) full-IC attempt
+counts by arm (b)'s and arm (c)'s measured per-attempt native work; they are lower
+bounds on those arms' oracle phase, not end-to-end measurements, and carry no
+ranking by themselves.
