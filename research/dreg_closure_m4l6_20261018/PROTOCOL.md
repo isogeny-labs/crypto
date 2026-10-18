@@ -159,3 +159,28 @@ at `m = 3`, `N = 21` by its 45-minute wall inside the second degree-7 step at
 reading follows item 3's rule: a productive degree-8 step is H0 (growth
 resumes) from a lower bound; a finished run gives `D`; a wall stop with no
 degree-8 step is inconclusive. It does not replace the f4_fp_tower cell.
+
+## 10. Amendment 2026-10-18 11:30Z: A1 runs on the draws found, A2 deferred
+
+Recorded before any closure measurement. On the first host (RunPod
+2×RTX 4090, 200 GB, booted 06:22Z) draw generation for A1 (m4-15-6,
+S = −9) ran 06:29Z–11:30Z at about 70 s per draw and found 2 unsatisfiable
+draws in 251 (draws 42 and 214), against the prediction in §4 that S = −9
+would reach `--unsat 4` within about 150 draws. At that rate A1 alone would
+have needed about 8.5 h more of generation and A2 (m4-16-6) had not started,
+so the host's 12 h cap would have expired before any measurement.
+
+- The 251 A1 draws are committed as `draws/m4-15-6.jsonl` (+ `.log`,
+  `sha256.txt`) and tagged `draws-m4l6-20261018`; A1 is measured on its two
+  unsatisfiable draws (42, 214), side by side under §8, exactly as §8 planned
+  for "draws 0 and 1 of the unsatisfiable list". The generator's
+  `--max-draws` is thus effectively 251 for A1 ("the cell runs on what it
+  found", §5).
+- A2 (m4-16-6) joins the B cells and C2 as deferred: no draws, no
+  measurement, no result in this run.
+- The first host was terminated at 11:30Z without measuring; a second host
+  with the same shape is launched with `FRESH=4:15:6`, which skips
+  generation (the committed file exists) and waits for the tag as before.
+- Nothing else in §§1–9 changes. The unsatisfiable-draw rate at S = −9
+  (2/251, 95 % Clopper–Pearson 0.1 %–2.8 %) is itself a recorded
+  observation against §4's expectation and is reported with the result.

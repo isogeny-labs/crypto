@@ -31,7 +31,7 @@ run_closure() {
   cargo build --release --example dreg_ladder --example dreg_closure > "$OUT/build.log" 2>&1 || { status BUILD_FAILED; return 1; }
   L=target/release/examples/dreg_ladder; C=target/release/examples/dreg_closure
   S=research/dreg_closure_m4l6_20261018/run.sh
-  export FRESH="4:15:6 4:16:6" TMO4=14400 DEG5_DRAWS=1
+  export FRESH="${FRESH:-4:15:6 4:16:6}" TMO4="${TMO4:-14400}" DEG5_DRAWS="${DEG5_DRAWS:-1}"
   $S $L $C host; status GENERATING; $S $L $C gen; status GEN_DONE
   # The draws are committed before any closure measurement: wait for the tag.
   until git ls-remote --tags origin 2>/dev/null | grep -q 'refs/tags/draws-m4l6-20261018$'; do sleep 120; done
