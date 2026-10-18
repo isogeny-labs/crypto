@@ -2852,4 +2852,222 @@ pub(crate) mod tests {
             eprintln!("k={} q={} done", k, q);
         }
     }
+
+    // ------------------------------------------------------------------
+    // V4: agreement with the degree-6 keys of quartic_ic.rs (GHS toys)
+    // ------------------------------------------------------------------
+
+    struct V4Rec {
+        n: u64,
+        deg6_key: String,
+        pic3_deg: u64,
+        pic3_key: String,
+        cubics: Vec<Vec<u32>>,
+    }
+
+    pub struct V4Report {
+        pub q: u32,
+        pub ell: u64,
+        pub usable: usize,
+        pub distinct_deg6_keys: usize,
+        pub distinct_pic3_keys: usize,
+        pub distinct_canonical_keys: usize,
+        pub triples_tested: usize,
+        pub hom_failures: usize,
+        pub order_ell_failures: usize,
+        pub scalar_relation_failures: usize,
+        pub canonical_collisions_unexplained: usize,
+        pub pic3_collisions_resolved: usize,
+        pub canonical_equal_deg6_differ: usize,
+        pub nonzero_images: bool,
+    }
+
+    fn v4_run(q: u32, text: &str) -> V4Report {
+        let mut header = None;
+        let mut recs: Vec<V4Rec> = Vec::new();
+        for line in text.lines() {
+            let v: serde_json::Value = serde_json::from_str(line).unwrap();
+            match v["rec"].as_str().unwrap() {
+                "header" => header = Some(v),
+                "transfer" => recs.push(V4Rec {
+                    n: v["n"].as_u64().unwrap(),
+                    deg6_key: v["deg6_key"].as_str().unwrap().to_string(),
+                    pic3_deg: v["pic3_deg"].as_u64().unwrap(),
+                    pic3_key: v["pic3_key"].as_str().unwrap().to_string(),
+                    cubics: v["cubics"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .map(|r| r.as_array().unwrap().iter().map(|x| x.as_u64().unwrap() as u32).collect())
+                        .collect(),
+                }),
+                _ => {}
+            }
+        }
+        let h = header.unwrap();
+        assert_eq!(h["q"].as_u64().unwrap() as u32, q);
+        let ell = h["ell"].as_u64().unwrap();
+        let m4 = mons_of_degree(4);
+        let mut f = [0u32; 15];
+        for t in h["quartic"].as_array().unwrap() {
+            let t = t.as_array().unwrap();
+            let m = (t[0].as_u64().unwrap() as u8, t[1].as_u64().unwrap() as u8, t[2].as_u64().unwrap() as u8);
+            f[m4.iter().position(|&x| x == m).unwrap()] = t[3].as_u64().unwrap() as u32 % q;
+        }
+        let p0 = first_rational_point_canonical(q, &f).unwrap();
+        let c = PlaneQuartic::new(q, f, p0).unwrap();
+        // their cubic monomial order: i ascending, j ascending
+        let theirs: Vec<(u8, u8, u8)> = h["cubic_monomials"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|m| {
+                let m = m.as_array().unwrap();
+                (m[0].as_u64().unwrap() as u8, m[1].as_u64().unwrap() as u8, m[2].as_u64().unwrap() as u8)
+            })
+            .collect();
+        let mine = mons_of_degree(3);
+        let perm: Vec<usize> = theirs.iter().map(|m| mine.iter().position(|x| x == m).unwrap()).collect();
+        let hn: Vec<PicClass> = recs
+            .iter()
+            .map(|r| {
+                let rows: Vec<Vec<u32>> = r
+                    .cubics
+                    .iter()
+                    .map(|row| {
+                        let mut v = vec![0u32; 10];
+                        for (j, &x) in row.iter().enumerate() {
+                            v[perm[j]] = x % q;
+                        }
+                        v
+                    })
+                    .collect();
+                c.reduce_deg6(&Gen { k: 3, rows })
+            })
+            .collect();
+        let idx_of_n: HashMap<u64, usize> = recs.iter().enumerate().map(|(i, r)| (r.n, i)).collect();
+        // base shift B = h(a) + h(b) - h(a+b), constant over all triples
+        let mut bshift: Option<PicClass> = None;
+        let mut triples = 0usize;
+        let mut hom_fail = 0usize;
+        let mut triples_list = vec![];
+        for i in 0..recs.len() {
+            for j in i..recs.len() {
+                let s = (recs[i].n + recs[j].n) % ell;
+                if s == 0 {
+                    continue;
+                }
+                if let Some(&k) = idx_of_n.get(&s) {
+                    let b = c.sub(&c.add(&hn[i], &hn[j]), &hn[k]);
+                    match &bshift {
+                        None => bshift = Some(b),
+                        Some(b0) => {
+                            if *b0 != b {
+                                hom_fail += 1;
+                            }
+                        }
+                    }
+                    triples += 1;
+                    triples_list.push((i, j, k));
+                }
+            }
+        }
+        let b = bshift.expect("no addable triple among the usable transfers");
+        let x: Vec<PicClass> = hn.iter().map(|y| c.sub(y, &b)).collect();
+        // (iv) key(phi((a+b)G)) = add(key(phi(aG)), key(phi(bG)))
+        for &(i, j, k) in &triples_list {
+            if c.add(&x[i], &x[j]) != x[k] {
+                hom_fail += 1;
+            }
+        }
+        // l * x = 0 and x(n) = n * x(n0) / n0
+        let mut ord_fail = 0usize;
+        let mut scal_fail = 0usize;
+        let n0 = recs[0].n;
+        let inv_n0 = {
+            // modular inverse of n0 mod ell (ell prime)
+            let mut r = 1u64;
+            let mut base = n0 % ell;
+            let mut e = ell - 2;
+            while e > 0 {
+                if e & 1 == 1 {
+                    r = r * base % ell;
+                }
+                base = base * base % ell;
+                e >>= 1;
+            }
+            r
+        };
+        for (i, r) in recs.iter().enumerate() {
+            if c.mul_scalar(&x[i], ell as u128) != c.zero() {
+                ord_fail += 1;
+            }
+            let k = (r.n % ell) * inv_n0 % ell;
+            if c.mul_scalar(&x[0], k as u128) != x[i] {
+                scal_fail += 1;
+            }
+        }
+        let nonzero = x.iter().all(|y| *y != c.zero());
+        // key statistics and collisions
+        let d6: HashSet<&str> = recs.iter().map(|r| r.deg6_key.as_str()).collect();
+        let p3: HashSet<&str> = recs.iter().map(|r| r.pic3_key.as_str()).collect();
+        let canon: HashSet<PicKey> = x.iter().map(|y| y.key()).collect();
+        let mut unexplained = 0usize;
+        let mut pic3_resolved = 0usize;
+        let mut canon_eq_d6_differ = 0usize;
+        for i in 0..recs.len() {
+            for j in i + 1..recs.len() {
+                let same_c = x[i].key() == x[j].key();
+                if same_c && recs[i].n % ell != recs[j].n % ell {
+                    unexplained += 1;
+                }
+                if same_c && recs[i].deg6_key != recs[j].deg6_key {
+                    canon_eq_d6_differ += 1;
+                }
+                if !same_c && recs[i].pic3_deg == 3 && recs[j].pic3_deg == 3 && recs[i].pic3_key == recs[j].pic3_key {
+                    pic3_resolved += 1;
+                }
+            }
+        }
+        V4Report {
+            q,
+            ell,
+            usable: recs.len(),
+            distinct_deg6_keys: d6.len(),
+            distinct_pic3_keys: p3.len(),
+            distinct_canonical_keys: canon.len(),
+            triples_tested: triples,
+            hom_failures: hom_fail,
+            order_ell_failures: ord_fail,
+            scalar_relation_failures: scal_fail,
+            canonical_collisions_unexplained: unexplained,
+            pic3_collisions_resolved: pic3_resolved,
+            canonical_equal_deg6_differ: canon_eq_d6_differ,
+            nonzero_images: nonzero,
+        }
+    }
+
+    #[test]
+    fn v4_ghs_transfer_agreement() {
+        let dumps: [(u32, &str); 3] = [
+            (5, include_str!("../../research/quartic_pic_canonical_20261018/results/v4_dump_q5.jsonl")),
+            (7, include_str!("../../research/quartic_pic_canonical_20261018/results/v4_dump_q7.jsonl")),
+            (11, include_str!("../../research/quartic_pic_canonical_20261018/results/v4_dump_q11.jsonl")),
+        ];
+        for (q, text) in dumps {
+            let r = v4_run(q, text);
+            eprintln!(
+                "V4 q={} ell={} usable={} deg6_keys={} pic3_keys={} canonical_keys={} triples={} hom_fail={} ord_fail={} scalar_fail={} unexplained_canon_collisions={} pic3_collisions_resolved={} canon_equal_but_deg6_differs={} nonzero={}",
+                r.q, r.ell, r.usable, r.distinct_deg6_keys, r.distinct_pic3_keys, r.distinct_canonical_keys, r.triples_tested,
+                r.hom_failures, r.order_ell_failures, r.scalar_relation_failures, r.canonical_collisions_unexplained,
+                r.pic3_collisions_resolved, r.canonical_equal_deg6_differ, r.nonzero_images
+            );
+            assert_eq!(r.hom_failures, 0);
+            assert_eq!(r.order_ell_failures, 0);
+            assert_eq!(r.scalar_relation_failures, 0);
+            assert!(r.nonzero_images);
+            assert_eq!(r.canonical_collisions_unexplained, 0);
+            assert_eq!(r.distinct_canonical_keys, r.usable);
+        }
+    }
 }
