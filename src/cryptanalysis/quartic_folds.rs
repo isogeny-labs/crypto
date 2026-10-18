@@ -1288,6 +1288,347 @@ pub fn run_k4_d4_pipeline(
     })
 }
 
+/// E22 Stage A (§9.7): a curve over `F_{p⁴}` with full rational 2-torsion
+/// `{T₁, T₂, T₃}` and a Möbius coordinate `z = g⁻¹(x)` in which the
+/// translations act as `z ↦ −z`, `z ↦ 1/z` and `z ↦ −1/z`, all over `F_p`:
+/// `g` sends `0, ∞` to the fixed points `x₁ ± √f′(x₁)` of `τ_{T₁}` and `1` to
+/// a fixed point of `τ_{T₂}`.  The base is `z ∈ F_p`.  It is confined (§9.7,
+/// fact 1) exactly when the pole of `g`, `z(O)`, lies in `F_p`.
+#[derive(Clone, Copy, Debug)]
+pub struct KleinInstance {
+    pub inst: FoldInstance4,
+    pub roots: [E4; 3],
+    /// `g(z) = (b₁c·z + a₁) / (c·z + 1)`.
+    pub a1: E4,
+    pub b1: E4,
+    pub c: E4,
+}
+
+impl KleinInstance {
+    pub fn x_of_z(&self, f: &super::gaudry_quartic::Fp4, z: &E4) -> Option<E4> {
+        let den = f.add(&f.mul(&self.c, z), &E4::ONE);
+        if den.is_zero() {
+            return None;
+        }
+        let num = f.add(&f.mul(&f.mul(&self.b1, &self.c), z), &self.a1);
+        Some(f.mul(&num, &f.inv(&den)))
+    }
+
+    /// `z = (x − a₁) / (c·(b₁ − x))`; `None` at `x = b₁` (`z = ∞`).
+    pub fn z_of_x(&self, f: &super::gaudry_quartic::Fp4, x: &E4) -> Option<E4> {
+        let den = f.mul(&self.c, &f.sub(&self.b1, x));
+        if den.is_zero() {
+            return None;
+        }
+        Some(f.mul(&f.sub(x, &self.a1), &f.inv(&den)))
+    }
+
+    /// `z(O)`, the pole of `g`: `−1/c`.
+    pub fn pole(&self, f: &super::gaudry_quartic::Fp4) -> E4 {
+        f.neg(&f.inv(&self.c))
+    }
+}
+
+pub fn generate_klein_instance(
+    p: u64,
+    seed: u64,
+    max_cofactor: u64,
+) -> Result<KleinInstance, String> {
+    if p % 4 != 1 || !is_prime_u64(p) {
+        return Err(format!("p = {p} must be a prime ≡ 1 (mod 4)"));
+    }
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x4B1E_1A22);
+    let mut fallback: Option<KleinInstance> = None;
+    for attempt in 0..20_000u32 {
+        if attempt == 6_000 && fallback.is_some() {
+            break;
+        }
+        let probe = Curve4::with_params(p, E4::ZERO, E4::ZERO);
+        let f = &probe.f;
+        let x1 = f.random(&mut rng);
+        let x2 = f.random(&mut rng);
+        let x3 = f.neg(&f.add(&x1, &x2));
+        if x1 == x2 || x1 == x3 || x2 == x3 {
+            continue;
+        }
+        // f = (x − x₁)(x − x₂)(x − x₃) = x³ + a x + b.
+        let a = f.add(&f.add(&f.mul(&x1, &x2), &f.mul(&x1, &x3)), &f.mul(&x2, &x3));
+        let b = f.neg(&f.mul(&f.mul(&x1, &x2), &x3));
+        let a3x4 = f.scale(&f.mul(&f.sq(&a), &a), 4);
+        let disc = f.add(&a3x4, &f.scale(&f.sq(&b), 27));
+        if disc.is_zero() || !not_in_fp2(&f.mul(&a3x4, &f.inv(&disc))) {
+            continue;
+        }
+        let d1 = f.mul(&f.sub(&x1, &x2), &f.sub(&x1, &x3));
+        let d2 = f.mul(&f.sub(&x2, &x1), &f.sub(&x2, &x3));
+        let (Some(s1), Some(s2)) = (f.sqrt(&d1, &mut rng), f.sqrt(&d2, &mut rng)) else {
+            continue;
+        };
+        let (a1, b1, a2) = (f.add(&x1, &s1), f.sub(&x1, &s1), f.add(&x2, &s2));
+        let c = f.mul(&f.sub(&a2, &a1), &f.inv(&f.sub(&b1, &a2)));
+        if c.is_zero() {
+            continue;
+        }
+        let curve = Curve4::with_params(p, a, b);
+        let Some(order) = hasse_multiple(&curve, &mut rng) else {
+            continue;
+        };
+        if order % 4 != 0 {
+            return Err(format!(
+                "#E = {order} is not divisible by 4 with full 2-torsion"
+            ));
+        }
+        let Some(&(n, _)) = factor_u64(order).last() else {
+            continue;
+        };
+        let h = order / n;
+        if h > max_cofactor || order % (n * n) == 0 || n <= p * p * p {
+            continue;
+        }
+        let g = loop {
+            let g = curve.mul(&random_point(&curve, &mut rng), h);
+            if !g.inf {
+                break g;
+            }
+        };
+        if !curve.mul(&g, n).inf {
+            return Err("n·G ≠ O: the order is wrong".into());
+        }
+        let d = rng.gen_range(1..n);
+        let ki = KleinInstance {
+            inst: FoldInstance4 {
+                family: Family4::Translation,
+                p,
+                a,
+                b,
+                group_order: order,
+                n,
+                cofactor: h,
+                g,
+                d,
+                q: curve.mul(&g, d),
+                omega: 0,
+                lambda: 0,
+                x0: x1,
+                c: 0,
+            },
+            roots: [x1, x2, x3],
+            a1,
+            b1,
+            c,
+        };
+        if h == 4 {
+            return Ok(ki);
+        }
+        if fallback.as_ref().is_none_or(|f| h < f.inst.cofactor) {
+            fallback = Some(ki);
+        }
+    }
+    fallback.ok_or_else(|| format!("no full-2-torsion instance with h ≤ {max_cofactor} at p = {p}"))
+}
+
+/// The base `{P : z(P) ∈ F_p}` (2-torsion excluded) and its columns, the
+/// orbits under the three translations, every coefficient checked on points
+/// (`Err` if a translate leaves the base).
+pub fn klein_base(ki: &KleinInstance, rng: &mut StdRng) -> Result<FoldedBase4, String> {
+    let inst = &ki.inst;
+    let curve = inst.curve();
+    let f = &curve.f;
+    let (p, n) = (inst.p, inst.n);
+    let ts: Vec<Pt4> = ki
+        .roots
+        .iter()
+        .map(|&x| Pt4 {
+            x,
+            y: E4::ZERO,
+            inf: false,
+        })
+        .collect();
+    let mut points = Vec::new();
+    let mut key = Vec::new();
+    // The fixed points of the translations, z ∈ {0, ±1, ±i} (the halves of
+    // the T's, of order 4), collapse their orbits; excluded, as E19's base
+    // excludes Y ∈ {0, ±1}.
+    let i = sqrt_mod(p - 1, p).ok_or("p ≢ 1 (mod 4)")?;
+    let special = [0, 1, p - 1, i, p - i];
+    for z in 0..p {
+        if special.contains(&z) {
+            continue;
+        }
+        let Some(x) = ki.x_of_z(f, &f.from_fp(z)) else {
+            continue;
+        };
+        if ki.roots.contains(&x) {
+            continue;
+        }
+        if let Some(pt) = curve.lift_x(&x, rng) {
+            points.push(pt);
+            key.push(z);
+        }
+    }
+    let index: HashMap<u64, usize> = key.iter().enumerate().map(|(i, &k)| (k, i)).collect();
+    let mut col = vec![usize::MAX; points.len()];
+    let mut coef = vec![0u64; points.len()];
+    let mut columns = 0usize;
+    for i in 0..points.len() {
+        if col[i] != usize::MAX {
+            continue;
+        }
+        col[i] = columns;
+        coef[i] = 1;
+        for t in &ts {
+            let img = curve.add(&points[i], t);
+            let z2 = ki
+                .z_of_x(f, &img.x)
+                .filter(|z| z.in_fp())
+                .ok_or("a translate leaves the line")?;
+            let &j = index.get(&z2.0[0]).ok_or("a translate leaves the base")?;
+            if j == i {
+                continue;
+            }
+            let s = if points[j].y == img.y {
+                1
+            } else if points[j].y == f.neg(&img.y) {
+                n - 1
+            } else {
+                return Err("a translate is neither P nor −P".into());
+            };
+            if col[j] != usize::MAX && (col[j] != columns || coef[j] != s) {
+                return Err("an orbit closes inconsistently".into());
+            }
+            col[j] = columns;
+            coef[j] = s;
+        }
+        columns += 1;
+    }
+    let ppc = points.len() as f64 / columns.max(1) as f64;
+    Ok(FoldedBase4 {
+        points,
+        col,
+        coef,
+        columns,
+        points_per_column: ppc,
+        build_muls: curve.f.muls(),
+    })
+}
+
+/// One E22 Stage A run.
+#[derive(Clone, Debug, Serialize)]
+pub struct KleinStageA {
+    pub p: u64,
+    pub seed: u64,
+    pub n: u64,
+    pub bits: f64,
+    pub cofactor: u64,
+    /// `z(O) ∈ F_p`: the line passes through `x(O)` and is confined.
+    pub pole_in_fp: bool,
+    pub base_points: usize,
+    /// `base_points / p`.
+    pub density: f64,
+    pub columns: usize,
+    pub points_per_column: f64,
+    pub residuals: u64,
+    pub decompositions: u64,
+    pub targets_decomposed: u64,
+    /// Verified decompositions per target, the last bucket `≥ 99`.
+    pub decompositions_per_target: Vec<u64>,
+    pub folded: ArmReport,
+    pub wall_ms: f64,
+}
+
+/// Stage A: the instance, the base with its folds checked on points, and a
+/// meet-in-the-middle relation stream on the `V₄`-folded columns (one
+/// decomposition per target, drawn uniformly) until `[d]G = Q` verifies.
+pub fn run_klein_stage_a(p: u64, seed: u64, max_residuals: u64) -> Result<KleinStageA, String> {
+    let start = Instant::now();
+    let ki = generate_klein_instance(p, seed, 16)?;
+    let inst = ki.inst;
+    let curve = inst.curve();
+    let n = inst.n;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xE22A);
+    let fb = klein_base(&ki, &mut rng)?;
+    let base = &fb.points;
+    let table = pair_table(&curve, base);
+    let mut folded = Arm::new("v4-folded", fb.columns);
+    let (mut residuals, mut decompositions, mut targets_decomposed) = (0u64, 0u64, 0u64);
+    let mut per_target = vec![0u64; 100];
+    while residuals < max_residuals && !folded.rep.solved {
+        let batch: Vec<(u64, u64)> = (0..64)
+            .map(|_| (rng.gen_range(0..n), rng.gen_range(1..n)))
+            .collect();
+        let found: Vec<(u64, u64, Pt4, Vec<Vec<(usize, i64)>>)> = batch
+            .par_iter()
+            .map(|&(a, b)| {
+                let c = inst.curve();
+                let r = c.add(&c.mul(&inst.g, a), &c.mul(&inst.q, b));
+                let decs = mitm_signed(&c, base, &table, &r);
+                (a, b, r, decs)
+            })
+            .collect();
+        for (a, b, r, decs) in found {
+            if folded.rep.solved {
+                break;
+            }
+            residuals += 1;
+            let mut good: Vec<Vec<(usize, i64)>> = Vec::new();
+            for terms in decs {
+                let mut acc = r;
+                for &(i, s) in &terms {
+                    acc = if s == 1 {
+                        curve.sub(&acc, &base[i])
+                    } else {
+                        curve.add(&acc, &base[i])
+                    };
+                }
+                if acc.inf {
+                    decompositions += 1;
+                    good.push(terms);
+                }
+            }
+            per_target[good.len().min(99)] += 1;
+            if good.is_empty() {
+                continue;
+            }
+            targets_decomposed += 1;
+            let terms = good.swap_remove(rng.gen_range(0..good.len()));
+            let mut merged: HashMap<usize, u64> = HashMap::new();
+            for &(i, s) in &terms {
+                let v = if s == 1 {
+                    fb.coef[i]
+                } else {
+                    (n - fb.coef[i]) % n
+                };
+                let e = merged.entry(fb.col[i]).or_insert(0);
+                *e = (*e + v) % n;
+            }
+            let mut cols: Vec<(usize, u64)> = merged.into_iter().filter(|&(_, v)| v != 0).collect();
+            cols.push((folded.small, (n - b) % n));
+            cols.sort_unstable();
+            folded.push(SparseRel { cols, rhs: a });
+            folded.attempt(&inst, &curve, &mut rng, residuals);
+        }
+    }
+    let pole = ki.pole(&curve.f);
+    Ok(KleinStageA {
+        p,
+        seed,
+        n,
+        bits: (n as f64).log2(),
+        cofactor: inst.cofactor,
+        pole_in_fp: pole.in_fp(),
+        base_points: base.len(),
+        density: base.len() as f64 / p as f64,
+        columns: fb.columns,
+        points_per_column: fb.points_per_column,
+        residuals,
+        decompositions,
+        targets_decomposed,
+        decompositions_per_target: per_target,
+        folded: folded.rep,
+        wall_ms: start.elapsed().as_secs_f64() * 1e3,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
