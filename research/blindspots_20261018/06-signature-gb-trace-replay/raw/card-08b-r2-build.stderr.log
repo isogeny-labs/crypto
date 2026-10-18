@@ -1,0 +1,56 @@
+warning: methods `has` and `list` are never used
+  --> examples/blindspots_06_signature_gb.rs:89:8
+   |
+81 | impl Args {
+   | --------- methods in this implementation
+...
+89 |     fn has(&self, name: &str) -> bool {
+   |        ^^^
+...
+97 |     fn list(&self, name: &str) -> Vec<u64> {
+   |        ^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `nleaf` is never used
+   --> examples/blindspots_06_signature_gb.rs:547:8
+    |
+543 | impl Cell {
+    | --------- method in this implementation
+...
+547 |     fn nleaf(&self) -> usize {
+    |        ^^^^^
+
+warning: fields `ms` and `d_mat` are never read
+    --> examples/blindspots_06_signature_gb.rs:3022:5
+     |
+3014 | struct Rec {
+     |        --- fields in this struct
+...
+3022 |     ms: f64,
+     |     ^^
+3023 |     replay: String,
+3024 |     d_mat: f64,
+     |     ^^^^^
+     |
+     = note: `Rec` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: fields `ratios`, `bounds`, `zero_r`, and `sym_r` are never read
+    --> examples/blindspots_06_signature_gb.rs:3056:5
+     |
+3053 | struct ArmCell {
+     |        ------- fields in this struct
+...
+3056 |     ratios: Vec<f64>, // exact ratios (both refuted)
+     |     ^^^^^^
+3057 |     bounds: Vec<f64>, // upper bounds for the censored targets
+     |     ^^^^^^
+...
+3061 |     zero_r: f64,
+     |     ^^^^^^
+...
+3064 |     sym_r: f64,
+     |     ^^^^^
+
+warning: 4 warnings emitted
+
