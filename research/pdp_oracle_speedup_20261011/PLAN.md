@@ -206,7 +206,7 @@ days (before PS-7).
 | PS-3 | **partial**: three widths (`bs64`, `bs256`, `bs512`) with identical digests and root sets on the whole corpus, on **two host classes** (never pooled); 17.5×–62.5× the baseline per target at `ℓ = 11` (A/A spread ≤ 9.8%) but **not distinguishable from, or slower than, PS-2's scalar kernel** per pair; the 4-thread isolated run is **blocked** (the isolation tool refuses to reserve all four vCPUs; 1/2/3 isolated cores and a non-isolated 4-thread diagnostic measured); host A `ℓ = 13` has 3 rounds; `bs512` instruction counts impossible under valgrind 3.22; the library module and PS-3b are not done ([`ps3_bitsliced/`](ps3_bitsliced/README.md)) |
 | PS-4, PS-5, PS-7 | **stopped early** (the authoring agents hit the organisation's API spend limit): partial work snapshotted on `exp/pdp-ps4-symmetry`, `exp/pdp-ps7-cdcl` and, in `cryptanalysis`, `exp/pdp-ps5-gpu-emulation`; no results, no READMEs ([`LEADS.md`](LEADS.md) L5-L7) |
 | PS-6, PS-3b | **not attempted** (each updates this row when it lands) |
-| PS-8 (added after the others were frozen) | protocol frozen ([`protocols/PS-8.md`](protocols/PS-8.md)); arm written, not yet built or measured ([`LEADS.md`](LEADS.md) L1) |
+| PS-8 (added after the others were frozen) | **verified complete** against its own protocol, one host class: the meet-in-the-middle pair table returns PS-0's verdicts and root sets and probes a target in 1/94…1/361 of the scalar kernel's time at 24-29 bytes per key; build 3-8 targets' worth; H1…H4 held ([`ps8_mitm/`](ps8_mitm/README.md), [`LEADS.md`](LEADS.md) L1) |
 | Any speedup claim | **none made** |
 
 ## 9. Graphs and canonical artifacts checked
