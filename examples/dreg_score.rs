@@ -684,7 +684,8 @@ fn slope(paths: &[String]) {
         bool, /*capped*/
     );
     let mut cells: BTreeMap<(u64, u64, u64), BTreeMap<u64, BTreeMap<u64, Rec>>> = BTreeMap::new();
-    let (mut check_runs, mut check_refuted) = (0usize, 0usize);
+    let mut kinds: BTreeMap<(u64, u64, u64), String> = BTreeMap::new();
+    let (mut check_runs, mut check_measured, mut check_refuted) = (0usize, 0usize, 0usize);
     let (mut ctrl_runs, mut ctrl_bad, mut ctrl_unmeasured) = (0usize, 0usize, 0usize);
     for path in paths {
         let name = std::path::Path::new(path)
@@ -726,6 +727,7 @@ fn slope(paths: &[String]) {
         match kind.as_str() {
             "check" => {
                 check_runs += 1;
+                check_measured += rec.0 as usize;
                 check_refuted += (rec.0 && rec.1) as usize;
             }
             "control" => {
@@ -740,6 +742,7 @@ fn slope(paths: &[String]) {
                     .entry(k)
                     .or_default()
                     .insert(d, rec);
+                kinds.insert((m, n, ell), kind.clone());
             }
         }
     }
@@ -776,6 +779,13 @@ fn slope(paths: &[String]) {
         let mut bounds: Vec<u64> = Vec::new();
         let mut labels: Vec<String> = Vec::new();
         let mut secs: Vec<String> = Vec::new();
+        // The committed m·ℓ = 21 cells start their scan at 5: the dense closure
+        // at 4 is committed (saturated, not refuting). Fresh cells start at 4.
+        let scan_start = if kinds.get(&(*m, *n, *ell)).is_some_and(|k| k == "committed") {
+            5
+        } else {
+            4
+        };
         for (_, degs) in draws {
             let mut label = String::from("unmeasured");
             let mut best_bound = 0u64;
@@ -791,7 +801,21 @@ fn slope(paths: &[String]) {
                     best_bound = best_bound.max(d + 1);
                 }
             }
-            if let Some(d) = found {
+            // "refutes and no lower scanned degree did": every lower degree must
+            // be measured and saturated without refuting, else the degree is only
+            // an upper bound and the draw is not exact.
+            let gap = found.is_some_and(|d| {
+                (scan_start..d).any(|dd| {
+                    !degs
+                        .get(&dd)
+                        .is_some_and(|&(measured, refuted, saturated, _, _)| {
+                            measured && saturated && !refuted
+                        })
+                })
+            });
+            if let (Some(d), true) = (found, gap) {
+                label = format!("≤{d} (lower degree unmeasured)");
+            } else if let Some(d) = found {
                 exact.push(d);
                 label = d.to_string();
             } else if best_bound > 0 {
@@ -801,6 +825,11 @@ fn slope(paths: &[String]) {
             labels.push(label);
             secs.push(format!("{total:.0}"));
         }
+        if m * ell == 20 || m * ell == 21 {
+            // A draw bounded below by 6 or more is "not 5": a violation.
+            p1_total += exact.len() + bounds.len();
+            p1_ok += exact.iter().filter(|&&d| d == 5).count();
+        }
         let verdict = if exact.len() >= 3 {
             let mut e = exact.clone();
             e.sort_unstable();
@@ -808,10 +837,6 @@ fn slope(paths: &[String]) {
             points.push(((m * ell) as f64, med as f64));
             if med >= 6 {
                 first_six = Some(first_six.map_or(m * ell, |f| f.min(m * ell)));
-            }
-            if m * ell == 20 || m * ell == 21 {
-                p1_total += exact.len();
-                p1_ok += exact.iter().filter(|&&d| d == 5).count();
             }
             format!("resolved at {med}")
         } else {
@@ -822,7 +847,7 @@ fn slope(paths: &[String]) {
                 .collect();
             lows.sort_unstable();
             if lows.len() >= 3 {
-                format!("bounded below by {}", lows[0])
+                format!("bounded below by {}", lows[lows.len() - 3])
             } else {
                 "unmeasured".to_string()
             }
@@ -886,8 +911,16 @@ fn slope(paths: &[String]) {
         }
     );
     println!(
-        "P4 (sparse degree-4 replays of committed dense refutations refute): {check_refuted} of {check_runs}{}",
-        if check_runs > 0 && check_refuted == check_runs { " → holds" } else if check_runs > 0 { " → FAILS: instrument failure" } else { " → not run" }
+        "P4 (sparse degree-4 replays of committed dense refutations refute): {check_refuted} of {check_measured} measured ({check_runs} runs){}",
+        if check_runs == 0 {
+            " → not run"
+        } else if check_measured > check_refuted {
+            " → FAILS: instrument failure"
+        } else if check_measured < check_runs {
+            " → incomplete (capped or killed runs are unmeasured)"
+        } else {
+            " → holds"
+        }
     );
     println!(
         "P5 (no satisfiable draw refuted): {ctrl_runs} control runs, {ctrl_bad} refuted, {ctrl_unmeasured} unmeasured{}",
