@@ -73,14 +73,23 @@ def source_manifest(root, metadata):
         directory = Path(package['manifest_path']).parent
         if directory == root:
             continue
-        require(package['source'] is not None and package['source'].startswith('registry+'),
-                'path/git dependency needs explicit build admission')
+        source = package['source']
+        if source is None:
+            # In-repo path crates (tools/volcano-cli and isogeny_algos since
+            # #2001) are admitted like registry crates: every file is hashed.
+            # Path crates outside the root and git crates stay unadmitted.
+            require(directory.resolve().is_relative_to(root),
+                    'path dependency outside the source root needs explicit build admission')
+            source = 'path+' + directory.resolve().relative_to(root).as_posix()
+        require(source.startswith(('registry+', 'path+')),
+                'git dependency needs explicit build admission')
         # Include native headers/build scripts/data, not only Rust modules.
         files = sorted(path for path in directory.rglob('*') if path.is_file()
-                       and path.name not in {'.cargo-ok', '.cargo_vcs_info.json'})
+                       and path.name not in {'.cargo-ok', '.cargo_vcs_info.json'}
+                       and 'target' not in path.relative_to(directory).parts)
         require(not any(path.is_symlink() for path in files), 'symlinked dependency input')
         dependencies.append(dict(package=package['name'], version=package['version'],
-                                 source=package['source'],
+                                 source=source,
                                  files={path.relative_to(directory).as_posix(): digest(path) for path in files}))
     dependencies.sort(key=lambda p: (p['package'], p['version']))
     return dict(schema_version=1, root_files=root_files, dependencies=dependencies)
