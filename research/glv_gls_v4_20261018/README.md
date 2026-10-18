@@ -33,3 +33,5 @@ G2.36's improvement band was exceeded at `p ≤ 149`, where walk set-up dominate
 | Unit tests | `cargo test --release --lib quartic_folds` (GLS: coefficients against true logs at `p = 37, 41`; the `⟨±ψ⟩` walk), `-- --ignored the_gls_pipeline` (both arms at `p = 37`) | the tests |
 
 Host: one shared 4-vCPU container, L0; operation counts only, no wall-time claim.
+
+**E26 addendum (note §9.17–§9.18):** a census of 560 GLS twists shows no GLS curve carries the `V₄` line with `h = 4` — `t ≡ 2 (mod 4)` (the only way to `h = 4`) and the halves condition never meet; `h = 16` is the minimum. Records: `experiments/31_gls_cofactor/`; figure `figures/census.svg`.

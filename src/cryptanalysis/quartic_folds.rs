@@ -2086,6 +2086,90 @@ pub fn run_k4_v4_pipeline(
     )
 }
 
+/// E26 (§9.17): one GLS twist from E25's construction without the halves
+/// condition, and the quantities the derivation ties together.
+#[derive(Clone, Debug, Serialize)]
+pub struct GlsCensusRow {
+    pub p: u64,
+    pub seed: u64,
+    pub group_order: u64,
+    /// `|t|` with `#E = (p² − 1)² + t²`.
+    pub t_abs: u64,
+    pub t_mod_4: u64,
+    pub v2_order: u32,
+    /// `f′(x₂)` a square in `F_{p⁴}`: the halves of `T₂` have rational
+    /// abscissae (E25's condition).
+    pub halves_t2_rational_x: bool,
+    /// `E₀(F_{p²})` has a point of order 4, found as a half of `T₁` with both
+    /// coordinates in `F_{p²}` (checked on the curve, independent of `t`).
+    pub e0_has_order4_point: bool,
+}
+
+pub fn gls_cofactor_census(p: u64, seed: u64) -> Result<GlsCensusRow, String> {
+    if p % 4 != 1 || !is_prime_u64(p) {
+        return Err(format!("p = {p} must be a prime ≡ 1 (mod 4)"));
+    }
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xE26C_E115);
+    let q2 = p as u128 * p as u128;
+    for _ in 0..1_000u32 {
+        let probe = Curve4::with_params(p, E4::ZERO, E4::ZERO);
+        let f = &probe.f;
+        let e2 = f.random(&mut rng);
+        if !not_in_fp2(&e2) {
+            continue;
+        }
+        let e3 = sigma(p, &e2);
+        let e1 = f.neg(&f.add(&e2, &e3));
+        let mu = f.random(&mut rng);
+        if mu.is_zero() || f.is_square(&mu) {
+            continue;
+        }
+        let (x1, x2, x3) = (f.mul(&mu, &e1), f.mul(&mu, &e2), f.mul(&mu, &e3));
+        let a = f.add(&f.add(&f.mul(&x1, &x2), &f.mul(&x1, &x3)), &f.mul(&x2, &x3));
+        let b = f.neg(&f.mul(&f.mul(&x1, &x2), &x3));
+        let disc = f.add(&f.scale(&f.mul(&f.sq(&a), &a), 4), &f.scale(&f.sq(&b), 27));
+        if disc.is_zero() {
+            continue;
+        }
+        let curve = Curve4::with_params(p, a, b);
+        let Some(order) = hasse_multiple(&curve, &mut rng) else {
+            continue;
+        };
+        let t2 = (order as u128)
+            .checked_sub((q2 - 1) * (q2 - 1))
+            .ok_or("#E below (p² − 1)²: not a GLS twist")?;
+        let t = (t2 as f64).sqrt().round() as u128;
+        if t * t != t2 {
+            return Err(format!("#E − (p² − 1)² = {t2} is not a square"));
+        }
+        let d2 = f.mul(&f.sub(&x2, &x1), &f.sub(&x2, &x3));
+        // E₀ : y² = (x − e₁)(x − e₂)(x − e₃) over F_{p²}; the halves of
+        // (e₁, 0) have x = e₁ ± √N, N = (e₁ − e₂)(e₁ − e₃) ∈ F_{p²}.
+        let n0 = f.mul(&f.sub(&e1, &e2), &f.sub(&e1, &e3));
+        let f0 = |x: &E4| f.mul(&f.mul(&f.sub(x, &e1), &f.sub(x, &e2)), &f.sub(x, &e3));
+        let mut order4 = false;
+        if let Some(s) = f.sqrt(&n0, &mut rng).filter(|s| !not_in_fp2(s)) {
+            for x in [f.add(&e1, &s), f.sub(&e1, &s)] {
+                let rhs = f0(&x);
+                if f.sqrt(&rhs, &mut rng).is_some_and(|y| !not_in_fp2(&y)) {
+                    order4 = true;
+                }
+            }
+        }
+        return Ok(GlsCensusRow {
+            p,
+            seed,
+            group_order: order,
+            t_abs: t as u64,
+            t_mod_4: (t % 4) as u64,
+            v2_order: order.trailing_zeros(),
+            halves_t2_rational_x: f.is_square(&d2),
+            e0_has_order4_point: order4,
+        });
+    }
+    Err(format!("no GLS twist found at p = {p}"))
+}
+
 /// E25 Stage A (G2.32) on one curve: the base both arms hold, the `ψ` fold,
 /// the confinement test (`ν² ∉ F_p`, `ν = −(w² + w⁻²)`, `w = z(O)`), and for
 /// `n ≤ 2^{26}` the number of distinct column logarithms (classes under
@@ -2349,6 +2433,18 @@ mod log_tests {
                     "p = {p} point {i}"
                 );
             }
+        }
+    }
+
+    /// E26: the census row is internally consistent on small curves.
+    #[test]
+    fn gls_census_rows_are_consistent() {
+        for seed in 1..=12 {
+            let r = gls_cofactor_census(37, seed).unwrap();
+            let q1 = 37u64 * 37 - 1;
+            assert_eq!(r.group_order, q1 * q1 + r.t_abs * r.t_abs);
+            assert_eq!(r.v2_order, r.group_order.trailing_zeros());
+            assert!(r.v2_order >= 2, "full 2-torsion");
         }
     }
 

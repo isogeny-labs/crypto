@@ -2672,3 +2672,33 @@ the halves condition (`f′(x₂)` a square) and without a cofactor bound; for e
 **Class:** accounting (an exact statement about a family; no algorithm changes).  If G2.39 holds, the
 GLS lever on the `V₄` line is closed at `h = 16`, and what is left is §9.16's measured `√2`-class
 constant against the matched walk.
+
+### 9.18 E26 measured: no GLS curve carries the `V₄` line with `h = 4`
+
+*2026-10-18.*  `examples/gls_cofactor_census.rs --sizes 29,37,41,53,61,89,97,101,109,113,149,197,269,397
+--seeds 40` (`experiments/31_gls_cofactor/census.{json,log}`), 560 GLS twists, every order computed
+and checked to be `(p² − 1)² + t²`.
+
+| class | curves | `v₂(#E)` | `E₀(F_{p²})` has a point of order 4 | halves of `T₂` have rational abscissae |
+|:--|--:|:--|:--|:--|
+| `t ≡ 2 (mod 4)` | 310 | `2` on all 310 | yes, on all 310 | **no, on all 310** |
+| `4 | t` | 250 | `4` (131), `6` (60), `7` (45), `≥ 8` (14) | no, on all 250 | yes, on all 250 |
+
+At every one of the 14 sizes both classes occur (`t ≡ 2 (mod 4)`: `18`–`28` of `40`).
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.38 | `t ≡ 2 (mod 4)` on `310 / 560`, at every `p`; `v₂(#E) = 2` and an order-4 point in `E₀(F_{p²})` on every one | **holds** |
+| G2.39 | the halves condition fails on all `310` | **holds**: no GLS twist of this shape has the `V₄` line with `h = 4` |
+| G2.40 | the halves condition holds on all `250` with `4 | t`, each with `v₂(#E) ≥ 4` | **holds** |
+
+**What it says.**  The census is sharper than the derivation: on these twists the three conditions
+coincide exactly.  `4 | t` holds iff the halves of `T₂` have rational abscissae iff `E₀(F_{p²})` has
+no point of order 4, and each fails together with the others.  So E25's `h = 16` is the smallest
+cofactor any GLS twist with the `V₄` line can have, as §9.17 derived.  **Class: accounting**, an
+exact statement about the family.  The GLS lever on the `V₄` line ends at §9.16's measured constant
+(median `1.86×` on the same curve, `1.26`–`1.97×` against the matched walk at `p ≥ 197`), with the
+`h = 16` penalty that absorbs most of it at matched `n`.  **What remains open:** the `ψ` fold without
+the full `V₄` symmetry (E19's single-`τ_T` line, where `h = 4` is not excluded by this argument but
+the solve costs `≈ 820×` more per call), and GLS-type endomorphisms of higher order (quartic or sextic
+twists of `j = 1728` and `j = 0`), which act on the 2-torsion differently and are not covered here.

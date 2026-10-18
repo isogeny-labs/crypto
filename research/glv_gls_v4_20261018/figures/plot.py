@@ -74,3 +74,18 @@ axs[0].set_title("Walk steps (16 walks each)", fontsize=10)
 axs[1].set_title("Walk cost, set-up and class representative included", fontsize=10)
 save(fig, "walks")
 print("figures:", keys)
+
+# 4. E26: the cofactor census (experiments/31_gls_cofactor/census.json).
+census = [r for r in json.load(open("experiments/31_gls_cofactor/census.json")) if "error" not in r]
+ps = sorted({r["p"] for r in census})
+fig, ax = plt.subplots(figsize=(8, 3.8))
+for i, (cls, lab, col) in enumerate(((2, "t ≡ 2 (mod 4): v₂(#E) = 2, halves of T₂ NOT x-rational", C_A),
+                                     (0, "4 | t: v₂(#E) ≥ 4, halves of T₂ x-rational", C_B))):
+    ys = [sum(1 for r in census if r["p"] == p and r["t_mod_4"] == cls) for p in ps]
+    ax.bar([j + (i - 0.5) * 0.4 for j in range(len(ps))], ys, 0.4, label=lab, color=col)
+ax.set_xticks(range(len(ps)), [str(p) for p in ps], fontsize=8)
+ax.set_xlabel("p")
+ax.set_ylabel("curves (of 40 per p)")
+ax.set_title("E26: 560 GLS twists over F_p⁴ — the V₄ line's condition and h = 4 never meet", fontsize=10)
+ax.legend(fontsize=8)
+save(fig, "census")

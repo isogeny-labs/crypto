@@ -79,9 +79,23 @@ together). $h = 16$ on every curve.
 
 #figure(image("figures/walks.svg", width: 95%), caption: [The matched walks: steps (left) and $FF_p$ multiplications with set-up and class representatives (right), negation against $chevron.l plus.minus psi chevron.r$, 16 walks each per curve. Below $n approx 2^(25)$ set-up dominates and the $psi$ walk costs more.])
 
+= Addendum: a GLS construction with $h = 4$ (E26)
+
+Registered in §9.17 before code; results §9.18. On the GLS twist, $E(FF_(q^2))$ is a $ZZ[i]$-module
+killed by $(q - 1) - t psi$, so its 2-part is $(ZZ slash 2)^2$ exactly when $t equiv 2 med (mod 4)$. The
+$V_4$ line needs the halves of $T_1$ and $T_2$ to have rational abscissae; when $h = 4$ that forces
+$E_0[4] subset E_0(FF_(q^2))$, i.e. $pi^2 equiv 1 med (mod 4)$ for the $q$-Frobenius of $E_0$, which is
+impossible when $pi$ swaps $T_2, T_3$ and $det pi = q equiv 1 med (mod 4)$. *Census of 560 twists,
+$p = 29$–$397$:* the 310 curves with $t equiv 2 med (mod 4)$ all have $v_2(\#E) = 2$ and all fail the
+halves condition; the 250 with $4 | t$ all satisfy it and all have $v_2(\#E) >= 4$. *No GLS twist
+carries the $V_4$ line with $h = 4$; E25's $h = 16$ is the minimum* (accounting; records
+`experiments/31_gls_cofactor/`).
+
+#figure(image("figures/census.svg", width: 85%), caption: [E26: per $p$, the 40 GLS twists split into the two classes; the $V_4$ line's condition holds exactly on the $4 | t$ class.])
+
 = Records
 
-Raw: `experiments/30_gls_v4/p{101,149,197,269,397}s{1,2}.json` (both arms in each), `stage_a.json`,
+Raw (E26): `experiments/31_gls_cofactor/census.json`. Raw (E25): `experiments/30_gls_v4/p{101,149,197,269,397}s{1,2}.json` (both arms in each), `stage_a.json`,
 `run.log`, `tables.md`. Code: `src/cryptanalysis/quartic_folds.rs` (`generate_gls_klein_instance`,
 `klein_base_with`, `RhoFold::Gls`, `run_k4_gls_pipeline`, `run_gls_stage_a`), `examples/quartic_pipeline_gls.rs`,
 `examples/gls_stage_a.rs`. Figures: `figures/plot.py` (recorded values only).
