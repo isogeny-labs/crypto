@@ -93,6 +93,14 @@ correlated targets on one curve cannot automatically be counted as
 independent evidence across curves. A discrepancy from a Poisson formula
 alone is not a calibrated test against matched random factor bases.
 
+Summation-polynomial zeros are defined using points over the algebraic
+closure. Especially at higher arity, x coordinates in the desired field
+do not alone certify usable rational-point relations. Check every lift
+and the actual signed group sum. The fresh coverage censuses use rational
+points and group sums directly; they do not count unverified polynomial
+zeros as relations. This distinction is explicit in Kosters–Yeo,
+Proposition 2.1 and Remark 4.8.
+
 Coverage and relation multiplicity are different. If D(R) counts all
 ordered decompositions over a fixed base, then exactly
 `sum_R D(R)=B^n`. For unordered tuples, use the chosen distinctness and

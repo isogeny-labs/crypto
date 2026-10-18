@@ -77,6 +77,9 @@
 #text("The usual independent occupancy approximation is ")#text(font: "DejaVu Sans Mono", size: 8.1pt, "1-exp(-lambda)")#text(", with lambda approximately B^n/(n!*N) for signed point-base size B and group population N. At B approximately q and n=2, lambda is about 1/2 and the model gives 0.39346934. This is a heuristic occupancy model, not the exact law for every random sign-closed x-set. The half-group theorem gives a 1/2 upper bound; it does not select 3/8. The quoted z=-4.7 needs its actual null variance and sampling unit; correlated targets on one curve cannot automatically be counted as independent evidence across curves. A discrepancy from a Poisson formula alone is not a calibrated test against matched random factor bases.")
 
 
+#text("Summation-polynomial zeros are defined using points over the algebraic closure. Especially at higher arity, x coordinates in the desired field do not alone certify usable rational-point relations. Check every lift and the actual signed group sum. The fresh coverage censuses use rational points and group sums directly; they do not count unverified polynomial zeros as relations. This distinction is explicit in Kosters–Yeo, Proposition 2.1 and Remark 4.8.")
+
+
 #text("Coverage and relation multiplicity are different. If D(R) counts all ordered decompositions over a fixed base, then exactly ")#text(font: "DejaVu Sans Mono", size: 8.1pt, "sum_R D(R)=B^n")#text(". For unordered tuples, use the chosen distinctness and repetition convention instead. A different sumset redistributes the same tuple population. A lower fraction of successful targets therefore does not imply fewer mean relations when every decomposition is returned. The approximately 4.7% statement applies to a first-success-per-target strategy under the quoted occupancy comparison.")
 
 
