@@ -82,3 +82,36 @@ ax.set_ylabel("targets per kept relation")
 ax.set_title("E19: residuals per relation from the exact D4 oracle")
 ax.legend(fontsize=7)
 save(fig, "residuals_per_relation")
+
+# 4. E24 against E19: S / rho per curve on both pipelines (recorded values).
+v4 = []
+for path in sorted(glob.glob(os.path.join(ROOT, "experiments/29_quartic_pipeline_v4/p*s*.json"))):
+    v4.extend(json.load(open(path)))
+v4.sort(key=lambda r: (r["p"], r["seed"]))
+if v4:
+    fig, ax = plt.subplots(figsize=(6.4, 4.2))
+    ax.scatter([r["bits"] for r in rows], [r["ratio"] for r in rows], color="C0", zorder=3,
+               label=f"E19: τ_T line, weighted D4 solve ({len(rows)} curves)")
+    ax.scatter([r["bits"] for r in v4], [r["ratio"] for r in v4], color="C3", marker="s", zorder=3,
+               label=f"E24: V4 line, V4-invariant solve ({len(v4)} curves)")
+    ax.axhline(1.0, color="k", lw=1)
+    ax.text(min(r["bits"] for r in rows), 1.4, "rho (parity)", fontsize=7)
+    ax.set_yscale("log")
+    ax.set_xlabel("log2 n (prime subgroup order)")
+    ax.set_ylabel("S_IC / S_rho-negation  (F_p multiplications)")
+    ax.set_title("k = 4 index calculus end to end: distance to the matched rho")
+    ax.legend(fontsize=7)
+    save(fig, "e24_vs_e19")
+
+    # 5. Per-call solve cost, both solvers.
+    fig, ax = plt.subplots(figsize=(6.4, 3.6))
+    ax.scatter([r["bits"] for r in rows], [r["call"]["median"] for r in rows], color="C0",
+               label="E19: weighted D4 solve (degree 26, quotient 512)")
+    ax.scatter([r["bits"] for r in v4], [r["call"]["median"] for r in v4], color="C3", marker="s",
+               label="E24: V4-invariant solve (degree 11, quotient 64)")
+    ax.set_yscale("log")
+    ax.set_xlabel("log2 n")
+    ax.set_ylabel("median C per call (F_p multiplications)")
+    ax.set_title("One k = 4 decomposition, inside the pipeline")
+    ax.legend(fontsize=7)
+    save(fig, "solve_cost_both")
