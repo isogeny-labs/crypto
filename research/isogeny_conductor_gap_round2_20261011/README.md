@@ -26,6 +26,14 @@ Round 1 is [`../isogeny_conductor_gap_ic_20261010/`](../isogeny_conductor_gap_ic
 Its pairs are reused unchanged: crater `End = O_K`, floor `End = Z[π]`, and an
 isomorphic model of the floor as the null control.
 
+> **Later evidence (2026-10-18).**  Round 5 (E7a,
+> [`../isogeny_conductor_gap_round5_20261012/`](../isogeny_conductor_gap_round5_20261012/README.md))
+> finds that a cofactor-cleared base (`[h]P` for the same small-abscissa
+> points) beats the fiber-closed tables of this round and of round 1 by
+> about `h^{1/3}`, with no fiber, closure or `h`-fold table.  The cofactor
+> penalty these rounds fought was set by the choice of base.  The
+> measurements below stand, but their best configurations are dominated.
+
 ## Findings
 
 1. **Round 1's unexplained crater/floor set-up gap was a counting defect.**
