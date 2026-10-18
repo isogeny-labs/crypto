@@ -1574,12 +1574,12 @@ fn random_target(cell: &Cell, base: &Base, rng: &mut Rng) -> Pt {
 fn planted_target(cv: &Curve, base: &Base, rng: &mut Rng) -> (Pt, [usize; 4]) {
     loop {
         let b = base.xs.len();
-        if b < 4 {
-            panic!("base too small");
-        }
+        assert!(b >= 3, "base too small for a planted target");
         let mut idx = [0usize; 4];
         let mut cs = [0usize; 4];
-        for t in 0..4 {
+        // with fewer than four abscissae the first point is used twice
+        let distinct = b.min(4);
+        for t in 0..distinct {
             loop {
                 let c = rng.below(b as u64) as usize;
                 if !cs[..t].contains(&c) {
@@ -1588,6 +1588,9 @@ fn planted_target(cv: &Curve, base: &Base, rng: &mut Rng) -> (Pt, [usize; 4]) {
                 }
             }
             idx[t] = 2 * cs[t] + rng.below(2) as usize;
+        }
+        if distinct < 4 {
+            idx[3] = idx[0];
         }
         let mut s = INF;
         for &i in &idx {
@@ -2463,7 +2466,7 @@ fn cmd_summarize(args: &[String]) {
         }
     }
     out.line(
-        "\nFit of log2 T_dec(a) on log2 p over the design cells (OLS slope, 95% t interval):\n",
+        "\nFit of log2 T_dec(a) on log2 p over the design cells (OLS slope, 95% t interval). Arm (a) is the reference: its base is |F| = p^(1/4) up to rounding by construction, so this slope checks the base sizes; it is not an arm verdict (Decision rule 1):\n",
     );
     for (i, w) in ws.iter().enumerate() {
         let xs: Vec<f64> = fit_a.iter().map(|v| v.0).collect();
@@ -2524,7 +2527,7 @@ fn cmd_summarize(args: &[String]) {
     }
     // ---- arm b tdec
     out.line("\n## Arm (b): F4 on S5 with the membership polynomials\n");
-    out.line("| bits | bx | targets | done | budget | dim==brute (checked) | planted vanishes | mean madds (done) | min..max madds (done) | mean steps | max degree | max cols | max rows | peak nnz | zero rows | mean ms (done) | T(0.1) | T(1) |");
+    out.line("| bits | bx | targets | done | budget | dim==brute (checked) | planted vanishes | mean madds (done) | min..max madds (done) | mean steps | max degree | max cols | max rows | peak nnz | zero rows | mean ms (done) | T(0.1) = 0.1 x native | T(1) = native |");
     out.line("|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|");
     let mut kb: Vec<(u32, u32)> = Vec::new();
     for l in &lines {
@@ -2558,6 +2561,7 @@ fn cmd_summarize(args: &[String]) {
             .iter()
             .map(|l| jnum(jsec(l, "counts").unwrap(), "madd").unwrap())
             .collect();
+        let natv: Vec<f64> = done.iter().map(|l| jnum(l, "native").unwrap()).collect();
         let ms: Vec<f64> = done.iter().map(|l| jnum(l, "ms").unwrap()).collect();
         let mut agree = 0;
         let mut checked = 0;
@@ -2584,7 +2588,7 @@ fn cmd_summarize(args: &[String]) {
             madds.iter().cloned().fold(f64::INFINITY, f64::min),
             madds.iter().cloned().fold(0.0f64, f64::max),
         );
-        out.line(&format!("| {bits} | {bx} | {} | {} | {} | {agree}/{checked} | {pv_t}/{pv_n} | {:.4e} | {:.4e}..{:.4e} | {:.1} | {} | {} | {} | {} | {:.0} | {:.0} | {:.4e} | {:.4e} |", r.len(), done.len(), r.len() - done.len(), mean(&madds), lo, hi, mean(&st), mx("max_degree"), mx("max_cols"), mx("max_rows"), mx("peak_nnz"), mean(&zr), mean(&ms), 0.1 * mean(&madds), mean(&madds)));
+        out.line(&format!("| {bits} | {bx} | {} | {} | {} | {agree}/{checked} | {pv_t}/{pv_n} | {:.4e} | {:.4e}..{:.4e} | {:.1} | {} | {} | {} | {} | {:.0} | {:.0} | {:.4e} | {:.4e} |", r.len(), done.len(), r.len() - done.len(), mean(&madds), lo, hi, mean(&st), mx("max_degree"), mx("max_cols"), mx("max_rows"), mx("peak_nnz"), mean(&zr), mean(&ms), 0.1 * mean(&natv), mean(&natv)));
         if bits == 16 && !madds.is_empty() && r.len() == done.len() {
             ladder.push((((2 * bx) as f64).log2(), mean(&madds).log2()));
         }
