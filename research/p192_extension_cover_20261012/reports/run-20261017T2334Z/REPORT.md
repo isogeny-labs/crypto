@@ -59,6 +59,9 @@ the triple overlap as a common anchor. For pivot pairs 000/001 and
 $(2,574-1)+(2,552-1)+(2,485-1,295)=6,314$ rows. Every other rectangle
 is a difference of anchor rows, and a triple-overlap 001/002 anchor row
 is the difference of its 000/002 and 000/001 rows. The
+[Lean anchor and pivot-triangle identities](../../lean/CrossPivotRectangles.lean)
+prove these span reductions for arbitrary additive commutative groups and
+arbitrary residual-pair column maps. The
 [full-fan producer](../../line_full_cross_pivot_cycle_rank.py) certifies
 a column occurring in exactly one row of this compact basis for every
 basis row, even after coalescing three duplicate projected-point
@@ -163,6 +166,7 @@ retains the first collision witness and its eight-seed coefficient vector.
 | Mathematical statement | Lean declaration | Finite-field input and status |
 | --- | --- | --- |
 | Four split cuts imply the eight-column rectangle | `cross_pivot_rectangle` in [CrossPivotRectangles.lean](../../lean/CrossPivotRectangles.lean) | The complete frozen producers check all 15,034 cuts; the new full replay samples 111 cuts and 71 basis rectangles. The Lean theorem assumes precisely the four line equations in an additive commutative group. |
+| Every same-pair rectangle is a difference of anchor rows; a third-pair anchor row is a difference through the first pivot | `rectangle_anchor_difference`, `rectangle_pivot_triangle` in [CrossPivotRectangles.lean](../../lean/CrossPivotRectangles.lean) | The identities are unconditional for a column map into an additive commutative group. The finite endpoint overlaps, basis selection, coalesced private columns, and resulting rank 6,309 are separately certified by the full-fan replay. |
 | Rectangle target formula and known-scalar logarithm equation | `rectangle_target_formula`, `rectangle_known_scalar_log` in [CrossPivotRectangles.lean](../../lean/CrossPivotRectangles.lean) | The full lookup and independent replay test 128 known scalars against all implicit rectangle targets. |
 | Full-fan arithmetic consequences of the replayed overlaps | `full_fan_cycle_dimension_arithmetic`, `full_fan_implicit_rectangle_count`, `full_fan_active_edge_count` and their `non_source_*` counterparts in [FullFanCycleArithmetic.lean](../../lean/FullFanCycleArithmetic.lean) | Both finite incidence graphs, connectivity, and every compact-basis pivot are checked by the producer and independent replay. |
 | Ideal-uniform accepted-set capacity bound | `full_rectangle_accepted_capacity_bound` in [FullFanCycleArithmetic.lean](../../lean/FullFanCycleArithmetic.lean) | Uses the prior exact lower bound $L$ and the complete-fan presentation count as an upper bound on distinct support. |
@@ -174,13 +178,12 @@ The pinned Lean 4.34.1 toolchain and mathlib revision
 [lean-toolchain](../../lean/lean-toolchain) and
 [lakefile.toml](../../lean/lakefile.toml). The final build and
 `#print axioms` audit are retained in
-[the Lean log](../../lean/rectangle-lean-build-20261017-final3.log),
-with the full-fan arithmetic build in
-[its own log](../../lean/full-fan-cycle-lean-build-20261017-final.log).
+[the combined Lean log](../../lean/rectangle-lean-build-20261017-combined.log).
 The finite-field incidence rank is replayed separately; the Lean structural
-theorem takes its four checked cut equations as hypotheses. A generic Lean
-theorem identifying the complete graph-cycle basis with the coalesced
-subgroup-column matrix is still an open formalization bridge.
+theorem takes its four checked cut equations as hypotheses. Lean also proves
+the full family lies in the stated anchor-row span. A generic Lean theorem
+identifying the finite graph-cycle basis with the coalesced subgroup-column
+matrix is still an open formalization bridge.
 The builds' `#print axioms` output lists only `propext`,
 `Classical.choice`, and `Quot.sound`; it lists no `sorryAx`.
 A local `leanchecker --fresh` attempt on `CrossPivotRectangles` was

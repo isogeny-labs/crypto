@@ -39,6 +39,28 @@ theorem cross_pivot_rectangle
   rw [h₁, h₂, h₃, h₄]
   abel
 
+/-- The signed rectangle row formed from residual-pair columns. -/
+def rectangleExpr {I J : Type*} (R : I → J → G)
+    (a b : I) (u v : J) : G :=
+  (R a u + R b v) - (R a v + R b u)
+
+/-- Every rectangle on one pivot pair lies in the span of its anchor rows. -/
+theorem rectangle_anchor_difference {I J : Type*} (R : I → J → G)
+    (a b : I) (u v w : J) :
+    rectangleExpr R a b u v =
+      rectangleExpr R a b u w - rectangleExpr R a b v w := by
+  unfold rectangleExpr
+  abel
+
+/-- A third-pivot rectangle on a shared endpoint is the difference of
+the two rectangles through the first pivot. -/
+theorem rectangle_pivot_triangle {I J : Type*} (R : I → J → G)
+    (a b c : I) (u w : J) :
+    rectangleExpr R b c u w =
+      rectangleExpr R a c u w - rectangleExpr R a b u w := by
+  unfold rectangleExpr
+  abel
+
 theorem rectangle_target_formula
     (S a b u v xau yau xbv ybv : G)
     (hau : a + u + xau + yau = S)
@@ -69,6 +91,8 @@ theorem rectangle_known_scalar_log {K : Type*} [AddCommGroup K]
     _ = n • (-(log generator + log generator)) := by simp
 
 #print axioms cross_pivot_rectangle
+#print axioms rectangle_anchor_difference
+#print axioms rectangle_pivot_triangle
 #print axioms rectangle_target_formula
 #print axioms rectangle_known_scalar_log
 
