@@ -1,0 +1,54 @@
+{
+  "schema": "n83.bridge-s3-custody-plan/v1",
+  "source_run_id": "39096257170",
+  "source_branch": "codex/n83-small-intermediate-bridge-20261018",
+  "source_commit": "77c8ebe307c047c78a7f66f6a7f41a0efef60584",
+  "source_artifacts": [
+    {
+      "stratum": 0,
+      "job_id": 117583935321,
+      "artifact_id": 12126920530,
+      "artifact_name": "n83-native-bridge-stratum-0-39096257170-1",
+      "zip_bytes": 111186426,
+      "zip_sha256": "f3df5bc8a996fdf432d9f70a42c8d7f58b54a56f59eb2fa8fc7eaead136de1bb"
+    }
+  ],
+  "curve": {
+    "n": 83,
+    "a": 1,
+    "field_modulus_low_terms": [0, 2, 4, 7],
+    "subgroup_order": 8569786107849059,
+    "kind": "point_defined_factor_base"
+  },
+  "destination_bucket": "crypto-autoresearcher",
+  "destination_prefix": "factor-bases/icv1/etc/n83_small_intermediate_bridge_20261018/a1/objects/",
+  "points_per_orbit_column": 166,
+  "expected_copies_per_arm": 8,
+  "arms": [
+    {
+      "role": "k1107root11",
+      "provider_run_dir": "ic_k1107root11",
+      "candidate_id": "IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40a",
+      "candidate_manifest_path": "research/n83_small_intermediate_bridge_20261018/candidate_IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hc54c7b61d40a.json",
+      "candidate_manifest_sha256": "a75238fec263ca74a7010def10174cf6e8db5b8a9f28c4315992ceed3d30af65",
+      "orbit_columns": 1107,
+      "point_count": 183762,
+      "base_hash": "b0aea97c1c8b9b46e13df67e6af9c33ca73034d2ec3eff33a2392ceb1452b40e",
+      "raw_sha256": "08608f6ad2b8c66510246348933740c78d0937cae783d521514f467940edc3dc",
+      "raw_bytes": 14874912
+    },
+    {
+      "role": "k2304root11",
+      "provider_run_dir": "ic_k2304root11",
+      "candidate_id": "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1",
+      "candidate_manifest_path": "research/n83_small_intermediate_bridge_20261018/candidate_IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h7513107d16d1.json",
+      "candidate_manifest_sha256": "972fded8203968e40844a078d2cefcebc2e238fe75694c7c6d371a70cc4b7efa",
+      "orbit_columns": 2304,
+      "point_count": 382464,
+      "base_hash": "cc39291fc49ba8d4c25c0c9aba46012bda023b4d7294a46f73d6c3f809727b3f",
+      "raw_sha256": "f51e436c399688ebd710075f16a57cd631a6799ce79891d53250b46bfd6c4534",
+      "raw_bytes": 31156577
+    }
+  ],
+  "selected_best_total_runtime": null
+}
