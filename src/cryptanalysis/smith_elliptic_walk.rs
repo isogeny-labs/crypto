@@ -739,10 +739,6 @@ pub struct ModelSpec {
     pub alpha: El,
 }
 
-fn is_square_fp(p: u64, a: u64) -> bool {
-    sp::chi(a, p) >= 0
-}
-
 /// Reduced weak models with `alpha = z`: `2 p^2` of them.
 pub fn reduced_models(k: &Fp3) -> Vec<ModelSpec> {
     let p = k.p;

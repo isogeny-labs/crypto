@@ -353,11 +353,11 @@ fn fit(args: &[String]) {
                 ols(&xs, &ys)
             };
             let (a, b) = est(&|w| w.clone());
-            let mut rng = sp::SplitMix64(99);
+            let rng = std::cell::RefCell::new(sp::SplitMix64(99));
             let mut slopes = vec![];
             for _ in 0..2000 {
                 let (s, _) = est(&|ws: &Vec<Value>| {
-                    (0..ws.len()).map(|_| ws[rng_below(&mut rng, ws.len())].clone()).collect()
+                    (0..ws.len()).map(|_| ws[rng_below(&mut rng.borrow_mut(), ws.len())].clone()).collect()
                 });
                 if s.is_finite() {
                     slopes.push(s);
