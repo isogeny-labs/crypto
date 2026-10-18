@@ -121,7 +121,7 @@ is retained. No throughput result has been measured for the batch lane.
 ## Next gates
 
 1. Rebuild this worker-profiler source on a qualified Linux allocation and
-   freeze its job spec, two public Q points, CPU and memory envelope, host
+   freeze its job spec, 32 public Q points, CPU and memory envelope, host
    counters, and A/A controls. The requested source transfer to RunPod was
    rejected by automatic approval review pending explicit authorization.
 2. The separate [rho arithmetic closeout in PR #920](https://github.com/aburan28/cryptanalysis/pull/920)
@@ -129,11 +129,50 @@ is retained. No throughput result has been measured for the batch lane.
    mixed-76, and generator-only-warmed OpenSSL across 32 Q points. Two full
    panels failed their A/A noise gates. Its separate reuse panel passed the
    Tier 1 gate at 32 and 128 restarts per Q; 1 and 8 failed A/A gates.
-3. Replay the opt-in lane on longer secp256k1 traces, including check-ins,
-   stop behavior, and each walker's affine states. Compare paired full-worker
-   throughput on the same Q points.
+3. Run the frozen 32-Q full-worker Tier 1 panel below, preserving every
+   pair and A/A control. Compare charged setup-plus-walk time on each Q.
    Require a 95% lower speedup bound above 1.05 and a frozen peak-memory
    cap before changing the default path. The generic C rho path has a
    64-bit group order; the full-size worker is this Rust implementation.
 
 The default worker routing remains serial.
+
+## Frozen full-worker Tier 1 panel
+
+`rho_worker_batch_benchmark` reads the same 32 public secp256k1 Q points as
+the [arithmetic closeout manifest](rho-closeout-q-manifest.json), SHA-256
+`f46ad43788b7f9241927904541cbeb03ea70a96ca95aa84d527a9b22ba8d12b8`.
+Each arm runs 32 walkers with 32 branches, `dp_bits=8`, a 2,048-step cap,
+and a check-in every eight completed walkers. The serial arm uses batch width
+one; the candidate uses width 32. Q decoding and known-scalar fixture replay
+precede timing. The charged interval includes Q-dependent job and state
+construction plus the complete lane run. Every distinguished-point record
+is independently replayed afterward, and a time-normalized digest binds
+all emitted check-ins.
+
+On a Linux allocation, build a release example from the frozen source and
+use `build_worker_batch_plan.py` to bind the binary, Q manifest, source
+bundle, allocation receipt, and selected CPU before any arm runs. The
+[Tier 1 runner](run_tier1_worker_batch.py) takes a host-wide lock and pins
+one child at a time. Its 32-Q plan has four alternating repetitions of a
+serial/batch pair and serial/serial and batch/batch A/A controls: 384 pairs,
+768 arms. It retains stdout, stderr, topology, cgroup, CPU, and failure
+receipts. The [independent auditor](analyze_tier1_worker_batch.py) requires
+equal check-in digests and work counts, no host-noise failures, all A/A
+ratios in `[0.90, 1.11]`, and no more than 10% or 64 MiB additional peak
+RSS. The integration threshold is a Q-cluster bootstrap 95% lower paired
+speedup bound above 1.05. The plan and auditor do not supply a performance
+result until the hosted panel passes its gates.
+
+The [local all-Q replay](local-all32-worker-replay/summary.json) completed
+64 of 64 arms and 32 of 32 serial/batch exact-output pairs on these frozen
+points. Every arm independently checked each emitted distinguished point;
+the pair check includes the time-normalized ordered check-in digest, steps,
+point count, worker count, dead trails, units, and check-ins. This was a
+correctness run on the shared macOS host, so `performance_result` is null.
+The [harness validation receipt](worker-batch-harness-validation.json)
+records the binary and temporary upstream-repair commit used for this replay,
+the 96-case plan expansion, reproducible provisional source archive, and
+fail-closed non-Linux preflight. Rebuild and hash the archive on the final
+merged source before dispatch; the provisional archive is not a hosted
+measurement artifact.
