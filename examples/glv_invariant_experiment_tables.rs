@@ -12,7 +12,7 @@
 //! Python") and reproduce its output byte for byte on the merged files,
 //! Python's float formatting included.
 
-use serde_json::Value;
+use serde_json::{json, Value};
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
 use std::env;
@@ -2719,7 +2719,112 @@ fn e15(o: &mut String, rows: &[&Value]) {
     }
 }
 
+/// The study summary the leaderboard copies (`AGENTS.md` §7b): per `p`, the
+/// E19 (`D₄`) and E24 (`V₄`) end-to-end `S / rho` ranges, their ratio range
+/// paired by seed, the per-call `C` medians, and each pipeline's handover from
+/// its own constants (§11.16's model, every curve pooled).  Usage:
+/// `glv_invariant_experiment_tables --k4-summary OUT.json E19_FILES… -- E24_FILES…`.
+fn k4_summary(args: &[String]) {
+    let out = &args[0];
+    let split = args
+        .iter()
+        .position(|a| a == "--")
+        .expect("-- between E19 and E24 files");
+    let read = |files: &[String]| -> Vec<Value> {
+        files
+            .iter()
+            .flat_map(|f| {
+                let v: Value = serde_json::from_str(&fs::read_to_string(f).unwrap()).unwrap();
+                v.as_array().cloned().unwrap_or_default()
+            })
+            .collect()
+    };
+    let e19 = read(&args[1..split]);
+    let e24 = read(&args[split + 1..]);
+    let handover = |rows: &[Value]| -> f64 {
+        let m = |f: &dyn Fn(&Value) -> f64| mean(&rows.iter().map(f).collect::<Vec<_>>());
+        let y = rows.iter().map(|r| fl(r, "residuals")).sum::<f64>()
+            / rows.iter().map(|r| fl(r, "folded.relations")).sum::<f64>();
+        let cols_p = m(&|r| fl(r, "folded.columns") / fl(r, "p"));
+        let c = m(&|r| fl(r, "call.mean"));
+        let h = m(&|r| fl(r, "cofactor"));
+        let s_rho = m(&|r| fl(r, "rho_matched_muls") / fl(r, "n").sqrt());
+        let r_la = m(&|r| fl(r, "la_fp_muls") / fl(r, "rho_matched_muls"));
+        let p_star = y * cols_p * c * h.sqrt() / (s_rho * (1.0 - r_la));
+        (p_star.powi(4) / h).log2()
+    };
+    let mut ps: Vec<u64> = e19
+        .iter()
+        .chain(&e24)
+        .map(|r| r["p"].as_u64().unwrap())
+        .collect();
+    ps.sort_unstable();
+    ps.dedup();
+    let range = |v: &[f64]| -> Value {
+        if v.is_empty() {
+            Value::Null
+        } else {
+            json!([
+                v.iter().copied().fold(f64::MAX, f64::min),
+                v.iter().copied().fold(0.0, f64::max)
+            ])
+        }
+    };
+    let rows: Vec<Value> = ps
+        .iter()
+        .map(|&p| {
+            let a: Vec<&Value> = e19.iter().filter(|r| r["p"].as_u64() == Some(p)).collect();
+            let b: Vec<&Value> = e24.iter().filter(|r| r["p"].as_u64() == Some(p)).collect();
+            let ratios: Vec<f64> = a
+                .iter()
+                .filter_map(|x| {
+                    b.iter()
+                        .find(|y| y["seed"] == x["seed"])
+                        .map(|y| fl(x, "ratio") / fl(y, "ratio"))
+                })
+                .collect();
+            let bits = a.first().or(b.first()).map(|r| fl(r, "bits"));
+            json!({
+                "p": p, "log2_n": bits,
+                "e19_s_over_rho": range(&a.iter().map(|r| fl(r, "ratio")).collect::<Vec<_>>()),
+                "e24_s_over_rho": range(&b.iter().map(|r| fl(r, "ratio")).collect::<Vec<_>>()),
+                "e19_over_e24_by_seed": range(&ratios),
+                "e19_c_median": range(&a.iter().map(|r| fl(r, "call.median")).collect::<Vec<_>>()),
+                "e24_c_median": range(&b.iter().map(|r| fl(r, "call.median")).collect::<Vec<_>>()),
+                "curves": [a.len(), b.len()],
+            })
+        })
+        .collect();
+    let all_correct = e19.iter().chain(&e24).all(|r| {
+        bool_at(r, "folded.correct")
+            && fl(r, "check_failures") == 0.0
+            && fl(r, "rows_readd_failures") == 0.0
+            && r["rho"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|w| bool_at(w, "correct"))
+    });
+    let summary = json!({
+        "schema": "crypto.glv_k4_pipeline_summary/v1",
+        "study": "research/glv_k4_pipeline_d4_20261017/",
+        "note": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6, §9.14",
+        "class": "engineering",
+        "before": "E19: tau_T line, weighted D4 solve (degree 26, quotient 512)",
+        "after": "E24: full-2-torsion V4 line, V4-invariant solve (degree 11, quotient 64)",
+        "e19_curves": e19.len(), "e24_curves": e24.len(), "all_verified": all_correct,
+        "e19_handover_log2_n": handover(&e19), "e24_handover_log2_n": handover(&e24),
+        "e24_s_over_rho_all": range(&e24.iter().map(|r| fl(r, "ratio")).collect::<Vec<_>>()),
+        "rows": rows,
+    });
+    fs::write(out, serde_json::to_string_pretty(&summary).unwrap() + "\n").expect("write summary");
+}
+
 fn main() {
+    if env::args().nth(1).as_deref() == Some("--k4-summary") {
+        k4_summary(&env::args().skip(2).collect::<Vec<_>>());
+        return;
+    }
     let mut rows: Vec<Value> = Vec::new();
     for path in env::args().skip(1) {
         let text = fs::read_to_string(&path).unwrap_or_else(|e| panic!("{path}: {e}"));

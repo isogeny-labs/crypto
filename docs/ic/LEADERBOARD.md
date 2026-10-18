@@ -259,9 +259,24 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
+- `research/glv_k4_pipeline_d4_20261017/summary.json` — sha256 `369769457fdf5657…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `765f6e8d05ebbf75…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `docs/curves/registry.json` — sha256 `584d070fbec7e21f…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `ab4891397fe07fca…`
+## k = 4 decomposition oracle on curves with rational 2-torsion, outside tables A–C
+
+Before: E19: tau_T line, weighted D4 solve (degree 26, quotient 512). After: E24: full-2-torsion V4 line, V4-invariant solve (degree 11, quotient 64). Both end to end over F_p^4 (10 and 12 curves, every logarithm verified), every phase charged in F_p multiplications against 16 matched negation walks per curve. Handover from each pipeline's own constants: 2^116.7 → 2^90.1 (extrapolated). Class: engineering, a constant; every row still 1.31e+04–1.69e+05× slower than rho. Read the [report](../../research/glv_k4_pipeline_d4_20261017/REPORT.pdf) and [summary](../../research/glv_k4_pipeline_d4_20261017/summary.json).
+
+| p | log2 n | E19 S/rho | E24 S/rho | E19 / E24 (by seed) | E19 C per call | E24 C per call |
+|--:|--:|--:|--:|--:|--:|--:|
+| 53 | 20.9 | 7.08e+06–8.75e+06 | — | — | 1.37e+09–1.37e+09 | — |
+| 101 | 24.6 | 5.85e+06–6.33e+06 | 3.43e+04–1.69e+05 | 37–170 | 1.39e+09–1.39e+09 | 1.62e+06–1.62e+06 |
+| 149 | 26.9 | 3.40e+06–4.09e+06 | 3.80e+04–5.54e+04 | 61–108 | 1.40e+09–1.40e+09 | 1.63e+06–1.63e+06 |
+| 197 | 28.5 | 2.83e+06–4.91e+06 | 5.44e+04–1.40e+05 | 35–52 | 1.41e+09–1.41e+09 | 1.64e+06–1.65e+06 |
+| 269 | 30.3 | 2.57e+06–5.51e+06 | 2.30e+04–2.34e+04 | 110–240 | 1.41e+09–1.41e+09 | 1.65e+06–1.65e+06 |
+| 397 | 32.5 | — | 1.31e+04–1.58e+04 | — | — | 1.66e+06–1.66e+06 |
+| 521 | 34.1 | — | 1.88e+04–2.15e+04 | — | — | 1.66e+06–1.66e+06 |
+

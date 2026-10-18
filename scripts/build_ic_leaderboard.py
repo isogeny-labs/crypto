@@ -72,6 +72,7 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "glv_k4": "research/glv_k4_pipeline_d4_20261017/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -617,6 +618,23 @@ def la_component() -> dict:
             "class": "engineering"}
 
 
+def k4_v4_component() -> dict:
+    """The k = 4 decomposition oracle on its own family: E19 (the tau_T line,
+    weighted D4 solve) as the before figure and E24 (the full-2-torsion V4
+    line and its invariant solve) as the after, end to end on curves over
+    F_{p^4} with rational 2-torsion, copied from the study's summary.json
+    (written by examples/glv_invariant_experiment_tables.rs --k4-summary from
+    the raw records). A solver speed-up on curves no table A-C row prices:
+    it moves no row there."""
+    sm = load(SOURCES["glv_k4"])
+    if (sm.get("schema") != "crypto.glv_k4_pipeline_summary/v1"
+            or sm.get("all_verified") is not True
+            or sm.get("class") != "engineering"):
+        raise SystemExit("review the k = 4 V4-line summary before updating the leaderboard")
+    return {**sm, "source": SOURCES["glv_k4"],
+            "report": "research/glv_k4_pipeline_d4_20261017/REPORT.pdf"}
+
+
 def latest_frontier_audit() -> dict:
     """Copy the latest performance handoff into the generated board.
 
@@ -1069,6 +1087,7 @@ def build() -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "k4_v4_component": k4_v4_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -1411,6 +1430,25 @@ def markdown(doc: dict) -> str:
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
         L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
+    k = doc["k4_v4_component"]
+
+    def rr(v, fmt="{:.2e}"):
+        return "—" if v is None else "–".join(fmt.format(x) for x in v)
+
+    L += ["## k = 4 decomposition oracle on curves with rational 2-torsion, outside tables A–C", "",
+          f"Before: {k['before']}. After: {k['after']}. Both end to end over F_p^4 "
+          f"({k['e19_curves']} and {k['e24_curves']} curves, every logarithm verified), every phase "
+          "charged in F_p multiplications against 16 matched negation walks per curve. "
+          f"Handover from each pipeline's own constants: 2^{k['e19_handover_log2_n']:.1f} → "
+          f"2^{k['e24_handover_log2_n']:.1f} (extrapolated). Class: {k['class']}, a constant; "
+          f"every row still {rr(k['e24_s_over_rho_all'])}× slower than rho. "
+          f"Read the [report](../../{k['report']}) and [summary](../../{k['source']}).", "",
+          "| p | log2 n | E19 S/rho | E24 S/rho | E19 / E24 (by seed) | E19 C per call | E24 C per call |",
+          "|--:|--:|--:|--:|--:|--:|--:|"]
+    for z in k["rows"]:
+        L.append(f"| {z['p']} | {z['log2_n']:.1f} | {rr(z['e19_s_over_rho'])} | {rr(z['e24_s_over_rho'])} | "
+                 f"{rr(z['e19_over_e24_by_seed'], '{:.0f}')} | {rr(z['e19_c_median'])} | {rr(z['e24_c_median'])} |")
+    L.append("")
     return "\n".join(L) + "\n"
 
 
@@ -2061,6 +2099,28 @@ def page(doc: dict, standalone: bool) -> str:
              'This Tier 1 wall-time panel uses its own unit and sits outside the '
              'operation-unit S rankings.</p>' +
              gh(n83["source"], 'Frozen IC1 rows and candidate identities') + '</section>')
+
+    k = doc["k4_v4_component"]
+
+    def rh(v, fmt="{:.2e}"):
+        return "—" if v is None else "–".join(fmt.format(x) for x in v)
+
+    P.append('<section id="k4-v4-line"><h2>k = 4 decomposition oracle on curves with rational 2-torsion, '
+             'outside tables A–C</h2>'
+             f'<p>Before: {esc(k["before"])}. After: {esc(k["after"])}. Both end to end over '
+             f'F<sub>p⁴</sub> ({k["e19_curves"]} and {k["e24_curves"]} curves, every logarithm verified), '
+             'every phase charged in F<sub>p</sub> multiplications against 16 matched negation walks per curve. '
+             f'Handover from each pipeline&rsquo;s own constants: 2<sup>{k["e19_handover_log2_n"]:.1f}</sup> &rarr; '
+             f'2<sup>{k["e24_handover_log2_n"]:.1f}</sup> (extrapolated). Class: {esc(k["class"])}, a constant; '
+             f'every row still {rh(k["e24_s_over_rho_all"])}&times; slower than rho.</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>log2 n</th><th>E19 S/rho</th>'
+             '<th>E24 S/rho</th><th>E19 / E24 (by seed)</th><th>E19 C per call</th><th>E24 C per call</th>'
+             '</tr></thead><tbody>')
+    for z in k["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["log2_n"]:.1f}</td><td>{rh(z["e19_s_over_rho"])}</td>'
+                 f'<td>{rh(z["e24_s_over_rho"])}</td><td>{rh(z["e19_over_e24_by_seed"], "{:.0f}")}</td>'
+                 f'<td>{rh(z["e19_c_median"])}</td><td>{rh(z["e24_c_median"])}</td></tr>')
+    P.append('</tbody></table></div>' + gh(k["source"], 'Frozen study summary') + '</section>')
 
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '

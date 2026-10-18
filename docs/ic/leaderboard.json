@@ -102,6 +102,10 @@
    "path": "research/la_engines_20261014/summary.json",
    "sha256": "b34650a95c5f106c8302dc5311194d8e1ffb798dff59b2669cda59818712f533"
   },
+  "glv_k4": {
+   "path": "research/glv_k4_pipeline_d4_20261017/summary.json",
+   "sha256": "369769457fdf565702317391c434464984a4653e8c243f45f7af0dac4a8800a2"
+  },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
    "sha256": "765f6e8d05ebbf75e7a3dddcbb886015274311589352b9107746976fb2a670d7"
@@ -47765,6 +47769,196 @@
   "study": "research/la_engines_20261014/",
   "report": "research/la_engines_20261014/REPORT.pdf",
   "class": "engineering"
+ },
+ "k4_v4_component": {
+  "after": "E24: full-2-torsion V4 line, V4-invariant solve (degree 11, quotient 64)",
+  "all_verified": true,
+  "before": "E19: tau_T line, weighted D4 solve (degree 26, quotient 512)",
+  "class": "engineering",
+  "e19_curves": 10,
+  "e19_handover_log2_n": 116.692522221,
+  "e24_curves": 12,
+  "e24_handover_log2_n": 90.0903363578,
+  "e24_s_over_rho_all": [
+   13084.3603375,
+   169291.807965
+  ],
+  "note": "research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md §9.6, §9.14",
+  "rows": [
+   {
+    "curves": [
+     2,
+     0
+    ],
+    "e19_c_median": [
+     1371585124.0,
+     1373141362.0
+    ],
+    "e19_over_e24_by_seed": null,
+    "e19_s_over_rho": [
+     7083173.49712,
+     8751567.30061
+    ],
+    "e24_c_median": null,
+    "e24_s_over_rho": null,
+    "log2_n": 20.9119675688,
+    "p": 53
+   },
+   {
+    "curves": [
+     2,
+     2
+    ],
+    "e19_c_median": [
+     1393690031.0,
+     1394792949.0
+    ],
+    "e19_over_e24_by_seed": [
+     37.3869548615,
+     170.422898668
+    ],
+    "e19_s_over_rho": [
+     5845096.90153,
+     6329305.18281
+    ],
+    "e24_c_median": [
+     1616050.0,
+     1618648.0
+    ],
+    "e24_s_over_rho": [
+     34297.6028879,
+     169291.807965
+    ],
+    "log2_n": 24.6327457046,
+    "p": 101
+   },
+   {
+    "curves": [
+     2,
+     2
+    ],
+    "e19_c_median": [
+     1403705473.0,
+     1403837551.0
+    ],
+    "e19_over_e24_by_seed": [
+     61.3444057953,
+     107.628275877
+    ],
+    "e19_s_over_rho": [
+     3399526.49374,
+     4089235.07221
+    ],
+    "e24_c_median": [
+     1632924.0,
+     1634480.0
+    ],
+    "e24_s_over_rho": [
+     37994.0590786,
+     55417.0579969
+    ],
+    "log2_n": 26.876752908,
+    "p": 149
+   },
+   {
+    "curves": [
+     2,
+     2
+    ],
+    "e19_c_median": [
+     1407640710.0,
+     1407986558.0
+    ],
+    "e19_over_e24_by_seed": [
+     35.1784939837,
+     51.9480528396
+    ],
+    "e19_s_over_rho": [
+     2826098.5986,
+     4907797.78283
+    ],
+    "e24_c_median": [
+     1644141.0,
+     1645042.0
+    ],
+    "e24_s_over_rho": [
+     54402.3970893,
+     139511.310095
+    ],
+    "log2_n": 28.4881375762,
+    "p": 197
+   },
+   {
+    "curves": [
+     2,
+     2
+    ],
+    "e19_c_median": [
+     1411216051.0,
+     1411558115.0
+    ],
+    "e19_over_e24_by_seed": [
+     110.18420048,
+     239.806956475
+    ],
+    "e19_s_over_rho": [
+     2572845.6861,
+     5509599.19583
+    ],
+    "e24_c_median": [
+     1650417.0,
+     1651012.0
+    ],
+    "e24_s_over_rho": [
+     22975.143327,
+     23350.4048211
+    ],
+    "log2_n": 30.28587934,
+    "p": 269
+   },
+   {
+    "curves": [
+     0,
+     2
+    ],
+    "e19_c_median": null,
+    "e19_over_e24_by_seed": null,
+    "e19_s_over_rho": null,
+    "e24_c_median": [
+     1662646.0,
+     1663036.0
+    ],
+    "e24_s_over_rho": [
+     13084.3603375,
+     15815.3016566
+    ],
+    "log2_n": 32.5319831862,
+    "p": 397
+   },
+   {
+    "curves": [
+     0,
+     2
+    ],
+    "e19_c_median": null,
+    "e19_over_e24_by_seed": null,
+    "e19_s_over_rho": null,
+    "e24_c_median": [
+     1663913.0,
+     1664008.0
+    ],
+    "e24_s_over_rho": [
+     18832.9902493,
+     21508.4583798
+    ],
+    "log2_n": 34.1005535404,
+    "p": 521
+   }
+  ],
+  "schema": "crypto.glv_k4_pipeline_summary/v1",
+  "study": "research/glv_k4_pipeline_d4_20261017/",
+  "source": "research/glv_k4_pipeline_d4_20261017/summary.json",
+  "report": "research/glv_k4_pipeline_d4_20261017/REPORT.pdf"
  },
  "phases": [
   {
