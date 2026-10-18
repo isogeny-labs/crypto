@@ -150,3 +150,57 @@ Acceptance requires divisor inputs/outputs, exceptional cases, a nonzero
 prime-subgroup image, and relations generated on that destination. The
 same-field control does not discharge this obligation. No timing experiment
 or efficiency assessment is part of this round.
+
+## Round 04: explicit quotient and modular closed-divisor projection
+
+[Round 04](../research/koblitz_modular_ic_20261018/rounds/04/REPORT.md)
+constructs the natural determinant-five quotient A5(E) x E -> Res(E) for
+both signs, with F2 affine equations, rational inverse, all rational group
+additions, and both 25-point geometric kernels over F_(2^24). All fourteen
+finite gluing presentations now have explicit integral quotient bases and
+principal alternating forms with compatible Frobenius. This latter evidence
+is prime-to-two polarization data; it is not coordinate equations for every
+individual graph, particularly those with supersingular elliptic cofactor.
+Both distinct determinant-19 A5 forms now have certified global minimum 3.
+Decomposition and explicit equations for their glued fivefolds remain open.
+
+The n=5 modular track now transports both cyclic-seven stages through actual
+degree-eleven isogenies, reconstructs all twelve X0(49) targets for 24
+supported inputs and verifies T11=[4]. Fixed Weil-paired bases and canonical
+modular Frobenius give 15,840 geometric level points, grouped into 544 closed
+columns of degrees 6 and 30. Their forward twisting-correspondence projections
+are actual order-11 points: 510 nonzero for a=1 and 520 for a=0. Global
+moduli/character identification is a written bridge and not fully formalized.
+The evaluator's finite closed-divisor domain is explicit; it does not supply
+arbitrary modular Jacobian normal forms or a reverse subgroup embedding.
+
+Full-fiber pullbacks of principal norms give 102 genuine direct modular
+relations, separately reconstructed and checked with maintained-library
+point arithmetic and BigInt rank. Their rank is 4 on 544 columns. A new
+Lean matrix theorem explains the ceiling: every such row factors through
+only four closed base fibers. Collecting more of those functions cannot
+supply the remaining 539 ranks. The proposed level-coordinate function
+x(P)+1 is rejected: its zero divisor has degree 9,240 and none of the zeros
+is in the current factor base; poles also remain unresolved.
+
+Eleven new structural Lean lemmas build and pass the transitive axiom audit.
+See the [proof map](../research/koblitz_modular_ic_20261018/rounds/04/PROOF_MAP.md)
+for actual modular geometry, principal-divisor completeness and polarization
+bridges. Failed integer lifts, first counts, deficient matrices, unsupported
+branches, rejected partial divisors and failed builds remain archived.
+
+Next actions have checkable acceptance conditions:
+
+- Construct equations and a compatible principal polarization for a specified
+  nonnatural quotient, or certify its polarized decomposition.
+- Compute the forward/reverse correspondence composition and denominator on
+  eleven-torsion; an evaluated forward point image alone does not discharge
+  the subgroup-to-Jacobian transfer requirement.
+- Factor psi11(1,b), construct its missing cyclic49/complementary-eleven
+  closed orbits and pole support, and admit level-dependent principal rows
+  only with a complete divisor certificate. Require rank beyond the proven
+  four-fiber ceiling before attempting individual descent.
+
+These steps do not resolve the original n=131 construction or establish a
+cost advantage. The user assesses IC implications; no timing protocol or
+background execution is scheduled by this record.

@@ -48,11 +48,16 @@ mod identity_certificate;
 mod klein_transfer;
 #[path = "../../../../src/cryptanalysis/curve_construction/lpoly.rs"]
 mod lpoly;
+mod modular_geometry;
 mod modular_screen;
 mod n5_relations;
 mod polarized;
+mod quotient_geometry;
 mod round02;
 mod round03_record;
+mod round04;
+mod round04_record;
+mod round04_verify;
 mod round_record;
 
 fn pow(mut a: u64, mut k: u64, p: u64) -> u64 {
@@ -330,6 +335,42 @@ fn run(out: &std::path::Path) {
 }
 fn main() {
     let args: Vec<_> = std::env::args().collect();
+    if args.get(1).map(String::as_str) == Some("--quotient-lattices") {
+        quotient_geometry::lattices(std::path::Path::new(args.get(2).expect("output")));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--natural-quotient") {
+        quotient_geometry::natural(std::path::Path::new(args.get(2).expect("output")));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--record-round04") {
+        round04_record::record(std::path::Path::new(args.get(2).expect("round")));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--verify-round04") {
+        round04_verify::run(std::path::Path::new(args.get(2).expect("output")));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--modular-interior-test") {
+        modular_geometry::interior_test(std::path::Path::new(args.get(2).expect("output")));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--direct-modular-relations") {
+        modular_geometry::relations(std::path::Path::new(args.get(2).expect("output")));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--modular-transport-paired") {
+        modular_geometry::transport_paired(std::path::Path::new(args.get(2).expect("output")));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--modular-transport") {
+        modular_geometry::transport(std::path::Path::new(args.get(2).expect("output")));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--modular-geometry") {
+        modular_geometry::run(std::path::Path::new(args.get(2).expect("output")));
+        return;
+    }
     if args.get(1).map(String::as_str) == Some("--genus4-bounds") {
         census::genus_four_bounds(std::path::Path::new(
             args.get(2).expect("round output directory"),
