@@ -296,3 +296,54 @@ fn grid_options_freeze_all_requested_seed_dimension_combinations() {
     .status
     .success());
 }
+
+#[cfg(target_os = "linux")]
+#[test]
+fn a_second_supervisor_cannot_write_into_an_active_run() {
+    struct Guard(std::process::Child);
+    impl Drop for Guard {
+        fn drop(&mut self) {
+            let _ = self.0.kill();
+            let _ = self.0.wait();
+        }
+    }
+    let t = Temp::new();
+    let p = plan(&t, true);
+    let mut v = value(&p);
+    v["candidates"][0]["curve"] = json!({"kind":"prime_search","bits":32,"seed":19});
+    v["candidate_seconds"] = json!(30);
+    fs::write(&p, serde_json::to_vec(&v).unwrap()).unwrap();
+    let dir = t.0.join("active");
+    let _first = Guard(
+        Command::new(exe())
+            .args([
+                "run",
+                "--plan",
+                p.to_str().unwrap(),
+                "--out",
+                dir.to_str().unwrap(),
+            ])
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .spawn()
+            .unwrap(),
+    );
+    let began = Instant::now();
+    while began.elapsed() < Duration::from_secs(10) {
+        if fs::read_to_string(dir.join("events.jsonl"))
+            .unwrap_or_default()
+            .contains("worker_started")
+        {
+            break;
+        }
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    assert!(fs::read_to_string(dir.join("events.jsonl"))
+        .unwrap()
+        .contains("worker_started"));
+    let manifest = fs::read(dir.join("manifest.json")).unwrap();
+    let second = call(&["run", "--out", dir.to_str().unwrap(), "--resume"]);
+    assert!(!second.status.success());
+    assert!(String::from_utf8_lossy(&second.stderr).contains("holds the sweep run lock"));
+    assert_eq!(manifest, fs::read(dir.join("manifest.json")).unwrap());
+}

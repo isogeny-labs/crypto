@@ -68,8 +68,8 @@ pub fn basis(i: &BinaryInstance, shape: &str, dim: u32, seed: u64) -> Result<Vec
                 .map(|k| pow(i, g, (mask - u64::from(dim / 2) + u64::from(k)) % mask))
                 .collect(),
             "small-order" => {
-                let Some(order) =
-                    (2..=mask.min(4096)).find(|d| mask % d == 0 && *d >= u64::from(2 * dim - 1))
+                let Some(order) = (2..=mask.min(4096))
+                    .find(|d| mask.is_multiple_of(*d) && *d >= u64::from(2 * dim - 1))
                 else {
                     return Err("no suitable bounded small multiplicative order".into());
                 };
@@ -94,7 +94,7 @@ pub fn basis(i: &BinaryInstance, shape: &str, dim: u32, seed: u64) -> Result<Vec
                     .collect()
             }
             "mixed" => {
-                let Some(a) = (2..=dim).find(|a| dim % a == 0 && a * a <= dim) else {
+                let Some(a) = (2..=dim).find(|a| dim.is_multiple_of(*a) && a * a <= dim) else {
                     return Err("mixed shape requires a composite dimension".into());
                 };
                 let mut cols = Vec::new();
@@ -143,6 +143,26 @@ pub fn subspace(i: &BinaryInstance, cols: &[u64]) -> FactorSubspace {
     }
 }
 
+pub fn recipe_basis(
+    params: &std::collections::BTreeMap<String, String>,
+    dimension: u32,
+) -> Result<Vec<u64>> {
+    if let Some(text) = params.get("basis") {
+        text.split(';')
+            .map(|s| {
+                if let Some(s) = s.strip_prefix("0x") {
+                    u64::from_str_radix(s, 16)
+                } else {
+                    s.parse()
+                }
+            })
+            .collect::<std::result::Result<Vec<_>, _>>()
+            .map_err(|e| e.to_string())
+    } else {
+        Ok((0..dimension).map(|k| 1u64 << k).collect())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -173,25 +193,5 @@ mod tests {
         assert!(basis(&i, "subfield", 3, 9).is_err());
         assert!(basis(&i, "mixed", 3, 9).is_err());
         assert_eq!(rank(&basis(&i, "mixed", 4, 9).unwrap()), 4);
-    }
-}
-
-pub fn recipe_basis(
-    params: &std::collections::BTreeMap<String, String>,
-    dimension: u32,
-) -> Result<Vec<u64>> {
-    if let Some(text) = params.get("basis") {
-        text.split(';')
-            .map(|s| {
-                if let Some(s) = s.strip_prefix("0x") {
-                    u64::from_str_radix(s, 16)
-                } else {
-                    s.parse()
-                }
-            })
-            .collect::<std::result::Result<Vec<_>, _>>()
-            .map_err(|e| e.to_string())
-    } else {
-        Ok((0..dimension).map(|k| 1u64 << k).collect())
     }
 }

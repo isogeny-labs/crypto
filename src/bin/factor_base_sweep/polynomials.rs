@@ -37,7 +37,7 @@ fn mul(a: &P, b: &P, p: u64) -> P {
     r
 }
 fn constant(c: u64, p: u64) -> P {
-    if c % p == 0 {
+    if c.is_multiple_of(p) {
         P::new()
     } else {
         [(vec![0, 0], c % p)].into()

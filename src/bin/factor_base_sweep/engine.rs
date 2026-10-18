@@ -115,25 +115,6 @@ pub(super) fn measurement_identity(
     .seal()
 }
 
-#[cfg(test)]
-mod identity_tests {
-    use super::*;
-    #[test]
-    fn a_prime_orbit_constructor_keeps_the_prime_formulation_identity() {
-        let spec = "glv-orbit:size=4";
-        let dump = dump_factor_base(
-            &crypto_lib::cryptanalysis::ecbench::workload::CurveSpec::PrimeRoster { bits: 16 },
-            spec,
-        )
-        .unwrap();
-        assert_eq!(dump.curve.family, "prime");
-        assert_eq!(
-            measurement_identity(&dump, spec, 8).unwrap().config.oracle,
-            "semaev-s3-direct-membership"
-        );
-    }
-}
-
 pub fn run(request: &Request, dir: &Path) -> Result<Value> {
     request.plan.validate()?;
     let started = Instant::now();
@@ -473,4 +454,23 @@ fn execute<G: CountedGroup>(
         json!({"best_observed_successful_solving_degree":best_degree,"training_rank":rows.rank()}),
     )?;
     Ok(result)
+}
+
+#[cfg(test)]
+mod identity_tests {
+    use super::*;
+    #[test]
+    fn a_prime_orbit_constructor_keeps_the_prime_formulation_identity() {
+        let spec = "glv-orbit:size=4";
+        let dump = dump_factor_base(
+            &crypto_lib::cryptanalysis::ecbench::workload::CurveSpec::PrimeRoster { bits: 16 },
+            spec,
+        )
+        .unwrap();
+        assert_eq!(dump.curve.family, "prime");
+        assert_eq!(
+            measurement_identity(&dump, spec, 8).unwrap().config.oracle,
+            "semaev-s3-direct-membership"
+        );
+    }
 }
