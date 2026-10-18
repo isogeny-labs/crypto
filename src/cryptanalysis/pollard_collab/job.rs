@@ -25,6 +25,7 @@
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
+use std::time::Instant;
 
 use crate::cryptanalysis::ecdlp_variants::masked_is_zero;
 use crate::ecc::curve::CurveParams;
@@ -208,6 +209,16 @@ pub struct JobContext {
     pub half_p: BigUint,
 }
 
+/// Exclusive construction phases for a validated collaborative rho job.
+/// Durations are diagnostics; benchmark admission also requires host receipts.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct JobBuildProfile {
+    pub validation_ns: u128,
+    pub branch_table_ns: u128,
+    pub finalization_ns: u128,
+    pub branch_points: u32,
+}
+
 impl JobContext {
     /// Validate `spec` and expand it into the curve context, the branch
     /// table and the DP mask.
@@ -219,6 +230,22 @@ impl JobContext {
     /// what [`FieldElement::inv`]'s `a^(p−2)`, not an inverse there, would
     /// give.
     pub fn new(spec: JobSpec) -> Result<Self, String> {
+        Self::build_internal(spec, None)
+    }
+
+    /// Build the same context as `new`, recording branch-table construction
+    /// separately from input and subgroup validation.
+    pub fn new_profiled(spec: JobSpec) -> Result<(Self, JobBuildProfile), String> {
+        let mut profile = JobBuildProfile::default();
+        let context = Self::build_internal(spec, Some(&mut profile))?;
+        Ok((context, profile))
+    }
+
+    fn build_internal(
+        spec: JobSpec,
+        mut profile: Option<&mut JobBuildProfile>,
+    ) -> Result<Self, String> {
+        let phase_start = profile.is_some().then(Instant::now);
         if spec.version != PROTOCOL_VERSION {
             return Err(format!(
                 "job version {} ≠ supported {}",
@@ -267,6 +294,10 @@ impl JobContext {
             return Err("n·P ≠ ∞: order is wrong".into());
         }
         let job_id = spec.job_id();
+        if let (Some(p), Some(t)) = (profile.as_deref_mut(), phase_start) {
+            p.validation_ns = t.elapsed().as_nanos();
+        }
+        let phase_start = profile.is_some().then(Instant::now);
         let mut branches = Vec::with_capacity(spec.num_branches as usize);
         for j in 0..spec.num_branches as u64 {
             let u = derive_scalar(&job_id, "branch-u", j, &n);
@@ -276,6 +307,11 @@ impl JobContext {
                 .add_vartime(&q.scalar_mul_vartime(&v, &a), &a);
             branches.push(Branch { u, v, point });
         }
+        if let (Some(p), Some(t)) = (profile.as_deref_mut(), phase_start) {
+            p.branch_table_ns = t.elapsed().as_nanos();
+            p.branch_points = branches.len() as u32;
+        }
+        let phase_start = profile.is_some().then(Instant::now);
         let dp_mask = (BigUint::one() << spec.dp_bits) - BigUint::one();
         let step_cap = if spec.max_steps_per_walker == 0 {
             20u64 << spec.dp_bits
@@ -283,7 +319,7 @@ impl JobContext {
             spec.max_steps_per_walker
         };
         let half_p = &p >> 1;
-        Ok(Self {
+        let context = Self {
             spec,
             job_id,
             p,
@@ -296,7 +332,11 @@ impl JobContext {
             dp_mask,
             step_cap,
             half_p,
-        })
+        };
+        if let (Some(p), Some(t)) = (profile.as_deref_mut(), phase_start) {
+            p.finalization_ns = t.elapsed().as_nanos();
+        }
+        Ok(context)
     }
 
     /// Deterministic start of walker `i`: `(a_i, b_i, a_i·P + b_i·Q)`.
