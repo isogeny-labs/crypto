@@ -19,7 +19,7 @@ cd "$REPO"
 STUDY=research/target_free_s4_20261018
 
 if [ -n "${SCORE_BIN:-}" ]; then
-  "$SCORE_BIN" target_free $STUDY/runs/cell-*.jsonl > "$HERE/score-output.txt"
+  "$SCORE_BIN" s4_free $STUDY/runs/cell-*.jsonl > "$HERE/score-output.txt"
 else
   cargo run --release --example dreg_score -- s4_free $STUDY/runs/cell-*.jsonl > "$HERE/score-output.txt"
 fi
@@ -87,7 +87,7 @@ subs = {
  "N_TF": str(len(tf)), "N_TF_FIN": str(fin(tf)), "N_TF_OVER": str(over(tf)), "N_TF_TOUT": str(tout(tf)),
  "N_TG": str(len(tg)), "N_TG_FIN": str(fin(tg)), "N_TG_OVER": str(over(tg)), "N_TG_TOUT": str(tout(tg)),
  "N_EXITS": str(len(exits)), "N_NONZERO": str(len(nonzero)),
- "NONZERO_LINES": esc("; ".join(l.split(" ", 1)[1] for l in nonzero) or "none"),
+ "NONZERO_LINES": esc("; ".join(l.split(" ", 1)[1].replace("/home/user/crypto/", "") for l in nonzero) or "none"),
  "MAX_SECS": "%.0f" % max(secs) if secs else "—",
  "PEAK_MATRIX_GIB": "%.2f" % (peak / 2**30),
 }

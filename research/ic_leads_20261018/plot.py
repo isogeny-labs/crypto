@@ -51,9 +51,9 @@ fig.savefig(os.path.join(out, "coset_indicator_pilot.png"), dpi=150)
 # --- (1) lead map ----------------------------------------------------------
 arguments = ["generic-group bound\n(table oracles)", "no stable subspace\nat n = 131, 163", "shape closure\nat m ≥ 3", "admissible-degree\ninequality", "measured degree\nwall (this host)"]
 leads = [
-    ("L1 target-free algebraic relations", ["pass", "pass", "escapes (no x_R)", "must still pass", "untested"]),
+    ("L1 target-free algebraic relations", ["pass", "pass", "closed: no lower degree", "must still pass", "closed: +1 degree (S4)"]),
     ("L2 dense-bit-row XL at degree 5", ["n/a", "n/a", "n/a", "n/a", "aimed at it"]),
-    ("L3 raised-cap sparse closure", ["n/a", "n/a", "n/a", "n/a", "in flight"]),
+    ("L3 raised-cap sparse closure", ["n/a", "n/a", "n/a", "n/a", "closed: OOM at 7.2 GB"]),
     ("L4 4E-class stratification", ["pass", "pass", "closed: free signs", "n/a", "n/a"]),
     ("L5 coset-indicator degree (pilot)", ["pass", "pass", "closed: ≈ ℓ−1 on every V", "n/a", "n/a"]),
     ("L6 theorem: shape closure m ≥ 3", ["n/a", "n/a", "formalises it", "n/a", "n/a"]),

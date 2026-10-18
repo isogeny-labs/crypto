@@ -52,7 +52,7 @@ Figure `figures/lead_map.svg` places each lead against these five.
 
 | # | lead | why it survives the filter | cheapest falsifier | cost | prior art |
 |:--|:--|:--|:--|:--|:--|
-| **L1** | **Target-free algebraic relations.** Solve `S₄(x₁, x₂, x₃, x₄) = 0` (or the `S₃` chain with no `x_R`) with every variable in `V`, optionally with Frobenius twists `x_i^{2^{a_i}}` so the relation reads `P₁ + σ^a P₂ + σ^b P₃ + σ^c P₄ = O`. | Argument 3 needs a generic multiplier; here there is none: every leading form lives in `V·V·V·V` (or its twists), which for a progression base of dimension `ℓ < n/4` has dimension `≤ 4ℓ − 3 < n`, so `n − 4ℓ + 3` dependencies exist at the lowest degree. Yield is the price: 4-term relations among `2^ℓ` base points number about `n³·2^{4ℓ−n}/24` with twists, so `2^ℓ/n` relations need `ℓ ≳ n/3 − 7`, outside the no-wrap window `ℓ < n/4`. The question is whether a partial-wrap window (`n/4 ≤ ℓ < n/3`) keeps a fraction of the dependencies. | Build the target-free system at `(n, ℓ) ∈ {(16,4), (20,5), (24,6)}` and the chained target system at equal `m·ℓ`; compare closure degrees with the registered instrument. Kill: no cell at least one degree below the target system. | 1 day; small `N = 4ℓ ≤ 24`, degree 4–5 dense closure fits | **not tried** (Q1): every closure study uses `build_decomposition_system(…, x_r, …)`; only table versions exist (Lead B census, `KN` idea C1) |
+| **L1** | **Target-free algebraic relations.** Solve `S₄(x₁, x₂, x₃, x₄) = 0` (or the `S₃` chain with no `x_R`) with every variable in `V`, optionally with Frobenius twists `x_i^{2^{a_i}}` so the relation reads `P₁ + σ^a P₂ + σ^b P₃ + σ^c P₄ = O`. | Argument 3 needs a generic multiplier; here there is none: every leading form lives in `V·V·V·V` (or its twists), which for a progression base of dimension `ℓ < n/4` has dimension `≤ 4ℓ − 3 < n`, so `n − 4ℓ + 3` dependencies exist at the lowest degree. Yield is the price: 4-term relations among `2^ℓ` base points number about `n³·2^{4ℓ−n}/24` with twists, so `2^ℓ/n` relations need `ℓ ≳ n/3 − 7`, outside the no-wrap window `ℓ < n/4`. The question is whether a partial-wrap window (`n/4 ≤ ℓ < n/3`) keeps a fraction of the dependencies. | Build the target-free system at `(n, ℓ) ∈ {(16,4), (20,5), (24,6)}` and the chained target system at equal `m·ℓ`; compare closure degrees with the registered instrument. Kill: no cell at least one degree below the target system. | 1 day; small `N = 4ℓ ≤ 24`, degree 4–5 dense closure fits | **closed 2026-10-18, both presentations** (§3a): chained, F4 degree equal to the target system at (16, 4) with about 10× the columns (`research/target_free_relations_20261018/`); eliminated `S₄`, one degree *higher* than the `S₄` target system on 15 of 15 readings at (13, 3) and (16–19, 4), with no top-form dependency on the progression base at ℓ = 4 (`research/target_free_s4_20261018/`, registered verdict killed). Before: never tried (Q1). |
 | **L2** | **Dense-bit-row XL at degree 5 for `m·ℓ = 21`.** Plain XL rows at degree 5 are `42 equations × C(40, ≤2) = 34,482` rows over 760 k columns: 3.3 GB as dense bit rows, M4RI elimination in about an hour. The closure degree is `≤` the XL degree, so if XL refutes at 5 the `m·ℓ = 21` cells resolve to exactly 5 (they are already `> 4`). | Aims at argument 5 directly; needs no new mathematics. | Implement a dense-row, sparse-row-count XL refuter (rows as packed `u64` words over the degree-`D` monomial index; M4RI or Four-Russians elimination), run it on the 8 committed `m·ℓ = 21` draws at degree 5. Positive result resolves the cells; negative gives "XL > 5", consistent with the XL fits (`ℓ + 4`), and nothing on the closure. Odds of a positive: about one in four, from the XL-minus-closure gaps of 1–3 in Results 11–12. | 1–2 days | **not built** (Q5): every engine stores sparse rows with fill-in or a dense full matrix. The existing dense engine's scan to degree 5 was tried and killed twice (§3): its closure products, not the XL rows, exceed the host. |
 | **L3** | **Raised-cap sparse closure.** The rewritten sparse closure stores 4-byte colex ranks; its 350 M-entry cap used 1.4 GB of 15 GB. | Argument 5 only. | Rerun degree 5 on `m3 (19, 7)` draw 0 with `--max-entries 2500000000`. **Done, unmeasured:** killed by the memory cgroup at 7.2 GB after about two hours (§3). The engine needs more than this host at degree 5, N = 40. | done | this note |
 | **L4** | **4E-class stratification (accounting).** For `a = 0` Koblitz curves `E(F_{2^n}) ≅ Z/4 × Z/r`, so points carry a 2-bit class in `E/4E`; EXP-H conditioned on the 1-bit trace class only. | — | **Closed by a sign argument before any run.** A decomposition is `R = Σ ε_i P_i` with free signs; flipping `ε_i` moves the class sum by `2c_i mod 4`, which is 2 whenever `c_i` is odd. So as soon as one summand lies outside `2E`, both residues of the right parity are reachable and the `4E` class never obstructs a target; it can obstruct only bases contained in `2E` (trace-zero bases), and there only if the base has no class-2 point, which a random trace-zero base has. No class-2 artefact exists in the committed draws. | done | not tried; not needed |
@@ -81,9 +81,9 @@ Only three things move the exponent question, and each has a named test:
 
 - the closure degree at `m·ℓ = 21` and beyond, on a 64 GB host or through
   L2/L3 (argument 5);
-- a target-free system whose closure degree sits a degree below the target
-  system at equal `m·ℓ` (L1), which would be the first shape effect at
-  `m ≥ 3`;
+- ~~a target-free system whose closure degree sits a degree below the
+  target system at equal `m·ℓ` (L1)~~: measured on 2026-10-18 in both
+  presentations and closed (§3a);
 - a proof that the closure degree of the chained system is `Ω(ℓ)` (the
   defensive theorem), for which L6 is the first lemma and §4's pilot the
   first negative mechanism (the parity route is not the one the closure
@@ -96,6 +96,30 @@ listed because the success criterion counts verified constants.
 
 - **L3 (raised-cap sparse closure): killed, unmeasured.** `dreg_closure --sparse 5 --max-entries 2500000000` on `m3 (19, 7)` draw 0 was killed by the memory cgroup at 7.2 GB RSS after about two hours (92 CPU-minutes), with the dense probe holding 3.5 GB in the same cgroup; no record was written. With 4-byte ranks the registered 350 M cap was 1.4 GB; the fill-in past it outgrows the entry count. Degree 5 at 40 unknowns needs more than about 7 GB for this engine, consistent with F4's 12.6 GB kill. Records: `research/dreg_closure_slope_20261018/probe_highcap/`.
 - **L2 test (dense engine scanning to degree 5): killed twice, unmeasured.** `dreg_closure --to 5 --max-cols 800000` on the same draw: run 1 killed by the cgroup at 9.8 GB RSS, run 2 (alone) aborted on allocation under a 13.5 GB address space after 7 minutes. The dense engine's closure holds every fall product as a 760 k-bit row, so the 34,482 XL rows are not the binding count. The pure dense-row XL pass of L2 (no closure) remains unbuilt; it would decide only whether plain XL refutes at 5. Records: `research/dreg_closure_slope_20261018/probe_highcap/`.
+
+## 3a. L1 measured: target-free relations solve no lower, in either presentation
+
+Two preregistered studies, both on 2026-10-18.
+
+- **Chained** (`research/target_free_relations_20261018/RESULTS.md`): the
+  target-free system with intermediate `u`, against the chained `m = 3`
+  target system on the same base, at (16, 4). No target-free draw finished
+  under the registered 1 GiB cap, so the registered verdict is undecided as
+  scored. Every draw is bounded at ≥ 4, the target value. Two raised-cap
+  draws, a deviation, finish at 4: equal, with about ten times the
+  step-matrix columns. The design error is recorded there: Lemma 1 already
+  predicts independent leading forms in this presentation.
+- **Eliminated `S₄`** (`research/target_free_s4_20261018/RESULTS.md`): the
+  presentation the corollary is about. The target-free system reads
+  *higher* than the `S₄` target system on 15 of 15 readings at (13, 3) and
+  (16–19, 4), on progression, twisted and random bases (8 against 7 at
+  ℓ = 4). The progression base shows no dependency among the Boolean top
+  forms (degree 7) at ℓ = 4. The corollary's field-level dependencies do
+  not reach the forms F4 works with. Registered verdict: killed. (20, 5)
+  does not fit in 12 GB.
+
+L1 is closed. The corollary in `LEMMAS.md` stays true as stated, and it now
+carries a note that it bounds the wrong quantity for the solving degree.
 
 ## 4. Pilot: the coset-indicator degree (L5), negative
 
@@ -125,5 +149,6 @@ makes no claim beyond these 80 records.
 
 ## 5. Order of work
 
-L3 (running) → L2 (if L3 caps) → L1 → L6, L7 → L10 → L8. L4, L5 and L9 are
-closed by this round (sign argument, pilot, count).
+L3 (killed, unmeasured) → L2 (if L3 caps) → L1 (closed 2026-10-18, §3a) →
+L6, L7 → L10 → L8. L4, L5 and L9 are closed by this round (sign argument,
+pilot, count). Next: L2.

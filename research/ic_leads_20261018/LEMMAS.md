@@ -64,6 +64,13 @@ dependencies exist at the lowest degree. That is the only place in this
 family where the shape of `V` is allowed to matter, and it is why L1 is
 listed.
 
+*Measured 2026-10-18* (`research/target_free_s4_20261018/RESULTS.md`): the
+dependencies above live at the field level. The Boolean top forms of the
+descended eliminated `S₄` (degree 7) have full rank on the progression base
+at every ℓ = 4 cell. The target-free system solves one F4 degree *above*
+the target system. The corollary is true and does not bound the solving
+degree.
+
 ## Lemma 2 (the admissible Macaulay degree)
 
 **Setting.** Index calculus on `E(F_{2^n})` with a factor base of `2^ℓ`

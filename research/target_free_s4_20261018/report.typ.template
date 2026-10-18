@@ -15,15 +15,17 @@ diagnostic, with no `S`, no rho ratio and no speed claim.
 
 - *Command.* `run.sh`: cells (13,3), (16,4), (17,4), (18,4), (19,4), (20,5),
   (24,6) in that order, arms gp `[0,0,0,0]`, gp `[0,1,2,3]` and random
-  `[0,0,0,0]`, one process each:
-  `prlimit --as=12000000000 timeout 10800 dreg_eliminated_s4 --cells n:ℓ --basis B --twists T --draws 4 --seed 20261018 --budget-secs 1800`,
-  with `F4_F2_MAX_MATRIX_WORDS = 2^29` (4 GiB step matrices) and 3 rayon
+  `[0,0,0,0]`, one process each (below), with `F4_F2_MAX_MATRIX_WORDS = 2^29` (4 GiB step matrices) and 3 rayon
   threads. The queue stops at the first cell with no finished target-free
   record.
+  ```
+  prlimit --as=12000000000 timeout 10800 dreg_eliminated_s4 --cells n:l \
+    --basis B --twists T --draws 4 --seed 20261018 --budget-secs 1800
+  ```
 - *Arms.* `target_free_s4`: `build_eliminated_s4_system(basis, 1, None, twists)`,
-  `4ℓ` unknowns, `n` equations, solved once on gp (deterministic) and on
-  4 draws on random. `target_s4`: the same with `x₄ = x_R` (random per
-  draw), `3ℓ` unknowns, 4 draws.
+  $4 ell$ unknowns, `n` equations, solved once on gp (deterministic) and on
+  4 draws on random. `target_s4`: the same with $x_4 = x_R$ (random per
+  draw), $3 ell$ unknowns, 4 draws.
 - *Measure.* F4 solving degree (field equations included), degree reached,
   and the top-form deficiency `top_forms − top_rank`, computed before F4.
 - *Host.* The 4-core, 15 GB container, which is not isolated (`AGENTS.md`

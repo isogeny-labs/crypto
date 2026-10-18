@@ -15,7 +15,7 @@ Five closure arguments are settled enough that a lead failing one is not a lead:
 
 == The leads, ranked
 
-- *L1 target-free algebraic relations* (not tried before): solve $S_4(x_1, dots, x_4) = 0$ with every variable in $V$ and no target; the leading forms then live in $V^4$, which can be dependent. Falsifier: closure degree at $(16,4), (20,5), (24,6)$ against the chained target system at equal $m dot ell$; kill if no cell is a degree lower. Yield is the price ($ell gt.tilde n/3 - 7$ needed, no-wrap window $ell < n/4$).
+- *L1 target-free algebraic relations* (closed 2026-10-18): solve $S_4(x_1, dots, x_4) = 0$ with every variable in $V$ and no target. Measured in two preregistered studies. In the chained presentation, the F4 degree equals the target system at $(16,4)$, with about 10 times the columns. In the eliminated $S_4$, the target-free system is one degree *higher* than the $S_4$ target system on 15 of 15 readings at $(13,3)$ and $(16$–$19, 4)$, with no Boolean top-form dependency on the progression base at $ell = 4$. Registered verdict: killed (`research/target_free_s4_20261018/`).
 - *L2 dense-bit-row XL at degree 5* for the $m dot ell = 21$ cells: 34,482 rows over 760 k columns (3.3 GB); a refutation resolves the cells at exactly 5. Not built; about one chance in four of a positive.
 - *L3 raised-cap sparse closure*: run at 2.5 G entries and killed by the memory cgroup at 7.2 GB after two hours; unmeasured. The existing dense engine scanning to degree 5 was killed twice as well (9.8 GB; allocation failure under 13.5 GB). Degree 5 at 40 unknowns needs more than this host for every engine tried.
 - *L4 4E-class stratification*: closed by a sign argument; with free summand signs the $E\/4E$ class never obstructs a target unless the whole base lies in $2E$ without class-2 points.
@@ -34,4 +34,4 @@ The indicator degree is $ell - 1$ or $ell$ on every base, progression no better 
 
 == What would change the picture
 
-The closure degree at $m dot ell = 21$ and beyond (64 GB host, or L2/L3); a target-free system a degree below the target system (L1); or a proof that the closure degree is $Omega(ell)$, for which L6 is the first lemma. Everything else is a constant, a row or bookkeeping, listed because the success criterion counts verified constants.
+The closure degree at $m dot ell = 21$ and beyond (64 GB host, or L2/L3); (L1, a target-free system a degree below the target system, was measured and closed on 2026-10-18); or a proof that the closure degree is $Omega(ell)$, for which L6 is the first lemma. Everything else is a constant, a row or bookkeeping, listed because the success criterion counts verified constants.
