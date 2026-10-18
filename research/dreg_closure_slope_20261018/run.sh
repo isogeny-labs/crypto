@@ -26,6 +26,9 @@ DRAWS=$HERE/draws
 RUNS=$HERE/runs
 mkdir -p "$DRAWS" "$RUNS"
 SEED=20261018
+# The Macaulay builder's row/column guards, as the previous closure studies set them.
+export F4_F2_MAX_ROWS=50000000 F4_F2_MAX_COLS=50000000
+export RAYON_NUM_THREADS=${RAYON_NUM_THREADS:-2}
 MAX_ENTRIES=350000000
 AS_LIMIT=7000000000
 TIME_LIMIT=10800
