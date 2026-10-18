@@ -69,8 +69,8 @@ fn parse_args() -> Result<Args, String> {
 
 fn read_records(dir: &Path) -> Result<Vec<Record>, String> {
     let path = dir.join("records.jsonl");
-    let text = std::fs::read_to_string(&path)
-        .map_err(|e| format!("reading {}: {e}", path.display()))?;
+    let text =
+        std::fs::read_to_string(&path).map_err(|e| format!("reading {}: {e}", path.display()))?;
     let mut out = Vec::new();
     for line in text.lines().filter(|l| !l.trim().is_empty()) {
         let record: Record = serde_json::from_str(line)
@@ -147,7 +147,11 @@ fn run(args: Args) -> Result<(), String> {
             .find(|a| a.contains("rho"))
             .ok_or_else(|| format!("{}: no rho arm", dir.display()))?
             .clone();
-        for key in [&rho_name, &candidate_arms[0].clone(), &candidate_arms[1].clone()] {
+        for key in [
+            &rho_name,
+            &candidate_arms[0].clone(),
+            &candidate_arms[1].clone(),
+        ] {
             let arms = &by_arm[key];
             if arms.iter().any(|r| r.warmup) {
                 continue;
@@ -220,10 +224,7 @@ fn run(args: Args) -> Result<(), String> {
             let cand_gaes = cand_by_wl
                 .get(wl)
                 .ok_or_else(|| format!("{}: workload {wl} missing in candidate", dir.display()))?;
-            workload_ratios.insert(
-                wl.clone(),
-                (mean(rho_gaes), mean(cand_gaes)),
-            );
+            workload_ratios.insert(wl.clone(), (mean(rho_gaes), mean(cand_gaes)));
         }
         let total_point = {
             let a: Vec<f64> = workload_ratios.values().map(|(a, _)| *a).collect();
