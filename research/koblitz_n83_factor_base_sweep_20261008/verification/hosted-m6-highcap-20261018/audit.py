@@ -266,8 +266,12 @@ def audit(hosted: Path, provider_zip: Path) -> dict:
                           "artifact_id": meta["id"],
                           "artifact_zip_sha256": sha256(archive_bytes)})
     require(run["conclusion"] == "success", "hosted run failed")
+    status = ("BOUND_RECEIPTS_MODEL_REPLAY_REQUIRED"
+              if any(row["status"] == "OBSERVED_MODEL_REQUIRES_INDEPENDENT_REPLAY"
+                     for row in summaries)
+              else "PASS_BOUND_TWO_HOSTED_SOLVER_RECEIPTS")
     return {"schema": "n83.hosted-m6-highcap-audit/v1",
-            "status": "PASS_BOUND_TWO_HOSTED_SOLVER_RECEIPTS",
+            "status": status,
             "run_id": run_id, "run_attempt": 1, "head_sha": HEAD_SHA,
             "dispatch_sha256": sha256(dispatch_bytes),
             "arms": summaries,
