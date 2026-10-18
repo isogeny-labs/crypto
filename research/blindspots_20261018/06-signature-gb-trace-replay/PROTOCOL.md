@@ -535,3 +535,65 @@ README, graph and PDF are written by the assessing stage from `raw/`.
 13. **Peak memory** is the resident high-water mark after a reset before each solve
     (`/proc/self/clear_refs`); a stopped job's peak is not comparable with a finished one.
 14. **Per-card build** instead of one build in the first card (cards cannot share a file).
+
+
+---
+
+## Amendment 2: repair pass (written after the first run, before any r2 card)
+
+The first run left five cards without a clean receipt. This amendment changes no question, arm,
+cell, metric or decision rule of the protocol above; it adds cards that fill the missing cells.
+
+### A. State of the first run (read from `raw/`, 2026-10-18)
+
+| card | state | what is on disk |
+|--:|---|---|
+| 01, 02, 06, 07, 09, 10, 11, 13, 14 | receipt, `status: completed` | all outputs |
+| 03 | receipt `stopped at command 5` (failed) | `sigr/sign` and ablation of `c17-4-3` complete (exit 0); `long-c17-4-3` aborted (exit -6, allocation failure 3221225472 bytes in `Vec<Cand>::grow_one`, `Sig::step`) and left only its `f4` row; clean-up commands did not run |
+| 04 | no receipt (executor shell timeout) | `f4,sig` `c15-5-3` t0-7: 16 complete rows; `f4rs` `c15-5-3` never ran |
+| 05 | no receipt | build log only: `c15-5-3` t8-15 and its ablation never ran |
+| 08 | no receipt | `f4,sig` `c13-3-4` t8-15: 16 complete rows; the `c13-3-4` ablation never ran |
+| 12 | no receipt | build log only: `f4r,f4n` on `c15-3-4` never ran |
+
+No card was refused. Cards 04 and 08 are re-run in full (their complete rows have no receipt that
+vouches for them).
+
+### B. Instrument fixes (the only change to `examples/blindspots_06_signature_gb.rs`)
+
+15. **Candidate-list growth guard in `Sig::step`.** Proved by the first run (card 03,
+    `long-c17-4-3`): the pair candidate list doubled from 1.5 to 3 GiB in one reallocation and
+    the allocator aborted the process before the periodic memory check, which would have recorded
+    status `memcap`. Fix: before a reallocation, return `memcap` when the doubled buffer plus the
+    current address space would pass the existing cap (88% of the `prlimit --as` limit). It can
+    change a result only for a job that would have aborted. No card whose job finished can be
+    affected, so no finished card is re-run for it. Smoke test (`smoke-test-r2.txt`): 33 of 36
+    held-out-target rows identical, the other three are time-limit stops; `selftest` OK; the
+    failing command now ends `memcap` after 44 s with exit 0.
+16. **`summarize` reads re-runs last.** A file whose name contains `-r2` is read after the others,
+    so its row replaces a first-run row of the same (cell, target, arm).
+17. **`summarize` does not read `-long-` files.** The descriptive long run (`--touch-ratio 100`)
+    has a different cap from the rule's `--touch-ratio 2`; its `sig` row must not replace the
+    rule's row of the same target. Its numbers are read from its own log and stay descriptive.
+    On the first run's `raw/` the new `summarize` reproduces `card-14-summarize.stdout.log` except
+    two `mem(f4/X)` cells (descriptive), because `rss_kb` of `f4` target 0 was then read from the
+    long-run log.
+
+The instrument's new sha256 is `48a39c343ff7abee7fb38bb9a0790d10e353c7b71a0eb5b9209ad60425f45dbc`;
+every r2 card binds it. The first run's cards stay bound to `d9d7ffc3...`.
+
+### C. Execution parameters of the r2 cards (not rule parameters)
+
+* Same arms, cells, targets, `--touch-ratio 2`, `--sig-time-limit`, `--time-limit` and
+  `--trace-target 16` as the first-run commands. `--total-limit` (the budget after which a job is
+  recorded `skipped`) is raised where the first run's value would have skipped rows: `f4rs`
+  `c15-5-3` 30 to 60 s, the two ablations 100/120 to 200 s, `f4r,f4n` on `c15-3-4` 170 to 300 s
+  per card.
+* Each card keeps the sum of its command timeouts at or below 480 s (the first run's 495-505 s
+  cards were the ones that outlasted the executor). First-run cards 05, 08 and 12 are split:
+  `05-r2` (sig, t8-15) and `05b-r2` (ablation); `08-r2` and `08b-r2` likewise; `12-r2`,
+  `12b-r2`, `12c-r2` run `f4r,f4n` on `c15-3-4` targets 0-3, 4-11, 12-15 (each recomputes the
+  held-out trace, which is charged once in the cell total, as in the first run).
+* Outputs are `raw/card-NN-r2-<command>.{stdout,stderr}.log` and `raw/receipt-card-NN-r2.json`;
+  no first-run path is written. `make_cards_r2.py` generates the cards.
+* After the r2 cards, `b06 summarize` is re-run over `raw/`; that card is frozen only once the r2
+  outputs are committed (it reads them), by the same pattern as the other items' verdict cards.

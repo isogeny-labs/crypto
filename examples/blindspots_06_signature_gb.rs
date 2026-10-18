@@ -1806,6 +1806,21 @@ impl<'a> Sig<'a> {
         Some(SRow { poly: r, idx: ix as u32, sig: s, pk, seq: self.seq })
     }
 
+    /// Repair pass (PROTOCOL.md deviation 15): the candidate list of a step can grow past the
+    /// address-space limit in one reallocation (Vec doubling), which aborts the process before
+    /// the periodic memory check runs. Before a reallocation, stop with `memcap` when the doubled
+    /// buffer would not fit under the cap. Changes no counted quantity of a job that finishes.
+    #[inline]
+    fn grow_ok(&self, cands: &Vec<Cand>) -> Result<(), Status> {
+        if cands.len() == cands.capacity() && self.lim.vm_cap != 0 {
+            let need = (cands.capacity().max(4) * 2 * std::mem::size_of::<Cand>()) as u64;
+            if vm_bytes() + need > self.lim.vm_cap {
+                return Err(Status::MemCap);
+            }
+        }
+        Ok(())
+    }
+
     fn step(&mut self, d: u32) -> Result<bool, Status> {
         let t_pairs = Instant::now();
         self.seen.clear();
@@ -1818,6 +1833,7 @@ impl<'a> Sig<'a> {
             while bits != 0 {
                 let v = bits.trailing_zeros() as u8;
                 bits &= bits - 1;
+                self.grow_ok(&cands)?;
                 cands.push(Cand { a: b, b: NONE, var: v });
             }
             self.fpl[b as usize] = 0;
@@ -1829,6 +1845,7 @@ impl<'a> Sig<'a> {
                 while x != 0 {
                     let a = w * 64 + x.trailing_zeros() as usize;
                     x &= x - 1;
+                    self.grow_ok(&cands)?;
                     cands.push(Cand { a: a as u32, b: b as u32, var: 0 });
                 }
             }
@@ -3069,7 +3086,14 @@ fn mode_summarize(a: &Args) {
         .map(|e| e.path())
         .filter(|p| p.to_string_lossy().ends_with(".stdout.log"))
         .collect();
-    files.sort();
+    // Repair pass (PROTOCOL.md deviation 17): a re-run (`-r2` in the file name) is read after the
+    // first-run files so it replaces a row of the same (cell, target, arm); a descriptive long run
+    // (`-long-` in the file name, a different touch cap) never enters the rule's table.
+    files.retain(|p| !p.file_name().map(|n| n.to_string_lossy().contains("-long-")).unwrap_or(false));
+    files.sort_by_key(|p| {
+        let n = p.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default();
+        (n.contains("-r2"), n)
+    });
     for f in files {
         let txt = std::fs::read_to_string(&f).unwrap_or_default();
         for line in txt.lines() {
