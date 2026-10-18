@@ -2790,6 +2790,10 @@ pub fn run_cover_dlp(
     let mut next_attempt = unknowns;
     let mut la_ops = 0u64;
     let cap = 400 * (unknowns as u64) * 720;
+    // Opt-in, read-only: JV_LP_LOG=1 prints one `LPLOG {json}` line per decomposition
+    // (its six factor-base indices and abscissae).  Used by the large-prime
+    // feasibility study; nothing below depends on it.
+    let lp_log = std::env::var("JV_LP_LOG").is_ok();
     'collect: while rep.residuals < cap {
         let mut batch: Vec<(u64, u64, Div<E2>, u64)> = Vec::with_capacity(64);
         for _ in 0..64 {
@@ -2864,6 +2868,17 @@ pub fn run_cover_dlp(
             for d in decs {
                 any = true;
                 rep.decompositions += 1;
+                if lp_log {
+                    eprintln!(
+                        "LPLOG {{\"p\":{},\"seed\":{},\"residual\":{},\"base\":{},\"idx\":{:?},\"x\":{:?}}}",
+                        p,
+                        seed,
+                        rep.residuals,
+                        small,
+                        d.terms.iter().map(|t| t.0).collect::<Vec<_>>(),
+                        d.terms.iter().map(|t| base[t.0].x).collect::<Vec<_>>()
+                    );
+                }
                 let mut cols: Vec<(usize, u64)> = d
                     .terms
                     .iter()
