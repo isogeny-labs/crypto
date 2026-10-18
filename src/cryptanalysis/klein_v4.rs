@@ -1113,3 +1113,68 @@ pub fn lift_back_v4(
     lb.decompositions = found.into_iter().collect();
     lb
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::cryptanalysis::quartic_folds::{generate_klein_instance, klein_base};
+    use rand::SeedableRng;
+
+    /// A planted sum of four base points from four distinct translation
+    /// orbits comes back with its 64 translates, the quotient is 64, and
+    /// every returned quadruple sums to `±R` in the group (§9.10, E22).
+    #[test]
+    fn v4_solve_returns_the_planted_orbit_of_decompositions() {
+        let ki = generate_klein_instance(37, 1, 64).unwrap();
+        let curve = ki.inst.curve();
+        let f = &curve.f;
+        let mut rng = StdRng::seed_from_u64(7);
+        let fb = klein_base(&ki, &mut rng).unwrap();
+        let pre = SymmetrisedV4::precompute(&ki, &curve, &mut rng, 4).unwrap();
+        let mut pick: Vec<usize> = Vec::new();
+        for i in 0..fb.points.len() {
+            if pick.iter().all(|&j| fb.col[j] != fb.col[i]) {
+                pick.push(i);
+            }
+            if pick.len() == 4 {
+                break;
+            }
+        }
+        assert_eq!(pick.len(), 4, "four distinct columns");
+        let b = &fb.points;
+        let r = curve.add(
+            &curve.sub(&curve.add(&b[pick[0]], &b[pick[1]]), &b[pick[2]]),
+            &b[pick[3]],
+        );
+        let z_r = ki.z_of_x(f, &r.x).unwrap();
+        let mut fp = 0u64;
+        let comps = v4_system(&pre, f, &z_r, &mut fp);
+        let mut st = QuarticSolve::default();
+        let (sols, _) = solve_weighted_traced(
+            &comps,
+            MACAULAY_BOUND,
+            37,
+            &mut rng,
+            &mut st,
+            true,
+            false,
+            None,
+            None,
+        );
+        assert!(sols.is_some(), "{}", st.outcome);
+        assert_eq!(st.dim, 64);
+        let lb = lift_back_v4(&ki, &curve, &sols.unwrap(), &r, &mut rng);
+        let z_of = |i: usize| ki.z_of_x(f, &b[i].x).unwrap().0[0];
+        let mut planted: [u64; 4] = core::array::from_fn(|k| z_of(pick[k]));
+        planted.sort_unstable();
+        assert!(
+            lb.decompositions.contains(&planted),
+            "the planted quadruple is missing"
+        );
+        assert_eq!(
+            lb.decompositions.len() % 64,
+            0,
+            "translates come in orbits of 64"
+        );
+    }
+}

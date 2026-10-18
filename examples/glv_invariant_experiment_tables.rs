@@ -2000,7 +2000,10 @@ fn e24(o: &mut String, rows: &[&Value]) {
 
 fn pipeline_tables(o: &mut String, rows: &[&Value], id: &str, what: &str) {
     let rows = sorted(rows, &["bits", "seed"]);
-    let _ = writeln!(o, "### {id} — the k = 4 index calculus end to end with {what}\n");
+    let _ = writeln!(
+        o,
+        "### {id} — the k = 4 index calculus end to end with {what}\n"
+    );
     o.push_str("| p | seed | log2 n | h | base | cols | targets | unsolved | reruns | decompositions (off base, check failures) | rows | y | core (φ) | C median | C mean | correct (log, walks) |\n");
     o.push_str("|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|--:|--:|:--|\n");
     for r in &rows {
@@ -2034,7 +2037,10 @@ fn pipeline_tables(o: &mut String, rows: &[&Value], id: &str, what: &str) {
                 .all(|w| bool_at(w, "correct"))),
         );
     }
-    let _ = writeln!(o, "\n#### {id} — where the multiplications go, and the distance to rho\n");
+    let _ = writeln!(
+        o,
+        "\n#### {id} — where the multiplications go, and the distance to rho\n"
+    );
     o.push_str("| p | seed | precompute | base | generation | Weil | solves | lift-back | checks | LA ×16 | solves share | other than solves | S total | rho (negation) | S / rho | registered 0.584·C/p, C = 1.3e9 | measured / registered | 0.584·C/p at this curve's mean C | measured / that |\n");
     o.push_str("|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|\n");
     let mut fit: Vec<(f64, f64)> = Vec::new();
@@ -2074,7 +2080,10 @@ fn pipeline_tables(o: &mut String, rows: &[&Value], id: &str, what: &str) {
         fmt_f(fit_exponent(&fit)),
         fit.len()
     );
-    let _ = writeln!(o, "#### {id} — unpriced native work at 0, 0.1 and 1 GAE (AGENTS.md §5a)\n");
+    let _ = writeln!(
+        o,
+        "#### {id} — unpriced native work at 0, 0.1 and 1 GAE (AGENTS.md §5a)\n"
+    );
     o.push_str("Native work: one operation per Macaulay-matrix entry (rows · cols of each call's last degree) for the index calculus, one per step for each walk; a GAE is one affine addition in E(F_{p⁴}) at the curve's measured F_p multiplications.\n\n");
     o.push_str("| p | seed | GAE (F_p mults) | S / rho at 0 | at 0.1 | at 1 | order holds |\n|--:|--:|--:|--:|--:|--:|:--|\n");
     for r in &rows {

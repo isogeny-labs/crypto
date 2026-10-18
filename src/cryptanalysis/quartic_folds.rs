@@ -1316,7 +1316,7 @@ fn collect_and_solve(
         rows_readded,
         rows_readd_failures,
         call: CallStats::of(calls),
-        precompute_muls: precompute_muls,
+        precompute_muls,
         base_muls,
         generation_muls: gen_muls,
         weil_muls,
