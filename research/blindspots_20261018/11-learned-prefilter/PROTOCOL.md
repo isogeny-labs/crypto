@@ -257,3 +257,38 @@ each card. Nothing in `src/` or `Cargo.toml` is touched.
 frozen rule), an SVG and PNG graph, and `REPORT.pdf` after the runs. No leaderboard
 row and no `benchmarks/` entry is warranted (a stage diagnostic with no
 speed claim); the integration step decides.
+
+## Card plan (appended 2026-10-18, before any measured run; adds no design change)
+
+Instrument: `examples/blindspots_11_learned_prefilter.rs` (std-only Rust,
+compiled by `rustc`, Deviation 1). Smoke test, at the smallest cell with
+reduced sizes (n = 17, m = 2, population U, 300 targets per base, 3
+permutations, 100 pilot targets; not a measured result, not used by the
+verdict): `smoke/smoke-n17-m2-U-per300-perms3.jsonl`, and the instrument
+self-test `smoke/selftest.txt` (0 failures; decomposer equals brute force on
+every point of `E(F_2^11)` and `E(F_2^13)`; planted-label positive controls
+pass for both models; permuted labels give AUC in [0.45, 0.55]). The smoke
+run's `planted_trace` control passed for both models (AUC 1.0, refutation
+rate 1.0). Timings from reduced runs (single thread) set the split below.
+
+Every measured cell uses `--per-base 2000 --perms 20 --pilot 400` (the code
+default of 10 permutations is overridden to the frozen 20) and lets the pilot
+choose `l`. One thread, `prlimit --as=4294967296` on every job. Each card
+builds its own binary into `target/blindspots-11/card-NN/` and removes it at
+the end (a binary that lingers in the tree would fail the card linter's
+"names a repository file that binds does not pin" rule on the next card).
+
+| card | contents | estimated run time |
+| --- | --- | --- |
+| 01 | build, `selftest`, (n,m,pop) = (17,2,U) (17,2,S) (17,3,U) | about 4 min |
+| 02 | build, (17,3,S) (19,2,U) (19,2,S) (19,3,U) | about 5 min |
+| 03 | build, (19,3,S) (23,2,U) (23,2,S) (23,3,U) | about 6.5 min |
+| 04 | build, (23,3,S) (29,3,U) (29,3,S) | about 6 min |
+| 05 | build, (29,2,U) (29,2,S) | about 5 min |
+| 06 | build, `verdict --dir raw` (reads every `raw/*.jsonl`), remove binary | seconds |
+
+Total measured about 27 CPU-minutes, far under the 2 CPU-hour budget. The
+sixteen cell-populations of the frozen cell list are each run exactly once;
+no cell is dropped, merged or re-run. Raw outputs: `raw/n<N>-m<M>-<pop>.jsonl`
+(stdout) and `.log` (stderr), `raw/selftest.txt`, `raw/verdict.txt`,
+`raw/receipt-card-NN.json`.
