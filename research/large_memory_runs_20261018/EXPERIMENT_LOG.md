@@ -29,6 +29,8 @@ checkout `/home/ec2-user/crypto`, and are committed to branch
 | 4 | `XP-20261015-shape-g1-frozen-cells`, sizing probe (13, 5), d_max = 7, random, 1 × 1, seed 1, 1 thread, 64 GB address cap, 4 h wall cap | `research/shape_search_g1_frozen_cells_20261018/probe/probe.sh 13:5:7 64 14400` | 06:11:00 | 10:11:05 | **killed at the 4 h wall cap** (exit 137), no draw finished, sampled peak RSS 7.7 GB: time, not memory, limits (13, 5) at d_max = 7 on one thread | `probe/probe-13-5-7.{jsonl,err,meta}` (empty jsonl), `probe/progress.txt` |
 | 6 | same card, probe (13, 5) d_max = 7, 8 threads, 64 GB cap, 12 h wall | `probe/probe.sh 13:5:7 64 43200 8` | 10:12 | — | running (does threading help?) | `probe/probe-13-5-7-th8.*` |
 | 7 | same card, probe (13, 5) d_max = 6, 1 thread, 64 GB cap, 4 h wall | `probe/probe.sh 13:5:6 64 14400 1` | 10:12 | — | running (fallback sizing) | `probe/probe-13-5-6-th1.*` |
+| 9 | same card, probes (17, 6) and (19, 7) at d_max = 6, 1 thread, 24 GB cap, 4 h wall | `probe/probe.sh 17:6:6 24 14400 1`, `probe/probe.sh 19:7:6 24 14400 1` | 10:35 | — | running | `probe/probe-17-6-6-th1.*`, `probe/probe-19-7-6-th1.*` |
+| 10 | same card, probes (17, 6) and (19, 7) at d_max = 7, 1 thread, 24 GB cap, 12 h wall | `probe/probe.sh 17:6:7 24 43200 1`, `probe/probe.sh 19:7:7 24 43200 1` | 10:35 | — | running | `probe/probe-17-6-7-th1.*`, `probe/probe-19-7-7-th1.*` |
 
 Planned, not started: PKM `main 1`, `confirm T D` for each finished target,
 `verify`; the shape card's PROTOCOL.md (sized from run 4), then its three
@@ -46,5 +48,6 @@ cells `13:5:7`, `17:6:7`, `19:7:7` as the card's shards.
 - 2026-10-18 06:05–06:13: the first autocommit loop failed silently on a
   missing pathspec; replaced. First commit `67e221167` at 06:13.
 - 2026-10-18 07:59: target 0 stopped at the protocol's `--max-dense C` cap (engine source: `f4_fp_tower.rs` stops as oversize when `dense_entries > max_dense`; the trace's `oversize: --max-nnz` wording is generic). The degree-8 step needs a B' of 7.93e10 entries (≈ 317 GB, ≈ 460 GB at round 7's 1.45 peak ratio): the card's 133–146 GB projection assumed D stays at 7 and is too low, as PROTOCOL.md §4.4 warned. Under §5 the reading is for the coordinator: the degree-7 closure was exhausted without refuting, and the degree-8 step did no productive reduction before the cap (`muladds` 0). Target 1 runs with identical flags, as §5 requires.
+- 2026-10-18 10:30: the 8-thread (13, 5) probe runs at one core (97% CPU): `factor_base_shape_ladder g1` does not parallelise a draw, so threads do not shorten a cell.
 - A swap file was not created (permission denied by the session's policy),
   so there is no cushion beyond the protocol's `ulimit -v`.
