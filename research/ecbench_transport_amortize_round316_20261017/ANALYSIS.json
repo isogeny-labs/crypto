@@ -1,0 +1,123 @@
+{
+  "caveat": "a distinguished-point rho fleet sharing tables across targets can also amortize; this is a multi-target mechanism screen, not a one-target speedup",
+  "fits": [
+    {
+      "amortized_candidate_exponent": 0.47636538616615387,
+      "amortized_candidate_r2": 0.99795673927959,
+      "amortized_targets": 16,
+      "note": "finite-size fits over the frozen T=16 cells; not asymptotic proofs",
+      "rho_exponent": 0.42280387968861466,
+      "rho_r2": 0.990252733831456,
+      "sizes": 4
+    }
+  ],
+  "reference": "rho.signed_frobenius_strong, one cold target per execution, no reusable precomputation",
+  "rows": [
+    {
+      "aa_exact": true,
+      "amortized_per_target_ratio": 0.6857866258063038,
+      "amortized_per_target_ratio_ci95": [
+        0.6303600485229053,
+        0.7400762338360994
+      ],
+      "amortized_targets": 16,
+      "candidate_mean_amortized_per_target_gae": 2796.5822749687495,
+      "candidate_mean_total_gae": 44745.31639949999,
+      "gate_amortized_ci_excludes_one": true,
+      "log2_r": 27.78083708554834,
+      "measured_pairs": 40,
+      "online_fraction_of_total": 0.8411870933361104,
+      "online_gae_mean": 37639.182642499996,
+      "rho_mean_gae": 4077.918946991288,
+      "session": "holdout-n37-t16",
+      "shared_cold_gae_mean": 7106.133757000001,
+      "total_ratio": 10.97258601290086,
+      "total_ratio_ci95": [
+        10.085760776366484,
+        11.841219741377591
+      ],
+      "total_records": 144,
+      "verified": 144
+    },
+    {
+      "aa_exact": true,
+      "amortized_per_target_ratio": 1.020305090244522,
+      "amortized_per_target_ratio_ci95": [
+        0.8785864046148484,
+        1.1907942298500973
+      ],
+      "amortized_targets": 16,
+      "candidate_mean_amortized_per_target_gae": 112703.86963936251,
+      "candidate_mean_total_gae": 1803261.9142298002,
+      "gate_amortized_ci_excludes_one": false,
+      "log2_r": 39.00000151433405,
+      "measured_pairs": 40,
+      "online_fraction_of_total": 0.8666515180654139,
+      "online_gae_mean": 1562799.6754368,
+      "rho_mean_gae": 110460.95007950247,
+      "session": "holdout-n41-t16",
+      "shared_cold_gae_mean": 240462.2387929997,
+      "total_ratio": 16.324881443912354,
+      "total_ratio_ci95": [
+        14.057382473837574,
+        19.052707677601557
+      ],
+      "total_records": 144,
+      "verified": 144
+    },
+    {
+      "aa_exact": true,
+      "amortized_per_target_ratio": 0.9078944748648509,
+      "amortized_per_target_ratio_ci95": [
+        0.7804902750295911,
+        1.0634238853591744
+      ],
+      "amortized_targets": 16,
+      "candidate_mean_amortized_per_target_gae": 9982.31875,
+      "candidate_mean_total_gae": 159717.1,
+      "gate_amortized_ci_excludes_one": false,
+      "log2_r": 32.112779548336775,
+      "measured_pairs": 40,
+      "online_fraction_of_total": 0.8631768295317158,
+      "online_gae_mean": 137864.1,
+      "rho_mean_gae": 10995.02092628767,
+      "session": "holdout-n43-t16",
+      "shared_cold_gae_mean": 21853.0,
+      "total_ratio": 14.526311597837614,
+      "total_ratio_ci95": [
+        12.487844400473458,
+        17.01478216574679
+      ],
+      "total_records": 144,
+      "verified": 144
+    },
+    {
+      "aa_exact": true,
+      "amortized_per_target_ratio": 1.0663672216899245,
+      "amortized_per_target_ratio_ci95": [
+        0.945006122585621,
+        1.221391105880517
+      ],
+      "amortized_targets": 16,
+      "candidate_mean_amortized_per_target_gae": 47741.6421875,
+      "candidate_mean_total_gae": 763866.275,
+      "gate_amortized_ci_excludes_one": false,
+      "log2_r": 36.635865112243344,
+      "measured_pairs": 40,
+      "online_fraction_of_total": 0.8777299076333747,
+      "online_gae_mean": 670468.275,
+      "rho_mean_gae": 44770.35791839277,
+      "session": "holdout-n47-t16",
+      "shared_cold_gae_mean": 93398.0,
+      "total_ratio": 17.06187554703879,
+      "total_ratio_ci95": [
+        15.120097961369936,
+        19.54225769408827
+      ],
+      "total_records": 144,
+      "verified": 144
+    }
+  ],
+  "schema": "transport-log-amortize-round315/v1",
+  "unit": "counted GAE; the amortized per-target unit divides the candidate's whole-execution cost by the named amortized_targets"
+}
