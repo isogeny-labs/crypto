@@ -25,7 +25,7 @@ instances relative to the static order WDSat uses?
 * **The incumbent, the instance family and the CryptoMiniSat arm are already
   measured on 60 instances; that result is reused and cited, not re-measured.**
   `crypto-autoresearcher/experiments/EXP-ICPERF-66fd51/runs/RUN-ICPERF-305ca3/results.jsonl`
-  (sha256 `429f455a...e0f0`, merged by PR 2331) holds, for the 60 Trimoska
+  (sha256 `429f455a...e0f0`, in the tree after PR 2331) holds, for the 60 Trimoska
   `EC-Index-Calculus-Benchmarks` instances `n15l5`, `n17l6`, `n19l6` (ids 1-10
   `S`, 11-20 `U`; git `a053971c`), stock WDSat's printed decision counter under
   the default order (and `-g 1..3l`, which equals it) and CryptoMiniSat 5.11.15
@@ -34,8 +34,11 @@ instances relative to the static order WDSat uses?
   an unsatisfiable instance costs 30,874 to 31,448 WDSat decisions at `l = 5`
   and 254,599 to 255,969 at `l = 6`, i.e. 0.94 of the `2^(3l)` leaves: the
   default order prunes only at the last levels; a bad order (`e`-variables
-  first, "noncore_first") costs 10^2 to 10^3 times more; CryptoMiniSat needs
-  3 to 10 times more decisions than WDSat on the same instances.
+  first, "noncore_first") costs 10^2 to 10^3 times more; CryptoMiniSat
+  5.11.15 needs 2.4 to 11.4 times more decisions than WDSat on the 28
+  unsatisfiable instances it finished (two timed out at 300 s) and 0.9 to 254
+  times on the satisfiable ones; satisfiable instances cost WDSat 10 to 144,329
+  decisions, depending on where the first model lies.
 * **No learned branching rule, no non-default static order and no dynamic rule
   has been measured on this family.** `research/pdp_oracle_speedup_20261011/protocols/PS-7.md`
   (dynamic order on a different oracle, "expected negative", not run),
@@ -226,10 +229,10 @@ Card plan (all `experiment_id: BLINDSPOT-08`, `background: false`):
 Before this freeze the engine was run unmeasured, on seeds 1 and 5 and on the
 committed corpus, to choose `l` and the caps: unsatisfiable trees cost 30.8k
 decisions (4.4M decisions+propagations, 0.4 s) at `l = 5` for every `n` in
-23..37, 255k (44M, 3.7 s) at `l = 6`, a factor 8.3 per unit of `l`, and 10-95%
-of that for satisfiable targets depending on where the first model lies;
+23..37, 255k (44M, 3.7 s) at `l = 6`, a factor 8.3 per unit of `l`, and anything from 0.03%
+to full for satisfiable targets, depending on where the first model lies;
 identity, structural and random orders differ by 2% on unsatisfiable trees; the
-first-variable rollout labels at a root span 0.1 bit (4%). Dynamic scoring
+first-variable rollout labels at a root span 0.06 bit (4%). Dynamic scoring
 costs about 450 `W` per decision. A smoke pipeline (`smoke/`) ran the whole
 chain at `n = 23` on 2 P + 2 R targets with seed 1.
 
@@ -243,7 +246,8 @@ chain at `n = 23` on 2 P + 2 R targets with seed 1.
    `n`, `P/D ~ 140`, and the replica runs at about 11 million assignments per
    second, so `l = 11` to 12 (`n ~ 33..37`, the factor base for which a
    decomposition is expected) would cost about `8e9..6e10` decisions, about
-   `10^5` s (35 hours) **per instance**; `l = 7` already costs 2M decisions.
+   `10^5` s (a day) per instance at `l = 11` and 8 times that at `l = 12`;
+   `l = 7` already costs 2M decisions.
    The cells therefore keep the design's field degrees and sample sizes with a
    small factor base, which makes almost every random target unsatisfiable (hence
    the planted half). The published corpus is also `l = 5, 6`.
