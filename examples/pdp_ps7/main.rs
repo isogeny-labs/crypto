@@ -696,6 +696,87 @@ fn cmd_fidelity(args: &[String]) {
     }
 }
 
+/// `count-check --l L --corpus F [--targets K]` (build with `--features pdp-opcount`): the library's
+/// instrumented field-operation counters against the harness' own counts, for the plain loop (`a1`, whose
+/// counts are derived from the structure of `kernel.rs`) and for the one-pair leaf (`a1u`, counted by hand),
+/// over `K` refuted targets.  The instrumented counters include the products and squarings inside every
+/// inversion; the inversion's own cost is measured once and subtracted, so that the comparison is of the
+/// operations outside inversions and of the number of inversions.
+#[cfg(feature = "pdp-opcount")]
+fn cmd_count_check(args: &[String]) {
+    use crypto_lib::cryptanalysis::semaev_decomp::opcount;
+    use std::hint::black_box;
+    let l: u32 = arg(args, "--l").expect("--l");
+    let path = arg_s(args, "--corpus").expect("--corpus");
+    let text = std::fs::read_to_string(&path).unwrap_or_else(|e| panic!("{path}: {e}"));
+    let loaded = read_corpus(&text);
+    let rung = Rung::new(l);
+    let k: usize = arg(args, "--targets").unwrap_or(2);
+    assert!(rung.gf.folds(), "counts are defined for the folding path");
+    let refuted: Vec<(u64, u64)> = loaded
+        .recs
+        .iter()
+        .filter(|r| !r.t.planted && r.roots.is_empty())
+        .map(|r| (r.t.xr, r.t.yr))
+        .take(k)
+        .collect();
+    let sol = ArtinSchreier::new(&rung.gf);
+    let kernel = ScalarKernel::new(&rung.gf, &sol, l);
+    let tab = BaseTable::new(base_points(&rung.gf, &sol, l), l);
+    let m = tab.xs.len() as u64;
+    opcount::reset();
+    black_box(rung.gf.inv(0x1234_5671 & rung.mask() | 1));
+    let ci = opcount::snapshot();
+    let mut out = Vec::new();
+    for arm in ["a1", "a1u"] {
+        opcount::reset();
+        let mut mine = LeafCounts::default();
+        for &r in &refuted {
+            if arm == "a1" {
+                out.clear();
+                let (found, pairs) = kernel.run(r, false, &mut out);
+                assert!(!found);
+                mine = mine.plus(&plain_loop_counts(m, rows_entered(m, pairs), pairs));
+            } else {
+                let mut leaf = GroupLeaf::new(&rung.gf, l, &tab, r);
+                let (found, _, _) = plain_loop(&mut leaf, false);
+                assert!(!found);
+                mine = mine.plus(&leaf.counts());
+            }
+        }
+        let c = opcount::snapshot();
+        let pairs = (m * (m + 1) / 2 * refuted.len() as u64) as f64;
+        let inst_mul_outside = c.mul as i64 - (c.inv * ci.mul) as i64 + c.batch_mul as i64;
+        let inst_sqr_outside = c.sqr as i64 - (c.inv * ci.sqr) as i64;
+        let inst_sqrk_outside = c.sqr_k as i64 - (c.inv * ci.sqr_k) as i64;
+        println!(
+            "{}",
+            json!({
+                "kind": "count-check", "arm": arm, "l": l, "targets": refuted.len(), "pairs": pairs as u64,
+                "instrumented": {"mul": c.mul, "sqr": c.sqr, "sqr_k": c.sqr_k, "inv": c.inv,
+                                 "batch_calls": c.batch_calls, "batch_elems": c.batch_elems, "batch_mul": c.batch_mul},
+                "one_inversion_inside": {"mul": ci.mul, "sqr": ci.sqr, "sqr_k": ci.sqr_k, "inv": ci.inv},
+                "instrumented_outside_inversions": {"mul_incl_batch": inst_mul_outside, "sqr": inst_sqr_outside, "sqr_k": inst_sqrk_outside},
+                "harness": leaf_json(&mine),
+                "per_pair": {
+                    "instrumented_mul_outside": inst_mul_outside as f64 / pairs,
+                    "harness_mul": mine.mul as f64 / pairs,
+                    "instrumented_sqr_outside": inst_sqr_outside as f64 / pairs,
+                    "harness_sqr": mine.sqr as f64 / pairs,
+                    "instrumented_inv": c.inv as f64 / pairs,
+                    "harness_inv": mine.inv as f64 / pairs,
+                },
+            })
+        );
+    }
+}
+
+#[cfg(not(feature = "pdp-opcount"))]
+fn cmd_count_check(_args: &[String]) {
+    eprintln!("build with --features pdp-opcount");
+    std::process::exit(2);
+}
+
 fn cmd_graph_stats(args: &[String]) {
     let l: u32 = arg(args, "--l").expect("--l");
     let n: u32 = arg(args, "--n").unwrap_or(3 * l);
@@ -885,6 +966,7 @@ fn main() {
         Some("reg") => cmd_reg(&args),
         Some("fidelity") => cmd_fidelity(&args),
         Some("graph-stats") => cmd_graph_stats(&args),
+        Some("count-check") => cmd_count_check(&args),
         Some("summarize") => cmd_summarize(&args),
         _ => {
             eprintln!(

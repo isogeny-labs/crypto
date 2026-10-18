@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # PS-7: CDCL with an algebraic leaf, and dynamic branching (protocols/PS-7.md).
 #
-#   PS7_STAGES=all|build|test|graph|fidelity|counts|verify|reg|timing|summary   (default all)
+#   PS7_STAGES=all|build|test|graph|fidelity|countcheck|counts|verify|reg|timing|summary   (default all)
 #
 # Every heavy command goes through `tools/isolated_bench.py busy --wait` (the benchmark lock); the timed stage uses
 # `tools/isolated_bench.py run --cpus $PS7_CPU` (reserved core, contention recorded).  Counts do not depend on
@@ -28,7 +28,13 @@ try() {   # try LABEL CMD... : run, log a failure, keep going
   local label=$1; shift
   if ! "$@"; then echo "$(date -u +%FT%TZ) FAILED: $label :: $*" >> "$OUT/failures.log"; FAIL=1; fi
 }
-want() { [ "$STAGES" = all ] || [ "$STAGES" = "$1" ]; }
+want() {   # want STAGE: is it selected?  Selected stages log the host they ran on (the container can move between hosts).
+  if [ "$STAGES" = all ] || [ "$STAGES" = "$1" ]; then
+    echo "$(date -u +%FT%TZ) stage=$1 host=$(hostname) cpu=\"$(lscpu | sed -n 's/^Model name: *//p')\" mhz=$(lscpu | sed -n 's/^CPU MHz: *//p') kernel=$(uname -r) up=$(cut -d' ' -f1 /proc/uptime)s" >> "$OUT/host_per_stage.log"
+    return 0
+  fi
+  return 1
+}
 
 if want build; then
   busy cargo build --release --example pdp_ps7 2>&1 | tee "$OUT/build.log"
@@ -58,6 +64,16 @@ if want fidelity; then
   : > "$OUT/fidelity.jsonl"
   for l in $RUNGS; do
     try fidelity-$l busy "$BIN" fidelity --l "$l" --corpus "$C/corpus_l$l.txt" --targets 16 --out "$OUT/fidelity.jsonl" > /dev/null
+  done
+fi
+
+if want countcheck; then   # instrumented field-operation counters (a second build, feature pdp-opcount) against the harness' counts
+  OPBIN=${PS7_OPTARGET:-target/ps7op}/release/examples/pdp_ps7
+  CARGO_TARGET_DIR=${PS7_OPTARGET:-target/ps7op} busy cargo build --release --example pdp_ps7 --features pdp-opcount 2>&1 | tail -n 5
+  sha256sum "$OPBIN" > "$OUT/binary_hash_opcount.txt"
+  : > "$OUT/count_check.jsonl"
+  for l in $RUNGS; do
+    try countcheck-$l busy "$OPBIN" count-check --l "$l" --corpus "$C/corpus_l$l.txt" --targets 2 >> "$OUT/count_check.jsonl"
   done
 fi
 
