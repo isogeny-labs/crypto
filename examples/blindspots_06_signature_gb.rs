@@ -1617,20 +1617,42 @@ impl<'a> Sig<'a> {
         false
     }
 
+    /// Selection degree of the pair (a, b): the degree of the lcm (F4 normal strategy), or with
+    /// crit bit 6 the degree of the pair signature (as a polynomial-ring monomial).
+    #[inline]
+    fn pair_deg(&self, a: usize, b: usize) -> u32 {
+        let (ea, eb) = (&self.g[a], &self.g[b]);
+        let lcm = ea.lm | eb.lm;
+        if self.crit & 64 == 0 {
+            return lcm.count_ones();
+        }
+        let da = ea.sig.count_ones() + (lcm & !ea.lm).count_ones();
+        let db = eb.sig.count_ones() + (lcm & !eb.lm).count_ones();
+        da.max(db)
+    }
+    #[inline]
+    fn field_deg(&self, b: usize) -> u32 {
+        if self.crit & 64 == 0 {
+            self.g[b].lm.count_ones() + 1
+        } else {
+            self.g[b].sig.count_ones() + 1
+        }
+    }
+
     fn min_degree(&self) -> Option<u32> {
         let mut best = u32::MAX;
         for b in 0..self.g.len() {
             let lb = self.g[b].lm;
             let f = self.fpl[b];
             if f != 0 {
-                best = best.min(lb.count_ones() + 1);
+                best = best.min(self.field_deg(b));
             }
             for (w, &word) in self.un[b].iter().enumerate() {
                 let mut x = word;
                 while x != 0 {
                     let a = w * 64 + x.trailing_zeros() as usize;
                     x &= x - 1;
-                    let d = (self.g[a].lm | lb).count_ones();
+                    let d = self.pair_deg(a, b);
                     if d < best {
                         best = d;
                     }
@@ -1717,7 +1739,7 @@ impl<'a> Sig<'a> {
         for b in 0..self.g.len() {
             let lb = self.g[b].lm;
             let f = self.fpl[b];
-            if f != 0 && lb.count_ones() + 1 == d {
+            if f != 0 && self.field_deg(b) == d {
                 let mut bits = f;
                 while bits != 0 {
                     let v = bits.trailing_zeros() as u8;
@@ -1733,7 +1755,7 @@ impl<'a> Sig<'a> {
                     let bit = x.trailing_zeros() as usize;
                     x &= x - 1;
                     let a = w * 64 + bit;
-                    if (self.g[a].lm | lb).count_ones() == d {
+                    if self.pair_deg(a, b) == d {
                         cands.push(Cand { a: a as u32, b: b as u32, var: 0 });
                         clear |= 1u64 << bit;
                     }
@@ -2255,6 +2277,7 @@ fn run_arm(arm: &str, eqs: &[Poly], nv: usize, lim: &Limits, tr: &Traces, own: &
         "sig0" => exec(Kind::Sig(0), eqs, nv, lim, false, None),
         "sig4" => exec(Kind::Sig(15), eqs, nv, lim, false, None),
         "sigc" => exec(Kind::Sig(FULL | 32), eqs, nv, lim, false, None),
+        "sigs" => exec(Kind::Sig(FULL | 64), eqs, nv, lim, false, None),
         "f4r" => exec_replay(Kind::F4, eqs, nv, lim, tr.f4.as_ref().expect("f4 trace")),
         "sigr" => exec_replay(Kind::Sig(FULL), eqs, nv, lim, tr.sig.as_ref().expect("sig trace")),
         "f4rs" => exec_replay(Kind::F4, eqs, nv, lim, own.f4.as_ref().expect("own f4 trace")),
