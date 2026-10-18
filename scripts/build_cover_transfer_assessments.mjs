@@ -8,8 +8,8 @@ import { dirname, resolve } from "node:path";
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(SCRIPT_DIR, "..");
 const OUTPUT_PATH = "docs/curves/cover-transfer-assessments.json";
-const ASSESSMENT_DATE = "2026-10-14";
-const CATALOG_COMMIT = "ff48e2800f62b45c746b3f391540c07b16af4e75";
+const ASSESSMENT_DATE = "2026-10-18";
+const CATALOG_COMMIT = "f8501268305c0c84d0e077a4ab9054c07ff74540";
 const MAP_HASH_DOMAIN = "cover-transfer-assessments/v2/map_base";
 const SUBGROUP_HASH_DOMAIN = "cover-transfer-assessments/v2/subgroup_base";
 
@@ -1549,7 +1549,7 @@ async function buildLedger() {
         control: "odd_degree2_transfer",
         assessment: freshness(
           "refuted",
-          "claim that the current one-infinity odd-prime implementation supports the 1,940 even-sextic source models",
+          "claim that the current one-infinity odd-prime implementation supports the 2,407 even-sextic source models",
           "The current model contract and the catalog infinity configuration are structurally incompatible.",
           ["src/prime_hyperelliptic/curve.rs", "docs/curves/covers.json"],
         ),
@@ -1620,7 +1620,7 @@ async function buildLedger() {
       "No search for production targets, private keys, or discrete logarithms was performed.",
       "All 2,572 map rows and all 977 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
       "The 165 catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
-      "The 1,940 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
+      "The 2,407 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
       "Generator checks and [r]G=O do not by themselves prove that every catalog integer r is the exact source order.",
       "Formula-screen outputs in jacobian-transfers.json were not promoted to executable or measured claims.",
       "A full cover-integrated Jacobian index-calculus solver, relation collection, linear algebra, and target decomposition remain a separate deliverable. The bounded odd-prime one-infinity solver library is outside these catalog-cover paths.",
