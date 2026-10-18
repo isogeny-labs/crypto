@@ -1,0 +1,122 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "comprehensive generic sweep, prime-order curves over 16..32-bit primes",
+  "description": "Method × size scaling study (prime curves, bits of p 16,18,20,22,24,26,28,30,32; 2 independent single-target workload(s) per curve, 3 interleaved round(s)). One curve per size so `ecbench bound fit` and `ecbench report` can fit cost against r. Counted group operations; a measurement, not a performance claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 16,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 18,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 22,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 24,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 30,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 59297
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 20261002
+  },
+  "arms": [
+    {
+      "name": "rho-plain",
+      "role": "baseline",
+      "method": {
+        "id": "rho.plain",
+        "params": {}
+      }
+    },
+    {
+      "name": "rho-negation",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation",
+        "params": {}
+      }
+    },
+    {
+      "name": "bsgs-textbook",
+      "role": "candidate",
+      "method": {
+        "id": "bsgs.textbook",
+        "params": {}
+      }
+    },
+    {
+      "name": "bsgs-interleaved",
+      "role": "candidate",
+      "method": {
+        "id": "bsgs.interleaved",
+        "params": {}
+      }
+    },
+    {
+      "name": "bsgs-negation",
+      "role": "candidate",
+      "method": {
+        "id": "bsgs.negation",
+        "params": {}
+      }
+    },
+    {
+      "name": "kangaroo-vow",
+      "role": "candidate",
+      "method": {
+        "id": "kangaroo.vow",
+        "params": {}
+      }
+    },
+    {
+      "name": "rho-negation-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation",
+        "params": {}
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 1,
+    "isolation_required": "L2",
+    "timeout_seconds": 300
+  }
+}
