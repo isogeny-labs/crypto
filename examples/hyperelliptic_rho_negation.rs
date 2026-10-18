@@ -31,8 +31,6 @@ const RHO_RUNS: u64 = 40;
 const MAX_STEPS: usize = 200_000_000;
 
 struct Row {
-    genus: u32,
-    p: u64,
     n: f64,
     plain_walk: f64,
     folded_walk: f64,
@@ -115,8 +113,6 @@ fn main() {
             let r = RHO_RUNS as f64;
             let nf: f64 = n.to_string().parse().expect("N fits f64");
             let row = Row {
-                genus,
-                p,
                 n: nf,
                 plain_walk: pw / r,
                 folded_walk: fw / r,
