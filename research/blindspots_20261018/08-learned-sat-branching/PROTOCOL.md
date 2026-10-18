@@ -209,20 +209,26 @@ percentile interval).
 
 One thread, `prlimit --as=4294967296` per job; peak memory is a few MB (the
 largest system has about 2,000 atoms at `l = 6`). At most 2 CPU-hours measured;
-the card plan below is about 40 CPU-minutes. Each card finishes in under nine
+the card plan below is about 25 CPU-minutes. Each card finishes in under nine
 minutes (per-command timeouts sum to less than that). Build products go to
 `target/blindspots-08/<card>/` and are removed at the end of each card; the CMS
 binary (static, 15 MB) is built once outside the cards in `target/` and bound by
 sha256. Nothing in `src/` or `Cargo.toml` is touched.
 
-Card plan (all `experiment_id: BLINDSPOT-08`, `background: false`):
+Card plan (all `experiment_id: BLINDSPOT-08`, `background: false`; each card builds
+the instrument with `rustc` into its own `target/blindspots-08/card-NN/` and
+removes it; per-command timeouts of every card sum to under 540 s):
 
-1. build, `selftest`, `corpus` on all 60 instances (replica fidelity);
+1. `selftest` and `corpus` on all 60 corpus instances (replica fidelity);
 2. `samples` at `n = 23, 25`; 3. `samples` at `n = 27, 29`;
-4. `fit` (model file, validation, shuffled controls);
+4. `fit` (model file, validation, shuffled-label controls);
 5. test cells `n = 31, 33`; 6. test cells `n = 35, 37`;
-7. secondary `l = 6` cells; 8. CryptoMiniSat arm on a subset;
-9. `summarize` (primary and secondary tables, by size and population).
+7. secondary `l = 6` cell `n = 31`; 8. secondary `l = 6` cell `n = 37`;
+9. arm (e), CryptoMiniSat on 3 P + 3 R at `n = 31` (binary bound by sha256);
+10. `summarize`: primary table (the rule), secondary table, CMS table.
+
+Cards 1 to 4 and 10 are in order; 5 to 9 need card 4's model file. The expected
+total is about 25 CPU-minutes.
 
 ### Pilot calibration disclosed (not reused)
 
