@@ -427,8 +427,16 @@ impl Store {
         let key = object_key(&sha256)?;
         let present: Option<Meta> = remote.head(&key)?;
         let uploaded = match present {
-            Some(m) if m.bytes == bytes => false,
-            _ => {
+            Some(m) => {
+                if m.bytes != bytes || m.sha256.as_deref() != Some(sha256.as_str()) {
+                    return Err(format!(
+                        "{key}: existing remote object has {} bytes and digest {:?}; expected {bytes} bytes and {sha256}",
+                        m.bytes, m.sha256
+                    ));
+                }
+                false
+            }
+            None => {
                 remote.put(&key, file, &sha256)?;
                 let after = remote
                     .head(&key)?
@@ -439,12 +447,11 @@ impl Store {
                         after.bytes
                     ));
                 }
-                if let Some(s) = &after.sha256 {
-                    if *s != sha256 {
-                        return Err(format!(
-                            "{key}: the remote recorded digest {s}, expected {sha256}"
-                        ));
-                    }
+                if after.sha256.as_deref() != Some(sha256.as_str()) {
+                    return Err(format!(
+                        "{key}: the remote recorded digest {:?}, expected {sha256}",
+                        after.sha256
+                    ));
                 }
                 true
             }
@@ -505,10 +512,9 @@ impl Store {
                         RemoteState::Mismatch(format!("{} bytes, index says {}", m.bytes, e.bytes))
                     }
                     Some(m) => match m.sha256 {
-                        Some(s) if s != e.sha256 => {
-                            RemoteState::Mismatch(format!("recorded digest {s}"))
-                        }
-                        _ => RemoteState::Ok,
+                        Some(s) if s == e.sha256 => RemoteState::Ok,
+                        Some(s) => RemoteState::Mismatch(format!("recorded digest {s}")),
+                        None => RemoteState::Mismatch("remote has no recorded digest".into()),
                     },
                 })
             } else {
@@ -726,6 +732,10 @@ mod tests {
         let key = object_key(&r.sha256).unwrap();
         fs::remove_file(root.join("remote").join(&key)).unwrap();
         fs::write(root.join("remote").join(&key), b"tampered").unwrap();
+        let rows = s.verify(&[], true).unwrap();
+        assert!(matches!(rows[0].remote, Some(RemoteState::Mismatch(_))));
+        let push_err = s.push("x", &src, PushMeta::default()).unwrap_err();
+        assert!(push_err.contains("existing remote object"), "{push_err}");
         let mut cfg = s.cfg.clone();
         cfg.cache_dir = root.join("fresh");
         let t = Store::open(cfg).unwrap();

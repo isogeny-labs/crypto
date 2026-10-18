@@ -28,8 +28,8 @@ use super::index::validate_sha256;
 pub struct Meta {
     pub bytes: u64,
     /// The object's SHA-256 when the backend knows it: S3's stored checksum,
-    /// the digest recorded in a multipart object's metadata, or the key of a
-    /// [`DirBackend`] object.
+    /// the digest recorded in a multipart object's metadata, or the hash of a
+    /// [`DirBackend`] object's bytes.
     pub sha256: Option<String>,
 }
 
@@ -154,10 +154,13 @@ impl Backend for DirBackend {
     fn head(&self, key: &str) -> Result<Option<Meta>, String> {
         let path = self.path(key)?;
         match fs::metadata(&path) {
-            Ok(m) if m.is_file() => Ok(Some(Meta {
-                bytes: m.len(),
-                sha256: key.rsplit('/').next().map(str::to_string),
-            })),
+            Ok(m) if m.is_file() => {
+                let (sha256, bytes) = super::hash_file(&path)?;
+                Ok(Some(Meta {
+                    bytes,
+                    sha256: Some(sha256),
+                }))
+            }
             Ok(_) => Err(format!("{} is not a file", path.display())),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
             Err(e) => Err(format!("{}: {e}", path.display())),
@@ -393,15 +396,32 @@ pub fn parse_head(stdout: &[u8]) -> Result<Meta, String> {
         .get("ContentLength")
         .and_then(|n| n.as_u64())
         .ok_or("head-object output has no ContentLength")?;
-    // A single-PUT object carries S3's own SHA-256; a multipart one carries
-    // the digest we put in its metadata.
-    let sha256 = match v.get("ChecksumSHA256").and_then(|s| s.as_str()) {
-        Some(b64) => Some(b64_to_hex(b64)?),
-        None => v
-            .get("Metadata")
-            .and_then(|m| m.get("sha256"))
-            .and_then(|s| s.as_str())
-            .map(str::to_string),
+    // A multipart SHA-256 checksum may be composite rather than the digest
+    // of the object's bytes. Our multipart path records that full digest in
+    // user metadata. A single PUT uses S3's direct checksum.
+    let metadata_sha256 = v
+        .get("Metadata")
+        .and_then(|m| m.get("sha256"))
+        .and_then(|s| s.as_str())
+        .map(str::to_string);
+    let sha256 = if v.get("ChecksumType").and_then(|s| s.as_str()) == Some("COMPOSITE") {
+        metadata_sha256
+    } else {
+        match v.get("ChecksumSHA256").and_then(|s| s.as_str()) {
+            Some(b64) => {
+                let direct = b64_to_hex(b64)?;
+                if metadata_sha256
+                    .as_ref()
+                    .is_some_and(|stored| stored != &direct)
+                {
+                    return Err(
+                        "head-object direct checksum disagrees with SHA-256 metadata".into(),
+                    );
+                }
+                Some(direct)
+            }
+            None => metadata_sha256,
+        }
     };
     Ok(Meta { bytes, sha256 })
 }
@@ -481,11 +501,7 @@ impl Backend for S3Backend {
                 // Someone stored this key first. Content addressing makes
                 // that fine only if what is there is what we meant to store.
                 return match self.head(key)? {
-                    Some(m)
-                        if m.bytes == len && m.sha256.as_deref().is_none_or(|s| s == sha256) =>
-                    {
-                        Ok(())
-                    }
+                    Some(m) if m.bytes == len && m.sha256.as_deref() == Some(sha256) => Ok(()),
                     _ => Err(format!(
                         "{key}: an object with a different size or digest already holds this key"
                     )),
@@ -688,6 +704,24 @@ mod tests {
         .unwrap();
         assert_eq!(c.sha256.as_deref(), Some(D));
         assert!(parse_head(br#"{"ContentLength": 9, "ChecksumSHA256": "AAAA"}"#).is_err());
+        let composite = parse_head(
+            format!(
+                r#"{{"ContentLength": 9, "ChecksumType": "COMPOSITE", "ChecksumSHA256": "{}", "Metadata": {{"sha256": "{D}"}}}}"#,
+                hex_to_b64(&"00".repeat(32)).unwrap()
+            )
+            .as_bytes(),
+        )
+        .unwrap();
+        assert_eq!(composite.sha256.as_deref(), Some(D));
+        assert!(parse_head(
+            format!(
+                r#"{{"ContentLength": 9, "ChecksumType": "FULL_OBJECT", "ChecksumSHA256": "{}", "Metadata": {{"sha256": "{}"}}}}"#,
+                hex_to_b64(D).unwrap(),
+                "00".repeat(32)
+            )
+            .as_bytes()
+        )
+        .is_err());
 
         let l = parse_list(
             br#"{"Contents":[{"Key":"p/sha256/ab/x","Size":3},{"Key":"p/sha256/aa/y","Size":5}]}"#,

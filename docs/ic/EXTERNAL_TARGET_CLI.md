@@ -169,7 +169,9 @@ object with a `pairs` array. Every entry has `plaintext_hex`,
 in hex. The command checks that each pair has the expected four-byte
 diffusion pattern, intersects round-10 key candidates by affected column,
 reverses the key schedule when every column has one survivor, and verifies
-the master key by encrypting every supplied plaintext. An unresolved set of
+the master key by encrypting every supplied plaintext. It also replays each
+faulted ciphertext by injecting a nonzero byte fault at the declared round-9
+boundary under that key. An unresolved set of
 candidates is reported as `bounded_ambiguous` with a nonzero exit status;
 contradictory or malformed pairs also fail. The input may be a file path or
 a `store:`/`sha256:` artifact reference. The reproducible public input and
@@ -182,7 +184,9 @@ The input SHA-256 is
 Its 16 correct ciphertexts also match independent OpenSSL AES-128-ECB
 encryption under the recovered key. The corpus varies all four injected
 source rows in each of the four MixColumns columns; every column has one
-surviving round-key tuple.
+surviving round-key tuple. The release report records
+`faulted_pairs_replayed: 16` after the recovered master key reproduces every
+faulted ciphertext through an injected round-9 byte fault.
 
 `aes-dfa-schedule` reverses a supplied AES-128 round-10 key to the master
 key and checks that forward expansion reproduces it. The example round key

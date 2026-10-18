@@ -75,7 +75,7 @@ figure stays visible as the "was".
 | `store info <spec>` | one entry in full |
 | `store push <file> --name N` | upload (skipped if the remote already holds the bytes), cache, index |
 | `store pull <spec> [--out P]` | make available locally, print the path |
-| `store verify [names] [--remote]` | re-hash cached objects; with `--remote`, confirm each object exists with the indexed size and digest |
+| `store verify [names] [--remote]` | re-hash cached objects; with `--remote`, check existence, size, and required digest metadata through S3 HEAD, or re-hash a file-backed remote |
 | `store gc [--apply]` | drop cached objects the index no longer names (dry run by default) |
 | `store rm <name>` | remove a name from the index |
 
@@ -114,10 +114,18 @@ HTTP stack. Uploads follow the `isogeny_walk::store` conventions:
   compared again.
 * **Large objects.** Past 4 GiB a single PUT is not possible, so the upload
   is multipart through `aws s3 cp`, with the digest in user metadata. S3
-  cannot check a whole-object SHA-256 across parts, so the guarantee for
-  those objects rests on the hash taken on download.
+  can return a composite SHA-256 for multipart HEAD requests, so the store
+  uses its recorded full-object digest metadata for HEAD comparisons. The
+  byte-level guarantee for those objects rests on the hash taken on download.
 * **Checked on download.** Every object is hashed as it enters the cache, and
   a mismatch is discarded.
+
+For S3, `verify --remote` checks metadata without downloading an object. A
+matching HEAD response is an existence and metadata check; a missing digest
+is reported as a mismatch. `push` likewise refuses to accept an existing
+object without the indexed digest. Use `store pull` into a fresh cache to
+hash the downloaded bytes against the index. The file-backed remote hashes
+its bytes directly for HEAD and remote verification.
 
 The IAM permissions needed are `s3:GetObject`, `s3:PutObject` and
 `s3:ListBucket` on the bucket and prefix. S3 answers `403` rather than `404`

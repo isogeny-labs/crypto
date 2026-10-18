@@ -305,6 +305,7 @@ pub struct DfaFaultPair {
 #[derive(Clone, Debug)]
 pub struct DfaRecovery {
     pub pairs_used: usize,
+    pub faulted_pairs_replayed: usize,
     pub pairs_by_column: [usize; 4],
     pub candidates_by_column: [usize; 4],
     pub last_round_key: Option<[u8; 16]>,
@@ -424,6 +425,7 @@ pub fn dfa_full_recovery(pairs: &[DfaFaultPair]) -> Result<DfaRecovery, String> 
         std::array::from_fn(|column| survivors[column].as_ref().map_or(0, HashSet::len));
     let mut report = DfaRecovery {
         pairs_used: pairs.len(),
+        faulted_pairs_replayed: 0,
         pairs_by_column,
         candidates_by_column,
         last_round_key: None,
@@ -448,6 +450,33 @@ pub fn dfa_full_recovery(pairs: &[DfaFaultPair]) -> Result<DfaRecovery, String> 
         .any(|pair| cipher.encrypt(&pair.plaintext) != pair.correct_ciphertext)
     {
         return Err("unique DFA candidate failed full AES plaintext/ciphertext replay".into());
+    }
+    for (pair_index, pair) in pairs.iter().enumerate() {
+        let row_zero_changed = (0..16)
+            .step_by(4)
+            .find(|&index| pair.correct_ciphertext[index] != pair.faulted_ciphertext[index])
+            .expect("validated fault pair has four changed bytes");
+        // The final ShiftRows leaves row zero in its MixColumns column.
+        // Independently replay the declared injection boundary, source row,
+        // and nonzero byte fault under the recovered master key.
+        let column = row_zero_changed / 4;
+        let matches = (0..4).any(|row| {
+            (1u16..=255).any(|difference| {
+                inject_fault_round_9(
+                    &cipher,
+                    &pair.plaintext,
+                    ((column + row) % 4) * 4 + row,
+                    difference as u8,
+                )
+                .1 == pair.faulted_ciphertext
+            })
+        });
+        if !matches {
+            return Err(format!(
+                "fault pair {pair_index} failed full AES round-9 fault replay"
+            ));
+        }
+        report.faulted_pairs_replayed += 1;
     }
     report.last_round_key = Some(last_round);
     report.master_key = Some(master);
@@ -700,8 +729,12 @@ mod tests {
                         ^ (trial as u8).wrapping_mul(29)
                         ^ (i as u8).wrapping_mul(17)
                 });
-                let (correct_ciphertext, faulted_ciphertext) =
-                    inject_fault_round_9(&cipher, &plaintext, column * 4, fault);
+                let (correct_ciphertext, faulted_ciphertext) = inject_fault_round_9(
+                    &cipher,
+                    &plaintext,
+                    ((column + trial) % 4) * 4 + trial,
+                    fault,
+                );
                 pairs.push(DfaFaultPair {
                     plaintext,
                     correct_ciphertext,
@@ -712,6 +745,7 @@ mod tests {
         let recovered = dfa_full_recovery(&pairs).unwrap();
         assert_eq!(recovered.pairs_by_column, [4; 4]);
         assert_eq!(recovered.candidates_by_column, [1; 4]);
+        assert_eq!(recovered.faulted_pairs_replayed, pairs.len());
         assert_eq!(recovered.master_key, Some(master));
         assert!(recovered.verified);
 

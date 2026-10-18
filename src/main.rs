@@ -1479,6 +1479,7 @@ fn cmd_aes_dfa(input: &Path) -> Result<(), String> {
             "operation": "aes-dfa",
             "fault_model": "single-byte-before-round-9-subbytes",
             "pairs_used": report.pairs_used,
+            "faulted_pairs_replayed": report.faulted_pairs_replayed,
             "pairs_by_column": report.pairs_by_column,
             "candidate_tuples_by_column": report.candidates_by_column,
             "last_round_key_hex": report.last_round_key.map(|key| to_hex(&key)),
