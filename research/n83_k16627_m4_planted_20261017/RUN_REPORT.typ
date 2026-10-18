@@ -34,6 +34,12 @@ memory, zero swap, no network and a read-only root. Its UTC interval was
 01:11:04 to 01:41:04. `pinned/` contains the outer outcome, container state,
 host config, cgroup peak and empty stdout/stderr.
 
+The pre-stack release library suite passed 4,216 tests with 117 ignored.
+After stacking on the capacity-study branch, its release build stopped at
+26 inherited ecbench/Gaudry compilation errors before tests ran. The two
+touched Rust files pass formatting; repository-wide formatting fails on
+four unchanged files. `VALIDATION.md` links the complete logs and commands.
+
 The worker wrote no phase or result JSON before the outer timeout. The
 stopped phase cannot be identified from this receipt, and a SAT answer or
 group relation cannot be inferred. The earlier full-model capacity pass is
