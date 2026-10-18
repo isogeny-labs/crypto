@@ -25,6 +25,7 @@
 #   ordinary sigma table  exact polynomial-coordinate table in the
 #                       witness-carrying ordinary sigma walk (default 0)
 #   PACKED_CLMUL_FLAT  issue 128-bit Karatsuba as 3x lo then 3x hi clmad
+#   PACKED_CLMAD_SELF  product clmads as clmad r,r,y,r on a copy, XOR-corrected (default 0)
 #   PACKED_PAIR_CLMUL  twelve-clmad interleaved pair product (default 0)
 #   PACKED_ALU_SQR  ONB sqr131 on the logic pipe instead of clmad (default 0)
 #   PACKED_SQUARE_TABLE  lambda^2 with its reduced half from a shared table
@@ -144,6 +145,8 @@ PACKED_ONB_INV ?= 0
 PACKED_FROM_REDUCED ?= 0
 PACKED_SIGMA_TABLE ?= 0
 PACKED_CLMUL_FLAT ?= 0
+# 1: product CLMADs in the in-place accumulate form (benchmarks/clmad-pairs).
+PACKED_CLMAD_SELF ?= 0
 PACKED_PAIR_CLMUL ?= 0
 PACKED_ALU_SQR ?= 0
 # The table walk of ITERATION-FUNCTION.md §4 (tablewalk.h) in place of sigma^j + 1.
@@ -310,6 +313,7 @@ DEFS = -DECC_BATCH=$(BATCH) -DECC_THREADS=$(THREADS) -DECC_MINBLOCKS=$(MINBLOCKS
        -DECC_PACKED_FROM_REDUCED=$(PACKED_FROM_REDUCED) \
        -DECC_PACKED_SIGMA_TABLE=$(PACKED_SIGMA_TABLE) \
        -DECC_PACKED_CLMUL_FLAT=$(PACKED_CLMUL_FLAT) \
+       -DECC_PACKED_CLMAD_SELF=$(PACKED_CLMAD_SELF) \
        -DECC_PACKED_PAIR_CLMUL=$(PACKED_PAIR_CLMUL) \
        -DECC_PACKED_ALU_SQR=$(PACKED_ALU_SQR) \
        -DECC_WALK_TABLE=$(WALK_TABLE) -DECC_TABLE_BRANCHES=$(TABLE_BRANCHES) \
@@ -846,6 +850,21 @@ gpu-rtx-pro6000-sigma-fused:
 PRO6000_SIGMA_TABLE_KNOBS = $(PRO6000_SIGMA_FUSED_KNOBS) THREADS=512 MINBLOCKS=1 PACKED_SIGMA_TABLE=1
 gpu-rtx-pro6000-sigma-table:
 	$(MAKE) -B ecc2k130 ARCH="$(PRO6000_ARCH)" $(PRO6000_SIGMA_TABLE_KNOBS)
+# The sigma-table build with the persisting L2 window and tail layout, promoted
+# by benchmarks/sigma-table-tuned at the automatic worker count (17.088 vs
+# 16.029 B/s against the 385,024-worker campaign shape).  Run it without
+# --threads: at 385,024 workers the window covers 20% of the state and the
+# gain is 0.3%.  The campaign preset is unchanged.
+PRO6000_SIGMA_TABLE_L2_KNOBS = $(PRO6000_SIGMA_TABLE_KNOBS) PACKED_L2_PERSIST=1 PACKED_TAIL_LAYOUT=1
+gpu-rtx-pro6000-sigma-table-l2:
+	$(MAKE) -B ecc2k130 ARCH="$(PRO6000_ARCH)" $(PRO6000_SIGMA_TABLE_L2_KNOBS)
+.PHONY: gpu-rtx-pro6000-sigma-table-l2
+
+# The sigma-table preset plus explicit overrides (last assignment wins), for
+# sweeps around the campaign walk: make gpu-preset-sigma KNOBS="THREADS=576".
+gpu-preset-sigma:
+	$(MAKE) -B ecc2k130 ARCH="$(PRO6000_ARCH)" $(PRO6000_SIGMA_TABLE_KNOBS) $(KNOBS)
+.PHONY: gpu-preset-sigma
 
 # Same-walk DP32 candidate: retain the ordinary witness-carrying sigma walk,
 # but evaluate I+sigma^j directly from the exact polynomial-coordinate nibble
