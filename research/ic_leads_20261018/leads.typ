@@ -21,7 +21,7 @@ Five closure arguments are settled enough that a lead failing one is not a lead:
 - *L4 4E-class stratification* (accounting): $a = 0$ Koblitz curves carry a 2-bit class in $E\/4E$; EXP-H conditioned on one bit. Re-score the committed draws by class.
 - *L5 coset-indicator degree* — piloted, negative as a predictor (below).
 - *L6, L7 theorem and lemma*: write the $m >= 3$ shape-closure argument and the admissible-degree inequality as statements the FFD programme can cite; neither exists in writing.
-- *L8 K-233 derived row*: $"ord"_233(2) = 29$, eight stable 29-blocks, admissible degree 3–4 at $w = 1$; a distance row for the one standard Koblitz curve where Frobenius structure helps the algebra. Not analysed anywhere.
+- *L8 K-233 derived row*: $"ord"_233(2) = 29$, eight stable 29-blocks, admissible degree 3–4 under the $C(N, <= D)^(2.2)$ cost and 7–8 under the $w = 1$ lower bound; a distance row for the one standard Koblitz curve where Frobenius structure helps the algebra. Not analysed anywhere.
 - *L9 G4 stable non-subspace bases*: closed by counting (87 conditions, 22 cubic, $3n$ unknowns).
 - *L10 ladder accounting*: Lead A ran positive twice; two documents still list it as scheduled.
 

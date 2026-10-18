@@ -58,7 +58,7 @@ leads = [
     ("L5 coset-indicator degree (pilot)", ["pass", "pass", "closed: ≈ ℓ−1 on every V", "n/a", "n/a"]),
     ("L6 theorem: shape closure m ≥ 3", ["n/a", "n/a", "formalises it", "n/a", "n/a"]),
     ("L7 lemma: admissible degree", ["n/a", "n/a", "n/a", "formalises it", "n/a"]),
-    ("L8 K-233 derived row", ["pass", "stable 29-blocks exist", "pass", "D ≤ 3–4 at w = 1", "n/a"]),
+    ("L8 K-233 derived row", ["pass", "stable 29-blocks exist", "pass", "D ≤ 3–4 (cols^2.2) / 7–8 (w = 1)", "n/a"]),
     ("L9 G4 stable non-subspace base", ["pass", "escapes (not a subspace)", "untested", "3n unknowns: fails", "n/a"]),
     ("L10 ladder: retire online rows (Lead A)", ["is the bound", "n/a", "n/a", "n/a", "n/a"]),
 ]
