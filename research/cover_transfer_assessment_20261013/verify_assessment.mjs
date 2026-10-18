@@ -13,12 +13,27 @@ const registryPath = path.join(curvesDir, "registry.json");
 const reportPath = path.join(curvesDir, "covers.json");
 const graphPath = path.join(curvesDir, "cover-links.yaml");
 const assessmentPath = path.join(curvesDir, "cover-transfer-assessments.json");
+const expectedCatalogCommit = "ff48e2800f62b45c746b3f391540c07b16af4e75";
+const pinnedCatalogPaths = new Set([
+  "docs/curves/registry.json",
+  "docs/curves/covers.json",
+  "docs/curves/cover-links.yaml",
+]);
 
-const readJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
-const registry = readJson(registryPath);
-const report = readJson(reportPath);
-const graph = readJson(graphPath);
-const assessment = readJson(assessmentPath);
+function sourceBytes(relativePath) {
+  if (pinnedCatalogPaths.has(relativePath)) {
+    return execFileSync("git", ["show", `${expectedCatalogCommit}:${relativePath}`], {
+      cwd: root,
+      maxBuffer: 32 * 1024 * 1024,
+    });
+  }
+  return fs.readFileSync(path.join(root, relativePath));
+}
+
+const registry = JSON.parse(sourceBytes("docs/curves/registry.json"));
+const report = JSON.parse(sourceBytes("docs/curves/covers.json"));
+const graph = JSON.parse(sourceBytes("docs/curves/cover-links.yaml"));
+const assessment = JSON.parse(fs.readFileSync(assessmentPath, "utf8"));
 
 function canonicalJson(value) {
   if (Array.isArray(value)) {
@@ -370,7 +385,7 @@ check(graph.curves.length === 2100, "unexpected graph curve-node count");
 check(Object.keys(graph.maps).length === 2100, "unexpected CV1 map count");
 check(Object.keys(graph.covers).length === 2098, "unexpected HC1 cover count");
 
-const registryBytes = fs.readFileSync(registryPath);
+const registryBytes = sourceBytes("docs/curves/registry.json");
 check(report.registry_sha256 === sha256(registryBytes), "covers.json registry digest mismatch");
 check(graph.registry_sha256 === report.registry_sha256, "cover-links registry digest mismatch");
 
@@ -796,7 +811,6 @@ check(
 );
 
 const expectedStatusVocabulary = ["unknown", "supported", "refuted", "not_applicable"];
-const expectedCatalogCommit = "ff48e2800f62b45c746b3f391540c07b16af4e75";
 const expectedRootKeys = [
   "assessment_date",
   "catalog_commit",
@@ -1025,7 +1039,7 @@ const expectedSemanticDigests = {
   claim_contract: "36a2bb9524810994c02633462e71ae08ac88da6fbb520df72e66e05150628634",
   result_templates: "74d48723d80213cef7032b499e2d36a051ebed3c23e03bfce5819ad80f5edb7c",
   profiles: "807800e78066e8c3b0caa6634072a585cf4ae924a40b13817d9ca7a3c0aa3710",
-  controls: "6ef9bbf2eed4dd04ff0025f06c6d6b73e62519c54519e356c0dc7e3c22eb1850",
+  controls: "62ebc38eeed44bfb643b14d7054bf2dca74b9b0d783f57cb65da5aec676d87a9",
   open_obligations: "142a997795d925f10923d7fc4adb80bfa886ca7d5c46f5a911529d8538189629",
   global_cost_accounting:
     "b3b77a401d4dd76cabfc9a65d5a738fcfb977fd1a3abc2db3733c41820304619",
@@ -1108,27 +1122,12 @@ check(
   assessment.catalog_commit === expectedCatalogCommit,
   "assessment catalog commit changed",
 );
-for (const relativePath of [
-  "docs/curves/registry.json",
-  "docs/curves/covers.json",
-  "docs/curves/cover-links.yaml",
-]) {
-  try {
-    const committedBytes = execFileSync(
-      "git",
-      ["show", `${assessment.catalog_commit}:${relativePath}`],
-      { cwd: root, encoding: "buffer", maxBuffer: 32 * 1024 * 1024 },
-    );
-    check(
-      sha256(committedBytes) === sha256(fs.readFileSync(path.join(root, relativePath))),
-      `catalog file ${relativePath} does not match catalog_commit ${assessment.catalog_commit}`,
-    );
-  } catch (error) {
-    check(
-      false,
-      `cannot resolve catalog_commit ${assessment.catalog_commit} for ${relativePath}: ${error.message}`,
-    );
-  }
+for (const relativePath of pinnedCatalogPaths) {
+  check(
+    sha256(sourceBytes(relativePath)) ===
+      assessment.source_artifacts.find((artifact) => artifact.path === relativePath)?.sha256,
+    `catalog file ${relativePath} is not pinned to catalog_commit ${assessment.catalog_commit}`,
+  );
 }
 check(
   canonicalJson(assessment.status_vocabulary) === canonicalJson(expectedStatusVocabulary),
@@ -1159,11 +1158,14 @@ for (const artifact of sourceArtifacts) {
   sourceArtifactPaths.add(artifact.path);
   const absolute = resolveRepoPath(artifact.path);
   check(absolute !== null, "unsafe source-artifact path " + String(artifact.path));
-  check(absolute !== null && fs.existsSync(absolute), "missing source artifact " + String(artifact.path));
-  if (absolute !== null && fs.existsSync(absolute)) {
+  check(
+    absolute !== null && (pinnedCatalogPaths.has(artifact.path) || fs.existsSync(absolute)),
+    "missing source artifact " + String(artifact.path),
+  );
+  if (absolute !== null && (pinnedCatalogPaths.has(artifact.path) || fs.existsSync(absolute))) {
     check(
       /^[0-9a-f]{64}$/u.test(artifact.sha256) &&
-        sha256(fs.readFileSync(absolute)) === artifact.sha256,
+        sha256(sourceBytes(artifact.path)) === artifact.sha256,
       "source-artifact digest mismatch for " + artifact.path,
     );
   }

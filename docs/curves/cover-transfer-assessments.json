@@ -16,7 +16,7 @@
       "freshness": {
         "status": "supported",
         "scope": "the exact input registry for all 2,100 assessed map rows",
-        "rationale": "The digest is computed from the current file and every membership is joined through its model hash.",
+        "rationale": "The digest is computed from the catalog_commit blob and every membership is joined through its model hash.",
         "evidence_refs": [
           "docs/curves/registry.json"
         ]
@@ -28,7 +28,7 @@
       "role": "generated curve-level geometry catalog",
       "freshness": {
         "status": "supported",
-        "scope": "all 2,100 current verified-over-declared-field geometry rows",
+        "scope": "all 2,100 catalog_commit verified-over-declared-field geometry rows",
         "rationale": "The ledger derives every map profile predicate from this exact file.",
         "evidence_refs": [
           "docs/curves/covers.json"
@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "841f1e987a462e620448925793fc529db80512cf7aa30c270fbe775907a4f4a7",
+      "sha256": "4ae308ad82ef9a5f1355218a8a8b66ff4c85582c3f94b7d7ff5875cd6b833159",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -128,7 +128,7 @@
     },
     {
       "path": "src/bin/hyperelliptic_cover.rs",
-      "sha256": "f75dbfb50bce3b63a6dd2291320d006cfcf05bc4d7071731bf5bfef44a0c021d",
+      "sha256": "ffdc8814741baec7b1ffbddd73b5273af7438486223701e32d01438f3d678628",
       "role": "standalone CLI and native binary subgroup batch certificate",
       "freshness": {
         "status": "supported",
@@ -208,7 +208,7 @@
     },
     {
       "path": "Cargo.toml",
-      "sha256": "72ed7dff4b38c32bb53f58f8b44a51daf819813ce3e183aa34d9e86e9e425d79",
+      "sha256": "bce1095d381cc258288d3ad51de9597b5c18b2babf428ec210bf8f28af79fc3f",
       "role": "exact implementation-version dependency: Cargo.toml",
       "freshness": {
         "status": "supported",
@@ -221,7 +221,7 @@
     },
     {
       "path": "Cargo.lock",
-      "sha256": "ac5cd7a3459be776180afe1eb2975c76b1a88f84bd1e99aa20475927ec260a90",
+      "sha256": "45223ac12cb2f0d1c2f478342515a4d06fa5d80badfa41f22eeca61dcbb7803b",
       "role": "exact implementation-version dependency: Cargo.lock",
       "freshness": {
         "status": "supported",
@@ -234,7 +234,7 @@
     },
     {
       "path": ".github/workflows/curve-covers.yml",
-      "sha256": "03cb3b3771ab1502d8fa3521952ad0cfab72d3963f3f8068900240446b66eaae",
+      "sha256": "38abaf0f8cd2772354c3ffe465b64ba3d154abe7d4c41fe3c7eb5d548613109d",
       "role": "exact implementation-version dependency: .github/workflows/curve-covers.yml",
       "freshness": {
         "status": "supported",
@@ -247,7 +247,7 @@
     },
     {
       "path": ".github/workflows/release.yml",
-      "sha256": "0da341d9e036ad4696f18324163666a06ff5bbcfdfb497f3c1723b5a87f5bfbd",
+      "sha256": "357376e0a9f1036af36e1e7baddad8a9025552b8985de985dd15471a5faf8ae5",
       "role": "exact implementation-version dependency: .github/workflows/release.yml",
       "freshness": {
         "status": "supported",
@@ -286,7 +286,7 @@
     },
     {
       "path": "src/binary_ecc/f2m.rs",
-      "sha256": "2bc2a1f55887ef7db1fdb1ce5a6cd05c86b7c75e9eb8ade36497ff5686b37fd3",
+      "sha256": "cd25cffcb1d904be8fd8da059f4f0379c1bb60e566592f741e5ca3ee68223548",
       "role": "exact implementation-version dependency: src/binary_ecc/f2m.rs",
       "freshness": {
         "status": "supported",
@@ -312,7 +312,7 @@
     },
     {
       "path": "src/binary_ecc/curve.rs",
-      "sha256": "e4dae09dd5aa4f9f8eb22b9413b0fc00e08b70c1b284455c165d93d4c7c04fca",
+      "sha256": "ceb94d849e17ec0ae678463f2d8a0a3f970f6de6713003abf0544395eb1dcd62",
       "role": "exact implementation-version dependency: src/binary_ecc/curve.rs",
       "freshness": {
         "status": "supported",
@@ -325,7 +325,7 @@
     },
     {
       "path": "src/cryptanalysis/mod.rs",
-      "sha256": "49801c9c62c924f24a1db81608d9e19bc988c2ebde694f4ee7b85df1d7b669b5",
+      "sha256": "a2ce25bacbe559f226e857fb3f782c84f8db003661896a6472b23ae4d7e763b7",
       "role": "exact implementation-version dependency: src/cryptanalysis/mod.rs",
       "freshness": {
         "status": "supported",
@@ -443,7 +443,7 @@
     },
     {
       "path": "docs/curves/jacobian-transfers.json",
-      "sha256": "f06c271c03ec5b3fb9f592ab1ff4b67e45c8a796305506590e0b8500300e7ab4",
+      "sha256": "ea5e33fc96249b6c6e25bd8ab4f206b1661d62fa6699393c8e6dbdd5afa79009",
       "role": "legacy formula-screen inventory; not a transfer certificate",
       "freshness": {
         "status": "refuted",
@@ -458,7 +458,7 @@
     },
     {
       "path": "docs/curves/JACOBIAN_TRANSFERS.md",
-      "sha256": "277918373c2c556ba209830eaae686e8df15c27ccac77207102b1bc6fd728fc5",
+      "sha256": "47b619f17e9fe913170edb3b8bf8ab2ed806be5d330514d8303e91edc07eeb36",
       "role": "legacy formula-screen documentation pinned for the stale-inventory finding",
       "freshness": {
         "status": "supported",
@@ -484,7 +484,7 @@
     },
     {
       "path": "docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md",
-      "sha256": "b140b28e7cb40878ff7ee37520d9a606079607784f67deb3f003b2f3674abab9",
+      "sha256": "8fae841818d4324e314bb55735f521dc83e15f0dec2997872fa4399be7b4a95e",
       "role": "standalone CLI and supported-model documentation",
       "freshness": {
         "status": "supported",
@@ -536,7 +536,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
-      "sha256": "3c2487e809350bbe74384952d588f0927a05b1951acac01377069543a9b62951",
+      "sha256": "8e049c63fd6d77136ae5f8c7b5a62179c261d614d0a365536b451cbf4e732d16",
       "role": "independent catalog-wide assessment verifier",
       "freshness": {
         "status": "supported",
@@ -60630,7 +60630,7 @@
     "subgroup_membership_entries": 664,
     "map_profiles": 4,
     "subgroup_profiles": 2,
-    "scope_note": "Every current map UID and every exact [EC1, curve UID, map UID] triple has one base profile. Assessment means each claim receives an explicit supported, refuted, unknown, or not-applicable result; it does not mean every transfer capability is supported."
+    "scope_note": "Every catalog_commit map UID and every exact [EC1, curve UID, map UID] triple has one base profile. Assessment means each claim receives an explicit supported, refuted, unknown, or not-applicable result; it does not mean every transfer capability is supported."
   },
   "global_cost_accounting": [
     {
@@ -60820,7 +60820,7 @@
       "control": "published_artifact",
       "assessment": {
         "status": "refuted",
-        "scope": "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 2,100 current catalog models",
+        "scope": "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 2,100 catalog_commit models",
         "rationale": "Direct artifact replay covered only its bundled 592-row registry. Static comparison of the pinned source allowlist with the current partition places 160 binary and 586 direct prime-field forms inside that syntactic domain, and 1,324 extension-field plus 30 normalized-target forms outside it; this 746/1,354 split is not a 2,100-command artifact receipt. Current source adds those paths but has not been published in that artifact.",
         "evidence_refs": [
           "research/cover_transfer_assessment_20261013/release_replay.txt",

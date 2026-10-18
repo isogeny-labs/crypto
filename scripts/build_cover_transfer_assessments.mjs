@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
@@ -10,6 +11,11 @@ const ROOT = resolve(SCRIPT_DIR, "..");
 const OUTPUT_PATH = "docs/curves/cover-transfer-assessments.json";
 const ASSESSMENT_DATE = "2026-10-14";
 const CATALOG_COMMIT = "ff48e2800f62b45c746b3f391540c07b16af4e75";
+const PINNED_CATALOG_FILES = new Set([
+  "docs/curves/registry.json",
+  "docs/curves/covers.json",
+  "docs/curves/cover-links.yaml",
+]);
 const MAP_HASH_DOMAIN = "cover-transfer-assessments/v2/map_base";
 const SUBGROUP_HASH_DOMAIN = "cover-transfer-assessments/v2/subgroup_base";
 
@@ -34,12 +40,22 @@ function membershipHash(domain, members) {
   return sha256Bytes(`${domain}\0${JSON.stringify(members)}`);
 }
 
+async function sourceBytes(path) {
+  if (PINNED_CATALOG_FILES.has(path)) {
+    return execFileSync("git", ["show", `${CATALOG_COMMIT}:${path}`], {
+      cwd: ROOT,
+      maxBuffer: 32 * 1024 * 1024,
+    });
+  }
+  return readFile(resolve(ROOT, path));
+}
+
 async function readJson(path) {
-  return JSON.parse(await readFile(resolve(ROOT, path), "utf8"));
+  return JSON.parse(await sourceBytes(path));
 }
 
 async function fileHash(path) {
-  return sha256Bytes(await readFile(resolve(ROOT, path)));
+  return sha256Bytes(await sourceBytes(path));
 }
 
 function assert(condition, message) {
@@ -852,7 +868,7 @@ async function buildSourceArtifacts() {
       freshness(
         "supported",
         "the exact input registry for all 2,100 assessed map rows",
-        "The digest is computed from the current file and every membership is joined through its model hash.",
+        "The digest is computed from the catalog_commit blob and every membership is joined through its model hash.",
         ["docs/curves/registry.json"],
       ),
     ),
@@ -861,7 +877,7 @@ async function buildSourceArtifacts() {
       "generated curve-level geometry catalog",
       freshness(
         "supported",
-        "all 2,100 current verified-over-declared-field geometry rows",
+        "all 2,100 catalog_commit verified-over-declared-field geometry rows",
         "The ledger derives every map profile predicate from this exact file.",
         ["docs/curves/covers.json"],
       ),
@@ -1449,7 +1465,7 @@ async function buildLedger() {
       map_profiles: mapBase.length,
       subgroup_profiles: subgroupBase.length,
       scope_note:
-        "Every current map UID and every exact [EC1, curve UID, map UID] triple has one base profile. Assessment means each claim receives an explicit supported, refuted, unknown, or not-applicable result; it does not mean every transfer capability is supported.",
+        "Every catalog_commit map UID and every exact [EC1, curve UID, map UID] triple has one base profile. Assessment means each claim receives an explicit supported, refuted, unknown, or not-applicable result; it does not mean every transfer capability is supported.",
     },
     global_cost_accounting: [
       ["cover_construction", null, null, "Executable constructors exist, but no calibrated operation count or timing is claimed."],
@@ -1559,7 +1575,7 @@ async function buildLedger() {
         control: "published_artifact",
         assessment: freshness(
           "refuted",
-          "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 2,100 current catalog models",
+          "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 2,100 catalog_commit models",
           "Direct artifact replay covered only its bundled 592-row registry. Static comparison of the pinned source allowlist with the current partition places 160 binary and 586 direct prime-field forms inside that syntactic domain, and 1,324 extension-field plus 30 normalized-target forms outside it; this 746/1,354 split is not a 2,100-command artifact receipt. Current source adds those paths but has not been published in that artifact.",
           [
             "research/cover_transfer_assessment_20261013/release_replay.txt",

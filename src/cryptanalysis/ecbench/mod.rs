@@ -49,6 +49,7 @@ pub mod cm_folded;
 pub mod compare;
 pub mod conductor_gap;
 pub mod db;
+pub mod fbm;
 pub mod fp4;
 pub mod frontier;
 pub mod full_price;
