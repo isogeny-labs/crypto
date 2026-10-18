@@ -235,6 +235,14 @@ pub enum RhoVariant {
     /// trial is a counted group operation, reported in
     /// [`RhoResult::fruitless_ops`].
     DistinguishedPointsNegation,
+    /// [`Self::DistinguishedPoints`] with the walk hash passed through
+    /// the SplitMix64 finaliser before it picks branches and
+    /// distinguished points (round ten).  `divisor_hash` alone is a
+    /// multiply-accumulate whose low bits depend only on the low bits of
+    /// each coefficient.
+    DistinguishedPointsMixed,
+    /// [`Self::DistinguishedPointsNegation`] with the mixed hash.
+    DistinguishedPointsNegationMixed,
 }
 
 /// Outcome of one rho run.
@@ -338,6 +346,16 @@ fn divisor_hash(d: &MumfordDivisorP) -> u64 {
     acc
 }
 
+/// SplitMix64's output finaliser: a bijection on `u64` whose every output
+/// bit depends on every input bit.
+fn splitmix64_finalise(mut z: u64) -> u64 {
+    z ^= z >> 30;
+    z = z.wrapping_mul(0xbf58_476d_1ce4_e5b9);
+    z ^= z >> 27;
+    z = z.wrapping_mul(0x94d0_49bb_1331_11eb);
+    z ^ (z >> 31)
+}
+
 /// Recover `k` from a collision `a₁ + b₁k ≡ a₂ + b₂k`, or `None` when
 /// the collision is degenerate (`b₁ ≡ b₂`, which carries no
 /// information).
@@ -369,8 +387,16 @@ pub fn pollard_rho_jacobian_with(
 ) -> RhoResult {
     match variant {
         RhoVariant::Floyd => rho_floyd(curve, d1, d2, n, seed, max_steps),
-        RhoVariant::DistinguishedPoints => rho_dp(curve, d1, d2, n, seed, max_steps, false),
-        RhoVariant::DistinguishedPointsNegation => rho_dp(curve, d1, d2, n, seed, max_steps, true),
+        RhoVariant::DistinguishedPoints => rho_dp(curve, d1, d2, n, seed, max_steps, false, false),
+        RhoVariant::DistinguishedPointsNegation => {
+            rho_dp(curve, d1, d2, n, seed, max_steps, true, false)
+        }
+        RhoVariant::DistinguishedPointsMixed => {
+            rho_dp(curve, d1, d2, n, seed, max_steps, false, true)
+        }
+        RhoVariant::DistinguishedPointsNegationMixed => {
+            rho_dp(curve, d1, d2, n, seed, max_steps, true, true)
+        }
     }
 }
 
@@ -407,8 +433,20 @@ fn rho_dp(
     seed: u64,
     max_steps: usize,
     negation: bool,
+    mix: bool,
 ) -> RhoResult {
     let started = Instant::now();
+    // The walk's hash: `divisor_hash`, optionally through SplitMix64's
+    // finaliser (round ten).  Used for branch choice, the
+    // distinguished-point test and the look-ahead alike.
+    let walk_hash = |d: &MumfordDivisorP| {
+        let h = divisor_hash(d);
+        if mix {
+            splitmix64_finalise(h)
+        } else {
+            h
+        }
+    };
     let mut fruitless_ops = 0usize;
     // Fold a position and its coefficients together, so that the walk
     // position is always exactly `a·D₁ + b·D₂`.
@@ -499,7 +537,7 @@ fn rho_dp(
                 break;
             }
             this_attempt += 1;
-            let h = divisor_hash(&x);
+            let h = walk_hash(&x);
             since_dp += 1;
             if (h & mask) == 0 {
                 since_dp = 0;
@@ -555,7 +593,7 @@ fn rho_dp(
                 let (cx, ca, cb, flipped) = fold(x.add(rj, curve), (&a + aj) % n, (&b + bj) % n);
                 group_ops += 1;
                 tries += 1;
-                let returns = flipped && (divisor_hash(&cx) >> 32) as usize % branch.len() == j;
+                let returns = flipped && (walk_hash(&cx) >> 32) as usize % branch.len() == j;
                 if !returns || tries >= branch.len() {
                     break (cx, ca, cb);
                 }
@@ -1191,6 +1229,28 @@ mod tests {
             (fruitless as f64) < 0.15 * folded as f64,
             "fruitless {fruitless} of {folded}"
         );
+    }
+
+    #[test]
+    fn mixed_hash_walks_solve_and_mixing_is_a_bijection_on_samples() {
+        // The mixed-hash variants change only the walk's hash, so they
+        // must still recover `k` on every seed.  The finaliser itself must
+        // be injective (it is a bijection on u64); spot-check that no two
+        // of a few thousand inputs collide.
+        let (curve, d1, d2, n, k) = instance(101);
+        for seed in 0..10u64 {
+            for v in [
+                RhoVariant::DistinguishedPointsMixed,
+                RhoVariant::DistinguishedPointsNegationMixed,
+            ] {
+                let r = pollard_rho_jacobian_with(&curve, &d1, &d2, &n, seed, 5_000_000, &v);
+                assert_eq!(r.k.as_ref(), Some(&k), "{v:?} seed {seed}");
+            }
+        }
+        let mut seen = std::collections::HashSet::new();
+        for z in 0..4096u64 {
+            assert!(seen.insert(splitmix64_finalise(z.wrapping_mul(0x1234_5678_9abc_def1))));
+        }
     }
 
     #[test]
