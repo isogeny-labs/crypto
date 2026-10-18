@@ -1182,7 +1182,7 @@ impl S3LinkRoots {
             if v != 0 {
                 let lead = 1u64 << (63 - v.leading_zeros());
                 pivots.push((lead, v, pre));
-                pivots.sort_unstable_by(|x, y| y.0.cmp(&x.0));
+                pivots.sort_unstable_by_key(|x| std::cmp::Reverse(x.0));
             }
         }
         debug_assert_eq!(pivots.len() as u32, n - 1);
@@ -1688,35 +1688,14 @@ pub fn sparse_closure_refutes(
     max_entries: usize,
 ) -> Option<SparseClosure> {
     use crate::cryptanalysis::koblitz_groebner::build_macaulay_sparse;
-    use std::cmp::Ordering;
     use std::collections::HashMap;
 
-    // Higher degree first; ties by mask.  Rows are ascending in this order,
-    // so the leading monomial is row[0].
-    let cmp = |a: &u64, b: &u64| -> Ordering { b.count_ones().cmp(&a.count_ones()).then(a.cmp(b)) };
-    let xor = |a: &[u64], b: &[u64]| -> Vec<u64> {
-        let mut out = Vec::with_capacity(a.len() + b.len());
-        let (mut i, mut j) = (0, 0);
-        while i < a.len() && j < b.len() {
-            match cmp(&a[i], &b[j]) {
-                Ordering::Less => {
-                    out.push(a[i]);
-                    i += 1;
-                }
-                Ordering::Greater => {
-                    out.push(b[j]);
-                    j += 1;
-                }
-                Ordering::Equal => {
-                    i += 1;
-                    j += 1;
-                }
-            }
-        }
-        out.extend_from_slice(&a[i..]);
-        out.extend_from_slice(&b[j..]);
-        out
-    };
+    // Monomials are ranked in the closure's order (higher degree first, ties
+    // by mask) by the colex combinatorial number system, so a stored row is
+    // a sorted list of u32 ranks, its leading monomial is the smallest rank,
+    // and no monomial table is needed.  Reduction runs in a dense bit
+    // accumulator over the ranks; stored rows stay sparse.
+    const NONE: u32 = u32::MAX;
     let occurring = system
         .iter()
         .flat_map(|p| p.terms.iter())
@@ -1725,6 +1704,62 @@ pub fn sparse_closure_refutes(
         .filter(|i| occurring >> i & 1 == 1)
         .map(|i| 1u64 << i)
         .collect();
+    let v = vars.len();
+    let mut pos = [0usize; 64];
+    for (p, &b) in vars.iter().enumerate() {
+        pos[b.trailing_zeros() as usize] = p;
+    }
+    let mut binom = vec![[0u64; 66]; 66];
+    for n in 0..66 {
+        binom[n][0] = 1;
+        for k in 1..=n.min(65) {
+            binom[n][k] = binom[n - 1][k - 1] + if k < n { binom[n - 1][k] } else { 0 };
+        }
+    }
+    let deg = degree as usize;
+    // offset[d]: first rank of the degree-d block (degree-`degree` first).
+    let mut offset = vec![0u64; deg + 2];
+    {
+        let mut run = 0u64;
+        for d in (0..=deg).rev() {
+            offset[d] = run;
+            run += binom[v][d.min(65)];
+        }
+        if run >= NONE as u64 {
+            return None;
+        }
+        offset[deg + 1] = run;
+    }
+    let ncols = offset[deg + 1] as usize;
+    let top = binom[v][deg.min(65)] as u32; // ranks >= top have degree < `degree`
+    let rank_of = |m: u64| -> u32 {
+        let mut r = offset[m.count_ones() as usize];
+        let (mut bits, mut i) = (m, 1usize);
+        while bits != 0 {
+            r += binom[pos[bits.trailing_zeros() as usize]][i];
+            bits &= bits - 1;
+            i += 1;
+        }
+        r as u32
+    };
+    let unrank = |idx: u32| -> u64 {
+        let idx = idx as u64;
+        let d = (0..=deg)
+            .find(|&d| idx >= offset[d] && idx < offset[d] + binom[v][d.min(65)])
+            .unwrap();
+        let mut r = idx - offset[d];
+        let mut m = 0u64;
+        let mut p = v as isize - 1;
+        for i in (1..=d).rev() {
+            while binom[p as usize][i] > r {
+                p -= 1;
+            }
+            m |= vars[p as usize];
+            r -= binom[p as usize][i];
+            p -= 1;
+        }
+        m
+    };
     // Monomials of degree 1..=k over the occurring variables.
     let monomials_up_to = |k: u32| -> Vec<u64> {
         let mut out = Vec::new();
@@ -1732,8 +1767,8 @@ pub fn sparse_closure_refutes(
         for _ in 0..k {
             let mut next = Vec::new();
             for &(m, start) in &frontier {
-                for (i, &v) in vars.iter().enumerate().skip(start) {
-                    next.push((m | v, i + 1));
+                for (i, &vb) in vars.iter().enumerate().skip(start) {
+                    next.push((m | vb, i + 1));
                 }
             }
             out.extend(next.iter().map(|&(m, _)| m));
@@ -1743,93 +1778,141 @@ pub fn sparse_closure_refutes(
     };
 
     let (cols, rows) = build_macaulay_sparse(system, n_vars, degree)?;
-    let mut pivots: HashMap<u64, Vec<u64>> = HashMap::new();
-    let mut entries = 0usize;
-    let mut out = SparseClosure {
-        degree,
-        refuted: false,
-        saturated: false,
-        rank: 0,
-        falls: 0,
-        products: 0,
-        max_weight: 0,
-    };
-    let mut queue: Vec<Vec<u64>> = Vec::new();
 
-    // Insert one row; a new fall goes on the queue.  `false` on the cap.
-    let mut insert = |mut row: Vec<u64>,
-                      pivots: &mut HashMap<u64, Vec<u64>>,
-                      queue: &mut Vec<Vec<u64>>,
-                      out: &mut SparseClosure|
-     -> bool {
-        row.sort_unstable_by(cmp);
-        // Boolean products can repeat a monomial; equal pairs cancel.
-        let mut dedup: Vec<u64> = Vec::with_capacity(row.len());
-        for m in row {
-            if dedup.last() == Some(&m) {
-                dedup.pop();
-            } else {
-                dedup.push(m);
+    struct State {
+        acc: Vec<u64>,
+        lo: usize,
+        hi: usize,
+        pivot_of: Vec<u32>,
+        stored: Vec<Box<[u32]>>,
+        queue: Vec<u32>,
+        entries: usize,
+        max_entries: usize,
+        top: u32,
+        zero: u32,
+        out: SparseClosure,
+    }
+    impl State {
+        #[inline]
+        fn toggle(&mut self, c: u32) {
+            let w = (c >> 6) as usize;
+            self.acc[w] ^= 1u64 << (c & 63);
+            self.lo = self.lo.min(w);
+            self.hi = self.hi.max(w);
+        }
+        /// Reduce the accumulated row by leading term, store it, and clear
+        /// the accumulator.  `false` on the entry cap.
+        fn finish(&mut self) -> bool {
+            let mut w = self.lo;
+            let lead = loop {
+                while w <= self.hi && self.acc[w] == 0 {
+                    w += 1;
+                }
+                if w > self.hi {
+                    self.lo = usize::MAX;
+                    self.hi = 0;
+                    return true;
+                }
+                let lead = (w as u32) * 64 + self.acc[w].trailing_zeros();
+                let p = self.pivot_of[lead as usize];
+                if p == NONE {
+                    break lead;
+                }
+                let row = &self.stored[p as usize];
+                for &c in row.iter() {
+                    self.acc[(c >> 6) as usize] ^= 1u64 << (c & 63);
+                }
+                self.hi = self.hi.max((row[row.len() - 1] >> 6) as usize);
+            };
+            let mut row: Vec<u32> = Vec::new();
+            for x in w..=self.hi {
+                let mut bits = self.acc[x];
+                self.acc[x] = 0;
+                while bits != 0 {
+                    row.push((x as u32) * 64 + bits.trailing_zeros());
+                    bits &= bits - 1;
+                }
             }
-        }
-        let mut row = dedup;
-        while let Some(&lead) = row.first() {
-            match pivots.get(&lead) {
-                Some(p) => row = xor(&row, p),
-                None => break,
+            self.lo = usize::MAX;
+            self.hi = 0;
+            self.entries += row.len();
+            if self.entries > self.max_entries {
+                return false;
             }
+            self.out.max_weight = self.out.max_weight.max(row.len());
+            self.out.rank += 1;
+            if lead == self.zero {
+                self.out.refuted = true;
+            }
+            let id = self.stored.len() as u32;
+            if lead >= self.top {
+                self.out.falls += 1;
+                self.queue.push(id);
+            }
+            self.pivot_of[lead as usize] = id;
+            self.stored.push(row.into_boxed_slice());
+            true
         }
-        let Some(&lead) = row.first() else {
-            return true;
-        };
-        entries += row.len();
-        if entries > max_entries {
-            return false;
-        }
-        out.max_weight = out.max_weight.max(row.len());
-        out.rank += 1;
-        if lead == 0 {
-            out.refuted = true;
-        }
-        if lead.count_ones() < degree {
-            out.falls += 1;
-            queue.push(row.clone());
-        }
-        pivots.insert(lead, row);
-        true
+    }
+    let mut st = State {
+        acc: vec![0u64; ncols.div_ceil(64).max(1)],
+        lo: usize::MAX,
+        hi: 0,
+        pivot_of: vec![NONE; ncols],
+        stored: Vec::new(),
+        queue: Vec::new(),
+        entries: 0,
+        max_entries,
+        top,
+        zero: (ncols - 1) as u32,
+        out: SparseClosure {
+            degree,
+            refuted: false,
+            saturated: false,
+            rank: 0,
+            falls: 0,
+            products: 0,
+            max_weight: 0,
+        },
     };
 
     for r in rows {
-        let row: Vec<u64> = r.iter().map(|&c| cols[c as usize]).collect();
-        if !insert(row, &mut pivots, &mut queue, &mut out) {
+        for &c in r.iter() {
+            st.toggle(rank_of(cols[c as usize]));
+        }
+        if !st.finish() {
             return None;
         }
-        if out.refuted {
-            out.saturated = true;
-            return Some(out);
+        if st.out.refuted {
+            st.out.saturated = true;
+            return Some(st.out);
         }
     }
     let mut multipliers: HashMap<u32, Vec<u64>> = HashMap::new();
-    while let Some(fall) = queue.pop() {
-        let room = degree - fall[0].count_ones();
+    let mut fall_masks: Vec<u64> = Vec::new();
+    while let Some(id) = st.queue.pop() {
+        fall_masks.clear();
+        fall_masks.extend(st.stored[id as usize].iter().map(|&c| unrank(c)));
+        let room = degree - fall_masks[0].count_ones();
         let ts = multipliers
             .entry(room)
-            .or_insert_with(|| monomials_up_to(room))
-            .clone();
-        for t in ts {
-            out.products += 1;
-            let product: Vec<u64> = fall.iter().map(|&m| m | t).collect();
-            if !insert(product, &mut pivots, &mut queue, &mut out) {
+            .or_insert_with(|| monomials_up_to(room));
+        for &t in ts.iter() {
+            st.out.products += 1;
+            for &m in &fall_masks {
+                st.toggle(rank_of(m | t));
+            }
+            if !st.finish() {
                 return None;
             }
-            if out.refuted {
-                out.saturated = true;
-                return Some(out);
+            if st.out.refuted {
+                st.out.saturated = true;
+                return Some(st.out);
             }
         }
     }
-    out.saturated = true;
-    Some(out)
+    st.out.saturated = true;
+    Some(st.out)
 }
 
 /// The infeasible null object for a ladder cell: same unknowns, degree and
