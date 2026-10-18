@@ -3568,32 +3568,47 @@ fn main() {
             Ok(())
         }
         "list" => {
-            // The instances of a cell, one line each: provenance for the raw data.
-            let family = args.get("family").ok_or("--family")?.clone();
-            let bits: u32 = args
-                .get("bits")
-                .ok_or("--bits")?
-                .parse()
-                .map_err(|_| "--bits")?;
-            for idx in parse_targets(args.get("idx").ok_or("--idx")?)? {
-                let inst = if family == "gls" {
-                    build_gls_instance(bits, idx)?
-                } else {
-                    build_random_instance(&family, bits, idx)?
-                };
-                println!(
-                    "{} p={} n={} cofactor={} r={} log2_r={:.3} g=({},{}),({},{})",
-                    inst.name,
-                    inst.p,
-                    inst.n,
-                    inst.h,
-                    inst.r,
-                    (inst.r as f64).log2(),
-                    inst.g.x[0],
-                    inst.g.x[1],
-                    inst.g.y[0],
-                    inst.g.y[1]
-                );
+            // The instances of the cells, one line each: provenance for the raw data.
+            // `--all` lists every cell of the protocol.
+            let cells: Vec<(String, u32, Vec<u64>)> = if args.contains_key("all") {
+                let mut v = Vec::new();
+                for bits in [24u32, 28, 32, 36, 40] {
+                    v.push(("torsion".to_string(), bits, (0..6).collect()));
+                    v.push(("prime".to_string(), bits, (0..3).collect()));
+                    v.push(("gls".to_string(), bits, (0..3).collect()));
+                }
+                v
+            } else {
+                vec![(
+                    args.get("family").ok_or("--family")?.clone(),
+                    args.get("bits")
+                        .ok_or("--bits")?
+                        .parse()
+                        .map_err(|_| "--bits")?,
+                    parse_targets(args.get("idx").ok_or("--idx")?)?,
+                )]
+            };
+            for (family, bits, idxs) in cells {
+                for idx in idxs {
+                    let inst = if family == "gls" {
+                        build_gls_instance(bits, idx)?
+                    } else {
+                        build_random_instance(&family, bits, idx)?
+                    };
+                    println!(
+                        "{} p={} n={} cofactor={} r={} log2_r={:.3} g=({},{}),({},{})",
+                        inst.name,
+                        inst.p,
+                        inst.n,
+                        inst.h,
+                        inst.r,
+                        (inst.r as f64).log2(),
+                        inst.g.x[0],
+                        inst.g.x[1],
+                        inst.g.y[0],
+                        inst.g.y[1]
+                    );
+                }
             }
             Ok(())
         }
