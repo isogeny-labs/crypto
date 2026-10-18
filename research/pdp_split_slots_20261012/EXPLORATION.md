@@ -49,6 +49,21 @@ XORs per target, all `2^g` branches charged; two targets each, both exact.
   strong rho on n = 17 (dimension-9 invariant base). The hybrid
   interpolates between F4 and that table.
 
+## Sweep 3: ℓ-ladder on the closure at n = 23 (`K_0`, plan `3`, g = 8)
+
+Two targets, two slot tuples each (seed 79), every run complete and exact.
+
+| ℓ | unknowns | residual k | closure abscissae | columns | λ per system | XORs per branch | XORs per target | growth per unknown |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 4 | 12 | 4 | 186 | 10 | 0.0078 | 8.0e1 | 2.0e4 | — |
+| 5 | 15 | 7 | 370 | 18 | 0.0156 | 4.2e3 | 1.07e6 | 3.74 |
+| 6 | 18 | 10 | 761 | 35 | 0.0625 | 2.1e5 | 5.5e7 | 3.71 |
+| 7 | 21 | 13 | 1428 | 64 | 0.297 | 4.6e7 | 1.18e10 | 5.99 |
+
+The same growth read from sweep 2 at fixed ℓ: 8.7 (n = 13, ℓ = 5, k 9 → 11),
+6.8 and 7.9 (n = 17, ℓ = 5, k 7 → 9 → 11). Enumeration grows by 2 per
+unknown. `pdp_split_analyze --ladder` produced these columns.
+
 ## What this suggests for round 3
 
 1. An oracle that **enumerates** the residual unknowns after guessing, with
