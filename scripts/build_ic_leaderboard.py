@@ -73,6 +73,7 @@ SOURCES = {
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
     "sixsum_resolvent": "research/ic_techniques_20261012/sixsum_extraction/resolvent_summary.json",
+    "wide_producer": "benchmarks/20261018-wide-producer-engineering/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -736,6 +737,18 @@ def sixsum_resolvent_component() -> dict:
             "class": "engineering"}
 
 
+def wide_producer_component() -> dict:
+    """The wide (64 < n <= 127) relation producer's probe path and index
+    build on their own: the frozen summary of
+    benchmarks/20261018-wide-producer-engineering, copied from the raw
+    same-binary interleaved A/B runs. A component (stage) speed-up: it moves
+    no row of tables A-C and carries no end-to-end S or rho claim."""
+    sm = load(SOURCES["wide_producer"])
+    if sm.get("schema") != "crypto.wide_producer_engineering/v1" or sm.get("class") != "engineering":
+        raise SystemExit("review the wide producer summary before updating the leaderboard")
+    return {**sm, "study": "benchmarks/20261018-wide-producer-engineering/"}
+
+
 def latest_frontier_audit() -> dict:
     """Copy the latest performance handoff into the generated board.
 
@@ -1180,6 +1193,7 @@ def build() -> dict:
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
         "sixsum_resolvent_component": sixsum_resolvent_component(),
+        "wide_producer_component": wide_producer_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -1541,6 +1555,30 @@ def markdown(doc: dict) -> str:
           "its target-dependent walk and ends with scalar verification. "
           "This wall-time panel is kept separate from Tables A–C and their "
           "operation-unit S rankings.", ""]
+    w = doc["wide_producer_component"]
+    L += ["", "## Component: wide producer probe path and index build (engineering)", "",
+          f"Class **{w['class']}**: {w['claim']}. Instance size n = {w['n']}, public synthetic "
+          f"Koblitz fixtures, {w['host']}. Control arm `{w['scan_control']}`; all-switches arm "
+          f"`{w['scan_all_switches']}`. This panel is outside Tables A–C and moves no ranked row.", "",
+          "| K | control ns/probe (median, min-max) | lazy key | prefetch | all switches | all / control |",
+          "|---:|---|---|---|---|---:|"]
+    for row in w["scan_ns_per_probe"]:
+        a = row["arms"]
+        f = lambda x: f"{x['median']:.1f} ({x['min']:.1f}-{x['max']:.1f})"
+        L.append(f"| {row['k']} | {f(a['control'])} | {f(a['lazy_canon'])} | {f(a['prefetch'])} | "
+                 f"{f(a['all_three'])} | {a['all_three']['ratio_to_control']:.3f} |")
+    L += ["", "| K | index build serial s (median, min-max) | 4 threads + batch inversion s | ratio |",
+          "|---:|---|---|---:|"]
+    for row in w["index_build_seconds"]:
+        a = row["arms"]
+        f = lambda x: f"{x['median']:.2f} ({x['min']:.2f}-{x['max']:.2f})"
+        L.append(f"| {row['k']} | {f(a['serial'])} | {f(a['threads_batch_inv'])} | "
+                 f"{a['threads_batch_inv']['ratio_to_serial']:.3f} |")
+    e = w["e2e_identity"]
+    L += ["", f"Identity: {w['index_equality']}. End to end `{e['spec']}`: {e['arms']} arms, all identical "
+          f"to the control ({e['rank_relations']} relations, {e['targets_solved']} targets solved). "
+          "Caveats: " + "; ".join(w["caveats"]) + ".",
+          "", f"[Frozen summary](../../{SOURCES['wide_producer']}), [report](../../{w['report']}).", ""]
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
         L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
@@ -2222,6 +2260,30 @@ def page(doc: dict, standalone: bool) -> str:
              'This Tier 1 wall-time panel uses its own unit and sits outside the '
              'operation-unit S rankings.</p>' +
              gh(n83["source"], 'Frozen IC1 rows and candidate identities') + '</section>')
+
+    w = doc["wide_producer_component"]
+    P.append('<section id="wide-producer-engineering-20261018"><h2>Wide producer probe path and index build (engineering component)</h2>'
+             f'<p>Class <strong>{esc(w["class"])}</strong>: {esc(w["claim"])}. n = {w["n"]}, {esc(w["host"])}. '
+             f'Control <code>{esc(w["scan_control"])}</code>. Outside Tables A–C; no ranked row moves.</p>'
+             '<div class="scroll"><table><thead><tr><th>K</th><th>Control ns/probe</th><th>Lazy key</th>'
+             '<th>Prefetch</th><th>All switches</th><th>All / control</th></tr></thead><tbody>')
+    fm = lambda x, d=1: f'{x["median"]:.{d}f} <span class="muted">({x["min"]:.{d}f}-{x["max"]:.{d}f})</span>'
+    for row in w["scan_ns_per_probe"]:
+        a = row["arms"]
+        P.append(f'<tr><td>{row["k"]}</td><td>{fm(a["control"])}</td><td>{fm(a["lazy_canon"])}</td>'
+                 f'<td>{fm(a["prefetch"])}</td><td>{fm(a["all_three"])}</td>'
+                 f'<td>{a["all_three"]["ratio_to_control"]:.3f}</td></tr>')
+    P.append('</tbody></table></div><div class="scroll"><table><thead><tr><th>K</th><th>Index build serial s</th>'
+             '<th>4 threads + batch inversion s</th><th>Ratio</th></tr></thead><tbody>')
+    for row in w["index_build_seconds"]:
+        a = row["arms"]
+        P.append(f'<tr><td>{row["k"]}</td><td>{fm(a["serial"], 2)}</td><td>{fm(a["threads_batch_inv"], 2)}</td>'
+                 f'<td>{a["threads_batch_inv"]["ratio_to_serial"]:.3f}</td></tr>')
+    e = w["e2e_identity"]
+    P.append('</tbody></table></div>'
+             f'<p>{esc(w["index_equality"])}. End to end <code>{esc(e["spec"])}</code>: {e["arms"]} arms identical to the control '
+             f'({e["rank_relations"]} relations, {e["targets_solved"]} targets solved). Caveats: '
+             + esc("; ".join(w["caveats"])) + '.</p>' + gh(SOURCES["wide_producer"], 'Frozen summary') + '</section>')
 
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '

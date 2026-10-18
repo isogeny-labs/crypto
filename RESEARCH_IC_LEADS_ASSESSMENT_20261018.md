@@ -131,8 +131,8 @@ updated in this table as commits land.
 
 | id | task | scope | status |
 |:--|:--|:--|:--|
-| T01 | parallel, batch-inverted `build_index` in the wide producer | `examples/koblitz_orbit_dlp_fast.rs` | pending |
-| T02 | blocked Bloom filter, slot prefetch, single canonicalisation per hit in the wide probe path | same file | pending |
+| T01 | parallel, batch-inverted `build_index` in the wide producer | `examples/koblitz_orbit_dlp_fast.rs` | landed (`0f831d70b`, engineering): index build at n = 73 serial -> 4 threads + batch inversion, K = 300 14.60 s -> 5.56 s, K = 600 66.4 s -> 29.1 s (x0.44); index identical to serial (`KIC_VERIFY_INDEX`, unit test); the 18,398 s was the rank-stage wall, not the index build; `docs/ic/perf/WIDE_PRODUCER_ENGINEERING_20261018.md` |
+| T02 | blocked Bloom filter, slot prefetch, single canonicalisation per hit in the wide probe path | same file | landed (`21dccf843`, engineering): wall ns per probe at n = 73, control -> all switches, K = 40 417 -> 217, K = 300 614 -> 226, K = 600 622 -> 235 (x0.52, x0.37, x0.38); lazy canonical key alone x0.50 to x0.62, prefetch alone x0.71 at K >= 300, blocked Bloom no gain (off by default); hits 0 in timed scans, e2e n = 69 identical to control; unisolated 4-vCPU guest; no end-to-end S, no rho claim |
 | T03 | callgrind profile of `scan_state128` at `n = 73` on this host | `docs/ic/perf/WIDE_PRODUCER_PROFILE_20261018.md` | pending |
 | T04 | char-2 quartic root solve for `S₄`; B2 kernel re-measured in `S₃` units | `src/cryptanalysis/koblitz_sixsum_extract.rs` | pending |
 | T05 | MutantXL closure as `SolverEngine::Closure` with verdict-agreement tests | `src/cryptanalysis/koblitz_groebner.rs` | pending |
