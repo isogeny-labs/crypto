@@ -1452,7 +1452,9 @@ fn run_f4(
                 stats.pairs_reduced += 1;
             }
         }
+        let tb = Instant::now();
         let sm = build_step(&st, &selected);
+        if std::env::var("B09_TIMING").is_ok() { eprintln!("step {step} deg {d} pairs {} build {:.2}s rows {} cols {}", selected.len(), tb.elapsed().as_secs_f64(), sm.reducers.len()+sm.srows.len(), sm.cols.monos.len()); }
         stats.divisor_tests += sm.divisor_tests;
         let n_rows = sm.reducers.len() + sm.srows.len();
         let words = sm.cols.words() as u64;
