@@ -1421,7 +1421,7 @@ pub fn matrix_f4_f2_counted_with(
 /// `KIC_F4_SOLVER_LINEAR_TAIL=0|1` overrides that selection and
 /// `KIC_F4_FLAT_MATRIX=0|1` controls the contiguous solver matrix,
 /// `KIC_F4_SOLVER_FULL_READBACK=1` restores the complete legacy readback.
-fn matrix_f4_f2_solver_consequences(
+pub(crate) fn matrix_f4_f2_solver_consequences(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
