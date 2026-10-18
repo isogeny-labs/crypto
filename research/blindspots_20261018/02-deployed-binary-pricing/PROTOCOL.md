@@ -31,7 +31,7 @@ worth the machine?
   `descent_degree_cost.rs`** (it reproduces the `D = 6` rows); this item does
   not re-port it, it reproduces both committed tables as the positive control.
 * The `n = 131` cells of the sweep (the `k1` family, ECC2K-130) are **reused
-  results**: the instrument reproduces every one of the 26 + 16 committed rows
+  results**: the instrument reproduces every one of the 30 + 16 committed rows
   identically (control below) and the sweep's `n = 131` cells are those same
   model evaluations. Nothing at `n = 131` is claimed as new; the new content is
   `n >= 163`, the `m = 5` and `m = 2` rows, `K`, memory, and the `r1` family.
@@ -223,11 +223,25 @@ Each tightens or makes the design concrete; none loosens it.
 7. **Floating point.** The monomial-count recurrence is the committed one,
    rescaled by exact powers of two to avoid overflow at `N` up to ~2800; it is
    bit-identical to the committed evaluation wherever that is finite.
-8. **Invocation.** The measured cards call `cargo run --release --example` under
-   `prlimit` rather than a built binary path, because a binary under `target/`
-   is a repository file that `tools/task_card.py` would require to be bound by
-   a sha256 that cannot be known before the build; the example source and the
-   two committed reference tables are bound instead.
+8. **Dependency-free build, `rustc` instead of `cargo`.** At the branch base
+   (`1d0d9617d`, also `origin/main`) the `crypto` library does not compile
+   (`cargo build --release --lib`: duplicate `Instance::Fp4` variant in
+   `src/cryptanalysis/ecbench/workload.rs`, `ecbench::fbm` not declared in
+   `ecbench/mod.rs`, undefined `OnbWeightBase` and `sparsest`; 25 errors), and
+   `target/` holds no `crypto_lib` rlib, so `cargo build --example` cannot
+   succeed for any example. The instrument therefore depends on `std` only:
+   the curve orders and cofactors are copied from `src/binary_ecc/curve.rs`
+   (each checked against `#E = h*r` within the Hasse interval of `2^n`, and
+   ECC2K-130's against its decimal order), and the committed
+   `semi_regular_dreg` is re-implemented on 768-bit two's-complement integers
+   (it is exercised by the positive control: 30/30 rows including the
+   semi-regular ones). Each card compiles the example with
+   `rustc --edition 2021 -C opt-level=3 -C codegen-units=1` to a path that does
+   not yet exist, because a binary path that exists is a repository file that
+   `tools/task_card.py` would require to be bound by a sha256 unknowable before
+   the build. The example source and the two committed reference tables are
+   bound by sha256. This is a change of build tool only; no formula changes.
+   Not fixed here: the broken library belongs to other lanes.
 9. **Conductor.** `conductor` is not installed on this host (CLAUDE.md asks for
    a task check); the hooks warn and let edits through, per docs/CONDUCTOR.md.
 
@@ -236,3 +250,16 @@ Each tightens or makes the design concrete; none loosens it.
 `raw/` holds `control.txt`, `cells.tsv`, `cells.md`, `scan.tsv`, `scan.md`, the
 receipts, and the run logs. `README.md` (verdict by this rule), the SVG and PNG
 graph and `REPORT.pdf` are produced by the assess stage, not here.
+
+## Smoke test disclosure (before the cards were frozen)
+
+The positive and negative controls were run once on the built instrument
+(30/30 and 16/16 committed rows identical; `m = 2` minimum gap `+24.50` at
+the sect131r1 floor; 1392 monotonicity checks, 0 violations). The `cells` and
+`scan` code paths were then run once with `--smoke`, which restricts them to
+the smallest cell (`n = 131`) and the grid up to `n = 131`. That output was
+written to the scratchpad, not to `raw/`, and was inspected only for crashes;
+it shows that at `n = 131` some `m = 5` rows already have a gap at or below
+zero (for example the sect131r1 `D = 3` and `D = 4` rows). The decision rule,
+arms, cells and verdict vocabulary above were fixed before this and are not
+changed by it; the measured cards below re-run everything into `raw/`.
