@@ -343,7 +343,7 @@ targets (the `fes` mode exits 2 on a mismatch) and the parity of the recorded
 
 | card | content | development time | timeouts (sum) |
 |---|---|---|---|
-| 01 | build `b03`, `b05`; selftest, `asym`, `sens`; counted model rows (`poly`, no `--real`) for all 10 cells | 4 s build, < 2 s per cell | 365 s |
+| 01 | build `b03`, `b05`; selftest, `asym`, `sens`; counted model rows (`poly`, no `--real`) for all 10 cells | 4 s build, < 2 s per cell | 375 s |
 | 02 | FES full scans (8 descended + 8 random dense each) on `s3-12 .. s3-28`; `crossover` to N = 400 | < 11 s; 99 s | 340 s |
 | 03 | FES full scans on `s3-32` | 160 s | 420 s |
 | 04 | F4 (item 05 `grevlex`) on `s3-12 .. s3-24` (8 targets), `s3-28` (targets 0-1, 80 s cap per job) | < 100 s; cap | 480 s |
@@ -351,7 +351,7 @@ targets (the `fes` mode exits 2 on a mismatch) and the parity of the recorded
 | 06 | positive control 1 (real `dinur`, `lptwy`, paper `t`, hash sizes k = 0..N) on `s3-16` | 230 s | 450 s |
 | 07 | positive control 1 on `s4-13`; on `s3-12` seeds 1 to 9 | 40 s; 12 s per seed | 370 s |
 | 08 | positive control 1 on `s3-12`, seeds 10 to 18 | 12 s per seed | 270 s |
-| 09 | positive control 1 on `s3-12`, seeds 19 to 26; `b03 summarize --dir raw`; remove binaries | 12 s per seed | 280 s |
+| 09 | positive control 1 on `s3-12`, seeds 19 to 26; `b03 summarize --dir raw`; remove binaries | 12 s per seed | 285 s |
 
 Estimated CPU total about 20 minutes against the 2 CPU-hour budget; every card
 sums to under 9 minutes of timeouts. The F4 jobs carry the same caps and
