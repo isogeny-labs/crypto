@@ -120,6 +120,7 @@ crypto cryptanalysis aes-distinguisher --technique yoyo --samples 4096
 crypto cryptanalysis aes-distinguisher --technique mixture --samples 4096
 crypto cryptanalysis aes-distinguisher --technique zero-correlation
 crypto cryptanalysis aes-cpa --input traces.json
+crypto cryptanalysis aes-dfa-schedule --last-round-key-hex 13111d7fe3944a17f307a78b4d2b30c5
 ```
 
 These commands expose the existing AES-128 two-round differential,
@@ -159,3 +160,11 @@ of the AES S-box output at that plaintext byte XOR the matching key byte.
 The input JSON SHA-256 is
 `81b50a60c0361b33d7df6fe73cf5827942ce8dd10ff6284e931c97172a9ed2d8`.
 The known-answer ciphertext is `69c4e0d86a7b0430d8cdb78070b4c55a`.
+
+`aes-dfa-schedule` reverses an already established AES-128 round-10 key to
+the master key and checks that the forward schedule reproduces the supplied
+round key. The example round key maps to master key
+`000102030405060708090a0b0c0d0e0f`. Fault-pair equation solving is a
+separate stage; this command does not infer a last-round key from ciphertexts.
+The release command output is frozen in
+[`aes_dfa_schedule_public_report_20261018.json`](fixtures/aes_dfa_schedule_public_report_20261018.json).

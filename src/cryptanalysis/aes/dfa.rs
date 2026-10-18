@@ -42,11 +42,15 @@
 //! - [`dfa_recover_last_round_key_byte`] — for one column position
 //!   and one (correct, faulted) byte pair, enumerate the candidate
 //!   key-byte values.
-//! - [`dfa_full_recovery`] — combine multiple fault injections to
-//!   uniquely recover K_R10, then invert the schedule to get K_master.
+//! - [`invert_aes128_schedule_from_last_round_key`] — recover K_master
+//!   once K_R10 has been established by a fault-equation solver.
 //! - [`format_dfa_visualization`] — ASCII diagram of the fault
 //!   propagation: where the byte was flipped, which 4 ciphertext
 //!   bytes it lands at, and the per-column candidate counts.
+//!
+//! The current ciphertext-pair candidate helper uses a heuristic
+//! input difference. It does not solve the full Piret-Quisquater
+//! fault equations or recover K_R10 from arbitrary observed pairs.
 
 use super::reduced::{ReducedAes128, RoundOps};
 use super::visualize::{format_recovery_progress, format_state_grid};
@@ -267,35 +271,20 @@ pub fn dfa_per_column_candidates(correct_ct: &[u8; 16], faulted_ct: &[u8; 16]) -
     out
 }
 
-/// **Test if the AES master key is recoverable** given a known
-/// last-round key.  Inverts the AES-128 key schedule by re-expanding
-/// from K_R10 backwards.  This is what `dfa_full_recovery` calls
-/// once it has uniquely determined K_R10.
+/// Recover the AES-128 master key from the 10th-round key by reversing
+/// the key schedule. The caller must first establish K_R10 from fault
+/// equations; this function does not infer it from ciphertext pairs.
 pub fn invert_aes128_schedule_from_last_round_key(k_r10: &[u8; 16]) -> [u8; 16] {
-    // We use the standard trick: AES key schedule is linear in the
-    // round-key columns, so given K_R10 we can step backwards 10
-    // times to recover K_R0 (= master key).
-    let mut w: Vec<[u8; 4]> = Vec::with_capacity(44);
-    // Initialise last 4 words from K_R10.
+    let mut round_key = [[0u8; 4]; 4];
     for c in 0..4 {
-        w.push([
+        round_key[c] = [
             k_r10[c * 4],
             k_r10[c * 4 + 1],
             k_r10[c * 4 + 2],
             k_r10[c * 4 + 3],
-        ]);
+        ];
     }
-    // Step backwards: w[i - 4] = w[i] XOR (something depending on
-    // w[i-1], possibly with sub_word/rot_word).
-    //
-    // Simpler & known-correct: enumerate possible K_master values and
-    // check that key_expansion(K_master)[40..44] == K_R10.  This is
-    // O(2^128) worst case, but for the test we just verify the
-    // function exists.  See the test for the working version.
-    //
-    // Stub: return zero.  The full inverter is in the test.
-    let _ = w;
-    [0u8; 16]
+    ReducedAes128::invert_schedule(10, &round_key)
 }
 
 // ── Visualization ────────────────────────────────────────────────────
@@ -507,6 +496,28 @@ mod tests {
         let (c2, f2) = inject_fault_round_8(&cipher, &pt, 0, 0x77);
         assert_eq!(count_active_ct_bytes(&c1, &f1), 4);
         assert_eq!(count_active_ct_bytes(&c2, &f2), 16);
+    }
+
+    #[test]
+    fn last_round_key_inverts_to_the_master_key() {
+        for master in [
+            [0u8; 16],
+            [
+                0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
+                0x0e, 0x0f,
+            ],
+            [0xa5u8; 16],
+        ] {
+            let cipher = ReducedAes128::new(&master, 10, false);
+            let mut last_round = [0u8; 16];
+            for (column, word) in cipher.round_key(10).iter().enumerate() {
+                last_round[column * 4..column * 4 + 4].copy_from_slice(word);
+            }
+            assert_eq!(
+                invert_aes128_schedule_from_last_round_key(&last_round),
+                master
+            );
+        }
     }
 
     /// **DFA visualisation renders** with the right section headers.

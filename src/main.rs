@@ -335,6 +335,12 @@ enum CryptanalysisOp {
         #[arg(long)]
         known_ciphertext_hex: Option<String>,
     },
+    /// Reverse an established AES-128 10th-round key to the master key.
+    AesDfaSchedule {
+        /// Last-round AES-128 key as 32 hex digits, in column-major byte order.
+        #[arg(long)]
+        last_round_key_hex: String,
+    },
     /// Run the full research bench and emit the Markdown report.
     /// (Equivalent to `cargo test --lib --release bench_demo --
     /// --ignored --nocapture` but accessible from the CLI.)
@@ -1410,6 +1416,38 @@ fn cmd_isogeny(op: IsogenyOp) {
 
 // ── Cryptanalysis subcommands ─────────────────────────────────────────────────
 
+fn cmd_aes_dfa_schedule(last_round_key_hex: &str) -> Result<(), String> {
+    use crypto_lib::cryptanalysis::aes::{dfa, ReducedAes128};
+
+    let bytes =
+        from_hex(last_round_key_hex).map_err(|e| format!("invalid AES last-round key hex: {e}"))?;
+    let last_round: [u8; 16] = bytes
+        .try_into()
+        .map_err(|_| "AES-128 last-round key must be exactly 16 bytes".to_string())?;
+    let master = dfa::invert_aes128_schedule_from_last_round_key(&last_round);
+    let expanded = ReducedAes128::new(&master, 10, false).round_key(10);
+    let reexpanded_matches = expanded
+        .iter()
+        .enumerate()
+        .all(|(column, word)| word.as_slice() == &last_round[column * 4..column * 4 + 4]);
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&serde_json::json!({
+            "schema_version": 1,
+            "operation": "aes-dfa-schedule",
+            "last_round_key_hex": to_hex(&last_round),
+            "master_key_hex": to_hex(&master),
+            "round_key_reexpansion_matches": reexpanded_matches,
+            "status": if reexpanded_matches { "schedule_inverted" } else { "verification_failed" },
+        }))
+        .map_err(|e| e.to_string())?
+    );
+    if !reexpanded_matches {
+        return Err("AES-128 inverse key schedule failed re-expansion".into());
+    }
+    Ok(())
+}
+
 fn cmd_aes_cpa(input: &Path, known_ciphertext_hex: Option<&str>) -> Result<(), String> {
     use crypto_lib::cryptanalysis::aes::{dpa, ReducedAes128};
     use serde::Deserialize;
@@ -1895,6 +1933,12 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
             known_ciphertext_hex,
         } => {
             if let Err(e) = cmd_aes_cpa(&input, known_ciphertext_hex.as_deref()) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesDfaSchedule { last_round_key_hex } => {
+            if let Err(e) = cmd_aes_dfa_schedule(&last_round_key_hex) {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }
