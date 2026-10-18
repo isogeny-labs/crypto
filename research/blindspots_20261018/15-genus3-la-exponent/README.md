@@ -72,9 +72,8 @@ the mod-ell products of LA and SGE; the rho record is used as measured at every 
 The IC whole cost is below the single measured rho run on these three curves at every price in the band, for every
 arm. **This is not a claim of beating rho:** (i) rho is one measured run per curve, whose cost is a heavy-tailed random
 variable (the rho model `sqrt(pi ell / 4)` steps is about 16 % below the measured value on curve 0), (ii) the cells are
-toy scale (q about 2^20, group order about 2^60 where genus-3 IC is not the incumbent solver), (iii) the exponent gap
-above is still positive and the whole-solve local exponent is above rho's 1.5 only in the sense that the IC exponents
-quoted here are fit over a short range, and (iv) at c_ell = 0 the arms tie by construction (equal relation phases).
+toy scale (q about 2^20, group order about 2^60), (iii) the whole-solve exponent gap to 4/3 above is still positive
+and a short-range fit says nothing about the crossover at cryptographic sizes, and (iv) at c_ell = 0 the arms tie by construction (equal relation phases).
 Order between two arms is stated only where it holds at c_ell = 0.1 and 1: d < a holds (0.9992 and 0.9949, tie at 0); e < a
 does **not** hold across the band (whole ratio 1.084 at c_ell = 0, 1.064 at 0.1, 0.947 at 1, 0.771 at 9), so no order
 of e against a is stated; b and c are above a at every priced c_ell > 0.
