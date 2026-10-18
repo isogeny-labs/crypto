@@ -747,6 +747,32 @@ struct Stats {
     primes_lm1: BTreeSet<u64>,
     max_j: i64,
     max_jm: i64,
+    pointless: u64,
+    no_degree_one: u64,
+}
+
+/// A divisor of degree 1 supported on the factor base: the first degree-1 place, or else
+/// a P_j - b P_i from two places of coprime degrees (a d_j - b d_i = 1, a = 1 when possible
+/// by choosing the pair). Returns `None` if no such pair exists.
+fn degree_one_divisor(pl_deg: &[u32]) -> Option<Vec<i128>> {
+    let np = pl_deg.len();
+    let mut d1 = vec![0i128; np];
+    if let Some(p0) = pl_deg.iter().position(|&d| d == 1) {
+        d1[p0] = 1;
+        return Some(d1);
+    }
+    for i in 0..np {
+        for j in 0..np {
+            let (di, dj) = (pl_deg[i] as i128, pl_deg[j] as i128);
+            // smallest a >= 1 with a dj = 1 (mod di)
+            if let Some(a) = (1..=di).find(|a| (a * dj - 1).rem_euclid(di) == 0) {
+                d1[j] += a;
+                d1[i] -= (a * dj - 1) / di;
+                return Some(d1);
+            }
+        }
+    }
+    None
 }
 
 /// Whether the relation lattice gives free rank 1 and torsion of order `jorder`.
@@ -801,16 +827,23 @@ fn analyse(
             g, label, lp, jorder, diag
         );
     }
-    // base point: first degree-1 place
-    let Some(p0) = (0..np).find(|&i| pl_deg[i] == 1) else {
+    // a divisor of degree 1 to extend characters from Pic^0 to Pic
+    let Some(d1) = degree_one_divisor(pl_deg) else {
+        st.no_degree_one += 1;
+        eprintln!("no degree-1 divisor in the factor base g={} {}", g, label);
         return None;
     };
-    // coordinates of [v - deg(v) P0]
+    if !pl_deg.contains(&1) {
+        st.pointless += 1;
+    }
+    // coordinates of [v - deg(v) D1]
     let coords: Vec<Vec<i128>> = (0..np)
         .map(|vid| {
             let mut e = vec![0i128; np];
             e[vid] += 1;
-            e[p0] -= pl_deg[vid] as i128;
+            for (x, &y) in e.iter_mut().zip(&d1) {
+                *x -= pl_deg[vid] as i128 * y;
+            }
             (0..np)
                 .map(|j| (0..np).map(|i| e[i] * v[i][j]).sum::<i128>())
                 .collect()
@@ -1031,12 +1064,14 @@ fn json_map(m: &HashMap<u64, u64>) -> String {
 
 fn summary(g: i32, family: &str, st: &Stats) {
     println!(
-        "{{\"kind\":\"summary\",\"g\":{},{}\"smooth_models\":{},\"validated\":{},\"unvalidated\":{},\"rh_fail\":{},\"fe_fail\":{},\"nk_checked\":{},\"nk_fail\":{},\"exact_mismatch\":{},\"hits\":{},\"curves_per_n\":{},\"chars_per_n\":{},\"max_L1\":{},\"max_abs_Lm1\":{},\"odd_primes_L1\":{:?},\"odd_primes_Lm1\":{:?}}}",
+        "{{\"kind\":\"summary\",\"g\":{},{}\"smooth_models\":{},\"validated\":{},\"unvalidated\":{},\"pointless_tested\":{},\"no_degree_one\":{},\"rh_fail\":{},\"fe_fail\":{},\"nk_checked\":{},\"nk_fail\":{},\"exact_mismatch\":{},\"hits\":{},\"curves_per_n\":{},\"chars_per_n\":{},\"max_L1\":{},\"max_abs_Lm1\":{},\"odd_primes_L1\":{:?},\"odd_primes_Lm1\":{:?}}}",
         g,
         family,
         st.curves,
         st.validated,
         st.unvalidated,
+        st.pointless,
+        st.no_degree_one,
         st.rh_fail,
         st.fe_fail,
         st.nk_checked,
