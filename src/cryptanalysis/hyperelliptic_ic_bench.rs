@@ -81,8 +81,101 @@ use crate::prime_hyperelliptic::{HyperellipticCurveP, MumfordDivisorP};
 use crate::utils::mod_inverse;
 
 use super::hyperelliptic_index_calculus::{
-    build_factor_base, hec_index_calculus_dlp, HecIndexCalculusParams,
+    build_factor_base, divisor_order_bsgs, hasse_interval, hec_index_calculus_dlp,
+    largest_prime_factor, HecIndexCalculusParams,
 };
+use crate::prime_hyperelliptic::FpPoly;
+
+// ── The thread's curves and instance rule ──────────────────────────────
+
+/// The curve family every round of this thread measures on, as the
+/// frozen examples `hyperelliptic_ic_vs_rho` and
+/// `hyperelliptic_ic_large_prime` define it (they keep their own copies so
+/// their frozen commands stay byte-for-byte as they were):
+///
+/// - genus 2: `y² = x⁵ + 3x³ + 2x² + x + c`,
+/// - genus 3: `y² = x⁷ + x³ + c·x + 1`,
+/// - genus 4: `y² = x⁹ + x³ + c·x + 1`.
+pub fn thread_curve(p: u64, c: u64, genus: u32) -> HyperellipticCurveP {
+    let p = BigUint::from(p);
+    let one = BigUint::one;
+    let zero = BigUint::zero;
+    let cc = BigUint::from(c) % &p;
+    let coeffs = match genus {
+        2 => vec![
+            cc,
+            one(),
+            BigUint::from(2u32),
+            BigUint::from(3u32),
+            zero(),
+            one(),
+        ],
+        3 => vec![one(), cc, zero(), one(), zero(), zero(), zero(), one()],
+        4 => vec![
+            one(),
+            cc,
+            zero(),
+            one(),
+            zero(),
+            zero(),
+            zero(),
+            zero(),
+            zero(),
+            one(),
+        ],
+        g => panic!("no thread curve for genus {g}"),
+    };
+    HyperellipticCurveP::new(p.clone(), FpPoly::from_coeffs(coeffs, p), genus)
+}
+
+fn thread_curve_is_squarefree(curve: &HyperellipticCurveP) -> bool {
+    let p = &curve.p;
+    let d: Vec<BigUint> = curve
+        .f
+        .coeffs
+        .iter()
+        .enumerate()
+        .skip(1)
+        .map(|(i, c)| (c * BigUint::from(i as u64)) % p)
+        .collect();
+    let deriv = FpPoly::from_coeffs(d, p.clone());
+    !deriv.is_zero() && curve.f.gcd(&deriv).degree() == Some(0)
+}
+
+/// The thread's instance rule, unchanged since round three: the first `c`
+/// whose Jacobian has a prime subgroup above 1000 carrying at least a
+/// quarter of the Hasse-Weil lower bound, its generator the first
+/// factor-base place (of the first eight) whose order exposes it.
+/// Returns `(curve, D₁, N, c)`.
+pub fn thread_instance(
+    p: u64,
+    genus: u32,
+) -> Option<(HyperellipticCurveP, MumfordDivisorP, BigUint, u64)> {
+    for c in 1..p.min(60) {
+        let curve = thread_curve(p, c, genus);
+        if !thread_curve_is_squarefree(&curve) {
+            continue;
+        }
+        let fb = build_factor_base(&curve, usize::MAX);
+        for e in fb.entries.iter().take(8) {
+            let order = match divisor_order_bsgs(&curve, &e.divisor, 200_000) {
+                Some(o) => o,
+                None => continue,
+            };
+            let l = largest_prime_factor(&order);
+            let (lo, _hi) = hasse_interval(&curve)?;
+            if l < BigUint::from(1000u32) || &l * BigUint::from(4u32) < BigUint::from(lo) {
+                continue;
+            }
+            let d1 = e.divisor.scalar_mul(&(&order / &l), &curve);
+            if divisor_order_bsgs(&curve, &d1, 200_000).as_ref() != Some(&l) {
+                continue;
+            }
+            return Some((curve, d1, l, c));
+        }
+    }
+    None
+}
 
 // ── Pollard rho on the Jacobian ────────────────────────────────────────
 
@@ -121,6 +214,21 @@ pub enum RhoVariant {
     /// reference.
     #[default]
     DistinguishedPoints,
+    /// Distinguished points on `±` classes: after every step the
+    /// position is replaced by a canonical representative of `{D, −D}`,
+    /// with `(a, b)` negated alongside, so the walk needs
+    /// `sqrt(πN/4)` steps instead of `sqrt(πN/2)` — the `√2` of the
+    /// negation map (Wiener–Zuccherato 1998; Duursma–Gaudry–Morain
+    /// 1999).  Index calculus folds `±P` in its factor base, so a
+    /// reference without this fold leaves out a cheap automorphism the
+    /// method under study already uses.
+    ///
+    /// Folding makes fruitless two-cycles likely (about `1/(2r)` per
+    /// step); a look-ahead takes the next branch when the folded
+    /// position would select the same branch again.  Every look-ahead
+    /// trial is a counted group operation, reported in
+    /// [`RhoResult::fruitless_ops`].
+    DistinguishedPointsNegation,
 }
 
 /// Outcome of one rho run.
@@ -139,6 +247,10 @@ pub struct RhoResult {
     /// Of those, the tortoise/hare steps.
     pub walk_ops: usize,
     pub restarts: usize,
+    /// Of `walk_ops`, the work spent on fruitless cycles: look-ahead
+    /// trials that were discarded and distinguished-point gap escapes.
+    /// Zero for walks that do not fold `±`.
+    pub fruitless_ops: usize,
     pub wall_ms: f64,
 }
 
@@ -251,7 +363,8 @@ pub fn pollard_rho_jacobian_with(
 ) -> RhoResult {
     match variant {
         RhoVariant::Floyd => rho_floyd(curve, d1, d2, n, seed, max_steps),
-        RhoVariant::DistinguishedPoints => rho_dp(curve, d1, d2, n, seed, max_steps),
+        RhoVariant::DistinguishedPoints => rho_dp(curve, d1, d2, n, seed, max_steps, false),
+        RhoVariant::DistinguishedPointsNegation => rho_dp(curve, d1, d2, n, seed, max_steps, true),
     }
 }
 
@@ -261,6 +374,25 @@ pub fn pollard_rho_jacobian_with(
 /// expected before the collision — few enough that the table is
 /// negligible, many enough that the walk is not dominated by the
 /// distance to the first one.
+/// Canonical representative of `{D, −D}`: the one whose `v` has its
+/// leading coefficient in `[0, (p−1)/2]`.  `−(u, v) = (u, −v)` because
+/// `deg v < deg u`, so the two `v`s are coefficientwise negatives and
+/// exactly one of them qualifies unless `v = 0`, where `D = −D`.
+/// Returns the representative and whether it is the negation.
+fn fold_negation(d: MumfordDivisorP, curve: &HyperellipticCurveP) -> (MumfordDivisorP, bool) {
+    let lead = match d.v.coeffs.iter().rposition(|c| !c.is_zero()) {
+        Some(i) => d.v.coeffs[i].clone(),
+        None => return (d, false),
+    };
+    let half = (&curve.p - BigUint::one()) >> 1;
+    if lead <= half {
+        (d, false)
+    } else {
+        (d.neg(curve), true)
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
 fn rho_dp(
     curve: &HyperellipticCurveP,
     d1: &MumfordDivisorP,
@@ -268,8 +400,23 @@ fn rho_dp(
     n: &BigUint,
     seed: u64,
     max_steps: usize,
+    negation: bool,
 ) -> RhoResult {
     let started = Instant::now();
+    let mut fruitless_ops = 0usize;
+    // Fold a position and its coefficients together, so that the walk
+    // position is always exactly `a·D₁ + b·D₂`.
+    let fold = |x: MumfordDivisorP, a: BigUint, b: BigUint| {
+        if !negation {
+            return (x, a, b, false);
+        }
+        let (x, flipped) = fold_negation(x, curve);
+        if flipped {
+            (x, (n - a) % n, (n - b) % n, true)
+        } else {
+            (x, a, b, false)
+        }
+    };
     let mut group_ops = 0usize;
     let mut precompute_ops = 0usize;
     let mut restarts = 0usize;
@@ -311,6 +458,8 @@ fn rho_dp(
             .add(&d2.scalar_mul(&b0, curve), curve);
         group_ops += 2 * (n.bits() as usize + 1);
         precompute_ops += 2 * (n.bits() as usize + 1);
+        let (x0, a0, b0, _) = fold(x, a0, b0);
+        x = x0;
         let (mut a, mut b) = (a0, b0);
         let mut this_attempt = 0usize;
         let mut since_dp = 0usize;
@@ -327,10 +476,12 @@ fn rho_dp(
                 since_dp = 0;
                 let j = (rng.next_u64() as usize) % branch.len();
                 let (aj, bj, rj) = &branch[j];
-                a = (&a + aj) % n;
-                b = (&b + bj) % n;
-                x = x.add(rj, curve);
+                let (nx, na, nb, _) = fold(x.add(rj, curve), (&a + aj) % n, (&b + bj) % n);
+                (x, a, b) = (nx, na, nb);
                 group_ops += 1;
+                if negation {
+                    fruitless_ops += 1;
+                }
                 steps_left -= 1;
                 this_attempt += 1;
                 continue;
@@ -356,6 +507,7 @@ fn rho_dp(
                                     precompute_ops,
                                     walk_ops: group_ops - precompute_ops,
                                     restarts,
+                                    fruitless_ops,
                                     wall_ms: started.elapsed().as_secs_f64() * 1e3,
                                 };
                             }
@@ -373,9 +525,8 @@ fn rho_dp(
                         restarts += 1;
                         let j = (rng.next_u64() as usize) % branch.len();
                         let (aj, bj, rj) = &branch[j];
-                        a = (&a + aj) % n;
-                        b = (&b + bj) % n;
-                        x = x.add(rj, curve);
+                        let (nx, na, nb, _) = fold(x.add(rj, curve), (&a + aj) % n, (&b + bj) % n);
+                        (x, a, b) = (nx, na, nb);
                         group_ops += 1;
                         steps_left -= 1;
                         this_attempt += 1;
@@ -386,13 +537,27 @@ fn rho_dp(
                     }
                 }
             }
-            let j = (h >> 32) as usize % branch.len();
-            let (aj, bj, rj) = &branch[j];
-            a = (&a + aj) % n;
-            b = (&b + bj) % n;
-            x = x.add(rj, curve);
-            group_ops += 1;
-            steps_left -= 1;
+            let mut j = (h >> 32) as usize % branch.len();
+            // Look-ahead (folded walk only): a step that lands on the
+            // negation of `x + S_j` and then selects `S_j` again returns
+            // to `x` — a fruitless two-cycle.  Take the next branch
+            // instead.  Each discarded trial is a group operation spent,
+            // and counted.
+            let mut tries = 0usize;
+            let (nx, na, nb) = loop {
+                let (aj, bj, rj) = &branch[j];
+                let (cx, ca, cb, flipped) = fold(x.add(rj, curve), (&a + aj) % n, (&b + bj) % n);
+                group_ops += 1;
+                tries += 1;
+                let returns = flipped && (divisor_hash(&cx) >> 32) as usize % branch.len() == j;
+                if !returns || tries >= branch.len() {
+                    break (cx, ca, cb);
+                }
+                fruitless_ops += 1;
+                j = (j + 1) % branch.len();
+            };
+            (x, a, b) = (nx, na, nb);
+            steps_left = steps_left.saturating_sub(tries);
         }
         if steps_left == 0 {
             break;
@@ -405,6 +570,7 @@ fn rho_dp(
         precompute_ops,
         walk_ops: group_ops - precompute_ops,
         restarts,
+        fruitless_ops,
         wall_ms: started.elapsed().as_secs_f64() * 1e3,
     }
 }
@@ -495,6 +661,7 @@ fn rho_floyd(
                         precompute_ops,
                         walk_ops: group_ops - precompute_ops,
                         restarts,
+                        fruitless_ops: 0,
                         wall_ms: started.elapsed().as_secs_f64() * 1e3,
                     };
                 }
@@ -513,6 +680,7 @@ fn rho_floyd(
         precompute_ops,
         walk_ops: group_ops - precompute_ops,
         restarts,
+        fruitless_ops: 0,
         wall_ms: started.elapsed().as_secs_f64() * 1e3,
     }
 }
@@ -952,6 +1120,88 @@ mod tests {
         let r = pollard_rho_jacobian(&curve, &d1, &d2, &n, 1, 1_000_000);
         assert_eq!(r.k, Some(k));
         assert!(r.group_ops > 0);
+    }
+
+    #[test]
+    fn thread_instance_matches_the_frozen_rows() {
+        // `N` for these instances is recorded in round seven's frozen
+        // output (experiments/hyperelliptic_sparse_solve_r7/): the
+        // library copy of the instance rule must pick the same subgroups
+        // the frozen examples did.
+        for (genus, p, n) in [
+            (2u32, 41u64, 1321u64),
+            (3, 23, 6299),
+            (4, 31, 239753),
+            (4, 61, 16790591),
+        ] {
+            let (_curve, _d1, got, _c) = thread_instance(p, genus).expect("instance");
+            assert_eq!(got, BigUint::from(n), "genus {genus} p {p}");
+        }
+    }
+
+    #[test]
+    fn negation_folded_rho_solves_and_walks_less() {
+        // The folded walk must recover `k` on every seed, keep the plain
+        // walk's result untouched, and on average take fewer walk
+        // operations: ideally `1/√2 ≈ 0.71` of the plain walk's.  The
+        // bound here is loose (0.9) because twenty runs of either walk
+        // are a wide random variable at this size; the registered
+        // measurement is the round-nine sweep, not this test.
+        let (curve, d1, d2, n, k) = instance(251);
+        let (mut plain, mut folded, mut fruitless) = (0usize, 0usize, 0usize);
+        for seed in 0..20u64 {
+            let p = pollard_rho_jacobian_with(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                &RhoVariant::DistinguishedPoints,
+            );
+            let f = pollard_rho_jacobian_with(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                &RhoVariant::DistinguishedPointsNegation,
+            );
+            assert_eq!(p.k.as_ref(), Some(&k), "plain seed {seed}");
+            assert_eq!(f.k.as_ref(), Some(&k), "folded seed {seed}");
+            assert_eq!(p.fruitless_ops, 0, "the plain walk folds nothing");
+            assert!(f.fruitless_ops <= f.walk_ops);
+            plain += p.walk_ops;
+            folded += f.walk_ops;
+            fruitless += f.fruitless_ops;
+        }
+        assert!(
+            (folded as f64) < 0.9 * plain as f64,
+            "folded {folded} vs plain {plain} walk ops"
+        );
+        assert!(
+            (fruitless as f64) < 0.15 * folded as f64,
+            "fruitless {fruitless} of {folded}"
+        );
+    }
+
+    #[test]
+    fn fold_negation_picks_one_of_each_pair() {
+        // `{D, −D}` must map to one representative from either side, and
+        // the flag must say which one was taken.
+        let (curve, d1, _d2, _n, _k) = instance(61);
+        let mut d = d1.clone();
+        for _ in 0..200 {
+            let (a, fa) = fold_negation(d.clone(), &curve);
+            let (b, fb) = fold_negation(d.neg(&curve), &curve);
+            assert_eq!(a, b, "both signs fold to one representative");
+            assert_eq!(a, if fa { d.neg(&curve) } else { d.clone() });
+            if !d.v.is_zero() {
+                assert_ne!(fa, fb, "exactly one side is flipped");
+            }
+            d = d.add(&d1, &curve);
+        }
     }
 
     #[test]
