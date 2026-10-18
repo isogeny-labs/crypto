@@ -27,6 +27,8 @@
 //! `o` oracle subset (a bound, not an arm: labels computed on the same state,
 //! unpriced), `r` random subset (negative control).
 
+#![allow(dead_code)]
+
 use std::collections::{HashMap, HashSet};
 use std::hash::{BuildHasherDefault, Hasher};
 use std::time::Instant;
@@ -236,7 +238,11 @@ impl Gf {
 fn count_solutions(gf: &Gf, m: usize, basis: &[u64], xr: u64) -> u64 {
     let l = basis.len();
     let span: Vec<u64> = (0..1u64 << l)
-        .map(|c| (0..l).filter(|t| (c >> t) & 1 == 1).fold(0, |a, t| a ^ basis[t]))
+        .map(|c| {
+            (0..l)
+                .filter(|t| (c >> t) & 1 == 1)
+                .fold(0, |a, t| a ^ basis[t])
+        })
         .collect();
     let mut state: HashMap<u64, u64> = HashMap::new();
     for &x1 in &span {
@@ -320,7 +326,9 @@ fn pmul(a: &Poly, b: &Poly) -> Poly {
 type Sym = Vec<Poly>;
 
 fn sym_const(v: u64, n: u32) -> Sym {
-    (0..n).map(|k| if (v >> k) & 1 == 1 { vec![0] } else { vec![] }).collect()
+    (0..n)
+        .map(|k| if (v >> k) & 1 == 1 { vec![0] } else { vec![] })
+        .collect()
 }
 fn sym_add(a: &Sym, b: &Sym) -> Sym {
     a.iter().zip(b).map(|(x, y)| padd(x, y)).collect()
@@ -387,7 +395,9 @@ fn sym_subspace(basis: &[u64], offset: usize, n: u32) -> Sym {
     c.into_iter().map(norm).collect()
 }
 fn sym_free(offset: usize, n: u32) -> Sym {
-    (0..n as usize).map(|k| vec![1u64 << (offset + k)]).collect()
+    (0..n as usize)
+        .map(|k| vec![1u64 << (offset + k)])
+        .collect()
 }
 
 /// The chained system `build_decomposition_system` builds, for `m >= 3`:
@@ -537,7 +547,10 @@ impl MRow {
         None
     }
     fn nnz(&self) -> u32 {
-        self.bits[self.start..self.end].iter().map(|w| w.count_ones()).sum()
+        self.bits[self.start..self.end]
+            .iter()
+            .map(|w| w.count_ones())
+            .sum()
     }
     fn clone_row(&self) -> MRow {
         MRow {
@@ -581,7 +594,12 @@ impl Columns {
             lo = 0;
             hi = 0;
         }
-        MRow { bits, start: lo, end: hi, sp: None }
+        MRow {
+            bits,
+            start: lo,
+            end: hi,
+            sp: None,
+        }
     }
     fn unpack(&self, r: &MRow) -> KPoly {
         let mut out = Vec::new();
@@ -771,7 +789,13 @@ impl St {
         while bits != 0 {
             let v = bits.trailing_zeros();
             bits &= bits - 1;
-            self.pairs.push(Pair { field: true, a: h as u32, b: v, lcm: lh, deg: dh + 1 });
+            self.pairs.push(Pair {
+                field: true,
+                a: h as u32,
+                b: v,
+                lcm: lh,
+                deg: dh + 1,
+            });
         }
         let active: Vec<usize> = (0..h).filter(|&g| self.active[g]).collect();
         let mut candidates: Vec<(usize, u64)> =
@@ -779,18 +803,29 @@ impl St {
         let mut kept: Vec<(usize, u64)> = Vec::with_capacity(candidates.len());
         while let Some((g1, l1)) = candidates.pop() {
             let coprime = lh & self.lm[g1] == 0;
-            let covered = candidates.iter().chain(kept.iter()).any(|&(_, l2)| l2 & !l1 == 0);
+            let covered = candidates
+                .iter()
+                .chain(kept.iter())
+                .any(|&(_, l2)| l2 & !l1 == 0);
             if coprime || !covered {
                 kept.push((g1, l1));
             }
         }
-        let selected: Vec<(usize, u64)> =
-            kept.into_iter().filter(|&(g, _)| lh & self.lm[g] != 0).collect();
+        let selected: Vec<(usize, u64)> = kept
+            .into_iter()
+            .filter(|&(g, _)| lh & self.lm[g] != 0)
+            .collect();
         if immediate_filter {
             self.filter_pairs_since(h);
         }
         for (g, l) in selected {
-            self.pairs.push(Pair { field: false, a: g as u32, b: h as u32, lcm: l, deg: l.count_ones() });
+            self.pairs.push(Pair {
+                field: false,
+                a: g as u32,
+                b: h as u32,
+                lcm: l,
+                deg: l.count_ones(),
+            });
         }
         for g in 0..h {
             if self.active[g] && lh & !self.lm[g] == 0 {
@@ -922,7 +957,11 @@ impl Model {
     fn score(&self, x: &[f64; NF]) -> f64 {
         let mut s = 0.0;
         for i in 0..NF {
-            let z = if self.sel_sd[i] > 0.0 { (x[i] - self.sel_mu[i]) / self.sel_sd[i] } else { 0.0 };
+            let z = if self.sel_sd[i] > 0.0 {
+                (x[i] - self.sel_mu[i]) / self.sel_sd[i]
+            } else {
+                0.0
+            };
             s += self.sel_w[i] * z;
         }
         s
@@ -930,13 +969,22 @@ impl Model {
     fn row_score(&self, x: &[f64; NR]) -> f64 {
         let mut s = 0.0;
         for i in 0..NR {
-            let z = if self.ord_sd[i] > 0.0 { (x[i] - self.ord_mu[i]) / self.ord_sd[i] } else { 0.0 };
+            let z = if self.ord_sd[i] > 0.0 {
+                (x[i] - self.ord_mu[i]) / self.ord_sd[i]
+            } else {
+                0.0
+            };
             s += self.ord_w[i] * z;
         }
         s
     }
     fn to_text(&self) -> String {
-        let f = |v: &Vec<f64>| v.iter().map(|x| format!("{x}")).collect::<Vec<_>>().join(" ");
+        let f = |v: &Vec<f64>| {
+            v.iter()
+                .map(|x| format!("{x}"))
+                .collect::<Vec<_>>()
+                .join(" ")
+        };
         format!(
             "b09-model-v1\nsel_mu {}\nsel_sd {}\nsel_w {}\nsel_tau {}\nsel_rate {}\nord_mu {}\nord_sd {}\nord_w {}\n",
             f(&self.sel_mu), f(&self.sel_sd), f(&self.sel_w), self.sel_tau, self.sel_rate,
@@ -961,7 +1009,10 @@ impl Model {
                 _ => {}
             }
         }
-        assert!(m.sel_w.len() == NF && m.ord_w.len() == NR, "model file has wrong dimensions");
+        assert!(
+            m.sel_w.len() == NF && m.ord_w.len() == NR,
+            "model file has wrong dimensions"
+        );
         m
     }
 }
@@ -986,7 +1037,12 @@ struct Policy {
 }
 impl Policy {
     fn incumbent() -> Policy {
-        Policy { pair: PairPol::All, learned_order: false, random_order: false, model: None }
+        Policy {
+            pair: PairPol::All,
+            learned_order: false,
+            random_order: false,
+            model: None,
+        }
     }
 }
 
@@ -1127,7 +1183,15 @@ fn build_step(st: &St, selected: &[Pair]) -> StepMat {
         frontier = next;
     }
     let cols = Columns::from_monomials(examined.into_iter().collect());
-    StepMat { cols, reducers, srows, srow_field, pair_rows, no_div, divisor_tests: tests }
+    StepMat {
+        cols,
+        reducers,
+        srows,
+        srow_field,
+        pair_rows,
+        no_div,
+        divisor_tests: tests,
+    }
 }
 
 /// Which selected pairs are useful: process the pairs one at a time (by
@@ -1140,7 +1204,14 @@ fn label_pass(sm: &StepMat, selected: &[Pair], stats: &mut Stats) -> Vec<bool> {
         el.reduce(sm.cols.pack(r));
     }
     let mut idx: Vec<usize> = (0..selected.len()).collect();
-    idx.sort_by_key(|&i| (selected[i].deg, mkey(selected[i].lcm), selected[i].a, selected[i].b));
+    idx.sort_by_key(|&i| {
+        (
+            selected[i].deg,
+            mkey(selected[i].lcm),
+            selected[i].a,
+            selected[i].b,
+        )
+    });
     let mut labels = vec![false; selected.len()];
     for i in idx {
         let (r0, r1) = sm.pair_rows[i];
@@ -1159,7 +1230,15 @@ fn label_pass(sm: &StepMat, selected: &[Pair], stats: &mut Stats) -> Vec<bool> {
     labels
 }
 
-fn row_feats(r: &MRow, lead: usize, ncols: usize, field: bool, group: usize, basepos: f64, monos: &[u64]) -> [f64; NR] {
+fn row_feats(
+    r: &MRow,
+    lead: usize,
+    ncols: usize,
+    field: bool,
+    group: usize,
+    basepos: f64,
+    monos: &[u64],
+) -> [f64; NR] {
     let nnz = r.nnz() as f64;
     let span = (r.end - r.start) as f64;
     [
@@ -1207,7 +1286,10 @@ fn eliminate_step(
     for &l in &leads {
         *group.entry(l).or_insert(0) += 1;
     }
-    let needs_feats = learned_order || col.as_ref().map_or(false, |c| nsr >= 500 && c.rx.len() < c.row_samples_cap && c.order_matrices < 2);
+    let needs_feats = learned_order
+        || col.as_ref().map_or(false, |c| {
+            nsr >= 500 && c.rx.len() < c.row_samples_cap && c.order_matrices < 2
+        });
     let mut feats: Vec<[f64; NR]> = Vec::new();
     if needs_feats && nsr > 0 {
         let mut basepos = vec![0.0f64; nsr];
@@ -1217,7 +1299,15 @@ fn eliminate_step(
         for i in 0..nsr {
             let l = leads[i];
             let g = *group.get(&l).unwrap_or(&1);
-            feats.push(row_feats(packed[i].as_ref().unwrap(), l.min(ncols.saturating_sub(1)), ncols, sm.srow_field[i], g, basepos[i], &sm.cols.monos));
+            feats.push(row_feats(
+                packed[i].as_ref().unwrap(),
+                l.min(ncols.saturating_sub(1)),
+                ncols,
+                sm.srow_field[i],
+                g,
+                basepos[i],
+                &sm.cols.monos,
+            ));
         }
     }
     // (c) training samples: the cheapest of five candidate orders
@@ -1228,7 +1318,9 @@ fn eliminate_step(
             && c.order_matrices < 2
             && (sm.reducers.len() + nsr) as u64 * words <= 1u64 << 26
         {
-            let nnz: Vec<f64> = (0..nsr).map(|i| packed[i].as_ref().unwrap().nnz() as f64).collect();
+            let nnz: Vec<f64> = (0..nsr)
+                .map(|i| packed[i].as_ref().unwrap().nnz() as f64)
+                .collect();
             let span: Vec<f64> = (0..nsr)
                 .map(|i| {
                     let r = packed[i].as_ref().unwrap();
@@ -1247,7 +1339,12 @@ fn eliminate_step(
             o.reverse();
             orders.push(o);
             let mut o = base.clone();
-            o.sort_by(|&x, &y| (nnz[x] * span[x]).partial_cmp(&(nnz[y] * span[y])).unwrap().then(x.cmp(&y)));
+            o.sort_by(|&x, &y| {
+                (nnz[x] * span[x])
+                    .partial_cmp(&(nnz[y] * span[y]))
+                    .unwrap()
+                    .then(x.cmp(&y))
+            });
             orders.push(o);
             let mut best = 0usize;
             let mut best_x = u64::MAX;
@@ -1290,7 +1387,8 @@ fn eliminate_step(
         let m = model.expect("learned order needs a model");
         let mut sc: Vec<(f64, usize)> = (0..nsr).map(|i| (m.row_score(&feats[i]), i)).collect();
         sc.sort_by(|x, y| x.0.partial_cmp(&y.0).unwrap().then(x.1.cmp(&y.1)));
-        stats.policy_ops += (nsr as u64) * (2 * NR as u64) + (nsr as u64) * 2 * ((nsr as f64).log2().ceil() as u64).max(1);
+        stats.policy_ops += (nsr as u64) * (2 * NR as u64)
+            + (nsr as u64) * 2 * ((nsr as f64).log2().ceil() as u64).max(1);
         sc.into_iter().map(|x| x.1).collect()
     } else if random_order && nsr > 0 {
         stats.policy_ops += nsr as u64 * (1 + 2 * ((nsr as f64).log2().ceil() as u64).max(1));
@@ -1354,8 +1452,11 @@ fn select_pairs(
         PairPol::Learned(q) => {
             let m = pol.model.as_ref().expect("learned selection needs a model");
             let n = cand.len();
-            stats.policy_ops += n as u64 * OPS_PER_PAIR_SCORE + 2 * n as u64 * ((n as f64).log2().ceil() as u64).max(1);
-            let mut sc: Vec<(f64, usize)> = (0..n).map(|k| (m.score(&pair_feats(st, &st.pairs[cand[k]], step, cx)), k)).collect();
+            stats.policy_ops += n as u64 * OPS_PER_PAIR_SCORE
+                + 2 * n as u64 * ((n as f64).log2().ceil() as u64).max(1);
+            let mut sc: Vec<(f64, usize)> = (0..n)
+                .map(|k| (m.score(&pair_feats(st, &st.pairs[cand[k]], step, cx)), k))
+                .collect();
             sc.sort_by(|x, y| y.0.partial_cmp(&x.0).unwrap().then(x.1.cmp(&y.1)));
             let take = ((*q * n as f64).ceil() as usize).clamp(1, n);
             let mut keep = vec![false; n];
@@ -1366,8 +1467,15 @@ fn select_pairs(
         }
         PairPol::Trace(set) => {
             stats.policy_ops += cand.len() as u64 * OPS_PER_TRACE_TEST;
-            let keep: Vec<bool> = cand.iter().map(|&i| set.contains(&trace_key(st, &st.pairs[i]))).collect();
-            if keep.iter().any(|&k| k) { keep } else { all }
+            let keep: Vec<bool> = cand
+                .iter()
+                .map(|&i| set.contains(&trace_key(st, &st.pairs[i])))
+                .collect();
+            if keep.iter().any(|&k| k) {
+                keep
+            } else {
+                all
+            }
         }
         PairPol::Random(q) => {
             let n = cand.len();
@@ -1400,16 +1508,23 @@ fn run_f4(
     let t0 = Instant::now();
     let mut stats = Stats::default();
     let mut trace: Vec<TraceKey> = Vec::new();
-    let coord_mask = if draw.ncoord >= 64 { u64::MAX } else { (1u64 << draw.ncoord) - 1 };
-    let finish = |outcome: Outcome, stats: Stats, h: u64, bl: usize, nstd: u64, trace: Vec<TraceKey>| RunOut {
-        outcome,
-        stats,
-        basis_hash: h,
-        basis_len: bl,
-        nstd,
-        useful_trace: trace,
-        wall_ms: t0.elapsed().as_millis(),
+    let coord_mask = if draw.ncoord >= 64 {
+        u64::MAX
+    } else {
+        (1u64 << draw.ncoord) - 1
     };
+    let finish =
+        |outcome: Outcome, stats: Stats, h: u64, bl: usize, nstd: u64, trace: Vec<TraceKey>| {
+            RunOut {
+                outcome,
+                stats,
+                basis_hash: h,
+                basis_len: bl,
+                nstd,
+                useful_trace: trace,
+                wall_ms: t0.elapsed().as_millis(),
+            }
+        };
     // initial echelon of the equations
     let cols = Columns::from_monomials(draw.eqs.iter().flat_map(|p| p.iter().copied()).collect());
     let mut el = Elim::new(cols.monos.len());
@@ -1426,7 +1541,11 @@ fn run_f4(
     start.sort_by_key(|p| mkey(p[0]));
     let mut st = St::new();
     st.insert_batch(start);
-    let cx = Ctx { nv: draw.nv, coord_mask, n_start: st.polys.len() };
+    let cx = Ctx {
+        nv: draw.nv,
+        coord_mask,
+        n_start: st.polys.len(),
+    };
     let _ = cx.nv;
     let mut step = 0usize;
     while !st.pairs.is_empty() {
@@ -1439,7 +1558,9 @@ fn run_f4(
             return finish(Outcome::CapTouch, stats, 0, 0, 0, trace);
         }
         let d = st.pairs.iter().map(|p| p.deg).min().unwrap();
-        let cand: Vec<usize> = (0..st.pairs.len()).filter(|&i| st.pairs[i].deg == d).collect();
+        let cand: Vec<usize> = (0..st.pairs.len())
+            .filter(|&i| st.pairs[i].deg == d)
+            .collect();
         let mut keep = select_pairs(pol, &st, &cand, step, &cx, &mut stats, rng);
         let mut oracle_rows: Option<()> = None;
         let _ = &mut oracle_rows;
@@ -1447,7 +1568,9 @@ fn run_f4(
         if matches!(pol.pair, PairPol::Oracle) {
             let sel_all: Vec<Pair> = cand.iter().map(|&i| st.pairs[i]).collect();
             let sm_all = build_step(&st, &sel_all);
-            if (sm_all.reducers.len() + sm_all.srows.len()) as u64 * sm_all.cols.words() as u64 > caps.max_matrix_words {
+            if (sm_all.reducers.len() + sm_all.srows.len()) as u64 * sm_all.cols.words() as u64
+                > caps.max_matrix_words
+            {
                 stats.pairs_left = st.pairs.len() as u64;
                 return finish(Outcome::CapMatrix, stats, 0, 0, 0, trace);
             }
@@ -1456,7 +1579,12 @@ fn run_f4(
                 keep = labels;
             }
         }
-        let selected: Vec<Pair> = cand.iter().zip(&keep).filter(|(_, &k)| k).map(|(&i, _)| st.pairs[i]).collect();
+        let selected: Vec<Pair> = cand
+            .iter()
+            .zip(&keep)
+            .filter(|(_, &k)| k)
+            .map(|(&i, _)| st.pairs[i])
+            .collect();
         stats.pairs_deferred += (cand.len() - selected.len()) as u64;
         // remove the selected pairs from the queue
         let mut remove = vec![false; st.pairs.len()];
@@ -1483,7 +1611,15 @@ fn run_f4(
         }
         let tb = Instant::now();
         let sm = build_step(&st, &selected);
-        if std::env::var("B09_TIMING").is_ok() { eprintln!("step {step} deg {d} pairs {} build {:.2}s rows {} cols {}", selected.len(), tb.elapsed().as_secs_f64(), sm.reducers.len()+sm.srows.len(), sm.cols.monos.len()); }
+        if std::env::var("B09_TIMING").is_ok() {
+            eprintln!(
+                "step {step} deg {d} pairs {} build {:.2}s rows {} cols {}",
+                selected.len(),
+                tb.elapsed().as_secs_f64(),
+                sm.reducers.len() + sm.srows.len(),
+                sm.cols.monos.len()
+            );
+        }
         stats.divisor_tests += sm.divisor_tests;
         let n_rows = sm.reducers.len() + sm.srows.len();
         let words = sm.cols.words() as u64;
@@ -1501,7 +1637,11 @@ fn run_f4(
         if col.is_some() {
             let labels = label_pass(&sm, &selected, &mut stats);
             let c = col.as_mut().unwrap();
-            let stride = if selected.len() > c.pair_samples_cap { selected.len() / c.pair_samples_cap + 1 } else { 1 };
+            let stride = if selected.len() > c.pair_samples_cap {
+                selected.len() / c.pair_samples_cap + 1
+            } else {
+                1
+            };
             for (i, p) in selected.iter().enumerate() {
                 if labels[i] {
                     trace.push(trace_key(&st, p));
@@ -1546,7 +1686,10 @@ fn run_f4(
     }
     stats.pairs_left = 0;
     // complete: reduced basis and the standard-monomial count
-    let active: Vec<KPoly> = (0..st.polys.len()).filter(|&g| st.active[g]).map(|g| st.polys[g].clone()).collect();
+    let active: Vec<KPoly> = (0..st.polys.len())
+        .filter(|&g| st.active[g])
+        .map(|g| st.polys[g].clone())
+        .collect();
     let basis = reduce_basis(active);
     let mut h = 0xcbf2_9ce4_8422_2325u64;
     for p in &basis {
@@ -1665,7 +1808,9 @@ fn make_cell(n: u32, l: usize, m: usize, seed: u64) -> Cell {
     // planted: a decomposable target (x_1..x_m in the span, the chain solved)
     let span_elem = |rng: &mut Rng| -> u64 {
         let c = rng.next() & ((1u64 << l) - 1);
-        (0..l).filter(|t| (c >> t) & 1 == 1).fold(0u64, |a, t| a ^ basis[t])
+        (0..l)
+            .filter(|t| (c >> t) & 1 == 1)
+            .fold(0u64, |a, t| a ^ basis[t])
     };
     let mut planted: Vec<u64> = Vec::new();
     let mut guard = 0;
@@ -1690,7 +1835,15 @@ fn make_cell(n: u32, l: usize, m: usize, seed: u64) -> Cell {
             planted.push(u);
         }
     }
-    Cell { n, l, m, gf, basis, targets, planted }
+    Cell {
+        n,
+        l,
+        m,
+        gf,
+        basis,
+        targets,
+        planted,
+    }
 }
 
 fn cell_target(c: &Cell, role: &str, idx: usize) -> u64 {
@@ -1749,7 +1902,15 @@ fn solve_linear(mut a: Vec<Vec<f64>>, mut b: Vec<f64>) -> Vec<f64> {
             }
         }
     }
-    (0..n).map(|i| if a[i][i].abs() < 1e-14 { 0.0 } else { b[i] / a[i][i] }).collect()
+    (0..n)
+        .map(|i| {
+            if a[i][i].abs() < 1e-14 {
+                0.0
+            } else {
+                b[i] / a[i][i]
+            }
+        })
+        .collect()
 }
 
 fn standardize<const D: usize>(xs: &[[f64; D]]) -> (Vec<f64>, Vec<f64>) {
@@ -1781,7 +1942,11 @@ fn standardize<const D: usize>(xs: &[[f64; D]]) -> (Vec<f64>, Vec<f64>) {
 fn zrow<const D: usize>(x: &[f64; D], mu: &[f64], sd: &[f64]) -> [f64; D] {
     let mut z = [0.0; D];
     for i in 0..D {
-        z[i] = if sd[i] > 0.0 { (x[i] - mu[i]) / sd[i] } else { 1.0 };
+        z[i] = if sd[i] > 0.0 {
+            (x[i] - mu[i]) / sd[i]
+        } else {
+            1.0
+        };
     }
     z
 }
@@ -1837,10 +2002,22 @@ fn fit_model(c: &Collector) -> (Model, FitReport) {
     m.sel_sd = sd;
     m.sel_w = w.clone();
     // threshold: keep 98 percent of the useful pairs
-    let scores: Vec<f64> = zs.iter().map(|z| (0..NF).map(|i| w[i] * z[i]).sum()).collect();
-    let mut pos_scores: Vec<f64> = scores.iter().zip(&c.py).filter(|(_, &y)| y == 1).map(|(s, _)| *s).collect();
+    let scores: Vec<f64> = zs
+        .iter()
+        .map(|z| (0..NF).map(|i| w[i] * z[i]).sum())
+        .collect();
+    let mut pos_scores: Vec<f64> = scores
+        .iter()
+        .zip(&c.py)
+        .filter(|(_, &y)| y == 1)
+        .map(|(s, _)| *s)
+        .collect();
     pos_scores.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    m.sel_tau = if pos_scores.is_empty() { f64::NEG_INFINITY } else { pos_scores[(pos_scores.len() as f64 * 0.02) as usize] };
+    m.sel_tau = if pos_scores.is_empty() {
+        f64::NEG_INFINITY
+    } else {
+        pos_scores[(pos_scores.len() as f64 * 0.02) as usize]
+    };
     let sel: Vec<bool> = scores.iter().map(|&s| s >= m.sel_tau).collect();
     let nsel = sel.iter().filter(|&&b| b).count();
     let tp = sel.iter().zip(&c.py).filter(|(&s, &y)| s && y == 1).count();
@@ -1861,7 +2038,11 @@ fn fit_model(c: &Collector) -> (Model, FitReport) {
     for i in 0..NR {
         ata[i][i] += 1e-3 * rz.len().max(1) as f64;
     }
-    let rw = if rz.is_empty() { vec![0.0; NR] } else { solve_linear(ata, aty) };
+    let rw = if rz.is_empty() {
+        vec![0.0; NR]
+    } else {
+        solve_linear(ata, aty)
+    };
     let ymean = c.ry.iter().sum::<f64>() / c.ry.len().max(1) as f64;
     let (mut sse, mut sst) = (0.0, 0.0);
     for (z, &y) in rz.iter().zip(&c.ry) {
@@ -1875,9 +2056,17 @@ fn fit_model(c: &Collector) -> (Model, FitReport) {
     let rep = FitReport {
         n_pairs: c.py.len(),
         pos_rate: npos as f64 / c.py.len().max(1) as f64,
-        recall: if npos > 0 { tp as f64 / npos as f64 } else { 0.0 },
+        recall: if npos > 0 {
+            tp as f64 / npos as f64
+        } else {
+            0.0
+        },
         sel_rate: m.sel_rate,
-        precision: if nsel > 0 { tp as f64 / nsel as f64 } else { 0.0 },
+        precision: if nsel > 0 {
+            tp as f64 / nsel as f64
+        } else {
+            0.0
+        },
         n_rows: c.ry.len(),
         ridge_r2: if sst > 0.0 { 1.0 - sse / sst } else { 0.0 },
         order_wins: c.order_wins,
@@ -1890,7 +2079,15 @@ fn fit_model(c: &Collector) -> (Model, FitReport) {
 
 // ---------------------------------------------------------------- output lines
 
-fn run_line(cell: &Cell, role: &str, idx: usize, arm: &str, xr: u64, sols: u64, r: &RunOut) -> String {
+fn run_line(
+    cell: &Cell,
+    role: &str,
+    idx: usize,
+    arm: &str,
+    xr: u64,
+    sols: u64,
+    r: &RunOut,
+) -> String {
     let s = &r.stats;
     let ok = match r.outcome {
         Outcome::Unsat => sols == 0,
@@ -1916,7 +2113,10 @@ fn cell_from(a: &Args) -> Cell {
 }
 
 fn trace_to_text(idx: usize, t: &[TraceKey]) -> String {
-    let mut v: Vec<String> = t.iter().map(|k| format!("{},{},{}", k.0, k.1, k.2 as u8)).collect();
+    let mut v: Vec<String> = t
+        .iter()
+        .map(|k| format!("{},{},{}", k.0, k.1, k.2 as u8))
+        .collect();
     v.sort();
     format!("T {} {}\n", idx, v.join(" "))
 }
@@ -1943,20 +2143,55 @@ fn read_traces(path: &str) -> Vec<FxSet<TraceKey>> {
     out
 }
 
-
-fn parse_arm(arm: &str, model: &Option<Model>, traces: &Option<Vec<FxSet<TraceKey>>>, i: usize) -> Policy {
-    let q = |name: &str| -> f64 { name[1..].parse::<f64>().expect("arm fraction in percent") / 100.0 };
+fn parse_arm(
+    arm: &str,
+    model: &Option<Model>,
+    traces: &Option<Vec<FxSet<TraceKey>>>,
+    i: usize,
+) -> Policy {
+    let q =
+        |name: &str| -> f64 { name[1..].parse::<f64>().expect("arm fraction in percent") / 100.0 };
     match arm {
         "a" => Policy::incumbent(),
-        "c" => Policy { pair: PairPol::All, learned_order: true, random_order: false, model: model.clone() },
+        "c" => Policy {
+            pair: PairPol::All,
+            learned_order: true,
+            random_order: false,
+            model: model.clone(),
+        },
         "d" => {
             let t = traces.as_ref().expect("arm d needs --trace");
-            Policy { pair: PairPol::Trace(t.get(i).cloned().unwrap_or_default()), learned_order: false, random_order: false, model: None }
+            Policy {
+                pair: PairPol::Trace(t.get(i % N_TRAIN).cloned().unwrap_or_default()),
+                learned_order: false,
+                random_order: false,
+                model: None,
+            }
         }
-        "p" => Policy { pair: PairPol::All, learned_order: false, random_order: true, model: None },
-        "o" => Policy { pair: PairPol::Oracle, learned_order: false, random_order: false, model: None },
-        x if x.starts_with('b') => Policy { pair: PairPol::Learned(q(x)), learned_order: false, random_order: false, model: model.clone() },
-        x if x.starts_with('r') => Policy { pair: PairPol::Random(q(x)), learned_order: false, random_order: false, model: None },
+        "p" => Policy {
+            pair: PairPol::All,
+            learned_order: false,
+            random_order: true,
+            model: None,
+        },
+        "o" => Policy {
+            pair: PairPol::Oracle,
+            learned_order: false,
+            random_order: false,
+            model: None,
+        },
+        x if x.starts_with('b') => Policy {
+            pair: PairPol::Learned(q(x)),
+            learned_order: false,
+            random_order: false,
+            model: model.clone(),
+        },
+        x if x.starts_with('r') => Policy {
+            pair: PairPol::Random(q(x)),
+            learned_order: false,
+            random_order: false,
+            model: None,
+        },
         other => panic!("unknown arm {other}"),
     }
 }
@@ -1978,7 +2213,11 @@ fn mode_train(a: &Args) {
         let xr = cell_target(&cell, "train", i);
         let sols = count_solutions(&cell.gf, cell.m, &cell.basis, xr);
         let draw = draw_for(&cell, xr);
-        let mut c = Some(Collector { pair_samples_cap: pair_cap, row_samples_cap: row_cap, ..Collector::default() });
+        let mut c = Some(Collector {
+            pair_samples_cap: pair_cap,
+            row_samples_cap: row_cap,
+            ..Collector::default()
+        });
         let r = run_f4(&draw, &Policy::incumbent(), &caps, &mut c, &mut rng);
         let c = c.unwrap();
         println!("{}", run_line(&cell, "train", i, "a", xr, sols, &r));
@@ -2004,7 +2243,10 @@ fn mode_train(a: &Args) {
         obx += c.order_best_xors;
         odx += c.order_default_xors;
     }
-    samples.push_str(&format!("O {} {} {} {} {} {} {} {}\n", ow[0], ow[1], ow[2], ow[3], ow[4], om, obx, odx));
+    samples.push_str(&format!(
+        "O {} {} {} {} {} {} {} {}\n",
+        ow[0], ow[1], ow[2], ow[3], ow[4], om, obx, odx
+    ));
     std::fs::write(format!("{out}.samples.{lo}"), samples).expect("write samples");
     std::fs::write(format!("{out}.trace.{lo}"), traces).expect("write trace");
 }
@@ -2012,7 +2254,12 @@ fn mode_train(a: &Args) {
 fn mode_fit(a: &Args) {
     let cell = cell_from(a);
     let out = a.flag("--out").expect("--out PREFIX");
-    let files: Vec<String> = a.flag("--samples").expect("--samples f1,f2").split(',').map(|s| s.to_string()).collect();
+    let files: Vec<String> = a
+        .flag("--samples")
+        .expect("--samples f1,f2")
+        .split(',')
+        .map(|s| s.to_string())
+        .collect();
     let mut col = Collector::default();
     for f in &files {
         let text = std::fs::read_to_string(f).unwrap_or_else(|e| panic!("{f}: {e}"));
@@ -2063,11 +2310,18 @@ fn mode_eval(a: &Args) {
     let cell = cell_from(a);
     let mut caps = caps_from(a);
     let role = a.flag("--role").unwrap_or_else(|| "test".to_string());
-    let arms: Vec<String> = a.flag("--arms").unwrap_or_else(|| "a".to_string()).split(',').map(|s| s.to_string()).collect();
+    let arms: Vec<String> = a
+        .flag("--arms")
+        .unwrap_or_else(|| "a".to_string())
+        .split(',')
+        .map(|s| s.to_string())
+        .collect();
     let lo: usize = a.num("--from", 0);
     let hi: usize = a.num("--to", N_TEST);
     let rel_cap: f64 = a.num("--rel-cap", 1.5f64);
-    let model = a.flag("--model").map(|p| Model::from_text(&std::fs::read_to_string(&p).unwrap_or_else(|e| panic!("{p}: {e}"))));
+    let model = a.flag("--model").map(|p| {
+        Model::from_text(&std::fs::read_to_string(&p).unwrap_or_else(|e| panic!("{p}: {e}")))
+    });
     let traces: Option<Vec<FxSet<TraceKey>>> = a.flag("--trace").map(|p| {
         let mut all: Vec<FxSet<TraceKey>> = Vec::new();
         for f in p.split(',') {
@@ -2118,7 +2372,11 @@ fn jraw<'a>(line: &'a str, key: &str) -> Option<&'a str> {
 }
 fn jn(line: &str, key: &str) -> Option<f64> {
     let s = jraw(line, key)?;
-    let end = s.find(|c: char| !(c.is_ascii_digit() || c == '-' || c == '.' || c == 'e' || c == 'E' || c == '+')).unwrap_or(s.len());
+    let end = s
+        .find(|c: char| {
+            !(c.is_ascii_digit() || c == '-' || c == '.' || c == 'e' || c == 'E' || c == '+')
+        })
+        .unwrap_or(s.len());
     s[..end].parse().ok()
 }
 fn js(line: &str, key: &str) -> Option<String> {
@@ -2193,7 +2451,9 @@ fn mode_report(a: &Args) {
             if !line.contains("\"arm\":") {
                 continue;
             }
-            let Some(h) = jn(line, "basis_hash") else { continue };
+            let Some(h) = jn(line, "basis_hash") else {
+                continue;
+            };
             recs.push(Rec {
                 cell: js(line, "cell").unwrap_or_default(),
                 role: js(line, "role").unwrap_or_default(),
@@ -2218,23 +2478,48 @@ fn mode_report(a: &Args) {
     let done = |r: &Rec| r.outcome == "unsat" || r.outcome == "sat";
     let usable = |r: &Rec| done(r) || r.outcome.starts_with("cap");
     // verdict table: (arm, literal win count, tightened win count) over the design cells
-    let design_cells: Vec<&String> = cells.iter().filter(|c| ["17-4-3", "19-4-3", "21-5-3", "13-3-4"].contains(&c.as_str())).collect();
+    let design_cells: Vec<&String> = cells
+        .iter()
+        .filter(|c| ["17-4-3", "19-4-3", "21-5-3", "13-3-4"].contains(&c.as_str()))
+        .collect();
     let mut lit: HashMap<String, usize> = HashMap::new();
     let mut tight: HashMap<String, usize> = HashMap::new();
     for role in ["test", "planted"] {
         println!("== role {role}");
         for cell in &cells {
-            let find = |arm: &str, idx: usize| recs.iter().find(|r| &r.cell == cell && r.role == role && r.arm == arm && r.idx == idx);
-            let mut idxs: Vec<usize> = recs.iter().filter(|r| &r.cell == cell && r.role == role && r.arm == "a").map(|r| r.idx).collect();
+            let find = |arm: &str, idx: usize| {
+                recs.iter()
+                    .find(|r| &r.cell == cell && r.role == role && r.arm == arm && r.idx == idx)
+            };
+            let mut idxs: Vec<usize> = recs
+                .iter()
+                .filter(|r| &r.cell == cell && r.role == role && r.arm == "a")
+                .map(|r| r.idx)
+                .collect();
             idxs.sort();
             idxs.dedup();
             if idxs.is_empty() {
                 continue;
             }
-            let n_cens = idxs.iter().filter(|&&i| find("a", i).map_or(false, |r| !done(r))).count();
-            let nsat = idxs.iter().filter(|&&i| find("a", i).map_or(false, |r| r.sols > 0.0)).count();
-            println!("cell {cell}: {} targets, {} satisfiable, {} censored at the incumbent", idxs.len(), nsat, n_cens);
-            let mut arms: Vec<String> = recs.iter().filter(|r| &r.cell == cell && r.role == role && r.arm != "a").map(|r| r.arm.clone()).collect();
+            let n_cens = idxs
+                .iter()
+                .filter(|&&i| find("a", i).map_or(false, |r| !done(r)))
+                .count();
+            let nsat = idxs
+                .iter()
+                .filter(|&&i| find("a", i).map_or(false, |r| r.sols > 0.0))
+                .count();
+            println!(
+                "cell {cell}: {} targets, {} satisfiable, {} censored at the incumbent",
+                idxs.len(),
+                nsat,
+                n_cens
+            );
+            let mut arms: Vec<String> = recs
+                .iter()
+                .filter(|r| &r.cell == cell && r.role == role && r.arm != "a")
+                .map(|r| r.arm.clone())
+                .collect();
             arms.sort();
             arms.dedup();
             let mut result: HashMap<String, (bool, bool, bool)> = HashMap::new(); // (touch win, rows ok, null beaten)
@@ -2272,13 +2557,23 @@ fn mode_report(a: &Args) {
                 let rows_ok = ra >= rb;
                 win &= all_w_ok;
                 // matched null: b<q> against r<q>, c against p
-                let null = if arm.starts_with('b') { Some(format!("r{}", &arm[1..])) } else if arm == "c" { Some("p".to_string()) } else { None };
+                let null = if arm.starts_with('b') {
+                    Some(format!("r{}", &arm[1..]))
+                } else if arm == "c" {
+                    Some("p".to_string())
+                } else {
+                    None
+                };
                 let mut beats_null = true;
                 if let Some(nm) = &null {
                     let np: Vec<(&Rec, &Rec)> = idxs
                         .iter()
                         .filter_map(|&i| match (find(nm, i), find(arm, i)) {
-                            (Some(x), Some(y)) if usable(x) && usable(y) && done(find("a", i).unwrap()) => Some((x, y)),
+                            (Some(x), Some(y))
+                                if usable(x) && usable(y) && done(find("a", i).unwrap()) =>
+                            {
+                                Some((x, y))
+                            }
                             _ => None,
                         })
                         .collect();
@@ -2289,8 +2584,16 @@ fn mode_report(a: &Args) {
                         line.push_str(&format!(" || null {nm} / {arm}:"));
                         for (wi, &w) in weights.iter().enumerate() {
                             let ia: Vec<&Rec> = idxs.iter().filter(|&&i| matches!((find(nm, i), find(arm, i)), (Some(x), Some(y)) if usable(x) && usable(y) && done(find("a", i).unwrap()))).map(|&i| find("a", i).unwrap()).collect();
-                            let ca: Vec<f64> = np.iter().zip(&ia).map(|((x, _), a0)| cens_cost(x, a0, w)).collect();
-                            let cb: Vec<f64> = np.iter().zip(&ia).map(|((_, y), a0)| cens_cost(y, a0, w)).collect();
+                            let ca: Vec<f64> = np
+                                .iter()
+                                .zip(&ia)
+                                .map(|((x, _), a0)| cens_cost(x, a0, w))
+                                .collect();
+                            let cb: Vec<f64> = np
+                                .iter()
+                                .zip(&ia)
+                                .map(|((_, y), a0)| cens_cost(y, a0, w))
+                                .collect();
                             let (pt, lo, hi, _) = ratio_ci(&ca, &cb, 0xB107 + wi as u64);
                             line.push_str(&format!(" w={w}: {pt:.3} [{lo:.3},{hi:.3}]"));
                             if !(lo > 1.0) {
@@ -2300,7 +2603,14 @@ fn mode_report(a: &Args) {
                         beats_null = ok_all;
                     }
                 }
-                println!("{line} | touch_win {win} | rows_ok {rows_ok}{}", if null.is_some() { format!(" | beats_null {beats_null}") } else { String::new() });
+                println!(
+                    "{line} | touch_win {win} | rows_ok {rows_ok}{}",
+                    if null.is_some() {
+                        format!(" | beats_null {beats_null}")
+                    } else {
+                        String::new()
+                    }
+                );
                 result.insert(arm.clone(), (win, rows_ok, beats_null));
             }
             if role == "test" {
@@ -2315,7 +2625,10 @@ fn mode_report(a: &Args) {
             }
         }
     }
-    println!("== verdicts over the {} design cells found", design_cells.len());
+    println!(
+        "== verdicts over the {} design cells found",
+        design_cells.len()
+    );
     let mut arms: Vec<String> = lit.keys().chain(tight.keys()).cloned().collect();
     arms.sort();
     arms.dedup();
@@ -2353,12 +2666,20 @@ fn points_of(draw: &Draw) -> Vec<u64> {
 }
 
 fn train_small(cell: &Cell, caps: &Caps, ntrain: usize) -> Model {
-    let mut col = Collector { pair_samples_cap: 2000, row_samples_cap: 1500, ..Collector::default() };
+    let mut col = Collector {
+        pair_samples_cap: 2000,
+        row_samples_cap: 1500,
+        ..Collector::default()
+    };
     let mut rng = Rng(3);
     for i in 0..ntrain {
         let xr = cell_target(cell, "train", i);
         let draw = draw_for(cell, xr);
-        let mut c = Some(Collector { pair_samples_cap: 2000, row_samples_cap: 1500, ..Collector::default() });
+        let mut c = Some(Collector {
+            pair_samples_cap: 2000,
+            row_samples_cap: 1500,
+            ..Collector::default()
+        });
         let _ = run_f4(&draw, &Policy::incumbent(), caps, &mut c, &mut rng);
         let c = c.unwrap();
         col.px.extend(c.px);
@@ -2386,9 +2707,18 @@ fn selftest(a: &Args) {
             agree = false;
         }
     }
-    check("monomial-order", agree, "mkey vs grevlex_greater on 20000 pairs".into());
+    check(
+        "monomial-order",
+        agree,
+        "mkey vs grevlex_greater on 20000 pairs".into(),
+    );
     // 2. small cells: every arm against exhaustive enumeration
-    let caps = Caps { max_touch: 1 << 40, max_matrix_words: 1 << 27, wall_s: 120.0, train_clone_words: 1 << 25 };
+    let caps = Caps {
+        max_touch: 1 << 40,
+        max_matrix_words: 1 << 27,
+        wall_s: 120.0,
+        train_clone_words: 1 << 25,
+    };
     let cells = [(7u32, 3usize, 3usize), (8, 3, 3), (8, 2, 4)];
     let ntrain: usize = a.num("--ntrain", 8);
     for &(n, l, m) in &cells {
@@ -2397,13 +2727,24 @@ fn selftest(a: &Args) {
         let traces: Vec<FxSet<TraceKey>> = (0..N_TRAIN)
             .map(|i| {
                 let xr = cell_target(&cell, "train", i);
-                let mut none: Option<Collector> = Some(Collector { pair_samples_cap: 100, row_samples_cap: 0, ..Collector::default() });
-                let r = run_f4(&draw_for(&cell, xr), &Policy::incumbent(), &caps, &mut none, &mut Rng(1));
+                let mut none: Option<Collector> = Some(Collector {
+                    pair_samples_cap: 100,
+                    row_samples_cap: 0,
+                    ..Collector::default()
+                });
+                let r = run_f4(
+                    &draw_for(&cell, xr),
+                    &Policy::incumbent(),
+                    &caps,
+                    &mut none,
+                    &mut Rng(1),
+                );
                 r.useful_trace.into_iter().collect()
             })
             .collect();
         let (mut n_sat, mut n_unsat, mut bad, mut hash_diff, mut nchk) = (0, 0, 0, 0, 0);
-        let mut targets: Vec<(String, usize)> = (0..N_TRAIN).map(|i| ("train".to_string(), i)).collect();
+        let mut targets: Vec<(String, usize)> =
+            (0..N_TRAIN).map(|i| ("train".to_string(), i)).collect();
         targets.extend((0..cell.planted.len()).map(|i| ("planted".to_string(), i)));
         for (role, i) in &targets {
             let xr = cell_target(&cell, role, *i);
@@ -2414,19 +2755,53 @@ fn selftest(a: &Args) {
                 let pts = points_of(&draw);
                 if pts.len() as u64 != sols {
                     bad += 1;
-                    println!("  exhaustive {} vs counter {} at {role} {i}", pts.len(), sols);
+                    println!(
+                        "  exhaustive {} vs counter {} at {role} {i}",
+                        pts.len(),
+                        sols
+                    );
                 }
             }
             let mut ref_hash = None;
             for arm in ["a", "b", "c", "d", "o", "r", "p"] {
                 let pol = match arm {
                     "a" => Policy::incumbent(),
-                    "b" => Policy { pair: PairPol::Learned(0.5), learned_order: false, random_order: false, model: Some(model.clone()) },
-                    "c" => Policy { pair: PairPol::All, learned_order: true, random_order: false, model: Some(model.clone()) },
-                    "d" => Policy { pair: PairPol::Trace(traces[(*i + 5) % N_TRAIN].clone()), learned_order: false, random_order: false, model: None },
-                    "p" => Policy { pair: PairPol::All, learned_order: false, random_order: true, model: None },
-        "o" => Policy { pair: PairPol::Oracle, learned_order: false, random_order: false, model: None },
-                    _ => Policy { pair: PairPol::Random(0.5), learned_order: false, random_order: false, model: None },
+                    "b" => Policy {
+                        pair: PairPol::Learned(0.5),
+                        learned_order: false,
+                        random_order: false,
+                        model: Some(model.clone()),
+                    },
+                    "c" => Policy {
+                        pair: PairPol::All,
+                        learned_order: true,
+                        random_order: false,
+                        model: Some(model.clone()),
+                    },
+                    "d" => Policy {
+                        pair: PairPol::Trace(traces[(*i + 5) % N_TRAIN].clone()),
+                        learned_order: false,
+                        random_order: false,
+                        model: None,
+                    },
+                    "p" => Policy {
+                        pair: PairPol::All,
+                        learned_order: false,
+                        random_order: true,
+                        model: None,
+                    },
+                    "o" => Policy {
+                        pair: PairPol::Oracle,
+                        learned_order: false,
+                        random_order: false,
+                        model: None,
+                    },
+                    _ => Policy {
+                        pair: PairPol::Random(0.5),
+                        learned_order: false,
+                        random_order: false,
+                        model: None,
+                    },
                 };
                 let mut none: Option<Collector> = None;
                 let r = run_f4(&draw, &pol, &caps, &mut none, &mut Rng(5 + *i as u64));
@@ -2438,7 +2813,10 @@ fn selftest(a: &Args) {
                 };
                 if !good {
                     bad += 1;
-                    println!("  FAIL arm {arm} {role} {i}: outcome {:?} nstd {} sols {}", r.outcome, r.nstd, sols);
+                    println!(
+                        "  FAIL arm {arm} {role} {i}: outcome {:?} nstd {} sols {}",
+                        r.outcome, r.nstd, sols
+                    );
                 }
                 match ref_hash {
                     None => ref_hash = Some(r.basis_hash),
@@ -2461,7 +2839,9 @@ fn selftest(a: &Args) {
         check(
             &format!("cell-{n}-{l}-{m}"),
             bad == 0 && hash_diff == 0 && n_sat > 0 && n_unsat > 0,
-            format!("{nchk} runs; sat {n_sat} unsat {n_unsat}; wrong {bad}; basis differs {hash_diff}"),
+            format!(
+                "{nchk} runs; sat {n_sat} unsat {n_unsat}; wrong {bad}; basis differs {hash_diff}"
+            ),
         );
     }
     println!("{}", if ok { "SELFTEST OK" } else { "SELFTEST FAILED" });
@@ -2485,7 +2865,11 @@ fn mode_control(a: &Args) {
         if f.len() < 10 {
             continue;
         }
-        let (m, nn, l): (usize, u32, usize) = (f[1].parse().unwrap(), f[2].parse().unwrap(), f[3].parse().unwrap());
+        let (m, nn, l): (usize, u32, usize) = (
+            f[1].parse().unwrap(),
+            f[2].parse().unwrap(),
+            f[3].parse().unwrap(),
+        );
         let basis: Vec<u64> = f[4].split(',').map(|x| x.parse().unwrap()).collect();
         let xr: u64 = f[5].parse().unwrap();
         let sols: i64 = f[6].parse().unwrap();
@@ -2495,7 +2879,11 @@ fn mode_control(a: &Args) {
         }
         let gf = Gf::new(nn);
         let (eqs, nv) = build_system(&gf, m, &basis, xr);
-        let draw = Draw { nv, ncoord: m * l, eqs: eqs.iter().map(to_kpoly).collect() };
+        let draw = Draw {
+            nv,
+            ncoord: m * l,
+            eqs: eqs.iter().map(to_kpoly).collect(),
+        };
         let mut none: Option<Collector> = None;
         let r = run_f4(&draw, &Policy::incumbent(), &caps, &mut none, &mut Rng(1));
         let d = r.stats.degree_reached as i64;
@@ -2518,7 +2906,9 @@ fn mode_control(a: &Args) {
 }
 
 fn main() {
-    let a = Args { v: std::env::args().collect() };
+    let a = Args {
+        v: std::env::args().collect(),
+    };
     match a.v.get(1).map(|s| s.as_str()) {
         Some("selftest") => selftest(&a),
         Some("control") => mode_control(&a),
