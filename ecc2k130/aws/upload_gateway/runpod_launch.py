@@ -160,8 +160,8 @@ ship_pid=$!
 
 while true; do
   echo "starting DP ingester sha256=$INGEST_SHA256 at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  python3 -u dp_ingest.py --bucket "$CANONICAL_BUCKET" --status-bucket "$STATUS_BUCKET" \
-    --threads 6 --status-every 180 --metric-namespace ECC2K130/Ingest &
+  python3 -u dp_ingest.py --bucket "$CANONICAL_BUCKET" --worker-only \
+    --threads 6 &
   ingest_pid=$!
   set +e
   wait "$ingest_pid"
@@ -256,7 +256,6 @@ def service_environment(args):
         "AWS_REGION": args.region,
         "AWS_DEFAULT_REGION": args.region,
         "CANONICAL_BUCKET": canonical,
-        "STATUS_BUCKET": args.status_bucket,
         "INGRESS_BUCKET": out["IngressBucket"],
         "AUTH_TABLE": out["WorkerTokensTable"],
         "TICKET_TABLE": out["UploadTicketsTable"],
@@ -368,7 +367,6 @@ def parser():
     central = sub.add_parser("service")
     central.add_argument("--credentials-file", required=True)
     central.add_argument("--bucket")
-    central.add_argument("--status-bucket", default="ecc2k130-status-590183823895")
     central.add_argument("--rds-security-group", default="sg-08c045a6f2fd2b8dc")
     central.add_argument("--runpodctl")
     central.add_argument("--name", default="ecc2k130-upload-gateway-ingest")
@@ -377,7 +375,6 @@ def parser():
     central_update.add_argument("pod_id")
     central_update.add_argument("--credentials-file", required=True)
     central_update.add_argument("--bucket")
-    central_update.add_argument("--status-bucket", default="ecc2k130-status-590183823895")
     central_update.add_argument("--rds-security-group", default="sg-08c045a6f2fd2b8dc")
     central_update.add_argument("--runpodctl")
     central_update.set_defaults(func=update_service)
