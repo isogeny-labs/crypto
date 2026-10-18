@@ -397,7 +397,7 @@ outputs were scratch and are not records.
 | 01 | stopped at command 3 | `selftest` took 78 s against a 62 s card timeout; 3 PASS lines printed; the 11 later commands never ran |
 | 05 | stopped at command 4 | `fit-19-4-3` exit 101: `model-19-4-3.samples.0` absent (card 04 never ran) |
 | 06, 07, 08 | stopped at command 3 | `eval` exit 101: `model-19-4-3.model` absent |
-| 03, 04, 11, 13 to 26 | none, never ran | 03, 04 and 26 name first-run outputs without a bind and 11 names a stale binary directory, so `lint` refuses them; 13 to 25 would fail on the missing 19- and 21-cell inputs |
+| 03, 04, 11, 13 to 26 | none, never ran | 03, 04 and 26 name existing first-run outputs without a bind, so `lint` refuses them; 11 and 13 were not reached (cell-21 chunks 12 to 18 and 24 to 32 are missing); 14 to 25 need the cell-21 and cell-13 model files, which no completed card produced |
 
 Cards 05 to 08 therefore failed on missing inputs, not on the instrument; no
 number from a stopped card is used. The 0-byte `eval-19-4-3-*.jsonl` files and
