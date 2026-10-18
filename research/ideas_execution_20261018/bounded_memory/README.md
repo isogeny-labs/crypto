@@ -20,11 +20,13 @@ results and limitations. Protocols were written before their respective trials:
 | Larger n=15 and n=17 passes | Completed, independently unverified | Dense reference exceeded its explicit 256 MiB construction budget; large continuations deliberately remain diagnostic and do not discharge that validation gate |
 | Fail-closed budgets and input binding | Verified on stated controls | Truncated stream, generated-row disk cap, restart SHA mismatch and unsupported ell=7 layout refused; raw stderr retained |
 | Full Boolean F4 / MutantXL closure | Not implemented | No critical-pair/closure scheduler or integration into the incumbent solver |
-| Original frontier ell=6/7, guessed ell=8/9 closures | Open | Chosen n=17/ell=6 is a diagnostic cell, not a substitute for the canonical frozen frontier suite; n=19/ell=7 requires 66 variables and the current exporter is capped at 64 |
+| Original frontier ell=6/7, guessed ell=8/9 closures | Open | Chosen n=17/ell=6 is a diagnostic cell, not a substitute for the canonical frozen frontier suite; m=4, n=19/ell=7 requires 66 variables and the current exporter is capped at 64. The later remote m=3, n=19/ell=7 MutantXL attempt had 40 variables and stopped at its 80 GB address-space cap; these are different cells. |
 | Distributed / GPU reduction | Not implemented | No GPU or configured cloud runtime; this is a serial disk-backed implementation |
 | Legal pivot policy hooks and traces | Executed | `first` and minimum incoming weight are legal choices among rows with the same leading column; all decisions have row/lead/weight/action trace records |
 | Learned column/pivot policy with heldout transfer | Not attempted | No model, frozen train/calibration/heldout split, training charge or heldout efficacy experiment; deterministic hooks only |
 | End-to-end or fastest-engine improvement | Not claimed | Shared host, isolation tier 0; no matched external engine or full pipeline/rho comparison |
+
+Later campaign work is reported separately: [the restricted learned selector](../learned_pivot/README.md) evaluates whole-pass policy selection, and [the execution matrix](../EXECUTION.md) links the remote GPU and MutantXL attempts. Those continuations do not add learned pivot control, a GPU implementation or full closure to this standalone reducer.
 
 ## Reproduce
 
