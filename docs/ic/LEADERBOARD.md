@@ -248,6 +248,26 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 [Frozen IC1 rows and candidate identities](../../research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json). The cold process includes base and index construction, relation rank, target recovery and producer verification. Rho's interval starts with its target-dependent walk and ends with scalar verification. This wall-time panel is kept separate from Tables A–C and their operation-unit S rankings.
 
 
+## Component: wide producer probe path and index build (engineering)
+
+Class **engineering**: no end-to-end S claim, no rho claim; wall time of two stages of the wide (64 < n <= 127) relation producer, same binary, interleaved A/B. Instance size n = 73, public synthetic Koblitz fixtures, unisolated shared 4-vCPU Xeon 2.80 GHz KVM guest, no PMU, load 3 to 6. Control arm `KIC_LAZY_CANON=0 KIC_PREFETCH=0`; all-switches arm `KIC_LAZY_CANON=1 KIC_PREFETCH=1 KIC_BLOCKED_BLOOM=1 (lazy + prefetch alone: 232.8 vs 226.7 at K=300, same set)`. This panel is outside Tables A–C and moves no ranked row.
+
+| K | control ns/probe (median, min-max) | lazy key | prefetch | all switches | all / control |
+|---:|---|---|---|---|---:|
+| 40 | 417.0 (414.3-424.7) | 209.9 (203.0-223.1) | 401.7 (374.9-456.5) | 217.0 (204.5-245.0) | 0.520 |
+| 300 | 614.5 (559.3-684.6) | 367.0 (349.3-416.9) | 434.7 (386.8-485.8) | 225.6 (216.7-250.5) | 0.367 |
+| 600 | 621.6 (583.1-653.5) | 382.7 (372.0-433.1) | 441.6 (422.2-459.5) | 235.0 (223.4-303.0) | 0.378 |
+
+| K | index build serial s (median, min-max) | 4 threads + batch inversion s | ratio |
+|---:|---|---|---:|
+| 300 | 14.60 (14.39-15.81) | 5.56 (4.85-5.86) | 0.381 |
+| 600 | 66.38 (60.61-72.14) | 29.13 (28.59-29.66) | 0.439 |
+
+Identity: KIC_VERIFY_INDEX identical at K=150 (1,642,500 states, 1,642,050 table entries) for 4 threads + batch, 3 threads, batch alone; unit test at n=73 and symmetric n=83. End to end `construct:69:0:60`: 6 arms, all identical to the control (60 relations, 8 targets solved). Caveats: hits are 0 in every timed scan; the hit path is covered by the n=69 end-to-end run and unit tests; index rows: 3 repeats (K=300), 2 repeats (K=600); no A/A control; scan covers 20,000 to 40,000 states from the start of the state order; the 18,398 s of the landed n=73 K=600 run is the rank-stage wall; the serial index build is about 66 s.
+
+[Frozen summary](../../benchmarks/20261018-wide-producer-engineering/summary.json), [report](../../docs/ic/perf/WIDE_PRODUCER_ENGINEERING_20261018.md).
+
+
 ## Sources
 
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
@@ -274,6 +294,7 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ic_techniques_20261012/sixsum_extraction/resolvent_summary.json` — sha256 `307771287ae19521…`
+- `benchmarks/20261018-wide-producer-engineering/summary.json` — sha256 `1f63f91e5f62cc43…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `765f6e8d05ebbf75…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
