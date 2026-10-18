@@ -10,7 +10,6 @@ const MASK: u64 = (1u64 << N) - 1;
 
 #[derive(Clone)]
 pub(super) struct NormalBasis53 {
-    pub(super) beta: u64,
     columns: [u64; N],
     inverse_columns: [u64; N],
 }
@@ -59,7 +58,6 @@ impl NormalBasis53 {
                 }
             }
             return Self {
-                beta,
                 columns,
                 inverse_columns,
             };

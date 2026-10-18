@@ -5035,7 +5035,7 @@ mod packed_tests {
     fn n53_normal_x_key_preserves_pair_sum_orbits_and_witnesses() {
         let curve = KoblitzCurve::new(0, 53).unwrap();
         let normal = normal::NormalBasis53::new(|x| square_raw(&curve, x));
-        assert!(normal.beta > 0);
+        assert!(normal.to_poly(1) > 0);
         let mask = (1u64 << 53) - 1;
         let mut state = 0x9e37_79b9_7f4a_7c15u64;
         for _ in 0..256 {
