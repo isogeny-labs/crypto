@@ -29,12 +29,12 @@ checkout `/home/ec2-user/crypto`, and are committed to branch
 | 4 | `XP-20261015-shape-g1-frozen-cells`, sizing probe (13, 5), d_max = 7, random, 1 × 1, seed 1, 1 thread, 64 GB address cap, 4 h wall cap | `research/shape_search_g1_frozen_cells_20261018/probe/probe.sh 13:5:7 64 14400` | 06:11:00 | 10:11:05 | **killed at the 4 h wall cap** (exit 137), no draw finished, sampled peak RSS 7.7 GB: time, not memory, limits (13, 5) at d_max = 7 on one thread | `probe/probe-13-5-7.{jsonl,err,meta}` (empty jsonl), `probe/progress.txt` |
 | 6 | same card, probe (13, 5) d_max = 7, 8 threads, 64 GB cap, 12 h wall | `probe/probe.sh 13:5:7 64 43200 8` | 10:12 | — | running (does threading help?) | `probe/probe-13-5-7-th8.*` |
 | 7 | same card, probe (13, 5) d_max = 6, 1 thread, 64 GB cap, 4 h wall | `probe/probe.sh 13:5:6 64 14400 1` | 10:12 | 11:47 | done, exit 0: one random draw 5,732 s, peak 2.1 GB, outcome `at_least 7` | `probe/probe-13-5-6-th1.*` |
-| 9 | same card, probes (17, 6) and (19, 7) at d_max = 6, 1 thread, 24 GB cap, 4 h wall | `probe/probe.sh 17:6:6 24 14400 1`, `probe/probe.sh 19:7:6 24 14400 1` | 10:33 | — | running | `probe/probe-17-6-6-th1.*`, `probe/probe-19-7-6-th1.*` |
+| 9 | same card, probes (17, 6) and (19, 7) at d_max = 6, 1 thread, 24 GB cap, 4 h wall | `probe/probe.sh 17:6:6 24 14400 1`, `probe/probe.sh 19:7:6 24 14400 1` | 10:33 | 14:33 | **both killed at the 4 h wall cap** (exit 137), no draw finished; sampled peak RSS 5.5 GB (17, 6) and 12.3 GB (19, 7). Under PROTOCOL.md §3, stage C ((17, 6) and (19, 7)) is **not sized on this host and is not run** (prediction 3 holds) | `probe/probe-17-6-6-th1.*`, `probe/probe-19-7-6-th1.*` |
 | 10 | same card, probes (17, 6) and (19, 7) at d_max = 7, 1 thread, 24 GB cap, 12 h wall | `probe/probe.sh 17:6:7 24 43200 1`, `probe/probe.sh 19:7:7 24 43200 1` | 10:33 | — | running | `probe/probe-17-6-7-th1.*`, `probe/probe-19-7-7-th1.*` |
 
 | 11 | `XP-20261015-shape-g1-frozen-cells`, **stage A** (PROTOCOL.md §3, frozen in `ad6c224f6`): (13, 5) d_max = 6, shapes random, random2, gp, fp, coord, 2 × 2, seed 20261015, one process per shape, 16 GB cap, 24 h wall | `research/shape_search_g1_frozen_cells_20261018/run.sh stage A` | 11:50:03 | — | running (5 processes) | `runs/g1-13-5-d6-<shape>.{jsonl,err,meta}`, `progress.txt` |
 
-Planned, not started: stage B ((13, 5) d_max = 7, at most 2 processes at a time) after stage A; stage C ((17, 6), (19, 7)) only if their d_max = 6 probes finish within 4 h.
+Planned, not started: stage B ((13, 5) d_max = 7, at most 2 processes at a time) after stage A; stage C is not run (its d_max = 6 probes did not finish within 4 h, PROTOCOL.md §3).
 
 ## Reports
 
