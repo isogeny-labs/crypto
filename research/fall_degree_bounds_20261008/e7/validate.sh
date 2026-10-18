@@ -5,7 +5,7 @@
 # line per draw plus a final AGREE/DISAGREE count.
 set -euo pipefail
 S=research/fall_degree_bounds_20261008
-B=target/release/examples/hky_par
+B=${HKY_PAR:-target/release/examples/hky_par}
 O=$S/e7/validate
 mkdir -p "$O"
 cat research/dreg_m4_chain_20261006/runs/cell-9-3-6.u{0,1,2,3}.jsonl >"$O/inputs_m4_9-3.jsonl"
