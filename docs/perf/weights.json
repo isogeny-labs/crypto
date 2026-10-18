@@ -1,5 +1,5 @@
 {
-  "comment": "Area weights for the performance index (docs/perf/PERFORMANCE_INDEX.md). Normalised over the areas present in a comparison. Changing a weight defines a new index.",
+  "comment": "Area weights for the performance index (docs/perf/PERFORMANCE_INDEX.md). Normalised over the areas present in a comparison. Changing a weight defines a new index. ic_factor_base is tracked and charted with weight 0: it never moves the overall index.",
   "areas": {
     "gf2_la": 1,
     "bool_gb": 1,
@@ -8,6 +8,7 @@
     "pdp": 1,
     "field_ec": 1,
     "relation": 1,
-    "dlp": 1
+    "dlp": 1,
+    "ic_factor_base": 0
   }
 }
