@@ -40,24 +40,22 @@ is still needed for selection.
 
 Validation of this evidence change: `py_compile` passed for the builder and
 verifier under Python 3.13 with [pinned `blake3==1.0.8`](requirements.txt);
-the full N83 Python discovery
-suite passed 63/63 tests, and the
-previously touched Rust worker example passed 6/6. An unrestricted local
-`cargo test --release --lib` ran 4,202 tests and reported 4,072 passed,
-117 ignored, and 13 failed. Four failures were in long `jv_cover` solver
-cases, including a reported `timed_out: true`; nine `pollard_collab` socket
-tests returned `PermissionDenied` under the filesystem/network sandbox.
-The exact cases and first-attempt status are retained in
-[initial-release.json](validation/initial-release.json), and the Python,
-example, and mutation logs are in [validation](validation/).
-No Rust source changed in this custody round. A bounded-concurrency release
-library rerun with local socket access passed 4,084, ignored 117, and failed
-only `jv_cover::tests::replayed_f4_agrees_with_the_full_solver_and_the_oracle`.
-That test obtained 16 of the required 30 usable cases after capped attempts
-were skipped. All nine previously sandbox-blocked socket tests passed. The
-complete raw output is retained in the
-[bounded-release receipt and log](validation/bounded-release.json).
-The failing replayed-F4 case then passed alone in 69.24 seconds, as recorded
-in its [isolated receipt](validation/replayed-f4-isolated.json). This
-distinguishes its concurrency-sensitive cap from a factor-base or custody
-failure.
+the full N83 Python discovery suite passed 63/63 tests, and the previously
+touched Rust worker example passed 6/6. The full serial
+`cargo test --release --lib -- --test-threads=1` passed **4,085 tests, with
+117 ignored and zero failed**. Its exact raw output, SHA-256, command,
+environment, and 3,882.17-second test wall are retained in the
+[serial-release receipt and log](validation/serial-release.json).
+
+The validation history also retains two earlier resource-limited attempts.
+The unrestricted local run reported 4,072 passed, 117 ignored, and 13 failed:
+four long `jv_cover` cases reached bounded-work limits, and nine
+`pollard_collab` socket tests returned `PermissionDenied` in the sandbox.
+Their exact names are in [initial-release.json](validation/initial-release.json).
+With four test threads and socket access, 4,084 passed, 117 were ignored, and
+only the replayed-F4 case failed after reaching 16 of its required 30 usable
+cases. Its [complete raw log](validation/bounded-release.json) is retained.
+That case then [passed alone in 69.24 seconds](validation/replayed-f4-isolated.json)
+and passed again inside the full serial suite. No Rust source changed in this
+custody round; the Python, example, and mutation logs are also in
+[validation](validation/).
