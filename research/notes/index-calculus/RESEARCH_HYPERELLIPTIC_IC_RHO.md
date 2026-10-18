@@ -1627,3 +1627,82 @@ seeds, plain walk only, counted steps.
 
 **Expected class: accounting**, against index calculus, if the excess
 is a bug in the reference.
+
+## Round eleven: measured — the control shows the same excess, so C1 fails
+
+Registered run: card `CARD-HEIC-ROUND11-1` (commit `42d29092`, binary
+sha256 `472d8921…578b98`), receipt
+`research/notes/index-calculus/round11/run1/receipt.json` (completed,
+nine commands exit 0), output `run1/R11.txt`, isolation record
+uncontended on reserved CPU 3 (334 s). 18 instances × 40 seeds, plain
+walk; the Jacobian column reproduces round nine's plain column exactly.
+
+| | registered test | result |
+|--|--|--|
+| C1 | integer-model median `S_walk`, `N ≥ 10⁵`, in [1.10, 1.40] | **falsified**: 1.521 |
+| C2 | localisation | **not read** (C1 failed, as registered) |
+| C3 | every integer-model run verified | holds |
+
+Largest rows (`S_walk`, ideal 1.2533):
+
+| g | `p` | `N` | Jacobian | integer model | ratio | integer min over 40 seeds |
+|--:|--:|--:|--:|--:|--:|--:|
+| 3 | 151 | 1180351 | 1.706 | 1.514 | 1.127 | 0.502 |
+| 3 | 211 | 4620611 | 1.820 | 1.752 | 1.039 | 0.835 |
+| 4 | 61 | 16790591 | 2.100 | 2.171 | 0.967 | 1.226 |
+
+**Reading it, within the registration.** C1 was written as an instrument
+check, on the premise that the walk rule both arms share reaches the
+random-map constant on `Z/N`. It does not, so that premise, not just the
+instrument, is what failed, and C2 is not read. Not registered, and
+stated only as what the table shows: the integer model reproduces the
+large-`N` excess row by row (ratios 0.84–1.13 over all 18 rows, 0.967 on
+the largest), including the floor on the minimum (1.226 over 40 seeds on
+the largest row). Nothing Jacobian-specific is needed to produce it.
+Class: none; the reference is unchanged.
+
+## Round twelve: are the short branch coefficients the cause? — protocol, written before measuring
+
+**Mechanism.** Both walks add steps `s_j = a_j + b_j·k` with
+`a_j, b_j < 2^8` (`RHO_STEP_BITS`), chosen on the argument that short
+coefficients "cost rho nothing". A single walk's point is
+`x_t = x_0 + A_t + B_t·k`, with `A_t, B_t` sums of the short
+coefficients, and a rho collision `x_s = x_t` needs
+`ΔA + ΔB·k ≡ 0 (mod N)` with `(ΔA, ΔB) = (A_t − A_s, B_t − B_s)`. Over a gap
+of `Δt` steps that displacement concentrates (central limit) on a 2-D
+blob of area about `Δt·σ_a·σ_b·const` around `Δt·(μ_a, μ_b)`, with
+`σ ≈ 74` for 8-bit draws, while the solutions form a lattice of
+covolume `N`. Once the blob's area at `Δt ≈ √N` falls short of `N`
+(about `N ≳ 10⁷` by this estimate), the walk collides less often than a
+random map: the excess grows with `N`, every seed is slow, and the group
+does not matter. Each of these matches rounds nine to eleven. Full-width
+coefficients (`a_j, b_j` uniform in `[0, N)`) remove the structure: the
+`s_j` are then independent of each other's small-integer relations and
+the walk is Teske's `r = 16` adding walk.
+
+**Arms.** Same 18 instances, same 40 seeds, plain DP walk, counted
+operations: Jacobian and integer model, each with 8-bit coefficients (the
+current rule, reproducing rounds nine and eleven) and with full-width
+coefficients. Everything else (hash, `θ`, gap limit, collision handling)
+unchanged. Precomputation for full-width branches is
+`2·⌈log₂ N⌉` operations per branch (the same doubling-and-add count the
+code already charges), reported separately and not in `S_walk`.
+
+**Registered hypotheses.**
+
+- **W1.** Integer model, full width: median `S_walk` over the 7 rows with
+  `N ≥ 10⁵` lies in **[1.10, 1.40]**, and each of the two largest rows is
+  **≤ 1.55**.
+- **W2.** Jacobian, full width: the same two bounds.
+- **W3 (control).** At `N ≤ 6·10⁴`, the Jacobian's median `S_walk`
+  moves by **< 0.15** between 8-bit and full width.
+- **W4.** Every run recovers the planted `k`.
+
+If W1 and W2 hold, the reference rho was handicapped at large `N` by its
+own step rule, by up to `2.10 / S_full` on the largest row; every thread
+IC/rho ratio at `N ≥ 10⁵` flattered index calculus by that factor, and the
+reference is replaced (class **accounting**, against index calculus). The
+index-calculus walk keeps its short coefficients: it looks for smooth
+points, not collisions, so the argument above does not reach it. If W1
+holds and W2 fails, the Jacobian adds its own excess and is examined
+next. If W1 fails, the short coefficients are not the cause.
