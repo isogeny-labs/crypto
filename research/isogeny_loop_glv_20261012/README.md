@@ -23,8 +23,8 @@ the stated argument), **proposed** (untested). All computation is native Rust in
 | point-level validation of the GLV-GLS eigenvalue | **measured, all pass.** Curves were built from H_D at D ∈ {−619, −23, −71, −431, −3019}, with p of 127 bits. ψ acts as +μ, and each closing loop acts as ±λ(±s), on 24 points per check (§2). |
 | benchmark at D = −619 | **measured, two runs on two hosts.** GLV-GLS-4 with a projective loop is 1.147× faster than GLS-2 in run 1 and 1.091× in run 2 (median/median). In run 1 it takes 0.872× GLS-2's time and 0.498× the time of plain wNAF. The A/A control reads 0.987. The measured gain is below the round-2 model at every D tested (§3). |
 | binary-field GLS version | **constructed and validated at toy size.** The construction uses Frobenius-assisted loops 𝔩·F^k. Scans at m = 83, 127 and 131 find loops on prime-order GLS twists. An x-only point check at m = 31 over GF(2^62) passes on 2 discriminants (§4). Not timed. |
-| native sweeper port | §5 (subagent run; see there for status) |
-| x-only re-run of the searches | §5 |
+| native sweeper port | **done.** Native class group (GRH) + relation lattice reproduce round 1's class groups and cheapest loops on 12 curves and 911 + 911 + 306 scan discriminants; a 131-bit defect was found and fixed (§5). |
+| x-only re-run of the searches | **measured.** No non-Frobenius loop below the saving on any large-|D| challenge curve in groups a + d; LLL upper bounds 5.1–13.2× the saving. Scans: every small D has one, median 0.078 (§5). |
 
 ## 1. What was built (code)
 
@@ -254,7 +254,76 @@ isolated. All commands and the kernel log lines are in `binary_validate_cmd.txt`
 
 ## 5. Native sweeper port and x-only re-run
 
-*Pending.* The native sweeper port and x-only re-run are in progress in a separate worktree. This section and `sweeper_native/` are filled in when that run lands.
+**What exists now (measured).** `examples/isogeny_loop_sweeper.rs` in the main
+crate replaces `scripts/isogeny_loop_sweeper.py` (Python + PARI, now legacy):
+- `src/isogeny/class_group_subexp.rs`: a subexponential class group under GRH.
+  Factor base up to the Bach bound 6 log²|D|; relations from random products of
+  factor-base forms with a large-prime variation; structured Gaussian
+  elimination; modular HNF and Smith form; discrete logs of every factor-base
+  prime. Each result is checked three ways: fresh relations must lie in the
+  lattice (two stable rounds plus 32 held-out relations), the analytic class
+  number must agree within log √2, and for |D| < 20,000 all 6,079 fundamental
+  discriminants agree with brute force (`cargo test`).
+- `src/isogeny/loop_lattice.rs`: the relation lattice of the split primes
+  ℓ ≤ 100, LLL in the weighted norm, exact DFS for the cheapest loops within a
+  radius, loop generators α = (A + B√D)/2 verified by norm, the eigenvalue
+  λ = (A + Bs)/2 mod r, and the 2-adic orientation of the step above 2 in
+  characteristic 2 (F = 2 M forward, V = c_dbl + 2 M backward, round 2's erratum).
+- Cost models `projective` (7.5ℓ), `affine` (2ℓ + 2) and `xonly` (2ℓ for odd ℓ,
+  4 for ℓ = 2 in odd characteristic), several per run, sharing each class group.
+- `curve` mode re-runs round 1's frozen curve groups and compares h, the cycle
+  structure and the cheapest projective cost with the PARI records; `scan` mode
+  re-runs the discriminant scans; `disc` mode computes one class group.
+
+Evidence: `sweeper_native/`, run report
+`reports/run-20261018T1648Z-sweeper-native/`, figures `figures/sweeper_scan.svg`
+and `figures/sweeper_curves.svg`.
+
+**Reproduction of round 1 (measured).**
+
+| round-1 record | native result |
+|:--|:--|
+| groups a + d, 13 curves | h and cycle structure equal on 12; cheapest projective loop cost equal on 12; CryptoPro-A (258-bit D) skipped by both tools |
+| scan, 911 fundamental D in [−3000, −3], 128 bits | 911 / 911 cheapest projective costs equal |
+| the same at 256 bits | 911 / 911 |
+| scan in characteristic 2 (306 D ≡ 1 mod 8), corrected V pricing | 306 / 306 equal to round 1's 2 M-both-ways costs: every cheapest loop there runs purely in the F direction, so the repricing never touches the minimum |
+| groups b + c (97–131-bit D) | GROUPS_BC_PLACEHOLDER |
+
+**A defect found on the way (measured, fixed).** The first port could not
+finish any 131-bit discriminant: its relation matrix stayed "rank deficient" at
+7× the factor-base size. The diagnostic run on ECC2-131's discriminant
+(`sweeper_native/ecc2-131_debug_before_fix.log`) showed 104,276 relations hitting
+1 of 2,547 columns. Reduced forms have a ≤ √(|D|/3) ≈ 2^64.7 there, and a
+product of at most four factor-base primes has a ≤ 2^62.3, so every trial product
+was already reduced and factored back into its own primes: a zero relation. (At
+115 bits the threshold is 2^56.7 and the same code worked.) The fix multiplies
+primes until the product passes √|D| by 12 bits before reducing; a second fix
+restores a varying term count, without which D = −163 was trapped at h* = 2 by
+even coefficient sums. Both are in the worktree branch's history
+(fa264086a, c9ba859db) and the 6,079-discriminant test passes after them.
+
+**x-only re-run (measured).** The x-only model was the one per-step model that
+round 2's class-group-free bound could not exclude (κ = 3.786 against a saving
+of 8 M per bit). Under it:
+- *Challenge curves with large |D|* (sect113r1, ECC2-89, ECCp-89, ECC2-79,
+  ECCp-79): the exhaustive search up to the saving finds no non-Frobenius loop
+  in any model. The cheapest candidate from the LLL basis costs 5.1–13.2× the
+  saving under x-only (20–49× projective, 5.3–13.7× affine). Round 1's negative
+  therefore stands under the x-only model too, for these curves.
+- *Koblitz D = −7, secp256k1 D = −3, CryptoPro-B D = −619*: the known loops
+  (the Frobenius, the automorphism, the 5·5·7 loop) at 0.004–0.033 of the saving
+  under x-only; they are the GLV/GLS structure already in use, and the −619 loop
+  is round 3's §2–§3 object (34 M x-only, 40 M affine, 127.5 M projective).
+- *Scans*: for every one of the 911 small discriminants the cheapest loop is
+  below the saving under x-only (median 0.078 at 128 bits, 0.039 at 256 bits);
+  the projective model has 2 above it at 128 bits. The scan ranks CM
+  constructions, the constructive direction; it says nothing about a given
+  challenge curve.
+
+**Performance (measured, contended host).** The class group takes 0.1 s for
+h ≤ 5, 16–52 s at 79–89 bits, 121 s at 115 bits uncontended (PARI: 14 s) and
+540 s under load 6–13 from the other runs. Relation collection is parallel
+(rayon); the dense linear algebra is not.
 
 ## 6. Open after round 3
 
@@ -264,7 +333,8 @@ isolated. All commands and the kernel log lines are in `binary_validate_cmd.txt`
   against the model holds once the field is fast.
 - A binary GLV-GLS-4 benchmark over F_{2^254} with carry-less multiplication
   (§4 model).
-- Merging the x-only loop costs (§5) into the GLV-GLS cost model.
+- Groups b + c at 131 bits: the native class group needs minutes to hours per discriminant where PARI needs 2–6 minutes; a sieve for relations and a sparse modular HNF would close that gap.
+- The x-only costs (§5) folded into the GLV-GLS model of §3.
 
 ## 7. Evidence index
 
@@ -275,4 +345,4 @@ isolated. All commands and the kernel log lines are in `binary_validate_cmd.txt`
 | `bench_run2.*` | §3 confirmation | `reports/run-20261012T0216Z-bench-confirm/` |
 | `binary_scan_m{83,127,131}.*` | §4 scans | `reports/run-…-binary-scan/` |
 | `binary_validate.*`, `binary_validate_run1_hmax160.*`, `binary_validate_attempt3_killed.*`, `binary_validate_cmd.txt` | §4 validation | `reports/run-…-binary-validate/` |
-| `sweeper_native/` | §5 | see §5 |
+| `sweeper_native/` | §5 | `reports/run-20261018T1648Z-sweeper-native/` |

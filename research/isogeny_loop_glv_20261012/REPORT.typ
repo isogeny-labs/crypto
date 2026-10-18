@@ -24,7 +24,7 @@ Round 2 left the 4-dimensional GLV-GLS split as a lead backed only by lattices a
   [*point-level validation*], [*measured, all pass.* Curves at $D in {-619, -23, -71, -431, -3019}$, with $p$ of 127 bits, are built from a natively computed $H_D$. $psi$ acts as $+mu$, and each closing loop acts as $plus.minus lambda(plus.minus s)$, on 24 points of order $r$ (248–253 bits). The two closing walks land on conjugate embeddings.],
   [*benchmark, $D = -619$*], [*measured.* GLV-GLS-4 with a projective loop beats GLS-2 by 1.147× (run 1) and 1.091× (run 2, a different host), median/median. In run 1 it runs and 0.498× the time of wNAF; the A/A control reads 0.987. Across five $D$, the ratio is 1.06–1.21, which is 0.05–0.17 below round 2's model.],
   [*binary GLS*], [*constructed; validated at toy size.* Frobenius-assisted loops $frak(l) dot F^k$ exist on prime-order GLS twists at $m = 127$ and $131$, but not at $m = 83$ for $l <= 61$. An x-only point check at $m = 31$ over GF($2^62$) passes on 2 discriminants. *Not timed.*],
-  [*native sweeper, x-only*], [§5.],
+  [*native sweeper, x-only*], [*measured.* The port reproduces round 1 (12 curves; 911 + 911 + 306 scan discriminants) after a 131-bit defect was fixed. Under the x-only model no large-$|D|$ challenge curve has a non-Frobenius loop below the saving (upper bounds 5–13×).],
 )
 
 #figure(image("figures/status.svg", width: 92%), caption: [What round 3 computed natively (blue), validated or measured (green), and built in characteristic 2 (amber).])
@@ -111,14 +111,24 @@ Run `run-20261012T0002Z-binary-validate`.
 - So the binary lead looks stronger than the prime one. In the prime case, though, the model overstated the measured gain by 0.05–0.17.
 - Not examined: security beyond prime order, including GHS for $bb(F)_(2^(2m))$ with $m$ prime and the moderate class number.
 
-= Native sweeper port and x-only re-run
+= Native sweeper port and x-only re-run (measured)
 
-*Pending.* The native sweeper port and x-only re-run are in progress; see `README.md` §5.
+Round 1's sweeper is now native: `examples/isogeny_loop_sweeper.rs` with a subexponential class group under GRH (`class_group_subexp.rs`: Bach-bound factor base, random-product relations with a large-prime variation, structured elimination, modular HNF and Smith form, discrete logs; verified by held-out relations, the analytic class number and brute force on all 6,079 fundamental $|D| < 20,000$) and the relation-lattice loop search (`loop_lattice.rs`: weighted LLL, exact DFS to a radius, verified generators, the 2-adic $F slash V$ orientation in characteristic 2). Three cost models share each class group: projective $7.5 l$, affine $2 l + 2$, x-only $2 l$.
+
+*Reproduction of round 1.* Groups a + d: $h$, cycle structure and cheapest projective cost equal PARI's on 12 of 13 curves (CryptoPro-A, 258 bits, skipped by both). Scans: 911 / 911 at 128 bits, 911 / 911 at 256 bits, 306 / 306 in characteristic 2 ($D equiv 1$ mod 8), where the corrected Verschiebung price never changes the minimum because every cheapest loop there runs in the $F$ direction. GROUPS_BC_PLACEHOLDER_TYP
+
+*A defect, found and fixed.* The first port never finished a 131-bit discriminant: reduced forms have $a <= sqrt(|D| slash 3) approx 2^64.7$ there, products of at most four factor-base primes have $a <= 2^62.3$, so every trial product was already reduced and factored back into its own primes, a zero relation (104,276 of them hitting 1 of 2,547 columns in the diagnostic run). The base product is now built past $sqrt|D|$ by 12 bits, with a varying term count (a constant count trapped $D = -163$ at $h^* = 2$).
+
+*x-only verdicts.* On the large-$|D|$ challenge curves of groups a + d the exhaustive search up to the saving finds no non-Frobenius loop in any model; the LLL upper bounds are 5.1–13.2× the saving under x-only (20–49× projective). Round 1's negative stands under the one model round 2's bound left open. The Koblitz, secp256k1 and CryptoPro-B loops are the known structure at 0.004–0.033 of the saving. In the scans every small discriminant has a loop below the saving under x-only (median 0.078 at 128 bits, 0.039 at 256 bits): the constructive direction, not a statement about any given curve.
+
+#figure(image("figures/sweeper_curves.svg", width: 100%), caption: [Cheapest non-Frobenius loop per challenge curve and cost model, as a fraction of the doublings saved; hatched bars are LLL upper bounds above the exhaustive radius. Run `run-20261018T1648Z-sweeper-native`.])
+#figure(image("figures/sweeper_scan.svg", width: 100%), caption: [Cumulative distribution of the cheapest loop's cost / saving over the 911 scanned fundamental discriminants (306 in characteristic 2), per cost model.])
 
 = Open after round 3
 
 - A constant-time GLV-GLS-4 over a special prime. The condition is on $D$ ($4p = t^2 + |D| v^2$), not on $p$, so Mersenne $p$ is allowed. Does the shortfall against the model persist once the field is fast?
 - A binary GLV-GLS-4 benchmark over $bb(F)_(2^254)$ with carry-less multiplication.
+- Groups b + c at 131 bits natively: a relation sieve and a sparse modular HNF (the class group is minutes to hours there against PARI's 2–6 minutes).
 - Folding the x-only loop costs into the GLV-GLS model.
 
 Evidence: `README.md` §7 indexes every record and run report.
