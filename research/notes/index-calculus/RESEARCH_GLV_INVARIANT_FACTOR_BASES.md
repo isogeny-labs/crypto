@@ -2633,3 +2633,42 @@ not a measured crossing.  **Scope:** GLS twists over `F_{p⁴}` of curves over `
 there, the halves condition of E24, `p ≡ 1 (mod 4)`, `p ≤ 397` (`n ≤ 2^{30.5}`).  The next lever on
 this family is the cofactor, not the fold: a GLS construction with the `V₄` line and `h = 4` would
 keep the fold and give back the `2×` that `h = 16` costs against rho.
+
+### 9.17 E26 pre-registration: can a GLS curve carry the `V₄` line with `h = 4`?
+
+*Registered 2026-10-18, after E25 and before any E26 code.*  Owner request: try a GLS construction
+with `h = 4`, the lever §9.16 named.  A derivation says the `V₄` line cannot have one; E26 checks it
+on curves.  Notation as §9.15: `q = p²`, `E₀ / F_q` with one root `e₁ ∈ F_q`, `E` its quadratic twist
+over `F_{q²}`, `ψ² = −1`, `#E = (q − 1)² + t²`.
+
+1. **The cofactor is set by `t mod 4`.**  `ψ` satisfies `ψ² − tψ + q = 0` and `ψ² = −1` on
+   `E(F_{q²})`, so `α = (q − 1) − tψ` kills `E(F_{q²})`, a `Z[ψ] ≅ Z[i]`-module of order `N(α)`.  With
+   `8 | q − 1`, the `(1 + i)`-adic valuation of `α` is `2` when `t ≡ 2 (mod 4)` (2-part `Z[i]/(2) ≅
+   (Z/2)²`, `h = 4` possible) and `≥ 4` when `4 | t` (2-part of order `≥ 16`).  `h = 8` cannot occur.
+2. **`t ≡ 2 (mod 4)` rules out the `V₄` line.**  The line needs the halves of `T₁` and `T₂` to have
+   abscissae in `F_{q²}` (they are `g(0), g(∞), g(±1)`, and `g` is defined over `F_{q²}` whenever `z ∈ F_p`
+   gives rational `x`).  A half of `T_j` has a rational abscissa iff `T_j ∈ 2E(F_{q²})` or
+   `T_j ∈ 2E₀(F_{q²})`.  When `h = 4`, `E(F_{q²})` has no point of order 4, so both `T₁` and `T₂` must be
+   halved in `E₀(F_{q²})`, which with `E₀[2] ⊂ E₀(F_{q²})` puts all of `E₀[4]` in `E₀(F_{q²})`: the
+   `q`-Frobenius `π` of `E₀` satisfies `π² ≡ 1 (mod 4)` on `E₀[4]`.  But `π` swaps `T₂, T₃` (`π ≡
+   [[0,1],[1,0]] (mod 2)`) and `det π = q ≡ 1 (mod 4)`; writing `π = [[2a, 1+2b], [1+2c, 2d]]`, the
+   determinant forces `b + c` odd and then `(π²)₁₁ ≡ 1 + 2(b + c) ≡ 3 (mod 4)`.  Contradiction.
+3. **The other `ψ`-actions do not escape.**  If `ψ` fixes all three `T`'s (`E₀` with full 2-torsion over
+   `F_q`), §9.15 fact 2 gives `h ∈ V₄` and a confined line.  If it fixes none, `E[2]` is not rational
+   over `F_{q²}`.  So **on GLS twists the `V₄` line forces `h ≥ 16`**; E25's `h = 16` is the minimum, not
+   a sampling accident.
+
+**E26 (an exact census, no cost measured).**  `gls_cofactor_census(p, seed)`: E25's generator without
+the halves condition (`f′(x₂)` a square) and without a cofactor bound; for each curve record `t mod 4`,
+`v₂(#E)`, whether `f′(x₂)` is a square in `F_{q²}`, and whether `E₀(F_q)` has a point of order 4.  Sizes
+`p ≡ 1 (mod 4)` from `29` to `397`, `40` curves each.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.38 | `t ≡ 2 (mod 4)` curves exist, each with `v₂(#E) = 2` and a point of order 4 in `E₀(F_q)` | about half of all curves | none at some `p`, or any with `v₂(#E) ≠ 2` |
+| G2.39 | the obstruction | `f′(x₂)` a non-square on **every** `t ≡ 2 (mod 4)` curve | any `t ≡ 2 (mod 4)` curve with `f′(x₂)` a square (then a GLS `V₄` curve with `h = 4` exists, and E25 is re-run on it) |
+| G2.40 | the converse | every curve with `f′(x₂)` a square has `4 | t` and `v₂(#E) ≥ 4` | any exception |
+
+**Class:** accounting (an exact statement about a family; no algorithm changes).  If G2.39 holds, the
+GLS lever on the `V₄` line is closed at `h = 16`, and what is left is §9.16's measured `√2`-class
+constant against the matched walk.
