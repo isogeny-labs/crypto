@@ -250,8 +250,8 @@ design's own `(31, 15, 2)`:
 | `c19-4-3` | (19, 4, 3) | 31 | 38 | full |
 | `c13-3-4` | (13, 3, 4) | 38 | 39 | full |
 | `c15-3-4` | (15, 3, 4) | 42 | 45 | full |
-| `c17-4-4` | (17, 4, 4) | 50 | 51 | limited: grevlex and wdeg on 2 targets, 380 s cap |
-| `c31-15-2` | (31, 15, 2) | 30 | 31 | limited: 1 target, grevlex, mindeg, tw, rand0, rand1, 380 s cap |
+| `c17-4-4` | (17, 4, 4) | 50 | 51 | limited: grevlex and wdeg on 2 targets, 370 s cap |
+| `c31-15-2` | (31, 15, 2) | 30 | 31 | limited: 1 target, grevlex, mindeg, tw, rand0, rand1, 370 s cap |
 
 * **Draws.** `draws.tsv` (committed, bound by sha256 into every card) holds,
   for each cell, one random `l`-dimensional `F_2`-subspace base (the same for
@@ -275,28 +275,36 @@ design's own `(31, 15, 2)`:
   finished and times out at 150 s on two). The plan below is therefore the
   frozen design, with its consequences for the verdict stated up front:
 
-| card | cell | targets | arms | per-job cap | card limit |
+| card | cell | targets | arms | per-job cap | run limit |
 |---|---|---|---|--:|--:|
-| 01 | controls | toys, 84 committed draws, 6 planted systems | selftest, sens | none | 170 s |
-| 02 | `c17-4-3` | 0-7 | grevlex, wdeg, blkIL, mindeg, tw, mindeg-rev, tw-rev, rand0..7 | 60 s | 200 s |
+| 01 | controls | toys, 84 committed draws, 6 planted systems | selftest, sens | none | 210 s |
+| 02 | `c17-4-3` | 0-7 | grevlex, wdeg, blkIL, mindeg, tw, mindeg-rev, tw-rev, rand0..7 (15) | 60 s | 200 s |
 | 02 | `c17-4-3` | 0-1 | blkLI | 40 s | 100 s |
 | 03 | `c19-4-3` | 0-7 | the same 15 arms | 60 s | 220 s |
 | 03 | `c19-4-3` | 0-1 | blkLI | 40 s | 90 s |
-| 04 | `c13-3-4` | 0-3 | the same 15 arms | 60 s | 220 s |
+| 04 | `c13-3-4` | 0-3 | grevlex, wdeg, blkIL, mindeg, tw, rand0..7 (13, no reverse arms) | 60 s | 230 s |
 | 04 | `c13-3-4` | 0-1 | blkLI | 40 s | 90 s |
-| 05 | `c13-3-4` | 4-7 | the same 15 arms | 60 s | 250 s |
-| 06 | `c15-3-4` | 0-7 | the same 15 arms | 60 s | 160 s |
+| 05 | `c13-3-4` | 4-7 | the same 13 arms | 60 s | 230 s |
+| 06 | `c15-3-4` | 0-7 | the same 15 arms as card 02 | 60 s | 160 s |
 | 06 | `c15-3-4` | 0-1 | blkLI | 40 s | 90 s |
-| 07 | `c17-4-4` | 0 | grevlex | 380 s | 380 s |
-| 08 | `c17-4-4` | 0 | wdeg | 380 s | 380 s |
-| 09 | `c17-4-4` | 1 | grevlex | 380 s | 380 s |
-| 10 | `c17-4-4` | 1 | wdeg | 380 s | 380 s |
-| 11-15 | `c31-15-2` | 0 | grevlex, mindeg, tw, rand0, rand1 (one per card) | 380 s | 380 s each |
+| 07 | `c17-4-4` | 0 | grevlex | 370 s | 370 s |
+| 08 | `c17-4-4` | 0 | wdeg | 370 s | 370 s |
+| 09 | `c17-4-4` | 1 | grevlex | 370 s | 370 s |
+| 10 | `c17-4-4` | 1 | wdeg | 370 s | 370 s |
+| 11-15 | `c31-15-2` | 0 | grevlex, mindeg, tw, rand0, rand1 (one per card) | 370 s | 370 s each |
 
-  Worst case 4,880 s of measured time (1.36 CPU-hours), under the 2 CPU-hours
-  allowed. Each card has a hard timeout per command whose sum is under 540 s,
-  and a `--total-limit` inside the instrument that skips (records `skipped`)
-  rather than starts a job it cannot finish.
+  The reverse arms are dropped on `c13-3-4` only, to keep four targets inside
+  a card's limit; they are descriptive in every cell.
+
+  Cards run in order. Card 01 is the gate: if it does not end `completed`
+  (a failed control exits 2), cards 02 to 15 are not relayed. The card time
+  limits are hard timeouts per command; summed over every command of every
+  card (build and clean-up included) they come to **6,630 s, 1.84
+  CPU-hours**, under the 2 CPU-hours allowed; the expected use is about half of
+  that (the full cells took 1 to 50 s per target and arm on development draws).
+  Each card's commands sum to under 540 s. Inside a job, the instrument's
+  `--total-limit` skips (records `skipped`) rather than starts a job that
+  cannot finish.
 
 * **Consequence for the rule, stated before the data.** Only the four full
   cells can be *countable* (at least 4 grevlex-refuted targets, the 8 random
@@ -317,9 +325,9 @@ design's own `(31, 15, 2)`:
 One thread per job (the instrument is single-threaded), every run wrapped in
 `prlimit --as=4294967296` (4 GiB address space; the instrument stops itself
 with status `memcap` at 88% of the limit and with `colscap` at 400,000
-columns). At most 2 CPU-hours of measured runs: the worst case above is 4,880
-s. No job runs longer than 380 s, far under the 45-minute job limit, and every
-card is under 9 minutes. Build products live in the shared `target/` under
+columns). At most 2 CPU-hours of measured runs: the worst case above is 6,630
+s. No job runs longer than 370 s (405 s hard timeout), far under the 45-minute
+job limit, and every card is under 9 minutes. Build products live in the shared `target/` under
 `target/blindspots-05/card-NN/` (no per-item `CARGO_TARGET_DIR`; `rustc`, not
 cargo, see Deviation 2) and each card removes its binary. Raw outputs and the
 receipt go to `research/blindspots_20261018/05-elimination-orders/raw/`.
