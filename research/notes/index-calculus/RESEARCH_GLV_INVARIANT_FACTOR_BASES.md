@@ -2270,3 +2270,27 @@ constant: at the weighted `C ≈ 1.4·10⁹` the solve is the whole cost at ever
 so shrinking the matrix buys nothing until `n ≈ 2^{164}–2^{222}`, long after the full base has
 already crossed rho (`2^{119}`).  Cutting `C` moves both crossovers; that is E21's and E22's
 question.  **Class: measurement.**
+
+### 9.10 Amendment to E22 Stage B, before its code: the invariant form, derived
+
+*2026-10-18, additive to §9.7; G2.23's registered band stands.*  On each coordinate the
+translations act as `z ↦ −z, 1/z, −1/z`.  Their invariant is `u = z² + z⁻²`; the three
+non-trivial characters are carried by `v₁ = z − 1/z` (`v₁² = u − 2`), `v₂ = z + 1/z`
+(`v₂² = u + 2`) and `v₁v₂ = z² − z⁻²`.  The decomposition group `V₄⁴_0 ⋊ S₄` admits exactly the
+four diagonal characters, so `H / Πz_i⁴` (degree `8` in each `z_i`, i.e. `≤ 2` in each `u_i`) lies
+in the 30-dimensional span
+
+  `{e_i e_j : 0 ≤ i ≤ j ≤ 4} ∪ {P₁e_k} ∪ {P₂e_k} ∪ {P₁P₂e_k}`,  `e_k = e_k(u)`,
+  `P₁ = Πv₁(z_i)`, `P₂ = Πv₂(z_i)`,
+
+(precompute checks this on fresh points, as `SymmetrisedD4::precompute` does; failure ends Stage B
+as a negative).  `Π(u_i ∓ 2) = P_{1,2}²` give `e₄ = P₁² + 2e₃ − 4e₂ + 8e₁ − 16` and
+`P₂² − P₁² = 16e₁ + 4e₃`, so `e₁ = (P₂² − P₁² − 4e₃)/16` and `e₄` are eliminated: **four unknowns
+`(e₂, e₃, P₁, P₂)`, weights `(2, 2, 1, 1)`, four Weil components of weighted degree `4`.**
+Weighted Bézout `4⁴/(2·2·1·1) = 64` (`= 98,304 / 1536`, the multihomogeneous count over the group
+order, as `512 = 98,304 / 192` for `D₄`); weighted Macaulay bound `16 − 6 + 1 = 11` (`D₄`: `26`),
+`882`-odd columns before row selection (`D₄`: `4,200`), quotient `64` (`D₄`: `512`).  Lift-back:
+`u_i` from `T⁴ − e₁T³ + e₂T² − e₃T + e₄`, `z_i` from `z⁴ − u_iz² + 1`, the four `V₄`-choices per
+coordinate fixed by `P₁, P₂` and a group check.  **Derived expectation, not a prediction:** with
+an eighth of the quotient and a fifth of the columns, `C_V₄` could fall below `C_w / 30`, past
+G2.23's band, which would then be falsified on the high side.
