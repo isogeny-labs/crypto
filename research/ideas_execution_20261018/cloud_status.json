@@ -1,19 +1,81 @@
 {
-  "schema":"ideas-cloud-readiness/v1",
-  "items":[7,13],
-  "local_host":{"cpu_cores":4,"memory_bytes":17179869184,"gpu":false},
-  "local_credential_presence":{"RUNPOD_API_KEY":false,"MODAL_TOKEN_ID":false,"MODAL_TOKEN_SECRET":false,"AWS_ACCESS_KEY_ID":false,"AWS_SECRET_ACCESS_KEY":false},
-  "attempts":[
-    {"command":"python3 cloud/fleet.py status (cryptanalysis)","result":"RUNPOD_API_KEY missing"},
-    {"command":"gh secret list --repo aburan28/cryptanalysis","result":"403 Resource not accessible by integration; repository-held credentials remain unknown"},
-    {"command":"gh workflow run cloud-ecc2k130.yml --repo aburan28/cryptanalysis --ref claude/cryptanalysis-repo-setup-p59kek -f action=doctor","result":"422 workflow is disabled"},
-    {"command":"gh api repos/aburan28/cryptanalysis/actions/workflows/367505054","result":{"state":"disabled_manually","path":".github/workflows/cloud-ecc2k130.yml"}}
+  "schema": "ideas-cloud-readiness/v1",
+  "items": [
+    7,
+    13
   ],
-  "updates":[{"event":"User supplied RunPod access and selected RunPod route","credential_value_retained":false},{"event":"Authenticated status and GPU catalogue/availability queries succeeded"},{"event":"First allocation refused HTTP400 for unsupported provider CUDA13.3 enum; no pod created"},{"event":"Amended provider family13.0 request created dedicated ddklh0efbq99mv at2.49USD/hour with2hourcap; SSH readiness pending; actualdriver/nativegatesnotyetpassed"}],
-  "cloud_provisioning_executed":true,
-  "workflow_enable_executed":false,
-  "challenge_logarithm_recovered":false,
-  "blocked_scope":"Full multi-year public ECC2K-130 completion remains unfulfilled; bounded device/frontier campaign is provisioning through RunPod",
-  "next_concrete_route":"Run the existing doctor action after an authorized workflow/access configuration; verify DP ingestion/restart, matched device rate, memory/driver availability and bounded shutdown before launching billed workers.",
-  "interpretation":"Access/infrastructure limit only; not a mathematical negative. The ten-GPU-year audit figure was not independently measured in this round."
+  "local_host": {
+    "cpu_cores": 4,
+    "memory_bytes": 17179869184,
+    "gpu": false
+  },
+  "local_credential_presence": {
+    "RUNPOD_API_KEY": false,
+    "MODAL_TOKEN_ID": false,
+    "MODAL_TOKEN_SECRET": false,
+    "AWS_ACCESS_KEY_ID": false,
+    "AWS_SECRET_ACCESS_KEY": false
+  },
+  "attempts": [
+    {
+      "command": "python3 cloud/fleet.py status (cryptanalysis)",
+      "result": "RUNPOD_API_KEY missing"
+    },
+    {
+      "command": "gh secret list --repo aburan28/cryptanalysis",
+      "result": "403 Resource not accessible by integration; repository-held credentials remain unknown"
+    },
+    {
+      "command": "gh workflow run cloud-ecc2k130.yml --repo aburan28/cryptanalysis --ref claude/cryptanalysis-repo-setup-p59kek -f action=doctor",
+      "result": "422 workflow is disabled"
+    },
+    {
+      "command": "gh api repos/aburan28/cryptanalysis/actions/workflows/367505054",
+      "result": {
+        "state": "disabled_manually",
+        "path": ".github/workflows/cloud-ecc2k130.yml"
+      }
+    }
+  ],
+  "updates": [
+    {
+      "event": "User supplied RunPod access and selected RunPod route",
+      "credential_value_retained": false
+    },
+    {
+      "event": "Authenticated status and GPU catalogue/availability queries succeeded"
+    },
+    {
+      "event": "First allocation refused HTTP400 for unsupported provider CUDA13.3 enum; no pod created"
+    },
+    {
+      "event": "Amended provider family13.0 request created dedicated ddklh0efbq99mv at2.49USD/hour with2hourcap; SSH readiness pending; actualdriver/nativegatesnotyetpassed"
+    },
+    {
+      "event": "Both first SSH-readiness allocations were explicitly deleted; no scientific work ran on them."
+    },
+    {
+      "event": "Third dedicated instance uf7o6868cpoxi7 allocated at0.69USD/hour,28vCPU,125GBhostRAM,RTX5090; provider and native hardware receipts retained in sibling study."
+    },
+    {
+      "event": "Provider logs confirmed listening sshd; directSSH route unavailable. Documented fixed-job HTTP delivery/retrieval used, with ephemeral bearer separate from user API key."
+    },
+    {
+      "event": "Automatic review initially refused transfer as possible private-source disclosure; public GitHub visibility and unauthenticated exact-hash download established public payload, then same launch was approved."
+    },
+    {
+      "event": "HTTP run0 terminal packet fetched/hashverified; GPU/frontier refused incomplete transport and permissions, four native negation arms completed with three censored. Failure retained."
+    },
+    {
+      "event": "Corrected complete-manifest/executable-bit payload v2 published; fresh run1 passed setup and is executing unchanged native scientific workflow on same pod."
+    }
+  ],
+  "cloud_provisioning_executed": true,
+  "workflow_enable_executed": false,
+  "challenge_logarithm_recovered": false,
+  "blocked_scope": "Full public challenge completion remains unresolved. Bounded native device/frontier execution is active; final gates are not yet reported as passed.",
+  "next_concrete_route": "Retrieve/hashcheck final run1 native records, record all failed gates and censoring, explicitly delete exact owned pod and verify absence.",
+  "interpretation": "Access/infrastructure limit only; not a mathematical negative. The ten-GPU-year audit figure was not independently measured in this round.",
+  "bounded_measurement_status": "in_progress",
+  "user_credential_in_artifact": false
 }
