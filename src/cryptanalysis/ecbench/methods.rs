@@ -1145,7 +1145,9 @@ fn solve_transported_logs_multi(
                 format!("no derived public co-target {index} in 10 000 hash attempts")
             })?;
         if co_target == target {
-            return Err(format!("derived co-target {index} equals the workload target"));
+            return Err(format!(
+                "derived co-target {index} equals the workload target"
+            ));
         }
         // The derivation itself is not charged: it is the same
         // hash-to-subgroup law that produced the workload target, and no
@@ -1162,13 +1164,8 @@ fn solve_transported_logs_multi(
     };
     let calib = pinned_only_calibration("koblitz", &curve.slug);
     let started = Instant::now();
-    let report = run_hash_transported_log_multi_target(
-        inst,
-        &spec,
-        &targets,
-        params.u64("seed")?,
-        &calib,
-    )?;
+    let report =
+        run_hash_transported_log_multi_target(inst, &spec, &targets, params.u64("seed")?, &calib)?;
     let wall = started.elapsed().as_nanos() as u64;
     let mut phases = vec![
         phase_of("factor_base", &report.base),
@@ -1178,13 +1175,19 @@ fn solve_transported_logs_multi(
     let mut online_wall_ns = 0u64;
     let mut online_gae = 0.0;
     for (index, target_report) in report.targets.iter().enumerate() {
-        phases.push(phase_of(&format!("target{index}_query"), &target_report.query));
+        phases.push(phase_of(
+            &format!("target{index}_query"),
+            &target_report.query,
+        ));
         phases.push(phase_of(&format!("target{index}_PDP"), &target_report.pdp));
         phases.push(phase_of(
             &format!("target{index}_relation_check"),
             &target_report.relation_check,
         ));
-        phases.push(phase_of(&format!("target{index}_descent"), &target_report.descent));
+        phases.push(phase_of(
+            &format!("target{index}_descent"),
+            &target_report.descent,
+        ));
         phases.push(phase_of(
             &format!("target{index}_recovery_check"),
             &target_report.recovery_check,
@@ -1317,7 +1320,8 @@ fn solve_transported_logs_multi(
 
 /// The online window from the phase clock's snapshot, mapped to the
 /// claim schema's stage names.
-fn online_window(family: &str, id: &str, snap: &Snapshot) -> Option<OnlineWindow> {    let wall_ns = snap.online_wall_ns?;
+fn online_window(family: &str, id: &str, snap: &Snapshot) -> Option<OnlineWindow> {
+    let wall_ns = snap.online_wall_ns?;
     let get = |name: &str| snap.online_phases_ns.get(name).copied().flatten();
     let mut w = OnlineWindow {
         wall_ns,

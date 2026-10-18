@@ -488,7 +488,9 @@ pub fn run_hash_transported_log_multi_target(
             && group.is_identity(&group.mul(&mut query.group_ops, target, inst.r));
         query.wall_ns += validation_start.elapsed().as_nanos() as u64;
         if !valid {
-            return Err(format!("multi-target {target_index} is not a valid subgroup point"));
+            return Err(format!(
+                "multi-target {target_index} is not a valid subgroup point"
+            ));
         }
         for number in 0..spec.max_attempts {
             let query_start = Instant::now();
@@ -520,9 +522,8 @@ pub fn run_hash_transported_log_multi_target(
                         .ok_or("target witness index outside transported base")?;
                     sum = group.add(&mut relation_check.group_ops, sum, point);
                     let column = fb.col_of[index];
-                    dense[column] =
-                        ((dense[column] as u128 + fb.coef_of[index] as u128) % inst.r as u128)
-                            as u64;
+                    dense[column] = ((dense[column] as u128 + fb.coef_of[index] as u128)
+                        % inst.r as u128) as u64;
                 }
                 relation_check.wall_ns += check_start.elapsed().as_nanos() as u64;
                 relation_check.count("witnesses_checked", 1);
@@ -539,8 +540,7 @@ pub fn run_hash_transported_log_multi_target(
                 let log = (residual_log + inst.r - a) % inst.r;
                 descent.wall_ns += descent_start.elapsed().as_nanos() as u64;
                 let replay_start = Instant::now();
-                verified =
-                    group.mul(&mut recovery_check.group_ops, inst.generator, log) == target;
+                verified = group.mul(&mut recovery_check.group_ops, inst.generator, log) == target;
                 recovery_check.wall_ns += replay_start.elapsed().as_nanos() as u64;
                 recovery_check.count("scalar_replays", 1);
                 if !verified {
@@ -622,8 +622,10 @@ fn pdp_transfer_counters(
 ) {
     if let Some(last) = targets.last_mut() {
         last.pdp.count("lookups", counters.lookups);
-        last.pdp.count("canonicalisations", counters.canonicalisations);
-        last.pdp.count("frobfold_mismatches", counters.frobfold_mismatches);
+        last.pdp
+            .count("canonicalisations", counters.canonicalisations);
+        last.pdp
+            .count("frobfold_mismatches", counters.frobfold_mismatches);
         last.pdp.count("lift_failures", counters.lift_failures);
     }
 }
@@ -720,7 +722,9 @@ mod tests {
         }
         // One shared base, one shared table, one shared verification pass.
         assert_eq!(
-            report.transport_verification.get("transported_columns_checked"),
+            report
+                .transport_verification
+                .get("transported_columns_checked"),
             4
         );
         assert_eq!(report.columns, 4);
