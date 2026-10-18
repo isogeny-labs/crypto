@@ -1,0 +1,12 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Round316 transported-log amortized holdout n41 T16",
+  "description": "Four-size scaling cell for the Round 315 amortized multi-target candidate: one shared hash-scheduled known-log base and folded pair table over T=16 public targets, against matched strong signed-Frobenius rho; Round 314 frozen K rule, per research/ecbench_transport_amortize_round316_20261017/PREREGISTRATION.md.",
+  "workloads": {"curves": [{"kind": "koblitz", "a": 0, "n": 41}], "targets_per_curve": 8, "target_seed": 20261017315003, "target_kind": "public"},
+  "arms": [
+    {"name": "rho-strong", "role": "reference", "method": {"id": "rho.signed_frobenius_strong", "params": {"lanes": "32", "dp_bits": "4", "step_cap_factor": "2000"}}},
+    {"name": "transport-multi-t16", "role": "candidate", "method": {"id": "ic.transported_logs_hash_multi", "params": {"factor_base": "known-log-orbit:columns=71,scalar_cap=1000000,schedule=hash,seed=20261014314005", "target_max_attempts": "2048", "amortized_targets": "16", "co_target_seed": "20261017315002"}}},
+    {"name": "transport-multi-t16-aa", "role": "control", "method": {"id": "ic.transported_logs_hash_multi", "params": {"factor_base": "known-log-orbit:columns=71,scalar_cap=1000000,schedule=hash,seed=20261014314005", "target_max_attempts": "2048", "amortized_targets": "16", "co_target_seed": "20261017315002"}}}
+  ],
+  "measurement": {"rounds": 5, "warmup": 1, "order": "alternate", "seed": 20261017315004, "isolation_required": "L2", "timeout_seconds": 3600}
+}

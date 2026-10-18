@@ -12,7 +12,7 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 use serde::Deserialize;
-use serde_json::json;
+use serde_json::{json, Value};
 
 #[derive(Deserialize)]
 struct Record {
@@ -41,6 +41,13 @@ struct Cost {
 #[derive(Deserialize)]
 struct WorkloadRef {
     workload_id: String,
+    #[serde(default)]
+    curve: Option<CurveFacts>,
+}
+
+#[derive(Deserialize)]
+struct CurveFacts {
+    r: u64,
 }
 
 #[derive(Deserialize)]
@@ -251,6 +258,7 @@ fn run(args: Args) -> Result<(), String> {
         let executions = cand.len() as f64;
         rows.push(json!({
             "session": dir.file_name().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default(),
+            "log2_r": cand.first().and_then(|r| r.workload.curve.as_ref()).map(|c| (c.r as f64).log2()),
             "amortized_targets": targets[0],
             "measured_pairs": cand.len(),
             "verified": measured.len() + records.iter().filter(|r| r.warmup).count(),
@@ -269,12 +277,70 @@ fn run(args: Args) -> Result<(), String> {
             "gate_amortized_ci_excludes_one": amortized_hi < 1.0,
         }));
     }
+    // Four-size exponent fits over the T=16 rows, one per distinct size
+    // (log2 GAE against log2 r), reported next to the point estimates.
+    let mut fits = Vec::new();
+    {
+        let mut by_size: BTreeMap<u64, &Value> = BTreeMap::new();
+        for row in &rows {
+            if row["amortized_targets"] == json!(16) {
+                by_size.insert(row["log2_r"].as_f64().unwrap_or_default().to_bits(), row);
+            }
+        }
+        let mut xs: Vec<f64> = Vec::new();
+        let mut cand_ys: Vec<f64> = Vec::new();
+        let mut rho_ys: Vec<f64> = Vec::new();
+        for row in by_size.values() {
+            let Some(lr) = row["log2_r"].as_f64() else {
+                continue;
+            };
+            let Some(cand) = row["candidate_mean_amortized_per_target_gae"].as_f64() else {
+                continue;
+            };
+            let Some(rho) = row["rho_mean_gae"].as_f64() else {
+                continue;
+            };
+            xs.push(lr);
+            cand_ys.push(cand.log2());
+            rho_ys.push(rho.log2());
+        }
+        if xs.len() >= 3 {
+            let fit = |ys: &[f64]| {
+                let n = xs.len() as f64;
+                let mx = xs.iter().sum::<f64>() / n;
+                let my = ys.iter().sum::<f64>() / n;
+                let mut sxy = 0.0;
+                let mut sxx = 0.0;
+                let mut syy = 0.0;
+                for (x, y) in xs.iter().zip(ys) {
+                    sxy += (x - mx) * (y - my);
+                    sxx += (x - mx) * (x - mx);
+                    syy += (y - my) * (y - my);
+                }
+                let slope = sxy / sxx;
+                let r2 = (sxy * sxy) / (sxx * syy);
+                (slope, r2)
+            };
+            let (cand_exp, cand_r2) = fit(&cand_ys);
+            let (rho_exp, rho_r2) = fit(&rho_ys);
+            fits.push(json!({
+                "sizes": xs.len(),
+                "amortized_targets": 16,
+                "amortized_candidate_exponent": cand_exp,
+                "amortized_candidate_r2": cand_r2,
+                "rho_exponent": rho_exp,
+                "rho_r2": rho_r2,
+                "note": "finite-size fits over the frozen T=16 cells; not asymptotic proofs",
+            }));
+        }
+    }
     let out = json!({
         "schema": "transport-log-amortize-round315/v1",
         "unit": "counted GAE; the amortized per-target unit divides the candidate's whole-execution cost by the named amortized_targets",
         "reference": "rho.signed_frobenius_strong, one cold target per execution, no reusable precomputation",
         "caveat": "a distinguished-point rho fleet sharing tables across targets can also amortize; this is a multi-target mechanism screen, not a one-target speedup",
         "rows": rows,
+        "fits": fits,
     });
     let text = serde_json::to_string_pretty(&out).map_err(|e| e.to_string())?;
     std::fs::write(&args.out, text).map_err(|e| e.to_string())?;
