@@ -212,3 +212,12 @@ release benchmark; a library-test attempt from it found test-only research
 fixtures outside that bundle and was recorded as censored. Run repository
 tests from the full checkout. Rebuild the archive once the final repair
 source lands before hosted dispatch.
+
+The [auditor policy self-check](worker-auditor-policy-selfcheck.json) uses
+synthetic host and timing fields around the committed long-replay outputs.
+Its complete 768-arm panel exercises the passing Q-cluster interval path;
+one out-of-range A/A control and one missing raw stdout each force
+`unknown_gate_failed` with the aggregate ratio and interval null. The
+[self-check script](validate_worker_batch_auditor.py) regenerates these
+cases in a temporary directory. Its synthetic times are never performance
+measurements.
