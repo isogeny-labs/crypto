@@ -15,8 +15,8 @@ Every card gives the host flavour, $/h (RunPod secure-cloud prices queried 21:13
 | P1 | closure A3: decisive A1 count at (m, ℓ) = (4, 6), 3,000 fresh draws in parallel (**running**: pod `6sh5qyoyusv6ux`, launched 21:50Z by the parent session from `ee7a5d972`) | [`closure_a3/LAUNCH.md`](closure_a3/LAUNCH.md) | `cpu3m-32-256` | 1.76 | 5.5 | **$9.70** ($7.00–$10.60) | $15.84 | 0.8 |
 | P7 | closure C1: degree 5 at m = 3, (19, 7), draw 0, above 280 GB (**running**: pod `9g6slrqws33cr8`, launched 21:50Z by the parent session; no 2 × L40 was available) | [`closure_c1/LAUNCH.md`](closure_c1/LAUNCH.md) | `cpu3m-64-512` (planned: 2 × L40 at $1.64/h, $8.20) | 3.52 | 5.0 | **$17.60** ($9.50–$43.00) | $56.32 | 0.6 |
 | P4 | equal-advice BL rho vs compact-orbit IC, n = 73 and 83 | [`equal_advice_wide/LAUNCH.md`](equal_advice_wide/LAUNCH.md) | `cpu3g-32-128` | 1.28 | 7.5 | **$9.60** ($6.90–$11.50) | $17.92 | 0.6 |
-| P4-min | the same, n = 83 only (minimal) | [`equal_advice_wide/LAUNCH.md`](equal_advice_wide/LAUNCH.md) | `cpu3g-32-128` | 1.28 | 3.5 | **$4.50** ($2.80–$5.90) | $7.68 | 0.6 |
-| P2-min | PKM msolve `-t 16`, m3_t7 target 0 only, 6 h wall (minimal; reads H0 only) | [`pkm_msolve_mt/LAUNCH.md`](pkm_msolve_mt/LAUNCH.md) | `cpu3m-16-128` | 0.88 | 6.6 | **$5.80** | $6.60 | 0.3 |
+| P4-min | the same, n = 83 only (minimal) (**running**: pod `mhjde0s1ysa5aq`, launched 22:08Z by the parent session) | [`equal_advice_wide/LAUNCH.md`](equal_advice_wide/LAUNCH.md) | `cpu3g-32-128` | 1.28 | 3.5 | **$4.50** ($2.80–$5.90) | $7.68 | 0.6 |
+| P2-min | PKM msolve `-t 16`, m3_t7 target 0 only, 6 h wall (minimal; reads H0 only) (**running**: pod `dapncaphacx5w3`, launched 22:08Z by the parent session) | [`pkm_msolve_mt/LAUNCH.md`](pkm_msolve_mt/LAUNCH.md) | `cpu3m-16-128` | 0.88 | 6.6 | **$5.80** | $6.60 | 0.3 |
 | P2a | PKM m = 3, N = 21, msolve `-t 16`, both t7 targets, 22 h wall | [`pkm_msolve_mt/LAUNCH.md`](pkm_msolve_mt/LAUNCH.md) | `cpu3m-32-256` | 1.76 | 22.5 | **$39.60** ($10.60–$40.50) | $46.73 | 0.5 |
 | P2b | PKM m = 3, N = 24, msolve `-t 16`, both t8 targets (target 1 never run) | [`pkm_msolve_mt/LAUNCH.md`](pkm_msolve_mt/LAUNCH.md) | `cpu3m-32-256` | 1.76 | 22.5 | **$39.60** ($10.60–$40.50) | $46.73 | 0.35 |
 | P3 | PKM native `f4_fp_tower` 192 GB cell (frozen 2026-10-16) | [`pkm_f4_tower/LAUNCH.md`](pkm_f4_tower/LAUNCH.md) | `cpu3m-32-256` | 1.76 | 60 (28–120) | **$106** ($49–$211) | $220 | 0.6 |
@@ -62,7 +62,7 @@ Already done: **P0, the PMU probe** ([`pmu_probe/README.md`](pmu_probe/README.md
 ## How to run any card
 
 1. Top up the balance. Check prices with `python3 research/dreg_closure_m4l6_20261018/pod/launch.py prices`.
-2. Run the card's launch command from a checkout of `main` after this PR merges (pods clone `--branch main`).
+2. Run the card's launch command from a checkout of `main` after this PR merges (pods clone `--branch main`). Until then the jobs exist only on `claude/ic-leads-rented-launch-ready`, so pass that branch instead. The four running pods booted from it.
 3. Watch `https://ID-8000.proxy.runpod.net/STATUS`. Fetch with `launch.py fetch ID DEST --path …` as the card says, then `launch.py terminate ID`.
    - A pod whose container has ended may still bill (or restart) until it is terminated.
    - Never fetch the top level recursively: it links the whole clone.

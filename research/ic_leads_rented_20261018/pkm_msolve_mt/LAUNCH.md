@@ -18,6 +18,8 @@ Run P2a first. P2b's reading at N = 24 matters only together with N = 21's, so P
 
 ## Minimal configuration (the about $12 left for P2 + P4 together)
 
+**Launched 2026-10-18 22:08Z by the parent session:** pod `dapncaphacx5w3`, `cpu3m-16-128` at $0.88/h, 7.5 h cap, booted from this branch at `b91b196ef`.
+
 One system only, `m3_t7_x221026520` (target 0), on `cpu3m-16-128` ($0.88/h, queried 22:04Z): 16 threads, `CAP` ≈ 109 GB, wall 6 h. Expected 6.6 h, **$5.80**, cap 7.5 h = $6.60. It reads only H0 (a productive degree-8 step on target 0). "Finished D = 7" needs both targets (A1.4), so a finished run here is recorded but the plateau row stays open.
 
 ```sh

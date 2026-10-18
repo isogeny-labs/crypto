@@ -14,6 +14,8 @@
 
 ## Minimal configuration (the about $12 left for P2 + P4 together)
 
+**Launched 2026-10-18 22:08Z by the parent session:** pod `mhjde0s1ysa5aq`, `cpu3g-32-128` at $1.28/h, 6 h cap, `RUNGS=n83`, booted from this branch at `b91b196ef`.
+
 The n = 83 rung only (`RUNGS=n83`), the rung with the recorded IC claims (root21, K = 3240), on the same `cpu3g-32-128`. Expected 3.5 h (range 2.2–4.6: BL walks 1.4–3.5 h, two IC setups 0.2–0.4 h, boot and build 0.4 h), **$4.50** (range $2.80–$5.90), cap 6 h = $7.68. With the minimal P2 that is $10.30 expected, $14.28 at the caps. n = 73 stays for a later launch: same command with `RUNGS=n73`, about $6.
 
 ```sh
