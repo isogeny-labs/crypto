@@ -117,6 +117,13 @@ full-suite result on current main still depends on the build repair. A
 four-thread retry passed 1,089 tests before it was stopped after the repair
 branch advanced; its [partial log](rebased-full-fourthreads-censored.log)
 is retained. No throughput result has been measured for the batch lane.
+On a later temporary combination with repair commit `b11d1948`, the
+complete-checkout [focused rho test log](rebased-latest-rho-44.log) records
+44/44 release tests passing with loopback access. The first sandboxed
+attempt compiled and passed 35 tests; nine network tests encountered socket
+`PermissionDenied`. The [latest validation receipt](rebased-latest-rho-validation.json)
+binds the retry log and records the temporary merge removal. The complete
+release library suite still awaits the final repaired source.
 
 ## Next gates
 
@@ -200,5 +207,8 @@ dependencies and literal `include_str!`/`include_bytes!` paths. An archive
 made from a temporary combination with build-repair PR #2135 then built the
 release benchmark from a clean extraction, and its extracted executable
 passed a serial/batch q00 exact-output replay. The temporary repair merge
-was removed from this branch afterward. Rebuild the archive once the final
-repair source lands before hosted dispatch.
+was removed from this branch afterward. The archive is scoped to the
+release benchmark; a library-test attempt from it found test-only research
+fixtures outside that bundle and was recorded as censored. Run repository
+tests from the full checkout. Rebuild the archive once the final repair
+source lands before hosted dispatch.

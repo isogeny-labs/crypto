@@ -39,6 +39,16 @@
   ],
   "current_unmerged_branch_archive_sha256": "4935d7c13e57e8cba2d944ca6b62ddec856b302e7044be065e4d90d169b0ecd2",
   "current_archive_rebuilt_identically": true,
+  "archive_library_test_attempt": {
+    "command": "cargo test --offline --release --lib cryptanalysis::pollard_collab -- --nocapture",
+    "status": "censored_missing_test_only_research_fixtures",
+    "missing_examples": [
+      "research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json",
+      "research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl",
+      "research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz"
+    ],
+    "execution_stopped_after_compile_errors": true
+  },
   "final_merged_source_archive_sha256": null,
   "hosted_performance_result": null
 }
