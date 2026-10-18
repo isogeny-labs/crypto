@@ -23,3 +23,23 @@ host receipt, all A/A ratios in `[0.90, 1.11]`, extra peak RSS within both
 1.05 for default worker routing. Any failed gate leaves the aggregate ratio
 and interval unknown. The longer workload is a new measured condition; it
 does not revise or erase the prior two failed attempts.
+
+## Infrastructure stop
+
+The live process-affinity audit found RunPod web-terminal PID `8862` and its
+two shell children (`8906`, `8909`) with affinity that included the measured
+CPU `5` and its SMT sibling `29`. These processes appeared after the prior
+process-pinning snapshot. The runner was stopped with `SIGINT` after 47 arms
+and 23 exact-output pairs. Its summary records `rejected`, and the
+independent auditor records `unknown_gate_failed`; the partial result is not
+used for timing selection.
+
+The [complete partial archive](attempt3-partial.tar.gz) retains 108 entries,
+including all completed arm stdout/stderr receipts, ledgers, the original
+frozen plan, executable, source bundle, log, and audit. SHA-256:
+`25d62c9a669054a5345b2a84cb743679a993405bc232c6aea33fddb063657184`.
+The [process-affinity failure receipt](attempt3-affinity-failure.json),
+[runner summary](attempt3-summary.json), and
+[independent audit](attempt3-audit.json) expose the stop reason without
+extracting the archive. The web-terminal process tree was subsequently pinned
+to housekeeping CPUs `2,26`; a fresh panel uses its own allocation and plan.
