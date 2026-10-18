@@ -1,5 +1,7 @@
 # Volcano experiment downloads, 17 October 2026
 
+[Download guide v6: 6,137-vertex dataset, all downloads and actual guarded resume](https://drive.google.com/file/d/1XyB-FgGQ3vxC90RbE_Z41T787RONHHQQ/view).
+
 Latest immutable publication, 18 October: **6,137 / 24,823 audited vertices**,
 all 51 strata sampled, 98,192 accepted records (63,182 verified / 30,553
 exhausted / 4,457 timeout), 3,181,542 relations / 149,275,746 actual calls.

@@ -46,3 +46,5 @@ passes native inventory/summary, every archive manifest entry and byte-identical
 outer repacking. A later actual launch/process/progress receipt controls resumed
 status; no historical PID or ledger row implies current execution. All frozen
 mathematical inputs and original outer guards remain unchanged.
+
+Latest actual resume: PID50943, verified2026-10-18T19:00:23.433487+00:00 with new audited progress; [receipt](publication-20261018T1835Z/resumed-verified.json). Deadline and frozen budgets unchanged. Earlier PID3298 is stopped; current live status requires fresh process verification.

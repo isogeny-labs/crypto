@@ -78,3 +78,7 @@ staging hard-linked 30,695 session files containing 770,860,614 payload bytes,
 avoiding that redundant payload copy. This is a logical file-byte count, not
 measured physical allocation or a runtime result. Native totals are 156,623,072
 source trials / 149,275,746 actual decomposition calls / 3,181,542 relations.
+
+Actual later resume: PID50943, launched2026-10-18T19:00:02.991751+00:00, verified2026-10-18T19:00:23.433487+00:00 PPID1/own-session/non-zombie with new audited progress. Original deadline2026-10-20T20:13:42.570000+00:00 and6GiB cap preserved. See resumed-launch.json / resumed-verified.json; published downloads remain6,137 vertices.
+
+[Download guide v6](https://drive.google.com/file/d/1XyB-FgGQ3vxC90RbE_Z41T787RONHHQQ/view) includes all cohorts and current launch evidence. [Continuation run card](CAMPAIGN_RUN_CARD.md) retains exact guards and validated staging instructions.
