@@ -95,7 +95,7 @@ pub(super) fn measurement_identity(
     max_degree: u32,
 ) -> Result<crypto_lib::cryptanalysis::ecbench::fbm::FactorBaseMeasurementId> {
     let (_, params) = Params::parse_spec(spec)?;
-    let formulation = if dump.factor_base.family.starts_with("prime-") {
+    let formulation = if dump.curve.family == "prime" {
         "semaev-s3-direct-membership"
     } else {
         "semaev-s3-weil-subspace"
@@ -113,6 +113,25 @@ pub(super) fn measurement_identity(
         instrument: "factor-base-sweep/v1".into(),
     }
     .seal()
+}
+
+#[cfg(test)]
+mod identity_tests {
+    use super::*;
+    #[test]
+    fn a_prime_orbit_constructor_keeps_the_prime_formulation_identity() {
+        let spec = "glv-orbit:size=4";
+        let dump = dump_factor_base(
+            &crypto_lib::cryptanalysis::ecbench::workload::CurveSpec::PrimeRoster { bits: 16 },
+            spec,
+        )
+        .unwrap();
+        assert_eq!(dump.curve.family, "prime");
+        assert_eq!(
+            measurement_identity(&dump, spec, 8).unwrap().config.oracle,
+            "semaev-s3-direct-membership"
+        );
+    }
 }
 
 pub fn run(request: &Request, dir: &Path) -> Result<Value> {
