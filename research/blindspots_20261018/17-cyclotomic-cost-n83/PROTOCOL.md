@@ -152,7 +152,7 @@ the verdict is INCONCLUSIVE.
 ## Cells (frozen)
 
 `a = 1` and `a = 0` where the curve has a usable prime-order subgroup
-(`r > h`; `K_0 / F_{2^47}` does not: `r = 7,086,097 < h = 19,861,076`).
+(`r > h`; the `a = 0` Koblitz curve over the degree-47 binary field does not: `r = 7,086,097 < h = 19,861,076`).
 
 | cell | n, a | K | cyc | arms | pair table | nulls |
 |---|---|---|---|---|---|---|
