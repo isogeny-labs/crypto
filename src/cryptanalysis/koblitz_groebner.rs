@@ -968,6 +968,63 @@ pub fn build_decomposition_system(
     })
 }
 
+/// `w^{2^a}` for the coordinate mask `w`, by `a` applications of the
+/// squaring table of `st`.
+fn frobenius_mask(w: u64, a: u32, st: &FieldStructure) -> u64 {
+    (0..a).fold(w, |acc, _| constant_square_mask(acc, st))
+}
+
+/// **Target-free 4-sum system**: `±(P₁^{(a₁)} + P₂^{(a₂)}) = ±(P₃^{(a₃)} + P₄^{(a₄)})`
+/// with no target `x_R`, as two `S₃` links sharing the middle abscissa `u`.
+///
+/// Unknown layout (`4ℓ + n` Boolean variables): `x₁, x₂, x₃, x₄ ∈ V`
+/// at `[0, ℓ)`, `[ℓ, 2ℓ)`, `[2ℓ, 3ℓ)`, `[3ℓ, 4ℓ)` (summand `i` owns
+/// `[i·ℓ, (i+1)·ℓ)`, the same convention as [`build_decomposition_system`]),
+/// then `u ∈ F_{2^n}` at `[4ℓ, 4ℓ+n)`.
+///
+/// Equations (`2n`, `n` per link): the Weil restrictions of
+/// `S₃(x₁^{2^{a₁}}, x₂^{2^{a₂}}, u) = 0` then
+/// `S₃(x₃^{2^{a₃}}, x₄^{2^{a₄}}, u) = 0`.  A twisted block is the same `ℓ`
+/// unknowns with basis vectors `v_t^{2^{a}}` (Frobenius is `F₂`-linear), so
+/// the degrees match the untwisted system.  `twists = [0,0,0,0]` is the
+/// plain 4-sum `P₁+P₂ = ±(P₃+P₄)`.  `DecompositionSystem::m` is 4; its
+/// `blocks`/`interleaved_order` helpers describe the chained system, not
+/// this one.
+///
+/// Returns `None` if `4ℓ + n > MAX_VARS`.
+pub fn build_target_free_system(
+    basis: &[F2mElement],
+    b: &F2mElement,
+    twists: [u32; 4],
+    st: &FieldStructure,
+) -> Option<DecompositionSystem> {
+    let ell = basis.len();
+    let n = st.n;
+    let n_vars = ell.checked_mul(4)?.checked_add(n as usize)?;
+    if n_vars > MAX_VARS {
+        return None;
+    }
+    let summand = |i: usize| -> SymElement {
+        let tw: Vec<F2mElement> = basis
+            .iter()
+            .map(|v| {
+                let w = v.raw_bits().first().copied().unwrap_or(0);
+                element_from_mask(frobenius_mask(w, twists[i], st), n)
+            })
+            .collect();
+        SymElement::from_subspace_vars(&tw, i * ell, n, n_vars)
+    };
+    let u = SymElement::from_free_vars(4 * ell, n, n_vars);
+    let mut equations = sym_semaev_s3(&summand(0), &summand(1), &u, b, st);
+    equations.extend(sym_semaev_s3(&summand(2), &summand(3), &u, b, st));
+    Some(DecompositionSystem {
+        equations,
+        n_vars,
+        ell,
+        m: 4,
+    })
+}
+
 // ── Block structure ────────────────────────────────────────────────
 
 impl DecompositionSystem {
@@ -9823,4 +9880,104 @@ thread_local! {
 /// `KIC_F4_EARLY_ABORT`; a same-binary control for tests and harnesses.
 pub fn set_early_abort_mode(mode: Option<u8>) {
     EARLY_ABORT_OVERRIDE.with(|m| m.set(mode));
+}
+
+#[cfg(test)]
+mod target_free_tests {
+    use super::*;
+    use crate::cryptanalysis::koblitz_bench::{random_subspace_basis, S3LinkRoots};
+    use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+    use rand::rngs::StdRng;
+    use rand::SeedableRng;
+
+    fn word(e: &F2mElement) -> u64 {
+        e.raw_bits().first().copied().unwrap_or(0)
+    }
+
+    fn check(n: u32, ell: usize, twists: [u32; 4]) {
+        let irr = find_irreducible_sparse(n).expect("field");
+        let st = FieldStructure::new(n, &irr);
+        let b = F2mElement::one(n);
+        let mut rng = StdRng::seed_from_u64(1000 + n as u64 * 10 + ell as u64);
+        let basis = random_subspace_basis(n, ell, &mut rng);
+        let sys = build_target_free_system(&basis, &b, twists, &st).expect("system");
+        assert_eq!(sys.n_vars, 4 * ell + n as usize);
+        assert_eq!(sys.equations.len(), 2 * n as usize);
+        // Span of V with the twist applied, indexed by coefficient vector.
+        let spans: Vec<Vec<u64>> = (0..4)
+            .map(|i| {
+                let w: Vec<u64> = basis
+                    .iter()
+                    .map(|v| frobenius_mask(word(v), twists[i], &st))
+                    .collect();
+                (0..1u64 << ell)
+                    .map(|c| {
+                        (0..ell)
+                            .filter(|t| c >> t & 1 == 1)
+                            .fold(0, |a, t| a ^ w[t])
+                    })
+                    .collect()
+            })
+            .collect();
+        let solver = S3LinkRoots::new(&irr, 1);
+        // Expected solution set, as full assignments.
+        let mut expected = std::collections::BTreeSet::new();
+        for c in 0..1u64 << (4 * ell) {
+            let cs: Vec<usize> = (0..4)
+                .map(|i| ((c >> (i * ell)) & ((1 << ell) - 1)) as usize)
+                .collect();
+            let r1 = solver.roots(spans[0][cs[0]], spans[1][cs[1]]);
+            if r1.is_empty() {
+                continue;
+            }
+            let r2 = solver.roots(spans[2][cs[2]], spans[3][cs[3]]);
+            for u in r1.iter().filter(|u| r2.contains(u)) {
+                expected.insert(c | (u << (4 * ell)));
+            }
+        }
+        let mut got = std::collections::BTreeSet::new();
+        for a in 0..1u64 << sys.n_vars {
+            if sys.equations.iter().all(|p| p.eval(a) == 0) {
+                got.insert(a);
+            }
+        }
+        assert_eq!(got, expected, "n={n} ell={ell} twists={twists:?}");
+        if twists == [0, 0, 0, 0] {
+            // x1=x3, x2=x4 and x1=x4, x2=x3 with u a root of the first link.
+            let mask = (1u64 << ell) - 1;
+            let mut trivial = 0;
+            for c1 in 0..1u64 << ell {
+                for c2 in 0..1u64 << ell {
+                    for u in solver.roots(spans[0][c1 as usize], spans[1][c2 as usize]) {
+                        for (c3, c4) in [(c1, c2), (c2, c1)] {
+                            let a =
+                                c1 | c2 << ell | c3 << (2 * ell) | c4 << (3 * ell) | u << (4 * ell);
+                            assert!(got.contains(&a), "trivial assignment missing");
+                            trivial += 1;
+                        }
+                    }
+                }
+            }
+            let _ = mask;
+            assert!(trivial > 0);
+        }
+        eprintln!(
+            "target_free n={n} ell={ell} twists={twists:?}: {} solutions",
+            got.len()
+        );
+    }
+
+    #[test]
+    fn target_free_matches_link_roots_plain() {
+        for (n, ell) in [(7, 2), (9, 2), (9, 3)] {
+            check(n, ell, [0, 0, 0, 0]);
+        }
+    }
+
+    #[test]
+    fn target_free_matches_link_roots_twisted() {
+        for (n, ell) in [(7, 2), (9, 2), (9, 3)] {
+            check(n, ell, [0, 1, 2, 3]);
+        }
+    }
 }
