@@ -17,7 +17,14 @@ Freeze N83 source SHA-256
 [native analyzer](../../examples/n83_root_batch_highk_analyze.rs) SHA-256
 `961ddb7448ca57f05a341385cbde5bc53179eba9149974fe0e1eaa0d41599cb9`,
 and workflow SHA-256
-`84d7ce64300457746d278e630cd9c324eb386ea8e9c588cef00c85fa9920a343`.
+`71e43db235fbb9392da1b7535948d53d8f75b8313afdcc0bc948cf77494fa061`.
+
+The first [cloud attempt](https://github.com/aburan28/crypto/actions/runs/39093280175)
+built and tested the frozen producer, then stopped before the first arm because
+the shell runner file lacked executable permission. Its preserved artifact
+contains the compiler versions; [the attempt receipt](first_highk_attempt_39093280175.json)
+records the failure. The revised workflow invokes that same hashed shell
+source with `bash`. No index timings came from the first attempt.
 
 Run one frozen `ubuntu-24.04` cloud allocation in scalar, batch, batch,
 scalar order. Both builders use `KIC_SYMMETRIC_S3=1`,

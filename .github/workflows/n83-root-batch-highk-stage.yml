@@ -39,7 +39,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          research/n83_root_batch_index_20261018/run_highk_stage.sh \
+          bash research/n83_root_batch_index_20261018/run_highk_stage.sh \
             "$RUNNER_TEMP/n83-root-batch-target/release/examples/koblitz_orbit_dlp_fast" \
             "$RUNNER_TEMP/n83-root-batch-stage"
 
