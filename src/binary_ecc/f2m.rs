@@ -8,9 +8,10 @@
 //!
 //! - **Addition** = XOR (since `1 + 1 = 0` in `F_2`).
 //! - **Multiplication** = polynomial multiplication then reduction
-//!   mod `m(z)`.  We use the **improved Karatsuba** scheme from
-//!   Putranto et al. §3.1: divide-and-conquer with three half-size
-//!   multiplications, then combine via two MODSHIFT operations.
+//!   mod `m(z)`. Hardware carryless multiplication uses three products
+//!   for two-word operands and six for three-word operands; the general
+//!   path uses word-level schoolbook. An independent improved-Karatsuba
+//!   reference is retained for cross-checking.
 //! - **Squaring** = bit-spread (each bit `b_i` of input goes to
 //!   bit `2i` of output, others = 0) followed by reduction.  Much
 //!   cheaper than general multiplication for binary fields.
@@ -28,6 +29,8 @@
 //! this is `O(m)` time and very fast in practice.
 
 use num_bigint::BigUint;
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex, OnceLock};
 
 /// An irreducible polynomial of `F_2[z]` defining a binary field
 /// `F_{2^m}`.  Stored as the bit-positions of the polynomial's
@@ -578,6 +581,169 @@ impl F2mElement {
     }
 }
 
+// ── Absolute trace and half-trace ─────────────────────────────────
+
+impl F2mElement {
+    /// **Absolute trace** `Tr(a) = Σ_{i<m} a^{2^i} ∈ F_2`, returned as `0`
+    /// or `1`.
+    ///
+    /// `Tr` is `F_2`-linear, so it is evaluated as the parity of `a AND
+    /// mask`, where bit `i` of the mask is `Tr(z^i)`.  The mask is computed
+    /// once per irreducible polynomial (Newton's identities on its
+    /// coefficients, no field operations) and cached for the process.
+    /// Variable-time; intended for public inputs.
+    pub fn trace(&self, irreducible: &IrreduciblePoly) -> u8 {
+        debug_assert_eq!(self.m, irreducible.degree);
+        let tables = trace_tables(irreducible);
+        let ones: u32 = self
+            .bits
+            .iter()
+            .zip(&tables.trace_mask)
+            .map(|(a, t)| (a & t).count_ones())
+            .sum();
+        (ones & 1) as u8
+    }
+
+    /// **Half-trace** `H(a) = Σ_{i=0}^{(m−1)/2} a^{2^{2i}}`, defined for odd
+    /// `m` only (`None` for even `m`).
+    ///
+    /// For odd `m`, `H(a)² + H(a) = a + Tr(a)`, so when `Tr(a) = 0` the
+    /// roots of `λ² + λ = a` are `H(a)` and `H(a) + 1`.  `H` is
+    /// `F_2`-linear and is evaluated as `⌈m/8⌉` lookups in byte tables
+    /// (`256` entries per byte position, built once per irreducible
+    /// polynomial and cached for the process) instead of `m − 1`
+    /// squarings.  Variable-time; intended for public inputs.
+    pub fn half_trace(&self, irreducible: &IrreduciblePoly) -> Option<Self> {
+        debug_assert_eq!(self.m, irreducible.degree);
+        if self.m.is_multiple_of(2) {
+            return None;
+        }
+        let tables = trace_tables(irreducible);
+        let nw = tables.nw;
+        let mut out = Self::zero(self.m);
+        for k in 0..tables.n_bytes {
+            let byte = ((self.bits[k / 8] >> (8 * (k % 8))) & 0xff) as usize;
+            if byte == 0 {
+                continue;
+            }
+            let at = (k * 256 + byte) * nw;
+            for (o, t) in out.bits.iter_mut().zip(&tables.half_trace[at..at + nw]) {
+                *o ^= t;
+            }
+        }
+        Some(out)
+    }
+}
+
+/// Precomputed `F_2`-linear maps for one field `F_2[z]/f(z)`.
+struct TraceTables {
+    /// Words per element.
+    nw: usize,
+    /// Bit `i` set iff `Tr(z^i) = 1`.
+    trace_mask: Vec<u64>,
+    /// `⌈m/8⌉` byte positions (odd `m` only; `0` otherwise).
+    n_bytes: usize,
+    /// `half_trace[(k·256 + v)·nw ..][..nw] = H(v·z^{8k})`; empty for even `m`.
+    half_trace: Vec<u64>,
+}
+
+impl TraceTables {
+    fn new(irreducible: &IrreduciblePoly) -> Self {
+        let m = irreducible.degree;
+        assert!(m >= 2, "trace tables need m >= 2");
+        let nw = m.div_ceil(64) as usize;
+
+        // Newton's identities over F_2.  The roots of f are the conjugates
+        // z^{2^i}, so the power sum s_k = Σ_i (z^{2^i})^k is Tr(z^k).  With
+        // f(X) = X^m + Σ_j c_j X^j, the elementary symmetric functions are
+        // e_j = c_{m−j} (signs vanish in characteristic 2) and
+        //   s_k = Σ_{j=1}^{k−1} e_j s_{k−j} + k·e_k   (mod 2),  1 ≤ k < m,
+        // with s_0 = Tr(1) = m mod 2.
+        let mut c = vec![false; m as usize];
+        for &t in &irreducible.low_terms {
+            if t < m {
+                c[t as usize] ^= true;
+            }
+        }
+        let e = |j: usize| -> bool { j >= 1 && j <= m as usize && c[m as usize - j] };
+        let e_nonzero: Vec<usize> = (1..=m as usize).filter(|&j| e(j)).collect();
+        let mut s = vec![false; m as usize];
+        s[0] = m % 2 == 1;
+        for k in 1..m as usize {
+            let mut v = k % 2 == 1 && e(k);
+            for &j in e_nonzero.iter().take_while(|&&j| j < k) {
+                v ^= s[k - j];
+            }
+            s[k] = v;
+        }
+        let mut trace_mask = vec![0u64; nw];
+        for (i, &bit) in s.iter().enumerate() {
+            if bit {
+                trace_mask[i / 64] |= 1u64 << (i % 64);
+            }
+        }
+
+        // Half-trace byte tables (odd m): H(z^i) by its squaring chain,
+        // then every byte combination by linearity.
+        let (n_bytes, half_trace) = if m % 2 == 1 {
+            let basis: Vec<F2mElement> = (0..m)
+                .map(|i| {
+                    let a = F2mElement::from_bit_positions(&[i], m);
+                    let mut h = a.clone();
+                    let mut t = a;
+                    for _ in 0..(m - 1) / 2 {
+                        t = t.square_k_times(2, irreducible);
+                        h.add_assign(&t);
+                    }
+                    h
+                })
+                .collect();
+            let n_bytes = m.div_ceil(8) as usize;
+            let mut tab = vec![0u64; n_bytes * 256 * nw];
+            for k in 0..n_bytes {
+                for v in 1..256usize {
+                    let j = v.trailing_zeros() as usize;
+                    let prev = (k * 256 + (v & (v - 1))) * nw;
+                    let at = (k * 256 + v) * nw;
+                    let bit = 8 * k + j;
+                    for w in 0..nw {
+                        let b = if bit < m as usize {
+                            basis[bit].bits[w]
+                        } else {
+                            0
+                        };
+                        tab[at + w] = tab[prev + w] ^ b;
+                    }
+                }
+            }
+            (n_bytes, tab)
+        } else {
+            (0, Vec::new())
+        };
+
+        Self {
+            nw,
+            trace_mask,
+            n_bytes,
+            half_trace,
+        }
+    }
+}
+
+/// The cached [`TraceTables`] for `irreducible` (built on first use).
+fn trace_tables(irreducible: &IrreduciblePoly) -> Arc<TraceTables> {
+    type Cache = Mutex<HashMap<(u32, Vec<u32>), Arc<TraceTables>>>;
+    static CACHE: OnceLock<Cache> = OnceLock::new();
+    let key = (irreducible.degree, irreducible.low_terms.clone());
+    let mut map = CACHE
+        .get_or_init(|| Mutex::new(HashMap::new()))
+        .lock()
+        .unwrap_or_else(|e| e.into_inner());
+    map.entry(key)
+        .or_insert_with(|| Arc::new(TraceTables::new(irreducible)))
+        .clone()
+}
+
 // ── Internal helpers (unreduced bit-vector arithmetic) ────────────
 
 /// XOR two bit-vectors (different lengths allowed; result is
@@ -803,9 +969,9 @@ fn has_hw_clmul() -> bool {
     }
 }
 
-/// `out ^= a · b` over `F_2[z]`, word-level schoolbook with one
-/// carry-less multiply per pair of limbs.  `out` must hold at least
-/// `a.len() + b.len()` words.
+/// `out ^= a · b` over `F_2[z]`. Hardware two- and three-word products
+/// use Karatsuba cross terms; other widths use one carry-less multiply
+/// per limb pair. `out` must hold at least `a.len() + b.len()` words.
 fn mul_words_into(a: &[u64], b: &[u64], out: &mut [u64]) {
     debug_assert!(out.len() >= a.len() + b.len());
     #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
@@ -826,28 +992,60 @@ fn mul_words_into(a: &[u64], b: &[u64], out: &mut [u64]) {
     }
 }
 
+macro_rules! mul_words_hw_body {
+    ($a:ident, $b:ident, $out:ident) => {{
+        let a = $a;
+        let b = $b;
+        let out = $out;
+        if a.len() == 2 && b.len() == 2 {
+            let p0 = clmul64_hw(a[0], b[0]);
+            let p2 = clmul64_hw(a[1], b[1]);
+            let cross = clmul64_hw(a[0] ^ a[1], b[0] ^ b[1]);
+            let p1 = (cross.0 ^ p0.0 ^ p2.0, cross.1 ^ p0.1 ^ p2.1);
+            out[0] ^= p0.0;
+            out[1] ^= p0.1 ^ p1.0;
+            out[2] ^= p1.1 ^ p2.0;
+            out[3] ^= p2.1;
+            return;
+        }
+        if a.len() == 3 && b.len() == 3 {
+            let p0 = clmul64_hw(a[0], b[0]);
+            let p2 = clmul64_hw(a[1], b[1]);
+            let p4 = clmul64_hw(a[2], b[2]);
+            let q01 = clmul64_hw(a[0] ^ a[1], b[0] ^ b[1]);
+            let q12 = clmul64_hw(a[1] ^ a[2], b[1] ^ b[2]);
+            let q02 = clmul64_hw(a[0] ^ a[2], b[0] ^ b[2]);
+            let p1 = (q01.0 ^ p0.0 ^ p2.0, q01.1 ^ p0.1 ^ p2.1);
+            let p3 = (q12.0 ^ p2.0 ^ p4.0, q12.1 ^ p2.1 ^ p4.1);
+            let p2_total = (q02.0 ^ p0.0 ^ p4.0 ^ p2.0, q02.1 ^ p0.1 ^ p4.1 ^ p2.1);
+            out[0] ^= p0.0;
+            out[1] ^= p0.1 ^ p1.0;
+            out[2] ^= p1.1 ^ p2_total.0;
+            out[3] ^= p2_total.1 ^ p3.0;
+            out[4] ^= p3.1 ^ p4.0;
+            out[5] ^= p4.1;
+            return;
+        }
+        for (i, &ai) in a.iter().enumerate() {
+            for (j, &bj) in b.iter().enumerate() {
+                let (lo, hi) = clmul64_hw(ai, bj);
+                out[i + j] ^= lo;
+                out[i + j + 1] ^= hi;
+            }
+        }
+    }};
+}
+
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "pclmulqdq")]
 unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
-    for (i, &ai) in a.iter().enumerate() {
-        for (j, &bj) in b.iter().enumerate() {
-            let (lo, hi) = clmul64_hw(ai, bj);
-            out[i + j] ^= lo;
-            out[i + j + 1] ^= hi;
-        }
-    }
+    mul_words_hw_body!(a, b, out)
 }
 
 #[cfg(target_arch = "aarch64")]
 #[target_feature(enable = "aes")]
 unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
-    for (i, &ai) in a.iter().enumerate() {
-        for (j, &bj) in b.iter().enumerate() {
-            let (lo, hi) = clmul64_hw(ai, bj);
-            out[i + j] ^= lo;
-            out[i + j + 1] ^= hi;
-        }
-    }
+    mul_words_hw_body!(a, b, out)
 }
 
 /// Reduce `value` modulo `m(z)` in place, a whole word at a time.
@@ -1417,13 +1615,96 @@ mod tests {
     /// folded down to degree < m.
     #[test]
     fn reduction_works_at_boundary() {
-        let irr = IrreduciblePoly::deg_8(); // x⁸ + x⁴ + x³ + x + 1
-                                            // a = z⁵, b = z⁵.  a·b = z¹⁰ = z² · z⁸ = z² · (z⁴ + z³ + z + 1)
-                                            //                       = z⁶ + z⁵ + z³ + z².
+        // x⁸ + x⁴ + x³ + x + 1
+        let irr = IrreduciblePoly::deg_8();
+        // a = z⁵, b = z⁵.  a·b = z¹⁰ = z² · z⁸ = z² · (z⁴ + z³ + z + 1)
+        //                       = z⁶ + z⁵ + z³ + z².
         let a = F2mElement::from_bit_positions(&[5], 8);
         let b = a.clone();
         let p = a.schoolbook_mul(&b, &irr);
         let expected = F2mElement::from_bit_positions(&[2, 3, 5, 6], 8);
         assert_eq!(p, expected);
+    }
+
+    /// `Tr(a)` by its definition, `Σ_{i<m} a^{2^i}`.
+    fn trace_by_squarings(a: &F2mElement, irr: &IrreduciblePoly) -> u8 {
+        let mut acc = a.clone();
+        let mut t = a.clone();
+        for _ in 1..a.m_value() {
+            t = t.square(irr);
+            acc.add_assign(&t);
+        }
+        if acc.is_zero() {
+            0
+        } else {
+            assert_eq!(acc, F2mElement::one(a.m_value()), "trace not in F_2");
+            1
+        }
+    }
+
+    /// The table trace and half-trace agree with their squaring-chain
+    /// definitions on every basis element and on pseudo-random elements,
+    /// for trinomial and pentanomial moduli, odd and even `m`; and
+    /// `H(a)² + H(a) = a + Tr(a)` for odd `m`.
+    #[test]
+    fn trace_and_half_trace_tables_match_definitions() {
+        let fields = [
+            IrreduciblePoly::deg_8(),
+            IrreduciblePoly::deg_16(),
+            IrreduciblePoly {
+                degree: 5,
+                low_terms: vec![0, 2],
+            },
+            IrreduciblePoly {
+                degree: 13,
+                low_terms: vec![0, 1, 3, 4],
+            },
+            IrreduciblePoly::deg_113(),
+            IrreduciblePoly::deg_131(),
+            IrreduciblePoly::deg_163(),
+            IrreduciblePoly::deg_233(),
+        ];
+        let mut state = 0x9e37_79b9_7f4a_7c15u64;
+        let mut next = || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state
+        };
+        for irr in &fields {
+            let m = irr.degree;
+            let nw = m.div_ceil(64) as usize;
+            let mut samples: Vec<F2mElement> = (0..m)
+                .map(|i| F2mElement::from_bit_positions(&[i], m))
+                .collect();
+            for _ in 0..40 {
+                let words: Vec<u64> = (0..nw).map(|_| next()).collect();
+                samples.push(F2mElement::from_words(&words, m));
+            }
+            samples.push(F2mElement::zero(m));
+            for a in &samples {
+                let tr = a.trace(irr);
+                assert_eq!(tr, trace_by_squarings(a, irr), "Tr mismatch, m = {m}");
+                match a.half_trace(irr) {
+                    None => assert_eq!(m % 2, 0),
+                    Some(h) => {
+                        assert_eq!(m % 2, 1);
+                        let mut chain = a.clone();
+                        let mut t = a.clone();
+                        for _ in 0..(m - 1) / 2 {
+                            t = t.square_k_times(2, irr);
+                            chain.add_assign(&t);
+                        }
+                        assert_eq!(h, chain, "H mismatch, m = {m}");
+                        let mut rhs = a.clone();
+                        if tr == 1 {
+                            rhs.add_assign(&F2mElement::one(m));
+                        }
+                        assert_eq!(h.square(irr).add(&h), rhs, "H² + H ≠ a + Tr(a)");
+                    }
+                }
+            }
+            assert_eq!(F2mElement::one(m).trace(irr), (m % 2) as u8);
+        }
     }
 }

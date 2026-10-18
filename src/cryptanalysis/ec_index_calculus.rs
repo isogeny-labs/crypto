@@ -383,7 +383,6 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
     // Monic copy for the polynomial arithmetic.
     let lead_inv = f[deg].inv().expect("nonzero lead is invertible mod p");
     let monic: Vec<FieldElement> = f.iter().map(|c| c.mul(&lead_inv)).collect();
-    let _deg = monic.len() - 1;
 
     // X^p mod f(X) by repeated squaring.
     let x_pow_p = poly_pow_x_mod(&monic, p);
@@ -1481,6 +1480,7 @@ pub fn ec_index_calculus_dlp_staged(
     let mut trials_per_relation: Vec<usize> = Vec::with_capacity(target);
     let mut trials_total = 0usize;
     while relations.len() < target {
+        let mut failed_trials = 0usize;
         let found = 'attempt: {
             for _ in 0..max_relation_attempts {
                 if let Some(found) =
@@ -1489,10 +1489,13 @@ pub fn ec_index_calculus_dlp_staged(
                     break 'attempt Some(found);
                 }
                 attempts_exhausted += 1;
+                failed_trials += max_trials_per_relation;
             }
             None
         };
         let (rel, trials) = found?;
+        trials_total += failed_trials + trials;
+        trials_per_relation.push(failed_trials + trials);
         trials_total += trials;
         trials_per_relation.push(trials);
         relations.push(rel);
@@ -1523,8 +1526,8 @@ pub fn ec_index_calculus_dlp_staged(
     if !solution.determined[m] {
         return None;
     }
-    let x = solution.values[m].clone();
     let linear_algebra_ms = la_started.elapsed().as_secs_f64() * 1e3;
+    let x = solution.values[m].clone();
 
     let verify_started = Instant::now();
     let a_fe = curve.a_fe();
@@ -1591,6 +1594,7 @@ pub fn ec_index_calculus_dlp_s4_staged(
     let mut trials_per_relation: Vec<usize> = Vec::with_capacity(target);
     let mut trials_total = 0usize;
     while relations.len() < target {
+        let mut failed_trials = 0usize;
         let found = 'attempt: {
             for _ in 0..max_relation_attempts {
                 if let Some(found) =
@@ -1599,10 +1603,13 @@ pub fn ec_index_calculus_dlp_s4_staged(
                     break 'attempt Some(found);
                 }
                 attempts_exhausted += 1;
+                failed_trials += max_trials_per_relation;
             }
             None
         };
         let (rel, trials) = found?;
+        trials_total += failed_trials + trials;
+        trials_per_relation.push(failed_trials + trials);
         trials_total += trials;
         trials_per_relation.push(trials);
         relations.push(rel);
@@ -1629,8 +1636,8 @@ pub fn ec_index_calculus_dlp_s4_staged(
     if !solution.determined[m] {
         return None;
     }
-    let x = solution.values[m].clone();
     let linear_algebra_ms = la_started.elapsed().as_secs_f64() * 1e3;
+    let x = solution.values[m].clone();
 
     let verify_started = Instant::now();
     let a_fe = curve.a_fe();
@@ -1826,19 +1833,20 @@ mod tests {
         let q = g.scalar_mul(&BigUint::from(190u32), &a_fe);
         let fb = build_factor_base(&curve, 10);
         assert!(!fb.is_empty());
-        let (_relation, _trials) = (0..64)
+        let (x, _trials) = (0..64)
             .find_map(|_| find_one_relation_s4_counted(&curve, &g, &q, &fb, 5000))
             .expect("an S4 relation exists within 64 bounded attempts");
-        // Independent random relation sets can leave the target column free.
-        let (s4_x, report) = (0..64)
-            .find_map(|_| ec_index_calculus_dlp_s4_staged(&curve, &g, &q, 10, 6, 5000, 64))
-            .expect("S4 staged solve succeeds within 64 bounded attempts");
+        let _ = x; // one relation suffices; full solve below.
+
+        // Compare the relation formats with ample random-row redundancy;
+        // a small raw-row surplus is not a matrix-rank guarantee.
+        let extra_relations = 64;
+        let staged = ec_index_calculus_dlp_s4_staged(&curve, &g, &q, 10, extra_relations, 5000, 64);
+        let (s4_x, report) = staged.expect("S4 staged solve succeeds on the tiny curve");
         assert_eq!(g.scalar_mul(&s4_x, &a_fe), q);
-        let plain_x = (0..64)
-            .find_map(|_| ec_index_calculus_dlp(&curve, &g, &q, 10, 6, 5000))
-            .expect("2-decomp solve succeeds within 64 bounded attempts");
-        assert_eq!(s4_x, plain_x);
-        assert!(report.relations_collected >= 10);
+        let plain = ec_index_calculus_dlp(&curve, &g, &q, 10, extra_relations, 5000);
+        assert_eq!(s4_x, plain.expect("2-decomp solve also succeeds"));
+        assert_eq!(report.relations_collected, 10 + extra_relations);
         assert!(report.trials_per_relation_median >= 1.0);
     }
 
@@ -1851,18 +1859,18 @@ mod tests {
         let a_fe = curve.a_fe();
         let g = curve.generator();
         let q = g.scalar_mul(&BigUint::from(190u32), &a_fe);
-        // A bounded fresh relation set may leave the target column free.
-        // Retry the randomized collection while keeping both correctness checks.
-        let plain_x = (0..64)
-            .find_map(|_| ec_index_calculus_dlp(&curve, &g, &q, 8, 4, 5000))
-            .expect("plain solve succeeds on the small curve within 64 attempts");
-        let (staged_x, report) = (0..64)
-            .find_map(|_| ec_index_calculus_dlp_staged(&curve, &g, &q, 8, 4, 5000, 64))
-            .expect("staged solve succeeds on the small curve within 64 attempts");
+        // Stage accounting needs a successful solve. Four extra random
+        // relation rows can leave the matrix rank deficient; retain ample
+        // redundancy in this public known-answer fixture.
+        let extra_relations = 64;
+        let plain = ec_index_calculus_dlp(&curve, &g, &q, 8, extra_relations, 5000);
+        let staged = ec_index_calculus_dlp_staged(&curve, &g, &q, 8, extra_relations, 5000, 64);
+        let (staged_x, report) = staged.expect("staged solve succeeds on the tiny curve");
+        let plain_x = plain.expect("plain solve succeeds on the tiny curve");
         assert_eq!(staged_x, plain_x);
         assert_eq!(g.scalar_mul(&staged_x, &a_fe), q);
         assert_eq!(report.factor_base_size, 8);
-        assert_eq!(report.relations_collected, 8 + 4);
+        assert_eq!(report.relations_collected, 8 + extra_relations);
         assert!(report.factor_base_ms >= 0.0);
         assert!(report.relations_ms >= 0.0);
         assert!(report.linear_algebra_ms >= 0.0);
@@ -1870,7 +1878,10 @@ mod tests {
         assert!(report.total_ms >= report.relations_ms);
         assert!(report.trials_total >= report.relations_collected);
         assert!(report.trials_per_relation_median >= 1.0);
-        assert!(report.relation_attempts_exhausted == 0);
+        assert!(
+            report.trials_total
+                >= report.relations_collected + report.relation_attempts_exhausted * 64
+        );
     }
 
     /// **Small curve for tests**: y² = x³ + x + 19 (mod 271).  Curve

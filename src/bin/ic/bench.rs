@@ -94,7 +94,8 @@ pub struct BenchArgs {
     /// `random` or `walk`.
     #[arg(long, default_value = "walk")]
     pub targets: String,
-    /// The relation matrix: `incremental-gauss` or `structured-gauss`.
+    /// The relation matrix: `incremental-gauss`, `structured-gauss`,
+    /// `sparse-cado`, … (`ic bench --list` prints them all).
     #[arg(long, default_value = "incremental-gauss")]
     pub linalg: String,
     #[arg(long, default_value_t = 2_000_000)]
@@ -121,6 +122,17 @@ pub struct BenchArgs {
     /// the report.  Binary and Koblitz instances only.
     #[arg(long)]
     pub factor_base_out: Option<std::path::PathBuf>,
+    /// Large primes a `mitm-frobenius:m=3` partial relation may carry:
+    /// 0 (the classic oracle), 1 or 2.  Injected as the oracle's
+    /// `large_primes` parameter into every configuration that does not
+    /// set it; see `ic_framework::large_prime`.
+    #[arg(long)]
+    pub large_primes: Option<u32>,
+    /// Size of the large-prime domain `D` as a multiple of `|F|` in signed
+    /// points; injected as `lp_domain_factor` where the configuration
+    /// does not set it (the oracle's default is 10).
+    #[arg(long)]
+    pub lp_domain_factor: Option<f64>,
 }
 
 /// The factor base a configuration builds, frozen point by point: the
@@ -264,7 +276,10 @@ fn listing() -> Value {
                      "parameters": [{"name": "negation_folded", "means": "1 to halve the table's additions"},
                                     {"name": "m", "means": "summands, 2 or 3"}]},
                     {"name": "mitm-frobenius", "summands": "2 or 3", "regimes": ["koblitz"],
-                     "parameters": [{"name": "m", "means": "summands, 2 or 3"}]},
+                     "parameters": [{"name": "m", "means": "summands, 2 or 3"},
+                                    {"name": "large_primes", "means": "0, 1 or 2 residuals outside the base a partial relation may carry (m=3 only); --large-primes sets it for every configuration"},
+                                    {"name": "lp_domain_factor", "means": "the large-prime domain as a multiple of |F| in signed points (default 10); --lp-domain-factor sets it"},
+                                    {"name": "lp_raw_x_cap", "means": "raw-abscissa cap of the scan that materialises the domain"}]},
                     {"name": "descent-algebraic", "summands": "2 or 3", "regimes": ["char2", "koblitz"],
                      "parameters": [{"name": "m", "means": "summands, 2 (descends S3) or 3 (descends S4)"}],
                      "needs": "a subspace factor base (binary-subspace or koblitz-orbit) and --solver"},
@@ -756,7 +771,21 @@ fn spec_from(
         .cloned()
         .unwrap_or_else(|| defaults.targets.clone());
     let (fb_name, fb_params) = parse_plugin(&fb)?;
-    let (or_name, or_params) = parse_plugin(&or)?;
+    let (or_name, mut or_params) = parse_plugin(&or)?;
+    // The large-prime flags are defaults for the Frobenius table oracle;
+    // a configuration that names them itself wins.
+    if or_name == "mitm-frobenius" {
+        if let Some(lp) = defaults.large_primes {
+            if or_params.get("large_primes").is_none() {
+                or_params.set("large_primes", lp.to_string());
+            }
+        }
+        if let Some(c) = defaults.lp_domain_factor {
+            if or_params.get("lp_domain_factor").is_none() {
+                or_params.set("lp_domain_factor", c.to_string());
+            }
+        }
+    }
     Ok(PipelineSpec {
         factor_base: fb_name,
         factor_base_params: fb_params,
@@ -866,6 +895,14 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         }
     }
 
+    // Parse every configuration's plug-in specs now too: a malformed one
+    // (a `,` list, a missing `=`) fails before the instance, calibration
+    // or rho reference rather than after them.
+    let specs = configs
+        .iter()
+        .map(|cfg| spec_from(cfg, &args))
+        .collect::<Result<Vec<_>, _>>()?;
+
     let (regime, degree) = instance_spec;
     let instance = match regime.as_str() {
         "prime" => Instance::Prime(match CmFamily::parse(&args.family)? {
@@ -943,8 +980,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
     let mut rows: Vec<RunReport> = Vec::new();
     let mut failures: Vec<Value> = Vec::new();
     let mut frozen: Vec<Value> = Vec::new();
-    for cfg in &configs {
-        let spec = spec_from(cfg, &args)?;
+    for spec in &specs {
         if !json_only {
             eprintln!("  {} …", spec.label());
         }
@@ -953,8 +989,8 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         // combinations that do not exist, and the useful output is the
         // ones that do plus a note on the ones that do not.
         let outcome = match &instance {
-            Instance::Prime(i) => run_prime(i, &spec, &args, &calib, rho_s),
-            Instance::Binary(i) => run_binary(i, &spec, &args, &calib, rho_s, &mut frozen),
+            Instance::Prime(i) => run_prime(i, spec, &args, &calib, rho_s),
+            Instance::Binary(i) => run_binary(i, spec, &args, &calib, rho_s, &mut frozen),
         };
         match outcome {
             Ok(mut got) => rows.append(&mut got),
@@ -1014,4 +1050,48 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         "markdown": markdown,
         "rows": rows,
     }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use clap::Parser;
+
+    #[derive(Parser)]
+    struct Cli {
+        #[command(flatten)]
+        bench: BenchArgs,
+    }
+
+    fn bench_args(flags: &[&str]) -> BenchArgs {
+        Cli::parse_from(std::iter::once("ic-bench").chain(flags.iter().copied())).bench
+    }
+
+    /// `--model-b` without `--koblitz-a` is refused when the instance is
+    /// chosen, before anything is built: a stand-in for "the long part of
+    /// the run starts here".
+    const INSTANCE_STAGE: [&str; 4] = ["--koblitz-degree", "17", "--model-b", "1"];
+
+    /// The control: with every spec well formed, the run reaches the
+    /// instance stage and stops there, so the test below is telling the
+    /// two stages apart.
+    #[test]
+    fn a_well_formed_spec_reaches_the_instance_stage() {
+        let mut flags = INSTANCE_STAGE.to_vec();
+        flags.extend(["--factor-base", "koblitz-orbit:divisor=1;2"]);
+        flags.extend(["--oracle", "mitm-frobenius:m=2"]);
+        let err = run(bench_args(&flags), true).unwrap_err();
+        assert_eq!(err, "--model-b needs --koblitz-a");
+    }
+
+    /// A comma list in a plug-in spec is refused before the instance, the
+    /// calibration or the rho reference, so a typo costs nothing.
+    #[test]
+    fn a_malformed_spec_fails_before_the_instance_stage() {
+        let mut flags = INSTANCE_STAGE.to_vec();
+        flags.extend(["--factor-base", "koblitz-orbit:divisor=1,2"]);
+        flags.extend(["--oracle", "mitm-frobenius:m=2"]);
+        let err = run(bench_args(&flags), true).unwrap_err();
+        assert!(err.contains("stray token `2`"), "{err}");
+    }
 }
