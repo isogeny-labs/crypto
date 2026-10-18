@@ -1,9 +1,18 @@
 # ECDLP Attack Taxonomy & Applicability Matrix
 
-A comprehensive map of every known attack on elliptic-curve cryptography,
-cross-referenced with where each one is implemented in this repository.
-The matrix is calibrated to **what an attacker can actually do to a curve**
-— not speculative weaknesses.
+> **Status:** taxonomy seed and historical implementation view, not the
+> canonical completeness or evidence ledger. The proposed
+> [comprehensive audit plan](../research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md)
+> and its [non-authoritative machine mock](ecdlp-audit/ECDLP_AUDIT_PLAN.mock.json)
+> define the new identity, evidence, accounting, authorization, and governance
+> contract. Existing `✗/◐/◌/○` cells must be recertified before import; a
+> bypass is not automatically an ECDLP solution, and a blank or stale cell is
+> `unknown`, not safe.
+
+A historical map of attacks presently inventoried for elliptic-curve
+cryptography, cross-referenced with where each one is represented in this
+repository. Its cells are leads for recertification under the audit plan, not
+proof that the route inventory or implementation coverage is complete.
 
 ---
 
@@ -58,20 +67,20 @@ The matrix is calibrated to **what an attacker can actually do to a curve**
 
 | # | Attack | Class | Prime-order curve (P-256, SM2, secp256k1) | Twist (with bad twist-order) | Anomalous curve | Binary / extension-field curve | Pairing-friendly curve | Repo path |
 |---|--------|-------|:--:|:--:|:--:|:--:|:--:|---|
-| 1 | **Pollard rho** | generic | ◐ Partial *(this IS the security bound)* | ◐ Partial | ◐ Partial | ◐ Partial | ◐ Partial | 🛡 `cryptanalysis/pollard_rho.rs`<br>🛡 `cryptanalysis/ec_index_calculus.rs::pollard_rho_ecdlp` |
-| 2 | **Baby-step / giant-step** | generic | ◐ √n time, √n memory | ◐ Partial | ◐ Partial | ◐ Partial | ◐ Partial | (folded into `pollard_rho.rs`) |
-| 3 | **Pohlig-Hellman** | generic | ○ N/A *(prime order)* | ✗ Breaks *(if cofactor has small factors)* | ○ N/A | ◐ Partial | ◐ Partial | 🛡 logic re-used by IC linear-algebra step |
+| 1 | **Pollard rho** | generic | ◐ Partial *(this IS the security bound)* | ◐ Partial | ◐ Partial | ◐ Partial | ◐ Partial | 🛡 `cryptanalysis/pollard_rho.rs`<br>🛡 `cryptanalysis/ec_index_calculus.rs::pollard_rho_ecdlp`<br>🛡 `cryptanalysis/ecdlp_nist/rho.rs` (parallel, distinguished points, negation map, Frobenius folding on K-curves; runs on every NIST curve, see `docs/ECDLP_NIST.md`) |
+| 2 | **Baby-step / giant-step** (and kangaroo on an interval) | generic | ◐ √n time, √n memory | ◐ Partial | ◐ Partial | ◐ Partial | ◐ Partial | 🛡 `cryptanalysis/ecdlp_nist/interval.rs` (negation-map BSGS, parallel kangaroos; bounded instances on all 15 NIST curves) |
+| 3 | **Pohlig-Hellman** | generic | ○ N/A *(prime order)* | ✗ Breaks *(if cofactor has small factors)* | ○ N/A | ◐ Partial | ◐ Partial | 🛡 `cryptanalysis/pohlig_hellman.rs`; 🛡 `cryptanalysis/ecdlp_nist/pohlig.rs` (generic over prime/binary groups, rho factoring, CRT) |
 | 4 | **Preprocessed / table rho** | generic | ◐ Partial | ◐ Partial | ◐ Partial | ◐ Partial | ◐ Partial | 🛡 `cryptanalysis/preprocessing_rho.rs` |
 | 5 | **Automorphism-folded rho** (GLV/GLS speedup) | generic | ◐ Partial *(√2 speedup on secp256k1)* | ◐ Partial | ◐ Partial | ◐ Partial | ◐ Partial | 🛡 `cryptanalysis/aut_folded_rho.rs` |
 | 6 | **ML-augmented rho walks** | generic | ◐ Partial *(small constant gain)* | ◐ Partial | ◐ Partial | ◐ Partial | ◐ Partial | 🛡 `cryptanalysis/ml_rho_walks.rs` |
-| 7 | **Smart-Semaev-Satoh-Araki** *(anomalous curves)* | structural | ○ N/A *(curve order ≠ p)* | ○ N/A | ✗ Breaks *(polynomial time)* | ○ N/A | ○ N/A | 🛡 `cryptanalysis/canonical_lift.rs::smart_attack_anomalous` |
+| 7 | **Smart-Semaev-Satoh-Araki** *(anomalous curves)* | structural | ○ N/A *(curve order ≠ p)* | ○ N/A | ✗ Breaks *(polynomial time)* | ○ N/A | ○ N/A | 🛡 `cryptanalysis/ecdlp_nist/anomalous.rs` (end to end: Jacobian lift mod p², formal log, CM-constructed anomalous curves of any size; `canonical_lift.rs::smart_attack_anomalous` delegates to it) |
 | 8 | **MOV / Frey-Rück** *(low embedding degree)* | structural | ○ N/A *(P-256 embedding degree astronomical)* | ○ N/A | ○ N/A | ○ N/A | ✗ Breaks *(transfers to F_{p^k}\*)* | (target group attacks via `bls12_381/`) |
 | 9 | **Weil descent / Gaudry-Hess-Smart** | structural | ○ N/A *(no extension structure)* | ○ N/A | ○ N/A | ✗ Breaks *(on F_{2^n}, n composite)* | partially applicable | (binary_ecc — vulnerable curves not deployed) |
 | 10 | **Index calculus / Semaev summation polys** (Semaev 2004, FPPR 2012, PQ 2012, PKM 2016) | structural | ◐ Asymptotically O(p^{3/2}) for 2-decomp; worse than rho | ◐ Same | ◐ Same | ✗ Breaks *(via Weil descent)* | ◐ Same | 🛡 `cryptanalysis/ec_index_calculus.rs` (full pipeline: S₃, S₄, factor base, relations, GE, end-to-end solver) |
 | 10a | **Residual-collision hybrids** (partial decompositions + large-prime cancellation, r-adding residual walks, MITM 4-decompositions) | structural/generic | ◐ Partial *(measured √(2nB) ≥ rho; no non-generic gain)* | ◐ Same | ◐ Same | ◐ Same | ◐ Same | 🛡 `cryptanalysis/residual_walk.rs` (`research/notes/index-calculus/RESEARCH_RESIDUAL_WALKS.md`) |
 | 10b | **Gaudry index calculus on E(F_{q^k}), subspace base** (Gaudry 2009; k = 3 toy) | structural | ○ N/A *(prime field)* | ○ N/A | ○ N/A | ✗ Breaks asymptotically for fixed k ≥ 3 *(measured: MITM oracle ∝ n^{2/3}; the O(1) S₄ solve costs C₃ ≈ 0.88·10⁶ F_p mults per residual after two optimisation rounds, three orders of magnitude above the rho crossover at these sizes; relation phase n^{1/3}, plain linear algebra n^{0.68} so S bottoms out near 200× rho, double-large-prime variation measured at n^{4/9} with the crossover past 2^230)* | ○ N/A | 🛡 `cryptanalysis/gaudry_cubic.rs` (`research/notes/index-calculus/RESEARCH_RESIDUAL_WALKS.md` §11) |
-| 11 | **Diem on E(F_{p^k})** *(small composite k)* | structural | ○ N/A | ○ N/A | ○ N/A | ✗ Breaks *(faster than rho)* | ○ N/A | (documented; not implemented) |
-| 12 | **Trace-zero variety / Weil restriction (genus ≥ 3)** | structural | ○ N/A *(genus 1)* | ○ N/A | ○ N/A | partial | partial | (documented; not implemented) |
+| 11 | **Diem on E(F_{p^k})** *(small composite k)* | structural | ○ N/A | ○ N/A | ○ N/A | ✗ Breaks *(faster than rho in applicable regimes)* | ○ N/A | 🛡 `cryptanalysis/diem_descent.rs` *(toy k=2 demonstration; scale path not integrated)* |
+| 12 | **Trace-zero variety / Weil restriction (genus ≥ 3)** | structural | ○ N/A *(genus 1)* | ○ N/A | ○ N/A | partial | partial | 🛡 `cryptanalysis/ghs_descent.rs` *(m=1 end to end; m=2 structural)*; trace-kernel factor-base detection in `koblitz_factor_base_search.rs`; higher-genus smooth model pending |
 | 13 | **Special-prime SNFS trapdoor** (Fried-Gaudry-Heninger-Thomé 2017) | structural / speculative | ◌ Impl-dep on curve generator *(no known ECDLP analog of F_p\* result)* | ◌ Same | ◌ Same | ○ N/A | ◌ Same | (Solinas-prime correlation study in `cryptanalysis/solinas_correlations.rs`) |
 | 14 | **Invalid-curve attack** | implementation | ◌ Impl-dep *(needs missing point validation)* | ✗ Breaks *(if no validation)* | ◌ Impl-dep | ◌ Impl-dep | ◌ Impl-dep | (defended via `ecc::is_on_curve`) |
 | 15 | **Twist attack** *(small-subgroup on quadratic twist)* | implementation | ✗ Breaks *(if no validation AND bad twist)*<br>e.g. brainpoolP256t1: 2⁴⁴·⁵<br>P-224: 2⁵⁸·⁴<br>FRP256v1: 2⁷⁹·⁴ | ✗ Breaks | ◌ Impl-dep | ◌ Impl-dep | ◌ Impl-dep | (defended via `is_on_curve`) |
@@ -113,7 +122,7 @@ The bottom row is the only one that breaks a properly-deployed, properly-impleme
 
 ## Index calculus in this repository
 
-The index-calculus column above corresponds to the most-active live research program against ECDLP. It is implemented in this repo as of commit `8b05099` at `src/cryptanalysis/ec_index_calculus.rs`. Specifically:
+The index-calculus column above corresponds to the most-active live research program against ECDLP. The [stage-by-stage technique inventory](ic/ECDLP_RESEARCH_TECHNIQUES.md) tracks the integrated, experimental, component, and backlog status across the full pipeline. The prime-field toy path starts at `src/cryptanalysis/ec_index_calculus.rs`. Specifically:
 
 | Component | Function / type | Reference |
 |-----------|-----------------|-----------|
@@ -155,7 +164,7 @@ repository (`src/ecc/curve_zoo.rs`):
 | Curve | Country / Standard | Worst applicable row | Severity |
 |-------|--------------------|----------------------|----------|
 | secp256k1 | SECG / Bitcoin | #15 twist attack | ◌ Impl-dep, twist work factor 2¹⁰⁹·⁵ — passes SafeCurves |
-| P-256 (NIST) | NIST / NIST | #13 special-prime trapdoor *(speculative)*, #15 twist 2¹²⁰ | ◌ Impl-dep + speculative rigidity |
+| P-256 (NIST) | NIST / NIST | #13 special-prime trapdoor *(speculative)*, #15 twist 2¹²⁰ | ◌ Impl-dep + speculative rigidity (seed explained 2026-10-16; see note) |
 | P-224 (NIST) | NIST / NIST | #15 twist attack 2⁵⁸·⁴ | **✗ Breaks** if validation skipped |
 | P-384 / P-521 (NIST) | NIST | #15 twist 2¹⁹¹·⁸ / 2²²¹·⁸ | ◌ Impl-dep but high margin |
 | brainpoolP256r1 / t1 | BSI / RFC 5639 | #15 twist 2⁴⁴·⁵ on t1 | **✗ Breaks** on twisted variant if validation skipped |
@@ -167,6 +176,15 @@ repository (`src/ecc/curve_zoo.rs`):
 | Curve25519 / Curve448 | Bernstein / RFC 7748 | none (twist-secure by design) | passes every SafeCurves row |
 | BN254 / alt_bn128 | Brazilian / Ethereum | #8 MOV-style via Kim-Barbulescu 2016 → ~110 bit | **✗ Below 128-bit pairing security**; migration to BLS12-381 advised |
 | BLS12-381 | Swiss-academic / Ethereum-2 | #8 future Tower-NFS erosion | ◐ ~120-bit margin holding for now |
+
+*Note (2026-10-16).* The NIST P-curve seeds are now explained: they are
+`drand48` output seeded with UNIX times from 1997–98 (Anthropic Frontier Red
+Team and F. Valsorda, 2026-10-16; reproduced in
+`research/nist_seed_provenance_20261016/`). The rigidity concern on the NIST
+rows therefore no longer rests on the seed, whose remaining freedom is about
+30 bits per curve. It rests only on the unexplained base points (no ECDLP
+consequence in a prime-order group) and on an unexplained skip of about half
+the valid candidates in each generation run.
 
 ---
 

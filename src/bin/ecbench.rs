@@ -8,15 +8,32 @@
 //! ecbench verify --dir D [--replay N]  re-derive a session; replay runs exactly
 //! ecbench compare --dir D --a X --b Y  paired ratio with a bootstrap interval
 //! ecbench table  --dir D... [--reference ARM]   the one-unit table AGENTS.md §2 asks for
+//! ecbench resources --dir D [--out F]   cold native-work, memory and PMU vectors
 //! ecbench fb --curve C --factor-base F a factor base with its points
+//! ecbench fbm --curve C --factor-base F --oracle O [--solver S]  seal an FBM1 measurement id
 //! ecbench claim build --dir D --ic X --rho Y --workload W   a vs_rho claim, checked
 //! ecbench claim attach --base-report R --independent-receipt A   attach a later replay
 //! ecbench claim check --report R       the vs_rho checker
 //! ecbench db sql PATHS... | sqlite3 ecbench.db
 //! ecbench isolab-job --spec S --binary B    an isolab.job/v1 for an independent runner
+//! ecbench bound fit --dir D... --arm A --out B.json     a sealed bound: the method's fitted cost
+//! ecbench bound check --record B.json      re-derive a committed bound from its sessions
+//! ecbench frontier build --bounds DIR --out F.json --markdown FRONTIER.md [--check]
+//! ecbench challenge seal --draft C.json --out C.json    validate and seal a challenge
+//! ecbench challenge spec --challenge C --candidate '{"id":"..."}' --epoch N --out spec.json
+//! ecbench challenge verdict --challenge C --dir D --epoch N --replay-all --out V.json
+//! ecbench gpu-stage --binary gpu/ecc/bench --out D --mode rho -- --iters 256
+//! ecbench gpu-match --binary gpu/ecc/bench --workload W.json --out D
 //! ```
 //!
+//! Bounds, frontiers and challenges are `docs/bounds/README.md`.
+//!
 //! The standard is `docs/ecbench/README.md`.
+
+#[path = "ecbench/pdp3_koblitz.rs"]
+mod pdp3_koblitz;
+#[path = "ecbench/pdp_split_oracle.rs"]
+mod pdp_split_oracle;
 
 use std::io::Write as _;
 use std::path::{Path, PathBuf};
@@ -25,13 +42,15 @@ use std::process::ExitCode;
 use clap::{Parser, Subcommand};
 
 use crypto_lib::cryptanalysis::ecbench::{
-    audit, callgrind, canonical, claim, compare, db, host, isolab, isolation, methods, record,
-    runner, signals, spec, stats, workload,
+    audit, bounds, calibration, callgrind, canonical, challenge, claim, compare, db, fbm, frontier,
+    full_price, gpu, host, isolab, isolation, methods, record, resources, runner, signals, spec,
+    stats, trend, workload,
 };
 
 #[derive(Parser)]
 #[command(
     name = "ecbench",
+    version,
     about = "One harness for every ECDLP method: rho, BSGS, kangaroo, index calculus"
 )]
 struct Cli {
@@ -41,10 +60,86 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
+    /// Push, pull and index large files (factor bases, tables) in the object store.
+    Store(crypto_lib::store::cli::StoreArgs),
+    /// Run the existing CUDA ECC binary as a separately labelled GPU stage.
+    GpuStage {
+        /// A built gpu/ecc/bench CUDA binary.
+        #[arg(long)]
+        binary: PathBuf,
+        /// A new directory for exact outputs and the receipt.
+        #[arg(long)]
+        out: PathBuf,
+        /// field, mul, rho or bsgs.
+        #[arg(long)]
+        mode: String,
+        /// Watchdog limit for each command, including the device self-test.
+        #[arg(long, default_value_t = 600)]
+        timeout_seconds: u64,
+        /// Options forwarded to the CUDA binary after `--`.
+        #[arg(last = true)]
+        gpu_args: Vec<String>,
+    },
+    /// Run CUDA BSGS on a frozen EC Bench workload and verify its scalar here.
+    GpuMatch {
+        #[arg(long)]
+        binary: PathBuf,
+        /// One workload JSON exported from `ecbench plan --json` or a session.
+        #[arg(long)]
+        workload: PathBuf,
+        /// A new directory for the binary snapshot, raw streams and receipt.
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, default_value_t = 600)]
+        timeout_seconds: u64,
+        #[arg(long, default_value = "nvidia-smi")]
+        telemetry_binary: PathBuf,
+        /// Optional verified CPU record for an exact workload identity link.
+        #[arg(long)]
+        cpu_record: Option<PathBuf>,
+        /// CUDA BSGS tuning arguments after `--`.
+        #[arg(last = true)]
+        gpu_args: Vec<String>,
+    },
+    /// Recheck a GPU receipt, raw streams, workload and scalar without a GPU.
+    GpuMatchVerify {
+        #[arg(long)]
+        dir: PathBuf,
+    },
+    /// Check A/A interval coverage and false admissions across quiet and contended sessions.
+    Calibrate {
+        #[arg(long, num_args = 1..)]
+        quiet: Vec<PathBuf>,
+        #[arg(long, num_args = 1..)]
+        contended: Vec<PathBuf>,
+        #[arg(long)]
+        out: PathBuf,
+    },
     /// List every method with its parameters.
     Methods {
         #[arg(long)]
         json: bool,
+    },
+    /// Measure the full-pricing units (src/cryptanalysis/ecbench/full_prices.json) on
+    /// this host for Koblitz curves `a:n`, median of `reps` passes each.
+    PriceUnits {
+        /// Curves as `a:n`, e.g. `0:13 0:19 1:29`.
+        #[arg(long, num_args = 1.., required = true)]
+        curve: Vec<String>,
+        #[arg(long, default_value_t = 9)]
+        reps: usize,
+    },
+    /// Fit how a paired ratio moves across curves (ln ratio against ln r
+    /// and ln n) from `compare --save` files; JSON to stdout.
+    Trend {
+        #[arg(long, num_args = 1.., required = true)]
+        compare: Vec<PathBuf>,
+        /// Fixed exponent of r in the `model` fit.
+        #[arg(long, allow_hyphen_values = true, default_value_t = 1.0 / 6.0)]
+        beta: f64,
+        /// Fixed exponent of n in the `model` fit.
+        #[arg(long, allow_hyphen_values = true, default_value_t = -0.5)]
+        gamma: f64,
     },
     /// Print the host capsule.
     Host {
@@ -102,6 +197,12 @@ enum Cmd {
         #[arg(long)]
         prefix: PathBuf,
     },
+    /// Split one profiled solve into reusable, one-target online and tail Ir.
+    CallgrindOnlineIr {
+        /// The value supplied to --callgrind-out-file.
+        #[arg(long)]
+        prefix: PathBuf,
+    },
     /// Audit a session from its own files.
     Verify {
         #[arg(long)]
@@ -154,6 +255,30 @@ enum Cmd {
         #[arg(long)]
         reference: Option<String>,
     },
+    /// The pricing band of AGENTS.md §5a: every arm's unpriced native work,
+    /// and any calibration-priced native work, charged alike at each weight
+    /// (GAE per native operation); pairs ranked only where the order holds
+    /// at every weight.
+    Band {
+        #[arg(long, num_args = 1..)]
+        dir: Vec<PathBuf>,
+        /// Comma-separated weights in GAE per native operation.
+        #[arg(long, default_value = "0,0.1,1")]
+        weights: String,
+        /// Also write the report (`ecbench.band/v1`) as JSON here.
+        #[arg(long)]
+        json: Option<PathBuf>,
+        /// Print the pairwise verdicts after the table.
+        #[arg(long)]
+        ranks: bool,
+    },
+    /// Resource vectors for all measured attempts; no invented SAT/GAE conversion.
+    Resources {
+        #[arg(long)]
+        dir: PathBuf,
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
     /// Build a factor base and write it with its points.
     Fb {
         /// A curve spec, e.g. '{"kind":"koblitz","a":0,"n":31}'.
@@ -162,6 +287,29 @@ enum Cmd {
         /// A factor-base plug-in spec, e.g. 'koblitz-orbit:divisor=1'.
         #[arg(long)]
         factor_base: String,
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
+    /// Seal an FBM1 measurement identity (curve × FB1 × oracle × solver × instrument).
+    Fbm {
+        /// A curve spec, e.g. '{"kind":"koblitz","a":1,"n":17}'.
+        #[arg(long)]
+        curve: String,
+        /// A factor-base plug-in spec, e.g. 'binary-subspace:dimension=4'.
+        #[arg(long)]
+        factor_base: String,
+        /// Oracle plug-in string, e.g. 'mitm:m=2' or 'descent-algebraic:m=2'.
+        #[arg(long)]
+        oracle: String,
+        /// Solver plug-in string for algebraic oracles (default empty for table oracles).
+        #[arg(long, default_value = "")]
+        solver: String,
+        /// Linear algebra backend (default incremental-gauss).
+        #[arg(long, default_value = "incremental-gauss")]
+        linalg: String,
+        /// Instrument tag (default ecbench.ic_pipeline/v1).
+        #[arg(long, default_value = "ecbench.ic_pipeline/v1")]
+        instrument: String,
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -200,6 +348,168 @@ enum Cmd {
         policy: String,
         #[arg(long, default_value_t = 0)]
         timeout_seconds: u64,
+    },
+    /// Bound records: what a method costs on a domain, fitted across
+    /// sizes, sealed and re-derivable (`docs/bounds/README.md`).
+    Bound {
+        #[command(subcommand)]
+        cmd: BoundCmd,
+    },
+    /// The frontier of every domain's bounds, and its page.
+    Frontier {
+        #[command(subcommand)]
+        cmd: FrontierCmd,
+    },
+    /// Challenges: the frozen paired spec a candidate runs against an
+    /// incumbent, and the verdict that moves (or does not move) the frontier.
+    Challenge {
+        #[command(subcommand)]
+        cmd: ChallengeCmd,
+    },
+}
+
+// Parsed once per process; boxing the fit options would only add noise.
+#[allow(clippy::large_enum_variant)]
+#[derive(Subcommand)]
+enum BoundCmd {
+    /// Fit the bound of one arm from one or more sessions of it.
+    Fit {
+        #[arg(long, num_args = 1..)]
+        dir: Vec<PathBuf>,
+        #[arg(long)]
+        arm: String,
+        /// Keep only curves of this tier (toy, medium, crypto).
+        #[arg(long)]
+        tier: Option<String>,
+        /// Keep only these curve slugs.
+        #[arg(long)]
+        curve: Vec<String>,
+        /// Audit receipts of the sessions, cited in the provenance.
+        #[arg(long)]
+        audit: Vec<PathBuf>,
+        #[arg(long)]
+        label: Option<String>,
+        #[arg(long, default_value = "")]
+        notes: String,
+        /// Paths in the record are written relative to this directory.
+        #[arg(long, default_value = ".")]
+        root: PathBuf,
+        #[arg(long, default_value_t = bounds::RESAMPLES)]
+        resamples: usize,
+        #[arg(long, default_value_t = bounds::SEED)]
+        seed: u64,
+        /// Fit the band-priced cost at this weight in GAE per native
+        /// operation (AGENTS.md §5a) instead of the charged cost.
+        #[arg(long)]
+        weight: Option<f64>,
+        /// Fit an arm whose parameters follow a declared per-size rule;
+        /// the rule text enters the bound's method identity.
+        #[arg(long)]
+        param_rule: Option<String>,
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
+    /// Re-derive committed bounds from the sessions they name and require
+    /// the same ids.
+    Check {
+        #[arg(long, num_args = 1..)]
+        record: Vec<PathBuf>,
+        #[arg(long, default_value = ".")]
+        root: PathBuf,
+    },
+}
+
+#[derive(Subcommand)]
+enum FrontierCmd {
+    /// Build the frontier from bound records (files or directories).
+    Build {
+        #[arg(long, num_args = 1..)]
+        bounds: Vec<PathBuf>,
+        /// Dominance axes, comma-separated: ops, memory, uncharged,
+        /// field_muls, field_sqrs, field_invs.
+        #[arg(long, default_value = "ops,memory")]
+        axes: String,
+        #[arg(long)]
+        out: Option<PathBuf>,
+        #[arg(long)]
+        markdown: Option<PathBuf>,
+        /// Write nothing; fail if --out or --markdown is stale.
+        #[arg(long)]
+        check: bool,
+        #[arg(long)]
+        json: bool,
+    },
+}
+
+#[derive(Subcommand)]
+enum ChallengeCmd {
+    /// Validate a drafted challenge (its curves build, lie in its domain,
+    /// and number enough sizes) and seal it.
+    Seal {
+        #[arg(long)]
+        draft: PathBuf,
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
+    /// Check committed challenges: seals, domain ids, curves.
+    Check {
+        #[arg(long, num_args = 1..)]
+        file: Vec<PathBuf>,
+    },
+    /// The spec a candidate runs against the challenge in an epoch.
+    Spec {
+        #[arg(long)]
+        challenge: PathBuf,
+        /// The candidate as a method spec, e.g. '{"id":"rho.plain"}'.
+        #[arg(long)]
+        candidate: String,
+        #[arg(long)]
+        epoch: u64,
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
+    /// Judge a session run from `challenge spec`: audit, pair, fit, decide.
+    Verdict {
+        #[arg(long)]
+        challenge: PathBuf,
+        #[arg(long)]
+        dir: PathBuf,
+        #[arg(long)]
+        epoch: u64,
+        #[arg(long, default_value = challenge::CANDIDATE_ARM)]
+        candidate: String,
+        #[arg(long, default_value = challenge::INCUMBENT_ARM)]
+        incumbent: String,
+        #[arg(long, default_value = challenge::CONTROL_ARM)]
+        control: String,
+        /// Runs to replay in the audit.
+        #[arg(long, default_value_t = 0)]
+        replay: usize,
+        /// Replay every measured deterministic run (what acceptance
+        /// requires by default).
+        #[arg(long)]
+        replay_all: bool,
+        /// Committed bound records, to compare the incumbent's recorded
+        /// figure with what it measured here.
+        #[arg(long)]
+        bounds: Option<PathBuf>,
+        #[arg(long, default_value = ".")]
+        root: PathBuf,
+        #[arg(long, default_value_t = bounds::RESAMPLES)]
+        resamples: usize,
+        #[arg(long, default_value_t = bounds::SEED)]
+        seed: u64,
+        #[arg(long)]
+        out: Option<PathBuf>,
+        /// Write the candidate's new bound here on an advance or trade.
+        #[arg(long)]
+        bound_out: Option<PathBuf>,
+        /// Write the audit receipt here.
+        #[arg(long)]
+        audit_out: Option<PathBuf>,
+        /// Exit 1 when the verdict is inadmissible.
+        #[arg(long)]
+        exit_code: bool,
     },
 }
 
@@ -282,7 +592,26 @@ enum DbCmd {
     },
 }
 
-fn main() -> ExitCode {
+/// Every plug-in this binary links: `pdp3_koblitz`'s, then
+/// `pdp_split_oracle`'s (the `pdp-split` oracle and the `koblitz-closure`
+/// base).  Names do not overlap, so the order only fixes lookup.
+fn binary_plugins() -> crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugins {
+    crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugins {
+        base: |name, instance| {
+            (pdp3_koblitz::plugins().base)(name, instance)
+                .or_else(|| pdp_split_oracle::base(name, instance))
+        },
+        oracle: |name, summands, instance| {
+            (pdp3_koblitz::plugins().oracle)(name, summands, instance)
+                .or_else(|| pdp_split_oracle::oracle(name, summands, instance))
+        },
+    }
+}
+
+pub fn main() -> ExitCode {
+    // Oracles this binary links that the library cannot name (see
+    // `pdp3_koblitz`); registered before any run, child or replay.
+    crypto_lib::cryptanalysis::ecbench::methods::register_binary_plugins(binary_plugins());
     match run(Cli::parse()) {
         Ok(code) => code,
         Err(e) => {
@@ -352,6 +681,7 @@ fn emit_claim(
 
 fn run(cli: Cli) -> Result<ExitCode, String> {
     match cli.cmd {
+        Cmd::Store(args) => crypto_lib::store::cli::run(&args)?,
         Cmd::Methods { json } => {
             if json {
                 let v: Vec<_> = methods::registry()
@@ -382,6 +712,54 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 }
             }
         }
+        Cmd::PriceUnits { curve, reps } => {
+            let mut rows = serde_json::Map::new();
+            for c in &curve {
+                let (a, n) = c
+                    .split_once(':')
+                    .ok_or_else(|| format!("curve `{c}` is not a:n"))?;
+                let a: u8 = a.parse().map_err(|_| format!("bad a in `{c}`"))?;
+                let n: u32 = n.parse().map_err(|_| format!("bad n in `{c}`"))?;
+                let cs = workload::CurveSpec::Koblitz { a, n };
+                let inst = cs.build()?;
+                let slug = inst.facts(&cs).slug;
+                let workload::Instance::Binary(bi) = &inst else {
+                    return Err(format!("{c}: not a one-word binary instance"));
+                };
+                eprintln!("measuring {slug}");
+                rows.insert(slug, full_price::measure(bi, reps)?);
+            }
+            print_json(&serde_json::json!({
+                "host": host::capture()?.stable,
+                "curves": rows,
+            }))?;
+        }
+        Cmd::Trend {
+            compare,
+            beta,
+            gamma,
+        } => {
+            let mut docs = Vec::new();
+            let mut inputs = Vec::new();
+            for p in &compare {
+                let text = read(p)?;
+                inputs.push(serde_json::json!({
+                    "path": p.display().to_string(),
+                    "sha256": canonical::sha256_hex(text.as_bytes()),
+                }));
+                docs.push(
+                    serde_json::from_str(&text).map_err(|e| format!("{}: {e}", p.display()))?,
+                );
+            }
+            let pts = trend::points(&docs)?;
+            let fits = trend::fits(&pts, beta, gamma);
+            print_json(&serde_json::json!({
+                "schema": "ecbench.trend/v1",
+                "inputs": inputs,
+                "points": pts,
+                "fits": fits,
+            }))?;
+        }
         Cmd::Host { json } => {
             let c = host::capture()?;
             if json {
@@ -409,10 +787,18 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     c.build.binary_sha256.as_deref().unwrap_or("?")
                 );
                 println!(
-                    "commit      {} (dirty: {:?})",
+                    "commit      {} (dirty: {:?}, source: {})",
                     c.build.git_commit.as_deref().unwrap_or("?"),
-                    c.build.git_dirty
+                    c.build.git_dirty,
+                    c.build.git_commit_source.as_deref().unwrap_or("?")
                 );
+                if c.build.runtime_git_commit != c.build.git_commit {
+                    println!(
+                        "runtime git {} (dirty: {:?}; diagnostic only)",
+                        c.build.runtime_git_commit.as_deref().unwrap_or("none"),
+                        c.build.runtime_git_dirty
+                    );
+                }
                 if c.build.debug_assertions {
                     println!(
                         "note        debug build: operation counts are valid, wall time is not"
@@ -559,8 +945,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             let w = &p.workloads[ex.workload];
             let input = record::ChildInput {
                 schema: record::CHILD_INPUT_SCHEMA.into(),
-                curve: workload::CurveSpec::explicit(p.instance(ex.workload))
-                    .unwrap_or_else(|| w.curve_spec.clone()),
+                curve: w.curve_spec.for_child(p.instance(ex.workload)),
                 target_seed: w.target_seed,
                 target_index: w.target_index,
                 target_kind: w.kind(),
@@ -576,6 +961,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
         }
         Cmd::CallgrindIr { prefix } => {
             print_json(&callgrind::solve_ir(&prefix)?)?;
+        }
+        Cmd::CallgrindOnlineIr { prefix } => {
+            print_json(&callgrind::online_ir(&prefix)?)?;
         }
         Cmd::Verify {
             dir,
@@ -609,9 +997,80 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 rep.replays.iter().filter(|r| r.reproduced).count(),
                 rep.problems.len()
             );
+            if rep.records_bound == Some(false) && rep.interruption.is_some() {
+                eprintln!(
+                    "warning: interruption {}: records_bound false (no records hash binds \
+                     records.jsonl); this session must not be cited as complete",
+                    rep.interruption.as_deref().unwrap_or("")
+                );
+            }
             if exit_code && !rep.ok {
                 return Ok(ExitCode::from(1));
             }
+        }
+        Cmd::GpuStage {
+            binary,
+            out,
+            mode,
+            timeout_seconds,
+            gpu_args,
+        } => {
+            let receipt = gpu::run(&gpu::GpuOptions {
+                binary,
+                out: out.clone(),
+                mode,
+                args: gpu_args,
+                timeout_seconds,
+            })?;
+            print_json(&receipt)?;
+            if receipt.status != "stage_completed" {
+                eprintln!("GPU stage {}: see {}", receipt.status, out.display());
+                return Ok(ExitCode::from(1));
+            }
+        }
+        Cmd::GpuMatch {
+            binary,
+            workload,
+            out,
+            timeout_seconds,
+            telemetry_binary,
+            cpu_record,
+            gpu_args,
+        } => {
+            let receipt = gpu::run_match(&gpu::GpuMatchOptions {
+                binary,
+                workload,
+                out,
+                timeout_seconds,
+                telemetry_binary,
+                cpu_record,
+                args: gpu_args,
+            })?;
+            print_json(&receipt)?;
+            if receipt.status != "verified" {
+                return Ok(ExitCode::from(1));
+            }
+        }
+        Cmd::GpuMatchVerify { dir } => {
+            let issues = gpu::audit_match(&dir)?;
+            print_json(&serde_json::json!({
+                "schema": "ecbench.gpu_match_audit/v1",
+                "valid": issues.is_empty(),
+                "issues": issues,
+            }))?;
+            if !issues.is_empty() {
+                return Ok(ExitCode::from(1));
+            }
+        }
+        Cmd::Calibrate {
+            quiet,
+            contended,
+            out,
+        } => {
+            let report = calibration::evaluate(&quiet, &contended)?;
+            let bytes = serde_json::to_vec_pretty(&report).map_err(|e| e.to_string())?;
+            std::fs::write(&out, bytes).map_err(|e| e.to_string())?;
+            print_json(&report)?;
         }
         Cmd::Compare {
             dir,
@@ -639,6 +1098,21 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 print_json(&c)?;
             } else {
                 println!("{}", c.verdict);
+                if let Some(q) = &c.quality {
+                    println!(
+                        "measurement quality: {} / 100; paired attempts {}, verified {}, admitted {}; levels {:?}; p95 foreign busy {}%, p95 run queue {}%",
+                        q.score.map(|n| n.to_string()).unwrap_or_else(|| "unavailable".into()),
+                        q.paired_attempts,
+                        q.verified_pairs,
+                        q.admitted_pairs,
+                        q.levels,
+                        q.p95_foreign_busy_percent.map(|n| format!("{n:.2}")).unwrap_or_else(|| "unknown".into()),
+                        q.p95_run_queue_percent.map(|n| format!("{n:.2}")).unwrap_or_else(|| "unknown".into()),
+                    );
+                    if !q.notes.is_empty() {
+                        println!("quality notes: {}", q.notes.join("; "));
+                    }
+                }
                 let o = |v: Option<f64>| v.map(|x| format!("{x:.4}")).unwrap_or_else(|| "–".into());
                 let ci = |v: Option<(f64, f64)>| {
                     v.map(|(l, h)| format!("[{l:.4}, {h:.4}]"))
@@ -674,6 +1148,25 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             }
         }
         Cmd::Table { dir, reference } => table(&dir, reference.as_deref())?,
+        Cmd::Band {
+            dir,
+            weights,
+            json,
+            ranks,
+        } => band_cmd(&dir, &weights, json.as_deref(), ranks)?,
+        Cmd::Resources { dir, out } => {
+            let report = resources::session(&dir)?;
+            if let Some(path) = out {
+                std::fs::write(
+                    &path,
+                    serde_json::to_string_pretty(&report).map_err(|e| e.to_string())? + "\n",
+                )
+                .map_err(|e| format!("{}: {e}", path.display()))?;
+                eprintln!("saved {}", path.display());
+            } else {
+                print_json(&report)?;
+            }
+        }
         Cmd::Fb {
             curve,
             factor_base,
@@ -692,6 +1185,47 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         dump.curve.slug,
                         dump.factor_base.signed_points,
                         dump.factor_base.columns,
+                        p.display()
+                    );
+                }
+                None => print!("{text}"),
+            }
+        }
+        Cmd::Fbm {
+            curve,
+            factor_base,
+            oracle,
+            solver,
+            linalg,
+            instrument,
+            out,
+        } => {
+            let spec: workload::CurveSpec =
+                serde_json::from_str(&curve).map_err(|e| format!("--curve: {e}"))?;
+            let dump = methods::dump_factor_base(&spec, &factor_base)?;
+            let cfg = fbm::FactorBaseMeasurementConfig {
+                schema: fbm::FBM_SCHEMA.into(),
+                curve: dump.curve.slug.clone(),
+                fb_id: dump.factor_base.fb_id.clone(),
+                fb_sha256: dump.factor_base.fb_sha256.clone(),
+                family: dump.factor_base.family.clone(),
+                fb_params: dump.factor_base.params.clone(),
+                oracle,
+                solver,
+                linalg,
+                instrument,
+            };
+            let sealed = cfg.seal()?;
+            let text = serde_json::to_string_pretty(&sealed).map_err(|e| e.to_string())? + "\n";
+            match out {
+                Some(p) => {
+                    std::fs::write(&p, &text).map_err(|e| e.to_string())?;
+                    eprintln!(
+                        "{} = {} × {} × oracle={} -> {}",
+                        sealed.fbm_id,
+                        sealed.config.curve,
+                        sealed.config.fb_id,
+                        sealed.config.oracle,
                         p.display()
                     );
                 }
@@ -796,17 +1330,350 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             )?;
             print_json(&job)?;
         }
+        Cmd::Bound { cmd } => match cmd {
+            BoundCmd::Fit {
+                dir,
+                arm,
+                tier,
+                curve,
+                audit,
+                label,
+                notes,
+                root,
+                resamples,
+                seed,
+                weight,
+                param_rule,
+                out,
+            } => {
+                let b = bounds::bound_from_sessions(&bounds::FitInputs {
+                    dirs: &dir,
+                    arm: &arm,
+                    audits: &audit,
+                    label: label.as_deref(),
+                    notes: &notes,
+                    root: &root,
+                    options: bounds::FitOptions {
+                        tier,
+                        curves: curve,
+                        resamples,
+                        seed,
+                        weight,
+                        param_rule,
+                    },
+                })?;
+                let mut b = b;
+                let text = b.seal()?;
+                write_or_print(out.as_deref(), &text)?;
+                eprintln!(
+                    "{} {} ({}): {} on {} size(s), {} verified runs; ops {:.3}× floor, α {} ; {}",
+                    b.bound_id,
+                    b.method.id,
+                    b.domain.tier,
+                    b.level,
+                    b.fit.sizes,
+                    b.provenance.verified,
+                    b.constant.ratio_to_floor.value,
+                    b.fit
+                        .alpha
+                        .map(|a| format!("{a:.3}"))
+                        .unwrap_or_else(|| "–".into()),
+                    b.admissibility.status
+                );
+                for r in &b.admissibility.reasons {
+                    eprintln!("  - {r}");
+                }
+            }
+            BoundCmd::Check { record, root } => {
+                let mut failed = 0;
+                for r in &record {
+                    match bounds::check(r, &root) {
+                        Ok(b) => eprintln!("{}: re-derived {} OK", r.display(), b.bound_id),
+                        Err(e) => {
+                            failed += 1;
+                            eprintln!("{e}");
+                        }
+                    }
+                }
+                if failed > 0 {
+                    return Ok(ExitCode::from(1));
+                }
+            }
+        },
+        Cmd::Frontier { cmd } => match cmd {
+            FrontierCmd::Build {
+                bounds: paths,
+                axes,
+                out,
+                markdown,
+                check,
+                json,
+            } => {
+                let loaded = frontier::load_bounds(&paths)?;
+                let axes: Vec<String> = axes
+                    .split(',')
+                    .map(|s| s.trim().to_string())
+                    .filter(|s| !s.is_empty())
+                    .collect();
+                let mut f = frontier::build(&loaded, &axes)?;
+                let text = f.seal()?;
+                let records_dir = paths
+                    .first()
+                    .map(|p| p.display().to_string())
+                    .unwrap_or_default();
+                let page = frontier::render_markdown(&f, &records_dir);
+                if check {
+                    let mut stale = Vec::new();
+                    if let Some(o) = &out {
+                        if read(o)? != text {
+                            stale.push(o.display().to_string());
+                        }
+                    }
+                    if let Some(m) = &markdown {
+                        if read(m)? != page {
+                            stale.push(m.display().to_string());
+                        }
+                    }
+                    if !stale.is_empty() {
+                        eprintln!(
+                            "stale: {}; rebuild with `ecbench frontier build`",
+                            stale.join(", ")
+                        );
+                        return Ok(ExitCode::from(1));
+                    }
+                    eprintln!("frontier {} is current", f.frontier_id);
+                } else {
+                    if let Some(o) = &out {
+                        std::fs::write(o, &text).map_err(|e| format!("{}: {e}", o.display()))?;
+                    }
+                    if let Some(m) = &markdown {
+                        std::fs::write(m, &page).map_err(|e| format!("{}: {e}", m.display()))?;
+                    }
+                    if json || (out.is_none() && markdown.is_none()) {
+                        print!("{text}");
+                    }
+                }
+                for d in &f.domains {
+                    eprintln!(
+                        "{} {} {} {}: {} bound(s), {} on the frontier; ops leader {}",
+                        d.domain.family,
+                        d.domain.target_kind,
+                        d.domain.tier,
+                        d.domain_id,
+                        d.entries.len(),
+                        d.entries.iter().filter(|e| e.is_frontier).count(),
+                        d.ops_leader.as_deref().unwrap_or("–")
+                    );
+                }
+                if !f.inadmissible.is_empty() {
+                    eprintln!("{} inadmissible bound(s) listed", f.inadmissible.len());
+                }
+            }
+        },
+        Cmd::Challenge { cmd } => match cmd {
+            ChallengeCmd::Seal { draft, out } => {
+                let mut v: serde_json::Value = serde_json::from_str(&read(&draft)?)
+                    .map_err(|e| format!("{}: {e}", draft.display()))?;
+                let domain: bounds::Domain = serde_json::from_value(
+                    v.get("domain").cloned().ok_or("the draft has no domain")?,
+                )
+                .map_err(|e| format!("domain: {e}"))?;
+                v["domain_id"] = serde_json::Value::String(domain.id()?);
+                v["challenge_id"] = serde_json::Value::String(String::new());
+                v["schema"] = serde_json::Value::String(challenge::CHALLENGE_SCHEMA.into());
+                let mut c: challenge::Challenge =
+                    serde_json::from_value(v).map_err(|e| format!("{}: {e}", draft.display()))?;
+                challenge::validate(&c)?;
+                let text = c.seal()?;
+                write_or_print(out.as_deref(), &text)?;
+                eprintln!(
+                    "challenge {} ({}): {} on {} curve(s), incumbent {}",
+                    c.challenge_id,
+                    c.domain.tier,
+                    c.domain.family,
+                    c.workloads.curves.len(),
+                    c.incumbent.method.id
+                );
+            }
+            ChallengeCmd::Check { file } => {
+                let mut failed = 0;
+                for f in &file {
+                    match challenge::Challenge::read(f)
+                        .and_then(|c| challenge::validate(&c).map(|_| c))
+                    {
+                        Ok(c) => eprintln!(
+                            "{}: challenge {} OK ({} {} {}, {} curves, incumbent {})",
+                            f.display(),
+                            c.challenge_id,
+                            c.domain.family,
+                            c.domain.target_kind,
+                            c.domain.tier,
+                            c.workloads.curves.len(),
+                            c.incumbent.method.id
+                        ),
+                        Err(e) => {
+                            failed += 1;
+                            eprintln!("{e}");
+                        }
+                    }
+                }
+                if failed > 0 {
+                    return Ok(ExitCode::from(1));
+                }
+            }
+            ChallengeCmd::Spec {
+                challenge: path,
+                candidate,
+                epoch,
+                out,
+            } => {
+                let c = challenge::Challenge::read(&path)?;
+                challenge::validate(&c)?;
+                let m: methods::MethodSpec =
+                    serde_json::from_str(&candidate).map_err(|e| format!("--candidate: {e}"))?;
+                let s = challenge::spec_for(&c, &m, epoch);
+                let p = spec::plan(s.clone())?;
+                let text = serde_json::to_string_pretty(&s).map_err(|e| e.to_string())? + "\n";
+                write_or_print(out.as_deref(), &text)?;
+                eprintln!(
+                    "spec {} for challenge {} epoch {epoch}: {} executions, target seed {}",
+                    p.spec_id,
+                    c.challenge_id,
+                    p.executions.len(),
+                    s.workloads.target_seed
+                );
+            }
+            ChallengeCmd::Verdict {
+                challenge: path,
+                dir,
+                epoch,
+                candidate,
+                incumbent,
+                control,
+                replay,
+                replay_all,
+                bounds: bdir,
+                root,
+                resamples,
+                seed,
+                out,
+                bound_out,
+                audit_out,
+                exit_code,
+            } => {
+                let c = challenge::Challenge::read(&path)?;
+                let o = challenge::verdict(&challenge::VerdictInputs {
+                    challenge: &c,
+                    dir: &dir,
+                    epoch,
+                    candidate_arm: &candidate,
+                    incumbent_arm: &incumbent,
+                    control_arm: Some(&control),
+                    replay: if replay_all {
+                        audit::REPLAY_ALL
+                    } else {
+                        replay
+                    },
+                    bounds: bdir.as_deref(),
+                    root: &root,
+                    resamples,
+                    seed,
+                })?;
+                if let Some(a) = &audit_out {
+                    std::fs::write(a, &o.audit_text)
+                        .map_err(|e| format!("{}: {e}", a.display()))?;
+                }
+                write_or_print(out.as_deref(), &o.verdict_text)?;
+                if let (Some(b), Some(text)) = (&bound_out, &o.candidate_bound_text) {
+                    std::fs::write(b, text).map_err(|e| format!("{}: {e}", b.display()))?;
+                    eprintln!(
+                        "new bound {} -> {}",
+                        o.candidate_bound
+                            .as_ref()
+                            .map(|x| x.bound_id.as_str())
+                            .unwrap_or(""),
+                        b.display()
+                    );
+                } else if bound_out.is_some() {
+                    eprintln!("no new bound: the verdict is {}", o.verdict.outcome);
+                }
+                eprintln!("verdict {}: {}", o.verdict.verdict_id, o.verdict.statement);
+                if exit_code && o.verdict.outcome == "inadmissible" {
+                    return Ok(ExitCode::from(1));
+                }
+            }
+        },
     }
     Ok(ExitCode::SUCCESS)
+}
+
+fn write_or_print(out: Option<&Path>, text: &str) -> Result<(), String> {
+    match out {
+        Some(o) => {
+            std::fs::write(o, text).map_err(|e| format!("{}: {e}", o.display()))?;
+            eprintln!(
+                "wrote {} (sha256 {})",
+                o.display(),
+                canonical::sha256_hex(text.as_bytes())
+            );
+        }
+        None => print!("{text}"),
+    }
+    Ok(())
 }
 
 /// One row per (session, arm, curve): mean S over verified measured runs
 /// with its two-stage bootstrap interval (workloads, then runs), the
 /// method's derived expectation, and the ratios to the curve's generic
 /// floor and to the reference arm on the same workloads.
+///
+/// Median `solve_wall_ms` is descriptive host timing (L0 unless isolation
+/// says otherwise); it is not an admitted cost unit.  Kept on the table so
+/// oracle-time wins vs Gröbner are visible beside S without a second tool.
+fn band_cmd(
+    dirs: &[PathBuf],
+    weights: &str,
+    json: Option<&std::path::Path>,
+    ranks: bool,
+) -> Result<(), String> {
+    let weights: Vec<f64> = weights
+        .split(',')
+        .map(|w| {
+            w.trim()
+                .parse::<f64>()
+                .map_err(|e| format!("weight {w:?}: {e}"))
+        })
+        .collect::<Result<_, _>>()?;
+    let mut recs = Vec::new();
+    for d in dirs {
+        recs.extend(runner::read_records(d)?);
+    }
+    let rep = crypto_lib::cryptanalysis::ecbench::band::band(&recs, &weights)?;
+    print!(
+        "{}",
+        crypto_lib::cryptanalysis::ecbench::band::markdown(&rep)
+    );
+    if ranks {
+        println!();
+        println!("| curve | pair | verdict across the band |");
+        println!("|:--|:--|:--|");
+        for r in &rep.ranks {
+            println!("| {} | {} vs {} | {} |", r.curve, r.a, r.b, r.verdict);
+        }
+    }
+    if let Some(p) = json {
+        std::fs::write(
+            p,
+            serde_json::to_string_pretty(&rep).map_err(|e| e.to_string())?,
+        )
+        .map_err(|e| format!("{}: {e}", p.display()))?;
+    }
+    Ok(())
+}
+
 fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
-    println!("| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | levels |");
-    println!("|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---|");
+    println!("| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels |");
+    println!("|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|");
     for d in dirs {
         let s = runner::read_session(d)?;
         let recs = runner::read_records(d)?;
@@ -886,8 +1753,19 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                     *levels.entry(r.isolation.level.name()).or_insert(0) += 1;
                 }
                 let o = |v: Option<f64>| v.map(|x| format!("{x:.3}")).unwrap_or_else(|| "–".into());
+                let mut walls_ms: Vec<f64> = mine
+                    .iter()
+                    .filter(|r| r.counts())
+                    .filter_map(|r| r.time.solve_wall_ns.map(|ns| ns as f64 / 1e6))
+                    .collect();
+                walls_ms.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+                let med_wall = if walls_ms.is_empty() {
+                    None
+                } else {
+                    Some(walls_ms[walls_ms.len() / 2])
+                };
                 println!(
-                    "| {} | {} | {} | {} | {:.2} | {}/{} | {} | {} | {} | {} | {} | {} | {} | {} |",
+                    "| {} | {} | {} | {} | {:.2} | {}/{} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
                     s.session_id,
                     arm.name,
                     arm.method.id,
@@ -911,6 +1789,9 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                     } else {
                         "no"
                     },
+                    med_wall
+                        .map(|ms| format!("{ms:.3}"))
+                        .unwrap_or_else(|| "–".into()),
                     levels
                         .iter()
                         .map(|(k, v)| format!("{k}×{v}"))

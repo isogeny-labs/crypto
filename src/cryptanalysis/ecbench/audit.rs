@@ -13,8 +13,11 @@
 //!   record's status must agree with that check;
 //! - with `--replay N`, N measured deterministic runs are re-executed and
 //!   must reproduce their answer, total, phases, counters and factor base
-//!   exactly.  Operation counts do not depend on the host, so a replay on
-//!   any machine is an independent check of the figure.
+//!   exactly, and their field-operation block when both the record and
+//!   the replay carry one (a record written before the block existed has
+//!   none, and unknown is not a disagreement).  Operation counts do not
+//!   depend on the host, so a replay on any machine is an independent
+//!   check of the figure.
 //!
 //! The receipt names every file by hash and every check by result; its
 //! own SHA-256 is the replay certificate a claim cites.
@@ -25,7 +28,7 @@ use std::path::Path;
 use serde::{Deserialize, Serialize};
 
 use crate::cryptanalysis::ecbench::canonical::sha256_hex;
-use crate::cryptanalysis::ecbench::host::{recompute_class, HostCapsule};
+use crate::cryptanalysis::ecbench::host::{self, recompute_class, HostCapsule};
 use crate::cryptanalysis::ecbench::methods::MethodSpec;
 use crate::cryptanalysis::ecbench::record::{
     check_line_seal, child_main, floor_s, grade, json_roundtrip, ChildInput, GradeInput, Record,
@@ -33,7 +36,7 @@ use crate::cryptanalysis::ecbench::record::{
 };
 use crate::cryptanalysis::ecbench::runner::{read_record_lines, read_session, PlanDoc};
 use crate::cryptanalysis::ecbench::spec::{plan, Arm, Spec};
-use crate::cryptanalysis::ecbench::workload::{CurveSpec, Workload};
+use crate::cryptanalysis::ecbench::workload::Workload;
 
 /// Replay every measured deterministic run.
 pub const REPLAY_ALL: usize = usize::MAX;
@@ -74,6 +77,48 @@ fn close(a: f64, b: f64) -> bool {
     a == b || (a - b).abs() <= 1e-12 * a.abs().max(b.abs())
 }
 
+/// Replay detail for a record whose gae carries the pre-fix rounding.
+pub const LEGACY_IDENTICAL: &str =
+    "identical (legacy gae rounding, reproduced from the record's solver term)";
+
+/// The gae figures an `ic.pipeline` record written before the
+/// solver-rounding fix carries, from the replay's exact phases.
+///
+/// Those binaries removed a wall-priced solver term `w` by subtraction,
+/// so the relations phase was `(x + w) - w` and the total
+/// `(fb + prep + (x + w) + la + ver) - w`: `x` rounded to `w`'s binade.
+/// The rounding is a function of `w`, which the record carries
+/// (`detail.decomposition.solver.gae`), so it is reproduced here from the
+/// record rather than from the replay host's clock.  `w` is accepted only
+/// when it also reproduces the record's own pre-removal total
+/// (`detail.framework_total_gae_before_solver_removal`), so the record
+/// cannot pick a `w` that absorbs a real difference; what stays unchecked
+/// is below one ulp of `x + w`.
+pub fn legacy_solver_rounding(
+    exact: &[f64],
+    detail: &serde_json::Value,
+) -> Option<(Vec<f64>, f64)> {
+    let solver = detail.pointer("/decomposition/solver")?;
+    let w = solver.get("gae")?.as_f64()?;
+    if exact.len() != 5
+        || w.partial_cmp(&0.0) != Some(std::cmp::Ordering::Greater)
+        || solver.get("priced_by")?.as_str()? == "pinned"
+    {
+        return None;
+    }
+    let with_w = exact[2] + w;
+    let before = exact[0] + exact[1] + with_w + exact[3] + exact[4];
+    let recorded = detail
+        .get("framework_total_gae_before_solver_removal")?
+        .as_f64()?;
+    if json_roundtrip(before).to_bits() != recorded.to_bits() {
+        return None;
+    }
+    let mut phases = exact.to_vec();
+    phases[2] = with_w - w;
+    Some((phases, before - w))
+}
+
 pub const AUDIT_SCHEMA: &str = "ecbench.audit/v1";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -89,9 +134,28 @@ pub struct AuditReport {
     pub schema: String,
     pub session_id: String,
     /// The session's own status: `complete`, or `interrupted` when that
-    /// was accepted.
+    /// was accepted (including a session that was never finalised, see
+    /// [`never_finalised`]).
     #[serde(default)]
     pub session_status: String,
+    /// Why an accepted interruption is one: `never_finalised` when the
+    /// session still reads `running` exactly as the runner first wrote it
+    /// (the runner was killed before it could mark the session).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub interruption: Option<String>,
+    /// Whether `records.jsonl` was checked against the whole-file hash
+    /// the runner wrote (`session.records_sha256`) when it finalised the
+    /// session.  `false` for a never-finalised session
+    /// (`interruption: never_finalised`): the runner never wrote that
+    /// hash, so nothing binds the file as a whole.  Its records carry
+    /// only their own per-record seals, which are unkeyed hashes, so a
+    /// truncated file, or one with valid-looking records appended, is not
+    /// detected by any whole-file check.  **An unbound session must not
+    /// be cited as complete**: cite it, if at all, as an interrupted,
+    /// unbound prefix of its plan.  `None` only in receipts written
+    /// before this field existed.
+    #[serde(default)]
+    pub records_bound: Option<bool>,
     pub ok: bool,
     pub problems: Vec<String>,
     pub checks: BTreeMap<String, bool>,
@@ -105,10 +169,13 @@ pub struct AuditReport {
     /// SHA-256 of every file the audit read.
     pub files: BTreeMap<String, String>,
     pub auditor_binary_sha256: Option<String>,
-    /// The host class the audit ran on: a replay on a class other than
-    /// the session's is an independent one.
+    /// The measurement environment class the audit ran under.
     #[serde(default)]
     pub auditor_env_class_id: Option<String>,
+    /// Hardware profile class, which omits mutable compiler and OS policy.
+    /// A claim rejects an auditor with the session's same hardware class.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub auditor_hardware_class_id: Option<String>,
     pub audited_unix_ms: u128,
 }
 
@@ -125,11 +192,41 @@ pub fn audit(dir: &Path, replay: usize) -> Result<AuditReport, String> {
     audit_with(dir, replay, false)
 }
 
+/// The interruption [`audit_with`] reports for a session that was never
+/// finalised.
+pub const NEVER_FINALISED: &str = "never_finalised";
+
+/// A session whose `session.json` is still exactly in the state the runner
+/// writes before its first execution: status `running`, no finish time, no
+/// record count, no records hash, no status counts.  The runner rewrites
+/// `session.json` only when the session ends (`complete`, or `interrupted`
+/// on a signal or an error), so a session left in this state was killed
+/// outright (SIGKILL, host loss) or is still being written by a live
+/// runner; the files cannot tell those apart, and a committed session has
+/// no live runner.  Its records are still sealed line by line as they are
+/// written, so every per-record check applies; only the whole-file hash,
+/// which the runner never got to write, does not.
+pub fn never_finalised(session: &crate::cryptanalysis::ecbench::runner::Session) -> bool {
+    session.status == "running"
+        && session.finished_unix_ms.is_none()
+        && session.records_written == 0
+        && session.records_sha256.is_none()
+        && session.status_counts.is_empty()
+}
+
 /// [`audit`], optionally accepting an `interrupted` session: it is held
 /// to every integrity check (hashes, seals, plan, answers, derived
 /// figures), with "every planned execution recorded" replaced by "every
-/// record it says it wrote".  A session that claims `complete` gets no
-/// such relaxation.
+/// record it says it wrote".  A session that was never finalised
+/// ([`never_finalised`]) is accepted as interrupted too, held to every
+/// per-record check (seals, sequence, plan, answers, derived figures,
+/// grading) with no records hash or count to compare against; it is
+/// reported as `interrupted` with `interruption: never_finalised` and
+/// `records_bound: false` (explicitly unbound: no whole-file hash ties
+/// `records.jsonl` together, so truncation or appended records are seen
+/// only through the unkeyed per-record seals).  Such a session must not
+/// be cited as complete.  A session that claims `complete` gets no such
+/// relaxation.
 pub fn audit_with(
     dir: &Path,
     replay: usize,
@@ -166,10 +263,11 @@ pub fn audit_with(
     );
     let rec_sha = file_sha(dir, "records.jsonl", &mut files);
     let complete = session.status == "complete";
-    let accepted_interruption = allow_interrupted && session.status == "interrupted";
+    let killed = allow_interrupted && never_finalised(&session);
+    let accepted_interruption = allow_interrupted && (session.status == "interrupted" || killed);
     check(
         "records_hash",
-        !(complete || accepted_interruption) || rec_sha == session.records_sha256,
+        !(complete || accepted_interruption) || killed || rec_sha == session.records_sha256,
         "records.jsonl does not hash to session.records_sha256".into(),
         &mut problems,
     );
@@ -247,6 +345,8 @@ pub fn audit_with(
         "record_count",
         if complete {
             records.len() as u64 == session.records_written && records.len() == p.executions.len()
+        } else if killed {
+            records.len() <= p.executions.len()
         } else {
             records.len() as u64 == session.records_written && records.len() <= p.executions.len()
         },
@@ -308,7 +408,7 @@ pub fn audit_with(
                 (None, None, None) => true,
                 _ => false,
             }
-            && r.cost.lower_bound == !r.cost.unpriced.is_empty()
+            && r.cost.lower_bound != r.cost.unpriced.is_empty()
             && (r.cost.total_gae.is_none()
                 || r.cost.deterministic == r.cost.nondeterminism.is_empty())
             && r.run_id
@@ -320,7 +420,7 @@ pub fn audit_with(
         }
         // Re-check the answer here.
         let inst = p.instance(ex.workload);
-        let rec: Option<u64> = r.outcome.recovered.as_deref().and_then(|s| s.parse().ok());
+        let rec: Option<u128> = r.outcome.recovered.as_deref().and_then(|s| s.parse().ok());
         let target_ok = rec.map(|k| inst.mul_generator_hex(k).as_ref() == Some(&w.target));
         let planted_ok = w.planted.and_then(|p| rec.map(|k| k == p));
         if target_ok != r.outcome.matches_target || planted_ok != r.outcome.matches_planted {
@@ -401,8 +501,7 @@ pub fn audit_with(
             let w = &p.workloads[ex.workload];
             let input = ChildInput {
                 schema: CHILD_INPUT_SCHEMA.into(),
-                curve: CurveSpec::explicit(p.instance(ex.workload))
-                    .unwrap_or_else(|| w.curve_spec.clone()),
+                curve: w.curve_spec.for_child(p.instance(ex.workload)),
                 target_seed: w.target_seed,
                 target_index: w.target_index,
                 target_kind: w.kind(),
@@ -427,9 +526,27 @@ pub fn audit_with(
                     }
                     // Integer counts compare exactly; a float compares after
                     // the same serialise-parse round trip the record's took.
-                    if Some(json_roundtrip(rep.total_gae).to_bits())
-                        != r.cost.total_gae.map(f64::to_bits)
-                    {
+                    let same_gae = |phases: &[f64], total: f64| {
+                        (
+                            Some(json_roundtrip(total).to_bits())
+                                == r.cost.total_gae.map(f64::to_bits),
+                            phases
+                                .iter()
+                                .map(|g| json_roundtrip(*g).to_bits())
+                                .eq(r.phases.iter().map(|p| p.gae.to_bits())),
+                        )
+                    };
+                    let exact: Vec<f64> = rep.phases.iter().map(|p| p.gae).collect();
+                    let (mut total_ok, mut phases_ok) = same_gae(&exact, rep.total_gae);
+                    let mut legacy = false;
+                    if !(total_ok && phases_ok) {
+                        if let Some((ph, tot)) = legacy_solver_rounding(&exact, &r.detail) {
+                            if same_gae(&ph, tot) == (true, true) {
+                                (total_ok, phases_ok, legacy) = (true, true, true);
+                            }
+                        }
+                    }
+                    if !total_ok {
                         diffs.push("total_gae");
                     }
                     let ints = |ps: &[crate::cryptanalysis::ecbench::methods::PhaseRecord]| {
@@ -448,12 +565,7 @@ pub fn audit_with(
                     if ints(&rep.phases) != ints(&r.phases) {
                         diffs.push("phase counts");
                     }
-                    if rep
-                        .phases
-                        .iter()
-                        .map(|p| json_roundtrip(p.gae).to_bits())
-                        .ne(r.phases.iter().map(|p| p.gae.to_bits()))
-                    {
+                    if !phases_ok {
                         diffs.push("phase gae");
                     }
                     if rep.counters != r.counters {
@@ -461,6 +573,14 @@ pub fn audit_with(
                     }
                     if rep.factor_base != r.factor_base {
                         diffs.push("factor_base");
+                    }
+                    // Field operations compare only when both sides carry
+                    // them: a committed record written before they were
+                    // counted has none, and unknown is not a disagreement.
+                    if let (Some(a), Some(b)) = (rep.field_ops, r.field_ops) {
+                        if a != b {
+                            diffs.push("field_ops");
+                        }
                     }
                     if rep.unpriced != r.cost.unpriced
                         || rep.deterministic != r.cost.deterministic
@@ -470,7 +590,9 @@ pub fn audit_with(
                     }
                     (
                         diffs.is_empty(),
-                        if diffs.is_empty() {
+                        if diffs.is_empty() && legacy {
+                            LEGACY_IDENTICAL.into()
+                        } else if diffs.is_empty() {
                             "identical".into()
                         } else {
                             format!("differs in {}", diffs.join(", "))
@@ -495,9 +617,20 @@ pub fn audit_with(
         .ok()
         .and_then(|p| std::fs::read(p).ok())
         .map(|b| sha256_hex(&b));
+    let auditor_host = host::capture().ok();
     Ok(AuditReport {
         schema: AUDIT_SCHEMA.into(),
-        session_status: session.status.clone(),
+        session_status: if killed {
+            "interrupted".into()
+        } else {
+            session.status.clone()
+        },
+        interruption: killed.then(|| NEVER_FINALISED.to_string()),
+        // The records hash binds the file only when the runner wrote one
+        // and it was compared (`records_hash` above).
+        records_bound: Some(
+            !killed && session.records_sha256.is_some() && rec_sha == session.records_sha256,
+        ),
         session_id: session.session_id,
         ok: problems.is_empty(),
         problems,
@@ -508,12 +641,185 @@ pub fn audit_with(
         replays,
         files,
         auditor_binary_sha256,
-        auditor_env_class_id: crate::cryptanalysis::ecbench::host::capture()
-            .ok()
-            .map(|c| c.env_class_id),
+        auditor_env_class_id: auditor_host.as_ref().map(|c| c.env_class_id.clone()),
+        auditor_hardware_class_id: auditor_host
+            .as_ref()
+            .and_then(|c| host::hardware_class_id(c).ok()),
         audited_unix_ms: std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .map(|d| d.as_millis())
             .unwrap_or(0),
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    fn detail(w: f64, before: f64, priced_by: &str) -> serde_json::Value {
+        json!({
+            "decomposition": {"solver": {"gae": w, "priced_by": priced_by}},
+            "framework_total_gae_before_solver_removal": before,
+        })
+    }
+
+    /// The figures of the committed koblitz session's seq 4
+    /// (`sub6-da-buch`): the pre-fix rounding is a function of the
+    /// record's own solver term, so it reproduces exactly.
+    #[test]
+    fn legacy_rounding_is_reproduced_from_the_record_alone() {
+        let x = 611.5963;
+        let exact = [3.223395, 0.0, x, 2.721705, 15.0];
+        let w = 91449423.0;
+        let before = exact[0] + exact[1] + (x + w) + exact[3] + exact[4];
+        let (ph, tot) = legacy_solver_rounding(&exact, &detail(w, before, "measured")).unwrap();
+        assert_eq!(ph[2], (x + w) - w);
+        assert_eq!(tot, before - w);
+        assert_eq!(ph[..2], exact[..2]);
+        assert_eq!(ph[3..], exact[3..]);
+        // Another host's clock lands `w` in another binade: the old
+        // subtraction then disagrees with itself, the exact figure does not.
+        let w2 = 29295605.0;
+        assert_ne!((x + w).to_bits(), x.to_bits());
+        assert_ne!(((x + w) - w).to_bits(), ((x + w2) - w2).to_bits());
+    }
+
+    /// A committed session whose runner was killed
+    /// (`research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02`):
+    /// `session.json` still reads `running`, as first written, and
+    /// `records.jsonl` holds the four sealed records written before the
+    /// kill.  Embedded, so every lane that builds the tests has it.
+    const KILLED: [(&str, &str); 5] = [
+        (
+            "session.json",
+            include_str!("../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/session.json"),
+        ),
+        (
+            "spec.json",
+            include_str!("../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/spec.json"),
+        ),
+        (
+            "plan.json",
+            include_str!("../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/plan.json"),
+        ),
+        (
+            "host.json",
+            include_str!("../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/host.json"),
+        ),
+        (
+            "records.jsonl",
+            include_str!("../../../research/f6_ic_ecbench_ladder_20261005/sessions/n31-killed-02/records.jsonl"),
+        ),
+    ];
+
+    /// A scratch copy of the killed session, byte for byte, to audit or
+    /// mutate.
+    fn killed_copy(tag: &str) -> std::path::PathBuf {
+        let dir = std::env::temp_dir().join(format!("ecbench-audit-{}-{tag}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        for (name, text) in KILLED {
+            std::fs::write(dir.join(name), text).unwrap();
+        }
+        dir
+    }
+
+    #[test]
+    fn a_killed_session_is_interrupted_only_when_interruptions_are_allowed() {
+        let dir = killed_copy("as-committed");
+        let session = read_session(&dir).unwrap();
+        assert!(never_finalised(&session));
+
+        let strict = audit_with(&dir, 0, false).unwrap();
+        assert!(!strict.ok);
+        assert_eq!(strict.checks.get("session_complete"), Some(&false));
+        assert_eq!(strict.session_status, "running");
+        assert_eq!(strict.interruption, None);
+        assert_eq!(strict.records_bound, Some(false));
+
+        let lenient = audit_with(&dir, 0, true).unwrap();
+        assert!(lenient.ok, "{:?}", lenient.problems);
+        assert_eq!(lenient.session_status, "interrupted");
+        assert_eq!(lenient.interruption.as_deref(), Some(NEVER_FINALISED));
+        // Accepted, but explicitly unbound: no records hash was compared.
+        assert_eq!(lenient.records_bound, Some(false));
+        let text = serde_json::to_string(&lenient).unwrap();
+        assert!(
+            text.contains("\"interruption\":\"never_finalised\""),
+            "{text}"
+        );
+        assert!(text.contains("\"records_bound\":false"), "{text}");
+        assert_eq!(lenient.records, 4);
+        assert_eq!(lenient.checks.get("records"), Some(&true));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn a_finalised_interrupted_session_is_records_bound() {
+        // The same records, finalised the way the runner marks an
+        // interruption: now the whole-file hash binds them.
+        let dir = killed_copy("finalised");
+        let records = std::fs::read(dir.join("records.jsonl")).unwrap();
+        let text = std::fs::read_to_string(dir.join("session.json")).unwrap();
+        let mut v: serde_json::Value = serde_json::from_str(&text).unwrap();
+        v["status"] = json!("interrupted");
+        v["finished_unix_ms"] = json!(1791170600000u64);
+        v["records_written"] = json!(4);
+        v["records_sha256"] = json!(sha256_hex(&records));
+        std::fs::write(dir.join("session.json"), v.to_string()).unwrap();
+        let rep = audit_with(&dir, 0, true).unwrap();
+        assert_eq!(rep.interruption, None);
+        assert_eq!(rep.checks.get("records_hash"), Some(&true));
+        assert_eq!(rep.records_bound, Some(true));
+        // Appending a byte breaks the binding (and the audit).
+        let mut longer = records.clone();
+        longer.extend_from_slice(b"\n");
+        std::fs::write(dir.join("records.jsonl"), longer).unwrap();
+        let rep = audit_with(&dir, 0, true).unwrap();
+        assert_eq!(rep.records_bound, Some(false));
+        assert_eq!(rep.checks.get("records_hash"), Some(&false));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn a_killed_session_keeps_every_record_check() {
+        // A session the runner did mark (a finish time) is not a killed
+        // one, so it gets no relaxation for still reading `running`.
+        let dir = killed_copy("finished");
+        let text = std::fs::read_to_string(dir.join("session.json")).unwrap();
+        let mut v: serde_json::Value = serde_json::from_str(&text).unwrap();
+        v["finished_unix_ms"] = json!(1791170600000u64);
+        std::fs::write(dir.join("session.json"), v.to_string()).unwrap();
+        assert!(!never_finalised(&read_session(&dir).unwrap()));
+        let rep = audit_with(&dir, 0, true).unwrap();
+        assert!(!rep.ok);
+        assert_eq!(rep.checks.get("session_complete"), Some(&false));
+        let _ = std::fs::remove_dir_all(&dir);
+
+        // Dropping a sealed record is still caught: the rest are out of
+        // sequence against the plan.
+        let dir = killed_copy("dropped");
+        let text = std::fs::read_to_string(dir.join("records.jsonl")).unwrap();
+        let rest: String = text.lines().skip(1).map(|l| format!("{l}\n")).collect();
+        std::fs::write(dir.join("records.jsonl"), rest).unwrap();
+        let rep = audit_with(&dir, 0, true).unwrap();
+        assert!(!rep.ok);
+        assert_eq!(rep.checks.get("records"), Some(&false));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn legacy_rounding_needs_the_records_own_total_and_a_wall_price() {
+        let exact = [3.223395, 0.0, 611.5963, 2.721705, 15.0];
+        let w = 91449423.0;
+        let before = exact[0] + exact[1] + (exact[2] + w) + exact[3] + exact[4];
+        // A solver term that does not reproduce the recorded pre-removal
+        // total is not the one the record was written with.
+        assert!(legacy_solver_rounding(&exact, &detail(w * 2.0, before, "measured")).is_none());
+        assert!(legacy_solver_rounding(&exact, &detail(w, before + 1.0, "measured")).is_none());
+        // Pinned solver work was never subtracted.
+        assert!(legacy_solver_rounding(&exact, &detail(w, before, "pinned")).is_none());
+        assert!(legacy_solver_rounding(&exact, &json!({})).is_none());
+    }
 }

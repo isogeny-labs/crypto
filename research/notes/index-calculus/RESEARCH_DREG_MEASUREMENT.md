@@ -704,6 +704,179 @@ It builds degree 7 on the committed `≥7` draws, replayed with `--d-min 7`.
   route at `n = 131` under a constant degree and under `D_reg`. Every
   figure there is an extrapolation.
 
+## Result 10: the `m = 4` chain — one degree above `m = 3`, flat in `n`, rising with `ℓ`
+
+`research/dreg_m4_chain_20261006/` holds everything. It was pre-registered
+before any `m = 4` cell ran; its `ℓ = 3` amendment was registered before
+those cells ran.
+
+`m = 4` is the smallest decomposition whose free-oracle floor at
+ECC2K-130 is below rho. Every degree before this one was `m = 3`'s.
+
+| `ℓ` | `m = 4` cells (`N`) | measured | semi-regular `D_reg` | `m = 3` at the same `ℓ` |
+|--:|---|---|---|---|
+| 1 | (4,1) (5,1) (6,1) (12–16) | 5 in every draw | 5 5 5 | — |
+| 2 | (5,2) (6,2) (7,2) (8,2) (18–24) | **6 in every draw** | 6 7 7 7 | 5 in every draw (11–18) |
+| 3 | (9,3) (10,3) (30, 32) | **≥7 in all eight draws** (degree 6 built in full; degree 7 out of reach) | 8, 9 | 5 at S = −5, else 6 |
+
+- **Q7, as registered: `m = 4` refutes above `m = 3` at the same `ℓ`.**
+  Every `ℓ = 2` cell reads 6, where `m = 3` reads 5. The prediction held.
+- **Q8, as registered: `m = 4` tracks its reference.** Every cell is within
+  one of `D_reg`.
+  - It is equal in four of the seven registered cells.
+  - It is one below at `(6, 2)`–`(8, 2)`, where my exact predictions of 7
+    missed.
+- **Q10, amendment 1: rises with `ℓ`.** Both `ℓ = 3` cells read ≥7 on
+  every draw, as predicted.
+- **The degree is flat in `n` at fixed `ℓ`, for both `m`.**
+  - `m = 4` at `ℓ = 2` reads 6 from 18 to 24 unknowns, and `m = 3` at
+    `ℓ = 2` reads 5 from 11 to 18.
+  - The reference rises with `N` meanwhile. So it fits within one here but
+    overstates the growth in `n`.
+  - On this evidence the degree is set by `m` and `ℓ`. Two small-`ℓ` fits:
+    - **`m = 3`: `⌈ℓ/2⌉ + 4`.** It matches every exactly measured cell
+      except `(4, 3)` and `(7, 4)` at surplus −5, and the two `(8, 4)`
+      draws at −4 that read 7.
+    - **`m = 4`: `ℓ + 4`.** It matches every cell, and the `ℓ = 3` bounds
+      are consistent with it.
+  - They are fits to three or four rungs, not laws.
+- **The FFD is 3** (two draws at 2).
+- **Cost.** The `ℓ ≤ 2` draws resolve in seconds. The `ℓ = 3` draws took
+  6–7 min at `(9, 3)` and about 17 min at `(10, 3)`, with peaks of 2.9 and
+  5.4 GB. Those are practicality notes on the four-core container.
+- **Harness.** It is native, per `AGENTS.md`'s no-Python rule:
+  - `chained_solution_count` is tested against an exhaustive evaluation at
+    `m = 4`;
+  - `dreg_ladder --m`, with the `m = 3` identity check at 328 rows and 0
+    mismatches;
+  - `examples/dreg_score` for scoring, comparison, the reference and matrix
+    shapes;
+  - `examples/descent_degree_cost`, the native `n = 131` cost model, which
+    reproduces the committed Python table exactly.
+- **For ECC2K-130**:
+  `research/notes/ecc2k130/RESEARCH_ECC2K130_DESCENT_DEGREE.md` §5. Every
+  figure there is an extrapolation.
+
+## Result 11: MutantXL closure refutes at 3–4 where XL needs 5–7, flat in `ℓ`
+
+`research/dreg_closure_mutantxl_20261016/` holds everything, and it was
+pre-registered before any closure was measured. Results 1–10 are all **XL**
+degrees: the first degree whose plain Macaulay row space contains `1`.
+
+This study replays the 92 committed unsatisfiable draws of Results 5–10 (the
+same systems) and saturates each degree under MutantXL's fixed-degree step:
+every degree fall, linear falls included, times every monomial that keeps
+the degree, repeated to saturation.
+
+| | `m = 3`, `ℓ = 2` | `ℓ = 3` | `ℓ = 4` | `ℓ = 5` | `m = 4`, `ℓ = 1` | `ℓ = 2` | `ℓ = 3` |
+|---|---|---|---|---|---|---|---|
+| XL (Results 5–10) | 5 | 5–6 | 6–7 | 7 | 5 | 6 | ≥7 |
+| closure | 3–4 | 4 | 4 | 4 | 3–4 | 3–4 | 4 |
+
+- **Q1: the closure lowers the degree. Held** in all 20 testable cells and
+  in the 3 exploratory ones, on every draw.
+- **Q2: by exactly one degree. Refuted.**
+  - 58 of the 84 resolved draws are two or more below XL.
+  - The gap is 3 where XL is 7.
+- **Q3: the closure still grows with `ℓ`. Refuted.**
+  - The m = 3 median is 4 at every `ℓ` from 2 to 5.
+  - Over 11 to 32 unknowns, the closure degree does not move with `ℓ`,
+    `m`, or `n`.
+- **The growth of Results 7–10 is XL's.** The fits `⌈ℓ/2⌉ + 4` and
+  `ℓ + 4` describe plain XL. They do not describe the ideal's refutation
+  under a fall-aware solver.
+- **Instrument checks.**
+  - XL identity on every degree built: 92 of 92.
+  - Every closure saturated.
+  - A constructed positive control: closure 3, XL 4.
+  - A post-hoc soundness control on every committed satisfiable draw: no
+    refutation. This control was disclosed as added after measurement.
+- **Cost (descriptive).**
+  - The closure's matrix is 2^1 to 2^7 narrower than XL's.
+  - Its counted work grows roughly as columns^2.2.
+- **For ECC2K-130.** A "4, constant" row now sits in
+  `RESEARCH_ECC2K130_DESCENT_DEGREE.md` §6. It is an extrapolation from
+  `N ≤ 32` to `N ≈ 400`, and it still does not beat rho.
+
+## Result 12: the closure stays at 4 to N = 42 at m = 4, and rises past 4 at m = 3, ℓ = 7
+
+`research/dreg_closure_scale_20261016/` was pre-registered before any
+closure was measured on its cells. It has 40 unsatisfiable draws at degree
+4, N = 26–42.
+
+- 28 of them are fresh draws, generated by exact solution count with XL
+  built only to degree 3, and committed first.
+- 12 are the committed m = 3, ℓ = 5 draws at N = 26–30 that Result 11 could
+  not reach.
+
+| | ℓ = 5 (N 26–30) | ℓ = 6 (N 34, 36) | ℓ = 7 (N 40, 42) |
+|---|---|---|---|
+| m = 3 closure | 4 (12/12) | 4 (8/8) | **> 4 (8/8)**, degree 4 saturated without `1` |
+
+| | ℓ = 3 (N 36, 40) | ℓ = 4 (N 42) |
+|---|---|---|
+| m = 4 closure | 4 (8/8) | 4 (4/4) |
+
+- **Registered verdict: "rises at N = 40".** Q4 (flat at 4) is refuted
+  on m = 3, ℓ = 7.
+- **Q5 (XL never refutes at 4) holds,** on 40 of 40.
+- **Q6 (work ratio log₂ ops ÷ log₂ cols in 2.0–2.4) holds,** at
+  2.18–2.33.
+- **The rise follows ℓ, not N.** m = 4 holds at 4 at the same N = 40 and
+  42.
+  - The refuting cells have `m·ℓ ≤ 18`, and the rising cells have 21.
+  - That is a descriptive reading, not a registered one. m = 4, ℓ = 5
+    (`m·ℓ = 20`) tests it.
+- **Soundness control.** One registered satisfiable draw, not refuted
+  (thin by construction). Result 11's control of 345 draws covers the
+  same instrument.
+- **For ECC2K-130.** `RESEARCH_ECC2K130_DESCENT_DEGREE.md` §7 withdraws
+  the m = 3 degree-4 row and adds degree-5 rows. The m = 4 degree-4 row's
+  support grows from N ≤ 32 to N ≤ 42, still about 10× short of the priced
+  N.
+
+## Result 13: what sets the closure degree is not N; ℓ = 7 or m·ℓ ≥ 21 remain
+
+`research/dreg_closure_driver_20261016/` was pre-registered before any
+closure measurement on its cells. It has 16 unsatisfiable draws at degree 4.
+
+| cell | N | m·ℓ | closure at 4 |
+|---|--:|--:|---|
+| m = 3 (22, 6), (24, 6) | 40, 42 | 18 | refutes, 8 of 8 |
+| m = 4 (11, 5), (12, 5) | 42, 44 | 20 | refutes, 8 of 8 |
+
+- **N is rejected.** At the same N = 40 and 42 where ℓ = 7 does not
+  refute (Result 12), ℓ = 6 does.
+- **An m·ℓ threshold ≤ 20 is rejected,** because m·ℓ = 20 refutes.
+- **Surviving:** the degree rises at **ℓ = 7**, or once **m·ℓ ≥ 21**.
+  Both fit all 56 draws of Results 12 and 13. They differ first at m = 4,
+  ℓ = 6, which this container cannot reach: there are almost no
+  unsatisfiable draws at surplus ≤ −14 within 155k columns.
+- **Controls.** Q5 (XL never refutes at 4) and Q6 (work ratio 2.18–2.33)
+  hold again. Four satisfiable draws were replayed, and none was refuted.
+- **For ECC2K-130.** `RESEARCH_ECC2K130_DESCENT_DEGREE.md` §8: both
+  survivors put the m = 4 rise at ℓ ≤ 7, so the m = 4 degree-4 row is
+  contradicted.
+
+## Result 14: one fixed variable usually brings the ℓ = 7 draws back to degree 4
+
+`research/dreg_closure_specialise_20261017/` was pre-registered. It
+specialises the 8 m = 3, ℓ = 7 draws whose degree-4 closure does not refute
+(Result 12), one fixed variable or three, and reruns the closure.
+
+- **Registered verdict: uninformative for "max ℓ" vs "Σℓ".**
+  - The positive control is valid: fixing one coordinate per summand
+    refutes on 8 of 8.
+  - The null control is not: fixing one intermediate-point coordinate also
+    refutes, on 6 of 8.
+- **Descriptive.** Any single fixed variable lets degree 4 refute on 6 of 8
+  draws. The ℓ = 7 degree-4 failure is marginal.
+- **Both branches of one guess.** Both values of one guessed summand
+  coordinate refute on 5 of 8 draws. That is a one-guess, degree-4 hybrid
+  refutation: about 100k columns per branch, against about 760k–1M at
+  degree 5.
+- **The open question.** It is how many guesses degree 4 needs as ℓ grows.
+
 ## Reproducing
 
 ```sh
@@ -776,6 +949,12 @@ F4_F2_MAX_ROWS=2000000 F4_F2_MAX_COLS=200000 \
 - *Done (Result 9):* **the size of the growth.** `(10, 5)` refutes at
   exactly 7, one degree above 6. It needed a memory-budgeted dense switch
   and F5-criterion rows.
+- *Done (Result 10):* **`m = 4`**, the decomposition size ECC2K-130's
+  floor needs. It reads `ℓ + 4` at `ℓ ≤ 2`, one above `m = 3`, and ≥7 at
+  `ℓ = 3`.
+- **Next: `m = 4` at `ℓ = 3` and degree 7**, which tells whether its slope
+  stays at one per `ℓ`. `(9, 3)`'s degree-7 matrix is about 2.1M × 2.8M,
+  so it needs a large host, like `(15, 5)` below.
 - **Next: `(15, 5)` at degree 7**, the cell where the semi-regular
   reference (8) and a degree levelled off at 7 disagree.
   - At `(10, 5)`'s F5 fraction and band-7 rank ratio, its block after

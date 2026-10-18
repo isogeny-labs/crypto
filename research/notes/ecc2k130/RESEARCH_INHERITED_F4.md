@@ -458,6 +458,66 @@ are shared with the parent — and none of it moved a word operation.  The
 `27%` readback the predecessor note found is gone with the matrices it read
 from.
 
+### 4.1 The work outside the unit (2026-10-05)
+
+By the `E_0` ladder of the F6-IC round (`m = 3` chains, cubic Macaulay
+degree), the engine had moved on from the quadratic rungs above. On
+`icv1-f2m19-t797-b6cf2467`, one whole-process `ecbench exec` of the
+inherited-F4 arm ran about **120 instructions per counted word XOR**. The
+unit sees almost none of the machine work. A Callgrind profile of one
+frozen run placed it in the per-bit column remap of `rewrite` (19%), in
+`insert` (18%, including the counted XORs), in sorting for completion rows
+and layout extension (~13%), in allocation (~8%), in `specialise_shared`'s
+own bookkeeping (8%) and in substituting the system at every node (5%).
+
+The round `research/inherited_f4_overhead_20261005` removed most of the
+sorting and three of the four hash lookups per completion monomial
+(`CompletionBatch`), merged new columns into the sorted layout instead of
+re-sorting it, inlined the pivot is-current test, and vectorised the pivot
+XOR. It was preregistered, and gated on byte-identical outputs on 48 frozen
+inputs: ladder rounds at m = 13, 19 and 23 and fresh holdouts at m = 13 and
+19. On them the candidate runs these fractions of the baseline's
+instructions:
+
+| arm | m = 13 | m = 19 |
+| :-- | --: | --: |
+| inherited F4 | 0.863 | 0.793 |
+| F6-IC | 0.947 | 0.917 |
+
+That is 0.847 on the confirmatory m = 19 inputs, against a preregistered
+0.90. At m = 19 the inherited arm now runs about 95 instructions per word
+XOR. **Class: engineering, outside the unit.** Every counted operation, and
+so every `S`, is identical. Rejected: a branch-free sink-word scatter in
+`rewrite`, which cost 2.5 × 10⁹ more instructions than it saved. What remains
+is the remap, the re-reduction, allocation and substitution, in that
+order.
+
+### 4.2 The remap a word at a time: measured, superseded (2026-10-07)
+
+A second preregistered round, `research/inherited_f4_remap_20261007`,
+went after `rewrite`'s remap:
+
+- **Masks.** Every layout map got per-word live masks.
+- **Deletion steps.** A word whose kept columns land on consecutive
+  targets moved with one BMI2 `pext` and a shift.
+- **Everything else** went bit by bit, without visiting deleted bits.
+
+Against its baseline (`main` at `a3652edd`) it passed its rule. All 60
+frozen inputs gave identical outputs, and the confirmatory m = 19
+instruction ratio was 0.923 against a preregistered 0.97 (inherited F4 0.936,
+F6-IC 0.907 at m = 19; 0.984 and 0.978 at m = 13).
+
+It was **not merged**. While it waited on a Conductor reservation, `main`
+gained a more general word-wise rewrite (#1646: `pext`/`pdep` segment plans
+for every map, folds and composed maps included) and eager row rewrites
+(#1671). Rebuilt from `main` at `7666b708e`, that engine runs fewer
+instructions than the round-2 candidate at m = 19 (L19 seq 25: 46.2 against
+48.8 × 10⁹; L19 seq 24: 27.8 against 30.9 × 10⁹) and more at m = 13
+(L13 seq 25: 2.29 against 2.19 × 10⁹). Its counted `solver_ops` also differ
+from the round-2 baseline, so that comparison is not a gated A/B. The round's
+protocol, raw results, unmerged diff and run report are kept in its
+directory.
+
 ## 5. What this does not establish
 
 Per `AGENTS.md` §8, and because the number is large enough to tempt:

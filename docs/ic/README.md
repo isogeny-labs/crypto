@@ -7,6 +7,10 @@ accepts explicit K_0 curve parameters and points through degree 131, with durabl
 pair tables, relations and precomputation. See [Fixed parameters](FIXED_PARAMETERS.md).
 The older inspection command uses imported points for mathematical validation.
 
+**Factor-base encyclopedia:** [factor-base-encyclopedia/README.md](factor-base-encyclopedia/README.md) describes every factor base tried here and in crypto-autoresearcher (definition, existence, build cost, oracle, measured results, verdict), starting with the PKM Kummer-coset (P-224 shape) and isogeny-chain (P-192 shape) towers; PDF in the same directory.
+
+**Technique inventory:** [ECDLP_RESEARCH_TECHNIQUES.md](ECDLP_RESEARCH_TECHNIQUES.md) maps factor-base, relation, filtering, sparse-linear-algebra, and individual-logarithm research techniques to their native modules and labels each as integrated, experimental, component, or backlog.
+
 **Agent scoreboard:** per-stage records and next targets to beat live in
 [`BOUNDARY_TARGETS.md`](BOUNDARY_TARGETS.md) and
 [`boundary_targets.json`](boundary_targets.json) (binary, Koblitz, prime;
@@ -299,9 +303,26 @@ target then needs one or two relations. The `logs` trial budget
 relation set; a base whose coverage cannot determine every column
 reports `incomplete` rather than emitting an unverified database.
 
-### Linear algebra: relation filtering and block Wiedemann
+## Primary one-target comparison
+
+For an IC-versus-rho speedup claim, the measured workload is one previously
+unseen public target point, and both algorithms solve that exact point. The IC
+clock starts at the first target-dependent step after reusable curve, base,
+index, and factor-log preparation is ready. The rho clock starts at its first
+target-dependent walk step. Both clocks stop after scalar recovery and
+independent verification. Exclude process launch, input loading, target
+fixture generation, and target-independent preparation from these online
+times; report setup separately when useful. Do not replace this result with
+batch throughput, a multi-target average, or shared-table amortization. Those
+are secondary measurements for a separately stated question.
+
+The `--batch` execution knob in the option list describes internal target scheduling. It
+does not change the primary workload definition: submit exactly one target
+when measuring the one-target online comparison.
+### Linear algebra: filtering, block Wiedemann, and block Lanczos
 
     ./target/release/ic logs --degree 31 --curve-a 0 --summands 3 --factor-base fb31.json --database logs31.json --linear-algebra sparse --block-size 4
+    ./target/release/ic logs --degree 31 --curve-a 0 --summands 3 --factor-base fb31.json --database logs31-lanczos.json --linear-algebra sparse --sparse-solver block-lanczos --block-size 4 --spmv sharded --spmv-shards 8
     ./target/release/ic logs --degree 31 --curve-a 0 --summands 3 --factor-base fb31.json --database logs31.json --linear-algebra dense
 
 Each relation has at most `m` nonzero entries, so the relation matrix is
@@ -317,12 +338,30 @@ sparse in exactly the way a number-field-sieve matrix is. By default
    recorded, so the eliminated logarithms are reconstructed exactly from
    the core solution (back-substitution, then propagation through the
    original rows, then a small dense residual if anything is left).
-2. **Block Wiedemann** — the reduced core is made square by folding its
+2. **Black-box core solve** — block Wiedemann (the default) makes the
+   reduced core square by folding its
    excess rows into random earlier rows, homogenised to `M (x, 1)ᵀ = 0`,
    and a kernel vector is read off the Krylov sequence `X Mⁱ Y` of
    `block_size × block_size` blocks through a matrix Berlekamp–Massey
    step (a shifted minimal approximant basis). Only sparse
-   matrix-times-block products touch the matrix, in parallel over rows.
+   matrix-times-block products touch the matrix. `--sparse-solver
+   block-lanczos` instead runs finite-field block Lanczos on the symmetric
+   congruence `A^T D A`; it retries on breakdown and still verifies `A x = b`.
+   Products select `auto`, `serial`, `rayon`, deterministic `sharded`, or
+   `worker` execution with `--spmv`. A worker speaks the CPU-verified `SPMV1`
+   contract in `gpu/spmv`; set `IC_SPMV_WORKER` to the host, CUDA, or cluster
+   launcher executable. Worker failure emits a warning and falls back to the
+   serial CPU product.
+
+The filter before the Krylov solve is selected with `--filter-strategy`:
+`cado` (the default) runs CADO-NFS's filter as ported into
+`koblitz_sparse_la` (`FilterOptions::cado()`: whole-clique purge under
+Bouvier's Ω₃₁ weight over up to 50 steps, then Markowitz-ordered merges along
+minimum spanning trees up to an average row weight of 100); `legacy` runs the
+historical filter described above. On synthetic m = 3 systems of 262,144
+columns the `cado` filter's whole solve is about 10× faster than `legacy` and
+about 1.9× faster than CADO-NFS's own pipeline; below about 4,096 columns it is
+slower by milliseconds (`research/la_engines_20261014`).
 
 The sparse path never attempts a solve before every column occurs in
 some row, and the solution is checked against every relation before
@@ -331,7 +370,8 @@ keeps the reference behaviour: full big-integer elimination after every
 new relation. Both paths certify the same database (the `ic` tests
 compare them); the report's `linear_algebra` object records the mode,
 the attempts, the time, and for the sparse path the filtering counts
-and the Wiedemann run (`core_dimension`, `sequence_length`, products).
+and the configured solver/SpMV backend plus the selected Wiedemann or Lanczos
+run (`core_dimension`, iterations or sequence length, and products).
 
 ## Running the pipeline as a resumable workflow
 
@@ -430,7 +470,10 @@ A parameter file (schema_version 1):
     {"schema_version":1,"name":"icv1-f2m31-tm90707-c95f16f5","curve":{"degree":31,"curve_a":0},
      "summands":3,"solver":"pair_table","seed":1,"max_trials":200000,
      "linear_algebra":{"mode":"sparse",
-                       "sparse":{"wiedemann":{"block_m":4,"block_n":4},
+                       "sparse":{"solver":"block-wiedemann",
+                                 "spmv":{"backend":"auto","shards":0},
+                                 "wiedemann":{"block_m":4,"block_n":4},
+                                 "lanczos":{"block_size":4,"margin":8},
                                  "filter":{"target_excess":32,"merge_max_weight":8}}},
      "collection":{"unit_trials":4096,"units":4,"max_units":64},
      "factor_base":{"mode":"search","family":"divisor","min_dimension":5,
@@ -450,8 +493,8 @@ without child validation). Each target is a synthetic known-answer
 instance: `known_log` names the scalar, `random_seed` draws one
 reproducibly. Solver is `pair_table` (default), `enumerate`, `groebner`
 or `sat`. `linear_algebra` is optional: `mode` is `sparse` (default;
-filtering + block Wiedemann, with every knob of the sparse solver under
-`sparse`) or `dense`. `collection` sizes the work units (above). The
+filtering plus block Wiedemann or block Lanczos, with every solver and SpMV
+knob under `sparse`) or `dense`. `collection` sizes the work units (above). The
 report lists every stage with whether it ran or was reused — the collect
 stage with its units, the logs stage with its verification counts and
 linear-algebra statistics — and every solution with its expected and
@@ -547,9 +590,69 @@ The control that the counts are the workflow's own is
 `research/ic_exponent_20260926/control.py`, which compares a price
 report with `ic workflow`'s report and relation files, field by field.
 
+### SECG curves and `ic prime`
+
+`ic list` names **every SECG curve in the repository's standards database**
+(`docs/curves/standards/parameters.json`, read by
+`src/cryptanalysis/secg_standards.rs`): `secp112r1` … `secp521r1` and
+`sect113r1` … `sect571r1`, including `sect113r1`, `sect113r2`, `sect163r1`,
+`sect163r2` and `secp160k1/r1/r2`. `ic inspect --curve sect113r1` (or `ic
+sect113r1`) checks the order, the modulus or reduction polynomial,
+nonsingularity, that the generator is on the curve and that `[r]G = O`; the
+cardinality check is reported as not implemented for these curves.
+`secp192r1` is also `p192`, `nist-p192`, `p-192`.
+
+`search`, `run`, `logs`, `solve` and `workflow` are binary Koblitz pipelines.
+`ic prime` is the one factor-base measurement that covers every SECG curve:
+it builds the **small-x** factor base (the points with the smallest abscissae
+`x = 0, 1, 2, …` on the curve, both signs) and reports the probability that a
+random subgroup element is a signed sum of two base points, **exactly**. A base
+of `B` abscissae has `B²` pair-sum abscissae if none coincide, a target is
+covered when its abscissa is one, and the yield is `2·D/(n − 1)` for `D`
+distinct sum abscissae and `n` the order of the prime-order subgroup. `ic prime`
+computes `D` from every pair sum, checks it by Monte Carlo on random subgroup
+elements, and plants decompositions that must be detected and recovered.
+
+    ic prime --size 4096                       # P-192: exact yield 2^-167.0, 0 collisions
+    ic prime --curve sect113r1 --size 4096     # binary, cofactor 2
+    ic prime --curve sect163r2 --size 4096
+    ic prime --curve secp160r1 --size 4096     # prime, 160 bits
+    ic prime --curve sect571r1 --size 4096 --trials 100000
+    ic prime --curve toy:20,7,4 --size 512     # toy prime with cofactor 4: exact count against Monte Carlo hits
+    ic prime --curve toy-binary:17,7,4 --size 128   # toy binary curve, cofactor 4
+
+Fields: primes up to 521 bits (3, 4, 6 or 9 limbs of Montgomery arithmetic;
+Tonelli–Shanks when `p ≡ 1 mod 4`) and binary fields up to degree 571 (2, 3, 4,
+5, 7 or 9 limbs). The base is capped at 8192 abscissae and lower where the
+pair-sum keys would not fit in memory (`secp521r1`, `sect571k1/r1` stop at 4096).
+
+**Cofactor.** Every SECG binary curve has `h = 2` or `4`, and `secp112r2`,
+`secp128r2` have `h = 4`. A relation is a relation in the subgroup `⟨G⟩`, so
+each small-x point `P` enters the base as `[h]P` and a target is `[h]` of a
+uniform point; the yield is over that subgroup. `--raw-samples N` samples the
+share of raw small-x pair sums (no `[h]`) that lands in `⟨G⟩`: 1/h on nine of
+ten curves measured, which is the factor the raw variant loses.
+
+**Cost of a trial.** `--s3-trials N` decides `N` random subgroup targets by
+solving Semaev's `S₃(x₁, x₂, X) = 0` for `x₂` at every base abscissa (a
+quadratic each), checks every decision against the pair-sum table, plants
+decompositions that must be found, and times it against the table lookup and
+against Pollard rho on the same machine:
+
+    ic prime --curve sect163r2 --size 4096 --trials 1000 --s3-trials 20
+
+At `B = 4096` a target costs 5.4 ms on `sect113r1`, 9.6 ms on `sect163r2` and
+42 ms on `secp160r1`; collecting `B + 1` relations that way is 52, 77 and 79 bits
+slower than rho (52 to 280 bits over the 33 curves).
+
+On P-192 the yield is `2B²/(n − 1)`, from 2⁻¹⁷⁵ (`B = 256`) to 2⁻¹⁶⁵
+(`B = 8192`). Two-point sums only; linear algebra and descent are not measured.
+Measurements and limits: `research/prime_small_x_p192_20261014/REPORT.pdf`
+(P-192) and `research/secg_small_x_20261014/REPORT.pdf` (all SECG curves).
+
 ### Choosing a factor base
 
-Five families are recipes (`ic search --family`): `factor`, `divisor`
+Five families are recipes, and `greedy` is a sixth that is opt-in (`ic search --family`): `factor`, `divisor`
 and `union` are linear — an invariant subspace, a divisor of `x^e − 1`,
 or a union of Frobenius translates of a seed span — and `subgroup` is
 not. The linear families exist because the algebraic oracles need them:
@@ -567,6 +670,29 @@ uses no logarithm: `[h]P` is in the subgroup whatever `P` is.
 
 Use it with the pair-table solver. `groebner` and `sat` need a linear
 domain and will refuse.
+
+`greedy` (opt-in, not part of `--family all`) chooses the signed Frobenius
+orbits instead of drawing them: at each step it adds the orbit that covers
+the most new subgroup targets as a sum of two base points. At equal columns
+and equal points it covered up to 18% more targets than random orbits where
+coverage was partial (`K₀/2¹³`, `K₀/2¹⁵`, `K₁/2¹⁷`), and cut the expected
+trials at the best column count by 8–18%; the gain vanishes once coverage
+saturates. Use it with the pair-table solver, like `subgroup`. Up to
+`r = 2²²` it scans the enumerated orbits (every orbit up to `r = 2¹⁷`, a
+sample of 64 per step above that, which keeps less of the gain). Above `2²²`
+a sampled selector takes over: it draws candidate orbits and tracks covered
+sums in a hashed set, with no enumeration, capped at 8192 points per base.
+Its measured advantage over random orbits shrinks as the subgroup grows (about
+1.09 at `r = 2¹⁶`, 1.04 at `2²¹`, 1.012 at `2²⁷·⁸`, and 1.000 at `2³⁹`), so past
+`r ≈ 2²⁸` use `subgroup`. Measurements and limits:
+`research/greedy_factor_base_yield_20261014/REPORT.pdf`; the end-to-end
+`search → run → logs → solve → workflow` record is
+`research/greedy_factor_base_yield_20261014/e2e/E2E.md`.
+
+A greedy selection is saved **frozen**: `ic search --spec-out` and the
+workflow's select stage write `{"kind":"explicit_orbits","abscissae":[…]}`
+(inside `pruned` where pruning applied) in place of the `greedy_coverage`
+recipe, so a recipe rebuilds in milliseconds instead of re-running the scan.
 
 **How big?** With a subgroup base the work per target falls as
 `r/|F|²` — four times cheaper per doubling — while the pair table grows
@@ -1113,13 +1239,41 @@ to child runs launched by compare.
 
 Selection time includes process startup, curve and factor-base
 construction, relation collection, matrix solving, verification, and
-report emission. Child completion is polled every 10 ms; very small
-timing differences should not be interpreted as meaningful. The report
-also includes the total comparison time, so selection and unsuccessful
-candidate costs remain visible. A selected candidate is a bounded
-observation, not a global optimum, scaling claim, or challenge result.
+report emission. This is an engineering-selection diagnostic and is not the
+primary one-target online metric above. Child completion is polled every 10
+ms; very small timing differences should not be interpreted as meaningful.
+The report also includes the total comparison time, so selection and
+unsuccessful candidate costs remain visible. A selected candidate is a
+bounded observation, not a global optimum, scaling claim, or challenge result.
 
 ## Reports and resource accounting
+
+Use `ic --verbose` (or `ic -v`) for a live, line-by-line trace:
+
+```sh
+ic run --degree 9 --solver enumerate --verbose
+ic workflow --params params.json --dir run-directory --verbose
+ic logs --degree 9 --database logs.json --verbose
+ic solve --degree 9 --logs logs.json --known-log 53 --verbose
+```
+
+Verbose `run` output includes elapsed time, factor-base and pair-table
+construction, batch starts, every trial's outcome (including unsuccessful
+attempts), relation counts, matrix dimensions and rank, and scalar
+verification. Parallel `run` batches report their outcomes in trial order
+after the batch completes; use `--batch 1` for one attempt at a time.
+Workflow collection reports each probe as its worker finishes, so probe IDs
+can appear out of order. Workflow descent and `solve` report each completed
+decomposition attempt; a found decomposition is verified before a target
+is reported solved. `logs` reports collection batches, coefficient rank,
+and the start and completion of linear algebra and column verification.
+Each trace line is flushed immediately, including when piped to `tee`.
+Verbose logging adds I/O work; use ordinary or JSON output for measurements.
+
+The flag is global and can appear before or after the subcommand. `--json`
+takes precedence over `--verbose` and suppresses the trace. Progress text
+does not enter saved reports or change the query stream, solver limits,
+or verification gates.
 
 Add --json for machine-readable output or --out PATH to save the JSON
 report while retaining the human progress display. Output files are

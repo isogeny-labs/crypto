@@ -69,18 +69,23 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 use num_bigint::BigUint;
 use num_traits::{ToPrimitive, Zero};
 use rand::{rngs::StdRng, Rng, SeedableRng};
+use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::binary_ecc::{BinaryPoint, F2mElement};
 
+use super::koblitz_greedy_base::{
+    build_greedy_coverage_factor_base, explicit_orbit_factor_base, MAX_SUBGROUP_ORDER,
+};
+use super::koblitz_greedy_sampled::MAX_SAMPLED_POINTS;
 use super::koblitz_groebner::{f4_word_ops_thread, FieldStructure, SolverEngine};
 use super::koblitz_index_calculus::{
-    build_frobenius_factor_base, build_frobenius_factor_base_from_divisor,
-    build_frobenius_union_factor_base, build_standard_subspace_factor_base,
-    build_subgroup_orbit_factor_base, cofactor_project_factor_base, groebner_decompose,
-    invariant_factors, projected_signed_orbit_count, restrict_factor_base_to_orbits,
-    saturate_factor_base_two_torsion, span_f2, top_factor_indices, FactorBaseDomain,
-    FrobeniusFactorBase, KoblitzCurve, PairSumTable,
+    all_factors_of_x_n_minus_1, build_frobenius_factor_base,
+    build_frobenius_factor_base_from_divisor, build_frobenius_union_factor_base,
+    build_standard_subspace_factor_base, build_subgroup_orbit_factor_base,
+    cofactor_project_factor_base, groebner_decompose, invariant_factors,
+    projected_signed_orbit_count, restrict_factor_base_to_orbits, saturate_factor_base_two_torsion,
+    span_f2, top_factor_indices, FactorBaseDomain, FrobeniusFactorBase, KoblitzCurve, PairSumTable,
 };
 
 // ── Specifications ─────────────────────────────────────────────────
@@ -136,6 +141,28 @@ pub enum FactorBaseSpec {
         /// Sampling stops once the base has at least this many points.
         points: usize,
     },
+    /// Signed Frobenius orbits of the prime-order subgroup, chosen one at
+    /// a time to cover the most new subgroup targets as sums of two base
+    /// points.  Same stopping rule as `SubgroupOrbits`; see
+    /// [`super::koblitz_greedy_base`] for the construction and why its
+    /// count is exact.  `pool` is the number of candidate orbits scored
+    /// per step (`0` scores all of them, and then `seed` has no effect).  Above
+    /// `MAX_SUBGROUP_ORDER` the sampled selector runs instead: `0` means 64
+    /// candidates drawn per step, and `seed` selects them.
+    GreedyCoverage {
+        /// Seed for the candidate sample; ignored when `pool` is `0`.
+        seed: u64,
+        /// Target point count, reached by whole orbits.
+        points: usize,
+        /// Candidate orbits scored per step, or `0` for all.
+        pool: usize,
+    },
+    /// The Frobenius orbits of these abscissae (polynomial-basis
+    /// bitmasks), one per orbit.  A frozen selection: `ic search` writes
+    /// this in place of `GreedyCoverage`, so a saved recipe rebuilds in
+    /// milliseconds and keeps meaning the same base if the selection rule
+    /// later changes.
+    ExplicitOrbits { abscissae: Vec<u64> },
     /// The parent base restricted to the signed Frobenius orbits whose
     /// canonical (smallest) abscissa is listed.
     Pruned {
@@ -154,6 +181,8 @@ impl FactorBaseSpec {
             Self::Divisor { .. } => "divisor",
             Self::FrobeniusUnion { .. } => "frobenius_union",
             Self::SubgroupOrbits { .. } => "subgroup_orbits",
+            Self::GreedyCoverage { .. } => "greedy_coverage",
+            Self::ExplicitOrbits { .. } => "explicit_orbits",
             Self::TwoTorsionSaturated { .. } => "two_torsion_saturated",
             Self::Pruned { .. } => "pruned",
         }
@@ -221,6 +250,10 @@ impl FactorBaseSpec {
             Self::SubgroupOrbits { seed, points } => {
                 build_subgroup_orbit_factor_base(kc, *seed, *points)
             }
+            Self::GreedyCoverage { seed, points, pool } => {
+                build_greedy_coverage_factor_base(kc, *points, *pool, *seed).map(|(fb, _)| fb)
+            }
+            Self::ExplicitOrbits { abscissae } => explicit_orbit_factor_base(kc, abscissae),
             Self::TwoTorsionSaturated { parent } => {
                 let inner = parent.materialize(kc)?;
                 saturate_factor_base_two_torsion(kc, &inner)
@@ -305,10 +338,38 @@ impl TargetSet {
             }
             (out, false)
         };
-        let points = scalars
-            .iter()
-            .map(|&k| kc.mul(g, &BigUint::from(k)))
-            .collect();
+        let points = match kc.fast_binary_curve() {
+            // One batched multi-scalar multiplication for the whole target
+            // set (two inversions per scalar bit for all targets together
+            // instead of ~1.5 per target per bit).  Bit-exact with the
+            // per-target scalar muls, so the census sees identical points.
+            Some(fast)
+                if kc.n <= 63
+                    && kc.curve.b == F2mElement::one(kc.n)
+                    && kc.curve.a == F2mElement::from_biguint(&BigUint::from(kc.a), kc.n) =>
+            {
+                let base = match g {
+                    BinaryPoint::Infinity => None,
+                    BinaryPoint::Affine { x, y } => Some((fast.word(x), fast.word(y))),
+                };
+                let bases = vec![base; scalars.len()];
+                let ks: Vec<BigUint> = scalars.iter().map(|&k| BigUint::from(k)).collect();
+                fast.batch_scalar_mul(&bases, &ks)
+                    .into_iter()
+                    .map(|p| match p {
+                        None => BinaryPoint::Infinity,
+                        Some((x, y)) => BinaryPoint::Affine {
+                            x: fast.element(x),
+                            y: fast.element(y),
+                        },
+                    })
+                    .collect()
+            }
+            _ => scalars
+                .iter()
+                .map(|&k| kc.mul(g, &BigUint::from(k)))
+                .collect(),
+        };
         Self {
             points,
             scalars,
@@ -537,6 +598,12 @@ pub fn greedy_prune(
 
 // ── Search ─────────────────────────────────────────────────────────
 
+/// Largest subgroup order for which the search scores every orbit at
+/// each greedy step; above it a sampled pool is used.
+const GREEDY_FULL_SCAN_ORDER: u64 = 1 << 17;
+/// Orbits scored per greedy step when the full scan is too slow.
+const GREEDY_SEARCH_POOL: usize = 64;
+
 /// Candidate families.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -551,6 +618,15 @@ pub enum Family {
     /// no linear structure, so only the pair-table oracle can use it —
     /// and it is the family that decomposes targets most often.
     Subgroup,
+    /// Signed Frobenius orbits chosen greedily to cover the most new
+    /// subgroup targets as sums of two base points
+    /// ([`super::koblitz_greedy_base`]).  Pair-table oracle only, like
+    /// `Subgroup`.  Up to `MAX_SUBGROUP_ORDER` the dense selector scans the
+    /// enumerated orbits; above it the sampled selector
+    /// ([`super::koblitz_greedy_sampled`]) draws candidates and caps a base
+    /// at `MAX_SAMPLED_POINTS`, and measures no gain once the subgroup is
+    /// much larger than the base can cover.
+    Greedy,
 }
 
 /// Search controls.
@@ -775,6 +851,93 @@ fn unscored(spec: FactorBaseSpec, reason: String, m: usize, n: u32) -> Candidate
     }
 }
 
+/// Exact-or-fail abscissa bound for a spec, without materialising.
+///
+/// A linear-subspace base over a full kernel has exactly `2^dim`
+/// abscissae, and saturation only adds abscissae — so for
+/// Factor/Divisor specs (and lower bounds through saturation parents)
+/// this is the exact count whenever the build would succeed, and
+/// `None` whenever validation could fail the build anyway
+/// (out-of-range or duplicate indices, degenerate degree, nonlinear
+/// families).  Callers skip materialisation only when the bound already
+/// exceeds their cap, which preserves every verdict: skipped specs
+/// could never have scored.
+fn spec_abscissa_bound(spec: &FactorBaseSpec, n: u32) -> Option<u64> {
+    let degree_of = |f: u64| -> u32 { 63 - f.leading_zeros() };
+    match spec {
+        FactorBaseSpec::Factor { index } => {
+            let f = *all_factors_of_x_n_minus_1(n).get(*index)?;
+            1u64.checked_shl(degree_of(f))
+        }
+        FactorBaseSpec::Divisor { indices } => {
+            let factors = all_factors_of_x_n_minus_1(n);
+            let mut sorted = indices.clone();
+            sorted.sort_unstable();
+            sorted.dedup();
+            if sorted.len() != indices.len() {
+                return None;
+            }
+            let mut total = 0u32;
+            for &i in indices {
+                total += degree_of(*factors.get(i)?);
+            }
+            if total == 0 || total >= n {
+                return None;
+            }
+            1u64.checked_shl(total)
+        }
+        FactorBaseSpec::StandardSubspace { dimension } => {
+            if *dimension == 0 || *dimension > 20 || *dimension >= n {
+                return None;
+            }
+            1u64.checked_shl(*dimension)
+        }
+        // A cofactor image can merge abscissae, so the parent bound is
+        // not a lower bound for the child; sampled orbits have no bound
+        // at all.
+        FactorBaseSpec::CofactorProjected { .. }
+        | FactorBaseSpec::SubgroupOrbits { .. }
+        | FactorBaseSpec::GreedyCoverage { .. }
+        | FactorBaseSpec::ExplicitOrbits { .. } => None,
+        // Saturation is monotone in abscissae (parent x-values are kept),
+        // so a parent bound is a lower bound for the child.
+        FactorBaseSpec::TwoTorsionSaturated { parent } => spec_abscissa_bound(parent, n),
+        FactorBaseSpec::FrobeniusUnion { .. } | FactorBaseSpec::Pruned { .. } => None,
+    }
+}
+
+/// Replace every greedy selection in `spec` by the orbits it chose.
+///
+/// The greedy scans the whole prime-order subgroup, which costs seconds on
+/// a degree-17 curve, and every consumer of a recipe would pay that again.
+/// A frozen spec names the same base by its orbits, so it materialises in
+/// milliseconds and does not change meaning if the rule is later improved.
+/// Specs with no greedy root are returned unchanged.
+pub fn freeze_spec(kc: &KoblitzCurve, spec: &FactorBaseSpec) -> Result<FactorBaseSpec, String> {
+    Ok(match spec {
+        FactorBaseSpec::GreedyCoverage { seed, points, pool } => {
+            let (_, report) = build_greedy_coverage_factor_base(kc, *points, *pool, *seed)?;
+            FactorBaseSpec::ExplicitOrbits {
+                abscissae: report.representatives,
+            }
+        }
+        FactorBaseSpec::Pruned {
+            parent,
+            retained_abscissa_orbits,
+        } => FactorBaseSpec::Pruned {
+            parent: Box::new(freeze_spec(kc, parent)?),
+            retained_abscissa_orbits: retained_abscissa_orbits.clone(),
+        },
+        FactorBaseSpec::TwoTorsionSaturated { parent } => FactorBaseSpec::TwoTorsionSaturated {
+            parent: Box::new(freeze_spec(kc, parent)?),
+        },
+        FactorBaseSpec::CofactorProjected { parent } => FactorBaseSpec::CofactorProjected {
+            parent: Box::new(freeze_spec(kc, parent)?),
+        },
+        other => other.clone(),
+    })
+}
+
 /// Score one spec on a target set.  With `prune` set, a pruned variant
 /// is appended when the greedy pass removes at least one orbit.
 pub fn evaluate_spec(
@@ -784,6 +947,21 @@ pub fn evaluate_spec(
     opts: &SearchOptions,
     prune: bool,
 ) -> Vec<Candidate> {
+    // Over-cap linear specs are skipped from their exact abscissa bound
+    // (a full kernel has exactly 2^dim abscissae) instead of
+    // materialising millions of points first.  Same verdict and message
+    // as the post-build cap check whenever the build would succeed; a
+    // degenerate kernel fails the build either way.
+    if let Some(bound) = spec_abscissa_bound(spec, kc.n) {
+        if bound > opts.max_abscissae as u64 {
+            return vec![unscored(
+                spec.clone(),
+                format!("{} abscissae exceed the cap {}", bound, opts.max_abscissae),
+                opts.m,
+                kc.n,
+            )];
+        }
+    }
     let build_start = std::time::Instant::now();
     let fb = match spec.materialize(kc) {
         Ok(fb) => fb,
@@ -819,7 +997,28 @@ pub fn evaluate_spec(
                     .collect(),
             };
             let pruned_start = std::time::Instant::now();
-            match pruned_spec.materialize(kc) {
+            // Restrict the in-hand base directly: identical to
+            // re-materialising the pruned recipe (same parent, same keep
+            // set without the abscissa round-trip) minus the full parent
+            // rebuild.  Falls back to the recipe path in the corners
+            // where direct restriction declines.
+            let restricted = restrict_factor_base_to_orbits(kc, &fb, &keep);
+            let materialized = restricted.map_or_else(
+                || pruned_spec.materialize(kc),
+                |pruned_fb| {
+                    // The direct restriction must agree with the recipe
+                    // path it replaces; re-check cheaply in debug builds.
+                    debug_assert_eq!(
+                        pruned_fb.points.len(),
+                        pruned_spec
+                            .materialize(kc)
+                            .map(|rebuilt| rebuilt.points.len())
+                            .unwrap_or(usize::MAX)
+                    );
+                    Ok(pruned_fb)
+                },
+            );
+            match materialized {
                 Ok(pruned_fb) => {
                     let ms = pruned_start.elapsed().as_secs_f64() * 1000.0;
                     let (c, _) = score_base(kc, pruned_spec, &pruned_fb, targets, opts, ms, steps);
@@ -909,7 +1108,7 @@ fn score_base(
 /// For an invariant subspace this is the divisibility test `(x+1) ∤ g`,
 /// but the base may be a union or a pruned set, so it is computed
 /// directly on the abscissae and holds for every family.
-fn subspace_is_trace_zero(kc: &KoblitzCurve, fb: &FrobeniusFactorBase) -> bool {
+pub fn subspace_is_trace_zero(kc: &KoblitzCurve, fb: &FrobeniusFactorBase) -> bool {
     fb.subspace.iter().all(|x| {
         let mut acc = x.clone();
         let mut cur = x.clone();
@@ -1099,6 +1298,31 @@ pub fn candidate_specs(kc: &KoblitzCurve, opts: &SearchOptions) -> Vec<FactorBas
             }
         }
     }
+    if opts.families.contains(&Family::Greedy) && kc.n < 64 {
+        // Same point budgets as the subgroup family, so the two line up.
+        // A full scan of every orbit is exact and seed-free; a sampled
+        // pool keeps the larger subgroups affordable.  Past the dense
+        // selector's cap the sampled selector takes over, and it has a
+        // cap of its own on the points of a base.
+        let order = kc.subgroup_order.to_u64();
+        let dense = order.is_some_and(|r| r <= MAX_SUBGROUP_ORDER);
+        let pool = match order {
+            Some(r) if r <= GREEDY_FULL_SCAN_ORDER => 0,
+            _ => GREEDY_SEARCH_POOL,
+        };
+        let (lo, hi) = opts.union_seed_dimensions;
+        for dim in lo.max(1)..=hi.min(12) {
+            let points = (1usize << dim) * kc.n as usize;
+            if points > 2 * opts.max_abscissae || (!dense && points > MAX_SAMPLED_POINTS) {
+                continue;
+            }
+            push(FactorBaseSpec::GreedyCoverage {
+                seed: opts.seed ^ (0x4752_4545_4459_0000 + dim as u64),
+                points,
+                pool,
+            });
+        }
+    }
     if opts.saturate && (&kc.cofactor % BigUint::from(2u32)).is_zero() {
         let base: Vec<FactorBaseSpec> = specs.clone();
         for spec in base {
@@ -1122,6 +1346,15 @@ pub fn search(kc: &KoblitzCurve, opts: &SearchOptions) -> SearchReport {
 
 /// [`search`] with a callback `(index, total, candidate)` after each
 /// spec is scored.
+///
+/// Specs are scored in parallel on the process-wide rayon pool; each
+/// spec is independent (fixed target set, deterministic scoring), so the
+/// only shared work is read-only.  Results are collected in spec order
+/// and the progress callback is replayed serially in that order, hence
+/// rankings, selections, and report ordering are identical to serial
+/// scoring — only wall time and the `*_ms` timing fields move.  (Nested
+/// parallelism is safe: the pair-table build inside scoring splits
+/// further on the same pool.)
 pub fn search_with_progress(
     kc: &KoblitzCurve,
     opts: &SearchOptions,
@@ -1130,9 +1363,17 @@ pub fn search_with_progress(
     let start = std::time::Instant::now();
     let targets = TargetSet::new(kc, opts.sample_targets, opts.exhaustive_cap, opts.seed);
     let specs = candidate_specs(kc, opts);
+    let mut scored: Vec<(usize, Vec<Candidate>)> = specs
+        .par_iter()
+        .enumerate()
+        .map(|(i, spec)| (i, evaluate_spec(kc, spec, &targets, opts, opts.prune)))
+        .collect();
+    // Rayon preserves encounter order, but sort explicitly: progress and
+    // ranking must never depend on thread scheduling.
+    scored.sort_by_key(|(i, _)| *i);
     let mut candidates = Vec::new();
-    for (i, spec) in specs.iter().enumerate() {
-        for candidate in evaluate_spec(kc, spec, &targets, opts, opts.prune) {
+    for (i, cs) in scored {
+        for candidate in cs {
             progress(i + 1, specs.len(), &candidate);
             candidates.push(candidate);
         }
@@ -1429,6 +1670,108 @@ mod tests {
             let text = serde_json::to_string(&pruned.spec).unwrap();
             let back: FactorBaseSpec = serde_json::from_str(&text).unwrap();
             assert_eq!(back, pruned.spec);
+        }
+    }
+
+    #[test]
+    fn over_cap_specs_skip_without_materialising() {
+        use crate::cryptanalysis::koblitz_index_calculus::order_of_2_mod_n;
+        // n = 41 has a degree-20 factor: 2^20 abscissae, far above any
+        // cap, previously built point by point before being discarded.
+        let kc = KoblitzCurve::new(0, 41).unwrap();
+        assert_eq!(order_of_2_mod_n(41), Some(20));
+        let targets = TargetSet::new(&kc, 8, 4096, 11);
+        let opts = SearchOptions {
+            m: 2,
+            max_abscissae: 2048,
+            ..SearchOptions::default()
+        };
+        for spec in [
+            FactorBaseSpec::Factor { index: 1 },
+            FactorBaseSpec::Divisor {
+                indices: vec![1, 2],
+            },
+            FactorBaseSpec::TwoTorsionSaturated {
+                parent: Box::new(FactorBaseSpec::Factor { index: 1 }),
+            },
+        ] {
+            let bound = spec_abscissa_bound(&spec, kc.n).expect("exact bound");
+            assert!(bound > opts.max_abscissae as u64, "{spec:?}");
+            let candidates = evaluate_spec(&kc, &spec, &targets, &opts, true);
+            assert_eq!(candidates.len(), 1);
+            assert!(candidates[0].expected_trials().is_infinite());
+            assert!(
+                candidates[0]
+                    .skipped
+                    .as_ref()
+                    .is_some_and(|s| s.contains("exceed the cap")),
+                "{spec:?}"
+            );
+        }
+        // A small spec still builds (no false skip); it may still be
+        // skipped for other exact reasons (e.g. cofactor classes), but
+        // never by the cap gate.
+        let small = FactorBaseSpec::Divisor { indices: vec![0] };
+        assert!(spec_abscissa_bound(&small, kc.n).unwrap() <= opts.max_abscissae as u64);
+        let candidates = evaluate_spec(&kc, &small, &targets, &opts, false);
+        assert!(!candidates.is_empty());
+        assert!(candidates[0]
+            .skipped
+            .as_ref()
+            .is_none_or(|s| !s.contains("exceed the cap")));
+    }
+
+    #[test]
+    fn direct_restrict_matches_recipe_rebuild() {
+        use crate::cryptanalysis::koblitz_index_calculus::saturate_factor_base_two_torsion;
+        // The in-hand restriction must equal the recipe round-trip on
+        // points, orbits, and locations — including through saturation.
+        let kc = KoblitzCurve::new(1, 15).unwrap();
+        let divisor = FactorBaseSpec::Divisor {
+            indices: vec![0, 1, 2],
+        };
+        let fb = divisor.materialize(&kc).unwrap();
+        let sat = saturate_factor_base_two_torsion(&kc, &fb).unwrap();
+        for (base, name) in [(&fb, "plain"), (&sat, "saturated")] {
+            let keep: Vec<usize> = (0..base.signed_orbits.len()).step_by(3).collect();
+            assert!(keep.len() < base.signed_orbits.len());
+            let direct = restrict_factor_base_to_orbits(&kc, base, &keep).unwrap();
+            let reps = base.signed_orbit_abscissa_representatives();
+            let recipe = FactorBaseSpec::Pruned {
+                parent: Box::new(divisor.clone()),
+                retained_abscissa_orbits: keep.iter().map(|&o| reps[o].to_u64().unwrap()).collect(),
+            };
+            // NOTE: recipe replays from the divisor parent, so compare
+            // against the plain base here only for `plain`; saturated
+            // needs its saturated parent.
+            let rebuilt = if name == "plain" {
+                recipe.materialize(&kc).unwrap()
+            } else {
+                let sat_spec = FactorBaseSpec::TwoTorsionSaturated {
+                    parent: Box::new(divisor.clone()),
+                };
+                let sat_parent = sat_spec.materialize(&kc).unwrap();
+                assert_eq!(sat_parent.points.len(), base.points.len());
+                let reps = sat_parent.signed_orbit_abscissa_representatives();
+                let recipe = FactorBaseSpec::Pruned {
+                    parent: Box::new(sat_spec),
+                    retained_abscissa_orbits: keep
+                        .iter()
+                        .map(|&o| reps[o].to_u64().unwrap())
+                        .collect(),
+                };
+                recipe.materialize(&kc).unwrap()
+            };
+            assert_eq!(direct.points, rebuilt.points, "{name}: points");
+            assert_eq!(
+                direct.signed_orbits, rebuilt.signed_orbits,
+                "{name}: orbits"
+            );
+            assert_eq!(direct.orbit_of, rebuilt.orbit_of, "{name}: orbit_of");
+            assert_eq!(
+                direct.signed_orbit_of, rebuilt.signed_orbit_of,
+                "{name}: signed_orbit_of"
+            );
         }
     }
 

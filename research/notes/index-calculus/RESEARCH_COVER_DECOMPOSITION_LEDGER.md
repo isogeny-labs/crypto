@@ -139,13 +139,13 @@ None of the four touched the group arithmetic or the transfer, which the tests c
 
 **Class:** reproduction and measurement of a published route inside the harness: **accounting and engineering, no advance** (the algorithm is [JV12]'s).  What the harness adds is the crossover in its own unit.
 
-**The boundary statement.**  On the weak class `y² = h(x)(x − α)(x − σα)` over `F_{p⁶}`, `S / rho` was measured falling as `n^{−0.32}` to `≈ 9×` at `ℓ = 2^{58}` and extrapolates to parity near `ℓ = 2^{67}`; on every generic curve of the ledger it does not (`k = 3` never, `k = 4` Joux–Vitse never, `k = 5` above `2^{200}`).  The route's cost is `720·p/2` tests of `5·10⁶` multiplications against rho's `p³/2` additions of `331`: parity is where `p² ≈ 720·C_cov/(ρ_S·c_add)`.
+**The boundary statement** (as first written, 2026-10-03; amended 2026-10-04).  On the weak class `y² = h(x)(x − α)(x − σα)` over `F_{p⁶}`, `S / rho` was measured falling as `n^{−0.32}` to `≈ 9×` at `ℓ = 2^{58}` and extrapolated to parity near `ℓ = 2^{67}`; on every generic curve of the ledger it does not (`k = 3` never, `k = 4` Joux–Vitse never, `k = 5` above `2^{200}`).  The route's cost is `720·p/2` tests of `5·10⁶` multiplications against rho's `p³/2` additions of `331`: parity is where `p² ≈ 720·C_cov/(ρ_S·c_add)`.  **Since then:** the test costs `1.6·10⁶` (§§10, 12; `2.4–3.0×` at `2^{58}`, parity extrapolated near `2^{62}`), and with the sieved relation phase of §11 the crossover is *measured* at `p ≈ 430` (`ℓ ≈ 2^{50}`), the route reading `0.012–0.014×` rho at `ℓ = 2^{61.4}`; §13 prices the walk that reaches the class at more than rho below `p ≈ 8,000`.
 
 **Not measured, and not to be read into the numbers:**
 
 - The isogeny walk to a weak curve.  The class has `Θ(q²)` of `Θ(q³)` curves over `F_{q³}`, all of order divisible by `4`; [JV12] estimate `≈ q = p²` isogeny steps for a generic curve of such order (cited, conjectural) — at `p ≈ 3,000` that is `10⁷` steps, none priced here.  A curve not of the form, of prime order, is not touched.  **Priced in §13 (2026-10-04):** the class is `3/q` of the curves with full 2-torsion (a cross-ratio of norm one), a 2,3-isogeny step costs `3–7·10⁵` multiplications, and a walk of `q/3` steps is above rho below `p ≈ 8,000`; no walk of that round sampled a whole class.
-- Any size at which the crossover itself occurs (`ℓ ≈ 2^{67}`, above the harness's range), and any curve outside `F_{p⁶}`.
-- The sieving variant (P6): [JV12] report `960×` per relation against Nagao tests in their C, which would move `p*` down by `≈ √960`; cited, not built, and not a measurement of this repository.
+- Any size above `ℓ = 2^{61.4}` (the crossover of the Nagao-relation route, extrapolated near `2^{62}`, was not run; the sieved route's crossover at `ℓ ≈ 2^{50}` was), and any curve outside `F_{p⁶}`.
+- The sieving variant (P6): [JV12] report `960×` per relation against Nagao tests in their C.  **Built and measured in §11 (2026-10-04):** `720·C_cov / C_rel = 566` in this unit, the crossover with rho measured at `p ≈ 430`; a reproduction, not a measurement of theirs.
 - Anything about a deployed curve: prime-field curves and extension-field curves of prime order outside this form are untouched, and nothing here is a claim about them.
 
 ---
@@ -556,3 +556,901 @@ this round sampled a whole isogeny class.*  Nothing about a generic or
 deployed curve follows: a curve of order divisible by `4` is in the walk's
 reach only through its class, and the class's weak members are `3/q` of its
 full-2-torsion curves.
+
+## 14. Engineering after the fact: the sieve's line enumeration, registered before it is built (2026-10-04)
+
+§11.5 found the enumeration of the lines — factoring `Im(B²h)` for every
+`B` — to be `70–80 %` of the relation phase at `m = 9`, the sieve's own
+steps `15–25 %`.  Measured before building (`probe_enumeration_breakdown`,
+`3,000` `B`'s at `p = 1009` and `1511`, seed 1, `m = 9`), the multiplications
+per `B` go as follows:
+
+| step | `p = 1009` | `p = 1511` | note |
+|:--|--:|--:|:--|
+| `B²h` over `F_q` | `140` | `140` | |
+| squarefree decomposition (Yun) | `300` | `300` | the polynomial is squarefree for every `B` seen |
+| linear factors by evaluation | `86` | `87` | plus `8,100` / `12,100` additions |
+| `x^p mod G` (right-to-left square-and-multiply) | `1,181` | `1,282` | |
+| Frobenius columns and powers | `765` | `757` | |
+| distinct-degree gcds | `341` | `344` | |
+| Cantor–Zassenhaus (EDF) | `1,120` | `1,195` | runs on `19 % / 17 %` of the `B`'s, `≈ 6,500` per run |
+| divisors and line polynomials | `132` | `131` | |
+| **total** (`lines_for_b`) | **`4,207`** | **`4,387`** | `0.50 / 0.48` lines per `B`; `34 % / 32 %` of the `B`'s have a line |
+
+Three things are avoidable without changing a single line that is sieved:
+
+- **EDF is run on groups that no line needs.**  A degree-`m₁` divisor uses a
+  strict sub-multiple of a distinct-degree group (`j` of its `k` irreducibles
+  of degree `d`, `0 < j < k`) on only `8 % / 7 %` of the `B`'s; on the other
+  `11 % / 10 %` the group is used whole or not at all and its product is
+  all the enumeration needs.  Splitting a group only when a reachability
+  pass over the other factors' degrees says a line needs it removes more
+  than half of the EDF runs.
+- **EDF recomputes the Frobenius it already has.**  The group `g` divides
+  the root-free cofactor `z`, so `x^{p^i} mod g` is `x^{p^i} mod z` reduced
+  mod `g`, which the distinct-degree step has; with it, the Frobenius trace
+  `r + r^p + ⋯ + r^{p^{d−1}}` of a random `r` costs `(d − 1)·deg(g)²`
+  multiplications and the exponent falls from `(p^d − 1)/2` to `(p − 1)/2`:
+  `d×` fewer modular squarings.
+- **`x^p mod z` multiplies by `x`.**  Left-to-right binary exponentiation
+  squares the accumulator and multiplies it by `x`, a shift and one
+  reduction (`deg z` multiplications) instead of a product with a full
+  polynomial; squaring itself costs `deg(deg + 1)/2` cross products rather
+  than `deg²`.
+
+And one thing about the run's policy, not its cost per `B`: §11.5's rule
+for `m` (`p^{m−6}/m! ≥ 1.25·|F|`) over-counts what a `B`-space yields (it
+assumes one line per `B` and the full rate `p/m!`; the measured values are
+`0.5` lines per `B` for `m` odd, `1.0` for `m` even, and a rate of `0.45–1.4`
+times `p/m!` by instance, `0.9` on average), so at `p = 503` it started at
+`m = 9` and found that space short, and at `p = 251` and `101` it started at
+`m = 10` and `11`, skipping the `m = 9` and `m = 10` lines, which exist at
+every size and are the cheapest relations there are.  The honest policy is
+to **climb from `m = 9`**: sieve every line of the smallest `m`, then the
+next, until the count is reached.  The rule's estimate stays in the report
+as a prediction (`relations_estimate`, with the measured constants) and no
+longer sets where the run starts.
+
+### 14.1 Predictions and falsification lines
+
+**P12.  Enumeration per `B`.**  With the three changes the enumeration
+costs `2,600–3,100` multiplications per `B` at `p = 1009–1511` (`1.4–1.6×`
+below the table), the lines found for every `B` being *the same set*
+(`A₀`, `A₁′`, `B`) as before, bit for bit.  *Falsified if* the per-`B` cost is
+above `3,300` or below `2,300`, or any `B` of a `10,000`-`B` sample yields a
+different set of lines.
+
+**P13.  `C_rel` and `S / rho`.**  `C_rel` at `m = 9` falls by `1.25–1.45×`
+(`p = 1009, 1511`), `S / rho` at `p = 1511` by `8–15 %` and at `p = 1009` by
+`10–20 %` (the relation phase is `27–47 %` of `S` with the descent replaying
+§12's trace), and the measured crossover stays in `[400, 460]`.  *Falsified
+if* `C_rel` at `m = 9` falls by less than `1.15×` or more than `1.6×`, or
+`S / rho` rises at any size.
+
+**P14.  Climbing from `m = 9`.**  At `p ≥ 1009` nothing changes (`m = 9`
+suffices).  At `p = 503` the run is the same as §11.5's fallback.  At
+`p = 251` the `m = 9` and `m = 10` lines supply `≈ 20` and `≈ 100` of the
+`≈ 160` relations at `≈ 10×` and `1×` below the `m = 10`-only cost, so the
+relation phase falls by `10–25 %`; at `p = 101` (`m = 9, 10, 11`) by
+`5–20 %`.  The lower-`m` lines cost at most their `B`-space times the
+per-`B` cost above, `< 5 %` of the phase at every size.  *Falsified if* the
+relation phase at `p = 251` rises, or falls by more than `40 %`.
+
+**P15.  The estimate (accounting).**  `relations_estimate = |B-space(m)| ·
+lines_per_B(m) · 0.9·p/m!` is within `[0.5, 2]×` of the relations the run
+finds at every `m` it exhausts.  *Falsified if* outside that band at any
+`(p, m)` with at least `50` relations found at that `m`.
+
+### 14.2 Inadmissible moves
+
+Dropping a line because its group would need splitting; changing the
+counting unit (a squaring is `d(d + 1)/2` multiplications, a reduction
+`deg` per step, an inversion `16`, as everywhere in this note); changing
+the sieve, the descent, the linear algebra or the rho reference; choosing
+the instance.
+
+### 14.3 Class (registered)
+
+**Engineering**: a constant on the enumeration and a policy that sieves the
+cheapest lines first.  The exponent, the class and §9 are untouched; the
+measured crossover of §11.5 may move within its registered band and no
+further.
+
+### 14.4 Measured (2026-10-04; `experiments/35_jv_cover_sieve_enum_*.json`, ledger section F.3)
+
+Built as registered, in `jv_sieve.rs`: `FpRing::factor_lazy` (the
+distinct-degree groups of the root-free cofactor, a group split by
+`edf_frob` — Cantor–Zassenhaus on the Frobenius columns the distinct-degree
+step computed, the trace by `d − 1` matrix products and one exponent
+`(p − 1)/2` — only when the reachability pass over the other factors'
+degrees finds a line that would use part of it), `powmod_x` (left to right,
+a squaring at `n(n + 1)/2` and a shift), and the run climbing from `m = 9`.
+The lines are the same: over `4,000` `B`'s at `p = 1009` (`m = 9` and `10`)
+the lazy and the full factorisation give the same `(A₀, A₁′)` sets, and
+every end-to-end run below found the same relation count from the same
+`B`'s as §11.5's.  The same seeds, sizes and rho references as §11.5, the
+descent replaying §12's trace:
+
+| `p` | seed | `m` climbed | relations by `m` | enum per `B`, §11.5 → §14 | `C_rel`, §11.5 → §14 | relation phase, §11.5 → §14 | `S / rho`, §12 → §14 |
+|--:|--:|:--|:--|:--|:--|:--|:--|
+| 251 | 1 | 9 → 10 | 24 at 9, 106 at 10 | `4,251 → 3,084` | `8.7·10⁷ → 5.4·10⁷` (`1.61×`) | `1.14·10¹⁰ → 7.0·10⁹` (`1.63×`) | `3.19`† → `1.91` |
+| 251 | 2 | 9 → 10 | 12 at 9, 112 at 10 | `4,278 → 3,112` | `1.27·10⁸ → 8.9·10⁷` (`1.43×`) | `1.59·10¹⁰ → 1.10·10¹⁰` (`1.44×`) | `8.50`† → `5.36` |
+| 503 | 1 | 9 → 10 | 78 at 9, 160 at 10 | `4,570 → 3,216` | `6.8·10⁷ → 5.3·10⁷` (`1.29×`) | `1.61·10¹⁰ → 1.25·10¹⁰` (`1.29×`) | `0.792 → 0.666` (`1.19×`) |
+| 503 | 2 | 9 → 10 | 250 at 9, 13 at 10 | `3,877 → 2,625` | `6.0·10⁶ → 4.5·10⁶` (`1.33×`) | `1.59·10⁹ → 1.19·10⁹` (`1.33×`) | `0.0838 → 0.0700` (`1.20×`) |
+| 1009 | 1 | 9 | 488 | `4,002 → 2,572` | `5.9·10⁶ → 4.4·10⁶` (`1.35×`) | `2.88·10⁹ → 2.14·10⁹` (`1.35×`) | `0.0253 → 0.0221` (`1.15×`) |
+| 1009 | 2 | 9 | 528 | `3,953 → 2,549` | `3.9·10⁶ → 2.9·10⁶` (`1.33×`) | `2.06·10⁹ → 1.55·10⁹` (`1.33×`) | `0.0375 → 0.0353` (`1.06×`) |
+| 1511 | 1 | 9 | 770 | `4,154 → 2,631` | `3.0·10⁶ → 2.3·10⁶` (`1.30×`) | `2.31·10⁹ → 1.78·10⁹` (`1.30×`) | `0.0075 → 0.0068` (`1.10×`) |
+| 1511 | 2 | 9 | 757 | `4,197 → 2,645` | `3.7·10⁶ → 2.9·10⁶` (`1.31×`) | `2.84·10⁹ → 2.16·10⁹` (`1.31×`) | `0.0086 → 0.0077` (`1.11×`) |
+
+† §11.5's own rows (`p = 251` was not rerun with the traced descent in
+§12).  All eight logarithms recovered and checked, `0` relations failing
+the group check, `0` duplicates; the descent replayed the trace on
+`98–99 %` of its tests.
+
+**Against the registration (§14.1):**
+
+| | registered | measured | |
+|:--|:--|:--|:--|
+| P12 enum per `B` | `2,600–3,100`, the same lines | `2,550–2,650` at `m = 9`; `3,080–3,220` on the runs that climbed to `m = 10` (the lazy pass saves less there: a degree-`5` divisor of a degree-`9` cofactor needs its groups split more often); the same lines, the same relation counts | holds (band `[2,300, 3,300]`) |
+| P13 `C_rel` at `m = 9` | `1.25–1.45×` | `1.30–1.35×` | holds |
+| P13 `S / rho` at `1511` | `8–15 %` lower | `10 %`, `11 %` | holds |
+| P13 `S / rho` at `1009` | `10–20 %` lower | `13 %`, **`6 %`** (seed 2: the descent is `75 %` of its `S`) | **misses on one seed** (not a falsification line) |
+| P13 crossover | stays in `[400, 460]` | **`p* ≈ 371`** (`ℓ ≈ 2^{49}`; `3.64` pooled at `251`, `0.368` at `503`) | **misses**: the registered band took §11.5's rows at `251`, whose descent was not yet traced; the traced descent and the climb move `251` by `1.6–1.7×` together, and the crossover with them |
+| P14 relation phase at `251` | `10–25 %` lower; falsified above `40 %` | `39 %`, `31 %` lower (`24` and `12` relations from the `m = 9` lines at `≈ 10×` below the `m = 10` cost, then the enumeration's `1.3×` on the rest) | holds, at the edge: the two effects were registered as if the climb alone moved the phase |
+| P15 the estimate | within `[0.5, 2]×` of what each exhausted `m` yielded | `1.22`, `0.61` at `251`; `1.58`, **`0.49`** at `503` | **misses by `0.01`** on the instance whose rate is `0.47` of `p/m!` (§11.5's instance effect, unexplained) |
+
+Four of the registered lines hold, two miss: the crossover band, because it
+was set on rows whose descent §12 later halved, and the estimate's band,
+by the width of the instance effect.  Neither moves the class.
+
+**What it is.**  A `1.6×` constant on the enumeration of the lines, `1.3×`
+on `C_rel`, `6–20 %` on `S / rho` where the descent dominates and
+`1.6–1.7×` at `p = 251` together with the traced descent; the measured
+crossover is now `p* ≈ 371` (`ℓ ≈ 2^{49}`), inside §11.2's registered band
+`[280, 420]` where §11.5's `427` was just outside it.  The sieve's own steps
+(`6.3` multiplications a base step, `≈ 1.1·10⁶` per relation at `m = 9`)
+are now `45–50 %` of `C_rel` and the floor of this design.  Class:
+**engineering**; §9 is untouched.
+
+**`p = 101`** (seed 1, `35_jv_cover_sieve_enum_101.json`, rho measured in the
+run): the climb found `0` relations from the `m = 9` lines (`5,354` of them),
+`7` from `m = 10` (`5.4·10⁵` lines) and `45` from `m = 11`; `S / rho` `1,360`
+against §11.5's `1,977` (`S⁺ / rho` `2,183` against `2,902`), the relation phase
+`1.45×` lower where P14 said `5–20 %` — the `m = 10` lines are worth more
+than registered, their `7` relations costing `≈ 10×` less each than `m = 11`'s.
+Seed 2 (`35_jv_cover_sieve_enum_101_seed2.log`, no JSON) hit the same
+90-minute budget as in §11.5, at `38` of `49` relations: `0` from `m = 9`, `6`
+from `m = 10`, `21` from `m = 11` (its `1.05·10⁸` `B`'s exhausted) and `11` from
+`m = 12` in `2.8·10¹²` multiplications; `S / rho ≥ 12,400` against seed 1's rho
+(`1.501`), a lower bound like §11.5's `≥ 7,560` and not comparable to it as a
+cost (both runs are dominated by `m = 12` lines, whose relations cost
+`≈ 10¹¹` each at this size).  The instance's small factor base (`49`
+columns) is the whole story at `p = 101`, as P10 registered.
+
+## 15. The rho reference measured at the top sizes (2026-10-04; `experiments/36_jv_cover_rho_dp_*.json`)
+
+Every `S / rho` row above `p = 251` divides by a rho reference pooled from
+the smaller sizes (`1.361 ± 0.070` over `72` walks, the `*` of the ledger's
+tables), because the harness's rho stores its whole walk and the table
+does not fit above `ℓ ≈ 2^{46}`.  A reader asked whether `0.0068×` at
+`p = 1511` was too good to be true, and the pooled reference was the one
+input not measured on that instance.  `rho_e_dp` is the same `r`-adding
+walk without the stored points: four walkers from random starts, a point
+distinguished when `dp_bits` bits of its mixed hash vanish, the
+distinguished points shared; every group operation of every walker is
+charged, the walk's multipliers once per walker.  At `p = 251` it finds
+the logarithm with `S = 2.58, 0.98, 2.09, 2.02` over four runs, inside the stored
+walk's spread on the same instance (`0.81–2.06`).  On the §14 instances
+(seed 1, four runs each, every run correct):
+
+| `p` | `ℓ` | `S` of the four runs | mean ± s.e. | pooled reference | `S / rho` of §14.4, pooled → measured |
+|--:|:--|:--|:--|:--|:--|
+| 1009 | `2^{57.9}` | `1.25, 2.14, 1.04, 1.28` | `1.43 ± 0.24` | `1.36` | `0.0221 → 0.0211` (seed 1; seed 2's instance was not walked) |
+| 1511 | `2^{61.4}` | `1.27, 0.16, 0.95, 0.85` | `0.81 ± 0.23` | `1.36` | `0.0068 → 0.0115` (seed 1) |
+
+The eight new walks together give `1.12 ± 0.19`, compatible with
+the pooled `1.36 ± 0.07`; one lucky walk at `p = 1511` (`0.16`) pulls that
+size's four-run mean to `0.81`, which is why its re-based ratio reads
+`0.012` rather than `0.007`.  Either way the attack is `75–150×`
+below rho at `ℓ = 2^{61.4}` on this instance, and the reference is now
+measured where the headline rows live, not pooled.  Rho's cost per step
+is the harness's own affine addition (`331` multiplications, one inversion);
+a rho with batched inversion and the negation map would be `2–3×` cheaper
+a step, which the ledger's unit does not credit to either side.  Class:
+**accounting**; nothing above changes in kind.
+
+## 16. Other primes, other sizes, and the rest of the parameter space (2026-10-04; `experiments/37_jv_cover_sieve_primes_*.json`, `38_jv_cover_sieve_*.json`, `38_jv_cover_rho_dp_1777.json`; ledger section F.4)
+
+Asked to extend the measurements to other fields and other parameters,
+this section does three things: it runs the sieved route on twenty
+different primes of two sizes to see how much of the spread between
+instances is the field and how much the instance; it extends the size to
+the largest the harness's arithmetic allows; and it states, for the
+members of this construction that were *not* built, why — which of them
+are degenerate, which reduce to measurements the repository already has,
+and which would be a different build.  Nothing here was registered
+beforehand; the rows are read against the predictions of §11.2 that
+already cover them (P7 on the rate, P9 on the crossover).
+
+### 16.1 Twenty primes: the spread is the instance, not the field
+
+One instance (seed 1) on each of ten primes near `500` and ten near `1,000`,
+the sieved route with the descent replaying §12's trace and the line
+enumeration of §14, rho pooled (`1.361`).  Every one of the twenty
+logarithms was recovered and checked.
+
+| `p` | `ℓ` | `|F|` | `m` | rate / (`p/m!`) | `C_rel` | `S / rho` | relations / descent | descent tests |
+|--:|:--|--:|:--|--:|--:|--:|:--|--:|
+| 503 | `2^51.8` | 238 | 9 → 10 | `0.71` | `5.3e+07` | `0.6658` | 66 % / 34 % | 4,288 |
+| 509 | `2^51.9` | 268 | 9 → 10 | `8.11` | `5.1e+06` | `0.0782` | 60 % / 39 % | 576 |
+| 521 | `2^52.2` | 265 | 9 → 10 | `2.57` | `1.4e+07` | `0.2620` | 46 % / 54 % | 2,944 |
+| 541 | `2^52.5` | 274 | 9 → 10 | `3.26` | `1.1e+07` | `0.1488` | 59 % / 40 % | 1,408 |
+| 557 | `2^52.7` | 280 | 9 → 10 | `4.12` | `9.0e+06` | `0.1499` | 44 % / 56 % | 2,112 |
+| 563 | `2^52.8` | 279 | 9 → 10 | `2.49` | `1.4e+07` | `0.2018` | 49 % / 50 % | 2,688 |
+| 569 | `2^52.9` | 291 | 9 → 10 | `8.24` | `4.9e+06` | `0.0592` | 58 % / 40 % | 640 |
+| 577 | `2^53.0` | 277 | 9 → 10 | `1.52` | `2.3e+07` | `0.2217` | 65 % / 34 % | 2,176 |
+| 587 | `2^53.2` | 304 | 9 | `1.21` | `3.5e+06` | `0.0396` | 59 % / 39 % | 448 |
+| 593 | `2^53.3` | 282 | 9 → 10 | `1.03` | `3.3e+07` | `0.2348` | 84 % / 16 % | 1,152 |
+| 1009 | `2^57.9` | 484 | 9 | `0.70` | `4.4e+06` | `0.0221` | 42 % / 56 % | 1,856 |
+| 1013 | `2^57.9` | 482 | 9 | `0.56` | `5.5e+06` | `0.0194` | 58 % / 39 % | 1,152 |
+| 1019 | `2^58.0` | 510 | 9 | `0.94` | `3.2e+06` | `0.0175` | 40 % / 57 % | 1,536 |
+| 1021 | `2^58.0` | 496 | 9 | `0.81` | `3.8e+06` | `0.0113` | 70 % / 26 % | 448 |
+| 1031 | `2^58.1` | 497 | 9 | `0.69` | `4.3e+06` | `0.0320` | 27 % / 71 % | 3,712 |
+| 1033 | `2^58.1` | 534 | 9 | `1.23` | `2.4e+06` | `0.0173` | 31 % / 66 % | 1,856 |
+| 1039 | `2^58.1` | 532 | 9 | `1.22` | `2.4e+06` | `0.0097` | 54 % / 40 % | 640 |
+| 1049 | `2^58.2` | 518 | 9 | `0.78` | `3.8e+06` | `0.0178` | 43 % / 54 % | 1,664 |
+| 1051 | `2^58.2` | 534 | 9 | `1.00` | `2.9e+06` | `0.0092` | 65 % / 29 % | 448 |
+| 1061 | `2^58.3` | 542 | 9 | `1.12` | `2.6e+06` | `0.0081` | 66 % / 27 % | 384 |
+
+Near `500` the ratio runs from `0.040` to `0.666` (median `0.176`, geometric
+mean `0.154`); near `1,000` from `0.0081` to `0.0320` (median `0.0174`,
+geometric mean `0.0151`).  Three things the census says:
+
+- **The `p = 503` instance of §§11.5 and 14 is the worst of its band** by
+  `3×`: its rate at `m = 9` was `0.47` of `p/m!` where the band's single-`m`
+  rows run `0.56–1.23` (P7's band `[0.5, 2]` holds on every row that stayed
+  on one `m`), and its `m = 9` lines ran out so that most of its relations
+  cost `m = 10`'s price.  The rate correlates with the factor base's size
+  (`|F|/p` from `0.473` to `0.527` across the twenty; correlation `0.5` with
+  the rate) and not with `p mod 3` or `p mod 4`: the spread is the
+  instance's `h`, not the prime.
+- **The crossover from the bands is `p* ≈ 333`** (`ℓ ≈ 2^{48}`): between the
+  bands' geometric means `S / rho` falls as `p^{−3.7}`, and the band means
+  put parity at `333`, inside §11.2's registered `[280, 420]` and below the
+  `371–427` that two seeds at `251` and `503` gave.  The seed-1 instance at
+  `503` had pulled that estimate up.
+- **The descent's share varies from `16 %` to `71 %`** across instances of
+  one size, because two successes are a Poisson count with mean `2`: the
+  tests per success range `192–2,144` against the expected `≈ 720`.
+
+### 16.2 Larger sizes: `p = 1,777` and `1,823`, the arithmetic's limit
+
+The harness's rho reference and linear algebra work mod `ℓ` in 64-bit
+words with a modular addition that adds before reducing, so `ℓ < 2^{63}` is
+the limit: `p ≤ 1,823`.  The group-order search also computed `#E ≈ p⁶` in
+64 bits, which overflows from `p = 1,622`; it now runs in 128-bit
+arithmetic, which is what makes `1,777` and `1,823` reachable.  A first
+attempt at `p = 2,003` (`ℓ = 2^{63.8}`) sieved past `9,000` relations without
+the linear algebra ever succeeding, the modular additions wrapping; its log
+is kept as `38_jv_cover_sieve_2003_defective.log`.
+
+| `p` | `ℓ` | `|F|` | relations | `C_rel` | `S / rho` (pooled rho) | relations / descent | descent tests |
+|--:|:--|--:|--:|--:|--:|:--|--:|
+| 1777 | `2^62.8` | 880 | 889 | `2.64e+06` | `0.0047` | 39 % / 54 % | 2,112 |
+| 1777 | `2^62.8` | 891 | 892 | `2.32e+06` | `0.0037` | 45 % / 47 % | 1,408 |
+| 1823 | `2^63.0` | 893 | 900 | `2.71e+06` | `0.0030` | 59 % / 31 % | 832 |
+| 1823 | `2^63.0` | 922 | 933 | `2.06e+06` | `0.0037` | 38 % / 54 % | 1,792 |
+
+Rho measured at `p = 1,777` by distinguished points (§15's method, three
+runs): `S = 1.25, 1.48, 0.44`, mean `1.06` against the pooled `1.36`, every run correct; the seed-1 row re-based on it reads `0.0061` (pooled: `0.0047`).  All four logarithms recovered and checked.  From `p = 1,009`
+to `1,823` the ratio keeps falling at the slope the census gives.
+
+### 16.3 The rest of the parameter space, and why it was not built
+
+The construction is `E: y² = h(x)(x − α)(x − σα)` over `F_{q^n}` with
+`q = p^k`, a genus-`n` hyperelliptic cover over `F_q`, a factor base of
+abscissae in `F_p`, decompositions into `ng = nk` points.  The measured case
+is `n = 3`, `k = 2`.  The others:
+
+- **`n = 2` is degenerate.**  `(x − α)(x − σα)` is the norm polynomial of
+  `α` over `F_q`, so for `n = 2` the whole equation has coefficients in `F_q`
+  and `E` is a subfield curve: `E(F_{q²})` is isogenous to `E(F_q) × E′(F_q)`
+  and its logarithm splits into two of size `√q` each, with no cover
+  needed.  Genus-2 covers of curves over `F_{q²}` exist for a broader class
+  (Scholten's construction, a rational 2-torsion point), but index calculus
+  on a genus-2 Jacobian over `F_q` is `Õ(q)` with double large primes against
+  rho's `Õ(q)`: no exponent, a constant to measure, and not this family.
+- **`k = 1` (`E` over `F_{p³}`) is the ordinary genus-3 index calculus over
+  `F_p`**: decompositions into `3` points, no sieve (the sieve's quadratic
+  structure needs `[F_q : F_p] = 2`), linear algebra in `p/2` unknowns at
+  `O(p²)` against rho's `p^{3/2}`.  It loses by exponent without large
+  primes, and with them is Diem's `Õ(p^{4/3})`; the repository's genus-3 and
+  genus-4 hyperelliptic panels are that measurement.
+- **`k ≥ 3` (`E` over `F_{p⁹}` and up) has `ng ≥ 9`.**  The six-point test's
+  system becomes nine quadrics in nine unknowns with a rate of `1/9!`, the
+  sieve does not apply, and no size the harness can run would collect a
+  relation in reasonable time; the asymptotic gain (`p²` against `p^{4.5}`)
+  is real and unmeasurable here.
+- **`deg h = 2`** gives a cover of higher genus (the cover's equation gains
+  two degrees); the code constructs `h(x) = x` only.  Not built.
+- **Even characteristic** is where the GHS attack began (curves over
+  `F_{2^{nk}}`, Artin–Schreier covers) and is the genuine "other field".  The
+  repository has `F_{2^n}` curve arithmetic from its Koblitz work but no
+  cover construction over it; that is a separate build of its own, with its
+  own registration, and is not started here.
+
+**Class: measurement and accounting.**  Twenty more instances of the same
+route, two more sizes, and a boundary for the construction's parameters;
+the class stays the weak class, and nothing about a generic or deployed
+curve follows.
+
+## 17. The walk, rebuilt: Legendre steps, enumerated components, larger-degree jumps — registered before it is built (2026-10-05)
+
+§13 priced the walk to a weak curve at `≈ (q/3) · c_step` with `c_step`
+measured at `2.6–6.8·10⁵` `F_p` multiplications for a 2,3-step and
+`1.9–4.1·10⁴` for a 2-step, above rho below `p ≈ 8,000`, and left one
+caveat: no walk of that round sampled a whole isogeny class, `60–90 %` of
+them ending in a component with no weak curve.  This section registers a
+rebuilt walk in the manner of §§3, 11 and 14: the construction as it will
+be built, the accounting, numbered predictions with falsification lines,
+and the class — fixed before the first line of code, with §17.5 the
+measured part.  Everything in it is in the service of one question: *what
+does reaching the weak class from a given curve cost, in the ledger's
+unit, at the sizes where §§14–16 measured the route below rho?*
+
+### 17.1 The construction, as it will be built
+
+- **State.**  A curve with full rational 2-torsion is carried as its triple
+  of 2-torsion abscissae `(e₀, e₁, e₂) ∈ F_{q³}³`, never normalised (no
+  inversion per step).  Its class is the `j`-invariant of §13, computed
+  once per curve met, for the visited set.
+- **The weak test, by norms.**  `N((e₃ − e₁)/(e₂ − e₁)) = 1` is
+  `N(e₃ − e₁) = N(e₂ − e₁)`, three norms `F_{q³} → F_q` of the differences
+  and no inversion; the sign `N(−1) = −1` is kept in the three orderings.
+  It is checked against §13's `weak_root` on random triples and on the
+  constructed weak curves before any run.
+- **A 2-isogeny edge.**  Kernel `(e_k, 0)`, `u = e_i − e_k`, `v = e_j − e_k`,
+  `w = uv`; the image `y² = x(x² + 2(u + v)x + (u − v)²)` has full 2-torsion
+  iff `w` is a square (§13).  The character of `w` is read off the norm
+  down to `F_p` and one Legendre symbol, not an exponentiation in
+  `F_{q³}`.  The root is taken by the odd-degree descent
+  `√w = w · σ(w^{(q+1)/2}) / √N_{q³/q}(w)`, one exponentiation of
+  `(q + 1)/2` in `F_{q³}` and one square root in `F_q`, instead of
+  Tonelli–Shanks in `F_{q³}`.  The dual edge's root is `±(u − v)` and is
+  carried, not recomputed, so a newly met curve costs two square roots,
+  not three.
+- **Components, enumerated.**  Instead of a random walk with a stopping
+  heuristic (§13's "no new `j` for `50 · distinct` steps", which on a
+  cycle-shaped crater stops long before the cycle is covered), the
+  2-isogeny component of the current curve among full-2-torsion curves is
+  enumerated breadth first, keyed by `j`, each curve met exactly once and
+  tested on arrival.  A component is the upper levels of one 2-volcano:
+  its size is a fact about the class, and it is reported.
+- **Jumps.**  When a component holds no weak curve, the walk leaves it by
+  a rational `ℓ`-isogeny, `ℓ ∈ {3, 5, 7}` in that order of preference,
+  from a random curve of the component: a root `x₁` of the division
+  polynomial `ψ_ℓ` of the model `y² = x³ + a₂x² + a₄x` (`e₀` moved to `0`,
+  `a₂ = −(u + v)`, `a₄ = uv`) over `F_{q³}`, the kernel abscissae
+  `x([k]T)` from `ψ₂, ψ₃, ψ₄`, and Vélu's `x`-map applied to the three
+  2-torsion points, which gives the image's triple directly (§13 factored
+  the image cubic a second time).  `ψ₅` and `ψ₇` are built by the standard
+  recursion from `ψ₃` and `ψ₄`.  A jump that lands on a curve already met
+  is counted as wasted and another is tried; a curve with no rational
+  `ℓ`-isogeny for any `ℓ` of the list restarts from a random curve, and
+  that restart is counted, as in §13.
+- **Budget.**  A walk stops when it meets a weak curve or when it has met
+  `3q` distinct curves; the latter is reported as `capped`, never as a
+  partial success.
+
+### 17.2 The accounting
+
+As §13: every `F_p` multiplication of the tower, through the one counter,
+including the `j`-invariants, the visited set's keys, every character
+test, every wasted jump and every restart.  Rho at `p` is
+`1.3 · (p³/2) · 331` as in section G.  The reported price is the whole
+walk, `curves met · c_curve + jumps · c_jump`, with the two constants
+also reported separately.
+
+### 17.3 Predictions and falsification lines
+
+**P1.  The step.**  `c_curve`, the cost per curve met in the enumeration,
+is at most `8,000` `F_p` multiplications at every `p ≤ 1,511` (two square
+roots of `≈ 3 log₂ p` multiplications in `F_{q³}` each, three character
+tests, the norm test, one `j`), growing as `log p`: at least `5×` below
+§13's 2-step and at least `30×` below its 2,3-step at `p = 53`.
+*Falsified if* `c_curve > 12,000` at `p = 1009`, or the ratio to §13's
+2,3-step at `p = 53` (`6.8·10⁵`) is below `10×`.
+
+**P2.  The components are small, and that is why §13's walks failed.**
+The mean size of a 2-isogeny component among full-2-torsion curves is
+below `q/10` at every `p ≥ 23`, and the fraction of start curves whose own
+component holds a weak curve is below `1/2` at every `p ≥ 31`.
+*Falsified if* the fraction is `≥ 1/2` at some `p ≥ 31` (then §13's
+exhaustion was the heuristic's artefact, not the graph's).
+
+**P3.  Jumps make the class reachable.**  With `ℓ ∈ {3, 5, 7}` jumps,
+at least `90 %` of `40` walks reach a weak curve within the `3q` budget at
+every `p ≤ 251`, and the median number of distinct curves met lies in
+`[q/9, q]` (`q/3` within `3×`, the weak density `3/q` of §13 seen through
+whole volcanoes).  *Falsified if* fewer than `75 %` find one at some
+`p ≤ 251`, or the median leaves `[q/12, 2q]`.
+
+**P4.  The price.**  The whole walk, jumps and restarts included, costs
+below rho at every `p ≥ 53`: `walk / rho ≤ 0.1` at `p = 251` and
+`≤ 0.02` at `p = 1009`.  *Falsified if* `walk / rho > 0.3` at `p = 251`
+or `> 0.1` at `p = 1009`.
+
+**P5.  The route with the walk inside it.**  Adding the measured walk to
+the sieved route's cost at `p = 1009` (§14–§16: `0.021×` rho on the
+measured reference) keeps the total below `0.05×` rho, and the route's
+crossover with rho, walk included, stays below `p ≈ 450` (`ℓ ≈ 2^{50}`),
+against `p ≈ 333` without it.  *Falsified if* the walk's share at
+`p = 1009` exceeds the route's own cost.
+
+**Sizes and seeds.**  `p ∈ {7, 11, 13, 17, 23, 31, 53, 101, 251, 503}`
+with `40` walks each and `p = 1009` with `20`; seed `1`; `p ≢ 0 (mod 3)`
+as the tower requires.  The §13 runs are kept and reprinted beside the
+new ones.
+
+### 17.4 Inadmissible moves, and what the section is not
+
+Not admissible: changing the weak test or the unit; leaving the
+`j`-invariants, the visited set, wasted jumps or restarts out of the
+count; reading a `capped` walk as a partial success; choosing seeds; a
+start curve that is already weak (those are counted and excluded from the
+medians, as in §13).
+
+**Out of scope, stated so as not to be mistaken for done.**  (i) The
+transport of the logarithm along the path found: one isogeny evaluation
+per step on the path, `O(ℓ)` per point, charged when the route is run end
+to end from a non-weak start curve, which this round does not do.
+(ii) Start curves with order divisible by `4` but only one rational
+2-torsion point over `F_{q³}`: the walk starts, as §13's did, at full
+2-torsion, and whether a 2-isogeny climb from such a curve reaches full
+2-torsion is not measured here.  (iii) Any curve outside the weak class's
+isogeny classes, and anything about a generic or deployed curve.
+
+**Class, registered.**  Engineering (the step and the enumeration) and
+accounting (the price, and the caveat of §9/§13 discharged or not by P3).
+Not an advance: the algorithm is [JV12]'s suggestion priced, and the class
+is the weak class.
+
+### 17.5 Measured (2026-10-05; `experiments/39_jv_isogeny_walk_v2*.{json,log}`; every number below is printed by `cargo run --release --example jv_isogeny_walk -- --summarize FILE.json` or is the run's own log line)
+
+**Code:** `src/cryptanalysis/jv_isogeny_walk.rs` (`WalkCtx`, `Curve2::{weak_by_norms, two_edges, ell_targets}`, `curve_order`, `run_walk2`, `exact_census`), driver `examples/jv_isogeny_walk.rs --v2`.  Nine unit tests pin the norm test against §13's cross-ratio test on every ordering of the constructed weak curves and on random triples, the fast character and root against the slow ones, the 2-edges against §13's neighbours with the carried dual root, the `ℓ = 3` targets against §13's, the `ℓ = 5, 7` targets by their duals, and the point count against the cover instances' `4ℓ`.
+
+**One amendment, made on the pilot and before the registered run** (recorded here because §17.4 promised none after it): §17.1 said a curve with no rational `ℓ`-isogeny *restarts from a random curve, counted, as in §13*.  The pilot showed what a restart is: a change of instance.  A walk that restarts lands in a fresh isogeny class, and whether *that* class holds a weak curve has nothing to do with the curve the attacker was given.  So the registered run has no restarts: a walk whose reachable set under `{2} ∪ jumps` closes without a weak curve ends `exhausted`, and the search over components is breadth first (a component's unexplored jumps are kept and resumed), so `exhausted` means the closure is closed, not that a sample of it was.  The exact closure mode (every `ℓ`-neighbour of every curve of every component) was run beside it at `p ≤ 31` to check that: it finds the same `found` and the same `exhausted` counts at every size (`22 / 18`, `15 / 25`, `17 / 23`, `13 / 26`, `17 / 23`, `15 / 25` at `p = 7 … 31`, against `22 / 18`, `15 / 24`, `17 / 22`, `13 / 24`, `17 / 21`, `15 / 23` for the lazy search, the one-to-two differences being walks the lazy search `capped` first).  A second change of the same kind: one source curve per degree and component suffices (a horizontal `ℓ`-isogeny from any curve of a 2-component lands in the same neighbouring component), so the pilot's eight were cut to one; this is cost, not outcome.
+
+**The registered run was stopped after `p = 101`.**  §17.3 named `p = 251, 503, 1009`.  By `p = 101` P3 was falsified (below) and the walks that fail do so by exhausting a closure of thousands of components at `3·10⁵`–`10⁶` multiplications a jump, hours per walk at `p = 251` and days at `503`; the budget went instead to the diagnostics that explain the failure (§17.5.2–17.5.4), which are post hoc and labelled so.  `experiments/39_jv_isogeny_walk_v2.json` holds `p = 7 … 101`, forty walks each, seed `1`, as frozen.
+
+#### 17.5.1 The registered run: random full-2-torsion start curves
+
+| p | q | walks (start weak) | success | success by admitted degrees 0 / 1 / 2 / 3 (walks) | exhausted / capped | curves met, median of found (q/3) | first component mean | c_order | c_curve | c_jump | jumps per found walk | walk / rho, found | walk / rho, all |
+|---:|--:|:--|--:|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|
+| 7 | 49 | 40 (1) | 0.54 | – / 0.50 (2) / 0.44 (18) / 0.63 (19) | 18 / 0 | 5 (16) | 4.7 | 5.90e4 | 2519 | 3.26e5 | 1.5 | 3.3675 | 58.0645 |
+| 11 | 121 | 40 (1) | 0.36 | 1.00 (1) / 0.12 (8) / 0.39 (18) / 0.42 (12) | 24 / 1 | 12 (40) | 6.5 | 8.43e4 | 2539 | 2.84e5 | 2.9 | 5.9758 | 21.0231 |
+| 13 | 169 | 40 (1) | 0.41 | – / 0.00 (7) / 0.53 (19) / 0.46 (13) | 22 / 1 | 21 (56) | 10.8 | 1.02e5 | 2605 | 5.01e5 | 4.6 | 4.6610 | 39.8819 |
+| 17 | 289 | 40 (0) | 0.33 | – / 0.12 (8) / 0.32 (19) / 0.46 (13) | 24 / 3 | 19 (96) | 50.3 | 1.33e5 | 2675 | 4.15e5 | 3.5 | 2.2999 | 27.7903 |
+| 23 | 529 | 40 (0) | 0.42 | 0.00 (1) / 0.57 (7) / 0.50 (20) / 0.25 (12) | 21 / 2 | 22 (176) | 9.0 | 1.75e5 | 2295 | 6.77e5 | 2.8 | 0.2957 | 52.0835 |
+| 31 | 961 | 40 (0) | 0.38 | – / 0.27 (11) / 0.50 (12) / 0.35 (17) | 23 / 2 | 207 (320) | 102.1 | 2.41e5 | 2834 | 1.12e6 | 9.1 | 0.8306 | 61.4546 |
+| 53 | 2809 | 40 (0) | 0.25 | – / 0.38 (8) / 0.26 (23) / 0.11 (9) | 29 / 1 | 443 (936) | 23.1 | 4.62e5 | 2765 | 5.07e5 | 71.4 | 1.7483 | 8.0189 |
+| 101 | 10201 | 40 (0) | 0.20 | – / 0.12 (8) / 0.24 (17) / 0.20 (15) | 29 / 3 | 1700 (3400) | 91.5 | 1.12e6 | 2757 | 7.64e5 | 412.9 | 3.6435 | 9.7598 |
+
+(`c_order`, `c_curve`, `c_jump` in `F_p` multiplications: the point count per walk, the enumeration per curve met, a root-finding of `ψ_ℓ` per jump attempted; `walk / rho` on `1.3 · (p³/2) · 331`, over the walks that found a weak curve and over all of them.  "Admitted degrees" is how many of `3, 5, 7` are not inert in the class's order.)
+
+**Against the registration.**
+
+- **P1 holds.**  `c_curve = 2,295`–`2,834` at every size, flat in `p` (`∝ p^{0.07}` over `p ≥ 53`): `15×` below §13's 2-step at `p = 53` (`4.1·10⁴`) and `246×` below its 2,3-step (`6.8·10⁵`), against the registered `5×` and `30×`.  The square root by descent is `2.8–3.5×` cheaper than Tonelli–Shanks in `F_{q³}` on the same inputs (pinned by a test), and the character by the norm costs a Legendre symbol.
+- **P2 holds, with one marginal cell.**  The start curve's 2-isogeny component has `4.7`–`102` curves on average (`q/10` is `53` at `p = 23`, `96` at `31`, `281` at `53`, `1,020` at `101`): below `q/10` everywhere except `p = 31` (`102` against `96`).  Its chance of holding a weak curve is `0.07`–`0.38`, below `1/2` at every size.  §13's walks did fail because the components are small — but not only because of that (P3).
+- **P3 is falsified, and the median part of it holds.**  Success is `0.54, 0.36, 0.41, 0.33, 0.42, 0.38, 0.25, 0.20` at `p = 7 … 101`, against the registered `≥ 0.9`, and it falls with `p`.  The walks that succeed do so after a median of `5`–`1,700` distinct curves, inside `[q/9, q]` at every size as registered.  The failures are not the walk's: the exact closure mode reproduces every one of them.  The jumps are not the cause either, in the sense that admitting more degrees barely moves the rate (`0.12`–`0.50` with one degree, `0.24`–`0.53` with two, `0.11`–`0.63` with three; no monotone trend).  The cause is where the weak curves are (§17.5.2–3).
+- **P4 is not met on random starts, and is unmeasured at `p ≥ 251` on them.**  Over the walks that found a weak curve, `walk / rho` is `0.30`–`6.0` at `p ≤ 101`, above `1` at six of eight sizes, because the jumps dominate: `2.8`–`413` root-findings per found walk at `3`–`11·10⁵` each, against `c_curve · curves met` of `10⁴`–`5·10⁶`.  Over all walks it is `8`–`61×` rho.  The registered `≤ 0.1` at `p = 251` was not measured on random starts; on starts inside a weak class (§17.5.4) it is `0.0038`.
+- **P5 is conditional** (§17.5.4): for a curve whose class holds a weak curve, the walk's share at `p = 1009` is `1 %` of the route's cost (`0.0002×` against `0.021×` rho), inside the registered `< 0.05×` total.  For a curve whose class holds none, there is no route.
+
+#### 17.5.2 Where the weak curves are: a sampled census (post hoc; `39_jv_isogeny_walk_v2_census.*`)
+
+`1,000` random weak curves (`y² = (x − ρ)(x − α)(x − σα)`) and `1,000` random full-2-torsion curves, each with its trace by the point count; the trace is the isogeny class (Tate).
+
+| p | q | distinct traces, weak / random | weak traces by frequency (t: weak, random) | t mod 4, weak / random |
+|---:|--:|:--|:--|:--|
+| 7 | 49 | 124 / 263 | −110: 38, 11; 146: 34, 10; 430: 34, 6; 110: 33, 5; −146: 30, 11; −430: 24, 5 | 2 always / 2 always |
+| 11 | 121 | 387 / 626 | 554: 13, 1; −470: 12, 3; −1238: 11, 3; −938: 11, 3; −982: 10, 1; 470: 10, 5 | 2 always / 2 always |
+| 13 | 169 | 525 / 750 | 1990: 8, 0; −2234: 7, 4; 570: 7, 2; −2630: 6, 1; −1990: 6, 1; −1594: 6, 2 | 2 always / 2 always |
+| 17 | 289 | 719 / 877 | −1310: 7, 2; −3746: 5, 2; −674: 5, 2; 286: 5, 0; 674: 5, 0; 866: 5, 1 | 2 always / 2 always |
+| 23 | 529 | 863 / 947 | −1742: 4, 0; 13298: 4, 0; −15118: 3, 0; −13966: 3, 0; −10546: 3, 0; −6194: 3, 0 | 2 always / 2 always |
+
+The weak curves fall in far fewer classes than random curves do, and some classes hold many of them: at `p = 7` one class holds `3.8 %` of all weak curves against `1.1 %` of random ones, i.e. a weak density `3.5×` the mean, while others hold none.  No residue condition on `t` separates them (`t ≡ 2 (mod 4)` for every full-2-torsion curve, as it must; the residues mod `8` are `0.47–0.53` on both sides).  A sampled census cannot say how many classes hold *no* weak curve, so:
+
+#### 17.5.3 Historical census (post hoc; `39_jv_isogeny_walk_v2_exact_census*.{json,log}`; corrected in §18.6)
+
+Every weak curve up to the isomorphisms that keep the form (`x ↦ x − ρ`, `x ↦ s²x`) is `y² = x(x − α)(x − σα)` with `α ∈ F_{q³} ∖ F_q` modulo `F_q^{×2}`: `2q² + 2q` representatives. **Correction (2026-10-07):** the implementation used a nonsquare from `F_p` as its second `F_q` square-class representative. Every nonzero `F_p` element is square in `F_{p²}`, so it duplicated one branch and omitted the other. Also, the point counter uses two random points and can mislabel individual traces (two p = 7 witnesses failed a direct square-table audit). The following values are preserved as historical outputs, **not an exact class census**; corrected p = 11, 13, 17, 37 trace tables and uncertainty are in §18.6.
+
+| p | q | weak representatives | weak classes | random curves: distinct classes | **random curves in a weak class** | largest weak classes (t: representatives) |
+|---:|--:|--:|--:|--:|--:|:--|
+| 7 | 49 | 4,900 | 121 | 293 | **0.528** | 110: 192; 146: 192; −110: 155; −146: 144; 430: 132; 466: 120 |
+| 11 | 121 | 29,524 | 539 | 1,079 | **0.592** | 470: 348; 1450: 276; −1258: 270; −938: 258; −470: 252; 554: 240 |
+| 13 | 169 | 57,460 | 875 | 1,582 | **0.570** | 2374: 432; −826: 408; −3130: 372; −2630: 346; 826: 336; −1990: 324 |
+| 17 | 289 | 167,620 | 2,186 | 2,500 | **0.608** | −3746: 630; −610: 504; 610: 504; −3170: 462; 2914: 456; −674: 402 |
+| 23 | 529 | 560,740 | 5,594 | 3,251 | **0.618** | −3890: 726; 3890: 702; 7666: 624; −7666: 600; 13070: 594; −13070: 558 |
+| 31 | 961 | 1,848,964 | 13,889 | 3,665 | **0.609** | −17282: 1212; 17282: 1164; −24190: 1044; −3970: 1032; −38590: 996; −8318: 996 |
+
+The historical run suggested that about `53–62 %` of random full-2-torsion curves lie in an isogeny class with a weak representative. Those particular fractions and class counts are superseded where §18.6 has corrected data. The general distinction remains: a walk cannot reach a weak curve if its isogeny class has none. The earlier numerical decomposition of walk failures, including `0.33 / 0.61` at p = 17, must be re-evaluated against corrected trace labels before being used as a controlled reach estimate.
+
+#### 17.5.4 The walk from inside a weak class (post hoc; `39_jv_isogeny_walk_v2_weakclass*.{json,log}`)
+
+The attack's own question is the second factor: given a curve whose class holds a weak curve, what does reaching one cost?  Start: a random weak curve moved by `≥ 8` random moves (a 2-edge or an `ℓ`-jump) until it is not weak; the walk then runs as registered, with the start's cost excluded.  The start is **not** a uniform curve of its class (it is eight moves from a weak one), and §17.5.5 checks how much that matters.
+
+| p | q | walks | success | exhausted / capped | curves met, median of found (q/3) | first component mean | c_order | c_curve | c_jump | jumps per found walk | walk / rho |
+|---:|--:|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|
+| 7 | 49 | 40 | 1.00 | 0 / 0 | 3 (16) | 10.1 | 5.87e4 | 2779 | 7.85e4 | 0.3 | 1.6803 |
+| 11 | 121 | 40 | 1.00 | 0 / 0 | 7 (40) | 10.2 | 8.45e4 | 2810 | 1.41e5 | 1.1 | 0.9736 |
+| 13 | 169 | 40 | 1.00 | 0 / 0 | 6 (56) | 7.6 | 1.03e5 | 2663 | 1.32e5 | 0.5 | 0.4282 |
+| 17 | 289 | 40 | 1.00 | 0 / 0 | 6 (96) | 6.7 | 1.32e5 | 2724 | 2.57e5 | 1.1 | 0.4470 |
+| 23 | 529 | 40 | 1.00 | 0 / 0 | 8 (176) | 14.9 | 1.74e5 | 3056 | 3.46e5 | 2.4 | 0.5707 |
+| 31 | 961 | 40 | 1.00 | 0 / 0 | 13 (320) | 14.6 | 2.45e5 | 3199 | 3.48e5 | 1.2 | 0.1332 |
+| 53 | 2,809 | 40 | 1.00 | 0 / 0 | 8 (936) | 48.9 | 4.61e5 | 3671 | 3.05e5 | 1.1 | 0.0382 |
+| 101 | 10,201 | 40 | 1.00 | 0 / 0 | 9 (3,400) | 37.5 | 1.15e6 | 3835 | 3.27e5 | 1.1 | 0.0079 |
+| 251 | 63,001 | 40 | 1.00 | 0 / 0 | 16 (21,000) | 395.6 | 3.98e6 | 4084 | 4.26e5 | 10.5 | 0.0038 |
+| 503 | 253,009 | 40 | 1.00 | 0 / 0 | 11 (84,336) | 1,697.0 | 1.14e7 | 4306 | 4.83e5 | 65.0 | 0.0027 |
+| 1009 | 1,018,081 | 20 | 1.00 | 0 / 0 | 10 (339,360) | 4,889.3 | 3.05e7 | 4509 | 8.28e5 | 0.8 | 0.0002 |
+
+`walk / rho ∝ p^{−1.48}` over `p ≥ 53`; `c_jump ∝ p^{0.32}`, `c_curve ∝ p^{0.07}`.
+
+Every walk finds a weak curve, after a median of `3`–`16` distinct curves at every size — not `q/3`, and not growing with `p`.  Inside a weak class the weak curves are not a `3/q` sprinkling: the start's own 2-component holds one `47`–`80 %` of the time.  The whole walk, point count included, costs `1.7×` rho at `p = 7` and falls through parity at `p ≈ 11` to `0.0002×` at `p = 1009`, where the point count (`3·10⁷`) is more than half of it.  Set beside the separately measured sieved route of §§14–16 (`0.021×` rho at `p = 1009` on its reference; `0.0068`–`0.012×` at `1511`), the walk stage is about one per cent of that route reference at `p = 1009`.  This is a comparison of separately measured costs on different instances.  Point transport and a complete DLP run from a non-weak curve remain unmeasured in this round, so neither their end-to-end `S` nor their crossover with rho is established.  The walk alone is `0.0038×` rho at `251` and `0.0027×` at `503`, while the earlier route measured `≈ 3×` and `≈ 0.4×` on its own instances.
+
+#### 17.5.5 How far from a weak curve the start is (post hoc; `39_jv_isogeny_walk_v2_weakclass_m64.*`)
+
+Same walk, the start moved `≥ 64` random moves from the weak curve instead of `≥ 8` (seed `1`, forty walks a size):
+
+| p | start moves | success | curves met, median of found | first component mean, weak share | jumps per found walk | c_jump | walk / rho |
+|---:|--:|--:|--:|--:|--:|--:|--:|
+| 23 | ≥ 8 | 1.00 | 8 | 14.9, 0.60 | 2.4 | 3.46e5 | 0.5707 |
+| 23 | ≥ 64 | 1.00 | 23 | 21.9, 0.40 | 4.1 | 2.59e5 | 0.7846 |
+| 53 | ≥ 8 | 1.00 | 8 | 48.9, 0.80 | 1.1 | 3.05e5 | 0.0382 |
+| 53 | ≥ 64 | 1.00 | 38 | 224.7, 0.65 | 5.3 | 5.38e5 | 0.2038 |
+| 101 | ≥ 8 | 1.00 | 9 | 37.5, 0.60 | 1.1 | 3.27e5 | 0.0079 |
+| 101 | ≥ 64 | 1.00 | 21 | 167.2, 0.55 | 4.1 | 3.88e5 | 0.0185 |
+| 251 | ≥ 8 | 1.00 | 16 | 395.6, 0.62 | 10.5 | 4.26e5 | 0.0038 |
+| 251 | ≥ 64 | 1.00 | 26 | 1,176.9, 0.47 | 116.9 | 1.90e6 | 0.1504 |
+
+The distance matters: eight times farther from a weak curve, the walk meets `2`–`5×` more curves and costs `1.4`–`40×` more (the `40×` at `p = 251` is `117` jumps per walk at a `c_jump` four times the `≥ 8` run's, one class's large components dominating), and the start's own component still holds a weak curve `40`–`65 %` of the time.  So weak curves are dense around weak curves and §17.5.4's figures are those of a start near one; a uniform start in a weak class is not sampled here, and its cost lies somewhere above the `≥ 64` row.  Every walk still succeeds, and the walk is still below rho at every `p ≥ 23` (`0.78×` there, `0.15×` at `p = 251` against the route's `≈ 3×`): the conclusion of §17.5.4 survives with a wider margin of ignorance on the constant.
+
+#### 17.5.6 What this changes, and what it does not
+
+- **§9's caveat is answered in two parts, with a corrected reach estimate in §18.6.** *The cost* of reaching the weak class from a curve whose class holds one is measured and is negligible beside the route (`≤ 1 %` at `p = 1009`; the step is `246×` cheaper than §13's and the walk needs tens of curves, not `q/3`). *The reach* is limited because some full-2-torsion isogeny classes have no observed weak curve; a corrected p = 37 sample estimates `39.2 %` of random starts in such classes (Wilson 95 % interval `37.7–40.7 %`). The older p ≤ 31 figures used a duplicate square-class branch and are superseded where rerun. A walk cannot leave its isogeny class, so no walk length helps if that class truly has no weak curve.
+- **§13's "`q/3` steps, above rho below `p ≈ 8,000`" is superseded**, and it was wrong in both directions: the price per curve was `246×` too high, and the number of curves to meet was `q/3` only on the premise, false, that weak curves are a uniform `3/q` of every class.
+- **The cited `≈ q` is refuted as a description of the walk** inside a weak class (tens of curves) and is not the relevant quantity outside one (no number of steps suffices).
+- **Open, and not claimed:** a necessary-and-sufficient formula for weak-class membership and its behavior through p ≈ 200 (§18.6 now tests p = 37 and finds a 2-adic necessary condition with counterexamples to sufficiency); a uniform start inside a weak class (§17.5.5 is the only check, and it moves the constant by up to `40×`); the transport of the logarithm along the path (§17.4); and anything about a curve of order divisible by `4` without full rational 2-torsion.
+
+**Class.**  Engineering (the step: `246×`; the search: exact exhaustion instead of a heuristic) and accounting (the reach and the price, both measured where §13 had estimated).  Not an advance: no number on the route's own rows moves, and the class it applies to is now *smaller* than §9 and §13 implied, not larger.
+
+## 18. The route end to end from a curve that is not weak, and the reach at larger p — registered before it is built (2026-10-07)
+
+§17 priced the walk and found the route's reach, in pieces.  Four items
+were left open (§17.5.6), and this section takes them in order of what the
+repository's rule asks first: **a whole-method measurement**.  No run in
+§§6–17 started from a curve that is not already weak; every `S / rho` on the
+route's rows is the route on the weak curve it was handed.  §18.1 runs the
+whole thing from a non-weak curve with a planted logarithm and verifies the
+answer on that curve.  §18.2 extends the reach census past `p = 31`.  §18.3
+is the exploratory characterization, labelled so.
+
+### 18.1 End to end from a non-weak curve (primary)
+
+**Instance.**  For `p` and seed `s`: the instance generator of §6
+(`generate_spec`) produces a weak curve `W₀` of order `4ℓ`, `ℓ` prime.  The
+**challenge curve** `C` is `W₀` moved by `M` random moves (a rational
+2-isogeny or a rational `3`-, `5`- or `7`-isogeny, uniformly among those
+available; §17.5.5's construction), continued until `C` is not weak.  `C`
+has order `4ℓ`, is isogenous to `W₀`, and is handed to the attacker as an
+equation `y² = (x − e₀)(x − e₁)(x − e₂)` over `F_{p⁶}` with `ℓ` and the
+cofactor `4`.  On `C`: `G = [4]·(random point)` of order `ℓ`, a planted
+`d ∈ [1, ℓ)`, `Q = [d]G`.  The construction of `C`, `G`, `Q` is the
+instance's, not the attacker's, and is not charged.
+
+**Attack, every phase charged in `F_p` multiplications through the one
+counter of each field context.**
+
+1. *Walk* (§17's walk with the path recorded): from `C`, enumerate 2-isogeny
+   components breadth first, jump by `3, 5, 7` (degrees inert in the class's
+   order skipped: the trace is `q³ + 1 − 4ℓ`, read from the public order, so
+   no point count is charged), until a weak curve `W`.  Every curve met,
+   every jump tried, every `j`-invariant is charged.
+2. *Transport*: the isogeny path `C → … → W` is evaluated on `G` and `Q`
+   (Vélu on each step: the 2-isogeny `(x, y) ↦ (y²/x², y(uv − x²)/x²)` on the
+   translated model, the odd-degree map with its `y`-formula), each image
+   checked on its curve.  Every degree on the path is coprime to `ℓ`, so the
+   images have order `ℓ` and the logarithm is unchanged.
+3. *Model change*: `W`'s weak ordering `(e₁; e₂, e₃)` with
+   `N((e₃ − e₁)/(e₂ − e₁)) = 1`; `α` solving `σ(α) = c·α` (a 3×3 kernel over
+   `F_q`); `v = (e₂ − e₁)/α`, rescaled by a non-square of `F_q` if `v` is not
+   a square in `F_{q³}`; `(x, y) ↦ ((x − e₁)/v, y/v^{3/2})` onto
+   `y² = x(x − α)(x − σα)`, the form §6's cover takes.  If the cover
+   construction refuses that `α`, `α` is rescaled by squares of `F_q` (an
+   isomorphism), at most 8 times, then the walk continues to another weak
+   curve; both counted.
+4. *The route*: §§11–16's sieved route (`m` climbing from 9, line
+   enumeration of §14, descent replaying the trace, F4 stopped at the
+   staircase), unchanged, on the transported instance, cover transfer
+   included.
+5. *Verification* on `C`: `[d′]G = Q` on the challenge curve itself.
+
+**Unit and reference.**  `S = total / (c_add · √ℓ)`, cold, every phase
+inside; `c_add` the affine addition on `E(F_{p⁶})` as in §2.  The
+reference is §15's pooled rho, `S_ρ = 1.361`, and the walk-free route's
+own `S / rho` on `W₀` for the same seed is reported beside it (paired),
+so the walk's share is read off the same instance.
+
+**Grid.**  `p ∈ {251, 503, 1009, 1511}`, seeds `1–4`, `M ∈ {8, 64}`:
+32 runs.  Seeds are not chosen; a failed run is kept and reported.
+
+**Predictions, with falsification lines.**
+
+- **E1 (correctness).** Every run that finishes recovers `d` and passes
+  `[d′]G = Q` on `C`.  *Falsified by one wrong answer.*  A run whose route
+  exhausts, or whose walk finds no weak curve in `3q` curves, is reported
+  as a failure, never as a cost.
+- **E2 (the walk is small beside the route).**  At `p = 1009`, walk plus
+  transport plus model change is below `5 %` of the run's total for
+  `M = 8`, and below `25 %` for `M = 64`.  *Falsified if* above either.
+- **E3 (the crossover survives).**  The end-to-end `S / rho` at `p = 1009`
+  and `1511` is below `0.1` for every finished run with `M = 8`, and its
+  mean over seeds is below `0.15` for `M = 64`.  *Falsified if* any `M = 8`
+  run at those sizes reads `≥ 0.1`.
+- **E4 (paired).**  The end-to-end total over the walk-free route's total on
+  `W₀` (same seed) is below `1.25` at `p ≥ 1009` for `M = 8`.  *Falsified if*
+  above `1.5` for any such run.
+
+**Inadmissible.**  Handing the attacker `W₀` or any weak curve; charging
+the instance's construction to the attack or the attack's walk to the
+instance; skipping the transport check or the verification on `C`;
+replacing a failed seed; changing the route's parameters from §16's.
+
+### 18.2 The reach at larger p
+
+§17.5.3's exact census (every weak curve up to the isomorphisms that keep
+the form, `2q² + 2q` representatives, each with its trace; then `4,000`
+random full-2-torsion curves tested against the set) at
+`p ∈ {37, 41, 43}`, run in parallel over representatives, and
+**every trace kept** (the weak set with multiplicities and the random
+sample), so that §18.3 can work from frozen files.  `p ≤ 31` is re-run with
+the full sets kept and must reproduce §17.5.3's counts exactly.
+
+**Correction after registration:** that reproduction condition cannot hold for
+the corrected implementation because §17.5.3's second square-class branch
+was duplicated. The original requirement is preserved above; §18.6 reports
+the discrepancy and the corrected p = 37 result rather than silently
+changing the frozen historical count.
+
+- **R1.**  The fraction of random full-2-torsion curves in a weak class
+  stays in `[0.50, 0.68]` at `p = 37, 41, 43`.  *Falsified if* outside at
+  any of them; a monotone fall below `0.50` would mean the route's reach
+  shrinks with `p`, and is the outcome this part exists to detect.
+- **Stop.**  A census that has not finished in 12 hours of wall time on
+  this machine is stopped, its partial counts kept and labelled partial.
+
+### 18.3 What distinguishes the weak classes (exploratory, post hoc)
+
+From §18.2's frozen sets: whether membership of a trace `t` in the weak set
+is decided by `t` modulo small primes (3, 4, 8, 9, `p`), by the class size
+(the random sample's multiplicity of `t`), or by the discriminant
+`t² − 4q³` (its square-free part, its 3-adic valuation).  Labelled
+exploratory throughout; nothing in it is a claim until a candidate rule is
+registered and tested on a size it was not fitted on (`p = 43` held out).
+
+**Class, registered.**  §18.1 is accounting (the first whole-method
+measurement of the route from a non-weak curve; the algorithm is [JV12]'s
+and §§11–17's); §18.2 is accounting; §18.3 is exploratory.  Nothing here is
+an advance, and nothing concerns a generic or deployed curve: the curves
+are those whose isogeny class holds a weak curve over `F_{p⁶}`.
+
+### 18.4 Measured: the whole method from a non-weak curve (2026-10-07; `experiments/40_jv_cover_e2e_{251,fast}.{json,log}`)
+
+**Code:** `src/cryptanalysis/jv_isogeny_walk.rs` (`run_end_to_end`, `walk_to_weak_record`,
+`map_two`, `map_odd`, `model_change`, `Curve2::scalar_mul`), `spec_from_curve` and
+`run_cover_sieve_dlp_on` in `jv_cover.rs`/`jv_sieve.rs`, driver
+`examples/jv_isogeny_walk.rs --e2e`.  Eleven module tests pass, including
+`point_maps_preserve_the_curve_and_the_logarithm` (the 2- and ℓ-isogeny point maps
+are homomorphisms that commute with scalar multiplication) and
+`end_to_end_from_a_non_weak_curve_recovers_and_verifies`.  Grid: `p ∈ {251, 503,
+1009, 1511}`, seeds `1–4`, `M ∈ {8, 64}` moves off the weak locus, `32` runs, the
+route unchanged from §16 (sieve from `m = 9`, trace replay, no staircase stop,
+pooled rho `1.3609`).
+
+| p | log₂ ℓ | moves | runs | correct & verified on C | reach share (max) | S/rho end to end, min–max (mean) | route-only S/rho on W₀ | e2e / route-only |
+|--:|--:|--:|--:|:--|--:|:--|:--|:--|
+| 251 | 45.8 | 8 | 4 | 4/4 | 0.0042 | 3.97–9.50 (5.71) | 2.88–8.01 | 0.51–1.44 |
+| 251 | 45.8 | 64 | 4 | 4/4 | 0.0626 | 3.47–6.56 (5.61) | 2.88–8.01 | 0.43–2.19 |
+| 503 | 51.8 | 8 | 4 | 4/4 | 0.0012 | 0.35–0.80 (0.49) | 0.16–1.36 | 0.32–2.20 |
+| 503 | 51.8 | 64 | 4 | 4/4 | 0.0059 | 0.36–0.92 (0.65) | 0.16–1.36 | 0.42–3.48 |
+| 1009 | 57.9 | 8 | 4 | 4/4 | 0.0017 | 0.035–0.082 (0.056) | 0.011–0.120 | 0.69–3.18 |
+| 1009 | 57.9 | 64 | 4 | 4/4 | 0.0018 | 0.056–0.152 (0.100) | 0.011–0.120 | 0.94–8.37 |
+| 1511 | 61.4 | 8 | 4 | 4/4 | 0.0081 | 0.0049–0.019 (0.010) | 0.0062–0.021 | 0.25–1.33 |
+| 1511 | 61.4 | 64 | 4 | 4/4 | 0.0021 | 0.0063–0.021 (0.011) | 0.0062–0.021 | 0.42–1.00 |
+
+All 32 runs: the challenge curve `C` was not weak, the walk reached a weak curve,
+the route solved, and the recovered scalar verified `[d]·G = Q` **on `C` itself**.
+
+**Against the registration.**
+
+- **E1 (correctness) holds.** 32/32 recovered `d` and passed the verification on the
+  challenge curve.  No wrong answer; no run counted a failure as a cost.
+- **E2 (the walk is small) holds.** Walk plus transport plus model change is below
+  `0.9 %` of the run's total at every size for `M = 8` (max `0.0081`), and below
+  `6.3 %` for `M = 64` (one `p = 251` seed; the rest below `0.6 %`), inside the
+  registered `5 %`/`25 %`.  The transport is a few thousand multiplications; the
+  model change a constant `3.5·10⁴`–`2.4·10⁵`; the walk itself the only variable
+  part, and still small.
+- **E3 (the crossover survives) holds.** Every `M = 8` run at `p ≥ 1009` reads
+  below `0.1` (`0.035`–`0.082` at `1009`, `0.0049`–`0.019` at `1511`), and the
+  `M = 64` means are `0.100` and `0.011`, below `0.15`.  `p = 251` and `503` sit
+  above and around rho, as §16's crossover at `p ≈ 333` requires: the end-to-end
+  run does not move the crossover, because the walk is negligible.
+- **E4 (the paired ratio) is falsified**, at `p = 1009` seeds 3 and 4 for `M = 8`
+  (`3.18`, `3.18`... `2.43`, `3.18`), above the `1.5` line.  The cause is **not**
+  the walk (reach share `< 0.0001` on those runs).  It is that the route runs on
+  the *transported* curve, a different curve from the weak `W₀` of the same seed,
+  and the sieved route's cost swings with the instance's factor base — the same
+  instance-to-instance spread §16 measured (`0.04`–`0.67×` across ten primes near
+  `500`).  `W₀` happened to be a cheap instance for those two seeds
+  (`0.0255`, `0.0110×` rho), so a transported instance of ordinary cost reads high
+  against it.  E4 presumed the two instances were comparable; they are not, and
+  that is the finding.
+
+**What it establishes.**  The route's first whole-method measurement from a curve
+that is not weak: correct, verified on the challenge curve, and below rho at
+`p ≥ 1009` with the walk, the transport and the model change all priced inside it.
+The reach to the weak class costs `< 1 %` of the attack for a curve whose class
+holds a weak curve, confirming §17.5.4 inside a complete run.  Nothing changes the
+bottom line: the class is still the weak class, `C` is still one of the `≈ 55–60 %`
+of full-2-torsion curves whose isogeny class holds a weak curve (§18.5), and no
+generic or deployed curve is in it.  **Class: accounting** (the first end-to-end
+pricing; the algorithm is [JV12]'s and §§11–17's).
+
+### 18.5 Measured: the reach at larger p (2026-10-07; `experiments/40_jv_cover_reach_*.json`)
+
+§18.2's exact census (every weak curve's trace among `2q² + 2q`
+representatives, against `4,000` random full-2-torsion curves) extends
+§17.5.3's `p ≤ 31`. **`p = 37, 41, 43, 47` now measured by the corrected native census.**
+
+| p | q | weak representatives | weak classes | random curves in a weak class | status |
+|--:|--:|--:|--:|--:|:--|
+| 7–31 | | | | 0.528–0.609 | historical, superseded where §18.6 reran |
+| 37 | 1,369 | 3,751,060 | 24,352 ordinary trace rows with weak representatives | 0.60825 (2,433/4,000; Wilson 95 % [0.5930, 0.6233]) | corrected census; §18.6 |
+| 41 | 1,681 | 5,654,884 | 33,224 ordinary trace rows with weak representatives | 0.62525 (2,501/4,000; Wilson 95 % [0.6101, 0.6401]) | corrected census; §18.6 |
+| 43 | 1,849 | 6,841,300 | 38,452 ordinary trace rows with weak representatives | 0.61950 (2,478/4,000; Wilson 95 % [0.6043, 0.6344]) | corrected census; §18.6 |
+| 47 | 2,209 | 9,763,780 | 50,382 ordinary trace rows with weak representatives | 0.63200 (2,528/4,000; Wilson 95 % [0.6169, 0.6468]) | corrected orbit census; §18.6 |
+
+**R1** (the weak-class fraction stays in `[0.50, 0.68]` at `p = 37, 41, 43, 47`)
+has corrected observations inside the band at all four primes. The p = 31 value `0.609` is historical and affected by
+the representative bug; corrected p = 23 and 31 reruns are also pending.
+
+### 18.6 ISO-1 corrected weak-class labels and invariant audit (updated 2026-10-08)
+
+The [generalized norm-one theorem](../../iso1_weak_classes_20261007/THEOREM.pdf)
+proves `t ≡ ±(q^n+1) (mod 16)` and `4 | f_pi` for every ordinary
+weak curve when `q ≡ 1 (mod 4)` and `n ≥ 3` is odd. The exact
+[p = 7 census](../../iso1_weak_classes_20261007/p7_exact_absolute.csv)
+and complete independent GP orbit counts prove the converse false:
+the existing ordinary full-2 class `t = ±610` has `f_pi=72`, depth 3,
+and no weak representative. Absolute Frobenius and inversion give exactly
+`(p^4+3p^2+8)/12` point-count calls for the cubic census. The completed
+p = 53 census has 72,540 weak rows among 146,068 ordinary rows, no
+depth-1 weak row, and 494 high-depth zero rows. All 5,000 independent
+GP controls agree. The worker has started p = 59 and retains later
+primes through 199 under the [protocol](../../iso1_weak_classes_20261007/CONTINUATION_PROTOCOL.md).
+
+[The dated report](../../iso1_weak_classes_20261007/REPORT.md), [every-trace p = 37 CSV](../../iso1_weak_classes_20261007/p37_twist_derived.csv), [fit output](../../iso1_weak_classes_20261007/fit_p11_p13_to_p37.txt), and [visual](../../iso1_weak_classes_20261007/class_strata.svg) are the frozen evidence. The corrected census chooses an actual nonsquare of `F_{p²}` and uses both square-class branches, with one quadratic twist's trace derived from the other at p = 37. It visits all `2q²+2q = 3,751,060` normalized weak representatives at p = 37 and writes all 50,654 Hasse trace candidates; 49,284 are ordinary. The trace assignment remains probabilistic because `curve_order` validates a baby-step result on two random points. As an independent positive-label control, [PARI/GP `ellcard`](../../iso1_weak_classes_20261007/gp_p37_validation_receipt.txt) placed 100 distinct traces of random norm-one Legendre curves in the observed weak set; this does not certify every zero row.
+
+| p | q | ordinary trace rows | rows with weak representatives | depth-1 weak / depth-1 rows | depth-≥2 zero / depth-≥2 rows | random full-2 curves in weak class (4,000 samples) |
+|--:|--:|--:|--:|--:|--:|--:|
+| 7 | 49 | 294 | 126 | 0 / 148 | 20 / 146 | Exact census; not sampled |
+| 11 | 121 | 1,210 | 542 | 0 / 606 | 62 / 604 | 0.59075 [0.57543, 0.60589] |
+| 13 | 169 | 2,028 | 928 | 0 / 1,014 | 86 / 1,014 | 0.58100 [0.56564, 0.59621] |
+| 17 | 289 | 4,624 | 2,198 | 0 / 2,312 | 114 / 2,312 | 0.62000 [0.60485, 0.63492] |
+| **37** | **1,369** | **49,284** | **24,352** | **0 / 24,642** | **290 / 24,642** | **0.60825 [0.59303, 0.62327]** |
+| **41** | **1,681** | **67,240** | **33,224** | **0 / 33,620** | **396 / 33,620** | **0.62525 [0.61014, 0.64012]** |
+| **43** | **1,849** | **77,658** | **38,452** | **0 / 38,830** | **376 / 38,828** | **0.61950 [0.60435, 0.63443]** |
+| **47** | **2,209** | **101,614** | **50,382** | **0 / 50,808** | **424 / 50,806** | **0.63200 [0.61694, 0.64681]** |
+| **53** | **2,809** | **146,068** | **72,540** | **0 / 73,034** | **494 / 73,034** | **0.63475 [0.61971, 0.64954]** |
+
+For `D=t²−4p⁶=f_π²D_K` with `D_K` fundamental, the weak-trace condition `v₂(f_π)≥2`, equivalently `(t/2)²≡p⁶ (mod 16)` or `t/2≡±p³ (mod 8)`, is now **proved necessary**. Put `λ=α^{p²}/α` on a weak model. It has norm one, hence odd order and a fourth root `μ` in `F_{p⁶}`. The 2-isogenous quotient of the Legendre model `y²=x(x−1)(x−λ)` at `(0,0)` has roots `0, −(1+μ²)², −(1−μ²)²`; their pairwise differences are squares because `−1` is square. The quotient has full rational 4-torsion, forcing its order divisible by 16. The weak model is a quadratic twist of the Legendre model, so its trace satisfies `t≡±(p⁶+1) (mod 16)`. This is the exact class obstruction behind approximately half the zero rows. The quotient also has `(π−1)/4` in its endomorphism ring, so its 2-adic endomorphism conductor is at most `v₂(f_π)−2`; the quadratic twist has the same order, and a degree-2 isogeny changes conductor depth by at most one. Therefore every ordinary weak curve satisfies `v₂(f_End(E))≤v₂(f_π)−1`: it is not at the deepest possible 2-volcano level. This is a curve-level bound, not a measured exact level or a class-existence criterion. The bound is shared by every full-2-torsion curve, since (pi-1)/2 is an endomorphism with generated-order conductor f_pi/2; the extra weak-class restriction comes from full 4-torsion on the neighbor. The report now supplies the explicit map and replayable polynomial records.
+
+The condition is **not sufficient for the recorded computational labels**: held-out p = 37, 41, 43, 47 have respectively 290, 396, 376, 424 high-depth zero rows. On p = 37 its classifier has TP 24,352, FP 290, FN 0, TN 24,642 (99.41 % accuracy); on p = 47 it has TP 50,382, FP 424, FN 0, TN 50,808 (99.58 %). It cannot fully replace the reach census or seed sieve. Splitting of 2 and maximal-order class-number parity fit worse. A p = 37 counterexample is `t=-92218` (zero) versus `t=38854` (24): same Frobenius depth 3, ramified 2, even class-number parity, and identical trace mod `2^17`. The stronger p = 41 pair `t=136542` (zero) versus `t=5470` (132) also shares the exact maximal-order class number `h_K=192`, depth 2, ramified 2, and trace mod `2^17`; a near-edge pair 256 trace units apart shares depth 3, split 2, and `h_K=1680`. A held-out p = 47 pair (`t=204238` zero versus `t=73166` with 96) repeats the same depth, splitting, exact `h_K=336`, and trace residue mod `2^17`. See the [matched-class audit](../../iso1_weak_classes_20261007/counterexample_hk_residue.txt). The residual zeros concentrate near the Hasse edge but also occur centrally; maximal-order class-number magnitude is associated with their rate without classifying them exactly. The requested every-trace p = 53–about 200 census and sufficient criterion remain open; see the [full report](../../iso1_weak_classes_20261007/REPORT.md).
+
+Hilbert 90 identifies normalized `α/F_q^*` with the nonidentity norm-one parameters `λ=α^q/α`. The `q`-Frobenius and inversion orbits of `λ` have size six except one two-element orbit, and preserve the symmetric trace pair. The [orbit implementation and receipt](../../iso1_weak_classes_20261007/orbit_run_receipt.txt) reduce point-count calls by almost exactly sixfold: p = 13 and 37 orbit CSVs are byte-identical to their direct twist-derived CSVs, with 312,589 rather than 1,875,530 calls at p = 37. At p = 47, the completed [orbit census](../../iso1_weak_classes_20261007/p47_orbit_run_receipt.txt) needs 813,649 point counts and weights to 9,763,780 representatives. The special orbit yields two nonordinary Hasse-boundary rows at `t=±2·47³`, independently checked with PARI/GP. Another 5,000 independent GP norm-one samples give 4,200 distinct traces, all in the p = 47 positive set. These operation counts and sampled positive controls do not certify every zero row or establish an isolated CPU speedup.
+
+### 18.6.1 Larger-field controls and prime-degree orbit theorem (2026-10-09)
+
+The [larger-field report](../../iso1_weak_classes_20261007/larger_fields_20261009/REPORT.md) verifies 17 independently counted source/target pairs, 49 explicit geometric controls, fields through log2(Q)=252, and total extension degrees 10 and 14. All pairs are ordinary, have equal cardinality divisible by 16, and pass Hasse. Exact coefficient vectors, moduli, and 34 ICV1 model IDs are retained. These are individual norm-one positive controls; full trace-class coverage remains a separate requirement.
+
+For odd prime n, the absolute-Frobenius orbit count is now proved as C_(p,n)=[N+A+B-3+2e(n-1)^2]/(4n), where N=(p^(2n)-1)/(p^2-1), A=(p^n-1)/(p-1), B=(p^n+1)/(p+1), and e=1 iff p^2=1 mod n. Its cleared sum has record IDC1h90d58cc0e0c48fe3. Eight exhaustive cyclic-group audits cover 6,928,970 parameters; 45 stabilizer cases pass. The temporary p59 continuation was interrupted and is now restarted with a finite local service and persistent receipts; the original requested range through p199 remains preserved.
+
+The p = 59 census completed during this round: 100,408 weak ordinary rows among 201,898, 0/100,950 depth-1 positives, and 540/100,948 higher-depth zeros. All 5,000 GP controls are positive (4,565 distinct absolute traces). The archived CSV and decompressed SHA replay are retained in the larger-field report's p59_completed directory. The worker has advanced to p61.
+
+### 18.6.2 Independently sampled 192–252-bit fields (2026-10-09)
+
+The [population report](../../iso1_weak_classes_20261007/large_population_20261009/REPORT.md) point-counts 512 uniformly sampled full-2-torsion root-pair models in ten fields with total extension degrees 6, 10 and 14. All are ordinary. The proved conductor condition admits 323/512 (63.0859%; pooled Wilson 95% 58.8229–67.1540%). Every admitted source, after choosing the trace sign, has a verified full-4 representative at distance at most one rational 2-isogeny. The new theorem proves this torsion equivalence; its duplication identity has certificate IDC1h40099ec00a503c89. An independent exhaustive check verifies all 5,264 root pairs in eight smaller fields.
+
+The bounded degree-2/3 searches test 32,484 vertices and find zero norm-one witnesses from the independent population. All 323 admitted weak-class labels remain unresolved: 219 restricted-component closures and 104 vertex caps. Ten separately constructed large-field controls find a weak endpoint after two tested vertices and one edge. In the exact p7 validation, four weak classes appear among restricted-component closures, directly confirming that these closures cannot label a class zero. The precision interval for the admitted large-field population remains [0,1]; the earlier class-uniform small-prime precision is a separate result.
+
+The direct weak-model density bound is 3/(p²−1), from the three norm-fiber conditions; its degree-3/5/7 geometric sums have certified polynomial records. A CM preflight on an admitted 192-bit source obtains f_pi=8, then `polclass` reports an integer-conversion overflow on the 188-bit fundamental discriminant. The report retains the source law, all 512 field/model identities and raw receipts, 1,326 independent model replays, 72 route replays, proofs, SVGs, and a compiled PDF. Canonical dashboard context is refreshed; IC/rho ratios keep their earlier workloads and values.
+
+### 18.6.3 Exact support of both genus-3 branches (2026-10-09)
+
+The [two-branch theorem supplement](../../iso1_weak_classes_20261007/two_branch_20261009/REPORT.md) proves complete cubic and nonsplit-quadratic torus normalizations and an exact CM intersection criterion for ordinary trace pairs with D_K < -4. Cubic quotient orders satisfy c | f_pi/4; quadratic orders occupy the 2-volcano floor v2(c)=v2(f_pi). Each reduced CM factor has degree dividing six, so the reciprocal-variable decision polynomial has degree at most 18. Building the CM support retains a separate cost.
+
+At p=37 the combined family covers 48,630 of 49,284 ordinary trace classes: 24,352 cubic, 48,164 quadratic, 23,886 in both, and 654 exact zeros. Seven complete censuses extend from p7 through p37. Independent all-x replay verifies all 409 p7 parameter models with 48,118,441 evaluations; the cubic counts match the historical native p7, p13 and p37 rows. Two independent quadratic CM implementations agree on five classes, including the positive quadratic class at trace magnitude 610.
+
+From the 64 frozen independent p7 source fixtures, all 63 positive fixtures now have explicit verified routes after degree-11 and degree-19 follow-ups; the remaining trace-474 fixture is a combined-family zero. Independent coordinate replay checks 230 retained route edges and 117 literal conversions across successful variants. Their repeated-policy costs and all earlier caps remain recorded.
+
+The expanded 512-source 192–252-bit panel visits 46,356 vertices and evaluates 75,996 degree-2 and 53,604 degree-3 edges. Its 383 restricted closures and 129 vertex caps leave all large-field class labels unresolved. A generalized quadratic-base Hilbert-90 reconstruction passes 16 degree-10/14 controls, including eight section-gcd-5 cases. The specified compositum covers have genera 25 and 161 at these degrees. The selected CM support and an explicit large-field positive route remain the next construction requirements. Seven identity records, all source/phase receipts, canonical model records, source-linked diagrams and a reviewed PDF accompany the result; IC/rho ratio points retain their earlier workloads.
+
+The separate cubic worker has now completed p61 and p67. It records respectively 111,084/223,260 and 147,496/296,274 positive ordinary rows, zero depth-1 positives, and 546/640 higher-depth zeros. Each prime has 5,000 positive independent PARI controls and a replay-verified compressed archive. These retain diagnostic status for the probabilistic counter. The finite continuation stopped before p71 at the storage preflight; the stopped queue receipt remains intact. After storage became available, a fresh finite queue resumed at p71 with the same frozen runtime, four CPU threads, the original per-prime storage guard and the authorized range through p199; its restart receipt records 38,786,592,768 available bytes and the running service.
+
+### 18.7 Historical candidate R-v2, registered before its held-out test and now falsified (2026-10-08)
+
+Scope correction, 2026-10-09: the earlier weak-row labels, conductor
+restriction and zero examples select the cubic norm-one branch. The
+[prior-work comparison](../../iso1_weak_classes_20261007/large_population_20261009/PRIOR_WORK.md)
+verifies three quadratic-h Joux–Vitse models independently by complete
+affine-x enumeration and two infinity points. Their traces are −38, −10
+and 610, with Frobenius conductors 18, 26 and 72. The first two have
+conductor depth one, and the third occupies the class empty in the cubic
+census. Consequently those cubic exclusions do not exclude the broader
+published family. The 192–252-bit admission measurement and restricted
+searches also concern the cubic family. The next class criterion must
+include the quadratic branch explicitly.
+
+This preregistration is preserved as research history. The corrected p = 37,
+41, 43, 47 censuses in §18.6 falsify its **if and only if** claim, while the
+necessary half is now proved algebraically. The older p ≤ 31 and preliminary
+p = 37 reach figures in the original record used the omitted square-class
+branch and are superseded by §18.5–18.6.
+
+§18.3's exploration (`--characterize experiments/42_jv_cover_reach_all_curves_small.json`,
+sizes `p = 7, 11, 13, 17, 23`, post hoc) found one feature that nearly separates
+the weak classes among full-2-torsion classes, and none other does (`t mod 3`,
+`t mod 8`, `v₃(D)` and the class-size proxy are flat):
+
+| p | weak share of sampled classes with `v₂(D) = 5` | with `v₂(D) ≥ 6` |
+|--:|--:|--:|
+| 7 | 0.02 (147) | 0.68–1.00 |
+| 11 | 0.00 (511) | 0.67–1.00 |
+| 13 | 0.00 (728) | 0.67–1.00 |
+| 17 | 0.00 (1,025) | 0.93–1.00 |
+| 23 | 0.00 (1,305) | 0.97–1.00 |
+
+with `D = t² − 4q³` the Frobenius discriminant.  The weak set is closed under
+`t ↦ −t` up to the randomized group order's sub-1 % error (`5,568/5,594` at
+`p = 23`), as a rule in `t²` must be.
+
+**Historical R-v2 claim (falsified).** A full-2-torsion isogeny class over
+`F_{q³}` holds a weak curve **iff `v₂(t² − 4q³) ≥ 6`**. The forward
+implication is proved in §18.6; the reverse implication has 290, 396, and
+376 counterexample rows at p = 37, 41, 43.
+
+*Why it might hold (heuristic, not a proof).*  The norm-one subgroup of
+`F_{q³}^×` has odd order `q² + q + 1`, so a weak curve's Legendre parameter
+`λ`, for the ordering with `N(λ) = 1`, lies in the odd part of `F_{q³}^×`
+and is a `2^k`-th power for every `k`.  Halving the 2-torsion point `(0, 0)`
+of `y² = x(x − 1)(x − λ)` needs `−1` and `−λ` to be squares, and `−1` is a
+square because `q³ ≡ 1 (mod 4)`; so a weak curve carries extra rational
+2-power torsion, which shows in the 2-adic valuation of its Frobenius
+discriminant.
+
+**Held-out test, registered now.**  `p = 19`, never examined by any analysis
+in §§17–18, exact census with `4,000` random full-2-torsion curves.
+
+- **V1 (necessity).**  Every exact weak trace has `v₂(D) ≥ 6`, except at most
+  `1 %` attributable to the randomized group order.  *Falsified if* more
+  than `1 %` of the weak traces have `v₂(D) = 5`.
+- **V2 (sufficiency).**  Among the sampled full-2-torsion classes with
+  `v₂(D) ≥ 7`, at least `95 %` are weak; with `v₂(D) = 6`, at least `85 %`.
+  *Falsified if* below either.
+- **V3 (the reach follows).**  The share of sampled full-2-torsion curves
+  with `v₂(D) ≥ 6` matches the census's reach fraction within `0.03`.
+
+R-v2 did not survive as an exact classifier. Its conditional reach estimate
+and proposed replacement for the `2q²+2q` enumeration are therefore
+withdrawn. The p = 19 preregistered test remains an unrun historical plan;
+the larger corrected holdouts and proof establish the current status.

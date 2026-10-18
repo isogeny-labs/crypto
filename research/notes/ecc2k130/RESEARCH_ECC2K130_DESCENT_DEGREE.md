@@ -7,6 +7,22 @@ no speed claim, and it moves no ECC2K-130 cost. Every number at
 `n = 131` below is **derived, not measured**, and is marked with the
 exponents it rests on.
 
+**Updated 2026-10-06** with the first `m = 4` measurement
+(`research/dreg_m4_chain_20261006/`). It adds §5 and point 5 of the short
+version, plus the new rows of §2's table. The cost model is now native
+(`examples/descent_degree_cost`), and its first 16 rows reproduce the
+2026-09-30 table exactly.
+
+**Updated 2026-10-16** with the MutantXL closure study
+(`research/dreg_closure_mutantxl_20261016/`). It adds §6 and point 6 of the
+short version. The model's output with the new rows is
+`descent_degree_cost-output-20261016.txt`, and every earlier row reproduces
+unchanged.
+
+**Updated again 2026-10-16** with the closure-at-scale study
+(`research/dreg_closure_scale_20261016/`). It adds §7 and point 7, and the
+model output is `descent_degree_cost-output-20261016-scale.txt`.
+
 ## The short version
 
 1. **Measured.** The system is the `m = 3` chained `S₃` system over
@@ -40,6 +56,45 @@ exponents it rests on.
    - At `n = 131`, `m = 3` then prices at `≥ 2^196.95`. That is above an
      exhaustive search of the `2^129` subgroup. This is an extrapolation
      from `n ≤ 15`.
+5. **`m = 4`, measured (2026-10-06, §5).** This is the decomposition size
+   whose free-oracle floor is below rho.
+   - It refutes at `ℓ + 4` for `ℓ ≤ 2`, one degree above `m = 3` at the
+     same `ℓ`, and at ≥7 for `ℓ = 3`.
+   - Like `m = 3`, it is flat in `n` at fixed `ℓ`. So the measured degree
+     is set by `m` and `ℓ`, and the semi-regular reference overstates its
+     growth in `n`.
+   - **Any degree that grows with `ℓ` collapses the route.** Under either
+     small-`ℓ` fit the best cell sits at the smallest factor base in the
+     range, where the route is a search over targets:
+     - `m = 3`: `2^158.96`;
+     - `m = 4`: `2^173.13`.
+     Both are above an exhaustive search of the subgroup.
+   - Below the range the model searches (`ℓ < 4`), the fits price
+     `2^158.12` to `2^170.90`, with target counts at or past the subgroup's
+     `2^129`. So every `ℓ` is above exhaustive search.
+   - These are extrapolations of three-rung fits.
+6. **The growth in points 1 and 5 is XL's, not the ideal's (2026-10-16,
+   §6).**
+   - Saturating each degree under MutantXL's fall closure refutes the same
+     92 committed draws at **3–4**, flat in `ℓ` (1 to 5), in `m` (3 and 4),
+     and in the unknowns (11 to 32). XL needs 5 to 7 on those draws.
+   - Held at 4 to `n = 131`, the best `m = 4` row is `2^68.43` at `w = 1`,
+     `2^+7.62` over rho in unconverted units, against `2^173.13` under the
+     XL fit.
+   - It is still above rho, and point 3 stands.
+   - The constant-degree case point 4 called removed is back on the table
+     as an **open extrapolation** from `N ≤ 32`.
+7. **The closure degree does grow, slowly (2026-10-16, §7).**
+   - **m = 3.** It refutes at 4 for ℓ ≤ 6. At ℓ = 7 (N = 40, 42), on 8 of
+     8 draws, it does not refute at 4.
+   - **m = 4.** It still refutes at 4 at ℓ = 3, 4 (N = 36–42).
+   - **Rows.** The m = 3 degree-4 row is withdrawn. The m = 4 degree-4 row
+     (`2^68.43`) keeps measured support to ℓ = 4 only. Held at 5, m = 4
+     prices `2^71.13`, `2^+10.32` over rho.
+8. **N does not set the closure degree; ℓ = 7 or m·ℓ ≥ 21 does (§8).**
+   - Both surviving explanations put m = 4's rise at ℓ ≤ 7. So the m = 4
+     degree-4 row (`2^68.43`) is contradicted.
+   - The degree-5 rows are now the optimistic case: m = 4 at `2^71.13`.
 
 ## 1. What is measured
 
@@ -95,9 +150,16 @@ non-positive coefficient of `(1+z)^N / ((1+z²)^n (1+z³)^n)`. It comes from
 
 ## 2. The price at `n = 131`, by degree
 
-`descent_degree_cost_20260930.py` evaluates the cost model of
+`examples/descent_degree_cost` evaluates the cost model of
 `RESEARCH_ECC2K130_DECOMPOSITION.md` §5.1 with the oracle priced as a
 Macaulay elimination of the descended system:
+
+- It is the native port of `descent_degree_cost_20260930.py`, which
+  produced this table on 2026-09-30 and stays as that record.
+- The port's first 16 rows are identical, and its output is
+  `descent_degree_cost-output-20261006.txt`.
+
+The model:
 
 - **relations:** `2^ℓ`;
 - **targets:** `m!·2^{n−(m−1)ℓ}`, at least one a relation;
@@ -129,6 +191,12 @@ Each row is minimised over integer `ℓ`. The rho reference is `2^60.81`
 | 4 | 6, constant | 2 | 34 | 398 | `2^84.59` | `2^118.59` | `2^+57.78` |
 | 4 | 7, constant | 1 | 34 | 398 | `2^48.11` | `2^82.11` | `2^+21.30` |
 | 4 | 7, constant | 2 | 34 | 398 | `2^96.21` | `2^130.21` | `2^+69.40` |
+| 3 | `⌈ℓ/2⌉ + 4`, the `m = 3` fit (6 at `ℓ = 4`) — *new 2026-10-06* | 1 | 4 | 143 | `2^33.38` | `2^158.96` | `2^+98.15` |
+| 3 | `⌈ℓ/2⌉ + 4`, the `m = 3` fit — *new* | 2 | 4 | 143 | `2^66.76` | `2^192.34` | `2^+131.53` |
+| 4 | semi-regular `D_reg(N)` of the `m = 4` shape (55 at `ℓ = 27`) — *new* | 1 | 27 | 370 | `2^220.56` | `2^275.14` | `2^+214.33` |
+| 4 | semi-regular `D_reg(N)` (38 at `ℓ = 5`) — *new* | 2 | 5 | 282 | `2^314.45` | `2^435.04` | `2^+374.23` |
+| 4 | **`ℓ + 4`, the measured `m = 4` fit** (8 at `ℓ = 4`) — *new* | 1 | 4 | 278 | `2^49.55` | **`2^173.13`** | **`2^+112.32`** |
+| 4 | `ℓ + 4`, the `m = 4` fit — *new* | 2 | 4 | 278 | `2^99.10` | `2^222.68` | `2^+161.87` |
 
 - **The free-oracle rows reproduce §5.3.** At `m = 3`, `ℓ = 33` gives
   `2^68.58`, exactly. At `m = 4` the integer optimum `ℓ = 27` gives
@@ -142,11 +210,32 @@ Each row is minimised over integer `ℓ`. The rho reference is `2^60.81`
   - So the `m = 4`, `D = 2`, `w = 1` row, `2^+2.07`, is **not a separation**.
     Every other row with an oracle clears rho by 8 to 209 bits, and a
     reader should subtract `log₂ K` from those gaps.
-- **The `m = 4` rows are `m = 3`'s degrees applied to an unmeasured
-  system.** The `m = 4` chain has `2n` cubic equations. At equal `ℓ` it
-  has `n + ℓ` more unknowns, one more 131-bit intermediate point and one
-  more summand. Nothing here measures its degree, so those rows are the
-  optimistic case.
+- **The `m = 4` constant-degree rows are `m = 3`'s degrees applied to
+  `m = 4`.** The chain has `2n` cubic equations. At equal `ℓ` it has
+  `n + ℓ` more unknowns, one more 131-bit intermediate point and one more
+  summand.
+  - On 2026-09-30 these rows were unmeasured and called the optimistic
+    case.
+  - §5 now measures `m = 4`: 6 at `ℓ = 2` and ≥7 at `ℓ = 3`.
+  - The `D = 6` rows are already exceeded at `ℓ = 3`, and `D = 7` is
+    already reached there. Both are priced at `ℓ ≈ 34`.
+  - Holding the degree at 7 from `ℓ = 3` to `ℓ = 34` would need the
+    measured rise of one degree per `ℓ` to stop at once. So both rows
+    remain the optimistic case.
+  - A ≥7 is a bound, so this does not show 7 exceeded.
+- **The fit rows' minima sit at the bottom of the search range,
+  `ℓ = 4`.** The range `4..70` is the 2026-09-30 model's, kept so the
+  existing rows reproduce.
+  - Once the degree grows with `ℓ`, a larger factor base costs more than
+    it saves in targets. The optimiser therefore shrinks the base until
+    the target count, `2^125.6` here, is nearly the whole group.
+  - The route has then turned into an expensive search over targets.
+  - The tool also prints the fits below the range, at `ℓ = 1`–`3`:
+    - `m = 3`: `2^158.12` to `2^160.78`;
+    - `m = 4`: `2^165.93` to `2^170.90`.
+  - There the target count is at or past the `2^129` subgroup, so the
+    model has stopped describing index calculus. Every value is still above
+    exhaustive search.
 
 ### What the table says
 
@@ -174,6 +263,15 @@ Each row is minimised over integer `ℓ`. The rho reference is `2^60.81`
   that follows `D_reg`. Both say 7 at `(10, 5)`.
   - Between those two, the `n = 131` price differs by 106 bits at `w = 1`.
   - `(15, 5)` is the cell that decides it.
+  - *Added 2026-10-06:*
+    - Both `m` show a degree that is flat in `n` at fixed `ℓ` and rises
+      with `ℓ`.
+    - That favours an `ℓ`-driven degree, which the fit rows model, over
+      both "levelled off" and the `N`-driven `D_reg`.
+    - The fit rows sit between those two prices, and above brute force.
+    - Whatever the right model, any degree that keeps rising with `ℓ`
+      gives the same verdict: the optimiser shrinks the factor base until
+      the route is a target search.
 
 ## 3. What changes, and what does not
 
@@ -206,6 +304,9 @@ Each row is minimised over integer `ℓ`. The rho reference is `2^60.81`
     measured cell within one degree, and it is not constant.
   - Any future ECC2K-130 figure for this route should state which degree
     model it assumes. The two differ by more than 100 bits at `n = 131`.
+  - *2026-10-06:* §5 adds a third model, a degree set by `m` and `ℓ` and
+    flat in `n`. It fits both `m` measured so far, and it is the one the
+    data favour.
 
 ## 4. What would move it
 
@@ -226,6 +327,161 @@ Each row is minimised over integer `ℓ`. The rho reference is `2^60.81`
 - **A different oracle.** SAT is measured and goes the wrong way (§5.4
   there). Anything else is unpriced.
 
+## 5. The `m = 4` measurement (2026-10-06)
+
+`research/dreg_m4_chain_20261006/` and Result 10 of
+`RESEARCH_DREG_MEASUREMENT.md`. It was pre-registered, and its predictions
+held.
+
+| `ℓ` | `m = 4` cells, unknowns | measured, four draws each | semi-regular `D_reg` | `m = 3` at the same `ℓ` |
+|--:|---|---|---|---|
+| 1 | (4,1) (5,1) (6,1), 12–16 | 5 in every draw | 5 | — |
+| 2 | (5,2) (6,2) (7,2) (8,2), 18–24 | 6 in every draw | 6, 7, 7, 7 | 5 in every draw |
+| 3 | (9,3) (10,3), 30 and 32 | ≥7 in all eight draws | 8, 9 | 6 (5 at surplus −5) |
+
+- **`m = 4` sits one degree above `m = 3` at the same `ℓ`**, and the gap
+  does not close as `n` grows.
+- **It rises with `ℓ`:** 5, then 6, then ≥7. That is at least one degree
+  per unit of `ℓ`, against about half a degree for `m = 3`.
+- **It is flat in `n` at fixed `ℓ`.**
+  - So the measured degree is set by `m` and `ℓ`.
+  - The semi-regular reference, which counts unknowns and equations, is
+    within one in every cell but overstates the growth in `n`.
+- **What it does to §2.**
+  - The `m = 4` constant-degree rows are the optimistic case. 6 is
+    exceeded and 7 is reached at `ℓ = 3`, against the `ℓ ≈ 34` they
+    assume.
+  - The new `ℓ + 4` row prices `m = 4` at `2^173.13` at `w = 1`, with its
+    minimum at the smallest factor base. That is `2^+112` over rho, and
+    above an exhaustive search of the subgroup.
+  - Below the searched range it is `2^165.93` at `ℓ = 1`, still above that
+    search.
+  - It is an extrapolation of a fit to three rungs, one of them a bound.
+    What it shows robustly is the shape: a degree that rises with `ℓ` makes
+    the factor base shrink until the route is a search.
+- **Unchanged:** the verdict against rho, which never depended on the
+  degree (§2, "What the table says").
+
+## 6. The MutantXL closure degree (2026-10-16)
+
+Every degree in §1–§5 is XL's: the first degree whose plain Macaulay row
+space contains `1`. `research/dreg_closure_mutantxl_20261016/` replays the
+same 92 unsatisfiable draws and saturates each degree under MutantXL's step:
+degree falls times monomials, repeated to saturation.
+
+| | XL | closure |
+|---|---|---|
+| `m = 3`, `ℓ = 2..5` (N = 11–25) | 5, 5–6, 6–7, 7 | 3–4, 4, 4, 4 |
+| `m = 4`, `ℓ = 1..3` (N = 12–32) | 5, 6, ≥7 | 3–4, 3–4, 4 |
+
+- **Refutation degree.** Every draw refutes under the closure below XL.
+  58 of the 84 resolved draws refute two or more degrees below.
+- **Growth with `ℓ`.** None appears: the m = 3 closure median is 4 at
+  every `ℓ`.
+- **Soundness.** The closure never refuted a committed satisfiable draw.
+  This control was disclosed as added after measurement.
+- **Instrument checks.** XL identity held on every degree built.
+
+**Priced as a constant degree 4** (`descent_degree_cost`, derived):
+
+| m | w | ℓ | N | total | vs rho |
+|--:|--:|--:|--:|--:|--:|
+| 3 | 1 | 40 | 251 | `2^82.27` | `2^+21.46` |
+| 3 | 2 | 45 | 266 | `2^100.25` | `2^+39.44` |
+| 4 | 1 | 33 | 394 | `2^68.43` | `2^+7.62` |
+| 4 | 2 | 34 | 398 | `2^93.91` | `2^+33.10` |
+
+- **The closure's counted work.** It grows roughly as its column count to
+  the power 2.2. So the `w = 2` rows are the ones the measured closure
+  tracks.
+- **The extrapolation.** These rows assume the closure stays at 4 from
+  `N = 32` to `N ≈ 400`, and nothing here measures that.
+  - The successor lead is a sparse closure at degree 4 for `N ≈ 40` to 50.
+- **The free-oracle floor still binds.** At `m = 4` it is `2^56.46`, which
+  leaves `2^5.71` an oracle call. So **no row beats rho**.
+- **Units are unconverted, as in §2.** Touches against group operations,
+  with `K` unmeasured. So `+7.62` is a distance, not a separation.
+
+## 7. The closure at scale (2026-10-16)
+
+`research/dreg_closure_scale_20261016/` measured degree 4 on 40
+unsatisfiable draws at N = 26–42. It was pre-registered, and every draw
+ran to completion.
+
+| | refutes at 4 | does not refute at 4 (degree 4 saturated) |
+|---|---|---|
+| m = 3 | ℓ = 5 (12/12), ℓ = 6 (8/8) | **ℓ = 7 (8/8)**, N = 40, 42 |
+| m = 4 | ℓ = 3 (8/8), ℓ = 4 (4/4), up to N = 42 | — |
+
+- **The rise follows ℓ, not N.** At N = 40 and 42, m = 4 holds and m = 3
+  rises. A descriptive reading is that the closure degree is set by
+  `m·ℓ`: the refuting cells have `m·ℓ ≤ 18` and the rising cells 21. It
+  was not registered.
+- **What it does to §6:**
+  - The m = 3 "4, constant" row (`2^82.27`) is **withdrawn**, because
+    m = 3 exceeds 4 from ℓ = 7, far below its priced ℓ = 40.
+  - The m = 4 row (`2^68.43`) keeps its status as an open extrapolation.
+    Its measured support is now ℓ ≤ 4 and N ≤ 42, against a priced ℓ = 33
+    and N = 394.
+- **Degree held at 5** (`descent_degree_cost`, derived):
+
+| m | w | ℓ | N | total | vs rho |
+|--:|--:|--:|--:|--:|--:|
+| 3 | 1 | 41 | 254 | `2^85.18` | `2^+24.37` |
+| 4 | 1 | 34 | 398 | `2^71.13` | `2^+10.32` |
+| 4 | 2 | 34 | 398 | `2^106.52` | `2^+45.71` |
+
+- **Degree 5 is unmeasured above N = 25.** At N = 40 it is 760k columns,
+  past the dense engine. A sparse closure would be needed.
+- **No row beats rho.** The free-oracle floor (§2) still binds, and the
+  units are unconverted.
+
+## 8. What sets the closure degree (2026-10-16)
+
+`research/dreg_closure_driver_20261016/` was pre-registered, with 16 draws.
+
+- **Cells.**
+  - m = 3, ℓ = 6 at N = 40 and 42: it refutes at 4 on 8 of 8, at the same
+    N where ℓ = 7 does not (§7).
+  - m = 4, ℓ = 5 (`m·ℓ = 20`) at N = 42 and 44: it refutes at 4 on 8 of 8.
+- **Rejected:**
+  - N as the driver;
+  - an `m·ℓ` threshold ≤ 20.
+- **Surviving:**
+  - the closure degree exceeds 4 from **ℓ = 7**;
+  - it exceeds 4 from **m·ℓ ≥ 21**.
+- **What this does to §6–§7.** Under either survivor, m = 4 exceeds
+  degree 4 by ℓ = 7 at the latest, against the priced ℓ = 33.
+  - So the m = 4 "4, constant" row (`2^68.43`) is **contradicted**, not
+    merely extrapolated. It is unmeasured at m = 4, ℓ ≥ 6.
+  - The optimistic case is now the degree-5 row:
+
+| m | w | ℓ | total | vs rho |
+|--:|--:|--:|--:|--:|
+| 4 | 1 | 34 | `2^71.13` | `2^+10.32` |
+| 3 | 1 | 41 | `2^85.18` | `2^+24.37` |
+
+- **Degree 5 is unmeasured past ℓ = 7.** Whether it holds there decides
+  even these rows, and testing that needs a sparse closure.
+- **No row beats rho.** The free-oracle floor binds, and the units are
+  unconverted.
+
+## 9. Guess-then-degree-4 (2026-10-17)
+
+`research/dreg_closure_specialise_20261017/` fixed single variables in the 8
+m = 3, ℓ = 7 draws that do not refute at degree 4.
+
+- **Single fixes.** Any one fixed variable lets degree 4 refute on 6 of 8.
+- **Both branches.** On 5 of 8, both values of one guess refute.
+- **That names a third oracle model.** Alongside "degree 4" (contradicted,
+  §8) and "degree 5" (optimistic, §8), there is **guess k variables, then
+  degree 4**, at `2^k · C(N−k, ≤4)^w` per target.
+  - It is measured only at ℓ = 7, where k = 1 often suffices.
+  - If k grows like `m·(ℓ−6)`, it is about 108 at m = 4, ℓ = 33. That is
+    far worse than degree 5, so no row is added.
+  - The measurement that would decide it is k at ℓ = 8 and 9.
+- **No row beats rho.**
+
 ## Scope and disclosures
 
 - **System.** `m = 3`, the chained `S₃`, with `b = 1`.
@@ -241,6 +497,8 @@ Each row is minimised over integer `ℓ`. The rho reference is `2^60.81`
     (GF(2²)), 8 (GF(2²), GF(2⁴)), 9 (GF(2³)), 10 (GF(2²), GF(2⁵)), 12
     (GF(2²), GF(2³), GF(2⁴), GF(2⁶)) and 15 (GF(2³), GF(2⁵)).
   - The subspaces are random, so no subfield structure is chosen or used.
+  - The `m = 4` cells (§5) are `n = 4`–`10`, with GF(2^6) adding GF(2²)
+    and GF(2³). Their other subfields are listed above.
   - The challenge field GF(2^131) has no proper intermediate subfields.
   - No result here depends on a subfield. No Frobenius action is used.
 - **§8a.** Nothing here is an index-calculus improvement, so the `m = 83`
@@ -251,15 +509,24 @@ Each row is minimised over integer `ℓ`. The rho reference is `2^60.81`
   - The constant-degree rows assume the degree stops where `n ≤ 15` left
     it.
   - The semi-regular rows assume the one-degree agreement seen at `n ≤ 15`
-    persists to `N ≈ 209`.
-  - Neither is measured.
+    persists to `N ≈ 209`. For `m = 4` that is `N ≈ 370`.
+  - The fit rows (2026-10-06) assume that `⌈ℓ/2⌉ + 4` (`m = 3`) and
+    `ℓ + 4` (`m = 4`), fitted at `ℓ ≤ 5` and `ℓ ≤ 3`, hold at `ℓ = 4`.
+    That `ℓ` is in range, but `n = 131` is not.
+  - None of these is measured.
 - **Units.** Oracle costs are in monomial-column touches and rho is in
   group operations, unconverted (§2).
 
 ## Reproducing
 
 ```sh
-python3 research/dreg_degree7_ell5_20260930/semireg.py        # the reference column
-python3 research/dreg_degree7_ell5_20260930/score.py          # the degree-7 cells
-python3 research/notes/ecc2k130/descent_degree_cost_20260930.py  # §2's table
+# native (AGENTS.md: no Python); the 2026-09-30 Python tools stay as that
+# round's record and are reproduced exactly
+cargo run --release --example dreg_score -- semireg 3 10:5 13:5 15:5     # the reference column
+cargo run --release --example dreg_score -- score research/dreg_degree7_ell5_20260930/runs/cell-10-5-7.u*.jsonl
+cargo run --release --example dreg_score -- score research/dreg_m4_chain_20261006/runs/cell-*.jsonl  # §5
+cargo run --release --example descent_degree_cost                        # §2's table + §6's rows
+cargo run --release --example dreg_score -- closure research/dreg_closure_mutantxl_20261016/runs/*.jsonl  # §6
+cargo run --release --example dreg_score -- scale research/dreg_closure_scale_20261016/runs/*.d*.jsonl  # §7
+cargo run --release --example dreg_score -- scale research/dreg_closure_driver_20261016/runs/*.d*.jsonl  # §8
 ```

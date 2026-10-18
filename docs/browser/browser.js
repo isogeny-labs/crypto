@@ -44,7 +44,25 @@
     return el("div", { class: "fact" }, [el("dt", { text: label }), dd]);
   }
   function fieldLabel(c) {
-    return c.field.characteristic === 2 ? "GF(2^" + c.field.degree + ")" : "GF(p), p of " + c.field.bits + " bits";
+    if (c.field.characteristic === 2) return "GF(2^" + c.field.degree + ")";
+    if (c.field.degree > 1) return "GF(p^" + c.field.degree + "), p of " + BigInt(c.field.p).toString(2).length + " bits";
+    return "GF(p), p of " + c.field.bits + " bits";
+  }
+  /* An extension's modulus t^k + c_{k-1}t^{k-1} + ... + c_0, from its low
+     coefficients [c_0, ..., c_{k-1}]. */
+  function extensionModulus(low) {
+    var terms = ["t^" + low.length];
+    for (var i = low.length - 1; i >= 0; i--) {
+      if (low[i] === "0") continue;
+      var power = i === 0 ? "" : (i === 1 ? "t" : "t^" + i);
+      terms.push((low[i] === "1" && i > 0 ? "" : low[i]) + power);
+    }
+    return terms.join(" + ");
+  }
+  function fieldFact(c) {
+    if (c.field.characteristic === 2) return "GF(2^" + c.field.degree + "), modulus " + fmt(c.field.modulus);
+    if (c.field.degree > 1) return "GF(p^" + c.field.degree + ") = GF(p)[t]/(" + extensionModulus(c.field.modulus) + "), p = " + c.field.p + "; coefficients listed over 1, t, …, t^" + (c.field.degree - 1);
+    return "GF(p), p = " + c.field.p + " (" + c.field.bits + " bits)";
   }
   function bestRatio(c) {
     var vals = (c.leaderboard || []).map(function (b) { return b.ratio_rho; }).filter(function (v) { return typeof v === "number"; });
@@ -133,7 +151,7 @@
   function curvesView(q) {
     var head = el("div", null, [
       el("h1", { text: "Curves" }),
-      el("p", { class: "lede", text: "Every curve in the ICV1 registry: " + DATA.counts.curves + " models. Search by name or identity, filter by family, field, trace, order, subgroup and what has been measured on it. Click a slug for its full record and everything that cites it. A conductor is not an invariant of a curve over a finite field; the endomorphism discriminant (−7 for every Koblitz curve) is the nearest thing recorded." })
+      el("p", { class: "lede", text: "Every curve in the ICV1 registry: " + DATA.counts.curves + " models. Search by name or identity, filter by family, field, trace, order, subgroup and what has been measured on it. Click a slug for its full record and everything that cites it. This catalog filters the recorded endomorphism discriminant. Volcano conductors require a certified endomorphism order; missing order data is not a conductor assignment." })
     ]);
     var f = el("form", { class: "filters" });
     function input(name, label, type, extra) {
@@ -235,6 +253,10 @@
         { key: "r_bits", label: "log₂ r", numeric: true, digits: 2 },
         { key: "cofactor", label: "Cofactor", numeric: true, sort: function (c) { return c.cofactor === null ? null : Number(c.cofactor); } },
         { key: "end", label: "End. disc.", cell: function (c) { return tdText(c.endomorphism_discriminant === null ? "–" : String(c.endomorphism_discriminant), "n"); } },
+        { key: "cover", label: "Cover", cell: function (c) {
+          var cert = c.hyperelliptic_cover && c.hyperelliptic_cover.certificate;
+          return tdText(cert ? "genus " + cert.genus + ", degree " + cert.degree : "unresolved");
+        } },
         { key: "best", label: "Best IC / rho", numeric: true, sort: bestRatio, cell: function (c) { return ratioCell(bestRatio(c)); } },
         { key: "measured", label: "Cited by", sort: function (c) { return c.ecbench.length + c.tournament_cells.length + (c.on_leaderboard ? 1 : 0); }, cell: function (c) {
           var items = [];
@@ -271,7 +293,7 @@
     view.appendChild(chips);
     var facts = el("dl", { class: "facts" }, [
       fact("ICV1 identity", c.icv1, true),
-      fact("Field", c.field.characteristic === 2 ? "GF(2^" + c.field.degree + "), modulus " + fmt(c.field.modulus) : "GF(p), p = " + c.field.p + " (" + c.field.bits + " bits)", false),
+      fact("Field", fieldFact(c), false),
       fact("Coefficients", "a = " + fmt(c.a) + ", b = " + fmt(c.b), true),
       fact("Trace of Frobenius", c.trace),
       fact("Group order #E", c.order, true),
@@ -285,6 +307,38 @@
       fact("Construction", c.construction, true)
     ]);
     view.appendChild(facts);
+
+    view.appendChild(el("p", { class: "note" }, [repoLink("docs/curves/standards/coverage.json", "Standards inventory and unresolved records"), "; worldwide historical completeness has not been established."]));
+    view.appendChild(el("h2", { text: "Hyperelliptic cover" }));
+    var cover = c.hyperelliptic_cover;
+    var linkage = (c.cover_links || [])[0];
+    if (cover) {
+      var cert = cover.certificate;
+      view.appendChild(el("dl", { class: "facts" }, [
+        fact("Existence", cover.exists === true ? "Verified over the declared field" : (cover.status === "invalid_input" ? "Invalid input model" : "Unresolved")),
+        fact("Cover direction", "H → E"),
+        fact("Cover identity", linkage ? linkage.cover_id : null, true),
+        fact("Map identity", linkage ? linkage.map_id : null, true),
+        fact("Cover UID", linkage ? linkage.cover_uid : null, true),
+        fact("Map UID", linkage ? linkage.map_uid : null, true),
+        fact("Cover genus", cert ? cert.genus : null),
+        fact("Map degree", cert ? cert.degree : null),
+        fact("Field", cert ? "Same field as E" : "Not established"),
+        fact("Field validation", cover.field_check || cover.reason),
+        fact("Minimum genus / degree", "Not determined"),
+        fact("Subfield descent / subgroup transfer", "Not tested"),
+        fact("DLP advantage", "Not measured")
+      ]));
+      view.appendChild(el("p", { class: "note" }, [cert ? "An explicit geometric cover is recorded. Computational advantage requires separate evidence. " : "This result establishes neither existence nor nonexistence. ", repoLink("docs/curves/COVERS.md", "Proof and scope"), "; ", repoLink("docs/curves/covers.json", "replayable catalog findings"), "; ", repoLink("docs/curves/cover-links.yaml", "YAML identity graph"), "."]));
+      if (cert) {
+        var details = el("details", null, [el("summary", { text: "Cover equation and map certificate" })]);
+        details.appendChild(el("p", { text: "Ascending powers of u; H: v² + h(u)v = f(u). Map to the short model: x = x(u), y = y_v(u)v + y_0(u); compose with target_model_map when present. Coefficients use the curve's field representation." }));
+        details.appendChild(el("pre", { text: JSON.stringify(cert, null, 2) }));
+        view.appendChild(details);
+      }
+    } else {
+      view.appendChild(el("p", { class: "note", text: "Cover existence has not been checked for this model." }));
+    }
 
     view.appendChild(el("h2", { text: "Identities" }));
     var idl = el("dl", { class: "facts" });
@@ -392,12 +446,16 @@
   }
 
   /* ---------- factor bases ---------- */
+  function recordedCurveCell(slug) {
+    if (!slug) return tdText("–");
+    return byId.curve[slug] ? tdLink("#curve/" + slug, slug) : tdText(slug + " (registration pending)");
+  }
   function fbColumns() {
     return [
       { key: "fb_id", label: "Factor base", cell: function (f) { return tdLink("#fb/" + f.fb_id, f.fb_id); } },
       { key: "family", label: "Family" },
       { key: "params", label: "Parameters", cell: function (f) { return tdText(paramsText(f.params), "mono"); } },
-      { key: "curve", label: "Curve", cell: function (f) { return f.curve ? tdLink("#curve/" + f.curve, f.curve) : tdText("–"); } },
+      { key: "curve", label: "Curve", cell: function (f) { return recordedCurveCell(f.curve || f.recorded_curve); } },
       { key: "signed_points", label: "Signed points", numeric: true },
       { key: "abscissae", label: "Abscissae", numeric: true },
       { key: "columns", label: "Columns", numeric: true },
@@ -418,7 +476,7 @@
     view.appendChild(el("h1", { text: f.fb_id }));
     view.appendChild(el("dl", { class: "facts" }, [
       fact("Family", f.family), fact("Parameters", paramsText(f.params), true), fact("Description", f.description),
-      fact("Curve", f.curve ? link("#curve/" + f.curve, f.curve) : null, true),
+      fact("Curve", f.curve ? link("#curve/" + f.curve, f.curve) : (f.recorded_curve ? f.recorded_curve + " (registration pending)" : null), true),
       fact("Signed points", f.signed_points), fact("Abscissae", f.abscissae), fact("Columns", f.columns), fact("Dimension", f.dimension),
       fact("Points SHA-256", f.points_sha256, true), fact("Record SHA-256", f.fb_sha256, true)
     ]));
@@ -555,13 +613,90 @@
       return { slug: slug, r_bits: c ? c.r_bits : null, arms: ref.length, best: best === Infinity ? null : best };
     });
     view.appendChild(table([
-      { key: "slug", label: "Curve", cell: function (r) { return tdLink("#curve/" + r.slug, r.slug); } },
+      { key: "slug", label: "Curve", cell: function (r) { return recordedCurveCell(r.slug); } },
       { key: "r_bits", label: "log₂ r", numeric: true, digits: 2 },
       { key: "arms", label: "Arms measured", numeric: true },
       { key: "best", label: "Lowest mean S", numeric: true, digits: 3 }
     ], rows, { sortKey: "r_bits" }));
   }
 
+
+  /* ---------- yield ledger ---------- */
+  function yieldView(q) {
+    var head = el("div", null, [
+      el("h1", { text: "Yield ledger" }),
+      el("p", { class: "lede", text: "What each index-calculus run yielded on one target: relations per trial, lookups per relation, the relation matrix's rank, and the decomposition solver's own statistics where the harness recorded them. One row per (curve, target, factor base, oracle, solver, round), quoted from the run's record. These are stage diagnostics: they rank bases and oracles on the same targets, and only a whole-pipeline S decides speed." })
+    ]);
+    var f = el("form", { class: "filters" });
+    function select(name, label, options) {
+      var sel = el("select", { name: name });
+      options.forEach(function (o) { var opt = el("option", { value: o[0], text: o[1] }); if ((q[name] || "") === o[0]) opt.selected = true; sel.appendChild(opt); });
+      f.appendChild(el("label", null, [label, sel]));
+      return sel;
+    }
+    function uniq(key) { var s = {}; DATA.yields.forEach(function (y) { if (y[key] !== null && y[key] !== undefined) s[y[key]] = 1; }); return Object.keys(s).sort(); }
+    var curve = select("curve", "Curve", [["", "any"]].concat(uniq("curve").map(function (c) { return [c, c]; })));
+    var fbf = select("fb_family", "Factor-base family", [["", "any"]].concat(uniq("fb_family").map(function (c) { return [c, c]; })));
+    var fb = select("fb_id", "Factor base", [["", "any"]].concat(uniq("fb_id").map(function (c) { return [c, c]; })));
+    var oracle = select("oracle", "Oracle", [["", "any"]].concat(uniq("oracle").map(function (c) { return [c, c]; })));
+    var solver = select("solver_name", "Solver", [["", "any"]].concat(uniq("solver_name").map(function (c) { return [c, c]; })));
+    var status = select("status", "Outcome", [["", "any"], ["verified", "verified"], ["exhausted", "exhausted"], ["error", "error"], ["timeout", "timeout"]]);
+    var session = select("session_id", "Session", [["", "any"]].concat(uniq("session_id").map(function (c) { return [c, c]; })));
+    var withSolver = el("input", { type: "checkbox", name: "has_solver" }); withSolver.checked = q.has_solver === "1";
+    f.appendChild(el("label", { class: "check" }, [withSolver, "has solver statistics"]));
+    var reset = el("button", { type: "button", text: "Clear filters" });
+    f.appendChild(el("label", null, ["", reset]));
+    var count = el("p", { class: "count" });
+    var holder = el("div");
+    function current() {
+      var out = {};
+      Array.prototype.forEach.call(f.querySelectorAll("input,select"), function (i) { if (i.type === "checkbox") { if (i.checked) out[i.name] = "1"; } else if (i.value !== "") out[i.name] = i.value; });
+      return out;
+    }
+    function apply() {
+      var s = current();
+      setQuery("yield", s);
+      var rows = DATA.yields.filter(function (y) {
+        for (var k in s) {
+          if (k === "has_solver") { if (!y.solver) return false; continue; }
+          if (String(y[k]) !== s[k]) return false;
+        }
+        return true;
+      });
+      var verified = rows.filter(function (y) { return y.status === "verified" && y["yield"] !== null; });
+      var meanYield = verified.length ? verified.reduce(function (a, y) { return a + y["yield"]; }, 0) / verified.length : null;
+      count.textContent = rows.length + " of " + DATA.yields.length + " runs" + (meanYield === null ? "" : " · mean yield over " + verified.length + " verified: " + (100 * meanYield).toFixed(3) + " %");
+      while (holder.firstChild) holder.removeChild(holder.firstChild);
+      holder.appendChild(table([
+        { key: "curve", label: "Curve", cell: function (y) { return recordedCurveCell(y.curve); } },
+        { key: "target_index", label: "Target", numeric: true, cell: function (y) { return tdText(y.target_index === null ? "–" : "#" + y.target_index, "n"); } },
+        { key: "fb_id", label: "Factor base", cell: function (y) { return y.fb_id ? el("td", null, [link("#fb/" + y.fb_id, y.fb_id, "mono"), " ", chip(y.fb_family || "")]) : tdText("–"); } },
+        { key: "fb_columns", label: "Cols", numeric: true },
+        { key: "oracle", label: "Oracle", cell: function (y) { return tdText(fmt(y.oracle), "mono"); } },
+        { key: "solver_name", label: "Solver", cell: function (y) { return tdText(fmt(y.solver_name), "mono"); } },
+        { key: "status", label: "Outcome", cell: function (y) { return el("td", null, [chip(y.status, y.status === "verified" ? "ok" : "warn")]); } },
+        { key: "trials", label: "Trials", numeric: true },
+        { key: "relations", label: "Relations", numeric: true },
+        { key: "yield", label: "Yield", numeric: true, cell: function (y) { return tdText(y["yield"] === null ? "–" : (100 * y["yield"]).toFixed(3) + " %", "n"); } },
+        { key: "lookups_per_relation", label: "Lookups / rel.", numeric: true, digits: 1 },
+        { key: "matrix_rank", label: "Rank / rows", numeric: true, cell: function (y) { return tdText(y.matrix_rank === null ? "–" : y.matrix_rank + " / " + y.matrix_rows, "n"); } },
+        { key: "solver", label: "Solver stats", sort: function (y) { return y.solver ? 1 : 0; }, cell: function (y) {
+          if (!y.solver) return tdText("–");
+          var sv = y.solver, parts = [];
+          ["macaulay_rows", "macaulay_columns", "macaulay_degree", "macaulay_rank", "first_fall_degree", "sat_variables", "sat_clauses", "sat_conflicts", "sat_decisions", "sat_propagations"].forEach(function (k) { if (sv[k] !== undefined && sv[k] !== null) parts.push(k.replace(/_/g, " ") + " " + sv[k]); });
+          if (sv.budget_exhausted) parts.push("budget exhausted");
+          return tdText(parts.join(" · ") || "(empty)", "mono wrap");
+        } },
+        { key: "s", label: "S", numeric: true, digits: 3 },
+        { key: "session_id", label: "Session", cell: function (y) { return tdLink("#session/" + y.session_id, y.session_id); } }
+      ], rows, { sortKey: "curve", empty: "No runs match." }));
+    }
+    f.addEventListener("input", apply);
+    f.addEventListener("submit", function (e) { e.preventDefault(); apply(); });
+    reset.addEventListener("click", function () { Array.prototype.forEach.call(f.querySelectorAll("input,select"), function (i) { if (i.type === "checkbox") i.checked = false; else i.value = ""; }); apply(); });
+    view.appendChild(head); view.appendChild(f); view.appendChild(count); view.appendChild(holder);
+    apply();
+  }
   /* ---------- vocabulary ---------- */
   function vocabularyView() {
     view.appendChild(el("h1", { text: "Vocabulary" }));
@@ -589,7 +724,7 @@
     while (view.firstChild) view.removeChild(view.firstChild);
     Array.prototype.forEach.call(document.querySelectorAll(".views a"), function (a) {
       var v = a.getAttribute("data-view");
-      var active = h.view === v || (h.view === "curve" && v === "curves") || (h.view === "method" && v === "methods") || (h.view === "fb" && v === "factor-bases") || (h.view === "candidate" && v === "candidates") || (h.view === "round" && v === "rounds") || (h.view === "session" && v === "sessions");
+      var active = h.view === v || (h.view === "curve" && v === "curves") || (h.view === "method" && v === "methods") || (h.view === "fb" && v === "factor-bases") || (h.view === "candidate" && v === "candidates") || (h.view === "round" && v === "rounds") || (h.view === "session" && v === "sessions") || (h.view === "yield" && v === "yield");
       if (active) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
     switch (h.view) {
@@ -604,6 +739,7 @@
       case "round": roundDetail(h.id); break;
       case "sessions": sessionsView(); break;
       case "session": sessionDetail(h.id); break;
+      case "yield": yieldView(h.q); break;
       case "vocabulary": vocabularyView(); break;
       default: curvesView(h.q);
     }

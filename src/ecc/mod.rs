@@ -2,6 +2,10 @@
 //! key generation, ECDSA, and ECDH over secp256k1 / P-256.
 
 pub mod barrett_ecdsa;
+pub mod cryptopro_b_chain_consts;
+pub mod cryptopro_b_chain_set;
+pub mod cryptopro_b_field;
+pub mod cryptopro_b_point;
 pub mod ct;
 pub mod curve;
 pub mod curve25519;
@@ -11,11 +15,16 @@ pub mod ecdh;
 pub mod ecdsa;
 pub mod ed25519;
 pub mod ed448;
+pub mod endo_generic_chain_set;
+pub mod endo_generic_field;
+pub mod endo_generic_point;
+mod f25519;
 pub mod field;
 pub mod gost_3410_2012;
 pub mod keys;
 pub mod p256_field;
 pub mod p256_point;
+pub mod p521_field;
 pub mod point;
 pub mod schnorr;
 pub mod secp256k1_field;

@@ -48,11 +48,13 @@ pub struct WorkloadPlan {
     /// row; they are never pooled into a multi-target run.
     pub targets_per_curve: u64,
     pub target_seed: u64,
-    /// `planted` (the default: `Q = [k]G`, checked against `k`) or
-    /// `public` (`Q` hashed to the subgroup, checked by `[d]G = Q`): what a
-    /// `vs_rho` claim needs.  Not serialised when planted, so a spec
-    /// written before the field keeps its id.
-    #[serde(default, skip_serializing_if = "TargetKind::is_planted")]
+    /// `planted` (the default: `Q = [k]G`, checked against `k`),
+    /// `planted_shared` (the same `k` on every curve of one order, for
+    /// paired quotient statistics) or `public` (`Q` hashed to the
+    /// subgroup, checked by `[d]G = Q`): what a `vs_rho` claim needs.
+    /// Not serialised when planted, so a spec written before the field
+    /// keeps its id.
+    #[serde(default, skip_serializing_if = "TargetKind::is_plain_planted")]
     pub target_kind: TargetKind,
 }
 
@@ -255,6 +257,12 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
                 if d.applies == Applies::KoblitzOnly && w.curve.family != "koblitz" {
                     return Err(format!(
                         "arm `{}` ({}) runs on Koblitz curves only, and {} is {}; put it in a spec of its own",
+                        a.name, a.method.id, w.curve.slug, w.curve.family
+                    ));
+                }
+                if d.applies == Applies::BinaryOnly && !matches!(inst, Instance::Binary(_)) {
+                    return Err(format!(
+                        "arm `{}` ({}) runs on binary curves only, and {} is {}; put it in a spec of its own",
                         a.name, a.method.id, w.curve.slug, w.curve.family
                     ));
                 }

@@ -226,7 +226,7 @@ stopwatch, and the table should say which is which.
 
 | field | meaning |
 |:--|:--|
-| `name` | the matrix: `incremental-gauss` or `structured-gauss` |
+| `name` | the matrix: `incremental-gauss`, `structured-gauss` or `sparse-cado` |
 | `rows`, `rank`, `dependent` | relations added, rank reached, and the ones that added nothing |
 | `work`, `work_unit` | the method's own count (`row_ops` for an elimination) |
 | `recovered`, `verified` | the logarithm found, and whether it is the planted one |
@@ -463,12 +463,13 @@ incremental elimination, structured Gaussian elimination and an
 iterative method (Wiedemann, Lanczos) is a real lever and the one most
 often left unpriced.
 
-Two ship, chosen with `--linalg` (or the `linalg` key of a sweep):
+Three ship, chosen with `--linalg` (or the `linalg` key of a sweep):
 
 | name | what it is | pivot | storage |
 |:--|:--|:--|:--|
 | `incremental-gauss` | dense reduced row echelon, maintained as rows arrive | leftmost non-zero | `rank × columns` |
 | `structured-gauss` | sparse reduced row echelon, maintained as rows arrive | lightest column (Markowitz) | the non-zeros |
+| `sparse-cado` | batch: CADO-style filter (clique purge, spanning-tree merge), then block Wiedemann, re-solved as relations arrive; full-rank stop rule | — | the non-zeros |
 
 Both charge one `row_op` per non-zero multiply-subtract, so their
 `work` columns compare directly; on the two- or three-non-zero rows an
@@ -480,7 +481,12 @@ reduces the new row against the pivots held so far and answers
 `Independent`, `Dependent` or `Inconsistent`; `pinned` says whether one
 column is determined on its own. The loop calls them after every
 relation, so an implementation must answer incrementally; a batch
-method would re-solve on every call.
+method would re-solve on every call. `sparse-cado` is that batch method,
+made workable by re-solving only once every column is covered, then every
+`max(1, columns / 32)` relations; it answers only at full column rank,
+certified by two independently seeded solves agreeing, and charges the
+same `row_ops` (entry multiply-subtracts in merges, sparse products,
+checks and reconstruction) summed over every solve it tried.
 
 ---
 
@@ -748,6 +754,14 @@ worse than none:
   step's elimination once the residue echelon is full, is round 6 (§15):
   every output unchanged, 39% fewer multiply-adds at `m = 4`, `N = 12` and
   25% at `N = 16`, all in the refutation step.
+
+  Round 7 (§16) finishes `m = 3` at `N = 18`, where round 2 had only
+  `D ≥ 7`: `D = 7` on both targets. The `m = 3` line reads 6, 6, 7, 7
+  over `N = 9`–18, which A1 calls inconclusive, like `m = 4`'s 7, 7. Its
+  address space peaked at 96% of the 14 GB that machine allows, so
+  `m = 3` at `N = 21` is beyond it too. The round's checks run on a native
+  checker (`examples/pkm_tower_check.rs`) that reproduces the retired
+  Python scripts line for line.
 - **No parallelism.** Every count is single-threaded, which is what
   makes operation counts comparable; a parallel implementation would
   need its own accounting.
@@ -761,15 +775,16 @@ worse than none:
 
 | stage | trait | plug-ins |
 |:--|:--|:--|
-| factor base | `FactorBaseBuilder` | `prime-abscissa`, `glv-orbit`, `binary-subspace`, `koblitz-orbit`, `koblitz-symmetrised`, `gls-line` |
+| factor base | `FactorBaseBuilder` | `prime-abscissa`, `glv-orbit`, `binary-subspace`, `koblitz-orbit`, `koblitz-trace-zero`, `koblitz-symmetrised`, `gls-line` |
 | targets | `Targets` | `random`, `walk` |
 | point decomposition | `DecompositionOracle` | `subtract`, `mitm`, `mitm-frobenius`, `descent-algebraic`, `symmetrised`; `line-resultant` (library and `examples/glv_invariant_experiments.rs`: the `O(log p)` Weil-descent oracle for a line base over `F_{p^k}`, `line_oracle.rs`) |
 | polynomial solver | `SystemSolver` | `f4-f2`, `buchberger-f2`, `matrix-f4`, `matrix-f5`, `inherited-f4`, `crossbred-f2`, `xl-f2`, `sat-cdcl`, `fes-f2`, `fes-f2-wide`, `exhaustive` |
-| relation matrix | `RelationSolver` | `incremental-gauss`, `structured-gauss` |
+| relation matrix | `RelationSolver` | `incremental-gauss`, `structured-gauss`, `sparse-cado` |
 
 `ic bench --list` prints this with every parameter each plug-in reads.
-A parameter that takes several values (`divisor` on `koblitz-orbit` and
-`koblitz-symmetrised`) takes them separated by `;`, quoted in a shell.
+A parameter that takes several values (`divisor` on `koblitz-orbit`,
+`koblitz-trace-zero`, and `koblitz-symmetrised`) takes them separated by `;`,
+quoted in a shell.
 
 ### Source map
 

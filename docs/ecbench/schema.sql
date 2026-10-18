@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS algorithms (
   method_id     TEXT PRIMARY KEY,                     -- ECM1h + 12 hex
   method_sha256 TEXT NOT NULL UNIQUE,
   method        TEXT NOT NULL,                        -- e.g. rho.negation, ic.pipeline
-  family        TEXT NOT NULL CHECK (family IN ('rho', 'bsgs', 'kangaroo', 'ic')),
+  family        TEXT NOT NULL CHECK (family IN ('rho', 'bsgs', 'kangaroo', 'claw', 'ic')),
   params_json   TEXT NOT NULL,
   entry         TEXT NOT NULL                         -- the code path it runs
 );
@@ -110,6 +110,22 @@ CREATE TABLE IF NOT EXISTS factor_base_points (
   col    INTEGER NOT NULL,                            -- relation-matrix column
   coef   TEXT NOT NULL,                               -- coefficient of the point in its column
   PRIMARY KEY (fb_id, idx)
+);
+
+-- FBM1: measurement configuration identity (curve × FB1 × oracle × solver ×
+-- linalg × instrument). Results attach to cells; they are never part of the hash.
+CREATE TABLE IF NOT EXISTS factor_base_measurements (
+  fbm_id        TEXT PRIMARY KEY,                     -- FBM1h + 12 hex
+  fbm_sha256    TEXT NOT NULL UNIQUE,
+  curve_slug    TEXT NOT NULL REFERENCES curves(slug),
+  fb_id         TEXT NOT NULL REFERENCES factor_bases(fb_id),
+  fb_sha256     TEXT NOT NULL,
+  family        TEXT NOT NULL,
+  fb_params_json TEXT NOT NULL,
+  oracle        TEXT NOT NULL,
+  solver        TEXT NOT NULL,
+  linalg        TEXT NOT NULL,
+  instrument    TEXT NOT NULL                          -- e.g. ecbench.ic_pipeline/v1, sage.factor_base_dor/v1
 );
 
 -- ── Where and how ────────────────────────────────────────────────────
@@ -172,6 +188,7 @@ CREATE TABLE IF NOT EXISTS runs (
   method_id            TEXT NOT NULL REFERENCES algorithms(method_id),
   workload_id          TEXT NOT NULL REFERENCES workloads(workload_id),
   fb_id                TEXT REFERENCES factor_bases(fb_id),
+  fbm_id               TEXT REFERENCES factor_base_measurements(fbm_id),
   algorithm_seed       TEXT NOT NULL,
   status               TEXT NOT NULL CHECK (status IN ('verified', 'wrong_answer', 'exhausted', 'error', 'timeout', 'crashed')),
   recovered            TEXT,
@@ -217,11 +234,60 @@ CREATE TABLE IF NOT EXISTS run_counters (
   PRIMARY KEY (record_id, name)
 );
 
+-- The decomposition solver's statistics for an algebraic or SAT
+-- index-calculus run (the record's `solver` block; ICMS pdp_metrics).
+-- Absent for table oracles and generic methods.
+CREATE TABLE IF NOT EXISTS run_solver (
+  record_id            TEXT PRIMARY KEY REFERENCES runs(record_id),
+  name                 TEXT NOT NULL,
+  calls                INTEGER NOT NULL,
+  ops                  INTEGER NOT NULL,
+  op_unit              TEXT NOT NULL,
+  wall_ns              INTEGER NOT NULL,
+  budget_exceeded      INTEGER NOT NULL,
+  n_vars               INTEGER,
+  n_equations          INTEGER,
+  semi_regular_degree  INTEGER,
+  solving_degree_mean  REAL,
+  solving_degree_max   INTEGER,
+  macaulay_rows        INTEGER,
+  macaulay_columns     INTEGER,
+  macaulay_degree      INTEGER,
+  macaulay_rank        INTEGER,
+  sat_variables        INTEGER,
+  sat_clauses          INTEGER,
+  sat_conflicts        INTEGER,
+  sat_decisions        INTEGER,
+  sat_propagations     INTEGER,
+  extra_json           TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS isolation_blockers (
   record_id TEXT NOT NULL REFERENCES runs(record_id),
   ord       INTEGER NOT NULL,
   blocker   TEXT NOT NULL,                            -- "L2: 3 ticks of hypervisor steal ..."
   PRIMARY KEY (record_id, ord)
+);
+
+-- One measured cell under an FBM1 id (yield / DoR / cost). Source may be an
+-- ecbench record or a Sage DoR join stamped with the same FBM1.
+CREATE TABLE IF NOT EXISTS factor_base_measurement_cells (
+  cell_id              TEXT PRIMARY KEY,              -- optional stable id; else fbm_id||':'||record_id
+  fbm_id               TEXT NOT NULL REFERENCES factor_base_measurements(fbm_id),
+  record_id            TEXT REFERENCES runs(record_id),
+  session_id           TEXT,
+  s                    REAL,
+  total_gae            REAL,
+  trials               INTEGER,
+  relations            INTEGER,
+  yield_per_trial      REAL,
+  solving_degree_mean  REAL,
+  solving_degree_max   INTEGER,
+  semi_regular_degree  INTEGER,
+  macaulay_rows        INTEGER,
+  macaulay_columns     INTEGER,
+  status               TEXT,
+  extra_json           TEXT NOT NULL DEFAULT '{}'
 );
 
 CREATE TABLE IF NOT EXISTS comparisons (
@@ -355,4 +421,58 @@ JOIN workloads w ON w.workload_id = r.workload_id
 LEFT JOIN factor_bases f ON f.fb_id = r.fb_id
 WHERE r.fb_id IS NOT NULL;
 
-INSERT OR REPLACE INTO schema_info (key, value) VALUES ('ecbench_schema_version', '1');
+-- The yield ledger: what each index-calculus run yielded on one target,
+-- with its base, oracle, matrix rank and solver statistics.  `yield` is
+-- relations per trial.  ic.pipeline writes `relations`, ic.shared_rank
+-- writes `hits`; the view reads either.
+CREATE VIEW IF NOT EXISTS ic_yield AS
+SELECT r.record_id, r.session_id, r.arm, r.round, r.status, r.run_id,
+       w.curve_slug, w.target_index, r.fb_id, r.fbm_id, f.family AS fb_family, f.columns AS fb_columns,
+       f.signed_points AS fb_signed_points, a.method AS method,
+       json_extract(a.params_json, '$.oracle') AS oracle,
+       json_extract(a.params_json, '$.solver') AS solver_param,
+       json_extract(p.native_json, '$.trials') AS trials,
+       COALESCE(json_extract(p.native_json, '$.relations'), json_extract(p.native_json, '$.hits')) AS relations,
+       CAST(COALESCE(json_extract(p.native_json, '$.relations'), json_extract(p.native_json, '$.hits')) AS REAL)
+         / NULLIF(json_extract(p.native_json, '$.trials'), 0) AS yield,
+       json_extract(p.native_json, '$.lookups') AS lookups,
+       json_extract(p.native_json, '$.lift_failures') AS lift_failures,
+       json_extract(l.native_json, '$.rows') AS matrix_rows,
+       json_extract(l.native_json, '$.rank') AS matrix_rank,
+       p.gae AS relations_gae, r.total_gae, r.s, r.deterministic,
+       s.name AS solver, s.calls AS solver_calls, s.ops AS solver_ops, s.op_unit AS solver_op_unit,
+       s.budget_exceeded, s.n_vars, s.n_equations, s.semi_regular_degree, s.solving_degree_max,
+       s.macaulay_rows, s.macaulay_columns, s.macaulay_degree, s.macaulay_rank,
+       s.sat_variables, s.sat_clauses, s.sat_conflicts, s.sat_decisions, s.sat_propagations
+FROM runs r
+JOIN algorithms a ON a.method_id = r.method_id
+JOIN workloads w ON w.workload_id = r.workload_id
+LEFT JOIN factor_bases f ON f.fb_id = r.fb_id
+LEFT JOIN phases p ON p.record_id = r.record_id AND p.phase = 'relations'
+LEFT JOIN phases l ON l.record_id = r.record_id AND l.phase = 'linear_algebra'
+LEFT JOIN run_solver s ON s.record_id = r.record_id
+WHERE a.family = 'ic' AND r.warmup = 0;
+
+-- The FBM1 ledger: every measurement cell with its identity and DoR/yield fields.
+-- Cite yield or DoR only with both fb_id and fbm_id present.
+CREATE VIEW IF NOT EXISTS fb_measurement_ledger AS
+SELECT m.fbm_id, m.fbm_sha256, m.curve_slug, m.fb_id, m.family AS fb_family,
+       m.oracle, m.solver, m.linalg, m.instrument,
+       c.cell_id, c.record_id, c.session_id, c.s, c.total_gae,
+       c.trials, c.relations, c.yield_per_trial,
+       c.solving_degree_mean, c.solving_degree_max, c.semi_regular_degree,
+       c.macaulay_rows, c.macaulay_columns, c.status, c.extra_json
+FROM factor_base_measurements m
+LEFT JOIN factor_base_measurement_cells c ON c.fbm_id = m.fbm_id;
+
+CREATE TRIGGER IF NOT EXISTS factor_base_measurements_identity
+BEFORE INSERT ON factor_base_measurements
+WHEN EXISTS (
+  SELECT 1 FROM factor_base_measurements
+  WHERE fbm_id = NEW.fbm_id AND fbm_sha256 <> NEW.fbm_sha256
+)
+BEGIN
+  SELECT RAISE(ABORT, 'fbm_id collision: same short id, different sha256');
+END;
+
+INSERT OR REPLACE INTO schema_info (key, value) VALUES ('ecbench_schema_version', '3');

@@ -23,6 +23,8 @@ use std::cell::Cell;
 use std::collections::{BTreeSet, HashMap};
 use std::time::Instant;
 
+use num_bigint::BigUint;
+use num_traits::{One, Zero};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
@@ -243,8 +245,14 @@ impl Fq3 {
         assert!(!p.is_multiple_of(3));
         let f = Fq::new(p);
         let q1 = f.order();
-        let s = (1..p * p)
-            .map(|k| E2([k % p, (k / p) % p]))
+        // When p ≡ 2 (mod 3), every nonzero element of F_p is a cube.
+        // Search the non-base-field slice first instead of spending p
+        // exponentiations on elements that cannot work.
+        let base_limit = if p % 3 == 1 { p } else { 1 };
+        let base_candidates = (1..base_limit).map(|x| E2([x, 0]));
+        let extension_candidates = (1..p).flat_map(|y| (0..p).map(move |x| E2([x, y])));
+        let s = base_candidates
+            .chain(extension_candidates)
             .find(|s| *s != E2::ZERO && f.pow(s, q1 / 3) != E2::ONE)
             .expect("a non-cube");
         let zeta = f.pow(&s, q1 / 3);
@@ -288,11 +296,34 @@ impl Fq3 {
         }
         acc
     }
+    /// Exponentiation when `p^6` exceeds `u128`.
+    pub fn pow_big(&self, a: &E6, exponent: &BigUint) -> E6 {
+        let mut e = exponent.clone();
+        let mut base = *a;
+        let mut acc = E6::ONE;
+        while !e.is_zero() {
+            if (&e & BigUint::one()) == BigUint::one() {
+                acc = self.mul(&acc, &base);
+            }
+            e >>= 1;
+            if !e.is_zero() {
+                base = self.sq(&base);
+            }
+        }
+        acc
+    }
+    pub fn order_big(&self) -> BigUint {
+        BigUint::from(self.f.p).pow(6) - 1u8
+    }
     fn order(&self) -> u128 {
         (self.f.p as u128).pow(6) - 1
     }
     pub fn is_square(&self, a: &E6) -> bool {
-        *a == E6::ZERO || self.pow(a, self.order() / 2) == E6::ONE
+        *a == E6::ZERO
+            || match (self.f.p as u128).checked_pow(6) {
+                Some(q) => self.pow(a, (q - 1) / 2) == E6::ONE,
+                None => self.pow_big(a, &(self.order_big() >> 1)) == E6::ONE,
+            }
     }
     pub fn random(&self, rng: &mut StdRng) -> E6 {
         E6(core::array::from_fn(|_| self.f.random(rng)))
@@ -303,6 +334,9 @@ impl Fq3 {
         }
         if !self.is_square(a) {
             return None;
+        }
+        if (self.f.p as u128).checked_pow(6).is_none() {
+            return self.sqrt_big(a, rng);
         }
         let q1 = self.order();
         let s = q1.trailing_zeros();
@@ -323,6 +357,45 @@ impl Fq3 {
             while tt != E6::ONE {
                 tt = self.sq(&tt);
                 i += 1;
+            }
+            let mut b = cc;
+            for _ in 0..(m - i - 1) {
+                b = self.sq(&b);
+            }
+            m = i;
+            cc = self.sq(&b);
+            t = self.mul(&t, &cc);
+            r = self.mul(&r, &b);
+        }
+        Some(r)
+    }
+    fn sqrt_big(&self, a: &E6, rng: &mut StdRng) -> Option<E6> {
+        let q1 = self.order_big();
+        let mut odd = q1.clone();
+        let mut s = 0u32;
+        while (&odd & BigUint::one()).is_zero() {
+            odd >>= 1;
+            s += 1;
+        }
+        let z = loop {
+            let z = self.random(rng);
+            if z != E6::ZERO && !self.is_square(&z) {
+                break z;
+            }
+        };
+        let mut m = s;
+        let mut cc = self.pow_big(&z, &odd);
+        let mut t = self.pow_big(a, &odd);
+        let mut r = self.pow_big(a, &((&odd + 1u8) >> 1));
+        while t != E6::ONE {
+            let mut i = 0;
+            let mut tt = t;
+            while tt != E6::ONE && i < m {
+                tt = self.sq(&tt);
+                i += 1;
+            }
+            if i == m {
+                return None;
             }
             let mut b = cc;
             for _ in 0..(m - i - 1) {
@@ -611,6 +684,22 @@ impl<'a, F: Fld> Hyp<'a, F> {
         }
         acc
     }
+    /// Scalar multiplication without a fixed-width group-order limit.
+    pub fn mul_big(&self, a: &Div<F::E>, scalar: &BigUint) -> Div<F::E> {
+        let mut k = scalar.clone();
+        let mut acc = self.identity();
+        let mut base = a.clone();
+        while !k.is_zero() {
+            if (&k & BigUint::one()) == BigUint::one() {
+                acc = self.add(&acc, &base);
+            }
+            k >>= 1;
+            if !k.is_zero() {
+                base = self.add(&base, &base);
+            }
+        }
+        acc
+    }
 }
 
 // ── The weak curve y² = x³ + a₂x² + a₄x over F_{q³}, a₂ = −(α+σα), a₄ = α·σα
@@ -644,6 +733,16 @@ impl<'a> EllE<'a> {
             f,
             a2: f.neg(&f.add(alpha, &sa)),
             a4: f.mul(alpha, &sa),
+            ops: Cell::new(0),
+        }
+    }
+    /// `y² = x³ + a₂x² + a₄x` from its coefficients (the model of a curve
+    /// with full 2-torsion after one root is moved to `0`; §17's walk).
+    pub fn from_a2_a4(f: &'a Fq3, a2: E6, a4: E6) -> EllE<'a> {
+        EllE {
+            f,
+            a2,
+            a4,
             ops: Cell::new(0),
         }
     }
@@ -713,6 +812,37 @@ impl<'a> EllE<'a> {
     pub fn sub(&self, p: &PtE6, q: &PtE6) -> PtE6 {
         self.add(p, &self.neg(q))
     }
+    /// [`EllE::mul`] for a scalar above 2⁶⁴ (the group order itself).
+    pub fn mul_u128(&self, pt: &PtE6, mut k: u128) -> PtE6 {
+        let mut acc = PtE6::INF;
+        let mut base = *pt;
+        while k > 0 {
+            if k & 1 == 1 {
+                acc = self.add(&acc, &base);
+            }
+            k >>= 1;
+            if k > 0 {
+                base = self.add(&base, &base);
+            }
+        }
+        acc
+    }
+    /// Scalar multiplication for subgroup orders above `u128`.
+    pub fn mul_big(&self, pt: &PtE6, scalar: &BigUint) -> PtE6 {
+        let mut k = scalar.clone();
+        let mut acc = PtE6::INF;
+        let mut base = *pt;
+        while !k.is_zero() {
+            if (&k & BigUint::one()) == BigUint::one() {
+                acc = self.add(&acc, &base);
+            }
+            k >>= 1;
+            if !k.is_zero() {
+                base = self.add(&base, &base);
+            }
+        }
+        acc
+    }
     pub fn mul(&self, pt: &PtE6, mut k: u64) -> PtE6 {
         let mut acc = PtE6::INF;
         let mut base = *pt;
@@ -739,29 +869,21 @@ impl<'a> EllE<'a> {
     }
 }
 
-fn isqrt(n: u64) -> u64 {
-    let mut r = (n as f64).sqrt() as u64;
-    while r * r > n {
-        r -= 1;
-    }
-    while (r + 1) * (r + 1) <= n {
-        r += 1;
-    }
-    r
-}
-
 /// `#E(F_{q³})` by baby-step giant-step on a random point, accepted when it
 /// is four times a prime (the group is then `Z/2 × Z/2ℓ` and the DLP lives
 /// in the subgroup of order `ℓ`).
 fn group_order_4_prime(ec: &EllE, rng: &mut StdRng) -> Option<u64> {
-    let p = ec.f.f.p;
+    // returns ℓ = #E/4 when #E = 4ℓ with ℓ prime;
+    // the order is near p⁶, which passes 2⁶⁴ at p = 1,622 while ℓ = #E/4 stays
+    // below it up to p = 2,039: the search runs in u128 (note §16)
+    let p = ec.f.f.p as u128;
     let q3 = p.pow(6);
-    let two_sqrt = 2 * isqrt(q3) + 2;
+    let two_sqrt = 2 * isqrt128(q3) + 2;
     let lo = q3 + 1 - two_sqrt;
     let width = 2 * two_sqrt;
     let pt = ec.random_point(rng);
-    let steps = isqrt(width) + 1;
-    let mut table: HashMap<PtE6, u64> = HashMap::new();
+    let steps = isqrt128(width) + 1;
+    let mut table: HashMap<PtE6, u128> = HashMap::new();
     let mut jp = PtE6::INF;
     for j in 0..steps {
         if !jp.inf {
@@ -769,9 +891,9 @@ fn group_order_4_prime(ec: &EllE, rng: &mut StdRng) -> Option<u64> {
         }
         jp = ec.add(&jp, &pt);
     }
-    let giant = ec.mul(&pt, steps);
-    let mut t = ec.mul(&pt, lo);
-    let mut i = 0u64;
+    let giant = ec.mul_u128(&pt, steps);
+    let mut t = ec.mul_u128(&pt, lo);
+    let mut i = 0u128;
     let mut found = None;
     while i * steps <= width + steps {
         let m = if t.inf {
@@ -787,11 +909,22 @@ fn group_order_4_prime(ec: &EllE, rng: &mut StdRng) -> Option<u64> {
         i += 1;
     }
     let m = found?;
-    if m % 4 != 0 || !is_prime_u64(m / 4) {
+    if m % 4 != 0 || m / 4 > u64::MAX as u128 || !is_prime_u64((m / 4) as u64) {
         return None;
     }
     let other = ec.random_point(rng);
-    ec.mul(&other, m).inf.then_some(m)
+    ec.mul_u128(&other, m).inf.then_some((m / 4) as u64)
+}
+
+fn isqrt128(n: u128) -> u128 {
+    let mut r = (n as f64).sqrt() as u128;
+    while r * r > n {
+        r -= 1;
+    }
+    while (r + 1) * (r + 1) <= n {
+        r += 1;
+    }
+    r
 }
 
 // ── The genus-3 cover H : y² = F(x)·N(x) over F_q ─────────────────────────
@@ -1654,10 +1787,9 @@ pub fn generate_spec(p: u64, seed: u64) -> Spec {
             continue;
         }
         let ec = EllE::new(&f, &alpha);
-        let Some(m) = group_order_4_prime(&ec, &mut rng) else {
+        let Some(l) = group_order_4_prime(&ec, &mut rng) else {
             continue;
         };
-        let l = m / 4;
         let Some(cov) = Cover::new(&f, &alpha) else {
             continue;
         };
@@ -1697,6 +1829,39 @@ pub fn generate_spec(p: u64, seed: u64) -> Spec {
             transfer_muls,
         };
     }
+}
+
+/// An instance on a given weak curve `y² = x(x − α)(x − σα)` with given
+/// points: `G` of prime order `l`, `Q = [d]G` (`d` is the planted answer, used
+/// only to report correctness; the route never reads it).  `None` when the
+/// cover refuses `α` or a transfer degenerates.  §18 builds this from the
+/// curve the walk reached and the transported points.
+pub fn spec_from_curve(p: u64, alpha: E6, l: u64, g: PtE6, q: PtE6, d: u64) -> Option<Spec> {
+    let f = Fq3::new(p);
+    let cov = Cover::new(&f, &alpha)?;
+    f.reset_muls();
+    let gj = cov.transfer(&f, &g)?;
+    let qj = cov.transfer(&f, &q)?;
+    let transfer_muls = f.muls();
+    let jac = Hyp {
+        f: &f.f,
+        h: cov.hx.clone(),
+        g: 3,
+    };
+    if jac.is_identity(&gj) || !jac.is_identity(&jac.mul(&gj, l as u128)) {
+        return None;
+    }
+    Some(Spec {
+        p,
+        alpha,
+        l,
+        g,
+        q,
+        d,
+        gj,
+        qj,
+        transfer_muls,
+    })
 }
 
 #[derive(Clone, Debug)]
@@ -2091,6 +2256,162 @@ pub fn rho_e(spec: &Spec, seed: u64) -> RhoRunE {
         group_ops: ops,
         s: ops as f64 / (n as f64).sqrt(),
         correct: found == Some(spec.d),
+    }
+}
+
+/// [`rho_e`] without the stored walk (note §15): the same r-adding walk,
+/// `threads` walkers from random starts, a point distinguished when `dp_bits`
+/// bits of its mixed hash vanish, the distinguished points shared between
+/// the walkers; a walker that meets no distinguished point in `40·2^dp_bits`
+/// steps restarts from a new random point.  Every group operation of every
+/// walker is charged, the walk's multipliers once per walker.
+pub fn rho_e_dp(spec: &Spec, seed: u64, dp_bits: u32, threads: usize) -> RhoRunE {
+    use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+    use std::sync::Mutex;
+    let n = spec.l;
+    let r = 32usize;
+    let scalars: Vec<(u64, u64)> = {
+        let mut rng = StdRng::seed_from_u64(seed ^ 0x8D06);
+        (0..r)
+            .map(|_| (rng.gen_range(0..n), rng.gen_range(1..n)))
+            .collect()
+    };
+    let table: Mutex<HashMap<PtE6, (u64, u64)>> = Mutex::new(HashMap::new());
+    let found: Mutex<Option<u64>> = Mutex::new(None);
+    let stop = AtomicBool::new(false);
+    let steps = AtomicU64::new(0);
+    let ops = AtomicU64::new(0);
+    let cap = 64 * (n as f64).sqrt() as u64 + 1_000_000;
+    let mask = (1u64 << dp_bits) - 1;
+    let tail_cap = 40u64 << dp_bits;
+    let progress = std::env::var("JV_RHO_PROGRESS").is_ok();
+    let start = Instant::now();
+    std::thread::scope(|sc| {
+        for w in 0..threads.max(1) {
+            let (table, found, stop, steps, ops, scalars) =
+                (&table, &found, &stop, &steps, &ops, &scalars);
+            sc.spawn(move || {
+                let f = Fq3::new(spec.p);
+                let ec = EllE::new(&f, &spec.alpha);
+                let mults: Vec<PtE6> = scalars
+                    .iter()
+                    .map(|&(al, be)| ec.add(&ec.mul(&spec.g, al), &ec.mul(&spec.q, be)))
+                    .collect();
+                let mut rng = StdRng::seed_from_u64(
+                    seed ^ 0x8D06 ^ (w as u64 + 1).wrapping_mul(0x9E37_79B9_7F4A_7C15),
+                );
+                let mut local = 0u64;
+                'outer: while !stop.load(Ordering::Relaxed) {
+                    let mut a = rng.gen_range(0..n);
+                    let mut b = rng.gen_range(1..n);
+                    let mut l = ec.add(&ec.mul(&spec.g, a), &ec.mul(&spec.q, b));
+                    let mut tail = 0u64;
+                    loop {
+                        let h = l.x.0[0].0[0]
+                            ^ l.x.0[0].0[1].wrapping_mul(0x9E37_79B9)
+                            ^ l.x.0[1].0[0].rotate_left(17)
+                            ^ l.x.0[2].0[1].rotate_left(33);
+                        let idx = mix64(h);
+                        if (idx >> 20) & mask == 0 {
+                            let mut t = table.lock().unwrap();
+                            if let Some(&(a2, b2)) = t.get(&l) {
+                                let db = (b + n - b2) % n;
+                                if db != 0 {
+                                    let da = (a2 + n - a) % n;
+                                    *found.lock().unwrap() = Some(mm(da, inv_mod(db, n), n));
+                                    stop.store(true, Ordering::Relaxed);
+                                    break 'outer;
+                                }
+                                drop(t);
+                                break; // the same walk met its own point: restart
+                            }
+                            t.insert(l, (a, b));
+                            drop(t);
+                            tail = 0;
+                        }
+                        let j = (idx % r as u64) as usize;
+                        l = ec.add(&l, &mults[j]);
+                        a = (a + scalars[j].0) % n;
+                        b = (b + scalars[j].1) % n;
+                        local += 1;
+                        tail += 1;
+                        if local & ((1 << 20) - 1) == 0 {
+                            let tot = steps.fetch_add(1 << 20, Ordering::Relaxed) + (1 << 20);
+                            if progress && w == 0 && tot & ((1 << 26) - 1) < (1 << 20) {
+                                eprintln!(
+                                    "  [rho-dp p={} seed={}] steps {:.3e} ({:.2} sqrt l) dps {} {:.0} s",
+                                    spec.p,
+                                    seed,
+                                    tot as f64,
+                                    tot as f64 / (n as f64).sqrt(),
+                                    table.lock().unwrap().len(),
+                                    start.elapsed().as_secs_f64()
+                                );
+                            }
+                            if tot > cap || stop.load(Ordering::Relaxed) {
+                                stop.store(true, Ordering::Relaxed);
+                                break 'outer;
+                            }
+                        }
+                        if tail > tail_cap {
+                            break;
+                        }
+                    }
+                }
+                steps.fetch_add(local & ((1 << 20) - 1), Ordering::Relaxed);
+                ops.fetch_add(ec.ops(), Ordering::Relaxed);
+            });
+        }
+    });
+    let ops = ops.load(Ordering::Relaxed);
+    let correct = *found.lock().unwrap() == Some(spec.d);
+    RhoRunE {
+        seed,
+        steps: steps.load(Ordering::Relaxed),
+        group_ops: ops,
+        s: ops as f64 / (n as f64).sqrt(),
+        correct,
+    }
+}
+
+/// One distinguished-point rho run on the instance `(p, seed)` (note §15).
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct RhoDpReport {
+    pub p: u64,
+    pub seed: u64,
+    pub run: u64,
+    pub l: u64,
+    pub bits: f64,
+    pub dp_bits: u32,
+    pub threads: usize,
+    pub c_add_e: f64,
+    pub steps: u64,
+    pub group_ops: u64,
+    pub s: f64,
+    pub correct: bool,
+    pub wall_ms: f64,
+}
+
+pub fn run_rho_dp(p: u64, seed: u64, run: u64, dp_bits: u32, threads: usize) -> RhoDpReport {
+    let spec = generate_spec(p, seed);
+    let ctx = Ctx::new(&spec);
+    let (c_e, _) = unit_costs(&spec, &ctx);
+    let start = Instant::now();
+    let r = rho_e_dp(&spec, seed.wrapping_mul(1000) + run, dp_bits, threads);
+    RhoDpReport {
+        p,
+        seed,
+        run,
+        l: spec.l,
+        bits: (spec.l as f64).log2(),
+        dp_bits,
+        threads,
+        c_add_e: c_e,
+        steps: r.steps,
+        group_ops: r.group_ops,
+        s: r.s,
+        correct: r.correct,
+        wall_ms: start.elapsed().as_secs_f64() * 1e3,
     }
 }
 
@@ -2700,6 +3021,55 @@ mod tests {
     }
 
     #[test]
+    fn tower_field_and_curve_scalars_beyond_u64() {
+        for (p, seed) in [(524_309u64, 113u64), (4_820_937_851, 192)] {
+            let (f, alpha, mut rng) = weak(p, seed);
+            let a = f.random(&mut rng);
+            let square = f.sq(&a);
+            let root = f.sqrt(&square, &mut rng).expect("square root");
+            assert_eq!(f.sq(&root), square);
+            assert_eq!(
+                f.pow_big(&a, &BigUint::from(131_071u64)),
+                f.pow(&a, 131_071)
+            );
+            let ec = EllE::new(&f, &alpha);
+            let point = ec.random_point(&mut rng);
+            let k = (BigUint::one() << 190) + 17u8;
+            let mut high = point;
+            for _ in 0..190 {
+                high = ec.add(&high, &high);
+            }
+            assert_eq!(ec.mul_big(&point, &(BigUint::one() << 190)), high);
+            assert_eq!(ec.mul_big(&point, &k), ec.add(&high, &ec.mul(&point, 17)));
+        }
+    }
+
+    #[test]
+    fn jacobian_scalar_beyond_u128() {
+        let (f, alpha, mut rng) = weak(53, 5);
+        let ec = EllE::new(&f, &alpha);
+        let cov = Cover::new(&f, &alpha).expect("cover");
+        let divisor = (0..20)
+            .find_map(|_| cov.transfer(&f, &ec.random_point(&mut rng)))
+            .expect("transferred point");
+        let jac = Hyp {
+            f: &f.f,
+            h: cov.hx.clone(),
+            g: 3,
+        };
+        let mut high = divisor.clone();
+        for _ in 0..130 {
+            high = jac.add(&high, &high);
+        }
+        assert_eq!(jac.mul_big(&divisor, &(BigUint::one() << 130)), high);
+        let scalar = (BigUint::one() << 130) + 3u8;
+        assert_eq!(
+            jac.mul_big(&divisor, &scalar),
+            jac.add(&high, &jac.mul(&divisor, 3))
+        );
+    }
+
+    #[test]
     fn polynomial_gcd_and_division() {
         let (f, _, mut rng) = weak(53, 2);
         let fq = &f.f;
@@ -2949,7 +3319,10 @@ mod tests {
         for trial in 0..120 {
             let (r, want) = planted(&jac, &base, &mut rng);
             let (found, cost) = nagao_decompose(&ctx, &base, &by_x, &r, &opts, &mut rng);
-            assert!(!cost.incomplete, "trial {trial}");
+            assert!(
+                !cost.incomplete && !cost.timed_out,
+                "trial {trial}: {cost:?}"
+            );
             assert!(
                 found.contains(&want),
                 "trial {trial}: missed {want:?}, {cost:?}"
@@ -3003,7 +3376,7 @@ mod tests {
             };
             let (fa, ca) = nagao_decompose(&ctx, &base, &by_x, &r, &full, &mut rng);
             let (fb, cb) = nagao_decompose(&ctx, &base, &by_x, &r, &stop, &mut rng);
-            if ca.degenerate || ca.incomplete || cb.incomplete {
+            if ca.degenerate || ca.incomplete || cb.incomplete || ca.timed_out || cb.timed_out {
                 continue;
             }
             n += 1;
@@ -3014,11 +3387,14 @@ mod tests {
             if cb.stopped_at == Some(64) {
                 stopped += 1;
             }
-            // "cheaper" by the F4 degree and matrix the stop saves, which are
-            // per-run facts; `f4_muls` is a difference of the process-wide
-            // counter and interleaves with other tests' F4 runs under
-            // `cargo test`'s parallelism.
-            if cb.degree_reached < ca.degree_reached && cb.max_rows < ca.max_rows {
+            // "no dearer" by the F4 degree and matrix, which are per-run
+            // facts; `f4_muls` is a difference of the process-wide counter and
+            // interleaves with other tests' F4 runs under `cargo test`'s
+            // parallelism.  Since `f4_fp` applies the Gebauer–Möller criteria
+            // the full run no longer reduces redundant pairs past the basis
+            // either, so the stop saves nothing on these systems; it must
+            // still never cost more.
+            if cb.degree_reached <= ca.degree_reached && cb.max_rows <= ca.max_rows {
                 cheaper += 1;
             }
         }
@@ -3026,8 +3402,19 @@ mod tests {
         assert_eq!(stopped, n, "every system stops at the Bézout staircase");
         assert_eq!(
             cheaper, n,
-            "every stopped run ends at a lower degree with a smaller matrix"
+            "no stopped run ends at a higher degree or with a larger matrix"
         );
+    }
+
+    #[test]
+    fn distinguished_point_rho_finds_the_planted_logarithm() {
+        // p = 53: l ≈ 2^32, sqrt l ≈ 6.5·10⁴ steps; three runs, two walkers
+        let spec = generate_spec(53, 1);
+        for run in 0..3u64 {
+            let r = rho_e_dp(&spec, 100 + run, 6, 2);
+            assert!(r.correct, "run {run}: {r:?}");
+            assert!(r.s > 0.2 && r.s < 8.0, "run {run}: S = {}", r.s);
+        }
     }
 
     #[test]
@@ -3048,7 +3435,7 @@ mod tests {
             };
             let (fa, ca) = nagao_decompose(&ctx, &base, &by_x, &r, &stop, &mut rng);
             let (fb, cb) = nagao_decompose(&traced, &base, &by_x, &r, &stop, &mut rng);
-            if ca.degenerate || ca.incomplete || cb.incomplete {
+            if ca.degenerate || ca.incomplete || cb.incomplete || ca.timed_out || cb.timed_out {
                 continue;
             }
             n += 1;

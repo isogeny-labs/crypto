@@ -1,4 +1,146 @@
+# Agent instructions
+
+## Standing workflow rules (from the owner)
+
+- **Always commit finished work and open or update a PR.** Landed rungs,
+  ledger promotions, evidence directories, and code changes land as commits
+  on a feature branch. If the branch already has an open PR, extend that
+  PR and update its title and description to match the new scope instead of
+  opening a second one. Do not leave finished work uncommitted.
+- **Verify before pushing:** run `cargo test --release --lib`, the touched
+  examples' tests, and the relevant Python suites (for example
+  `research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py`)
+  and fix failures first.
+- **Claim hygiene** (see `docs/ic/boundary_targets.json`): public synthetic
+  / known-answer fixtures only; fail-closed evidence; no key-recovery,
+  asymptotic sub-rho, or deployed-curve-security claims; multi-target and
+  amortized results stay secondary; ledger rows promote only with complete
+  measurement fields and independent replay.
+- **Beat the fastest external tool, and show it** (owner's rule,
+  2026-10-16; details in §15): our implementations should be faster than
+  every other implementation of the same computation. Every speed result
+  is compared with the fastest external tool for that computation, for
+  example Magma's F4 and F5 or msolve for Gröbner bases, on the same inputs
+  and host, with the outputs checked equal. A result that has not been
+  compared is not yet a claim of being the fastest, and a loss is reported
+  as a loss.
+- **Every big improvement updates the leaderboard** (owner, 2026-10-15).
+  A PR that lands a large measured gain, whether a whole pipeline, a phase
+  or a component (an engine, filter, oracle, solver or kernel), regenerates
+  `docs/ic-leaderboard.html` and its twins in the same PR (§7b), even when
+  no row of tables A–C moves; it is not a follow-up.
+- **Conductor:** run `conductor check --summary "…" --scope path:…` before
+  editing; report scope expansion before editing outside reserved paths. Do
+  not publish chat transcripts or secrets as task metadata.
+
+## Success criterion: iterative improvement of the index-calculus baseline
+
+Owner's rule, 2026-10-15. It replaces any earlier wording that treats only
+beating rho, or only an "advance", as success.
+
+The long-term goal is an index calculus that beats Pollard rho. That will
+not come from one breakthrough. It comes from many measured improvements,
+each building on the last, until the gap closes. So **the success criterion
+is a verified, measured improvement over the current index-calculus
+baseline. Every such improvement is a success and is reported as one.**
+
+- **Baseline.** For each curve and size, the baseline is the best current
+  verified index-calculus pipeline, frozen with its protocol, receipts and
+  end-to-end `S` (every phase, cold). Name it before you optimise.
+- **Improvement.** The improvement must lower cost against that baseline on
+  the same instances, with every answer verified, under a protocol frozen
+  before timing. A stage-level win is reported as a stage improvement and
+  becomes a pipeline improvement once it moves end-to-end `S`. The
+  measurement rules still apply in full: isolation tiers, A/A and positive
+  controls, matched references, and no combining results from different
+  experiments.
+- **What counts.** Advance and engineering are both successes. Relabelling
+  (the headline count fell while total cost rose) and accounting (the
+  numbers changed but the algorithm did not) are recorded honestly and are
+  not improvements. A negative or null result is a valid outcome to record,
+  but it is not an improvement.
+- **Ratchet.** Each landed improvement becomes the new baseline. Record it
+  with its delta, so progress is cumulative and visible across the
+  sequence.
+- **Distance to rho.** Report the gap to the matched rho on every row,
+  and to precomputation rho (Bernstein–Lange) where setup is excluded. The
+  gap is the distance remaining, not a pass/fail gate. Not beating rho
+  never makes an improvement a failure. A claim to *beat* rho still needs
+  every reference rule: an end-to-end cold `S` below the matched rho's,
+  robust at growing `n`, independently replayed.
+- **Keep going.** After each result, name the next improvement to try, and
+  move on to it.
+
+## Pointers
+
+- Boundary ledger (machine): `docs/ic/boundary_targets.json`
+- Boundary scoreboard (human): `docs/ic/BOUNDARY_TARGETS.md`
+- Autolab runner: `research/sat_factor_base_review_20260908/autolab/`
+- Current ladder frontiers: `RESEARCH_KOBLITZ_INDEX_CALCULUS.md`,
+  `RESEARCH_ECC2K130_IC_FEASIBILITY.md`
+- Faster checkouts (blobless clone, sparse profiles, cloud-session
+  settings): [docs/sparse-checkout.md](docs/sparse-checkout.md)
+
+For small-prime or pinned GF(2^83) elliptic-curve surface searches, quartic
+subgroup transfers, genus-2+ Jacobian transfers, hyperelliptic covers, Mumford
+arithmetic, gluing or polarization candidates, or Frobenius compatibility
+checks, use
+[ecdlp-surfaces](.agents/skills/ecdlp-surfaces/SKILL.md) for tool selection,
+commands, and interpretation limits.
+
+## Reading discipline
+
+`research/` is most of a 6.6 GB, 100,000-file checkout. Read what the current step needs:
+
+- **Indexes before archives.** Status comes from the pointers above,
+  `docs/bounds/frontier.json`, and the ecbench database views; open a session
+  or note to act on it, not to find it.
+- **Locate, then read.** `rg -n` an exact id, slug, or term in the narrowest
+  directory, then read the matching range.
+- **Size before contents.** Check `wc -c` first. Read raw session outputs,
+  `*.jsonl`, logs and CSVs by key or range (`jq`, `rg`), never whole; a
+  session is read through its audit, replay or claim JSON.
+- **Paths, not contents,** in handoffs and subagent prompts.
+- **Off disk is not absent.** In a sparse checkout (`docs/sparse-checkout.md`)
+  a path `git ls-files` lists is materialized with
+  `scripts/sparse-checkout.sh add --path`, never reported missing.
+
 # AGENTS.md
+
+## Preserve scope and report evidence
+
+Use [report-evidence](.agents/skills/report-evidence/SKILL.md) for implementation,
+experiments, benchmarks, completion reports, and research handoffs.
+
+- Preserve the user's requested deliverables, parameters, workloads, and acceptance
+  criteria. Do not silently substitute a smaller experiment, weaken an argument
+  or validation gate, or omit a requested run because you expect it to fail.
+- Execute authorized, feasible experiments as requested. The user decides research
+  significance and priorities. Report measured values and exact ratios; do not
+  independently market results as "massive", "breakthrough", or dismiss them as
+  "not worth running". Give interpretation when requested and label it separately.
+- Continue to check correctness and flag invalid results, factual errors, and
+  uncertainty. Preserve failed runs, timeouts, regressions, raw evidence, exact
+  commands, inputs, revisions, environment, and accounting intervals.
+- Distinguish assistance restrictions, access/tool limits, resource limits,
+  implementation gaps, untested hypotheses, and proved mathematical obstructions.
+  Never disguise an assistance limit as mathematical impossibility. State the
+  actual blocker explicitly; retain the original requirement as unresolved.
+  Higher-priority restrictions and authorization boundaries still apply.
+- Keep observations, calculations, hypotheses, extrapolations, and interpretations
+  distinct. A stage ratio does not establish an end-to-end gain; a bounded search
+  failure does not prove nonexistence; a toy implementation is not general support.
+- Track each requested requirement as verified complete, implemented but unverified,
+  partial, blocked, or not attempted, with evidence or the exact remaining gap.
+  Passing tests or merging a PR does not make the original task complete.
+- Correct misleading prior claims explicitly. Do not rewrite frozen evidence or
+  quietly redefine completion. Report actual execution status, never planned runs
+  as completed or unscheduled work as continuing in the background.
+
+These rules govern scope and reporting throughout this file. Existing measurement
+and correctness gates remain in force; they do not authorize an agent to cancel a
+requested experiment or decide its research significance for the user.
+
 
 Guidance for agents doing cryptanalysis work in this repository.
 
@@ -8,6 +150,233 @@ rather than to produce attacks.  That makes the reporting rule below the
 most important convention here: without it, a thread can run for weeks,
 improve its own headline number by two orders of magnitude, and have
 established nothing.
+
+## Name the obstruction
+
+When substantial research, cryptanalysis, or audit work cannot meet a proof,
+implementation, experiment, or validation requirement, **name the specific
+problem**. Before repeating the same blocked approach or handing it off, create
+or update `problems/<descriptive-slug>.md` using
+[the problem template](problems/TEMPLATE.md), add it to
+[the problem index](problems/README.md), and link it from the affected work.
+
+- State exactly what is blocked, under which parameters and assumptions, and
+  why that gap prevents the requested conclusion. Track major or recurring
+  blockers, not every routine TODO.
+- Separate observed evidence, suspected explanations, missing implementations,
+  access/tool or assistance limits, resource limits, and proved mathematical
+  obstructions. Cite artifacts or proofs with their exact scope; mark unknowns
+  explicitly. A timeout or bounded failed search does not prove impossibility;
+  failure to find an attack does not establish security.
+- Say **what would unblock it**: the missing lemma, construction, verified map,
+  measurement, implementation, access, or resource, with checkable acceptance
+  criteria. Explain what satisfying those criteria would establish and what
+  would remain unresolved. "More research" is not an exit condition.
+- Give the next discriminating experiment or proof obligation, its controls
+  and execution limits where relevant, and how each possible outcome changes
+  the next action. Apply the existing experiment and budget rules.
+- Reuse an existing problem record for the same obstruction, including a
+  cross-repository link when appropriate. Update its evidence, next action,
+  and index row in the PR that changes the situation; preserve frozen evidence.
+  Resolve it only with linked evidence meeting its exit criteria. If another
+  record replaces it, mark it superseded and link the successor.
+
+Recording a problem keeps the original requirement visible; recording it alone
+does not resolve that requirement. It
+does not authorize abandoning requested work, weakening its acceptance criteria,
+or promoting a claim. Completing the template or merging its PR does not solve
+the underlying problem.
+
+## Intermediate-cost and asymmetric-access hypotheses
+
+User instruction, 2026-10-06. In assessments of supplied or published claims
+of hidden mathematical advantage, include costly intermediate advantages:
+a hypothetical reduction from subgroup-size work r^(1/2) to r^alpha with
+alpha < 1/2 may matter even when recovery remains expensive. The example
+alpha = 1/3 is a threat-model assumption, not a discovered algorithm or a
+required outcome. Do not dismiss a claim solely because it fails to make
+recovery trivial; do not infer practical recovery from its exponent alone.
+
+Keep mathematical existence, executable transfer, subgroup preservation,
+destination-solver advantage, practical resources, and asymmetric access as
+separate obligations. A hypothesis about agency capabilities or motives is
+not evidence that a trapdoor exists. Distinguish a deliberately selected
+weak instance from an unpublished method applying to honestly generated
+instances, and distinguish both from implementation compromise.
+
+Account for curve-specific construction and preprocessing, per-target work,
+transfer and recovery, verification, failed attempts, memory, hardware, and
+the exact number of targets reusing setup. Report cold-start and genuinely
+amortized costs separately. Separate exponent changes, constant factors,
+primitive costs, and hardware throughput. Faster known-scalar multiplication
+alone does not establish faster unknown-scalar recovery.
+
+Under the user's hidden-route scenario, public discovery must require
+substantial deliberate work rather than routine inspection or accidental
+rediscovery. An illustrative reconstruction cost near 2^60 operations is a
+scenario parameter, not a measured bound or evidence of agency capability.
+Define the operation unit, algorithm, success probability, memory, parallelism,
+and uncertainty before interpreting that number. Keep public discovery cost,
+designer setup with a retained witness, map evaluation, and destination solving
+separate. Isogeny degree alone establishes none of these costs. Assess cheaper
+equivalent routes as well as reconstruction of the exact withheld map; one
+comparably useful public shortcut can defeat the claimed access asymmetry.
+
+Treat secrecy as a separate hypothesis: identify the withheld information,
+whether it can be reconstructed from public parameters, and whether a
+comparably useful public route exists. A high-degree map is not automatically
+cheap to evaluate or hard to reconstruct. State field and construction-family
+restrictions; do not transfer composite-degree binary-field conclusions to
+prime fields or prime-degree binary extensions without justification.
+
+When the user stipulates layered adversary capability, assess a portfolio
+rather than one all-purpose vulnerability. Record each hypothetical technique's
+prerequisites, coverage, cost, reusable setup, access requirements, secrecy,
+and failure conditions. Distinguish independent alternatives from methods
+sharing the same dependency; do not assume independence or multiply speculative
+probabilities. Include redundancy, complementary combinations, and what
+remains available if one technique is disclosed, patched, or loses its advantage.
+
+Model reserved capabilities and exceptional-use scenarios explicitly, including
+activation constraints, scarcity, exposure risk, and the cost of losing secrecy.
+These are stipulated game-theoretic assumptions, not observations of agency
+behavior or proof of any particular mathematical capability. Alternative
+implementation or protocol compromises do not refute an algebraic hypothesis
+and do not replace an algebraic workstream the user has requested. Preserve
+each requested track and its unresolved obligations.
+
+Apply existing transfer, evidence, run-routing, and review rules. Missing
+formulas or measurements remain open obligations. Bounded failure is not
+universal nonexistence. This assessment rule adds no autonomous key-recovery
+campaign, production-target exploitation, or scientific state transition.
+
+## Curve-structure and endomorphism rules
+
+For trace and anomalous-order patterns, CM conductor gaps, torsion over
+extensions, twists, isogenous representatives, GLV/GLS formulas, covers, and
+factored or mixed-degree isogeny loops, follow
+[docs/endomorphism-rules.md](docs/endomorphism-rules.md). Record the exact
+ICV1/EC1 identity, working field, subgroup, bounded signal calculation,
+explicit map when proposed, and its complete evaluation and transfer costs.
+Keep existence, executable construction, subgroup action, measured scalar
+arithmetic, and unknown-scalar recovery as separate claims. A small torsion
+factor, class number, embedding degree, or composite map degree is a lead with
+specific hypotheses, not a universal verdict. Preserve negative searches
+within their exact bounds and run authorized feasible experiments under the
+existing evidence, review, and benchmark rules.
+
+## Research searches must leave visual reports
+
+Every experiment run (ICMS or ecbench session, autolab or tournament round,
+benchmark, or other research run), every PR that lands a result, and every
+substantive search for new isogenies, curves, scalar rules, endomorphisms, or
+related ECDLP mechanisms follows
+[the research-visuals skill](.agents/skills/research-visuals/SKILL.md), on
+every runtime (Claude Code reads it at `.claude/skills/research-visuals/`).
+Deliver a source-linked report, a graph or explanatory diagram, and a PDF
+containing the report and visual. A run report is descriptive and sits beside
+the run's records, never inside a sealed or audited session directory.
+Include negative, failed, and inconclusive findings.
+Update every affected canonical graph, chart, and rendered copy in the same
+change as a new verified finding or correction; record why a graph was left
+unchanged when the search yields no graphable result. Keep proposed routes and
+unverified rules visibly separate from proved or measured ones. This visual
+record supplements the evidence, curve-identity, scoreboard, and PR rules
+below; it does not promote a hypothesis or replace a verified run.
+
+### Performance results also land in `benchmarks/`
+
+Every run or PR that measures how fast an algorithm runs or reports a speedup
+(an engine, kernel or solver timing, a before/after comparison of the same
+code, a comparison with an external system such as msolve, Singular or Magma)
+also copies its visual record into `benchmarks/`, in the same PR, always:
+
+- `benchmarks/<YYYYMMDD>-<slug>/` holds the report PDFs (run report and
+  results report), every graph as SVG, and a PNG render of every graph
+  (150 dpi, rendered from the same plotting source as the SVG).
+- `benchmarks/README.md` gets one row per entry, newest first: date, what was
+  measured, the headline values with their units and ratios as the report
+  states them, host and isolation level, and links to the study directory
+  and run report.
+- The study directory stays the source of truth (raw records, sources,
+  inputs); `benchmarks/` holds copies for browsing. Regenerate both from the
+  same source and never edit a copy alone. A later run adds a new entry and
+  leaves earlier ones as they are.
+
+`benchmarks/` is not `benches/`, which holds Cargo bench sources.
+
+## Papers
+
+Manuscripts generated from this repository's results live under `papers/`,
+one directory per paper, and nowhere else. The layout is the same in
+`aburan28/cryptanalysis`, `aburan28/crypto`, `aburan28/crypto-autoresearcher`
+and `aburan28/ml-cryptanalysis`:
+
+- `papers/README.md` is the index: one row per paper (directory, title,
+  status). Add a row when adding a paper; never add a paper outside `papers/`.
+- `papers/paper.mk` is the shared build. A paper's `Makefile` sets `TEX`,
+  `SECTIONS`, `BIB` and, for figures or other files the build reads,
+  `ASSETS`, and includes it; the targets are `make`, `make check`,
+  `make arxiv`, `make eprint`, `make deanonymize` and `make clean`.
+- `papers/.gitignore` ignores LaTeX auxiliaries and submission bundles. The
+  built PDF is committed next to its sources and rebuilt whenever a cited
+  number, conclusion or figure changes.
+- `papers/AUTHORS.example` is the author-block template. Sources stay
+  anonymized (`\author{Anonymous}`); `make deanonymize` restores the authors
+  from an untracked `AUTHORS` file.
+- Each paper directory holds the root `.tex` (or the `.md` of a draft that is
+  not typeset yet), its sections and bibliography, `README.md` (status banner,
+  what it says, what it does not say, how to build, reproduction pointers, and
+  the checklist owed before submission), `abstract.txt` (title, keywords,
+  category) and the PDF.
+- Claims follow the repository's evidence rules: every number cites a
+  committed artefact in this repository or a sibling (prefix the path with
+  `crypto:`, `cryptanalysis:` or `crypto-autoresearcher:`); a stage
+  diagnostic is never reported as a speedup; every end-to-end row has
+  verified answers; each change is classed as advance, engineering,
+  relabelling or accounting. A draft is not submitted, posted or cleared for
+  either until its README says so, and its README names the novelty audit
+  and the measurements still owed.
+- `make check` must pass (references and citations resolved, no LaTeX errors,
+  no overfull boxes) before a PDF is recommitted.
+
+## Mathematical results should include Lean proofs
+
+**Standing owner instruction, 2026-10-11:** For every new or substantially
+revised mathematical result, include a faithful Lean 4 theorem and checked
+proof whenever formalization is feasible. Treat the formalization attempt as
+part of the requested work, and prioritize the central theorem and its
+dependencies. Keep the readable mathematical proof in the report.
+
+- Maintain a proof map from each report theorem, proposition, lemma or
+  corollary to its Lean declaration, exact hypotheses and verification status.
+  Match the mathematical statement, including quantifiers, exceptional cases
+  and field, curve, subgroup and endomorphism-order assumptions.
+- Pin the Lean toolchain and dependency revisions. Build the actual theorem
+  modules with `lake build` or an equivalent command, retain the command and
+  output, and inspect `#print axioms` for every reported theorem. Recheck the
+  compiled proofs with `lean4checker --fresh` when available.
+- A reported Lean proof must contain no `sorry`, `admit`, `sorryAx`, custom
+  axioms encoding the research claim, kernel-check bypasses or unverified
+  native evaluation. Record the standard Lean foundations used.
+- Prove the structural implications as well as the algebraic identities.
+  Conditional theorems must expose their assumptions and identify any missing
+  bridge to the actual mathematical objects. Do not present a weaker statement,
+  assumed conclusion, circular hypothesis or arithmetic certificate as a full
+  Lean proof of the report's theorem.
+- If the full formalization cannot be completed, preserve the original result
+  and its written proof, finish the feasible Lean lemmas, and record the
+  concrete missing definition, dependency, proof obligation or failed build.
+  Report partial formalization explicitly; keep the full theorem open.
+- Add reproducible proof checks to the relevant CI workflow where practical.
+  Every Lean target is also checked by the repository-wide proof gate
+  (`tools/lean/proof-gate.sh`, workflow `lean-proof-gate.yml`): it builds each
+  Lake project and standalone file and fails any theorem whose transitive
+  axioms include `sorryAx`, an unlisted `native_decide` or a user axiom. A
+  `native_decide` that a study deliberately trusts is recorded with its reason
+  in `tools/lean/trusted-native.txt`. See `tools/lean/README.md`.
+  Preserve frozen evidence and attach formalization updates as versioned
+  additions rather than rewriting historical verification records.
 
 ## Implementation language: no Python
 
@@ -36,44 +405,128 @@ verifiers, replay tools, and research result generation.
   do not grant an exception. Preserve their mathematical contracts, fixtures,
   and accounting requirements in the native replacement.
 
-## Default workflow: finish and merge when authorized
+## Model tiers
 
-The repository owner's standing preference is autonomous delivery. For work
-the user requests in this repository, completing the task includes implementing
-the change, validating it, opening or updating its PR, monitoring CI, and
-merging when ready. **Do not ask for another approval just to merge a completed,
-passing PR unless a policy or reviewer requires explicit authorization for that
-merge.**
+Owner rule, 2026-10-17: one model-tier topology across the owner's
+repositories. The reference design is
+[`docs/model-tiers.md`](https://github.com/aburan28/crypto-autoresearcher/blob/main/docs/model-tiers.md)
+in aburan28/crypto-autoresearcher.
 
-- Apply this authorization to PRs created or maintained for the current user
+| tier | does here | Anthropic |
+| --- | --- | --- |
+| frontier | design, interpretation, claims, breakthrough review | Mythos (`claude-mythos-5`), Fable 5.1 (`claude-fable-5-1`) |
+| core | the same when frontier is not needed; coordination and review | Opus 5.5 (`claude-opus-5-5`); OpenAI, GLM 5.3 and Qwen equivalents |
+| director | compiles a decided experiment into a task card (`tools/task_card.py`: one format in every repository, copied byte-identical from crypto-autoresearcher, never edited here), then assesses the run | Sonnet 5.5 (`claude-sonnet-5-5`), [`experiment-director`](.claude/agents/experiment-director.md) |
+| mechanical | runs the card through `tools/task_card.py run`, relays its output verbatim, computes nothing, refuses anything underspecified | Haiku 5.5 (`claude-haiku-5-5`, effort low), [`executor-mechanical`](.claude/agents/executor-mechanical.md) |
+
+- **Frontier and core keep the reasoning**: the spec and preregistration,
+  analysis (`ecbench compare` and `table` read-outs), the §5a pricing band and
+  every cross-method ranking, success-criterion classification, claims, and
+  every PR decision (open, fix, merge).
+- **The relay.** Subagents do not nest in Claude Code, so the main session
+  does every dispatch: it dispatches `experiment-director` in compile mode,
+  relays the card it returns to `executor-mechanical` verbatim (adding
+  nothing), then dispatches `experiment-director` again in assess mode with
+  the executor's returned text. A card with a `specification_error` is not
+  relayed; the reasoning tier fixes the spec.
+- **The mechanical tier's output is an observation, never a result claim.**
+  The director's assessment says only whether the run executed as specified
+  and the relay was verbatim. What the numbers mean is decided by the
+  frontier or core tier under the measurement rules below.
+
+## Default workflow: open the PR, check in, and land it
+
+The repository owner's standing preference (owner, 2026-10-14) is that the
+session which opens a PR stays with it until the PR is merged or closed. That
+session checks in on the PR, fixes the CI failures and review feedback its
+change causes, and merges once the PR is green and authorized. This replaces
+the 2026-10-09 split, in which the authoring session stopped at the PR and a
+separate small-model automation did the CI work and the merge.
+
+**The authoring session** implements the change, validates it locally,
+commits, pushes, and opens the PR (or updates the existing one). It then
+follows the PR until it lands, under the check-in and merge rules below.
+
+- **Open every PR ready for review, never as a draft**, whatever a tool or
+  runtime defaults to, and mark an existing draft ready when you update it,
+  so reviews and checks that skip drafts (`llm-review`) run from the first
+  push. Open a draft only when the user asks for one in that task.
+- Review the final diff and confirm that the requested scope, relevant tests,
+  evidence, and documentation are complete before opening the PR. Passing CI
+  does not substitute for checking that the work is finished.
+- **Check in on PRs you opened.** Follow the PR's activity: CI results, review
+  comments, merge-state changes, and merges or closes. Where the runtime
+  provides PR-activity subscriptions (`subscribe_pr_activity`), use them. Where
+  it provides scheduled check-ins (`send_later` or similar), keep one
+  safety-net check-in about 50 minutes after the last activity, later ones
+  about 4 hours apart, re-armed silently when nothing has changed. Stop after 3
+  check-ins in a row that find nothing new, when the PR merges or closes, or
+  when the user says to stop. Any new activity resets the count.
+- **No busy polling.** Do not sleep in a loop, re-read check runs or job logs
+  faster than the check-in cadence, or wait on a job in the foreground. The
+  cadence limits apply to every runtime, top-tier models included.
+- **Any runtime may do the CI work.** Claude Opus, Fable, and other top tiers
+  may check in on, fix, and merge the PRs they opened, under the same rules as
+  a small model. The owner's 2026-10-09 restriction on top-tier CI work is
+  withdrawn.
+
+**Merging** is part of the same flow. The authoring session does not ask for
+another approval to merge a completed, passing PR unless a policy or reviewer
+requires explicit authorization for that merge, and it follows these rules:
+
+- Apply merge authorization to PRs created or maintained for the current user
   task, not unrelated PRs. An explicit instruction to leave a PR open, keep it
   as a draft, wait for review, or avoid merging overrides this default.
-- Review the final diff and confirm that the requested scope, relevant tests,
-  evidence, and documentation are complete before merging. Passing CI does not
-  substitute for checking that the work is finished.
 - Check the current PR head: all required and applicable CI checks must have
   completed successfully. Pending, cancelled, timed-out, or failed checks are
   not a pass. A skipped job counts as inapplicable only when its conditions or
   path filters justify that status; required checks must still be satisfied.
-- Fix failures caused by the change and resolve routine merge conflicts
-  autonomously, then rerun the affected validation. Any new commit requires
-  checking CI again for the new head. Do not bypass branch protections, required
-  reviews, unresolved blocking review feedback, or required checks.
+- Fix failures caused by the change autonomously: read the failing check's
+  log, reproduce the failure locally, fix it, and rerun the affected
+  validation before pushing. Never skip, disable, or quarantine a test to get
+  green, and never push an empty commit or close and reopen a PR to re-run CI.
+  A failure that is not this change's (red on the base branch, or a service
+  the diff does not touch) is reported on the PR with the evidence, not
+  patched around. Offload merge conflicts to GitHub Copilot (next bullet) rather
+  than resolving them yourself. Any new commit requires checking CI again for
+  the new head. Do not bypass branch protections, required reviews, unresolved
+  blocking review feedback, or required checks.
+- **Merge conflicts go to Copilot first.** When a PR you maintain reports a
+  merge conflict (`mergeable_state` `dirty`, or a conflict notice), post one PR
+  comment asking `@copilot` to resolve it by merging the base branch into the
+  PR head, without rebasing or force-pushing, and to keep the PR's scope
+  unchanged (the GitHub MCP tools also expose Copilot assignment if a comment is
+  not enough). This standing instruction authorizes that comment; do not ask
+  again. Then:
+  - Do not edit the conflicted files yourself while Copilot's request is
+    pending; two resolvers on one branch create a second conflict.
+  - When Copilot pushes, review its diff against both sides, regenerate
+    lockfiles and generated files with the repo's tooling rather than by hand,
+    and rerun the affected validation (`cargo check`, the touched tests). A
+    resolution is not done until the PR head merges cleanly and CI is checked
+    on the new head. Report Copilot's result as unverified until you have done
+    this.
+  - Resolve it yourself (merge the base in, never rebase or force-push a shared
+    branch) only if Copilot declines or cannot act on the PR, pushes a
+    resolution that fails validation, or has not responded after a reasonable
+    wait; say in the PR why you stepped in.
+  - Conflicts in frozen evidence, ledger rows, or claim files are never
+    resolved by picking a side: report them to the user.
+  - If Copilot is unavailable in the session (no GitHub MCP access, plan
+    limits), say so and fall back to resolving it yourself.
 - If a documentation-only change legitimately triggers no CI, verify the
   workflow filters, inspect the diff, and run any relevant local validation.
   State that no CI applied; do not claim that nonexistent checks passed.
 - Merge using the repository's permitted merge method and an expected-head-SHA
   guard where supported. Confirm that GitHub reports the PR as merged, then
-  report the PR link, merge commit, and validation outcome.
-- Do not stop at "PR opened" when the remaining merge work is authorized and
-  feasible. If access, required external review, a persistent CI failure, or
-  another concrete gate prevents merging, report that blocker precisely rather
-  than asking the user to repeat the authorization already given.
+  record the merge commit and validation outcome on the PR.
+- If access, required external review, a persistent CI failure, or another
+  concrete gate prevents merging, report that blocker precisely on the PR
+  rather than asking the user to repeat the authorization already given.
 - If automatic approval review rejects a merge for lack of authorization,
   leave that PR open and ask for explicit approval naming the exact PR. Do not
-  retry by changing tools, branches, accounts, or merge route. Continue work
-  that does not depend on the merge; after approval, recheck the final PR head,
-  review state, and applicable CI before merging.
+  retry by changing tools, branches, accounts, or merge route. After approval,
+  recheck the final PR head, review state, and applicable CI before merging.
 
 ## Research work belongs in pull requests
 
@@ -89,7 +542,7 @@ A planning PR may merge when the plan itself is complete and its applicable
 checks pass. Keep unperformed experiments and measurements marked pending;
 merging the plan does not close the underlying workstream. Track execution,
 evidence, and closeout in linked follow-on PRs and update the checklist as work
-lands. Apply the finish-and-merge rules above to each completed deliverable.
+lands. Apply the PR and merge rules above to each completed deliverable.
 
 Treat an experiment as repository work, including a negative or inconclusive
 result. A research decision, preregistered protocol, reproducibility fix, or
@@ -114,8 +567,8 @@ For performance changes, the existing frozen-suite, full-cost, matched-rho,
 and scoreboard requirements in sections 1–8 still apply. A PR that reports
 only a stage measurement must label it a stage diagnostic and leave
 end-to-end cost and speedup unset. Open or update the PR as part of the
-iteration, then follow the default finish-and-merge workflow above once
-its evidence, review, and CI gates are satisfied.
+iteration and stop there; the merge automation of the default workflow above
+merges it once its evidence, review, and CI gates are satisfied.
 
 ## The rule: boundary, table, ratio
 
@@ -189,13 +642,16 @@ Classify every change, in the note, as one of:
 | class | what moved | what it means |
 |:--|:--|:--|
 | **advance** | ratio to the floor fell | the method does something a generic algorithm cannot |
-| **engineering** | `S` fell, ratio to the floor flat | legitimate, bounded, and not a finding |
+| **engineering** | `S` fell, ratio to the floor flat | an improvement to the baseline: a success (see "Success criterion") |
 | **relabelling** | headline count fell, `S` rose | work moved somewhere the headline does not look |
 | **accounting** | numbers changed, algorithm did not | a correction; say so and do not claim the gain |
 
-All four are worth committing.  Only the first is worth calling a
-result.  Label each row, because the failure mode this rule exists to
-prevent is reporting the second or third as the first.
+All four are worth committing.  Advance and engineering are both
+improvements, and every improvement over the baseline is a success
+("Success criterion: iterative improvement of the index-calculus
+baseline").  Label each row, because the failure mode this rule exists
+to prevent is reporting relabelling or accounting as an improvement, or
+engineering as an advance.
 
 The relabelling class is not hypothetical.  In §10.5 of the
 residual-walk note a triple-decomposition oracle cut the walked count
@@ -231,6 +687,40 @@ measured it turned out to grow as `n^{0.68}` against relations at
 `n^{1/3}`, so the method's cost bottoms out near `200×` rho around
 `2^{50}` and rises after.  The `2^96` was a statement about one phase
 and had been read as a statement about the method.
+
+### 5a. Price the unpriced work on every arm, the reference included
+
+Owner rule, 2026-10-15. Almost no ECDLP cost in this repository is
+complete, and the rho baselines are no exception. Rho, BSGS and the
+kangaroo leave canonicalisations, partition hashes, table inserts and
+lookups unpriced. Index-calculus arms are complete only on curves that
+have a pinned timing calibration (`calibration_pinned_units`; in the
+2026-10-15 pilot that was Koblitz `n = 13` and `n = 23` but not `n = 19`).
+A "complete IC against lower-bound rho" comparison is therefore
+lopsided, and before this rule several were reported that way
+(`research/ic_frontier_campaign_20261015/pilot/FINDINGS.md`).
+
+Every cross-method comparison and every ranking must:
+
+- **List every unpriced counter for every arm**, references included,
+  with its count. An arm that names a counter but does not emit its count
+  cannot be ranked. Report it as a lower bound and record the missing
+  emission as an implementation gap to fix.
+- **Price the unpriced work at several weights**: at least 0, 0.1 and 1
+  group-addition equivalents per native operation, applied the same way
+  to every arm. Pinned calibrations may be added as a further point, but
+  they never replace the band.
+- **Rank only where the conclusion holds at every weight in the band.**
+  If the order of two arms changes inside the band, report them as
+  unresolved at that boundary, never as a win for either side.
+- **Never compare a calibrated cost on one side with an uncalibrated one
+  on the other.** If a calibration exists for only some arms or sizes,
+  use the band alone.
+
+This applies to `ecbench compare` read-outs, tables, frontier syntheses,
+ledger rows, papers and PR descriptions. A ratio produced before this rule
+is relabelled as a lower-bound comparison where it is cited again. Its
+frozen evidence is not rewritten.
 
 ### 6. What does not count
 
@@ -337,7 +827,7 @@ Rules that make this checkable:
   computed from another number on the page.
 
 A PR that lands a result without its dashboard update is incomplete, and
-the finish-and-merge authorization above does not cover merging it.
+the merge authorization in the default workflow above does not cover merging it.
 
 #### 7b. Keep the leaderboard current
 
@@ -357,7 +847,13 @@ until the leaderboard shows it**, in the same pull request.
   - a reference re-matched;
   - a rule change that redefines the primary comparison, as the
     one-target rule did;
-  - a change to `docs/curves/registry.json`, which the page's roster reads.
+  - a change to `docs/curves/registry.json`, which the page's roster reads;
+  - a big improvement in a phase or component (an engine, filter, oracle,
+    solver or kernel) that moves no whole-pipeline row (owner, 2026-10-15):
+    it gets its own section outside tables A–C, generated from the study's
+    frozen summary with the before figure kept and its class (usually
+    engineering) named, as the linear-algebra engine section was added for
+    `research/la_engines_20261014`.
 - **How.** The page is generated, never edited by hand.
   - Point `SOURCES` in `scripts/build_ic_leaderboard.py` at the round's
     frozen files.
@@ -390,9 +886,15 @@ endomorphism discriminant) and identities (ICV1, EC1, curve UID, retired
 names), every `ecbench` method (`ECM1`) and factor base (`FB1`) a
 committed session ran, every tournament candidate identity (`IC1`) the
 repository writes, every tournament round, every committed `ecbench`
-session, and the vocabulary of oracles, solvers and factor-base families.
-It is how a reader gets from a number on the scoreboard to the curve,
-algorithm and evidence behind it.
+session, the vocabulary of oracles, solvers and factor-base families,
+and the **yield ledger**: one row per index-calculus run with its curve,
+target, factor base, oracle, solver, trials, relations, yield, lookups,
+matrix rank and the record's `solver` block (the ICMS `pdp_metrics`:
+system shape, solving degree, Macaulay and SAT figures), which the
+`ecbench` database exposes as the `ic_yield` view. It is how a reader
+gets from a number on the scoreboard to the curve, algorithm and
+evidence behind it, and how a candidate combination is informed: a
+yield is a stage diagnostic, and only a whole-pipeline `S` decides speed.
 
 - **Generated, never edited.** `docs/browser/data.json` is written by
   `python3 scripts/build_lab_browser.py` from committed files only (the
@@ -552,6 +1054,37 @@ existing EC2 key-pair name **`meow34`** when launching the instance.
   accessible, report that access blocker and continue with non-SSH work where
   possible.
 
+### 9a. Experiments that do not run locally go through `ephemeral`
+
+When an experiment, benchmark or build is to run in the cloud rather than on
+the local machine, run it with the ephemeral runner
+([`taskq/deploy/ephemeral/`](taskq/deploy/ephemeral/README.md)). Do not
+launch EC2 instances by hand for it. `conductor/deploy/aws/launch.py`, in the
+Conductor repository, starts the Conductor control plane, not experiments.
+
+```sh
+cargo build --release --manifest-path taskq/deploy/ephemeral/cli/Cargo.toml   # once
+E=taskq/deploy/ephemeral/cli/target/release/ephemeral   # or the bash CLI: taskq/deploy/ephemeral/ephemeral
+$E run --detach --type c7i.4xlarge --ttl 4h -- 'cargo run --release -- ... --out "$EPHEMERAL_OUT"'
+$E status last; $E logs -f last; $E fetch last
+```
+
+- The two CLIs are interchangeable: same flags, S3 layout and runner, and
+  either one can follow, fetch or kill the other's jobs.
+- Agents use `--detach` and check back with `status` or `logs -f` at the
+  check-in cadence of the default workflow, rather than holding a foreground
+  session open on a long job.
+- Each job is a paid instance. Start the jobs the request asks for and no
+  more. Pick the smallest instance type and `--ttl` that fit, and `kill` any
+  `--keep` instance once you are done with it. The runner, the deadline timer
+  and the reaper terminate everything else.
+- Runners use Session Manager (`ephemeral shell`), not SSH. Section 9 applies
+  to hosts launched by hand.
+- A result that lands in the repository still follows section 10, the
+  `benchmarks/` rule and the research-visuals rule. Its provenance is the
+  fetched `job.json`, `host.txt` and `rusage.txt` in
+  `~/.cache/ephemeral/runs/<id>/`.
+
 ### 10. Performance work starts from a clean, recorded baseline
 
 A speedup is a comparison, so it is only as good as the baseline and the
@@ -694,6 +1227,140 @@ workloads, under the same isolation, into the same sealed records.
 
 Historical autolab, tournament and ICMS evidence keeps its own protocols.
 
+### 13. Large files go through the store
+
+A factor base, relation table or raw evidence file too big for Git is pushed
+with `crypto store push` (or `ecbench store push`) and referred to by name,
+not by a local path or a one-off bucket URL: `store:<name>`, accepted
+wherever a path is (`ic --factor-base`, and any code that calls
+`crypto_lib::store::resolve_path`). The tracked `store/index.json` is the
+manifest the evidence rules ask for: content hash, byte count, location,
+and the command that produced the file (`--provenance`). Commit the index
+entry in the PR that lands the result. Objects are immutable and keyed by
+SHA-256; a name is not repointed without `--replace`, which keeps the old
+digest as superseded. Never delete remote objects from an agent session.
+See [docs/store/README.md](docs/store/README.md).
+
+### 13a. Raw run trees land as one archive
+
+A round's or study's raw run tree (per-run reports, stderr, isolation records,
+logs: everything under its `runs/`) lands as one deterministic `runs.tar.xz`
+beside its README, with `runs.tar.xz.sha256` (`sha256sum runs.tar.xz`, so
+`sha256sum -c` checks it in place) and a `.gitignore` there holding `/runs/`. The
+analysis, figures and claims are made from the extracted tree, and the README
+says how to extract and re-check it. Pack it so packing the extracted tree
+again gives the same bytes, as
+`research/ic_tool_program/rounds/R01-baseline-v0/` does:
+
+```sh
+tar --sort=name --mtime='YYYY-MM-DD 00:00:00Z' --owner=0 --group=0 \
+    --numeric-owner --mode='u+rwX,go+rX,go-w' --format=gnu -cf - runs \
+  | xz -6 -T1 > runs.tar.xz
+sha256sum runs.tar.xz > runs.tar.xz.sha256
+```
+
+Use the round's start date for `--mtime`. Raw `.jsonl` and logs compress
+5-20x, and one file costs a checkout one entry instead of thousands.
+
+**Exception: keep it loose when a path must resolve.** When a claim, replay,
+manifest or verifier names individual run records by repository path (the
+`report` fields of `research/ic_tool_program/rule/v*/claims/` point into
+`runs/`; `verify_archive.py`-style checkers hash files in place), those
+records stay committed as loose files. Only the part nothing names goes in the
+archive; say in the README which part is which.
+
+This applies to new run trees. Never re-pack, compress or move a committed
+tree, or rewrite history to slim one: committed evidence stays as it was
+written. A tree too big for Git even compressed goes through the store (§13).
+Checkouts that do not need a research tree leave it off disk instead
+([docs/sparse-checkout.md](docs/sparse-checkout.md)).
+
+### 14. Experiments to run later go in `backlog/`
+
+An experiment worth running that this session will not run (too big, blocked,
+or for another machine) is written as a card in `backlog/<ID>/` and checked
+with `backlog validate`; leases and runs go through cairn, and results return
+to `research/` by PR. The protocol, including funding as priority, is
+[backlog/README.md](backlog/README.md).
+
+### 15. Compare against the fastest external implementations
+
+Owner's rule, 2026-10-16. The goal is for our implementations to be faster
+than everything else that computes the same thing. A before/after speedup
+against our own previous code (§10) shows progress. It does not show where
+we stand. So every performance result also names the fastest external
+implementation of the same computation and measures against it.
+
+**Which tools.** Compare against the fastest available implementation, not a
+convenient one. As a minimum, for the areas this repository works in:
+
+| computation | compare against |
+|:--|:--|
+| Gröbner bases (F4, F5, decomposition and summation-polynomial systems) | Magma `GroebnerBasis` (its F4, and its F5 where Magma offers it), msolve, FGb; also Singular (`std`, `slimgb`, `modStd`) and OpenF4 where relevant |
+| Sparse or dense linear algebra mod p and over GF(2) | Magma, FLINT, M4RI/M4RIE (GF(2)), and the block Lanczos/Wiedemann solvers of CADO-NFS |
+| Polynomial and field arithmetic (products, powers, roots, factoring) | FLINT (`nmod_poly`, `fmpz_mod_poly`, `fq`), NTL, Magma, PARI/GP |
+| Point counting (SEA), modular polynomials, isogenies | PARI/GP (`ellcard`, `ellap`), Magma (`#E`, `ClassicalModularPolynomial`, `Isogeny`), Sutherland's `classpoly`/`modpoly` and his published tables, Sage where it calls a faster library |
+| Isogeny-based protocols (CSIDH, √élu, SQIsign-style quaternion steps) | the authors' reference and optimised implementations, and published cycle counts on named CPUs |
+| ECDLP (rho, kangaroo, index calculus) | the fastest published implementation or record computation for that curve class, with its hardware stated |
+
+If a faster tool exists than the ones listed, use it and add it to this
+table.
+
+**How to compare.**
+
+- **Same inputs, same answer.**
+  - Run the external tool on exactly the inputs our code runs on, exported
+    by a checked-in script. `examples/gb_cas_export.rs` writes msolve,
+    Singular and Magma inputs for the Gröbner workloads; add an equivalent
+    when a workload has none.
+  - Check that the outputs agree: the same reduced basis and order, the same
+    group order, the same j-invariants, the same kernel. A faster run that
+    computes something different is not comparable.
+  - Record the tool's name, version, options, and the algorithm it actually
+    ran (for example whether Magma used F4 or F5, or which msolve flags
+    were set).
+- **Same host, same conditions.**
+  - Run both sides on the same machine, with the same isolation as §10 and
+    the same thread count. Compare single-threaded with single-threaded and
+    many threads with many.
+  - Do not time the external tool's start-up, licence check or
+    parsing/printing as its algorithm. Use its own internal timer
+    (Magma `Cputime`/`Realtime`, msolve `-v`) when it reports one, and say
+    which was used.
+- **Report the ratio, per size.**
+  - Report our time divided by the external tool's time, at each problem
+    size, with the A/A spread (or another uncertainty) for both sides. Also
+    report how the cost grows with size for both, so a constant-factor win
+    at small sizes is not mistaken for a better exponent.
+  - Say plainly who is faster, at which sizes, and on which hardware class.
+  - "Faster than X" holds only over the sizes and hosts that were measured,
+    and only against the fastest configuration of X that was tried. A loss
+    at large sizes is reported even when small sizes win.
+- **Missing tools are named, not skipped.**
+  - If the fastest tool is unavailable (Magma needs a licence; some tools
+    run only on other platforms), use the fastest open tool available. msolve
+    is the open reference for F4.
+  - Cite the missing tool's published timings with their hardware, labelled
+    "published, not reproduced".
+  - List which comparisons are still missing, and ask the owner for access
+    or a host that has the tool instead of quietly dropping the comparison.
+  - Never present a comparison against a slower tool as "fastest".
+- **A loss is a target.** When an external tool is faster, record the gap,
+  as the ratio and the sizes where it holds, in the study and as a
+  `backlog/` card (§14) or the next round's goal. A later performance PR on
+  the same computation reports the ratio against the external tool before
+  and after.
+- **Where it lands.**
+  - The external comparison goes in the same report and `benchmarks/` entry
+    as the speed result, under the rules of "Performance results also land
+    in `benchmarks/`".
+  - The `benchmarks/README.md` row gives the ratio against the fastest
+    external tool next to the before/after ratio, or says "external
+    comparison: not run" with the reason.
+  - Keep the export and run scripts in the repository. Do not commit
+    proprietary binaries, or output that the tool's licence forbids
+    redistributing.
+
 ## Worked example
 
 `research/notes/index-calculus/RESEARCH_RESIDUAL_WALKS.md` is the reference implementation of this
@@ -724,6 +1391,26 @@ immutable historical names and never infer exact identity from field degree alon
 Within this repository the text name is the ICV1 slug (§11); the curve
 registry, [docs/curves/registry.json](docs/curves/registry.json), maps each
 slug to the EC1 identities of its recorded representations.
+The [IC curve crosswalk](docs/curves/ic/README.md) mirrors cryptanalysis's
+exact curve records and links them to ICV1 only when the model match is
+established.
+The [typed curve-link rules](docs/curves/ic/curve-links/README.md) keep
+twists and field/model changes separate from verified isogeny routes; no
+base-field log transport is inferred from a shared j-invariant. Keep unknown traits and unsupported models as `null` with status.
+Large factor bases remain content-addressed archives, while the browser's
+FB1 entries are session summaries; link them only after exact curve and
+point-set identities, encoding and quotient rules agree. An isogenous curve
+has its own EC1/UID and an ordered, verified map route before `ISO1` is used.
+Run `python3 docs/curves/ic/validate_semantics.py` after changing the IC curve
+crosswalk or typed links. The `ic-semantic-metadata` CI job also compares the
+three mirrored files with cryptanalysis `main`; land source changes there
+first, then update this mirror and its `mirror-lock.json` in a paired PR.
+To enumerate a prime-field curve's isogeny class, use the native walker
+`src/bin/isogeny_walk.rs` ([docs/curves/ic/README.md](docs/curves/ic/README.md#walking-an-isogeny-class)):
+it emits these records and kernel-certified `IW1` routes, and `isogeny_walk
+verify` replays them.
+The user guide, including S3 storage, is
+[docs/isogeny-walk/README.md](docs/isogeny-walk/README.md).
 
 # Agent rules for IC measurements
 
@@ -773,3 +1460,11 @@ The current `boundary_autolab.py` producer timing is whole-process or
 operation-counted. Treat those outputs as legacy diagnostics until producers
 emit the online intervals above; they cannot establish the primary speedup.
 Its launch interface now permits one target per run only.
+
+<!-- conductor:begin -->
+Before making code changes, obtain or attach to a Conductor task. Run
+`conductor check --summary "…" --scope path:…` first — if someone already holds
+those files, it will tell you who and what to do about it. Read `.conductor/WORKFLOW.md`
+and the active task card. Report scope expansion before editing outside the reserved paths.
+Do not publish chat transcripts or secrets as task metadata.
+<!-- conductor:end -->

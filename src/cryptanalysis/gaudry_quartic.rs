@@ -30,7 +30,7 @@ use rayon::prelude::*;
 use serde::Serialize;
 
 use super::gaudry_cubic::{
-    am, charpoly_mod_p, eigenvectors_mod_p, mm, sm, split_eigenspace, PolyRing, UPoly,
+    am, charpoly_mod_p, eigenvectors_mod_p, mm, rref_mod_p, sm, split_eigenspace, PolyRing, UPoly,
 };
 use super::residual_walk::{inv_mod, pow_mod};
 
@@ -664,16 +664,19 @@ impl SymmetrisedS5 {
 
 // ── Monomials in four variables ───────────────────────────────────────────
 
-fn deg4(m: &[u8; 4]) -> u16 {
-    m.iter().map(|&x| x as u16).sum()
+/// The degree of `m` when unknown `k` has weight `w[k]`: the total degree
+/// for weights all 1.
+fn wdeg<const N: usize>(m: &[u8; N], w: &[u8; N]) -> u16 {
+    m.iter().zip(w).map(|(&x, &k)| x as u16 * k as u16).sum()
 }
 
-fn grevlex_cmp4(a: &[u8; 4], b: &[u8; 4]) -> std::cmp::Ordering {
-    let (da, db) = (deg4(a), deg4(b));
+/// Weighted degree, then reverse lexicographic: grevlex for weights all 1.
+fn wgrevlex_cmp<const N: usize>(a: &[u8; N], b: &[u8; N], w: &[u8; N]) -> std::cmp::Ordering {
+    let (da, db) = (wdeg(a, w), wdeg(b, w));
     if da != db {
         return da.cmp(&db);
     }
-    for i in (0..4).rev() {
+    for i in (0..N).rev() {
         if a[i] != b[i] {
             return b[i].cmp(&a[i]);
         }
@@ -681,38 +684,68 @@ fn grevlex_cmp4(a: &[u8; 4], b: &[u8; 4]) -> std::cmp::Ordering {
     std::cmp::Ordering::Equal
 }
 
-/// Monomials of total degree `≤ d` in four variables, grevlex descending.
-fn monomials4_desc(d: u8) -> Vec<[u8; 4]> {
-    let mut v = exponents4(d);
-    v.sort_by(|x, y| grevlex_cmp4(y, x));
+/// Monomials of weighted degree `≤ d` in `N` variables (any order).
+fn exponents_w<const N: usize>(d: u8, w: &[u8; N]) -> Vec<[u8; N]> {
+    let mut out = Vec::new();
+    let mut cur = [0u8; N];
+    fn rec<const N: usize>(
+        i: usize,
+        left: u8,
+        w: &[u8; N],
+        cur: &mut [u8; N],
+        out: &mut Vec<[u8; N]>,
+    ) {
+        if i == N {
+            out.push(*cur);
+            return;
+        }
+        for k in 0..=left / w[i] {
+            cur[i] = k;
+            rec(i + 1, left - k * w[i], w, cur, out);
+        }
+        cur[i] = 0;
+    }
+    rec(0, d, w, &mut cur, &mut out);
+    out
+}
+
+/// Monomials of weighted degree `≤ d`, weighted grevlex descending.
+fn monomials_w_desc<const N: usize>(d: u8, w: &[u8; N]) -> Vec<[u8; N]> {
+    let mut v = exponents_w::<N>(d, w);
+    v.sort_by(|x, y| wgrevlex_cmp(y, x, w));
     v
 }
 
-fn leading_monomial4(f: &HashMap<[u8; 4], u64>) -> Option<[u8; 4]> {
+fn leading_monomial_w<const N: usize>(f: &HashMap<[u8; N], u64>, w: &[u8; N]) -> Option<[u8; N]> {
     f.iter()
         .filter(|(_, &c)| c != 0)
         .map(|(m, _)| *m)
-        .max_by(grevlex_cmp4)
+        .max_by(|a, b| wgrevlex_cmp(a, b, w))
 }
 
 /// As `gaudry_cubic`'s `triangularise_leads`, for four components.
-fn triangularise_leads4(
-    comps: &[HashMap<[u8; 4], u64>],
+fn triangularise_leads4<const N: usize>(
+    comps: &[HashMap<[u8; N], u64>],
+    w: &[u8; N],
     p: u64,
     muls: &mut u64,
-) -> (Vec<HashMap<[u8; 4], u64>>, Vec<Option<[u8; 4]>>) {
-    let mut fs: Vec<HashMap<[u8; 4], u64>> = comps.to_vec();
+) -> (Vec<HashMap<[u8; N], u64>>, Vec<Option<[u8; N]>>) {
+    let mut fs: Vec<HashMap<[u8; N], u64>> = comps.to_vec();
     for _round in 0..16 {
-        fs.sort_by(|a, b| match (leading_monomial4(a), leading_monomial4(b)) {
-            (Some(x), Some(y)) => grevlex_cmp4(&y, &x),
-            (Some(_), None) => std::cmp::Ordering::Less,
-            (None, Some(_)) => std::cmp::Ordering::Greater,
-            (None, None) => std::cmp::Ordering::Equal,
-        });
+        fs.sort_by(
+            |a, b| match (leading_monomial_w(a, w), leading_monomial_w(b, w)) {
+                (Some(x), Some(y)) => wgrevlex_cmp(&y, &x, w),
+                (Some(_), None) => std::cmp::Ordering::Less,
+                (None, Some(_)) => std::cmp::Ordering::Greater,
+                (None, None) => std::cmp::Ordering::Equal,
+            },
+        );
         let mut changed = false;
         for i in 1..fs.len() {
-            let (Some(li), Some(lj)) = (leading_monomial4(&fs[i]), leading_monomial4(&fs[i - 1]))
-            else {
+            let (Some(li), Some(lj)) = (
+                leading_monomial_w(&fs[i], w),
+                leading_monomial_w(&fs[i - 1], w),
+            ) else {
                 continue;
             };
             if li == lj {
@@ -731,7 +764,7 @@ fn triangularise_leads4(
             break;
         }
     }
-    let leads = fs.iter().map(leading_monomial4).collect();
+    let leads = fs.iter().map(|f| leading_monomial_w(f, w)).collect();
     (fs, leads)
 }
 
@@ -747,6 +780,7 @@ fn axpy_const<const P: u32>(row: &mut [u16], piv: &[u16], f: u32) {
     }
 }
 
+#[inline(always)]
 fn axpy_dyn(row: &mut [u16], piv: &[u16], f: u32, p: u32) {
     let nf = p - f;
     for (r, &v) in row.iter_mut().zip(piv) {
@@ -754,12 +788,230 @@ fn axpy_dyn(row: &mut [u16], piv: &[u16], f: u32, p: u32) {
     }
 }
 
-fn axpy(row: &mut [u16], piv: &[u16], f: u32, p: u32) {
+#[inline(always)]
+/// Every prime `p ≡ 1 (mod 4)` below 300 gets the constant-modulus loop
+/// (the `k = 4` solves run there); others take the run-time remainder.
+fn axpy_portable(row: &mut [u16], piv: &[u16], f: u32, p: u32) {
     match p {
-        269 => axpy_const::<269>(row, piv, f),
+        5 => axpy_const::<5>(row, piv, f),
+        13 => axpy_const::<13>(row, piv, f),
+        17 => axpy_const::<17>(row, piv, f),
+        29 => axpy_const::<29>(row, piv, f),
+        37 => axpy_const::<37>(row, piv, f),
+        41 => axpy_const::<41>(row, piv, f),
+        53 => axpy_const::<53>(row, piv, f),
+        61 => axpy_const::<61>(row, piv, f),
+        73 => axpy_const::<73>(row, piv, f),
+        89 => axpy_const::<89>(row, piv, f),
+        97 => axpy_const::<97>(row, piv, f),
+        101 => axpy_const::<101>(row, piv, f),
+        109 => axpy_const::<109>(row, piv, f),
+        113 => axpy_const::<113>(row, piv, f),
+        137 => axpy_const::<137>(row, piv, f),
+        149 => axpy_const::<149>(row, piv, f),
+        157 => axpy_const::<157>(row, piv, f),
+        173 => axpy_const::<173>(row, piv, f),
+        181 => axpy_const::<181>(row, piv, f),
+        193 => axpy_const::<193>(row, piv, f),
+        197 => axpy_const::<197>(row, piv, f),
+        229 => axpy_const::<229>(row, piv, f),
+        233 => axpy_const::<233>(row, piv, f),
+        241 => axpy_const::<241>(row, piv, f),
         257 => axpy_const::<257>(row, piv, f),
+        269 => axpy_const::<269>(row, piv, f),
+        277 => axpy_const::<277>(row, piv, f),
+        281 => axpy_const::<281>(row, piv, f),
+        293 => axpy_const::<293>(row, piv, f),
         _ => axpy_dyn(row, piv, f, p),
     }
+}
+
+/// The same loop compiled for wider vectors, chosen at run time: the
+/// release build targets baseline x86-64, where the multiply and the
+/// constant remainder barely vectorise.  Integer arithmetic, so the result
+/// is the same whichever runs.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx512f,avx512bw,avx512vl,avx2")]
+unsafe fn axpy_avx512(row: &mut [u16], piv: &[u16], f: u32, p: u32) {
+    axpy_portable(row, piv, f, p)
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn axpy_avx2(row: &mut [u16], piv: &[u16], f: u32, p: u32) {
+    axpy_portable(row, piv, f, p)
+}
+
+#[inline]
+pub(crate) fn axpy(row: &mut [u16], piv: &[u16], f: u32, p: u32) {
+    #[cfg(target_arch = "x86_64")]
+    {
+        if is_x86_feature_detected!("avx512bw") && is_x86_feature_detected!("avx512vl") {
+            // SAFETY: the features were detected on this CPU.
+            return unsafe { axpy_avx512(row, piv, f, p) };
+        }
+        if is_x86_feature_detected!("avx2") {
+            // SAFETY: as above.
+            return unsafe { axpy_avx2(row, piv, f, p) };
+        }
+    }
+    axpy_portable(row, piv, f, p)
+}
+
+// ── Dense kernels on u16 rows ─────────────────────────────────────────────
+//
+// The quotient-side routines (characteristic polynomial, eigenvectors) do
+// exactly the operations of `gaudry_cubic`'s `charpoly_mod_p` and
+// `eigenvectors_mod_p`, charge the same count and return the same values;
+// they run on `u16` rows with the vectorised `axpy` and in parallel over
+// rows instead of through `u128` remainders one entry at a time.
+
+/// As `gaudry_cubic::rref_mod_p`, on `u16` rows, rows eliminated in parallel.
+fn rref_u16(m: &mut [Vec<u16>], p: u32, muls: &mut u64) -> Vec<usize> {
+    let rows = m.len();
+    let cols = if rows > 0 { m[0].len() } else { 0 };
+    let mut pivots = Vec::new();
+    let mut r = 0;
+    for c in 0..cols {
+        if r >= rows {
+            break;
+        }
+        let Some(pr) = (r..rows).find(|&i| m[i][c] != 0) else {
+            continue;
+        };
+        m.swap(r, pr);
+        let inv = inv_mod(m[r][c] as u64, p as u64) as u32;
+        for v in &mut m[r][c..] {
+            *v = ((*v as u32 * inv) % p) as u16;
+        }
+        *muls += (cols - c) as u64;
+        let pivot = m[r].clone();
+        let hit = m
+            .par_iter_mut()
+            .enumerate()
+            .filter(|(i, row)| *i != r && row[c] != 0)
+            .map(|(_, row)| {
+                let f = row[c] as u32;
+                axpy(&mut row[c..], &pivot[c..], f, p);
+            })
+            .count();
+        *muls += (hit * (cols - c)) as u64;
+        pivots.push(c);
+        r += 1;
+    }
+    pivots
+}
+
+/// As `gaudry_cubic::charpoly_mod_p`.  The Hessenberg step at column `j`
+/// is a similarity by `I + Σ fᵢ E_{i,j+1}`, whose elementary factors
+/// commute (their products vanish), so its row operations can all run
+/// before its column operations: the same matrix as the interleaved order.
+pub(crate) fn charpoly_u16(a: &[Vec<u64>], p: u32, muls: &mut u64) -> UPoly {
+    let n = a.len();
+    let mut h: Vec<Vec<u16>> = a
+        .iter()
+        .map(|r| r.iter().map(|&v| v as u16).collect())
+        .collect();
+    for j in 0..n.saturating_sub(2) {
+        let Some(piv) = ((j + 1)..n).find(|&i| h[i][j] != 0) else {
+            continue;
+        };
+        if piv != j + 1 {
+            h.swap(piv, j + 1);
+            for row in h.iter_mut() {
+                row.swap(piv, j + 1);
+            }
+        }
+        let inv = inv_mod(h[j + 1][j] as u64, p as u64) as u32;
+        let fs: Vec<(usize, u32)> = ((j + 2)..n)
+            .filter(|&i| h[i][j] != 0)
+            .map(|i| (i, (h[i][j] as u32 * inv) % p))
+            .collect();
+        if fs.is_empty() {
+            continue;
+        }
+        *muls += 2 * (n * fs.len()) as u64;
+        let mut fv = vec![0u32; n];
+        for &(i, f) in &fs {
+            fv[i] = f;
+        }
+        // row_i −= fᵢ · row_{j+1}
+        let pivot = h[j + 1].clone();
+        h.par_iter_mut().enumerate().for_each(|(i, row)| {
+            if fv[i] != 0 {
+                axpy(row, &pivot, fv[i], p);
+            }
+        });
+        // col_{j+1} += Σ fᵢ · col_i
+        h.par_iter_mut().for_each(|row| {
+            let s: u64 = fs.iter().map(|&(i, f)| f as u64 * row[i] as u64).sum();
+            row[j + 1] = ((row[j + 1] as u64 + s) % p as u64) as u16;
+        });
+    }
+    // p_0 = 1; p_k(x) = (x − h[k-1][k-1]) p_{k-1}
+    //                   − Σ_{i=1}^{k-1} h[i-1][k-1] (Π_{m=i}^{k-1} h[m][m-1]) p_{i-1},
+    // charged as `PolyRing` charges its product and scalings.
+    let pp = p as u64;
+    let mut polys: Vec<Vec<u32>> = vec![vec![1]];
+    let mut acc: Vec<u64> = Vec::with_capacity(n);
+    for k in 1..=n {
+        let prev = &polys[k - 1];
+        let hk = (pp - h[k - 1][k - 1] as u64) % pp;
+        let mut pk = vec![0u32; k + 1];
+        for t in 0..=k {
+            let hi = if t >= 1 { prev[t - 1] as u64 } else { 0 };
+            let lo = if t < k { hk * prev[t] as u64 } else { 0 };
+            pk[t] = ((hi + lo) % pp) as u32;
+        }
+        *muls += 2 * k as u64;
+        acc.clear();
+        acc.resize(k, 0);
+        let mut prod = 1u64;
+        for i in (1..k).rev() {
+            prod = prod * h[i][i - 1] as u64 % pp;
+            let coef = h[i - 1][k - 1] as u64 * prod % pp;
+            if coef != 0 {
+                for (s, &q) in acc.iter_mut().zip(&polys[i - 1]) {
+                    *s += coef * q as u64;
+                }
+                *muls += i as u64;
+            }
+        }
+        for (v, &s) in pk.iter_mut().zip(&acc) {
+            *v = ((*v as u64 + pp - s % pp) % pp) as u32;
+        }
+        polys.push(pk);
+    }
+    UPoly(polys.pop().unwrap().into_iter().map(u64::from).collect())
+}
+
+/// As `gaudry_cubic::eigenvectors_mod_p`: a kernel basis of `m − λI`.
+pub(crate) fn eigenvectors_u16(
+    m: &[Vec<u16>],
+    lambda: u64,
+    p: u32,
+    muls: &mut u64,
+) -> Vec<Vec<u64>> {
+    let n = m.len();
+    let mut a: Vec<Vec<u16>> = m.to_vec();
+    for (i, row) in a.iter_mut().enumerate() {
+        row[i] = ((row[i] as u64 + p as u64 - lambda) % p as u64) as u16;
+    }
+    let pivots = rref_u16(&mut a, p, muls);
+    let mut is_piv = vec![false; n];
+    for &c in &pivots {
+        is_piv[c] = true;
+    }
+    let mut basis = Vec::new();
+    for fc in (0..n).filter(|&c| !is_piv[c]) {
+        let mut v = vec![0u64; n];
+        v[fc] = 1;
+        for (r, &pc) in pivots.iter().enumerate() {
+            v[pc] = (p as u64 - a[r][fc] as u64) % p as u64;
+        }
+        basis.push(v);
+    }
+    basis
 }
 
 // ── The solve ─────────────────────────────────────────────────────────────
@@ -798,9 +1050,23 @@ pub struct QuarticSolve {
     pub eigen_ms: f64,
     pub total_ms: f64,
     pub outcome: String,
+    pub replay: ReplayOutcome,
+    /// Held rows a replay reduced into its echelon to reach the recorded
+    /// rank (`top_up`): 0 when the replayed rows had it.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub topped_up: u64,
+}
+
+fn is_zero(v: &u64) -> bool {
+    *v == 0
 }
 
 impl QuarticSolve {
+    /// Sum the phases into `total_muls` (for solves built outside this
+    /// module).
+    pub fn close_public(&mut self) {
+        self.close();
+    }
     fn close(&mut self) {
         self.total_muls = self.weil_muls
             + self.triangularise_muls
@@ -814,10 +1080,12 @@ impl QuarticSolve {
     }
 }
 
-struct Echelon {
-    rows: Vec<Vec<u16>>,
-    pivot_row: Vec<u32>,
-    zero_rows: usize,
+pub(crate) struct Echelon {
+    pub(crate) rows: Vec<Vec<u16>>,
+    pub(crate) pivot_row: Vec<u32>,
+    pub(crate) zero_rows: usize,
+    /// Input rows that reduced to zero (or were zero), by index.
+    pub(crate) zero_ids: Vec<u32>,
 }
 
 /// Forward elimination by leading column.  Every unused row has zeros
@@ -828,16 +1096,44 @@ struct Echelon {
 /// elimination, without scanning rows that are already zero there;
 /// `muls` counts the nonzero entries of each pivot row once per row it is
 /// subtracted from, and once for its normalisation.
-fn echelon_by_lead(mut rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool) -> Echelon {
+pub(crate) fn echelon_by_lead(rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool) -> Echelon {
+    echelon_by_lead_with(rows, p, muls, debug, false)
+}
+
+/// [`echelon_by_lead`], optionally with sparsest pivots.
+///
+/// With `sparsest`, each column's pivot is instead the row of its bucket
+/// with the fewest nonzero entries (lowest index on a tie), which cuts the
+/// work and the fill; the row space and the pivot columns are the same
+/// either way.
+pub(crate) fn echelon_by_lead_with(
+    mut rows: Vec<Vec<u16>>,
+    p: u32,
+    muls: &mut u64,
+    debug: bool,
+    sparsest: bool,
+) -> Echelon {
     let ncols = rows.first().map_or(0, |r| r.len());
     let mut buckets: Vec<Vec<u32>> = vec![Vec::new(); ncols];
     let mut zero_rows = 0usize;
+    let mut zero_ids: Vec<u32> = Vec::new();
     for (r, row) in rows.iter().enumerate() {
         match row.iter().position(|&x| x != 0) {
             Some(c) => buckets[c].push(r as u32),
-            None => zero_rows += 1,
+            None => {
+                zero_rows += 1;
+                zero_ids.push(r as u32);
+            }
         }
     }
+    // Nonzero entries of each row (kept only for `sparsest`).
+    let mut row_nnz: Vec<u32> = if sparsest {
+        rows.par_iter()
+            .map(|r| r.iter().filter(|&&x| x != 0).count() as u32)
+            .collect()
+    } else {
+        Vec::new()
+    };
     let mut pivot_row = vec![u32::MAX; ncols];
     let start = Instant::now();
     let mut npiv = 0usize;
@@ -847,6 +1143,12 @@ fn echelon_by_lead(mut rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool)
             continue;
         }
         b.sort_unstable();
+        if sparsest && b.len() > 1 {
+            let best = (0..b.len())
+                .min_by_key(|&i| (row_nnz[b[i] as usize], i))
+                .unwrap_or(0);
+            b.swap(0, best);
+        }
         let pr = b[0] as usize;
         let mut piv = std::mem::take(&mut rows[pr]);
         let inv = inv_mod(piv[c] as u64, p as u64) as u32;
@@ -859,12 +1161,12 @@ fn echelon_by_lead(mut rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool)
         }
         *muls += nz.len() as u64;
         let dense = nz.len() * 8 > ncols - c;
-        let mut others: Vec<(u32, Vec<u16>, Option<usize>)> = b[1..]
+        let mut others: Vec<(u32, Vec<u16>, Option<usize>, u32)> = b[1..]
             .iter()
-            .map(|&r| (r, std::mem::take(&mut rows[r as usize]), None))
+            .map(|&r| (r, std::mem::take(&mut rows[r as usize]), None, 0))
             .collect();
         *muls += (others.len() * nz.len()) as u64;
-        others.par_iter_mut().for_each(|(_, row, lead)| {
+        others.par_iter_mut().for_each(|(_, row, lead, nnz)| {
             let f = row[c] as u32;
             if dense {
                 axpy(&mut row[c..], &piv[c..], f, p);
@@ -876,12 +1178,23 @@ fn echelon_by_lead(mut rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool)
                 }
             }
             *lead = row[c + 1..].iter().position(|&x| x != 0).map(|k| k + c + 1);
+            if sparsest {
+                if let Some(l) = *lead {
+                    *nnz = row[l..].iter().filter(|&&x| x != 0).count() as u32;
+                }
+            }
         });
-        for (r, row, lead) in others {
+        for (r, row, lead, nnz) in others {
+            if sparsest {
+                row_nnz[r as usize] = nnz;
+            }
             rows[r as usize] = row;
             match lead {
                 Some(l) => buckets[l].push(r),
-                None => zero_rows += 1,
+                None => {
+                    zero_rows += 1;
+                    zero_ids.push(r);
+                }
             }
         }
         rows[pr] = piv;
@@ -895,31 +1208,86 @@ fn echelon_by_lead(mut rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool)
             );
         }
     }
+    zero_ids.sort_unstable();
     Echelon {
         rows,
         pivot_row,
         zero_rows,
+        zero_ids,
     }
+}
+
+/// Reduce `held` rows, in order, into a forward echelon until `need` new
+/// pivots are found (or the rows run out): each is reduced left to right
+/// by the pivot rows (one multiplication per nonzero entry of a pivot row
+/// used) and, if it survives, normalised (one per nonzero) as the pivot of
+/// its lead.  The echelon then spans what the full row set spans up to the
+/// rows not reached.  Returns the number of held rows reduced.
+fn top_up_echelon(
+    ech: &mut Echelon,
+    held: Vec<Vec<u16>>,
+    mut need: usize,
+    p: u32,
+    muls: &mut u64,
+) -> u64 {
+    let ncols = ech.pivot_row.len();
+    let mut used = 0u64;
+    for mut v in held {
+        if need == 0 {
+            break;
+        }
+        used += 1;
+        let mut lead = None;
+        for c in 0..ncols {
+            if v[c] == 0 {
+                continue;
+            }
+            let pr = ech.pivot_row[c];
+            if pr == u32::MAX {
+                lead = Some(c);
+                break;
+            }
+            let f = v[c] as u32;
+            let piv = &ech.rows[pr as usize];
+            *muls += piv[c..].iter().filter(|&&x| x != 0).count() as u64;
+            axpy(&mut v[c..], &piv[c..], f, p);
+        }
+        let Some(c) = lead else {
+            ech.zero_rows += 1;
+            continue;
+        };
+        let inv = inv_mod(v[c] as u64, p as u64) as u32;
+        for x in &mut v[c..] {
+            if *x != 0 {
+                *x = ((*x as u32 * inv) % p) as u16;
+                *muls += 1;
+            }
+        }
+        ech.pivot_row[c] = ech.rows.len() as u32;
+        ech.rows.push(v);
+        need -= 1;
+    }
+    used
 }
 
 /// Memoised normal forms over the standard monomials, computed for a set
 /// of target columns by one sweep from the right over the pivots they
 /// reach — iteratively, since a chain of pivots can be tens of thousands
 /// deep.
-struct NormalForms4<'a> {
-    ech: &'a Echelon,
-    is_std: Vec<bool>,
-    std_index: Vec<u32>,
-    dim: usize,
-    p: u32,
-    memo: Vec<Option<(Vec<u16>, u64)>>,
-    reached: usize,
+pub(crate) struct NormalForms4<'a> {
+    pub(crate) ech: &'a Echelon,
+    pub(crate) is_std: Vec<bool>,
+    pub(crate) std_index: Vec<u32>,
+    pub(crate) dim: usize,
+    pub(crate) p: u32,
+    pub(crate) memo: Vec<Option<(Vec<u16>, u64)>>,
+    pub(crate) reached: usize,
 }
 
 impl<'a> NormalForms4<'a> {
     /// Make every column in `targets` resolvable.  `Err(c)` names a column
     /// reached that is neither standard nor a pivot.
-    fn ensure(&mut self, targets: &[usize], muls: &mut u64) -> Result<(), usize> {
+    pub(crate) fn ensure(&mut self, targets: &[usize], muls: &mut u64) -> Result<(), usize> {
         let ncols = self.is_std.len();
         let mut need: Vec<usize> = Vec::new();
         let mut seen = vec![false; ncols];
@@ -945,32 +1313,64 @@ impl<'a> NormalForms4<'a> {
             }
         }
         need.sort_unstable_by(|a, b| b.cmp(a));
+        // Right to left in blocks: within a block, the terms on columns
+        // already resolved are summed in parallel; the terms on columns of
+        // the block itself are added afterwards, right to left.  The same
+        // products as one column at a time, so the same vectors and count.
+        const BLOCK: usize = 128;
         let p = self.p;
-        for c in need {
-            let row = &self.ech.rows[self.ech.pivot_row[c] as usize];
-            let mut v = vec![0u16; self.dim];
-            for j in (c + 1)..ncols {
-                let a = row[j] as u32;
-                if a == 0 {
-                    continue;
-                }
-                if self.is_std[j] {
-                    let i = self.std_index[j] as usize;
-                    v[i] = ((v[i] as u32 + p - a) % p) as u16;
-                } else {
-                    let (w, nnz) = self.memo[j].as_ref().expect("computed right to left");
+        let mut in_block = vec![false; ncols];
+        for block in need.chunks(BLOCK) {
+            for &c in block {
+                in_block[c] = true;
+            }
+            let this = &*self;
+            let in_block_ref = &in_block;
+            let partial: Vec<(Vec<u16>, u64, Vec<(usize, u32)>)> = block
+                .par_iter()
+                .map(|&c| {
+                    let row = &this.ech.rows[this.ech.pivot_row[c] as usize];
+                    let mut v = vec![0u16; this.dim];
+                    let mut m = 0u64;
+                    let mut later = Vec::new();
+                    for j in (c + 1)..ncols {
+                        let a = row[j] as u32;
+                        if a == 0 {
+                            continue;
+                        }
+                        if this.is_std[j] {
+                            let i = this.std_index[j] as usize;
+                            v[i] = ((v[i] as u32 + p - a) % p) as u16;
+                        } else if in_block_ref[j] {
+                            later.push((j, a));
+                        } else {
+                            let (w, nnz) = this.memo[j].as_ref().expect("computed right to left");
+                            axpy(&mut v, w, a, p);
+                            m += *nnz;
+                        }
+                    }
+                    (v, m, later)
+                })
+                .collect();
+            for (&c, (mut v, m, later)) in block.iter().zip(partial) {
+                *muls += m;
+                for (j, a) in later {
+                    let (w, nnz) = self.memo[j].as_ref().expect("earlier in the block");
                     axpy(&mut v, w, a, p);
                     *muls += *nnz;
                 }
+                let nnz = v.iter().filter(|&&x| x != 0).count() as u64;
+                self.memo[c] = Some((v, nnz));
+                self.reached += 1;
             }
-            let nnz = v.iter().filter(|&&x| x != 0).count() as u64;
-            self.memo[c] = Some((v, nnz));
-            self.reached += 1;
+            for &c in block {
+                in_block[c] = false;
+            }
         }
         Ok(())
     }
 
-    fn vector(&self, c: usize) -> Vec<u64> {
+    pub(crate) fn vector(&self, c: usize) -> Vec<u64> {
         if self.is_std[c] {
             let mut v = vec![0u64; self.dim];
             v[self.std_index[c] as usize] = 1;
@@ -982,11 +1382,16 @@ impl<'a> NormalForms4<'a> {
     }
 }
 
-fn eval4(comp: &HashMap<[u8; 4], u64>, e: &[u64; 4], p: u64, muls: &mut u64) -> u64 {
+fn eval4<const N: usize>(
+    comp: &HashMap<[u8; N], u64>,
+    e: &[u64; N],
+    p: u64,
+    muls: &mut u64,
+) -> u64 {
     let mut acc = 0u64;
     for (m, &c) in comp {
         let mut t = c;
-        for k in 0..4 {
+        for k in 0..N {
             for _ in 0..m[k] {
                 t = mm(t, e[k], p);
                 *muls += 1;
@@ -1012,21 +1417,265 @@ pub fn solve_system4(
     st: &mut QuarticSolve,
     debug: bool,
 ) -> Option<Vec<[u64; 4]>> {
+    solve_system4_traced(
+        comps,
+        equation_degree,
+        macaulay_degree,
+        p,
+        rng,
+        st,
+        debug,
+        None,
+        None,
+    )
+}
+
+/// [`solve_system4`] in `N` unknowns, each equation shifted by its own
+/// degree: the `D₄` system's solve, for callers outside the crate.
+pub fn solve_system_n<const N: usize>(
+    comps: &[HashMap<[u8; N], u64>],
+    equation_degree: u8,
+    macaulay_degree: u8,
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+) -> Option<Vec<[u64; N]>> {
+    solve_system_n_inner::<N>(
+        comps,
+        equation_degree,
+        macaulay_degree,
+        p,
+        rng,
+        st,
+        false,
+        None,
+        None,
+    )
+    .ok()
+    .flatten()
+}
+
+/// The shape of one Macaulay solve, recorded on a first system and replayed
+/// on later systems with the same monomial support (F4Remake's idea, for a
+/// Macaulay matrix): the leading monomials after triangularisation, the
+/// number of rows built, the input rows that reduced to zero, and the number
+/// of pivots.  A replay builds only the rows that did not reduce to zero.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct ShapeTrace {
+    pub leads: Vec<Option<Vec<u8>>>,
+    pub rows_built: usize,
+    pub zero_ids: Vec<u32>,
+    pub pivots: usize,
+    pub dim: usize,
+}
+
+/// How a traced solve went.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+pub enum ReplayOutcome {
+    /// No trace was given: a full solve, recorded.
+    #[default]
+    Recorded,
+    /// The trace matched: zero rows were not built.
+    Replayed,
+    /// The trace did not match this system (leads, rows, pivots or
+    /// dimension differ): the full solve ran and its cost is in `st`.
+    FellBack,
+}
+
+/// [`solve_system4`] with a shape trace.  With `replay = Some(t)`, the rows
+/// `t` records as reducing to zero are not built; if the replayed echelon
+/// does not reach `t`'s pivots and dimension, or the leads or row count
+/// differ, the full solve runs instead (charged in `st` as well: a fallback
+/// is never free).  With `record = Some(out)`, the full solve's shape is
+/// written to `out`.
+#[allow(clippy::too_many_arguments)]
+pub fn solve_system4_traced(
+    comps: &[HashMap<[u8; 4], u64>],
+    equation_degree: u8,
+    macaulay_degree: u8,
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    debug: bool,
+    replay: Option<&ShapeTrace>,
+    record: Option<&mut ShapeTrace>,
+) -> Option<Vec<[u64; 4]>> {
+    let mut outcome = ReplayOutcome::Recorded;
+    if let Some(t) = replay {
+        match solve_system4_inner(
+            comps,
+            equation_degree,
+            macaulay_degree,
+            p,
+            rng,
+            st,
+            debug,
+            Some(t),
+            None,
+        ) {
+            Ok(sols) => {
+                st.replay = ReplayOutcome::Replayed;
+                return sols;
+            }
+            Err(()) => outcome = ReplayOutcome::FellBack,
+        }
+    }
+    let r = solve_system4_inner(
+        comps,
+        equation_degree,
+        macaulay_degree,
+        p,
+        rng,
+        st,
+        debug,
+        None,
+        record,
+    )
+    .unwrap_or(None);
+    st.replay = outcome;
+    r
+}
+
+/// The solve.  `Err(())` only from a replay whose shape did not match.
+#[allow(clippy::too_many_arguments)]
+fn solve_system4_inner(
+    comps: &[HashMap<[u8; 4], u64>],
+    equation_degree: u8,
+    macaulay_degree: u8,
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    debug: bool,
+    replay: Option<&ShapeTrace>,
+    record: Option<&mut ShapeTrace>,
+) -> Result<Option<Vec<[u64; 4]>>, ()> {
+    solve_system_n_inner::<4>(
+        comps,
+        equation_degree,
+        macaulay_degree,
+        p,
+        rng,
+        st,
+        debug,
+        replay,
+        record,
+    )
+}
+
+/// The solve in `N` unknowns.  `equation_degree > 0`: every equation is
+/// shifted as one of that degree (the `k = 4` systems); `0`: each equation
+/// by its own total degree after triangularisation.  `Err(())` only from a
+/// replay whose shape did not match.
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn solve_system_n_inner<const N: usize>(
+    comps: &[HashMap<[u8; N], u64>],
+    equation_degree: u8,
+    macaulay_degree: u8,
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    debug: bool,
+    replay: Option<&ShapeTrace>,
+    record: Option<&mut ShapeTrace>,
+) -> Result<Option<Vec<[u64; N]>>, ()> {
+    solve_system_w_inner::<N>(
+        comps,
+        &[1; N],
+        false,
+        false,
+        false,
+        equation_degree,
+        macaulay_degree,
+        p,
+        rng,
+        st,
+        debug,
+        replay,
+        record,
+    )
+}
+
+/// [`solve_system_n_inner`] in a weighted grading: unknown `k` has weight
+/// `w[k]`, the Macaulay matrix holds the monomials of weighted degree
+/// `≤ macaulay_degree`, each equation is shifted by the monomials of
+/// weighted degree `≤ macaulay_degree − (its weighted degree)`, and the
+/// multiplication matrix is that of the first unknown of weight 1 (so its
+/// border stays inside the matrix).  Weights all 1 are the unweighted solve,
+/// operation for operation.  A rational eigenvalue whose eigenspace holds
+/// more than one solution is split by the multiplication matrices of the
+/// other unknowns when their border is inside the matrix; otherwise its
+/// solutions are lost, which the caller's exact check sees (they are never
+/// returned wrong: every returned solution satisfies all equations).
+/// `chains`: the eigen step along the chains of the multiplication
+/// unknown ([`solve_along_chains`]) instead of the dense
+/// multiplication matrix; `sparsest`: the elimination's pivot in each
+/// column is the sparsest candidate row ([`echelon_by_lead_with`]).
+/// Both off is the unweighted solve's arithmetic.
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn solve_system_w_inner<const N: usize>(
+    comps: &[HashMap<[u8; N], u64>],
+    w: &[u8; N],
+    chains: bool,
+    sparsest: bool,
+    top_up: bool,
+    equation_degree: u8,
+    macaulay_degree: u8,
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    debug: bool,
+    replay: Option<&ShapeTrace>,
+    record: Option<&mut ShapeTrace>,
+) -> Result<Option<Vec<[u64; N]>>, ()> {
     assert!(p < 1 << 15, "rows are u16 and products must fit u32");
+    let Some(mvar) = w.iter().position(|&k| k == 1) else {
+        st.outcome = "no unknown of weight 1".into();
+        return Ok(None);
+    };
     let t0 = Instant::now();
     st.equation_degree = equation_degree;
     st.macaulay_degree = macaulay_degree;
-    let cols = monomials4_desc(macaulay_degree);
-    let col_index: HashMap<[u8; 4], usize> =
+    let cols = monomials_w_desc(macaulay_degree, w);
+    let col_index: HashMap<[u8; N], usize> =
         cols.iter().enumerate().map(|(i, m)| (*m, i)).collect();
-    let shifts = monomials4_desc(macaulay_degree - equation_degree);
     let mut tri = 0u64;
-    let (comps, leads) = triangularise_leads4(comps, p, &mut tri);
+    let (comps, leads) = triangularise_leads4(comps, w, p, &mut tri);
     st.triangularise_muls += tri;
-    let divides = |lm: &[u8; 4], m: &[u8; 4]| (0..4).all(|k| lm[k] <= m[k]);
+    let leads_v: Vec<Option<Vec<u8>>> = leads.iter().map(|l| l.map(|m| m.to_vec())).collect();
+    if let Some(t) = replay {
+        if t.leads != leads_v {
+            st.outcome = "replay: leads differ".into();
+            return Err(());
+        }
+    }
+    let mut shifts_by: HashMap<u8, Vec<[u8; N]>> = HashMap::new();
+    let degree_of = |c: &HashMap<[u8; N], u64>| -> u8 {
+        if equation_degree > 0 {
+            equation_degree
+        } else {
+            c.iter()
+                .filter(|(_, &v)| v != 0)
+                .map(|(m, _)| wdeg(m, w) as u8)
+                .max()
+                .unwrap_or(0)
+        }
+    };
+    let divides = |lm: &[u8; N], m: &[u8; N]| (0..N).all(|k| lm[k] <= m[k]);
     let mut rows: Vec<Vec<u16>> = Vec::new();
+    // With `top_up`, the rows a replay skips, kept for a rank shortfall.
+    let mut held: Vec<Vec<u16>> = Vec::new();
+    let mut built = 0usize;
+    let mut skip_at = 0usize;
     for (i, comp) in comps.iter().enumerate() {
-        for sh in &shifts {
+        let dg = degree_of(comp);
+        if dg > macaulay_degree {
+            st.outcome = "an equation above the Macaulay degree".into();
+            return Ok(None);
+        }
+        let shifts = shifts_by
+            .entry(dg)
+            .or_insert_with(|| monomials_w_desc::<N>(macaulay_degree - dg, w));
+        for sh in shifts.iter() {
             if leads
                 .iter()
                 .take(i)
@@ -1034,13 +1683,35 @@ pub fn solve_system4(
             {
                 continue;
             }
+            let index = built;
+            built += 1;
+            let mut skip = false;
+            if let Some(t) = replay {
+                if skip_at < t.zero_ids.len() && t.zero_ids[skip_at] as usize == index {
+                    skip_at += 1;
+                    if !top_up {
+                        continue;
+                    }
+                    skip = true;
+                }
+            }
             let mut row = vec![0u16; cols.len()];
             for (&e, &c) in comp {
-                let m = [e[0] + sh[0], e[1] + sh[1], e[2] + sh[2], e[3] + sh[3]];
+                let m: [u8; N] = core::array::from_fn(|k| e[k] + sh[k]);
                 let ci = col_index[&m];
                 row[ci] = am(row[ci] as u64, c, p) as u16;
             }
-            rows.push(row);
+            if skip {
+                held.push(row);
+            } else {
+                rows.push(row);
+            }
+        }
+    }
+    if let Some(t) = replay {
+        if t.rows_built != built {
+            st.outcome = "replay: row count differs".into();
+            return Err(());
         }
     }
     st.rows = rows.len();
@@ -1056,17 +1727,45 @@ pub fn solve_system4(
     }
     let t1 = Instant::now();
     let mut ech_muls = 0u64;
-    let ech = echelon_by_lead(rows, p as u32, &mut ech_muls, debug);
+    let mut ech = echelon_by_lead_with(rows, p as u32, &mut ech_muls, debug, sparsest);
+    if let Some(t) = replay {
+        if top_up {
+            let have = ech.pivot_row.iter().filter(|&&r| r != u32::MAX).count();
+            if have < t.pivots {
+                st.topped_up +=
+                    top_up_echelon(&mut ech, held, t.pivots - have, p as u32, &mut ech_muls);
+            }
+        }
+    }
     st.echelon_muls += ech_muls;
     st.echelon_ms = t1.elapsed().as_secs_f64() * 1e3;
     st.zero_rows = ech.zero_rows;
     st.pivots = ech.pivot_row.iter().filter(|&&r| r != u32::MAX).count();
     let is_std: Vec<bool> = (0..cols.len())
-        .map(|c| ech.pivot_row[c] == u32::MAX && deg4(&cols[c]) < macaulay_degree as u16)
+        .map(|c| ech.pivot_row[c] == u32::MAX && wdeg(&cols[c], w) < macaulay_degree as u16)
         .collect();
     let standard: Vec<usize> = (0..cols.len()).filter(|&c| is_std[c]).collect();
     let dim = standard.len();
     st.dim = dim;
+    // With `top_up` a replay needs no rank check: it stops at the recorded
+    // rank, which a specialised system cannot exceed when the recorded one
+    // had the generic rank (Macaulay rank is lower semicontinuous), or it
+    // has used every row.  Either way it spans what the full matrix spans.
+    if let (Some(t), false) = (replay, top_up) {
+        if t.pivots != st.pivots || t.dim != dim {
+            st.outcome = "replay: pivots or dimension differ".into();
+            return Err(());
+        }
+    }
+    if let Some(out) = record {
+        *out = ShapeTrace {
+            leads: leads_v.clone(),
+            rows_built: built,
+            zero_ids: ech.zero_ids.clone(),
+            pivots: st.pivots,
+            dim,
+        };
+    }
     let mut std_index = vec![u32::MAX; cols.len()];
     for (i, &c) in standard.iter().enumerate() {
         std_index[c] = i as u32;
@@ -1080,23 +1779,30 @@ pub fn solve_system4(
             st.echelon_ms / 1e3
         );
     }
-    let find = |m: [u8; 4]| col_index.get(&m).copied();
-    let (Some(c0), Some(c1), Some(c2), Some(c3), Some(c4)) = (
-        find([0, 0, 0, 0]),
-        find([1, 0, 0, 0]),
-        find([0, 1, 0, 0]),
-        find([0, 0, 1, 0]),
-        find([0, 0, 0, 1]),
-    ) else {
-        st.outcome = "low-degree monomials missing".into();
-        return None;
-    };
-    if [c0, c1, c2, c3, c4].iter().any(|&c| !is_std[c]) {
-        st.outcome = "1 or a variable is not standard".into();
-        return None;
+    // Columns of 1 and of each unknown.
+    let mut low: Vec<usize> = Vec::with_capacity(N + 1);
+    for v in 0..=N {
+        let m: [u8; N] = core::array::from_fn(|k| u8::from(v > 0 && k == v - 1));
+        match col_index.get(&m) {
+            Some(&c) => low.push(c),
+            None => {
+                st.outcome = "low-degree monomials missing".into();
+                return Ok(None);
+            }
+        }
     }
-    let idx = [c0, c1, c2, c3, c4].map(|c| std_index[c] as usize);
+    if low.iter().any(|&c| !is_std[c]) {
+        st.outcome = "1 or a variable is not standard".into();
+        return Ok(None);
+    }
+    let idx: Vec<usize> = low.iter().map(|&c| std_index[c] as usize).collect();
     let t2 = Instant::now();
+    if chains {
+        return Ok(solve_along_chains::<N>(
+            &ech, &cols, &col_index, &is_std, &standard, &std_index, &idx, mvar, &comps, p, rng,
+            st, t0, t2,
+        ));
+    }
     let mut nfs = NormalForms4 {
         ech: &ech,
         is_std,
@@ -1107,31 +1813,37 @@ pub fn solve_system4(
         reached: 0,
     };
     // Multiplication matrix of a variable: column b ↦ NF(var · b).
-    let mult_matrix =
-        |nfs: &mut NormalForms4, var: usize, muls: &mut u64| -> Option<Vec<Vec<u64>>> {
-            let mut targets = Vec::with_capacity(dim);
-            for &bc in &standard {
-                let mut m = cols[bc];
-                m[var] += 1;
-                targets.push(*col_index.get(&m)?);
+    let mult_matrix = |nfs: &mut NormalForms4,
+                       var: usize,
+                       muls: &mut u64|
+     -> Option<Vec<Vec<u64>>> {
+        let mut targets = Vec::with_capacity(dim);
+        for &bc in &standard {
+            let mut m = cols[bc];
+            m[var] += 1;
+            targets.push(*col_index.get(&m)?);
+        }
+        if debug {
+            let border = targets.iter().filter(|&&t| !nfs.is_std[t]).count();
+            eprintln!("  multiplication by unknown {var}: {border} of {dim} products outside the standard monomials");
+        }
+        nfs.ensure(&targets, muls).ok()?;
+        let mut out = vec![vec![0u64; dim]; dim];
+        for (bi, &tc) in targets.iter().enumerate() {
+            for (ri, v) in nfs.vector(tc).into_iter().enumerate() {
+                out[ri][bi] = v;
             }
-            nfs.ensure(&targets, muls).ok()?;
-            let mut out = vec![vec![0u64; dim]; dim];
-            for (bi, &tc) in targets.iter().enumerate() {
-                for (ri, v) in nfs.vector(tc).into_iter().enumerate() {
-                    out[ri][bi] = v;
-                }
-            }
-            Some(out)
-        };
+        }
+        Some(out)
+    };
     let mut nf_muls = 0u64;
-    let m_e1 = mult_matrix(&mut nfs, 0, &mut nf_muls);
+    let m_e1 = mult_matrix(&mut nfs, mvar, &mut nf_muls);
     st.nf_muls += nf_muls;
     st.nf_ms = t2.elapsed().as_secs_f64() * 1e3;
     st.reached_pivots = nfs.reached;
     let Some(m_e1) = m_e1 else {
         st.outcome = "border unreachable at this degree".into();
-        return None;
+        return Ok(None);
     };
     if debug {
         eprintln!(
@@ -1143,7 +1855,7 @@ pub fn solve_system4(
     }
     let t3 = Instant::now();
     let mut cp_muls = 0u64;
-    let cp = charpoly_mod_p(&m_e1, p, &mut cp_muls);
+    let cp = charpoly_u16(&m_e1, p as u32, &mut cp_muls);
     st.charpoly_muls += cp_muls;
     st.charpoly_ms = t3.elapsed().as_secs_f64() * 1e3;
     let t4 = Instant::now();
@@ -1151,43 +1863,508 @@ pub fn solve_system4(
     let lambdas = ring.roots(&cp, rng);
     st.roots_muls += ring.muls.get();
     st.rational_eigenvalues = lambdas.len();
-    let mut mt = vec![vec![0u64; dim]; dim];
+    let mut mt = vec![vec![0u16; dim]; dim];
     for i in 0..dim {
         for j in 0..dim {
-            mt[j][i] = m_e1[i][j];
+            mt[j][i] = m_e1[i][j] as u16;
         }
     }
     drop(m_e1);
-    let mut others: [Option<Vec<Vec<u64>>>; 3] = [None, None, None];
+    // The other unknowns, in order, for splitting a degenerate eigenspace.
+    let other_vars: Vec<usize> = (0..N).filter(|&v| v != mvar).collect();
+    let mut others: Vec<Option<Vec<Vec<u64>>>> = vec![None; N - 1];
     let mut out = Vec::new();
     for lam in lambdas {
         let mut ev = 0u64;
-        let mut ker = eigenvectors_mod_p(&mt, lam, p, &mut ev);
+        let mut ker = eigenvectors_u16(&mt, lam, p as u32, &mut ev);
         if ker.len() > 1 {
             st.degenerate_eigenspaces += 1;
-            for k in 0..3 {
+            for (k, &var) in other_vars.iter().enumerate() {
                 if ker.len() <= 1 {
                     break;
                 }
                 if others[k].is_none() {
                     let mut nm = 0u64;
-                    others[k] = mult_matrix(&mut nfs, k + 1, &mut nm);
+                    others[k] = mult_matrix(&mut nfs, var, &mut nm);
                     st.nf_muls += nm;
                 }
+                // An unknown whose border leaves the matrix (weight above
+                // 1) cannot split it; with weights all 1 none does.
                 let Some(mv) = &others[k] else {
-                    break;
+                    continue;
                 };
                 ker = split_eigenspace(&ker, mv, p, rng, &mut ev);
             }
         }
         st.eigenvector_muls += ev;
-        for w in &ker {
-            if w[idx[0]] == 0 {
+        for v in &ker {
+            if v[idx[0]] == 0 {
                 continue;
             }
-            let inv = inv_mod(w[idx[0]], p);
-            let e: [u64; 4] = core::array::from_fn(|k| mm(w[idx[k + 1]], inv, p));
-            if e[0] != lam {
+            let inv = inv_mod(v[idx[0]], p);
+            let e: [u64; N] = core::array::from_fn(|k| mm(v[idx[k + 1]], inv, p));
+            if e[mvar] != lam {
+                continue;
+            }
+            let mut vm = 0u64;
+            let ok = comps.iter().all(|c| eval4(c, &e, p, &mut vm) == 0);
+            st.verify_muls += vm;
+            if ok {
+                out.push(e);
+            }
+        }
+    }
+    st.eigen_ms = t4.elapsed().as_secs_f64() * 1e3;
+    out.sort_unstable();
+    out.dedup();
+    st.e_solutions = out.len();
+    st.outcome = "solved".into();
+    st.total_ms = t0.elapsed().as_secs_f64() * 1e3;
+    st.close();
+    Ok(Some(out))
+}
+
+// ── The quotient along the chains of the multiplication unknown ───────────
+//
+// With `x` the multiplication unknown (weight 1) and `B` the standard
+// monomials, an order ideal, `B` splits into chains `h, hx, …, hx^{ℓ−1}`
+// from the heads `h ∈ B` not divisible by `x`; `M_x` maps each chain
+// element to the next, and only a chain's last element leaves `B`, to the
+// border monomial `hx^ℓ`.  A left eigenvector `w` of `M_x` for `λ` (the
+// evaluation at a solution, up to scale) is then fixed by its values `u`
+// on the heads, `w(hx^t) = λ^t u_h`, and the border relations
+// `w · NF(h_j x^{ℓ_j}) = λ^{ℓ_j} u_j` are `A(λ) u = 0` for the `k × k`
+// matrix `A(λ)_{ji} = Σ_t NF(h_j x^{ℓ_j})[h_i x^t] λ^t − δ_{ji} λ^{ℓ_j}`,
+// `k` the number of chains.  `det A(λ) = ± det(λI − M_x)`, of degree
+// `Σ ℓ_j = dim`.  So only the `k` border normal forms are computed, the
+// characteristic polynomial is `det A` (at every point of `F_p` when
+// `p ≤ dim + 1`, whose zeros are then the rational eigenvalues, otherwise
+// at `dim + 1` points and interpolated), and an eigenvector is a kernel
+// vector of a `k × k` matrix.
+
+/// What the chain step found, or why it could not run (the caller then
+/// reports the solve unsolved, its work charged).
+struct Chains {
+    /// For each standard index: (chain, position).
+    pos: Vec<(u32, u32)>,
+    /// Chain lengths.
+    len: Vec<u32>,
+    /// For each chain, its border normal form as (chain, position, coef).
+    nf: Vec<Vec<(u32, u32, u64)>>,
+}
+
+/// The heads, chains and border normal forms.  `Err` names the failure.
+#[allow(clippy::too_many_arguments)]
+fn chains_of<const N: usize>(
+    ech: &Echelon,
+    cols: &[[u8; N]],
+    col_index: &HashMap<[u8; N], usize>,
+    is_std: &[bool],
+    standard: &[usize],
+    std_index: &[u32],
+    mvar: usize,
+    p: u32,
+    muls: &mut u64,
+) -> Result<Chains, String> {
+    let dim = standard.len();
+    let ncols = cols.len();
+    // Successor of each standard monomial under x, or its border column.
+    let mut next: Vec<Result<usize, usize>> = Vec::with_capacity(dim);
+    for &bc in standard {
+        let mut m = cols[bc];
+        m[mvar] += 1;
+        let Some(&t) = col_index.get(&m) else {
+            return Err("border unreachable at this degree".into());
+        };
+        next.push(if is_std[t] {
+            Ok(std_index[t] as usize)
+        } else {
+            Err(t)
+        });
+    }
+    let mut pos = vec![(u32::MAX, u32::MAX); dim];
+    let mut len = Vec::new();
+    let mut ends = Vec::new();
+    for s in 0..dim {
+        if cols[standard[s]][mvar] != 0 {
+            continue;
+        }
+        let j = len.len() as u32;
+        let (mut cur, mut t) = (s, 0u32);
+        loop {
+            if pos[cur].0 != u32::MAX {
+                return Err("chain structure: a standard monomial on two chains".into());
+            }
+            pos[cur] = (j, t);
+            t += 1;
+            match next[cur] {
+                Ok(n) => cur = n,
+                Err(b) => {
+                    ends.push(b);
+                    break;
+                }
+            }
+        }
+        len.push(t);
+    }
+    if pos.iter().any(|&(j, _)| j == u32::MAX) {
+        return Err("chain structure: standard monomials are not an order ideal in x".into());
+    }
+    // nnz of each pivot row from its lead: bookkeeping, not arithmetic.
+    let nnz: Vec<u64> = (0..ncols)
+        .map(|c| match ech.pivot_row[c] {
+            u32::MAX => 0,
+            r => ech.rows[r as usize][c..]
+                .iter()
+                .filter(|&&v| v != 0)
+                .count() as u64,
+        })
+        .collect();
+    // Each border normal form by reducing e_b left to right by the pivot
+    // rows (normalised, lead 1): one multiplication per nonzero entry of a
+    // pivot row per use.
+    let reduced: Vec<Result<(Vec<u16>, u64), String>> = ends
+        .par_iter()
+        .map(|&b| {
+            let mut v = vec![0u16; ncols];
+            v[b] = 1;
+            let mut m = 0u64;
+            for c in b..ncols {
+                if v[c] == 0 || is_std[c] {
+                    continue;
+                }
+                let pr = ech.pivot_row[c];
+                if pr == u32::MAX {
+                    return Err("border unreachable at this degree".into());
+                }
+                let f = v[c] as u32;
+                axpy(&mut v[c..], &ech.rows[pr as usize][c..], f, p);
+                m += nnz[c];
+            }
+            Ok((v, m))
+        })
+        .collect();
+    let mut nf = Vec::with_capacity(ends.len());
+    for r in reduced {
+        let (v, m) = r?;
+        *muls += m;
+        nf.push(
+            standard
+                .iter()
+                .enumerate()
+                .filter(|&(_, &c)| v[c] != 0)
+                .map(|(s, &c)| (pos[s].0, pos[s].1, v[c] as u64))
+                .collect(),
+        );
+    }
+    Ok(Chains { pos, len, nf })
+}
+
+impl Chains {
+    fn k(&self) -> usize {
+        self.len.len()
+    }
+
+    /// `A(λ)`, charged one multiplication per term and per power.
+    fn matrix(&self, lam: u64, p: u64, muls: &mut u64) -> Vec<Vec<u64>> {
+        let top = *self.len.iter().max().unwrap_or(&0) as usize;
+        let mut pw = vec![1u64; top + 1];
+        for t in 1..=top {
+            pw[t] = mm(pw[t - 1], lam, p);
+        }
+        *muls += top as u64;
+        let k = self.k();
+        let mut a = vec![vec![0u64; k]; k];
+        for (j, row) in self.nf.iter().enumerate() {
+            for &(i, t, c) in row {
+                let e = &mut a[j][i as usize];
+                *e = am(*e, mm(c, pw[t as usize], p), p);
+            }
+            *muls += row.len() as u64;
+            let d = &mut a[j][j];
+            *d = sm(*d, pw[self.len[j] as usize], p);
+        }
+        a
+    }
+
+    /// `det A(λ)` by elimination, charged as `rref_mod_p` charges.
+    fn det(&self, lam: u64, p: u64, muls: &mut u64) -> u64 {
+        let mut a = self.matrix(lam, p, muls);
+        let k = a.len();
+        let mut det = 1u64;
+        for c in 0..k {
+            let Some(r) = (c..k).find(|&r| a[r][c] != 0) else {
+                return 0;
+            };
+            if r != c {
+                a.swap(r, c);
+                det = (p - det) % p;
+            }
+            det = mm(det, a[c][c], p);
+            let inv = inv_mod(a[c][c], p);
+            *muls += 1;
+            for r in (c + 1)..k {
+                if a[r][c] == 0 {
+                    continue;
+                }
+                let f = mm(a[r][c], inv, p);
+                for j in (c + 1)..k {
+                    a[r][j] = sm(a[r][j], mm(f, a[c][j], p), p);
+                }
+                *muls += (k - c) as u64;
+            }
+        }
+        det
+    }
+
+    /// The left eigenvectors of `M_x` for `λ` (as functionals on the
+    /// standard monomials): the kernel of `A(λ)`, along the chains.
+    fn eigenvectors(&self, lam: u64, p: u64, muls: &mut u64) -> Vec<Vec<u64>> {
+        let a = self.matrix(lam, p, muls);
+        let ker = eigenvectors_mod_p(&a, 0, p, muls);
+        let top = *self.len.iter().max().unwrap_or(&0) as usize;
+        let mut pw = vec![1u64; top + 1];
+        for t in 1..=top {
+            pw[t] = mm(pw[t - 1], lam, p);
+        }
+        *muls += top as u64;
+        ker.iter()
+            .map(|u| {
+                *muls += self.pos.len() as u64;
+                self.pos
+                    .iter()
+                    .map(|&(j, t)| mm(u[j as usize], pw[t as usize], p))
+                    .collect()
+            })
+            .collect()
+    }
+}
+
+/// The rational roots of `det A`: its zeros on `F_p` when `p ≤ dim + 1`,
+/// else the roots of its interpolation on `0, …, dim`.  `Err` if the
+/// interpolated determinant does not have degree `dim` and leading
+/// coefficient `±1`.
+fn chain_eigenvalues(
+    ch: &Chains,
+    dim: usize,
+    p: u64,
+    rng: &mut StdRng,
+    cp_muls: &mut u64,
+    roots_muls: &mut u64,
+) -> Result<Vec<u64>, String> {
+    let npts = if p <= dim as u64 + 1 {
+        p
+    } else {
+        dim as u64 + 1
+    };
+    let vals: Vec<(u64, u64)> = (0..npts)
+        .into_par_iter()
+        .map(|x| {
+            let mut m = 0u64;
+            (ch.det(x, p, &mut m), m)
+        })
+        .collect();
+    *cp_muls += vals.iter().map(|v| v.1).sum::<u64>();
+    if npts == p {
+        return Ok((0..p).filter(|&x| vals[x as usize].0 == 0).collect());
+    }
+    // Newton's divided differences on 0, …, dim (inverses of 1, …, dim
+    // once), then the Newton form expanded: O(dim²) each.
+    let n = dim + 1;
+    let inv: Vec<u64> = (0..n as u64)
+        .map(|d| if d == 0 { 0 } else { inv_mod(d, p) })
+        .collect();
+    let mut dd: Vec<u64> = vals.iter().map(|v| v.0).collect();
+    for lvl in 1..n {
+        for i in (lvl..n).rev() {
+            dd[i] = mm(sm(dd[i], dd[i - 1], p), inv[lvl], p);
+        }
+        *cp_muls += (n - lvl) as u64;
+    }
+    // Σ dd[i] Π_{j<i} (X − j), Horner from the top.
+    let mut poly = vec![0u64; n];
+    for i in (0..n).rev() {
+        // poly ← poly · (X − i) + dd[i]
+        let mut nxt = vec![0u64; n];
+        for d in 0..n - 1 {
+            if poly[d] != 0 {
+                nxt[d + 1] = am(nxt[d + 1], poly[d], p);
+                nxt[d] = sm(nxt[d], mm(poly[d], i as u64 % p, p), p);
+            }
+        }
+        *cp_muls += (n - 1 - i) as u64;
+        nxt[0] = am(nxt[0], dd[i], p);
+        poly = nxt;
+    }
+    let lead = poly[dim];
+    if lead != 1 && lead != p - 1 {
+        return Err(format!("det A(λ) has leading coefficient {lead}, not ±1"));
+    }
+    let ring = PolyRing::new(p);
+    let r = ring.roots(&UPoly(poly), rng);
+    *roots_muls += ring.muls.get();
+    Ok(r)
+}
+
+/// [`split_eigenspace`] for a multiplication unknown whose border may
+/// leave the matrix: `wᵢ · M_v` is known only at the standard monomials
+/// `b` with `v·b` standard (`known`: `(b, v·b)` as standard indices), which
+/// determine `a` when the `w` restricted to them are independent.
+/// Returns `w` unchanged if they are not (the eigenspace stays unsplit).
+fn split_eigenspace_partial(
+    w: &[Vec<u64>],
+    known: &[(usize, usize)],
+    p: u64,
+    rng: &mut StdRng,
+    muls: &mut u64,
+) -> Vec<Vec<u64>> {
+    let k = w.len();
+    let mut a = vec![vec![0u64; k]; k];
+    for i in 0..k {
+        let mut sys: Vec<Vec<u64>> = known
+            .iter()
+            .map(|&(l, t)| {
+                let mut row: Vec<u64> = (0..k).map(|j| w[j][l]).collect();
+                row.push(w[i][t]);
+                row
+            })
+            .collect();
+        let pivots = rref_mod_p(&mut sys, p, muls);
+        if pivots.len() != k || pivots.iter().any(|&c| c >= k) {
+            return w.to_vec();
+        }
+        for (r, &pc) in pivots.iter().enumerate() {
+            a[i][pc] = sys[r][k];
+        }
+    }
+    let mut at = vec![vec![0u64; k]; k];
+    for i in 0..k {
+        for j in 0..k {
+            at[j][i] = a[i][j];
+        }
+    }
+    let cp = charpoly_mod_p(&a, p, muls);
+    let ring = PolyRing::new(p);
+    let mus = ring.roots(&cp, rng);
+    *muls += ring.muls.get();
+    let dim = w[0].len();
+    let mut out = Vec::new();
+    for mu in mus {
+        for v in eigenvectors_mod_p(&at, mu, p, muls) {
+            let mut u = vec![0u64; dim];
+            for j in 0..k {
+                if v[j] == 0 {
+                    continue;
+                }
+                for r in 0..dim {
+                    if w[j][r] != 0 {
+                        u[r] = am(u[r], mm(v[j], w[j][r], p), p);
+                        *muls += 1;
+                    }
+                }
+            }
+            out.push(u);
+        }
+    }
+    out
+}
+
+/// The eigen step of [`solve_system_w_inner`] along the chains: border
+/// normal forms (`nf_muls`), `det A` at points (`charpoly_muls`), its
+/// roots (`roots_muls`), kernels of `A(λ)` and splits (`eigenvector_muls`),
+/// each solution checked in every equation (`verify_muls`).  A degenerate
+/// eigenspace is split by the other unknowns where their products stay
+/// standard.  `None` (with `st.outcome`) when the chain step cannot run.
+#[allow(clippy::too_many_arguments)]
+fn solve_along_chains<const N: usize>(
+    ech: &Echelon,
+    cols: &[[u8; N]],
+    col_index: &HashMap<[u8; N], usize>,
+    is_std: &[bool],
+    standard: &[usize],
+    std_index: &[u32],
+    idx: &[usize],
+    mvar: usize,
+    comps: &[HashMap<[u8; N], u64>],
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    t0: Instant,
+    t2: Instant,
+) -> Option<Vec<[u64; N]>> {
+    let dim = standard.len();
+    let mut nf_muls = 0u64;
+    let ch = chains_of::<N>(
+        ech,
+        cols,
+        col_index,
+        is_std,
+        standard,
+        std_index,
+        mvar,
+        p as u32,
+        &mut nf_muls,
+    );
+    st.nf_muls += nf_muls;
+    st.nf_ms = t2.elapsed().as_secs_f64() * 1e3;
+    let ch = match ch {
+        Ok(ch) => ch,
+        Err(why) => {
+            st.outcome = why;
+            return None;
+        }
+    };
+    st.reached_pivots = ch.k();
+    let t3 = Instant::now();
+    let (mut cp, mut rm) = (0u64, 0u64);
+    let lambdas = chain_eigenvalues(&ch, dim, p, rng, &mut cp, &mut rm);
+    st.charpoly_muls += cp;
+    st.roots_muls += rm;
+    st.charpoly_ms = t3.elapsed().as_secs_f64() * 1e3;
+    let lambdas = match lambdas {
+        Ok(l) => l,
+        Err(why) => {
+            st.outcome = why;
+            return None;
+        }
+    };
+    st.rational_eigenvalues = lambdas.len();
+    let t4 = Instant::now();
+    // For each other unknown, the standard monomials it keeps standard.
+    let known: Vec<Vec<(usize, usize)>> = (0..N)
+        .filter(|&v| v != mvar)
+        .map(|v| {
+            (0..dim)
+                .filter_map(|s| {
+                    let mut m = cols[standard[s]];
+                    m[v] += 1;
+                    let &t = col_index.get(&m)?;
+                    is_std[t].then(|| (s, std_index[t] as usize))
+                })
+                .collect()
+        })
+        .collect();
+    let mut out = Vec::new();
+    for lam in lambdas {
+        let mut ev = 0u64;
+        let mut ker = ch.eigenvectors(lam, p, &mut ev);
+        if ker.len() > 1 {
+            st.degenerate_eigenspaces += 1;
+            for kn in &known {
+                if ker.len() <= 1 {
+                    break;
+                }
+                ker = split_eigenspace_partial(&ker, kn, p, rng, &mut ev);
+            }
+        }
+        st.eigenvector_muls += ev;
+        for v in &ker {
+            if v[idx[0]] == 0 {
+                continue;
+            }
+            let inv = inv_mod(v[idx[0]], p);
+            let e: [u64; N] = core::array::from_fn(|k| mm(v[idx[k + 1]], inv, p));
+            if e[mvar] != lam {
                 continue;
             }
             let mut vm = 0u64;
@@ -1210,7 +2387,12 @@ pub fn solve_system4(
 
 /// The multisets `{x₁, …, x₄} ⊂ F_p` whose elementary symmetric functions
 /// are `e` — the roots of `T⁴ − e₁T³ + e₂T² − e₃T + e₄`, when it splits.
-fn split_quartic(e: &[u64; 4], p: u64, rng: &mut StdRng, muls: &mut u64) -> Option<[u64; 4]> {
+pub(crate) fn split_quartic(
+    e: &[u64; 4],
+    p: u64,
+    rng: &mut StdRng,
+    muls: &mut u64,
+) -> Option<[u64; 4]> {
     let ring = PolyRing::new(p);
     let f = UPoly(vec![e[3], (p - e[2]) % p, e[1], (p - e[0]) % p, 1]);
     let roots = ring.roots(&f, rng);
@@ -1762,6 +2944,55 @@ pub fn run_k4_la(p: u64, seed: u64, rho_runs: usize) -> K4LaReport {
 mod tests {
     use super::*;
     use rand::SeedableRng;
+
+    #[test]
+    fn u16_kernels_match_the_reference_routines() {
+        use super::super::gaudry_cubic::{charpoly_mod_p, eigenvectors_mod_p};
+        let mut rng = StdRng::seed_from_u64(7);
+        for (p, n, zeros) in [
+            (269u64, 40usize, 0.0),
+            (269, 33, 0.6),
+            (257, 25, 0.9),
+            (13, 30, 0.3),
+        ] {
+            let mut m: Vec<Vec<u64>> = (0..n)
+                .map(|_| {
+                    (0..n)
+                        .map(|_| {
+                            if rng.gen::<f64>() < zeros {
+                                0
+                            } else {
+                                rng.gen_range(0..p)
+                            }
+                        })
+                        .collect()
+                })
+                .collect();
+            // A planted eigenvalue with a two-dimensional eigenspace.
+            for row in m.iter_mut().take(2) {
+                row.iter_mut().for_each(|v| *v = 0);
+            }
+            m[0][0] = 5 % p;
+            m[1][1] = 5 % p;
+            let (mut c_ref, mut c_new) = (0u64, 0u64);
+            let cp_ref = charpoly_mod_p(&m, p, &mut c_ref);
+            let cp_new = charpoly_u16(&m, p as u32, &mut c_new);
+            assert_eq!(cp_ref.0, cp_new.0, "p {p} n {n}");
+            assert_eq!(c_ref, c_new, "charpoly count, p {p} n {n}");
+            let m16: Vec<Vec<u16>> = m
+                .iter()
+                .map(|r| r.iter().map(|&v| v as u16).collect())
+                .collect();
+            for lam in [5 % p, 0, 1] {
+                let (mut e_ref, mut e_new) = (0u64, 0u64);
+                assert_eq!(
+                    eigenvectors_mod_p(&m, lam, p, &mut e_ref),
+                    eigenvectors_u16(&m16, lam, p as u32, &mut e_new)
+                );
+                assert_eq!(e_ref, e_new, "eigenvector count, p {p} n {n} λ {lam}");
+            }
+        }
+    }
 
     #[test]
     fn fp4_is_a_field() {

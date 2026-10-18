@@ -1,0 +1,455 @@
+{
+  "schema": "perf.ecbench_children/v1",
+  "comment": "Frozen `ecbench exec` child inputs whose solve instruction count (callgrind Ir between the ecbench_before_solve/ecbench_solve markers) is tracked over time by scripts/perf/perfhistory.py as kernels of the `ecbench` area. Each is one execution of research/ecbench_calibration_20261002 (ecbench profile-input --spec \u2026 --seq \u2026); expected_recovered is the planted logarithm the child must return, and the counted phases must not change, or the row is marked re-based. Add a child by appending an entry; never edit an existing one (change the id instead). Children with area ic_factor_base also carry curve_label and, for index calculus, factor_base {spec, symmetry}; the size (columns, signed points) is read from the run's own report. Symmetry classes follow docs/ecbench/FACTOR_BASE_PROTOCOL.md: 'signed Frobenius' (koblitz-orbit, compact-orbit-scan), 'none' (binary-subspace, koblitz-standard-subspace), 'negation', 'GLV (order 6)' (glv-orbit with group=auto on a j = 0 curve; on a generic curve glv-orbit reports a negation-only fold).",
+  "children": [
+    {
+      "id": "ecbench/rho_negation_prime26_p42652151",
+      "desc": "rho.negation on the 26-bit registered prime curve p=42652151 (calibration prime.json seq 280, target 0)",
+      "input": {
+        "schema": "ecbench.child_input/v1",
+        "curve": {
+          "kind": "prime_explicit",
+          "p": 42652151,
+          "a": 26623966,
+          "b": 14210560,
+          "group_order": 42653927,
+          "r": 42653927,
+          "gx": 40895024,
+          "gy": 26279521
+        },
+        "target_seed": 20261002,
+        "target_index": 0,
+        "expected_workload_id": "Wf9c5da9613ce",
+        "method": {
+          "id": "rho.negation",
+          "params": {
+            "cap_multiple": "64"
+          }
+        },
+        "expected_method_id": "ECM1hefea4e0ebe79",
+        "algorithm_seed": 18071681976372581719
+      },
+      "expected_recovered": 15574975
+    },
+    {
+      "id": "ecbench/rho_signed_frobenius_k0n41",
+      "desc": "rho.signed_frobenius on Koblitz a=0, n=41 (calibration koblitz.json seq 240, target 0)",
+      "input": {
+        "schema": "ecbench.child_input/v1",
+        "curve": {
+          "kind": "koblitz",
+          "a": 0,
+          "n": 41
+        },
+        "target_seed": 20261002,
+        "target_index": 0,
+        "expected_workload_id": "Wfd165f36bfaf",
+        "method": {
+          "id": "rho.signed_frobenius",
+          "params": {
+            "cap_multiple": "64"
+          }
+        },
+        "expected_method_id": "ECM1h64b303e4183b",
+        "algorithm_seed": 15264665645144743329
+      },
+      "expected_recovered": 355415087257
+    },
+    {
+      "id": "ic_factor_base/k17_rho_signed_frobenius",
+      "area": "ic_factor_base",
+      "curve_label": "Koblitz a = 1, n = 17",
+      "desc": "rho.signed_frobenius on Koblitz a = 1, n = 17 (research/ecbench_factor_bases_20261013/sessions/koblitz17/spec.json seq 0, target 0)",
+      "input": {
+        "schema": "ecbench.child_input/v1",
+        "curve": {
+          "kind": "koblitz",
+          "a": 1,
+          "n": 17
+        },
+        "target_seed": 20261013,
+        "target_index": 0,
+        "expected_workload_id": "Wc7be7b5ab2ea",
+        "method": {
+          "id": "rho.signed_frobenius",
+          "params": {
+            "cap_multiple": "64"
+          }
+        },
+        "expected_method_id": "ECM1h64b303e4183b",
+        "algorithm_seed": 7255542365399584898
+      },
+      "expected_recovered": 8633
+    },
+    {
+      "id": "ic_factor_base/k17_koblitz_orbit",
+      "area": "ic_factor_base",
+      "curve_label": "Koblitz a = 1, n = 17",
+      "desc": "ic.pipeline with koblitz-orbit:divisor=0;1 on Koblitz a = 1, n = 17 (research/ecbench_factor_bases_20261013/sessions/koblitz17/spec.json seq 1, target 0)",
+      "input": {
+        "schema": "ecbench.child_input/v1",
+        "curve": {
+          "kind": "koblitz",
+          "a": 1,
+          "n": 17
+        },
+        "target_seed": 20261013,
+        "target_index": 0,
+        "expected_workload_id": "Wc7be7b5ab2ea",
+        "method": {
+          "id": "ic.pipeline",
+          "params": {
+            "factor_base": "koblitz-orbit:divisor=0;1",
+            "linalg": "incremental-gauss",
+            "max_trials": "200000",
+            "oracle": "mitm-frobenius:m=2",
+            "solver": "",
+            "solver_budget_seconds": "0",
+            "targets": "walk"
+          }
+        },
+        "expected_method_id": "ECM1hb09b1d8865b2",
+        "algorithm_seed": 7255542365399584898
+      },
+      "expected_recovered": 8633,
+      "factor_base": {
+        "spec": "koblitz-orbit:divisor=0;1",
+        "symmetry": "signed Frobenius"
+      }
+    },
+    {
+      "id": "ic_factor_base/k17_compact_orbit_scan",
+      "area": "ic_factor_base",
+      "curve_label": "Koblitz a = 1, n = 17",
+      "desc": "ic.pipeline with compact-orbit-scan:columns=8,raw_x_cap=5000 on Koblitz a = 1, n = 17 (research/ecbench_factor_bases_20261013/sessions/koblitz17/spec.json seq 3, target 0)",
+      "input": {
+        "schema": "ecbench.child_input/v1",
+        "curve": {
+          "kind": "koblitz",
+          "a": 1,
+          "n": 17
+        },
+        "target_seed": 20261013,
+        "target_index": 0,
+        "expected_workload_id": "Wc7be7b5ab2ea",
+        "method": {
+          "id": "ic.pipeline",
+          "params": {
+            "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=5000",
+            "linalg": "incremental-gauss",
+            "max_trials": "200000",
+            "oracle": "mitm-frobenius:m=2",
+            "solver": "",
+            "solver_budget_seconds": "0",
+            "targets": "walk"
+          }
+        },
+        "expected_method_id": "ECM1h35802f9a15e0",
+        "algorithm_seed": 7255542365399584898
+      },
+      "expected_recovered": 8633,
+      "factor_base": {
+        "spec": "compact-orbit-scan:columns=8,raw_x_cap=5000",
+        "symmetry": "signed Frobenius"
+      }
+    },
+    {
+      "id": "ic_factor_base/k17_binary_subspace",
+      "area": "ic_factor_base",
+      "curve_label": "Koblitz a = 1, n = 17",
+      "desc": "ic.pipeline with binary-subspace:dimension=4 on Koblitz a = 1, n = 17 (research/ecbench_factor_bases_20261013/sessions/koblitz17/spec.json seq 2, target 0)",
+      "input": {
+        "schema": "ecbench.child_input/v1",
+        "curve": {
+          "kind": "koblitz",
+          "a": 1,
+          "n": 17
+        },
+        "target_seed": 20261013,
+        "target_index": 0,
+        "expected_workload_id": "Wc7be7b5ab2ea",
+        "method": {
+          "id": "ic.pipeline",
+          "params": {
+            "factor_base": "binary-subspace:dimension=4",
+            "linalg": "incremental-gauss",
+            "max_trials": "200000",
+            "oracle": "mitm:m=2",
+            "solver": "",
+            "solver_budget_seconds": "0",
+            "targets": "walk"
+          }
+        },
+        "expected_method_id": "ECM1ha320c22efd36",
+        "algorithm_seed": 7255542365399584898
+      },
+      "expected_recovered": 8633,
+      "factor_base": {
+        "spec": "binary-subspace:dimension=4",
+        "symmetry": "none"
+      }
+    },
+    {
+      "id": "ic_factor_base/k17_standard_subspace",
+      "area": "ic_factor_base",
+      "curve_label": "Koblitz a = 1, n = 17",
+      "desc": "ic.pipeline with koblitz-standard-subspace:dimension=4 on Koblitz a = 1, n = 17 (research/ecbench_factor_bases_20261013/sessions/koblitz17/spec.json seq 4, target 0)",
+      "input": {
+        "schema": "ecbench.child_input/v1",
+        "curve": {
+          "kind": "koblitz",
+          "a": 1,
+          "n": 17
+        },
+        "target_seed": 20261013,
+        "target_index": 0,
+        "expected_workload_id": "Wc7be7b5ab2ea",
+        "method": {
+          "id": "ic.pipeline",
+          "params": {
+            "factor_base": "koblitz-standard-subspace:dimension=4",
+            "linalg": "incremental-gauss",
+            "max_trials": "200000",
+            "oracle": "mitm:m=2",
+            "solver": "",
+            "solver_budget_seconds": "0",
+            "targets": "walk"
+          }
+        },
+        "expected_method_id": "ECM1h1ec12bd2cd50",
+        "algorithm_seed": 7255542365399584898
+      },
+      "expected_recovered": 8633,
+      "factor_base": {
+        "spec": "koblitz-standard-subspace:dimension=4",
+        "symmetry": "none"
+      }
+    },
+    {
+      "id": "ic_factor_base/p20_rho_negation",
+      "area": "ic_factor_base",
+      "curve_label": "prime, 20-bit, generic (automorphisms \u00b11)",
+      "desc": "rho.negation on prime, 20-bit, generic (automorphisms \u00b11) (research/ecbench_factor_bases_20261013/sessions/prime20/spec.json seq 0, target 0)",
+      "input": {
+        "schema": "ecbench.child_input/v1",
+        "curve": {
+          "kind": "prime_explicit",
+          "p": 563153,
+          "a": 51142,
+          "b": 548946,
+          "group_order": 562427,
+          "r": 562427,
+          "gx": 271792,
+          "gy": 48157
+        },
+        "target_seed": 20261013,
+        "target_index": 0,
+        "expected_workload_id": "W433a5935ba85",
+        "method": {
+          "id": "rho.negation",
+          "params": {
+            "cap_multiple": "64"
+          }
+        },
+        "expected_method_id": "ECM1hefea4e0ebe79",
+        "algorithm_seed": 10432750886254496792
+      },
+      "expected_recovered": 174912
+    },
+    {
+      "id": "ic_factor_base/p20_prime_abscissa",
+      "area": "ic_factor_base",
+      "curve_label": "prime, 20-bit, generic (automorphisms \u00b11)",
+      "desc": "ic.pipeline with prime-abscissa:size=32 on prime, 20-bit, generic (automorphisms \u00b11) (research/ecbench_factor_bases_20261013/sessions/prime20/spec.json seq 1, target 0)",
+      "input": {
+        "schema": "ecbench.child_input/v1",
+        "curve": {
+          "kind": "prime_explicit",
+          "p": 563153,
+          "a": 51142,
+          "b": 548946,
+          "group_order": 562427,
+          "r": 562427,
+          "gx": 271792,
+          "gy": 48157
+        },
+        "target_seed": 20261013,
+        "target_index": 0,
+        "expected_workload_id": "W433a5935ba85",
+        "method": {
+          "id": "ic.pipeline",
+          "params": {
+            "factor_base": "prime-abscissa:size=32",
+            "linalg": "incremental-gauss",
+            "max_trials": "200000",
+            "oracle": "mitm:negation_folded=1",
+            "solver": "",
+            "solver_budget_seconds": "0",
+            "targets": "walk"
+          }
+        },
+        "expected_method_id": "ECM1h2366207a48c4",
+        "algorithm_seed": 10432750886254496792
+      },
+      "expected_recovered": 174912,
+      "factor_base": {
+        "spec": "prime-abscissa:size=32",
+        "symmetry": "negation"
+      }
+    },
+    {
+      "id": "ic_factor_base/p20_glv_orbit_generic",
+      "area": "ic_factor_base",
+      "curve_label": "prime, 20-bit, generic (automorphisms \u00b11)",
+      "desc": "ic.pipeline with glv-orbit:size=16 on prime, 20-bit, generic (automorphisms \u00b11) (research/ecbench_factor_bases_20261013/sessions/prime20/spec.json seq 2, target 0)",
+      "input": {
+        "schema": "ecbench.child_input/v1",
+        "curve": {
+          "kind": "prime_explicit",
+          "p": 563153,
+          "a": 51142,
+          "b": 548946,
+          "group_order": 562427,
+          "r": 562427,
+          "gx": 271792,
+          "gy": 48157
+        },
+        "target_seed": 20261013,
+        "target_index": 0,
+        "expected_workload_id": "W433a5935ba85",
+        "method": {
+          "id": "ic.pipeline",
+          "params": {
+            "factor_base": "glv-orbit:size=16",
+            "linalg": "incremental-gauss",
+            "max_trials": "200000",
+            "oracle": "mitm:negation_folded=1",
+            "solver": "",
+            "solver_budget_seconds": "0",
+            "targets": "walk"
+          }
+        },
+        "expected_method_id": "ECM1h672a1ceb17ff",
+        "algorithm_seed": 10432750886254496792
+      },
+      "expected_recovered": 174912,
+      "factor_base": {
+        "spec": "glv-orbit:size=16",
+        "symmetry": "negation"
+      }
+    },
+    {
+      "id": "ic_factor_base/j0_rho_negation",
+      "area": "ic_factor_base",
+      "curve_label": "prime, j = 0: y\u00b2 = x\u00b3 + 15, p = 2345743",
+      "desc": "rho.negation on prime, j = 0: y\u00b2 = x\u00b3 + 15, p = 2345743 (docs/perf/ic-factor-base-j0.spec.json seq 0, target 0)",
+      "input": {
+        "schema": "ecbench.child_input/v1",
+        "curve": {
+          "kind": "prime_explicit",
+          "p": 2345743,
+          "a": 0,
+          "b": 15,
+          "group_order": 2342739,
+          "r": 15937,
+          "gx": 947244,
+          "gy": 1525967
+        },
+        "target_seed": 20261011,
+        "target_index": 0,
+        "expected_workload_id": "W61c298ff0935",
+        "method": {
+          "id": "rho.negation",
+          "params": {
+            "cap_multiple": "64"
+          }
+        },
+        "expected_method_id": "ECM1hefea4e0ebe79",
+        "algorithm_seed": 11257082803607377905
+      },
+      "expected_recovered": 13523
+    },
+    {
+      "id": "ic_factor_base/j0_glv_orbit_auto",
+      "area": "ic_factor_base",
+      "curve_label": "prime, j = 0: y\u00b2 = x\u00b3 + 15, p = 2345743",
+      "desc": "ic.pipeline with glv-orbit:size=32,group=auto on prime, j = 0: y\u00b2 = x\u00b3 + 15, p = 2345743 (docs/perf/ic-factor-base-j0.spec.json seq 1, target 0)",
+      "input": {
+        "schema": "ecbench.child_input/v1",
+        "curve": {
+          "kind": "prime_explicit",
+          "p": 2345743,
+          "a": 0,
+          "b": 15,
+          "group_order": 2342739,
+          "r": 15937,
+          "gx": 947244,
+          "gy": 1525967
+        },
+        "target_seed": 20261011,
+        "target_index": 0,
+        "expected_workload_id": "W61c298ff0935",
+        "method": {
+          "id": "ic.pipeline",
+          "params": {
+            "factor_base": "glv-orbit:size=32,group=auto",
+            "linalg": "incremental-gauss",
+            "max_trials": "200000",
+            "oracle": "mitm:negation_folded=1",
+            "solver": "",
+            "solver_budget_seconds": "0",
+            "targets": "walk"
+          }
+        },
+        "expected_method_id": "ECM1hb125b7da9108",
+        "algorithm_seed": 11257082803607377905
+      },
+      "expected_recovered": 13523,
+      "factor_base": {
+        "spec": "glv-orbit:size=32,group=auto",
+        "symmetry": "GLV (order 6)"
+      }
+    },
+    {
+      "id": "ic_factor_base/j0_glv_orbit_negation",
+      "area": "ic_factor_base",
+      "curve_label": "prime, j = 0: y\u00b2 = x\u00b3 + 15, p = 2345743",
+      "desc": "ic.pipeline with glv-orbit:size=32,group=negation on prime, j = 0: y\u00b2 = x\u00b3 + 15, p = 2345743 (docs/perf/ic-factor-base-j0.spec.json seq 2, target 0)",
+      "input": {
+        "schema": "ecbench.child_input/v1",
+        "curve": {
+          "kind": "prime_explicit",
+          "p": 2345743,
+          "a": 0,
+          "b": 15,
+          "group_order": 2342739,
+          "r": 15937,
+          "gx": 947244,
+          "gy": 1525967
+        },
+        "target_seed": 20261011,
+        "target_index": 0,
+        "expected_workload_id": "W61c298ff0935",
+        "method": {
+          "id": "ic.pipeline",
+          "params": {
+            "factor_base": "glv-orbit:size=32,group=negation",
+            "linalg": "incremental-gauss",
+            "max_trials": "200000",
+            "oracle": "mitm:negation_folded=1",
+            "solver": "",
+            "solver_budget_seconds": "0",
+            "targets": "walk"
+          }
+        },
+        "expected_method_id": "ECM1h8682d4728854",
+        "algorithm_seed": 11257082803607377905
+      },
+      "expected_recovered": 13523,
+      "factor_base": {
+        "spec": "glv-orbit:size=32,group=negation",
+        "symmetry": "negation"
+      }
+    }
+  ]
+}

@@ -45,6 +45,7 @@ function section(text, id) {
 
 const [round3, roundPin] = source('improvement/round3/RESULTS.json', '8e6b506517c945a6180da9c7e7eb85bef4f6a145948deec06bc4a31093aff143');
 const [f5, f5Pin] = source('prepared-f5-v3-control-v1/TERMINAL.json', 'a06b68139abad2934fab8127d2ee69ea126ab09a7679ba6e775c9352db09ba1e');
+const [nativeF5, nativeF5Pin] = source('native-f5-control-registration-v1/result-v1/data/independent-audit.json', '994ab5bf1f3153eb6d22425eb15647a152cc1ebd14b68347147c279479a9ed69');
 const [oldSat, oldSatPin] = source('prepared-one-target-controls-v1/outcome/result.json', '9def5e0e4a3c3fd2e47252d08e3509a88205691c39a77912cd315428b7bed2eb');
 const [sat, satPin] = source('native-sat-control-registration-v1/result-v1/data/independent-audit.json', '3570722341b8ca2cd8794d51829cac1a1f3b8c1ff02a07a6af9377a36d2cbab7');
 const solverComparisonPath = 'research/ic_solver_online_20261003/confirmation/RESULT.md';
@@ -142,7 +143,7 @@ assert.equal(sharedIndependentCheck.status, 'PASS');
 const sharedIndependentCheckPin = {path:sharedIndependentCheckPath, sha256:sharedIndependentCheckSha};
 const rankColumnsPath = 'research/ecbench_n37_rank_columns_20261004/RESULT.json';
 const rankColumnsBytes = readFileSync(resolve(ROOT, rankColumnsPath));
-const rankColumnsSha = '9d3ba4708f70e2796bbdb8a541a85b794972563d6ecfe70bde160a698da49fbb';
+const rankColumnsSha = 'f7b950edc74978cbdf2dbc3da54c73bde6c05c0827fbe29ff8bd33659168afa1';
 assert.equal(sha(rankColumnsBytes), rankColumnsSha, 'n37 column decision changed; review its evidence before refreshing the dashboard.');
 const rankColumns = JSON.parse(rankColumnsBytes);
 assert.equal(rankColumns.status, 'independently_replayed_l0_bounded_diagnostic');
@@ -194,6 +195,62 @@ assert.equal(k8Confirm.comparisons[0].numerator, 'ic-k16');
 assert.equal(k8Confirm.comparisons[0].denominator, 'ic-k8');
 assert.equal(k8Confirm.comparisons[1].denominator, 'rho-strong');
 const k8ConfirmPin = {path:k8ConfirmPath, sha256:k8ConfirmSha};
+const onlineIrPath = 'research/ecbench_n37_online_ir_20261004/DECISION.json';
+const onlineIrBytes = readFileSync(resolve(ROOT, onlineIrPath));
+const onlineIrSha = 'e711979f64d08ea3417844b980e54e0fe095b4802bb803cf4f726c555be0e36a';
+assert.equal(sha(onlineIrBytes), onlineIrSha, 'n37 target-only instruction decision changed.');
+const onlineIr = JSON.parse(onlineIrBytes);
+assert.equal(onlineIr.schema, 'ecbench.n37_online_ir_decision/v1');
+assert.equal(onlineIr.unit, 'callgrind.Ir');
+assert.equal(onlineIr.workloads, 16);
+assert.equal(onlineIr.profiles, 64);
+assert.equal(onlineIr.all_archived_and_profiled_scalars_verified, true);
+assert.equal(onlineIr.decision, 'prioritize_k16_for_isolated_n37_online_wall_gate');
+assert.equal(onlineIr.online.comparisons[0].numerator, 'ic-k8');
+assert.equal(onlineIr.online.comparisons[0].denominator, 'ic-k16');
+assert.ok(onlineIr.online.comparisons[0].bootstrap_95[0] > 1.10);
+assert.equal(onlineIr.online.aa_max_absolute_relative_deviation, 0);
+const onlineIrPin = {path:onlineIrPath, sha256:onlineIrSha};
+const onlineIrReceiptPath = 'research/ecbench_n37_online_ir_20261004/independent_validation/RECEIPT.json';
+const onlineIrReceiptBytes = readFileSync(resolve(ROOT, onlineIrReceiptPath));
+const onlineIrReceiptSha = 'b75740f1a28dd4a5352c15e0e738a82bf9c8d3402e3f6ea797d129c424e05472';
+assert.equal(sha(onlineIrReceiptBytes), onlineIrReceiptSha, 'n37 target-only independent receipt changed.');
+const onlineIrReceipt = JSON.parse(onlineIrReceiptBytes);
+assert.equal(onlineIrReceipt.ok, true);
+assert.equal(onlineIrReceipt.records, 384);
+assert.equal(onlineIrReceipt.verified_records, 384);
+assert.equal(onlineIrReceipt.replays.length, 320);
+assert.ok(onlineIrReceipt.replays.every(row => row.reproduced));
+assert.equal(onlineIrReceiptSha, onlineIr.independent_audit_sha256);
+const onlineIrReceiptPin = {path:onlineIrReceiptPath, sha256:onlineIrReceiptSha};
+const nativeWallPath = 'research/ecbench_n37_native_online_wall_20261004/DECISION.json';
+const nativeWallBytes = readFileSync(resolve(ROOT, nativeWallPath));
+const nativeWallSha = 'eebbe2eef9524c7f45a5bfd1c0a2b312d72063a3a8865140a6e25200235c21e2';
+assert.equal(sha(nativeWallBytes), nativeWallSha, 'n37 native wall decision changed.');
+const nativeWall = JSON.parse(nativeWallBytes);
+assert.equal(nativeWall.schema, 'ecbench.native_online_wall_decision/v1');
+assert.equal(nativeWall.status, 'complete_exploratory_hosted');
+assert.equal(nativeWall.decision, 'carry_both_host_noise_exceeds_gate');
+assert.equal(nativeWall.measured_verified_runs, 320);
+assert.equal(nativeWall.same_target_paired_rounds, 80);
+assert.deepEqual(nativeWall.isolation_levels, {L1: 320});
+assert.equal(nativeWall.all_measured_L2, false);
+assert.equal(nativeWall.online_speedup, null);
+assert.ok(nativeWall.k16_aa_max_relative_deviation > .05);
+assert.equal(nativeWall.primary_one_target.target_index, 0);
+const nativeWallPin = {path:nativeWallPath, sha256:nativeWallSha};
+const nativeWallEvidencePath = 'research/ecbench_n37_native_online_wall_20261004/EVIDENCE.json';
+const nativeWallEvidenceBytes = readFileSync(resolve(ROOT, nativeWallEvidencePath));
+const nativeWallEvidenceSha = 'bb4dd48030029d21019a21db3cd10e646ef815d727db084013b7bdba3ed8d422';
+assert.equal(sha(nativeWallEvidenceBytes), nativeWallEvidenceSha, 'n37 native wall evidence changed.');
+const nativeWallEvidence = JSON.parse(nativeWallEvidenceBytes);
+assert.equal(nativeWallEvidence.decision_sha256, nativeWallSha);
+assert.equal(nativeWallEvidence.records_sha256, nativeWall.records_sha256);
+assert.equal(nativeWallEvidence.independent_receipt_sha256, nativeWall.independent_receipt_sha256);
+assert.equal(sha(readFileSync(resolve(ROOT, 'research/ecbench_n37_native_online_wall_20261004/SHA256SUMS'))), nativeWallEvidence.raw_sha256s_sha256);
+assert.equal(sha(readFileSync(resolve(ROOT, 'research/ecbench_n37_native_online_wall_20261004/SOURCE-ARTIFACT-SHA256SUMS'))), nativeWallEvidence.source_artifact_sha256s_sha256);
+assert.equal(nativeWallEvidence.admitted_online_speedup, null);
+const nativeWallEvidencePin = {path:nativeWallEvidencePath, sha256:nativeWallEvidenceSha};
 assert.equal(round3.decision.winner, 'incumbent');
 assert.equal(round3.decision.promotion_eligible, false);
 assert.ok(f5.scalar_verified && !f5.headline_online_admissible && !f5.fresh_paired_qualification);
@@ -203,6 +260,13 @@ assert.ok(!sat.headline_eligible && !sat.fresh_paired_qualification && !sat.prom
 assert.equal(sat.online_speedup, null);
 assert.equal(sat.audited_attempts.length, 3);
 assert.equal(sat.preparation_admission.new_queries, 0);
+assert.ok(nativeF5.source_bound_execution_admitted && nativeF5.target_complete);
+assert.ok(!nativeF5.headline_eligible && !nativeF5.fresh_paired_qualification && !nativeF5.promotion_eligible && !nativeF5.full_goal_complete);
+assert.equal(nativeF5.online_speedup, null);
+assert.equal(nativeF5.ordinary_queries_executed, 0);
+assert.equal(nativeF5.mathematics.audited_attempts.length, 3);
+assert.equal(nativeF5.mathematics.preparation_admission.new_queries, 0);
+assert.equal(nativeF5.mathematics.recovered_scalar, 24886);
 const confirmation = round3.decision.confirmation;
 const online = confirmation.online;
 const ratio = online.candidate_over_baseline;
@@ -224,18 +288,32 @@ const oldFront = between(page, START, END);
 const historical = section(oldFront, 'lab-best');
 const progressRaw = readFileSync(resolve(ROOT,'docs/ic/progress-timeline.json'));
 const retainedPanels = [
+  ['conductor-gap-native-20261015','Conductor-gap native controls: paired solves and generic recurrence · 15 October 2026'],
   ['cold-compact-orbit-20261003','Historical compact-orbit cold-cost panel'],
   ['full-rank-compact-orbit-20261003','Historical compact-orbit full-rank panel'],
   ['n61-compact-orbit-hosted-20261003','n61 compact-orbit autolab panels · hosted isolated reruns'],
+  ['isogeny-conductor-gap-20261011','Isogeny conductor gap and fiber-aware relations · 11 October 2026'],
+  ['isogeny-conductor-gap-round2-20261011','Conductor gap round 2: partial fibers and crater automorphisms · 11 October 2026'],
+  ['isogeny-conductor-gap-round3-20261011','Conductor gap round 3: two-torsion summation polynomials and the combined descent audited · 11 October 2026'],
+  ['conductor-gap-ic37-20261012','Large-prime conductor gap: IC measured at ell = 131101 · 12 October 2026'],
+  ['drastic-conductor-gap-20261012','Drastic prime conductor gaps: ECDLP on both ends · 12 October 2026'],
+  ['drastic-conductor-gap-round2-20261012','Drastic prime conductor gap round 2: the j = 0 crater · 12 October 2026'],
+  ['drastic-conductor-gap-round3-20261012','Drastic prime conductor gap round 3: paired targets · 12 October 2026'],
+  ['n83-tier1-cold-20261016','N83 Tier 1 cold factor-base holdout · 16 October 2026'],
   ['lab-ecbench-all','Cross-method evidence · every measured candidate'],
+  ['lab-pair-claw','Pair claw of cryptanalysis#175 · same-target strong rho'],
   ['lab-progress','Research progress over time · separate regimes and references'],
   ['lab-currency','How new results update this dashboard']
 ].map(([id,label])=>{
   let html = section(oldFront,id);
+  if (id === 'conductor-gap-native-20261015') {
+    html = readFileSync(resolve(ROOT,'research/conductor_gap_cm_orbits_20261015/native/dashboard_panel.html'),'utf8').trimEnd();
+    assert.ok(html.includes(`id="${id}"`), 'Native conductor panel source lost its identity');
+  }
   if (id === 'lab-progress') {
     const marker = /(<script type="application\/json" id="progress-data">)[\s\S]*?(<\/script>)/;
     assert.ok(marker.test(html), 'Progress panel has no canonical data embed');
-    html = html.replace(marker, (_, start, end) => start + progressRaw.toString('utf8').trim() + end);
+    html = html.replace(marker, (_, start, end) => start + progressRaw.toString('utf8') + end);
   }
   return {id,label,html};
 });
@@ -251,8 +329,8 @@ const front = `
 <main class="dash" id="ic-overview">
 <a class="skip-link" href="#lab-results">Skip to measured results</a>
 <nav class="dash-nav" aria-label="Dashboard"><a class="dash-brand" href="#ic-overview"><span class="brand-mark">IC</span> Research lab</a><div><a href="#lab-results">Results</a><a href="#lab-readiness">Solver readiness</a><a href="#lab-pipeline">Pipeline</a><a href="#evidence-search">Evidence</a><a href="../browser/">Lab browser</a></div></nav>
-<header class="dash-hero"><div><p class="dash-kicker">Index calculus · bounded autolab · evidence snapshot 3 October 2026</p><h1>Is the next candidate<br>actually better?</h1><p class="dash-lead">Compare complete solutions to the same one target. Keep failed attempts, check the answer, and make uncertainty part of the decision.</p></div><aside class="hero-decision" aria-label="Current decision"><span class="status">Current decision</span><strong>Keep the incumbent</strong><p>No challenger passed the last tournament’s promotion gate. A separate prepared F5/F4 target showed a 227× F4 gain, yet same-point rho remained 9,105× faster than F4. F5 and SAT still need a fresh paired comparison.</p><a href="#lab-next">See what comes next →</a></aside></header>
-<div class="dash-metrics" aria-label="At a glance"><article><span class="status">Tournament</span><h2>3 rounds closed</h2><p>The incumbent remains. Historical confirmation targets stay closed.</p></article><article><span class="status good">Disclosed-input correctness</span><h2>F5 &amp; SAT verified</h2><p>Both have recovered the disclosed toy target. Their execution and timing qualifications differ.</p></article><article><span class="status pending">Fresh comparison</span><h2>Not measured yet</h2><p>No fresh F5-versus-SAT-versus-rho ranking. Natural yield and source-bound preparation remain gates.</p></article></div>
+<header class="dash-hero"><div><p class="dash-kicker">Index calculus · bounded autolab · evidence snapshot 3 October 2026</p><h1>Is the next candidate<br>actually better?</h1><p class="dash-lead">Compare complete solutions to the same one target. Keep failed attempts, check the answer, and make uncertainty part of the decision.</p></div><aside class="hero-decision" aria-label="Current decision"><span class="status">Current decision</span><strong>Keep the incumbent</strong><p>No challenger passed the last tournament’s promotion gate. F5 and SAT still need a fresh paired comparison.</p><a href="#lab-next">See what comes next →</a></aside></header>
+<div class="dash-metrics" aria-label="At a glance"><article><span class="status">Tournament</span><h2>3 rounds closed</h2><p>The incumbent remains. Historical confirmation targets stay closed.</p></article><article><span class="status good">Disclosed-input correctness</span><h2>F5 &amp; SAT verified</h2><p>Both recovered the disclosed toy target under frozen native audits. Fresh ranking remains pending.</p></article><article><span class="status pending">Fresh comparison</span><h2>Not measured yet</h2><p>No fresh F5-versus-SAT-versus-rho ranking. Natural yield and source-bound preparation remain gates.</p></article></div>
 
 <section class="dash-section" id="lab-results" aria-labelledby="results-title"><div class="dash-section-head"><div><p class="dash-kicker">01 / Tournament result</p><h2 id="results-title">A promising average. No reliable win.</h2></div><span class="status pending">Incumbent retained</span></div>
 <div class="dash-result-grid"><figure class="dash-chart"><figcaption id="ratio-title"><strong>Last challenger vs qualified IC reference</strong><span id="ratio-desc">Online time ratio · below 1 is faster · one point per solve</span></figcaption><div class="chart-scroll" tabindex="0" aria-label="Scrollable challenger comparison graph">${forest}</div><p class="chart-note">Circles: faster cells. Diamonds: slower cells. Only the overall mark has a descriptive 95% interval; individual dots are estimates.</p></figure><div class="dash-explanation"><span class="result-number">${f(ratio)}× <span>reference time</span></span><h3>The interval crosses “no improvement.”</h3><p>Recorded 95% interval: <strong>${f(lo)}–${f(hi)}×</strong>. Two of six curve cells were slower.</p><p class="decision-note panel-summary"><strong>Decision:</strong> the stricter familywise upper bound is <strong>${f(upper)}×</strong>. The frozen promotion gate failed.</p><p><strong>${confirmation.paired_cases} paired targets · 6 curve cells</strong><br>Round 3 confirmation, synthetic toy panel. The challenger is <code>stop7_word</code>; its denominator is the qualified <code>ic_online</code> role.</p>${link('improvement/round3/README.md','Read the decision and full table →')}</div></div>
@@ -260,8 +338,8 @@ const front = `
 
 <section class="dash-section" aria-labelledby="rho-results-title"><div class="dash-section-head"><div><p class="dash-kicker">02 / Reference check</p><h2 id="rho-results-title">How does that incumbent compare with rho?</h2></div><span class="status">Toy panel · online only</span></div><div class="dash-result-grid"><figure class="dash-chart"><figcaption id="rho-graph-title"><strong>Same targets. Same online timing boundary.</strong><span>Recorded milliseconds · zero-based linear scale · lower is better</span></figcaption><div class="chart-scroll" tabindex="0" aria-label="Scrollable rho comparison graph">${rhoGraph}</div><p class="chart-note">Equal-cell geometric means of per-point three-process medians. Each arm verified 216/216 repetitions. No multi-target amortization.</p></figure><div class="dash-explanation"><span class="result-number">${f(rows.incumbent.rho_online_over_IC_online,2)}× <span>rho / IC online time</span></span><h3>A measured lead within this workload.</h3><p>Recorded IC/rho cost ratio: <strong>${f(rho.candidate_over_baseline)}×</strong>; descriptive 95% interval <strong>${f(rho.ci95[0])}–${f(rho.ci95[1])}</strong>.</p><p class="panel-summary">This is the pair-table incumbent. It does not rank F5 or SAT. Reusable preparation is excluded; cold costs and other curve sizes answer different questions.</p>${link('improvement/round3/README.md','Reference qualification and separate cold costs →')}</div></div></section>
 
-<section class="dash-section" id="lab-readiness" aria-labelledby="readiness-title"><div class="dash-section-head"><div><p class="dash-kicker">03 / Solver readiness</p><h2 id="readiness-title">Correctness comes before a speed ranking.</h2></div></div><p class="dash-section-intro panel-summary">A disclosed target proves that a path can recover an answer. It does not estimate performance on an unseen target. The accepted native SAT result supersedes its earlier eight-attempt incomplete control; both records remain available.</p><div class="readiness"><table><caption>Evidence levels for this bounded autolab; “pending” never means zero cost</caption><thead><tr><th>Pipeline family</th><th>Disclosed target</th><th>Native execution evidence</th><th>New natural yield</th><th>Fresh F5/SAT comparison</th></tr></thead><tbody><tr><td><strong>Pair-table incumbent</strong><small>Registered round 3 reference</small></td><td><span class="status good">Verified panel</span></td><td><span class="status good">Accepted round</span></td><td>Different method<small>No F5/SAT yield inference</small></td><td><span class="status pending">New protocol needed</span></td></tr><tr><td><strong>Matrix F5</strong><small>${link('prepared-f5-v3-control-v1/RESULT.md','Historical control evidence')}</small></td><td><span class="status good">Scalar verified</span></td><td><span class="status good">Fresh prepared run verified</span><small>One new n17 public point; certified logs imported. <a href="https://github.com/aburan28/crypto/blob/main/research/ic_solver_online_20261003/confirmation/RESULT.md">F5/F4 and rho result</a></small></td><td><span class="status pending">Pending</span></td><td><span class="status pending">Pending</span></td></tr><tr><td><strong>SAT · CryptoMiniSat</strong><small>${link('native-sat-control-registration-v1/RESULT.md','Accepted native control')}</small></td><td><span class="status good">Scalar verified</span></td><td><span class="status good">Source-bound, audited</span><small>Disclosed n17 control; consumed and closed</small></td><td><span class="status pending">Pending</span></td><td><span class="status pending">Pending</span></td></tr></tbody></table></div>
-<details class="dash-details"><summary id="control-title">Control diagnostics and the earlier SAT failure</summary><div class="dash-detail-body"><p>Neither control below is a fresh performance comparison. Preparation retains historical controller provenance; new ordinary-query yield is not measured. The independent SAT audit runs outside its producer interval, so that interval cannot establish the primary independently verified online speedup.</p><table><caption>Uncalibrated disclosed-input diagnostics; do not compare these as solver rankings</caption><thead><tr><th>Control</th><th>Retained producer interval</th><th>Attempts</th><th>Scope</th></tr></thead><tbody><tr><td>Historical F5</td><td>11.955969917 s</td><td>2 negatives + 1 witness</td><td>Native target worker, historical controller; ${link('prepared-f5-v3-control-v1/RESULT.md','original record')}</td></tr><tr><td>Native SAT</td><td>56.585480167 s</td><td>2 exact negatives + 1 witness</td><td>Source-bound audited execution; ${link('native-sat-control-registration-v1/RESULT.md','timing boundary and replay')}</td></tr><tr><td>Earlier SAT control</td><td>Not a completed online solve</td><td>8 inconclusive attempts</td><td>Failure retained; ${link('prepared-one-target-controls-v1/RESULT.md','original diagnosis')}</td></tr></tbody></table><p>Both current controls use 63 geometric points, 62 usable points before orbit folding, and 29 relation columns. These counts are distinct. Matched rho speedup for both controls remains <strong>unknown</strong>.</p></div></details></section>
+<section class="dash-section" id="lab-readiness" aria-labelledby="readiness-title"><div class="dash-section-head"><div><p class="dash-kicker">03 / Solver readiness</p><h2 id="readiness-title">Correctness comes before a speed ranking.</h2></div></div><p class="dash-section-intro panel-summary">A disclosed target proves that a path can recover an answer. It does not estimate performance on an unseen target. Both native F5 and SAT controls now have original source-bound admission. Earlier incomplete and historical controls remain available.</p><div class="readiness"><table><caption>Evidence levels for this bounded autolab; “pending” never means zero cost</caption><thead><tr><th>Pipeline family</th><th>Disclosed target</th><th>Native execution evidence</th><th>New natural yield</th><th>Fresh F5/SAT comparison</th></tr></thead><tbody><tr><td><strong>Pair-table incumbent</strong><small>Registered round 3 reference</small></td><td><span class="status good">Verified panel</span></td><td><span class="status good">Accepted round</span></td><td>Different method<small>No F5/SAT yield inference</small></td><td><span class="status pending">New protocol needed</span></td></tr><tr><td><strong>Matrix F5</strong><small>${link('native-f5-control-registration-v1/RESULT.md','Native control result')}</small></td><td><span class="status good">Scalar verified</span></td><td><span class="status good">Source-bound, audited</span><small>Disclosed n17 control; consumed and closed</small></td><td><span class="status pending">Pending</span></td><td><span class="status pending">Pending</span></td></tr><tr><td><strong>SAT · CryptoMiniSat</strong><small>${link('native-sat-control-registration-v1/RESULT.md','Accepted native control')}</small></td><td><span class="status good">Scalar verified</span></td><td><span class="status good">Source-bound, audited</span><small>Disclosed n17 control; consumed and closed</small></td><td><span class="status pending">Pending</span></td><td><span class="status pending">Pending</span></td></tr></tbody></table></div>
+<details class="dash-details"><summary id="control-title">Control diagnostics and the earlier SAT failure</summary><div class="dash-detail-body"><p>These are disclosed-input correctness controls. Historical Python preparation provenance remains explicit; neither native control ran new ordinary queries. Both independent audits run outside their producer intervals, so neither interval establishes the primary independently verified online speedup. Native F5 retains an outer stopwatch 500 ns below its phase sum; both values remain in the original record.</p><table><caption>Uncalibrated disclosed-input diagnostics; do not compare these as solver rankings</caption><thead><tr><th>Control</th><th>Retained producer interval</th><th>Attempts</th><th>Scope</th></tr></thead><tbody><tr><td>Historical F5</td><td>11.955969917 s</td><td>2 negatives + 1 witness</td><td>Native target worker, historical controller; ${link('prepared-f5-v3-control-v1/RESULT.md','original record')}</td></tr><tr><td>Native F5</td><td>22.420494542 s · phase sum</td><td>2 exact negatives + 1 witness</td><td>Source-bound audited execution; ${link('native-f5-control-registration-v1/RESULT.md','clock discrepancy and original audit')}</td></tr><tr><td>Native SAT</td><td>56.585480167 s</td><td>2 exact negatives + 1 witness</td><td>Source-bound audited execution; ${link('native-sat-control-registration-v1/RESULT.md','timing boundary and replay')}</td></tr><tr><td>Earlier SAT control</td><td>Not a completed online solve</td><td>8 inconclusive attempts</td><td>Failure retained; ${link('prepared-one-target-controls-v1/RESULT.md','original diagnosis')}</td></tr></tbody></table><p>Both current controls use 63 geometric points, 62 usable points before orbit folding, and 29 relation columns. These counts are distinct. Matched rho speedup for both controls remains <strong>unknown</strong>.</p></div></details></section>
 
 <section class="dash-section" id="shared-rank-folded-table-20261003" aria-labelledby="shared-rank-folded-title">
 <div class="dash-section-head"><div><p class="dash-kicker">n37 reusable setup / Stage diagnostic</p><h2 id="shared-rank-folded-title">A target-blind rank database now checks all 42 base logs.</h2></div><span class="status neutral">Correctness passed · no rho ratio</span></div>
@@ -289,8 +367,8 @@ ${rankColumns.candidates.map(row => `<tr><td>${escape(row.arm)}</td><td>${row.us
 </section>
 
 <section class="dash-section" id="n37-k8-k16-20261004" aria-labelledby="k8-confirm-title">
-<div class="dash-section-head"><div><p class="dash-kicker">n37 / 16 untouched one-target workloads / complete solve instructions</p><h2 id="k8-confirm-title">K8 wins cold implementation cost; K16 stays in the online comparison.</h2></div><span class="status neutral">Accounting · independent replay · L0</span></div>
-<p class="dash-section-intro panel-summary">The fresh public-point panel verified 384/384 native executions and 64/64 Callgrind profiles, with all 320 measured native rows independently replayed on Linux. K16/K8 whole-solve instructions are ${f(k8Confirm.comparisons[0].ratio_of_sums)} [${f(k8Confirm.comparisons[0].bootstrap_95[0])}, ${f(k8Confirm.comparisons[0].bootstrap_95[1])}], clearing the preregistered 5% K8 cold-route gate. K8/rho remains ${f(k8Confirm.comparisons[1].ratio_of_sums)} [${f(k8Confirm.comparisons[1].bootstrap_95[0])}, ${f(k8Confirm.comparisons[1].bootstrap_95[1])}] in the same simulated instruction unit. The primary isolated online wall result remains unset.</p>
+<div class="dash-section-head"><div><p class="dash-kicker">n37 / 16 untouched one-target workloads / complete solve instructions</p><h2 id="k8-confirm-title">K8 wins cold implementation cost; target-only attribution follows.</h2></div><span class="status neutral">Accounting · independent replay · L0</span></div>
+<p class="dash-section-intro panel-summary">The fresh public-point panel verified 384/384 native executions and 64/64 Callgrind profiles, with all 320 measured native rows independently replayed on Linux. K16/K8 whole-solve instructions are ${f(k8Confirm.comparisons[0].ratio_of_sums)} [${f(k8Confirm.comparisons[0].bootstrap_95[0])}, ${f(k8Confirm.comparisons[0].bootstrap_95[1])}], clearing the preregistered 5% K8 cold-route gate. K8/rho remains ${f(k8Confirm.comparisons[1].ratio_of_sums)} [${f(k8Confirm.comparisons[1].bootstrap_95[0])}, ${f(k8Confirm.comparisons[1].bootstrap_95[1])}] in the same simulated instruction unit. The new target-only instruction result appears below; the primary isolated online wall result remains unset.</p>
 <div class="table-scroll"><table><caption>Complete ecbench method-solve Callgrind Ir on the same 16 public points; one profile per arm and target. The cold method-solve boundary includes reusable setup and is not the online interval.</caption><thead><tr><th>Arm</th><th>Usable points</th><th>Folded columns</th><th>Verified</th><th>Mean solve Ir</th><th>Ir / √r</th></tr></thead><tbody>
 <tr><td>Strong signed-Frobenius rho</td><td>—</td><td>—</td><td>16/16</td><td>${Math.round(k8Confirm.arms.find(row => row.arm === 'rho-strong').mean_ir).toLocaleString('en-US')}</td><td>${f(k8Confirm.arms.find(row => row.arm === 'rho-strong').s_ir_per_target,2)}</td></tr>
 <tr><td>K8</td><td>592</td><td>8</td><td>16/16</td><td>${Math.round(k8Confirm.arms.find(row => row.arm === 'ic-k8').mean_ir).toLocaleString('en-US')}</td><td>${f(k8Confirm.arms.find(row => row.arm === 'ic-k8').s_ir_per_target,2)}</td></tr>
@@ -300,12 +378,30 @@ ${rankColumns.candidates.map(row => `<tr><td>${escape(row.arm)}</td><td>${row.us
 <p class="dash-footnote">The older incomplete counted-cost estimate had K16/K8 = 1.0175 [0.973, 1.059] on these new targets and could not choose a base. K8's pair table has 2,344 entries versus K16's 9,412, while K16 averaged 477 counted target GAE versus K8's 3,385. The largest paired K16 A/A deviation was ${(100*k8Confirm.aa_max_absolute_relative_deviation).toFixed(4)}%. These phase counters explain why both bases must remain in the n41/n53 online study: the cold instruction choice cannot settle target-only cost. <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_k8_k16_20261004/RESULT.md">Decision, raw profile archive, exact IC1 claims and limits →</a></p>
 </section>
 
+<section class="dash-section" id="n37-online-ir-20261004" aria-labelledby="n37-online-ir-title">
+<div class="dash-section-head"><div><p class="dash-kicker">n37 / 16 new public one-target workloads / target-only instructions</p><h2 id="n37-online-ir-title">K16 cuts target work; an isolated wall test is next.</h2></div><span class="status neutral">Accounting · independent replay · L0</span></div>
+<p class="dash-section-intro panel-summary">The fresh 16-point panel verified ${onlineIr.profiles}/${onlineIr.profiles} Callgrind profiles and independently replayed ${onlineIrReceipt.replays.length}/${onlineIrReceipt.replays.length} measured native executions. K8/K16 target-only instructions are ${f(onlineIr.online.comparisons[0].ratio_of_sums)} [${f(onlineIr.online.comparisons[0].bootstrap_95[0])}, ${f(onlineIr.online.comparisons[0].bootstrap_95[1])}], above the frozen 1.10 K16-priority gate. K16/rho target-only instructions are ${f(onlineIr.online.comparisons[2].ratio_of_sums)} [${f(onlineIr.online.comparisons[2].bootstrap_95[0])}, ${f(onlineIr.online.comparisons[2].bootstrap_95[1])}]. This is simulated instruction attribution, not an isolated online wall speedup.</p>
+<div class="table-scroll"><table><caption>One-target Callgrind Ir from the frozen solve and target interval markers; 16 same-point verified profiles per arm.</caption><thead><tr><th>Arm</th><th>Actual usable points</th><th>Folded columns</th><th>Mean target-only Ir</th><th>Mean complete-solve Ir</th></tr></thead><tbody>
+${[['rho-strong','Strong signed-Frobenius rho','—','—'],['ic-k8','K8','592','8'],['ic-k16','K16','1,184','16'],['ic-k16-control','Identical K16 control','1,184','16']].map(([arm,label,points,columns])=>`<tr><td>${label}</td><td>${points}</td><td>${columns}</td><td>${Math.round(onlineIr.online.arms.find(row=>row.arm===arm).mean_ir).toLocaleString('en-US')}</td><td>${Math.round(onlineIr.complete_solve.arms.find(row=>row.arm===arm).mean_ir).toLocaleString('en-US')}</td></tr>`).join('\n')}
+</tbody></table></div>
+<p class="dash-footnote">The cold choice reverses: K8/K16 complete-solve Ir is ${f(onlineIr.complete_solve.comparisons[0].ratio_of_sums)} [${f(onlineIr.complete_solve.comparisons[0].bootstrap_95[0])}, ${f(onlineIr.complete_solve.comparisons[0].bootstrap_95[1])}], as K16's larger base and pair table cost more reusable work. The target-only K16 A/A difference is exactly zero. Both bases stay in the n41/n53 study; no ECC2K-130 transfer follows from n37. The Mac wall session earned L0, so the primary online speedup stays unknown. <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_online_ir_20261004/RESULT.md">Decision, raw archive, exact IC1 claims, and limits →</a></p>
+</section>
+
+<section class="dash-section" id="n37-native-online-wall-20261004" aria-labelledby="n37-native-online-wall-title">
+<div class="dash-section-head"><div><p class="dash-kicker">n37 / 16 new public one-target workloads / native wall screen</p><h2 id="n37-native-online-wall-title">K16's native online lead remains exploratory.</h2></div><span class="status neutral">L1 · 320/320 independent replays · noise gate failed</span></div>
+<p class="dash-section-intro panel-summary">All 384 executions recovered and verified their public-point logarithms. The frozen primary target, <code>${escape(nativeWall.primary_one_target.workload_id)}</code>, has descriptive rho/K16 online wall ${f(nativeWall.primary_one_target.descriptive_rho_over_k16)}×, but no admitted speedup: all measured rows earned L1, and the identical K16 A/A maximum deviation was ${f(100*nativeWall.k16_aa_max_relative_deviation,2)}%, above the frozen 5% gate.</p>
+<div class="table-scroll"><table><caption>Primary target-zero mean of five paired one-target rounds; hosted wall milliseconds are exploratory.</caption><thead><tr><th>Arm</th><th>Usable points</th><th>Folded columns</th><th>Online wall, ms</th><th>Cold solve wall, ms (16-target panel)</th></tr></thead><tbody>
+${[['rho-strong','Strong signed-Frobenius rho','—','—'],['ic-k8','K8','592','8'],['ic-k16','K16','1,184','16'],['ic-k16-control','Identical K16 control','1,184','16']].map(([arm,label,points,columns])=>`<tr><td>${label}</td><td>${points}</td><td>${columns}</td><td>${f(nativeWall.primary_one_target.online_ns_totals[arm]/5e6,6)}</td><td>${f(nativeWall.arm_stage_totals[arm].cold_solve_ns_total/80e6,6)}</td></tr>`).join('\n')}
+</tbody></table></div>
+<p class="dash-footnote">Across the 16 separate one-target workloads, the secondary descriptive K8/K16 online ratio is ${f(nativeWall.panel_descriptive_ratios.k8_over_k16.ratio_of_sums)} [${f(nativeWall.panel_descriptive_ratios.k8_over_k16.target_block_bootstrap_95[0])}, ${f(nativeWall.panel_descriptive_ratios.k8_over_k16.target_block_bootstrap_95[1])}]. The frozen decision is <code>${escape(nativeWall.decision)}</code>: carry both bases to an auditable L2 host; retain K8 and K16 at n41/n53. The page's primary rho/IC online speedup remains unknown, and this n37 screen supplies no ECC2K-130 transfer. <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_native_online_wall_20261004/RESULT.md">Raw records, independent replay, exact IC1 identities and decision →</a></p>
+</section>
+
 <section class="dash-section" id="lab-pipeline" aria-labelledby="pipeline-title"><div class="dash-section-head"><div><p class="dash-kicker">04 / Pipeline map</p><h2 id="pipeline-title">What the solver actually has to do.</h2></div></div><p class="dash-section-intro panel-summary">Reusable preparation produces factor-base logs. The online solve consumes one new public point and includes every target-dependent attempt through independent scalar verification.</p>
 <div class="pipeline-zone"><div class="pipeline-zone-label">Reusable preparation <span>Cost and memory reported separately</span></div><ol class="pipeline"><li><b>1</b><strong>Build the factor base</strong><span>Choose exact subgroup points and declare sign / Frobenius orbit folding.</span></li><li><b>2</b><strong>Find and verify relations</strong><span>Ordinary queries → point decomposition → verified, useful matrix rows.</span></li><li><b>3</b><strong>Solve the relation matrix</strong><span>Check rank and recover verified factor-base logarithms.</span></li></ol></div>
 <div class="pipeline-zone online-zone"><div class="pipeline-zone-label">One target · primary online clock <span>Start at target-dependent work → stop after independent verification</span></div><ol class="pipeline"><li><b>4</b><strong>Decompose the target</strong><span>Generate queries, encode and solve. Charge failed and timed-out attempts.</span></li><li><b>5</b><strong>Recover its logarithm</strong><span>Check the relation, perform target descent and combine the known factor logs.</span></li><li><b>6</b><strong>Verify the answer</strong><span>Independently check that the recovered scalar maps the generator to this target.</span></li></ol></div>
 <div class="stage-details"><details><summary>Factor bases &amp; Frobenius orbits</summary><p>Record the actual usable point set before folding, then folded columns and final rank separately. Different bases are different complete candidates even when their counts match.</p></details><details><summary>PDP: F4 / F5 / SAT</summary><p>PDP means point decomposition. Its internal polynomial or Macaulay matrix belongs to this stage. Solvers must return a verified point relation, not merely a satisfiable encoding. Every inconclusive attempt stays visible.</p></details><details><summary>Final linear algebra &amp; descent</summary><p>The final relation matrix is distinct from the solver’s internal matrix. Rank, modular arithmetic, recovered logs, recursive target work and the final scalar check all need evidence.</p></details></div><p class="dash-footnote">Rho must solve the same one point with the same resource limits. Fixture generation, process launch and input loading are outside both online intervals. A missing phase cost remains unknown.</p></section>
 
-<section class="dash-section" id="lab-next" aria-labelledby="next-title"><div class="dash-section-head"><div><p class="dash-kicker">05 / Tournament design</p><h2 id="next-title">A local win is a candidate, not a final answer.</h2></div></div><div class="tournament-flow" aria-label="Proposed tournament flow"><article><span class="flow-number">01 / EXPLORE</span><strong>Keep diverse candidates</strong><p>Different bases, solver families and stage combinations. Preserve alternatives with different resource tradeoffs.</p></article><article><span class="flow-number">02 / ADMIT</span><strong>Pass correctness gates</strong><p>Source identity, natural yield, failed attempts, complete costs and verified recovered answers.</p></article><article><span class="flow-number">03 / COMPARE</span><strong>Pair frozen workloads</strong><p>Same fresh point, resources and reference. Screening and untouched confirmation have separate roles.</p></article><article><span class="flow-number">04 / DECIDE</span><strong>Promote or retain</strong><p>Apply the declared uncertainty gate. Keep negative outcomes and useful alternatives for later combinations.</p></article></div><div class="next-callout"><span class="status pending">Next gate</span><div><strong>Finish the native F5 control and both natural-yield records.</strong><p>Then freeze new target exclusions, calibrated resources and strong references before a fresh paired tournament. The three historical confirmation sets remain closed.</p></div></div><p class="dash-footnote panel-summary">This diagram describes the proposed process. It does not claim that a fresh F5/SAT tournament has run, or that any implementation is globally fastest.</p></section>
+<section class="dash-section" id="lab-next" aria-labelledby="next-title"><div class="dash-section-head"><div><p class="dash-kicker">05 / Tournament design</p><h2 id="next-title">A local win is a candidate, not a final answer.</h2></div></div><div class="tournament-flow" aria-label="Proposed tournament flow"><article><span class="flow-number">01 / EXPLORE</span><strong>Keep diverse candidates</strong><p>Different bases, solver families and stage combinations. Preserve alternatives with different resource tradeoffs.</p></article><article><span class="flow-number">02 / ADMIT</span><strong>Pass correctness gates</strong><p>Source identity, natural yield, failed attempts, complete costs and verified recovered answers.</p></article><article><span class="flow-number">03 / COMPARE</span><strong>Pair frozen workloads</strong><p>Same fresh point, resources and reference. Screening and untouched confirmation have separate roles.</p></article><article><span class="flow-number">04 / DECIDE</span><strong>Promote or retain</strong><p>Apply the declared uncertainty gate. Keep negative outcomes and useful alternatives for later combinations.</p></article></div><div class="next-callout"><span class="status pending">Next gate</span><div><strong>Produce both native natural-yield records.</strong><p>Use each exact pipeline, retaining failed attempts. Then freeze new target exclusions, calibrated resources and strong references before a fresh paired tournament. The three historical confirmation sets remain closed.</p></div></div><p class="dash-footnote panel-summary">This diagram describes the proposed process. It does not claim that a fresh F5/SAT tournament has run, or that any implementation is globally fastest.</p></section>
 
 <section class="dash-library-intro" id="evidence-search" aria-labelledby="library-title"><p class="dash-kicker">06 / Evidence</p><h2 id="library-title">Open the detail you need.</h2><p class="panel-summary">The historical ledger contains other curves, cost units and questions. Its reports are preserved; they are not a combined leaderboard.</p><label for="evidence-query">Search historical reports</label><input id="evidence-query" type="search" placeholder="Frobenius, F5, rho, factor base…" autocomplete="off" aria-controls="evidence-results"><p id="evidence-count" aria-live="polite"></p><ul id="evidence-results"></ul><noscript><p>Open the full ledger below and use your browser’s Find command.</p></noscript></section><details class="dash-details" id="historical-regimes"><summary>Historical best results by regime · different workloads and accounting</summary><div class="dash-detail-body">${historical}</div></details>
 ${historicalDetails}
@@ -323,16 +419,20 @@ assert.equal(between(page, '<div id="legacy-evidence">', '<!-- END IC EVIDENCE L
 assert.ok(page.includes(historical), 'Historical regime summary lost');
 for (const panel of retainedPanels) assert.ok(page.includes(panel.html), `Historical panel lost: ${panel.id}`);
 const data = {
-  schema_version: 2, scope: 'bounded IC autolab overview; not all repository research',
-  sources: [roundPin,f5Pin,oldSatPin,satPin,sharedRankPin,solverComparisonPin,sharedTargetsPin,sharedEcbenchPin,sharedControlPin,sharedIndependentPin,sharedIndependentClaimPin,sharedIndependentCheckPin,rankColumnsPin,rankColumnsAuditPin,callgrindPin,k8ConfirmPin], confirmation_online: online,
+  schema_version: 3, scope: 'bounded IC autolab overview; not all repository research',
+  sources: [roundPin,f5Pin,nativeF5Pin,oldSatPin,satPin,sharedRankPin,solverComparisonPin,sharedTargetsPin,sharedEcbenchPin,sharedControlPin,sharedIndependentPin,sharedIndependentClaimPin,sharedIndependentCheckPin,rankColumnsPin,rankColumnsAuditPin,callgrindPin,k8ConfirmPin,onlineIrPin,onlineIrReceiptPin,nativeWallPin,nativeWallEvidencePin], confirmation_online: online,
   confirmation_familywise_online_upper: upper, paired_targets: confirmation.paired_cases,
-  f5_control: f5, native_sat_control: sat, historical_incomplete_sat_control: oldSat.arms.sat,
+  historical_f5_control: f5, native_f5_control: nativeF5, native_sat_control: sat, historical_incomplete_sat_control: oldSat.arms.sat,
   rho_online_comparison: rho,
   shared_rank_ecbench: sharedEcbench,
   shared_rank_independent_replay: {session_id:sharedIndependent.session_id, auditor_env_class_id:sharedIndependent.auditor_env_class_id, replays:sharedIndependent.replays.length, receipt_sha256:sharedIndependentSha, claim_check_status:sharedIndependentCheck.status},
   n37_rank_columns: rankColumns,
   n37_callgrind: callgrind,
   n37_k8_k16_callgrind: k8Confirm,
+  n37_online_ir: onlineIr,
+  n37_online_ir_independent_replay: {session_id:onlineIrReceipt.session_id, auditor_env_class_id:onlineIrReceipt.auditor_env_class_id, replays:onlineIrReceipt.replays.length, receipt_sha256:onlineIrReceiptSha},
+  n37_native_online_wall: nativeWall,
+  n37_native_online_wall_evidence: nativeWallEvidence,
   n37_rank_columns_independent_replay: {session_id:rankColumnsAudit.session_id, auditor_env_class_id:rankColumnsAudit.auditor_env_class_id, replays:rankColumnsAudit.replays.length, receipt_sha256:rankColumnsAuditSha},
   rho_online_table: Object.values(rows).map(row=>Object.fromEntries(['alias','online_ms','rho_online_over_IC_online','verified','scheduled'].map(key=>[key,row[key]]))),
   historical_ledger_sha256: sha(ledgerBefore), historical_regime_summary_sha256: sha(historical),
