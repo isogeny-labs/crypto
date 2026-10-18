@@ -161,7 +161,7 @@ plain refutation degree reproduced the recorded `D*` on every draw.
 | 4 | (5, 2) | 18 | 6 | 4 4 3 3 | yes |
 | 4 | (7, 2) | 22 | 6 | 4 3 4 4 | yes |
 | 4 | **(9, 3)** | 30 | **≥ 7** | 4 4 4 4 | yes |
-| 4 | (13, 4), new draws | 42 | — | still running when this was written (first draw > 2 h); not included | — |
+| 4 | (13, 4), new draws | 42 | — | 4 4 4 4 | no; computed by `hky_par` (Amendment 7), which reproduces the validated engine on 24 committed draws and on all four (10, 2) draws |
 | 5 | (10, 2), new draws | 40 | — | 4 3 4 4 | no (draws 0–2 reproduced exactly by a rerun after a container restart) |
 
 - (13, 5) and (15, 5) are the cells the "does the degree level off at 7?" question was about.
@@ -196,8 +196,8 @@ it rises with `N` while the Semaev systems stay at 4.
 
 ## Lean and cairn
 
-- **`lean/FallDegree/Verdict.lean`**, kernel `decide` over 186 rows, proves
-  `report rows = ⟨p3a, p3b, p4a, p4b, bounded, semaevSpecific⟩ = all true`. The 186 rows are
+- **`lean/FallDegree/Verdict.lean`**, kernel `decide` over 190 rows, proves
+  `report rows = ⟨p3a, p3b, p4a, p4b, bounded, semaevSpecific⟩ = all true`. The 190 rows are
   generated from `e3/`, `e4/` and `e6/` by `examples/fall_degree_lean_data.rs`. Changing one
   verdict fails the build.
 - **Disclosure.** `Rule.lean` transcribes the prose rules of the pre-registration and
