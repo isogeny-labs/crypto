@@ -262,8 +262,11 @@ UNIT
 
 cat > /usr/local/bin/rho-ingest-logship <<'SHIP'
 #!/bin/bash
-IID=\$(curl -s -m 2 -H "X-aws-ec2-metadata-token: \$(curl -s -m 2 -X PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 120')" http://169.254.169.254/latest/meta-data/instance-id)
-journalctl -u rho-ingest -n 4000 --no-pager > /tmp/ingest.log 2>/dev/null
+set -euo pipefail
+token=\$(curl -fsS -m 2 -X PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 120')
+IID=\$(curl -fsS -m 2 -H "X-aws-ec2-metadata-token: \$token" http://169.254.169.254/latest/meta-data/instance-id)
+[[ "\$IID" =~ ^i-[0-9a-f]+$ ]] || { echo 'cannot identify this EC2 instance' >&2; exit 1; }
+journalctl -u rho-ingest -n 4000 --no-pager > /tmp/ingest.log 2>/dev/null || true
 aws s3 cp /tmp/ingest.log "s3://$BUCKET/logs/rho-ingest-\${IID}/ingest.log" --only-show-errors
 $EVIDENCE_SHIP
 SHIP

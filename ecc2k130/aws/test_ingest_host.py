@@ -155,6 +155,13 @@ esac
         syntax = subprocess.run(["bash", "-n", str(self.root / "user-data")],
                                 capture_output=True, text=True)
         self.assertEqual(syntax.returncode, 0, syntax.stderr)
+        shipper = unit.split("cat > /usr/local/bin/rho-ingest-logship <<'SHIP'\n", 1)[1].split("\nSHIP", 1)[0]
+        shipper_path = self.root / "shipper.sh"
+        shipper_path.write_text(shipper)
+        shipper_syntax = subprocess.run(["bash", "-n", str(shipper_path)],
+                                        capture_output=True, text=True)
+        self.assertEqual(shipper_syntax.returncode, 0, shipper_syntax.stderr)
+        self.assertIn("cannot identify this EC2 instance", shipper)
 
     def test_paid_service_rejects_invalid_period_before_upload(self):
         operator = self.root / "operator.py"
