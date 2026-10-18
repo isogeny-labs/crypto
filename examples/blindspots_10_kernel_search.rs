@@ -46,6 +46,8 @@
 //! (`lin`), hash/table probes (`probe`), trace tests (`trace`), pair
 //! iterations (`pairs`). Wall time is descriptive only.
 
+#![allow(dead_code)]
+
 use std::cell::Cell;
 use std::collections::HashMap;
 use std::io::Write as IoWrite;
@@ -601,7 +603,11 @@ fn random_point(gf: &Gf, cv: &Curve, rng: &mut Rng) -> (u64, u64) {
     loop {
         let x = rng.next() & gf.mask;
         if let Some((x, y)) = point_at(gf, cv, x) {
-            return if rng.next() & 1 == 1 { (x, y ^ x) } else { (x, y) };
+            return if rng.next() & 1 == 1 {
+                (x, y ^ x)
+            } else {
+                (x, y)
+            };
         }
     }
 }
@@ -808,7 +814,12 @@ impl QuarticFrobenius {
 }
 
 /// `L mod f` for a monic quartic `f` by the Horner route, as `[u0..u3]`.
-fn lv_mod_quartic_horner(f: [u64; 4], frob: &QuarticFrobenius, lvh: &LvHorner, gf: &Gf) -> [u64; 4] {
+fn lv_mod_quartic_horner(
+    f: [u64; 4],
+    frob: &QuarticFrobenius,
+    lvh: &LvHorner,
+    gf: &Gf,
+) -> [u64; 4] {
     let mut u = [
         gf.mul(lvh.top, f[0]),
         gf.add(gf.mul(lvh.top, f[1]), lvh.lin[0]),
@@ -1011,7 +1022,7 @@ enum Kind {
     Other,
 }
 
-const NFAM: usize = 19;
+const NFAM: usize = 24;
 
 fn fam_name(f: usize) -> String {
     match f {
@@ -1022,6 +1033,9 @@ fn fam_name(f: usize) -> String {
         13 => "ham".into(),
         14 => "ham-shift".into(),
         15..=18 => format!("geom-s{}", f - 14),
+        19..=20 => format!("affine-rand-s{}", f - 18),
+        21..=22 => format!("affine-aligned-s{}", f - 20),
+        23 => "affine-anti".into(),
         _ => panic!("family {f}"),
     }
 }
@@ -1031,6 +1045,7 @@ fn fam_kind(f: usize) -> Kind {
         0..=6 => Kind::Sub,
         7..=10 => Kind::Coset(2),
         11..=12 => Kind::Coset(4),
+        19..=23 => Kind::Coset(1),
         _ => Kind::Other,
     }
 }
@@ -1100,10 +1115,22 @@ struct BaseCtx {
     pts: Vec<(u64, u64)>,
     /// Linearized polynomial of the (sub)space `U` (the whole subspace for `Sub`).
     lv: Vec<u64>,
-    /// `L_U(c_i)` for the coset translates `c_1..c_{k-1}` (coset kinds).
+    /// Coefficients e_0..e_k (low to high) of prod_i (z + L_U(c_i)) for the coset
+    /// translates c_i (coset kinds).
     ys: Vec<u64>,
-    /// Bits of `delta = Tr(x + a)` over the rational points: used by planting.
+    /// Rational members with delta = Tr(x + a) equal to 0 and to 1.
+    n0: usize,
+    n1: usize,
     ell: usize,
+}
+
+impl BaseCtx {
+    /// Multisets of three rational members with delta_1 + delta_2 + delta_3 = 0
+    /// (the only ones that can sum into 2E, where every real target lives).
+    fn t_eff(&self) -> f64 {
+        let (a, b) = (self.n0 as f64, self.n1 as f64);
+        a * (a + 1.0) * (a + 2.0) / 6.0 + a * b * (b + 1.0) / 2.0
+    }
 }
 
 fn build_base(gf: &Gf, cv: &Curve, ell: usize, fam: usize, cell_seed: u64) -> BaseCtx {
@@ -1122,21 +1149,72 @@ fn build_base(gf: &Gf, cv: &Curve, ell: usize, fam: usize, cell_seed: u64) -> Ba
             lv = subspace_poly_for_basis(&basis, gf);
             span_all(&basis)
         }
-        7..=12 => {
-            let k = if fam <= 10 { 2usize } else { 4 };
+        7..=12 | 19..=23 => {
+            let k = if fam <= 10 {
+                2usize
+            } else if fam <= 12 {
+                4
+            } else {
+                1
+            };
             let lk = k.trailing_zeros() as usize;
-            let (ub, ech) = random_basis(gf, ell - lk, &mut rng);
-            lv = subspace_poly_for_basis(&ub, gf);
-            let uspan = span_all(&ub);
-            let mut cs: Vec<u64> = vec![0];
-            while cs.len() < k {
-                let c = rng.next() & gf.mask;
-                let ok = cs.iter().all(|&d| ech.reduce(c ^ d) != 0);
-                if ok {
-                    cs.push(c);
+            // 21, 22, 23: U inside the trace-zero hyperplane
+            let in_ker = fam >= 21;
+            let mut ech = Echelon::new();
+            let mut ub: Vec<u64> = vec![];
+            while ub.len() < ell - lk {
+                let v = rng.next() & gf.mask;
+                if in_ker && gf.tr_nc(v) == 1 {
+                    continue;
+                }
+                if ech.insert(v) {
+                    ub.push(v);
                 }
             }
-            ys = cs[1..].iter().map(|&c| lin_eval_nc(&lv, c, gf)).collect();
+            lv = subspace_poly_for_basis(&ub, gf);
+            let uspan = span_all(&ub);
+            let mut cs: Vec<u64> = vec![];
+            if k == 1 {
+                loop {
+                    let c = rng.next() & gf.mask;
+                    let want_tr = match fam {
+                        21 | 22 => Some(1),
+                        23 => Some(0),
+                        _ => None,
+                    };
+                    if let Some(t) = want_tr {
+                        if gf.tr_nc(c) != t {
+                            continue;
+                        }
+                    }
+                    if ech.reduce(c) != 0 {
+                        cs.push(c);
+                        break;
+                    }
+                }
+            } else {
+                cs.push(0);
+                while cs.len() < k {
+                    let c = rng.next() & gf.mask;
+                    let ok = cs.iter().all(|&d| ech.reduce(c ^ d) != 0);
+                    if ok {
+                        cs.push(c);
+                    }
+                }
+            }
+            let y: Vec<u64> = cs.iter().map(|&c| lin_eval_nc(&lv, c, gf)).collect();
+            // coefficients e_0..e_k of prod_i (z + y_i)
+            let mut e = vec![1u64];
+            for &yi in &y {
+                let mut next = vec![0u64; e.len() + 1];
+                for (j, &ej) in e.iter().enumerate() {
+                    next[j + 1] ^= ej;
+                    next[j] ^= gf.mul_nc(ej, yi);
+                }
+                e = next;
+            }
+            // low-to-high: e[0] = prod y_i, e[k] = 1
+            ys = e;
             let mut out = Vec::with_capacity(1 << ell);
             for &c in &cs {
                 for &u in &uspan {
@@ -1192,7 +1270,10 @@ fn build_base(gf: &Gf, cv: &Curve, ell: usize, fam: usize, cell_seed: u64) -> Ba
     assert_eq!(xs.len(), 1usize << ell, "family {fam} size");
     let mut idx = HashMap::new();
     for (i, &x) in xs.iter().enumerate() {
-        assert!(idx.insert(x, i).is_none(), "family {fam} has a repeated abscissa");
+        assert!(
+            idx.insert(x, i).is_none(),
+            "family {fam} has a repeated abscissa"
+        );
     }
     let sq: Vec<u64> = xs.iter().map(|&x| gf.sqr_nc(x)).collect();
     let mut rat = Vec::with_capacity(xs.len());
@@ -1208,9 +1289,13 @@ fn build_base(gf: &Gf, cv: &Curve, ell: usize, fam: usize, cell_seed: u64) -> Ba
             None => rat.push(false),
         }
     }
+    let n0 = pts.iter().filter(|p| gf.tr_nc(p.0 ^ cv.a) == 0).count();
+    let n1 = pts.len() - n0;
     BaseCtx {
         fam,
         kind,
+        n0,
+        n1,
         xs,
         sq,
         rat,
@@ -1460,7 +1545,11 @@ fn scan(cell: &CellCtx, bc: &BaseCtx, prog: &Prog, xr: u64, budget: u64) -> Scan
                 let dom: &[u64] = if lift { &bc.rlist } else { &bc.xs };
                 eval_roots(gf, &q, dom, &mut roots);
             } else {
-                let li = if batch == 2 { gf.inv(q[4]) } else { leads[lead_of[j]] };
+                let li = if batch == 2 {
+                    gf.inv(q[4])
+                } else {
+                    leads[lead_of[j]]
+                };
                 let f = [
                     gf.mul(q[0], li),
                     gf.mul(q[1], li),
@@ -1537,14 +1626,21 @@ fn scan(cell: &CellCtx, bc: &BaseCtx, prog: &Prog, xr: u64, budget: u64) -> Scan
 
 /// The polynomial whose roots are the roots of the monic quartic `f` that lie in
 /// the base (a gcd, up to a scalar).
-fn base_roots(gf: &Gf, bc: &BaseCtx, lvh: Option<&LvHorner>, f: [u64; 4], root: u8, fast: bool) -> Poly {
+fn base_roots(
+    gf: &Gf,
+    bc: &BaseCtx,
+    lvh: Option<&LvHorner>,
+    f: [u64; 4],
+    root: u8,
+    fast: bool,
+) -> Poly {
     let u: [u64; 4] = if root == 0 {
         let lvh = lvh.expect("horner needs a subspace polynomial");
         let frob = QuarticFrobenius::new(f, gf);
         let u = lv_mod_quartic_horner(f, &frob, lvh, gf);
         match bc.kind {
             Kind::Sub => u,
-            Kind::Coset(k) => coset_product(f, u, &bc.ys, k, Some(&frob), gf),
+            Kind::Coset(_) => coset_product(f, u, &bc.ys, Some(&frob), gf),
             Kind::Other => unreachable!(),
         }
     } else {
@@ -1552,7 +1648,7 @@ fn base_roots(gf: &Gf, bc: &BaseCtx, lvh: Option<&LvHorner>, f: [u64; 4], root: 
         let u = [p.c[0], p.c[1], p.c[2], p.c[3]];
         match bc.kind {
             Kind::Sub => u,
-            Kind::Coset(k) => coset_product(f, u, &bc.ys, k, None, gf),
+            Kind::Coset(_) => coset_product(f, u, &bc.ys, None, gf),
             Kind::Other => unreachable!(),
         }
     };
@@ -1563,37 +1659,66 @@ fn base_roots(gf: &Gf, bc: &BaseCtx, lvh: Option<&LvHorner>, f: [u64; 4], root: 
     }
 }
 
-/// `prod_i (u + y_i) mod f` with `y_0 = 0`: the polynomial in `t` vanishing on
-/// the union of cosets when `u = L_U(t) mod f`.
-fn coset_product(f: [u64; 4], u: [u64; 4], ys: &[u64], k: usize, frob: Option<&QuarticFrobenius>, gf: &Gf) -> [u64; 4] {
+/// `P(u) = sum_j e_j u^j mod f` where `e` are the coefficients of
+/// `prod_i (z + y_i)`: the polynomial in `t` vanishing on the union of cosets
+/// when `u = L_U(t) mod f`. Constants known at setup (a zero `e_j`) cost nothing.
+fn coset_product(
+    f: [u64; 4],
+    u: [u64; 4],
+    es: &[u64],
+    frob: Option<&QuarticFrobenius>,
+    gf: &Gf,
+) -> [u64; 4] {
+    let k = es.len() - 1;
     let monic = Poly::from_low(&[f[0], f[1], f[2], f[3], 1]);
-    let up = Poly::from_low(&u);
-    let shift = |y: u64| -> Poly {
-        let mut v = up;
-        v.c[0] = gf.add(v.c[0], y);
-        v
-    };
-    let res = if k == 2 {
-        // u * (u + y1) = u^2 + y1 u
-        let sq: [u64; 4] = match frob {
-            Some(fr) => fr.sqr(u, gf),
+    let sqf = |v: [u64; 4]| -> [u64; 4] {
+        match frob {
+            Some(fr) => fr.sqr(v, gf),
             None => {
-                let s = up.sqr_mod_monic(&monic, 4, gf);
+                let s = Poly::from_low(&v).sqr_mod_monic(&monic, 4, gf);
                 [s.c[0], s.c[1], s.c[2], s.c[3]]
             }
-        };
-        let mut r = [0u64; 4];
-        for i in 0..4 {
-            r[i] = gf.add(sq[i], gf.mul(ys[0], u[i]));
         }
-        r
-    } else {
-        let a = up.mul_mod_monic(&shift(ys[0]), &monic, 4, gf);
-        let bq = shift(ys[1]).mul_mod_monic(&shift(ys[2]), &monic, 4, gf);
-        let p = a.mul_mod_monic(&bq, &monic, 4, gf);
-        [p.c[0], p.c[1], p.c[2], p.c[3]]
     };
-    res
+    let scal = |v: [u64; 4], c: u64| -> [u64; 4] {
+        if c == 0 {
+            [0; 4]
+        } else {
+            [
+                gf.mul(v[0], c),
+                gf.mul(v[1], c),
+                gf.mul(v[2], c),
+                gf.mul(v[3], c),
+            ]
+        }
+    };
+    let addv = |a: [u64; 4], b: [u64; 4]| -> [u64; 4] {
+        [
+            gf.add(a[0], b[0]),
+            gf.add(a[1], b[1]),
+            gf.add(a[2], b[2]),
+            gf.add(a[3], b[3]),
+        ]
+    };
+    let mut r = match k {
+        1 => u,
+        2 => addv(sqf(u), scal(u, es[1])),
+        4 => {
+            let u2 = sqf(u);
+            let u4 = sqf(u2);
+            let u3p = Poly::from_low(&u2).mul_mod_monic(&Poly::from_low(&u), &monic, 4, gf);
+            let u3 = [u3p.c[0], u3p.c[1], u3p.c[2], u3p.c[3]];
+            addv(
+                addv(u4, scal(u3, es[3])),
+                addv(scal(u2, es[2]), scal(u, es[1])),
+            )
+        }
+        _ => unreachable!(),
+    };
+    if es[0] != 0 {
+        r[0] = gf.add(r[0], es[0]);
+    }
+    r
 }
 
 // ------------------------------------------------------------ target sets
@@ -1654,7 +1779,8 @@ fn gen_pos(cell: &CellCtx, bc: &BaseCtx, count: usize, seed: u64) -> Vec<u64> {
 struct EvalRes {
     prog: Prog,
     b_r: usize,
-    neg: Vec<Ops>,
+    t_eff: f64,
+    neg: Vec<(bool, Ops)>,
     pos: Vec<(bool, Ops)>,
     dominated: bool,
     wall_ms: u64,
@@ -1676,8 +1802,11 @@ impl EvalRes {
         if phi <= 0.0 {
             return f64::INFINITY;
         }
-        let c0: f64 = self.neg.iter().map(|o| o.priced(w)).sum::<f64>() / self.neg.len() as f64;
-        c0 / ((self.b_r as f64) * (self.b_r as f64) * phi)
+        let c0: f64 = self.neg.iter().map(|o| o.1.priced(w)).sum::<f64>() / self.neg.len() as f64;
+        if self.t_eff <= 0.0 {
+            return f64::INFINITY;
+        }
+        c0 * self.b_r as f64 / (self.t_eff * phi)
     }
     fn mean_priced_pos(&self, w: f64) -> f64 {
         if self.pos.is_empty() {
@@ -1731,22 +1860,33 @@ fn eval_prog(
 ) -> EvalRes {
     let t0 = Instant::now();
     let fam = prog.g[G_FAM] as usize;
-    let poss = cache.pos(cell, fam, pos_seed, npos);
+    cache.base(cell, fam);
+    let feasible = cache.map[&fam].t_eff() > 0.0;
+    let poss = if feasible {
+        cache.pos(cell, fam, pos_seed, npos)
+    } else {
+        vec![]
+    };
     let bc = &cache.map[&fam];
     let gf = &cell.gf;
     let mut res = EvalRes {
         prog: *prog,
         b_r: bc.rlist.len(),
+        t_eff: bc.t_eff(),
         neg: vec![],
         pos: vec![],
         dominated: false,
         wall_ms: 0,
     };
     'run: {
+        if !feasible {
+            // no multiset of base members can sum into 2E: zero yield, cost per relation unbounded
+            break 'run;
+        }
         for &x in negs {
             let s0 = gf.snap();
             let r = scan(cell, bc, prog, x, cap);
-            res.neg.push(gf.snap().sub(s0));
+            res.neg.push((r.found, gf.snap().sub(s0)));
             if r.aborted {
                 res.dominated = true;
                 break 'run;
@@ -1784,18 +1924,23 @@ fn f64j(x: f64) -> String {
 }
 
 fn eval_json(e: &EvalRes, extra: &str) -> String {
-    let negs: Vec<String> = e.neg.iter().map(ops_json).collect();
+    let negs: Vec<String> = e
+        .neg
+        .iter()
+        .map(|p| format!("[{},{}]", if p.0 { 1 } else { 0 }, ops_json(&p.1)))
+        .collect();
     let poss: Vec<String> = e
         .pos
         .iter()
         .map(|p| format!("[{},{}]", if p.0 { 1 } else { 0 }, ops_json(&p.1)))
         .collect();
     format!(
-        "{{{}\"genes\":{},\"name\":\"{}\",\"b_r\":{},\"dominated\":{},\"phi\":{},\"q0\":{},\"q01\":{},\"q1\":{},\"wall_ms\":{},\"neg\":[{}],\"pos\":[{}]}}",
+        "{{{}\"genes\":{},\"name\":\"{}\",\"b_r\":{},\"t_eff\":{},\"dominated\":{},\"phi\":{},\"q0\":{},\"q01\":{},\"q1\":{},\"wall_ms\":{},\"neg\":[{}],\"pos\":[{}]}}",
         extra,
         e.prog.json_genes(),
         e.prog.name(),
         e.b_r,
+        f64j(e.t_eff),
         e.dominated,
         f64j(e.phi()),
         f64j(e.q(0.0)),
@@ -1843,12 +1988,13 @@ fn jfield<'a>(line: &'a str, key: &str) -> Option<&'a str> {
 }
 
 fn parse_nums(s: &str) -> Vec<f64> {
-    s.split(|c: char| !(c.is_ascii_digit() || c == '.' || c == '-' || c == 'e' || c == 'E' || c == '+'))
-        .filter(|t| !t.is_empty())
-        .filter_map(|t| t.parse::<f64>().ok())
-        .collect()
+    s.split(|c: char| {
+        !(c.is_ascii_digit() || c == '.' || c == '-' || c == 'e' || c == 'E' || c == '+')
+    })
+    .filter(|t| !t.is_empty())
+    .filter_map(|t| t.parse::<f64>().ok())
+    .collect()
 }
-
 
 // ------------------------------------------------------------------ cell setup
 
@@ -1902,7 +2048,11 @@ fn selftest(args: &Args) -> bool {
             ok &= gf.sqr_nc(a) == gf.mul_nc(a, a);
             ok &= gf.mul_nc(a, b ^ 5) == gf.mul_nc(a, b) ^ gf.mul_nc(a, 5);
         }
-        all &= check(&format!("field n={n}"), ok, &format!("tail=0x{:x}", gf.tail));
+        all &= check(
+            &format!("field n={n}"),
+            ok,
+            &format!("tail=0x{:x}", gf.tail),
+        );
         // counted inversion is a pure mul/sqr chain
         let s0 = gf.snap();
         let a = (rng.next() & gf.mask).max(1);
@@ -1961,7 +2111,11 @@ fn selftest(args: &Args) -> bool {
             ok &= v == s4_ref(gf, &cell.cv, x1, x2, t, xr);
             ok &= s4_ref(gf, &cell.cv, x1, x2, t, xr) == s4_ref(gf, &cell.cv, t, x2, x1, xr);
         }
-        all &= check("quartic forms == resultant S4 (n=31)", ok, "300 random (x1,x2,xr,t)");
+        all &= check(
+            "quartic forms == resultant S4 (n=31)",
+            ok,
+            "300 random (x1,x2,xr,t)",
+        );
     }
     // 3. S4 vanishes on true sums
     for &n in &[17u32, 31, 41] {
@@ -1984,11 +2138,15 @@ fn selftest(args: &Args) -> bool {
                 }
             }
         }
-        all &= check(&format!("S4(x1,x2,x3,x(P1+-P2+-P3))=0 n={n}"), ok, "100 triples x 4 signs");
+        all &= check(
+            &format!("S4(x1,x2,x3,x(P1+-P2+-P3))=0 n={n}"),
+            ok,
+            "100 triples x 4 signs",
+        );
     }
-    // 4. family construction
-    {
-        let cell = make_cell(37, 9, 3);
+    // 4. family construction, at the three cell sizes
+    for &nn in &[31u32, 37, 41] {
+        let cell = make_cell(nn, 9, cell_seed(nn));
         let mut ok = true;
         let mut det = String::new();
         for fam in 0..NFAM {
@@ -1998,20 +2156,62 @@ fn selftest(args: &Args) -> bool {
                 ok &= bc.xs.iter().all(|&x| lin_eval_nc(&bc.lv, x, &cell.gf) == 0);
             }
             if let Kind::Coset(_) = bc.kind {
-                // every base member is a root of prod (L_U(t) + y_i)
+                // every base member is a root of sum_j e_j L_U(t)^j = prod (L_U(t) + y_i)
                 let g = &cell.gf;
                 ok &= bc.xs.iter().all(|&x| {
                     let u = lin_eval_nc(&bc.lv, x, g);
-                    let mut v = u;
-                    for &y in &bc.ys {
-                        v = g.mul_nc(v, u ^ y);
+                    let mut v = 0u64;
+                    for &ej in bc.ys.iter().rev() {
+                        v = g.mul_nc(v, u) ^ ej;
                     }
                     v == 0
                 });
             }
             det += &format!(" {}:{}", fam_name(fam), bc.rlist.len());
         }
-        all &= check("families n=37 l=9 size/membership", ok, &format!("rational counts{det}"));
+        all &= check(
+            &format!("families n={nn} l=9 size/membership"),
+            ok,
+            &format!("rational counts{det}"),
+        );
+    }
+    // 4b. trace alignment and the feasible-triple count
+    {
+        let cell = make_cell(17, 6, cell_seed(17));
+        let mut ok = true;
+        let mut det = String::new();
+        for fam in 0..NFAM {
+            let bc = build_base(&cell.gf, &cell.cv, 6, fam, cell.seed);
+            let deltas: Vec<u64> = bc
+                .rlist
+                .iter()
+                .map(|&x| cell.gf.tr_nc(x ^ cell.cv.a))
+                .collect();
+            let m = deltas.len();
+            let mut cnt = 0u64;
+            for i in 0..m {
+                for j in i..m {
+                    for k in j..m {
+                        if (deltas[i] + deltas[j] + deltas[k]) % 2 == 0 {
+                            cnt += 1;
+                        }
+                    }
+                }
+            }
+            ok &= cnt as f64 == bc.t_eff();
+            if (21..=22).contains(&fam) {
+                ok &= bc.n1 == 0 && bc.n0 == m;
+            }
+            if fam == 23 {
+                ok &= bc.n0 == 0 && bc.t_eff() == 0.0;
+            }
+            det += &format!(" {}:{}/{}", fam_name(fam), bc.n0, bc.n1);
+        }
+        all &= check(
+            "delta classes and T_eff (n=17 l=6)",
+            ok,
+            &format!("n0/n1{det}"),
+        );
     }
     // 5. kernel vs brute force over random programs, small cell
     {
@@ -2026,7 +2226,12 @@ fn selftest(args: &Args) -> bool {
         for _ in 0..nprog {
             let prog = random_prog(&mut rng);
             let fam = prog.g[G_FAM] as usize;
-            let poss = cache.pos(&cell, fam, 4242, 4);
+            cache.base(&cell, fam);
+            let poss = if cache.map[&fam].t_eff() > 0.0 {
+                cache.pos(&cell, fam, 4242, 4)
+            } else {
+                vec![]
+            };
             let bc = &cache.map[&fam];
             for &x in negs.iter().chain(poss.iter()) {
                 let exists = brute_exists(&cell, bc, x);
@@ -2035,7 +2240,8 @@ fn selftest(args: &Args) -> bool {
                     found_total += 1;
                     let w = r.witness.unwrap();
                     let valid = s4_ref(&cell.gf, &cell.cv, w[0], w[1], w[2], x) == 0
-                        && w.iter().all(|v| bc.idx.get(v).map(|&i| bc.rat[i]).unwrap_or(false));
+                        && w.iter()
+                            .all(|v| bc.idx.get(v).map(|&i| bc.rat[i]).unwrap_or(false));
                     if !valid || !exists {
                         bad += 1;
                         println!("  bad witness {} target {x}", prog.name());
@@ -2046,7 +2252,12 @@ fn selftest(args: &Args) -> bool {
                     exact_checked += 1;
                     if r.found != exists {
                         bad += 1;
-                        println!("  decision mismatch {} target {x}: kernel {} brute {}", prog.name(), r.found, exists);
+                        println!(
+                            "  decision mismatch {} target {x}: kernel {} brute {}",
+                            prog.name(),
+                            r.found,
+                            exists
+                        );
                     }
                 }
             }
@@ -2065,7 +2276,7 @@ fn selftest(args: &Args) -> bool {
         let run = |cache: &mut BaseCache, p: &Prog| -> Ops {
             let r = eval_prog(&cell, cache, p, &negs, 1, 0, 0);
             let mut t = Ops::default();
-            for o in &r.neg {
+            for (_, o) in &r.neg {
                 t.mul += o.mul;
                 t.sqr += o.sqr;
                 t.lin += o.lin;
@@ -2120,9 +2331,21 @@ fn selftest(args: &Args) -> bool {
             c_inc / o_inc.pairs as f64,
             o_inc.lin as f64 / o_inc.pairs as f64
         );
-        all &= check("handicap pairs=full costs ~2x pairs", (1.95..2.05).contains(&r_full), &format!("ratio {r_full:.3}"));
-        all &= check("lift prefilter costs ~1/4 pairs", (0.20..0.30).contains(&r_lift), &format!("ratio {r_lift:.3}"));
-        all &= check("abort 1/8 costs 1-(7/8)^2 = 0.234 of pairs", (0.22..0.25).contains(&r_ab), &format!("ratio {r_ab:.3}"));
+        all &= check(
+            "handicap pairs=full costs ~2x pairs",
+            (1.95..2.05).contains(&r_full),
+            &format!("ratio {r_full:.3}"),
+        );
+        all &= check(
+            "lift prefilter costs ~1/4 pairs",
+            (0.20..0.30).contains(&r_lift),
+            &format!("ratio {r_lift:.3}"),
+        );
+        all &= check(
+            "abort 1/8 costs 1-(7/8)^2 = 0.234 of pairs",
+            (0.22..0.25).contains(&r_ab),
+            &format!("ratio {r_ab:.3}"),
+        );
         all &= check(
             "generic root finder costs more core ops",
             o_gen.core() > o_inc.core() && (o_gen.core() as f64 / c_inc) > 1.3,
@@ -2144,6 +2367,816 @@ fn selftest(args: &Args) -> bool {
     all
 }
 
+// ---------------------------------------------------------------- the search
+
+const TRAIN_NEG: usize = 6;
+const TRAIN_POS: usize = 32;
+const CAP_FACTOR: u64 = 3;
+
+fn cell_seed(n: u32) -> u64 {
+    0xB10_5EED_0000 + n as u64
+}
+
+fn handicapped() -> Prog {
+    // Full pairs, naive quartic, generic root finder, one inversion per pair.
+    let mut g = [0u8; 10];
+    g[G_ROOT] = 1;
+    g[G_QUART] = 2;
+    g[G_PAIRS] = 1;
+    g[G_BATCH] = 2;
+    Prog { g }.canon()
+}
+
+struct Archive {
+    progs: Vec<Prog>,
+    q01: Vec<f64>,
+}
+
+fn load_archive(path: &str) -> Archive {
+    let mut a = Archive {
+        progs: vec![],
+        q01: vec![],
+    };
+    if let Ok(text) = std::fs::read_to_string(path) {
+        for line in text.lines() {
+            if line.trim().is_empty() {
+                continue;
+            }
+            let genes: Vec<u8> = parse_nums(jfield(line, "genes").unwrap())
+                .iter()
+                .map(|&v| v as u8)
+                .collect();
+            a.progs.push(Prog::from_genes(&genes));
+            let q = jfield(line, "q01").unwrap();
+            a.q01.push(if q == "null" {
+                f64::INFINITY
+            } else {
+                q.parse().unwrap()
+            });
+        }
+    }
+    a
+}
+
+fn best_of(a: &Archive) -> Option<usize> {
+    let mut best: Option<usize> = None;
+    for (i, &q) in a.q01.iter().enumerate() {
+        if q.is_finite() && best.map(|b| q < a.q01[b]).unwrap_or(true) {
+            best = Some(i);
+        }
+    }
+    best
+}
+
+fn cmd_search(args: &Args) {
+    let n: u32 = args.num("--n", 31);
+    let ell: usize = args.num("--ell", 9);
+    let arm = args.req("--arm");
+    let state = args.req("--state");
+    let budget: usize = args.num("--budget", 256);
+    let max_new: usize = args.num("--max-new", budget);
+    let cell = make_cell(n, ell, cell_seed(n));
+    let mut cache = BaseCache::new();
+    let negs = gen_neg(&cell, TRAIN_NEG, mix(cell.seed, 0x7A1)).neg;
+    let pos_seed = mix(cell.seed, 0x7A2);
+    // cap from the arm's start program (the incumbent; the handicapped incumbent for
+    // the positive control) on the training negatives
+    let start_prog = if arm == "p" {
+        handicapped()
+    } else {
+        Prog::incumbent()
+    };
+    let inc = eval_prog(&cell, &mut cache, &start_prog, &negs, pos_seed, 0, 0);
+    let mean1 = inc.neg.iter().map(|o| o.1.priced(1.0)).sum::<f64>() / inc.neg.len() as f64;
+    let cap = (mean1 * CAP_FACTOR as f64) as u64;
+    std::fs::create_dir_all(&state).expect("state dir");
+    let path = format!("{state}/n{n}-{arm}.jsonl");
+    let mut archive = load_archive(&path);
+    println!(
+        "search n={n} ell={ell} arm={arm} budget={budget} resume_at={} cap={cap}",
+        archive.progs.len()
+    );
+    let seed = mix3(cell.seed, 0x5EA2C, arm.bytes().next().unwrap() as u64);
+    let mut done_now = 0usize;
+    while archive.progs.len() < budget && done_now < max_new {
+        let i = archive.progs.len();
+        let mut rng = Rng(mix(seed, i as u64));
+        let seen = |p: &Prog, a: &Archive| a.progs.iter().any(|q| q == p);
+        let prog = match arm.as_str() {
+            "c" => loop {
+                let p = random_prog(&mut rng);
+                if !seen(&p, &archive) {
+                    break p;
+                }
+            },
+            "b" | "p" => {
+                if i == 0 {
+                    if arm == "b" {
+                        Prog::incumbent()
+                    } else {
+                        handicapped()
+                    }
+                } else {
+                    // elite parent: the best so far with probability 0.7, else one of the top 8
+                    let mut order: Vec<usize> = (0..archive.progs.len())
+                        .filter(|&k| archive.q01[k].is_finite())
+                        .collect();
+                    order.sort_by(|&x, &y| {
+                        archive.q01[x]
+                            .partial_cmp(&archive.q01[y])
+                            .unwrap()
+                            .then(x.cmp(&y))
+                    });
+                    let parent = if order.is_empty() {
+                        archive.progs[0]
+                    } else if rng.unit() < 0.7 {
+                        archive.progs[order[0]]
+                    } else {
+                        let top = order.len().min(8);
+                        archive.progs[order[rng.below(top as u64) as usize]]
+                    };
+                    let mut tries = 0;
+                    loop {
+                        let p = mutate(&parent, &mut rng);
+                        if !seen(&p, &archive) {
+                            break p;
+                        }
+                        tries += 1;
+                        if tries > 200 {
+                            let q = random_prog(&mut rng);
+                            if !seen(&q, &archive) {
+                                break q;
+                            }
+                        }
+                    }
+                }
+            }
+            _ => panic!("arm must be b, c or p"),
+        };
+        let e = eval_prog(&cell, &mut cache, &prog, &negs, pos_seed, TRAIN_POS, cap);
+        let line = format!(
+            "{{\"idx\":{i},\"arm\":\"{arm}\",\"n\":{n},\"genes\":{},\"name\":\"{}\",\"b_r\":{},\"t_eff\":{},\"dominated\":{},\"phi\":{},\"q0\":{},\"q01\":{},\"q1\":{},\"wall_ms\":{}}}",
+            prog.json_genes(),
+            prog.name(),
+            e.b_r,
+            f64j(e.t_eff),
+            e.dominated,
+            f64j(e.phi()),
+            f64j(e.q(0.0)),
+            f64j(e.q(0.1)),
+            f64j(e.q(1.0)),
+            e.wall_ms
+        );
+        {
+            let mut f = std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(&path)
+                .expect("archive file");
+            writeln!(f, "{line}").unwrap();
+        }
+        println!(
+            "eval {i:3} {:<58} q01={:>10.4e} phi={:.3} dom={} {}ms",
+            prog.name(),
+            e.q(0.1),
+            e.phi(),
+            e.dominated,
+            e.wall_ms
+        );
+        archive.progs.push(prog);
+        archive.q01.push(e.q(0.1));
+        done_now += 1;
+    }
+    if let Some(b) = best_of(&archive) {
+        println!(
+            "best so far idx {b} {} q01={:.4e} ({} of {budget} evaluations done)",
+            archive.progs[b].name(),
+            archive.q01[b],
+            archive.progs.len()
+        );
+    }
+}
+
+fn cmd_finalists(args: &Args) {
+    let n: u32 = args.num("--n", 31);
+    let state = args.req("--state");
+    let mut out = String::from("{");
+    let mut first = true;
+    for arm in ["b", "c", "p"] {
+        let path = format!("{state}/n{n}-{arm}.jsonl");
+        let a = load_archive(&path);
+        if let Some(b) = best_of(&a) {
+            if !first {
+                out.push(',');
+            }
+            first = false;
+            // running best (training Q at w = 0.1) after 1, 2, 4, .. evaluations
+            let mut curve: Vec<String> = vec![];
+            let mut best = f64::INFINITY;
+            let mut next = 1usize;
+            for (i, &q) in a.q01.iter().enumerate() {
+                if q < best {
+                    best = q;
+                }
+                if i + 1 == next || i + 1 == a.q01.len() {
+                    curve.push(format!("[{},{}]", i + 1, f64j(best)));
+                    next *= 2;
+                }
+            }
+            let dominated = a.q01.iter().filter(|q| !q.is_finite()).count();
+            let mut fams: Vec<usize> = a.progs.iter().map(|p| p.g[G_FAM] as usize).collect();
+            fams.sort();
+            fams.dedup();
+            out += &format!(
+                "\"{arm}\":{{\"idx\":{b},\"genes\":{},\"name\":\"{}\",\"q01_train\":{},\"start_q01\":{},\"evaluations\":{},\"infinite_fitness\":{dominated},\"families_visited\":{},\"curve\":[{}]}}",
+                a.progs[b].json_genes(),
+                a.progs[b].name(),
+                f64j(a.q01[b]),
+                f64j(a.q01[0]),
+                a.progs.len(),
+                fams.len(),
+                curve.join(",")
+            );
+        }
+    }
+    out.push('}');
+    println!("{out}");
+    std::fs::write(format!("{state}/finalists-n{n}.json"), format!("{out}\n"))
+        .expect("write finalists");
+}
+
+fn read_finalist(state: &str, n: u32, arm: &str) -> Option<Prog> {
+    let text = std::fs::read_to_string(format!("{state}/finalists-n{n}.json")).ok()?;
+    let pat = format!("\"{arm}\":{{");
+    let at = text.find(&pat)?;
+    let rest = &text[at + pat.len()..];
+    let genes = jfield(rest, "genes")?;
+    let v: Vec<u8> = parse_nums(genes).iter().map(|&x| x as u8).collect();
+    Some(Prog::from_genes(&v))
+}
+
+/// The labelled programs a held-out stage evaluates.
+fn labelled_programs(state: &str, n: u32) -> Vec<(String, Prog)> {
+    let mut v: Vec<(String, Prog)> = vec![("A".into(), Prog::incumbent())];
+    let mut a1 = Prog::incumbent();
+    a1.g[G_LIFT] = 1;
+    a1.g[G_STOP] = 1;
+    v.push(("A1".into(), a1));
+    for (lab, arm) in [("B", "b"), ("C", "c"), ("P", "p")] {
+        if let Some(p) = read_finalist(state, n, arm) {
+            v.push((lab.into(), p));
+        }
+    }
+    v
+}
+
+fn cmd_heldout(args: &Args) {
+    let n: u32 = args.num("--n", 31);
+    let ell: usize = args.num("--ell", 9);
+    let state = args.req("--state");
+    let out = args.req("--out");
+    let nneg: usize = args.num("--neg", 128);
+    let npos: usize = args.num("--pos", 128);
+    let only = args.flag("--only");
+    let cell = make_cell(n, ell, cell_seed(n));
+    let mut cache = BaseCache::new();
+    let negs = gen_neg(&cell, nneg, mix(cell.seed, 0x4E1D)).neg;
+    let pos_seed = mix(cell.seed, 0x4E1E);
+    let mut file = std::fs::File::create(&out).expect("output file");
+    for (label, prog) in labelled_programs(&state, n) {
+        if let Some(o) = &only {
+            if !o.split(',').any(|x| x == label) {
+                continue;
+            }
+        }
+        let e = eval_prog(&cell, &mut cache, &prog, &negs, pos_seed, npos, 0);
+        let extra = format!("\"label\":\"{label}\",\"n\":{n},\"ell\":{ell},");
+        writeln!(file, "{}", eval_json(&e, &extra)).unwrap();
+        println!(
+            "heldout n={n} {label:<3} {:<58} q0={:.4e} q01={:.4e} q1={:.4e} phi={:.3} b_r={} {}ms",
+            prog.name(),
+            e.q(0.0),
+            e.q(0.1),
+            e.q(1.0),
+            e.phi(),
+            e.b_r,
+            e.wall_ms
+        );
+    }
+}
+
+fn cmd_ablate(args: &Args) {
+    let n: u32 = args.num("--n", 31);
+    let ell: usize = args.num("--ell", 9);
+    let state = args.req("--state");
+    let out = args.req("--out");
+    let nneg: usize = args.num("--neg", 48);
+    let npos: usize = args.num("--pos", 48);
+    let cell = make_cell(n, ell, cell_seed(n));
+    let mut cache = BaseCache::new();
+    let negs = gen_neg(&cell, nneg, mix(cell.seed, 0x4E1D)).neg;
+    let pos_seed = mix(cell.seed, 0x4E1E);
+    let mut file = std::fs::File::create(&out).expect("output file");
+    let inc = Prog::incumbent();
+    let mut todo: Vec<(String, Prog)> = vec![("A".into(), inc)];
+    for (lab, arm) in [("B", "b"), ("C", "c")] {
+        let Some(best) = read_finalist(&state, n, arm) else {
+            continue;
+        };
+        todo.push((format!("{lab}"), best));
+        for i in 0..10 {
+            if best.g[i] == inc.g[i] {
+                continue;
+            }
+            // revert gene i of the finalist to the incumbent value
+            let mut r = best;
+            r.g[i] = inc.g[i];
+            let r = r.canon();
+            if r.valid() {
+                todo.push((format!("{lab}-revert-{}", GENE_NAME[i]), r));
+            }
+            // add only gene i of the finalist to the incumbent
+            let mut a = inc;
+            a.g[i] = best.g[i];
+            let a = a.canon();
+            if a.valid() {
+                todo.push((format!("{lab}-only-{}", GENE_NAME[i]), a));
+            }
+        }
+    }
+    for (label, prog) in todo {
+        let e = eval_prog(&cell, &mut cache, &prog, &negs, pos_seed, npos, 0);
+        let extra = format!("\"label\":\"{label}\",\"n\":{n},\"ell\":{ell},");
+        writeln!(file, "{}", eval_json(&e, &extra)).unwrap();
+        println!(
+            "ablate n={n} {label:<22} {:<58} q01={:.4e} phi={:.3}",
+            prog.name(),
+            e.q(0.1),
+            e.phi()
+        );
+    }
+}
+
+/// Yield conservation at a cell where natural relations are common: the
+/// found-rate of exact programs on natural S targets, per family, against
+/// the triple count C(B_r + 2, 3).
+fn cmd_conserve(args: &Args) {
+    let n: u32 = args.num("--n", 17);
+    let ell: usize = args.num("--ell", 6);
+    let ntargets: usize = args.num("--targets", 3000);
+    let out = args.req("--out");
+    let states: Vec<String> = args
+        .flag("--states")
+        .map(|s| s.split(',').map(|x| x.to_string()).collect())
+        .unwrap_or_default();
+    let cell = make_cell(n, ell, cell_seed(n));
+    let mut cache = BaseCache::new();
+    let negs = gen_neg(&cell, ntargets, mix(cell.seed, 0xC0));
+    let mut file = std::fs::File::create(&out).expect("output file");
+    let mut progs: Vec<(String, Prog)> = vec![];
+    let with_families: usize = args.num("--families", 1);
+    for fam in 0..NFAM {
+        if with_families == 0 && fam != 0 {
+            continue;
+        }
+        if args.num("--skip-other", 0usize) == 1 && fam_kind(fam) == Kind::Other {
+            continue;
+        }
+        let mut p = Prog::incumbent();
+        p.g[G_FAM] = fam as u8;
+        p.g[G_LIFT] = 1;
+        p.g[G_STOP] = 1;
+        p.g[G_QUART] = 1;
+        if fam_kind(fam) == Kind::Other {
+            p.g[G_ROOT] = 2;
+        }
+        progs.push((format!("exact-{}", fam_name(fam)), p.canon()));
+    }
+    progs.push(("A".into(), Prog::incumbent()));
+    for st in &states {
+        for nn in [31u32, 37, 41] {
+            for (lab, p) in labelled_programs(st, nn) {
+                if lab == "A" || lab == "A1" {
+                    continue;
+                }
+                progs.push((format!("{lab}-n{nn}"), p));
+            }
+        }
+    }
+    for (label, prog) in progs {
+        if !prog.valid() {
+            continue;
+        }
+        let fam = prog.g[G_FAM] as usize;
+        cache.base(&cell, fam);
+        let bc = &cache.map[&fam];
+        let b_r = bc.rlist.len();
+        let mut found = 0usize;
+        let mut core = 0u64;
+        let mut nat = 0u64;
+        for &x in &negs.neg {
+            let s0 = cell.gf.snap();
+            let r = scan(&cell, bc, &prog, x, 0);
+            let d = cell.gf.snap().sub(s0);
+            core += d.core();
+            nat += d.nat();
+            if r.found {
+                found += 1;
+            }
+        }
+        let triples = bc.t_eff();
+        let rate = found as f64 / ntargets as f64;
+        // Poisson-corrected yield per feasible triple: rate = 1 - exp(-kappa T_eff)
+        let kappa = if found > 0 && found < ntargets {
+            -(1.0 - rate).ln() / triples
+        } else {
+            f64::NAN
+        };
+        // relation-collection cost: counted cost per relation found, times the
+        // number of columns (rational base abscissae)
+        let wd = |w: f64| (core as f64 + w * nat as f64) / (found.max(1)) as f64 * b_r as f64;
+        writeln!(
+            file,
+            "{{\"label\":\"{label}\",\"genes\":{},\"n\":{n},\"ell\":{ell},\"targets\":{ntargets},\"found\":{found},\"rate\":{},\"b_r\":{b_r},\"triples\":{triples},\"rate_per_triple\":{},\"kappa\":{},\"core_per_target\":{},\"nat_per_target\":{},\"wd0\":{},\"wd01\":{},\"wd1\":{}}}",
+            prog.json_genes(),
+            f64j(rate),
+            f64j(rate / triples),
+            f64j(kappa),
+            f64j(core as f64 / ntargets as f64),
+            f64j(nat as f64 / ntargets as f64),
+            f64j(wd(0.0)),
+            f64j(wd(0.1)),
+            f64j(wd(1.0))
+        )
+        .unwrap();
+        println!(
+            "conserve {label:<24} b_r={b_r:3} found={found:4}/{ntargets} rate={rate:.4} kappa={:.4e} core/target={:.0} W(w=0.1)={:.4e}",
+            kappa,
+            core as f64 / ntargets as f64,
+            wd(0.1)
+        );
+    }
+}
+
+// --------------------------------------------------------------- summarising
+
+struct Loaded {
+    label: String,
+    b_r: usize,
+    t_eff: f64,
+    neg_core: Vec<f64>,
+    neg_nat: Vec<f64>,
+    neg_found: Vec<bool>,
+    pos_found: Vec<bool>,
+    pos_core: Vec<f64>,
+    pos_nat: Vec<f64>,
+}
+
+fn load_heldout(path: &str) -> Vec<Loaded> {
+    let text = std::fs::read_to_string(path).unwrap_or_else(|_| panic!("cannot read {path}"));
+    let mut out = vec![];
+    for line in text.lines().filter(|l| !l.trim().is_empty()) {
+        let label = jfield(line, "label").unwrap().trim_matches('"').to_string();
+        let b_r = jfield(line, "b_r").unwrap().parse().unwrap();
+        let t_eff: f64 = jfield(line, "t_eff").unwrap().parse().unwrap();
+        let neg = parse_nums(jfield(line, "neg").unwrap());
+        let pos = parse_nums(jfield(line, "pos").unwrap());
+        // each entry is [found, mul, sqr, lin, probe, trace, pairs]
+        let mut l = Loaded {
+            label,
+            b_r,
+            t_eff,
+            neg_core: vec![],
+            neg_nat: vec![],
+            neg_found: vec![],
+            pos_found: vec![],
+            pos_core: vec![],
+            pos_nat: vec![],
+        };
+        for c in neg.chunks(7) {
+            l.neg_found.push(c[0] > 0.5);
+            l.neg_core.push(c[1] + c[2]);
+            l.neg_nat.push(c[3] + c[4] + c[5] + c[6]);
+        }
+        for c in pos.chunks(7) {
+            l.pos_found.push(c[0] > 0.5);
+            l.pos_core.push(c[1] + c[2]);
+            l.pos_nat.push(c[3] + c[4] + c[5] + c[6]);
+        }
+        out.push(l);
+    }
+    out
+}
+
+fn q_of(l: &Loaded, w: f64, neg_idx: &[usize], pos_idx: &[usize]) -> f64 {
+    let c0: f64 = neg_idx
+        .iter()
+        .map(|&i| l.neg_core[i] + w * l.neg_nat[i])
+        .sum::<f64>()
+        / neg_idx.len() as f64;
+    let phi = pos_idx.iter().filter(|&&i| l.pos_found[i]).count() as f64 / pos_idx.len() as f64;
+    if phi <= 0.0 {
+        return f64::INFINITY;
+    }
+    if l.t_eff <= 0.0 {
+        return f64::INFINITY;
+    }
+    c0 * l.b_r as f64 / (l.t_eff * phi)
+}
+
+fn resample(rng: &mut Rng, n: usize) -> Vec<usize> {
+    (0..n).map(|_| rng.below(n as u64) as usize).collect()
+}
+
+/// Paired (negatives shared) bootstrap of Q_x / Q_y; positives resampled
+/// independently per program. Returns (point, lo, hi) at 95%.
+fn ratio_ci(
+    x: &Loaded,
+    y: &Loaded,
+    w: f64,
+    resamples: usize,
+    seed: u64,
+    neg_range: Option<(usize, usize)>,
+) -> (f64, f64, f64) {
+    let (a, b) = neg_range.unwrap_or((0, x.neg_core.len()));
+    let all_neg: Vec<usize> = (a..b).collect();
+    let all_pos_x: Vec<usize> = (0..x.pos_found.len()).collect();
+    let all_pos_y: Vec<usize> = (0..y.pos_found.len()).collect();
+    let point = q_of(x, w, &all_neg, &all_pos_x) / q_of(y, w, &all_neg, &all_pos_y);
+    let mut rng = Rng(seed);
+    let mut rs: Vec<f64> = vec![];
+    for _ in 0..resamples {
+        let ni: Vec<usize> = resample(&mut rng, all_neg.len())
+            .iter()
+            .map(|&i| all_neg[i])
+            .collect();
+        let px = resample(&mut rng, all_pos_x.len());
+        let py = resample(&mut rng, all_pos_y.len());
+        let r = q_of(x, w, &ni, &px) / q_of(y, w, &ni, &py);
+        if r.is_finite() {
+            rs.push(r);
+        }
+    }
+    rs.sort_by(|p, q| p.partial_cmp(q).unwrap());
+    if rs.is_empty() {
+        return (point, f64::NAN, f64::NAN);
+    }
+    let lo = rs[((rs.len() as f64) * 0.025) as usize];
+    let hi = rs[(((rs.len() as f64) * 0.975) as usize).min(rs.len() - 1)];
+    (point, lo, hi)
+}
+
+fn classify(ci: &[(f64, f64, f64)]) -> &'static str {
+    let better = ci.iter().filter(|c| c.2 < 1.0).count();
+    let worse = ci.iter().filter(|c| c.1 > 1.0).count();
+    if better == ci.len() {
+        "better"
+    } else if worse == ci.len() {
+        "worse"
+    } else if better > 0 && worse > 0 {
+        "trades"
+    } else {
+        "straddles"
+    }
+}
+
+const WEIGHTS: [f64; 3] = [0.0, 0.1, 1.0];
+
+fn cmd_summarize(args: &Args) {
+    let dir = args.req("--dir");
+    let ns: Vec<u32> = args
+        .flag("--ns")
+        .unwrap_or_else(|| "31,37,41".into())
+        .split(',')
+        .map(|s| s.parse().unwrap())
+        .collect();
+    let resamples: usize = args.num("--resamples", 2000);
+    let mut json = String::from("{\"cells\":[");
+    let mut verdicts: Vec<(u32, String)> = vec![];
+    for (ci_, &n) in ns.iter().enumerate() {
+        let path = format!("{dir}/heldout-n{n}.jsonl");
+        if !std::path::Path::new(&path).exists() {
+            println!("n={n}: no held-out file");
+            continue;
+        }
+        let ls = load_heldout(&path);
+        let get = |lab: &str| ls.iter().find(|l| l.label == lab);
+        println!(
+            "== n={n} (ell from file; negatives {}, positives {}) ==",
+            ls[0].neg_core.len(),
+            ls[0].pos_found.len()
+        );
+        println!(
+            "{:<4} {:>5} {:>7} {:>8} | {:>12} {:>12} {:>12} | natural found",
+            "prog", "B_r", "phi", "core/neg", "Q(w=0)", "Q(w=0.1)", "Q(w=1)"
+        );
+        let all_n: Vec<usize> = (0..ls[0].neg_core.len()).collect();
+        for l in &ls {
+            let all_p: Vec<usize> = (0..l.pos_found.len()).collect();
+            let phi = l.pos_found.iter().filter(|&&f| f).count() as f64 / l.pos_found.len() as f64;
+            let core = l.neg_core.iter().sum::<f64>() / l.neg_core.len() as f64;
+            println!(
+                "{:<4} {:>5} {:>7.3} {:>8.0} | {:>12.4e} {:>12.4e} {:>12.4e} | {}/{}",
+                l.label,
+                l.b_r,
+                phi,
+                core,
+                q_of(l, 0.0, &all_n, &all_p),
+                q_of(l, 0.1, &all_n, &all_p),
+                q_of(l, 1.0, &all_n, &all_p),
+                l.neg_found.iter().filter(|&&f| f).count(),
+                l.neg_found.len()
+            );
+        }
+        let mut cell_json = format!("{{\"n\":{n},\"comparisons\":[");
+        let mut verdict = String::from("INCONCLUSIVE");
+        let mut first = true;
+        let pairs = [
+            ("B", "A"),
+            ("B", "A1"),
+            ("B", "C"),
+            ("C", "A"),
+            ("C", "A1"),
+            ("A1", "A"),
+            ("P", "A"),
+        ];
+        let mut cls: HashMap<(String, String), &'static str> = HashMap::new();
+        for (xl, yl) in pairs {
+            let (Some(x), Some(y)) = (get(xl), get(yl)) else {
+                continue;
+            };
+            let mut cis = vec![];
+            for (wi, &w) in WEIGHTS.iter().enumerate() {
+                cis.push(ratio_ci(
+                    x,
+                    y,
+                    w,
+                    resamples,
+                    mix3(0xB007, n as u64 * 7 + ci_ as u64, wi as u64),
+                    None,
+                ));
+            }
+            let c = classify(&cis);
+            cls.insert((xl.into(), yl.into()), c);
+            println!(
+                "  Q({xl})/Q({yl}): w=0 {:.3} [{:.3},{:.3}]  w=0.1 {:.3} [{:.3},{:.3}]  w=1 {:.3} [{:.3},{:.3}]  -> {c}",
+                cis[0].0, cis[0].1, cis[0].2, cis[1].0, cis[1].1, cis[1].2, cis[2].0, cis[2].1, cis[2].2
+            );
+            if !first {
+                cell_json.push(',');
+            }
+            first = false;
+            cell_json += &format!(
+                "{{\"x\":\"{xl}\",\"y\":\"{yl}\",\"class\":\"{c}\",\"w0\":[{},{},{}],\"w01\":[{},{},{}],\"w1\":[{},{},{}]}}",
+                f64j(cis[0].0), f64j(cis[0].1), f64j(cis[0].2),
+                f64j(cis[1].0), f64j(cis[1].1), f64j(cis[1].2),
+                f64j(cis[2].0), f64j(cis[2].1), f64j(cis[2].2)
+            );
+        }
+        // null control: the incumbent against itself on disjoint halves of the negatives
+        if let Some(a) = get("A") {
+            let h = a.neg_core.len() / 2;
+            let mut cis = vec![];
+            for (wi, &w) in WEIGHTS.iter().enumerate() {
+                // first half vs second half, positives shared => ratio of neg-cost halves
+                let first_half: Vec<usize> = (0..h).collect();
+                let second_half: Vec<usize> = (h..a.neg_core.len()).collect();
+                let all_p: Vec<usize> = (0..a.pos_found.len()).collect();
+                let pt = q_of(a, w, &first_half, &all_p) / q_of(a, w, &second_half, &all_p);
+                let mut rng = Rng(mix3(0x2111, n as u64, wi as u64));
+                let mut rs = vec![];
+                for _ in 0..resamples {
+                    let fi: Vec<usize> = resample(&mut rng, h)
+                        .iter()
+                        .map(|&i| first_half[i])
+                        .collect();
+                    let si: Vec<usize> = resample(&mut rng, a.neg_core.len() - h)
+                        .iter()
+                        .map(|&i| second_half[i])
+                        .collect();
+                    let pp = resample(&mut rng, all_p.len());
+                    let r = q_of(a, w, &fi, &pp) / q_of(a, w, &si, &pp);
+                    if r.is_finite() {
+                        rs.push(r);
+                    }
+                }
+                rs.sort_by(|p, q| p.partial_cmp(q).unwrap());
+                cis.push((
+                    pt,
+                    rs[(rs.len() as f64 * 0.025) as usize],
+                    rs[((rs.len() as f64 * 0.975) as usize).min(rs.len() - 1)],
+                ));
+            }
+            let covers = cis.iter().all(|c| c.1 <= 1.0 && c.2 >= 1.0);
+            println!(
+                "  null (A first half / second half): {:.3} [{:.3},{:.3}] {:.3} [{:.3},{:.3}] {:.3} [{:.3},{:.3}] interval covers 1 at all weights: {covers}",
+                cis[0].0, cis[0].1, cis[0].2, cis[1].0, cis[1].1, cis[1].2, cis[2].0, cis[2].1, cis[2].2
+            );
+            cell_json += &format!(
+                ",{{\"x\":\"A-half1\",\"y\":\"A-half2\",\"covers_one_all_weights\":{covers}}}"
+            );
+        }
+        cell_json.push(']');
+        // the frozen rule
+        let ba = cls.get(&("B".into(), "A".into())).copied();
+        let bc = cls.get(&("B".into(), "C".into())).copied();
+        if let Some(c) = ba {
+            verdict = match c {
+                "better" => {
+                    if bc == Some("better") {
+                        "ADVANCES".into()
+                    } else {
+                        "MATCHES".into()
+                    }
+                }
+                "worse" => "REGRESSES".into(),
+                "trades" => "TRADES".into(),
+                _ => "INCONCLUSIVE".into(),
+            };
+        }
+        println!(
+            "  cell verdict by the frozen rule: {verdict} (B vs A: {:?}, B vs C: {:?})",
+            ba, bc
+        );
+        cell_json += &format!(",\"verdict\":\"{verdict}\"}}");
+        if ci_ > 0 {
+            json.push(',');
+        }
+        json += &cell_json;
+        verdicts.push((n, verdict));
+    }
+    json.push_str("],");
+    // overall: the common cell verdict, else INCONCLUSIVE
+    let overall = if !verdicts.is_empty() && verdicts.iter().all(|v| v.1 == verdicts[0].1) {
+        verdicts[0].1.clone()
+    } else {
+        "INCONCLUSIVE".to_string()
+    };
+    println!("overall verdict: {overall}; per cell {:?}", verdicts);
+    json += &format!("\"overall\":\"{overall}\"");
+    // search positive control (arm p, n = 31)
+    if let Some(state) = args.flag("--state") {
+        if let Ok(text) = std::fs::read_to_string(format!("{state}/finalists-n31.json")) {
+            let get = |arm: &str, key: &str| -> Option<f64> {
+                let pat = format!("\"{arm}\":{{");
+                let at = text.find(&pat)?;
+                jfield(&text[at + pat.len()..], key)?.parse().ok()
+            };
+            if let (Some(pb), Some(ps), Some(inc)) = (
+                get("p", "q01_train"),
+                get("p", "start_q01"),
+                get("b", "start_q01"),
+            ) {
+                let pass = pb <= inc && pb <= 0.5 * ps;
+                println!(
+                    "search positive control (arm p, n=31): best {pb:.4e}, handicapped start {ps:.4e}, incumbent {inc:.4e} -> {}",
+                    if pass { "PASS" } else { "FAIL" }
+                );
+                json += &format!(",\"positive_control_p\":{{\"best\":{},\"start\":{},\"incumbent\":{},\"pass\":{pass}}}", f64j(pb), f64j(ps), f64j(inc));
+            }
+        }
+    }
+    // yield-model check of the finalists' families against the conservation cell
+    if let Some(cons) = args.flag("--conserve") {
+        if let Ok(text) = std::fs::read_to_string(&cons) {
+            let mut sub: Vec<f64> = vec![];
+            let mut by_label: HashMap<String, f64> = HashMap::new();
+            for line in text.lines().filter(|l| !l.trim().is_empty()) {
+                let label = jfield(line, "label").unwrap().trim_matches('"').to_string();
+                if let Some(Ok(v)) = jfield(line, "kappa").map(|v| v.parse::<f64>()) {
+                    if label.starts_with("exact-sub-") {
+                        sub.push(v);
+                    }
+                    by_label.insert(label, v);
+                }
+            }
+            sub.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            if !sub.is_empty() {
+                let med = sub[sub.len() / 2];
+                println!("yield model (kappa = -ln(1-rate)/T_eff at the conservation cell), median over sub families {med:.4e}");
+                json += &format!(",\"yield_model_median\":{}", f64j(med));
+                for &n in &ns {
+                    for arm in ["b", "c"] {
+                        if let Some(pr) =
+                            read_finalist(args.flag("--state").as_deref().unwrap_or("."), n, arm)
+                        {
+                            let key = format!("exact-{}", fam_name(pr.g[G_FAM] as usize));
+                            if let Some(&v) = by_label.get(&key) {
+                                let ok = (v / med - 1.0).abs() <= 0.25;
+                                println!("  n={n} finalist {arm}: family {} kappa {v:.4e} ({:+.1}% of median) -> {}", fam_name(pr.g[G_FAM] as usize), (v / med - 1.0) * 100.0, if ok { "within 25%" } else { "VIOLATES" });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    json.push('}');
+    if let Some(out) = args.flag("--out") {
+        std::fs::write(out, format!("{json}\n")).expect("write summary");
+    }
+}
+
 fn main() {
     let args = Args {
         v: std::env::args().skip(1).collect(),
@@ -2155,6 +3188,12 @@ fn main() {
                 std::process::exit(1);
             }
         }
+        "search" => cmd_search(&args),
+        "finalists" => cmd_finalists(&args),
+        "heldout" => cmd_heldout(&args),
+        "ablate" => cmd_ablate(&args),
+        "conserve" => cmd_conserve(&args),
+        "summarize" => cmd_summarize(&args),
         _ => {
             eprintln!("usage: b10 selftest | search | finalists | heldout | conserve | ablate | summarize");
             std::process::exit(2);
