@@ -267,3 +267,128 @@ per measured degree, and the `plan` records of every beyond-cap cell.
 `README.md` (verdict by this rule), the SVG and PNG graph and `REPORT.pdf`
 are produced by the assess stage, not here; speed rows go to
 `benchmarks/20261018-blindspots-blocked-f4/` at integration.
+
+---
+
+## Amendment 1 (committed with the task cards, before any card runs)
+
+Everything above stands except where this amendment says otherwise. It makes
+no rule looser; each change adds a check or a cell, or corrects a statement
+that development showed to be wrong.
+
+### 1. Development disclosure
+
+The instrument was written and tuned before the cards were frozen. The runs
+below were made for correctness and for sizing the cards (every card must end
+inside nine minutes). **None is a result**; each is re-run from scratch by a
+card, and only card outputs are reported.
+
+* `selftest`, many times, and the committed-control table builder once.
+* (10,3,4) once (3.6 s) and (4,1,4)-scale tiny cells while debugging.
+* (11,4,4) draw u0: about twenty runs, varying block rows (256 to 32,768),
+  tile width (32 to 256 words) and work order (three), all reading `D = 4`
+  with `1 in V_4`; the satisfiable (11,4,4) draw 0 once (saturated at rank
+  82,839 of 82,993, no `1`).
+* (13,4,4) item-06 draw u0: six runs (three work orders, two builds), all
+  `D = 4`.
+* (19,6,3) draw 0 once (`D = 4`, 23 s); (19,7,3) committed draw 0 once
+  (saturated at degree 4 with rank 94,230, equal to the committed incumbent
+  rank).
+* (13,5,4) item-06 draw 14 once (`D = 4`, refuted at rank 173,122 of 179,447,
+  249 s, peak RSS 2.35 GB).
+* (15,5,4) draw 8 (unsatisfiable by the exact count): three runs, one
+  abandoned at about 90 s when the row-storage code was changed, two complete
+  (block rows 4,096 and 8,192): **the degree-4 closure saturated without `1`
+  at rank 182,475 of 251,176 columns** (273 s and 267 s, peak RSS 2.98 GB and
+  3.10 GB). The two runs agree on the saturated rank, as a fixed point must.
+* One random-system control (seed 1, to degree 5).
+
+This last observation changes the design in one place only: the decision
+rule's second branch ("D >= 5 and the growth model returns") is now a live
+outcome at `(m, l) = (4, 5)`, so (15,5,4) gets four draws instead of one and
+a transition cell is added (item 4 below). The rule is unchanged.
+
+### 2. Engine parameters, fixed
+
+Block rows `K = 4096` products per reduction block; tile 256 words in the
+panel pass; work order 2 (highest-degree fall first, last in first out). The
+order changes only how much work is done before `1` appears, never `V_D`
+(saturated ranks agree across orders and block sizes); it was chosen as the
+least work on the two development draws that are also card controls. The
+instrument records `chunk_rows`, `tile_words` and `order` in every output
+line.
+
+### 3. Corrections to the text above
+
+* **Control statistics.** The "28 draws" sentence is replaced by what the
+  selftest measured on the development build: 104 of 104 committed solution
+  counts reproduced; 88 of 88 per-draw closure degrees equal to the committed
+  incumbent closure (N <= 30, degrees 3 to 5); 36 of 36 per-draw degrees
+  equal to the committed msolve F4 step degree; 104 of 104 degree-3 closure
+  ranks equal to the committed `closure_rank` (N <= 44). The card re-runs the
+  selftest and the numbers it prints are the ones reported.
+* **Added control: saturated ranks.** The committed incumbent closure of
+  `(m, n, l) = (3, 19, 7)` (N = 40) saturates at degree 4 without `1`, at rank
+  94,230 (draws 0 and 3), 92,838 (draw 5) and 94,926 (draw 7) of 102,091
+  columns. The blocked engine must reproduce those ranks exactly (`--expect-rank`)
+  on draws 0, 5 and 7. A rank is the dimension of the closed space, so equality
+  is the strongest available test that this engine computes the incumbent's
+  space, and it is the positive control for the "no refutation" direction (an
+  engine that stopped early or missed products would give a smaller rank).
+* **Sensitivity control** is run to degree 5 (not 6): reading "no `1` through
+  degree 5" on all four seeds proves `D > 4`, which is all the control needs;
+  degree 6 at this shape costs minutes per seed.
+* **Deviation 3 corrected.** The plan record for (17,5,4) gives a resident
+  upper bound of 7.70e9 bytes against the instrument's 6.92e9-byte cap, a
+  shortfall of 0.78 GB, which is far below the 4.9 GB of free disk. So a
+  spill tier would *not* have left memory as the limit at (17,5,4); what limits
+  (17,5,4) in these cards is the nine-minute card (projected 9 to 11 minutes
+  from the (15,5,4) development runs). The tier was not built. A saturating
+  cell uses far less than the bound (2.9 GB at (15,5,4) against a 3.9 GB
+  bound).
+* **"28 + 20 draws" in the Controls paragraph** is superseded by the item
+  above.
+
+### 4. Cells and cards (frozen)
+
+Draws are unsatisfiable by the exact count, verified again inside the card
+(`--expect-solutions 0`; a mismatch stops the card). New-cell draws are the
+first unsatisfiable draws of the instrument's generator at seed 20261018, in
+generator order; (13,5,4) uses item 06's two committed draws.
+
+| card | content | expected time |
+|---|---|---|
+| 01 | selftest; positive control (11,4,4) u0 (`D = 4` asserted); satisfiable control (11,4,4) draw 0 (no `1` asserted); sensitivity control (6,2,4) shape, four seeds; saturated-rank controls (19,7,3) draws 0 and 7 | 4 min |
+| 02 | (11,4,4) u1, u2, u3; (13,4,4) item-06 u0; satisfiable control (13,4,4) draw 0 | 4 min |
+| 03 | (13,4,4) closure-study draws 1, 3, 4, 7 (the incumbent's); saturated-rank control (19,7,3) draw 5 | 5 min |
+| 04 | (19,6,3) four draws; `plan` records for (13,5,4), (15,5,4) at degrees 4 and 5, (17,5,4), (19,6,4), (19,6,3) | 2 min |
+| 05, 06 | (13,5,4), supplementary transition cell, item-06 draws 14 and 16 (one per card) | 4.5 min each |
+| 07 to 10 | (15,5,4), generator draws 0, 8, 12, 14 (one per card) | 5 min each |
+| 11 | (17,5,4), generator draw 0, time limit 450 s | 8 min |
+
+Total about 50 CPU-minutes against the 2 CPU-hour ceiling. The cards build the
+instrument with `rustc` (Deviation 2) into their own directory under
+`target/blindspots-07/` and remove it at the end.
+
+**Stop rule, operational.** The m = 4 ladder is attempted in order (15,5,4),
+(17,5,4); the first cell whose run ends `timelimit` or `memcap` is BLOCKED,
+and cells after it are not attempted (a card for a later cell, if it exists,
+is not relayed). (19,6,4) is never attempted: its `plan` record (resident
+upper bound 22.97 GB, 16.05 GB beyond the cap) is the BLOCKED record. (4,6)
+cannot be reached below N = 62 because smaller n makes unsatisfiable draws
+essentially impossible (`S = n - 24`).
+
+**Added outcome.** A cell whose degree-4 closure saturates without `1` is
+reported `D > 4 (saturated at rank r of C)`. Its degree-5 closure is BLOCKED
+and `plan --degree 5` records the projected memory and disk (for (15,5,4),
+2,369,936 columns, 3.5e11 bytes of reduced basis).
+
+**Replicates.** A cell with `k` measured draws is reported with `k`; the
+(15,5,4) reading is the set of its four draws, not a median of one.
+
+### 5. What a card cannot decide
+
+A card never interprets. The assess stage reads `raw/` and applies the
+Decision rule above. In particular the (13,5,4) transition cell and the
+saturated-rank controls are additions to the design's list, recorded here so
+they are not mistaken for it.
