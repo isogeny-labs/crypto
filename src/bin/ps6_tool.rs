@@ -192,7 +192,7 @@ fn calibrate(out: &Path, rungs: &[u32], reps: usize, min_pairs: u64) -> Result<(
         let mut rng = StdRng::seed_from_u64(0x5CA1_AB1E ^ n as u64);
         let mut targets: Vec<(u64, u64)> = Vec::new();
         while targets.len() < want {
-            let x = rng.gen::<u64>() & inst.gf.mask;
+            let x = rng.gen::<u64>() & ((1u64 << n) - 1);
             if x == 0 || degenerate_target(&inst.gf, inst.b, l, x) {
                 continue;
             }
@@ -213,7 +213,7 @@ fn calibrate(out: &Path, rungs: &[u32], reps: usize, min_pairs: u64) -> Result<(
                 calibrate_group(&g, &pts, &mut c);
                 ns_add.push(c.ns_per_add);
             };
-            let mut time_s4 = |ns: &mut Vec<f64>, tot: &mut u64| {
+            let time_s4 = |ns: &mut Vec<f64>, tot: &mut u64| {
                 let mut pairs = 0u64;
                 let t = Instant::now();
                 for &(x, _) in &targets {
@@ -272,7 +272,10 @@ fn calibrate(out: &Path, rungs: &[u32], reps: usize, min_pairs: u64) -> Result<(
             "ratio_gl_median": median(&r_gl), "ratio_gl_min": quantile(&r_gl, 0.0), "ratio_gl_max": quantile(&r_gl, 1.0),
             "ratio_s4_median": median(&r_s4),
             "ratio_s4_pinned": pinned_s4,
-            "gl_over_s4_ns_median": median(&ns_gl.iter().zip(&ns_s4).map(|(a, b)| a / b).collect::<Vec<_>>()),
+            "gl_over_s4_ns_per_rep": ratio(&ns_gl, &ns_s4),
+            "gl_over_s4_ns_median": median(&ratio(&ns_gl, &ns_s4)),
+            "gl_over_s4_ns_min": quantile(&ratio(&ns_gl, &ns_s4), 0.0),
+            "gl_over_s4_ns_max": quantile(&ratio(&ns_gl, &ns_s4), 1.0),
         }));
         eprintln!(
             "n={n} l={l} {slug}: ns/add {:.1}, ns/s4-pair {:.1}, ns/gl-pair {:.1}; ratio gl {:.3} s4 {:.3} (pinned {:?})",
@@ -337,7 +340,6 @@ fn memory(n: u32, fold: &str, out: &Path) -> Result<(), String> {
 /// One verified, measured run reduced to what the tables read.
 #[derive(Clone)]
 struct Row {
-    s: f64,
     total_ops: f64,
     phases: BTreeMap<String, f64>,
     solver_ops: u64,
@@ -359,7 +361,6 @@ struct Rung {
     session_id: String,
     /// arm → workload → rows over rounds
     arms: BTreeMap<String, BTreeMap<String, Vec<Row>>>,
-    roles: BTreeMap<String, String>,
     measured: BTreeMap<String, u64>,
     verified: BTreeMap<String, u64>,
     workloads: Vec<String>,
@@ -369,13 +370,11 @@ fn load_rung(dir: &Path) -> Result<Rung, String> {
     let session = read_session(dir)?;
     let recs = read_records(dir)?;
     let mut arms: BTreeMap<String, BTreeMap<String, Vec<Row>>> = BTreeMap::new();
-    let mut roles = BTreeMap::new();
     let (mut measured, mut verified) = (BTreeMap::new(), BTreeMap::new());
     let mut first: Option<&Record> = None;
     let mut workloads = std::collections::BTreeSet::new();
     for r in recs.iter().filter(|r| !r.warmup) {
         first.get_or_insert(r);
-        roles.insert(r.arm.clone(), r.role.clone());
         *measured.entry(r.arm.clone()).or_insert(0u64) += 1;
         workloads.insert(r.workload.workload_id.clone());
         if !r.counts() {
@@ -386,7 +385,6 @@ fn load_rung(dir: &Path) -> Result<Rung, String> {
         let s = r.cost.s.ok_or("verified run without S")?;
         let total = r.cost.total_gae.ok_or("verified run without total")?;
         let row = Row {
-            s,
             total_ops: total,
             phases: r.phases.iter().map(|p| (p.name.clone(), p.gae)).collect(),
             solver_ops: r.solver.as_ref().map_or(0, |s| s.ops),
@@ -416,7 +414,6 @@ fn load_rung(dir: &Path) -> Result<Rung, String> {
         dir: dir.to_path_buf(),
         session_id: session.session_id,
         arms,
-        roles,
         measured,
         verified,
         workloads: workloads.into_iter().collect(),
@@ -430,8 +427,11 @@ enum Conv {
     Lb,
     /// Each kernel pair priced as one baseline pair (the pinned `ns_per_s4_pair`).
     Pairs,
-    /// Each kernel pair priced at the measured ratio to a group addition.
+    /// Each kernel pair priced at the pinned baseline-pair price times the measured
+    /// kernel/baseline time ratio per pair (same process, interleaved).
     Est,
+    /// Each kernel pair priced at its measured time over a measured group addition.
+    EstAdd,
 }
 
 impl Conv {
@@ -439,17 +439,23 @@ impl Conv {
         match self {
             Conv::Lb => "lower bound (recorded)",
             Conv::Pairs => "pair-count (kernel pair = baseline pair)",
-            Conv::Est => "measured ratio",
+            Conv::Est => "anchored estimate",
+            Conv::EstAdd => "add-ratio estimate",
         }
     }
 }
 
 struct Calib {
     c_s4_pinned: f64,
+    /// Kernel pair over a measured group addition (median, min, max over repetitions).
     c_gl: f64,
     c_gl_min: f64,
     c_gl_max: f64,
     c_s4_measured: f64,
+    /// Kernel pair time over baseline pair time, same process (median, min, max).
+    gl_over_s4: f64,
+    gl_over_s4_min: f64,
+    gl_over_s4_max: f64,
 }
 
 /// Per-workload value of an arm: S (or total ops) under a convention, the
@@ -462,7 +468,8 @@ fn value(rung: &Rung, arm: &str, conv: Conv, cal: &Calib, ops: bool, wl: &str) -
             let extra_ops = match conv {
                 Conv::Lb => 0.0,
                 Conv::Pairs => r.solver_ops as f64 * cal.c_s4_pinned,
-                Conv::Est => r.solver_ops as f64 * cal.c_gl,
+                Conv::Est => r.solver_ops as f64 * cal.c_s4_pinned * cal.gl_over_s4,
+                Conv::EstAdd => r.solver_ops as f64 * cal.c_gl,
             };
             let total = r.total_ops + extra_ops;
             if ops {
@@ -561,6 +568,9 @@ fn analyze(
                 c_gl_min: g("ratio_gl_min")?,
                 c_gl_max: g("ratio_gl_max")?,
                 c_s4_measured: g("ratio_s4_median")?,
+                gl_over_s4: g("gl_over_s4_ns_median")?,
+                gl_over_s4_min: g("gl_over_s4_ns_min")?,
+                gl_over_s4_max: g("gl_over_s4_ns_max")?,
             },
         );
     }
@@ -585,6 +595,7 @@ fn analyze(
         (gl, Conv::Lb),
         (gl, Conv::Pairs),
         (gl, Conv::Est),
+        (gl, Conv::EstAdd),
         (mitm, Conv::Lb),
         (mitm_nf, Conv::Lb),
     ];
@@ -696,14 +707,15 @@ fn analyze(
             cmp_json.push(json!({"arm": arm, "convention": conv.name(), "baseline_over_arm": r, "ci95": ci}));
         }
         md.push_str(&format!(
-            "\nConversions at this rung: baseline pair pinned {:.3} GAE; kernel pair measured {:.4} GAE (min {:.4}, max {:.4} over the calibration repetitions); baseline pair measured {:.3} GAE.\n\n",
-            c.c_s4_pinned, c.c_gl, c.c_gl_min, c.c_gl_max, c.c_s4_measured
+            "\nConversions at this rung (GAE per pair): baseline pair pinned {:.3}; baseline pair measured here {:.3}; kernel pair / baseline pair time {:.4} (min {:.4}, max {:.4}), so anchored kernel pair {:.4}; kernel pair over a measured addition {:.4} (min {:.4}, max {:.4}).\n\n",
+            c.c_s4_pinned, c.c_s4_measured, c.gl_over_s4, c.gl_over_s4_min, c.gl_over_s4_max,
+            c.c_s4_pinned * c.gl_over_s4, c.c_gl, c.c_gl_min, c.c_gl_max
         ));
         rung_json.push(json!({
             "n": rg.n, "l": rg.l, "slug": rg.slug, "log2_r": rg.log2_r, "floor_s": rg.floor_s,
             "session": rg.session_id, "dir": rg.dir, "workloads": rg.workloads.len(),
             "arms": arms_json, "baseline_over_arm": cmp_json,
-            "conversions": {"c_s4_pinned": c.c_s4_pinned, "c_gl_median": c.c_gl, "c_gl_min": c.c_gl_min, "c_gl_max": c.c_gl_max, "c_s4_measured": c.c_s4_measured},
+            "conversions": {"c_s4_pinned": c.c_s4_pinned, "c_gl_over_add_median": c.c_gl, "c_gl_over_add_min": c.c_gl_min, "c_gl_over_add_max": c.c_gl_max, "c_s4_measured_over_add": c.c_s4_measured, "gl_over_s4_median": c.gl_over_s4, "gl_over_s4_min": c.gl_over_s4_min, "gl_over_s4_max": c.gl_over_s4_max, "c_gl_anchored": c.c_s4_pinned * c.gl_over_s4},
         }));
     }
 
@@ -862,6 +874,65 @@ fn analyze(
             arms_j.push(json!({"arm": arm, "runs": rows.len(), "median_wall_ms": median(&w), "min_wall_ms": quantile(&w, 0.0), "max_wall_ms": quantile(&w, 1.0), "levels": levels, "median_rss_mib": median(&rss)}));
         }
         md.push('\n');
+        // Paired wall-time ratios B/A over (target, round) pairs, with a cluster bootstrap over
+        // targets: every timed row gets its interval, admitted or not; the levels the pairs reached
+        // are printed beside it, and a figure below the spec's level is descriptive.
+        md.push_str("| paired wall ratio B/A | pairs | median | 95% CI | pairs at each level (lower of the two runs) |\n|:--|--:|--:|:--|:--|\n");
+        let mut paired_json = Vec::new();
+        for (a, b) in [
+            ("s4-baseline", "s4-baseline-control"),
+            ("s4-baseline", "s4-grouplaw"),
+            ("s4-baseline", "mitm"),
+            ("s4-baseline", "mitm-negfold"),
+            ("s4-grouplaw", "mitm"),
+            ("s4-grouplaw", "mitm-negfold"),
+            ("rho-negation", "s4-baseline"),
+            ("rho-negation", "mitm"),
+        ] {
+            let (Some(ra), Some(rb)) = (tr.arms.get(a), tr.arms.get(b)) else {
+                continue;
+            };
+            let mut strata: Vec<Vec<f64>> = Vec::new();
+            let mut levels: BTreeMap<String, u64> = BTreeMap::new();
+            for (w, va) in ra {
+                let Some(vb) = rb.get(w) else { continue };
+                let mut s = Vec::new();
+                for (x, y) in va.iter().zip(vb) {
+                    if let (Some(wa), Some(wb)) = (x.wall_ns, y.wall_ns) {
+                        s.push(wb as f64 / wa as f64);
+                        let lo = if x.level < y.level { &x.level } else { &y.level };
+                        *levels.entry(lo.clone()).or_insert(0) += 1;
+                    }
+                }
+                if !s.is_empty() {
+                    strata.push(s);
+                }
+            }
+            let all: Vec<f64> = strata.concat();
+            let stat = |s: &[Vec<f64>]| median(&s.concat());
+            let ci = if strata.len() >= 2 {
+                crypto_lib::cryptanalysis::ecbench::stats::cluster_bootstrap_ci(
+                    &strata, resamples, 31337, stat,
+                )
+            } else {
+                bootstrap_ci(&strata, resamples, 31337, stat)
+            };
+            md.push_str(&format!(
+                "| {} / {} | {} | {} | {} | {} |\n",
+                b,
+                a,
+                all.len(),
+                fnum(median(&all)),
+                fci(ci),
+                levels
+                    .iter()
+                    .map(|(k, v)| format!("{k}:{v}"))
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            ));
+            paired_json.push(json!({"a": a, "b": b, "pairs": all.len(), "median_ratio_b_over_a": median(&all), "ci95": ci, "levels": levels}));
+        }
+        md.push('\n');
         let mut comps = Vec::new();
         let cdir = tr.dir.join("comparisons");
         if let Ok(rd) = std::fs::read_dir(&cdir) {
@@ -893,14 +964,14 @@ fn analyze(
             }
             md.push('\n');
         }
-        timed_json.push(json!({"n": tr.n, "slug": tr.slug, "session": tr.session_id, "dir": tr.dir, "arms": arms_j, "comparisons": comps}));
+        timed_json.push(json!({"n": tr.n, "slug": tr.slug, "session": tr.session_id, "dir": tr.dir, "arms": arms_j, "paired_wall": paired_json, "comparisons": comps}));
     }
 
     let summary = json!({
         "schema": "ps6_tool.summary/v1",
         "rungs": rung_json, "fits": fits_json, "slope_differences": diff_json,
         "memory": mem, "timed": timed_json, "resamples": resamples,
-        "note": "mean S over targets; intervals are percentile bootstraps over targets; kernel conventions: lower bound (recorded), pair-count and measured-ratio (both NOT pinned conversions)",
+        "note": "mean S over targets; intervals are percentile bootstraps over targets; kernel conventions: lower bound (recorded), pair-count, anchored estimate and add-ratio estimate (the last three are NOT pinned conversions)",
     });
     std::fs::write(
         out,

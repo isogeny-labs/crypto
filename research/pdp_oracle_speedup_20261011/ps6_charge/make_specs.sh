@@ -6,7 +6,8 @@
 # n = 15, 18, 21, 24, 27 (BoundaryConfig::default), factor base the low-order subspace of
 # dimension ceil(n/3), three summands.  The seed 0x1CB00BDA7A is 123212651130.
 #
-#   counted: counted unit only (no wall-time claim), 8 targets x 2 rounds, L0, --cpus none.
+#   counted: counted unit only (no wall-time claim), 8 targets x 2 rounds (x 1 round at n = 27, where
+#            one baseline run takes about a minute and a half), L0, --cpus none.
 #   timed:   wall time too: 8 targets x 5 rounds (+1 warm-up) at n <= 24, an A/A control arm
 #            (the baseline repeated), isolation level L2 required for a wall figure.  At n = 27
 #            the baseline costs about a minute and a half per run, so the timed session has
@@ -58,9 +59,10 @@ spec() {   # kind n targets rounds warmup level timeout
   jq -e . "$f" > /dev/null
 }
 
-for n in 15 18 21 24 27; do
+for n in 15 18 21 24; do
   spec counted "$n" 8 2 0 L0 14400
 done
+spec counted 27 8 1 0 L0 14400
 for n in 15 18 21 24; do
   spec timed "$n" 8 5 1 L2 3600
 done

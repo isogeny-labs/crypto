@@ -393,6 +393,36 @@ frozen-source replays rebuild it against pre-F6 snapshots of
 evaluations, and the tournament admits no root build script. It also
 refuses to run while a `KIC_*`, `F4_*` or `SOLVER_*` tuning override is set.
 
+`semaev-s4-baseline:m=3` and `semaev-s4-grouplaw:m=3[,audit=1]` run the Semaev
+S4 pairs-and-solve loop (three summands) on `binary-subspace:dimension=D`, the
+low-order subspace `<1, z, …, z^{D−1}>` of a random binary curve, the boundary
+ledger's char2 regime (`research/pdp_oracle_speedup_20261011/ps6_charge/`).
+Like the PDP3 oracle they live in the `ecbench` binary
+(`src/bin/ecbench/ps6_charge.rs`, `ps6_kernel.rs`) and reach `ic.pipeline`
+through `methods::register_binary_plugins`; the binary merges its two plug-in
+tables because the registry keeps the first registration only.
+
+- `semaev-s4-baseline` is the ledger's `Oracle::SemaevS4`
+  (`SubspaceOracle::decompose`, then the framework's sign lift).
+  **Charged:** its pairs, in `s4_pairs` at the pinned `ns_per_s4_pair` of the
+  curve, and every group operation of the lift.  **Counted, not charged:** the
+  construction of the `SubspaceOracle` (`s4_oracle_span_words_uncharged`,
+  `s4_oracle_lv_coefficients_uncharged`).
+- `semaev-s4-grouplaw` is the PS-2 group-law kernel (four candidate abscissae
+  `x(P₁ ± P₂ ± R)` per pair of rational base points, generalised to any `a`
+  and `b`).  It returns the baseline's witness for the same target, so a
+  pipeline run with either draws the same targets and ends at the same rank;
+  `audit=1` also runs the baseline on every target and counts disagreements
+  (`audit_mismatches`) without charging that work.  **Charged:** the sign lift
+  and, for a degenerate target (PS-1), the baseline's pairs.  **Counted, not
+  charged:** the kernel's pairs, through the solver block in the unit
+  `group-law kernel pairs` (no pinned conversion exists for them, so the run is
+  a lower bound and lists `solver_group-law_kernel_pairs_uncharged`), one field
+  inversion per target in `inversions` (the degeneracy test), and the kernel's
+  base list (`grouplaw_base_points_uncharged`).
+- Memory is not in `S` here either: the library's `mitm` pair table grows as
+  `|B|²` entries, and the records keep `max_rss_kib` beside every row.
+
 **Calibration.** The unit has been checked against theory in
 [`research/ecbench_calibration_20261002`](../../research/ecbench_calibration_20261002/README.md).
 Over 2 384 verified runs, preregistered and replayed, every generic
