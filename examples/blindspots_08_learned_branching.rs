@@ -2013,15 +2013,14 @@ fn mode_cell(a: &Args) {
     let seed: u64 = a.num("--seed", 1);
     let role: u64 = a.num("--role", 7);
     let cap: u64 = a.num("--cap", 100_000_000);
-    let from: usize = a.num("--from", 0);
-    let to: usize = a.num("--to", usize::MAX);
+    let only: Vec<u64> = a.list("--only");
     let truth: bool = a.has("--truth");
     let arms: Vec<String> = a.flag("--arms").map(|s| s.split(',').map(|x| x.to_string()).collect()).unwrap_or_else(|| ARMS.iter().map(|s| s.to_string()).collect());
     let ms = read_models(&a.flag("--models").unwrap_or_else(|| fail("--models")));
     let cms_bin = a.flag("--cms");
     let gf = Gf::new(n);
     let insts = gen_insts(&gf, n, l, seed, role, np, nr);
-    for it in insts.iter().skip(from).take(to.saturating_sub(from)) {
+    for it in insts.iter().filter(|it| only.is_empty() || only.contains(&(it.idx as u64))) {
         let (sys, eqs) = build_sys(&gf, it);
         let direct = if truth { Some(direct_count(&gf, l, it.xr)) } else { None };
         let mut verdicts: Vec<Verdict> = Vec::new();
@@ -2223,6 +2222,7 @@ fn mode_summarize(a: &Args) {
     let cands: Vec<String> = a.flag("--cands").map(|s| s.split(',').map(|x| x.to_string()).collect()).unwrap_or_else(|| ["b", "b2", "c"].iter().map(|s| s.to_string()).collect());
     let controls: Vec<String> = a.flag("--controls").map(|s| s.split(',').map(|x| x.to_string()).collect()).unwrap_or_else(|| ["bs", "b2s", "d", "a2"].iter().map(|s| s.to_string()).collect());
     let thr: f64 = a.num("--threshold", 1.3);
+    let min_pairs: usize = a.num("--min-pairs", 100);
     let boots: usize = a.num("--boots", 10000);
     let kappas = [0.0, 0.1, 1.0];
     let mut recs: Vec<Rec> = Vec::new();
@@ -2310,7 +2310,7 @@ fn mode_summarize(a: &Args) {
             pass_all &= pass;
             if ki == 0 {
                 pass_k0 = pass;
-                regress_k0 = hi < 1.0;
+                regress_k0 = hi < 1.0 && med <= 1.0 / 1.1;
             }
             let mut per: Vec<String> = Vec::new();
             let mut ns: Vec<u32> = tags.iter().map(|t| t.0).collect();
@@ -2328,7 +2328,7 @@ fn mode_summarize(a: &Args) {
             }
             println!("rule {arm} vs {base} kappa={k}: pairs {} median ratio {med:.4} CI [{lo:.4}, {hi:.4}] pass {pass}  ({})", r.len(), per.join(" "));
         }
-        let word = if npair < 100 && sizes.len() >= 4 {
+        let word = if npair < min_pairs {
             "INCONCLUSIVE"
         } else if pass_all {
             "ADVANCES"
@@ -2339,8 +2339,26 @@ fn mode_summarize(a: &Args) {
         } else {
             "MATCHES"
         };
-        println!("VERDICT {arm} vs {base}: {word} (level: constant, ratio of D+P+Q+k*W, kappa in 0,0.1,1; threshold {thr})");
+        let frozen = cands.contains(arm) && *base == incumbent;
+        println!(
+            "{} {arm} vs {base}: {word} (level: constant; ratio of D+P+Q+k*W at k in 0,0.1,1; ADVANCES needs median >= {thr} with the bootstrap interval above 1 at all three)",
+            if frozen { "VERDICT" } else { "DESCRIPTIVE" }
+        );
         verdicts.push((format!("{arm} vs {base}"), word.to_string()));
+    }
+    // attribution: a shuffled-label control that passes the rule at kappa = 0 means the gain is not learning
+    for (pair, word) in &verdicts {
+        if pair.ends_with(&format!("vs {incumbent}")) && (word == "ADVANCES" || word == "TRADES") {
+            let arm = pair.split(' ').next().unwrap();
+            if cands.contains(&arm.to_string()) {
+                let bad: Vec<&str> = verdicts
+                    .iter()
+                    .filter(|(p2, w2)| (p2.starts_with("bs ") || p2.starts_with("b2s ")) && p2.ends_with(&format!("vs {incumbent}")) && (w2 == "ADVANCES" || w2 == "TRADES"))
+                    .map(|(p2, _)| p2.as_str())
+                    .collect();
+                println!("ATTRIBUTION {arm}: {}", if bad.is_empty() { "no shuffled-label control passes; the gain is attributable to the learned labels".to_string() } else { format!("shuffled-label control(s) {bad:?} also pass: the gain is NOT attributable to learning") });
+            }
+        }
     }
     let _ = verdicts;
 }
