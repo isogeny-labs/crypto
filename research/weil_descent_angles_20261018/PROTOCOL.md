@@ -342,3 +342,41 @@ a coverage deficit means fewer relations per trial, so the effect, if
 confirmed, is a constant-factor penalty for the attacker at `n = 2`, offset
 in solving cost only by the fact that the oracle is linear algebra over
 F_2.
+
+## Amendment E (Parts O/J), after smoke runs and before the recorded run
+
+Smoke runs at `log2 #E = 16 … 28`, with outputs discarded, showed four
+things.
+
+1. **Rho restarted after every distinguished point.** Each restart cost two
+   fresh scalar multiplications, so rho was overpriced. The reference arm now
+   follows van Oorschot–Wiener: a trail continues through a distinguished
+   point, and a fresh start is taken only when a trail meets its own stored
+   point or a fruitless cycle exceeds the length bound. This makes the
+   reference stronger.
+2. **Seeds.** Job seeds were successive xorshift outputs, so two jobs ran
+   shifted copies of one stream. They found the same curve. Seeds now come
+   from splitmix64 of (size, instance).
+3. **IC answers mostly come from large-prime cycles.** The answer usually
+   arrives as a cycle among large primes, which is a direct relation
+   `a + b k = 0` with no factor-base columns, long before `|B| + 10`
+   B-relations exist. Every arm now tries `k` as soon as a direct relation
+   appears, and still verifies `k·P = Q`. The B-relation path and dense
+   elimination are unchanged. The expected cost of the first cycle in a
+   random multigraph on `n ≈ p/2` vertices is `n/3` edges, so about `p/3`
+   trials. This does not depend on the cofactor `h`. Rho needs
+   `≈ 0.886 p/√h`. The factor-base size `c` should therefore barely
+   matter; it is still run at `c ∈ {1, 2, 4}`.
+4. **Jacobian pricing (a)** is now the measured count of this tool's genus-2
+   arithmetic. That arithmetic has a reduced-formula fast path for the
+   generic addition (41 M + 1 I) and doubling (48 M + 1 I), with Cantor
+   (113 M + 4 I, 116 M + 4 I) for every other case. The fast path agrees
+   with Cantor on every tested pair (tests; `check` K5). The Cantor-only
+   count is reported in `checks.txt` but is not used for ranking. Pricing
+   (b) is unchanged.
+
+Sizes: `log2 #E ∈ {20, 24, 28, 32}` as frozen, plus **36 and 40** as an
+extension declared now, so the per-`p` constants can be read where the
+fixed setup (r scalar multiplications) is amortised. Every other parameter
+of Addendum A and Amendment C stands. The added prediction **P8b** is
+`steps/p → 1/3` for Arm J at every `h`, against `0.886/√h` for rho.
