@@ -437,3 +437,172 @@ Changes, frozen before the re-run:
 
 Everything else stays as in Addendum A and Amendments C and E. The re-run
 is the recorded Part O/J result.
+
+## Addendum H (round 4: follow-up experiments), frozen before any of them runs
+
+The owner approved all eight leads on 2026-10-18 ("yes to all"). Cloud jobs
+go through the `ephemeral` runner (AGENTS.md §9a). Every job records the
+commit, the instance type, `host.txt` and `rusage.txt`. Costs are counted
+operations, as in rounds 1–3. Each experiment states its decision rule
+before it runs.
+
+### H1 (lead 3.1): the cofactor law for Arm J — first
+
+**Hypothesis.** Arm J's trials scale as `p/h^α`. Rho scales as
+`0.886·p/√h`. If `α > ½`, Arm J beats rho by count on large-cofactor curves
+over `F_{p²}`.
+
+**Instances.** The Scholten family, so `h` is even. The cofactor is exact
+(`#E = h·ℓ`, `ℓ` prime), with
+`h ∈ {2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128}` and
+`log2 #E ∈ {32, 36, 40}`. Each `(h, size)` cell has 4 instances × 10
+targets.
+
+**Arms.** R (rho, as in Amendment G) and J (`c = 2`, walk). At 32 bits
+only, also Jind (independent trials, Amendment F).
+
+**Recorded per run.** trials/p, the split fraction, and the cofactor
+group's structure (cyclic or not, from `ℓ·P` on random points).
+
+**Model check M-H1.** For each instance at `log2 #E ≤ 36`, compute the
+class `ℓ·P` of every degree-1 point. Simulate the uniform admissible-pair
+graph: an edge joins two points whose classes cancel up to sign. Read the
+first cycle with union-find, then trials = edges / (measured split
+fraction). Compare the measured trials with the model, cell by cell.
+
+**Statistic.** Fit `α` by least squares of `log(trials/p)` on `log h`
+over the cell means, with a bootstrap 95% interval (resampling instances
+within cells).
+
+**Decision.**
+- Interval entirely below ½: Arm J never beats rho on count; stop this
+  line.
+- Interval entirely above ½: report the crossover `h*`, where the count
+  ratio times the per-operation cost ratio (measured, and IC-favourable)
+  falls below 1 in every pricing cell.
+- Otherwise: unresolved.
+
+### H2 (lead 3.2): the general transfer, and `h = 1`
+
+**Hypothesis.** Any `E/F_{p²}` with `j ∉ F_p` can be glued to `E^σ` along
+Frobenius on `E[2]` (Kani / Howe–Leprévost–Poonen). This gives a bielliptic
+genus-2 `C/F_{p²}`, `y² = s_1 Π(x² − (a_i − s_2)/s_1)`, with quotient maps
+`X = s_1x² + s_2` and `X' = t_1/x² + t_2`. Here `(b_i − t_2)(a_i − s_2) = k`
+with `b_i = a_i^p`; `s_2, t_2, k` are solved linearly, and
+`s_1 = −kΠ(a_i − s_2)`. `C` should descend to `F_p` through the descent
+datum `x ↦ λ/x^σ`, with `λ² = k/N(s_1)`.
+
+**Tool.** A new `examples/res_glue.rs`:
+- `F_{p⁶}` arithmetic for the 2-torsion of odd-order `E`;
+- the gluing;
+- the `F_p` model through a Baer-subline (cross-ratio) map;
+- balanced real-model (sextic) Jacobian arithmetic, since odd order means
+  no rational Weierstrass point;
+- the transfer `τ = φ_1^* + σ`.
+
+**Checks.**
+- G1: `#C(F_p) = p + 1` and `#C(F_{p²}) = p² + 1 − 2t`;
+- G2: the group law is associative, `A + (−A) = 0`, and `N·A = 0`;
+- G3: `τ` is a homomorphism, nonzero on the `ℓ`-part, with `ℓ·τ(P) = 0`;
+- G4: on the Scholten family, the result agrees with `n2_routes`
+  (same `#Jac`).
+
+**Measurement.** Arm J and rho at `h = 1` and `h = 2`, with
+`log2 #E ∈ {28, 32, 36, 40}`, 4 instances × 10 targets.
+
+**Decision.** If G1–G3 hold, the route reaches every curve over `F_{p²}`.
+The report then states the `h = 1` gap to rho.
+
+### H3 (lead 3.3): a cheaper measured Jacobian operation
+
+**Work.**
+- Reduced formulas with values precomputed per walk multiplier (the
+  resultant and inverse pieces of `u_2`).
+- Mixed addition in the walk.
+- An honest split-test price: the Legendre symbol at one `I`, replacing
+  the table lookup.
+
+**Checks.** The new formulas must agree with Cantor on 10⁵ random pairs.
+They replace the measured price (a) only if they agree everywhere.
+
+**Decision.** Report `c_J/c_E` before and after. Not admissible: any
+literature constant.
+
+### H4 (lead 3.4): memory against time
+
+**Arm Jθ.** Keep a relation only if both of its points are
+"distinguished", with `θ ∈ {1, ½, ¼, ⅛}`.
+
+**Record.** Trials, and the peak count of stored rows. Rho's stored
+distinguished points are the reference.
+
+**Prediction.** Trials ∝ `1/θ` and memory ∝ `θ`. The time × memory product
+is then about constant, near `p²/9`, against rho's `≈ p·(p/2^d)`.
+
+**Sizes.** `log2 #E ∈ {32, 36}`.
+
+### H5 (lead 3.5): automorphisms
+
+**Census.** An exact census over `F_p`, `p ∈ {5, 7, 11, 13}`, of genus-2
+curves with even L-polynomial (`a_1 = 0`) and a nontrivial reduced
+automorphism group over `F_p`. Each class records whether its Jacobian
+splits over `F_p`.
+
+**Decision.** If a non-split class exists, measure Arm J with the
+automorphism-reduced graph on it, against rho in `Jac(C)` with the same
+automorphism.
+
+### H6 (lead 3.6): larger sizes
+
+**Run.** `log2 #E ∈ {44, 48}`, arms R, J and D at `c = 2`, 3 instances ×
+10 targets.
+
+**Prediction.** The per-`p` constants of Amendment G hold.
+
+### H7 (leads 1.1 and 1.2): coverage of the target subgroup
+
+**What is measured.** For each curve and arm (subfield, null), exact
+coverage of the `ℓ`-subgroup (`h·E`) and of each layer `2^k E`.
+
+**Cells.**
+- **1.1:** binary `n = 2` (`m = 4…10`) and `n = 4` (`m = 3…5`), 3 curves
+  each.
+- **1.2:** odd `n = 2` and 4 with `E ≅ Y² = Π(X − d e_i)`, `e_i ∈ F_q`,
+  `d ∈ F_{q^n}` generic. The factor base is `X ∈ d·F_q`.
+- **Controls:** odd generic `E` (Part D curves), and the null arm in every
+  cell.
+
+**Prediction.** Gain over null = `[E : H]` for the coset subgroup `H`:
+2 for binary, 4 for odd full-2-torsion at even `n`. The `ℓ`-subgroup is
+covered like `2E`.
+
+**Statistic.** Paired ratio of coverage on the `ℓ`-subgroup (subfield
+over null), with a z-score.
+
+### H8 (lead 1.3): decomposition crossover at `n = 3`
+
+**Arm D3.** Gaudry decomposition in `E(F_{p³})` with factor base
+`x ∈ F_p`. The oracle is the descended `S_3`. Resultants eliminate the
+system to a univariate polynomial; its roots are found by gcd with
+`x^p − x`. It is verified against brute force at `p ≤ 31`.
+
+**Comparison.** Against rho on `E(F_{p³})`, at `p ≈ 2^6 … 2^13`, 3
+instances × 5 targets, with the pricing band.
+
+**Record.** The exponent and the extrapolated crossover. An extrapolation
+is labelled as one.
+
+### H9 (lead 2.1): solving degree of PKM systems
+
+**Run.** The repo's degree-of-regularity tools (`examples/dreg_*`) on the
+PKM summation systems at `m = 3, 4` over primes of 12–24 bits, with a
+generic control system of the same shape.
+
+**Prediction.** The solving degree grows with `p` (no PKM gain).
+
+### Order and budget
+
+**Order.** H1, H6 and H7 run first on one `c7i.4xlarge` (16 vCPU,
+on-demand, TTL 4 h); their tools exist or need small changes. H2, H3, H4,
+H5, H8 and H9 follow as their tools land, one ephemeral job per
+experiment. Each recorded run follows the research-visuals rule.
