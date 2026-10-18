@@ -1,41 +1,34 @@
-# Tier 1 full-worker rho timing awaits an authorized CPU Pod
+# Qualified full-worker rho timing needs host-level CPU control
 
 - **Status:** `open`
-- **Kind:** access/tool limit and empirical measurement gap
-- **Affected work:** [frozen collaborative rho worker panel](../experiments/rho-worker-phase-profile-20261017/README.md), [worker PR #2137](https://github.com/aburan28/crypto/pull/2137), and [joint-scalar arithmetic closeout PR #920](https://github.com/aburan28/cryptanalysis/pull/920)
-- **Next action owner:** workspace owner for a rotated `RUNPOD_API_KEY` secret and approved source transfer; rho worker task for dispatch and audit
+- **Kind:** empirical measurement and host-isolation gap
+- **Affected work:** [worker experiment and decision table](../experiments/rho-worker-phase-profile-20261017/README.md), [worker PR #2137](https://github.com/aburan28/crypto/pull/2137), and [arithmetic PR #920](https://github.com/aburan28/cryptanalysis/pull/920)
+- **Next action owner:** workspace owner for an administratively controlled Linux host and SSH access; rho worker task for frozen replay and independent audit
 - **Last updated:** 2026-10-18
 
-## Problem
+## Result so far
 
-The frozen 32-Q secp256k1 serial/batch collaborative rho panel cannot establish qualified full-worker throughput until its public source and inputs run on a pinned Tier 1 Linux allocation. The workspace has no `RUNPOD_API_KEY` environment secret. Automatic approval review rejected an earlier transfer of the separate Rust source snapshot; its exact rejection reason was not retained. The chat-pasted key is not a workspace secret.
+The secp256k1 serial and opt-in batch worker paths replay the same frozen walk outputs. The rebased release library suite passed 4,396 tests with zero failures and 118 ignored, and the [32-Q local replay](../experiments/rho-worker-phase-profile-20261017/local-all32-rebased-main-worker-replay/summary.json) completed 64/64 arms and 32/32 exact-output pairs. The [source receipt](../experiments/rho-worker-phase-profile-20261017/shared-lock-source-validation.json) pins public bundle SHA-256 `ccc4c83128510e145bed6e8c04b26eb9a63f617bb2d3665826856ccd91902904` and verifies the fresh build, queue lock, and auditor controls.
 
-The planned comparison has 32 public Q points, 32 walkers per arm, `dp_bits=12`, an 8,192-step cap, four repetitions, and comparison plus serial/serial and batch/batch controls for every Q: 384 pairs and 768 arms. The integration gate requires exact ordered check-ins and verified distinguished-point records, no failed host-noise or A/A gates, added peak RSS within both 10% and 64 MiB, and a Q-cluster bootstrap 95% lower serial/batch charged-time bound above 1.05.
+Five hosted attempts ran on RunPod Pod `94uxi8f876o5gz`. The [decision table](../experiments/rho-worker-phase-profile-20261017/README.md#hosted-worker-decision) and attempt directories retain the frozen plans, raw or partial archives, noise observations, and independent audits. Every aggregate is `unknown_gate_failed`:
 
-## Evidence and uncertainty
+| Attempt | Completed arms / exact pairs | Gate observation |
+| --- | ---: | --- |
+| [1](../experiments/rho-worker-phase-profile-20261017/tier1-pod-20261018/README.md) | 768 / 384 | Three A/A ratios outside `[0.90, 1.11]` |
+| [2](../experiments/rho-worker-phase-profile-20261017/tier1-pod-20261018-r2/README.md) | 768 / 384 | One A/A ratio outside range |
+| [3](../experiments/rho-worker-phase-profile-20261017/tier1-pod-20261018-r3/README.md) | 47 / 23 | Web-terminal threads could run on the measurement core and its SMT sibling |
+| [4](../experiments/rho-worker-phase-profile-20261017/tier1-pod-20261018-r4/README.md) | 8 / 4 | Host-parent `runc` was eligible on those CPUs before the observer armed |
+| [5](../experiments/rho-worker-phase-profile-20261017/tier1-pod-20261018-r5/README.md) | 96 / 48 | Host-parent `runc` became eligible about 701 seconds after barrier release; observer stopped the run |
 
-- **Observed:** The long local replay completed 64/64 arms and 32/32 exact-output pairs on the previous combined source. After rebasing onto repaired main at `abee07ee7337d04a7e734333669ca1bacd6c763a`, the release benchmark built and the [rebased 32-Q replay](../experiments/rho-worker-phase-profile-20261017/local-all32-rebased-main-worker-replay/summary.json) again completed 64/64 arms and 32/32 exact-output pairs. The complete release library suite passed 4,396 tests with zero failures and 118 ignored. The [rebased-main validation receipt](../experiments/rho-worker-phase-profile-20261017/rebased-main-validation.json) binds those checks. The revised [shared-lock source receipt](../experiments/rho-worker-phase-profile-20261017/shared-lock-source-validation.json) pins the current bundle SHA-256 `ccc4c83128510e145bed6e8c04b26eb9a63f617bb2d3665826856ccd91902904`, two identical archive builds, a fresh extracted build, matching q00 serial/batch outputs, a two-process queue-lock check, and synthetic auditor rejection of a container-local lock receipt.
-- **Derived or proved:** Local exact replay establishes output equivalence for its frozen traces. It gives no qualified wall-time bound under the observed host contention.
-- **Suspected explanation:** None is needed for the access gap. The earlier automatic approval rejection applied to source transfer; its detailed reason is unknown.
-- **Missing capability:** A rotated workspace secret and an approved transfer path for the exact public source bundle, followed by a suitable CPU Pod allocation.
-- **Measurement limit:** The qualified full-worker speedup and memory change remain unknown until the hosted panel passes its gates. A failed or noisy run remains a retained failed pair, not a performance decision.
+Attempt 5 had no A/A exception in its completed pairs. Its host-affinity observation still invalidates the aggregate. The charged worker-time ratio, interval, and memory acceptance result remain unknown. Serial routing remains the default. All five archives were copied off the Pod and committed to PR #2137. The Pod had no persistent volume, was idle after the fifth audit, and was stopped through the RunPod API; a subsequent API read reported `EXITED`.
 
 ## What would unblock it
 
-- [ ] Make a rotated `RUNPOD_API_KEY` available as a workspace secret and approve transfer of the exact public source bundle whose SHA-256 is frozen immediately before dispatch. Do not use chat-pasted credentials.
-- [ ] Build the release benchmark from that bundle on the Pod and record allocation, binary, fixture and source hashes, CPU/NUMA/cgroup envelope, and host counters.
-- [ ] Execute all 768 arms serially under the shared Pod queue lock and independently audit every raw arm, pair, A/A control, phase sum, point record, memory observation and noise gate. Keep physical-host exclusivity marked unproven for Tier 1.
-
-These conditions permit a qualified decision. A passing lower bound above 1.05 and acceptable memory permit default routing; a qualified result below the gate retains the serial default and closes the worker arithmetic decision. A noisy or incomplete panel leaves the result unknown and requires a repeat under the same frozen plan.
-
-## Next discriminating step
-
-- **Action:** Dispatch the [frozen Tier 1 panel](../experiments/rho-worker-phase-profile-20261017/README.md) after the source and allocation are pinned.
-- **Inputs and controls:** Same 32 public Q points for both paths; alternating serial/batch arms with serial/serial and batch/batch controls; exact ordered check-in and distinguished-point replay.
-- **Execution limits and stop condition:** 768 planned arms, one child at a time; 180-second per-arm timeout; retain every failed or interrupted arm and stop only when the plan completes or an infrastructure failure is recorded.
-- **Outcomes:** A qualified >1.05 lower bound advances the batch default; a qualified lower result keeps the serial default; failed host/A/A/structural gates keep aggregate speedup unknown. Infrastructure failure is recorded separately.
-- **Recheck trigger:** Rotated secret plus approved source transfer, or a qualified alternative Linux allocation with an equivalent auditable host record.
+- [ ] Provide SSH access to a Linux host with administrative control of benchmark CPUs, their SMT siblings, NUMA memory placement, IRQ routing, frequency policy, and background services. Record the actual host-level isolation configuration and its verification, rather than inferring exclusivity from a container affinity mask.
+- [ ] Rebuild the pinned source on that host and freeze allocation, binary, fixture, and source hashes before dispatch. Confirm exact replay and the queue lock there.
+- [ ] Run the frozen 128-walker panel with 32 public Q points, `dp_bits=12`, an 8,192-step cap, four repetitions, serial/batch and A/A pairs, one child at a time. Retain every failed or interrupted arm and independently audit ordered check-ins, distinguished points, phase sums, A/A, memory, throttling, steal time, and host noise.
+- [ ] Apply the declared integration gate: a Q-cluster bootstrap paired 95% lower serial/batch charged-time bound above 1.05, exact replay, and added peak RSS within both 10% and 64 MiB. A qualified lower result keeps serial routing and closes the worker decision; a failed isolation or A/A gate leaves the speed result unknown.
 
 ## Resolution and history
 
-Unresolved. The source, correctness replay, and audit controls are committed in PR #2137. Recheck the source hash after any branch change before dispatch.
+Unresolved. The previously recorded need for a RunPod key and source-transfer approval was satisfied when the Pod was launched and the public bundle was uploaded; it is no longer the access blocker. The current blocker is host-level interference on the measurement CPUs. CI for PR #2137 was still queued at the last check; PR #920's reported checks passed. Recheck the source hash and PR status before dispatch or merge.
