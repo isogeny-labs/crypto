@@ -15,11 +15,15 @@ PAIR_FIELDS = [
 ]
 
 
-def frozen_case(binary, q_manifest, q_index, q_hex, kind, reference, candidate):
+def frozen_case(binary, q_manifest, q_index, q_hex, kind, reference, candidate,
+                walkers, checkin_every):
     def command(mode):
         width = 1 if mode == 'serial' else 32
-        return [str(binary), str(q_manifest), str(q_index), mode,
-                '32', '12', '8192', str(width)]
+        argv = [str(binary), str(q_manifest), str(q_index), mode,
+                str(walkers), '12', '8192', str(width)]
+        if checkin_every != 8:
+            argv.append(str(checkin_every))
+        return argv
 
     return {
         'id': f'q{q_index:02d}-{kind}',
@@ -43,6 +47,8 @@ def main():
     parser.add_argument('--allocation-receipt', type=Path, required=True)
     parser.add_argument('--allocation-id', required=True)
     parser.add_argument('--execution-cpu', type=int, required=True)
+    parser.add_argument('--walkers', type=int, default=32)
+    parser.add_argument('--checkin-every', type=int, default=8)
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
     binary = args.binary.resolve(strict=True)
@@ -53,6 +59,8 @@ def main():
         parser.error('binary, source bundle, and allocation receipt must be files')
     if args.execution_cpu < 0:
         parser.error('execution CPU must be nonnegative')
+    if not 1 <= args.checkin_every <= args.walkers <= 256 or args.walkers < 32:
+        parser.error('require 32 <= walkers <= 256 and 1 <= checkin-every <= walkers')
     raw_q = q_manifest.read_bytes()
     if sha256(raw_q).hexdigest() != EXPECTED_Q_SHA256:
         parser.error('frozen Q manifest hash mismatch')
@@ -64,11 +72,14 @@ def main():
         q_hex = fixture['q_hex']
         cases.extend([
             frozen_case(binary, q_manifest, q_index, q_hex,
-                        'comparison', 'serial', 'batch'),
+                        'comparison', 'serial', 'batch', args.walkers,
+                        args.checkin_every),
             frozen_case(binary, q_manifest, q_index, q_hex,
-                        'aa_serial', 'serial', 'serial'),
+                        'aa_serial', 'serial', 'serial', args.walkers,
+                        args.checkin_every),
             frozen_case(binary, q_manifest, q_index, q_hex,
-                        'aa_batch', 'batch', 'batch'),
+                        'aa_batch', 'batch', 'batch', args.walkers,
+                        args.checkin_every),
         ])
     plan = {
         'schema': 1,
@@ -84,10 +95,10 @@ def main():
         'outer_repeats': 1,
         'timeout_s': 180,
         'workload': {
-            'walkers_requested': 32,
+            'walkers_requested': args.walkers,
             'dp_bits': 12,
             'step_cap': 8192,
-            'checkin_every': 8,
+            'checkin_every': args.checkin_every,
             'batch_width': 32,
         },
         'pair_fields': PAIR_FIELDS,

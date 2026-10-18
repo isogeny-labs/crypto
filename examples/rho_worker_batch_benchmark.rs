@@ -36,10 +36,9 @@ fn peak_rss_kib() -> Option<u64> {
 
 fn main() {
     let args = std::env::args().collect::<Vec<_>>();
-    assert_eq!(
-        args.len(),
-        8,
-        "usage: rho_worker_batch_benchmark MANIFEST Q_INDEX serial|batch WALKERS DP_BITS STEP_CAP BATCH_WIDTH"
+    assert!(
+        matches!(args.len(), 8 | 9),
+        "usage: rho_worker_batch_benchmark MANIFEST Q_INDEX serial|batch WALKERS DP_BITS STEP_CAP BATCH_WIDTH [CHECKIN_EVERY]"
     );
     let manifest_bytes = fs::read(&args[1]).expect("read frozen Q manifest");
     let manifest_sha256 = hex::encode(sha256(&manifest_bytes));
@@ -56,9 +55,13 @@ fn main() {
     let dp_bits: u8 = args[5].parse().expect("DP bits");
     let step_cap: u64 = args[6].parse().expect("step cap");
     let batch_width: usize = args[7].parse().expect("batch width");
+    let checkin_every: u64 = args
+        .get(8)
+        .map_or(8, |word| word.parse().expect("checkin every"));
     assert!(walkers > 0 && walkers <= 256 && step_cap > 0);
     assert!((2..32).contains(&dp_bits));
     assert!(batch_width > 0 && batch_width <= walkers as usize);
+    assert!(checkin_every > 0 && checkin_every <= walkers);
     assert!(mode == "batch" || batch_width == 1);
 
     let curve = CurveParams::secp256k1();
@@ -92,7 +95,7 @@ fn main() {
     let setup_ns = setup_started.elapsed().as_nanos();
 
     let options = LaneOptions {
-        checkin_every: 8,
+        checkin_every,
         claim_window: 1,
         max_units: 1,
         max_walkers: walkers,
