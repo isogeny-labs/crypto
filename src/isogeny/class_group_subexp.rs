@@ -589,10 +589,19 @@ fn trial_batch(
         // base product F = prod g_i^{±1}
         let mut exps: Vec<(u32, i64)> = Vec::new();
         let mut base: Option<Bqf> = None;
-        let extra = rng.gen_range(0..=2);
+        // past the bit target, 0..=2 further terms (a varying term count)
+        let extra: u32 = rng.gen_range(0..=2);
+        let mut remaining_extra: Option<u32> = None;
         let mut acc_bits = 0.0f64;
         let mut k_base = 0usize;
-        while acc_bits < target_bits || k_base < 1 + extra {
+        loop {
+            if acc_bits >= target_bits {
+                let left = remaining_extra.get_or_insert(extra);
+                if *left == 0 {
+                    break;
+                }
+                *left -= 1;
+            }
             k_base += 1;
             if k_base > 4096 {
                 break;

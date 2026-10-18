@@ -568,7 +568,7 @@ fn main() {
     let mut md = Vec::new();
     md.push(format!(
         "## Native isogeny-loop sweep — cost model(s) {}, doubling {} M, primes ℓ ≤ {}, radius factor {}",
-        model_names(args),
+        model_names(&args),
         args.doubling_cost,
         args.prime_bound,
         args.radius_factor
@@ -593,7 +593,7 @@ fn main() {
             results.push(out);
             if let Some(p) = &args.json {
                 let payload = json!({"mode": "curve", "start_utc": start,
-                    "cost_models": model_names(args), "doubling_cost": args.doubling_cost,
+                    "cost_models": model_names(&args), "doubling_cost": args.doubling_cost,
                     "prime_bound": args.prime_bound, "radius_factor": args.radius_factor,
                     "fb_factor": args.fb_factor, "seed": args.seed, "node_cap": args.node_cap,
                     "certify_minimum": args.certify,
@@ -687,7 +687,7 @@ fn scan(args: &Args, start: &str, t0: Instant) {
         }
         scanned += 1;
         let t: i64 = if d.rem_euclid(2) == 0 { 0 } else { 1 };
-        let q = (BigInt::from(t) * t - d) / 4;
+        let q: BigInt = (BigInt::from(t) * t - d) / 4i64;
         let rec = json!({
             "curve": {"name": format!("D={d}"), "family": if args.char2 { "binary" } else { "prime" },
                 "q": q.to_string(), "trace": t.to_string(), "r": r_fake.to_string(), "n": 1},
