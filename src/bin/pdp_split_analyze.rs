@@ -259,9 +259,17 @@ fn main() {
         .filter_map(|(i, _)| args.get(i + 1).cloned())
         .collect();
     let (ecbench_json, ecbench_table) = ecbench_summary(&ecbench_dirs, &calibration);
+    let ladder_files: Vec<String> = args
+        .iter()
+        .enumerate()
+        .filter(|(_, a)| *a == "--ladder")
+        .filter_map(|(i, _)| args.get(i + 1).cloned())
+        .collect();
+    let (ladder_json, ladder_table) = ladder_summary(&ladder_files);
     let analysis = json!({
         "schema": "pdp_split_dreg.analysis/v1",
         "ecbench": ecbench_json,
+        "ladder": ladder_json,
         "inputs": {"runs": runs_dir, "rho_session": session, "calibration": calibration_path, "replica": flag("--replica")},
         "projection_rule": "S_relations = (F+1)/lambda * mean_word_xors * ns_per_word_xor / sqrt(r); relation phase only; pinned ratio from another host",
         "replica_runs_compared": replica_compared,
@@ -277,6 +285,7 @@ fn main() {
         print!("{table}");
     }
     print!("{ecbench_table}");
+    print!("{ladder_table}");
     println!("\nreplica: {replica_compared} runs compared, {replica_mismatch} mismatched (solving degree, word XORs, verified count)");
 }
 
@@ -419,6 +428,89 @@ fn ecbench_summary(dirs: &[String], calibration: &Value) -> (Value, String) {
             "rows": out,
         }),
         if dirs.is_empty() {
+            String::new()
+        } else {
+            table
+        },
+    )
+}
+
+/// The F4 cost-per-unknown ladder (round 3, Part B): per (cell, plan, g),
+/// the residual unknowns `k = n_vars − g` after guessing, the mean F4 word
+/// XORs per branch and per target, the mean F4 wall per branch
+/// (descriptive), the solving degree, and — between consecutive `k` of one
+/// (n, ℓ-independent) series — the growth factor per residual unknown,
+/// `(cost_k2 / cost_k1)^(1/(k2−k1))`.  Enumeration grows by 2 per unknown;
+/// a factor above 2 means F4 is dearer than enumeration on that step.
+fn ladder_summary(files: &[String]) -> (Value, String) {
+    // (n, plan, k) -> (ell, g, per-branch XORs, per-target XORs, per-branch wall s, sd, cells)
+    let mut rows: BTreeMap<(u64, String, u64), (u64, u64, Vec<f64>, Vec<f64>, Vec<f64>, Vec<u64>)> =
+        BTreeMap::new();
+    let mut cells = Vec::new();
+    for f in files {
+        for r in read_jsonl(Path::new(f)) {
+            if r["kind"] == "cell" {
+                cells.push(json!({
+                    "file": f, "n": r["n"], "ell": r["ell"], "base": r["base"],
+                    "closure_abscissae": r["closure_abscissae"], "closure_columns": r["closure_columns"],
+                    "lambda_per_system": r["lambda_system_decompositions"].as_f64().unwrap_or(0.0)
+                        / r["lambda_systems"].as_f64().unwrap_or(1.0).max(1.0),
+                }));
+                continue;
+            }
+            if r["kind"] != "run" {
+                continue;
+            }
+            let (n, ell, g) = (u(&r, "n"), u(&r, "ell"), u(&r, "g"));
+            let n_vars = u(&r, "n_vars");
+            let branches = u(&r, "branches").max(1) as f64;
+            let xors = u(&r, "word_xors") as f64;
+            let wall = u(&r, "f4_wall_ns") as f64 * 1e-9;
+            let e = rows
+                .entry((n, r["plan"].as_str().unwrap().to_string(), n_vars - g))
+                .or_insert((ell, g, Vec::new(), Vec::new(), Vec::new(), Vec::new()));
+            e.2.push(xors / branches);
+            e.3.push(xors);
+            e.4.push(wall / branches);
+            e.5.push(u(&r, "solving_degree_max"));
+        }
+    }
+    let mut out = Vec::new();
+    let mut table = String::from(
+        "\n| n | plan | ℓ | g | residual k | runs | mean XORs / branch | mean XORs / target | mean F4 wall / branch (s, descriptive) | solving degree | growth per unknown vs previous k |\n\
+         |--:|---|--:|--:|--:|--:|--:|--:|--:|---|--:|\n",
+    );
+    let mut prev: Option<((u64, String), u64, f64)> = None;
+    for ((n, plan, k), (ell, g, pb, pt, pw, sd)) in &rows {
+        let mpb = mean(pb).unwrap_or(0.0);
+        let growth = match &prev {
+            Some((key, k1, c1)) if *key == (*n, plan.clone()) && *k > *k1 && *c1 > 0.0 => {
+                Some((mpb / c1).powf(1.0 / (*k - *k1) as f64))
+            }
+            _ => None,
+        };
+        prev = Some(((*n, plan.clone()), *k, mpb));
+        let sds: Vec<String> = sd.iter().map(|d| d.to_string()).collect();
+        table.push_str(&format!(
+            "| {n} | {plan} | {ell} | {g} | {k} | {} | {:.3e} | {:.3e} | {:.4} | {} | {} |\n",
+            pb.len(),
+            mpb,
+            mean(pt).unwrap_or(0.0),
+            mean(pw).unwrap_or(0.0),
+            sds.join(","),
+            growth.map_or("—".to_string(), |x| format!("{x:.2}")),
+        ));
+        out.push(json!({
+            "n": n, "plan": plan, "ell": ell, "g": g, "residual_unknowns": k, "runs": pb.len(),
+            "mean_xors_per_branch": mpb, "mean_xors_per_target": mean(pt),
+            "mean_f4_wall_s_per_branch_descriptive": mean(pw),
+            "solving_degree_per_run": sd, "growth_per_unknown_vs_previous_k": growth,
+        }));
+    }
+    (
+        json!({"files": files, "cells": cells, "rows": out,
+               "rule": "growth = (cost_k2/cost_k1)^(1/(k2-k1)) on mean XORs per branch; enumeration is 2"}),
+        if files.is_empty() {
             String::new()
         } else {
             table
