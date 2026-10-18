@@ -131,6 +131,8 @@ jobs:
       - name: Materialize native fixture inputs
         run: node .github/scripts/ci-scope.mjs --materialize
       - uses: dtolnay/rust-toolchain@1.98
+        with:
+          components: clippy
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: ecbench
