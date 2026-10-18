@@ -122,20 +122,26 @@ fn capacity_preflight(system: &Value) -> Result<Value> {
         .and_then(|line| line.split_whitespace().nth(1))
         .ok_or_else(|| fail("host memory absent"))?
         .parse()?;
-    let cgroup_max = system["memory_max"]
-        .as_str()
-        .ok_or_else(|| fail("cgroup memory absent"))?
-        .trim();
-    let cgroup_bytes = cgroup_max.parse::<u64>().ok();
+    let cgroup_max = system["memory_max"].as_str().map(str::trim);
+    let cgroup_telemetry = cgroup_max.is_some()
+        && system["cpu_max"].as_str().is_some()
+        && system["cpu_stat"].as_str().is_some()
+        && system["memory_events"].as_str().is_some();
+    let cgroup_bytes = cgroup_max.and_then(|value| value.parse::<u64>().ok());
     let required = RSS_CAP_BYTES + 256 * 1024 * 1024;
-    let pass = cpus >= 4
+    let capacity_pass = cpus >= 4
         && mem_total_kib * 1024 >= required
         && cgroup_bytes.is_none_or(|value| value >= RSS_CAP_BYTES);
-    Ok(
-        json!({"status":if pass {"PASS_CAPACITY_PREFLIGHT"} else {"REJECTED_HOST_CAPACITY"},
+    let status = if !cgroup_telemetry {
+        "REJECTED_CGROUP_TELEMETRY"
+    } else if !capacity_pass {
+        "REJECTED_HOST_CAPACITY"
+    } else {
+        "PASS_CAPACITY_PREFLIGHT"
+    };
+    Ok(json!({"status":status,
               "visible_cpus":cpus,"mem_total_kib":mem_total_kib,
-              "cgroup_memory_max":cgroup_max,"rss_cap_bytes":RSS_CAP_BYTES}),
-    )
+              "cgroup_memory_max":cgroup_max,"rss_cap_bytes":RSS_CAP_BYTES}))
 }
 
 fn run_child(
