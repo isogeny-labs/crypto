@@ -43,3 +43,9 @@ any trait digest was written. The [separate format correction receipt](registrat
 retains that failure: only the four new entries were rendered with indented
 sequences and unwrapped scalars; exact hash preimages and old bytes are unchanged.
 The traits owner performs the final native dependency-equivalence/freshness check.
+
+## Current metadata erratum (2026-10-18)
+
+The four post-run candidate aliases described above are no longer present in the authoritative IC crosswalk. Their [exact research-only snapshot and correction provenance](../../research/ideas_execution_20261018/fp4_metadata_erratum/README.md) preserve every field/curve preimage and computed identity without claiming canonical model or representation registration. The native registration receipts and historical reports above remain unchanged at their original source bindings.
+
+References above to current source mean the captured run revision. The example has since received formatting and enum ownership maintenance; the [additive source binding](../../research/ideas_execution_20261018/oracle_integration/historical-label-binding-v2.json) retains the exact measured source. Software checks of the revised example do not remeasure these sessions or make their timings applicable to its changed allocation behavior.

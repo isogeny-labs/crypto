@@ -176,3 +176,9 @@ The IC leaderboard/boundary graphs remain unchanged: these components do
 not establish a new complete IC cost or admissible improvement. Prior
 frozen figures and reports were not rewritten. No commits or pushes were
 made by this workstream.
+
+## Current metadata correction (2026-10-18)
+
+The post-run crosswalk addition described above was withdrawn from the living authoritative mirror after semantic review. The four exact appended candidate records remain in the [unregistered metadata snapshot](../fp4_metadata_erratum/README.md); computed EC1/ICV1 strings do not establish canonical registry membership. Historical registration receipts, source snapshots, plans and reports are unchanged and retain their original commit bindings.
+
+The example has since received formatting and enum ownership maintenance. References above to current source or release tests describe the captured run revision. The [additive source binding](historical-label-binding-v2.json) locates its exact historical source; [software maintenance checks](../runs/pr2148-rust-lint-repair-20261018/REPORT.md) cover the revised example. Historical timings and operation counts do not measure the revised example, which has not been benchmarked again.

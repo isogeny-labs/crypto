@@ -203,7 +203,7 @@ enum MobiusPoint {
     Affine {
         u: F2mElement,
         v: F2mElement,
-        y: F2mElement,
+        y: Box<F2mElement>,
     },
 }
 
@@ -213,7 +213,7 @@ fn encode(p: &BinaryPoint, n: u32) -> MobiusPoint {
         BinaryPoint::Affine { x, y } => MobiusPoint::Affine {
             u: F2mElement::one(n),
             v: x.add(&F2mElement::one(n)),
-            y: y.clone(),
+            y: Box::new(y.clone()),
         },
     }
 }
@@ -226,7 +226,7 @@ fn decode(p: &MobiusPoint, c: &BinaryCurve) -> BinaryPoint {
                 &u.flt_inverse(&c.irreducible).expect("valid inverse chart"),
                 &c.irreducible,
             ),
-            y: y.clone(),
+            y: y.as_ref().clone(),
         },
     }
 }
@@ -745,6 +745,23 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn cloned_mobius_encoding_preserves_every_toy_curve_point() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let c = &kc.curve;
+        assert_eq!(
+            decode(&MobiusPoint::Infinity.clone(), c),
+            BinaryPoint::Infinity
+        );
+        for x in 0u32..128 {
+            for p in points_with_x(c, &F2mElement::from_biguint(&BigUint::from(x), 7)) {
+                let encoded = encode(&p, 7);
+                let cloned = encoded.clone();
+                drop(encoded);
+                assert_eq!(decode(&cloned, c), p);
+            }
+        }
+    }
     #[test]
     fn high_word_field_and_generic_backend_agree() {
         let irr = find_irreducible_sparse_wide(83).unwrap();

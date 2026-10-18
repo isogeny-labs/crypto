@@ -1,0 +1,16 @@
+Pre-edit head: eaedaf1c132ed1f1ff101edd10c75369ab5e2dfe
+Working directory: /workspace/crypto
+Environment: CARGO_HOME=/workspace/toolchains/cargo RUSTUP_HOME=/workspace/toolchains/rustup PATH=/workspace/toolchains/cargo/bin:$PATH CARGO_BUILD_JOBS=2
+Network: explicitly enabled for cargo commands; no scientific or provider actions.
+
+rustup toolchain install 1.98 --profile minimal --component rustfmt,clippy
+rustfmt +1.98 --edition 2021 --config skip_children=true examples/ideas_bounded_memory_export.rs examples/ideas_oracle_components.rs examples/ideas_oracle_factorial_summary.rs src/cryptanalysis/ecbench/workload.rs src/cryptanalysis/gaudry_quartic.rs src/cryptanalysis/jacobian_transfer/mod.rs
+rustfmt +1.98 --edition 2021 --check examples/ideas_bounded_memory_export.rs examples/ideas_oracle_components.rs examples/ideas_oracle_factorial_summary.rs src/cryptanalysis/ecbench/workload.rs src/cryptanalysis/gaudry_quartic.rs src/cryptanalysis/jacobian_transfer/mod.rs
+RUSTUP_TOOLCHAIN=1.98 bash scripts/clippy-maintained.sh
+PYTHONDONTWRITEBYTECODE=1 GIT_NO_LAZY_FETCH=1 python3 scripts/test_curve_names_archived_labels.py
+rustc +stable -Vv
+cargo +stable test --release --locked --lib curve_traits
+cargo +stable test --release --locked --example ideas_bounded_memory_export --example ideas_oracle_components --example ideas_oracle_factorial_summary
+
+The focused curve_traits test command runs after root copied traits SHA256 6b3d5bc69a6d4f321455762bce671ee1f5d949582f38ac325c3a88a193f78922.
+No cargo test --release --lib full-suite rerun is asserted.

@@ -1,0 +1,7 @@
+# Historical source before Rust lint maintenance
+
+The six files listed in `manifest.json` retain their exact bytes from the campaign head before current-source lint maintenance. They use `.rs.source` filenames as historical data. Their `original_path` fields retain the original compilation paths; historical raw source-manifest lines still name those original paths.
+
+The oracle component snapshot is SHA256 `ef34a53b6eb6daf47467cf94ccb5de9427ea6ca309d0a68d50a0cf5e5d4b260f`, Git blob `697b9ce42735024d82c3ae82411c46460a65120b`, present in historical commit `a64f374747836eeac709bfade8cb851e46cf1443`. The other five exact pre-edit sources are bound to captured head `eaedaf1c132ed1f1ff101edd10c75369ab5e2dfe`. Only two examples needed current-source changes; the unchanged four sources remain in the snapshot manifest to preserve the full reviewed set.
+
+The unchanged original `historical-label-binding.json` and raw archive continue to describe the old source and runs. The additive `historical-label-binding-v2.json` supplies its snapshot locator. It does not replace old source hashes with hashes of the revised executable. The revised oracle source boxes one owned field, which changes allocation behavior; old timing and counted-work records are not measurements of that revised source. Only software correctness checks accompany this maintenance. No frozen scientific cell is rerun or reattributed.

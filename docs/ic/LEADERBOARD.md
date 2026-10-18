@@ -264,4 +264,4 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `docs/curves/registry.json` — sha256 `584d070fbec7e21f…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
-- `docs/curves/ic/curves.yaml` — sha256 `658a422ce97ef3ea…`
+- `docs/curves/ic/curves.yaml` — sha256 `ab4891397fe07fca…`
