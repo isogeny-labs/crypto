@@ -54,7 +54,7 @@ use crypto_lib::cryptanalysis::ic_framework::stages::{
 use crypto_lib::cryptanalysis::koblitz_fast::FastPoint;
 use crypto_lib::cryptanalysis::semaev_decomp::SubspaceOracle;
 
-use crate::ps6_kernel::{degenerate_target, sqrt_b, Kernel, Work};
+use crate::ps6_kernel::{base_with_torsion, degenerate_target, Kernel, Work};
 
 /// Unit string of the kernel's count.  It is not `word XORs`, so the runner
 /// leaves it out of `S` and lists it unpriced.
@@ -275,6 +275,12 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for S4GroupLaw<'_> {
         let l = standard_dimension(fb)?;
         self.l = l;
         self.audit = params.flag("audit");
+        if self.audit {
+            // Present and zero until a mismatch, so a clean audit says so.
+            self.tally.insert("audit_checks".into(), 0);
+            self.tally.insert("audit_mismatches".into(), 0);
+            self.tally.insert("audit_baseline_pairs".into(), 0);
+        }
         let inst = self.inst;
         let basis = fb.subspace_basis.clone().expect("checked above");
         let o = SubspaceOracle::new(&basis, inst.b, &inst.gf);
@@ -287,14 +293,13 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for S4GroupLaw<'_> {
         // base supplies every abscissa of V that lifts (x = 0 is not in it,
         // being the 2-torsion point T = (0, sqrt b), which the baseline's
         // span does contain and the kernel's base must too).
-        let mut base: Vec<(u64, u64)> = Vec::with_capacity(fb.abscissa_list.len() + 1);
-        base.push((0, sqrt_b(&inst.gf, inst.b)));
+        let mut pts: Vec<(u64, u64)> = Vec::with_capacity(fb.abscissa_list.len() + 1);
         for &x in &fb.abscissa_list {
             let idx = fb.x_index.get(&x).ok_or("abscissa without a point")?;
             let p = fb.points[idx[0]];
-            base.push((p.x, p.y));
+            pts.push((p.x, p.y));
         }
-        base.sort_unstable_by_key(|&(x, _)| x);
+        let base = base_with_torsion(&inst.gf, inst.b, pts);
         if base.windows(2).any(|w| w[0].0 == w[1].0) || base.iter().any(|&(x, _)| x >> l != 0) {
             return Err("the factor base is not the abscissae of the subspace".into());
         }

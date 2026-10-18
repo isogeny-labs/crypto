@@ -82,6 +82,16 @@ pub fn sqrt_b(gf: &Gf2, b: u64) -> u64 {
     gf.sqr_k(b, gf.n - 1)
 }
 
+/// The kernel's base: the rational points of `V` that the run's factor base
+/// holds (any one of the two signs each) plus the 2-torsion point
+/// `T = (0, √b)`, which the baseline's span contains and the factor base,
+/// built from the non-zero abscissae, does not.  Sorted by abscissa.
+pub fn base_with_torsion(gf: &Gf2, b: u64, mut points: Vec<(u64, u64)>) -> Vec<(u64, u64)> {
+    points.push((0, sqrt_b(gf, b)));
+    points.sort_unstable_by_key(|&(x, _)| x);
+    points
+}
+
 /// A target for which the group-law formulation can disagree with the
 /// baseline: `x_R = 0` (R is 2-torsion), `x_R ∈ V`, or `√b / x_R ∈ V`
 /// (translation by `T` sends `x ↦ √b / x`).  `V = {x < 2^l}`.
