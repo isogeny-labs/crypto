@@ -94,4 +94,64 @@ about 2 % at these sample sizes).
   η²(target) = 0.0089, η²(source) = 0.0003; KW by target p = 0.15, by
   source p = 0.56; no cell flagged (largest |z| 3.17 against 3.66).
 
-<!-- K follows -->
+### K (Koblitz E_0 over F_2^41, class of 708,153 curves, 11 measured over all 4 strata)
+
+- **The class.** `D = 703889² · (−7)`, `703889 = 409 · 1721`, `h(−7) = 1`: the
+  Koblitz curve is alone on the crater of both volcanoes, every horizontal
+  edge is a loop, and the class is the crater plus `h(409²·(−7)) = 410`,
+  `h(1721²·(−7)) = 1,722` and `h(703889²·(−7)) = 706,020` curves (the last
+  counted directly as well as by the formula). For odd `m` every prime of
+  the conductor is `≡ ±1 (mod 8)`, so there is no 3-, 5-, 7- or
+  13-isogeny to walk: the only way off the crater is a 409- or a
+  1721-isogeny. Their division polynomials have degree 83,640 and
+  1,480,920; the torsion route found three kernels of each at each vertex
+  through abscissae in `F_2^{41·204}` and `F_2^{41·215}` (eigenvalue orbit
+  degrees 204 and 215), 54 Montgomery ladders of 8.3–8.8 kbit, 39 s each
+  on a loaded core; a 409-kernel search took 197 s and a 1721-kernel search
+  978 s (three kernels each), so the transport to a conductor-703889 curve
+  is 9–15 minutes against a 0.46 s solve. Every edge verified on points;
+  `#E` re-counted on all 11 curves; the duals of the sampled edges, found by
+  pushing a second torsion abscissa through them, carried the shifted
+  instances back to the crater.
+- **R1–R3:** all 11 curves within the control distribution (largest |z|
+  2.38 against 2.84); heterogeneity not detected (KW p = 0.21, ANOVA p =
+  0.076, variance ratio 1.70 on 11 curves); the four strata — the Koblitz
+  crater (0.996), conductor 409 (1.009), 1721 (1.001) and 703889 (0.978)
+  — within ±2.5 % of √(πn/2) with |z| ≤ 0.8; both levels of both volcanoes
+  likewise. Representation controls (three other polynomial bases) 0.98,
+  1.03, 0.96; A/A 0.97. The generic walk does not know it is on a Koblitz
+  curve.
+- **R4:** `plant-neg` 0.769 [0.705, 0.838] (z = −5.9); `plant-r4` 1.358
+  [1.221, 1.508] (z = +4.7). **`fold-frob` 0.155 [0.141, 0.170] against the
+  expected 1/√41 = 0.156 (z = −48); `fold-frobneg` 0.113 [0.103, 0.124]
+  against 1/√82 = 0.110 (z = −53).** Each folded step costs 41 squarings
+  more (1.92 and 2.05 µs per step against 0.50 µs), and the fold still
+  wins in wall time: 275 ms and 212 ms per solve against 459 ms. The fold
+  needs `τ: (x, y) ↦ (x², y²)` to be an endomorphism, which it is only when
+  the curve is defined over F_2; every other curve of the class has
+  `b ∉ F_2`, no such map, and the same plain cost. The 409- and
+  1721-isogenies carry the instance away from the only curve where the
+  √(2m) speed-up exists.
+
+- **R5:** 3 curves × 64 generators × 25 seeds, 4,800 solves, all correct.
+  Generator means spread as the null predicts on every curve (sd 94,978–
+  102,029 against 95,141–102,210 expected; variance ratios 1.00–1.04; KW p
+  0.34–0.72); no generator flagged (family 192, largest |z| 3.52 against
+  3.65); |ρ| ≤ 0.20 with every generator feature.
+- **R6:** 3 sources (the crater, a conductor-409 and a conductor-1721
+  curve) × 11 targets × 25 seeds, 825 solves, all correct. η²(target) =
+  0.016, η²(source) = 0.0008; KW by target p = 0.36, by source p = 0.49; no
+  cell flagged (largest |z| 3.11 against 3.17).
+
+### Across the four classes
+
+Everything the protocol allowed the data to say about the curve, the
+stratum, the level, the route, the generator and the source came back
+*within the control distribution*; every positive control came back
+*detected*, at the size the theory of the fold predicts. The spread of
+curve means was 1.1–1.7× the pooled single-solve prediction (1.18, 1.13,
+1.11, 1.70 on 104, 45, 40, 11 curves); the largest is the smallest family,
+and no single curve carried it. The 32-adding walk itself ran 0.5–2.0 %
+above √(πn/2) in every class, consistent with Teske's `1/√(1 − 1/32)`.
+
+

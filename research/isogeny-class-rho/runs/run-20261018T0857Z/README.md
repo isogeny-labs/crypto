@@ -20,12 +20,12 @@ with which records. The reading of the numbers is in the study README
 | P1 | 3137 / 3137 | 104 | 12: 1, 3, 5, 7, 9, 15, 21, 35, 45, 63, 105, 315 | 168 | Elkies 168 | 66 s |
 | P0 | 68 / 68 | 45 | 12: 1, 2, 3, 4, 6, 8, 9, 12, 16, 18, 24, 36 | 44 | Elkies 27, cubic 13, division 4 | 0.4 s |
 | B1 | 177 / 1608 (level-only vertices included) | 40 | 6: 1, 7, 17, 49, 119, 833 | 523 | division 523 | 53 s |
-| K | see below | | | | torsion | |
+| K | 25 / 25 | 11 | 4: 1, 409, 1721, 703889 (all of them) | 10 | torsion 10 (sampled: 3 kernels per vertex and prime; 54 Montgomery ladders of 8,347–8,794 bits in F_2^{41·204} / F_2^{41·215}, 39 s each on average) | 4,922 s (82 min, sharing the host with the measurements) |
 
 `#E` re-counted on every measured curve (`order_checked` = measured in each
 `walk.json`); every edge passed the point checks; no warning in any walk
 log except the expected "Elkies declined (SpecialJ)" at P0's `j = 0` root and
-its `j = 0` neighbours, which took the division route.
+its `j = 0` neighbours, which took the division route. The K walk was run twice with the same command and seed: the first run was killed by an environment restart after the root and one child (its log was overwritten by the re-run, which used the same output directory); the record and `K/walk.log` are from the second.
 
 ## Measurements
 
@@ -40,15 +40,15 @@ its `j = 0` neighbours, which took the division route.
 | B1 | class | 40 + 3 rep + 1 + 2 = 46 | 4,600 | yes | 218 s |
 | B1 | generators | 6 × 64 | 9,600 | yes | 466 s |
 | B1 | shift | 5 × 40 | 5,000 | yes | 246 s |
-| K | class | | | | |
-| K | generators | | | | |
-| K | shift | | | | |
+| K | class | 11 + 3 rep + 1 + 2 + `fold-frob` + `fold-frobneg` = 19 | 1,900 | yes | 218 s |
+| K | generators | 3 × 64 | 4,800 | yes | 563 s |
+| K | shift | 3 × 11 | 825 | yes | 91 s |
 
 ## Replay
 
 Each class mode re-run with `--trials 5` (`<class>/replay/`): P1 550/550,
-P0 260/260, B1 230/230 iteration counts identical to the recorded
-`class/trials.csv` rows with the same arm and seed. K: see below.
+P0 260/260, B1 230/230, K 95/95 iteration counts identical to the recorded
+`class/trials.csv` rows with the same arm and seed.
 
 ## Files
 

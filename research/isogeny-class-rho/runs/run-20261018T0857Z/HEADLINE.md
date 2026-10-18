@@ -28,14 +28,13 @@ returning the planted `k`, every isogeny edge verified on points:
   the plain walk (expected 1/√6 = 0.408, z = −25); on the Koblitz crater the
   Frobenius-folded walk <!-- K-FOLD -->. Those folds exist only on the
   crater curve; every curve the isogenies lead to has lost them and costs
-  the same as the rest. In wall time the Koblitz fold still wins by
-  <!-- K-WALL -->, even though each folded step costs 41 squarings more.
+  the same as the rest. In wall time the Koblitz fold still wins by 1.7× (τ) and 2.2× (τ and negation), even though each folded step costs 41 squarings more (1.9–2.0 µs per step against 0.50 µs).
 - **Hard isogenies are findable and change nothing.** The 409- and
   1721-isogenies of the Koblitz curve (division polynomials of degree
   83,640 and 1,480,920, out of reach) were found through torsion abscissae
-  in `F_{2^{41·204}}` and `F_{2^{41·215}}` in <!-- K-FIND --> each; the
+  in `F_{2^{41·204}}` and `F_{2^{41·215}}` in about 1 min (409) and 5 min (1721) per kernel on a loaded core (three kernels per search: 197 s and 978 s per search); the
   curves they reach (conductor-409, -1721 and -703,889 strata of a
-  708,153-curve class) cost <!-- K-RATIO --> of the reference. End-to-end,
+  708,153-curve class) cost 0.978–1.009 of the reference by stratum (|z| ≤ 0.8), and the crater curve itself 0.996. End-to-end,
   finding the isogeny is the only cost that depends on the route: 7–74 ms
   for the Elkies edges of P1 against a 98 ms solve, 1.4–3.1 s for the 23-
   and 31-isogenies of B1 against a 0.19 s solve.

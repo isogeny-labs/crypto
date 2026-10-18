@@ -1,0 +1,9 @@
+START 2026-10-18T14:46:32Z target/release/isoclass-rho measure --walk research/isogeny-class-rho/runs/run-20261018T0857Z/K/walk.json --mode class --trials 100 --controls 3 --plants --folds --seed 20261018 --out research/isogeny-class-rho/runs/run-20261018T0857Z/K/class
+EXIT 0 2026-10-18T14:50:11Z research/isogeny-class-rho/runs/run-20261018T0857Z/K/class
+START 2026-10-18T14:50:11Z target/release/isoclass-rho measure --walk research/isogeny-class-rho/runs/run-20261018T0857Z/K/walk.json --mode generators --generators 64 --max-vertices 3 --trials 25 --controls 0 --seed 20261018 --out research/isogeny-class-rho/runs/run-20261018T0857Z/K/generators
+EXIT 0 2026-10-18T14:59:36Z research/isogeny-class-rho/runs/run-20261018T0857Z/K/generators
+START 2026-10-18T14:59:36Z target/release/isoclass-rho measure --walk research/isogeny-class-rho/runs/run-20261018T0857Z/K/walk.json --mode shift --trials 25 --seed 20261018 --out research/isogeny-class-rho/runs/run-20261018T0857Z/K/shift
+EXIT 0 2026-10-18T15:01:08Z research/isogeny-class-rho/runs/run-20261018T0857Z/K/shift
+START 2026-10-18T15:01:08Z target/release/isoclass-rho measure --walk research/isogeny-class-rho/runs/run-20261018T0857Z/K/walk.json --mode class --trials 5 --controls 3 --plants --folds --seed 20261018 --out research/isogeny-class-rho/runs/run-20261018T0857Z/K/replay
+EXIT 0 2026-10-18T15:01:19Z research/isogeny-class-rho/runs/run-20261018T0857Z/K/replay
+ALL DONE 2026-10-18T15:01:19Z
