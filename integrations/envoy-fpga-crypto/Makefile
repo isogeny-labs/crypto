@@ -71,7 +71,8 @@ sanitize-pq: build/pq_test_sanitize build/libfpga_pq_oqs_sanitize.so
 VERILATOR ?= verilator
 RTL_SOURCES = rtl/keccak_f1600.sv rtl/shake_stream.sv rtl/lattice_modmul.sv rtl/lattice_ntt.sv
 RTL_TOP = tests/rtl/crypto_kernels_top.sv
-RTL_FLAGS = --assert -Wall --x-initial unique --x-assign unique --top-module crypto_kernels_top
+# Verilator 5.020 needs static SHAKE state-copy/erase loops fully unrolled.
+RTL_FLAGS = --assert -Wall --unroll-count 256 --x-initial unique --x-assign unique --top-module crypto_kernels_top
 .PHONY: lint-rtl test-rtl
 lint-rtl:
 	$(VERILATOR) --lint-only $(RTL_FLAGS) $(RTL_SOURCES) $(RTL_TOP)

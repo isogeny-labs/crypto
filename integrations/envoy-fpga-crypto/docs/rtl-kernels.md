@@ -96,6 +96,13 @@ With Verilator, a C++17 compiler, Make and OpenSSL development files:
 make lint-rtl test-rtl
 ```
 
+Full validation with Verilator 5.020 (Ubuntu 24.04) and fatal source lint
+with 5.032 are recorded in the
+[CI compatibility receipt](receipts/2026-10-18-ci-compat/README.md).
+The Makefile sets `--unroll-count 256` so the older frontend can elaborate
+the 200-byte SHAKE state-copy and erase loops. Fatal `-Wall` lint and
+assertions remain enabled; no warning category is suppressed.
+
 The test harness is native C++. It checks the Keccak zero-state known answer,
 SHAKE known answers and independent OpenSSL XOF results across input/output
 rate boundaries. It compares NTT output to direct polynomial evaluation and

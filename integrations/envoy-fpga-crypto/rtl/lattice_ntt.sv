@@ -89,10 +89,10 @@ module lattice_ntt (
     mul_a = '0;
     mul_b = '0;
     if (phase_q == BUTTERFLY_START) begin
-      mul_a = 32'(inverse_q ?
-          sub_mod(coefficients[high_index[7:0]], coefficients[j_q[7:0]], modulus) :
-          coefficients[high_index[7:0]]);
-      mul_b = 32'(dsa_q ? dsa_zetas[twiddle_q] : kem_zetas[twiddle_q]);
+      mul_a = inverse_q ?
+          {9'b0, sub_mod(coefficients[high_index[7:0]], coefficients[j_q[7:0]], modulus)} :
+          {9'b0, coefficients[high_index[7:0]]};
+      mul_b = dsa_q ? {9'b0, dsa_zetas[twiddle_q]} : {9'b0, kem_zetas[twiddle_q]};
     end else if (phase_q == SCALE_START) begin
       mul_a = 32'(coefficients[io_index_q]);
       // Multiplicative inverses of 256 and 128 in the selected fields.

@@ -42,4 +42,9 @@ jobs:
           unzip -q sv2v.zip
           echo "$RUNNER_TEMP/envoy-rtl/sv2v-Linux" >> "$GITHUB_PATH"
       - name: Validate host transport and actual RTL
-        run: make test lint-rtl test-rtl test-rtl-synth
+        run: |
+          g++ --version
+          verilator --version
+          yosys -V
+          sv2v --version
+          make test lint-rtl test-rtl test-rtl-synth
