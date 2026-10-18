@@ -59,6 +59,13 @@ Two targets, two slot tuples each (seed 79), every run complete and exact.
 | 5 | 15 | 7 | 370 | 18 | 0.0156 | 4.2e3 | 1.07e6 | 3.74 |
 | 6 | 18 | 10 | 761 | 35 | 0.0625 | 2.1e5 | 5.5e7 | 3.71 |
 | 7 | 21 | 13 | 1428 | 64 | 0.297 | 4.6e7 | 1.18e10 | 5.99 |
+| 8 | 24 | 16 | — | — | — | 5.2e8 | 1.33e11 | 2.25 (one target, one slot; 443 s; exact) |
+
+The ℓ = 8 step is the first below 3: the solving degree has been 5 since
+k = 10, and once it stops rising F4's cost in k should turn polynomial, so
+the per-unknown factor would keep falling. Whether it falls below
+enumeration's 2 is the degree-of-regularity question in measurable form;
+ℓ = 9 (k = 19) is the next point.
 
 The same growth read from sweep 2 at fixed ℓ: 8.7 (n = 13, ℓ = 5, k 9 → 11),
 6.8 and 7.9 (n = 17, ℓ = 5, k 7 → 9 → 11). Enumeration grows by 2 per
