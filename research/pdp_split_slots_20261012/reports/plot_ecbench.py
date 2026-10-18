@@ -82,12 +82,21 @@ def main():
     ladder = analysis.get("ladder", {}).get("rows", [])
     if ladder:
         fig, ax = plt.subplots(figsize=(7, 4.2))
-        series = sorted({(r["n"], r["plan"]) for r in ladder})
-        for (n, plan), color in zip(series, ["#2a78d6", "#eb6834", "#1baf7a"] * 3):
-            pts = sorted((r["residual_unknowns"], r["mean_xors_per_branch"]) for r in ladder
-                         if r["n"] == n and r["plan"] == plan)
-            ax.plot([p[0] for p in pts], [p[1] for p in pts], marker="o", color=color,
-                    linewidth=2, markersize=6, label=f"n = {n}, {plan}, F4 (measured)")
+        # One line per (n, plan, fixed g) across ℓ, and one per (n, plan,
+        # fixed ℓ) across g, so a step never mixes an ℓ change with a g change.
+        series = {}
+        for r in ladder:
+            series.setdefault(("g fixed", r["n"], r["plan"], r["g"]), []).append(r)
+            series.setdefault(("ℓ fixed", r["n"], r["plan"], r["ell"]), []).append(r)
+        colors = iter(["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#6250d6"])
+        for (kind, n, plan, fixed), rs in sorted(series.items()):
+            if len(rs) < 2:
+                continue
+            pts = sorted((r["residual_unknowns"], r["mean_xors_per_branch"]) for r in rs)
+            label = (f"n = {n}, {plan}, g = {fixed} fixed, ℓ varies" if kind == "g fixed"
+                     else f"n = {n}, {plan}, ℓ = {fixed} fixed, g varies")
+            ax.plot([p[0] for p in pts], [p[1] for p in pts], marker="o" if kind == "g fixed" else "s",
+                    color=next(colors, INK2), linewidth=2, markersize=6, label=label)
         ks = sorted({r["residual_unknowns"] for r in ladder})
         k0, c0 = ks[0], min(r["mean_xors_per_branch"] for r in ladder if r["residual_unknowns"] == ks[0])
         ax.plot(ks, [c0 * 2 ** (k - k0) for k in ks], color=INK2, linestyle=(0, (2, 2)), linewidth=1.5,
