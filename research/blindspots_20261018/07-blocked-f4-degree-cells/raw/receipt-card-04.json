@@ -1,0 +1,620 @@
+{
+  "card_id": "CARD-BLINDSPOT-07-04",
+  "card_path": "research/blindspots_20261018/07-blocked-f4-degree-cells/card-04.yaml",
+  "card_sha256": "62e5ca580217d0711478ba54f84978e79356223e36f8b7decc4519c9b9f8c8cd",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-07/card-04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-07/card-04/b07",
+        "examples/blindspots_07_blocked_closure.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.843,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 2.843,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-04/b07",
+        "closure",
+        "--m",
+        "3",
+        "--n",
+        "19",
+        "--ell",
+        "6",
+        "--basis",
+        "177804,106678,237875,419046,244408,214309",
+        "--xr",
+        "396617",
+        "--from",
+        "3",
+        "--to",
+        "4",
+        "--label",
+        "c-19-6-3-g0",
+        "--time-limit",
+        "300",
+        "--expect-solutions",
+        "0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 25.655,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "c-19-6-3-g0",
+      "index": 3,
+      "outputs": {},
+      "seconds": 25.655,
+      "stderr_sha256": "3f73de61198585aa9c16a6dabc557ea7e32e14faff03ad12a99fba5ab4655746",
+      "stderr_tail": [
+        "  [20s] rank 63401 products 148873 pending 1763 basis 279 MiB vm 325 MiB rss-peak 323 MiB"
+      ],
+      "stdout_sha256": "b67e50d099bda21a60d2083aed36442e5b1c0c9a6549b142103877a10e98e2ec",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"count\",\"cell\":\"c-19-6-3-g0\",\"solutions\":0}",
+        "{\"tool\":\"b07\",\"cell\":\"c-19-6-3-g0\",\"m\":3,\"n\":19,\"ell\":6,\"n_vars\":37,\"degree\":3,\"columns\":8474,\"status\":\"saturated\",\"refuted\":false,\"rank\":1856,\"products\":2526,\"seed_rows\":38,\"chunks\":4,\"falls\":69,\"new_pivots\":1856,\"word_ops\":9057868,\"word_ops_forward\":493767,\"word_ops_block\":6228599,\"word_ops_pass\":2335502,\"hits_forward\":7453,\"bytes_pass\":1789944,\"bytes_read_forward\":3950136,\"basis_bytes_peak\":1278056,\"rss_peak_kb\":5556,\"secs\":0.008,\"secs_forward\":0.001,\"secs_block\":0.003,\"secs_pass\":0.002,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"cell\":\"c-19-6-3-g0\",\"m\":3,\"n\":19,\"ell\":6,\"n_vars\":37,\"degree\":4,\"columns\":74519,\"status\":\"refuted\",\"refuted\":true,\"rank\":72460,\"products\":218494,\"seed_rows\":38,\"chunks\":55,\"falls\":7320,\"new_pivots\":72460,\"word_ops\":27110031588,\"word_ops_forward\":3342108970,\"word_ops_block\":5378351424,\"word_ops_pass\":18389571194,\"hits_forward\":10825808,\"bytes_pass\":9569307424,\"bytes_read_forward\":26736871760,\"basis_bytes_peak\":342732288,\"rss_peak_kb\":382764,\"secs\":25.567,\"secs_forward\":3.807,\"secs_block\":3.896,\"secs_pass\":17.223,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"mode\":\"closure-summary\",\"cell\":\"c-19-6-3-g0\",\"closure_degree\":4,\"last_status\":\"refuted\",\"rss_peak_kb\":382516}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-04/b07",
+        "closure",
+        "--m",
+        "3",
+        "--n",
+        "19",
+        "--ell",
+        "6",
+        "--basis",
+        "190801,26261,13448,437607,497212,180538",
+        "--xr",
+        "211840",
+        "--from",
+        "3",
+        "--to",
+        "4",
+        "--label",
+        "c-19-6-3-g1",
+        "--time-limit",
+        "300",
+        "--expect-solutions",
+        "0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 22.523,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "c-19-6-3-g1",
+      "index": 4,
+      "outputs": {},
+      "seconds": 22.523,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7e8bc0c18844dd18a4c7aea725daeb9c4e9790c686aa300e75dc1c1683b3b6ec",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"count\",\"cell\":\"c-19-6-3-g1\",\"solutions\":0}",
+        "{\"tool\":\"b07\",\"cell\":\"c-19-6-3-g1\",\"m\":3,\"n\":19,\"ell\":6,\"n_vars\":37,\"degree\":3,\"columns\":8474,\"status\":\"saturated\",\"refuted\":false,\"rank\":1855,\"products\":2526,\"seed_rows\":38,\"chunks\":4,\"falls\":69,\"new_pivots\":1855,\"word_ops\":8931392,\"word_ops_forward\":463440,\"word_ops_block\":6126263,\"word_ops_pass\":2341689,\"hits_forward\":7030,\"bytes_pass\":1790000,\"bytes_read_forward\":3707520,\"basis_bytes_peak\":1277352,\"rss_peak_kb\":5624,\"secs\":0.009,\"secs_forward\":0.001,\"secs_block\":0.004,\"secs_pass\":0.002,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"cell\":\"c-19-6-3-g1\",\"m\":3,\"n\":19,\"ell\":6,\"n_vars\":37,\"degree\":4,\"columns\":74519,\"status\":\"refuted\",\"refuted\":true,\"rank\":72751,\"products\":218494,\"seed_rows\":38,\"chunks\":55,\"falls\":8023,\"new_pivots\":72751,\"word_ops\":20650133835,\"word_ops_forward\":3526624163,\"word_ops_block\":4669289881,\"word_ops_pass\":12454219791,\"hits_forward\":10713227,\"bytes_pass\":10776063656,\"bytes_read_forward\":28212993304,\"basis_bytes_peak\":338706992,\"rss_peak_kb\":409268,\"secs\":22.410,\"secs_forward\":4.214,\"secs_block\":3.648,\"secs_pass\":13.875,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"mode\":\"closure-summary\",\"cell\":\"c-19-6-3-g1\",\"closure_degree\":4,\"last_status\":\"refuted\",\"rss_peak_kb\":409268}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-04/b07",
+        "closure",
+        "--m",
+        "3",
+        "--n",
+        "19",
+        "--ell",
+        "6",
+        "--basis",
+        "244462,103577,228757,206569,324083,102174",
+        "--xr",
+        "323859",
+        "--from",
+        "3",
+        "--to",
+        "4",
+        "--label",
+        "c-19-6-3-g2",
+        "--time-limit",
+        "300",
+        "--expect-solutions",
+        "0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 24.937,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "c-19-6-3-g2",
+      "index": 5,
+      "outputs": {},
+      "seconds": 24.937,
+      "stderr_sha256": "fd8883184ff623f15ef11eb961652b4df5e5aea9de2c51917f8542e90c352030",
+      "stderr_tail": [
+        "  [20s] rank 69090 products 206210 pending 470 basis 315 MiB vm 350 MiB rss-peak 362 MiB"
+      ],
+      "stdout_sha256": "a7241d3425b17b5e31110e755ec5e05c9a8112006004a0b3875b3095befa3180",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"count\",\"cell\":\"c-19-6-3-g2\",\"solutions\":0}",
+        "{\"tool\":\"b07\",\"cell\":\"c-19-6-3-g2\",\"m\":3,\"n\":19,\"ell\":6,\"n_vars\":37,\"degree\":3,\"columns\":8474,\"status\":\"saturated\",\"refuted\":false,\"rank\":1856,\"products\":2527,\"seed_rows\":38,\"chunks\":4,\"falls\":69,\"new_pivots\":1856,\"word_ops\":9070429,\"word_ops_forward\":507793,\"word_ops_block\":6282659,\"word_ops_pass\":2279977,\"hits_forward\":7615,\"bytes_pass\":1790976,\"bytes_read_forward\":4062344,\"basis_bytes_peak\":1278400,\"rss_peak_kb\":5540,\"secs\":0.008,\"secs_forward\":0.001,\"secs_block\":0.004,\"secs_pass\":0.002,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"cell\":\"c-19-6-3-g2\",\"m\":3,\"n\":19,\"ell\":6,\"n_vars\":37,\"degree\":4,\"columns\":74519,\"status\":\"refuted\",\"refuted\":true,\"rank\":74484,\"products\":218494,\"seed_rows\":38,\"chunks\":55,\"falls\":8454,\"new_pivots\":74484,\"word_ops\":29376336331,\"word_ops_forward\":4821003150,\"word_ops_block\":4582336617,\"word_ops_pass\":19972996564,\"hits_forward\":16585670,\"bytes_pass\":10712810008,\"bytes_read_forward\":38568025200,\"basis_bytes_peak\":347593184,\"rss_peak_kb\":455036,\"secs\":24.835,\"secs_forward\":5.162,\"secs_block\":3.461,\"secs_pass\":15.527,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"mode\":\"closure-summary\",\"cell\":\"c-19-6-3-g2\",\"closure_degree\":4,\"last_status\":\"refuted\",\"rss_peak_kb\":455036}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-04/b07",
+        "closure",
+        "--m",
+        "3",
+        "--n",
+        "19",
+        "--ell",
+        "6",
+        "--basis",
+        "385499,462036,249579,232145,8787,386684",
+        "--xr",
+        "53731",
+        "--from",
+        "3",
+        "--to",
+        "4",
+        "--label",
+        "c-19-6-3-g3",
+        "--time-limit",
+        "300",
+        "--expect-solutions",
+        "0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 27.024,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "c-19-6-3-g3",
+      "index": 6,
+      "outputs": {},
+      "seconds": 27.024,
+      "stderr_sha256": "d9501e6efff57e0e9d459442ddf75e39b01e9e86ab3a7976ff8f0abdefe7b760",
+      "stderr_tail": [
+        "  [20s] rank 68520 products 206220 pending 629 basis 312 MiB vm 360 MiB rss-peak 358 MiB"
+      ],
+      "stdout_sha256": "0750068be38f807c6c074473a1eb461b44086918b4e0e0edf36e335f13a9237f",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"count\",\"cell\":\"c-19-6-3-g3\",\"solutions\":0}",
+        "{\"tool\":\"b07\",\"cell\":\"c-19-6-3-g3\",\"m\":3,\"n\":19,\"ell\":6,\"n_vars\":37,\"degree\":3,\"columns\":8474,\"status\":\"saturated\",\"refuted\":false,\"rank\":1856,\"products\":2526,\"seed_rows\":38,\"chunks\":4,\"falls\":69,\"new_pivots\":1856,\"word_ops\":8951077,\"word_ops_forward\":491325,\"word_ops_block\":6144898,\"word_ops_pass\":2314854,\"hits_forward\":7366,\"bytes_pass\":1790944,\"bytes_read_forward\":3930600,\"basis_bytes_peak\":1278704,\"rss_peak_kb\":5556,\"secs\":0.008,\"secs_forward\":0.001,\"secs_block\":0.004,\"secs_pass\":0.002,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"cell\":\"c-19-6-3-g3\",\"m\":3,\"n\":19,\"ell\":6,\"n_vars\":37,\"degree\":4,\"columns\":74519,\"status\":\"refuted\",\"refuted\":true,\"rank\":73846,\"products\":218494,\"seed_rows\":38,\"chunks\":55,\"falls\":7816,\"new_pivots\":73846,\"word_ops\":30456101371,\"word_ops_forward\":5066098570,\"word_ops_block\":4500640804,\"word_ops_pass\":20889361997,\"hits_forward\":15147028,\"bytes_pass\":10324319368,\"bytes_read_forward\":40528788560,\"basis_bytes_peak\":347440904,\"rss_peak_kb\":427132,\"secs\":26.941,\"secs_forward\":5.829,\"secs_block\":3.538,\"secs_pass\":16.874,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"mode\":\"closure-summary\",\"cell\":\"c-19-6-3-g3\",\"closure_degree\":4,\"last_status\":\"refuted\",\"rss_peak_kb\":427132}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-04/b07",
+        "plan",
+        "--m",
+        "4",
+        "--n",
+        "13",
+        "--ell",
+        "5"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "plan-13-5-4",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "1ca032eed685ac76ffe62240618b6f7d1b3d5943f774da6d58f052be6b822010",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"plan\",\"m\":4,\"n\":13,\"ell\":5,\"n_vars\":46,\"degree\":4,\"columns\":179447,\"columns_below_degree\":16262,\"words\":2804,\"basis_tri_upper_bytes\":2012576613,\"dense_square_bytes\":4025355104,\"block_bytes\":91881472,\"comb_bytes\":91876864,\"resident_upper_bytes\":2207222825,\"instrument_cap_bytes\":6920601600,\"address_space_cap_bytes\":7516192768,\"projected_disk_bytes_if_spilled\":0,\"fits_instrument_cap\":true,\"word_ops_log2_low\":38.05,\"word_ops_log2_high\":40.67,\"note\":\"bounds are upper bounds at rank = columns; the word-op range is the committed dense engine's log2(ops)/log2(cols) in 2.18..2.33, a projection, not a measurement\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-04/b07",
+        "plan",
+        "--m",
+        "4",
+        "--n",
+        "15",
+        "--ell",
+        "5"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "plan-15-5-4",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ab78fa492dcbe8395f5753a9a5cd75bbb92f680910b9ad0afda0beda53a1277f",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"plan\",\"m\":4,\"n\":15,\"ell\":5,\"n_vars\":50,\"degree\":4,\"columns\":251176,\"columns_below_degree\":20876,\"words\":3925,\"basis_tri_upper_bytes\":3943086436,\"dense_square_bytes\":7886926400,\"block_bytes\":128614400,\"comb_bytes\":128602112,\"resident_upper_bytes\":4215529892,\"instrument_cap_bytes\":6920601600,\"address_space_cap_bytes\":7516192768,\"projected_disk_bytes_if_spilled\":0,\"fits_instrument_cap\":true,\"word_ops_log2_low\":39.11,\"word_ops_log2_high\":41.80,\"note\":\"bounds are upper bounds at rank = columns; the word-op range is the committed dense engine's log2(ops)/log2(cols) in 2.18..2.33, a projection, not a measurement\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-04/b07",
+        "plan",
+        "--m",
+        "4",
+        "--n",
+        "15",
+        "--ell",
+        "5",
+        "--degree",
+        "5"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "plan-15-5-4-degree5",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "74171138d781aff497cbdb1d2b19c67d95602e75049b7899781d52b7115a2254",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"plan\",\"m\":4,\"n\":15,\"ell\":5,\"n_vars\":50,\"degree\":5,\"columns\":2369936,\"columns_below_degree\":251176,\"words\":37031,\"basis_tri_upper_bytes\":351037290256,\"dense_square_bytes\":702088800128,\"block_bytes\":1213431808,\"comb_bytes\":1213407232,\"resident_upper_bytes\":353618641680,\"instrument_cap_bytes\":6920601600,\"address_space_cap_bytes\":7516192768,\"projected_disk_bytes_if_spilled\":346698040080,\"fits_instrument_cap\":false,\"word_ops_log2_low\":46.16,\"word_ops_log2_high\":49.34,\"note\":\"bounds are upper bounds at rank = columns; the word-op range is the committed dense engine's log2(ops)/log2(cols) in 2.18..2.33, a projection, not a measurement\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-04/b07",
+        "plan",
+        "--m",
+        "4",
+        "--n",
+        "17",
+        "--ell",
+        "5"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "plan-17-5-4",
+      "index": 10,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "1cd81d30042776d98f2427f8a7cb47f294016f53dc78111c7536f4110f065daa",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"plan\",\"m\":4,\"n\":17,\"ell\":5,\"n_vars\":54,\"degree\":4,\"columns\":342541,\"columns_below_degree\":26290,\"words\":5353,\"basis_tri_upper_bytes\":7333396043,\"dense_square_bytes\":14668975784,\"block_bytes\":175407104,\"comb_bytes\":175380992,\"resident_upper_bytes\":7704934583,\"instrument_cap_bytes\":6920601600,\"address_space_cap_bytes\":7516192768,\"projected_disk_bytes_if_spilled\":784332983,\"fits_instrument_cap\":false,\"word_ops_log2_low\":40.08,\"word_ops_log2_high\":42.84,\"note\":\"bounds are upper bounds at rank = columns; the word-op range is the committed dense engine's log2(ops)/log2(cols) in 2.18..2.33, a projection, not a measurement\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-04/b07",
+        "plan",
+        "--m",
+        "4",
+        "--n",
+        "19",
+        "--ell",
+        "6"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "plan-19-6-4",
+      "index": 11,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "50215475bdbabae05f89b4f6dbb1f7f99e851895ad80a88cb670a76fd6a49b38",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"plan\",\"m\":4,\"n\":19,\"ell\":6,\"n_vars\":62,\"degree\":4,\"columns\":597619,\"columns_below_degree\":39774,\"words\":9338,\"basis_tri_upper_bytes\":22321779323,\"dense_square_bytes\":44644529776,\"block_bytes\":305987584,\"comb_bytes\":305980928,\"resident_upper_bytes\":22969907023,\"instrument_cap_bytes\":6920601600,\"address_space_cap_bytes\":7516192768,\"projected_disk_bytes_if_spilled\":16049305423,\"fits_instrument_cap\":false,\"word_ops_log2_low\":41.83,\"word_ops_log2_high\":44.71,\"note\":\"bounds are upper bounds at rank = columns; the word-op range is the committed dense engine's log2(ops)/log2(cols) in 2.18..2.33, a projection, not a measurement\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-04/b07",
+        "plan",
+        "--m",
+        "3",
+        "--n",
+        "19",
+        "--ell",
+        "6"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "plan-19-6-3",
+      "index": 12,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "068f206ffb935fe875a0da0b82db237e8ed9c2478759c7fac767e424b2727ffa",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"plan\",\"m\":3,\"n\":19,\"ell\":6,\"n_vars\":37,\"degree\":4,\"columns\":74519,\"columns_below_degree\":8474,\"words\":1165,\"basis_tri_upper_bytes\":347067585,\"dense_square_bytes\":694517080,\"block_bytes\":38174720,\"comb_bytes\":38153728,\"resident_upper_bytes\":427929021,\"instrument_cap_bytes\":6920601600,\"address_space_cap_bytes\":7516192768,\"projected_disk_bytes_if_spilled\":0,\"fits_instrument_cap\":true,\"word_ops_log2_low\":35.28,\"word_ops_log2_high\":37.71,\"note\":\"bounds are upper bounds at rank = columns; the word-op range is the committed dense engine's log2(ops)/log2(cols) in 2.18..2.33, a projection, not a measurement\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-07/card-04/b07"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 13,
+      "outputs": {},
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-07/card-04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 14,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 14,
+  "commit": "8a01749ed80a1ef45d2e7de14fb5c4b139bddab0",
+  "dirty_after": [
+    "research/blindspots_20261018/04-presentation-search/raw/card-04-build.stderr.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-04-build.stdout.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-04-e-cell3-second.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-04-e-cell3-second.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-build.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-build.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-c-19-6-3-g0.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-c-19-6-3-g0.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-c-19-6-3-g1.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-c-19-6-3-g1.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-c-19-6-3-g2.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-c-19-6-3-g2.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-c-19-6-3-g3.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-c-19-6-3-g3.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-plan-13-5-4.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-plan-13-5-4.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-plan-15-5-4-degree5.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-plan-15-5-4-degree5.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-plan-15-5-4.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-plan-15-5-4.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-plan-17-5-4.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-plan-17-5-4.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-plan-19-6-3.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-plan-19-6-3.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-plan-19-6-4.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-04-plan-19-6-4.stdout.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/card-01-build.stderr.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/card-01-build.stdout.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-S.jsonl",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-S.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-U.jsonl",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-U.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m3-U.jsonl",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m3-U.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/receipt-card-01.json",
+    "research/blindspots_20261018/11-learned-prefilter/raw/selftest.stderr.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/selftest.txt"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/11-learned-prefilter/raw/card-01-build.stderr.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/card-01-build.stdout.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-S.jsonl",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-S.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-U.jsonl",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-U.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m3-U.jsonl",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m3-U.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/receipt-card-01.json",
+    "research/blindspots_20261018/11-learned-prefilter/raw/selftest.stderr.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/selftest.txt",
+    "research/blindspots_20261018/12-degree-surrogate/PROTOCOL.md",
+    "research/blindspots_20261018/12-degree-surrogate/card-01.yaml",
+    "research/blindspots_20261018/12-degree-surrogate/card-02.yaml",
+    "research/blindspots_20261018/12-degree-surrogate/card-03.yaml",
+    "xamples/blindspots_12_degree_surrogate.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

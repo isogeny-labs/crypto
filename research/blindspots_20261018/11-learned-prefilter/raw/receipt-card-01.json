@@ -1,0 +1,374 @@
+{
+  "card_id": "CARD-BLINDSPOT-11-01",
+  "card_path": "research/blindspots_20261018/11-learned-prefilter/card-01.yaml",
+  "card_sha256": "61d2b408b15c4ddc0a55f6306059f3aa78ab7a936e425585fc0faa2591abf90e",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-11/card-01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-11/card-01/b11",
+        "examples/blindspots_11_learned_prefilter.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 6.135,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 6.135,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-11/card-01/b11",
+        "selftest"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.812,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "selftest",
+      "index": 3,
+      "outputs": {},
+      "seconds": 1.812,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "65796209ae051402c50f4368189541f2ab77e794830d88ac20a0c9f83139b7dc",
+      "stdout_tail": [
+        "PASS decomposer n=13 l=5 m=2 base=G a=0: exact vs brute force on 8206 points (414 decomposable), arm b false refutations 0",
+        "PASS decomposer n=13 l=5 m=2 base=T a=0: exact vs brute force on 8206 points (584 decomposable), arm b false refutations 0",
+        "PASS decomposer n=13 l=5 m=2 base=P a=0: exact vs brute force on 8206 points (348 decomposable), arm b false refutations 0",
+        "PASS decomposer n=13 l=5 m=2 base=G a=1: exact vs brute force on 8224 points (416 decomposable), arm b false refutations 0",
+        "PASS decomposer n=13 l=5 m=2 base=T a=1: exact vs brute force on 8224 points (516 decomposable), arm b false refutations 0",
+        "PASS decomposer n=13 l=5 m=2 base=P a=1: exact vs brute force on 8224 points (364 decomposable), arm b false refutations 0",
+        "PASS decomposer n=13 l=4 m=3 base=G a=0: exact vs brute force on 8206 points (1110 decomposable), arm b false refutations 0",
+        "PASS decomposer n=13 l=4 m=3 base=T a=0: exact vs brute force on 8206 points (1172 decomposable), arm b false refutations 0",
+        "PASS decomposer n=13 l=4 m=3 base=P a=0: exact vs brute force on 8206 points (546 decomposable), arm b false refutations 0",
+        "PASS decomposer n=13 l=4 m=3 base=G a=1: exact vs brute force on 8224 points (574 decomposable), arm b false refutations 0",
+        "PASS decomposer n=13 l=4 m=3 base=T a=1: exact vs brute force on 8224 points (992 decomposable), arm b false refutations 0",
+        "PASS decomposer n=13 l=4 m=3 base=P a=1: exact vs brute force on 8224 points (376 decomposable), arm b false refutations 0",
+        "PASS feature vector length matches layout",
+        "PASS positive control lr: planted Tr(x) recovered (auc 1.0000, fr 2, refuted 1.000)",
+        "PASS negative control lr: permuted labels give auc 0.4944 within [0.45, 0.55]",
+        "INFO interaction control lr (descriptive, linear model on a selector label): auc 0.9105",
+        "PASS positive control gbt: planted Tr(x) recovered (auc 1.0000, fr 0, refuted 1.000)",
+        "PASS negative control gbt: permuted labels give auc 0.4937 within [0.45, 0.55]",
+        "PASS interaction control gbt: planted selector interaction recovered (auc 1.0000)",
+        "selftest failures: 0"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-11/card-01/b11",
+        "cell",
+        "--n",
+        "17",
+        "--m",
+        "2",
+        "--per-base",
+        "2000",
+        "--perms",
+        "20",
+        "--pilot",
+        "400",
+        "--pop",
+        "U"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 81.225,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cell-n17-m2-u",
+      "index": 4,
+      "outputs": {},
+      "seconds": 81.225,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f89061440e6b2e7c511d1cba164c00a59c718436bbe634c054720a360f050f10",
+      "stdout_tail": [
+        "{\"pop\":\"U\",\"kind\":\"base\",\"n\":17,\"m\":2,\"l\":9,\"idx\":8,\"type\":\"P\",\"classes\":259,\"tv0\":false,\"dset0\":true,\"dset1\":true,\"sumset0\":true,\"sumset1\":true,\"targets\":2000,\"pos\":1247,\"pos_frac\":0.623500,\"b_refutes\":0}",
+        "{\"pop\":\"U\",\"kind\":\"base\",\"n\":17,\"m\":2,\"l\":9,\"idx\":9,\"type\":\"P\",\"classes\":265,\"tv0\":false,\"dset0\":true,\"dset1\":true,\"sumset0\":true,\"sumset1\":true,\"targets\":2000,\"pos\":1311,\"pos_frac\":0.655500,\"b_refutes\":0}",
+        "{\"pop\":\"U\",\"kind\":\"label_summary\",\"n\":17,\"m\":2,\"l\":9,\"targets\":20000,\"pos\":11202,\"false_refutations_b\":0,\"seconds\":0.663158}",
+        "{\"pop\":\"U\",\"kind\":\"cost\",\"n\":17,\"m\":2,\"l\":9,\"feat_mul\":35.000000,\"feat_sqr\":19.000000,\"feat_lin\":152.000000,\"lr_model_ops\":232,\"gbt_model_ops\":400,\"dec_neg_field_ops\":1832.343146,\"dec_neg_lin\":4633.113662,\"dec_pos_field_ops\":1045.835208,\"dec_pos_lin\":1180.107927,\"neg_targets\":8798,\"pos_targets\":11202}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"lr\",\"type\":\"ALL\",\"neg\":8798,\"pos\":11202,\"rate_b\":0.454649,\"rate_c\":0.000000,\"fr\":4,\"delta\":-0.454649,\"delta_lo\":-0.465333,\"delta_hi\":-0.444419,\"rate_union\":0.454649,\"roc0\":0.454649,\"auc\":0.752100,\"null_auc_max\":0.580072,\"null_auc_mean\":0.575959,\"null_roc0_max\":0.001137,\"null_roc0_mean\":0.000591,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"lr\",\"type\":\"T\",\"neg\":4590,\"pos\":3410,\"rate_b\":0.871460,\"rate_c\":0.871460,\"fr\":0,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.871460,\"roc0\":0.871460,\"auc\":0.937172,\"null_auc_max\":0.510463,\"null_auc_mean\":0.499332,\"null_roc0_max\":0.002179,\"null_roc0_mean\":0.001002,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"lr\",\"type\":\"G\",\"neg\":2059,\"pos\":3941,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":1,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000000,\"roc0\":0.000000,\"auc\":0.500053,\"null_auc_max\":0.512699,\"null_auc_mean\":0.501183,\"null_roc0_max\":0.000971,\"null_roc0_mean\":0.000146,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"lr\",\"type\":\"P\",\"neg\":2149,\"pos\":3851,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":3,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000000,\"roc0\":0.000000,\"auc\":0.505010,\"null_auc_max\":0.509440,\"null_auc_mean\":0.500160,\"null_roc0_max\":0.000931,\"null_roc0_mean\":0.000140,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"control\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"lr\",\"name\":\"planted_trace\",\"neg\":9976,\"pos\":10024,\"auc\":1.000000,\"fr\":5,\"rate_cal\":1.000000,\"roc0\":1.000000}",
+        "{\"pop\":\"U\",\"kind\":\"control\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"lr\",\"name\":\"planted_selector\",\"neg\":10055,\"pos\":9945,\"auc\":0.876788,\"fr\":9,\"rate_cal\":0.485828,\"roc0\":0.485828}",
+        "{\"pop\":\"U\",\"kind\":\"timing\",\"n\":17,\"m\":2,\"model\":\"lr\",\"seconds\":11.666202}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"gbt\",\"type\":\"ALL\",\"neg\":8798,\"pos\":11202,\"rate_b\":0.454649,\"rate_c\":0.000000,\"fr\":10,\"delta\":-0.454649,\"delta_lo\":-0.464424,\"delta_hi\":-0.444306,\"rate_union\":0.455785,\"roc0\":0.455444,\"auc\":0.762967,\"null_auc_max\":0.595179,\"null_auc_mean\":0.590671,\"null_roc0_max\":0.001478,\"null_roc0_mean\":0.000642,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"gbt\",\"type\":\"T\",\"neg\":4590,\"pos\":3410,\"rate_b\":0.871460,\"rate_c\":0.871460,\"fr\":0,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.871460,\"roc0\":0.871460,\"auc\":0.936821,\"null_auc_max\":0.521839,\"null_auc_mean\":0.503530,\"null_roc0_max\":0.002614,\"null_roc0_mean\":0.001144,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"gbt\",\"type\":\"G\",\"neg\":2059,\"pos\":3941,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":6,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.002914,\"roc0\":0.001943,\"auc\":0.512036,\"null_auc_max\":0.516852,\"null_auc_mean\":0.502212,\"null_roc0_max\":0.000486,\"null_roc0_mean\":0.000049,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"gbt\",\"type\":\"P\",\"neg\":2149,\"pos\":3851,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":4,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.001861,\"roc0\":0.001396,\"auc\":0.517533,\"null_auc_max\":0.515160,\"null_auc_mean\":0.501822,\"null_roc0_max\":0.000931,\"null_roc0_mean\":0.000140,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"gbt_splits\",\"n\":17,\"m\":2,\"l\":9,\"total\":2430,\"splits_polybits\":329,\"splits_normalbits\":275,\"splits_powertraces\":465,\"splits_hilbert90\":19,\"splits_shiftedV\":203,\"splits_halftrace\":621,\"splits_context\":518}",
+        "{\"pop\":\"U\",\"kind\":\"control\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"gbt\",\"name\":\"planted_trace\",\"neg\":9976,\"pos\":10024,\"auc\":1.000000,\"fr\":0,\"rate_cal\":1.000000,\"roc0\":1.000000}",
+        "{\"pop\":\"U\",\"kind\":\"control\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"gbt\",\"name\":\"planted_selector\",\"neg\":10055,\"pos\":9945,\"auc\":1.000000,\"fr\":0,\"rate_cal\":1.000000,\"roc0\":1.000000}",
+        "{\"pop\":\"U\",\"kind\":\"timing\",\"n\":17,\"m\":2,\"model\":\"gbt\",\"seconds\":68.888738}",
+        "{\"pop\":\"U\",\"kind\":\"done\",\"n\":17,\"m\":2,\"l\":9,\"seconds\":81.218182,\"rss_peak_kb\":15112}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-11/card-01/b11",
+        "cell",
+        "--n",
+        "17",
+        "--m",
+        "2",
+        "--per-base",
+        "2000",
+        "--perms",
+        "20",
+        "--pilot",
+        "400",
+        "--pop",
+        "S"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 79.546,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cell-n17-m2-s",
+      "index": 5,
+      "outputs": {},
+      "seconds": 79.546,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "9c60218f2b8b8a2ab05796caba4b9bf0b9d8ed2348b0f62ec72ce696abf03d90",
+      "stdout_tail": [
+        "{\"pop\":\"S\",\"kind\":\"base\",\"n\":17,\"m\":2,\"l\":9,\"idx\":8,\"type\":\"P\",\"classes\":255,\"tv0\":false,\"dset0\":true,\"dset1\":true,\"sumset0\":true,\"sumset1\":true,\"targets\":2000,\"pos\":1278,\"pos_frac\":0.639000,\"b_refutes\":0}",
+        "{\"pop\":\"S\",\"kind\":\"base\",\"n\":17,\"m\":2,\"l\":9,\"idx\":9,\"type\":\"P\",\"classes\":252,\"tv0\":false,\"dset0\":true,\"dset1\":true,\"sumset0\":true,\"sumset1\":true,\"targets\":2000,\"pos\":1270,\"pos_frac\":0.635000,\"b_refutes\":0}",
+        "{\"pop\":\"S\",\"kind\":\"label_summary\",\"n\":17,\"m\":2,\"l\":9,\"targets\":20000,\"pos\":14513,\"false_refutations_b\":0,\"seconds\":0.541174}",
+        "{\"pop\":\"S\",\"kind\":\"cost\",\"n\":17,\"m\":2,\"l\":9,\"feat_mul\":35.000000,\"feat_sqr\":19.000000,\"feat_lin\":152.000000,\"lr_model_ops\":232,\"gbt_model_ops\":400,\"dec_neg_field_ops\":1806.479132,\"dec_neg_lin\":4579.390924,\"dec_pos_field_ops\":1032.156205,\"dec_pos_lin\":1159.738028,\"neg_targets\":5487,\"pos_targets\":14513}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"lr\",\"type\":\"ALL\",\"neg\":5487,\"pos\":14513,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":7,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000729,\"roc0\":0.000182,\"auc\":0.611654,\"null_auc_max\":0.619284,\"null_auc_mean\":0.612840,\"null_roc0_max\":0.001093,\"null_roc0_mean\":0.000483,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"lr\",\"type\":\"T\",\"neg\":1139,\"pos\":6861,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":0,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000000,\"roc0\":0.000000,\"auc\":0.497170,\"null_auc_max\":0.519814,\"null_auc_mean\":0.504250,\"null_roc0_max\":0.000000,\"null_roc0_mean\":0.000000,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"lr\",\"type\":\"G\",\"neg\":2169,\"pos\":3831,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":5,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.001383,\"roc0\":0.000461,\"auc\":0.513257,\"null_auc_max\":0.511892,\"null_auc_mean\":0.498561,\"null_roc0_max\":0.001383,\"null_roc0_mean\":0.000669,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"lr\",\"type\":\"P\",\"neg\":2179,\"pos\":3821,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":2,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000459,\"roc0\":0.000000,\"auc\":0.491876,\"null_auc_max\":0.521176,\"null_auc_mean\":0.498424,\"null_roc0_max\":0.002754,\"null_roc0_mean\":0.000551,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"control\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"lr\",\"name\":\"planted_trace\",\"neg\":10067,\"pos\":9933,\"auc\":1.000000,\"fr\":5,\"rate_cal\":1.000000,\"roc0\":1.000000}",
+        "{\"pop\":\"S\",\"kind\":\"control\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"lr\",\"name\":\"planted_selector\",\"neg\":10043,\"pos\":9957,\"auc\":0.887128,\"fr\":10,\"rate_cal\":0.502340,\"roc0\":0.501743}",
+        "{\"pop\":\"S\",\"kind\":\"timing\",\"n\":17,\"m\":2,\"model\":\"lr\",\"seconds\":12.873562}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"gbt\",\"type\":\"ALL\",\"neg\":5487,\"pos\":14513,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":7,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000182,\"roc0\":0.000000,\"auc\":0.620324,\"null_auc_max\":0.626270,\"null_auc_mean\":0.619601,\"null_roc0_max\":0.001822,\"null_roc0_mean\":0.000556,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"gbt\",\"type\":\"T\",\"neg\":1139,\"pos\":6861,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":0,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000000,\"roc0\":0.000000,\"auc\":0.500470,\"null_auc_max\":0.532616,\"null_auc_mean\":0.504448,\"null_roc0_max\":0.000000,\"null_roc0_mean\":0.000000,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"gbt\",\"type\":\"G\",\"neg\":2169,\"pos\":3831,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":3,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000000,\"roc0\":0.000000,\"auc\":0.502730,\"null_auc_max\":0.516485,\"null_auc_mean\":0.498781,\"null_roc0_max\":0.002305,\"null_roc0_mean\":0.000669,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"summary\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"gbt\",\"type\":\"P\",\"neg\":2179,\"pos\":3821,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":4,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000459,\"roc0\":0.000000,\"auc\":0.501258,\"null_auc_max\":0.513336,\"null_auc_mean\":0.497403,\"null_roc0_max\":0.004130,\"null_roc0_mean\":0.000734,\"perms\":20}",
+        "{\"pop\":\"S\",\"kind\":\"gbt_splits\",\"n\":17,\"m\":2,\"l\":9,\"total\":3467,\"splits_polybits\":491,\"splits_normalbits\":485,\"splits_powertraces\":982,\"splits_hilbert90\":5,\"splits_shiftedV\":241,\"splits_halftrace\":1084,\"splits_context\":179}",
+        "{\"pop\":\"S\",\"kind\":\"control\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"gbt\",\"name\":\"planted_trace\",\"neg\":10067,\"pos\":9933,\"auc\":1.000000,\"fr\":0,\"rate_cal\":1.000000,\"roc0\":1.000000}",
+        "{\"pop\":\"S\",\"kind\":\"control\",\"n\":17,\"m\":2,\"l\":9,\"model\":\"gbt\",\"name\":\"planted_selector\",\"neg\":10043,\"pos\":9957,\"auc\":1.000000,\"fr\":0,\"rate_cal\":1.000000,\"roc0\":1.000000}",
+        "{\"pop\":\"S\",\"kind\":\"timing\",\"n\":17,\"m\":2,\"model\":\"gbt\",\"seconds\":66.126644}",
+        "{\"pop\":\"S\",\"kind\":\"done\",\"n\":17,\"m\":2,\"l\":9,\"seconds\":79.541469,\"rss_peak_kb\":15044}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-11/card-01/b11",
+        "cell",
+        "--n",
+        "17",
+        "--m",
+        "3",
+        "--per-base",
+        "2000",
+        "--perms",
+        "20",
+        "--pilot",
+        "400",
+        "--pop",
+        "U"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 80.29,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cell-n17-m3-u",
+      "index": 6,
+      "outputs": {},
+      "seconds": 80.29,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "905f99028638a3bac3cad4b592aca49969735cf9e2b8b1fa0db840a51863de9f",
+      "stdout_tail": [
+        "{\"pop\":\"U\",\"kind\":\"base\",\"n\":17,\"m\":3,\"l\":6,\"idx\":8,\"type\":\"P\",\"classes\":34,\"tv0\":false,\"dset0\":true,\"dset1\":true,\"sumset0\":true,\"sumset1\":true,\"targets\":2000,\"pos\":642,\"pos_frac\":0.321000,\"b_refutes\":0}",
+        "{\"pop\":\"U\",\"kind\":\"base\",\"n\":17,\"m\":3,\"l\":6,\"idx\":9,\"type\":\"P\",\"classes\":27,\"tv0\":false,\"dset0\":true,\"dset1\":true,\"sumset0\":true,\"sumset1\":true,\"targets\":2000,\"pos\":333,\"pos_frac\":0.166500,\"b_refutes\":0}",
+        "{\"pop\":\"U\",\"kind\":\"label_summary\",\"n\":17,\"m\":3,\"l\":6,\"targets\":20000,\"pos\":4997,\"false_refutations_b\":0,\"seconds\":0.081481}",
+        "{\"pop\":\"U\",\"kind\":\"cost\",\"n\":17,\"m\":3,\"l\":6,\"feat_mul\":35.000000,\"feat_sqr\":19.000000,\"feat_lin\":131.000000,\"lr_model_ops\":232,\"gbt_model_ops\":400,\"dec_neg_field_ops\":237.840165,\"dec_neg_lin\":62.525762,\"dec_pos_field_ops\":146.427857,\"dec_pos_lin\":15.620372,\"neg_targets\":15003,\"pos_targets\":4997}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":3,\"l\":6,\"model\":\"lr\",\"type\":\"ALL\",\"neg\":15003,\"pos\":4997,\"rate_b\":0.265547,\"rate_c\":0.000000,\"fr\":1,\"delta\":-0.265547,\"delta_lo\":-0.272612,\"delta_hi\":-0.258882,\"rate_union\":0.265747,\"roc0\":0.267613,\"auc\":0.692554,\"null_auc_max\":0.507763,\"null_auc_mean\":0.499939,\"null_roc0_max\":0.001600,\"null_roc0_mean\":0.000850,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":3,\"l\":6,\"model\":\"lr\",\"type\":\"T\",\"neg\":5994,\"pos\":2006,\"rate_b\":0.664665,\"rate_c\":0.664498,\"fr\":0,\"delta\":-0.000167,\"delta_lo\":-0.000501,\"delta_hi\":0.000000,\"rate_union\":0.664665,\"roc0\":0.664498,\"auc\":0.832050,\"null_auc_max\":0.514474,\"null_auc_mean\":0.503297,\"null_roc0_max\":0.001502,\"null_roc0_mean\":0.000742,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":3,\"l\":6,\"model\":\"lr\",\"type\":\"G\",\"neg\":4611,\"pos\":1389,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":1,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000434,\"roc0\":0.002386,\"auc\":0.498579,\"null_auc_max\":0.516806,\"null_auc_mean\":0.501981,\"null_roc0_max\":0.002602,\"null_roc0_mean\":0.000824,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":3,\"l\":6,\"model\":\"lr\",\"type\":\"P\",\"neg\":4398,\"pos\":1602,\"rate_b\":0.000000,\"rate_c\":0.000227,\"fr\":0,\"delta\":0.000227,\"delta_lo\":0.000000,\"delta_hi\":0.000682,\"rate_union\":0.000227,\"roc0\":0.004775,\"auc\":0.510478,\"null_auc_max\":0.516145,\"null_auc_mean\":0.502237,\"null_roc0_max\":0.002956,\"null_roc0_mean\":0.001023,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"control\",\"n\":17,\"m\":3,\"l\":6,\"model\":\"lr\",\"name\":\"planted_trace\",\"neg\":9988,\"pos\":10012,\"auc\":1.000000,\"fr\":6,\"rate_cal\":1.000000,\"roc0\":1.000000}",
+        "{\"pop\":\"U\",\"kind\":\"control\",\"n\":17,\"m\":3,\"l\":6,\"model\":\"lr\",\"name\":\"planted_selector\",\"neg\":9983,\"pos\":10017,\"auc\":0.879193,\"fr\":12,\"rate_cal\":0.498748,\"roc0\":0.497746}",
+        "{\"pop\":\"U\",\"kind\":\"timing\",\"n\":17,\"m\":3,\"model\":\"lr\",\"seconds\":11.860813}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":3,\"l\":6,\"model\":\"gbt\",\"type\":\"ALL\",\"neg\":15003,\"pos\":4997,\"rate_b\":0.265547,\"rate_c\":0.000000,\"fr\":5,\"delta\":-0.265547,\"delta_lo\":-0.272479,\"delta_hi\":-0.259082,\"rate_union\":0.266213,\"roc0\":0.266747,\"auc\":0.696579,\"null_auc_max\":0.500854,\"null_auc_mean\":0.493756,\"null_roc0_max\":0.002799,\"null_roc0_mean\":0.001076,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":3,\"l\":6,\"model\":\"gbt\",\"type\":\"T\",\"neg\":5994,\"pos\":2006,\"rate_b\":0.664665,\"rate_c\":0.664665,\"fr\":0,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.664665,\"roc0\":0.664665,\"auc\":0.834648,\"null_auc_max\":0.506983,\"null_auc_mean\":0.497988,\"null_roc0_max\":0.003003,\"null_roc0_mean\":0.000926,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":3,\"l\":6,\"model\":\"gbt\",\"type\":\"G\",\"neg\":4611,\"pos\":1389,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":1,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.000434,\"roc0\":0.001084,\"auc\":0.493260,\"null_auc_max\":0.512538,\"null_auc_mean\":0.500156,\"null_roc0_max\":0.003253,\"null_roc0_mean\":0.001139,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"summary\",\"n\":17,\"m\":3,\"l\":6,\"model\":\"gbt\",\"type\":\"P\",\"neg\":4398,\"pos\":1602,\"rate_b\":0.000000,\"rate_c\":0.000000,\"fr\":4,\"delta\":0.000000,\"delta_lo\":0.000000,\"delta_hi\":0.000000,\"rate_union\":0.001819,\"roc0\":0.002956,\"auc\":0.508818,\"null_auc_max\":0.515544,\"null_auc_mean\":0.499890,\"null_roc0_max\":0.002729,\"null_roc0_mean\":0.001216,\"perms\":20}",
+        "{\"pop\":\"U\",\"kind\":\"gbt_splits\",\"n\":17,\"m\":3,\"l\":6,\"total\":2495,\"splits_polybits\":308,\"splits_normalbits\":294,\"splits_powertraces\":484,\"splits_hilbert90\":25,\"splits_shiftedV\":224,\"splits_halftrace\":696,\"splits_context\":464}",
+        "{\"pop\":\"U\",\"kind\":\"control\",\"n\":17,\"m\":3,\"l\":6,\"model\":\"gbt\",\"name\":\"planted_trace\",\"neg\":9988,\"pos\":10012,\"auc\":1.000000,\"fr\":0,\"rate_cal\":1.000000,\"roc0\":1.000000}",
+        "{\"pop\":\"U\",\"kind\":\"control\",\"n\":17,\"m\":3,\"l\":6,\"model\":\"gbt\",\"name\":\"planted_selector\",\"neg\":9983,\"pos\":10017,\"auc\":1.000000,\"fr\":0,\"rate_cal\":1.000000,\"roc0\":1.000000}",
+        "{\"pop\":\"U\",\"kind\":\"timing\",\"n\":17,\"m\":3,\"model\":\"gbt\",\"seconds\":68.343154}",
+        "{\"pop\":\"U\",\"kind\":\"done\",\"n\":17,\"m\":3,\"l\":6,\"seconds\":80.285498,\"rss_peak_kb\":15020}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-11/card-01/b11"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.013,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.013,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-11/card-01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 8,
+  "commit": "9da973c4d0a1f27114e3068802a0a9cb96841e15",
+  "dirty_after": [
+    "research/blindspots_20261018/11-learned-prefilter/raw/card-01-build.stderr.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/card-01-build.stdout.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-S.jsonl",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-S.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-U.jsonl",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m2-U.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m3-U.jsonl",
+    "research/blindspots_20261018/11-learned-prefilter/raw/n17-m3-U.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/selftest.stderr.log",
+    "research/blindspots_20261018/11-learned-prefilter/raw/selftest.txt"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
