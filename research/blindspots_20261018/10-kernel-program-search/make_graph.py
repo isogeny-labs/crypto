@@ -4,9 +4,9 @@ import json, math, matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
-A = {('31','b'):'raw-r2/state/n31-b.jsonl', ('37','b'):'raw-r2/state-1/n37-b.jsonl', ('41','b'):'raw-r2/state-1/n41-b.jsonl',
-     ('31','c'):'raw-r2/state-1/n31-c.jsonl', ('37','c'):'raw-r2/state-1/n37-c.jsonl', ('41','c'):'raw-r2/state-1/n41-c.jsonl',
-     ('31','p'):'raw-r2/state-1/n31-p.jsonl'}
+A = {('31','b'):'raw-r2/state/n31-b.jsonl', ('37','b'):'raw-r2/state/n37-b.jsonl', ('41','b'):'raw-r2/state/n41-b.jsonl',
+     ('31','c'):'raw-r2/state/n31-c.jsonl', ('37','c'):'raw-r2/state/n37-c.jsonl', ('41','c'):'raw-r2/state/n41-c.jsonl',
+     ('31','p'):'raw-r2/state/n31-p.jsonl'}
 def load(f): return [json.loads(l) for l in open(f)]
 def q(r,k='q01'):
     v=r[k]; return math.inf if v is None else v
@@ -37,9 +37,9 @@ rc_=[S[f'n{n}-c']['ratio_best_over_incumbent']['0.1'] for n in cells]
 ax[1].bar([i-0.2 for i in x],rb_,0.4,color=col['b'],label='b (search)')
 ax[1].bar([i+0.2 for i in x],rc_,0.4,color=col['c'],label='c (random)')
 ax[1].set_xticks(list(x)); ax[1].set_xticklabels([f'n={n}\nb:{S[f"n{n}-b"]["evals"]} c:{S[f"n{n}-c"]["evals"]} evals' for n in cells],fontsize=8)
-ax[1].set_ylabel('best training Q / incumbent training Q (w=0.1)'); ax[1].set_ylim(0,0.3)
+ax[1].set_ylabel('best training Q / incumbent training Q (w=0.1)'); ax[1].set_ylim(0,0.2)
 ax[1].set_title('TRAINING ratios only: no held-out data, no verdict\nselected from the same targets (winner\'s curse)',fontsize=9); ax[1].legend(fontsize=8)
-fig.suptitle('Item 10 kernel program search, stage 1 of 4 complete (CARD-BLINDSPOT-10-02/05/06/07/08/10/12-r2)',fontsize=9)
+fig.suptitle('Item 10 kernel program search, stage 2 of 4 complete: all seven searches at 256 evaluations',fontsize=9)
 fig.tight_layout()
 fig.savefig('graph.svg'); fig.savefig('graph.png',dpi=150)
 with PdfPages('REPORT.pdf') as pdf:
@@ -54,4 +54,4 @@ with PdfPages('REPORT.pdf') as pdf:
     plt.close(pf)
     for p in pages:
         f=plt.figure(figsize=(8.27,11.69)); f.text(0.06,0.97,'\n'.join(p),va='top',family='monospace',fontsize=6.6); pdf.savefig(f); plt.close(f)
-print(json.dumps(S,indent=1)[:3000])
+print(json.dumps(S,indent=1)[:200])
