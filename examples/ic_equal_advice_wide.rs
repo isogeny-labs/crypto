@@ -163,7 +163,7 @@ impl Arith {
         }
     }
 
-    fn from_element(&self, e: &crypto_lib::binary_ecc::F2mElement) -> u128 {
+    fn word_of_element(&self, e: &crypto_lib::binary_ecc::F2mElement) -> u128 {
         match &self.backend {
             Backend::Narrow { gf, .. } => gf.from_element(e) as u128,
             Backend::Wide { gf, .. } => gf.from_element(e),
@@ -425,7 +425,7 @@ fn setup(n: u32, a: u8) -> Setup {
         .expect("subgroup order must fit one word (r < 2^64)");
     let lambda = curve.lambda.to_u64().expect("lambda < 2^64");
     let arith = Arith::new(&curve, a);
-    let b = arith.from_element(&curve.curve.b);
+    let b = arith.word_of_element(&curve.curve.b);
     let basis = NormalBasis128::new(&arith);
     let generator: Pt = match curve.generator() {
         crypto_lib::binary_ecc::BinaryPoint::Affine { x, y } => {
@@ -1072,6 +1072,8 @@ impl BlConfig {
     }
 }
 
+/// Read by the n = 61 check (`#[cfg(test)]`); the production path only writes the JSONL.
+#[cfg_attr(not(test), allow(dead_code))]
 struct TargetRow {
     pass: u32,
     level: u32,
@@ -1080,6 +1082,8 @@ struct TargetRow {
     res: OnlineResult,
 }
 
+/// Read by the n = 61 check (`#[cfg(test)]`); the production path only writes the JSONL.
+#[cfg_attr(not(test), allow(dead_code))]
 struct BlOutcome {
     summary_pre: Value,
     rows: Vec<TargetRow>,
@@ -1352,7 +1356,7 @@ fn planted_check(s: &Setup, count: usize, dp_bits: u32) -> usize {
     let mut table: Vec<(u64, u64)> = Vec::new();
     let mut stream = Stream::new("planted-streams");
     let _ = &mut stream;
-    for (index, &(d, q)) in targets.iter().enumerate() {
+    for (index, &(d, _q)) in targets.iter().enumerate() {
         let mut tstream = Stream::new(&format!(
             "ic-next10-09-online|{}|{}|planted|{index}",
             s.n, s.a
