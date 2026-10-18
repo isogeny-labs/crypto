@@ -43,3 +43,5 @@ Archive verification/delivery receipts are retained here; a later actual resume
 gets its own receipt. Downloaded snapshots do not track live worker progress.
 
 [Complete immutable archive](https://drive.google.com/file/d/1B3W6IJfsh1kypx4-dA4KQGAi-eKcqIQ1/view): 58,185,176 bytes; SHA-256 `9073021ed47a2c028416eea01400945baa8783a6a1bd3894f0ef7c1c4baaa8b0`. Fresh extraction and every manifest entry pass. Outer repacking was not rechecked. `delivery.json` records local hashes and Drive name/size/parent readbacks, not remote whole-file content hashing. All raw accepted/interrupted attempts remain in that archive.
+
+Actual resumed PID3298, launched 2026-10-18T17:07:08.420807+00:00, verified 2026-10-18T17:07:52.044044+00:00 with new audited progress. Interrupted attempt2 audited. `resume-envelope.json` preserves deadline2026-10-20T20:13:42.570000+00:00 and6GiB cap; no mathematical budget change. A bounded continuation check is scheduled around21:09UTC18October; verify real process status after environment recovery. Published downloads stay5533vertices.

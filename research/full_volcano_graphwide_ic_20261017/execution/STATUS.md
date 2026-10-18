@@ -37,3 +37,5 @@ See [full-order C evidence](full_point_order/README.md) and [4,037 checkpoint](c
 Active local resume: PID 97646; [verified live progress](resume-after-4037/verified.json), [new 72-hour/6-GiB outer envelope](resume-after-4037/envelope.json). Mathematical budgets unchanged. This is actual launch/progress, not completion or a live Drive upload.
 
 18 October recovery: earlier PID97646 is absent, not live. The retained stale attempt was marked interrupted with the unchanged zero-job driver; [native-checked checkpoint](recovery-20261018T1647Z/README.md) advances coverage to5,533 vertices. A later actual launch receipt controls current status. Older launch/download receipts remain historical.
+
+Latest actual resume overrides historical absent-PID notes: PID3298, verified live 2026-10-18T17:07:52.044044+00:00; [receipt](recovery-20261018T1647Z/resumed-verified.json). Original72h deadline preserved,6GiB cap and frozen child budgets unchanged; bounded continuation rearmed.

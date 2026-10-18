@@ -1,5 +1,7 @@
 # Volcano experiment downloads, 17 October 2026
 
+[Download guide v5: 5,533-vertex checkpoint and actual bounded resume](https://drive.google.com/file/d/1MC0v3MQpCbWTZpa6oWtrQO7EfOYbW_vq/view).
+
 Latest stopped checkpoint, 18 October 2026: **5,533 / 24,823 audited vertices**,
 all 51 strata, 88,528 accepted records (56,959 verified / 27,545 exhausted /
 4,024 timeout), 2,870,489 relations / 134,616,948 actual decomposition calls.
@@ -155,3 +157,5 @@ access was rechecked and still lacks a runtime AWS identity.
 Recovery resume **PID 8973 launched 2026-10-17T16:14:06.513686+00:00**, verified live at 2026-10-17T16:15:21.322908+00:00. The unchanged frozen queue/solver/driver retry the preserved interruption in attempt 2, under the same 24-hour / 2-GiB guard. This is a new runtime epoch; wall times remain unqualified. See `execution/recovery-20261017T1450Z/resumed-launch-verified.json` for actual native progress. The Drive archive and explorer remain the frozen 2,935-vertex checkpoint, not live uploads.
 
 Current local resume: PID 97646, launched 2026-10-17T20:13:41.722914+00:00, verified live 2026-10-17T20:13:55.172771+00:00 with newly audited progress. [Actual receipt](execution/resume-after-4037/verified.json) and [outer envelope](execution/resume-after-4037/envelope.json). Outer guards changed from 24 h / 2 GiB to 72 h / 6 GiB; frozen mathematical/child budgets and queue are unchanged. Multiple runtime epochs remain unqualified; no host-survival or unattended-upload guarantee. Frozen Drive snapshots remain 4,037 vertices.
+
+18 October actual resume: PID3298 launched 2026-10-18T17:07:08.420807+00:00, verified 2026-10-18T17:07:52.044044+00:00 with new audited progress and interrupted attempt2 accepted. [Process/native receipt](execution/recovery-20261018T1647Z/resumed-verified.json), [preserved-deadline envelope](execution/recovery-20261018T1647Z/resume-envelope.json). Deadline2026-10-20T20:13:42.570000+00:00; remaining seconds were charged rather than resetting72hours, spool cap6GiB. A bounded continuation check is scheduled around21:09UTC18October. Published snapshot remains5533; clocks unqualified.
