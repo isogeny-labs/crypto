@@ -75,6 +75,9 @@ SOURCES = {
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
+    "n83_precomp_rho_k600_run1": "research/20261016-n83-precomputed-rho-control/records/run-38855595549/k600/analysis.json",
+    "n83_precomp_rho_k600_run2": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k600/analysis.json",
+    "n83_precomp_rho_k3300_run2": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k3300/analysis.json",
     "registry": "docs/curves/registry.json",
     "curves_schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
@@ -325,6 +328,8 @@ def ladder_rows(names: Names) -> list[dict]:
             "targets": 1, "recipes": recipes, "best": recipes[0],
             "source": SOURCES["round5"], "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
             "class": "accounting",
+            "gae_pin": {**gae_pin_state((inst.get("calibration_pinned") or {}).get("pinned")),
+                        "record": SOURCES["round5"] + " instances[].calibration_pinned.pinned"},
         })
     return rows
 
@@ -420,6 +425,7 @@ def koblitz_rows(names: Names) -> list[dict]:
                          "(a 32-target batch: a historical diagnostic under AGENTS.md's one-target rule)",
             "reference_s": x["s_rho_s20"], "floor_s": floor_s, "targets": 32,
             "recipes": [recipe], "best": recipe, "source": SOURCES["koblitz_s22"],
+            "gae_pin": gae_pin_state(None, priced_in_gae=False),
             "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
             "class": "engineering",
         })
@@ -486,6 +492,7 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
             "reference_s": x["s_rho_online_mean"] + x["s_rho_setup"], "floor_s": floor_s,
             "targets": 1, "recipes": [recipe], "best": recipe, "source": SOURCES["koblitz_rule_v3"],
             "before_source": SOURCES["koblitz_s23"],
+            "gae_pin": gae_pin_state(None, priced_in_gae=False),
             "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
             "class": "accounting",
         })
@@ -577,7 +584,9 @@ def families(board: list[dict]) -> dict:
         rows = [r for r in board if r["family"] == code]
         canon = [r["best"]["canonical_step_units"] for r in rows if "canonical_step_units" in r["best"]]
         built = [r["best"]["rho_step_units_as_built"] for r in rows if "rho_step_units_as_built" in r["best"]]
+        gae = [r for r in rows if r["gae_pin"]["priced_in_gae"]]
         out[code] = {**f, "rows": len(rows),
+                     "gae_rows": len(gae), "gae_unpinned_rows": sum(r["gae_pin"]["unpinned"] for r in gae),
                      "canonical_step_units": [min(canon), max(canon)] if canon else None,
                      "rho_step_units_as_built": [min(built), max(built)] if built else None}
     return out
@@ -615,6 +624,99 @@ def la_component() -> dict:
     return {"rows": rows, "study": "research/la_engines_20261014/",
             "report": "research/la_engines_20261014/REPORT.pdf",
             "class": "engineering"}
+
+
+PRECOMP_RHO_README = "research/20261016-n83-precomputed-rho-control/README.md"
+# The arms of the control that its README's verdict table reads (run 1's K3300
+# job ran on a host where arm (a) was not matched and is excluded there).
+PRECOMP_RHO_ARMS = (
+    ("K3300", "n83_precomp_rho_k3300_run2", "ic_over_bl_a2", "bl_a2_wall_equal",
+     "(a') table walks = IC setup wall, 1 thread"),
+    ("K3300", "n83_precomp_rho_k3300_run2", "ic_over_bl_b", "bl_b_memory_matched",
+     "(b) table = IC max RSS"),
+    ("K600", "n83_precomp_rho_k600_run2", "ic_over_bl_a2", "bl_a2_wall_equal",
+     "(a') table walks = IC setup wall, 1 thread"),
+    ("K600", "n83_precomp_rho_k600_run1", "ic_over_bl_a", "bl_a_time_matched",
+     "(a) 650 s table walks <= IC setup wall"),
+    ("K600", "n83_precomp_rho_k600_run2", "ic_over_bl_b", "bl_b_memory_matched",
+     "(b) table = IC max RSS"),
+)
+NOT_RUN_PRECOMP = {
+    "n61 compact orbit": "not run: no Bernstein-Lange precomputed-rho control exists for the n61 instance",
+    "n83 dense K1798": "not run for K1798: the n83 control measured K3300 and K600, a different factor "
+                       "base and a different run, so neither is a matched reference for this row",
+}
+
+
+def precomputed_rho_control() -> dict:
+    """The Bernstein-Lange precomputed-rho control on N83, copied from its analysis.json files.
+
+    Direction is IC online / precomputed-rho online: above 1 means the
+    precomputed table makes rho faster online than the index calculus.  The
+    frontier-audit rows quote rho / IC, the inverse direction."""
+    rows, verified = [], True
+    for k_label, src, paired_key, arm_key, arm_label in PRECOMP_RHO_ARMS:
+        a = load(SOURCES[src])
+        pr = a["paired"][paired_key]
+        if (a["ic_label"].upper() != k_label or a["all_scalars_verified_and_agreeing"] is not True
+                or a["hosted_reference_checked"] is not True
+                or pr["numerator"] != "ic" or pr["denominator"] != arm_key):
+            raise SystemExit(f"review the n83 precomputed-rho control {src} before updating the leaderboard")
+        rows.append({
+            "k": k_label, "arm": arm_label, "source": SOURCES[src],
+            "ic_median_ms": a["arms"]["ic"]["median_ms"],
+            "precomputed_rho_median_ms": a["arms"][arm_key]["median_ms"],
+            "ic_over_precomputed_rho": pr["median_of_paired_ratios"],
+            "ci95": list(pr["median_of_paired_ratios_ci95"]),
+            "targets": a["arms"]["ic"]["n"],
+        })
+    ratios = [r["ic_over_precomputed_rho"] for r in rows]
+    return {
+        "readme": PRECOMP_RHO_README, "rows": rows,
+        "range": [min(ratios), max(ratios)],
+        "direction": "IC online / precomputed-rho online, median of paired per-target ratios; "
+                     "above 1 means precomputed rho is faster online",
+        "scope": "Neither factor base is the K1798 instance of the frontier-audit row",
+    }
+
+
+def gae_pin_state(pinned, priced_in_gae: bool = True) -> dict:
+    """Whether a row's GAE conversion rests on pinned calibration ratios.
+
+    `pinned` is the source's `calibration_pinned.pinned` list, or None when
+    the source has no pin record.  An empty list or no record means the
+    native counters were converted at host-measured ratios, which differ
+    between identical runs (LEAD_LADDER_METHODOLOGY_20261010 section 1:
+    0.22 against 8.7 GAE for the same work), so the row is `GAE unpinned`
+    and no ranking sentence may use it.  Rows priced in a clock unit make no
+    GAE conversion and carry no flag."""
+    if not priced_in_gae:
+        return {"priced_in_gae": False, "unpinned": False, "pinned": None}
+    names = list(pinned) if pinned else []
+    return {"priced_in_gae": True, "unpinned": not names, "pinned": names}
+
+
+def leaders_of(board: list[dict]) -> dict:
+    """Per regime, the closest row, the largest row and their ratios.
+
+    GAE-unpinned rows are never named, whatever their ratio."""
+    leaders = {}
+    for regime in ("prime", "char2", "koblitz", "koblitz_batch"):
+        rows = [r for r in board if r["regime"] == regime]
+        pinned_rows = [r for r in rows if not r["gae_pin"]["unpinned"]]
+        if rows and not pinned_rows:
+            raise SystemExit(f"every {regime} row is GAE unpinned; no ranking sentence can be written")
+        ranked = [r for r in pinned_rows if not r["best"].get("construction_artefact")] or pinned_rows
+        best = min(ranked, key=lambda r: r["best"]["ratio_rho"])
+        top = max(pinned_rows, key=lambda r: r["log2_r"])
+        leaders[regime] = {"slug": best["slug"], "log2_r": best["log2_r"],
+                           "ratio_rho": best["best"]["ratio_rho"], "s": best["best"]["s"],
+                           "recipe": best["best"]["label"],
+                           "one_target": best["best"].get("one_target_cold_ratio_section20"),
+                           "online_speedup": best["best"].get("online_speedup"),
+                           "largest": {"slug": top["slug"], "log2_r": top["log2_r"],
+                                       "ratio_rho": top["best"]["ratio_rho"]}}
+    return leaders
 
 
 def latest_frontier_audit() -> dict:
@@ -708,6 +810,7 @@ def latest_frontier_audit() -> dict:
             "label": n61["label"], "rho_over_ic": n61["online_rho_over_ic"],
             "ci95": n61["online_ci95"], "targets": n61["targets"],
             "setup_seconds_approx": n61["setup_seconds_approx"], "status": n61["status"],
+            "precomputed_rho": {"status": NOT_RUN_PRECOMP["n61 compact orbit"]},
         },
         "exploratory_online": {
             "label": n83["label"], "rho_over_ic": n83["online_rho_over_ic"],
@@ -715,7 +818,9 @@ def latest_frontier_audit() -> dict:
             "setup_inclusive_class": n83["setup_inclusive_class"],
             "first_integer_break_even_under_model": n83["first_integer_break_even_under_model"],
             "status": n83["status"],
+            "precomputed_rho": {"status": NOT_RUN_PRECOMP["n83 dense K1798"]},
         },
+        "precomputed_rho_control": precomputed_rho_control(),
         "replay_block": {
             "identical": failed["replays_identical"], "total": failed["replays_total"],
             "failures": failed["failures"], "scope": failed["failure_scope"],
@@ -1006,19 +1111,7 @@ def build() -> dict:
                             "variant": r["best"].get("variant"), "source": r["source"],
                             "refs": r["curve_record"]["factor_base_refs"],
                             "link_status": r["curve_record"]["factor_base_link_status"]}
-    leaders = {}
-    for regime in ("prime", "char2", "koblitz", "koblitz_batch"):
-        rows = [r for r in board if r["regime"] == regime]
-        ranked = [r for r in rows if not r["best"].get("construction_artefact")] or rows
-        best = min(ranked, key=lambda r: r["best"]["ratio_rho"])
-        top = max(rows, key=lambda r: r["log2_r"])
-        leaders[regime] = {"slug": best["slug"], "log2_r": best["log2_r"],
-                           "ratio_rho": best["best"]["ratio_rho"], "s": best["best"]["s"],
-                           "recipe": best["best"]["label"],
-                           "one_target": best["best"].get("one_target_cold_ratio_section20"),
-                           "online_speedup": best["best"].get("online_speedup"),
-                           "largest": {"slug": top["slug"], "log2_r": top["log2_r"],
-                                       "ratio_rho": top["best"]["ratio_rho"]}}
+    leaders = leaders_of(board)
     return {
         "schema_version": 1,
         "generated_by": "scripts/build_ic_leaderboard.py",
@@ -1138,33 +1231,46 @@ def markdown(doc: dict) -> str:
     L += [f"## Latest frontier audit ({audit['date']})", "",
           "This performance handoff is published beside the curve-by-curve tables. The standing rho "
           "implementation improved, while its mathematical work and every ranked IC row stayed fixed.", "",
-          "| boundary | observed result | leaderboard treatment |",
-          "|:--|:--|:--|",
+          "| boundary | observed result | leaderboard treatment | matched precomputed rho (IC online / pre-rho) |",
+          "|:--|:--|:--|:--|",
           f"| Standing strong-rho implementation | complete-solve Callgrind: optimized / archived "
           f"baseline {rho['optimized_over_archived_baseline']:.6f}× and optimized / same-binary legacy "
           f"{rho['optimized_over_same_binary_legacy']:.6f}×; GAE {rho['ops_ratio']:.3f} "
           f"[{rho['ops_ci95'][0]:.3f}, {rho['ops_ci95'][1]:.3f}] over {rho['ops_pairs']} pairs; "
           f"{rho['replays_identical']}/{rho['measured_replays']} measured replays identical | "
           f"Implementation win; operation boundary unchanged. Native wall remained {rho['wall_level']} "
-          "and is not admitted |",
+          "and is not admitted | n/a |",
           f"| Canonical medium-tier Koblitz cold operations | `{cold['method']}` / "
           f"`{cold['bound_id']}`: {cold['ops_over_floor']:.3f}× floor "
           f"[{cold['ops_ci95'][0]:.3f}, {cold['ops_ci95'][1]:.3f}], "
-          f"{cold['runs']} runs at {cold['sizes']} sizes | Standing rho boundary; not an IC row |",
+          f"{cold['runs']} runs at {cold['sizes']} sizes | Standing rho boundary; not an IC row | n/a |",
           f"| Retained-setup online, `{admitted['label']}` | rho/IC "
           f"{admitted['rho_over_ic']:.1f}× [{admitted['ci95'][0]:.1f}, "
           f"{admitted['ci95'][1]:.1f}], {admitted['targets']} unseen targets; about "
           f"{admitted['setup_seconds_approx']:.0f} s setup excluded | Admitted online result; "
-          "kept separate from cold ranked rows |",
+          f"kept separate from cold ranked rows | {admitted['precomputed_rho']['status']} |",
           f"| Retained-setup online, `{exploratory['label']}` | rho/IC "
           f"{exploratory['rho_over_ic']:.6f}× on {exploratory['targets']} public point; complete IC "
           f"process {exploratory['complete_process_seconds']:.3f} s | Exploratory shared-host result; "
-          "no matched cold ratio and no rank promotion |",
+          f"no matched cold ratio and no rank promotion | {exploratory['precomputed_rho']['status']} |",
           f"| Current-binary root-finder replay-all | {replay['identical']}/{replay['total']} identical; "
           f"{replay['failures']} inherited-F4 counter mismatches | Failed replay retained; affected "
-          "stage counters blocked from promotion |", "",
+          "stage counters blocked from promotion | n/a |", "",
           f"[Latest result data](../../{audit['source']}); "
           f"[prior full synthesis](../../{audit['previous_source']}). {audit['reason']}", ""]
+    pc = audit["precomputed_rho_control"]
+    L += ["### Precomputed-rho control on N83 (Bernstein–Lange), the nearest matched evidence", "",
+          f"AGENTS.md asks for the precomputed-rho reference wherever setup is excluded. The only such control "
+          f"in the repository is [`{pc['readme']}`](../../{pc['readme']}), on N83 K3300 and K600. {pc['scope']}. "
+          f"Direction: {pc['direction']}; the frontier-audit rows above quote the inverse, rho / IC, against "
+          f"plain rho. Range over these rows: {pc['range'][0]:.2f}–{pc['range'][1]:.2f}×.", "",
+          "| K | precomputed-rho arm | IC online median ms | precomputed-rho median ms | median IC / pre-rho (95% CI) | targets | source |",
+          "|:--|:--|--:|--:|:--|--:|:--|"]
+    for x in pc["rows"]:
+        L.append(f"| {x['k']} | {x['arm']} | {x['ic_median_ms']:.2f} | {x['precomputed_rho_median_ms']:.2f} | "
+                 f"**{x['ic_over_precomputed_rho']:.2f}** ({x['ci95'][0]:.2f}–{x['ci95'][1]:.2f}) | "
+                 f"{x['targets']} | [`analysis.json`](../../{x['source']}) |")
+    L.append("")
     for code in ("A", "B", "C"):
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
@@ -1187,10 +1293,19 @@ def markdown(doc: dict) -> str:
             cells = ([REGIME_NAME[r["regime"]]] if multi else []) + [
                 f"`{r['slug']}`", f"{r['log2_r']:.1f}", b["label"], g3(b["s"]), g3(r["reference_s"]),
                 f"**{times(b['ratio_rho'])}**" + (f" (was {times(b['ratio_rho_section23'])}, §23)"
-                                                   if "ratio_rho_section23" in b else ""),
+                                                   if "ratio_rho_section23" in b else "")
+                + (" **GAE unpinned**" if r["gae_pin"]["unpinned"] else ""),
                 g3(r["floor_s"]), times(b["ratio_floor"]),
-                "✓" if b["verified"] else "✗"]
+                ("✓" if b["verified"] else "✗") + (" GAE unpinned" if r["gae_pin"]["unpinned"] else "")]
             L.append("| " + " | ".join(cells) + " |")
+        if f["gae_rows"]:
+            L += ["", f"- **Calibration pins:** {f['gae_rows'] - f['gae_unpinned_rows']} of {f['gae_rows']} rows "
+                  "record a non-empty `calibration_pinned.pinned` list in their source "
+                  f"(`{SOURCES['round5']}`). A row whose source has an empty list or no pin record is marked "
+                  "`GAE unpinned`, because its non-group-operation counters were converted at host-measured "
+                  "ratios that differ between identical runs "
+                  "([lead ladder methodology §1](LEAD_LADDER_METHODOLOGY_20261010.md)); it is excluded from "
+                  "every `× reference` ranking sentence. Tables A and C are clock-priced and make no GAE conversion."]
         L.append("")
     L += ["## Phases, as a share of S", "",
           "Shares are fractions of each row's own `S`, so they carry no unit; read each row in the "
@@ -1525,8 +1640,10 @@ def ratio_chart(board: list[dict]) -> str:
         out.append(f'<text x="0" y="{y + 4}">{esc(REGIME_NAME[regime])} ({FAMILY_OF[regime]})</text>')
         for r in (r for r in board if r["regime"] == regime):
             v = r["best"]["ratio_rho"]
-            out.append(f'<circle cx="{x(v):.1f}" cy="{y}" r="5" fill="var(--data)" fill-opacity=".55" '
-                       f'stroke="var(--data)"><title>{esc(r["slug"])}: {times(v)} at 2^{r["log2_r"]:.1f}</title></circle>')
+            flag = r["gae_pin"]["unpinned"]
+            out.append(f'<circle cx="{x(v):.1f}" cy="{y}" r="5" fill="var(--data)" '
+                       f'fill-opacity="{"0" if flag else ".55"}" stroke="var(--data)"><title>{esc(r["slug"])}: '
+                       f'{times(v)} at 2^{r["log2_r"]:.1f}{" (GAE unpinned, not ranked)" if flag else ""}</title></circle>')
     out.append("</svg>")
     return "".join(out)
 
@@ -1534,7 +1651,8 @@ def ratio_chart(board: list[dict]) -> str:
 def page(doc: dict, standalone: bool) -> str:
     board = doc["board"]
     L = doc["leaders"]
-    by_regime = {g: sorted((r for r in board if r["regime"] == g), key=lambda r: r["best"]["ratio_rho"])
+    by_regime = {g: sorted((r for r in board if r["regime"] == g),
+                           key=lambda r: (r["gae_pin"]["unpinned"], r["best"]["ratio_rho"]))
                  for g in ("koblitz", "prime", "char2", "koblitz_batch")}
     head = ('<title>Index Calculus Leaderboard</title>\n'
             '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
@@ -1600,7 +1718,7 @@ def page(doc: dict, standalone: bool) -> str:
              '<p>The standing rho implementation improved while its mathematical work and every ranked IC '
              'row stayed fixed. Cold, retained-setup online, exploratory and failed-replay evidence remain separate.</p>'
              '<div class="scroll"><table><thead><tr><th>Boundary</th><th>Observed result</th>'
-             '<th>Leaderboard treatment</th></tr></thead><tbody>'
+             '<th>Leaderboard treatment</th><th>Matched precomputed rho (IC online / pre-rho)</th></tr></thead><tbody>'
              '<tr><td>Standing strong-rho implementation</td>'
              f'<td>complete-solve Callgrind: optimized / archived baseline '
              f'{rho["optimized_over_archived_baseline"]:.6f}× and optimized / same-binary legacy '
@@ -1608,27 +1726,43 @@ def page(doc: dict, standalone: bool) -> str:
              f'[{rho["ops_ci95"][0]:.3f}, {rho["ops_ci95"][1]:.3f}] over {rho["ops_pairs"]} pairs; '
              f'{rho["replays_identical"]}/{rho["measured_replays"]} measured replays identical</td>'
              f'<td>Implementation win; operation boundary unchanged. Native wall remained '
-             f'{esc(rho["wall_level"])} and is not admitted</td></tr>'
+             f'{esc(rho["wall_level"])} and is not admitted</td><td>n/a</td></tr>'
              '<tr><td>Canonical medium-tier Koblitz cold operations</td>'
              f'<td><code>{esc(acold["method"])}</code> / <code>{esc(acold["bound_id"])}</code>: '
              f'{acold["ops_over_floor"]:.3f}× floor [{acold["ops_ci95"][0]:.3f}, '
              f'{acold["ops_ci95"][1]:.3f}], {acold["runs"]} runs at {acold["sizes"]} sizes</td>'
-             '<td>Standing rho boundary; not an IC row</td></tr>'
+             '<td>Standing rho boundary; not an IC row</td><td>n/a</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(admitted["label"])}</code></td>'
              f'<td>rho/IC {admitted["rho_over_ic"]:.1f}× [{admitted["ci95"][0]:.1f}, '
              f'{admitted["ci95"][1]:.1f}], {admitted["targets"]} unseen targets; about '
              f'{admitted["setup_seconds_approx"]:.0f} s setup excluded</td>'
-             '<td>Admitted online result; separate from cold ranked rows</td></tr>'
+             f'<td>Admitted online result; separate from cold ranked rows</td><td>{esc(admitted["precomputed_rho"]["status"])}</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(exploratory["label"])}</code></td>'
              f'<td>rho/IC {exploratory["rho_over_ic"]:.6f}× on {exploratory["targets"]} public point; '
              f'complete IC process {exploratory["complete_process_seconds"]:.3f} s</td>'
-             '<td>Exploratory shared-host result; no matched cold ratio and no rank promotion</td></tr>'
+             f'<td>Exploratory shared-host result; no matched cold ratio and no rank promotion</td><td>{esc(exploratory["precomputed_rho"]["status"])}</td></tr>'
              f'<tr><td>Current-binary root-finder replay-all</td><td>{replay["identical"]}/'
              f'{replay["total"]} identical; {replay["failures"]} inherited-F4 counter mismatches</td>'
-             '<td>Failed replay retained; affected stage counters blocked from promotion</td></tr>'
+             '<td>Failed replay retained; affected stage counters blocked from promotion</td><td>n/a</td></tr>'
              '</tbody></table></div>'
              f'<p>{esc(audit["reason"])} {gh(audit["source"], "Latest result data")} · '
-             f'{gh(audit["previous_source"], "prior full synthesis")}.</p></section>')
+             f'{gh(audit["previous_source"], "prior full synthesis")}.</p>')
+    pc = audit["precomputed_rho_control"]
+    P.append('<h3>Precomputed-rho control on N83 (Bernstein–Lange), the nearest matched evidence</h3>'
+             f'<p>AGENTS.md asks for the precomputed-rho reference wherever setup is excluded. The only such '
+             f'control in the repository is {gh(pc["readme"])}, on N83 K3300 and K600. {esc(pc["scope"])}. '
+             f'Direction: {esc(pc["direction"])}; the rows above quote the inverse, rho / IC, against plain rho. '
+             f'Range over these rows: {pc["range"][0]:.2f}–{pc["range"][1]:.2f}×.</p>'
+             '<div class="scroll"><table><thead><tr><th>K</th><th>Precomputed-rho arm</th>'
+             '<th class="n">IC online median ms</th><th class="n">Pre-rho median ms</th>'
+             '<th class="n">Median IC / pre-rho (95% CI)</th><th class="n">Targets</th><th>Source</th></tr></thead><tbody>')
+    for x in pc["rows"]:
+        P.append(f'<tr><td>{esc(x["k"])}</td><td>{esc(x["arm"])}</td><td class="n">{x["ic_median_ms"]:.2f}</td>'
+                 f'<td class="n">{x["precomputed_rho_median_ms"]:.2f}</td>'
+                 f'<td class="n"><span class="ratio">{x["ic_over_precomputed_rho"]:.2f}</span> '
+                 f'({x["ci95"][0]:.2f}–{x["ci95"][1]:.2f})</td><td class="n">{x["targets"]}</td>'
+                 f'<td>{gh(x["source"], "analysis.json")}</td></tr>')
+    P.append('</tbody></table></div></section>')
     d = doc["bounded_diagnostics"][0]
     P.append(f'<section class="card" id="bounded-n37-diagnostic"><h2>New n37 counted diagnostic, outside the priced tables</h2>'
              f'<p>On <code>{esc(d["curve"])}</code>, shared-rank K16 has {d["usable_points"]:,} actual usable '
@@ -1801,14 +1935,17 @@ def page(doc: dict, standalone: bool) -> str:
                 ci += (f'<br><span class="muted">was {times(b["ratio_rho_section21"])} (§21)</span>'
                        f'<br><span class="muted">derived one-target cold estimate: {times(b["one_target_cold_ratio_section20"])} '
                      f'(§20; not table A\'s measurement)</span>')
-            rank = "—" if b.get("construction_artefact") else i
+            unpinned = r["gae_pin"]["unpinned"]
+            if unpinned:
+                ci += '<br><span class="chip">GAE unpinned</span>'
+            rank = "—" if b.get("construction_artefact") or unpinned else i
             P.append(f'<tr class="{"lead" if r["slug"] == L[g]["slug"] else ""}"><td class="n">{rank}</td>'
                      f'<td><span class="slug">{esc(r["slug"])}</span>{record_cell(r)}</td><td class="n">{r["log2_r"]:.1f}</td>'
                      f'<td class="recipe">{esc(b["label"])}</td><td class="n">{b["m"]}</td><td class="n">{b["base_points"]:,}</td>'
                      f'<td class="n">{b["columns"]:,}</td><td class="n">{g3(b["s"])}</td>'
                      f'<td class="n">{g3(r["reference_s"])}</td><td class="n"><span class="ratio">{times(b["ratio_rho"])}</span>{ci}</td>'
                      f'<td class="n">{g3(r["floor_s"])}</td><td class="n">{times(b["ratio_floor"])}</td><td>{phase_bar(b["phases_s"], b["s"])}</td>'
-                     f'<td>{"✓" if b["verified"] else "✗"}</td></tr>')
+                     f'<td>{"✓" if b["verified"] else "✗"}{" GAE unpinned" if unpinned else ""}</td></tr>')
 
 
     def family_defs(code: str) -> str:
@@ -1820,7 +1957,13 @@ def page(doc: dict, standalone: bool) -> str:
             defs.append(("Rho step", steps))
         return ('<dl class="defs">' + "".join(
             f'<div><dt>{esc(k)}</dt><dd>{rich(v)}</dd></div>' for k, v in defs) + '</dl>'
-            f'<p class="muted">Read S, × ref and × floor in table {code} only.</p>')
+            f'<p class="muted">Read S, × ref and × floor in table {code} only.</p>' + (
+                f'<p class="muted"><strong>Calibration pins:</strong> {f["gae_rows"] - f["gae_unpinned_rows"]} of '
+                f'{f["gae_rows"]} rows record a non-empty <code>calibration_pinned.pinned</code> list in their '
+                f'source. A row with an empty list or no pin record is marked <span class="chip">GAE unpinned</span> '
+                'and excluded from every × reference ranking sentence, because its native counters were converted '
+                'at host-measured ratios that differ between identical runs (lead ladder methodology §1).</p>'
+                if f["gae_rows"] else ""))
 
     def family_table(code: str) -> None:
         f = doc["families"][code]

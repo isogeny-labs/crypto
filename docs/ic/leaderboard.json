@@ -114,6 +114,18 @@
    "path": "research/ecbench_rho_optimized_20261014/RESULT.json",
    "sha256": "195f3c4e3565dc2669769893b86741cc58d95c982190f77a0052c70b7f847cf9"
   },
+  "n83_precomp_rho_k600_run1": {
+   "path": "research/20261016-n83-precomputed-rho-control/records/run-38855595549/k600/analysis.json",
+   "sha256": "5eff3fd1336881afc098054cdd5242297402db32b4c704e689eb838d2d6921d1"
+  },
+  "n83_precomp_rho_k600_run2": {
+   "path": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k600/analysis.json",
+   "sha256": "2cafd393386abcbcece6da1c16ea976b89e46ad60e60dd0bd32325fb5bd45423"
+  },
+  "n83_precomp_rho_k3300_run2": {
+   "path": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k3300/analysis.json",
+   "sha256": "fc4981fe5e7a99ca3a5c0440506f704e25bd47fe4dfdf96afc76fed303710d68"
+  },
   "registry": {
    "path": "docs/curves/registry.json",
    "sha256": "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf"
@@ -143,6 +155,8 @@
    "unit_short": "batched-addition units",
    "ref_short": "one-target rho",
    "rows": 6,
+   "gae_rows": 0,
+   "gae_unpinned_rows": 0,
    "canonical_step_units": [
     4.60273174732,
     5.39421535943
@@ -168,6 +182,8 @@
    "unit_short": "GAE",
    "ref_short": "matched negation-map rho",
    "rows": 13,
+   "gae_rows": 13,
+   "gae_unpinned_rows": 0,
    "canonical_step_units": null,
    "rho_step_units_as_built": null
   },
@@ -186,6 +202,8 @@
    "unit_short": "batched-addition units, per target",
    "ref_short": "32-target batch rho",
    "rows": 9,
+   "gae_rows": 0,
+   "gae_unpinned_rows": 0,
    "canonical_step_units": [
     1.79795983513,
     2.29989035767
@@ -498,6 +516,20 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
+   "gae_pin": {
+    "priced_in_gae": true,
+    "unpinned": false,
+    "pinned": [
+     "ns_per_double",
+     "ns_per_lookup",
+     "ns_per_row_op",
+     "ns_per_sqrt",
+     "ns_per_word_xor",
+     "ns_per_legendre",
+     "ns_per_inversion"
+    ],
+    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
+   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -762,6 +794,20 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
+   "gae_pin": {
+    "priced_in_gae": true,
+    "unpinned": false,
+    "pinned": [
+     "ns_per_double",
+     "ns_per_lookup",
+     "ns_per_row_op",
+     "ns_per_sqrt",
+     "ns_per_word_xor",
+     "ns_per_legendre",
+     "ns_per_inversion"
+    ],
+    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
+   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -1026,6 +1072,20 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
+   "gae_pin": {
+    "priced_in_gae": true,
+    "unpinned": false,
+    "pinned": [
+     "ns_per_double",
+     "ns_per_lookup",
+     "ns_per_row_op",
+     "ns_per_sqrt",
+     "ns_per_word_xor",
+     "ns_per_legendre",
+     "ns_per_inversion"
+    ],
+    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
+   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -1290,6 +1350,20 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
+   "gae_pin": {
+    "priced_in_gae": true,
+    "unpinned": false,
+    "pinned": [
+     "ns_per_double",
+     "ns_per_lookup",
+     "ns_per_row_op",
+     "ns_per_sqrt",
+     "ns_per_word_xor",
+     "ns_per_legendre",
+     "ns_per_inversion"
+    ],
+    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
+   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -1554,6 +1628,20 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
+   "gae_pin": {
+    "priced_in_gae": true,
+    "unpinned": false,
+    "pinned": [
+     "ns_per_double",
+     "ns_per_lookup",
+     "ns_per_row_op",
+     "ns_per_sqrt",
+     "ns_per_word_xor",
+     "ns_per_legendre",
+     "ns_per_inversion"
+    ],
+    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
+   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -1818,6 +1906,20 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
+   "gae_pin": {
+    "priced_in_gae": true,
+    "unpinned": false,
+    "pinned": [
+     "ns_per_double",
+     "ns_per_lookup",
+     "ns_per_row_op",
+     "ns_per_sqrt",
+     "ns_per_word_xor",
+     "ns_per_legendre",
+     "ns_per_inversion"
+    ],
+    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
+   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -2082,6 +2184,20 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
+   "gae_pin": {
+    "priced_in_gae": true,
+    "unpinned": false,
+    "pinned": [
+     "ns_per_double",
+     "ns_per_lookup",
+     "ns_per_row_op",
+     "ns_per_sqrt",
+     "ns_per_word_xor",
+     "ns_per_legendre",
+     "ns_per_inversion"
+    ],
+    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
+   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -2346,6 +2462,20 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
+   "gae_pin": {
+    "priced_in_gae": true,
+    "unpinned": false,
+    "pinned": [
+     "ns_per_double",
+     "ns_per_lookup",
+     "ns_per_row_op",
+     "ns_per_sqrt",
+     "ns_per_word_xor",
+     "ns_per_legendre",
+     "ns_per_inversion"
+    ],
+    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
+   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -2564,6 +2694,20 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
+   "gae_pin": {
+    "priced_in_gae": true,
+    "unpinned": false,
+    "pinned": [
+     "ns_per_double",
+     "ns_per_lookup",
+     "ns_per_row_op",
+     "ns_per_as_solve",
+     "ns_per_s4_pair",
+     "ns_per_word_xor",
+     "ns_per_frobenius"
+    ],
+    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
+   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -2782,6 +2926,20 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
+   "gae_pin": {
+    "priced_in_gae": true,
+    "unpinned": false,
+    "pinned": [
+     "ns_per_double",
+     "ns_per_lookup",
+     "ns_per_row_op",
+     "ns_per_as_solve",
+     "ns_per_s4_pair",
+     "ns_per_word_xor",
+     "ns_per_frobenius"
+    ],
+    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
+   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -3000,6 +3158,20 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
+   "gae_pin": {
+    "priced_in_gae": true,
+    "unpinned": false,
+    "pinned": [
+     "ns_per_double",
+     "ns_per_lookup",
+     "ns_per_row_op",
+     "ns_per_as_solve",
+     "ns_per_s4_pair",
+     "ns_per_word_xor",
+     "ns_per_frobenius"
+    ],
+    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
+   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -3218,6 +3390,20 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
+   "gae_pin": {
+    "priced_in_gae": true,
+    "unpinned": false,
+    "pinned": [
+     "ns_per_double",
+     "ns_per_lookup",
+     "ns_per_row_op",
+     "ns_per_as_solve",
+     "ns_per_s4_pair",
+     "ns_per_word_xor",
+     "ns_per_frobenius"
+    ],
+    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
+   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -3436,6 +3622,20 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
+   "gae_pin": {
+    "priced_in_gae": true,
+    "unpinned": false,
+    "pinned": [
+     "ns_per_double",
+     "ns_per_lookup",
+     "ns_per_row_op",
+     "ns_per_as_solve",
+     "ns_per_s4_pair",
+     "ns_per_word_xor",
+     "ns_per_frobenius"
+    ],
+    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
+   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
@@ -3545,6 +3745,11 @@
    },
    "source": "research/ic_tool_program/rule/v3/analysis.json",
    "before_source": "research/ic_single_target_20260930/analysis.json",
+   "gae_pin": {
+    "priced_in_gae": false,
+    "unpinned": false,
+    "pinned": null
+   },
    "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
    "class": "accounting",
    "family": "A",
@@ -3656,6 +3861,11 @@
    },
    "source": "research/ic_tool_program/rule/v3/analysis.json",
    "before_source": "research/ic_single_target_20260930/analysis.json",
+   "gae_pin": {
+    "priced_in_gae": false,
+    "unpinned": false,
+    "pinned": null
+   },
    "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
    "class": "accounting",
    "family": "A",
@@ -3767,6 +3977,11 @@
    },
    "source": "research/ic_tool_program/rule/v3/analysis.json",
    "before_source": "research/ic_single_target_20260930/analysis.json",
+   "gae_pin": {
+    "priced_in_gae": false,
+    "unpinned": false,
+    "pinned": null
+   },
    "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
    "class": "accounting",
    "family": "A",
@@ -3878,6 +4093,11 @@
    },
    "source": "research/ic_tool_program/rule/v3/analysis.json",
    "before_source": "research/ic_single_target_20260930/analysis.json",
+   "gae_pin": {
+    "priced_in_gae": false,
+    "unpinned": false,
+    "pinned": null
+   },
    "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
    "class": "accounting",
    "family": "A",
@@ -3989,6 +4209,11 @@
    },
    "source": "research/ic_tool_program/rule/v3/analysis.json",
    "before_source": "research/ic_single_target_20260930/analysis.json",
+   "gae_pin": {
+    "priced_in_gae": false,
+    "unpinned": false,
+    "pinned": null
+   },
    "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
    "class": "accounting",
    "family": "A",
@@ -4100,6 +4325,11 @@
    },
    "source": "research/ic_tool_program/rule/v3/analysis.json",
    "before_source": "research/ic_single_target_20260930/analysis.json",
+   "gae_pin": {
+    "priced_in_gae": false,
+    "unpinned": false,
+    "pinned": null
+   },
    "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
    "class": "accounting",
    "family": "A",
@@ -4226,6 +4456,11 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
+   "gae_pin": {
+    "priced_in_gae": false,
+    "unpinned": false,
+    "pinned": null
+   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -4352,6 +4587,11 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
+   "gae_pin": {
+    "priced_in_gae": false,
+    "unpinned": false,
+    "pinned": null
+   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -4478,6 +4718,11 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
+   "gae_pin": {
+    "priced_in_gae": false,
+    "unpinned": false,
+    "pinned": null
+   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -4604,6 +4849,11 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
+   "gae_pin": {
+    "priced_in_gae": false,
+    "unpinned": false,
+    "pinned": null
+   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -4730,6 +4980,11 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
+   "gae_pin": {
+    "priced_in_gae": false,
+    "unpinned": false,
+    "pinned": null
+   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -4856,6 +5111,11 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
+   "gae_pin": {
+    "priced_in_gae": false,
+    "unpinned": false,
+    "pinned": null
+   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -4982,6 +5242,11 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
+   "gae_pin": {
+    "priced_in_gae": false,
+    "unpinned": false,
+    "pinned": null
+   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -5108,6 +5373,11 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
+   "gae_pin": {
+    "priced_in_gae": false,
+    "unpinned": false,
+    "pinned": null
+   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -5234,6 +5504,11 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
+   "gae_pin": {
+    "priced_in_gae": false,
+    "unpinned": false,
+    "pinned": null
+   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -5898,7 +6173,10 @@
    ],
    "targets": 64,
    "setup_seconds_approx": 28.0,
-   "status": "admitted online"
+   "status": "admitted online",
+   "precomputed_rho": {
+    "status": "not run: no Bernstein-Lange precomputed-rho control exists for the n61 instance"
+   }
   },
   "exploratory_online": {
    "label": "n83 dense K1798",
@@ -5907,7 +6185,86 @@
    "complete_process_seconds": 339.068,
    "setup_inclusive_class": "diagnostic: complete IC process divided by reported rho online time; not a matched cold ratio",
    "first_integer_break_even_under_model": 306,
-   "status": "exploratory one point"
+   "status": "exploratory one point",
+   "precomputed_rho": {
+    "status": "not run for K1798: the n83 control measured K3300 and K600, a different factor base and a different run, so neither is a matched reference for this row"
+   }
+  },
+  "precomputed_rho_control": {
+   "readme": "research/20261016-n83-precomputed-rho-control/README.md",
+   "rows": [
+    {
+     "k": "K3300",
+     "arm": "(a') table walks = IC setup wall, 1 thread",
+     "source": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k3300/analysis.json",
+     "ic_median_ms": 32.78367,
+     "precomputed_rho_median_ms": 8.113225,
+     "ic_over_precomputed_rho": 3.74397251134,
+     "ci95": [
+      2.65110714379,
+      11.0466601892
+     ],
+     "targets": 16
+    },
+    {
+     "k": "K3300",
+     "arm": "(b) table = IC max RSS",
+     "source": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k3300/analysis.json",
+     "ic_median_ms": 32.78367,
+     "precomputed_rho_median_ms": 1.166846,
+     "ic_over_precomputed_rho": 40.6069049775,
+     "ci95": [
+      24.2694988488,
+      71.7150779186
+     ],
+     "targets": 16
+    },
+    {
+     "k": "K600",
+     "arm": "(a') table walks = IC setup wall, 1 thread",
+     "source": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k600/analysis.json",
+     "ic_median_ms": 563.8835245,
+     "precomputed_rho_median_ms": 5.171888,
+     "ic_over_precomputed_rho": 81.5222228726,
+     "ci95": [
+      46.3507359086,
+      236.590887956
+     ],
+     "targets": 16
+    },
+    {
+     "k": "K600",
+     "arm": "(a) 650 s table walks <= IC setup wall",
+     "source": "research/20261016-n83-precomputed-rho-control/records/run-38855595549/k600/analysis.json",
+     "ic_median_ms": 580.2756445,
+     "precomputed_rho_median_ms": 3.3333905,
+     "ic_over_precomputed_rho": 214.7322697,
+     "ci95": [
+      47.9380691924,
+      483.837096224
+     ],
+     "targets": 16
+    },
+    {
+     "k": "K600",
+     "arm": "(b) table = IC max RSS",
+     "source": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k600/analysis.json",
+     "ic_median_ms": 563.8835245,
+     "precomputed_rho_median_ms": 1.189073,
+     "ic_over_precomputed_rho": 395.530825225,
+     "ci95": [
+      177.934097024,
+      1134.45033434
+     ],
+     "targets": 16
+    }
+   ],
+   "range": [
+    3.74397251134,
+    395.530825225
+   ],
+   "direction": "IC online / precomputed-rho online, median of paired per-target ratios; above 1 means precomputed rho is faster online",
+   "scope": "Neither factor base is the K1798 instance of the frontier-audit row"
   },
   "replay_block": {
    "identical": 120,
