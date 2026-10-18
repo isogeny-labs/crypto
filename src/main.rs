@@ -309,6 +309,23 @@ enum CryptanalysisOp {
         #[arg(long, default_value_t = 0x73)]
         alpha: u8,
     },
+    /// Measure a bounded AES impossible, yoyo, mixture, or S-box zero-correlation distinguisher.
+    AesDistinguisher {
+        /// `impossible` (4 rounds), `yoyo` (2 vs 3), `mixture` (1 vs 2), or `zero-correlation` (S-box).
+        #[arg(long)]
+        technique: String,
+        /// 16-byte analysis key as 32 hex digits (unused for S-box statistics).
+        #[arg(long, default_value = "914f6da1c78305bb2957ee104d826cfa")]
+        key_hex: String,
+        /// Chosen pairs, yoyo trials, or mixture quadruples.
+        #[arg(long, default_value_t = 4096)]
+        samples: usize,
+        #[arg(long, default_value_t = 0xdead_beef_cafe)]
+        seed: u64,
+        /// Input difference at plaintext byte zero for `impossible`.
+        #[arg(long, default_value_t = 0x73)]
+        alpha: u8,
+    },
     /// Run the full research bench and emit the Markdown report.
     /// (Equivalent to `cargo test --lib --release bench_demo --
     /// --ignored --nocapture` but accessible from the CLI.)
@@ -1473,6 +1490,122 @@ fn cmd_aes_attack(
     Ok(())
 }
 
+fn cmd_aes_distinguisher(
+    technique: &str,
+    key_hex: &str,
+    samples: usize,
+    seed: u64,
+    alpha: u8,
+) -> Result<(), String> {
+    use crypto_lib::cryptanalysis::aes::{
+        impossible, mixture, yoyo, zero_correlation, ReducedAes128,
+    };
+
+    if !(1..=1_000_000).contains(&samples) {
+        return Err("samples must be in 1..=1000000".into());
+    }
+    let key_vec = from_hex(key_hex).map_err(|e| format!("invalid AES key hex: {e}"))?;
+    let key: [u8; 16] = key_vec
+        .try_into()
+        .map_err(|_| "AES-128 key must be exactly 16 bytes".to_string())?;
+    match technique {
+        "impossible" => {
+            if alpha == 0 {
+                return Err("alpha must be nonzero".into());
+            }
+            let cipher = ReducedAes128::new(&key, 4, false);
+            let report = impossible::verify_4_round_impossibility(&cipher, alpha, samples, seed);
+            println!("# AES-128 four-round impossible differential");
+            println!("pairs tested: {}", report.pairs_tested);
+            println!(
+                "one-active-byte output pairs: {}",
+                report.one_active_output_pairs
+            );
+            println!(
+                "low-activity output pairs: {}",
+                report.low_activity_output_pairs
+            );
+            let verified = report.one_active_output_pairs == 0;
+            println!("structural check: {verified}");
+            if !verified {
+                return Err(
+                    "observed a pair contradicting the specified impossible differential".into(),
+                );
+            }
+        }
+        "yoyo" => {
+            if samples < 64 {
+                return Err("yoyo comparison requires at least 64 trials".into());
+            }
+            let two = yoyo::yoyo_distinguisher(&ReducedAes128::new(&key, 2, false), samples, seed);
+            let three =
+                yoyo::yoyo_distinguisher(&ReducedAes128::new(&key, 3, false), samples, seed);
+            println!("# AES-128 yoyo distinguisher (2 vs 3 rounds)");
+            println!("trials: {samples}");
+            println!("two-round structure preserved: {}", two.structure_preserved);
+            println!(
+                "three-round structure preserved: {}",
+                three.structure_preserved
+            );
+            let verified = two.structure_preserved == samples
+                && three.structure_preserved < two.structure_preserved;
+            println!("observed round distinction: {verified}");
+            if !verified {
+                return Err("configured trial panel did not separate the two round counts".into());
+            }
+        }
+        "mixture" => {
+            if samples < 64 {
+                return Err("mixture comparison requires at least 64 quadruples".into());
+            }
+            let one = ReducedAes128::new(&key, 1, false);
+            let two = ReducedAes128::new(&key, 2, false);
+            let report = mixture::column_confined_subspace_check(&one, &two, samples, seed);
+            let one_identity = mixture::algebraic_identity_holds(&one, samples, seed);
+            let two_identity = mixture::algebraic_identity_holds(&two, samples, seed);
+            println!("# AES-128 mixture identity distinguisher (1 vs 2 rounds)");
+            println!("quadruples: {}", report.quadruples);
+            println!("one-round mixture identity: {one_identity}");
+            println!("two-round mixture identity: {two_identity}");
+            println!(
+                "one-round column confined: {}",
+                report.one_round_column_confined
+            );
+            println!(
+                "two-round column confined: {}",
+                report.two_round_column_confined
+            );
+            let verified = one_identity && !two_identity && report.two_round_column_confined == 0;
+            println!("observed round distinction: {verified}");
+            if !verified {
+                return Err("configured mixture panel did not separate the round counts".into());
+            }
+        }
+        "zero-correlation" => {
+            let pairs = zero_correlation::enumerate_zero_correlation_pairs(1e-12);
+            let verified = !pairs.is_empty() && pairs.iter().all(|(_, _, c)| c.abs() < 1e-12);
+            println!("# AES S-box zero-correlation mask pairs");
+            println!(
+                "nonzero-mask pairs with exact zero correlation: {}",
+                pairs.len()
+            );
+            if let Some((input_mask, output_mask, correlation)) = pairs.first() {
+                println!("first pair: {input_mask:02x} -> {output_mask:02x} ({correlation:.6})");
+            }
+            println!("S-box correlation check: {verified}");
+            if !verified {
+                return Err("S-box zero-correlation enumeration failed its exact check".into());
+            }
+        }
+        other => {
+            return Err(format!(
+                "unknown AES distinguisher '{other}'; use impossible, yoyo, mixture, or zero-correlation"
+            ));
+        }
+    }
+    Ok(())
+}
+
 fn cmd_cryptanalysis(op: CryptanalysisOp) {
     use crypto_lib::cryptanalysis::auto_attack::{auto_attack_with, AutoAttackOptions};
     use crypto_lib::cryptanalysis::boomerang::{boomerang_distinguisher, rectangle_attack};
@@ -1646,6 +1779,18 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
             alpha,
         } => {
             if let Err(e) = cmd_aes_attack(&technique, &key_hex, samples, seed, alpha) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesDistinguisher {
+            technique,
+            key_hex,
+            samples,
+            seed,
+            alpha,
+        } => {
+            if let Err(e) = cmd_aes_distinguisher(&technique, &key_hex, samples, seed, alpha) {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }

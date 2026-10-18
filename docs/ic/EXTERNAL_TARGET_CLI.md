@@ -93,6 +93,10 @@ not a claim against the repository's full IC-versus-rho measurement gates.
 crypto cryptanalysis aes-attack --technique differential
 crypto cryptanalysis aes-attack --technique linear
 crypto cryptanalysis aes-attack --technique square
+crypto cryptanalysis aes-distinguisher --technique impossible --samples 4096
+crypto cryptanalysis aes-distinguisher --technique yoyo --samples 4096
+crypto cryptanalysis aes-distinguisher --technique mixture --samples 4096
+crypto cryptanalysis aes-distinguisher --technique zero-correlation
 ```
 
 These commands expose the existing AES-128 two-round differential,
@@ -102,3 +106,12 @@ and linear corpora. Each recovered result is checked against that instance.
 The rest of the AES modules have separate input models and remain outside
 this adapter; `crypto cryptanalysis sbox`, `auto`, `boomerang`, `rectangle`,
 `aes-related-key`, and `aes-visual-demo` provide other entry points.
+`aes-distinguisher` exposes four further bounded analyses: a four-round
+impossible differential, a two-versus-three-round yoyo comparison, a
+one-versus-two-round mixture identity comparison with subspace diagnostics,
+and exact zero-correlation
+mask enumeration on the AES S-box. The first three use a supplied AES-128
+analysis key; the S-box check concerns the public substitution table. Each
+command reports the configured sample count and its observed structural
+check. These are distinct input models and do not imply an attack on
+full-round AES.
