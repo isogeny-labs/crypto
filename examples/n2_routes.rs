@@ -19,7 +19,7 @@
 //! separately and priced afterwards at 0, 0.1 and 1 M.
 //!
 //! std-only; `rustc --edition 2021 -O examples/n2_routes.rs`.
-//! Usage: `n2_routes <out-dir> [run|check|control]`; env `N2_THREADS`, `N2_SIZES`
+//! Usage: `n2_routes <out-dir> [run|check|control|summarize]`; env `N2_THREADS`, `N2_SIZES`
 //! (comma-separated `log2 #E` targets, default `20,24,28,32,36,40`).
 #![allow(dead_code)]
 #![allow(clippy::needless_range_loop)]
@@ -2318,6 +2318,24 @@ fn summarize(csv: &str) -> (String, String, String) {
             txt.push_str(&format!("O/J scaling arm {arm} c {c}: cost ~ p^{:.3}\n", sxy / sxx));
         }
     }
+    // K6: rho positive control, mean steps/p against 0.886/sqrt(h) per size
+    for &b in &bits {
+        let rho: Vec<&HashMap<&str, f64>> = rows
+            .iter()
+            .filter(|(m, a)| m["bits"] as u64 == b && a == "R")
+            .map(|(m, _)| m)
+            .collect();
+        let n = rho.len() as f64;
+        let obs: Vec<f64> = rho.iter().map(|m| m["steps"] / m["p"]).collect();
+        let th: Vec<f64> = rho.iter().map(|m| 0.886 * (m["ell"] / (m["p"] * m["p"])).sqrt()).collect();
+        let mo = obs.iter().sum::<f64>() / n;
+        let mt = th.iter().sum::<f64>() / n;
+        let sd = (obs.iter().map(|x| (x - mo).powi(2)).sum::<f64>() / (n - 1.0).max(1.0)).sqrt();
+        txt.push_str(&format!(
+            "K6 bits {b}: rho steps/p mean {mo:.4} (s.e. {:.4}, {n} runs) vs 0.886*sqrt(ell)/p mean {mt:.4}\n",
+            sd / n.sqrt()
+        ));
+    }
     txt.push_str(&format!("O/J all answers verified: {verified_all}\n"));
     (out, rank, txt)
 }
@@ -2405,6 +2423,15 @@ fn main() {
     let mode = args.get(2).map(String::as_str).unwrap_or("run");
     if mode == "check" {
         run_checks(out);
+        return;
+    }
+    if mode == "summarize" {
+        // re-derive the summary files from a recorded routes.csv
+        let summary = summarize(&std::fs::read_to_string(out.join("routes.csv")).unwrap());
+        std::fs::write(out.join("routes_summary.csv"), &summary.0).unwrap();
+        std::fs::write(out.join("ranking.csv"), &summary.1).unwrap();
+        std::fs::write(out.join("summary.txt"), &summary.2).unwrap();
+        eprint!("{}", summary.2);
         return;
     }
     let control = mode == "control";
