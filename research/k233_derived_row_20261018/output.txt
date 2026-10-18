@@ -1,0 +1,56 @@
+# K-233 derived row (derived calculation; no S, no measured cost)
+
+ord_233(2) = 29; cosets: 9 total, 1 of size 1, 8 of size 29; check PASS
+log2 r = 231.0000 (r = 0x8000000000000000000000000000069d5bb915bcd46efb1ad5f173abdf); log2 T_rho = 110.894
+stable dimensions (a in 0..8, c in 0..1): 0 1 29 30 58 59 87 88 116 117 145 146 174 175 203 204 232 233
+
+| m | ℓ | m·ℓ | log₂ B | D (chained, w=1) | D (chained, w=2.2) | D (elim, w=1) | D (elim, w=2.2) | D=4 fits (any) |
+|--:|--:|--:|--:|--:|--:|--:|--:|---|
+| 3 | 58 | 174 | 0.2 | none | none | none | none | no |
+| 3 | 59 | 177 | 2.2 | none | none | none | none | no |
+| 3 | 87 | 261 | 32.8 | 4 | none | 4 | none | yes |
+| 3 | 88 | 264 | 31.8 | 4 | none | 4 | none | yes |
+| 3 | 116 | 348 | 3.8 | none | none | none | none | no |
+| 4 | 58 | 232 | 56.2 | 7 | 2 | 9 | 3 | yes |
+| 4 | 59 | 236 | 59.2 | 7 | 3 | 10 | 3 | yes |
+| 4 | 87 | 348 | 32.8 | 3 | none | 4 | none | yes |
+| 5 | 29 | 145 | -4.1 | none | none | none | none | no |
+| 5 | 30 | 150 | -0.1 | none | none | none | none | no |
+| 5 | 58 | 290 | 61.8 | 7 | 3 | 10 | 3 | yes |
+| 5 | 59 | 295 | 60.8 | 7 | 3 | 10 | 3 | yes |
+| 6 | 29 | 174 | 22.3 | 2 | none | 3 | none | no |
+| 6 | 30 | 180 | 27.3 | 2 | none | 4 | none | yes |
+| 6 | 58 | 348 | 61.8 | 7 | 2 | 9 | 3 | yes |
+
+{"d4_fits":false,"d_chained_w1":null,"d_chained_w2_2":null,"d_elim_w1":null,"d_elim_w2_2":null,"ell":58,"kind":"derived","log2_budget":0.173,"m":3,"m_ell":174,"n":233}
+{"d4_fits":false,"d_chained_w1":null,"d_chained_w2_2":null,"d_elim_w1":null,"d_elim_w2_2":null,"ell":59,"kind":"derived","log2_budget":2.173,"m":3,"m_ell":177,"n":233}
+{"d4_fits":true,"d_chained_w1":4,"d_chained_w2_2":null,"d_elim_w1":4,"d_elim_w2_2":null,"ell":87,"kind":"derived","log2_budget":32.758,"m":3,"m_ell":261,"n":233}
+{"d4_fits":true,"d_chained_w1":4,"d_chained_w2_2":null,"d_elim_w1":4,"d_elim_w2_2":null,"ell":88,"kind":"derived","log2_budget":31.758,"m":3,"m_ell":264,"n":233}
+{"d4_fits":false,"d_chained_w1":null,"d_chained_w2_2":null,"d_elim_w1":null,"d_elim_w2_2":null,"ell":116,"kind":"derived","log2_budget":3.758,"m":3,"m_ell":348,"n":233}
+{"d4_fits":true,"d_chained_w1":7,"d_chained_w2_2":2,"d_elim_w1":9,"d_elim_w2_2":3,"ell":58,"kind":"derived","log2_budget":56.173,"m":4,"m_ell":232,"n":233}
+{"d4_fits":true,"d_chained_w1":7,"d_chained_w2_2":3,"d_elim_w1":10,"d_elim_w2_2":3,"ell":59,"kind":"derived","log2_budget":59.173,"m":4,"m_ell":236,"n":233}
+{"d4_fits":true,"d_chained_w1":3,"d_chained_w2_2":null,"d_elim_w1":4,"d_elim_w2_2":null,"ell":87,"kind":"derived","log2_budget":32.758,"m":4,"m_ell":348,"n":233}
+{"d4_fits":false,"d_chained_w1":null,"d_chained_w2_2":null,"d_elim_w1":null,"d_elim_w2_2":null,"ell":29,"kind":"derived","log2_budget":-4.149,"m":5,"m_ell":145,"n":233}
+{"d4_fits":false,"d_chained_w1":null,"d_chained_w2_2":null,"d_elim_w1":null,"d_elim_w2_2":null,"ell":30,"kind":"derived","log2_budget":-0.149,"m":5,"m_ell":150,"n":233}
+{"d4_fits":true,"d_chained_w1":7,"d_chained_w2_2":3,"d_elim_w1":10,"d_elim_w2_2":3,"ell":58,"kind":"derived","log2_budget":61.758,"m":5,"m_ell":290,"n":233}
+{"d4_fits":true,"d_chained_w1":7,"d_chained_w2_2":3,"d_elim_w1":10,"d_elim_w2_2":3,"ell":59,"kind":"derived","log2_budget":60.758,"m":5,"m_ell":295,"n":233}
+{"d4_fits":false,"d_chained_w1":2,"d_chained_w2_2":null,"d_elim_w1":3,"d_elim_w2_2":null,"ell":29,"kind":"derived","log2_budget":22.266,"m":6,"m_ell":174,"n":233}
+{"d4_fits":true,"d_chained_w1":2,"d_chained_w2_2":null,"d_elim_w1":4,"d_elim_w2_2":null,"ell":30,"kind":"derived","log2_budget":27.266,"m":6,"m_ell":180,"n":233}
+{"d4_fits":true,"d_chained_w1":7,"d_chained_w2_2":2,"d_elim_w1":9,"d_elim_w2_2":3,"ell":58,"kind":"derived","log2_budget":61.758,"m":6,"m_ell":348,"n":233}
+
+first D >= 4 fits, chained N, w = 1: m = 4, ℓ = 58, m·ℓ = 232 (D_adm = 7)
+first D >= 4 fits, chained N, w = 2.2: none in the listed range
+first D >= 4 fits, N = m·ℓ, w = 1: m = 6, ℓ = 30, m·ℓ = 180 (D_adm = 4)
+first D >= 4 fits, N = m·ℓ, w = 2.2: none in the listed range
+first D >= 5 fits, chained N, w = 1: m = 4, ℓ = 58, m·ℓ = 232 (D_adm = 7)
+first D >= 5 fits, chained N, w = 2.2: none in the listed range
+first D >= 5 fits, N = m·ℓ, w = 1: m = 4, ℓ = 58, m·ℓ = 232 (D_adm = 9)
+first D >= 5 fits, N = m·ℓ, w = 2.2: none in the listed range
+
+Per m, first stable ℓ with D >= 4 (chained w=1 / chained w=2.2 / elim w=1 / elim w=2.2):
+m = 3: 87 / none / 87 / none
+m = 4: 58 / none / 58 / none
+m = 5: 58 / none / 58 / none
+m = 6: 58 / none / 30 / none
+
+Measured wall (research/dreg_closure_slope_20261018/RESULTS.md): closure degree 4 at m·ℓ <= 18, > 4 at m·ℓ = 21. Every row above is derived, not measured.
