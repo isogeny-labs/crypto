@@ -16,4 +16,4 @@ rendered and visually inspected for legibility and clipping.
 
 The experiment tests (4091 library passes, 117 ignored; 19 example passes;
 historical 63 study and 46 boundary Python passes) apply to frozen source.
-Post-merge native tests are recorded separately in INTEGRATION.md.
+Post-merge native tests are recorded separately in [INTEGRATION.md](INTEGRATION.md).

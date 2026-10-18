@@ -85,3 +85,8 @@ are graphed locally. Benchmark copies are diagnostic only.
 The prepared 5,771,044-byte raw ZIP remains local: automatic approval review
 rejected upload of the broader worker/source/log payload. Factor-base storage
 succeeded independently. No raw ZIP upload is claimed.
+
+Post-merge native [integration validation](INTEGRATION.md): 4397 library
+passes (118 ignored), 19 exporter passes. The combined outer tool reported
+143 despite complete passing summaries; exporter confirmation captured 0.
+This is a separate validation receipt, not new research measurement evidence.
