@@ -29,6 +29,7 @@ STYLE = {
     "s4-grouplaw|lower bound (recorded)": ("group-law kernel, lower bound (pairs unpriced)", "C0", "v", "--"),
     "s4-grouplaw|pair-count (kernel pair = baseline pair)": ("group-law kernel, pair = baseline pair (NOT pinned)", "C9", "^", ":"),
     "s4-grouplaw|anchored estimate": ("group-law kernel, pinned baseline pair x measured time ratio (NOT pinned)", "C1", "D", "-"),
+    "s4-grouplaw|clmul-count estimate": ("group-law kernel, pinned baseline pair x counted clmul ratio (NOT pinned)", "C8", "*", "-"),
     "s4-grouplaw|add-ratio estimate": ("group-law kernel, measured pair / measured add (NOT pinned)", "C6", "d", ":"),
     "mitm": ("meet in the middle, m=3 (full table)", "C2", "P", "-"),
     "mitm-negfold": ("meet in the middle, m=3, negation-folded", "C4", "X", "--"),

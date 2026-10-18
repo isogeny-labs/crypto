@@ -144,7 +144,10 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for S4Baseline<'_> {
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
-        &[("m", "summands; this oracle is the three-summand S4 loop, so 3")]
+        &[(
+            "m",
+            "summands; this oracle is the three-summand S4 loop, so 3",
+        )]
     }
 
     fn prepare(
@@ -160,8 +163,10 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for S4Baseline<'_> {
         let o = SubspaceOracle::new(&basis, self.inst.b, &self.inst.gf);
         self.setup
             .insert("s4_oracle_span_words_uncharged".into(), o.span.len() as u64);
-        self.setup
-            .insert("s4_oracle_lv_coefficients_uncharged".into(), o.lv.len() as u64);
+        self.setup.insert(
+            "s4_oracle_lv_coefficients_uncharged".into(),
+            o.lv.len() as u64,
+        );
         debug_assert_eq!(o.l, l);
         self.oracle = Some(o);
         Ok(())
@@ -255,7 +260,10 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for S4GroupLaw<'_> {
 
     fn parameters(&self) -> &[(&str, &str)] {
         &[
-            ("m", "summands; this oracle is the three-summand S4 loop, so 3"),
+            (
+                "m",
+                "summands; this oracle is the three-summand S4 loop, so 3",
+            ),
             (
                 "audit",
                 "1 to decide every target with the baseline as well and compare witnesses; the \
@@ -286,8 +294,10 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for S4GroupLaw<'_> {
         let o = SubspaceOracle::new(&basis, inst.b, &inst.gf);
         self.setup
             .insert("s4_oracle_span_words_uncharged".into(), o.span.len() as u64);
-        self.setup
-            .insert("s4_oracle_lv_coefficients_uncharged".into(), o.lv.len() as u64);
+        self.setup.insert(
+            "s4_oracle_lv_coefficients_uncharged".into(),
+            o.lv.len() as u64,
+        );
         self.baseline = Some(o);
         // Rational base points of V in increasing abscissa: the run's own
         // base supplies every abscissa of V that lifts (x = 0 is not in it,

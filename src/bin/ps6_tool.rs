@@ -77,6 +77,16 @@ enum Cmd {
         #[arg(long, default_value_t = 3_000_000)]
         min_pairs: u64,
     },
+    /// Count field operations of the baseline loop and the kernel on the same targets
+    /// (needs a build with `--features pdp-opcount`).
+    Opcount {
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, value_delimiter = ',', default_value = "15,18,21,24,27")]
+        rungs: Vec<u32>,
+        #[arg(long, default_value_t = 64)]
+        targets: usize,
+    },
     /// Build the repository's pair table for one rung and report its memory.
     Memory {
         #[arg(long)]
@@ -94,6 +104,9 @@ enum Cmd {
         timed: Vec<PathBuf>,
         #[arg(long)]
         calibration: PathBuf,
+        /// `ps6_tool opcount` output, for the count-based conversion.
+        #[arg(long)]
+        opcount: Option<PathBuf>,
         #[arg(long)]
         memory: Option<PathBuf>,
         #[arg(long)]
@@ -123,11 +136,17 @@ fn run(cli: Cli) -> Result<(), String> {
             reps,
             min_pairs,
         } => calibrate(&out, &rungs, reps, min_pairs),
+        Cmd::Opcount {
+            out,
+            rungs,
+            targets,
+        } => opcount(&out, &rungs, targets),
         Cmd::Memory { n, fold, out } => memory(n, &fold, &out),
         Cmd::Analyze {
             counted,
             timed,
             calibration,
+            opcount,
             memory,
             out,
             markdown,
@@ -136,6 +155,7 @@ fn run(cli: Cli) -> Result<(), String> {
             &counted,
             &timed,
             &calibration,
+            opcount.as_deref(),
             memory.as_deref(),
             &out,
             &markdown,
@@ -149,9 +169,7 @@ fn ledger_instance(n: u32) -> Result<BinaryInstance, String> {
 }
 
 /// The base and kernel of a rung, built as the ecbench plug-in builds them.
-fn rung_parts(
-    inst: &BinaryInstance,
-) -> (u32, Vec<u64>, FactorBase<FastPoint>, Vec<(u64, u64)>) {
+fn rung_parts(inst: &BinaryInstance) -> (u32, Vec<u64>, FactorBase<FastPoint>, Vec<(u64, u64)>) {
     let l = inst.n.div_ceil(3);
     let basis: Vec<u64> = (0..l).map(|i| 1u64 << i).collect();
     let fb = binary_subspace_factor_base(inst, &basis);
@@ -176,6 +194,65 @@ fn write_jsonl(path: &Path, rows: &[Value]) -> Result<(), String> {
     Ok(())
 }
 
+/// `want` random rational non-degenerate target points of the rung.
+fn rung_targets(inst: &BinaryInstance, l: u32, want: usize, rng: &mut StdRng) -> Vec<(u64, u64)> {
+    let mut targets: Vec<(u64, u64)> = Vec::new();
+    while targets.len() < want {
+        let x = rng.gen::<u64>() & ((1u64 << inst.n) - 1);
+        if x == 0 || degenerate_target(&inst.gf, inst.b, l, x) {
+            continue;
+        }
+        if let Some(p) = inst.points_with_x(x).first() {
+            targets.push((p.x, p.y));
+        }
+    }
+    targets
+}
+
+// ── opcount ───────────────────────────────────────────────────────
+
+#[cfg(feature = "pdp-opcount")]
+fn opcount(out: &Path, rungs: &[u32], want: usize) -> Result<(), String> {
+    use crypto_lib::cryptanalysis::semaev_decomp::opcount as oc;
+    let mut rows = Vec::new();
+    for &n in rungs {
+        let inst = ledger_instance(n)?;
+        let (l, basis, _fb, base) = rung_parts(&inst);
+        let baseline = SubspaceOracle::new(&basis, inst.b, &inst.gf);
+        let mut kernel = Kernel::new(&inst.gf, inst.a, l, base);
+        let mut rng = StdRng::seed_from_u64(0x0C0C_0C0C ^ n as u64);
+        let targets = rung_targets(&inst, l, want, &mut rng);
+        oc::reset();
+        let mut s4_pairs = 0u64;
+        for &(x, _) in &targets {
+            s4_pairs += baseline.decompose(x, &inst.gf).1;
+        }
+        let cb = oc::snapshot();
+        oc::reset();
+        let mut gl_pairs = 0u64;
+        for &p in &targets {
+            gl_pairs += kernel.first(p).1.pairs;
+        }
+        let ck = oc::snapshot();
+        let per = |c: u64, p: u64| c as f64 / p as f64;
+        rows.push(json!({
+            "kind": "opcount", "n": n, "l": l, "targets": targets.len(),
+            "baseline_pairs": s4_pairs, "kernel_pairs": gl_pairs,
+            "baseline_counts": serde_json::from_str::<Value>(&cb.json()).map_err(|e| e.to_string())?,
+            "kernel_counts": serde_json::from_str::<Value>(&ck.json()).map_err(|e| e.to_string())?,
+            "baseline_pclmul_per_pair": per(cb.pclmul(), s4_pairs),
+            "kernel_pclmul_per_pair": per(ck.pclmul(), gl_pairs),
+            "kernel_over_baseline_pclmul_per_pair": per(ck.pclmul(), gl_pairs) / per(cb.pclmul(), s4_pairs),
+        }));
+    }
+    write_jsonl(out, &rows)
+}
+
+#[cfg(not(feature = "pdp-opcount"))]
+fn opcount(_out: &Path, _rungs: &[u32], _want: usize) -> Result<(), String> {
+    Err("rebuild with --features pdp-opcount (CARGO_TARGET_DIR=target/opcount): this build counts nothing".into())
+}
+
 // ── calibrate ─────────────────────────────────────────────────────
 
 fn calibrate(out: &Path, rungs: &[u32], reps: usize, min_pairs: u64) -> Result<(), String> {
@@ -190,16 +267,7 @@ fn calibrate(out: &Path, rungs: &[u32], reps: usize, min_pairs: u64) -> Result<(
         let full_pairs = span * (span + 1) / 2;
         let want = (min_pairs / full_pairs).clamp(8, 4000) as usize;
         let mut rng = StdRng::seed_from_u64(0x5CA1_AB1E ^ n as u64);
-        let mut targets: Vec<(u64, u64)> = Vec::new();
-        while targets.len() < want {
-            let x = rng.gen::<u64>() & ((1u64 << n) - 1);
-            if x == 0 || degenerate_target(&inst.gf, inst.b, l, x) {
-                continue;
-            }
-            if let Some(p) = inst.points_with_x(x).first() {
-                targets.push((p.x, p.y));
-            }
-        }
+        let targets = rung_targets(&inst, l, want, &mut rng);
         let g = BinaryGroup(&inst.fast);
         let mut ops = GroupOps::default();
         let pts: Vec<FastPoint> = (0..64)
@@ -244,9 +312,8 @@ fn calibrate(out: &Path, rungs: &[u32], reps: usize, min_pairs: u64) -> Result<(
                 time_gl(&mut ns_gl, &mut gl_pairs_total);
             }
         }
-        let ratio = |a: &[f64], b: &[f64]| -> Vec<f64> {
-            a.iter().zip(b).map(|(x, y)| x / y).collect()
-        };
+        let ratio =
+            |a: &[f64], b: &[f64]| -> Vec<f64> { a.iter().zip(b).map(|(x, y)| x / y).collect() };
         let r_gl = ratio(&ns_gl, &ns_add);
         let r_s4 = ratio(&ns_s4, &ns_add);
         // The pinned ratio the framework prices a baseline pair at.
@@ -321,7 +388,7 @@ fn memory(n: u32, fold: &str, out: &Path) -> Result<(), String> {
     let entries = table.entries;
     // The kernel's and the baseline's own memory, from their sizes.
     let kernel_bytes = (base.len() * 16 + 2 * base.len() * 8 * 2) as u64;
-    let baseline_bytes = ((1u64 << l) * 8) as u64;
+    let baseline_bytes = (1u64 << l) * 8;
     let row = json!({
         "kind": "memory", "n": n, "l": l, "slug": inst.curve_id().slug, "fold": fold,
         "signed_points": fb.points.len(), "abscissae": fb.abscissae,
@@ -432,6 +499,9 @@ enum Conv {
     Est,
     /// Each kernel pair priced at its measured time over a measured group addition.
     EstAdd,
+    /// Each kernel pair priced at the pinned baseline-pair price times the counted
+    /// carry-less-multiply ratio per pair (deterministic; needs the opcount build).
+    EstClmul,
 }
 
 impl Conv {
@@ -441,6 +511,7 @@ impl Conv {
             Conv::Pairs => "pair-count (kernel pair = baseline pair)",
             Conv::Est => "anchored estimate",
             Conv::EstAdd => "add-ratio estimate",
+            Conv::EstClmul => "clmul-count estimate",
         }
     }
 }
@@ -456,6 +527,8 @@ struct Calib {
     gl_over_s4: f64,
     gl_over_s4_min: f64,
     gl_over_s4_max: f64,
+    /// Counted carry-less multiplies per kernel pair over per baseline pair.
+    clmul_ratio: Option<f64>,
 }
 
 /// Per-workload value of an arm: S (or total ops) under a convention, the
@@ -470,6 +543,9 @@ fn value(rung: &Rung, arm: &str, conv: Conv, cal: &Calib, ops: bool, wl: &str) -
                 Conv::Pairs => r.solver_ops as f64 * cal.c_s4_pinned,
                 Conv::Est => r.solver_ops as f64 * cal.c_s4_pinned * cal.gl_over_s4,
                 Conv::EstAdd => r.solver_ops as f64 * cal.c_gl,
+                Conv::EstClmul => {
+                    r.solver_ops as f64 * cal.c_s4_pinned * cal.clmul_ratio.unwrap_or(f64::NAN)
+                }
             };
             let total = r.total_ops + extra_ops;
             if ops {
@@ -496,7 +572,9 @@ fn ci_mean(xs: &[f64], resamples: usize, seed: u64) -> Option<(f64, f64)> {
 fn ci_ratio(num: &[f64], den: &[f64], resamples: usize, seed: u64) -> Option<(f64, f64)> {
     let pairs: Vec<(f64, f64)> = num.iter().copied().zip(den.iter().copied()).collect();
     bootstrap_ci(&[pairs], resamples, seed, |s| {
-        let (a, b) = s[0].iter().fold((0.0, 0.0), |(a, b), (x, y)| (a + x, b + y));
+        let (a, b) = s[0]
+            .iter()
+            .fold((0.0, 0.0), |(a, b), (x, y)| (a + x, b + y));
         (b > 0.0).then(|| a / b)
     })
 }
@@ -535,6 +613,7 @@ fn analyze(
     counted: &[PathBuf],
     timed: &[PathBuf],
     calibration: &Path,
+    opcount_file: Option<&Path>,
     memory_file: Option<&Path>,
     out: &Path,
     markdown: &Path,
@@ -571,8 +650,24 @@ fn analyze(
                 gl_over_s4: g("gl_over_s4_ns_median")?,
                 gl_over_s4_min: g("gl_over_s4_ns_min")?,
                 gl_over_s4_max: g("gl_over_s4_ns_max")?,
+                clmul_ratio: None,
             },
         );
+    }
+    if let Some(p) = opcount_file {
+        for line in std::fs::read_to_string(p)
+            .map_err(|e| format!("{}: {e}", p.display()))?
+            .lines()
+        {
+            let v: Value = serde_json::from_str(line).map_err(|e| e.to_string())?;
+            if v["kind"] != "opcount" {
+                continue;
+            }
+            let n = v["n"].as_u64().ok_or("opcount n")? as u32;
+            if let Some(c) = cal.get_mut(&n) {
+                c.clmul_ratio = v["kernel_over_baseline_pclmul_per_pair"].as_f64();
+            }
+        }
     }
     let mem: Vec<Value> = match memory_file {
         Some(p) => std::fs::read_to_string(p)
@@ -589,16 +684,19 @@ fn analyze(
     let gl = "s4-grouplaw";
     let mitm = "mitm";
     let mitm_nf = "mitm-negfold";
-    let arm_list: Vec<(&str, Conv)> = vec![
+    let have_clmul = !cal.is_empty() && cal.values().all(|c| c.clmul_ratio.is_some());
+    let mut arm_list: Vec<(&str, Conv)> = vec![
         (rho, Conv::Lb),
         (base, Conv::Lb),
         (gl, Conv::Lb),
         (gl, Conv::Pairs),
         (gl, Conv::Est),
         (gl, Conv::EstAdd),
+        (gl, Conv::EstClmul),
         (mitm, Conv::Lb),
         (mitm_nf, Conv::Lb),
     ];
+    arm_list.retain(|(_, c)| *c != Conv::EstClmul || have_clmul);
     let label = |a: &str, c: Conv| -> String {
         if a == gl {
             format!("{a} [{}]", c.name())
@@ -611,7 +709,9 @@ fn analyze(
     let mut md = String::new();
     md.push_str("# PS-6 tables (generated by `ps6_tool analyze`; do not edit)\n\n");
     for (ri, rg) in rungs.iter().enumerate() {
-        let c = cal.get(&rg.n).ok_or(format!("no calibration for n = {}", rg.n))?;
+        let c = cal
+            .get(&rg.n)
+            .ok_or(format!("no calibration for n = {}", rg.n))?;
         md.push_str(&format!(
             "## n = {} (l = {}), {} , r = 2^{:.2}, floor S = {:.4}; session {}\n\n",
             rg.n, rg.l, rg.slug, rg.log2_r, rg.floor_s, rg.session_id
@@ -628,18 +728,13 @@ fn analyze(
             let ci = ci_mean(&v, resamples, seed);
             let m = mean(&v);
             let ratio_floor = m.map(|x| x / rg.floor_s);
-            let rr = (!rho_vals.is_empty() && v.len() == rho_vals.len())
-                .then(|| {
-                    (
-                        v.iter().sum::<f64>() / rho_vals.iter().sum::<f64>(),
-                        ci_ratio(&v, &rho_vals, resamples, seed + 1),
-                    )
-                });
-            let lb = rg.arms[*arm]
-                .values()
-                .flatten()
-                .any(|r| r.lower_bound)
-                && *conv == Conv::Lb;
+            let rr = (!rho_vals.is_empty() && v.len() == rho_vals.len()).then(|| {
+                (
+                    v.iter().sum::<f64>() / rho_vals.iter().sum::<f64>(),
+                    ci_ratio(&v, &rho_vals, resamples, seed + 1),
+                )
+            });
+            let lb = rg.arms[*arm].values().flatten().any(|r| r.lower_bound) && *conv == Conv::Lb;
             md.push_str(&format!(
                 "| {} | {}/{} | {} | {} {} | {} | {} {} |\n",
                 label(arm, *conv),
@@ -704,7 +799,9 @@ fn analyze(
                 fnum(Some(r)),
                 fci(ci)
             ));
-            cmp_json.push(json!({"arm": arm, "convention": conv.name(), "baseline_over_arm": r, "ci95": ci}));
+            cmp_json.push(
+                json!({"arm": arm, "convention": conv.name(), "baseline_over_arm": r, "ci95": ci}),
+            );
         }
         md.push_str(&format!(
             "\nConversions at this rung (GAE per pair): baseline pair pinned {:.3}; baseline pair measured here {:.3}; kernel pair / baseline pair time {:.4} (min {:.4}, max {:.4}), so anchored kernel pair {:.4}; kernel pair over a measured addition {:.4} (min {:.4}, max {:.4}).\n\n",
@@ -723,7 +820,10 @@ fn analyze(
     // bootstrapped over targets (the same resampled targets for every arm).
     md.push_str("## Exponent fits (total operations T = S sqrt(r) proportional to r^e; S / floor proportional to r^(e - 1/2))\n\n");
     md.push_str("| arm [convention] | e (all rungs) | 95% CI | R^2 | slope of S/floor = e - 1/2 |\n|:--|--:|:--|--:|--:|\n");
-    let xs: Vec<f64> = rungs.iter().map(|r| r.log2_r * std::f64::consts::LN_2).collect();
+    let xs: Vec<f64> = rungs
+        .iter()
+        .map(|r| r.log2_r * std::f64::consts::LN_2)
+        .collect();
     let fit_arms: Vec<(&str, Conv)> = arm_list.clone();
     let point_fit = |sel: &dyn Fn(usize, &str, Conv) -> Option<f64>, arm: &str, conv: Conv| {
         let ys: Option<Vec<f64>> = (0..rungs.len())
@@ -785,8 +885,12 @@ fn analyze(
     }
     for (k, (arm, conv)) in fit_arms.iter().enumerate() {
         let f = point_fit(&mean_t, arm, *conv);
-        let ci = (boot[k].len() >= resamples * 9 / 10)
-            .then(|| (quantile(&boot[k], 0.025).unwrap(), quantile(&boot[k], 0.975).unwrap()));
+        let ci = (boot[k].len() >= resamples * 9 / 10).then(|| {
+            (
+                quantile(&boot[k], 0.025).unwrap(),
+                quantile(&boot[k], 0.975).unwrap(),
+            )
+        });
         md.push_str(&format!(
             "| {} | {} | {} | {} | {} |\n",
             label(arm, *conv),
@@ -900,7 +1004,11 @@ fn analyze(
                 for (x, y) in va.iter().zip(vb) {
                     if let (Some(wa), Some(wb)) = (x.wall_ns, y.wall_ns) {
                         s.push(wb as f64 / wa as f64);
-                        let lo = if x.level < y.level { &x.level } else { &y.level };
+                        let lo = if x.level < y.level {
+                            &x.level
+                        } else {
+                            &y.level
+                        };
                         *levels.entry(lo.clone()).or_insert(0) += 1;
                     }
                 }
