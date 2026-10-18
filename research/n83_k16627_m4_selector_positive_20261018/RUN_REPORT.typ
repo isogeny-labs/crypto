@@ -1,4 +1,4 @@
-#set page(paper: "a4", margin: 15mm)
+#set page(paper: "a4", margin: 12mm)
 #set text(font: "New Computer Modern", size: 9.3pt)
 = N83 K = 16,627: selector-pinned four-summand control
 
@@ -9,7 +9,7 @@ stored points. The accepted source is commit `b4beefcb55f05713d1d63468fcbcd21e43
 `source-files.sha256`, `inputs-before-run.sha256`, `worker-binary.sha256` and
 `BUILD_RECEIPT.md` bind the executed worker and public inputs.
 
-#image("selector-positive-stages.svg", width: 100%)
+#image("selector-positive-stages.svg", width: 90%)
 
 == Frozen arm and observations
 
@@ -44,10 +44,15 @@ The separate native `replay/receipt.json` recomputed curve and subgroup
 membership, seven group x blocks, three original-field S3 equations and
 the phase-zero relation row from the compressed object. Changed-x and
 changed-row receipts were rejected. The worker did not export SAT assignment
-bits, so the separate replay does not check those bits.
+bits, so the separate replay does not check those bits. It also shares the
+library's field and curve arithmetic with the worker; it is a separate
+execution path, not independent arithmetic or second-host replication.
 
-The earlier seven-x-block control reached its outer cap while searching.
-It had a different source revision and no selector or phase pins, so these
+The earlier seven-x-block control reached root fixpoint with 63,910
+propagated assignments, then reached its outer cap while searching. This
+choice-pinned arm reached root fixpoint with 201,598 assigned variables.
+The earlier arm used a different source revision and lacked the choice pins,
+so these
 wall values are not a paired speed ratio. This positive control does not
 measure natural relation yield, useful natural rank or complete cold IC cost.
 The next experiment separates selector and phase information under a
