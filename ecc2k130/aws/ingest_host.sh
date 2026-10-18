@@ -184,6 +184,9 @@ if ! aws iam get-instance-profile --instance-profile-name "$PROFILE" >/dev/null 
     exit 1
 fi
 echo "using instance profile $PROFILE"
+if [ "$PAID_SERVICE" = 0 ]; then
+    echo "Cairn period evidence is disabled; this host cannot support a service-period claim" >&2
+fi
 
 AMI=${INGEST_AMI:-$(aws ec2 describe-images --owners 099720109477 \
     --filters "Name=name,Values=ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-arm64-server-*" \

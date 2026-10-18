@@ -81,6 +81,7 @@ esac
             with self.subTest(role=role):
                 result = self.run_launcher(role, "up")
                 self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn("cannot support a service-period claim", result.stderr)
                 unit = (self.root / "user-data").read_text()
                 args = (self.root / "run-args").read_text()
                 self.assertIn(f"Environment=RHO_INGEST_WORKER_ONLY={worker_only}", unit)
@@ -141,6 +142,7 @@ esac
             INGEST_OPERATOR_PATH=str(operator), INGEST_PERIOD_SECONDS="600",
             TEST_VERSIONING="Enabled")
         self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("cannot support a service-period claim", result.stderr)
         unit = (self.root / "user-data").read_text()
         args = (self.root / "run-args").read_text()
         self.assertIn("/opt/rho-ingest/operator.py --replica-id %H", unit)
