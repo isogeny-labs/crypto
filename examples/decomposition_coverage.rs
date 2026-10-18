@@ -10,7 +10,7 @@
 //! (positive control).
 //!
 //! std-only; `rustc --edition 2021 -O examples/decomposition_coverage.rs`.
-//! Usage: `decomposition_coverage <out-dir> [mult]`; env `DC_THREADS`, `DC_SCALE`.
+//! Usage: `decomposition_coverage <out-dir> [mult|subgroup]`; env `DC_THREADS`, `DC_SCALE`.
 //! `mult` runs the Amendment D diagnostic (binary `n = 2` coverage deficit).
 #![allow(dead_code)]
 
@@ -1181,6 +1181,320 @@ fn bin_diag(c: &BinCurve) -> BinDiag {
     d
 }
 
+// ---------------------------------------------------------------------------
+// Addendum H7: coverage of the target subgroup and of the layers 2^k E.
+// ---------------------------------------------------------------------------
+
+impl OddCurve {
+    fn with_ab(g: Gf, a: u32, b: u32) -> OddCurve {
+        let mut c = OddCurve {
+            g,
+            m: 1,
+            a,
+            b,
+            order: 0,
+        };
+        let mut cnt = 1u64;
+        for x in 0..=c.g.nn {
+            let v = c.rhs(x);
+            cnt += if c.g.is_zero(v) {
+                1
+            } else if v % 2 == 0 {
+                2
+            } else {
+                0
+            };
+        }
+        c.order = cnt;
+        c
+    }
+    /// `E ≅ Y² = Π(X − d e_i)` with `e_i ∈ F_q` distinct and `d` generic,
+    /// in short Weierstrass form, with the factor base `X ∈ d·F_q` as x-values.
+    fn split_twist(p: u32, n: u32, rng: &mut u64, d_square: Option<bool>) -> (OddCurve, Vec<u32>) {
+        let g = Gf::new(p, n);
+        let sub = {
+            let st = g.step(1);
+            let mut v = vec![g.nn];
+            for j in 0..(p - 1) {
+                v.push(j * st);
+            }
+            v
+        };
+        loop {
+            let d = (xorshift(rng) % g.nn as u64) as u32;
+            if (1..n).any(|k| n % k == 0 && g.in_sub(d, k)) {
+                continue;
+            }
+            // log-form element: even log = square
+            if d_square.is_some_and(|sq| (d % 2 == 0) != sq) {
+                continue;
+            }
+            let pick = |rng: &mut u64| sub[(xorshift(rng) % sub.len() as u64) as usize];
+            let (e1, e2, e3) = (pick(rng), pick(rng), pick(rng));
+            if e1 == e2 || e1 == e3 || e2 == e3 {
+                continue;
+            }
+            let r: Vec<u32> = [e1, e2, e3].iter().map(|&e| g.mul(d, e)).collect();
+            let s1 = g.add(g.add(r[0], r[1]), r[2]);
+            let s2 = g.add(
+                g.add(g.mul(r[0], r[1]), g.mul(r[0], r[2])),
+                g.mul(r[1], r[2]),
+            );
+            let s3 = g.mul(g.mul(r[0], r[1]), r[2]);
+            // X^3 + c2 X^2 + c1 X + c0 with c2 = -s1, c1 = s2, c0 = -s3; X = x - c2/3
+            let (c2, c1, c0) = (g.neg(s1), s2, g.neg(s3));
+            let i3 = g.inv(g.const_int(3));
+            let a = g.sub(c1, g.mul(g.mul(c2, c2), i3));
+            let b = g.add(
+                g.sub(
+                    g.mul(
+                        g.mul(g.const_int(2), g.mul(c2, g.mul(c2, c2))),
+                        g.inv(g.const_int(27)),
+                    ),
+                    g.mul(g.mul(c2, c1), i3),
+                ),
+                c0,
+            );
+            let shift = g.mul(c2, i3); // x = X + c2/3
+            let xs: Vec<u32> = sub.iter().map(|&e| g.add(g.mul(d, e), shift)).collect();
+            let c = OddCurve::with_ab(g, a, b);
+            return (c, xs);
+        }
+    }
+}
+
+fn gmul<G: Group>(g: &G, p: Pt, mut k: u64) -> Pt {
+    let (mut r, mut b) = (Pt::O, p);
+    while k > 0 {
+        if k & 1 == 1 {
+            r = g.add(r, b);
+        }
+        b = g.add(b, b);
+        k >>= 1;
+    }
+    r
+}
+
+fn largest_prime_factor(mut n: u64) -> u64 {
+    let mut best = 1;
+    let mut d = 2u64;
+    while d * d <= n {
+        while n % d == 0 {
+            best = d;
+            n /= d;
+        }
+        d += 1;
+    }
+    if n > 1 {
+        best = n;
+    }
+    best
+}
+
+fn sums_set<G: Group>(g: &G, f: &[Pt], n: usize) -> (Vec<u64>, u64) {
+    let mut seen = vec![0u64; g.domain().div_ceil(64)];
+    let (mut d, mut t) = (0u64, 0u64);
+    sums_rec(g, f, 0, n, Pt::O, &mut seen, &mut d, &mut t);
+    (seen, t)
+}
+
+/// Rows: (layer, size, covered by subfield, covered by null, multisets sub, multisets null)
+fn subgroup_rows<G: Group>(
+    g: &G,
+    fsub: &[Pt],
+    fnull: &[Pt],
+    n: usize,
+) -> Vec<(String, u64, u64, u64)> {
+    let mut pts = vec![Pt::O];
+    for x in g.field_elems() {
+        pts.extend(g.points_at(x));
+    }
+    let ord = g.order();
+    assert_eq!(pts.len() as u64, ord);
+    let ell = largest_prime_factor(ord);
+    let (ss, _) = sums_set(g, fsub, n);
+    let (sn, _) = sums_set(g, fnull, n);
+    let bit = |s: &[u64], i: usize| s[i / 64] >> (i % 64) & 1 == 1;
+    let mut layers: Vec<(String, Vec<Pt>)> = Vec::new();
+    layers.push(("E".into(), pts.clone()));
+    let mut cur = pts.clone();
+    let v2 = ord.trailing_zeros();
+    for k in 1..=v2.min(4) {
+        let mut set = std::collections::HashSet::new();
+        for &p in &cur {
+            set.insert(g.idx(g.add(p, p)));
+        }
+        cur = pts
+            .iter()
+            .copied()
+            .filter(|p| set.contains(&g.idx(*p)))
+            .collect();
+        layers.push((format!("{}E", 1u64 << k), cur.clone()));
+    }
+    let lsub: Vec<Pt> = pts
+        .iter()
+        .copied()
+        .filter(|&p| gmul(g, p, ell) == Pt::O)
+        .collect();
+    layers.push(("ell".into(), lsub));
+    layers
+        .into_iter()
+        .map(|(name, set)| {
+            let cs = set.iter().filter(|p| bit(&ss, g.idx(**p))).count() as u64;
+            let cn = set.iter().filter(|p| bit(&sn, g.idx(**p))).count() as u64;
+            (name, set.len() as u64, cs, cn)
+        })
+        .collect()
+}
+
+fn null_arm<G: Group>(g: &G, size: usize, rng: &mut u64) -> Vec<Pt> {
+    let all = g.field_elems();
+    let mut used = std::collections::HashSet::new();
+    let mut xs = Vec::new();
+    while xs.len() < size {
+        let x = all[(xorshift(rng) % all.len() as u64) as usize];
+        if used.insert(x) {
+            xs.push(x);
+        }
+    }
+    xs.iter().flat_map(|&x| g.points_at(x)).collect()
+}
+
+fn subgroup_main(out: &Path) {
+    let mut rng = 0x4837_5ab9_u64;
+    let mut csv = String::from(
+        "kind,n,q,curve,order,ell,cofactor,layer,layer_size,F_sub,F_null,cov_sub,cov_null,ratio\n",
+    );
+    // per (kind, n): ratios on the ell-subgroup
+    let mut acc: BTreeMap<(String, usize), Vec<f64>> = BTreeMap::new();
+    let mut emit = |csv: &mut String,
+                    kind: &str,
+                    n: usize,
+                    q: u64,
+                    ci: usize,
+                    ord: u64,
+                    rows: Vec<(String, u64, u64, u64)>,
+                    fs: usize,
+                    fnl: usize| {
+        let ell = largest_prime_factor(ord);
+        for (layer, size, cs, cn) in rows {
+            let (a, b) = (cs as f64 / size as f64, cn as f64 / size as f64);
+            let ratio = if b > 0.0 { a / b } else { f64::NAN };
+            csv.push_str(&format!(
+                "{kind},{n},{q},{ci},{ord},{ell},{},{layer},{size},{fs},{fnl},{a:.6},{b:.6},{ratio:.5}\n",
+                ord / ell
+            ));
+            if layer == "ell" && ratio.is_finite() {
+                acc.entry((kind.to_string(), n)).or_default().push(ratio);
+            }
+        }
+    };
+    // binary: n = 2 (m = 4..10), n = 4 (m = 3..5)
+    for (n, ms) in [(2u32, 4u32..=10), (4, 3..=5)] {
+        for m in ms {
+            for ci in 0..3 {
+                let c = BinCurve::new(m, n, &mut rng);
+                let fsub: Vec<Pt> = c
+                    .subfield_elems()
+                    .iter()
+                    .flat_map(|&x| c.points_at(x))
+                    .collect();
+                let fnl = null_arm(&c, c.subfield_elems().len(), &mut rng);
+                let rows = subgroup_rows(&c, &fsub, &fnl, n as usize);
+                emit(
+                    &mut csv,
+                    "binary",
+                    n as usize,
+                    1u64 << m,
+                    ci,
+                    c.order(),
+                    rows,
+                    fsub.len(),
+                    fnl.len(),
+                );
+            }
+        }
+    }
+    // odd: generic control and split twist, n = 2 and 4
+    for (n, ps) in [(2u32, vec![53u32, 101, 211, 401]), (4, vec![5u32, 7, 11])] {
+        for &p in &ps {
+            for ci in 0..3 {
+                let c = OddCurve::new(p, n, &mut rng);
+                let fsub: Vec<Pt> = c
+                    .subfield_elems()
+                    .iter()
+                    .flat_map(|&x| c.points_at(x))
+                    .collect();
+                let fnl = null_arm(&c, c.subfield_elems().len(), &mut rng);
+                let rows = subgroup_rows(&c, &fsub, &fnl, n as usize);
+                emit(
+                    &mut csv,
+                    "odd_generic",
+                    n as usize,
+                    p as u64,
+                    ci,
+                    c.order(),
+                    rows,
+                    fsub.len(),
+                    fnl.len(),
+                );
+                let (c2, xs) = OddCurve::split_twist(p, n, &mut rng, None);
+                let fsub: Vec<Pt> = xs.iter().flat_map(|&x| c2.points_at(x)).collect();
+                let fnl = null_arm(&c2, xs.len(), &mut rng);
+                let rows = subgroup_rows(&c2, &fsub, &fnl, n as usize);
+                emit(
+                    &mut csv,
+                    "odd_split_twist",
+                    n as usize,
+                    p as u64,
+                    ci,
+                    c2.order(),
+                    rows,
+                    fsub.len(),
+                    fnl.len(),
+                );
+                // Amendment H-a: d a square, factor base the first |F_q|/2 of d·F_q
+                // in a fixed random order (as many points as the null arm)
+                let (c3, mut xs3) = OddCurve::split_twist(p, n, &mut rng, Some(true));
+                for i in (1..xs3.len()).rev() {
+                    let j = (xorshift(&mut rng) % (i as u64 + 1)) as usize;
+                    xs3.swap(i, j);
+                }
+                xs3.truncate(xs3.len() / 2);
+                let fsub: Vec<Pt> = xs3.iter().flat_map(|&x| c3.points_at(x)).collect();
+                let fnl = null_arm(&c3, 2 * xs3.len(), &mut rng);
+                let rows = subgroup_rows(&c3, &fsub, &fnl, n as usize);
+                emit(
+                    &mut csv,
+                    "odd_split_twist_matched",
+                    n as usize,
+                    p as u64,
+                    ci,
+                    c3.order(),
+                    rows,
+                    fsub.len(),
+                    fnl.len(),
+                );
+            }
+        }
+        eprintln!("subgroup: odd n = {n} done");
+    }
+    let mut checks = String::new();
+    for ((kind, n), v) in &acc {
+        let k = v.len() as f64;
+        let m = v.iter().sum::<f64>() / k;
+        let sd = (v.iter().map(|x| (x - m).powi(2)).sum::<f64>() / (k - 1.0).max(1.0)).sqrt();
+        checks.push_str(&format!(
+            "H7 {kind} n={n}: ell-subgroup coverage ratio subfield/null mean {m:.3} (s.e. {:.3}, {} curves)\n",
+            sd / k.sqrt(),
+            v.len()
+        ));
+    }
+    std::fs::write(out.join("subgroup.csv"), csv).unwrap();
+    std::fs::write(out.join("checks.txt"), &checks).unwrap();
+    eprint!("{checks}");
+}
+
 fn mult_main(out: &Path) {
     let mut rng = 0xd1a9_0000_0d0d_u64;
     let mut csv = String::from(
@@ -1322,6 +1636,10 @@ fn main() {
             .expect("usage: decomposition_coverage <out-dir>"),
     );
     std::fs::create_dir_all(out).unwrap();
+    if args.get(2).map(String::as_str) == Some("subgroup") {
+        subgroup_main(out);
+        return;
+    }
     if args.get(2).map(String::as_str) == Some("mult") {
         mult_main(out);
         return;

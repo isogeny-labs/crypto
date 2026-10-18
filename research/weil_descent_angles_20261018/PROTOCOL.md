@@ -606,3 +606,34 @@ generic control system of the same shape.
 on-demand, TTL 4 h); their tools exist or need small changes. H2, H3, H4,
 H5, H8 and H9 follow as their tools land, one ephemeral job per
 experiment. Each recorded run follows the research-visuals rule.
+
+### Amendment H-a (before any recorded H run)
+
+**H1.**
+- **Cofactor list.** The Scholten family never yields `h ∈ {2, 6}`:
+  every one of the 222 instances generated so far has `4 | #E`, and the
+  generator looped on `h = 2`. The `h` list becomes
+  `{4, 8, 12, 16, 24, 32, 48, 64, 96, 128}`. `h = 2` and `h = 1` move to
+  H2, whose general gluing has no such constraint.
+- **Model check (scratch smoke, one cell).** At `log2 #E = 24`, `h = 4`,
+  model M-H1 predicted trials/p 0.365 against 0.377 measured (4 instances).
+- **Where it runs.** The `ephemeral` runner cannot authenticate here: there
+  is an AWS access-key ID but no secret key or credential source. H1 and H6
+  therefore run on RunPod CPU pods through
+  `research/weil_descent_angles_20261018/runpod/podrun.py`. The pod fetches
+  the tool at a pinned, pushed commit from the public repository and checks
+  each file's SHA-256 before building. Its command is fixed at launch, and
+  it serves only read-only status and results. `pod.json`, `host.txt` and
+  `rusage.txt` are kept with each run.
+
+**H7.**
+- **Split-twist curves.** A split-twist curve with `d` a non-square in
+  `F_{q^n}` has no factor-base points except the three 2-torsion points,
+  because every `X ∈ d·F_q` has a right-hand side in `d³·F_q`. With `d` a
+  square, every `X` carries 2 points, so the factor base is twice the
+  null's, and the target layer saturates (coverage 1.0 at `p = 401`).
+- **Change.** The recorded H7 keeps the frozen cells. It also adds a
+  size-matched split-twist cell: `d` a square, and the factor base the
+  first `|F_q|/2` elements of `d·F_q` in a fixed random order. That gives
+  as many points as the null arm, so the comparison isolates the coset
+  confinement from the density.

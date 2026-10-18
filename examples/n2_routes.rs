@@ -19,7 +19,7 @@
 //! separately and priced afterwards at 0, 0.1 and 1 M.
 //!
 //! std-only; `rustc --edition 2021 -O examples/n2_routes.rs`.
-//! Usage: `n2_routes <out-dir> [run|check|control|summarize]`; env `N2_THREADS`, `N2_SIZES`
+//! Usage: `n2_routes <out-dir> [run|check|control|summarize|hsweep|memsweep|hsummarize]`; env `N2_THREADS`, `N2_SIZES`
 //! (comma-separated `log2 #E` targets, default `20,24,28,32,36,40`).
 #![allow(dead_code)]
 #![allow(clippy::needless_range_loop)]
@@ -43,6 +43,8 @@ thread_local! {
     static CI: Cell<u64> = const { Cell::new(0) };
     static CN: Cell<u64> = const { Cell::new(0) };
     static CJ: Cell<u64> = const { Cell::new(0) };
+    /// Addendum H1: exact cofactor wanted by the instance generator (0: h <= 8)
+    static WANT_H: Cell<u64> = const { Cell::new(0) };
     /// sqrt table: SQ[a] = some b with b^2 = a, or u32::MAX for a non-residue
     static SQ: RefCell<Vec<u32>> = const { RefCell::new(Vec::new()) };
 }
@@ -936,6 +938,14 @@ impl Instance {
         }
     }
 
+    /// An instance with exact cofactor `h` (`#E = h·ℓ`, `ℓ` prime).
+    fn with_h(bits: u32, h: u64, rng: &mut u64) -> Instance {
+        WANT_H.with(|c| c.set(h));
+        let inst = Instance::new(bits, rng);
+        WANT_H.with(|c| c.set(0));
+        inst
+    }
+
     fn try_new(p: u64, kappa: u64, rng: &mut u64) -> Option<Instance> {
         let k = Fp(kappa);
         let r = Fp(1 + xorshift(rng) % (p - 1));
@@ -997,10 +1007,17 @@ impl Instance {
         let e = Ell { a, b };
         let n = ec_order(&e, p, rng)?;
         let mut h = 0;
-        for hh in 1..=8u64 {
-            if n % hh == 0 && is_prime(n / hh) && n / hh > 8 {
-                h = hh;
-                break;
+        let want = WANT_H.with(|c| c.get());
+        if want > 0 {
+            if n % want == 0 && n / want > want && is_prime(n / want) {
+                h = want;
+            }
+        } else {
+            for hh in 1..=8u64 {
+                if n % hh == 0 && is_prime(n / hh) && n / hh > 8 {
+                    h = hh;
+                    break;
+                }
             }
         }
         if h == 0 {
@@ -1324,6 +1341,8 @@ struct ArmResult {
     /// whether the solving row's divisor was such a repeat
     dup_events: u64,
     solved_by_dup: bool,
+    /// Addendum H4: stored rows (J: pivots + B-relations; R: distinguished points)
+    mem: u64,
 }
 
 fn canon_e(pt: EP) -> (EP, bool) {
@@ -1473,6 +1492,7 @@ fn arm_rho(inst: &Instance, pt: EP, q: EP, rng: &mut u64) -> ArmResult {
         }
     }
     res.steps = steps;
+    res.mem = table.len() as u64;
     res.walk = c0.since();
     res.secs = t0.elapsed().as_secs_f64();
     res
@@ -1492,7 +1512,7 @@ const IC_RESTART: u64 = 4096;
 
 /// Arm J: genus-2 index calculus in Jac(C)(F_p) on τ(P), τ(Q).
 fn arm_jac(inst: &Instance, pt: EP, q: EP, c: u32, rng: &mut u64) -> ArmResult {
-    arm_jac_impl(inst, pt, q, c, rng, false, false)
+    arm_jac_impl(inst, pt, q, c, rng, false, false, 1.0)
 }
 
 /// `track`: record repeated divisors (Amendment F); `indep`: every trial is a
@@ -1505,7 +1525,11 @@ fn arm_jac_impl(
     rng: &mut u64,
     track: bool,
     indep: bool,
+    theta: f64,
 ) -> ArmResult {
+    // Addendum H4: keep a relation only if every point is distinguished
+    let dist_cut = (theta * (1u64 << 32) as f64) as u64;
+    let distinguished = |xi: u64| (splitmix(xi ^ 0xd157) >> 32) < dist_cut;
     let mut seen: HashMap<Vec<u64>, ()> = HashMap::new();
     let t0 = Instant::now();
     let c0 = Counts::now();
@@ -1588,6 +1612,9 @@ fn arm_jac_impl(
                 let v0 = d.v.first().copied().unwrap_or(Fp(0));
                 pts.push((d.u[0].neg().0, v0.0));
             }
+            if theta < 1.0 && pts.iter().any(|&(xi, _)| !distinguished(xi)) {
+                pts.clear();
+            }
             if !pts.is_empty() {
                 let mut row = Row {
                     a,
@@ -1637,6 +1664,7 @@ fn arm_jac_impl(
                     res.brels = lin.brels.len() as u64;
                     res.jac = jac;
                     res.jac_ops = jac.j;
+                    res.mem = (lin.pivots.len() + lin.brels.len()) as u64;
                     res.walk = c0.since().minus(res.la);
                     res.secs = t0.elapsed().as_secs_f64();
                     return res;
@@ -1652,6 +1680,7 @@ fn arm_jac_impl(
                         res.brels = lin.brels.len() as u64;
                         res.jac = jac;
                         res.jac_ops = jac.j;
+                        res.mem = (lin.pivots.len() + lin.brels.len()) as u64;
                         res.walk = c0.since().minus(res.la);
                         res.secs = t0.elapsed().as_secs_f64();
                         return res;
@@ -2186,7 +2215,12 @@ fn run_job(job: &Job) -> Vec<String> {
         let k = 1 + xorshift(&mut rng) % (inst.ell - 1);
         let q = inst.e.mul(pt, k);
         let mut results = vec![arm_rho(&inst, pt, q, &mut rng)];
-        for c in [1u32, 2, 4] {
+        let cs: Vec<u32> = std::env::var("N2_CS")
+            .unwrap_or_else(|_| "1,2,4".into())
+            .split(',')
+            .map(|x| x.trim().parse().unwrap())
+            .collect();
+        for &c in &cs {
             let rj = arm_jac(&inst, pt, q, c, &mut rng);
             let nb = rj.nb;
             results.push(rj);
@@ -2437,7 +2471,7 @@ fn control_job(job: &Job) -> Vec<String> {
         let k = 1 + xorshift(&mut rng) % (inst.ell - 1);
         let q = inst.e.mul(pt, k);
         for (name, indep) in [("Jwalk", false), ("Jind", true)] {
-            let r = arm_jac_impl(&inst, pt, q, 2, &mut rng, true, indep);
+            let r = arm_jac_impl(&inst, pt, q, 2, &mut rng, true, indep, 1.0);
             let ok = r.ok && r.k == k && inst.e.mul(pt, r.k) == q;
             rows.push(format!(
                 "{},{},{},{},{},{},{},{},{},{},{},{}",
@@ -2508,6 +2542,347 @@ fn summarize_control(csv: &str) -> String {
     t
 }
 
+// ---------------------------------------------------------------------------
+// Addendum H1 (cofactor law), H4 (memory against time).
+// ---------------------------------------------------------------------------
+
+/// Structure of the cofactor part: the largest order of `ℓ·Q` over 24 random
+/// points Q of E (equal to h iff that part is cyclic).
+fn cofactor_exponent(inst: &Instance, rng: &mut u64) -> u64 {
+    let mut best = 1u64;
+    for _ in 0..24 {
+        let q = inst.e.mul(inst.e.random_point(rng), inst.ell);
+        let mut ord = inst.h;
+        for f in small_factors(inst.h) {
+            while ord % f == 0 && inst.e.mul(q, ord / f) == EP::O {
+                ord /= f;
+            }
+        }
+        best = best.max(ord);
+    }
+    best
+}
+
+/// Model M-H1: first useful cycle in the uniform admissible-pair graph on the
+/// instance's actual degree-1 points and their cofactor classes. Useful means
+/// a dependency mod ℓ: a cycle whose sign product closes consistently, or any
+/// cycle in (or edge between) components already fixed by an inconsistent one.
+/// Returns the mean number of edges over `reps` simulations, and n (vertices).
+fn model_first_cycle(inst: &Instance, reps: usize, rng: &mut u64) -> (f64, usize) {
+    let f = &inst.fq;
+    let p = inst.p;
+    // vertices: ξ with F(ξ) a nonzero square; class = ℓ·(ξ, w)
+    let mut class_of: Vec<usize> = Vec::new();
+    let mut self_ok: Vec<bool> = Vec::new();
+    let mut keys: HashMap<Vec<u64>, usize> = HashMap::new();
+    for x in 0..p {
+        let v = peval(f, Fp(x)).0;
+        let Some(w) = (if v == 0 { None } else { sqrt_p(v) }) else {
+            continue;
+        };
+        let d = Div {
+            u: vec![Fp(x).neg(), Fp(1)],
+            v: trim(vec![Fp(w)]),
+        };
+        let c = jmul_fast(f, &d, inst.ell);
+        let key = |d: &Div<Fp>| -> Vec<u64> { d.u.iter().chain(d.v.iter()).map(|c| c.0).collect() };
+        let k1 = key(&c);
+        let k2 = key(&c.neg());
+        let k = if k1 <= k2 { k1.clone() } else { k2 };
+        let n = keys.len();
+        let id = *keys.entry(k).or_insert(n);
+        class_of.push(id);
+        // R = 2P is in the ℓ-part iff 2c = 0, i.e. c = -c
+        self_ok.push(k1 == key(&c.neg()));
+    }
+    let n = class_of.len();
+    let mut groups: Vec<Vec<usize>> = vec![Vec::new(); keys.len()];
+    for (v, &g) in class_of.iter().enumerate() {
+        groups[g].push(v);
+    }
+    // choose a group with probability ∝ |G|^2, then two uniform members
+    let mut cum = Vec::with_capacity(groups.len());
+    let mut acc = 0f64;
+    for g in &groups {
+        acc += (g.len() * g.len()) as f64;
+        cum.push(acc);
+    }
+    let mut total = 0f64;
+    for _ in 0..reps {
+        let mut parent: Vec<usize> = (0..n).collect();
+        let mut par: Vec<u8> = vec![0; n]; // parity to parent
+        let mut rigid: Vec<bool> = vec![false; n];
+        fn find(parent: &mut [usize], par: &mut [u8], x: usize) -> (usize, u8) {
+            let mut path = Vec::new();
+            let mut y = x;
+            while parent[y] != y {
+                path.push(y);
+                y = parent[y];
+            }
+            let root = y;
+            // compress: parity of each node to root
+            let mut acc = 0u8;
+            for &z in path.iter().rev() {
+                acc ^= par[z];
+                par[z] = acc;
+                parent[z] = root;
+            }
+            (root, if path.is_empty() { 0 } else { par[x] })
+        }
+        let mut edges = 0u64;
+        loop {
+            let r = (xorshift(rng) as f64 / u64::MAX as f64) * acc;
+            let gi = cum.partition_point(|&c| c < r).min(groups.len() - 1);
+            let g = &groups[gi];
+            let u = g[(xorshift(rng) % g.len() as u64) as usize];
+            let v = g[(xorshift(rng) % g.len() as u64) as usize];
+            if u == v && !self_ok[u] {
+                continue;
+            }
+            edges += 1;
+            // edge sign: potential ratio -ε_u ε_v, random
+            let sgn = (xorshift(rng) & 1) as u8;
+            let (ru, pu) = find(&mut parent, &mut par, u);
+            let (rv, pv) = find(&mut parent, &mut par, v);
+            if u == v {
+                // 2 x_u = r: fixes the component
+                if rigid[ru] {
+                    break;
+                }
+                rigid[ru] = true;
+                continue;
+            }
+            if ru == rv {
+                if rigid[ru] || (pu ^ pv ^ sgn) == 0 {
+                    break;
+                }
+                rigid[ru] = true;
+            } else {
+                if rigid[ru] && rigid[rv] {
+                    break;
+                }
+                parent[ru] = rv;
+                par[ru] = pu ^ pv ^ sgn;
+                rigid[rv] = rigid[rv] || rigid[ru];
+            }
+        }
+        total += edges as f64;
+    }
+    (total / reps as f64, n)
+}
+
+#[derive(Clone, Debug)]
+struct HJob {
+    bits: u32,
+    h: u64,
+    inst_id: usize,
+    seed: u64,
+    theta: f64,
+}
+
+fn hsweep_job(job: &HJob) -> Vec<String> {
+    let mut rng = job.seed | 1;
+    let inst = Instance::with_h(job.bits, job.h, &mut rng);
+    let cexp = cofactor_exponent(&inst, &mut rng);
+    let pt = loop {
+        let v = inst.e.mul(inst.e.random_point(&mut rng), inst.h);
+        if v != EP::O {
+            break v;
+        }
+    };
+    let (model_edges, nverts) = if job.theta == 1.0 && job.bits <= 40 {
+        model_first_cycle(&inst, 200, &mut rng)
+    } else {
+        (f64::NAN, 0)
+    };
+    let mut rows = Vec::new();
+    for tgt in 0..TARGETS {
+        let k = 1 + xorshift(&mut rng) % (inst.ell - 1);
+        let q = inst.e.mul(pt, k);
+        let mut arms: Vec<(&str, ArmResult)> = Vec::new();
+        if job.theta == 1.0 {
+            arms.push(("R", arm_rho(&inst, pt, q, &mut rng)));
+            arms.push((
+                "J",
+                arm_jac_impl(&inst, pt, q, 2, &mut rng, false, false, 1.0),
+            ));
+            if job.bits <= 32 {
+                arms.push((
+                    "Jind",
+                    arm_jac_impl(&inst, pt, q, 2, &mut rng, false, true, 1.0),
+                ));
+            }
+        } else {
+            arms.push((
+                "Jtheta",
+                arm_jac_impl(&inst, pt, q, 2, &mut rng, false, false, job.theta),
+            ));
+        }
+        for (name, r) in arms {
+            let ok = r.ok && r.k == k && inst.e.mul(pt, r.k) == q;
+            rows.push(format!(
+                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{:.3},{},{:.6}",
+                job.bits,
+                job.h,
+                job.inst_id,
+                inst.p,
+                inst.ell,
+                cexp,
+                tgt,
+                name,
+                job.theta,
+                r.steps,
+                r.rels,
+                r.mem,
+                u8::from(ok),
+                nverts,
+                model_edges,
+                r.walk.m + r.la.m,
+                r.secs
+            ));
+        }
+    }
+    eprintln!(
+        "h-sweep bits {} h {} inst {} theta {} done",
+        job.bits, job.h, job.inst_id, job.theta
+    );
+    rows
+}
+
+/// Per-cell means and the α fit (bootstrap over instances) for H1; the
+/// memory/time table for H4.
+fn summarize_hsweep(csv: &str) -> String {
+    use std::collections::BTreeMap;
+    // per (bits, h, inst, arm): mean trials/p, split fraction, model trials/p
+    let mut per: BTreeMap<(u32, u64, usize, String), Vec<(f64, f64, f64, f64, f64)>> =
+        BTreeMap::new();
+    let mut all_ok = true;
+    let mut theta_rows: BTreeMap<(u32, String), Vec<(f64, f64)>> = BTreeMap::new();
+    for l in csv.lines().skip(1) {
+        let v: Vec<&str> = l.split(',').collect();
+        let bits: u32 = v[0].parse().unwrap();
+        let h: u64 = v[1].parse().unwrap();
+        let inst: usize = v[2].parse().unwrap();
+        let p: f64 = v[3].parse().unwrap();
+        let arm = v[7].to_string();
+        let theta: f64 = v[8].parse().unwrap();
+        let steps: f64 = v[9].parse().unwrap();
+        let rels: f64 = v[10].parse().unwrap();
+        let mem: f64 = v[11].parse().unwrap();
+        all_ok &= v[12] == "1";
+        let model: f64 = v[14].parse().unwrap_or(f64::NAN);
+        if arm == "Jtheta" || (arm == "J" && theta == 1.0 && h == 4) {
+            theta_rows
+                .entry((bits, format!("{theta}")))
+                .or_default()
+                .push((steps / p, mem / p));
+        }
+        per.entry((bits, h, inst, arm)).or_default().push((
+            steps / p,
+            rels / steps.max(1.0),
+            model / p,
+            mem / p,
+            theta,
+        ));
+    }
+    let mut out = String::new();
+    // cell means
+    let mut cells: BTreeMap<(u32, u64, String), Vec<f64>> = BTreeMap::new();
+    let mut model_cells: BTreeMap<(u32, u64), Vec<f64>> = BTreeMap::new();
+    for ((bits, h, _inst, arm), v) in &per {
+        if v[0].4 != 1.0 {
+            continue;
+        }
+        let m = v.iter().map(|x| x.0).sum::<f64>() / v.len() as f64;
+        cells.entry((*bits, *h, arm.clone())).or_default().push(m);
+        if arm == "J" {
+            let split = v.iter().map(|x| x.1).sum::<f64>() / v.len() as f64;
+            let me = v[0].2;
+            if me.is_finite() && split > 0.0 {
+                // model trials/p = model edges/p / split fraction
+                model_cells.entry((*bits, *h)).or_default().push(me / split);
+            }
+        }
+    }
+    for ((bits, h, arm), v) in &cells {
+        let n = v.len() as f64;
+        let m = v.iter().sum::<f64>() / n;
+        let sd = (v.iter().map(|x| (x - m).powi(2)).sum::<f64>() / (n - 1.0).max(1.0)).sqrt();
+        let model = model_cells
+            .get(&(*bits, *h))
+            .filter(|_| arm == "J")
+            .map(|w| format!(" | model {:.4}", w.iter().sum::<f64>() / w.len() as f64))
+            .unwrap_or_default();
+        out.push_str(&format!(
+            "H1 bits {bits} h {h} {arm}: trials/p {m:.4} (s.e. over {} instances {:.4}){model} | rho theory 0.886/sqrt(h) {:.4}\n",
+            v.len(),
+            sd / n.sqrt(),
+            0.886 / (*h as f64).sqrt()
+        ));
+    }
+    // α fit per arm: log(trials/p) = c - α log h, cell means over instances, bootstrap
+    for arm in ["J", "R", "Jind"] {
+        let mut pts: Vec<(f64, Vec<f64>)> = Vec::new();
+        for ((_bits, h, a), v) in &cells {
+            if a == arm {
+                pts.push(((*h as f64).ln(), v.clone()));
+            }
+        }
+        if pts.len() < 3 {
+            continue;
+        }
+        let fit = |pts: &[(f64, f64)]| -> f64 {
+            let n = pts.len() as f64;
+            let mx = pts.iter().map(|x| x.0).sum::<f64>() / n;
+            let my = pts.iter().map(|x| x.1).sum::<f64>() / n;
+            let sxy: f64 = pts.iter().map(|x| (x.0 - mx) * (x.1 - my)).sum();
+            let sxx: f64 = pts.iter().map(|x| (x.0 - mx).powi(2)).sum();
+            -sxy / sxx
+        };
+        let base: Vec<(f64, f64)> = pts
+            .iter()
+            .map(|(lh, v)| (*lh, (v.iter().sum::<f64>() / v.len() as f64).ln()))
+            .collect();
+        let alpha = fit(&base);
+        let mut rng = 0xa1fa_u64;
+        let mut boots = Vec::new();
+        for _ in 0..2000 {
+            let bp: Vec<(f64, f64)> = pts
+                .iter()
+                .map(|(lh, v)| {
+                    let m = (0..v.len())
+                        .map(|_| v[(xorshift(&mut rng) % v.len() as u64) as usize])
+                        .sum::<f64>()
+                        / v.len() as f64;
+                    (*lh, m.ln())
+                })
+                .collect();
+            boots.push(fit(&bp));
+        }
+        boots.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        let lo = boots[(0.025 * boots.len() as f64) as usize];
+        let hi = boots[(0.975 * boots.len() as f64) as usize];
+        let verdict = if arm != "J" {
+            ""
+        } else if hi < 0.5 {
+            " -> alpha < 1/2: Arm J never beats rho on count (stop)"
+        } else if lo > 0.5 {
+            " -> alpha > 1/2: report the crossover h*"
+        } else {
+            " -> unresolved"
+        };
+        out.push_str(&format!("H1 alpha fit {arm}: alpha {alpha:.3} (bootstrap 95% [{lo:.3}, {hi:.3}], {} cells){verdict}\n", pts.len()));
+    }
+    for ((bits, th), v) in &theta_rows {
+        let n = v.len() as f64;
+        let t = v.iter().map(|x| x.0).sum::<f64>() / n;
+        let m = v.iter().map(|x| x.1).sum::<f64>() / n;
+        out.push_str(&format!("H4 bits {bits} theta {th}: trials/p {t:.4} stored/p {m:.5} time*memory/p^2 {:.5} ({} runs)\n", t * m, v.len()));
+    }
+    out.push_str(&format!("H1/H4 all answers verified: {all_ok}\n"));
+    out
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let out = Path::new(args.get(1).expect("usage: n2_routes <out-dir> [run|check]"));
@@ -2524,6 +2899,94 @@ fn main() {
         std::fs::write(out.join("ranking.csv"), &summary.1).unwrap();
         std::fs::write(out.join("summary.txt"), &summary.2).unwrap();
         eprint!("{}", summary.2);
+        return;
+    }
+    if mode == "hsweep" || mode == "memsweep" || mode == "hsummarize" {
+        if mode == "hsummarize" {
+            let t = summarize_hsweep(&std::fs::read_to_string(out.join("hsweep.csv")).unwrap());
+            std::fs::write(out.join("hsweep_summary.txt"), &t).unwrap();
+            eprint!("{t}");
+            return;
+        }
+        let threads: usize = std::env::var("N2_THREADS")
+            .ok()
+            .and_then(|s| s.parse().ok())
+            .unwrap_or(4);
+        let env_list = |k: &str, d: &str| -> Vec<u64> {
+            std::env::var(k)
+                .unwrap_or_else(|_| d.into())
+                .split(',')
+                .map(|x| x.trim().parse().unwrap())
+                .collect()
+        };
+        let mut jobs = Vec::new();
+        if mode == "hsweep" {
+            let sizes = env_list("N2_SIZES", "32,36,40");
+            let hs = env_list("N2_HS", "4,8,12,16,24,32,48,64,96,128");
+            for &bits in &sizes {
+                for &h in &hs {
+                    for inst_id in 0..4 {
+                        jobs.push(HJob {
+                            bits: bits as u32,
+                            h,
+                            inst_id,
+                            seed: splitmix(0x4831_0000 ^ (bits << 40) ^ (h << 8) ^ inst_id as u64),
+                            theta: 1.0,
+                        });
+                    }
+                }
+            }
+        } else {
+            let sizes = env_list("N2_SIZES", "32,36");
+            for &bits in &sizes {
+                for theta in [0.5f64, 0.25, 0.125] {
+                    for inst_id in 0..4 {
+                        jobs.push(HJob {
+                            bits: bits as u32,
+                            h: 4,
+                            inst_id,
+                            // same instances as the h = 4 cells of the h-sweep
+                            seed: splitmix(0x4831_0000 ^ (bits << 40) ^ (4 << 8) ^ inst_id as u64),
+                            theta,
+                        });
+                    }
+                }
+            }
+        }
+        let t0 = Instant::now();
+        // big jobs first
+        jobs.sort_by_key(|j| (j.bits, j.h));
+        let queue = std::sync::Mutex::new(jobs);
+        let results = std::sync::Mutex::new(Vec::<String>::new());
+        std::thread::scope(|s| {
+            for _ in 0..threads {
+                s.spawn(|| loop {
+                    let j = queue.lock().unwrap().pop();
+                    let Some(job) = j else { break };
+                    let r = hsweep_job(&job);
+                    results.lock().unwrap().extend(r);
+                });
+            }
+        });
+        let mut rows = results.into_inner().unwrap();
+        rows.sort();
+        let mut csv = String::from(
+            "bits,h,instance,p,ell,cofactor_exponent,target,arm,theta,steps,relations,stored_rows,verified,model_vertices,model_first_cycle_edges,M_total,seconds\n",
+        );
+        for r in &rows {
+            csv.push_str(r);
+            csv.push('\n');
+        }
+        let name = if mode == "hsweep" {
+            "hsweep"
+        } else {
+            "memsweep"
+        };
+        std::fs::write(out.join(format!("{name}.csv")), &csv).unwrap();
+        let t = summarize_hsweep(&csv);
+        std::fs::write(out.join(format!("{name}_summary.txt")), &t).unwrap();
+        eprint!("{t}");
+        eprintln!("done in {:.1}s", t0.elapsed().as_secs_f64());
         return;
     }
     let control = mode == "control";
