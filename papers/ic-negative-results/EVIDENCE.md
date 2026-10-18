@@ -3,8 +3,8 @@
 Every number in the paper cites one of these files as [E#]. The SHA-256 is
 of the file as read when this ledger was generated (first 16 hex digits;
 the full digest is in `evidence/ledger.full`). Repository heads at that time:
-- `crypto` at `64b87d52adda`
-- `crypto-autoresearcher` at `e4b1f0d1323c`
+- `crypto` at `1ccd8006f789`
+- `crypto-autoresearcher` at `eb4eedef8729`
 
 | id | repository:path | sha256 (16) | what |
 |:--|:--|:--|:--|
@@ -30,7 +30,7 @@ the full digest is in `evidence/ledger.full`). Repository heads at that time:
 | E20 | `crypto-autoresearcher:knowledge/findings/KN-FIND-9cba50.md` | `812688a01a31d18a` | Assumption 1 on the correct subspaces |
 | E21 | `crypto-autoresearcher:ledger/goals/GOAL-SEMBIN-5078bc/goal.yaml` | `107a5cc6507e58ff` | Goal record quoting Assumption 1 and Semaev section 4.5.1 |
 | E22 | `crypto:research/blindspots_20261018/07-blocked-f4-degree-cells/README.md` | `131ad266f6cb604b` | Campaign item 07 (degree cells) |
-| E23 | `crypto:research/blindspots_20261018/10-kernel-program-search/README.md` | `d954435afea4783e` | Campaign item 10 (conservation check not run) |
+| E23 | `crypto:research/blindspots_20261018/10-kernel-program-search/README.md` | `67dd70829c4e08a7` | Campaign item 10 (conservation check not run) |
 | E24 | `crypto:research/blindspots_20261018/01-fp2-gaudry-k2/README.md` | `34d06d7bdec87acc` | Campaign item 01 (Gaudry k=2 against rho) |
 | E25 | `crypto:research/blindspots_20261018/14-prime-m4-cells/README.md` | `5a333ca46a54939f` | Campaign item 14 (prime m=4 cells) |
 | E26 | `crypto:research/blindspots_20261018/02-deployed-binary-pricing/README.md` | `529c38f03889ab2b` | Campaign item 02 (derived pricing, gate open) |
@@ -42,3 +42,6 @@ the full digest is in `evidence/ledger.full`). Repository heads at that time:
 | E32 | `crypto:papers/ic-negative-results/lean/IcNegative/YieldConservation.lean` | `ee973d4cd005356f` | Lean: yield identity and coverage bound |
 | E33 | `crypto:research/pair46_factor_bases_20261015/13-xy-windows/RESULTS.md` | `f2f6a266dc807687` | xy-windows base geometry (mentions conservation) |
 | E34 | `crypto-autoresearcher:papers/semaev-conservation-specialization/README.md` | `99888c7d58c128e6` | Status and blockers of the monodromy manuscript |
+| E35 | `crypto:research/blindspots_20261018/17-cyclotomic-cost-n83/README.md` | `7ba9a2653dce7a3d` | Campaign item 17 (cyclotomic base cost at n=83, TRADES) |
+| E36 | `crypto:research/blindspots_20261018/04-presentation-search/README.md` | `d4676ae4b5ec3e4b` | Campaign item 04 (presentation search, closure degree D) |
+| E37 | `crypto:research/blindspots_20261018/05-elimination-orders/README.md` | `845129e7617bb62d` | Campaign item 05 (elimination orders, D_mat) |

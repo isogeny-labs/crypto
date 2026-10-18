@@ -37,8 +37,13 @@ paper claims none. Restore the authors with `make deanonymize` after creating an
 | S5 | Nagao 2015/984 Lemma 4 (`d_F <= d'_F`) is false over `F_2`, equality reading, both field-equation placements | exact (hand proof for witness A; native re-derivation of both) | `KN-FIND-936151`, `evidence/checks.txt` |
 | S6 | Semaev 2015 Assumption 1 off the diagonal | **not established** (the design listed it as a negative; the records do not support that) | `KN-FIND-9cba50`, campaign item 07 |
 
-Campaign results that bear on the statements (items 01, 02, 07, 10, 14) are in
-section 8 of the paper, quoted from each item's own verdict.
+Campaign results that bear on the statements (items 01, 02, 04, 05, 07, 10, 14, 17) are in
+section 8 of the paper, quoted from each item's own verdict (second pass, `PROTOCOL.md`
+Addendum B: items 04, 05 and 17 added, item 10 re-hashed; items 03, 06, 08, 09, 11, 12, 13, 15
+and 16 are listed as not bearing and no number is cited from them). No label of S1 to S6
+changed. The smoke test (`evidence/checks.txt`, 20 PASS, positive control X, X+1 passes) was
+re-run on the second pass and matched line for line. Lean was not built: no toolchain and
+1.5 GB of disk, so no task card exists for item 19.
 
 ## What it does not say
 

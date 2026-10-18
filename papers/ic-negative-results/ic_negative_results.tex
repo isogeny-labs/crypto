@@ -372,7 +372,7 @@ decomposition or the linear-algebra stage, where the cost of index calculus sits
 The yield-neutral result of \ev{E6} tests the yield clause only; the solving-degree
 clause of that lead was not tested there. In the campaign of 2026-10-18 the planned
 toy check of conservation inside the kernel-program search (item 10) has not run
-(\ev{E23}); we cite no number from it.
+(\ev{E23}); we cite no number from it. Item 17 (\ev{E35}) measures the counted cost of a cyclotomic base at $n=83$, not its yield: it reports that the base-dependent part of the cost is small next to the arm-independent pair table, and it is context for S3, not evidence for or against it.
 
 \section{S4: the monodromy of the Semaev cover is $(\ZZ/2)^{m-2}$}
 \label{sec:s4}
@@ -609,7 +609,7 @@ reading exists at that cell), and a result at toy scale; the cell is
 No committed record contains an F4 degree certificate $d_{F4}>4$ at any cell, on or
 off the diagonal. The programme's findings state that Assumption 1 is not refuted
 (\ev{E14}, ``reads this before using anything below''), and the only off-diagonal
-reading above $4$ is one closure draw in item 07.
+reading above $4$ is one closure draw in item 07. Items 04 and 05 (\ev{E36}, \ev{E37}) measure closure degrees of related descent systems at toy cells, the first with the chained $S_3$ route at $D=4$ on four cells, the second with grevlex at $D_{\mathrm{mat}}=4$ on its countable targets; neither is a reading at the deciding cell.
 \end{proposition}
 
 \paragraph{Why it matters, and what would settle it.}
@@ -630,9 +630,11 @@ that the two objects agree.
 
 The blind-spot campaign of 2026-10-18 measured twenty directions. Table~\ref{tab:campaign}
 lists the ones whose results bear on S1--S6, quoted from each item's own verdict. Items
-03, 04, 05, 06, 08, 09, 11, 12, 13 and 16 concern solver and model engineering and bear on none
-of the six; items 15 and 17 had run cards but no verdict at the time of writing, and we cite
-no number from them.
+03, 06, 08, 09, 11, 12, 13, 15 and 16 concern solver, learned-policy, rho-walk, genus-3 linear-algebra
+and toy-size oracle engineering and bear on none of the six; we cite no number from them. The
+selection of rows was fixed before the edit (\texttt{PROTOCOL.md}, Addendum B), and each row
+quotes the item's own verdict line and level, as the READMEs read when the ledger digests were taken
+(item 10's README was still a stage-2 assessment; its frozen rule had no input).
 
 \begin{table}[t]
 \centering\small
@@ -642,9 +644,12 @@ item & verdict as recorded & bears on \\
 \midrule
 01 \ev{E24} & \textsc{regresses} at the constant level; \textsc{inconclusive} at the exponent level. No arm cheaper than matched rho at $\log_2\#E=24$ to $40$; best arms $50.0$ [$42.0,60.3$] and $51.6$ [$43.3,62.0$] times matched rho at $40$ bits, weight $0$ & S1 context: distance to rho remains \\
 02 \ev{E26} & \textsc{advances} (derived, model level), conditional on a constant-degree model; item-07 gate open; not a measured improvement & S6: the constant-degree hypothesis is the unsettled boundary \\
+04 \ev{E36} & \textsc{advances}, level primitive, stage diagnostic: the M\"obius-frame arm lowers the Macaulay closure degree of the incumbent presentation on $5$ of $5$ cells (for example $D$ from $7$ to $5$ at $(17,4,3)$) and does not go below the chained $S_3$ arm, $D=4$ on every cell where it was measured; no $S$, rho ratio or GAE is computed & S6 context: closure degrees at the cells Assumption 1 concerns \\
+05 \ev{E37} & \textsc{advances}, level constant, one arm (\texttt{wdeg}): $3.4\times$ to $18.6\times$ fewer matrix-entry touches than this engine's grevlex on four cells; the solving degree is not lowered ($D_{\mathrm{mat}}\ge4$ everywhere) and at the next size the arm hit the time cap & S6 context: grevlex closure degree is $4$ on every countable target \\
 07 \ev{E22} & \textsc{blocked} at $(15,5,4)$, level primitive; one draw reads $D>4$ & S6 (iii) \\
-10 \ev{E23} & \textsc{inconclusive}; the planned conservation check did not run & S3: no evidence from this item \\
+10 \ev{E23} & \textsc{inconclusive}, level constant; the frozen rule has no input because the held-out, finalist and conservation cards were not run & S3: no evidence from this item \\
 14 \ev{E25} & \textsc{regresses}, level primitive; no $m=4$ oracle's $T_{\mathrm{dec}}$ grows slower than $p^{1/4}$ at the measured scale & S1 context: first measured $m=4$ cells \\
+17 \ev{E35} & \textsc{trades}, level constant: the cyclotomic base is never cheaper than the incumbent by the frozen rule at $n=83$ ($S_{\mathrm{ready}}$ ratio $0.995$ to $2.003$ across accountings and cells; about $96\%$ of $S_{\mathrm{ready}}$ is the arm-independent pair table); model rows put the cyclotomic arm at $231.9$ to $1.26\times10^{7}$ times the rho floor at $c=0$ (upper bounds, model rows, not run); the solving-degree leg is \textsc{blocked} & S1 context: distance to rho; S3 context: base-dependent cost is a few percent, yield not measured \\
 \bottomrule
 \end{tabular}
 \caption{Campaign items that bear on the six statements. None is a speedup claim.}
