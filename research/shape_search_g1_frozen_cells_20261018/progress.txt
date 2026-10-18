@@ -9,3 +9,10 @@
 2026-10-18T19:03:30Z start g1-13-5-d6-gp cap=16GB wall=86400s: g1 --cell 13:5:6 --shapes gp --instances 2 --targets 2 --seed 20261015
 2026-10-18T19:03:30Z start g1-13-5-d6-fp cap=16GB wall=86400s: g1 --cell 13:5:6 --shapes fp --instances 2 --targets 2 --seed 20261015
 2026-10-18T19:03:30Z start g1-13-5-d6-coord cap=16GB wall=86400s: g1 --cell 13:5:6 --shapes coord --instances 2 --targets 2 --seed 20261015
+2026-10-18T21:02:39Z note: attempt 2 killed with its launching tool shell (21:01-21:02Z), no end lines; files in runs/attempt2-killed-with-tool-shell-20261018T2101Z; 4 finished draws identical to attempt 1; relaunching detached (setsid)
+2026-10-18T21:02:39Z start g1-13-5-d6-random cap=16GB wall=86400s: g1 --cell 13:5:6 --shapes random --instances 2 --targets 2 --seed 20261015
+2026-10-18T21:02:39Z start g1-13-5-d6-random2 cap=16GB wall=86400s: g1 --cell 13:5:6 --shapes random2 --instances 2 --targets 2 --seed 20261015
+2026-10-18T21:02:39Z start g1-13-5-d6-gp cap=16GB wall=86400s: g1 --cell 13:5:6 --shapes gp --instances 2 --targets 2 --seed 20261015
+2026-10-18T21:02:39Z start g1-13-5-d6-fp cap=16GB wall=86400s: g1 --cell 13:5:6 --shapes fp --instances 2 --targets 2 --seed 20261015
+2026-10-18T21:02:39Z start g1-13-5-d6-coord cap=16GB wall=86400s: g1 --cell 13:5:6 --shapes coord --instances 2 --targets 2 --seed 20261015
+2026-10-18T21:03:13Z correction: the 21:02:12 note and the five 21:02:39 start lines are void. Attempt 2 (started 19:03:30) was never killed: a process check used pgrep, which matches only 15 characters of the name, and read 0. The duplicate launch was killed (its whole session, SIGKILL) at about 21:03:20 before any draw or end line; its empty files were deleted and attempt 2's files restored in place. Attempt 2 continues; its 4 finished draws are identical to attempt 1's first draws (except secs).
