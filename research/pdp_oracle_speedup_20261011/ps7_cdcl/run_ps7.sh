@@ -23,7 +23,9 @@ SHELL_ARMS="a2 a2p a2l a3"
 ALL_ARMS="a1 a1u $SHELL_ARMS"
 mkdir -p "$OUT"
 FAIL=0
-busy() { python3 tools/isolated_bench.py busy --wait -- "$@"; }
+# One lock for a whole stage: the driver runs `busy env PS7_LOCKED=1 PS7_STAGES=<stage> run_ps7.sh`; without it every
+# command takes the lock on its own.  The timing stage never runs inside a lock (isolated_bench `run` takes it itself).
+busy() { if [ -n "${PS7_LOCKED:-}" ]; then "$@"; else python3 tools/isolated_bench.py busy --wait -- "$@"; fi; }
 try() {   # try LABEL CMD... : run, log a failure, keep going
   local label=$1; shift
   if ! "$@"; then echo "$(date -u +%FT%TZ) FAILED: $label :: $*" >> "$OUT/failures.log"; FAIL=1; fi
@@ -57,7 +59,10 @@ if want graph; then
   try graph-15 busy "$BIN" graph-stats --n 15 --l 5 --low-terms 0,2,4,5 >> "$OUT/graph_stats.jsonl"
   try graph-17 busy "$BIN" graph-stats --n 17 --l 6 --low-terms 0,3 >> "$OUT/graph_stats.jsonl"
   try graph-19 busy "$BIN" graph-stats --n 19 --l 6 --low-terms 0,1,2,5 >> "$OUT/graph_stats.jsonl"
-  for l in $RUNGS; do try graph-l$l busy "$BIN" graph-stats --l "$l" >> "$OUT/graph_stats.jsonl"; done
+  for l in $RUNGS; do
+    try graph-x-l$l busy "$BIN" graph-stats --l "$l" --x-only >> "$OUT/graph_stats.jsonl"                     # the part arm 3 reads
+    try graph-full-l$l busy timeout 900 "$BIN" graph-stats --l "$l" >> "$OUT/graph_stats.jsonl"               # whole system, may time out
+  done
 fi
 
 if want fidelity; then

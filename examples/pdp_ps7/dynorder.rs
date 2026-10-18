@@ -289,10 +289,9 @@ impl<'g> MvcDecider<'g> {
     }
 }
 
-/// Shape of the monomial graph of a whole system (diagnostic for `graph-stats`).
-pub fn shape(sys: &S4System) -> GraphShape {
-    let g = XGraph::from_system(sys);
-    let l = sys.l as usize;
+/// Shape of the `x` component alone: (edges within a summand, edges across summands, minimum vertex cover size).
+pub fn x_shape(g: &XGraph) -> (usize, usize, u32) {
+    let l = g.nx / 3;
     let mut adj = vec![0u64; g.nx];
     let mut buf = Vec::new();
     g.adjacency(0, 0, &mut adj, &mut buf);
@@ -312,6 +311,13 @@ pub fn shape(sys: &S4System) -> GraphShape {
     let all = (1u64 << g.nx) - 1;
     let mut steps = 0u64;
     let alpha_x = alpha(all, &adj, &mut steps);
+    (within, across, g.nx as u32 - alpha_x)
+}
+
+/// Shape of the monomial graph of a whole system (diagnostic for `graph-stats`).
+pub fn shape(sys: &S4System) -> GraphShape {
+    let g = XGraph::from_system(sys);
+    let (within, across, mvc) = x_shape(&g);
     // The e-component: the Semaev equations are monomials in e only.
     let n_e = sys.n_e_vars() as usize;
     assert!(n_e <= 64, "e-graph masks are u64");
@@ -335,7 +341,7 @@ pub fn shape(sys: &S4System) -> GraphShape {
         x_edges: within + across,
         x_edges_within_summand: within,
         x_edges_across_summands: across,
-        x_min_vertex_cover: g.nx as u32 - alpha_x,
+        x_min_vertex_cover: mvc,
         e_vertices: n_e,
         e_edges,
     }

@@ -789,6 +789,21 @@ fn cmd_graph_stats(args: &[String]) {
         Some(t) => rung_of(n, l, &t),
         None => Rung::with(n, l),
     };
+    if flag(args, "--x-only") {
+        // The x component alone (target-independent; what the branching rule reads), without the Semaev half.
+        let g = XGraph::new(l);
+        let (within, across, mvc) = dynorder::x_shape(&g);
+        println!(
+            "{}",
+            json!({
+                "kind": "graph-stats-x-only", "n": n, "l": l, "x_vertices": g.nx,
+                "correspondence_equations": g.n_equations, "correspondence_monomials_deg_ge2": g.n_monomials,
+                "x_edges": within + across, "x_edges_within_summand": within, "x_edges_across_summands": across,
+                "x_complete_graph_edges": g.nx * (g.nx - 1) / 2, "x_min_vertex_cover": mvc,
+            })
+        );
+        return;
+    }
     let xr = rung.gf.to_element(0x1234_5678 & rung.mask());
     let sys = weil_descend_s4(n, l, &rung.irr, &F2mElement::one(n), &xr);
     let shape = dynorder::shape(&sys);
