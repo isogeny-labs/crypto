@@ -222,6 +222,10 @@ fn main() {
             continue;
         };
         let _ = coset_cfg;
+        // Compare on the targets both bases ran (a truncated configuration
+        // ran a prefix of the shared target list).
+        let common = dv.len().min(cv.len());
+        let (dv, cv) = (&dv[..common], &cv[..common]);
         let f2 = cfg["base_points_in_2e"].as_f64().unwrap() / cfg["base_points"].as_f64().unwrap();
         let yd: f64 = dv.iter().map(|s| s.lifted).sum();
         let yc: f64 = cv.iter().map(|s| s.lifted).sum();

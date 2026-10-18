@@ -127,3 +127,20 @@ below 1.25×, or P-E8d savings below 10 % on every configuration.
   - Poisson for counts;
   - a bootstrap over systems (2,000 resamples, seed 1) for work.
 - Rows are ranked only where the order holds across the band.
+
+## Amendment 1 (2026-10-18 17:55 UTC, during E8, before any coset d = 10 data)
+
+- **Why.** E8's d = 10 configurations on F_2^17 are underdetermined
+  (20 unknowns, 17 equations).  The default base needs solving degree 4
+  there, about 2 s per system.  The coset base was already 45× costlier
+  than the default at d = 9, so its d = 10 run alone would take many
+  hours, beyond the host's uptime.
+- **Change.** Each configuration stops starting new targets after 30
+  minutes of wall time and is recorded with `truncated` and
+  `systems_run`.  Targets run in their frozen order, so a truncated
+  configuration holds a prefix of the shared list.
+- **Analysis.** Coset ÷ default comparisons use the common prefix.  The
+  E8 per-configuration rows use what ran.
+- **Scope.** Configurations finished before the amendment are unchanged:
+  all of F_2^17 at d = 8 and 9, and its d = 10 default run.  No prediction
+  changes.

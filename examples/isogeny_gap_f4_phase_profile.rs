@@ -18,7 +18,9 @@
 //!   --out research/isogeny_conductor_gap_round6_20261018/e8/records.jsonl
 //! ```
 //!
-//! Resumable: configurations already in `--out` are skipped.
+//! Resumable: configurations already in `--out` are skipped.  A
+//! configuration stops starting new targets after 30 minutes of wall time
+//! and is then recorded as truncated (PROTOCOL amendment 1).
 
 use std::collections::BTreeSet;
 use std::io::Write;
@@ -41,6 +43,9 @@ use serde_json::json;
 const TARGETS: usize = 200;
 const SEED: u64 = 20261018;
 const FREE: usize = 8;
+/// Wall budget per configuration (PROTOCOL amendment 1): no new target
+/// starts after it; the configuration is then marked truncated.
+const BUDGET_S: f64 = 1800.0;
 
 fn arg(args: &[String], name: &str) -> String {
     let i = args
@@ -101,7 +106,12 @@ fn main() {
                         .filter(|&&p| g.mul(&mut gops, p, half).infinity)
                         .count();
                     let started = Instant::now();
+                    let mut systems_run = 0usize;
                     for (t, &target) in targets.iter().enumerate() {
+                        if started.elapsed().as_secs_f64() > BUDGET_S {
+                            break;
+                        }
+                        systems_run += 1;
                         let bases = vec![basis.clone(), basis.clone()];
                         let sys = descend_affine(&inst.gf, inst.b, target.x, &bases, offset)
                             .expect("dimension fits");
@@ -159,7 +169,9 @@ fn main() {
                         "cofactor": inst.cofactor, "r": inst.r, "d": d, "base": base,
                         "offset": offset, "basis": basis, "base_points": fb.points.len(),
                         "base_abscissae": fb.abscissae, "base_points_in_2e": in_two_e,
-                        "targets": TARGETS, "free": FREE, "seed": SEED,
+                        "targets": TARGETS, "systems_run": systems_run,
+                        "truncated": systems_run < TARGETS, "budget_s": BUDGET_S,
+                        "free": FREE, "seed": SEED,
                         "wall_s": started.elapsed().as_secs_f64(),
                     });
                     writeln!(file, "{cfg}").unwrap();
