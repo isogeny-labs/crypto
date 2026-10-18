@@ -280,7 +280,8 @@ pub fn audit_with(
 
     // The host class.
     let host: HostCapsule = serde_json::from_str(
-        &std::fs::read_to_string(dir.join("host.json")).map_err(|e| e.to_string())?,
+        &std::fs::read_to_string(dir.join("host.json"))
+            .map_err(|e| format!("{}: {e}", dir.join("host.json").display()))?,
     )
     .map_err(|e| format!("host.json: {e}"))?;
     let class = recompute_class(&host)?;
@@ -295,10 +296,12 @@ pub fn audit_with(
     );
 
     // The spec re-expands to the plan.
-    let spec_text = std::fs::read_to_string(dir.join("spec.json")).map_err(|e| e.to_string())?;
+    let spec_text = std::fs::read_to_string(dir.join("spec.json"))
+        .map_err(|e| format!("{}: {e}", dir.join("spec.json").display()))?;
     let p = plan(Spec::from_json(&spec_text)?)?;
     let doc: PlanDoc = serde_json::from_str(
-        &std::fs::read_to_string(dir.join("plan.json")).map_err(|e| e.to_string())?,
+        &std::fs::read_to_string(dir.join("plan.json"))
+            .map_err(|e| format!("{}: {e}", dir.join("plan.json").display()))?,
     )
     .map_err(|e| format!("plan.json: {e}"))?;
     check(

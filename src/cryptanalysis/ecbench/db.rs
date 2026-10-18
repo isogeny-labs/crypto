@@ -504,7 +504,8 @@ pub fn sql_for_path(path: &Path) -> Result<String, String> {
     if path.is_dir() {
         let session = read_session(path)?;
         let host: HostCapsule = serde_json::from_str(
-            &std::fs::read_to_string(path.join("host.json")).map_err(|e| e.to_string())?,
+            &std::fs::read_to_string(path.join("host.json"))
+                .map_err(|e| format!("{}: {e}", path.join("host.json").display()))?,
         )
         .map_err(|e| format!("host.json: {e}"))?;
         host_row(&mut out, &host);
