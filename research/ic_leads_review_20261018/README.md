@@ -63,7 +63,7 @@ ml-cryptanalysis experiment reports; a 30-query ePrint, arXiv and web scan for
 
 | # | Lead | Status | What was measured | File |
 |---|---|---|---|---|
-| 1 | Preprocessing-rho control at equal advice (n = 73, 83) | **Open in the specified form.** Ran at n = 41, 53, 61 | Bernstein–Lange rho at equal or smaller advice is 53–317× faster online than compact-orbit IC (317× [137, 739] at n = 41; 53× [35, 80] at n = 61, K = 360). The N83 figure (≈50–100×) is a projection: the instrument covers n ≤ 63 and the run did not fit a 1 GiB cap. A later n = 61 pairing over 1024 points (BL 3.37 ms vs IC 111.4 ms) is `claim_check FAIL / SCHEMA_INCOMPLETE` because BL was replayed from an archive, not co-measured. Owner decision 2026-10-15: online rows stay on the board | `ic_next10_20261014/09-equal-advice/README.md`; `ic_improve_20261015/README.md:21` |
+| 1 | Preprocessing-rho control at equal advice (n = 73, 83) | **Partly open.** Ran at n = 41, 53, 61 at equal advice; at N83 a time- and RSS-matched (not equal-bytes) control exists on `main` (see correction) | Bernstein–Lange rho at equal or smaller advice is 53–317× faster online than compact-orbit IC (317× [137, 739] at n = 41; 53× [35, 80] at n = 61, K = 360). The N83 figure (≈50–100×) is a projection: the instrument covers n ≤ 63 and the run did not fit a 1 GiB cap. A later n = 61 pairing over 1024 points (BL 3.37 ms vs IC 111.4 ms) is `claim_check FAIL / SCHEMA_INCOMPLETE` because BL was replayed from an archive, not co-measured. Owner decision 2026-10-15: online rows stay on the board. **Correction (2026-10-18, later the same day):** `research/20261016-n83-precomputed-rho-control/` (PR #1987, merge `bb023d5d7`) already ran a time-matched and memory-matched Bernstein–Lange control at N83 in separate processes; under its frozen rule neither N83 online reading survives (the 95% interval of median IC/precomputed-rho is above 1 in every matched comparison). What remains open is the equal-bytes, one-process-group, co-measured form at n = 73 and 83, which PR #2163 now provides as a frozen protocol | `ic_next10_20261014/09-equal-advice/README.md`; `ic_improve_20261015/README.md:21`; `research/20261016-n83-precomputed-rho-control/README.md` |
 | 2 | Free relations by pair-root self-collision | **Closed.** Mechanism real, yield not | Homogeneous rank 49 of 599 at n = 61, K = 600; 6 of 599 at n = 83. The anchor note's n⁴K⁴/r prediction was about 60× too high. Residual constant landed: 0.960× [0.946, 0.976] with free relations on by default | `RESEARCH_FREE_RELATIONS_CENSUS_20261012.md`; `ic_improve_20261015` item 02 |
 | 3 | Solving-degree cells (4,4), (4,5), (4,6) with FGHR and Faugère–Svartz | **Partly measured; deciding cell open.** | msolve F4: (4,4) and (15,5) level at degree 4 where XL read ≥ 7. MutantXL closure refutes 2–3 degrees below XL on 20/20 cells. m = 4 flat at 4 through N = 42; m = 3 rises above 4 at ℓ = 7 on 8/8 draws. Two survivors: "rise at ℓ = 7" or "rise once m·ℓ ≥ 21"; (4,6) separates them and is unmeasured (needs ≈70 GB or a sparse closure; the sparse engine built on 10-17 is too slow). **The FGHR arm was not run; no Faugère–Svartz block run exists anywhere.** | `ic_next10_20261014/06-equivariant-f4-m4/README.md`; `dreg_closure_{mutantxl,scale,driver}_20261016/RESULTS.md`; `dreg_closure_specialise_20261017/RESULTS.md` |
 | 4 | Equivariant F4 to full F4 | **Done; not a production lever.** | G2 pass bit-identical to full F₂ RREF; 44–73× was against a naive kernel, 2–3× against `gf2_elim`. Oracle-level verdict TRADES (0.25× at n = 5, 15.5× at n = 13), most of it from fall rows, not equivariance; production never builds σ-symmetric systems, so the hook is dead code. Fall-row gate kept opt-in (`KIC_FALLROW_GATE=1`) | `ic_improve_20261014/02-equivariant-oracle/README.md`; `ic_improve_20261015` item 03 |
@@ -203,7 +203,9 @@ These are cheap, and each one can flip the sign of a headline row.
 - **Equal-advice preprocessing rho at n = 73 and 83, co-measured.** Extend the
   n ≤ 63 instrument to the wide field and run BL and IC in one session under
   one resource envelope with replay certificates, as the n = 61 diagnostic's
-  own next step says. Record `log₂(S·T²) − log₂(r/|Aut|)` on every online row,
+  own next step says. (Correction, same day: the N83 time- and RSS-matched
+  control already exists on `main`, `research/20261016-n83-precomputed-rho-control/`;
+  the equal-bytes co-measured form is what PR #2163 adds.) Record `log₂(S·T²) − log₂(r/|Aut|)` on every online row,
   as the anchor note asked (not verified to be on the board today).
 - **Measure K**, the column-touch to group-operation conversion. Every m = 4
   price row at ECC2K-130 is in unconverted units; at +7.6 to +10.3 bits the
@@ -307,7 +309,9 @@ factor-base censuses (0.93–1.03×); further Kummer spectra (0/31).
 It does not show that any IC variant beats rho, cold or online. One
 statement was corrected after publication: §3.3's "sparse solvers
 unreachable" was true of the PR base but not of `main`, which already had
-`sparse-cado` (see the correction there). It does not
+`sparse-cado` (see the correction there). A second: §2.1 item 1 called the
+N83 preprocessing-rho control open; a time- and RSS-matched one was on `main`
+since 2026-10-16 (see the correction there). It does not
 rerun or re-derive any number; two of the anchor note's own calculations
 (free-relation count, 60× high; the C ≈ D^3.1 symmetry rule, 13× high) are a
 reminder that calculations here are not measurements. The costs in §4 are

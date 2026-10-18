@@ -84,7 +84,9 @@ group operations with the measured 2^60.81 constant. Source:
   [\#], [Lead], [Status], [What was measured], [File],
   [1],
   [Preprocessing-rho control at equal advice (n \= 73, 83)],
-  [#strong[Open in the specified form.] Ran at n \= 41, 53, 61],
+  [#strong[Partly open.] Ran at n \= 41, 53, 61 at equal advice; at N83
+  a time- and RSS-matched (not equal-bytes) control exists on `main`
+  (see correction)],
   [Bernstein–Lange rho at equal or smaller advice is 53–317× faster
   online than compact-orbit IC (317× \[137, 739\] at n \= 41; 53× \[35,
   80\] at n \= 61, K \= 360). The N83 figure (≈50–100×) is a projection:
@@ -92,9 +94,17 @@ group operations with the measured 2^60.81 constant. Source:
   later n \= 61 pairing over 1024 points (BL 3.37 ms vs IC 111.4 ms) is
   `claim_check FAIL / SCHEMA_INCOMPLETE` because BL was replayed from an
   archive, not co-measured. Owner decision 2026-10-15: online rows stay
-  on the board],
+  on the board. #strong[Correction (2026-10-18, later the same day):]
+  `research/20261016-n83-precomputed-rho-control/` (PR \#1987, merge
+  `bb023d5d7`) already ran a time-matched and memory-matched
+  Bernstein–Lange control at N83 in separate processes; under its frozen
+  rule neither N83 online reading survives (the 95% interval of median
+  IC/precomputed-rho is above 1 in every matched comparison). What
+  remains open is the equal-bytes, one-process-group, co-measured form
+  at n \= 73 and 83, which PR \#2163 now provides as a frozen protocol],
   [`ic_next10_20261014/09-equal-advice/README.md`;
-  `ic_improve_20261015/README.md:21`],
+  `ic_improve_20261015/README.md:21`;
+  `research/20261016-n83-precomputed-rho-control/README.md`],
   [2],
   [Free relations by pair-root self-collision],
   [#strong[Closed.] Mechanism real, yield not],
@@ -357,7 +367,10 @@ These are cheap, and each one can flip the sign of a headline row.
 - #strong[Equal-advice preprocessing rho at n \= 73 and 83,
   co-measured.] Extend the n ≤ 63 instrument to the wide field and run
   BL and IC in one session under one resource envelope with replay
-  certificates, as the n \= 61 diagnostic\'s own next step says. Record
+  certificates, as the n \= 61 diagnostic\'s own next step says.
+  (Correction, same day: the N83 time- and RSS-matched control already
+  exists on `main`, `research/20261016-n83-precomputed-rho-control/`;
+  the equal-bytes co-measured form is what PR \#2163 adds.) Record
   `log₂(S·T²) − log₂(r/|Aut|)` on every online row, as the anchor note
   asked (not verified to be on the board today).
 - #strong[Measure K], the column-touch to group-operation conversion.
@@ -513,14 +526,17 @@ further Kummer spectra (0/31).
 It does not show that any IC variant beats rho, cold or online. One
 statement was corrected after publication: §3.3\'s \"sparse solvers
 unreachable\" was true of the PR base but not of `main`, which already
-had `sparse-cado` (see the correction there). It does not rerun or
-re-derive any number; two of the anchor note\'s own calculations
-(free-relation count, 60× high; the C ≈ D^3.1 symmetry rule, 13× high)
-are a reminder that calculations here are not measurements. The costs in
-§4 are estimates. The sweeps could not see uncommitted worktrees or open
-PRs, so each action should start with a five-minute check of those
-places. No canonical graph changes: the leaderboard, scoreboard and
-progress timeline were checked and carry no new value from this review.
+had `sparse-cado` (see the correction there). A second: §2.1 item 1
+called the N83 preprocessing-rho control open; a time- and RSS-matched
+one was on `main` since 2026-10-16 (see the correction there). It does
+not rerun or re-derive any number; two of the anchor note\'s own
+calculations (free-relation count, 60× high; the C ≈ D^3.1 symmetry
+rule, 13× high) are a reminder that calculations here are not
+measurements. The costs in §4 are estimates. The sweeps could not see
+uncommitted worktrees or open PRs, so each action should start with a
+five-minute check of those places. No canonical graph changes: the
+leaderboard, scoreboard and progress timeline were checked and carry no
+new value from this review.
 
 == Files
 <files>
