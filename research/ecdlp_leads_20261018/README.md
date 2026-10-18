@@ -114,7 +114,7 @@ defined above.
 
 | # | family | lead | status | first experiment | kill criterion | if it works |
 |:--|:--|:--|:--|:--|:--|:--|
-| L8 | Koblitz | Étale route: curve D/F₂ with an order-n automorphism and an F₂-map to E; its twist contains E × T_n, genus 1 + n(g₀ − 1) | proposed | enumerate all genus-2 and genus-3 curves B/F₂ covering E with n ∣ #J_B(F₂); test L(B, χ, X) for the factor L_E(X) | no hit for g₀ ≤ 3 at any toy n | the only structured family inside the L(1/2) budget for K-163, K-283, K-409 and K-571, with explicit maps |
+| L8 | Koblitz | Étale route: curve D/F₂ with an order-n automorphism and an F₂-map to E; its twist contains E × T_n, genus 1 + n(g₀ − 1) | **measured (partial):** hits only at n = 3; none for any n from 5 to 37 over genus-2 and hyperelliptic genus-3 B | next: plane-quartic genus-3 B (#J up to 198, which reaches n = 131, 163), then genus 4 | no hit for plane quartics | the only structured family inside the L(1/2) budget for K-163, K-283, K-409 and K-571, with explicit maps |
 | L6 | Koblitz | Modular twists: (f_E ⊗ χ) mod 2 ≅ T_n up to isogeny, for every n | derived | find the smallest curve whose Jacobian contains A_{f⊗χ} for n = 3, 5, 7, 11 (modular quotients, Fermat quotients of level 7ℓ, Ekedahl–Serre curves) | minimal genus grows faster than c(n)·n | an explicit, computable transfer of T_n into a Jacobian over F₂ |
 | L10 | random-b binary | Genus-n Jacobians realising Res(E), beyond GHS | proposed | n = 3: all genus-3 curves over F₂, which traces t₃ are realised. n = 5: genus-5 curves with point counts 3, 5, 9, 17, 33 − 5t₅ | no genus-5 realisation for any t₅ | a genus-O(n) family would make prime-degree binary curves subexponential |
 | L9 | Koblitz and binary | Certified lower bounds on the cover genus | derived (partial) | Howe's principal-polarisability test on T_n for deployed n; the manypoints (q = 32, g = 5) bound; point-count positivity | (produces bounds) | closes deployed sizes for good where the bound exceeds the budget |
@@ -306,9 +306,35 @@ bound (1+√2)^{2g₀} allows *(optimistic)*:
 The first four are inside the budget. K-233 and ECC2K-130 are just outside.
 
 **Test.** For unramified χ of order n, D's χ-part has L-polynomial
-L(B, χ, X), of degree 2g₀ − 2. It must be divisible by L_E(X) = 1 − tX + 2X².
-Genus-2 B (#J ≤ 34, so toy n ≤ 31) and genus-3 B (#J ≤ 198, which includes
-131 and 163) are finite, cheap enumerations. Caveats:
+L(B, χ, X), of degree 2g₀ − 2. It must be divisible by (1 − cπX)(1 − cπ̄X) for
+some c ∈ μ_n. With c = 1 the twist of D carries T_n; with c primitive, D
+itself does.
+
+**Result** *(measured, exact enumeration; run report
+[`reports/run-20261018T2043Z`](reports/run-20261018T2043Z/README.md), crate
+[`etale_search`](etale_search/src/main.rs))*. Covered: every smooth genus-2
+curve over F₂ (768 models) and every smooth hyperelliptic genus-3 curve
+(6,144 models).
+
+- **Validation.** Every Jacobian group was computed from relations and passed
+  the check (free rank 1, torsion = L_B(1)). No twisted L-function failed the
+  Riemann-hypothesis check.
+- **n = 3 only.** Characters with the T_n factor exist only for n = 3: 192 in
+  genus 2 and 576 in genus 3, in six isogeny classes of B, for both a = 0 and
+  a = 1. So T₃ sits in the Jacobian of an explicit genus-4 étale cover
+  for a = 0. That case cannot occur at genus 3, by point counts.
+- **Nothing for n ≥ 5.** Characters tested: 2,304 in genus 2 for n ∈ {5, 7,
+  11, 13, 19}, and 25,536 in genus 3 for n from 5 to 37. Not one has the
+  factor.
+- **Genus 2, n = 5 and 7.** The counting argument predicted that only four
+  L-polynomials could work. One occurs over F₂, 1 + X + 2X² + 2X³ + 4X⁴, on
+  48 models, and fails the character condition. The other three do not occur.
+  The genus-2 étale route is closed for n ≥ 5.
+- **Deployed sizes untouched.** Over F₂, hyperelliptic genus-3 Jacobians never
+  exceed 56 points, so n = 131 and 163 cannot arise from them. Those sizes
+  need plane-quartic B, which is next, and genus 4 is needed for n ≥ 233.
+
+Caveats:
 
 - The Weil bound overstates the reachable #J_B(F₂).
 - D is generally not hyperelliptic. General-curve class-group algorithms have
@@ -433,6 +459,8 @@ restriction beyond n = 3.
   trace-zero classes in dimension 6, and `3.2.a_a_af` were blocked by a
   captcha. The other n = 3 classes are in the table under "Method and
   sources".
+- L8 is only partly run: plane-quartic genus-3 curves and genus 4 are not
+  covered by the étale search.
 - The manypoints entry for (q = 32, g = 5) has not been checked.
 - Novelty audit: not done against the cover-attack literature. Check Diem and
   Scholten's trace-zero cover reports, Hess's generalised GHS, Ekedahl–Serre,
@@ -442,8 +470,9 @@ restriction beyond n = 3.
 
 ## Graphs checked and left unchanged
 
-These were checked and left unchanged, because this round has no measurement
-and no certified finding:
+These were checked and left unchanged. The only measured item, the L8
+enumeration, is a lead-level search with no cost or index-calculus result, and
+nothing here is certified:
 
 - `docs/index-calculus-scoreboard.html`
 - `docs/ic/progress-timeline.json`

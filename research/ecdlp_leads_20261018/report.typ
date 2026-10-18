@@ -53,7 +53,7 @@ closed on paper while drafting.
   inset: 4pt,
   align: left,
   [*\#*], [*family*], [*lead*], [*status*], [*first experiment*], [*kill criterion*],
-  [L8], [Koblitz], [Étale route: $D\/FF_2$ with an order-$n$ automorphism and an $FF_2$-map to $E$; its twist contains $E times T_n$, genus $1 + n(g_0 - 1)$], [proposed], [enumerate genus-2 and genus-3 $B\/FF_2$ covering $E$ with $n | \#J_B(FF_2)$; test $L(B, chi, X)$ for the factor $L_E(X)$], [no hit for $g_0 <= 3$],
+  [L8], [Koblitz], [Étale route: $D\/FF_2$ with an order-$n$ automorphism and an $FF_2$-map to $E$; its twist contains $E times T_n$, genus $1 + n(g_0 - 1)$], [measured (partial): $n = 3$ only], [enumerate genus-2 and genus-3 $B\/FF_2$ covering $E$ with $n | \#J_B(FF_2)$; test $L(B, chi, X)$ for the factor $L_E(X)$], [no hit for $g_0 <= 3$],
   [L6], [Koblitz], [Modular twists: $(f_E ⊗ chi) mod 2 ∼ T_n$ for every $n$], [derived], [smallest curve containing $A_(f ⊗ chi)$ for $n = 3, 5, 7, 11$], [genus grows faster than $c(n) n$],
   [L10], [binary], [Genus-$n$ Jacobians realising $op("Res")(E)$, beyond GHS], [proposed], [all genus-3 curves over $FF_2$, which traces $t_3$; genus-5 search for point counts $3, 5, 9, 17, 33 - 5 t_5$], [no genus-5 realisation],
   [L9], [Koblitz and binary], [Certified lower bounds on the cover genus], [derived (partial)], [Howe's test on $T_n$; manypoints (32, 5); point-count positivity], [(produces bounds)],
@@ -106,6 +106,27 @@ $FF_2$ but 2 over $FF_4$, which is impossible.
 
 #figure(image("cover-genus-budget.svg", width: 100%), caption: [Derived, not measured. For each deployed Koblitz size: the L(1/2) genus budget $g_max (n)$ (Enge–Gaudry constant $sqrt(2)$, o(1) dropped), the étale-route genus $1 + n(g_0 - 1)$ at the smallest $g_0$ the Weil bound allows (optimistic), and the ramified Klein-family genus $1 + op("ord")_n (2) (n-1)\/2$. Data: `cover-genus-budget.csv`.])
 
+= L8 first experiment (measured)
+
+The native crate `etale_search` enumerated every smooth genus-2 curve $B\/FF_2$ (768 models) and
+every smooth hyperelliptic genus-3 curve (6,144 models). It computed $J_B(FF_2)$ from relations,
+validated by free rank 1 and torsion $= L_B(1)$. Then it tested every character $chi$ of
+$J_B(FF_2)\/n$, for every odd prime $n$ dividing the group order, for the factor
+$(1 - c pi X)(1 - c overline(pi) X)$ in $L(B, chi, X)$. Every curve passed validation, and no
+$L$-function failed the Riemann-hypothesis check.
+
+- *Hits only for $n = 3$:* 192 characters in genus 2 and 576 in genus 3, in six isogeny classes, for
+  both $a = 0$ and $a = 1$. So $T_3$ sits in an explicit genus-4 Jacobian over $FF_2$ also for
+  $a = 0$, where genus 3 is impossible.
+- *No hits for any $n$ from 5 to 37:* 27,840 characters tested. In genus 2, one of the four
+  $L$-polynomials the counting argument allows occurs over $FF_2$ ($1 + X + 2X^2 + 2X^3 + 4X^4$) and
+  fails the character condition. The other three do not occur. The genus-2 route is closed for
+  $n >= 5$.
+- *Deployed sizes untouched.* Hyperelliptic genus-3 Jacobians over $FF_2$ never exceed 56 points.
+  The case $n = 131, 163$ needs plane-quartic $B$, which is next.
+
+#figure(image("reports/run-20261018T2043Z/hits-by-n.svg", width: 100%), caption: [Run run-20261018T2043Z (commit `bd694bf2`): characters tested and characters with a $T_n$ factor, per $n$. Recorded values; see the run report.])
+
 = Closed on paper while drafting
 
 #table(
@@ -134,6 +155,7 @@ $FF_2$ but 2 over $FF_4$, which is impossible.
   cannot separate covers from GHS, and L10 starts at $n = 5$.
 - Still blocked by a captcha: the nine admissible $n = 5$ classes, the two $n = 7$ trace-zero
   classes, and $t_3 = 5$ (already excluded by point counts).
+- L8 is only partly run: plane-quartic genus-3 curves and genus 4 remain.
 - The manypoints bound for $(q, g) = (32, 5)$ is unchecked. It decides whether $(a = 0, n = 5)$ can
   be realised at genus 5.
 - The novelty audit against the cover-attack literature (Diem, Scholten, Hess, Ekedahl–Serre,
@@ -141,4 +163,5 @@ $FF_2$ but 2 over $FF_4$, which is impossible.
 - The L(1/2) budget is optimistic: it uses the hyperelliptic constant and drops o(1). General curves
   need slower class-group algorithms.
 - Graphs checked and left unchanged: the IC scoreboard, the progress timeline, the IC leaderboard
-  and the ECDLP attack matrix. Nothing in this round is measured or certified.
+  and the ECDLP attack matrix. The one measured item, the L8 enumeration, is a lead-level search with
+  no cost or index-calculus result, and nothing here is certified.
