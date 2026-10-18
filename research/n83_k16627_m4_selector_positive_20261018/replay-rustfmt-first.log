@@ -1,0 +1,49 @@
+Diff in /private/tmp/crypto-n83-k16627-progress/examples/n83_selector_receipt_replay.rs:126:
+             return Err("worker x block differs from independent group addition".into());
+         }
+     }
+-    let mut distinct = group_x[..4].iter().map(F2mElement::to_biguint).collect::<Vec<_>>();
++    let mut distinct = group_x[..4]
++        .iter()
++        .map(F2mElement::to_biguint)
++        .collect::<Vec<_>>();
+     distinct.sort_unstable();
+     distinct.dedup();
+     if distinct.len() != 4 {
+Diff in /private/tmp/crypto-n83-k16627-progress/examples/n83_selector_receipt_replay.rs:159:
+     let row: Vec<String> = (0..16_627)
+         .map(|column| if column < 4 { "1" } else { "0" }.to_string())
+         .collect();
+-    let row_hash = blake3::hash(&serde_json::to_vec(&row)?).to_hex().to_string();
++    let row_hash = blake3::hash(&serde_json::to_vec(&row)?)
++        .to_hex()
++        .to_string();
+     if worker["relation"]["dense_decimal_blake3"] != row_hash {
+         return Err("relation row hash differs from independent phase-zero row".into());
+     }
+Diff in /private/tmp/crypto-n83-k16627-progress/examples/n83_selector_receipt_replay.rs:166:
+-    let choices = worker["orbit_choice_pins"].as_array().ok_or("missing orbit pins")?;
++    let choices = worker["orbit_choice_pins"]
++        .as_array()
++        .ok_or("missing orbit pins")?;
+     if choices.len() != 4 {
+         return Err("wrong orbit-pin count".into());
+     }
+Diff in /private/tmp/crypto-n83-k16627-progress/examples/n83_selector_receipt_replay.rs:193:
+ fn main() -> Result<(), Box<dyn std::error::Error>> {
+     let args: Vec<_> = std::env::args().collect();
+     if args.len() != 4 {
+-        return Err("usage: n83_selector_receipt_replay OBJECT_JSONL_GZ WORKER_JSON NEW_OUTPUT_JSON".into());
++        return Err(
++            "usage: n83_selector_receipt_replay OBJECT_JSONL_GZ WORKER_JSON NEW_OUTPUT_JSON".into(),
++        );
+     }
+     let result = replay(Path::new(&args[1]), Path::new(&args[2]))?;
+-    let output = OpenOptions::new().write(true).create_new(true).open(&args[3])?;
++    let output = OpenOptions::new()
++        .write(true)
++        .create_new(true)
++        .open(&args[3])?;
+     serde_json::to_writer_pretty(output, &result)?;
+     println!("{}", result);
+     Ok(())
