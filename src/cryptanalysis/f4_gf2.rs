@@ -1155,7 +1155,9 @@ pub fn f5_row_mask(polys: &[F2BoolPoly], n_vars: usize, degree: u32) -> Option<V
                 if j == 0 {
                     break;
                 }
-                let low = c.isolate_lowest_one();
+                // `isolate_lowest_one` is not on every toolchain CI runs.
+                #[allow(clippy::manual_isolate_lowest_one)]
+                let low = c & c.wrapping_neg();
                 let ripple = c + low;
                 c = (((ripple ^ c) >> 2) / low) | ripple;
             }
