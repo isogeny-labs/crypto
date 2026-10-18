@@ -2,6 +2,10 @@
 
 **Status:** native solver integration and correctness validation. This change
 does not report a degree-83 relation yield, useful rank, or runtime comparison.
+The pre-merge release suite passed. After the current PR #2100 head was merged
+into this branch, [inherited library compile errors](../../problems/current-main-library-build-20261017.md)
+blocked current-head validation; this code remains unverified on that merged
+head until the base build is repaired and rerun.
 
 ## Question and scope
 
