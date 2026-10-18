@@ -1576,3 +1576,54 @@ the hash. Next: a per-seed profile, to see whether every seed walks long
 or a few seeds blow up — the latter would point at a pathological event
 (stuck walks, repeated escapes) rather than a slow walk. Class: none; the
 reference is unchanged, and so is every ratio.
+
+### Diagnostic after round ten (not registered): every seed walks long
+
+`examples/hyperelliptic_rho_seed_profile.rs`, plain DP rho, 40 seeds,
+counts only; output `round10/diagnostic/seed_profile.txt`. Run directly,
+not through a card, because it only shapes the next hypothesis.
+
+| row | mean `S_walk` | median | min | restarts |
+|--|--:|--:|--:|--:|
+| g2 `p = 251` (`N = 6.2·10⁴`) | 1.25 | 1.07 | 0.25 | 0 |
+| g3 `p = 151` (`N = 1.2·10⁶`) | 1.71 | 1.64 | 0.50 | 0 |
+| g3 `p = 211` (`N = 4.6·10⁶`) | 1.82 | 1.66 | 0.72 | 0 |
+| g4 `p = 61` (`N = 1.7·10⁷`) | 2.10 | 1.96 | **1.38** | 0 |
+
+No seed restarts, so no pathological event drives the mean. Every seed
+walks long. For an ideal single-walk rho the detection time over `√N`
+is approximately Rayleigh, `P(T < x) = 1 − e^{−x²/2}`, so
+`P(T < 1.375) ≈ 0.61` and the chance that none of 40 seeds lands below
+1.375 is about `0.39⁴⁰`, effectively zero. At the largest row the walk
+cannot collide early: it behaves as if it explored a larger set than
+`N`, or as if early collisions went undetected.
+
+## Round eleven: the walk on integers as a control — protocol, written before measuring
+
+**Question.** Is the reference walk's large-`N` excess in the walk and
+detection logic, or in the Jacobian (its representation, hashing or
+arithmetic)?
+
+**The control.** The identical DP walk run on `Z/N`: the position is the
+logarithm `x = a + b·k mod N` itself, the branches add
+`s_j = a_j + b_j·k mod N` from the same `(a_j, b_j)` the Jacobian walk
+draws from the same seed, the branch and distinguished-point rules read
+a SplitMix64 hash of `x`, and `θ`, the gap limit and the collision
+handling are the same code path's rules. Same 18 instances, same 40
+seeds, plain walk only, counted steps.
+
+**Registered hypotheses.**
+
+- **C1 (instrument).** The integer model's median `S_walk` over the 7
+  rows with `N ≥ 10⁵` lies in **[1.10, 1.40]**. If it does not, the
+  model itself is wrong and nothing below is read.
+- **C2 (localisation).** If C1 holds and the Jacobian walk's
+  `S_walk` exceeds the integer model's by more than **25%** on both of the
+  two largest rows, the excess is in the Jacobian side (representation,
+  hashing, or arithmetic producing a different point than `a·D₁ + b·D₂`),
+  and that is examined next. If the integer model shows the same excess
+  (within 25%) on both, the excess is in the shared walk logic.
+- **C3.** Every integer-model run recovers the planted `k`.
+
+**Expected class: accounting**, against index calculus, if the excess
+is a bug in the reference.
