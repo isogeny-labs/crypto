@@ -1,10 +1,10 @@
 # No class arithmetic on the Jacobian of a plane quartic
 
-- **Status:** `resolved` (toy smokes)
+- **Status:** `open` (reopened 2026-10-18: the "pure IC" recovery is a transfer enumeration, see below)
 - **Kind:** implementation gap
 - **Affected work:** `research/ghs_cubic_genus3_build_20261012/` (Conductor T-2267); follow-up IC study `research/ghs_cubic_quartic_ic_20261012/` (T-2280 / T-2491, PR #1768)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-14
+- **Last updated:** 2026-10-18
 
 ## Problem
 
@@ -37,3 +37,17 @@ Evidence: `research/ghs_cubic_quartic_ic_20261012/results/run-20261014T0200Z.jso
 2026-10-13: partial progress — pushforward identity / `transfer_pushforward_dlog` only (not full Pic; not pure IC).
 2026-10-13: different route executed for the hyperelliptic type only (T-2463, PR #1796).
 2026-10-14: Pic lin-equiv checks + orbit-aware pure IC on toys (T-2491 / PR #1768). Status → `resolved` for the discriminating toy checks named in "What would unblock it."
+2026-10-18: reopened by the scaling measurement
+`research/ghs_cubic_quartic_ic_20261012/SCALING_20261018.md` (LEADS.md L5).
+Reading the `ic` recovery with phase counters shows it never solves the
+line-relation system (the rows are built and discarded, `let _ = rows;`,
+`quartic_ic.rs`): the scalar comes from a table of the transfer divisor
+`φ(nG)` for every `n = 1..ℓ−1`, an `O(ℓ)` enumeration of the subgroup
+through the transfer, with its counted cost scaling as `ℓ^{2.5}` from `q = 5`
+to `23` against rho's `ℓ^{0.5}`. The Pic checks of 2026-10-14 stand (the
+transfer is a verified homomorphism and the degree-6 keys are distinct);
+what they do not supply is an index calculus on `Jac(C)`: the factor-base
+line system has rank below its column count at every `q ≤ 23`, and no
+degree-3 canonical form is unique. "What would unblock it" is therefore
+still the original list, with the solve of the relation system and an
+`O(1)`-per-pair line enumeration added (SCALING_20261018.md "Still owed").
