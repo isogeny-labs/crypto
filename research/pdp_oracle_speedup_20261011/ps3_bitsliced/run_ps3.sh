@@ -92,13 +92,20 @@ if [ "$STAGES" = all ] || [ "$STAGES" = timing ]; then
   done
 fi
 
-# 7. threads: the same arm on 1, 2 and 4 pinned cores, interleaved (efficiency = per-core throughput ratio).
+# 7. threads: the same arm on 1, 2 and 3 pinned cores, interleaved (efficiency = per-core throughput ratio).
+#    The tool refuses to reserve all four vCPUs ("leave at least one free"; the harness needs one), so the
+#    4-thread isolated run of the protocol cannot be made here: 3 cores is the widest admissible run.  A
+#    4-thread run without isolation is recorded beside them as a labelled diagnostic, never pooled.
 if [ "$STAGES" = all ] || [ "$STAGES" = threads ]; then
   for l in 11 12; do
     for r in $(seq 1 "$ROUNDS"); do
       timed_run "bs512-1c" bs512 "$l" "$r" 3 "$C/corpus_l$l.txt"
       timed_run "bs512-2c" bs512-t2 "$l" "$r" 2-3 "$C/corpus_l$l.txt"
-      timed_run "bs512-4c" bs512-t4 "$l" "$r" 0-3 "$C/corpus_l$l.txt"
+      timed_run "bs512-3c" bs512-t3 "$l" "$r" 1-3 "$C/corpus_l$l.txt"
+      lab="bs512-4c-notisolated-l$l-r$r"
+      grep -q "\"label\":\"$lab\"" "$OUT/times_4thread_not_isolated.jsonl" 2>/dev/null || \
+        $BUSY taskset -c 0-3 "$S" time --arm bs512-t4 --l "$l" --corpus "$C/corpus_l$l.txt" --targets "${TARGETS[$l]}" \
+          --passes 1 --min-secs 3 --label "$lab" --out "$OUT/times_4thread_not_isolated.jsonl"
     done
   done
 fi
