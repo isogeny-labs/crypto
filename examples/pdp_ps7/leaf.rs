@@ -151,7 +151,6 @@ struct RowPts {
 
 /// Rational base points of one rung, shared by every target of the rung.
 pub struct BaseTable {
-    pub base: Vec<(u64, u64)>,
     pub xs: Vec<u64>,
     /// `y` of each base abscissa, indexed by `x`; `u64::MAX` for a non-liftable `x`.
     pub ytab: Vec<u64>,
@@ -164,7 +163,7 @@ impl BaseTable {
             ytab[x as usize] = y;
         }
         let xs = base.iter().map(|p| p.0).collect();
-        Self { base, xs, ytab }
+        Self { xs, ytab }
     }
 }
 
@@ -195,8 +194,7 @@ impl<'a> GroupLeaf<'a> {
         }
         let p1 = Pt::Aff(a, self.tab.ytab[a as usize]);
         let rp = Pt::Aff(self.r.0, self.r.1);
-        let (Pt::Aff(xu, yu), Pt::Aff(xv, yv)) =
-            (add(self.gf, p1, rp), add(self.gf, p1, neg(rp)))
+        let (Pt::Aff(xu, yu), Pt::Aff(xv, yv)) = (add(self.gf, p1, rp), add(self.gf, p1, neg(rp)))
         else {
             return None;
         };
@@ -320,10 +318,6 @@ pub fn rows_entered(m: u64, pairs: u64) -> u64 {
 }
 
 // ── PS-0's algebraic leaf (quartic and gcd), all of V ──────────────────
-
-pub struct QuartInfo {
-    pub lv: Vec<u64>,
-}
 
 pub struct QuarticLeaf<'a> {
     rung: &'a Rung,

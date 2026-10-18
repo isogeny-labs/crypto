@@ -36,7 +36,6 @@ pub fn lex_pos(l: u32, s: usize, j: u32) -> usize {
 
 pub struct XGraph {
     pub nx: usize,
-    pub l: u32,
     /// Per equation, the degree ≥ 2 monomials as masks over lexicographic positions.
     eqs: Vec<Vec<u64>>,
     pub n_monomials: usize,
@@ -106,7 +105,6 @@ impl XGraph {
         let n_equations = eqs.len();
         Self {
             nx,
-            l,
             eqs,
             n_monomials,
             n_equations,

@@ -2412,7 +2412,6 @@ pub fn check_model(clauses: &[Vec<Lit>], model: &[bool]) -> bool {
     true
 }
 
-
 /// PS-7 hook object for [`Solver::solve_with_hooks`] (example-local).
 pub trait ShellHooks {
     /// The lazy-clause theory: the library's callback, with the same contract

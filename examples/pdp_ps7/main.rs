@@ -53,9 +53,13 @@ use crypto_lib::cryptanalysis::semaev_decomp::Gf2;
 use dynorder::XGraph;
 use group::{base_points, degenerate_target, lift, ArtinSchreier};
 use kernel::ScalarKernel;
-use leaf::{plain_loop_counts, rows_entered, BaseTable, Gates, GroupLeaf, Leaf, LeafCounts, QuarticLeaf};
+use leaf::{
+    plain_loop_counts, rows_entered, BaseTable, Gates, GroupLeaf, Leaf, LeafCounts, QuarticLeaf,
+};
 use serde_json::{json, Value};
-use shell::{plain_loop, run_shell, Encoding, Engine, Order, Outcome, ShellCfg, ShellRun, ShellState, Stats};
+use shell::{
+    plain_loop, run_shell, Encoding, Engine, Order, Outcome, ShellCfg, ShellRun, ShellState, Stats,
+};
 use std::collections::BTreeMap;
 use std::io::Write;
 use std::time::Instant;
@@ -190,7 +194,9 @@ fn shell_record<L: Leaf>(
         && (if all {
             run.roots == refr.roots
         } else {
-            run.witness.map(|w| refr.roots.binary_search(&w).is_ok()).unwrap_or(!found)
+            run.witness
+                .map(|w| refr.roots.binary_search(&w).is_ok())
+                .unwrap_or(!found)
         });
     let a = &st.acct;
     let mut v = base;
@@ -202,9 +208,14 @@ fn shell_record<L: Leaf>(
     o.insert("ok".into(), json!(ok));
     o.insert("all_roots".into(), json!(all));
     o.insert("roots".into(), json!(run.roots.len()));
+    o.insert("models".into(), json!(run.models));
+    o.insert("leaf_name".into(), json!(st.leaf.name()));
     o.insert("pairs_total".into(), json!(total));
     o.insert("leaf_visits".into(), json!(st.leaf_visits));
-    o.insert("pairs_saved".into(), json!(total as i64 - st.leaf_visits as i64));
+    o.insert(
+        "pairs_saved".into(),
+        json!(total as i64 - st.leaf_visits as i64),
+    );
     o.insert("solver".into(), stats_json(&run.stats));
     o.insert(
         "theory".into(),
@@ -264,7 +275,10 @@ fn plain_record(
         && (if all {
             roots == refr.roots
         } else {
-            roots.first().map(|w| refr.roots.binary_search(w).is_ok()).unwrap_or(!found)
+            roots
+                .first()
+                .map(|w| refr.roots.binary_search(w).is_ok())
+                .unwrap_or(!found)
         });
     let leaf_bits = gates.map(|g| g.price(&counts));
     let mut v = base;
@@ -342,14 +356,28 @@ fn run_group_target(
             out.sort_unstable();
             out.dedup();
             let counts = plain_loop_counts(m, rows_entered(m, pairs), pairs);
-            plain_record(arm, found, pairs, total, counts, &out, gates, refr, all, wall, base)
+            plain_record(
+                arm, found, pairs, total, counts, &out, gates, refr, all, wall, base,
+            )
         }
         Arm::A1u => {
             let mut leaf = GroupLeaf::new(&rung.gf, rung.l, tab, r);
             let t0 = Instant::now();
             let (found, pairs, roots) = plain_loop(&mut leaf, all);
             let wall = t0.elapsed().as_nanos();
-            plain_record(arm, found, pairs, total, leaf.counts(), &roots, gates, refr, all, wall, base)
+            plain_record(
+                arm,
+                found,
+                pairs,
+                total,
+                leaf.counts(),
+                &roots,
+                gates,
+                refr,
+                all,
+                wall,
+                base,
+            )
         }
         _ => {
             let (engine, order, encoding) = arm.shell().unwrap();
@@ -389,16 +417,29 @@ fn cmd_run(args: &[String]) {
     let mut out = open_out(args);
 
     // The first k uniform targets of the PS-0 corpus, re-derived from the frozen generator.
-    let recs: Vec<&Record> = loaded.recs.iter().filter(|r| !r.t.planted).take(k).collect();
+    let recs: Vec<&Record> = loaded
+        .recs
+        .iter()
+        .filter(|r| !r.t.planted)
+        .take(k)
+        .collect();
     let gen = make_targets(&rung, k, 0);
     for (r, g) in recs.iter().zip(&gen) {
-        assert_eq!((r.t.xr, r.t.yr), (g.xr, g.yr), "corpus target differs from the frozen generator");
+        assert_eq!(
+            (r.t.xr, r.t.yr),
+            (g.xr, g.yr),
+            "corpus target differs from the frozen generator"
+        );
     }
 
     let sol = ArtinSchreier::new(&rung.gf);
     let kernel = ScalarKernel::new(&rung.gf, &sol, l);
     let tab = BaseTable::new(base_points(&rung.gf, &sol, l), l);
-    let graph = if arm == Arm::A3 { Some(XGraph::new(l)) } else { None };
+    let graph = if arm == Arm::A3 {
+        Some(XGraph::new(l))
+    } else {
+        None
+    };
     let t_all = Instant::now();
     let (mut n_ok, mut n) = (0u64, 0u64);
     for rec in recs {
@@ -407,7 +448,10 @@ fn cmd_run(args: &[String]) {
             "xr": format!("{:x}", rec.t.xr), "space": tab.xs.len(),
             "leaf": "group", "wall_includes_accounting": log,
         });
-        let refr = Ref { found: !rec.roots.is_empty(), roots: &rec.roots };
+        let refr = Ref {
+            found: !rec.roots.is_empty(),
+            roots: &rec.roots,
+        };
         let v = run_group_target(
             arm,
             &rung,
@@ -432,10 +476,14 @@ fn cmd_run(args: &[String]) {
     emit(
         &mut out,
         &json!({"kind": "summary", "label": label, "arm": arm.name(), "l": l, "targets": n, "ok": n_ok,
-                "all_roots": all, "wall_ns": wall, "log": log, "rustc_profile": "release"}),
+                "all_roots": all, "wall_ns": wall, "ns_per_target": wall as f64 / n.max(1) as f64, "log": log}),
     );
     if n_ok != n {
-        eprintln!("VERDICT MISMATCH: {} of {} targets disagree with the corpus", n - n_ok, n);
+        eprintln!(
+            "VERDICT MISMATCH: {} of {} targets disagree with the corpus",
+            n - n_ok,
+            n
+        );
         std::process::exit(2);
     }
 }
@@ -459,7 +507,13 @@ fn rung_of(n: u32, l: u32, low_terms: &[u32]) -> Rung {
         order: BigUint::from(1u32),
         cofactor: BigUint::from(1u32),
     };
-    Rung { l, n, irr, gf, curve }
+    Rung {
+        l,
+        n,
+        irr,
+        gf,
+        curve,
+    }
 }
 
 fn cmd_reg(args: &[String]) {
@@ -482,13 +536,22 @@ fn cmd_reg(args: &[String]) {
             found: inst.truly_sat,
             roots: &reference,
         };
-        assert_eq!(!reference.is_empty(), inst.truly_sat, "{}: exhaustive roots disagree with truly_sat", inst.name);
+        assert_eq!(
+            !reference.is_empty(),
+            inst.truly_sat,
+            "{}: exhaustive roots disagree with truly_sat",
+            inst.name
+        );
         let base = json!({
             "kind": "target", "label": label, "l": inst.l, "n": inst.n, "name": inst.name,
             "xr": format!("{:x}", xr), "labelled_sat": inst.labelled_sat, "truly_sat": inst.truly_sat,
             "wall_includes_accounting": log,
         });
-        let graph = if arm == Arm::A3 { Some(XGraph::new(inst.l)) } else { None };
+        let graph = if arm == Arm::A3 {
+            Some(XGraph::new(inst.l))
+        } else {
+            None
+        };
         let v = match leaf_kind.as_str() {
             "group" => {
                 let sol = ArtinSchreier::new(&rung.gf);
@@ -505,7 +568,18 @@ fn cmd_reg(args: &[String]) {
                 let mut b = base.clone();
                 b["leaf"] = json!("group");
                 run_group_target(
-                    arm, &rung, &tab, &kernel, None, graph.as_ref(), (xr, y), &refr, all, log, max_conflicts, b,
+                    arm,
+                    &rung,
+                    &tab,
+                    &kernel,
+                    None,
+                    graph.as_ref(),
+                    (xr, y),
+                    &refr,
+                    all,
+                    log,
+                    max_conflicts,
+                    b,
                 )
             }
             _ => {
@@ -518,7 +592,19 @@ fn cmd_reg(args: &[String]) {
                         let t0 = Instant::now();
                         let (found, pairs, roots) = plain_loop(&mut leaf, all);
                         let wall = t0.elapsed().as_nanos();
-                        plain_record(arm, found, pairs, m * (m + 1) / 2, leaf.counts(), &roots, None, &refr, all, wall, b)
+                        plain_record(
+                            arm,
+                            found,
+                            pairs,
+                            m * (m + 1) / 2,
+                            leaf.counts(),
+                            &roots,
+                            None,
+                            &refr,
+                            all,
+                            wall,
+                            b,
+                        )
                     }
                     _ => {
                         let (engine, order, encoding) = arm.shell().unwrap();
@@ -548,7 +634,11 @@ fn cmd_reg(args: &[String]) {
                 "targets": n, "ok": n_ok, "skipped_not_applicable": skipped, "all_roots": all}),
     );
     if n_ok != n {
-        eprintln!("VERDICT MISMATCH: {} of {} inputs disagree with the corpus", n - n_ok, n);
+        eprintln!(
+            "VERDICT MISMATCH: {} of {} inputs disagree with the corpus",
+            n - n_ok,
+            n
+        );
         std::process::exit(2);
     }
 }
@@ -597,7 +687,10 @@ fn cmd_fidelity(args: &[String]) {
                     "leaf_visits": [a.1, b.1], "frontier_calls": [a.2, b.2], "roots": a.0.roots.len()}),
         );
     }
-    emit(&mut out, &json!({"kind": "fidelity_summary", "l": l, "targets": k, "differing": bad}));
+    emit(
+        &mut out,
+        &json!({"kind": "fidelity_summary", "l": l, "targets": k, "differing": bad}),
+    );
     if bad != 0 {
         std::process::exit(2);
     }
@@ -606,7 +699,11 @@ fn cmd_fidelity(args: &[String]) {
 fn cmd_graph_stats(args: &[String]) {
     let l: u32 = arg(args, "--l").expect("--l");
     let n: u32 = arg(args, "--n").unwrap_or(3 * l);
-    let low = arg_s(args, "--low-terms").map(|s| s.split(',').map(|t| t.parse().unwrap()).collect::<Vec<u32>>());
+    let low = arg_s(args, "--low-terms").map(|s| {
+        s.split(',')
+            .map(|t| t.parse().unwrap())
+            .collect::<Vec<u32>>()
+    });
     let rung = match low {
         Some(t) => rung_of(n, l, &t),
         None => Rung::with(n, l),
@@ -657,17 +754,36 @@ fn getf(v: &Value, path: &[&str]) -> f64 {
 }
 
 fn cmd_summarize(args: &[String]) {
+    let json_out = arg_s(args, "--json");
     let mut groups: BTreeMap<(String, String, String, String), Agg> = BTreeMap::new();
-    for path in args.iter().filter(|a| !a.starts_with("--")) {
+    for path in args
+        .iter()
+        .skip(1)
+        .filter(|a| !a.starts_with("--") && Some(a.as_str()) != json_out.as_deref())
+    {
         let text = std::fs::read_to_string(path).unwrap_or_else(|e| panic!("{path}: {e}"));
         for line in text.lines() {
-            let Ok(v) = serde_json::from_str::<Value>(line) else { continue };
+            let Ok(v) = serde_json::from_str::<Value>(line) else {
+                continue;
+            };
             if v["kind"] != "target" || v["all_roots"] == true {
                 continue;
             }
-            let set = v["name"].as_str().map(|_| "reg60".to_string()).unwrap_or_else(|| format!("l={}", v["l"]));
-            let class = if v["ref_found"] == true { "found" } else { "refuted" };
-            let key = (set, v["leaf"].as_str().unwrap_or("").to_string(), v["arm"].as_str().unwrap().to_string(), class.to_string());
+            let set = v["name"]
+                .as_str()
+                .map(|_| "reg60".to_string())
+                .unwrap_or_else(|| format!("l={}", v["l"]));
+            let class = if v["ref_found"] == true {
+                "found"
+            } else {
+                "refuted"
+            };
+            let key = (
+                set,
+                v["leaf"].as_str().unwrap_or("").to_string(),
+                v["arm"].as_str().unwrap().to_string(),
+                class.to_string(),
+            );
             let g = groups.entry(key).or_default();
             g.n += 1;
             g.ok += (v["ok"] == true) as u64;
@@ -693,13 +809,54 @@ fn cmd_summarize(args: &[String]) {
             add("dyn_differs", getf(&v, &["dyn", "differs_from_lex"]));
         }
     }
+    if let Some(p) = &json_out {
+        let mut f = std::fs::File::create(p).unwrap();
+        for ((set, leaf, arm, class), g) in &groups {
+            let mut row = serde_json::Map::new();
+            row.insert("set".into(), json!(set));
+            row.insert("leaf".into(), json!(leaf));
+            row.insert("arm".into(), json!(arm));
+            row.insert("class".into(), json!(class));
+            row.insert("targets".into(), json!(g.n));
+            row.insert("ok".into(), json!(g.ok));
+            for (k, v) in &g.sums {
+                row.insert(format!("sum_{k}"), json!(v));
+                row.insert(format!("mean_{k}"), json!(v / g.n as f64));
+            }
+            let sum = |k: &str| g.sums.get(k).copied().unwrap_or(0.0);
+            let ratio = |a: f64, b: f64| if b > 0.0 { json!(a / b) } else { Value::Null };
+            row.insert(
+                "leaves_over_pairs".into(),
+                ratio(sum("leaf_visits"), sum("pairs_total")),
+            );
+            row.insert(
+                "conflicts_over_pairs".into(),
+                ratio(sum("conflicts"), sum("pairs_total")),
+            );
+            row.insert(
+                "pairs_per_conflict".into(),
+                ratio(sum("pairs_total"), sum("conflicts")),
+            );
+            row.insert(
+                "saved_per_conflict".into(),
+                ratio(sum("pairs_saved"), sum("conflicts")),
+            );
+            writeln!(f, "{}", Value::Object(row)).unwrap();
+        }
+    }
     println!("| set | leaf | arm | class | targets | ok | pairs/target | leaves/target | saved/target | conflicts/target | learned/target | saved per learned | cube per learned | marginal per learned | shorter than pair | leaf bitops/target | shell bitops/target | total bitops/target | ms/target |");
     println!("|:--|:--|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|");
     for ((set, leaf, arm, class), g) in &groups {
         let n = g.n as f64;
         let s = |k: &str| g.sums.get(k).copied().unwrap_or(0.0);
         let learned = s("conflicts");
-        let per = |a: f64, b: f64| if b > 0.0 { format!("{:.3}", a / b) } else { "-".to_string() };
+        let per = |a: f64, b: f64| {
+            if b > 0.0 {
+                format!("{:.3}", a / b)
+            } else {
+                "-".to_string()
+            }
+        };
         println!(
             "| {set} | {leaf} | {arm} | {class} | {} | {} | {:.1} | {:.1} | {:.1} | {:.1} | {:.1} | {} | {} | {} | {:.0} | {:.0} | {:.0} | {:.0} | {:.2} |",
             g.n,
@@ -730,7 +887,9 @@ fn main() {
         Some("graph-stats") => cmd_graph_stats(&args),
         Some("summarize") => cmd_summarize(&args),
         _ => {
-            eprintln!("usage: pdp_ps7 run|reg|fidelity|graph-stats|summarize ... (see the module docs)");
+            eprintln!(
+                "usage: pdp_ps7 run|reg|fidelity|graph-stats|summarize ... (see the module docs)"
+            );
             std::process::exit(1);
         }
     }

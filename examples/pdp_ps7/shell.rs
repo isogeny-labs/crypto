@@ -463,7 +463,9 @@ pub fn run_shell<'g, L: Leaf>(cfg: &ShellCfg<'g>, leaf: L) -> (ShellRun, ShellSt
     let statics = static_clauses(lay, leaf.space());
     let st = ShellState::new(leaf, lay, cfg.encoding);
     let mvc = match cfg.order {
-        Order::Mvc => Some(MvcDecider::new(cfg.graph.expect("--order mvc needs the graph"))),
+        Order::Mvc => Some(MvcDecider::new(
+            cfg.graph.expect("--order mvc needs the graph"),
+        )),
         _ => None,
     };
     let mut hooks = Hooks {
@@ -700,7 +702,10 @@ mod tests {
                         },
                     );
                     assert_eq!(run.outcome, Outcome::Unsat, "{engine:?} {order:?} {enc:?}");
-                    assert_eq!(run.roots, roots, "{engine:?} {order:?} {enc:?} l={l} seed={seed}");
+                    assert_eq!(
+                        run.roots, roots,
+                        "{engine:?} {order:?} {enc:?} l={l} seed={seed}"
+                    );
                 }
             }
         }

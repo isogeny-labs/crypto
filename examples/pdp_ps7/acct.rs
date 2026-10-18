@@ -116,7 +116,11 @@ impl PairAcct {
     fn matches(&self, mask: u64, val: u64) -> Vec<usize> {
         if mask == (1u64 << self.lay.l) - 1 {
             let i = self.idx_of[val as usize];
-            return if i == u32::MAX { vec![] } else { vec![i as usize] };
+            return if i == u32::MAX {
+                vec![]
+            } else {
+                vec![i as usize]
+            };
         }
         self.space
             .iter()
