@@ -121,6 +121,26 @@ Two preregistered studies, both on 2026-10-18.
 L1 is closed. The corollary in `LEMMAS.md` stays true as stated, and it now
 carries a note that it bounds the wrong quantity for the solving degree.
 
+## 3b. Round of 2026-10-18 evening: L2 unmeasured, L8 computed, a new oracle lead
+
+- **L2, plain dense XL at degree 5** (`research/dreg_xl_degree5_20261018/RESULTS.md`, preregistered):
+  unmeasured on all 8 registered draws at m·ℓ = 21. This note's size estimate was wrong:
+  the degree-5 matrix has 218,918 × 619,790 (N = 40) and 279,048 × 778,394 (N = 42)
+  entries, 17 and 27 GB dense, against 34,482 rows estimated. Every run stopped at the
+  6.3 GB pivot cap with about half and about a quarter of the rows inserted. Controls pass.
+  Degree 5 at m·ℓ = 21 now needs a 32 GB host or a non-dense rank test (sparse or
+  block Wiedemann).
+- **L8, K-233 derived row** (`research/k233_derived_row_20261018/`): ord₂₃₃(2) = 29,
+  stable dimensions 29a + c. Degree 4 first fits at (m, ℓ) = (6, 30), m·ℓ = 180, with
+  N = mℓ and w = 1; never at w = 2.2, where the largest admissible degree is 3. Derived only.
+- **New lead, eliminated S₄ as the target oracle** (`research/s4_oracle_cost_20261018/`,
+  preregistered): 5.5× and 6.4× fewer counted F4 word XORs than the chained system at
+  (12, 3) and (13, 4), every answer verified; no verdict at (16, 5) (about 1.1× on two
+  paired draws); (18, 6) unmeasured. A stage improvement at toy sizes; on the
+  leaderboard as a component panel. Next: (16, 5) and (18, 6) with a larger cap.
+- **Lean:** Lemmas 1 and 2 are machine-checked in core Lean (`lean/`), with three
+  bridges open.
+
 ## 4. Pilot: the coset-indicator degree (L5), negative
 
 `examples/coset_indicator_degree` computes the ANF of `x ↦ Tr(x)`,
@@ -149,6 +169,6 @@ makes no claim beyond these 80 records.
 
 ## 5. Order of work
 
-L3 (killed, unmeasured) → L2 (if L3 caps) → L1 (closed 2026-10-18, §3a) →
-L6, L7 → L10 → L8. L4, L5 and L9 are closed by this round (sign argument,
-pilot, count). Next: L2.
+L3 (killed, unmeasured) → L2 (unmeasured at 6.3 GB, §3b) → L1 (closed, §3a) →
+L6, L7 (Lean, §3b) → L10 → L8 (computed, §3b). L4, L5 and L9 are closed by this round (sign argument,
+pilot, count). Next: the S₄ oracle at larger ℓ, and L2 on a larger host.
