@@ -2509,8 +2509,11 @@ fn mode_run(a: &Args) {
     let want_sig_trace = arms.iter().any(|x| x == "sigr" || x == "sign");
     let need_x = arms.iter().find(|x| x.starts_with("f4rx")).cloned();
     let mut traces = Traces { f4: None, sig: None, f4x: None };
+    let sig_job: f64 = a.num("--sig-time-limit", per_job);
     let job_lim = |t_start: &Instant, cap: u64| {
         let mut lim = limits_from(a);
+        // a signature arm (it has a touch cap) gets the signature limit
+        let per_job = if cap > 0 { sig_job } else { per_job };
         if per_job > 0.0 {
             let mut secs = per_job;
             if total_limit > 0.0 {
