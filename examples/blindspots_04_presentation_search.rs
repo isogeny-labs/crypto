@@ -1591,6 +1591,37 @@ fn ground_truth(cell: &Cell, dr: &Draw, f: Frame, r: Pt) -> Truth {
     }
     // the target in the sum is R itself; fibres are closed under negation
     // (and under +T' in the W frame), so "sum = R" and "sum = -R" coincide
+    if f == Frame::W && m == 4 {
+        // meet in the middle: pair sums of (v1, v2) and (v3, v4)
+        let pair = |va: usize, vb: usize| -> Vec<Pt> {
+            let mut out = vec![];
+            for &p in &fib[va] {
+                for &q in &fib[vb] {
+                    let s = cv.e_add(p, q);
+                    if !out.contains(&s) {
+                        out.push(s);
+                    }
+                }
+            }
+            out
+        };
+        let pairs: Vec<Vec<Pt>> = (0..nv * nv).map(|k| pair(k % nv, k / nv)).collect();
+        let sets: Vec<HashSet<Pt>> = pairs.iter().map(|v| v.iter().copied().collect()).collect();
+        for k12 in 0..nv * nv {
+            // for each partial sum a, the needed complement is r - a
+            let needs: Vec<Pt> = pairs[k12].iter().map(|&a| cv.e_add(r, cv.e_neg(a))).collect();
+            for k34 in 0..nv * nv {
+                if needs.iter().any(|nd| sets[k34].contains(nd)) {
+                    let idx = (k12 % nv) as u64
+                        | (((k12 / nv) as u64) << l)
+                        | (((k34 % nv) as u64) << (2 * l))
+                        | (((k34 / nv) as u64) << (3 * l));
+                    any.insert(idx);
+                }
+            }
+        }
+        return Truth { any, gen };
+    }
     let start = if f == Frame::W { (0u64, 0u64) } else { INF };
     // pos 0 handles the first point specially, so start from a dummy
     rec(cv, f, fib, nv, l, m, 0, 0, start, true, r, &mut any, &mut gen);
@@ -2881,6 +2912,7 @@ struct CellOpts {
     mem_cap: u64,
     dmax_e: usize,
     dmax_b: usize,
+    dmax_u: usize,
     sol_cap: usize,
 }
 
@@ -2951,12 +2983,23 @@ fn run_one(
     let dmax = match arm {
         "e" => opts.dmax_e,
         "b" => opts.dmax_b,
-        _ => 23,
+        _ => opts.dmax_u,
     };
     let left = opts.time_limit - started.elapsed().as_secs_f64();
     let tl = opts.job_time.min(left.max(1.0));
     let scan = find_d(&sys, &ech, dmax, tl, opts.mem_cap, opts.sol_cap);
     let secs = t_arm.elapsed().as_secs_f64();
+    let d_lb = match scan.d {
+        Some(d) => d,
+        None => scan
+            .per_degree
+            .iter()
+            .filter(|r| r.outcome == Outcome::Saturated)
+            .map(|r| r.degree)
+            .max()
+            .map(|d| d + 1)
+            .unwrap_or((mindeg as usize).max(1)),
+    };
     let per: Vec<String> = scan.per_degree.iter().map(degree_json).collect();
     let (rows_at, cols_at, ops_at) = scan
         .per_degree
@@ -2980,7 +3023,7 @@ fn run_one(
             "{head},\"nv0\":{nv0},\"elim\":{elim},\"nv\":{nv},\"eqs\":{eqs},\"ech_rows\":{ech},\"mindeg\":{mind},\"maxdeg\":{maxd},",
             "\"n_sols\":{ns},\"n_z\":{nz},\"n_truth_any\":{ta},\"n_truth_gen\":{tg},\"spurious_z\":{sp},",
             "\"complete\":{comp},\"sound\":{sound},\"planted_in\":{pin},",
-            "\"status\":\"{status}\",\"D\":{dd},\"last_degree\":{ld},\"recovered_ok\":{rec},",
+            "\"status\":\"{status}\",\"D\":{dd},\"D_lb\":{dlb},\"last_degree\":{ld},\"recovered_ok\":{rec},",
             "\"matrix_rows\":{mr},\"matrix_cols\":{mc},\"word_ops_last\":{ol},\"word_ops_total\":{ot},",
             "\"peak_basis_bytes\":{pb},\"secs\":{secs},\"rss_peak_kb\":{rss},\"degrees\":[{per}]}}"
         ),
@@ -3002,6 +3045,7 @@ fn run_one(
         pin = planted_in.map(|b| b.to_string()).unwrap_or("null".into()),
         status = scan.status,
         dd = scan.d.map(|d| d.to_string()).unwrap_or("null".into()),
+        dlb = d_lb,
         ld = scan.last_degree,
         rec = scan.recovered_ok.map(|b| b.to_string()).unwrap_or("null".into()),
         mr = rows_at,
@@ -3035,12 +3079,14 @@ fn mode_cell(a: &Args) {
         mem_cap: a.num("--mem-cap-mb", 3000u64) << 20,
         dmax_e: a.num("--dmax-e", 5usize),
         dmax_b: a.num("--dmax-b", 3usize),
+        dmax_u: a.num("--dmax-u", 23usize),
         sol_cap: a.num("--sol-cap", 4000usize),
     };
     let t_first: usize = a.num("--first", 0); // first target index to run
     let started = Instant::now();
     let cell = Cell::new(n, l, m);
     let dr = Draw::new(&cell, draw);
+    assert_eq!(cell.cv.w_count(), cell.cv.e_count(), "Edwards and Weierstrass point counts differ");
     eprintln!(
         "cell n={} l={} m={} draw={} curve d1={} d2={} a={} b={} basis={:?} setup {:.1}s",
         n,
@@ -3430,6 +3476,7 @@ struct Rec {
     t: i64,
     status: String,
     d: Option<i64>,
+    d_lb: Option<i64>,
     complete: Option<bool>,
     sound: Option<bool>,
     planted_in: Option<bool>,
@@ -3454,6 +3501,7 @@ fn parse_rec(line: &str) -> Option<Rec> {
         t: jnum(line, "t")?,
         status: jstr(line, "status")?,
         d: jnum(line, "D").filter(|_| !line.contains("\"D\":null")),
+        d_lb: jnum(line, "D_lb"),
         complete: jbool(line, "complete"),
         sound: jbool(line, "sound"),
         planted_in: jbool(line, "planted_in"),
@@ -3498,6 +3546,21 @@ fn mode_summarize(a: &Args) {
             .map(|t| find(c, draw, arm, "random", t).filter(|r| measured(r)).and_then(|r| r.d))
             .collect()
     };
+    let lbvec = |c: &(i64, i64, i64), draw: i64, arm: &str| -> Vec<Option<i64>> {
+        (0..nrand as i64)
+            .map(|t| {
+                find(c, draw, arm, "random", t).and_then(|r| {
+                    if measured(r) {
+                        r.d
+                    } else if r.status == "skipped-timebudget" || r.status == "not-attempted-stop-rule" {
+                        None
+                    } else {
+                        r.d_lb
+                    }
+                })
+            })
+            .collect()
+    };
     for c in &cells {
         println!("cell n={} l={} m={}", c.0, c.1, c.2);
         for arm in arms.iter() {
@@ -3513,6 +3576,9 @@ fn mode_summarize(a: &Args) {
                     .iter()
                     .map(|r| match r {
                         Some(r) if measured(r) => format!("{}", r.d.unwrap()),
+                        Some(r) if r.d_lb.is_some() && r.status != "skipped-timebudget" => {
+                            format!(">={}[{}]", r.d_lb.unwrap(), r.status)
+                        }
                         Some(r) => format!(".[{}]", r.status),
                         None => ".[absent]".into(),
                     })
@@ -3533,14 +3599,14 @@ fn mode_summarize(a: &Args) {
         }
     }
     // rule
-    println!("\n# frozen rule: an arm LOWERS D on a cell if all 8 random targets of both arms are measured, median(arm) <= median(a) - 1 and max(arm) <= max(a) - 1, and every random and planted run of the arm on the cell is complete, sound and contains its planted decomposition");
+    println!("\n# frozen rule: an arm LOWERS D on a cell if all 8 random targets of the arm are measured exactly and of the incumbent measured (exactly, or by the certified lower bound D >= last saturated degree + 1), median(arm) <= median(a) - 1 and max(arm) <= max(a) - 1, and every random and planted run of the arm on the cell is complete, sound and contains its planted decomposition");
     let gate = |c: &(i64, i64, i64), arm: &str| -> bool {
         let rs: Vec<&Rec> = recs.iter().filter(|r| r.n == c.0 && r.l == c.1 && r.m == c.2 && r.draw == 0 && r.arm == arm && (r.status != "skipped-timebudget" && r.status != "not-attempted-stop-rule")).collect();
         !rs.is_empty() && rs.iter().all(|r| r.complete == Some(true) && r.sound == Some(true) && r.planted_in != Some(false))
     };
     let passes = |c: &(i64, i64, i64), arm: &str, base_draw: i64, arm_draw: i64, base: &str| -> Option<(bool, bool)> {
         let x = dvec(c, arm_draw, arm);
-        let y = dvec(c, base_draw, base);
+        let y = lbvec(c, base_draw, base);
         if x.iter().any(|v| v.is_none()) || y.iter().any(|v| v.is_none()) {
             return None;
         }
