@@ -747,6 +747,9 @@ for index calculus.
 crypto hash sha256 "hello world"
 crypto hash sha3   "hello world"
 crypto hash blake3 "hello world"
+# Hash exact bytes, including NUL and non-UTF-8 values
+crypto hash sha256 --hex 00ff0180
+crypto hash sha3-256 --file ./message.bin
 
 # ECC / ECDSA / ECDH
 crypto ecc keygen

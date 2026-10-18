@@ -1,7 +1,7 @@
 //! CLI demo for the crypto library.
 //!
 //! Commands:
-//!   hash    <algorithm> <message>      — Compute a hash
+//!   hash    <algorithm> [message|--hex HEX|--file PATH] — Compute a hash
 //!   ecc     keygen                     — Generate an ECC key pair
 //!   ecdsa   sign <privkey-hex> <msg>   — ECDSA sign
 //!   ecdsa   verify <pubkey-hex> <msg> <r-hex> <s-hex>
@@ -46,6 +46,7 @@ use crypto_lib::{
     utils::encoding::{bigint_to_bytes_be, from_hex, to_hex},
 };
 use num_bigint::BigUint;
+use std::path::{Path, PathBuf};
 
 #[derive(Parser)]
 #[command(name = "crypto", about = "Educational cryptography library demo")]
@@ -66,7 +67,15 @@ enum Cmd {
     /// Hash a message with SHA-2, SHA-3, SHAKE, or BLAKE3.
     Hash {
         algorithm: String,
-        message: String,
+        /// UTF-8 message; use --hex or --file for arbitrary bytes.
+        #[arg(conflicts_with_all = ["hex", "file"])]
+        message: Option<String>,
+        /// Hex-encoded message bytes.
+        #[arg(long, conflicts_with = "file")]
+        hex: Option<String>,
+        /// Read message bytes from a file.
+        #[arg(long)]
+        file: Option<PathBuf>,
         /// Required output length in bytes for SHAKE128 and SHAKE256.
         #[arg(long)]
         output_bytes: Option<usize>,
@@ -544,8 +553,12 @@ fn main() {
         Cmd::Hash {
             algorithm,
             message,
+            hex,
+            file,
             output_bytes,
-        } => match cmd_hash(&algorithm, &message, output_bytes) {
+        } => match load_hash_input(message.as_deref(), hex.as_deref(), file.as_deref())
+            .and_then(|bytes| cmd_hash(&algorithm, &bytes, output_bytes))
+        {
             Ok(digest) => println!("{digest}"),
             Err(error) => {
                 eprintln!("hash: {error}");
@@ -1904,7 +1917,22 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
 
 // ── Command implementations ───────────────────────────────────────────────────
 
-fn cmd_hash(alg: &str, msg: &str, output_bytes: Option<usize>) -> Result<String, String> {
+fn load_hash_input(
+    message: Option<&str>,
+    hex: Option<&str>,
+    file: Option<&Path>,
+) -> Result<Vec<u8>, String> {
+    match (message, hex, file) {
+        (Some(message), None, None) => Ok(message.as_bytes().to_vec()),
+        (None, Some(hex), None) => from_hex(hex).map_err(|e| format!("invalid input hex: {e}")),
+        (None, None, Some(file)) => std::fs::read(file)
+            .map_err(|e| format!("cannot read input file {}: {e}", file.display())),
+        (None, None, None) => Err("provide a message, --hex, or --file".into()),
+        _ => Err("provide exactly one of message, --hex, or --file".into()),
+    }
+}
+
+fn cmd_hash(alg: &str, bytes: &[u8], output_bytes: Option<usize>) -> Result<String, String> {
     let is_xof = matches!(alg, "shake128" | "shake256");
     let length = if is_xof {
         match output_bytes {
@@ -1917,7 +1945,6 @@ fn cmd_hash(alg: &str, msg: &str, output_bytes: Option<usize>) -> Result<String,
         }
         0
     };
-    let bytes = msg.as_bytes();
     let digest = match alg {
         "sha224" | "sha-224" => to_hex(&sha224(bytes)),
         "sha256" | "sha-256" => to_hex(&sha256(bytes)),
@@ -2347,7 +2374,7 @@ fn cmd_visual(op: VisualOp) {
 
 #[cfg(test)]
 mod hash_cli_tests {
-    use super::cmd_hash;
+    use super::{cmd_hash, load_hash_input};
 
     #[test]
     fn sha_variants_match_independent_abc_vectors() {
@@ -2364,23 +2391,42 @@ mod hash_cli_tests {
             ("sha3-512", "b751850b1a57168a5693cd924b6b096e08f621827444f70d884f5d0240d2712e10e116e9192af3c91a7ec57647e3934057340b4cf408d5a56592f8274eec53f0"),
         ];
         for (name, expected) in vectors {
-            assert_eq!(cmd_hash(name, "abc", None).unwrap(), expected, "{name}");
+            assert_eq!(cmd_hash(name, b"abc", None).unwrap(), expected, "{name}");
         }
         assert_eq!(
-            cmd_hash("shake128", "abc", Some(16)).unwrap(),
+            cmd_hash("shake128", b"abc", Some(16)).unwrap(),
             "5881092dd818bf5cf8a3ddb793fbcba7"
         );
         assert_eq!(
-            cmd_hash("shake256", "abc", Some(16)).unwrap(),
+            cmd_hash("shake256", b"abc", Some(16)).unwrap(),
             "483366601360a8771c6863080cc4114d"
         );
     }
 
     #[test]
     fn output_length_and_name_errors_are_explicit() {
-        assert!(cmd_hash("shake128", "abc", None).is_err());
-        assert!(cmd_hash("shake128", "abc", Some(0)).is_err());
-        assert!(cmd_hash("sha256", "abc", Some(32)).is_err());
-        assert!(cmd_hash("unknown", "abc", None).is_err());
+        assert!(cmd_hash("shake128", b"abc", None).is_err());
+        assert!(cmd_hash("shake128", b"abc", Some(0)).is_err());
+        assert!(cmd_hash("sha256", b"abc", Some(32)).is_err());
+        assert!(cmd_hash("unknown", b"abc", None).is_err());
+    }
+
+    #[test]
+    fn binary_input_modes_hash_exact_bytes() {
+        let expected = cmd_hash("sha3-256", &[0, 255, 1, 128], None).unwrap();
+        let hex = load_hash_input(None, Some("00ff0180"), None).unwrap();
+        assert_eq!(cmd_hash("sha3-256", &hex, None).unwrap(), expected);
+        let path = std::env::temp_dir().join(format!(
+            "crypto-hash-input-{}-{}",
+            std::process::id(),
+            std::thread::current().name().unwrap_or("unnamed")
+        ));
+        std::fs::write(&path, &hex).unwrap();
+        let file = load_hash_input(None, None, Some(&path)).unwrap();
+        std::fs::remove_file(&path).unwrap();
+        assert_eq!(cmd_hash("sha3-256", &file, None).unwrap(), expected);
+        assert!(load_hash_input(None, None, None).is_err());
+        assert!(load_hash_input(Some("abc"), Some("616263"), None).is_err());
+        assert!(load_hash_input(None, Some("0"), None).is_err());
     }
 }
