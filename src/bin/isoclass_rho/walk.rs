@@ -25,6 +25,10 @@ use super::search::{self, Found};
 
 pub struct WalkParams {
     pub ells: Vec<u64>,
+    /// Primes applied only at the first `hard_from` vertices (BFS order):
+    /// the expensive, "hard to find" degrees.
+    pub hard_ells: Vec<u64>,
+    pub hard_from: usize,
     /// Largest division-polynomial degree the division route may factor;
     /// above it (binary fields) the torsion route samples kernels.
     pub max_psi_degree: usize,
@@ -86,8 +90,13 @@ pub struct Walker<'a, F: Fq> {
     pub rng: SmallRng,
     pub max_psi_degree: usize,
     pub sample_kernels: usize,
+    pub hard_ells: Vec<u64>,
+    pub hard_from: usize,
     /// Primes whose kernels are sampled (torsion route), not enumerated.
     pub sampled: Vec<u64>,
+    /// Extension-field data of sampled kernels: (vertex, ℓ) → the modulus
+    /// and one ℓ-torsion abscissa per kernel (for dual edges).
+    pub torsion_ctx: HashMap<(usize, u64), isogeny::TorsionCtx>,
     pub edges_verified: u64,
     pub route_counts: HashMap<&'static str, u64>,
     pub ell_ms: HashMap<u64, (f64, u64)>,
@@ -160,7 +169,10 @@ impl<'a, F: Fq> Walker<'a, F> {
             rng: SmallRng::seed_from_u64(seed ^ 0x77a1_4e55),
             max_psi_degree: 1500,
             sample_kernels: 3,
+            hard_ells: Vec::new(),
+            hard_from: 2,
             sampled: Vec::new(),
+            torsion_ctx: HashMap::new(),
             edges_verified: 0,
             route_counts: HashMap::new(),
             ell_ms: HashMap::new(),
@@ -232,7 +244,9 @@ impl<'a, F: Fq> Walker<'a, F> {
             if !self.sampled.contains(&ell) {
                 self.sampled.push(ell);
             }
-            isogeny::kernels_torsion(self.f, &c, ell, self.found.t, q, d, self.sample_kernels, &mut self.rng)
+            let (ks, ctx) = isogeny::kernels_torsion(self.f, &c, ell, self.found.t, q, d, self.sample_kernels, &mut self.rng);
+            self.torsion_ctx.insert((v, ell), ctx);
+            ks
         } else {
             isogeny::kernels_division(self.f, &c, ell, &mut self.rng)
         };
@@ -301,6 +315,17 @@ impl<'a, F: Fq> Walker<'a, F> {
             }
             self.vs[v].expanded = true;
             for &ell in &ells {
+                if self.hard_ells.contains(&ell) && v >= self.hard_from {
+                    continue;
+                }
+                // a sampled prime cannot be enumerated at the floor of its
+                // volcano (the one rational kernel is the ascending edge)
+                if self.is_sampled_ell(ell) {
+                    let depth = self.ells.iter().find(|e| e.ell == ell).unwrap().depth;
+                    if depth > 0 && self.level_of(v, ell) >= depth {
+                        continue;
+                    }
+                }
                 let nb = self.neighbours(v, ell);
                 self.vs[v].kernel_counts.insert(ell, nb.len());
                 for j2 in nb {
@@ -327,6 +352,10 @@ impl<'a, F: Fq> Walker<'a, F> {
                 }
             }
         }
+    }
+
+    fn is_sampled_ell(&self, ell: u64) -> bool {
+        self.lib.is_none() && ((ell * ell - 1) / 2) as usize > self.max_psi_degree
     }
 
     fn is_special_j(&self, j: u64) -> bool {
@@ -561,11 +590,19 @@ impl<'a, F: Fq> Walker<'a, F> {
         let jp = self.vs[par].j;
         let cv = self.vs[v].curve.unwrap();
         let pc = self.vs[par].curve.unwrap();
-        let ks = self.kernels_at(v, ell);
-        let k = ks
-            .into_iter()
-            .find(|k| self.f.ec_j(&k.codomain) == Some(jp))
-            .unwrap_or_else(|| panic!("internal: no dual edge from v{v} to its parent"));
+        let k = if self.is_sampled_ell(ell) {
+            // the dual of a sampled edge: push another ℓ-torsion abscissa of
+            // the parent through the edge; its image generates ker φ̂
+            let edge = self.vs[v].edge.clone().unwrap();
+            let ctx = self.torsion_ctx.get(&(par, ell)).expect("torsion context of a sampled edge").clone();
+            isogeny::dual_torsion(self.f, &pc, &edge, &ctx, self.found.t, self.q as u64)
+                .unwrap_or_else(|e| panic!("dual of the sampled edge v{par} → v{v} (ℓ = {ell}): {e}"))
+        } else {
+            let ks = self.kernels_at(v, ell);
+            ks.into_iter()
+                .find(|k| self.f.ec_j(&k.codomain) == Some(jp))
+                .unwrap_or_else(|| panic!("internal: no dual edge from v{v} to its parent"))
+        };
         let cod = k.codomain;
         let f = *self.f;
         if f.char2() {
@@ -604,9 +641,17 @@ pub fn run_walk<F: Fq>(f: &F, q: f64, found: Found, params: &WalkParams, field_j
     let q0 = f.ec_mul(&e0, Some(p0), k_secret).unwrap();
     let n_src = 1 + params.sources;
     let class = classno::class_summary(found.t, q, found.d_abs, true);
-    let mut w = Walker::new(f, q, found.clone(), &params.ells, params.seed, &params.route);
+    let mut all_ells: Vec<u64> = params.ells.clone();
+    for &l in &params.hard_ells {
+        if !all_ells.contains(&l) {
+            all_ells.push(l);
+        }
+    }
+    let mut w = Walker::new(f, q, found.clone(), &all_ells, params.seed, &params.route);
     w.max_psi_degree = params.max_psi_degree;
     w.sample_kernels = params.sample_kernels;
+    w.hard_ells = params.hard_ells.clone();
+    w.hard_from = params.hard_from;
     let root = w.add_vertex(f.ec_j(&e0).expect("root j"), 0, None, 0, n_src);
     w.vs[root].curve = Some(e0);
     w.vs[root].inst[0] = Some((p0, q0));
@@ -661,7 +706,7 @@ pub fn run_walk<F: Fq>(f: &F, q: f64, found: Found, params: &WalkParams, field_j
     let hard: Vec<usize> = ids
         .iter()
         .copied()
-        .filter(|&v| v != root && w.vs[v].parent_ell == max_ell)
+        .filter(|&v| v != root && (w.vs[v].parent_ell == max_ell || params.hard_ells.contains(&w.vs[v].parent_ell)))
         .take(params.hard)
         .collect();
     for v in hard {
@@ -816,7 +861,7 @@ pub fn run_walk<F: Fq>(f: &F, q: f64, found: Found, params: &WalkParams, field_j
     let out_json = json!({
         "schema": "isoclass-walk/v1",
         "command": params.command,
-        "params": {"ells": params.ells, "radius": params.radius, "max_vertices": params.max_vertices,
+        "params": {"ells": params.ells, "hard_ells": params.hard_ells, "hard_from": params.hard_from, "radius": params.radius, "max_vertices": params.max_vertices,
                    "max_psi_degree": params.max_psi_degree, "sample_kernels": params.sample_kernels, "sampled_ells": w.sampled,
                    "per_stratum": params.per_stratum, "hard": params.hard, "sources": params.sources,
                    "seed": params.seed, "route": params.route},

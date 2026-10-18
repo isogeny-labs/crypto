@@ -101,7 +101,7 @@ const HELP: &str = "isoclass-rho: ECDLP cost across an isogeny class (prime, bin
   isoclass-rho koblitz-table [--m-lo 20] [--m-hi 60]
   isoclass-rho walk --curve P,A,B [--order N] --ells 2,3,5,7,37 [--radius 3] [--max-vertices 4000]
                     [--per-stratum 8] [--hard 6] [--sources 4] [--route elkies|division] [--seed 1]
-                    [--max-psi-degree 1500] [--sample-kernels 3] --out DIR
+                    [--max-psi-degree 1500] [--sample-kernels 3] [--hard-ells 23,31 --hard-from 2] --out DIR
   isoclass-rho walk --binary --curve M,A,B [--poly-index 0] [--order N] --ells 3,5,7 ... --out DIR
   isoclass-rho measure --walk DIR/walk.json --mode class|generators|shift [--trials 100] [--generators 64]
                     [--vertices 0,5,9] [--max-vertices 8] [--controls 3] [--plants] [--folds] [--r 32]
@@ -172,6 +172,8 @@ fn cmd_walk(o: &Opts, command: String) {
     }
     let params = walk::WalkParams {
         ells: o.list("ells", "2,3"),
+        hard_ells: o.list("hard-ells", ""),
+        hard_from: o.get("hard-from", 2),
         radius: o.get("radius", 3),
         max_vertices: o.get("max-vertices", 4000),
         per_stratum: o.get("per-stratum", 8),
@@ -501,8 +503,22 @@ fn selftest(seed: u64) {
         check(&format!("torsion: #E(F_q) by the recurrence = {me} (BSGS {})", kf.order), me == num_bigint::BigInt::from(kf.order), &mut fails);
         let _ = mt;
         let d11 = isogeny::eigen_orbit(kf.t, 1u64 << 31, 11);
-        let kt = isogeny::kernels_torsion(&f2, &ck, 11, kf.t, 1u64 << 31, d11, 2, &mut rng);
+        let (kt, ctx) = isogeny::kernels_torsion(&f2, &ck, 11, kf.t, 1u64 << 31, d11, 2, &mut rng);
         let kd = isogeny::kernels_division(&f2, &ck, 11, &mut rng);
+        if kt.len() >= 2 {
+            match isogeny::dual_torsion(&f2, &ck, &kt[0], &ctx, kf.t, 1u64 << 31) {
+                Ok(dual) => {
+                    let cod = kt[0].codomain;
+                    let ip = kt[0].map(&f2, &ck, Some(pk)).unwrap();
+                    let iq = kt[0].map(&f2, &ck, Some(qk)).unwrap();
+                    let back_ok = isogeny::verify_map(&f2, &cod, &dual, &[ip, iq], kf.n).is_ok();
+                    let bp = dual.map(&f2, &cod, Some(ip)).unwrap();
+                    let is_mult = f2.ec_mul(&ck, Some(pk), 11) == Some(bp) || f2.ec_neg(&ck, f2.ec_mul(&ck, Some(pk), 11)) == Some(bp);
+                    check(&format!("torsion: dual of the ℓ = 11 edge verified, φ̂φ = ±[11] (codomain b = {:#x}): {back_ok} {is_mult}", dual.codomain.b), back_ok && is_mult, &mut fails);
+                }
+                Err(e) => check(&format!("torsion: dual ({e})"), false, &mut fails),
+            }
+        }
         check(&format!("torsion: ℓ = 11 (d = {d11}) finds {} kernels, all among the division route's {}", kt.len(), kd.len()), !kt.is_empty() && kt.iter().all(|k| kd.iter().any(|e| e.h == k.h && e.codomain == k.codomain)), &mut fails);
         for k in &kt {
             check(&format!("torsion: ℓ = 11 map verified ({:.1} ms)", k.find_ms), isogeny::verify_map(&f2, &ck, k, &[pk, qk], kf.n).is_ok(), &mut fails);
@@ -512,7 +528,7 @@ fn selftest(seed: u64) {
             println!("     torsion route for ℓ = 7193 would need F_q^{d}: {}", if d <= 40 { "trying one kernel" } else { "skipped (too large for the self-test)" });
             if d <= 40 {
                 let t1 = std::time::Instant::now();
-                let kt = isogeny::kernels_torsion(&f2, &ck, 7193, kf.t, 1u64 << 31, d, 1, &mut rng);
+                let (kt, _) = isogeny::kernels_torsion(&f2, &ck, 7193, kf.t, 1u64 << 31, d, 1, &mut rng);
                 check(&format!("torsion: ℓ = 7193 found {} kernel(s) in {:.1}s", kt.len(), t1.elapsed().as_secs_f64()), !kt.is_empty(), &mut fails);
                 for k in &kt {
                     check(&format!("torsion: ℓ = 7193 map verified (codomain b = {:#x}, field degree {})", k.codomain.b, k.field_degree), isogeny::verify_map(&f2, &ck, k, &[pk, qk], kf.n).is_ok(), &mut fails);

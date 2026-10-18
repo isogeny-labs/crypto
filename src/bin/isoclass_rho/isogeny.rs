@@ -506,16 +506,66 @@ fn big_bits(n: &BigInt) -> Vec<bool> {
 /// `ℓ`-torsion abscissa, its multiples give the kernel polynomial, whose
 /// coefficients must land in `F_q`.  Finds up to `count` distinct kernels
 /// (a sample of the `ℓ + 1`), each verified on points by the caller.
-pub fn kernels_torsion<F: Fq>(f: &F, c: &Curve, ell: u64, t: i64, q: u64, d: usize, count: usize, rng: &mut SmallRng) -> Vec<Kernel> {
+/// What the torsion route keeps for the dual edges: the extension modulus
+/// and one ℓ-torsion abscissa (in `F_q[y]/(g)`) per kernel found.
+#[derive(Clone, Debug)]
+pub struct TorsionCtx {
+    pub g: Poly,
+    pub d: usize,
+    pub ell: u64,
+    pub xs: Vec<Poly>,
+}
+
+/// The kernel polynomial of `⟨T⟩` from the abscissae `xs[i] = x((i+1)T)`,
+/// `i < (ℓ−1)/2`, as the product over Frobenius orbits `{x(±iλ^j T)}`:
+/// each orbit's polynomial has `F_q` coefficients (`None` if one does not,
+/// i.e. `⟨T⟩` is not rational or `λ` is not its eigenvalue).
+fn kernel_from_orbits<F: Fq>(f: &F, ext: &Ext<F>, xs: &[Poly], ell: u64, lam: u64) -> Option<Poly> {
+    let half = (ell as usize - 1) / 2;
+    let idx = |k: u64| -> usize {
+        let k = k % ell;
+        let k = if k > ell / 2 { ell - k } else { k };
+        k as usize - 1
+    };
+    let mut seen = vec![false; half];
+    let mut h: Poly = vec![1];
+    for i in 1..=half as u64 {
+        if seen[i as usize - 1] {
+            continue;
+        }
+        let mut orbit: Vec<Poly> = Vec::new();
+        let mut k = i;
+        loop {
+            let ix = idx(k);
+            if seen[ix] {
+                break;
+            }
+            seen[ix] = true;
+            orbit.push(xs[ix].clone());
+            k = k * lam % ell;
+        }
+        let op = poly::product_of_linear(ext, &orbit);
+        let mut ob: Poly = Vec::with_capacity(op.len());
+        for coeff in &op {
+            ob.push(ext.to_base(coeff)?);
+        }
+        h = poly::mul(f, &h, &poly::trim(ob));
+    }
+    Some(poly::trim(h))
+}
+
+pub fn kernels_torsion<F: Fq>(f: &F, c: &Curve, ell: u64, t: i64, q: u64, d: usize, count: usize, rng: &mut SmallRng) -> (Vec<Kernel>, TorsionCtx) {
     let t0 = Instant::now();
     let gcoef = poly::irreducible_f2(d);
     let g: Poly = poly::trim(gcoef.iter().map(|&b| f.fsmall(b)).collect());
     let ext = Ext::new(f, &g);
     let (m_e, m_tw) = extension_orders(q, t, d);
-    eprintln!("    torsion ℓ = {ell}: F_q^{d} built in {:.2}s", t0.elapsed().as_secs_f64());
+    let lam = frobenius_scalar(t, q, ell);
+    eprintln!("    torsion ℓ = {ell}: F_q^{d} built in {:.2}s (λ = {lam})", t0.elapsed().as_secs_f64());
     let ellb = BigInt::from(ell);
     let half = (ell as usize - 1) / 2;
     let mut found: Vec<Poly> = Vec::new();
+    let mut found_x: Vec<Poly> = Vec::new();
     let mut attempts = 0;
     while found.len() < count && attempts < 40 * count {
         attempts += 1;
@@ -540,25 +590,14 @@ pub fn kernels_torsion<F: Fq>(f: &F, c: &Curve, ell: u64, t: i64, q: u64, d: usi
                 // ℓ-torsion test: x(((ℓ+1)/2)T) = x(((ℓ−1)/2)T)
                 if let Some(xs) = x_ladder(f, &ext, c, &y, half + 1) {
                     if xs[half] == xs[half - 1] {
-                        let hp = poly::product_of_linear(&ext, &xs[..half]);
-                        let mut h: Poly = Vec::with_capacity(hp.len());
-                        let mut rational = true;
-                        for coeff in &hp {
-                            match ext.to_base(coeff) {
-                                Some(v) => h.push(v),
-                                None => {
-                                    rational = false;
-                                    break;
+                        match kernel_from_orbits(f, &ext, &xs[..half], ell, lam) {
+                            Some(h) => {
+                                if !found.contains(&h) {
+                                    found.push(h);
+                                    found_x.push(y.clone());
                                 }
                             }
-                        }
-                        if rational {
-                            let h = poly::trim(h);
-                            if !found.contains(&h) {
-                                found.push(h);
-                            }
-                        } else {
-                            eprintln!("isoclass-rho: warning: torsion route found an ℓ-subgroup whose kernel polynomial is not over F_q");
+                            None => eprintln!("isoclass-rho: warning: torsion route found an ℓ-subgroup whose kernel polynomial is not over F_q (λ = {lam})"),
                         }
                         break 'orders;
                     }
@@ -571,10 +610,87 @@ pub fn kernels_torsion<F: Fq>(f: &F, c: &Curve, ell: u64, t: i64, q: u64, d: usi
         }
     }
     let ms = t0.elapsed().as_secs_f64() * 1e3;
-    found
+    let ks = found
         .into_iter()
         .map(|h| finish_kernel(f, c, ell, &h, "torsion", ms))
-        .collect()
+        .collect();
+    (ks, TorsionCtx { g, d, ell, xs: found_x })
+}
+
+/// Evaluate an `F_q[x]` polynomial at a ring element.
+fn eval_in<R: Ring>(r: &R, a: &Poly, x: &R::El) -> R::El {
+    let mut acc = r.zero();
+    for &c in a.iter().rev() {
+        acc = r.add(&r.mul(&acc, x), &r.lift(c));
+    }
+    acc
+}
+
+/// The `x`-map of a kernel applied to an abscissa in an extension ring.
+fn x_map_in<F: Fq, R: Ring>(f: &F, r: &R, c: &Curve, k: &Kernel, x: &R::El) -> Option<R::El> {
+    let hx = eval_in(r, &k.h, x);
+    let hi = r.inv(&hx)?;
+    let d1 = r.mul(&eval_in(r, &k.dh[0], x), &hi);
+    if f.char2() {
+        let l = d1;
+        let x2 = r.sqr(x);
+        Some(r.add(&r.add(x, &r.mul(x, &l)), &r.mul(&x2, &r.sqr(&l))))
+    } else {
+        let d2 = r.mul(&eval_in(r, &k.dh[1], x), &hi);
+        let l = d1;
+        let lp = r.sub(&d2, &r.sqr(&l));
+        let x2 = r.sqr(x);
+        let big_f = r.add(&r.mul(&r.add(&x2, &r.lift(c.a)), x), &r.lift(c.b));
+        let fp = r.add(&r.mul(&r.small(3), &x2), &r.lift(c.a));
+        let ell = r.small(k.ell);
+        Some(r.sub(
+            &r.sub(&r.sub(&r.mul(&ell, x), &r.mul(&r.small(2), &r.lift(k.sigma))), &r.mul(&r.small(2), &r.mul(&fp, &l))),
+            &r.mul(&r.small(4), &r.mul(&big_f, &lp)),
+        ))
+    }
+}
+
+/// The dual direction of a sampled edge `φ: E → E'` (kernel `k`): push an
+/// ℓ-torsion abscissa of `E` outside `ker φ` through `φ`; its image
+/// generates `ker φ̂`, and the Frobenius-orbit product gives the kernel
+/// polynomial on `E'`.  Needs a second sampled kernel in `ctx`.
+pub fn dual_torsion<F: Fq>(f: &F, c: &Curve, k: &Kernel, ctx: &TorsionCtx, t: i64, q: u64) -> Result<Kernel, String> {
+    let t0 = Instant::now();
+    let ell = k.ell;
+    let ext = Ext::new(f, &ctx.g);
+    let half = (ell as usize - 1) / 2;
+    let lam = frobenius_scalar(t, q, ell);
+    let other = ctx
+        .xs
+        .iter()
+        .find(|x| !ext.is_zero(&eval_in(&ext, &k.h, x)))
+        .ok_or("no ℓ-torsion abscissa outside the kernel in the torsion context")?;
+    let y = x_map_in(f, &ext, c, k, other).ok_or("image abscissa undefined")?;
+    let cod = k.codomain;
+    let xs = x_ladder(f, &ext, &cod, &y, half + 1).ok_or("ladder on the codomain failed")?;
+    if xs[half] != xs[half - 1] {
+        return Err("image of the torsion abscissa is not ℓ-torsion".into());
+    }
+    let h = kernel_from_orbits(f, &ext, &xs[..half], ell, lam).ok_or("dual kernel polynomial is not over F_q")?;
+    let ms = t0.elapsed().as_secs_f64() * 1e3;
+    Ok(finish_kernel(f, &cod, ell, &h, "torsion-dual", ms))
+}
+
+/// The Frobenius scalar `λ ≡ t/2 (mod ℓ)` on `E[ℓ]` when `ℓ | f` off the
+/// floor (`π ≡ λ`), else a root of `X² − tX + q`.
+pub fn frobenius_scalar(t: i64, q: u64, ell: u64) -> u64 {
+    let tm = t.rem_euclid(ell as i64) as u64;
+    let qm = q % ell;
+    let disc = (tm * tm % ell + 4 * (ell - qm) % ell) % ell;
+    if disc == 0 {
+        return tm * super::field::inv_mod(2, ell) % ell;
+    }
+    for x in 0..ell {
+        if (x * x % ell + ell - tm * x % ell) % ell == (ell - qm) % ell {
+            return x;
+        }
+    }
+    1
 }
 
 /// `ord(±λ)` in `(Z/ℓ)^*/±1` for the Frobenius eigenvalue `λ = t/2 mod ℓ`
