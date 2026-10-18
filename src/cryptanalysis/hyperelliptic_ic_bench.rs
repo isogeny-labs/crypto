@@ -243,6 +243,12 @@ pub enum RhoVariant {
     DistinguishedPointsMixed,
     /// [`Self::DistinguishedPointsNegation`] with the mixed hash.
     DistinguishedPointsNegationMixed,
+    /// [`Self::DistinguishedPoints`] with full-width branch coefficients
+    /// `a_j, b_j` uniform in `[0, N)` instead of `RHO_STEP_BITS`-bit ones
+    /// (round twelve).  With short coefficients a walk's displacement
+    /// `ΔA + ΔB·k` concentrates on a small 2-D set, which can delay its
+    /// rho collision at large `N`.
+    DistinguishedPointsFullWidth,
 }
 
 /// Outcome of one rho run.
@@ -310,6 +316,10 @@ pub fn pollard_rho_jacobian(
 }
 
 /// Build the `r`-adding walk's branches, charging their construction.
+///
+/// `full_width` draws `a_j, b_j` uniform in `[0, N)` and charges
+/// `2·(bits(N) + 1)` operations per branch, as for a walk's start point;
+/// otherwise they are `RHO_STEP_BITS`-bit and nonzero.
 fn build_branches(
     curve: &HyperellipticCurveP,
     d1: &MumfordDivisorP,
@@ -317,17 +327,27 @@ fn build_branches(
     n: &BigUint,
     rng: &mut StdRng,
     ops: &mut usize,
+    full_width: bool,
 ) -> Vec<(BigUint, BigUint, MumfordDivisorP)> {
-    let _ = n;
     let step_bound = BigUint::one() << RHO_STEP_BITS;
     let mut branch = Vec::with_capacity(RHO_BRANCHES);
     for _ in 0..RHO_BRANCHES {
-        let a = rand_below(rng, &step_bound) + BigUint::one();
-        let b = rand_below(rng, &step_bound) + BigUint::one();
+        let (a, b) = if full_width {
+            (rand_below(rng, n), rand_below(rng, n))
+        } else {
+            (
+                rand_below(rng, &step_bound) + BigUint::one(),
+                rand_below(rng, &step_bound) + BigUint::one(),
+            )
+        };
         let r = d1
             .scalar_mul(&a, curve)
             .add(&d2.scalar_mul(&b, curve), curve);
-        *ops += 2 * RHO_STEP_BITS as usize;
+        *ops += if full_width {
+            2 * (n.bits() as usize + 1)
+        } else {
+            2 * RHO_STEP_BITS as usize
+        };
         branch.push((a, b, r));
     }
     branch
@@ -387,15 +407,20 @@ pub fn pollard_rho_jacobian_with(
 ) -> RhoResult {
     match variant {
         RhoVariant::Floyd => rho_floyd(curve, d1, d2, n, seed, max_steps),
-        RhoVariant::DistinguishedPoints => rho_dp(curve, d1, d2, n, seed, max_steps, false, false),
+        RhoVariant::DistinguishedPoints => {
+            rho_dp(curve, d1, d2, n, seed, max_steps, false, false, false)
+        }
         RhoVariant::DistinguishedPointsNegation => {
-            rho_dp(curve, d1, d2, n, seed, max_steps, true, false)
+            rho_dp(curve, d1, d2, n, seed, max_steps, true, false, false)
         }
         RhoVariant::DistinguishedPointsMixed => {
-            rho_dp(curve, d1, d2, n, seed, max_steps, false, true)
+            rho_dp(curve, d1, d2, n, seed, max_steps, false, true, false)
         }
         RhoVariant::DistinguishedPointsNegationMixed => {
-            rho_dp(curve, d1, d2, n, seed, max_steps, true, true)
+            rho_dp(curve, d1, d2, n, seed, max_steps, true, true, false)
+        }
+        RhoVariant::DistinguishedPointsFullWidth => {
+            rho_dp(curve, d1, d2, n, seed, max_steps, false, false, true)
         }
     }
 }
@@ -434,6 +459,7 @@ fn rho_dp(
     max_steps: usize,
     negation: bool,
     mix: bool,
+    full_width: bool,
 ) -> RhoResult {
     let started = Instant::now();
     // The walk's hash: `divisor_hash`, optionally through SplitMix64's
@@ -468,7 +494,7 @@ fn rho_dp(
     let mut rng = StdRng::seed_from_u64(seed);
 
     let mut branch_ops = 0usize;
-    let branch = build_branches(curve, d1, d2, n, &mut rng, &mut branch_ops);
+    let branch = build_branches(curve, d1, d2, n, &mut rng, &mut branch_ops, full_width);
     group_ops += branch_ops;
     precompute_ops += branch_ops;
 
@@ -634,6 +660,19 @@ fn rho_dp(
 /// as `D₂ = k·D₁` places the Jacobian walk; the returned `k` is
 /// recovered from a collision and compared against nothing here.
 pub fn rho_dp_integer_model(n: &BigUint, k: &BigUint, seed: u64, max_steps: usize) -> RhoResult {
+    rho_dp_integer_model_width(n, k, seed, max_steps, false)
+}
+
+/// [`rho_dp_integer_model`] with the branch width chosen: `full_width`
+/// mirrors [`RhoVariant::DistinguishedPointsFullWidth`]'s draws and charge
+/// (round twelve).
+pub fn rho_dp_integer_model_width(
+    n: &BigUint,
+    k: &BigUint,
+    seed: u64,
+    max_steps: usize,
+    full_width: bool,
+) -> RhoResult {
     let started = Instant::now();
     let nn: u64 = n.to_u64_digits().first().copied().unwrap_or(0);
     assert!(n.bits() < 63, "integer model needs N < 2^63");
@@ -647,12 +686,26 @@ pub fn rho_dp_integer_model(n: &BigUint, k: &BigUint, seed: u64, max_steps: usiz
     // Branches: the same draws as `build_branches`, same order.
     let step_bound = BigUint::one() << RHO_STEP_BITS;
     let mut branch: Vec<(u64, u64, u64)> = Vec::with_capacity(RHO_BRANCHES);
+    let branch_cost = if full_width {
+        2 * (n.bits() as usize + 1)
+    } else {
+        2 * RHO_STEP_BITS as usize
+    };
     for _ in 0..RHO_BRANCHES {
-        let a = to64(&(rand_below(&mut rng, &step_bound) + BigUint::one())) % nn;
-        let b = to64(&(rand_below(&mut rng, &step_bound) + BigUint::one())) % nn;
+        let (a, b) = if full_width {
+            (
+                to64(&rand_below(&mut rng, n)),
+                to64(&rand_below(&mut rng, n)),
+            )
+        } else {
+            (
+                to64(&(rand_below(&mut rng, &step_bound) + BigUint::one())) % nn,
+                to64(&(rand_below(&mut rng, &step_bound) + BigUint::one())) % nn,
+            )
+        };
         branch.push((a, b, (a + mulmod(b, kk)) % nn));
-        group_ops += 2 * RHO_STEP_BITS as usize;
-        precompute_ops += 2 * RHO_STEP_BITS as usize;
+        group_ops += branch_cost;
+        precompute_ops += branch_cost;
     }
 
     let root_n = sqrt_big(n).max(2.0);
@@ -1391,6 +1444,39 @@ mod tests {
                 let r =
                     rho_dp_integer_model(&BigUint::from(n), &BigUint::from(k), seed, 50_000_000);
                 assert_eq!(r.k, Some(BigUint::from(k)), "N {n} seed {seed}");
+            }
+        }
+    }
+
+    #[test]
+    fn full_width_branches_solve_on_both_walks() {
+        // Round twelve's arms change only the branch coefficients' width,
+        // so both must still recover `k` on every seed, and the branch
+        // charge must be the full-width one.
+        let (curve, d1, d2, n, k) = instance(101);
+        for seed in 0..10u64 {
+            let r = pollard_rho_jacobian_with(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                &RhoVariant::DistinguishedPointsFullWidth,
+            );
+            assert_eq!(r.k.as_ref(), Some(&k), "jacobian seed {seed}");
+            assert_eq!(r.precompute_ops % (2 * (n.bits() as usize + 1)), 0);
+        }
+        for (nn, kk) in [(61667u64, 20562u64), (4620611, 1540210)] {
+            for seed in 0..8u64 {
+                let r = rho_dp_integer_model_width(
+                    &BigUint::from(nn),
+                    &BigUint::from(kk),
+                    seed,
+                    50_000_000,
+                    true,
+                );
+                assert_eq!(r.k, Some(BigUint::from(kk)), "N {nn} seed {seed}");
             }
         }
     }
