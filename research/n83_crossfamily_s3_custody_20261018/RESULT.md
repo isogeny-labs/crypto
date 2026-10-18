@@ -5,6 +5,9 @@ The frozen [plan](plan.json) (SHA-256
 binds the four point-defined bases from GitHub Actions run
 [`39075872898`](https://github.com/aburan28/crypto/actions/runs/39075872898),
 attempt 1 at source commit `577c8cbe9ddfa20a2b6a62d8c39eb1dd339497ed`.
+The [provider download receipt](receipts/provider-artifacts.json) binds all
+four artifact IDs and ZIP hashes to that run and source; its artifact rows
+match the plan exactly.
 This is the degree-83, a=1 diagnostic curve with a 53-bit subgroup.
 
 The [build receipt](receipts/build.json) checks all 24 archived raw copies per
@@ -35,3 +38,12 @@ local `artifacts/` for replay; their digests and S3 API receipts are committed
 under `receipts/`. This custody result identifies stored bases. Runtime and
 selection claims belong to the separate cross-family holdout and its frozen
 selector. `selected_best_total_runtime` remains null in this study.
+
+Validation on this feature branch: `py_compile` passed for both custody
+programs; the N83 Python discovery suite passed 63/63 tests
+([receipt and full log](validation/n83-python.json)); and
+`cargo test --release --lib -- --test-threads=8` passed 4,085 tests, with
+117 ignored and zero failed in 931.66 seconds
+([receipt and full log](validation/cargo-release-lib.json)). Both raw and
+deterministically compressed log hashes are recorded. No Rust source or
+examples changed in this custody round.
