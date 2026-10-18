@@ -619,6 +619,137 @@ fn rho_dp(
     }
 }
 
+/// Round eleven's control: the plain distinguished-point walk run on the
+/// logarithms themselves, `Z/N`, instead of on the Jacobian.
+///
+/// The position is `x = a + b·k mod N`; the branches add
+/// `s_j = a_j + b_j·k` with `(a_j, b_j)` drawn from the same RNG stream, in
+/// the same order, as [`rho_dp`] draws them; the starts are drawn the same
+/// way; `θ`, the gap limit, the attempt cap and the collision handling are
+/// the same rules.  Only the hash differs: SplitMix64 of `x`, which is an
+/// ideal hash of the group element.  If this walk needs `≈ 1.25·√N` and
+/// the Jacobian walk needs much more, the excess is on the Jacobian side.
+///
+/// `n` must be below `2⁶³`.  `k` is used only to place the walk, exactly
+/// as `D₂ = k·D₁` places the Jacobian walk; the returned `k` is
+/// recovered from a collision and compared against nothing here.
+pub fn rho_dp_integer_model(n: &BigUint, k: &BigUint, seed: u64, max_steps: usize) -> RhoResult {
+    let started = Instant::now();
+    let nn: u64 = n.to_u64_digits().first().copied().unwrap_or(0);
+    assert!(n.bits() < 63, "integer model needs N < 2^63");
+    let kk: u64 = (k % n).to_u64_digits().first().copied().unwrap_or(0);
+    let mulmod = |a: u64, b: u64| ((a as u128 * b as u128) % nn as u128) as u64;
+    let to64 = |v: &BigUint| v.to_u64_digits().first().copied().unwrap_or(0);
+    let mut rng = StdRng::seed_from_u64(seed);
+    let (mut group_ops, mut precompute_ops, mut restarts) = (0usize, 0usize, 0usize);
+    let mut steps_left = max_steps;
+
+    // Branches: the same draws as `build_branches`, same order.
+    let step_bound = BigUint::one() << RHO_STEP_BITS;
+    let mut branch: Vec<(u64, u64, u64)> = Vec::with_capacity(RHO_BRANCHES);
+    for _ in 0..RHO_BRANCHES {
+        let a = to64(&(rand_below(&mut rng, &step_bound) + BigUint::one())) % nn;
+        let b = to64(&(rand_below(&mut rng, &step_bound) + BigUint::one())) % nn;
+        branch.push((a, b, (a + mulmod(b, kk)) % nn));
+        group_ops += 2 * RHO_STEP_BITS as usize;
+        precompute_ops += 2 * RHO_STEP_BITS as usize;
+    }
+
+    let root_n = sqrt_big(n).max(2.0);
+    let theta_bits = ((root_n / 32.0).log2().round() as i64).clamp(0, 24) as u32;
+    let mask: u64 = if theta_bits == 0 {
+        0
+    } else {
+        (1u64 << theta_bits) - 1
+    };
+    let mut seen: HashMap<u64, (u64, u64)> = HashMap::new();
+    let expected = 1.25 * root_n + (1u64 << theta_bits) as f64;
+    let attempt_cap = (64.0 * expected).min(1e9) as usize + 64;
+    let add = |x: (u64, u64, u64), s: (u64, u64, u64)| {
+        ((x.0 + s.0) % nn, (x.1 + s.1) % nn, (x.2 + s.2) % nn)
+    };
+
+    for _attempt in 0..64u64 {
+        let a0 = to64(&rand_below(&mut rng, n));
+        let b0 = to64(&rand_below(&mut rng, n));
+        let mut pos = (a0, b0, (a0 + mulmod(b0, kk)) % nn); // (a, b, x)
+        group_ops += 2 * (n.bits() as usize + 1);
+        precompute_ops += 2 * (n.bits() as usize + 1);
+        let (mut this_attempt, mut since_dp) = (0usize, 0usize);
+        let dp_gap_limit = 32usize << theta_bits;
+        while steps_left > 0 {
+            if since_dp >= dp_gap_limit {
+                restarts += 1;
+                since_dp = 0;
+                let j = (rng.next_u64() as usize) % branch.len();
+                pos = add(pos, branch[j]);
+                group_ops += 1;
+                steps_left -= 1;
+                this_attempt += 1;
+                continue;
+            }
+            if this_attempt >= attempt_cap {
+                restarts += 1;
+                break;
+            }
+            this_attempt += 1;
+            let h = splitmix64_finalise(pos.2);
+            since_dp += 1;
+            if (h & mask) == 0 {
+                since_dp = 0;
+                match seen.get(&h) {
+                    Some(&(pa, pb)) => {
+                        let got = solve_collision(
+                            &BigUint::from(pos.0),
+                            &BigUint::from(pos.1),
+                            &BigUint::from(pa),
+                            &BigUint::from(pb),
+                            n,
+                        );
+                        if let Some(kk_found) = got {
+                            return RhoResult {
+                                k: Some(kk_found),
+                                group_ops,
+                                precompute_ops,
+                                walk_ops: group_ops - precompute_ops,
+                                restarts,
+                                fruitless_ops: 0,
+                                wall_ms: started.elapsed().as_secs_f64() * 1e3,
+                            };
+                        }
+                        restarts += 1;
+                        let j = (rng.next_u64() as usize) % branch.len();
+                        pos = add(pos, branch[j]);
+                        group_ops += 1;
+                        steps_left -= 1;
+                        this_attempt += 1;
+                        continue;
+                    }
+                    None => {
+                        seen.insert(h, (pos.0, pos.1));
+                    }
+                }
+            }
+            let j = (h >> 32) as usize % branch.len();
+            pos = add(pos, branch[j]);
+            group_ops += 1;
+            steps_left -= 1;
+        }
+        if steps_left == 0 {
+            break;
+        }
+    }
+    RhoResult {
+        k: None,
+        group_ops,
+        precompute_ops,
+        walk_ops: group_ops - precompute_ops,
+        restarts,
+        fruitless_ops: 0,
+        wall_ms: started.elapsed().as_secs_f64() * 1e3,
+    }
+}
+
 fn rho_floyd(
     curve: &HyperellipticCurveP,
     d1: &MumfordDivisorP,
@@ -1250,6 +1381,17 @@ mod tests {
         let mut seen = std::collections::HashSet::new();
         for z in 0..4096u64 {
             assert!(seen.insert(splitmix64_finalise(z.wrapping_mul(0x1234_5678_9abc_def1))));
+        }
+    }
+
+    #[test]
+    fn integer_model_recovers_k() {
+        for (n, k) in [(1009u64, 777u64), (61667, 20562), (4620611, 1540210)] {
+            for seed in 0..8u64 {
+                let r =
+                    rho_dp_integer_model(&BigUint::from(n), &BigUint::from(k), seed, 50_000_000);
+                assert_eq!(r.k, Some(BigUint::from(k)), "N {n} seed {seed}");
+            }
         }
     }
 
