@@ -14,7 +14,8 @@ HERE = Path(__file__).resolve().parent
 FIG = HERE / "figures"
 FIG.mkdir(exist_ok=True)
 plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 10,
-                     "svg.fonttype": "none", "axes.spines.top": False,
+                     "svg.fonttype": "none", "svg.hashsalt": "three-leads-audit-20261018",
+                     "axes.spines.top": False,
                      "axes.spines.right": False})
 BLUE, ORANGE, GREEN = "#235789", "#b04f15", "#287359"
 
@@ -25,7 +26,7 @@ def rows(name):
 
 
 def save(fig, name):
-    fig.savefig(FIG / f"{name}.svg", bbox_inches="tight")
+    fig.savefig(FIG / f"{name}.svg", bbox_inches="tight", metadata={"Date": None})
     svg = FIG / f"{name}.svg"
     svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
     fig.savefig(FIG / f"{name}.png", dpi=150, bbox_inches="tight")

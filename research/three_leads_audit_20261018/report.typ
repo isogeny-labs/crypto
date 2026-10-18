@@ -66,6 +66,9 @@
 #text("Every odd-order subgroup G is contained in 2E(K): doubling is invertible on G. Thus chi(aP+bQ)=0 whenever P,Q belong to G. The full-group statement “half the targets are impossible” cannot be used as a half-target saving for this usual DLP sampling law. If full-group targets really are sampled, the filter can save decomposition calls. Its bit operations and basis conversion still belong in a complete cost ledger.")
 
 
+#text("In the particularly important case where G=2E(K) has odd order, full-group coverage 3/8 would mean coverage 3/4 on uniformly sampled G targets, because every reachable point is in G. This is a conditional consequence of the proposed 3/8 value, not a new proof of that value. For a proper subgroup of 2E the distribution requires its own analysis. A random-base comparison must match both subgroup projection and target population; the 4.7% full-group difference does not give the attack's relation yield.")
+
+
 #link("https://github.com/aburan28/crypto/blob/codex/three-leads-audit-20261018/research/three_leads_audit_20261018/TraceKernel.lean")[#text("TraceKernel.lean")]#text(" formally proves the same-coset and odd-order consequences ")#strong[#text("conditional on a Boolean homomorphism")]#text(". The ")#link("https://github.com/aburan28/crypto/blob/codex/three-leads-audit-20261018/research/three_leads_audit_20261018/lean-gate-v2/research_three_leads_audit_20261018_TraceKernel_lean/audit.log")[#text("successful proof gate")]#text(" audits seven declarations, including three generated recursive equations, with zero failing or trusted declarations. The elliptic-curve homomorphism, its kernel and the field-trace bridge are cited mathematics and finite checks, not formalized by this file.")
 
 
