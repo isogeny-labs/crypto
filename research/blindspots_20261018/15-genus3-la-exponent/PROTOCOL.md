@@ -250,3 +250,68 @@ For each of b, c, c0, d (and e from its committed records), against a:
 * The code of `ic_improve4_01_genus3_rel.rs`. No measurement of any new arm.
 * Host: PARI/GP was installed with `apt-get` in this session only to generate
   the orders table; msolve, Magma and Sage are not used.
+
+## Addendum A (2026-10-18, after the instrument was built and smoke-tested, before any card run)
+
+**A1. The training stage and rules T-B, T-C, T-D are withdrawn; arm (d) is tuned per instance.**
+Every card of this lane is frozen before it runs and may not read another card's output, so
+arm strings that depend on training results cannot be frozen. Arm (d) is now an online rule with
+no training data: for each check the SGE filter is run for every `(cx, mw)` of the frozen grid
+`cx` in {4, 8, 16, 32} x `mw` in {0, 8, 16, 32}, and the candidate with the lowest modelled solver
+cost `(matrix-vector products) * nnz + g * N^2` is solved (arm string `lpsgebw2*`). The
+matrix-vector count is exact for the solver (`N (1 + n/m)` for block Wiedemann, `2N` for block
+Lanczos); `g` is the dense-algebra constant, 6.0 for (2, 1), 12.2 for (4, 4), 21.0 for Lanczos
+width 4 and 6.0 for width 1, read off a pilot on **training curve 5 at b = 18** (a non-test cell;
+the measured generator/dense products per `N^2` were 6.03, 12.16 to 12.19, 21.01 and 6.00). The SGE
+products of all 16 candidates are charged to the arm (they are cached across arms within a check but
+every arm is charged every candidate's counters). The rule reads only the instance's own matrix, not
+the outcome of the solve, so it is an algorithm and not tuning on the test result. This replaces
+Deviation 5's step function; arms (b) and (c) run at the incumbent's `cx(b)`, and the auto-filter
+variants of them are reported as diagnostics (below), so a candidate is never judged with a worse
+filter than the incumbent without that being visible.
+
+**A2. Arms as run.**
+
+| role | arm string | cells |
+|---|---|---|
+| a | `lpsgebw2@cx(b)` | all |
+| d | `lpsgebw2*` | all |
+| b | `lpsgebw4x4@cx(b)` | all |
+| c | `lpsgebl4@cx(b)` | all |
+| n | `lpsgebw2!1@cx(b)` | b <= 19 |
+| bd, cd | `lpsgebw4x4*`, `lpsgebl4*` (diagnostic) | b <= 18 |
+| c0 | `lpsgebl1@cx(b)` (width control, diagnostic) | b <= 18 |
+| aa | `lpsgebw2@cx(b)` on an independent walk (stream `aa`) | b <= 19 |
+| e | `r2:lpsgebw2o70c@32`, reused from the committed round-4 files | where committed |
+
+`cx(b)` = 16 for b <= 17, 8 above; kappa as round 4's `kappa_R2(b)`: 1.9027, 1.7319, 1.5763,
+1.4348, 1.3059 for b = 16..20. The diagnostics and the null reach fewer sizes because of the card
+time limit; `analyze` gives them per-size ratios and, with fewer than four sizes of three or more
+correct curves, no exponent verdict (INCONCLUSIVE by the rule). The decision rule for b, c, d is
+unchanged, with exponent on the LA cost, constant on the whole solve at b = 20, primitive on the LA
+cost at b = 20. The null arm `n` changes only which coordinates and vectors the solver projects on;
+the counted cost may be identical to arm a (it was in the pilots), which is the expected null.
+
+**A3. Cards.** Nine cards, each independent: it builds its own binary with plain `rustc`
+(`prlimit --as=4294967296`, std only, because the library does not compile at this branch base),
+runs, gates and deletes the binary. Card 1: selftest, b = 16 and 17 (curves 0 to 3); cards 2, 3:
+b = 18; cards 4, 5: b = 19; cards 6 to 9: b = 20, one curve each. Gate 0 is run in every card against
+the committed round-4 `r2` file of each cell that has one (bound by sha256). The analysis is run
+after the cards, not in a card: `analyze raw/analysis.json 16 20 raw/ <committed r2 dir of round 4>
+--rho-dir <2026-10-14 item 04 run dir>`; it reads many outputs and so cannot be frozen before they exist.
+
+**A4. Disclosures made before the cards.** The instrument was smoke-tested on every test cell
+(b = 16..20, curves 0 to 3) with the same arms as the cards; those records are discarded (kept out
+of `raw/`). What they showed, so the verdicts are read as not blind: every arm returned the verified
+log on every cell; gate 0 matched the committed records on every cell that has one; arms (b) and (c)
+cost more LA than arm (a) at every size (about 1.5x and 1.7x at b = 16 and 17); arm (d) was within
+about 2 % of arm (a). The `selftest` positive controls (planted solutions for every solver) and
+negative controls (tampered right-hand side) pass, and `lpsgebw2x1` equals the existing (2, 1) code
+value for value and counter for counter. PARI/GP was installed with `apt-get` only to produce
+`orders.csv` (475 lines: every order computed while building the 33 instances the item and its
+pilot use); the measured runs read the table and do not need `gp`.
+
+**A5. Budget (estimated from the smoke wall times, shared host, load about 3).**
+b = 16 and 17: about 3 minutes; b = 18: about 3 minutes per card; b = 19: about 5 minutes per card;
+b = 20: about 4.5 minutes per card (walk about 75 s, arms a, d, b, c about 190 s). All cards are
+under 8 minutes; the measured total is about 40 CPU-minutes, within the 2 CPU-hour budget.
