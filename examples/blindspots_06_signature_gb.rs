@@ -1447,7 +1447,12 @@ struct Sig<'a> {
     nidx: usize,
     gen_lm: Vec<u64>,
     g: Vec<Elem>,
-    un: Vec<Vec<u64>>,
+    un: Vec<Vec<Vec<u64>>>, // un[deg][b]: bitset over a < b of the unprocessed pairs of that selection degree
+    ucnt: Vec<u64>,
+    fp_by_deg: Vec<Vec<u32>>,
+    lm_pc: Vec<(u32, u32)>,
+    z_pc: Vec<(u32, u32)>,
+    sig_pc: Vec<(u32, u32)>,
     fpl: Vec<u64>,
     lmset: Vec<FxSet<u64>>,
     zset: Vec<FxSet<u64>>,
@@ -1473,7 +1478,12 @@ impl<'a> Sig<'a> {
             nidx: 0,
             gen_lm: Vec::new(),
             g: Vec::new(),
-            un: Vec::new(),
+            un: (0..65).map(|_| Vec::new()).collect(),
+            ucnt: vec![0; 65],
+            fp_by_deg: (0..65).map(|_| Vec::new()).collect(),
+            lm_pc: Vec::new(),
+            z_pc: Vec::new(),
+            sig_pc: Vec::new(),
             fpl: Vec::new(),
             lmset: Vec::new(),
             zset: Vec::new(),
@@ -1500,22 +1510,48 @@ impl<'a> Sig<'a> {
     fn add_elem(&mut self, poly: Vec<u64>, idx: u32, sig: u64) {
         let h = self.g.len();
         let lm = poly[0];
+        self.g_terms += poly.len() as u64;
+        self.g.push(Elem { poly, lm, idx, sig });
+        // the unprocessed pairs of h with every older element, bucketed by selection degree
         let words = (h + 63) / 64;
-        let mut bits = vec![!0u64; words];
-        if h % 64 != 0 && words > 0 {
-            bits[words - 1] = (1u64 << (h % 64)) - 1;
+        let mut local: Vec<Vec<u64>> = (0..65).map(|_| Vec::new()).collect();
+        for a in 0..h {
+            let d = self.pair_deg(a, h) as usize;
+            if local[d].is_empty() {
+                local[d] = vec![0u64; words];
+            }
+            local[d][a >> 6] |= 1u64 << (a & 63);
+            self.ucnt[d] += 1;
         }
-        self.un.push(bits);
+        for d in 0..65 {
+            let v = std::mem::take(&mut local[d]);
+            self.un[d].push(v);
+        }
         self.fpl.push(lm & !sig);
+        if lm & !sig != 0 {
+            let fd = self.field_deg(h) as usize;
+            self.fp_by_deg[fd].push(h as u32);
+        }
         self.t.d_k0 += (lm & sig).count_ones() as u64;
+        let pc = lm.count_ones();
         for j in (idx as usize + 1)..self.nidx {
             self.lmset[j].insert(lm);
+            let r = &mut self.lm_pc[j];
+            *r = (r.0.min(pc), r.1.max(pc));
         }
         self.lm_ys[idx as usize].entry(lm).or_default().push(h as u32);
         self.sig_ys[idx as usize].entry(sig).or_default().push(h as u32);
+        let sp = sig.count_ones();
+        let r = &mut self.sig_pc[idx as usize];
+        *r = (r.0.min(sp), r.1.max(sp));
         self.ekey_idx.insert(ekey(idx, sig, lm), h as u32);
-        self.g_terms += poly.len() as u64;
-        self.g.push(Elem { poly, lm, idx, sig });
+    }
+
+    fn add_syz(&mut self, i: usize, s: u64) {
+        self.add_syz(i, s);
+        let pc = s.count_ones();
+        let r = &mut self.z_pc[i];
+        *r = (r.0.min(pc), r.1.max(pc));
     }
 
     fn pair_key(&self, c: &Cand) -> u64 {
@@ -1584,11 +1620,23 @@ impl<'a> Sig<'a> {
             self.t.d_k1 += 1;
             return true;
         }
-        if self.crit & 2 != 0 && i > 0 && Subs::new(s).any(|u| u != 0 && self.lmset[i].contains(&u)) {
+        if self.crit & 2 != 0 && i > 0 && {
+            let (lo, hi) = self.lm_pc[i];
+            Subs::new(s).any(|u| {
+                let pc = u.count_ones();
+                pc >= lo && pc <= hi && u != 0 && self.lmset[i].contains(&u)
+            })
+        } {
             self.t.d_k2 += 1;
             return true;
         }
-        if self.crit & 8 != 0 && Subs::new(s).any(|u| self.zset[i].contains(&u)) {
+        if self.crit & 8 != 0 && !self.zset[i].is_empty() && {
+            let (lo, hi) = self.z_pc[i];
+            Subs::new(s).any(|u| {
+                let pc = u.count_ones();
+                pc >= lo && pc <= hi && self.zset[i].contains(&u)
+            })
+        } {
             self.t.d_k4 += 1;
             return true;
         }
@@ -1609,7 +1657,11 @@ impl<'a> Sig<'a> {
         // K5 (rewritable): a newer element of the same index has a signature dividing s
         if self.crit & 16 != 0 {
             let xx = x as u32;
-            if Subs::new(s).any(|u| self.sig_ys[i].get(&u).map_or(false, |ys| *ys.last().unwrap() > xx)) {
+            let (lo, hi) = self.sig_pc[i];
+            if Subs::new(s).any(|u| {
+                let pc = u.count_ones();
+                pc >= lo && pc <= hi && self.sig_ys[i].get(&u).map_or(false, |ys| *ys.last().unwrap() > xx)
+            }) {
                 self.t.d_k5 += 1;
                 return true;
             }
@@ -1640,30 +1692,7 @@ impl<'a> Sig<'a> {
     }
 
     fn min_degree(&self) -> Option<u32> {
-        let mut best = u32::MAX;
-        for b in 0..self.g.len() {
-            let lb = self.g[b].lm;
-            let f = self.fpl[b];
-            if f != 0 {
-                best = best.min(self.field_deg(b));
-            }
-            for (w, &word) in self.un[b].iter().enumerate() {
-                let mut x = word;
-                while x != 0 {
-                    let a = w * 64 + x.trailing_zeros() as usize;
-                    x &= x - 1;
-                    let d = self.pair_deg(a, b);
-                    if d < best {
-                        best = d;
-                    }
-                }
-            }
-        }
-        if best == u32::MAX {
-            None
-        } else {
-            Some(best)
-        }
+        (0..65u32).find(|&d| self.ucnt[d as usize] > 0 || !self.fp_by_deg[d as usize].is_empty())
     }
 
     fn make_row(&mut self, c: &Cand) -> Option<SRow> {
@@ -1679,7 +1708,7 @@ impl<'a> Sig<'a> {
             self.t.build += r.len() as u64;
             if r.is_empty() {
                 self.t.zero_build += 1;
-                self.zset[i].insert(s);
+                self.add_syz(i, s);
                 return None;
             }
             self.seq += 1;
@@ -1736,33 +1765,29 @@ impl<'a> Sig<'a> {
         self.seen.clear();
         // collect the unprocessed pairs of degree d
         let mut cands: Vec<Cand> = Vec::new();
-        for b in 0..self.g.len() {
-            let lb = self.g[b].lm;
-            let f = self.fpl[b];
-            if f != 0 && self.field_deg(b) == d {
-                let mut bits = f;
-                while bits != 0 {
-                    let v = bits.trailing_zeros() as u8;
-                    bits &= bits - 1;
-                    cands.push(Cand { a: b as u32, b: NONE, var: v });
-                }
-                self.fpl[b] = 0;
+        let du = d as usize;
+        for b in std::mem::take(&mut self.fp_by_deg[du]) {
+            let f = self.fpl[b as usize];
+            let mut bits = f;
+            while bits != 0 {
+                let v = bits.trailing_zeros() as u8;
+                bits &= bits - 1;
+                cands.push(Cand { a: b, b: NONE, var: v });
             }
-            for w in 0..self.un[b].len() {
-                let mut x = self.un[b][w];
-                let mut clear = 0u64;
+            self.fpl[b as usize] = 0;
+        }
+        for b in 0..self.un[du].len() {
+            let words = std::mem::take(&mut self.un[du][b]);
+            for (w, &word) in words.iter().enumerate() {
+                let mut x = word;
                 while x != 0 {
-                    let bit = x.trailing_zeros() as usize;
+                    let a = w * 64 + x.trailing_zeros() as usize;
                     x &= x - 1;
-                    let a = w * 64 + bit;
-                    if self.pair_deg(a, b) == d {
-                        cands.push(Cand { a: a as u32, b: b as u32, var: 0 });
-                        clear |= 1u64 << bit;
-                    }
+                    cands.push(Cand { a: a as u32, b: b as u32, var: 0 });
                 }
-                self.un[b][w] &= !clear;
             }
         }
+        self.ucnt[du] = 0;
         self.t.pairs_cand += cands.len() as u64;
         self.t.d_sel = self.t.d_sel.max(d);
         let mut srows: Vec<SRow> = Vec::new();
@@ -1998,7 +2023,7 @@ impl<'a> Sig<'a> {
                 self.t.super_top += 1;
             } else if kept.is_empty() {
                 self.t.zero_elim += 1;
-                self.zset[row.idx as usize].insert(row.sig);
+                self.add_syz(row.idx as usize, row.sig);
             } else {
                 nnz += kept.len() as u64;
                 let col = kept[0] as usize;
@@ -2127,6 +2152,9 @@ impl<'a> Sig<'a> {
         self.zset = (0..self.nidx).map(|_| FxSet::default()).collect();
         self.lm_ys = (0..self.nidx).map(|_| FxMap::default()).collect();
         self.sig_ys = (0..self.nidx).map(|_| FxMap::default()).collect();
+        self.lm_pc = vec![(u32::MAX, 0); self.nidx];
+        self.z_pc = vec![(u32::MAX, 0); self.nidx];
+        self.sig_pc = vec![(u32::MAX, 0); self.nidx];
         let mut refuted = false;
         for (i, p) in polys.into_iter().enumerate() {
             self.gen_lm.push(p[0]);
