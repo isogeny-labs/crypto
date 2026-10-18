@@ -28,6 +28,12 @@
 //! site, the model evaluates the same charges in closed form, and the selftest
 //! requires them to agree to 1e-9 (relative).
 
+#![allow(dead_code)]
+
+use std::collections::HashMap;
+use std::rc::Rc;
+use std::time::Instant;
+
 // ---------------------------------------------------------------- utilities
 
 struct Rng(u64);
@@ -101,9 +107,6 @@ impl Args {
 
 // ---------------------------------------------------------------- GF(2^n)
 
-use std::collections::HashMap;
-use std::rc::Rc;
-use std::time::Instant;
 
 struct Gf {
     n: u32,
@@ -1952,6 +1955,419 @@ fn main() {
     }
 }
 
-fn mode_summarize(_a: &Args) {
-    println!("summarize: not yet written");
+// ---------------------------------------------------------------- summarize
+
+fn jnum_f(line: &str, key: &str) -> Option<f64> {
+    let pat = format!("\"{key}\":");
+    let i = line.find(&pat)? + pat.len();
+    let rest = &line[i..];
+    let end = rest
+        .find(|c: char| !(c.is_ascii_digit() || c == '.' || c == '-' || c == 'e' || c == 'E' || c == '+'))
+        .unwrap_or(rest.len());
+    rest[..end].parse().ok()
+}
+fn jstr_f(line: &str, key: &str) -> Option<String> {
+    let pat = format!("\"{key}\":\"");
+    let i = line.find(&pat)? + pat.len();
+    let rest = &line[i..];
+    Some(rest[..rest.find('"')?].to_string())
+}
+fn jbool_f(line: &str, key: &str) -> Option<bool> {
+    let pat = format!("\"{key}\":");
+    let i = line.find(&pat)? + pat.len();
+    let rest = &line[i..];
+    if rest.starts_with("true") {
+        Some(true)
+    } else if rest.starts_with("false") {
+        Some(false)
+    } else {
+        None
+    }
+}
+
+fn ols(xs: &[f64], ys: &[f64]) -> f64 {
+    let n = xs.len() as f64;
+    let mx = xs.iter().sum::<f64>() / n;
+    let my = ys.iter().sum::<f64>() / n;
+    let num: f64 = xs.iter().zip(ys).map(|(x, y)| (x - mx) * (y - my)).sum();
+    let den: f64 = xs.iter().map(|x| (x - mx) * (x - mx)).sum();
+    num / den
+}
+
+/// (slope, jackknife min, jackknife max)
+fn slope_jack(xs: &[f64], ys: &[f64]) -> (f64, f64, f64) {
+    let s = ols(xs, ys);
+    let (mut lo, mut hi) = (f64::INFINITY, f64::NEG_INFINITY);
+    for i in 0..xs.len() {
+        let (mut a, mut b) = (Vec::new(), Vec::new());
+        for j in 0..xs.len() {
+            if j != i {
+                a.push(xs[j]);
+                b.push(ys[j]);
+            }
+        }
+        let t = ols(&a, &b);
+        lo = lo.min(t);
+        hi = hi.max(t);
+    }
+    (s, lo, hi)
+}
+
+fn gmean_f(v: &[f64]) -> f64 {
+    if v.is_empty() {
+        return f64::NAN;
+    }
+    (v.iter().map(|x| x.ln()).sum::<f64>() / v.len() as f64).exp()
+}
+
+#[derive(Default, Clone)]
+struct CellAgg {
+    label: String,
+    n: usize,
+    e: usize,
+    d: usize,
+    fes_desc: Vec<f64>,   // bitops
+    fes_rand: Vec<f64>,
+    fes_ms: Vec<f64>,
+    model: HashMap<String, Vec<f64>>, // arm -> log2 values (desc)
+    model_rand: HashMap<String, Vec<f64>>,
+    mem: HashMap<String, f64>,
+    sched: HashMap<String, String>,
+    f4: Vec<(usize, String, f64, f64)>, // target, status, touches, ms
+    affine: Vec<(f64, f64, f64)>,
+}
+
+fn mode_summarize(a: &Args) {
+    let dir = a.flag("--dir").expect("--dir");
+    let mut files: Vec<_> = std::fs::read_dir(&dir)
+        .expect("read dir")
+        .filter_map(|e| e.ok())
+        .map(|e| e.path())
+        .filter(|p| p.to_string_lossy().ends_with(".stdout.log"))
+        .collect();
+    files.sort();
+    let mut cells: HashMap<String, CellAgg> = HashMap::new();
+    let mut selftest_ok = false;
+    let mut sens_ok = false;
+    let mut asym_ok = false;
+    let (mut par_checked, mut par_odd, mut par_bad, mut par_skipped) = (0f64, 0f64, 0f64, 0f64);
+    let mut par_cells: Vec<String> = Vec::new();
+    let mut control_fail: Vec<String> = Vec::new();
+    let mut asym_rows: Vec<(String, usize, usize, f64)> = Vec::new();
+    let mut cross: Option<String> = None;
+    let mut cross_grid: Vec<String> = Vec::new();
+    let mut real_ops_equal = (0usize, 0usize);
+    let mut real_sched_depth: HashMap<String, usize> = HashMap::new();
+    let mut nlines = 0usize;
+    for f in &files {
+        let txt = std::fs::read_to_string(f).unwrap_or_default();
+        for line in txt.lines() {
+            if line.contains("SELFTEST OK") {
+                selftest_ok = true;
+            }
+            if line.contains("SENS OK") {
+                sens_ok = true;
+            }
+            if line.contains("ASYM OK") {
+                asym_ok = true;
+            }
+            if line.starts_with("{\"cell\"") {
+                // item 05 F4 lines
+                let cell = jstr_f(line, "cell").unwrap_or_default();
+                let arm = jstr_f(line, "arm").unwrap_or_default();
+                if arm != "grevlex" {
+                    continue;
+                }
+                nlines += 1;
+                let c = cells.entry(cell.clone()).or_default();
+                c.label = cell;
+                c.f4.push((
+                    jnum_f(line, "target").unwrap_or(0.0) as usize,
+                    jstr_f(line, "status").unwrap_or_default(),
+                    jnum_f(line, "touches").unwrap_or(f64::NAN),
+                    jnum_f(line, "ms").unwrap_or(f64::NAN),
+                ));
+                continue;
+            }
+            if !line.starts_with("{\"item\":\"03\"") {
+                continue;
+            }
+            nlines += 1;
+            let kind = jstr_f(line, "kind").unwrap_or_default();
+            match kind.as_str() {
+                "fes" | "model" => {
+                    let cell = jstr_f(line, "cell").unwrap_or_default();
+                    let c = cells.entry(cell.clone()).or_default();
+                    c.label = cell;
+                    c.n = jnum_f(line, "N").unwrap_or(0.0) as usize;
+                    c.e = jnum_f(line, "E").unwrap_or(0.0) as usize;
+                    c.d = jnum_f(line, "d").unwrap_or(0.0) as usize;
+                    let sys = jstr_f(line, "sys").unwrap_or_default();
+                    if kind == "fes" {
+                        let b = jnum_f(line, "bitops").unwrap_or(f64::NAN);
+                        if sys == "desc" {
+                            c.fes_desc.push(b);
+                            c.fes_ms.push(jnum_f(line, "ms").unwrap_or(f64::NAN));
+                            c.affine.push((
+                                jnum_f(line, "affine_combos").unwrap_or(0.0),
+                                jnum_f(line, "affine_linear_rank").unwrap_or(0.0),
+                                jnum_f(line, "affine_const_one").unwrap_or(0.0),
+                            ));
+                        } else {
+                            c.fes_rand.push(b);
+                        }
+                    } else {
+                        let arm = jstr_f(line, "arm").unwrap_or_default();
+                        let v = jnum_f(line, "log2").unwrap_or(f64::NAN);
+                        if sys == "desc" {
+                            c.model.entry(arm.clone()).or_default().push(v);
+                            if let Some(m) = jnum_f(line, "mem_log2_bits") {
+                                c.mem.insert(arm.clone(), m);
+                            }
+                            c.sched.insert(arm, jstr_f(line, "sched").unwrap_or_default());
+                        } else {
+                            c.model_rand.entry(arm).or_default().push(v);
+                        }
+                    }
+                }
+                "real" => {
+                    if jstr_f(line, "status").as_deref() == Some("done") {
+                        real_ops_equal.1 += 1;
+                        if jbool_f(line, "model_equal") == Some(true) {
+                            real_ops_equal.0 += 1;
+                        }
+                        let sched = jstr_f(line, "sched").unwrap_or_default();
+                        let arm = jstr_f(line, "arm").unwrap_or_default();
+                        let depth = sched.split('-').count().saturating_sub(1);
+                        let key = format!("{arm}-L{depth}");
+                        *real_sched_depth.entry(key).or_insert(0) += 1;
+                    }
+                }
+                "control" => {
+                    let name = jstr_f(line, "name").unwrap_or_default();
+                    let pass = jbool_f(line, "pass").unwrap_or(false);
+                    if name == "parity-agreement" {
+                        par_checked += jnum_f(line, "checked").unwrap_or(0.0);
+                        par_odd += jnum_f(line, "odd").unwrap_or(0.0);
+                        par_bad += jnum_f(line, "bad").unwrap_or(0.0);
+                        par_skipped += jnum_f(line, "skipped").unwrap_or(0.0);
+                        par_cells.push(jstr_f(line, "cell").unwrap_or_default());
+                    }
+                    if !pass {
+                        control_fail.push(name);
+                    }
+                }
+                "asym" => asym_rows.push((
+                    jstr_f(line, "arm").unwrap_or_default(),
+                    jnum_f(line, "d").unwrap_or(0.0) as usize,
+                    jnum_f(line, "lmax").unwrap_or(0.0) as usize,
+                    jnum_f(line, "exponent").unwrap_or(f64::NAN),
+                )),
+                "crossover" => cross = Some(line.to_string()),
+                "crossover-grid" => cross_grid.push(line.to_string()),
+                _ => {}
+            }
+        }
+    }
+    println!("# item 03 summary: {} files, {} records", files.len(), nlines);
+
+    // controls
+    println!("\n## Controls");
+    println!("selftest line present: {selftest_ok}");
+    println!("sensitivity control: {sens_ok}");
+    println!("published-exponent control (asym): {asym_ok}");
+    println!(
+        "parity agreement: {par_checked} real calls on hashed systems over cells {:?}, {par_odd} with odd true parity, {par_bad} wrong or model-unequal, {par_skipped} skipped",
+        par_cells
+    );
+    println!("real counter == counted model on {} of {} real calls", real_ops_equal.0, real_ops_equal.1);
+    println!("real calls by arm and interior depth: {:?}", { let mut v: Vec<_> = real_sched_depth.iter().collect(); v.sort(); v });
+    if !control_fail.is_empty() {
+        println!("FAILED CONTROLS: {:?}", control_fail);
+    }
+    let odd_needed = 200.0;
+    let controls_ok = selftest_ok && sens_ok && asym_ok && control_fail.is_empty() && par_bad == 0.0 && par_odd >= odd_needed;
+    println!("controls pass: {controls_ok} (odd-parity real calls {par_odd} of {odd_needed} required)");
+
+    let mut s3: Vec<&CellAgg> = cells.values().filter(|c| c.d == 2 && c.n > 0).collect();
+    s3.sort_by_key(|c| c.n);
+    let mut s4: Vec<&CellAgg> = cells.values().filter(|c| c.d == 3 && c.n > 0).collect();
+    s4.sort_by_key(|c| c.n);
+    let mean = |v: &Vec<f64>| if v.is_empty() { f64::NAN } else { v.iter().sum::<f64>() / v.len() as f64 };
+    let m0 = |c: &CellAgg, arm: &str| -> f64 { c.model.get(arm).map(|v| v[0]).unwrap_or(f64::NAN) };
+
+    println!("\n## S_3 family (m = 2, quadratic): counted bit operations, log2");
+    println!("cell        N   E  fes(desc)  fes(rand)  d%     dinur   (sched)         lptwy  dinur-t11  dinur-L2  dinur-L3     exh   mem(dinur)  rho_dinur  rho_lptwy");
+    let mut xs: Vec<f64> = Vec::new();
+    let (mut y_fes, mut y_din, mut y_lp) = (Vec::new(), Vec::new(), Vec::new());
+    let mut null_gap = 0f64;
+    for c in &s3 {
+        let fes = mean(&c.fes_desc).log2();
+        let fesr = mean(&c.fes_rand).log2();
+        let dpct = (mean(&c.fes_rand) / mean(&c.fes_desc) - 1.0) * 100.0;
+        let din = m0(c, "dinur");
+        let lp = m0(c, "lptwy");
+        for (arm, v) in &c.model {
+            if let Some(r) = c.model_rand.get(arm) {
+                for x in r {
+                    null_gap = null_gap.max((x - v[0]).abs());
+                }
+            }
+        }
+        println!(
+            "{:<10} {:>3} {:>3}  {:>9.3}  {:>9.3} {:>5.2}  {:>7.3}  {:<14} {:>7.3}  {:>9.3}  {:>8.3}  {:>8.3}  {:>7.3}  {:>9.2}  {:>9.3e}  {:>9.3e}",
+            c.label, c.n, c.e, fes, fesr, dpct, din, c.sched.get("dinur").cloned().unwrap_or_default(), lp,
+            m0(c, "dinur-t11"), m0(c, "dinur-L2"), m0(c, "dinur-L3"), m0(c, "exh"),
+            c.mem.get("dinur").cloned().unwrap_or(f64::NAN), (fes - din).exp2(), (fes - lp).exp2()
+        );
+        if c.n > 0 && !c.fes_desc.is_empty() {
+            xs.push(c.n as f64);
+            y_fes.push(fes);
+            y_din.push(din);
+            y_lp.push(lp);
+        }
+    }
+    println!("negative control: largest |log2 difference| between a descended draw and a random dense system of equal (N,E,d), dinur/lptwy/exh/t11 model rows: {null_gap:.2e}");
+    println!("FES cost differs between draws only through the early-exit test (column d% = random mean over descended mean, in percent)");
+
+    println!("\n## Affine relations among the equations of the descended draws (combos, linear rank, constant-one)");
+    for c in &s3 {
+        if let Some(first) = c.affine.first() {
+            let all_same = c.affine.iter().all(|x| x == first);
+            println!("{:<10} N={:>2}: {:?} on {} draws (all equal: {all_same})", c.label, c.n, first, c.affine.len());
+        }
+    }
+
+    let (fit_fes, fit_din, fit_lp);
+    println!("\n## Fitted exponent c in 2^(cN) over the S_3 cells (slope of log2 cost against N; jackknife = leave-one-cell-out range, a stability interval)");
+    if xs.len() >= 4 {
+        fit_fes = slope_jack(&xs, &y_fes);
+        fit_din = slope_jack(&xs, &y_din);
+        fit_lp = slope_jack(&xs, &y_lp);
+        let loc = |ys: &Vec<f64>| (ys[ys.len() - 1] - ys[ys.len() - 2]) / (xs[xs.len() - 1] - xs[xs.len() - 2]);
+        println!("fes    c = {:.4}  [{:.4}, {:.4}]  local({}->{}) = {:.4}", fit_fes.0, fit_fes.1, fit_fes.2, xs[xs.len() - 2], xs[xs.len() - 1], loc(&y_fes));
+        println!("dinur  c = {:.4}  [{:.4}, {:.4}]  local = {:.4}", fit_din.0, fit_din.1, fit_din.2, loc(&y_din));
+        println!("lptwy  c = {:.4}  [{:.4}, {:.4}]  local = {:.4}", fit_lp.0, fit_lp.1, fit_lp.2, loc(&y_lp));
+    } else {
+        fit_fes = (f64::NAN, f64::NAN, f64::NAN);
+        fit_din = fit_fes;
+        fit_lp = fit_fes;
+        println!("fewer than 4 cells with FES rows: no fit");
+    }
+
+    println!("\n## F4 (item 05 Boolean F4, grevlex), touches, per cell");
+    println!("cell        N  finished/rows  statuses            geo-mean touches (log2)  range over targets (log2)   F4/FES(desc mean)");
+    let mut f4_x = Vec::new();
+    let mut f4_y = Vec::new();
+    for c in s3.iter().chain(s4.iter()) {
+        if c.f4.is_empty() {
+            println!("{:<10} {:>3}  no F4 rows", c.label, c.n);
+            continue;
+        }
+        let done: Vec<f64> = c.f4.iter().filter(|r| r.1 == "refuted").map(|r| r.2).collect();
+        let mut st: HashMap<String, usize> = HashMap::new();
+        for r in &c.f4 {
+            *st.entry(r.1.clone()).or_insert(0) += 1;
+        }
+        let mut stv: Vec<_> = st.into_iter().collect();
+        stv.sort();
+        let (lo, hi) = (done.iter().cloned().fold(f64::INFINITY, f64::min), done.iter().cloned().fold(0.0, f64::max));
+        let base = if c.d == 2 { mean(&c.fes_desc) } else { fes_model_log2(c.n, c.e).exp2() };
+        println!(
+            "{:<10} {:>3}  {:>3}/{:<3}        {:<18}  {:>10.3}               [{:.3}, {:.3}]          {:.3}{}",
+            c.label, c.n, done.len(), c.f4.len(), format!("{:?}", stv),
+            gmean_f(&done).log2(), lo.log2(), hi.log2(), gmean_f(&done) / base,
+            if c.d == 3 { "  (vs FES floor)" } else { "" }
+        );
+        if c.d == 2 && done.len() >= 4 {
+            f4_x.push(c.n as f64);
+            f4_y.push(gmean_f(&done).log2());
+        }
+    }
+    let fit_f4 = if f4_x.len() >= 3 { slope_jack(&f4_x, &f4_y) } else { (f64::NAN, f64::NAN, f64::NAN) };
+    println!("F4 fitted c over the S_3 cells with >= 4 finished targets ({} cells): {:.4} [{:.4}, {:.4}]", f4_x.len(), fit_f4.0, fit_f4.1, fit_f4.2);
+
+    println!("\n## S_4 family (m = 3 chain, cubic): log2 counted cost");
+    println!("cell        N   E  fes-floor  dinur  (sched)        lptwy  dinur-t11  mem(dinur)  F4(geo)   rho_dinur(vs floor)");
+    for c in &s4 {
+        let fl = m0(c, "fes-floor");
+        let f4d: Vec<f64> = c.f4.iter().filter(|r| r.1 == "refuted").map(|r| r.2).collect();
+        println!(
+            "{:<10} {:>3} {:>3}  {:>9.3}  {:>6.3}  {:<12} {:>7.3}  {:>9.3}  {:>9.2}  {:>8.3}  {:>9.3e}",
+            c.label, c.n, c.e, fl, m0(c, "dinur"), c.sched.get("dinur").cloned().unwrap_or_default(), m0(c, "lptwy"),
+            m0(c, "dinur-t11"), c.mem.get("dinur").cloned().unwrap_or(f64::NAN), gmean_f(&f4d).log2(), (fl - m0(c, "dinur")).exp2()
+        );
+    }
+
+    println!("\n## Crossover (counted model, E = N + 1, d = 2) and working set");
+    for g in &cross_grid {
+        println!(
+            "N={:>3} fes {:>7.2}  dinur {:>7.2} ({})  mem {:>6.2}  cap2^43 {}  cap2^35 {}  lptwy {:>7.2}",
+            jnum_f(g, "N").unwrap_or(0.0), jnum_f(g, "fes_log2").unwrap_or(f64::NAN), jnum_f(g, "dinur_log2").unwrap_or(f64::NAN),
+            jstr_f(g, "dinur_sched").unwrap_or_default(), jnum_f(g, "dinur_mem_log2_bits").unwrap_or(f64::NAN),
+            jnum_f(g, "dinur_cap43_log2").map(|x| format!("{x:.2}")).unwrap_or("none".into()),
+            jnum_f(g, "dinur_cap35_log2").map(|x| format!("{x:.2}")).unwrap_or("none".into()),
+            jnum_f(g, "lptwy_log2").unwrap_or(f64::NAN)
+        );
+    }
+    if let Some(c) = &cross {
+        println!("{c}");
+    }
+
+    println!("\n## Exponent statement (asym routine)");
+    let get = |arm: &str, d: usize, lm: usize| asym_rows.iter().find(|r| r.0 == arm && r.1 == d && r.2 == lm).map(|r| r.3).unwrap_or(f64::NAN);
+    let c2 = get("dinur", 2, 60);
+    let c3 = get("dinur", 3, 60);
+    let cl = get("lptwy", 2, 1);
+    println!("asymptotic exponent, least over schedules with up to L levels: d=2 L=1 {:.4}, L=3 {:.4}, L=60 {:.4}; d=3 L=1 {:.4}, L=60 {:.4}; lptwy d=2 {:.4}", get("dinur", 2, 1), get("dinur", 2, 3), c2, get("dinur", 3, 1), c3, cl);
+    for &(m, c) in &[(2usize, c2), (3usize, c3)] {
+        let need = 0.5 - 1.0 / m as f64;
+        println!(
+            "family m={m}: required c < 1/2 - 1/m = {need:.4}; published-form asymptotic c = {c:.4}; distance remaining {:.4}; index-calculus exponent relative to rho 2/m + 2c = {:.4} (above 1 loses)",
+            c - need, 2.0 / m as f64 + 2.0 * c
+        );
+    }
+    for (name, fit, m) in [("dinur", fit_din, 2usize), ("lptwy", fit_lp, 2), ("fes", fit_fes, 2)] {
+        let need = 0.5 - 1.0 / m as f64;
+        println!("fitted c of {name} over the measured S_3 range: {:.4}; distance to required {:.4}; 2/m + 2c = {:.4}", fit.0, fit.0 - need, 2.0 / m as f64 + 2.0 * fit.0);
+    }
+
+    // verdict
+    println!("\n## Verdict by the frozen rule");
+    let big = s3.last();
+    let mut verdict = "INCONCLUSIVE".to_string();
+    let mut level = "n/a";
+    if !controls_ok {
+        println!("a control did not pass or is missing: INCONCLUSIVE");
+    } else if let Some(c) = big {
+        if c.n != 32 || c.fes_desc.is_empty() {
+            println!("the N = 32 cell has no FES rows: INCONCLUSIVE");
+        } else {
+            let fes = mean(&c.fes_desc).log2();
+            let rho_d = (fes - m0(c, "dinur")).exp2();
+            let rho_l = (fes - m0(c, "lptwy")).exp2();
+            let best = rho_d.max(rho_l);
+            let jack_fes = fit_fes.2 - fit_fes.1;
+            let margin_d = (fit_fes.0 - fit_din.0) - jack_fes.max(fit_din.2 - fit_din.1);
+            let margin_l = (fit_fes.0 - fit_lp.0) - jack_fes.max(fit_lp.2 - fit_lp.1);
+            if best >= 1.5 {
+                verdict = "ADVANCES".into();
+                level = "constant";
+            } else if best > 2.0 / 3.0 {
+                verdict = "MATCHES".into();
+                level = "constant";
+            } else if margin_d > 0.0 || margin_l > 0.0 {
+                verdict = "TRADES".into();
+                level = "exponent over constant";
+            } else {
+                verdict = "REGRESSES".into();
+                level = "constant";
+            }
+            println!(
+                "rho_dinur(32) = {rho_d:.3e}, rho_lptwy(32) = {rho_l:.3e}; fitted-exponent margin below FES (after the larger jackknife range): dinur {margin_d:.4}, lptwy {margin_l:.4}"
+            );
+        }
+    }
+    println!("arm (e) msolve: BLOCKED (not installed; no GMP/MPFR/FLINT headers; ~4 GB disk); unblock with a prebuilt msolve binary");
+    println!("VERDICT: {verdict} (level: {level})");
 }

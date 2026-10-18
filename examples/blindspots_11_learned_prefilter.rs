@@ -24,6 +24,18 @@ use std::time::Instant;
 
 // ------------------------------------------------------------------ utilities
 
+thread_local! {
+    static POPCH: Cell<char> = Cell::new('U');
+}
+
+/// Print one flat JSON object with the target population tagged first.
+macro_rules! emitj {
+    ($($arg:tt)*) => {{
+        let s = format!($($arg)*);
+        println!("{{\"pop\":\"{}\",{}", POPCH.with(|c| c.get()), &s[1..]);
+    }};
+}
+
 struct Rng(u64);
 impl Rng {
     fn next(&mut self) -> u64 {
@@ -1345,8 +1357,8 @@ struct CellParams {
     ell: usize, // 0 = auto
     per_base: usize,
     perms: usize,
-    seed: u64,
     pilot: usize,
+    pop: char, // 'U' uniform over E(F); 'S' uniform over 2E(F) (delta = 0), the subgroup-target population
 }
 
 fn lambda_formula(n: u32, m: usize, ell: usize) -> f64 {
@@ -1366,9 +1378,20 @@ fn formula_ell(n: u32, m: usize) -> usize {
     best.1
 }
 
+/// The selftest draws a in {0, 1}; the measured cells fix a = 0 (see `make_cell_curve`).
 fn make_curve(gf: &Gf, seed: u64) -> Curve {
     let mut rng = Rng(seed);
     let a = rng.next() & 1;
+    make_curve_a(gf, &mut rng, a)
+}
+
+/// Measured cells use the Koblitz-form family y^2 + xy = x^3 + b (a = 0), b random non-zero.
+fn make_cell_curve(gf: &Gf, seed: u64) -> Curve {
+    let mut rng = Rng(seed);
+    make_curve_a(gf, &mut rng, 0)
+}
+
+fn make_curve_a(gf: &Gf, rng: &mut Rng, a: u64) -> Curve {
     loop {
         let b = rng.next() & gf.mask;
         if b != 0 {
@@ -1377,10 +1400,13 @@ fn make_curve(gf: &Gf, seed: u64) -> Curve {
     }
 }
 
-fn random_target(gf: &Gf, cv: &Curve, rng: &mut Rng) -> (u64, u64) {
+fn random_target(gf: &Gf, cv: &Curve, rng: &mut Rng, pop: char) -> (u64, u64) {
     loop {
         let x = rng.next() & gf.mask;
         if x == 0 {
+            continue;
+        }
+        if pop == 'S' && gf.tr(x ^ cv.a) == 1 {
             continue;
         }
         if let Some((x, y)) = point_at(gf, cv, x) {
@@ -1390,13 +1416,13 @@ fn random_target(gf: &Gf, cv: &Curve, rng: &mut Rng) -> (u64, u64) {
     }
 }
 
-fn pos_fraction(gf: &Gf, cv: &Curve, kind: char, ell: usize, m: usize, count: usize, seed: u64) -> f64 {
+fn pos_fraction(gf: &Gf, cv: &Curve, kind: char, ell: usize, m: usize, count: usize, seed: u64, pop: char) -> f64 {
     let mut rng = Rng(seed);
     let base = build_base(gf, cv, kind, ell, &mut rng);
     let dec = Decomposer::new(gf, *cv, &base, m);
     let mut pos = 0;
     for _ in 0..count {
-        let (x, y) = random_target(gf, cv, &mut rng);
+        let (x, y) = random_target(gf, cv, &mut rng, pop);
         if dec.label(x, y) {
             pos += 1;
         }
@@ -1408,8 +1434,10 @@ fn run_cell(p: &CellParams) {
     let t0 = Instant::now();
     let gf = Gf::new(p.n);
     let n = p.n as usize;
-    let cell_seed = 20261018u64 ^ ((p.n as u64) << 40) ^ ((p.m as u64) << 32);
-    let cv = make_curve(&gf, mix(cell_seed, 1));
+    POPCH.with(|c| c.set(p.pop));
+    let cell_seed = 20261018u64 ^ ((p.n as u64) << 40) ^ ((p.m as u64) << 32) ^ if p.pop == 'S' { 1 << 24 } else { 0 };
+    let curve_seed = 20261018u64 ^ ((p.n as u64) << 40) ^ ((p.m as u64) << 32);
+    let cv = make_cell_curve(&gf, mix(curve_seed, 1));
     // ---- choose ell
     let ell0 = formula_ell(p.n, p.m);
     let mut ell = p.ell;
@@ -1422,10 +1450,10 @@ fn run_cell(p: &CellParams) {
             .collect();
         for &l in &cands {
             let half = p.pilot / 2;
-            let f1 = pos_fraction(&gf, &cv, 'G', l, p.m, half, mix(cell_seed, 7000 + l as u64));
-            let f2 = pos_fraction(&gf, &cv, 'G', l, p.m, half, mix(cell_seed, 8000 + l as u64));
+            let f1 = pos_fraction(&gf, &cv, 'G', l, p.m, half, mix(cell_seed, 7000 + l as u64), p.pop);
+            let f2 = pos_fraction(&gf, &cv, 'G', l, p.m, half, mix(cell_seed, 8000 + l as u64), p.pop);
             let f = (f1 + f2) / 2.0;
-            println!(
+            emitj!(
                 "{{\"kind\":\"pilot\",\"n\":{},\"m\":{},\"l\":{},\"formula_lambda\":{},\"pos_frac\":{}}}",
                 p.n,
                 p.m,
@@ -1440,7 +1468,7 @@ fn run_cell(p: &CellParams) {
         }
         ell = best.1;
     }
-    println!(
+    emitj!(
         "{{\"kind\":\"cell\",\"n\":{},\"m\":{},\"l\":{},\"a\":{},\"b\":{},\"seed\":{},\"per_base\":{},\"perms\":{},\"formula_l\":{},\"hw_clmul\":{}}}",
         p.n, p.m, ell, cv.a, cv.b, cell_seed, p.per_base, p.perms, ell0, gf.hw
     );
@@ -1453,6 +1481,7 @@ fn run_cell(p: &CellParams) {
     let mut base_of: Vec<usize> = Vec::with_capacity(total);
     let mut b_ref: Vec<bool> = Vec::with_capacity(total);
     let mut tr_x: Vec<u8> = vec![]; // Tr(x_R)
+    let mut tr_xi: Vec<u8> = vec![]; // Tr(1/x_R)
     let mut tr_x3: Vec<u8> = vec![]; // Tr(x_R^3)
     let mut tr_x5: Vec<u8> = vec![]; // Tr(x_R^5)
     let mut false_b = 0usize;
@@ -1469,7 +1498,7 @@ fn run_cell(p: &CellParams) {
         let mut npos = 0usize;
         let mut nb_ref = 0usize;
         for _ in 0..p.per_base {
-            let (xr, yr) = random_target(&gf, &cv, &mut trng);
+            let (xr, yr) = random_target(&gf, &cv, &mut trng, p.pop);
             let s0 = gf.snap();
             let lab = dec.label(xr, yr);
             let s1 = gf.snap().sub(s0);
@@ -1505,10 +1534,11 @@ fn run_cell(p: &CellParams) {
             let x2 = gf.sqr(xr);
             let x3 = gf.mul(x2, xr);
             let x5 = gf.mul(gf.sqr(x2), xr);
+            tr_xi.push(gf.tr(gf.inv(xr)) as u8);
             tr_x3.push(gf.tr(x3) as u8);
             tr_x5.push(gf.tr(x5) as u8);
         }
-        println!(
+        emitj!(
             "{{\"kind\":\"base\",\"n\":{},\"m\":{},\"l\":{},\"idx\":{},\"type\":\"{}\",\"classes\":{},\"tv0\":{},\"dset0\":{},\"dset1\":{},\"sumset0\":{},\"sumset1\":{},\"targets\":{},\"pos\":{},\"pos_frac\":{},\"b_refutes\":{}}}",
             p.n, p.m, ell, bi, kind, base.pts.len(), base.tv0, base.dset[0], base.dset[1], ss[0], ss[1],
             p.per_base, npos, jnum(npos as f64 / p.per_base as f64), nb_ref
@@ -1516,7 +1546,7 @@ fn run_cell(p: &CellParams) {
     }
     assert_eq!(xs.len(), total * d);
     let t_label = t0.elapsed().as_secs_f64();
-    println!(
+    emitj!(
         "{{\"kind\":\"label_summary\",\"n\":{},\"m\":{},\"l\":{},\"targets\":{},\"pos\":{},\"false_refutations_b\":{},\"seconds\":{}}}",
         p.n, p.m, ell, total, y.iter().map(|&v| v as usize).sum::<usize>(), false_b, jnum(t_label)
     );
@@ -1524,7 +1554,7 @@ fn run_cell(p: &CellParams) {
     let tn = total as f64;
     let dn = dec_neg_cnt.max(1) as f64;
     let dp = dec_pos_cnt.max(1) as f64;
-    println!(
+    emitj!(
         "{{\"kind\":\"cost\",\"n\":{},\"m\":{},\"l\":{},\"feat_mul\":{},\"feat_sqr\":{},\"feat_lin\":{},\"lr_model_ops\":{},\"gbt_model_ops\":{},\"dec_neg_field_ops\":{},\"dec_neg_lin\":{},\"dec_pos_field_ops\":{},\"dec_pos_lin\":{},\"neg_targets\":{},\"pos_targets\":{}}}",
         p.n, p.m, ell,
         jnum(feat_ops.mul as f64 / tn), jnum(feat_ops.sqr as f64 / tn), jnum(feat_ops.lin as f64 / tn),
@@ -1582,7 +1612,7 @@ fn run_cell(p: &CellParams) {
             let rmax = nr.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
             let amean = if na.is_empty() { f64::NAN } else { na.iter().sum::<f64>() / na.len() as f64 };
             let rmean = if nr.is_empty() { f64::NAN } else { nr.iter().sum::<f64>() / nr.len() as f64 };
-            println!(
+            emitj!(
                 "{{\"kind\":\"summary\",\"n\":{},\"m\":{},\"l\":{},\"model\":\"{}\",\"type\":\"{}\",\"neg\":{},\"pos\":{},\"rate_b\":{},\"rate_c\":{},\"fr\":{},\"delta\":{},\"delta_lo\":{},\"delta_hi\":{},\"rate_union\":{},\"roc0\":{},\"auc\":{},\"null_auc_max\":{},\"null_auc_mean\":{},\"null_roc0_max\":{},\"null_roc0_mean\":{},\"perms\":{}}}",
                 p.n, p.m, ell, mname, sname, st.neg, st.pos, jnum(rate_b), jnum(rate_c), st.fr,
                 jnum(dl), jnum(lo), jnum(hi), jnum(rate_u), jnum(roc0), jnum(st.auc),
@@ -1596,34 +1626,35 @@ fn run_cell(p: &CellParams) {
             for (i, name) in GROUP_NAMES.iter().enumerate() {
                 s.push_str(&format!(",\"splits_{}\":{}", name, g[i]));
             }
-            println!(
+            emitj!(
                 "{{\"kind\":\"gbt_splits\",\"n\":{},\"m\":{},\"l\":{},\"total\":{}{}}}",
                 p.n, p.m, ell, tot, s
             );
         }
         // ---- positive controls with this model
         let mut yc1 = vec![0u8; total]; // planted: Tr(x_R) = 0
-        let mut yc2 = vec![0u8; total]; // planted interaction: if Tr(x) = 0 then Tr(x^3) = 0 else Tr(x^5) = 0
+        let mut yc2 = vec![0u8; total]; // planted interaction: if Tr(1/x) = 0 then Tr(x^3) = 0 else Tr(x^5) = 0
         for i in 0..total {
-            yc1[i] = (tr_x[i] == 0) as u8;
-            yc2[i] = (if tr_x[i] == 0 { tr_x3[i] == 0 } else { tr_x5[i] == 0 }) as u8;
+            // planted label: Tr(x_R) = 0 on U; on S Tr(x_R) = Tr(a) is constant, so Tr(1/x_R) = 0
+            yc1[i] = (if p.pop == 'U' { tr_x[i] == 0 } else { tr_xi[i] == 0 }) as u8;
+            yc2[i] = (if tr_xi[i] == 0 { tr_x3[i] == 0 } else { tr_x5[i] == 0 }) as u8;
         }
         for (cname, yc) in [("planted_trace", &yc1), ("planted_selector", &yc2)] {
             let out = run_folds(model, &xs, d, &lay.groups, yc, &base_of, mix(cell_seed, 50000));
             let st = group_stats(&out, yc, &base_of, &|_| true, &b_ref);
             let neg = st.neg.max(1) as f64;
-            println!(
+            emitj!(
                 "{{\"kind\":\"control\",\"n\":{},\"m\":{},\"l\":{},\"model\":\"{}\",\"name\":\"{}\",\"neg\":{},\"pos\":{},\"auc\":{},\"fr\":{},\"rate_cal\":{},\"roc0\":{}}}",
                 p.n, p.m, ell, mname, cname, st.neg, st.pos, jnum(st.auc), st.fr,
                 jnum(st.ref_neg as f64 / neg), jnum(st.roc0_neg as f64 / neg)
             );
         }
-        println!(
+        emitj!(
             "{{\"kind\":\"timing\",\"n\":{},\"m\":{},\"model\":\"{}\",\"seconds\":{}}}",
             p.n, p.m, mname, jnum(tm.elapsed().as_secs_f64())
         );
     }
-    println!(
+    emitj!(
         "{{\"kind\":\"done\",\"n\":{},\"m\":{},\"l\":{},\"seconds\":{},\"rss_peak_kb\":{}}}",
         p.n, p.m, ell, jnum(t0.elapsed().as_secs_f64()), rss_peak_kb()
     );
@@ -1731,6 +1762,19 @@ fn selftest() -> usize {
             }
         }
         ok(&format!("curve a={}: delta(P) = Tr(x + a) is additive", cv.a), good, &mut fails);
+        // the population S (delta = 0) is exactly 2E(F) minus O
+        let doubles: std::collections::HashSet<Pt> = all_pts.iter().map(|&q| add(&gf, &cv, Some(q), Some(q))).collect();
+        let mut good = true;
+        for &(x, y) in &all_pts {
+            let in2e = doubles.contains(&Some((x, y)));
+            good &= in2e == (delta(&gf, &cv, x) == 0);
+        }
+        let mut srng = Rng(99);
+        for _ in 0..200 {
+            let (x, y) = random_target(&gf, &cv, &mut srng, 'S');
+            good &= doubles.contains(&Some((x, y)));
+        }
+        ok(&format!("curve a={}: {{delta = 0}} equals 2E(F), and the S-population sampler stays inside it", cv.a), good, &mut fails);
     }
     // 3. exact decomposer against brute force over every point of E(F_{2^11}) and E(F_{2^13})
     for &(n, ell, m) in &[(11u32, 4usize, 2usize), (11, 5, 2), (11, 3, 3), (11, 4, 3), (13, 5, 2), (13, 4, 3)] {
@@ -1795,13 +1839,14 @@ fn selftest() -> usize {
         let base = build_base(&gf, &cv, 'G', 5, &mut rng);
         let total = N_BASES * 400;
         let mut xs: Vec<f32> = vec![];
-        let (mut tx, mut t3, mut t5) = (vec![], vec![], vec![]);
+        let (mut tx, mut ti, mut t3, mut t5) = (vec![], vec![], vec![], vec![]);
         let mut base_of = vec![];
         for bi in 0..N_BASES {
             for _ in 0..400 {
-                let (x, _) = random_target(&gf, &cv, &mut rng);
+                let (x, _) = random_target(&gf, &cv, &mut rng, 'U');
                 features(&gf, &cv, &base, 2, x, &mut xs);
                 tx.push(gf.tr(x) as u8);
+                ti.push(gf.tr(gf.inv(x)) as u8);
                 let x2 = gf.sqr(x);
                 let x3 = gf.mul(x2, x);
                 let x5 = gf.mul(gf.sqr(x2), x);
@@ -1813,7 +1858,7 @@ fn selftest() -> usize {
         let d = lay.d;
         ok("feature vector length matches layout", xs.len() == total * d, &mut fails);
         let yp: Vec<u8> = tx.iter().map(|&t| (t == 0) as u8).collect();
-        let yx: Vec<u8> = (0..total).map(|i| (if tx[i] == 0 { t3[i] == 0 } else { t5[i] == 0 }) as u8).collect();
+        let yx: Vec<u8> = (0..total).map(|i| (if ti[i] == 0 { t3[i] == 0 } else { t5[i] == 0 }) as u8).collect();
         let mut yn = yp.clone();
         for i in (1..yn.len()).rev() {
             let j = rng.below(i as u64 + 1) as usize;
@@ -1912,38 +1957,44 @@ fn verdict(dir: &str) {
     for f in &files {
         let text = std::fs::read_to_string(f).unwrap();
         for l in text.lines() {
-            if l.starts_with("{\"kind\"") {
+            if l.starts_with("{\"pop\"") {
                 rows.push(parse_flat(l));
             }
         }
     }
     println!("verdict input: {} jsonl files, {} rows", files.len(), rows.len());
-    let mut cells: Vec<(u32, usize)> = rows
+    let mut cells: Vec<(String, u32, usize)> = rows
         .iter()
         .filter(|r| kv(r, "kind") == "done")
-        .map(|r| (kf(r, "n") as u32, kf(r, "m") as usize))
+        .map(|r| (kv(r, "pop").to_string(), kf(r, "n") as u32, kf(r, "m") as usize))
         .collect();
     cells.sort();
     cells.dedup();
-    println!("cells present: {}", cells.len());
-    let mut passes: std::collections::BTreeMap<(String, String), Vec<(u32, usize)>> = Default::default();
-    let mut any_valid = false;
-    let mut b_beats = 0;
-    let mut t_rows = 0;
+    println!("cell-populations present: {}", cells.len());
+    // per population: pass table, any valid control, trace-applicable rows
+    type Key = (String, String); // (model, type)
+    let mut passes: std::collections::BTreeMap<String, std::collections::BTreeMap<Key, Vec<(u32, usize)>>> = Default::default();
+    let mut any_valid: std::collections::BTreeMap<String, bool> = Default::default();
+    let mut t_rows: std::collections::BTreeMap<String, (u32, u32)> = Default::default(); // (rows, rows where c >= b - 0.05)
     let mut false_b_total = 0.0;
-    for &(n, m) in &cells {
-        let sel = |r: &Vec<(String, String)>, kind: &str| kv(r, "kind") == kind && kf(r, "n") as u32 == n && kf(r, "m") as usize == m;
-        let lsum = rows.iter().find(|r| sel(r, "label_summary"));
-        if let Some(ls) = lsum {
+    for (pop, n, m) in &cells {
+        let (n, m) = (*n, *m);
+        let sel = |r: &Vec<(String, String)>, kind: &str| {
+            kv(r, "kind") == kind && kv(r, "pop") == pop && kf(r, "n") as u32 == n && kf(r, "m") as usize == m
+        };
+        if let Some(ls) = rows.iter().find(|r| sel(r, "label_summary")) {
             false_b_total += kf(ls, "false_refutations_b");
-            println!("cell n={n} m={m} l={}: targets {} positives {} false refutations of arm b {}", kv(ls, "l"), kv(ls, "targets"), kv(ls, "pos"), kv(ls, "false_refutations_b"));
+            println!(
+                "cell pop={pop} n={n} m={m} l={}: targets {} positives {} false refutations of arm b {}",
+                kv(ls, "l"), kv(ls, "targets"), kv(ls, "pos"), kv(ls, "false_refutations_b")
+            );
         }
         for model in ["lr", "gbt"] {
             let ctl = rows.iter().find(|r| sel(r, "control") && kv(r, "model") == model && kv(r, "name") == "planted_trace");
             let ctl_ok = ctl.map_or(false, |c| kf(c, "auc") >= 0.99 && kf(c, "roc0") >= 0.9);
             println!("  control planted_trace {model}: {}", if ctl_ok { "PASS" } else { "FAIL" });
             if ctl_ok {
-                any_valid = true;
+                any_valid.insert(pop.clone(), true);
             }
             for ty in ["ALL", "T", "G", "P"] {
                 if let Some(s) = rows.iter().find(|r| sel(r, "summary") && kv(r, "model") == model && kv(r, "type") == ty) {
@@ -1961,18 +2012,19 @@ fn verdict(dir: &str) {
                         if pass { "CELL PASS" } else { "no" }
                     );
                     if pass {
-                        passes.entry((model.to_string(), ty.to_string())).or_default().push((n, m));
+                        passes.entry(pop.clone()).or_default().entry((model.to_string(), ty.to_string())).or_default().push((n, m));
                     }
-                    if ty == "T" {
-                        t_rows += 1;
+                    if ty == "T" && kf(s, "rate_b") > 0.0 {
+                        let e = t_rows.entry(pop.clone()).or_insert((0, 0));
+                        e.0 += 1;
                         if kf(s, "rate_c") >= kf(s, "rate_b") - 0.05 {
-                            b_beats += 1;
+                            e.1 += 1;
                         }
                     }
                 }
             }
         }
-        // net work at three prices of the unpriced word operations
+        // net work at three prices of the unpriced word operations (gbt, all bases)
         if let (Some(c), Some(s)) = (
             rows.iter().find(|r| sel(r, "cost")),
             rows.iter().find(|r| sel(r, "summary") && kv(r, "model") == "gbt" && kv(r, "type") == "ALL"),
@@ -1987,37 +2039,54 @@ fn verdict(dir: &str) {
                 let mean_dec = negfrac * dneg + (1.0 - negfrac) * dpos;
                 let saved = negfrac * kf(s, "rate_c") * dneg;
                 println!(
-                    "  cost n={n} m={m} w={w}: gbt filter {:.1} per target, decomposer {:.1} per target, saved by refutation {:.1} -> net {:+.4} of decomposer work",
+                    "  cost pop={pop} n={n} m={m} w={w}: gbt filter {:.1} per target, decomposer {:.1} per target, saved by refutation {:.1} -> net {:+.4} of decomposer work",
                     filt, mean_dec, saved, (saved - filt) / mean_dec
                 );
             }
         }
     }
-    println!("false refutations of arm b over all cells: {false_b_total}");
-    let mut winners: Vec<String> = vec![];
-    let mut single: Vec<String> = vec![];
-    for ((model, ty), v) in &passes {
-        let mut cs = v.clone();
-        cs.sort();
-        cs.dedup();
-        if cs.len() >= 2 {
-            winners.push(format!("{model}/{ty} in {} cells", cs.len()));
-        } else {
-            single.push(format!("{model}/{ty} in {:?}", cs));
-        }
-    }
-    let v = if !any_valid {
-        "INCONCLUSIVE (primitive): the planted-label positive control failed in every cell and model, so the instrument cannot see an effect".to_string()
-    } else if !winners.is_empty() {
-        format!("ADVANCES (primitive): learned filter beats the trace filter by >= 5 points at zero false refutations, null excluded, in >= 2 cells: {}", winners.join("; "))
-    } else if !single.is_empty() {
-        format!("INCONCLUSIVE (primitive): the frozen rule is met in exactly one cell per arm, which the protocol does not accept as replicated: {}", single.join("; "))
-    } else if t_rows > 0 && b_beats == 0 {
-        "REGRESSES (primitive): on the trace-applicable bases the learned filter alone refutes more than 5 points fewer targets than the trace filter in every cell, and gains nowhere".to_string()
-    } else {
-        "MATCHES (primitive): no cell and base type gives the learned filter a refutation rate 5 points above the trace filter at zero false refutations with the null band excluded".to_string()
+    println!("false refutations of arm b over all cell-populations: {false_b_total}");
+    let mut per_pop: Vec<(String, u8, String)> = vec![]; // (pop, rank, text); rank 3 best
+    let pops: Vec<String> = {
+        let mut v: Vec<String> = cells.iter().map(|c| c.0.clone()).collect();
+        v.dedup();
+        v
     };
-    println!("VERDICT {v}");
+    for pop in &pops {
+        let mut winners: Vec<String> = vec![];
+        let mut single: Vec<String> = vec![];
+        if let Some(pm) = passes.get(pop) {
+            for ((model, ty), v) in pm {
+                let mut cs = v.clone();
+                cs.sort();
+                cs.dedup();
+                if cs.len() >= 2 {
+                    winners.push(format!("{model}/{ty} in {} cells", cs.len()));
+                } else {
+                    single.push(format!("{model}/{ty} in {:?}", cs));
+                }
+            }
+        }
+        let tr = t_rows.get(pop).copied().unwrap_or((0, 0));
+        let (rank, text) = if !any_valid.get(pop).copied().unwrap_or(false) {
+            (1, "INCONCLUSIVE (primitive): the planted-label positive control failed in every cell and model, so the instrument cannot see an effect".to_string())
+        } else if !winners.is_empty() {
+            (4, format!("ADVANCES (primitive): the learned filter beats the trace filter by >= 5 points at zero false refutations, null excluded, in >= 2 cells: {}", winners.join("; ")))
+        } else if !single.is_empty() {
+            (2, format!("INCONCLUSIVE (primitive): the frozen rule is met in exactly one cell per arm, which the protocol does not accept as replicated: {}", single.join("; ")))
+        } else if tr.0 > 0 && tr.1 == 0 {
+            (0, "REGRESSES (primitive): on the trace-applicable bases the learned filter alone refutes more than 5 points fewer targets than the trace filter in every cell, and gains nowhere".to_string())
+        } else {
+            (3, "MATCHES (primitive): no cell and base type gives the learned filter a refutation rate 5 points above the trace filter at zero false refutations with the null band excluded".to_string())
+        };
+        println!("VERDICT population {pop}: {text}");
+        per_pop.push((pop.clone(), rank, text));
+    }
+    // overall: ADVANCES if any population advances, else INCONCLUSIVE if any, else MATCHES if any, else REGRESSES
+    let order = |r: u8| match r { 4 => 5, 2 => 4, 3 => 3, 1 => 2, _ => 1 };
+    if let Some(best) = per_pop.iter().max_by_key(|p| order(p.1)) {
+        println!("VERDICT OVERALL (population {}): {}", best.0, best.2);
+    }
 }
 
 fn main() {
@@ -2039,10 +2108,10 @@ fn main() {
                 ell: args.num("--l", 0usize),
                 per_base: args.num("--per-base", 2000usize),
                 perms: args.num("--perms", 10usize),
-                seed: args.num("--seed", 0u64),
                 pilot: args.num("--pilot", 400usize),
+                pop: args.flag("--pop").map_or('U', |s| s.chars().next().unwrap()),
             };
-            let _ = p.seed;
+            assert!(p.pop == 'U' || p.pop == 'S', "--pop U|S");
             run_cell(&p);
         }
         Some("verdict") => verdict(&args.flag("--dir").expect("--dir")),
