@@ -17,6 +17,9 @@ use serde_json::json;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::time::Instant;
 
+#[path = "normal.rs"]
+mod normal;
+
 const TASK_ID: &str = "TASK-KIC-SAT-RHO-CROSSOVER-20260909";
 
 #[derive(Clone)]
@@ -33,6 +36,7 @@ struct Base {
 enum PairMode {
     Full,
     SignedQuotient,
+    NormalQuotient,
     SignedExpanded,
 }
 
@@ -238,6 +242,7 @@ impl PairMode {
         match value {
             "full" => Self::Full,
             "signed_quotient" => Self::SignedQuotient,
+            "normal_quotient" => Self::NormalQuotient,
             "signed_expanded" => Self::SignedExpanded,
             _ => panic!("unknown pair-index mode {value}"),
         }
@@ -247,6 +252,7 @@ impl PairMode {
         match self {
             Self::Full => "full",
             Self::SignedQuotient => "signed_quotient",
+            Self::NormalQuotient => "normal_quotient",
             Self::SignedExpanded => "signed_expanded",
         }
     }
@@ -1773,6 +1779,33 @@ fn canonical_signed_key(
     (best_key, best_multiplier, maps)
 }
 
+fn n53_normal_basis(curve: &KoblitzCurve) -> &'static normal::NormalBasis53 {
+    static BASIS: std::sync::OnceLock<normal::NormalBasis53> = std::sync::OnceLock::new();
+    assert_eq!(curve.n, 53, "normal quotient mode requires degree 53");
+    BASIS.get_or_init(|| normal::NormalBasis53::new(|x| square_raw(curve, x)))
+}
+
+// The key is x-only and consequently identifies both signs.  Keep the
+// transformed y in the witness so lookup can choose the correct sign.
+fn canonical_normal_key(
+    curve: &KoblitzCurve,
+    key: (u64, u64),
+    modulus: u64,
+    lambda: u64,
+) -> ((u64, u64), u64, u64, usize) {
+    if key.0 == 0 {
+        return ((0, 0), 1, 0, 0);
+    }
+    let basis = n53_normal_basis(curve);
+    let (normal_x, shift) = basis.canonical_x(key.0 - 1);
+    let mut image_y = key.1;
+    for _ in 0..shift {
+        image_y = square_raw(curve, image_y);
+    }
+    let multiplier = modpow(lambda, shift as u64, modulus);
+    ((normal_x + 1, 0), multiplier, image_y, shift)
+}
+
 #[derive(Default)]
 struct Echelon {
     pivots: Vec<Option<Vec<u64>>>,
@@ -3121,6 +3154,35 @@ fn lookup_pair_witness(
             });
             (witness, maps)
         }
+        PairMode::NormalQuotient => {
+            let (key, mut multiplier, image_y, maps) =
+                canonical_normal_key(curve, rest_key, modulus, lambda);
+            let witness = quotient_pairs.get(key).map(|pair| {
+                if pair.image_y != image_y {
+                    let canonical_x = n53_normal_basis(curve).to_poly(key.0 - 1);
+                    assert_eq!(
+                        pair.image_y,
+                        image_y ^ canonical_x,
+                        "normal-x key must represent the opposite sign"
+                    );
+                    multiplier = modulus - multiplier;
+                }
+                let stored = pair.labels();
+                let inverse = modpow(multiplier, modulus - 2, modulus);
+                let left_label = (
+                    stored[0].0,
+                    ((stored[0].1 as u128 * inverse as u128) % modulus as u128) as u64,
+                );
+                let middle_label = (
+                    stored[1].0,
+                    ((stored[1].1 as u128 * inverse as u128) % modulus as u128) as u64,
+                );
+                let labels = [left_label, middle_label, base.point_labels[right]];
+                let indices = labels.map(|label| label_to_index[&label]);
+                (indices, labels)
+            });
+            (witness, maps)
+        }
         PairMode::SignedExpanded => {
             let witness = lookup_signed_expanded_pair(
                 rest_key,
@@ -3637,7 +3699,7 @@ pub(super) fn run() {
     let arguments: Vec<_> = std::env::args().collect();
     assert!(
         (6..=11).contains(&arguments.len()),
-        "usage: <n> <a> <eta_numerator> <eta_denominator> <seed> [full|signed_quotient|signed_expanded] [independent|coefficient_walk|partition_walk] [pointwise|batch_inverse_*|fiber_batch_*|pair_pair_*] [batch_fixtures] [explicit_fixture_scalar|hash:public_seed]"
+        "usage: <n> <a> <eta_numerator> <eta_denominator> <seed> [full|signed_quotient|normal_quotient|signed_expanded] [independent|coefficient_walk|partition_walk] [pointwise|batch_inverse_*|fiber_batch_*|pair_pair_*] [batch_fixtures] [explicit_fixture_scalar|hash:public_seed]"
     );
     let n: u32 = arguments[1].parse().unwrap();
     let a: u8 = arguments[2].parse().unwrap();
@@ -3710,6 +3772,13 @@ pub(super) fn run() {
 
     let curve_setup_started = Instant::now();
     let curve = KoblitzCurve::new(a, n).expect("frozen exact rung must construct");
+    if pair_mode == PairMode::NormalQuotient {
+        assert_eq!(
+            (a, n),
+            (0, 53),
+            "normal quotient mode requires the registered k0n53 curve"
+        );
+    }
     let curve_setup_ms = curve_setup_started.elapsed().as_secs_f64() * 1000.0;
     let setup_started = Instant::now();
     let modulus = curve.subgroup_order.to_u64().unwrap();
@@ -3747,7 +3816,7 @@ pub(super) fn run() {
     let mut full_pairs = HashMap::with_capacity(base.points.len() * (base.points.len() + 1) / 2);
     let quotient_capacity = match pair_mode {
         PairMode::Full => 0,
-        PairMode::SignedQuotient => pair_types * base.signed_size,
+        PairMode::SignedQuotient | PairMode::NormalQuotient => pair_types * base.signed_size,
         PairMode::SignedExpanded => pair_types * base.signed_size * (base.signed_size / 2),
     };
     let mut quotient_pairs = CompactPairTable::with_capacity(
@@ -3787,7 +3856,7 @@ pub(super) fn run() {
                 }
             }
         }
-        PairMode::SignedQuotient | PairMode::SignedExpanded => {
+        PairMode::SignedQuotient | PairMode::NormalQuotient | PairMode::SignedExpanded => {
             let automorphisms: Vec<_> = signed_scalars(lambda, modulus, n).into_iter().collect();
             assert_eq!(automorphisms.len(), base.signed_size);
             let diagonal_relatives: Vec<_> = automorphisms
@@ -3877,9 +3946,17 @@ pub(super) fn run() {
                 for ((left_column, right_column, relative, left, right), key) in
                     jobs.into_iter().zip(sum_keys)
                 {
-                    if pair_mode == PairMode::SignedQuotient {
-                        let (canonical, multiplier, maps) =
-                            canonical_signed_key(&curve, key, modulus, lambda);
+                    if pair_mode == PairMode::SignedQuotient
+                        || pair_mode == PairMode::NormalQuotient
+                    {
+                        let (canonical, multiplier, image_y, maps) =
+                            if pair_mode == PairMode::SignedQuotient {
+                                let (canonical, multiplier, maps) =
+                                    canonical_signed_key(&curve, key, modulus, lambda);
+                                (canonical, multiplier, canonical.1, maps)
+                            } else {
+                                canonical_normal_key(&curve, key, modulus, lambda)
+                            };
                         pair_canonicalization_maps += maps;
                         quotient_pairs.insert(
                             canonical,
@@ -3892,7 +3969,7 @@ pub(super) fn run() {
                                             as u64,
                                     ),
                                 ],
-                                canonical.1,
+                                image_y,
                             ),
                         );
                     } else {
@@ -3923,7 +4000,9 @@ pub(super) fn run() {
     }
     let support_index_entries = match pair_mode {
         PairMode::Full => full_pairs.len(),
-        PairMode::SignedQuotient | PairMode::SignedExpanded => quotient_pairs.len(),
+        PairMode::SignedQuotient | PairMode::NormalQuotient | PairMode::SignedExpanded => {
+            quotient_pairs.len()
+        }
     };
     let pair_ms = pair_started.elapsed().as_secs_f64() * 1000.0;
     let setup_ms = setup_started.elapsed().as_secs_f64() * 1000.0;
@@ -4861,7 +4940,7 @@ pub(super) fn run() {
                 },
                 "reverse_incremental_rank_crosschecks":reverse_incremental_rank_crosschecks,
                 "terminal_dense_rank_crosschecks":terminal_dense_rank_crosschecks,
-                "variant":match pair_mode { PairMode::Full=>"V2_full_pair_support_index", PairMode::SignedQuotient=>"V2_signed_quotient_pair_support_index", PairMode::SignedExpanded=>"V2_signed_expanded_pair_support_index" },
+                "variant":match pair_mode { PairMode::Full=>"V2_full_pair_support_index", PairMode::SignedQuotient=>"V2_signed_quotient_pair_support_index", PairMode::NormalQuotient=>"V2_normal_quotient_pair_support_index", PairMode::SignedExpanded=>"V2_signed_expanded_pair_support_index" },
                 "summary_only_timing":summary_only,
                 "relation_hashes":summary_only.then_some(&relation_hashes),
                 "relation_receipts_emitted":!summary_only,
@@ -4951,6 +5030,320 @@ pub(super) fn run() {
 #[cfg(test)]
 mod packed_tests {
     use super::*;
+
+    #[test]
+    fn n53_normal_x_key_preserves_pair_sum_orbits_and_witnesses() {
+        let curve = KoblitzCurve::new(0, 53).unwrap();
+        let normal = normal::NormalBasis53::new(|x| square_raw(&curve, x));
+        assert!(normal.beta > 0);
+        let mask = (1u64 << 53) - 1;
+        let mut state = 0x9e37_79b9_7f4a_7c15u64;
+        for _ in 0..256 {
+            state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+            let x = state & mask;
+            let normal_x = normal.to_normal(x);
+            assert_eq!(normal.to_poly(normal_x), x);
+            assert_eq!(
+                normal.to_normal(square_raw(&curve, x)),
+                normal::NormalBasis53::rotate(normal_x, 1)
+            );
+            let canonical = normal.canonical_x(x).0;
+            for shift in 0..53 {
+                assert_eq!(
+                    normal
+                        .canonical_x(normal.to_poly(normal::NormalBasis53::rotate(normal_x, shift)))
+                        .0,
+                    canonical
+                );
+            }
+        }
+
+        // Each row retains its complete point witness.  The x key merges
+        // both signs, so check the transported full point after lookup.
+        let generator = to_raw_point(curve.generator()).unwrap();
+        let mut points = Vec::new();
+        for scalar in 1..=24u64 {
+            points.push(raw_scalar_point(&curve, Some(generator), scalar).unwrap());
+        }
+        let mut rows: HashMap<u64, Vec<((u64, u64), (u64, u64), (u64, u64))>> = HashMap::new();
+        let mut signed_to_normal = HashMap::new();
+        let mut normal_to_signed = HashMap::new();
+        let modulus = curve.subgroup_order.to_u64().unwrap();
+        let lambda = curve.lambda.to_u64().unwrap();
+        for (i, &left) in points.iter().enumerate() {
+            for (offset, &right) in points[i..].iter().enumerate() {
+                let sum = raw_add_point(&curve, Some(left), Some(right)).unwrap();
+                let reference = to_raw_point(&curve.mul(
+                    curve.generator(),
+                    &BigUint::from((2 * i + offset + 2) as u64),
+                ))
+                .unwrap();
+                assert_eq!(sum, reference, "independent scalar witness");
+                let normal_key = normal.canonical_x(sum.0).0;
+                let signed_key =
+                    canonical_signed_key(&curve, (sum.0 + 1, sum.1), modulus, lambda).0;
+                assert!(signed_to_normal
+                    .insert(signed_key, normal_key)
+                    .map_or(true, |old| old == normal_key));
+                assert!(normal_to_signed
+                    .insert(normal_key, signed_key)
+                    .map_or(true, |old| old == signed_key));
+                rows.entry(normal_key).or_default().push((left, right, sum));
+            }
+        }
+        assert_eq!(signed_to_normal.len(), normal_to_signed.len());
+        for (&key, entries) in &rows {
+            for &(left, right, sum) in entries {
+                assert_eq!(normal.canonical_x(sum.0).0, key);
+                for shift in [0, 1, 7, 26, 52] {
+                    let mut transported = sum;
+                    for _ in 0..shift {
+                        transported = (
+                            square_raw(&curve, transported.0),
+                            square_raw(&curve, transported.1),
+                        );
+                    }
+                    assert_eq!(normal.canonical_x(transported.0).0, key);
+                    let witness = raw_add_point(&curve, Some(left), Some(right)).unwrap();
+                    let mut witness_forward = witness;
+                    for _ in 0..shift {
+                        witness_forward = (
+                            square_raw(&curve, witness_forward.0),
+                            square_raw(&curve, witness_forward.1),
+                        );
+                    }
+                    assert_eq!(witness_forward, transported);
+                    assert_eq!(
+                        (transported.0, transported.1 ^ transported.0),
+                        raw_neg_point(Some(transported)).unwrap()
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn n53_normal_quotient_lookup_recovers_exact_one_orbit_pair_support() {
+        let curve = KoblitzCurve::new(0, 53).unwrap();
+        let base = point_defined_base(&curve, 1);
+        let modulus = curve.subgroup_order.to_u64().unwrap();
+        let lambda = curve.lambda.to_u64().unwrap();
+        let labels: HashMap<_, _> = base
+            .point_labels
+            .iter()
+            .copied()
+            .enumerate()
+            .map(|(index, label)| (label, index))
+            .collect();
+        let left = labels[&(0, 1)];
+        let mut pairs =
+            CompactPairTable::with_capacity(base.signed_size, false, (1usize << 53) + 1);
+        for &relative in &signed_scalars(lambda, modulus, 53) {
+            let right = labels[&(0, relative)];
+            let sum = curve.add(&base.points[left], &base.points[right]);
+            let (key, multiplier, image_y, _) =
+                canonical_normal_key(&curve, compact_point_key(&sum), modulus, lambda);
+            pairs.insert(
+                key,
+                QuotientPairWitness::new(
+                    [
+                        (0, multiplier),
+                        (
+                            0,
+                            ((relative as u128 * multiplier as u128) % modulus as u128) as u64,
+                        ),
+                    ],
+                    image_y,
+                ),
+            );
+        }
+        let empty_full = HashMap::new();
+        for left_index in 0..base.points.len() {
+            for right_index in 0..base.points.len() {
+                let rest = curve.add(&base.points[left_index], &base.points[right_index]);
+                let (witness, _) = lookup_pair_witness(
+                    PairMode::NormalQuotient,
+                    &curve,
+                    compact_point_key(&rest),
+                    0,
+                    modulus,
+                    lambda,
+                    &base,
+                    &empty_full,
+                    &pairs,
+                    &labels,
+                );
+                let (indices, _) =
+                    witness.expect("normal-x pair key preserves complete signed orbit support");
+                assert_eq!(
+                    curve.add(&base.points[indices[0]], &base.points[indices[1]]),
+                    rest
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn n53_normal_quotient_matches_75_column_signed_support_panel() {
+        let curve = KoblitzCurve::new(0, 53).unwrap();
+        let base = point_defined_base(&curve, 75);
+        let modulus = curve.subgroup_order.to_u64().unwrap();
+        let lambda = curve.lambda.to_u64().unwrap();
+        let labels: HashMap<_, _> = base
+            .point_labels
+            .iter()
+            .copied()
+            .enumerate()
+            .map(|(index, label)| (label, index))
+            .collect();
+        let automorphisms: Vec<_> = signed_scalars(lambda, modulus, 53).into_iter().collect();
+        let diagonal_relatives: Vec<_> = automorphisms
+            .iter()
+            .copied()
+            .filter(|&value| value <= modpow(value, modulus - 2, modulus))
+            .collect();
+        let pair_types = 75 * 76 / 2;
+        let capacity = pair_types * base.signed_size;
+        let mut signed_pairs = CompactPairTable::with_capacity(capacity, false, (1usize << 53) + 1);
+        let mut normal_pairs = CompactPairTable::with_capacity(capacity, false, (1usize << 53) + 1);
+        let mut jobs = Vec::new();
+        let mut operands = Vec::new();
+        for left_column in 0..75 {
+            let left = labels[&(left_column, 1)];
+            for right_column in left_column..75 {
+                let relatives = if left_column == right_column {
+                    &diagonal_relatives
+                } else {
+                    &automorphisms
+                };
+                for &relative in relatives {
+                    let right = labels[&(right_column, relative)];
+                    jobs.push((left_column, right_column, relative));
+                    operands.push((
+                        to_raw_point(&base.points[left]),
+                        to_raw_point(&base.points[right]),
+                    ));
+                }
+            }
+        }
+        let sums = batch_raw_add_keys_selected(&curve, &operands, false);
+        assert_eq!(sums.len(), jobs.len());
+        let mut signed_to_normal = HashMap::new();
+        let mut normal_to_signed = HashMap::new();
+        for ((left_column, right_column, relative), sum) in jobs.into_iter().zip(sums) {
+            let (signed_key, signed_multiplier, _) =
+                canonical_signed_key(&curve, sum, modulus, lambda);
+            let (normal_key, normal_multiplier, image_y, _) =
+                canonical_normal_key(&curve, sum, modulus, lambda);
+            assert!(signed_to_normal
+                .insert(signed_key, normal_key)
+                .map_or(true, |old| old == normal_key));
+            assert!(normal_to_signed
+                .insert(normal_key, signed_key)
+                .map_or(true, |old| old == signed_key));
+            signed_pairs.insert(
+                signed_key,
+                QuotientPairWitness::new(
+                    [
+                        (left_column, signed_multiplier),
+                        (
+                            right_column,
+                            ((relative as u128 * signed_multiplier as u128) % modulus as u128)
+                                as u64,
+                        ),
+                    ],
+                    signed_key.1,
+                ),
+            );
+            normal_pairs.insert(
+                normal_key,
+                QuotientPairWitness::new(
+                    [
+                        (left_column, normal_multiplier),
+                        (
+                            right_column,
+                            ((relative as u128 * normal_multiplier as u128) % modulus as u128)
+                                as u64,
+                        ),
+                    ],
+                    image_y,
+                ),
+            );
+        }
+        assert_eq!(signed_pairs.len(), normal_pairs.len());
+        assert_eq!(signed_to_normal.len(), normal_to_signed.len());
+        assert_eq!(signed_pairs.len(), signed_to_normal.len());
+
+        let mut panel = vec![BinaryPoint::Infinity];
+        let zero = F2mElement::from_biguint(&BigUint::from(0u8), 53);
+        let torsion = points_with_x(&curve.curve, &zero)
+            .into_iter()
+            .next()
+            .unwrap();
+        assert_eq!(curve.add(&torsion, &torsion), BinaryPoint::Infinity);
+        assert_eq!(curve.mul(&torsion, &curve.cofactor), BinaryPoint::Infinity);
+        panel.push(torsion);
+        let mut state = 0x7c15_9e37_79b9_4a7fu64;
+        for case in 0..256usize {
+            state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+            let left = (state as usize) % base.points.len();
+            state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+            let right = if case % 16 == 0 {
+                left
+            } else {
+                (state as usize) % base.points.len()
+            };
+            let sum = curve.add(&base.points[left], &base.points[right]);
+            panel.push(sum.clone());
+            panel.push(point_neg(&sum));
+        }
+        for scalar in 1..=128u64 {
+            panel.push(curve.mul(curve.generator(), &BigUint::from(scalar)));
+        }
+        let empty_full = HashMap::new();
+        for rest in panel {
+            let key = compact_point_key(&rest);
+            let (signed, _) = lookup_pair_witness(
+                PairMode::SignedQuotient,
+                &curve,
+                key,
+                0,
+                modulus,
+                lambda,
+                &base,
+                &empty_full,
+                &signed_pairs,
+                &labels,
+            );
+            let (normal, _) = lookup_pair_witness(
+                PairMode::NormalQuotient,
+                &curve,
+                key,
+                0,
+                modulus,
+                lambda,
+                &base,
+                &empty_full,
+                &normal_pairs,
+                &labels,
+            );
+            assert_eq!(signed.is_some(), normal.is_some(), "same point support");
+            if let (Some((signed_indices, _)), Some((normal_indices, _))) = (signed, normal) {
+                assert_eq!(
+                    signed_indices[..2],
+                    normal_indices[..2],
+                    "same first-hit witness"
+                );
+                assert_eq!(
+                    curve.add(
+                        &base.points[normal_indices[0]],
+                        &base.points[normal_indices[1]]
+                    ),
+                    rest
+                );
+            }
+        }
+    }
 
     #[test]
     fn packed_field_and_group_operations_match_reference() {
