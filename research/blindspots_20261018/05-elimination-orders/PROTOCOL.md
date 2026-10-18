@@ -396,6 +396,27 @@ or cell it says so.
     from the design text and not tuned to those readings, except that the
     weighting of `wdeg` was chosen by the link multiplicity before any run.
 
+11. **Repair pass (2026-10-18): card defect, no instrument change.** The first run's
+    cards 02 to 06 wrote `--arms` as a YAML flow list, which split on the commas, so
+    `task_card.py` passed each arm name as a separate argv item and the instrument (which reads
+    only the token after `--arms`) ran `grevlex` alone in those commands. The instrument is
+    not at fault and is **unchanged** (sha256 `f21a7613...e82adf`, as bound in the first-run
+    cards; `smoke-r2.sh` rebuilds it, runs every arm of the four full cells once on target 0
+    with the arm list as one argument, and checks that grevlex touches equal the first run's).
+    Nothing in this repair changes the question, arms, cells, metric, caps or decision rule.
+    Revision cards `card-02-r2` .. `card-06g-r2` (card ids suffixed `-r2`) run exactly the arms
+    that did not run, with the list quoted as one string and the same targets and per-job caps:
+    the 14 (cells with reverse arms) or 12 (`c13-3-4`) non-grevlex, non-`blkLI` arms. They do not
+    re-run `grevlex` (the first-run records are deterministic and are the pairing baseline) nor
+    `blkLI` (single-arm commands, which ran as written). Card 06 is split by target into six
+    cards of under 8 minutes each (targets 0,1,2,4,6 together; the three targets 3, 5, 7 on which the
+    first-run grevlex needed about 33 s, each in two arm groups) because the arms are about 30 s
+    per target and arm on those targets. Outputs go to `raw/card-NN-r2-*` and receipts to
+    `raw/receipt-card-NN-r2.json`; no first-run file is overwritten. Cards 01 and 07 to 15
+    completed as written and are not re-run. The `-r2` caps per card are those of the frozen
+    plan; the run limits of the split cards are wall-time limits chosen from a smoke timing and
+    do not alter any per-job cap.
+
 ## Outputs
 
 `PROTOCOL.md` (this file), `draws.tsv`, `card-NN.yaml` (the frozen cards, run in
