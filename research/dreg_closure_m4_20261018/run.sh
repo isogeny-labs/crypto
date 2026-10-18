@@ -24,7 +24,7 @@ measure)
     for k in $(grep -v '"satisfiable"' "$f" | grep -o '"draw":[0-9]*' | cut -d: -f2); do out="$RUNS/m$m-$n-$ell.d$k.jsonl"
       if [ -s "$out" ]; then log "m$m-$n-$ell d$k: done already"; continue; fi
       log "m$m-$n-$ell d$k: start"; start=$(date +%s)
-      (cd "$REPO" && prlimit --as=14000000000 timeout 10800 "$CLOSURE" --to 4 --max-cols 200000 --draw "$k" "$f") > "$out" 2> "$RUNS/m$m-$n-$ell.d$k.log"
+      (cd "$REPO" && prlimit --as=13000000000 timeout 10800 "$CLOSURE" --to 4 --max-cols 200000 --draw "$k" "$f") > "$out" 2> "$RUNS/m$m-$n-$ell.d$k.log"
       log "m$m-$n-$ell d$k: exit $? after $(( $(date +%s) - start )) s"
     done
   done ;;

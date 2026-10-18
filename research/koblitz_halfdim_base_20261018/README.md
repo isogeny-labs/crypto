@@ -6,7 +6,7 @@ The scaling note (`research/notes/ecc2k130/RESEARCH_KOBLITZ_SCALING_TARGET.md`,
 factor base of dimension near `n/2` makes `m = 2` summands enough, so the
 `(m − 2)·n` chaining unknowns disappear and the binding constraint moves
 to materialising `2^{dim}` points. This session measures that trade on
-``icv1-f2m31-tm90707-c95f16f5` (K_0 over F_2^31)` (`icv1-f2m31-tm90707-c95f16f5`, `r = 1 439 393 ≈ 2^{20.46}`,
+`icv1-f2m31-tm90707-c95f16f5` (K_0 over F_2^31; `r = 1 439 393 ≈ 2^{20.46}`,
 `A = 62`) with every phase charged, against the strong signed-Frobenius
 rho reference and its A/A control. Counted group operations; a measurement,
 not a performance claim; no `S` on any leaderboard changes.

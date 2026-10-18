@@ -16,6 +16,10 @@ This note settles which of them the existing bounds already cover.
 
 ## 1. The basic-strategy reach, reproduced exactly
 
+![reach vs need](reach_graph.svg)
+
+`reach_graph.py` draws the table below with the W10 ceilings and the need per `m` (`reach_graph.svg/.png`, values in `reach_graph.diagram.json`).
+
 `reach.py` computes the Jochemsz–May basic-strategy reach on the monomial
 box `[0, d]^m` of `S_{m+1}(x_1, …, x_m, x_R)` with `x_R` known and every
 `|x_i| ≤ p^δ`, in exact rationals, and its closed-form limit:
@@ -61,9 +65,9 @@ greedily removes the row whose removal raises `δ` most, until none does.
 |--:|--:|--:|--:|--:|--:|
 | 1 | 9 | 0.0396 | 1/18 = 0.0556 | 0.0396 | 0 |
 | 2 | 25 | 0.0865 | 1/10 = 0.1000 | 0.0865 | 0 |
-| 3 | 49 | `level3.txt` | 0.1190 | `level3.txt` | |
+| 3 | 49 | 0.1080 | 0.1190 | 0.1080 | 0 |
 
-No single-row deletion improves the bound at either level: the full box
+No single-row deletion improves the bound at any of the three levels (`level3.txt`: 49 rows, 0 dropped): the full box
 lattice is a local optimum under row removal, the box-closure optimality
 W10 proves for the triangular family seen one step outside it. The
 finite-`p` values sit below the asymptotic ones by the `√dim` and

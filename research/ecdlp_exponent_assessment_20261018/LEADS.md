@@ -104,7 +104,7 @@ low-probability and bounded in cost, which is why they rank first.
 - **Effort.** Days per variant at `p ≈ 2^{32}`; the closing bound is the
   cheaper outcome.
 
-### L4. The PKM tower at `m = 3, N = 21` (exponent decision for the auxiliary-curve line; blocked on a 256 GB host or a disk-backed reducer)
+### L4. The PKM tower at `m = 3, N = 21` (exponent decision for the auxiliary-curve line; a 6 h wall on the present host, not a bigger host: the earlier stop was the 45-minute cap at 2.6 GB)
 
 - **Mechanism.** Whether the Kummer-tower solving degree stays bounded at
   `m = 3` decides the P-192 auxiliary-curve search gated behind it
@@ -115,22 +115,32 @@ low-probability and bounded in cost, which is why they rank first.
   degrees agree where measured (`research/pkm_dickson_torus_20261015`).
 - **Against.** `m = 4, N = 20` answered negative (`D ≥ 8`; the line reads
   6, 7, 7, ≥ 8 at `N = 8, 12, 16, 20`). The `m = 3, N = 21` cell is
-  inconclusive at `D ≥ 7`. The exponent-space structure of the tower is
+  inconclusive at `D ≥ 7`. Correction (2026-10-18): that cell did not hit
+  memory. `ic_next10_20261014/03-pkm-degree/runs/*.mem` shows the three
+  `m = 3`, `N ≥ 18` runs stopped by `timeout 2700` (exit 124) at 1.5–2.6 GB
+  resident; the memory wall (exit 139 at 4.86 GB of a 5 GB cap) is the
+  `m = 4` cells'. So the blocker is wall time, not a 256 GB host, and the
+  rerun is `research/pkm_m3_n21_20261018/` (14 GB cap, 6 h wall, msolve
+  built from source). The exponent-space structure of the tower is
   falsified (`research/ic_exponent_falsifiers_20261013`: largest-class share
   0.244 against null 0.248).
 - **Test.** Finish `(m, N) = (3, 21)`: `D ≥ 7` persisting closes the line
   like `m = 4`; a bounded `D` re-opens the P-192 search with the degree as
   its cost.
-- **Effort.** A host, or one to two weeks for a disk-backed reducer.
+- **Effort.** Hours of wall on the present host (two systems, 6 h cap each); a disk-backed reducer only if the second degree-7 step itself runs past the cap.
 
-### L5. Plane-quartic class arithmetic, then the `m = 2` genus-3 cover transfer with relations by lines (exponent on paper; 3 weeks; cubic-extension curves with cofactor ≥ 4 only)
+### L5. The `m = 2` genus-3 plane-quartic cover transfer with relations by lines: measure the IC scaling against rho (exponent on paper; 3 weeks; cubic-extension curves with cofactor ≥ 4 only)
 
 - **Mechanism.** Diem's genus-3 index calculus on the cover costs
   `Õ(q^{4/3})` against rho's `≈ q^{3/2}` on `E(F_{q³})`; the `m = 3, r = 5`
   hyperelliptic transfer is executed (Cantor, injective on the odd part,
-  `|ker φ| ∈ {2, 4}`); the `m = 2` plane-quartic class arithmetic is the
-  one missing piece
-  (`problems/plane-quartic-jacobian-class-arithmetic-missing.md`;
+  `|ker φ| ∈ {2, 4}`); the `m = 2` plane-quartic class arithmetic exists
+  since 2026-10-14 (`quartic_ic.rs`, Pic checks and a pure IC target path
+  passing 90/90 at `q ∈ {5, 7, 11}`;
+  `problems/plane-quartic-jacobian-class-arithmetic-missing.md` is
+  `resolved (toy smokes)`). What is missing is the scaling measurement: the
+  cover IC's counted cost against rho on the same instances at growing `q`
+  (`research/ghs_cubic_quartic_ic_20261012/SCALING_20261018.md`;
   `research/ghs_cubic_hyperelliptic_genus3_20261013`,
   `research/ghs_cubic_cover_census_20261012`).
 - **For.** For `4 | #E(K)` a genus-3 cover is one 2-isogeny away on 438 of
