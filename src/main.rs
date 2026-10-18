@@ -326,6 +326,15 @@ enum CryptanalysisOp {
         #[arg(long, default_value_t = 0x73)]
         alpha: u8,
     },
+    /// Recover an AES-128 key candidate from measured first-round S-box power traces.
+    AesCpa {
+        /// JSON with plaintexts and sixteen aligned trace arrays.
+        #[arg(long)]
+        input: PathBuf,
+        /// Ciphertext for the first plaintext, to verify the recovered key.
+        #[arg(long)]
+        known_ciphertext_hex: Option<String>,
+    },
     /// Run the full research bench and emit the Markdown report.
     /// (Equivalent to `cargo test --lib --release bench_demo --
     /// --ignored --nocapture` but accessible from the CLI.)
@@ -1401,6 +1410,92 @@ fn cmd_isogeny(op: IsogenyOp) {
 
 // ── Cryptanalysis subcommands ─────────────────────────────────────────────────
 
+fn cmd_aes_cpa(input: &Path, known_ciphertext_hex: Option<&str>) -> Result<(), String> {
+    use crypto_lib::cryptanalysis::aes::{dpa, ReducedAes128};
+    use serde::Deserialize;
+
+    #[derive(Deserialize)]
+    #[serde(deny_unknown_fields)]
+    struct TraceInput {
+        plaintexts: Vec<String>,
+        traces_per_byte: [Vec<f64>; 16],
+    }
+
+    let bytes =
+        std::fs::read(input).map_err(|e| format!("cannot read {}: {e}", input.display()))?;
+    let trace_input: TraceInput =
+        serde_json::from_slice(&bytes).map_err(|e| format!("invalid AES CPA trace JSON: {e}"))?;
+    let count = trace_input.plaintexts.len();
+    if !(16..=100_000).contains(&count) {
+        return Err("AES CPA requires 16..=100000 aligned traces".into());
+    }
+    let mut plaintexts = Vec::with_capacity(count);
+    for (index, encoded) in trace_input.plaintexts.iter().enumerate() {
+        let value = from_hex(encoded)
+            .map_err(|e| format!("invalid plaintext hex at index {index}: {e}"))?;
+        let block: [u8; 16] = value
+            .try_into()
+            .map_err(|_| format!("plaintext at index {index} must be 16 bytes"))?;
+        plaintexts.push(block);
+    }
+    let mut recovered = [0u8; 16];
+    let mut peak_correlation = [0.0f64; 16];
+    let mut runner_up_correlation = [0.0f64; 16];
+    for byte in 0..16 {
+        let traces = &trace_input.traces_per_byte[byte];
+        if traces.len() != count || traces.iter().any(|v| !v.is_finite()) {
+            return Err(format!(
+                "trace channel {byte} must contain {count} finite samples"
+            ));
+        }
+        if plaintexts.iter().all(|p| p[byte] == plaintexts[0][byte])
+            || traces.iter().all(|&value| value == traces[0])
+        {
+            return Err(format!("trace channel {byte} has no usable variation"));
+        }
+        let (candidate, correlations) = dpa::cpa_recover_byte(&plaintexts, traces, byte);
+        recovered[byte] = candidate;
+        peak_correlation[byte] = correlations[candidate as usize].abs();
+        runner_up_correlation[byte] = correlations
+            .iter()
+            .enumerate()
+            .filter(|(guess, _)| *guess != candidate as usize)
+            .map(|(_, value)| value.abs())
+            .fold(0.0, f64::max);
+    }
+    let known_ciphertext = known_ciphertext_hex
+        .map(|encoded| {
+            let value = from_hex(encoded).map_err(|e| format!("invalid ciphertext hex: {e}"))?;
+            let block: [u8; 16] = value
+                .try_into()
+                .map_err(|_| "known ciphertext must be 16 bytes".to_string())?;
+            Ok::<_, String>(block)
+        })
+        .transpose()?;
+    let verified = known_ciphertext.map(|ciphertext| {
+        ReducedAes128::new(&recovered, 10, false).encrypt(&plaintexts[0]) == ciphertext
+    });
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&serde_json::json!({
+            "schema_version": 1,
+            "operation": "aes-cpa",
+            "model": "first-round-sbox-hamming-weight",
+            "samples_per_byte": count,
+            "candidate_key_hex": to_hex(&recovered),
+            "peak_abs_correlation": peak_correlation,
+            "runner_up_abs_correlation": runner_up_correlation,
+            "verified": verified,
+            "status": if verified == Some(true) { "complete" } else if verified == Some(false) { "verification_failed" } else { "candidate" },
+        }))
+        .map_err(|e| e.to_string())?
+    );
+    if verified == Some(false) {
+        return Err("AES CPA candidate failed the supplied ciphertext check".into());
+    }
+    Ok(())
+}
+
 fn cmd_aes_attack(
     technique: &str,
     key_hex: &str,
@@ -1791,6 +1886,15 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
             alpha,
         } => {
             if let Err(e) = cmd_aes_distinguisher(&technique, &key_hex, samples, seed, alpha) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesCpa {
+            input,
+            known_ciphertext_hex,
+        } => {
+            if let Err(e) = cmd_aes_cpa(&input, known_ciphertext_hex.as_deref()) {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }

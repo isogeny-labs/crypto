@@ -20,9 +20,11 @@
 //! # What is implemented
 //!
 //! `k = 3`, `m = 3`: random curves `y² = x³ + ax + b` with
-//! `a, b ∈ F_{p³}` and prime group order `n ≈ p³`, the factor base of
+//! `a, b ∈ F_{p³}` and a prime-order subgroup `n` of `#E(F_{p³})`, the factor base of
 //! the `≈ p/2` points with `x ∈ F_p`, and the decomposition
-//! `R = ±P_i ± P_j ± P_k`.  The oracle is the meet-in-the-middle form:
+//! `R + T = ±P_i ± P_j ± P_k`, with `T` in the cofactor subgroup when
+//! `#E = hn`. Relations are checked in the full group and then multiplied
+//! by `h` before elimination modulo `n`. The oracle is the meet-in-the-middle form:
 //! for every `P_k` in the base, `Y = R ∓ P_k` (one group operation) is
 //! tested for `Y ∈ ±F ± F` by the **Weil-restricted `S₃`**:
 //! `S₃(x_Y, x_1, x_2) = 0` with `x_1, x_2 ∈ F_p` unknown is three
@@ -2968,6 +2970,8 @@ pub struct GaudryReport {
     pub group_ops: u64,
     /// `F_p` multiplications inside the pair tests.
     pub oracle_fp_muls: u64,
+    /// Field multiplications spent lifting points for cofactor shifts.
+    pub torsion_lift_fp_muls: u64,
     /// `F_p` multiplications per affine addition, measured.
     pub fp_muls_per_add: f64,
     /// `group_ops + oracle_fp_muls / fp_muls_per_add`.
@@ -3027,6 +3031,9 @@ pub struct GaudryReport {
 #[derive(Clone, Debug, Serialize)]
 pub struct GaudryOptions {
     pub max_residuals: u64,
+    /// Cofactor of the prime-order target subgroup. Relations are projected
+    /// through multiplication by this value before linear algebra.
+    pub cofactor: u64,
     pub solver: Solver,
     /// Run the other oracle on every residual and count disagreements.
     pub cross_check: bool,
@@ -3056,6 +3063,7 @@ impl Default for GaudryOptions {
     fn default() -> Self {
         GaudryOptions {
             max_residuals: 1_000_000,
+            cofactor: 1,
             solver: Solver::MeetInTheMiddle,
             cross_check: false,
             sparse_la: false,
@@ -3599,6 +3607,8 @@ pub fn run_gaudry_opts(
     let la_fp_equiv = 9.0;
     let curve = &inst.curve;
     let n = curve.n;
+    let h = opts.cofactor;
+    assert!(h > 0 && h % n != 0, "cofactor must be invertible modulo n");
     let mut rng = StdRng::seed_from_u64(seed ^ 0x9A0D);
     curve.reset();
     let start = Instant::now();
@@ -3647,6 +3657,7 @@ pub fn run_gaudry_opts(
         correct: None,
         group_ops: 0,
         oracle_fp_muls: 0,
+        torsion_lift_fp_muls: 0,
         fp_muls_per_add: fp_per_add,
         total_ops: 0.0,
         s: 0.0,
@@ -3686,7 +3697,29 @@ pub fn run_gaudry_opts(
         rep.residuals += 1;
         let a = rng.gen_range(0..n);
         let b = rng.gen_range(1..n);
-        let r = curve.add(&curve.mul(&curve.g, a), &curve.mul(&inst.q, b));
+        let subgroup_residual = curve.add(&curve.mul(&curve.g, a), &curve.mul(&inst.q, b));
+        // A raw subspace decomposition can have any cofactor component.
+        // Sample one component in ker([h]) using [n] of a curve point;
+        // [h][n]P = O because #E = hn. Every accepted relation is then
+        // checked in the full group below before projection modulo n.
+        let torsion = if h == 1 {
+            Pt3::INFINITY
+        } else {
+            loop {
+                let x = E3([
+                    rng.gen_range(0..curve.field.p),
+                    rng.gen_range(0..curve.field.p),
+                    rng.gen_range(0..curve.field.p),
+                ]);
+                let before_lift = curve.field.muls();
+                let point = curve.lift(&x, &mut rng);
+                rep.torsion_lift_fp_muls += curve.field.muls() - before_lift;
+                if let Some(point) = point {
+                    break curve.mul(&point, n);
+                }
+            }
+        };
+        let r = curve.add(&subgroup_residual, &torsion);
         let decs = match solver {
             Solver::MeetInTheMiddle => {
                 let (decs, muls) = subspace_triple_oracle(inst, base, &r, &mut rng);
@@ -3753,7 +3786,7 @@ pub fn run_gaudry_opts(
         }
         for terms in decs {
             rep.decompositions += 1;
-            // Verify aG + bQ = Σ c_i P_i.
+            // Verify aG + bQ + T = Σ c_i P_i in the full curve group.
             let mut acc = r;
             for &(i, c) in &terms {
                 acc = curve.sub(&acc, &curve.mul_signed(&base.points[i], c));
@@ -3773,7 +3806,7 @@ pub fn run_gaudry_opts(
                     (if i < small { i } else { i + 1 }, v)
                 })
                 .collect();
-            cols.push((small, (n - b) % n));
+            cols.push((small, (n - mm(h % n, b, n)) % n));
             cols.sort_unstable();
             let lp_count = cols.iter().filter(|&&(c, _)| c > small).count();
             rep.lp_histogram[lp_count.min(3)] += 1;
@@ -3781,7 +3814,10 @@ pub fn run_gaudry_opts(
                 continue;
             }
             let t0 = Instant::now();
-            let rel = SparseRel { cols, rhs: a };
+            let rel = SparseRel {
+                cols,
+                rhs: mm(h % n, a, n),
+            };
             let full = if lp_count == 0 {
                 Some(rel)
             } else {
@@ -3892,7 +3928,7 @@ pub fn run_gaudry_opts(
         };
     }
     rep.total_ops = rep.group_ops as f64
-        + (rep.oracle_fp_muls + precompute_muls) as f64 / fp_per_add
+        + (rep.oracle_fp_muls + rep.torsion_lift_fp_muls + precompute_muls) as f64 / fp_per_add
         + rep.la_ops as f64 * la_fp_equiv / fp_per_add;
     rep.s = rep.total_ops / (n as f64).sqrt();
     rep.fp_muls_per_pair_test = rep.oracle_fp_muls as f64 / rep.pair_tests.max(1) as f64;

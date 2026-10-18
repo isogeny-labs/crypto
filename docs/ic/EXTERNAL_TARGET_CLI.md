@@ -73,8 +73,11 @@ fixture has `p=7`, `c=2`, full curve order `347`, and target `[5]G`; its
 coordinates and curve order were also computed independently with direct
 extension-field arithmetic and point enumeration. The command requires prime
 `p` in `7..=101`, a noncube `c<p`, prime `n` in `3..=2000000`, a nonsingular
-curve, valid subgroup points, and a counted curve order equal to `n`. The
-current Gaudry factor base requires that full prime-order condition.
+curve, and valid subgroup points. It counts `#E(F_{p³})`, requires `n` to
+divide that order, and supports a cofactor `h = #E/n` up to 64 when `h` is
+invertible modulo `n`. It samples cofactor components, verifies relations in
+the full group, then projects each relation by `[h]` before linear algebra.
+The projected factor base must contain a nonidentity subgroup point.
 It reports the Gaudry-style relation and linear-algebra counters and runs a
 same-target rho reference unless `--skip-rho` is set.
 The checked `ic solve-cubic` output for this input is frozen as
@@ -86,8 +89,13 @@ Before the full-order check was added, its bounded run used 100,000 residuals
 and found zero decompositions; the exact report is
 [`cubic_f7_cofactor8_bounded_20261018.json`](fixtures/cubic_f7_cofactor8_bounded_20261018.json).
 That observation does not establish that no decomposition exists. The updated
-CLI rejects the input before relation collection because the current factor
-base requires the full curve group to have prime order.
+CLI rejects the input before relation collection because all three factor-base
+points project to the identity in its order-43 subgroup. The cofactor-12
+fixture [`cubic_f7_cofactor12_public_target.json`](fixtures/cubic_f7_cofactor12_public_target.json)
+has four nonidentity projected base points and recovers its externally
+specified scalar with full-group relation checks and subgroup replay. Its
+charged run and same-target rho reference are frozen in
+[`cubic_f7_cofactor12_solve_report_20261018.json`](fixtures/cubic_f7_cofactor12_solve_report_20261018.json).
 
 The prime and cubic commands return `bounded_unknown` with a nonzero exit
 status if their configured IC budget ends without a verified scalar. These
@@ -105,6 +113,7 @@ crypto cryptanalysis aes-distinguisher --technique impossible --samples 4096
 crypto cryptanalysis aes-distinguisher --technique yoyo --samples 4096
 crypto cryptanalysis aes-distinguisher --technique mixture --samples 4096
 crypto cryptanalysis aes-distinguisher --technique zero-correlation
+crypto cryptanalysis aes-cpa --input traces.json
 ```
 
 These commands expose the existing AES-128 two-round differential,
@@ -123,3 +132,24 @@ analysis key; the S-box check concerns the public substitution table. Each
 command reports the configured sample count and its observed structural
 check. These are distinct input models and do not imply an attack on
 full-round AES.
+
+`aes-cpa` accepts JSON with `plaintexts` as 16-byte hex strings and
+`traces_per_byte` as sixteen equal-length arrays of finite measured values.
+Each channel corresponds to first-round S-box leakage for the matching
+plaintext byte. It requires 16–100,000 aligned samples and reports the
+candidate AES-128 key, peak and runner-up absolute correlations, and the
+first-round Hamming-weight leakage model. Pass
+`--known-ciphertext-hex HEX` for the first plaintext to verify the full
+ten-round AES encryption; without that check the status is `candidate`.
+This command analyzes supplied traces. Trace acquisition and alignment
+depend on the measured device.
+The release CLI acceptance report is
+[`aes_cpa_public_report_20261018.json`](fixtures/aes_cpa_public_report_20261018.json).
+It uses 512 noiseless Hamming-weight samples per byte with key
+`000102030405060708090a0b0c0d0e0f`. The first plaintext is
+`00112233445566778899aabbccddeeff`; for sample `i` from 1 to 511,
+plaintext byte `j` is `(37i + 19j) mod 256`. Each trace is the bit count
+of the AES S-box output at that plaintext byte XOR the matching key byte.
+The input JSON SHA-256 is
+`81b50a60c0361b33d7df6fe73cf5827942ce8dd10ff6284e931c97172a9ed2d8`.
+The known-answer ciphertext is `69c4e0d86a7b0430d8cdb78070b4c55a`.
