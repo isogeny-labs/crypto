@@ -1,8 +1,10 @@
 # Lean retrospective, 2026-10-18
 
-Status: **partial retrospective; five new theorems machine checked**. Independent
-semantic review is pending. This does not certify every historical claim in
-crypto, cryptanalysis, or crypto-autoresearcher.
+Status: **partial retrospective; 5 mapped declarations machine checked and
+independently reviewed within their stated assumptions**. See the current
+[review disposition](semantic-review-v2.json), [status diagram](proof-chain-reviewed.svg)
+and [independent synthesis](https://github.com/aburan28/crypto-autoresearcher/blob/e792163f3b66b72ca7bac849459aa6eeeafc99bb/research/lean_review_evidence_20261018/synthesis.md). Broader historical claims
+and concrete bridges remain open; no official scientific status changes.
 
 ## Request and coverage
 
@@ -18,7 +20,7 @@ The baseline is crypto commit `abee07ee7337d04a7e734333669ca1bacd6c763a`.
 | State transfer on elliptic-curve points | Machine checked, conditional | `curve_dlog_transport_iff`, using Mathlib `WeierstrassCurve.Affine.Point` |
 | Re-prove factor-base range containment | Machine checked | `closure_le_range`, `outside_range_not_in_closure` |
 | Recheck all historical crypto proofs and prose claims | Open | The inventory is not a build or a complete extraction of prose claims |
-| Independent semantic-fidelity review | Pending | Author correspondence notes below are not an independent review |
+| Independent semantic-fidelity review | Complete for the five mapped claims only | [Current independent disposition](semantic-review-v2.json); broader history remains open |
 
 ## Statements, proofs, and correspondence
 
@@ -96,3 +98,13 @@ findings. Receipt consistency is not authentication of a Lean run.
 
 The original `report.pdf` is the frozen producer report; current independent
 review PDFs are linked from the per-declaration review reports above.
+
+## Sealed review disposition
+
+[semantic-review-v2.json](semantic-review-v2.json) links the sealed19-claim synthesis
+and the independently authored44-control workflow closure. The original proof
+map, receipts, report and status graph remain dated producer snapshots; the new
+[diagram source](proof-chain-reviewed.json), [SVG](proof-chain-reviewed.svg) and
+[PDF](proof-chain-reviewed.pdf) reflect only the scoped review updates. Full raw
+records for two workflow rounds remain local, so public raw reproducibility is
+partial. Current-head GitHub CI remains pending in the linked review snapshot.
