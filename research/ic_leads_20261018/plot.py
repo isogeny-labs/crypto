@@ -54,7 +54,7 @@ leads = [
     ("L1 target-free algebraic relations", ["pass", "pass", "escapes (no x_R)", "must still pass", "untested"]),
     ("L2 dense-bit-row XL at degree 5", ["n/a", "n/a", "n/a", "n/a", "aimed at it"]),
     ("L3 raised-cap sparse closure", ["n/a", "n/a", "n/a", "n/a", "in flight"]),
-    ("L4 4E-class stratification", ["pass", "pass", "accounting", "n/a", "n/a"]),
+    ("L4 4E-class stratification", ["pass", "pass", "closed: free signs", "n/a", "n/a"]),
     ("L5 coset-indicator degree (pilot)", ["pass", "pass", "closed: ≈ ℓ−1 on every V", "n/a", "n/a"]),
     ("L6 theorem: shape closure m ≥ 3", ["n/a", "n/a", "formalises it", "n/a", "n/a"]),
     ("L7 lemma: admissible degree", ["n/a", "n/a", "n/a", "formalises it", "n/a"]),

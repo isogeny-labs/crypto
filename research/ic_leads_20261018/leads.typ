@@ -18,7 +18,7 @@ Five closure arguments are settled enough that a lead failing one is not a lead:
 - *L1 target-free algebraic relations* (not tried before): solve $S_4(x_1, dots, x_4) = 0$ with every variable in $V$ and no target; the leading forms then live in $V^4$, which can be dependent. Falsifier: closure degree at $(16,4), (20,5), (24,6)$ against the chained target system at equal $m dot ell$; kill if no cell is a degree lower. Yield is the price ($ell gt.tilde n/3 - 7$ needed, no-wrap window $ell < n/4$).
 - *L2 dense-bit-row XL at degree 5* for the $m dot ell = 21$ cells: 34,482 rows over 760 k columns (3.3 GB); a refutation resolves the cells at exactly 5. Not built; about one chance in four of a positive.
 - *L3 raised-cap sparse closure*: the rewritten engine's cap used 1.4 GB of 15 GB; a degree-5 run at 2.5 G entries is in flight (§3 of the note).
-- *L4 4E-class stratification* (accounting): $a = 0$ Koblitz curves carry a 2-bit class in $E\/4E$; EXP-H conditioned on one bit. Re-score the committed draws by class.
+- *L4 4E-class stratification*: closed by a sign argument; with free summand signs the $E\/4E$ class never obstructs a target unless the whole base lies in $2E$ without class-2 points.
 - *L5 coset-indicator degree* — piloted, negative as a predictor (below).
 - *L6, L7 theorem and lemma*: write the $m >= 3$ shape-closure argument and the admissible-degree inequality as statements the FFD programme can cite; neither exists in writing.
 - *L8 K-233 derived row*: $"ord"_233(2) = 29$, eight stable 29-blocks, admissible degree 3–4 under the $C(N, <= D)^(2.2)$ cost and 7–8 under the $w = 1$ lower bound; a distance row for the one standard Koblitz curve where Frobenius structure helps the algebra. Not analysed anywhere.
