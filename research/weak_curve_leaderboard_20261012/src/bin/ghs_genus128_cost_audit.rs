@@ -90,17 +90,47 @@ fn advance_counts(previous: &[BigUint], degree: usize, irreducibles: &BigUint) -
         .collect()
 }
 
+/// `CostModel::log2_jacobian_op_mults` replayed from the registry: linear in
+/// `log2 g` between the elliptic point and the measured genera, then the
+/// extrapolation exponent past the last one.
+fn log2_jacobian_op_mults(model: &Value, log2_genus: f64) -> f64 {
+    let elliptic = (
+        0.0,
+        model["elliptic_group_op_mults"].as_f64().unwrap().log2(),
+    );
+    let measured = model["jacobian_group_op_mults_measured"]
+        .as_array()
+        .unwrap();
+    let points = std::iter::once(elliptic).chain(measured.iter().map(|pair| {
+        (
+            pair[0].as_f64().unwrap().log2(),
+            pair[1].as_f64().unwrap().log2(),
+        )
+    }));
+    let mut prev: Option<(f64, f64)> = None;
+    for (x, y) in points {
+        if log2_genus <= x + 1e-12 {
+            return match prev {
+                Some((x0, y0)) if log2_genus > x0 => y0 + (y - y0) * (log2_genus - x0) / (x - x0),
+                _ => y,
+            };
+        }
+        prev = Some((x, y));
+    }
+    let (x, y) = prev.unwrap();
+    y + model["jacobian_group_op_extrapolation_exponent"]
+        .as_f64()
+        .unwrap()
+        * (log2_genus - x)
+}
+
 fn sweep(model: &Value, subgroup_bits: f64) -> Value {
     let mut counts = vec![BigUint::zero(); G + 1];
     counts[0] = BigUint::one();
     let mut total_irreducibles = BigUint::zero();
     let exponent = model["karatsuba_exponent"].as_f64().unwrap();
-    let group_op = model["jacobian_group_op_mults_per_genus_squared"]
-        .as_f64()
-        .unwrap()
-        .log2()
-        + 2.0 * (G as f64).log2()
-        + exponent * (Q as f64).log2().log2();
+    let group_op =
+        log2_jacobian_op_mults(model, (G as f64).log2()) + exponent * (Q as f64).log2().log2();
     let linear_op = exponent * subgroup_bits.log2();
     let mut rows = Vec::new();
     let mut selected = BigUint::zero();
