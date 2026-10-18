@@ -2,9 +2,9 @@
 
 - **Status:** `open`
 - **Kind:** inherited implementation/build gap; current-head validation blocker
-- **Affected work:** [N83 chained-S3 m=4 validation](../research/n83_chained_s3_m4_20261017/VALIDATION.md), PR #2100 and its dependent m=4 PR
+- **Affected work:** [N83 chained-S3 m=4 validation](../research/n83_chained_s3_m4_20261017/VALIDATION.md), [K=16,627 m=4 capacity validation](../research/n83_k16627_m4_capacity_20261017/VALIDATION.md), PR #2100 and its dependent m=4 PRs
 - **Next action owner:** maintainers of the current `main` build and PR #2100 CI
-- **Last updated:** 2026-10-17
+- **Last updated:** 2026-10-18
 
 ## Problem
 
@@ -27,6 +27,7 @@ about relation yield or mathematical feasibility at degree 83.
   `src/cryptanalysis/gaudry_quartic.rs`. The [exact full command log](../research/n83_chained_s3_m4_20261017/final-release-lib.log)
   is retained separately. The pre-merge m=4 code passed 4,216 release library
   tests, with 117 ignored, in [its complete log](../research/n83_chained_s3_m4_20261017/cargo-release-lib.log).
+- **Observed:** The [K=16,627 capacity stack](../research/n83_k16627_m4_capacity_20261017/VALIDATION.md) independently reran `cargo test --release --lib -- --test-threads=2` after merging its #2124 base. It exited 101 with 26 errors in the same ecbench and Gaudry source area; [the raw log](../research/n83_k16627_m4_capacity_20261017/cargo-release-lib-stacked.log) is retained. The five error-location source files are byte unchanged from #2124. Before the stack merge, its source passed the complete library suite: 4,216 passed and 117 ignored.
 - **Derived from source identity:** The three affected files above have
   identical Git blob IDs in main parent `c6d64436a33359320ad9d5b42c4acebee2968b9a`
   and PR #2100 head `dd1f7585fa7c7e56749580afb561d59f78f9f624`.

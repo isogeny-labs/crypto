@@ -16,4 +16,27 @@ validation is recorded separately below.
 
 ## Stacked-head validation
 
-Pending current-head command and log.
+`cargo fmt --all -- --check` exited 1 on the stacked head. Its retained
+[log](cargo-fmt-stacked.log) names only
+`examples/n83_precomputed_rho.rs`,
+`examples/n83_precomputed_rho_analyze.rs`, and
+`research/conductor_gap_cm_orbits_20261015/native/ecbench_next.rs`.
+All three are byte-unchanged from the #2124 base branch. The touched
+`primary_adapter.rs` passed `rustfmt --check --edition 2021` separately;
+its [log](rustfmt-touched-stacked.log) is empty on success.
+
+`CARGO_TARGET_DIR=/private/tmp/n83-structured-m4-target cargo test --release
+--lib -- --test-threads=2` exited **101** on stacked source commit `d6b7360498`
+before any library test could execute. The complete [compiler log](cargo-release-lib-stacked.log)
+contains **26 errors**, including unresolved `ecbench::fbm` paths, inconsistent
+`Fp4` definitions, and Gaudry F4 names. The error locations are confined to
+`src/cryptanalysis/ecbench/{db,methods,runner,workload}.rs` and
+`src/cryptanalysis/gaudry_quartic.rs`; all five files are byte unchanged
+from the #2124 base. This is the same open inherited blocker tracked in
+`problems/current-main-library-build-20261017.md`. The touched exporter
+cannot be retested at this stacked head until the base library compiles;
+its 19/19 release pass above applies to the pre-stack source.
+
+`node --check .github/scripts/ci-scope.mjs` also exited 1 on the stacked
+head because `root` is declared twice at line 50; the script is unchanged
+from #2124. Its [raw log](ci-scope-stacked.log) is retained as a CI diagnostic.
