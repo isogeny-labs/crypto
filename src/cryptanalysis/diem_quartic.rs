@@ -519,8 +519,8 @@ pub struct Kf {
     pub f: Fq,
     pub a: u64,
     pub b: u64,
-    gq: K,
-    gq2: K,
+    pub gq: K,
+    pub gq2: K,
 }
 
 impl Kf {
@@ -1684,6 +1684,7 @@ pub struct Rel {
     pub line: (u32, u32),
 }
 
+
 /// Counters emitted by the relation phase (all arms).
 #[derive(Clone, Debug, Default)]
 pub struct IcCounters {
@@ -1692,6 +1693,7 @@ pub struct IcCounters {
     pub rel_full: u64,
     pub rel_slp: u64,
     pub rel_dlp: u64,
+    pub dups: u64,
     pub verified: u64,
     pub verify_failed: u64,
     pub hash_lookups: u64,
@@ -1700,18 +1702,23 @@ pub struct IcCounters {
     pub uf_ops: u64,
     pub root_calls: u64,
     pub norm_calls: u64,
-    pub row_entries: u64,
-    pub lops: u64,
     pub fq_mul_collect: u64,
     pub fq_inv_collect: u64,
     pub fq_mul_verify: u64,
     pub fq_inv_verify: u64,
     pub fq_mul_fb: u64,
     pub fq_inv_fb: u64,
-    pub fq_mul_elim: u64,
+    // linear-algebra phase (mod-ell operations and bookkeeping)
+    pub elim_ops: u64,
+    pub elim_entries: u64,
+    pub wied_ops: u64,
+    pub bm_ops: u64,
+    pub matvecs: u64,
 }
 
 /// Parity union-find over large-prime vertices; vertex 0 is the sink (the factor base).
+/// Used only to decide when enough FB-only relations are obtainable (`E - V + B`); the
+/// matrix itself is produced by the real elimination below.
 pub struct LpGraph {
     parent: Vec<u32>,
     parity: Vec<u8>,
@@ -1736,7 +1743,6 @@ impl LpGraph {
             v = self.parent[v as usize];
             self.ops += 1;
         }
-        // compress
         let mut acc = par;
         for &u in path.iter() {
             let pu = self.parity[u as usize];
@@ -1749,7 +1755,6 @@ impl LpGraph {
     fn is_b(&self, r: u32) -> i64 {
         (!self.sink[r as usize] && !self.odd[r as usize]) as i64
     }
-    /// Ensure LP vertex id `v >= 1` exists.
     fn ensure(&mut self, v: u32) {
         while self.parent.len() <= v as usize {
             let id = self.parent.len() as u32;
@@ -1761,7 +1766,6 @@ impl LpGraph {
             self.bip += 1;
         }
     }
-    /// Add an edge between vertices (0 is the sink).
     pub fn add_edge(&mut self, a: u32, b: u32) {
         self.ensure(a.max(b));
         self.edges += 1;
@@ -1787,21 +1791,8 @@ impl LpGraph {
     }
 }
 
-/// Everything the relation phase produces.
-pub struct Collected {
-    pub arm: Arm,
-    pub kappa: f64,
-    pub fb: Vec<FbPt>,
-    pub rels: Vec<Rel>,
-    pub lp_pts: Vec<[u64; 3]>,
-    pub ctr: IcCounters,
-    pub full_rels: u64,
-    pub graph_yield: i64,
-    pub rounds: u32,
-}
-
-/// Build the factor base for an arm. FULL: all rational points. Reduced: `f` uniform random
-/// rational points (with `W2 != 0`), deduplicated.
+/// Build the factor base for an arm. FULL: all rational points (sorted by key). Reduced:
+/// `size` uniform random rational points (with `W2 != 0`), deduplicated.
 pub fn build_fb(inst: &Inst, arm: Arm, kappa: f64, rng: &mut SplitMix64, ctr: &mut IcCounters) -> Vec<FbPt> {
     let f = inst.f();
     let g = &inst.quartic;
@@ -1809,90 +1800,167 @@ pub fn build_fb(inst: &Inst, arm: Arm, kappa: f64, rng: &mut SplitMix64, ctr: &m
     let mut pts: Vec<[u64; 3]>;
     if arm == Arm::Full {
         pts = enumerate_points(f, g);
-        // canonical order: sorted by key so the factor base is a function of the instance
-        pts.sort_by_key(|p| pt_key(p));
         assert_eq!(pts.len() as u64, inst.q + 1, "N1 != q + 1");
+        pts = pts.iter().map(|p| normalize_pt(f, p)).collect();
+        pts.sort_by_key(|p| pt_key(p));
     } else {
         let mut seen: FxSet<u64> = FxSet::default();
         pts = Vec::with_capacity(size);
         while pts.len() < size {
             let p = sample_point(f, g, rng);
             ctr.rng_draws += 1;
+            ctr.hash_lookups += 1;
+            let p = normalize_pt(f, &p);
             if seen.insert(pt_key(&p)) {
+                ctr.hash_inserts += 1;
                 pts.push(p);
             }
         }
     }
+    // projective normalisation (first non-zero coordinate 1) so that `pt_key` identifies points
     pts.iter().map(|p| make_fb_pt(f, g, *p)).collect()
 }
 
-/// Run the relation phase for `arm`, collecting until `target_rows` FB-only relations are
-/// available (cyclomatic count for large primes), verifying every relation.
-pub fn collect(inst: &Inst, arm: Arm, kappa: f64, seed: u64, target_rows: &mut dyn FnMut(&Collected) -> bool, max_lines: u64) -> Collected {
-    let f = inst.f();
-    let g = inst.quartic;
-    let mut rng = SplitMix64::new(seed);
-    let mut ctr = IcCounters::default();
-    let (m0, i0) = f.counts();
-    let fb = build_fb(inst, arm, kappa, &mut rng, &mut ctr);
-    let (m1, i1) = f.counts();
-    ctr.fq_mul_fb = m1 - m0;
-    ctr.fq_inv_fb = i1 - i0;
-    let nfb = fb.len() as u64;
-    let mut fb_index: FxMap<u64, u32> = FxMap::default();
-    for (i, p) in fb.iter().enumerate() {
-        fb_index.insert(pt_key(&p.c), i as u32);
-        ctr.hash_inserts += 1;
+fn line_key(pts: &[[u64; 3]; 4]) -> u64 {
+    let mut k: Vec<u64> = pts.iter().map(pt_key).collect();
+    k.sort_unstable();
+    let mut h = 0x9E37_79B9_7F4A_7C15u64;
+    for x in k {
+        h = (h.rotate_left(7) ^ x).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        h ^= h >> 29;
     }
-    let mut lp_map: FxMap<u64, u32> = FxMap::default();
-    let mut lp_pts: Vec<[u64; 3]> = vec![];
-    let mut graph = LpGraph::new();
-    let mut rels: Vec<Rel> = vec![];
-    let mut full_rels = 0u64;
-    let npairs = nfb * (nfb - 1) / 2;
-    let perm = Perm::new(npairs, &mut rng);
-    let mut next_idx = 0u64;
-    let max_lp = match arm {
-        Arm::Full => 0,
-        Arm::Slp => 1,
-        Arm::Dlp => 2,
-    };
-    let mut col = Collected { arm, kappa, fb, rels: vec![], lp_pts: vec![], ctr: IcCounters::default(), full_rels: 0, graph_yield: 0, rounds: 1 };
-    let mut check_every = 256u64;
-    let mut since_check = 0u64;
-    // main loop
-    loop {
-        if next_idx >= npairs || next_idx >= max_lines {
-            break;
+    h
+}
+
+/// Resumable relation collector (one arm, one factor base).
+pub struct Collector<'a> {
+    pub inst: &'a Inst,
+    pub arm: Arm,
+    pub kappa: f64,
+    pub fb: Vec<FbPt>,
+    fb_index: FxMap<u64, u32>,
+    lp_map: FxMap<u64, u32>,
+    pub lp_pts: Vec<[u64; 3]>,
+    pub graph: LpGraph,
+    pub rels: Vec<Rel>,
+    seen: FxSet<u64>,
+    pub full_rels: u64,
+    pub ctr: IcCounters,
+    perm: Perm,
+    next_idx: u64,
+    npairs: u64,
+    max_lp: usize,
+    pub exhausted: bool,
+}
+
+impl<'a> Collector<'a> {
+    pub fn new(inst: &'a Inst, arm: Arm, kappa: f64, seed: u64) -> Collector<'a> {
+        let f = inst.f();
+        let mut rng = SplitMix64::new(seed);
+        let mut ctr = IcCounters::default();
+        let (m0, i0) = f.counts();
+        let fb = build_fb(inst, arm, kappa, &mut rng, &mut ctr);
+        let (m1, i1) = f.counts();
+        ctr.fq_mul_fb = m1 - m0;
+        ctr.fq_inv_fb = i1 - i0;
+        let nfb = fb.len() as u64;
+        let mut fb_index: FxMap<u64, u32> = FxMap::default();
+        for (i, p) in fb.iter().enumerate() {
+            fb_index.insert(pt_key(&p.c), i as u32);
+            ctr.hash_inserts += 1;
         }
-        let pidx = perm.at(next_idx);
-        next_idx += 1;
-        ctr.lines += 1;
-        let (i, j) = pair_of_index(pidx, nfb);
-        let (m_before, v_before) = f.counts();
-        let c = line_coeffs(f, &col.fb[i], &col.fb[j]);
-        ctr.root_calls += 1;
-        let roots = residual_roots(f, c);
-        let roots = match roots {
-            Some(r) => r,
-            None => {
-                continue;
-            }
+        let npairs = nfb * (nfb - 1) / 2;
+        ctr.rng_draws += 4;
+        let perm = Perm::new(npairs, &mut rng);
+        let max_lp = match arm {
+            Arm::Full => 0,
+            Arm::Slp => 1,
+            Arm::Dlp => 2,
         };
-        ctr.split += 1;
-        // residual points (normalised)
-        let (p1, p2) = (col.fb[i].c, col.fb[j].c);
+        Collector {
+            inst,
+            arm,
+            kappa,
+            fb,
+            fb_index,
+            lp_map: FxMap::default(),
+            lp_pts: vec![],
+            graph: LpGraph::new(),
+            rels: vec![],
+            seen: FxSet::default(),
+            full_rels: 0,
+            ctr,
+            perm,
+            next_idx: 0,
+            npairs,
+            max_lp,
+            exhausted: false,
+        }
+    }
+
+    /// FB-only relations obtainable now: full relations plus the cyclomatic count.
+    pub fn available(&self) -> i64 {
+        self.full_rels as i64 + self.graph.yield_count().max(0)
+    }
+
+    /// Process lines until `available() >= target` (true) or the pairs are exhausted, the
+    /// line budget is hit or the deadline passes (false).
+    pub fn run_until(&mut self, target: i64, max_lines: u64, deadline: Option<std::time::Instant>) -> bool {
+        let inst = self.inst;
+        let f = inst.f();
+        let g = inst.quartic;
+        let nfb = self.fb.len();
+        loop {
+            if self.available() >= target {
+                return true;
+            }
+            if self.next_idx >= self.npairs {
+                self.exhausted = true;
+                return false;
+            }
+            if self.ctr.lines >= max_lines {
+                return false;
+            }
+            if self.ctr.lines % 4096 == 0 {
+                if let Some(d) = deadline {
+                    if std::time::Instant::now() > d {
+                        return false;
+                    }
+                }
+            }
+            let pidx = self.perm.at(self.next_idx);
+            self.next_idx += 1;
+            self.ctr.lines += 1;
+            let (i, j) = pair_of_index(pidx, nfb as u64);
+            let (mb, ib) = f.counts();
+            let mut vm = 0u64;
+            let mut vi = 0u64;
+            self.process_line(i, j, &g, &mut vm, &mut vi);
+            let (ma, ia) = f.counts();
+            self.ctr.fq_mul_collect += (ma - mb) - vm;
+            self.ctr.fq_inv_collect += (ia - ib) - vi;
+        }
+    }
+
+    fn process_line(&mut self, i: usize, j: usize, g: &[u64; 15], vm: &mut u64, vi: &mut u64) {
+        let f = self.inst.f();
+        let c = line_coeffs(f, &self.fb[i], &self.fb[j]);
+        self.ctr.root_calls += 1;
+        let roots = match residual_roots(f, c) {
+            Some(r) => r,
+            None => return,
+        };
+        self.ctr.split += 1;
+        let (p1, p2) = (self.fb[i].c, self.fb[j].c);
         let mut pts4: [[u64; 3]; 4] = [p1, p2, [0; 3], [0; 3]];
         for (k, &(l, m)) in roots.iter().enumerate() {
             let r = comb(f, l, m, &p1, &p2);
-            ctr.norm_calls += 1;
+            self.ctr.norm_calls += 1;
             pts4[2 + k] = normalize_pt(f, &r);
         }
-        // classify: multiplicities
         let mut fbs: Vec<(u32, i32)> = vec![];
-        let mut lps: Vec<(u64, i32)> = vec![];
-        let mut lp_keys_order: Vec<[u64; 3]> = vec![];
-        let mut add_fb = |idx: u32, fbs: &mut Vec<(u32, i32)>| {
+        let mut lps: Vec<(u64, i32, [u64; 3])> = vec![];
+        let add_fb = |idx: u32, fbs: &mut Vec<(u32, i32)>| {
             if let Some(e) = fbs.iter_mut().find(|e| e.0 == idx) {
                 e.1 += 1;
             } else {
@@ -1901,49 +1969,52 @@ pub fn collect(inst: &Inst, arm: Arm, kappa: f64, seed: u64, target_rows: &mut d
         };
         add_fb(i as u32, &mut fbs);
         add_fb(j as u32, &mut fbs);
-        let mut ok = true;
         for k in 2..4 {
             let key = pt_key(&pts4[k]);
-            ctr.hash_lookups += 1;
-            if let Some(&idx) = fb_index.get(&key) {
+            self.ctr.hash_lookups += 1;
+            if let Some(&idx) = self.fb_index.get(&key) {
                 add_fb(idx, &mut fbs);
             } else if let Some(e) = lps.iter_mut().find(|e| e.0 == key) {
                 e.1 += 1;
             } else {
-                lps.push((key, 1));
-                lp_keys_order.push(pts4[k]);
+                lps.push((key, 1, pts4[k]));
             }
         }
-        if lps.len() > max_lp {
-            ok = false;
+        if lps.len() > self.max_lp {
+            return;
         }
-        let (m_after, v_after) = f.counts();
-        let _ = (m_before, v_before, m_after, v_after);
-        if !ok {
-            continue;
+        // duplicate lines (the same section reached from another pair of its points)
+        let lk = line_key(&pts4);
+        self.ctr.hash_lookups += 1;
+        if self.seen.contains(&lk) {
+            self.ctr.dups += 1;
+            return;
         }
-        // independent verification (cost recorded separately)
+        // independent verification (cost recorded separately, excluded from the attack cost)
         let (mv0, iv0) = f.counts();
-        let good = verify_line(f, &g, &p1, &p2, &pts4);
+        let good = verify_line(f, g, &p1, &p2, &pts4);
         let (mv1, iv1) = f.counts();
-        ctr.fq_mul_verify += mv1 - mv0;
-        ctr.fq_inv_verify += iv1 - iv0;
-        ctr.verified += 1;
+        *vm = mv1 - mv0;
+        *vi = iv1 - iv0;
+        self.ctr.fq_mul_verify += *vm;
+        self.ctr.fq_inv_verify += *vi;
+        self.ctr.verified += 1;
         if !good {
-            ctr.verify_failed += 1;
-            continue;
+            self.ctr.verify_failed += 1;
+            return;
         }
-        // register large primes
+        self.seen.insert(lk);
+        self.ctr.hash_inserts += 1;
         let mut lpv: Vec<(u32, i32)> = vec![];
-        for (n, (key, cf)) in lps.iter().enumerate() {
-            ctr.hash_lookups += 1;
-            let id = match lp_map.get(key) {
+        for (key, cf, pt) in lps.iter() {
+            self.ctr.hash_lookups += 1;
+            let id = match self.lp_map.get(key) {
                 Some(&id) => id,
                 None => {
-                    let id = lp_pts.len() as u32 + 1;
-                    lp_map.insert(*key, id);
-                    lp_pts.push(lp_keys_order[n]);
-                    ctr.hash_inserts += 1;
+                    let id = self.lp_pts.len() as u32 + 1;
+                    self.lp_map.insert(*key, id);
+                    self.lp_pts.push(*pt);
+                    self.ctr.hash_inserts += 1;
                     id
                 }
             };
@@ -1951,40 +2022,1157 @@ pub fn collect(inst: &Inst, arm: Arm, kappa: f64, seed: u64, target_rows: &mut d
         }
         match lpv.len() {
             0 => {
-                full_rels += 1;
-                ctr.rel_full += 1;
+                self.full_rels += 1;
+                self.ctr.rel_full += 1;
             }
             1 => {
-                graph.add_edge(lpv[0].0, 0);
-                ctr.rel_slp += 1;
+                self.graph.add_edge(lpv[0].0, 0);
+                self.ctr.rel_slp += 1;
             }
             _ => {
-                graph.add_edge(lpv[0].0, lpv[1].0);
-                ctr.rel_dlp += 1;
+                self.graph.add_edge(lpv[0].0, lpv[1].0);
+                self.ctr.rel_dlp += 1;
             }
         }
-        rels.push(Rel { fb: fbs, lp: lpv, line: (i as u32, j as u32) });
-        since_check += 1;
-        if since_check >= check_every {
-            since_check = 0;
-            col.full_rels = full_rels;
-            col.graph_yield = graph.yield_count();
-            col.ctr = ctr.clone();
-            if target_rows(&col) {
-                break;
-            }
-            check_every = (check_every / 2).max(16);
-        }
+        self.rels.push(Rel { fb: fbs, lp: lpv, line: (i as u32, j as u32) });
     }
-    ctr.uf_ops = graph.ops + graph.edges;
-    let (me, ie) = f.counts();
-    ctr.fq_mul_collect = me - m1 - ctr.fq_mul_verify;
-    ctr.fq_inv_collect = ie - i1 - ctr.fq_inv_verify;
-    col.rels = rels;
-    col.lp_pts = lp_pts;
-    col.ctr = ctr;
-    col.full_rels = full_rels;
-    col.graph_yield = graph.yield_count();
-    col
+
+    pub fn finish_counters(&mut self) {
+        self.ctr.uf_ops = self.graph.ops + self.graph.edges;
+    }
 }
 
+// ---------------------------------------------------------------------------
+// 4. sparse structured elimination and Wiedemann mod ell
+// ---------------------------------------------------------------------------
+
+/// Sparse row: `(column, value in Montgomery form)` sorted by column.
+pub type SRow = Vec<(u32, u64)>;
+
+/// Matrix rows from relations. Column 0 is the unknown `h` (coefficient `-1`), FB point
+/// `i >= 1` is column `i` (`x_{P0} = 0` is dropped), large prime `id >= 1` is column `nfb + id`.
+pub fn build_rows(mont: &Mont, nfb: usize, rels: &[Rel]) -> Vec<SRow> {
+    rels.iter()
+        .map(|r| {
+            let mut row: SRow = vec![(0, mont.from_i(-1))];
+            for &(idx, c) in &r.fb {
+                if idx != 0 {
+                    row.push((idx, mont.from_i(c as i64)));
+                }
+            }
+            for &(id, c) in &r.lp {
+                row.push((nfb as u32 + id, mont.from_i(c as i64)));
+            }
+            row.sort_unstable_by_key(|e| e.0);
+            row
+        })
+        .collect()
+}
+
+/// `a - f * b` for sparse rows, counting one mod-ell operation per entry of `b`.
+fn axpy_sub(mont: &Mont, a: &SRow, f: u64, b: &SRow, ops: &mut u64) -> SRow {
+    let mut out = Vec::with_capacity(a.len() + b.len());
+    let (mut i, mut j) = (0, 0);
+    while i < a.len() || j < b.len() {
+        if j >= b.len() || (i < a.len() && a[i].0 < b[j].0) {
+            out.push(a[i]);
+            i += 1;
+        } else if i >= a.len() || b[j].0 < a[i].0 {
+            *ops += 1;
+            out.push((b[j].0, mont.neg(mont.mul(f, b[j].1))));
+            j += 1;
+        } else {
+            *ops += 1;
+            let v = mont.sub(a[i].1, mont.mul(f, b[j].1));
+            if v != 0 {
+                out.push((a[i].0, v));
+            }
+            i += 1;
+            j += 1;
+        }
+    }
+    out
+}
+
+fn row_coef(row: &SRow, c: u32) -> u64 {
+    match row.binary_search_by_key(&c, |e| e.0) {
+        Ok(p) => row[p].1,
+        Err(_) => 0,
+    }
+}
+
+/// Eliminate every large-prime column (columns `>= nfb`) by minimum-weight pivoting
+/// (weight 1: row dropped; weight 2: the two rows merged; general weight: Markowitz-style
+/// pivot on the shortest row). Returns FB-only rows. All mod-ell work is counted in
+/// `ops` / `entries`.
+pub fn eliminate_lp(mont: &Mont, nfb: usize, rows_in: Vec<SRow>, ops: &mut u64, entries: &mut u64) -> Vec<SRow> {
+    use std::cmp::Reverse;
+    let mut rows: Vec<Option<SRow>> = rows_in.into_iter().map(Some).collect();
+    let mut colset: FxMap<u32, FxSet<u32>> = FxMap::default();
+    for (r, row) in rows.iter().enumerate() {
+        for &(c, _) in row.as_ref().unwrap() {
+            if c as usize >= nfb {
+                colset.entry(c).or_default().insert(r as u32);
+                *entries += 1;
+            }
+        }
+    }
+    let mut heap: BinaryHeap<Reverse<(usize, u32)>> = colset.iter().map(|(&c, s)| Reverse((s.len(), c))).collect();
+    while let Some(Reverse((w, c))) = heap.pop() {
+        let cur = colset.get(&c).map(|s| s.len()).unwrap_or(0);
+        if cur == 0 {
+            colset.remove(&c);
+            continue;
+        }
+        if cur != w {
+            heap.push(Reverse((cur, c)));
+            continue;
+        }
+        let pr = *colset[&c].iter().min_by_key(|&&r| (rows[r as usize].as_ref().unwrap().len(), r)).unwrap();
+        let mut prow = rows[pr as usize].take().unwrap();
+        for &(cc, _) in &prow {
+            if cc as usize >= nfb {
+                colset.get_mut(&cc).unwrap().remove(&pr);
+            }
+        }
+        let pc = row_coef(&prow, c);
+        let inv = mont.inv(pc);
+        *ops += 128; // Fermat inversion: ~ 2 log2(ell) multiplications
+        for e in prow.iter_mut() {
+            e.1 = mont.mul(e.1, inv);
+        }
+        *ops += prow.len() as u64;
+        let mut others: Vec<u32> = colset.get(&c).map(|s| s.iter().cloned().collect()).unwrap_or_default();
+        others.sort_unstable();
+        for r in others {
+            let row = rows[r as usize].take().unwrap();
+            let fct = row_coef(&row, c);
+            let newrow = axpy_sub(mont, &row, fct, &prow, ops);
+            *entries += (row.len() + prow.len()) as u64;
+            // update column sets
+            for &(cc, _) in &row {
+                if cc as usize >= nfb && newrow.binary_search_by_key(&cc, |e| e.0).is_err() {
+                    let s = colset.get_mut(&cc).unwrap();
+                    s.remove(&r);
+                    if cc != c {
+                        heap.push(Reverse((s.len(), cc)));
+                    }
+                }
+            }
+            for &(cc, _) in &newrow {
+                if cc as usize >= nfb && row.binary_search_by_key(&cc, |e| e.0).is_err() {
+                    let s = colset.entry(cc).or_default();
+                    s.insert(r);
+                    heap.push(Reverse((s.len(), cc)));
+                }
+            }
+            rows[r as usize] = Some(newrow);
+        }
+        colset.remove(&c);
+    }
+    rows.into_iter().flatten().filter(|r| !r.is_empty()).collect()
+}
+
+/// Dense rank of the rows over `F_ell` (cross-check only; not part of any attack cost).
+pub fn dense_rank(mont: &Mont, rows: &[SRow], ncols: usize) -> usize {
+    let mut m: Vec<Vec<u64>> = rows
+        .iter()
+        .map(|r| {
+            let mut d = vec![0u64; ncols];
+            for &(c, v) in r {
+                d[c as usize] = v;
+            }
+            d
+        })
+        .collect();
+    let mut rank = 0;
+    for col in 0..ncols {
+        let mut piv = None;
+        for r in rank..m.len() {
+            if m[r][col] != 0 {
+                piv = Some(r);
+                break;
+            }
+        }
+        let Some(p) = piv else { continue };
+        m.swap(rank, p);
+        let inv = mont.inv(m[rank][col]);
+        for c in col..ncols {
+            m[rank][c] = mont.mul(m[rank][c], inv);
+        }
+        let prow = m[rank].clone();
+        for r in (rank + 1)..m.len() {
+            let f = m[r][col];
+            if f != 0 {
+                for c in col..ncols {
+                    if prow[c] != 0 {
+                        m[r][c] = mont.sub(m[r][c], mont.mul(f, prow[c]));
+                    }
+                }
+            }
+        }
+        rank += 1;
+        if rank == m.len() {
+            break;
+        }
+    }
+    rank
+}
+
+/// Berlekamp-Massey; returns the connection polynomial `C` (`C[0] = 1`) and its length `L`.
+pub fn berlekamp_massey(mont: &Mont, s: &[u64], ops: &mut u64) -> (Vec<u64>, usize) {
+    let one = mont.one;
+    let mut c = vec![one];
+    let mut b = vec![one];
+    let (mut l, mut m) = (0usize, 1usize);
+    let mut binv = one;
+    for i in 0..s.len() {
+        let mut d = s[i];
+        let top = l.min(c.len() - 1);
+        for j in 1..=top {
+            d = mont.add(d, mont.mul(c[j], s[i - j]));
+        }
+        *ops += top as u64;
+        if d == 0 {
+            m += 1;
+            continue;
+        }
+        let coef = mont.mul(d, binv);
+        let t = if 2 * l <= i { Some(c.clone()) } else { None };
+        if c.len() < b.len() + m {
+            c.resize(b.len() + m, 0);
+        }
+        for j in 0..b.len() {
+            c[j + m] = mont.sub(c[j + m], mont.mul(coef, b[j]));
+        }
+        *ops += b.len() as u64;
+        if let Some(tc) = t {
+            l = i + 1 - l;
+            b = tc;
+            binv = mont.inv(d);
+            *ops += 128;
+            m = 1;
+        } else {
+            m += 1;
+        }
+    }
+    c.resize(l + 1, 0);
+    (c, l)
+}
+
+pub struct LaResult {
+    pub ok: bool,
+    pub fail: &'static str,
+    /// `v[0] = 1` (the `h` unknown), `v[i]` the log of `[P_i - P_0]` in units of `h`, plain residues.
+    pub v: Vec<u64>,
+    pub wied_ops: u64,
+    pub bm_ops: u64,
+    pub matvecs: u64,
+    pub deg: usize,
+    pub rows_used: usize,
+    pub holdout: usize,
+    pub holdout_ok: bool,
+}
+
+/// Solve `A v = 0` with `v[0] = 1` by Wiedemann on `M = A'^T D A'` (`A'` = `A` without column 0).
+/// The last `holdout` rows are not used in the solve and checked afterwards, as are all rows.
+pub fn wiedemann_solve(mont: &Mont, rows: &[SRow], ncols: usize, holdout: usize, seed: u64, deadline: Option<std::time::Instant>) -> LaResult {
+    let mut res = LaResult { ok: false, fail: "", v: vec![], wied_ops: 0, bm_ops: 0, matvecs: 0, deg: 0, rows_used: 0, holdout, holdout_ok: false };
+    let nc = ncols - 1;
+    if rows.len() < holdout + nc {
+        res.fail = "too_few_rows";
+        return res;
+    }
+    let m = rows.len() - holdout;
+    res.rows_used = m;
+    let mut rng = SplitMix64::new(seed);
+    // CSR of A' (columns shifted by one) and the right-hand side r = -A[:, 0]
+    let mut ptr = vec![0usize; m + 1];
+    let mut cols: Vec<u32> = vec![];
+    let mut vals: Vec<u64> = vec![];
+    let mut rhs_r = vec![0u64; m];
+    for (r, row) in rows[..m].iter().enumerate() {
+        for &(c, v) in row {
+            if c == 0 {
+                rhs_r[r] = mont.neg(v);
+            } else {
+                cols.push(c - 1);
+                vals.push(v);
+            }
+        }
+        ptr[r + 1] = cols.len();
+    }
+    let nnz = cols.len() as u64;
+    let diag: Vec<u64> = (0..m).map(|_| mont.to(1 + rng.below(mont.n - 1))).collect();
+    let mut ops = 0u64;
+    let mut mv = 0u64;
+    let mut tmp = vec![0u64; m];
+    let matvec = |x: &[u64], out: &mut Vec<u64>, tmp: &mut Vec<u64>, ops: &mut u64, mv: &mut u64| {
+        for r in 0..m {
+            let mut acc = 0u64;
+            for p in ptr[r]..ptr[r + 1] {
+                acc = mont.add(acc, mont.mul(vals[p], x[cols[p] as usize]));
+            }
+            tmp[r] = mont.mul(acc, diag[r]);
+        }
+        for o in out.iter_mut() {
+            *o = 0;
+        }
+        for r in 0..m {
+            let t = tmp[r];
+            if t == 0 {
+                continue;
+            }
+            for p in ptr[r]..ptr[r + 1] {
+                let c = cols[p] as usize;
+                out[c] = mont.add(out[c], mont.mul(vals[p], t));
+            }
+        }
+        *ops += 2 * nnz + m as u64;
+        *mv += 1;
+    };
+    // b = A'^T D r
+    let mut b = vec![0u64; nc];
+    for r in 0..m {
+        let t = mont.mul(rhs_r[r], diag[r]);
+        if t == 0 {
+            continue;
+        }
+        for p in ptr[r]..ptr[r + 1] {
+            let c = cols[p] as usize;
+            b[c] = mont.add(b[c], mont.mul(vals[p], t));
+        }
+    }
+    ops += nnz + m as u64;
+    let u: Vec<u64> = (0..nc).map(|_| mont.to(rng.below(mont.n))).collect();
+    let mut seq = Vec::with_capacity(2 * nc);
+    let mut cur = b.clone();
+    let mut nxt = vec![0u64; nc];
+    for _ in 0..2 * nc {
+        let mut d = 0u64;
+        for i in 0..nc {
+            d = mont.add(d, mont.mul(u[i], cur[i]));
+        }
+        ops += nc as u64;
+        seq.push(d);
+        matvec(&cur, &mut nxt, &mut tmp, &mut ops, &mut mv);
+        std::mem::swap(&mut cur, &mut nxt);
+        if let Some(dl) = deadline {
+            if mv % 64 == 0 && std::time::Instant::now() > dl {
+                res.fail = "timeout";
+                res.wied_ops = ops;
+                res.matvecs = mv;
+                return res;
+            }
+        }
+    }
+    let mut bm_ops = 0u64;
+    let (cpoly, l) = berlekamp_massey(mont, &seq, &mut bm_ops);
+    res.bm_ops = bm_ops;
+    res.deg = l;
+    // f_j = C[L - j]
+    let f0 = cpoly[l];
+    if l == 0 || f0 == 0 {
+        res.fail = "minpoly_zero_constant";
+        res.wied_ops = ops;
+        res.matvecs = mv;
+        return res;
+    }
+    // w = -f0^{-1} sum_{j=1}^{L} f_j M^{j-1} b
+    let mut acc = vec![0u64; nc];
+    let mut cur = b.clone();
+    for j in 1..=l {
+        let fj = cpoly[l - j];
+        if fj != 0 {
+            for i in 0..nc {
+                acc[i] = mont.add(acc[i], mont.mul(fj, cur[i]));
+            }
+            ops += nc as u64;
+        }
+        if j < l {
+            matvec(&cur, &mut nxt, &mut tmp, &mut ops, &mut mv);
+            std::mem::swap(&mut cur, &mut nxt);
+        }
+        if let Some(dl) = deadline {
+            if mv % 64 == 0 && std::time::Instant::now() > dl {
+                res.fail = "timeout";
+                res.wied_ops = ops;
+                res.matvecs = mv;
+                return res;
+            }
+        }
+    }
+    let sc = mont.neg(mont.inv(f0));
+    for i in 0..nc {
+        acc[i] = mont.mul(acc[i], sc);
+    }
+    ops += nc as u64;
+    // verify on all rows (used and held out)
+    let mut v = vec![0u64; ncols];
+    v[0] = mont.one;
+    v[1..].copy_from_slice(&acc);
+    let mut all_ok = true;
+    let mut hold_ok = true;
+    for (r, row) in rows.iter().enumerate() {
+        let mut s = 0u64;
+        for &(c, val) in row {
+            s = mont.add(s, mont.mul(val, v[c as usize]));
+        }
+        ops += row.len() as u64;
+        if s != 0 {
+            all_ok = false;
+            if r >= m {
+                hold_ok = false;
+            }
+        }
+    }
+    res.wied_ops = ops;
+    res.matvecs = mv;
+    res.holdout_ok = hold_ok;
+    res.ok = all_ok;
+    if !all_ok {
+        res.fail = "verification_failed";
+    }
+    res.v = v.iter().map(|&x| mont.from(x)).collect();
+    res
+}
+
+// ---------------------------------------------------------------------------
+// 5. rho on E0(K)
+// ---------------------------------------------------------------------------
+
+/// `K` arithmetic with the same operation tallies as `Kf` (13 `F_q` products per `K` product,
+/// 6 per Frobenius, one counted inversion per `K` inversion) but without per-operation cell
+/// traffic: tallies are plain integer increments. Equivalence with `Kf` (results and tallies)
+/// is unit-tested.
+pub struct KFast {
+    pub q: u64,
+    a: u64,
+    b: u64,
+    gq: K,
+    gq2: K,
+    pub fqm: Cell<u64>,
+    pub fqi: Cell<u64>,
+}
+
+impl KFast {
+    pub fn new(kf: &Kf) -> KFast {
+        KFast { q: kf.q(), a: kf.a, b: kf.b, gq: kf.gq, gq2: kf.gq2, fqm: Cell::new(0), fqi: Cell::new(0) }
+    }
+    #[inline]
+    pub fn add(&self, x: &K, y: &K) -> K {
+        let q = self.q;
+        let r = |a: u64, b: u64| {
+            let s = a + b;
+            if s >= q {
+                s - q
+            } else {
+                s
+            }
+        };
+        [r(x[0], y[0]), r(x[1], y[1]), r(x[2], y[2])]
+    }
+    #[inline]
+    pub fn sub(&self, x: &K, y: &K) -> K {
+        let q = self.q;
+        let r = |a: u64, b: u64| if a >= b { a - b } else { a + q - b };
+        [r(x[0], y[0]), r(x[1], y[1]), r(x[2], y[2])]
+    }
+    #[inline]
+    pub fn mul(&self, x: &K, y: &K) -> K {
+        self.fqm.set(self.fqm.get() + 13);
+        let q = self.q;
+        let c0 = x[0] * y[0];
+        let c1 = x[0] * y[1] + x[1] * y[0];
+        let c2 = x[0] * y[2] + x[1] * y[1] + x[2] * y[0];
+        let c3 = (x[1] * y[2] + x[2] * y[1]) % q;
+        let c4 = (x[2] * y[2]) % q;
+        // g^3 = -a g - b, g^4 = -a g^2 - b g
+        let nb = q - self.b;
+        let na = q - self.a;
+        [(c0 + nb * c3) % q, (c1 + na * c3 + nb * c4) % q, (c2 + na * c4) % q]
+    }
+    #[inline]
+    fn scale(&self, x: &K, c: u64) -> K {
+        self.fqm.set(self.fqm.get() + 3);
+        [x[0] * c % self.q, x[1] * c % self.q, x[2] * c % self.q]
+    }
+    fn frob(&self, x: &K) -> K {
+        let t1 = self.scale(&self.gq, x[1]);
+        let t2 = self.scale(&self.gq2, x[2]);
+        let s = self.add(&t1, &t2);
+        [(s[0] + x[0]) % self.q, s[1], s[2]]
+    }
+    fn fq_inv(&self, a: u64) -> u64 {
+        self.fqi.set(self.fqi.get() + 1);
+        let (mut t, mut newt) = (0i64, 1i64);
+        let (mut r, mut newr) = (self.q as i64, a as i64);
+        while newr != 0 {
+            let qt = r / newr;
+            let tmp = t - qt * newt;
+            t = newt;
+            newt = tmp;
+            let tmp = r - qt * newr;
+            r = newr;
+            newr = tmp;
+        }
+        t.rem_euclid(self.q as i64) as u64
+    }
+    pub fn inv(&self, x: &K) -> K {
+        let x1 = self.frob(x);
+        let x2 = self.frob(&x1);
+        let t = self.mul(&x1, &x2);
+        let n = self.mul(x, &t);
+        let ni = self.fq_inv(n[0]);
+        self.scale(&t, ni)
+    }
+}
+
+#[inline]
+fn kmix(x: &K) -> u64 {
+    let mut h = x[0].wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ x[1].wrapping_mul(0xBF58_476D_1CE4_E5B9).rotate_left(21) ^ x[2].wrapping_mul(0x94D0_49BB_1331_11EB).rotate_left(42);
+    h ^= h >> 31;
+    h = h.wrapping_mul(0xD6E8_FEB8_6659_FD93);
+    h ^= h >> 32;
+    h
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct RhoOut {
+    pub ok: bool,
+    pub verified: bool,
+    pub timeout: bool,
+    pub steps: u64,
+    pub dps: u64,
+    pub dp_lookups: u64,
+    pub dp_inserts: u64,
+    pub dp_checks: u64,
+    pub part_hashes: u64,
+    pub rng_draws: u64,
+    pub modl_adds: u64,
+    pub canon: u64,
+    pub restarts: u64,
+    pub fallbacks: u64,
+    pub fq_mul: u64,
+    pub fq_inv: u64,
+    pub setup_fq_mul: u64,
+    pub setup_fq_inv: u64,
+    pub restart_fq_mul: u64,
+    pub restart_fq_inv: u64,
+    pub d: u32,
+    pub m: usize,
+    pub r: usize,
+    pub wall_s: f64,
+}
+
+pub const RHO_R: usize = 32;
+pub const RHO_M: usize = 64;
+
+/// `a G0 + b Q` by double-and-add through the counted `Kf` arithmetic.
+fn lin_comb(inst: &Inst, g0: &EPt, qq: &EPt, a: u64, b: u64) -> EPt {
+    let x = inst.e_mul(g0, a as u128);
+    let y = inst.e_mul(qq, b as u128);
+    inst.e_add(&x, &y)
+}
+
+/// Pollard rho (r-adding walk, `m` lock-step walkers, Montgomery batch inversion in `K`,
+/// distinguished points, no negation map) for `Q = s G0` in the order-`ell` subgroup.
+pub fn rho_run(inst: &Inst, seed: u64, deadline: Option<std::time::Instant>) -> RhoOut {
+    let t0 = std::time::Instant::now();
+    let ell = inst.ell;
+    let mut out = RhoOut { m: RHO_M, r: RHO_R, ..Default::default() };
+    let mut rng = SplitMix64::new(seed ^ 0x52_48_4F_00_00_00_00_00);
+    let f = inst.f();
+    let (sm0, si0) = f.counts();
+    // generator and target
+    let g0 = loop {
+        out.rng_draws += 1;
+        let p = inst.e_random_point(&mut rng);
+        let g = inst.e_mul(&p, inst.h as u128);
+        if g.is_some() {
+            break g;
+        }
+    };
+    let s = 1 + rng.below(ell - 1);
+    out.rng_draws += 1;
+    let qq = inst.e_mul(&g0, s as u128);
+    // multipliers
+    let mut mult: Vec<(K, K, u64, u64)> = vec![];
+    while mult.len() < RHO_R {
+        let (mj, nj) = (rng.below(ell), rng.below(ell));
+        out.rng_draws += 2;
+        if let Some((x, y)) = lin_comb(inst, &g0, &qq, mj, nj) {
+            mult.push((x, y, mj, nj));
+        }
+    }
+    let rd = (isqrt_u128(ell as u128).max(1) as f64).log2().floor() as i64 - 10;
+    let d = rd.max(0) as u32;
+    out.d = d;
+    let mask = (1u64 << d) - 1;
+    let nw = RHO_M;
+    let mut px: Vec<K> = vec![[0; 3]; nw];
+    let mut py: Vec<K> = vec![[0; 3]; nw];
+    let mut wa = vec![0u64; nw];
+    let mut wb = vec![0u64; nw];
+    let mut start_walker = |i: usize, rng: &mut SplitMix64, px: &mut Vec<K>, py: &mut Vec<K>, wa: &mut Vec<u64>, wb: &mut Vec<u64>, out: &mut RhoOut| {
+        loop {
+            let (a, b) = (rng.below(ell), rng.below(ell));
+            out.rng_draws += 2;
+            if let Some((x, y)) = lin_comb(inst, &g0, &qq, a, b) {
+                px[i] = x;
+                py[i] = y;
+                wa[i] = a;
+                wb[i] = b;
+                return;
+            }
+        }
+    };
+    for i in 0..nw {
+        start_walker(i, &mut rng, &mut px, &mut py, &mut wa, &mut wb, &mut out);
+    }
+    let (sm1, si1) = f.counts();
+    out.setup_fq_mul = sm1 - sm0;
+    out.setup_fq_inv = si1 - si0;
+    let kf = KFast::new(&inst.kf);
+    let mut table: FxMap<[u32; 6], (u64, u64)> = FxMap::default();
+    let cap = 60 * (isqrt_u128(ell as u128) as u64 + 1) + 200_000;
+    let mut hs: Vec<u64> = px.iter().map(kmix).collect();
+    out.part_hashes += nw as u64;
+    let one: K = [1, 0, 0];
+    let mut pre: Vec<K> = vec![one; nw];
+    let mut den: Vec<K> = vec![one; nw];
+    let mut jsel = vec![0usize; nw];
+    let mut special = vec![false; nw];
+    loop {
+        if out.steps >= cap {
+            break;
+        }
+        if out.steps % (1 << 16) < nw as u64 {
+            if let Some(dl) = deadline {
+                if std::time::Instant::now() > dl {
+                    out.timeout = true;
+                    break;
+                }
+            }
+        }
+        // partition and denominators
+        let mut run = one;
+        for i in 0..nw {
+            let j = ((hs[i] >> 40) as usize) % RHO_R;
+            jsel[i] = j;
+            let dd = kf.sub(&mult[j].0, &px[i]);
+            special[i] = dd == [0; 3];
+            den[i] = if special[i] { one } else { dd };
+            pre[i] = run;
+            if i + 1 < nw {
+                run = kf.mul(&run, &den[i]);
+            } else {
+                run = kf.mul(&run, &den[i]);
+            }
+        }
+        // run = product of all den; invert once, sweep back
+        let mut inv_run = kf.inv(&run);
+        for i in (0..nw).rev() {
+            let inv_i = kf.mul(&inv_run, &pre[i]);
+            inv_run = kf.mul(&inv_run, &den[i]);
+            let j = jsel[i];
+            let (mx, my, mj, nj) = &mult[j];
+            if special[i] {
+                out.fallbacks += 1;
+                let cur: EPt = Some((px[i], py[i]));
+                let nw_pt = inst.e_add(&cur, &Some((*mx, *my)));
+                match nw_pt {
+                    Some((x, y)) => {
+                        px[i] = x;
+                        py[i] = y;
+                    }
+                    None => {
+                        out.restarts += 1;
+                        start_walker(i, &mut rng, &mut px, &mut py, &mut wa, &mut wb, &mut out);
+                    }
+                }
+            } else {
+                let lam = kf.mul(&kf.sub(my, &py[i]), &inv_i);
+                let x3 = kf.sub(&kf.sub(&kf.mul(&lam, &lam), &px[i]), mx);
+                let y3 = kf.sub(&kf.mul(&lam, &kf.sub(&px[i], &x3)), &py[i]);
+                px[i] = x3;
+                py[i] = y3;
+            }
+            wa[i] = {
+                let t = wa[i] + mj;
+                if t >= ell {
+                    t - ell
+                } else {
+                    t
+                }
+            };
+            wb[i] = {
+                let t = wb[i] + nj;
+                if t >= ell {
+                    t - ell
+                } else {
+                    t
+                }
+            };
+        }
+        out.steps += nw as u64;
+        out.modl_adds += 2 * nw as u64;
+        // new hashes, distinguished-point checks
+        for i in 0..nw {
+            hs[i] = kmix(&px[i]);
+            out.part_hashes += 1;
+            out.dp_checks += 1;
+            if hs[i] & mask == 0 {
+                out.dps += 1;
+                let key = [px[i][0] as u32, px[i][1] as u32, px[i][2] as u32, py[i][0] as u32, py[i][1] as u32, py[i][2] as u32];
+                out.dp_lookups += 1;
+                let mut solved = None;
+                let mut solved_none_cycle = false;
+                if let Some(&(a2, b2)) = table.get(&key) {
+                    if (a2, b2) == (wa[i], wb[i]) {
+                        solved_none_cycle = true;
+                    }
+                    if (a2, b2) != (wa[i], wb[i]) && b2 != wb[i] {
+                        // a + b s = a2 + b2 s  =>  s = (a - a2) / (b2 - b)
+                        let mt = Mont::new(ell);
+                        let num = mt.sub(mt.to(wa[i]), mt.to(a2));
+                        let dn = mt.sub(mt.to(b2), mt.to(wb[i]));
+                        solved = Some(mt.from(mt.mul(num, mt.inv(dn))));
+                    }
+                } else {
+                    table.insert(key, (wa[i], wb[i]));
+                    out.dp_inserts += 1;
+                }
+                if let Some(sc) = solved {
+                    out.ok = true;
+                    out.verified = inst.e_mul(&g0, sc as u128) == qq && sc == s;
+                    // the verified solution must equal the planted scalar
+                    out.fq_mul = kf.fqm.get();
+                    out.fq_inv = kf.fqi.get();
+                    out.wall_s = t0.elapsed().as_secs_f64();
+                    return out;
+                }
+                // walkers continue after a distinguished point; one that reproduces an
+                // already stored (a, b) is on a cycle and is restarted at a fresh point
+                if table.get(&key) == Some(&(wa[i], wb[i])) && solved_none_cycle {
+                    out.restarts += 1;
+                    let (rm0, ri0) = f.counts();
+                    start_walker(i, &mut rng, &mut px, &mut py, &mut wa, &mut wb, &mut out);
+                    let (rm1, ri1) = f.counts();
+                    out.restart_fq_mul += rm1 - rm0;
+                    out.restart_fq_inv += ri1 - ri0;
+                    hs[i] = kmix(&px[i]);
+                }
+            }
+        }
+    }
+    out.fq_mul = kf.fqm.get();
+    out.fq_inv = kf.fqi.get();
+    out.wall_s = t0.elapsed().as_secs_f64();
+    out
+}
+
+/// Measured multiplication-equivalent of one `F_q` inversion (extended Euclid vs `a*b % q`),
+/// dependent chains, `samples` each; median of 5 repeats.
+pub fn measure_rho_inv(q: u64, samples: u64) -> f64 {
+    let f = Fq::new(q);
+    let mut ratios = vec![];
+    for rep in 0..5u64 {
+        let mut x = 12345 + rep;
+        let t = std::time::Instant::now();
+        for _ in 0..samples {
+            x = (x * (x | 1) + 7) % q;
+        }
+        let tm = t.elapsed().as_secs_f64();
+        let t = std::time::Instant::now();
+        let mut y = 12345 + rep;
+        for _ in 0..samples {
+            y = f.inv(y % (q - 1) + 1) + 1;
+        }
+        let ti = t.elapsed().as_secs_f64();
+        std::hint::black_box((x, y));
+        ratios.push(ti / tm);
+    }
+    ratios.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    ratios[2]
+}
+
+// ---------------------------------------------------------------------------
+// 6. cells: relation phase + linear algebra + verification (the measurement unit)
+// ---------------------------------------------------------------------------
+
+/// Tiny JSON-object builder (numbers via `Display`, strings escaped minimally).
+pub struct J(pub String);
+impl J {
+    pub fn new() -> J {
+        J(String::from("{"))
+    }
+    fn sep(&mut self) {
+        if self.0.len() > 1 {
+            self.0.push(',');
+        }
+    }
+    pub fn n<T: std::fmt::Display>(&mut self, k: &str, v: T) -> &mut J {
+        self.sep();
+        let s = format!("{}", v);
+        let s = if s == "NaN" || s == "inf" || s == "-inf" { "null".to_string() } else { s };
+        self.0.push_str(&format!("\"{}\":{}", k, s));
+        self
+    }
+    pub fn s(&mut self, k: &str, v: &str) -> &mut J {
+        self.sep();
+        self.0.push_str(&format!("\"{}\":\"{}\"", k, v.replace('\\', "\\\\").replace('"', "\\\"")));
+        self
+    }
+    pub fn raw(&mut self, k: &str, v: &str) -> &mut J {
+        self.sep();
+        self.0.push_str(&format!("\"{}\":{}", k, v));
+        self
+    }
+    pub fn done(&self) -> String {
+        format!("{}}}", self.0)
+    }
+}
+
+/// Pushforward of a relation: `sum cnt * pi0(point)` in `E0(K)`. `None` if some point is
+/// not on the cover.
+pub fn pushforward_sum(inst: &Inst, col: &Collector, rel: &Rel) -> Option<EPt> {
+    let mut acc: EPt = None;
+    for &(idx, c) in &rel.fb {
+        let p = inst.pi0(&col.fb[idx as usize].c)?;
+        acc = inst.e_add(&acc, &inst.e_mul(&p, c as u128));
+    }
+    for &(id, c) in &rel.lp {
+        let p = inst.pi0(&col.lp_pts[id as usize - 1])?;
+        acc = inst.e_add(&acc, &inst.e_mul(&p, c as u128));
+    }
+    Some(acc)
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct IcCell {
+    pub k: u32,
+    pub idx: u32,
+    pub arm: &'static str,
+    pub kappa: f64,
+    pub q: u64,
+    pub ell: u64,
+    pub h: u64,
+    pub nfb: usize,
+    pub ncols: usize,
+    pub status: String,
+    pub rounds: u32,
+    pub target_final: i64,
+    pub rows_collected: usize,
+    pub rows_after_elim: usize,
+    pub ctr: IcCounters,
+    pub rel_wall_s: f64,
+    pub la_wall_s: f64,
+    pub la_ok: bool,
+    pub la_fail: String,
+    pub la_deg: usize,
+    pub holdout: usize,
+    pub holdout_ok: bool,
+    pub coverage: bool,
+    pub cross_pairs: u32,
+    pub cross_ok: u32,
+    pub push_checked: u64,
+    pub push_fail: u64,
+    pub rank_profile: Vec<(f64, usize, usize, usize)>,
+    pub v: Vec<u64>,
+}
+
+impl IcCell {
+    /// Attack cost in `F_q`-multiplication equivalents with inversion price `rinv` and
+    /// mod-ell weight `w_ell`: relation phase (incl. FB construction, excl. verification) +
+    /// linear algebra.
+    pub fn cost_rel(&self, rinv: f64) -> f64 {
+        (self.ctr.fq_mul_collect + self.ctr.fq_mul_fb) as f64 + rinv * (self.ctr.fq_inv_collect + self.ctr.fq_inv_fb) as f64
+    }
+    pub fn lops(&self) -> u64 {
+        self.ctr.elim_ops + self.ctr.wied_ops + self.ctr.bm_ops
+    }
+    pub fn to_json(&self) -> String {
+        let c = &self.ctr;
+        let mut j = J::new();
+        j.n("k", self.k).n("idx", self.idx).s("arm", self.arm).n("kappa", self.kappa).n("q", self.q).n("ell", self.ell).n("h", self.h);
+        j.n("nfb", self.nfb).n("ncols", self.ncols).s("status", &self.status).n("rounds", self.rounds).n("target_final", self.target_final);
+        j.n("rows_collected", self.rows_collected).n("rows_after_elim", self.rows_after_elim);
+        j.n("lines", c.lines).n("split", c.split).n("rel_full", c.rel_full).n("rel_slp", c.rel_slp).n("rel_dlp", c.rel_dlp).n("dups", c.dups);
+        j.n("verified", c.verified).n("verify_failed", c.verify_failed);
+        j.n("fq_mul_collect", c.fq_mul_collect).n("fq_inv_collect", c.fq_inv_collect).n("fq_mul_fb", c.fq_mul_fb).n("fq_inv_fb", c.fq_inv_fb);
+        j.n("fq_mul_verify", c.fq_mul_verify).n("fq_inv_verify", c.fq_inv_verify);
+        j.n("elim_ops", c.elim_ops).n("elim_entries", c.elim_entries).n("wied_ops", c.wied_ops).n("bm_ops", c.bm_ops).n("matvecs", c.matvecs);
+        j.n("lops", self.lops());
+        j.n("hash_lookups", c.hash_lookups).n("hash_inserts", c.hash_inserts).n("rng_draws", c.rng_draws).n("uf_ops", c.uf_ops).n("root_calls", c.root_calls).n("norm_calls", c.norm_calls);
+        j.n("rel_wall_s", self.rel_wall_s).n("la_wall_s", self.la_wall_s);
+        j.n("la_ok", self.la_ok as u32).s("la_fail", &self.la_fail).n("la_deg", self.la_deg).n("holdout", self.holdout).n("holdout_ok", self.holdout_ok as u32);
+        j.n("coverage", self.coverage as u32).n("cross_pairs", self.cross_pairs).n("cross_ok", self.cross_ok);
+        j.n("push_checked", self.push_checked).n("push_fail", self.push_fail);
+        let rp: Vec<String> = self.rank_profile.iter().map(|(f, t, r, k)| format!("[{},{},{},{}]", f, t, r, k)).collect();
+        j.raw("rank_profile", &format!("[{}]", rp.join(",")));
+        j.done()
+    }
+}
+
+fn ceil_i(x: f64) -> i64 {
+    x.ceil() as i64
+}
+
+/// Execute one IC cell: relation phase, structured elimination, Wiedemann, with the
+/// protocol's verification and ell-part tests. `wall_cap_s` bounds relation + LA wall time.
+pub fn run_ic_cell(inst: &Inst, arm: Arm, kappa: f64, seed: u64, wall_cap_s: f64, do_rank_profile: bool) -> IcCell {
+    let start = std::time::Instant::now();
+    let deadline = start + std::time::Duration::from_secs_f64(wall_cap_s);
+    let mont = Mont::new(inst.ell);
+    let mut col = Collector::new(inst, arm, kappa, seed);
+    let nfb = col.fb.len();
+    let ncols = nfb;
+    let mut cell = IcCell { k: inst.k, idx: inst.idx, arm: arm.name(), kappa, q: inst.q, ell: inst.ell, h: inst.h, nfb, ncols, rounds: 1, ..Default::default() };
+    let mut target = ceil_i(1.1 * (nfb as f64 + 1.0) + 20.0);
+    let mut la_best: Option<LaResult> = None;
+    let mut rows_final: Vec<SRow> = vec![];
+    loop {
+        let t = std::time::Instant::now();
+        let ok = col.run_until(target, u64::MAX, Some(deadline));
+        cell.rel_wall_s += t.elapsed().as_secs_f64();
+        if std::env::var("DQ_DEBUG").is_ok() {
+            eprintln!("[dq] rel done ok={} lines={} rels={} avail={} t={:.2}", ok, col.ctr.lines, col.rels.len(), col.available(), cell.rel_wall_s);
+        }
+        if !ok {
+            cell.status = if col.exhausted { "pairs_exhausted".into() } else { "timeout_relations".into() };
+            break;
+        }
+        let t = std::time::Instant::now();
+        let rows0 = build_rows(&mont, nfb, &col.rels);
+        cell.rows_collected = rows0.len();
+        let (mut eo, mut ee) = (0u64, 0u64);
+        let rows = eliminate_lp(&mont, nfb, rows0, &mut eo, &mut ee);
+        col.ctr.elim_ops += eo;
+        col.ctr.elim_entries += ee;
+        cell.rows_after_elim = rows.len();
+        if std::env::var("DQ_DEBUG").is_ok() {
+            eprintln!("[dq] elim done rows={} ops={} t={:.2}", rows.len(), eo, t.elapsed().as_secs_f64());
+        }
+        let holdout = ((rows.len() / 20).max(20)).min(rows.len());
+        let la = wiedemann_solve(&mont, &rows, ncols, holdout, seed ^ 0x4C41 ^ cell.rounds as u64, Some(deadline));
+        cell.la_wall_s += t.elapsed().as_secs_f64();
+        col.ctr.wied_ops += la.wied_ops;
+        col.ctr.bm_ops += la.bm_ops;
+        col.ctr.matvecs += la.matvecs;
+        cell.la_deg = la.deg;
+        cell.holdout = la.holdout;
+        cell.holdout_ok = la.holdout_ok;
+        cell.la_fail = la.fail.to_string();
+        cell.target_final = target;
+        if la.ok {
+            cell.la_ok = true;
+            cell.status = "ok".into();
+            rows_final = rows;
+            la_best = Some(la);
+            break;
+        }
+        if la.fail == "timeout" {
+            cell.status = "timeout_la".into();
+            break;
+        }
+        if cell.rounds >= 6 {
+            cell.status = "la_failed".into();
+            break;
+        }
+        cell.rounds += 1;
+        target = ceil_i(target as f64 * 1.25);
+    }
+    col.finish_counters();
+    let _ = rows_final;
+    // ---- verification and ell-part tests (not part of the attack cost) ----
+    // pushforward of relations
+    {
+        let mut rng = SplitMix64::new(seed ^ 0x5055_5348);
+        let n = col.rels.len();
+        let idxs: Vec<usize> = if inst.k <= 12 || n <= 2000 { (0..n).collect() } else { (0..2000).map(|_| rng.below(n as u64) as usize).collect() };
+        let mut first: Option<EPt> = None;
+        for &i in &idxs {
+            let s = pushforward_sum(inst, &col, &col.rels[i]);
+            cell.push_checked += 1;
+            match s {
+                None => cell.push_fail += 1,
+                Some(sv) => match &first {
+                    None => first = Some(sv),
+                    Some(f0) => {
+                        if *f0 != sv {
+                            cell.push_fail += 1;
+                        }
+                    }
+                },
+            }
+        }
+    }
+    // ell-part coverage
+    let p0 = inst.pi0(&col.fb[0].c).unwrap_or(None);
+    let mut tvec: Vec<EPt> = Vec::with_capacity(nfb);
+    {
+        let np0 = inst.e_neg(&p0);
+        let mut any = false;
+        let limit = if nfb > 4000 { 4000 } else { nfb };
+        for i in 0..limit {
+            let pi = inst.pi0(&col.fb[i].c).unwrap_or(None);
+            let t = inst.e_mul(&inst.e_add(&pi, &np0), inst.h as u128);
+            if t.is_some() {
+                any = true;
+            }
+            tvec.push(t);
+        }
+        cell.coverage = any;
+    }
+    if let Some(la) = &la_best {
+        cell.v = la.v.clone();
+        let mut rng = SplitMix64::new(seed ^ 0x4352_4F53);
+        let lim = tvec.len() as u64;
+        for _ in 0..20 {
+            let a = rng.below(lim) as usize;
+            let b = rng.below(lim) as usize;
+            let (va, vb) = (if a == 0 { 0 } else { la.v[a] }, if b == 0 { 0 } else { la.v[b] });
+            let l = inst.e_mul(&tvec[b], va as u128);
+            let r = inst.e_mul(&tvec[a], vb as u128);
+            cell.cross_pairs += 1;
+            if l == r {
+                cell.cross_ok += 1;
+            }
+        }
+    }
+    cell.ctr = col.ctr.clone();
+    // rank profile (separate collector, same seed; cost excluded)
+    if do_rank_profile && ncols <= 1500 {
+        for &fct in &[1.0f64, 1.05, 1.1, 1.25, 1.5] {
+            let mut c2 = Collector::new(inst, arm, kappa, seed);
+            let tgt = ceil_i(fct * ncols as f64);
+            if !c2.run_until(tgt, u64::MAX, Some(deadline + std::time::Duration::from_secs(600))) {
+                break;
+            }
+            let rows0 = build_rows(&mont, nfb, &c2.rels);
+            let (mut eo, mut ee) = (0u64, 0u64);
+            let rows = eliminate_lp(&mont, nfb, rows0, &mut eo, &mut ee);
+            let rk = dense_rank(&mont, &rows, ncols);
+            cell.rank_profile.push((fct, rows.len(), rk, ncols - rk));
+        }
+    }
+    cell
+}
+
+/// One rho measurement as a JSON line (raw counters; pricing is done by the analysis).
+pub fn rho_json(inst: &Inst, run: u32, o: &RhoOut, rinv: f64) -> String {
+    let mut j = J::new();
+    j.n("k", inst.k).n("idx", inst.idx).n("run", run).n("q", inst.q).n("ell", inst.ell).n("h", inst.h);
+    j.n("ok", o.ok as u32).n("verified", o.verified as u32).n("timeout", o.timeout as u32);
+    j.n("steps", o.steps).n("dps", o.dps).n("dp_lookups", o.dp_lookups).n("dp_inserts", o.dp_inserts).n("dp_checks", o.dp_checks);
+    j.n("part_hashes", o.part_hashes).n("rng_draws", o.rng_draws).n("modl_adds", o.modl_adds).n("canon", o.canon);
+    j.n("restarts", o.restarts).n("fallbacks", o.fallbacks);
+    j.n("fq_mul", o.fq_mul).n("fq_inv", o.fq_inv).n("setup_fq_mul", o.setup_fq_mul).n("setup_fq_inv", o.setup_fq_inv);
+    j.n("restart_fq_mul", o.restart_fq_mul).n("restart_fq_inv", o.restart_fq_inv);
+    j.n("d", o.d).n("m", o.m).n("r", o.r).n("wall_s", o.wall_s).n("rho_inv", rinv);
+    j.done()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn kfast_matches_kf() {
+        let q = q_of_k(9);
+        let kf = Kf::new(q);
+        let fast = KFast::new(&kf);
+        let mut rng = SplitMix64::new(7);
+        for _ in 0..50 {
+            let x = kf.rand(&mut rng);
+            let y = kf.rand(&mut rng);
+            kf.f.muls.set(0);
+            kf.f.invs.set(0);
+            fast.fqm.set(0);
+            fast.fqi.set(0);
+            assert_eq!(kf.mul(&x, &y), fast.mul(&x, &y));
+            assert_eq!(kf.f.counts().0, fast.fqm.get());
+            if x != [0; 3] {
+                kf.f.muls.set(0);
+                kf.f.invs.set(0);
+                fast.fqm.set(0);
+                fast.fqi.set(0);
+                assert_eq!(kf.inv(&x), fast.inv(&x));
+                assert_eq!(kf.f.counts(), (fast.fqm.get(), fast.fqi.get()));
+            }
+        }
+    }
+
+    #[test]
+    fn mont_and_bm() {
+        let m = Mont::new(1_000_000_007);
+        let a = m.to(123456789);
+        assert_eq!(m.from(m.mul(a, m.inv(a))), 1);
+        // Fibonacci-like recurrence
+        let mut s = vec![m.to(1), m.to(1)];
+        for i in 2..20 {
+            let v = m.add(s[i - 1], s[i - 2]);
+            s.push(v);
+        }
+        let mut ops = 0;
+        let (_c, l) = berlekamp_massey(&m, &s, &mut ops);
+        assert_eq!(l, 2);
+    }
+
+    fn check_instance(k: u32, idx: u32) -> Inst {
+        let inst = gen_instance(k, idx);
+        assert!(is_prime_u64(inst.ell));
+        assert_eq!(inst.order, inst.h * inst.ell);
+        let f = inst.f();
+        let pts = enumerate_points(f, &inst.quartic);
+        assert_eq!(pts.len() as u64, inst.q + 1);
+        for p in &pts {
+            assert_eq!(eval_g(f, &inst.quartic, p), 0);
+            let e = inst.pi0(p).expect("point lies on the cover");
+            assert!(inst.e_on_curve(&e), "pi0 image on E0");
+            assert!(inst.e_mul(&e, inst.order as u128).is_none(), "N pi0(P) = O");
+        }
+        inst
+    }
+
+    #[test]
+    fn instance_k8() {
+        check_instance(8, 0);
+    }
+
+    #[test]
+    fn full_cell_k8() {
+        let inst = gen_instance(8, 0);
+        let c = run_ic_cell(&inst, Arm::Full, 1.0, 11, 300.0, true);
+        eprintln!("{}", c.to_json());
+        assert_eq!(c.ctr.verify_failed, 0);
+        assert_eq!(c.push_fail, 0);
+        assert!(c.la_ok);
+        assert!(c.coverage);
+        assert_eq!(c.cross_ok, c.cross_pairs);
+    }
+
+    #[test]
+    fn slp_dlp_cells_k10() {
+        let inst = gen_instance(10, 0);
+        for (arm, kappa) in [(Arm::Slp, 2.0), (Arm::Dlp, 4.0)] {
+            let c = run_ic_cell(&inst, arm, kappa, 5, 300.0, false);
+            eprintln!("{}", c.to_json());
+            assert_eq!(c.ctr.verify_failed, 0);
+            assert_eq!(c.push_fail, 0);
+            assert!(c.la_ok, "{:?}", c.status);
+            assert_eq!(c.cross_ok, c.cross_pairs);
+        }
+    }
+
+    #[test]
+    fn rho_k8_k10() {
+        for k in [8u32, 10] {
+            let inst = gen_instance(k, 0);
+            let o = rho_run(&inst, 3, None);
+            eprintln!("{:?}", o);
+            assert!(o.ok && o.verified);
+        }
+    }
+}
