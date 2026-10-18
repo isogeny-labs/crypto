@@ -219,8 +219,8 @@ Run before the cards were frozen, at the smallest draw counts. What was run:
   `--force-n0` negative controls (threshold at the smallest `sym_vars` gives
   TRADES; a threshold above every size gives MATCHES).
 * Replication of item 02 on its `t = 0..3` targets at `n = 5, 7, 11`: `x_R` and
-  root counts equal on 12 of 12; incumbent splits equal on 8, within 1 on 3 and
-  within 3 on 1 (arm C); solver word XORs of I 10 % lower at `n = 11` than
+  root counts equal on 12 of 12; split counts of I within 2 and of C within 3 of
+  item 02's on all 12 (equal on most); solver word XORs of I 10 % lower at `n = 11` than
   item 02's rows (the solver change above).
 
 **Disclosure.** (1) The smoke set included held-out targets `t = 12..15` at
