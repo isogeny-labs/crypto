@@ -36,3 +36,24 @@ remain unchanged. The independent audit still requires exact output, valid
 host receipts, every A/A ratio in `[0.90, 1.11]`, both RSS limits, and a
 Q-cluster bootstrap 95% lower charged-time ratio above 1.05 for default
 worker routing. Every partial, failed, noisy, and valid arm is retained.
+
+## Infrastructure stop
+
+The observer's deliberate negative and clear-core self-checks passed, but its
+first live run stopped on a `runc` task with host-level parent `0` and an
+affinity mask covering CPU `5` and sibling `29`. This happened before the
+observer saw the runner PID file. The runner was then stopped with `SIGINT`
+after eight arms and four exact-output pairs. Its summary is `rejected`, the
+independent audit is `unknown_gate_failed`, and no timing result is admitted.
+The [observer receipt](attempt4-affinity-watch.json) records the host task and
+time; the [self-check](attempt4-observer-selfcheck.json) and
+[runner summary](attempt4-summary.json) preserve the surrounding evidence.
+
+The [complete partial archive](attempt4-partial.tar.gz) contains 36 entries,
+including every completed arm stdout/stderr receipt, the frozen plan and
+allocation, observer script and log, source bundle, executable, and audit.
+SHA-256: `bc748931e3b72cffca6ee144703f2bfe38fa035c76e45b2ccbb030811506c6c3`.
+A subsequent launch needs a start barrier: the runner must not begin timed
+arms until the observer has the runner PID, the Pod startup task has cleared,
+and a full thread-affinity scan has passed. The observer must remain strict
+for the full timed interval.
