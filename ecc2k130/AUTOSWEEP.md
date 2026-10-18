@@ -235,3 +235,111 @@ against an automatic search of the same space that moved the B200 by 26%.
 | `kernel_cost.py` on the fused kernel | tooling gap, recorded | its loop finder sees one loop where the fused kernel has a step loop containing a slot loop; the fused rows' ALU column is the bound from the measured rate, not a static count |
 | 640 × 1 on the RTX PRO 6000 | engineering, did not pay | +1.4% per clock, −0.9% once the card is warm; 2 of 5 paired repetitions below 1.0 |
 | the 6000's other 19 arms | engineering that did not pay | star table of §4; the B200's four winners are the 6000's four largest losses |
+
+## 6. After cycle escape v3: the campaign sigma-table walk and the table walk (2026-10-17)
+
+Sections 3 and 4 swept the table walk under its pre-v3 rule. Cycle escape v3
+(CYCLE-ESCAPE-V3.md) replaced that rule, and the 20 B/s build now runs at
+about 5.6 B/s, so its tuning had to be redone, and the campaign moved to the
+fused sigma-table walk (RTX-PRO6000.md), which no sweep had covered. Both
+were swept on one RTX PRO 6000 each (Modal, driver 610.57.04, nvcc 13.3.73,
+source `c6d64436a`), with `benchmarks/autosweep/gpujob.sh` unchanged except
+for a new `PRESET_TARGET` that selects the base preset. Receipts:
+[`rtx-pro-6000-sigma-table/`](benchmarks/autosweep/rtx-pro-6000-sigma-table/)
+and [`rtx-pro-6000-table-v3-round2/`](benchmarks/autosweep/rtx-pro-6000-table-v3-round2/).
+
+### 6.1 The sigma-table walk (`make gpu-preset-sigma`)
+
+Base: `gpu-rtx-pro6000-sigma-table`, 128 registers, no spills. Twenty-four
+arms ([arms file](benchmarks/autosweep/arms-rtx-pro-6000-sigma-table.txt)),
+screened twice, base 16.163 B/s:
+
+| arm | screened / base | | arm | screened / base |
+|---|---:|---|---|---:|
+| **`PACKED_L2_PERSIST=1`** | **1.0465** | | `PACKED_ONB_INV=1` | 0.9851 |
+| `PACKED_TAIL_LAYOUT=1` | 1.0056 | | 640 × 1 (96 regs, 36 B spill) | 0.9814 |
+| `PACKED_ALU_SQUARE=1` | 1.0019 | | batch 12 | 0.9735 |
+| `PACKED_INV_POLY=2` | 0.9978 | | 384 × 1 (148 regs) | 0.9715 |
+| `SIGMA_FUSED_LATE_Y=1` | 0.9951 | | 576 × 1 (96 regs, 36 B spill) | 0.9712 |
+| `PACKED_ADD_COMBINE=1` | 0.9947 | | 768 × 1 (80 regs, 12 B spill) | 0.9659 |
+| `PACKED_CLMUL_FLAT=1` | 0.9947 | | `PACKED_NATIVE_PRODUCT=2` | 0.9348 |
+| `PACKED_PAIR_ILP=1` | 0.9945 | | batch 24 | 0.9288 |
+| `PACKED_ALU_SQR=1` | 0.9943 | | `UNROLL_SLOTS=2` (120 B spill) | 0.9216 |
+| `PACKED_FROM_REDUCED=1` | 0.9936 | | `PACKED_NATIVE_REDUCE=1` | 0.4159 |
+| `PACKED_TOP_HOIST=1` | 0.9910 | | | |
+| `PACKED_PAIR_ILP=1 PACKED_PAIR_CLMUL=1` | 0.9906 | | | |
+| `PACKED_INLINE_POLY=1` | 0.9873 | | | |
+
+The greedy pass kept `PACKED_L2_PERSIST=1`, then `PACKED_TAIL_LAYOUT=1`
+(17.086 screened). The final bench, five alternating repetitions of 64
+launches:
+
+| finalist | median B/s | / base | paired ratios | SM clock, MHz |
+|---|---:|---:|---|---|
+| base | 16.046 | 1 | | 2317, 2302, 2302, 2295, 2295 |
+| + L2 persist | 16.915 | 1.0541 | 1.0391-1.0569 | 2422 throughout |
+| **+ L2 persist + tail layout** | **17.098** | **1.0655** | **1.0503-1.0681** | 2422 throughout |
+
+All three re-walked 300/300 reports with zero drops and produced the same
+1,478,764 distinguished points on the forced common walk count. The base sat
+at or near the 600 W limit and ran 100-130 MHz below the persisting builds;
+the clock is sampled after each repetition, not during it, so this records
+the correlation and not a measured power split. Promotion needs the A/A panel
+of the headline protocol, run separately below.
+
+Two arms bound what limits this walk. `PACKED_ALU_SQUARE=1` takes about 11%
+of the CLMADs off the carry-less unit and moved the rate by +0.19%, and the
+CLMAD self-addend form, which raises the unit's issue rate 1.19x for a full
+product (`benchmarks/clmad-pairs/`), lost 0.5% under the headline protocol
+(`benchmarks/clmad-self/`). The carry-less unit does not bind this walk.
+
+### 6.2 The v3 table walk (`make gpu-preset`), repeated
+
+Base: `gpu-rtx-pro6000-20b`. Seven arms
+([arms file](benchmarks/autosweep/arms-rtx-pro-6000-round2.txt)). The
+576-thread block led the star (1.060) and the greedy pass kept it alone. The
+final bench:
+
+| finalist | median B/s | / base | paired ratios |
+|---|---:|---:|---|
+| base, 512 × 1 | 5.173 | 1 | |
+| **576 × 1** | **5.611** | **1.0847** | **1.0825-1.0991** |
+| 576 × 1 + `PACKED_PAIR_CLMUL=1` | 5.625 | 1.0872 | 1.0822-1.1101 |
+
+All three re-walked 300/300 with zero drops and produced the identical
+1,480,278-record DP set. An earlier run of the same arms on 2026-10-09, from
+an older tree, measured 5.53 against 5.10 B/s for 576 × 1 (1.083 in every
+pair). The `PACKED_PAIR_CLMUL` increment is within the base's own spread.
+576 × 1 is an engineering candidate for the table-walk preset; it has not had
+an A/A panel, and the table walk is not the campaign walk, so the preset is
+unchanged here. `TABLE_PHASE_POPC=1` was neutral in this star (1.0069) and
+lost in its own paired run (CHEAPER-SELECTION.md).
+
+### 6.3 Classification
+
+| change | class | evidence |
+|---|---|---|
+| `PACKED_L2_PERSIST=1 PACKED_TAIL_LAYOUT=1` on the sigma-table walk, automatic workers | **engineering, promoted**: 1.0661 under the headline protocol | `PROMOTE_ENGINEERING`, §6.4 |
+| the same at the campaign's 385,024 workers | engineering that did not pay | 1.0032, `DO_NOT_PROMOTE`, §6.4 |
+| 576 × 1 on the v3 table walk | engineering, +8.5%, not selected | 5/5 pairs in two independent runs; 300/300; identical DPs; no A/A panel |
+| `PACKED_CLMAD_SELF=1` on the sigma-table walk | engineering that did not pay | headline protocol `DO_NOT_PROMOTE`, median 0.9947 |
+| the other sigma-table arms | engineering that did not pay | §6.1 star |
+
+### 6.4 The sigma-table winner under the headline protocol
+
+[`benchmarks/sigma-table-tuned/`](benchmarks/sigma-table-tuned/README.md)
+runs the sigma-fused headline protocol (A/A panel, five A/B pairs of 64
+launches, device arithmetic, replay and corpus gates, the frozen summarizer)
+with the sigma-table build as control at the campaign's 385,024 workers.
+
+| candidate | candidate workers | median B/s, control / candidate | median ratio | verdict |
+|---|---:|---|---:|---|
+| + L2 persist + tail layout | 385,024 | 15.788 / 15.833 | 1.0032 | `DO_NOT_PROMOTE` |
+| **+ L2 persist + tail layout** | **96,256** | **16.029 / 17.088** | **1.0661** | **`PROMOTE_ENGINEERING`** |
+
+The 80 MiB persisting window covers 80% of the field state at 96,256 workers
+and 20% at 385,024, which is why the knobs pay only at the smaller
+population. The promoted row compares two worker populations, so it bundles
+the knobs with a 4x smaller walk count; it is a device-local rate for the
+same walk, and the campaign preset is unchanged (`make
+gpu-rtx-pro6000-sigma-table-l2` builds it).
