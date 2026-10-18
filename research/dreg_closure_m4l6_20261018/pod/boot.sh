@@ -19,7 +19,7 @@ apt-get install -y -qq git build-essential curl pkg-config libssl-dev python3 ut
 curl -sSf https://sh.rustup.rs | sh -s -- -y -q --profile minimal > "$OUT/rustup.log" 2>&1
 . "$HOME/.cargo/env"
 cd /workspace
-git clone -q --branch "$BRANCH" https://github.com/aburan28/crypto src >> "$OUT/boot.log" 2>&1 || { status CLONE_FAILED; exit 1; }
+git clone -q --depth 1 --single-branch --branch "$BRANCH" https://github.com/aburan28/crypto src >> "$OUT/boot.log" 2>&1 || { status CLONE_FAILED; exit 1; }
 cd src
 ln -sfn /workspace/src/research/dreg_closure_m4l6_20261018 "$OUT/closure"
 ln -sfn /workspace/src/research/pkm_lead1_m3n21_20261016 "$OUT/pkm"

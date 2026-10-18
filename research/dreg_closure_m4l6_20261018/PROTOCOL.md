@@ -291,3 +291,15 @@ in the result PR.
 cpu3m, 32 vCPU, 256 GB) and `research/ic_leads_rented_20261018/closure_c1/LAUNCH.md`
 (C1: a 2 × L40 GPU pod, used for its 286 GB of host memory; the GPUs are
 idle). A2, B1, B2 and C2 stay deferred.
+
+### 11.7 Disclosure after the freeze (plumbing tests only)
+
+After the commit that froze §11 (`ee7a5d972`), a local test of `pod/boot.sh a3` on the 4 vCPU,
+15 GB authoring container ran the whole job with `A3_FIRST=251 A3_END=255`
+(`research/ic_leads_rented_20261018/tests/boot_a3_20261018/`). It computed
+draws 251–254 of the frozen range, all satisfiable, with no closure on any
+unsatisfiable draw. The control closure on draw 251 was killed by the host's
+memory (exit 137). Those files are kept as test records, not in `draws/`, so
+the pod generates the whole range itself. Draws 251–254 are fixed by the
+seed, and the selection rule (§11.2) reads only draw order, so this changes
+nothing in what will be measured.

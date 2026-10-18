@@ -10,7 +10,7 @@ OUT=$1; CAPS=$2; T0=$3
 remaining() { echo $(( CAPS - ($(date +%s) - T0) )); }
 status() { echo "$(date -u +%FT%TZ) $1" >> "$OUT/STATUS"; }
 D=research/pkm_m3_n21_msolve_20261018
-SYSTEMS=${MSOLVE_SYSTEMS:-"pkm_kummer_p2013265921_m3_t7_x221026520 pkm_kummer_p2013265921_m3_t7_x704078485 pkm_kummer_p2013265921_m3_t8_x1227422598 pkm_kummer_p2013265921_m3_t8_x1272776806"}
+SYSTEMS=${MSOLVE_SYSTEMS:-"pkm_kummer_p2013265921_m3_t7_x221026520 pkm_kummer_p2013265921_m3_t7_x704078485"}   # card P2a; P2b passes the two m3_t8 targets
 CONTROL=pkm_kummer_p2013265921_m3_t5_x1289903598
 set -- $SYSTEMS; PAR=$#
 NCPU=$(nproc); THREADS=$(( NCPU / PAR )); [ "$THREADS" -ge 1 ] || THREADS=1
