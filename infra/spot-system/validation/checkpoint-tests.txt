@@ -1,51 +1,48 @@
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
    Compiling checkpoint-discovery v0.1.0 (/home/ec2-user/crypto-spot-system/infra/spot-system/checkpoint-discovery)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.68s
-     Running unittests src/lib.rs (infra/spot-system/checkpoint-discovery/target/debug/deps/checkpoint_discovery-4a15343a92ac3835)
+    Finished `release` profile [optimized] target(s) in 0.54s
+     Running unittests src/lib.rs (infra/spot-system/checkpoint-discovery/target/release/deps/checkpoint_discovery-3d74e96d64fefe0b)
 
 running 0 tests
 
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
-     Running unittests src/main.rs (infra/spot-system/checkpoint-discovery/target/debug/deps/checkpoint_discovery-cc3e607267b1c462)
+     Running unittests src/main.rs (infra/spot-system/checkpoint-discovery/target/release/deps/checkpoint_discovery-58edc97ff4a4d222)
 
 running 0 tests
 
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
-     Running tests/discovery.rs (infra/spot-system/checkpoint-discovery/target/debug/deps/discovery-5fe5f38296a38848)
+     Running tests/discovery.rs (infra/spot-system/checkpoint-discovery/target/release/deps/discovery-372e14d933f40786)
 
 running 18 tests
-test a_previous_attempt_without_a_checkpoint_cannot_restart_from_zero ... ok
 test atomic_inventory_output_is_private_and_replaces_a_symlink_without_touching_target ... ok
 test completion_marker_must_match_the_job_identity ... ok
-test empty_job_is_fresh_but_a_temporary_file_is_not ... ok
+test a_previous_attempt_without_a_checkpoint_cannot_restart_from_zero ... ok
 test durable_root_is_scanned_before_a_large_external_archive ... ok
+test live_process_inventory_finds_legacy_worker_without_recording_arguments_or_environment ... ok
+test resource_limits_and_missing_jobs_are_not_a_clean_inventory ... ok
 test duplicate_generation_is_ambiguous ... ok
+test orphan_checkpoint_is_only_a_candidate_and_node_identity_is_excluded ... ok
+test job_spec_change_cannot_adopt_previous_state ... ok
+test unsafe_or_uncontracted_jobs_are_not_admitted ... ok
+test empty_job_is_fresh_but_a_temporary_file_is_not ... ok
+test escaped_or_duplicate_file_paths_are_rejected ... ok
+test newest_valid_generation_is_selected_by_number_not_write_time ... ok
+test symlinks_in_file_directory_or_checkpoint_root_block_admission ... ok
 test same_length_corruption_is_detected_by_digest ... ok
 test corrupt_latest_generation_falls_back_without_erasing_it ... ok
-test orphan_checkpoint_is_only_a_candidate_and_node_identity_is_excluded ... ok
 test fifo_checkpoint_cannot_hang_the_validator ... ok
-test job_spec_change_cannot_adopt_previous_state ... ok
-test resource_limits_and_missing_jobs_are_not_a_clean_inventory ... ok
-test live_process_inventory_finds_legacy_worker_without_recording_arguments_or_environment ... ok
-test newest_valid_generation_is_selected_by_number_not_write_time ... ok
-test unsafe_or_uncontracted_jobs_are_not_admitted ... ok
-test symlinks_in_file_directory_or_checkpoint_root_block_admission ... ok
-test escaped_or_duplicate_file_paths_are_rejected ... ok
 test uncommitted_or_missing_files_never_become_recoverable ... ok
 
 test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
-     Running tests/recovery.rs (infra/spot-system/checkpoint-discovery/target/debug/deps/recovery-d3be204a1c6c2e28)
+     Running tests/recovery.rs (infra/spot-system/checkpoint-discovery/target/release/deps/recovery-a079c6cdf34d1092)
 
 running 2 tests
 test native_checkpoint_worker ... ok
 test supervisor_restores_a_discovered_generation_after_abrupt_worker_death ... ok
 
-test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.14s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.15s
 
    Doc-tests checkpoint_discovery
 

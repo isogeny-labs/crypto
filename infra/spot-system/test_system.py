@@ -13,7 +13,7 @@ from types import SimpleNamespace
 from build_template import build
 from controller import handler, reconcile
 from runner import read_jobs
-from install_services import discovery_units
+from install_services import discovery_units, units
 
 
 class AddressTests(unittest.TestCase):
@@ -175,6 +175,27 @@ class ResumeTests(unittest.TestCase):
 
 
 class DeploymentTests(unittest.TestCase):
+    def test_compute_lifecycle_is_independent_of_ip_cutover(self):
+        template = build()
+        self.assertEqual(template['Conditions']['LifecycleActive'],
+                         {'Fn::Equals': [{'Ref': 'LifecycleEnabled'}, 'true']})
+        self.assertEqual(template['Resources']['Controller']['Properties']['Environment']['Variables']['ENABLED'],
+                         {'Ref': 'Cutover'})
+
+    def test_isolated_worker_root_applies_to_every_service(self):
+        root = Path('/srv/experiments/spot-worker')
+        text = units(Path('/opt/spot'), Path('/opt/spot/bin'), root/'work', root=root)
+        self.assertIn('--root '+str(root)+'/nodes', text['spot-nodes'])
+        self.assertIn('--root '+str(root), text['spot-experiments'])
+        self.assertIn('--nodes '+str(root)+'/nodes', text['spot-activity'])
+        self.assertIn('--output '+str(root)+'/discovery/current-host.json',
+                      discovery_units(Path('/opt/spot'), [], root)['spot-checkpoint-discovery.service'])
+
+    def test_bootstrap_proves_recovery_before_marking_instance_ready(self):
+        bootstrap = build()['Resources']['Template']['Properties']['LaunchTemplateData']['UserData']['Fn::Base64']['Fn::Sub']
+        self.assertLess(bootstrap.index('/opt/spot/bin/checkpoint-selftest'), bootstrap.index('aws ec2 create-tags'))
+        self.assertIn("SPOT_SELFTEST_PARENT='${WorkRoot}'", bootstrap)
+
     def test_discovery_timer_only_runs_read_only_inventory(self):
         units = discovery_units(Path('/opt/spot'), [Path('/work/with spaces')])
         service = units['spot-checkpoint-discovery.service']

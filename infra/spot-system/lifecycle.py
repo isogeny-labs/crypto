@@ -20,7 +20,7 @@ def run(db, autoscaling, event, owner, now, table, group, enabled, idle_seconds=
         return {"state": "enabled" if enabled else "staged",
                 "control": read(db, table, "control")}
     if not enabled:
-        return {"state": "staged", "reason": "Workload migration/cutover is not enabled"}
+        return {"state": "staged", "reason": "Managed worker lifecycle is not enabled"}
     if action == 'release':
         return {'state': 'idle-timer-managed', 'idle_seconds': idle_seconds}
     key = {"Id": {"S": "lifecycle-lock"}}
@@ -105,8 +105,13 @@ def handler(event, context):
         ec2 = boto3.client('ec2')
         address = ec2.describe_addresses(AllocationIds=[os.environ['ALLOCATION']])['Addresses'][0]
         target = address.get('InstanceId')
-        if target in ids:
-            instances = ec2.describe_instances(InstanceIds=[target])['Reservations'][0]['Instances']
-            if {t['Key']: t['Value'] for t in instances[0].get('Tags', [])}.get('SpotReady') == 'true':
-                result['state'] = 'ready'
+        instances = [i for r in ec2.describe_instances(InstanceIds=ids)['Reservations'] for i in r['Instances']] if ids else []
+        ready = [i for i in instances if i.get('State', {}).get('Name') == 'running' and
+                 {t['Key']: t['Value'] for t in i.get('Tags', [])}.get('SpotReady') == 'true']
+        result['compute_ready'] = bool(ready)
+        result['ready_instance_ids'] = [i['InstanceId'] for i in ready]
+        result['cutover_enabled'] = os.environ.get('CUTOVER') == 'true'
+        result['ssh_endpoint_ready'] = target in result['ready_instance_ids']
+        if result['ssh_endpoint_ready']:
+            result['state'] = 'ready'
     return result

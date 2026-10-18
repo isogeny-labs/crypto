@@ -1,12 +1,15 @@
 import copy
 from contextlib import contextmanager
 import json
+import os
 from pathlib import Path
+import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock, patch
 
-from lifecycle import run
+from lifecycle import run, handler
 from install_hooks import install
 import worker_state
 
@@ -53,6 +56,24 @@ class LifecycleTests(unittest.TestCase):
         self.assertEqual(self.invoke('wake', enabled=False)['state'], 'staged')
         self.assertFalse(self.db.items)
         self.asg.set_desired_capacity.assert_not_called()
+
+    def test_compute_ready_does_not_claim_ssh_ready_while_original_ip_is_protected(self):
+        ec2 = Mock()
+        self.asg.describe_auto_scaling_groups.return_value = {'AutoScalingGroups':[self.group]}
+        ec2.describe_addresses.return_value = {'Addresses':[{'InstanceId':'i-original'}]}
+        ec2.describe_instances.return_value = {'Reservations':[{'Instances':[{
+            'InstanceId':'i-worker', 'State':{'Name':'running'},
+            'Tags':[{'Key':'SpotReady','Value':'true'}]}]}]}
+        clients = {'dynamodb':self.db, 'autoscaling':self.asg, 'ec2':ec2}
+        with patch.dict(os.environ, {'TABLE':'table', 'GROUP':'group', 'ALLOCATION':'eip',
+                                     'ENABLED':'true', 'CUTOVER':'false'}), \
+                patch.dict(sys.modules, {'boto3':SimpleNamespace(client=lambda name:clients[name])}):
+            result = handler({'action':'status'}, SimpleNamespace(aws_request_id='request'))
+        self.assertTrue(result['compute_ready'])
+        self.assertFalse(result['ssh_endpoint_ready'])
+        self.assertFalse(result['cutover_enabled'])
+        self.assertEqual(result['state'], 'enabled')
+        ec2.associate_address.assert_not_called()
 
     def test_prompt_starts_and_cancels_idle(self):
         self.db.items['control'] = {'Id': {'S': 'control'}, 'IdleSince': {'N': '1'}, 'StoppingAt': {'N': '2'}}

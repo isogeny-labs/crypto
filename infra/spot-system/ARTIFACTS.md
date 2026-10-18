@@ -15,6 +15,8 @@ identity keys, Conductor credentials, or database files are in these artifacts.
   reporter, node services and pinned node executables.
 - `checkpoint_discovery`: the portable native scanner executable, also included
   in the runtime. Its runbook is `CHECKPOINT_DISCOVERY.md`.
+- `checkpoint_selftest`: the native kill/corrupt/restore bootstrap gate, also
+  included in the runtime. Its build/deployment instructions are in `AWS_DEPLOYMENT.md`.
 
 The release's `artifacts.json` sits beside the deployment bundle and is also
 committed here. It is excluded from the bundle to avoid a circular self-hash.
@@ -38,10 +40,11 @@ do not replace a bundle's content under another bundle's digest.
 
 ## Deployment status
 
-The observed stack is staged: worker capacity is zero, IP cutover is disabled,
-and automatic lifecycle scaling is disabled. The separate original host still
-runs its existing experiments and the local Cairn/Conductor node bundle.
-Publishing these artifacts does not activate scaling or migrate experiments.
+The applied stack enables managed wake/idle scaling in an isolated workspace;
+IP cutover is disabled. The first Spot launch was quota-blocked. The separate
+original host still runs its existing experiments and local Cairn/Conductor
+node bundle. `AWS_DEPLOYMENT.md` and `validation/aws-deployment.json` record the
+applied settings, quota requests and validation limits.
 
 Before activation, complete the recovery, workload migration, node writer-lock
 handoff and client installation gates in `README.md`. Existing non-checkpointed

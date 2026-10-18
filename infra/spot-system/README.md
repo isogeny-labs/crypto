@@ -9,6 +9,11 @@ checkpoint candidates. New manifest-contract jobs validate generation checksums
 and automatically select the newest valid state before resuming. A read-only
 timer writes the durable inventory every minute.
 
+The AWS compute lifecycle is now enabled in an isolated managed workspace;
+IP cutover remains disabled to protect the original jobs. Launch validation
+hit the regional Spot quota. See [AWS deployment](AWS_DEPLOYMENT.md) and
+`validation/aws-deployment.json` for applied settings and the capacity gate.
+
 This deployment targets one logical x86_64 host with 32 vCPUs and 128 GiB RAM
 in us-east-2. It uses Spot only, with capacity gaps accepted. It preserves
 the existing SSH endpoint `3.134.144.201` by moving its existing Elastic IP
@@ -44,8 +49,9 @@ factor-base workers have an additional explicit guard. Unregistered root/remote
 jobs are outside that scan. Tracking remains necessary for checkpoint recovery
 and coordinated job admission.
 
-`LifecycleEnabled=false` and `Cutover=false` currently keep automatic startup and
-shutdown staged. Both must be true after the migration gates below are met.
+`LifecycleEnabled` controls managed startup/shutdown independently of `Cutover`,
+which controls IP movement. The deployed settings enable the former and leave
+the latter false until the migration gates below are met.
 The original host is outside the new Auto Scaling group and is not a shutdown
 target. The new Lambda role can change desired capacity only for its worker group.
 Stopping compute keeps EFS, backups, snapshots and the Elastic IP allocation;
@@ -79,7 +85,8 @@ versioned S3 bucket and verify its SHA-256 before installation. The archive
 includes the node binaries and supervisor/idle services. `NodeProject` selects
 the durable project directory. Scientific dependencies still need migration.
 Build the native checkpoint-discovery binary as described in its runbook and
-install it beside the node executables before packaging. After a runtime change,
+the bootstrap self-test as described in `AWS_DEPLOYMENT.md`; install both beside
+the node executables before packaging. After a runtime change,
 run `python3 package_runtime.py`, upload it as
 `runtime/<digest>.tar.gz` in the stack bucket, and explicitly update the
 `RuntimeDigest` stack parameter. Keep old versions for rollback.
@@ -208,9 +215,10 @@ cfn-lint template.json
 aws cloudformation validate-template --region us-east-2 --template-body file://template.json
 ```
 
-`spot-experiments` was prepared with capacity zero and cutover false. Those are
-also the template defaults. The corrected stack reached UPDATE_COMPLETE, and a
-direct invocation of its deployed controller returned `{"state":"staged"}`.
+`spot-experiments` was initially prepared with capacity zero and cutover false,
+which remain template defaults. The current deployment enables wake/idle control
+in `/srv/experiments/spot-worker` while preserving the original IP. See the AWS
+deployment record for current runtime/parameters and the quota-blocked launch.
 Current resource ids, parameters, snapshot progress and remaining work are saved
 in the private release bundle's `status.json` (download instructions are in `ARTIFACTS.md`). Inspect its current state with:
 
@@ -250,7 +258,8 @@ Before activation:
    and compare its final result to uninterrupted execution. Test EFS locking
    across two instances, restart behavior, restore rejection of corrupt state,
    and a lost instance without an interruption warning.
-7. Review the stack update with Cutover=true and LifecycleEnabled=true. A prompt
+7. After migration validation, review the stack update with Cutover=true;
+   LifecycleEnabled is already true in the deployed configuration. A prompt
    then starts a worker; the IP moves once bootstrap is ready. This interrupts
    SSH connections. Run this
    from an independent session, not solely the SSH session being replaced.
@@ -264,7 +273,7 @@ Retained EFS and the original volume need explicit retention/cost management.
 
 ## Validation status
 
-38 system tests and 20 native discovery tests passed locally; 35 earlier system
+42 system tests and 20 native discovery tests passed locally; 35 earlier system
 tests also passed with temporary state on the actual
 mounted EFS before the final short-job timer and user-process guard cases. Tests include idle threshold boundaries, wake
 races, missing/stale activity, failed probes, draining-worker admission,

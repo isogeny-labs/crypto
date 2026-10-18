@@ -23,7 +23,7 @@ echo '${FileSystem}:/ /srv/experiments efs _netdev,tls,iam,noresvport 0 0' >> /e
 mount /srv/experiments
 chown ec2-user:ec2-user /srv/experiments
 # Fail closed if the operator has not finished durable migration and the job manifest.
-test -f /srv/experiments/jobs.json
+test -f '${WorkRoot}/jobs.json'
 aws s3 cp 's3://${RuntimeBucket}/runtime/${RuntimeDigest}.tar.gz' /tmp/spot-runtime.tar.gz --region '${AWS::Region}'
 echo '${RuntimeDigest}  /tmp/spot-runtime.tar.gz' | sha256sum -c -
 mkdir -p /opt/spot
@@ -38,8 +38,11 @@ if [ '${PreserveHostKeys}' = 'true' ]; then
 fi
 mkdir -p '${NodeProject}'
 chown ec2-user:ec2-user '${NodeProject}'
-runuser -u ec2-user -- python3 /opt/spot/runner.py --root /srv/experiments --validate
-python3 /opt/spot/install_services.py --project '${NodeProject}' --table '${ControllerLock}' --region '${AWS::Region}'
+runuser -u ec2-user -- python3 /opt/spot/runner.py --root '${WorkRoot}' --validate
+# Prove durable checkpoint selection/restore before publishing readiness.
+# The private temporary workspace is separate from registered workloads.
+runuser -u ec2-user -- env SPOT_SELFTEST_RUNTIME=/opt/spot SPOT_SELFTEST_PARENT='${WorkRoot}' /opt/spot/bin/checkpoint-selftest --exact supervisor_restores_a_discovered_generation_after_abrupt_worker_death --nocapture > /var/log/spot-checkpoint-selftest.log 2>&1
+python3 /opt/spot/install_services.py --root '${WorkRoot}' --project '${NodeProject}' --table '${ControllerLock}' --region '${AWS::Region}'
 node_ready=0
 for attempt in $(seq 150); do
   if curl -fsS --max-time 2 http://127.0.0.1:9180/health >/dev/null && curl -fsS --max-time 2 http://127.0.0.1:8080/ >/dev/null; then
@@ -51,6 +54,8 @@ done
 test "$node_ready" -eq 1
 systemctl is-active --quiet sshd
 systemctl is-active --quiet spot-experiments
+systemctl is-active --quiet spot-activity
+systemctl is-active --quiet spot-checkpoint-discovery.timer
 TOKEN=$(curl -fsS --max-time 3 -X PUT -H 'X-aws-ec2-metadata-token-ttl-seconds: 60' http://169.254.169.254/latest/api/token)
 INSTANCE=$(curl -fsS --max-time 3 -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
 aws ec2 create-tags --region '${AWS::Region}' --resources "$INSTANCE" --tags Key=SpotReady,Value=true
@@ -189,6 +194,7 @@ aws ec2 create-tags --region '${AWS::Region}' --resources "$INSTANCE" --tags Key
         'Code': {'ZipFile': (HERE/'lifecycle.py').read_text()},
         'Environment': {'Variables': {'GROUP': ref('Group'), 'TABLE': ref('ControllerLock'),
             'ALLOCATION': ref('AllocationId'), 'IDLE_SECONDS': ref('IdleSeconds'),
+            'CUTOVER': ref('Cutover'),
             'ENABLED': {'Fn::If': ['LifecycleActive', 'true', 'false']}}}})
     resource('IdleTimer', 'AWS::Events::Rule', {'ScheduleExpression': 'rate(1 minute)', 'State': 'ENABLED',
         'Targets': [{'Id': 'lifecycle', 'Arn': {'Fn::GetAtt': ['Lifecycle', 'Arn']}}]})
@@ -215,6 +221,9 @@ aws ec2 create-tags --region '${AWS::Region}' --resources "$INSTANCE" --tags Key
                 if (HERE/'runtime.tar.sha256').exists() else 'unpublished', 'AllowedPattern': '([a-f0-9]{64}|unpublished)'},
             'NodeProject': {'Type': 'String', 'Default': '/srv/experiments/work',
                 'AllowedPattern': '/srv/experiments/[A-Za-z0-9_-]+(/[A-Za-z0-9_-]+)*'},
+            'WorkRoot': {'Type': 'String', 'Default': '/srv/experiments',
+                'AllowedPattern': '/srv/experiments(/[A-Za-z0-9_-]+)*',
+                'Description': 'Existing durable workspace with jobs.json; isolates managed workers from legacy node/work state.'},
             "Cutover": {"Type": "String", "Default": "false", "AllowedValues": ["false", "true"]},
             "PreserveHostKeys": {"Type": "String", "Default": "false", "AllowedValues": ["false", "true"],
                 "Description": "Enable only after approval to store the original SSH private host keys in EFS."},
@@ -222,7 +231,7 @@ aws ec2 create-tags --region '${AWS::Region}' --resources "$INSTANCE" --tags Key
                 "Description": "Spot price limit as percent of optimal On-Demand price; limits may reduce capacity."},
             "AlarmTopicArn": {"Type": "String", "Default": ""}},
         "Conditions": {"HasAlarmTopic": {"Fn::Not": [{"Fn::Equals": [ref("AlarmTopicArn"), ""]}]},
-            'LifecycleActive': {'Fn::And': [{'Fn::Equals': [ref('LifecycleEnabled'), 'true']}, {'Fn::Equals': [ref('Cutover'), 'true']}]}
+            'LifecycleActive': {'Fn::Equals': [ref('LifecycleEnabled'), 'true']}
         },
         "Resources": resources,
         "Outputs": {"FileSystemId": {"Value": ref("FileSystem")}, "GroupName": {"Value": ref("Group")},

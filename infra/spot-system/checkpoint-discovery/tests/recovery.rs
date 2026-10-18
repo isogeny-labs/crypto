@@ -81,18 +81,24 @@ impl Drop for Root {
 }
 
 fn supervisor(root: &Path) -> Child {
-    Command::new("python3")
-        .arg(
+    let runtime = std::env::var_os("SPOT_SELFTEST_RUNTIME").map(PathBuf::from);
+    let runner = runtime
+        .as_ref()
+        .map(|p| p.join("runner.py"))
+        .unwrap_or_else(|| {
             Path::new(env!("CARGO_MANIFEST_DIR"))
                 .parent()
                 .unwrap()
-                .join("runner.py"),
-        )
+                .join("runner.py")
+        });
+    let discovery = runtime
+        .as_ref()
+        .map(|p| p.join("bin/checkpoint-discovery"))
+        .unwrap_or_else(|| PathBuf::from(env!("CARGO_BIN_EXE_checkpoint-discovery")));
+    Command::new("python3")
+        .arg(runner)
         .args(["--root", root.to_str().unwrap(), "--no-imds", "--once"])
-        .env(
-            "SPOT_CHECKPOINT_DISCOVERY_BIN",
-            env!("CARGO_BIN_EXE_checkpoint-discovery"),
-        )
+        .env("SPOT_CHECKPOINT_DISCOVERY_BIN", discovery)
         .env("SPOT_CHECKPOINT_MANIFEST", "/must-not-be-inherited")
         .env_remove("SPOT_ACTIVITY_TABLE")
         .stdout(Stdio::null())
@@ -117,9 +123,19 @@ fn wait(child: &mut Child) -> std::process::ExitStatus {
 
 #[test]
 fn supervisor_restores_a_discovered_generation_after_abrupt_worker_death() {
-    let root =
-        Root(std::env::temp_dir().join(format!("spot-native-recovery-{}", std::process::id())));
-    fs::create_dir_all(&root.0).unwrap();
+    let parent = std::env::var_os("SPOT_SELFTEST_PARENT")
+        .map(PathBuf::from)
+        .unwrap_or_else(std::env::temp_dir);
+    let path = parent.join(format!(
+        ".spot-native-recovery-{}-{}",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    fs::create_dir(&path).unwrap();
+    let root = Root(path);
     atomic(
         &root.0.join("jobs.json"),
         &json!([{
