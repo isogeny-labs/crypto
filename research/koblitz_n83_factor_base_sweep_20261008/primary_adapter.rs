@@ -786,6 +786,13 @@ pub(super) fn chain_planted_cli(
     let (base, base_row, manifest_hash) =
         load_panel_selected(root, 16_627, "public_x_hash", 2026100801)?;
     let base_import_ms = start.elapsed().as_secs_f64() * 1000.0;
+    if base_row["object"]
+        != "objects/1aa70cc1571f4cb25af42936699378329128a869f2ae8ad35efb375663d4e59d.jsonl.gz"
+        || base_row["point_set_blake3"]
+            != "564c6bb72b346b73112240bb0bddc4ef68b7525f7ef2556d6046e52c32f976e0"
+    {
+        return Err("planted control imported a different retained object".into());
+    }
     let fb = &base.factor_base;
     if fb.signed_orbits.len() != 16_627 || fb.points.len() != 2_760_082 {
         return Err("planted control imported the wrong retained base size".into());
