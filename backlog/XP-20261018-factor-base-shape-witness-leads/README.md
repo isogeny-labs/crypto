@@ -34,4 +34,3 @@ solver references for any fastest claim. The degree83 gate and exact challenge
 remain separate unperformed obligations. No rho win is required for a verified
 engineering improvement. Resource fields are ceilings, not time estimates.
 The older prime-base/oracle card from #1963 is unchanged.
-

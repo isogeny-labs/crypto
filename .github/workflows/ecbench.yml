@@ -125,6 +125,7 @@ jobs:
             /tools/volcano-cli/
             /isogeny_algos/
             /docs/
+            /research/factor_base_shape_leads_20261018/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
       - name: Materialize native fixture inputs
@@ -137,6 +138,32 @@ jobs:
         run: cargo test --locked --release --bin factor-base-sweep
       - name: Actual CLI witnesses, caps, interruption, resume and corruption
         run: cargo test --locked --release --test factor_base_sweep_cli -- --test-threads=1
+      - name: Independent native shape audit tests and strict lint
+        env:
+          CARGO_TARGET_DIR: ${{ github.workspace }}/target
+        run: |
+          cargo test --locked --release --manifest-path research/factor_base_shape_leads_20261018/analysis/Cargo.toml
+          cargo clippy --locked --all-targets --manifest-path research/factor_base_shape_leads_20261018/analysis/Cargo.toml -- -D warnings
+          cargo build --locked --release --manifest-path research/factor_base_shape_leads_20261018/analysis/Cargo.toml
+      - name: Recheck sealed shape evidence and independent exact coverage
+        env:
+          CARGO_TARGET_DIR: ${{ github.workspace }}/target
+        run: |
+          study=research/factor_base_shape_leads_20261018
+          replay="$RUNNER_TEMP/factor-base-shape-evidence"
+          mkdir -p "$replay"
+          (cd "$study" && sha256sum -c runs.tar.xz.sha256)
+          tar -xJf "$study/runs.tar.xz" -C "$replay"
+          (cd "$replay" && sha256sum -c "$GITHUB_WORKSPACE/$study/RUNS_SHA256SUMS")
+          for panel in primary secondary confirmation representation subgroup-guard; do
+            "$CARGO_TARGET_DIR/release/factor-base-sweep" verify --run "$replay/runs/$panel"
+          done
+          "$CARGO_TARGET_DIR/release/factor-base-lead-audit" "$replay/runs" primary secondary confirmation representation > "$replay/observations.json"
+          cmp "$study/observations.json" "$replay/observations.json"
+          "$CARGO_TARGET_DIR/release/factor-base-lead-audit" --coverage "$replay/runs" docs/curves/registry.json primary secondary confirmation representation > "$replay/coverage.json"
+          cmp "$study/exact-coverage.json" "$replay/coverage.json"
+          "$CARGO_TARGET_DIR/release/factor-base-lead-audit" --coverage "$replay/runs" docs/curves/registry.json subgroup-guard > "$replay/guard-coverage.json"
+          cmp "$replay/runs/guard-coverage.json" "$replay/guard-coverage.json"
 
   harness:
     if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
