@@ -29,8 +29,8 @@ checkout `/home/ec2-user/crypto`, and are committed to branch
 | 4 | `XP-20261015-shape-g1-frozen-cells`, sizing probe (13, 5), d_max = 7, random, 1 × 1, seed 1, 1 thread, 64 GB address cap, 4 h wall cap | `research/shape_search_g1_frozen_cells_20261018/probe/probe.sh 13:5:7 64 14400` | 06:11:00 | 10:11:05 | **killed at the 4 h wall cap** (exit 137), no draw finished, sampled peak RSS 7.7 GB: time, not memory, limits (13, 5) at d_max = 7 on one thread | `probe/probe-13-5-7.{jsonl,err,meta}` (empty jsonl), `probe/progress.txt` |
 | 6 | same card, probe (13, 5) d_max = 7, 8 threads, 64 GB cap, 12 h wall | `probe/probe.sh 13:5:7 64 43200 8` | 10:12 | — | running (does threading help?) | `probe/probe-13-5-7-th8.*` |
 | 7 | same card, probe (13, 5) d_max = 6, 1 thread, 64 GB cap, 4 h wall | `probe/probe.sh 13:5:6 64 14400 1` | 10:12 | — | running (fallback sizing) | `probe/probe-13-5-6-th1.*` |
-| 9 | same card, probes (17, 6) and (19, 7) at d_max = 6, 1 thread, 24 GB cap, 4 h wall | `probe/probe.sh 17:6:6 24 14400 1`, `probe/probe.sh 19:7:6 24 14400 1` | 10:35 | — | running | `probe/probe-17-6-6-th1.*`, `probe/probe-19-7-6-th1.*` |
-| 10 | same card, probes (17, 6) and (19, 7) at d_max = 7, 1 thread, 24 GB cap, 12 h wall | `probe/probe.sh 17:6:7 24 43200 1`, `probe/probe.sh 19:7:7 24 43200 1` | 10:35 | — | running | `probe/probe-17-6-7-th1.*`, `probe/probe-19-7-7-th1.*` |
+| 9 | same card, probes (17, 6) and (19, 7) at d_max = 6, 1 thread, 24 GB cap, 4 h wall | `probe/probe.sh 17:6:6 24 14400 1`, `probe/probe.sh 19:7:6 24 14400 1` | 10:33 | — | running | `probe/probe-17-6-6-th1.*`, `probe/probe-19-7-6-th1.*` |
+| 10 | same card, probes (17, 6) and (19, 7) at d_max = 7, 1 thread, 24 GB cap, 12 h wall | `probe/probe.sh 17:6:7 24 43200 1`, `probe/probe.sh 19:7:7 24 43200 1` | 10:33 | — | running | `probe/probe-17-6-7-th1.*`, `probe/probe-19-7-7-th1.*` |
 
 Planned, not started: PKM `main 1`, `confirm T D` for each finished target,
 `verify`; the shape card's PROTOCOL.md (sized from run 4), then its three
