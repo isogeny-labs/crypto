@@ -102,17 +102,6 @@
      "value": 4.3
     },
     {
-     "anchor": "#lab-pair-claw",
-     "class": "accounting",
-     "date": "2026-10-04",
-     "detail": "The four-point signed-Frobenius pair claw with a known-log orbit base (the PR's IC1 PDP4qtable LAnone candidate), run cold through ecbench against the strong signed-Frobenius rho on the same 48 Koblitz targets: 1.85x to 2.96x per curve at its cost-minimising table, 2.20x [1.90, 2.55] pooled; 32.6x [25.3, 41.0] at the PR's own n=83 shape. Flat in r, as a generic method must be. n = 83 itself is not measured.",
-     "label": "Pair claw of cryptanalysis#175, ported into ecbench: best cell icv1-f2m43-tm998717-e2e742b0 (r = 2^32.1)",
-     "reference": "matched",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_pair_claw_20261003/README.md",
-     "unit": "S",
-     "value": 1.85
-    },
-    {
      "anchor": "#n61-compact-orbit-hosted-20261003",
      "class": "accounting",
      "date": "2026-10-03",
@@ -122,6 +111,17 @@
      "source": "https://github.com/aburan28/crypto/blob/main/research/sat_factor_base_review_20260908/autolab/evidence/20261003-koblitz-n61-hosted-isolated/README.md",
      "unit": "isolated wall time",
      "value": 74.8
+    },
+    {
+     "anchor": "#lab-pair-claw",
+     "class": "accounting",
+     "date": "2026-10-04",
+     "detail": "The four-point signed-Frobenius pair claw with a known-log orbit base (the PR's IC1 PDP4qtable LAnone candidate), run cold through ecbench against the strong signed-Frobenius rho on the same 48 Koblitz targets: 1.85x to 2.96x per curve at its cost-minimising table, 2.20x [1.90, 2.55] pooled; 32.6x [25.3, 41.0] at the PR's own n=83 shape. Flat in r, as a generic method must be. n = 83 itself is not measured.",
+     "label": "Pair claw of cryptanalysis#175, ported into ecbench: best cell icv1-f2m43-tm998717-e2e742b0 (r = 2^32.1)",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_pair_claw_20261003/README.md",
+     "unit": "S",
+     "value": 1.85
     },
     {
      "anchor": "#ic-tool-programme-20261001",
@@ -143,6 +143,39 @@
      "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_frobenius_orbit_vs_rho_20261014/README.md",
      "unit": "S",
      "value": 1.566
+    },
+    {
+     "date": "2026-10-15",
+     "value": 68183174.19,
+     "reference": "matched",
+     "unit": "F_p multiplications",
+     "label": "Joux-Vitse (n - 1)-decomposition at n = 5, E(F_{p^5}), complete DLP at p = 31 (ell = 2^24.8), F4 trace replay",
+     "detail": "Native complete DLPs paired with rho on the same target in F_p multiplications: 6.8e7x at p = 31 (6,688 trials, 19 relations), 4.5e7x and 1.8e8x at p = 11; one trial 5.9-9.2e9 flat in p over a 12-rung ladder (p = 11-241), about 25p trials per relation; every trial agrees with a meet-in-the-middle oracle and every answer verified; parity extrapolated at q = 2^58.2 (group 2^291). A reproduction of a published route; no ecbench session (no F_{p^k} instance on main).",
+     "class": "accounting",
+     "anchor": "#rho-parity-ledger",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
+    },
+    {
+     "date": "2026-10-16",
+     "value": 55.36777360324759,
+     "reference": "matched",
+     "unit": "Tier 1 cloud-instance cold IC / same-point rho online wall",
+     "label": "n83 K1120 five-point cold factor-base holdout, selected ID null",
+     "detail": "On five sealed public points, 25/25 IC and 5/5 same-point rho arms replayed. K1120 mean cold process 119.826 s divided by mean rho online 2.164 s gives 55.368. K1120 saves 2.645 s [2.085, 3.205] against K1152; its 0.401 s advantage over K1104 has interval [-0.236, 1.038], so the frozen selection remains BOUNDED_UNKNOWN. Tier 1 GitHub cloud instance, A/A and topology gates passed.",
+     "class": "engineering",
+     "anchor": "#n83-tier1-cold-20261016",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/n83_e2e_holdout_20261016/RESULT.md"
+    },
+    {
+     "date": "2026-10-17",
+     "value": 19.214979195561725,
+     "reference": "matched",
+     "unit": "quotient of incomplete cold GAE lower bounds; diagnostic",
+     "label": "Volcano projected-base control/pilot; best bounded IC cell",
+     "detail": "Projected size-16 MITM on icv1-fp57-t536870914-6cabb0c9, two public one-target attempts, one round, L0/debug. Both IC and rho have unpriced work. The ratio is a quotient of incomplete lower bounds, not a direction-of-cost or speedup claim. Full graph-wide completion and exact representations remain open.",
+     "class": "accounting",
+     "anchor": "#lab-volcano-ic",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json"
     }
    ],
    "role": "emphasis"
@@ -218,6 +251,17 @@
      "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-base-size-cold-panel-20261004/RESULT.md",
      "unit": "unisolated in-process cold wall diagnostic",
      "value": 57.96488041072309
+    },
+    {
+     "date": "2026-10-12",
+     "value": 52.58560062120812,
+     "reference": "matched",
+     "unit": "unisolated in-process cold wall diagnostic",
+     "label": "n53 K220 fixed-base S3 root batch, nine single-target pairs",
+     "detail": "Nine verified same-Q/rank-seed control/batch pairs and nine strong-rho cells; batch/rho cold median 52.586 [33.179\u201364.668], was control/rho 78.146 on these Q. Batch/control complete-cold median 0.738 [0.714\u20130.750]. All 27 cells completed and 18 IC replays verified; shared Apple M4 Pro L0 only, common-operation S unset.",
+     "class": "engineering",
+     "anchor": "#n53-s3-root-batch-20261012",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/notes/ecc2k130/n53_s3_root_batch_20261012/RESULT.md"
     }
    ],
    "role": "context"
@@ -359,6 +403,17 @@
      "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_conductor_gap_20261012/README.md",
      "unit": "counted GAE lower-bound diagnostic",
      "value": 45.08273811955142
+    },
+    {
+     "date": "2026-10-14",
+     "value": 6.8746893347260745,
+     "reference": "matched",
+     "unit": "counted GAE lower-bound diagnostic",
+     "label": "Prime rootfinding B48 batch-8 buffer reuse, registered 20-bit subgroup",
+     "detail": "Same-session candidate batch-8 IC / rho-negation cold counted-cost ratio 6.8747 [5.6689, 8.4198] over 24 matched measured pairs on eight public targets. The cross-session baseline/candidate counted-cost ratio is exactly 1.000 over 24 pairs. Native field work remains unpriced; wall comparisons are L0 diagnostics and cross-session ecbench wall comparison is refused.",
+     "class": "engineering",
+     "anchor": "#rootfinding-buffers-20261014",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_rootfinding_alloc_20261014/REPORT.md"
     }
    ],
    "role": "context"
@@ -648,6 +703,17 @@
      "source": "https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v3/README.md",
      "unit": "online wall time",
      "value": 0.0377
+    },
+    {
+     "date": "2026-10-12",
+     "value": 0.37777093852601323,
+     "reference": "matched",
+     "unit": "unisolated online wall diagnostic",
+     "label": "n53 K220 fixed-base S3 root batch, target phase, nine single-target pairs",
+     "detail": "Nine verified same-Q/rank-seed pairs; batch/rho target-online median 0.378 [0.103\u20130.442], was control/rho 0.490 on these Q. Batch/control online median 0.612 [0.569\u20130.903]. Reusable K220 setup excluded here but charged in the cold-series point; shared Apple M4 Pro L0 diagnostic.",
+     "class": "engineering",
+     "anchor": "#n53-s3-root-batch-20261012",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/notes/ecc2k130/n53_s3_root_batch_20261012/RESULT.md"
     }
    ],
    "role": "context"
@@ -817,524 +883,20 @@
    "role": "context"
   },
   {
-   "id": "ec-cold",
-   "label": "Elliptic curve, whole method, cold, one target",
-   "role": "emphasis",
-   "barrier_test": true,
-   "note": "The repository's own definition of faster than rho (AGENTS.md section 2). Hollow markers were later shown to be measured against an unmatched rho and are kept as 'was'.",
-   "points": [
-    {
-     "date": "2026-09-16",
-     "value": 0.7376,
-     "reference": "unmatched",
-     "label": "Tournament round 0007, five Koblitz cells",
-     "detail": "0.7376 of the worker rho's instructions, 95% 0.7066-0.7644. That rho named Frobenius classes by squaring; the control of 2026-09-23 showed it was not a matched reference.",
-     "class": "engineering",
-     "anchor": "#ic-tournament-round-0007",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/runs/round-0007/REPORT.md"
-    },
-    {
-     "date": "2026-09-21",
-     "value": 0.6751,
-     "reference": "unmatched",
-     "label": "Tournament round 0019, eight cells, strict win promoted",
-     "detail": "0.6751 [0.6298, 0.7265] of the worker rho's instructions on all eight cells; replicated by round 0020 at 0.6629. Same unmatched reference.",
-     "class": "engineering",
-     "anchor": "#ic-tournament-round-0019",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/runs/round-0019/REPORT.md"
-    },
-    {
-     "date": "2026-09-23",
-     "value": 1.192,
-     "reference": "matched",
-     "label": "Control: rho given the IC arm's orbit naming",
-     "detail": "The IC arm is above that rho at every cell measured, 1.19x (n59a0) to 2.88x (n43a1). Triple collector with counted sizing, five cells. Class accounting: what the ratios were counted against changed.",
-     "class": "accounting",
-     "anchor": "#ic-triple-counted-20260923",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_triple_counted_20260923/RESULTS.md"
-    },
-    {
-     "date": "2026-09-28",
-     "value": 0.609,
-     "reference": "matched",
-     "label": "Tournament round 0024, matched rho, best cell n17a1",
-     "detail": "Six of eight panel cells 0.61-0.82 of the matched rho; the strict gate fails at n23a1 (1.126); the whole twelve-cell panel reads 1.380 [0.847, 2.387]. Best cell plotted.",
-     "class": "accounting",
-     "anchor": "#ic-tournament-round-0024",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/campaign_20260916/RESULTS.md"
-    },
-    {
-     "date": "2026-09-29",
-     "value": 1.356,
-     "reference": "matched",
-     "label": "Tournament round 0025, lean rho, best cell n19a0",
-     "detail": "The matched walk run in the IC arm's own single-word arithmetic. Above rho in instructions at every one of twelve cells: 1.36-2.56x on the panel, up to 13.7x past the crossing. The line was stopped on 2026-09-29.",
-     "class": "accounting",
-     "anchor": "#ic-tournament-round-0025",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/campaign_20260916/RESULTS.md"
-    },
-    {
-     "date": "2026-10-01",
-     "value": 2,
-     "reference": "matched",
-     "label": "Koblitz descent, one target cold, best size 2^38.0",
-     "detail": "Ledger section 23: with the reusable set-up charged, the method is 4.9-31.6x slower than rho cold across six sizes 2^36.6-2^47.2; 2.0x at 2^38.0 where both arms pay a slow curve construction. Online only it is 8.8-17.5x faster (see the online series).",
-     "class": "accounting",
-     "anchor": "#koblitz-descent-20260930",
-     "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#koblitz-descent-20260930"
-    },
-    {
-     "date": "2026-10-01",
-     "value": 1.314,
-     "reference": "matched",
-     "unit": "isolated CPU time",
-     "label": "Orbit-disjoint cold CPU panel, closest cell n41/L1,024",
-     "detail": "Six cells timing-eligible on reserved cores, every paired compact/rho CPU interval above one; the closest, n41/L1,024, reads 1.314 [1.288, 1.359] and would need 23.9% less CPU to match rho. Isolated CPU time, not a counted unit; S unset.",
-     "class": "accounting",
-     "anchor": "#disjoint-cold-v2-outcome-20261001",
-     "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#disjoint-cold-v2-outcome-20261001"
-    },
-    {
-     "date": "2026-10-03",
-     "value": 4.3,
-     "reference": "matched",
-     "unit": "S",
-     "label": "ecbench baseline, every candidate: best cell icv1-f2m17-tm101-00378d4e (r = 2^16)",
-     "detail": "Every ic.pipeline configuration run cold through ecbench against the strong signed-Frobenius rho on the same targets, every phase charged in one unit: 4.30x at r = 2^16 (orbit base, Frobenius MITM m = 2), 129x at r = 2^21; on prime curves 7.70x at 18 bits rising to 40.5x at 24 bits. The reference is 18.5x its floor at this size because its fixed setup dominates, so the ratio flatters the candidate. No method changed; a baseline, not a round.",
-     "class": "accounting",
-     "anchor": "#lab-ecbench-all",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_all_candidates_20261003/README.md"
-    },
-    {
-     "date": "2026-10-04",
-     "value": 1.85,
-     "reference": "matched",
-     "unit": "S",
-     "label": "Pair claw of cryptanalysis#175, ported into ecbench: best cell icv1-f2m43-tm998717-e2e742b0 (r = 2^32.1)",
-     "detail": "The four-point signed-Frobenius pair claw with a known-log orbit base (the PR's IC1 PDP4qtable LAnone candidate), run cold through ecbench against the strong signed-Frobenius rho on the same 48 Koblitz targets: 1.85x to 2.96x per curve at its cost-minimising table, 2.20x [1.90, 2.55] pooled; 32.6x [25.3, 41.0] at the PR's own n=83 shape. Flat in r, as a generic method must be. n = 83 itself is not measured.",
-     "class": "accounting",
-     "anchor": "#lab-pair-claw",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_pair_claw_20261003/README.md"
-    },
-    {
-     "date": "2026-10-03",
-     "value": 74.8,
-     "reference": "matched",
-     "unit": "isolated wall time",
-     "label": "n61 compact orbit, one target cold, 256 workloads, hosted isolated",
-     "detail": "Cold IC/rho median 74.8 (95% 70.0-80.0) against strong rho rung 3 on 256 public one-target workloads, a pinned reserved core on a hosted AMD EPYC 7763 runner with 0 contended samples: the IC process spends a median 22.0 s on reusable setup against rho's 0.30 s. Online only, IC is 14.67x faster (online series). Same-runner replay 256/256; PENDING_INDEPENDENT_VALIDATION.",
-     "class": "accounting",
-     "anchor": "#n61-compact-orbit-hosted-20261003",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/sat_factor_base_review_20260908/autolab/evidence/20261003-koblitz-n61-hosted-isolated/README.md"
-    },
-    {
-     "date": "2026-10-07",
-     "value": 5.226,
-     "reference": "matched",
-     "label": "Rule v3: the Koblitz descent at baseline v3, one target cold, closest size 2^36.6",
-     "detail": "Ledger section 23's single-target comparison re-run at the ic tool programme's baseline v3 (main's 995ea207): six sizes 2^36.6-2^47.2, 64 public points and four A/A repeats a size, 408/408 rows checked, every logarithm section 23's. With the reusable set-up charged the index calculus costs 5.2-21.0x rho cold on the same point (section 23: 2.0-31.6x): 5.23x [4.80, 5.72] at 2^36.6, where section 23 read 4.95x. Rho is still faster at every size, and the cold ratio grows as r^0.18. Online only it is 10.2-26.5x faster (online series). It re-measures and changes no algorithm.",
-     "class": "accounting",
-     "anchor": "#ic-tool-programme-20261001",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v3/README.md"
-    },
-    {
-     "date": "2026-10-14",
-     "value": 1.566,
-     "reference": "matched",
-     "unit": "S",
-     "label": "Frobenius-orbit IC, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)",
-     "detail": "Orbit factor base (compact-orbit-scan, mitm-frobenius-counted m = 2) with every native priced, paired against the fully priced signed-Frobenius rho on 16 targets x 3 rounds per curve: 1.566 [0.992, 2.347] at the best cell (interval reaches 1; rho-frob heavy-tailed there), 2.96 at n = 13, 3.85 at r = 2^21, 18.2 at r = 2^39; never below 1. Slope of ln ratio 0.165 [0.117, 0.213] per ln r with ln n fitted (model 1/6): constant-only.",
-     "class": "accounting",
-     "anchor": "#lab-ecbench-all",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_frobenius_orbit_vs_rho_20261014/README.md"
-    },
-    {
-     "date": "2026-10-16",
-     "value": 55.36777360324759,
-     "reference": "matched",
-     "unit": "Tier 1 cloud-instance cold IC / same-point rho online wall",
-     "label": "n83 K1120 five-point cold factor-base holdout, selected ID null",
-     "detail": "On five sealed public points, 25/25 IC and 5/5 same-point rho arms replayed. K1120 mean cold process 119.826 s divided by mean rho online 2.164 s gives 55.368. K1120 saves 2.645 s [2.085, 3.205] against K1152; its 0.401 s advantage over K1104 has interval [-0.236, 1.038], so the frozen selection remains BOUNDED_UNKNOWN. Tier 1 GitHub cloud instance, A/A and topology gates passed.",
-     "class": "engineering",
-     "anchor": "#n83-tier1-cold-20261016",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/n83_e2e_holdout_20261016/RESULT.md"
-    }
-   ]
-  },
-  {
-   "id": "ec-cold-unisolated",
-   "label": "Elliptic curve, one-target cold example diagnostics on an unisolated host",
+   "id": "genus3-ghs-2lp",
+   "label": "Not an elliptic curve: genus-3 Jacobian of a GHS cubic cover, double large primes",
    "role": "context",
-   "barrier_test": false,
-   "note": "Same-point native example producer intervals include every IC setup phase and one verified target, but lack ecbench calibration and host isolation. They are descriptive cold diagnostics, not admitted method speedups.",
+   "note": "Index calculus with double large primes on Jac(C) of hyperelliptic GHS cubic covers (m = 3, r = 5) over prime F_q, q = 2^10-2^20, counted F_q plus mod-ell multiplications, one target cold, 12 paired instances per size. Rho is measured on the same Jac(C)[ell] in the same unit at q <= 2^14 only (4 single walks per size, renormalised to sqrt(pi/2)); it is not rho on the elliptic curve E0(F_q^3). The exponent result (total q^1.383 against GTTD's 4/3) is in the genus-crossover panel.",
    "points": [
     {
-     "date": "2026-10-04",
-     "value": 23.969713977698,
+     "date": "2026-10-15",
+     "value": 0.252,
      "reference": "matched",
-     "unit": "unisolated in-process cold wall diagnostic",
-     "label": "n41 compact S3 root index, K85, one frozen public point",
-     "detail": "Six verified same-point pairs: median paired IC/rho cold 23.969714 [19.100346, 25.178967], with 6,970 actual base points and 85 folded columns. Median rank PDP 354.595 ms, index build 74.549 ms, matrix work 51.105 ms; each latter stage exceeds the rho cold median. No ecbench or isolation receipt; controlled speedup unknown.",
-     "class": "accounting",
-     "anchor": "#n41-n53-cold-online-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-n41-n53-single-target-20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-04",
-     "value": 46.18616388128559,
-     "reference": "matched",
-     "unit": "unisolated in-process cold wall diagnostic",
-     "label": "n53 compact S3 root index, K220, one frozen public point",
-     "detail": "Six verified same-point pairs: median paired IC/rho cold 46.186164 [39.973286, 50.827050], with 23,320 actual base points and 220 folded columns. Median rank PDP 3687.618 ms, index build 912.892 ms, matrix work 241.364 ms. No ecbench or isolation receipt; controlled speedup unknown.",
-     "class": "accounting",
-     "anchor": "#n41-n53-cold-online-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-n41-n53-single-target-20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-04",
-     "value": 35.144489578785496,
-     "reference": "matched",
-     "unit": "unisolated in-process cold wall diagnostic",
-     "label": "n41 K85, held-out base-size baseline, 6,970 points",
-     "detail": "Six verified same-point held-out pairs; median paired IC/rho cold 35.144 [34.709, 35.982]. IC cold median 480.211 ms versus rho 13.659 ms. K64 on the same Q had 5,248 points and a 1.186 median within-repeat IC cold penalty. Example binaries on an unisolated host; controlled speedup unknown.",
-     "class": "accounting",
-     "anchor": "#n41-n53-base-size-cold-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-base-size-cold-panel-20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-04",
-     "value": 40.04871196082114,
-     "reference": "matched",
-     "unit": "unisolated in-process cold wall diagnostic",
-     "label": "n41 K64, held-out smaller base, 5,248 points",
-     "detail": "Six verified same-point held-out pairs; median paired IC/rho cold 40.049 [38.737, 42.310]. IC cold median 572.210 ms. The smaller index saved setup but raised rank probes from 2,100,243 to 2,993,628; within-repeat IC cold penalty was 1.186. Unisolated diagnostic only.",
-     "class": "accounting",
-     "anchor": "#n41-n53-base-size-cold-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-base-size-cold-panel-20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-04",
-     "value": 40.36513169520292,
-     "reference": "matched",
-     "unit": "unisolated in-process cold wall diagnostic",
-     "label": "n53 K220, held-out base-size baseline, 23,320 points",
-     "detail": "Six verified same-point held-out pairs; median paired IC/rho cold 40.365 [37.703, 48.625]. IC cold median 5586.337 ms versus rho 136.538 ms. K160 on the same Q had 16,960 points and a 1.636 median within-repeat IC cold penalty. Host noise was substantial; controlled speedup unknown.",
-     "class": "accounting",
-     "anchor": "#n41-n53-base-size-cold-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-base-size-cold-panel-20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-04",
-     "value": 57.96488041072309,
-     "reference": "matched",
-     "unit": "unisolated in-process cold wall diagnostic",
-     "label": "n53 K160, held-out smaller base, 16,960 points",
-     "detail": "Six verified same-point held-out pairs; median paired IC/rho cold 57.965 [15.709, 75.415]. IC cold median 9418.334 ms. Index/matrix shrank, but rank probes rose from 18,413,613 to 32,315,380; within-repeat IC cold penalty was 1.636. Host noise was substantial; controlled speedup unknown.",
-     "class": "accounting",
-     "anchor": "#n41-n53-base-size-cold-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-base-size-cold-panel-20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-12",
-     "value": 52.58560062120812,
-     "reference": "matched",
-     "unit": "unisolated in-process cold wall diagnostic",
-     "label": "n53 K220 fixed-base S3 root batch, nine single-target pairs",
-     "detail": "Nine verified same-Q/rank-seed control/batch pairs and nine strong-rho cells; batch/rho cold median 52.586 [33.179\u201364.668], was control/rho 78.146 on these Q. Batch/control complete-cold median 0.738 [0.714\u20130.750]. All 27 cells completed and 18 IC replays verified; shared Apple M4 Pro L0 only, common-operation S unset.",
+     "label": "Genus-3 GHS IC-2LP rebuilt baseline at q = 2^14 (04b)",
+     "detail": "Rebuilt IC-2LP baseline (kappa = 2, tree-cycle elimination + Lanczos) against rho on the same Jac(C)[ell] at q = 2^14: 0.252x with rho renormalised to sqrt(pi/2) (0.162x raw; rho walks 0.49-3.48 steps per sqrt(ell), n = 4). Cost exponent over 2^14-2^20: 1.383 (99% [1.382, 1.384]) against rho's 3/2 and GTTD's 4/3; relation phase 1.332, linear algebra 1.447. Retuning the factor base gives 1.373; structured Gaussian elimination before Lanczos gives 1.419 while cheaper by 9-22%. The original study this follows up is not in the repository; this is a rebuild. Toy sizes; not an ECDLP crossover, since rho on E0(F_q^3) is not measured.",
      "class": "engineering",
-     "anchor": "#n53-s3-root-batch-20261012",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/notes/ecc2k130/n53_s3_root_batch_20261012/RESULT.md"
-    }
-   ]
-  },
-  {
-   "id": "ec-bounded-counts",
-   "label": "Elliptic curve, cold counted-work diagnostics with unpriced native work",
-   "role": "context",
-   "barrier_test": false,
-   "note": "A ratio between two operation lower bounds does not bound true IC/rho cost. These paired, verified points show implementation accounting only and cannot cross the rho speed barrier.",
-   "points": [
-    {
-     "date": "2026-10-04",
-     "value": 5.034403533221078,
-     "reference": "matched",
-     "unit": "counted GAE lower-bound diagnostic",
-     "label": "n37 shared-rank K16, eight one-target workloads, strong rho",
-     "detail": "K16 uses 1,184 usable points and 16 folded columns. Across 40 paired verified runs on eight public points, counted cold IC/rho is 5.0344 [4.3462, 5.8664]; K16/K42 is 0.349 [0.343, 0.359]. Both IC and rho omit native costs, so their lower-bound quotient does not bound true speed. macOS L0 wall speedup remains unknown; independent Linux replay 320/320.",
-     "class": "accounting",
-     "anchor": "#n37-rank-columns-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_rank_columns_20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-04",
-     "value": 4.550110158256505,
-     "reference": "matched",
-     "unit": "counted GAE lower-bound diagnostic",
-     "label": "n37 shared-rank K8, 16 untouched one-target workloads, strong rho",
-     "detail": "K8 has 592 usable points and eight folded columns. Across 80 paired verified runs on 16 new public points, incomplete cold counted IC/rho is 4.5501 [4.110, 5.040]; K16/K8 on the same points is 1.0175 [0.973, 1.059]. This apparent change from the earlier K16 panel is not a paired improvement across panels. Both methods leave native work unpriced; independent Linux replay 320/320 and macOS L0 wall speedup remains unknown.",
-     "class": "accounting",
-     "anchor": "#n37-k8-k16-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_k8_k16_20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-04",
-     "value": 4.7661,
-     "reference": "matched",
-     "unit": "counted GAE lower-bound diagnostic",
-     "label": "n37 shared-rank K8, 16 fresh target-only instruction-panel points, strong rho",
-     "detail": "Across 80 verified paired runs on 16 new public points, incomplete cold counted K8/rho is 4.7661 [4.3033, 5.2847] and K16/K8 is 1.0198 [0.9835, 1.0562]. The paired target-only Callgrind instruction result belongs to a separate series. Native work is unpriced in this counted ledger and Mac wall is L0; no admitted speedup.",
-     "class": "accounting",
-     "anchor": "#n37-online-ir-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_online_ir_20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-05",
-     "value": 2.721264717429671,
-     "reference": "matched",
-     "unit": "counted GAE lower-bound diagnostic",
-     "label": "F6-IC (#1333 decomposer) in ecbench, E_0 ladder, m = 23, strong rho",
-     "detail": "Median over eight one-target public workloads of lower-bound S over same-target strong rho; 72 of 72 runs verified. At m = 13 and 19 the same arm is 54.75x and 2,091x because each geometric point addition is charged; at m = 23 the 275-point base exceeds #1333's 256-point closure cap and F6-IC does F4's work (median log2 W4/W6 = 0.000). Solver word XORs are unpriced, so this quotient does not bound true speed. The preregistered decision is pending m = 31.",
-     "class": "relabelling",
-     "anchor": "#ic-f6-ecbench-ladder-20261005",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/f6_ic_ecbench_ladder_20261005/RESULT.md"
-    },
-    {
-     "date": "2026-10-05",
-     "value": 2.090818628531976,
-     "reference": "matched",
-     "unit": "counted GAE lower-bound diagnostic",
-     "label": "Inherited F4 (#1333 control) in ecbench, E_0 ladder, m = 23, strong rho",
-     "detail": "Median over eight one-target public workloads; 72 of 72 runs verified. The same arm is 1.105x at m = 13 and 1.582x at m = 19: a lower bound above one, so IC is slower than rho at all three sizes and the gap widens. Solver word XORs are unpriced (lower bound).",
-     "class": "accounting",
-     "anchor": "#ic-f6-ecbench-ladder-20261005",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/f6_ic_ecbench_ladder_20261005/RESULT.md"
-    },
-    {
-     "date": "2026-10-07",
-     "value": 256.2364154308237,
-     "reference": "matched",
-     "unit": "counted GAE lower-bound diagnostic",
-     "label": "n41 shared-rank K16 (n37 parameters unchanged), 16 one-target workloads, strong rho",
-     "detail": "Ratio of sums over the 23 of 80 measured K16 runs that verified (95%: 202.5-332.8); the other 57 exhausted their 512 target attempts. K8 never reached full rank at n41, and neither base reached full rank at n53, so those cells have no quotient. Decision frozen_parameters_do_not_transfer: the n37 parameters (4.55x K8, 5.03x K16 there) do not scale. Native work is unpriced (lower bound); every run L0; 206 of 206 deterministic verified runs replayed.",
-     "class": "accounting",
-     "anchor": "#n41-n53-shared-rank-20261005",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n41_n53_shared_rank_20261005/RESULT.md"
-    },
-    {
-     "date": "2026-10-11",
-     "value": 2.004,
-     "reference": "matched",
-     "unit": "counted GAE lower-bound diagnostic",
-     "label": "Conductor-gap round: best cold cell, F4 descent on the a = 1 Koblitz floor over F_2^23 (icv1-f2m23-tm5197-d29bcbd9)",
-     "detail": "Seventeen audited ecbench sessions on 46 certified crater/floor pairs (38 prime CM, 5 Koblitz, 3 random binary, gaps 17 to 1458) and on cofactor curves for fiber-aware oracles. The best index-calculus cell is S >= 2.37 against the session's own rho at 1.18 on the same curve; every IC cell in the round is above rho. Floor over crater medians of S, yield and wall lie between 0.89 and 1.17 and the F4 solving degree is the same at both ends; fiber-closed tables cut relation-phase cost per relation by up to 200x but win S only on prime curves with h <= 25. IC S is a lower bound (native work unpriced); every audit replayed 12 runs exactly.",
-     "class": "engineering",
-     "anchor": "#isogeny-conductor-gap-20261011",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/isogeny_conductor_gap_ic_20261010/README.md"
-    },
-    {
-     "date": "2026-10-11",
-     "value": 12.825,
-     "reference": "matched",
-     "unit": "counted GAE lower-bound diagnostic",
-     "label": "Conductor-gap round 2: best cold cell, coset fiber-closed MITM over the order-6-folded base on the j = 0 crater (D = -3, 2^8, 26-bit, h = 4)",
-     "detail": "Six audited ecbench sessions (3,870 records) on round-1 crater/floor pairs. The best index-calculus cell is S = 14.8 against the session's own negation rho at 1.16 on the same curve; every IC cell is above rho, and a rho over the order-6 group would widen the gap by up to sqrt 3. The corrected fiber closure removes round 1's crater/floor set-up gap (3.56x on the h = 5408 floor); partial fibers [d]E[h] cut S by up to 79x against the whole fiber; at matched subgroup size crater and floor agree within 1 to 3 percent. IC S is a lower bound (native work unpriced); every audit replayed 12 runs exactly.",
-     "class": "engineering",
-     "anchor": "#isogeny-conductor-gap-round2-20261011",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/isogeny_conductor_gap_round2_20261011/README.md"
-    },
-    {
-     "date": "2026-10-11",
-     "value": 2.283118312719571,
-     "reference": "matched",
-     "unit": "counted GAE lower-bound diagnostic",
-     "label": "Inherited F4 on a generic binary curve (pdp3-binary), m = 19, rho-negation",
-     "detail": "Median over eight one-target public workloads of lower-bound S over same-target rho-negation on icv1-f2m19-tm649-a9133fe6; 24 of 24 runs verified, replay audited. Above one on all eight targets (1.471-4.898), so IC is slower than rho; the Koblitz m = 19 cell is 3.772x. Solver word XORs are unpriced (lower bound).",
-     "class": "accounting",
-     "anchor": "#ic-f4-f5-f6-cross-family-20261011",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/f4_f5_f6_cross_family_20261011/RESULT.md"
-    },
-    {
-     "date": "2026-10-11",
-     "value": 2773.9946405485066,
-     "reference": "matched",
-     "unit": "counted GAE lower-bound diagnostic",
-     "label": "F6-IC on a generic binary curve (pdp3-binary), m = 19, rho-negation",
-     "detail": "Median over eight one-target public workloads; F6-IC cuts inherited F4's solver word XORs by log2 0.372 (1.29x) but its 2.4 million charged geometric additions per run raise lower-bound S 1,353x. Koblitz m = 19: 4,883x. First F6-IC runs on a non-Koblitz curve.",
-     "class": "relabelling",
-     "anchor": "#ic-f4-f5-f6-cross-family-20261011",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/f4_f5_f6_cross_family_20261011/RESULT.md"
-    },
-    {
-     "date": "2026-10-12",
-     "value": 19.731120130433272,
-     "reference": "matched",
-     "unit": "counted GAE lower-bound diagnostic",
-     "label": "Large-prime conductor-gap IC, ell = 8209, fixed floor, eight one-target workloads",
-     "detail": "Mean cold counted S quotient, with unpriced native work. ECBS1h2686905ba61d; all measured runs exactly replayed. No full-cost, scaling, transport or intrinsic-hardness claim.",
-     "class": "accounting",
-     "anchor": "#conductor-gap-ic37-20261012",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_conductor_gap_20261012/README.md"
-    },
-    {
-     "date": "2026-10-12",
-     "value": 45.08273811955142,
-     "reference": "matched",
-     "unit": "counted GAE lower-bound diagnostic",
-     "label": "Large-prime conductor-gap IC, ell = 131101, fixed floor, eight one-target workloads",
-     "detail": "Mean cold counted S quotient, with unpriced native work. ECBS1h8dc7fcf4f74b; all measured runs exactly replayed. No full-cost, scaling, transport or intrinsic-hardness claim.",
-     "class": "accounting",
-     "anchor": "#conductor-gap-ic37-20261012",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_conductor_gap_20261012/README.md"
-    },
-    {
-     "date": "2026-10-14",
-     "value": 6.8746893347260745,
-     "reference": "matched",
-     "unit": "counted GAE lower-bound diagnostic",
-     "label": "Prime rootfinding B48 batch-8 buffer reuse, registered 20-bit subgroup",
-     "detail": "Same-session candidate batch-8 IC / rho-negation cold counted-cost ratio 6.8747 [5.6689, 8.4198] over 24 matched measured pairs on eight public targets. The cross-session baseline/candidate counted-cost ratio is exactly 1.000 over 24 pairs. Native field work remains unpriced; wall comparisons are L0 diagnostics and cross-session ecbench wall comparison is refused.",
-     "class": "engineering",
-     "anchor": "#rootfinding-buffers-20261014",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_rootfinding_alloc_20261014/REPORT.md"
-    }
-   ]
-  },
-  {
-   "id": "ec-online",
-   "label": "Elliptic curve, online phase only (reusable set-up excluded)",
-   "role": "context",
-   "note": "Starts the clock after a reusable set-up. Not a cold result; the same set-up spent as a generic precomputation would speed rho up too.",
-   "points": [
-    {
-     "date": "2026-09-28",
-     "value": 0.134,
-     "reference": "qualified",
-     "label": "Bounded autolab round 3, pair-table incumbent, six toy cells",
-     "detail": "Paired IC/rho online cost 0.134x, descriptive 95% 0.125-0.144; the qualified rho online reference took 7.45x the incumbent's online time. 216/216 verified. Ledger section 23 (2026-10-01) reads 8.8-17.5x faster online at 2^36.6-2^47.2 on the Koblitz descent, and 4.9-31.6x slower once its set-up is charged.",
-     "class": "engineering",
-     "anchor": "#rho-results-title",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/goal_20260924/improvement/round3/README.md"
-    },
-    {
-     "date": "2026-10-03",
-     "value": 9104.845,
-     "reference": "matched",
-     "unit": "online wall time",
-     "label": "n17 prepared inherited-F4 development target, same-point rho",
-     "detail": "Median paired IC/rho online cost 9,105x across three clean verified repetitions on one new n17 public point. The inherited-F4 solver family is 227x faster than production F5 on the same point, but this is not a win against rho and does not price the n53 PDP4root path.",
-     "class": "accounting",
-     "anchor": "#ic-f5-inherited-f4-online-20261003",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_solver_online_20261003/confirmation/RESULT.md"
-    },
-    {
-     "date": "2026-10-03",
-     "value": 0.0682,
-     "reference": "matched",
-     "unit": "isolated wall time",
-     "label": "n61 compact orbit vs strong rho rung 3, 256 one-target workloads, hosted isolated",
-     "detail": "Median of 256 per-workload IC/rho online ratios 0.0682 (rho/IC median 14.67, 95% 12.40-17.21); IC faster online on 255 of 256 public targets, at r = 2^47.2 on a pinned hosted AMD EPYC 7763 core. Cold, with its 22 s set-up charged, the same IC is 74.8x slower (cold series). Same-runner replay 256/256; PENDING_INDEPENDENT_VALIDATION.",
-     "class": "engineering",
-     "anchor": "#n61-compact-orbit-hosted-20261003",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/sat_factor_base_review_20260908/autolab/evidence/20261003-koblitz-n61-hosted-isolated/README.md"
-    },
-    {
-     "date": "2026-10-04",
-     "value": 0.9276907676250028,
-     "reference": "matched",
-     "unit": "unisolated online wall diagnostic",
-     "label": "n37 compact-orbit K7, one frozen public point, six paired repeats",
-     "detail": "Median paired IC/rho online wall ratio 0.927691 (rho/IC paired median 1.0780), spanning 0.875695-1.554470 in six repeats on one public point. IC median 0.136063 ms; strong rho median 0.144334 ms. All six pairs and all 518 base logs independently replayed. Apple M4 Pro host was not isolated; controlled speedup and cold fully charged cost remain unknown. The RSS change is accounting, not an algorithm improvement.",
-     "class": "accounting",
-     "anchor": "#n37-compact-orbit-online-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-n37-single-target-20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-04",
-     "value": 0.18696614180699,
-     "reference": "matched",
-     "unit": "unisolated online wall diagnostic",
-     "label": "n41 compact S3 root index, K85, one frozen public point",
-     "detail": "Six verified same-point pairs: median paired IC/rho online 0.186966 [0.119434, 0.197568], 6,970 actual base points and 85 folded columns. Median IC target 3.442 ms; strong rho 20.286 ms. Cold IC/rho is 23.969714 in a separate diagnostic series; no isolated speedup claim.",
-     "class": "accounting",
-     "anchor": "#n41-n53-cold-online-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-n41-n53-single-target-20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-04",
-     "value": 0.04971403936536562,
-     "reference": "matched",
-     "unit": "unisolated online wall diagnostic",
-     "label": "n53 compact S3 root index, K220, one frozen public point",
-     "detail": "Six verified same-point pairs: median paired IC/rho online 0.049714 [0.042543, 0.056671], 23,320 actual base points and 220 folded columns. Median IC target 5.218 ms; strong rho 103.777 ms. Cold IC/rho is 46.186164 in a separate diagnostic series; no isolated speedup claim.",
-     "class": "accounting",
-     "anchor": "#n41-n53-cold-online-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-n41-n53-single-target-20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-04",
-     "value": 0.19586704770931318,
-     "reference": "matched",
-     "unit": "unisolated online wall diagnostic",
-     "label": "n41 K85, held-out base-size baseline",
-     "detail": "Six verified same-point held-out pairs: median paired IC/rho online 0.195867, or rho/IC 5.106. IC online median 2.631 ms versus rho 13.409 ms; cold IC/rho was 35.144 in the separate unisolated diagnostic series. No controlled speedup claim.",
-     "class": "accounting",
-     "anchor": "#n41-n53-base-size-cold-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-base-size-cold-panel-20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-04",
-     "value": 0.2351697349718147,
-     "reference": "matched",
-     "unit": "unisolated online wall diagnostic",
-     "label": "n41 K64, held-out smaller base",
-     "detail": "Six verified same-point held-out pairs: median paired IC/rho online 0.235170, or rho/IC 4.255. IC online median 3.320 ms; within-repeat smaller/baseline IC online ratio was 1.250. Cold setup remains slower than rho; unisolated diagnostic only.",
-     "class": "accounting",
-     "anchor": "#n41-n53-base-size-cold-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-base-size-cold-panel-20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-04",
-     "value": 0.052510658589816905,
-     "reference": "matched",
-     "unit": "unisolated online wall diagnostic",
-     "label": "n53 K220, held-out base-size baseline",
-     "detail": "Six verified same-point held-out pairs: median paired IC/rho online 0.052511, or rho/IC 19.300. IC online median 6.736 ms versus rho 135.913 ms; cold IC/rho was 40.365 in the separate unisolated diagnostic series. Host noise was substantial.",
-     "class": "accounting",
-     "anchor": "#n41-n53-base-size-cold-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-base-size-cold-panel-20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-04",
-     "value": 0.0744283266338394,
-     "reference": "matched",
-     "unit": "unisolated online wall diagnostic",
-     "label": "n53 K160, held-out smaller base",
-     "detail": "Six verified same-point held-out pairs: median paired IC/rho online 0.074428, or rho/IC 13.899. IC online median 11.767 ms; within-repeat smaller/baseline IC online ratio was 1.519. Host noise was substantial and cold setup remains slower than rho.",
-     "class": "accounting",
-     "anchor": "#n41-n53-base-size-cold-20261004",
-     "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-base-size-cold-panel-20261004/RESULT.md"
-    },
-    {
-     "date": "2026-10-07",
-     "value": 0.0377,
-     "reference": "matched",
-     "unit": "online wall time",
-     "label": "Rule v3: the Koblitz descent at baseline v3, online only, closest size 2^44.5",
-     "detail": "Mean index-calculus online over mean rho online on the same 64 public points: 0.0377 [0.0290, 0.0487] at 2^44.5 and 0.038-0.098 across the six sizes 2^36.6-2^47.2 (rho/IC 10.2-26.5x; section 23: 8.8-17.5x). Every target's online speedup is above 1. Cold, with its set-up charged, the same method is 5.2-21.0x slower (cold series).",
-     "class": "accounting",
-     "anchor": "#ic-tool-programme-20261001",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v3/README.md"
-    },
-    {
-     "date": "2026-10-12",
-     "value": 0.37777093852601323,
-     "reference": "matched",
-     "unit": "unisolated online wall diagnostic",
-     "label": "n53 K220 fixed-base S3 root batch, target phase, nine single-target pairs",
-     "detail": "Nine verified same-Q/rank-seed pairs; batch/rho target-online median 0.378 [0.103\u20130.442], was control/rho 0.490 on these Q. Batch/control online median 0.612 [0.569\u20130.903]. Reusable K220 setup excluded here but charged in the cold-series point; shared Apple M4 Pro L0 diagnostic.",
-     "class": "engineering",
-     "anchor": "#n53-s3-root-batch-20261012",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/notes/ecc2k130/n53_s3_root_batch_20261012/RESULT.md"
+     "anchor": "#genus-crossover",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_improve_20261014/04b-genus3-2lp-rebalance/README.md"
     }
    ]
   },
@@ -1378,5 +940,5 @@
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-10-15"
+ "updated": "2026-10-17"
 }

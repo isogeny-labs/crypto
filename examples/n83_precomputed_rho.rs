@@ -100,7 +100,9 @@ impl Config {
     fn parse(bytes: &[u8]) -> Result<Self, String> {
         let c: Self =
             serde_json::from_slice(bytes).map_err(|e| format!("invalid strict config: {e}"))?;
-        let wall_ok = c.budget_wall_seconds.is_none_or(|s| s.is_finite() && s > 0.0);
+        let wall_ok = c
+            .budget_wall_seconds
+            .is_none_or(|s| s.is_finite() && s > 0.0);
         let bytes_ok = c.budget_table_bytes.is_none_or(|b| b >= ENTRY_BYTES);
         let some_budget = c.budget_wall_seconds.is_some() || c.budget_table_bytes.is_some();
         if c.backend != "fold"
@@ -136,7 +138,10 @@ fn parse_targets(text: &str) -> Result<Vec<[u128; 2]>, String> {
             .strip_prefix('[')
             .and_then(|l| l.strip_suffix(']'))
             .ok_or(format!("line {i}: expected a JSON array"))?;
-        let parts: Vec<&str> = inner.split(',').map(|p| p.trim().trim_matches('"')).collect();
+        let parts: Vec<&str> = inner
+            .split(',')
+            .map(|p| p.trim().trim_matches('"'))
+            .collect();
         if parts.len() != 2 {
             return Err(format!("line {i}: expected two coordinates"));
         }
@@ -145,9 +150,13 @@ fn parse_targets(text: &str) -> Result<Vec<[u128; 2]>, String> {
             if part.is_empty() || !part.bytes().all(|b| b.is_ascii_digit()) {
                 return Err(format!("line {i}: coordinates must be decimal"));
             }
-            *slot = part.parse::<u128>().map_err(|_| format!("line {i}: bad coordinate"))?;
+            *slot = part
+                .parse::<u128>()
+                .map_err(|_| format!("line {i}: bad coordinate"))?;
             if *slot >> 83 != 0 {
-                return Err(format!("line {i}: coordinate is not a canonical field word"));
+                return Err(format!(
+                    "line {i}: coordinate is not a canonical field word"
+                ));
             }
         }
         out.push(point);
@@ -175,7 +184,9 @@ fn assert_legacy_curve(curve: &KoblitzCurve) -> Result<(), String> {
         || curve.cofactor.to_u64() != Some(1_128_547_018)
         || point_strings(curve.generator())? != [LEGACY_G[0].to_string(), LEGACY_G[1].to_string()]
     {
-        return Err("constructor does not match the exact legacy n83 a1 curve and generator".into());
+        return Err(
+            "constructor does not match the exact legacy n83 a1 curve and generator".into(),
+        );
     }
     Ok(())
 }
@@ -246,7 +257,7 @@ fn precompute_thread(
         || {
             starts += 1;
             if let Some(deadline) = deadline {
-                if starts % 64 == 0 && Instant::now() >= deadline {
+                if starts.is_multiple_of(64) && Instant::now() >= deadline {
                     return None;
                 }
             }
@@ -305,10 +316,15 @@ fn build_table(rho: &Rho, jumps: &[JumpG<u128, u64>], config: &Config, start: In
             .chunks_mut(per_thread)
             .enumerate()
             .map(|(t, chunk)| {
-                let seed = derive_seed(b"n83-bl-table-walks-v1\0", config.table_seed, &t.to_le_bytes());
+                let seed = derive_seed(
+                    b"n83-bl-table-walks-v1\0",
+                    config.table_seed,
+                    &t.to_le_bytes(),
+                );
                 scope.spawn(move || {
                     let mut stats = DpWalkStats::default();
-                    let written = precompute_thread(rho, jumps, config, seed, deadline, chunk, &mut stats);
+                    let written =
+                        precompute_thread(rho, jumps, config, seed, deadline, chunk, &mut stats);
                     (written, stats)
                 })
             })
@@ -474,7 +490,11 @@ fn solve_online(
                     let candidate = mul_mod(sub_mod(hit_a, state.a, r), inv, r);
                     if rho.scalar_mul(rho.generator(), candidate) == q {
                         scalar = Some(candidate);
-                        source = if from_table { "precomputed_table" } else { "own_walks" };
+                        source = if from_table {
+                            "precomputed_table"
+                        } else {
+                            "own_walks"
+                        };
                         return true;
                     }
                     counts.failed_candidates += 1;
@@ -527,7 +547,8 @@ fn run(config_path: &str, targets_path: &str, out_path: &str) -> Result<bool, St
     let config_bytes = fs::read(config_path).map_err(|e| format!("read config: {e}"))?;
     let config = Config::parse(&config_bytes)?;
     let targets_bytes = fs::read(targets_path).map_err(|e| format!("read targets: {e}"))?;
-    let targets = parse_targets(std::str::from_utf8(&targets_bytes).map_err(|_| "targets not UTF-8")?)?;
+    let targets =
+        parse_targets(std::str::from_utf8(&targets_bytes).map_err(|_| "targets not UTF-8")?)?;
     let mut out = fs::OpenOptions::new()
         .write(true)
         .create_new(true)
@@ -613,7 +634,10 @@ fn run(config_path: &str, targets_path: &str, out_path: &str) -> Result<bool, St
     // ---- per-target online ---------------------------------------------
     let mut all_ok = true;
     for (index, coords) in targets.iter().enumerate() {
-        let q = RawPointG::Affine { x: coords[0], y: coords[1] };
+        let q = RawPointG::Affine {
+            x: coords[0],
+            y: coords[1],
+        };
         let seed = derive_seed(
             b"n83-bl-online-v1\0",
             config.online_seed,
@@ -705,7 +729,10 @@ mod tests {
 
     #[test]
     fn targets_parse_numbers_and_strings_and_refuse_bad_rows() {
-        let t = parse_targets("[6274346871052084705058109, 7777137791885914859810330]\n[\"1\",\"2\"]\n").unwrap();
+        let t = parse_targets(
+            "[6274346871052084705058109, 7777137791885914859810330]\n[\"1\",\"2\"]\n",
+        )
+        .unwrap();
         assert_eq!(t.len(), 2);
         assert_eq!(t[1], [1, 2]);
         assert!(parse_targets("").is_err());
@@ -722,8 +749,14 @@ mod tests {
         let bytes = String::from_utf8(ok.to_vec()).unwrap();
         for bad in [
             bytes.replace("fold", "wide"),
-            bytes.replace("\"budget_wall_seconds\":640.0", "\"budget_wall_seconds\":-1.0"),
-            bytes.replace("\"budget_wall_seconds\":640.0", "\"budget_wall_seconds\":null"),
+            bytes.replace(
+                "\"budget_wall_seconds\":640.0",
+                "\"budget_wall_seconds\":-1.0",
+            ),
+            bytes.replace(
+                "\"budget_wall_seconds\":640.0",
+                "\"budget_wall_seconds\":null",
+            ),
             bytes.replace("\"budget_table_bytes\":null", "\"budget_table_bytes\":3"),
             bytes.replace("\"online_seed\":2", "\"online_seed\":2,\"scalar\":3"),
         ] {

@@ -1,0 +1,10 @@
+# Second-round arms around the 20 B/s build on the RTX PRO 6000: knobs and
+# geometries the first sweep (AUTOSWEEP.md section 4) did not screen.
+# name|knob overrides appended to the base (last assignment wins)
+inv-poly-inline|PACKED_INV_POLY=1
+geo-544x1|THREADS=544 MINBLOCKS=1
+geo-576x1|THREADS=576 MINBLOCKS=1
+phase-popc|TABLE_PHASE_POPC=1
+phase-popc-no-pipe|TABLE_PHASE_POPC=1 TABLE_PIPE_SELECT=0 TABLE_SPLIT_FORWARD=0 TABLE_BATCH_HINTS=0 TABLE_BLOCK_HINTS=0
+no-square-table|PACKED_SQUARE_TABLE=0
+pair-clmul|PACKED_PAIR_CLMUL=1
