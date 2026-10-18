@@ -397,3 +397,26 @@ build command); it applies the decision rule above to `summary.md`.
 10. **Gaps filled.** The design names no DP-bit rule, no cap, no pricing model,
     no definition of "reach" or of the verdict thresholds; they are in this
     document, fixed before any measured run.
+
+## Addendum A (card split; written before any measured run; changes no cell, rule or threshold)
+
+Timing the `2^48` cells (about 6.3, 5.6, 5.2 and 4.0 s per target for all 14
+rules at `r` = 16, 32, 128, 2048) showed the card table above would leave a
+loaded shared host too close to the 8-minute limit. The frozen cards are:
+
+| card | content |
+|:--|:--|
+| 01 | build, selftest, ideal-map controls at 40 and 44 (512 targets), `2^40` all `r` |
+| 02 | `2^44`, `r` in {16, 32} |
+| 03 | `2^44`, `r` in {128, 2048} |
+| 04 to 07 | `2^48`, `r` = 16, targets 0..15, 16..31, 32..47, 48..63 |
+| 08, 09 | `2^48`, `r` = 32, targets 0..31, 32..63 |
+| 10, 11 | `2^48`, `r` = 128, targets 0..31, 32..63 |
+| 12, 13 | `2^48`, `r` = 2048, targets 0..31, 32..63 |
+| 14 | ideal-map control at 48 (512 targets) and the `theta` extension |
+| 15 | part B: CPU build, five bench runs, plan |
+
+Every sweep card also runs the `baseb` A/A sample on the same target range
+with seed offset 9000011. Each card builds the binary it runs and removes it.
+The assess stage rebuilds `b13` with card 01's `rustc` argv and runs `summary`
+on `raw/`.
