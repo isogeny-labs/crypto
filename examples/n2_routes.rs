@@ -19,7 +19,7 @@
 //! separately and priced afterwards at 0, 0.1 and 1 M.
 //!
 //! std-only; `rustc --edition 2021 -O examples/n2_routes.rs`.
-//! Usage: `n2_routes <out-dir> [run|check|control|summarize|hsweep|memsweep|hsummarize|gluecheck|glue]`; env `N2_THREADS`, `N2_SIZES`
+//! Usage: `n2_routes <out-dir> [run|check|control|summarize|hsweep|memsweep|hsummarize|gluecheck|glue|gluesummarize]`; env `N2_THREADS`, `N2_SIZES`
 //! (comma-separated `log2 #E` targets, default `20,24,28,32,36,40`).
 #![allow(dead_code)]
 #![allow(clippy::needless_range_loop)]
@@ -3764,6 +3764,74 @@ fn summarize_glue(csv: &str) -> String {
             i / j
         ));
     }
+    // Full pricing band (Amendment C, with H3's honest split test: one
+    // Legendre symbol per Jglue step priced at one inversion).
+    let mut rows: BTreeMap<(u32, u64, String), Vec<Vec<f64>>> = BTreeMap::new();
+    for l in csv.lines().skip(1) {
+        let v: Vec<&str> = l.split(',').collect();
+        let f: Vec<f64> = v
+            .iter()
+            .map(|x| x.parse::<f64>().unwrap_or(f64::NAN))
+            .collect();
+        rows.entry((
+            v[0].parse().unwrap(),
+            v[1].parse().unwrap(),
+            v[8].to_string(),
+        ))
+        .or_default()
+        .push(f);
+    }
+    // columns: 3 p, 9 steps, 11 jac_ops, 12 walk_M, 13 walk_I, 14 walk_native,
+    // 15 jac_M, 16 jac_I, 17 la_native, 18 eadd_M, 19 eadd_I
+    let cost = |r: &Vec<f64>, ipr: f64, eadd_price: bool, w: f64, legendre: bool| -> f64 {
+        let mut c = r[12] + ipr * r[13] + w * (r[14] + r[17]);
+        if eadd_price {
+            c -= r[15] + ipr * r[16];
+            c += r[11] * (r[18] + ipr * r[19]);
+        }
+        if legendre {
+            c += r[9] * ipr;
+        }
+        c
+    };
+    for ((bits, h, arm), v) in &rows {
+        if arm != "Jglue" {
+            continue;
+        }
+        let Some(rr) = rows.get(&(*bits, *h, "R".to_string())) else {
+            continue;
+        };
+        let (mut lo, mut hi, mut icw, mut cells) = (f64::MAX, 0f64, 0, 0);
+        for ik in 0..2 {
+            for jp in [false, true] {
+                for w in [0.0, 0.1, 1.0] {
+                    let ipr = |r: &Vec<f64>| if ik == 0 { 3.0 } else { 2.0 * r[3].log2() };
+                    let ci = v.iter().map(|r| cost(r, ipr(r), jp, w, true)).sum::<f64>()
+                        / v.len() as f64;
+                    let cr = rr
+                        .iter()
+                        .map(|r| cost(r, ipr(r), false, w, false))
+                        .sum::<f64>()
+                        / rr.len() as f64;
+                    let ratio = ci / cr;
+                    lo = lo.min(ratio);
+                    hi = hi.max(ratio);
+                    cells += 1;
+                    icw += usize::from(ratio < 1.0);
+                }
+            }
+        }
+        let verdict = if icw == cells {
+            "IC cheaper in every cell"
+        } else if icw == 0 {
+            "rho cheaper in every cell"
+        } else {
+            "unresolved"
+        };
+        out.push_str(&format!(
+            "H2 band bits {bits} h {h}: Jglue/rho in [{lo:.3}, {hi:.3}] over {cells} cells (IC cheaper in {icw}) -> {verdict}\n"
+        ));
+    }
     out.push_str(&format!("H2 all answers verified: {all_ok}\n"));
     out
 }
@@ -3784,6 +3852,12 @@ fn main() {
         std::fs::write(out.join("ranking.csv"), &summary.1).unwrap();
         std::fs::write(out.join("summary.txt"), &summary.2).unwrap();
         eprint!("{}", summary.2);
+        return;
+    }
+    if mode == "gluesummarize" {
+        let t = summarize_glue(&std::fs::read_to_string(out.join("glue.csv")).unwrap());
+        std::fs::write(out.join("glue_summary.txt"), &t).unwrap();
+        eprint!("{t}");
         return;
     }
     if mode == "gluecheck" {
