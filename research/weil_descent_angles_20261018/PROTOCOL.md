@@ -138,3 +138,127 @@ that does not finish is reported as not run.
 - Existence of `C` with `Jac(C) ~ Res E` is not an explicit isogeny; no
   transfer is computed and no DLP solved. Diem's `Õ(q^{4/3})` is quoted [T].
 - Exhaustive only at `q = 3` (`E` over `F_81`, a toy size).
+
+## Addendum A (items 1–3), frozen before any run of items 1–3
+
+Written after three read-only surveys of the repository (decomposition
+programme; PKM series; genus-2 and cover tooling). What exists, quoted from
+the surveys, and the gaps this round fills:
+
+- **Decomposition over `F_{q^n}`**: measured end-to-end at `n = 3, 4, 5` (odd)
+  and `n = 4` (binary), all above rho; the 1/n! rate was sampled at `k = 3`
+  (`0.152–0.180` vs `1/6`, `p = 271–2083`), `k = 4` and the JV variants.
+  **Gaps**: no Weil-descended summation oracle at `n = 2` (odd); no rate
+  sweep at `n = 2`; nothing for binary `F_{(2^m)^n}` with `n = 2, 3, 5`; no
+  null control (random factor base of the same size) anywhere.
+- **PKM over prime fields**: solving degrees measured (`m = 2, 3, 4`), ecbench
+  end-to-end `17–141×` rho with table oracles. **Gap**: "nobody has measured"
+  the exact decomposition probability of the PKM factor base against its
+  heuristic `|V|^m/(m!·r)`, nor against a random factor base of the same size.
+- **`n = 2` Jacobian route**: genus-2 arithmetic and single-large-prime
+  genus-2 index calculus exist (`genus2_fp.rs`, `hyperelliptic_index_calculus.rs`);
+  IC vs rho on the *same* Jacobian measured (`0.42–1.78`). **Gaps**: no
+  explicit map `E(F_{p^2}) → Jac(C)(F_p)` (no Scholten construction); no
+  comparison against rho on `E(F_{p^2})`; no double-large-prime genus-2 IC
+  over odd `F_p`.
+
+### Item 1, Part D: exact decomposition coverage over `F_{q^n}`
+
+Tool: `examples/decomposition_coverage.rs` (std-only).
+
+For `E/F_{q^n}` (random curves, coefficients generic in `F_{q^n}`), factor base
+`F = {P : x(P) ∈ F_q}`, and `m = n` summands, compute **exactly** over the
+whole group: the coverage `π = #{R : R = P_1 + … + P_m, P_i ∈ F}/#E`, the
+mean number of multiset decompositions per point `μ`, and compare with the
+Gaudry heuristic `1/n!` and with the Poisson model `1 − e^{−λ}`,
+`λ = (#size-m multisets of F)/#E`. Cells (each: every prime power in range,
+3 curves per field):
+
+| char | n | q range |
+|:--|:--|:--|
+| odd | 2 | primes 53 ≤ p ≤ 1500 |
+| odd | 3 | primes 13 ≤ p ≤ 101 |
+| odd | 4 | primes 5 ≤ p ≤ 23 |
+| odd | 5 | primes 5 ≤ p ≤ 11 |
+| 2 | 2 | 2^m, 4 ≤ m ≤ 10 |
+| 2 | 3 | 2^m, 3 ≤ m ≤ 7 |
+| 2 | 4 | 2^m, 3 ≤ m ≤ 5 |
+| 2 | 5 | 2^m, 2 ≤ m ≤ 4 |
+
+Controls on every curve: **null** — a random subset of `E` closed under
+negation with `|F|` elements; **positive** — `F = {±jG : 1 ≤ j ≤ |F|/2}` (an
+interval in discrete-log space), whose sums form an interval, so coverage must
+fall far below Poisson. Prediction **P7**: the subfield factor base matches
+the null control within sampling spread at every `n` and both
+characteristics, and `π` is the Poisson value, not `1/n!`
+(`1 − e^{−1/2} = 0.393` at `n = 2`, `0.154` at `n = 3`, `0.041` at `n = 4`).
+A systematic subfield-vs-null difference would be a structural effect of the
+Weil-descent factor base and is reported as found.
+
+### Item 1, Part O and item 3, Part J: the `n = 2` routes end to end
+
+Tool: `examples/n2_routes.rs` (std-only).
+
+Instances: `E/F_{p^2}` with `#E = h·ℓ`, `ℓ` prime, `h ≤ 8`, at
+`log2 #E ≈ 20, 24, 28, 32` (p ≈ 2^10 … 2^16), from the Scholten-type family
+below so that both routes apply to the same curve; 3 instances per size, 3
+targets per instance; every answer verified (`k·P = Q`).
+
+- **Arm R (reference)**: rho on `E(F_{p^2})`, negation map, r-adding walk
+  (r = 32) with distinguished points, affine coordinates with simultaneous
+  inversion off; cost counted in `F_p` multiplications (`F_{p^2}` multiply =
+  3, square = 2, inverse = 1 `F_p` inverse + 4; an `F_p` inverse is
+  counted separately and priced at its measured multiplication equivalent).
+- **Arm J (Jacobian route, item 3)**: `C : y^2 = f(x)` over `F_p` with
+  `x^6 f(κ/x) = κ^3 f(x)`, `κ` a non-square, so the involution
+  `(x, y) ↦ (κ/x, κ^{3/2} y/x^3)` is defined over `F_{p^2}` and swapped with
+  its conjugate by Frobenius; `E = C/⟨ι⟩` over `F_{p^2}` and
+  `Jac(C) ~ Res_{F_{p^2}/F_p} E`. Transfer `τ(P) = φ^*P + (φ^*P)^σ` (pull-back
+  along `φ : C → E`, then the trace to `F_p`), verified as a homomorphism with
+  `#Jac(C)(F_p) = #E(F_{p^2})` and the kernel of `τ` on `E[ℓ]` trivial. DLP
+  in `Jac(C)(F_p)` by index calculus with degree-1 factor base of size
+  `p^{1/2}·c` and double large primes (Gaudry–Thomé–Thériault–Diem), the
+  linear algebra by structured Gaussian elimination then dense elimination
+  mod `ℓ`. Cost: `F_p` multiplications of the Jacobian arithmetic and the
+  splitting tests, plus the transfer, plus the linear algebra.
+- **Arm D (decomposition route, item 1)**: Gaudry's decomposition in
+  `E(F_{p^2})` with factor base `x ∈ F_p` (reduced to the same size as Arm J)
+  and double large primes; the decomposition oracle is the Weil-descended
+  summation polynomial `S_3(x_1, x_2, x_R) = 0` solved over `F_p` (two
+  equations in `e_1 = x_1 + x_2`, `e_2 = x_1 x_2`, eliminated to a quartic,
+  roots by gcd with `x^p − x`), verified against brute force on every point
+  for `p ≤ 101`. Same linear algebra as Arm J.
+
+Native operations not reducible to `F_p` multiplications (linear algebra mod
+`ℓ`, hashing, distinguished-point storage) are counted separately and priced
+at `0`, `0.1` and `1` `F_p`-multiplication equivalents; two arms are ranked
+only where the order holds across the band (AGENTS.md §5a). Prediction
+**P8**: both IC arms cost a constant multiple of rho with exponent ≈ 1 in
+`p` (no exponent gain at `n = 2`); the constant favours rho at every size;
+Arm D's per-trial cost is below Arm J's (an oracle call versus a Jacobian
+addition) but its linear algebra is the same. A crossover inside the measured
+range would be reported, not extrapolated beyond it.
+
+### Item 2, Part P: exact decomposition coverage of PKM factor bases
+
+Tool: `examples/pkm_coverage.rs` (std-only).
+
+Prime-order `E/F_p`, `r = #E`, `p` over all primes in the ranges below with
+`2^t | p − 1` (Kummer, split Dickson) or `2^t | p + 1` (torus Dickson).
+`V` = the `2^t` roots of `L_t ∘ … ∘ L_1(x) = c` for the tower family
+(Kummer `x ↦ x^2`; Dickson `x ↦ x^2 − 2`), `c` chosen so all roots lie in
+`F_p`; `F = {P : x(P) ∈ V}`. For `m = 2, 3` and `t` at the sizing
+`|V|^m ≈ m!·r` and one step either side, compute exactly `π`, `μ`, the
+heuristic `|V|^m/(m!·r)` and the Poisson value. Same null and positive
+controls as Part D. Ranges: `m = 2`: `r ≤ 2^24`; `m = 3`: `r ≤ 2^21`; at
+least 20 primes per (family, m). Prediction **P9**: Kummer and Dickson
+factor bases match the null control (their algebraic structure does not
+change decomposition statistics; the PKM advantage, if any, is in solving,
+not in coverage).
+
+### Common
+
+Budgets: Part D 60 min, Part P 60 min, Parts O/J 4 h wall (4 threads). Each
+part writes CSVs, `checks.txt`, `env.txt`; each recorded run gets a run
+report, graphs and the round report. A cell over budget is reported as not
+run.
