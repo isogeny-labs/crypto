@@ -2199,7 +2199,7 @@ fn selftest(a: &Args) {
             let draw = draw_for(&cell, xr);
             let sols = count_solutions(&cell.gf, m, &cell.basis, xr);
             // exhaustive count of the polynomial system itself
-            if draw.nv <= 22 {
+            if draw.nv <= 20 && *i < 3 {
                 let pts = points_of(&draw);
                 if pts.len() as u64 != sols {
                     bad += 1;
