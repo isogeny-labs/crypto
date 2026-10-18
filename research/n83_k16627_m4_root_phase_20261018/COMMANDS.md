@@ -62,3 +62,31 @@ The local paths above are execution coordinates. Source revision, exact
 file hashes, retained-object digest, image digest and binary SHA-256 are
 the durable identities. Earlier failed build attempts are recorded in
 [`BUILD_RECEIPT.md`](BUILD_RECEIPT.md), not omitted from the run history.
+
+After the outer exit, `docker inspect --format '{{json .State}}'
+n83-k16627-root-positive-20261018` and
+`docker inspect --format '{{json .HostConfig}}'
+n83-k16627-root-positive-20261018` supplied the retained container and
+host JSON. The four `/out` files were copied byte-for-byte into
+[`positive/`](positive/), and the separately redirected empty stdout/stderr
+were retained there. The worker JSON was absent, checked explicitly with
+`test ! -e positive/worker.json`. The fail-closed derived receipt ran from
+this study directory as:
+
+```sh
+jq -n \
+  --slurpfile state positive/container-state.json \
+  --slurpfile host positive/host-config.json \
+  --slurpfile phases positive/worker.json.phases.jsonl \
+  --rawfile peak positive/peak.bytes \
+  --rawfile start positive/start.utc \
+  --rawfile end positive/end.utc \
+  -f derive-outcome.jq > positive/outcome.json
+```
+
+The required pre-stack full library suite was started after the Docker
+arm exited, with the same SSD Cargo target directory:
+
+```sh
+cargo test --release --lib -- --test-threads=2
+```

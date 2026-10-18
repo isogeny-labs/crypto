@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">N83 K=16,627 four-summand root-propagation control</title>
+  <desc id="desc">The exact retained signed-Frobenius base and full orbit-domain model passed preflight. Root propagation reached a fixpoint in 185 milliseconds, then ordinary SAT search reached the frozen 1,800-second outer wall cap without returning.</desc>
+  <rect width="1200" height="620" fill="#f7f9fc"/>
+  <text x="60" y="57" font-family="DejaVu Sans, sans-serif" font-size="27" font-weight="700" fill="#152238">N83 retained base · where the full-chain solver spends time</text>
+  <text x="60" y="87" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#42536b">Exact K=16,627 signed-Frobenius object · m=4 · one CPU · hard 4 GiB · source 43c9850a73</text>
+
+  <g font-family="DejaVu Sans, sans-serif">
+    <rect x="60" y="128" width="250" height="215" rx="14" fill="#e8f6ee" stroke="#238052" stroke-width="2"/>
+    <text x="80" y="162" font-size="18" font-weight="700" fill="#175a38">Base + group</text>
+    <text x="80" y="195" font-size="15" fill="#244737">35.049 s elapsed</text>
+    <text x="80" y="226" font-size="14" fill="#244737">2,760,082 points</text>
+    <text x="80" y="254" font-size="14" fill="#244737">Four distinct summand x</text>
+    <text x="80" y="282" font-size="14" fill="#244737">Rank 1; tamper rejected</text>
+    <text x="80" y="318" font-size="12" fill="#367453">Pre-SAT group control</text>
+
+    <line x1="315" y1="235" x2="334" y2="235" stroke="#6f8096" stroke-width="3"/>
+    <polygon points="336,235 326,229 326,241" fill="#6f8096"/>
+
+    <rect x="340" y="128" width="250" height="215" rx="14" fill="#e8f6ee" stroke="#238052" stroke-width="2"/>
+    <text x="360" y="162" font-size="18" font-weight="700" fill="#175a38">Full orbit model</text>
+    <text x="360" y="195" font-size="15" fill="#244737">35.221 s elapsed</text>
+    <text x="360" y="226" font-size="14" fill="#244737">201,598 variables</text>
+    <text x="360" y="254" font-size="14" fill="#244737">5,915,238 clauses</text>
+    <text x="360" y="282" font-size="14" fill="#244737">3,901 XOR rows</text>
+    <text x="360" y="318" font-size="12" fill="#367453">Seven x blocks pinned next</text>
+
+    <line x1="595" y1="235" x2="614" y2="235" stroke="#6f8096" stroke-width="3"/>
+    <polygon points="616,235 606,229 606,241" fill="#6f8096"/>
+
+    <rect x="620" y="128" width="250" height="215" rx="14" fill="#e7f1fc" stroke="#2a6bad" stroke-width="2"/>
+    <text x="640" y="162" font-size="18" font-weight="700" fill="#174e82">Root propagation</text>
+    <text x="640" y="195" font-size="15" fill="#234a70">Fixpoint in 185.023 ms</text>
+    <text x="640" y="226" font-size="14" fill="#234a70">3 XOR passes</text>
+    <text x="640" y="254" font-size="14" fill="#234a70">89,094 clause visits</text>
+    <text x="640" y="282" font-size="14" fill="#234a70">0 decisions, 0 conflicts</text>
+    <text x="640" y="318" font-size="12" fill="#346b9d">Returned at 35.427 s</text>
+
+    <line x1="875" y1="235" x2="894" y2="235" stroke="#6f8096" stroke-width="3"/>
+    <polygon points="896,235 886,229 886,241" fill="#6f8096"/>
+
+    <rect x="900" y="128" width="250" height="215" rx="14" fill="#fff3dd" stroke="#b87815" stroke-width="2"/>
+    <text x="920" y="162" font-size="18" font-weight="700" fill="#82530d">Ordinary SAT</text>
+    <text x="920" y="195" font-size="15" fill="#684712">Entered at 35.437 s</text>
+    <text x="920" y="226" font-size="14" fill="#684712">100,000 conflict cap</text>
+    <text x="920" y="254" font-size="14" fill="#684712">1,800 s outer wall cap</text>
+    <text x="920" y="282" font-size="14" fill="#684712">UNKNOWN_wall_cap</text>
+    <text x="920" y="318" font-size="12" fill="#946b2b">No solver return or lift</text>
+  </g>
+
+  <rect x="60" y="390" width="1090" height="150" rx="15" fill="#eef2f8" stroke="#b9c7d9"/>
+  <text x="82" y="428" font-family="DejaVu Sans, sans-serif" font-size="18" font-weight="700" fill="#243b58">What this checkpoint establishes</text>
+  <text x="82" y="463" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#334b67">Root was fast in this run; the earlier arm had no root marker, so its precise phase remains unobserved.</text>
+  <text x="82" y="493" font-family="DejaVu Sans, sans-serif" font-size="15" fill="#334b67">Later search, repeated propagation and conflict work still need completed progress receipts.</text>
+  <text x="82" y="522" font-family="DejaVu Sans, sans-serif" font-size="13" fill="#52677f">Stage diagnostic only · natural relation yield, useful rank and full index-calculus cost remain open.</text>
+  <text x="60" y="585" font-family="DejaVu Sans, sans-serif" font-size="12" fill="#53657b">Source: root-phase PROTOCOL.md, seven fsynced phase records, input and source SHA-256 manifests.</text>
+</svg>
