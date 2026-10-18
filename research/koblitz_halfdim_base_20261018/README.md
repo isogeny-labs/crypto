@@ -51,7 +51,7 @@ not a performance claim; no `S` on any leaderboard changes.
 values in `s_vs_dimension.diagram.json`). Audits: `sessions/n31.audit.json`
 (60 records, 60 verified, 40 replays reproduced, 0 problems) and
 `sessions/n23.audit.json` (84 records, 84 verified, 56 replays reproduced,
-0 problems). Reports with phase tables and PDFs: [`reports/n31/`](reports/n31/),
+0 problems). Reports with phase tables and PDFs (the spec label's retired curve spelling is replaced by the ICV1 slug in the generated `report.md/.typ/.json`, the only edit to `ecbench report`'s output; the sessions are untouched): [`reports/n31/`](reports/n31/),
 [`reports/n23/`](reports/n23/). Every cell is 8 measured runs (4 targets ×
 2 rounds), all verified; L0 (no CPU reservation), so wall time is
 descriptive only.

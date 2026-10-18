@@ -1,6 +1,6 @@
 # ecbench report: ECBS1hdf1473acacd3
 
-**Label:** chain-free Koblitz IC: m = 2 half-dimension base against the m = 3 one-link chain, K_0 / F_2^23
+**Label:** chain-free Koblitz IC: m = 2 half-dimension base against the m = 3 one-link chain, icv1-f2m23-t5197-69e76b73
 
 **Description:** LEADS.md L2, the chained comparison. At n = 23 (the largest size the inherited-F4 m = 3 oracle has completed before, research/pdp_root_finder_ecbench_20261013) the m = 2 pair-table arms at dimension 8, 10, 12 are run against the m = 3 one-link chain at dimension 8 and 10 with the inherited-F4 oracle, the strong rho reference and its A/A control. Counted operations; every phase charged; a measurement, not a performance claim.
 

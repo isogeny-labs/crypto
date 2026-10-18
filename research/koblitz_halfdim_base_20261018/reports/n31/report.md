@@ -1,6 +1,6 @@
 # ecbench report: ECBS1h24a44d1bc573
 
-**Label:** chain-free Koblitz IC: half-dimension Frobenius-invariant base, m = 2 (lookup oracle), K_0 / F_2^31
+**Label:** chain-free Koblitz IC: half-dimension Frobenius-invariant base, m = 2 (lookup oracle), icv1-f2m31-tm90707-c95f16f5
 
 **Description:** LEADS.md L2. The chaining term (m-2)n vanishes at m = 2 when the Frobenius-invariant base has dimension near n/2. Arms at n = 31: the strong signed-Frobenius rho reference and its A/A control; ic.pipeline on koblitz-standard-subspace bases of dimension 10, 12, 14 with the m = 2 pair-table oracle (negation fold). Counted operations; every phase charged; a measurement, not a performance claim. Dimension 16 was removed after its warm-up failed a 36.5 GB allocation (sessions/n31-interrupted-d16); the m = 3 one-link inherited-F4 arm was removed after it timed out at 2400 s on the first target at 34 MiB (sessions/n31-m3-timeout) and is measured at n = 23 instead (spec_n23.json).
 
