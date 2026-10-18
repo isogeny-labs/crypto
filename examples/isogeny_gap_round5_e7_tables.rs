@@ -321,6 +321,61 @@ fn main() {
     } else {
         writeln!(md, "`e7b_k0`: no session.").unwrap();
     }
+    // ── §5a band ──
+    // From `ecbench band` (`sessions/<name>.band.json`): per curve and
+    // weight, the cheapest closed and cleared arms and rho, and whether the
+    // cleared base stays cheaper than the closed table at every weight.
+    writeln!(md, "\n## E7a under the §5a pricing band\n").unwrap();
+    let mut band_json = serde_json::Map::new();
+    for name in ["e7a_h4", "e7a_h72"] {
+        let Ok(text) = std::fs::read_to_string(format!("{dir}/sessions/{name}.band.json")) else {
+            continue;
+        };
+        let b: Value = serde_json::from_str(&text).unwrap();
+        let weights: Vec<f64> = b["weights"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|w| w.as_f64().unwrap())
+            .collect();
+        let mut by_curve: BTreeMap<String, Vec<&Value>> = BTreeMap::new();
+        for r in b["rows"].as_array().unwrap() {
+            by_curve
+                .entry(r["curve"].as_str().unwrap().to_string())
+                .or_default()
+                .push(r);
+        }
+        writeln!(md, "### `{name}`\n\n| curve | weight | best closed | best cleared | rho | cleared ÷ closed | cleared ÷ rho |\n|:--|--:|--:|--:|--:|--:|--:|").unwrap();
+        let mut holds = true;
+        let mut rows = Vec::new();
+        for (curve, rs) in &by_curve {
+            for (wi, w) in weights.iter().enumerate() {
+                let pick = |prefix: &str| {
+                    rs.iter()
+                        .filter(|r| {
+                            r["arm"].as_str().unwrap().starts_with(prefix)
+                                && r["verified"] == r["runs"]
+                        })
+                        .map(|r| r["mean_s"][wi].as_f64().unwrap())
+                        .fold(f64::INFINITY, f64::min)
+                };
+                let (c, g, rho) = (pick("closed-"), pick("subgroup-"), pick("rho-neg"));
+                holds &= g < c;
+                writeln!(
+                    md,
+                    "| `{curve}` | {w} | {c:.2} | {g:.2} | {rho:.3} | {:.3} | {:.2} |",
+                    g / c,
+                    g / rho
+                )
+                .unwrap();
+                rows.push(json!({"curve": curve, "weight": w, "best_closed": c, "best_cleared": g, "rho": rho,
+                    "cleared_over_closed": g / c, "cleared_over_rho": g / rho}));
+            }
+        }
+        writeln!(md, "\nCleared base cheaper than the closed table on every curve at every weight: **{}**.\n", if holds { "yes" } else { "no" }).unwrap();
+        band_json.insert(name.into(), json!({"weights": weights, "rows": rows, "cleared_beats_closed_at_every_weight": holds}));
+    }
+    js.insert("band".into(), Value::Object(band_json));
     std::fs::write(arg(&args, "--out"), &md).unwrap();
     std::fs::write(
         arg(&args, "--json"),

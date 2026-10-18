@@ -65,6 +65,17 @@ Refresh every affected canonical graph and its rendered copies in the same PR
 ("Refresh existing graphs in the same change" below; AGENTS.md section 7), and
 list the graphs checked and left unchanged.
 
+## Performance results: copy into `benchmarks/`
+
+When the run or PR measures how fast an algorithm runs or reports a speedup,
+also copy the report PDFs, every graph as SVG and a 150 dpi PNG render of
+every graph into `benchmarks/<YYYYMMDD>-<slug>/`, and add a row to
+`benchmarks/README.md` (date, what was measured, headline values with units,
+host and isolation, links to the study and run report), in the same PR
+(AGENTS.md "Performance results also land in `benchmarks/`"). Render the PNG
+from the same plotting source as the SVG (for matplotlib, a second `savefig`
+with `dpi=150`). The study directory stays the source of truth.
+
 ## Rendering
 
 Use an installed renderer: Typst, Pandoc with a PDF engine, or LaTeX. Where
@@ -85,6 +96,32 @@ every page: it opens, the graph is legible and labeled, and ids and citations
 are present. Never commit a PDF you have not inspected or present an older
 PDF as current. If no renderer can be installed, commit the complete source
 and graphs and state the exact blocker in the report and the PR.
+
+## Isogeny volcanoes: the standard diagram
+
+Draw every ℓ-isogeny volcano — a walk's result, or measurements placed on
+its curves — with `tools/volcano-diagram/volcano_diagram.py`
+(`volcano-diagram/v2` input, documented in its README). Don't hand-roll a
+new layout. That gives every volcano figure the same reading, a heat map of
+the volcano:
+- **Strata:** each level is a shaded band labelled `Level i · crater/floor`,
+  with its curve count (and how many were measured) and its conductor
+  relative to the crater, ℓ^i.
+- **Rings:** each level is an elliptical ring in perspective, wider going
+  down. Every vertex sits at the angle of the curves below it, under its
+  parent.
+- **Panels:** one per metric, normally mean operations beside mean time.
+  Each panel has one observed-range YlOrRd colour bar, shared by every
+  level, with its min, mid and max printed.
+- **Marks:** unmeasured vertices are small and grey, unverified edges
+  dashed, and the root ringed blue. The title says what was measured and
+  how many seeds or instances per curve; the subtitle carries the run id,
+  and a footnote states anything the colours leave out.
+
+Save the input as `<name>.diagram.json` beside the SVG and PNG. Map each
+short vertex label to its full curve id in the report. If a figure needs
+something the renderer lacks, extend the renderer and its schema version
+rather than forking it.
 
 ## Deliverables for each search round
 
