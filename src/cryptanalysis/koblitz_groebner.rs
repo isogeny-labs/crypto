@@ -8159,8 +8159,16 @@ mod tests {
         let base = run(1, 0);
         assert!(base.iter().any(|&(ops, _)| ops > 0), "counter never moved");
         assert_eq!(base, run(4, 0), "thread count changed the counters");
-        assert_eq!(base, run(1, 0x9e37_79b9_7f4a_7c15), "hash salt changed the counters");
-        assert_eq!(base, run(4, 0x1234_5678_9abc_def1), "threads+salt changed the counters");
+        assert_eq!(
+            base,
+            run(1, 0x9e37_79b9_7f4a_7c15),
+            "hash salt changed the counters"
+        );
+        assert_eq!(
+            base,
+            run(4, 0x1234_5678_9abc_def1),
+            "threads+salt changed the counters"
+        );
         crate::cryptanalysis::fx_hash::TEST_SALT.store(0, Relaxed);
     }
 
