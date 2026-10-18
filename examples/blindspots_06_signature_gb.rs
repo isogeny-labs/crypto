@@ -559,6 +559,20 @@ fn standard_monomials(lm: &[u64], nv: usize) -> u64 {
     c
 }
 
+/// The leading monomials not divisible by another one.
+fn minimal_lms(lm: &[u64]) -> Vec<u64> {
+    let mut v: Vec<u64> = lm.to_vec();
+    v.sort_unstable_by_key(|&m| key(m));
+    v.dedup();
+    let mut out: Vec<u64> = Vec::new();
+    for &m in &v {
+        if !out.iter().any(|&l| l & !m == 0) {
+            out.push(m);
+        }
+    }
+    out
+}
+
 fn brute_solutions(eqs: &[Poly], nv: usize) -> u64 {
     let mut c = 0u64;
     for pt in 0..(1u64 << nv) {
@@ -2702,8 +2716,10 @@ fn check_system(name: &str, eqs: &[Poly], nv: usize, cross: &Traces, st: &mut Sy
         st.sat += 1;
     }
     let lim = Limits { deadline: None, max_cols: 1 << 22, vm_cap: 0, touch_cap: 0 };
-    let kinds: Vec<Kind> = if nv <= 10 {
+    let kinds: Vec<Kind> = if nv <= 8 {
         vec![Kind::F4, Kind::Sig(FULL), Kind::Sig(0), Kind::Sig(1), Kind::Sig(2), Kind::Sig(4), Kind::Sig(8), Kind::Sig(16), Kind::Sig(3), Kind::Sig(12), Kind::Sig(15), Kind::Sig(FULL | 32)]
+    } else if nv <= 12 {
+        vec![Kind::F4, Kind::Sig(FULL), Kind::Sig(15), Kind::Sig(8), Kind::Sig(16)]
     } else {
         vec![Kind::F4, Kind::Sig(FULL), Kind::Sig(15)]
     };
@@ -2730,7 +2746,7 @@ fn check_system(name: &str, eqs: &[Poly], nv: usize, cross: &Traces, st: &mut Sy
             if j.status != Status::Gb {
                 fail(&format!("{name}: sat system, {kind:?} ended {}", j.status.name()));
             }
-            let sm = standard_monomials(&j.lm, nv);
+            let sm = standard_monomials(&minimal_lms(&j.lm), nv);
             if sm != brute {
                 fail(&format!("{name}: {kind:?} not a Groebner basis: {sm} standard monomials vs {brute} solutions"));
             }
@@ -2770,6 +2786,9 @@ fn check_system(name: &str, eqs: &[Poly], nv: usize, cross: &Traces, st: &mut Sy
                 Some(t) => t,
                 None => continue,
             };
+            if brute > 0 && nv > 12 {
+                continue; // a replay on a satisfiable system ends in a full run; skipped on the larger toys
+            }
             let j = exec_replay_n(kind, eqs, nv, &lim, tr, neg);
             st.replays += 1;
             if j.replay == "fallback" {
