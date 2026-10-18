@@ -8,6 +8,12 @@ controls, with four repetitions. Its charge is Q-dependent setup plus the
 complete worker lane. Independent distinguished-point replay and exact
 ordered check-in comparison accompany every pair.
 
+The initial plan sets `batch_width=32` and `checkin_every=8`. The worker
+flushes at each check-in, so an actual simultaneous batch contains at most
+eight walkers. A separate `checkin_every=64` panel is needed to measure
+the full requested width under the production cadence; it will have its own
+frozen source, plan, observer, and audit.
+
 The fresh `c8i.8xlarge` EC2 allocation is instance
 `i-04455af916e7aefe4`, launched on 2026-10-18 in `us-east-2a`.
 [AWS allocation](ec2-instance.json) exposes 16 guest vCPUs on 16 configured
