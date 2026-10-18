@@ -37,10 +37,13 @@ the `n = 31` reading is confounded by that curve's cofactor 1 492. L4 was
 run on `main` in parallel (`research/pkm_m3_n21_msolve_20261018`, #2175,
 27 GB host): inconclusive at `D ≥ 7` after 4.3 h; this PR's run on the
 same system reproduced its per-round new-element counts (2 354, 4 269,
-5 421) with msolve 0.11 against 0.6.5 and was stopped as superseded. L1:
-`main`'s `(m, ℓ) = (4, 6)` cell at `n = 15` refuted at degree 4 on 2 draws
-(`research/dreg_closure_m4l6_20261018`); this PR's `(13, 5)` draws 18 and
-19 give closure degree 4, the rest are running. Section 7 lists the leads
+5 421) with msolve 0.11 against 0.6.5 and was stopped as superseded. L1
+measured ([`../dreg_closure_m4_20261018/RESULTS.md`](../dreg_closure_m4_20261018/RESULTS.md)):
+closure degree 4 on 4 of 4 unsatisfiable `(13, 5)` draws (`N = 46`; XL
+never refutes); with `main`'s `(4, 6)` cell at `n = 15` refuted at degree
+4 (`research/dreg_closure_m4l6_20261018`), "`m·ℓ` sets the degree" is
+answered no up to `m·ℓ = 24`. The `(13, 6)` draws need about 14 GB at
+degree 4 and were not measured here. Section 7 lists the leads
 these results opened.
 
 These are the only leads with a mechanism that could change `α`; each is

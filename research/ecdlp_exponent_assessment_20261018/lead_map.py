@@ -28,7 +28,7 @@ LEVEL_COLOR = {
 
 # (id, label, tier, level, effort_weeks, blocked, probability note)
 LEADS = [
-    ("L1", "closure degree of the Koblitz chain (m = 4, ℓ = 5, 6)", 1, "exponent", 2.5, False, "decisive two cells"),
+    ("L1", "closure degree of the Koblitz chain (m = 4, ℓ = 5, 6)", 1, "exponent", 2.5, False, "measured: degree 4 up to m·ℓ = 24"),
     ("L2", "half-dimension invariant base, implicit past n ≈ 40", 1, "exponent", 2.0, False, "measured: 17× rho at n = 23"),
     ("L3", "S₅ small roots at δ ≈ 1/5, uncovered lattice variants", 1, "exponent", 1.0, False, "closed (this PR)"),
     ("L4", "PKM tower m = 3, N = 21 solving degree", 1, "exponent", 0.5, True, "D ≥ 7 at 4.3 h (#2175); needs -t 8 or 192 GB"),
