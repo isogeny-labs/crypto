@@ -95,7 +95,8 @@ def run_job(root, job, stop):
         binary = os.environ.get('SPOT_CHECKPOINT_DISCOVERY_BIN',
                                 str(Path(__file__).with_name('bin') / 'checkpoint-discovery'))
         discovery = subprocess.run([binary, '--root', str(root), '--job', job['id'],
-                                    '--require-valid'], capture_output=True, text=True, timeout=120)
+                                    '--require-valid', '--max-hash-bytes', str(64 * 1024**3)],
+                                   capture_output=True, text=True, timeout=1800)
         if discovery.returncode:
             raise RuntimeError(f"{job['id']}: checkpoint discovery rejected recovery; inspect the inventory")
         report = json.loads(discovery.stdout)

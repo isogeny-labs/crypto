@@ -19,15 +19,30 @@ mistaken for a migrated SSH endpoint. `--wait` still waits for the SSH endpoint.
 Do not enable cutover until the original jobs finish or support tested recovery
 and workspace/dependency migration is complete.
 
-## Capacity gate
+## Capacity and cold start
 
-The actual wake call succeeded, but EC2 rejected the launch with
-`MaxSpotInstanceCountExceeded`. The applied Standard Spot quota was 32 vCPUs,
-entirely consumed by the original `m8i.8xlarge`. A replacement alongside it
-requires at least 64; 96 allows an additional rebalance overlap during migration.
-The 96-vCPU request was closed without an applied increase. A minimum 64-vCPU
-request was then submitted; its observed state and request identifiers are in
-`validation/aws-deployment.json`. No On-Demand fallback was introduced.
+The applied Standard Spot quota is now **96 vCPUs**, checked directly with
+`get-service-quota`. This meets the requested minimum of 64 and permits the
+original 32-vCPU host plus two 32-vCPU managed workers during rebalance.
+Earlier launches failed while only 32 was applied; that history remains in
+the earlier release and scaling activity records. The minimum-64 request's
+case can remain open even after the separate 96 limit is applied. No
+On-Demand fallback was introduced, and quota does not guarantee Spot capacity.
+
+The first managed worker needed a bootstrap repair: AL2023 supplies
+`/usr/bin/aws`, but has no `awscli2` RPM. The corrected script verifies the
+existing CLI and installs EFS/PostgreSQL packages. A subsequent
+`m7a.8xlarge` completed unattended cold boot, mounted EFS, passed the packaged
+kill/corrupt/restore self-test, started all four service units, and reported
+idle with no unknown probes. AWS then issued a real rebalance recommendation
+and launched an `m8i.8xlarge` replacement. The original host and IP stayed put.
+
+The template no longer specifies ASG `DesiredCapacity`. Creation defaults to
+`MinSize=0`; wake/idle owns demand thereafter. The old `Capacity=0` property
+reset a demand-driven group during updates and replaced an idle canary. It
+has been removed so stack updates do not reapply a zero desired capacity.
+Do not add a rolling replacement policy or instance refresh over active work
+without verified checkpoint support and a deliberate drain.
 
 AWS Support's case API required a Premium Support subscription, so the closure
 reason could not be read through that API. A closed quota case is not evidence
@@ -42,9 +57,9 @@ aws autoscaling describe-scaling-activities --region us-east-2 \
 
 Spot requests and running instances share the regional vCPU quota. See
 [AWS Spot quotas](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-spot-limits.html).
-New-worker cold boot, cross-worker recovery and live idle shutdown remain
-unverified until an actual managed worker can launch. These are separate from
-the successful configuration and original-host EFS tests.
+New-worker cold boot and the packaged recovery gate have passed. Actual
+application checkpoints, cross-worker recovery, and idle shutdown have separate
+evidence entries; bootstrap success alone does not establish them.
 
 ## Bootstrap recovery gate
 
@@ -55,9 +70,9 @@ private temporary directory under `WorkRoot`. It uses the packaged production
 supervisor and scanner, then removes its synthetic state. Failure blocks
 readiness. Output goes to `/var/log/spot-checkpoint-selftest.log`.
 
-The exact packaged test passed on the original host's mounted EFS workspace.
-It does not establish that a new AMI/instance family has booted or that the
-existing factor-base workers implement application checkpoints.
+The exact packaged test passed on mounted EFS on both original and managed
+hosts, including AMD and Intel workers. The existing factor-base processes
+still run their older executable and have no native checkpoint interface.
 
 Build/install both native executables before `package_runtime.py`:
 
@@ -82,8 +97,8 @@ change set with `aws-config.json`'s parameters plus `RuntimeDigest` from
 `runtime.tar.sha256`. Preserve other current stack parameters. Review resource
 replacements before execution; retain the original instance, EFS and S3 data.
 Use a separate workspace for validation and check for active managed work before
-an update that changes desired capacity. The configured initial `Capacity=0`
-differs from demand-driven ASG capacity after wake.
+an update that changes desired capacity. Demand-driven desired capacity belongs
+to the lifecycle controller and is intentionally absent from the template.
 
 The deployed wake function is the stack's `LifecycleFunctionArn` output.
 Its `wake`, `status` and `release` actions require IAM `lambda:InvokeFunction`.

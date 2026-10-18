@@ -1,33 +1,68 @@
 {
-  "schema": "spot.aws-deployment/v1",
-  "observed_utc": "2026-10-18T21:20:25.378367+00:00",
+  "schema": "spot.aws-deployment/v2",
+  "observed_utc": "2026-10-18T23:18:43.066294+00:00",
   "stack": "spot-experiments",
   "region": "us-east-2",
   "stack_status": "UPDATE_COMPLETE",
-  "runtime_sha256": "8a1f23fc4a42552d2f85f951ebeb2efbc4f78154b7a3aacdb50e8f269cd8e1f7",
+  "runtime_sha256": "4e9e3899571becd92a001dd545bfadca6aa26419c4b7b24f2d0bfc611b447eb2",
   "work_root": "/srv/experiments/spot-worker",
   "node_project": "/srv/experiments/spot-worker/work",
   "lifecycle_enabled": true,
   "ip_cutover_enabled": false,
   "idle_seconds": 1800,
-  "configured_initial_capacity": 0,
+  "desired_capacity_managed_by": "lifecycle-only; template DesiredCapacity removed",
   "desired_capacity": 1,
-  "managed_instances": [],
+  "managed_instances": [
+    {
+      "InstanceId": "i-03b522c4152a4d83c",
+      "InstanceType": "m6a.8xlarge",
+      "AvailabilityZone": "us-east-2c",
+      "AvailabilityZoneId": "use2-az3",
+      "LifecycleState": "InService",
+      "HealthStatus": "Healthy",
+      "LaunchTemplate": {
+        "LaunchTemplateId": "lt-0a663a3e15a051473",
+        "LaunchTemplateName": "Template_mQUD6gyzx0rc",
+        "Version": "11"
+      },
+      "ProtectedFromScaleIn": false
+    }
+  ],
   "distribution": {
     "OnDemandAllocationStrategy": "lowest-price",
     "OnDemandBaseCapacity": 0,
     "OnDemandPercentageAboveBaseCapacity": 0,
     "SpotAllocationStrategy": "price-capacity-optimized"
   },
-  "image_id": "ami-0d31a22b09ceec4db",
-  "image_checked_against_aws_ssm_latest": true,
-  "wake_result": {
-    "state": "starting",
-    "wake_until": 1792359676
+  "spot_quota": {
+    "code": "L-34B43A08",
+    "applied_vcpus": 96.0,
+    "minimum_request": {
+      "Id": "2b1830e9af0e45cda1c75d0c2ff1947d43M9Khoh",
+      "Status": "CASE_OPENED",
+      "DesiredValue": 64.0,
+      "CaseId": "179235827800379"
+    }
   },
-  "release_result": {
-    "state": "idle-timer-managed",
-    "idle_seconds": 1800
+  "bootstrap_failure_then_repair": "AL2023 AMI includes AWS CLI; removed nonexistent awscli2 RPM from package install",
+  "cold_start_amd": {
+    "instance_id": "i-063986fde2f088d28",
+    "instance_type": "m7a.8xlarge",
+    "cloud_init": "done",
+    "recovery_gate": "passed",
+    "services": "all active",
+    "activity": {
+      "Busy": false,
+      "Pending": 0,
+      "Unknown": false
+    }
+  },
+  "rebalance_replacement": {
+    "instance_id": "i-00194ed4cf4e73dbe",
+    "instance_type": "m8i.8xlarge",
+    "cloud_init": "done",
+    "recovery_gate": "passed",
+    "services": "all active"
   },
   "lifecycle_status": {
     "state": "enabled",
@@ -36,51 +71,40 @@
         "S": "control"
       },
       "WakeUntil": {
-        "N": "1792359676"
+        "N": "1792366204"
+      },
+      "IdleSince": {
+        "N": "1792364971"
       }
     },
     "desired": 1,
-    "compute_ready": false,
-    "ready_instance_ids": [],
+    "compute_ready": true,
+    "ready_instance_ids": [
+      "i-03b522c4152a4d83c"
+    ],
     "cutover_enabled": false,
     "ssh_endpoint_ready": false
   },
-  "idle_schedule": {
-    "State": "ENABLED",
-    "Schedule": "rate(1 minute)"
-  },
-  "launch_failure": [
-    {
-      "Status": "Failed",
-      "Message": "Could not launch Spot Instances. MaxSpotInstanceCountExceeded - Max spot instance count exceeded. Launching EC2 instance failed."
-    }
-  ],
-  "spot_quota": {
-    "code": "L-34B43A08",
-    "applied_vcpus": 32.0,
-    "overlap_request": {
-      "Id": "820532cf15cc41aaa8eb1517bc5b2ae3pTXeNqKe",
-      "Status": "CASE_CLOSED",
-      "DesiredValue": 96.0,
-      "CaseId": "179235795500524"
-    },
-    "minimum_request": {
-      "Id": "2b1830e9af0e45cda1c75d0c2ff1947d43M9Khoh",
-      "Status": "CASE_OPENED",
-      "DesiredValue": 64.0,
-      "CaseId": "179235827800379"
-    }
-  },
-  "packaged_recovery_test_on_original_efs": "passed",
-  "managed_worker_cold_boot": "blocked_by_spot_quota",
-  "live_idle_shutdown": "not_tested_no_managed_worker",
-  "cross_worker_recovery": "not_tested_no_managed_worker",
   "original_host": {
     "instance_id": "i-01f85a6c905181498",
     "ssh_ip": "3.134.144.201",
     "running_factor_base_jobs": 5,
-    "nodes_active": true,
-    "discovery_timer_active": true,
+    "approved_snapshot_pauses": true,
     "terminated_or_migrated": false
+  },
+  "application_native_checkpoints": "passed: internal-column SIGKILL recovery; real worker termination/replacement; AMD cold-start gate; managed save/replay and scoring deduplication",
+  "live_idle_shutdown": "passed: automatically scaled 1 to 0 at 2026-10-18T22:30:32Z after the replacement became idle around 22:00; original host untouched",
+  "criu": {
+    "packaged_3_17_1": "dump succeeded; disposable restore failed sys_rseq -22",
+    "upstream_4_2_1": "disposable same-host dump/kill/restore passed; counter advanced",
+    "live_experiments": "no snapshots or signals; pause decision pending"
+  },
+  "live_criu": {
+    "snapshots": "five approved leave-running snapshots plus scheduled checksummed local generations",
+    "private_store": "/var/lib/spot-criu-managed",
+    "interval_seconds_after_run": 900,
+    "retained_generations_per_pid": 2,
+    "off_host_memory_export": "blocked by automatic approval review pending explicit destination authorization",
+    "live_restore": "private same-host namespace probe stalled; no off-host/live recovery claim"
   }
 }

@@ -7,12 +7,14 @@ and its SHA-256 manifest. Publication checks are in [VALIDATION.md](VALIDATION.m
 [Checkpoint discovery](CHECKPOINT_DISCOVERY.md) inventories live experiments and
 checkpoint candidates. New manifest-contract jobs validate generation checksums
 and automatically select the newest valid state before resuming. A read-only
-timer writes the durable inventory every minute.
+timer writes the durable inventory 15 minutes after its previous run finishes.
+[Native factor-base checkpoints](NATIVE_CHECKPOINTS.md) save and restore the
+actual sparse-elimination state for new runs; existing old processes are separate.
 
 The AWS compute lifecycle is now enabled in an isolated managed workspace;
-IP cutover remains disabled to protect the original jobs. Launch validation
-hit the regional Spot quota. See [AWS deployment](AWS_DEPLOYMENT.md) and
-`validation/aws-deployment.json` for applied settings and the capacity gate.
+IP cutover remains disabled to protect the original jobs. The applied Standard
+Spot quota is now 96 vCPUs and managed workers have booted successfully.
+See [AWS deployment](AWS_DEPLOYMENT.md) and `validation/aws-deployment.json`.
 
 This deployment targets one logical x86_64 host with 32 vCPUs and 128 GiB RAM
 in us-east-2. It uses Spot only, with capacity gaps accepted. It preserves
@@ -133,8 +135,9 @@ Hook schema references: [Codex hooks and trust](https://learn.chatgpt.com/docs/h
   crash-consistent disk snapshot, not an application checkpoint or RAM image.
 - No existing Auto Scaling membership was present.
 - Five running `factor_base_shape_ladder` jobs were found. The launcher has
-  no checkpoint, resume, or signal handling implementation. They have NOT
-  been migrated or made resumable. Do not terminate the host to test recovery.
+  no native checkpoint, resume, or signal handling implementation. Approved
+  leave-running CRIU snapshots now exist locally and are refreshed by a timer;
+  actual legacy restore remains unverified. Do not terminate this host to test recovery.
 
 ## Architecture and limits
 
@@ -216,9 +219,9 @@ aws cloudformation validate-template --region us-east-2 --template-body file://t
 ```
 
 `spot-experiments` was initially prepared with capacity zero and cutover false,
-which remain template defaults. The current deployment enables wake/idle control
+with an initial minimum of zero. The current deployment enables wake/idle control
 in `/srv/experiments/spot-worker` while preserving the original IP. See the AWS
-deployment record for current runtime/parameters and the quota-blocked launch.
+deployment record for current runtime/parameters, cold-boot and recovery tests.
 Current resource ids, parameters, snapshot progress and remaining work are saved
 in the private release bundle's `status.json` (download instructions are in `ARTIFACTS.md`). Inspect its current state with:
 
