@@ -28,8 +28,11 @@ Expand the grid and control the work from that same command:
 Seeds expand constructor recipes; all candidates on a curve get the same
 seeded training targets and a separate matched holdout set. At most 1,024
 candidate configurations are accepted. Different recipes can produce the same
-point set: compare the full FB1 digest before treating them as distinct bases.
-The coordinate basis in particular does not change with its seed.
+point set: compare the curve identity and `factor_base.points_sha256` in the
+native inventory when counting unique point sets. FB1 also binds family and
+parameters; a different basis parameterization can have a different FB1 even
+with the same points. Its algebraic system is still a distinct measurement
+configuration. The coordinate basis in particular does not change with its seed.
 
 For other existing native curve constructors or exact bases, first write a
 plan, edit its explicit candidate list and budgets, then run it:
@@ -103,6 +106,8 @@ degree over that solve's substitution tree. Refutations, successful
 decompositions and exhausted solves are distinct. The best successful degree
 uses training probes only. These are bounded procedural diagnostics, **not
 certified degree of regularity**. No algebraic-closure certificate is produced.
+`--max-degree` limits F4 critical-pair degree; it does not reduce the degree of
+the original membership equations, which is retained in the observed diagnostic.
 `certified_degree_of_regularity`, `total_cost_winner` and
 `full_pipeline_speedup` remain null.
 
@@ -114,6 +119,9 @@ certified degree of regularity**. No algebraic-closure certificate is produced.
 ```
 
 Resume requires the **same executable bytes and frozen plan**. It verifies
+the recorded `F4_*` solver environment too; changing those overrides refuses
+resume. Ratios to a candidate retained from an earlier resume segment are
+marked explicitly, since host and load conditions can have changed. It verifies
 sealed attempt hashes and skips finished attempts, including recorded failures
 and caps. It retains an interrupted attempt and starts a new numbered attempt;
 it never overwrites a completed inventory or transcript. To change budgets,

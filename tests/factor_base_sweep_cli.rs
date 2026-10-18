@@ -121,6 +121,13 @@ fn binary_and_prime_probes_replay_and_resume_without_overwriting() {
         assert_eq!(complete, fs::read(a.join("complete.json")).unwrap());
         assert!(dir.join("summary-0002.json").exists());
         assert!(!a.parent().unwrap().join("attempt-0002").exists());
+        let changed_environment = Command::new(exe())
+            .env("F4_SWEEP_CONFIG_BINDING_TEST", "changed")
+            .args(["run", "--out", dir.to_str().unwrap(), "--resume"])
+            .output()
+            .unwrap();
+        assert!(!changed_environment.status.success());
+        assert!(String::from_utf8_lossy(&changed_environment.stderr).contains("F4 environment"));
         let mut other = value(&p);
         other["train"] = json!(5);
         fs::write(&p, serde_json::to_vec(&other).unwrap()).unwrap();

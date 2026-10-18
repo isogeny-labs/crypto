@@ -146,6 +146,7 @@ fn verify_attempt(dir: &Path, candidate: &Candidate, plan: &Plan) -> Result<Valu
 struct Observation {
     id: String,
     rates: BTreeMap<u64, f64>,
+    from_previous_segment: bool,
 }
 fn compare(data: &mut Value, reference: &Observation, key: &str) {
     let trial = data["trial"].as_u64().unwrap_or(0);
@@ -155,8 +156,8 @@ fn compare(data: &mut Value, reference: &Observation, key: &str) {
         .filter(|rate| **rate > 0.0 && trial >= 4)
     {
         if let Some(rate) = data["verified_decompositions_per_second"].as_f64() {
-            data[key] = json!({"candidate":reference.id,"ratio":rate/base,"reference_verified_per_second":base,"matched_probe_count":trial});
-            data["comparison_scope"]=json!("same curve, exact seeded training prefix, solver and limits; provisional wall telemetry including census/setup/logging, not an accepted speedup");
+            data[key] = json!({"candidate":reference.id,"ratio":rate/base,"reference_verified_per_second":base,"matched_probe_count":trial,"reference_from_previous_segment":reference.from_previous_segment});
+            data["comparison_scope"]=json!("same curve, exact seeded training prefix, solver and limits; provisional wall telemetry including census/setup/logging, not an accepted speedup; previous segments may have different host/load conditions");
         }
     }
 }
@@ -412,6 +413,18 @@ pub fn run(
     #[cfg(not(target_os = "linux"))]
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
     let binary = digest(&exe)?;
+    let solver_environment: BTreeMap<String, String> = std::env::vars_os()
+        .filter(|(key, _)| key.to_string_lossy().starts_with("F4_"))
+        .map(|(key, value)| {
+            Ok((
+                key.into_string()
+                    .map_err(|_| "non-UTF8 F4 environment key")?,
+                value
+                    .into_string()
+                    .map_err(|_| "non-UTF8 F4 environment value")?,
+            ))
+        })
+        .collect::<Result<_>>()?;
     if !resume {
         if let Some(parent) = dir.parent().filter(|p| !p.as_os_str().is_empty()) {
             fs::create_dir_all(parent).map_err(|e| format!("{}: {e}", parent.display()))?;
@@ -426,11 +439,13 @@ pub fn run(
         return Err("resume directory does not exist".into());
     }
     let _lock = lock(dir)?;
-    let manifest = json!({"schema":"factor_base_sweep.run/v1","plan":plan,"binary_sha256":binary});
+    let manifest = json!({"schema":"factor_base_sweep.run/v1","plan":plan,"binary_sha256":binary,"solver_environment":solver_environment});
     if resume {
         let old: Value = read(&dir.join("manifest.json"))?;
         if old != manifest {
-            return Err("resume refuses a different plan or executable hash".into());
+            return Err(
+                "resume refuses a different plan, executable hash or F4 environment".into(),
+            );
         }
     } else {
         write_new(&dir.join("manifest.json"), &manifest)?;
@@ -457,6 +472,7 @@ pub fn run(
                 completed = Some((attempt.clone(), verify_attempt(attempt, c, &plan)?));
             }
         }
+        let cached = completed.is_some();
         let (attempt, done) = if let Some((path, done)) = completed {
             log.event(
                 Some(&id),
@@ -495,6 +511,7 @@ pub fn run(
             if let Some(trials) = result["trials"].as_array() {
                 let observation = Observation {
                     id: id.clone(),
+                    from_previous_segment: cached,
                     rates: trials
                         .iter()
                         .filter(|v| v["phase"] == "train")
@@ -580,6 +597,7 @@ mod tests {
         let reference = Observation {
             id: "baseline".into(),
             rates: [(4, 2.0), (8, 3.0)].into(),
+            from_previous_segment: false,
         };
         let mut early = json!({"trial":3,"verified_decompositions_per_second":6.0});
         compare(&mut early, &reference, "comparison");
@@ -594,6 +612,7 @@ mod tests {
         let zero = Observation {
             id: "no-successes".into(),
             rates: [(4, 0.0)].into(),
+            from_previous_segment: true,
         };
         compare(&mut matched, &zero, "zero_reference");
         assert!(matched.get("zero_reference").is_none());
