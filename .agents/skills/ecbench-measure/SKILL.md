@@ -48,9 +48,11 @@ Copy `docs/ecbench/specs/smoke-prime.json` and edit it. Rules:
 
 Once the spec is frozen, steps 3 and 4 go through the model tiers (AGENTS.md
 "Model tiers"). The main session dispatches `experiment-director` in compile
-mode to write the command card (build, `ecbench run`, `ecbench verify`: exact
-argv, spec sha256, `OUT_DIR`, timeouts, stop conditions), relays the card
-verbatim to `executor-mechanical`, then dispatches `experiment-director` in
+mode to write the task card (build, `ecbench run`, `ecbench verify`: exact
+argv, spec sha256, `OUT_DIR` as `must_not_exist`, timeouts, stop conditions;
+`python3 tools/task_card.py lint` must print `CARD OK`), relays the text
+`python3 tools/task_card.py prompt <card>` prints verbatim to
+`executor-mechanical`, which runs it with `tools/task_card.py run`, then dispatches `experiment-director` in
 assess mode with the executor's returned text. Only an assessment of
 `executed_as_specified` with a verbatim relay goes on to step 5. The
 measurement, audit, compare, tabulate and land steps stay as written; compare,

@@ -496,9 +496,20 @@ cairn run</code></pre>
         <p class="join-kicker">Unpaid</p>
         <h3>Run the ECC2K-130 GPU client</h3>
         <p>
-          <span class="mono">ec2k-gpu</span>, from
-          <a href="https://github.com/aburan28/cryptanalysis/tree/HEAD/ecc2k130">aburan28/cryptanalysis</a>,
-          walks what this campaign walks: <span class="mono">R + &sigma;^j(R)</span>
+          <strong>Contribute through <a href="https://ecc-challenges.com">ecc-challenges.com</a>.</strong>
+          Sign in with GitHub, create an API key, and run the one container the
+          dashboard shows. It runs this campaign's walk on NVIDIA GPUs from
+          Ampere on, hands its points in, and has them checked against the other
+          contributors' points and, once the historical import has run, this
+          campaign's own. The same image covers all
+          24 Certicom challenges. See
+          <a href="https://github.com/aburan28/ecc-challenges/blob/main/docs/running-a-worker.md">running a worker</a>.
+        </p>
+        <p>
+          To walk without handing points in, use
+          <span class="mono">ec2k-gpu</span> from
+          <a href="https://github.com/aburan28/cryptanalysis/tree/HEAD/ecc2k130">aburan28/cryptanalysis</a>.
+          It walks what this campaign walks: <span class="mono">R + &sigma;^j(R)</span>
           from Certicom's challenge points, distinguished at
           <span class="mono">HW(x) &le; 32</span>. It writes the campaign's
           32-byte records. Its test suite replays 48 points that the campaign's
@@ -536,8 +547,9 @@ cd ec2k-gpu-$V-linux-x86_64
           <strong>Pick a run id no one else walks.</strong> Every walk seed
           carries the 16-bit <span class="mono">--run-id</span>, and two runs
           under one id repeat each other's trails step for step. The fleet uses
-          ids from 1 upward and its Modal runs use 8000&ndash;9999. Pick one at
-          random in 10000&ndash;65534, a different one for each GPU. The run
+          ids from 1 upward and its Modal runs use 8000&ndash;9999, and
+          ecc-challenges.com assigns 50000&ndash;65534 to its contributors.
+          Pick one at random in 10000&ndash;49999, a different one for each GPU. The run
           goes until stopped. It saves every lane to
           <span class="mono">state.ck</span> every ten minutes and on Ctrl-C,
           and the same command resumes it. It is collection, not a solve:
