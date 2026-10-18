@@ -297,7 +297,7 @@ products is enough and no orbit closure of rows is needed.
 - *Predicted.* 2–4× CPU and 0.2–0.3× peak RSS against the plain dense closure on arm B
   at P3. The gate (G2) asks for ≥ 1.5× and ≤ 0.5×.
 - *What FGHR itself buys (measured analogue, not this card's number).* At `m = 3`,
-  `K₀/F_{2^15}`, `ℓ = 5`, the FGHR system (13 unknowns, degree 4) refuted a target in
+  `icv1-f2m15-tm275-2d22ff5d`, `ℓ = 5`, the FGHR system (13 unknowns, degree 4) refuted a target in
   29 ms against 10,291 ms for the chained system (30 unknowns, degree 3)
   (`research/notes/index-calculus/RESEARCH_EXOTIC_COORDINATES.md:509–510`). That is a
   solve time on a splitting solver, not a degree; at `ℓ = 33` the unknown counts are
