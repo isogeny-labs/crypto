@@ -51,6 +51,21 @@ def run(a):
 
 GQL = "https://api.runpod.io/graphql"
 
+def fetch(base, path, dest):
+    """Recursive copy of a python http.server listing (no key needed: the proxy URL is public)."""
+    import html, re, urllib.parse
+    listing = subprocess.run(["curl", "-sSfL", "-m", "120", base + path], capture_output=True, text=True).stdout
+    for href in re.findall(r'<a href="([^"]+)">', listing):
+        name = urllib.parse.unquote(html.unescape(href))
+        if name.startswith(("/", "..", "?")):
+            continue
+        if name.endswith("/"):
+            fetch(base, path + href, os.path.join(dest, name))
+        else:
+            os.makedirs(dest, exist_ok=True)
+            subprocess.run(["curl", "-sSfL", "-m", "600", base + path + href, "-o", os.path.join(dest, name)], check=False)
+            print(os.path.join(dest, name))
+
 def prices(a):
     """One JSON line per CPU instance id (flavor-vcpu-ramGB) and per GPU type with its RAM per GPU."""
     stamp = subprocess.run(["date", "-u", "+%FT%TZ"], capture_output=True, text=True).stdout.strip()
@@ -80,10 +95,13 @@ def main():
     pr = sub.add_parser("prices", help="secure-cloud $/h of CPU instances and high-RAM GPU types (GraphQL)")
     pr.add_argument("--instances", default="cpu3c-2-4,cpu5c-2-4,cpu3c-32-64,cpu3g-8-32,cpu3g-32-128,cpu3m-16-128,cpu3m-32-256,cpu5c-32-64,cpu5g-32-128,cpu5m-32-256")
     for c in ("status", "stop", "terminate", "url"): sub.add_parser(c).add_argument("id")
+    f = sub.add_parser("fetch", help="mirror the pod's :8000 listing (a sub-path of it) into DEST")
+    f.add_argument("id"); f.add_argument("dest"); f.add_argument("--path", default="")
     sub.add_parser("ls")
     a = p.parse_args()
     if a.cmd == "run": run(a)
     elif a.cmd == "prices": prices(a)
+    elif a.cmd == "fetch": fetch(f"https://{a.id}-8000.proxy.runpod.net/", a.path, a.dest)
     elif a.cmd == "ls":
         for q in call("GET", "/pods"): print(q["id"], q.get("name"), q.get("desiredStatus"), q.get("vcpuCount"), q.get("memoryInGb"), q.get("costPerHr"))
     elif a.cmd == "status":

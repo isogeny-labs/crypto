@@ -4,6 +4,7 @@
 # Plumbing only: installs a toolchain, clones the pinned branch, builds the
 # two examples, runs the frozen run.sh, serves the study directory on :8000.
 #   boot.sh closure|pkm|both     (env: BRANCH; PKM_SHARE=1|2 runs the two PKM targets one after the other or at once)
+#   boot.sh a3|c1|pkm-msolve-mt|ea-wide   (research/ic_leads_rented_20261018/: one LAUNCH.md card each)
 set -u
 JOB=$1; BRANCH=${BRANCH:?BRANCH}
 T0=$(date +%s); CAPS=${POD_MAX_SECONDS:-36000}
@@ -13,7 +14,7 @@ status() { echo "$(date -u +%FT%TZ) $1" >> "$OUT/STATUS"; }
 status BOOT
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq > "$OUT/apt.log" 2>&1
-apt-get install -y -qq git build-essential curl pkg-config libssl-dev python3 util-linux time ca-certificates >> "$OUT/apt.log" 2>&1
+apt-get install -y -qq git build-essential curl pkg-config libssl-dev python3 util-linux time bc ca-certificates >> "$OUT/apt.log" 2>&1
 (cd "$OUT" && nohup python3 -m http.server 8000 > /dev/null 2>&1 &)
 curl -sSf https://sh.rustup.rs | sh -s -- -y -q --profile minimal > "$OUT/rustup.log" 2>&1
 . "$HOME/.cargo/env"
@@ -24,6 +25,8 @@ ln -sfn /workspace/src/research/dreg_closure_m4l6_20261018 "$OUT/closure"
 ln -sfn /workspace/src/research/pkm_lead1_m3n21_20261016 "$OUT/pkm"
 ln -sfn /workspace/src/research/pkm_m3_n21_msolve_20261018 "$OUT/pkm-msolve"
 ln -sfn /workspace/src "$OUT/src"
+ln -sfn /workspace/src/research/ic_leads_rented_20261018 "$OUT/leads"
+ln -sfn /workspace/src/research/equal_advice_wide_20261018 "$OUT/ea-wide"
 { echo "cgroup memory.max: $(cat /sys/fs/cgroup/memory.max 2>/dev/null || cat /sys/fs/cgroup/memory/memory.limit_in_bytes 2>/dev/null)"
   grep MemTotal /proc/meminfo; nproc; } > "$OUT/host-quick.txt"
 status BUILDING
@@ -43,6 +46,24 @@ run_closure() {
   $S $L $C measure; status A_DONE
   export TMO5=$(( $(remaining) - 2400 )); [ "$TMO5" -gt 600 ] && $S $L $C deg5
   $S $L $C control; status CLOSURE_DONE
+}
+run_a3() { # PROTOCOL.md §11.2: fresh A1 draws in parallel, then the decisive closures
+  cargo build --release --example dreg_ladder --example dreg_closure > "$OUT/build.log" 2>&1 || { status BUILD_FAILED; return 1; }
+  L=target/release/examples/dreg_ladder; C=target/release/examples/dreg_closure
+  S=research/dreg_closure_m4l6_20261018/run.sh
+  $S $L $C host; status GENERATING_A3
+  $S $L $C gen-a3 || { status "GEN_A3_FAILED (see runs/queue.log)"; return 1; }
+  status MEASURING_A3; $S $L $C measure-a3; $S $L $C tally-a3 > /dev/null; status A3_DONE
+}
+run_c1() { # PROTOCOL.md §11.3: degree 5 on C1 on a host above 280 GB
+  cargo build --release --example dreg_ladder --example dreg_closure > "$OUT/build.log" 2>&1 || { status BUILD_FAILED; return 1; }
+  L=target/release/examples/dreg_ladder; C=target/release/examples/dreg_closure
+  S=research/dreg_closure_m4l6_20261018/run.sh
+  $S $L $C host
+  export DEG5_DRAWS="${DEG5_DRAWS:-1}" DEG5_MIN_LIMIT="${DEG5_MIN_LIMIT:-280000000000}"
+  export TMO5=$(( $(remaining) - ${SERVE_SECONDS:-2700} - 1800 )); [ "$TMO5" -gt 43200 ] && [ "$DEG5_DRAWS" = 1 ] && TMO5=43200
+  [ "$DEG5_DRAWS" -gt 1 ] && TMO5=$(( TMO5 / DEG5_DRAWS ))
+  status "DEG5 C1 draws=$DEG5_DRAWS TMO5=$TMO5"; $S $L $C deg5; status C1_DONE
 }
 run_pkm() {
   cargo build --release --example pkm_tower_pilot --example pkm_tower_check > "$OUT/build-pkm.log" 2>&1 || { status BUILD_FAILED; return 1; }
@@ -101,13 +122,18 @@ run_pkm_msolve() {
 }
 case $JOB in
   closure) run_closure ;;
+  a3) run_a3 ;;
+  c1) run_c1 ;;
+  pkm-msolve-mt) bash research/ic_leads_rented_20261018/pkm_msolve_mt/job.sh "$OUT" "$CAPS" "$T0" ;;
+  ea-wide) bash research/ic_leads_rented_20261018/equal_advice_wide/job.sh "$OUT" ;;
   pkm-msolve) run_pkm_msolve ;;
   pkm) run_pkm ;;
   both) run_closure; run_pkm ;;
 esac
 status DONE
-# Keep serving results for 45 minutes, then end the container (budget); the
-# launching session also terminates the pod. No API key lives on the pod.
-sleep 2700
+# Keep serving results for SERVE_SECONDS (default 45 minutes), then end the
+# container (budget); whoever launched the pod also terminates it
+# (launch.py terminate ID) after fetching. No API key lives on the pod.
+sleep "${SERVE_SECONDS:-2700}"
 echo "$(date -u +%FT%TZ) serving window over" >> "$OUT/STATUS"
 kill -TERM 1
