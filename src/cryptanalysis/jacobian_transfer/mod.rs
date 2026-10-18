@@ -1180,13 +1180,15 @@ mod tests {
             );
         }
         // c2pnb304w1's 288-bit subgroup does not fit in a 256-bit Jacobian;
-        // its best route is the n = 4 descent over GF(2^76).
+        // its best route is the n = 4 descent over GF(2^76).  With the
+        // measured Cantor counts (#1983) that route costs 2^160.26 against
+        // rho's 2^160.23: a boundary, no longer a marginal advantage.
         let r = screen(
             &by_name("c2pnb304w1"),
             &CostModel::default(),
             DEFAULT_FACTOR_BUDGET,
         );
-        assert_eq!(r.verdict, RouteClass::FormulaMarginal);
+        assert_eq!(r.verdict, RouteClass::Boundary);
         assert_eq!(
             r.routes[r.best_route.unwrap()].invariants["base_degree"],
             76
