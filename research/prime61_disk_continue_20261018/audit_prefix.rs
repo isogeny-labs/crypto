@@ -1,6 +1,10 @@
 //! Check immutable restored rows against the extended native JSONL dump.
 use serde_json::{json, Value};
-use std::{collections::BTreeMap, fs::File, io::{BufRead, BufReader}};
+use std::{
+    collections::BTreeMap,
+    fs::File,
+    io::{BufRead, BufReader},
+};
 fn rows(path: &str) -> BTreeMap<String, Value> {
     let mut out = BTreeMap::new();
     for line in BufReader::new(File::open(path).unwrap()).lines() {
@@ -27,5 +31,8 @@ fn main() {
     for (key, value) in &before {
         assert_eq!(after.get(key), Some(value), "changed immutable row: {key}");
     }
-    println!("{}", json!({"schema":"prime61.immutable-prefix-audit/v1", "status":"PASS", "inherited_rows_matched":before.len(), "final_rows":after.len(), "mutable_fields_excluded":["curve.expanded","curve.measured"]}));
+    println!(
+        "{}",
+        json!({"schema":"prime61.immutable-prefix-audit/v1", "status":"PASS", "inherited_rows_matched":before.len(), "final_rows":after.len(), "mutable_fields_excluded":["curve.expanded","curve.measured"]})
+    );
 }
