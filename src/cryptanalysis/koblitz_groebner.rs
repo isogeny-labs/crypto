@@ -8097,6 +8097,73 @@ mod tests {
         }
     }
 
+    /// The counted word XORs of inherited F4 do not depend on the rayon
+    /// pool size the caller runs in, nor on the hash layout of the engine's
+    /// maps (two salts of the monomial hashers).  Replay-all of
+    /// `research/ecbench_frontier_20261013` found the counter unreproducible
+    /// across hosts; this pins the two within-host sources it could have been.
+    #[test]
+    fn inherited_f4_word_xors_ignore_thread_count_and_hash_salt() {
+        use std::sync::atomic::Ordering::Relaxed;
+        let mut seed = 0x5eed_f4f4_0123_4567u64;
+        let mut next = || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+        let mut systems = Vec::new();
+        for trial in 0..24 {
+            let n_vars = 7 + (trial % 4);
+            let system: Vec<F2BoolPoly> = (0..5 + trial % 3)
+                .map(|k| {
+                    let deg = if k % 3 == 2 { 1 } else { 2 };
+                    let monos = (0..3 + (next() % 6) as usize)
+                        .map(|_| {
+                            let d = (next() % (deg + 1)) as u32;
+                            let mut mask = 0u64;
+                            for _ in 0..d {
+                                mask |= 1u64 << (next() % n_vars as u64);
+                            }
+                            F2BoolMono::from_mask(mask)
+                        })
+                        .collect();
+                    F2BoolPoly::from_monos(monos, n_vars)
+                })
+                .filter(|p| !p.is_zero())
+                .collect();
+            systems.push((system, n_vars));
+        }
+        let run = |threads: usize, salt: u64| -> Vec<(u64, usize)> {
+            crate::cryptanalysis::fx_hash::TEST_SALT.store(salt, Relaxed);
+            let pool = rayon::ThreadPoolBuilder::new()
+                .num_threads(threads)
+                .build()
+                .unwrap();
+            pool.install(|| {
+                systems
+                    .iter()
+                    .map(|(system, n_vars)| {
+                        let opts = SolveOptions {
+                            max_solutions: 1 << 12,
+                            engine: SolverEngine::InheritedF4 { max_degree: 3 },
+                            ..SolveOptions::default()
+                        };
+                        let before = f4_word_ops_thread();
+                        let (roots, _) = solve_boolean_system(system, *n_vars, &opts);
+                        (f4_word_ops_thread() - before, roots.len())
+                    })
+                    .collect()
+            })
+        };
+        let base = run(1, 0);
+        assert!(base.iter().any(|&(ops, _)| ops > 0), "counter never moved");
+        assert_eq!(base, run(4, 0), "thread count changed the counters");
+        assert_eq!(base, run(1, 0x9e37_79b9_7f4a_7c15), "hash salt changed the counters");
+        assert_eq!(base, run(4, 0x1234_5678_9abc_def1), "threads+salt changed the counters");
+        crate::cryptanalysis::fx_hash::TEST_SALT.store(0, Relaxed);
+    }
+
     /// Linear elimination changes the tree, never the roots: on random
     /// systems with linear generators mixed in, every engine and split
     /// rule, with either degree-drop rule, returns exactly the variety.
