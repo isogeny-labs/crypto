@@ -26,6 +26,8 @@ def main():
     parser.add_argument('--q-manifest', type=Path, required=True)
     parser.add_argument('--output-dir', type=Path, required=True)
     parser.add_argument('--repair-commit', required=True)
+    parser.add_argument('--dp-bits', type=int, default=8)
+    parser.add_argument('--step-cap', type=int, default=2048)
     args = parser.parse_args()
     binary = args.binary.resolve(strict=True)
     q_manifest = args.q_manifest.resolve(strict=True)
@@ -42,10 +44,10 @@ def main():
             results = {}
             for mode, width in (('serial', 1), ('batch', 32)):
                 command = [str(binary), str(q_manifest), str(q_index), mode,
-                           '32', '8', '2048', str(width)]
+                           '32', str(args.dp_bits), str(args.step_cap), str(width)]
                 try:
                     completed = subprocess.run(command, capture_output=True,
-                                               text=True, timeout=120, check=False)
+                                               text=True, timeout=180, check=False)
                     stdout, stderr, returncode = (completed.stdout,
                                                    completed.stderr, completed.returncode)
                     timed_out = False
@@ -98,6 +100,8 @@ def main():
         'schema': 'rho-worker-batch-fixture-replay-v1',
         'status': 'pass' if not failures and len(rows) == 64 else 'fail',
         'scope': '32 public secp256k1 Q points, 32 workers per Q, serial and batch width 32',
+        'dp_bits': args.dp_bits,
+        'step_cap': args.step_cap,
         'measurement_tier': 'local_correctness_only',
         'repair_commit': args.repair_commit,
         'q_manifest_sha256': EXPECTED_Q_SHA256,

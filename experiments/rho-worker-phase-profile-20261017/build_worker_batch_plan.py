@@ -19,7 +19,7 @@ def frozen_case(binary, q_manifest, q_index, q_hex, kind, reference, candidate):
     def command(mode):
         width = 1 if mode == 'serial' else 32
         return [str(binary), str(q_manifest), str(q_index), mode,
-                '32', '8', '2048', str(width)]
+                '32', '12', '8192', str(width)]
 
     return {
         'id': f'q{q_index:02d}-{kind}',
@@ -82,11 +82,11 @@ def main():
         'fixture_manifest_sha256': EXPECTED_Q_SHA256,
         'repetitions': 4,
         'outer_repeats': 1,
-        'timeout_s': 120,
+        'timeout_s': 180,
         'workload': {
             'walkers_requested': 32,
-            'dp_bits': 8,
-            'step_cap': 2048,
+            'dp_bits': 12,
+            'step_cap': 8192,
             'checkin_every': 8,
             'batch_width': 32,
         },

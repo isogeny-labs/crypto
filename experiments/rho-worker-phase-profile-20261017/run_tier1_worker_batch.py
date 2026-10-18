@@ -153,8 +153,8 @@ def probe(manifest):
         problems.append('memory limit receipt unavailable')
     if not Path(allocation['receipt']).is_file():
         problems.append('allocation receipt missing')
-    if not evidence['counter_probe']['cpu_times']:
-        problems.append('selected CPU counters missing')
+    if len(evidence['counter_probe']['cpu_times']) <= 7:
+        problems.append('selected CPU or steal-time counters missing')
     return {'ok': not problems, 'problems': problems, 'evidence': evidence}
 
 
@@ -233,8 +233,14 @@ def arm(manifest, case, repeat, variant, serial, folder):
     if delta['cgroup_v2_memory_events'].get('oom', 0) or delta[
             'cgroup_v2_memory_events'].get('oom_kill', 0):
         issues.append('memory OOM')
-    if delta['cpu_times'] and len(delta['cpu_times']) > 7 and delta['cpu_times'][7]:
+    if (delta['cgroup_v1_memory_failcnt'] or 0) > 0:
+        issues.append('cgroup v1 memory failure')
+    if len(delta.get('cpu_times', [])) <= 7:
+        issues.append('CPU steal counter missing')
+    elif delta['cpu_times'][7]:
         issues.append('CPU steal time')
+    if (delta['thermal_throttle'] or 0) > 0:
+        issues.append('thermal throttling')
     if (usage_after.ru_majflt - usage_before.ru_majflt) > 0:
         issues.append('major fault')
     postflight = probe(manifest)
@@ -288,51 +294,62 @@ def run(manifest, folder):
     rows = 0
     pairs = 0
     valid_pairs = 0
-    if health['ok']:
-        with (folder / 'runs.jsonl').open('w') as ledger, (
-                folder / 'pairs.jsonl').open('w') as pair_ledger:
-            for repeat in range(manifest['repetitions']):
-                for index, case in enumerate(manifest['cases']):
-                    order = ('reference', 'candidate') if (repeat + index) % 2 == 0 else (
-                        'candidate', 'reference')
-                    outcomes = {}
-                    for variant in order:
-                        row = arm(manifest, case, repeat, variant, rows + 1, folder)
-                        rows += 1
-                        outcomes[variant] = row
-                        ledger.write(json.dumps(row, sort_keys=True) + '\n')
-                        ledger.flush()
-                    issues = []
-                    if any(row['status'] != 'valid' for row in outcomes.values()):
-                        issues.append('invalid arm')
-                    for field in manifest['pair_fields']:
-                        if outcomes['reference']['fields'].get(field) != outcomes[
-                                'candidate']['fields'].get(field):
-                            issues.append('pair field mismatch: ' + field)
-                    ratio = None
-                    if not issues:
-                        ratio = outcomes['reference']['total_charged_ns'] / outcomes[
-                            'candidate']['total_charged_ns']
-                        valid_pairs += 1
-                    pair = {'case': case['id'], 'kind': case['kind'], 'repeat': repeat,
-                            'measurement_tier': 'tier1_instance',
-                            'run_serials': {key: value['serial']
-                                            for key, value in outcomes.items()},
-                            'status': 'valid' if not issues else 'invalid',
-                            'issues': issues, 'speedup': ratio}
-                    pairs += 1
-                    pair_ledger.write(json.dumps(pair, sort_keys=True) + '\n')
-                    pair_ledger.flush()
-    artifacts_after = {path: digest(path) for path in manifest['artifacts']}
-    stable = artifacts_before == artifacts_after
-    complete = health['ok'] and rows == 2 * expected and pairs == expected
-    summary = {'status': 'completed' if complete else 'rejected',
-               'measurement_tier': 'tier1_instance', 'expected_pairs': expected,
-               'valid_pairs': valid_pairs, 'artifact_sha256': artifacts_before,
-               'artifacts_stable': stable, 'runner_sha256': digest(__file__),
-               'manifest_sha256': digest(folder / 'manifest.json'),
-               'paired_speedup': None}
-    write(folder / 'summary.json', summary)
+    error = None
+    try:
+        if health['ok']:
+            with (folder / 'runs.jsonl').open('w') as ledger, (
+                    folder / 'pairs.jsonl').open('w') as pair_ledger:
+                for repeat in range(manifest['repetitions']):
+                    for index, case in enumerate(manifest['cases']):
+                        order = ('reference', 'candidate') if (repeat + index) % 2 == 0 else (
+                            'candidate', 'reference')
+                        outcomes = {}
+                        for variant in order:
+                            row = arm(manifest, case, repeat, variant, rows + 1, folder)
+                            rows += 1
+                            outcomes[variant] = row
+                            ledger.write(json.dumps(row, sort_keys=True) + '\n')
+                            ledger.flush()
+                        issues = []
+                        if any(row['status'] != 'valid' for row in outcomes.values()):
+                            issues.append('invalid arm')
+                        for field in manifest['pair_fields']:
+                            if outcomes['reference']['fields'].get(field) != outcomes[
+                                    'candidate']['fields'].get(field):
+                                issues.append('pair field mismatch: ' + field)
+                        ratio = None
+                        if not issues:
+                            ratio = outcomes['reference']['total_charged_ns'] / outcomes[
+                                'candidate']['total_charged_ns']
+                            valid_pairs += 1
+                        pair = {'case': case['id'], 'kind': case['kind'], 'repeat': repeat,
+                                'measurement_tier': 'tier1_instance',
+                                'run_serials': {key: value['serial']
+                                                for key, value in outcomes.items()},
+                                'status': 'valid' if not issues else 'invalid',
+                                'issues': issues, 'speedup': ratio}
+                        pairs += 1
+                        pair_ledger.write(json.dumps(pair, sort_keys=True) + '\n')
+                        pair_ledger.flush()
+    except BaseException as failure:
+        error = f'{type(failure).__name__}: {failure}'
+        raise
+    finally:
+        try:
+            artifacts_after = {path: digest(path) for path in manifest['artifacts']}
+        except OSError:
+            artifacts_after = {}
+        stable = artifacts_before == artifacts_after
+        complete = health['ok'] and rows == 2 * expected and pairs == expected and error is None
+        summary = {'status': 'completed' if complete else 'rejected',
+                   'measurement_tier': 'tier1_instance', 'expected_pairs': expected,
+                   'completed_arms': rows, 'completed_pairs': pairs,
+                   'error': error, 'valid_pairs': valid_pairs,
+                   'artifact_sha256': artifacts_before,
+                   'artifacts_stable': stable, 'runner_sha256': digest(__file__),
+                   'manifest_sha256': digest(folder / 'manifest.json'),
+                   'paired_speedup': None}
+        write(folder / 'summary.json', summary)
     return summary
 
 

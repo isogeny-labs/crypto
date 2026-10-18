@@ -17,11 +17,17 @@ BOOTSTRAP_SEED = 0x71CC20261017
 
 
 def digest(path):
-    return sha256(Path(path).read_bytes()).hexdigest()
+    try:
+        return sha256(Path(path).read_bytes()).hexdigest()
+    except OSError:
+        return None
 
 
 def rows(path):
-    return [json.loads(line) for line in path.read_text().splitlines() if line]
+    try:
+        return [json.loads(line) for line in path.read_text().splitlines() if line]
+    except OSError:
+        return []
 
 
 def interval(by_q):
@@ -110,7 +116,9 @@ def audit(folder):
                 delta.get('cgroup_v2_cpu_stat', {}).get('nr_throttled', 0) or
                 delta.get('cgroup_v2_memory_events', {}).get('oom', 0) or
                 delta.get('cgroup_v2_memory_events', {}).get('oom_kill', 0) or
-                (len(delta.get('cpu_times', [])) > 7 and delta['cpu_times'][7]) or
+                (len(delta.get('cpu_times', [])) <= 7 or delta['cpu_times'][7]) or
+                (delta.get('cgroup_v1_memory_failcnt') or 0) > 0 or
+                (delta.get('thermal_throttle') or 0) > 0 or
                 (row.get('child_major_faults') or 0) > 0):
             issues.append('host noise or memory event')
         try:

@@ -142,7 +142,7 @@ The default worker routing remains serial.
 `rho_worker_batch_benchmark` reads the same 32 public secp256k1 Q points as
 the [arithmetic closeout manifest](rho-closeout-q-manifest.json), SHA-256
 `f46ad43788b7f9241927904541cbeb03ea70a96ca95aa84d527a9b22ba8d12b8`.
-Each arm runs 32 walkers with 32 branches, `dp_bits=8`, a 2,048-step cap,
+Each arm runs 32 walkers with 32 branches, `dp_bits=12`, an 8,192-step cap,
 and a check-in every eight completed walkers. The serial arm uses batch width
 one; the candidate uses width 32. Q decoding and known-scalar fixture replay
 precede timing. The charged interval includes Q-dependent job and state
@@ -166,7 +166,8 @@ result until the hosted panel passes its gates.
 
 The [local all-Q replay](local-all32-worker-replay/summary.json) completed
 64 of 64 arms and 32 of 32 serial/batch exact-output pairs on these frozen
-points. Every arm independently checked each emitted distinguished point;
+points with `dp_bits=8` and a 2,048-step cap. Every arm independently
+checked each emitted distinguished point;
 the pair check includes the time-normalized ordered check-in digest, steps,
 point count, worker count, dead trails, units, and check-ins. This was a
 correctness run on the shared macOS host, so `performance_result` is null.
