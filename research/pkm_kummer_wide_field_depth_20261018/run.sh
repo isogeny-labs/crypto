@@ -31,7 +31,7 @@ launch() { # name cell prime target threads as_gb budget_s
     ( RAYON_NUM_THREADS=$th prlimit --as=$((asgb*1024*1024*1024)) -- "$bin" $args --out "$here/runs/$name.jsonl" 2> "$here/runs/$name.log" ) &
     pid=$!; peak=0
     while kill -0 $pid 2>/dev/null; do
-      r=$(ps -o rss= --ppid $pid 2>/dev/null | sort -n | tail -1); r=${r:-0}; [ "$r" -gt "$peak" ] && peak=$r; sleep 10
+      r=$( (ps -o rss= -p $pid; ps -o rss= --ppid $pid) 2>/dev/null | sort -n | tail -1); r=${r:-0}; [ "$r" -gt "$peak" ] && peak=$r; sleep 10
     done
     wait $pid; rc=$?; e=$(date +%s)
     echo "{\"name\":\"$name\",\"args\":\"$args\",\"threads\":$th,\"as_gb\":$asgb,\"exit\":$rc,\"wall_s\":$((e-s)),\"peak_rss_kB_sampled\":$peak}" > "$here/runs/$name.meta"
