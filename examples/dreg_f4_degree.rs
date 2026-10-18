@@ -85,12 +85,14 @@ fn main() {
                 && gb[0].terms.len() == 1
                 && gb[0].terms[0].mask == 0;
             println!(
-                r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{},"engine":"f4","budget_secs":{budget},"timed_out":{},"refuted":{refuted},"basis_len":{},"degree_reached":{},"solving_degree":{},"max_poly_degree":{},"steps":{},"matrix_rows_max":{},"matrix_cols_max":{},"word_xors":{},"peak_matrix_bytes":{},"secs":{:.3}}}"#,
+                r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"committed_outcome":{},"engine":"f4","budget_secs":{budget},"timed_out":{},"oversize":{},"pairs_left":{},"refuted":{refuted},"basis_len":{},"degree_reached":{},"solving_degree":{},"max_poly_degree":{},"steps":{},"matrix_rows_max":{},"matrix_cols_max":{},"word_xors":{},"peak_matrix_bytes":{},"secs":{:.3}}}"#,
                 v["cell"].as_str().unwrap_or(""),
                 v["draw"],
                 sys.n_vars,
                 v["outcome"],
                 stats.timed_out,
+                stats.oversize,
+                stats.pairs_left,
                 gb.len(),
                 stats.degree_reached,
                 stats.solving_degree,
@@ -103,9 +105,10 @@ fn main() {
                 stats.wall_ns as f64 / 1e9
             );
             eprintln!(
-                "m={m} ({n},{ell}) draw {}: refuted={refuted} timed_out={} degree_reached={} solving_degree={} ({:.1}s)",
+                "m={m} ({n},{ell}) draw {}: refuted={refuted} timed_out={} oversize={} degree_reached={} solving_degree={} ({:.1}s)",
                 v["draw"],
                 stats.timed_out,
+                stats.oversize,
                 stats.degree_reached,
                 stats.solving_degree,
                 stats.wall_ns as f64 / 1e9

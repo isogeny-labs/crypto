@@ -203,8 +203,19 @@ pub struct F4Stats {
     pub pairs_left: u64,
 }
 
-/// The largest matrix a step may build, in 64-bit words (1 GiB).
+/// The largest matrix a step may build, in 64-bit words (1 GiB), unless
+/// `F4_F2_MAX_MATRIX_WORDS` raises or lowers it for one run.
 pub const MAX_MATRIX_WORDS: u64 = 1 << 27;
+
+fn max_matrix_words() -> u64 {
+    static CAP: std::sync::OnceLock<u64> = std::sync::OnceLock::new();
+    *CAP.get_or_init(|| {
+        std::env::var("F4_F2_MAX_MATRIX_WORDS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(MAX_MATRIX_WORDS)
+    })
+}
 
 const NONE: u32 = u32::MAX;
 pub const MATRIX_PROFILE_BINS: usize = 6;
@@ -1831,7 +1842,7 @@ pub fn groebner_basis_f4(
         let n_rows = reducers.len() + half_rows.len() + field_rows.len();
         let cols = Columns::from_monomials(examined.into_values());
         let words = cols.words() as u64;
-        if words * n_rows as u64 > MAX_MATRIX_WORDS {
+        if words * n_rows as u64 > max_matrix_words() {
             st.oversize = true;
             st.build_ns += t.elapsed().as_nanos() as u64;
             s.pairs.extend(selected);
