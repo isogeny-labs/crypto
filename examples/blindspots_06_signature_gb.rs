@@ -1548,7 +1548,7 @@ impl<'a> Sig<'a> {
     }
 
     fn add_syz(&mut self, i: usize, s: u64) {
-        self.add_syz(i, s);
+        self.zset[i].insert(s);
         let pc = s.count_ones();
         let r = &mut self.z_pc[i];
         *r = (r.0.min(pc), r.1.max(pc));
