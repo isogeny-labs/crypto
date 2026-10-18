@@ -689,6 +689,11 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
 </tbody></table></div>
 <p class="dash-footnote">The hash candidate&rsquo;s fitted counted-work exponent is 0.473794 [0.335270, 0.612318] over four sizes; table entries fit 0.491786 [0.467495, 0.516076]. Pair-table setup is 60.8&ndash;69.0% and target PDP 19.8&ndash;36.8% of cold GAE. All 960 executions verify; all 800 measured rows replay identically; 160 counted A/A pairs are exact. Every run is L0 and native work remains unpriced, so wall time and a fully priced speedup are unset. The exact P-256 transport census checks 8,413,312 small-multiple and 5,986,344 Dickson-block images, finds rank zero, and leaves all 131,458 <code>FB1h2f8621cda105</code> logs independent. Structured residual degree remains 4; unsplit S17 degree remains unknown. <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_known_log_transport_round314_20261014/RESULT.md">Protocol, sessions, audits, native analysis and decision</a>.</p>
 </section></div></details>
+<details class="dash-details"><summary>Round 315 amortized multi-target transport · same-target strong rho</summary><div class="dash-detail-body"><section class="dash-section" id="transport-amortize-round315-20261017" aria-labelledby="transport-amortize-round315-title" data-collapse="open"><div class="dash-section-head"><div><p class="dash-kicker">Amortized multi-target transport / 17 October 2026</p><h2 id="transport-amortize-round315-title">One shared base and table over 16 public targets: 0.686&times; rho per target.</h2>
+<p class="panel-summary">The hash-scheduled transported-log candidate, with its folded pair table charged once and divided over T=16 public targets, costs 0.686&times; [0.630, 0.740] the matched strong rho one-target reference per target at the degree-37 cell &mdash; the first measured per-target parity result in this lane.</p></div><span class="status pass">per-target parity at T=16</span></div>
+<p class="dash-section-intro">This is the explicit multi-target amortization question, not the one-target rule: Round 314&rsquo;s one-target gates stay failed (2.121&times;), and a distinguished-point rho fleet sharing walk state across targets (PR #1987) is the standing control on any &ldquo;cheaper than rho&rdquo; reading. T=16 was frozen by the preregistered development sweep before the holdout opened; T=8 gave 0.866&times; with an interval still including 1.00.</p>
+<p class="dash-footnote">The shared cold cost is 7,106 counted GAE per execution (base + folded pair table + transport verification), amortizing to 15.9% of the per-target unit at T=16; per-target online work is 84.1%. All 432 records across the three sessions verify, 360 measured records replay bit-for-bit, and the counted A/A is exact. No claim transfers to P-256: the Dickson membership gate stays rank 0 with 131,458 dimensions. <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_transport_amortize_round315_20261017/RESULT.md">Protocol, sessions, audits, native analysis and decision</a>.</p>
+</section></div></details>
 <details class="dash-details"><summary>Research progress over time · separate regimes and references</summary><div class="dash-detail-body"><section class="dash-section" id="lab-progress" aria-labelledby="progress-title" data-collapse="open"><div class="dash-section-head"><div><p class="dash-kicker">Progress over time / The rho barrier</p><h2 id="progress-title">Where index calculus stands against rho, by the day each result landed.</h2>
 <p class="panel-summary">Plots verified IC over rho ratios in each regime by the day they landed, with early below-one points hollow because their rho later proved unmatched, citing frozen timeline data.</p></div><span class="status neutral">Log scale &middot; rho = 1</span></div>
 <p class="dash-section-intro">Every point quotes a verified comparison from the named result on the day it landed on <code>main</code>. Below one means index calculus is cheaper only when both arms have a complete common cost. The heavy series is the repository&rsquo;s whole-method, cold, one-target test against matched rho. Early below-one points used a rho later proved unmatched and remain hollow as &ldquo;was&rdquo;. Grey series are separate regimes; the n37 counted-work point is a quotient of two incomplete lower bounds and is not a barrier test.</p>
@@ -715,6 +720,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
 <tr><td>2026-10-04</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>n37 shared-rank K8, 16 fresh target-only instruction-panel points, strong rho</td><td class="n">4.766&times; <small>counted GAE lower-bound diagnostic; not a speed bound</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#n37-online-ir-20261004">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_online_ir_20261004/RESULT.md">source</a></td></tr>
 <tr><td>2026-10-05</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>F6-IC (#1333 decomposer) in ecbench, E_0 ladder, m = 23, strong rho</td><td class="n">2.721&times; <small>counted GAE lower-bound diagnostic; not a speed bound</small></td><td>matched</td><td><span class="chip">relabelling</span></td><td><a href="#ic-f6-ecbench-ladder-20261005">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/f6_ic_ecbench_ladder_20261005/RESULT.md">source</a></td></tr>
 <tr><td>2026-10-05</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Inherited F4 (#1333 control) in ecbench, E_0 ladder, m = 23, strong rho</td><td class="n">2.091&times; <small>counted GAE lower-bound diagnostic; not a speed bound</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#ic-f6-ecbench-ladder-20261005">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/f6_ic_ecbench_ladder_20261005/RESULT.md">source</a></td></tr>
+<tr><td>2026-10-17</td><td>Elliptic curve, amortized per-target counted-work diagnostics with unpriced native work</td><td>Round 315 amortized multi-target transported logs at T=16, <code>icv1-f2m37-tm534059-32aad96b</code></td><td class="n">0.686&times; <small>[0.630, 0.740] per target with T=16 named; T=8 gave 0.866&times; with an interval including 1.00</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#transport-amortize-round315-20261017">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_transport_amortize_round315_20261017/RESULT.md">source</a></td></tr>
 <tr><td>2026-10-14</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Round 314 hash transported logs, best checked cell <code>icv1-f2m37-tm534059-32aad96b</code></td><td class="n">2.121&times; <small>[1.908, 2.409]; 3.267&times; at the largest checked width</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#known-log-transport-round314-20261014">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_known_log_transport_round314_20261014/RESULT.md">source</a></td></tr>
 <tr><td>2026-10-04</td><td>Elliptic curve, complete method-solve simulated instructions</td><td>n37 shared-rank K8 whole solve vs strong rho, 16 fresh public points</td><td class="n">3.984&times; <small>Callgrind Ir diagnostic; not online wall speed</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#n37-online-ir-20261004">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_online_ir_20261004/RESULT.md">source</a></td></tr>
 <tr><td>2026-10-04</td><td>Elliptic curve, one-target online simulated instructions</td><td>n37 shared-rank K16 target-only vs strong rho, 16 fresh public points</td><td class="n">0.153&times; <small>target-only Callgrind Ir diagnostic; not online wall speed</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#n37-online-ir-20261004">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_online_ir_20261004/RESULT.md">source</a></td></tr>
@@ -765,9 +771,10 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
 </tbody></table></div></details>
 <noscript><div class="dash-detail-body"><p>The chart needs JavaScript; the table above lists every plotted point.</p></div></noscript>
 <p class="dash-footnote">What would move the heavy series below the line for good: a cold, one-target, every-phase-priced <code>S</code> below a matched rho&rsquo;s at growing size (AGENTS.md &sect;2, &sect;8). The nearest measured approaches are 1.36&times; (round 0025) and 1.314&times; in CPU time (n41). The exponent story is in the <a href="#boundary-ledger">boundary ledger</a>: no fitted exponent on an elliptic curve sits below rho&rsquo;s one half; the cover route&rsquo;s ratio falls with size but on a weak class.</p>
-<script type="application/json" id="progress-data">{
+<script type="application/json" id="progress-data">
+{
   "schema_version": "ic-progress-timeline/1",
-  "updated": "2026-10-14",
+  "updated": "2026-10-17",
   "question": "Verified index-calculus cost over matched Pollard rho (IC / rho), by date landed on main. Below 1 means index calculus is cheaper. The barrier is rho's own cost, 1.",
   "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
   "series": [
@@ -778,16 +785,110 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
       "barrier_test": true,
       "note": "The repository's own definition of faster than rho (AGENTS.md section 2). Hollow markers were later shown to be measured against an unmatched rho and are kept as 'was'.",
       "points": [
-        {"date": "2026-09-16", "value": 0.7376, "reference": "unmatched", "label": "Tournament round 0007, five Koblitz cells", "detail": "0.7376 of the worker rho's instructions, 95% 0.7066-0.7644. That rho named Frobenius classes by squaring; the control of 2026-09-23 showed it was not a matched reference.", "class": "engineering", "anchor": "#ic-tournament-round-0007", "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/runs/round-0007/REPORT.md"},
-        {"date": "2026-09-21", "value": 0.6751, "reference": "unmatched", "label": "Tournament round 0019, eight cells, strict win promoted", "detail": "0.6751 [0.6298, 0.7265] of the worker rho's instructions on all eight cells; replicated by round 0020 at 0.6629. Same unmatched reference.", "class": "engineering", "anchor": "#ic-tournament-round-0019", "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/runs/round-0019/REPORT.md"},
-        {"date": "2026-09-23", "value": 1.192, "reference": "matched", "label": "Control: rho given the IC arm's orbit naming", "detail": "The IC arm is above that rho at every cell measured, 1.19x (n59a0) to 2.88x (n43a1). Triple collector with counted sizing, five cells. Class accounting: what the ratios were counted against changed.", "class": "accounting", "anchor": "#ic-triple-counted-20260923", "source": "https://github.com/aburan28/crypto/blob/main/research/ic_triple_counted_20260923/RESULTS.md"},
-        {"date": "2026-09-28", "value": 0.609, "reference": "matched", "label": "Tournament round 0024, matched rho, best cell n17a1", "detail": "Six of eight panel cells 0.61-0.82 of the matched rho; the strict gate fails at n23a1 (1.126); the whole twelve-cell panel reads 1.380 [0.847, 2.387]. Best cell plotted.", "class": "accounting", "anchor": "#ic-tournament-round-0024", "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/campaign_20260916/RESULTS.md"},
-        {"date": "2026-09-29", "value": 1.356, "reference": "matched", "label": "Tournament round 0025, lean rho, best cell n19a0", "detail": "The matched walk run in the IC arm's own single-word arithmetic. Above rho in instructions at every one of twelve cells: 1.36-2.56x on the panel, up to 13.7x past the crossing. The line was stopped on 2026-09-29.", "class": "accounting", "anchor": "#ic-tournament-round-0025", "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/campaign_20260916/RESULTS.md"},
-        {"date": "2026-10-01", "value": 2.0, "reference": "matched", "label": "Koblitz descent, one target cold, best size 2^38.0", "detail": "Ledger section 23: with the reusable set-up charged, the method is 4.9-31.6x slower than rho cold across six sizes 2^36.6-2^47.2; 2.0x at 2^38.0 where both arms pay a slow curve construction. Online only it is 8.8-17.5x faster (see the online series).", "class": "accounting", "anchor": "#koblitz-descent-20260930", "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#koblitz-descent-20260930"},
-        {"date": "2026-10-01", "value": 1.314, "reference": "matched", "unit": "isolated CPU time", "label": "Orbit-disjoint cold CPU panel, closest cell n41/L1,024", "detail": "Six cells timing-eligible on reserved cores, every paired compact/rho CPU interval above one; the closest, n41/L1,024, reads 1.314 [1.288, 1.359] and would need 23.9% less CPU to match rho. Isolated CPU time, not a counted unit; S unset.", "class": "accounting", "anchor": "#disjoint-cold-v2-outcome-20261001", "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#disjoint-cold-v2-outcome-20261001"},
-        {"date": "2026-10-03", "value": 4.3, "reference": "matched", "unit": "S", "label": "ecbench baseline, every candidate: best cell icv1-f2m17-tm101-00378d4e (r = 2^16)", "detail": "Every ic.pipeline configuration run cold through ecbench against the strong signed-Frobenius rho on the same targets, every phase charged in one unit: 4.30x at r = 2^16 (orbit base, Frobenius MITM m = 2), 129x at r = 2^21; on prime curves 7.70x at 18 bits rising to 40.5x at 24 bits. The reference is 18.5x its floor at this size because its fixed setup dominates, so the ratio flatters the candidate. No method changed; a baseline, not a round.", "class": "accounting", "anchor": "#lab-ecbench-all", "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_all_candidates_20261003/README.md"},
-        {"date": "2026-10-04", "value": 1.85, "reference": "matched", "unit": "S", "label": "Pair claw of cryptanalysis#175, ported into ecbench: best cell icv1-f2m43-tm998717-e2e742b0 (r = 2^32.1)", "detail": "The four-point signed-Frobenius pair claw with a known-log orbit base (the PR's IC1 PDP4qtable LAnone candidate), run cold through ecbench against the strong signed-Frobenius rho on the same 48 Koblitz targets: 1.85x to 2.96x per curve at its cost-minimising table, 2.20x [1.90, 2.55] pooled; 32.6x [25.3, 41.0] at the PR's own n=83 shape. Flat in r, as a generic method must be. n = 83 itself is not measured.", "class": "accounting", "anchor": "#lab-pair-claw", "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_pair_claw_20261003/README.md"},
-        {"date": "2026-10-03", "value": 74.8, "reference": "matched", "unit": "isolated wall time", "label": "n61 compact orbit, one target cold, 256 workloads, hosted isolated", "detail": "Cold IC/rho median 74.8 (95% 70.0-80.0) against strong rho rung 3 on 256 public one-target workloads, a pinned reserved core on a hosted AMD EPYC 7763 runner with 0 contended samples: the IC process spends a median 22.0 s on reusable setup against rho's 0.30 s. Online only, IC is 14.67x faster (online series). Same-runner replay 256/256; PENDING_INDEPENDENT_VALIDATION.", "class": "accounting", "anchor": "#n61-compact-orbit-hosted-20261003", "source": "https://github.com/aburan28/crypto/blob/main/research/sat_factor_base_review_20260908/autolab/evidence/20261003-koblitz-n61-hosted-isolated/README.md"}
+        {
+          "date": "2026-09-16",
+          "value": 0.7376,
+          "reference": "unmatched",
+          "label": "Tournament round 0007, five Koblitz cells",
+          "detail": "0.7376 of the worker rho's instructions, 95% 0.7066-0.7644. That rho named Frobenius classes by squaring; the control of 2026-09-23 showed it was not a matched reference.",
+          "class": "engineering",
+          "anchor": "#ic-tournament-round-0007",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/runs/round-0007/REPORT.md"
+        },
+        {
+          "date": "2026-09-21",
+          "value": 0.6751,
+          "reference": "unmatched",
+          "label": "Tournament round 0019, eight cells, strict win promoted",
+          "detail": "0.6751 [0.6298, 0.7265] of the worker rho's instructions on all eight cells; replicated by round 0020 at 0.6629. Same unmatched reference.",
+          "class": "engineering",
+          "anchor": "#ic-tournament-round-0019",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/runs/round-0019/REPORT.md"
+        },
+        {
+          "date": "2026-09-23",
+          "value": 1.192,
+          "reference": "matched",
+          "label": "Control: rho given the IC arm's orbit naming",
+          "detail": "The IC arm is above that rho at every cell measured, 1.19x (n59a0) to 2.88x (n43a1). Triple collector with counted sizing, five cells. Class accounting: what the ratios were counted against changed.",
+          "class": "accounting",
+          "anchor": "#ic-triple-counted-20260923",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ic_triple_counted_20260923/RESULTS.md"
+        },
+        {
+          "date": "2026-09-28",
+          "value": 0.609,
+          "reference": "matched",
+          "label": "Tournament round 0024, matched rho, best cell n17a1",
+          "detail": "Six of eight panel cells 0.61-0.82 of the matched rho; the strict gate fails at n23a1 (1.126); the whole twelve-cell panel reads 1.380 [0.847, 2.387]. Best cell plotted.",
+          "class": "accounting",
+          "anchor": "#ic-tournament-round-0024",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/campaign_20260916/RESULTS.md"
+        },
+        {
+          "date": "2026-09-29",
+          "value": 1.356,
+          "reference": "matched",
+          "label": "Tournament round 0025, lean rho, best cell n19a0",
+          "detail": "The matched walk run in the IC arm's own single-word arithmetic. Above rho in instructions at every one of twelve cells: 1.36-2.56x on the panel, up to 13.7x past the crossing. The line was stopped on 2026-09-29.",
+          "class": "accounting",
+          "anchor": "#ic-tournament-round-0025",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/campaign_20260916/RESULTS.md"
+        },
+        {
+          "date": "2026-10-01",
+          "value": 2.0,
+          "reference": "matched",
+          "label": "Koblitz descent, one target cold, best size 2^38.0",
+          "detail": "Ledger section 23: with the reusable set-up charged, the method is 4.9-31.6x slower than rho cold across six sizes 2^36.6-2^47.2; 2.0x at 2^38.0 where both arms pay a slow curve construction. Online only it is 8.8-17.5x faster (see the online series).",
+          "class": "accounting",
+          "anchor": "#koblitz-descent-20260930",
+          "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#koblitz-descent-20260930"
+        },
+        {
+          "date": "2026-10-01",
+          "value": 1.314,
+          "reference": "matched",
+          "unit": "isolated CPU time",
+          "label": "Orbit-disjoint cold CPU panel, closest cell n41/L1,024",
+          "detail": "Six cells timing-eligible on reserved cores, every paired compact/rho CPU interval above one; the closest, n41/L1,024, reads 1.314 [1.288, 1.359] and would need 23.9% less CPU to match rho. Isolated CPU time, not a counted unit; S unset.",
+          "class": "accounting",
+          "anchor": "#disjoint-cold-v2-outcome-20261001",
+          "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#disjoint-cold-v2-outcome-20261001"
+        },
+        {
+          "date": "2026-10-03",
+          "value": 4.3,
+          "reference": "matched",
+          "unit": "S",
+          "label": "ecbench baseline, every candidate: best cell icv1-f2m17-tm101-00378d4e (r = 2^16)",
+          "detail": "Every ic.pipeline configuration run cold through ecbench against the strong signed-Frobenius rho on the same targets, every phase charged in one unit: 4.30x at r = 2^16 (orbit base, Frobenius MITM m = 2), 129x at r = 2^21; on prime curves 7.70x at 18 bits rising to 40.5x at 24 bits. The reference is 18.5x its floor at this size because its fixed setup dominates, so the ratio flatters the candidate. No method changed; a baseline, not a round.",
+          "class": "accounting",
+          "anchor": "#lab-ecbench-all",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_all_candidates_20261003/README.md"
+        },
+        {
+          "date": "2026-10-04",
+          "value": 1.85,
+          "reference": "matched",
+          "unit": "S",
+          "label": "Pair claw of cryptanalysis#175, ported into ecbench: best cell icv1-f2m43-tm998717-e2e742b0 (r = 2^32.1)",
+          "detail": "The four-point signed-Frobenius pair claw with a known-log orbit base (the PR's IC1 PDP4qtable LAnone candidate), run cold through ecbench against the strong signed-Frobenius rho on the same 48 Koblitz targets: 1.85x to 2.96x per curve at its cost-minimising table, 2.20x [1.90, 2.55] pooled; 32.6x [25.3, 41.0] at the PR's own n=83 shape. Flat in r, as a generic method must be. n = 83 itself is not measured.",
+          "class": "accounting",
+          "anchor": "#lab-pair-claw",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_pair_claw_20261003/README.md"
+        },
+        {
+          "date": "2026-10-03",
+          "value": 74.8,
+          "reference": "matched",
+          "unit": "isolated wall time",
+          "label": "n61 compact orbit, one target cold, 256 workloads, hosted isolated",
+          "detail": "Cold IC/rho median 74.8 (95% 70.0-80.0) against strong rho rung 3 on 256 public one-target workloads, a pinned reserved core on a hosted AMD EPYC 7763 runner with 0 contended samples: the IC process spends a median 22.0 s on reusable setup against rho's 0.30 s. Online only, IC is 14.67x faster (online series). Same-runner replay 256/256; PENDING_INDEPENDENT_VALIDATION.",
+          "class": "accounting",
+          "anchor": "#n61-compact-orbit-hosted-20261003",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/sat_factor_base_review_20260908/autolab/evidence/20261003-koblitz-n61-hosted-isolated/README.md"
+        }
       ]
     },
     {
@@ -797,12 +898,83 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
       "barrier_test": false,
       "note": "A ratio between two operation lower bounds does not bound true IC/rho cost. These paired, verified points show implementation accounting only and cannot cross the rho speed barrier.",
       "points": [
-        {"date": "2026-10-04", "value": 5.034403533221078, "reference": "matched", "unit": "counted GAE lower-bound diagnostic", "label": "n37 shared-rank K16, eight one-target workloads, strong rho", "detail": "K16 uses 1,184 usable points and 16 folded columns. Across 40 paired verified runs on eight public points, counted cold IC/rho is 5.0344 [4.3462, 5.8664]; K16/K42 is 0.349 [0.343, 0.359]. Both IC and rho omit native costs, so their lower-bound quotient does not bound true speed. macOS L0 wall speedup remains unknown; independent Linux replay 320/320.", "class": "accounting", "anchor": "#n37-rank-columns-20261004", "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_rank_columns_20261004/RESULT.md"},
-        {"date": "2026-10-04", "value": 4.550110158256505, "reference": "matched", "unit": "counted GAE lower-bound diagnostic", "label": "n37 shared-rank K8, 16 untouched one-target workloads, strong rho", "detail": "K8 has 592 usable points and eight folded columns. Across 80 paired verified runs on 16 new public points, incomplete cold counted IC/rho is 4.5501 [4.110, 5.040]; K16/K8 on the same points is 1.0175 [0.973, 1.059]. This apparent change from the earlier K16 panel is not a paired improvement across panels. Both methods leave native work unpriced; independent Linux replay 320/320 and macOS L0 wall speedup remains unknown.", "class": "accounting", "anchor": "#n37-k8-k16-20261004", "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_k8_k16_20261004/RESULT.md"},
-        {"date": "2026-10-04", "value": 4.7661, "reference": "matched", "unit": "counted GAE lower-bound diagnostic", "label": "n37 shared-rank K8, 16 fresh target-only instruction-panel points, strong rho", "detail": "Across 80 verified paired runs on 16 new public points, incomplete cold counted K8/rho is 4.7661 [4.3033, 5.2847] and K16/K8 is 1.0198 [0.9835, 1.0562]. The paired target-only Callgrind instruction result belongs to a separate series. Native work is unpriced in this counted ledger and Mac wall is L0; no admitted speedup.", "class": "accounting", "anchor": "#n37-online-ir-20261004", "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_online_ir_20261004/RESULT.md"},
-        {"date": "2026-10-05", "value": 2.721264717429671, "reference": "matched", "unit": "counted GAE lower-bound diagnostic", "label": "F6-IC (#1333 decomposer) in ecbench, E_0 ladder, m = 23, strong rho", "detail": "Median over eight one-target public workloads of lower-bound S over same-target strong rho; 72 of 72 runs verified. At m = 13 and 19 the same arm is 54.75x and 2,091x because each geometric point addition is charged; at m = 23 the 275-point base exceeds #1333's 256-point closure cap and F6-IC does F4's work (median log2 W4/W6 = 0.000). Solver word XORs are unpriced, so this quotient does not bound true speed. The preregistered decision is pending m = 31.", "class": "relabelling", "anchor": "#ic-f6-ecbench-ladder-20261005", "source": "https://github.com/aburan28/crypto/blob/main/research/f6_ic_ecbench_ladder_20261005/RESULT.md"},
-        {"date": "2026-10-05", "value": 2.090818628531976, "reference": "matched", "unit": "counted GAE lower-bound diagnostic", "label": "Inherited F4 (#1333 control) in ecbench, E_0 ladder, m = 23, strong rho", "detail": "Median over eight one-target public workloads; 72 of 72 runs verified. The same arm is 1.105x at m = 13 and 1.582x at m = 19: a lower bound above one, so IC is slower than rho at all three sizes and the gap widens. Solver word XORs are unpriced (lower bound).", "class": "accounting", "anchor": "#ic-f6-ecbench-ladder-20261005", "source": "https://github.com/aburan28/crypto/blob/main/research/f6_ic_ecbench_ladder_20261005/RESULT.md"},
-        {"date": "2026-10-14", "value": 2.121222563144107, "reference": "matched", "unit": "counted GAE lower-bound diagnostic", "label": "Round 314 hash transported logs, best checked cell icv1-f2m37-tm534059-32aad96b", "detail": "The hash-selected exact-log candidate improves its sequential baseline by 21.3-36.8% over four frozen sizes, but remains 2.121x [1.908, 2.409] to 3.267x [2.578, 4.301] the same-target strong rho. All 960 final executions verify, 800 measured executions replay identically, and counted A/A is exactly one. Native work is unpriced and wall runs are L0. The construction is a generic scalar-labelled base; the exact P-256 certificate finds zero transport relations in FB1h2f8621cda105 and leaves 131,458 dimensions.", "class": "engineering", "anchor": "#known-log-transport-round314-20261014", "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_known_log_transport_round314_20261014/RESULT.md"}
+        {
+          "date": "2026-10-04",
+          "value": 5.034403533221078,
+          "reference": "matched",
+          "unit": "counted GAE lower-bound diagnostic",
+          "label": "n37 shared-rank K16, eight one-target workloads, strong rho",
+          "detail": "K16 uses 1,184 usable points and 16 folded columns. Across 40 paired verified runs on eight public points, counted cold IC/rho is 5.0344 [4.3462, 5.8664]; K16/K42 is 0.349 [0.343, 0.359]. Both IC and rho omit native costs, so their lower-bound quotient does not bound true speed. macOS L0 wall speedup remains unknown; independent Linux replay 320/320.",
+          "class": "accounting",
+          "anchor": "#n37-rank-columns-20261004",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_rank_columns_20261004/RESULT.md"
+        },
+        {
+          "date": "2026-10-04",
+          "value": 4.550110158256505,
+          "reference": "matched",
+          "unit": "counted GAE lower-bound diagnostic",
+          "label": "n37 shared-rank K8, 16 untouched one-target workloads, strong rho",
+          "detail": "K8 has 592 usable points and eight folded columns. Across 80 paired verified runs on 16 new public points, incomplete cold counted IC/rho is 4.5501 [4.110, 5.040]; K16/K8 on the same points is 1.0175 [0.973, 1.059]. This apparent change from the earlier K16 panel is not a paired improvement across panels. Both methods leave native work unpriced; independent Linux replay 320/320 and macOS L0 wall speedup remains unknown.",
+          "class": "accounting",
+          "anchor": "#n37-k8-k16-20261004",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_k8_k16_20261004/RESULT.md"
+        },
+        {
+          "date": "2026-10-04",
+          "value": 4.7661,
+          "reference": "matched",
+          "unit": "counted GAE lower-bound diagnostic",
+          "label": "n37 shared-rank K8, 16 fresh target-only instruction-panel points, strong rho",
+          "detail": "Across 80 verified paired runs on 16 new public points, incomplete cold counted K8/rho is 4.7661 [4.3033, 5.2847] and K16/K8 is 1.0198 [0.9835, 1.0562]. The paired target-only Callgrind instruction result belongs to a separate series. Native work is unpriced in this counted ledger and Mac wall is L0; no admitted speedup.",
+          "class": "accounting",
+          "anchor": "#n37-online-ir-20261004",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_online_ir_20261004/RESULT.md"
+        },
+        {
+          "date": "2026-10-05",
+          "value": 2.721264717429671,
+          "reference": "matched",
+          "unit": "counted GAE lower-bound diagnostic",
+          "label": "F6-IC (#1333 decomposer) in ecbench, E_0 ladder, m = 23, strong rho",
+          "detail": "Median over eight one-target public workloads of lower-bound S over same-target strong rho; 72 of 72 runs verified. At m = 13 and 19 the same arm is 54.75x and 2,091x because each geometric point addition is charged; at m = 23 the 275-point base exceeds #1333's 256-point closure cap and F6-IC does F4's work (median log2 W4/W6 = 0.000). Solver word XORs are unpriced, so this quotient does not bound true speed. The preregistered decision is pending m = 31.",
+          "class": "relabelling",
+          "anchor": "#ic-f6-ecbench-ladder-20261005",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/f6_ic_ecbench_ladder_20261005/RESULT.md"
+        },
+        {
+          "date": "2026-10-05",
+          "value": 2.090818628531976,
+          "reference": "matched",
+          "unit": "counted GAE lower-bound diagnostic",
+          "label": "Inherited F4 (#1333 control) in ecbench, E_0 ladder, m = 23, strong rho",
+          "detail": "Median over eight one-target public workloads; 72 of 72 runs verified. The same arm is 1.105x at m = 13 and 1.582x at m = 19: a lower bound above one, so IC is slower than rho at all three sizes and the gap widens. Solver word XORs are unpriced (lower bound).",
+          "class": "accounting",
+          "anchor": "#ic-f6-ecbench-ladder-20261005",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/f6_ic_ecbench_ladder_20261005/RESULT.md"
+        },
+        {
+          "date": "2026-10-14",
+          "value": 2.121222563144107,
+          "reference": "matched",
+          "unit": "counted GAE lower-bound diagnostic",
+          "label": "Round 314 hash transported logs, best checked cell icv1-f2m37-tm534059-32aad96b",
+          "detail": "The hash-selected exact-log candidate improves its sequential baseline by 21.3-36.8% over four frozen sizes, but remains 2.121x [1.908, 2.409] to 3.267x [2.578, 4.301] the same-target strong rho. All 960 final executions verify, 800 measured executions replay identically, and counted A/A is exactly one. Native work is unpriced and wall runs are L0. The construction is a generic scalar-labelled base; the exact P-256 certificate finds zero transport relations in FB1h2f8621cda105 and leaves 131,458 dimensions.",
+          "class": "engineering",
+          "anchor": "#known-log-transport-round314-20261014",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_known_log_transport_round314_20261014/RESULT.md"
+        },
+        {
+          "date": "2026-10-17",
+          "value": 0.6857866258063038,
+          "reference": "matched",
+          "unit": "amortized per-target counted GAE lower bound, T=16 named",
+          "label": "Round 315 amortized multi-target transported logs, icv1-f2m37-tm534059-32aad96b",
+          "detail": "One shared cold known-log base and folded pair table charged once and divided over T=16 public targets: 0.686x [0.630, 0.740] the matched strong rho one-target reference per target at the degree-37 cell. T=16 was frozen by the preregistered development sweep (T=8 gave 0.866 with an interval still including 1.00). 432/432 records verify, 360/360 measured records replay bit-identically, counted A/A exact, shared cold cost 7,106 GAE amortizing to 15.9% of the per-target unit. Multi-target mechanism screen only: Round 314's one-target gates stay failed, P-256 transport stays rank 0 with 131,458 dimensions, and a distinguished-point rho fleet sharing walk state is the standing control (PR #1987).",
+          "class": "engineering",
+          "anchor": "#transport-amortize-round315-20261017",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_transport_amortize_round315_20261017/RESULT.md"
+        }
       ]
     },
     {
@@ -812,8 +984,28 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
       "barrier_test": false,
       "note": "Callgrind counts user-space instructions inside the solve boundary, including reusable setup. It is neither isolated native wall time nor the primary online target interval.",
       "points": [
-        {"date": "2026-10-04", "value": 3.6445922113828733, "reference": "matched", "unit": "Callgrind Ir diagnostic", "label": "n37 shared-rank K8 vs strong rho, 16 untouched public points", "detail": "All 64 profiles recovered the archived logarithms; K8/rho whole-solve Callgrind Ir is 3.6446 [3.2353, 4.1360], with K16/K8 1.1903 [1.1584, 1.2218]. The identical K16 A/A maximum deviation was 0.0042%. The native session replayed 320/320 records on a different host class. This does not establish an isolated online wall speedup; K16 remains a target-only candidate.", "class": "accounting", "anchor": "#n37-k8-k16-20261004", "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_k8_k16_20261004/RESULT.md"},
-        {"date": "2026-10-04", "value": 3.9836937719692034, "reference": "matched", "unit": "Callgrind Ir diagnostic", "label": "n37 shared-rank K8 whole solve vs strong rho, 16 fresh public points", "detail": "On 64 verified profiles and 320 independently replayed native executions, K8/rho complete-solve Callgrind Ir is 3.9837 [3.4043, 4.6925]; K8/K16 is 0.8484 [0.8186, 0.8837]. The target-only instruction choice reverses this cold preference and appears in the separate online-Ir series. L0 Mac wall speedup remains unknown.", "class": "accounting", "anchor": "#n37-online-ir-20261004", "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_online_ir_20261004/RESULT.md"}
+        {
+          "date": "2026-10-04",
+          "value": 3.6445922113828733,
+          "reference": "matched",
+          "unit": "Callgrind Ir diagnostic",
+          "label": "n37 shared-rank K8 vs strong rho, 16 untouched public points",
+          "detail": "All 64 profiles recovered the archived logarithms; K8/rho whole-solve Callgrind Ir is 3.6446 [3.2353, 4.1360], with K16/K8 1.1903 [1.1584, 1.2218]. The identical K16 A/A maximum deviation was 0.0042%. The native session replayed 320/320 records on a different host class. This does not establish an isolated online wall speedup; K16 remains a target-only candidate.",
+          "class": "accounting",
+          "anchor": "#n37-k8-k16-20261004",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_k8_k16_20261004/RESULT.md"
+        },
+        {
+          "date": "2026-10-04",
+          "value": 3.9836937719692034,
+          "reference": "matched",
+          "unit": "Callgrind Ir diagnostic",
+          "label": "n37 shared-rank K8 whole solve vs strong rho, 16 fresh public points",
+          "detail": "On 64 verified profiles and 320 independently replayed native executions, K8/rho complete-solve Callgrind Ir is 3.9837 [3.4043, 4.6925]; K8/K16 is 0.8484 [0.8186, 0.8837]. The target-only instruction choice reverses this cold preference and appears in the separate online-Ir series. L0 Mac wall speedup remains unknown.",
+          "class": "accounting",
+          "anchor": "#n37-online-ir-20261004",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_online_ir_20261004/RESULT.md"
+        }
       ]
     },
     {
@@ -823,7 +1015,17 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
       "barrier_test": false,
       "note": "Callgrind target-only Ir begins after reusable preparation and stops after scalar replay. It is a same-point instruction diagnostic, not isolated online wall speed or native retired instructions.",
       "points": [
-        {"date": "2026-10-04", "value": 0.15337193605882804, "reference": "matched", "unit": "target-only Callgrind Ir diagnostic", "label": "n37 shared-rank K16 target-only vs strong rho, 16 fresh public points", "detail": "K16/rho target-only Callgrind Ir is 0.15337 [0.09234, 0.24000]. K8/K16 target-only is 2.8860 [1.7302, 4.6015], clearing the frozen K16-priority gate; duplicate K16 online A/A is exact. All 64 profile scalars verified and 320 native measured runs independently replayed. The Mac wall runs earned L0, so no primary online speedup or n41/n53 transfer is claimed.", "class": "accounting", "anchor": "#n37-online-ir-20261004", "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_online_ir_20261004/RESULT.md"}
+        {
+          "date": "2026-10-04",
+          "value": 0.15337193605882804,
+          "reference": "matched",
+          "unit": "target-only Callgrind Ir diagnostic",
+          "label": "n37 shared-rank K16 target-only vs strong rho, 16 fresh public points",
+          "detail": "K16/rho target-only Callgrind Ir is 0.15337 [0.09234, 0.24000]. K8/K16 target-only is 2.8860 [1.7302, 4.6015], clearing the frozen K16-priority gate; duplicate K16 online A/A is exact. All 64 profile scalars verified and 320 native measured runs independently replayed. The Mac wall runs earned L0, so no primary online speedup or n41/n53 transfer is claimed.",
+          "class": "accounting",
+          "anchor": "#n37-online-ir-20261004",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_online_ir_20261004/RESULT.md"
+        }
       ]
     },
     {
@@ -833,8 +1035,28 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
       "barrier_test": false,
       "note": "Same-point one-target native intervals on a contended hosted VM. L1 and the failed A/A noise gate make these descriptive ratios, not admitted online or cold speedups.",
       "points": [
-        {"date": "2026-10-04", "value": 9.009441291840432, "reference": "matched", "unit": "hosted L1 cold wall diagnostic", "label": "n37 K8 cold solve versus strong rho, frozen target zero", "detail": "Five paired verified rounds on the preregistered public point give K8/rho cold solve wall 9.0094; K16/rho is 9.2675. All 320 measured children replayed on another host class. Host isolation stayed L1, so neither ratio is an admitted cold crossover.", "class": "accounting", "anchor": "#n37-native-online-wall-20261004", "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_native_online_wall_20261004/RESULT.md"},
-        {"date": "2026-10-04", "value": 0.13931577090627645, "reference": "matched", "unit": "hosted L1 online wall diagnostic", "label": "n37 K16 online versus strong rho, frozen target zero", "detail": "Five paired verified rounds on the preregistered public point give descriptive K16/rho online wall 0.13932 (rho/K16 7.17794). The 16-point secondary panel gives K8/K16 7.1103 [3.6693, 16.9818]. A/A maximum deviation 12.85% exceeded the frozen 5% gate, and the host earned L1; admitted speedup remains unknown.", "class": "accounting", "anchor": "#n37-native-online-wall-20261004", "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_native_online_wall_20261004/RESULT.md"}
+        {
+          "date": "2026-10-04",
+          "value": 9.009441291840432,
+          "reference": "matched",
+          "unit": "hosted L1 cold wall diagnostic",
+          "label": "n37 K8 cold solve versus strong rho, frozen target zero",
+          "detail": "Five paired verified rounds on the preregistered public point give K8/rho cold solve wall 9.0094; K16/rho is 9.2675. All 320 measured children replayed on another host class. Host isolation stayed L1, so neither ratio is an admitted cold crossover.",
+          "class": "accounting",
+          "anchor": "#n37-native-online-wall-20261004",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_native_online_wall_20261004/RESULT.md"
+        },
+        {
+          "date": "2026-10-04",
+          "value": 0.13931577090627645,
+          "reference": "matched",
+          "unit": "hosted L1 online wall diagnostic",
+          "label": "n37 K16 online versus strong rho, frozen target zero",
+          "detail": "Five paired verified rounds on the preregistered public point give descriptive K16/rho online wall 0.13932 (rho/K16 7.17794). The 16-point secondary panel gives K8/K16 7.1103 [3.6693, 16.9818]. A/A maximum deviation 12.85% exceeded the frozen 5% gate, and the host earned L1; admitted speedup remains unknown.",
+          "class": "accounting",
+          "anchor": "#n37-native-online-wall-20261004",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_native_online_wall_20261004/RESULT.md"
+        }
       ]
     },
     {
@@ -843,10 +1065,46 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
       "role": "context",
       "note": "Per target against batch rho on the same 32 targets, 39-bit Koblitz subgroup. Under the one-target rule this is a historical multi-target diagnostic.",
       "points": [
-        {"date": "2026-09-23", "value": 6.5, "reference": "matched", "label": "Ledger section 19: reference matched to the batch", "detail": "Had read 1.17x against rho solving one target; against batch rho on the same 32 targets it is 6.5x, 6.4x priced by time on both sides.", "class": "accounting", "anchor": "#plain-reading", "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#plain-reading"},
-        {"date": "2026-09-26", "value": 12.5, "reference": "matched", "label": "Ledger section 20: every phase on the clock", "detail": "Re-priced on current main with the descent's 748,180-unit scan and the workflow's constructions charged: 12.5x. Best recipe swept at nine sizes reaches 4.9x at 2^39 and no lower.", "class": "accounting", "anchor": "#plain-reading", "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#plain-reading"},
-        {"date": "2026-09-26", "value": 4.3, "reference": "matched", "label": "Ledger section 21: constructions built once per base", "detail": "Whole pipeline 1.04-2.25x faster with every count unchanged; the row reads 4.3x.", "class": "engineering", "anchor": "#plain-reading", "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#plain-reading"},
-        {"date": "2026-09-30", "value": 3.6, "reference": "matched", "label": "Ledger section 22: descent fixed cost cut", "detail": "1.35-1.39x at the small end in isolated runs; the row reads 3.6x. The closest any elliptic-curve pipeline gets end to end, and it is a batch figure.", "class": "engineering", "anchor": "#koblitz-descent-20260930", "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#koblitz-descent-20260930"}
+        {
+          "date": "2026-09-23",
+          "value": 6.5,
+          "reference": "matched",
+          "label": "Ledger section 19: reference matched to the batch",
+          "detail": "Had read 1.17x against rho solving one target; against batch rho on the same 32 targets it is 6.5x, 6.4x priced by time on both sides.",
+          "class": "accounting",
+          "anchor": "#plain-reading",
+          "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#plain-reading"
+        },
+        {
+          "date": "2026-09-26",
+          "value": 12.5,
+          "reference": "matched",
+          "label": "Ledger section 20: every phase on the clock",
+          "detail": "Re-priced on current main with the descent's 748,180-unit scan and the workflow's constructions charged: 12.5x. Best recipe swept at nine sizes reaches 4.9x at 2^39 and no lower.",
+          "class": "accounting",
+          "anchor": "#plain-reading",
+          "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#plain-reading"
+        },
+        {
+          "date": "2026-09-26",
+          "value": 4.3,
+          "reference": "matched",
+          "label": "Ledger section 21: constructions built once per base",
+          "detail": "Whole pipeline 1.04-2.25x faster with every count unchanged; the row reads 4.3x.",
+          "class": "engineering",
+          "anchor": "#plain-reading",
+          "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#plain-reading"
+        },
+        {
+          "date": "2026-09-30",
+          "value": 3.6,
+          "reference": "matched",
+          "label": "Ledger section 22: descent fixed cost cut",
+          "detail": "1.35-1.39x at the small end in isolated runs; the row reads 3.6x. The closest any elliptic-curve pipeline gets end to end, and it is a batch figure.",
+          "class": "engineering",
+          "anchor": "#koblitz-descent-20260930",
+          "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#koblitz-descent-20260930"
+        }
       ]
     },
     {
@@ -855,10 +1113,49 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
       "role": "context",
       "note": "Starts the clock after a reusable set-up. Not a cold result; the same set-up spent as a generic precomputation would speed rho up too.",
       "points": [
-        {"date": "2026-09-28", "value": 0.134, "reference": "qualified", "label": "Bounded autolab round 3, pair-table incumbent, six toy cells", "detail": "Paired IC/rho online cost 0.134x, descriptive 95% 0.125-0.144; the qualified rho online reference took 7.45x the incumbent's online time. 216/216 verified. Ledger section 23 (2026-10-01) reads 8.8-17.5x faster online at 2^36.6-2^47.2 on the Koblitz descent, and 4.9-31.6x slower once its set-up is charged.", "class": "engineering", "anchor": "#rho-results-title", "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/goal_20260924/improvement/round3/README.md"},
-        {"date": "2026-10-03", "value": 9104.845, "reference": "matched", "unit": "online wall time", "label": "n17 prepared inherited-F4 development target, same-point rho", "detail": "Median paired IC/rho online cost 9,105x across three clean verified repetitions on one new n17 public point. The inherited-F4 solver family is 227x faster than production F5 on the same point, but this is not a win against rho and does not price the n53 PDP4root path.", "class": "accounting", "anchor": "#ic-f5-inherited-f4-online-20261003", "source": "https://github.com/aburan28/crypto/blob/main/research/ic_solver_online_20261003/confirmation/RESULT.md"},
-        {"date": "2026-10-03", "value": 0.0682, "reference": "matched", "unit": "isolated wall time", "label": "n61 compact orbit vs strong rho rung 3, 256 one-target workloads, hosted isolated", "detail": "Median of 256 per-workload IC/rho online ratios 0.0682 (rho/IC median 14.67, 95% 12.40-17.21); IC faster online on 255 of 256 public targets, at r = 2^47.2 on a pinned hosted AMD EPYC 7763 core. Cold, with its 22 s set-up charged, the same IC is 74.8x slower (cold series). Same-runner replay 256/256; PENDING_INDEPENDENT_VALIDATION.", "class": "engineering", "anchor": "#n61-compact-orbit-hosted-20261003", "source": "https://github.com/aburan28/crypto/blob/main/research/sat_factor_base_review_20260908/autolab/evidence/20261003-koblitz-n61-hosted-isolated/README.md"},
-        {"date": "2026-10-04", "value": 0.9276907676250028, "reference": "matched", "unit": "unisolated online wall diagnostic", "label": "n37 compact-orbit K7, one frozen public point, six paired repeats", "detail": "Median paired IC/rho online wall ratio 0.927691 (rho/IC paired median 1.0780), spanning 0.875695-1.554470 in six repeats on one public point. IC median 0.136063 ms; strong rho median 0.144334 ms. All six pairs and all 518 base logs independently replayed. Apple M4 Pro host was not isolated; controlled speedup and cold fully charged cost remain unknown. The RSS change is accounting, not an algorithm improvement.", "class": "accounting", "anchor": "#n37-compact-orbit-online-20261004", "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-n37-single-target-20261004/RESULT.md"}
+        {
+          "date": "2026-09-28",
+          "value": 0.134,
+          "reference": "qualified",
+          "label": "Bounded autolab round 3, pair-table incumbent, six toy cells",
+          "detail": "Paired IC/rho online cost 0.134x, descriptive 95% 0.125-0.144; the qualified rho online reference took 7.45x the incumbent's online time. 216/216 verified. Ledger section 23 (2026-10-01) reads 8.8-17.5x faster online at 2^36.6-2^47.2 on the Koblitz descent, and 4.9-31.6x slower once its set-up is charged.",
+          "class": "engineering",
+          "anchor": "#rho-results-title",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ic_candidate_tournament_20260915/goal_20260924/improvement/round3/README.md"
+        },
+        {
+          "date": "2026-10-03",
+          "value": 9104.845,
+          "reference": "matched",
+          "unit": "online wall time",
+          "label": "n17 prepared inherited-F4 development target, same-point rho",
+          "detail": "Median paired IC/rho online cost 9,105x across three clean verified repetitions on one new n17 public point. The inherited-F4 solver family is 227x faster than production F5 on the same point, but this is not a win against rho and does not price the n53 PDP4root path.",
+          "class": "accounting",
+          "anchor": "#ic-f5-inherited-f4-online-20261003",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ic_solver_online_20261003/confirmation/RESULT.md"
+        },
+        {
+          "date": "2026-10-03",
+          "value": 0.0682,
+          "reference": "matched",
+          "unit": "isolated wall time",
+          "label": "n61 compact orbit vs strong rho rung 3, 256 one-target workloads, hosted isolated",
+          "detail": "Median of 256 per-workload IC/rho online ratios 0.0682 (rho/IC median 14.67, 95% 12.40-17.21); IC faster online on 255 of 256 public targets, at r = 2^47.2 on a pinned hosted AMD EPYC 7763 core. Cold, with its 22 s set-up charged, the same IC is 74.8x slower (cold series). Same-runner replay 256/256; PENDING_INDEPENDENT_VALIDATION.",
+          "class": "engineering",
+          "anchor": "#n61-compact-orbit-hosted-20261003",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/sat_factor_base_review_20260908/autolab/evidence/20261003-koblitz-n61-hosted-isolated/README.md"
+        },
+        {
+          "date": "2026-10-04",
+          "value": 0.9276907676250028,
+          "reference": "matched",
+          "unit": "unisolated online wall diagnostic",
+          "label": "n37 compact-orbit K7, one frozen public point, six paired repeats",
+          "detail": "Median paired IC/rho online wall ratio 0.927691 (rho/IC paired median 1.0780), spanning 0.875695-1.554470 in six repeats on one public point. IC median 0.136063 ms; strong rho median 0.144334 ms. All six pairs and all 518 base logs independently replayed. Apple M4 Pro host was not isolated; controlled speedup and cold fully charged cost remain unknown. The RSS change is accounting, not an algorithm improvement.",
+          "class": "accounting",
+          "anchor": "#n37-compact-orbit-online-20261004",
+          "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-n37-single-target-20261004/RESULT.md"
+        }
       ]
     },
     {
@@ -867,10 +1164,50 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
       "role": "context",
       "note": "Counted P-256 selector-generation work against the frozen rho boundary. Round 292 exactly corrects Round 291 for distinct covered group elements. Collision detection, relation solving and scalar recovery remain excluded, so this is still a stage diagnostic rather than end-to-end speed.",
       "points": [
-        {"date": "2026-10-06", "value": 0.9686171464465044, "reference": "stage-boundary", "unit": "counted P-256 addition equivalents", "label": "P-256 Round 291 serpentine sign-orbit construction", "detail": "Complete 2^17-sign primary orbit: 29,884,416 exactly replayed emissions, 1.004439 additions/emission and 9,808 bytes live state. Round 292 subsequently proves that only 19.56% are distinct and corrects this stage ratio to 4.951724.", "class": "advance", "anchor": "#p256-serpentine-sign-orbit-round291-20261006", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_serpentine_sign_orbit_round291_20261006/RESULT.md"},
-        {"date": "2026-10-06", "value": 4.951723549971528, "reference": "stage-boundary", "unit": "counted P-256 addition equivalents per exact distinct state", "label": "P-256 Round 292 exact primary-orbit coverage correction", "detail": "The primary orbit emits 29,884,416 states but exactly covers 5,845,754 group elements (19.56%). Correcting the frozen Round 291 construction charge for distinct coverage raises the stage ratio to 4.951724; four tuples worsen it to 11.349928. Direct controls have zero FP/FN. Degree, relations, linear algebra and scalar recovery remain unset.", "class": "accounting", "anchor": "#p256-orbit-coverage-round292-20261006", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_orbit_coverage_round292_20261006/RESULT.md"},
-        {"date": "2026-10-06", "value": 2.320918327943466, "reference": "stage-boundary", "unit": "factor-base-corrected P-256 addition equivalents per exact distinct state", "label": "P-256 289-round executed monotone factor-base screen", "detail": "All 289 rounds 2-290 executed with separate receipts and zero projections. Best Round 189, LD2R7021h58521a0ef3de, covers 13,096,682 distinct elements from 29,753,344 emissions (44.02%); its ideal-local ratio is 2.200455 and R-specific corrected lower bound 2.320918. Zero selector candidates pass; degree and end-to-end phases remain unset.", "class": "advance", "anchor": "#p256-executed-screen-round2-290-20261006", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_executed_screen_round2_290_20261006/RESULT.md"},
-        {"date": "2026-10-07", "value": 0.99799534265119, "reference": "stage-boundary", "unit": "delta-frequency-corrected P-256 addition equivalents per exact distinct state", "label": "P-256 Round 293 decorrelated hash-jump selector", "detail": "LDHJR4093h94827a2592b7 exactly covers all 48,889,856 emitted states and reaches a 0.997995 selector-stage lower bound. This is relabelling, not end-to-end parity: the explicit 131,458-point set has membership degree at least 131,458, structured degree remains unset, and the +G path is generic translation. An optimistic sweep over every two-delta tuple capacity has a 1.033025 corrected floor.", "class": "relabelling", "anchor": "#p256-hash-jump-round293-20261007", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_hash_jump_round293_20261007/RESULT.md"}
+        {
+          "date": "2026-10-06",
+          "value": 0.9686171464465044,
+          "reference": "stage-boundary",
+          "unit": "counted P-256 addition equivalents",
+          "label": "P-256 Round 291 serpentine sign-orbit construction",
+          "detail": "Complete 2^17-sign primary orbit: 29,884,416 exactly replayed emissions, 1.004439 additions/emission and 9,808 bytes live state. Round 292 subsequently proves that only 19.56% are distinct and corrects this stage ratio to 4.951724.",
+          "class": "advance",
+          "anchor": "#p256-serpentine-sign-orbit-round291-20261006",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_serpentine_sign_orbit_round291_20261006/RESULT.md"
+        },
+        {
+          "date": "2026-10-06",
+          "value": 4.951723549971528,
+          "reference": "stage-boundary",
+          "unit": "counted P-256 addition equivalents per exact distinct state",
+          "label": "P-256 Round 292 exact primary-orbit coverage correction",
+          "detail": "The primary orbit emits 29,884,416 states but exactly covers 5,845,754 group elements (19.56%). Correcting the frozen Round 291 construction charge for distinct coverage raises the stage ratio to 4.951724; four tuples worsen it to 11.349928. Direct controls have zero FP/FN. Degree, relations, linear algebra and scalar recovery remain unset.",
+          "class": "accounting",
+          "anchor": "#p256-orbit-coverage-round292-20261006",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_orbit_coverage_round292_20261006/RESULT.md"
+        },
+        {
+          "date": "2026-10-06",
+          "value": 2.320918327943466,
+          "reference": "stage-boundary",
+          "unit": "factor-base-corrected P-256 addition equivalents per exact distinct state",
+          "label": "P-256 289-round executed monotone factor-base screen",
+          "detail": "All 289 rounds 2-290 executed with separate receipts and zero projections. Best Round 189, LD2R7021h58521a0ef3de, covers 13,096,682 distinct elements from 29,753,344 emissions (44.02%); its ideal-local ratio is 2.200455 and R-specific corrected lower bound 2.320918. Zero selector candidates pass; degree and end-to-end phases remain unset.",
+          "class": "advance",
+          "anchor": "#p256-executed-screen-round2-290-20261006",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_executed_screen_round2_290_20261006/RESULT.md"
+        },
+        {
+          "date": "2026-10-07",
+          "value": 0.99799534265119,
+          "reference": "stage-boundary",
+          "unit": "delta-frequency-corrected P-256 addition equivalents per exact distinct state",
+          "label": "P-256 Round 293 decorrelated hash-jump selector",
+          "detail": "LDHJR4093h94827a2592b7 exactly covers all 48,889,856 emitted states and reaches a 0.997995 selector-stage lower bound. This is relabelling, not end-to-end parity: the explicit 131,458-point set has membership degree at least 131,458, structured degree remains unset, and the +G path is generic translation. An optimistic sweep over every two-delta tuple capacity has a 1.033025 corrected floor.",
+          "class": "relabelling",
+          "anchor": "#p256-hash-jump-round293-20261007",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_hash_jump_round293_20261007/RESULT.md"
+        }
       ]
     },
     {
@@ -879,26 +1216,226 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
       "role": "context",
       "note": "Favourable P-256 generic-collection boundaries against rho. These rows grant exact coverage, a perfect free decomposition oracle, one operation per collision sample, and omit implementation costs; they are obstruction diagnostics, not end-to-end measurements.",
       "points": [
-        {"date": "2026-10-07", "value": 13.920747397073491, "reference": "generic-lower-bound", "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents", "label": "P-256 Round 294 variable-arity global fixed-arity threshold", "detail": "Exact enumeration first finds a covering fixed arity at B=K=164, m=109 or 110. Even with success probability one and all solver, verification, setup and linear-algebra costs removed, the exact Round-24 gamma-ratio collision law costs 13.920747 times rho. The smallest executed covering Dickson base is depth 9, B=266, m=59, at 17.734068 times rho.", "class": "accounting", "anchor": "#p256-variable-arity-round294-20261007", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_variable_arity_round294_20261007/RESULT.md"},
-        {"date": "2026-10-07", "value": 13.920747397073491, "reference": "generic-lower-bound", "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents", "label": "P-256 Round 295 complete width-164 Dickson-union factor base", "detail": "FB1hc72514a2a8d3 exactly realizes Round 294's theoretical width floor as a verified union of complete depth-8 and depth-6 fibres, 136+28 columns with zero overlap. It improves the prior native depth-9 boundary by 1.273931x, from 17.734068x to 13.920747x rho, but does not cross rho; global 109/110-term regularity and complete solver costs remain unset.", "class": "advance", "anchor": "#p256-dickson-union-round295-20261007", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_dickson_union_round295_20261007/RESULT.md"},
-        {"date": "2026-10-07", "value": 13.920747397073491, "reference": "generic-lower-bound", "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents", "label": "P-256 Round 296 Dickson-aware RR selector", "detail": "The exact 164-column base has a one-chain quadratic terminal product and a normalized 273-variable quadratic divisor/Riemann--Roch selector. Complete m=3 controls solve at degree 3, but productive work reaches degree 6 already at m=5 and m=7/9 time out with matrices up to 373,917 columns. Six targets are censored; no P-256 solver cost or relation is projected.", "class": "negative", "anchor": "#p256-rr-selector-round296-20261007", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_rr_selector_round296_20261007/RESULT.md"},
-        {"date": "2026-10-07", "value": 13.920747397073491, "reference": "generic-lower-bound", "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents", "label": "P-256 Round 297 exhaustive scalar stabilizer", "detail": "Every scalar preserving the 328 signed points has order dividing gcd(n-1,328)=8. Exhaustive action of all eight eighth roots accepts only +1 and -1; negation was already folded, so the quotient remains K=164 and the favourable boundary remains 13.920747 times rho. All 328 accepted action mappings replay with zero failures.", "class": "negative", "anchor": "#p256-scalar-stabilizer-round297-20261007", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_scalar_stabilizer_round297_20261007/RESULT.md"},
-        {"date": "2026-10-07", "value": 13.920747397073491, "reference": "generic-lower-bound", "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents", "label": "P-256 Round 298 multi-row and transport parity escapes", "detail": "Parity permits only one collision event, so the 164-class base needs one target bucket with at least 165 distinct normalized rows (330 raw folded preimages) and rank 164. Complete toy domains show full rank only after mean distinct occupancy reaches 35.377; P-256 has exact mean distinct occupancy 1.00511 and no measured rank-164 event. Base-field endomorphisms reduce to scalar action, while the certified degree-11 isogeny walk changes coordinates without reducing the log quotient.", "class": "negative", "anchor": "#p256-parity-escapes-round298-20261007", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_parity_escapes_round298_20261007/RESULT.md"},
-        {"date": "2026-10-07", "value": 13.920747397073491, "reference": "generic-lower-bound", "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents", "label": "P-256 Round 299 transfer-anchor and structured multiplicity", "detail": "A nonzero homomorphic lift of the prime-order subgroup is injective and preserves the discrete-log scalar; a zero lift kills recovery. The corrected known-target threshold is 164 distinct normalized rows, but the random-map union diagnostic remains below 2^-713.831. Complete order-149 controls find rank-6 buckets only in scalar-defined affine/pair-sum bases; 1,848 geometry-defined bases produce none. No P-256 construction or relation is promoted.", "class": "negative", "anchor": "#p256-transfer-anchor-round299-20261007", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_transfer_anchor_round299_20261007/RESULT.md"},
-        {"date": "2026-10-07", "value": 13.920747397073491, "reference": "generic-lower-bound", "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents", "label": "P-256 Round 300 cover-fibre quotient screen", "detail": "Complete [1], [2], [4], and [8] rational fibres over four frozen toy bases replay 374,400 lifted rows. Eight sheets create 512 lifts per destination row and raise raw lifted-column rank by 42, but every added direction lies in the sheet-collapse kernel: quotient-rank gain is zero in every bucket. On cofactor-one P-256 the corresponding multiplication maps are rational-point bijections, so the 13.920747-times-rho free-oracle boundary does not move.", "class": "negative", "anchor": "#p256-cover-fiber-round300-20261007", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_cover_fiber_round300_20261007/RESULT.md"},
-        {"date": "2026-10-07", "value": 13.920747397073491, "reference": "generic-lower-bound", "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents", "label": "P-256 Round 301 standard algebraic-escape census", "detail": "P-256 is ordinary, non-anomalous, generic-j, and defined over a prime field. Its exact pairing embedding degree is ord_n(p)=(n-1)/3, a 255-bit integer, so MOV/Frey--Ruck is not a low-degree transfer. Hash-pinned CM, registered isogeny, scalar-stabilizer, and cover-fibre certificates likewise supply no log quotient. No named standard family moves the 13.920747-times-rho free-oracle boundary; constructions outside the census remain open.", "class": "negative", "anchor": "#p256-algebraic-escapes-round301-20261007", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_algebraic_escapes_round301_20261007/RESULT.md"},
-        {"date": "2026-10-08", "value": 13.920747397073491, "reference": "generic-lower-bound", "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents", "label": "P-256 Round 302 complementary-cover quotient", "detail": "The exact quotient maps replay wherever defined over the complete 994-point toy control, with two u=0 exceptions counted explicitly, and on all 64 deterministic P-256 controls. A deterministic point on the complementary quotient satisfies [n]R!=O under independent scalar algorithms; the Hasse interval contains no other positive multiple of n. The complement therefore has no rational P-256 order-n subgroup, supplies no second row, and leaves the 13.920747-times-rho free-oracle boundary unchanged for this split cover.", "class": "negative", "anchor": "#p256-complementary-quotient-round302-20261008", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_complementary_quotient_round302_20261008/RESULT.md"},
-        {"date": "2026-10-08", "value": 13.920747397073491, "reference": "generic-lower-bound", "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents", "label": "P-256 Round 303 homomorphic Jacobian row-capacity bound", "detail": "For a separable cover C->E, same-target sheet differences lie in a Prym of dimension g-1. After scalar transports are quotiented, homomorphic P-256 row rank is at most g-1. The one-event rank-164 gate therefore needs genus and degree at least 165 plus 164 P-256 Prym factors. A dual-modulus 256-sheet character control reaches abstract rank 164, but no such cover, fibre, solver, or attack is constructed; the executable boundary remains 13.920747 times rho.", "class": "negative", "anchor": "#p256-jacobian-row-capacity-round303-20261008", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_jacobian_row_capacity_round303_20261008/RESULT.md"},
-        {"date": "2026-10-08", "value": 13.920747397073491, "reference": "generic-lower-bound", "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents", "label": "P-256 Round 304 algebraic quotient rigidity", "detail": "Every rational algebraic self-map of P-256 induces affine-scalar log transport x->a*x+b. Complete enumeration of all 823,543 functions on Z/7Z finds exactly 7 additive, 49 affine, and 42 bijective affine maps with no exceptions. Exact 164-column graphs retain one unknown anchor at rank 163; its free-oracle cost is already 1.446505 times rho. Solving the anchor requires scalar labels, whose registered direct control costs 7.714692 times rho. No non-affine quotient or attack is constructed, so the executable boundary remains 13.920747 times rho.", "class": "negative", "anchor": "#p256-algebraic-quotient-rigidity-round304-20261008", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_algebraic_quotient_rigidity_round304_20261008/RESULT.md"},
-        {"date": "2026-10-08", "value": 13.920747397073491, "reference": "generic-lower-bound", "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents", "label": "P-256 Round 305 homogeneous anchor conservation", "detail": "Every homogeneous static factor-base row annihilates the nonzero log vector, so rank is at most K-1 and one global scale remains. Unanchored fixed-target rows likewise have augmented rank at most K. Complete controls cover 400 projective toy profiles and 984 P-256 group equations with zero discrepancies. Full rank needs target coupling plus an independent generator anchor, or two anchored target rows; no non-labelled mechanism supplies that pair. The one-anchor oracle is already 1.446505 times rho, and the executable boundary remains 13.920747 times rho.", "class": "negative", "anchor": "#p256-homogeneous-anchor-round305-20261008", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_homogeneous_anchor_round305_20261008/RESULT.md"},
-        {"date": "2026-10-08", "value": 13.920747397073491, "reference": "generic-lower-bound", "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents", "label": "P-256 Round 306 fixed-bucket signature rank", "detail": "After the maximal static quotient, every decomposition in one fixed walk bucket has the same two-variable signature, so arbitrary occupancy adds at most one dimension. The complete toy census checked 19,200 buckets, 6,585,600 retained rows, and 451,200 signature pairs with zero discrepancies. The P-256 labelled control remains rank 164 with 327 same-signature rows or a proportional second signature, reaching rank 165 only with an independent generator signature. No non-labelled two-signature event is constructed; the free two-event oracle is already 1.446505 times rho and the executable boundary remains 13.920747 times rho.", "class": "negative", "anchor": "#p256-bucket-signature-round306-20261008", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_bucket_signature_round306_20261008/RESULT.md"},
-        {"date": "2026-10-08", "value": 13.920747397073491, "reference": "generic-lower-bound", "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents", "label": "P-256 Round 307 one-event provenance rank", "detail": "Modulo independently verified pre-event equations W0, all scalar, group-law, column, and charged affine post-processing of one primitive relation remains in W0+span(r). The complete toy census enumerated 6,722,800 equations: all 3,200 complete one-line closures add one dimension and all 11,200 distinct-line pairs add two. The P-256 labelled control stays rank 164 with 1,024 distinct derived rows and reaches 165 only with an independent primitive. No non-labelled two-primitive event is constructed; its free oracle is already 1.446505 times rho and the executable boundary remains 13.920747 times rho.", "class": "negative", "anchor": "#p256-event-provenance-round307-20261008", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_event_provenance_round307_20261008/RESULT.md"},
-        {"date": "2026-10-08", "value": 3.2806207776272584e38, "reference": "rho-parity", "unit": "optimistic generic balanced product-collision samples divided by original-group Pollard rho", "label": "P-256 Round 308 direct product-lift trilemma", "detail": "A linked auxiliary coordinate is a scalar multiple and gives useful rank one. An independent coordinate reaches block rank two only by adding a new unknown log block; its projection to the original recovery variables has rank one. A known-label auxiliary coordinate is only a coefficient selector. The complete order-five census checked 7,447,750 coefficient pairs and 279,000 full collisions with zero errors; all four P-256 coordinate equations replay. A generic balanced GxG collision costs 2^255.825748 samples, or 2^127.947236 times rho, and the executable boundary remains 13.920747 times rho.", "class": "negative", "anchor": "#p256-product-lift-round308-20261008", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_product_lift_round308_20261008/RESULT.md"},
-        {"date": "2026-10-08", "value": 3.1076465657559445e45, "reference": "rho-parity", "unit": "exact arity-40 balanced product-target list width divided by original-group Pollard rho", "label": "P-256 Round 309 Dickson half-turn permutation", "detail": "The complete registered-base rebuild extracts FB1h6255ce9746fe: 65,724 columns in 32,862 exact x->-x two-cycles with zero mapping failures. A planted (Q,G) product hit gives two useful rows on the same log vector, closing Round 308's information defect. But the exact S17 product-target mean is only 2^-271.270334; the first domain-covering arity is 40, whose balanced 20+20 baseline has 2^279.001098 entries and is 2^151.122587 times rho. The new base's structured degree is unset and no actual relation is attempted.", "class": "negative", "anchor": "#p256-dickson-permutation-round309-20261008", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_dickson_permutation_round309_20261008/RESULT.md"},
-        {"date": "2026-10-08", "value": 3.1076465657559445e45, "reference": "rho-parity", "unit": "Round-309 exact arity-40 baseline divided by original-group Pollard rho; unchanged", "label": "P-256 Round 310 same-base permutation dichotomy", "detail": "On the complete fixed-sum coefficient span, a same-base column permutation has one-dimensional paired image exactly when its transported log vector is affine in the original logs. The complete F5 census checked 3,744 profile/permutation pairs and 468,000 slice rows: all 600 nonconstant affine cases had rank one, all 3,120 non-affine cases had rank two, and all discrepancies were zero. P-256 dual-field controls give S17 span rank 16 and exact planted group replay. This closes unrestricted linear permutations, not nonlinear restricted subsets; degree remains unset and the Round-309 2^151.122587-times-rho baseline is unchanged.", "class": "negative", "anchor": "#p256-permutation-dichotomy-round310-20261008", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_permutation_dichotomy_round310_20261008/RESULT.md"},
-        {"date": "2026-10-13", "value": 575.2280803951578, "reference": "rho-parity", "unit": "optimistic cold lower projection in P-256 group-addition equivalents divided by Pollard rho", "label": "P-256 Round 311 half-turn involution atoms", "detail": "The exact A=P+P_pi, B=P-P_pi target factorization separates a different arity-20-plus-20 family, but the complete actual-P-256 census finds 65,724 unique atom columns from 65,724 parent columns: zero dimension reduction, zero overlaps, and zero scalar matches for 2, 3, 4, 8, and 16. All group and coordinate identities replay, and the complete 960,400-state F7 control has zero false positives or negatives. The target-only projection is still 3.649761 times rho and requires 2^136.603866 bytes; the favourable complete lower projection is 575.228080 times rho. Degree remains unset and no unplanted relation is attempted.", "class": "negative", "anchor": "#p256-involution-atom-round311-20261013", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_involution_atom_round311_20261013/RESULT.md"},
-        {"date": "2026-10-13", "value": 394.4252803452522, "reference": "rho-parity", "unit": "free-relation-oracle lower projection divided by Pollard rho", "label": "P-256 Round 312 Dickson-additive static-rank screen", "detail": "On FB1h2f8621cda105, the complete minimal-coalescence levels 1--7 cover 4,185,775 unordered pairs and 8,371,550 signed P_i+/-P_j atoms. Complete atom collisions and matches against [1,2,3,4,8,16] times every column find zero identities, so certified static rank is zero and all 131,458 log classes remain. The complete order-101 control has zero false positives or negatives and all 70 P-256 detector-control relations replay. Levels 8--18 are sampled and receive no projection credit. Structured residual degree remains 4, but the unchanged free oracle is 394.425280 times rho, executable cost is 2^148.080980 FME per usable relation, and no unplanted relation is attempted.", "class": "negative", "anchor": "#p256-dickson-additive-rank-round312-20261013", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_dickson_additive_rank_round312_20261013/RESULT.md"},
-        {"date": "2026-10-14", "value": 394.4252803452522, "reference": "rho-parity", "unit": "free-relation-oracle lower projection divided by Pollard rho", "label": "P-256 Round 313 complete Dickson-Walsh transport", "detail": "The complete group-valued Walsh transform exhausts all 262,144 characters of the depth-18 Dickson fibre for FB1h2f8621cda105. Every output is nonidentity; exhaustive output/output and output/[1,2,3,4,8,16]P_j matching finds zero candidates and certified rank zero. Independent cyclic controls have zero false positives or negatives, both planted P-256 relations replay, and the final result repeats byte-identically. Structured residual degree remains 4, but all 131,458 log classes remain and the free-oracle floor stays 394.425280 times rho. The rank-zero screen is not an ecbench-eligible DLP method and no unplanted relation is attempted.", "class": "negative", "anchor": "#p256-dickson-walsh-round313-20261014", "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_walsh_transport_round313_20261014/RESULT.md"}
+        {
+          "date": "2026-10-07",
+          "value": 13.920747397073491,
+          "reference": "generic-lower-bound",
+          "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents",
+          "label": "P-256 Round 294 variable-arity global fixed-arity threshold",
+          "detail": "Exact enumeration first finds a covering fixed arity at B=K=164, m=109 or 110. Even with success probability one and all solver, verification, setup and linear-algebra costs removed, the exact Round-24 gamma-ratio collision law costs 13.920747 times rho. The smallest executed covering Dickson base is depth 9, B=266, m=59, at 17.734068 times rho.",
+          "class": "accounting",
+          "anchor": "#p256-variable-arity-round294-20261007",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_variable_arity_round294_20261007/RESULT.md"
+        },
+        {
+          "date": "2026-10-07",
+          "value": 13.920747397073491,
+          "reference": "generic-lower-bound",
+          "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents",
+          "label": "P-256 Round 295 complete width-164 Dickson-union factor base",
+          "detail": "FB1hc72514a2a8d3 exactly realizes Round 294's theoretical width floor as a verified union of complete depth-8 and depth-6 fibres, 136+28 columns with zero overlap. It improves the prior native depth-9 boundary by 1.273931x, from 17.734068x to 13.920747x rho, but does not cross rho; global 109/110-term regularity and complete solver costs remain unset.",
+          "class": "advance",
+          "anchor": "#p256-dickson-union-round295-20261007",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_dickson_union_round295_20261007/RESULT.md"
+        },
+        {
+          "date": "2026-10-07",
+          "value": 13.920747397073491,
+          "reference": "generic-lower-bound",
+          "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents",
+          "label": "P-256 Round 296 Dickson-aware RR selector",
+          "detail": "The exact 164-column base has a one-chain quadratic terminal product and a normalized 273-variable quadratic divisor/Riemann--Roch selector. Complete m=3 controls solve at degree 3, but productive work reaches degree 6 already at m=5 and m=7/9 time out with matrices up to 373,917 columns. Six targets are censored; no P-256 solver cost or relation is projected.",
+          "class": "negative",
+          "anchor": "#p256-rr-selector-round296-20261007",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_rr_selector_round296_20261007/RESULT.md"
+        },
+        {
+          "date": "2026-10-07",
+          "value": 13.920747397073491,
+          "reference": "generic-lower-bound",
+          "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents",
+          "label": "P-256 Round 297 exhaustive scalar stabilizer",
+          "detail": "Every scalar preserving the 328 signed points has order dividing gcd(n-1,328)=8. Exhaustive action of all eight eighth roots accepts only +1 and -1; negation was already folded, so the quotient remains K=164 and the favourable boundary remains 13.920747 times rho. All 328 accepted action mappings replay with zero failures.",
+          "class": "negative",
+          "anchor": "#p256-scalar-stabilizer-round297-20261007",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_scalar_stabilizer_round297_20261007/RESULT.md"
+        },
+        {
+          "date": "2026-10-07",
+          "value": 13.920747397073491,
+          "reference": "generic-lower-bound",
+          "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents",
+          "label": "P-256 Round 298 multi-row and transport parity escapes",
+          "detail": "Parity permits only one collision event, so the 164-class base needs one target bucket with at least 165 distinct normalized rows (330 raw folded preimages) and rank 164. Complete toy domains show full rank only after mean distinct occupancy reaches 35.377; P-256 has exact mean distinct occupancy 1.00511 and no measured rank-164 event. Base-field endomorphisms reduce to scalar action, while the certified degree-11 isogeny walk changes coordinates without reducing the log quotient.",
+          "class": "negative",
+          "anchor": "#p256-parity-escapes-round298-20261007",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_parity_escapes_round298_20261007/RESULT.md"
+        },
+        {
+          "date": "2026-10-07",
+          "value": 13.920747397073491,
+          "reference": "generic-lower-bound",
+          "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents",
+          "label": "P-256 Round 299 transfer-anchor and structured multiplicity",
+          "detail": "A nonzero homomorphic lift of the prime-order subgroup is injective and preserves the discrete-log scalar; a zero lift kills recovery. The corrected known-target threshold is 164 distinct normalized rows, but the random-map union diagnostic remains below 2^-713.831. Complete order-149 controls find rank-6 buckets only in scalar-defined affine/pair-sum bases; 1,848 geometry-defined bases produce none. No P-256 construction or relation is promoted.",
+          "class": "negative",
+          "anchor": "#p256-transfer-anchor-round299-20261007",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_transfer_anchor_round299_20261007/RESULT.md"
+        },
+        {
+          "date": "2026-10-07",
+          "value": 13.920747397073491,
+          "reference": "generic-lower-bound",
+          "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents",
+          "label": "P-256 Round 300 cover-fibre quotient screen",
+          "detail": "Complete [1], [2], [4], and [8] rational fibres over four frozen toy bases replay 374,400 lifted rows. Eight sheets create 512 lifts per destination row and raise raw lifted-column rank by 42, but every added direction lies in the sheet-collapse kernel: quotient-rank gain is zero in every bucket. On cofactor-one P-256 the corresponding multiplication maps are rational-point bijections, so the 13.920747-times-rho free-oracle boundary does not move.",
+          "class": "negative",
+          "anchor": "#p256-cover-fiber-round300-20261007",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_cover_fiber_round300_20261007/RESULT.md"
+        },
+        {
+          "date": "2026-10-07",
+          "value": 13.920747397073491,
+          "reference": "generic-lower-bound",
+          "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents",
+          "label": "P-256 Round 301 standard algebraic-escape census",
+          "detail": "P-256 is ordinary, non-anomalous, generic-j, and defined over a prime field. Its exact pairing embedding degree is ord_n(p)=(n-1)/3, a 255-bit integer, so MOV/Frey--Ruck is not a low-degree transfer. Hash-pinned CM, registered isogeny, scalar-stabilizer, and cover-fibre certificates likewise supply no log quotient. No named standard family moves the 13.920747-times-rho free-oracle boundary; constructions outside the census remain open.",
+          "class": "negative",
+          "anchor": "#p256-algebraic-escapes-round301-20261007",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_algebraic_escapes_round301_20261007/RESULT.md"
+        },
+        {
+          "date": "2026-10-08",
+          "value": 13.920747397073491,
+          "reference": "generic-lower-bound",
+          "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents",
+          "label": "P-256 Round 302 complementary-cover quotient",
+          "detail": "The exact quotient maps replay wherever defined over the complete 994-point toy control, with two u=0 exceptions counted explicitly, and on all 64 deterministic P-256 controls. A deterministic point on the complementary quotient satisfies [n]R!=O under independent scalar algorithms; the Hasse interval contains no other positive multiple of n. The complement therefore has no rational P-256 order-n subgroup, supplies no second row, and leaves the 13.920747-times-rho free-oracle boundary unchanged for this split cover.",
+          "class": "negative",
+          "anchor": "#p256-complementary-quotient-round302-20261008",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_complementary_quotient_round302_20261008/RESULT.md"
+        },
+        {
+          "date": "2026-10-08",
+          "value": 13.920747397073491,
+          "reference": "generic-lower-bound",
+          "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents",
+          "label": "P-256 Round 303 homomorphic Jacobian row-capacity bound",
+          "detail": "For a separable cover C->E, same-target sheet differences lie in a Prym of dimension g-1. After scalar transports are quotiented, homomorphic P-256 row rank is at most g-1. The one-event rank-164 gate therefore needs genus and degree at least 165 plus 164 P-256 Prym factors. A dual-modulus 256-sheet character control reaches abstract rank 164, but no such cover, fibre, solver, or attack is constructed; the executable boundary remains 13.920747 times rho.",
+          "class": "negative",
+          "anchor": "#p256-jacobian-row-capacity-round303-20261008",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_jacobian_row_capacity_round303_20261008/RESULT.md"
+        },
+        {
+          "date": "2026-10-08",
+          "value": 13.920747397073491,
+          "reference": "generic-lower-bound",
+          "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents",
+          "label": "P-256 Round 304 algebraic quotient rigidity",
+          "detail": "Every rational algebraic self-map of P-256 induces affine-scalar log transport x->a*x+b. Complete enumeration of all 823,543 functions on Z/7Z finds exactly 7 additive, 49 affine, and 42 bijective affine maps with no exceptions. Exact 164-column graphs retain one unknown anchor at rank 163; its free-oracle cost is already 1.446505 times rho. Solving the anchor requires scalar labels, whose registered direct control costs 7.714692 times rho. No non-affine quotient or attack is constructed, so the executable boundary remains 13.920747 times rho.",
+          "class": "negative",
+          "anchor": "#p256-algebraic-quotient-rigidity-round304-20261008",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_algebraic_quotient_rigidity_round304_20261008/RESULT.md"
+        },
+        {
+          "date": "2026-10-08",
+          "value": 13.920747397073491,
+          "reference": "generic-lower-bound",
+          "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents",
+          "label": "P-256 Round 305 homogeneous anchor conservation",
+          "detail": "Every homogeneous static factor-base row annihilates the nonzero log vector, so rank is at most K-1 and one global scale remains. Unanchored fixed-target rows likewise have augmented rank at most K. Complete controls cover 400 projective toy profiles and 984 P-256 group equations with zero discrepancies. Full rank needs target coupling plus an independent generator anchor, or two anchored target rows; no non-labelled mechanism supplies that pair. The one-anchor oracle is already 1.446505 times rho, and the executable boundary remains 13.920747 times rho.",
+          "class": "negative",
+          "anchor": "#p256-homogeneous-anchor-round305-20261008",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_homogeneous_anchor_round305_20261008/RESULT.md"
+        },
+        {
+          "date": "2026-10-08",
+          "value": 13.920747397073491,
+          "reference": "generic-lower-bound",
+          "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents",
+          "label": "P-256 Round 306 fixed-bucket signature rank",
+          "detail": "After the maximal static quotient, every decomposition in one fixed walk bucket has the same two-variable signature, so arbitrary occupancy adds at most one dimension. The complete toy census checked 19,200 buckets, 6,585,600 retained rows, and 451,200 signature pairs with zero discrepancies. The P-256 labelled control remains rank 164 with 327 same-signature rows or a proportional second signature, reaching rank 165 only with an independent generator signature. No non-labelled two-signature event is constructed; the free two-event oracle is already 1.446505 times rho and the executable boundary remains 13.920747 times rho.",
+          "class": "negative",
+          "anchor": "#p256-bucket-signature-round306-20261008",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_bucket_signature_round306_20261008/RESULT.md"
+        },
+        {
+          "date": "2026-10-08",
+          "value": 13.920747397073491,
+          "reference": "generic-lower-bound",
+          "unit": "exact negation-folded K-th collision samples in P-256 group-addition equivalents",
+          "label": "P-256 Round 307 one-event provenance rank",
+          "detail": "Modulo independently verified pre-event equations W0, all scalar, group-law, column, and charged affine post-processing of one primitive relation remains in W0+span(r). The complete toy census enumerated 6,722,800 equations: all 3,200 complete one-line closures add one dimension and all 11,200 distinct-line pairs add two. The P-256 labelled control stays rank 164 with 1,024 distinct derived rows and reaches 165 only with an independent primitive. No non-labelled two-primitive event is constructed; its free oracle is already 1.446505 times rho and the executable boundary remains 13.920747 times rho.",
+          "class": "negative",
+          "anchor": "#p256-event-provenance-round307-20261008",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_event_provenance_round307_20261008/RESULT.md"
+        },
+        {
+          "date": "2026-10-08",
+          "value": 3.2806207776272584e+38,
+          "reference": "rho-parity",
+          "unit": "optimistic generic balanced product-collision samples divided by original-group Pollard rho",
+          "label": "P-256 Round 308 direct product-lift trilemma",
+          "detail": "A linked auxiliary coordinate is a scalar multiple and gives useful rank one. An independent coordinate reaches block rank two only by adding a new unknown log block; its projection to the original recovery variables has rank one. A known-label auxiliary coordinate is only a coefficient selector. The complete order-five census checked 7,447,750 coefficient pairs and 279,000 full collisions with zero errors; all four P-256 coordinate equations replay. A generic balanced GxG collision costs 2^255.825748 samples, or 2^127.947236 times rho, and the executable boundary remains 13.920747 times rho.",
+          "class": "negative",
+          "anchor": "#p256-product-lift-round308-20261008",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_product_lift_round308_20261008/RESULT.md"
+        },
+        {
+          "date": "2026-10-08",
+          "value": 3.1076465657559445e+45,
+          "reference": "rho-parity",
+          "unit": "exact arity-40 balanced product-target list width divided by original-group Pollard rho",
+          "label": "P-256 Round 309 Dickson half-turn permutation",
+          "detail": "The complete registered-base rebuild extracts FB1h6255ce9746fe: 65,724 columns in 32,862 exact x->-x two-cycles with zero mapping failures. A planted (Q,G) product hit gives two useful rows on the same log vector, closing Round 308's information defect. But the exact S17 product-target mean is only 2^-271.270334; the first domain-covering arity is 40, whose balanced 20+20 baseline has 2^279.001098 entries and is 2^151.122587 times rho. The new base's structured degree is unset and no actual relation is attempted.",
+          "class": "negative",
+          "anchor": "#p256-dickson-permutation-round309-20261008",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_dickson_permutation_round309_20261008/RESULT.md"
+        },
+        {
+          "date": "2026-10-08",
+          "value": 3.1076465657559445e+45,
+          "reference": "rho-parity",
+          "unit": "Round-309 exact arity-40 baseline divided by original-group Pollard rho; unchanged",
+          "label": "P-256 Round 310 same-base permutation dichotomy",
+          "detail": "On the complete fixed-sum coefficient span, a same-base column permutation has one-dimensional paired image exactly when its transported log vector is affine in the original logs. The complete F5 census checked 3,744 profile/permutation pairs and 468,000 slice rows: all 600 nonconstant affine cases had rank one, all 3,120 non-affine cases had rank two, and all discrepancies were zero. P-256 dual-field controls give S17 span rank 16 and exact planted group replay. This closes unrestricted linear permutations, not nonlinear restricted subsets; degree remains unset and the Round-309 2^151.122587-times-rho baseline is unchanged.",
+          "class": "negative",
+          "anchor": "#p256-permutation-dichotomy-round310-20261008",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_permutation_dichotomy_round310_20261008/RESULT.md"
+        },
+        {
+          "date": "2026-10-13",
+          "value": 575.2280803951578,
+          "reference": "rho-parity",
+          "unit": "optimistic cold lower projection in P-256 group-addition equivalents divided by Pollard rho",
+          "label": "P-256 Round 311 half-turn involution atoms",
+          "detail": "The exact A=P+P_pi, B=P-P_pi target factorization separates a different arity-20-plus-20 family, but the complete actual-P-256 census finds 65,724 unique atom columns from 65,724 parent columns: zero dimension reduction, zero overlaps, and zero scalar matches for 2, 3, 4, 8, and 16. All group and coordinate identities replay, and the complete 960,400-state F7 control has zero false positives or negatives. The target-only projection is still 3.649761 times rho and requires 2^136.603866 bytes; the favourable complete lower projection is 575.228080 times rho. Degree remains unset and no unplanted relation is attempted.",
+          "class": "negative",
+          "anchor": "#p256-involution-atom-round311-20261013",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_involution_atom_round311_20261013/RESULT.md"
+        },
+        {
+          "date": "2026-10-13",
+          "value": 394.4252803452522,
+          "reference": "rho-parity",
+          "unit": "free-relation-oracle lower projection divided by Pollard rho",
+          "label": "P-256 Round 312 Dickson-additive static-rank screen",
+          "detail": "On FB1h2f8621cda105, the complete minimal-coalescence levels 1--7 cover 4,185,775 unordered pairs and 8,371,550 signed P_i+/-P_j atoms. Complete atom collisions and matches against [1,2,3,4,8,16] times every column find zero identities, so certified static rank is zero and all 131,458 log classes remain. The complete order-101 control has zero false positives or negatives and all 70 P-256 detector-control relations replay. Levels 8--18 are sampled and receive no projection credit. Structured residual degree remains 4, but the unchanged free oracle is 394.425280 times rho, executable cost is 2^148.080980 FME per usable relation, and no unplanted relation is attempted.",
+          "class": "negative",
+          "anchor": "#p256-dickson-additive-rank-round312-20261013",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_dickson_additive_rank_round312_20261013/RESULT.md"
+        },
+        {
+          "date": "2026-10-14",
+          "value": 394.4252803452522,
+          "reference": "rho-parity",
+          "unit": "free-relation-oracle lower projection divided by Pollard rho",
+          "label": "P-256 Round 313 complete Dickson-Walsh transport",
+          "detail": "The complete group-valued Walsh transform exhausts all 262,144 characters of the depth-18 Dickson fibre for FB1h2f8621cda105. Every output is nonidentity; exhaustive output/output and output/[1,2,3,4,8,16]P_j matching finds zero candidates and certified rank zero. Independent cyclic controls have zero false positives or negatives, both planted P-256 relations replay, and the final result repeats byte-identically. Structured residual degree remains 4, but all 131,458 log classes remain and the free-oracle floor stays 394.425280 times rho. The rank-zero screen is not an ecbench-eligible DLP method and no unplanted relation is attempted.",
+          "class": "negative",
+          "anchor": "#p256-dickson-walsh-round313-20261014",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_walsh_transport_round313_20261014/RESULT.md"
+        }
       ]
     },
     {
@@ -907,8 +1444,28 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
       "role": "context",
       "note": "Compact-orbit shared-log DLP on one batch of L targets against the frozen KS v2 batched rho on the same targets. Strong rho rung 3 supersedes that comparator (IC/rho = 2.297 against it at L = 1,024), so the points are hollow. Under the one-target rule this is a historical multi-target diagnostic.",
       "points": [
-        {"date": "2026-10-03", "value": 0.213, "reference": "unmatched", "unit": "isolated wall time", "label": "n61 L = 4,096, K = 700, hosted isolated", "detail": "Wall ratio IC/rho median 0.213 (0.2125-0.2132) over 5 alternating blocks on a pinned hosted AMD EPYC 7763 core, 0 contended samples; every target verified and replayed (IC 20,480/20,480, rho 20,480/20,480). Against the superseded KS v2 batched rho; PENDING_INDEPENDENT_VALIDATION.", "class": "accounting", "anchor": "#n61-compact-orbit-hosted-20261003", "source": "https://github.com/aburan28/crypto/blob/main/research/sat_factor_base_review_20260908/autolab/evidence/20261003-koblitz-n61-hosted-isolated/README.md"},
-        {"date": "2026-10-03", "value": 0.323, "reference": "unmatched", "unit": "isolated wall time", "label": "n61 L = 16,384, K = 700, hosted isolated", "detail": "Wall ratio IC/rho median 0.323 (0.3225-0.3230) over 3 alternating blocks on a pinned hosted AMD EPYC 7763 core, 0 contended samples; every target verified and replayed (IC 49,152/49,152, rho 49,152/49,152). K = 700 comes from the 1,024-target tune, which leaves the per-target descent dominant at this L. Against the superseded KS v2 batched rho; PENDING_INDEPENDENT_VALIDATION.", "class": "accounting", "anchor": "#n61-compact-orbit-hosted-20261003", "source": "https://github.com/aburan28/crypto/blob/main/research/sat_factor_base_review_20260908/autolab/evidence/20261003-koblitz-n61-hosted-isolated/README.md"}
+        {
+          "date": "2026-10-03",
+          "value": 0.213,
+          "reference": "unmatched",
+          "unit": "isolated wall time",
+          "label": "n61 L = 4,096, K = 700, hosted isolated",
+          "detail": "Wall ratio IC/rho median 0.213 (0.2125-0.2132) over 5 alternating blocks on a pinned hosted AMD EPYC 7763 core, 0 contended samples; every target verified and replayed (IC 20,480/20,480, rho 20,480/20,480). Against the superseded KS v2 batched rho; PENDING_INDEPENDENT_VALIDATION.",
+          "class": "accounting",
+          "anchor": "#n61-compact-orbit-hosted-20261003",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/sat_factor_base_review_20260908/autolab/evidence/20261003-koblitz-n61-hosted-isolated/README.md"
+        },
+        {
+          "date": "2026-10-03",
+          "value": 0.323,
+          "reference": "unmatched",
+          "unit": "isolated wall time",
+          "label": "n61 L = 16,384, K = 700, hosted isolated",
+          "detail": "Wall ratio IC/rho median 0.323 (0.3225-0.3230) over 3 alternating blocks on a pinned hosted AMD EPYC 7763 core, 0 contended samples; every target verified and replayed (IC 49,152/49,152, rho 49,152/49,152). K = 700 comes from the 1,024-target tune, which leaves the per-target descent dominant at this L. Against the superseded KS v2 batched rho; PENDING_INDEPENDENT_VALIDATION.",
+          "class": "accounting",
+          "anchor": "#n61-compact-orbit-hosted-20261003",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/sat_factor_base_review_20260908/autolab/evidence/20261003-koblitz-n61-hosted-isolated/README.md"
+        }
       ]
     },
     {
@@ -917,8 +1474,26 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
       "role": "context",
       "note": "p <= 251, N = 2^24, conservative accounting against a distinguished-point rho. The only end-to-end measurement below rho on the page; no deployed system is hyperelliptic.",
       "points": [
-        {"date": "2026-09-19", "value": 0.21, "reference": "matched", "label": "Genus-4 crossover exponent", "detail": "0.21 at N = 2^24 on the conservative accounting; fitted exponent -0.275 against rho.", "class": "advance, exponent", "anchor": "#genus-crossover", "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#genus-crossover"},
-        {"date": "2026-09-30", "value": 0.24, "reference": "matched", "label": "Round seven: sparse solve priced, genus-3 claim withdrawn", "detail": "The solve became 5.1x cheaper and the linear algebra was priced; genus 4 reads 0.24 at N = 2^24 (was 0.21) with exponent -0.29 [-0.42, -0.16]; genus 3's exponent claim was withdrawn.", "class": "accounting", "anchor": "#genus-crossover", "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#genus-crossover"}
+        {
+          "date": "2026-09-19",
+          "value": 0.21,
+          "reference": "matched",
+          "label": "Genus-4 crossover exponent",
+          "detail": "0.21 at N = 2^24 on the conservative accounting; fitted exponent -0.275 against rho.",
+          "class": "advance, exponent",
+          "anchor": "#genus-crossover",
+          "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#genus-crossover"
+        },
+        {
+          "date": "2026-09-30",
+          "value": 0.24,
+          "reference": "matched",
+          "label": "Round seven: sparse solve priced, genus-3 claim withdrawn",
+          "detail": "The solve became 5.1x cheaper and the linear algebra was priced; genus 4 reads 0.24 at N = 2^24 (was 0.21) with exponent -0.29 [-0.42, -0.16]; genus 3's exponent claim was withdrawn.",
+          "class": "accounting",
+          "anchor": "#genus-crossover",
+          "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#genus-crossover"
+        }
       ]
     },
     {
@@ -927,16 +1502,72 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
       "role": "context",
       "note": "Joux-Vitse 2012 reproduced on a genus-3 GHS cover. The ratio falls as p^-1.92 and extrapolates to parity near 2^67 on this weak class (2^65 after F4 is stopped at the Bezout staircase, a 1.61x constant); the isogeny walk to reach it is priced in section 13 (a walk of q/3 steps costs more than rho below p about 8,000). Its sieving variant (section 11) measures the crossover with rho at p about 430 (subgroup 2^50) and reads 0.012x at p = 1511. Replaying a recorded F4 trace (section 12) takes another 2.0x off the test: 2.4x at p = 1009, parity extrapolated near 2^62.",
       "points": [
-        {"date": "2026-10-03", "value": 8.1, "reference": "matched", "label": "Cover and decomposition, p = 1009 (subgroup 2^57.9), best of two seeds", "detail": "S/rho 8.1x and 10.2x at p = 1009, falling as p^-1.92 +/- 0.12 over five sizes; parity extrapolated near 2^67 (p* about 2,900-3,050), above the harness's 64-bit range. All 10 logarithms recovered.", "class": "accounting", "anchor": "#rho-parity-ledger", "source": "https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md"},
-        {"date": "2026-10-03", "value": 5.1, "reference": "matched", "label": "Cover and decomposition, F4 stopped at the Bezout staircase, p = 1009 (subgroup 2^57.9), best of two seeds", "detail": "S/rho 5.1x and 6.3x at p = 1009 (8.1x and 10.2x before the stop): F4 stops once the leading monomials leave 64 standard monomials, the partial basis being a Groebner basis already; 1.61x on the test, the same relations from the same residuals, exponent -1.91 +/- 0.12 unchanged; parity extrapolated near 2^65 (p* about 2,300). Class: engineering.", "class": "engineering", "anchor": "#rho-parity-ledger", "source": "https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md"},
-        {"date": "2026-10-04", "value": 0.012, "reference": "matched", "label": "Sieving variant of the cover route (Joux-Vitse section 3.2), p = 1511 (subgroup 2^61.4), best of two seeds", "detail": "S/rho 0.0122x and 0.0137x at p = 1511 (0.039x and 0.069x at p = 1009; 1.05x and 0.114x at 503; 3.2x and 8.5x at 251; 1,977x and a lower bound above 7,560x at 101): relations from a sieve over the factor base instead of Nagao tests, a measured crossover with rho at p about 430 (subgroup 2^50) where section 6 could only extrapolate one; all ten logarithms above p = 101 recovered. The descent, two Nagao tests, is 46-86 % of the cost from p = 503 up. Class: reproduction of a published route (accounting and engineering), on the weak class only.", "class": "accounting", "anchor": "#rho-parity-ledger", "source": "https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md"},
-        {"date": "2026-10-04", "value": 2.4, "reference": "matched", "label": "Cover and decomposition, F4 replaying a recorded trace, p = 1009 (subgroup 2^57.9), best of two seeds", "detail": "S/rho 2.98x and 2.40x at p = 1009 (6.3x and 5.1x with the stop alone, 8.1x and 10.2x before it): F4 records, on the first six-quadric system of a size, the pair rows every new pivot is a combination of, and replays them on the rest (no pair selection, no reduction to zero); 2.0x on the test (C_cov 1.6e6, 3.2x against the original), 1,462,000 of 1,516,000 systems replayed, the rest diverged and ran in full; exponent -1.96 +/- 0.11, parity extrapolated near 2^62 (p* about 1,650). Class: engineering.", "class": "engineering", "anchor": "#rho-parity-ledger", "source": "https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md"},
-        {"date": "2026-10-04", "value": 0.0068, "reference": "matched", "label": "Sieving variant, descent replaying the F4 trace, line enumeration of section 14, p = 1511 (subgroup 2^61.4), best of two seeds", "detail": "S/rho 0.0068x and 0.0077x at p = 1511 (0.0075x and 0.0086x before section 14, 0.0122x and 0.0137x before the traced descent): the lines of every B are found from a lazy factorisation (a distinct-degree group split only when a line needs part of it, Cantor-Zassenhaus on the Frobenius columns already computed, x^p by shift and square), 2,600 multiplications per B against 4,200; C_rel at m = 9 falls 1.30-1.35x, S/rho 6-20 % at p = 503-1511 (the descent is the larger term); the same relations from the same B's. Class: engineering.", "class": "engineering", "anchor": "#rho-parity-ledger", "source": "https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md"},
-        {"date": "2026-10-04", "value": 0.003, "reference": "matched", "label": "Sieving variant at the arithmetic's limit, p = 1,823 (subgroup 2^63.0), best of two seeds; twenty-prime census", "detail": "S/rho 0.0030x and 0.0037x at p = 1,823 and 0.0037x and 0.0047x at p = 1,777 (pooled rho; rho measured by distinguished points at 1,777 in section 16), the largest sizes the 64-bit mod-l arithmetic allows (l below 2^63). A census of one instance on each of ten primes near 500 and ten near 1,000 (all solved) reads 0.04-0.67x and 0.008-0.032x: the spread between instances is the factor base, not the prime, and the crossover from the band means is p about 333 (subgroup 2^48), inside the registered band. Class: measurement.", "class": "accounting", "anchor": "#rho-parity-ledger", "source": "https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md"}
+        {
+          "date": "2026-10-03",
+          "value": 8.1,
+          "reference": "matched",
+          "label": "Cover and decomposition, p = 1009 (subgroup 2^57.9), best of two seeds",
+          "detail": "S/rho 8.1x and 10.2x at p = 1009, falling as p^-1.92 +/- 0.12 over five sizes; parity extrapolated near 2^67 (p* about 2,900-3,050), above the harness's 64-bit range. All 10 logarithms recovered.",
+          "class": "accounting",
+          "anchor": "#rho-parity-ledger",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md"
+        },
+        {
+          "date": "2026-10-03",
+          "value": 5.1,
+          "reference": "matched",
+          "label": "Cover and decomposition, F4 stopped at the Bezout staircase, p = 1009 (subgroup 2^57.9), best of two seeds",
+          "detail": "S/rho 5.1x and 6.3x at p = 1009 (8.1x and 10.2x before the stop): F4 stops once the leading monomials leave 64 standard monomials, the partial basis being a Groebner basis already; 1.61x on the test, the same relations from the same residuals, exponent -1.91 +/- 0.12 unchanged; parity extrapolated near 2^65 (p* about 2,300). Class: engineering.",
+          "class": "engineering",
+          "anchor": "#rho-parity-ledger",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md"
+        },
+        {
+          "date": "2026-10-04",
+          "value": 0.012,
+          "reference": "matched",
+          "label": "Sieving variant of the cover route (Joux-Vitse section 3.2), p = 1511 (subgroup 2^61.4), best of two seeds",
+          "detail": "S/rho 0.0122x and 0.0137x at p = 1511 (0.039x and 0.069x at p = 1009; 1.05x and 0.114x at 503; 3.2x and 8.5x at 251; 1,977x and a lower bound above 7,560x at 101): relations from a sieve over the factor base instead of Nagao tests, a measured crossover with rho at p about 430 (subgroup 2^50) where section 6 could only extrapolate one; all ten logarithms above p = 101 recovered. The descent, two Nagao tests, is 46-86 % of the cost from p = 503 up. Class: reproduction of a published route (accounting and engineering), on the weak class only.",
+          "class": "accounting",
+          "anchor": "#rho-parity-ledger",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md"
+        },
+        {
+          "date": "2026-10-04",
+          "value": 2.4,
+          "reference": "matched",
+          "label": "Cover and decomposition, F4 replaying a recorded trace, p = 1009 (subgroup 2^57.9), best of two seeds",
+          "detail": "S/rho 2.98x and 2.40x at p = 1009 (6.3x and 5.1x with the stop alone, 8.1x and 10.2x before it): F4 records, on the first six-quadric system of a size, the pair rows every new pivot is a combination of, and replays them on the rest (no pair selection, no reduction to zero); 2.0x on the test (C_cov 1.6e6, 3.2x against the original), 1,462,000 of 1,516,000 systems replayed, the rest diverged and ran in full; exponent -1.96 +/- 0.11, parity extrapolated near 2^62 (p* about 1,650). Class: engineering.",
+          "class": "engineering",
+          "anchor": "#rho-parity-ledger",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md"
+        },
+        {
+          "date": "2026-10-04",
+          "value": 0.0068,
+          "reference": "matched",
+          "label": "Sieving variant, descent replaying the F4 trace, line enumeration of section 14, p = 1511 (subgroup 2^61.4), best of two seeds",
+          "detail": "S/rho 0.0068x and 0.0077x at p = 1511 (0.0075x and 0.0086x before section 14, 0.0122x and 0.0137x before the traced descent): the lines of every B are found from a lazy factorisation (a distinct-degree group split only when a line needs part of it, Cantor-Zassenhaus on the Frobenius columns already computed, x^p by shift and square), 2,600 multiplications per B against 4,200; C_rel at m = 9 falls 1.30-1.35x, S/rho 6-20 % at p = 503-1511 (the descent is the larger term); the same relations from the same B's. Class: engineering.",
+          "class": "engineering",
+          "anchor": "#rho-parity-ledger",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md"
+        },
+        {
+          "date": "2026-10-04",
+          "value": 0.003,
+          "reference": "matched",
+          "label": "Sieving variant at the arithmetic's limit, p = 1,823 (subgroup 2^63.0), best of two seeds; twenty-prime census",
+          "detail": "S/rho 0.0030x and 0.0037x at p = 1,823 and 0.0037x and 0.0047x at p = 1,777 (pooled rho; rho measured by distinguished points at 1,777 in section 16), the largest sizes the 64-bit mod-l arithmetic allows (l below 2^63). A census of one instance on each of ten primes near 500 and ten near 1,000 (all solved) reads 0.04-0.67x and 0.008-0.032x: the spread between instances is the factor base, not the prime, and the crossover from the band means is p about 333 (subgroup 2^48), inside the registered band. Class: measurement.",
+          "class": "accounting",
+          "anchor": "#rho-parity-ledger",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md"
+        }
       ]
     }
   ]
-}</script>
+}
+
+</script>
 <script>
 (function () {
   var el = document.getElementById('progress-chart'); if (!el) return;

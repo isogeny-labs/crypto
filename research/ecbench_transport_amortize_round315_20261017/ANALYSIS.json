@@ -1,0 +1,83 @@
+{
+  "caveat": "a distinguished-point rho fleet sharing tables across targets can also amortize; this is a multi-target mechanism screen, not a one-target speedup",
+  "reference": "rho.signed_frobenius_strong, one cold target per execution, no reusable precomputation",
+  "rows": [
+    {
+      "aa_exact": true,
+      "amortized_per_target_ratio": 0.8661189659233915,
+      "amortized_per_target_ratio_ci95": [
+        0.755900409210262,
+        0.9692188122970596
+      ],
+      "amortized_targets": 8,
+      "candidate_mean_amortized_per_target_gae": 3531.9629414874994,
+      "candidate_mean_total_gae": 28255.703531899995,
+      "gate_amortized_ci_excludes_one": true,
+      "measured_pairs": 40,
+      "online_fraction_of_total": 0.7485062175508266,
+      "online_gae_mean": 21149.569774900003,
+      "rho_mean_gae": 4077.918946991288,
+      "session": "holdout-n37-t8",
+      "shared_cold_gae_mean": 7106.133757000001,
+      "total_ratio": 6.928951727387132,
+      "total_ratio_ci95": [
+        6.047203273682096,
+        7.753750498376477
+      ],
+      "total_records": 144,
+      "verified": 144
+    },
+    {
+      "aa_exact": true,
+      "amortized_per_target_ratio": 0.6982290427890001,
+      "amortized_per_target_ratio_ci95": [
+        0.6445530028005301,
+        0.7532241395671854
+      ],
+      "amortized_targets": 16,
+      "candidate_mean_amortized_per_target_gae": 2914.26415240625,
+      "candidate_mean_total_gae": 46628.2264385,
+      "gate_amortized_ci_excludes_one": true,
+      "measured_pairs": 40,
+      "online_fraction_of_total": 0.8476001705453543,
+      "online_gae_mean": 39522.0926815,
+      "rho_mean_gae": 4173.793946991287,
+      "session": "development-n37-t16",
+      "shared_cold_gae_mean": 7106.133757000001,
+      "total_ratio": 11.171664684624002,
+      "total_ratio_ci95": [
+        10.312848044808481,
+        12.051586233074966
+      ],
+      "total_records": 144,
+      "verified": 144
+    },
+    {
+      "aa_exact": true,
+      "amortized_per_target_ratio": 0.6857866258063038,
+      "amortized_per_target_ratio_ci95": [
+        0.6303600485229053,
+        0.7400762338360994
+      ],
+      "amortized_targets": 16,
+      "candidate_mean_amortized_per_target_gae": 2796.5822749687495,
+      "candidate_mean_total_gae": 44745.31639949999,
+      "gate_amortized_ci_excludes_one": true,
+      "measured_pairs": 40,
+      "online_fraction_of_total": 0.8411870933361104,
+      "online_gae_mean": 37639.182642499996,
+      "rho_mean_gae": 4077.918946991288,
+      "session": "holdout-n37-t16",
+      "shared_cold_gae_mean": 7106.133757000001,
+      "total_ratio": 10.97258601290086,
+      "total_ratio_ci95": [
+        10.085760776366484,
+        11.841219741377591
+      ],
+      "total_records": 144,
+      "verified": 144
+    }
+  ],
+  "schema": "transport-log-amortize-round315/v1",
+  "unit": "counted GAE; the amortized per-target unit divides the candidate's whole-execution cost by the named amortized_targets"
+}

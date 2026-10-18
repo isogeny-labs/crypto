@@ -475,6 +475,41 @@ impl Instance {
 }
 
 /// ICV1's last field: the first 12 hex digits of the model hash.
+/// A derived public co-target for a binary instance, drawn with the same
+/// `hash_to_subgroup_v1` law as [`Instance::hash_to_subgroup`], returned
+/// as the point and the hash counter that landed it.  Methods that amortize
+/// a shared setup over several public targets use this so every co-target
+/// obeys the same public-target law as the workload's own target.
+pub fn public_binary_target(
+    inst: &BinaryInstance,
+    curve: &CurveFacts,
+    seed: u64,
+    index: u64,
+) -> Option<(crate::cryptanalysis::koblitz_fast::FastPoint, u64)> {
+    let model = model_hash(curve);
+    let r = u64::try_from(curve.r).ok()?;
+    let mut scratch = GroupOps::default();
+    for counter in 0..10_000u64 {
+        let h = derive_u64(PUBLIC_TARGET_LAW, &[model, r, seed, index, counter]);
+        let flip = (h >> 63) & 1 == 1;
+        let mask = if inst.n >= 64 {
+            u64::MAX
+        } else {
+            (1u64 << inst.n) - 1
+        };
+        let pts = inst.points_with_x(h & mask);
+        let Some(&p) = pts.get(usize::from(flip && pts.len() > 1)) else {
+            continue;
+        };
+        let g = BinaryGroup(&inst.fast);
+        let q = g.mul(&mut scratch, p, inst.cofactor);
+        if !q.infinity {
+            return Some((q, counter));
+        }
+    }
+    None
+}
+
 fn model_hash(curve: &CurveFacts) -> u64 {
     curve
         .icv1

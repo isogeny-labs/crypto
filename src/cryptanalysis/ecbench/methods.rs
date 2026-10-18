@@ -25,7 +25,9 @@ use crate::cryptanalysis::ecbench::claw::{pair_claw, pair_claw_wide, ClawOutcome
 use crate::cryptanalysis::ecbench::generic::{
     bsgs_interleaved, bsgs_negation, bsgs_textbook, kangaroo, GenericOutcome,
 };
-use crate::cryptanalysis::ecbench::workload::{CurveFacts, Instance, WideInstance};
+use crate::cryptanalysis::ecbench::workload::{
+    public_binary_target, CurveFacts, Instance, WideInstance,
+};
 use crate::cryptanalysis::ic_boundary::{
     rho_cap, rho_reference, rho_walk_with, signed_frobenius_rho_tuned, BinaryGroup, BinaryInstance,
     Calibration, CountedGroup, GroupOps, NegationClasses, PhaseCost, PointClasses, PrimeInstance,
@@ -44,7 +46,8 @@ use crate::cryptanalysis::ic_framework::stages::{
     DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, Targets,
 };
 use crate::cryptanalysis::ic_framework::transported_logs::{
-    run_hash_transported_log_target, run_transported_log_target, TransportedLogSpec,
+    run_hash_transported_log_multi_target, run_hash_transported_log_target,
+    run_transported_log_target, TransportedLogSpec,
 };
 use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec, RunReport};
 use crate::cryptanalysis::ic_measurement::{self as measurement, Phase, Snapshot};
@@ -315,6 +318,35 @@ pub fn registry() -> &'static [MethodDecl] {
                     name: "target_max_attempts",
                     default: None,
                     help: "direct Q query followed by at most this many total residual attempts",
+                },
+            ],
+        },
+        MethodDecl {
+            id: "ic.transported_logs_hash_multi",
+            family: "ic",
+            summary: "one shared hash-scheduled known-log base and folded pair table amortized over several public targets; the record's answer is the workload target, and the report carries the whole shared cost",
+            entry: "ic_framework::transported_logs::run_hash_transported_log_multi_target",
+            applies: Applies::KoblitzOnly,
+            params: &[
+                ParamDecl {
+                    name: "factor_base",
+                    default: None,
+                    help: "known-log-orbit:columns=N,scalar_cap=M,schedule=hash,seed=S; deterministic hash-selected generator multiples",
+                },
+                ParamDecl {
+                    name: "target_max_attempts",
+                    default: None,
+                    help: "per target: direct Q query followed by at most this many residual attempts",
+                },
+                ParamDecl {
+                    name: "amortized_targets",
+                    default: None,
+                    help: "number of public targets solved per shared base and table, including the workload target",
+                },
+                ParamDecl {
+                    name: "co_target_seed",
+                    default: None,
+                    help: "hash-to-subgroup seed for the T-1 derived public co-targets",
                 },
             ],
         },
@@ -856,9 +888,15 @@ fn solve_inner(
     }
     match (inst, d.family) {
         (Instance::Binary(i), _)
-            if m.id == "ic.transported_logs" || m.id == "ic.transported_logs_hash" =>
+            if m.id == "ic.transported_logs"
+                || m.id == "ic.transported_logs_hash"
+                || m.id == "ic.transported_logs_hash_multi" =>
         {
-            solve_transported_logs(m, i, curve, FastPoint::affine(tx, ty), seed)
+            if m.id == "ic.transported_logs_hash_multi" {
+                solve_transported_logs_multi(m, i, curve, FastPoint::affine(tx, ty), seed)
+            } else {
+                solve_transported_logs(m, i, curve, FastPoint::affine(tx, ty), seed)
+            }
         }
         (Instance::Binary(i), _) if m.id == "ic.shared_rank" => {
             solve_shared_rank(m, i, curve, FastPoint::affine(tx, ty), seed)
@@ -1069,10 +1107,217 @@ fn solve_transported_logs(
     })
 }
 
+/// The multi-target amortized variant of the hash-scheduled transported-log
+/// candidate: one cold base and one folded pair table are charged once and
+/// shared by `amortized_targets` public targets.  The workload's own target
+/// is always solved first, so the record's recovered logarithm answers it.
+/// The report carries the whole shared cost; dividing it by the target count
+/// to obtain the amortized per-target unit belongs to the analysis.
+fn solve_transported_logs_multi(
+    m: &ResolvedMethod,
+    inst: &BinaryInstance,
+    curve: &CurveFacts,
+    target: FastPoint,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    if inst.koblitz.is_none() {
+        return Err("ic.transported_logs_hash_multi needs a Koblitz instance".into());
+    }
+    let (name, params) = Params::parse_spec(&m.params["factor_base"])?;
+    let valid = name == "known-log-orbit"
+        && params.0.len() == 4
+        && params.0.contains_key("columns")
+        && params.0.contains_key("scalar_cap")
+        && params.get("schedule") == Some("hash")
+        && params.0.contains_key("seed");
+    if !valid {
+        return Err("ic.transported_logs_hash_multi needs exactly known-log-orbit:columns=N,scalar_cap=M,schedule=hash,seed=S".into());
+    }
+    let targets_total = param_u64(m, "amortized_targets")?;
+    if targets_total == 0 {
+        return Err("amortized_targets must be at least 1".into());
+    }
+    let co_seed = param_u64(m, "co_target_seed")?;
+    let mut targets = vec![target];
+    for index in 0..(targets_total - 1) {
+        let (co_target, counter) =
+            public_binary_target(inst, curve, co_seed, index).ok_or_else(|| {
+                format!("no derived public co-target {index} in 10 000 hash attempts")
+            })?;
+        if co_target == target {
+            return Err(format!("derived co-target {index} equals the workload target"));
+        }
+        // The derivation itself is not charged: it is the same
+        // hash-to-subgroup law that produced the workload target, and no
+        // solver sees the scalar.
+        let _ = counter;
+        targets.push(co_target);
+    }
+    let spec = TransportedLogSpec {
+        columns: usize::try_from(params.u64("columns")?).map_err(|_| "columns do not fit usize")?,
+        scalar_cap: params.u64("scalar_cap")?,
+        residual_seed: seed,
+        max_attempts: u32::try_from(param_u64(m, "target_max_attempts")?)
+            .map_err(|_| "target_max_attempts do not fit u32")?,
+    };
+    let calib = pinned_only_calibration("koblitz", &curve.slug);
+    let started = Instant::now();
+    let report = run_hash_transported_log_multi_target(
+        inst,
+        &spec,
+        &targets,
+        params.u64("seed")?,
+        &calib,
+    )?;
+    let wall = started.elapsed().as_nanos() as u64;
+    let mut phases = vec![
+        phase_of("factor_base", &report.base),
+        phase_of("oracle_setup", &report.table),
+        phase_of("transport_verification", &report.transport_verification),
+    ];
+    let mut online_wall_ns = 0u64;
+    let mut online_gae = 0.0;
+    for (index, target_report) in report.targets.iter().enumerate() {
+        phases.push(phase_of(&format!("target{index}_query"), &target_report.query));
+        phases.push(phase_of(&format!("target{index}_PDP"), &target_report.pdp));
+        phases.push(phase_of(
+            &format!("target{index}_relation_check"),
+            &target_report.relation_check,
+        ));
+        phases.push(phase_of(&format!("target{index}_descent"), &target_report.descent));
+        phases.push(phase_of(
+            &format!("target{index}_recovery_check"),
+            &target_report.recovery_check,
+        ));
+        online_wall_ns += target_report.online_wall_ns;
+        online_gae += target_report.query.gae
+            + target_report.pdp.gae
+            + target_report.relation_check.gae
+            + target_report.descent.gae
+            + target_report.recovery_check.gae;
+    }
+    let mut counters = BTreeMap::new();
+    counters.insert("transported_columns".into(), report.columns as u64);
+    counters.insert("amortized_targets".into(), targets_total);
+    counters.insert(
+        "targets_verified".into(),
+        report.targets.iter().filter(|t| t.verified).count() as u64,
+    );
+    counters.insert(
+        "pair_table_entries".into(),
+        report.table.get("pair_table_entries"),
+    );
+    let mut unpriced = Vec::new();
+    for phase in &phases {
+        for (name, &count) in &phase.native {
+            if count == 0 {
+                continue;
+            }
+            let priced = PRICED_NATIVE
+                .iter()
+                .find(|(counter, _)| *counter == name)
+                .is_some_and(|(_, unit)| calib.is_pinned(unit));
+            if !priced {
+                let label = if name.ends_with("_uncharged") {
+                    name.clone()
+                } else {
+                    format!("{name}_uncharged")
+                };
+                *counters.entry(label.clone()).or_insert(0) += count;
+                unpriced.push(label);
+            }
+        }
+    }
+    unpriced.extend([
+        "field_arithmetic_uncharged".into(),
+        "hash_and_allocation_uncharged".into(),
+        "modular_combination_uncharged".into(),
+    ]);
+    unpriced.sort();
+    unpriced.dedup();
+    let online = OnlineWindow {
+        wall_ns: online_wall_ns,
+        phases_ns: report
+            .targets
+            .iter()
+            .enumerate()
+            .flat_map(|(index, t)| {
+                [
+                    (format!("target{index}_query"), t.query.wall_ns),
+                    (format!("target{index}_PDP"), t.pdp.wall_ns),
+                    (format!("target{index}_relation_check"), t.relation_check.wall_ns),
+                    (format!("target{index}_descent"), t.descent.wall_ns),
+                    (format!("target{index}_recovery_check"), t.recovery_check.wall_ns),
+                ]
+            })
+            .collect(),
+        zero_phases: report
+            .targets
+            .iter()
+            .enumerate()
+            .flat_map(|(index, t)| {
+                [
+                    (format!("target{index}_descent"), t.descent.wall_ns),
+                    (format!("target{index}_relation_check"), t.relation_check.wall_ns),
+                ]
+            })
+            .filter(|(_, ns)| *ns == 0)
+            .map(|(name, _)| (name, "phase performed no work".into()))
+            .collect(),
+        start_event: "first target-dependent query of the first target, after the shared known-log base construction, transport verification and folded table setup".into(),
+        stop_event: "every target's [d]G = Q verified by full-point scalar replay".into(),
+        included_stages: report
+            .targets
+            .iter()
+            .enumerate()
+            .flat_map(|(index, _)| {
+                [
+                    format!("target{index}_query"),
+                    format!("target{index}_PDP"),
+                    format!("target{index}_relation_check"),
+                    format!("target{index}_descent"),
+                    format!("target{index}_recovery_check"),
+                ]
+            })
+            .collect(),
+        mapping: "shared cold base and table; each target's residual shifts, exact m3 folded-table PDP, witness replay, transported-log combination and full-point scalar replay are charged per target".into(),
+    };
+    if online.phases_ns.values().sum::<u64>() != online.wall_ns {
+        return Err("multi-target online phases do not sum to the online wall interval".into());
+    }
+    Ok(SolveReport {
+        recovered: report
+            .targets
+            .first()
+            .and_then(|t| t.recovered_log)
+            .map(u128::from),
+        exhausted: !report.verified,
+        phases,
+        total_gae: report.total_gae,
+        automorphisms_used: 2 * inst.n,
+        counters,
+        unpriced,
+        deterministic: true,
+        nondeterminism: Vec::new(),
+        solve_wall_ns: wall,
+        factor_base: None,
+        detail: json!({
+            "base_schedule": "deterministic_hash_selected_scalars",
+            "base_seed": params.u64("seed")?,
+            "co_target_seed": co_seed,
+            "amortized_targets": targets_total,
+            "online_gae": online_gae,
+            "report": report,
+        }),
+        online: Some(online),
+        online_error: None,
+        solver: None,
+    })
+}
+
 /// The online window from the phase clock's snapshot, mapped to the
 /// claim schema's stage names.
-fn online_window(family: &str, id: &str, snap: &Snapshot) -> Option<OnlineWindow> {
-    let wall_ns = snap.online_wall_ns?;
+fn online_window(family: &str, id: &str, snap: &Snapshot) -> Option<OnlineWindow> {    let wall_ns = snap.online_wall_ns?;
     let get = |name: &str| snap.online_phases_ns.get(name).copied().flatten();
     let mut w = OnlineWindow {
         wall_ns,
