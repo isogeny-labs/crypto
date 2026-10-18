@@ -67,6 +67,15 @@ def main():
     wrong = copy.deepcopy(data)
     wrong['different_cloud_instances'] = False
     assert subject.select(wrong)['online']['selected_candidate_id'] is None
+    tied = copy.deepcopy(data)
+    for point in tied['points']:
+        for arm in point['arms']:
+            arm['one_target_online_ms'] = 30
+            arm['cold_process_ms'] = 100_000
+    tied_result = subject.select(tied)
+    assert tied_result['online']['status'] == 'BOUNDED_UNKNOWN'
+    assert tied_result['online']['selected_candidate_id'] is None
+    assert tied_result['cold']['selected_candidate_id'] is None
     original = subject.sign_flip_p
     try:
         def unstable(_differences):
@@ -79,7 +88,7 @@ def main():
     finally:
         subject.sign_flip_p = original
     print(json.dumps({'status': 'PASS_ROOT4_FRONTIER_SELECTOR',
-                      'cases': 8, 'exact_minimum_p': minimum}, sort_keys=True))
+                      'cases': 9, 'exact_minimum_p': minimum}, sort_keys=True))
 
 
 if __name__ == '__main__':
