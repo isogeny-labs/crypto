@@ -262,3 +262,14 @@ Budgets: Part D 60 min, Part P 60 min, Parts O/J 4 h wall (4 threads). Each
 part writes CSVs, `checks.txt`, `env.txt`; each recorded run gets a run
 report, graphs and the round report. A cell over budget is reported as not
 run.
+
+## Amendment B (before any recorded run of Parts D and P)
+
+A smoke run of Part P (`PKM_SCALE=0.15`, outputs discarded) showed that the
+raw coverage difference "family minus null" is dominated by the factor-base
+size each arm happens to draw (a random `x`-set gives a different `|F|`, and
+at `m = 3` coverage moves as `|F|^3`). The primary statistic for P7 and P9 is
+therefore each arm's **residual from its own Poisson value**,
+`π − (1 − e^{−λ})` with `λ` the arm's own multiset count over `#E`, paired per
+field between the structured arm and the null arm, with a z-score over the
+fields. The raw `π` are still reported. Nothing else changes.
