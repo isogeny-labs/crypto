@@ -53,6 +53,17 @@ present at their manifest-listed sizes. The full 7,500-second hosted envelope
 is charged. These capped one-query results leave natural relation yield and
 complete index-calculus runtime unmeasured; no factor-base winner is selected.
 
+The [hosted equal-domain canonical 4+2 successor](verification/hosted-m6-canonical-run-39082501084/RESULT.md)
+retained the same target, coefficients and three exact S3-backed archives,
+while ordering exchangeable summand x coordinates within the four-base and
+two-residual blocks. Both Gray and hash arms again reached
+`UNKNOWN_search_cap` at 20,000 conflicts with zero models and only the first
+identity pattern attempted. The 65-file artifact, fresh S3 bytes for the three
+inputs, and live presence of all 54 pilot objects passed separate audits. Its
+full 7,500-second hosted envelope is charged. The different hosted jobs do not
+support a paired speed comparison, and this one-query screen still cannot
+select a minimum-total-runtime factor base.
+
 ## Matched retained-base extension, 2026-10-11
 
 The [K=1,182 versus K=2,048 matched search gate](verification/matched-k1182-k2048-900s-20261011/RESULT.md) used the same public point, source-matched Linux worker, five-summand orbit-domain search and 5,000-conflict cap for each S3-backed factor base. Both runs returned `UNKNOWN_solver_cap` with zero models, zero relations and rank zero. The complete point-row prefix and compressed object hashes were rechecked. The full additional 900 seconds were charged, bringing the cumulative conservative local charge at that round to **11,700 of 11,700 seconds**. Neither one-trial wall time ranks the bases by complete cold runtime; no minimum-runtime base is selected. Earlier dated budget paragraphs below describe their frozen rounds.
