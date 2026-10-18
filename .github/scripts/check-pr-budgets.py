@@ -58,6 +58,20 @@ NAMED_BUDGET_EXCEPTIONS = {
         "timeout": 30,
         "reason": "Polynomial-reuse correctness job; 15-minute runs that hit the 25-minute cap on slow shared runners (2026-10-17)",
     },
+    (".github/workflows/codeql.yml", "warm-rust-cache"): {
+        "timeout": 45,
+        "reason": "Whole-library Rust type-inference warm-up; cancelled at the 25-minute cap on #2149 and #2153 (2026-10-18)",
+    },
+    (".github/workflows/ecbench.yml", "harness"): {
+        "timeout": 45,
+        # The workflow's pull_request budget expression evaluates to 45.
+        "reason": "ecbench harness; cancelled at the 25-minute cap on #2135, #2149 and #2153 (2026-10-18)",
+    },
+    (".github/workflows/ic-producer.yml", "archived-producer"): {
+        "timeout": 45,
+        # The workflow's pull_request budget expression evaluates to 45.
+        "reason": "Archived IC producer replay; the scaled variant was cancelled at the 25-minute cap on #2149 and #2153 (2026-10-18)",
+    },
 }
 
 

@@ -373,7 +373,9 @@ jobs:
     name: Warm cache (rust)
     if: needs.scope.outputs.rust != 'false' && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
     needs: [scope, build-rust-database]
-    timeout-minutes: 25
+    # Type inference over the whole library ran past 25 minutes on the arm
+    # runner (#2149, #2153); check-pr-budgets.py names this exception.
+    timeout-minutes: 45
     runs-on: ubuntu-24.04-arm
     permissions:
       packages: read
