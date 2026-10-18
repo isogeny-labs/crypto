@@ -333,7 +333,7 @@ impl JobContext {
             step_cap,
             half_p,
         };
-        if let (Some(p), Some(t)) = (profile.as_deref_mut(), phase_start) {
+        if let (Some(p), Some(t)) = (profile, phase_start) {
             p.finalization_ns = t.elapsed().as_nanos();
         }
         Ok(context)

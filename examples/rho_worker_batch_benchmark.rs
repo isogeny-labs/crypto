@@ -57,7 +57,7 @@ fn main() {
     let step_cap: u64 = args[6].parse().expect("step cap");
     let batch_width: usize = args[7].parse().expect("batch width");
     assert!(walkers > 0 && walkers <= 256 && step_cap > 0);
-    assert!(dp_bits >= 2 && dp_bits < 32);
+    assert!((2..32).contains(&dp_bits));
     assert!(batch_width > 0 && batch_width <= walkers as usize);
     assert!(mode == "batch" || batch_width == 1);
 
