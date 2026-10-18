@@ -15,6 +15,8 @@
 
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+use std::collections::HashMap;
+use std::sync::OnceLock;
 
 use crate::binary_ecc::IrreduciblePoly;
 use crate::cryptanalysis::ecbench::canonical::{bare_id, compat_u128, derive_u128, derive_u64};
@@ -448,8 +450,7 @@ pub struct WideInstance {
 
 /// The registry's modulus for `K_a` over `F_{2^n}`, if it lists one.
 pub fn registry_koblitz_modulus(a: u8, n: u32) -> Option<IrreduciblePoly> {
-    let doc: Value = serde_json::from_str(REGISTRY).ok()?;
-    let entry = doc.get("curves")?.as_array()?.iter().find(|c| {
+    let entry = registry_curves().iter().find(|c| {
         let p = c.get("params");
         c.get("family").and_then(Value::as_str) == Some("koblitz")
             && p.and_then(|p| p.get("a")).and_then(Value::as_u64) == Some(u64::from(a))
@@ -504,14 +505,42 @@ pub struct CurveFacts {
 
 const REGISTRY: &str = include_str!("../../../docs/curves/registry.json");
 
+/// The registry's curves, parsed once per process: the document is several
+/// megabytes, and `facts()` runs once per target when planning and once in
+/// every measured child, so parsing it on each call was a fixed cost of
+/// tens of milliseconds per execution.
+fn registry_curves() -> &'static [Value] {
+    static CURVES: OnceLock<Vec<Value>> = OnceLock::new();
+    CURVES.get_or_init(|| {
+        serde_json::from_str::<Value>(REGISTRY)
+            .ok()
+            .and_then(|mut doc| doc.get_mut("curves").map(Value::take))
+            .and_then(|curves| match curves {
+                Value::Array(curves) => Some(curves),
+                _ => None,
+            })
+            .unwrap_or_default()
+    })
+}
+
+/// The registry's curves by slug, built once from [`registry_curves`].
+fn registry_index() -> &'static HashMap<&'static str, &'static Value> {
+    static INDEX: OnceLock<HashMap<&'static str, &'static Value>> = OnceLock::new();
+    INDEX.get_or_init(|| {
+        let mut index = HashMap::new();
+        for c in registry_curves() {
+            if let Some(slug) = c.get("slug").and_then(Value::as_str) {
+                // The first entry wins, as `Iterator::find` did.
+                index.entry(slug).or_insert(c);
+            }
+        }
+        index
+    })
+}
+
 /// The registry entry of `slug`, if any.
-fn registry_entry(slug: &str) -> Option<Value> {
-    let doc: Value = serde_json::from_str(REGISTRY).ok()?;
-    doc.get("curves")?
-        .as_array()?
-        .iter()
-        .find(|c| c.get("slug").and_then(Value::as_str) == Some(slug))
-        .cloned()
+fn registry_entry(slug: &str) -> Option<&'static Value> {
+    registry_index().get(slug).copied()
 }
 
 fn parse_hex(s: &str) -> Option<u128> {
@@ -671,9 +700,7 @@ impl Instance {
             }
         };
         let entry = registry_entry(&id.slug);
-        let rep = entry
-            .as_ref()
-            .and_then(|e| matching_representation(e, r, gx, gy));
+        let rep = entry.and_then(|e| matching_representation(e, r, gx, gy));
         CurveFacts {
             slug: id.slug,
             icv1: id.icv1,

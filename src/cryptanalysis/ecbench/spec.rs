@@ -14,7 +14,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
 use crate::cryptanalysis::ecbench::canonical::{derive_u64, short_id};
-use crate::cryptanalysis::ecbench::methods::{decl, resolve, Applies, MethodSpec, ResolvedMethod};
+use crate::cryptanalysis::ecbench::methods::{
+    applicable, decl, resolve, Applies, MethodSpec, ResolvedMethod,
+};
 use crate::cryptanalysis::ecbench::workload::{CurveSpec, Instance, TargetKind, Workload};
 
 pub const SPEC_SCHEMA: &str = "ecbench.spec/v1";
@@ -266,6 +268,15 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
                         a.name, a.method.id, w.curve.slug, w.curve.family
                     ));
                 }
+                if i == 0 {
+                    // Once per curve: the refusal does not depend on the target.
+                    applicable(&a.method, &inst, &w.curve).map_err(|e| {
+                        format!(
+                            "arm `{}` ({}) cannot run on {}: {e}",
+                            a.name, a.method.id, w.curve.slug
+                        )
+                    })?;
+                }
             }
             if workloads
                 .iter()
@@ -355,6 +366,19 @@ mod tests {
             .to_string(),
         )
         .unwrap()
+    }
+
+    /// An arm whose method cannot run on the spec's curve is a spec error
+    /// at plan time, not a session of `error` records.
+    #[test]
+    fn plan_rejects_an_arm_its_curve_cannot_run() {
+        let err = plan(spec(&[("q", "rho.quartic")])).err().expect("refused");
+        assert!(
+            err.contains("cannot run on") && err.contains("rho.quartic"),
+            "{err}"
+        );
+        let err = plan(spec(&[("k", "ic.k4_gaudry")])).err().expect("refused");
+        assert!(err.contains("fp4_translation"), "{err}");
     }
 
     #[test]

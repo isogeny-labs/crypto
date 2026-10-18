@@ -937,6 +937,16 @@ fn generic_report(
 
 /// Split a tuned rho run into set-up, walk and verification from its own
 /// counters; the frozen walk has none and stays one phase.
+/// Charge a class set-up performed on its own ledger (the scalar
+/// multiplication that fixes ι or ζ₃ on the subgroup) to a finished walk:
+/// the ledger, the total `gae` and `S` move together, so the phases
+/// `rho_report` derives from the ledger sum to the total it reports.
+fn charge_class_setup(res: &mut RhoResult, setup: GroupOps, r: u64) {
+    res.group_ops.merge(setup);
+    res.gae = res.group_ops.gae();
+    res.s = res.gae / (r as f64).sqrt();
+}
+
 fn rho_report(res: RhoResult, wall: u64, field_ops: Option<FieldOps>) -> SolveReport {
     let c = &res.counters;
     let get = |k: &str| c.get(k).copied().unwrap_or(0);
@@ -1091,6 +1101,62 @@ fn solve_wide(
 
 fn parse_hex(s: &str) -> Result<u64, String> {
     u64::from_str_radix(s.trim_start_matches("0x"), 16).map_err(|_| format!("bad hex `{s}`"))
+}
+
+/// Whether `m` can run on `inst` at all, decided when the spec is planned
+/// with the refusals `solve` would raise on every execution: a wide
+/// Koblitz curve past one word, which only the strong rhos and
+/// `claw.pair_table` implement; the CM folded controls and
+/// `ic.k4_gaudry`, each bound to one construction; and `rho.quartic` /
+/// `rho.cubic`, which need the j = 1728 / j = 0 structure on the subgroup.
+/// An arm that cannot run is a spec error, not a session of `error`
+/// records that `compare` then reports as incomplete.
+pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Result<(), String> {
+    let id = full_price::base_of(&m.id).unwrap_or(m.id.as_str());
+    if id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
+        return Err("CM folded controls require a prime-field instance".into());
+    }
+    if id == "ic.k4_gaudry" && !matches!(inst, Instance::Fp4(_)) {
+        return Err(format!(
+            "`ic.k4_gaudry` runs on fp4_translation curves only; {} is {}",
+            curve.slug, curve.family
+        ));
+    }
+    match inst {
+        Instance::Wide(wi) => match id {
+            "rho.signed_frobenius_strong"
+            | "rho.signed_frobenius_strong_legacy"
+            | "rho.signed_frobenius_strong_escape"
+            | "claw.pair_table" => Ok(()),
+            other => Err(format!(
+                "`{other}` has no wide-field implementation; on a curve past one word (n = {}) only the strong rho (with or without the escape) and claw.pair_table run",
+                wi.kc.n
+            )),
+        },
+        Instance::Prime(i) if id == "rho.quartic" => {
+            let mut scratch = GroupOps::default();
+            QuarticClasses::new(&i.curve, i.generator_point(), i.r, &mut scratch)
+                .map(|_| ())
+                .ok_or_else(|| format!(
+                    "`rho.quartic` needs a j = 1728 curve over p ≡ 1 (mod 4) with 4 | r − 1 and a nontrivial ι on the subgroup; {} lacks the structure",
+                    curve.slug
+                ))
+        }
+        Instance::Prime(i) if id == "rho.cubic" => {
+            let mut scratch = GroupOps::default();
+            CubicClasses::new(&i.curve, i.generator_point(), i.r, &mut scratch)
+                .map(|_| ())
+                .ok_or_else(|| format!(
+                    "`rho.cubic` needs a j = 0 curve over p ≡ 1 (mod 3) with 3 | r − 1 and a nontrivial ζ₃ on the subgroup; {} lacks the structure",
+                    curve.slug
+                ))
+        }
+        _ if id == "rho.quartic" || id == "rho.cubic" => Err(format!(
+            "`{id}` runs on prime-field curves only; {} is {}",
+            curve.slug, curve.family
+        )),
+        _ => Ok(()),
+    }
 }
 
 /// Solve for `target` with method `m` on `inst`, under algorithm seed
@@ -1263,7 +1329,7 @@ fn solve_inner(
                 rho_cap(i.r, param_u64(m, "cap_multiple")? as f64),
                 RhoWalk::negation(),
             );
-            res.group_ops.merge(setup);
+            charge_class_setup(&mut res, setup, i.r);
             measurement::end_online();
             let f = FieldOps::total(&[res.group_ops]);
             Ok(rho_report(res, t.elapsed().as_nanos() as u64, Some(f)))
@@ -1288,7 +1354,7 @@ fn solve_inner(
                 rho_cap(i.r, param_u64(m, "cap_multiple")? as f64),
                 RhoWalk::negation(),
             );
-            res.group_ops.merge(setup);
+            charge_class_setup(&mut res, setup, i.r);
             measurement::end_online();
             let f = FieldOps::total(&[res.group_ops]);
             Ok(rho_report(res, t.elapsed().as_nanos() as u64, Some(f)))
@@ -3029,6 +3095,60 @@ mod tests {
         );
         assert_eq!(s.sat_conflicts, None);
         assert_eq!(s.n_vars, None);
+    }
+
+    /// The quartic walk's class set-up (the scalar multiplication that
+    /// fixes ι on the subgroup) is charged on its own ledger and merged
+    /// in afterwards; the total and `S` must move with it, so the phases
+    /// sum to the total the record reports.
+    #[test]
+    fn quartic_class_setup_is_in_the_total_and_the_phases_sum_to_it() {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+        let m = resolve(&MethodSpec {
+            id: "rho.quartic".into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        // A j = 1728 crater curve of research/prime_rho_automorphism_20261015.
+        let spec = CurveSpec::PrimeExplicit {
+            p: 2463541,
+            a: 8,
+            b: 0,
+            group_order: 2460762,
+            r: 136709,
+            gx: 1664813,
+            gy: 581781,
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        applicable(&m, &inst, &facts).unwrap();
+        let Instance::Prime(prime) = &inst else {
+            unreachable!()
+        };
+        let mut scratch = GroupOps::default();
+        let target = prime.curve.mul(&mut scratch, prime.generator_point(), 4321);
+        let rep = solve(
+            &m,
+            &inst,
+            &facts,
+            &[format!("0x{:x}", target.x), format!("0x{:x}", target.y)],
+            3,
+        )
+        .unwrap();
+        assert_eq!(rep.recovered, Some(4321));
+        let phases: f64 = rep.phases.iter().map(|p| p.gae).sum();
+        assert_eq!(phases, rep.total_gae, "{:?}", rep.phases);
+        let setup = rep.phases.iter().find(|p| p.name == "setup").unwrap();
+        assert!(setup.gae > 0.0, "the class set-up is charged");
+        // A curve without the structure is refused when planned, with the
+        // message the solver would give on every execution.
+        let plain = CurveSpec::PrimeSearch {
+            bits: 12,
+            seed: 59297,
+        };
+        let plain_inst = plain.build().unwrap();
+        let err = applicable(&m, &plain_inst, &plain_inst.facts(&plain)).unwrap_err();
+        assert!(err.contains("lacks the structure"), "{err}");
     }
 
     /// A prime-curve solve reports the field operations behind its group

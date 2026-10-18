@@ -15,7 +15,9 @@
 
 use std::collections::BTreeMap;
 
-use crate::cryptanalysis::ic_boundary::{addmod, mulmod, CountedGroup, GroupOps};
+use crate::cryptanalysis::ic_boundary::{
+    addmod, fast_map, mulmod, CountedGroup, FastMap, GroupOps,
+};
 
 /// What one generic solve did.
 #[derive(Clone, Debug, Default)]
@@ -31,8 +33,14 @@ pub struct GenericOutcome {
 }
 
 impl GenericOutcome {
+    /// Called on every baby, giant or kangaroo step: the key is only
+    /// allocated the first time a counter is seen, not per step.
     fn count(&mut self, name: &str, by: u64) {
-        *self.counters.entry(name.to_string()).or_insert(0) += by;
+        if let Some(c) = self.counters.get_mut(name) {
+            *c += by;
+        } else {
+            self.counters.insert(name.to_string(), by);
+        }
     }
 }
 
@@ -63,8 +71,7 @@ pub fn bsgs_textbook<G: CountedGroup>(
 ) -> GenericOutcome {
     let mut out = GenericOutcome::default();
     let m = ceil_sqrt(r);
-    let mut table: std::collections::HashMap<u64, u64> =
-        std::collections::HashMap::with_capacity(m as usize);
+    let mut table: FastMap<u64> = fast_map(m as usize);
     let mut p = g.identity();
     for j in 0..m {
         table.entry(g.key(&p)).or_insert(j);
@@ -104,8 +111,10 @@ pub fn bsgs_interleaved<G: CountedGroup>(
     let m = ceil_sqrt(r);
     let stride = g.mul(&mut out.setup, gen, m);
     let back = g.neg(stride);
-    let mut baby: std::collections::HashMap<u64, u64> = std::collections::HashMap::new();
-    let mut giant: std::collections::HashMap<u64, u64> = std::collections::HashMap::new();
+    // Each table holds at most the steps taken before the collision, on
+    // average about √r · 2/3; sized for the expectation, grown past it.
+    let mut baby: FastMap<u64> = fast_map((m as usize).div_ceil(3) * 2);
+    let mut giant: FastMap<u64> = fast_map((m as usize).div_ceil(3) * 2);
     let mut b = g.identity();
     let mut y = target;
     for t in 0..m {
@@ -152,8 +161,7 @@ pub fn bsgs_negation<G: CountedGroup>(
 ) -> GenericOutcome {
     let mut out = GenericOutcome::default();
     let m = ceil_sqrt(r).div_ceil(2).max(1);
-    let mut table: std::collections::HashMap<u64, (u64, u64)> =
-        std::collections::HashMap::with_capacity(m as usize + 1);
+    let mut table: FastMap<(u64, u64)> = fast_map(m as usize + 1);
     let mut p = g.identity();
     for j in 0..=m {
         table.entry(class_key(g, &p)).or_insert((j, g.key(&p)));
@@ -251,7 +259,7 @@ pub fn kangaroo<G: CountedGroup>(
         (1u64 << shape.dp_bits) - 1
     };
     // kind 0 = tame (position = distance), kind 1 = wild (position = k + distance).
-    let mut table: std::collections::HashMap<u64, (u8, u64)> = std::collections::HashMap::new();
+    let mut table: FastMap<(u8, u64)> = fast_map(64);
     let mut rng = seed;
     let mut next = || {
         rng = mix(rng);
