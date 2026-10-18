@@ -66,10 +66,13 @@ receipts. The raw ZIPs remain outside Git under
 `/Volumes/SSD990/crypto/artifacts/n83_crossfamily_independent_audit_20261018/run_39075872898/`.
 
 The four factor bases themselves are content-addressed in the approved S3
-prefix, with [fresh-download and tamper audits](https://github.com/aburan28/crypto/blob/580d080e9b/research/n83_crossfamily_s3_custody_20261018/RESULT.md)
-in the separate custody PR. An additional
-[hosted independent replay](https://github.com/aburan28/crypto/actions/runs/39096459511)
-is running as a cross-check; its result will be recorded separately.
+prefix, with [fresh-download and tamper audits](https://github.com/aburan28/crypto/blob/44519dc5b4/research/n83_crossfamily_s3_custody_20261018/RESULT.md)
+in the separate custody PR. The additional
+[four-host independent replay](https://github.com/aburan28/crypto/blob/44519dc5b4/research/n83_crossfamily_independent_replay_20261018/RESULT.md)
+passed on distinct runners disjoint from the provider runners. Each full
+replayed JSON matched both the pinned provider analysis and the local replay.
+That cross-check adds provenance evidence, not new timing samples or a
+broader factor-base comparison.
 
 The unchanged source passed its 768-event preflight, 12-case selector suite,
 and sealed dispatch check. Re-executing the frozen selector over the committed
