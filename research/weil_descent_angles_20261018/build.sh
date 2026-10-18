@@ -22,3 +22,15 @@ pandoc REPORT.md -t typst --wrap=none -o /tmp/report_body.typ
 { cat preamble.typ; echo; cat /tmp/report_body.typ; } > REPORT.typ
 "$PY" -c "import typst; typst.compile('REPORT.typ', output='REPORT.pdf', root='.')"
 echo "built REPORT.pdf and reports/*/run-report.pdf"
+# round 4 (Addendum H)
+"$PY" figures/plot4.py results figures
+rep H1-hsweep-run-20261018T2240Z h1_cofactor_law.svg "H1: Arm J trials per p against the cofactor h, with rho and the M-H1 model; 30 cells x 4 instances x 10 targets."
+rep H2-glue-run-20261018T2240Z h2_glue.svg "H2: general E~E^sigma gluing, h = 1 and 4: group operations per p and the pricing band."
+rep H4-memsweep-run-20261018T2209Z h4_memory_time.svg "H4: trials against stored relations as the distinguished fraction theta falls."
+rep H5-aut-census-run-20261018T2227Z h7_subgroup.svg "H5 has no graph of its own (an exact census table); shown: the H7 graph of the same round."
+rep H6-large-run-20261018T2210Z h1_cofactor_law.svg "H6 values are in this report's summary; graph shown: H1 of the same round."
+rep H7-subgroup-run-20261018T2209Z h7_subgroup.svg "H7: coverage of the l-subgroup, subfield over null, mean and 1.96 s.e. per cell."
+pandoc REPORT_ROUND4.md -t typst --wrap=none -o /tmp/report4_body.typ
+{ cat preamble.typ; echo; cat /tmp/report4_body.typ; } > REPORT_ROUND4.typ
+"$PY" -c "import typst; typst.compile('REPORT_ROUND4.typ', output='REPORT_ROUND4.pdf', root='.')"
+echo "built REPORT_ROUND4.pdf"

@@ -671,3 +671,16 @@ addition and 51 M + 1 I per doubling; the generic law costs 113 M + 4 I and
 `c_E = 12 M + I` and `c_split = 2 M + 1 Legendre` (priced as one `I`).
 At `h = 1`, with `T_J ≈ 0.44` from the scratch run and `I = 3M`, that
 requires `c_J ≤ 22 M + I`.
+
+### Closing note on Addendum H (after the runs)
+
+- **Ran:** H1, H2, H3 (folded into H2), H4, H5, H6 and H7, each under
+  the frozen text plus Amendments H-a and H-b. Results are in
+  `REPORT_ROUND4.md`.
+- **H8 (decomposition at `n = 3`) was not run.** The repo's Semaev
+  tools are binary-field only, and a descended-`S_4` oracle over `F_{p³}`
+  is a separate build. It is listed as the next item-1 experiment.
+- **H9 is answered by existing studies, with no new run:**
+  `research/notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md` and
+  `research/pkm_tower_round*`, `pkm_dickson_torus_20261015`. Re-measuring
+  would duplicate them.

@@ -11,6 +11,12 @@ from pathlib import Path
 
 run, out, fig, cap = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3], sys.argv[4]
 TOOLS = {
+    "H1-hsweep": "examples/n2_routes.rs, mode hsweep (Addendum H1), on a RunPod CPU pod",
+    "H2-glue": "examples/n2_routes.rs, modes gluecheck and glue (Addendum H2/H3), on a RunPod CPU pod",
+    "H4-memsweep": "examples/n2_routes.rs, mode memsweep (Addendum H4)",
+    "H5-aut-census": "examples/genus2_aut_census.rs (Addendum H5)",
+    "H6-large": "examples/n2_routes.rs, mode run at 44 and 48 bits (Addendum H6), on a RunPod CPU pod",
+    "H7-subgroup": "examples/decomposition_coverage.rs, mode subgroup (Addendum H7)",
     "item4": "examples/genus4_res_census.rs (Parts T, H4, K)",
     "item1D-mult": "examples/decomposition_coverage.rs, mode mult (Amendment D)",
     "item1D": "examples/decomposition_coverage.rs (Part D)",
@@ -61,20 +67,21 @@ P = [f"""#set page(paper: "a4", flipped: true, margin: (x: 1.2cm, y: 1.2cm), num
 
 Descriptive record of one recorded run of {esc(tool)} under
 `research/weil_descent_angles_20261018/PROTOCOL.md` (Addendum A and
-Amendments B–G, each committed before the run it governs). It lists what
+Amendments B–G and Addendum H, each committed before the run it governs). It lists what
 ran, on what host, and what the tool recorded, file by file. Interpretation
 is in the study's `REPORT.md`. Costs are counted operations
 (F#sub[p] multiplications and inversions, group operations, native
 operations), never wall-clock; the only times are the tool's own seconds.
-Isolation: none earned (a shared cloud container, 4 threads); this
+Isolation: none earned (a shared cloud container, or a RunPod CPU pod whose lscpu is in host.txt); this
 affects only the seconds, since every recorded value is an exact count or
 a counted operation total.
 
 """]
 P.append(block("env.txt"))
 P.append(block("tool_log.txt"))
-for name in ["checks.txt", "summary.txt", "control_summary.txt"]:
-    P.append(block(name))
+for p in sorted(run.glob("*.txt")):
+    if p.name not in ("env.txt", "tool_log.txt"):
+        P.append(block(p.name))
 for p in sorted(run.glob("*.csv")):
     P.append(head(p.name))
 P.append(f"""

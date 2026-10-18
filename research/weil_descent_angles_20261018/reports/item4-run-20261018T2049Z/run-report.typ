@@ -10,12 +10,12 @@
 
 Descriptive record of one recorded run of examples/genus4\_res\_census.rs (Parts T, H4, K) under
 `research/weil_descent_angles_20261018/PROTOCOL.md` (Addendum A and
-Amendments B–G, each committed before the run it governs). It lists what
+Amendments B–G and Addendum H, each committed before the run it governs). It lists what
 ran, on what host, and what the tool recorded, file by file. Interpretation
 is in the study's `REPORT.md`. Costs are counted operations
 (F#sub[p] multiplications and inversions, group operations, native
 operations), never wall-clock; the only times are the tool's own seconds.
-Isolation: none earned (a shared cloud container, 4 threads); this
+Isolation: none earned (a shared cloud container, or a RunPod CPU pod whose lscpu is in host.txt); this
 affects only the seconds, since every recorded value is an exact count or
 a counted operation total.
 
