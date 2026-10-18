@@ -15,14 +15,22 @@ pub struct Mont {
 
 impl Mont {
     pub fn new(n: u64) -> Self {
-        assert!(n & 1 == 1 && n < (1u64 << 63) && n > 2, "modulus must be odd, 2 < n < 2^63");
+        assert!(
+            n & 1 == 1 && n < (1u64 << 63) && n > 2,
+            "modulus must be odd, 2 < n < 2^63"
+        );
         let mut inv: u64 = n;
         for _ in 0..6 {
             inv = inv.wrapping_mul(2u64.wrapping_sub(n.wrapping_mul(inv)));
         }
         let r = ((1u128 << 64) % n as u128) as u64;
         let r2 = ((r as u128 * r as u128) % n as u128) as u64;
-        Mont { n, ninv: inv.wrapping_neg(), r2, one: r }
+        Mont {
+            n,
+            ninv: inv.wrapping_neg(),
+            r2,
+            one: r,
+        }
     }
     #[inline(always)]
     pub fn one(&self) -> u64 {
@@ -330,12 +338,22 @@ mod tests {
     fn group_law_order() {
         // Count points of y^2 = x^3 + 2x + 3 over F_97 by brute force, then check [N]P = O.
         let f = Mont::new(97);
-        let e = Ec { f, a: f.to_mont(2), b: f.to_mont(3) };
+        let e = Ec {
+            f,
+            a: f.to_mont(2),
+            b: f.to_mont(3),
+        };
         let mut n = 1u64;
         for x in 0..97u64 {
             let xm = f.to_mont(x);
             let rhs = f.add(f.add(f.mul(f.mul(xm, xm), xm), f.mul(e.a, xm)), e.b);
-            n += if rhs == 0 { 1 } else if f.sqrt(rhs).is_some() { 2 } else { 0 };
+            n += if rhs == 0 {
+                1
+            } else if f.sqrt(rhs).is_some() {
+                2
+            } else {
+                0
+            };
         }
         let mut r = Rng(7);
         for _ in 0..20 {

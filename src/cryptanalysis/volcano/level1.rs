@@ -94,7 +94,15 @@ const Q_HI: i128 = 1 << 62;
 
 impl PrimeGen {
     pub fn new(d: i64, ell: u64) -> Self {
-        let mut g = PrimeGen { d, ell: ell as i128, v: 0, side: 1, x: 1, x_end: 0, seen: HashSet::new() };
+        let mut g = PrimeGen {
+            d,
+            ell: ell as i128,
+            v: 0,
+            side: 1,
+            x: 1,
+            x_end: 0,
+            seen: HashSet::new(),
+        };
         g.advance_range();
         g
     }
@@ -414,7 +422,12 @@ fn sym_residue(val: &BigUint, m: &BigUint, q: u64) -> u64 {
 
 /// `Φ_ℓ(X, j₀)` with `j₀ = j(O_K)`, coefficients low degree first, length `ℓ + 2`
 /// (monic).  `batch` primes are evaluated in parallel per round.
-pub fn phi_at_crater(d: i64, ell: u64, batch: usize, progress: bool) -> Result<(Vec<BigInt>, Level1Report), String> {
+pub fn phi_at_crater(
+    d: i64,
+    ell: u64,
+    batch: usize,
+    progress: bool,
+) -> Result<(Vec<BigInt>, Level1Report), String> {
     let j0 = class_one_j(d).ok_or("D must be a class-number-one fundamental discriminant")?;
     if ell < 3 || ell % 2 == 0 || !is_prime_u64(ell) {
         return Err("ell must be an odd prime".into());
@@ -444,7 +457,8 @@ pub fn phi_at_crater(d: i64, ell: u64, batch: usize, progress: bool) -> Result<(
         // convergence test against the whole fresh batch
         if used > 0 {
             let all_ok = (0..ncoef).into_par_iter().all(|k| {
-                res.iter().all(|(q, r)| sym_residue(&vals[k], &m, *q) == r[k])
+                res.iter()
+                    .all(|(q, r)| sym_residue(&vals[k], &m, *q) == r[k])
             });
             if all_ok {
                 let mut out: Vec<BigInt> = Vec::with_capacity(ncoef + 1);
@@ -569,7 +583,6 @@ mod tests {
         }
     }
 
-
     /// Independent native cross-check: the repository's own `Φ_ℓ mod p` (computed from the
     /// `q`-expansion of `j`, `isogeny_walk::modpoly`) evaluated at `j₀ mod p` must equal our
     /// integer polynomial reduced mod `p`.  Covers the special craters `j = 0` and `j = 1728`.
@@ -578,8 +591,13 @@ mod tests {
         use crate::cryptanalysis::isogeny_walk::field::Field;
         use crate::cryptanalysis::isogeny_walk::modpoly::modular_polynomial;
         let primes: [u64; 3] = [1_000_003, 998_244_353, 4_611_686_018_427_387_847];
-        let cases: [(i64, &[u64]); 5] =
-            [(-7, &[5, 7, 11, 13, 17, 19]), (-3, &[5, 7, 11]), (-4, &[5, 7, 13]), (-8, &[5, 11]), (-163, &[5, 7])];
+        let cases: [(i64, &[u64]); 5] = [
+            (-7, &[5, 7, 11, 13, 17, 19]),
+            (-3, &[5, 7, 11]),
+            (-4, &[5, 7, 13]),
+            (-8, &[5, 11]),
+            (-163, &[5, 7]),
+        ];
         for (d, ells) in cases {
             let j0 = class_one_j(d).unwrap();
             for &ell in ells {
@@ -591,7 +609,11 @@ mod tests {
                     assert_eq!(theirs.len(), ours.len(), "degree, D={d} ell={ell} p={p}");
                     for (k, c) in ours.iter().enumerate() {
                         let want = c.mod_floor(&BigInt::from(p)).to_biguint().unwrap();
-                        assert_eq!(f.to_big(&theirs[k]), want, "coefficient {k}, D={d} ell={ell} p={p}");
+                        assert_eq!(
+                            f.to_big(&theirs[k]),
+                            want,
+                            "coefficient {k}, D={d} ell={ell} p={p}"
+                        );
                     }
                 }
             }

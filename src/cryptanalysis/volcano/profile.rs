@@ -17,7 +17,9 @@ pub fn is_probable_prime(n: &BigUint) -> bool {
     if n < &two {
         return false;
     }
-    for p in [2u32, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53] {
+    for p in [
+        2u32, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53,
+    ] {
         let bp = BigUint::from(p);
         if n == &bp {
             return true;
@@ -29,7 +31,9 @@ pub fn is_probable_prime(n: &BigUint) -> bool {
     let nm1 = n - 1u32;
     let s = nm1.trailing_zeros().unwrap_or(0);
     let d = &nm1 >> s;
-    'w: for a in [2u32, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53] {
+    'w: for a in [
+        2u32, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53,
+    ] {
         let mut x = BigUint::from(a).modpow(&d, n);
         if x.is_one() || x == nm1 {
             continue;
@@ -146,7 +150,11 @@ pub fn factor(n: &BigUint) -> (Vec<(BigUint, u32)>, Option<BigUint>) {
         }
     }
     out.sort();
-    let cof = if stuck.is_empty() { None } else { Some(stuck.iter().fold(BigUint::one(), |a, b| a * b)) };
+    let cof = if stuck.is_empty() {
+        None
+    } else {
+        Some(stuck.iter().fold(BigUint::one(), |a, b| a * b))
+    };
     (out, cof)
 }
 
@@ -255,7 +263,9 @@ pub fn analyze(q: BigUint, t: BigInt, known: Option<(i64, BigUint)>) -> Result<P
     if !delta.is_negative() {
         return Err("t^2 - 4q >= 0: not an ordinary curve with a CM Frobenius order".into());
     }
-    let n_order = (BigInt::from(q.clone()) + BigInt::one() - &t).to_biguint().ok_or("negative order")?;
+    let n_order = (BigInt::from(q.clone()) + BigInt::one() - &t)
+        .to_biguint()
+        .ok_or("negative order")?;
     let (d_k, f, f_factors, f_unfactored) = match known {
         Some((dk, f)) => {
             let chk = BigInt::from(dk) * BigInt::from(f.clone()) * BigInt::from(f.clone());
@@ -296,8 +306,21 @@ pub fn analyze(q: BigUint, t: BigInt, known: Option<(i64, BigUint)>) -> Result<P
             (dk, f, ff, cof_note)
         }
     };
-    let h_k = d_k.to_i64().filter(|d| d.abs() < 4_000_000_000).map(class_number_primitive);
-    Ok(Profile { q, t, n_order, delta, d_k, f, f_factors, f_unfactored, h_k })
+    let h_k = d_k
+        .to_i64()
+        .filter(|d| d.abs() < 4_000_000_000)
+        .map(class_number_primitive);
+    Ok(Profile {
+        q,
+        t,
+        n_order,
+        delta,
+        d_k,
+        f,
+        f_factors,
+        f_unfactored,
+        h_k,
+    })
 }
 
 #[derive(Clone, Debug)]
@@ -317,11 +340,21 @@ pub fn prime_rows(p: &Profile) -> Vec<PrimeRow> {
         .map(|(ell, v)| {
             let k = kronecker(&p.d_k, ell);
             let horiz = 1 + k;
-            let desc = ell.clone() - BigUint::from(k.max(0) as u32) + if k < 0 { BigUint::one() } else { BigUint::zero() };
-            let h = p.d_k.to_i64().zip(p.h_k).filter(|_| p.f_unfactored.is_none()).map(|(dk, hk)| {
-                let cond = ell.clone();
-                class_number_of_order(dk, hk, &cond)
-            });
+            let desc = ell.clone() - BigUint::from(k.max(0) as u32)
+                + if k < 0 {
+                    BigUint::one()
+                } else {
+                    BigUint::zero()
+                };
+            let h = p
+                .d_k
+                .to_i64()
+                .zip(p.h_k)
+                .filter(|_| p.f_unfactored.is_none())
+                .map(|(dk, hk)| {
+                    let cond = ell.clone();
+                    class_number_of_order(dk, hk, &cond)
+                });
             PrimeRow {
                 ell: ell.clone(),
                 depth: *v,
@@ -374,8 +407,16 @@ pub fn level_table(p: &Profile, ell: &BigUint, c: &BigUint) -> Result<Vec<LevelR
     if p.f_unfactored.is_some() {
         return Err("conductor not fully factored; level table would be unreliable".into());
     }
-    let v = p.f_factors.iter().find(|(l, _)| l == ell).map(|(_, v)| *v).unwrap_or(0);
-    let dk = p.d_k.to_i64().ok_or("D_K too large for the class-number routines")?;
+    let v = p
+        .f_factors
+        .iter()
+        .find(|(l, _)| l == ell)
+        .map(|(_, v)| *v)
+        .unwrap_or(0);
+    let dk = p
+        .d_k
+        .to_i64()
+        .ok_or("D_K too large for the class-number routines")?;
     let x = (&p.t - &p.d_k * BigInt::from(p.f.clone())) / 2;
     let a = &x - 1;
     let mut ell_pow = BigUint::one();
@@ -388,7 +429,13 @@ pub fn level_table(p: &Profile, ell: &BigUint, c: &BigUint) -> Result<Vec<LevelR
         let n1 = BigInt::from(p.f.clone() / &d).gcd(&a).to_biguint().unwrap();
         let n2 = &p.n_order / &n1;
         let nc = p.h_k.map(|hk| class_number_of_order(dk, hk, &d));
-        rows.push(LevelRow { level: i, conductor: d, n_curves: nc, n1, n2 });
+        rows.push(LevelRow {
+            level: i,
+            conductor: d,
+            n_curves: nc,
+            n1,
+            n2,
+        });
         ell_pow *= ell;
     }
     Ok(rows)
@@ -400,7 +447,18 @@ mod tests {
 
     #[test]
     fn class_numbers() {
-        for (d, h) in [(-3i64, 1u64), (-4, 1), (-7, 1), (-15, 2), (-23, 3), (-47, 5), (-63, 4), (-112, 2), (-27, 1), (-28, 1)] {
+        for (d, h) in [
+            (-3i64, 1u64),
+            (-4, 1),
+            (-7, 1),
+            (-15, 2),
+            (-23, 3),
+            (-47, 5),
+            (-63, 4),
+            (-112, 2),
+            (-27, 1),
+            (-28, 1),
+        ] {
             assert_eq!(class_number_primitive(d), h, "h({d})");
         }
     }

@@ -52,14 +52,20 @@ pub fn find_irreducible(n: u32) -> IrreduciblePoly {
     };
     for k in 1..nn {
         if is_irreducible(&mk(&[k, 0]), nn) {
-            return IrreduciblePoly { degree: n, low_terms: vec![0, k as u32] };
+            return IrreduciblePoly {
+                degree: n,
+                low_terms: vec![0, k as u32],
+            };
         }
     }
     for a in 3..nn {
         for b in 2..a {
             for c in 1..b {
                 if is_irreducible(&mk(&[a, b, c, 0]), nn) {
-                    return IrreduciblePoly { degree: n, low_terms: vec![0, c as u32, b as u32, a as u32] };
+                    return IrreduciblePoly {
+                        degree: n,
+                        low_terms: vec![0, c as u32, b as u32, a as u32],
+                    };
                 }
             }
         }
@@ -71,9 +77,13 @@ fn rand_elt(n: u32, rng: &mut u64) -> F2mElement {
     let words = (n as usize).div_ceil(64);
     let mut w = vec![0u64; words];
     for v in w.iter_mut() {
-        *rng = rng.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        *rng = rng
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         let hi = *rng;
-        *rng = rng.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        *rng = rng
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         *v = (hi & 0xFFFF_FFFF_0000_0000) | (*rng >> 32);
     }
     F2mElement::from_words(&w, n)
@@ -82,8 +92,15 @@ fn rand_elt(n: u32, rng: &mut u64) -> F2mElement {
 /// Embed an `F_2` polynomial as a polynomial over `F_{2^n}`.
 pub fn lift_poly(g: &F2Poly, n: u32) -> F2mPoly {
     let d = g.deg().unwrap_or(0);
-    let coeffs: Vec<F2mElement> =
-        (0..=d).map(|i| if g.coeff(i) { F2mElement::one(n) } else { F2mElement::zero(n) }).collect();
+    let coeffs: Vec<F2mElement> = (0..=d)
+        .map(|i| {
+            if g.coeff(i) {
+                F2mElement::one(n)
+            } else {
+                F2mElement::zero(n)
+            }
+        })
+        .collect();
     F2mPoly::from_coeffs(coeffs, n)
 }
 
@@ -164,7 +181,11 @@ pub fn curve_for_j(j: &F2mElement, a2: bool, n: u32, irr: &IrreduciblePoly) -> B
     BinaryCurve {
         m: n,
         irreducible: irr.clone(),
-        a: if a2 { F2mElement::one(n) } else { F2mElement::zero(n) },
+        a: if a2 {
+            F2mElement::one(n)
+        } else {
+            F2mElement::zero(n)
+        },
         b: a6,
         generator: BinaryPoint::Infinity,
         order: BigUint::one(),
@@ -256,7 +277,9 @@ mod tests {
             .add(&F2Poly::monomial(1))
             .add(&F2Poly::one());
         assert!(is_irreducible(&aes, 8));
-        let red = F2Poly::monomial(4).add(&F2Poly::monomial(2)).add(&F2Poly::one()); // (x^2+x+1)^2
+        let red = F2Poly::monomial(4)
+            .add(&F2Poly::monomial(2))
+            .add(&F2Poly::one()); // (x^2+x+1)^2
         assert!(!is_irreducible(&red, 4));
     }
 

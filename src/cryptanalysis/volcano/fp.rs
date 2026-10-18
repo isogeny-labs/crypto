@@ -61,7 +61,15 @@ fn isqrt(n: i128) -> i128 {
 
 /// Random `(p, t)` with `t² − 4p = D (ℓ^k)²`, `v_ℓ(A) ≥ m`, `p` of about `bits` bits.
 /// `smooth_slack = Some(s)` also requires `#E = (product of primes below 1230, < 2^s) × (one prime)`.
-pub fn find_instance(ell: u64, d: i64, k: u32, m: u32, bits: u32, seed: u64, smooth_slack: Option<u32>) -> Result<Instance, String> {
+pub fn find_instance(
+    ell: u64,
+    d: i64,
+    k: u32,
+    m: u32,
+    bits: u32,
+    seed: u64,
+    smooth_slack: Option<u32>,
+) -> Result<Instance, String> {
     class_one_j(d).ok_or("D must be a class-number-one fundamental discriminant")?;
     if !(3..=62).contains(&bits) || m > k {
         return Err("need 3 <= bits <= 62 and m <= k".into());
@@ -69,7 +77,10 @@ pub fn find_instance(ell: u64, d: i64, k: u32, m: u32, bits: u32, seed: u64, smo
     let f = ell.pow(k) as i128;
     let dd = d as i128;
     if (d.rem_euclid(8) == 1) && f % 2 == 1 {
-        return Err("local obstruction: D ≡ 1 (mod 8) with odd f makes N(π) even; use an even conductor".into());
+        return Err(
+            "local obstruction: D ≡ 1 (mod 8) with odd f makes N(π) even; use an even conductor"
+                .into(),
+        );
     }
     if (1i128 << (bits + 1)) <= -dd * f * f {
         return Err("bits too small for this depth: need p >= |D| f² / 4".into());
@@ -107,7 +118,14 @@ pub fn find_instance(ell: u64, d: i64, k: u32, m: u32, bits: u32, seed: u64, smo
                 continue;
             }
         }
-        return Ok(Instance { ell, d, k, m, p, t: t as i64 });
+        return Ok(Instance {
+            ell,
+            d,
+            k,
+            m,
+            p,
+            t: t as i64,
+        });
     }
     Err("no instance found (a local congruence may forbid this combination)".into())
 }
@@ -174,7 +192,12 @@ pub fn explore(inst: &Instance, ctx: &Ctx, max_vertices: usize) -> Result<Volcan
 
 /// Breadth-first search from the crater that does not expand vertices at `max_level`: every
 /// vertex of levels `0..=max_level` is found, and `totals` holds only the expanded ones.
-pub fn explore_to(inst: &Instance, ctx: &Ctx, max_level: u32, max_vertices: usize) -> Result<Volcano, String> {
+pub fn explore_to(
+    inst: &Instance,
+    ctx: &Ctx,
+    max_level: u32,
+    max_vertices: usize,
+) -> Result<Volcano, String> {
     let j0 = crater_j(inst);
     let mut level = HashMap::new();
     let mut totals = HashMap::new();
@@ -200,7 +223,12 @@ pub fn explore_to(inst: &Instance, ctx: &Ctx, max_level: u32, max_vertices: usiz
             }
         }
     }
-    Ok(Volcano { level, totals, edges, order })
+    Ok(Volcano {
+        level,
+        totals,
+        edges,
+        order,
+    })
 }
 
 /// Level sizes expected from the class numbers `h(O_{ℓ^i})`, `i = 0..=k`.
@@ -235,7 +263,9 @@ pub fn degree_violations(inst: &Instance, v: &Volcano) -> usize {
 pub fn group_order_factors(n: u64) -> Vec<(u64, u32)> {
     let (f, cof) = profile::factor(&BigUint::from(n));
     assert!(cof.is_none());
-    f.into_iter().map(|(p, e)| (p.to_u64().unwrap(), e)).collect()
+    f.into_iter()
+        .map(|(p, e)| (p.to_u64().unwrap(), e))
+        .collect()
 }
 
 fn point_order(ec: &Ec, p: Pt, n: u64, fac: &[(u64, u32)]) -> u64 {
@@ -257,7 +287,12 @@ fn gcd64(a: u64, b: u64) -> u64 {
 }
 
 /// `(n1, n2)` with `E(F_p) = Z/n1 × Z/n2` from the exponent of 24 random points.
-pub fn group_structure(ec: &Ec, n: u64, fac: &[(u64, u32)], rng: &mut Rng) -> Result<(u64, u64), String> {
+pub fn group_structure(
+    ec: &Ec,
+    n: u64,
+    fac: &[(u64, u32)],
+    rng: &mut Rng,
+) -> Result<(u64, u64), String> {
     let mut e = 1u64;
     for _ in 0..24 {
         let p = ec.random_point(rng);
@@ -272,10 +307,17 @@ pub fn group_structure(ec: &Ec, n: u64, fac: &[(u64, u32)], rng: &mut Rng) -> Re
 
 /// `(n1, n2)` predicted by `O_d/(π − 1)` for a vertex at `level`.
 pub fn predicted_structure(inst: &Instance, level: u32) -> Result<(u64, u64), String> {
-    let prof = profile::analyze(BigUint::from(inst.p), BigInt::from(inst.t), Some((inst.d, BigUint::from(inst.conductor()))))?;
+    let prof = profile::analyze(
+        BigUint::from(inst.p),
+        BigInt::from(inst.t),
+        Some((inst.d, BigUint::from(inst.conductor()))),
+    )?;
     let rows = profile::level_table(&prof, &BigUint::from(inst.ell), &BigUint::one())?;
     let r = rows.get(level as usize).ok_or("level out of range")?;
-    Ok((r.n1.to_u64().ok_or("n1 too large")?, r.n2.to_u64().ok_or("n2 too large")?))
+    Ok((
+        r.n1.to_u64().ok_or("n1 too large")?,
+        r.n2.to_u64().ok_or("n2 too large")?,
+    ))
 }
 
 pub fn curve_of(inst: &Instance, j: u64, rng: &mut Rng) -> Result<Ec, String> {
@@ -327,12 +369,20 @@ pub struct Descent {
 /// Blind descent: needs only `p`, the trace (for the depth `k = v_ℓ(f)`), `ℓ` and a start `j`.
 pub fn blind_descent(ctx: &Ctx, k: u32, j0: u64, rng: &mut Rng) -> Result<Descent, String> {
     if k == 0 {
-        return Ok(Descent { path: vec![j0], start_level: 0, k });
+        return Ok(Descent {
+            path: vec![j0],
+            start_level: 0,
+            k,
+        });
     }
     let (nb, tot) = ctx.neighbors(j0);
     let mut path = vec![j0];
     if tot == 1 {
-        return Ok(Descent { path, start_level: k, k });
+        return Ok(Descent {
+            path,
+            start_level: k,
+            k,
+        });
     }
     let mut best: Option<(u64, u32)> = None;
     for &(r, _) in &nb {
@@ -353,7 +403,9 @@ pub fn blind_descent(ctx: &Ctx, k: u32, j0: u64, rng: &mut Rng) -> Result<Descen
         }
     }
     let (first, first_len) = best.ok_or("no descending neighbour found")?;
-    let start_level = k.checked_sub(first_len).ok_or("walk longer than the depth")?;
+    let start_level = k
+        .checked_sub(first_len)
+        .ok_or("walk longer than the depth")?;
     let (mut prev, mut cur) = (j0, first);
     path.push(cur);
     loop {
@@ -368,7 +420,11 @@ pub fn blind_descent(ctx: &Ctx, k: u32, j0: u64, rng: &mut Rng) -> Result<Descen
             }
         }
     }
-    Ok(Descent { path, start_level, k })
+    Ok(Descent {
+        path,
+        start_level,
+        k,
+    })
 }
 
 /// A random descent from the crater `j0` of a volcano whose crater is one vertex (class
@@ -376,11 +432,19 @@ pub fn blind_descent(ctx: &Ctx, k: u32, j0: u64, rng: &mut Rng) -> Result<Descen
 /// chosen kernel other than the one back to the parent, `depth` steps in all.  Returns the path
 /// with each vertex's rational-kernel count, checked against the degree rule (ℓ + 1 above the
 /// floor, 1 on it); a violation is an error, never a silent skip.
-pub fn random_descent(ctx: &Ctx, j0: u64, depth: u32, rng: &mut Rng) -> Result<Vec<(u64, u32)>, String> {
+pub fn random_descent(
+    ctx: &Ctx,
+    j0: u64,
+    depth: u32,
+    rng: &mut Rng,
+) -> Result<Vec<(u64, u32)>, String> {
     let want = |l: u32| if l < depth { ctx.ell as u32 + 1 } else { 1 };
     let (nb, tot) = ctx.neighbors(j0);
     if tot != want(0) {
-        return Err(format!("crater has {tot} rational kernels, expected {}", want(0)));
+        return Err(format!(
+            "crater has {tot} rational kernels, expected {}",
+            want(0)
+        ));
     }
     let mut path = vec![(j0, tot)];
     let mut av: Vec<(u64, u32)> = nb.into_iter().filter(|&(r, _)| r != j0).collect();
@@ -400,7 +464,10 @@ pub fn random_descent(ctx: &Ctx, j0: u64, depth: u32, rng: &mut Rng) -> Result<V
         }
         let (nb, tot) = ctx.neighbors(next);
         if tot != want(l) {
-            return Err(format!("vertex {next} at level {l} has {tot} rational kernels, expected {}", want(l)));
+            return Err(format!(
+                "vertex {next} at level {l} has {tot} rational kernels, expected {}",
+                want(l)
+            ));
         }
         path.push((next, tot));
         av = avail(&nb, Some(path[path.len() - 2].0));
@@ -425,7 +492,12 @@ pub struct VertexCurve {
 
 /// A curve with trace `t` at `j`, its group structure, and a generator of the largest
 /// prime-order subgroup (for ecbench's `prime_explicit`).
-pub fn vertex_curve(inst: &Instance, level: u32, j: u64, rng: &mut Rng) -> Result<VertexCurve, String> {
+pub fn vertex_curve(
+    inst: &Instance,
+    level: u32,
+    j: u64,
+    rng: &mut Rng,
+) -> Result<VertexCurve, String> {
     let ec = curve_of(inst, j, rng)?;
     let n = inst.order();
     let fac = group_order_factors(n);
@@ -467,9 +539,19 @@ mod tests {
 
     #[test]
     fn level_sizes_equal_class_numbers_and_degrees_hold() {
-        for (ell, d, k, m, bits) in [(2u64, -7i64, 6u32, 0u32, 36u32), (2, -4, 5, 3, 36), (3, -8, 4, 2, 36), (5, -4, 3, 1, 36), (2, -3, 5, 2, 36), (3, -3, 4, 0, 36)] {
+        for (ell, d, k, m, bits) in [
+            (2u64, -7i64, 6u32, 0u32, 36u32),
+            (2, -4, 5, 3, 36),
+            (3, -8, 4, 2, 36),
+            (5, -4, 3, 1, 36),
+            (2, -3, 5, 2, 36),
+            (3, -3, 4, 0, 36),
+        ] {
             let (inst, _ctx, v) = run(ell, d, k, m, bits);
-            let want: Vec<usize> = expected_level_sizes(&inst).iter().map(|x| x.to_usize().unwrap()).collect();
+            let want: Vec<usize> = expected_level_sizes(&inst)
+                .iter()
+                .map(|x| x.to_usize().unwrap())
+                .collect();
             assert_eq!(level_sizes(&v, k), want, "ell={ell} D={d}");
             assert_eq!(degree_violations(&inst, &v), 0, "ell={ell} D={d}");
         }
@@ -477,7 +559,11 @@ mod tests {
 
     #[test]
     fn group_structure_matches_the_ideal_quotient_at_every_level() {
-        for (ell, d, k, m, bits) in [(2u64, -7i64, 6u32, 6u32, 40u32), (3, -8, 4, 2, 40), (2, -4, 5, 5, 40)] {
+        for (ell, d, k, m, bits) in [
+            (2u64, -7i64, 6u32, 6u32, 40u32),
+            (3, -8, 4, 2, 40),
+            (2, -4, 5, 5, 40),
+        ] {
             let (inst, _ctx, v) = run(ell, d, k, m, bits);
             let mut rng = Rng(11);
             let mut by_level: HashMap<u32, Vec<u64>> = HashMap::new();
@@ -489,17 +575,31 @@ mod tests {
                 let ec = curve_of(&inst, j, &mut rng).unwrap();
                 let fac = group_order_factors(inst.order());
                 let got = group_structure(&ec, inst.order(), &fac, &mut rng).unwrap();
-                assert_eq!(got, predicted_structure(&inst, l).unwrap(), "level {l}, ell={ell} D={d}");
+                assert_eq!(
+                    got,
+                    predicted_structure(&inst, l).unwrap(),
+                    "level {l}, ell={ell} D={d}"
+                );
             }
         }
     }
 
     #[test]
     fn blind_descent_agrees_with_exploration_including_the_automorphism_craters() {
-        for (ell, d, k, m, bits) in [(2u64, -3i64, 5u32, 3u32, 36u32), (2, -4, 5, 2, 36), (3, -4, 4, 1, 36), (2, -7, 6, 0, 36)] {
+        for (ell, d, k, m, bits) in [
+            (2u64, -3i64, 5u32, 3u32, 36u32),
+            (2, -4, 5, 2, 36),
+            (3, -4, 4, 1, 36),
+            (2, -7, 6, 0, 36),
+        ] {
             let (inst, ctx, v) = run(ell, d, k, m, bits);
             let mut rng = Rng(5);
-            let mut starts: Vec<u64> = v.level.iter().filter(|(_, &l)| l <= 1).map(|(&j, _)| j).collect();
+            let mut starts: Vec<u64> = v
+                .level
+                .iter()
+                .filter(|(_, &l)| l <= 1)
+                .map(|(&j, _)| j)
+                .collect();
             starts.extend(v.order.iter().step_by(7).take(20));
             for j in starts {
                 let dsc = blind_descent(&ctx, k, j, &mut rng).unwrap();
@@ -514,11 +614,22 @@ mod tests {
 
     #[test]
     fn truncated_search_and_random_descents_agree_with_full_exploration() {
-        for (ell, d, k, m, bits) in [(2u64, -7i64, 7u32, 0u32, 36u32), (2, -3, 6, 0, 36), (2, -4, 6, 0, 36), (3, -3, 4, 0, 36), (3, -11, 4, 0, 36), (5, -19, 3, 0, 40)] {
+        for (ell, d, k, m, bits) in [
+            (2u64, -7i64, 7u32, 0u32, 36u32),
+            (2, -3, 6, 0, 36),
+            (2, -4, 6, 0, 36),
+            (3, -3, 4, 0, 36),
+            (3, -11, 4, 0, 36),
+            (5, -19, 3, 0, 40),
+        ] {
             let (inst, ctx, v) = run(ell, d, k, m, bits);
             let top = k / 2;
             let t = explore_to(&inst, &ctx, top, 1_000_000).unwrap();
-            assert_eq!(level_sizes(&t, top), level_sizes(&v, k)[..=top as usize].to_vec(), "ell={ell} D={d}");
+            assert_eq!(
+                level_sizes(&t, top),
+                level_sizes(&v, k)[..=top as usize].to_vec(),
+                "ell={ell} D={d}"
+            );
             let mut rng = Rng(3);
             for _ in 0..8 {
                 let path = random_descent(&ctx, crater_j(&inst), k, &mut rng).unwrap();
