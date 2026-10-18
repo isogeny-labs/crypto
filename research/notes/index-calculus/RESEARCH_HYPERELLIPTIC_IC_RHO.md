@@ -1419,3 +1419,84 @@ under study changes; the comparison does. Predicted direction: every
 ratio rises, by up to `√2` where the walk dominates, by less at toy `N`
 where rho's precomputation does. The genus-4 headline (0.24 walk-
 renormalised) should move to about 0.34.
+
+## Round nine: measured
+
+Registered run: card `CARD-HEIC-ROUND9-5`, receipt
+`research/notes/index-calculus/round9/run5/receipt.json` (status
+completed), output `run5/R9.txt` (sha256 `a6a02c3f…`), isolation record
+`run5/isolated_bench.jsonl` (uncontended, 554 s on reserved CPU 3).
+Counted operations only; they are deterministic in the seed, and attempt
+3's complete output is byte-identical in every row. Four earlier
+attempts failed for reasons unrelated to the walk and are kept beside it
+with an `ATTEMPT.md` each: a constructor change on `main` (attempt 1), an
+executor that returned before its background run finished (2), a
+wrapper timeout just after the binary finished (3), and an isolation
+preflight that counted the agent harness's own 0.21 CPU-seconds (4).
+Card 5 relaxed only that preflight threshold, which gates wall time and
+not counts. All 18 instances are round seven's (`N` identical).
+
+| | registered test | result |
+|--|--|--|
+| **R1** | median folded/plain walk ops ≤ 0.80 at `N ≥ 10⁵` | **falsified: 0.968** (7 rows) |
+| R2 | look-ahead + escape steps ≤ 10% of folded walk | holds: max 6.5% |
+| R3 | every run verified | holds: 18 × 40 × 2 |
+
+| g | `p` | `N` | plain `S_walk` | folded `S_walk` | folded/plain |
+|--:|--:|--:|--:|--:|--:|
+| 2 | 41 – 251 | 1321 – 61667 | 1.25 – 1.42 | 0.87 – 1.09 | 0.67 – 0.87 |
+| 3 | 23 – 41 | 6299 – 7333 | 1.05 – 1.31 | 0.90 – 1.03 | 0.72 – 0.89 |
+| 3 | 61 | 124459 | 1.48 | 1.18 | 0.80 |
+| 3 | 101 | 364747 | 1.41 | 1.36 | 0.97 |
+| 3 | 151 | 1180351 | 1.71 | 0.95 | 0.56 |
+| 3 | 211 | 4620611 | **1.82** | **2.15** | 1.18 |
+| 4 | 17 – 23 | 5639 – 30223 | 1.23 – 1.42 | 1.05 – 1.08 | 0.74 – 0.87 |
+| 4 | 31 | 239753 | 1.30 | 1.49 | 1.14 |
+| 4 | 41 | 333041 | 1.34 | 1.01 | 0.75 |
+| 4 | 61 | 16790591 | **2.10** | **2.16** | 1.03 |
+
+(Ideals: plain 1.2533, folded 0.8862, ratio 0.7071.)
+
+**Reading it.** On small groups the fold works as the theory says. On
+the largest the reference does not: the *plain* walk is 45 – 68% above
+its ideal at the two biggest rows (the drift round five worked around by
+renormalising), and the folded walk loses its whole advantage there. Two
+things the registered tests did not separate are now the question:
+
+1. **Both walks degrade with `N`.** That is a property of the walk, not
+   of the fold. A candidate cause, from reading the code: `divisor_hash`
+   is a multiply-accumulate (`acc·C + limb`), so its low bits — the
+   distinguished-point test — depend only on the low bits of each
+   coefficient, and its branch bits are weakly mixed when every limb is
+   a coefficient below `p ≤ 251`. A poorly mixed branch function makes
+   an `r`-adding walk correlated with its own position, which is worse
+   than random and gets worse with `N`. Unverified.
+2. **R2 under-counts the fold's waste.** It counts the escape step but
+   not the steps spent inside a fruitless cycle before the escape fires
+   (up to `32·2^θ`). The folded walk's loss at large `N` may be that.
+
+**Decision, per the protocol's stop rule:** the folded walk is recorded
+as built and measured; the reference stays as it is until the cause is
+understood. Class: none — no ratio in the thread changes.
+
+**Amendment (additive), on rules that changed after round eight.**
+`AGENTS.md` now requires cross-method ECDLP measurements to go through
+the native `ecbench` harness (§12), requires every arm's unpriced work
+(hashes, canonicalisations, table probes; IC bookkeeping outside the
+timers) to be counted and priced at 0, 0.1 and 1 GAE before arms are
+ranked (§5a), and forbids Python for research harnesses and analysis.
+This thread's IC/rho ratios predate all three: `ecbench` has no
+hyperelliptic family, neither arm emits its unpriced counters, and the
+round-seven and round-eight analyses are Python. **Every IC/rho ratio
+this thread has reported is therefore a lower-bound comparison under
+§5a, and unranked.** Their frozen evidence stands as written. Round nine
+itself reads counts only, was analysed natively, and ranks nothing
+across methods.
+
+**Next.** (a) Test the hash hypothesis: the same walk with
+`divisor_hash` passed through a strong 64-bit finaliser, all else equal,
+registered as round ten; if the plain walk returns to ≈ 1.25 at large
+`N`, every ratio in the thread has been flattered by up to 1.7× and
+must be re-measured. (b) Add a native word-arithmetic Jacobian
+`CountedGroup` to `ecbench`, so that `rho.negation` and the IC can be
+measured under the repository's current rules.
