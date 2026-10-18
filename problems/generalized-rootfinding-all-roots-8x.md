@@ -2,9 +2,9 @@
 
 - **Status:** open
 - **Kind:** implementation and empirical qualification gaps
-- **Affected work:** [theory cycle](../research/quintic_cached_frobenius_20261017_v1/README.md), [next experiment](../backlog/XP-20261017-quintic-support-frobenius/README.md)
+- **Affected work:** [native bounded solver](../tools/generalized-rootfinder/README.md), [Boolean comparison](../research/f4_f5_boolean_perf_20261018/REPORT.md), [theory cycle](../research/quintic_cached_frobenius_20261017_v1/README.md), [next experiment](../backlog/XP-20261017-quintic-support-frobenius/README.md)
 - **Next action owner:** generalized-rootfinding research program
-- **Last updated:**2026-10-17
+- **Last updated:**2026-10-18
 
 ## Problem
 A novel exact generalized solver with qualified8x end-to-end gain over the
@@ -48,5 +48,17 @@ alone. Mismatch refutes implementation; regression rejects universal dispatch;
 a null result redirects work toward upstream reuse and hard-family search.
 
 ## Resolution and history
+
+2026-10-18: Completed a native bounded generalized solver with certified fields,
+exact polynomial, affine-linearized and rational-composition domains, complete
+system enumeration/component MITM/Boolean dispatch, and the complete original
+eight-coordinate S3 separator. Ten independent native tests pass, including
+literal all-coordinate separator enumeration, poles, repeated and inseparable
+roots, a wide prime certificate and GF(2^83) extraction. The linked study
+compares matching 16/22-variable Boolean root sets and same-target F6/rootfind
+decomposition calls. This closes the bounded native execution gap for these
+contracts. It does not close hard implicit-domain search, the original
+20-case external-comparator/runtime gate, independent-host replay, novelty
+or the requested 8x qualification. Those conditions remain unchanged.
 Unresolved. This record and its PR keep the original requirement visible;
 they do not stop the continuing program or close the goal.

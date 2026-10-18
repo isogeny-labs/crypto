@@ -61,6 +61,61 @@ fn reuse_table_enabled() -> bool {
     *REUSE_TABLE.get_or_init(|| std::env::var("KIC_GF2_REUSE_TABLE").as_deref() == Ok("1"))
 }
 
+/// Experimental single-write table construction. Instruction counts can
+/// establish less initialization work, but cannot establish native speed;
+/// retain the historical default until isolated runtime comparisons exist.
+fn write_table_once_enabled() -> bool {
+    static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ENABLED.get_or_init(|| std::env::var("KIC_GF2_WRITE_TABLE_ONCE").as_deref() == Ok("1"))
+}
+
+/// Build only addressable entries, initializing each exactly once. The
+/// previous entry `g & (g - 1)` is always below `g`, so every read observes
+/// an initialized entry. The last table can be shorter than `table_size`:
+/// its selectors contain only as many bits as its remaining pivots.
+fn build_tables_once(
+    matrix: &[Vec<u64>],
+    block_start: usize,
+    pivots: usize,
+    bits: usize,
+    range: std::ops::Range<usize>,
+    table: &mut Vec<u64>,
+    word_ops: &mut u64,
+) {
+    let suffix = range.len();
+    let table_size = 1usize << bits;
+    let n_tables = pivots.div_ceil(bits);
+    let last_bits = pivots - (n_tables - 1) * bits;
+    let len = ((n_tables - 1) * table_size + (1usize << last_bits)) * suffix;
+    table.clear();
+    table.reserve(len);
+    let out = table.as_mut_ptr();
+    for t in 0..n_tables {
+        let group_len = bits.min(pivots - t * bits);
+        let base = t * table_size * suffix;
+        // SAFETY: reserve provides `len` writable slots. Entry zero is
+        // initialized here; every nonzero entry is written in full below.
+        unsafe { std::ptr::write_bytes(out.add(base), 0, suffix) };
+        for g in 1usize..(1 << group_len) {
+            let prev = g & (g - 1);
+            let src = &matrix[block_start + t * bits + g.trailing_zeros() as usize][range.clone()];
+            for (i, &word) in src.iter().enumerate() {
+                // SAFETY: `prev < g` names an initialized earlier entry
+                // of this table. Destination and source entries are disjoint
+                // and every destination index is strictly below `len`.
+                unsafe {
+                    let old = out.add(base + prev * suffix + i).read();
+                    out.add(base + g * suffix + i).write(old ^ word);
+                }
+            }
+            *word_ops += suffix as u64;
+        }
+    }
+    // SAFETY: all `len` entries have been initialized. No unused tail
+    // entries are included in the vector or in the slice handed to clears.
+    unsafe { table.set_len(len) };
+}
+
 /// Largest pattern width of one Gray-code table.
 const MAX_TABLE_BITS: usize = 8;
 
@@ -718,13 +773,26 @@ fn clear_block(
     let suffix = end_word - first_word;
     let n_tables = b.div_ceil(bits);
     let table_size = 1usize << bits;
-    if !reuse_table {
-        table.clear();
+    let write_once = write_table_once_enabled();
+    if write_once {
+        build_tables_once(
+            matrix,
+            block_start,
+            b,
+            bits,
+            first_word..end_word,
+            table,
+            word_ops,
+        );
+    } else {
+        if !reuse_table {
+            table.clear();
+        }
+        table.resize(n_tables * table_size * suffix, 0);
     }
-    table.resize(n_tables * table_size * suffix, 0);
     // Gray-code tables: entry g of table t is the XOR of the pivots whose
     // bits within the table's group are set in g.
-    for t in 0..n_tables {
+    for t in 0..if write_once { 0 } else { n_tables } {
         let group = &pivot_cols[t * bits..((t + 1) * bits).min(b)];
         let base = t * table_size * suffix;
         if reuse_table {
@@ -1000,6 +1068,51 @@ pub fn simd_available() -> bool {
 mod tests {
     use super::*;
     use rand::{rngs::StdRng, Rng, SeedableRng};
+
+    #[test]
+    fn single_write_tables_match_subset_xors_with_partial_groups_and_reused_storage() {
+        let mut rng = StdRng::seed_from_u64(0x47_ab_901);
+        let mut table = vec![u64::MAX; 200_000];
+        for bits in 1..=8 {
+            for pivots in 1..=4 * bits {
+                for suffix in [1, 2, 7, 133] {
+                    let matrix: Vec<Vec<u64>> = (0..pivots + 3)
+                        .map(|_| (0..suffix + 4).map(|_| rng.gen()).collect())
+                        .collect();
+                    let mut ops = 17;
+                    build_tables_once(
+                        &matrix,
+                        3,
+                        pivots,
+                        bits,
+                        2..suffix + 2,
+                        &mut table,
+                        &mut ops,
+                    );
+                    let tables = pivots.div_ceil(bits);
+                    let size = 1usize << bits;
+                    let expected_len =
+                        ((tables - 1) * size + (1 << (pivots - (tables - 1) * bits))) * suffix;
+                    assert_eq!(table.len(), expected_len);
+                    let mut expected_ops = 17;
+                    for t in 0..tables {
+                        let group = bits.min(pivots - t * bits);
+                        for g in 0..1usize << group {
+                            for i in 0..suffix {
+                                let expected = (0..group)
+                                    .filter(|&j| g >> j & 1 != 0)
+                                    .fold(0, |acc, j| acc ^ matrix[3 + t * bits + j][i + 2]);
+                                assert_eq!(table[(t * size + g) * suffix + i], expected);
+                            }
+                        }
+                        expected_ops += ((1u64 << group) - 1) * suffix as u64;
+                    }
+                    assert_eq!(ops, expected_ops);
+                    table.fill(u64::MAX);
+                }
+            }
+        }
+    }
 
     #[test]
     fn branchless_strip_matches_conditional_clear() {

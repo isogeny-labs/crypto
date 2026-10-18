@@ -72,6 +72,7 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "boolean_solver_component": "research/f4_f5_boolean_perf_20261018/component.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -1069,6 +1070,7 @@ def build() -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "boolean_solver_component": load(SOURCES["boolean_solver_component"]),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -1129,6 +1131,16 @@ def markdown(doc: dict) -> str:
          "`× reference` and `× floor` are comparable within a table and nowhere else.  The same slug "
          "can appear in two tables with different `S`, because the unit, the reference and the number "
          "of targets differ.", ""]
+    component = doc["boolean_solver_component"]
+    L += ["## Boolean F4/F5 instruction work, outside tables A–C", "", component["scope"], "",
+          "| engine | field degree | seed | before Ir | candidate Ir | before/candidate | samples per arm |",
+          "|:--|--:|--:|--:|--:|--:|:--|"]
+    for row in component["rows"]:
+        L.append(f"| {row['case'][0]} | {row['case'][1]} | {row['case'][2]} | {row['reference_median_ir']:,.0f} | "
+                 f"{row['candidate_median_ir']:,.0f} | {row['reference_over_candidate']:.4f} | "
+                 f"{row['reference_samples']}/{row['candidate_samples']} |")
+    L += ["", f"[Native solver and complete evidence](../../{component['study']}) · "
+          f"[report](../../{component['report']}). The default kernel is unchanged; no whole-pipeline row moves.", ""]
     audit = doc["latest_frontier_audit"]
     cold = audit["cold"]
     admitted = audit["admitted_online"]
@@ -2061,6 +2073,17 @@ def page(doc: dict, standalone: bool) -> str:
              'This Tier 1 wall-time panel uses its own unit and sits outside the '
              'operation-unit S rankings.</p>' +
              gh(n83["source"], 'Frozen IC1 rows and candidate identities') + '</section>')
+
+    component = doc["boolean_solver_component"]
+    rows = "".join(f"<tr><td>{esc(row['case'][0])}</td><td>{row['case'][1]}</td><td>{row['case'][2]}</td>"
+                   f"<td>{row['reference_median_ir']:,.0f}</td><td>{row['candidate_median_ir']:,.0f}</td>"
+                   f"<td>{row['reference_over_candidate']:.4f}</td>"
+                   f"<td>{row['reference_samples']}/{row['candidate_samples']}</td></tr>" for row in component["rows"])
+    P.append('<section id="boolean-solver-component"><h2>Boolean F4/F5 instruction work</h2><p>'
+             + esc(component["scope"]) + '</p><table><thead><tr><th>Engine</th><th>Field degree</th><th>Seed</th><th>Before Ir</th>'
+             '<th>Candidate Ir</th><th>Before/candidate</th><th>Samples per arm</th></tr></thead><tbody>'
+             + rows + '</tbody></table><p>Outside tables A–C; default kernel unchanged. '
+             + gh(component["report"], 'Complete solver and comparison report') + '</p></section>')
 
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '

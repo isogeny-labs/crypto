@@ -1,0 +1,78 @@
+name: Boolean solver qualification
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - src/cryptanalysis/gf2_elim.rs
+      - examples/f4_f5_boolean_perf.rs
+      - tools/generalized-rootfinder/**
+      - .github/workflows/boolean-single-write-runtime.yml
+
+permissions:
+  contents: read
+
+jobs:
+  native-solver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tools/generalized-rootfinder -> target
+      - name: Complete root and certificate tests
+        run: cargo test --release --locked --manifest-path tools/generalized-rootfinder/Cargo.toml
+  runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build before measurement
+        run: cargo build --release --locked --example f4_f5_boolean_perf --bin isolated_bench
+      - name: A/A and alternating A/B, one worker
+        env:
+          RAYON_NUM_THREADS: '1'
+        shell: bash
+        run: |
+          set -u
+          out="$RUNNER_TEMP/boolean-runtime"
+          mkdir -p "$out"
+          git rev-parse HEAD > "$out/revision.txt"
+          rustc --version > "$out/compiler.txt"
+          lscpu > "$out/cpu.txt"
+          sha256sum target/release/examples/f4_f5_boolean_perf > "$out/binary.sha256"
+          cpu=$(lscpu -p=CPU | sed '/^#/d' | tail -1)
+          cpus=$(cat "/sys/devices/system/cpu/cpu$cpu/topology/thread_siblings_list")
+          for arm in matrix-f4 matrix-f5; do
+            for phase in aa ab; do
+              for round in 0 1 2 3 4; do
+                for side in a b; do
+                  state=0
+                  if [ "$phase" = ab ] && [ "$side" = b ]; then state=1; fi
+                  sample="$out/$arm-$phase-$round-$side"
+                  for attempt in 0 1 2; do
+                    if sudo target/release/isolated_bench run --cpus "$cpus" --out "$sample-$attempt.isolation.jsonl" --label "$arm-$phase-$round-$side" -- \
+                      env RAYON_NUM_THREADS=1 KIC_GF2_WRITE_TABLE_ONCE="$state" timeout 60 \
+                      target/release/examples/f4_f5_boolean_perf --arm "$arm" \
+                      > "$sample-$attempt.jsonl" 2> "$sample-$attempt.stderr"; then
+                      break
+                    fi
+                  done
+                done
+              done
+            done
+          done
+          rustc --edition 2021 -O research/f4_f5_boolean_perf_20261018/runtime.rs \
+            -L dependency=target/release/deps --extern serde_json="$(find target/release/deps -name 'libserde_json-*.rlib' | head -1)" \
+            -o "$out/analyze-runtime"
+          "$out/analyze-runtime" "$out" > "$out/qualification.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: boolean-runtime-${{ github.run_id }}
+          path: ${{ runner.temp }}/boolean-runtime
+          if-no-files-found: error
