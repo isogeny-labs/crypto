@@ -31,7 +31,7 @@ def run(a):
         "name": a.name, "cloudType": "SECURE", "imageName": "runpod/base:1.0.2-ubuntu2404",
         "containerDiskInGb": a.disk, "volumeInGb": 0, "ports": ["8000/http"],
         "dockerEntrypoint": ["bash", "-c"], "dockerStartCmd": [START],
-        "env": {"JOB": a.job, "BRANCH": a.branch, "POD_MAX_SECONDS": str(a.max_seconds)},  # no secrets on the pod
+        "env": {"JOB": a.job, "BRANCH": a.branch, "POD_MAX_SECONDS": str(a.max_seconds), **dict(kv.split("=", 1) for kv in a.env)},  # no secrets on the pod
     }
     if a.gpu:
         body.update({"computeType": "GPU", "gpuTypeIds": [a.gpu], "gpuCount": a.gpu_count,
@@ -51,6 +51,7 @@ def main():
     r.add_argument("--flavors", default="cpu5m,cpu3m"); r.add_argument("--disk", type=int, default=150)
     r.add_argument("--max-seconds", type=int, default=172800); r.add_argument("--gpu"); r.add_argument("--gpu-count", type=int, default=1)
     r.add_argument("--min-ram-per-gpu", type=int, default=8); r.add_argument("--min-vcpu-per-gpu", type=int, default=2)
+    r.add_argument("--env", action="append", default=[], help="extra K=V for the pod (no secrets)")
     for c in ("status", "stop", "terminate", "url"): sub.add_parser(c).add_argument("id")
     sub.add_parser("ls")
     a = p.parse_args()
