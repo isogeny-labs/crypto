@@ -2227,3 +2227,46 @@ the three 2-torsion points are on `E`; where the `x₀·F_p` base is non-empty, 
 `#C(F_{p²})`, `C : v² = t³ − 1`; the other curves have an empty base.  Both branches occur.
 **G2.26 holds: direction 4 is closed** — the order-24 group exists on that line, and the line
 carries no point of the large subgroup.  Class: a negative, by derivation, confirmed on points.
+
+### 9.9 E20 measured: double large primes at `k = 4` on the folded base — the right exponent, the wrong constant
+
+*2026-10-18.*  Run: `experiments/28_e20_dlp/run.sh` (the ic_next10 ladder, `--arms d4dlp,rho
+--c4-d4 1.40e9`, one thread, 4 GB cap); raw `experiments/28_e20_dlp/ladder.jsonl`; tables
+`experiments/28_e20_dlp/tables.md` (`glv_invariant_experiment_tables`, `e20`).  **Deviations from
+§9.7, stated:** (1) `p = 2053` was dropped, because the ladder's exact three-point oracle table does
+not fit in memory there (`≈ 12 GB`); sizes are `p = 269, 521, 1033`, two curves each.  (2) The
+instances are the ladder's (`generate_translation_instance(p, seed, 16)`); every curve drew
+`h = 4`.  (3) The small base is the first `⌈cols^{3/4}⌉` `τ_T`-classes in base order, as the
+ladder's own DLP arm does, not a uniform draw.  **Prior work found after registration:** the
+ladder (`research/ic_next10_20261014/01-fp4-ladder/`, 2026-10-14) had already run DLP at
+`k = 4` on the *unfolded* `x`-line base, charged at the `S₄` solve's `C₄ = 1.213·10¹²`: DLP
+`1.8`–`4.5×` dearer than plain, crossing it at `#E ≈ 2^{219}`.  E20 adds the `τ_T`-folded `D₄`
+base charged at the weighted `C`, which that run did not have.
+
+| p | log₂ r | trials full | trials DLP | DLP / full | `S` full / rho-neg | `S` DLP / rho-neg |
+|--:|--:|--:|--:|--:|--:|--:|
+| 269 | 30.3 | 10,020 / 6,823 | 16,586 / 11,915 | 1.66 / 1.75 | `4.5·10⁶` / `2.8·10⁶` | `7.4·10⁶` / `4.8·10⁶` |
+| 521 | 34.1 | 10,717 / 12,459 | 25,905 / 31,499 | 2.42 / 2.53 | `1.2·10⁶` / `1.3·10⁶` | `2.8·10⁶` / `3.2·10⁶` |
+| 1033 | 38.1 | 24,319 / 30,321 | 76,761 / 109,255 | 3.16 / 3.60 | `7.2·10⁵` / `9.8·10⁵` | `2.3·10⁶` / `3.5·10⁶` |
+
+Fitted exponents in `p` (theory in brackets): relation full `0.89` (1), linear algebra full `2.12`
+(2), relation DLP `1.39` (3/2), linear algebra DLP `1.89` (3/2), rho `1.95` (2).
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.14 | every log verified (18 of 18: three arms × six curves); every walk correct; the null arm (`F' = F`) reproduced the full arm's trials and `S` exactly on all six | **holds** |
+| G2.15 | `S_DLP / S_full` = `1.66`–`3.60`, above 1 at every `p`, widening | **holds** |
+| G2.16 | targets per full relation DLP / full grows as `p^{0.51}` | **holds** (band `[0.25, 1.0]`) |
+| G2.17 | DLP below the full base at `2^{164}` (fitted exponents) / `2^{222}` (theory exponents); DLP below rho at `2^{193}` / `2^{209}` | **holds** (falsifier: either below `2^{160}`) |
+
+**A cross-check that comes for free.**  With the theory exponents imposed, the *full* base crosses
+rho at `2^{119}` — `d4-s5`'s `2^{118.9}`, re-derived here from a different harness and different
+targets.  With the freely fitted exponents it never does: the full-base linear algebra fits
+`p^{2.12}` against rho's `p^{1.95}` over three sizes, which a ±0.1 error in either exponent
+explains; the theory exponents (both `2`, E18's constant `r`) are the ones to read.
+
+**What it says.**  Double large primes have the sub-rho exponent at `k = 4` and lose by the
+constant: at the weighted `C ≈ 1.4·10⁹` the solve is the whole cost at every size anyone can run,
+so shrinking the matrix buys nothing until `n ≈ 2^{164}–2^{222}`, long after the full base has
+already crossed rho (`2^{119}`).  Cutting `C` moves both crossovers; that is E21's and E22's
+question.  **Class: measurement.**

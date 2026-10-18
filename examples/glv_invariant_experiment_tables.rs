@@ -2124,6 +2124,164 @@ fn e19(o: &mut String, rows: &[&Value]) {
     }
 }
 
+/// Least squares `log₂ y = a + b·log₂ x`: `(a, b)`.
+fn fit_line(points: &[(f64, f64)]) -> Option<(f64, f64)> {
+    let b = fit_exponent(points)?;
+    let pts: Vec<(f64, f64)> = points.iter().map(|(x, y)| (x.log2(), y.log2())).collect();
+    let a = mean(&pts.iter().map(|p| p.1 - b * p.0).collect::<Vec<_>>());
+    Some((a, b))
+}
+
+/// E20 (goal G2, note §9.7): double large primes on the `τ_T`-folded `D₄`
+/// base, every trial charged at E19's weighted `C`, in the ic_next10 ladder
+/// (`--arms d4dlp`).  Units are the ladder's: GAE (one `E(F_{p⁴})` addition,
+/// `97` `F_p` multiplications).  The relation phase is `trials · C / 97`; the
+/// rest of each arm's charged cost (linear algebra, merges, base) is "other".
+/// Crossovers come from power laws fitted in `p` per phase, extrapolated.
+fn e20(o: &mut String, rows: &[&Value]) {
+    let rows = sorted(rows, &["p", "seed"]);
+    o.push_str(
+        "### E20 — double large primes on the τ_T-folded D₄ base, charged at the weighted C\n\n",
+    );
+    o.push_str("| p | seed | log2 r | h | cols full / small | trials full | trials DLP | DLP / full trials | LA full (GAE) | LA DLP (GAE) | S full / rho-neg | S DLP / rho-neg | S DLP / S full | correct (full, DLP, null = full) |\n");
+    o.push_str("|--:|--:|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|\n");
+    let arm = |r: &Value, name: &str| -> Option<Value> {
+        r["arms"]
+            .as_array()?
+            .iter()
+            .find(|a| a["arm"].as_str() == Some(name))
+            .cloned()
+    };
+    let (mut rf, mut lf, mut rd, mut ld, mut rho, mut ratio) =
+        (vec![], vec![], vec![], vec![], vec![], vec![]);
+    let (mut bf, mut bd) = (vec![], vec![]);
+    let mut log2h = Vec::new();
+    for r in &rows {
+        let (Some(f), Some(d), Some(z)) = (arm(r, "d4"), arm(r, "d4-dlp"), arm(r, "d4-dlp-null"))
+        else {
+            continue;
+        };
+        let sq = fl(r, "r").sqrt();
+        let p = fl(r, "p");
+        let rel = |a: &Value| fl(a, "trials") * fl(a, "c4_fp_mults") / 97.0;
+        let la = |a: &Value| (fl(a, "la_modr_mults") + fl(a, "merge_modr_mults")) * 16.0 / 97.0;
+        let other = |a: &Value| fl(a, "S_charged") * sq - rel(a);
+        let rho_s = fl(r, "rho.rho-neg.mean_S");
+        rf.push((p, rel(&f)));
+        lf.push((p, la(&f)));
+        rd.push((p, rel(&d)));
+        ld.push((p, la(&d)));
+        bf.push((p, other(&f) - la(&f)));
+        bd.push((p, other(&d) - la(&d)));
+        rho.push((p, rho_s * sq));
+        ratio.push((p, fl(&d, "trials") / fl(&f, "trials")));
+        log2h.push((fl(r, "group_order") / fl(r, "r")).log2());
+        let walks_ok = r["rho"]["rho-neg"]["runs"]
+            .as_array()
+            .is_some_and(|w| w.iter().all(|w| bool_at(w, "correct")));
+        let _ = writeln!(
+            o,
+            "| {} | {} | {:.1} | {} | {} / {} | {} | {} | {:.2} | {} | {} | {} | {} | {:.2} | {}, {}, {} |",
+            py_str(at(r, "p")),
+            py_str(at(r, "seed")),
+            fl(r, "log2_r"),
+            py_str(at(r, "cofactor")),
+            py_str(at(r, "y_columns")),
+            py_str(at(&d, "small_columns")),
+            py_str(at(&f, "trials")),
+            py_str(at(&d, "trials")),
+            fl(&d, "trials") / fl(&f, "trials"),
+            g3(la(&f)),
+            g3(la(&d)),
+            g3(fl(&f, "S_charged") / rho_s),
+            g3(fl(&d, "S_charged") / rho_s),
+            fl(&d, "S_charged") / fl(&f, "S_charged"),
+            yes(bool_at(&f, "correct")),
+            yes(bool_at(&d, "correct")),
+            yes(bool_at(&z, "correct")
+                && fl(&z, "trials") == fl(&f, "trials")
+                && fl(&z, "S_charged") == fl(&f, "S_charged")
+                && walks_ok),
+        );
+    }
+    // Phases: relation, linear algebra (and merges), base and generation,
+    // per arm; rho.  Fitted freely, and with the theory's exponents imposed
+    // (relation p¹ / p^{3/2}, linear algebra p² / p^{3/2}, base p, rho p²),
+    // only the constants fitted.
+    let phases: [(&str, &Vec<(f64, f64)>, f64); 7] = [
+        ("relation, full", &rf, 1.0),
+        ("linear algebra and merges, full", &lf, 2.0),
+        ("base and generation, full", &bf, 1.0),
+        ("relation, DLP", &rd, 1.5),
+        ("linear algebra and merges, DLP", &ld, 1.5),
+        ("base and generation, DLP", &bd, 1.0),
+        ("rho-neg", &rho, 2.0),
+    ];
+    let free: Vec<Option<(f64, f64)>> = phases.iter().map(|(_, v, _)| fit_line(v)).collect();
+    let imposed: Vec<(f64, f64)> = phases
+        .iter()
+        .map(|(_, v, b)| {
+            let a = mean(
+                &v.iter()
+                    .map(|(x, y)| y.log2() - b * x.log2())
+                    .collect::<Vec<_>>(),
+            );
+            (a, *b)
+        })
+        .collect();
+    o.push_str(
+        "\n| phase | fitted exponent in p | theory exponent | curves |\n|:--|--:|--:|--:|\n",
+    );
+    for ((nm, v, b), f) in phases.iter().zip(&free) {
+        let _ = writeln!(
+            o,
+            "| {nm} | {} | {b} | {} |",
+            fmt_f(f.map(|f| f.1)),
+            v.len()
+        );
+    }
+    let _ = writeln!(
+        o,
+        "\nTargets per full relation, DLP / full: fitted exponent in p {} over {} curves.\n",
+        fmt_f(fit_exponent(&ratio)),
+        ratio.len()
+    );
+    let h = mean(&log2h);
+    let lp0 = rf.iter().map(|x| x.0.log2()).fold(0.0, f64::max);
+    let at = |f: (f64, f64), lp: f64| 2f64.powf(f.0 + f.1 * lp);
+    // The first log₂ p above the measured range where total g ≤ total k.
+    let cross = |fs: &[(f64, f64)], g: &[usize], k: &[usize]| -> Option<f64> {
+        let tot = |ix: &[usize], lp: f64| ix.iter().map(|&i| at(fs[i], lp)).sum::<f64>();
+        let mut lp = lp0;
+        while lp < 400.0 {
+            if tot(g, lp) <= tot(k, lp) {
+                return Some(4.0 * lp - h);
+            }
+            lp += 0.01;
+        }
+        None
+    };
+    let fmt_n = |v: Option<f64>| v.map_or("none below 2^1600".into(), |v| format!("2^{v:.0}"));
+    let (full, dlp, rho_ix) = ([0usize, 1, 2], [3usize, 4, 5], [6usize]);
+    let mut table = format!("| crossover (extrapolated; log2 n = 4·log2 p − log2 h, mean log2 h = {h:.2}) | fitted exponents | theory exponents |\n|:--|--:|--:|\n");
+    let free_ok: Option<Vec<(f64, f64)>> = free.iter().copied().collect();
+    for (label, g, k) in [
+        ("DLP below full", &dlp[..], &full[..]),
+        ("DLP below rho-neg", &dlp[..], &rho_ix[..]),
+        ("full below rho-neg", &full[..], &rho_ix[..]),
+    ] {
+        let a = free_ok
+            .as_ref()
+            .map_or("—".into(), |fs| fmt_n(cross(fs, g, k)));
+        let _ = writeln!(
+            table,
+            "| {label} | {a} | {} |",
+            fmt_n(cross(&imposed, g, k))
+        );
+    }
+    o.push_str(&table);
+}
+
 fn e13_ok(r: &Value) -> bool {
     ["d3_fold12", "d3_fold6", "s3_fold12", "s3_fold6"]
         .iter()
@@ -2547,15 +2705,30 @@ fn main() {
     let mut rows: Vec<Value> = Vec::new();
     for path in env::args().skip(1) {
         let text = fs::read_to_string(&path).unwrap_or_else(|e| panic!("{path}: {e}"));
-        let v: Value = serde_json::from_str(&text).unwrap_or_else(|e| panic!("{path}: {e}"));
-        // `{"rows": [...]}` (this binary's runners) or a bare array (`quartic_folds`).
-        rows.extend(
-            v["rows"]
+        // `{"rows": [...]}` (this binary's runners), a bare array
+        // (`quartic_folds`), or JSON lines (the ic_next10 ladder).
+        let parsed: Vec<Value> = match serde_json::from_str::<Value>(&text) {
+            Ok(v) => v["rows"]
                 .as_array()
                 .or(v.as_array())
                 .cloned()
                 .unwrap_or_default(),
-        );
+            Err(_) => text
+                .lines()
+                .filter(|l| !l.trim().is_empty())
+                .map(|l| serde_json::from_str(l).unwrap_or_else(|e| panic!("{path}: {e}")))
+                .collect(),
+        };
+        for mut v in parsed {
+            let ladder_dlp = v["item"].as_str() == Some("ic_next10_01_fp4_ladder")
+                && v["arms"]
+                    .as_array()
+                    .is_some_and(|a| a.iter().any(|a| a["arm"].as_str() == Some("d4-dlp")));
+            if ladder_dlp {
+                v["experiment"] = Value::from("e20");
+            }
+            rows.push(v);
+        }
     }
     let mut by: BTreeMap<String, Vec<&Value>> = BTreeMap::new();
     for r in &rows {
@@ -2563,7 +2736,7 @@ fn main() {
     }
     let mut o = String::new();
     type Printer = fn(&mut String, &[&Value]);
-    let printers: [(&str, Printer); 19] = [
+    let printers: [(&str, Printer); 20] = [
         ("e1", e1),
         ("e2", e2),
         ("e3", e3),
@@ -2581,6 +2754,7 @@ fn main() {
         ("e17", e17),
         ("e18", e18),
         ("e19", e19),
+        ("e20", e20),
         ("e14", e14),
         ("e15", e15),
     ];
