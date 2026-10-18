@@ -111,8 +111,10 @@ listed so that nobody spends budget on them.
      *(measured)*. A T_n factor appears only at n = 3 and at n = 5, the
      latter from one plane quartic with a genus-11 cover carrying T₅ for
      a = 0.
-   - The route is closed for ECC2K-130, K-163 and K-233. K-283, K-409 and
-     K-571 need bases of genus 4 or more.
+   - A screen of every genus-4 curve, together with a point-count lemma,
+     adds K-283.
+   - The route is now closed for ECC2K-130, K-163, K-233 and K-283. K-409
+     and K-571 need bases of genus 5 or more.
 3. **Random-b binary curves: only the cover question is new here.** A
    random-b curve does not lift to a curve over Q, so the modular mechanism
    behind the Koblitz leads is unavailable *(derived sketch)*. The one new
@@ -126,7 +128,7 @@ defined above.
 
 | # | family | lead | status | first experiment | kill criterion | if it works |
 |:--|:--|:--|:--|:--|:--|:--|
-| L8 | Koblitz | Étale route: curve D/F₂ with an order-n automorphism and an F₂-map to E; its twist contains E × T_n, genus 1 + n(g₀ − 1) | **measured, every base of genus ≤ 3:** hits at n = 3 and n = 5 only (one plane quartic gives a genus-11 cover carrying T₅, a = 0); **closed for ECC2K-130, K-163 and K-233** | next: genus-4 bases with 283 ∣ L_B(λ), ord λ ≤ 3, for K-283 | no hit for genus-4 B at n = 283 | the only structured family left inside the L(1/2) budget for K-283, K-409 and K-571, with explicit maps |
+| L8 | Koblitz | Étale route: curve D/F₂ with an order-n automorphism and an F₂-map to E; its twist contains E × T_n, genus 1 + n(g₀ − 1) | **measured, every base of genus ≤ 3; genus 4 screened:** hits at n = 3 and n = 5 only (one plane quartic gives a genus-11 cover carrying T₅, a = 0); **closed for ECC2K-130, K-163, K-233 and K-283** | next: genus-5 bases with 409 ∣ P_B(λ), ord λ ≤ 3, for K-409 | no genus-5 B passes the screen at n = 409 | the only structured family left inside the L(1/2) budget for K-409 and K-571, with explicit maps |
 | L6 | Koblitz | Modular twists: (f_E ⊗ χ) mod 2 ≅ T_n up to isogeny, for every n | derived | find the smallest curve whose Jacobian contains A_{f⊗χ} for n = 3, 5, 7, 11 (modular quotients, Fermat quotients of level 7ℓ, Ekedahl–Serre curves) | minimal genus grows faster than c(n)·n | an explicit, computable transfer of T_n into a Jacobian over F₂ |
 | L10 | random-b binary | Genus-n Jacobians realising Res(E), beyond GHS | proposed | n = 3: all genus-3 curves over F₂, which traces t₃ are realised. n = 5: genus-5 curves with point counts 3, 5, 9, 17, 33 − 5t₅ | no genus-5 realisation for any t₅ | a genus-O(n) family would make prime-degree binary curves subexponential |
 | L9 | Koblitz and binary | Certified lower bounds on the cover genus | derived (partial) | Howe's principal-polarisability test on T_n for deployed n; the manypoints (q = 32, g = 5) bound; point-count positivity | (produces bounds) | closes deployed sizes for good where the bound exceeds the budget |
@@ -319,7 +321,7 @@ bound (1+√2)^{2g₀} allows *(optimistic)*:
 
 The first four are inside the budget. K-233 and ECC2K-130 are just outside.
 The second run then closed K-163 too: no genus-3 curve over F₂ has 163 ∣ L(±1).
-That leaves K-283, K-409 and K-571.
+The genus-4 screen closed K-283. That leaves K-409 and K-571.
 
 **Test.** For unramified χ of order n, D's χ-part has L-polynomial
 L(B, χ, X), of degree 2g₀ − 2. It must be divisible by (1 − cπX)(1 − cπ̄X) for
@@ -371,8 +373,19 @@ Bergström)*.
   - K-233 (g₀ ≤ 3) is closed by the Weil bound 198 *(derived)*.
   - K-163 (g₀ ≤ 3) is closed because no genus-≤3 curve over F₂ has
     163 ∣ L(±1) *(measured, exhaustive)*.
-  - K-283 (g₀ ≤ 4), K-409 (≤ 5) and K-571 (≤ 7) stay open. They need
-    genus-4 or larger bases.
+  - K-283 (g₀ ≤ 4) is closed by the genus-4 screen
+    ([`run-20261018T2144Z`](reports/run-20261018T2144Z/README.md)).
+    - Every genus-4 curve over F₂ has #J ≤ 260 and |L(−1)| ≤ 144 *(measured,
+      exhaustive; the L-polynomial sets match Xarles's census)*. So no
+      cover with λ = ±1 exists at n = 283, 409 or 571.
+    - Order-3 twists are excluded by a point-count lemma *(derived)*. If
+      ord λ = g₀ − 1, then T_n fills the Prym. That gives
+      #D(F_{2^k}) = #B(F_{2^k}) + k·t_k, which must be ≡ 0 (mod n).
+    - For the a = 0 curve, t₃ = 5, so #D(F₈) lies between 15 and 47, which
+      is never ≡ 0 mod 283.
+  - K-409 (g₀ ≤ 5) and K-571 (≤ 7) stay open. Genus 4 is closed for them
+    too, so they need genus-5 or larger bases. The same lemma also excludes
+    the maximal twist at g₀ = 5 and 7.
 
 Caveats:
 
@@ -492,6 +505,8 @@ restriction beyond n = 3.
     T_n hits per n, over every genus-2 and genus-3 curve.
   - `reports/run-20261018T2129Z/reach.svg`: the odd primes dividing L(±1)
     against the deployed sizes and their allowed g₀.
+  - `reports/run-20261018T2144Z/reach.svg`: the same for every genus-4
+    curve, with the order-3 twist candidates.
 
 ## Unresolved checks and owed certificates
 
@@ -505,8 +520,8 @@ restriction beyond n = 3.
   trace-zero classes in dimension 6, and `3.2.a_a_af` were blocked by a
   captcha. The other n = 3 classes are in the table under "Method and
   sources".
-- L8 covers bases of genus ≤ 3 only. Still not run:
-  - genus-4 and larger bases, needed for K-283, K-409 and K-571;
+- L8 covers bases of genus ≤ 3, and genus 4 by the screen. Still not run:
+  - genus-5 and larger bases, needed for K-409 and K-571;
   - the twisted λ = −1 genus-3 covers, which were checked only for
     existence (n ∣ L(−1), never 163) and not for small-n hits;
   - ramified covers (L7) and non-cyclic covers.
@@ -548,6 +563,7 @@ cargo build --release --manifest-path etale_search/Cargo.toml
 etale_search/target/release/etale-search 2      # genus 2
 etale_search/target/release/etale-search 3      # hyperelliptic genus 3
 etale_search/target/release/etale-search q      # plane quartics
+etale_search/target/release/etale-search s4     # genus-4 screen at n = 283, 409, 571
 ```
 
 ## References
@@ -565,4 +581,5 @@ etale_search/target/release/etale-search q      # plane quartics
 - Bergström. Equivariant counts of points of the moduli spaces of pointed hyperelliptic curves. Doc. Math. 14, 2009.
 - Ekedahl, Serre. Exemples de courbes algébriques à jacobienne complètement décomposable. C. R. Acad. Sci. 317, 1993.
 - Galbraith, Granger, Merz, Petit. On index calculus algorithms for subfield curves. ePrint 2020/1315.
+- Xarles. A census of all genus 4 curves over the field with 2 elements. arXiv:2007.07822, 2020.
 - LMFDB, abelian varieties over finite fields, https://www.lmfdb.org/Variety/Abelian/Fq/ (queried 2026-10-18).

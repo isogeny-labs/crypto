@@ -44,8 +44,9 @@ closed on paper while drafting.
   subexponential. A covering curve of genus at most $c(n) dot n$ beats rho, where $c(131) approx 1.9$
   and $c(571) approx 6.1$ (computed). The L8 étale search now covers every base curve of genus
   $<= 3$ over $FF_2$ (measured). $T_n$ factors appear only at $n = 3$ and $n = 5$. The $n = 5$ case is
-  one plane quartic with a genus-11 cover carrying $T_5$ for $a = 0$. The route is closed for
-  ECC2K-130, K-163 and K-233. K-283, K-409 and K-571 need bases of genus $>= 4$.
+  one plane quartic with a genus-11 cover carrying $T_5$ for $a = 0$. A screen of every genus-4 curve
+  plus a point-count lemma closes K-283 as well. The route is now closed for ECC2K-130, K-163, K-233
+  and K-283. K-409 and K-571 need bases of genus $>= 5$.
 + *Random-b binary curves: only the cover question is new here.* A random-b curve does not lift to
   a Q-curve, so the Koblitz mechanisms do not transfer (derived sketch).
 
@@ -57,7 +58,7 @@ closed on paper while drafting.
   inset: 4pt,
   align: left,
   [*\#*], [*family*], [*lead*], [*status*], [*first experiment*], [*kill criterion*],
-  [L8], [Koblitz], [Étale route: $D\/FF_2$ with an order-$n$ automorphism and an $FF_2$-map to $E$; its twist contains $E times T_n$, genus $1 + n(g_0 - 1)$], [measured ($g_0 <= 3$): hits at $n = 3, 5$; closed for ECC2K-130, K-163, K-233], [genus-4 bases with $283 | L_B (lambda)$, $op("ord") lambda <= 3$, for K-283], [no hit for genus-4 $B$ at $n = 283$],
+  [L8], [Koblitz], [Étale route: $D\/FF_2$ with an order-$n$ automorphism and an $FF_2$-map to $E$; its twist contains $E times T_n$, genus $1 + n(g_0 - 1)$], [measured ($g_0 <= 3$; genus 4 screened): hits at $n = 3, 5$; closed for ECC2K-130, K-163, K-233, K-283], [genus-5 bases with $409 | P_B (lambda)$, $op("ord") lambda <= 3$, for K-409], [no genus-5 $B$ passes at $n = 409$],
   [L6], [Koblitz], [Modular twists: $(f_E ⊗ chi) mod 2 ∼ T_n$ for every $n$], [derived], [smallest curve containing $A_(f ⊗ chi)$ for $n = 3, 5, 7, 11$], [genus grows faster than $c(n) n$],
   [L10], [binary], [Genus-$n$ Jacobians realising $op("Res")(E)$, beyond GHS], [proposed], [all genus-3 curves over $FF_2$, which traces $t_3$; genus-5 search for point counts $3, 5, 9, 17, 33 - 5 t_5$], [no genus-5 realisation],
   [L9], [Koblitz and binary], [Certified lower bounds on the cover genus], [derived (partial)], [Howe's test on $T_n$; manypoints (32, 5); point-count positivity], [(produces bounds)],
@@ -145,11 +146,18 @@ time.
   - K-233 ($g_0 <= 3$) is closed by the Weil bound 198 (derived).
   - K-163 ($g_0 <= 3$) is closed because no genus $<= 3$ curve has $163 | L(plus.minus 1)$
     (measured).
-  - K-283, K-409 and K-571 need $g_0 >= 4$.
+  - K-283 ($g_0 <= 4$) is closed by the genus-4 screen (run-20261018T2144Z).
+    - Every genus-4 curve over $FF_2$ has $\#J <= 260$ and $|L(-1)| <= 144$ (measured; the
+      $L$-polynomial sets match Xarles's census).
+    - The order-3 twist is excluded by a point-count lemma (derived). With $op("ord") lambda = g_0 - 1$,
+      $\#D(FF_(2^k)) = \#B(FF_(2^k)) + k t_k equiv 0 mod n$, and for $a = 0$, $t_3 = 5 > 0$.
+  - K-409 and K-571 need $g_0 >= 5$.
 
 #figure(image("reports/run-20261018T2129Z/hits-by-n.svg", width: 100%), caption: [Run run-20261018T2129Z: characters tested and characters with a $T_n$ factor, per $n$, over every genus-2 and genus-3 curve over $FF_2$. Recorded values; see the run report.])
 
 #figure(image("reports/run-20261018T2129Z/reach.svg", width: 100%), caption: [Run run-20261018T2129Z: odd primes dividing $L_B (plus.minus 1)$ over every genus-2 and genus-3 curve over $FF_2$, against the deployed Koblitz sizes and the base genus each budget allows. Recorded values plus the derived budget.])
+
+#figure(image("reports/run-20261018T2144Z/reach.svg", width: 100%), caption: [Run run-20261018T2144Z: odd primes dividing $L_B (plus.minus 1)$ over every genus-4 curve over $FF_2$, and the order-3 twist candidates, against the deployed sizes whose budget allows $g_0 = 4$. Recorded values plus the derived budget.])
 
 = Closed on paper while drafting
 
@@ -179,8 +187,8 @@ time.
   cannot separate covers from GHS, and L10 starts at $n = 5$.
 - Still blocked by a captcha: the nine admissible $n = 5$ classes, the two $n = 7$ trace-zero
   classes, and $t_3 = 5$ (already excluded by point counts).
-- L8 covers bases of genus $<= 3$ only. Not yet run: genus-4 and larger bases (K-283, K-409,
-  K-571); small-$n$ hits of twisted ($lambda = -1$) genus-3 covers; ramified and non-cyclic covers. The
+- L8 covers bases of genus $<= 3$, and genus 4 by the screen. Not yet run: genus-5 and larger bases
+  (K-409, K-571); small-$n$ hits of twisted ($lambda = -1$) genus-3 covers; ramified and non-cyclic covers. The
   $n = 5$ genus-11 cover has no equations or certificate yet.
 - The manypoints bound for $(q, g) = (32, 5)$ is unchecked. It decides whether $(a = 0, n = 5)$ can
   be realised at genus 5; the étale route gives genus 11.
