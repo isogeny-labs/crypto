@@ -1352,6 +1352,30 @@ fn arm_rho(inst: &Instance, pt: EP, q: EP, rng: &mut u64) -> ArmResult {
         arm: "R".into(),
         ..Default::default()
     };
+    // one canonical step of the walk (negation map)
+    let step = |w: EP, a: u64, b: u64, steps: &mut u64| -> (EP, u64, u64, u64) {
+        let EP::A(x, _) = w else { return (w, a, b, 0) };
+        let hx = hash_fp2(x);
+        let (m, ma, mb) = mults[((hx >> dbits) as usize) % r];
+        let (nw, fl) = canon_e(e.add(w, m));
+        *steps += 1;
+        let (mut na, mut nb) = ((a + ma) % ell, (b + mb) % ell);
+        if fl {
+            na = (ell - na) % ell;
+            nb = (ell - nb) % ell;
+        }
+        (nw, na, nb, hx)
+    };
+    let double = |w: EP, a: u64, b: u64, steps: &mut u64| -> (EP, u64, u64) {
+        let (dw, fl) = canon_e(e.add(w, w));
+        *steps += 1;
+        let (mut da, mut db) = (2 * a % ell, 2 * b % ell);
+        if fl {
+            da = (ell - da) % ell;
+            db = (ell - db) % ell;
+        }
+        (dw, da, db)
+    };
     'outer: loop {
         let (mut a, mut b) = (xorshift(rng) % ell, xorshift(rng) % ell);
         let (mut w, fl) = canon_e(e.add(e.mul(pt, a), e.mul(q, b)));
@@ -1359,8 +1383,13 @@ fn arm_rho(inst: &Instance, pt: EP, q: EP, rng: &mut u64) -> ArmResult {
             a = (ell - a) % ell;
             b = (ell - b) % ell;
         }
-        let mut prev = EP::O;
         let mut len = 0u64;
+        // fruitless-cycle detection (Bos–Kleinjung–Lenstra style): every 32
+        // steps remember the point; meeting it again within 32 steps means a
+        // cycle of length <= 32, left by doubling its smallest point
+        let mut chk = EP::O;
+        let mut chk_len = 0u64;
+        let mut prev: (EP, u64, u64) = (EP::O, 0, 0);
         loop {
             let EP::A(x, _) = w else { continue 'outer };
             let hx = hash_fp2(x);
@@ -1376,44 +1405,43 @@ fn arm_rho(inst: &Instance, pt: EP, q: EP, rng: &mut u64) -> ArmResult {
                             break 'outer;
                         }
                     }
-                    // own trail revisited (cycle): restart from a fresh point
+                    // own trail revisited: restart from a fresh point
                     continue 'outer;
                 }
                 // store and keep walking (van Oorschot–Wiener trails continue)
                 table.insert(key, (a, b));
             }
-            let j = ((hx >> dbits) as usize) % r;
-            let (m, ma, mb) = mults[j];
-            let mut nw = e.add(w, m);
-            let (mut na, mut nb) = ((a + ma) % ell, (b + mb) % ell);
-            steps += 1;
+            let (nw, na, nb, _) = step(w, a, b, &mut steps);
             len += 1;
-            let (cw, fl) = canon_e(nw);
-            nw = cw;
-            if fl {
-                na = (ell - na) % ell;
-                nb = (ell - nb) % ell;
-            }
-            if nw == prev {
-                // fruitless 2-cycle: escape by doubling the smaller point
-                let (sel, sa, sb) = if key_ep(w) < key_ep(nw) { (w, a, b) } else { (nw, na, nb) };
-                let (dw, fl) = canon_e(e.add(sel, sel));
-                let (mut da, mut db) = (2 * sa % ell, 2 * sb % ell);
-                if fl {
-                    da = (ell - da) % ell;
-                    db = (ell - db) % ell;
-                }
-                prev = EP::O;
-                w = dw;
-                a = da;
-                b = db;
-                steps += 1;
+            if nw == prev.0 {
+                // fruitless 2-cycle: double the smaller of the two points
+                let sel = if key_ep(w) < key_ep(nw) { (w, a, b) } else { (nw, na, nb) };
+                (w, a, b) = double(sel.0, sel.1, sel.2, &mut steps);
+                prev = (EP::O, 0, 0);
                 continue;
             }
-            prev = w;
-            w = nw;
-            a = na;
-            b = nb;
+            prev = (w, a, b);
+            (w, a, b) = (nw, na, nb);
+            if w == chk && len - chk_len <= 32 {
+                // walk the cycle once more to find its smallest point
+                let (mut mw, mut ma, mut mb) = (w, a, b);
+                let (mut cw, mut ca, mut cb) = (w, a, b);
+                for _ in 0..(len - chk_len) {
+                    let (nw, na, nb, _) = step(cw, ca, cb, &mut steps);
+                    (cw, ca, cb) = (nw, na, nb);
+                    if key_ep(cw) < key_ep(mw) {
+                        (mw, ma, mb) = (cw, ca, cb);
+                    }
+                }
+                (w, a, b) = double(mw, ma, mb, &mut steps);
+                chk = EP::O;
+                prev = (EP::O, 0, 0);
+                continue;
+            }
+            if len % 32 == 0 {
+                chk = w;
+                chk_len = len;
+            }
             if len > maxlen {
                 continue 'outer;
             }
@@ -1433,6 +1461,8 @@ fn key_ep(p: EP) -> (u64, u64) {
 }
 
 const IC_R: usize = 32;
+/// targets per instance in `run` (Amendment G: 10; Addendum A had 3)
+const TARGETS: usize = 10;
 const IC_RESTART: u64 = 4096;
 
 /// Arm J: genus-2 index calculus in Jac(C)(F_p) on τ(P), τ(Q).
@@ -2106,7 +2136,7 @@ fn run_job(job: &Job) -> Vec<String> {
             break v;
         }
     };
-    for tgt in 0..3 {
+    for tgt in 0..TARGETS {
         let k = 1 + xorshift(&mut rng) % (inst.ell - 1);
         let q = inst.e.mul(pt, k);
         let mut results = vec![arm_rho(&inst, pt, q, &mut rng)];

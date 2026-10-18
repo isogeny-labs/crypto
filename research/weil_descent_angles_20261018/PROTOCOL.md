@@ -406,3 +406,34 @@ compared with rho. Prediction **P8c**: Jind `steps/p ≈ 1/3`, not larger
 than Jwalk's within sampling spread, with few solves by repeats.
 Otherwise the measured Arm J advantage in group operations is partly a
 rho effect, and the report says so.
+
+## Amendment G (reference arm repaired; Part O/J re-run), before the re-run
+
+The recorded run `results/itemOJ-run-20261018T2124Z` has a weak reference
+arm at the two largest sizes. Its mean rho `steps/p` is `0.63` at 36 bits
+and `0.81` at 40 bits, against the theoretical `0.886/√h ≈ 0.44` for
+`h = 4`. Rho with the negation map also enters fruitless cycles of length
+4 and more, about once per `4r²` steps. The only way out was the
+trail-length cap (`40·2^d` steps), which wasted up to that many steps per
+trap. The run is kept as recorded, and its rho rows are superseded.
+
+Changes, frozen before the re-run:
+
+- **Rho fruitless cycles.** 2-cycles are caught at once, as before.
+  Longer cycles use Bos–Kleinjung–Lenstra-style detection: every 32 steps
+  the walk records its point. Meeting that point again within 32 steps
+  means a cycle of length ≤ 32. The walk goes around it once more, at
+  counted cost, and leaves by doubling the cycle's smallest point. That
+  choice is canonical, so merged trails stay merged. The reference arm
+  gets stronger.
+- **Precision.** Targets per instance go from 3 to 10 for every arm, so
+  each size has 30 runs per arm. Rho's per-run spread is wide (sd ≈ 0.52
+  × mean). With 9 runs, the size means carried about ±17% standard error.
+- **Check K6 (rho positive control).** On scratch runs (40 targets on
+  three instances), mean rho `steps/p` was `0.450` and `0.490` against
+  `0.443` (36 bits, `h = 4`), and `0.381` against `0.313` (32 bits,
+  `h = 8`). The re-run reports each size's rho mean against
+  `0.886/√h`.
+
+Everything else stays as in Addendum A and Amendments C and E. The re-run
+is the recorded Part O/J result.
