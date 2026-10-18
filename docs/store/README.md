@@ -37,8 +37,9 @@ crypto store pull <name> --out ./fb.bin                                # also co
 ```
 
 `ecbench store …` is the same command. A path argument that accepts a
-`store:NAME` or `sha256:DIGEST` reference needs no other change; today that
-is `ic … --factor-base`, and any code can adopt it with one call:
+`store:NAME` or `sha256:DIGEST` reference needs no other change; current
+callers include `ic … --factor-base`, `ic solve-prime --route-file`, and
+`ic solve-cubic --input`. Any code can adopt it with one call:
 
 ```rust
 let path = crypto_lib::store::resolve_path(&arg)?;   // a plain path is returned unchanged
@@ -181,6 +182,13 @@ checked against its content hash and graph certificates, and used to verify
 the scalar on the source and destination curves. The exact HEAD, fetch,
 verification, and cleanup results are in
 [`ROUTE_IC_S3_ACCEPTANCE_20261018.json`](ROUTE_IC_S3_ACCEPTANCE_20261018.json).
+The public cubic-field cofactor-12 target input also passed a live upload,
+HEAD checksum, fresh-cache `icx solve-cubic --input store:...` fetch, scalar
+replay, remote verify, exact-object cleanup, and final HEAD 404. The first
+attempt used the shell's default AWS profile and failed at preflight HEAD
+with 403 before upload; the recorded `ecc-challenges-new` profile completed
+the test. The receipt is
+[`CUBIC_TARGET_S3_ACCEPTANCE_20261018.json`](CUBIC_TARGET_S3_ACCEPTANCE_20261018.json).
 
 ## For evidence
 

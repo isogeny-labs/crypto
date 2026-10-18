@@ -78,6 +78,8 @@ divide that order, and supports a cofactor `h = #E/n` up to 64 when `h` is
 invertible modulo `n`. It samples cofactor components, verifies relations in
 the full group, then projects each relation by `[h]` before linear algebra.
 The projected factor base must contain a nonidentity subgroup point.
+`--input` also accepts `store:NAME` or `sha256:DIGEST`; the artifact store
+checks the indexed content hash when it fetches the JSON into its cache.
 It reports the Gaudry-style relation and linear-algebra counters and runs a
 same-target rho reference unless `--skip-rho` is set.
 The checked `ic solve-cubic` output for this input is frozen as
@@ -96,6 +98,10 @@ has four nonidentity projected base points and recovers its externally
 specified scalar with full-group relation checks and subgroup replay. Its
 charged run and same-target rho reference are frozen in
 [`cubic_f7_cofactor12_solve_report_20261018.json`](fixtures/cubic_f7_cofactor12_solve_report_20261018.json).
+A separate live S3 test fetched this input into a fresh cache through the
+`solve-cubic` command and verified scalar 5; its upload, HEAD, remote check,
+and cleanup receipt is
+[`CUBIC_TARGET_S3_ACCEPTANCE_20261018.json`](../store/CUBIC_TARGET_S3_ACCEPTANCE_20261018.json).
 
 The prime and cubic commands return `bounded_unknown` with a nonzero exit
 status if their configured IC budget ends without a verified scalar. These

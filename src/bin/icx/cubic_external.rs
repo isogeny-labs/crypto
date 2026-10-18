@@ -11,7 +11,7 @@ use std::path::PathBuf;
 
 #[derive(Args)]
 pub struct CubicArgs {
-    /// JSON file with p, c, a, b, n, gx, gy, qx, qy.
+    /// JSON file or store:NAME/sha256:DIGEST reference with p, c, a, b, n, gx, gy, qx, qy.
     #[arg(long)]
     input: PathBuf,
     #[arg(long, default_value_t = 1)]
@@ -69,7 +69,8 @@ fn count_curve_order3(field: &Fp3, a: &E3, b: &E3) -> u64 {
 }
 
 pub fn solve(args: &CubicArgs) -> Result<Value, String> {
-    let bytes = std::fs::read(&args.input)
+    let resolved = crypto_lib::store::resolve_path(&args.input)?;
+    let bytes = std::fs::read(&resolved)
         .map_err(|e| format!("cannot read {}: {e}", args.input.display()))?;
     let input: Input =
         serde_json::from_slice(&bytes).map_err(|e| format!("invalid cubic input JSON: {e}"))?;
