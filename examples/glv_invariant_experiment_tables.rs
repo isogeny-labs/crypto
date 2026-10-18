@@ -1990,15 +1990,107 @@ fn e18(o: &mut String, rows: &[&Value]) {
 /// negation-folded walks; the handover re-derived from E19's own constants
 /// by §11.16's `p* = y·(cols/p)·C·√h / (S_rho·(1 − r))`, `n* = p*⁴/h`.
 fn e19(o: &mut String, rows: &[&Value]) {
-    pipeline_tables(o, rows, "E19", "the weighted D₄ solve");
+    pipeline_tables(o, rows, "E19", "the weighted D₄ solve", "negation");
 }
 
 /// E24 (§9.13): E19's tables on the `V₄` line.
 fn e24(o: &mut String, rows: &[&Value]) {
-    pipeline_tables(o, rows, "E24", "the V₄-invariant solve on the V₄ line");
+    pipeline_tables(
+        o,
+        rows,
+        "E24",
+        "the V₄-invariant solve on the V₄ line",
+        "negation",
+    );
 }
 
-fn pipeline_tables(o: &mut String, rows: &[&Value], id: &str, what: &str) {
+/// E25 (§9.15): both arms on each GLS curve.  Each arm gets E24's tables
+/// against the matched `⟨±ψ⟩` walk; then the paired table, one row per curve,
+/// and the gates G2.33–G2.37.
+fn e25(o: &mut String, rows: &[&Value]) {
+    let arm = |a: &str| -> Vec<&Value> {
+        rows.iter()
+            .copied()
+            .filter(|r| r["arm"].as_str() == Some(a))
+            .collect()
+    };
+    let (a, b) = (arm("A"), arm("B"));
+    pipeline_tables(
+        o,
+        &a,
+        "E25 arm A",
+        "the V₄ fold on GLS curves (control)",
+        "±ψ",
+    );
+    pipeline_tables(o, &b, "E25 arm B", "the ⟨V₄, ψ⟩ fold on GLS curves", "±ψ");
+    o.push_str(
+        "#### E25 — the two arms on one curve
+
+",
+    );
+    o.push_str("| p | seed | log2 n | cols A / B | y A | y B | y B / A | S A | S B | S A / S B | rho neg | rho ±ψ | neg / ±ψ steps | S A / rho neg | S B / rho ±ψ | improvement |
+");
+    o.push_str(
+        "|--:|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+",
+    );
+    let mut steps = Vec::new();
+    let mut gates = [true; 4];
+    for rb in sorted(&b, &["bits", "seed"]) {
+        let Some(ra) = a
+            .iter()
+            .find(|r| r["p"] == rb["p"] && r["seed"] == rb["seed"])
+        else {
+            continue;
+        };
+        let y = |r: &Value| fl(r, "residuals") / fl(r, "folded.relations");
+        let cols = fl(ra, "folded.columns") / fl(rb, "folded.columns");
+        let yr = y(rb) / y(ra);
+        let sr = fl(ra, "total_muls") / fl(rb, "total_muls");
+        let st = fl(rb, "rho_negation_steps") / fl(rb, "rho_matched_steps");
+        let imp = (fl(ra, "total_muls") / fl(ra, "rho_negation_muls")) / fl(rb, "ratio");
+        steps.push(st);
+        gates[0] &= (1.9..=2.0).contains(&cols);
+        gates[1] &= (0.8..=1.25).contains(&yr);
+        gates[2] &= (1.6..=2.4).contains(&sr);
+        gates[3] &= (1.1..=2.0).contains(&imp);
+        let _ = writeln!(
+            o,
+            "| {} | {} | {:.1} | {} / {} | {:.1} | {:.1} | {:.2} | {} | {} | {:.2} | {} | {} | {:.2} | {} | {} | {:.2} |",
+            py_str(at(rb, "p")),
+            py_str(at(rb, "seed")),
+            fl(rb, "bits"),
+            py_str(at(ra, "folded.columns")),
+            py_str(at(rb, "folded.columns")),
+            y(ra),
+            y(rb),
+            yr,
+            g3(fl(ra, "total_muls")),
+            g3(fl(rb, "total_muls")),
+            sr,
+            g3(fl(rb, "rho_negation_muls")),
+            g3(fl(rb, "rho_matched_muls")),
+            st,
+            g3(fl(ra, "total_muls") / fl(ra, "rho_negation_muls")),
+            g3(fl(rb, "ratio")),
+            imp,
+        );
+    }
+    let ms = mean(&steps);
+    let _ = writeln!(
+        o,
+        "
+Gates on every curve: G2.33 cols A / B in [1.9, 2.0]: {}; G2.34 y B / A in [0.8, 1.25]: {}; G2.35 S A / S B in [1.6, 2.4]: {}; G2.36 neg / ±ψ steps mean {:.3} in [1.2, 1.6]: {}, improvement in [1.1, 2.0]: {}.\n",
+        yes(gates[0]),
+        yes(gates[1]),
+        yes(gates[2]),
+        ms,
+        yes((1.2..=1.6).contains(&ms)),
+        yes(gates[3]),
+    );
+}
+
+fn pipeline_tables(o: &mut String, rows: &[&Value], id: &str, what: &str, walk: &str) {
     let rows = sorted(rows, &["bits", "seed"]);
     let _ = writeln!(
         o,
@@ -2041,7 +2133,7 @@ fn pipeline_tables(o: &mut String, rows: &[&Value], id: &str, what: &str) {
         o,
         "\n#### {id} — where the multiplications go, and the distance to rho\n"
     );
-    o.push_str("| p | seed | precompute | base | generation | Weil | solves | lift-back | checks | LA ×16 | solves share | other than solves | S total | rho (negation) | S / rho | registered 0.584·C/p, C = 1.3e9 | measured / registered | 0.584·C/p at this curve's mean C | measured / that |\n");
+    let _ = writeln!(o, "| p | seed | precompute | base | generation | Weil | solves | lift-back | checks | LA ×16 | solves share | other than solves | S total | rho ({walk}) | S / rho | registered 0.584·C/p, C = 1.3e9 | measured / registered | 0.584·C/p at this curve's mean C | measured / that |");
     o.push_str("|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|\n");
     let mut fit: Vec<(f64, f64)> = Vec::new();
     for r in &rows {
@@ -2108,7 +2200,7 @@ fn pipeline_tables(o: &mut String, rows: &[&Value], id: &str, what: &str) {
     // §11.16's handover from E19's own constants: pooled over every curve
     // (the registered G2.13), and over the largest p only, where rho's
     // set-up is the smallest share of its cost.
-    let _ = write!(o, "\n#### {id} — the handover from {id}'s own constants\n\n| curves | y (pooled) | cols / p | C (mean of means) | h | S_rho (negation) | r = LA / rho | p* | log2 n* |\n|:--|--:|--:|--:|--:|--:|--:|--:|--:|\n");
+    let _ = write!(o, "\n#### {id} — the handover from {id}'s own constants\n\n| curves | y (pooled) | cols / p | C (mean of means) | h | S_rho ({walk}) | r = LA / rho | p* | log2 n* |\n|:--|--:|--:|--:|--:|--:|--:|--:|--:|\n");
     let pmax = rows.iter().map(|r| fl(r, "p")).fold(0.0, f64::max);
     let largest: Vec<&Value> = rows
         .iter()
@@ -2859,7 +2951,7 @@ fn main() {
     }
     let mut o = String::new();
     type Printer = fn(&mut String, &[&Value]);
-    let printers: [(&str, Printer); 21] = [
+    let printers: [(&str, Printer); 22] = [
         ("e1", e1),
         ("e2", e2),
         ("e3", e3),
@@ -2879,6 +2971,7 @@ fn main() {
         ("e19", e19),
         ("e20", e20),
         ("e24", e24),
+        ("e25", e25),
         ("e14", e14),
         ("e15", e15),
     ];
