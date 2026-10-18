@@ -1345,7 +1345,6 @@ fn chain_witness_impl(
             json!(format!("{}.progress.jsonl",output.display()))
         } else {Value::Null},
         "point_indices":indices, "x_decimal":planted_xs.iter().map(|x| x.to_biguint().to_string()).collect::<Vec<_>>(),
-        "orbit_choice_pins":orbit_choice_receipt,
         "relation":relation,
         "max_variables":250_000, "max_domain_clauses":6_000_000,
         "conflict_budget":100_000, "max_models":1,
@@ -1361,6 +1360,9 @@ fn chain_witness_impl(
         "total_index_calculus_runtime_ms":Value::Null,
         "selected_best_total_runtime":Value::Null,
     });
+    if pin_orbit_choices {
+        receipt["orbit_choice_pins"] = orbit_choice_receipt;
+    }
     if checkpoint_root {
         receipt["source_sat_blake3"] = Value::String(
             blake3::hash(include_bytes!("../../src/cryptanalysis/sat.rs"))
