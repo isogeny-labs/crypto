@@ -41,3 +41,21 @@ grows with K² — the note's S₄-tree premise in its strongest form.
 cargo run --release --example koblitz_sixsum_orbit_n37 -- 4 24 0x0AB1_7037
 cargo run --release --example koblitz_sixsum_orbit_n37 -- 16 24 0x0AB1_7037
 ```
+
+## Addendum: the third scan shape settles the law
+
+The (2+1+2) mix (one pair sum + two base points + pair lookup; 24 relations
+at K=16) measures mean 624 / median 480 trials per relation against the
+S₄-chain's (2+2+2) 519/376 and the 4-sum join's (2+2) 782/573 — all three
+shapes within 1.5×, all scaling as r/K². The general law: for any m-sum
+join scan with `k` sampled pair levels and `j` sampled single levels
+(`2k + j = m`, last level free), probes per relation = |T|^k·B^j / E_m ∝
+r/B² — the arity and the level mix change only constants (the measured
+range across all shapes and arities at n=37: 1.5×). The K⁴ concentration
+of the feasibility note's model therefore requires a scan whose per-state
+structure itself grows with K² — a state table whose entries are not pair
+sums but K²-growing structures (e.g. shared S₃-root trees indexed by
+column pairs) — not any join over pair tables. That is the precise,
+falsifiable form of the remaining build.
+
+Reproduction: `cargo run --release --example koblitz_sixsum_orbit_n37 -- 16 24 0x0AB1_7037`

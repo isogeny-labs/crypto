@@ -313,6 +313,42 @@ fn main() {
         }
         let wall6 = t2.elapsed().as_secs_f64();
 
+        // ── arm 2b: (2+1+2) mix — pair + two base points + pair lookup ──
+        let t2b = Instant::now();
+        let mut trials_mix = 0u64;
+        let mut found_mix = false;
+        while trials_mix < 30_000_000 {
+            trials_mix += 1;
+            let idx = rng.gen_range(0..tsize);
+            let p3 = rng.gen_range(0..b);
+            let p4 = rng.gen_range(0..b);
+            let mut res = point_add(curve, &target, &point_neg(&sums[idx]));
+            res = point_add(curve, &res, &point_neg(&base_pts[p3]));
+            res = point_add(curve, &res, &point_neg(&base_pts[p4]));
+            let Some(xr) = point_x(&res) else { continue };
+            let xbk = elem_bits(&xr);
+            if let Ok(pos) = entries.binary_search_by_key(&xbk, |e| e.0) {
+                let mut p = pos;
+                while p < tsize && entries[p].0 == xbk {
+                    let (m, nn) = (entries[p].1 as usize, entries[p].2 as usize);
+                    let s = point_add(
+                        curve,
+                        &point_add(curve, &sums[idx], &point_add(curve, &base_pts[p3], &base_pts[p4])),
+                        &point_add(curve, &base_pts[m], &base_pts[nn]),
+                    );
+                    if s == target {
+                        found_mix = true;
+                        break;
+                    }
+                    p += 1;
+                }
+                if found_mix {
+                    break;
+                }
+            }
+        }
+        let wall_mix = t2b.elapsed().as_secs_f64();
+
         // ── arm 3: fold — free Frobenius images of the found 6-sum ──────
         let mut free_images = 0usize;
         let mut orbit_len = 0usize;
@@ -341,6 +377,7 @@ fn main() {
             "relation_index": rel,
             "four_sum_join": {"trials": trials4, "wall_s": wall4, "found": found4},
             "six_sum_s4chain": {"trials": trials6, "wall_s": wall6, "found": found6.is_some()},
+            "six_sum_mix_212": {"trials": trials_mix, "wall_s": wall_mix, "found": found_mix},
             "fold": {"free_images_of_first_step": free_images, "target_orbit_len": orbit_len},
         });
         println!("{row}");
