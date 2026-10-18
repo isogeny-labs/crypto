@@ -16,9 +16,11 @@ zero, empty stderr, `STRATUM_ADMITTED`, and canonical JSON equality with the
 provider analysis whose raw SHA-256 is pinned. Success and failure receipts
 are retained as workflow artifacts. Runner IDs and source hashes are explicit.
 
-After all four replay receipts pass, bind them with the frozen
-`research/n83_crossfamily_cancel_20261017/aggregate.py` and selector using
-the locally retained ZIPs. Keep `selected_best_total_runtime` null until
-that aggregate has admitted all four strata and its exact paired selection
-rule runs. The online and complete cold selections have separate verdicts;
-neither is a global optimum across the broader factor-base sweep.
+After all four replay receipts pass, bind them to the frozen local aggregate
+and selector using the locally retained provider ZIPs. The local aggregate
+has already admitted the four strata and selected K2816 for complete cold
+process time within this panel; its online selector is `BOUNDED_UNKNOWN`.
+This hosted replay checks that verdict's arithmetic and source provenance;
+it adds no timing measurements. Keep `selected_best_total_runtime` null for
+the broader factor-base sweep, which also includes smaller a=1 and a=0
+families.
