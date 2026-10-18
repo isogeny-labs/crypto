@@ -402,8 +402,9 @@ fn sym_free(offset: usize, n: u32) -> Sym {
 /// The m = 3 chain `S_3(x1,x2,u) = 0`, `S_3(u,x3,x_R) = 0`: variables are the
 /// `3*l` subspace coordinates (block `i`, bit `t` is variable `i*l + t`), then
 /// the `n` bits of `u`. The same layout and equations as `build_system` of
-/// item 05 and `build_decomposition_system` of the crate.
-fn build_system(gf: &Gf, basis: &[u64], xr: u64) -> (Vec<Poly>, usize) {
+/// item 05 and `build_decomposition_system` of the crate. Used here only as an
+/// independent ground truth for the direct system below.
+fn build_chain_system(gf: &Gf, basis: &[u64], xr: u64) -> (Vec<Poly>, usize) {
     let l = basis.len();
     let n = gf.n;
     let nv = 3 * l + n as usize;
@@ -415,6 +416,51 @@ fn build_system(gf: &Gf, basis: &[u64], xr: u64) -> (Vec<Poly>, usize) {
     eqs.extend(sym_s3(&s[0], &s[1], &u, gf));
     eqs.extend(sym_s3(&u, &s[2], &target, gf));
     (eqs, nv)
+}
+
+/// The direct Semaev system `S_4(x1, x2, x3, x_R) = 0` of the WDSat corpus
+/// (`EC-Index-Calculus-Benchmarks`, the committed ICPERF instances `n15l5` ..):
+/// `u` is eliminated by the resultant of the two quadratics
+/// `S_3(x1,x2,u) = A u^2 + B u + C` and `S_3(u,x3,x_R) = A' u^2 + B' u + C'`,
+/// `Res = (A C' + A' C)^2 + (A B' + A' B)(B C' + B' C)` (characteristic 2),
+/// with `A = (x1+x2)^2`, `B = x1 x2`, `C = B^2 + 1`, `A' = (x3+x_R)^2`,
+/// `B' = x3 x_R`, `C' = B'^2 + 1`. Unknowns: the `3*l` subspace coordinates
+/// only; one bit-equation per coordinate of `GF(2^n)` (monomials up to degree 6).
+fn build_system(gf: &Gf, basis: &[u64], xr: u64) -> (Vec<Poly>, usize) {
+    let l = basis.len();
+    let n = gf.n;
+    let nv = 3 * l;
+    assert!(nv <= 62);
+    let s: Vec<Sym> = (0..3).map(|i| sym_subspace(basis, i * l, n)).collect();
+    let x4 = sym_const(xr, n);
+    let one = sym_const(1, n);
+    let a = sym_sq(&sym_add(&s[0], &s[1]), gf);
+    let b = sym_mul(&s[0], &s[1], gf);
+    let c = sym_add(&sym_sq(&b, gf), &one);
+    let a2 = sym_sq(&sym_add(&s[2], &x4), gf);
+    let b2 = sym_mul(&s[2], &x4, gf);
+    let c2 = sym_add(&sym_sq(&b2, gf), &one);
+    let t1 = sym_sq(&sym_add(&sym_mul(&a, &c2, gf), &sym_mul(&a2, &c, gf)), gf);
+    let t2a = sym_add(&sym_mul(&a, &b2, gf), &sym_mul(&a2, &b, gf));
+    let t2b = sym_add(&sym_mul(&b, &c2, gf), &sym_mul(&b2, &c, gf));
+    let mut eqs = sym_add(&t1, &sym_mul(&t2a, &t2b, gf));
+    eqs.retain(|p| !p.is_empty());
+    (eqs, nv)
+}
+
+/// `Res(x1, x2, x3, x_R)` evaluated with field arithmetic (zero iff the direct
+/// system holds at these field elements).
+fn s4_eval(gf: &Gf, x1: u64, x2: u64, x3: u64, xr: u64) -> u64 {
+    let a = gf.sqr(x1 ^ x2);
+    let b = gf.mul(x1, x2);
+    let c = gf.sqr(b) ^ 1;
+    let a2 = gf.sqr(x3 ^ xr);
+    let b2 = gf.mul(x3, xr);
+    let c2 = gf.sqr(b2) ^ 1;
+    let t1 = gf.sqr(gf.mul(a, c2) ^ gf.mul(a2, c));
+    let t2a = gf.mul(a, b2) ^ gf.mul(a2, b);
+    let t2b = gf.mul(b, c2) ^ gf.mul(b2, c);
+    t1 ^ gf.mul(t2a, t2b)
 }
 
 fn eval_poly(p: &Poly, point: u64) -> u64 {
