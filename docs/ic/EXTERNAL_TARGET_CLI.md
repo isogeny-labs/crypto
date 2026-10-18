@@ -15,6 +15,8 @@ ic solve-prime --p 271 --a 1 --b 19 --n 281 \
 The example target is `[190]G`. The command requires a prime `p` in
 `5..=1000000`, a nonsingular short-Weierstrass curve, a prime subgroup order
 `n` in `3..=4000000`, canonical coordinates, and `[n]G = [n]Q = O`.
+When `n` also divides the cofactor, it checks exact membership in `<G>`;
+an order-`n` point in another subgroup is rejected.
 It counts `#E(F_p)` and records the exact cofactor before collection.
 Relation collection is limited by `--fb-size`, `--extra-relations`,
 `--max-trials-per-relation`, and `--max-relation-attempts`. The JSON report
