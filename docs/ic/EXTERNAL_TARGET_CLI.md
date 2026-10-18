@@ -41,6 +41,14 @@ ic solve-prime --p 271 --a 1 --b 19 --n 281 \
   --route-id IW1E11h1h1a619f4ab250 --json
 ```
 
+`--route-file` also accepts an indexed `store:NAME` or `sha256:DIGEST`
+reference. The solver verifies and fetches a missing route file through the
+configured content store before checking the graph and transporting points.
+For example, after publishing the fixture as
+`isogeny-routes/public-prime271/walk-11/routes.json`, replace the local path
+above with
+`store:isogeny-routes/public-prime271/walk-11/routes.json`.
+
 The fixture was enumerated by `isogeny_walk walk` with `--primes 11`,
 `--max-curves 3`, and `--max-depth 1`; the two edge certificates also passed
 `isogeny_walk verify`. The IC command independently counts the starting

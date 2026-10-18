@@ -67,15 +67,16 @@ pub(super) fn transport(
     path: &Path,
     route_id: &str,
 ) -> Result<Transport, String> {
-    let size = std::fs::metadata(path)
-        .map_err(|e| format!("{}: {e}", path.display()))?
+    let resolved = crypto_lib::store::resolve_path(path)?;
+    let size = std::fs::metadata(&resolved)
+        .map_err(|e| format!("{}: {e}", resolved.display()))?
         .len();
     if size > 32 * 1024 * 1024 {
         return Err("route file exceeds the 32 MiB verification limit".into());
     }
-    let bytes = std::fs::read(path).map_err(|e| format!("{}: {e}", path.display()))?;
+    let bytes = std::fs::read(&resolved).map_err(|e| format!("{}: {e}", resolved.display()))?;
     let data: Value =
-        serde_json::from_slice(&bytes).map_err(|e| format!("{}: {e}", path.display()))?;
+        serde_json::from_slice(&bytes).map_err(|e| format!("{}: {e}", resolved.display()))?;
     let nodes = data["curve_nodes"]
         .as_array()
         .ok_or("route lacks curve_nodes")?;

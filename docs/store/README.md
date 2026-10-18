@@ -175,6 +175,12 @@ content store, checked with S3 HEAD and `store verify --remote`, pulled into
 a fresh cache with matching SHA-256, and removed from its unique acceptance
 prefix. Its receipt is
 [`IC_REPORT_S3_ACCEPTANCE_20261018.json`](IC_REPORT_S3_ACCEPTANCE_20261018.json).
+The public isogeny route was also published to a separate acceptance prefix,
+fetched into an empty cache by `ic solve-prime --route-file store:...`,
+checked against its content hash and graph certificates, and used to verify
+the scalar on the source and destination curves. The exact HEAD, fetch,
+verification, and cleanup results are in
+[`ROUTE_IC_S3_ACCEPTANCE_20261018.json`](ROUTE_IC_S3_ACCEPTANCE_20261018.json).
 
 ## For evidence
 
