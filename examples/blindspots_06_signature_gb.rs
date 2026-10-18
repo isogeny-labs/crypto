@@ -853,6 +853,7 @@ impl Totals {
 #[derive(Default, Clone)]
 struct Trace {
     useful: FxSet<u64>,
+    zero: FxSet<u64>,
     red: Vec<FxMap<u64, u64>>, // per matrix step: monomial -> reducer key
 }
 
@@ -897,6 +898,7 @@ struct F4<'a> {
     t: Totals,
     rec: Option<Trace>,
     rep: Option<&'a Trace>,
+    neg: bool,
 }
 
 impl<'a> F4<'a> {
@@ -912,6 +914,7 @@ impl<'a> F4<'a> {
             t: Totals::default(),
             rec: None,
             rep: None,
+            neg: false,
         }
     }
 
@@ -1026,7 +1029,8 @@ impl<'a> F4<'a> {
                 0
             };
             if let Some(rep) = self.rep {
-                if !rep.useful.contains(&pk) {
+                let drop = if self.neg { rep.zero.contains(&pk) } else { !rep.useful.contains(&pk) };
+                if drop {
                     self.t.pairs_drop += 1;
                     continue;
                 }
@@ -1038,6 +1042,9 @@ impl<'a> F4<'a> {
                 build += r.len() as u64;
                 if r.is_empty() {
                     zero_at_build += 1;
+                    if let Some(rec) = self.rec.as_mut() {
+                        rec.zero.insert(pk);
+                    }
                 } else {
                     srows.push(r);
                     skeys.push(pk);
@@ -1052,6 +1059,9 @@ impl<'a> F4<'a> {
                 let r = xor_merge(&ra, &rb);
                 if r.is_empty() {
                     zero_at_build += 1;
+                    if let Some(rec) = self.rec.as_mut() {
+                        rec.zero.insert(pk);
+                    }
                 } else {
                     srows.push(r);
                     skeys.push(pk);
@@ -1202,6 +1212,9 @@ impl<'a> F4<'a> {
             }
             if kept.is_empty() {
                 zero_red += 1;
+                if let Some(rec) = self.rec.as_mut() {
+                    rec.zero.insert(skeys[ri]);
+                }
             } else {
                 nnz += kept.len() as u64;
                 if let Some(rec) = self.rec.as_mut() {
@@ -1466,6 +1479,7 @@ struct Sig<'a> {
     t: Totals,
     rec: Option<Trace>,
     rep: Option<&'a Trace>,
+    neg: bool,
     seq: u32,
 }
 
@@ -1498,6 +1512,7 @@ impl<'a> Sig<'a> {
             t: Totals::default(),
             rec: None,
             rep: None,
+            neg: false,
             seq: 0,
         }
     }
@@ -1712,6 +1727,10 @@ impl<'a> Sig<'a> {
             if r.is_empty() {
                 self.t.zero_build += 1;
                 self.add_syz(i, s);
+                if self.rec.is_some() {
+                    let pk = self.pair_key(c);
+                    self.rec.as_mut().unwrap().zero.insert(pk);
+                }
                 return None;
             }
             self.seq += 1;
@@ -1798,7 +1817,8 @@ impl<'a> Sig<'a> {
         for (ci, c) in cands.iter().enumerate() {
             if let Some(rep) = self.rep {
                 let pk = self.pair_key(c);
-                if !rep.useful.contains(&pk) {
+                let drop = if self.neg { rep.zero.contains(&pk) } else { !rep.useful.contains(&pk) };
+                if drop {
                     self.t.pairs_drop += 1;
                     continue;
                 }
@@ -2031,6 +2051,9 @@ impl<'a> Sig<'a> {
             } else if kept.is_empty() {
                 self.t.zero_elim += 1;
                 self.add_syz(row.idx as usize, row.sig);
+                if let Some(rec) = self.rec.as_mut() {
+                    rec.zero.insert(row.pk);
+                }
             } else {
                 nnz += kept.len() as u64;
                 let col = kept[0] as usize;
@@ -2229,6 +2252,10 @@ impl JobOut {
 }
 
 fn exec(kind: Kind, eqs: &[Poly], nv: usize, lim: &Limits, record: bool, rep: Option<&Trace>) -> JobOut {
+    exec_n(kind, eqs, nv, lim, record, rep, false)
+}
+
+fn exec_n(kind: Kind, eqs: &[Poly], nv: usize, lim: &Limits, record: bool, rep: Option<&Trace>, neg: bool) -> JobOut {
     let hwm_ok = reset_hwm();
     let t0 = Instant::now();
     let rec = if record { Some(Trace::default()) } else { None };
@@ -2237,6 +2264,7 @@ fn exec(kind: Kind, eqs: &[Poly], nv: usize, lim: &Limits, record: bool, rep: Op
             let mut e = F4::new(lim);
             e.rec = rec;
             e.rep = rep;
+            e.neg = neg;
             let s = e.run(eqs);
             (s, e.t, e.g, e.lm, e.rec)
         }
@@ -2244,6 +2272,7 @@ fn exec(kind: Kind, eqs: &[Poly], nv: usize, lim: &Limits, record: bool, rep: Op
             let mut e = Sig::new(lim, nv as u32, crit);
             e.rec = rec;
             e.rep = rep;
+            e.neg = neg;
             let s = e.run(eqs);
             let g: Vec<Vec<u64>> = e.g.iter().map(|x| x.poly.clone()).collect();
             let lm: Vec<u64> = e.g.iter().map(|x| x.lm).collect();
@@ -2269,7 +2298,11 @@ fn exec(kind: Kind, eqs: &[Poly], nv: usize, lim: &Limits, record: bool, rep: Op
 /// A replay with the trace `tr`; if the replayed pairs run out without `1`,
 /// the full engine is run from scratch and both are charged.
 fn exec_replay(kind: Kind, eqs: &[Poly], nv: usize, lim: &Limits, tr: &Trace) -> JobOut {
-    let mut j = exec(kind, eqs, nv, lim, false, Some(tr));
+    exec_replay_n(kind, eqs, nv, lim, tr, false)
+}
+
+fn exec_replay_n(kind: Kind, eqs: &[Poly], nv: usize, lim: &Limits, tr: &Trace, neg: bool) -> JobOut {
+    let mut j = exec_n(kind, eqs, nv, lim, false, Some(tr), neg);
     let rep_touches = j.t.touches();
     let dropped = j.t.pairs_drop;
     let rep_ms = j.ms;
@@ -2314,6 +2347,7 @@ fn run_arm(arm: &str, eqs: &[Poly], nv: usize, lim: &Limits, tr: &Traces, own: &
         "sigc" => exec(Kind::Sig(FULL | 32), eqs, nv, lim, false, None),
         "sigs" => exec(Kind::Sig(FULL | 64), eqs, nv, lim, false, None),
         "f4r" => exec_replay(Kind::F4, eqs, nv, lim, tr.f4.as_ref().expect("f4 trace")),
+        "f4n" => exec_replay_n(Kind::F4, eqs, nv, lim, tr.f4.as_ref().expect("f4 trace"), true),
         "sigr" => exec_replay(Kind::Sig(FULL), eqs, nv, lim, tr.sig.as_ref().expect("sig trace")),
         "f4rs" => exec_replay(Kind::F4, eqs, nv, lim, own.f4.as_ref().expect("own f4 trace")),
         "sigrs" => exec_replay(Kind::Sig(FULL), eqs, nv, lim, own.sig.as_ref().expect("own sig trace")),
@@ -2444,7 +2478,7 @@ fn mode_run(a: &Args) {
     let trace_ratio: f64 = a.num("--trace-ratio", touch_ratio);
     let t_start = Instant::now();
     let mut bad = false;
-    let want_f4_trace = arms.iter().any(|x| x == "f4r");
+    let want_f4_trace = arms.iter().any(|x| x == "f4r" || x == "f4n");
     let want_sig_trace = arms.iter().any(|x| x == "sigr");
     let need_x = arms.iter().find(|x| x.starts_with("f4rx")).cloned();
     let mut traces = Traces { f4: None, sig: None, f4x: None };
