@@ -970,8 +970,11 @@ type TraceKey = (u64, u64, bool);
 
 enum PairPol {
     All,
-    Learned,
+    /// The top `q` fraction (at least one pair) of the minimal-degree pairs
+    /// by the learned score.
+    Learned(f64),
     Trace(FxSet<TraceKey>),
+    /// A uniformly random `q` fraction (at least one pair): the null of `Learned(q)`.
     Random(f64),
     Oracle,
 }
@@ -1332,25 +1335,35 @@ fn select_pairs(
     let all = vec![true; cand.len()];
     match &pol.pair {
         PairPol::All | PairPol::Oracle => all,
-        PairPol::Learned => {
+        PairPol::Learned(q) => {
             let m = pol.model.as_ref().expect("learned selection needs a model");
-            stats.policy_ops += cand.len() as u64 * OPS_PER_PAIR_SCORE;
-            let keep: Vec<bool> = cand
-                .iter()
-                .map(|&i| m.score(&pair_feats(st, &st.pairs[i], step, cx)) >= m.sel_tau)
-                .collect();
-            if keep.iter().any(|&k| k) { keep } else { all }
+            let n = cand.len();
+            stats.policy_ops += n as u64 * OPS_PER_PAIR_SCORE + 2 * n as u64 * ((n as f64).log2().ceil() as u64).max(1);
+            let mut sc: Vec<(f64, usize)> = (0..n).map(|k| (m.score(&pair_feats(st, &st.pairs[cand[k]], step, cx)), k)).collect();
+            sc.sort_by(|x, y| y.0.partial_cmp(&x.0).unwrap().then(x.1.cmp(&y.1)));
+            let take = ((*q * n as f64).ceil() as usize).clamp(1, n);
+            let mut keep = vec![false; n];
+            for &(_, k) in sc.iter().take(take) {
+                keep[k] = true;
+            }
+            keep
         }
         PairPol::Trace(set) => {
             stats.policy_ops += cand.len() as u64 * OPS_PER_TRACE_TEST;
             let keep: Vec<bool> = cand.iter().map(|&i| set.contains(&trace_key(st, &st.pairs[i]))).collect();
             if keep.iter().any(|&k| k) { keep } else { all }
         }
-        PairPol::Random(rate) => {
-            stats.policy_ops += cand.len() as u64;
-            let thr = (*rate * (u64::MAX as f64)) as u64;
-            let keep: Vec<bool> = cand.iter().map(|_| rng.next() < thr).collect();
-            if keep.iter().any(|&k| k) { keep } else { all }
+        PairPol::Random(q) => {
+            let n = cand.len();
+            stats.policy_ops += n as u64 + 2 * n as u64 * ((n as f64).log2().ceil() as u64).max(1);
+            let mut sc: Vec<(u64, usize)> = (0..n).map(|k| (rng.next(), k)).collect();
+            sc.sort();
+            let take = ((*q * n as f64).ceil() as usize).clamp(1, n);
+            let mut keep = vec![false; n];
+            for &(_, k) in sc.iter().take(take) {
+                keep[k] = true;
+            }
+            keep
         }
     }
 }
@@ -1908,85 +1921,163 @@ fn read_traces(path: &str) -> Vec<FxSet<TraceKey>> {
     out
 }
 
+
+fn parse_arm(arm: &str, model: &Option<Model>, traces: &Option<Vec<FxSet<TraceKey>>>, i: usize) -> Policy {
+    let q = |name: &str| -> f64 { name[1..].parse::<f64>().expect("arm fraction in percent") / 100.0 };
+    match arm {
+        "a" => Policy::incumbent(),
+        "c" => Policy { pair: PairPol::All, learned_order: true, model: model.clone() },
+        "d" => {
+            let t = traces.as_ref().expect("arm d needs --trace");
+            Policy { pair: PairPol::Trace(t.get(i).cloned().unwrap_or_default()), learned_order: false, model: None }
+        }
+        "o" => Policy { pair: PairPol::Oracle, learned_order: false, model: None },
+        x if x.starts_with('b') => Policy { pair: PairPol::Learned(q(x)), learned_order: false, model: model.clone() },
+        x if x.starts_with('r') => Policy { pair: PairPol::Random(q(x)), learned_order: false, model: None },
+        other => panic!("unknown arm {other}"),
+    }
+}
+
 fn mode_train(a: &Args) {
     let cell = cell_from(a);
     let caps = caps_from(a);
     let out = a.flag("--out").expect("--out PREFIX");
-    let ntrain: usize = a.num("--ntrain", N_TRAIN);
-    let mut col = Collector {
-        pair_samples_cap: a.num("--pair-cap", 4000usize),
-        row_samples_cap: a.num("--row-cap", 3000usize),
-        ..Collector::default()
-    };
+    let lo: usize = a.num("--from", 0);
+    let hi: usize = a.num("--to", N_TRAIN);
+    let pair_cap: usize = a.num("--pair-cap", 1000usize);
+    let row_cap: usize = a.num("--row-cap", 300usize);
+    let mut samples = String::new();
     let mut traces = String::new();
+    let mut ow = [0u64; 5];
+    let (mut om, mut obx, mut odx) = (0u64, 0u64, 0u64);
     let mut rng = Rng(7);
-    for i in 0..ntrain {
+    for i in lo..hi {
         let xr = cell_target(&cell, "train", i);
         let sols = count_solutions(&cell.gf, cell.m, &cell.basis, xr);
         let draw = draw_for(&cell, xr);
-        let mut c = Some(Collector {
-            pair_samples_cap: col.pair_samples_cap,
-            row_samples_cap: col.row_samples_cap.saturating_sub(col.rx.len()),
-            ..Collector::default()
-        });
+        let mut c = Some(Collector { pair_samples_cap: pair_cap, row_samples_cap: row_cap, ..Collector::default() });
         let r = run_f4(&draw, &Policy::incumbent(), &caps, &mut c, &mut rng);
         let c = c.unwrap();
         println!("{}", run_line(&cell, "train", i, "a", xr, sols, &r));
         traces.push_str(&trace_to_text(i, &r.useful_trace));
-        col.px.extend(c.px);
-        col.py.extend(c.py);
-        col.rx.extend(c.rx);
-        col.ry.extend(c.ry);
-        for k in 0..5 {
-            col.order_wins[k] += c.order_wins[k];
+        for (x, y) in c.px.iter().zip(&c.py) {
+            samples.push_str(&format!("P {y}"));
+            for v in x {
+                samples.push_str(&format!(" {}", *v as f32));
+            }
+            samples.push('\n');
         }
-        col.order_matrices += c.order_matrices;
-        col.order_best_xors += c.order_best_xors;
-        col.order_default_xors += c.order_default_xors;
+        for (x, y) in c.rx.iter().zip(&c.ry) {
+            samples.push_str(&format!("R {}", *y as f32));
+            for v in x {
+                samples.push_str(&format!(" {}", *v as f32));
+            }
+            samples.push('\n');
+        }
+        for k in 0..5 {
+            ow[k] += c.order_wins[k];
+        }
+        om += c.order_matrices;
+        obx += c.order_best_xors;
+        odx += c.order_default_xors;
+    }
+    samples.push_str(&format!("O {} {} {} {} {} {} {} {}\n", ow[0], ow[1], ow[2], ow[3], ow[4], om, obx, odx));
+    std::fs::write(format!("{out}.samples.{lo}"), samples).expect("write samples");
+    std::fs::write(format!("{out}.trace.{lo}"), traces).expect("write trace");
+}
+
+fn mode_fit(a: &Args) {
+    let cell = cell_from(a);
+    let out = a.flag("--out").expect("--out PREFIX");
+    let files: Vec<String> = a.flag("--samples").expect("--samples f1,f2").split(',').map(|s| s.to_string()).collect();
+    let mut col = Collector::default();
+    for f in &files {
+        let text = std::fs::read_to_string(f).unwrap_or_else(|e| panic!("{f}: {e}"));
+        for line in text.lines() {
+            let mut it = line.split_whitespace();
+            match it.next() {
+                Some("P") => {
+                    let y: u8 = it.next().unwrap().parse().unwrap();
+                    let mut x = [0.0f64; NF];
+                    for k in 0..NF {
+                        x[k] = it.next().unwrap().parse().unwrap();
+                    }
+                    col.px.push(x);
+                    col.py.push(y);
+                }
+                Some("R") => {
+                    let y: f64 = it.next().unwrap().parse().unwrap();
+                    let mut x = [0.0f64; NR];
+                    for k in 0..NR {
+                        x[k] = it.next().unwrap().parse().unwrap();
+                    }
+                    col.rx.push(x);
+                    col.ry.push(y);
+                }
+                Some("O") => {
+                    let v: Vec<u64> = it.map(|t| t.parse().unwrap()).collect();
+                    for k in 0..5 {
+                        col.order_wins[k] += v[k];
+                    }
+                    col.order_matrices += v[5];
+                    col.order_best_xors += v[6];
+                    col.order_default_xors += v[7];
+                }
+                _ => {}
+            }
+        }
     }
     let (model, rep) = fit_model(&col);
     std::fs::write(format!("{out}.model"), model.to_text()).expect("write model");
-    std::fs::write(format!("{out}.trace"), traces).expect("write trace");
     println!(
-        "{{\"tool\":\"b09\",\"mode\":\"fit\",\"cell\":\"{}-{}-{}\",\"ntrain\":{},\"pair_samples\":{},\"pos_rate\":{:.6},\"recall\":{:.4},\"sel_rate\":{:.4},\"precision\":{:.4},\"row_samples\":{},\"ridge_r2\":{:.4},\"order_wins\":{:?},\"order_matrices\":{},\"order_best_xors\":{},\"order_default_xors\":{}}}",
-        cell.n, cell.l, cell.m, ntrain, rep.n_pairs, rep.pos_rate, rep.recall, rep.sel_rate, rep.precision,
+        "{{\"tool\":\"b09\",\"mode\":\"fit\",\"cell\":\"{}-{}-{}\",\"pair_samples\":{},\"pos_rate\":{:.6},\"recall_at_tau\":{:.4},\"sel_rate_at_tau\":{:.4},\"precision_at_tau\":{:.4},\"row_samples\":{},\"ridge_r2\":{:.4},\"order_wins\":{:?},\"order_matrices\":{},\"order_best_xors\":{},\"order_default_xors\":{}}}",
+        cell.n, cell.l, cell.m, rep.n_pairs, rep.pos_rate, rep.recall, rep.sel_rate, rep.precision,
         rep.n_rows, rep.ridge_r2, rep.order_wins, rep.order_matrices, rep.order_best_xors, rep.order_default_xors
     );
 }
 
 fn mode_eval(a: &Args) {
     let cell = cell_from(a);
-    let caps = caps_from(a);
+    let mut caps = caps_from(a);
     let role = a.flag("--role").unwrap_or_else(|| "test".to_string());
     let arms: Vec<String> = a.flag("--arms").unwrap_or_else(|| "a".to_string()).split(',').map(|s| s.to_string()).collect();
     let lo: usize = a.num("--from", 0);
     let hi: usize = a.num("--to", N_TEST);
+    let rel_cap: f64 = a.num("--rel-cap", 4.0f64);
     let model = a.flag("--model").map(|p| Model::from_text(&std::fs::read_to_string(&p).unwrap_or_else(|e| panic!("{p}: {e}"))));
-    let traces = a.flag("--trace").map(|p| read_traces(&p));
+    let traces: Option<Vec<FxSet<TraceKey>>> = a.flag("--trace").map(|p| {
+        let mut all: Vec<FxSet<TraceKey>> = Vec::new();
+        for f in p.split(',') {
+            let t = read_traces(f);
+            for (i, set) in t.into_iter().enumerate() {
+                while all.len() <= i {
+                    all.push(FxSet::default());
+                }
+                if !set.is_empty() {
+                    all[i] = set;
+                }
+            }
+        }
+        all
+    });
+    let base_cap = caps.max_touch;
     for i in lo..hi {
         let xr = cell_target(&cell, &role, i);
         let sols = count_solutions(&cell.gf, cell.m, &cell.basis, xr);
         let draw = draw_for(&cell, xr);
+        let mut a_touches: Option<u64> = None;
         for arm in &arms {
-            let pol = match arm.as_str() {
-                "a" => Policy::incumbent(),
-                "b" => Policy { pair: PairPol::Learned, learned_order: false, model: model.clone() },
-                "c" => Policy { pair: PairPol::All, learned_order: true, model: model.clone() },
-                "d" => {
-                    let t = traces.as_ref().expect("arm d needs --trace");
-                    Policy { pair: PairPol::Trace(t.get(i).cloned().unwrap_or_default()), learned_order: false, model: None }
-                }
-                "o" => Policy { pair: PairPol::Oracle, learned_order: false, model: None },
-                "r" => Policy {
-                    pair: PairPol::Random(model.as_ref().expect("arm r needs --model").sel_rate.clamp(0.05, 0.95)),
-                    learned_order: false,
-                    model: None,
-                },
-                other => panic!("unknown arm {other}"),
-            };
+            let pol = parse_arm(arm, &model, &traces, i);
             let mut rng = Rng(0x5EED ^ (i as u64) << 8);
             let mut none: Option<Collector> = None;
+            caps.max_touch = match (arm.as_str(), a_touches) {
+                ("a", _) | (_, None) => base_cap,
+                (_, Some(t)) => ((t as f64 * rel_cap) as u64).min(base_cap),
+            };
             let r = run_f4(&draw, &pol, &caps, &mut none, &mut rng);
+            if arm == "a" && (r.outcome == Outcome::Unsat || r.outcome == Outcome::Sat) {
+                a_touches = Some(r.stats.touches());
+            }
             println!("{}", run_line(&cell, &role, i, arm, xr, sols, &r));
         }
     }
@@ -2241,7 +2332,7 @@ fn selftest(a: &Args) {
             for arm in ["a", "b", "c", "d", "o", "r"] {
                 let pol = match arm {
                     "a" => Policy::incumbent(),
-                    "b" => Policy { pair: PairPol::Learned, learned_order: false, model: Some(model.clone()) },
+                    "b" => Policy { pair: PairPol::Learned(0.5), learned_order: false, model: Some(model.clone()) },
                     "c" => Policy { pair: PairPol::All, learned_order: true, model: Some(model.clone()) },
                     "d" => Policy { pair: PairPol::Trace(traces[(*i + 5) % N_TRAIN].clone()), learned_order: false, model: None },
                     "o" => Policy { pair: PairPol::Oracle, learned_order: false, model: None },
@@ -2342,10 +2433,11 @@ fn main() {
         Some("selftest") => selftest(&a),
         Some("control") => mode_control(&a),
         Some("train") => mode_train(&a),
+        Some("fit") => mode_fit(&a),
         Some("eval") => mode_eval(&a),
         Some("report") => mode_report(&a),
         _ => {
-            eprintln!("usage: b09 selftest|control|train|eval|report ...");
+            eprintln!("usage: b09 selftest|control|train|fit|eval|report ...");
             std::process::exit(2);
         }
     }
