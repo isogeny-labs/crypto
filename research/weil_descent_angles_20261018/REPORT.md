@@ -42,9 +42,14 @@ genus-2 index calculus over `F_p`; (d) genus-4 Jacobians isogenous to
    identity and the exact reconstruction of coverage from F_2 cosets agree
    on all 21 curves.
 
-   For an attacker this is neutral to slightly negative: 4.7% fewer
-   relations per target, offset by a free trace test that skips half the
-   targets before any oracle call.
+   Attack reading, corrected after the first push: the earlier text called
+   the effect neutral to slightly negative, measured over the whole group.
+   In an attack every target `aP + bQ` lies in the odd `ℓ`-subgroup, which
+   sits inside `2E`, so the relevant figure is coverage of `2E`. That is
+   exactly 3/4, against 0.3935 for the Poisson model at the same factor-base
+   size: about 1.9× more relations per target. This is a correction of the
+   cost model (accounting), not a new algorithm. Coverage of the
+   `ℓ`-subgroup itself was not measured separately.
 
    End to end at `n = 2`, the decomposition route (Arm D) costs **2.7–66×
    rho in every pricing cell**. Its oracle needs a quartic root-finding,
@@ -188,12 +193,22 @@ descended quartic). At `λ ≈ 0.5` that truncation has no visible effect.
 
 ![Multiplicities](figures/item1_multiplicity.svg)
 
-**Attack reading.** Per random target, the yield is 3/8 relations against
-0.3935 for the Poisson model: about 4.7% fewer. But the trace test
-`Tr(x_3) = Tr(a)` is free and discards the half that can never decompose,
-so the yield per oracle call is 3/4. At `n = 2` the oracle is a linear
-F_2 system anyway. Classification: an exact structural fact about binary
-`n = 2` decomposition, not an improvement. We have not checked whether it
+**Attack reading (corrected after the first push).** Over the whole
+group the yield is 3/8 against the Poisson value 0.3935, which the first
+version of this report read as "4.7% fewer relations per target". That
+used the wrong denominator. Every attack target `aP + bQ` lies in the odd
+`ℓ`-subgroup, which is contained in `2E`. Inside `2E` the multiplicities
+are exactly `Bin(2, 1/2)`, so coverage of `2E` is **3/4**. A random
+factor base of the same size reaches 0.39 there, so the subfield factor
+base yields about **1.9× more relations per target**, or 1.5× against
+Gaudry's `1/n! = 1/2` estimate.
+
+The gain is bounded by the index of the coset subgroup, which is at most
+the 2-part of the cofactor. It is a correction to the cost model of binary
+`n = 2` decomposition (accounting), not a new algorithm. Coverage of the
+`ℓ`-subgroup itself was not measured separately; that is the first
+follow-up experiment. Classification: an exact structural fact plus a cost
+model correction, not an improvement. We have not checked whether it
 is in the literature (novelty audit owed); the `2E` coset observation may
 be folklore.
 
