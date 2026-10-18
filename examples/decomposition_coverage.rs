@@ -10,7 +10,8 @@
 //! (positive control).
 //!
 //! std-only; `rustc --edition 2021 -O examples/decomposition_coverage.rs`.
-//! Usage: `decomposition_coverage <out-dir>`; env `DC_THREADS`, `DC_SCALE`.
+//! Usage: `decomposition_coverage <out-dir> [mult]`; env `DC_THREADS`, `DC_SCALE`.
+//! `mult` runs the Amendment D diagnostic (binary `n = 2` coverage deficit).
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
@@ -996,6 +997,273 @@ fn run_job(job: &Job, seed: u64) -> Vec<Row> {
     rows
 }
 
+// ---------------------------------------------------------------------------
+// Amendment D: follow-up diagnostic for binary n = 2 (`mult` mode).
+// ---------------------------------------------------------------------------
+
+/// Per-point multiplicity statistics of 2-fold multiset sums over `R != O`:
+/// (index of dispersion var/mean, histogram of multiplicities 0..=8 with the
+/// last bucket ">= 8").
+fn multiplicity<G: Group>(g: &G, f: &[Pt]) -> (f64, [u64; 9]) {
+    let mut cnt = vec![0u32; g.domain()];
+    for i in 0..f.len() {
+        for j in i..f.len() {
+            cnt[g.idx(g.add(f[i], f[j]))] += 1;
+        }
+    }
+    let mut hist = [0u64; 9];
+    let (mut s1, mut s2, mut npts) = (0f64, 0f64, 0f64);
+    for x in g.field_elems() {
+        for p in g.points_at(x) {
+            let c = cnt[g.idx(p)] as f64;
+            s1 += c;
+            s2 += c * c;
+            npts += 1.0;
+            hist[(c as usize).min(8)] += 1;
+        }
+    }
+    let mean = s1 / npts;
+    let var = s2 / npts - mean * mean;
+    (var / mean, hist)
+}
+
+/// Gaussian elimination over F_2 on field elements (bit vectors) with the
+/// combination of unknowns tracked. Returns (particular solution or None,
+/// kernel basis) for sum_j c_j v_j = rhs.
+fn f2_solve(cols: &[u32], rhs: u32) -> (Option<u64>, Vec<u64>) {
+    let mut piv: Vec<(u32, u64)> = Vec::new();
+    let mut ker = Vec::new();
+    let reduce = |piv: &Vec<(u32, u64)>, mut v: u32, mut c: u64| {
+        for &(pv, pc) in piv {
+            let hb = 31 - pv.leading_zeros();
+            if v >> hb & 1 == 1 {
+                v ^= pv;
+                c ^= pc;
+            }
+        }
+        (v, c)
+    };
+    for (j, &v) in cols.iter().enumerate() {
+        let (v, c) = reduce(&piv, v, 1u64 << j);
+        if v == 0 {
+            ker.push(c);
+        } else {
+            piv.push((v, c));
+            // highest leading bit first, so reduction never reintroduces a pivot bit
+            piv.sort_by_key(|&(pv, _)| pv.leading_zeros());
+        }
+    }
+    let (r, c) = reduce(&piv, rhs, 0);
+    (if r == 0 { Some(c) } else { None }, ker)
+}
+
+#[derive(Default, Debug)]
+struct BinDiag {
+    m1_pairs: u64,
+    m1_viol: u64,
+    kdim_hist: [u64; 8],
+    solvable: u64,
+    x3_total: u64,
+    nonpow2: u64,
+    valid_hist: [u64; 9],
+    distinct_from_cosets: u64,
+}
+
+fn bin_diag(c: &BinCurve) -> BinDiag {
+    let g = &c.g;
+    let m = c.m;
+    let mut d = BinDiag::default();
+    let sub = g.subfield(m);
+    let insub = {
+        let mut v = vec![false; g.size as usize];
+        for &s in &sub {
+            v[s as usize] = true;
+        }
+        v
+    };
+    // M1
+    for (i, &x1) in sub.iter().enumerate() {
+        for &x2 in &sub[i + 1..] {
+            let (p1, p2) = (c.points_at(x1), c.points_at(x2));
+            if p1.is_empty() || p2.is_empty() {
+                continue;
+            }
+            let (a, b) = (c.add(p1[0], p2[0]), c.add(p1[0], c.neg(p2[0])));
+            if let (Pt::A(xa, _), Pt::A(xb, _)) = (a, b) {
+                d.m1_pairs += 1;
+                let s = x1 ^ x2;
+                if xa ^ xb != g.mul(g.mul(x1, x2), g.inv(g.sq(s))) {
+                    d.m1_viol += 1;
+                }
+            }
+        }
+    }
+    // F_2 basis of F_q
+    let mut basis: Vec<u32> = Vec::new();
+    let mut ech: Vec<u32> = Vec::new();
+    for &s in &sub {
+        let mut v = s;
+        for &e in &ech {
+            v = v.min(v ^ e);
+        }
+        if v != 0 {
+            ech.push(v);
+            ech.sort_unstable_by(|a, b| b.cmp(a));
+            basis.push(s);
+        }
+    }
+    assert_eq!(basis.len() as u32, m);
+    let has_pt = |x: u32| !c.points_at(x).is_empty();
+    let mut distinct = 1u64; // O
+    for x3 in 0..g.size {
+        d.x3_total += 1;
+        let x3s = g.sq(x3);
+        let mut cols = Vec::with_capacity(2 * m as usize);
+        for &bi in &basis {
+            cols.push(g.mul(x3s, g.sq(bi)));
+        }
+        for &bi in &basis {
+            cols.push(g.sq(bi) ^ g.mul(x3, bi));
+        }
+        let (part, ker) = f2_solve(&cols, c.b);
+        d.kdim_hist[ker.len().min(7)] += 1;
+        let Some(p0) = part else { continue };
+        d.solvable += 1;
+        let mut valid = 0u64;
+        let mut cnt = 0u64;
+        for mask in 0u64..(1u64 << ker.len()) {
+            let mut comb = p0;
+            for (t, &k) in ker.iter().enumerate() {
+                if mask >> t & 1 == 1 {
+                    comb ^= k;
+                }
+            }
+            cnt += 1;
+            let (mut e1, mut e2) = (0u32, 0u32);
+            for (t, &bi) in basis.iter().enumerate() {
+                if comb >> t & 1 == 1 {
+                    e1 ^= bi;
+                }
+                if comb >> (t + m as usize) & 1 == 1 {
+                    e2 ^= bi;
+                }
+            }
+            if e1 == 0 {
+                // double root x1 = sqrt(e2): multiset {P, P}
+                let mut r = e2;
+                for _ in 0..g.k - 1 {
+                    r = g.sq(r);
+                }
+                if r != 0 && has_pt(r) {
+                    valid += 1;
+                }
+                continue;
+            }
+            let w = g.mul(e2, g.inv(g.sq(e1)));
+            let z = g.half[w as usize];
+            if z == u32::MAX || !insub[z as usize] {
+                continue; // roots not in F_q
+            }
+            let (x1, x2) = (g.mul(e1, z), g.mul(e1, z ^ 1));
+            if has_pt(x1) && has_pt(x2) {
+                valid += 1;
+            }
+        }
+        if cnt & (cnt - 1) != 0 {
+            d.nonpow2 += 1;
+        }
+        d.valid_hist[(valid as usize).min(8)] += 1;
+        if valid > 0 {
+            distinct += c.points_at(x3).len() as u64;
+        }
+    }
+    d.distinct_from_cosets = distinct;
+    d
+}
+
+fn mult_main(out: &Path) {
+    let mut rng = 0xd1a9_0000_0d0d_u64;
+    let mut csv = String::from(
+        "char,q,curve,order,arm,F,lambda,poisson,pi,dispersion,h0,h1,h2,h3,h4,h5,h6,h7,h8plus\n",
+    );
+    let mut bcsv = String::from("m,curve,order,m1_pairs,m1_violations,x3_total,solvable,nonpow2_cosets,kdim0,kdim1,kdim2,kdim3,kdim4plus,valid0,valid1,valid2,valid3,valid4,valid5,valid6,valid7,valid8plus,distinct_subfield,distinct_from_cosets\n");
+    let mut checks = String::new();
+    let mut disp: BTreeMap<(u8, &'static str), Vec<f64>> = BTreeMap::new();
+    let mut emit = |csv: &mut String, ch: u8, q: u64, ci: usize, ord: u64, arm: &'static str, f: usize, distinct: u64, total: u64, dsp: f64, h: [u64; 9]| {
+        let lam = total as f64 / ord as f64;
+        csv.push_str(&format!(
+            "{ch},{q},{ci},{ord},{arm},{f},{lam:.6},{:.6},{:.6},{dsp:.5},{}\n",
+            1.0 - (-lam).exp(),
+            distinct as f64 / ord as f64,
+            h.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(",")
+        ));
+        disp.entry((ch, arm)).or_default().push(dsp);
+    };
+    let (mut m1v, mut npw, mut xchk) = (0u64, 0u64, 0u64);
+    for mm in 4u32..=10 {
+        for ci in 0..3 {
+            let c = BinCurve::new(mm, 2, &mut rng);
+            let arms = arms(&c, 2, &mut rng);
+            let mut dsub = 0;
+            for (arm, _xs, f) in &arms[..2] {
+                let (dd, tt) = coverage(&c, f, 2);
+                let (dsp, h) = multiplicity(&c, f);
+                if *arm == "subfield" {
+                    dsub = dd;
+                }
+                emit(&mut csv, 2, 1 << mm, ci, c.order, arm, f.len(), dd, tt, dsp, h);
+            }
+            let d = bin_diag(&c);
+            m1v += d.m1_viol;
+            npw += d.nonpow2;
+            xchk += u64::from(d.distinct_from_cosets != dsub);
+            let k = &d.kdim_hist;
+            bcsv.push_str(&format!(
+                "{mm},{ci},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n",
+                c.order,
+                d.m1_pairs,
+                d.m1_viol,
+                d.x3_total,
+                d.solvable,
+                d.nonpow2,
+                k[0],
+                k[1],
+                k[2],
+                k[3],
+                k[4..].iter().sum::<u64>(),
+                d.valid_hist.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(","),
+                dsub,
+                d.distinct_from_cosets
+            ));
+            eprintln!("mult binary m={mm} curve {ci}: kdim {:?} solvable {}/{} valid {:?}", d.kdim_hist, d.solvable, d.x3_total, d.valid_hist);
+        }
+    }
+    for p in [53u32, 101, 211, 401, 809] {
+        for ci in 0..3 {
+            let c = OddCurve::new(p, 2, &mut rng);
+            let arms = arms(&c, 2, &mut rng);
+            for (arm, _xs, f) in &arms[..2] {
+                let (dd, tt) = coverage(&c, f, 2);
+                let (dsp, h) = multiplicity(&c, f);
+                emit(&mut csv, 0, p as u64, ci, c.order, arm, f.len(), dd, tt, dsp, h);
+            }
+        }
+    }
+    checks.push_str(&format!("M1 identity x(P+Q)+x(P-Q) = x1x2/(x1+x2)^2 violations: {m1v}\n"));
+    checks.push_str(&format!("M2 solution cosets not a power of 2: {npw}\n"));
+    checks.push_str(&format!("M3 cross-check distinct(subfield) != distinct from cosets: {xchk} curves\n"));
+    for ((ch, arm), v) in &disp {
+        let k = v.len() as f64;
+        let mean = v.iter().sum::<f64>() / k;
+        let sd = (v.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / (k - 1.0)).sqrt();
+        checks.push_str(&format!("M3 dispersion char {ch} {arm}: mean {mean:.4} sd {sd:.4} over {} curves\n", v.len()));
+    }
+    std::fs::write(out.join("mult.csv"), csv).unwrap();
+    std::fs::write(out.join("binary_cosets.csv"), bcsv).unwrap();
+    std::fs::write(out.join("checks.txt"), &checks).unwrap();
+    eprint!("{checks}");
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let out = Path::new(
@@ -1003,6 +1271,10 @@ fn main() {
             .expect("usage: decomposition_coverage <out-dir>"),
     );
     std::fs::create_dir_all(out).unwrap();
+    if args.get(2).map(String::as_str) == Some("mult") {
+        mult_main(out);
+        return;
+    }
     let threads: usize = std::env::var("DC_THREADS")
         .ok()
         .and_then(|s| s.parse().ok())
@@ -1195,5 +1467,30 @@ mod tests {
         let a = arms(&c, 2, &mut rng);
         let (_d, t) = coverage(&c, &a[0].2, 2);
         assert_eq!(t as f64, n_multisets(a[0].2.len(), 2));
+    }
+
+    #[test]
+    fn binary_cosets_reproduce_coverage() {
+        let mut rng = 31u64;
+        for m in [4u32, 5] {
+            let c = BinCurve::new(m, 2, &mut rng);
+            let a = arms(&c, 2, &mut rng);
+            let (dsub, _) = coverage(&c, &a[0].2, 2);
+            let d = bin_diag(&c);
+            assert_eq!(d.m1_viol, 0);
+            assert_eq!(d.nonpow2, 0);
+            assert_eq!(d.distinct_from_cosets, dsub);
+        }
+    }
+
+    #[test]
+    fn f2_solve_small() {
+        // columns 0b01, 0b10, 0b11: kernel {c0+c1+c2}, rhs 0b11 solvable
+        let (p, k) = f2_solve(&[1, 2, 3], 3);
+        assert_eq!(k.len(), 1);
+        let pc = p.unwrap();
+        let img = (0..3).filter(|j| pc >> j & 1 == 1).fold(0u32, |a, j| a ^ [1u32, 2, 3][j]);
+        assert_eq!(img, 3);
+        assert!(f2_solve(&[1, 1], 2).0.is_none());
     }
 }
