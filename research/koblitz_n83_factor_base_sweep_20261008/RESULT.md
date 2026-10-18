@@ -1,5 +1,15 @@
 # Degree-83 factor-base sweep: observed evidence
 
+The [retained primary K2048 high-cap search](verification/k2048-natural-highcap-20261018/RESULT.md)
+used a fresh hash-verified GET of the exact S3 factor base and the frozen
+public `a=0` point. Its single five-summand orbit-phase SAT call reached
+`UNKNOWN_solver_cap` at 100,000 conflicts after 2,846.703 seconds of
+supervised wall time, with zero models, zero relations and rank zero.
+The original and retained-copy independent audits passed, including original
+group replay, container limits and cleanup; a forged success was rejected.
+The primary `selected_best_total_runtime` remains `null` because natural
+relation yield, useful rank and the full cold comparison are unresolved.
+
 The [retained primary K64 compact-root capacity probe](verification/compact-retained-k64-20261018/RESULT.md)
 made a fresh exact S3 GET, imported the replayed base under a hard 4-GiB
 cgroup, completed all 172,640 unordered index states, and returned `MISS`
@@ -129,7 +139,7 @@ Started 2026-10-08. Public known-answer research. The requested minimum **comple
 | Splitting, symmetry, WDSat, Gray, FES, double large primes, Frobenius | Included in the design; all finite tuple dispositions are audited. Signed-Frobenius construction and Gray-prefix policies are executed. Retained N83 SAT construction gates pass for selected K=64/K=256 cells; most backend adapters and complete runtime remain unvalidated |
 | Empirical factor-base panel | 57 constructions complete, containing 45 distinct point sets; exact scan counts, all points and labels retained |
 | Arithmetic replay | PASS: 57 bases, 3,617,306 point-record entries and 21,791 representatives checked with generic multi-limb arithmetic on the same host/repository |
-| Relation-stage experiments | 1,728 fixed public two-summand probes on the original 54-object panel, 87,966,720 exact complement lookups, zero relations. A separate structured-orbit five-summand trial reached 10,000 SAT conflicts with zero models or relations and `UNKNOWN_solver_cap`. The K=2,048 v2 object has one ordered and one unrestricted five-summand trial, each capped at 1,000 conflicts with zero models or relations. The matched K=1,182/K=2,048 one-trial searches both reached 5,000 conflicts without a model or relation. The two retained nested 3+2 mixed-orbit trials, K=1,182 and K=600 inside K=2,048, and the first cross-stream K600 hash/sequential trial each reached 5,000 conflicts with zero models and `UNKNOWN_search_cap`. The cross-stream import found zero shared signed orbits. Useful natural yield remains unknown |
+| Relation-stage experiments | 1,728 fixed public two-summand probes on the original 54-object panel, 87,966,720 exact complement lookups, zero relations. A separate structured-orbit five-summand trial reached 10,000 SAT conflicts with zero models or relations and `UNKNOWN_solver_cap`. The K=2,048 v2 object has one ordered and one unrestricted five-summand trial, each capped at 1,000 conflicts with zero models or relations. The matched K=1,182/K=2,048 one-trial searches both reached 5,000 conflicts without a model or relation. A later exact-S3 K2048 one-trial search reached 100,000 conflicts with zero models or relations and `UNKNOWN_solver_cap`. The two retained nested 3+2 mixed-orbit trials, K=1,182 and K=600 inside K=2,048, and the first cross-stream K600 hash/sequential trial each reached 5,000 conflicts with zero models and `UNKNOWN_search_cap`. The cross-stream import found zero shared signed orbits. Useful natural yield remains unknown |
 | Exact support screen | 30 original-panel base-size/arity cases and a later six-cell K=1,182/K=2,048 mixed-orbit screen derived from audited point counts and subgroup order. Every later five/six-summand Markov ceiling is vacuous; no solver or fixed-fixture yield follows |
 | Size frontier extension | Exact v2 design has 57,024,000 addressable tuples, preserving all v1 ordinals and adding K=1,182/2,048/4,096/8,192/16,627; K=1,182 and K=2,048 objects constructed and stored, with no v2 runtime ranking |
 | Paired frontier extension | Exact v3 design preserves v2 ordinals and appends 461,894,400 same-stream small/envelope cases with zero, one or two residual summands; only eight have a bounded partial worker, and no complete-runtime ranking follows |
