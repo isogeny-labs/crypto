@@ -184,3 +184,12 @@ so the host's 12 h cap would have expired before any measurement.
 - Nothing else in §§1–9 changes. The unsatisfiable-draw rate at S = −9
   (2/251, 95 % Clopper–Pearson 0.1 %–2.8 %) is itself a recorded
   observation against §4's expectation and is reported with the result.
+
+Addendum 11:45Z: every push of the tag `draws-m4l6-20261018` from the
+authoring session was refused by its git proxy ("remote end hung up" on
+`refs/tags/*`; branch pushes succeed), so the pre-registration anchor is the
+commit that adds `draws/m4-15-6.jsonl` and `draws/sha256.txt`
+(`fc1eea79`, pushed 11:33Z) and the host's gate is that committed checksum
+file verifying in its clone. The tag may be added later from a local
+checkout; it must point at `fc1eea79` or a descendant that leaves `draws/`
+unchanged.
