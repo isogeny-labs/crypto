@@ -1,0 +1,70 @@
+# Exploration notes (not preregistered, not results)
+
+Two stage-driver sweeps run on 2026-10-18 while the frozen Part A/B/C runs
+were in progress, niced under them. Seeds 77 and 78, two targets per cell,
+four slot tuples per target on the closure. They size round 3; nothing
+here is a measured result of this protocol, and nothing here changes it.
+
+## Sweep 1: ℓ downward on the closure (`--base closure`, plan `3`)
+
+| cell `m:a:n:ℓ` | closure abscissae | columns | slot tuples | λ per system (512 random systems) | XORs per target, g = 4 | g = 6 |
+|---|--:|--:|--:|--:|--:|--:|
+| 3:1:17:3 | 18 | 2 | 153 | 0 | 3.8e3 | 1.9e3 |
+| 3:1:17:4 | 69 | 5 | 153 | 0.0078 (≈ 1.2 per target) | 2.5e5 | 6.5e4 |
+| 3:1:19:3 | 20 | 2 | 190 | 0 | 3.5e3 | — |
+
+- At n = 17 the closure of the dimension-4 subspace has yield where V
+  alone had none in round 1 (0 in 256 targets): about 1.2 decompositions
+  per target spread over 153 systems. Per relation that is about 128
+  systems at 6.5e4 XORs (g = 6), about 8e6 XORs, against the measured
+  ℓ = 5 arm's 1.5e10 per run. The rough projection is a 100–200× cheaper
+  run at ℓ = 4 than the frozen ℓ = 5 arm, with a 5-column base.
+- ℓ = 3 is too sparse at both sizes: the closure has 18–20 abscissae and
+  no decomposition in 512 random systems. Expected decompositions per
+  target scale like `|closure|³ / (6 r)`, which puts the useful ℓ at
+  about `n/3 − log₂ n + 2.3`: 3.9 at n = 17, 4.4 at n = 19, 5.4 at
+  n = 23. The closure buys about `log₂ n − 1.3` of ℓ against the plain
+  subspace, i.e. about 3·that fewer Boolean unknowns per unsplit system.
+- Every run was complete and exact against exhaustive enumeration.
+
+## Sweep 2: guess count g on the standard base (plan `3`, g ∈ {4, 6, 8})
+
+XORs per target, all `2^g` branches charged; two targets each, both exact.
+
+| cell | g = 4 | g = 6 | g = 8 | solving degree 4 → 8 | F4 wall 4 → 8 (descriptive) |
+|---|--:|--:|--:|---|---|
+| 3:1:19:4 | 1.56e5 | 3.3e4 | 1.6e4 | 4 → 0 (linear after substitution) | 0.013 s → 0.003 s |
+| 3:1:17:5 | 1.07e8 | 7.0e6 | 8.4e5 | 6 → 4 | 0.8 s → 0.11 s |
+| 3:0:13:5 | 6.0e7–8.1e7 | 3.0e6–4.4e6 | 8.6e5–9.9e5 | 6 → 4 | 0.4–0.6 s → 0.09 s |
+
+- At ℓ = 5 the XOR count falls 128× from g = 4 to g = 8, and the frozen
+  round-2 arms (g = 4) sit far from the hybrid optimum.
+- Wall time fell only 7×. F4's fixed per-call work (symbolic
+  preprocessing, pair selection, divisor tests) is not in the
+  elimination-only XOR count, and at 256 calls per target it dominates.
+  The XOR figure therefore overstates the gain as g grows, and the priced
+  S of a high-g arm would be unreliable in the same direction.
+- g = mℓ is brute force over V³. Its fully charged relative is the
+  pair-table MITM oracle, which the repository already measures at 4.27×
+  strong rho on n = 17 (dimension-9 invariant base). The hybrid
+  interpolates between F4 and that table.
+
+## What this suggests for round 3
+
+1. An oracle that **enumerates** the residual unknowns after guessing, with
+   every polynomial evaluation counted at a pinned price, as the fully
+   charged bracket; F4 stays as the lower bound. The two together bound the
+   true cost from both sides.
+2. g swept to the per-cell optimum, with XORs, F4 calls, divisor tests and
+   wall all recorded.
+3. ℓ = 4 on the closure at n = 17 (and ℓ = 5 at n = 19 and 23) in ecbench,
+   to put the closure's "yield for free" where it matters.
+4. An ℓ-ladder at one n large enough for yield (closure), ℓ = 4…7 at a
+   fixed guess fraction, for the per-system cost exponent in ℓ. That
+   exponent, against the table's `2^{2ℓ}` and rho's `2^{n/2}`, is what
+   decides whether any of this scales, and it is not visible at one ℓ.
+5. n = 15, where Frobenius-invariant subspaces of dimension 4–6 exist:
+   invariant base vs closure vs standard, same oracle.
+
+Raw lines: scratch only (`x-ell.jsonl`, `x-g.jsonl`), not committed; the
+commands are in the text above and reproduce from the committed binaries.
