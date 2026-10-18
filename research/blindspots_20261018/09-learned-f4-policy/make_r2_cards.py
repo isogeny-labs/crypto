@@ -308,8 +308,8 @@ def stage3(in_dir: str) -> list[Card]:
         "19-4-3": ev("19-4-3", [(0, 8), (8, 16), (16, 24), (24, 32)]),
         "21-5-3": ev("21-5-3", [(i, i + 3) for i in range(0, 30, 3)] + [(30, 32)]),
         "13-3-4": ev("13-3-4", [(0, 32), (32, 64)]),
-        "p3": [f"{RAW}/eval-p3-8-3-3-test-r2.jsonl", f"{RAW}/eval-p3-8-3-3-planted-r2.jsonl",
-               f"{RAW}/eval-p3-8-2-4-test-r2.jsonl", f"{RAW}/eval-p3-8-2-4-planted-r2.jsonl"],
+        "p3": [f"{in_dir}/eval-p3-8-3-3-test-r2.jsonl", f"{in_dir}/eval-p3-8-3-3-planted-r2.jsonl",
+               f"{in_dir}/eval-p3-8-2-4-test-r2.jsonl", f"{in_dir}/eval-p3-8-2-4-planted-r2.jsonl"],
     }
     c = Card("26")
     for files in groups.values():

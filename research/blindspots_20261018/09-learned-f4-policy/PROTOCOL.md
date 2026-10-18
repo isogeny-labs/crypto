@@ -371,3 +371,85 @@ rule), an SVG and PNG graph and `REPORT.pdf` after the runs. A
 `benchmarks/20261018-blindspots-learned-f4/` entry and a leaderboard component
 section are warranted only if a verdict reads ADVANCES or the random-subset
 finding stands; the integration step decides.
+
+## Repair pass r2 (2026-10-18, experiment-director)
+
+The first run stopped while card 13 of 26 was executing. This section records
+what happened and how the unfinished work is re-frozen. **The question, arms,
+cells, draws, caps, metric, controls and decision rule above are unchanged.**
+No instrument change: the first run did not prove an instrument bug, and
+`examples/blindspots_09_learned_f4.rs` is byte-identical (sha256
+`7e46e27eaf9f5901f74772e9fd2a5f95457ab3182cda7ffcad320fcd820e5743`, bound by
+every r2 card). A fresh `rustc` build was smoke-tested before freezing: `selftest`
+(4 PASS lines, SELFTEST OK, 78 s), `control` P1 (92 of 92 and 40 of 40, 24 s),
+the full P3 chain on both control cells (train, fit, eval test and planted, all
+nine arms, 37 s, all `check` true), and at every design cell
+`(17,4,3)`, `(19,4,3)`, `(21,5,3)`, `(13,3,4)` a one-target train, fit and eval
+with the cell's arm list (no panic, every `check` true), plus the `o` arm and
+the two-file trace list at `(17,4,3)` with the real first-run model. Smoke
+outputs were scratch and are not records.
+
+### What the first run left (receipts under `raw/`)
+
+| cards | first-run receipt | cause |
+|---|---|---|
+| 02, 09, 10, 12 | completed | none; their outputs are reused as bound inputs |
+| 01 | stopped at command 3 | `selftest` took 78 s against a 62 s card timeout; 3 PASS lines printed; the 11 later commands never ran |
+| 05 | stopped at command 4 | `fit-19-4-3` exit 101: `model-19-4-3.samples.0` absent (card 04 never ran) |
+| 06, 07, 08 | stopped at command 3 | `eval` exit 101: `model-19-4-3.model` absent |
+| 03, 04, 11, 13 to 26 | none, never ran | 03, 04 and 26 name first-run outputs without a bind and 11 names a stale binary directory, so `lint` refuses them; 13 to 25 would fail on the missing 19- and 21-cell inputs |
+
+Cards 05 to 08 therefore failed on missing inputs, not on the instrument; no
+number from a stopped card is used. The 0-byte `eval-19-4-3-*.jsonl` files and
+the `train-19-4-3-24-32` output of the stopped card 05 are not reused (that
+chunk is re-run in r2). Nothing from the first run is overwritten; every r2
+output carries the suffix `-r2` and every r2 card id the suffix `-r2`.
+
+### Card rules applied to r2
+
+Notes read "The repository root is /home/user/crypto. Run the command through the
+Bash tool with timeout 600000."; `background: false`; the per-command timeouts
+of each card sum to at most 460 s (card actual time estimates 100 to 300 s);
+each card builds its own binary and removes it; a card reads a file from
+another card only if that file is committed and bound by sha256; list-valued
+arguments (`--arms`, `--trace`, `--samples`) are single quoted strings.
+
+### Layout (replaces the card-content list in "Budget and execution" for the unfinished work)
+
+Cards are written by `make_r2_cards.py` in three stages, because a consuming
+card cannot be frozen before the file it binds exists and is committed.
+
+* **Stage 1 (frozen now):** `01-r2` selftest and P1; `01b-r2` P3 control cells
+  (train, fit, eval, self-contained); `03-r2`, `03b-r2` cell `(17,4,3)` test
+  0 to 16 and 16 to 32, binding the completed card 02's `model-17-4-3.model`,
+  `.trace.0`, `.trace.16`; `04-r2` the `o` arm at `(17,4,3)` targets 0 to 2 and
+  cell-19 train 0 to 16; `05-r2` cell-19 train 16 to 32; `11-r2` cell-21 train
+  12 to 18; `13-r2` cell-21 train 24 to 32; `24-r2` cell-13 train 0 to 32 (two
+  chunks). Train chunks write `model-<cell>-r2.samples.<lo>` and `.trace.<lo>`.
+* **Stage 2 (frozen after every stage-1 receipt is committed):** the evaluation
+  cards `05b`, `06`, `07`, `08` (cell 19, 8 targets each), `14` to `23`, `23b`
+  (cell 21, 3 targets each, last 2) and `25`, `25b` (cell 13, 32 each). Each
+  begins with `fit` from the bound sample files (cell 21 binds the first-run
+  chunks 0, 6, 18 and the r2 chunks 12, 24, 30), then evaluates with the
+  model it just wrote. The fit is deterministic: refitting the cell-17 first-run
+  samples reproduced the committed `model-17-4-3.model` and `fit-17-4-3.json`
+  byte for byte, so every card of a cell obtains the same model, and the model
+  digest is in each receipt (a differing digest within a cell fails the item).
+  No fit input contains a test target.
+* **Stage 3 (frozen after every stage-2 receipt is committed):** `26-r2`, the
+  `report` runs, binding every `-r2` eval record.
+
+Eval chunk sizes follow the measured wall time per test target (smoke:
+`(17,4,3)` 11 s, `(19,4,3)` 27 s, `(21,5,3)` 66 s) so that each card stays under
+8 minutes; chunk boundaries do not enter any statistic (the report pools the
+records of a cell).
+
+### Budget
+
+Expected r2 CPU time is about 1,450 s (stage 1), 3,300 s (stage 2) and 10 s
+(stage 3), plus about 715 s already spent by the completed first-run cards, near
+5,500 s against the 7,200 s cap. The per-command timeouts of the r2 measured
+commands sum to 8,790 s, so unlike the first freeze the timeouts alone do not
+guarantee the cap; the executor's receipts give the running total and the
+assessor stops the item if the summed `seconds` of measured commands reach
+7,200.
