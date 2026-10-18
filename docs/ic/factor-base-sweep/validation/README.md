@@ -33,6 +33,10 @@ command ran from the wrong working directory and therefore failed to find its
 relative member paths; `member-check-initial.log` retains that metadata error.
 The corrected check ran inside the extracted root and passes every member.
 This does not alter the scientific or software test outcomes in the bundle.
+The generated SVG's line-end whitespace was normalized without changing its
+recorded values or geometry. The PDF has a local binary Git attribute to
+preserve renderer bytes; it was rebuilt and all four pages inspected again.
+The initial text-style whitespace diagnostics are retained compressed.
 
 See [the validation report](../VALIDATION.md) for the actual failed upstream
 gates. Hash/repack success never promotes a failed or partial native run.

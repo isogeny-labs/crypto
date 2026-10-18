@@ -44,3 +44,5 @@ fig.text(0.02, 0.015,
 fig.tight_layout(rect=(0, 0.105, 1, 0.95))
 fig.savefig(root / "functional-witnesses.svg")
 fig.savefig(root / "functional-witnesses.png", dpi=150)
+svg = root / "functional-witnesses.svg"
+svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
