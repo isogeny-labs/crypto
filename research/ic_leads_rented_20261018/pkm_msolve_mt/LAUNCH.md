@@ -16,7 +16,17 @@
 
 Run P2a first. P2b's reading at N = 24 matters only together with N = 21's, so P2b waits for P2a unless both are funded at once.
 
-## Launch
+## Minimal configuration (the about $12 left for P2 + P4 together)
+
+One system only, `m3_t7_x221026520` (target 0), on `cpu3m-16-128` ($0.88/h, queried 22:04Z): 16 threads, `CAP` ≈ 109 GB, wall 6 h. Expected 6.6 h, **$5.80**, cap 7.5 h = $6.60. It reads only H0 (a productive degree-8 step on target 0). "Finished D = 7" needs both targets (A1.4), so a finished run here is recorded but the plateau row stays open.
+
+```sh
+python3 launch.py run --job pkm-msolve-mt --name pkm-msolve-mt-t7-min --branch main \
+  --flavors cpu3m --vcpu 16 --disk 40 --max-seconds 27000 --env SERVE_SECONDS=1800 \
+  --env MSOLVE_SYSTEMS=pkm_kummer_p2013265921_m3_t7_x221026520 --env MSOLVE_WALL_MAX=21600
+```
+
+## Launch (full configuration)
 
 ```sh
 cd research/dreg_closure_m4l6_20261018/pod

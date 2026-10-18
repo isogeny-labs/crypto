@@ -1,5 +1,7 @@
 # Launch card: degree 5 on C1 (m = 3, (19, 7)) above 280 GB (closure amendment A3 §11.3)
 
+**Launched 2026-10-18 21:50Z by the parent session:** pod `9g6slrqws33cr8` (`dreg-c1-deg5-20261018`) on **`cpu3m-64-512`** (64 vCPU, 512 GB) at **$3.52/h** (`costPerHr` of the pod record), booted from `ee7a5d972`. No 2 × L40 was available. RunPod CPU pods do offer 64 vCPU in powers of two, beyond the GraphQL `maxVcpu` of 32. At that price the expected cost is **$17.60** for 5 h (range $9.50–$43.00 for 2.7–12.2 h). 512 GB clears the 280 GB gate with room for C2's 420 GB in a later launch. The 2 × L40 plan below stays as the cheaper option when that GPU is in stock.
+
 **Protocol:** [`research/dreg_closure_m4l6_20261018/PROTOCOL.md`](../../dreg_closure_m4l6_20261018/PROTOCOL.md) §11.3, §4 row C (Q3).
 **Question:** does the MutantXL closure refute at degree 5 on the committed m = 3, ℓ = 7 draws that did not refute at 4? The last attempt failed to allocate at 169 GB resident under a 184 GB cap (projection 217 GB).
 

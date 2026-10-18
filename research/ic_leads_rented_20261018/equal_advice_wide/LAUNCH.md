@@ -12,7 +12,16 @@
 | expected cost | **$9.60** (range $6.90–$11.50); lifetime cap 14 h = **$17.92 at most** |
 | isolation | L0 (a shared cloud host), recorded as such by `run.sh` |
 
-## Launch
+## Minimal configuration (the about $12 left for P2 + P4 together)
+
+The n = 83 rung only (`RUNGS=n83`), the rung with the recorded IC claims (root21, K = 3240), on the same `cpu3g-32-128`. Expected 3.5 h (range 2.2–4.6: BL walks 1.4–3.5 h, two IC setups 0.2–0.4 h, boot and build 0.4 h), **$4.50** (range $2.80–$5.90), cap 6 h = $7.68. With the minimal P2 that is $10.30 expected, $14.28 at the caps. n = 73 stays for a later launch: same command with `RUNGS=n73`, about $6.
+
+```sh
+python3 launch.py run --job ea-wide --name equal-advice-n83 --branch main \
+  --flavors cpu3g --vcpu 32 --disk 80 --max-seconds 21600 --env SERVE_SECONDS=1800 --env RUNGS=n83
+```
+
+## Launch (full configuration)
 
 ```sh
 cd research/dreg_closure_m4l6_20261018/pod

@@ -6,15 +6,17 @@ Every card gives the host flavour, $/h (RunPod secure-cloud prices queried 21:13
 
 ## Cards, sorted by information per dollar
 
-"p" is the card's own stated chance of reaching a non-inconclusive row of its decision rule. It is a judgment, not a measurement. The sort is by p ÷ expected cost; the two $0 cards run on the owner's machines.
+"p" is the card's own stated chance of reaching a non-inconclusive row of its decision rule. It is a judgment, not a measurement. The sort is by p ÷ expected cost; the two $0 cards run on the owner's machines. The minimal variants (P4-min, P2-min) sit next to their full cards; they are the configurations that fit the about $12 left after P1 and P7.
 
 | # | run | card | host | $/h | expected h | expected cost (range) | cap | p |
 |--:|---|---|---|--:|--:|--:|--:|--:|
 | P6 | cross-host inherited-F4 counter drift: aarch64 half | [`cross_host/README.md`](../inherited_f4_replay_determinism_20261018/cross_host/README.md) | owner's Apple-silicon Mac (RunPod has no aarch64) | 0 | ≈ 1 | **$0** | — | 0.8 |
 | P5 | K conversion at degree 4, N = 34–44, hardware counters | [`k_conversion_perf/LAUNCH.md`](k_conversion_perf/LAUNCH.md) | owner's Linux host with a PMU (not RunPod: probe below) | 0 | 18.5 (2–37) | **$0** | — | 0.8 |
-| P1 | closure A3: decisive A1 count at (m, ℓ) = (4, 6), 3,000 fresh draws in parallel | [`closure_a3/LAUNCH.md`](closure_a3/LAUNCH.md) | `cpu3m-32-256` | 1.76 | 5.5 | **$9.70** ($7.00–$10.60) | $15.84 | 0.8 |
-| P7 | closure C1: degree 5 at m = 3, (19, 7), draw 0, above 280 GB | [`closure_c1/LAUNCH.md`](closure_c1/LAUNCH.md) | 2 × L40 GPU pod (286 GB host RAM) | 1.64 | 5.0 | **$8.20** ($4.40–$20.00) | $26.24 | 0.6 |
+| P1 | closure A3: decisive A1 count at (m, ℓ) = (4, 6), 3,000 fresh draws in parallel (**running**: pod `6sh5qyoyusv6ux`, launched 21:50Z by the parent session from `ee7a5d972`) | [`closure_a3/LAUNCH.md`](closure_a3/LAUNCH.md) | `cpu3m-32-256` | 1.76 | 5.5 | **$9.70** ($7.00–$10.60) | $15.84 | 0.8 |
+| P7 | closure C1: degree 5 at m = 3, (19, 7), draw 0, above 280 GB (**running**: pod `9g6slrqws33cr8`, launched 21:50Z by the parent session; no 2 × L40 was available) | [`closure_c1/LAUNCH.md`](closure_c1/LAUNCH.md) | `cpu3m-64-512` (planned: 2 × L40 at $1.64/h, $8.20) | 3.52 | 5.0 | **$17.60** ($9.50–$43.00) | $56.32 | 0.6 |
 | P4 | equal-advice BL rho vs compact-orbit IC, n = 73 and 83 | [`equal_advice_wide/LAUNCH.md`](equal_advice_wide/LAUNCH.md) | `cpu3g-32-128` | 1.28 | 7.5 | **$9.60** ($6.90–$11.50) | $17.92 | 0.6 |
+| P4-min | the same, n = 83 only (minimal) | [`equal_advice_wide/LAUNCH.md`](equal_advice_wide/LAUNCH.md) | `cpu3g-32-128` | 1.28 | 3.5 | **$4.50** ($2.80–$5.90) | $7.68 | 0.6 |
+| P2-min | PKM msolve `-t 16`, m3_t7 target 0 only, 6 h wall (minimal; reads H0 only) | [`pkm_msolve_mt/LAUNCH.md`](pkm_msolve_mt/LAUNCH.md) | `cpu3m-16-128` | 0.88 | 6.6 | **$5.80** | $6.60 | 0.3 |
 | P2a | PKM m = 3, N = 21, msolve `-t 16`, both t7 targets, 22 h wall | [`pkm_msolve_mt/LAUNCH.md`](pkm_msolve_mt/LAUNCH.md) | `cpu3m-32-256` | 1.76 | 22.5 | **$39.60** ($10.60–$40.50) | $46.73 | 0.5 |
 | P2b | PKM m = 3, N = 24, msolve `-t 16`, both t8 targets (target 1 never run) | [`pkm_msolve_mt/LAUNCH.md`](pkm_msolve_mt/LAUNCH.md) | `cpu3m-32-256` | 1.76 | 22.5 | **$39.60** ($10.60–$40.50) | $46.73 | 0.35 |
 | P3 | PKM native `f4_fp_tower` 192 GB cell (frozen 2026-10-16) | [`pkm_f4_tower/LAUNCH.md`](pkm_f4_tower/LAUNCH.md) | `cpu3m-32-256` | 1.76 | 60 (28–120) | **$106** ($49–$211) | $220 | 0.6 |
@@ -23,9 +25,11 @@ Every card gives the host flavour, $/h (RunPod secure-cloud prices queried 21:13
 
 | scope | expected | at the lifetime caps |
 |---|--:|--:|
-| P1 + P7 + P4 | **$27.50** | $59.99 |
-| + P2a + P2b | **$106.70** | $153.45 |
-| + P3 | **$212.70** | $373.45 |
+| P1 + P7 (running, as launched) | **$27.30** | $72.16 |
+| + P4-min + P2-min (the about $12 left) | **$37.60** | $86.44 |
+| P1 + P7 + full P4 | **$36.90** | $90.08 |
+| + P2a + P2b | **$116.10** | $183.54 |
+| + P3 | **$222.10** | $403.54 |
 
 Already done: **P0, the PMU probe** ([`pmu_probe/README.md`](pmu_probe/README.md)). RunPod hosts have a PMU, but `perf_event_paranoid = 4` gives EPERM for cycles and instructions inside the container. That is why P5 runs on the owner's host.
 
