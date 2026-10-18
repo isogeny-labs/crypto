@@ -1,4 +1,4 @@
-# Chain-free Koblitz index calculus with a half-dimension Frobenius-invariant base (L2), K_0 / F_2^31
+# Chain-free Koblitz index calculus with a half-dimension Frobenius-invariant base (L2), `icv1-f2m31-tm90707-c95f16f5` (K_0 over F_2^31)
 
 Lead L2 of [`../ecdlp_exponent_assessment_20261018/LEADS.md`](../ecdlp_exponent_assessment_20261018/LEADS.md).
 The scaling note (`research/notes/ecc2k130/RESEARCH_KOBLITZ_SCALING_TARGET.md`,
@@ -6,7 +6,7 @@ The scaling note (`research/notes/ecc2k130/RESEARCH_KOBLITZ_SCALING_TARGET.md`,
 factor base of dimension near `n/2` makes `m = 2` summands enough, so the
 `(m − 2)·n` chaining unknowns disappear and the binding constraint moves
 to materialising `2^{dim}` points. This session measures that trade on
-`K_0 / F_2^31` (`icv1-f2m31-tm90707-c95f16f5`, `r = 1 439 393 ≈ 2^{20.46}`,
+``icv1-f2m31-tm90707-c95f16f5` (K_0 over F_2^31)` (`icv1-f2m31-tm90707-c95f16f5`, `r = 1 439 393 ≈ 2^{20.46}`,
 `A = 62`) with every phase charged, against the strong signed-Frobenius
 rho reference and its A/A control. Counted group operations; a measurement,
 not a performance claim; no `S` on any leaderboard changes.
