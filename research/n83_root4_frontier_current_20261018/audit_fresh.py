@@ -17,6 +17,7 @@ AUDIT = HERE / "fresh_exclusion_audit.json"
 FINALISTS_HEAD = "9b9a0f3842de6cf921e38573cb99fcaed2a4683c"
 FINALISTS_PATH = "research/n83_root11_finalists_tier1_20261017/targets.jsonl"
 FINALISTS_SHA256 = "4eb139e73c99f0921041a911d30698997913d1e71155a8e09035ffa647e02a58"
+FINALISTS_COPY = HERE / "finalists_historical_targets.jsonl"
 
 
 def digest(data):
@@ -52,12 +53,19 @@ def audit():
         prior_files.append({"path": str(path.relative_to(ROOT)),
                             "sha256": digest(blob), "point_rows": len(rows)})
         prior_points.update(rows)
-    complete = subprocess.run(
-        ["git", "show", f"{FINALISTS_HEAD}:{FINALISTS_PATH}"],
-        cwd=ROOT, capture_output=True, check=True)
-    if digest(complete.stdout) != FINALISTS_SHA256:
+    finalist_blob = FINALISTS_COPY.read_bytes()
+    if digest(finalist_blob) != FINALISTS_SHA256:
         raise ValueError("historical finalist fixture hash differs")
-    finalist_rows = points(complete.stdout)
+    available = subprocess.run(
+        ["git", "cat-file", "-e", f"{FINALISTS_HEAD}^{{commit}}"],
+        cwd=ROOT, capture_output=True, check=False)
+    if available.returncode == 0:
+        complete = subprocess.run(
+            ["git", "show", f"{FINALISTS_HEAD}:{FINALISTS_PATH}"],
+            cwd=ROOT, capture_output=True, check=True)
+        if complete.stdout != finalist_blob:
+            raise ValueError("archived finalist copy differs from source commit")
+    finalist_rows = points(finalist_blob)
     result = {
         "schema": "n83.root4-frontier-exclusion/v1",
         "fresh_targets_sha256": digest(new_blob),
