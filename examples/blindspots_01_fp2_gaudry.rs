@@ -1510,11 +1510,19 @@ struct Line2 {
     f: Fp2,
     x0: El,
     c: El,
+    /// Solve the system through the FGHR symmetry `t ↦ 1/t` of the
+    /// `τ_T`-closed line (see [`Line2::solve_sym`]) instead of the degree-8
+    /// resultant.
+    sym: bool,
     calls: u64,
     degenerate: u64,
     unliftable: u64,
     lift_failures: u64,
     lookups: u64,
+    /// Calls the symmetric solver handed to the resultant solver because the
+    /// polynomial was not palindromic and swap-symmetric, or the linear
+    /// system was degenerate.
+    sym_fallbacks: u64,
 }
 
 impl Line2 {
@@ -1523,11 +1531,13 @@ impl Line2 {
             f,
             x0,
             c,
+            sym: false,
             calls: 0,
             degenerate: 0,
             unliftable: 0,
             lift_failures: 0,
             lookups: 0,
+            sym_fallbacks: 0,
         }
     }
     fn x_of(&self, t: u64) -> El {
@@ -1620,6 +1630,130 @@ impl Line2 {
         }
         (pairs, false)
     }
+    /// **The FGHR symmetrisation at `m = 2`.**  On the line `x = x₀ + c t`
+    /// translation by `T` is `t ↦ 1/t`, and `R ± T`-invariance of the
+    /// decomposition shows `G(t₁, t₂) = G(1/t₁, 1/t₂)·t₁²t₂²` (checked on
+    /// every call): the descended polynomial is a polynomial in the
+    /// invariants `σᵢ = tᵢ + 1/tᵢ` and `D = (t₁ − 1/t₁)(t₂ − 1/t₂)`.  With
+    /// `S = σ₁ + σ₂`, `P = σ₁σ₂`, the two `F_p` equations are linear in
+    /// `(S, P, D)`, and `D² = (P + 4)² − 4S²`: a line cut by a quadric, so a
+    /// quadratic over `F_p`, then square roots for `σᵢ` and `tᵢ`.  Returns
+    /// `None` when the structure fails or the linear system is degenerate
+    /// (the caller then uses the resultant), `Some(pairs)` otherwise.
+    fn solve_sym(&mut self, polys: &[[[u64; 3]; 3]; 2]) -> Option<Vec<(u64, u64)>> {
+        let p = self.f.p;
+        for q in polys.iter() {
+            for i in 0..3 {
+                for j in 0..3 {
+                    if q[i][j] != q[2 - i][2 - j] || q[i][j] != q[j][i] {
+                        return None;
+                    }
+                }
+            }
+        }
+        let g = |i: usize, j: usize| -> El { [polys[0][i][j], polys[1][i][j]] };
+        let f = self.f;
+        // 2·(g00 + g02) P + ... : (g00 + g02) P + (g00 − g02) D + 2 g01 S + 2 g11 = 0.
+        let c_p = f.add(g(0, 0), g(0, 2));
+        let c_d = f.sub(g(0, 0), g(0, 2));
+        let c_s = f.add(g(0, 1), g(0, 1));
+        let c_0 = f.add(g(1, 1), g(1, 1));
+        // Unknown order (S, P, D); rows are the real and imaginary parts.
+        let l = [[c_s[0], c_p[0], c_d[0]], [c_s[1], c_p[1], c_d[1]]];
+        let e = [fsub(0, c_0[0], p), fsub(0, c_0[1], p)];
+        let cross = |a: usize, b: usize| fsub(fm(l[0][a], l[1][b], p), fm(l[0][b], l[1][a], p), p);
+        let n = [cross(1, 2), cross(2, 0), cross(0, 1)];
+        let k = (0..3).find(|&i| n[i] != 0)?;
+        let (a, b) = ((k + 1) % 3, (k + 2) % 3);
+        let det_inv = finv(n[k], p);
+        let mut v = [0u64; 3];
+        v[a] = fm(
+            fsub(fm(e[0], l[1][b], p), fm(l[0][b], e[1], p), p),
+            det_inv,
+            p,
+        );
+        v[b] = fm(
+            fsub(fm(l[0][a], e[1], p), fm(e[0], l[1][a], p), p),
+            det_inv,
+            p,
+        );
+        // Q(u) = D² − (P + 4)² + 4S² on u = v + λ n.
+        let sq = |x: u64| fm(x, x, p);
+        let q2 = fadd(fsub(sq(n[2]), sq(n[1]), p), fm(4, sq(n[0]), p), p);
+        let q1 = fadd(
+            fsub(
+                fm(2, fsub(fm(v[2], n[2], p), fm(v[1], n[1], p), p), p),
+                fm(8, n[1], p),
+                p,
+            ),
+            fm(8, fm(v[0], n[0], p), p),
+            p,
+        );
+        let q0 = fsub(
+            fadd(fsub(sq(v[2]), sq(v[1]), p), fm(4, sq(v[0]), p), p),
+            fadd(fm(8, v[1], p), 16 % p, p),
+            p,
+        );
+        let mut lambdas: Vec<u64> = Vec::new();
+        if q2 == 0 {
+            if q1 == 0 {
+                if q0 == 0 {
+                    return None;
+                }
+            } else {
+                lambdas.push(fm(fsub(0, q0, p), finv(q1, p), p));
+            }
+        } else {
+            let disc = fsub(sq(q1), fm(4, fm(q2, q0, p), p), p);
+            if let Some(rt) = fsqrt(disc, p) {
+                let inv2a = finv(fm(2, q2, p), p);
+                lambdas.push(fm(fsub(rt, q1, p), inv2a, p));
+                if rt != 0 {
+                    lambdas.push(fm(fsub(0, fadd(q1, rt, p), p), inv2a, p));
+                }
+            }
+        }
+        let half = (p + 1) / 2;
+        let mut pairs = Vec::new();
+        for lam in lambdas {
+            let u = [
+                fadd(v[0], fm(lam, n[0], p), p),
+                fadd(v[1], fm(lam, n[1], p), p),
+                fadd(v[2], fm(lam, n[2], p), p),
+            ];
+            let (s_, p_, d_) = (u[0], u[1], u[2]);
+            let disc = fsub(sq(s_), fm(4, p_, p), p);
+            let Some(rt) = fsqrt(disc, p) else { continue };
+            let sigma_a = fm(fadd(s_, rt, p), half, p);
+            let sigma_b = fm(fsub(s_, rt, p), half, p);
+            let Some(da) = fsqrt(fsub(sq(sigma_a), 4 % p, p), p) else {
+                continue;
+            };
+            let Some(db) = fsqrt(fsub(sq(sigma_b), 4 % p, p), p) else {
+                continue;
+            };
+            let prod = fm(da, db, p);
+            let db = if prod == d_ {
+                db
+            } else if prod == fsub(0, d_, p) {
+                fsub(0, db, p)
+            } else {
+                continue;
+            };
+            let (t1, t2) = (
+                fm(fadd(sigma_a, da, p), half, p),
+                fm(fadd(sigma_b, db, p), half, p),
+            );
+            let (u1, u2) = (
+                fm(fsub(sigma_a, da, p), half, p),
+                fm(fsub(sigma_b, db, p), half, p),
+            );
+            pairs.push((t1, t2));
+            pairs.push((u1, u2));
+        }
+        Some(pairs)
+    }
+
     /// Indices of a two-point decomposition of `point` over the base.
     fn decompose(
         &mut self,
@@ -1632,7 +1766,20 @@ impl Line2 {
         self.calls += 1;
         let polys = self.descend(curve, point.x);
         let seed = curve.key(&point);
-        let (pairs, degenerate) = self.solve(&polys, seed);
+        let sym = if self.sym {
+            self.solve_sym(&polys)
+        } else {
+            None
+        };
+        let (pairs, degenerate) = match sym {
+            Some(pairs) => (pairs, false),
+            None => {
+                if self.sym {
+                    self.sym_fallbacks += 1;
+                }
+                self.solve(&polys, seed)
+            }
+        };
         meter.lap("oracle");
         if degenerate {
             self.degenerate += 1;
@@ -2240,6 +2387,8 @@ fn ic_solve(inst: &Inst, fb: &Fb, oracle: &mut Line2, cfg: &IcCfg, seed: u64) ->
         ("oracle_degenerate", J::u(oracle.degenerate)),
         ("oracle_unliftable", J::u(oracle.unliftable)),
         ("oracle_lift_failures", J::u(oracle.lift_failures)),
+        ("oracle_symmetric", J::B(oracle.sym)),
+        ("oracle_symmetric_fallbacks", J::u(oracle.sym_fallbacks)),
         ("crosscheck_trials", J::u(cc_checked)),
         ("crosscheck_disagreements", J::u(cc_disagree)),
         ("exhausted", J::B(recovered.is_none())),
@@ -2340,7 +2489,8 @@ fn build_line_base(inst: &Inst, tors: bool) -> Result<(Fb, Line2), String> {
     } else {
         (f.zero(), f.one())
     };
-    let line = Line2::new(*f, x0, c);
+    let mut line = Line2::new(*f, x0, c);
+    line.sym = tors;
     let mut seed = Vec::with_capacity(2 * inst.p as usize);
     for t in 1..inst.p {
         seed.extend(curve.lift_x(line.x_of(t)));
@@ -3434,6 +3584,50 @@ fn smoke(args: &HashMap<String, String>) -> Result<(), String> {
             run_ic_arm(&inst, arm, inv_cost, u64::MAX)?
         };
         report(arm, &rec, &mut failures);
+    }
+    // The symmetrised oracle against the resultant oracle and exact enumeration.
+    {
+        let inst = build_random_instance("torsion", bits, 0)?;
+        let (fb, mut sym) = build_line_base(&inst, true)?;
+        let mut generic = Line2::new(inst.curve.f, sym.x0, sym.c);
+        let mut ops = Ops::default();
+        let mut meter = Meter::default();
+        let mut rng = Rng::new(31);
+        let (mut found, mut bad, mut sym_mults, mut gen_mults) = (0u64, 0u64, 0f64, 0f64);
+        let n = 300;
+        let _ = take_counters();
+        for _ in 0..n {
+            let rr = inst.curve.mul(&mut ops, inst.g, rng.below(inst.r));
+            let _ = take_counters();
+            let spent = |m: &Meter| m.mult_eq("oracle", 4.0) + m.mult_eq("lift", 4.0);
+            let before = spent(&meter);
+            let a = sym.decompose(&inst.curve, &fb, &mut ops, &mut meter, rr);
+            sym_mults += spent(&meter) - before;
+            let before = spent(&meter);
+            let b = generic.decompose(&inst.curve, &fb, &mut ops, &mut meter, rr);
+            gen_mults += spent(&meter) - before;
+            let ex = exact_decomposes(&inst.curve, &fb, rr);
+            let _ = take_counters();
+            if a.is_some() != ex || b.is_some() != ex {
+                bad += 1;
+            }
+            if let Some(ix) = &a {
+                let sum = inst.curve.add_raw(fb.points[ix[0]], fb.points[ix[1]]);
+                if sum != rr {
+                    bad += 1;
+                }
+            }
+            found += u64::from(ex);
+        }
+        println!(
+            "  symmetric oracle vs resultant oracle vs exact enumeration: {n} targets, {found} decomposable, {bad} disagreements; F_p multiplication equivalents per call (oracle and lift): symmetric {:.0}, resultant {:.0}; symmetric fallbacks {}",
+            sym_mults / n as f64,
+            gen_mults / n as f64,
+            sym.sym_fallbacks
+        );
+        if bad > 0 {
+            failures += 1;
+        }
     }
     let inst = build_random_instance("torsion", bits, 0)?;
     let rec = run_shuffled_control(&inst, inv_cost, None)?;

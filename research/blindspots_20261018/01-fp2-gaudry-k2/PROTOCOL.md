@@ -70,8 +70,16 @@ column's unit point. The answer is accepted only when `[d]G = Q`.
 * **(b) `ic-b`, plus the FGHR 2-torsion symmetry.** On a curve with a rational
   2-torsion point `T = (x₀, 0)` and `c² = f'(x₀)`, `c ∈ F_{p²}`, the line
   `x ∈ x₀ + c·F_p^*` is closed under `P ↦ P + T` (`t ↦ 1/t`); the base is folded
-  by `⟨−1, τ_T⟩` (4 points a column, checked by `Closure::Strict`'s port). The
-  same oracle on the shifted line. Applies to the torsion family below.
+  by `⟨−1, τ_T⟩` (4 points a column, checked by `Closure::Strict`'s port).
+  The decomposition system is symmetrised as well (FGHR at `m = 2`): the
+  descended polynomial `G(t₁, t₂)` of the shifted line satisfies
+  `G(t₁, t₂) = t₁²t₂² G(1/t₁, 1/t₂)` (checked on every call, resultant solver as
+  the counted fallback), so it is a polynomial in `σᵢ = tᵢ + 1/tᵢ` and
+  `D = (t₁ − 1/t₁)(t₂ − 1/t₂)`; with `S = σ₁ + σ₂`, `P = σ₁σ₂` the two `F_p`
+  equations are linear in `(S, P, D)` and `D² = (P + 4)² − 4S²`, so the system
+  is a line cut by a quadric: one `F_p` quadratic, then square roots, in place
+  of the degree-8 resultant and its `gcd(t^p − t, ·)`. Applies to the torsion
+  family below.
 * **(c) `ic-c1`, `ic-c2`: (b) with single and double large primes.** The small
   base is a pseudo-random `⌈|columns|^e⌉` subset of the columns, `e = 0.75` for
   one large prime and `e = 0.5` for two; the rest of the line is the large-prime
@@ -202,8 +210,8 @@ and `rho-neg` as well):
 
 * One thread per job, `prlimit --as=4294967296`, one `rustc` build a card (about
   10 s). Every card's command timeouts sum to at most 540 s.
-* Measured work expected about 0.5 CPU-hour (limit 2): at 40 bits an
-  index-calculus run is about 15 to 50 s a curve and arm; the control's full
+* Measured work expected about 0.4 CPU-hour (limit 2): at 40 bits an
+  index-calculus run is about 7 to 50 s a curve and arm; the control's full
   solves are cut at 28 bits because their cost grows as `p²` (a 32-bit full
   control took 236 s in a development probe).
 * No GPU, no external solver; msolve, Magma and Sage are not used (the
@@ -212,7 +220,7 @@ and `rho-neg` as well):
 
 ## Pre-protocol runs (not cited)
 
-Development runs of the instrument before this protocol was frozen, all
+Development runs of the instrument before the cards were frozen, all
 unregistered: the `smoke` run at 24 bits and 28 bits; timing probes at
 torsion `b24 i1`, `b28 i0 i1`, `b32 i0 i1`, `b36 i0`, `b38 i0`, `b40 i0`, gls
 `b40 i0`, prime `b40 i0` (their outputs were read, so the same cells are
@@ -224,7 +232,15 @@ rows (a rho collision counted as a relation); the walk now restarts every 64
 targets and a target whose abscissa repeats is skipped; (2) after a failed
 Wiedemann attempt the same square core was retried on every later relation; an
 identical selection is now not re-run. Neither fix was chosen to move a verdict:
-both remove cost the library implementation would also avoid.
+both remove cost the library implementation would also avoid. (3) The
+FGHR system symmetrisation of arm (b) was added after those probes had shown
+the resultant solver at about three quarters of the oracle's cost: arm (b) as
+the design states it includes the symmetrisation, and the first version of the
+instrument had only its base lever. The symmetric solver agrees with the
+resultant solver and with exact enumeration on 300 of 300 targets (smoke test,
+24 and 28 bits) at 862 against 4,958 multiplication equivalents a call; the
+cards bind the instrument that has it. This protocol file was edited for it
+before any card ran.
 
 ## Deviations from the design (and why)
 
@@ -244,7 +260,8 @@ Forced by the budget or by the repository state (each reduces coverage):
 
 5. The library does not compile; the instrument is a `std`-only port
    (above). Differences from the audited code: the `S₃` oracle, the fold and the
-   linear algebra are re-written from the library's source; `F_p`
+   linear algebra are re-written from the library's source, and the symmetric
+   solver of arm (b) is new code (no library counterpart at `m = 2`); `F_p`
    multiplications are counted inside every routine (the library counts them
    in the oracle and in the group, and prices the framework's `solver` term by
    wall time, which this item does not use); rho is a fresh Van Oorschot–Wiener
