@@ -1,6 +1,6 @@
 """Metadata-only packaging of a native checkpoint. Never aggregate or solve.
 
-Usage: REPO CHECKPOINT SUMMARY REPORT GRAPH_DIR HELPERS FRESH_STAGE FRESH_ARCHIVE
+Usage: REPO CHECKPOINT SUMMARY REPORT GRAPH_DIR HELPERS FRESH_STAGE FRESH_ARCHIVE [DELIVERY_NOTE]
 """
 import json
 import shutil
@@ -9,7 +9,8 @@ import sys
 from pathlib import Path
 from package_checkpoint import archive_tree, digest
 
-repo, checkpoint, summary, report, graphs, helpers, stage, archive = map(Path, sys.argv[1:])
+repo, checkpoint, summary, report, graphs, helpers, stage, archive = map(Path, sys.argv[1:9])
+delivery_note = Path(sys.argv[9]) if len(sys.argv) > 9 else None
 assert not stage.exists() and not archive.exists(), "fresh output required"
 inv=json.loads((checkpoint/'inventory.json').read_text())
 doc=json.loads((summary/'summary.json').read_text())
@@ -20,6 +21,8 @@ assert not inv['states'].get('running',0)
 shutil.copytree(checkpoint,stage)
 shutil.copytree(summary,stage/'summary')
 shutil.copytree(report,stage/'report')
+if delivery_note:
+    shutil.copy2(delivery_note,stage/'DELIVERY_NOTE.md')
 expected={}
 with (stage/'campaign/queue.jsonl').open() as f:
     for line in f:
@@ -66,12 +69,15 @@ The exact queue, binaries and source are in campaign/. The native graph files
 are complete only for their declared fields and finite degree sets, with
 24823 vertices / 51 strata / 69300 directed maps. Original A--E full graphs,
 full benchmark matrix, exact representation registration, transported targets,
-full composite PH, independent arithmetic replay and large-extension finite-
-field IC remain open. C's order-7 k=1 diagnostic is separate.
+full graph-wide composite-PH comparison, independent arithmetic replay and
+large-extension finite-field IC remain open. Original C's separate retained-
+prefix full-selected-point-order PH/k=1 diagnostic does not discharge them.
 
 Linux x86-64 inspection: bin/volcano-ic-driver status campaign
 Native summary: bin/volcano-ic-summarize-v2 /fresh/summary campaign
-Explicit resume only: bin/volcano-ic-driver run campaign 24823 86400 2147483648
+Explicit resume only: bin/volcano-ic-driver run campaign 24823 MAX_SECONDS MAX_SPOOL_BYTES
+Choose the outer time/storage guards explicitly; see DELIVERY_NOTE.md when
+included. These are execution guards, not changes to child mathematical budgets.
 The snapshot has no STOP marker; never run resume merely to inspect it.
 Interrupted work retries into a new numbered session; it never edits the old.
 Full source revision {manifest['source_head']}; exact binaries supplied.

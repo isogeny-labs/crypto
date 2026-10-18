@@ -1,5 +1,17 @@
 # Volcano experiment downloads, 17 October 2026
 
+Latest stopped checkpoint, 18 October 2026: **5,533 / 24,823 audited vertices**,
+all 51 strata, 88,528 accepted records (56,959 verified / 27,545 exhausted /
+4,024 timeout), 2,870,489 relations / 134,616,948 actual decomposition calls.
+The retained interrupted attempt was marked by a zero-job native stop;
+its disappearance cause is unknown. [Recovery and new downloads](execution/recovery-20261018T1647Z/README.md).
+Older 4,037-vertex links and PID receipts remain immutable historical snapshots.
+The frozen solver, queue and child mathematical budgets are unchanged. A new
+actual launch receipt will determine resumed status; no stale ledger is treated
+as a live process. Clocks remain unqualified; full original classes and matrix
+remain open.
+
+
 [Download guide v4](https://drive.google.com/file/d/1We8r_TMO00hXcGUdTJhrFOHYOHF61kXd/view) includes all new artifacts, exact scopes and the actual local resume receipt.
 
 Latest measured addition (17 October 2026): **full selected-point-order C**.

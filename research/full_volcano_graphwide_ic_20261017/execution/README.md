@@ -257,3 +257,5 @@ visibility-cut controls pass, and generic C reproduces its frozen certificate.
 These prefixes do not discharge full A/C/D/E generation or new DLP timings.
 
 Latest additions: [full selected-point-order C](full_point_order/README.md) and [clean 4,037-vertex checkpoint](checkpoint-4037/README.md). Neither completes original A/C/D/E or the full requested method matrix. See STATUS.md for exact scope.
+
+18 October: [recovered 5,533-vertex native checkpoint](recovery-20261018T1647Z/README.md). All earlier snapshots remain fixed; source/budgets unchanged, clocks unqualified.

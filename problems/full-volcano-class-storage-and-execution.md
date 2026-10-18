@@ -172,3 +172,11 @@ Rechecking and deleting only B's redundant compressed local cache recovered
 The historical specialized B generator is an mmap backend restricted to
 D_K=-11 and 3-power conductor, not a generic external-memory A/C/D/E generator.
 These resource and implementation gaps remain open.
+
+18 October recovery: [native-verified 5,533-vertex checkpoint](../research/full_volcano_graphwide_ic_20261017/execution/recovery-20261018T1647Z/README.md)
+retains 88,528 accepted records, all51 strata, 56,959 verified /27,545 exhausted /
+4,024 timeout and2,870,489 relations. The absent worker's in-flight attempt is
+preserved and marked interrupted by the unchanged native zero-job stop; cause
+unknown. S3 credential discovery still finds no signing identity. Frozen graph,
+solver and child budgets are unchanged; original full classes, original matrix,
+independent arithmetic and large-k implementation gaps remain open.
