@@ -2322,7 +2322,8 @@ mod tests {
                         node_budget: 1_000_000,
                         split_rule: SplitRule::LowestFree,
                     };
-                    let (mut roots, stats) = solve_boolean_system(&sys.equations, sys.n_vars, &opts);
+                    let (mut roots, stats) =
+                        solve_boolean_system(&sys.equations, sys.n_vars, &opts);
                     roots.sort_unstable();
                     assert!(!stats.exhausted);
                     (roots, stats)
