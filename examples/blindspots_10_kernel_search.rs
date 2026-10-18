@@ -1493,7 +1493,7 @@ fn scan(cell: &CellCtx, bc: &BaseCtx, prog: &Prog, xr: u64, budget: u64) -> Scan
                 let ok = match bc.idx.get(&x3) {
                     Some(&i3) => {
                         bc.rat[i3] && {
-                            let i1 = if lift { bc.idx[&x1] } else { bc.idx[&x1] };
+                            let i1 = bc.idx[&x1];
                             let i2 = bc.idx[&x2];
                             bc.rat[i1] && bc.rat[i2]
                         }
@@ -1849,4 +1849,316 @@ fn parse_nums(s: &str) -> Vec<f64> {
         .collect()
 }
 
-include!("blindspots_10_kernel_search_cmds.rs");
+
+// ------------------------------------------------------------------ cell setup
+
+fn make_cell(n: u32, ell: usize, seed: u64) -> CellCtx {
+    CellCtx {
+        gf: Gf::new(n),
+        cv: Curve { a: 1, b: 1 },
+        n,
+        ell,
+        seed,
+    }
+}
+
+// -------------------------------------------------------------------- selftest
+
+/// All unordered rational triples (repeats allowed) with S4 = 0 for `xr`.
+fn brute_exists(cell: &CellCtx, bc: &BaseCtx, xr: u64) -> bool {
+    let r = &bc.rlist;
+    let m = r.len();
+    for i in 0..m {
+        for j in i..m {
+            for k in j..m {
+                if s4_ref(&cell.gf, &cell.cv, r[i], r[j], r[k], xr) == 0 {
+                    return true;
+                }
+            }
+        }
+    }
+    false
+}
+
+fn check(name: &str, ok: bool, detail: &str) -> bool {
+    println!("{} {} {}", if ok { "PASS" } else { "FAIL" }, name, detail);
+    ok
+}
+
+fn selftest(args: &Args) -> bool {
+    let mut all = true;
+    let t0 = Instant::now();
+    // 1. field and curve at every cell size
+    for &n in &[13u32, 17, 31, 37, 41] {
+        let cell = make_cell(n, 6, 1);
+        let gf = &cell.gf;
+        let mut rng = Rng(77 + n as u64);
+        let mut ok = is_irreducible((1u64 << n) | gf.tail);
+        for _ in 0..200 {
+            let a = (rng.next() & gf.mask).max(1);
+            let b = rng.next() & gf.mask;
+            ok &= gf.mul_nc(a, gf.inv_nc(a)) == 1;
+            ok &= gf.mul_nc(a, b) == gf.mul_nc(b, a);
+            ok &= gf.sqr_nc(a) == gf.mul_nc(a, a);
+            ok &= gf.mul_nc(a, b ^ 5) == gf.mul_nc(a, b) ^ gf.mul_nc(a, 5);
+        }
+        all &= check(&format!("field n={n}"), ok, &format!("tail=0x{:x}", gf.tail));
+        // counted inversion is a pure mul/sqr chain
+        let s0 = gf.snap();
+        let a = (rng.next() & gf.mask).max(1);
+        let ai = gf.inv(a);
+        let d = gf.snap().sub(s0);
+        all &= check(
+            &format!("inv n={n}"),
+            gf.mul_nc(a, ai) == 1 && d.lin == 0,
+            &format!("mul={} sqr={}", d.mul, d.sqr),
+        );
+        let ord = koblitz_order(n);
+        let mut ok = true;
+        for _ in 0..12 {
+            let q = random_point(gf, &cell.cv, &mut rng);
+            ok &= on_curve(gf, &cell.cv, q);
+            ok &= scalar_mul(gf, &cell.cv, Some(q), ord).is_none();
+        }
+        all &= check(
+            &format!("curve n={n}"),
+            ok,
+            &format!("#E=2^{n}+1-V_n={ord} (mod 4 = {})", ord % 4),
+        );
+        all &= check(
+            &format!("2E=ker(delta) n={n}"),
+            ord % 4 == 2,
+            "cyclic 2-part Z/2",
+        );
+    }
+    // 2. quartic forms agree with each other and with the resultant S4
+    {
+        let cell = make_cell(31, 6, 1);
+        let gf = &cell.gf;
+        let mut rng = Rng(5);
+        let mut ok = true;
+        for _ in 0..300 {
+            let x1 = rng.next() & gf.mask;
+            let x2 = rng.next() & gf.mask;
+            let xr = (rng.next() & gf.mask).max(1);
+            let xr2 = gf.sqr_nc(xr);
+            let tp = Tp {
+                xr,
+                xr2,
+                xr4: gf.sqr_nc(xr2),
+                b: 1,
+            };
+            let a = q_general(gf, x1, x2, None, &tp);
+            let b = q_b1(gf, x1, x2, None, &tp);
+            let c = q_naive(gf, x1, x2, None, &tp);
+            let d = q_b1(gf, x1, x2, Some((gf.sqr_nc(x1), gf.sqr_nc(x2))), &tp);
+            ok &= a == b && a == c && a == d;
+            let t = rng.next() & gf.mask;
+            let mut v = 0u64;
+            for k in (0..5).rev() {
+                v = gf.mul_nc(v, t) ^ a[k];
+            }
+            ok &= v == s4_ref(gf, &cell.cv, x1, x2, t, xr);
+            ok &= s4_ref(gf, &cell.cv, x1, x2, t, xr) == s4_ref(gf, &cell.cv, t, x2, x1, xr);
+        }
+        all &= check("quartic forms == resultant S4 (n=31)", ok, "300 random (x1,x2,xr,t)");
+    }
+    // 3. S4 vanishes on true sums
+    for &n in &[17u32, 31, 41] {
+        let cell = make_cell(n, 6, 1);
+        let gf = &cell.gf;
+        let mut rng = Rng(9 + n as u64);
+        let mut ok = true;
+        for _ in 0..100 {
+            let p1 = random_point(gf, &cell.cv, &mut rng);
+            let p2 = random_point(gf, &cell.cv, &mut rng);
+            let p3 = random_point(gf, &cell.cv, &mut rng);
+            for s2 in 0..2 {
+                for s3 in 0..2 {
+                    let q2 = if s2 == 1 { neg(Some(p2)) } else { Some(p2) };
+                    let q3 = if s3 == 1 { neg(Some(p3)) } else { Some(p3) };
+                    let r = add_pt(gf, &cell.cv, add_pt(gf, &cell.cv, Some(p1), q2), q3);
+                    if let Some((xr, _)) = r {
+                        ok &= s4_ref(gf, &cell.cv, p1.0, p2.0, p3.0, xr) == 0;
+                    }
+                }
+            }
+        }
+        all &= check(&format!("S4(x1,x2,x3,x(P1+-P2+-P3))=0 n={n}"), ok, "100 triples x 4 signs");
+    }
+    // 4. family construction
+    {
+        let cell = make_cell(37, 9, 3);
+        let mut ok = true;
+        let mut det = String::new();
+        for fam in 0..NFAM {
+            let bc = build_base(&cell.gf, &cell.cv, 9, fam, cell.seed);
+            ok &= bc.xs.len() == 512;
+            if matches!(bc.kind, Kind::Sub) {
+                ok &= bc.xs.iter().all(|&x| lin_eval_nc(&bc.lv, x, &cell.gf) == 0);
+            }
+            if let Kind::Coset(_) = bc.kind {
+                // every base member is a root of prod (L_U(t) + y_i)
+                let g = &cell.gf;
+                ok &= bc.xs.iter().all(|&x| {
+                    let u = lin_eval_nc(&bc.lv, x, g);
+                    let mut v = u;
+                    for &y in &bc.ys {
+                        v = g.mul_nc(v, u ^ y);
+                    }
+                    v == 0
+                });
+            }
+            det += &format!(" {}:{}", fam_name(fam), bc.rlist.len());
+        }
+        all &= check("families n=37 l=9 size/membership", ok, &format!("rational counts{det}"));
+    }
+    // 5. kernel vs brute force over random programs, small cell
+    {
+        let cell = make_cell(17, 6, 11);
+        let mut cache = BaseCache::new();
+        let mut rng = Rng(123);
+        let negs = gen_neg(&cell, 6, 999).neg;
+        let mut bad = 0;
+        let mut exact_checked = 0;
+        let mut found_total = 0;
+        let nprog = args.num("--progs", 400usize);
+        for _ in 0..nprog {
+            let prog = random_prog(&mut rng);
+            let fam = prog.g[G_FAM] as usize;
+            let poss = cache.pos(&cell, fam, 4242, 4);
+            let bc = &cache.map[&fam];
+            for &x in negs.iter().chain(poss.iter()) {
+                let exists = brute_exists(&cell, bc, x);
+                let r = scan(&cell, bc, &prog, x, 0);
+                if r.found {
+                    found_total += 1;
+                    let w = r.witness.unwrap();
+                    let valid = s4_ref(&cell.gf, &cell.cv, w[0], w[1], w[2], x) == 0
+                        && w.iter().all(|v| bc.idx.get(v).map(|&i| bc.rat[i]).unwrap_or(false));
+                    if !valid || !exists {
+                        bad += 1;
+                        println!("  bad witness {} target {x}", prog.name());
+                    }
+                }
+                // exact programs (full scan, continue until lifted) must agree with brute force
+                if prog.g[G_STOP] == 1 && prog.g[G_ABORT] == 0 {
+                    exact_checked += 1;
+                    if r.found != exists {
+                        bad += 1;
+                        println!("  decision mismatch {} target {x}: kernel {} brute {}", prog.name(), r.found, exists);
+                    }
+                }
+            }
+        }
+        all &= check(
+            "kernel == brute force (n=17 l=6, random programs)",
+            bad == 0,
+            &format!("{nprog} programs, exact decisions checked {exact_checked}, witnesses {found_total}, bad {bad}"),
+        );
+    }
+    // 6. cost positive control: handicaps cost what they must
+    {
+        let cell = make_cell(31, 9, 21);
+        let mut cache = BaseCache::new();
+        let negs = gen_neg(&cell, 2, 31).neg;
+        let run = |cache: &mut BaseCache, p: &Prog| -> Ops {
+            let r = eval_prog(&cell, cache, p, &negs, 1, 0, 0);
+            let mut t = Ops::default();
+            for o in &r.neg {
+                t.mul += o.mul;
+                t.sqr += o.sqr;
+                t.lin += o.lin;
+                t.probe += o.probe;
+                t.trace += o.trace;
+                t.pairs += o.pairs;
+            }
+            t
+        };
+        let base = Prog::incumbent();
+        let mut full = base;
+        full.g[G_PAIRS] = 1;
+        let mut lifted = base;
+        lifted.g[G_LIFT] = 1;
+        lifted.g[G_STOP] = 1;
+        let mut cont = base;
+        cont.g[G_STOP] = 1;
+        let mut ab = cont;
+        ab.g[G_ABORT] = 4;
+        let mut gen = base;
+        gen.g[G_ROOT] = 1;
+        let mut b1 = base;
+        b1.g[G_QUART] = 1;
+        let o_inc = run(&mut cache, &cont);
+        let o_full = run(&mut cache, &{
+            let mut p = cont;
+            p.g[G_PAIRS] = 1;
+            p
+        });
+        let o_lift = run(&mut cache, &{
+            let mut p = cont;
+            p.g[G_LIFT] = 1;
+            p
+        });
+        let o_ab = run(&mut cache, &ab);
+        let o_gen = run(&mut cache, &{
+            let mut p = cont;
+            p.g[G_ROOT] = 1;
+            p
+        });
+        let o_b1 = run(&mut cache, &{
+            let mut p = cont;
+            p.g[G_QUART] = 1;
+            p
+        });
+        let r_full = o_full.pairs as f64 / o_inc.pairs as f64;
+        let r_lift = o_lift.pairs as f64 / o_inc.pairs as f64;
+        let r_ab = o_ab.pairs as f64 / o_inc.pairs as f64;
+        let c_inc = o_inc.core() as f64;
+        println!(
+            "  incumbent-continue core/pair {:.1}, lin/pair {:.1}",
+            c_inc / o_inc.pairs as f64,
+            o_inc.lin as f64 / o_inc.pairs as f64
+        );
+        all &= check("handicap pairs=full costs ~2x pairs", (1.95..2.05).contains(&r_full), &format!("ratio {r_full:.3}"));
+        all &= check("lift prefilter costs ~1/4 pairs", (0.20..0.30).contains(&r_lift), &format!("ratio {r_lift:.3}"));
+        all &= check("abort 1/8 costs 1-(7/8)^2 = 0.234 of pairs", (0.22..0.25).contains(&r_ab), &format!("ratio {r_ab:.3}"));
+        all &= check(
+            "generic root finder costs more core ops",
+            o_gen.core() > o_inc.core() && (o_gen.core() as f64 / c_inc) > 1.3,
+            &format!("ratio {:.3}", o_gen.core() as f64 / c_inc),
+        );
+        all &= check(
+            "b1 quartic costs fewer core ops",
+            o_b1.core() < o_inc.core(),
+            &format!("ratio {:.4}", o_b1.core() as f64 / c_inc),
+        );
+        let _ = (base, full, lifted, gen, b1);
+    }
+    println!(
+        "selftest {} in {:.1}s, peak RSS {} MB",
+        if all { "PASSED" } else { "FAILED" },
+        t0.elapsed().as_secs_f64(),
+        rss_peak_kb() / 1024
+    );
+    all
+}
+
+fn main() {
+    let args = Args {
+        v: std::env::args().skip(1).collect(),
+    };
+    let cmd = args.v.first().cloned().unwrap_or_default();
+    match cmd.as_str() {
+        "selftest" => {
+            if !selftest(&args) {
+                std::process::exit(1);
+            }
+        }
+        _ => {
+            eprintln!("usage: b10 selftest | search | finalists | heldout | conserve | ablate | summarize");
+            std::process::exit(2);
+        }
+    }
+    let _ = std::io::stdout().flush();
+}
