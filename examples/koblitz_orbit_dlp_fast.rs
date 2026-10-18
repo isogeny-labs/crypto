@@ -2087,21 +2087,31 @@ mod wide {
                 5959927424489161220022208,
             ];
             let full =
-                build_index128_with_symmetry(&gf, &basis, &solver, &reps, false, false, false);
+                build_index128_with_symmetry(&gf, &basis, &solver, &reps, false, false, false, 1);
             let quotient =
-                build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false, false);
+                build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false, false, 1);
             let batched =
-                build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false, true);
+                build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false, true, 1);
+            let multipair =
+                build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false, true, 4);
             assert_eq!(batched.states.len(), quotient.states.len());
             assert_eq!(batched.table.len, quotient.table.len);
+            assert_eq!(multipair.states.len(), quotient.states.len());
+            assert_eq!(multipair.table.len, quotient.table.len);
             for index in 0..quotient.states.len() {
                 let scalar = quotient.states.get(index);
                 let batch = batched.states.get(index);
+                let multi = multipair.states.get(index);
                 assert_eq!(
                     (batch.left, batch.right, batch.relative),
                     (scalar.left, scalar.right, scalar.relative)
                 );
                 assert_eq!(batch.normal_roots, scalar.normal_roots);
+                assert_eq!(
+                    (multi.left, multi.right, multi.relative),
+                    (scalar.left, scalar.right, scalar.relative)
+                );
+                assert_eq!(multi.normal_roots, scalar.normal_roots);
                 for root in scalar.normal_roots {
                     let key = basis.canonical_selected(root).0;
                     assert_eq!(
@@ -2110,6 +2120,15 @@ mod wide {
                             .table
                             .get_with_context(key, &quotient.states, &basis),
                         "batched index changed the first witness for key {key}",
+                    );
+                    assert_eq!(
+                        multipair
+                            .table
+                            .get_with_context(key, &multipair.states, &basis),
+                        quotient
+                            .table
+                            .get_with_context(key, &quotient.states, &basis),
+                        "multipair index changed the first witness for key {key}",
                     );
                 }
             }
@@ -3353,6 +3372,18 @@ mod wide {
         let symmetric_states = std::env::var("KIC_SYMMETRIC_S3").as_deref() == Ok("1");
         let indexed5_load75 = std::env::var("KIC_INDEXED5_LOAD75").as_deref() == Ok("1");
         let batch_roots = std::env::var("KIC_INDEX_ROOT_BATCH").as_deref() == Ok("1");
+        let pair_batch = std::env::var("KIC_INDEX_ROOT_PAIR_BATCH")
+            .ok()
+            .map(|value| {
+                value
+                    .parse::<usize>()
+                    .expect("invalid root pair batch size")
+            })
+            .unwrap_or(1);
+        assert!(
+            (1..=8).contains(&pair_batch) && (pair_batch == 1 || batch_roots),
+            "root pair batching requires KIC_INDEX_ROOT_BATCH=1 and a size of 1..8"
+        );
         build_index128_with_symmetry(
             gf,
             basis,
@@ -3361,6 +3392,7 @@ mod wide {
             symmetric_states,
             indexed5_load75,
             batch_roots,
+            pair_batch,
         )
     }
 
@@ -3372,6 +3404,7 @@ mod wide {
         symmetric_states: bool,
         indexed5_load75: bool,
         batch_roots: bool,
+        pair_batch: usize,
     ) -> Index128 {
         let n = gf.n as usize;
         assert!(
@@ -3523,9 +3556,12 @@ mod wide {
             Vec::new()
         };
         let mut states_wide = Vec::new();
-        let mut root_batch = RootBatch128::with_capacity(n);
-        let mut root_inputs = Vec::with_capacity(n);
+        assert!((1..=8).contains(&pair_batch));
+        let mut root_batch = RootBatch128::with_capacity(n * pair_batch);
+        let mut root_inputs = Vec::with_capacity(n * pair_batch);
         for left in 0..reps.len() {
+            let mut batch_end_right = 0usize;
+            let mut batch_offset = 0usize;
             for right in 0..reps.len() {
                 if symmetric_states && left > right {
                     continue;
@@ -3535,16 +3571,25 @@ mod wide {
                 } else {
                     n
                 };
-                if batch_roots {
+                if batch_roots && right >= batch_end_right {
+                    batch_end_right = (right + pair_batch).min(reps.len());
+                    batch_offset = 0;
                     root_inputs.clear();
-                    for relative in 0..relative_count {
-                        root_inputs.push((shifted[left][0], shifted[right][relative]));
+                    for batch_right in right..batch_end_right {
+                        let batch_relatives = if symmetric_states && left == batch_right {
+                            n / 2 + 1
+                        } else {
+                            n
+                        };
+                        for relative in 0..batch_relatives {
+                            root_inputs.push((shifted[left][0], shifted[batch_right][relative]));
+                        }
                     }
                     root_batch.solve(gf, basis, solver, &root_inputs);
                 }
                 for relative in 0..relative_count {
                     let roots = if batch_roots {
-                        root_batch.results[relative]
+                        root_batch.results[batch_offset + relative]
                     } else {
                         solver.roots(gf, basis, shifted[left][0], shifted[right][relative])
                     };
@@ -3601,6 +3646,9 @@ mod wide {
                             states_wide.push(state);
                         }
                     }
+                }
+                if batch_roots {
+                    batch_offset += relative_count;
                 }
             }
         }
@@ -4208,6 +4256,10 @@ mod wide {
                     "state_digest_blake3": state_digest,
                     "table_digest_blake3": table_digest,
                     "batch_roots": std::env::var("KIC_INDEX_ROOT_BATCH").as_deref() == Ok("1"),
+                    "root_pair_batch": std::env::var("KIC_INDEX_ROOT_PAIR_BATCH")
+                        .ok()
+                        .map(|value| value.parse::<usize>().unwrap())
+                        .unwrap_or(1),
                     "base_load_ms": base_load_ms,
                     "normal_basis_and_selftest_ms": basis_ms,
                     "index_build_ms": index_ms,
