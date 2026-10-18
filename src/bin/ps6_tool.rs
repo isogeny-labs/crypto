@@ -250,7 +250,7 @@ fn opcount(out: &Path, rungs: &[u32], want: usize) -> Result<(), String> {
 
 #[cfg(not(feature = "pdp-opcount"))]
 fn opcount(_out: &Path, _rungs: &[u32], _want: usize) -> Result<(), String> {
-    Err("rebuild with --features pdp-opcount (CARGO_TARGET_DIR=target/opcount): this build counts nothing".into())
+    Err("rebuild with --features pdp-opcount: this build counts nothing".into())
 }
 
 // ── calibrate ─────────────────────────────────────────────────────
