@@ -292,3 +292,37 @@ hours; the allocation of targets to cards is in the cards themselves.
 
 A card never interprets. The assess stage reads `raw/`, applies the rule above
 with `b04 summarize`, and writes `README.md`, the graph and `REPORT.pdf`.
+
+## Amendment 1 (before any measured run): the card plan and the operational stop rule
+
+The measured runs are twenty frozen cards, `card-01.yaml` to `card-20.yaml`,
+each building the instrument with `rustc` (7 s) into
+`target/blindspots-04/card-NN/` and removing it, each with command timeouts
+summing to at most 530 s:
+
+| card | content | expected |
+|---|---|---|
+| 01 | self-test; arms a, c, d0, d at cells 1 to 4 (8 random + 4 planted); cell 5 arms d0, d; cell 5 arms a, c capped at degree 12 (certifies `D >= 13`) | 2 min |
+| 02 | A/A control (arm a, draw 1) at cells 1 to 5; linear and nonlinear recodings of arm a at cells 1 to 4 | 1 min |
+| 03 | arm e: cells 1 and 2 (8 random + 4 planted), cell 3 random 0 to 3 + planted 0 to 3 | 4 min |
+| 04, 05 | arm e: cell 3 random 4 to 7; cell 4 random 0 to 3 and 4 to 7; cell 4 planted 0, 1 | 6, 7 min |
+| 06 | arm e: cell 5, one random target | 6 min |
+| 07, 08 | arm b: cell 1, random 0 to 7 and planted 0 to 3 (degree cap 3) | 5, 1 min plus card 08's cell-2 share |
+| 08, 09 | arm b: cell 2 random 0 to 3, 4 to 7; cell 2 planted 0, 1 (degree cap 2) | 5 min each |
+| 10, 11 | arm b: cell 3 random 0 to 3, 4 to 7; cell 3 planted 0, 1 (degree cap 2) | 6 min each |
+| 12 to 19 | arm b: cell 4, one random target per card (`--first t`); card 12 also cell 4 planted 0, 1 (degree cap 2) | 4.5 min each |
+| 20 | `b04 plan --build` for the five cells (records the cell-5 arm-b projection), `b04 summarize` of `raw/` into `raw/summary.txt` and `raw/summary.tsv` | 1 min |
+
+Expected total about 92 CPU-minutes; the instrument time limits (which bound
+what a card can spend) sum to about 117 CPU-minutes, inside the 2 CPU-hour
+ceiling. Each cell invocation prints its curve, basis and per-run counts to the
+`.log` next to its `.jsonl`.
+
+**Operational stop rule.** Arms e and b are attempted cell by cell in the order
+above. If the first card of a cell ends a run on `timelimit` or `memcap` (a
+`.jsonl` row whose status is `timelimit` or `memcap`), that arm's remaining
+cards for the same cell are not relayed (cards 05, 06 for arm e; cards 13 to 19
+for arm b at cell 4) and the cell is recorded BLOCKED with the exact reason. A
+card whose instrument rows show `skipped-timebudget` leaves those targets
+unmeasured (BLOCKED(time)); they are not retried. Card 20 is relayed last in
+every case.
