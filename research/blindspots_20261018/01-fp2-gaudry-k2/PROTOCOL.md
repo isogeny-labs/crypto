@@ -95,8 +95,8 @@ column's unit point. The answer is accepted only when `[d]G = Q`.
   (order by Mestre/BSGS in the Hasse interval, certified on four more points).
   Cofactor 4 is the design's "cofactor ≤ 4". It is forced, not chosen: with
   `f'(x₀)` a square (needed for `c ∈ F_{p²}`), `T` lies in the image of the
-  2-descent map's kernel, so `4 | #E`; a development probe on 3,057 random such
-  curves at `p = 3989` found `v₂(#E) ≥ 2` on every one, against 1,001 of 1,862
+  2-descent map's kernel, so `4 | #E`; a development probe on 2,017 random such
+  curves at `p = 3989` found `v₂(#E) ≥ 2` on every one, against 1,001 of 1,983
   curves with `f'(x₀)` a non-square at `v₂(#E) = 1`. Arms (a), (b), (c1), (c2),
   (d).
 * **prime family (3 curves a size, `idx` 0 to 2).** Random `a, b`, prime
