@@ -3526,13 +3526,36 @@ fn med2_max(v: &[i64]) -> (i64, i64) {
 
 fn mode_summarize(a: &Args) {
     let mut recs: Vec<Rec> = vec![];
-    for f in a.v.iter().skip(2).filter(|x| !x.starts_with("--")) {
+    let mut files: Vec<String> = vec![];
+    let mut i = 2;
+    while i < a.v.len() {
+        let x = &a.v[i];
+        if x == "--tsv" || x == "--targets" {
+            i += 2;
+            continue;
+        }
+        if std::path::Path::new(x).is_dir() {
+            let mut names: Vec<String> = std::fs::read_dir(x)
+                .expect("read dir")
+                .filter_map(|e| e.ok())
+                .map(|e| e.path().to_string_lossy().to_string())
+                .filter(|p| p.ends_with(".jsonl"))
+                .collect();
+            names.sort();
+            files.extend(names);
+        } else {
+            files.push(x.clone());
+        }
+        i += 1;
+    }
+    for f in &files {
         if let Ok(t) = std::fs::read_to_string(f) {
             recs.extend(t.lines().filter_map(parse_rec));
         } else {
             println!("MISSING {f}");
         }
     }
+    println!("read {} rows from {} files", recs.len(), files.len());
     let cells: Vec<(i64, i64, i64)> = vec![(17, 4, 3), (19, 4, 3), (13, 3, 4), (15, 3, 4), (17, 4, 4)];
     let nrand: usize = a.num("--targets", 8);
     let arms = ["a", "d0", "d", "c", "e", "b", "a-linear", "a-nonlinear"];
