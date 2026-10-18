@@ -44,8 +44,13 @@ struct Args {
     positional: Vec<String>,
     groups: Vec<String>,
     only: Vec<String>,
-    model: CostModel,
+    models: Vec<CostModel>,
     doubling_cost: f64,
+    scan_from: i64,
+    scan_to: i64,
+    bits: u64,
+    char2: bool,
+    frozen_scan: Option<String>,
     prime_bound: u64,
     radius_factor: f64,
     top: usize,
@@ -67,8 +72,13 @@ fn parse_args() -> Args {
         positional: Vec::new(),
         groups: Vec::new(),
         only: Vec::new(),
-        model: CostModel::Projective,
+        models: Vec::new(),
         doubling_cost: 8.0,
+        scan_from: 3,
+        scan_to: 3000,
+        bits: 128,
+        char2: false,
+        frozen_scan: None,
         prime_bound: 100,
         radius_factor: 1.0,
         top: 6,
@@ -88,8 +98,16 @@ fn parse_args() -> Args {
             "--groups" => a.groups.push(val()),
             "--only" => a.only.push(val()),
             "--cost-model" => {
-                a.model = CostModel::parse(&val()).expect("cost model: projective|affine|xonly")
+                for m in val().split(',') {
+                    a.models
+                        .push(CostModel::parse(m.trim()).expect("cost model: projective|affine|xonly"));
+                }
             }
+            "--scan-from" => a.scan_from = val().parse().unwrap(),
+            "--scan-to" => a.scan_to = val().parse().unwrap(),
+            "--bits" => a.bits = val().parse().unwrap(),
+            "--char2" => a.char2 = true,
+            "--frozen-scan" => a.frozen_scan = Some(val()),
             "--doubling-cost" => a.doubling_cost = val().parse().unwrap(),
             "--prime-bound" => a.prime_bound = val().parse().unwrap(),
             "--radius-factor" => a.radius_factor = val().parse().unwrap(),
@@ -109,7 +127,14 @@ fn parse_args() -> Args {
     if a.groups.is_empty() {
         a.groups = DEFAULT_GROUPS.iter().map(|s| s.to_string()).collect();
     }
+    if a.models.is_empty() {
+        a.models.push(CostModel::Projective);
+    }
     a
+}
+
+fn model_names(args: &Args) -> String {
+    args.models.iter().map(|m| m.name()).collect::<Vec<_>>().join(",")
 }
 
 fn big(v: &Value) -> BigInt {
@@ -225,7 +250,7 @@ fn analyse(rec: &Value, args: &Args, md: &mut Vec<String>) -> Value {
     let dbl_half = (args.doubling_cost * 2.0).round() as u64;
     let saving_half = dbl_half * lprime;
     out["budget"] = json!({"log2_r": bits_r, "half_bits": lprime,
-        "doublings_saved_cost_M": half_f(saving_half), "cost_model": args.model.name(),
+        "doublings_saved_cost_M": half_f(saving_half), "cost_models": model_names(args),
         "doubling_cost_M": args.doubling_cost});
     // frozen evidence
     let frozen = rec["orders"].get(0).cloned().unwrap_or(Value::Null);
@@ -302,9 +327,17 @@ fn analyse(rec: &Value, args: &Args, md: &mut Vec<String>) -> Value {
     };
     let s = s.filter(|s| (s * s - &dk).mod_floor(&r).is_zero());
     out["sqrtDK_mod_r"] = json!(s.as_ref().map(|x| x.to_string()));
+    let mut models_out = serde_json::Map::new();
+    for &model in &args.models {
+        let mut om = json!({});
+        if args.models.len() > 1 {
+            md.push(String::new());
+            md.push(format!("#### cost model {}", model.name()));
+            md.push(String::new());
+        }
     // loop primes; char 2: orient l = 2 so that +1 is the prime containing pi
     let two = BigInt::from(2);
-    let primes = loop_primes(&cg, args.prime_bound, char2, args.model, dbl_half, |fp| {
+    let primes = loop_primes(&cg, args.prime_bound, char2, model, dbl_half, |fp| {
         char2 && fp.p == 2 && !in_ideal(&t, &f, &fp.b, &two)
     });
     if char2 {
@@ -313,8 +346,11 @@ fn analyse(rec: &Value, args: &Args, md: &mut Vec<String>) -> Value {
         }
     }
     if primes.is_empty() {
-        out["error"] = json!("no split primes below the bound");
-        return out;
+        om["error"] = json!("no split primes below the bound");
+        {
+            models_out.insert(model.name().to_string(), om);
+            continue;
+        }
     }
     let radius_cap = (args.radius_factor * saving_half as f64).floor() as u64;
     let ts = Instant::now();
@@ -333,11 +369,11 @@ fn analyse(rec: &Value, args: &Args, md: &mut Vec<String>) -> Value {
     }
     let search_s = ts.elapsed().as_secs_f64();
     let within = res.ranked.iter().filter(|x| x.0 <= res.radius).count();
-    out["relation_search"] = json!({"rank": primes.len(), "exhaustive_within_radius": res.exhaustive,
+    om["relation_search"] = json!({"rank": primes.len(), "exhaustive_within_radius": res.exhaustive,
         "radius_M": half_f(res.radius), "lll_upper_bound_M": half_f(res.lll_best),
         "loops_within_radius": within, "candidates": res.ranked.len(), "nodes": res.nodes,
         "seconds": search_s, "certify_minimum": certified});
-    out["primes"] = Value::Array(
+    om["primes"] = Value::Array(
         primes
             .iter()
             .map(|p| {
@@ -352,7 +388,7 @@ fn analyse(rec: &Value, args: &Args, md: &mut Vec<String>) -> Value {
         "- split primes ℓ ≤ {}: {} ; cost model {} (c_dbl = {} M), GLV saving {} M; radius {} M, LLL upper bound {} M, exhaustive within radius: {}, {} loops within radius",
         args.prime_bound,
         primes.iter().map(|p| p.ell.to_string()).collect::<Vec<_>>().join(","),
-        args.model.name(), args.doubling_cost, half(saving_half), half(res.radius),
+        model.name(), args.doubling_cost, half(saving_half), half(res.radius),
         half(res.lll_best), res.exhaustive, within
     ));
     md.push(String::new());
@@ -430,7 +466,7 @@ fn analyse(rec: &Value, args: &Args, md: &mut Vec<String>) -> Value {
             lam.as_ref().map(|l| short(&l.to_string())).unwrap_or_default()
         ));
     }
-    out["loops"] = Value::Array(loops);
+    om["loops"] = Value::Array(loops);
     let genuine = res
         .ranked
         .iter()
@@ -440,13 +476,14 @@ fn analyse(rec: &Value, args: &Args, md: &mut Vec<String>) -> Value {
             "exponents": exps_map(&primes, e), "chain_length": e.iter().map(|x| x.unsigned_abs()).sum::<u64>(),
             "within_radius": *c <= res.radius})
         });
-    out["cheapest_non_frobenius_loop"] = genuine.clone().unwrap_or(Value::Null);
+    om["cheapest_non_frobenius_loop"] = genuine.clone().unwrap_or(Value::Null);
     let cheapest = res.ranked.first().map(|x| half_f(x.0));
+    // the frozen (round 1, PARI) costs are projective-model costs
     let cost_match = match (frozen_cost, cheapest) {
-        (Some(a), Some(b)) => Some((a - b).abs() < 1e-9),
+        (Some(a), Some(b)) if model == CostModel::Projective => Some((a - b).abs() < 1e-9),
         _ => None,
     };
-    out["frozen_comparison"] = json!({"frozen_loops0_cost_M": frozen_cost, "native_loops0_cost_M": cheapest,
+    om["frozen_comparison"] = json!({"frozen_loops0_cost_M": frozen_cost, "native_loops0_cost_M": cheapest,
         "cost_equal": cost_match, "h_equal": h_match, "cyc_equal": cyc_match});
     md.push(String::new());
     if let Some(g) = &genuine {
@@ -456,10 +493,21 @@ fn analyse(rec: &Value, args: &Args, md: &mut Vec<String>) -> Value {
             if g["within_radius"].as_bool() == Some(true) { "" } else { " — above the radius, from the LLL basis (upper bound)" }
         ));
     }
-    md.push(format!(
-        "- frozen PARI loops[0].cost_M = {:?}, native = {:?} → equal: {:?}",
-        frozen_cost, cheapest, cost_match
-    ));
+    if model == CostModel::Projective {
+        md.push(format!(
+            "- frozen PARI loops[0].cost_M = {:?}, native = {:?} → equal: {:?}",
+            frozen_cost, cheapest, cost_match
+        ));
+    }
+        models_out.insert(model.name().to_string(), om);
+    }
+    // the first model's results also sit at the top level (round-1 layout)
+    if let Some(Value::Object(first)) = models_out.get(args.models[0].name()) {
+        for (k, v) in first {
+            out[k.as_str()] = v.clone();
+        }
+    }
+    out["models"] = Value::Object(models_out);
     let secs = t_curve.elapsed().as_secs_f64();
     out["seconds"] = json!(secs);
     md.push(format!("- wall time {:.2} s", secs));
@@ -513,10 +561,14 @@ fn main() {
         }
         return;
     }
+    if args.mode == "scan" {
+        scan(&args, &start, t0);
+        return;
+    }
     let mut md = Vec::new();
     md.push(format!(
-        "## Native isogeny-loop sweep — cost model {}, doubling {} M, primes ℓ ≤ {}, radius factor {}",
-        args.model.name(),
+        "## Native isogeny-loop sweep — cost model(s) {}, doubling {} M, primes ℓ ≤ {}, radius factor {}",
+        model_names(args),
         args.doubling_cost,
         args.prime_bound,
         args.radius_factor
@@ -541,7 +593,7 @@ fn main() {
             results.push(out);
             if let Some(p) = &args.json {
                 let payload = json!({"mode": "curve", "start_utc": start,
-                    "cost_model": args.model.name(), "doubling_cost": args.doubling_cost,
+                    "cost_models": model_names(args), "doubling_cost": args.doubling_cost,
                     "prime_bound": args.prime_bound, "radius_factor": args.radius_factor,
                     "fb_factor": args.fb_factor, "seed": args.seed, "node_cap": args.node_cap,
                     "certify_minimum": args.certify,
@@ -551,4 +603,168 @@ fn main() {
         }
     }
     eprintln!("total {:.1} s", t0.elapsed().as_secs_f64());
+}
+
+fn is_squarefree(mut m: i64) -> bool {
+    let mut p = 2i64;
+    while p * p <= m {
+        if m % (p * p) == 0 {
+            return false;
+        }
+        while m % p == 0 {
+            m /= p;
+        }
+        p += 1;
+    }
+    true
+}
+
+/// Fundamental discriminant test for `D = -m < 0`.
+fn is_fundamental_neg(m: i64) -> bool {
+    if m <= 0 {
+        return false;
+    }
+    if m % 4 == 3 {
+        return is_squarefree(m);
+    }
+    if m % 4 == 0 {
+        let k = m / 4;
+        return (k % 4 == 1 || k % 4 == 2) && is_squarefree(k);
+    }
+    false
+}
+
+/// `scan` mode: every fundamental `D = -m`, `scan_from ≤ m ≤ scan_to`, as a
+/// synthetic record (`t² − 4q = D`, `f = 1`, `r` of `--bits` bits; no curve),
+/// through the same class-group and loop search as `curve` mode, one row per
+/// discriminant with the cheapest loop under every cost model.  With
+/// `--char2` only `D ≡ 1 (mod 8)` (2 splits) is scanned, the family is
+/// binary, and the 2-steps are priced F = 2 M / V = c_dbl + 2 M.
+fn scan(args: &Args, start: &str, t0: Instant) {
+    let frozen: Option<Value> = args.frozen_scan.as_ref().map(|p| {
+        serde_json::from_str(&std::fs::read_to_string(p).unwrap_or_else(|e| panic!("{p}: {e}")))
+            .expect("frozen scan json")
+    });
+    let frozen_rows: std::collections::HashMap<i64, Value> = frozen
+        .as_ref()
+        .and_then(|v| v["rows"].as_array().cloned())
+        .unwrap_or_default()
+        .into_iter()
+        .filter_map(|r| r["DK"].as_i64().map(|d| (d, r)))
+        .collect();
+    let r_fake: BigInt = (BigInt::one() << args.bits) - 1;
+    println!(
+        "## Native isogeny-loop scan — fundamental D in [-{}, -{}], cost model(s) {}, doubling {} M, primes ℓ ≤ {}, saving at {} bits{}",
+        args.scan_to, args.scan_from, model_names(args), args.doubling_cost, args.prime_bound, args.bits,
+        if args.char2 { ", characteristic 2 (D ≡ 1 mod 8 only; F = 2 M, V = c_dbl + 2 M)" } else { "" }
+    );
+    println!();
+    println!("start (UTC): {start}");
+    println!();
+    let mut head = String::from("| D_K | h | Cl | ");
+    let mut sep = String::from("|--:|--:|:--|");
+    for m in &args.models {
+        head.push_str(&format!("{} cost M | ratio | loop | degree | ", m.name()));
+        sep.push_str("--:|--:|:--|--:|");
+    }
+    if frozen.is_some() {
+        head.push_str("round-1 projective cost M | match |");
+        sep.push_str("--:|:--|");
+    }
+    println!("{head}");
+    println!("{sep}");
+    let mut rows = Vec::new();
+    let mut summary: Vec<(usize, usize, f64, i64)> = vec![(0, 0, f64::INFINITY, 0); args.models.len()];
+    let (mut matched, mut compared) = (0usize, 0usize);
+    let mut scanned = 0usize;
+    for m in args.scan_from..=args.scan_to {
+        if !is_fundamental_neg(m) {
+            continue;
+        }
+        let d = -m;
+        if args.char2 && d.rem_euclid(8) != 1 {
+            continue;
+        }
+        scanned += 1;
+        let t: i64 = if d.rem_euclid(2) == 0 { 0 } else { 1 };
+        let q = (BigInt::from(t) * t - d) / 4;
+        let rec = json!({
+            "curve": {"name": format!("D={d}"), "family": if args.char2 { "binary" } else { "prime" },
+                "q": q.to_string(), "trace": t.to_string(), "r": r_fake.to_string(), "n": 1},
+            "frobenius": {"DK": d.to_string(), "conductor_f": "1"},
+        });
+        let mut scratch = Vec::new();
+        let out = analyse(&rec, args, &mut scratch);
+        let h = out["class_group"]["h"].as_str().unwrap_or("?").to_string();
+        let cyc = out["class_group"]["cyc_K"].clone();
+        let mut line = format!("| {d} | {h} | {} | ", cyc);
+        let mut row = json!({"DK": d, "h": h, "cyc": cyc, "models": {}});
+        for (mi, model) in args.models.iter().enumerate() {
+            let mo = &out["models"][model.name()];
+            let l0 = &mo["loops"][0];
+            let cost = l0["cost_M"].as_f64();
+            let ratio = l0["ratio_to_saving"].as_f64();
+            match (cost, ratio) {
+                (Some(c), Some(r)) => {
+                    line.push_str(&format!("{c} | {r:.3} | {} | {} | ", l0["exponents"], l0["degree"]));
+                    let e = &mut summary[mi];
+                    if r < 1.0 {
+                        e.0 += 1;
+                    }
+                    if r < 0.5 {
+                        e.1 += 1;
+                    }
+                    if r < e.2 {
+                        e.2 = r;
+                        e.3 = d;
+                    }
+                }
+                _ => line.push_str(&format!("{} | | | | ", mo["error"].as_str().unwrap_or("—"))),
+            }
+            row["models"][model.name()] = json!({"cheapest": l0.clone(),
+                "relation_search": mo["relation_search"].clone(),
+                "cheapest_non_frobenius_loop": mo["cheapest_non_frobenius_loop"].clone()});
+        }
+        if frozen.is_some() {
+            let fz = frozen_rows.get(&d).and_then(|r| r["best_cost_M"].as_f64());
+            let native = out["models"]["projective"]["loops"][0]["cost_M"].as_f64();
+            let eq = match (fz, native) {
+                (Some(a), Some(b)) => {
+                    compared += 1;
+                    let ok = (a - b).abs() < 1e-9;
+                    if ok {
+                        matched += 1;
+                    }
+                    Some(ok)
+                }
+                _ => None,
+            };
+            line.push_str(&format!("{} | {} |", fz.map(|x| x.to_string()).unwrap_or_default(),
+                eq.map(|x| x.to_string()).unwrap_or_default()));
+            row["round1_projective_cost_M"] = json!(fz);
+            row["round1_match"] = json!(eq);
+        }
+        println!("{line}");
+        rows.push(row);
+    }
+    println!();
+    println!("scanned {scanned} fundamental discriminants in {:.1} s", t0.elapsed().as_secs_f64());
+    for (mi, model) in args.models.iter().enumerate() {
+        let e = &summary[mi];
+        println!(
+            "- {}: {} discriminants with cheapest loop below the saving, {} below half of it; minimum ratio {:.3} at D = {}",
+            model.name(), e.0, e.1, e.2, e.3
+        );
+    }
+    if frozen.is_some() {
+        println!("- round-1 projective cheapest-loop costs reproduced: {matched} / {compared}");
+    }
+    if let Some(p) = &args.json {
+        let payload = json!({"mode": "scan", "start_utc": start, "from": args.scan_from, "to": args.scan_to,
+            "bits": args.bits, "char2": args.char2, "cost_models": model_names(args),
+            "doubling_cost": args.doubling_cost, "prime_bound": args.prime_bound,
+            "seconds": t0.elapsed().as_secs_f64(), "scanned": scanned,
+            "round1_matched": matched, "round1_compared": compared, "rows": rows});
+        std::fs::write(p, serde_json::to_string_pretty(&payload).unwrap()).unwrap();
+    }
 }
