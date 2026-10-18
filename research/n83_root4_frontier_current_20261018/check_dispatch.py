@@ -27,6 +27,7 @@ def required_paths(chosen):
            'prepare_dispatch.py', 'pilot.py', 'prepare_manifest.py',
            'test_provider_jobs.py', 'test_select.py', 'fresh_manifest.json', 'fresh_targets.jsonl',
            'fresh_answers.jsonl', 'fresh_exclusion_audit.json',
+           'finalists_historical_targets.jsonl',
            'generate_fresh.py', 'audit_fresh.py', 'lean_check.json',
            'pilots/k3596.tar.gz')
     return {'.github/workflows/n83-root4-frontier-current.yml', 'Cargo.lock',

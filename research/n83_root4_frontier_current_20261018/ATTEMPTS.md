@@ -15,3 +15,17 @@ The replay checks all 596,936 base points, rank 3,596, root-index occupancy,
 four-point relation, subgroup scalar, and exclusive online phases. The
 archive is freshly extracted and replayed by `prepare_dispatch.py` before
 the cloud dispatch can be sealed.
+
+## Tier 1 dispatch attempts
+
+| GitHub run | Recorded outcome | Producer coverage | Selection use |
+| --- | --- | --- | --- |
+| `39168749314` | Cancelled while queued after the direct-script fixture audit import-order preflight failed locally; corrected before a runner started | Zero | None |
+| `39169469839` | `INFRASTRUCTURE_CENSORED`: both jobs started, then their fixture audit failed because the default shallow checkout did not contain historical commit `9b9a0f3842de6cf921e38573cb99fcaed2a4683c` | Zero | None |
+
+The second run retained provider artifacts `12153185305` and `12152383616`.
+Its 32-point historical finalist fixture is now stored byte-for-byte under
+`finalists_historical_targets.jsonl`, SHA-256
+`4eb139e73c99f0921041a911d30698997913d1e71155a8e09035ffa647e02a58`.
+The fixture audit checks that digest in shallow checkouts and compares the
+bytes with the historical commit whenever that commit is locally available.
