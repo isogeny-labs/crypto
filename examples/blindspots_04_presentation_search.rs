@@ -3229,13 +3229,15 @@ fn mode_plan(a: &Args) {
             let sys = build_arm(&cell, &dr, &tgt, arm_static(arm), None);
             let (es, ne) = eliminate(&sys);
             println!(
-                "built arm {arm}: N={} eliminated {} -> N={} eqs {} columns d3 {} d4 {}  ({:.1}s)",
+                "built arm {arm}: N={} eliminated {} -> N={} eqs {} columns d3 {} d4 {} reduced-basis bound d3 {:.2e} B d4 {:.2e} B  ({:.1}s)",
                 sys.nv,
                 ne,
                 es.nv,
                 es.eqs.len(),
                 cols_up_to(es.nv, 3),
                 cols_up_to(es.nv, 4),
+                (cols_up_to(es.nv, 3) as f64).powi(2) / 16.0,
+                (cols_up_to(es.nv, 4) as f64).powi(2) / 16.0,
                 t0.elapsed().as_secs_f64()
             );
         }
