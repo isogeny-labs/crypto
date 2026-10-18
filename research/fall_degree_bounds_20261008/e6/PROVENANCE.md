@@ -12,3 +12,4 @@
   their outputs do not depend on which build ran them.
 - Part D used the rebuilt binary.
 - 2026-10-12T00:57:25Z: rebuilt again for Part D′ (`--dlast`); sha256 `0ef3a347a2e32dd3cdc6d3bee216743ff2bda692a2e504569b78bc97079679ac`. Part B cells launched after this time and Part D′ used it. The `newcells` path is unchanged.
+- 2026-10-18T16:27:55Z: the container restarted mid-Part B (after 3 of 4 m=5 (10,2) draws; m=4 (13,4) not started). Both cells were rerun from scratch with the same binary (sha256 0ef3a347…) into B_5-10-2.rerun.jsonl and B_4-13-4.jsonl; the first three m=5 draws must reproduce exactly.
