@@ -1,0 +1,72 @@
+{
+ "mode": "index",
+ "spec": "construct:73:1:600",
+ "repeats": 2,
+ "states_cap": 40000,
+ "threads": 4,
+ "metric": "total_s",
+ "summary": {
+  "serial": {
+   "n": 2,
+   "median": 66.37700000000001,
+   "min": 60.61,
+   "max": 72.144,
+   "all": [
+    72.144,
+    60.61
+   ]
+  },
+  "threads_batch_inv": {
+   "n": 2,
+   "median": 29.1295,
+   "min": 28.594,
+   "max": 29.665,
+   "all": [
+    29.665,
+    28.594
+   ]
+  }
+ },
+ "runs": {
+  "serial": [
+   {
+    "states": 26280000,
+    "states_s": 19.843,
+    "keys_s": 15.793,
+    "fill_s": 36.508,
+    "total_s": 72.144,
+    "process_wall_s": 80.82953071594238
+   },
+   {
+    "states": 26280000,
+    "states_s": 19.313,
+    "keys_s": 2.635,
+    "fill_s": 38.663,
+    "total_s": 60.61,
+    "process_wall_s": 69.72565031051636
+   }
+  ],
+  "threads_batch_inv": [
+   {
+    "states": 26280000,
+    "states_s": 5.744,
+    "keys_s": 12.873,
+    "fill_s": 11.049,
+    "total_s": 29.665,
+    "process_wall_s": 38.27611994743347
+   },
+   {
+    "states": 26280000,
+    "states_s": 6.408,
+    "keys_s": 10.857,
+    "fill_s": 11.328,
+    "total_s": 28.594,
+    "process_wall_s": 37.47062540054321
+   }
+  ]
+ },
+ "host": {
+  "nproc": 4,
+  "uname": "6.18.44-fc-v139"
+ }
+}

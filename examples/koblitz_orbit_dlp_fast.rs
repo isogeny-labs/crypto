@@ -3864,6 +3864,46 @@ mod wide {
         columns: usize,
     }
 
+    /// How the index build runs.  `serial()` is the original loop (the
+    /// control); the other settings change only how the same states and the
+    /// same table are produced, never their content or order.
+    #[derive(Clone, Copy, Debug)]
+    struct IndexBuildOpts {
+        /// `KIC_INDEX_THREADS=N` (N > 1): states and canonical keys are
+        /// computed in parallel; the table is filled serially, in order.
+        threads: usize,
+        /// `KIC_INDEX_BATCH_INV=1`: one shared inversion per chunk of
+        /// `INDEX_BATCH` root solves (Montgomery's trick) instead of one each.
+        batch_inv: bool,
+    }
+
+    /// Root solves per shared inversion in the batched build.
+    const INDEX_BATCH: usize = 256;
+
+    impl IndexBuildOpts {
+        fn serial() -> Self {
+            Self {
+                threads: 1,
+                batch_inv: false,
+            }
+        }
+
+        fn from_env() -> Self {
+            Self {
+                threads: std::env::var("KIC_INDEX_THREADS")
+                    .ok()
+                    .and_then(|value| value.trim().parse::<usize>().ok())
+                    .filter(|&threads| threads > 0)
+                    .unwrap_or(1),
+                batch_inv: std::env::var("KIC_INDEX_BATCH_INV").as_deref() == Ok("1"),
+            }
+        }
+
+        fn is_serial(self) -> bool {
+            self.threads <= 1 && !self.batch_inv
+        }
+    }
+
     fn build_index128(
         gf: &Gf2_128,
         basis: &NormalBasis128,
@@ -3872,9 +3912,164 @@ mod wide {
     ) -> Index128 {
         let symmetric_states = std::env::var("KIC_SYMMETRIC_S3").as_deref() == Ok("1");
         let indexed5_load75 = std::env::var("KIC_INDEXED5_LOAD75").as_deref() == Ok("1");
-        build_index128_with_symmetry(gf, basis, solver, reps, symmetric_states, indexed5_load75)
+        let opts = IndexBuildOpts::from_env();
+        let index = build_index128_impl(
+            gf,
+            basis,
+            solver,
+            reps,
+            symmetric_states,
+            indexed5_load75,
+            opts,
+        );
+        if !opts.is_serial() && std::env::var("KIC_VERIFY_INDEX").as_deref() == Ok("1") {
+            let started = Instant::now();
+            let reference = build_index128_impl(
+                gf,
+                basis,
+                solver,
+                reps,
+                symmetric_states,
+                indexed5_load75,
+                IndexBuildOpts::serial(),
+            );
+            match index_difference(&index, &reference) {
+                None => eprintln!(
+                    "VERIFY_INDEX identical states={} table_entries={} serial_rebuild_s={:.3}",
+                    index.states.len(),
+                    index.table.len,
+                    started.elapsed().as_secs_f64()
+                ),
+                Some(difference) => panic!("VERIFY_INDEX mismatch: {difference}"),
+            }
+        }
+        index
     }
 
+    /// `None` when the two indexes hold identical states in identical order
+    /// and a byte-identical table and Bloom filter; otherwise the first
+    /// difference found.  Covers the default `Wide` state layout.
+    fn index_difference(a: &Index128, b: &Index128) -> Option<String> {
+        match (&a.states, &b.states) {
+            (StateStore128::Wide(x), StateStore128::Wide(y)) => {
+                if x.len() != y.len() {
+                    return Some(format!("state count {} vs {}", x.len(), y.len()));
+                }
+                for (i, (p, q)) in x.iter().zip(y).enumerate() {
+                    if (p.left, p.right, p.relative, p.normal_roots)
+                        != (q.left, q.right, q.relative, q.normal_roots)
+                    {
+                        return Some(format!("state {i} differs"));
+                    }
+                }
+            }
+            _ => return Some("state layout not comparable".into()),
+        }
+        if a.table.len != b.table.len || a.table.shift != b.table.shift {
+            return Some("table len or shift differs".into());
+        }
+        let slots_equal = match (&a.table.slots, &b.table.slots) {
+            (RootSlots128::Wide(x), RootSlots128::Wide(y)) => x == y,
+            (RootSlots128::Packed(x), RootSlots128::Packed(y)) => x == y,
+            (RootSlots128::Indexed83(x), RootSlots128::Indexed83(y)) => x == y,
+            (RootSlots128::Indexed83Four(x), RootSlots128::Indexed83Four(y)) => x == y,
+            _ => false,
+        };
+        if !slots_equal {
+            return Some("table slots differ".into());
+        }
+        match (&a.table.bloom, &b.table.bloom) {
+            (None, None) => {}
+            (Some(x), Some(y)) if x.words == y.words && x.hashes == y.hashes => {}
+            _ => return Some("Bloom filter differs".into()),
+        }
+        if a.shifted != b.shifted {
+            return Some("shifted rows differ".into());
+        }
+        None
+    }
+
+    /// The default-layout states, in the serial loop's order
+    /// `(left, right, relative)`, computed one `left` row per task.  With
+    /// `batch_inv` the root solves of a row share one inversion per
+    /// `INDEX_BATCH` pairs ([`RootBatch128::solve`] equals
+    /// `S3Solver128::roots` pair for pair, including exceptional inputs).
+    fn build_states_blocked(
+        gf: &Gf2_128,
+        basis: &NormalBasis128,
+        solver: &S3Solver128,
+        shifted: &[Vec<u128>],
+        symmetric_states: bool,
+        opts: IndexBuildOpts,
+    ) -> Vec<State128> {
+        use rayon::prelude::*;
+        let n = gf.n as usize;
+        let k = shifted.len();
+        let row = |left: usize| -> Vec<State128> {
+            let mut out = Vec::with_capacity(k * n / 2);
+            let mut batch = RootBatch128::with_capacity(INDEX_BATCH);
+            let mut inputs: Vec<(u128, u128)> = Vec::with_capacity(INDEX_BATCH);
+            let mut labels: Vec<(u16, u16)> = Vec::with_capacity(INDEX_BATCH);
+            let mut flush = |inputs: &mut Vec<(u128, u128)>,
+                             labels: &mut Vec<(u16, u16)>,
+                             out: &mut Vec<State128>| {
+                if opts.batch_inv {
+                    batch.solve(gf, basis, solver, inputs);
+                }
+                for (i, &(x, y)) in inputs.iter().enumerate() {
+                    let roots = if opts.batch_inv {
+                        batch.results[i]
+                    } else {
+                        solver.roots(gf, basis, x, y)
+                    };
+                    if let Some(roots) = roots {
+                        out.push(State128 {
+                            left: left as u16,
+                            right: labels[i].0,
+                            relative: labels[i].1,
+                            normal_roots: [
+                                basis.to_normal.apply(roots[0]),
+                                basis.to_normal.apply(roots[1]),
+                            ],
+                        });
+                    }
+                }
+                inputs.clear();
+                labels.clear();
+            };
+            for right in 0..k {
+                for relative in 0..n {
+                    if symmetric_states && (left > right || (left == right && relative > n / 2)) {
+                        continue;
+                    }
+                    inputs.push((shifted[left][0], shifted[right][relative]));
+                    labels.push((right as u16, relative as u16));
+                    if inputs.len() == INDEX_BATCH {
+                        flush(&mut inputs, &mut labels, &mut out);
+                    }
+                }
+            }
+            flush(&mut inputs, &mut labels, &mut out);
+            out
+        };
+        let rows: Vec<Vec<State128>> = if opts.threads > 1 {
+            let pool = rayon::ThreadPoolBuilder::new()
+                .num_threads(opts.threads)
+                .build()
+                .expect("index build thread pool");
+            pool.install(|| (0..k).into_par_iter().map(row).collect())
+        } else {
+            (0..k).map(row).collect()
+        };
+        let total = rows.iter().map(Vec::len).sum();
+        let mut states = Vec::with_capacity(total);
+        for part in rows {
+            states.extend(part);
+        }
+        states
+    }
+
+    #[cfg(test)]
     fn build_index128_with_symmetry(
         gf: &Gf2_128,
         basis: &NormalBasis128,
@@ -3883,6 +4078,28 @@ mod wide {
         symmetric_states: bool,
         indexed5_load75: bool,
     ) -> Index128 {
+        build_index128_impl(
+            gf,
+            basis,
+            solver,
+            reps,
+            symmetric_states,
+            indexed5_load75,
+            IndexBuildOpts::serial(),
+        )
+    }
+
+    fn build_index128_impl(
+        gf: &Gf2_128,
+        basis: &NormalBasis128,
+        solver: &S3Solver128,
+        reps: &[u128],
+        symmetric_states: bool,
+        indexed5_load75: bool,
+        opts: IndexBuildOpts,
+    ) -> Index128 {
+        let timing = std::env::var("KIC_INDEX_TIMING").as_deref() == Ok("1");
+        let index_started = Instant::now();
         let n = gf.n as usize;
         assert!(
             !symmetric_states || gf.n == 83,
@@ -4033,7 +4250,12 @@ mod wide {
             Vec::new()
         };
         let mut states_wide = Vec::new();
-        for left in 0..reps.len() {
+        let blocked_states = !opts.is_serial()
+            && !(packed_state83 || packed_state26 || root_only83 || root_only21 || root_only11);
+        if blocked_states {
+            states_wide = build_states_blocked(gf, basis, solver, &shifted, symmetric_states, opts);
+        }
+        for left in 0..if blocked_states { 0 } else { reps.len() } {
             for right in 0..reps.len() {
                 for relative in 0..n {
                     if symmetric_states && (left > right || (left == right && relative > n / 2)) {
@@ -4096,6 +4318,7 @@ mod wide {
                 }
             }
         }
+        let states_done = index_started.elapsed();
         let states = if packed_state83 {
             StateStore128::Packed83(states83)
         } else if packed_state26 {
@@ -4225,16 +4448,52 @@ mod wide {
         } else {
             RootTable128::with_capacity(root_table_request_entries, gf.n, reps.len(), packed)
         };
+        // Canonical keys of the default layout, computed ahead (in parallel
+        // when asked) so the serial, order-preserving fill below only walks
+        // the table.
+        let state_keys: Option<Vec<[(u128, u32); 2]>> = match &states {
+            StateStore128::Wide(wide_states) if blocked_states && !root_only11 => {
+                use rayon::prelude::*;
+                let keys_of = |state: &State128| {
+                    [
+                        basis.canonical_selected(state.normal_roots[0]),
+                        basis.canonical_selected(state.normal_roots[1]),
+                    ]
+                };
+                Some(if opts.threads > 1 {
+                    let pool = rayon::ThreadPoolBuilder::new()
+                        .num_threads(opts.threads)
+                        .build()
+                        .expect("index key thread pool");
+                    pool.install(|| wide_states.par_iter().map(keys_of).collect())
+                } else {
+                    wide_states.iter().map(keys_of).collect()
+                })
+            }
+            _ => None,
+        };
+        let keys_done = index_started.elapsed();
         if !root_only11 {
             for state_index in 0..states.len() {
+                if let Some(keys) = &state_keys {
+                    if let Some(ahead) = keys.get(state_index + 8) {
+                        table.prefetch_slot(ahead[0].0);
+                        table.prefetch_slot(ahead[1].0);
+                    }
+                }
                 if matches!(
                     &table.slots,
                     RootSlots128::Indexed83(_) | RootSlots128::Indexed83Four(_)
                 ) {
                     for root_selector in 0..2 {
-                        let canonical = basis
-                            .canonical_selected(states.root_at(state_index, root_selector))
-                            .0;
+                        let canonical = match &state_keys {
+                            Some(keys) => keys[state_index][root_selector].0,
+                            None => {
+                                basis
+                                    .canonical_selected(states.root_at(state_index, root_selector))
+                                    .0
+                            }
+                        };
                         table.insert_indexed83(
                             canonical,
                             state_index,
@@ -4246,8 +4505,11 @@ mod wide {
                     }
                 } else {
                     let state = states.get(state_index);
-                    for &root in &state.normal_roots {
-                        let (canonical, shift) = basis.canonical_selected(root);
+                    for (selector, &root) in state.normal_roots.iter().enumerate() {
+                        let (canonical, shift) = match &state_keys {
+                            Some(keys) => keys[state_index][selector],
+                            None => basis.canonical_selected(root),
+                        };
                         table.insert_if_absent(
                             canonical,
                             pack(state.left, state.right, state.relative, shift),
@@ -4255,6 +4517,18 @@ mod wide {
                     }
                 }
             }
+        }
+        if timing {
+            eprintln!(
+                "INDEX_TIMING threads={} batch_inv={} states={} states_s={:.3} keys_s={:.3} fill_s={:.3} total_s={:.3}",
+                opts.threads,
+                opts.batch_inv,
+                states.len(),
+                states_done.as_secs_f64(),
+                (keys_done - states_done).as_secs_f64(),
+                (index_started.elapsed() - keys_done).as_secs_f64(),
+                index_started.elapsed().as_secs_f64()
+            );
         }
         Index128 {
             states,
@@ -5310,6 +5584,43 @@ mod wide {
         }
 
         #[test]
+        fn parallel_batched_index_equals_serial_build() {
+            for (n, symmetric) in [(73u32, false), (83, true)] {
+                let gf = Gf2_128::new(&find_irreducible_sparse_wide(n).unwrap());
+                let basis = NormalBasis128::new(&gf);
+                let solver = S3Solver128::new(&gf, 1);
+                let mut seed = 0xC0FF_EE00_1234_5678u64 ^ n as u64;
+                let reps: Vec<u128> = (0..7).map(|_| random_word(&mut seed, basis.mask)).collect();
+                let reference = build_index128_impl(
+                    &gf,
+                    &basis,
+                    &solver,
+                    &reps,
+                    symmetric,
+                    false,
+                    IndexBuildOpts::serial(),
+                );
+                assert!(reference.states.len() > 100);
+                for (threads, batch_inv) in [(1, true), (3, false), (3, true), (4, true)] {
+                    let built = build_index128_impl(
+                        &gf,
+                        &basis,
+                        &solver,
+                        &reps,
+                        symmetric,
+                        false,
+                        IndexBuildOpts { threads, batch_inv },
+                    );
+                    assert_eq!(
+                        index_difference(&built, &reference),
+                        None,
+                        "n={n} threads={threads} batch_inv={batch_inv}"
+                    );
+                }
+            }
+        }
+
+        #[test]
         fn blocked_bloom_has_no_false_negatives_and_prehashed_calls_agree() {
             let mut seed = 0x1357_9BDF_0246_8ACEu64;
             for profile in [
@@ -5408,7 +5719,15 @@ mod wide {
             let solver = S3Solver128::new(&gf, 1);
             let mut seed = 0xDEAD_BEEF_0BAD_F00Du64;
             let reps: Vec<u128> = (0..6).map(|_| random_word(&mut seed, basis.mask)).collect();
-            let mut index = build_index128_with_symmetry(&gf, &basis, &solver, &reps, false, false);
+            let mut index = build_index128_impl(
+                &gf,
+                &basis,
+                &solver,
+                &reps,
+                false,
+                false,
+                IndexBuildOpts::serial(),
+            );
             let base = Base128 {
                 points: Vec::new(),
                 labels: Vec::new(),
