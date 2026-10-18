@@ -19,7 +19,7 @@ control 1, negative control cross-check, or F4 run exists.
 * `asym` ASYM OK: Dinur d=2 0.694550 (published 0.6943), d=3 0.811490 (0.8114),
   lptwy d=2 0.876250 (0.8765); all inside the frozen intervals. Positive control 2 passed.
 * `sens` SENS OK (E=33 FES ratio 1.888, expected 1.889; E=64 3.610 vs 3.611;
-  dinur change 1.4% and 4.0%: see caveat below).
+  dinur change 1.4% and 4.0%: exceeds the protocol's 1%, see caveats).
 * Counted model for ten cells (targets 0-7 and 8 random systems each).
 
 ## Counted-model numbers (descended target 6, log2 bit operations; model only)
@@ -80,9 +80,12 @@ is condensed; its full output is in `raw/card-01-*.log`).
 ## Caveats
 
 Counted model only; host is shared 4-vCPU at isolation level L0; toy scale
-(N <= 32); sensitivity control shows the dinur count is not fully independent
-of E (4.0% at E=64, 1% threshold in the protocol was stated for the sensitivity
-rule; the printed line is marked pass by the instrument, reported as seen).
+(N <= 32); **the sensitivity control disagrees with the frozen text**: PROTOCOL.md
+requires the dinur count to move by less than 1% across E = 17, 33, 64, but the
+instrument measured 1.36% (E=33) and 3.99% (E=64) and its code passes at
+`rel_d < 0.05`. Read against the frozen 1% the control fails; read against the
+code's 5% it passes. This code/protocol mismatch is reported, not resolved; it
+is a second reason the verdict is INCONCLUSIVE and needs a director decision.
 The built binaries remain in `target/blindspots-03/bin` because card 09, which
 removes them, did not run. No speed result, so no `benchmarks/` entry.
 
