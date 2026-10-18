@@ -3,7 +3,7 @@
 # PKM m = 3, N = 21 cell (research/pkm_lead1_m3n21_20261016/PROTOCOL.md).
 # Plumbing only: installs a toolchain, clones the pinned branch, builds the
 # two examples, runs the frozen run.sh, serves the study directory on :8000.
-#   boot.sh closure|pkm     (env: BRANCH, RUNPOD_API_KEY, RUNPOD_POD_ID)
+#   boot.sh closure|pkm     (env: BRANCH)
 set -u
 JOB=$1; BRANCH=${BRANCH:?BRANCH}
 OUT=/workspace/out; mkdir -p "$OUT"; ln -sf /root/boot.log "$OUT/boot.log"
@@ -65,7 +65,8 @@ PY
   done
   status VERIFY; $S verify; status DONE ;;
 esac
-# Keep serving results for a day, then stop the pod (billing stops; disk kept).
+# Keep serving results for a day, then end the container (the session that
+# launched the pod terminates it; no API key lives on the pod).
 sleep 86400
-curl -s https://api.runpod.io/graphql -H 'Content-Type: application/json' -H "Authorization: Bearer ${RUNPOD_API_KEY:-}" \
-  -d "{\"query\":\"mutation { podStop(input: {podId: \\\"${RUNPOD_POD_ID:-}\\\"}) { id } }\"}" > /dev/null
+echo "$(date -u +%FT%TZ) serving window over" >> "$OUT/STATUS"
+kill -TERM 1

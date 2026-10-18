@@ -18,10 +18,7 @@ def call(method, path, body=None):
     out = subprocess.run(cmd, capture_output=True, text=True, check=True).stdout
     return json.loads(out or "null")
 
-START = r'''( sleep "$POD_MAX_SECONDS"
-  curl -s https://api.runpod.io/graphql -H 'Content-Type: application/json' -H "Authorization: Bearer $RUNPOD_API_KEY" \
-    -d "{\"query\":\"mutation { podStop(input: {podId: \\\"$RUNPOD_POD_ID\\\"}) { id } }\"}"
-) >/tmp/pod-lifetime.log 2>&1 &
+START = r'''( sleep "$POD_MAX_SECONDS"; echo "lifetime cap reached" >> /root/boot.log; kill -TERM 1 ) >/tmp/pod-lifetime.log 2>&1 &
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq >/dev/null 2>&1; apt-get install -y -qq curl ca-certificates >/dev/null 2>&1
 curl -sSL "https://raw.githubusercontent.com/aburan28/crypto/$BRANCH/research/dreg_closure_m4l6_20261018/pod/boot.sh" -o /root/boot.sh
@@ -34,7 +31,7 @@ def run(a):
         "name": a.name, "cloudType": "SECURE", "imageName": "runpod/base:1.0.2-ubuntu2404",
         "containerDiskInGb": a.disk, "volumeInGb": 0, "ports": ["8000/http"],
         "dockerEntrypoint": ["bash", "-c"], "dockerStartCmd": [START],
-        "env": {"JOB": a.job, "BRANCH": a.branch, "POD_MAX_SECONDS": str(a.max_seconds), "RUNPOD_API_KEY": KEY},
+        "env": {"JOB": a.job, "BRANCH": a.branch, "POD_MAX_SECONDS": str(a.max_seconds)},  # no secrets on the pod
     }
     if a.gpu:
         body.update({"computeType": "GPU", "gpuTypeIds": [a.gpu], "gpuCount": a.gpu_count,
@@ -42,6 +39,8 @@ def run(a):
     else:
         body.update({"computeType": "CPU", "cpuFlavorIds": a.flavors.split(","), "vcpuCount": a.vcpu})
     r = call("POST", "/pods", body)
+    if not isinstance(r, dict) or "id" not in r:
+        sys.exit(f"pod not created: {json.dumps(r)[:600]}")
     print(json.dumps({k: r.get(k) for k in ("id", "name", "desiredStatus", "cpuFlavorId", "vcpuCount", "memoryInGb", "costPerHr", "machineId")}))
     print("results:", f"https://{r['id']}-8000.proxy.runpod.net/")
 
