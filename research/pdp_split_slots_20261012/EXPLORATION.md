@@ -64,6 +64,22 @@ The same growth read from sweep 2 at fixed ℓ: 8.7 (n = 13, ℓ = 5, k 9 → 11
 6.8 and 7.9 (n = 17, ℓ = 5, k 7 → 9 → 11). Enumeration grows by 2 per
 unknown. `pdp_split_analyze --ladder` produced these columns.
 
+## Sweep 4: g at fixed ℓ = 7, n = 23 closure (one target, two slot tuples, seed 79)
+
+| g | branches | residual k | XORs per branch | XORs per target | F4 wall per target (descriptive) | solving degree |
+|--:|--:|--:|--:|--:|--:|--:|
+| 8 | 256 | 13 | 4.6e7 | 1.18e10 | 26–28 s | 5 |
+| 10 | 1,024 | 11 | 4.2e5 | 4.35e8 | 13–21 s | 5 |
+| 12 | 4,096 | 9 | 2.9e4 | 1.18e8 | 29–63 s | 4 |
+| 14 | 16,384 | 7 | 1.9e2 | 3.1e6 | 45–108 s | 0–2 |
+
+Growth per unknown from these: 12.3 (k 7 → 9), 3.8 (9 → 11), 10.5
+(11 → 13). From g = 8 to g = 14 the XOR count falls 3,700× while the wall
+time **rises** 2–4×: at 16,384 F4 calls per target the per-call work that
+the elimination-only count omits is the whole cost. The XOR-priced S of a
+high-g arm is therefore not a cost at all; only the fully charged table
+arm (round 3's bracket) and, descriptively, wall time bound it.
+
 ## What this suggests for round 3
 
 1. An oracle that **enumerates** the residual unknowns after guessing, with
