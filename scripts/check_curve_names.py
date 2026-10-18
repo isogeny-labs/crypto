@@ -55,15 +55,22 @@ SELF = {"docs/curves/ICV1.md", "docs/curves/README.md", "scripts/check_curve_nam
         # legacy spellings on purpose.
         "docs/ic-leaderboard.html", "docs/ic/LEADERBOARD.md"}
 
-# This initial rendering is explicitly frozen in tools/groebner-history/README.md.
-# Its labels quote the source-hash-bound workload definitions. Only these exact
-# labels at the reviewed artifact hash are retained; ordinary prose remains linted.
+# These historical artifacts retain source-bound labels at exact byte hashes.
+# The first rendering is frozen in tools/groebner-history/README.md; the oracle
+# protocol's historical commit, native source and archived raw certificate are
+# bound in its historical-label-binding.json. Ordinary prose remains linted.
 ARCHIVED_LABELS = {
     "research/f4_f5_history_20261012/reports/run-20261012T0009Z/REPORT.md": {
         "sha256": "d481fbfa188cafe6fb1364c4df1b8a7c704bd2867b7d866cc3a39c66c7b85ba9",
         "labels": {
             "K_1 / 2^23": "icv1-f2m23-tm5197-1f85e9e1",
             "K_1 / 2^17": "icv1-f2m17-tm101-00378d4e",
+        },
+    },
+    "research/ideas_execution_20261018/oracle_integration/PROTOCOL.md": {
+        "sha256": "799dfb71a8aa125c699415c52a31076923d9d2a2ae752af06e014b0ebcdc7530",
+        "labels": {
+            "K_0/GF(2^7)": "icv1-f2m7-t13-616700dd",
         },
     },
 }
