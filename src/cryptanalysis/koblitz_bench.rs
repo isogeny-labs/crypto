@@ -1144,6 +1144,106 @@ pub fn random_subspace_basis(n: u32, ell: usize, rng: &mut StdRng) -> Vec<F2mEle
 /// this is the count an exhaustive evaluation of the system would give --
 /// `chained_s3_count_matches_exhaustive_evaluation` holds it to that.  Cost
 /// `2^{2ℓ+n}` quadratic evaluations, then `2^ℓ` per root.
+/// Roots `d ∈ F_{2^n}` of one chain link `S₃(a, c, d) = (a+c)²d² + ac·d + (ac)² + b = 0`,
+/// solved directly instead of by scanning the field.
+///
+/// With `λ = ac/(a+c)²` and `d = λt` the link is `t² + t = c₀`,
+/// `c₀ = ((ac)² + b)(a+c)²/(ac)²`: an Artin–Schreier equation, solved by
+/// linear algebra over `F₂` (the map `t ↦ t² + t` is `F₂`-linear, of rank
+/// `n − 1`; `c₀` is in its image iff `Tr(c₀) = 0`, and then the two roots
+/// are `t₀` and `t₀ + 1`).  The degenerate links: `a = c` makes the link
+/// linear in `d` (`ac·d = (ac)² + b`, one root, or none if also `ac = 0`
+/// since `b ≠ 0`); `ac = 0 ≠ a + c` makes it `d² = b/(a+c)²`, one root.
+/// `s3_link_roots_match_the_field_scan` holds every case to the scan.
+pub struct S3LinkRoots {
+    gf: crate::cryptanalysis::semaev_decomp::Gf2,
+    n: u32,
+    b: u64,
+    /// `(lead bit, image, preimage)` of `t ↦ t² + t`, descending by lead.
+    pivots: Vec<(u64, u64, u64)>,
+}
+
+impl S3LinkRoots {
+    pub fn new(irr: &crate::binary_ecc::IrreduciblePoly, b: u64) -> Self {
+        use crate::cryptanalysis::semaev_decomp::Gf2;
+        assert!(b != 0, "b = 0 makes the ac = 0 link vanish identically");
+        let gf = Gf2::new(irr);
+        let n = irr.degree;
+        let mut pivots: Vec<(u64, u64, u64)> = Vec::new();
+        for i in 0..n {
+            let e = 1u64 << i;
+            let (mut v, mut pre) = (gf.sqr(e) ^ e, e);
+            for &(lead, img, pim) in &pivots {
+                if v & lead != 0 {
+                    v ^= img;
+                    pre ^= pim;
+                }
+            }
+            if v != 0 {
+                let lead = 1u64 << (63 - v.leading_zeros());
+                pivots.push((lead, v, pre));
+                pivots.sort_unstable_by(|x, y| y.0.cmp(&x.0));
+            }
+        }
+        debug_assert_eq!(pivots.len() as u32, n - 1);
+        Self { gf, n, b, pivots }
+    }
+
+    /// One `t` with `t² + t = c`, if any.
+    pub fn artin_schreier(&self, c: u64) -> Option<u64> {
+        let (mut v, mut pre) = (c, 0u64);
+        for &(lead, img, pim) in &self.pivots {
+            if v & lead != 0 {
+                v ^= img;
+                pre ^= pim;
+            }
+        }
+        (v == 0).then_some(pre)
+    }
+
+    /// Every `d` with `S₃(a, c, d) = 0`, distinct, at most two.
+    pub fn roots(&self, a: u64, c: u64) -> Vec<u64> {
+        let gf = &self.gf;
+        let (lead, mid) = (gf.sqr(a ^ c), gf.mul(a, c));
+        let tail = gf.sqr(mid) ^ self.b;
+        if lead == 0 {
+            // a = c: `mid·d = tail`.
+            return if mid == 0 {
+                Vec::new()
+            } else {
+                vec![gf.mul(tail, gf.inv(mid))]
+            };
+        }
+        if mid == 0 {
+            // `lead·d² = tail`: squaring is a bijection.
+            return vec![gf.sqr_k(gf.mul(tail, gf.inv(lead)), self.n - 1)];
+        }
+        let inv_mid = gf.inv(mid);
+        let lambda = gf.mul(mid, gf.inv(lead));
+        let c0 = gf.mul(gf.mul(tail, lead), gf.sqr(inv_mid));
+        match self.artin_schreier(c0) {
+            Some(t0) => vec![gf.mul(lambda, t0), gf.mul(lambda, t0 ^ 1)],
+            None => Vec::new(),
+        }
+    }
+}
+
+/// The `2^n` field scan [`S3LinkRoots::roots`] replaces: the reference the
+/// solver is tested against.  `O(2^n)` field operations per link.
+pub fn s3_link_roots_by_scan(
+    a: u64,
+    c: u64,
+    b: u64,
+    gf: &crate::cryptanalysis::semaev_decomp::Gf2,
+    n: u32,
+) -> Vec<u64> {
+    let (lead, mid) = (gf.sqr(a ^ c), gf.mul(a, c));
+    let tail = gf.sqr(mid) ^ b;
+    (0..1u64 << n)
+        .filter(|&d| gf.mul(lead, gf.sqr(d)) ^ gf.mul(mid, d) ^ tail == 0)
+        .collect()
+}
+
 pub fn chained_s3_solution_count(
     basis: &[F2mElement],
     x_r: &F2mElement,
@@ -1163,22 +1263,20 @@ pub fn chained_s3_solution_count(
         })
         .collect();
     let (xr, bb) = (word(x_r), word(b));
-    let s3 = |a: u64, c: u64, d: u64| {
-        let ac = gf.mul(a, c);
-        gf.mul(gf.sqr(a ^ c), gf.sqr(d)) ^ gf.mul(ac, d) ^ gf.sqr(ac) ^ bb
-    };
-    let squares: Vec<u64> = (0..1u64 << n).map(|u| gf.sqr(u)).collect();
+    let _ = (&gf, n);
+    let solver = S3LinkRoots::new(irr, bb);
+    // `closing[u]` = #{x₃ ∈ span : S₃(u, x₃, x_R) = 0} = #{x₃ : u is a root of the last link}.
+    let mut closing: std::collections::HashMap<u64, u64> = std::collections::HashMap::new();
+    for &x3 in &span {
+        for u in solver.roots(x3, xr) {
+            *closing.entry(u).or_insert(0) += 1;
+        }
+    }
     let mut count = 0u64;
     for &x1 in &span {
         for &x2 in &span {
-            let (lead, mid) = (gf.sqr(x1 ^ x2), gf.mul(x1, x2));
-            let tail = gf.sqr(mid) ^ bb;
-            for (u, &uu) in squares.iter().enumerate() {
-                let u = u as u64;
-                if gf.mul(lead, uu) ^ gf.mul(mid, u) ^ tail != 0 {
-                    continue;
-                }
-                count += span.iter().filter(|&&x3| s3(u, x3, xr) == 0).count() as u64;
+            for u in solver.roots(x1, x2) {
+                count += closing.get(&u).copied().unwrap_or(0);
             }
         }
     }
@@ -1196,7 +1294,7 @@ pub fn chained_s3_solution_count(
 /// and root of the next, closing on the last summand.  At `m = 3` it equals
 /// [`chained_s3_solution_count`]; `chained_count_matches_exhaustive_evaluation_at_m4`
 /// holds `m = 4` to an exhaustive evaluation of the system.  Cost about
-/// `2^{(m−1)ℓ + n + m − 2}` field operations.
+/// `2^{(m−1)ℓ + m − 2}` direct link solves ([`S3LinkRoots`]).
 pub fn chained_solution_count(
     m: usize,
     basis: &[F2mElement],
@@ -1218,37 +1316,40 @@ pub fn chained_solution_count(
         })
         .collect();
     let (xr, bb) = (word(x_r), word(b));
-    let squares: Vec<u64> = (0..1u64 << n).map(|u| gf.sqr(u)).collect();
-    // Every `d` with S₃(a, c, d) = 0: (a+c)²d² + acd + (ac)² + b = 0.
-    let roots = |a: u64, c: u64| -> Vec<u64> {
-        let (lead, mid) = (gf.sqr(a ^ c), gf.mul(a, c));
-        let tail = gf.sqr(mid) ^ bb;
-        (0..1u64 << n)
-            .filter(|&d| gf.mul(lead, squares[d as usize]) ^ gf.mul(mid, d) ^ tail == 0)
-            .collect()
-    };
-    let s3 = |a: u64, c: u64, d: u64| {
-        let ac = gf.mul(a, c);
-        gf.mul(gf.sqr(a ^ c), gf.sqr(d)) ^ gf.mul(ac, d) ^ gf.sqr(ac) ^ bb
-    };
+    let _ = (&gf, n);
+    let solver = S3LinkRoots::new(irr, bb);
+    // Every `d` with S₃(a, c, d) = 0, solved directly ([`S3LinkRoots`]).
+    let roots = |a: u64, c: u64| -> Vec<u64> { solver.roots(a, c) };
+    // `closing[e]` = #{x ∈ span : S₃(e, x, x_R) = 0}.
+    let mut closing: std::collections::HashMap<u64, u64> = std::collections::HashMap::new();
+    for &x in &span {
+        for e in roots(x, xr) {
+            *closing.entry(e).or_insert(0) += 1;
+        }
+    }
     // Solutions of the links after the intermediate point `e`, with `left`
     // summands still to place; the last one closes on x(R).
     type Roots<'a> = &'a dyn Fn(u64, u64) -> Vec<u64>;
-    type Link<'a> = &'a dyn Fn(u64, u64, u64) -> u64;
-    fn rest(e: u64, left: usize, span: &[u64], xr: u64, roots: Roots, s3: Link) -> u64 {
+    fn rest(
+        e: u64,
+        left: usize,
+        span: &[u64],
+        closing: &std::collections::HashMap<u64, u64>,
+        roots: Roots,
+    ) -> u64 {
         if left == 1 {
-            return span.iter().filter(|&&x| s3(e, x, xr) == 0).count() as u64;
+            return closing.get(&e).copied().unwrap_or(0);
         }
         span.iter()
             .flat_map(|&x| roots(e, x))
-            .map(|next| rest(next, left - 1, span, xr, roots, s3))
+            .map(|next| rest(next, left - 1, span, closing, roots))
             .sum()
     }
     let mut count = 0u64;
     for &x1 in &span {
         for &x2 in &span {
             for e1 in roots(x1, x2) {
-                count += rest(e1, m - 2, &span, xr, &roots, &s3);
+                count += rest(e1, m - 2, &span, &closing, &roots);
             }
         }
     }
@@ -2096,6 +2197,42 @@ mod tests {
             sat > 0 && unsat > 0,
             "both kinds of draw exercised: {sat} sat, {unsat} unsat"
         );
+    }
+
+    /// The direct link solver returns exactly the roots the `2^n` field scan
+    /// finds: random links at `n = 5..13` (odd and even `n`), and the
+    /// degenerate links `a = c`, `a = 0`, `a = c = 0`.
+    #[test]
+    fn s3_link_roots_match_the_field_scan() {
+        use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+        use crate::cryptanalysis::semaev_decomp::Gf2;
+        let mut rng = StdRng::seed_from_u64(0x5_0_1_7);
+        let (mut two, mut one, mut none) = (0usize, 0usize, 0usize);
+        for n in 5u32..=13 {
+            let irr = find_irreducible_sparse(n).unwrap();
+            let gf = Gf2::new(&irr);
+            let mask = (1u64 << n) - 1;
+            for b in [1u64, rng.gen::<u64>() & mask | 1] {
+                let solver = S3LinkRoots::new(&irr, b);
+                let mut links: Vec<(u64, u64)> = (0..40)
+                    .map(|_| (rng.gen::<u64>() & mask, rng.gen::<u64>() & mask))
+                    .collect();
+                let a = rng.gen::<u64>() & mask | 1;
+                links.extend([(a, a), (0, a), (a, 0), (0, 0), (1, 1), (1, 0)]);
+                for (a, c) in links {
+                    let mut got = solver.roots(a, c);
+                    got.sort_unstable();
+                    let want = s3_link_roots_by_scan(a, c, b, &gf, n);
+                    assert_eq!(got, want, "n={n} b={b} a={a} c={c}");
+                    match got.len() {
+                        2 => two += 1,
+                        1 => one += 1,
+                        _ => none += 1,
+                    }
+                }
+            }
+        }
+        assert!(two > 0 && one > 0 && none > 0, "{two} {one} {none}");
     }
 
     /// At `m = 3` the general chained count is the `S₃` count it generalises.

@@ -664,6 +664,307 @@ fn specialise(paths: &[String]) {
     }
 }
 
+/// Score `research/dreg_closure_slope_20261018` (its PREREGISTRATION.md):
+/// one `dreg_closure --sparse D --draw K` output per `<cell>.d<K>.D<d>.jsonl`.
+/// An empty file is a run the memory or time limit killed; `"capped":true` is
+/// a run that hit the entry cap; both are unmeasured, never evidence.  Per
+/// draw: the first scanned degree that refutes, `≥ D+1` when degree `D`
+/// saturated without refuting and nothing higher was measured, or
+/// unmeasured.  Per cell: resolved at the median of ≥ 3 exact degrees, or
+/// bounded below.  Study: the least-squares slope of cell degree against
+/// `m·ℓ` over the resolved cells with the committed degree-4 anchors, the
+/// registered verdict, P1–P5, and the derived distance table.
+fn slope(paths: &[String]) {
+    // (m, n, ℓ) → draw → degree → record
+    type Rec = (
+        bool, /*measured*/
+        bool, /*refuted*/
+        bool, /*saturated*/
+        f64,  /*secs*/
+        bool, /*capped*/
+    );
+    let mut cells: BTreeMap<(u64, u64, u64), BTreeMap<u64, BTreeMap<u64, Rec>>> = BTreeMap::new();
+    let (mut check_runs, mut check_refuted) = (0usize, 0usize);
+    let (mut ctrl_runs, mut ctrl_bad, mut ctrl_unmeasured) = (0usize, 0usize, 0usize);
+    for path in paths {
+        let name = std::path::Path::new(path)
+            .file_name()
+            .and_then(|f| f.to_str())
+            .unwrap_or("");
+        let text = std::fs::read_to_string(path).unwrap_or_default();
+        let line = text.lines().find(|l| !l.trim().is_empty());
+        // `<kind>-m<M>-<n>-<ℓ>.d<K>.D<d>.jsonl`
+        let parse_name = || -> Option<(String, u64, u64, u64, u64, u64)> {
+            let (kind, rest) = name.split_once("-m")?;
+            let mut it = rest.split(['-', '.']);
+            let m = it.next()?.parse().ok()?;
+            let n = it.next()?.parse().ok()?;
+            let ell = it.next()?.parse().ok()?;
+            let k = it.next()?.strip_prefix('d')?.parse().ok()?;
+            let d = it.next()?.strip_prefix('D')?.parse().ok()?;
+            Some((kind.to_string(), m, n, ell, k, d))
+        };
+        let Some((kind, m, n, ell, k, d)) = parse_name() else {
+            panic!("{path}: unparsable file name");
+        };
+        let rec: Rec = match line {
+            None => (false, false, false, 0.0, false),
+            Some(l) => {
+                let v: Value = serde_json::from_str(l).expect("json");
+                assert_eq!(v["degree"].as_u64(), Some(d), "{path}: degree");
+                assert_eq!(v["m"].as_u64(), Some(m), "{path}: m");
+                let capped = v["capped"].as_bool().unwrap_or(false);
+                (
+                    !capped,
+                    v["closure_refuted"].as_bool().unwrap_or(false),
+                    v["saturated"].as_bool().unwrap_or(false),
+                    v["secs"].as_f64().unwrap_or(0.0),
+                    capped,
+                )
+            }
+        };
+        match kind.as_str() {
+            "check" => {
+                check_runs += 1;
+                check_refuted += (rec.0 && rec.1) as usize;
+            }
+            "control" => {
+                ctrl_runs += 1;
+                ctrl_bad += (rec.0 && rec.1) as usize;
+                ctrl_unmeasured += (!rec.0) as usize;
+            }
+            _ => {
+                cells
+                    .entry((m, n, ell))
+                    .or_default()
+                    .entry(k)
+                    .or_default()
+                    .insert(d, rec);
+            }
+        }
+    }
+
+    // Committed anchors: dense closure 4 on every draw (dreg_closure_scale_20261016, dreg_closure_mutantxl_20261016).
+    let anchors: [(u64, u64, u64); 8] = [
+        (4, 12, 3),
+        (4, 14, 3),
+        (3, 11, 5),
+        (3, 13, 5),
+        (3, 15, 5),
+        (4, 13, 4),
+        (3, 16, 6),
+        (3, 18, 6),
+    ];
+    println!("| m | (n, ℓ) | m·ℓ | N | degree per draw | cell | secs per draw |");
+    println!("|--:|---|--:|--:|---|---|---|");
+    for (m, n, ell) in anchors {
+        println!(
+            "| {m} | ({n}, {ell}) | {} | {} | 4 4 4 4 (committed, dense) | resolved at 4 | — |",
+            m * ell,
+            m * ell + (m - 2) * n
+        );
+    }
+    let mut points: Vec<(f64, f64)> = anchors
+        .iter()
+        .map(|&(m, _, l)| ((m * l) as f64, 4.0))
+        .collect();
+    let mut first_six: Option<u64> = None;
+    let mut p1_ok = 0usize;
+    let mut p1_total = 0usize;
+    for ((m, n, ell), draws) in &cells {
+        let mut exact: Vec<u64> = Vec::new();
+        let mut bounds: Vec<u64> = Vec::new();
+        let mut labels: Vec<String> = Vec::new();
+        let mut secs: Vec<String> = Vec::new();
+        for (_, degs) in draws {
+            let mut label = String::from("unmeasured");
+            let mut best_bound = 0u64;
+            let mut found: Option<u64> = None;
+            let mut total = 0.0;
+            for (&d, &(measured, refuted, saturated, s, _)) in degs {
+                total += s;
+                if measured && refuted {
+                    found = Some(d);
+                    break;
+                }
+                if measured && saturated {
+                    best_bound = best_bound.max(d + 1);
+                }
+            }
+            if let Some(d) = found {
+                exact.push(d);
+                label = d.to_string();
+            } else if best_bound > 0 {
+                bounds.push(best_bound);
+                label = format!("≥{best_bound}");
+            }
+            labels.push(label);
+            secs.push(format!("{total:.0}"));
+        }
+        let verdict = if exact.len() >= 3 {
+            let mut e = exact.clone();
+            e.sort_unstable();
+            let med = e[e.len() / 2];
+            points.push(((m * ell) as f64, med as f64));
+            if med >= 6 {
+                first_six = Some(first_six.map_or(m * ell, |f| f.min(m * ell)));
+            }
+            if m * ell == 20 || m * ell == 21 {
+                p1_total += exact.len();
+                p1_ok += exact.iter().filter(|&&d| d == 5).count();
+            }
+            format!("resolved at {med}")
+        } else {
+            let mut lows: Vec<u64> = exact
+                .iter()
+                .copied()
+                .chain(bounds.iter().copied())
+                .collect();
+            lows.sort_unstable();
+            if lows.len() >= 3 {
+                format!("bounded below by {}", lows[0])
+            } else {
+                "unmeasured".to_string()
+            }
+        };
+        println!(
+            "| {m} | ({n}, {ell}) | {} | {} | {} | {verdict} | {} |",
+            m * ell,
+            m * ell + (m - 2) * n,
+            labels.join(" "),
+            secs.join(" ")
+        );
+    }
+    println!();
+    // Least squares over resolved cells (anchors included), one point per cell.
+    let k = points.len() as f64;
+    let (sx, sy) = points
+        .iter()
+        .fold((0.0, 0.0), |(a, b), &(x, y)| (a + x, b + y));
+    let (mx, my) = (sx / k, sy / k);
+    let sxx: f64 = points.iter().map(|&(x, _)| (x - mx) * (x - mx)).sum();
+    let sxy: f64 = points.iter().map(|&(x, y)| (x - mx) * (y - my)).sum();
+    let s = if sxx > 0.0 { sxy / sxx } else { f64::NAN };
+    let fitted = points.iter().filter(|&&(x, _)| x > 18.0).count();
+    println!(
+        "Slope s = {s:.4} degrees per summand unknown (m·ℓ), least squares over {} cells ({} anchors at degree 4, {fitted} measured here)",
+        points.len(),
+        anchors.len()
+    );
+    let verdict = if fitted == 0 {
+        "nothing resolved above the anchors: undecided"
+    } else if s < 0.03 {
+        "grows slowly (s < 0.03): compute the crossover"
+    } else if s >= 0.10 {
+        "closed at every size (s ≥ 0.10)"
+    } else {
+        "undecided (0.03 ≤ s < 0.10)"
+    };
+    println!("Registered verdict: {verdict}");
+    println!(
+        "P1 (every resolved draw at m·ℓ = 20, 21 reads 5): {p1_ok} of {p1_total}{}",
+        if p1_total > 0 && p1_ok == p1_total {
+            " → holds"
+        } else if p1_total > 0 {
+            " → refuted"
+        } else {
+            " → unmeasured"
+        }
+    );
+    match first_six {
+        Some(x) => println!("P2 (a resolved cell with m·ℓ ≤ 30 reads 6): holds, first at m·ℓ = {x}"),
+        None => println!("P2 (a resolved cell with m·ℓ ≤ 30 reads 6): refuted on the resolved cells (or unmeasured)"),
+    }
+    println!(
+        "P3 (s ≥ 0.10): {}",
+        if fitted == 0 {
+            "unmeasured".to_string()
+        } else if s >= 0.10 {
+            "holds".to_string()
+        } else {
+            format!("refuted (s = {s:.4})")
+        }
+    );
+    println!(
+        "P4 (sparse degree-4 replays of committed dense refutations refute): {check_refuted} of {check_runs}{}",
+        if check_runs > 0 && check_refuted == check_runs { " → holds" } else if check_runs > 0 { " → FAILS: instrument failure" } else { " → not run" }
+    );
+    println!(
+        "P5 (no satisfiable draw refuted): {ctrl_runs} control runs, {ctrl_bad} refuted, {ctrl_unmeasured} unmeasured{}",
+        if ctrl_bad > 0 { " → FAILS: instrument failure" } else { "" }
+    );
+
+    // Derived distance table (cost model of PREREGISTRATION.md, w = 1 column touches):
+    //   rho = sqrt(pi r / (4·2n)), r = 2^n / cofactor; relations 2^ℓ/(2n); attempts max(1, m!·2^{n−mℓ});
+    //   oracle ≥ C(N, ≤D), N = m·ℓ + (m−2)·n (chained) — and N = m·ℓ for the eliminated system.
+    println!();
+    println!("Derived (cost model, w = 1; extrapolated degree 4 + s·(m·ℓ − 18) at ℓ = ⌈n/m⌉, read from the fit over m·ℓ ≤ 30):");
+    println!("| n | m | ℓ | log₂ budget per solve | admissible D (chained N) | admissible D (N = m·ℓ) | extrapolated degree | gap, degrees (chained) |");
+    println!("|--:|--:|--:|--:|--:|--:|--:|--:|");
+    let log2_cols = |nv: u64, d: u64| -> f64 {
+        let mut total = 0f64;
+        let mut binom = 1f64;
+        for i in 0..=d {
+            if i > nv {
+                break;
+            }
+            total += binom;
+            binom = binom * (nv - i) as f64 / (i + 1) as f64;
+        }
+        total.log2()
+    };
+    let admissible = |nv: u64, budget: f64| -> Option<u64> {
+        (2..=40u64).rev().find(|&d| log2_cols(nv, d) <= budget)
+    };
+    for &(n, cof) in &[
+        (73u64, 4u64),
+        (109, 4),
+        (127, 4),
+        (131, 4),
+        (163, 2),
+        (233, 4),
+    ] {
+        for m in 3..=6u64 {
+            let ell = n.div_ceil(m);
+            let rho = 0.5
+                * ((std::f64::consts::PI / (8.0 * n as f64)).log2() + n as f64
+                    - (cof as f64).log2());
+            let fact: f64 = (1..=m).map(|i| i as f64).product();
+            let attempts = (fact.log2() + n as f64 - (m * ell) as f64).max(0.0);
+            let relations = ell as f64 - (2.0 * n as f64).log2();
+            let budget = rho - relations - attempts;
+            let n_ch = m * ell + (m - 2) * n;
+            let a_ch = admissible(n_ch, budget);
+            let a_el = admissible(m * ell, budget);
+            let extrap = 4.0 + s.max(0.0) * ((m * ell) as f64 - 18.0);
+            let gap = a_ch.map_or("—".to_string(), |a| format!("{:+.1}", extrap - a as f64));
+            println!(
+                "| {n} | {m} | {ell} | {budget:.1} | {} | {} | {extrap:.1} | {gap} |",
+                a_ch.map_or("none".to_string(), |a| a.to_string()),
+                a_el.map_or("none".to_string(), |a| a.to_string())
+            );
+        }
+    }
+    if s.is_finite() && s > 0.0 {
+        // The crossover: the first n at which the extrapolated degree fits the chained budget, per m.
+        for m in 3..=6u64 {
+            let hit = (40..=20000u64).find(|&n| {
+                let ell = n.div_ceil(m);
+                let rho = 0.5 * ((std::f64::consts::PI / (8.0 * n as f64)).log2() + n as f64 - 2.0);
+                let fact: f64 = (1..=m).map(|i| i as f64).product();
+                let attempts = (fact.log2() + n as f64 - (m * ell) as f64).max(0.0);
+                let budget = rho - (ell as f64 - (2.0 * n as f64).log2()) - attempts;
+                let extrap = (4.0 + s * ((m * ell) as f64 - 18.0)).ceil() as u64;
+                log2_cols(m * ell + (m - 2) * n, extrap) <= budget
+            });
+            match hit {
+                Some(n) => println!("Crossover under the fit, m = {m}: first n = {n} (derived; the fit is read beyond its range)"),
+                None => println!("Crossover under the fit, m = {m}: none below n = 20000 (derived)"),
+            }
+        }
+    }
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     match args.first().map(String::as_str) {
@@ -674,9 +975,10 @@ fn main() {
         Some("closure") => closure(&args[1..]),
         Some("scale") => scale(&args[1..]),
         Some("specialise") => specialise(&args[1..]),
+        Some("slope") => slope(&args[1..]),
         _ => {
             eprintln!(
-                "usage: dreg_score score FILES… | compare REF RERUN | semireg M n:ℓ… | shape M n:ℓ:D… | closure FILES… | scale FILES… | specialise FILES…"
+                "usage: dreg_score score FILES… | compare REF RERUN | semireg M n:ℓ… | shape M n:ℓ:D… | closure FILES… | scale FILES… | specialise FILES… | slope FILES…"
             );
             std::process::exit(2);
         }
