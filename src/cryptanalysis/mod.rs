@@ -152,6 +152,7 @@ pub mod ecdlp_nist;
 pub mod ecdlp_variants;
 pub mod ecdsa_audit;
 pub mod ecm;
+pub mod equivariant_f4;
 pub mod eds_mov;
 pub mod eds_net;
 pub mod eds_residue;
