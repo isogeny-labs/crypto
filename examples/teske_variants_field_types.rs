@@ -85,7 +85,7 @@ fn is_prime(n: u64) -> bool {
     }
     let mut d = 2u64;
     while d * d <= n {
-        if n % d == 0 {
+        if n.is_multiple_of(d) {
             return false;
         }
         d += 1;
@@ -98,9 +98,9 @@ fn prime_factors(mut n: u64) -> Vec<u64> {
     let mut out = Vec::new();
     let mut d = 2u64;
     while d * d <= n {
-        if n % d == 0 {
+        if n.is_multiple_of(d) {
             out.push(d);
-            while n % d == 0 {
+            while n.is_multiple_of(d) {
                 n /= d;
             }
         }
@@ -177,7 +177,6 @@ fn ghs_genus(m: u32, type_i: bool) -> (Option<u128>, f64) {
 
 #[derive(Clone, Debug)]
 struct BinRow {
-    n: u32,
     deg: u32,
     type_i: bool,
     m: u32,
@@ -218,7 +217,6 @@ fn binary_rows(n: u32) -> Vec<BinRow> {
             let m = deg + if type_i { 1 } else { 0 };
             let (genus, log2_genus) = ghs_genus(m, type_i);
             BinRow {
-                n,
                 deg,
                 type_i,
                 m,
@@ -233,7 +231,6 @@ fn binary_rows(n: u32) -> Vec<BinRow> {
 
 #[derive(Clone, Debug)]
 struct GghsRow {
-    n: u32,
     r: u32,
     s: u32,
     t: u32,
@@ -287,7 +284,6 @@ fn gghs_rows(n: u32) -> Vec<GghsRow> {
                 (None, t as f64)
             };
             GghsRow {
-                n,
                 r,
                 s,
                 t,
@@ -512,9 +508,10 @@ const INF: u32 = u32::MAX;
 
 struct Gf {
     p: u32,
+    #[cfg_attr(not(test), allow(dead_code))]
     l: u32,
-    size: u32,
     nn: u32,
+    #[cfg_attr(not(test), allow(dead_code))]
     exp: Vec<u32>,
     log: Vec<u32>,
     zech: Vec<u32>,
@@ -613,10 +610,10 @@ fn poly_gcd(a: &[u32], b: &[u32], p: u32) -> Vec<u32> {
 fn poly_sub(a: &[u32], b: &[u32], p: u32) -> Vec<u32> {
     let n = a.len().max(b.len());
     let mut out = vec![0u32; n];
-    for i in 0..n {
+    for (i, o) in out.iter_mut().enumerate() {
         let x = a.get(i).copied().unwrap_or(0);
         let y = b.get(i).copied().unwrap_or(0);
-        out[i] = (x + p - y) % p;
+        *o = (x + p - y) % p;
     }
     poly_trim(&mut out);
     out
@@ -667,8 +664,8 @@ impl Gf {
             'search: for c in 0..size {
                 let mut coeffs = vec![0u32; l as usize + 1];
                 let mut v = c;
-                for i in 0..l as usize {
-                    coeffs[i] = v % p;
+                for coeff in coeffs.iter_mut().take(l as usize) {
+                    *coeff = v % p;
                     v /= p;
                 }
                 coeffs[l as usize] = 1;
@@ -733,7 +730,6 @@ impl Gf {
         Gf {
             p,
             l,
-            size,
             nn,
             exp,
             log,
@@ -807,14 +803,8 @@ impl Gf {
     fn sub(&self, a: u32, b: u32) -> u32 {
         self.add(a, self.neg(b))
     }
-    fn pow(&self, a: u32, e: u64) -> u32 {
-        if a == self.nn {
-            return if e == 0 { 0 } else { self.nn };
-        }
-        ((a as u64 * (e % self.nn as u64)) % self.nn as u64) as u32
-    }
     /// Constant `c mod p` in log form.
-    fn from_int(&self, c: i64) -> u32 {
+    fn const_int(&self, c: i64) -> u32 {
         let c = c.rem_euclid(self.p as i64) as u32;
         self.log[c as usize]
     }
@@ -823,13 +813,13 @@ impl Gf {
         self.nn / ((self.p as u64).pow(d) as u32 - 1)
     }
     fn in_sub(&self, a: u32, d: u32) -> bool {
-        a == self.nn || a % self.step(d) == 0
+        a == self.nn || a.is_multiple_of(self.step(d))
     }
     /// Quadratic character of `a` in `F_{p^d}` (`a` must lie there).
     fn chi_sub(&self, a: u32, step: u32) -> i32 {
         if a == self.nn {
             0
-        } else if (a / step) % 2 == 0 {
+        } else if (a / step).is_multiple_of(2) {
             1
         } else {
             -1
@@ -846,7 +836,8 @@ impl Gf {
     fn pk_mod(&self, k: u32) -> u64 {
         powmod(self.p as u64, k as u64, self.nn as u64)
     }
-    /// Digit vector (ascending) of a log-form element, for printing.
+    /// Digit vector (ascending) of a log-form element (used by the tests).
+    #[cfg_attr(not(test), allow(dead_code))]
     fn digits(&self, a: u32) -> Vec<u32> {
         let mut idx = if a == self.nn {
             0
@@ -885,7 +876,7 @@ fn j_from_lambda(f: &Gf, lam: u32) -> u32 {
     let one = 0u32;
     let l2 = f.mul(lam, lam);
     let num_base = f.add(f.sub(l2, lam), one);
-    let num = f.mul(f.from_int(256), f.mul(num_base, f.mul(num_base, num_base)));
+    let num = f.mul(f.const_int(256), f.mul(num_base, f.mul(num_base, num_base)));
     let lm1 = f.sub(lam, one);
     let den = f.mul(l2, f.mul(lm1, lm1));
     f.mul(num, f.inv(den))
@@ -924,7 +915,7 @@ fn model_for_j(f: &Gf, j: u32) -> (u32, u32, u32) {
         }
         return (one, zero, f.neg(f.inv(j)));
     }
-    let c1728 = f.from_int(1728);
+    let c1728 = f.const_int(1728);
     if f.is_zero(j) {
         return (zero, zero, one);
     }
@@ -932,34 +923,9 @@ fn model_for_j(f: &Gf, j: u32) -> (u32, u32, u32) {
         return (zero, one, zero);
     }
     let d = f.sub(c1728, j);
-    let a = f.mul(f.from_int(3), f.mul(j, d));
-    let b = f.mul(f.from_int(2), f.mul(j, f.mul(d, d)));
+    let a = f.mul(f.const_int(3), f.mul(j, d));
+    let b = f.mul(f.const_int(2), f.mul(j, f.mul(d, d)));
     (zero, a, b)
-}
-
-/// Trace of `E_B: y^2 = prod_{b in B, b != INF} (x - b)` over `F_{p^n}`.
-fn trace_of_branch_set(f: &Gf, b: &[u32; 4], n: u32, step_k: u32) -> i64 {
-    let p = f.p;
-    let qn = (p as u64).pow(n);
-    let finite: Vec<u32> = b.iter().copied().filter(|&z| z != INF).collect();
-    let mut count: i64 = if finite.len() == 4 { 2 } else { 1 }; // points at infinity (monic)
-    let mut e = 0u32;
-    let eval = |x: u32| -> u32 {
-        let mut v = 0u32; // one
-        for &z in &finite {
-            v = f.mul(v, f.sub(x, z));
-        }
-        v
-    };
-    count += 1 + f.chi_sub(eval(f.zero()), step_k) as i64;
-    for _ in 1..qn {
-        count += 1 + f.chi_sub(eval(e), step_k) as i64;
-        e += step_k;
-        if e >= f.nn {
-            e -= f.nn;
-        }
-    }
-    qn as i64 + 1 - count
 }
 
 // ===========================================================================
@@ -1055,7 +1021,7 @@ fn orbits_by_size(f: &Gf, sizes: &[u32]) -> BTreeMap<u32, Vec<Vec<u32>>> {
             let proper: Vec<u32> = (1..d).filter(|&dd| d % dd == 0).collect();
             let mut e = 0u32;
             while e < f.nn {
-                if proper.iter().all(|&dd| e % f.step(dd) != 0) {
+                if proper.iter().all(|&dd| !e.is_multiple_of(f.step(dd))) {
                     let mut orb = vec![e];
                     let mut x = e;
                     let mut canonical = true;
@@ -1111,7 +1077,6 @@ fn size_multisets(sizes: &[u32], r_min: u32, r_max: u32) -> Vec<Vec<u32>> {
 struct TypeAcc {
     instances: u64,
     weak_j: HashSet<u32>,
-    period_ok: u64,
 }
 
 type TypeKey = (String, u32, u32, u32); // (orbit sizes, r, m, g)
@@ -1225,9 +1190,9 @@ fn enumerate_chunk(
         debug_assert_eq!(points.len(), r as usize);
         let apply = |mask: u32| -> u32 {
             let mut out = 0u32;
-            for i in 0..r as usize {
+            for (i, &target) in perm.iter().enumerate().take(r as usize) {
                 if mask >> i & 1 == 1 {
-                    out |= 1 << perm[i];
+                    out |= 1 << target;
                 }
             }
             out
@@ -1254,9 +1219,9 @@ fn enumerate_chunk(
                     if g <= g_max {
                         let mut b = [0u32; 4];
                         let mut k = 0;
-                        for i in 0..r as usize {
+                        for (i, &pt) in points.iter().enumerate().take(r as usize) {
                             if mask >> i & 1 == 1 {
-                                b[k] = points[i];
+                                b[k] = pt;
                                 k += 1;
                             }
                         }
@@ -1409,7 +1374,7 @@ fn part_b_one(q: u32, cfg: &OddCfg, log: &mut String) -> OddResult {
     };
     let mut rows = String::new();
     let mut class_rows = String::new();
-    let c1728 = f.from_int(1728);
+    let c1728 = f.const_int(1728);
     for (key, v) in &acc {
         let (sizes, r, m, g) = key;
         let wj = v.weak_j.len() as f64;
@@ -1596,15 +1561,6 @@ fn is_squarefree(f: &[u32], p: u32) -> bool {
     poly_gcd(f, &d, p).len() == 1
 }
 
-/// Binary octic form from a model: `form[i]` = coefficient of `X^i Z^{8-i}`.
-fn form_of(coeffs: &[u32], deg: usize) -> [u32; 9] {
-    let mut form = [0u32; 9];
-    for i in 0..=deg {
-        form[i] = coeffs[i];
-    }
-    form
-}
-
 /// `G(X, Z) = F(aX + bZ, cX + dZ)` over F_p.
 fn subst_form(form: &[u32; 9], a: u32, b: u32, c: u32, d: u32, p: u32) -> [u32; 9] {
     let p64 = p as u64;
@@ -1710,8 +1666,8 @@ impl Census {
     fn model_form(&self, m: &Model) -> [u32; 9] {
         let c = if m.c_nu { self.nu } else { 1 };
         let mut form = [0u32; 9];
-        for i in 0..9 {
-            form[i] = m.coeffs[i] as u32 * c % self.q;
+        for (f, &co) in form.iter_mut().zip(m.coeffs.iter()) {
+            *f = co as u32 * c % self.q;
         }
         form
     }
@@ -1738,10 +1694,10 @@ impl Census {
 
     /// Point count of `y^2 = c f(x)` over `F_{q^k}` using the table field `g`.
     fn count_ext(&self, g: &Gf, coeffs: &[u32], deg: usize, c_nu: bool, k: u32) -> i64 {
-        let c = if c_nu { g.from_int(self.nu as i64) } else { 0 };
+        let c = if c_nu { g.const_int(self.nu as i64) } else { 0 };
         let emb: Vec<u32> = coeffs[..=deg]
             .iter()
-            .map(|&v| g.from_int(v as i64))
+            .map(|&v| g.const_int(v as i64))
             .collect();
         let inf: i64 = if deg == 7 {
             1
@@ -1839,7 +1795,7 @@ impl Census {
         let g = &self.f6;
         let emb: Vec<u32> = coeffs[..=deg]
             .iter()
-            .map(|&v| g.from_int(v as i64))
+            .map(|&v| g.const_int(v as i64))
             .collect();
         let mut w: Vec<u32> = Vec::new();
         if deg == 7 {
@@ -2164,7 +2120,6 @@ fn aut_info(g: &Gf, w: &[u32]) -> AutInfo {
 struct ResModel {
     model: Model,
     t: i64,
-    n3: i64,
 }
 
 fn enumerate_models(
@@ -2177,19 +2132,12 @@ fn enumerate_models(
 ) {
     let p = cx.q;
     // free coefficient positions
-    let free: Vec<usize> = if deg == 8 {
-        (0..=5).collect()
-    } else if p == 7 {
-        (0..=5).collect()
+    // degree 8: x^7 killed, free x^0..x^5, top x^6; degree 7: x^6 killed
+    // (free x^0..x^4, top x^5) except for p = 7, where x^6 stays free.
+    let (free, top_pos): (Vec<usize>, usize) = if deg == 8 || p == 7 {
+        ((0..=5).collect(), 6)
     } else {
-        (0..=4).collect()
-    };
-    let top_pos = if deg == 8 {
-        6
-    } else if p == 7 {
-        6
-    } else {
-        5
+        ((0..=4).collect(), 5)
     };
     let total = (p as u64).pow(free.len() as u32);
     let mut coeffs = vec![0u32; 9];
@@ -2206,7 +2154,7 @@ fn enumerate_models(
             continue;
         }
         stats.1 += 1;
-        if let Some((t, n3)) = cx.res_shaped(&coeffs, deg, c_nu) {
+        if let Some((t, _n3)) = cx.res_shaped(&coeffs, deg, c_nu) {
             let mut c8 = [0u8; 9];
             for i in 0..9 {
                 c8[i] = coeffs[i] as u8;
@@ -2218,7 +2166,6 @@ fn enumerate_models(
                     coeffs: c8,
                 },
                 t,
-                n3,
             });
         }
     }
@@ -2357,7 +2304,7 @@ fn part_c_one(q: u32, log: &mut String) -> CensusOut {
     let mut traces: BTreeSet<i64> = BTreeSet::new();
     let mut traces_sig: BTreeSet<i64> = BTreeSet::new();
     let mut by_pattern: BTreeMap<(String, &str), usize> = BTreeMap::new();
-    for (_, members) in &classes {
+    for members in classes.values() {
         let rep = members
             .iter()
             .min_by_key(|&&i| &models[i].model)
@@ -2648,7 +2595,7 @@ mod tests {
             }
             assert_eq!(f.mul(5 % f.nn, f.inv(5 % f.nn)), 0);
             assert!(f.in_sub(f.step(1), 1));
-            assert_eq!(f.from_int(p as i64), f.zero());
+            assert_eq!(f.const_int(p as i64), f.zero());
         }
     }
 
