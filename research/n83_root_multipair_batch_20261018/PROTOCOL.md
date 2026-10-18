@@ -10,7 +10,7 @@ measurement with `candidate_id: null`.
 Freeze source SHA-256
 `0b3fe1952e5ea193373b539a1c3149c25945b0c56f585ed7e626e204078f12d1`,
 runner SHA-256
-`0448d52fe925f43936697cc1182c2c7b3b346385060d9a6ee69fb069e2a4791f`,
+`4c0eac85981f88c2ce0d2531a627e17b8c25bbd495f960fee00dc643f197219f`,
 analyzer SHA-256
 `b6283f45ffb2a5ee235c56e246d53dd39e828b05b6c8a77a4c4ea051ee0e0c68`,
 and K512 base dump SHA-256
@@ -29,6 +29,13 @@ Those digests must also equal the earlier sparse K512 panel's
 state digest and
 `67dac08b8514076544f8ca53e2306ba39118c90f1ce6a3edc308a1fff2e75a70`
 table digest.
+The first local launch stopped before an arm when sandboxed `sysctl` denied
+the load-average read; its partial host files and failure receipt are retained
+under `local_pilot1`. The second launch produced four matching digest rows,
+but sandboxed macOS `/usr/bin/time -l` returned status 1 after each child when
+it could not read `kern.clockrate`; its raw rows and failure receipt are under
+`local_pilot2`. The runner now records host load through `uptime` and uses
+the child process exit status directly.
 Record failed and capped arms. Report paired index-build ratios only when all
 four arms pass. A larger-base cloud index test and a complete same-point
 IC/rho panel remain the promotion gates.

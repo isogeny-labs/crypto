@@ -17,7 +17,7 @@ mkdir "$output"
 shasum -a 256 "$source" "$base" "$binary" > "$output/sha256.txt"
 uname -a > "$output/host.txt"
 date -u '+%Y-%m-%dT%H:%M:%SZ' >> "$output/host.txt"
-sysctl vm.loadavg >> "$output/host.txt"
+uptime >> "$output/host.txt"
 
 failed=0
 for arm in 1-pair1 2-pair4 3-pair4 4-pair1; do
@@ -27,7 +27,7 @@ for arm in 1-pair1 2-pair4 3-pair4 4-pair1; do
     esac
     mkdir "$output/$arm"
     date -u '+%Y-%m-%dT%H:%M:%SZ' > "$output/$arm/started_utc.txt"
-    if /usr/bin/time -l timeout 180 env -i \
+    if timeout 180 env -i \
         PATH=/usr/bin:/bin:/opt/homebrew/bin \
         KIC_SYMMETRIC_S3=1 \
         KIC_SPARSE_CANONICAL=1 \
