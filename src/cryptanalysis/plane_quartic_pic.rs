@@ -1082,8 +1082,20 @@ impl PlaneQuartic {
             return x.clone();
         }
         let gx = self.gen_of_with(x, vx);
-        let gy = self.gen_of_with(y, vy);
-        let z6 = self.gen_mul(&gx, &gy);
+        let z6 = if x == y && vx == vy && gx.k == 2 {
+            // doubling: the 6 products q_i q_j of a conic space span only a
+            // 6-dimensional space of quartics (8 are needed), so go straight
+            // to degree 5 (designed path, not counted as a lift)
+            let g2 = self.gen_mul(&gx, &gx);
+            let r1 = Gen {
+                k: 1,
+                rows: (0..3).map(|i| self.unit(1, i)).collect(),
+            };
+            self.gen_mul(&g2, &r1)
+        } else {
+            let gy = self.gen_of_with(y, vy);
+            self.gen_mul(&gx, &gy)
+        };
         self.reduce_deg6(&z6)
     }
 
@@ -2519,6 +2531,63 @@ pub(crate) mod tests {
         );
     }
 
+
+    #[test]
+    fn v2_exceptional_and_paths() {
+        let mut tot = PicStats::default();
+        let mut exc_sum_results = 0u64;
+        let mut pairs_checked = 0u64;
+        for inst in small_instances() {
+            let name = inst.name.clone();
+            let q = inst.q;
+            let fu = full(inst);
+            let c = &fu.c;
+            let n = fu.classes.len();
+            let keyset: HashSet<PicKey> = fu.classes.iter().map(|x| x.key()).collect();
+            let zero = c.zero();
+            c.reset_counter();
+            for x in &fu.classes {
+                let nx = c.neg(x);
+                assert!(keyset.contains(&nx.key()), "{}: neg closure", name);
+                assert_eq!(c.neg(&nx), *x, "{}: -(-x)", name);
+                assert_eq!(c.add(x, &nx), zero, "{}: x+(-x)", name);
+            }
+            let mut rng = 77u64 + q as u64;
+            let excs: Vec<&PicClass> = fu.classes.iter().filter(|x| matches!(x, PicClass::Exc(_))).collect();
+            for e in &excs {
+                for _ in 0..60.min(n) {
+                    let y = &fu.classes[(xorshift_next(&mut rng) % n as u64) as usize];
+                    let z = &fu.classes[(xorshift_next(&mut rng) % n as u64) as usize];
+                    let s = c.add(e, y);
+                    assert!(keyset.contains(&s.key()));
+                    assert_eq!(s, c.add(y, e));
+                    assert_eq!(c.add(&s, z), c.add(e, &c.add(y, z)), "{}: assoc with exceptional", name);
+                    if matches!(s, PicClass::Exc(_)) {
+                        exc_sum_results += 1;
+                    }
+                    let (vx, vy) = ((xorshift_next(&mut rng) % q as u64) as u32, (xorshift_next(&mut rng) % q as u64) as u32);
+                    assert_eq!(c.add_with(e, y, vx, vy), s);
+                    pairs_checked += 1;
+                }
+                for e2 in &excs {
+                    let s = c.add(e, e2);
+                    assert!(keyset.contains(&s.key()));
+                    assert_eq!(s, c.add(e2, e));
+                    pairs_checked += 1;
+                }
+            }
+            let st = c.stats();
+            tot.ops += st.ops;
+            tot.lifts += st.lifts;
+            tot.p0_in_support += st.p0_in_support;
+            tot.exc_results += st.exc_results;
+            tot.neg_pencil += st.neg_pencil;
+            tot.exc_operands += st.exc_operands;
+        }
+        eprintln!("V2 exceptional PASS: pairs {} exceptional results {} ; path counters {:?}", pairs_checked, exc_sum_results, tot);
+        assert!(tot.exc_results > 0 && tot.neg_pencil > 0 && tot.p0_in_support > 0 && tot.exc_operands > 0);
+    }
+
     #[test]
     fn v2_cayley_table_q5() {
         let inst = random_instances(5, 1).pop().unwrap();
@@ -2564,5 +2633,223 @@ pub(crate) mod tests {
             *orders.entry(o).or_insert(0) += 1;
         }
         eprintln!("Cayley table q=5: #Jac={} full associativity ({} triples) PASS; element orders {:?}", n, n * n * n, orders);
+    }
+
+    // ------------------------------------------------------------------
+    // M1-M3: operation cost sweep (ignored by default; run explicitly)
+    // ------------------------------------------------------------------
+
+    fn median_iqr(v: &mut Vec<f64>) -> (f64, f64, f64) {
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        let n = v.len();
+        let at = |p: f64| -> f64 {
+            let x = p * (n - 1) as f64;
+            let lo = x.floor() as usize;
+            let hi = x.ceil() as usize;
+            v[lo] + (v[hi] - v[lo]) * (x - lo as f64)
+        };
+        (at(0.5), at(0.25), at(0.75))
+    }
+
+    /// Time one `inv` against one `mul` at this `q` (nanoseconds each), using
+    /// dependent chains so neither is optimised away.
+    fn inv_mul_ratio(q: u32) -> (f64, f64) {
+        let qq = q as u64;
+        let reps = 200_000u64;
+        let mut x = 123456789u64 % qq;
+        let t0 = std::time::Instant::now();
+        for i in 0..reps {
+            x = (x * (i % 1000 + 2) % qq + 1) % qq;
+        }
+        let tmul = t0.elapsed().as_nanos() as f64 / reps as f64;
+        std::hint::black_box(x);
+        let fq = Fq { q: qq, c_mul: Cell::new(0), c_inv: Cell::new(0), c_add: Cell::new(0) };
+        let reps2 = 50_000u64;
+        let mut y = 987654321u64 % qq;
+        let t1 = std::time::Instant::now();
+        for _ in 0..reps2 {
+            y = fq.invu((y + 1) as u32 % q.max(2)) as u64;
+            if y == 0 {
+                y = 1;
+            }
+        }
+        let tinv = t1.elapsed().as_nanos() as f64 / reps2 as f64;
+        std::hint::black_box(y);
+        (tmul, tinv)
+    }
+
+    #[test]
+    #[ignore]
+    fn m1_cost_sweep() {
+        use std::io::Write;
+        let out_dir = std::env::var("W1_OUT").unwrap_or_else(|_| "research/quartic_pic_canonical_20261018/results".to_string());
+        std::fs::create_dir_all(&out_dir).unwrap();
+        let ks: Vec<u32> = match std::env::var("W1_KS") {
+            Ok(v) => v.split(',').map(|x| x.parse().unwrap()).collect(),
+            Err(_) => vec![8, 12, 16, 20, 24, 28, 31],
+        };
+        let npairs: usize = std::env::var("W1_PAIRS").ok().and_then(|v| v.parse().ok()).unwrap_or(200);
+        let mut raw = std::fs::File::create(format!("{}/m1_raw.jsonl", out_dir)).unwrap();
+        let mut summ = std::fs::File::create(format!("{}/m1_summary.jsonl", out_dir)).unwrap();
+        for &k in &ks {
+            let q = largest_prime_below_pow2(k);
+            // ---- M3 setup ----
+            let t_setup = std::time::Instant::now();
+            let mut rng = 20261018u64 + k as u64;
+            let t_pt = std::time::Instant::now();
+            let (f, p0) = next_smooth_quartic_with_point(q, &mut rng);
+            let ns_find = t_pt.elapsed().as_nanos();
+            let t_c = std::time::Instant::now();
+            let ok_smooth = smoothness_certificate(q, &f);
+            let ns_cert = t_c.elapsed().as_nanos();
+            assert!(ok_smooth);
+            let t_n = std::time::Instant::now();
+            let c = PlaneQuartic::new(q, f, p0).unwrap();
+            let ns_new = t_n.elapsed().as_nanos();
+            let setup = c.setup_cost();
+            let ns_setup_total = t_setup.elapsed().as_nanos();
+            let (tmul, tinv) = inv_mul_ratio(q);
+            let inv_equiv = tinv / tmul;
+            writeln!(
+                summ,
+                "{{\"rec\":\"setup\",\"k\":{},\"q\":{},\"f\":{:?},\"p0\":{:?},\"ns_find_instance_incl_smoothness\":{},\"ns_smoothness_cert\":{},\"ns_new_incl_base_point\":{},\"ns_setup_total\":{},\"setup_mul\":{},\"setup_inv\":{},\"ns_per_mul\":{:.3},\"ns_per_inv\":{:.3},\"inv_mul_equiv\":{:.3}}}",
+                k, q, f, p0, ns_find, ns_cert, ns_new, ns_setup_total, setup.mul, setup.inv, tmul, tinv, inv_equiv
+            )
+            .unwrap();
+            // ---- classes from random rational points ----
+            let mut prng = 0xDEADBEEFu64 ^ (k as u64 * 7919);
+            let mut random_pt = |prng: &mut u64| -> Pt {
+                find_rational_point(q, &f, prng, 100_000).expect("rational point")
+            };
+            let mut typical = |prng: &mut u64| -> PicClass {
+                let mut x = c.zero();
+                for _ in 0..6 {
+                    let p = random_pt(prng);
+                    x = c.add(&x, &c.point_class(p));
+                }
+                x
+            };
+            let mut xs: Vec<PicClass> = Vec::new();
+            let mut ys: Vec<PicClass> = Vec::new();
+            let mut es: Vec<PicClass> = Vec::new();
+            while xs.len() < npairs {
+                let x = typical(&mut prng);
+                if matches!(x, PicClass::Typ(_)) {
+                    xs.push(x);
+                }
+            }
+            while ys.len() < npairs {
+                let y = typical(&mut prng);
+                if matches!(y, PicClass::Typ(_)) {
+                    ys.push(y);
+                }
+            }
+            for _ in 0..npairs {
+                es.push(c.exceptional(random_pt(&mut prng)));
+            }
+            let scalars: Vec<u64> = (0..npairs).map(|_| xorshift_next(&mut prng) | (1u64 << 63)).collect();
+            // helper to time and record one operation
+            let mut record = |op: &str, i: usize, f: &mut dyn FnMut() -> PicClass, raw: &mut std::fs::File| -> (f64, f64, f64, f64, f64, PicStats) {
+                c.reset_counter();
+                let t = std::time::Instant::now();
+                let r = f();
+                let ns = t.elapsed().as_nanos() as f64;
+                let cnt = c.counter();
+                let st = c.stats();
+                std::hint::black_box(&r);
+                writeln!(
+                    raw,
+                    "{{\"k\":{},\"q\":{},\"op\":\"{}\",\"i\":{},\"mul\":{},\"inv\":{},\"add\":{},\"ns\":{},\"lifts\":{},\"p0_in_support\":{},\"exc_results\":{},\"neg_pencil\":{},\"exc_operands\":{},\"norm_mul\":{},\"norm_inv\":{},\"ops\":{}}}",
+                    k, q, op, i, cnt.mul, cnt.inv, cnt.add, ns as u64, st.lifts, st.p0_in_support, st.exc_results, st.neg_pencil, st.exc_operands, st.norm_mul, st.norm_inv, st.ops
+                )
+                .unwrap();
+                (cnt.mul as f64, cnt.inv as f64, cnt.add as f64, ns, (st.lifts > 0) as u8 as f64, st)
+            };
+            let mut results: Vec<(String, Vec<(f64, f64, f64, f64, f64, PicStats)>)> = Vec::new();
+            let mut run_op = |name: &str, f: &mut dyn FnMut(usize) -> PicClass, raw: &mut std::fs::File| {
+                let mut v = Vec::new();
+                for i in 0..npairs {
+                    let mut g = || f(i);
+                    v.push(record(name, i, &mut g, raw));
+                }
+                results.push((name.to_string(), v));
+            };
+            run_op("add_generic", &mut |i| c.add(&xs[i], &ys[i]), &mut raw);
+            run_op("add_exceptional_operand", &mut |i| c.add(&es[i], &ys[i]), &mut raw);
+            run_op("double", &mut |i| c.double(&xs[i]), &mut raw);
+            run_op("negate", &mut |i| c.neg(&xs[i]), &mut raw);
+            run_op(
+                "key_encoding",
+                &mut |i| {
+                    // re-encode a scrambled conic basis (random invertible 3x3 combination)
+                    let PicClass::Typ(m) = &xs[i] else { unreachable!() };
+                    let mut st = 0xABCDEFu64 ^ i as u64;
+                    let rows: Vec<Vec<u32>> = loop {
+                        let mut mix = [[0u32; 3]; 3];
+                        for r in mix.iter_mut() {
+                            for e in r.iter_mut() {
+                                *e = (xorshift_next(&mut st) % q as u64) as u32;
+                            }
+                        }
+                        let mut out = vec![vec![0u32; 6]; 3];
+                        for a in 0..3 {
+                            for b in 0..3 {
+                                for t in 0..6 {
+                                    out[a][t] = ((out[a][t] as u64 + mix[a][b] as u64 * m[b][t] as u64) % q as u64) as u32;
+                                }
+                            }
+                        }
+                        let det = {
+                            let m = &mix;
+                            let qq = q as u128;
+                            let t = |a: u32, b: u32| a as u128 * b as u128 % qq;
+                            let d = (t(m[0][0], ((t(m[1][1], m[2][2]) + qq - t(m[1][2], m[2][1])) % qq) as u32)
+                                + qq
+                                - t(m[0][1], ((t(m[1][0], m[2][2]) + qq - t(m[1][2], m[2][0])) % qq) as u32)
+                                + t(m[0][2], ((t(m[1][0], m[2][1]) + qq - t(m[1][1], m[2][0])) % qq) as u32))
+                                % qq;
+                            d
+                        };
+                        if det != 0 {
+                            break out;
+                        }
+                    };
+                    c.class_from_conics(rows)
+                },
+                &mut raw,
+            );
+            run_op(
+                "scalar_mul_64bit",
+                &mut |i| c.mul_scalar(&xs[i], scalars[i] as u128),
+                &mut raw,
+            );
+            for (name, v) in &results {
+                let col = |j: usize| -> Vec<f64> {
+                    v.iter()
+                        .map(|t| match j {
+                            0 => t.0,
+                            1 => t.1,
+                            2 => t.2,
+                            _ => t.3,
+                        })
+                        .collect()
+                };
+                let (mm, m1, m3) = median_iqr(&mut col(0));
+                let (im, i1, i3) = median_iqr(&mut col(1));
+                let (am, a1, a3) = median_iqr(&mut col(2));
+                let (nm, n1, n3) = median_iqr(&mut col(3));
+                let used_lift = v.iter().filter(|t| t.5.lifts > 0).count();
+                let used_p0 = v.iter().filter(|t| t.5.p0_in_support > 0).count();
+                let used_exc = v.iter().filter(|t| t.5.exc_results > 0 || t.5.neg_pencil > 0).count();
+                let used_excop = v.iter().filter(|t| t.5.exc_operands > 0).count();
+                writeln!(
+                    summ,
+                    "{{\"rec\":\"op\",\"k\":{},\"q\":{},\"op\":\"{}\",\"n\":{},\"mul\":{{\"median\":{},\"q1\":{},\"q3\":{}}},\"inv\":{{\"median\":{},\"q1\":{},\"q3\":{}}},\"add\":{{\"median\":{},\"q1\":{},\"q3\":{}}},\"ns\":{{\"median\":{},\"q1\":{},\"q3\":{}}},\"ops_with_lift\":{},\"ops_with_p0_in_support\":{},\"ops_with_exceptional_result\":{},\"ops_with_exceptional_operand\":{},\"priced_mul_equiv_median\":{:.1}}}",
+                    k, q, name, v.len(), mm, m1, m3, im, i1, i3, am, a1, a3, nm, n1, n3, used_lift, used_p0, used_exc, used_excop, mm + im * inv_equiv
+                )
+                .unwrap();
+            }
+            eprintln!("k={} q={} done", k, q);
+        }
     }
 }
