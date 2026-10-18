@@ -136,7 +136,7 @@ updated in this table as commits land.
 | T03 | callgrind profile of `scan_state128` at `n = 73` on this host | `docs/ic/perf/WIDE_PRODUCER_PROFILE_20261018.md` | pending |
 | T04 | char-2 quartic root solve for `S₄`; B2 kernel re-measured in `S₃` units | `src/cryptanalysis/koblitz_sixsum_extract.rs` | pending |
 | T05 | MutantXL closure as `SolverEngine::Closure` with verdict-agreement tests | `src/cryptanalysis/koblitz_groebner.rs` | pending |
-| T06 | multigraded Hilbert-series predictor of the closure degree, compared with the 148 committed draws | `research/closure_degree_predictor_20261018/` | pending |
+| T06 | multigraded Hilbert-series predictor of the closure degree, compared with the 148 committed draws | `research/closure_degree_predictor_20261018/` | negative: frozen multigraded rule matches 8 of 148 draws (5.4%, all at ell = 7, same as the univariate control) against 124 of 148 (83.8%) for constant 4; Spearman 0.369 (draws), 0.489 (cell means); ell = 7 rise not reproduced; FSS bound applies to 0 of 37 cells; no PDF (no typst, pandoc has no engine) |
 | T07 | equivariant F4 as a library module with inverse DFT and row-space agreement test | `src/cryptanalysis/equivariant_f4.rs` | pending |
 | T08 | Joux–Vitse trace record/replay in `matrix_f4_f2` | `src/cryptanalysis/koblitz_groebner.rs` | pending |
 | T09 | three-limb `GF(2ⁿ)` field for `n ≤ 191` with the ECC2K-130 polynomial pinned | `src/cryptanalysis/wide_gf2m.rs` | pending |
