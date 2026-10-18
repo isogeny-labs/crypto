@@ -61,6 +61,18 @@ identity, doubling, cancellation, and both negation modes. A full-worker
 throughput result requires a frozen host panel and exact trail replay before
 changing scheduling or the default path.
 
+`walk::run_walkers_batch` now supplies an opt-in lane-refill scheduler for a
+consecutive walker range. It keeps completed outcomes in walker-index order,
+checks the distinguished-point rule and step cap at the same point in each
+trail as `run_walker`, and assigns the next walker when a lane becomes free.
+The replay tests cover widths 1, 2, 7, 32, and 128, both negation modes,
+short and longer step caps, and a secp256k1 job. The production `run_lane` still calls the serial
+walker; the next integration gate must establish check-in and stop behavior
+when batched ranges are used there.
+The [batch walker validation receipt](batch-walker-validation.json) binds the
+final source hash and complete release-suite log; 2,246 tests passed, 94
+were ignored, and none failed.
+
 The [local validation receipt](batch-step-local-validation.json) binds the
 batch-step source hash and release test logs. The focused tests passed 2/2.
 The first full-library run passed 2,242 tests and hit two loopback
@@ -79,9 +91,9 @@ that environment passed 2,244 tests with 94 ignored.
    mixed-76, and generator-only-warmed OpenSSL across 32 Q points. Two full
    panels failed their A/A noise gates. Its separate reuse panel passed the
    Tier 1 gate at 32 and 128 restarts per Q; 1 and 8 failed A/A gates.
-3. Build a lockstep scheduler around `step_batch`, refill lanes after a DP,
-   and replay each walker's entire affine state sequence against the serial
-   worker. Compare paired full-worker throughput on the same Q points.
+3. Connect the opt-in lane-refill scheduler to `run_lane`, preserve check-in
+   and stop behavior, and replay each walker's entire affine state sequence
+   against the serial worker. Compare paired full-worker throughput on the same Q points.
    Require a 95% lower speedup bound above 1.05 and a frozen peak-memory
    cap before changing the default path. The generic C rho path has a
    64-bit group order; the full-size worker is this Rust implementation.

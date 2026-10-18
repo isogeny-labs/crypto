@@ -291,6 +291,113 @@ pub fn run_walker(ctx: &JobContext, i: u64) -> WalkerOutcome {
     }
 }
 
+/// Run consecutive independent walkers through the batched addition kernel.
+/// Results remain ordered by walker index, even when trails end at different
+/// depths. A completed lane starts the next unassigned walker on the next
+/// batch step; the serial walk definition and distinguished-point records
+/// remain unchanged.
+pub fn run_walkers_batch(
+    ctx: &JobContext,
+    first: u64,
+    count: usize,
+    width: usize,
+) -> Vec<WalkerOutcome> {
+    struct ActiveWalker {
+        output_index: usize,
+        a: BigUint,
+        b: BigUint,
+        point: Point,
+        last: Option<Point>,
+        steps: u64,
+    }
+
+    assert!(width > 0, "batch width must be positive");
+    let mut active: Vec<Option<ActiveWalker>> = (0..width.min(count)).map(|_| None).collect();
+    let mut results = vec![None; count];
+    let mut assigned = 0usize;
+    let mut completed = 0usize;
+
+    while completed < count {
+        for lane in &mut active {
+            if lane.is_none() && assigned < count {
+                let walker = first
+                    .checked_add(assigned as u64)
+                    .expect("walker index overflow");
+                let (mut a, mut b, mut point) = ctx.walker_start(walker);
+                if ctx.spec.negation_map && needs_flip(&point, &ctx.p) {
+                    point = point.neg();
+                    a = neg_mod(&a, &ctx.n);
+                    b = neg_mod(&b, &ctx.n);
+                }
+                *lane = Some(ActiveWalker {
+                    output_index: assigned,
+                    a,
+                    b,
+                    point,
+                    last: None,
+                    steps: 0,
+                });
+                assigned += 1;
+            }
+        }
+
+        for lane in &mut active {
+            let Some(walker) = lane.as_ref() else {
+                continue;
+            };
+            let outcome = if ctx.is_dp(&walker.point) {
+                let (x, y) = match &walker.point {
+                    Point::Affine { x, y } => (hex_of(&x.value), hex_of(&y.value)),
+                    Point::Infinity => unreachable!("∞ is never distinguished"),
+                };
+                Some(WalkerOutcome::Dp(DpRecord {
+                    walker: first + walker.output_index as u64,
+                    steps: walker.steps,
+                    x,
+                    y,
+                    a: hex_of(&walker.a),
+                    b: hex_of(&walker.b),
+                }))
+            } else if walker.steps >= ctx.step_cap {
+                Some(WalkerOutcome::DeadTrail {
+                    steps: walker.steps,
+                })
+            } else {
+                None
+            };
+            if let Some(outcome) = outcome {
+                results[walker.output_index] = Some(outcome);
+                *lane = None;
+                completed += 1;
+            }
+        }
+
+        if completed == count {
+            break;
+        }
+        let inputs: Vec<_> = active
+            .iter()
+            .filter_map(|lane| {
+                lane.as_ref().map(|walker| BatchStepInput {
+                    point: &walker.point,
+                    a: &walker.a,
+                    b: &walker.b,
+                    last: walker.last.as_ref(),
+                })
+            })
+            .collect();
+        let advanced = step_batch(ctx, &inputs);
+        for (walker, (point, a, b)) in active.iter_mut().flatten().zip(advanced) {
+            walker.last = Some(std::mem::replace(&mut walker.point, point));
+            walker.a = a;
+            walker.b = b;
+            walker.steps += 1;
+        }
+    }
+
+    results.into_iter().map(Option::unwrap).collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::super::job::{demo_curve, JobSpec};
@@ -394,6 +501,41 @@ mod tests {
             assert_eq!(c.combine(&a3, &b3), r2_other);
         }
         assert!(cycles >= 4, "only {cycles} 2-cycles among 1024 starts");
+    }
+
+    #[test]
+    fn batched_walkers_replay_serial_outcomes_with_lane_refill() {
+        for negation in [false, true] {
+            for step_cap in [3, 128] {
+                let mut c = ctx(negation);
+                c.step_cap = step_cap;
+                let expected = (7..71).map(|i| run_walker(&c, i)).collect::<Vec<_>>();
+                for width in [1, 2, 7, 32, 128] {
+                    assert_eq!(
+                        run_walkers_batch(&c, 7, expected.len(), width),
+                        expected,
+                        "negation={negation}, step_cap={step_cap}, width={width}"
+                    );
+                }
+                assert!(run_walkers_batch(&c, 7, 0, 8).is_empty());
+            }
+        }
+    }
+
+    #[test]
+    fn batched_secp256k1_walkers_replay_serial_outcomes() {
+        let curve = crate::ecc::curve::CurveParams::secp256k1();
+        let q = curve
+            .generator()
+            .scalar_mul(&BigUint::from(7u32), &curve.a_fe());
+        let mut spec = JobSpec::new(&curve, &q, "batched-walk-secp256k1", 0x71cc_2026_1017)
+            .expect("valid secp256k1 job");
+        spec.dp_bits = 6;
+        spec.num_branches = 32;
+        spec.max_steps_per_walker = 12;
+        let c = spec.build().expect("valid context");
+        let expected = (0..8).map(|i| run_walker(&c, i)).collect::<Vec<_>>();
+        assert_eq!(run_walkers_batch(&c, 0, 8, 4), expected);
     }
 
     #[test]
