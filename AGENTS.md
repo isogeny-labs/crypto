@@ -416,8 +416,8 @@ in aburan28/crypto-autoresearcher.
 | --- | --- | --- |
 | frontier | design, interpretation, claims, breakthrough review | Mythos (`claude-mythos-5`), Fable 5.1 (`claude-fable-5-1`) |
 | core | the same when frontier is not needed; coordination and review | Opus 5.5 (`claude-opus-5-5`); OpenAI, GLM 5.3 and Qwen equivalents |
-| director | compiles a decided experiment into a frozen command card, then assesses the run | Sonnet 5.5 (`claude-sonnet-5-5`), [`experiment-director`](.claude/agents/experiment-director.md) |
-| mechanical | runs the card, relays tool output verbatim, computes nothing, refuses anything underspecified | Haiku 5.5 (`claude-haiku-5-5`, effort low), [`executor-mechanical`](.claude/agents/executor-mechanical.md) |
+| director | compiles a decided experiment into a task card (`tools/task_card.py`: one format in every repository, copied byte-identical from crypto-autoresearcher, never edited here), then assesses the run | Sonnet 5.5 (`claude-sonnet-5-5`), [`experiment-director`](.claude/agents/experiment-director.md) |
+| mechanical | runs the card through `tools/task_card.py run`, relays its output verbatim, computes nothing, refuses anything underspecified | Haiku 5.5 (`claude-haiku-5-5`, effort low), [`executor-mechanical`](.claude/agents/executor-mechanical.md) |
 
 - **Frontier and core keep the reasoning**: the spec and preregistration,
   analysis (`ecbench compare` and `table` read-outs), the §5a pricing band and
