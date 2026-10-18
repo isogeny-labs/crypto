@@ -1,0 +1,18 @@
+status: completed
+
+CARD-BLINDSPOT-12-02 ran to completion, exit 0, under the card's commands only. The receipt is at research/blindspots_20261018/12-degree-surrogate/raw/receipt-card-02.json.
+
+card: CARD-BLINDSPOT-12-02 (sha256 1acd4c02f3bf0d55755e1005adcdf0eb3fc02ed8d26fcae58c542ae23de30c98)
+commit: 26916471b80676c2e4964cef61cd42522368038a
+receipt: research/blindspots_20261018/12-degree-surrogate/raw/receipt-card-02.json sha256 3918dfbdd15e0f12db08484863e244b12ac3cee72e672cd95894c72ba98e4d27
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-12/card-02"] exit 0 (0.002 s) succeeded
+command 2 (build): exit 0 (4.407 s) succeeded
+command 3 (planted): exit 0 (0.251 s) succeeded
+command 4 (evaluate): exit 0 (3.469 s) succeeded
+command 5 (nullperm): exit 0 (10.651 s) succeeded
+command 6 (remove-bin): exit 0
+command 7 (remove-bin-dir): exit 0
+(abridged by the assessor on saving: full per-command argv and stdout digests are in raw/receipt-card-02.json; key lines below)
+PLANTED PASS; KV planted_pass=1
+KV null_q025=0.483461 null_q500=0.522679 null_q975=0.575224 real3_mae_d_c1=0.568687 null_perms_at_or_below_real=93

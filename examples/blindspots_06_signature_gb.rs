@@ -498,6 +498,7 @@ fn count_solutions_m2(gf: &Gf, basis: &[u64], xr: u64) -> u64 {
 
 // ---------------------------------------------------------------- hashing
 
+#[derive(Default, Clone, Copy)]
 struct Fx(u64);
 impl Hasher for Fx {
     fn write(&mut self, bytes: &[u8]) {
@@ -654,3 +655,2275 @@ fn mode_gen(a: &Args) {
     eprintln!("gen {label}: {tried} draws tried, {have} unsat, {have_sat} sat kept");
 }
 
+
+// ---------------------------------------------------------------- monomial order
+
+/// Degree, then grevlex with variable 0 largest (the committed DegRevLex
+/// convention: among equal degree the numerically smaller mask is larger).
+/// `key(a) > key(b)` iff `a > b`.  At most 56 variables.
+const KM: u64 = (1u64 << 56) - 1;
+#[inline]
+fn key(m: u64) -> u64 {
+    ((m.count_ones() as u64) << 56) | (!m & KM)
+}
+
+fn grevlex_greater(a: u64, b: u64) -> bool {
+    let (da, db) = (a.count_ones(), b.count_ones());
+    if da != db {
+        return da > db;
+    }
+    a < b
+}
+
+type FxSet<K> = HashSet<K, BuildHasherDefault<Fx>>;
+
+fn sort_cancel(v: Vec<u64>) -> Vec<u64> {
+    let mut kv: Vec<(u64, u64)> = v.into_iter().map(|m| (key(m), m)).collect();
+    kv.sort_unstable_by(|a, b| b.0.cmp(&a.0));
+    let mut out = Vec::with_capacity(kv.len());
+    let mut i = 0;
+    while i < kv.len() {
+        let mut j = i;
+        while j < kv.len() && kv[j].0 == kv[i].0 {
+            j += 1;
+        }
+        if (j - i) & 1 == 1 {
+            out.push(kv[i].1);
+        }
+        i = j;
+    }
+    out
+}
+
+/// `t * p` in the Boolean ring (descending by the order).
+fn mul_mono(p: &[u64], t: u64) -> Vec<u64> {
+    if t == 0 {
+        return p.to_vec();
+    }
+    if p.iter().all(|&m| m & t == 0) {
+        return p.iter().map(|&m| m | t).collect();
+    }
+    sort_cancel(p.iter().map(|&m| m | t).collect())
+}
+
+fn xor_merge(a: &[u64], b: &[u64]) -> Vec<u64> {
+    let mut out = Vec::with_capacity(a.len() + b.len());
+    let (mut i, mut j) = (0, 0);
+    let mut ka = if a.is_empty() { 0 } else { key(a[0]) };
+    let mut kb = if b.is_empty() { 0 } else { key(b[0]) };
+    while i < a.len() && j < b.len() {
+        if ka > kb {
+            out.push(a[i]);
+            i += 1;
+            if i < a.len() {
+                ka = key(a[i]);
+            }
+        } else if ka < kb {
+            out.push(b[j]);
+            j += 1;
+            if j < b.len() {
+                kb = key(b[j]);
+            }
+        } else {
+            i += 1;
+            j += 1;
+            if i < a.len() {
+                ka = key(a[i]);
+            }
+            if j < b.len() {
+                kb = key(b[j]);
+            }
+        }
+    }
+    out.extend_from_slice(&a[i..]);
+    out.extend_from_slice(&b[j..]);
+    out
+}
+
+// ---------------------------------------------------------------- common engine types
+
+/// Criteria K1-K4 on (K5, bit 4 = 16, is an experimental rewritable test, off), generators in ascending degree.  Bit 5 (32) keeps the construction order.
+const FULL: u32 = 15;
+const NONE: u32 = u32::MAX;
+const NOPIV: u32 = u32::MAX;
+
+fn next_set(acc: &[u64], pos: usize) -> Option<usize> {
+    let mut w = pos >> 6;
+    if w >= acc.len() {
+        return None;
+    }
+    let mut x = acc[w] & (!0u64 << (pos & 63));
+    loop {
+        if x != 0 {
+            return Some(w * 64 + x.trailing_zeros() as usize);
+        }
+        w += 1;
+        if w >= acc.len() {
+            return None;
+        }
+        x = acc[w];
+    }
+}
+
+struct Limits {
+    deadline: Option<Instant>,
+    max_cols: usize,
+    vm_cap: u64, // bytes of virtual size at which a run stops, 0 = none
+}
+
+#[derive(Clone, Copy, PartialEq, Debug)]
+enum Status {
+    Refuted,
+    Gb,
+    TimeLimit,
+    MemCap,
+    ColsCap,
+}
+impl Status {
+    fn name(self) -> &'static str {
+        match self {
+            Status::Refuted => "refuted",
+            Status::Gb => "gb",
+            Status::TimeLimit => "timelimit",
+            Status::MemCap => "memcap",
+            Status::ColsCap => "colscap",
+        }
+    }
+}
+
+#[derive(Default, Clone)]
+struct Totals {
+    steps: u32,
+    pairs_cand: u64,
+    pairs_sel: u64,
+    pairs_gen: u64,
+    pairs_drop: u64,
+    d_k0: u64,
+    d_sing: u64,
+    d_dup: u64,
+    d_k1: u64,
+    d_k2: u64,
+    d_k3: u64,
+    d_k4: u64,
+    d_k5: u64,
+    rows_s: u64,
+    zero_build: u64,
+    zero_elim: u64,
+    super_top: u64,
+    rows_max: u64,
+    cols_max: u64,
+    rc_max: u128,
+    nnz_max: u64,
+    cols_sum: u64,
+    rows_sum: u64,
+    build: u64,
+    elim: u64,
+    back: u64,
+    new_elems: u64,
+    d_mat: u32,
+    d_sel: u32,
+    g_size: usize,
+    sym_tests: u64,
+    mem_est_kb: u64,
+    ms_sym: f64,
+    ms_elim: f64,
+    ms_back: f64,
+    ms_add: f64,
+    ms_pairs: f64,
+}
+impl Totals {
+    fn touches(&self) -> u64 {
+        self.build + self.elim + self.back
+    }
+    fn zero_red(&self) -> u64 {
+        self.zero_build + self.zero_elim
+    }
+}
+
+/// A recorded trace (F4Remake): the pairs whose row became a new element, and
+/// the reducer chosen for every monomial.
+#[derive(Default, Clone)]
+struct Trace {
+    useful: FxSet<u64>,
+    red: FxMap<u64, u64>,
+}
+
+#[inline]
+fn mix(a: u64, b: u64) -> u64 {
+    let mut z = a.wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ b.rotate_left(29).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+    z ^= z >> 31;
+    z = z.wrapping_mul(0x94D0_49BB_1331_11EB);
+    z ^ (z >> 29)
+}
+
+fn reset_hwm() -> bool {
+    std::fs::write("/proc/self/clear_refs", "5").is_ok()
+}
+
+// ---------------------------------------------------------------- arm (a): the F4 of item 05
+
+#[derive(Clone, Copy)]
+struct Pair {
+    a: u32,
+    b: u32, // NONE: the field-equation pair of `a` with variable `var`
+    lcm: u64,
+    sel: u32,
+    var: u8,
+}
+
+fn f4_pair_key(lm_a: u64, lm_b: Option<u64>, var: u8) -> u64 {
+    match lm_b {
+        None => mix(mix(lm_a, u64::MAX), var as u64),
+        Some(lb) => mix(mix(lm_a.min(lb), lm_a.max(lb)), 0x1000),
+    }
+}
+
+struct F4<'a> {
+    lim: &'a Limits,
+    g: Vec<Vec<u64>>,
+    lm: Vec<u64>,
+    lm_idx: FxMap<u64, u32>,
+    pairs: Vec<Pair>,
+    g_terms: u64,
+    t: Totals,
+    rec: Option<Trace>,
+    rep: Option<&'a Trace>,
+}
+
+impl<'a> F4<'a> {
+    fn new(lim: &'a Limits) -> Self {
+        F4 {
+            lim,
+            g: Vec::new(),
+            lm: Vec::new(),
+            lm_idx: FxMap::default(),
+            pairs: Vec::new(),
+            g_terms: 0,
+            t: Totals::default(),
+            rec: None,
+            rep: None,
+        }
+    }
+
+    fn over_time(&self) -> bool {
+        self.lim.deadline.map_or(false, |d| Instant::now() >= d)
+    }
+    fn over_mem(&self) -> bool {
+        self.lim.vm_cap != 0 && vm_bytes() > self.lim.vm_cap
+    }
+
+    /// Gebauer-Moeller update with the Boolean field-equation pairs.
+    fn add(&mut self, p: Vec<u64>) {
+        let h = self.g.len();
+        let lmh = p[0];
+        let mut cand: Vec<(u32, u8, u64, u32)> = (0..h)
+            .map(|g| {
+                let l = self.lm[g] | lmh;
+                (
+                    l.count_ones(),
+                    if self.lm[g] & lmh == 0 { 0 } else { 1 },
+                    l,
+                    g as u32,
+                )
+            })
+            .collect();
+        cand.sort_unstable();
+        {
+            let lm = &self.lm;
+            self.pairs.retain(|p| {
+                if p.b == NONE {
+                    return true;
+                }
+                let l = p.lcm;
+                !(lmh & !l == 0
+                    && (lm[p.a as usize] | lmh) != l
+                    && (lm[p.b as usize] | lmh) != l)
+            });
+        }
+        let mut kept: Vec<(u64, u32, bool)> = Vec::new();
+        for &(_, nc, l, g) in &cand {
+            let coprime = nc == 0;
+            if coprime || !kept.iter().any(|&(kl, _, _)| kl & !l == 0) {
+                kept.push((l, g, coprime));
+            }
+        }
+        for &(l, g, coprime) in &kept {
+            if !coprime {
+                self.pairs.push(Pair {
+                    a: g,
+                    b: h as u32,
+                    lcm: l,
+                    sel: l.count_ones(),
+                    var: 0,
+                });
+                self.t.pairs_gen += 1;
+            }
+        }
+        let base = lmh.count_ones();
+        let mut bits = lmh;
+        while bits != 0 {
+            let v = bits.trailing_zeros() as usize;
+            bits &= bits - 1;
+            self.pairs.push(Pair {
+                a: h as u32,
+                b: NONE,
+                lcm: lmh,
+                sel: base + 1,
+                var: v as u8,
+            });
+            self.t.pairs_gen += 1;
+        }
+        self.g_terms += p.len() as u64;
+        self.g.push(p);
+        self.lm.push(lmh);
+        self.lm_idx.insert(lmh, h as u32);
+    }
+
+    fn step(&mut self) -> Result<bool, Status> {
+        let min_sel = self.pairs.iter().map(|p| p.sel).min().unwrap();
+        let mut selected: Vec<Pair> = Vec::new();
+        self.pairs.retain(|p| {
+            if p.sel == min_sel {
+                selected.push(*p);
+                false
+            } else {
+                true
+            }
+        });
+        selected.sort_unstable_by(|x, y| {
+            key(x.lcm)
+                .cmp(&key(y.lcm))
+                .then(x.a.cmp(&y.a))
+                .then(x.b.cmp(&y.b))
+                .then(x.var.cmp(&y.var))
+        });
+        self.t.pairs_cand += selected.len() as u64;
+        let mut build = 0u64;
+        let mut d_sel = self.t.d_sel;
+        let mut srows: Vec<Vec<u64>> = Vec::with_capacity(selected.len());
+        let mut skeys: Vec<u64> = Vec::new();
+        let track = self.rec.is_some() || self.rep.is_some();
+        let mut zero_at_build = 0u64;
+        let mut sel_n = 0u64;
+        for p in &selected {
+            let pk = if track {
+                if p.b == NONE {
+                    f4_pair_key(self.lm[p.a as usize], None, p.var)
+                } else {
+                    f4_pair_key(self.lm[p.a as usize], Some(self.lm[p.b as usize]), 0)
+                }
+            } else {
+                0
+            };
+            if let Some(rep) = self.rep {
+                if !rep.useful.contains(&pk) {
+                    self.t.pairs_drop += 1;
+                    continue;
+                }
+            }
+            sel_n += 1;
+            if p.b == NONE {
+                d_sel = d_sel.max(p.lcm.count_ones() + 1);
+                let r = mul_mono(&self.g[p.a as usize], 1u64 << p.var);
+                build += r.len() as u64;
+                if r.is_empty() {
+                    zero_at_build += 1;
+                } else {
+                    srows.push(r);
+                    skeys.push(pk);
+                }
+            } else {
+                d_sel = d_sel.max(p.lcm.count_ones());
+                let ta = p.lcm & !self.lm[p.a as usize];
+                let tb = p.lcm & !self.lm[p.b as usize];
+                let ra = mul_mono(&self.g[p.a as usize], ta);
+                let rb = mul_mono(&self.g[p.b as usize], tb);
+                build += (ra.len() + rb.len()) as u64;
+                let r = xor_merge(&ra, &rb);
+                if r.is_empty() {
+                    zero_at_build += 1;
+                } else {
+                    srows.push(r);
+                    skeys.push(pk);
+                }
+            }
+        }
+        self.t.pairs_sel += sel_n;
+        self.t.rows_s += srows.len() as u64;
+        self.t.d_sel = d_sel;
+        self.t.zero_build += zero_at_build;
+        // symbolic preprocessing
+        let t_sym = Instant::now();
+        let mut idx: FxMap<u64, u32> = FxMap::default();
+        let mut monos: Vec<u64> = Vec::new();
+        for r in &srows {
+            for &m in r {
+                if !idx.contains_key(&m) {
+                    idx.insert(m, monos.len() as u32);
+                    monos.push(m);
+                }
+            }
+        }
+        let mut reducers: Vec<(u64, Vec<u64>)> = Vec::new();
+        let mut qi = 0usize;
+        while qi < monos.len() {
+            let m = monos[qi];
+            qi += 1;
+            let mut best = usize::MAX;
+            if let Some(rep) = self.rep {
+                if let Some(&l) = rep.red.get(&m) {
+                    if let Some(&gi) = self.lm_idx.get(&l) {
+                        if self.lm[gi as usize] & !m == 0 {
+                            best = gi as usize;
+                        }
+                    }
+                }
+                self.t.sym_tests += 1;
+            }
+            if best == usize::MAX {
+                self.t.sym_tests += self.lm.len() as u64;
+                let mut bl = usize::MAX;
+                for (gi, &l) in self.lm.iter().enumerate() {
+                    if l & !m == 0 {
+                        let len = self.g[gi].len();
+                        if len < bl {
+                            bl = len;
+                            best = gi;
+                        }
+                    }
+                }
+            }
+            if best != usize::MAX {
+                if let Some(rec) = self.rec.as_mut() {
+                    rec.red.insert(m, self.lm[best]);
+                }
+                let t = m & !self.lm[best];
+                let row = mul_mono(&self.g[best], t);
+                build += row.len() as u64;
+                for &x in &row {
+                    if x != m && !idx.contains_key(&x) {
+                        idx.insert(x, monos.len() as u32);
+                        monos.push(x);
+                    }
+                }
+                reducers.push((m, row));
+            }
+            if qi & 1023 == 0 {
+                if self.over_time() {
+                    return Err(Status::TimeLimit);
+                }
+                if self.over_mem() {
+                    return Err(Status::MemCap);
+                }
+                if monos.len() > self.lim.max_cols {
+                    return Err(Status::ColsCap);
+                }
+            }
+        }
+        let c = monos.len();
+        if c > self.lim.max_cols {
+            return Err(Status::ColsCap);
+        }
+        let d_mat = monos.iter().map(|m| m.count_ones()).max().unwrap_or(0);
+        self.t.d_mat = self.t.d_mat.max(d_mat);
+        let mut ks: Vec<(u64, u64)> = monos.iter().map(|&m| (key(m), m)).collect();
+        ks.sort_unstable_by(|a, b| b.0.cmp(&a.0));
+        let cols: Vec<u64> = ks.iter().map(|x| x.1).collect();
+        drop(ks);
+        let mut cidx: FxMap<u64, u32> = FxMap::default();
+        cidx.reserve(c);
+        for (i, &m) in cols.iter().enumerate() {
+            cidx.insert(m, i as u32);
+        }
+        drop(idx);
+        drop(monos);
+        self.t.ms_sym += t_sym.elapsed().as_secs_f64() * 1000.0;
+        let t_elim = Instant::now();
+        let rows = (reducers.len() + srows.len()) as u64;
+        let mut nnz = 0u64;
+        let mut pivot: Vec<u32> = vec![NOPIV; c];
+        let mut store: Vec<Vec<u32>> = Vec::with_capacity(reducers.len() + 64);
+        for (m, row) in reducers.drain(..) {
+            let r: Vec<u32> = row.iter().map(|x| cidx[x]).collect();
+            nnz += r.len() as u64;
+            pivot[cidx[&m] as usize] = store.len() as u32;
+            store.push(r);
+        }
+        let words = (c + 63) / 64;
+        let mut acc = vec![0u64; words];
+        let mut elim = 0u64;
+        let mut newp: Vec<u32> = Vec::new();
+        let mut zero_red = 0u64;
+        for (ri, r) in srows.iter().enumerate() {
+            for w in acc.iter_mut() {
+                *w = 0;
+            }
+            for &mm in r {
+                let ci = cidx[&mm] as usize;
+                acc[ci >> 6] ^= 1u64 << (ci & 63);
+            }
+            nnz += r.len() as u64;
+            let mut pos = 0usize;
+            let mut kept: Vec<u32> = Vec::new();
+            while let Some(cc) = next_set(&acc, pos) {
+                let pv = pivot[cc];
+                if pv != NOPIV {
+                    let prow = &store[pv as usize];
+                    for &x in prow {
+                        acc[(x >> 6) as usize] ^= 1u64 << (x & 63);
+                    }
+                    elim += prow.len() as u64;
+                    pos = cc;
+                } else {
+                    kept.push(cc as u32);
+                    pos = cc + 1;
+                }
+            }
+            if kept.is_empty() {
+                zero_red += 1;
+            } else {
+                nnz += kept.len() as u64;
+                if let Some(rec) = self.rec.as_mut() {
+                    rec.useful.insert(skeys[ri]);
+                }
+                pivot[kept[0] as usize] = store.len() as u32;
+                newp.push(store.len() as u32);
+                store.push(kept);
+            }
+            if ri & 15 == 15 {
+                if self.over_time() {
+                    return Err(Status::TimeLimit);
+                }
+                if self.over_mem() {
+                    return Err(Status::MemCap);
+                }
+            }
+        }
+        self.t.ms_elim += t_elim.elapsed().as_secs_f64() * 1000.0;
+        let t_back = Instant::now();
+        let mut back = 0u64;
+        newp.sort_unstable_by(|&x, &y| store[y as usize][0].cmp(&store[x as usize][0]));
+        let is_new = {
+            let mut v = vec![false; c];
+            for &p in &newp {
+                v[store[p as usize][0] as usize] = true;
+            }
+            v
+        };
+        for (bi, &p) in newp.iter().enumerate() {
+            if bi & 63 == 63 && self.over_time() {
+                return Err(Status::TimeLimit);
+            }
+            let row = store[p as usize].clone();
+            if !row[1..].iter().any(|&x| is_new[x as usize]) {
+                continue;
+            }
+            for w in acc.iter_mut() {
+                *w = 0;
+            }
+            for &x in &row {
+                acc[(x >> 6) as usize] ^= 1u64 << (x & 63);
+            }
+            let lead = row[0] as usize;
+            let mut pos = lead + 1;
+            let mut out: Vec<u32> = vec![row[0]];
+            while let Some(cc) = next_set(&acc, pos) {
+                if is_new[cc] {
+                    let prow = &store[pivot[cc] as usize];
+                    for &x in prow {
+                        acc[(x >> 6) as usize] ^= 1u64 << (x & 63);
+                    }
+                    back += prow.len() as u64;
+                    pos = cc;
+                } else {
+                    out.push(cc as u32);
+                    pos = cc + 1;
+                }
+            }
+            store[p as usize] = out;
+        }
+        self.t.ms_back += t_back.elapsed().as_secs_f64() * 1000.0;
+        self.t.build += build;
+        self.t.elim += elim;
+        self.t.back += back;
+        self.t.zero_elim += zero_red;
+        self.t.steps += 1;
+        self.t.rows_max = self.t.rows_max.max(rows);
+        self.t.cols_max = self.t.cols_max.max(c as u64);
+        self.t.nnz_max = self.t.nnz_max.max(nnz);
+        let rc = rows as u128 * c as u128;
+        self.t.rc_max = self.t.rc_max.max(rc);
+        self.t.cols_sum += c as u64;
+        self.t.rows_sum += rows;
+        let mem = nnz * 4 + rows * 32 + c as u64 * 32 + words as u64 * 8 + self.g_terms * 8;
+        self.t.mem_est_kb = self.t.mem_est_kb.max(mem / 1024);
+        let t_add = Instant::now();
+        let mut news: Vec<Vec<u64>> = Vec::new();
+        for &p in newp.iter() {
+            let row = &store[p as usize];
+            news.push(row.iter().map(|&x| cols[x as usize]).collect());
+        }
+        news.sort_by(|a, b| key(a[0]).cmp(&key(b[0])));
+        self.t.new_elems += news.len() as u64;
+        let mut refuted = false;
+        for p in news {
+            if p[0] == 0 {
+                refuted = true;
+            }
+            self.add(p);
+        }
+        self.t.ms_add += t_add.elapsed().as_secs_f64() * 1000.0;
+        if std::env::var("B06_VERBOSE").is_ok() {
+            eprintln!("  f4 step sel={min_sel} rows={rows} cols={c} s_rows={} new={} zero_elim={} zero_build={} G={} touches={}", self.t.rows_s, self.t.new_elems, self.t.zero_elim, self.t.zero_build, self.g.len() + 0, self.t.touches());
+        }
+        Ok(refuted)
+    }
+
+    fn run(&mut self, eqs: &[Poly]) -> Status {
+        let mut refuted = false;
+        for e in eqs {
+            if e.is_empty() {
+                continue;
+            }
+            let p = sort_cancel(e.clone());
+            if p.is_empty() {
+                continue;
+            }
+            if p[0] == 0 {
+                refuted = true;
+            }
+            self.add(p);
+        }
+        let status = if refuted {
+            Status::Refuted
+        } else {
+            loop {
+                if self.pairs.is_empty() {
+                    break Status::Gb;
+                }
+                if self.over_time() {
+                    break Status::TimeLimit;
+                }
+                match self.step() {
+                    Ok(true) => break Status::Refuted,
+                    Ok(false) => {}
+                    Err(s) => break s,
+                }
+            }
+        };
+        self.t.g_size = self.g.len();
+        status
+    }
+}
+
+// ---------------------------------------------------------------- arm (b): the signature-based engine
+
+/// Spread the bits of `x` (below bit 56) to the even bit positions of a u128.
+fn spread(x: u64) -> u128 {
+    let mut v = x as u128;
+    v = (v | (v << 32)) & 0x0000_0000_FFFF_FFFF_0000_0000_FFFF_FFFF;
+    v = (v | (v << 16)) & 0x0000_FFFF_0000_FFFF_0000_FFFF_0000_FFFF;
+    v = (v | (v << 8)) & 0x00FF_00FF_00FF_00FF_00FF_00FF_00FF_00FF;
+    v = (v | (v << 4)) & 0x0F0F_0F0F_0F0F_0F0F_0F0F_0F0F_0F0F_0F0F;
+    v = (v | (v << 2)) & 0x3333_3333_3333_3333_3333_3333_3333_3333;
+    v = (v | (v << 1)) & 0x5555_5555_5555_5555_5555_5555_5555_5555;
+    v
+}
+
+/// Order key of the monomial `m * t` of the polynomial ring (exponent of a
+/// variable = [in m] + [in t], so a variable in both is a square): degree
+/// first, then grevlex (a smaller exponent of the smallest variable is
+/// larger).  On squarefree monomials this is `key` (checked in the selftest).
+/// Larger key = larger monomial.
+#[inline]
+fn rk(m: u64, t: u64, nv: u32) -> u128 {
+    let full = (1u64 << nv) - 1;
+    let u = m | t;
+    let deg = (m.count_ones() + t.count_ones()) as u128;
+    let absent = !u & full; // exponent 0: digit 2
+    let one = m ^ t; // exponent 1: digit 1
+    (deg << 120) | (spread(absent) << 1) | spread(one)
+}
+
+struct Elem {
+    poly: Vec<u64>,
+    lm: u64,
+    idx: u32,
+    sig: u64,
+}
+
+fn ekey(idx: u32, sig: u64, lm: u64) -> u64 {
+    mix(mix(idx as u64 + 1, sig), lm)
+}
+
+struct Cand {
+    a: u32,
+    b: u32, // NONE: field pair of `a` with `var`
+    var: u8,
+}
+
+struct SRow {
+    poly: Vec<u64>,
+    idx: u32,
+    sig: u64,
+    pk: u64,
+    seq: u32,
+}
+
+struct MRow {
+    kind: u8, // 0 reducer, 1 S-row
+    idx: u32,
+    rk: u128,
+    seq: u32,
+    sig: u64,
+    pk: u64,
+    poly: Vec<u64>,
+}
+
+/// Iterate every submask of `m` (including `m` and 0).
+struct Subs {
+    m: u64,
+    cur: u64,
+    done: bool,
+}
+impl Subs {
+    fn new(m: u64) -> Subs {
+        Subs { m, cur: m, done: false }
+    }
+}
+impl Iterator for Subs {
+    type Item = u64;
+    fn next(&mut self) -> Option<u64> {
+        if self.done {
+            return None;
+        }
+        let r = self.cur;
+        if self.cur == 0 {
+            self.done = true;
+        } else {
+            self.cur = (self.cur - 1) & self.m;
+        }
+        Some(r)
+    }
+}
+
+struct Sig<'a> {
+    lim: &'a Limits,
+    nv: u32,
+    crit: u32, // bit0 K1, bit1 K2, bit2 K3, bit3 K4
+    nidx: usize,
+    gen_lm: Vec<u64>,
+    g: Vec<Elem>,
+    un: Vec<Vec<u64>>,
+    fpl: Vec<u64>,
+    lmset: Vec<FxSet<u64>>,
+    zset: Vec<FxSet<u64>>,
+    lm_ys: Vec<FxMap<u64, Vec<u32>>>,
+    sig_ys: Vec<FxMap<u64, Vec<u32>>>,
+    ekey_idx: FxMap<u64, u32>,
+    seen: FxSet<u64>,
+    g_terms: u64,
+    t: Totals,
+    rec: Option<Trace>,
+    rep: Option<&'a Trace>,
+    seq: u32,
+}
+
+impl<'a> Sig<'a> {
+    fn new(lim: &'a Limits, nv: u32, crit: u32) -> Self {
+        assert!(nv <= 56);
+        Sig {
+            lim,
+            nv,
+            crit,
+            nidx: 0,
+            gen_lm: Vec::new(),
+            g: Vec::new(),
+            un: Vec::new(),
+            fpl: Vec::new(),
+            lmset: Vec::new(),
+            zset: Vec::new(),
+            lm_ys: Vec::new(),
+            sig_ys: Vec::new(),
+            ekey_idx: FxMap::default(),
+            seen: FxSet::default(),
+            g_terms: 0,
+            t: Totals::default(),
+            rec: None,
+            rep: None,
+            seq: 0,
+        }
+    }
+
+    fn over_time(&self) -> bool {
+        self.lim.deadline.map_or(false, |d| Instant::now() >= d)
+    }
+    fn over_mem(&self) -> bool {
+        self.lim.vm_cap != 0 && vm_bytes() > self.lim.vm_cap
+    }
+
+    fn add_elem(&mut self, poly: Vec<u64>, idx: u32, sig: u64) {
+        let h = self.g.len();
+        let lm = poly[0];
+        let words = (h + 63) / 64;
+        let mut bits = vec![!0u64; words];
+        if h % 64 != 0 && words > 0 {
+            bits[words - 1] = (1u64 << (h % 64)) - 1;
+        }
+        self.un.push(bits);
+        self.fpl.push(lm & !sig);
+        self.t.d_k0 += (lm & sig).count_ones() as u64;
+        for j in (idx as usize + 1)..self.nidx {
+            self.lmset[j].insert(lm);
+        }
+        self.lm_ys[idx as usize].entry(lm).or_default().push(h as u32);
+        self.sig_ys[idx as usize].entry(sig).or_default().push(h as u32);
+        self.ekey_idx.insert(ekey(idx, sig, lm), h as u32);
+        self.g_terms += poly.len() as u64;
+        self.g.push(Elem { poly, lm, idx, sig });
+    }
+
+    fn pair_key(&self, c: &Cand) -> u64 {
+        let ea = &self.g[c.a as usize];
+        let ka = ekey(ea.idx, ea.sig, ea.lm);
+        if c.b == NONE {
+            mix(mix(ka, u64::MAX), c.var as u64)
+        } else {
+            let eb = &self.g[c.b as usize];
+            let kb = ekey(eb.idx, eb.sig, eb.lm);
+            mix(mix(ka.min(kb), ka.max(kb)), 0x1000)
+        }
+    }
+
+    /// K3: the principal syzygy of the element `x` with an element `y` of the
+    /// same index has a leading term dividing `s`.
+    fn k3_hit(&self, x: usize, i: usize, s: u64) -> bool {
+        let nv = self.nv;
+        let ex = &self.g[x];
+        let (lmx, sx) = (ex.lm, ex.sig);
+        // direction 1: leading term LM(y) * sig(x)
+        if sx & !s == 0 {
+            let u = s & !sx;
+            for sub in Subs::new(u) {
+                if sub == 0 {
+                    continue;
+                }
+                if let Some(ys) = self.lm_ys[i].get(&sub) {
+                    for &y in ys {
+                        if y as usize == x {
+                            continue;
+                        }
+                        let ey = &self.g[y as usize];
+                        if rk(ey.lm, sx, nv) > rk(lmx, ey.sig, nv) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        // direction 2: leading term LM(x) * sig(y)
+        if lmx & !s == 0 {
+            let u = s & !lmx;
+            for sub in Subs::new(u) {
+                if let Some(ys) = self.sig_ys[i].get(&sub) {
+                    for &y in ys {
+                        if y as usize == x {
+                            continue;
+                        }
+                        let ey = &self.g[y as usize];
+                        if rk(lmx, ey.sig, nv) > rk(ey.lm, sx, nv) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        false
+    }
+
+    /// Apply K1-K4 to the label `(i, s)` of a pair whose larger side is `x`
+    /// and whose other side is `y` (an element index, or none for a field
+    /// pair).  Counts the criterion that fired.
+    fn discarded(&mut self, i: usize, s: u64, x: usize, y: Option<usize>) -> bool {
+        if self.crit & 1 != 0 && self.gen_lm[i] & !s == 0 {
+            self.t.d_k1 += 1;
+            return true;
+        }
+        if self.crit & 2 != 0 && i > 0 && Subs::new(s).any(|u| u != 0 && self.lmset[i].contains(&u)) {
+            self.t.d_k2 += 1;
+            return true;
+        }
+        if self.crit & 8 != 0 && Subs::new(s).any(|u| self.zset[i].contains(&u)) {
+            self.t.d_k4 += 1;
+            return true;
+        }
+        if self.crit & 4 != 0 {
+            let mut hit = self.k3_hit(x, i, s);
+            if !hit {
+                if let Some(yy) = y {
+                    if self.g[yy].idx as usize == i {
+                        hit = self.k3_hit(yy, i, s);
+                    }
+                }
+            }
+            if hit {
+                self.t.d_k3 += 1;
+                return true;
+            }
+        }
+        // K5 (rewritable): a newer element of the same index has a signature dividing s
+        if self.crit & 16 != 0 {
+            let xx = x as u32;
+            if Subs::new(s).any(|u| self.sig_ys[i].get(&u).map_or(false, |ys| *ys.last().unwrap() > xx)) {
+                self.t.d_k5 += 1;
+                return true;
+            }
+        }
+        false
+    }
+
+    fn min_degree(&self) -> Option<u32> {
+        let mut best = u32::MAX;
+        for b in 0..self.g.len() {
+            let lb = self.g[b].lm;
+            let f = self.fpl[b];
+            if f != 0 {
+                best = best.min(lb.count_ones() + 1);
+            }
+            for (w, &word) in self.un[b].iter().enumerate() {
+                let mut x = word;
+                while x != 0 {
+                    let a = w * 64 + x.trailing_zeros() as usize;
+                    x &= x - 1;
+                    let d = (self.g[a].lm | lb).count_ones();
+                    if d < best {
+                        best = d;
+                    }
+                }
+            }
+        }
+        if best == u32::MAX {
+            None
+        } else {
+            Some(best)
+        }
+    }
+
+    fn make_row(&mut self, c: &Cand) -> Option<SRow> {
+        let nv = self.nv;
+        if c.b == NONE {
+            // field pair: label x * sig(a), squarefree because K0 removed x in sig(a)
+            let a = c.a as usize;
+            let (i, s) = (self.g[a].idx as usize, self.g[a].sig | (1u64 << c.var));
+            if self.discarded(i, s, a, None) {
+                return None;
+            }
+            let r = mul_mono(&self.g[a].poly, 1u64 << c.var);
+            self.t.build += r.len() as u64;
+            if r.is_empty() {
+                self.t.zero_build += 1;
+                self.zset[i].insert(s);
+                return None;
+            }
+            self.seq += 1;
+            let pk = if self.rec.is_some() || self.rep.is_some() { self.pair_key(c) } else { 0 };
+            return Some(SRow { poly: r, idx: i as u32, sig: s, pk, seq: self.seq });
+        }
+        let (a, b) = (c.a as usize, c.b as usize);
+        let (la, lb, sa, sb, ia, ib) = (
+            self.g[a].lm,
+            self.g[b].lm,
+            self.g[a].sig,
+            self.g[b].sig,
+            self.g[a].idx,
+            self.g[b].idx,
+        );
+        let lcm = la | lb;
+        let ta = lcm & !la;
+        let tb = lcm & !lb;
+        let ord = if ia != ib {
+            ia.cmp(&ib)
+        } else {
+            rk(sa, ta, nv).cmp(&rk(sb, tb, nv))
+        };
+        if ord == std::cmp::Ordering::Equal {
+            self.t.d_sing += 1;
+            return None;
+        }
+        let (x, tx, y, ty) = if ord == std::cmp::Ordering::Greater { (a, ta, b, tb) } else { (b, tb, a, ta) };
+        let (sx, ix) = (self.g[x].sig, self.g[x].idx as usize);
+        if sx & tx != 0 {
+            self.t.d_k0 += 1;
+            return None;
+        }
+        let s = sx | tx;
+        if self.discarded(ix, s, x, Some(y)) {
+            return None;
+        }
+        // F5/GVW formulation: the row is the larger-signature multiple t_x * X alone;
+        // the smaller multiple is cancelled in elimination by the reducer of least label.
+        if !self.seen.insert(mix(x as u64 + 1, tx)) {
+            self.t.d_dup += 1;
+            return None;
+        }
+        let r = mul_mono(&self.g[x].poly, tx);
+        let _ = (y, ty);
+        self.t.build += r.len() as u64;
+        self.seq += 1;
+        let pk = if self.rec.is_some() || self.rep.is_some() { self.pair_key(c) } else { 0 };
+        Some(SRow { poly: r, idx: ix as u32, sig: s, pk, seq: self.seq })
+    }
+
+    fn step(&mut self, d: u32) -> Result<bool, Status> {
+        let t_pairs = Instant::now();
+        self.seen.clear();
+        // collect the unprocessed pairs of degree d
+        let mut cands: Vec<Cand> = Vec::new();
+        for b in 0..self.g.len() {
+            let lb = self.g[b].lm;
+            let f = self.fpl[b];
+            if f != 0 && lb.count_ones() + 1 == d {
+                let mut bits = f;
+                while bits != 0 {
+                    let v = bits.trailing_zeros() as u8;
+                    bits &= bits - 1;
+                    cands.push(Cand { a: b as u32, b: NONE, var: v });
+                }
+                self.fpl[b] = 0;
+            }
+            for w in 0..self.un[b].len() {
+                let mut x = self.un[b][w];
+                let mut clear = 0u64;
+                while x != 0 {
+                    let bit = x.trailing_zeros() as usize;
+                    x &= x - 1;
+                    let a = w * 64 + bit;
+                    if (self.g[a].lm | lb).count_ones() == d {
+                        cands.push(Cand { a: a as u32, b: b as u32, var: 0 });
+                        clear |= 1u64 << bit;
+                    }
+                }
+                self.un[b][w] &= !clear;
+            }
+        }
+        self.t.pairs_cand += cands.len() as u64;
+        self.t.d_sel = self.t.d_sel.max(d);
+        let mut srows: Vec<SRow> = Vec::new();
+        let mut sel_n = 0u64;
+        for (ci, c) in cands.iter().enumerate() {
+            if let Some(rep) = self.rep {
+                let pk = self.pair_key(c);
+                if !rep.useful.contains(&pk) {
+                    self.t.pairs_drop += 1;
+                    continue;
+                }
+            }
+            sel_n += 1;
+            if let Some(r) = self.make_row(c) {
+                srows.push(r);
+            }
+            if ci & 4095 == 4095 {
+                if self.over_time() {
+                    return Err(Status::TimeLimit);
+                }
+                if self.over_mem() {
+                    return Err(Status::MemCap);
+                }
+            }
+        }
+        drop(cands);
+        self.t.pairs_sel += sel_n;
+        self.t.rows_s += srows.len() as u64;
+        self.t.ms_pairs += t_pairs.elapsed().as_secs_f64() * 1000.0;
+        if srows.is_empty() {
+            return Ok(false);
+        }
+        let nv = self.nv;
+        // symbolic preprocessing: the reducer of a monomial is the divisor of least label
+        let t_sym = Instant::now();
+        let mut build = 0u64;
+        let mut idx: FxMap<u64, u32> = FxMap::default();
+        let mut monos: Vec<u64> = Vec::new();
+        for r in &srows {
+            for &m in &r.poly {
+                if !idx.contains_key(&m) {
+                    idx.insert(m, monos.len() as u32);
+                    monos.push(m);
+                }
+            }
+        }
+        let mut reducers: Vec<MRow> = Vec::new();
+        let mut qi = 0usize;
+        while qi < monos.len() {
+            let m = monos[qi];
+            qi += 1;
+            let mut best = usize::MAX;
+            if let Some(rep) = self.rep {
+                if let Some(&ek) = rep.red.get(&m) {
+                    if let Some(&gi) = self.ekey_idx.get(&ek) {
+                        if self.g[gi as usize].lm & !m == 0 {
+                            best = gi as usize;
+                        }
+                    }
+                }
+                self.t.sym_tests += 1;
+            }
+            if best == usize::MAX {
+                self.t.sym_tests += self.g.len() as u64;
+                let mut bl: (u32, u128, usize) = (u32::MAX, u128::MAX, usize::MAX);
+                for (gi, e) in self.g.iter().enumerate() {
+                    if e.lm & !m == 0 {
+                        let t = m & !e.lm;
+                        let cand = (e.idx, rk(e.sig, t, nv), e.poly.len());
+                        if cand < bl {
+                            bl = cand;
+                            best = gi;
+                        }
+                    }
+                }
+            }
+            if best != usize::MAX {
+                let e = &self.g[best];
+                if let Some(rec) = self.rec.as_mut() {
+                    rec.red.insert(m, ekey(e.idx, e.sig, e.lm));
+                }
+                let t = m & !e.lm;
+                let row = mul_mono(&e.poly, t);
+                build += row.len() as u64;
+                for &x in &row {
+                    if x != m && !idx.contains_key(&x) {
+                        idx.insert(x, monos.len() as u32);
+                        monos.push(x);
+                    }
+                }
+                self.seq += 1;
+                reducers.push(MRow {
+                    kind: 0,
+                    idx: e.idx,
+                    rk: rk(e.sig, t, nv),
+                    seq: self.seq,
+                    sig: e.sig | t,
+                    pk: 0,
+                    poly: row,
+                });
+            }
+            if qi & 1023 == 0 {
+                if self.over_time() {
+                    return Err(Status::TimeLimit);
+                }
+                if self.over_mem() {
+                    return Err(Status::MemCap);
+                }
+                if monos.len() > self.lim.max_cols {
+                    return Err(Status::ColsCap);
+                }
+            }
+        }
+        let c = monos.len();
+        if c > self.lim.max_cols {
+            return Err(Status::ColsCap);
+        }
+        let d_mat = monos.iter().map(|m| m.count_ones()).max().unwrap_or(0);
+        self.t.d_mat = self.t.d_mat.max(d_mat);
+        let mut ks: Vec<(u64, u64)> = monos.iter().map(|&m| (key(m), m)).collect();
+        ks.sort_unstable_by(|a, b| b.0.cmp(&a.0));
+        let cols: Vec<u64> = ks.iter().map(|x| x.1).collect();
+        drop(ks);
+        let mut cidx: FxMap<u64, u32> = FxMap::default();
+        cidx.reserve(c);
+        for (i, &m) in cols.iter().enumerate() {
+            cidx.insert(m, i as u32);
+        }
+        drop(idx);
+        drop(monos);
+        // all rows in increasing label order
+        let mut mrows: Vec<MRow> = reducers;
+        for r in srows.drain(..) {
+            mrows.push(MRow {
+                kind: 1,
+                idx: r.idx,
+                rk: rk(r.sig, 0, nv),
+                seq: r.seq,
+                sig: r.sig,
+                pk: r.pk,
+                poly: r.poly,
+            });
+        }
+        mrows.sort_unstable_by(|x, y| {
+            x.idx
+                .cmp(&y.idx)
+                .then(x.rk.cmp(&y.rk))
+                .then(x.kind.cmp(&y.kind))
+                .then(x.seq.cmp(&y.seq))
+        });
+        self.t.ms_sym += t_sym.elapsed().as_secs_f64() * 1000.0;
+        let t_elim = Instant::now();
+        let rows = mrows.len() as u64;
+        let mut nnz = 0u64;
+        let words = (c + 63) / 64;
+        let mut acc = vec![0u64; words];
+        // pivots: several per column are allowed (a raw reducer and a reduced S-row can
+        // share a leading column); a row uses the sparsest pivot of strictly smaller label
+        let mut pivot: Vec<u32> = vec![NOPIV; c];
+        let mut chain: Vec<u32> = Vec::with_capacity(mrows.len());
+        let mut store: Vec<Vec<u32>> = Vec::with_capacity(mrows.len());
+        let mut slab: Vec<(u32, u128)> = Vec::with_capacity(mrows.len());
+        let mut newpiv: Vec<u32> = vec![NOPIV; c];
+        let mut elim = 0u64;
+        // (store index, idx, sig, rk, seq)
+        let mut newp: Vec<(u32, u32, u64, u128, u32)> = Vec::new();
+        for (ri, row) in mrows.iter().enumerate() {
+            let lab = (row.idx, row.rk);
+            let r: Vec<u32> = row.poly.iter().map(|x| cidx[x]).collect();
+            if row.kind == 0 {
+                nnz += r.len() as u64;
+                let col = r[0] as usize;
+                chain.push(pivot[col]);
+                pivot[col] = store.len() as u32;
+                store.push(r);
+                slab.push(lab);
+                continue;
+            }
+            for w in acc.iter_mut() {
+                *w = 0;
+            }
+            for &ci in &r {
+                acc[(ci >> 6) as usize] ^= 1u64 << (ci & 63);
+            }
+            nnz += r.len() as u64;
+            let mut pos = 0usize;
+            let mut kept: Vec<u32> = Vec::new();
+            let mut dropped = false;
+            while let Some(cc) = next_set(&acc, pos) {
+                let mut best = NOPIV;
+                let mut bl = usize::MAX;
+                let mut any = false;
+                let mut p = pivot[cc];
+                while p != NOPIV {
+                    any = true;
+                    if slab[p as usize] < lab {
+                        let l = store[p as usize].len();
+                        if l < bl {
+                            bl = l;
+                            best = p;
+                        }
+                    }
+                    p = chain[p as usize];
+                }
+                if best != NOPIV {
+                    let prow = &store[best as usize];
+                    for &x in prow {
+                        acc[(x >> 6) as usize] ^= 1u64 << (x & 63);
+                    }
+                    elim += prow.len() as u64;
+                    pos = cc;
+                } else if any && kept.is_empty() {
+                    dropped = true;
+                    break;
+                } else {
+                    kept.push(cc as u32);
+                    pos = cc + 1;
+                }
+            }
+            if dropped {
+                self.t.super_top += 1;
+            } else if kept.is_empty() {
+                self.t.zero_elim += 1;
+                self.zset[row.idx as usize].insert(row.sig);
+            } else {
+                nnz += kept.len() as u64;
+                let col = kept[0] as usize;
+                chain.push(pivot[col]);
+                pivot[col] = store.len() as u32;
+                newpiv[col] = store.len() as u32;
+                newp.push((store.len() as u32, row.idx, row.sig, row.rk, row.seq));
+                if let Some(rec) = self.rec.as_mut() {
+                    rec.useful.insert(row.pk);
+                }
+                store.push(kept);
+                slab.push(lab);
+            }
+            if ri & 15 == 15 {
+                if self.over_time() {
+                    return Err(Status::TimeLimit);
+                }
+                if self.over_mem() {
+                    return Err(Status::MemCap);
+                }
+            }
+        }
+        self.t.ms_elim += t_elim.elapsed().as_secs_f64() * 1000.0;
+        let t_back = Instant::now();
+        let mut back = 0u64;
+        let mut order: Vec<usize> = (0..newp.len()).collect();
+        order.sort_unstable_by(|&x, &y| store[newp[y].0 as usize][0].cmp(&store[newp[x].0 as usize][0]));
+        for (bi, &oi) in order.iter().enumerate() {
+            let p = newp[oi].0 as usize;
+            if bi & 63 == 63 && self.over_time() {
+                return Err(Status::TimeLimit);
+            }
+            let lab = slab[p];
+            let row = store[p].clone();
+            let blocked = |x: u32, slab: &Vec<(u32, u128)>| {
+                let np = newpiv[x as usize];
+                np != NOPIV && slab[np as usize] < lab
+            };
+            if !row[1..].iter().any(|&x| blocked(x, &slab)) {
+                continue;
+            }
+            for w in acc.iter_mut() {
+                *w = 0;
+            }
+            for &x in &row {
+                acc[(x >> 6) as usize] ^= 1u64 << (x & 63);
+            }
+            let lead = row[0] as usize;
+            let mut pos = lead + 1;
+            let mut out: Vec<u32> = vec![row[0]];
+            while let Some(cc) = next_set(&acc, pos) {
+                if blocked(cc as u32, &slab) {
+                    let prow = &store[newpiv[cc] as usize];
+                    for &x in prow {
+                        acc[(x >> 6) as usize] ^= 1u64 << (x & 63);
+                    }
+                    back += prow.len() as u64;
+                    pos = cc;
+                } else {
+                    out.push(cc as u32);
+                    pos = cc + 1;
+                }
+            }
+            store[p] = out;
+        }
+        self.t.ms_back += t_back.elapsed().as_secs_f64() * 1000.0;
+        self.t.build += build;
+        self.t.elim += elim;
+        self.t.back += back;
+        self.t.steps += 1;
+        self.t.rows_max = self.t.rows_max.max(rows);
+        self.t.cols_max = self.t.cols_max.max(c as u64);
+        self.t.nnz_max = self.t.nnz_max.max(nnz);
+        self.t.rc_max = self.t.rc_max.max(rows as u128 * c as u128);
+        self.t.cols_sum += c as u64;
+        self.t.rows_sum += rows;
+        let mem = nnz * 4 + rows * 48 + c as u64 * 32 + words as u64 * 8 + self.g_terms * 8
+            + (self.g.len() as u64) * (self.g.len() as u64) / 16;
+        self.t.mem_est_kb = self.t.mem_est_kb.max(mem / 1024);
+        let t_add = Instant::now();
+        // new elements in increasing label order
+        newp.sort_unstable_by(|x, y| x.1.cmp(&y.1).then(x.3.cmp(&y.3)).then(x.4.cmp(&y.4)));
+        let mut refuted = false;
+        self.t.new_elems += newp.len() as u64;
+        for np in &newp {
+            let poly: Vec<u64> = store[np.0 as usize].iter().map(|&x| cols[x as usize]).collect();
+            if poly[0] == 0 {
+                refuted = true;
+            }
+            self.add_elem(poly, np.1, np.2);
+        }
+        self.t.ms_add += t_add.elapsed().as_secs_f64() * 1000.0;
+        if std::env::var("B06_VERBOSE").is_ok() {
+            eprintln!("  sig step d={d} rows={rows} cols={c} s_rows={} new={} zero_elim={} zero_build={} super={} G={} touches={} k0={} k1={} k2={} k3={} k4={} sing={}", self.t.rows_s, newp.len(), self.t.zero_elim, self.t.zero_build, self.t.super_top, self.g.len(), self.t.touches(), self.t.d_k0, self.t.d_k1, self.t.d_k2, self.t.d_k3, self.t.d_k4, self.t.d_sing);
+        }
+        Ok(refuted)
+    }
+
+    fn run(&mut self, eqs: &[Poly]) -> Status {
+        let polys: Vec<Vec<u64>> = eqs
+            .iter()
+            .map(|e| sort_cancel(e.clone()))
+            .filter(|p| !p.is_empty())
+            .collect();
+        let mut polys = polys;
+        if self.crit & 32 == 0 {
+            polys.sort_by_key(|p| poly_degree(&p.clone()));
+        }
+        self.nidx = polys.len();
+        self.lmset = (0..self.nidx).map(|_| FxSet::default()).collect();
+        self.zset = (0..self.nidx).map(|_| FxSet::default()).collect();
+        self.lm_ys = (0..self.nidx).map(|_| FxMap::default()).collect();
+        self.sig_ys = (0..self.nidx).map(|_| FxMap::default()).collect();
+        let mut refuted = false;
+        for (i, p) in polys.into_iter().enumerate() {
+            self.gen_lm.push(p[0]);
+            if p[0] == 0 {
+                refuted = true;
+            }
+            self.add_elem(p, i as u32, 0);
+        }
+        let status = if refuted {
+            Status::Refuted
+        } else {
+            loop {
+                if self.over_time() {
+                    break Status::TimeLimit;
+                }
+                let d = match self.min_degree() {
+                    Some(d) => d,
+                    None => break Status::Gb,
+                };
+                match self.step(d) {
+                    Ok(true) => break Status::Refuted,
+                    Ok(false) => {}
+                    Err(s) => break s,
+                }
+            }
+        };
+        self.t.g_size = self.g.len();
+        status
+    }
+}
+
+// ---------------------------------------------------------------- running one job
+
+#[derive(Clone, Copy, PartialEq, Debug)]
+enum Kind {
+    F4,
+    Sig(u32),
+}
+
+struct JobOut {
+    status: Status,
+    t: Totals,
+    ms: f64,
+    rss_kb: u64,
+    hwm_ok: bool,
+    g: Vec<Vec<u64>>,
+    lm: Vec<u64>,
+    trace: Option<Trace>,
+    replay: &'static str, // "na" | "ok" | "fallback"
+    replay_touches: u64,
+    fb_touches: u64,
+    dropped: u64,
+}
+impl JobOut {
+    fn charged(&self) -> u64 {
+        if self.replay == "na" {
+            self.t.touches()
+        } else {
+            self.replay_touches + self.fb_touches
+        }
+    }
+}
+
+fn exec(kind: Kind, eqs: &[Poly], nv: usize, lim: &Limits, record: bool, rep: Option<&Trace>) -> JobOut {
+    let hwm_ok = reset_hwm();
+    let t0 = Instant::now();
+    let rec = if record { Some(Trace::default()) } else { None };
+    let (status, t, g, lm, trace) = match kind {
+        Kind::F4 => {
+            let mut e = F4::new(lim);
+            e.rec = rec;
+            e.rep = rep;
+            let s = e.run(eqs);
+            (s, e.t, e.g, e.lm, e.rec)
+        }
+        Kind::Sig(crit) => {
+            let mut e = Sig::new(lim, nv as u32, crit);
+            e.rec = rec;
+            e.rep = rep;
+            let s = e.run(eqs);
+            let g: Vec<Vec<u64>> = e.g.iter().map(|x| x.poly.clone()).collect();
+            let lm: Vec<u64> = e.g.iter().map(|x| x.lm).collect();
+            (s, e.t, g, lm, e.rec)
+        }
+    };
+    JobOut {
+        status,
+        ms: t0.elapsed().as_secs_f64() * 1000.0,
+        rss_kb: rss_peak_kb(),
+        hwm_ok,
+        dropped: t.pairs_drop,
+        t,
+        g,
+        lm,
+        trace,
+        replay: "na",
+        replay_touches: 0,
+        fb_touches: 0,
+    }
+}
+
+/// A replay with the trace `tr`; if the replayed pairs run out without `1`,
+/// the full engine is run from scratch and both are charged.
+fn exec_replay(kind: Kind, eqs: &[Poly], nv: usize, lim: &Limits, tr: &Trace) -> JobOut {
+    let mut j = exec(kind, eqs, nv, lim, false, Some(tr));
+    let rep_touches = j.t.touches();
+    let dropped = j.t.pairs_drop;
+    let rep_ms = j.ms;
+    match j.status {
+        Status::Refuted => {
+            j.replay = "ok";
+            j.replay_touches = rep_touches;
+            j.fb_touches = 0;
+            j
+        }
+        Status::Gb => {
+            let mut f = exec(kind, eqs, nv, lim, false, None);
+            f.replay = "fallback";
+            f.replay_touches = rep_touches;
+            f.fb_touches = f.t.touches();
+            f.dropped = dropped;
+            f.ms += rep_ms;
+            f
+        }
+        _ => {
+            j.replay = "ok";
+            j.replay_touches = rep_touches;
+            j
+        }
+    }
+}
+
+struct Traces {
+    f4: Option<Trace>,
+    sig: Option<Trace>,
+    f4x: Option<Trace>,
+}
+
+/// Run the arm `arm` once.  `own` holds the traces recorded on this very target
+/// (for `f4rs`/`sigrs`).
+fn run_arm(arm: &str, eqs: &[Poly], nv: usize, lim: &Limits, tr: &Traces, own: &Traces) -> JobOut {
+    match arm {
+        "f4" => exec(Kind::F4, eqs, nv, lim, false, None),
+        "sig" => exec(Kind::Sig(FULL), eqs, nv, lim, false, None),
+        "sig0" => exec(Kind::Sig(0), eqs, nv, lim, false, None),
+        "f4r" => exec_replay(Kind::F4, eqs, nv, lim, tr.f4.as_ref().expect("f4 trace")),
+        "sigr" => exec_replay(Kind::Sig(FULL), eqs, nv, lim, tr.sig.as_ref().expect("sig trace")),
+        "f4rs" => exec_replay(Kind::F4, eqs, nv, lim, own.f4.as_ref().expect("own f4 trace")),
+        "sigrs" => exec_replay(Kind::Sig(FULL), eqs, nv, lim, own.sig.as_ref().expect("own sig trace")),
+        a if a.starts_with("f4rx") => exec_replay(Kind::F4, eqs, nv, lim, tr.f4x.as_ref().expect("cross trace")),
+        _ => panic!("unknown arm {arm}"),
+    }
+}
+
+// ---------------------------------------------------------------- reference reduced basis
+
+fn nf(p: &[u64], red: &[(u64, Vec<u64>)]) -> Vec<u64> {
+    let mut cur: Vec<u64> = p.to_vec();
+    let mut out: Vec<u64> = Vec::new();
+    let mut start = 0usize;
+    // `cur[start..]` is the part not yet decided; `out` the irreducible leading terms so far
+    let mut work: Vec<u64> = Vec::new();
+    std::mem::swap(&mut work, &mut cur);
+    while start < work.len() {
+        let m = work[start];
+        if let Some((lm, r)) = red.iter().find(|(l, _)| l & !m == 0) {
+            let t = m & !*lm;
+            let prod = mul_mono(r, t);
+            let rest = xor_merge(&work[start..], &prod);
+            work = rest;
+            start = 0;
+        } else {
+            out.push(m);
+            start += 1;
+        }
+    }
+    out
+}
+
+/// The reduced Groebner basis of the ideal (plus field equations) generated by
+/// `g` (a Groebner basis, not necessarily minimal): sorted by leading monomial.
+fn reduced_gb(g: &[Vec<u64>]) -> Vec<Vec<u64>> {
+    let mut polys: Vec<Vec<u64>> = g.iter().filter(|p| !p.is_empty()).cloned().collect();
+    polys.sort_by_key(|p| key(p[0]));
+    let mut red: Vec<(u64, Vec<u64>)> = Vec::new();
+    for p in &polys {
+        let q = nf(p, &red);
+        if !q.is_empty() {
+            red.push((q[0], q));
+        }
+    }
+    let mut out: Vec<Vec<u64>> = red.into_iter().map(|x| x.1).collect();
+    out.sort_by_key(|p| key(p[0]));
+    out
+}
+
+// ---------------------------------------------------------------- output
+
+fn json_job(label: &str, cell: &Cell, target: usize, arm: &str, solutions: u64, j: &JobOut, extra: &str) -> String {
+    let t = &j.t;
+    format!(
+        "{{\"cell\":\"{}\",\"m\":{},\"n\":{},\"ell\":{},\"nv\":{},\"target\":{},\"arm\":\"{}\",\"solutions\":{},\"status\":\"{}\",\"d_mat\":{},\"d_sel\":{},\"steps\":{},\"pairs_cand\":{},\"pairs_sel\":{},\"pairs_gen\":{},\"pairs_drop\":{},\"d_k0\":{},\"d_sing\":{},\"d_dup\":{},\"d_k1\":{},\"d_k2\":{},\"d_k3\":{},\"d_k4\":{},\"d_k5\":{},\"rows_s\":{},\"zero_build\":{},\"zero_elim\":{},\"zero_red\":{},\"super_top\":{},\"rows_max\":{},\"cols_max\":{},\"rc_max\":{},\"nnz_max\":{},\"cols_sum\":{},\"rows_sum\":{},\"touches\":{},\"build\":{},\"elim\":{},\"back\":{},\"new_elems\":{},\"g_size\":{},\"sym_tests\":{},\"replay\":\"{}\",\"replay_touches\":{},\"fb_touches\":{},\"ms\":{:.1},\"ms_pairs\":{:.1},\"ms_sym\":{:.1},\"ms_elim\":{:.1},\"ms_back\":{:.1},\"ms_add\":{:.1},\"rss_kb\":{},\"hwm_reset\":{},\"mem_est_kb\":{}{}}}",
+        label, cell.m, cell.n, cell.l, cell.nv(), target, arm, solutions, j.status.name(),
+        t.d_mat, t.d_sel, t.steps, t.pairs_cand, t.pairs_sel, t.pairs_gen, j.dropped,
+        t.d_k0, t.d_sing, t.d_dup, t.d_k1, t.d_k2, t.d_k3, t.d_k4, t.d_k5, t.rows_s, t.zero_build, t.zero_elim, t.zero_red(), t.super_top,
+        t.rows_max, t.cols_max, t.rc_max, t.nnz_max, t.cols_sum, t.rows_sum,
+        j.charged(), t.build, t.elim, t.back, t.new_elems, t.g_size, t.sym_tests,
+        j.replay, j.replay_touches, j.fb_touches,
+        j.ms, t.ms_pairs, t.ms_sym, t.ms_elim, t.ms_back, t.ms_add, j.rss_kb, j.hwm_ok, t.mem_est_kb, extra
+    )
+}
+
+fn limits_from(a: &Args) -> Limits {
+    let secs: f64 = a.num("--time-limit", 0.0);
+    let cap = as_limit_bytes().map(|b| b / 100 * 88).unwrap_or(0);
+    Limits {
+        deadline: if secs > 0.0 {
+            Some(Instant::now() + std::time::Duration::from_secs_f64(secs))
+        } else {
+            None
+        },
+        max_cols: a.num("--max-cols", 400_000usize),
+        vm_cap: cap,
+    }
+}
+
+fn fail(msg: &str) -> ! {
+    println!("SELFTEST FAILED: {msg}");
+    std::process::exit(2);
+}
+
+// ---------------------------------------------------------------- run
+
+fn cell_draws<'a>(draws: &'a [Draw], label: &str) -> Vec<&'a Draw> {
+    let v: Vec<&Draw> = draws.iter().filter(|d| d.label == label).collect();
+    assert!(!v.is_empty(), "no draws for {label}");
+    v
+}
+
+fn system_of(d: &Draw) -> (Vec<Poly>, usize) {
+    let gf = Gf::new(d.cell.n);
+    let (mut eqs, nv) = build_system(&gf, d.cell.m, &d.basis, d.xr);
+    if let Ok(mode) = std::env::var("B06_ORDER") {
+        match mode.as_str() {
+            "rev" => eqs.reverse(),
+            "deg" => eqs.sort_by_key(|p| poly_degree(p)),
+            "degrev" => eqs.sort_by_key(|p| std::cmp::Reverse(poly_degree(p))),
+            _ => {}
+        }
+    }
+    assert_eq!(nv, d.cell.nv());
+    (eqs, nv)
+}
+
+fn mode_run(a: &Args) {
+    let draws = read_draws(&a.flag("--draws").expect("--draws"));
+    let label = a.flag("--cell").expect("--cell");
+    let cd = cell_draws(&draws, &label);
+    let tgts = parse_targets(&a.flag("--targets").unwrap_or("all".into()), cd.len());
+    let arms: Vec<String> = a
+        .flag("--arms")
+        .unwrap_or_else(|| "f4".into())
+        .split(',')
+        .map(|s| s.to_string())
+        .collect();
+    let trace_target: Option<usize> = a.flag("--trace-target").map(|s| s.parse().unwrap());
+    let total_limit: f64 = a.num("--total-limit", 0.0);
+    let per_job: f64 = a.num("--time-limit", 0.0);
+    let t_start = Instant::now();
+    let mut bad = false;
+    let need_f4 = arms.iter().any(|x| x == "f4r");
+    let need_sig = arms.iter().any(|x| x == "sigr");
+    let need_x = arms.iter().find(|x| x.starts_with("f4rx")).cloned();
+    let mut traces = Traces { f4: None, sig: None, f4x: None };
+    let job_lim = |t_start: &Instant| {
+        let mut lim = limits_from(a);
+        if per_job > 0.0 {
+            let mut secs = per_job;
+            if total_limit > 0.0 {
+                secs = secs.min((total_limit - t_start.elapsed().as_secs_f64()).max(1.0));
+            }
+            lim.deadline = Some(Instant::now() + std::time::Duration::from_secs_f64(secs));
+        }
+        lim
+    };
+    // the held-out target: record the traces (and print their cost: they are charged)
+    if let Some(tt) = trace_target {
+        if need_f4 || need_sig || arms.iter().any(|x| x == "f4" || x == "sig") {
+            let d = cd.iter().find(|d| d.idx == tt).expect("trace target idx");
+            let (eqs, nv) = system_of(d);
+            for (arm, kind, slot) in [("f4", Kind::F4, 0), ("sig", Kind::Sig(FULL), 1)] {
+                if (slot == 0 && !(need_f4 || arms.iter().any(|x| x == "f4"))) || (slot == 1 && !(need_sig || arms.iter().any(|x| x == "sig"))) {
+                    continue;
+                }
+                let lim = job_lim(&t_start);
+                let j = exec(kind, &eqs, nv, &lim, true, None);
+                println!("{}", json_job(&label, &d.cell, tt, arm, d.solutions, &j, ",\"trace\":1"));
+                eprintln!("{label} t{tt} {arm} (trace): {} touches={} {:.1}s", j.status.name(), j.t.touches(), j.ms / 1000.0);
+                if j.status != Status::Refuted && d.solutions == 0 {
+                    eprintln!("trace run did not refute: {}", j.status.name());
+                    bad = true;
+                }
+                if slot == 0 {
+                    traces.f4 = j.trace;
+                } else {
+                    traces.sig = j.trace;
+                }
+            }
+        }
+    }
+    if let Some(xa) = need_x {
+        let xcell = xa.split_once(':').expect("f4rx:<cell>").1.to_string();
+        let xd = cell_draws(&draws, &xcell);
+        let tt = trace_target.unwrap_or(xd.len() - 1);
+        let d = xd.iter().find(|d| d.idx == tt).expect("cross trace target");
+        let (eqs, nv) = system_of(d);
+        let lim = job_lim(&t_start);
+        let j = exec(Kind::F4, &eqs, nv, &lim, true, None);
+        eprintln!("{xcell} t{tt} f4 (cross trace): {} touches={}", j.status.name(), j.t.touches());
+        traces.f4x = j.trace;
+    }
+    for &ti in &tgts {
+        let d = cd.iter().find(|d| d.idx == ti).expect("target idx");
+        let (eqs, nv) = system_of(d);
+        let sols = d.solutions;
+        let mut own = Traces { f4: None, sig: None, f4x: None };
+        if arms.iter().any(|x| x == "f4rs") {
+            own.f4 = exec(Kind::F4, &eqs, nv, &job_lim(&t_start), true, None).trace;
+        }
+        if arms.iter().any(|x| x == "sigrs") {
+            own.sig = exec(Kind::Sig(FULL), &eqs, nv, &job_lim(&t_start), true, None).trace;
+        }
+        for arm in &arms {
+            if total_limit > 0.0 && t_start.elapsed().as_secs_f64() > total_limit {
+                println!("{{\"cell\":\"{}\",\"target\":{},\"arm\":\"{}\",\"status\":\"skipped\"}}", label, ti, arm);
+                continue;
+            }
+            let lim = job_lim(&t_start);
+            let j = run_arm(arm, &eqs, nv, &lim, &traces, &own);
+            let consistent = match j.status {
+                Status::Refuted => sols == 0,
+                Status::Gb => sols > 0,
+                _ => true,
+            };
+            if !consistent {
+                eprintln!("INCONSISTENT {label} target {ti} arm {arm}: status {} with {sols} solutions", j.status.name());
+                bad = true;
+            }
+            println!("{}", json_job(&label, &d.cell, ti, arm, sols, &j, ""));
+            eprintln!(
+                "{label} t{ti} {arm}: {} D={} steps={} zero={} touches={} {}{:.1}s",
+                j.status.name(),
+                j.t.d_mat,
+                j.t.steps,
+                j.t.zero_red(),
+                j.charged(),
+                if j.replay == "fallback" { "FALLBACK " } else { "" },
+                j.ms / 1000.0
+            );
+        }
+    }
+    if bad {
+        std::process::exit(2);
+    }
+}
+
+fn main() {
+    let args = Args {
+        v: std::env::args().skip(1).collect(),
+    };
+    match args.v.first().map(|s| s.as_str()) {
+        Some("gen") => mode_gen(&args),
+        Some("run") => mode_run(&args),
+        Some("selftest") => mode_selftest(&args),
+        Some("xcheck") => mode_xcheck(&args),
+        Some("summarize") => mode_summarize(&args),
+        _ => {
+            eprintln!("usage: b06 selftest|gen|run|xcheck|summarize ...");
+            std::process::exit(2);
+        }
+    }
+}
+
+// ---------------------------------------------------------------- selftest
+
+fn rand_sys(rng: &mut Rng, nv: usize, k: usize) -> Vec<Poly> {
+    let mut eqs = Vec::new();
+    for _ in 0..k {
+        let nterms = 3 + (rng.next() % 5) as usize;
+        let mut v: Vec<u64> = Vec::new();
+        for _ in 0..nterms {
+            let r = rng.next() % 4;
+            let deg = if r == 0 { 1 } else if r == 3 { 3 } else { 2 };
+            let mut m = 0u64;
+            while (m.count_ones() as usize) < deg {
+                m |= 1u64 << (rng.next() % nv as u64);
+            }
+            v.push(m);
+        }
+        if rng.next() % 3 == 0 {
+            v.push(0);
+        }
+        eqs.push(norm(v));
+    }
+    eqs
+}
+
+fn selftest_orders() {
+    let mut rng = Rng(77);
+    let nv = 24usize;
+    for _ in 0..20000 {
+        let a = rng.next() & ((1 << nv) - 1);
+        let b = rng.next() & ((1 << nv) - 1);
+        if a == b {
+            continue;
+        }
+        if (key(a) > key(b)) != grevlex_greater(a, b) {
+            fail(&format!("key vs grevlex {a:#x} {b:#x}"));
+        }
+        // the polynomial-ring key agrees with `key` on squarefree monomials
+        if (rk(a, 0, nv as u32) > rk(b, 0, nv as u32)) != grevlex_greater(a, b) {
+            fail(&format!("rk vs grevlex on squarefree {a:#x} {b:#x}"));
+        }
+        // multiplicativity on disjoint multipliers
+        let t = rng.next() & ((1 << nv) - 1) & !a & !b;
+        if (rk(a, t, nv as u32) > rk(b, t, nv as u32)) != grevlex_greater(a, b) {
+            fail("rk not multiplicative on a disjoint multiplier");
+        }
+        // squares: degree first
+        let c = rng.next() & ((1 << nv) - 1);
+        let d = rng.next() & c;
+        let (dc, dd) = (c.count_ones() + d.count_ones(), a.count_ones());
+        if dc != dd && (rk(c, d, nv as u32) > rk(a, 0, nv as u32)) != (dc > dd) {
+            fail("rk degree-first");
+        }
+    }
+    println!("orders ok: key = plain grevlex; rk = key on squarefree, multiplicative, degree-first with squares");
+}
+
+struct SysStats {
+    unsat: u32,
+    sat: u32,
+    k: [u64; 6],
+    replays: u32,
+    self_ok: u32,
+    fallbacks: u32,
+}
+
+fn check_system(name: &str, eqs: &[Poly], nv: usize, cross: &Traces, st: &mut SysStats) {
+    let brute = brute_solutions(eqs, nv);
+    let sols: Vec<u64> = if brute > 0 {
+        (0..(1u64 << nv)).filter(|&pt| eqs.iter().all(|p| eval_poly(p, pt) == 0)).collect()
+    } else {
+        Vec::new()
+    };
+    if brute == 0 {
+        st.unsat += 1;
+    } else {
+        st.sat += 1;
+    }
+    let lim = Limits { deadline: None, max_cols: 1 << 22, vm_cap: 0 };
+    let kinds = [Kind::F4, Kind::Sig(FULL), Kind::Sig(0), Kind::Sig(1), Kind::Sig(2), Kind::Sig(4), Kind::Sig(8), Kind::Sig(3), Kind::Sig(12)];
+    let mut ref_gb: Option<Vec<Vec<u64>>> = None;
+    let mut own = Traces { f4: None, sig: None, f4x: None };
+    for kind in kinds {
+        let j = exec(kind, eqs, nv, &lim, true, None);
+        if std::env::var("B06_TIMING").is_ok() {
+            eprintln!("  {name} {kind:?}: {} {:.0} ms, touches {}, g {}", j.status.name(), j.ms, j.t.touches(), j.t.g_size);
+        }
+        if kind == Kind::Sig(FULL) {
+            st.k[0] += j.t.d_k0;
+            st.k[1] += j.t.d_k1;
+            st.k[2] += j.t.d_k2;
+            st.k[3] += j.t.d_k3;
+            st.k[4] += j.t.d_k4;
+            st.k[5] += j.t.d_sing;
+        }
+        if brute == 0 {
+            if j.status != Status::Refuted {
+                fail(&format!("{name}: unsat system not refuted by {kind:?}: {}", j.status.name()));
+            }
+        } else {
+            if j.status != Status::Gb {
+                fail(&format!("{name}: sat system, {kind:?} ended {}", j.status.name()));
+            }
+            let sm = standard_monomials(&j.lm, nv);
+            if sm != brute {
+                fail(&format!("{name}: {kind:?} not a Groebner basis: {sm} standard monomials vs {brute} solutions"));
+            }
+            for gp in &j.g {
+                for &pt in &sols {
+                    if eval_poly(gp, pt) != 0 {
+                        fail(&format!("{name}: {kind:?} element does not vanish on a solution"));
+                    }
+                }
+            }
+            let rgb = reduced_gb(&j.g);
+            match &ref_gb {
+                None => ref_gb = Some(rgb),
+                Some(r) => {
+                    if *r != rgb {
+                        fail(&format!("{name}: reduced basis of {kind:?} differs from the F4 reduced basis"));
+                    }
+                }
+            }
+        }
+        if kind == Kind::F4 {
+            own.f4 = j.trace.clone();
+        }
+        if kind == Kind::Sig(FULL) {
+            own.sig = j.trace.clone();
+        }
+    }
+    // replays: own trace, then a trace of another system
+    for (kind, mine, other) in [(Kind::F4, &own.f4, &cross.f4), (Kind::Sig(FULL), &own.sig, &cross.sig)] {
+        for (lab, tr) in [("own", mine), ("cross", other)] {
+            let tr = match tr {
+                Some(t) => t,
+                None => continue,
+            };
+            let j = exec_replay(kind, eqs, nv, &lim, tr);
+            st.replays += 1;
+            if j.replay == "fallback" {
+                st.fallbacks += 1;
+            }
+            if brute == 0 {
+                if j.status != Status::Refuted {
+                    fail(&format!("{name}: {kind:?} {lab}-trace replay did not refute an unsat system: {}", j.status.name()));
+                }
+                if lab == "own" {
+                    if j.replay != "ok" {
+                        fail(&format!("{name}: {kind:?} replay of its own trace fell back"));
+                    }
+                    st.self_ok += 1;
+                    let full = exec(kind, eqs, nv, &lim, false, None);
+                    if j.t.touches() > full.t.touches() {
+                        fail(&format!("{name}: {kind:?} own-trace replay costs more than the full run"));
+                    }
+                }
+            } else {
+                if j.status != Status::Gb {
+                    fail(&format!("{name}: {kind:?} {lab}-trace replay on a sat system ended {}", j.status.name()));
+                }
+                if j.replay != "fallback" {
+                    fail(&format!("{name}: replay on a sat system must fall back (a finished replay is not a basis)"));
+                }
+                let rgb = reduced_gb(&j.g);
+                if Some(&rgb) != ref_gb.as_ref() {
+                    fail(&format!("{name}: {kind:?} {lab} replay (after fallback) has a different reduced basis"));
+                }
+            }
+        }
+    }
+}
+
+fn selftest_systems() {
+    let mut st = SysStats { unsat: 0, sat: 0, k: [0; 6], replays: 0, self_ok: 0, fallbacks: 0 };
+    let toys = [
+        Cell { m: 3, n: 5, l: 2 },
+        Cell { m: 4, n: 4, l: 1 },
+        Cell { m: 2, n: 7, l: 3 },
+        Cell { m: 3, n: 6, l: 3 },
+        Cell { m: 4, n: 5, l: 2 },
+        Cell { m: 3, n: 7, l: 3 },
+        Cell { m: 2, n: 9, l: 5 },
+    ];
+    let mut cross = Traces { f4: None, sig: None, f4x: None };
+    let lim = Limits { deadline: None, max_cols: 1 << 22, vm_cap: 0 };
+    for c in toys {
+        let gf = Gf::new(c.n);
+        let mut rng = Rng(1000 + c.n as u64);
+        let basis = random_basis(c.n, c.l, &mut rng);
+        let (mut unsat, mut sat) = (0, 0);
+        let mut tries = 0;
+        while (unsat < 3 || sat < 3) && tries < 6000 {
+            tries += 1;
+            let xr = rng.next() & gf.mask;
+            if xr == 0 {
+                continue;
+            }
+            let alg = count_solutions(&gf, c.m, &basis, xr);
+            if (alg > 0 && sat >= 3) || (alg == 0 && unsat >= 3) {
+                continue;
+            }
+            let (eqs, nv) = build_system(&gf, c.m, &basis, xr);
+            if brute_solutions(&eqs, nv) != alg {
+                fail("algebraic solution count differs from brute force");
+            }
+            if alg > 0 {
+                sat += 1;
+            } else {
+                unsat += 1;
+            }
+            check_system(&format!("toy {:?} xr={xr}", (c.m, c.n, c.l)), &eqs, nv, &cross, &mut st);
+            let r = exec(Kind::F4, &eqs, nv, &lim, true, None);
+            cross.f4 = r.trace;
+            let r = exec(Kind::Sig(FULL), &eqs, nv, &lim, true, None);
+            cross.sig = r.trace;
+        }
+        println!("toy (m,n,l)={:?} nv={}: {unsat} unsat, {sat} sat systems, all engines agree", (c.m, c.n, c.l), c.nv());
+    }
+    // random Boolean systems of 6 to 11 unknowns, under- and over-determined
+    let mut rng = Rng(424242);
+    for it in 0..90 {
+        let nv = 6 + (rng.next() % 6) as usize;
+        let k = (nv as i64 + (rng.next() % 7) as i64 - 3).max(2) as usize;
+        let eqs = rand_sys(&mut rng, nv, k);
+        check_system(&format!("random #{it} nv={nv} k={k}"), &eqs, nv, &cross, &mut st);
+        let r = exec(Kind::F4, &eqs, nv, &lim, true, None);
+        cross.f4 = r.trace;
+        let r = exec(Kind::Sig(FULL), &eqs, nv, &lim, true, None);
+        cross.sig = r.trace;
+    }
+    println!(
+        "systems: {} unsat, {} sat; engines f4, sig, sig0 and each criterion alone agree (refutation, standard monomials = brute force, vanishing, identical reduced bases)",
+        st.unsat, st.sat
+    );
+    println!(
+        "criteria fired in sig over the selftest: K0 {} K1 {} K2 {} K3 {} K4 {} singular {}",
+        st.k[0], st.k[1], st.k[2], st.k[3], st.k[4], st.k[5]
+    );
+    println!(
+        "replays: {} run, {} own-trace replays of unsat systems refuted without fallback, {} fell back (never a wrong verdict)",
+        st.replays, st.self_ok, st.fallbacks
+    );
+}
+
+fn mode_selftest(_a: &Args) {
+    selftest_orders();
+    selftest_systems();
+    println!("SELFTEST OK");
+}
+
+// ---------------------------------------------------------------- xcheck against the committed item 05 rows
+
+fn mode_xcheck(a: &Args) {
+    let draws = read_draws(&a.flag("--draws").expect("--draws"));
+    let label = a.flag("--cell").expect("--cell");
+    let refpath = a.flag("--ref").expect("--ref");
+    let txt = std::fs::read_to_string(&refpath).unwrap_or_else(|e| panic!("ref {refpath}: {e}"));
+    let cd = cell_draws(&draws, &label);
+    let mut n = 0;
+    let mut bad = 0;
+    for line in txt.lines() {
+        if !line.starts_with("{\"cell\"") || jstr_f(line, "cell").as_deref() != Some(label.as_str()) {
+            continue;
+        }
+        if jstr_f(line, "arm").as_deref() != Some("grevlex") || jstr_f(line, "status").as_deref() != Some("refuted") {
+            continue;
+        }
+        let ti = jnum_f(line, "target").unwrap() as usize;
+        let d = cd.iter().find(|d| d.idx == ti).expect("target");
+        let (eqs, nv) = system_of(d);
+        let lim = Limits { deadline: None, max_cols: 400_000, vm_cap: 0 };
+        let j = exec(Kind::F4, &eqs, nv, &lim, false, None);
+        let mine = [
+            ("touches", j.t.touches()),
+            ("build", j.t.build),
+            ("elim", j.t.elim),
+            ("back", j.t.back),
+            ("zero_red", j.t.zero_red()),
+            ("d_mat", j.t.d_mat as u64),
+            ("steps", j.t.steps as u64),
+            ("pairs_sel", j.t.pairs_sel),
+            ("new_elems", j.t.new_elems),
+            ("g_size", j.t.g_size as u64),
+        ];
+        let mut ok = j.status == Status::Refuted;
+        for (k, v) in mine {
+            if jnum_f(line, k).map(|x| x as u64) != Some(v) {
+                ok = false;
+                println!("  MISMATCH {label} t{ti} {k}: committed {:?}, here {v}", jnum_f(line, k));
+            }
+        }
+        n += 1;
+        if !ok {
+            bad += 1;
+        }
+        println!("{label} target {ti}: committed touches {} here {} {}", jnum_f(line, "touches").unwrap() as u64, j.t.touches(), if ok { "IDENTICAL" } else { "DIFFERENT" });
+    }
+    println!("xcheck {label}: {n} committed item 05 grevlex rows, {bad} differ");
+    if n == 0 || bad > 0 {
+        println!("XCHECK FAILED");
+        std::process::exit(2);
+    }
+    println!("XCHECK OK");
+}
+
+// ---------------------------------------------------------------- summarize
+
+fn jnum_f(line: &str, key: &str) -> Option<f64> {
+    let pat = format!("\"{key}\":");
+    let i = line.find(&pat)? + pat.len();
+    let rest = &line[i..];
+    let end = rest
+        .find(|c: char| !(c.is_ascii_digit() || c == '.' || c == '-' || c == 'e' || c == 'E' || c == '+'))
+        .unwrap_or(rest.len());
+    rest[..end].parse().ok()
+}
+fn jstr_f(line: &str, key: &str) -> Option<String> {
+    let pat = format!("\"{key}\":\"");
+    let i = line.find(&pat)? + pat.len();
+    let rest = &line[i..];
+    Some(rest[..rest.find('"')?].to_string())
+}
+
+#[derive(Clone)]
+struct Rec {
+    status: String,
+    touches: f64,
+    rc_max: f64,
+    zero_red: f64,
+    sym_tests: f64,
+    rss_kb: f64,
+    mem_est: f64,
+    ms: f64,
+    replay: String,
+    d_mat: f64,
+}
+
+fn gmean(v: &[f64]) -> f64 {
+    if v.is_empty() {
+        return f64::NAN;
+    }
+    (v.iter().map(|x| x.ln()).sum::<f64>() / v.len() as f64).exp()
+}
+
+/// `summarize --dir <raw dir>`: read every `*.stdout.log`, pair each arm with
+/// `f4` target by target and apply the frozen rule of PROTOCOL.md.
+fn mode_summarize(a: &Args) {
+    let dir = a.flag("--dir").expect("--dir");
+    let cells: Vec<String> = a
+        .flag("--cells")
+        .unwrap_or_else(|| "c13-3-4,c15-3-4,c15-5-3,c17-4-3".into())
+        .split(',')
+        .map(|s| s.to_string())
+        .collect();
+    let ntargets: usize = a.num("--targets", 16);
+    let min_ge: usize = a.num("--min-ge", 12);
+    let mut recs: HashMap<(String, usize, String), Rec> = HashMap::new();
+    let mut files: Vec<_> = std::fs::read_dir(&dir)
+        .expect("dir")
+        .filter_map(|e| e.ok())
+        .map(|e| e.path())
+        .filter(|p| p.to_string_lossy().ends_with(".stdout.log"))
+        .collect();
+    files.sort();
+    for f in files {
+        let txt = std::fs::read_to_string(&f).unwrap_or_default();
+        for line in txt.lines() {
+            if !line.starts_with("{\"cell\"") {
+                continue;
+            }
+            let (cell, arm, status) = match (jstr_f(line, "cell"), jstr_f(line, "arm"), jstr_f(line, "status")) {
+                (Some(c), Some(a), Some(s)) => (c, a, s),
+                _ => continue,
+            };
+            if status == "skipped" || status == "na" {
+                continue;
+            }
+            let target = jnum_f(line, "target").unwrap_or(-1.0) as usize;
+            recs.insert(
+                (cell, target, arm),
+                Rec {
+                    status,
+                    touches: jnum_f(line, "touches").unwrap_or(0.0),
+                    rc_max: jnum_f(line, "rc_max").unwrap_or(0.0),
+                    zero_red: jnum_f(line, "zero_red").unwrap_or(0.0),
+                    sym_tests: jnum_f(line, "sym_tests").unwrap_or(0.0),
+                    rss_kb: jnum_f(line, "rss_kb").unwrap_or(0.0),
+                    mem_est: jnum_f(line, "mem_est_kb").unwrap_or(0.0),
+                    ms: jnum_f(line, "ms").unwrap_or(0.0),
+                    replay: jstr_f(line, "replay").unwrap_or_default(),
+                    d_mat: jnum_f(line, "d_mat").unwrap_or(0.0),
+                },
+            );
+        }
+    }
+    println!("# item 06 summary: arm X against f4, paired by target (targets 0..{})", ntargets - 1);
+    println!("# cost(sigr) = touches + touches(sig, held-out)/{ntargets}; cost(f4r) = touches + touches(f4, held-out)/{ntargets}; fallbacks are inside touches");
+    println!("cell      arm    refuted  gmean_R  n>=1.5  gmean_R(no trace charge)  zero_red(f4/X)  rc_max(f4/X)  mem(f4/X)  sym_tests(f4/X)  fallbacks");
+    struct CellRes {
+        qual: bool,
+        guard: bool,
+        countable: bool,
+        gmean: f64,
+    }
+    let arms_all = ["sig", "sig0", "f4r", "sigr", "f4rs", "sigrs", "f4rx"];
+    let mut res: HashMap<(String, String), CellRes> = HashMap::new();
+    for cell in &cells {
+        let trace_f4 = recs.get(&(cell.clone(), ntargets, "f4".into())).map(|r| r.touches);
+        let trace_sig = recs.get(&(cell.clone(), ntargets, "sig".into())).map(|r| r.touches);
+        for arm in arms_all {
+            let charge = match arm {
+                "f4r" => trace_f4.unwrap_or(f64::NAN) / ntargets as f64,
+                "sigr" => trace_sig.unwrap_or(f64::NAN) / ntargets as f64,
+                _ => 0.0,
+            };
+            let (mut rs, mut rs_nc, mut zr, mut rc, mut me, mut sy) = (vec![], vec![], vec![], vec![], vec![], vec![]);
+            let mut n_ref_f4 = 0;
+            let mut n_ref_both = 0;
+            let mut n_present = 0;
+            let mut fb = 0;
+            for t in 0..ntargets {
+                let f = match recs.get(&(cell.clone(), t, "f4".into())) {
+                    Some(f) => f,
+                    None => continue,
+                };
+                if f.status == "refuted" {
+                    n_ref_f4 += 1;
+                }
+                let x = match recs.get(&(cell.clone(), t, arm.to_string())) {
+                    Some(x) => x,
+                    None => {
+                        if arm == "f4rx" {
+                            recs.get(&(cell.clone(), t, "f4rx:c13-3-4".to_string())).unwrap_or(f)
+                        } else {
+                            continue;
+                        }
+                    }
+                };
+                n_present += 1;
+                if x.replay == "fallback" {
+                    fb += 1;
+                }
+                if f.status == "refuted" && x.status == "refuted" {
+                    n_ref_both += 1;
+                    rs.push(f.touches / (x.touches + charge));
+                    rs_nc.push(f.touches / x.touches);
+                    zr.push((f.zero_red.max(1.0)) / (x.zero_red.max(1.0)));
+                    rc.push(f.rc_max / x.rc_max.max(1.0));
+                    let (mf, mx) = if f.rss_kb > 0.0 && x.rss_kb > 0.0 { (f.rss_kb, x.rss_kb) } else { (f.mem_est, x.mem_est) };
+                    me.push(mf / mx.max(1.0));
+                    sy.push(f.sym_tests.max(1.0) / x.sym_tests.max(1.0));
+                }
+            }
+            if n_present == 0 {
+                continue;
+            }
+            let ge = rs.iter().filter(|&&r| r >= 1.5).count();
+            let g = gmean(&rs);
+            println!(
+                "{:<9} {:<6} {:>2}/{:<2}    {:>7.3}  {:>2}/{:<2}   {:>8.3}                   {:>8.3}        {:>8.3}      {:>8.3}   {:>8.3}         {}",
+                cell, arm, n_ref_both, ntargets, g, ge, rs.len(), gmean(&rs_nc), gmean(&zr), gmean(&rc), gmean(&me), gmean(&sy), fb
+            );
+            let countable = n_ref_both >= min_ge;
+            let qual = n_ref_both == ntargets && n_ref_f4 == ntargets && g >= 1.5 && ge >= min_ge;
+            // the guard: largest matrix and peak memory not more than 1.5x larger than f4's
+            let guard = gmean(&rc) >= 1.0 / 1.5 && gmean(&me) >= 1.0 / 1.5;
+            res.insert((cell.clone(), arm.to_string()), CellRes { qual, guard, countable, gmean: g });
+        }
+    }
+    // the verdict
+    let mut verdict = String::new();
+    let mut detail = Vec::new();
+    for arm in ["sig", "sigr"] {
+        let q: Vec<&String> = cells.iter().filter(|c| res.get(&((*c).clone(), arm.to_string())).map_or(false, |r| r.qual)).collect();
+        let qg: Vec<&String> = q.iter().cloned().filter(|c| res.get(&((*c).clone(), arm.to_string())).map_or(false, |r| r.guard)).collect();
+        detail.push(format!("{arm}: qualifies on {} of {} cells ({:?}); with the matrix and memory guard {}", q.len(), cells.len(), q, qg.len()));
+        if qg.len() >= 3 && verdict.is_empty() {
+            verdict = format!("ADVANCES (constant) by {arm}");
+        } else if q.len() >= 3 && verdict.is_empty() {
+            verdict = format!("TRADES (constant, but the largest matrix or the peak memory is more than 1.5x larger) by {arm}");
+        }
+    }
+    let countable_sig = cells.iter().filter(|c| res.get(&((*c).clone(), "sig".to_string())).map_or(false, |r| r.countable)).count();
+    let regress = cells.iter().filter(|c| res.get(&((*c).clone(), "sig".to_string())).map_or(false, |r| r.countable && r.gmean < 1.0 / 1.5)).count();
+    if verdict.is_empty() {
+        verdict = if countable_sig < 3 {
+            "INCONCLUSIVE (fewer than 3 countable cells for sig)".to_string()
+        } else if regress >= 3 {
+            "REGRESSES (constant): sig is at least 1.5x worse than f4 in at least 3 cells".to_string()
+        } else if countable_sig == cells.len() {
+            "MATCHES (constant)".to_string()
+        } else {
+            "INCONCLUSIVE (a cell is not countable)".to_string()
+        };
+    }
+    for d in detail {
+        println!("# {d}");
+    }
+    println!("# arm (e) msolve: BLOCKED (not installed; no GMP/FLINT/MPFR headers; 3.8 GB disk free); would be unblocked by an msolve build with a matrix-entry counter");
+    println!("VERDICT: {verdict}");
+}
