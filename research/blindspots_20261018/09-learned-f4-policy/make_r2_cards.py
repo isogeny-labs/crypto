@@ -59,9 +59,10 @@ def q(s: str) -> str:
 
 
 class Card:
-    def __init__(self, cid: str):
+    def __init__(self, cid: str, sfx: str = "r2"):
         self.cid = cid
-        self.dir = f"target/blindspots-09/card-{cid}-r2"
+        self.sfx = sfx
+        self.dir = f"target/blindspots-09/card-{cid}-{sfx}"
         self.bin = f"{self.dir}/b09"
         self.binds: dict[str, str] = {}
         self.cmds: list[dict] = []
@@ -81,8 +82,8 @@ class Card:
         self.add("build", PRLIMIT + ["rustc", "--edition", "2021", "-C", "opt-level=3",
                                      "-C", "codegen-units=1", "-C", "target-cpu=native",
                                      "-o", self.bin, INSTR], 45,
-                 f"{RAW}/card-{self.cid}-r2-build.stdout.log",
-                 f"{RAW}/card-{self.cid}-r2-build.stderr.log")
+                 f"{RAW}/card-{self.cid}-{self.sfx}-build.stdout.log",
+                 f"{RAW}/card-{self.cid}-{self.sfx}-build.stderr.log")
 
     def finish(self):
         self.add("remove-bin", ["rm", "-f", self.bin], 5)
@@ -96,13 +97,13 @@ class Card:
 
     def yaml(self) -> str:
         o = ["schema: crypto.autoresearch.mechanical-task-card.v1",
-             f"card_id: CARD-BLINDSPOT-09-{self.cid}-r2",
+             f"card_id: CARD-BLINDSPOT-09-{self.cid}-{self.sfx}",
              "experiment_id: BLINDSPOT-09",
              "author_role: experiment-director",
              "executor_role: executor-mechanical",
              "kind: frozen_command",
              "",
-             f"receipt: {RAW}/receipt-card-{self.cid}-r2.json",
+             f"receipt: {RAW}/receipt-card-{self.cid}-{self.sfx}.json",
              "binds:"]
         for p, h in self.binds.items():
             o.append(f"  - {{path: {p}, sha256: {h}}}")
@@ -149,21 +150,23 @@ def train(c: Card, cell: str, lo: int, hi: int, prefix: str, timeout: int,
           [f"{RAW}/{prefix}.samples.{lo}", f"{RAW}/{prefix}.trace.{lo}"])
 
 
-def fit(c: Card, cell: str, tag: str, prefix: str, samples: list[str], timeout=20):
+def fit(c: Card, cell: str, tag: str, prefix: str, samples: list[str], timeout=20,
+        sfx: str = "r2"):
     c.b09(f"fit-{tag}", ["fit"] + cell_args(cell) + ["--out", f"{RAW}/{prefix}", "--samples",
                                                     ",".join(samples)],
-          timeout, f"{RAW}/fit-{tag}-r2.json", f"{RAW}/fit-{tag}-r2.stderr.log",
+          timeout, f"{RAW}/fit-{tag}-{sfx}.json", f"{RAW}/fit-{tag}-{sfx}.stderr.log",
           [f"{RAW}/{prefix}.model"])
 
 
 def evaluate(c: Card, cell: str, role: str, lo: int, hi: int, arms: str, model: str,
-             traces: list[str], cap: int, rel_cap: str, tag: str, timeout: int):
+             traces: list[str], cap: int, rel_cap: str, tag: str, timeout: int,
+             sfx: str = "r2"):
     c.b09(f"eval-{tag}",
           ["eval"] + cell_args(cell) + ["--role", role, "--from", str(lo), "--to", str(hi),
                                         "--arms", arms, "--model", model, "--trace",
                                         ",".join(traces), "--cap", str(cap), "--rel-cap",
                                         rel_cap],
-          timeout, f"{RAW}/eval-{tag}-r2.jsonl", f"{RAW}/eval-{tag}-r2.stderr.log")
+          timeout, f"{RAW}/eval-{tag}-{sfx}.jsonl", f"{RAW}/eval-{tag}-{sfx}.stderr.log")
 
 
 # ------------------------------------------------------------------ stage 1
@@ -267,19 +270,20 @@ def sample_trace_files(cell: str, in_dir: str):
     raise ValueError(cell)
 
 
-def eval_card(cid: str, cell: str, lo: int, hi: int, timeout: int, in_dir: str) -> Card:
+def eval_card(cid: str, cell: str, lo: int, hi: int, timeout: int, in_dir: str,
+              sfx: str = "r2") -> Card:
     n, l, m = CELLS[cell]
     cellname = f"{n}-{l}-{m}"
     samples, traces = sample_trace_files(cell, in_dir)
-    c = Card(cid)
+    c = Card(cid, sfx)
     for p in samples + traces:
         c.bind(p)
     c.start()
-    pre = f"model-{cellname}-r2-c{cid}"
-    fit(c, cell, f"{cellname}-c{cid}", pre, samples)
+    pre = f"model-{cellname}-{sfx}-c{cid}"
+    fit(c, cell, f"{cellname}-c{cid}", pre, samples, sfx=sfx)
     arms = ARMS_21 if cell == "21" else ARMS_FULL
     evaluate(c, cell, "test", lo, hi, arms, f"{RAW}/{pre}.model", traces, CAPS[cell], "1.5",
-             f"{cellname}-test-{lo:02d}-{hi:02d}", timeout)
+             f"{cellname}-test-{lo:02d}-{hi:02d}", timeout, sfx=sfx)
     c.finish()
     return c
 
@@ -296,6 +300,16 @@ def stage2(in_dir: str) -> list[Card]:
     # Cell (13,3,4) evaluation cards (25, 25b) are NOT written here: their bound
     # sample files do not exist until stage2b has run (see stage2b, then stage2c).
     return cards
+
+
+# ------------------------------------------------------------------ stage 2r
+# Container restart (2026-10-18 19:42) killed card 18-r2 mid-run: no receipt, a
+# leftover binary, and committed partial outputs (build logs, fit json, model)
+# at the -r2 paths, which lint refuses. Card 18 is re-frozen as 18-r2b with
+# every output under the suffix r2b; the card-18-r2 files are left untouched.
+
+def stage2r() -> list[Card]:
+    return [eval_card("18", "21", 12, 15, 380, RAW, sfx="r2b")]
 
 
 # ------------------------------------------------------------------ stage 2b
@@ -325,7 +339,8 @@ def stage3(in_dir: str) -> list[Card]:
         "17-4-3": ev("17-4-3", [(0, 16), (16, 32)]) +
                   [f"{in_dir}/eval-17-4-3-test-00-03-o-r2.jsonl"],
         "19-4-3": ev("19-4-3", [(0, 8), (8, 16), (16, 24), (24, 32)]),
-        "21-5-3": ev("21-5-3", [(i, i + 3) for i in range(0, 30, 3)] + [(30, 32)]),
+        "21-5-3": [f.replace("-r2.jsonl", "-r2b.jsonl") if "-12-15-" in f else f
+                   for f in ev("21-5-3", [(i, i + 3) for i in range(0, 30, 3)] + [(30, 32)])],
         "13-3-4": ev("13-3-4", [(0, 32), (32, 64)]),
         "p3": [f"{in_dir}/eval-p3-8-3-3-test-r2.jsonl", f"{in_dir}/eval-p3-8-3-3-planted-r2.jsonl",
                f"{in_dir}/eval-p3-8-2-4-test-r2.jsonl", f"{in_dir}/eval-p3-8-2-4-planted-r2.jsonl"],
@@ -344,17 +359,17 @@ def stage3(in_dir: str) -> list[Card]:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("stage", choices=["stage1", "stage2", "stage2b", "stage3"])
+    ap.add_argument("stage", choices=["stage1", "stage2", "stage2b", "stage2r", "stage3"])
     ap.add_argument("--in-dir", default=RAW)
     ap.add_argument("--out-dir", default=ITEM)
     a = ap.parse_args()
     cards = {"stage1": lambda: stage1(), "stage2": lambda: stage2(a.in_dir),
-             "stage2b": lambda: stage2b(),
+             "stage2b": lambda: stage2b(), "stage2r": lambda: stage2r(),
              "stage3": lambda: stage3(a.in_dir)}[a.stage]()
     out = REPO / a.out_dir
     out.mkdir(parents=True, exist_ok=True)
     for c in cards:
-        path = out / f"card-{c.cid}-r2.yaml"
+        path = out / f"card-{c.cid}-{c.sfx}.yaml"
         path.write_text(c.yaml())
         print(f"{path.relative_to(REPO)}  timeouts sum {c.total_timeout()} s", file=sys.stderr)
 

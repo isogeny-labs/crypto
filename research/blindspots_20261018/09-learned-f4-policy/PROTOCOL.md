@@ -524,3 +524,39 @@ evaluation.
 `make_r2_cards.py` gained `stage2b` and the `cap` and `sfx` parameters of
 `train`; `stage2` no longer writes the cell-13 cards (`25`, `25b`), which
 cannot be frozen before their inputs exist.
+
+## Repair pass r3b (2026-10-18, experiment-director; restart during card 18-r2)
+
+A container restart at 19:42 killed the run while card 18-r2 was executing.
+Receipts: completed are 01-r2, 01b-r2, 03-r2, 03b-r2, 04-r2, 05-r2, 05b-r2,
+06-r2, 07-r2, 08-r2, 11-r2, 13-r2, 14-r2, 15-r2, 16-r2, 17-r2 (and first-run
+02, 09, 10, 12); stopped are 01, 05, 06, 07, 08 and 24-r2; **no receipt** for
+18-r2 (killed after its `fit`, before any eval record), 19-r2 to 23b-r2,
+24b-r2 to 24e-r2, the cell-(13,3,4) evaluation cards and the report card.
+**Question, arms, cells, draws, caps (incl. Deviation 13), metric, controls and
+decision rule are unchanged; the instrument is byte-identical** (sha256
+`7e46e27e...0e4743`).
+
+* The killed card left a binary at `target/blindspots-09/card-18-r2/b09` (a
+  build product, deleted; it made lint refuse the card) and committed partial
+  outputs at the `-r2` paths (`card-18-r2-build.*.log`, `fit-21-5-3-c18-r2.*`,
+  `model-21-5-3-r2-c18.model`). None is a record; they are left in place, not
+  overwritten. Card 18 is re-frozen as **`card-18-r2b.yaml`** (id
+  `CARD-BLINDSPOT-09-18-r2b`), same command line, every output under the suffix
+  `r2b` (`model-21-5-3-r2b-c18.model`, `fit-21-5-3-c18-r2b.*`,
+  `eval-21-5-3-test-12-15-r2b.jsonl`). The suffix `r2b` is used because the
+  `-r2` paths of card 18 are taken. `card-18-r2.yaml` must not be run.
+* Cards 19-r2 to 23b-r2 and 24b-r2 to 24e-r2 already obey the card rules and
+  lint OK; they are unchanged and are run as frozen. `make_r2_cards.py`
+  regenerates every committed r2 card byte for byte (checked), gained the
+  `stage2r` stage and a card suffix, and its `stage3` template binds
+  `eval-21-5-3-test-12-15-r2b.jsonl` for the 12-to-15 chunk of cell (21,5,3).
+* Smoke test before freezing (scratch, not a record): refitting the cell-21
+  model from the bound sample files reproduced `model-21-5-3-r2-c17.model` and
+  the partial `...-c18.model` byte for byte; one-target eval of test 12 with
+  the card's arm list ran with every `check` true and no panic (55 s).
+* Still staged (rule: a card is frozen only after its input is committed): the
+  cell-(13,3,4) fit-plus-eval cards after 24b to 24e have run, and the report
+  card `26-r2` (stage 3) after every evaluation receipt is committed.
+* Budget: measured-command seconds in all receipts so far 3,583 of 7,200; the
+  assessor sums them again and stops the item at 7,200.
