@@ -2075,6 +2075,44 @@ reported as such, with no speed claimed.  Under the 2026-10-15 success criterion
 **measurement** of the current `k = 4` baseline, not an improvement of it.  **Class:
 accounting** for the method's first measured `S`, and engineering for nothing.
 
+### 9.6 E19 measured: the first end-to-end `k = 4` index calculus, `2.6`–`8.8·10⁶×` from rho
+
+*2026-10-18.*  `experiments/27_quartic_pipeline_d4/run_all.sh` (one curve per invocation,
+`--rho-runs 16`), binary `4e5810598`; raw `p{53,101,149,197,269}s{1,2}.json`, log `run.log`
+(one host restart, p = 101 seed 1 rerun from scratch, recorded there), tables `tables.md`.  Host:
+the 4-vCPU container, shared with E20–E24 for part of the run (operation counts only).
+
+| p | seed | log₂ n | cols | targets | y | unsolved | `C` median | `S` | rho (negation) | `S` / rho |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 53 | 1 | 20.9 | 15 | 1,498 | 93.6 | 2 | `1.37·10⁹` | `2.41·10¹²` | `3.40·10⁵` | `7.08·10⁶` |
+| 53 | 2 | 20.9 | 13 | 1,926 | 137.6 | 5 | `1.37·10⁹` | `3.00·10¹²` | `3.43·10⁵` | `8.75·10⁶` |
+| 101 | 1 | 24.6 | 23 | 2,608 | 108.7 | 0 | `1.39·10⁹` | `3.91·10¹²` | `6.18·10⁵` | `6.33·10⁶` |
+| 101 | 2 | 24.6 | 23 | 2,701 | 112.5 | 0 | `1.39·10⁹` | `4.01·10¹²` | `6.86·10⁵` | `5.85·10⁶` |
+| 149 | 1 | 26.9 | 37 | 3,525 | 92.8 | 0 | `1.40·10⁹` | `5.26·10¹²` | `1.29·10⁶` | `4.09·10⁶` |
+| 149 | 2 | 26.9 | 41 | 2,868 | 68.3 | 0 | `1.40·10⁹` | `4.30·10¹²` | `1.26·10⁶` | `3.40·10⁶` |
+| 197 | 1 | 28.5 | 48 | 7,061 | 144.1 | 0 | `1.41·10⁹` | `1.04·10¹³` | `2.11·10⁶` | `4.91·10⁶` |
+| 197 | 2 | 28.5 | 53 | 4,306 | 79.7 | 0 | `1.41·10⁹` | `6.29·10¹²` | `2.22·10⁶` | `2.83·10⁶` |
+| 269 | 1 | 30.3 | 58 | 11,975 | 203.0 | 0 | `1.41·10⁹` | `1.74·10¹³` | `3.17·10⁶` | `5.51·10⁶` |
+| 269 | 2 | 30.3 | 67 | 6,200 | 91.2 | 0 | `1.41·10⁹` | `9.01·10¹²` | `3.50·10⁶` | `2.57·10⁶` |
+
+All `h = 4`.  Every log recovered; every kept row re-added in the group; no lifted quadruple off
+the base (`Y = 0` never met) or without an exact sign vector; all 320 walks correct.  The solves
+are `100.0 %` of `S` on every curve (everything else `≤ 0.001 %`); unpriced native work at
+`0, 0.1, 1` GAE moves `S / rho` by at most `1.5×` and never reverses the order.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.9 | every log, row and decomposition verified | **holds** |
+| G2.10 | pooled `y = 115.1` | **holds** (`[70, 160]`) |
+| G2.11 | `C` median `1.37`–`1.41·10⁹` (d4-s5's `1.2`–`1.44·10⁹`); unsolved `7` of `44,668` targets | **holds** |
+| G2.12 | measured / registered `0.584·C/p`: per size (mean of two curves) `0.55, 0.81, 0.73, 1.00, 1.43` — inside `×2`; one curve (`p = 53` seed 1) at `0.495`, a hair outside; fitted slope in `n` **`−0.13`**; non-solve phases `0.001 %` | **holds per size; slope falsified** (`[−0.35, −0.15]`): rho's `S` per `√n` carries its set-up at small `n` (`242` at `p = 53` against `92` at `p = 269`), which flattens the fit |
+| G2.13 | handover from E19's own constants `2^{116.7}` (`2^{120.0}` from `p = 269` alone) | **holds** (`[2^{115.9}, 2^{121.9}]`) |
+
+**What it says.**  The `2^{119}` handover that C8, d4-s5 and E18 assembled from separate
+harnesses is reproduced from one pipeline's own constants (`2^{116.7}`).  The method recovers
+logarithms at `k = 4` with every phase priced, and is **`2.6`–`8.8·10⁶×` slower than rho**: the
+distance remaining.  **Class: accounting** (the baseline measured, not moved).  E24 (§9.14) moves it.
+
 ### 9.7 Pre-registration of E20–E23: the four directions after E19
 
 *Added 2026-10-17, while E19 runs (5 of 10 curves in), before any E20–E23 code exists.  Owner
@@ -2395,7 +2433,7 @@ Sizes `p = 101, 149, 197, 269, 397, 521`, two curves each.
 | G2.28 | the solve in the pipeline | per-call `C` median in `[1.3, 2.2]·10⁶` at every `p`; unsolved `≤ 1 %` of targets | outside, or more |
 | G2.29 | end to end against E19 | `S_V₄ / rho` below E19's `S / rho` at matched `p` (`101`–`269`) by a factor in `[20, 300]` | outside the band |
 | G2.30 | slope | fitted exponent of `S / rho` in `n` in `[−0.35, −0.15]`; the solves `≥ 90 %` of `S` | outside, or less |
-| G2.31 | the handover, from E24's own constants (§11.16's model, the theory exponents) | `n* ∈ [2^{86}, 2^{98}]`, against E19's `2^{119}` | outside |
+| G2.31 | the handover, from E24's own constants (§11.16's model, the theory exponents) | `n* ∈ [2^{86}, 2^{98}]`, against E19's own `2^{116.7}` | outside |
 
 **What it would say.**  If G2.27–G2.31 hold, the `k = 4` baseline moves by two orders of magnitude
 at every measured size and its modelled handover by `≈ 2^{20}`–`2^{30}` in `n`: a verified,
@@ -2403,7 +2441,7 @@ measured improvement of the index-calculus baseline under the 2026-10-15 success
 (**class: engineering** — a constant; the exponents are unchanged), and the rows stay
 `10⁴`–`10⁵×` slower than rho: the distance remaining, reported as such.
 
-### 9.14 E24 measured: the `k = 4` baseline moves by `37`–`190×`, and its handover to `2^{90}`
+### 9.14 E24 measured: the `k = 4` baseline moves by `35`–`240×`, and its handover from `2^{117}` to `2^{90}`
 
 *2026-10-18.*  `experiments/29_quartic_pipeline_v4/run_all.sh` (one curve per invocation,
 `--rho-runs 16`), binary `854acdbc6`; raw `p{101,149,197,269,397,521}s{1,2}.json`, log `run.log`,
@@ -2438,23 +2476,22 @@ across the band.
 
 **Against E19 at matched `p`** (E19's `τ_T`/`D₄` pipeline, same unit, same walks; different curves
 of the same `p`): `p = 101`: `6.33·10⁶`, `5.85·10⁶` → `37×`, `171×`; `p = 149`: `4.09·10⁶`,
-`3.40·10⁶` → `108×`, `61×` (pairing by seed; any pairing stays in `[37, 185]`).  E19's
-`p = 197, 269` curves are still running; until they land, the ic_next10 ladder's `D₄` arm at the
-same weighted `C` (E20, `p = 269`: `4.47·10⁶`, `2.75·10⁶`) gives `118`–`194×` there.
+`3.40·10⁶` → `108×`, `61×`; `p = 197`: `4.91·10⁶`, `2.83·10⁶` → `35×`, `52×`; `p = 269`:
+`5.51·10⁶`, `2.57·10⁶` → `240×`, `110×` (pairing by seed; any pairing stays in `[20, 240]`).
 
 | id | result | verdict |
 |:--|:--|:--|
 | G2.27 | every log, row and quadruple verified | **holds** |
 | G2.28 | `C` median `1.62`–`1.66·10⁶`; unsolved `≤ 0.012 %` | **holds** |
-| G2.29 | `37`–`171×` below E19 at `p = 101, 149` (`118`–`194×` against E20's `D₄` arm at `p = 269`) | **holds** (band `[20, 300]`); final at `p = 197, 269` when E19 lands |
+| G2.29 | below E19 at every matched `p`, by seed: `37×`, `171×` (`101`), `108×`, `61×` (`149`), `35×`, `52×` (`197`), `240×`, `110×` (`269`); by size (means) `60×, 80×, 40×, 174×` | **holds** (band `[20, 300]`) |
 | G2.30 | slope `−0.25`; solves `99.3`–`99.5 %` | **holds** |
 | G2.31 | `n* = 2^{90.1}` (`2^{91.7}` from the largest `p`) | **holds** (band `[2^{86}, 2^{98}]`; E19's frame `2^{119}`) |
 
 **What it says.**  The full rational 2-torsion symmetry, on a base line it keeps, cuts one `k = 4`
 decomposition from `1.4·10⁹` to `1.66·10⁶` `F_p` multiplications (quotient `512 → 64`, Macaulay
 degree `26 → 11`), and pays `≈ 10×` in targets per relation for the larger translation orbits and
-the thinner base.  Net, measured end to end: **the `k = 4` index-calculus baseline is `37`–`190×`
-cheaper at every size measured, and the modelled handover with rho moves from `2^{119}` to
+the thinner base.  Net, measured end to end: **the `k = 4` index-calculus baseline is `35`–`240×`
+cheaper at every size measured, and the modelled handover with rho moves from `2^{116.7}` (E19, §9.6) to
 `2^{90}`.**  The exponents are unchanged (`S / rho ∝ n^{−1/4}`, fitted `−0.25`): **class:
 engineering**, a constant — and under the 2026-10-15 success criterion a verified, measured
 improvement of the baseline.  **Distance remaining:** every row is still `1.3·10⁴`–`1.7·10⁵×`
