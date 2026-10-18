@@ -58,3 +58,12 @@ tr = load(["train-17-4-3-00-16.jsonl", "train-17-4-3-16-32.jsonl"])
 print("train targets", len(tr), "label_xors sum", sum(r['label_xors'] for r in tr), "touches sum", sum(r['touches'] for r in tr))
 sav = sum(by[i]['a']['touches'] - by[i]['b50']['touches'] for i in usable) / len(usable)
 print("mean saving b50 per target", sav)
+# figure data (recorded/derived values only)
+out = {"cell": "17-4-3", "n_usable": len(usable), "arms": {}}
+for x in arms:
+    rt, lo, hi, med = res[(x, 0)]
+    out["arms"][x] = {"ratio_w0": rt, "lo": lo, "hi": hi, "median": med, "rows_ratio": rrows(usable, x),
+                      "ratio_w1": res[(x, 1)][0], "lo_w1": res[(x, 1)][1], "hi_w1": res[(x, 1)][2]}
+out["o_ratio_3targets"] = sum(by[r['idx']]['a']['touches'] for r in o) / sum(r['touches'] for r in o)
+out["cell13_train"] = [{"idx": r["idx"], "touches": r["touches"], "outcome": r["outcome"]} for r in load(["train-13-3-4-00-16-r2.jsonl"])]
+json.dump(out, open("figures/cell17.json", "w"), indent=1)

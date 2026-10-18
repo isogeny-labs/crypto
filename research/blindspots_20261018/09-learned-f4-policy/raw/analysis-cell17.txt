@@ -1,0 +1,52 @@
+P3 eval-p3-8-3-3-test-r2 sat runs 63 nstd!=solutions 0
+P3 eval-p3-8-3-3-planted-r2 sat runs 72 nstd!=solutions 0
+P3 eval-p3-8-2-4-test-r2 sat runs 18 nstd!=solutions 0
+P3 eval-p3-8-2-4-planted-r2 sat runs 72 nstd!=solutions 0
+targets 32 outcomes Counter()
+incumbent outcomes Counter({'unsat': 32}) checks false 0
+arm w ratio_vs_a [95%] median rows_ratio  censored(cap_touch)
+b50  w=0     1.992 [1.966,2.020] med 1.999 rows 0.801 cens 0
+b50  w=0.1   1.992 [1.966,2.020] med 1.999 rows 0.801 cens 0
+b50  w=1     1.990 [1.964,2.018] med 1.997 rows 0.801 cens 0
+b25  w=0     2.811 [2.706,2.942] med 2.712 rows 0.644 cens 0
+b25  w=0.1   2.810 [2.705,2.941] med 2.712 rows 0.644 cens 0
+b25  w=1     2.805 [2.700,2.935] med 2.706 rows 0.644 cens 0
+c    w=0     1.000 [0.992,1.007] med 1.000 rows 1.000 cens 0
+c    w=0.1   1.000 [0.992,1.007] med 1.000 rows 1.000 cens 0
+c    w=1     1.000 [0.992,1.007] med 1.000 rows 1.000 cens 0
+d    w=0     0.842 [0.810,0.878] med 0.809 rows 0.603 cens 0
+d    w=0.1   0.842 [0.810,0.878] med 0.809 rows 0.603 cens 0
+d    w=1     0.842 [0.810,0.878] med 0.809 rows 0.603 cens 0
+p    w=0     0.946 [0.936,0.957] med 0.939 rows 1.000 cens 0
+p    w=0.1   0.946 [0.936,0.957] med 0.939 rows 1.000 cens 0
+p    w=1     0.946 [0.936,0.957] med 0.938 rows 1.000 cens 0
+r50  w=0     7.278 [7.149,7.402] med 7.309 rows 0.862 cens 0
+r50  w=0.1   7.277 [7.148,7.401] med 7.308 rows 0.862 cens 0
+r50  w=1     7.270 [7.141,7.394] med 7.301 rows 0.862 cens 0
+r25  w=0     4.103 [3.859,4.365] med 4.467 rows 0.468 cens 0
+r25  w=0.1   4.103 [3.859,4.365] med 4.467 rows 0.468 cens 0
+r25  w=1     4.099 [3.856,4.360] med 4.462 rows 0.468 cens 0
+matched null: sum cost_null / sum cost_learned
+r50/b50 w=0     0.274 [0.269,0.279]
+r50/b50 w=0.1   0.274 [0.269,0.279]
+r50/b50 w=1     0.274 [0.269,0.279]
+r25/b25 w=0     0.685 [0.641,0.728]
+r25/b25 w=0.1   0.685 [0.641,0.728]
+r25/b25 w=1     0.684 [0.641,0.728]
+p/c w=0     1.057 [1.044,1.070]
+p/c w=0.1   1.057 [1.044,1.070]
+p/c w=1     1.057 [1.044,1.069]
+r50/d w=0     0.116 [0.111,0.120]
+r50/d w=0.1   0.116 [0.111,0.120]
+r50/d w=1     0.116 [0.112,0.121]
+basis hash agree where both complete: True
+wall_ms sums: {'a': 46858, 'b50': 27209, 'b25': 20713, 'c': 49161, 'd': 113081, 'p': 62960, 'r50': 11346, 'r25': 18081}
+touches sums: {'a': 61536899470, 'b50': 30884652588, 'b25': 21891797770, 'c': 61546847688, 'd': 73097469943, 'p': 65052439004, 'r50': 8455205885, 'r25': 14997050042}
+per-target b50 ratio min/max: 1.8521416791719003 2.1933296420427664
+o idx 0 touches 246021889 a 1747156642 ratio 7.102 rows ratio 0.642 outcome unsat label_xors 4184296617
+o idx 1 touches 275559303 a 2036051988 ratio 7.389 rows ratio 0.670 outcome unsat label_xors 4742070971
+o idx 2 touches 271603800 a 1888772216 ratio 6.954 rows ratio 0.627 outcome unsat label_xors 4507922325
+o sum ratio 7.150892797023572
+a vs b50 on same 3 targets 1.9886551454857702
+train targets 32 label_xors sum 113126751934 touches sum 62010166727
+mean saving b50 per target 957882715.0625
