@@ -2,6 +2,7 @@
 """Capture the guest allocation and noise-control state before dispatch."""
 
 import hashlib
+import argparse
 import json
 import os
 from pathlib import Path
@@ -11,6 +12,10 @@ import time
 
 ROOT = Path('/home/ec2-user/rho-worker-tier1-20261018')
 CPU = 15
+parser = argparse.ArgumentParser()
+parser.add_argument('--source-bundle', type=Path, default=ROOT / 'source.tar.gz')
+parser.add_argument('--out', type=Path, default=ROOT / 'allocation.json')
+args = parser.parse_args()
 
 
 def read(path):
@@ -85,7 +90,7 @@ receipt = {
     'hard_stop_timer': command('systemctl', 'is-active', 'rho-hard-stop.timer'),
     'hard_stop_schedule': command('systemctl', 'cat', 'rho-hard-stop.timer'),
     'build': {
-        'source_bundle_sha256': sha256(ROOT / 'source.tar.gz'),
+        'source_bundle_sha256': sha256(args.source_bundle),
         'binary_sha256': sha256(ROOT / 'source/target/release/examples/rho_worker_batch_benchmark'),
         'q_manifest_sha256': sha256(ROOT / 'source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json'),
         'rustc': command('rustc', '--version'),
@@ -100,7 +105,7 @@ assert receipt['cgroups']['user.slice']['cpus'] == '0-14'
 assert receipt['cgroups']['init.scope']['cpus'] == '0-14'
 assert receipt['cgroups']['rho.slice/rho-runner.slice']['cpus'] == '0-15'
 assert receipt['build']['q_manifest_sha256'] == 'f46ad43788b7f9241927904541cbeb03ea70a96ca95aa84d527a9b22ba8d12b8'
-out = ROOT / 'allocation.json'
+out = args.out
 out.write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\n')
 print(json.dumps({'path': str(out), 'sha256': sha256(out),
                   'irqs_checked': irq_count, 'irq_overlap': len(irq_overlap)}))

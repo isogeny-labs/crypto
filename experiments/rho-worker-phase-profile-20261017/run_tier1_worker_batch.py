@@ -54,6 +54,30 @@ def numeric_file(path):
     return result
 
 
+def cgroup_v2_file(name):
+    """Read the current process scope, not the cgroup mount root."""
+    for line in (read('/proc/self/cgroup') or '').splitlines():
+        if line.startswith('0::'):
+            relative = line[3:].lstrip('/')
+            parts = Path(relative).parts
+            if '..' in parts:
+                return None
+            return read(Path('/sys/fs/cgroup').joinpath(*parts, name))
+    return None
+
+
+def cgroup_v2_numeric(name):
+    result = {}
+    for line in (cgroup_v2_file(name) or '').splitlines():
+        words = line.split()
+        if len(words) == 2:
+            try:
+                result[words[0]] = int(words[1])
+            except ValueError:
+                pass
+    return result
+
+
 def parse_cpu_set(value):
     result = set()
     for part in (value or '').split(','):
@@ -82,8 +106,8 @@ def counters(cpu):
         'local_irq_count': irq_counts[cpu] if len(irq_counts) > cpu else None,
         'cgroup_v1_cpu_stat': numeric_file('/sys/fs/cgroup/cpu/cpu.stat'),
         'cgroup_v1_memory_failcnt': read('/sys/fs/cgroup/memory/memory.failcnt'),
-        'cgroup_v2_cpu_stat': numeric_file('/sys/fs/cgroup/cpu.stat'),
-        'cgroup_v2_memory_events': numeric_file('/sys/fs/cgroup/memory.events'),
+        'cgroup_v2_cpu_stat': cgroup_v2_numeric('cpu.stat'),
+        'cgroup_v2_memory_events': cgroup_v2_numeric('memory.events'),
         'frequency_khz': read(f'/sys/devices/system/cpu/cpu{cpu}/cpufreq/scaling_cur_freq'),
         'thermal_throttle': read(
             f'/sys/devices/system/cpu/cpu{cpu}/thermal_throttle/core_throttle_count'),
@@ -114,7 +138,8 @@ def probe(manifest):
     cpu = manifest['isolation']['execution_cpu']
     allocation = manifest['allocation']
     allowed = sorted(os.sched_getaffinity(0)) if hasattr(os, 'sched_getaffinity') else []
-    cpuset = (read('/sys/fs/cgroup/cpuset.cpus.effective') or
+    cpuset = (cgroup_v2_file('cpuset.cpus.effective') or
+              read('/sys/fs/cgroup/cpuset.cpus.effective') or
               read('/sys/fs/cgroup/cpuset/cpuset.cpus') or
               read('/sys/fs/cgroup/cpuset.cpus'))
     allocated = parse_cpu_set(cpuset) if cpuset else set()
@@ -136,6 +161,8 @@ def probe(manifest):
         'memory_nodes': (read('/sys/fs/cgroup/cpuset.mems.effective') or
                          read('/sys/fs/cgroup/cpuset/cpuset.mems')),
         'self_cgroup': read('/proc/self/cgroup'),
+        'cgroup_v2_cpu_max': cgroup_v2_file('cpu.max'),
+        'cgroup_v2_memory_max': cgroup_v2_file('memory.max'),
         'counter_probe': counters(cpu),
         'host_exclusivity': 'unproven_container_allocation',
     }
@@ -148,10 +175,12 @@ def probe(manifest):
         problems.append('effective cgroup CPU set unavailable')
     if os.geteuid() != 0:
         problems.append('runner must be root for host receipts')
-    if quota is None and read('/sys/fs/cgroup/cpu.max') is None:
+    if quota is None and evidence['cgroup_v2_cpu_max'] is None:
         problems.append('CPU quota receipt unavailable')
-    if memory is None and read('/sys/fs/cgroup/memory.max') is None:
+    if memory is None and evidence['cgroup_v2_memory_max'] is None:
         problems.append('memory limit receipt unavailable')
+    if cgroup_v2_file('cpu.stat') is None and not evidence['counter_probe']['cgroup_v1_cpu_stat']:
+        problems.append('CPU throttle counter unavailable')
     if not Path(allocation['receipt']).is_file():
         problems.append('allocation receipt missing')
     if len(evidence['counter_probe']['cpu_times']) <= 7:
