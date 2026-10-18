@@ -147,6 +147,18 @@ auditor policy self-check passed on the rebased binary. These are local
 build and correctness checks;
 the full-worker speed decision still awaits the Tier 1 host panel.
 
+The [repaired-main phase trace](rebased-main-phase-32x8192-dp12.json)
+replayed the same 106,327 steps and terminal transcript as the earlier
+32-walker trace. Its local setup-plus-start share was 7.01%, compared with
+3.61% in the earlier trace. The [phase validation receipt](rebased-main-phase-validation.json)
+pins the current binary and source hashes, both trace hashes, and the exact
+replay. The worker source and host timing conditions changed between these
+diagnostics, so the share difference cannot be assigned to either cause.
+On the current trace, a twofold reduction of setup-plus-start time would
+improve the measured total by 1.036x, while eliminating that phase would
+bound the same-trace gain at 1.075x. Neither calculation selects a worker
+implementation; the hosted panel measures the complete worker directly.
+
 ## Next gates
 
 The recurring hosted-access and measurement obligation is tracked in
@@ -219,8 +231,10 @@ The [32-walker phase trace](local-long-32x8192-dp12.json) independently
 replayed 106,327 walk steps and 32 starts after constructing 32 branch
 points. Setup plus starts occupied 3.61% of its locally observed profiled
 interval; host load was high, so that percentage is a diagnostic, not a
-Tier 1 estimate. The trace strengthens the case for measuring walk-step
-arithmetic in the full-worker panel. The [long validation receipt](worker-batch-long-validation.json)
+Tier 1 estimate. The repaired-main replay above observed 7.01% on the same
+transcript; both remain local diagnostics. Walk-step arithmetic dominates
+both recorded intervals and is the target of the full-worker panel. The
+[long validation receipt](worker-batch-long-validation.json)
 pins the replay and trace hashes and records the fail-closed local host
 preflight.
 
