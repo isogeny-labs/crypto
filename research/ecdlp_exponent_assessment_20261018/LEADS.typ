@@ -4,6 +4,8 @@ Companion of #link("REPORT.md")[`REPORT.md`] §4, which ranks four leads (Koblit
 `lead_map.svg` (from `lead_map.py`, values in `lead_map.diagram.json`) plots the leads by effort and level; `LEADS.pdf` embeds it.
 
 == 1. Where an exponent can still move (five leads, each with a decisive test)
+#strong[Outcomes so far (2026-10-18, this PR).] L3 closed (#link("../s5_small_roots_variants_20261018/README.md")[`../s5_small_roots_variants_20261018/`]): no sublattice gain at levels 1–3, multi-polynomial variants not applicable. L5 measured (#link("../ghs_cubic_quartic_ic_20261012/SCALING_20261018.md")[`../ghs_cubic_quartic_ic_20261012/SCALING_20261018.md`]): the counted cost scales as `ℓ^{2.50}` against rho\'s `ℓ^{0.50}`, because the recorded \"pure IC\" recovery is a transfer enumeration of the subgroup, not a relation solve; the class-arithmetic problem card is reopened. L2 measured (#link("../koblitz_halfdim_base_20261018/README.md")[`../koblitz_halfdim_base_20261018/`]): chain-free `m = 2` is 18× cheaper than the one-link `m = 3` chain at matched dimension on `icv1-f2m23-t5197-69e76b73`, but its best `S` is 17× rho there and 256× at `n = 31`, with the pair table, not the chaining term, as the cost. L1 (closure degree at `m = 4`) and L4 (msolve at `m = 3, N = 21`) are running; first L1 draw at `(13, 5)`: closure degree 4.
+
 These are the only leads with a mechanism that could change `α`; each is low-probability and bounded in cost, which is why they rank first.
 
 === L1. Closure degree as the true solving degree of the Koblitz chain (exponent-adjacent, 2–3 weeks)

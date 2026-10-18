@@ -51,11 +51,12 @@ for n in (23, 31):
     if rho:
         ax.axhspan(rho[1], rho[2], color=COL[("rho", n)], alpha=0.18, zorder=1)
         ax.axhline(rho[0], color=COL[("rho", n)], lw=1.2, zorder=2)
-        ax.text(14.6, rho[0], f"rho-strong, n = {n}: S = {rho[0]:.2f}", va="center", fontsize=8, color=COL[("rho", n)])
+        ax.text(14.3, rho[0] * (1.9 if n == 31 else 0.55), f"rho-strong, n = {n}: S = {rho[0]:.2f}", va="center",
+                fontsize=8, color=COL[("rho", n)])
 # the n/2 marks
 for n, c in ((23, COL[("m2", 23)]), (31, COL[("m2", 31)])):
     ax.axvline(n / 2, color=c, lw=0.8, ls=":", zorder=1)
-    ax.text(n / 2, 0.45, f"n/2 = {n / 2:g}", rotation=90, va="bottom", ha="right", fontsize=7.5, color=c)
+    ax.text(n / 2, 1.2e5, f"n/2 = {n / 2:g} (n = {n})", rotation=90, va="top", ha="right", fontsize=7.5, color=c)
 ax.set_yscale("log")
 ax.set_ylim(0.3, 2e5)
 ax.set_xlim(7.5, 17.5)
@@ -71,8 +72,8 @@ fig.text(0.02, 0.985, "Chain-free (m = 2) against one-link (m = 3) Koblitz index
          ha="left", va="top", fontsize=11, color=INK, fontweight="bold")
 fig.text(0.02, 0.945, "icv1-f2m23-t5197-69e76b73 and icv1-f2m31-tm90707-c95f16f5; mean of the verified measured runs, bars = min…max; "
          "bands = the rho reference's range", ha="left", va="top", fontsize=8, color=INK2)
-fig.text(0.01, 0.005, "Counted group operations (ecbench, L0); the m = 2 cost is the folded pair table (|F|²/(4n) additions), "
-         "growing ×16 per +2 in dimension. A measurement, not a speed-up; no leaderboard S changes.", fontsize=7.2, color=MUTED, va="bottom")
+fig.text(0.01, 0.005, "Counted group operations (ecbench, L0). The m = 2 cost is the folded pair table, "
+         "×14–16 per +2 in dimension. Neither curve is on the IC leaderboard.", fontsize=7.2, color=MUTED, va="bottom")
 fig.tight_layout(rect=(0, 0.03, 1, 0.92))
 fig.savefig(os.path.join(HERE, "s_vs_dimension.svg"), format="svg")
 fig.savefig(os.path.join(HERE, "s_vs_dimension.png"), dpi=150)
