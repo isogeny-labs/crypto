@@ -453,3 +453,74 @@ commands sum to 8,790 s, so unlike the first freeze the timeouts alone do not
 guarantee the cap; the executor's receipts give the running total and the
 assessor stops the item if the summed `seconds` of measured commands reach
 7,200.
+
+## Repair pass r3 (2026-10-18, experiment-director; stage 2 and the cell-(13,3,4) re-freeze)
+
+State after the r2 stage-1 run (receipts under `raw/`): completed are 02, 09,
+10, 12 (first run) and 01-r2, 01b-r2, 03-r2, 03b-r2, 04-r2, 05-r2, 11-r2, 13-r2
+(r2); stopped are 01, 05, 06, 07, 08 (first run) and 24-r2 (timeout, 13 of 13
+incumbent runs `cap_touch`); never run are the cell-19, cell-21 and cell-13
+evaluation cards and the report card. **Question, arms, cells, draws, metric,
+controls and decision rule are unchanged, and the instrument is byte-identical**
+(sha256 `7e46e27e...0e4743`, bound by every card). No receipt or output from an
+earlier pass is overwritten: new cards carry `-r2` ids, new cell-13 outputs the
+suffix `r2b`.
+
+### Deviation 13: cell (13,3,4) touch cap raised from 3e9 to 6e10
+
+Proven by the r2 run, not assumed: `raw/train-13-3-4-00-16-r2.jsonl` has all 13
+incumbent runs observed at `cap_touch` (3.02e9 to 3.93e9; 12 unsatisfiable, 1
+with 24 solutions). The frozen 3e9 was set from seed-1 calibration (0.9e9
+touches per refutation), which did not predict the frozen-seed factor base. A
+scratch run (not a record) of train target 0 at cap 4e10 refuted it at 2.19e10
+touches in 20 s, `check` true; one eval target (test 0, all eight arms, cap
+4e10, 97 s) gave `a` 3.2e10 touches, all arms `check` true. Cap 3e9 would censor
+every target, so the cell could not be measured at all. The new cap is **6e10**
+for training (cards 24b to 24e) and for the later evaluation cards; the
+relative cap 1.5 and every other setting are unchanged. A satisfiable train
+target (idx 12, 24 solutions) ends `cap_matrix` at 2.96e10 touches in 36 s, so
+satisfiable targets stay censored as before. This changes the censoring
+threshold only; a target whose incumbent exceeds 6e10 is censored and counted.
+
+### Budget, with the cell-13 cut-off stated in advance
+
+Measured-command seconds in all receipts so far: 2,221 (of the 7,200 s item
+cap; the assessor sums the receipts' `seconds`). Smoke times per target with the
+cell's full arm list: `(19,4,3)` 26 s, `(21,5,3)` 62 s, `(13,3,4)` 97 s (train
+target about 20 s, satisfiable about 36 s). Stage 2 for cells 19 and 21 (32
+targets each) is about 830 s + 2,000 s, and the cell-13 train 32 targets about
+700 s, which brings the running total to about 5,750 s. That leaves roughly
+1,400 s, enough for about 12 `(13,3,4)` test targets (4 cards of 3), not the 32
+usable the design asks for. The cell-13 evaluation cards are therefore **not
+frozen in this pass**: they bind the sample files of cards 24b to 24e, which do
+not exist yet, and are sized afterwards from the receipts' actual seconds (stage
+2c). If the remaining budget supports fewer than the design's 32 usable test
+targets, that is a further, named deviation of that pass, and the assessor
+reports the cell as measured on fewer targets, not as the design's cell. The
+cell-13 cards run last, so the 7,200 s stop cannot cut a cell-19 or cell-21
+evaluation.
+
+### Layout (stage 2 frozen now; 2b frozen now; 2c and 3 later)
+
+* **Stage 2 (this pass):** `05b-r2`, `06-r2`, `07-r2`, `08-r2` (cell 19, test 0
+  to 8, 8 to 16, 16 to 24, 24 to 32), `14-r2` to `23-r2` (cell 21, 3 test
+  targets each) and `23b-r2` (targets 30 to 32). Each card first runs `fit` on
+  the bound sample files (cell 19: the four r2 chunks; cell 21: first-run
+  chunks 0, 6, 18 and r2 chunks 12, 24, 30), then `eval` against the model it
+  just wrote and the bound trace files. A refit is byte-deterministic (the
+  cell-17 refit reproduced the committed model), so every card of a cell obtains
+  the same model; each card writes its own `model-<cell>-r2-c<id>.model` and the
+  assessor checks the digests agree. The 19 and 21 flows were smoke-tested with
+  the real bound files at one test target each (arm lists as in the cards, all
+  `check` true, no panic) before freezing.
+* **Stage 2b (this pass):** `24b-r2` to `24e-r2`, cell-13 training in four
+  chunks of 8 targets (0 to 32), cap 6e10, outputs `model-13-3-4-r2b.samples.<lo>`
+  and `.trace.<lo>`, records `train-13-3-4-<lo>-<hi>-r2b.jsonl`.
+* **Stage 2c (after 24b to 24e are committed):** the cell-13 `fit` plus `eval`
+  cards, sized to the remaining budget.
+* **Stage 3 (after every evaluation receipt is committed):** `26-r2`, the
+  `report` runs.
+
+`make_r2_cards.py` gained `stage2b` and the `cap` and `sfx` parameters of
+`train`; `stage2` no longer writes the cell-13 cards (`25`, `25b`), which
+cannot be frozen before their inputs exist.

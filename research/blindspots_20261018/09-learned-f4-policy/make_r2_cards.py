@@ -138,13 +138,14 @@ def cell_args(cell: str):
     return ["--n", str(n), "--ell", str(l), "--m", str(m), "--seed", SEED]
 
 
-def train(c: Card, cell: str, lo: int, hi: int, prefix: str, timeout: int):
+def train(c: Card, cell: str, lo: int, hi: int, prefix: str, timeout: int,
+          cap: int | None = None, sfx: str = "r2"):
     n, l, m = CELLS[cell]
     tag = f"{n}-{l}-{m}-{lo:02d}-{hi:02d}"
     c.b09(f"train-{tag}",
           ["train"] + cell_args(cell) + ["--from", str(lo), "--to", str(hi), "--cap",
-                                           str(CAPS[cell]), "--out", f"{RAW}/{prefix}"],
-          timeout, f"{RAW}/train-{tag}-r2.jsonl", f"{RAW}/train-{tag}-r2.stderr.log",
+                                           str(cap or CAPS[cell]), "--out", f"{RAW}/{prefix}"],
+          timeout, f"{RAW}/train-{tag}-{sfx}.jsonl", f"{RAW}/train-{tag}-{sfx}.stderr.log",
           [f"{RAW}/{prefix}.samples.{lo}", f"{RAW}/{prefix}.trace.{lo}"])
 
 
@@ -286,14 +287,32 @@ def eval_card(cid: str, cell: str, lo: int, hi: int, timeout: int, in_dir: str) 
 def stage2(in_dir: str) -> list[Card]:
     cards = []
     for cid, lo, hi in (("05b", 0, 8), ("06", 8, 16), ("07", 16, 24), ("08", 24, 32)):
-        cards.append(eval_card(cid, "19", lo, hi, 330, in_dir))
+        cards.append(eval_card(cid, "19", lo, hi, 380, in_dir))
     for cid, lo, hi in (("14", 0, 3), ("15", 3, 6), ("16", 6, 9), ("17", 9, 12),
                         ("18", 12, 15), ("19", 15, 18), ("20", 18, 21), ("21", 21, 24),
                         ("22", 24, 27), ("23", 27, 30)):
-        cards.append(eval_card(cid, "21", lo, hi, 330, in_dir))
-    cards.append(eval_card("23b", "21", 30, 32, 200, in_dir))
-    cards.append(eval_card("25", "13", 0, 32, 300, in_dir))
-    cards.append(eval_card("25b", "13", 32, 64, 300, in_dir))
+        cards.append(eval_card(cid, "21", lo, hi, 380, in_dir))
+    cards.append(eval_card("23b", "21", 30, 32, 250, in_dir))
+    # Cell (13,3,4) evaluation cards (25, 25b) are NOT written here: their bound
+    # sample files do not exist until stage2b has run (see stage2b, then stage2c).
+    return cards
+
+
+# ------------------------------------------------------------------ stage 2b
+# Cell (13,3,4) training, re-frozen with the cap raised from 3e9 to 6e10 touches
+# (PROTOCOL.md "Repair pass r3"): the card-24-r2 run showed 13 of 13 incumbent
+# runs at cap_touch 3.0e9 to 3.9e9; a scratch run of train target 0 at cap 4e10
+# refuted it at 2.19e10 touches (20 s). New output names carry the suffix r2b.
+
+CAP13_R2B = 60_000_000_000
+
+
+def stage2b() -> list[Card]:
+    cards = []
+    for cid, lo, hi in (("24b", 0, 8), ("24c", 8, 16), ("24d", 16, 24), ("24e", 24, 32)):
+        c = Card(cid); c.start()
+        train(c, "13", lo, hi, "model-13-3-4-r2b", 380, cap=CAP13_R2B, sfx="r2b")
+        c.finish(); cards.append(c)
     return cards
 
 
@@ -325,11 +344,12 @@ def stage3(in_dir: str) -> list[Card]:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("stage", choices=["stage1", "stage2", "stage3"])
+    ap.add_argument("stage", choices=["stage1", "stage2", "stage2b", "stage3"])
     ap.add_argument("--in-dir", default=RAW)
     ap.add_argument("--out-dir", default=ITEM)
     a = ap.parse_args()
     cards = {"stage1": lambda: stage1(), "stage2": lambda: stage2(a.in_dir),
+             "stage2b": lambda: stage2b(),
              "stage3": lambda: stage3(a.in_dir)}[a.stage]()
     out = REPO / a.out_dir
     out.mkdir(parents=True, exist_ok=True)
