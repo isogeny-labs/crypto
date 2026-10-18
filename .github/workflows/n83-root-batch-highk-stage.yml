@@ -1,0 +1,64 @@
+name: N83 K2816 batched root-index stage
+
+on:
+  push:
+    branches: [codex/n83-root-batch-index-20261018]
+    paths:
+      - research/n83_root_batch_index_20261018/HIGHK_PROTOCOL.md
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n83-root-batch-highk-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  k2816-stage:
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-root-batch-index-20261018'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and test the frozen native index producer and selector
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-root-batch-target"
+          export CARGO_BUILD_JOBS=2
+          cargo test --release --locked --example koblitz_orbit_dlp_fast
+          cargo build --release --locked \
+            --example koblitz_orbit_dlp_fast \
+            --example n83_root_batch_highk_analyze
+          mkdir -p "$RUNNER_TEMP/n83-root-batch-stage"
+          rustc --version > "$RUNNER_TEMP/n83-root-batch-stage/rustc-version.txt"
+          cargo --version > "$RUNNER_TEMP/n83-root-batch-stage/cargo-version.txt"
+
+      - name: Run four frozen scalar and batched K2816 index builds
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash research/n83_root_batch_index_20261018/run_highk_stage.sh \
+            "$RUNNER_TEMP/n83-root-batch-target/release/examples/koblitz_orbit_dlp_fast" \
+            "$RUNNER_TEMP/n83-root-batch-stage"
+
+      - name: Validate exact state and root-table identity and paired stage costs
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          ANALYZER="$RUNNER_TEMP/n83-root-batch-target/release/examples/n83_root_batch_highk_analyze"
+          if [ -x "$ANALYZER" ] && [ -d "$RUNNER_TEMP/n83-root-batch-stage/1-scalar" ]; then
+            "$ANALYZER" "$RUNNER_TEMP/n83-root-batch-stage" \
+              > "$RUNNER_TEMP/n83-root-batch-stage/analysis.json"
+          fi
+
+      - name: Preserve every raw receipt and capped run
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-root-batch-k2816-stage-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/n83-root-batch-stage/
+          if-no-files-found: warn
+          retention-days: 14
