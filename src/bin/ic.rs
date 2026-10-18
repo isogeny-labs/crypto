@@ -17,6 +17,8 @@ mod large_prime;
 mod params;
 #[path = "ic/price.rs"]
 mod price;
+#[path = "ic/prime.rs"]
+mod prime;
 #[path = "ic/progress.rs"]
 mod progress;
 #[path = "ic/rho.rs"]

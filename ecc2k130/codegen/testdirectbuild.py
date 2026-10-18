@@ -49,7 +49,7 @@ def environment(mode='0', generated='0', tile='0', clmad='0', weighted='0', comp
     for key in ('SINGLE_PRODUCT', 'CACHE_DENOM', 'BY_VALUE', 'POLY_CHAIN',
                 'UNROLL_INV', 'PAIR_PRODUCTS', 'POLY_STATE'):
         env['PACKED_' + key] = '1'
-    env.update(PACKED_PERM_SIGMA='3', PACKED_DIRECT_REDUCE=mode, PACKED_GENERATED_PRODUCT=generated, PACKED_STATE_TILE=tile, PACKED_CLMAD=clmad, PACKED_CLMAD_SQUARE=square, PACKED_KARAT3=karat, PACKED_WEIGHTED_PREFIX=weighted, PACKED_COMPACT_STATE=compact, PACKED_SHARED_SIGMA=shared, PACKED_TOP_CLMAD='0', PACKED_INLINE_POLY='0', SIGMA_FUSED='0', PACKED_SIGMA_TABLE='0', WALK_TABLE='0', TABLE_PIVOT_BYTES='0', WITNESS='0')
+    env.update(PACKED_PERM_SIGMA='3', PACKED_DIRECT_REDUCE=mode, PACKED_GENERATED_PRODUCT=generated, PACKED_STATE_TILE=tile, PACKED_CLMAD=clmad, PACKED_CLMAD_SQUARE=square, PACKED_KARAT3=karat, PACKED_WEIGHTED_PREFIX=weighted, PACKED_COMPACT_STATE=compact, PACKED_SHARED_SIGMA=shared, PACKED_TOP_CLMAD='0', PACKED_INLINE_POLY='0', SIGMA_FUSED='0', PACKED_SIGMA_TABLE='0', PACKED_L2_PERSIST='0', PACKED_TAIL_LAYOUT='0', WALK_TABLE='0', TABLE_PIVOT_BYTES='0', WITNESS='0')
     assignment('BAKED', env)
     assignment('CPU_BINARIES', env)
     return env
@@ -68,6 +68,8 @@ def raw(mode='0', generated='0', tile='0', clmad='0', weighted='0', compact='0',
             f'packed top clmad: 0\n'
             'packed sigma fused: 0\n'
             'packed sigma table: 0\n'
+            'packed L2 persist: 0\n'
+            'packed tail layout: 0\n'
             'packed inline polynomial: 0\n'
             'finished: 6000.000 M it/s, 0 distinguished points (0 verified against the reference, 0 dropped)\n')
 
@@ -363,6 +365,8 @@ class GeneratedProductBuildTests(unittest.TestCase):
                         f'packed top clmad: 0\n'
             'packed sigma fused: 0\n'
             'packed sigma table: 0\n'
+            'packed L2 persist: 0\n'
+            'packed tail layout: 0\n'
             'packed inline polynomial: 0\n'
                         f'backend cuda-packed131: {workers} threads x {batch} slots x 1 lanes = {workers * batch} walks, '
                         f'dp weight {weight}, 1024 steps per launch\n'

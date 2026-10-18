@@ -1,4 +1,4 @@
-# Cheaper table-walk selection (in progress)
+# Cheaper table-walk selection (popc candidate abandoned)
 
 Question: [ONE-BLOCK-GEOMETRY.md](ONE-BLOCK-GEOMETRY.md) §6 leaves the
 forward pass short of a fully fed carry-less unit because selection issues
@@ -107,9 +107,18 @@ identity, five alternating benches, profile dumps. Receipts under
 * Host gate: **PASS** (4096 points, zero mismatches; shared 48,732 → 44,540).
 * Static price: **filled** — candidate is much heavier on ALU (~246 slots vs
   ~33–72); only a MIO-starvation win on the 6000 can save it. Default stays off.
-* GPU measurement: blocked here (no `nvcc` / Modal token). Run
-  `make bench-cheaper-selection OUT=…` on an RTX PRO 6000 to clear or abandon
-  §2; file the receipt under `benchmarks/cheaper-selection/`.
+* GPU measurement: **ABANDON** (2026-10-09, one RTX PRO 6000, receipts in
+  [`benchmarks/cheaper-selection/rtx-pro-6000-20261009/`](benchmarks/cheaper-selection/rtx-pro-6000-20261009/README.md)).
+  Five alternating pairs: reference median 5.594 B/s, candidate 5.505, paired
+  ratio 0.9840, every pair between 0.9834 and 0.9849. Both arms re-walked
+  300/300 with zero drops and produced the identical 1,480,278-record DP set.
+  The forward pass stayed at 76% of the warp-step with popc planes, so the
+  phase lookups were not what held it back.
+* The section 2 bars (20.50 / 20.20 B/s) were frozen against the pre-v3
+  20.078 B/s walk. Cycle escape v3 replaced that walk and the same preset now
+  runs at 5.59 B/s, so the absolute bars are unreachable by either arm. The
+  relative test they encoded (about +2.1%, every pair favouring the
+  candidate) is the operative one, and the candidate fails it at -1.6%.
 
 ## 6. If the card abandons popc
 
