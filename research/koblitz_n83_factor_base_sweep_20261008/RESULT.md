@@ -4,9 +4,9 @@ The [user-selected S3 publication](verification/setec-publication-20261018/RESUL
 uploaded the exact reconstructed primary K2048 archive and compact public
 receipts to `setec-astronomy-artifacts` in `us-east-2`. Fresh downloads matched
 SHA-256, archive BLAKE3, lengths and ETags; encryption and overwrite protection
-were verified. Storage access for this destination is resolved. The Docker
-client is now present, but its managed daemon is unreachable, so no new
-guarded solver trial ran.
+were verified. Storage access for this destination is resolved. In that
+cloud checkout, the Docker client is present but its managed daemon is
+unreachable, so that checkout ran no guarded solver trial.
 
 The [cloud resume input recovery](verification/cloud-input-reconstruction-20261018/RESULT.md)
 reconstructed the primary K2048 archive byte-for-byte and passed generic
@@ -24,9 +24,12 @@ is now constructed, generically replayed and stored at a content-addressed
 S3 key. The frozen `a=0` hash-policy object contains 679,936 distinct points
 in 4,096 signed-Frobenius columns. A fresh S3 GET and independent full-row
 sign/Frobenius audit passed; a forged replay receipt was rejected. Its
-source-derived five-summand model would have 131,958 variables and 2,021,197
-clauses, but model construction and natural relation search remain unexecuted.
-No total-runtime factor-base selection follows from object construction.
+source-derived five-summand model prediction was 131,958 variables and
+2,021,197 clauses. The [follow-on guarded gate](verification/k4096-orbit-model-20261018/RESULT.md)
+confirmed those installed counts. Its first launch had a retained
+missing-corpus producer failure; the corrected model passed, and one public
+search returned `UNKNOWN_solver_cap` at 5,000 conflicts with zero models,
+relations and rank within the cap. No complete-runtime selection follows.
 
 The [approved K1182/K2048 mixed-orbit replication](verification/mixed-orbit-approved-20261018/RESULT.md)
 freshly reimported both exact S3 objects and repeated one frozen public
