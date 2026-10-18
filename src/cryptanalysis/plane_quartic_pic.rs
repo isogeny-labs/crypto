@@ -2590,7 +2590,14 @@ pub(crate) mod tests {
 
     #[test]
     fn v2_cayley_table_q5() {
-        let inst = random_instances(5, 1).pop().unwrap();
+        let mut insts = vec![random_instances(5, 1).pop().unwrap()];
+        insts.push(ghs_instances().into_iter().find(|i| i.q == 5 && i.name.ends_with("split")).unwrap());
+        for inst in insts {
+            cayley_table_check(inst);
+        }
+    }
+
+    fn cayley_table_check(inst: Inst) {
         let fu = full(inst);
         let c = &fu.c;
         let n = fu.classes.len();
@@ -2632,7 +2639,43 @@ pub(crate) mod tests {
             }
             *orders.entry(o).or_insert(0) += 1;
         }
-        eprintln!("Cayley table q=5: #Jac={} full associativity ({} triples) PASS; element orders {:?}", n, n * n * n, orders);
+        eprintln!("Cayley table {}: #Jac={} full associativity ({} triples) PASS; element orders {:?}", fu.inst.name, n, n * n * n, orders);
+    }
+
+    #[test]
+    fn scaling_group_law_sanity() {
+        // no brute-force class count is possible here; check the group axioms on
+        // classes built from random rational points, at q up to 2^31
+        for &k in &[8u32, 12, 16, 24, 31] {
+            let q = largest_prime_below_pow2(k);
+            let mut rng = 20261018u64 + k as u64;
+            let (f, p0) = next_smooth_quartic_with_point(q, &mut rng);
+            let c = PlaneQuartic::new(q, f, p0).unwrap();
+            let mut prng = 0xC0FFEEu64 + k as u64;
+            let mut rand_class = |prng: &mut u64| -> PicClass {
+                let mut x = c.zero();
+                for _ in 0..4 {
+                    let p = find_rational_point(q, &f, prng, 100_000).unwrap();
+                    x = c.add(&x, &c.point_class(p));
+                }
+                x
+            };
+            for _ in 0..25 {
+                let (a, b, d) = (rand_class(&mut prng), rand_class(&mut prng), rand_class(&mut prng));
+                assert_eq!(c.add(&a, &b), c.add(&b, &a));
+                assert_eq!(c.add(&c.add(&a, &b), &d), c.add(&a, &c.add(&b, &d)), "assoc q={}", q);
+                assert_eq!(c.add(&a, &c.neg(&a)), c.zero());
+                assert_eq!(c.sub(&c.add(&a, &b), &b), a);
+                assert_eq!(c.mul_scalar(&a, 7), {
+                    let a2 = c.double(&a);
+                    let a4 = c.double(&a2);
+                    c.add(&c.add(&a4, &a2), &a)
+                });
+                assert_eq!(c.mul_scalar(&c.add(&a, &b), 12345), c.add(&c.mul_scalar(&a, 12345), &c.mul_scalar(&b, 12345)));
+            }
+            let p = find_rational_point(q, &f, &mut prng, 100_000).unwrap();
+            assert_eq!(c.add(&c.point_class(p), &c.exceptional(p)), c.zero());
+        }
     }
 
     // ------------------------------------------------------------------
@@ -2651,31 +2694,40 @@ pub(crate) mod tests {
         (at(0.5), at(0.25), at(0.75))
     }
 
-    /// Time one `inv` against one `mul` at this `q` (nanoseconds each), using
-    /// dependent chains so neither is optimised away.
+    /// Time one `mul` (one 64-bit modular reduction per product, dependent
+    /// chain) against one `inv` (extended Euclid) at this `q`, in nanoseconds,
+    /// median of 9 repetitions.
     fn inv_mul_ratio(q: u32) -> (f64, f64) {
         let qq = q as u64;
-        let reps = 200_000u64;
-        let mut x = 123456789u64 % qq;
-        let t0 = std::time::Instant::now();
-        for i in 0..reps {
-            x = (x * (i % 1000 + 2) % qq + 1) % qq;
-        }
-        let tmul = t0.elapsed().as_nanos() as f64 / reps as f64;
-        std::hint::black_box(x);
         let fq = Fq { q: qq, c_mul: Cell::new(0), c_inv: Cell::new(0), c_add: Cell::new(0) };
-        let reps2 = 50_000u64;
-        let mut y = 987654321u64 % qq;
-        let t1 = std::time::Instant::now();
-        for _ in 0..reps2 {
-            y = fq.invu((y + 1) as u32 % q.max(2)) as u64;
-            if y == 0 {
-                y = 1;
+        let med = |mut v: Vec<f64>| -> f64 {
+            v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            v[v.len() / 2]
+        };
+        let mut tm = vec![];
+        let mut ti = vec![];
+        for rep in 0..9u64 {
+            let reps = 2_000_000u64;
+            let b = std::hint::black_box(qq - 2 - rep);
+            let mut x = std::hint::black_box(123456789u64 % qq);
+            let t0 = std::time::Instant::now();
+            for _ in 0..reps {
+                x = x * b % qq;
             }
+            tm.push(t0.elapsed().as_nanos() as f64 / reps as f64);
+            std::hint::black_box(x);
+            let reps2 = 200_000u64;
+            let mut y = std::hint::black_box(987654321u32 % q);
+            let t1 = std::time::Instant::now();
+            for _ in 0..reps2 {
+                // chain: invert, then perturb to stay nonzero
+                y = fq.invu(y);
+                y = if y + 1 >= q { 1 } else { y + 1 };
+            }
+            ti.push(t1.elapsed().as_nanos() as f64 / reps2 as f64);
+            std::hint::black_box(y);
         }
-        let tinv = t1.elapsed().as_nanos() as f64 / reps2 as f64;
-        std::hint::black_box(y);
-        (tmul, tinv)
+        (med(tm), med(ti))
     }
 
     #[test]
@@ -2691,6 +2743,8 @@ pub(crate) mod tests {
         let npairs: usize = std::env::var("W1_PAIRS").ok().and_then(|v| v.parse().ok()).unwrap_or(200);
         let mut raw = std::fs::File::create(format!("{}/m1_raw.jsonl", out_dir)).unwrap();
         let mut summ = std::fs::File::create(format!("{}/m1_summary.jsonl", out_dir)).unwrap();
+        // (op, log2 q, median mul, median priced mul-equivalents, median ns)
+        let mut series: Vec<(String, f64, f64, f64, f64)> = Vec::new();
         for &k in &ks {
             let q = largest_prime_below_pow2(k);
             // ---- M3 setup ----
@@ -2848,8 +2902,51 @@ pub(crate) mod tests {
                     k, q, name, v.len(), mm, m1, m3, im, i1, i3, am, a1, a3, nm, n1, n3, used_lift, used_p0, used_exc, used_excop, mm + im * inv_equiv
                 )
                 .unwrap();
+                series.push((name.clone(), (q as f64).log2(), mm, mm + im * inv_equiv, nm));
             }
             eprintln!("k={} q={} done", k, q);
+        }
+        // M2: OLS fits against log2 q with a 95% t-interval (n-2 degrees of freedom)
+        let tcrit = |df: usize| -> f64 {
+            // two-sided 95% critical values
+            [12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228][df.saturating_sub(1).min(9)]
+        };
+        let mut fits = std::fs::File::create(format!("{}/m2_fits.jsonl", out_dir)).unwrap();
+        let mut ops: Vec<String> = series.iter().map(|t| t.0.clone()).collect();
+        ops.sort();
+        ops.dedup();
+        for op in &ops {
+            let pts: Vec<&(String, f64, f64, f64, f64)> = series.iter().filter(|t| &t.0 == op).collect();
+            let n = pts.len();
+            if n < 3 {
+                continue;
+            }
+            for (metric, sel) in [("mul_median", 2usize), ("priced_mul_equiv_median", 3), ("ns_median", 4)] {
+                let xs: Vec<f64> = pts.iter().map(|t| t.1).collect();
+                let ys: Vec<f64> = pts
+                    .iter()
+                    .map(|t| match sel {
+                        2 => t.2,
+                        3 => t.3,
+                        _ => t.4,
+                    })
+                    .collect();
+                let mx = xs.iter().sum::<f64>() / n as f64;
+                let my = ys.iter().sum::<f64>() / n as f64;
+                let sxx: f64 = xs.iter().map(|x| (x - mx) * (x - mx)).sum();
+                let sxy: f64 = xs.iter().zip(&ys).map(|(x, y)| (x - mx) * (y - my)).sum();
+                let slope = sxy / sxx;
+                let icpt = my - slope * mx;
+                let rss: f64 = xs.iter().zip(&ys).map(|(x, y)| (y - icpt - slope * x).powi(2)).sum();
+                let se = (rss / (n as f64 - 2.0) / sxx).sqrt();
+                let hw = tcrit(n - 2) * se;
+                writeln!(
+                    fits,
+                    "{{\"op\":\"{}\",\"metric\":\"{}\",\"n_points\":{},\"slope_per_log2q\":{},\"slope_lo95\":{},\"slope_hi95\":{},\"intercept\":{},\"mean\":{}}}",
+                    op, metric, n, slope, slope - hw, slope + hw, icpt, my
+                )
+                .unwrap();
+            }
         }
     }
 
