@@ -73,3 +73,12 @@ score by PROTOCOL.md §4 and the msolve protocol's rule.
 - `run.sh`: `host | gen | measure | control | deg5 [C2]`; reads the cgroup memory limit.
 - `pod/boot.sh`, `pod/launch.py`: host plumbing (no research computation).
 - `../pkm_m3_n21_msolve_20261018/{PROTOCOL.md,run.sh}`: the msolve companion.
+
+
+## Status 2026-10-18 13:35Z
+
+Run 20261018T1134Z is complete (`reports/run-20261018T1134Z/`, records in
+`runs/`): A1 refuted at degree 4 on both unsatisfiable draws with a clean
+control, C1 capped by memory at 169 GB, A2/B/C2 deferred. Reading in
+`RESULTS.md`. The PKM msolve rerun is reported in
+`../pkm_m3_n21_msolve_20261018/`.
