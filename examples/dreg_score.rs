@@ -786,7 +786,7 @@ fn slope(paths: &[String]) {
         } else {
             4
         };
-        for (_, degs) in draws {
+        for degs in draws.values() {
             let mut label = String::from("unmeasured");
             let mut best_bound = 0u64;
             let mut found: Option<u64> = None;
