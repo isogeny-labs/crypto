@@ -33,10 +33,10 @@ The frozen four-arm selector over archived stratum analyses places K2816
 first for supplementary cold-process cost among these four bases: 24/24
 paired wins against each other arm, with mean cold times 334.291, 393.983,
 577.128, and 586.219 seconds for K2816, K3072, K3450, and K3500. Its
-primary online selector remains `BOUNDED_UNKNOWN`. The calibration and host
-resource gates in that selector still rely on the archived analysis; this
-native addition independently covers public points, IC relations, recovered
-scalars, and paired rho target results. A native calibration and resource
-replay is the remaining audit before treating the cold selector as fully
-native. The prospective batched-index and fresh small-intermediate panels
-remain separate comparisons.
+primary online selector remains `BOUNDED_UNKNOWN`. This arithmetic replay
+independently covers public points, IC relations, recovered scalars, and
+paired rho target results. A separate
+[native raw resource and calibration replay](NATIVE_SELECTION.md) now checks
+all 768 archived events; the selector binds both replay digests. The
+prospective batched-index and fresh small-intermediate panels remain separate
+comparisons.

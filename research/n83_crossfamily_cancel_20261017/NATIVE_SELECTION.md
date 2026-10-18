@@ -23,24 +23,34 @@ every paired difference, uncertainty interval, exact probability, and
 candidate ID.
 
 The [result](native_selection_39075872898.json) is SHA-256
-`883b6a5469a963298d802271bda96ab4abea9b5a934e4e168fc7c10ff190022b`.
+`d258e75e6b2dc6568b16dfe140c7ddc664ab63cdcb97222996700711a5028a77`.
 The selector source is SHA-256
-`3034b1b8a20cf71608710f8169dffddb22426e954382a6ddc48267e18b29f861`.
+`f88d1f1207b37978285989810dc184119530968d1af907adc87252d940acced6`.
 It binds the four raw archive ZIP hashes, the committed
 [provider jobs record](provider_jobs_39075872898.json) (SHA-256
 `fa4126b6ad2343f319af44429feea88c01e049abcbea568355eca536e2a7ce0b`),
 four distinct overlapping provider runner IDs, exact source and stratum
 identities, 24-point/four-arm coverage, and the separately passing
-[native arithmetic replay](NATIVE_REPLAY.md). Two independent exact sign-flip
+[native arithmetic replay](NATIVE_REPLAY.md) and the
+[native raw resource replay](native_resource_replay_39075872898.json) (SHA-256
+`3d3231161622e729db7f3d4330d1af644e647802c33424b217e9a7e35a8eed5a`).
+Two independent exact sign-flip
 implementations agree before a contrast is reported. Its online and cold
 outputs match the earlier standalone native selector byte-for-byte after
 removing the new provenance fields.
 
-The resource, calibration, execution-order, and host admission checks in this
-selection are taken from the archived stratum analyses; they have not been
-replayed natively from every raw event. The arithmetic replay independently
-checks all 24 public points, 96 IC scalars and relations, 96 paired rho
-scalars, and all ordered factor-base dumps. The new K2816 batched-index
+The [resource replayer](../../examples/n83_crossfamily_native_resource_replay.rs)
+(source SHA-256 `7e09e9cdb2ab97730c1c25a44434304b249531266d7daf7a6151256408a05a5f`)
+checks the 768 raw event receipts: 96 IC runs, 96 paired rho runs, and 576
+calibration runs. It checks frozen launch caps and process RSS, cgroup CPU and
+memory envelopes and per-event throttling/OOM deltas, steal-time deltas,
+nonoverlapping intervals, and the 10% before/after median calibration gate.
+It independently replays the calibration scalar against the frozen public
+point. The largest observed calibration median spread was 9.2434%. The
+selector still uses the archived stratum analyses for timing values and
+execution order. The arithmetic replay independently checks all 24 public
+points, 96 IC scalars and relations, 96 paired rho scalars, and all ordered
+factor-base dumps. The new K2816 batched-index
 measurement changes the code snapshot and only measures the index stage; its
 stage time is not spliced into this older complete cold panel. The fresh
 K1107/K2304 same-point bridge and a full batched-index candidate comparison
@@ -49,6 +59,7 @@ are the next selection gates.
 Build with `cargo build --release --locked --example
 n83_crossfamily_native_select`, then run the executable with an archive
 directory containing `stratum0.zip` through `stratum3.zip`, this directory's
-provider jobs JSON, and this directory's native arithmetic replay JSON. The
+provider jobs JSON, and this directory's native arithmetic and resource
+replay JSON files. The
 four ZIPs are the preserved artifacts of
 [run 39075872898](https://github.com/aburan28/crypto/actions/runs/39075872898).

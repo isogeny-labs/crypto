@@ -1,5 +1,5 @@
 //! Recompute frozen N83 four-arm paired selection from archived stratum analyses.
-//! Usage: n83_crossfamily_native_select <archive-dir> <provider-jobs.json> <native-arithmetic-replay.json>
+//! Usage: n83_crossfamily_native_select <archive-dir> <provider-jobs.json> <native-arithmetic-replay.json> <native-resource-replay.json>
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{self, File};
 use std::io::Read;
@@ -18,6 +18,8 @@ const ZIP_SHA256: [&str; 4] = [
 const PROVIDER_SHA256: &str = "fa4126b6ad2343f319af44429feea88c01e049abcbea568355eca536e2a7ce0b";
 const ARITHMETIC_REPLAY_SHA256: &str =
     "ccceea9197e9da9fb8fab4667913bd54caa9e20c7d57be9c5dd841a9c398d414";
+const RESOURCE_REPLAY_SHA256: &str =
+    "3d3231161622e729db7f3d4330d1af644e647802c33424b217e9a7e35a8eed5a";
 
 const IDS: [&str; 4] = [
     "IC1N83Ckb1a1fb467456PDP4rootRCguidedLAgaussTDdirectISO0h7a3cca2a9993",
@@ -213,16 +215,18 @@ fn select_metric(points: &BTreeMap<usize, [Value; 4]>, key: &str) -> Result<Valu
 
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
-    if args.len() != 4 {
-        return Err("usage: n83_crossfamily_native_select <archive-dir> <provider-jobs.json> <native-arithmetic-replay.json>".into());
+    if args.len() != 5 {
+        return Err("usage: n83_crossfamily_native_select <archive-dir> <provider-jobs.json> <native-arithmetic-replay.json> <native-resource-replay.json>".into());
     }
     let root = Path::new(&args[1]);
     let provider_path = Path::new(&args[2]);
     let arithmetic_path = Path::new(&args[3]);
+    let resource_path = Path::new(&args[4]);
     if sha_file(provider_path)? != PROVIDER_SHA256
         || sha_file(arithmetic_path)? != ARITHMETIC_REPLAY_SHA256
+        || sha_file(resource_path)? != RESOURCE_REPLAY_SHA256
     {
-        return Err("provider or native arithmetic replay digest differs".into());
+        return Err("provider or native replay digest differs".into());
     }
     let arithmetic: Value = serde_json::from_slice(&fs::read(arithmetic_path)?)?;
     if arithmetic["status"] != "PASS_NATIVE_IC_AND_PAIRED_RHO_TARGET_REPLAY"
@@ -231,6 +235,21 @@ fn main() -> Result<()> {
         || arithmetic["paired_rho_runs"] != 96
     {
         return Err("independent arithmetic replay absent".into());
+    }
+    let resource: Value = serde_json::from_slice(&fs::read(resource_path)?)?;
+    if resource["status"] != "PASS_NATIVE_RAW_RESOURCE_AND_CALIBRATION_REPLAY"
+        || resource["calibration_scalar_replay"] != true
+        || resource["event_count"] != 768
+        || resource["ic_runs"] != 96
+        || resource["paired_rho_runs"] != 96
+        || resource["calibration_runs"] != 576
+        || resource["archive_zip_sha256"] != json!(ZIP_SHA256)
+        || resource["maximum_calibration_relative_spread"]
+            .as_f64()
+            .ok_or("calibration spread absent")?
+            > 0.10
+    {
+        return Err("independent resource replay absent".into());
     }
     let provider: Value = serde_json::from_slice(&fs::read(provider_path)?)?;
     if provider["total_count"] != 4 {
@@ -337,7 +356,8 @@ fn main() -> Result<()> {
         serde_json::to_string_pretty(&json!({
             "status":"NATIVE_SELECTION_OVER_ARCHIVED_ANALYSIS",
             "independent_arithmetic_replay_status":arithmetic["status"],
-            "resource_replay":"ARCHIVED_ANALYSIS_ONLY",
+            "resource_replay":resource["status"],
+            "resource_replay_sha256":RESOURCE_REPLAY_SHA256,
             "archive_zip_sha256":ZIP_SHA256,
             "provider_jobs_sha256":PROVIDER_SHA256,
             "provider_runner_ids":runner_ids,
