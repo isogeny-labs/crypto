@@ -511,13 +511,61 @@ pub fn cmd_summary(args: &[String]) {
             .collect();
         let mx = all.iter().cloned().fold(f64::MIN, f64::max);
         let mn = all.iter().cloned().fold(f64::MAX, f64::min);
-        println!("| {n} | {w} | {m_pair:.4} | {pc_pair:.4} | {bits_pair:.1} | {nl} | {dn} | {nm} | {nb} | {nbs} | {ml} | {mm} | {mb} | {mn:.3} to {mx:.3} |");
+        let range = if all.is_empty() {
+            "-".to_string()
+        } else {
+            format!("{mn:.3} to {mx:.3}")
+        };
+        println!("| {n} | {w} | {m_pair:.4} | {pc_pair:.4} | {bits_pair:.1} | {nl} | {dn} | {nm} | {nb} | {nbs} | {ml} | {mm} | {mb} | {range} |");
     }
 
     println!("\n### Table 9. Unisolated wall time per pair (a labelled note, not a result)\n");
-    println!("`ms_unisolated` fields of the unordered full scans and of the control, on a shared container with no pinning. The weight kernel is portable Rust over a software cyclic convolution; the control uses `pclmulqdq`. Different code paths, so this is not a like-for-like measure of the two leaves.\n");
-    println!("| setting | ns/pair (weight, ONB) |");
-    println!("|:--|--:|");
+    println!("`ms_unisolated` fields of the unordered full scans and of the control, on a shared container with no pinning. The weight kernel is portable Rust over a software cyclic convolution; the control uses `pclmulqdq`. Different code paths, so this is not a like-for-like measure of the two leaves. The run was resumed on a second host class after a container restart; each record is attributed to the host whose manifest (`manifest.txt`, `host_*.txt`) is the latest one not later than the record's stage marker (`raw/done/`), and rows of different hosts are never pooled.\n");
+    // Hosts: (compact start time, cpu label), from manifest.txt and host_*.txt.
+    let mut hosts: Vec<(String, String)> = Vec::new();
+    let mut host_files = vec![format!("{raw}/manifest.txt")];
+    if let Ok(rd) = std::fs::read_dir(&raw) {
+        let mut v: Vec<String> = rd
+            .filter_map(|e| e.ok())
+            .map(|e| e.path().to_string_lossy().to_string())
+            .filter(|p| p.contains("/host_") && p.ends_with(".txt"))
+            .collect();
+        v.sort();
+        host_files.extend(v);
+    }
+    for hf in &host_files {
+        if let Ok(t) = std::fs::read_to_string(hf) {
+            let mut when = String::new();
+            let mut cpu = String::new();
+            for line in t.lines() {
+                if let Some(v) = line.strip_prefix("date_utc ") {
+                    when = v.replace(['-', ':'], "");
+                }
+                if let Some(v) = line.strip_prefix("cpu ") {
+                    cpu = v.to_string();
+                }
+            }
+            if !when.is_empty() {
+                hosts.push((when, cpu));
+            }
+        }
+    }
+    hosts.sort();
+    let host_of = |marker: &str| -> String {
+        let t = std::fs::read_to_string(format!("{raw}/done/{marker}"))
+            .unwrap_or_default()
+            .trim()
+            .to_string();
+        let mut label = "unknown host".to_string();
+        for (when, cpu) in &hosts {
+            if t.as_str() >= when.as_str() {
+                label = cpu.clone();
+            }
+        }
+        label
+    };
+    println!("| setting | host (cpu) | ns/pair (weight, ONB) |");
+    println!("|:--|:--|--:|");
     for ((n, w), r) in &rows {
         let mut ms = 0.0;
         let mut pairs = 0u64;
@@ -528,12 +576,17 @@ pub fn cmd_summary(args: &[String]) {
             }
         }
         let _ = r;
-        println!("| n={n} w={w} | {:.1} |", ms * 1e6 / pairs as f64);
+        println!(
+            "| n={n} w={w} | {} | {:.1} |",
+            host_of(&format!("run_n{n}_w{w}")),
+            ms * 1e6 / pairs as f64
+        );
     }
     for (l, c) in &rungs {
         println!(
-            "| control l={l} (n={}) | {:.1} |",
+            "| control l={l} (n={}) | {} | {:.1} |",
             u(&c["n"]),
+            host_of(&format!("control_l{l}")),
             fl(&c["ms_unisolated"]) * 1e6 / u(&c["pairs"]) as f64
         );
     }

@@ -33,6 +33,27 @@ PANEL_SETTINGS="11:2 11:3 23:2 23:3 29:2 29:3 33:2 33:3 35:2 39:2 41:2"
 # (uniform) and 6 (planted).
 torsion_only() { if [ "$2" = 3 ] && [ "$1" -ge 35 ]; then echo "--only 0,6"; fi; }
 
+# A resumed run on another host class records that host (the build stage records the first one,
+# in manifest.txt).  Counts do not depend on the host; the wall notes (`ms_unisolated`) are never
+# pooled across hosts (the summary attributes each record to a host by its stage marker's time).
+HOSTTAG=$(printf '%s-%s' "$(uname -r)" "$(grep -m1 'model name' /proc/cpuinfo | sed 's/.*: //')" | tr -c 'A-Za-z0-9.\n' '_')
+if [ -f "$OUT/manifest.txt" ] && ! grep -q "$(grep -m1 'model name' /proc/cpuinfo | sed 's/.*: //' | sed 's/[][()*.]/\\&/g')" "$OUT/manifest.txt" \
+   && [ ! -f "$OUT/host_$HOSTTAG.txt" ]; then
+  {
+    echo "date_utc $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    echo "note resumed run on a different host class; the binaries are the ones hashed in manifest.txt"
+    echo "rustc $(rustc --version)"
+    echo "cargo $(cargo --version)"
+    echo "git_head $(git rev-parse HEAD) branch $(git branch --show-current)"
+    echo "uname $(uname -srm)"
+    echo "cpu $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2- | sed 's/^ //')"
+    echo "cpu_flags $(grep -m1 '^flags' /proc/cpuinfo | tr ' ' '\n' | grep -E '^(popcnt|pclmulqdq|avx2|avx512f|avx512bw|bmi2)$' | tr '\n' ' ')"
+    echo "logical_cpus $(nproc)"
+    echo "mem_kb $(grep MemTotal /proc/meminfo | awk '{print $2}')"
+    sha256sum "$BIN" "$OPC" "$PANEL"
+  } > "$OUT/host_$HOSTTAG.txt"
+fi
+
 stage() { case " $STAGES " in *" $1 "*) return 0 ;; *) return 1 ;; esac; }
 done_marker() { [ -f "$OUT/done/$1" ]; }
 mark() { date -u +%Y%m%dT%H%M%SZ > "$OUT/done/$1"; }
