@@ -5,16 +5,18 @@
                  [--max-seconds N] [--gpu "NVIDIA H200" --gpu-count 2 --min-ram-per-gpu 250]
   launch.py ls | status ID | stop ID | url ID
 """
-import argparse, json, os, sys, urllib.request
+import argparse, json, os, subprocess, sys
 
 API = "https://rest.runpod.io/v1"
 KEY = os.environ["RUNPOD_API_KEY"]
 
 def call(method, path, body=None):
-    req = urllib.request.Request(API + path, method=method, data=json.dumps(body).encode() if body is not None else None,
-                                 headers={"Authorization": f"Bearer {KEY}", "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.loads(r.read() or b"null")
+    # curl, not urllib: this container's egress proxy answers urllib POSTs with 403.
+    cmd = ["curl", "-sS", "-m", "90", "-X", method, API + path, "-H", f"Authorization: Bearer {KEY}", "-H", "Content-Type: application/json"]
+    if body is not None:
+        cmd += ["-d", json.dumps(body)]
+    out = subprocess.run(cmd, capture_output=True, text=True, check=True).stdout
+    return json.loads(out or "null")
 
 START = r'''( sleep "$POD_MAX_SECONDS"
   curl -s https://api.runpod.io/graphql -H 'Content-Type: application/json' -H "Authorization: Bearer $RUNPOD_API_KEY" \
@@ -50,7 +52,7 @@ def main():
     r.add_argument("--flavors", default="cpu5m,cpu3m"); r.add_argument("--disk", type=int, default=150)
     r.add_argument("--max-seconds", type=int, default=172800); r.add_argument("--gpu"); r.add_argument("--gpu-count", type=int, default=1)
     r.add_argument("--min-ram-per-gpu", type=int, default=8); r.add_argument("--min-vcpu-per-gpu", type=int, default=2)
-    for c in ("status", "stop", "url"): sub.add_parser(c).add_argument("id")
+    for c in ("status", "stop", "terminate", "url"): sub.add_parser(c).add_argument("id")
     sub.add_parser("ls")
     a = p.parse_args()
     if a.cmd == "run": run(a)
@@ -59,6 +61,7 @@ def main():
     elif a.cmd == "status":
         q = call("GET", f"/pods/{a.id}"); print(json.dumps({k: q.get(k) for k in ("id", "name", "desiredStatus", "vcpuCount", "memoryInGb", "costPerHr", "lastStatusChange")}))
     elif a.cmd == "stop": print(call("POST", f"/pods/{a.id}/stop"))
+    elif a.cmd == "terminate": print(call("DELETE", f"/pods/{a.id}"))
     elif a.cmd == "url": print(f"https://{a.id}-8000.proxy.runpod.net/")
 
 if __name__ == "__main__": main()
