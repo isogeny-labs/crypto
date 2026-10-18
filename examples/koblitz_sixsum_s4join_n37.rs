@@ -109,6 +109,7 @@ fn main() {
     let ell: u32 = args.first().and_then(|a| a.parse().ok()).unwrap_or(8);
     let n_relations: usize = args.get(1).and_then(|a| a.parse().ok()).unwrap_or(6);
     let seed: u64 = args.get(2).and_then(|a| a.parse().ok()).unwrap_or(0x5437_0037);
+    let trial_cap: u64 = args.get(3).and_then(|a| a.parse().ok()).unwrap_or(50_000_000);
 
     let kc = KoblitzCurve::new(0, 37).expect("a=0 n=37 Koblitz curve");
     let curve = &kc.curve;
@@ -170,7 +171,7 @@ fn main() {
         let ta = Instant::now();
         let mut trials_a = 0u64;
         let mut found_a = false;
-        while trials_a < 50_000_000 {
+        while trials_a < trial_cap {
             trials_a += 1;
             let e1 = entries[rng.gen_range(0..tsize)];
             let e2 = entries[rng.gen_range(0..tsize)];
@@ -204,7 +205,7 @@ fn main() {
         let mut probes_b = 0u64;
         let mut found_b = false;
         let xkeys: Vec<u128> = entries.iter().map(|e| e.0).collect();
-        while trials_b < 50_000_000 {
+        while trials_b < trial_cap {
             trials_b += 1;
             let xa = xkeys[rng.gen_range(0..tsize)];
             let xb2 = xkeys[rng.gen_range(0..tsize)];
