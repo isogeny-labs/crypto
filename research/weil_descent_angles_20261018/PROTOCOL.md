@@ -383,7 +383,7 @@ of Addendum A and Amendment C stands. The added prediction **P8b** is
 
 ## Amendment F (control for Arm J), after the recorded Part O/J run and before this control ran
 
-The recorded run (`results/itemOJ-run-20261018T2132Z`) gives Arm J
+The recorded run (`results/itemOJ-run-20261018T2124Z`) gives Arm J
 `steps/p ≈ 0.24–0.39` at every size. Cofactors there are `h ∈ {4, 8}`,
 and the pricing band is unresolved at every size. Arm J's r-adding walk
 can collide with itself (a rho collision), and a repeated divisor appears
