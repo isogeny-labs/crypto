@@ -4051,11 +4051,17 @@ Increasing factor-base dimension remains the next scaling test.</p></div></div>
         construction lands there. Because 2 is a primitive root mod 131, the ordinary GHS/MMT
         model has magic number 1 or 131: genus 1, 2<sup>130</sup> &minus; 1, or
         2<sup>130</sup>. At genus 1 the transfer is exactly the zero map on the target subgroup. The
-        best explicit curve carrying the subgroup is the modular curve X<sub>H</sub>(3&sup2;&middot;7&sup2;&middot;263&sup2;)
-        mod 2, at genus 508,799,809 &asymp; 2<sup>28.92</sup> &mdash; 2<sup>20.69</sup> above the window,
-        with index calculus on it astronomically above rho. Every geometrically cyclic degree-131 cover of
+        historical modular carrier X<sub>H</sub>(3&sup2;&middot;7&sup2;&middot;263&sup2;)
+        has genus 508,799,809. A <a href="../research/koblitz_modular_ic_20261018/REPORT.md">2026-10-18 signed-character construction</a>
+        at level 7&sup2;&middot;787&sup2; lowers this to <strong>378,708,949</strong>, with the same
+        130-dimensional trace-zero factor. The maps and a destination IC solver remain unevaluated;
+        this is a structural genus reduction, with no measured cost or IC speedup. Every geometrically cyclic degree-131 cover of
         a curve of genus &le; 1 needs genus &ge; 1300 (2<sup>148.92</sup> under the exact model,
-        2<sup>88.11</sup>&times; rho). <em>Correction, accounting:</em> the nearest nontrivial GHS
+        2<sup>88.11</sup>&times; rho). The new study gives a written bound of genus &ge; 394 for
+        such covers of <em>any</em> quotient genus; its numerical implication is checked in Lean,
+        while the geometry is not fully formalized or independently reviewed. Noncyclic carriers remain open.
+        The genus-130&ndash;300 window is a historical smoothness model, not measured recovery.
+        <em>Correction, accounting:</em> the nearest nontrivial GHS
         branch is 2<sup>121.77</sup> away; that is not the gap to every construction
         (<code>docs/audits/GHS_MAGIC_NUMBER_MMT_CORRECTION_20261013.md</code>,
         <code>experiments/ecc2k130_hyperelliptic_cover_boundary.json</code>,

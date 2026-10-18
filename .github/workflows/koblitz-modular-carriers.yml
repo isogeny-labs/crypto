@@ -1,0 +1,52 @@
+name: Koblitz modular carrier replay
+on:
+  pull_request:
+    paths:
+      - 'research/koblitz_modular_ic_20261018/**'
+      - 'src/cryptanalysis/curve_construction/weil.rs'
+      - 'src/cryptanalysis/curve_construction/modular.rs'
+      - 'src/cryptanalysis/curve_construction/gf2k.rs'
+      - 'src/cryptanalysis/identity_certificate.rs'
+      - 'src/hash/sha256.rs'
+      - '.github/workflows/koblitz-modular-carriers.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/koblitz_modular_ic_20261018/**'
+      - '.github/workflows/koblitz-modular-carriers.yml'
+permissions:
+  contents: read
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Native tests and exact evidence replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/koblitz_modular_ic_20261018
+          manifest="$study/native/Cargo.toml"
+          cargo test --release --locked --manifest-path "$manifest"
+          replay_dir="$(mktemp -d)"
+          cargo run --release --locked --manifest-path "$manifest" -- "$replay_dir"
+          cmp "$study/results.json" "$replay_dir/results.json"
+          for identity in "$study"/identity-n*-t*.json; do
+            cmp "$identity" "$replay_dir/$(basename "$identity")"
+          done
+          cargo run --release --locked --manifest-path "$manifest" -- --cyclic-only "$replay_dir/cyclic-window.json"
+          cmp "$study/cyclic-window.json" "$replay_dir/cyclic-window.json"
+          cargo run --release --locked --manifest-path "$manifest" -- --large-identity "$replay_dir/identity-n131-balanced.json"
+          cmp "$study/identity-n131-balanced.json" "$replay_dir/identity-n131-balanced.json"
+      - name: Install pinned Lean
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Check conditional numerical proof and axioms
+        working-directory: research/koblitz_modular_ic_20261018
+        run: |
+          set -euo pipefail
+          lean CyclicWindow.lean | tee /tmp/cyclic-axioms.log
+          ! grep -E 'sorryAx|error:' /tmp/cyclic-axioms.log
