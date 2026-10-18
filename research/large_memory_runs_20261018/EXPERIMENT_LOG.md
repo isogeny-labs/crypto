@@ -34,6 +34,10 @@ Planned, not started: PKM `main 1`, `confirm T D` for each finished target,
 `verify`; the shape card's PROTOCOL.md (sized from run 4), then its three
 cells `13:5:7`, `17:6:7`, `19:7:7` as the card's shards.
 
+## Reports
+
+- PKM `m = 3`, `N = 21`: `research/pkm_lead1_m3n21_20261016/RESULTS.md` and the run report `research/pkm_lead1_m3n21_20261016/reports/run-20261018T0611Z/report.pdf` (graph `steps.svg`, source `plot.py`).
+
 ## Deviations and incidents
 
 - 2026-10-18 06:11: PKM PROTOCOL.md §2 requires ≥ 192 GB for SHARE = 1; this
