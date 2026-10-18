@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="660" viewBox="0 0 1000 660" font-family="Helvetica, Arial, sans-serif">
+<rect width="1000" height="660" fill="#ffffff"/>
+<text x="500" y="28" font-size="18" text-anchor="middle" font-weight="bold">Ten non-generic ECDLP leads by curve family (search round 2026-10-18)</text>
+<text x="500" y="48" font-size="12" text-anchor="middle" fill="#444">Nothing here is measured. Box colour gives each lead's status. Study: research/ecdlp_leads_20261018</text>
+<!-- column headers -->
+<rect x="20" y="64" width="400" height="30" fill="#1d3557"/><text x="220" y="84" font-size="14" fill="#fff" text-anchor="middle" font-weight="bold">Prime fields F_p</text>
+<rect x="440" y="64" width="330" height="30" fill="#1d3557"/><text x="605" y="84" font-size="14" fill="#fff" text-anchor="middle" font-weight="bold">Koblitz curves (E over F_2, group in F_{2^n})</text>
+<rect x="790" y="64" width="190" height="30" fill="#1d3557"/><text x="885" y="84" font-size="14" fill="#fff" text-anchor="middle" font-weight="bold">Random-b binary</text>
+<!-- mechanism bands -->
+<text x="24" y="112" font-size="12" fill="#555" font-style="italic">Mechanism: small-root lattices (decomposition oracle)</text>
+<text x="444" y="112" font-size="12" fill="#555" font-style="italic">Mechanism: covers, so class-group index calculus over F_2</text>
+<text x="794" y="112" font-size="12" fill="#555" font-style="italic">Mechanism: covers</text>
+<!-- prime leads -->
+<g font-size="12">
+<rect x="20" y="122" width="400" height="58" rx="6" fill="#d8f3ee" stroke="#2a9d8f"/>
+<text x="30" y="141" font-weight="bold">L1  Coefficient collapse + projective (Farey) bases</text>
+<text x="30" y="158">Small-coefficient curves: level-1 reach 1/12 to 1/9 to 1/6</text>
+<text x="30" y="173">secp256k1, Curve25519/448, BN254, BLS12-381 G1; P-curves 1/10</text>
+<rect x="20" y="188" width="400" height="44" rx="6" fill="#d8f3ee" stroke="#2a9d8f"/>
+<text x="30" y="207" font-weight="bold">L2  Eisenstein-Farey bases for j = 0 curves</text>
+<text x="30" y="224">zeta_3-invariant factor base at the same reach as L1</text>
+<rect x="20" y="240" width="400" height="44" rx="6" fill="#fff1d6" stroke="#e9a23b"/>
+<text x="30" y="259" font-weight="bold">L3  Algebraic-exposure ledger, every standard prime curve</text>
+<text x="30" y="276">models x factor-base shapes, giving the best level-1 reach per curve</text>
+<rect x="20" y="292" width="400" height="44" rx="6" fill="#eceff1" stroke="#90a4ae"/>
+<text x="30" y="311" font-weight="bold">L4  Audit unchecked prime-field IC algorithms</text>
+<text x="30" y="328">McGuire-Mueller 2017/1262, Hu 2024/1923 and 2025/015, APS 2017/609</text>
+<rect x="20" y="344" width="400" height="44" rx="6" fill="#eceff1" stroke="#90a4ae"/>
+<text x="30" y="363" font-weight="bold">L5  Global twist-collision relations (xedni variant)</text>
+<text x="30" y="380">small-x points on one quadratic twist; predicted sublinear yield</text>
+</g>
+<!-- koblitz leads -->
+<g font-size="12">
+<rect x="440" y="122" width="330" height="58" rx="6" fill="#d8f3ee" stroke="#2a9d8f"/>
+<text x="450" y="141" font-weight="bold">L6  Modular twists contain T_n</text>
+<text x="450" y="158">Eichler-Shimura: (f_E x chi) mod 2 ~ T_n</text>
+<text x="450" y="173">for chi of order n with chi(2) != 1; genus ~n^3</text>
+<rect x="440" y="188" width="330" height="58" rx="6" fill="#d8f3ee" stroke="#2a9d8f"/>
+<text x="450" y="207" font-weight="bold">L7  Klein-quartic family (ramified)</text>
+<text x="450" y="224">Klein/F_2 has Jacobian ~ Res_{F_8/F_2}(E, a = 1)</text>
+<text x="450" y="239">extend: genus 1 + ord_n(2)(n - 1)/2</text>
+<rect x="440" y="254" width="330" height="58" rx="6" fill="#fff1d6" stroke="#e9a23b"/>
+<text x="450" y="273" font-weight="bold">L8  Etale route, genus 1 + n(g0 - 1)</text>
+<text x="450" y="290">only structured family inside the L(1/2) budget</text>
+<text x="450" y="305">for K-163, K-283, K-409, K-571 (optimistic g0)</text>
+<rect x="440" y="320" width="330" height="68" rx="6" fill="#d8f3ee" stroke="#2a9d8f"/>
+<text x="450" y="339" font-weight="bold">L9  Certified lower bounds on cover genus</text>
+<text x="450" y="356">a = 1: T_n is never a Jacobian; genus n impossible</text>
+<text x="450" y="371">at (a=0, n=3), (a=1, n=5); LMFDB: T_3, T_5 not</text>
+<text x="450" y="384">principally polarisable</text>
+</g>
+<!-- binary lead -->
+<g font-size="12">
+<rect x="790" y="122" width="190" height="130" rx="6" fill="#fff1d6" stroke="#e9a23b"/>
+<text x="800" y="141" font-weight="bold">L10  Genus-n Jacobians</text>
+<text x="800" y="156" font-weight="bold">realising Res(E) at</text>
+<text x="800" y="171" font-weight="bold">n = 3, 5 beyond GHS</text>
+<text x="800" y="190">GHS genus 2^(n-1);</text>
+<text x="800" y="205">random-b curves are not</text>
+<text x="800" y="220">Q-curves, so the L6</text>
+<text x="800" y="235">mechanism is unavailable</text>
+</g>
+<!-- legend -->
+<g font-size="12">
+<rect x="20" y="408" width="14" height="14" fill="#d8f3ee" stroke="#2a9d8f"/><text x="40" y="420">derived: the mechanism follows from cited facts; the first experiment is specified</text>
+<rect x="20" y="430" width="14" height="14" fill="#fff1d6" stroke="#e9a23b"/><text x="40" y="442">proposed: existence or payoff open</text>
+<rect x="20" y="452" width="14" height="14" fill="#eceff1" stroke="#90a4ae"/><text x="40" y="464">audit or closure-type: expected to close or recalibrate</text>
+</g>
+<!-- closed on paper -->
+<rect x="20" y="482" width="960" height="160" rx="6" fill="#fbfbfb" stroke="#ccc"/>
+<text x="32" y="503" font-size="13" font-weight="bold">Closed on paper while drafting (README section "Closed on paper")</text>
+<g font-size="11.5" fill="#333">
+<text x="32" y="524">C1  Farey bases on generic-coefficient curves: level-1 reach stays 1/12 (no gain without the collapse)</text>
+<text x="32" y="541">C2  Special-prime quadratic orders (2^255-19: theta^2 = 38; secp256k1; P-521): equal reach, no automorphism gain</text>
+<text x="32" y="558">C3  Linked expansions by non-unit endomorphisms (1 + tau, sqrt(-3), halving): equivalent to re-randomising the target</text>
+<text x="32" y="575">C4  K-233 invariant subspaces (8 cosets of 29): linear algebra ~2^102 is under rho 2^111, but the per-solve budget 2^59 is below a degree-3 Macaulay solve (~2^73)</text>
+<text x="32" y="592">C5  F_2-rational norm-residue map P -> f_P on Koblitz trace-zero points: trivial by the Hasse norm theorem</text>
+<text x="32" y="609">C6  Characteristic-2 Farey (x = u/v, u and v in subspaces): the descended degree rises to 4</text>
+<text x="32" y="626">C7  Genus-n covers via an F_2-automorphism of order n: impossible for n &gt;= 5 (ray class group); Klein is the n = 3 case</text>
+</g>
+</svg>
