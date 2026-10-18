@@ -74,6 +74,7 @@ SOURCES = {
     "la_engines": "research/la_engines_20261014/summary.json",
     "sixsum_resolvent": "research/ic_techniques_20261012/sixsum_extraction/resolvent_summary.json",
     "wide_producer": "benchmarks/20261018-wide-producer-engineering/summary.json",
+    "f4_gf2_port": "benchmarks/20261018-f4-gf2-port/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -749,6 +750,17 @@ def wide_producer_component() -> dict:
     return {**sm, "study": "benchmarks/20261018-wide-producer-engineering/"}
 
 
+def f4_gf2_port_component() -> dict:
+    """The ported rank-indexed Boolean F4 kernel against this crate's
+    matrix_f4_f2 family, same binary, on its own: the frozen summary of
+    benchmarks/20261018-f4-gf2-port. A component (kernel) speed-up: it moves
+    no row of tables A-C and carries no end-to-end S or rho claim."""
+    sm = load(SOURCES["f4_gf2_port"])
+    if sm.get("schema") != "crypto.f4_gf2_port/v1" or sm.get("class") != "engineering":
+        raise SystemExit("review the f4_gf2 port summary before updating the leaderboard")
+    return {**sm, "study": "benchmarks/20261018-f4-gf2-port/"}
+
+
 def latest_frontier_audit() -> dict:
     """Copy the latest performance handoff into the generated board.
 
@@ -1194,6 +1206,7 @@ def build() -> dict:
         "linear_algebra_component": la_component(),
         "sixsum_resolvent_component": sixsum_resolvent_component(),
         "wide_producer_component": wide_producer_component(),
+        "f4_gf2_port_component": f4_gf2_port_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -1579,6 +1592,23 @@ def markdown(doc: dict) -> str:
           f"to the control ({e['rank_relations']} relations, {e['targets_solved']} targets solved). "
           "Caveats: " + "; ".join(w["caveats"]) + ".",
           "", f"[Frozen summary](../../{SOURCES['wide_producer']}), [report](../../{w['report']}).", ""]
+    g = doc["f4_gf2_port_component"]
+    ag = g["agreement"]
+    L += ["", "## Component: ported rank-indexed Boolean F4 kernel (engineering)", "",
+          f"Class **{g['class']}**: {g['claim']}. Cell n = {g['n']}, m = {g['m']}, ell = {g['ell']} "
+          f"({g['n_vars']} variables), degree {g['degree']}, {g['draws']} draws, same test binary, {g['host']}. "
+          "This panel is outside Tables A–C and moves no ranked row.", "",
+          "| arm | median ms | min–max ms | median word XORs | vs crate full |",
+          "|---|---:|---|---:|---:|"]
+    for a in g["arms"]:
+        L.append(f"| {a['label']} | {a['median_ms']:.1f} | {a['min_ms']:.1f}–{a['max_ms']:.1f} | "
+                 f"{a['median_word_xors']:,} | {a['speedup_vs_crate_full']:.2f}x |")
+    L += ["", f"Four runs: port F5 on is {g['four_run_ranges']['port_f5_on_vs_crate_full']} the crate full path and "
+          f"{g['four_run_ranges']['port_f5_on_vs_crate_solver']} the crate solver path. Agreement with `matrix_f4_f2`: "
+          f"{ag['koblitz_decomposition_comparisons']} Koblitz comparisons ({ag['refuted']} refuted, "
+          f"{ag['forced']} forced, {ag['undecided']} undecided) plus random dense systems; {ag['checks']}. "
+          "Caveats: " + "; ".join(g["caveats"]) + ".",
+          "", f"[Frozen summary](../../{SOURCES['f4_gf2_port']}), [report](../../{g['report']}).", ""]
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
         L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
@@ -2284,6 +2314,25 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{esc(w["index_equality"])}. End to end <code>{esc(e["spec"])}</code>: {e["arms"]} arms identical to the control '
              f'({e["rank_relations"]} relations, {e["targets_solved"]} targets solved). Caveats: '
              + esc("; ".join(w["caveats"])) + '.</p>' + gh(SOURCES["wide_producer"], 'Frozen summary') + '</section>')
+
+    g = doc["f4_gf2_port_component"]
+    ag = g["agreement"]
+    P.append('<section id="f4-gf2-port-20261018"><h2>Ported rank-indexed Boolean F4 kernel (engineering component)</h2>'
+             f'<p>Class <strong>{esc(g["class"])}</strong>: {esc(g["claim"])}. n = {g["n"]}, m = {g["m"]}, ell = {g["ell"]} '
+             f'({g["n_vars"]} variables), degree {g["degree"]}, {g["draws"]} draws, {esc(g["host"])}. '
+             'Outside Tables A–C; no ranked row moves.</p>'
+             '<div class="scroll"><table><thead><tr><th>Arm</th><th>Median ms</th><th>Min–max ms</th>'
+             '<th>Median word XORs</th><th>vs crate full</th></tr></thead><tbody>')
+    for a in g["arms"]:
+        P.append(f'<tr><td>{esc(a["label"])}</td><td>{a["median_ms"]:.1f}</td>'
+                 f'<td>{a["min_ms"]:.1f}–{a["max_ms"]:.1f}</td><td>{a["median_word_xors"]:,}</td>'
+                 f'<td>{a["speedup_vs_crate_full"]:.2f}x</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>Four runs: port F5 on is {esc(g["four_run_ranges"]["port_f5_on_vs_crate_full"])} the crate full path and '
+             f'{esc(g["four_run_ranges"]["port_f5_on_vs_crate_solver"])} the crate solver path. Agreement with '
+             f'<code>matrix_f4_f2</code>: {ag["koblitz_decomposition_comparisons"]} Koblitz comparisons '
+             f'({ag["refuted"]} refuted, {ag["forced"]} forced, {ag["undecided"]} undecided) plus random dense systems. Caveats: '
+             + esc("; ".join(g["caveats"])) + '.</p>' + gh(SOURCES["f4_gf2_port"], 'Frozen summary') + '</section>')
 
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '

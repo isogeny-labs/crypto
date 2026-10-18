@@ -268,6 +268,22 @@ Identity: KIC_VERIFY_INDEX identical at K=150 (1,642,500 states, 1,642,050 table
 [Frozen summary](../../benchmarks/20261018-wide-producer-engineering/summary.json), [report](../../docs/ic/perf/WIDE_PRODUCER_ENGINEERING_20261018.md).
 
 
+## Component: ported rank-indexed Boolean F4 kernel (engineering)
+
+Class **engineering**: kernel level: no end-to-end S, no rho claim, all 20 timed draws undecided. Cell n = 15, m = 3, ell = 5 (30 variables), degree 4, 20 draws, same test binary, 4-vCPU KVM guest, Xeon 2.80 GHz, no PMU, shared (L0). This panel is outside Tables A–C and moves no ranked row.
+
+| arm | median ms | min–max ms | median word XORs | vs crate full |
+|---|---:|---|---:|---:|
+| crate full readback (matrix_f4_f2_counted_with) | 199.5 | 175.0–253.1 | 154,963,841 | 1.00x |
+| crate solver path (SolverEngine::MatrixF4 call) | 396.7 | 368.9–420.7 | 64,342,540 | 0.50x |
+| port decide, F5 on | 35.6 | 33.5–55.7 | 57,472,744 | 5.61x |
+| port decide, F5 off | 40.1 | 37.5–85.5 | 68,746,716 | 4.98x |
+
+Four runs: port F5 on is 5.6-6.0x the crate full path and 10.4-11.2x the crate solver path. Agreement with `matrix_f4_f2`: 160 Koblitz comparisons (37 refuted, 73 forced, 50 undecided) plus random dense systems; rows bit-identical to matrix_f4_f2, decisions equal with F5 on and off, crate solver path decision equal. Caveats: kernel level: no end-to-end S, no rho claim; all 20 timed draws undecided, so the timing is a full degree-4 pass that finds nothing; decisive cases are covered by the agreement tests only; one cell and one degree; unisolated shared host; word-XOR counts are within 1.1x, so the gain is the rank-indexed build and absent readback, not the elimination; the port's counter is elimination only (F5 plan XORs not counted); default SolverEngine unchanged.
+
+[Frozen summary](../../benchmarks/20261018-f4-gf2-port/summary.json), [report](../../docs/ic/perf/F4_GF2_PORT_COMPARISON_20261018.md).
+
+
 ## Sources
 
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
@@ -295,6 +311,7 @@ Identity: KIC_VERIFY_INDEX identical at K=150 (1,642,500 states, 1,642,050 table
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ic_techniques_20261012/sixsum_extraction/resolvent_summary.json` — sha256 `307771287ae19521…`
 - `benchmarks/20261018-wide-producer-engineering/summary.json` — sha256 `1f63f91e5f62cc43…`
+- `benchmarks/20261018-f4-gf2-port/summary.json` — sha256 `a36b4262044654fb…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `765f6e8d05ebbf75…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
