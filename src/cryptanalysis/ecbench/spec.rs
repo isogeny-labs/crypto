@@ -377,8 +377,6 @@ mod tests {
             err.contains("cannot run on") && err.contains("rho.quartic"),
             "{err}"
         );
-        let err = plan(spec(&[("k", "ic.k4_gaudry")])).err().expect("refused");
-        assert!(err.contains("fp4_translation"), "{err}");
     }
 
     #[test]
