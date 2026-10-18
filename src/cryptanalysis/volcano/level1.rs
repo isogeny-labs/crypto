@@ -131,14 +131,13 @@ impl PrimeGen {
                 (self.search(xs, false, Q_HI), self.search(xs, false, Q_LO))
             };
             // right: x in [lo, hi); left: x in [lo, hi) with lo<hi after mirroring
-            let (a, b) = if self.side == 0 { (lo, hi) } else { (lo, hi) };
-            if a >= b {
+            if lo >= hi {
                 continue;
             }
-            // first x >= a with x ≡ 1 (mod ell)
-            let r = (1 - a).rem_euclid(self.ell);
-            self.x = a + r;
-            self.x_end = b;
+            // first x >= lo with x ≡ 1 (mod ell)
+            let r = (1 - lo).rem_euclid(self.ell);
+            self.x = lo + r;
+            self.x_end = hi;
             return;
         }
     }
@@ -244,7 +243,7 @@ pub fn eval_at_prime(d: i64, j0: i64, ell: u64, fr: Frob, seed: u64) -> Result<V
     let f = Mont::new(q);
     let t = 2 * fr.x + (d as i128) * fr.y;
     let n_ord = (q as i128 + 1 - t) as u64;
-    if n_ord % (ell * ell) != 0 {
+    if !n_ord.is_multiple_of(ell * ell) {
         return Err(format!("order {} not divisible by ell^2", n_ord));
     }
     let mut rng = Rng(seed ^ q ^ 0x9E37_79B9_7F4A_7C15);
@@ -253,7 +252,7 @@ pub fn eval_at_prime(d: i64, j0: i64, ell: u64, fr: Frob, seed: u64) -> Result<V
     // --- E[ell] basis ---
     let mut e = 0u32;
     let mut cof = n_ord;
-    while cof % ell == 0 {
+    while cof.is_multiple_of(ell) {
         cof /= ell;
         e += 1;
     }
@@ -372,7 +371,7 @@ pub fn eval_at_prime(d: i64, j0: i64, ell: u64, fr: Frob, seed: u64) -> Result<V
         num[s] = f.mul(c1728m, fa);
         den[s] = f.add(fa, f.mul(c27, f.mul(b2, b2)));
     }
-    if den.iter().any(|&v| v == 0) {
+    if den.contains(&0) {
         return Err("singular codomain".into());
     }
     f.batch_inv(&mut den, &mut scratch);
@@ -380,14 +379,12 @@ pub fn eval_at_prime(d: i64, j0: i64, ell: u64, fr: Frob, seed: u64) -> Result<V
     // --- product of (X - j') ---
     let mut c = vec![0u64; nsub + 1];
     c[0] = f.one();
-    let mut deg = 0usize;
-    for &r in &roots {
+    for (deg, &r) in roots.iter().enumerate() {
         c[deg + 1] = 0;
         for k in (1..=deg + 1).rev() {
             c[k] = f.sub(c[k - 1], f.mul(r, c[k]));
         }
         c[0] = f.neg(f.mul(r, c[0]));
-        deg += 1;
     }
     // c[nsub] must be 1 (monic)
     debug_assert_eq!(c[nsub], f.one());
@@ -429,7 +426,7 @@ pub fn phi_at_crater(
     progress: bool,
 ) -> Result<(Vec<BigInt>, Level1Report), String> {
     let j0 = class_one_j(d).ok_or("D must be a class-number-one fundamental discriminant")?;
-    if ell < 3 || ell % 2 == 0 || !is_prime_u64(ell) {
+    if ell < 3 || ell.is_multiple_of(2) || !is_prime_u64(ell) {
         return Err("ell must be an odd prime".into());
     }
     let start = Instant::now();

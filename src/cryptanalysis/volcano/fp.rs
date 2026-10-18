@@ -92,13 +92,13 @@ pub fn find_instance(
     let mut rng = Rng(seed | 1);
     let small_primes: Vec<u64> = (2..1230u64).filter(|&x| is_prime_u64(x)).collect();
     for _ in 0..2_000_000 {
-        let mut t = t_lo + (rng.next() as i128).rem_euclid((t_hi - t_lo).max(1));
+        let mut t = t_lo + (rng.next_u64() as i128).rem_euclid((t_hi - t_lo).max(1));
         t += (r0 - t).rem_euclid(modulus);
         if t >= t_hi || (t - f * dd).rem_euclid(2) != 0 {
             continue;
         }
         let p = (t * t - dd * f * f) / 4;
-        if p < 7 || p >= (1i128 << 62) || p % ell as i128 == 0 || t % p == 0 {
+        if !(7..(1i128 << 62)).contains(&p) || p % ell as i128 == 0 || t % p == 0 {
             continue;
         }
         let p = p as u64;
@@ -109,7 +109,7 @@ pub fn find_instance(
             let mut n = (p as i128 + 1 - t) as u64;
             let mut smooth_bits = 0u32;
             for &q in &small_primes {
-                while n % q == 0 {
+                while n.is_multiple_of(q) {
                     n /= q;
                     smooth_bits += 64 - q.leading_zeros() - 1;
                 }
@@ -271,7 +271,7 @@ pub fn group_order_factors(n: u64) -> Vec<(u64, u32)> {
 fn point_order(ec: &Ec, p: Pt, n: u64, fac: &[(u64, u32)]) -> u64 {
     let mut o = n;
     for &(q, _) in fac {
-        while o % q == 0 && ec.mul(o / q, p).is_none() {
+        while o.is_multiple_of(q) && ec.mul(o / q, p).is_none() {
             o /= q;
         }
     }
@@ -299,7 +299,7 @@ pub fn group_structure(
         let o = point_order(ec, p, n, fac);
         e = e / gcd64(e, o) * o;
     }
-    if n % e != 0 || e % (n / e) != 0 {
+    if !n.is_multiple_of(e) || !e.is_multiple_of(n / e) {
         return Err("exponent too small or group not 2-generated".into());
     }
     Ok((n / e, e))
@@ -344,7 +344,7 @@ fn walk_len(ctx: &Ctx, start: u64, prev: u64, rng: &mut Rng, cap: u32) -> Option
             return Some(n);
         }
         let total: u32 = av.iter().map(|x| x.1).sum();
-        let mut pick = (rng.next() % total as u64) as u32;
+        let mut pick = (rng.next_u64() % total as u64) as u32;
         let mut next = av[0].0;
         for (r, e) in &av {
             if pick < *e {
@@ -453,7 +453,7 @@ pub fn random_descent(
         if total == 0 {
             return Err(format!("dead end at level {}", l - 1));
         }
-        let mut pick = (rng.next() % total as u64) as u32;
+        let mut pick = (rng.next_u64() % total as u64) as u32;
         let mut next = av[0].0;
         for &(r, e) in &av {
             if pick < e {
@@ -507,8 +507,8 @@ pub fn vertex_curve(
     let g = loop {
         let p = ec.random_point(rng);
         let q = ec.mul(cof, p);
-        if q.is_some() {
-            break q.unwrap();
+        if let Some(q) = q {
+            break q;
         }
     };
     let f = ec.f;

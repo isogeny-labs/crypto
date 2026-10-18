@@ -26,12 +26,12 @@ pub fn is_irreducible(f: &F2Poly, n: usize) -> bool {
     let mut m = n;
     let mut p = 2;
     while m > 1 {
-        if m % p == 0 {
+        if m.is_multiple_of(p) {
             let g = f.gcd(&sq[n / p].add(&F2Poly::x()));
             if !g.is_one() {
                 return false;
             }
-            while m % p == 0 {
+            while m.is_multiple_of(p) {
                 m /= p;
             }
         }

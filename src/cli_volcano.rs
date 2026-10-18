@@ -942,7 +942,7 @@ fn cmd_explore(
             if checked >= verify {
                 break 'outer;
             }
-            let j = js[(rng.next() as usize) % js.len()];
+            let j = js[(rng.next_u64() as usize) % js.len()];
             let ec = fp::curve_of(&inst, j, &mut rng).unwrap_or_else(|e| die(&e));
             let got = fp::group_structure(&ec, n, &fac, &mut rng).unwrap_or_else(|e| die(&e));
             let want = fp::predicted_structure(&inst, l).unwrap_or_else(|e| die(&e));
@@ -1142,7 +1142,7 @@ fn cmd_sample(
         let take = per_level.min(pool.len());
         let mut pick = Vec::new();
         for _ in 0..take {
-            let i = (rng.next() as usize) % pool.len();
+            let i = (rng.next_u64() as usize) % pool.len();
             pick.push(pool.swap_remove(i));
         }
         chosen.insert(l, pick);

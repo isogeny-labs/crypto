@@ -338,7 +338,7 @@ pub fn rational_factors(f: &F2Poly, n: usize) -> RationalFactors {
     let mut leftover = 0usize;
     for (g, mult) in squarefree(f) {
         for (prod, d) in ddf(&g, n) {
-            if d != 0 && n % d == 0 {
+            if d != 0 && n.is_multiple_of(d) {
                 for irr in edf(&prod, d, &mut rng) {
                     factors.push((irr, d, mult));
                 }
