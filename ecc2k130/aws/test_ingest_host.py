@@ -145,7 +145,7 @@ esac
         self.assertNotIn("cannot support a service-period claim", result.stderr)
         unit = (self.root / "user-data").read_text()
         args = (self.root / "run-args").read_text()
-        self.assertIn("/opt/rho-ingest/operator.py --replica-id %H", unit)
+        self.assertIn("/opt/rho-ingest/cairn_ingest_operator.py --replica-id %H", unit)
         self.assertIn("--period-seconds 600 --", unit)
         self.assertIn("dp_ingest.py --replica-id %H", unit)
         self.assertIn("ExecStopPost=/usr/local/bin/rho-ingest-logship", unit)

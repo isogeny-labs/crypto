@@ -206,7 +206,9 @@ OPERATOR_SHA=
 if [ "$PAID_SERVICE" = 1 ]; then
     OPERATOR_SHA=$(sha256sum "$INGEST_OPERATOR_PATH" | cut -c1-16)
     aws s3 cp "$INGEST_OPERATOR_PATH" "s3://$BUCKET/ingest/$SHA/operator-$OPERATOR_SHA.py" --only-show-errors
-    EXEC_START="/opt/rho-ingest/venv/bin/python3 /opt/rho-ingest/operator.py --replica-id %H --evidence-dir /var/lib/rho-ingest/evidence --status-url https://$STATUS_BUCKET.s3.$REGION.amazonaws.com/status.json --period-seconds $PERIOD_SECONDS -- /opt/rho-ingest/venv/bin/python3 /opt/rho-ingest/dp_ingest.py --replica-id %H --bucket $BUCKET --status-bucket $STATUS_BUCKET --threads $THREADS --metric-namespace ECC2K130/Ingest"
+    # `operator.py` in the ingester's module directory shadows Python's
+    # standard-library operator module, including during venv/pip startup.
+    EXEC_START="/opt/rho-ingest/venv/bin/python3 /opt/rho-ingest/cairn_ingest_operator.py --replica-id %H --evidence-dir /var/lib/rho-ingest/evidence --status-url https://$STATUS_BUCKET.s3.$REGION.amazonaws.com/status.json --period-seconds $PERIOD_SECONDS -- /opt/rho-ingest/venv/bin/python3 /opt/rho-ingest/dp_ingest.py --replica-id %H --bucket $BUCKET --status-bucket $STATUS_BUCKET --threads $THREADS --metric-namespace ECC2K130/Ingest"
     STOP_POST=ExecStopPost=/usr/local/bin/rho-ingest-logship
     EVIDENCE_SHIP="aws s3 sync /var/lib/rho-ingest/evidence/ s3://$BUCKET/logs/rho-ingest-\${IID}/evidence/ --exclude current-period.json --exclude operator.lock --only-show-errors"
     echo "published Cairn operator $OPERATOR_SHA; period ${PERIOD_SECONDS}s"
@@ -235,8 +237,8 @@ got=\$(sha256sum /opt/rho-ingest/dp_ingest.py | cut -c1-16)
 [ "\$got" = "$SHA" ] || { echo "ingest digest \$got != $SHA; refusing to run"; exit 1; }
 
 if [ "$PAID_SERVICE" = 1 ]; then
-    aws s3 cp "s3://$BUCKET/ingest/$SHA/operator-$OPERATOR_SHA.py" /opt/rho-ingest/operator.py
-    got=\$(sha256sum /opt/rho-ingest/operator.py | cut -c1-16)
+    aws s3 cp "s3://$BUCKET/ingest/$SHA/operator-$OPERATOR_SHA.py" /opt/rho-ingest/cairn_ingest_operator.py
+    got=\$(sha256sum /opt/rho-ingest/cairn_ingest_operator.py | cut -c1-16)
     [ "\$got" = "$OPERATOR_SHA" ] || { echo "Cairn operator digest \$got != $OPERATOR_SHA; refusing to run"; exit 1; }
     install -d -m 700 /var/lib/rho-ingest/evidence
 fi
