@@ -1084,8 +1084,6 @@ pub fn run_k4_d4_pipeline(
 ) -> Result<K4PipelineReport, String> {
     let start = Instant::now();
     let inst = generate_translation_instance(p, seed, 4)?;
-    let n = inst.n;
-    let curve = inst.curve();
     let mut rng = StdRng::seed_from_u64(seed ^ 0xE19D_4A11);
     let fb = folded_base(&inst, &mut rng)?;
     let base = &fb.points;
@@ -1115,7 +1113,59 @@ pub fn run_k4_d4_pipeline(
         c.f.muls() as f64 / 64.0
     };
 
-    let mut folded = Arm::new("d4-folded", fb.columns);
+    collect_and_solve(
+        &inst,
+        &fb,
+        seed,
+        rho_runs,
+        max_residuals,
+        &mut rng,
+        MACAULAY_BOUND,
+        "d4-folded",
+        Setup {
+            precompute_muls: pre.precompute_muls,
+            base_muls,
+            fp_muls_per_add,
+            start,
+        },
+        &|r: &Pt4, tseed: u64| d4_decompose(&inst, &pre, base, &by_y, r, tseed),
+    )
+}
+
+/// What the instance's set-up cost, carried into the report.
+struct Setup {
+    precompute_muls: u64,
+    base_muls: u64,
+    fp_muls_per_add: f64,
+    start: Instant,
+}
+
+/// The relation phase, the solve and the walks shared by E19 and E24: targets
+/// drawn in parallel batches, each decomposed by `decompose`, one verified
+/// decomposition per target as a folded row, Wiedemann until `[d]G = Q`.
+#[allow(clippy::too_many_arguments)]
+fn collect_and_solve(
+    inst: &FoldInstance4,
+    fb: &FoldedBase4,
+    seed: u64,
+    rho_runs: usize,
+    max_residuals: u64,
+    rng: &mut StdRng,
+    bound: u16,
+    arm: &str,
+    setup: Setup,
+    decompose: &(dyn Fn(&Pt4, u64) -> TargetOut + Sync),
+) -> Result<K4PipelineReport, String> {
+    let (p, n) = (inst.p, inst.n);
+    let curve = inst.curve();
+    let base = &fb.points;
+    let Setup {
+        precompute_muls,
+        base_muls,
+        fp_muls_per_add,
+        start,
+    } = setup;
+    let mut folded = Arm::new(arm, fb.columns);
     let mut unsolved_outcomes = std::collections::BTreeMap::new();
     let mut per_target = [0u64; 10];
     let mut calls: Vec<u64> = Vec::new();
@@ -1141,7 +1191,7 @@ pub fn run_k4_d4_pipeline(
             .map(|&(a, b, tseed)| {
                 let c = inst.curve();
                 let r = c.add(&c.mul(&inst.g, a), &c.mul(&inst.q, b));
-                let mut o = d4_decompose(&inst, &pre, base, &by_y, &r, tseed);
+                let mut o = decompose(&r, tseed);
                 o.a = a;
                 o.b = b;
                 o.gen_muls = c.f.muls();
@@ -1172,7 +1222,7 @@ pub fn run_k4_d4_pipeline(
                 unsolved += 1;
                 *unsolved_outcomes.entry(o.outcome.clone()).or_insert(0u64) += 1;
             }
-            if o.degree > MACAULAY_BOUND {
+            if o.degree > bound {
                 reruns += 1;
             }
             per_target[o.decs.len().min(9)] += 1;
@@ -1210,7 +1260,7 @@ pub fn run_k4_d4_pipeline(
             cols.push((folded.small, (n - o.b) % n));
             cols.sort_unstable();
             folded.push(SparseRel { cols, rhs: o.a });
-            folded.attempt(&inst, &curve, &mut rng, residuals);
+            folded.attempt(inst, &curve, rng, residuals);
         }
     }
     if !folded.rep.solved {
@@ -1224,7 +1274,7 @@ pub fn run_k4_d4_pipeline(
         .collect();
     let rho: Vec<RhoRun4F> = jobs
         .par_iter()
-        .map(|&(f, s)| rho4_folded(&inst, f, s))
+        .map(|&(f, s)| rho4_folded(inst, f, s))
         .collect();
     let mean = |fold: RhoFold, steps: bool| -> f64 {
         let w: Vec<&RhoRun4F> = rho.iter().filter(|w| w.fold == fold).collect();
@@ -1235,7 +1285,7 @@ pub fn run_k4_d4_pipeline(
     };
     let rho_matched_muls = mean(RhoFold::Negation, false);
     let la_fp_muls = 16 * folded.rep.la_ops;
-    let total_muls = pre.precompute_muls
+    let total_muls = precompute_muls
         + base_muls
         + gen_muls
         + weil_muls
@@ -1266,7 +1316,7 @@ pub fn run_k4_d4_pipeline(
         rows_readded,
         rows_readd_failures,
         call: CallStats::of(calls),
-        precompute_muls: pre.precompute_muls,
+        precompute_muls: precompute_muls,
         base_muls,
         generation_muls: gen_muls,
         weil_muls,
@@ -1627,6 +1677,182 @@ pub fn run_klein_stage_a(p: u64, seed: u64, max_residuals: u64) -> Result<KleinS
         folded: folded.rep,
         wall_ms: start.elapsed().as_secs_f64() * 1e3,
     })
+}
+
+/// [`d4_decompose`] on the `V₄` line: Weil restriction in
+/// `(e₂, e₃, P₁, P₂)`, the weighted solve at degree 11, the lift-back, and
+/// each `z`-quadruple mapped to base points (`by_z`) with its signs fixed by
+/// a group check against `r` itself.
+fn v4_decompose(
+    ki: &KleinInstance,
+    pre: &super::klein_v4::SymmetrisedV4,
+    base: &[Pt4],
+    by_z: &HashMap<u64, usize>,
+    r: &Pt4,
+    tseed: u64,
+) -> TargetOut {
+    use super::klein_v4 as kv;
+    let mut trng = StdRng::seed_from_u64(tseed);
+    let curve = ki.inst.curve();
+    let c = &curve;
+    let mut st = QuarticSolve::default();
+    let empty = |st: QuarticSolve| TargetOut {
+        a: 0,
+        b: 0,
+        r: *r,
+        solved: false,
+        outcome: st.outcome.clone(),
+        degree: kv::MACAULAY_BOUND,
+        rational: 0,
+        call_muls: st.total_muls,
+        gen_muls: 0,
+        weil_muls: st.weil_muls,
+        lift_muls: 0,
+        check_muls: 0,
+        entries: 0,
+        ms: 0.0,
+        lifted: 0,
+        off_base: 0,
+        failures: 0,
+        decs: Vec::new(),
+    };
+    let before = c.f.muls();
+    let Some(z_r) = ki.z_of_x(&c.f, &r.x) else {
+        st.weil_muls = c.f.muls() - before;
+        st.total_muls = st.weil_muls;
+        st.outcome = "z(R) = ∞".into();
+        return empty(st);
+    };
+    let mut fp = 0u64;
+    let comps = kv::v4_system(pre, &c.f, &z_r, &mut fp);
+    st.weil_muls = c.f.muls() - before + fp;
+    let (sols, degree) = kv::solve_weighted_traced(
+        &comps,
+        kv::MACAULAY_BOUND,
+        ki.inst.p,
+        &mut trng,
+        &mut st,
+        true,
+        false,
+        None,
+        None,
+    );
+    let solved = sols.is_some();
+    let sols = sols.unwrap_or_default();
+    let lb = kv::lift_back_v4(ki, c, &sols, r, &mut trng);
+    let before = c.f.muls();
+    let (mut off, mut failures) = (0usize, 0usize);
+    let mut decs = Vec::new();
+    for zs in &lb.decompositions {
+        let idx: Option<Vec<usize>> = zs.iter().map(|z| by_z.get(z).copied()).collect();
+        let Some(idx) = idx else {
+            off += 1;
+            continue;
+        };
+        let pts: [Pt4; 4] = core::array::from_fn(|i| base[idx[i]]);
+        let mut hit = None;
+        for s in 0..8u32 {
+            let sign = |i: usize| -> i64 {
+                if i > 0 && s >> (i - 1) & 1 == 1 {
+                    -1
+                } else {
+                    1
+                }
+            };
+            let mut acc = pts[0];
+            for (i, q) in pts.iter().enumerate().skip(1) {
+                acc = if sign(i) == 1 {
+                    c.add(&acc, q)
+                } else {
+                    c.sub(&acc, q)
+                };
+            }
+            if !acc.inf && acc.x == r.x {
+                let flip = if acc.y == r.y { 1 } else { -1 };
+                hit = Some(core::array::from_fn(|i| (idx[i], flip * sign(i))));
+                break;
+            }
+        }
+        match hit {
+            Some(d) => decs.push(d),
+            None => failures += 1,
+        }
+    }
+    TargetOut {
+        a: 0,
+        b: 0,
+        r: *r,
+        solved,
+        outcome: st.outcome.clone(),
+        degree,
+        rational: sols.len(),
+        call_muls: st.total_muls,
+        gen_muls: 0,
+        weil_muls: st.weil_muls,
+        lift_muls: lb.muls,
+        check_muls: c.f.muls() - before,
+        entries: st.rows as u64 * st.cols as u64,
+        ms: st.total_ms,
+        lifted: lb.decompositions.len(),
+        off_base: off,
+        failures,
+        decs,
+    }
+}
+
+/// E24 (§9.13): the `k = 4` index calculus end to end on the `V₄` line —
+/// E19's protocol with [`generate_klein_instance`], [`klein_base`] and
+/// `klein_v4`'s solve at weighted degree 11.
+pub fn run_k4_v4_pipeline(
+    p: u64,
+    seed: u64,
+    rho_runs: usize,
+    max_residuals: u64,
+) -> Result<K4PipelineReport, String> {
+    let start = Instant::now();
+    let ki = generate_klein_instance(p, seed, 16)?;
+    let inst = ki.inst;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0xE24A_4B1E);
+    let fb = klein_base(&ki, &mut rng)?;
+    let base = &fb.points;
+    let pcurve = inst.curve();
+    let pre = super::klein_v4::SymmetrisedV4::precompute(&ki, &pcurve, &mut rng, 8)?;
+    // z of every base point, for the map back from the lift; charged.
+    let zc = inst.curve();
+    let mut by_z: HashMap<u64, usize> = HashMap::new();
+    for (i, pt) in base.iter().enumerate() {
+        let z = ki
+            .z_of_x(&zc.f, &pt.x)
+            .filter(|z| z.in_fp())
+            .ok_or("a base point's z is not in F_p")?;
+        by_z.insert(z.0[0], i);
+    }
+    let base_muls = fb.build_muls + zc.f.muls();
+    let fp_muls_per_add = {
+        let c = inst.curve();
+        let mut acc = base[0];
+        for _ in 0..64 {
+            acc = c.add(&acc, &base[1]);
+        }
+        c.f.muls() as f64 / 64.0
+    };
+    collect_and_solve(
+        &inst,
+        &fb,
+        seed,
+        rho_runs,
+        max_residuals,
+        &mut rng,
+        super::klein_v4::MACAULAY_BOUND,
+        "v4-folded",
+        Setup {
+            precompute_muls: pre.precompute_muls,
+            base_muls,
+            fp_muls_per_add,
+            start,
+        },
+        &|r: &Pt4, tseed: u64| v4_decompose(&ki, &pre, base, &by_z, r, tseed),
+    )
 }
 
 #[cfg(test)]
