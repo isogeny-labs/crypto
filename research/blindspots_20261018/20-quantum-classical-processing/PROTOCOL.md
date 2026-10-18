@@ -159,7 +159,7 @@ includes that file with `#[path]`). Built with a standalone `rustc` invocation
   shortcut through the additive structure is taken (the search sees `g`, `x`
   and equality tests only). `r` is the **largest prime below `2^m`**
   (the shape of both curves' group orders); a sensitivity arm uses the
-  smallest prime above `2^(m-1) + 1` (the shape the paper finds worst).
+  smallest prime above `2^(m-1) + 1` (the other extreme of the 60-82% range, see Amendment 1).
   `d` is redrawn every 20 runs.
 * **Model rows** (`--mode model`) print every arm above at every band point,
   with the mechanical verdict of the rule below.
@@ -213,7 +213,7 @@ includes that file with `#[path]`). Built with a standalone `rustc` invocation
    cell, the actual BSGS search and the closed criterion give the same answer
    (zero mismatches).
 5. **Sensitivity to `r`.** One cell family repeats the grid at the
-   worst-shape prime; the headline uses the curve-shaped prime.
+   other-extreme prime (Amendment 1); the headline uses the curve-shaped prime.
 
 ## Cells (frozen)
 
@@ -230,7 +230,7 @@ counted cost of the actual search on 100 verified runs at
 | S12 | 12 | 0, 1, 2, 4, 7 | 0, -2 | curve-shaped | 4000 |
 | S16 | 16 | 0, 2, 4, 7 | 0, -2, -4 | curve-shaped | 1500 |
 | S20 | 20 | 0, 2, 4 | 0 | curve-shaped | 600 |
-| S16w | 16 | 0, 7 | 0 | worst-shape | 1500 |
+| S16w | 16 | 0, 7 | 0 | other-extreme | 1500 |
 
 **L (several runs, lattice).** `s in {2, 3}`, `sigma in {4, 7}`, `ell =
 ceil(m/s)`, `n_max = s + 3` runs, every subset of size `>= s` tried in order of
@@ -315,3 +315,46 @@ the end of its card.
 `raw/receipt-card-NN.json`, `raw/*.jsonl` (one record per cell and grid point,
 and the model rows), `raw/*.log`. The README, graph and PDF are the
 assessment stage's.
+
+## Amendments made after the first commit and before any measured run
+
+The instrument was written and smoke-tested (selftest, and every mode and
+cell at 3-40 runs) after this protocol was first committed. Nothing below
+loosens a gate, a control or the decision rule; each item replaces the text
+it names. No measured card existed when they were made.
+
+1. **"Worst-shape" prime.** The smoke run shows the curve-shaped prime (just
+   below `2^m`, the shape of both group orders) gives the *low* end of
+   Ekerå's 60-82% single-run range (`0.58` at `m = 16`, `sigma = 0`), and the
+   prime just above `2^(m-1)` the *high* end (`~0.8`). Cell family S16w and
+   "Sensitivity to `r`" (control 5) are therefore the **other extreme of the
+   range**, not the worst case; the headline stays on the curve-shaped prime.
+2. **Search work formula.** The one in "Unit" is replaced by the code's
+   `prime_shor::single_run_search_work` (worst case, every `eta` scanned, no
+   early exit): with `W = 2 Bt + 1`, `q = ceil(sqrt(W))`, `G = (q - 1) + 1 +
+   (2 B_eta + 1)(3 m + 1 + ceil(W/q)) + 1.5 m`, `N = q + (2 B_eta + 1)
+   ceil(W/q)`. The measured mean includes the early exit at the right `eta`,
+   so for `B_eta > 0` it is below the formula; both and their ratio are
+   printed.
+3. **Cell sizes.** S12: 10000 runs per cell. S16 is split in two invocations,
+   `nu = 0` (all four `sigma`, 4000 runs; this one carries the positive-
+   control gate, which needs `sigma = 0` and `sigma = 7` with `nu = 0` in the
+   same invocation) and `nu in {-2, -4}` (2000 runs). S20: 500 runs per cell.
+   The lattice cells at `m = 20` use `sigma = 4` only (`sigma = 7` would need
+   a `2^27`-entry table; the cap is `2^24`); `m = 12, 16` use `sigma in
+   {4, 7}`. 400 trials per lattice cell.
+4. **Selftest gates as built:** the sampler is checked against brute force on
+   `(r, sigma, ell) = (29, 1, 4), (31, 2, 3), (13, 0, 4)`; the BSGS gate
+   compares the counted additions with the pure BSGS part of the formula (no
+   per-`eta` scalar multiplications); a sixth gate runs the actual search and
+   the closed criterion on 150 runs at `m = 10` and requires zero mismatches.
+   A zero-probability `u` or class `e` (where an exact sampler has nothing to
+   sample) is skipped, not renormalised.
+5. **A0p** takes the **upper** Wilson bound of `p0` (the side that favours the
+   baseline and so is the harder comparison for the candidate arms); the
+   candidate arms take the lower bounds, as stated.
+6. **Positive-control gate** is evaluated only for the curve-shaped prime at
+   `m = 16` (it is printed as `"na"` elsewhere). The "monotone in `sigma` and
+   `B_Delta`" gate allows two standard errors.
+7. **Per-run lattice cost** columns are means over a whole trial up to its
+   stopping run, so they repeat on every `runs` row of one cell.
