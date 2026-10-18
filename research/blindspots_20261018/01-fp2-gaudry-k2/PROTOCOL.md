@@ -149,8 +149,8 @@ column's unit point. The answer is accepted only when `[d]G = Q`.
 
 ## Targets, controls, cross-checks
 
-* **Targets.** Index-calculus arms: targets 0 and 1 of every curve at
-  `bits ≤ 32` and target 0 at 36 and 40. Rho: targets 0 to 7 of every curve at
+* **Targets.** Index-calculus arms: targets 0 and 1 of every curve at every
+  size. Rho: targets 0 to 7 of every curve at
   every size. A target is a planted `d` drawn from the curve and the target
   index; the arm sees only `G` and `Q = [d]G`. Targets are walk points
   `R = [a]G + [b]Q` (one addition each, a fresh random start every 64 targets);
@@ -210,8 +210,8 @@ and `rho-neg` as well):
 
 * One thread per job, `prlimit --as=4294967296`, one `rustc` build a card (about
   10 s). Every card's command timeouts sum to at most 540 s.
-* Measured work expected about 0.4 CPU-hour (limit 2): at 40 bits an
-  index-calculus run is about 7 to 50 s a curve and arm; the control's full
+* Measured work expected about 0.35 CPU-hour (limit 2): at 40 bits the four
+  torsion-family arms and rho take about 80 s a curve for two targets; the control's full
   solves are cut at 28 bits because their cost grows as `p²` (a 32-bit full
   control took 236 s in a development probe).
 * No GPU, no external solver; msolve, Magma and Sage are not used (the
@@ -246,7 +246,7 @@ before any card ran.
 
 Tightenings:
 
-1. Targets: 2 a curve (IC) at `bits ≤ 32`, 8 a curve (rho) at every size,
+1. Targets: 2 a curve (IC) and 8 a curve (rho) at every size,
    against the design's one: the extra targets are cheap and reduce the noise
    of a first-dependency stop. The curve stays the unit of replication.
 2. Curves: 6 torsion-family (cofactor 4) + 3 prime-order + 3 GLS a size. The
