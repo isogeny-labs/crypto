@@ -1404,15 +1404,33 @@
     "relation": 1.0060948619413823,
     "sat": 1.0002286869932158
    }
+  },
+  {
+   "rev": "3c192c34c6148620e9eb1d3dc962b9a6fe42915d",
+   "committed_at": "2026-10-18T09:23:26-07:00",
+   "subject": "Merge pull request #2171 from aburan28/claude/inherited-f4-replay-determinism",
+   "overall": 1.1320276283695294,
+   "areas": {
+    "bool_gb": 1.0466547923924225,
+    "dlp": 0.9905257792475574,
+    "ecbench": 1.9111696019827185,
+    "field_ec": 1.0735363568166607,
+    "fp_gb": 1.1516522108016882,
+    "gf2_la": 1.2191325588011603,
+    "ic_factor_base": 0.9999191789667269,
+    "pdp": 1.015822705268123,
+    "relation": 1.006093874507185,
+    "sat": 1.0002286869932158
+   }
   }
  ],
  "kernels": {
   "bool_gb/crossbred_m2_n23": {
    "area": "bool_gb",
-   "latest_ir": 686839439,
-   "latest_wall_ns": 68665429,
+   "latest_ir": 686848814,
+   "latest_wall_ns": 84815005,
    "factor_base": null,
-   "index": 0.9936641422246572,
+   "index": 0.993650579412662,
    "series_ir": [
     682487722,
     683319846,
@@ -1491,16 +1509,17 @@
     686860736,
     686833636,
     686844228,
-    686839439
+    686839439,
+    686848814
    ],
    "rebased_at": []
   },
   "bool_gb/f4_basis_m2_n17": {
    "area": "bool_gb",
-   "latest_ir": 1540776714,
-   "latest_wall_ns": 102640680,
+   "latest_ir": 1540776700,
+   "latest_wall_ns": 134165078,
    "factor_base": null,
-   "index": 0.9744986949484743,
+   "index": 0.9744987038030875,
    "series_ir": [
     1501484897,
     1501358353,
@@ -1579,16 +1598,17 @@
     1540795608,
     1540776784,
     1540776756,
-    1540776714
+    1540776714,
+    1540776700
    ],
    "rebased_at": []
   },
   "bool_gb/f4_basis_random_n18": {
    "area": "bool_gb",
-   "latest_ir": 1610976819,
-   "latest_wall_ns": 100199336,
+   "latest_ir": 1610976835,
+   "latest_wall_ns": 132547110,
    "factor_base": null,
-   "index": 0.9751183967843303,
+   "index": 0.9751183870995888,
    "series_ir": [
     1570893133,
     1570541776,
@@ -1667,14 +1687,15 @@
     1610971019,
     1610976805,
     1610976819,
-    1610976819
+    1610976819,
+    1610976835
    ],
    "rebased_at": []
   },
   "bool_gb/fes_gray_m2_n23": {
    "area": "bool_gb",
    "latest_ir": 321420860,
-   "latest_wall_ns": 19449574,
+   "latest_wall_ns": 24235335,
    "factor_base": null,
    "index": 1.0000078090762372,
    "series_ir": [
@@ -1755,6 +1776,7 @@
     321420764,
     321420860,
     321420860,
+    321420860,
     321420860
    ],
    "rebased_at": []
@@ -1762,7 +1784,7 @@
   "bool_gb/fes_gray_random_n28": {
    "area": "bool_gb",
    "latest_ir": 2567071311,
-   "latest_wall_ns": 154578993,
+   "latest_wall_ns": 192907152,
    "factor_base": null,
    "index": 1.0000001262138682,
    "series_ir": [
@@ -1843,6 +1865,7 @@
     2567071323,
     2567071311,
     2567071311,
+    2567071311,
     2567071311
    ],
    "rebased_at": []
@@ -1850,7 +1873,7 @@
   "bool_gb/fes_moebius_random_n22": {
    "area": "bool_gb",
    "latest_ir": 165638306,
-   "latest_wall_ns": 11000210,
+   "latest_wall_ns": 26167629,
    "factor_base": null,
    "index": 0.9746949959751462,
    "series_ir": [
@@ -1931,6 +1954,7 @@
     143539302,
     165638306,
     165638306,
+    165638306,
     165638306
    ],
    "rebased_at": []
@@ -1938,7 +1962,7 @@
   "bool_gb/fes_monica_random_n25": {
    "area": "bool_gb",
    "latest_ir": 501564132,
-   "latest_wall_ns": 117807072,
+   "latest_wall_ns": 146301585,
    "factor_base": null,
    "index": 0.9506636750492355,
    "series_ir": [
@@ -2019,6 +2043,7 @@
     501558436,
     501564132,
     501564132,
+    501564132,
     501564132
    ],
    "rebased_at": []
@@ -2026,7 +2051,7 @@
   "bool_gb/fes_wide_random_n30": {
    "area": "bool_gb",
    "latest_ir": 2051511216,
-   "latest_wall_ns": 250056666,
+   "latest_wall_ns": 188328081,
    "factor_base": null,
    "index": 0.9999999999999998,
    "series_ir": [
@@ -2107,6 +2132,7 @@
     2051511119,
     2051511216,
     2051511216,
+    2051511216,
     2051511216
    ],
    "rebased_at": []
@@ -2114,7 +2140,7 @@
   "bool_gb/matrix_f4_deg3_m3_n23": {
    "area": "bool_gb",
    "latest_ir": 214602499,
-   "latest_wall_ns": 20475428,
+   "latest_wall_ns": 25643818,
    "factor_base": null,
    "index": 1.337670308303353,
    "series_ir": [
@@ -2195,6 +2221,7 @@
     214397607,
     214602499,
     214602499,
+    214602499,
     214602499
    ],
    "rebased_at": []
@@ -2202,7 +2229,7 @@
   "bool_gb/matrix_f4_deg4_m2_n23": {
    "area": "bool_gb",
    "latest_ir": 679449938,
-   "latest_wall_ns": 75312032,
+   "latest_wall_ns": 93514055,
    "factor_base": null,
    "index": 1.2666626941395058,
    "series_ir": [
@@ -2283,6 +2310,7 @@
     679198639,
     679449938,
     679449938,
+    679449938,
     679449938
    ],
    "rebased_at": []
@@ -2290,7 +2318,7 @@
   "bool_gb/matrix_f4_deg4_m3_n15": {
    "area": "bool_gb",
    "latest_ir": 776003645,
-   "latest_wall_ns": 78636791,
+   "latest_wall_ns": 106153997,
    "factor_base": null,
    "index": 1.2273946806010176,
    "series_ir": [
@@ -2371,6 +2399,7 @@
     775816559,
     776003645,
     776003645,
+    776003645,
     776003645
    ],
    "rebased_at": []
@@ -2378,7 +2407,7 @@
   "bool_gb/matrix_f5_deg4_m2_n23": {
    "area": "bool_gb",
    "latest_ir": 690825106,
-   "latest_wall_ns": 82143607,
+   "latest_wall_ns": 100589120,
    "factor_base": null,
    "index": 1.110180365969502,
    "series_ir": [
@@ -2459,6 +2488,7 @@
     690798036,
     690826836,
     690826836,
+    690825106,
     690825106
    ],
    "rebased_at": []
@@ -2466,7 +2496,7 @@
   "bool_gb/solve_inherited_m2_n23": {
    "area": "bool_gb",
    "latest_ir": 1550847858,
-   "latest_wall_ns": 124412632,
+   "latest_wall_ns": 148596136,
    "factor_base": null,
    "index": 0.9956235208439042,
    "series_ir": [
@@ -2547,6 +2577,7 @@
     1560265025,
     1550847858,
     1550847858,
+    1550847858,
     1550847858
    ],
    "rebased_at": [
@@ -2556,7 +2587,7 @@
   "bool_gb/solve_inherited_m3_n15": {
    "area": "bool_gb",
    "latest_ir": 383810324,
-   "latest_wall_ns": 37672221,
+   "latest_wall_ns": 46326221,
    "factor_base": null,
    "index": 1.0221672200236167,
    "series_ir": [
@@ -2637,6 +2668,7 @@
     385219760,
     383810324,
     383810339,
+    383810324,
     383810324
    ],
    "rebased_at": [
@@ -2646,7 +2678,7 @@
   "bool_gb/solve_matrixf4_m2_n17": {
    "area": "bool_gb",
    "latest_ir": 1787980091,
-   "latest_wall_ns": 145608792,
+   "latest_wall_ns": 182413812,
    "factor_base": null,
    "index": 1.079983613754902,
    "series_ir": [
@@ -2727,6 +2759,7 @@
     1787129943,
     1787980091,
     1787980091,
+    1787980091,
     1787980091
    ],
    "rebased_at": []
@@ -2734,7 +2767,7 @@
   "bool_gb/solve_matrixf5_m2_n17": {
    "area": "bool_gb",
    "latest_ir": 1807674211,
-   "latest_wall_ns": 147871299,
+   "latest_wall_ns": 185142807,
    "factor_base": null,
    "index": 1.0804540885271277,
    "series_ir": [
@@ -2815,16 +2848,17 @@
     1807393178,
     1808180618,
     1808180618,
+    1807674211,
     1807674211
    ],
    "rebased_at": []
   },
   "bool_gb/wide_found_m5_n15": {
    "area": "bool_gb",
-   "latest_ir": 1979246806,
-   "latest_wall_ns": 204130950,
+   "latest_ir": 1979244100,
+   "latest_wall_ns": 247650113,
    "factor_base": null,
-   "index": 0.9987871477206769,
+   "index": 0.9987885132510941,
    "series_ir": [
     1976846272,
     1977874338,
@@ -2903,16 +2937,17 @@
     1973204954,
     1979246003,
     1979249795,
-    1979246806
+    1979246806,
+    1979244100
    ],
    "rebased_at": []
   },
   "bool_gb/wide_mixed_m4_n15": {
    "area": "bool_gb",
-   "latest_ir": 2386107908,
-   "latest_wall_ns": 243234719,
+   "latest_ir": 2386109603,
+   "latest_wall_ns": 300276210,
    "factor_base": null,
-   "index": 0.9985262539937073,
+   "index": 0.9985255446792657,
    "series_ir": [
     2382591391,
     2383293851,
@@ -2991,16 +3026,17 @@
     2379997940,
     2386115715,
     2386106878,
-    2386107908
+    2386107908,
+    2386109603
    ],
    "rebased_at": []
   },
   "bool_gb/wide_refute_m3_n31": {
    "area": "bool_gb",
-   "latest_ir": 874378515,
-   "latest_wall_ns": 79453920,
+   "latest_ir": 874378781,
+   "latest_wall_ns": 98543784,
    "factor_base": null,
-   "index": 0.9941077566390114,
+   "index": 0.9941074542155435,
    "series_ir": [
     869226464,
     868550987,
@@ -3079,14 +3115,15 @@
     874380597,
     874378669,
     874378607,
-    874378515
+    874378515,
+    874378781
    ],
    "rebased_at": []
   },
   "dlp/aut_folded_rho_j0_p25": {
    "area": "dlp",
    "latest_ir": 40385097,
-   "latest_wall_ns": 4408584,
+   "latest_wall_ns": 5676602,
    "factor_base": null,
    "index": 1.0003281408485907,
    "series_ir": [
@@ -3167,6 +3204,7 @@
     40490865,
     40385097,
     40385097,
+    40385097,
     40385097
    ],
    "rebased_at": []
@@ -3174,7 +3212,7 @@
   "dlp/bsgs_fast_toy40_w1_x4": {
    "area": "dlp",
    "latest_ir": 718635493,
-   "latest_wall_ns": 106166864,
+   "latest_wall_ns": 132100377,
    "factor_base": null,
    "index": 0.9122101153999087,
    "series_ir": [
@@ -3255,6 +3293,7 @@
     660001839,
     718635493,
     718635493,
+    718635493,
     718635493
    ],
    "rebased_at": []
@@ -3262,7 +3301,7 @@
   "dlp/bsgs_fast_toy40_w4_interval38_x8": {
    "area": "dlp",
    "latest_ir": 1021055076,
-   "latest_wall_ns": 160434350,
+   "latest_wall_ns": 196031825,
    "factor_base": null,
    "index": 0.9362923464865088,
    "series_ir": [
@@ -3343,6 +3382,7 @@
     958121459,
     1021055076,
     1021055076,
+    1021055076,
     1021055076
    ],
    "rebased_at": []
@@ -3350,7 +3390,7 @@
   "dlp/collab_walkers_demo32_x8": {
    "area": "dlp",
    "latest_ir": 5171405,
-   "latest_wall_ns": 487012,
+   "latest_wall_ns": 649127,
    "factor_base": null,
    "index": 0.9927604143945541,
    "series_ir": [
@@ -3431,6 +3471,7 @@
     113238940,
     5171405,
     5171405,
+    5171405,
     5171405
    ],
    "rebased_at": [
@@ -3439,10 +3480,10 @@
   },
   "dlp/ecc2k130_certify_m131_len12": {
    "area": "dlp",
-   "latest_ir": 25246730,
-   "latest_wall_ns": 2015518,
+   "latest_ir": 25245813,
+   "latest_wall_ns": 2293106,
    "factor_base": null,
-   "index": 0.9997893588595429,
+   "index": 0.9998256740632591,
    "series_ir": [
     25241412,
     25241711,
@@ -3521,16 +3562,17 @@
     25245919,
     25245583,
     25245476,
-    25246730
+    25246730,
+    25245813
    ],
    "rebased_at": []
   },
   "dlp/gaudry_schost_negation_demo32": {
    "area": "dlp",
-   "latest_ir": 134052216,
-   "latest_wall_ns": 13796970,
+   "latest_ir": 134052340,
+   "latest_wall_ns": 17514094,
    "factor_base": null,
-   "index": 0.9939391005666035,
+   "index": 0.9939381811611797,
    "series_ir": [
     133239739,
     133643871,
@@ -3609,16 +3651,17 @@
     134049919,
     134052645,
     134052792,
-    134052216
+    134052216,
+    134052340
    ],
    "rebased_at": []
   },
   "dlp/koblitz_signed_rho_k0_n41": {
    "area": "dlp",
-   "latest_ir": 232932399,
-   "latest_wall_ns": 39563053,
+   "latest_ir": 232932564,
+   "latest_wall_ns": 49702838,
    "factor_base": null,
-   "index": 0.9818641459147127,
+   "index": 0.9818634504018943,
    "series_ir": [
     228707971,
     228708334,
@@ -3697,16 +3740,17 @@
     237929876,
     232928975,
     232929045,
-    232932399
+    232932399,
+    232932564
    ],
    "rebased_at": []
   },
   "dlp/pohlig_hellman_smooth47": {
    "area": "dlp",
-   "latest_ir": 617567,
-   "latest_wall_ns": 65518,
+   "latest_ir": 617983,
+   "latest_wall_ns": 81181,
    "factor_base": null,
-   "index": 0.9948478851547775,
+   "index": 0.9941781956645741,
    "series_ir": [
     1713496,
     1716728,
@@ -3785,7 +3829,8 @@
     1721826,
     617372,
     617537,
-    617567
+    617567,
+    617983
    ],
    "rebased_at": [
     "f8501268305c0c84d0e077a4ab9054c07ff74540"
@@ -3793,10 +3838,10 @@
   },
   "dlp/rho_dp_zp_multi_q34_x3": {
    "area": "dlp",
-   "latest_ir": 34710672,
-   "latest_wall_ns": 2900508,
+   "latest_ir": 34711692,
+   "latest_wall_ns": 3325987,
    "factor_base": null,
-   "index": 1.0474896596643253,
+   "index": 1.0474588792733015,
    "series_ir": [
     36359070,
     36346256,
@@ -3875,16 +3920,17 @@
     36008976,
     34712766,
     34712687,
-    34710672
+    34710672,
+    34711692
    ],
    "rebased_at": []
   },
   "dlp/rho_dp_zp_wide_q30": {
    "area": "dlp",
-   "latest_ir": 202611191,
-   "latest_wall_ns": 13965352,
+   "latest_ir": 202612974,
+   "latest_wall_ns": 18126991,
    "factor_base": null,
-   "index": 1.0014184853194998,
+   "index": 1.0014096728080202,
    "series_ir": [
     null,
     null,
@@ -3963,14 +4009,15 @@
     202607914,
     202611591,
     202610974,
-    202611191
+    202611191,
+    202612974
    ],
    "rebased_at": []
   },
   "dlp/rho_floyd_zp_q36": {
    "area": "dlp",
    "latest_ir": 106582882,
-   "latest_wall_ns": 7668081,
+   "latest_wall_ns": 8429668,
    "factor_base": null,
    "index": 1.0335899999401406,
    "series_ir": [
@@ -4051,6 +4098,7 @@
     108820839,
     106582882,
     106582882,
+    106582882,
     106582882
    ],
    "rebased_at": []
@@ -4058,7 +4106,7 @@
   "dlp/rho_floyd_zp_wide_q30": {
    "area": "dlp",
    "latest_ir": 340421933,
-   "latest_wall_ns": 23536172,
+   "latest_wall_ns": 30080024,
    "factor_base": null,
    "index": 1.0000001145637112,
    "series_ir": [
@@ -4139,16 +4187,17 @@
     340421952,
     340421933,
     340421933,
+    340421933,
     340421933
    ],
    "rebased_at": []
   },
   "ecbench/rho_negation_prime26_p42652151": {
    "area": "ecbench",
-   "latest_ir": 1371185,
-   "latest_wall_ns": 34711033,
+   "latest_ir": 1371314,
+   "latest_wall_ns": 30481557,
    "factor_base": null,
-   "index": 3.5395967721350514,
+   "index": 3.5392638009967086,
    "series_ir": [
     4853442,
     1929331,
@@ -4227,16 +4276,17 @@
     1381914,
     1371109,
     1371109,
-    1371185
+    1371185,
+    1371314
    ],
    "rebased_at": []
   },
   "ecbench/rho_signed_frobenius_k0n41": {
    "area": "ecbench",
-   "latest_ir": 127695833,
-   "latest_wall_ns": 59078075,
+   "latest_ir": 127695966,
+   "latest_wall_ns": 63432201,
    "factor_base": null,
-   "index": 1.0320149209567384,
+   "index": 1.0320138460756063,
    "series_ir": [
     131784005,
     129040302,
@@ -4315,14 +4365,15 @@
     127690915,
     127695823,
     127695823,
-    127695833
+    127695833,
+    127695966
    ],
    "rebased_at": []
   },
   "field_ec/binary_scalar_mul_sect163k1_x8": {
    "area": "field_ec",
    "latest_ir": 171014450,
-   "latest_wall_ns": 13106240,
+   "latest_wall_ns": 15565769,
    "factor_base": null,
    "index": 1.0180751334170886,
    "series_ir": [
@@ -4403,6 +4454,7 @@
     171869207,
     171014450,
     171014450,
+    171014450,
     171014450
    ],
    "rebased_at": []
@@ -4410,7 +4462,7 @@
   "field_ec/binary_scalar_mul_sect233k1_x4": {
    "area": "field_ec",
    "latest_ir": 181343522,
-   "latest_wall_ns": 11746478,
+   "latest_wall_ns": 14127915,
    "factor_base": null,
    "index": 0.9944717959100852,
    "series_ir": [
@@ -4491,6 +4543,7 @@
     179016382,
     181343522,
     181343522,
+    181343522,
     181343522
    ],
    "rebased_at": []
@@ -4498,7 +4551,7 @@
   "field_ec/ct_scalar_mul_p256_x16": {
    "area": "field_ec",
    "latest_ir": 96442683,
-   "latest_wall_ns": 8080570,
+   "latest_wall_ns": 8797475,
    "factor_base": null,
    "index": 1.072452235697341,
    "series_ir": [
@@ -4579,6 +4632,7 @@
     103430123,
     103430395,
     103430395,
+    96442683,
     96442683
    ],
    "rebased_at": []
@@ -4586,7 +4640,7 @@
   "field_ec/ct_scalar_mul_secp256k1_x16": {
    "area": "field_ec",
    "latest_ir": 66124235,
-   "latest_wall_ns": 5553533,
+   "latest_wall_ns": 6127254,
    "factor_base": null,
    "index": 1.0654094826201026,
    "series_ir": [
@@ -4667,16 +4721,17 @@
     70449339,
     66066619,
     66066619,
+    66124235,
     66124235
    ],
    "rebased_at": []
   },
   "field_ec/ecdsa_verify_p256_x4": {
    "area": "field_ec",
-   "latest_ir": 548705827,
-   "latest_wall_ns": 33197094,
+   "latest_ir": 548705843,
+   "latest_wall_ns": 41772079,
    "factor_base": null,
-   "index": 0.9948065486827787,
+   "index": 0.9948065196746955,
    "series_ir": [
     545856150,
     545886326,
@@ -4755,16 +4810,17 @@
     548705363,
     548705827,
     548705827,
-    548705827
+    548705827,
+    548705843
    ],
    "rebased_at": []
   },
   "field_ec/ecdsa_verify_secp256k1_x4": {
    "area": "field_ec",
-   "latest_ir": 543213478,
-   "latest_wall_ns": 35028137,
+   "latest_ir": 543213494,
+   "latest_wall_ns": 43959769,
    "factor_base": null,
-   "index": 0.9944692683048628,
+   "index": 0.9944692390134177,
    "series_ir": [
     540209110,
     540361275,
@@ -4843,14 +4899,15 @@
     543213102,
     543213478,
     543213478,
-    543213478
+    543213478,
+    543213494
    ],
    "rebased_at": []
   },
   "field_ec/f2m_inv_m163_2k": {
    "area": "field_ec",
    "latest_ir": 188827711,
-   "latest_wall_ns": 14232383,
+   "latest_wall_ns": 17072621,
    "factor_base": null,
    "index": 1.0156244122452982,
    "series_ir": [
@@ -4931,6 +4988,7 @@
     189509695,
     188827711,
     188827711,
+    188827711,
     188827711
    ],
    "rebased_at": []
@@ -4938,7 +4996,7 @@
   "field_ec/f2m_mul_sqr_m131_64k": {
    "area": "field_ec",
    "latest_ir": 87219669,
-   "latest_wall_ns": 6756411,
+   "latest_wall_ns": 6911719,
    "factor_base": null,
    "index": 1.078497110554272,
    "series_ir": [
@@ -5019,6 +5077,7 @@
     91872725,
     87219669,
     87219669,
+    87219669,
     87219669
    ],
    "rebased_at": []
@@ -5026,7 +5085,7 @@
   "field_ec/f2m_mul_sqr_m163_64k": {
    "area": "field_ec",
    "latest_ir": 91667345,
-   "latest_wall_ns": 7488210,
+   "latest_wall_ns": 7869856,
    "factor_base": null,
    "index": 1.0718343484258213,
    "series_ir": [
@@ -5107,6 +5166,7 @@
     96320401,
     91667345,
     91667345,
+    91667345,
     91667345
    ],
    "rebased_at": []
@@ -5114,7 +5174,7 @@
   "field_ec/f2m_mul_sqr_m233_64k": {
    "area": "field_ec",
    "latest_ir": 116539859,
-   "latest_wall_ns": 7528501,
+   "latest_wall_ns": 9070649,
    "factor_base": null,
    "index": 0.9983170993882873,
    "series_ir": [
@@ -5195,6 +5255,7 @@
     114639315,
     116539859,
     116539859,
+    116539859,
     116539859
    ],
    "rebased_at": []
@@ -5202,10 +5263,11 @@
   "field_ec/fastfield_p61_inv": {
    "area": "field_ec",
    "latest_ir": 32546917,
-   "latest_wall_ns": 5449747,
+   "latest_wall_ns": 6518590,
    "factor_base": null,
    "index": 1.0,
    "series_ir": [
+    32546917,
     32546917,
     32546917,
     32546917,
@@ -5290,12 +5352,13 @@
   "field_ec/frobenius_canon_n53_bulk_256k": {
    "area": "field_ec",
    "latest_ir": 88234260,
-   "latest_wall_ns": 4356055,
+   "latest_wall_ns": 4903088,
    "factor_base": null,
    "index": 1.0433634395528448,
    "series_ir": [
     92060401,
     92060401,
+    88234260,
     88234260,
     88234260,
     88234260,
@@ -5378,12 +5441,13 @@
   "field_ec/frobenius_canon_n53_shift_256k": {
    "area": "field_ec",
    "latest_ir": 68209388,
-   "latest_wall_ns": 6263801,
+   "latest_wall_ns": 7783903,
    "factor_base": null,
    "index": 1.015372913183153,
    "series_ir": [
     69257965,
     69257965,
+    68209388,
     68209388,
     68209388,
     68209388,
@@ -5466,7 +5530,7 @@
   "field_ec/gf2_n53_batch_inv_4x64k": {
    "area": "field_ec",
    "latest_ir": 23875544,
-   "latest_wall_ns": 3874380,
+   "latest_wall_ns": 3450455,
    "factor_base": null,
    "index": 1.0494088846729523,
    "series_ir": [
@@ -5547,6 +5611,7 @@
     23875540,
     23875540,
     23875540,
+    23875544,
     23875544
    ],
    "rebased_at": []
@@ -5554,12 +5619,13 @@
   "field_ec/gf2_n53_inv_16k": {
    "area": "field_ec",
    "latest_ir": 12369962,
-   "latest_wall_ns": 4092869,
+   "latest_wall_ns": 5736333,
    "factor_base": null,
    "index": 0.9986755011858565,
    "series_ir": [
     12353578,
     12353578,
+    12369962,
     12369962,
     12369962,
     12369962,
@@ -5642,12 +5708,13 @@
   "field_ec/gf2_n53_mul_sqr_1m": {
    "area": "field_ec",
    "latest_ir": 53634918,
-   "latest_wall_ns": 5475095,
+   "latest_wall_ns": 4026903,
    "factor_base": null,
    "index": 0.9217989295704713,
    "series_ir": [
     49440610,
     49440610,
+    53634918,
     53634918,
     53634918,
     53634918,
@@ -5730,7 +5797,7 @@
   "field_ec/gf3m_mul_m97": {
    "area": "field_ec",
    "latest_ir": 54240322,
-   "latest_wall_ns": 3656794,
+   "latest_wall_ns": 5292241,
    "factor_base": null,
    "index": 4.29865722404819,
    "series_ir": [
@@ -5811,6 +5878,7 @@
     54240322,
     54240322,
     54240322,
+    54240322,
     54240322
    ],
    "rebased_at": []
@@ -5818,7 +5886,7 @@
   "field_ec/hyperelliptic_g2_scalar_mul_x4": {
    "area": "field_ec",
    "latest_ir": 668004526,
-   "latest_wall_ns": 37672008,
+   "latest_wall_ns": 45256130,
    "factor_base": null,
    "index": 0.9869364433018835,
    "series_ir": [
@@ -5899,6 +5967,7 @@
     668007649,
     667999942,
     667999942,
+    668004526,
     668004526
    ],
    "rebased_at": []
@@ -5906,12 +5975,13 @@
   "field_ec/isogeny_field_p256_mul_sqr_pow": {
    "area": "field_ec",
    "latest_ir": 327059289,
-   "latest_wall_ns": 31694624,
+   "latest_wall_ns": 36003220,
    "factor_base": null,
    "index": 1.0,
    "series_ir": [
     null,
     null,
+    327059289,
     327059289,
     327059289,
     327059289,
@@ -5994,7 +6064,7 @@
   "field_ec/koblitz_curve_mul_n53_1k": {
    "area": "field_ec",
    "latest_ir": 11415267,
-   "latest_wall_ns": 2008758,
+   "latest_wall_ns": 2138206,
    "factor_base": null,
    "index": 0.9992823645736887,
    "series_ir": [
@@ -6075,6 +6145,7 @@
     11369187,
     11415267,
     11415267,
+    11415267,
     11415267
    ],
    "rebased_at": []
@@ -6082,7 +6153,7 @@
   "field_ec/koblitz_n53_add_many_lazy_64x2k": {
    "area": "field_ec",
    "latest_ir": 34167600,
-   "latest_wall_ns": 4737227,
+   "latest_wall_ns": 5332867,
    "factor_base": null,
    "index": 1.020628724288508,
    "series_ir": [
@@ -6163,6 +6234,7 @@
     33904944,
     34167536,
     34167536,
+    34167600,
     34167600
    ],
    "rebased_at": []
@@ -6170,12 +6242,13 @@
   "field_ec/koblitz_n53_fast_mul_2k": {
    "area": "field_ec",
    "latest_ir": 26605481,
-   "latest_wall_ns": 5009817,
+   "latest_wall_ns": 5137763,
    "factor_base": null,
    "index": 0.9994611636602247,
    "series_ir": [
     26591145,
     26591145,
+    26605481,
     26605481,
     26605481,
     26605481,
@@ -6258,7 +6331,7 @@
   "field_ec/point_scalar_mul_ct_secp256k1_x1": {
    "area": "field_ec",
    "latest_ir": 779667425,
-   "latest_wall_ns": 51493315,
+   "latest_wall_ns": 61995845,
    "factor_base": null,
    "index": 1.002838710364228,
    "series_ir": [
@@ -6339,6 +6412,7 @@
     779674405,
     779667425,
     779667425,
+    779667425,
     779667425
    ],
    "rebased_at": []
@@ -6346,7 +6420,7 @@
   "field_ec/point_scalar_mul_p256_x8": {
    "area": "field_ec",
    "latest_ir": 165962014,
-   "latest_wall_ns": 9948185,
+   "latest_wall_ns": 12626088,
    "factor_base": null,
    "index": 0.995158416190346,
    "series_ir": [
@@ -6427,6 +6501,7 @@
     165962014,
     165962014,
     165962014,
+    165962014,
     165962014
    ],
    "rebased_at": []
@@ -6434,7 +6509,7 @@
   "field_ec/point_scalar_mul_secp256k1_x8": {
    "area": "field_ec",
    "latest_ir": 160104012,
-   "latest_wall_ns": 10225201,
+   "latest_wall_ns": 12966391,
    "factor_base": null,
    "index": 0.9948098302496002,
    "series_ir": [
@@ -6515,6 +6590,7 @@
     160104012,
     160104012,
     160104012,
+    160104012,
     160104012
    ],
    "rebased_at": []
@@ -6522,7 +6598,7 @@
   "fp_gb/buchberger_katsura3_p32003": {
    "area": "fp_gb",
    "latest_ir": 473641241,
-   "latest_wall_ns": 35106987,
+   "latest_wall_ns": 41997530,
    "factor_base": null,
    "index": 0.998799371864665,
    "series_ir": [
@@ -6603,6 +6679,7 @@
     469020612,
     473641241,
     473641241,
+    473641241,
     473641241
    ],
    "rebased_at": []
@@ -6610,7 +6687,7 @@
   "fp_gb/f4_autoreduce_pkm_m2_t4_x2": {
    "area": "fp_gb",
    "latest_ir": 528543185,
-   "latest_wall_ns": 45275896,
+   "latest_wall_ns": 51264261,
    "factor_base": null,
    "index": 0.9829909073560378,
    "series_ir": [
@@ -6691,6 +6768,7 @@
     516849391,
     519325489,
     519325489,
+    528543185,
     528543185
    ],
    "rebased_at": []
@@ -6698,7 +6776,7 @@
   "fp_gb/f4_cubic_n4_p31": {
    "area": "fp_gb",
    "latest_ir": 15425297,
-   "latest_wall_ns": 1557680,
+   "latest_wall_ns": 2008661,
    "factor_base": null,
    "index": 1.3811552126978532,
    "series_ir": [
@@ -6779,6 +6857,7 @@
     15309730,
     15436279,
     15436279,
+    15425297,
     15425297
    ],
    "rebased_at": [
@@ -6788,7 +6867,7 @@
   "fp_gb/f4_cyclic5_p65521": {
    "area": "fp_gb",
    "latest_ir": 5649166,
-   "latest_wall_ns": 858920,
+   "latest_wall_ns": 1218609,
    "factor_base": null,
    "index": 1.2315695864628728,
    "series_ir": [
@@ -6869,6 +6948,7 @@
     5629258,
     5662225,
     5662225,
+    5649166,
     5649166
    ],
    "rebased_at": [
@@ -6878,7 +6958,7 @@
   "fp_gb/f4_katsura6_p65521": {
    "area": "fp_gb",
    "latest_ir": 27323454,
-   "latest_wall_ns": 2812085,
+   "latest_wall_ns": 3595281,
    "factor_base": null,
    "index": 1.2820151353984057,
    "series_ir": [
@@ -6959,6 +7039,7 @@
     27185900,
     27601798,
     27601798,
+    27323454,
     27323454
    ],
    "rebased_at": [
@@ -6968,7 +7049,7 @@
   "fp_gb/f4_pkm_kummer_m2_t5": {
    "area": "fp_gb",
    "latest_ir": 246517152,
-   "latest_wall_ns": 22426045,
+   "latest_wall_ns": 26532515,
    "factor_base": null,
    "index": 1.094017621671469,
    "series_ir": [
@@ -7049,6 +7130,7 @@
     246074230,
     246964025,
     246964025,
+    246517152,
     246517152
    ],
    "rebased_at": [
@@ -7058,7 +7140,7 @@
   "fp_gb/f4_pkm_kummer_m3_t2": {
    "area": "fp_gb",
    "latest_ir": 29361143,
-   "latest_wall_ns": 3040608,
+   "latest_wall_ns": 3652109,
    "factor_base": null,
    "index": 1.165244083390129,
    "series_ir": [
@@ -7139,6 +7221,7 @@
     29270389,
     29423886,
     29423886,
+    29361143,
     29361143
    ],
    "rebased_at": [
@@ -7148,7 +7231,7 @@
   "fp_gb/f4_quad_n7_p65521": {
    "area": "fp_gb",
    "latest_ir": 88518868,
-   "latest_wall_ns": 8354913,
+   "latest_wall_ns": 10815164,
    "factor_base": null,
    "index": 1.5424955966043612,
    "series_ir": [
@@ -7229,6 +7312,7 @@
     87956096,
     90275135,
     90275135,
+    88518868,
     88518868
    ],
    "rebased_at": [
@@ -7237,10 +7321,10 @@
   },
   "fp_gb/f4_solve_cubic_n3_p29": {
    "area": "fp_gb",
-   "latest_ir": 28985365,
-   "latest_wall_ns": 4634474,
+   "latest_ir": 28985379,
+   "latest_wall_ns": 8760411,
    "factor_base": null,
-   "index": 1.141371319636244,
+   "index": 1.1413707683514576,
    "series_ir": [
     47181779,
     47333472,
@@ -7319,7 +7403,8 @@
     28690231,
     28999801,
     28999801,
-    28985365
+    28985365,
+    28985379
    ],
    "rebased_at": [
     "633d21586f84ec3659ec81f2f8b3b9f82e312a29"
@@ -7327,10 +7412,10 @@
   },
   "fp_gb/f4_solve_quad_n4_p31": {
    "area": "fp_gb",
-   "latest_ir": 32530629,
-   "latest_wall_ns": 4616756,
+   "latest_ir": 32530554,
+   "latest_wall_ns": 7778580,
    "factor_base": null,
-   "index": 1.1040649098444975,
+   "index": 1.1040674552935617,
    "series_ir": [
     48071233,
     47842336,
@@ -7409,7 +7494,8 @@
     32214995,
     32565535,
     32565568,
-    32530629
+    32530629,
+    32530554
    ],
    "rebased_at": [
     "633d21586f84ec3659ec81f2f8b3b9f82e312a29"
@@ -7417,10 +7503,10 @@
   },
   "fp_gb/f4_solve_quart_n3_p31": {
    "area": "fp_gb",
-   "latest_ir": 92542120,
-   "latest_wall_ns": 12565640,
+   "latest_ir": 92542130,
+   "latest_wall_ns": 19543892,
    "factor_base": null,
-   "index": 1.2014735377581884,
+   "index": 1.2014734079282896,
    "series_ir": [
     181596003,
     182812942,
@@ -7499,7 +7585,8 @@
     91682838,
     92575595,
     92575590,
-    92542120
+    92542120,
+    92542130
    ],
    "rebased_at": [
     "633d21586f84ec3659ec81f2f8b3b9f82e312a29"
@@ -7507,10 +7594,10 @@
   },
   "fp_gb/gaudry_quartic_generic_d3_p269": {
    "area": "fp_gb",
-   "latest_ir": 57877025,
-   "latest_wall_ns": 10200576,
+   "latest_ir": 57879161,
+   "latest_wall_ns": 17899317,
    "factor_base": null,
-   "index": 2.193487830447402,
+   "index": 2.193406880932501,
    "series_ir": [
     126952550,
     125364200,
@@ -7589,16 +7676,17 @@
     59514590,
     57876082,
     57880712,
-    57877025
+    57877025,
+    57879161
    ],
    "rebased_at": []
   },
   "fp_gb/gaudry_s4_macaulay_p1039": {
    "area": "fp_gb",
-   "latest_ir": 381508233,
-   "latest_wall_ns": 23744135,
+   "latest_ir": 381552940,
+   "latest_wall_ns": 29419072,
    "factor_base": null,
-   "index": 1.0280579528148754,
+   "index": 1.0279374940735628,
    "series_ir": [
     392212573,
     384734810,
@@ -7677,14 +7765,15 @@
     389452582,
     381537900,
     381208181,
-    381508233
+    381508233,
+    381552940
    ],
    "rebased_at": []
   },
   "fp_gb/sig_tower_kummer_m2_n12": {
    "area": "fp_gb",
    "latest_ir": 1012902139,
-   "latest_wall_ns": 85908669,
+   "latest_wall_ns": 105146239,
    "factor_base": null,
    "index": 1.018991918626011,
    "series_ir": [
@@ -7765,6 +7854,7 @@
     1051902108,
     1012792897,
     1012792897,
+    1012902139,
     1012902139
    ],
    "rebased_at": []
@@ -7772,7 +7862,7 @@
   "fp_gb/sig_tower_kummer_m3_n9": {
    "area": "fp_gb",
    "latest_ir": 1434978847,
-   "latest_wall_ns": 119976542,
+   "latest_wall_ns": 151310401,
    "factor_base": null,
    "index": 1.0128720092554786,
    "series_ir": [
@@ -7853,6 +7943,7 @@
     1486604123,
     1434886477,
     1434886477,
+    1434978847,
     1434978847
    ],
    "rebased_at": []
@@ -7860,7 +7951,7 @@
   "fp_gb/tower_f4_kummer_m2_n12": {
    "area": "fp_gb",
    "latest_ir": 827728641,
-   "latest_wall_ns": 62567496,
+   "latest_wall_ns": 85006033,
    "factor_base": null,
    "index": 0.9956033259938863,
    "series_ir": [
@@ -7941,6 +8032,7 @@
     834900273,
     827348445,
     827348445,
+    827728641,
     827728641
    ],
    "rebased_at": []
@@ -7948,7 +8040,7 @@
   "fp_gb/tower_f4_kummer_m2_n12_planted": {
    "area": "fp_gb",
    "latest_ir": 969523563,
-   "latest_wall_ns": 75220507,
+   "latest_wall_ns": 100228002,
    "factor_base": null,
    "index": 0.9954351011477172,
    "series_ir": [
@@ -8029,6 +8121,7 @@
     977862414,
     969076251,
     969076251,
+    969523563,
     969523563
    ],
    "rebased_at": []
@@ -8036,7 +8129,7 @@
   "fp_gb/tower_f4_kummer_m3_n9": {
    "area": "fp_gb",
    "latest_ir": 1453114404,
-   "latest_wall_ns": 108075941,
+   "latest_wall_ns": 147362718,
    "factor_base": null,
    "index": 0.9964907732068701,
    "series_ir": [
@@ -8117,6 +8210,7 @@
     1465423568,
     1452426140,
     1452426140,
+    1453114404,
     1453114404
    ],
    "rebased_at": []
@@ -8124,7 +8218,7 @@
   "fp_gb/tower_f4_kummer_m4_n8": {
    "area": "fp_gb",
    "latest_ir": 530789737,
-   "latest_wall_ns": 42073625,
+   "latest_wall_ns": 57271097,
    "factor_base": null,
    "index": 0.9983843112625966,
    "series_ir": [
@@ -8205,6 +8299,7 @@
     536401399,
     530604657,
     530604657,
+    530789737,
     530789737
    ],
    "rebased_at": []
@@ -8212,7 +8307,7 @@
   "gf2_la/echelon_macaulay_k23m2d4": {
    "area": "gf2_la",
    "latest_ir": 325668707,
-   "latest_wall_ns": 31127623,
+   "latest_wall_ns": 37084820,
    "factor_base": null,
    "index": 1.0643649682927636,
    "series_ir": [
@@ -8293,6 +8388,7 @@
     325668707,
     325668707,
     325668707,
+    325668707,
     325668707
    ],
    "rebased_at": []
@@ -8300,7 +8396,7 @@
   "gf2_la/echelon_macaulay_k5m3d5": {
    "area": "gf2_la",
    "latest_ir": 220760942,
-   "latest_wall_ns": 16639553,
+   "latest_wall_ns": 21497903,
    "factor_base": null,
    "index": 0.9848008258634814,
    "series_ir": [
@@ -8381,6 +8477,7 @@
     220760942,
     220760942,
     220760942,
+    220760942,
     220760942
    ],
    "rebased_at": []
@@ -8388,7 +8485,7 @@
   "gf2_la/f5_criterion_k23m2d6": {
    "area": "gf2_la",
    "latest_ir": 1079822683,
-   "latest_wall_ns": 116638091,
+   "latest_wall_ns": 137591525,
    "factor_base": null,
    "index": 3.03634223897851,
    "series_ir": [
@@ -8469,6 +8566,7 @@
     1081293795,
     1086328573,
     1086328573,
+    1079822683,
     1079822683
    ],
    "rebased_at": []
@@ -8476,7 +8574,7 @@
   "gf2_la/f5_criterion_k5m3d7": {
    "area": "gf2_la",
    "latest_ir": 89095090,
-   "latest_wall_ns": 10155318,
+   "latest_wall_ns": 12228302,
    "factor_base": null,
    "index": 3.4865081902942126,
    "series_ir": [
@@ -8557,6 +8655,7 @@
     89162134,
     89474404,
     89474404,
+    89095090,
     89095090
    ],
    "rebased_at": []
@@ -8564,7 +8663,7 @@
   "gf2_la/legacy_echelon_macaulay_k23m2d3_x16": {
    "area": "gf2_la",
    "latest_ir": 119379352,
-   "latest_wall_ns": 6925823,
+   "latest_wall_ns": 8810327,
    "factor_base": null,
    "index": 0.974450212895462,
    "series_ir": [
@@ -8645,6 +8744,7 @@
     119387116,
     119379352,
     119379352,
+    119379352,
     119379352
    ],
    "rebased_at": [
@@ -8654,12 +8754,13 @@
   "gf2_la/legacy_rref_macaulay_k23m3d3": {
    "area": "gf2_la",
    "latest_ir": 107652304,
-   "latest_wall_ns": 8181950,
+   "latest_wall_ns": 9908104,
    "factor_base": null,
    "index": 0.9996839454546184,
    "series_ir": [
     107618280,
     107618280,
+    107652304,
     107652304,
     107652304,
     107652304,
@@ -8742,7 +8843,7 @@
   "gf2_la/legacy_rref_macaulay_k5m3d5": {
    "area": "gf2_la",
    "latest_ir": 1295405768,
-   "latest_wall_ns": 75856724,
+   "latest_wall_ns": 99683747,
    "factor_base": null,
    "index": 0.9363080016793628,
    "series_ir": [
@@ -8823,6 +8924,7 @@
     1295405768,
     1295406894,
     1295406894,
+    1295405768,
     1295405768
    ],
    "rebased_at": []
@@ -8830,7 +8932,7 @@
   "gf2_la/rank_refute_anf_s4_n6l3d4": {
    "area": "gf2_la",
    "latest_ir": 1320032020,
-   "latest_wall_ns": 122489332,
+   "latest_wall_ns": 241313016,
    "factor_base": null,
    "index": 1.0000368119858185,
    "series_ir": [
@@ -8911,6 +9013,7 @@
     1320032020,
     1320032020,
     1320032020,
+    1320032020,
     1320032020
    ],
    "rebased_at": []
@@ -8918,7 +9021,7 @@
   "gf2_la/rref_macaulay_k15m3d4": {
    "area": "gf2_la",
    "latest_ir": 608697853,
-   "latest_wall_ns": 53864649,
+   "latest_wall_ns": 77594845,
    "factor_base": null,
    "index": 1.089153812080227,
    "series_ir": [
@@ -8999,6 +9102,7 @@
     608697853,
     608697853,
     608697853,
+    608697853,
     608697853
    ],
    "rebased_at": []
@@ -9006,7 +9110,7 @@
   "gf2_la/rref_macaulay_k17m2d5": {
    "area": "gf2_la",
    "latest_ir": 878202922,
-   "latest_wall_ns": 89896848,
+   "latest_wall_ns": 115890515,
    "factor_base": null,
    "index": 1.0890987117439817,
    "series_ir": [
@@ -9087,6 +9191,7 @@
     878202922,
     878202922,
     878202922,
+    878202922,
     878202922
    ],
    "rebased_at": []
@@ -9094,7 +9199,7 @@
   "gf2_la/rref_macaulay_k23m2d3_x16": {
    "area": "gf2_la",
    "latest_ir": 123595854,
-   "latest_wall_ns": 7223413,
+   "latest_wall_ns": 9370717,
    "factor_base": null,
    "index": 0.982524947802861,
    "series_ir": [
@@ -9175,6 +9280,7 @@
     123595854,
     123595854,
     123595854,
+    123595854,
     123595854
    ],
    "rebased_at": []
@@ -9182,7 +9288,7 @@
   "gf2_la/rref_macaulay_k23m2d4": {
    "area": "gf2_la",
    "latest_ir": 468983977,
-   "latest_wall_ns": 48355383,
+   "latest_wall_ns": 63745544,
    "factor_base": null,
    "index": 1.1089575476050857,
    "series_ir": [
@@ -9263,6 +9369,7 @@
     468983977,
     468983977,
     468983977,
+    468983977,
     468983977
    ],
    "rebased_at": []
@@ -9270,7 +9377,7 @@
   "gf2_la/rref_macaulay_k5m3d5": {
    "area": "gf2_la",
    "latest_ir": 275474595,
-   "latest_wall_ns": 23983228,
+   "latest_wall_ns": 32227290,
    "factor_base": null,
    "index": 1.0007020901509989,
    "series_ir": [
@@ -9351,6 +9458,7 @@
     275474595,
     275474595,
     275474595,
+    275474595,
     275474595
    ],
    "rebased_at": []
@@ -9358,7 +9466,7 @@
   "gf2_la/rref_random_2048": {
    "area": "gf2_la",
    "latest_ir": 77043759,
-   "latest_wall_ns": 5068086,
+   "latest_wall_ns": 6535258,
    "factor_base": null,
    "index": 1.0422445379384977,
    "series_ir": [
@@ -9439,6 +9547,7 @@
     77043759,
     77043759,
     77043759,
+    77043759,
     77043759
    ],
    "rebased_at": []
@@ -9446,7 +9555,7 @@
   "gf2_la/rref_random_4940x8357": {
    "area": "gf2_la",
    "latest_ir": 629840006,
-   "latest_wall_ns": 74918954,
+   "latest_wall_ns": 97747664,
    "factor_base": null,
    "index": 1.3739968988251277,
    "series_ir": [
@@ -9527,6 +9636,7 @@
     629840006,
     629840006,
     629840006,
+    629840006,
     629840006
    ],
    "rebased_at": []
@@ -9534,7 +9644,7 @@
   "gf2_la/rref_random_4940x8357_w17": {
    "area": "gf2_la",
    "latest_ir": 540745729,
-   "latest_wall_ns": 62461706,
+   "latest_wall_ns": 79722006,
    "factor_base": null,
    "index": 1.3040352168921145,
    "series_ir": [
@@ -9615,6 +9725,7 @@
     540745729,
     540745729,
     540745729,
+    540745729,
     540745729
    ],
    "rebased_at": []
@@ -9622,7 +9733,7 @@
   "gf2_la/sparse_finish_macaulay_k7m3d5": {
    "area": "gf2_la",
    "latest_ir": 158392795,
-   "latest_wall_ns": 15127088,
+   "latest_wall_ns": 18906882,
    "factor_base": null,
    "index": 1.7432741432462244,
    "series_ir": [
@@ -9703,6 +9814,7 @@
     158341321,
     158392795,
     158392795,
+    158392795,
     158392795
    ],
    "rebased_at": []
@@ -9710,7 +9822,7 @@
   "gf2_la/sparse_high_macaulay_k5m3d5": {
    "area": "gf2_la",
    "latest_ir": 232026546,
-   "latest_wall_ns": 23856535,
+   "latest_wall_ns": 28323527,
    "factor_base": null,
    "index": 0.9985131787463662,
    "series_ir": [
@@ -9791,16 +9903,17 @@
     231684670,
     232026546,
     232026546,
+    232026546,
     232026546
    ],
    "rebased_at": []
   },
   "gf2_la/sparse_rank_refute_macaulay_k5m3d5": {
    "area": "gf2_la",
-   "latest_ir": 388644606,
-   "latest_wall_ns": 66129150,
+   "latest_ir": 388224879,
+   "latest_wall_ns": 81384358,
    "factor_base": null,
-   "index": 1.012924185547554,
+   "index": 1.0140193024569144,
    "series_ir": [
     393667521,
     388551997,
@@ -9879,14 +9992,15 @@
     393504822,
     388463026,
     388612184,
-    388644606
+    388644606,
+    388224879
    ],
    "rebased_at": []
   },
   "ic_factor_base/j0_glv_orbit_auto": {
    "area": "ic_factor_base",
-   "latest_ir": 37880338,
-   "latest_wall_ns": 38258151,
+   "latest_ir": 37877303,
+   "latest_wall_ns": 37236461,
    "factor_base": {
     "spec": "glv-orbit:size=32,group=auto",
     "symmetry": "GLV (order 6)",
@@ -9896,7 +10010,7 @@
     "abscissae": 96,
     "fb_id": "FB1he8a2e233de5e"
    },
-   "index": 0.999982471117338,
+   "index": 1.0000625968538468,
    "series_ir": [
     null,
     null,
@@ -9975,14 +10089,15 @@
     null,
     null,
     37879674,
-    37880338
+    37880338,
+    37877303
    ],
    "rebased_at": []
   },
   "ic_factor_base/j0_glv_orbit_negation": {
    "area": "ic_factor_base",
-   "latest_ir": 36388655,
-   "latest_wall_ns": 38259693,
+   "latest_ir": 36388993,
+   "latest_wall_ns": 34360172,
    "factor_base": {
     "spec": "glv-orbit:size=32,group=negation",
     "symmetry": "negation",
@@ -9992,7 +10107,7 @@
     "abscissae": 32,
     "fb_id": "FB1h96d56dd6e95f"
    },
-   "index": 1.000023194042209,
+   "index": 1.0000139053037274,
    "series_ir": [
     null,
     null,
@@ -10071,16 +10186,17 @@
     null,
     null,
     36389499,
-    36388655
+    36388655,
+    36388993
    ],
    "rebased_at": []
   },
   "ic_factor_base/j0_rho_negation": {
    "area": "ic_factor_base",
-   "latest_ir": 216801,
-   "latest_wall_ns": 32736335,
+   "latest_ir": 216924,
+   "latest_wall_ns": 30217867,
    "factor_base": null,
-   "index": 0.9996356105368518,
+   "index": 0.9990687982888016,
    "series_ir": [
     null,
     null,
@@ -10159,14 +10275,15 @@
     null,
     null,
     216722,
-    216801
+    216801,
+    216924
    ],
    "rebased_at": []
   },
   "ic_factor_base/k17_binary_subspace": {
    "area": "ic_factor_base",
-   "latest_ir": 33745948,
-   "latest_wall_ns": 38001167,
+   "latest_ir": 33750975,
+   "latest_wall_ns": 35342547,
    "factor_base": {
     "spec": "binary-subspace:dimension=4",
     "symmetry": "none",
@@ -10176,7 +10293,7 @@
     "abscissae": 5,
     "fb_id": "FB1h70021407fcc7"
    },
-   "index": 1.0001295266619863,
+   "index": 0.9999805635244613,
    "series_ir": [
     null,
     null,
@@ -10255,14 +10372,15 @@
     null,
     null,
     33750319,
-    33745948
+    33745948,
+    33750975
    ],
    "rebased_at": []
   },
   "ic_factor_base/k17_compact_orbit_scan": {
    "area": "ic_factor_base",
-   "latest_ir": 31300690,
-   "latest_wall_ns": 37570554,
+   "latest_ir": 31296755,
+   "latest_wall_ns": 37272696,
    "factor_base": {
     "spec": "compact-orbit-scan:columns=8,raw_x_cap=5000",
     "symmetry": "signed Frobenius",
@@ -10272,7 +10390,7 @@
     "abscissae": 136,
     "fb_id": "FB1h585d0da5e4b8"
    },
-   "index": 1.000008626007925,
+   "index": 1.0001343589774723,
    "series_ir": [
     null,
     null,
@@ -10351,14 +10469,15 @@
     null,
     null,
     31300960,
-    31300690
+    31300690,
+    31296755
    ],
    "rebased_at": []
   },
   "ic_factor_base/k17_koblitz_orbit": {
    "area": "ic_factor_base",
-   "latest_ir": 37372463,
-   "latest_wall_ns": 36908029,
+   "latest_ir": 37369229,
+   "latest_wall_ns": 37446135,
    "factor_base": {
     "spec": "koblitz-orbit:divisor=0;1",
     "symmetry": "signed Frobenius",
@@ -10368,7 +10487,7 @@
     "abscissae": 222,
     "fb_id": "FB1hdd4118e0e739"
    },
-   "index": 1.000092474504557,
+   "index": 1.000179024298307,
    "series_ir": [
     null,
     null,
@@ -10447,16 +10566,17 @@
     null,
     null,
     37375919,
-    37372463
+    37372463,
+    37369229
    ],
    "rebased_at": []
   },
   "ic_factor_base/k17_rho_signed_frobenius": {
    "area": "ic_factor_base",
-   "latest_ir": 741467,
-   "latest_wall_ns": 32825794,
+   "latest_ir": 741613,
+   "latest_wall_ns": 31182865,
    "factor_base": null,
-   "index": 0.9999406581816858,
+   "index": 0.9997438016863243,
    "series_ir": [
     null,
     null,
@@ -10535,14 +10655,15 @@
     null,
     null,
     741423,
-    741467
+    741467,
+    741613
    ],
    "rebased_at": []
   },
   "ic_factor_base/k17_standard_subspace": {
    "area": "ic_factor_base",
-   "latest_ir": 33872761,
-   "latest_wall_ns": 38364082,
+   "latest_ir": 33872094,
+   "latest_wall_ns": 35426822,
    "factor_base": {
     "spec": "koblitz-standard-subspace:dimension=4",
     "symmetry": "none",
@@ -10552,7 +10673,7 @@
     "abscissae": 6,
     "fb_id": "FB1h554bcb8d6c56"
    },
-   "index": 1.0000152334791959,
+   "index": 1.0000349255053438,
    "series_ir": [
     null,
     null,
@@ -10631,14 +10752,15 @@
     null,
     null,
     33873277,
-    33872761
+    33872761,
+    33872094
    ],
    "rebased_at": []
   },
   "ic_factor_base/p20_glv_orbit_generic": {
    "area": "ic_factor_base",
-   "latest_ir": 35103033,
-   "latest_wall_ns": 38230752,
+   "latest_ir": 35097994,
+   "latest_wall_ns": 37735238,
    "factor_base": {
     "spec": "glv-orbit:size=16",
     "symmetry": "negation",
@@ -10648,7 +10770,7 @@
     "abscissae": 16,
     "fb_id": "FB1h81b0d90efecd"
    },
-   "index": 0.9999549611567753,
+   "index": 1.0000985241492721,
    "series_ir": [
     null,
     null,
@@ -10727,14 +10849,15 @@
     null,
     null,
     35101452,
-    35103033
+    35103033,
+    35097994
    ],
    "rebased_at": []
   },
   "ic_factor_base/p20_prime_abscissa": {
    "area": "ic_factor_base",
-   "latest_ir": 34587374,
-   "latest_wall_ns": 38066347,
+   "latest_ir": 34589062,
+   "latest_wall_ns": 36136479,
    "factor_base": {
     "spec": "prime-abscissa:size=32",
     "symmetry": "negation",
@@ -10744,7 +10867,7 @@
     "abscissae": 32,
     "fb_id": "FB1h4b3725c0aa92"
    },
-   "index": 1.0000405350229826,
+   "index": 0.9999917314901455,
    "series_ir": [
     null,
     null,
@@ -10823,16 +10946,17 @@
     null,
     null,
     34588776,
-    34587374
+    34587374,
+    34589062
    ],
    "rebased_at": []
   },
   "ic_factor_base/p20_rho_negation": {
    "area": "ic_factor_base",
-   "latest_ir": 838351,
-   "latest_wall_ns": 32843888,
+   "latest_ir": 838506,
+   "latest_wall_ns": 29241050,
    "factor_base": null,
-   "index": 0.9999880718219457,
+   "index": 0.9998032214438537,
    "series_ir": [
     null,
     null,
@@ -10911,14 +11035,15 @@
     null,
     null,
     838341,
-    838351
+    838351,
+    838506
    ],
    "rebased_at": []
   },
   "pdp/build_system_m2_n23": {
    "area": "pdp",
    "latest_ir": 2519846,
-   "latest_wall_ns": 239529,
+   "latest_wall_ns": 284711,
    "factor_base": null,
    "index": 1.0087576780485785,
    "series_ir": [
@@ -10999,6 +11124,7 @@
     2519846,
     2519846,
     2519846,
+    2519846,
     2519846
    ],
    "rebased_at": []
@@ -11006,7 +11132,7 @@
   "pdp/build_system_m3_n15": {
    "area": "pdp",
    "latest_ir": 13839152,
-   "latest_wall_ns": 1127545,
+   "latest_wall_ns": 1377917,
    "factor_base": null,
    "index": 1.011496874953032,
    "series_ir": [
@@ -11087,6 +11213,7 @@
     13839152,
     13839152,
     13839152,
+    13839152,
     13839152
    ],
    "rebased_at": []
@@ -11094,7 +11221,7 @@
   "pdp/descend_s3_n31_np20": {
    "area": "pdp",
    "latest_ir": 66729896,
-   "latest_wall_ns": 7921171,
+   "latest_wall_ns": 8894284,
    "factor_base": null,
    "index": 0.9827485869302119,
    "series_ir": [
@@ -11175,6 +11302,7 @@
     66543592,
     66729896,
     66729896,
+    66729896,
     66729896
    ],
    "rebased_at": []
@@ -11182,7 +11310,7 @@
   "pdp/descend_s4_n23_np6": {
    "area": "pdp",
    "latest_ir": 45606947,
-   "latest_wall_ns": 6080205,
+   "latest_wall_ns": 6606635,
    "factor_base": null,
    "index": 0.994160933420954,
    "series_ir": [
@@ -11263,16 +11391,17 @@
     45350717,
     45606947,
     45606947,
+    45606947,
     45606947
    ],
    "rebased_at": []
   },
   "pdp/enumerate_m2_n23": {
    "area": "pdp",
-   "latest_ir": 16033963,
-   "latest_wall_ns": 2528288,
+   "latest_ir": 16033267,
+   "latest_wall_ns": 3286538,
    "factor_base": null,
-   "index": 1.0146843921243927,
+   "index": 1.0147284393130858,
    "series_ir": [
     16269412,
     16270452,
@@ -11351,16 +11480,17 @@
     16046510,
     16032499,
     16032335,
-    16033963
+    16033963,
+    16033267
    ],
    "rebased_at": []
   },
   "pdp/enumerate_m3_n15": {
    "area": "pdp",
-   "latest_ir": 9024408,
-   "latest_wall_ns": 1762558,
+   "latest_ir": 9024468,
+   "latest_wall_ns": 2257439,
    "factor_base": null,
-   "index": 1.0122367029504873,
+   "index": 1.0122299730022868,
    "series_ir": [
     9134837,
     9134665,
@@ -11439,16 +11569,17 @@
     9039765,
     9024552,
     9024576,
-    9024408
+    9024408,
+    9024468
    ],
    "rebased_at": []
   },
   "pdp/groebner_m2_n17": {
    "area": "pdp",
-   "latest_ir": 176017344,
-   "latest_wall_ns": 15179954,
+   "latest_ir": 176017368,
+   "latest_wall_ns": 18731863,
    "factor_base": null,
-   "index": 1.0071871383310953,
+   "index": 1.0071870010009467,
    "series_ir": [
     177282405,
     179138558,
@@ -11527,16 +11658,17 @@
     176703020,
     176017268,
     176017272,
-    176017344
+    176017344,
+    176017368
    ],
    "rebased_at": []
   },
   "pdp/groebner_m3_n9": {
    "area": "pdp",
-   "latest_ir": 138301208,
-   "latest_wall_ns": 14071321,
+   "latest_ir": 138301347,
+   "latest_wall_ns": 17697170,
    "factor_base": null,
-   "index": 1.0850229449911963,
+   "index": 1.0850218544870718,
    "series_ir": [
     150059984,
     150067389,
@@ -11615,14 +11747,15 @@
     138614473,
     138301391,
     138301342,
-    138301208
+    138301208,
+    138301347
    ],
    "rebased_at": []
   },
   "pdp/instantiate_m2_n23": {
    "area": "pdp",
    "latest_ir": 30296529,
-   "latest_wall_ns": 4741884,
+   "latest_wall_ns": 5179194,
    "factor_base": null,
    "index": 1.0009575354325235,
    "series_ir": [
@@ -11703,6 +11836,7 @@
     30291921,
     30293969,
     30293969,
+    30296529,
     30296529
    ],
    "rebased_at": []
@@ -11710,7 +11844,7 @@
   "pdp/instantiate_m3_n15": {
    "area": "pdp",
    "latest_ir": 23621295,
-   "latest_wall_ns": 4095613,
+   "latest_wall_ns": 4445953,
    "factor_base": null,
    "index": 1.000439772671227,
    "series_ir": [
@@ -11791,6 +11925,7 @@
     23612591,
     23620271,
     23620271,
+    23621295,
     23621295
    ],
    "rebased_at": []
@@ -11798,7 +11933,7 @@
   "pdp/mitm_m3_n31": {
    "area": "pdp",
    "latest_ir": 217376426,
-   "latest_wall_ns": 25268942,
+   "latest_wall_ns": 24052540,
    "factor_base": null,
    "index": 1.013322925826373,
    "series_ir": [
@@ -11879,6 +12014,7 @@
     215380849,
     217379846,
     217379938,
+    217376426,
     217376426
    ],
    "rebased_at": []
@@ -11886,7 +12022,7 @@
   "pdp/mitm_m4_n31": {
    "area": "pdp",
    "latest_ir": 72359987,
-   "latest_wall_ns": 9081894,
+   "latest_wall_ns": 9853461,
    "factor_base": null,
    "index": 1.031157012231084,
    "series_ir": [
@@ -11967,6 +12103,7 @@
     72875314,
     72351637,
     72351653,
+    72359987,
     72359987
    ],
    "rebased_at": []
@@ -11974,7 +12111,7 @@
   "pdp/pair_table_build_n31_l10": {
    "area": "pdp",
    "latest_ir": 367006926,
-   "latest_wall_ns": 44062585,
+   "latest_wall_ns": 65045843,
    "factor_base": null,
    "index": 1.025014162811738,
    "series_ir": [
@@ -12055,6 +12192,7 @@
     367018321,
     367018340,
     367018340,
+    367006926,
     367006926
    ],
    "rebased_at": []
@@ -12062,7 +12200,7 @@
   "pdp/relation_solver_u1024": {
    "area": "pdp",
    "latest_ir": 188107062,
-   "latest_wall_ns": 18270848,
+   "latest_wall_ns": 17612247,
    "factor_base": null,
    "index": 0.9800965207781511,
    "series_ir": [
@@ -12143,16 +12281,17 @@
     188107062,
     188107062,
     188107062,
+    188107062,
     188107062
    ],
    "rebased_at": []
   },
   "pdp/sat_m2_n17": {
    "area": "pdp",
-   "latest_ir": 260446515,
-   "latest_wall_ns": 30491853,
+   "latest_ir": 260446519,
+   "latest_wall_ns": 37870087,
    "factor_base": null,
-   "index": 1.007876799580137,
+   "index": 1.0078767841009237,
    "series_ir": [
     262498000,
     262563824,
@@ -12231,14 +12370,15 @@
     260431728,
     260446479,
     260446537,
-    260446515
+    260446515,
+    260446519
    ],
    "rebased_at": []
   },
   "pdp/sat_m6_n7": {
    "area": "pdp",
    "latest_ir": 102778521,
-   "latest_wall_ns": 9781246,
+   "latest_wall_ns": 12334924,
    "factor_base": null,
    "index": 0.9849012032387578,
    "series_ir": [
@@ -12319,16 +12459,17 @@
     102767926,
     102778521,
     102778521,
+    102778521,
     102778521
    ],
    "rebased_at": []
   },
   "pdp/semaev_s5_symbolic": {
    "area": "pdp",
-   "latest_ir": 61944118,
-   "latest_wall_ns": 6115488,
+   "latest_ir": 61949511,
+   "latest_wall_ns": 7836415,
    "factor_base": null,
-   "index": 1.0002523726304404,
+   "index": 1.0001652958971696,
    "series_ir": [
     61959751,
     58479684,
@@ -12407,14 +12548,15 @@
     61905489,
     61948572,
     61940815,
-    61944118
+    61944118,
+    61949511
    ],
    "rebased_at": []
   },
   "pdp/subspace_oracle_n20_l7": {
    "area": "pdp",
    "latest_ir": 140417381,
-   "latest_wall_ns": 16437635,
+   "latest_wall_ns": 17659206,
    "factor_base": null,
    "index": 1.0165756189399366,
    "series_ir": [
@@ -12495,16 +12637,17 @@
     140416429,
     140416429,
     140416429,
+    140417381,
     140417381
    ],
    "rebased_at": []
   },
   "pdp/symmetrised_groebner_m2_n17": {
    "area": "pdp",
-   "latest_ir": 1388920799,
-   "latest_wall_ns": 111539423,
+   "latest_ir": 1388920791,
+   "latest_wall_ns": 139299262,
    "factor_base": null,
-   "index": 1.0767381567593626,
+   "index": 1.0767381629612318,
    "series_ir": [
     1495504021,
     1495770204,
@@ -12583,14 +12726,15 @@
     1388231354,
     1388920823,
     1388922093,
-    1388920799
+    1388920799,
+    1388920791
    ],
    "rebased_at": []
   },
   "pdp/symmetrised_groebner_m3_n15": {
    "area": "pdp",
    "latest_ir": 679640270,
-   "latest_wall_ns": 69734879,
+   "latest_wall_ns": 87149483,
    "factor_base": null,
    "index": 1.0856154241713785,
    "series_ir": [
@@ -12671,6 +12815,7 @@
     679942386,
     679640270,
     679642210,
+    679640270,
     679640270
    ],
    "rebased_at": []
@@ -12678,7 +12823,7 @@
   "pdp/weil_descend_s4_sym_n17_l4": {
    "area": "pdp",
    "latest_ir": 20421971,
-   "latest_wall_ns": 2081047,
+   "latest_wall_ns": 2367877,
    "factor_base": null,
    "index": 1.002010824518359,
    "series_ir": [
@@ -12759,6 +12904,7 @@
     20359025,
     20421971,
     20421971,
+    20421971,
     20421971
    ],
    "rebased_at": []
@@ -12766,7 +12912,7 @@
   "relation/block_wiedemann_r45_n768_w13": {
    "area": "relation",
    "latest_ir": 487478786,
-   "latest_wall_ns": 37463305,
+   "latest_wall_ns": 38791267,
    "factor_base": null,
    "index": 0.9648586472027522,
    "series_ir": [
@@ -12847,6 +12993,7 @@
     487478786,
     487478786,
     487478786,
+    487478786,
     487478786
    ],
    "rebased_at": []
@@ -12854,7 +13001,7 @@
   "relation/koblitz_collect_k0n41_w164_u4096": {
    "area": "relation",
    "latest_ir": 333594467,
-   "latest_wall_ns": 14724563,
+   "latest_wall_ns": 17461064,
    "factor_base": null,
    "index": 1.0426159406294944,
    "series_ir": [
@@ -12935,6 +13082,7 @@
     333762578,
     333590839,
     333590839,
+    333594467,
     333594467
    ],
    "rebased_at": []
@@ -12942,7 +13090,7 @@
   "relation/koblitz_collect_k0n53_w477_u1024": {
    "area": "relation",
    "latest_ir": 242005741,
-   "latest_wall_ns": 10687407,
+   "latest_wall_ns": 12874119,
    "factor_base": null,
    "index": 1.0454750864773896,
    "series_ir": [
@@ -13023,16 +13171,17 @@
     242773241,
     242004811,
     242004811,
+    242005741,
     242005741
    ],
    "rebased_at": []
   },
   "relation/koblitz_descent_k0n53_m2_x4": {
    "area": "relation",
-   "latest_ir": 418161937,
-   "latest_wall_ns": 22937661,
+   "latest_ir": 418161679,
+   "latest_wall_ns": 26372619,
    "factor_base": null,
-   "index": 1.0486565590975823,
+   "index": 1.0486572061042447,
    "series_ir": [
     438508258,
     438507242,
@@ -13111,14 +13260,15 @@
     420904793,
     418150666,
     418150603,
-    418161937
+    418161937,
+    418161679
    ],
    "rebased_at": []
   },
   "relation/koblitz_pair_table_k0n41_folded": {
    "area": "relation",
    "latest_ir": 110454359,
-   "latest_wall_ns": 6902981,
+   "latest_wall_ns": 8262633,
    "factor_base": null,
    "index": 1.0326383497458895,
    "series_ir": [
@@ -13199,16 +13349,17 @@
     110112682,
     110458778,
     110458778,
+    110454359,
     110454359
    ],
    "rebased_at": []
   },
   "relation/koblitz_rung_k0n31": {
    "area": "relation",
-   "latest_ir": 177737666,
-   "latest_wall_ns": 9500864,
+   "latest_ir": 177735284,
+   "latest_wall_ns": 11316238,
    "factor_base": null,
-   "index": 0.9598515544814227,
+   "index": 0.9598644183672608,
    "series_ir": [
     170601775,
     170559416,
@@ -13287,14 +13438,15 @@
     176876301,
     177744572,
     177743823,
-    177737666
+    177737666,
+    177735284
    ],
    "rebased_at": []
   },
   "relation/pq_sparse_solve_m127_c640": {
    "area": "relation",
    "latest_ir": 273876500,
-   "latest_wall_ns": 19784455,
+   "latest_wall_ns": 25352453,
    "factor_base": null,
    "index": 0.986792400954445,
    "series_ir": [
@@ -13375,6 +13527,7 @@
     273757780,
     273876500,
     273876500,
+    273876500,
     273876500
    ],
    "rebased_at": []
@@ -13382,7 +13535,7 @@
   "relation/pq_wiedemann_m127_c160": {
    "area": "relation",
    "latest_ir": 435676964,
-   "latest_wall_ns": 25220232,
+   "latest_wall_ns": 32519101,
    "factor_base": null,
    "index": 0.999213355241798,
    "series_ir": [
@@ -13463,6 +13616,7 @@
     435676964,
     435676964,
     435676964,
+    435676964,
     435676964
    ],
    "rebased_at": []
@@ -13470,7 +13624,7 @@
   "relation/residual_walk_lmw_b22_x3": {
    "area": "relation",
    "latest_ir": 234776387,
-   "latest_wall_ns": 33944259,
+   "latest_wall_ns": 41812332,
    "factor_base": null,
    "index": 0.9984856909822031,
    "series_ir": [
@@ -13551,16 +13705,17 @@
     233436192,
     234776387,
     234776387,
+    234776387,
     234776387
    ],
    "rebased_at": []
   },
   "relation/sparse_solve_r45_c4800_w3": {
    "area": "relation",
-   "latest_ir": 566257918,
-   "latest_wall_ns": 50795154,
+   "latest_ir": 566271414,
+   "latest_wall_ns": 53001265,
    "factor_base": null,
-   "index": 0.9873612910786713,
+   "index": 0.987337759203929,
    "series_ir": [
     559101149,
     559069050,
@@ -13639,14 +13794,15 @@
     565047885,
     566262851,
     566246523,
-    566257918
+    566257918,
+    566271414
    ],
    "rebased_at": []
   },
   "sat/koblitz_bool_cnf_m3_n15_b1500_x2": {
    "area": "sat",
    "latest_ir": 826328659,
-   "latest_wall_ns": 101489845,
+   "latest_wall_ns": 122809985,
    "factor_base": null,
    "index": 1.0173452739946662,
    "series_ir": [
@@ -13727,6 +13883,7 @@
     826328659,
     826328659,
     826328659,
+    826328659,
     826328659
    ],
    "rebased_at": []
@@ -13734,7 +13891,7 @@
   "sat/koblitz_bool_native_m2_n19_x2": {
    "area": "sat",
    "latest_ir": 980922643,
-   "latest_wall_ns": 102401747,
+   "latest_wall_ns": 126987883,
    "factor_base": null,
    "index": 0.9948789672296313,
    "series_ir": [
@@ -13815,6 +13972,7 @@
     980922647,
     980922643,
     980922643,
+    980922643,
     980922643
    ],
    "rebased_at": []
@@ -13822,7 +13980,7 @@
   "sat/koblitz_bool_native_m3_n15_x3": {
    "area": "sat",
    "latest_ir": 452993468,
-   "latest_wall_ns": 43680749,
+   "latest_wall_ns": 54661582,
    "factor_base": null,
    "index": 0.9886647725348656,
    "series_ir": [
@@ -13903,6 +14061,7 @@
     452993474,
     452993468,
     452993468,
+    452993468,
     452993468
    ],
    "rebased_at": []
@@ -13910,7 +14069,7 @@
   "sat/random3sat_n150_r426_x12": {
    "area": "sat",
    "latest_ir": 747779548,
-   "latest_wall_ns": 121455162,
+   "latest_wall_ns": 145609420,
    "factor_base": null,
    "index": 1.0148670220116796,
    "series_ir": [
@@ -13991,6 +14150,7 @@
     747779562,
     747779548,
     747779548,
+    747779548,
     747779548
    ],
    "rebased_at": []
@@ -13998,7 +14158,7 @@
   "sat/random3sat_n200_r426_x5": {
    "area": "sat",
    "latest_ir": 716997457,
-   "latest_wall_ns": 116276601,
+   "latest_wall_ns": 139244727,
    "factor_base": null,
    "index": 1.015587458352729,
    "series_ir": [
@@ -14079,6 +14239,7 @@
     716997465,
     716997457,
     716997457,
+    716997457,
     716997457
    ],
    "rebased_at": []
@@ -14086,7 +14247,7 @@
   "sat/semaev_s4_encode_n19l6_x4": {
    "area": "sat",
    "latest_ir": 60307394,
-   "latest_wall_ns": 5039441,
+   "latest_wall_ns": 5991933,
    "factor_base": null,
    "index": 1.0155457720491126,
    "series_ir": [
@@ -14167,6 +14328,7 @@
     60536818,
     60307394,
     60307394,
+    60307394,
     60307394
    ],
    "rebased_at": []
@@ -14174,7 +14336,7 @@
   "sat/semaev_s4_n15l5_cnf_x2": {
    "area": "sat",
    "latest_ir": 281916773,
-   "latest_wall_ns": 41339363,
+   "latest_wall_ns": 48244566,
    "factor_base": null,
    "index": 1.0185048301471582,
    "series_ir": [
@@ -14255,6 +14417,7 @@
     281915865,
     281916773,
     281916773,
+    281916773,
     281916773
    ],
    "rebased_at": []
@@ -14262,7 +14425,7 @@
   "sat/semaev_s4_n15l5_sat_x4": {
    "area": "sat",
    "latest_ir": 884112660,
-   "latest_wall_ns": 89836190,
+   "latest_wall_ns": 110835464,
    "factor_base": null,
    "index": 0.9929374702088302,
    "series_ir": [
@@ -14343,6 +14506,7 @@
     884110830,
     884112660,
     884112660,
+    884112660,
     884112660
    ],
    "rebased_at": []
@@ -14350,7 +14514,7 @@
   "sat/semaev_s4_n15l5_unsat_x1": {
    "area": "sat",
    "latest_ir": 1272381201,
-   "latest_wall_ns": 131143490,
+   "latest_wall_ns": 162573177,
    "factor_base": null,
    "index": 0.9930246941773226,
    "series_ir": [
@@ -14431,6 +14595,7 @@
     1272381201,
     1272381201,
     1272381201,
+    1272381201,
     1272381201
    ],
    "rebased_at": []
@@ -14438,7 +14603,7 @@
   "sat/semaev_s4_n17l6_sat_x1": {
    "area": "sat",
    "latest_ir": 1288021684,
-   "latest_wall_ns": 121871031,
+   "latest_wall_ns": 151537093,
    "factor_base": null,
    "index": 0.9932077773932884,
    "series_ir": [
@@ -14519,6 +14684,7 @@
     1288021221,
     1288021684,
     1288021684,
+    1288021684,
     1288021684
    ],
    "rebased_at": []
@@ -14526,7 +14692,7 @@
   "sat/xor_planted_n120_x6": {
    "area": "sat",
    "latest_ir": 980037246,
-   "latest_wall_ns": 116930630,
+   "latest_wall_ns": 144254574,
    "factor_base": null,
    "index": 0.9596073402704121,
    "series_ir": [
@@ -14605,6 +14771,7 @@
     980037258,
     980037258,
     980037258,
+    980037246,
     980037246,
     980037246,
     980037246
