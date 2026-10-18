@@ -27,6 +27,9 @@ passing audit.
 | root4 K3500 | 3,500 | 581,000 | New, conditional PUT | `s3://crypto-autoresearcher/factor-bases/icv1/etc/n83_crossfamily_cancel_20261018/a1/objects/c0cec5f5cc985c698d9e3648701f2660fa83bda09d6457da34758042d1949785.jsonl.gz` |
 
 The two new uploads used `If-None-Match: *` and AES256 server-side encryption.
+A repeated conditional PUT to K3450 returned `PreconditionFailed`; a fresh
+HEAD retained the expected ETag, size and metadata
+([receipt](receipts/no-overwrite.json)).
 The compressed and raw objects, provider ZIPs, and fresh downloads remain in
 local `artifacts/` for replay; their digests and S3 API receipts are committed
 under `receipts/`. This custody result identifies stored bases. Runtime and
