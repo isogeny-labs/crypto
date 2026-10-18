@@ -26,9 +26,9 @@ use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, HashSet};
-use std::fs::{self, OpenOptions};
+use std::fs::{self, File, OpenOptions};
 use std::io::Write;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 fn checked_cgroup_memory_limit(memory_mib: u64) -> Result<u64> {
@@ -765,6 +765,294 @@ fn checked_four_x_lift(
         }
     }
     Ok(None)
+}
+
+const K16627_OBJECT_BLAKE3: &str =
+    "1aa70cc1571f4cb25af42936699378329128a869f2ae8ad35efb375663d4e59d";
+const K16627_POINT_SET_BLAKE3: &str =
+    "564c6bb72b346b73112240bb0bddc4ef68b7525f7ef2556d6046e52c32f976e0";
+
+struct WitnessPhases {
+    file: File,
+    path: PathBuf,
+    start: Instant,
+    next_sequence: u32,
+    source_commit: String,
+}
+
+impl WitnessPhases {
+    fn create(output: &Path, start: Instant, source_commit: String) -> Result<Self> {
+        if output.exists() {
+            return Err("complete-witness output already exists".into());
+        }
+        let mut path = output.as_os_str().to_os_string();
+        path.push(".phases.jsonl");
+        let path = PathBuf::from(path);
+        let file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&path)?;
+        Ok(Self {
+            file,
+            path,
+            start,
+            next_sequence: 0,
+            source_commit,
+        })
+    }
+
+    fn mark(&mut self, phase: &str, details: Value) -> Result<()> {
+        let memory_current_bytes: u64 = fs::read_to_string("/sys/fs/cgroup/memory.current")?
+            .trim()
+            .parse()?;
+        let record = json!({
+            "schema":"n83.k16627-m4-witness-phase/v1",
+            "sequence":self.next_sequence,
+            "phase":phase,
+            "elapsed_wall_ms":self.start.elapsed().as_secs_f64()*1000.0,
+            "memory_current_bytes":memory_current_bytes,
+            "source_commit":self.source_commit,
+            "object_blake3":K16627_OBJECT_BLAKE3,
+            "point_set_blake3":K16627_POINT_SET_BLAKE3,
+            "details":details,
+        });
+        serde_json::to_writer(&mut self.file, &record)?;
+        self.file.write_all(b"\n")?;
+        self.file.flush()?;
+        self.file.sync_all()?;
+        self.next_sequence += 1;
+        Ok(())
+    }
+}
+
+/// Phase-observable complete x-chain witness on the exact retained primary
+/// object. The seven blocks are fixed only after the full orbit domain is
+/// installed, and a SAT answer is checked against the original group law.
+pub(super) fn chain_witness_cli(root: &Path, memory_mib: u64, output: &Path) -> Result<Value> {
+    if memory_mib != 4096 {
+        return Err("complete-witness control requires the frozen 4096 MiB cap".into());
+    }
+    let memory_limit_bytes = checked_cgroup_memory_limit(memory_mib)?;
+    let (source_commit, source_attestation_mode) = frozen_chain_source()?;
+    let start = Instant::now();
+    let mut phases = WitnessPhases::create(output, start, source_commit.clone())?;
+    let (base, base_row, manifest_hash) =
+        load_panel_selected(root, 16_627, "public_x_hash", 2026100801)?;
+    if base_row["object"] != format!("objects/{K16627_OBJECT_BLAKE3}.jsonl.gz")
+        || base_row["point_set_blake3"] != K16627_POINT_SET_BLAKE3
+        || base.factor_base.signed_orbits.len() != 16_627
+        || base.factor_base.points.len() != 2_760_082
+    {
+        return Err("complete-witness control imported a different retained object".into());
+    }
+    let base_import_ms = start.elapsed().as_secs_f64() * 1000.0;
+    phases.mark("base_import_done", json!({"base_import_ms":base_import_ms}))?;
+
+    let fb = &base.factor_base;
+    let indices: [usize; 4] = std::array::from_fn(|column| fb.signed_orbits[column][0]);
+    let points: [&BinaryPoint; 4] = indices.map(|index| &fb.points[index]);
+    let summand_xs: Vec<F2mElement> = points
+        .iter()
+        .map(|point| match point {
+            BinaryPoint::Affine { x, .. } => Ok(x.clone()),
+            BinaryPoint::Infinity => Err("planted orbit representative is infinity"),
+        })
+        .collect::<std::result::Result<_, _>>()?;
+    let mut sum = BinaryPoint::Infinity;
+    let mut sums = Vec::with_capacity(4);
+    for point in points {
+        sum = base.curve.add(&sum, point);
+        sums.push(sum.clone());
+    }
+    let target = sum;
+    let affine = sums
+        .iter()
+        .all(|point| matches!(point, BinaryPoint::Affine { .. }));
+    let distinct = summand_xs
+        .iter()
+        .map(F2mElement::to_biguint)
+        .collect::<HashSet<_>>()
+        .len()
+        == 4;
+    if !affine || !distinct {
+        let receipt = json!({
+            "schema":"n83.k16627-m4-witness/v1", "status":"INVALID_PLANTED_CONTROL",
+            "source_commit":source_commit, "object_blake3":K16627_OBJECT_BLAKE3,
+            "point_set_blake3":K16627_POINT_SET_BLAKE3,
+            "affine_partial_sums":affine, "distinct_summand_x":distinct,
+            "selected_best_total_runtime":Value::Null,
+        });
+        write_new_json(output, &receipt)?;
+        return Ok(receipt);
+    }
+    let preflight_row = checked_primary_relation_row(&base.curve, fb, &indices, &target)?;
+    let mut preflight_rank = WideRankTracker::new(&base.curve.subgroup_order, fb.unknowns());
+    let preflight_rank_after_insert = preflight_rank.insert(preflight_row.clone());
+    let tamper_target = base.curve.add(&target, base.curve.generator());
+    let tamper_rejected =
+        checked_primary_relation_row(&base.curve, fb, &indices, &tamper_target).is_err();
+    if preflight_rank_after_insert != 1 || !tamper_rejected {
+        return Err("complete-witness group preflight failed".into());
+    }
+    let target_x = match &target {
+        BinaryPoint::Affine { x, .. } => x.clone(),
+        BinaryPoint::Infinity => return Err("complete-witness target is infinity".into()),
+    };
+    let sum2_x = match &sums[1] {
+        BinaryPoint::Affine { x, .. } => x.clone(),
+        BinaryPoint::Infinity => {
+            return Err("complete-witness first intermediate is infinity".into())
+        }
+    };
+    let sum3_x = match &sums[2] {
+        BinaryPoint::Affine { x, .. } => x.clone(),
+        BinaryPoint::Infinity => {
+            return Err("complete-witness second intermediate is infinity".into())
+        }
+    };
+    let planted_xs = [
+        summand_xs[0].clone(),
+        summand_xs[1].clone(),
+        summand_xs[2].clone(),
+        summand_xs[3].clone(),
+        sum2_x,
+        sum3_x,
+        target_x.clone(),
+    ];
+    phases.mark(
+        "group_preflight_done",
+        json!({
+            "point_indices":indices,
+            "x_decimal":planted_xs.iter().map(|x| x.to_biguint().to_string()).collect::<Vec<_>>(),
+            "rank_after_insert":preflight_rank_after_insert,
+            "tamper_rejected":tamper_rejected,
+        }),
+    )?;
+
+    let representatives: Vec<BigUint> = fb
+        .signed_orbits
+        .iter()
+        .map(|orbit| match &fb.points[orbit[0]] {
+            BinaryPoint::Affine { x, .. } => Ok(x.to_biguint()),
+            BinaryPoint::Infinity => Err("complete-witness orbit domain has infinity"),
+        })
+        .collect::<std::result::Result<_, _>>()?;
+    let model_start = Instant::now();
+    let mut enc = ChainedS3Encoding::build(
+        4,
+        &base.curve.curve.irreducible,
+        &base.curve.curve.b,
+        Some(&target_x),
+        0,
+        250_000,
+    )
+    .map_err(|_| "complete-witness chained-S3 model build failed")?;
+    enc.constrain_frobenius_orbit_summands(&representatives, 250_000, 6_000_000)
+        .map_err(|_| "complete-witness orbit-domain install failed")?;
+    let model_domain_ms = model_start.elapsed().as_secs_f64() * 1000.0;
+    phases.mark(
+        "model_domain_done",
+        json!({
+            "model_domain_ms":model_domain_ms,
+            "sat_variables":enc.solver.n_vars(),
+            "sat_clauses":enc.solver.n_clauses(),
+            "sat_xor_rows":enc.solver.n_xors(),
+        }),
+    )?;
+    for (block, x) in planted_xs.iter().enumerate() {
+        enc.pin_x_block(block, x)
+            .map_err(|_| "complete-witness x-block pin failed")?;
+    }
+    phases.mark("seven_blocks_pinned", json!({"x_blocks":7}))?;
+    enc.solver.conflict_budget = 100_000;
+    enc.solver.deadline = Some(start + Duration::from_secs(1800));
+    phases.mark("sat_entered", json!({"conflict_budget":100_000}))?;
+    let solver_start = Instant::now();
+    let answer = enc.solver.solve();
+    let solver_ms = solver_start.elapsed().as_secs_f64() * 1000.0;
+    let models = usize::from(answer == SolveResult::Sat);
+    phases.mark(
+        "sat_returned",
+        json!({
+            "answer":format!("{answer:?}"),
+            "solver_ms":solver_ms,
+            "conflicts":enc.solver.conflicts(),
+            "models":models,
+        }),
+    )?;
+
+    let mut relation = Value::Null;
+    let status = match answer {
+        SolveResult::Unknown => "UNKNOWN_search_cap",
+        SolveResult::Unsat => "INVALID_UNSAT_PLANTED",
+        SolveResult::Sat => {
+            if !enc.verify_model() || enc.decode_x_blocks() != planted_xs {
+                "INVALID_MODEL"
+            } else if let Some((lifted_indices, lifted_row)) =
+                checked_four_x_lift(&base.curve, fb, &summand_xs, &target)?
+            {
+                phases.mark(
+                    "group_lift_done",
+                    json!({
+                        "point_indices":lifted_indices,
+                        "group_verified":true,
+                    }),
+                )?;
+                let mut rank = WideRankTracker::new(&base.curve.subgroup_order, fb.unknowns());
+                let rank_after_insert = rank.insert(lifted_row.clone());
+                phases.mark("rank_done", json!({"rank_after_insert":rank_after_insert}))?;
+                if rank_after_insert != 1 || lifted_row != preflight_row {
+                    "INVALID_RELATION_CONTROL"
+                } else {
+                    let dense: Vec<_> = lifted_row.iter().map(ToString::to_string).collect();
+                    relation = json!({
+                        "point_indices":lifted_indices,
+                        "dense_decimal_blake3":blake3::hash(&serde_json::to_vec(&dense)?).to_hex().to_string(),
+                        "rank_after_insert":rank_after_insert,
+                        "tamper_rejected":tamper_rejected,
+                        "group_verified":true,
+                    });
+                    "PASS_COMPLETE_WITNESS"
+                }
+            } else {
+                "INVALID_GROUP_LIFT"
+            }
+        }
+    };
+    let memory_cgroup_peak_bytes: u64 = fs::read_to_string("/sys/fs/cgroup/memory.peak")?
+        .trim()
+        .parse()?;
+    let receipt = json!({
+        "schema":"n83.k16627-m4-witness/v1", "status":status,
+        "curve_a":0, "orbit_columns":16_627, "summands":4, "identity_mask":0,
+        "policy":"public_x_hash", "seed":2026100801u64,
+        "object_blake3":K16627_OBJECT_BLAKE3,
+        "point_set_blake3":K16627_POINT_SET_BLAKE3,
+        "panel_manifest_blake3":manifest_hash,
+        "source_commit":source_commit, "source_attestation_mode":source_attestation_mode,
+        "source_exporter_blake3":blake3::hash(include_bytes!("../../examples/koblitz_n83_factor_base_export.rs")).to_hex().to_string(),
+        "source_adapter_blake3":blake3::hash(include_bytes!("primary_adapter.rs")).to_hex().to_string(),
+        "source_chain_blake3":blake3::hash(include_bytes!("../../src/cryptanalysis/binary_semaev_chain_sat.rs")).to_hex().to_string(),
+        "source_index_calculus_blake3":blake3::hash(include_bytes!("../../src/cryptanalysis/koblitz_index_calculus.rs")).to_hex().to_string(),
+        "phase_file":phases.path.to_string_lossy(),
+        "point_indices":indices, "x_decimal":planted_xs.iter().map(|x| x.to_biguint().to_string()).collect::<Vec<_>>(),
+        "relation":relation,
+        "max_variables":250_000, "max_domain_clauses":6_000_000,
+        "conflict_budget":100_000, "max_models":1,
+        "sat_variables":enc.solver.n_vars(), "sat_clauses":enc.solver.n_clauses(),
+        "sat_xor_rows":enc.solver.n_xors(), "solver_models":models,
+        "solver_conflicts":enc.solver.conflicts(),
+        "base_import_ms":base_import_ms, "model_domain_ms":model_domain_ms,
+        "solver_ms":solver_ms, "process_wall_ms":start.elapsed().as_secs_f64()*1000.0,
+        "memory_cgroup_limit_bytes":memory_limit_bytes,
+        "memory_cgroup_swap_limit_bytes":0,
+        "memory_cgroup_peak_bytes":memory_cgroup_peak_bytes,
+        "process_usage":process_usage(),
+        "total_index_calculus_runtime_ms":Value::Null,
+        "selected_best_total_runtime":Value::Null,
+    });
+    write_new_json(output, &receipt)?;
+    Ok(receipt)
 }
 
 /// Bound a constructed-target SAT control to the exact replayed K=16,627
