@@ -63,6 +63,13 @@ colors = {3: "#1f77b4", 4: "#d62728"}
 # Anchors
 for m, n, ell in anchors:
     ax.scatter([m * ell], [4], marker="s", s=60, facecolors="none", edgecolors=colors[m], zorder=3)
+# Committed lower bounds from the previous study (dense closure saturated at
+# degree 4 without refuting on all 8 draws of m3 (19,7) and (21,7)): plotted
+# as open triangles at 5, labelled as committed, not measured here.
+for x in (21, 21):
+    ax.scatter([x], [5], marker="^", s=70, facecolors="none", edgecolors=colors[3], zorder=3)
+ax.annotate("≥ (committed, 8 draws)", (21.4, 5.0), fontsize=8, color=colors[3])
+ax.scatter([], [], marker="^", facecolors="none", edgecolors="gray", label="committed lower bound, dense closure > 4 (previous study)")
 # Measured here, jittered per draw so coincident points stay visible
 import random  # noqa: E402
 

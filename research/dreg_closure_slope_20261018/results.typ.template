@@ -2,7 +2,7 @@
 #set text(size: 10pt)
 #set par(justify: true)
 
-= TODO-INTERPRETATION: one-line headline (what the slope is, over which range)
+= Closure slope study: nothing above the anchors resolved; degree 5 at 40 unknowns is beyond this container
 
 These are the results of `research/dreg_closure_slope_20261018/`. The full
 text is `RESULTS.md`, and the run report is `reports/{{RUN_ID}}/`. Commit
@@ -24,12 +24,29 @@ text is `RESULTS.md`, and the run report is `reports/{{RUN_ID}}/`. Commit
 
 {{SCORE_TABLE}}
 
-// TODO-INTERPRETATION: table of P1 to P5 (prediction, outcome, confidence,
-// evidence) as in the previous study; then
-// - Registered verdict, quoted.
-// - Descriptive reading (not registered), labelled so.
-// - Soundness control, and how thin it is.
-// - Scope: the slope is the growth over m·ℓ <= 30, not a law beyond it.
+#table(columns: 4,
+  [*Prediction*], [*outcome*], [*confidence*], [*evidence*],
+  [P1: every resolved draw at m·ℓ = 20, 21 reads 5], [*unmeasured*: no draw resolved (all capped at degrees 5 and 6)], [about 65%], [`score-output.txt`],
+  [P2: a resolved cell with m·ℓ ≤ 30 reads 6], [*unmeasured*: no cell above the anchors resolved], [about 55%], [same],
+  [P3: s ≥ 0.10], [*unmeasured*: the fit has no point above the anchors], [about 70%], [same],
+  [P4: sparse degree-4 replays of committed dense refutations refute], [*holds on 1 of 1 measured*, 1 of 2 runs killed (worker restart): incomplete], [above 95%], [`runs/check-*`],
+  [P5: no satisfiable draw refuted], [*not run*: every registered control sits at N ≥ 46, where degree 4 itself caps], [above 95%], [—],
+)
+
+- *Registered verdict:* "nothing resolved above the anchors: undecided".
+- *Descriptive reading (not registered):* the committed records fix the
+  closure degree at 4 for m·ℓ ≤ 18 and above 4 at m·ℓ = 21, so the local
+  slope over 18–21 is at least 0.33; a fitted slope below 0.10 would need
+  the degree to hold at 5 to about m·ℓ = 28, below 0.03 to about 51. Both
+  are consistent with the data and untested by it.
+- *Feasibility wall (measured):* at N = 40 the sparse closure caps at
+  350 M entries in about 3 minutes at degrees 5 and 6; F4 (a probe, not
+  registered) was stopped by its 1 GiB step-matrix cap and, with the cap
+  raised, killed at 12.6 GB RSS in the degree-5 step. At N = 46 even degree
+  4 caps after 8,466 s.
+- *Soundness control:* none run here (see P5); the sparse engine rests on
+  its agreement test with the dense closure and on P4.
+- *Scope:* every statement is about m·ℓ ≤ 24 on this 4-core, 15 GB host.
 
 == Distance remaining (derived)
 
@@ -37,5 +54,11 @@ text is `RESULTS.md`, and the run report is `reports/{{RUN_ID}}/`. Commit
 
 {{DERIVED_TABLE}}
 
-// TODO-INTERPRETATION: which rows fit, which do not, the next cell to
-// measure, and the next improvement to try (AGENTS.md "Keep going").
+The table's "extrapolated degree" column carries the anchors' value 4
+because the fit has no point above them; read against the measured lower
+bound (≥ 5 at m·ℓ = 21, far below the priced m·ℓ ≈ n), every n = 131 row
+with admissible degree ≤ 4 is short by at least one degree at w = 1 and by
+three at w = 2.2. The next cell is the same one: m·ℓ = 21 at degree 5,
+which needs a host with 64 GB or more (dense closure about 72 GB at
+N = 40; F4's degree-5 step above 12.6 GB) or an out-of-core closure. The
+cells, draws and scorer are in place for it.
