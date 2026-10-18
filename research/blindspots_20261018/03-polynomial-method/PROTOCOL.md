@@ -378,3 +378,79 @@ Details that tighten or clarify the frozen text (none loosens it):
     named, and BLOCKED applies to F4 at those cells.
 12. **No use of the F4 interior.** The F4 arm is the committed instrument
     unchanged (source sha256 `f21a761b...`).
+
+## Repair pass (2026-10-18, experiment-director)
+
+Written after the first run, before any revision card ran. Question, arms,
+cells, metric and decision rule are unchanged.
+
+**What the first run left.** Card 01 completed (receipt
+`raw/receipt-card-01.json`, status completed, 16 commands, all exit 0): build,
+`selftest` SELFTEST OK, `asym` ASYM OK, `sens`, and the counted-model rows of
+all ten cells. Cards 02 to 09 were **refused at lint** (no command started, no
+receipt, no output): each named `target/blindspots-03/bin/b03` or `b05`, which
+existed once card 01 had built it, and `task_card.py` refuses an argv token that
+names a repository file the card's binds do not pin. Card 01 itself now fails
+`check-relay` for the same reason. Nothing from cards 02 to 09 was measured, so
+the revision reruns all of them.
+
+**Card rules the revision follows.** Every revision card builds its own binary
+into its own directory `target/blindspots-03-r2/cNN/` (absent when the card is
+linted), runs only that binary, and ends by removing the directory, so the card
+lints before and after the run. No card reads a file produced by another card.
+`b03 summarize --dir raw` reads the outputs of all cards, so it is not a card
+here; the assessing stage runs it after the cards (it needs a binary built from
+the instrument at the sha below). Each card's timeouts sum to at most 470 s.
+Outputs and receipts carry the suffix `-r2`
+(`raw/card-NN-r2-<job>.{stdout,stderr}.log`, `raw/receipt-card-NN-r2.json`), so
+nothing from the first run is overwritten, and `summarize` (which reads every
+`*.stdout.log`) takes the first-run card 01 rows and the `-r2` rows together.
+
+**Deviation 13 (instrument fix proved by the first run): the sensitivity
+bound.** The frozen text of the Sensitivity control requires the `dinur` count
+to move by less than 1% across E = 17, 33, 64. The instrument gated at 5%
+(`rel_d.abs() < 0.05`), so `sens` printed SENS OK on changes of 1.36% (E = 33)
+and 3.99% (E = 64), which the frozen text rejects. Fix: the gate is now
+`< 0.01` as frozen, and `summarize` no longer reads the line "SENS OK" but
+evaluates the recorded `sensitivity` rows (at least 3 rows, every
+`dinur_rel_change` below 0.01, every `pass` true), so the first-run rows in
+`raw/card-01-sens.stdout.log` are judged by the frozen bound too. Consequence,
+stated here and not hidden: on the first-run numbers the sensitivity control
+**fails**, and by the frozen rule a failed control makes the verdict
+INCONCLUSIVE whatever the other rows say. `summarize` therefore prints the
+verdict INCONCLUSIVE and, as a descriptive line only, the rule branch that
+would apply with that one control waived. The revision cards do not re-run
+`sens` (deterministic; nothing would change); a replacement of the 1% bound is
+a decision for the owner, not for this item.
+
+**Deviation 14: `summarize` descriptive line.** The added line in Deviation 13
+changes no verdict and no number.
+
+**Deviation 15: why card 01 is not re-run.** The edits touch `mode_sens` and
+`mode_summarize` only. `smoke-r2.sh` (committed beside this file) rebuilds the
+instrument and checks that `selftest`, `asym` and the ten `poly` model outputs
+are byte-identical to the card-01 logs, and that `sens` now exits 2 on the
+first-run numbers. Instrument source sha256 before the fix `9cb0ba30...`, after
+the fix `c4a2a1ac94687e6a8170d651e5ecca81c444d4656f293207437f8394a224647c`
+(bound in every revision card). The item 05 instrument is unchanged
+(`f21a761b...`).
+
+**Revision card plan** (timeouts are sums of the per-command timeouts; the
+measured development times are the first run's plan, re-measured on the draws
+at the smallest draw count for panics, see the build result):
+
+| card | content (arguments unchanged from the first plan) | timeouts |
+|---|---|---|
+| 02-r2 | build `b03`; FES full scans (8 descended + 8 random dense) on `c13-6-2 .. c29-14-2`; `crossover` | 420 s |
+| 03-r2 | build `b03`; FES on `c33-16-2` | 470 s |
+| 04-r2 | build `b05`; F4 on `c13-6-2`, `c17-8-2`, `c21-10-2`, `c25-12-2` (caps as planned) | 360 s |
+| 05-r2 | build `b05`; F4 on `c29-14-2` (targets 0-1), `c7-2-3`, `c10-3-3`, `c13-4-3` | 380 s |
+| 06-r2 | build `b05`; F4 on `c33-16-2` (target 0), `c16-5-3` | 360 s |
+| 07-r2 | build `b03`; positive control 1 on `c17-8-2` (real `dinur`, `lptwy`, paper `t`) | 470 s |
+| 08-r2 | build `b03`; positive control 1 on `c7-2-3`; `c13-6-2` seeds 1 to 8 | 410 s |
+| 09-r2 | build `b03`; positive control 1 on `c13-6-2` seeds 9 to 17 | 340 s |
+| 10-r2 | build `b03`; positive control 1 on `c13-6-2` seeds 18 to 26 | 340 s |
+
+Cards run one at a time in this order (the F4 time caps are wall-clock caps, so
+two lanes at once could change which targets reach a cap; bit-operation counts
+do not depend on load).

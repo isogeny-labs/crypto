@@ -1860,7 +1860,7 @@ fn mode_sens(_a: &Args) {
         let dinur = model_top(&lg, &Par { n, d: 2, t: paper_t(n), cancel: true }, e, sched[0], &sched[1..]);
         let rel_d = (dinur - base_dinur).exp2() - 1.0;
         let pass_f = (got / want - 1.0).abs() <= 0.02;
-        let pass_d = rel_d.abs() < 0.05;
+        let pass_d = rel_d.abs() < 0.01;
         ok &= pass_f && pass_d;
         println!(
             "{}",
@@ -2051,7 +2051,8 @@ fn mode_summarize(a: &Args) {
     files.sort();
     let mut cells: HashMap<String, CellAgg> = HashMap::new();
     let mut selftest_ok = false;
-    let mut sens_ok = false;
+    let mut sens_rows = 0usize;
+    let mut sens_bad = 0usize;
     let mut asym_ok = false;
     let (mut par_checked, mut par_odd, mut par_bad, mut par_skipped) = (0f64, 0f64, 0f64, 0f64);
     let mut par_cells: Vec<String> = Vec::new();
@@ -2067,9 +2068,6 @@ fn mode_summarize(a: &Args) {
         for line in txt.lines() {
             if line.contains("SELFTEST OK") {
                 selftest_ok = true;
-            }
-            if line.contains("SENS OK") {
-                sens_ok = true;
             }
             if line.contains("ASYM OK") {
                 asym_ok = true;
@@ -2149,6 +2147,13 @@ fn mode_summarize(a: &Args) {
                 "control" => {
                     let name = jstr_f(line, "name").unwrap_or_default();
                     let pass = jbool_f(line, "pass").unwrap_or(false);
+                    if name == "sensitivity" {
+                        // the frozen text: the dinur count moves by less than 1% across E
+                        sens_rows += 1;
+                        if jnum_f(line, "dinur_rel_change").map(|x| x.abs() >= 0.01).unwrap_or(true) {
+                            sens_bad += 1;
+                        }
+                    }
                     if name == "parity-agreement" {
                         par_checked += jnum_f(line, "checked").unwrap_or(0.0);
                         par_odd += jnum_f(line, "odd").unwrap_or(0.0);
@@ -2177,7 +2182,8 @@ fn mode_summarize(a: &Args) {
     // controls
     println!("\n## Controls");
     println!("selftest line present: {selftest_ok}");
-    println!("sensitivity control: {sens_ok}");
+    let sens_ok = sens_rows >= 3 && sens_bad == 0;
+    println!("sensitivity control: {sens_ok} ({sens_rows} rows, {sens_bad} outside the frozen 1% bound on the dinur change or failing)");
     println!("published-exponent control (asym): {asym_ok}");
     println!(
         "parity agreement: {par_checked} real calls on hashed systems over cells {:?}, {par_odd} with odd true parity, {par_bad} wrong or model-unequal, {par_skipped} skipped",
@@ -2191,6 +2197,8 @@ fn mode_summarize(a: &Args) {
     let odd_needed = 400.0; // 200 odd hashed systems, each checked by both polynomial-method arms
     let controls_ok = selftest_ok && sens_ok && asym_ok && control_fail.is_empty() && par_bad == 0.0 && par_odd >= odd_needed;
     println!("controls pass: {controls_ok} (odd-parity real calls {par_odd} of {odd_needed} required)");
+    // descriptive only: every control but the sensitivity bound passes (the frozen verdict stays INCONCLUSIVE)
+    let controls_ok_but_sens = !controls_ok && selftest_ok && asym_ok && par_bad == 0.0 && par_odd >= odd_needed && control_fail.iter().all(|n| n == "sensitivity");
 
     let mut s3: Vec<&CellAgg> = cells.values().filter(|c| c.d == 2 && c.n > 0).collect();
     s3.sort_by_key(|c| c.n);
@@ -2340,7 +2348,7 @@ fn mode_summarize(a: &Args) {
     let big = s3.last();
     let mut verdict = "INCONCLUSIVE".to_string();
     let mut level = "n/a";
-    if !controls_ok {
+    if !controls_ok && !controls_ok_but_sens {
         println!("a control did not pass or is missing: INCONCLUSIVE");
     } else if let Some(c) = big {
         if c.n != 32 || c.fes_desc.is_empty() {
@@ -2369,6 +2377,11 @@ fn mode_summarize(a: &Args) {
             println!(
                 "rho_dinur(32) = {rho_d:.3e}, rho_lptwy(32) = {rho_l:.3e}; fitted-exponent margin below FES (after the larger jackknife range): dinur {margin_d:.4}, lptwy {margin_l:.4}"
             );
+            if !controls_ok {
+                println!("a control did not pass (the sensitivity bound): INCONCLUSIVE by the frozen rule; the branch the rule would give with that one control waived, descriptive only: {verdict} (level: {level})");
+                verdict = "INCONCLUSIVE".into();
+                level = "n/a";
+            }
         }
     }
     println!("arm (e) msolve: BLOCKED (not installed; no GMP/MPFR/FLINT headers; ~4 GB disk); unblock with a prebuilt msolve binary");
