@@ -25,6 +25,9 @@ pub struct GenericOutcome {
     pub recovered: Option<u64>,
     pub setup: GroupOps,
     pub search: GroupOps,
+    /// The part of `search` spent re-placing a kangaroo after a same-kind
+    /// collision (zero for every other method).
+    pub restarts: GroupOps,
     /// Native work the group-operation unit does not charge, and the
     /// shape of the run (`baby_steps`, `giant_steps`, `restarts`, …).
     pub counters: BTreeMap<String, u64>,
@@ -265,17 +268,26 @@ pub fn kangaroo<G: CountedGroup>(
         rng = mix(rng);
         rng
     };
-    let start = |kind: u8, out: &mut GenericOutcome, off: u64| -> (G::Elt, u64) {
+    // The two initial placements are set-up; a placement after a same-kind
+    // collision is part of the search that produced the collision, and is
+    // charged there, so the `setup` / `search` split reflects where the
+    // work happened (the total is the same either way).
+    let start = |kind: u8, out: &mut GenericOutcome, off: u64, restart: bool| -> (G::Elt, u64) {
         out.count("starts", 1);
+        let ledger = if restart {
+            &mut out.search
+        } else {
+            &mut out.setup
+        };
         if kind == 0 {
             let d = addmod(r / 2, off, r);
-            (g.mul(&mut out.setup, gen, d), d)
+            (g.mul(ledger, gen, d), d)
         } else {
-            let z = g.mul(&mut out.setup, gen, off);
-            (g.add(&mut out.setup, target, z), off)
+            let z = g.mul(ledger, gen, off);
+            (g.add(ledger, target, z), off)
         }
     };
-    let mut roo = [start(0, &mut out, 0), start(1, &mut out, 0)];
+    let mut roo = [start(0, &mut out, 0, false), start(1, &mut out, 0, false)];
     let mut steps = 0u64;
     while steps < max_steps {
         for kind in 0..2u8 {
@@ -302,7 +314,11 @@ pub fn kangaroo<G: CountedGroup>(
                 Some(_) => {
                     out.count("same_kind_collisions", 1);
                     let off = next() % r.max(2);
-                    roo[kind as usize] = start(kind, &mut out, off);
+                    let before = out.search;
+                    roo[kind as usize] = start(kind, &mut out, off, true);
+                    out.restarts.adds += out.search.adds - before.adds;
+                    out.restarts.doubles += out.search.doubles - before.doubles;
+                    out.restarts.scalar_mults += out.search.scalar_mults - before.scalar_mults;
                 }
                 None => {
                     table.insert(g.key(&np), (kind, nd));
@@ -339,6 +355,35 @@ mod tests {
                 assert_eq!(out.recovered, Some(k), "{name} k={k} r={}", inst.r);
             }
         }
+    }
+
+    /// Kangaroo's set-up is the jump table and the two initial placements,
+    /// a function of `r` alone; any re-placement after a same-kind
+    /// collision is charged to `search`.  So the set-up charge is the same
+    /// on every seed.  (A same-kind collision needs a kangaroo to land on
+    /// its own trail; none occurs on these seeds, and the restart's
+    /// accounting is tested on a report in `audit::tests`.)
+    #[test]
+    fn kangaroo_setup_is_a_function_of_r_alone() {
+        let inst = find_prime_order_curve(14, 59297);
+        let g = &inst.curve;
+        let gen = inst.generator_point();
+        let mut setups = Vec::new();
+        for seed in 0..200u64 {
+            let k = 1 + (seed * 7919 + 13) % (inst.r - 1);
+            let q = g.mul(&mut GroupOps::default(), gen, k);
+            let out = kangaroo(g, gen, q, inst.r, seed, 64 * inst.r);
+            assert_eq!(out.recovered, Some(k), "seed {seed}");
+            assert_eq!(
+                out.setup.gae() + out.search.gae(),
+                (out.setup.adds + out.setup.doubles + out.search.adds + out.search.doubles) as f64
+            );
+            setups.push(out.setup.gae());
+        }
+        assert!(
+            setups.iter().all(|&s| s == setups[0]),
+            "set-up varies with the seed: {setups:?}"
+        );
     }
 
     #[test]

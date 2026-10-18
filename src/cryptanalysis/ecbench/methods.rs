@@ -62,7 +62,7 @@ use crate::cryptanalysis::ic_framework::solvers::solver_by_name;
 use crate::cryptanalysis::ic_framework::stages::{
     DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, Targets,
 };
-use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec, RunReport};
+use crate::cryptanalysis::ic_framework::{run_pipeline_with_base, PipelineSpec, RunReport};
 use crate::cryptanalysis::ic_measurement::{self as measurement, Phase, Snapshot};
 use crate::cryptanalysis::koblitz_fast::FastPoint;
 use crate::cryptanalysis::koblitz_strong_rho::{
@@ -912,6 +912,15 @@ fn generic_report(
     field_ops: Option<FieldOps>,
 ) -> SolveReport {
     let total = out.setup.gae() + out.search.gae();
+    // A kangaroo re-placement is search; `detail` carries it so `verify`
+    // can reproduce a record written while it was charged to the set-up
+    // (`audit::legacy_restart_phase`).  `detail` is not compared on replay.
+    let detail = if out.restarts == GroupOps::default() {
+        Value::Null
+    } else {
+        json!({"restarts_in_search": {"adds": out.restarts.adds,
+            "doubles": out.restarts.doubles, "scalar_mults": out.restarts.scalar_mults}})
+    };
     SolveReport {
         recovered: out.recovered.map(u128::from),
         exhausted: out.exhausted,
@@ -927,7 +936,7 @@ fn generic_report(
         nondeterminism: vec![],
         solve_wall_ns: wall,
         factor_base: None,
-        detail: Value::Null,
+        detail,
         online: None,
         online_error: None,
         solver: None,
@@ -945,6 +954,14 @@ fn charge_class_setup(res: &mut RhoResult, setup: GroupOps, r: u64) {
     res.group_ops.merge(setup);
     res.gae = res.group_ops.gae();
     res.s = res.gae / (r as f64).sqrt();
+}
+
+/// The class set-up, carried in the report's `detail` so that `verify`
+/// can reproduce a record written before it was charged to the total
+/// (`audit::legacy_class_setup`).  `detail` is not compared on replay.
+fn class_setup_detail(setup: GroupOps) -> Value {
+    json!({"class_setup": {"adds": setup.adds, "doubles": setup.doubles,
+        "scalar_mults": setup.scalar_mults, "gae": setup.gae()}})
 }
 
 fn rho_report(res: RhoResult, wall: u64, field_ops: Option<FieldOps>) -> SolveReport {
@@ -1332,7 +1349,9 @@ fn solve_inner(
             charge_class_setup(&mut res, setup, i.r);
             measurement::end_online();
             let f = FieldOps::total(&[res.group_ops]);
-            Ok(rho_report(res, t.elapsed().as_nanos() as u64, Some(f)))
+            let mut rep = rho_report(res, t.elapsed().as_nanos() as u64, Some(f));
+            rep.detail = class_setup_detail(setup);
+            Ok(rep)
         }
         (Instance::Prime(i), _) if m.id == "rho.cubic" => {
             let t = Instant::now();
@@ -1357,7 +1376,9 @@ fn solve_inner(
             charge_class_setup(&mut res, setup, i.r);
             measurement::end_online();
             let f = FieldOps::total(&[res.group_ops]);
-            Ok(rho_report(res, t.elapsed().as_nanos() as u64, Some(f)))
+            let mut rep = rho_report(res, t.elapsed().as_nanos() as u64, Some(f));
+            rep.detail = class_setup_detail(setup);
+            Ok(rep)
         }
         (Instance::Prime(i), _) => solve_generic(
             m,
@@ -2233,10 +2254,10 @@ fn solve_ic_prime(
     let t = Instant::now();
     // The runner, not the pipeline, checks the answer: pass a planted
     // value that cannot match so `verified` carries no information.
-    let rep = run_pipeline(&ctx, &spec, base, oracle, u64::MAX, &calib, None)?;
+    // The base the run built and used is the one described below: no
+    // second build outside the measured run.
+    let (rep, fb) = run_pipeline_with_base(&ctx, &spec, base, oracle, u64::MAX, &calib, None)?;
     let wall = t.elapsed().as_nanos() as u64;
-    let mut scratch = GroupOps::default();
-    let fb = base.build(&ctx, &spec.factor_base_params, &mut scratch)?;
     let facts = factor_base_facts(
         &curve.slug,
         &m.params["factor_base"],
@@ -2325,10 +2346,11 @@ fn solve_ic_fp4(
         ..Default::default()
     };
     let t = Instant::now();
-    let rep = run_pipeline(&ctx, &spec, &base, &mut oracle, u64::MAX, &calib, None)?;
+    // The base the run built and used is the one described below: no
+    // second build outside the measured run.
+    let (rep, fb) =
+        run_pipeline_with_base(&ctx, &spec, &base, &mut oracle, u64::MAX, &calib, None)?;
     let wall = t.elapsed().as_nanos() as u64;
-    let mut scratch = GroupOps::default();
-    let fb = base.build(&ctx, &spec.factor_base_params, &mut scratch)?;
     let facts = factor_base_facts(
         &curve.slug,
         &m.params["factor_base"],
@@ -2412,10 +2434,11 @@ fn solve_ic_f2m4(
         ..Default::default()
     };
     let t = Instant::now();
-    let rep = run_pipeline(&ctx, &spec, &base, &mut oracle, u64::MAX, &calib, None)?;
+    // The base the run built and used is the one described below: no
+    // second build outside the measured run.
+    let (rep, fb) =
+        run_pipeline_with_base(&ctx, &spec, &base, &mut oracle, u64::MAX, &calib, None)?;
     let wall = t.elapsed().as_nanos() as u64;
-    let mut scratch = GroupOps::default();
-    let fb = base.build(&ctx, &spec.factor_base_params, &mut scratch)?;
     let facts = factor_base_facts(
         &curve.slug,
         &m.params["factor_base"],
@@ -2611,10 +2634,10 @@ fn solve_ic_binary(
     };
     let calib = pinned_only_calibration(regime, &curve.slug);
     let t = Instant::now();
-    let rep = run_pipeline(&ctx, &spec, base, oracle, u64::MAX, &calib, None)?;
+    // The base the run built and used is the one described below: no
+    // second build outside the measured run.
+    let (rep, fb) = run_pipeline_with_base(&ctx, &spec, base, oracle, u64::MAX, &calib, None)?;
     let wall = t.elapsed().as_nanos() as u64;
-    let mut scratch = GroupOps::default();
-    let fb = base.build(&ctx, &spec.factor_base_params, &mut scratch)?;
     let facts = factor_base_facts(
         &curve.slug,
         &m.params["factor_base"],
