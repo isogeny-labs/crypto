@@ -2768,7 +2768,7 @@ mod tests {
             let mut roots: Vec<u64> = (0..4).map(|_| rng.gen::<u64>() & gf.mask).collect();
             match round % 6 {
                 0 => roots[1] = roots[0],                       // double root
-                1 => roots[3] = roots[2] ^ 0,                   // double root again
+                1 => roots[3] = roots[2],                       // double root again
                 2 => roots[3] = roots[0] ^ roots[1] ^ roots[2], // sum zero: c3 = 0
                 3 => {
                     roots[1] = roots[0];

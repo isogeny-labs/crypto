@@ -164,7 +164,7 @@ fn is_odd_prime(n: usize) -> bool {
         && (3..)
             .step_by(2)
             .take_while(|p| p * p <= n)
-            .all(|p| n % p != 0)
+            .all(|p| !n.is_multiple_of(p))
 }
 
 impl CyclicAction {
