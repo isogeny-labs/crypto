@@ -292,3 +292,13 @@ sixteen cell-populations of the frozen cell list are each run exactly once;
 no cell is dropped, merged or re-run. Raw outputs: `raw/n<N>-m<M>-<pop>.jsonl`
 (stdout) and `.log` (stderr), `raw/selftest.txt`, `raw/verdict.txt`,
 `raw/receipt-card-NN.json`.
+
+### Card plan, final split (supersedes the table above; same sixteen cells)
+
+Seven cards, each with a timeout sum under nine minutes (at most 525 s) and an
+estimated run time of 4 to 6.5 minutes. Card 01: build, `selftest`, (17,2,U)
+(17,2,S) (17,3,U). Card 02: (17,3,S) (19,2,U) (19,2,S). Card 03: (19,3,U)
+(19,3,S) (23,2,U). Card 04: (23,2,S) (23,3,U) (23,3,S). Card 05: (29,3,U)
+(29,3,S). Card 06: (29,2,U) (29,2,S). Card 07: `verdict --dir raw` only.
+Every card builds its own binary (`target/blindspots-11/card-NN/b11`) and
+removes it at the end. Total measured about 27 CPU-minutes.
