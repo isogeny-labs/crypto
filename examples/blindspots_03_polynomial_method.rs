@@ -626,7 +626,7 @@ impl Sys {
             })
             .collect();
         let mut first = 0usize;
-        let mut elim = |rows: &mut Vec<Vec<u64>>, from: usize, cols: std::ops::Range<usize>| -> usize {
+        let elim = |rows: &mut Vec<Vec<u64>>, from: usize, cols: std::ops::Range<usize>| -> usize {
             let mut rank = from;
             for col in cols {
                 let (w, b) = (col / 64, col % 64);
