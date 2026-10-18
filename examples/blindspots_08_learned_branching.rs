@@ -161,7 +161,10 @@ fn find_irreducible_sparse(n: u32) -> u64 {
 
 impl Gf {
     fn new(n: u32) -> Gf {
-        let low = find_irreducible_sparse(n);
+        Gf::with_low(n, find_irreducible_sparse(n))
+    }
+    /// `GF(2^n)` defined by `z^n + low` (bit `i` of `low` is the coefficient of `z^i`).
+    fn with_low(n: u32, low: u64) -> Gf {
         let mask = (1u64 << n) - 1;
         let mut g = Gf { n, low, mask, pow: Vec::new() };
         let mut p = 1u64;
@@ -399,51 +402,102 @@ fn sym_free(offset: usize, n: u32) -> Sym {
     (0..n as usize).map(|k| vec![1u64 << (offset + k)]).collect()
 }
 
-/// The m = 3 chain `S_3(x1,x2,u) = 0`, `S_3(u,x3,x_R) = 0`: variables are the
-/// `3*l` subspace coordinates (block `i`, bit `t` is variable `i*l + t`), then
-/// the `n` bits of `u`. The same layout and equations as `build_system` of
-/// item 05 and `build_decomposition_system` of the crate. Used here only as an
-/// independent ground truth for the direct system below.
-fn build_chain_system(gf: &Gf, basis: &[u64], xr: u64) -> (Vec<Poly>, usize) {
-    let l = basis.len();
-    let n = gf.n;
-    let nv = 3 * l + n as usize;
-    assert!(nv <= 62, "at most 62 unknowns in this build");
-    let s: Vec<Sym> = (0..3).map(|i| sym_subspace(basis, i * l, n)).collect();
-    let target = sym_const(xr, n);
-    let u = sym_free(3 * l, n);
-    let mut eqs: Vec<Poly> = Vec::new();
-    eqs.extend(sym_s3(&s[0], &s[1], &u, gf));
-    eqs.extend(sym_s3(&u, &s[2], &target, gf));
-    (eqs, nv)
+/// Number of unknowns of the symmetrised system for factor-base dimension `l`:
+/// `3l` subspace coordinates, then the coordinates of the elementary symmetric
+/// functions `e1` (`l` bits), `e2` (`2l-1`) and `e3` (`3l-2`).
+fn nvars_sym(l: usize) -> usize {
+    9 * l - 3
 }
 
-/// The direct Semaev system `S_4(x1, x2, x3, x_R) = 0` of the WDSat corpus
-/// (`EC-Index-Calculus-Benchmarks`, the committed ICPERF instances `n15l5` ..):
-/// `u` is eliminated by the resultant of the two quadratics
-/// `S_3(x1,x2,u) = A u^2 + B u + C` and `S_3(u,x3,x_R) = A' u^2 + B' u + C'`,
-/// `Res = (A C' + A' C)^2 + (A B' + A' B)(B C' + B' C)` (characteristic 2),
-/// with `A = (x1+x2)^2`, `B = x1 x2`, `C = B^2 + 1`, `A' = (x3+x_R)^2`,
-/// `B' = x3 x_R`, `C' = B'^2 + 1`. Unknowns: the `3*l` subspace coordinates
-/// only; one bit-equation per coordinate of `GF(2^n)` (monomials up to degree 6).
+/// The symmetrised fourth-summation-polynomial system `S'_4` of the WDSat
+/// corpus (Trimoska, Ionica, Dequen; `EC-Index-Calculus-Benchmarks`, the
+/// committed ICPERF instances `n15l5`, `n17l6`, `n19l6`), for the factor base
+/// `V = span{1, z, .., z^(l-1)}` and the curve `y^2 + xy = x^3 + x^2 + 1`.
+///
+/// Unknowns (the corpus numbering): `x1` bits `0..l`, `x2` bits, `x3` bits,
+/// then `e1`, `e2`, `e3`, the coordinates (polynomial basis, no reduction while
+/// `n >= 3l - 2`) of `e1 = x1+x2+x3`, `e2 = x1x2+x1x3+x2x3`, `e3 = x1x2x3`.
+/// Equations: the `4l-1+3l-2-..` definitions of the `e` bits, and the `n` bit
+/// equations of
+///   `S_4 = t^4 + t^3 e3 + (1+t^4) e3^2 + t e3^3 + e3^4 + t^2 e2^2 + t^3 e2^2 e3
+///          + t^4 e2^4 + t e1^2 e3 + t^2 e1^2 e3^2 + e1^4`,  `t = x_R`,
+/// the resultant `Res_u(S_3(x1,x2,u), S_3(u,x3,x_R))` written in `e1,e2,e3`
+/// (coefficients found by an exact F_2 fit and re-checked in the selftest
+/// against `s4_eval` on random field elements).
 fn build_system(gf: &Gf, basis: &[u64], xr: u64) -> (Vec<Poly>, usize) {
     let l = basis.len();
-    let n = gf.n;
-    let nv = 3 * l;
-    assert!(nv <= 62);
-    let s: Vec<Sym> = (0..3).map(|i| sym_subspace(basis, i * l, n)).collect();
-    let x4 = sym_const(xr, n);
-    let one = sym_const(1, n);
-    let a = sym_sq(&sym_add(&s[0], &s[1]), gf);
-    let b = sym_mul(&s[0], &s[1], gf);
-    let c = sym_add(&sym_sq(&b, gf), &one);
-    let a2 = sym_sq(&sym_add(&s[2], &x4), gf);
-    let b2 = sym_mul(&s[2], &x4, gf);
-    let c2 = sym_add(&sym_sq(&b2, gf), &one);
-    let t1 = sym_sq(&sym_add(&sym_mul(&a, &c2, gf), &sym_mul(&a2, &c, gf)), gf);
-    let t2a = sym_add(&sym_mul(&a, &b2, gf), &sym_mul(&a2, &b, gf));
-    let t2b = sym_add(&sym_mul(&b, &c2, gf), &sym_mul(&b2, &c, gf));
-    let mut eqs = sym_add(&t1, &sym_mul(&t2a, &t2b, gf));
+    assert!(basis.iter().enumerate().all(|(i, &b)| b == 1u64 << i), "polynomial-basis factor base");
+    let n = gf.n as usize;
+    assert!(n >= 3 * l - 2, "n >= 3l-2 keeps e1,e2,e3 unreduced");
+    let nv = nvars_sym(l);
+    assert!(nv <= 62, "at most 62 unknowns in this build");
+    let xv = |blk: usize, t: usize| -> u64 { 1u64 << (blk * l + t) };
+    let e1v = |k: usize| -> u64 { 1u64 << (3 * l + k) };
+    let e2v = |k: usize| -> u64 { 1u64 << (4 * l + k) };
+    let e3v = |k: usize| -> u64 { 1u64 << (6 * l - 1 + k) };
+    let mut eqs: Vec<Poly> = Vec::new();
+    for k in 0..l {
+        eqs.push(norm(vec![e1v(k), xv(0, k), xv(1, k), xv(2, k)]));
+    }
+    for k in 0..2 * l - 1 {
+        let mut t = vec![e2v(k)];
+        for a in 0..l {
+            if k >= a && k - a < l {
+                let b = k - a;
+                t.push(xv(0, a) | xv(1, b));
+                t.push(xv(0, a) | xv(2, b));
+                t.push(xv(1, a) | xv(2, b));
+            }
+        }
+        eqs.push(norm(t));
+    }
+    for k in 0..3 * l - 2 {
+        let mut t = vec![e3v(k)];
+        for a in 0..l {
+            for b in 0..l {
+                if k >= a + b && k - a - b < l {
+                    t.push(xv(0, a) | xv(1, b) | xv(2, k - a - b));
+                }
+            }
+        }
+        eqs.push(norm(t));
+    }
+    let coord = |len: usize, var: &dyn Fn(usize) -> u64| -> Sym {
+        (0..n).map(|k| if k < len { vec![var(k)] } else { vec![] }).collect()
+    };
+    let e1 = coord(l, &e1v);
+    let e2 = coord(2 * l - 1, &e2v);
+    let e3 = coord(3 * l - 2, &e3v);
+    let pw = |k: u32| -> u64 {
+        let mut r = 1u64;
+        for _ in 0..k {
+            r = gf.mul(r, xr);
+        }
+        r
+    };
+    let cmul = |c: u64, x: &Sym| -> Sym { sym_mul(&sym_const(c, gf.n), x, gf) };
+    let e3s = sym_sq(&e3, gf);
+    let e3c = sym_mul(&e3s, &e3, gf);
+    let e3q = sym_sq(&e3s, gf);
+    let e2s = sym_sq(&e2, gf);
+    let e2q = sym_sq(&e2s, gf);
+    let e1s = sym_sq(&e1, gf);
+    let e1q = sym_sq(&e1s, gf);
+    let e1s_e3 = sym_mul(&e1s, &e3, gf);
+    let e1e3_sq = sym_sq(&sym_mul(&e1, &e3, gf), gf);
+    let e2s_e3 = sym_mul(&e2s, &e3, gf);
+    let mut f = sym_const(pw(4), gf.n);
+    f = sym_add(&f, &cmul(pw(3), &e3));
+    f = sym_add(&f, &cmul(1 ^ pw(4), &e3s));
+    f = sym_add(&f, &cmul(pw(1), &e3c));
+    f = sym_add(&f, &e3q);
+    f = sym_add(&f, &cmul(pw(2), &e2s));
+    f = sym_add(&f, &cmul(pw(3), &e2s_e3));
+    f = sym_add(&f, &cmul(pw(4), &e2q));
+    f = sym_add(&f, &cmul(pw(1), &e1s_e3));
+    f = sym_add(&f, &cmul(pw(2), &e1e3_sq));
+    f = sym_add(&f, &e1q);
+    eqs.extend(f);
     eqs.retain(|p| !p.is_empty());
     (eqs, nv)
 }
