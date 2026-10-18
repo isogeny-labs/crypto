@@ -1,5 +1,16 @@
 # Degree-83 factor-base sweep: observed evidence
 
+The [cloud resume input recovery](verification/cloud-input-reconstruction-20261018/RESULT.md)
+reconstructed the primary K2048 archive byte-for-byte and passed generic
+replay of all 339,968 points plus rejection of a forged orbit coefficient
+with recomputed hashes. This recovers the input despite current S3 denial;
+upstream then published the later Mac high-cap receipts. Their file hashes,
+source snapshots and original public query replay pass the recovery check.
+The original binary and live cleanup were not rechecked, and no new solver
+trial ran.
+The [remaining evidence/access gates](../../problems/n83-resume-evidence-and-execution-access.md)
+and unknown complete-runtime winner remain explicit.
+
 The [primary K4096 size-frontier candidate](verification/k4096-primary-20261018/RESULT.md)
 is now constructed, generically replayed and stored at a content-addressed
 S3 key. The frozen `a=0` hash-policy object contains 679,936 distinct points
