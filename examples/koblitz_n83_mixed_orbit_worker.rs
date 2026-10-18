@@ -16,6 +16,7 @@ use crypto_lib::cryptanalysis::koblitz_large_prime::{
     build_exact_residual_difference_factor_base, build_exact_residual_suffix_factor_base,
     FeedOutcome, LargePrimeLimits, MixedOrbitDomains, MixedOrbitOrdering, WideLargePrimeEliminator,
 };
+use crypto_lib::cryptanalysis::sat::to_dimacs_xor;
 use flate2::read::GzDecoder;
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
@@ -865,6 +866,96 @@ fn run_cross_pilot(args: &[String]) -> Result<()> {
     run_cross_pilot_with_ordering(args, MixedOrbitOrdering::FirstPair)
 }
 
+/// Export exactly one natural-query identity pattern from the canonical arm.
+/// The same encoder is called by the native search before its first solve.
+fn export_cross_pilot_canonical(args: &[String]) -> Result<()> {
+    if args.len() != 12 {
+        return Err("usage: export-cross-pilot-canonical BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BASE_SUMMANDS RESIDUAL_SUMMANDS IDENTITY_MASK NEW_XOR_DIMACS_PATH".into());
+    }
+    let base_summands: usize = args[8].parse()?;
+    let residual_summands: usize = args[9].parse()?;
+    let identity_mask: u32 = args[10].parse()?;
+    let m = base_summands
+        .checked_add(residual_summands)
+        .ok_or("summand overflow")?;
+    if !(5..=6).contains(&m)
+        || base_summands < 3
+        || !(1..=2).contains(&residual_summands)
+        || identity_mask >= (1u32 << (m - 2))
+    {
+        return Err("invalid natural-query export configuration".into());
+    }
+    let base_row = pinned_pilot_row(SMALL_600_MANIFEST, &args[1])?;
+    let pool_row = pinned_pilot_row(SMALL_600_MANIFEST, &args[4])?;
+    require_distinct_pilot_streams(&base_row, &pool_row)?;
+    let started = Instant::now();
+    let curve = KoblitzCurve::known_n83_k0().ok_or("pinned Koblitz curve")?;
+    if curve.label() != CURVE || curve.cofactor != BigUint::from(4u8) {
+        return Err("curve identity mismatch".into());
+    }
+    let (base_row, base) =
+        import_pilot(&args[1], Path::new(&args[2]), Path::new(&args[3]), &curve)?;
+    let (pool_row, pool) =
+        import_pilot(&args[4], Path::new(&args[5]), Path::new(&args[6]), &curve)?;
+    require_distinct_pilot_streams(&base_row, &pool_row)?;
+    let residual = build_exact_residual_difference_factor_base(&curve, &base, &pool)?;
+    let (public_target, corpus_hash) = public_target(Path::new(&args[7]), &curve)?;
+    let a = trial_coefficient(b"a", 0, &curve.subgroup_order);
+    let b = trial_coefficient(b"b", 0, &curve.subgroup_order);
+    let target = curve.add(
+        &curve.mul(curve.generator(), &a),
+        &curve.mul(&public_target, &b),
+    );
+    let domains = MixedOrbitDomains::new(&curve, &base, &residual)?;
+    let limits = ChainS3Limits {
+        max_variables: 150_000,
+        max_domain_clauses: 12_000_000,
+        max_models: 1,
+        conflict_budget: 1,
+    };
+    let enc = domains
+        .export_pattern_encoding(
+            &a,
+            &b,
+            &public_target,
+            base_summands,
+            residual_summands,
+            identity_mask,
+            limits,
+            MixedOrbitOrdering::EqualDomainRuns,
+        )
+        .map_err(|error| format!("natural-query export failed: {error:?}"))?;
+    let dimacs = to_dimacs_xor(&enc.solver);
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&args[11])?;
+    file.write_all(dimacs.as_bytes())?;
+    file.sync_all()?;
+    println!(
+        "{}",
+        json!({
+            "schema":"n83.mixed-orbit-natural-xor-dimacs-export/v1",
+            "status":"EXPORTED_ONE_IDENTITY_PATTERN",
+            "study":STUDY, "curve_slug":curve.label(),
+            "base_object_blake3":args[1], "pool_object_blake3":args[4],
+            "public_corpus_canonical_json_blake3":corpus_hash,
+            "source_blake3":blake3::hash(include_bytes!("koblitz_n83_mixed_orbit_worker.rs")).to_hex().to_string(),
+            "a":a.to_string(), "b":b.to_string(), "target":point_json(&target)?,
+            "base_summands":base_summands, "residual_summands":residual_summands,
+            "identity_mask":identity_mask, "ordering":"equal_domain_runs",
+            "small_signed_orbits":base.signed_orbits.len(),
+            "residual_signed_orbits":residual.signed_orbits.len(),
+            "variables":enc.solver.n_vars(), "clauses":enc.solver.n_original_clauses(),
+            "xors":enc.solver.n_xors(), "dimacs_bytes":dimacs.len(),
+            "dimacs_blake3":blake3::hash(dimacs.as_bytes()).to_hex().to_string(),
+            "export_wall_ms_L0":started.elapsed().as_secs_f64()*1000.0,
+            "selected_best_total_runtime":Value::Null
+        })
+    );
+    Ok(())
+}
+
 fn run_cross_pilot_with_ordering(args: &[String], ordering: MixedOrbitOrdering) -> Result<()> {
     if args.len() != 14 {
         return Err("usage: run-cross-pilot|run-cross-pilot-canonical BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS BASE_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR".into());
@@ -1081,6 +1172,7 @@ fn main() -> Result<()> {
         Some("run") => run(&args, &SMALL),
         Some("run-alt") => run(&args, &SMALL_600),
         Some("run-cross-pilot") => run_cross_pilot(&args),
+        Some("export-cross-pilot-canonical") => export_cross_pilot_canonical(&args),
         Some("run-cross-pilot-canonical") => {
             run_cross_pilot_with_ordering(&args, MixedOrbitOrdering::EqualDomainRuns)
         }
@@ -1093,7 +1185,7 @@ fn main() -> Result<()> {
             Ok(())
         }
         Some("control-run") => control_run(&args),
-        _ => Err("usage: verify|verify-alt SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT | verify-cross-pilot BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT | verify-control SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT FIXTURE | run|run-alt SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT CORPUS BUDGET_SECONDS MAX_TRIALS CONFLICT_BUDGET MAX_MODELS SMALL_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR | run-cross-pilot|run-cross-pilot-canonical BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS BASE_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR | control-run SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT FIXTURE BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS OUTPUT_DIR".into()),
+        _ => Err("usage: verify|verify-alt SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT | verify-cross-pilot BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT | export-cross-pilot-canonical BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BASE_SUMMANDS RESIDUAL_SUMMANDS IDENTITY_MASK NEW_XOR_DIMACS_PATH | verify-control SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT FIXTURE | run|run-alt SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT CORPUS BUDGET_SECONDS MAX_TRIALS CONFLICT_BUDGET MAX_MODELS SMALL_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR | run-cross-pilot|run-cross-pilot-canonical BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS BASE_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR | control-run SMALL_MANIFEST SMALL_OBJECT ENVELOPE_MANIFEST ENVELOPE_OBJECT FIXTURE BUDGET_SECONDS CONFLICT_BUDGET MAX_MODELS OUTPUT_DIR".into()),
     }
 }
 
