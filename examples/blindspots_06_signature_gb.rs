@@ -11,15 +11,26 @@
 //! b06 xcheck  --draws <item05 draws.tsv> --ref <item05 committed grevlex lines> --cell c17-4-3
 //! b06 gen     --m 3 --n 17 --ell 4 --seed 20261020 --want 17 --label c17-4-3
 //! b06 run     --draws draws.tsv --cell c17-4-3 --targets 0-15 --trace-target 16 \
-//!             --arms f4,sig,f4r,sigr [--time-limit S] [--total-limit S]
+//!             --arms f4,sig,f4r,f4n,sigr [--time-limit S] [--total-limit S] [--touch-ratio K]
 //! b06 summarize --dir raw
 //! ```
 //!
-//! Arms: `f4` (item 05's Boolean-ring F4, grevlex), `sig` (signature-based engine
-//! with criteria K0-K4), `sig0` (the ablation: K1-K4 off), `f4r`/`sigr` (replay of
-//! a trace recorded on the held-out target), `f4rs`/`sigrs` (replay of the
-//! target's own trace: the ceiling), `f4rx:<cell>` (replay of another cell's
-//! trace: the fallback control).
+//! Arms (all on the same system, same refutation test):
+//! * `f4`    item 05's Boolean-ring F4, grevlex (the incumbent, arm a);
+//! * `sig`   the signature-based engine with criteria K0-K5 (arm b), generators in
+//!           ascending degree;
+//! * `sig4`  the same without the rewritable criterion K5; `sig0` with K1-K5 off (squares and
+//!           singular pairs only); `sigc` the construction order of the generators;
+//! * `f4r`   F4 with replay of a trace recorded on the held-out target, keeping only the pairs
+//!           the trace found useful and the reducers it chose (exact F4Remake, arm c);
+//!           `f4n` the same with a negative filter (drop only the pairs the trace found
+//!           to reduce to zero), descriptive;
+//! * `sigr`  `sig` with the same replay (arm d); `sign` its negative-filter variant;
+//! * `f4rs`/`sigrs` replay of the target's own trace (the ceiling); `f4rx:<cell>` replay of
+//!           another cell's trace (the fallback control).
+//! `--touch-ratio K` stops a signature arm (status `touchcap`) once its touches exceed K times
+//! those of `f4` on the same target; the ratio R is then bounded above by touches(f4)/touches.
+//! (`sigs`, selection by signature degree, was a development arm: it needs degree-5 matrices.)
 
 use std::collections::{HashMap, HashSet};
 use std::hash::{BuildHasherDefault, Hasher};
@@ -2064,14 +2075,20 @@ impl<'a> Sig<'a> {
                 slab.push(lab);
             }
             if ri & 15 == 15 {
-                if self.over_time() {
-                    return Err(Status::TimeLimit);
-                }
-                if self.over_mem() {
-                    return Err(Status::MemCap);
-                }
-                if self.lim.touch_cap != 0 && self.t.touches() + build + elim > self.lim.touch_cap {
-                    return Err(Status::TouchCap);
+                // an abort still charges the work of the unfinished matrix
+                let abort = if self.over_time() {
+                    Some(Status::TimeLimit)
+                } else if self.over_mem() {
+                    Some(Status::MemCap)
+                } else if self.lim.touch_cap != 0 && self.t.touches() + build + elim > self.lim.touch_cap {
+                    Some(Status::TouchCap)
+                } else {
+                    None
+                };
+                if let Some(st) = abort {
+                    self.t.build += build;
+                    self.t.elim += elim;
+                    return Err(st);
                 }
             }
         }
@@ -2742,13 +2759,18 @@ fn check_system(name: &str, eqs: &[Poly], nv: usize, cross: &Traces, st: &mut Sy
         }
     }
     // replays: own trace, then a trace of another system
-    for (kind, mine, other) in [(Kind::F4, &own.f4, &cross.f4), (Kind::Sig(FULL), &own.sig, &cross.sig)] {
+    for (kind, mine, other, neg) in [
+        (Kind::F4, &own.f4, &cross.f4, false),
+        (Kind::Sig(FULL), &own.sig, &cross.sig, false),
+        (Kind::F4, &own.f4, &cross.f4, true),
+        (Kind::Sig(FULL), &own.sig, &cross.sig, true),
+    ] {
         for (lab, tr) in [("own", mine), ("cross", other)] {
             let tr = match tr {
                 Some(t) => t,
                 None => continue,
             };
-            let j = exec_replay(kind, eqs, nv, &lim, tr);
+            let j = exec_replay_n(kind, eqs, nv, &lim, tr, neg);
             st.replays += 1;
             if j.replay == "fallback" {
                 st.fallbacks += 1;
@@ -2768,7 +2790,7 @@ fn check_system(name: &str, eqs: &[Poly], nv: usize, cross: &Traces, st: &mut Sy
                     }
                     st.self_ok += 1;
                     let full = exec(kind, eqs, nv, &lim, false, None);
-                    if j.t.touches() > full.t.touches() {
+                    if !neg && j.t.touches() > full.t.touches() {
                         fail(&format!("{name}: {kind:?} own-trace replay costs more than the full run"));
                     }
                 }
