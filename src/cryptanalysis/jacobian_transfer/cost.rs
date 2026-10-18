@@ -582,7 +582,10 @@ mod tests {
         // above 10 g^2 at genus 2, 3.320 bits at genus 32.
         let m = CostModel::default();
         for (g, mults) in [(2.0f64, 164.7f64), (6.0, 1354.9), (32.0, 102282.5)] {
-            assert!((m.log2_jacobian_op_mults(g.log2()) - mults.log2()).abs() < 1e-9, "{g}");
+            assert!(
+                (m.log2_jacobian_op_mults(g.log2()) - mults.log2()).abs() < 1e-9,
+                "{g}"
+            );
         }
         let at = |g: f64| m.log2_jacobian_op_mults(g.log2()) - (10.0 * g * g).log2();
         assert!((at(2.0) - 2.041).abs() < 0.01);
