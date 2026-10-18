@@ -17,8 +17,15 @@ mod hash {
         pub use crate::sha256_impl::*;
     }
 }
+mod delpezzo;
+mod gluing;
 #[path = "../../../../src/cryptanalysis/identity_certificate.rs"]
 mod identity_certificate;
+mod klein_transfer;
+#[path = "../../../../src/cryptanalysis/curve_construction/lpoly.rs"]
+mod lpoly;
+mod round02;
+mod round_record;
 
 fn pow(mut a: u64, mut k: u64, p: u64) -> u64 {
     let mut b = 1;
@@ -295,6 +302,65 @@ fn run(out: &std::path::Path) {
 }
 fn main() {
     let args: Vec<_> = std::env::args().collect();
+    if args.get(1).map(String::as_str) == Some("--record-round") {
+        round_record::record(std::path::Path::new(args.get(2).expect("round directory")));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--verify-klein-relations") {
+        klein_transfer::verify_relations(
+            std::path::Path::new(args.get(2).expect("relation record")),
+            std::path::Path::new(args.get(3).expect("geometric point record")),
+        );
+        return;
+    }
+    if matches!(
+        args.get(1).map(String::as_str),
+        Some("--klein-lines" | "--klein-lines-wide")
+    ) {
+        klein_transfer::line_relations(
+            std::path::Path::new(args.get(2).expect("round directory")),
+            args[1] == "--klein-lines-wide",
+        );
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--gluing-modules") {
+        gluing::run(std::path::Path::new(args.get(2).expect("round directory")));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--unbalanced") {
+        round02::unbalanced(std::path::Path::new(
+            args.get(2).expect("fresh output path"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--verify-klein") {
+        klein_transfer::verify(std::path::Path::new(args.get(2).expect("certificate path")));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--klein-transfer-wide") {
+        klein_transfer::run_wide(std::path::Path::new(
+            args.get(2).expect("fresh output JSON path"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--delpezzo") {
+        delpezzo::run(std::path::Path::new(
+            args.get(2).expect("fresh output path"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--klein-transfer") {
+        klein_transfer::run(std::path::Path::new(
+            args.get(2).expect("fresh output JSON path"),
+        ));
+        return;
+    }
+    if args.get(1).map(String::as_str) == Some("--round02") {
+        round02::run(std::path::Path::new(
+            args.get(2).expect("fresh round output directory"),
+        ));
+        return;
+    }
     if args.get(1).map(String::as_str) == Some("--large-identity") {
         use identity_certificate::{Expr as E, IdentityStatement};
         fn constant(c: &BigInt) -> E {

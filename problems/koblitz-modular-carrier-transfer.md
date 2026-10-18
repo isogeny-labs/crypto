@@ -66,3 +66,38 @@ needed for an IC improvement; existence of the transfer alone is insufficient.
 
 2026-10-18: new investigation records the signed-character construction,
 exact arithmetic controls, and extension of the cyclic bound. Unresolved.
+
+## Round 02: evaluated control and remaining constructions
+
+[Round 02](../research/koblitz_modular_ic_20261018/rounds/02/REPORT.md)
+adds an explicit n=3 control: all seven source subgroup points are transferred
+through all 56 Klein quotient maps, 42 nonzero and 14 zero, with 393
+principal-function certificates checked separately. Geometric line norms
+produce 12,036 relations on 65 closed-point columns of rank64 modulo7;
+anchoring the flex divisor recovers all seven public fixtures. The smaller
+F8 factor base recovers four fixtures and retains three failed descents.
+This closes the n=3 executable-control obligation; it does not resolve the
+registered n=131 transfer or its relation algorithm.
+
+The [ledger](../research/koblitz_modular_ic_20261018/rounds/02/ledger.json)
+preserves finite searches of 722 genus-5 models and 2,424,825 genus-6 forms
+or sections, with zero A5 polynomial candidates in the enumerated families.
+Two del Pezzo Frobenius types (5 and 3+2), other genus-5 constructions and
+higher genera remain untested. Frobenius-module gluing candidates at primes
+5,11,19 have been enumerated; integral polarized gluing and curve realization
+remain missing. The companion lattice calculation does not enumerate all
+isogeny representatives.
+
+At n=131 the separate-orbit recurrence matrices have rank260 and rank261
+with a base anchor; a supplied cross row gives rank262 as an information
+control. The Eisenstein character-pair screen fails its necessary condition
+at five inert primes, but no general cusp/Hecke identification is proved.
+Actual higher-n interior relations remain open.
+
+Thirteen additional structural Lean lemmas compile and have standard-foundation
+axiom audits. The full geometric bridges are still open and named in the
+[proof map](../research/koblitz_modular_ic_20261018/rounds/02/PROOF_MAP.md).
+Next discriminating constructions are the remaining del Pezzo twists,
+Rosati-compatible integral gluing lattices, an evaluated n=5 map, and interior
+principal-function relations on its modular factor. The user determines IC
+speed assessment; this round contains no timing comparison.

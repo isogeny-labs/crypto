@@ -4043,7 +4043,7 @@ Increasing factor-base dimension remains the next scaling test.</p></div></div>
         subgroup E(F<sub>2</sub><sup>e</sup>) and no relation exists at any cost. Checked for
         e = 1&hellip;16; embedding degree &gt; 10<sup>7</sup> closes the transfer route
         (<code>experiments/ecc2k130_extension_field_boundary.json</code>).</p>
-      <p><strong>A bigger genus is not a lever either.</strong> A cover over F<sub>2</sub><sup>131</sup>
+      <p><strong>Carrier constructions and their evaluated scope.</strong> A cover over F<sub>2</sub><sup>131</sup>
         is priced by that field, so the cheapest one, genus 2, costs 2<sup>131</sup> &mdash;
         2<sup>70.19</sup>&times; rho, the same row as the bigger field. Over F<sub>2</sub>, the only
         proper subfield, index calculus would be cheap: genus 130 would cost 2<sup>37.17</sup>,
@@ -4060,6 +4060,13 @@ Increasing factor-base dimension remains the next scaling test.</p></div></div>
         2<sup>88.11</sup>&times; rho). The new study gives a written bound of genus &ge; 394 for
         such covers of <em>any</em> quotient genus; its numerical implication is checked in Lean,
         while the geometry is not fully formalized or independently reviewed. Noncyclic carriers remain open.
+        <a href="../research/koblitz_modular_ic_20261018/rounds/02/REPORT.md">Round 02</a>
+        checks explicit order-7 transfers on the n=3 Klein control: 42 of 56 quotient maps are nonzero.
+        Norms of 12,036 line functions give rank 64 on 65 factor-base columns modulo 7;
+        after anchoring, the solver recovers all seven public fixtures. Bounded searches of
+        722 genus-5 models and 2,424,825 genus-6 forms or sections find no A<sub>5</sub> match
+        in those families. Two del Pezzo twist types, polarized gluing and higher-n maps remain open.
+        Thirteen structural Lean lemmas accompany the experiments; the full geometric bridges remain partial.
         The genus-130&ndash;300 window is a historical smoothness model, not measured recovery.
         <em>Correction, accounting:</em> the nearest nontrivial GHS
         branch is 2<sup>121.77</sup> away; that is not the gap to every construction

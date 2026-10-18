@@ -6,6 +6,7 @@ on:
       - 'src/cryptanalysis/curve_construction/weil.rs'
       - 'src/cryptanalysis/curve_construction/modular.rs'
       - 'src/cryptanalysis/curve_construction/gf2k.rs'
+      - 'src/cryptanalysis/curve_construction/lpoly.rs'
       - 'src/cryptanalysis/identity_certificate.rs'
       - 'src/hash/sha256.rs'
       - '.github/workflows/koblitz-modular-carriers.yml'
@@ -19,7 +20,7 @@ permissions:
 jobs:
   replay:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -40,6 +41,13 @@ jobs:
           cmp "$study/cyclic-window.json" "$replay_dir/cyclic-window.json"
           cargo run --release --locked --manifest-path "$manifest" -- --large-identity "$replay_dir/identity-n131-balanced.json"
           cmp "$study/identity-n131-balanced.json" "$replay_dir/identity-n131-balanced.json"
+      - name: Replay round 02 and its independent certificate checkers
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/02
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
       - name: Install pinned Lean
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
@@ -50,3 +58,6 @@ jobs:
           set -euo pipefail
           lean CyclicWindow.lean | tee /tmp/cyclic-axioms.log
           ! grep -E 'sorryAx|error:' /tmp/cyclic-axioms.log
+      - name: Build structural proofs and audit transitive axioms
+        run: |
+          tools/lean/proof-gate.sh research/koblitz_modular_ic_20261018/lean
