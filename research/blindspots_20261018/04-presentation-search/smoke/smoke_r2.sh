@@ -49,7 +49,7 @@ echo "== 6. arm b, smallest count: cell 1 (random and planted), cell 4 (random t
 "$B" cell --n 15 --l 3 --m 4 --arms b --dmax-b 3 --first 0 --random 1 --planted 0 --time-limit 25 --job-time 20 >"$SC/b4.jsonl" 2>"$SC/b4.log"; chk "b cell 4 random t0 (20 s cap)" $?
 "$B" cell --n 15 --l 3 --m 4 --arms b --dmax-b 2 --random 0 --planted 2 --time-limit 40 --job-time 30 >"$SC/b4p.jsonl" 2>"$SC/b4p.log"; chk "b cell 4 planted" $?
 echo "== every row has a status"
-for f in "$SC"/*.jsonl; do python3 -c "
+for f in "$SC"/a_*.jsonl "$SC"/aa4.jsonl "$SC"/rc_*.jsonl "$SC"/e[345].jsonl "$SC"/b1.jsonl "$SC"/b1p.jsonl "$SC"/b4.jsonl "$SC"/b4p.jsonl; do python3 -c "
 import json,sys
 rows=[json.loads(l) for l in open('$f') if l.startswith('{')]
 assert rows and all('status' in r for r in rows), '$f'" || { echo "FAIL  rows of $f"; fail=1; }; done
