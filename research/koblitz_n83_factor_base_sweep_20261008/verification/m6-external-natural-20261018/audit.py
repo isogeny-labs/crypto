@@ -73,8 +73,20 @@ def audit(raw: Path, inputs: Path, worker: Path) -> dict:
             and export.get("base_summands") == 4
             and export.get("residual_summands") == 2
             and export.get("identity_mask") == 0
-            and export.get("ordering") == "equal_domain_runs",
+            and export.get("ordering") == "equal_domain_runs"
+            and export.get("a") == "1833078656608906180176350"
+            and export.get("b") == "163089659398503559150141"
+            and export.get("target") == ["3547082699798970859000627",
+                                         "6877207017147849837699235"]
+            and export.get("public_corpus_canonical_json_blake3")
+            == "831eaa7be2387634fd610f6706103b2af9b4e274f0db59923c0280af3cbed74b",
             "frozen natural-query export identity differs")
+    hosted = json.loads((STUDY / "verification/hosted-m6-highcap-20261018/results/39100306846"
+                         / f"{arm}-result.json").read_text())
+    require((export.get("variables"), export.get("clauses"), export.get("xors"))
+            == (hosted["search"]["peak_variables"],
+                hosted["search"]["peak_clauses"], hosted["search"]["peak_xors"]),
+            "hosted native pre-solve circuit shape differs")
     require(result.get("source_dirty") is False
             and result.get("solver_conflict_cap") == 5_000_000
             and result.get("solver_wall_cap_seconds") == 600
