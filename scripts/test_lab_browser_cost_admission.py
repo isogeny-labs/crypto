@@ -18,7 +18,7 @@ class NativeCostAdmission(unittest.TestCase):
     def test_unpriced_native_receipts_are_searchable_without_becoming_s_zero(self):
         curves = {r["workload"]["curve"]["slug"]: {"ecbench": [], "factor_bases": []} for r in self.records}
         with patch.object(browser, "ECBENCH_SESSIONS_GLOBS", (SESSION,)):
-            sessions, methods, _, yields = browser.ecbench_sessions(curves)
+            sessions, methods, _, yields = browser.ecbench_sessions(curves, browser.RepositoryInputs(browser.ROOT))
         self.assertEqual(len(sessions), 1)
         self.assertTrue(any(m["method"] == "ic.cm_folded_native_v1" for m in methods))
         for curve in curves.values():
