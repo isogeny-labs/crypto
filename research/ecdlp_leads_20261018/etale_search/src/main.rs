@@ -1,9 +1,10 @@
-//! L8 first experiment (study `research/ecdlp_leads_20261018`).
+//! L8 experiments (study `research/ecdlp_leads_20261018`).
 //!
 //! Exhaustive search over hyperelliptic curves `B: y^2 + h(x) y = f(x)` over F_2 of
-//! genus 2 and 3. For every curve and every odd prime `n` dividing `#J_B(F_2)`, the
-//! geometric unramified Z/n covers `D_chi -> B` (class field theory: characters
-//! `chi: J_B(F_2) -> Z/n`) are tested for the property
+//! genus 2 and 3, and (module `quartic`, argument `q`) over every smooth plane quartic,
+//! so every genus-3 curve over F_2. For every curve and every odd prime `n` dividing
+//! `#J_B(F_2)`, the geometric unramified Z/n covers `D_chi -> B` (class field theory:
+//! characters `chi: J_B(F_2) -> Z/n`) are tested for the property
 //!
 //!     L(B, chi, X)  is divisible by  (1 - c*pi*X)(1 - c*pibar*X)
 //!
@@ -17,12 +18,16 @@
 //! smooth over places of degree <= 4, and the group is read off a Smith-type
 //! diagonalisation. Every curve is checked: free rank 1 and torsion order equal to
 //! `L_B(1)` from point counts. Every twisted L-function is checked against the
-//! Riemann hypothesis (|top coefficient| = 2^(g-1)).
+//! Riemann hypothesis (|top coefficient| = 2^(g-1)) and the full functional equation,
+//! and for plane quartics against an out-of-sample `N_6`. The factor test runs in
+//! floating point and exactly in `Z[zeta_n]`; the two must agree.
 //!
 //! Output: one JSON object per line on stdout (curve records with hits, and a final
 //! summary); diagnostics on stderr.
 
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
+
+mod quartic;
 
 // ---------- F_2[x] as u64 bit polynomials ----------
 fn deg(p: u64) -> i32 {
@@ -243,10 +248,15 @@ impl Curve {
 
 /// L-polynomial coefficients a_0..a_{2g} from point counts N_1..N_g (Newton).
 fn lpoly(c: &Curve) -> Vec<i64> {
-    let g = c.g as usize;
+    let counts: Vec<i64> = (1..=c.g as u32).map(|k| c.count(k)).collect();
+    lpoly_from_counts(c.g, &counts)
+}
+fn lpoly_from_counts(g: i32, counts: &[i64]) -> Vec<i64> {
+    let g = g as usize;
+    assert_eq!(counts.len(), g);
     let mut s = vec![0i64; g + 1];
     for k in 1..=g {
-        s[k] = (1i64 << k) + 1 - c.count(k as u32);
+        s[k] = (1i64 << k) + 1 - counts[k - 1];
     }
     let mut a = vec![0i64; 2 * g + 1];
     a[0] = 1;
@@ -610,8 +620,114 @@ impl C {
     }
 }
 
+// ---------- exact arithmetic in Z[zeta_n], n prime ----------
+/// Coefficient vector modulo x^n - 1. It is zero in Z[zeta_n] iff all entries are equal
+/// (the kernel of Z[x]/(x^n - 1) -> Z[zeta_n] is spanned by 1 + x + ... + x^(n-1)).
+type Cyc = Vec<i128>;
+fn cyc_mul(a: &Cyc, b: &Cyc) -> Cyc {
+    let n = a.len();
+    let mut r = vec![0i128; n];
+    for (i, &x) in a.iter().enumerate() {
+        if x != 0 {
+            for (j, &y) in b.iter().enumerate() {
+                r[(i + j) % n] += x * y;
+            }
+        }
+    }
+    r
+}
+/// a * s * zeta^m.
+fn cyc_shift(a: &Cyc, m: u64, s: i128) -> Cyc {
+    let n = a.len();
+    let mut r = vec![0i128; n];
+    for (i, &x) in a.iter().enumerate() {
+        r[(i + m as usize) % n] += s * x;
+    }
+    r
+}
+fn cyc_add(a: &mut Cyc, b: &Cyc) {
+    for (x, y) in a.iter_mut().zip(b) {
+        *x += y;
+    }
+}
+fn cyc_is_zero(a: &Cyc) -> bool {
+    a.iter().all(|&x| x == a[0])
+}
+/// a / k in Z[zeta_n]: in the basis 1, zeta, ..., zeta^(n-2) the quotient must be integral.
+fn cyc_div(a: &Cyc, k: i128) -> Cyc {
+    let last = a[a.len() - 1];
+    a.iter()
+        .map(|&x| {
+            assert!((x - last) % k == 0, "L-coefficient not in Z[zeta_n]");
+            (x - last) / k
+        })
+        .collect()
+}
+/// Whether 1 - c t X + 2 c^2 X^2 (c = zeta^m) divides sum_k cf[k] X^k in Z[zeta_n][X]:
+/// power-series division from the constant term, Q_k = c_k + c t Q_{k-1} - 2 c^2 Q_{k-2}.
+fn exact_divides(cf: &[Cyc], t: i128, m: u64) -> bool {
+    let ldeg = cf.len() - 1;
+    let mut q: Vec<Cyc> = vec![];
+    for k in 0..=ldeg {
+        let mut v = cf[k].clone();
+        if let Some(q1) = k.checked_sub(1).and_then(|i| q.get(i)) {
+            cyc_add(&mut v, &cyc_shift(q1, m, t));
+        }
+        if let Some(q2) = k.checked_sub(2).and_then(|i| q.get(i)) {
+            cyc_add(&mut v, &cyc_shift(q2, 2 * m, -2));
+        }
+        if k + 2 <= ldeg {
+            q.push(v);
+        } else if !cyc_is_zero(&v) {
+            return false;
+        }
+    }
+    true
+}
+
 fn is_prime(n: u64) -> bool {
-    n >= 2 && (2..).take_while(|d| d * d <= n).all(|d| n % d != 0)
+    n >= 2
+        && (2..)
+            .take_while(|d| d * d <= n)
+            .all(|d| !n.is_multiple_of(d))
+}
+
+/// Odd prime factors of |x|.
+fn odd_primes(x: i64) -> Vec<u64> {
+    let mut x = x.unsigned_abs();
+    let mut out = vec![];
+    let mut p = 3u64;
+    while x.is_multiple_of(2) && x > 0 {
+        x /= 2;
+    }
+    while p * p <= x {
+        if x.is_multiple_of(p) {
+            out.push(p);
+            while x.is_multiple_of(p) {
+                x /= p;
+            }
+        }
+        p += 2;
+    }
+    if x > 1 {
+        out.push(x);
+    }
+    out
+}
+
+/// Records the odd primes dividing L(1) = #J(F_2) (untwisted covers) and L(-1) (covers with
+/// Frobenius acting by -1 on the Galois group, the only twist allowed in genus 3).
+fn note_primes(st: &mut Stats, lp: &[i64]) {
+    let l1: i64 = lp.iter().sum();
+    let lm1: i64 = lp
+        .iter()
+        .enumerate()
+        .map(|(k, &a)| if k % 2 == 0 { a } else { -a })
+        .sum();
+    st.primes_l1.extend(odd_primes(l1));
+    st.primes_lm1.extend(odd_primes(lm1));
+    st.max_j = st.max_j.max(l1);
+    st.max_jm = st.max_jm.max(lm1.abs());
 }
 
 #[derive(Default)]
@@ -620,14 +736,233 @@ struct Stats {
     validated: u64,
     unvalidated: u64,
     rh_fail: u64,
+    fe_fail: u64,
+    nk_checked: u64,
+    nk_fail: u64,
+    exact_mismatch: u64,
     chars_tested: HashMap<u64, u64>,
     curves_per_n: HashMap<u64, u64>,
     hits: u64,
+    primes_l1: BTreeSet<u64>,
+    primes_lm1: BTreeSet<u64>,
+    max_j: i64,
+    max_jm: i64,
+}
+
+/// Whether the relation lattice gives free rank 1 and torsion of order `jorder`.
+fn group_matches(rows: Vec<Vec<i128>>, np: usize, jorder: i64) -> bool {
+    let (diag, _) = diagonalise(rows, np);
+    let free = np - diag.iter().filter(|&&d| d != 0).count();
+    let tors: i128 = diag.iter().filter(|&&d| d > 1).product();
+    free == 1 && tors == jorder as i128
+}
+
+/// Diagonalise the relation lattice, validate the group against `L_B(1)`, and test every
+/// character of `J_B(F_2)/n` for the trace-zero factor. Returns the hit records, or `None`
+/// when the curve fails validation or has no degree-1 place.
+///
+/// Every twisted L-polynomial must satisfy the functional equation
+/// `c_{2g-2-k} = eps 2^(g-1-k) conj(c_k)` with `|eps| = 1`. For each `k` in `extra_k`
+/// (every place of degree dividing `k` is in the factor base, `k > 2g - 2`) the direct
+/// character sum `N_k(chi)` must equal the value the L-polynomial predicts.
+#[allow(clippy::too_many_arguments)]
+fn analyse(
+    g: i32,
+    label: &str,
+    pl_deg: &[u32],
+    rows: Vec<Vec<i128>>,
+    jorder: i64,
+    lp: &[i64],
+    primes: &[u64],
+    extra_k: &[u32],
+    st: &mut Stats,
+) -> Option<Vec<String>> {
+    let np = pl_deg.len();
+    let ldeg = (2 * g - 2) as u32;
+    let untouched: Vec<u32> = (0..np)
+        .filter(|&j| rows.iter().all(|r| r[j] == 0))
+        .map(|j| pl_deg[j])
+        .collect();
+    let (diag, v) = diagonalise(rows, np);
+    let free = np - diag.iter().filter(|&&d| d != 0).count();
+    let tors: i128 = diag.iter().filter(|&&d| d > 1).product();
+    if free != 1 || tors != jorder as i128 {
+        st.unvalidated += 1;
+        eprintln!(
+            "unvalidated g={} {} free={} tors={} #J={} untouched_place_degrees={:?}",
+            g, label, free, tors, jorder, untouched
+        );
+        return None;
+    }
+    st.validated += 1;
+    if std::env::var("ETALE_VERBOSE").is_ok() {
+        println!(
+            "{{\"kind\":\"curve\",\"g\":{},{},\"L\":{:?},\"J\":{},\"diag\":{:?}}}",
+            g, label, lp, jorder, diag
+        );
+    }
+    // base point: first degree-1 place
+    let Some(p0) = (0..np).find(|&i| pl_deg[i] == 1) else {
+        return None;
+    };
+    // coordinates of [v - deg(v) P0]
+    let coords: Vec<Vec<i128>> = (0..np)
+        .map(|vid| {
+            let mut e = vec![0i128; np];
+            e[vid] += 1;
+            e[p0] -= pl_deg[vid] as i128;
+            (0..np)
+                .map(|j| (0..np).map(|i| e[i] * v[i][j]).sum::<i128>())
+                .collect()
+        })
+        .collect();
+    let mut curve_hits = vec![];
+    for &n in primes {
+        let idx: Vec<usize> = (0..diag.len())
+            .filter(|&i| diag[i] > 1 && diag[i] % n as i128 == 0)
+            .collect();
+        assert!(!idx.is_empty());
+        *st.curves_per_n.entry(n).or_default() += 1;
+        let r = idx.len() as u32;
+        let total = (n as u128).pow(r) as u64;
+        for code in 1..total {
+            let mut js = vec![];
+            let mut cc = code;
+            for _ in 0..r {
+                js.push(cc % n);
+                cc /= n;
+            }
+            let chi = |vid: usize| -> u64 {
+                let mut s = 0u64;
+                for (k, &i) in idx.iter().enumerate() {
+                    let w = coords[vid][i].rem_euclid(diag[i]) as u64 % n;
+                    s = (s + js[k] * w) % n;
+                }
+                s
+            };
+            *st.chars_tested.entry(n).or_default() += 1;
+            // N_k(chi), k = 1..ldeg, in floating point and exactly in Z[zeta_n]
+            let mut nk = vec![C(0.0, 0.0); ldeg as usize + 1];
+            let mut nkx: Vec<Cyc> = vec![vec![0i128; n as usize]; ldeg as usize + 1];
+            let mut cnt1 = vec![0i64; n as usize];
+            for vid in 0..np {
+                let dvv = pl_deg[vid];
+                let x = chi(vid);
+                if dvv == 1 {
+                    cnt1[x as usize] += 1;
+                }
+                for k in 1..=ldeg {
+                    if k % dvv == 0 {
+                        nk[k as usize] =
+                            nk[k as usize].add(C::root(n, x * (k / dvv) as u64).scale(dvv as f64));
+                        nkx[k as usize][((x * (k / dvv) as u64) % n) as usize] += dvv as i128;
+                    }
+                }
+            }
+            // Newton: k c_k = sum_{i=1..k} N_i c_{k-i}
+            let mut cf = vec![C(0.0, 0.0); ldeg as usize + 1];
+            cf[0] = C(1.0, 0.0);
+            for k in 1..=ldeg as usize {
+                let mut acc = C(0.0, 0.0);
+                for i in 1..=k {
+                    acc = acc.add(nk[i].mul(cf[k - i]));
+                }
+                cf[k] = acc.scale(1.0 / k as f64);
+            }
+            let top = cf[ldeg as usize].abs();
+            if (top - (1u64 << (g - 1)) as f64).abs() > 1e-6 {
+                st.rh_fail += 1;
+                eprintln!("RH check failed g={} {} n={} |top|={}", g, label, n, top);
+                continue;
+            }
+            let eps = cf[ldeg as usize].scale(1.0 / (1u64 << (g - 1)) as f64);
+            let fe_ok = (0..=ldeg as usize).all(|k| {
+                let q = 2f64.powi(g - 1 - k as i32);
+                let want = eps.mul(C(cf[k].0, -cf[k].1)).scale(q);
+                let got = cf[ldeg as usize - k];
+                C(got.0 - want.0, got.1 - want.1).abs() < 1e-6
+            });
+            if !fe_ok {
+                st.fe_fail += 1;
+                eprintln!("functional equation failed g={} {} n={}", g, label, n);
+                continue;
+            }
+            // out-of-sample prediction: k N_k = k c_k - sum_{i<k} N_i c_{k-i}
+            if let Some(&kmax) = extra_k.iter().max() {
+                let mut nn = nk.clone();
+                for k in ldeg as usize + 1..=kmax as usize {
+                    let mut acc = C(0.0, 0.0);
+                    for i in 1..k {
+                        if k - i <= ldeg as usize {
+                            acc = acc.add(nn[i].mul(cf[k - i]));
+                        }
+                    }
+                    nn.push(acc.scale(-1.0));
+                }
+                for &k in extra_k {
+                    let mut direct = C(0.0, 0.0);
+                    for vid in 0..np {
+                        let dvv = pl_deg[vid];
+                        if k % dvv == 0 {
+                            direct = direct
+                                .add(C::root(n, chi(vid) * (k / dvv) as u64).scale(dvv as f64));
+                        }
+                    }
+                    st.nk_checked += 1;
+                    let pred = nn[k as usize];
+                    if C(direct.0 - pred.0, direct.1 - pred.1).abs() > 1e-6 {
+                        st.nk_fail += 1;
+                        eprintln!("N_{} prediction failed g={} {} n={}", k, g, label, n);
+                    }
+                }
+            }
+            // exact Newton in Z[zeta_n]; integrality is asserted at every division
+            let mut cfx: Vec<Cyc> = vec![vec![0i128; n as usize]];
+            cfx[0][0] = 1;
+            for k in 1..=ldeg as usize {
+                let mut acc = vec![0i128; n as usize];
+                for i in 1..=k {
+                    cyc_add(&mut acc, &cyc_mul(&nkx[i], &cfx[k - i]));
+                }
+                cfx.push(cyc_div(&acc, k as i128));
+            }
+            let evalp = |x: C| -> C {
+                let mut acc = C(0.0, 0.0);
+                for k in (0..=ldeg as usize).rev() {
+                    acc = acc.mul(x).add(cf[k]);
+                }
+                acc
+            };
+            for t in [1i64, -1] {
+                let s7 = 7f64.sqrt();
+                let pis = [C(t as f64 / 2.0, s7 / 2.0), C(t as f64 / 2.0, -s7 / 2.0)];
+                for m in 0..n {
+                    let cm = C::root(n, m);
+                    let ok_float = pis.iter().all(|&p| evalp(cm.mul(p).inv()).abs() < 1e-7);
+                    let ok = exact_divides(&cfx, t as i128, m);
+                    if ok != ok_float {
+                        st.exact_mismatch += 1;
+                        eprintln!(
+                            "exact/float mismatch g={} {} n={} chi={:?} t={} m={}",
+                            g, label, n, js, t, m
+                        );
+                    }
+                    if ok {
+                        st.hits += 1;
+                        curve_hits.push(format!(
+                            "{{\"n\":{},\"chi\":{:?},\"t\":{},\"c_exp\":{},\"cnt_deg1\":{:?}}}",
+                            n, js, t, m, cnt1
+                        ));
+                    }
+                }
+            }
+        }
+    }
+    Some(curve_hits)
 }
 
 fn run_genus(g: i32, st: &mut Stats) {
     let maxdeg = 4u32;
-    let ldeg = (2 * g - 2) as u32; // degree of L(B, chi, X)
     let hmax = 1u64 << (g + 2);
     let fmax = 1u64 << (2 * g + 3);
     let (adeg, bdeg) = if g == 2 { (5, 2) } else { (6, 2) };
@@ -639,16 +974,16 @@ fn run_genus(g: i32, st: &mut Stats) {
             }
             st.curves += 1;
             let lp = lpoly(&c);
+            note_primes(st, &lp);
             let jorder: i64 = lp.iter().sum();
             assert!(jorder > 0);
             let primes: Vec<u64> = (3..=jorder as u64)
-                .filter(|&p| is_prime(p) && jorder as u64 % p == 0)
+                .filter(|&p| is_prime(p) && (jorder as u64).is_multiple_of(p))
                 .collect();
             if primes.is_empty() {
                 continue;
             }
             let pl = Places::build(&c, maxdeg);
-            let np = pl.deg.len();
             // relations
             let mut rows: Vec<Vec<i128>> = vec![];
             for &q in IRRED.iter() {
@@ -666,129 +1001,16 @@ fn run_genus(g: i32, st: &mut Stats) {
                     }
                 }
             }
-            let (diag, v) = diagonalise(rows, np);
-            let free = np - diag.iter().filter(|&&d| d != 0).count();
-            let tors: i128 = diag.iter().filter(|&&d| d > 1).product();
-            if free != 1 || tors != jorder as i128 {
-                st.unvalidated += 1;
-                eprintln!(
-                    "unvalidated g={} h={:#b} f={:#b} free={} tors={} #J={}",
-                    g, h, f, free, tors, jorder
-                );
-                continue;
-            }
-            st.validated += 1;
-            if std::env::var("ETALE_VERBOSE").is_ok() {
-                println!(
-                    "{{\"kind\":\"curve\",\"g\":{},\"h\":\"{:#b}\",\"f\":\"{:#b}\",\"L\":{:?},\"J\":{},\"diag\":{:?}}}",
-                    g, h, f, lp, jorder, diag
-                );
-            }
-            // base point: first degree-1 place
-            let Some(p0) = (0..np).find(|&i| pl.deg[i] == 1) else {
+            let label = format!("\"h\":\"{:#b}\",\"f\":\"{:#b}\"", h, f);
+            let Some(curve_hits) = analyse(g, &label, &pl.deg, rows, jorder, &lp, &primes, &[], st)
+            else {
                 continue;
             };
-            // coordinates of [v - deg(v) P0]
-            let coords: Vec<Vec<i128>> = (0..np)
-                .map(|vid| {
-                    let mut e = vec![0i128; np];
-                    e[vid] += 1;
-                    e[p0] -= pl.deg[vid] as i128;
-                    (0..np)
-                        .map(|j| (0..np).map(|i| e[i] * v[i][j]).sum::<i128>())
-                        .collect()
-                })
-                .collect();
-            let mut curve_hits = vec![];
-            for &n in &primes {
-                let idx: Vec<usize> = (0..diag.len())
-                    .filter(|&i| diag[i] > 1 && diag[i] % n as i128 == 0)
-                    .collect();
-                assert!(!idx.is_empty());
-                *st.curves_per_n.entry(n).or_default() += 1;
-                let r = idx.len() as u32;
-                let total = (n as u128).pow(r) as u64;
-                for code in 1..total {
-                    let mut js = vec![];
-                    let mut cc = code;
-                    for _ in 0..r {
-                        js.push(cc % n);
-                        cc /= n;
-                    }
-                    let chi = |vid: usize| -> u64 {
-                        let mut s = 0u64;
-                        for (k, &i) in idx.iter().enumerate() {
-                            let w = coords[vid][i].rem_euclid(diag[i]) as u64 % n;
-                            s = (s + js[k] * w) % n;
-                        }
-                        s
-                    };
-                    *st.chars_tested.entry(n).or_default() += 1;
-                    // N_k(chi), k = 1..ldeg
-                    let mut nk = vec![C(0.0, 0.0); ldeg as usize + 1];
-                    let mut cnt1 = vec![0i64; n as usize];
-                    for vid in 0..np {
-                        let dvv = pl.deg[vid];
-                        let x = chi(vid);
-                        if dvv == 1 {
-                            cnt1[x as usize] += 1;
-                        }
-                        for k in 1..=ldeg {
-                            if k % dvv == 0 {
-                                nk[k as usize] = nk[k as usize]
-                                    .add(C::root(n, x * (k / dvv) as u64).scale(dvv as f64));
-                            }
-                        }
-                    }
-                    // Newton: k c_k = sum_{i=1..k} N_i c_{k-i}
-                    let mut cf = vec![C(0.0, 0.0); ldeg as usize + 1];
-                    cf[0] = C(1.0, 0.0);
-                    for k in 1..=ldeg as usize {
-                        let mut acc = C(0.0, 0.0);
-                        for i in 1..=k {
-                            acc = acc.add(nk[i].mul(cf[k - i]));
-                        }
-                        cf[k] = acc.scale(1.0 / k as f64);
-                    }
-                    let top = cf[ldeg as usize].abs();
-                    if (top - (1u64 << (g - 1)) as f64).abs() > 1e-6 {
-                        st.rh_fail += 1;
-                        eprintln!(
-                            "RH check failed g={} h={:#b} f={:#b} n={} |top|={}",
-                            g, h, f, n, top
-                        );
-                        continue;
-                    }
-                    let evalp = |x: C| -> C {
-                        let mut acc = C(0.0, 0.0);
-                        for k in (0..=ldeg as usize).rev() {
-                            acc = acc.mul(x).add(cf[k]);
-                        }
-                        acc
-                    };
-                    for t in [1i64, -1] {
-                        let s7 = 7f64.sqrt();
-                        let pis = [C(t as f64 / 2.0, s7 / 2.0), C(t as f64 / 2.0, -s7 / 2.0)];
-                        for m in 0..n {
-                            let cm = C::root(n, m);
-                            let ok = pis.iter().all(|&p| evalp(cm.mul(p).inv()).abs() < 1e-7);
-                            if ok {
-                                st.hits += 1;
-                                curve_hits.push(format!(
-                                    "{{\"n\":{},\"chi\":{:?},\"t\":{},\"c_exp\":{},\"cnt_deg1\":{:?}}}",
-                                    n, js, t, m, cnt1
-                                ));
-                            }
-                        }
-                    }
-                }
-            }
             if !curve_hits.is_empty() {
                 println!(
-                    "{{\"kind\":\"hit\",\"g\":{},\"h\":\"{:#b}\",\"f\":\"{:#b}\",\"N\":{:?},\"L\":{:?},\"J\":{},\"inf\":\"{:?}\",\"hits\":[{}]}}",
+                    "{{\"kind\":\"hit\",\"g\":{},{},\"N\":{:?},\"L\":{:?},\"J\":{},\"inf\":\"{:?}\",\"hits\":[{}]}}",
                     g,
-                    h,
-                    f,
+                    label,
                     (1..=g as u32).map(|k| c.count(k)).collect::<Vec<_>>(),
                     lp,
                     jorder,
@@ -800,8 +1022,49 @@ fn run_genus(g: i32, st: &mut Stats) {
     }
 }
 
+fn json_map(m: &HashMap<u64, u64>) -> String {
+    let mut kv: Vec<_> = m.iter().collect();
+    kv.sort();
+    let body: Vec<String> = kv.iter().map(|(k, v)| format!("\"{}\":{}", k, v)).collect();
+    format!("{{{}}}", body.join(","))
+}
+
+fn summary(g: i32, family: &str, st: &Stats) {
+    println!(
+        "{{\"kind\":\"summary\",\"g\":{},{}\"smooth_models\":{},\"validated\":{},\"unvalidated\":{},\"rh_fail\":{},\"fe_fail\":{},\"nk_checked\":{},\"nk_fail\":{},\"exact_mismatch\":{},\"hits\":{},\"curves_per_n\":{},\"chars_per_n\":{},\"max_L1\":{},\"max_abs_Lm1\":{},\"odd_primes_L1\":{:?},\"odd_primes_Lm1\":{:?}}}",
+        g,
+        family,
+        st.curves,
+        st.validated,
+        st.unvalidated,
+        st.rh_fail,
+        st.fe_fail,
+        st.nk_checked,
+        st.nk_fail,
+        st.exact_mismatch,
+        st.hits,
+        json_map(&st.curves_per_n),
+        json_map(&st.chars_tested),
+        st.max_j,
+        st.max_jm,
+        st.primes_l1.iter().collect::<Vec<_>>(),
+        st.primes_lm1.iter().collect::<Vec<_>>()
+    );
+}
+
+/// Arguments: genera of the hyperelliptic search (default `2 3`), or `q` for plane quartics.
 fn main() {
     let args: Vec<String> = std::env::args().collect();
+    if args.get(1).map(String::as_str) == Some("q") {
+        let mut st = Stats::default();
+        let fallback = quartic::run(&mut st);
+        let family = format!(
+            "\"family\":\"plane_quartic\",\"quartic_sections_used\":{},",
+            fallback
+        );
+        summary(3, &family, &st);
+        return;
+    }
     let genera: Vec<i32> = if args.len() > 1 {
         args[1..].iter().map(|s| s.parse().unwrap()).collect()
     } else {
@@ -810,13 +1073,6 @@ fn main() {
     for g in genera {
         let mut st = Stats::default();
         run_genus(g, &mut st);
-        let mut per_n: Vec<_> = st.curves_per_n.iter().collect();
-        per_n.sort();
-        let mut ch: Vec<_> = st.chars_tested.iter().collect();
-        ch.sort();
-        println!(
-            "{{\"kind\":\"summary\",\"g\":{},\"smooth_models\":{},\"validated\":{},\"unvalidated\":{},\"rh_fail\":{},\"hits\":{},\"curves_per_n\":{:?},\"chars_per_n\":{:?}}}",
-            g, st.curves, st.validated, st.unvalidated, st.rh_fail, st.hits, per_n, ch
-        );
+        summary(g, "", &st);
     }
 }
