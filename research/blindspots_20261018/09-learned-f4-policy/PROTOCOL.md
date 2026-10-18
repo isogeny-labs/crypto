@@ -130,9 +130,11 @@ does not use M4RI tables (the counted unit is the row-by-row convention).
 ## Draws and cells
 
 Per cell one factor base `V` (an `l`-dimensional `F_2`-subspace of
-`F_{2^n}`, sparse irreducible modulus as items 05, 07, 11) and 64 distinct
+`F_{2^n}`, sparse irreducible modulus as items 05, 07, 11) and 96 distinct
 random nonzero targets `x_R`, drawn from `Rng(seed ^ n<<40 ^ l<<32 ^ m<<48)`
-with seed `20261018`: targets 0 to 31 are **train**, 32 to 63 **test**. One
+with seed `20261018`: targets 0 to 31 are **train**, 32 to 95 the **test**
+pool (the first 32 test targets are the design's; the rest are used only at
+`(13,3,4)`, Deviation 10). One
 `V` per cell is what the index-calculus oracle faces (one factor base, many
 targets) and what makes "same shape" meaningful for trace transfer. The exact
 solution count is computed for every target inside the run (a draw whose F4
@@ -147,11 +149,11 @@ counted and listed. The solve measured at the design cells is therefore the
 identity of `{1}`; non-trivial bases are checked on the control cells below.
 
 Caps (touches, per run; reached means the run is censored, not a result):
-`(17,4,3)` 8e9, `(19,4,3)` 1.2e10, `(21,5,3)` 4e10, `(13,3,4)` 6e9; any arm
-other than `a` is stopped at 2.0 times the incumbent's touches on the same
+`(17,4,3)` 6e9, `(19,4,3)` 1e10, `(21,5,3)` 3e10, `(13,3,4)` 3e9; any arm
+other than `a` is stopped at 1.5 times the incumbent's touches on the same
 target and recorded `cap_touch` (a lower bound on its cost: it cannot win
-that target, and is counted as a censored loss); matrix cap 2^27 words;
-wall cap 120 s per solve.
+that target, and is counted at the cap, a censored loss); matrix cap 2^27
+words; wall cap 150 s per solve.
 
 ## Controls
 
@@ -168,7 +170,7 @@ wall cap 120 s per solve.
   or the exact counter, the standard-monomial count of every completed run
   equals the solution count, and all arms return an identical reduced basis.
 * **P3, basis identity with non-trivial bases.** Control cells `(8,3,3)` and
-  `(7,2,4)` (32 test + 8 planted targets, models trained on their own 32
+  `(8,2,4)` (32 test + 8 planted targets, models trained on their own 32
   train targets) with all arms and `o`: identical reduced-basis hash on every
   target, standard-monomial count equal to the exact solution count.
 * **N1, negative controls.** `r50`, `r25` (random pairs, same fraction) and
@@ -186,7 +188,7 @@ targets, `sum touches_a / sum (touches_X + w policy_ops_X)`, with the 95%
 paired-bootstrap interval (2,000 resamples of targets, fixed seeds); the
 median per-target ratio and the rows ratio `sum rows_a / sum rows_X` are
 reported. Usable: the incumbent completed and `X` completed or was censored at
-2x (its censored cost is a lower bound).
+1.5x (counted at the cap, a lower bound on its cost).
 
 **Cell win** for `X in {b50, c, d}` (and `b25` as a secondary row): the ratio
 is `>= 1.3` **and** its interval excludes 1, at **each** of `w = 0, 0.1, 1`
@@ -207,7 +209,8 @@ The design's literal rule: **ADVANCES (constant)** if `X` wins on `>= 3` of the
    no matched null (its selection fraction is data-dependent); `r50` is
    reported beside it.
 3. **Censoring.** Censored incumbent targets are excluded and counted; a
-   verdict computed with any censored arm target says so.
+   verdict computed with any censored arm target says so (censored arm
+   targets are counted at 1.5 times the incumbent, a loss for the arm).
 
 Other verdicts: **REGRESSES** when `X`'s ratio interval lies below 1 on `>= 3`
 cells; **INCONCLUSIVE** otherwise or when a control fails; **BLOCKED** if the
@@ -221,15 +224,143 @@ cost, not as a learned-policy result.
 
 ## Budget and execution
 
-One thread per job, `prlimit --as=4294967296`. CARD_PLAN_PLACEHOLDER
+One thread per job, `prlimit --as=4294967296`. Expected measured work is about 82 CPU-minutes (calibration wall times:
+cell `(17,4,3)` 520 s, `(19,4,3)` 1,180 s, `(21,5,3)` 2,700 s, `(13,3,4)` 520 s,
+controls about 100 s) against the 2 CPU-hour cap (7,200 s). The per-command
+timeouts of the measured commands sum to 7,189 s, so even if every command ran
+to its timeout the cap holds. There are 26 cards, `experiment_id: BLINDSPOT-09`,
+`background: false`; each builds the instrument with `rustc` into
+`target/blindspots-09/card-NN/` and removes it, and the timeouts of every card
+sum to under 530 s including the build (under 9 minutes). Per-command
+`--wall 150` and the touch caps bound a runaway. Peak resident memory is below
+1 GiB at every design cell. Nothing in `src/` or `Cargo.toml` is touched.
+
+Order: card 1 (controls P1, P2, P3), then per cell train chunks (each writes a
+sample file and a trace file), `fit` (writes the frozen model), then test
+chunks; the last card runs `report` on the raw JSON lines. The model of a cell
+is fitted from its 32 train targets alone and is not changed afterwards. Card
+contents, in run order:
+
+* card 01: selftest, control-p1, train-p3-8-3-3, fit-p3-8-3-3, eval-p3-8-3-3-test, eval-p3-8-3-3-planted, train-p3-8-2-4, fit-p3-8-2-4, eval-p3-8-2-4-test, eval-p3-8-2-4-planted
+* card 02: train-17-4-3-00-16, train-17-4-3-16-32, fit-17-4-3
+* card 03: eval-17-4-3-test-00-16, eval-17-4-3-test-16-32
+* card 04: eval-17-4-3-test-00-03-o, train-19-4-3-00-08, train-19-4-3-08-16, train-19-4-3-16-24
+* card 05: train-19-4-3-24-32, fit-19-4-3, eval-19-4-3-test-00-07
+* card 06: eval-19-4-3-test-07-14
+* card 07: eval-19-4-3-test-14-21
+* card 08: eval-19-4-3-test-21-28, eval-19-4-3-test-28-32
+* card 09: train-21-5-3-00-06
+* card 10: train-21-5-3-06-12
+* card 11: train-21-5-3-12-18
+* card 12: train-21-5-3-18-24
+* card 13: train-21-5-3-24-30, train-21-5-3-30-32, fit-21-5-3
+* card 14: eval-21-5-3-test-00-03
+* card 15: eval-21-5-3-test-03-06
+* card 16: eval-21-5-3-test-06-09
+* card 17: eval-21-5-3-test-09-12
+* card 18: eval-21-5-3-test-12-15
+* card 19: eval-21-5-3-test-15-18
+* card 20: eval-21-5-3-test-18-21
+* card 21: eval-21-5-3-test-21-24
+* card 22: eval-21-5-3-test-24-27
+* card 23: eval-21-5-3-test-27-30, eval-21-5-3-test-30-32
+* card 24: train-13-3-4-00-32, fit-13-3-4
+* card 25: eval-13-3-4-test-00-32, eval-13-3-4-test-32-64
+* card 26: report-17-4-3, report-19-4-3, report-21-5-3, report-13-3-4, report-p3
+
+Per-cell settings: `(17,4,3)` cap 6e9, arms a b50 b25 c d p r50 r25 on test
+targets 0 to 31 plus `o` on 0 to 2; `(19,4,3)` cap 1e10, same arms, 0 to 31;
+`(21,5,3)` cap 3e10, arms a b50 c d p r50 (the `q = 0.25` arms are dropped here
+for budget: they are secondary), 0 to 31; `(13,3,4)` cap 3e9, same arms as
+`(17,4,3)`, test targets 0 to 63 (about half are satisfiable and censored, so
+64 are drawn to leave about 32 usable). Every eval is run with `--rel-cap 1.5`.
+Train chunks use the same cap (satisfiable train targets run to the cap, and
+their partial runs still give labels).
 
 ## Calibration disclosed (not reused)
 
-CALIBRATION_PLACEHOLDER
+Before this freeze the instrument was run unmeasured on seed `1` (factor
+bases and targets that appear in no card) to choose the caps, the card sizes
+and the policy form; the outputs are discarded. What was seen, so a reader can
+judge the freeze:
+
+* The engine refutes every unsatisfiable calibration target at step degree 4
+  (`D = 4`), costs 1.8e9 touches (1.7 s) at `(17,4,3)`, 3.8e9 (3.2 s) at
+  `(19,4,3)`, 1.7e10 (9 s) at `(21,5,3)`, 0.9e9 (1 s) at `(13,3,4)`, and the
+  last degree-4 step is almost all of it. Satisfiable targets (24 to 106
+  solutions at `(13,3,4)`, 6 to 35 at `(17,4,3)` planted) need degree-5
+  matrices above the 1 GiB cap or run past 8e10 touches.
+* With 4 to 8 train targets: the learned subset (`b50`) gave ratios of about
+  2.0, 2.3 and 2.7 at `(17,4,3)`, `(19,4,3)`, `(21,5,3)` and lost at `(13,3,4)`
+  (0.9); a random half (`r50`) gave about 7.0 and 6.8 at the first two, 0.7 at
+  `(21,5,3)` and 0.6 at `(13,3,4)`; the learned row order (`c`) gave 1.5, 1.04,
+  1.00 and 1.1; trace transfer (`d`) lost everywhere (0.2 to 0.7); the oracle
+  subset reached 6.8 at `(17,4,3)`. These are 4 to 6 targets per cell, seed 1.
+  The first policy (a score threshold keeping 98% of useful pairs) kept most
+  pairs and gave 1.00; it was replaced by the top-fraction rule and the random
+  null was added after seeing that a random half already beats the incumbent
+  at two cells. The primary fractions were fixed to `q = 0.5` (primary) and
+  `0.25` before any frozen target was solved.
+* P1 on item 07's table (max 34 unknowns): degree equal to the committed
+  closure degree on 92 of 92 refuted draws and to the committed msolve degree
+  on 40 of 40; 3 draws reached the calibration cap.
+* The first calibration of `d` ran past its cap because the cap was checked
+  between steps; the cap is now checked every 256 rows inside the
+  elimination.
+* The fit's row-order target is dominated by the default order at the larger
+  cells (the cheapest of five orders was the default on the sampled matrices
+  at `(21,5,3)`), so `c` is expected to equal `a` there; it is measured anyway.
 
 ## Deviations from the frozen design
 
-DEVIATIONS_PLACEHOLDER
+1. **`rustc` instead of `cargo build --example`** (the crate library does not
+   compile at the branch base: 25 errors). The instrument is std-only, copies
+   the item-07 system builder, and each card builds its own copy (a built
+   binary cannot be bound by sha256 before it exists); the first card builds it
+   too.
+2. **The incumbent is a replica of `pq_f4_f2`'s step, not a call to the crate.**
+   The crate cannot be linked (Deviation 1) and has no selection hook. The
+   replica follows its pair update, field pairs, symbolic preprocessing and
+   counting convention; it has no M4RI tables, so `xors` is the row-by-row
+   logical count (the quantity `pq_f4_f2` reports as `word_xors`), and wall time
+   is descriptive only. Sparse pivot storage speeds the XOR without changing
+   the count. Fidelity is checked by P1 (committed degrees) and P2, not by a
+   side-by-side run of the crate engine.
+3. **"Column touches" is defined as `xors + mat_words`** (above); the design
+   does not define it. `xors` alone and `rows` are reported beside it.
+4. **Refutation, not complete solves, at the design cells.** Satisfiable
+   targets need degree-5 matrices above the matrix cap; they are censored at
+   the incumbent. Basis equality is therefore checked as `{1}` identity at the
+   design cells and on non-trivial bases at control cells P3 (an addition).
+5. **One factor base per cell, 64 targets** (32 train, 32 test), instead of
+   64 independent systems: the oracle's real workload and the only reading of
+   "same shape" under which a trace can transfer.
+6. **Selection is a top-fraction rule, not a threshold.** The first version
+   thresholded the classifier at 98% recall of useful pairs; on calibration
+   targets that kept about 50 to 80% of the pairs and changed nothing, so the
+   policy is now "the top `ceil(q n)` pairs by score", with the same-fraction
+   random null `r<q>`. `q = 0.5` is the primary, `q = 0.25` secondary; the
+   primary is fixed here and not chosen after the test data.
+7. **Oracle definitions are mine** (the design names the pair oracle only):
+   greedy useful-pair label for (b) and (d); cheapest of five candidate
+   orders for (c). `d` pairs train target `i` with test target `i`.
+8. **Additions (stronger incumbents and controls, never a loosening):**
+   nulls `r50`, `r25`, `p`; headroom arm `o`; control cells P3; P1/P2; the
+   matched-null and rows tightenings; the rule applied at three weights of
+   `w`; censoring at 1.5x the incumbent.
+9. **Costs of a pair selection that defers pairs are charged in full**: every
+   extra step's matrix, reducers and elimination are in `touches`; policy work
+   is in `policy_ops`; only offline labelling and fitting are outside, and
+   they are reported per cell.
+10. **Cell `(13,3,4)` draws 64 test targets** (design: 32) because about half
+    of its targets are satisfiable and censored; all usable targets are
+    measured. The m = 3 cells use the design's 32.
+11. **The `q = 0.25` arms are not run at `(21,5,3)`**, for the CPU budget; they
+    are secondary and never decide a verdict.
+12. **Relative cap 1.5.** Arms other than `a` are stopped at 1.5 times the
+    incumbent's touches on the same target and counted at that cap (a lower
+    bound), so a slow arm cannot burn the budget. An arm that wins is not
+    affected.
 
 ## Outputs
 
