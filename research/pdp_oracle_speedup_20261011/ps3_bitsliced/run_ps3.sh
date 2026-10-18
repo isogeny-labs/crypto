@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 # PS-3: bit-sliced CPU kernel (protocols/PS-3.md).  Correctness, counts and programs run on a busy
 # machine; the interleaved timing stage needs a QUIET one (tools/isolated_bench.py).
-#   PS3_STAGES = all | correctness | timing | threads
+#   PS3_STAGES = all | correctness | timing | threads | summary
+#   PS3_RAW    = raw directory under ps3_bitsliced/ (raw = host A; raw_hostB = the second host class)
+#   PS3_REUSE_BINARY=1: do not rebuild; use $PS3_SCRATCH/pdp_speedup (the frozen binary of an earlier stage)
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 R=research/pdp_oracle_speedup_20261011
-OUT=$R/ps3_bitsliced/raw
+OUT=$R/ps3_bitsliced/${PS3_RAW:-raw}
+CORPUS13=$R/ps3_bitsliced/raw/corpus_l13.txt   # one frozen l = 13 sample for every host
 C=$R/baseline_v1/corpus
 SCR=${PS3_SCRATCH:-/tmp/ps3_bin}
 CPU=${PS3_CPU:-3}
@@ -19,8 +22,10 @@ S="$SCR/pdp_speedup"
 BUSY="python3 tools/isolated_bench.py busy --wait --"   # untimed heavy work takes the benchmark lock, so it never overlaps a timed run
 
 if [ "$STAGES" = all ] || [ "$STAGES" = correctness ]; then
-  python3 tools/isolated_bench.py busy --wait -- cargo build --release --example pdp_speedup
-  cp target/release/examples/pdp_speedup "$S"
+  if [ "${PS3_REUSE_BINARY:-0}" != 1 ]; then
+    python3 tools/isolated_bench.py busy --wait -- cargo build --release --example pdp_speedup
+    cp target/release/examples/pdp_speedup "$S"
+  fi
   sha256sum "$S" > "$OUT/binary_hashes.txt"
   git rev-parse HEAD > "$OUT/revision.txt"; git status --short >> "$OUT/revision.txt"
 
@@ -33,13 +38,13 @@ if [ "$STAGES" = all ] || [ "$STAGES" = correctness ]; then
   done
 
   # 2. the l = 13 sample (timing only): verdicts decided against the baseline arm on the same targets
-  if [ ! -s "$OUT/corpus_l13.txt" ]; then
-    $BUSY "$S" corpus --l 13 --out "$OUT/corpus_l13.txt" --uniform 3 --planted 0 --threads 3 \
+  if [ ! -s "$CORPUS13" ]; then
+    $BUSY "$S" corpus --l 13 --out "$CORPUS13" --uniform 3 --planted 0 --threads 3 \
       | tee "$OUT/corpus_l13.log"
   fi
   : > "$OUT/verify_l13.jsonl"
   for arm in baseline group-scalar bs64 bs256 bs512 bs512-t4; do
-    $BUSY "$S" verify-arm --arm "$arm" --l 13 --corpus "$OUT/corpus_l13.txt" | tee -a "$OUT/verify_l13.jsonl"
+    $BUSY "$S" verify-arm --arm "$arm" --l 13 --corpus "$CORPUS13" | tee -a "$OUT/verify_l13.jsonl"
   done
 
   # 3. the recorded program is still PS-2's (same hash on every rung); the vector lanes run the same function
@@ -77,7 +82,7 @@ timed_run() {   # tag arm l round cpus corpus
 }
 if [ "$STAGES" = all ] || [ "$STAGES" = timing ]; then
   for l in 8 9 10 11 12 13; do
-    corp=$C/corpus_l$l.txt; [ "$l" = 13 ] && corp=$OUT/corpus_l13.txt
+    corp=$C/corpus_l$l.txt; [ "$l" = 13 ] && corp=$CORPUS13
     for r in $(seq 1 "$ROUNDS"); do
       for tag in $ARMS; do
         arm=$tag; [ "$tag" = baseline2 ] && arm=baseline
@@ -85,27 +90,6 @@ if [ "$STAGES" = all ] || [ "$STAGES" = timing ]; then
       done
     done
   done
-  {
-    echo "## A/A: baseline vs baseline (ns per target)"; "$S" summarize --times "$OUT/times.jsonl" --iso "$OUT/iso.jsonl" --a baseline --b baseline2 --metric ns_per_target
-    for b in group-scalar bs64 bs256 bs512; do
-      echo; echo "## baseline vs $b (ns per target, then ns per own pair)"
-      "$S" summarize --times "$OUT/times.jsonl" --iso "$OUT/iso.jsonl" --a baseline --b "$b" --metric ns_per_target
-      "$S" summarize --times "$OUT/times.jsonl" --iso "$OUT/iso.jsonl" --a baseline --b "$b" --metric ns_per_pair
-    done
-    for b in bs64 bs256 bs512; do
-      echo; echo "## group-scalar vs $b (ns per pair)"
-      "$S" summarize --times "$OUT/times.jsonl" --iso "$OUT/iso.jsonl" --a group-scalar --b "$b" --metric ns_per_pair
-    done
-  } > "$OUT/../ab_summary.md"
-  {
-    echo "## contended runs excluded"
-    for b in group-scalar bs64 bs256 bs512; do
-      echo; echo "## baseline vs $b, contended rounds excluded (ns per target)"
-      "$S" summarize --times "$OUT/times.jsonl" --iso "$OUT/iso.jsonl" --a baseline --b "$b" --metric ns_per_target --exclude-contended
-    done
-    echo; echo "## A/A, contended rounds excluded"
-    "$S" summarize --times "$OUT/times.jsonl" --iso "$OUT/iso.jsonl" --a baseline --b baseline2 --metric ns_per_target --exclude-contended
-  } > "$OUT/../ab_summary_excl_contended.md"
 fi
 
 # 7. threads: the same arm on 1, 2 and 4 pinned cores, interleaved (efficiency = per-core throughput ratio).
@@ -117,4 +101,29 @@ if [ "$STAGES" = all ] || [ "$STAGES" = threads ]; then
       timed_run "bs512-4c" bs512-t4 "$l" "$r" 0-3 "$C/corpus_l$l.txt"
     done
   done
+fi
+
+# 8. summaries (can be run alone once the rows exist)
+if [ "$STAGES" = all ] || [ "$STAGES" = timing ] || [ "$STAGES" = summary ]; then
+  {
+    echo "## A/A: baseline vs baseline (ns per target)"; "$S" summarize --times "$OUT/times.jsonl" --iso "$OUT/iso.jsonl" --a baseline --b baseline2 --metric ns_per_target
+    for b in group-scalar bs64 bs256 bs512; do
+      echo; echo "## baseline vs $b (ns per target, then ns per own pair)"
+      "$S" summarize --times "$OUT/times.jsonl" --iso "$OUT/iso.jsonl" --a baseline --b "$b" --metric ns_per_target
+      "$S" summarize --times "$OUT/times.jsonl" --iso "$OUT/iso.jsonl" --a baseline --b "$b" --metric ns_per_pair
+    done
+    for b in bs64 bs256 bs512; do
+      echo; echo "## group-scalar vs $b (ns per pair)"
+      "$S" summarize --times "$OUT/times.jsonl" --iso "$OUT/iso.jsonl" --a group-scalar --b "$b" --metric ns_per_pair
+    done
+  } > "$OUT/ab_summary.md"
+  {
+    echo "## contended runs excluded"
+    for b in group-scalar bs64 bs256 bs512; do
+      echo; echo "## baseline vs $b, contended rounds excluded (ns per target)"
+      "$S" summarize --times "$OUT/times.jsonl" --iso "$OUT/iso.jsonl" --a baseline --b "$b" --metric ns_per_target --exclude-contended
+    done
+    echo; echo "## A/A, contended rounds excluded"
+    "$S" summarize --times "$OUT/times.jsonl" --iso "$OUT/iso.jsonl" --a baseline --b baseline2 --metric ns_per_target --exclude-contended
+  } > "$OUT/ab_summary_excl_contended.md"
 fi
