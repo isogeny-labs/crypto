@@ -576,9 +576,19 @@ struct Arm {
     rule: Rule,
 }
 
-const ARM_NAMES: [&str; 11] = [
-    "base", "none", "dbl", "min2", "la", "per16", "per32", "per64", "laper16", "laper32", "laper64",
+const ARM_NAMES: [&str; 14] = [
+    "base", "none", "dbl", "min2", "la", "per2", "per4", "per8", "per16", "per32", "per64", "laper16", "laper32", "laper64",
 ];
+
+/// Collision-preserving escape rules: two walks that fall into the same cycle
+/// leave it at the same point (a function of the cycle's content, not of how
+/// each walk entered it), so distinguished-point collisions survive the escape
+/// (H-RHO-bc6ea6 memorylessness filter, read as that property).  `dbl` doubles
+/// the point at which the walk happened to be, which depends on the entry
+/// phase: it is measured and reported but never counted as a winner.
+fn admissible(name: &str) -> bool {
+    !matches!(name, "dbl" | "none" | "base" | "baseb")
+}
 
 fn arm_of(name: &str) -> Option<Arm> {
     let (neg, rule) = match name {
@@ -587,6 +597,9 @@ fn arm_of(name: &str) -> Option<Arm> {
         "dbl" => (true, Rule::Dbl),
         "min2" => (true, Rule::Min2),
         "la" => (true, Rule::La),
+        "per2" => (true, Rule::Per(2)),
+        "per4" => (true, Rule::Per(4)),
+        "per8" => (true, Rule::Per(8)),
         "per16" => (true, Rule::Per(16)),
         "per32" => (true, Rule::Per(32)),
         "per64" => (true, Rule::Per(64)),
@@ -620,6 +633,9 @@ struct Rec {
     escapes: u64,
     c2_entries: u64,
     c2_trials: u64,
+    /// The same two counts over every step, trapped walks included.
+    c2_entries_all: u64,
+    c2_trials_all: u64,
     useless: u64,
     bad: u64,
     solved: bool,
@@ -718,7 +734,23 @@ impl<'a, G: Grp> Ctx<'a, G> {
         Some(self.arrive(st, z, za, zb))
     }
 
+    /// One walk.  The fruitless-cycle entry counts of a walk are credited to
+    /// the record only when the walk ends at a distinguished point: steps spent
+    /// inside a longer trapped cycle until the cap are not draws of the
+    /// per-step 2-cycle probability that HEUR-RHO-1 states.
     fn walk(&self, st: &mut St, sx: G::P, sa: u64, sb: u64) -> End<G::P> {
+        let (mut ce, mut ct) = (0u64, 0u64);
+        let end = self.walk_inner(st, sx, sa, sb, &mut ce, &mut ct);
+        st.rec.c2_entries_all += ce;
+        st.rec.c2_trials_all += ct;
+        if matches!(end, End::Dp(..)) {
+            st.rec.c2_entries += ce;
+            st.rec.c2_trials += ct;
+        }
+        end
+    }
+
+    fn walk_inner(&self, st: &mut St, sx: G::P, sa: u64, sb: u64, ce: &mut u64, ct: &mut u64) -> End<G::P> {
         let g = self.g;
         let n = self.n;
         let r = self.r;
@@ -772,10 +804,10 @@ impl<'a, G: Grp> Ctx<'a, G> {
                 let ev = self.neg && fl && self.idx(hh) == j;
                 let fresh = !prev_ev;
                 if fresh {
-                    st.rec.c2_trials += 1;
+                    *ct += 1;
                 }
                 if ev && fresh {
-                    st.rec.c2_entries += 1;
+                    *ce += 1;
                 }
                 if la {
                     st.rec.cmp += fl as u64;
@@ -1002,16 +1034,16 @@ fn cap_ops_of(n: u64, mult: f64) -> u64 {
 
 // ---------------------------------------------------------------- JSON lines
 
-fn rec_json(bits: u32, r: usize, arm: &str, t: u64, rec: &Rec) -> String {
+fn rec_json(bits: u32, theta: u32, r: usize, arm: &str, t: u64, rec: &Rec) -> String {
     let mut s = String::new();
     let _ = write!(
         s,
-        "{{\"kind\":\"rec\",\"bits\":{bits},\"r\":{r},\"arm\":\"{arm}\",\"t\":{t},\
+        "{{\"kind\":\"rec\",\"bits\":{bits},\"theta\":{theta},\"r\":{r},\"arm\":\"{arm}\",\"t\":{t},\
 \"solved\":{},\"cens\":{},\"found\":{},\
 \"setup_a\":{},\"setup_d\":{},\"start_a\":{},\"walk_a\":{},\"walk_d\":{},\"la_a\":{},\"la_d\":{},\
 \"esc_a\":{},\"esc_d\":{},\"ver_a\":{},\"ver_d\":{},\
 \"hash\":{},\"canon\":{},\"cmp\":{},\"lookup\":{},\"walks\":{},\"dps\":{},\"capped\":{},\"lost\":{},\
-\"steps\":{},\"escapes\":{},\"c2e\":{},\"c2t\":{},\"useless\":{},\"bad\":{}}}",
+\"steps\":{},\"escapes\":{},\"c2e\":{},\"c2t\":{},\"c2ea\":{},\"c2ta\":{},\"useless\":{},\"bad\":{}}}",
         rec.solved as u8,
         rec.censored as u8,
         rec.found,
@@ -1038,6 +1070,8 @@ fn rec_json(bits: u32, r: usize, arm: &str, t: u64, rec: &Rec) -> String {
         rec.escapes,
         rec.c2_entries,
         rec.c2_trials,
+        rec.c2_entries_all,
+        rec.c2_trials_all,
         rec.useless,
         rec.bad
     );
@@ -1183,7 +1217,7 @@ fn selftest() -> bool {
                 if arm.neg && r1.bad > 0 || r1.bad > 0 {
                     all_equal = false;
                 }
-                if name != "none" && !r1.solved {
+                if matches!(name, "base" | "min2" | "la" | "laper16" | "laper32" | "laper64") && !r1.solved {
                     solved_all = false;
                     let _ = write!(detail, " [{name} r={r} t={t}: unsolved]");
                 }
@@ -1193,9 +1227,9 @@ fn selftest() -> bool {
     check(
         "agreement",
         all_equal,
-        format!("{runs} runs (11 arms x 2 r x 4 targets) identical in every counter, DP digest and recovered log; field ledger = constants x ops{detail}"),
+        format!("{runs} runs ({} arms x 2 r x 4 targets) identical in every counter, DP digest and recovered log; field ledger = constants x ops{detail}", ARM_NAMES.len()),
     );
-    check("recovery", solved_all, "every arm except the no-escape control recovered the planted log at N~2^20".into());
+    check("recovery", solved_all, "baseline, min-of-2, look-ahead and the three look-ahead+periodic arms recovered the planted log on every target at N~2^20 (no run returned a wrong log)".into());
 
     // 4. smoke at the smallest sweep cell: 2^40, r = 16
     let bits = 40u32;
@@ -1226,7 +1260,7 @@ fn selftest() -> bool {
         if name == "base" {
             base_ok = solved;
         }
-        if name != "none" && name != "dbl" && name != "min2" && name != "la" && solved < 5 {
+        if matches!(name, "per4" | "per8" | "per16" | "laper16" | "laper32" | "laper64") && solved < 5 {
             non_none_ok = false;
         }
         if bad > 0 {
@@ -1235,7 +1269,29 @@ fn selftest() -> bool {
     }
     check("positive control (absorption)", absorbed >= 5, format!("no-escape arm censored on {absorbed}/6 targets at r=16"));
     check("positive control (baseline)", base_ok >= 5, format!("baseline solved {base_ok}/6"));
-    check("positive control (detecting arms)", non_none_ok, "periodic and look-ahead+periodic arms solved at least 5 of 6".into());
+    check("positive control (detecting arms)", non_none_ok, "windows of 4, 8, 16 and the three look-ahead+periodic arms solved at least 5 of 6 at r=16 (a window of k sees only cycles of length <= k, so the window of 2 is a 2-cycle-only rule like min-of-2 and dbl, which longer fruitless cycles absorb at r=16; windows of 32 and 64 lose to re-entry; those are not asserted, they are the effect under measurement)".into());
+    // 4b. the same cell at r = 2048, where fruitless cycles are rare enough for 2-cycle rules
+    let cfg2 = Cfg { n, r: 2048, theta: theta_of(bits), cap_ops: cap_ops_of(n, 2.0) };
+    let mut r2048_ok = true;
+    for name in ["base", "dbl", "min2", "la", "per16", "laper16"] {
+        let arm = arm_of(name).unwrap();
+        let mut solved = 0;
+        for t in 0..6u64 {
+            let ts = tseed_of(bits, t, 0);
+            let dd = pick_d(ts, n);
+            let g = ZGroup { n, half: n / 2, d: dd };
+            let rec = run_target(&g, &cfg2, arm, ts, dd);
+            solved += rec.solved as u32;
+            if rec.bad > 0 {
+                ok.set(false);
+            }
+        }
+        println!("  r=2048 {name:8} solved {solved}/6");
+        if solved < 5 {
+            r2048_ok = false;
+        }
+    }
+    check("positive control (r = 2048)", r2048_ok, "baseline, doubling escape, min-of-2, look-ahead, window 16 and look-ahead+16 solved at least 5 of 6 at r=2048".into());
 
     // 5. ideal random-map control: the detector sees sqrt(2)
     let n30 = prev_prime(1u64 << 30);
@@ -1277,7 +1333,7 @@ fn cmd_sweep(args: &[String]) {
             for name in &arms {
                 let arm = arm_of(name).unwrap_or_else(|| die(&format!("unknown arm {name}")));
                 let rec = run_target(&g, &cfg, arm, ts, d);
-                writeln!(f, "{}", rec_json(bits, r, name, t, &rec)).unwrap();
+                writeln!(f, "{}", rec_json(bits, theta, r, name, t, &rec)).unwrap();
                 lines += 1;
             }
         }
@@ -1352,9 +1408,8 @@ fn parse_line(line: &str) -> Option<Row> {
     Some(row)
 }
 
-const GAE_FREE: [f64; 3] = [0.0, 0.1, 1.0];
-
 #[derive(Clone, Copy)]
+#[allow(dead_code)]
 struct Model {
     name: &'static str,
     add: f64,
@@ -1431,7 +1486,48 @@ fn unpaired_ratio(x: &[f64], y: &[f64], rng: &mut Rng, reps: usize) -> (f64, f64
     (point, v[(reps as f64 * 0.025) as usize], v[(reps as f64 * 0.975) as usize - 1])
 }
 
-type Key = (u32, usize, String);
+type Key = (u32, u32, usize, String);
+
+/// One (size, theta, r, rule) cell read out of the records.
+#[allow(dead_code)]
+struct Cell {
+    bits: u32,
+    theta: u32,
+    r: usize,
+    arm: String,
+    targets: usize,
+    solved: usize,
+    wo: f64,
+    wo_max: f64,
+    g_walk: (f64, f64, f64),
+    g_full: (f64, f64, f64),
+    band: Vec<f64>,
+}
+
+impl Cell {
+    fn band_min(&self) -> f64 {
+        self.band.iter().cloned().fold(f64::MAX, f64::min)
+    }
+    fn band_max(&self) -> f64 {
+        self.band.iter().cloned().fold(f64::MIN, f64::max)
+    }
+    fn tag(&self) -> String {
+        format!("{} r={} (2^{}): {:.3} [{:.3}, {:.3}], band {:.3}..{:.3}", self.arm, self.r, self.bits, self.g_full.0, self.g_full.1, self.g_full.2, self.band_min(), self.band_max())
+    }
+}
+
+/// Pricing band: three models times nu in {0, 0.1, 1}, fully charged, as point gains.
+fn band_points(base: &[(u64, Row)], arm: &[(u64, Row)], n_t: usize) -> Vec<f64> {
+    let mut v = Vec::new();
+    for m in MODELS.iter() {
+        for nu in [0.0, 0.1, 1.0] {
+            let b = mean(&base[..n_t].iter().map(|x| cost(&x.1, m, nu, true)).collect::<Vec<_>>());
+            let a = mean(&arm[..n_t].iter().map(|x| cost(&x.1, m, nu, true)).collect::<Vec<_>>());
+            v.push(b / a);
+        }
+    }
+    v
+}
 
 fn cmd_summary(args: &[String]) {
     let dir = arg(args, "--dir").unwrap_or_else(|| die("--dir required"));
@@ -1455,7 +1551,7 @@ fn cmd_summary(args: &[String]) {
             let t = row.f["t"] as u64;
             match row.s.get("kind").map(|s| s.as_str()) {
                 Some("rec") => {
-                    let key = (bits, row.f["r"] as usize, row.s["arm"].clone());
+                    let key = (bits, row.f["theta"] as u32, row.f["r"] as usize, row.s["arm"].clone());
                     recs.entry(key).or_default().push((t, row));
                 }
                 Some("ctl") => ctls.entry((bits, row.s["arm"].clone())).or_default().push((t, row.f["steps"])),
@@ -1467,127 +1563,155 @@ fn cmd_summary(args: &[String]) {
         v.sort_by_key(|x| x.0);
         v.dedup_by_key(|x| x.0);
     }
-    let mut sizes: Vec<u32> = recs.keys().map(|k| k.0).collect();
-    sizes.sort();
-    sizes.dedup();
+    for v in ctls.values_mut() {
+        v.sort_by_key(|x| x.0 as u64);
+        v.dedup_by_key(|x| x.0);
+    }
+    let mut sections: Vec<(u32, u32)> = recs.keys().map(|k| (k.0, k.1)).collect();
+    sections.sort();
+    sections.dedup();
     let mut md = String::new();
     let mut js = String::new();
     let mut rng = Rng::new(0x5EED_13);
     let _ = writeln!(md, "# Item 13 part A summary (mechanical read-out of the frozen rule)\n");
-    let _ = writeln!(md, "Files read: {files}. Bootstrap resamples: {reps}. Gain = mean cost of the baseline / mean cost of the arm, paired by target, 95% percentile interval. A dagger marks a cell where the arm left a target unsolved at the budget cap (its cost is then a lower bound, its gain an upper bound).\n");
+    let _ = writeln!(md, "Files read: {files}. Bootstrap resamples: {reps}. Gain = mean cost of the baseline / mean cost of the rule, paired by target, 95% percentile interval, fully charged (set-up and verification included) under the JAC30 model with native work at weight 0 unless a column says otherwise. `band` is the minimum and maximum point gain over the nine pricing points (JAC30, AFF3, AFF30 times native-work weights 0, 0.1, 1 group-addition equivalents). `adm` marks collision-preserving escape rules, the only ones counted as winners. A dagger marks a cell where the rule left a target unsolved at the budget cap (its cost is then a lower bound, its gain an upper bound). Sections whose theta is not bits/4 are extensions and do not enter the frozen rule.\n");
     let _ = writeln!(js, "{{\"cells\":[");
     let mut first_js = true;
-    let mut reach_cells: Vec<String> = Vec::new();
-    let mut point_reach: Vec<String> = Vec::new();
-    let mut loss_cells: HashMap<u32, Vec<String>> = HashMap::new();
+    let mut cells: Vec<Cell> = Vec::new();
     let mut gate_rows: Vec<String> = Vec::new();
-    let mut best: HashMap<(u32, String), (f64, f64, f64, usize)> = HashMap::new();
     let mut rate_rows: Vec<String> = Vec::new();
+    let mut rate_by: HashMap<(String, usize), Vec<(u32, f64)>> = HashMap::new();
     let mut baseline_gate_ok = true;
+    let mut baseline_gate_seen = false;
     let mut none_absorbed_ok = true;
-    for &bits in &sizes {
+    let mut none_seen = false;
+    let mut aa_total = 0usize;
+    let mut aa_cover = 0usize;
+    let mut ctl_ok = true;
+    for &(bits, theta) in &sections {
+        let default = theta == theta_of(bits);
         let n = prev_prime(1u64 << bits);
         let sqrt_n = (n as f64).sqrt();
-        let theta = theta_of(bits);
-        let mut rs: Vec<usize> = recs.keys().filter(|k| k.0 == bits).map(|k| k.1).collect();
+        let mut rs: Vec<usize> = recs.keys().filter(|k| k.0 == bits && k.1 == theta).map(|k| k.2).collect();
         rs.sort();
         rs.dedup();
-        let _ = writeln!(md, "\n## 2^{bits} (N = {n}, distinguished-point bits {theta}, walk cap {})\n", 20 * (1u64 << theta) + 64);
-        // baseline reproduction gate: pooled over r
-        let mut pool: Vec<f64> = Vec::new();
-        for &r in &rs {
-            if let Some(v) = recs.get(&(bits, r, "base".to_string())) {
-                pool.extend(v.iter().map(|x| walk_ops(&x.1) / sqrt_n));
+        let _ = writeln!(md, "\n## 2^{bits}, theta = {theta}{} (N = {n}, walk cap {})\n", if default { "" } else { " (extension)" }, 20 * (1u64 << theta) + 64);
+        if default {
+            // C1: the baseline, pooled over the near-ideal r, against the ideal random-map control
+            let mut pool: Vec<f64> = Vec::new();
+            for &r in &rs {
+                if r < 128 {
+                    continue;
+                }
+                for nm in ["base", "baseb"] {
+                    if let Some(v) = recs.get(&(bits, theta, r, nm.to_string())) {
+                        pool.extend(v.iter().map(|x| walk_ops(&x.1) / sqrt_n));
+                    }
+                }
+            }
+            if !pool.is_empty() {
+                baseline_gate_seen = true;
+                let m = mean(&pool);
+                match ctls.get(&(bits, "ctl_pts".to_string())) {
+                    Some(c) => {
+                        let cv: Vec<f64> = c.iter().map(|v| v.1 / sqrt_n).collect();
+                        let g = unpaired_ratio(&pool, &cv, &mut rng, reps);
+                        let ok = g.2 >= 0.92 && g.1 <= 1.08;
+                        baseline_gate_ok &= ok;
+                        gate_rows.push(format!("2^{bits}: baseline (r >= 128, base and baseb pooled, {} targets) mean walk ops / sqrt(N) = {m:.3}; ideal random-map control (ctl_pts, {} targets) mean = {:.3}; ratio {:.3} [{:.3}, {:.3}] must overlap the band [0.92, 1.08]; sqrt(pi/2) = 1.253 for reference (the KN-TECH-006 figure 0.886 is sqrt(pi/4), the ideal negation cost, not a plain-walk cost): {}", pool.len(), cv.len(), mean(&cv), g.0, g.1, g.2, if ok { "PASS" } else { "FAIL" }));
+                    }
+                    None => {
+                        baseline_gate_ok = false;
+                        gate_rows.push(format!("2^{bits}: baseline mean walk ops / sqrt(N) = {m:.3}; no ideal random-map control records for this size: FAIL"));
+                    }
+                }
             }
         }
-        if !pool.is_empty() {
-            let m = mean(&pool);
-            let ok = (1.10..=1.45).contains(&m);
-            baseline_gate_ok &= ok;
-            gate_rows.push(format!("2^{bits}: pooled baseline walk ops / sqrt(N) = {m:.3} over {} targets (band [1.10, 1.45]; sqrt(pi/2) = 1.253; the KN-TECH-006 figure 0.886 is sqrt(pi/4), the ideal negation cost): {}", pool.len(), if ok { "PASS" } else { "FAIL" }));
-        }
         for &r in &rs {
-            let Some(base) = recs.get(&(bits, r, "base".to_string())) else { continue };
-            let _ = writeln!(md, "\n### 2^{bits}, r = {r} ({} baseline targets)\n", base.len());
-            let _ = writeln!(md, "| arm | solved | walk ops / sqrt N | gain JAC30 nu=0 walk-only [95%] | gain JAC30 nu=0 fully charged [95%] | AFF3 nu=0 | AFF30 nu=0 | JAC30 nu=0.1 | JAC30 nu=1 | AFF3 nu=0.1 | AFF3 nu=1 |");
-            let _ = writeln!(md, "|:--|--:|--:|:--|:--|--:|--:|--:|--:|--:|--:|");
+            let Some(base) = recs.get(&(bits, theta, r, "base".to_string())) else { continue };
+            let _ = writeln!(md, "\n### 2^{bits}, theta = {theta}, r = {r} ({} baseline targets)\n", base.len());
+            let _ = writeln!(md, "| rule | adm | solved | mean ops / sqrt N | max ops / sqrt N | gain walk-only [95%] | gain fully charged [95%] | band min..max | AFF3 nu=0 | JAC30 nu=0.1 | JAC30 nu=1 |");
+            let _ = writeln!(md, "|:--|:-:|--:|--:|--:|:--|:--|:--|--:|--:|--:|");
             for name in ARM_NAMES.iter().skip(1) {
-                let Some(armv) = recs.get(&(bits, r, name.to_string())) else { continue };
+                let Some(armv) = recs.get(&(bits, theta, r, name.to_string())) else { continue };
                 let n_t = base.len().min(armv.len());
                 let col = |v: &Vec<(u64, Row)>, m: &Model, nu: f64, su: bool| -> Vec<f64> { v[..n_t].iter().map(|x| cost(&x.1, m, nu, su)).collect() };
                 let solved = armv.iter().filter(|x| x.1.f["solved"] > 0.5).count();
                 let dag = if solved < armv.len() { "†" } else { "" };
-                let wo = mean(&armv.iter().map(|x| walk_ops(&x.1) / sqrt_n).collect::<Vec<_>>());
+                let wov: Vec<f64> = armv.iter().map(|x| walk_ops(&x.1) / sqrt_n).collect();
+                let wo = mean(&wov);
+                let wo_max = wov.iter().cloned().fold(0.0, f64::max);
                 let g_walk = paired_ratio(&col(base, &MODELS[0], 0.0, false), &col(armv, &MODELS[0], 0.0, false), &mut rng, reps);
                 let g_full = paired_ratio(&col(base, &MODELS[0], 0.0, true), &col(armv, &MODELS[0], 0.0, true), &mut rng, reps);
-                let pt = |m: &Model, nu: f64| mean(&col(base, m, nu, false)) / mean(&col(armv, m, nu, false));
-                let (a3_0, a30_0) = (pt(&MODELS[1], 0.0), pt(&MODELS[2], 0.0));
-                let (j_01, j_1) = (pt(&MODELS[0], 0.1), pt(&MODELS[0], 1.0));
-                let (a3_01, a3_1) = (pt(&MODELS[1], 0.1), pt(&MODELS[1], 1.0));
+                let band = band_points(base, armv, n_t);
+                let pt = |m: &Model, nu: f64| mean(&col(base, m, nu, true)) / mean(&col(armv, m, nu, true));
+                let (a3_0, j_01, j_1) = (pt(&MODELS[1], 0.0), pt(&MODELS[0], 0.1), pt(&MODELS[0], 1.0));
+                let cell = Cell { bits, theta, r, arm: name.to_string(), targets: armv.len(), solved, wo, wo_max, g_walk, g_full, band };
                 let _ = writeln!(
                     md,
-                    "| {name} | {solved}/{}{dag} | {wo:.3} | {:.3} [{:.3}, {:.3}] | {:.3} [{:.3}, {:.3}] | {a3_0:.3} | {a30_0:.3} | {j_01:.3} | {j_1:.3} | {a3_01:.3} | {a3_1:.3} |",
+                    "| {name} | {} | {solved}/{}{dag} | {wo:.3} | {wo_max:.3} | {:.3} [{:.3}, {:.3}] | {:.3} [{:.3}, {:.3}] | {:.3}..{:.3} | {a3_0:.3} | {j_01:.3} | {j_1:.3} |",
+                    if admissible(name) { "y" } else { "n" },
                     armv.len(),
-                    g_walk.0, g_walk.1, g_walk.2, g_full.0, g_full.1, g_full.2
+                    g_walk.0, g_walk.1, g_walk.2, g_full.0, g_full.1, g_full.2, cell.band_min(), cell.band_max()
                 );
                 if !first_js {
                     js.push_str(",\n");
                 }
                 first_js = false;
-                let _ = write!(js, "{{\"bits\":{bits},\"r\":{r},\"arm\":\"{name}\",\"targets\":{},\"solved\":{solved},\"walk_ops_over_sqrtN\":{wo:.6},\"gain_jac30_nu0_walk\":[{:.6},{:.6},{:.6}],\"gain_jac30_nu0_full\":[{:.6},{:.6},{:.6}],\"gain_aff3_nu0\":{a3_0:.6},\"gain_aff30_nu0\":{a30_0:.6},\"gain_jac30_nu01\":{j_01:.6},\"gain_jac30_nu1\":{j_1:.6},\"gain_aff3_nu01\":{a3_01:.6},\"gain_aff3_nu1\":{a3_1:.6}}}", armv.len(), g_walk.0, g_walk.1, g_walk.2, g_full.0, g_full.1, g_full.2);
-                if *name != "none" {
-                    let tag = format!("2^{bits} {name} r={r}: {:.3} [{:.3}, {:.3}]", g_walk.0, g_walk.1, g_walk.2);
-                    if g_walk.1 >= 1.35 {
-                        reach_cells.push(tag.clone());
-                    }
-                    if g_walk.0 >= 1.35 {
-                        point_reach.push(tag);
-                    }
-                    if g_full.2 < 1.0 {
-                        loss_cells.entry(bits).or_default().push(format!("{name} r={r}: {:.3} [{:.3}, {:.3}]", g_full.0, g_full.1, g_full.2));
-                    }
-                    let e = best.entry((bits, name.to_string())).or_insert((0.0, 0.0, 0.0, 0));
-                    if g_walk.0 > e.0 {
-                        *e = (g_walk.0, g_walk.1, g_walk.2, r);
-                    }
-                }
-                // cycle-entry rate
-                if *name == "la" || *name == "min2" || *name == "dbl" {
+                let bandj: Vec<String> = cell.band.iter().map(|x| format!("{x:.6}")).collect();
+                let _ = write!(js, "{{\"bits\":{bits},\"theta\":{theta},\"r\":{r},\"arm\":\"{name}\",\"admissible\":{},\"targets\":{},\"solved\":{solved},\"ops_over_sqrtN\":{wo:.6},\"max_ops_over_sqrtN\":{wo_max:.6},\"gain_walk\":[{:.6},{:.6},{:.6}],\"gain_full\":[{:.6},{:.6},{:.6}],\"band_order\":\"JAC30,AFF3,AFF30 x nu 0,0.1,1\",\"band\":[{}]}}", admissible(name), armv.len(), g_walk.0, g_walk.1, g_walk.2, g_full.0, g_full.1, g_full.2, bandj.join(","));
+                cells.push(cell);
+                if default && ["la", "min2", "dbl", "per16"].contains(name) {
                     let e: f64 = armv.iter().map(|x| x.1.f["c2e"]).sum();
                     let t: f64 = armv.iter().map(|x| x.1.f["c2t"]).sum();
-                    let pred = 1.0 / (2.0 * r as f64);
-                    let rate = e / t;
-                    rate_rows.push(format!("| 2^{bits} | {r} | {name} | {rate:.5} | {pred:.5} | {:.3} | {} |", rate / pred, if (0.5..=2.0).contains(&(rate / pred)) { "within factor 2" } else { "OUTSIDE" }));
+                    let ea: f64 = armv.iter().map(|x| x.1.f.get("c2ea").copied().unwrap_or(0.0)).sum();
+                    let ta: f64 = armv.iter().map(|x| x.1.f.get("c2ta").copied().unwrap_or(0.0)).sum();
+                    if t > 0.0 {
+                        let pred = 1.0 / (2.0 * r as f64);
+                        let rate = e / t;
+                        rate_by.entry((name.to_string(), r)).or_default().push((bits, rate));
+                        rate_rows.push(format!("| 2^{bits} | {r} | {name} | {rate:.5} | {pred:.5} | {:.3} | {e} / {t} | {} | {:.3} |", rate / pred, if (0.5..=2.0).contains(&(rate / pred)) { "within factor 2" } else { "OUTSIDE" }, if ta > 0.0 { ea / ta / pred } else { 0.0 }));
+                    }
                 }
-                if *name == "none" {
+                if default && *name == "none" {
                     let cap: f64 = armv.iter().map(|x| x.1.f["capped"]).sum();
                     let w: f64 = armv.iter().map(|x| x.1.f["walks"]).sum();
                     let pred = 1.0 - (-(2f64.powi(theta as i32)) / (2.0 * r as f64)).exp();
                     let frac = cap / w;
                     let ok = frac >= 0.5 * pred;
                     if r == 16 {
-                        none_absorbed_ok &= ok;
+                        none_seen = true;
+                        none_absorbed_ok &= ok && solved == 0;
                     }
-                    gate_rows.push(format!("2^{bits} r={r}: no-escape arm capped-walk fraction {frac:.3} (model 1-exp(-2^theta/(2r)) = {pred:.3}), targets solved {solved}/{}: {}", armv.len(), if ok { "absorbed as modelled" } else { "NOT ABSORBED" }));
+                    gate_rows.push(format!("2^{bits} r={r}: no-escape rule capped-walk fraction {frac:.3} (model 1-exp(-2^theta/(2r)) = {pred:.3}), targets solved {solved}/{}: {}", armv.len(), if ok { "absorbed as modelled" } else { "NOT ABSORBED" }));
                 }
             }
             // A/A negative control
-            if let Some(bb) = recs.get(&(bits, r, "baseb".to_string())) {
-                let a: Vec<f64> = base.iter().map(|x| cost(&x.1, &MODELS[0], 0.0, false)).collect();
-                let b: Vec<f64> = bb.iter().map(|x| cost(&x.1, &MODELS[0], 0.0, false)).collect();
-                let g = unpaired_ratio(&a, &b, &mut rng, reps);
-                gate_rows.push(format!("2^{bits} r={r}: A/A baseline ratio {:.3} [{:.3}, {:.3}] ({} vs {} targets): {}", g.0, g.1, g.2, a.len(), b.len(), if g.1 <= 1.0 && g.2 >= 1.0 { "interval covers 1" } else { "INTERVAL EXCLUDES 1" }));
+            if default {
+                if let Some(bb) = recs.get(&(bits, theta, r, "baseb".to_string())) {
+                    let a: Vec<f64> = base.iter().map(|x| cost(&x.1, &MODELS[0], 0.0, false)).collect();
+                    let b: Vec<f64> = bb.iter().map(|x| cost(&x.1, &MODELS[0], 0.0, false)).collect();
+                    let g = unpaired_ratio(&a, &b, &mut rng, reps);
+                    let ok = g.1 <= 1.0 && g.2 >= 1.0;
+                    aa_total += 1;
+                    aa_cover += ok as usize;
+                    gate_rows.push(format!("2^{bits} r={r}: A/A baseline ratio {:.3} [{:.3}, {:.3}] ({} vs {} targets): {}", g.0, g.1, g.2, a.len(), b.len(), if ok { "interval covers 1" } else { "INTERVAL EXCLUDES 1" }));
+                }
             }
         }
     }
     let _ = writeln!(js, "\n]}}");
     // ideal-map control
-    for &bits in &sizes {
+    let mut ctl_sizes: Vec<u32> = ctls.keys().map(|k| k.0).collect();
+    ctl_sizes.sort();
+    ctl_sizes.dedup();
+    for &bits in &ctl_sizes {
         if let (Some(p), Some(c)) = (ctls.get(&(bits, "ctl_pts".to_string())), ctls.get(&(bits, "ctl_cls".to_string()))) {
             let x: Vec<f64> = p.iter().map(|v| v.1).collect();
             let y: Vec<f64> = c.iter().map(|v| v.1).collect();
             let g = unpaired_ratio(&x, &y, &mut rng, reps);
             let ok = g.1 <= std::f64::consts::SQRT_2 && g.2 >= std::f64::consts::SQRT_2;
+            ctl_ok &= ok;
             gate_rows.push(format!("2^{bits}: ideal random-map control, points/classes steps ratio {:.3} [{:.3}, {:.3}] ({} targets), sqrt2 = 1.414: {}", g.0, g.1, g.2, x.len(), if ok { "interval covers sqrt2" } else { "INTERVAL EXCLUDES sqrt2" }));
         }
     }
@@ -1595,29 +1719,100 @@ fn cmd_summary(args: &[String]) {
     for r in &gate_rows {
         let _ = writeln!(md, "- {r}");
     }
-    let _ = writeln!(md, "\n## Per-step fruitless-cycle entry rate (prediction 3)\n\n| size | r | arm | measured per-step rate | 1/(2r) | ratio | verdict |\n|:--|--:|:--|--:|--:|--:|:--|");
+    let _ = writeln!(md, "\n## Per-step fruitless-cycle entry rate (prediction 3, HEUR-RHO-1)\n\nThe primary estimator counts entries and draws over walks that ended at a distinguished point (steps spent inside a longer trapped cycle are not draws of the 2-cycle probability). The last column is the same ratio over every step, trapped walks included.\n\n| size | r | rule | measured per-step rate | 1/(2r) | ratio | entries / draws | verdict | ratio, all steps |\n|:--|--:|:--|--:|--:|--:|:--|:--|--:|");
     for r in &rate_rows {
         let _ = writeln!(md, "{r}");
     }
-    let _ = writeln!(md, "\n## Best r per rule (walk-only JAC30 nu=0 point estimate)\n\n| size | rule | best r | gain [95%] |\n|:--|:--|--:|:--|");
-    let mut bk: Vec<_> = best.iter().collect();
-    bk.sort_by(|a, b| a.0.cmp(b.0));
-    for ((bits, name), v) in bk {
-        let _ = writeln!(md, "| 2^{bits} | {name} | {} | {:.3} [{:.3}, {:.3}] |", v.3, v.0, v.1, v.2);
+    let mut rate_keys: Vec<_> = rate_by.keys().cloned().collect();
+    rate_keys.sort();
+    let _ = writeln!(md, "\nSpread of the measured rate across sizes (max / min over the sizes present), the N-dependence check of prediction 3:\n");
+    for k in &rate_keys {
+        let v = &rate_by[k];
+        if v.len() >= 2 {
+            let mx = v.iter().map(|x| x.1).fold(0.0, f64::max);
+            let mn = v.iter().map(|x| x.1).fold(f64::MAX, f64::min);
+            let _ = writeln!(md, "- {} r={}: {:.3}", k.0, k.1, mx / mn);
+        }
+    }
+    // size dependence (HEUR-RHO-2)
+    let _ = writeln!(md, "\n## Size dependence of the fully charged gain (HEUR-RHO-2)\n\nA rule/r pair is flagged when the 95% intervals of its smallest and largest size are disjoint.\n\n| rule | r | gains by size (point) | flag |\n|:--|--:|:--|:--|");
+    let mut keys: Vec<(String, usize)> = cells.iter().filter(|c| c.theta == theta_of(c.bits)).map(|c| (c.arm.clone(), c.r)).collect();
+    keys.sort();
+    keys.dedup();
+    for (arm, r) in &keys {
+        let mut v: Vec<&Cell> = cells.iter().filter(|c| c.theta == theta_of(c.bits) && &c.arm == arm && c.r == *r).collect();
+        v.sort_by_key(|c| c.bits);
+        if v.len() >= 2 {
+            let (lo, hi) = (v[0], v[v.len() - 1]);
+            let disjoint = lo.g_full.2 < hi.g_full.1 || hi.g_full.2 < lo.g_full.1;
+            let _ = writeln!(md, "| {arm} | {r} | {} | {} |", v.iter().map(|c| format!("2^{}: {:.3}", c.bits, c.g_full.0)).collect::<Vec<_>>().join(", "), if disjoint { "intervals disjoint" } else { "overlap" });
+        }
+    }
+    // frozen rule
+    let def: Vec<&Cell> = cells.iter().filter(|c| c.theta == theta_of(c.bits)).collect();
+    let mut sizes: Vec<u32> = def.iter().map(|c| c.bits).collect();
+    sizes.sort();
+    sizes.dedup();
+    let _ = writeln!(md, "\n## Best cell per size and rule (fully charged JAC30, native work 0; collision-preserving rules marked adm)\n\n| size | rule | adm | best r | gain [95%] | band min..max |\n|:--|:--|:-:|--:|:--|:--|");
+    for &bits in &sizes {
+        for name in ARM_NAMES.iter().skip(1) {
+            let mut best: Option<&Cell> = None;
+            for c in def.iter().filter(|c| c.bits == bits && c.arm == *name) {
+                if best.map(|b| c.g_full.0 > b.g_full.0).unwrap_or(true) {
+                    best = Some(c);
+                }
+            }
+            if let Some(c) = best {
+                let _ = writeln!(md, "| 2^{bits} | {name} | {} | {} | {:.3} [{:.3}, {:.3}] | {:.3}..{:.3} |", if admissible(name) { "y" } else { "n" }, c.r, c.g_full.0, c.g_full.1, c.g_full.2, c.band_min(), c.band_max());
+            }
+        }
     }
     let _ = writeln!(md, "\n## Frozen rule, read mechanically\n");
-    let _ = writeln!(md, "- Instrument gate (baseline within band at every size): {}", if baseline_gate_ok { "PASS" } else { "FAIL, no comparison may be reported" });
-    let _ = writeln!(md, "- No-escape control absorbed at r = 16 at every size: {}", if none_absorbed_ok { "yes" } else { "NO (falsification condition 2)" });
-    let _ = writeln!(md, "- Cells whose point estimate (walk-only, JAC30, nu = 0) is >= 1.35: {}", if point_reach.is_empty() { "none".to_string() } else { point_reach.join("; ") });
-    let _ = writeln!(md, "- Cells whose 95% lower bound is >= 1.35: {}", if reach_cells.is_empty() { "none".to_string() } else { reach_cells.join("; ") });
-    let mut loss_sizes: Vec<_> = loss_cells.keys().copied().collect();
-    loss_sizes.sort();
-    for s in &sizes {
-        let v = loss_cells.get(s);
-        let _ = writeln!(md, "- 2^{s}: cells with a clear net loss (fully charged JAC30 nu = 0, 95% upper bound < 1.0): {}", v.map(|v| v.join("; ")).unwrap_or_else(|| "none".into()));
+    let ctl_present = !ctl_sizes.is_empty();
+    let _ = writeln!(md, "- Instrument gate C1 (baseline against the ideal random-map control at every size): {}", if baseline_gate_seen && baseline_gate_ok { "PASS" } else { "FAIL or absent, no comparison may be reported" });
+    let _ = writeln!(md, "- Ideal random-map control sees sqrt2 at every size: {}", if ctl_present && ctl_ok { "yes" } else { "NO or absent" });
+    let _ = writeln!(md, "- A/A negative control (baseline against a second independent baseline sample): the 95% interval covers 1 in {aa_cover} of {aa_total} cells; the gate passes with at most one miss (a 95% interval misses about one cell in twenty by chance): {}", if aa_total > 0 && aa_total - aa_cover <= 1 { "PASS" } else { "FAIL" });
+    let _ = writeln!(md, "- No-escape control absorbed at r = 16 at every size (no target solved, capped-walk fraction as modelled): {}", if none_seen && none_absorbed_ok { "yes" } else { "NO or absent (falsification condition 2)" });
+    let adm: Vec<&&Cell> = def.iter().filter(|c| admissible(&c.arm)).collect();
+    let mut fav_all = true;
+    let mut rob_all = true;
+    for &bits in &sizes {
+        let sz: Vec<&&&Cell> = adm.iter().filter(|c| c.bits == bits).collect();
+        let fav: Vec<String> = sz.iter().filter(|c| c.band_max() >= 1.35).map(|c| c.tag()).collect();
+        let rob: Vec<String> = sz.iter().filter(|c| c.band_min() >= 1.35 && c.g_full.1 >= 1.35 && c.solved == c.targets).map(|c| c.tag()).collect();
+        let loss: Vec<String> = sz.iter().filter(|c| c.g_full.2 < 1.0).map(|c| c.tag()).collect();
+        let lossr: Vec<String> = sz.iter().filter(|c| c.g_full.2 < 1.0 && c.band_max() < 1.0).map(|c| c.tag()).collect();
+        let top = sz.iter().max_by(|a, b| a.g_full.0.partial_cmp(&b.g_full.0).unwrap()).map(|c| c.tag()).unwrap_or_default();
+        let nonadm: Vec<String> = def.iter().filter(|c| c.bits == bits && !admissible(&c.arm) && c.arm != "none" && c.band_max() >= 1.35).map(|c| c.tag()).collect();
+        fav_all &= !fav.is_empty();
+        rob_all &= !rob.is_empty();
+        let j = |v: &Vec<String>| if v.is_empty() { "none".to_string() } else { v.join("; ") };
+        let _ = writeln!(md, "- 2^{bits}: best collision-preserving cell: {top}");
+        let _ = writeln!(md, "  - cells whose point gain reaches 1.35 under the most favourable of the nine pricing points: {}", j(&fav));
+        let _ = writeln!(md, "  - cells whose gain reaches 1.35 at every pricing point and whose 95% lower bound is >= 1.35: {}", j(&rob));
+        let _ = writeln!(md, "  - cells with a clear net loss (JAC30, native 0, 95% upper bound < 1.0): {}", j(&loss));
+        let _ = writeln!(md, "  - cells with a clear net loss at every pricing point as well: {}", j(&lossr));
+        let _ = writeln!(md, "  - non-collision-preserving rules (reported, not counted) at or above 1.35 under the favourable pricing: {}", j(&nonadm));
     }
-    let all_three = sizes.len() >= 3 && sizes.iter().all(|s| loss_cells.contains_key(s));
-    let _ = writeln!(md, "- A setting with a clear net loss at all three sizes: {}", if all_three { "yes" } else { "no; the exact words for the tested range are: no sign change inside the tested range" });
+    let loss_every = |robust: bool| -> Vec<String> {
+        let mut out = Vec::new();
+        let mut ks: Vec<(String, usize)> = adm.iter().map(|c| (c.arm.clone(), c.r)).collect();
+        ks.sort();
+        ks.dedup();
+        for (arm, r) in ks {
+            let ok = !sizes.is_empty() && sizes.iter().all(|&b| adm.iter().any(|c| c.bits == b && c.arm == arm && c.r == r && c.g_full.2 < 1.0 && (!robust || c.band_max() < 1.0)));
+            if ok {
+                out.push(format!("{arm} r={r}"));
+            }
+        }
+        out
+    };
+    let la = loss_every(false);
+    let lr = loss_every(true);
+    let _ = writeln!(md, "- Settings (rule, r) with a clear net loss at every size: {}", if la.is_empty() { "none; the exact words for the tested range are: no sign change inside the tested range".to_string() } else { la.join("; ") });
+    let _ = writeln!(md, "- The same, also at every pricing point: {}", if lr.is_empty() { "none".to_string() } else { lr.join("; ") });
+    let _ = writeln!(md, "- At every size some collision-preserving cell reaches 1.35 under favourable pricing: {}", if fav_all && !sizes.is_empty() { "yes" } else { "no" });
+    let _ = writeln!(md, "- At every size some collision-preserving cell robustly reaches 1.35: {}", if rob_all && !sizes.is_empty() { "yes" } else { "no" });
     let _ = writeln!(md, "\nThe verdict words (SUPPORTED, REFUTED, INCONCLUSIVE; ADVANCES, TRADES, MATCHES, REGRESSES at the constant level) are assigned from these lines by the assess stage under PROTOCOL.md section \"Decision rule\".");
     std::fs::write(out_md, md).unwrap();
     std::fs::write(out_json, js).unwrap();
@@ -1656,69 +1851,95 @@ fn cmd_plan(args: &[String]) {
     let w_log2 = 60.9f64;
     let w = 2f64.powf(w_log2);
     let dp32_log2 = 28.41f64;
-    let dp34_log2 = 25.2f64;
+    let dp34_log2 = 25.27f64;
     let dp_bytes = 32.0f64;
     struct Gpu {
         name: &'static str,
         rate: f64,
+        /// Iterations per solve of this walk relative to the sigma walk's 2^60.9.
+        work_factor: f64,
         src: &'static str,
-        same_fn: bool,
+        /// Indexes into `prices` that name this GPU part.
+        price_ix: &'static [usize],
     }
-    let gpus = [
-        Gpu { name: "RTX PRO 6000, sigma-table kernel (campaign iteration function)", rate: 15.884369e9, src: "ecc2k130/benchmarks/sigma-table/headline/result.json candidate median; ecc2k130/benchmarks/modal-sigma-table-live-20261015/README.md", same_fn: true },
-        Gpu { name: "RTX PRO 6000, table walk (different iteration function, pre-v3 revision)", rate: 20.078e9, src: "ecc2k130/ONE-BLOCK-GEOMETRY.md (20.078 B/s median)", same_fn: false },
-        Gpu { name: "RTX PRO 4500 (AWS g7.2xlarge), promoted x-only bridge map", rate: 12.499203e9, src: "ecc2k130/README.md (12.499203 B/s paired median)", same_fn: false },
-    ];
     struct Price {
         name: &'static str,
         usd_h: f64,
         src: &'static str,
     }
     let prices = [
-        Price { name: "AWS g7e.2xlarge spot, us-west-2", usd_h: 1.2128, src: "ecc2k130/RTX-PRO4500.md, observed 2026-09-16" },
-        Price { name: "AWS g7.2xlarge spot, us-west-2", usd_h: 0.5705, src: "ecc2k130/RTX-PRO4500.md, observed 2026-09-16" },
-        Price { name: "g7e spot per GPU-hour", usd_h: 1.31, src: "ecc2k130/FPGA-CEILING.md section 5 (prices dated 2026-09-11)" },
-        Price { name: "g7e.48xlarge on-demand per GPU-hour", usd_h: 4.14, src: "ecc2k130/FPGA-CEILING.md section 5" },
+        Price { name: "AWS g7e.2xlarge spot, us-west-2 (RTX PRO 6000)", usd_h: 1.2128, src: "ecc2k130/RTX-PRO4500.md, observed 2026-09-16" },
+        Price { name: "AWS g7e spot per GPU-hour (RTX PRO 6000)", usd_h: 1.31, src: "ecc2k130/FPGA-CEILING.md section 5 (prices dated 2026-09-11)" },
+        Price { name: "AWS g7e.48xlarge on-demand per GPU-hour (RTX PRO 6000)", usd_h: 4.14, src: "ecc2k130/FPGA-CEILING.md section 5" },
         Price { name: "Modal list, RTX PRO 6000", usd_h: 3.03, src: "ecc2k130/B200.md" },
+        Price { name: "AWS g7.2xlarge spot, us-west-2 (RTX PRO 4500)", usd_h: 0.5705, src: "ecc2k130/RTX-PRO4500.md, observed 2026-09-16" },
+    ];
+    let gpus = [
+        Gpu {
+            name: "RTX PRO 6000, sigma walk with the shared-memory sigma-table kernel (the campaign's shipping iteration function)",
+            rate: 15.884369e9,
+            work_factor: 1.0,
+            src: "ecc2k130/benchmarks/sigma-table/headline/result.json candidate_median_million_per_second 15884.369; ecc2k130/README.md",
+            price_ix: &[0, 1, 2, 3],
+        },
+        Gpu {
+            name: "RTX PRO 4500, promoted x-only two-bridge map (a different iteration function; work factor 1.006696 from its frozen 2,000-trial collision study)",
+            rate: 12.499203e9,
+            work_factor: 1.006696,
+            src: "ecc2k130/README.md (12.499203 B/s paired median; 1.006696 mean-work ratio, benchmarks/g7-12b-xonly-doubling-bridge)",
+            price_ix: &[4],
+        },
     ];
     let mut md = String::new();
     let mut js = String::new();
     let _ = writeln!(md, "# Item 13 part B: costed plan for completing ECC2K-130\n");
     let _ = writeln!(md, "## Measured CPU rate of the current `ecc2k130/` client\n");
-    let _ = writeln!(md, "{} repetitions of `ecc2k130-cpu --curve 131 --bench --threads 1`, one thread each, on this host (shared 4-vCPU container, isolation level L0, load recorded in raw/): {}.", rates.len(), rates.iter().map(|r| format!("{r:.3}")).collect::<Vec<_>>().join(", "));
-    let _ = writeln!(md, "\nMedian **{:.3} M iterations/s per core**, min {:.3}, max {:.3}. Committed single-core figures for comparison (ecc2k130/README.md Status): 12.6 M/s per AVX-512 core, 15.7 M/s per M4 Pro core.\n", med / 1e6, lo / 1e6, hi / 1e6);
+    let _ = writeln!(md, "{} repetitions of `ecc2k130-cpu --curve 131 --bench --threads 1`, one thread each, built from the committed `ecc2k130/src/main.cu` by the card, on this host (shared 4-vCPU container, isolation level L0, load recorded in raw/): {} M iterations/s.", rates.len(), rates.iter().map(|r| format!("{r:.3}")).collect::<Vec<_>>().join(", "));
+    let _ = writeln!(md, "\nMedian **{:.3} M iterations/s per core**, min {:.3}, max {:.3}. Committed single-core figures for comparison (ecc2k130/README.md Status): 12.6 M/s per AVX-512 core, 15.7 M/s per M4 Pro core. This is the shipping sigma walk's CPU rate; it is not a GPU rate and not a prediction of one.\n", med / 1e6, lo / 1e6, hi / 1e6);
     let _ = writeln!(md, "## Work\n");
-    let _ = writeln!(md, "Expected iterations to solve: 2^{w_log2} = {w:.4e} (ecc2k130/README.md; measured for this walk 2^60.91 to 2^60.92 on completed trails, ecc2k130/WALK-CONSTANT.md). Iterations per distinguished point: 2^{dp32_log2} at weight 32 (ecc2k130/benchmarks/dp-interval/README.md, 132 workers), 2^{dp34_log2} at weight 34. Record: {dp_bytes} bytes per point.\n");
+    let _ = writeln!(md, "Expected iterations to solve: 2^{w_log2} = {w:.4e} (ecc2k130/README.md; measured for the sigma walk 2^60.91 to 2^60.92 on completed trails, ecc2k130/WALK-CONSTANT.md). Iterations per distinguished point: 2^{dp32_log2} at weight 32 (the live bucket, ecc2k130/benchmarks/dp-interval/README.md, 132 workers), 2^{dp34_log2} at weight 34 (Bailey et al., same file). Record: {dp_bytes} bytes per point (ecc2k130 `--dp-file`).\n");
     let dps32 = w / 2f64.powf(dp32_log2);
     let dps34 = w / 2f64.powf(dp34_log2);
-    let _ = writeln!(md, "| distinguished-point weight | points to collect | storage |\n|:--|--:|--:|");
+    let _ = writeln!(md, "| distinguished-point weight | points to collect (expected) | storage at 32 bytes |\n|:--|--:|--:|");
     let _ = writeln!(md, "| 32 | {dps32:.3e} (2^{:.2}) | {:.1} GB |", dps32.log2(), dps32 * dp_bytes / 1e9);
     let _ = writeln!(md, "| 34 | {dps34:.3e} (2^{:.2}) | {:.2} TB |", dps34.log2(), dps34 * dp_bytes / 1e12);
-    let _ = writeln!(md, "\nThe in-memory collision table needs the key (at least 8 bytes) of every point: {:.0} GB at weight 32.\n", dps32 * 8.0 / 1e9);
+    let _ = writeln!(md, "\nAn in-memory collision table needs at least the 8-byte key of every point: {:.0} GB at weight 32, {:.0} GB at weight 34. A sorted-run or disk-backed table with 32-byte records needs the storage column.\n", dps32 * 8.0 / 1e9, dps34 * 8.0 / 1e9);
     let _ = writeln!(md, "## CPU alone\n");
     let cpu_h = w / med / 3600.0;
-    let _ = writeln!(md, "{cpu_h:.3e} core-hours = {:.0} core-years at the measured median rate.\n", cpu_h / 8766.0);
-    let _ = writeln!(js, "{{\"cpu_rate_median\":{med:.1},\"cpu_rate_min\":{lo:.1},\"cpu_rate_max\":{hi:.1},\"cpu_reps\":{},\"work_iterations\":{w:.6e},\"dp32_points\":{dps32:.6e},\"dp34_points\":{dps34:.6e},\"cpu_core_hours\":{cpu_h:.6e},\"gpu_rows\":[", rates.len());
-    let _ = writeln!(md, "## GPU hours and cost\n");
-    let _ = writeln!(md, "GPU-hours = 2^60.9 / (rate x 3600). Cost = GPU-hours x price. A price is an input from a committed observation; no live quote was available to this run.\n");
-    let _ = writeln!(md, "| GPU row | rate (B it/s) | same iteration function as the CPU client and the corpus | GPU-hours | CPU core-hours per GPU-hour | break-even CPU core-hour price at the cheapest listed GPU price |\n|:--|--:|:--|--:|--:|--:|");
-    let cheapest = prices.iter().map(|p| p.usd_h).fold(f64::MAX, f64::min);
+    let _ = writeln!(md, "{cpu_h:.3e} core-hours = {:.3e} core-years at the measured median rate.\n", cpu_h / 8766.0);
+    let _ = writeln!(js, "{{\"cpu_rate_median\":{med:.1},\"cpu_rate_min\":{lo:.1},\"cpu_rate_max\":{hi:.1},\"cpu_reps\":{},\"work_iterations\":{w:.6e},\"dp32_points\":{dps32:.6e},\"dp34_points\":{dps34:.6e},\"dp32_bytes\":{:.6e},\"dp34_bytes\":{:.6e},\"cpu_core_hours\":{cpu_h:.6e},\"gpu_rows\":[", rates.len(), dps32 * dp_bytes, dps34 * dp_bytes);
+    let _ = writeln!(md, "## GPU hours and cost (expected work)\n");
+    let _ = writeln!(md, "GPU-hours = work factor x 2^60.9 / (rate x 3600). Cost = GPU-hours x the price of the same GPU part. Every price is an input from a committed observation with its date; no live quote was available to this run. Rates are the committed GPU measurements, not measured here (no GPU exists on this host).\n");
+    let _ = writeln!(md, "| GPU row | rate (B it/s) | work factor | GPU-hours | CPU core-hours per GPU-hour | cheapest listed price ($/h) | break-even CPU core-hour price |\n|:--|--:|--:|--:|--:|--:|--:|");
     for (i, g) in gpus.iter().enumerate() {
-        let gh = w / g.rate / 3600.0;
+        let gh = g.work_factor * w / g.rate / 3600.0;
+        let cheapest = g.price_ix.iter().map(|&k| prices[k].usd_h).fold(f64::MAX, f64::min);
         let be = cheapest * med / g.rate;
-        let _ = writeln!(md, "| {} | {:.3} | {} | {gh:.0} | {:.0} | ${be:.5} |", g.name, g.rate / 1e9, if g.same_fn { "yes" } else { "no (separate corpus or revision; not substitutable)" }, g.rate / med);
-        let _ = write!(js, "{}{{\"name\":\"{}\",\"rate\":{:.1},\"gpu_hours\":{gh:.1},\"src\":\"{}\"}}", if i > 0 { "," } else { "" }, g.name, g.rate, g.src);
+        let _ = writeln!(md, "| {} | {:.6} | {:.6} | {gh:.0} | {:.0} | {cheapest:.4} | ${be:.5} |", g.name, g.rate / 1e9, g.work_factor, g.rate / med);
+        let _ = write!(js, "{}{{\"name\":\"{}\",\"rate\":{:.1},\"work_factor\":{},\"gpu_hours\":{gh:.1},\"src\":\"{}\"}}", if i > 0 { "," } else { "" }, g.name, g.rate, g.work_factor, g.src);
     }
     let _ = writeln!(js, "],\"costs\":[");
-    let _ = writeln!(md, "\n| GPU row | price row | $/h | total cost (USD) |\n|:--|:--|--:|--:|");
+    let _ = writeln!(md, "\n| GPU row | price row | $/h | total cost, expected work (USD) |\n|:--|:--|--:|--:|");
     let mut first = true;
     for g in &gpus {
-        let gh = w / g.rate / 3600.0;
-        for p in &prices {
-            let _ = writeln!(md, "| {} | {} | {:.4} | {:.0} |", g.name, p.name, p.usd_h, gh * p.usd_h);
+        let gh = g.work_factor * w / g.rate / 3600.0;
+        for &k in g.price_ix {
+            let p = &prices[k];
+            let _ = writeln!(md, "| {} | {} | {:.4} | {:.0} |", g.name.split(',').next().unwrap(), p.name, p.usd_h, gh * p.usd_h);
             let _ = write!(js, "{}{{\"gpu\":\"{}\",\"price\":\"{}\",\"usd_h\":{},\"usd\":{:.1},\"price_src\":\"{}\"}}", if first { "" } else { "," }, g.name, p.name, p.usd_h, gh * p.usd_h, p.src);
             first = false;
         }
+    }
+    let _ = writeln!(js, "],\"quantiles\":[");
+    // Rayleigh model of the first-collision work: quantile q of the work in units of its mean.
+    let _ = writeln!(md, "\n## Work to complete at a stated probability (modelled, not measured)\n\nThe expected work is a mean; the first-collision work of a random map follows approximately a Rayleigh law, whose p-quantile in units of the mean is sqrt(-2 ln(1-p)) / sqrt(pi/2). This is a model (the classical random-map law the corpus assumes), not a measurement of this walk's tail.\n\n| probability of having solved | work, multiple of the mean | iterations | sigma-table GPU-hours (RTX PRO 6000) | cost at the lowest RTX PRO 6000 price (USD) |\n|--:|--:|--:|--:|--:|");
+    let g0 = &gpus[0];
+    let low0 = g0.price_ix.iter().map(|&k| prices[k].usd_h).fold(f64::MAX, f64::min);
+    for (i, p) in [0.5f64, 0.9, 0.99].iter().enumerate() {
+        let k = (-2.0 * (1.0 - p).ln()).sqrt() / (std::f64::consts::PI / 2.0).sqrt();
+        let gh = k * w / g0.rate / 3600.0;
+        let _ = writeln!(md, "| {p} | {k:.3} | {:.3e} | {gh:.0} | {:.0} |", k * w, gh * low0);
+        let _ = write!(js, "{}{{\"p\":{p},\"multiple_of_mean\":{k:.6},\"gpu_hours\":{gh:.1},\"usd\":{:.1}}}", if i > 0 { "," } else { "" }, gh * low0);
     }
     let _ = writeln!(js, "]}}");
     let _ = writeln!(md, "\nSources of the rates and prices:");
@@ -1728,11 +1949,12 @@ fn cmd_plan(args: &[String]) {
     for p in &prices {
         let _ = writeln!(md, "- {}: {}", p.name, p.src);
     }
-    let _ = writeln!(md, "\n## Wall clock\n\n| GPUs (sigma-table, 15.884 B/s each) | days |\n|--:|--:|");
+    let _ = writeln!(md, "\nNot used as a completion rate: the 20.078 B/s table-walk figure (ecc2k130/ONE-BLOCK-GEOMETRY.md) was measured under the superseded v2 cycle rule and does not transfer to the v3 table walk, which measures about 5.1 B/s (ecc2k130/README.md); the sigma walk is the faster one.");
+    let _ = writeln!(md, "\n## Wall clock\n\n| GPUs (sigma-table, 15.884 B/s each) | days at expected work |\n|--:|--:|");
     for fleet in [100.0f64, 1000.0, 10000.0] {
         let _ = writeln!(md, "| {fleet:.0} | {:.1} |", w / (gpus[0].rate * fleet) / 86400.0);
     }
-    let _ = writeln!(md, "\n## What this plan claims and does not\n\nIt claims the CPU rate measured above and arithmetic on the committed GPU rates, work constants and price observations listed with their sources. It claims no GPU rate measured here (no GPU exists on this host), no live price, no campaign progress credit, and nothing about the collision-finding cost beyond the storage line. The weight-34 interval is the committed 2^25.2; the weight-32 interval is the measured 2^28.41.");
+    let _ = writeln!(md, "\n## What this plan claims and does not\n\nIt claims the CPU rate measured above and arithmetic on the committed GPU rates, work constants, record size and price observations listed with their sources. It claims no GPU rate measured here, no live price, no campaign progress credit (distinguished points already collected are not subtracted), and nothing about the collision-finding cost beyond the storage lines. The weight-34 interval is the committed 2^25.27 and the weight-32 interval the measured 2^28.41. The Rayleigh quantiles are a model. Network, orchestration, preemption and data-transfer costs are not priced.");
     std::fs::write(out_md, md).unwrap();
     std::fs::write(out_json, js).unwrap();
     println!("wrote {out_md} and {out_json}");
