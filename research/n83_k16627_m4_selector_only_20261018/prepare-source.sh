@@ -20,6 +20,10 @@ for file in \
     src/cryptanalysis/koblitz_index_calculus.rs \
     research/koblitz_n83_factor_base_sweep_20261008/size-frontier-v2.json
 do
+    if ! git diff --quiet "$revision" -- "$file"; then
+        echo "compiled source differs from $revision: $file" >&2
+        exit 1
+    fi
     mkdir -p "$snapshot/$(dirname -- "$file")"
     git show "$revision:$file" > "$snapshot/$file"
 done
@@ -45,5 +49,5 @@ jq -n --arg revision "$revision" '{schema:"n83.chain-s3-source-attestation/v1",s
 ) > "$study/source-snapshot-check.log"
 
 jq -n --arg revision "$revision" --arg snapshot "$snapshot" \
-    '{schema:"n83.selector-positive-source/v1",source_commit:$revision,snapshot:$snapshot,source_files:6}' \
+    '{schema:"n83.selector-only-source/v1",source_commit:$revision,snapshot:$snapshot,source_files:6}' \
     > "$study/source-attestation.json"
