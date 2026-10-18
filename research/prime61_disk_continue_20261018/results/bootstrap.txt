@@ -1,0 +1,11 @@
+Fresh workspace: old checkout, database, binaries and toolchain absent.
+Restored checkpoint through connected Google Drive raw-file download.
+Archive SHA256 eb5ee1c252943ddeae9d62f49e3065e6b2e5f06e20a2c8598d804f8fc35dec32; all eight internal SHA256 entries pass.
+Installed exact Rust 1.99.1 with CARGO_HOME and RUSTUP_HOME in /workspace/crypto-toolchain.
+Initial sparse build exited 101 because tools/volcano-cli was not materialized.
+Second sparse build exited 101 because isogeny_algos was not materialized.
+Materialized both tracked paths before third build. No source workaround.
+Conductor check exited 127: executable absent; .conductor/WORKFLOW.md not tracked.
+Pinned-source initial full library run: 4162 passed, 6 failed, 117 ignored.
+All six failures are missing runtime fixtures in the sparse checkout: n37_four_policy_support_20261003/SOURCE42.jsonl (one test) and cryptopro_b_chain_sweep_20261006/frozen_inputs/chains.constants.json (five tests).
+Materialized the committed fixture directories without editing them. Retain the failed full-suite log and run the entire release library suite again.

@@ -4,7 +4,7 @@
 - **Kind:** resource limit and implementation gap; full class-count certification gap
 - **Affected work:** [prime61 experiment](../research/prime61_isogeny_20261016/README.md), [follow-up card](../backlog/XP-20261016-prime61-horizontal-class/card.json)
 - **Next action owner:** unassigned native isogeny-walker lane
-- **Last updated:** 2026-10-17
+- **Last updated:** 2026-10-18
 
 ## Problem
 
@@ -86,3 +86,24 @@ certification, chosen-prime coverage and full disk/compute provisioning
 remain open. Disk use still grows; this is not an empirical full-class RSS
 measurement or completed enumeration. The old header bound remains valid
 for the old backend.
+
+2026-10-18: [the frozen continuation](../research/prime61_disk_continue_20261018/README.md)
+restored the real Drive checkpoint into a fresh workspace and extended it
+to 1,344 discovered curves, 256 expanded sources, 3,840 verified maps and
+512 measured curves. All 6,144 committed streams complete 614,400,000
+target trials with zero relations or solves. Of those, 5,376 streams and
+537,600,000 trials are new; collection replays are separate controls.
+All 1,500 inherited immutable rows are unchanged. All three new Drive
+archives pass metadata, byte, manifest and restore comparisons. Worker
+peak RSS across the phases is 18,396 KiB; final live database size is
+3,387,392 bytes. This remains prefix capacity evidence. There are 1,088
+pending sources and 832 discovered unmeasured curves.
+
+The current main source failed unrelated ecbench compilation; the
+preregistered amendment pins the validated prior source `b68341cd` for
+the continuation. Its release library and example tests pass after
+materializing the tracked sparse-checkout fixtures; the failed attempts
+remain recorded. No class-count, selected-prime generation, full-run
+provisioning or class-wide ranking obligation is closed. Next freeze a
+larger envelope from this checkpoint while separately certifying class
+coverage; a larger prefix alone still cannot discharge the full request.

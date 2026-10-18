@@ -7,14 +7,15 @@
     "native research lane"
   ],
   "status": "blocked",
-  "status_note": "Disk-backed implementation and Drive restore controls pass; the 250-curve pilot removes the retained-vector requirement. Full class/degree-set coverage, all-class workloads and a sized disk/compute envelope remain open.",
+  "status_note": "The Drive-restored continuation has 1344 discovered curves, 256 expanded sources, 3840 verified maps and 512 measured curves (6144 streams, 614400000 target trials, zero relations/solves). All inherited rows and three new checkpoint round trips pass. Full class/degree-set coverage, all-class workloads and a sized full-run disk/compute envelope remain open.",
   "blocked_on": [
     "problem:problems/prime61-horizontal-class-memory.md"
   ],
   "links": {
-    "lead": "research/prime61_disk_walk_20261017/README.md",
+    "lead": "research/prime61_disk_continue_20261018/README.md",
     "notes": [
       "problems/prime61-horizontal-class-memory.md",
+      "research/prime61_disk_walk_20261017/README.md",
       "research/prime61_isogeny_20261016/README.md"
     ],
     "prs": [
@@ -40,7 +41,7 @@
     "gpu": null,
     "est_core_hours": null,
     "est_wall_hours": null,
-    "notes": "Pilot envelope only. SQLite cache is bounded; full-class disk, CPU and runtime sizing remain unknown. Drive checkpoint upload/download/resume is verified for small archives, not full quota. Freeze a complete envelope before readiness; no remote compute is provisioned."
+    "notes": "Bounded-prefix envelope only: worker peak RSS 18396 KiB and final live database 3387392 bytes at 1344 curves/3840 maps/6144 streams; 1088 sources remain pending. SQLite cache is bounded; full-class disk, CPU and runtime sizing remain unknown. Drive round trips pass for three additional small archives, not full quota. Current main fails unrelated compilation; continuation pins validated b68341cd. Freeze a complete envelope before readiness; no remote compute is provisioned."
   },
   "run": {
     "argv": [
