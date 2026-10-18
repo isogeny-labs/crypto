@@ -1096,17 +1096,16 @@ pub(crate) struct Echelon {
 /// elimination, without scanning rows that are already zero there;
 /// `muls` counts the nonzero entries of each pivot row once per row it is
 /// subtracted from, and once for its normalisation.
-pub(crate) fn echelon_by_lead(
-    rows: Vec<Vec<u16>>,
-    p: u32,
-    muls: &mut u64,
-    debug: bool,
-) -> Echelon {
+pub(crate) fn echelon_by_lead(rows: Vec<Vec<u16>>, p: u32, muls: &mut u64, debug: bool) -> Echelon {
     echelon_by_lead_with(rows, p, muls, debug, false)
 }
 
-/// Forward elimination by leading column; when `sparsest` is set, the pivot
-/// in each column is the candidate row with the fewest nonzeros.
+/// [`echelon_by_lead`], optionally with sparsest pivots.
+///
+/// With `sparsest`, each column's pivot is instead the row of its bucket
+/// with the fewest nonzero entries (lowest index on a tie), which cuts the
+/// work and the fill; the row space and the pivot columns are the same
+/// either way.
 pub(crate) fn echelon_by_lead_with(
     mut rows: Vec<Vec<u16>>,
     p: u32,

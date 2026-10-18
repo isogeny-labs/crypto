@@ -203,7 +203,6 @@ fn plan(root: &Path, input: &Path, binary: &Path, mode: &str) -> Result<()> {
             }
         }
     }
-    drop(emit);
     q.sync_all()?;
     tx.commit()?;
     let source = Command::new("git").args(["rev-parse", "HEAD"]).output()?;
