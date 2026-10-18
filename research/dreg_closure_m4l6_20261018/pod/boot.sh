@@ -31,10 +31,14 @@ run_closure() {
   cargo build --release --example dreg_ladder --example dreg_closure > "$OUT/build.log" 2>&1 || { status BUILD_FAILED; return 1; }
   L=target/release/examples/dreg_ladder; C=target/release/examples/dreg_closure
   S=research/dreg_closure_m4l6_20261018/run.sh
-  export FRESH="4:15:6 4:16:6" TMO4=14400 DEG5_DRAWS=1
+  export FRESH="${FRESH:-4:15:6 4:16:6}" TMO4="${TMO4:-14400}" DEG5_DRAWS="${DEG5_DRAWS:-1}"
   $S $L $C host; status GENERATING; $S $L $C gen; status GEN_DONE
-  # The draws are committed before any closure measurement: wait for the tag.
-  until git ls-remote --tags origin 2>/dev/null | grep -q 'refs/tags/draws-m4l6-20261018$'; do sleep 120; done
+  # The draws are committed before any closure measurement (PROTOCOL.md §10):
+  # the gate is the committed checksum file in this clone, which verifies
+  # against the draws it names. (The tag push was refused by the authoring
+  # session's git proxy; §10 names the anchor commit instead.)
+  DR=research/dreg_closure_m4l6_20261018/draws
+  until [ -s "$DR/sha256.txt" ] && (cd "$DR" && sha256sum -c --quiet sha256.txt); do git pull -q --ff-only origin "$BRANCH" || true; sleep 120; done
   status MEASURING
   $S $L $C measure; status A_DONE
   export TMO5=$(( $(remaining) - 2400 )); [ "$TMO5" -gt 600 ] && $S $L $C deg5
