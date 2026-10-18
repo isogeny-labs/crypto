@@ -917,8 +917,6 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
 <p class="dash-footnote">What would move the heavy series below the line for good: a cold, one-target, every-phase-priced <code>S</code> below a matched rho&rsquo;s at growing size (AGENTS.md &sect;2, &sect;8). The nearest measured approaches are 1.36&times; (round 0025) and 1.314&times; in CPU time (n41). The exponent story is in the <a href="#boundary-ledger">boundary ledger</a>: no fitted exponent on an elliptic curve sits below rho&rsquo;s one half; the cover route&rsquo;s ratio falls with size but on a weak class.</p>
 <p id="conductor-gap-unplotted">15 October: <a href="#conductor-gap-native-20261015">conductor-gap native controls</a> have no numerical IC/rho point while native costs remain incompletely priced. The canonical timeline retains this result in its non-numeric ledger.</p>
 <script type="application/json" id="progress-data">{
-  "schema_version": "ic-progress-timeline/1",
-  "updated": "2026-10-17",
   "non_numeric_results": [
     {
       "anchor": "#conductor-gap-native-20261015",
@@ -1022,17 +1020,6 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
           "value": 4.3
         },
         {
-          "anchor": "#lab-pair-claw",
-          "class": "accounting",
-          "date": "2026-10-04",
-          "detail": "The four-point signed-Frobenius pair claw with a known-log orbit base (the PR's IC1 PDP4qtable LAnone candidate), run cold through ecbench against the strong signed-Frobenius rho on the same 48 Koblitz targets: 1.85x to 2.96x per curve at its cost-minimising table, 2.20x [1.90, 2.55] pooled; 32.6x [25.3, 41.0] at the PR's own n=83 shape. Flat in r, as a generic method must be. n = 83 itself is not measured.",
-          "label": "Pair claw of cryptanalysis#175, ported into ecbench: best cell icv1-f2m43-tm998717-e2e742b0 (r = 2^32.1)",
-          "reference": "matched",
-          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_pair_claw_20261003/README.md",
-          "unit": "S",
-          "value": 1.85
-        },
-        {
           "anchor": "#n61-compact-orbit-hosted-20261003",
           "class": "accounting",
           "date": "2026-10-03",
@@ -1042,6 +1029,17 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
           "source": "https://github.com/aburan28/crypto/blob/main/research/sat_factor_base_review_20260908/autolab/evidence/20261003-koblitz-n61-hosted-isolated/README.md",
           "unit": "isolated wall time",
           "value": 74.8
+        },
+        {
+          "anchor": "#lab-pair-claw",
+          "class": "accounting",
+          "date": "2026-10-04",
+          "detail": "The four-point signed-Frobenius pair claw with a known-log orbit base (the PR's IC1 PDP4qtable LAnone candidate), run cold through ecbench against the strong signed-Frobenius rho on the same 48 Koblitz targets: 1.85x to 2.96x per curve at its cost-minimising table, 2.20x [1.90, 2.55] pooled; 32.6x [25.3, 41.0] at the PR's own n=83 shape. Flat in r, as a generic method must be. n = 83 itself is not measured.",
+          "label": "Pair claw of cryptanalysis#175, ported into ecbench: best cell icv1-f2m43-tm998717-e2e742b0 (r = 2^32.1)",
+          "reference": "matched",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_pair_claw_20261003/README.md",
+          "unit": "S",
+          "value": 1.85
         },
         {
           "anchor": "#ic-tool-programme-20261001",
@@ -1062,11 +1060,18 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
           "reference": "matched",
           "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_frobenius_orbit_vs_rho_20261014/README.md",
           "unit": "S",
-          "label": "Frobenius-orbit IC, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)",
-          "detail": "Orbit factor base (compact-orbit-scan, mitm-frobenius-counted m = 2) with every native priced, paired against the fully priced signed-Frobenius rho on 16 targets x 3 rounds per curve: 1.566 [0.992, 2.347] at the best cell (interval reaches 1; rho-frob heavy-tailed there), 2.96 at n = 13, 3.85 at r = 2^21, 18.2 at r = 2^39; never below 1. Slope of ln ratio 0.165 [0.117, 0.213] per ln r with ln n fitted (model 1/6): constant-only.",
+          "value": 1.566
+        },
+        {
+          "date": "2026-10-15",
+          "value": 68183174.19,
+          "reference": "matched",
+          "unit": "F_p multiplications",
+          "label": "Joux-Vitse (n - 1)-decomposition at n = 5, E(F_{p^5}), complete DLP at p = 31 (ell = 2^24.8), F4 trace replay",
+          "detail": "Native complete DLPs paired with rho on the same target in F_p multiplications: 6.8e7x at p = 31 (6,688 trials, 19 relations), 4.5e7x and 1.8e8x at p = 11; one trial 5.9-9.2e9 flat in p over a 12-rung ladder (p = 11-241), about 25p trials per relation; every trial agrees with a meet-in-the-middle oracle and every answer verified; parity extrapolated at q = 2^58.2 (group 2^291). A reproduction of a published route; no ecbench session (no F_{p^k} instance on main).",
           "class": "accounting",
-          "anchor": "#lab-ecbench-all",
-          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_frobenius_orbit_vs_rho_20261014/README.md"
+          "anchor": "#rho-parity-ledger",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
         },
         {
           "date": "2026-10-16",
@@ -1089,16 +1094,6 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
           "class": "accounting",
           "anchor": "#lab-volcano-ic",
           "source": "https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json"
-          "date": "2026-10-15",
-          "value": 68183174.19,
-          "reference": "matched",
-          "unit": "F_p multiplications",
-          "label": "Joux-Vitse (n - 1)-decomposition at n = 5, E(F_{p^5}), complete DLP at p = 31 (ell = 2^24.8), F4 trace replay",
-          "detail": "Native complete DLPs paired with rho on the same target in F_p multiplications: 6.8e7x at p = 31 (6,688 trials, 19 relations), 4.5e7x and 1.8e8x at p = 11; one trial 5.9-9.2e9 flat in p over a 12-rung ladder (p = 11-241), about 25p trials per relation; every trial agrees with a meet-in-the-middle oracle and every answer verified; parity extrapolated at q = 2^58.2 (group 2^291). A reproduction of a published route; no ecbench session (no F_{p^k} instance on main).",
-          "class": "accounting",
-          "anchor": "#rho-parity-ledger",
-          "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
-          "value": 1.566
         }
       ],
       "role": "emphasis"
@@ -1314,11 +1309,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
           "reference": "matched",
           "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_conductor_gap_20261012/README.md",
           "unit": "counted GAE lower-bound diagnostic",
-          "label": "Large-prime conductor-gap IC, ell = 131101, fixed floor, eight one-target workloads",
-          "detail": "Mean cold counted S quotient, with unpriced native work. ECBS1h8dc7fcf4f74b; all measured runs exactly replayed. No full-cost, scaling, transport or intrinsic-hardness claim.",
-          "class": "accounting",
-          "anchor": "#conductor-gap-ic37-20261012",
-          "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_conductor_gap_20261012/README.md"
+          "value": 45.08273811955142
         },
         {
           "date": "2026-10-14",
@@ -1330,7 +1321,6 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
           "class": "engineering",
           "anchor": "#rootfinding-buffers-20261014",
           "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_rootfinding_alloc_20261014/REPORT.md"
-          "value": 45.08273811955142
         }
       ],
       "role": "context"
@@ -1683,24 +1673,6 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
       "role": "context"
     },
     {
-      "id": "genus3-ghs-2lp",
-      "label": "Not an elliptic curve: genus-3 Jacobian of a GHS cubic cover, double large primes",
-      "role": "context",
-      "note": "Index calculus with double large primes on Jac(C) of hyperelliptic GHS cubic covers (m = 3, r = 5) over prime F_q, q = 2^10-2^20, counted F_q plus mod-ell multiplications, one target cold, 12 paired instances per size. Rho is measured on the same Jac(C)[ell] in the same unit at q <= 2^14 only (4 single walks per size, renormalised to sqrt(pi/2)); it is not rho on the elliptic curve E0(F_q^3). The exponent result (total q^1.383 against GTTD's 4/3) is in the genus-crossover panel.",
-      "points": [
-        {
-          "date": "2026-10-15",
-          "value": 0.252,
-          "reference": "matched",
-          "label": "Genus-3 GHS IC-2LP rebuilt baseline at q = 2^14 (04b)",
-          "detail": "Rebuilt IC-2LP baseline (kappa = 2, tree-cycle elimination + Lanczos) against rho on the same Jac(C)[ell] at q = 2^14: 0.252x with rho renormalised to sqrt(pi/2) (0.162x raw; rho walks 0.49-3.48 steps per sqrt(ell), n = 4). Cost exponent over 2^14-2^20: 1.383 (99% [1.382, 1.384]) against rho's 3/2 and GTTD's 4/3; relation phase 1.332, linear algebra 1.447. Retuning the factor base gives 1.373; structured Gaussian elimination before Lanczos gives 1.419 while cheaper by 9-22%. The original study this follows up is not in the repository; this is a rebuild. Toy sizes; not an ECDLP crossover, since rho on E0(F_q^3) is not measured.",
-          "class": "engineering",
-          "anchor": "#genus-crossover",
-          "source": "https://github.com/aburan28/crypto/blob/main/research/ic_improve_20261014/04b-genus3-2lp-rebalance/README.md"
-        }
-      ]
-    },
-    {
       "id": "cover-fp6",
       "label": "Weak elliptic class: cover and decomposition on E(F_p^6)",
       "note": "Joux-Vitse 2012 reproduced on a genus-3 GHS cover. The ratio falls as p^-1.92 and extrapolates to parity near 2^67 on this weak class (2^65 after F4 is stopped at the Bezout staircase, a 1.61x constant); the isogeny walk to reach it, priced in section 13 at a walk of q/3 steps above rho below p about 8,000, is repriced in section 17: from a curve whose class holds a weak curve it costs about 1% of the route at p = 1,009, and corrected p = 37, 41, 43 and 47 censuses estimate 60.8%, 62.5%, 62.0% and 63.2% of sampled full-2-torsion curves in such a class; the norm-one theorem proves the depth-1 exclusion for every odd extension with q = 1 mod 4; an exact p = 7 census and all independent GP orbits certify that t = +/-610 has conductor depth 3 and no weak representative; 290, 396, 376 and 424 larger-prime high-depth rows remain computationally empty; the absolute-Frobenius quotient requires (p^4+3p^2+8)/12 point counts; the completed p = 53 census has 72,540 weak ordinary rows, 494 high-depth zero rows, all 5,000 independent GP controls in its positive set, and sampled curve reach 63.5% (Wilson 95% 62.0-65.0%); p = 59 is running; the older p <= 31 values used a duplicate square-class branch. Its sieving variant (section 11) measures the crossover with rho at p about 430 (subgroup 2^50) and reads 0.012x at p = 1511. Replaying a recorded F4 trace (section 12) takes another 2.0x off the test: 2.4x at p = 1009, parity extrapolated near 2^62. Larger-field controls on 2026-10-09 verify 17 source/target cardinality pairs through log2(Q)=252 and extension degrees 10 and 14; 49 explicit geometric controls pass. The odd-prime-degree orbit formula is proved, and the interrupted p59 census is restarted under a finite local service with persistent receipts. The completed p59 census has 100,408 weak ordinary rows out of 201,898, zero depth-1 positives, and 540 high-depth zero rows; all 5,000 GP controls agree. The persistent worker has advanced to p61. The independently sampled 192-252-bit population on 2026-10-09 point-counts 512 full-2-torsion curves in ten fields of degrees 6, 10 and 14. The conductor condition admits 323/512 (63.0859%, pooled Wilson 95% 58.8229-67.1540%); all 323 have a verified full-4 representative within one rational 2-isogeny after choosing the trace sign. A new theorem proves this exact torsion equivalence. Bounded degree-2/3 searches test 32,484 vertices and leave all 323 admitted weak-class labels unresolved (219 restricted component closures, 104 vertex caps); all ten separately constructed positive controls recover a weak endpoint. The direct weak-model density is bounded by 3/(p^2-1). A recorded exact CM preflight obtains f_pi=8 on a 192-bit source, then polclass fails with an integer-conversion overflow. These curve-weighted admissions do not replace the small-prime class precision or alter IC/rho ratio points. Scope correction, 2026-10-09: the census and 63.1% admission concern the cubic norm-one h=x branch. Joux-Vitse also permit nonsplit quadratic h. Three exhaustive quadratic controls verify traces -38, -10 and 610 over F_(7^6), with orders 117688, 117660 and 117040. Hence the cubic zero at +/-610 and depth-one exclusions are not full-family exclusions; the next classification must cover both branches. The two-branch supplement of 2026-10-09 proves complete cubic and nonsplit-quadratic torus normalizations and an exact CM class criterion with distinct conductor selections. At p37 their union covers 48630/49284 ordinary classes (cubic 24352, quadratic 48164, overlap 23886, exact zeros 654). Independent all-x replay verifies 409 p7 models in 48118441 evaluations; all 63 positive fixtures among 64 independent p7 sources have explicit verified routes after broader-prime follow-ups. The expanded 512-source 192-252-bit search visits 46356 vertices and evaluates 129600 degree-2/3 edges; its 383 restricted closures and 129 vertex caps leave all large-field class labels unresolved. Quadratic-base Hilbert 90 validates 16 degree-10/14 controls, eight with noncoprime section gcd5; the specified compositum cover genera are 25 and 161. Finite-field CM decision degree is at most18 per factor, with CM support generation still a separate cost.",
@@ -1803,6 +1775,25 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
           "source": "https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md",
           "value": 0.0002
         }
+      ],
+      "role": "context"
+    },
+    {
+      "id": "genus3-ghs-2lp",
+      "label": "Not an elliptic curve: genus-3 Jacobian of a GHS cubic cover, double large primes",
+      "role": "context",
+      "note": "Index calculus with double large primes on Jac(C) of hyperelliptic GHS cubic covers (m = 3, r = 5) over prime F_q, q = 2^10-2^20, counted F_q plus mod-ell multiplications, one target cold, 12 paired instances per size. Rho is measured on the same Jac(C)[ell] in the same unit at q <= 2^14 only (4 single walks per size, renormalised to sqrt(pi/2)); it is not rho on the elliptic curve E0(F_q^3). The exponent result (total q^1.383 against GTTD's 4/3) is in the genus-crossover panel.",
+      "points": [
+        {
+          "date": "2026-10-15",
+          "value": 0.252,
+          "reference": "matched",
+          "label": "Genus-3 GHS IC-2LP rebuilt baseline at q = 2^14 (04b)",
+          "detail": "Rebuilt IC-2LP baseline (kappa = 2, tree-cycle elimination + Lanczos) against rho on the same Jac(C)[ell] at q = 2^14: 0.252x with rho renormalised to sqrt(pi/2) (0.162x raw; rho walks 0.49-3.48 steps per sqrt(ell), n = 4). Cost exponent over 2^14-2^20: 1.383 (99% [1.382, 1.384]) against rho's 3/2 and GTTD's 4/3; relation phase 1.332, linear algebra 1.447. Retuning the factor base gives 1.373; structured Gaussian elimination before Lanczos gives 1.419 while cheaper by 9-22%. The original study this follows up is not in the repository; this is a rebuild. Toy sizes; not an ECDLP crossover, since rho on E0(F_q^3) is not measured.",
+          "class": "engineering",
+          "anchor": "#genus-crossover",
+          "source": "https://github.com/aburan28/crypto/blob/main/research/ic_improve_20261014/04b-genus3-2lp-rebalance/README.md"
+        }
       ]
     },
     {
@@ -1842,14 +1833,11 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
           "source": "https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l11_l12_20261016/REPORT.typ"
         }
       ]
-      ],
-      "role": "context"
     }
   ],
   "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
-  "updated": "2026-10-15"
-}
-</script>
+  "updated": "2026-10-17"
+}</script>
 <script>
 (function () {
   var el = document.getElementById('progress-chart'); if (!el) return;
