@@ -299,3 +299,46 @@ fields. The raw `π` are still reported. Nothing else changes.
   mod `ℓ` (no sign bookkeeping), then dense elimination on the factor-base
   columns with the `(a, b)` combination tracked; the answer `k` is accepted
   only if `k·P = Q` verifies.
+
+## Amendment D (follow-up diagnostic for Part D, binary `n = 2`), before it ran
+
+The recorded Part D run (`results/item1D-run-20261018T2056Z`) rejects P7
+in one cell: binary `n = 2`, paired residual difference `−0.0308`
+(z −4.72, 21 curves). The subfield residual settles at `−0.0189 ± 0.0002`
+for `m = 7 … 10`, where the null arm's residual is about `0`. Per the
+protocol, this is reported as a structural effect of the Weil-descent
+factor base. The diagnostic below is frozen before it runs. It neither
+replaces nor reruns Part D.
+
+Mechanism to test. For `y² + xy = x³ + ax² + b` and `x_1, x_2 ∈ F_q`, the
+descended relation equation for a target `x_3 ∈ F_{q²}` is
+`S_3 = x_3² e_1² + e_2² + x_3 e_2 + b = 0` with `e_1 = x_1 + x_2` and
+`e_2 = x_1 x_2`. It is **F_2-affine** in `(e_1, e_2) ∈ F_q²` because
+squaring is additive in characteristic 2. The number of `(e_1, e_2)`
+solutions per `x_3` is therefore `0` or `2^{dim ker L_{x_3}}`, which is
+not Poisson-distributed. Equivalently, `x(P+Q) + x(P−Q) = x_1 x_2/(x_1+x_2)²`
+does not depend on `a` and `b`. In odd characteristic the analogous
+quantity involves `a` and `b`.
+
+Measurements (`decomposition_coverage <out> mult`, binary `m = 4 … 10` and
+odd `n = 2`, `p ∈ {53, 101, 211, 401, 809}`, 3 fresh curves each, seed
+fixed in the tool):
+
+- **M1**: the identity `x(P+Q) + x(P−Q) = x_1x_2/(x_1+x_2)²` holds on every
+  pair of subfield points with `x_1 ≠ x_2` (binary only).
+- **M2**: for every `x_3`, the F_2 rank of `L_{x_3}`, the solvability of
+  `L_{x_3}(e) = b`, and the coset size. The prediction is that every
+  solution count is `0` or a power of 2.
+- **M3**: the per-point multiplicity histogram (the number of multisets
+  summing to `R`) for the subfield and null arms. The index of dispersion
+  is var/mean over `R ≠ O`, and Poisson gives 1. The cross-check: from the
+  `M2` cosets, after the split condition and the point-existence
+  conditions, the subfield arm's distinct count must be reproduced
+  exactly.
+
+Prediction **P7b**: binary subfield dispersion > 1 (clustering explains the
+deficit); the null arm and odd subfield arms are ≈ 1. Attack relevance:
+a coverage deficit means fewer relations per trial, so the effect, if
+confirmed, is a constant-factor penalty for the attacker at `n = 2`, offset
+in solving cost only by the fact that the oracle is linear algebra over
+F_2.
