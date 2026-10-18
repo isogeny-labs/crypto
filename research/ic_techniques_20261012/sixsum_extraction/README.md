@@ -334,3 +334,10 @@ deployed-curve claim follows.  Not yet done: an end-to-end cold `S` for a
 B2 pipeline against the frozen baseline, and n = 53 (a pair table of
 that size).  Evidence: `raw_resolvent_20261018/` (n = 41, K = 10 and 20,
 split and resolvent; n = 23/31 saturated, solver costs only).
+
+Report and graph: `REPORT_resolvent.pdf` (source `REPORT_resolvent.typ`),
+`sixsum_s4_resolvent_n41.svg` / `.png` (source `plot_resolvent.py`, plots
+recorded values only), frozen summary `resolvent_summary.json` (feeds the
+leaderboard's `sixsum_resolvent_component`); copies in
+`benchmarks/20261018-sixsum-s4-resolvent/`.  The 3.4x / 1.9x margin against
+a table-half-trace 4-sum above is an estimate, not measured.

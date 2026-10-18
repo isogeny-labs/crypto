@@ -102,6 +102,10 @@
    "path": "research/la_engines_20261014/summary.json",
    "sha256": "b34650a95c5f106c8302dc5311194d8e1ffb798dff59b2669cda59818712f533"
   },
+  "sixsum_resolvent": {
+   "path": "research/ic_techniques_20261012/sixsum_extraction/resolvent_summary.json",
+   "sha256": "307771287ae195218cc671c3082c52d32f3b32ac0263a702f097157ff54c7ede"
+  },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
    "sha256": "765f6e8d05ebbf75e7a3dddcbb886015274311589352b9107746976fb2a670d7"
@@ -47765,6 +47769,126 @@
   "study": "research/la_engines_20261014/",
   "report": "research/la_engines_20261014/REPORT.pdf",
   "class": "engineering"
+ },
+ "sixsum_resolvent_component": {
+  "schema": "crypto.sixsum_s4_resolvent_summary/v1",
+  "class": "engineering",
+  "claim_scope": "n=41 Koblitz K_0, K=10 and 20, seed 20261012, 32 verified relations per cell, shared host (load ~2). No end-to-end S, no rho comparison, no key-recovery claim.",
+  "before": "2026-10-12 verdict: one S4 root solve 20-60 S3 (Berlekamp split), B2 1-8x more S3-work than the 4-sum",
+  "sources": [
+   "raw_resolvent_20261018/n41_k10_k20_split.json",
+   "raw_resolvent_20261018/n41_k10_k20_resolvent.json"
+  ],
+  "solver_cost_n41": {
+   "from_resolvent_run": {
+    "ns_s3_crate": 372.608083333,
+    "ns_s3_table": 186.872541667,
+    "ns_s4_build": 32.4666666667,
+    "ns_roots_split": 10150.762,
+    "ns_roots_resolvent": 649.407666667,
+    "resolvent_in_s3_wall": 1.74287058095,
+    "split_in_s3_wall": 27.2424632047,
+    "resolvent_in_s3_ops": 2.25108763672,
+    "split_in_s3_ops": 26.4926143671,
+    "ops_roots_split": {
+     "mul": 1710,
+     "sqr": 395,
+     "inv": 7,
+     "half_trace": 0,
+     "trace": 0,
+     "sqrt": 0
+    },
+    "ops_roots_resolvent": {
+     "mul": 70,
+     "sqr": 49,
+     "inv": 2,
+     "half_trace": 3,
+     "trace": 4,
+     "sqrt": 1
+    },
+    "resolvent_fallbacks": 0,
+    "solvers_disagree": 0,
+    "quartics": 3000
+   },
+   "from_split_run": {
+    "ns_s3_crate": 353.5685,
+    "ns_s3_table": 179.429708333,
+    "ns_s4_build": 30.1566666667,
+    "ns_roots_split": 9542.16933333,
+    "ns_roots_resolvent": 611.084666667,
+    "resolvent_in_s3_wall": 1.72833458486,
+    "split_in_s3_wall": 26.9881772085,
+    "resolvent_in_s3_ops": 2.18792025763,
+    "split_in_s3_ops": 26.4989740419,
+    "ops_roots_split": {
+     "mul": 1710,
+     "sqr": 395,
+     "inv": 7,
+     "half_trace": 0,
+     "trace": 0,
+     "sqrt": 0
+    },
+    "ops_roots_resolvent": {
+     "mul": 70,
+     "sqr": 49,
+     "inv": 2,
+     "half_trace": 3,
+     "trace": 4,
+     "sqrt": 1
+    },
+    "resolvent_fallbacks": 0,
+    "solvers_disagree": 0,
+    "quartics": 3000
+   }
+  },
+  "cells": [
+   {
+    "columns": 10,
+    "wall_s_per_relation": {
+     "4sum": 2.37265885778,
+     "b2_split": 3.89447233934,
+     "b2_resolvent": 0.349834808906
+    },
+    "s3_solves_per_relation_4sum": 5215058.71875,
+    "s4_solves_per_relation_b2": 370988.75,
+    "s4_solves_per_relation_b2_split_run": 370988.75,
+    "s3_equivalents_per_relation_wall": {
+     "4sum": 5215058.71875,
+     "b2_split": 10043952.607,
+     "b2_resolvent": 678910.946637
+    },
+    "relations": {
+     "4sum": 32,
+     "b2_split": 32,
+     "b2_resolvent": 32
+    },
+    "s4_fallbacks": 0
+   },
+   {
+    "columns": 20,
+    "wall_s_per_relation": {
+     "4sum": 0.474860922844,
+     "b2_split": 1.34079327597,
+     "b2_resolvent": 0.127945998719
+    },
+    "s3_solves_per_relation_4sum": 1009433.5625,
+    "s4_solves_per_relation_b2": 132122.0625,
+    "s4_solves_per_relation_b2_split_run": 132122.0625,
+    "s3_equivalents_per_relation_wall": {
+     "4sum": 1009433.5625,
+     "b2_split": 3577002.62903,
+     "b2_resolvent": 241783.920735
+    },
+    "relations": {
+     "4sum": 32,
+     "b2_split": 32,
+     "b2_resolvent": 32
+    },
+    "s4_fallbacks": 0
+   }
+  ],
+  "study": "research/ic_techniques_20261012/sixsum_extraction/",
+  "report": "research/ic_techniques_20261012/sixsum_extraction/REPORT_resolvent.pdf"
  },
  "phases": [
   {

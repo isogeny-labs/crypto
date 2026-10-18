@@ -72,6 +72,7 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "sixsum_resolvent": "research/ic_techniques_20261012/sixsum_extraction/resolvent_summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -617,6 +618,18 @@ def la_component() -> dict:
             "class": "engineering"}
 
 
+def sixsum_resolvent_component() -> dict:
+    """The six-sum kernel B/B2 quartic root finder on its own: the frozen
+    summary of research/ic_techniques_20261012/sixsum_extraction (values
+    copied from raw_resolvent_20261018/), with the 2026-10-12 figure kept as
+    the before mark. A component (stage) speed-up on public toy instances:
+    it moves no row of tables A-C and carries no end-to-end S or rho claim."""
+    sm = load(SOURCES["sixsum_resolvent"])
+    return {**sm, "study": "research/ic_techniques_20261012/sixsum_extraction/",
+            "report": "research/ic_techniques_20261012/sixsum_extraction/REPORT_resolvent.pdf",
+            "class": "engineering"}
+
+
 def latest_frontier_audit() -> dict:
     """Copy the latest performance handoff into the generated board.
 
@@ -1069,6 +1082,7 @@ def build() -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "sixsum_resolvent_component": sixsum_resolvent_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
