@@ -30,6 +30,21 @@ per sweep group, the self-test transcript, the scans).
 > also adds a measured lattice-level study of 4-dimensional GLV-GLS with
 > moderate-D loop endomorphisms.
 
+> **Round 3 (2026-10-12 to 2026-10-18), see `research/isogeny_loop_glv_20261012/`
+> ([README](research/isogeny_loop_glv_20261012/README.md), [PDF](research/isogeny_loop_glv_20261012/REPORT.pdf)).**
+> (1) The GLV-GLS eigenvalue is validated on points of constructed CM curves
+> (D = −619, −23, −71, −431, −3019; p of 127 bits), and the 4-dimensional split is
+> timed: 1.09–1.15× faster than GLS-2 at D = −619, 1.06–1.21× across D, below
+> round 2's model by 0.05–0.17. (2) A binary-field GLS version with
+> Frobenius-assisted loops is constructed, scanned at m = 83, 127, 131 and
+> validated on points at m = 31. (3) This sweeper is ported to native Rust
+> (`examples/isogeny_loop_sweeper.rs`); it reproduces the class groups and
+> cheapest loops below on 12 curves and on all scan discriminants, after a
+> defect at 131-bit discriminants was found and fixed. (4) Under the x-only
+> step model, the one round 2's bound left open, no large-|D| challenge curve
+> in groups a + d has a non-Frobenius loop below the saving (upper bounds
+> 5–13× the saving).
+
 ---
 
 ## 1. The construction (what the paper does, in the terms used here)
