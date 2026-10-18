@@ -1,0 +1,62 @@
+# item 03 summary: 15 files, 1366 records
+
+## Controls
+selftest line present: true
+sensitivity control: true
+published-exponent control (asym): true
+parity agreement: 0 real calls on hashed systems over cells [], 0 with odd true parity, 0 wrong or model-unequal, 0 skipped
+real counter == counted model on 0 of 0 real calls
+real calls by arm and interior depth: []
+controls pass: false (odd-parity real calls 0 of 400 required)
+
+## S_3 family (m = 2, quadratic): counted bit operations, log2
+cell        N   E  fes(desc)  fes(rand)  d%     dinur   (sched)         lptwy  dinur-t11  dinur-L2  dinur-L3     exh   mem(dinur)  rho_dinur  rho_lptwy
+c13-6-2     12  13        NaN        NaN   NaN   24.928  11-1            25.440     22.811    33.801    42.973   18.508      15.25        NaN        NaN
+c17-8-2     16  17        NaN        NaN   NaN   28.473  15-1            29.084     26.354    36.970    46.555   23.257      19.10        NaN        NaN
+c21-10-2    20  21        NaN        NaN   NaN   32.474  19-1            32.764     30.354    39.408    49.306   27.852      23.09        NaN        NaN
+c25-12-2    24  25        NaN        NaN   NaN   36.110  23-2            36.909     33.989    41.422    51.532   32.344      26.09        NaN        NaN
+c29-14-2    28  29        NaN        NaN   NaN   39.818  27-3            40.715     37.696    43.381    53.401   36.765      29.09        NaN        NaN
+c33-16-2    32  33        NaN        NaN   NaN   43.637  31-4            44.698     41.515    46.061    55.012   41.132      32.15        NaN        NaN
+negative control: largest |log2 difference| between a descended draw and a random dense system of equal (N,E,d), dinur/lptwy/exh/t11 model rows: 0.00e0
+FES cost differs between draws only through the early-exit test (column d% = random mean over descended mean, in percent)
+
+## Affine relations among the equations of the descended draws (combos, linear rank, constant-one)
+
+## Fitted exponent c in 2^(cN) over the S_3 cells (slope of log2 cost against N; jackknife = leave-one-cell-out range, a stability interval)
+fewer than 4 cells with FES rows: no fit
+
+## F4 (item 05 Boolean F4, grevlex), touches, per cell
+cell        N  finished/rows  statuses            geo-mean touches (log2)  range over targets (log2)   F4/FES(desc mean)
+c13-6-2     12  no F4 rows
+c17-8-2     16  no F4 rows
+c21-10-2    20  no F4 rows
+c25-12-2    24  no F4 rows
+c29-14-2    28  no F4 rows
+c33-16-2    32  no F4 rows
+c7-2-3      13  no F4 rows
+c10-3-3     19  no F4 rows
+c13-4-3     25  no F4 rows
+c16-5-3     31  no F4 rows
+F4 fitted c over the S_3 cells with >= 4 finished targets (0 cells): NaN [NaN, NaN]
+
+## S_4 family (m = 3 chain, cubic): log2 counted cost
+cell        N   E  fes-floor  dinur  (sched)        lptwy  dinur-t11  mem(dinur)  F4(geo)   rho_dinur(vs floor)
+c7-2-3      13  14     17.907  27.107  12-1          27.203     24.989      16.43       NaN   1.700e-3
+c10-3-3     19  20     24.392  32.911  18-1          33.392     30.791      22.21       NaN   2.726e-3
+c13-4-3     25  26     30.755  38.368  24-1          38.767     36.247      28.09       NaN   5.107e-3
+c16-5-3     31  32     37.044  44.369  30-2          44.666     42.247      33.09       NaN   6.238e-3
+
+## Crossover (counted model, E = N + 1, d = 2) and working set
+
+## Exponent statement (asym routine)
+asymptotic exponent, least over schedules with up to L levels: d=2 L=1 0.8149, L=3 0.7361, L=60 0.6946; d=3 L=1 0.8762, L=60 0.8115; lptwy d=2 0.8762
+family m=2: required c < 1/2 - 1/m = 0.0000; published-form asymptotic c = 0.6946; distance remaining 0.6946; index-calculus exponent relative to rho 2/m + 2c = 2.3891 (above 1 loses)
+family m=3: required c < 1/2 - 1/m = 0.1667; published-form asymptotic c = 0.8115; distance remaining 0.6448; index-calculus exponent relative to rho 2/m + 2c = 2.2896 (above 1 loses)
+fitted c of dinur over the measured S_3 range: NaN; distance to required NaN; 2/m + 2c = NaN
+fitted c of lptwy over the measured S_3 range: NaN; distance to required NaN; 2/m + 2c = NaN
+fitted c of fes over the measured S_3 range: NaN; distance to required NaN; 2/m + 2c = NaN
+
+## Verdict by the frozen rule
+a control did not pass or is missing: INCONCLUSIVE
+arm (e) msolve: BLOCKED (not installed; no GMP/MPFR/FLINT headers; ~4 GB disk); unblock with a prebuilt msolve binary
+VERDICT: INCONCLUSIVE (level: n/a)
