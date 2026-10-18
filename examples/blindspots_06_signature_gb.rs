@@ -3253,8 +3253,19 @@ fn mode_summarize(a: &Args) {
     for d in detail {
         println!("# {d}");
     }
+    let mut seen_nt: Vec<(String, String)> = Vec::new();
     for (c, arm) in &notrace {
-        println!("# {arm} on {c}: BLOCKED for at least one target: the recording run of the trace did not refute (no trace)");
+        if !seen_nt.contains(&(c.clone(), arm.clone())) {
+            seen_nt.push((c.clone(), arm.clone()));
+            println!("# {arm} on {c}: BLOCKED for at least one target: the recording run of the trace did not refute (no trace)");
+        }
+    }
+    // control 4: a replay with a trace of another cell may not be cheaper than the full run
+    for cell in &cells {
+        if let Some(r) = res.get(&(cell.clone(), "f4rx".to_string())) {
+            let ok = r.nc_r <= 1.0 + 1e-9;
+            println!("# CONTROL f4rx on {cell}: ratio {:.4} ({} fallbacks of {}) {}", r.nc_r, r.fb, r.n_both, if ok { "OK" } else { "FAILED: the accounting gives a replay a free lunch" });
+        }
     }
     println!("# arm (e) msolve: BLOCKED (not installed; no GMP/FLINT/MPFR headers; 3.8 GB disk free); would be unblocked by an msolve build with a matrix-entry counter");
     println!("VERDICT: {verdict}");
