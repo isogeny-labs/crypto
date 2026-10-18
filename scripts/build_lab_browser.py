@@ -402,7 +402,7 @@ def ecbench_sessions(
     curves_by_slug: dict, source: RepositoryInputs
 ) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
     sessions, methods, fbs, yields = [], {}, {}, []
-    per_curve_arm = defaultdict(lambda: {"n": 0, "verified": 0, "s_sum": 0.0, "floor_sum": 0.0})
+    per_curve_arm = defaultdict(lambda: {"n": 0, "verified": 0, "s_sum": 0.0, "floor_sum": 0.0, "unpriced_zero_runs": 0})
     session_paths = {
         path
         for pattern in ECBENCH_SESSIONS_GLOBS
