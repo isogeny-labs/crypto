@@ -1,9 +1,17 @@
 # RTX PRO 6000 benchmark and audit preset
 
-For the DP32 Modal campaign, `./run.sh deploy` and `./run.sh fleet` now select
+For the DP32 Modal campaign, `./run.sh deploy` and `./run.sh fleet` select
 the verified same-walk sigma-table build: `PACKED_INLINE_POLY=3`,
 `SIGMA_FUSED=1`, `PACKED_SIGMA_TABLE=1`, batch 16, 512 block threads and one
-block per SM. The matched 385,024-worker headline panel measured 15.884369
+block per SM. **Since 2026-10-17 they also select `PACKED_L2_PERSIST=1
+PACKED_TAIL_LAYOUT=1` at 96,256 workers** (1,540,096 walks), the build
+promoted in [benchmarks/sigma-table-tuned/](benchmarks/sigma-table-tuned/README.md);
+the deployed image validated (report replay PASS) and `./run.sh bench`
+measured 17.090, 17.100 and 17.089 B/s. Run ids 8000-8023 were started at
+385,024 workers: resume one with `WORKERS=385024`, because `modal_app.py`
+now refuses a checkpoint of another shape instead of letting the client
+restart the run. New run ids start at 8024 (`./run.sh next-run-id`). The
+paragraph below describes the 385,024-worker campaign before that change. The matched 385,024-worker headline panel measured 15.884369
 B/s versus 15.513653 B/s for the fused control, with replay and identical
 DP corpora; see [SIGMA-TABLE.md](SIGMA-TABLE.md). Modal's image records these
 flags and bakes that exact geometry. Existing campaign run IDs retain their
