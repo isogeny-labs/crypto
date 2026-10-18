@@ -29,7 +29,7 @@ commands:
     stdout: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/card-15-build-cpu.stdout.log
     stderr: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/card-15-build-cpu.stderr.log
   - id: host-load-before
-    argv: ["cat", "/proc/loadavg"]
+    argv: ["uptime"]
     timeout_seconds: 10
     success_exit_codes: [0]
     stdout: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-loadavg-before.txt
@@ -74,7 +74,7 @@ commands:
     stdout: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-5.log
     stderr: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-bench-5.stderr.log
   - id: host-load-after
-    argv: ["cat", "/proc/loadavg"]
+    argv: ["uptime"]
     timeout_seconds: 10
     success_exit_codes: [0]
     stdout: research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/cpu-loadavg-after.txt
