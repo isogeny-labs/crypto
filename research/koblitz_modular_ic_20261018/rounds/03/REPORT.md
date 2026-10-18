@@ -30,7 +30,7 @@ remain open.
 | G4 | Putative genus 4 polynomial for both signs | Positive sign N1=4>N2=2; negative sign N5=77>published maximum 71 |
 | MR3 | Determinant-compatible character screen, five primes, n=3, 5,131 | n=5 fails at 3 and 5; n=3 controls pass; scope remains a necessary character-pair condition |
 | N5d,a=0 | 43 rational-point columns; cubic, vertical and monic-quartic functions over F32 | 1,770 rows, rank 42 modulo 11, 11/11 fixtures recovered |
-| N5d,a=1 | 21 columns; add Hermite-generated quartics | 81 rows, rank 20 modulo 11, 11/11 recovered; 34,804 subdivisions give22,514 unique interpolants and 60 additional rows |
+| N5d,a=1 | 21 columns; add Hermite-generated quartics | 81 rows, rank 20 modulo 11, 11/11 recovered; 34,804 subdivisions give 22,514 unique interpolants and 60 additional rows |
 | Formal checks | New module plus prior proofs | 13 new named Lean lemmas build; 14 declarations audited including the defining equation; standard foundations only |
 
 The [ledger](ledger.json) contains the input/source hashes, requirements,
@@ -55,7 +55,7 @@ There are 72 direct section-count controls, 12 surface-count controls and 264
 conic-fiber vector checks across the two types and six fields. Every section
 is tested for both A5 signs. Singular/reducible sections remain in the
 enumeration; a smooth carrier would necessarily pass the polynomial test,
-and none does. Together with round02, all seven del Pezzo Frobenius types
+and none does. Together with round 02, all seven del Pezzo Frobenius types
 have now been tested in these anticanonical-square systems. This alone does
 not classify every genus-six curve. The construction and geometric argument
 are given in the [proof map](PROOF_MAP.md), with a primary-source link.
@@ -66,7 +66,7 @@ GL2 starts with the actual augmentation lattice of E to the fifth power,
 with endomorphism order O_-7. An initial integral circulant sublattice
 misses four congruence classes. GL2b includes them by dividing the restricted
 circulant matrices by 5 after explicit integrality checks. It finds small
-positive forms of determinants5 and 19; it finds none of determinant 1 or11
+positive forms of determinants 5 and 19; it finds none of determinant 1 or 11
 within its stated coefficient range. That bounded absence is not a general
 polarization obstruction or a search over all isogeny representatives.
 
@@ -75,7 +75,7 @@ J, the actual Frobenius matrix, kernel basis, kernel pairing and all elliptic
 cofactor Hom/anti-isometry counts. The separate checker uses integer Bareiss
 determinants and exhaustive two-by-two matrix enumeration, avoiding the
 generator's Hom-nullspace solver. It confirms 24 forms, 24 kernel pairings and
-14 nonempty graph cases. Four determinant 19 cases have20 anti-isometries
+14 nonempty graph cases. Four determinant 19 cases have 20 anti-isometries
 each, matching elliptic trace-2 for target trace-1 and trace+2 for target
 trace+1. The other ten determinant 19 cases do not match any F2 elliptic
 cofactor in the five tested isogeny classes.
@@ -115,7 +115,7 @@ representations or other base fields. It does not extrapolate to n=131.
 ## n=5 maps and geometric relations
 
 The source curves are E_a/F32: Y squared+X*Y=X cubed+a*X squared+1.
-They have group orders44 and 22, with unique order-eleven subgroups. The
+They have group orders 44 and 22, with unique order-eleven subgroups. The
 augmentation embedding is the Frobenius tuple (P,F(P),...,F to the fourth(P)).
 All eleven points and 121 additions per sign are evaluated and checked for
 Frobenius-fixedness and trace zero. The glued quotient and modular-Jacobian
@@ -130,7 +130,7 @@ prime-to-three push-pull argument. Every target is represented by a reduced
 Mumford pair, including nonsplit fibers. The field is F32, not F2.
 
 The initial collector exhausts all 32 to the fourth power polynomials of
-degree at most3. For a=0 this suffices; a=1 yields only ten rows of rank 10
+degree at most 3. For a=0 this suffices; a=1 yields only ten rows of rank 10
 on21 columns. Adding vertical functions raises that rank to 16. The selected
 monic-quartic family adds no a=1 rows. These failures are frozen. Finally,
 Hermite interpolation enumerates all allowed effective degree-five rational
@@ -140,9 +140,9 @@ adds 60 rows and reaches the unique-scale condition.
 The final solver anchors a nonzero projected factor-base class, verifies
 every projected log using independent library arithmetic, and performs
 bounded individual descent with principal-function witnesses. It uses
-at most32 trials per fixed offset and at most eight point offsets after the
+at most 32 trials per fixed offset and at most eight point offsets after the
 unshifted attempt. All22 fixture answers pass elliptic multiplication. The
-separate verifier reconstructs1,851 principal rows, recomputes ranks42 and 20
+separate verifier reconstructs 1,851 principal rows, recomputes ranks 42 and 20
 with BigInt elimination, checks 64 projected classes, and checks all 22
 individual descents. Fixture labels enter final comparison only; no planted
 logarithm is a matrix row or solver input.
@@ -169,9 +169,9 @@ are not hidden as custom axioms.
 
 The first N5 build needed borrowed point coordinates. The initial Lean
 file-write used the wrong directory; its following build did not build any
-round03 theorem. Two later Lean builds failed product subtraction/zero
+round 03 theorem. Two later Lean builds failed product subtraction/zero
 simplification. All are retained. N5c's historical polynomials_tested field
-reports1,048, 576 although two families, 2,097, 152 per sign, were executed;
+reports 1,048,576 although two families, 2,097,152 per sign, were executed;
 N5d corrects that metadata without rewriting the old file. The matrix-rank
 failures and bounded short-vector negative are results, not nonexistence
 proofs. Generation and verification were performed by the same agent using
