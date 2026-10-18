@@ -1,5 +1,23 @@
 # Negative Results for Elliptic-Curve Index Calculus: Six Statements, the Proofs or Evidence Behind Them, and What They Do Not Say
 
+## Verdict (assess stage, 2026-10-18)
+
+**DELIVERED** (paper item). Level: none; no exponent, constant or primitive changes, and
+by the success criterion a relabelling of existing negatives is not an improvement. No
+cross-method row, so no gap to matched rho and no 0 / 0.1 / 1 GAE pricing applies. The
+frozen decision rule in [`PROTOCOL.md`](PROTOCOL.md) gives S1 RECORDED, S2 PROVED (Lean
+unchecked), S3 PROVED and EXACT, S4 DERIVED UNREVIEWED, S5 EXACT, S6 NOT ESTABLISHED.
+
+Assessment re-ran `examples/blindspots_19_checks.rs` (sha256 `751277a8...8ec5`) and the
+output matched `evidence/checks.txt` line for line (ALL CHECKS PASS). Numbers are exact
+integer counts from one deterministic run, so there are no intervals: census of 7875
+pairs (d_F > d'_F in 6138 outside / 4830 inside; d_F < d'_F in 0 / 224), witnesses A, B
+(d_F 3, d'_F 2), witness C (3 outside, 2 inside, 2 fake). Controls passed: positive
+(X, X+1), negative (Z/8, Z/9), yield mirror. Caveats: host is shared, L0 isolation, toy
+scale; Lean not kernel-checked. Graph: `reports/lemma4_census.svg` / `.png` (source
+`reports/plot_census.py`); report: `REPORT.pdf` (source `reports/report.typ`). No
+`benchmarks/` copy: not a speed result. Lean gate: pending CI (`lean-proof-gate.yml`).
+
 `ic_negative_results.tex` (11 pages, A4). **Status**: research draft written
 2026-10-18 for blind-spot item 19 (`research/blindspots_20261018/EXPERIMENTS.md`,
 section 19; protocol in [`PROTOCOL.md`](PROTOCOL.md)). Anonymized, not peer reviewed,
