@@ -4,12 +4,28 @@ See the [validation receipt](VALIDATION.md) and [four-page report](report.pdf)
 for tested scope and current upstream integration blockers. Native validation
 uses Rust 1.98.0.
 
-Build once, then launch a bounded search with live CADO-style stderr lines:
+Install the standalone native executable once from this checkout (Rust is
+needed for this source-install step, not to launch an installed executable):
 
 ```sh
-cargo build --release --bin factor-base-sweep
-./target/release/factor-base-sweep run --out runs/my-bases --preset both
+cargo install --locked --path . --bin factor-base-sweep
 ```
+
+Put Cargo's installation directory (`$HOME/.cargo/bin` by default) on `PATH`.
+Then launch from any directory, without Cargo or a source checkout:
+
+```sh
+factor-base-sweep run --out runs/my-bases --preset both
+```
+
+The release workflow also builds, smoke-tests and includes `factor-base-sweep`
+in the Linux, Apple-silicon and Windows Rust archives. That download option
+becomes available after this PR lands and a release succeeds; older archives
+do not contain it. Extract the matching archive, verify its published checksum,
+and put `factor-base-sweep` (or `factor-base-sweep.exe`) in a directory on
+`PATH`. The executable starts its own native workers; no Cargo launcher or
+language interpreter is used at runtime. Linux builds require compatible glibc.
+Run `factor-base-sweep --help` to see its commands.
 
 The preset uses **small native functional fixtures**: Koblitz `a=1,n=7`
 and the repository's 16-bit prime roster. It tests geometric progressions,
@@ -23,7 +39,7 @@ that successful decomposition is cheap.
 Expand the grid and control the work from that same command:
 
 ```sh
-./target/release/factor-base-sweep run --out runs/grid \
+factor-base-sweep run --out runs/grid \
   --preset both --seed 42 --seed-count 4 --dimensions 3,4 \
   --train 32 --holdout 16 --max-degree 8 --candidate-seconds 30 \
   --max-abscissae 64 --max-matrix-cells 2000000 --memory-mib 2048 --threads 1
@@ -42,8 +58,8 @@ For other existing native curve constructors or exact bases, first write a
 plan, edit its explicit candidate list and budgets, then run it:
 
 ```sh
-./target/release/factor-base-sweep plan --out plan.json --preset binary
-./target/release/factor-base-sweep run --plan plan.json --out runs/custom
+factor-base-sweep plan --out plan.json --preset binary
+factor-base-sweep run --plan plan.json --out runs/custom
 ```
 
 Each candidate declares `curve` (the native ecbench `CurveSpec`), a `label`,
@@ -121,8 +137,8 @@ the original membership equations, which is retained in the observed diagnostic.
 ## Records, resume and verification
 
 ```sh
-./target/release/factor-base-sweep run --out runs/my-bases --resume
-./target/release/factor-base-sweep verify --run runs/my-bases
+factor-base-sweep run --out runs/my-bases --resume
+factor-base-sweep verify --run runs/my-bases
 ```
 
 Resume requires the **same executable bytes and frozen plan**. It verifies

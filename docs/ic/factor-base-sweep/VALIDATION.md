@@ -8,6 +8,33 @@ those native source bytes. See [launch and limitations](README.md),
 [requirements](IMPLEMENTATION.md), [architecture](architecture.svg) and
 [the rendered report](report.pdf).
 
+## Standalone installation and release packaging (2026-10-18)
+
+The native executable is installed on this workspace's existing user `PATH` as
+`factor-base-sweep`. It has the same SHA256 as the previously tested executable:
+`dd9c1e582effe751777081fc4d7fc6ba1acd90e1696797ef210d20da58c3c3f0`.
+From `/tmp`, outside the source checkout, direct `--help` and `plan` succeed.
+With `PATH` limited to the installed binary directory, `/usr/bin` and `/bin`
+(no Cargo directory), direct `verify` replays all 16 retained attempts and 29
+point witnesses. A locally staged/extracted Linux executable also passes
+`--help` and writes a binary preset plan with that restricted `PATH`.
+
+The release workflow now explicitly builds, smoke-tests and stages the CLI
+for its three existing native targets. YAML parsing, shell syntax for the
+build/smoke/stage steps and all nine CI-scope tests pass. The first CI-scope
+invocation used the wrong test filename; its corrected sandboxed invocation
+failed, and the networking-enabled retry passed. Both failures are retained.
+Installing to the existing user PATH first hit a read-only sandbox path;
+the authorized elevated installation succeeded. Cross-platform release
+execution and published download availability remain pending CI/release.
+
+This follow-up changes packaging and documentation only; Rust sources, Cargo
+inputs, the tested executable and the existing sealed evidence are unchanged.
+It does not claim a fresh full-library pass: the four documented upstream
+library failures and the other integration blockers below remain. Installation
+check logs are retained in `validation/install-20261018.tar.xz` with its SHA256
+sidecar. This archive contains checks, not a new search or timing campaign.
+
 ## Requested behavior and evidence
 
 | Requirement | Status and evidence |
