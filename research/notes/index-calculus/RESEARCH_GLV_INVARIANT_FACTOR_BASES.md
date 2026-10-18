@@ -2500,3 +2500,63 @@ extrapolation of measured constants with the theory exponents, not a measured cr
 curves over `F_{p⁴}` with full rational 2-torsion and rational halves of two of the `T`'s (the
 construction's condition), `h = 4`, `p ≤ 521` (`n ≤ 2^{34.1}`); a curve without rational 2-torsion,
 such as a prime-order curve, has no such symmetry.
+
+### 9.15 E25 pre-registration: the GLS endomorphism on the `V₄` line
+
+*Registered 2026-10-18, after E24 and before any E25 code.*  Owner request: pursue GLS-enabled
+index calculus.  E18's `ψ` was the `j = 0` automorphism of order 3 on prime-order curves, which
+have no rational 2-torsion, and E23 closed `ψ` with `τ_T` on `j = 0`.  The GLS endomorphism is a
+different map on a different family, and nothing below rules it out on the `V₄` line.  Four facts,
+derived before code:
+
+1. **The curves.**  Take `e₂ ∈ F_{p⁴} ∖ F_{p²}`, `e₃ = e₂^{p²}`, `e₁ = −e₂ − e₃ ∈ F_{p²}`, so
+   `E₀ : y² = Π(x − e_i)` is defined over `F_{p²}` with one root there.  With `μ` a non-square of
+   `F_{p⁴}`, `E : y² = Π(x − μe_i) = x³ + μ²a x + μ³b` is the quadratic twist of `E₀` over
+   `F_{p⁴}`, of order `(p² − 1)² + t²` (`t` the trace of `E₀/F_{p²}`), with the GLS endomorphism
+   `ψ(x, y) = (μ^{1−p²} x^{p²}, μ^{3(1−p²)/2} y^{p²})`, `ψ² = −1`, so `ψ = [λ]` on `⟨G⟩` with
+   `λ² ≡ −1 (mod n)`.  All of `E[2]` is rational over `F_{p⁴}`; `ψ` fixes `T₁` and swaps `T₂, T₃`.
+   E24's condition, rational abscissae of the halves of `T₁` and `T₂`, reads: `f′(x₁) =
+   μ²·N(e₁ − e₂)` is a square always, and `f′(x₂)` with probability `1/2`.  E24's generator
+   excluded `j ∈ F_{p²}`; these curves are exactly what it excluded.
+2. **`ψ` keeps the line and acts on it as `z ↦ ±i/z`.**  For `z ∈ F_p`, `z(ψP) = h(z(P))` with
+   `h = g⁻¹ ∘ [μ^{1−p²}] ∘ g^{σ}` a Möbius map (`σ` the `p²`-power).  `ψ(P + T) = ψP + ψT`, so `h`
+   normalises `V₄ = ⟨z ↦ −z, z ↦ 1/z⟩`, commutes with `z ↦ −z` (`T₁` fixed) and swaps `1/z` with
+   `−1/z` (`T₂ ↔ T₃`): `h ∈ {±iz, ±i/z}`.  `ψ² = −1` fixes every abscissa, so `h² = id` and
+   `h = ±i/z`.  With `p ≡ 1 (mod 4)`, `i ∈ F_p` and `h` keeps `z ∈ F_p`: the fold group on the line
+   is `⟨−z, 1/z, i/z⟩ ≅ D₄` of order `8`, so **`8` points a column against E24's `4`**.  The points
+   with `z⁴ = −1` are fixed by `±i/z`, so `ψP = ±P` and their `⟨G⟩`-component is `0`; they are
+   excluded with `z ∈ {0, ±1, ±i}`.
+3. **The base is not confined.**  In `z` the curve is `v² = κ(z⁴ + νz² + 1)` with `ν = −(w² + w⁻²)`
+   and `w = z(O)`.  `ψ(O) = O` gives `w·w^{σ} = ±i`, hence `ν^{σ} = −ν`: `ν ∉ F_{p²}` unless
+   `ν = 0`.  Were `ν ∈ F_{p²}`, every `z ∈ F_p` would lift or none would, and the base would lie in
+   one coset of a group of order `≈ p²` (E22's fact 1 in another form).  So the density should be
+   `≈ 1/2`, as on E24's curves.
+4. **What it buys, and what it does not.**  `ψ` acts on the base, not on the decomposition system
+   (§8.0): decompositions per target and targets per relation `y` are unchanged, the columns halve,
+   so the relation phase (`99.3 %` of `S` in E24) halves and the linear algebra quarters.  The
+   matched rho on these curves is the `⟨±ψ⟩` walk, `√2` fewer steps than the negation walk (E9
+   measured `1.40` on `F_{p²}` GLS twists).  **Net against the matched rho: `√2`**, a constant.
+   In §11.16's model `p* ∝ (cols/p) / S_rho`: `cols/p ÷ 2`, `S_rho ÷ √2`, so `p* ÷ √2` and
+   `n* = p*⁴/h ÷ 4`, two bits.
+
+**Protocol.**  `generate_gls_klein_instance(p, seed, 16)`; on each curve two arms on one target
+stream (same seed, uniform `R = aG + bQ`, the E24 oracle unchanged): **A**, E24's `V₄`-folded
+base (the control, `4` points a column), and **B**, the same base folded by `⟨V₄, ψ⟩` (`8` a
+column, coefficients `±λ^e` each checked on points).  Each runs until `[d]G = Q` verifies, every
+phase charged as in E24.  On each curve `16` `⟨±ψ⟩` walks, `16` negation walks and `16` unfolded
+walks.  Sizes `p = 101, 149, 197, 269, 397`, two curves each where time allows (at least one).
+Unpriced native work at `0, 0.1, 1` GAE as in E24.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.32 | Stage A (gate) | at every `p` a curve exists with `h ≤ 16`; `ψ² = −1` and `ψ(G) = [λ]G`, `λ² ≡ −1`, on points; every base point's `ψ`-image is in the base with `z ↦ ±i/z`; points per column `≥ 7.8`; density in `[0.3, 0.7]`; fold coefficients equal true logarithms (unit test); a log recovered | any (then E25 stops here, recorded as a negative) |
+| G2.33 | columns | `cols_A / cols_B` in `[1.9, 2.0]` | outside |
+| G2.34 | yield | `y_B / y_A` in `[0.8, 1.25]` per curve | outside |
+| G2.35 | end to end, same curve | `S_A / S_B` in `[1.6, 2.4]` on every curve | outside |
+| G2.36 | against the matched rho | `⟨±ψ⟩` / negation steps, mean over curves, in `[1.2, 1.6]`; `(S_A / rho_neg) / (S_B / rho_ψ)` in `[1.1, 2.0]` on every curve | outside |
+| G2.37 | handover, from arm B's own constants (§11.16's model) | `n* ∈ [2^{84}, 2^{92}]` (E24's own `2^{90.1}`, less two bits, with curve scatter) | outside |
+
+Against E24's rows at matched `p` the comparison crosses curve families (and E24's per-curve `y`
+spans `1,099`–`7,796`), so it is reported, not gated.  **Class if G2.32–G2.37 hold:** engineering
+(a constant, `√2` against the matched rho), on GLS twists over `F_{p⁴}` with the split 2-torsion
+above only.  The exponents do not move.
