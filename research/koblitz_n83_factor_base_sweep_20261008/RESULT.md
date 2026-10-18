@@ -1,5 +1,16 @@
 # Degree-83 factor-base sweep: observed evidence
 
+The [first-pattern external XOR-SAT Gray/hash pair](verification/m6-external-natural-20261018/RESULT.md)
+reimported the exact primary K600 S3 bases and exported the same public
+six-summand query as the hosted native worker. Both XOR-DIMACS circuit shapes
+matched the hosted pre-solve counts, but CryptoMiniSat reached its outer
+630-second wall cap on each arm without a solver disposition or model.
+Independent local and S3 raw-archive audits passed, including two fresh S3
+GETs and a mutation-rejection control. The conservative incremental
+two-arm envelope is **1,920 seconds**, plus earlier work. These censored
+first-pattern observations do not rank bases or measure natural yield,
+rank, or cold IC runtime; `selected_best_total_runtime` remains `null`.
+
 The [hosted canonical six-summand 100,000-conflict pair](verification/hosted-m6-highcap-20261018/RESULT.md)
 completed on two distinct Linux ARM runners. Exact input and provider audits,
 both write-once raw-artifact S3 round trips, and the paired receipt audit
