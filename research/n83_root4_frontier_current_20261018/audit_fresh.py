@@ -3,11 +3,16 @@
 
 import hashlib
 import json
-import subprocess
+import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
+if sys.path and Path(sys.path[0]).resolve() == HERE:
+    sys.path.pop(0)
+
+import subprocess  # noqa: E402
+
 AUDIT = HERE / "fresh_exclusion_audit.json"
 FINALISTS_HEAD = "9b9a0f3842de6cf921e38573cb99fcaed2a4683c"
 FINALISTS_PATH = "research/n83_root11_finalists_tier1_20261017/targets.jsonl"
