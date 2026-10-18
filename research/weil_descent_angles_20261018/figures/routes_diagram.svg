@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="430" viewBox="0 0 900 430" font-family="Helvetica, Arial, sans-serif" font-size="12">
+  <title>Round 3: four Weil-descent angles and what each measured</title>
+  <rect width="900" height="430" fill="#ffffff"/>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444"/>
+    </marker>
+  </defs>
+  <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="bold">Round 3: four Weil-descent angles, one ECDLP on E(F_{q^n})</text>
+
+  <!-- centre: the target -->
+  <rect x="345" y="175" width="210" height="62" rx="8" fill="#f3f1ea" stroke="#333"/>
+  <text x="450" y="200" text-anchor="middle" font-weight="bold">ECDLP on E(F_{q^n})</text>
+  <text x="450" y="219" text-anchor="middle">rho: ≈ 0.886·√ℓ group ops</text>
+
+  <!-- item 1: decomposition -->
+  <rect x="20" y="50" width="290" height="110" rx="8" fill="#eaf0f8" stroke="#4a6fa5"/>
+  <text x="30" y="70" font-weight="bold" fill="#2c4a75">1 · decomposition over F_q (summation polys)</text>
+  <text x="30" y="90">Part D: exact coverage, n = 2…5, odd and char 2</text>
+  <text x="30" y="107">odd: Poisson, no structure (z ≤ 0.9)</text>
+  <text x="30" y="124" fill="#c0392b">char 2, n = 2: factor base in one coset of 2E</text>
+  <text x="30" y="141" fill="#c0392b">→ coverage 3/8, not 1 − e^{−1/2} (proved, M1–M3)</text>
+  <text x="30" y="156">Arm D end to end: 2.7–66× rho in every cell</text>
+  <line x1="310" y1="120" x2="345" y2="185" stroke="#444" marker-end="url(#arr)"/>
+
+  <!-- item 2: PKM -->
+  <rect x="590" y="50" width="290" height="110" rx="8" fill="#eaf0f8" stroke="#4a6fa5"/>
+  <text x="600" y="70" font-weight="bold" fill="#2c4a75">2 · prime fields: PKM tower factor bases</text>
+  <text x="600" y="90">Kummer x↦x², Dickson split / torus, m = 2, 3</text>
+  <text x="600" y="107">18 cells, ≥ 23 primes each</text>
+  <text x="600" y="124">paired Poisson residual: |z| ≤ 1.84 everywhere</text>
+  <text x="600" y="141">structure does not change coverage (P9 holds)</text>
+  <line x1="590" y1="120" x2="555" y2="185" stroke="#444" marker-end="url(#arr)"/>
+
+  <!-- item 3: n = 2 genus 2 -->
+  <rect x="20" y="270" width="400" height="140" rx="8" fill="#fbeeea" stroke="#c0392b"/>
+  <text x="30" y="290" font-weight="bold" fill="#8e2a1e">3 · n = 2: Res E ~ Jac(C), C genus 2 over F_p</text>
+  <text x="30" y="310">Scholten-type C: x⁶f(κ/x) = κ³f(x); τ = φ* + σ(φ*)</text>
+  <text x="30" y="327">first-cycle 2LP IC needs ≈ p/3 Jacobian ops, any h</text>
+  <text x="30" y="344">rho needs ≈ 0.886·p/√h  (h = cofactor ≥ 2 here)</text>
+  <text x="30" y="361">control F: independent trials give the same p/3</text>
+  <text x="30" y="378">ratio IC/rho over the pricing band: unresolved</text>
+  <text x="30" y="395">(Jacobian op 41M+I measured vs 12M+I for E(F_{p²}))</text>
+  <line x1="300" y1="270" x2="400" y2="237" stroke="#444" marker-end="url(#arr)"/>
+
+  <!-- item 4: genus 4 -->
+  <rect x="480" y="270" width="400" height="140" rx="8" fill="#fbeeea" stroke="#c0392b"/>
+  <text x="490" y="290" font-weight="bold" fill="#8e2a1e">4 · n = 4: genus-4 C with Jac(C) ~ Res_{F_{q⁴}/F_q} E</text>
+  <text x="490" y="310">Theorem 5: q odd, n ≥ 3, C hyperelliptic ⇒ t even</text>
+  <text x="490" y="327">so hyperelliptic covers never reach prime #E</text>
+  <text x="490" y="344">q = 3 census, all genus 4: hyperelliptic 2187, non-hyp. 25515</text>
+  <text x="490" y="361">(both masses match the literature counts)</text>
+  <text x="490" y="378" fill="#c0392b">9 non-hyperelliptic classes reach prime #E(F_81)</text>
+  <text x="490" y="395">(t = 11, −1, −7, 9): Diem's q^{4/3} regime, toy size</text>
+  <line x1="600" y1="270" x2="500" y2="237" stroke="#444" marker-end="url(#arr)"/>
+</svg>
