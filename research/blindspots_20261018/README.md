@@ -116,6 +116,14 @@ Twelve items copied files into `benchmarks/20261018-blindspots-*/` (01, 02, 03,
 `benchmarks/README.md`. Items 04, 08, 09, 11, 12, 18, 19 and 20 are not speed
 results and have no copy.
 
+## Instruments
+
+The Rust instruments now live in [`instruments/`](instruments/). They were
+moved there byte for byte from `examples/` after the last card ran. Each card
+still names its instrument by the old `examples/` path, and the sha256 pins
+still match. [`instruments/README.md`](instruments/README.md) maps each old
+path to the new one.
+
 ## Process caveats shared by the items
 
 - Many relay checks report `relay_verbatim` false, or `CARD FAIL`, because
