@@ -154,6 +154,55 @@ fn f_by_group(n: u32, curves: &[u64], by: &BTreeMap<u64, BTreeMap<u64, &Value>>)
     Value::Object(out)
 }
 
+/// Percentile 95 % interval of `ICC_E` from `boots` resamples of the curves.
+fn boot_ci(grid: &[Vec<f64>], boots: usize, rng: &mut StdRng) -> (f64, f64) {
+    let mut v: Vec<f64> = (0..boots)
+        .map(|_| {
+            let g: Vec<Vec<f64>> = (0..grid.len())
+                .map(|_| grid[rng.gen_range(0..grid.len())].clone())
+                .collect();
+            icc(&g).0
+        })
+        .collect();
+    v.sort_by(f64::total_cmp);
+    (v[boots / 40], v[boots - 1 - boots / 40])
+}
+
+/// One standard normal draw (Box–Muller).
+fn normal(rng: &mut StdRng) -> f64 {
+    let (u1, u2): (f64, f64) = (rng.gen_range(1e-12..1.0), rng.gen());
+    (-2.0 * u1.ln()).sqrt() * (2.0 * std::f64::consts::PI * u2).cos()
+}
+
+/// Operating characteristics of the pre-registered rules (`KOBLITZ_ICC_POWER=1`):
+/// simulate `a × b` grids from the fitted model with the observed `σ²_w`, `σ²_e`
+/// and a planted curve share `rho`, and count how often the rules say H0
+/// (upper bound < 0.05) and H1 (point ≥ 0.10 with lower bound > 0).
+fn power(sw: f64, se: f64, a: usize, b: usize, rho: f64, sims: usize, rng: &mut StdRng) -> Value {
+    let su = rho / (1.0 - rho) * (sw + se);
+    let (mut h0, mut h1, mut points) = (0, 0, Vec::with_capacity(sims));
+    for _ in 0..sims {
+        let u: Vec<f64> = (0..a).map(|_| su.sqrt() * normal(rng)).collect();
+        let w: Vec<f64> = (0..b).map(|_| sw.sqrt() * normal(rng)).collect();
+        let grid: Vec<Vec<f64>> = (0..a)
+            .map(|i| {
+                (0..b)
+                    .map(|j| u[i] + w[j] + se.sqrt() * normal(rng))
+                    .collect()
+            })
+            .collect();
+        let point = icc(&grid).0;
+        let (lo, hi) = boot_ci(&grid, 400, rng);
+        h0 += (hi < 0.05) as usize;
+        h1 += (point >= 0.10 && lo > 0.0) as usize;
+        points.push(point);
+    }
+    points.sort_by(f64::total_cmp);
+    json!({"curves": a, "subspaces": b, "icc_true": rho, "sims": sims,
+           "p_h0": h0 as f64 / sims as f64, "p_h1": h1 as f64 / sims as f64,
+           "icc_median": points[sims / 2]})
+}
+
 fn main() {
     let mut groups: BTreeMap<(u64, u64, u64, i64), Vec<Value>> = BTreeMap::new();
     for path in std::env::args().skip(1) {
@@ -200,6 +249,7 @@ fn main() {
             .chain(if diag { DIAGNOSTICS.iter() } else { [].iter() })
             .copied()
             .collect();
+        let mut fitted: Vec<(&str, f64, f64)> = Vec::new();
         for (name, metric) in metrics {
             let grid: Vec<Vec<f64>> = curves
                 .iter()
@@ -207,22 +257,30 @@ fn main() {
                 .collect();
             let (point, su, sw, se) = icc(&grid);
             let mut rng = StdRng::seed_from_u64(7);
-            let mut boots: Vec<f64> = (0..2000)
-                .map(|_| {
-                    let g: Vec<Vec<f64>> = (0..grid.len())
-                        .map(|_| grid[rng.gen_range(0..grid.len())].clone())
-                        .collect();
-                    icc(&g).0
-                })
-                .collect();
-            boots.sort_by(f64::total_cmp);
+            let (lo, hi) = boot_ci(&grid, 2000, &mut rng);
             let tot = su + sw + se;
             res.insert(
                 name.into(),
-                json!({"icc_curve": point, "ci95": [boots[50], boots[1949]],
+                json!({"icc_curve": point, "ci95": [lo, hi],
                        "var_curve": su, "var_subspace": sw, "var_residual": se,
                        "share_subspace": if tot > 0.0 { sw / tot } else { 0.0 }}),
             );
+            fitted.push((name, sw, se));
+        }
+        if std::env::var("KOBLITZ_ICC_POWER").is_ok_and(|v| v == "1") {
+            let mut rng = StdRng::seed_from_u64(13);
+            let mut pw = serde_json::Map::new();
+            for (name, sw, se) in fitted.iter().take(METRICS.len()) {
+                let rows: Vec<Value> = [4usize, 8, 32]
+                    .iter()
+                    .flat_map(|&b| {
+                        [0.0, 0.05, 0.10, 0.20]
+                            .map(|rho| power(*sw, *se, curves.len(), b, rho, 200, &mut rng))
+                    })
+                    .collect();
+                pw.insert((*name).into(), Value::Array(rows));
+            }
+            res.insert("power".into(), Value::Object(pw));
         }
         if std::env::var("KOBLITZ_ICC_DIAG").is_ok_and(|v| v == "1") {
             res.insert("diag_F_by_group".into(), f_by_group(n as u32, &curves, &by));
