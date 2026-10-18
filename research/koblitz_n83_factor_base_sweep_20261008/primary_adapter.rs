@@ -21,14 +21,18 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     SatDecompositionOptions,
 };
 use crypto_lib::cryptanalysis::koblitz_relation_solver::WideRankTracker;
-use crypto_lib::cryptanalysis::sat::{RootPropagationResult, SolveResult, SolverStats};
+use crypto_lib::cryptanalysis::sat::{
+    RootPropagationResult, SolveResult, SolverProgress, SolverStats,
+};
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, HashSet};
 use std::fs::{self, File, OpenOptions};
-use std::io::Write;
+use std::io::{self, Write};
 use std::path::{Path, PathBuf};
+use std::sync::{mpsc, Arc};
+use std::thread;
 use std::time::{Duration, Instant};
 
 fn checked_cgroup_memory_limit(memory_mib: u64) -> Result<u64> {
@@ -851,16 +855,124 @@ fn root_phase_stats(stats: &SolverStats) -> Value {
     })
 }
 
+fn write_progress_sample(
+    file: &mut File,
+    sequence: &mut u64,
+    start: Instant,
+    source_commit: &str,
+    progress: &SolverProgress,
+    sample_kind: &str,
+) -> io::Result<()> {
+    let memory_current_bytes: u64 = fs::read_to_string("/sys/fs/cgroup/memory.current")?
+        .trim()
+        .parse()
+        .map_err(io::Error::other)?;
+    let snapshot = progress.snapshot();
+    let record = json!({
+        "schema":"n83.k16627-m4-search-progress/v1",
+        "sequence":*sequence,
+        "sample_kind":sample_kind,
+        "elapsed_wall_ms":start.elapsed().as_secs_f64()*1000.0,
+        "memory_current_bytes":memory_current_bytes,
+        "source_commit":source_commit,
+        "object_blake3":K16627_OBJECT_BLAKE3,
+        "point_set_blake3":K16627_POINT_SET_BLAKE3,
+        "phase":format!("{:?}",snapshot.phase),
+        "completed_decisions":snapshot.decisions,
+        "completed_conflicts":snapshot.conflicts,
+        "completed_restarts":snapshot.restarts,
+    });
+    serde_json::to_writer(&mut *file, &record).map_err(io::Error::other)?;
+    file.write_all(b"\n")?;
+    file.flush()?;
+    file.sync_all()?;
+    *sequence += 1;
+    Ok(())
+}
+
+struct ProgressSampler {
+    stop: mpsc::Sender<()>,
+    join: thread::JoinHandle<io::Result<()>>,
+}
+
+impl ProgressSampler {
+    fn start(
+        output: &Path,
+        start: Instant,
+        source_commit: String,
+        progress: Arc<SolverProgress>,
+    ) -> Result<Self> {
+        let mut path = output.as_os_str().to_os_string();
+        path.push(".progress.jsonl");
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(PathBuf::from(path))?;
+        let mut sequence = 0;
+        write_progress_sample(
+            &mut file,
+            &mut sequence,
+            start,
+            &source_commit,
+            &progress,
+            "entered",
+        )?;
+        let (stop, receiver) = mpsc::channel();
+        let join = thread::spawn(move || loop {
+            match receiver.recv_timeout(Duration::from_secs(10)) {
+                Err(mpsc::RecvTimeoutError::Timeout) => write_progress_sample(
+                    &mut file,
+                    &mut sequence,
+                    start,
+                    &source_commit,
+                    &progress,
+                    "periodic",
+                )?,
+                Ok(()) | Err(mpsc::RecvTimeoutError::Disconnected) => {
+                    write_progress_sample(
+                        &mut file,
+                        &mut sequence,
+                        start,
+                        &source_commit,
+                        &progress,
+                        "returned",
+                    )?;
+                    return Ok(());
+                }
+            }
+        });
+        Ok(Self { stop, join })
+    }
+
+    fn finish(self) -> Result<()> {
+        self.stop.send(())?;
+        self.join
+            .join()
+            .map_err(|_| "progress sampler thread panicked")??;
+        Ok(())
+    }
+}
+
 /// Phase-observable complete x-chain witness on the exact retained primary
 /// object. The seven blocks are fixed only after the full orbit domain is
 /// installed, and a SAT answer is checked against the original group law.
 pub(super) fn chain_witness_cli(root: &Path, memory_mib: u64, output: &Path) -> Result<Value> {
-    chain_witness_impl(root, memory_mib, output, false)
+    chain_witness_impl(root, memory_mib, output, false, false)
 }
 
 /// The same complete witness, with a separate durable root-propagation gate.
 pub(super) fn chain_root_phase_cli(root: &Path, memory_mib: u64, output: &Path) -> Result<Value> {
-    chain_witness_impl(root, memory_mib, output, true)
+    chain_witness_impl(root, memory_mib, output, true, false)
+}
+
+/// The exact root-phase workload with separately fsynced search-progress
+/// samples while the solver is active.
+pub(super) fn chain_search_progress_cli(
+    root: &Path,
+    memory_mib: u64,
+    output: &Path,
+) -> Result<Value> {
+    chain_witness_impl(root, memory_mib, output, true, true)
 }
 
 fn chain_witness_impl(
@@ -868,6 +980,7 @@ fn chain_witness_impl(
     memory_mib: u64,
     output: &Path,
     checkpoint_root: bool,
+    sample_progress: bool,
 ) -> Result<Value> {
     if memory_mib != 4096 {
         return Err("complete-witness control requires the frozen 4096 MiB cap".into());
@@ -875,7 +988,9 @@ fn chain_witness_impl(
     let memory_limit_bytes = checked_cgroup_memory_limit(memory_mib)?;
     let (source_commit, source_attestation_mode) = frozen_chain_source()?;
     let start = Instant::now();
-    let phase_schema = if checkpoint_root {
+    let phase_schema = if sample_progress {
+        "n83.k16627-m4-search-progress-phase/v1"
+    } else if checkpoint_root {
         "n83.k16627-m4-root-phase/v1"
     } else {
         "n83.k16627-m4-witness-phase/v1"
@@ -921,7 +1036,10 @@ fn chain_witness_impl(
         == 4;
     if !affine || !distinct {
         let receipt = json!({
-            "schema":"n83.k16627-m4-witness/v1", "status":"INVALID_PLANTED_CONTROL",
+            "schema":if sample_progress {"n83.k16627-m4-search-progress/v1"}
+                else if checkpoint_root {"n83.k16627-m4-root-phase/v1"}
+                else {"n83.k16627-m4-witness/v1"},
+            "status":"INVALID_PLANTED_CONTROL",
             "source_commit":source_commit, "object_blake3":K16627_OBJECT_BLAKE3,
             "point_set_blake3":K16627_POINT_SET_BLAKE3,
             "affine_partial_sums":affine, "distinct_summand_x":distinct,
@@ -1041,8 +1159,23 @@ fn chain_witness_impl(
         (SolveResult::Unsat, 0.0)
     } else {
         phases.mark("sat_entered", json!({"conflict_budget":100_000}))?;
+        let sampler = if sample_progress {
+            let progress = Arc::new(SolverProgress::default());
+            enc.solver.set_progress_observer(Arc::clone(&progress));
+            Some(ProgressSampler::start(
+                output,
+                start,
+                source_commit.clone(),
+                progress,
+            )?)
+        } else {
+            None
+        };
         let solver_start = Instant::now();
         let answer = enc.solver.solve();
+        if let Some(sampler) = sampler {
+            sampler.finish()?;
+        }
         (answer, solver_start.elapsed().as_secs_f64() * 1000.0)
     };
     let models = usize::from(answer == SolveResult::Sat);
@@ -1099,7 +1232,9 @@ fn chain_witness_impl(
         .trim()
         .parse()?;
     let mut receipt = json!({
-        "schema":if checkpoint_root {"n83.k16627-m4-root-phase/v1"} else {"n83.k16627-m4-witness/v1"},
+        "schema":if sample_progress {"n83.k16627-m4-search-progress/v1"}
+            else if checkpoint_root {"n83.k16627-m4-root-phase/v1"}
+            else {"n83.k16627-m4-witness/v1"},
         "status":status,
         "curve_a":0, "orbit_columns":16_627, "summands":4, "identity_mask":0,
         "policy":"public_x_hash", "seed":2026100801u64,
@@ -1112,6 +1247,9 @@ fn chain_witness_impl(
         "source_chain_blake3":blake3::hash(include_bytes!("../../src/cryptanalysis/binary_semaev_chain_sat.rs")).to_hex().to_string(),
         "source_index_calculus_blake3":blake3::hash(include_bytes!("../../src/cryptanalysis/koblitz_index_calculus.rs")).to_hex().to_string(),
         "phase_file":phases.path.to_string_lossy(),
+        "progress_file":if sample_progress {
+            json!(format!("{}.progress.jsonl",output.display()))
+        } else {Value::Null},
         "point_indices":indices, "x_decimal":planted_xs.iter().map(|x| x.to_biguint().to_string()).collect::<Vec<_>>(),
         "relation":relation,
         "max_variables":250_000, "max_domain_clauses":6_000_000,
