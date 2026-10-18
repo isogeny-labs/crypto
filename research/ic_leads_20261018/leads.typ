@@ -17,7 +17,7 @@ Five closure arguments are settled enough that a lead failing one is not a lead:
 
 - *L1 target-free algebraic relations* (not tried before): solve $S_4(x_1, dots, x_4) = 0$ with every variable in $V$ and no target; the leading forms then live in $V^4$, which can be dependent. Falsifier: closure degree at $(16,4), (20,5), (24,6)$ against the chained target system at equal $m dot ell$; kill if no cell is a degree lower. Yield is the price ($ell gt.tilde n/3 - 7$ needed, no-wrap window $ell < n/4$).
 - *L2 dense-bit-row XL at degree 5* for the $m dot ell = 21$ cells: 34,482 rows over 760 k columns (3.3 GB); a refutation resolves the cells at exactly 5. Not built; about one chance in four of a positive.
-- *L3 raised-cap sparse closure*: the rewritten engine's cap used 1.4 GB of 15 GB; a degree-5 run at 2.5 G entries is in flight (§3 of the note).
+- *L3 raised-cap sparse closure*: run at 2.5 G entries and killed by the memory cgroup at 7.2 GB after two hours; unmeasured. The existing dense engine scanning to degree 5 was killed twice as well (9.8 GB; allocation failure under 13.5 GB). Degree 5 at 40 unknowns needs more than this host for every engine tried.
 - *L4 4E-class stratification*: closed by a sign argument; with free summand signs the $E\/4E$ class never obstructs a target unless the whole base lies in $2E$ without class-2 points.
 - *L5 coset-indicator degree* — piloted, negative as a predictor (below).
 - *L6, L7 theorem and lemma*: write the $m >= 3$ shape-closure argument and the admissible-degree inequality as statements the FFD programme can cite; neither exists in writing.
