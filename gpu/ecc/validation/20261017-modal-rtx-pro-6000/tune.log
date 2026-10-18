@@ -1,0 +1,489 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/a-buran28/main/ap-ELJJSCBc7W12zY6d6NlRdk
+Building image im-WjjrgF7EId0sFJYslhe25O
+=> Step 0: FROM base
+=> Step 1: COPY . /
+Saving image...
+Image saved, took 1.45s
+Built image im-WjjrgF7EId0sFJYslhe25O in 4.38s
+Building image im-Dxu4EmfdPj0gUdt6HUV9Od
+=> Step 0: FROM base
+=> Step 1: RUN cd /root/ecc && make gen
+python3 ecref.py params --curve secp256k1 > curve_secp256k1.h
+python3 ecref.py params --curve toy40 > curve_toy40.h
+python3 ecref.py params --curve toy36j0 > curve_toy36j0.h
+python3 ecref.py params --curve curve25519 > curve_curve25519.h
+python3 ecref.py vectors --curve secp256k1 --mode mont > vec_secp256k1_mont.h
+python3 ecref.py vectors --curve secp256k1 --mode fast > vec_secp256k1_fast.h
+python3 ecref.py vectors --curve toy40 --mode mont > vec_toy40_mont.h
+python3 ecref.py vectors --curve toy36j0 --mode mont > vec_toy36j0_mont.h
+python3 ecref.py vectors --curve curve25519 --mode mont > vec_curve25519_mont.h
+python3 ecref.py vectors --curve curve25519 --mode fast > vec_curve25519_fast.h
+=> Step 2: RUN cd /root/ecc && make test
+g++ -O2 -std=c++17 -Wall -Wextra -Wno-unused-parameter -Wno-unknown-pragmas -DGPU_ECC_CURVE_HEADER='"curve_secp256k1.h"' \
+  -DGPU_ECC_VECTORS_HEADER='"vec_secp256k1_fast.h"' -DFP_FAST=1 -o test_secp_fast test_cpu.cpp
+g++ -O2 -std=c++17 -Wall -Wextra -Wno-unused-parameter -Wno-unknown-pragmas -DGPU_ECC_CURVE_HEADER='"curve_secp256k1.h"' \
+  -DGPU_ECC_VECTORS_HEADER='"vec_secp256k1_mont.h"' -DFP_FAST=0 -o test_secp_mont test_cpu.cpp
+g++ -O2 -std=c++17 -Wall -Wextra -Wno-unused-parameter -Wno-unknown-pragmas -DGPU_ECC_CURVE_HEADER='"curve_toy40.h"' \
+  -DGPU_ECC_VECTORS_HEADER='"vec_toy40_mont.h"' -DFP_FAST=0 -o test_toy_mont test_cpu.cpp
+g++ -O2 -std=c++17 -Wall -Wextra -Wno-unused-parameter -Wno-unknown-pragmas -DGPU_ECC_CURVE_HEADER='"curve_toy36j0.h"' \
+  -DGPU_ECC_VECTORS_HEADER='"vec_toy36j0_mont.h"' -DFP_FAST=0 -DSOLVE_RUNS=8 -o test_toyj0_mont test_cpu.cpp
+g++ -O2 -std=c++17 -Wall -Wextra -Wno-unused-parameter -Wno-unknown-pragmas -DGPU_ECC_CURVE_HEADER='"curve_curve25519.h"' \
+  -DGPU_ECC_VECTORS_HEADER='"vec_curve25519_fast.h"' -DFP_FAST=1 -o test_25519_fast test_cpu.cpp
+g++ -O2 -std=c++17 -Wall -Wextra -Wno-unused-parameter -Wno-unknown-pragmas -DGPU_ECC_CURVE_HEADER='"curve_curve25519.h"' \
+  -DGPU_ECC_VECTORS_HEADER='"vec_curve25519_mont.h"' -DFP_FAST=0 -o test_25519_mont test_cpu.cpp
+g++ -O2 -std=c++17 -Wall -Wextra -Wno-unused-parameter -Wno-unknown-pragmas -DGPU_ECC_CURVE_HEADER='"curve_toy40.h"' -DFP_FAST=0 -o test_bsgs_toy test_bsgs.cpp
+g++ -O2 -std=c++17 -Wall -Wextra -Wno-unused-parameter -Wno-unknown-pragmas -DGPU_ECC_CURVE_HEADER='"curve_secp256k1.h"' -DFP_FAST=1 -o test_bsgs_secp_fast test_bsgs.cpp
+g++ -O2 -std=c++17 -Wall -Wextra -Wno-unused-parameter -Wno-unknown-pragmas -DGPU_ECC_CURVE_HEADER='"curve_secp256k1.h"' -DFP_FAST=0 -o test_bsgs_secp_mont test_bsgs.cpp
+g++ -O2 -std=c++17 -Wall -Wextra -Wno-unused-parameter -Wno-unknown-pragmas -DGPU_ECC_CURVE_HEADER='"curve_curve25519.h"' -DFP_FAST=1 -o test_bsgs_25519_fast test_bsgs.cpp
+=== ptx_asm_check ===
+parsed 10 asm blocks in 7 functions from fp256.cuh
+  mp_add           1 block(s)   ok  (20000 trials)
+  mp_sub           1 block(s)   ok  (20000 trials)
+  mp_mac_row       2 block(s)   ok  (20000 trials)
+  mp_mul_row0      2 block(s)   ok  (20000 trials)
+  mp_mac_row9      2 block(s)   ok  (20000 trials)
+  mp_add_shift32   1 block(s)   ok  (20000 trials)
+  mp_add_small     1 block(s)   ok  (20000 trials)
+all 7 asm functions agree with the portable path
+NOTE: this checks the assembly's arithmetic, not register allocation
+      or real device behaviour.  ./bench selftest -DFP_PTX=1 on a
+      CUDA device is still the check that matters.
+=== ./test_secp_fast ===
+gpu/ecc CPU test: curve=secp256k1 mode=fast FP_FAST=1 aut6=1 cycle_depth=5
+[field] 64 vectors
+[points] 64 vectors
+[aut6] beta / lambda and the orbit folding, 64 points
+[walk plain] fold 1, 4 walks x 200 steps
+[walk neg] fold 2, 4 walks x 200 steps
+[walk aut6] fold 6, 4 walks x 200 steps
+[batched step] fold 1, T=3 W=8
+  171 distinguished points, cycles by length 2..6: 0 0 0 0 0, 26 aborts; all three steppers agree after 400 iterations
+[batched step] fold 2, T=3 W=8
+  157 distinguished points, cycles by length 2..6: 128 0 4 0 0, 28 aborts; all three steppers agree after 400 iterations
+[cycles] fold 2, R = 8, 24 walks x 6000 iterations
+  1499 distinguished points = ~95936 live steps of 144000; 17 aborts (cycles longer than 6)
+  2-cycles: 5408  (5.64e-02 per live step, predicted 6.25e-02)
+  3-cycles: 0  (0.00e+00 per live step, predicted 0.00e+00)
+  4-cycles: 277  (2.89e-03 per live step, predicted 3.42e-03)
+  5-cycles: 0  (0.00e+00 per live step)
+  6-cycles: 55  (5.73e-04 per live step)
+[escape] fold 2, R = 8: cycles found by brute force, escaped from every entry point
+  cycles checked by length 2..6: 4 0 4 0 1 (30 entry points); 0 longer cycles seen
+[batched step] fold 6, T=3 W=8
+  169 distinguished points, cycles by length 2..6: 45 0 0 0 0, 29 aborts; all three steppers agree after 400 iterations
+[cycles] fold 6, R = 8, 24 walks x 6000 iterations
+  2116 distinguished points = ~135424 live steps of 144000; 0 aborts (cycles longer than 6)
+  2-cycles: 2820  (2.08e-02 per live step, predicted 2.08e-02)
+  3-cycles: 123  (9.08e-04 per live step, predicted 8.68e-04)
+  4-cycles: 41  (3.03e-04 per live step, predicted 3.80e-04)
+  5-cycles: 8  (5.91e-05 per live step)
+  6-cycles: 9  (6.65e-05 per live step)
+[escape] fold 6, R = 8: cycles found by brute force, escaped from every entry point
+  cycles checked by length 2..6: 4 4 4 0 1 (42 entry points); 0 longer cycles seen
+[solve] skipped (group too large for a CPU-only run)
+[solve] skipped (group too large for a CPU-only run)
+[solve] skipped (group too large for a CPU-only run)
+ALL PASSED
+=== ./test_secp_mont ===
+gpu/ecc CPU test: curve=secp256k1 mode=mont FP_FAST=0 aut6=1 cycle_depth=5
+[field] 64 vectors
+[points] 64 vectors
+[aut6] beta / lambda and the orbit folding, 64 points
+[walk plain] fold 1, 4 walks x 200 steps
+[walk neg] fold 2, 4 walks x 200 steps
+[walk aut6] fold 6, 4 walks x 200 steps
+[batched step] fold 1, T=3 W=8
+  149 distinguished points, cycles by length 2..6: 0 0 0 0 0, 30 aborts; all three steppers agree after 400 iterations
+[batched step] fold 2, T=3 W=8
+  148 distinguished points, cycles by length 2..6: 129 0 1 0 0, 33 aborts; all three steppers agree after 400 iterations
+[cycles] fold 2, R = 8, 24 walks x 6000 iterations
+  1493 distinguished points = ~95552 live steps of 144000; 18 aborts (cycles longer than 6)
+  2-cycles: 5231  (5.47e-02 per live step, predicted 6.25e-02)
+  3-cycles: 0  (0.00e+00 per live step, predicted 0.00e+00)
+  4-cycles: 242  (2.53e-03 per live step, predicted 3.42e-03)
+  5-cycles: 0  (0.00e+00 per live step)
+  6-cycles: 44  (4.60e-04 per live step)
+[escape] fold 2, R = 8: cycles found by brute force, escaped from every entry point
+  cycles checked by length 2..6: 4 0 4 0 1 (30 entry points); 0 longer cycles seen
+[batched step] fold 6, T=3 W=8
+  143 distinguished points, cycles by length 2..6: 39 0 0 0 0, 43 aborts; all three steppers agree after 400 iterations
+[cycles] fold 6, R = 8, 24 walks x 6000 iterations
+  2101 distinguished points = ~134464 live steps of 144000; 3 aborts (cycles longer than 6)
+  2-cycles: 2668  (1.98e-02 per live step, predicted 2.08e-02)
+  3-cycles: 116  (8.63e-04 per live step, predicted 8.68e-04)
+  4-cycles: 52  (3.87e-04 per live step, predicted 3.80e-04)
+  5-cycles: 8  (5.95e-05 per live step)
+  6-cycles: 4  (2.97e-05 per live step)
+[escape] fold 6, R = 8: cycles found by brute force, escaped from every entry point
+  cycles checked by length 2..6: 4 4 4 2 0 (46 entry points); 0 longer cycles seen
+[solve] skipped (group too large for a CPU-only run)
+[solve] skipped (group too large for a CPU-only run)
+[solve] skipped (group too large for a CPU-only run)
+ALL PASSED
+=== ./test_toy_mont ===
+gpu/ecc CPU test: curve=toy40 mode=mont FP_FAST=0 aut6=0 cycle_depth=5
+[field] 64 vectors
+[points] 64 vectors
+[walk plain] fold 1, 4 walks x 200 steps
+[walk neg] fold 2, 4 walks x 200 steps
+[batched step] fold 1, T=3 W=8
+  140 distinguished points, cycles by length 2..6: 0 0 0 0 0, 38 aborts; all three steppers agree after 400 iterations
+[batched step] fold 2, T=3 W=8
+  149 distinguished points, cycles by length 2..6: 148 0 2 0 0, 37 aborts; all three steppers agree after 400 iterations
+[cycles] fold 2, R = 8, 24 walks x 6000 iterations
+  1416 distinguished points = ~90624 live steps of 144000; 21 aborts (cycles longer than 6)
+  2-cycles: 5075  (5.60e-02 per live step, predicted 6.25e-02)
+  3-cycles: 0  (0.00e+00 per live step, predicted 0.00e+00)
+  4-cycles: 262  (2.89e-03 per live step, predicted 3.42e-03)
+  5-cycles: 0  (0.00e+00 per live step)
+  6-cycles: 55  (6.07e-04 per live step)
+[escape] fold 2, R = 8: cycles found by brute force, escaped from every entry point
+  cycles checked by length 2..6: 4 0 4 0 0 (24 entry points); 0 longer cycles seen
+[solve] toy DLP, fold=1, 128 walks, r=2^8, dp=2^10: 1 run(s), expect ~1010083 steps each
+  run 0: solved in 2049280 steps (2.03x), 1969 DPs, 0 cycles, 0 aborts, 3.09s
+  fold 1: mean 2049280 steps over 1 runs = 2.03x sqrt(pi n / 2); 662.9 ksteps/s
+[solve] toy DLP, fold=2, 128 walks, r=2^8, dp=2^10: 1 run(s), expect ~714237 steps each
+  run 0: solved in 560768 steps (0.79x), 583 DPs, 1071 cycles, 0 aborts, 0.88s
+  fold 2: mean 560768 steps over 1 runs = 0.79x sqrt(pi n / 4); 636.5 ksteps/s
+ALL PASSED
+=== ./test_toyj0_mont ===
+gpu/ecc CPU test: curve=toy36j0 mode=mont FP_FAST=0 aut6=1 cycle_depth=5
+[field] 64 vectors
+[points] 64 vectors
+[aut6] beta / lambda and the orbit folding, 64 points
+[walk plain] fold 1, 4 walks x 200 steps
+[walk neg] fold 2, 4 walks x 200 steps
+[walk aut6] fold 6, 4 walks x 200 steps
+[batched step] fold 1, T=3 W=8
+  135 distinguished points, cycles by length 2..6: 0 0 0 0 0, 38 aborts; all three steppers agree after 400 iterations
+[batched step] fold 2, T=3 W=8
+  151 distinguished points, cycles by length 2..6: 146 0 5 0 0, 31 aborts; all three steppers agree after 400 iterations
+[cycles] fold 2, R = 8, 24 walks x 6000 iterations
+  1502 distinguished points = ~96128 live steps of 144000; 18 aborts (cycles longer than 6)
+  2-cycles: 5529  (5.75e-02 per live step, predicted 6.25e-02)
+  3-cycles: 0  (0.00e+00 per live step, predicted 0.00e+00)
+  4-cycles: 293  (3.05e-03 per live step, predicted 3.42e-03)
+  5-cycles: 0  (0.00e+00 per live step)
+  6-cycles: 45  (4.68e-04 per live step)
+[escape] fold 2, R = 8: cycles found by brute force, escaped from every entry point
+  cycles checked by length 2..6: 4 0 4 0 0 (24 entry points); 0 longer cycles seen
+[batched step] fold 6, T=3 W=8
+  140 distinguished points, cycles by length 2..6: 48 0 1 0 0, 34 aborts; all three steppers agree after 400 iterations
+[cycles] fold 6, R = 8, 24 walks x 6000 iterations
+  2093 distinguished points = ~133952 live steps of 144000; 2 aborts (cycles longer than 6)
+  2-cycles: 2723  (2.03e-02 per live step, predicted 2.08e-02)
+  3-cycles: 116  (8.66e-04 per live step, predicted 8.68e-04)
+  4-cycles: 48  (3.58e-04 per live step, predicted 3.80e-04)
+  5-cycles: 9  (6.72e-05 per live step)
+  6-cycles: 1  (7.47e-06 per live step)
+[escape] fold 6, R = 8: cycles found by brute force, escaped from every entry point
+  cycles checked by length 2..6: 4 4 4 0 0 (36 entry points); 0 longer cycles seen
+[solve] toy DLP, fold=1, 16 walks, r=2^8, dp=2^7: 8 run(s), expect ~249454 steps each
+  run 0: solved in 345088 steps (1.38x), 2650 DPs, 0 cycles, 0 aborts, 0.74s
+  run 1: solved in 147504 steps (0.59x), 1166 DPs, 0 cycles, 0 aborts, 0.32s
+  run 2: solved in 359616 steps (1.44x), 2882 DPs, 0 cycles, 0 aborts, 0.79s
+  run 3: solved in 495344 steps (1.99x), 3797 DPs, 0 cycles, 0 aborts, 1.06s
+  run 4: solved in 325776 steps (1.31x), 2487 DPs, 0 cycles, 3 aborts, 0.70s
+  run 5: solved in 400160 steps (1.60x), 3098 DPs, 0 cycles, 3 aborts, 0.86s
+  run 6: solved in 104384 steps (0.42x), 826 DPs, 0 cycles, 0 aborts, 0.23s
+  run 7: solved in 268048 steps (1.07x), 2075 DPs, 0 cycles, 0 aborts, 0.58s
+  fold 1: mean 305740 steps over 8 runs = 1.23x sqrt(pi n / 2); 462.6 ksteps/s
+[solve] toy DLP, fold=2, 16 walks, r=2^8, dp=2^7: 8 run(s), expect ~176391 steps each
+  run 0: solved in 261184 steps (1.48x), 2072 DPs, 522 cycles, 0 aborts, 0.57s
+  run 1: solved in 242848 steps (1.38x), 1904 DPs, 454 cycles, 0 aborts, 0.53s
+  run 2: solved in 206672 steps (1.17x), 1639 DPs, 402 cycles, 0 aborts, 0.45s
+  run 3: solved in 169232 steps (0.96x), 1315 DPs, 292 cycles, 1 aborts, 0.37s
+  run 4: solved in 89936 steps (0.51x), 745 DPs, 171 cycles, 0 aborts, 0.20s
+  run 5: solved in 233360 steps (1.32x), 1770 DPs, 459 cycles, 0 aborts, 0.50s
+  run 6: solved in 238192 steps (1.35x), 1810 DPs, 452 cycles, 0 aborts, 0.52s
+  run 7: solved in 150912 steps (0.86x), 1141 DPs, 280 cycles, 0 aborts, 0.33s
+  fold 2: mean 199042 steps over 8 runs = 1.13x sqrt(pi n / 4); 458.0 ksteps/s
+[solve] toy DLP, fold=6, 16 walks, r=2^8, dp=2^7: 8 run(s), expect ~101839 steps each
+  run 0: solved in 196768 steps (1.93x), 1530 DPs, 127 cycles, 1 aborts, 0.46s
+  run 1: solved in 132160 steps (1.30x), 1051 DPs, 100 cycles, 0 aborts, 0.31s
+  run 2: solved in 38480 steps (0.38x), 311 DPs, 21 cycles, 1 aborts, 0.10s
+  run 3: solved in 89616 steps (0.88x), 662 DPs, 54 cycles, 1 aborts, 0.21s
+  run 4: solved in 80352 steps (0.79x), 601 DPs, 43 cycles, 0 aborts, 0.19s
+  run 5: solved in 103696 steps (1.02x), 795 DPs, 74 cycles, 1 aborts, 0.24s
+  run 6: solved in 209312 steps (2.06x), 1656 DPs, 138 cycles, 1 aborts, 0.49s
+  run 7: solved in 57792 steps (0.57x), 462 DPs, 48 cycles, 0 aborts, 0.14s
+  fold 6: mean 113522 steps over 8 runs = 1.11x sqrt(pi n / 12); 422.6 ksteps/s
+ALL PASSED
+=== ./test_25519_fast ===
+gpu/ecc CPU test: curve=curve25519 mode=fast FP_FAST=1 aut6=0 cycle_depth=5
+[field] 64 vectors
+[points] 64 vectors
+[walk plain] fold 1, 4 walks x 200 steps
+[walk neg] fold 2, 4 walks x 200 steps
+[batched step] fold 1, T=3 W=8
+  127 distinguished points, cycles by length 2..6: 0 0 0 0 0, 42 aborts; all three steppers agree after 400 iterations
+[batched step] fold 2, T=3 W=8
+  144 distinguished points, cycles by length 2..6: 150 0 1 0 1, 31 aborts; all three steppers agree after 400 iterations
+[cycles] fold 2, R = 8, 24 walks x 6000 iterations
+  1566 distinguished points = ~100224 live steps of 144000; 16 aborts (cycles longer than 6)
+  2-cycles: 5652  (5.64e-02 per live step, predicted 6.25e-02)
+  3-cycles: 0  (0.00e+00 per live step, predicted 0.00e+00)
+  4-cycles: 312  (3.11e-03 per live step, predicted 3.42e-03)
+  5-cycles: 0  (0.00e+00 per live step)
+  6-cycles: 45  (4.49e-04 per live step)
+[escape] fold 2, R = 8: cycles found by brute force, escaped from every entry point
+  cycles checked by length 2..6: 4 0 4 0 0 (24 entry points); 0 longer cycles seen
+[solve] skipped (group too large for a CPU-only run)
+[solve] skipped (group too large for a CPU-only run)
+ALL PASSED
+=== ./test_25519_mont ===
+gpu/ecc CPU test: curve=curve25519 mode=mont FP_FAST=0 aut6=0 cycle_depth=5
+[field] 64 vectors
+[points] 64 vectors
+[walk plain] fold 1, 4 walks x 200 steps
+[walk neg] fold 2, 4 walks x 200 steps
+[batched step] fold 1, T=3 W=8
+  130 distinguished points, cycles by length 2..6: 0 0 0 0 0, 32 aborts; all three steppers agree after 400 iterations
+[batched step] fold 2, T=3 W=8
+  149 distinguished points, cycles by length 2..6: 139 0 7 0 1, 34 aborts; all three steppers agree after 400 iterations
+[cycles] fold 2, R = 8, 24 walks x 6000 iterations
+  1373 distinguished points = ~87872 live steps of 144000; 21 aborts (cycles longer than 6)
+  2-cycles: 5236  (5.96e-02 per live step, predicted 6.25e-02)
+  3-cycles: 0  (0.00e+00 per live step, predicted 0.00e+00)
+  4-cycles: 257  (2.92e-03 per live step, predicted 3.42e-03)
+  5-cycles: 0  (0.00e+00 per live step)
+  6-cycles: 53  (6.03e-04 per live step)
+[escape] fold 2, R = 8: cycles found by brute force, escaped from every entry point
+  cycles checked by length 2..6: 4 0 4 0 1 (30 entry points); 0 longer cycles seen
+[solve] skipped (group too large for a CPU-only run)
+[solve] skipped (group too large for a CPU-only run)
+ALL PASSED
+=== ./test_bsgs_toy ===
+gpu/ecc BSGS CPU test: curve=toy40 FP_FAST=0
+[table] insert / look-up
+  12000 entries, 0 false positives in 200k absent probes
+[steppers] batched<4> vs reference, T=3
+  5040 baby steps, 1790 giant rounds, 1 candidates, all identical
+[contents] every j in [1, 3000) found from x(jG)
+[coverage] every x in small intervals, both layouts
+[solve] toy full-group DLP, neg_map=1, 128 chains
+  n = 649523094257, m = 402965, M = 805929, giants = 805932, table 2^20 slots (load 0.38), Lb = 3149, Lg = 6297
+  table: 402964 entries in 409600 chain-steps (+1090 seed ops), 0.76s, 539 ksteps/s
+  x = 0    x=0              ok    giant      128 steps in   1 rounds, 1 cand (0 false)  S=0.511  0.00s
+  x = 1    x=1              ok    giant      128 steps in   1 rounds, 1 cand (0 false)  S=0.511  0.00s
+  x = m-1  x=402964         ok    giant      128 steps in   1 rounds, 1 cand (0 false)  S=0.511  0.00s
+  x = m    x=402965         ok    giant      256 steps in   1 rounds, 1 cand (0 false)  S=0.511  0.00s
+  x = M-1  x=805928         ok    giant      256 steps in   1 rounds, 1 cand (0 false)  S=0.511  0.00s
+  x = M    x=805929         ok    giant      256 steps in   1 rounds, 1 cand (0 false)  S=0.511  0.00s
+  x = M+1  x=805930         ok    giant      256 steps in   1 rounds, 1 cand (0 false)  S=0.511  0.00s
+  x = n-1  x=649523094256   ok    giant      128 steps in   1 rounds, 1 cand (0 false)  S=0.511  0.00s
+  x = n-m  x=649522691292   ok    giant   795136 steps in  98 rounds, 1 cand (0 false)  S=1.498  1.46s
+  random   x=509620189405   ok    giant   337920 steps in  42 rounds, 1 cand (0 false)  S=0.930  0.62s
+  random   x=231888850528   ok    giant   558720 steps in  69 rounds, 1 cand (0 false)  S=1.204  1.03s
+  random   x=405667856038   ok    giant   754176 steps in  93 rounds, 1 cand (0 false)  S=1.447  1.39s
+  random   x=177130985492   ok    giant   728064 steps in  89 rounds, 1 cand (0 false)  S=1.414  1.34s
+  random   x=172704132379   ok    giant    24960 steps in   4 rounds, 1 cand (0 false)  S=0.542  0.05s
+  random   x=463361176340   ok    giant   244992 steps in  30 rounds, 1 cand (0 false)  S=0.815  0.45s
+  random   x=186194950636   ok    giant   555520 steps in  68 rounds, 1 cand (0 false)  S=1.200  1.02s
+  random   x=149550005340   ok    giant   377600 steps in  47 rounds, 1 cand (0 false)  S=0.979  0.69s
+  random targets: mean S = 1.067 over 8 (expected ~1.00 with a cold table), giant only 0.556 (expected ~0.50); 0 false candidates in all
+[solve] toy full-group DLP, neg_map=0, 128 chains
+  n = 649523094257, m = 569878, M = 569878, giants = 1139760, table 2^21 slots (load 0.27), Lb = 4453, Lg = 8905
+  table: 569877 entries in 573440 chain-steps (+1090 seed ops), 1.06s, 542 ksteps/s
+  x = 0    x=0              ok    giant      128 steps in   1 rounds, 1 cand (0 false)  S=0.714  0.00s
+  x = 1    x=1              ok    giant      128 steps in   1 rounds, 1 cand (0 false)  S=0.714  0.00s
+  x = m-1  x=569877         ok    giant      128 steps in   1 rounds, 1 cand (0 false)  S=0.714  0.00s
+  x = m    x=569878         ok    giant      256 steps in   1 rounds, 1 cand (0 false)  S=0.715  0.00s
+  x = M-1  x=569877         ok    giant      128 steps in   1 rounds, 1 cand (0 false)  S=0.714  0.00s
+  x = M    x=569878         ok    giant      256 steps in   1 rounds, 1 cand (0 false)  S=0.715  0.00s
+  x = M+1  x=569879         ok    giant      256 steps in   1 rounds, 1 cand (0 false)  S=0.715  0.00s
+  x = n-1  x=649523094256   ok    giant      128 steps in   1 rounds, 1 cand (0 false)  S=0.714  0.00s
+  x = n-m  x=649522524379   ok    giant  1129344 steps in 138 rounds, 1 cand (0 false)  S=2.116  2.08s
+  random   x=125268554366   ok    giant   780416 steps in  96 rounds, 1 cand (0 false)  S=1.683  1.43s
+  random   x=106303226791   ok    giant  1079936 steps in 132 rounds, 1 cand (0 false)  S=2.054  1.99s
+  random   x=123759943771   ok    giant   441600 steps in  54 rounds, 1 cand (0 false)  S=1.262  0.81s
+  random   x=487561366890   ok    giant    86272 steps in  11 rounds, 1 cand (0 false)  S=0.821  0.16s
+  random   x=481296800822   ok    giant   958976 steps in 118 rounds, 1 cand (0 false)  S=1.904  1.77s
+  random   x=32682228304    ok    giant   501760 steps in  62 rounds, 1 cand (0 false)  S=1.337  0.92s
+  random   x=270739876426   ok    giant   399232 steps in  49 rounds, 1 cand (0 false)  S=1.210  0.73s
+  random   x=453452096972   ok    giant   403968 steps in  50 rounds, 1 cand (0 false)  S=1.215  0.74s
+  random targets: mean S = 1.436 over 8 (expected ~1.41 with a cold table), giant only 0.722 (expected ~0.71); 0 false candidates in all
+[iters] solve cost is independent of the launch size
+  batched  iters=4        2944 giant steps in  12 rounds  (slack 128)
+  batched  iters=64       2944 giant steps in   1 rounds  (slack 128)
+  batched  iters=512      2944 giant steps in   1 rounds  (slack 128)
+  ref      iters=4        2944 giant steps in  12 rounds  (slack 128)
+  ref      iters=64       2944 giant steps in   1 rounds  (slack 128)
+  ref      iters=512      2944 giant steps in   1 rounds  (slack 128)
+[multi] one table, 12 targets
+  table 8192 steps, 41024 giant steps over 12 targets, 12 candidates (0 false), 0.10s
+  S per target: 0.560 amortised over 12 (a single cold solve is 2.131); giant phase alone 0.417
+[interval] 2^22-wide interval at a random offset on toy40
+  x0 + 0        ok  64 giant steps, 1 candidates
+  x0 + 1        ok  64 giant steps, 1 candidates
+  x0 + 4194303  ok  256 giant steps, 1 candidates
+  x0 + 3916799  ok  2112 giant steps, 1 candidates
+  x0 + 2956145  ok  1664 giant steps, 1 candidates
+ALL PASSED
+=== ./test_bsgs_secp_fast ===
+gpu/ecc BSGS CPU test: curve=secp256k1 FP_FAST=1
+[table] insert / look-up
+  12000 entries, 0 false positives in 200k absent probes
+[steppers] batched<4> vs reference, T=3
+  5040 baby steps, 1790 giant rounds, 1 candidates, all identical
+[contents] every j in [1, 3000) found from x(jG)
+[coverage] every x in small intervals, both layouts
+[solve] skipped (group too large for a CPU-only run)
+[solve] skipped (group too large for a CPU-only run)
+[iters] skipped (group too large for a CPU-only run)
+[multi] skipped (group too large for a CPU-only run)
+[interval] 2^22-wide interval at a random offset on secp256k1
+  x0 + 0        ok  64 giant steps, 1 candidates
+  x0 + 1        ok  64 giant steps, 1 candidates
+  x0 + 4194303  ok  256 giant steps, 1 candidates
+  x0 + 3916799  ok  2112 giant steps, 1 candidates
+  x0 + 2956145  ok  1664 giant steps, 1 candidates
+ALL PASSED
+=== ./test_bsgs_secp_mont ===
+gpu/ecc BSGS CPU test: curve=secp256k1 FP_FAST=0
+[table] insert / look-up
+  12000 entries, 0 false positives in 200k absent probes
+[steppers] batched<4> vs reference, T=3
+  5040 baby steps, 1790 giant rounds, 1 candidates, all identical
+[contents] every j in [1, 3000) found from x(jG)
+[coverage] every x in small intervals, both layouts
+[solve] skipped (group too large for a CPU-only run)
+[solve] skipped (group too large for a CPU-only run)
+[iters] skipped (group too large for a CPU-only run)
+[multi] skipped (group too large for a CPU-only run)
+[interval] 2^22-wide interval at a random offset on secp256k1
+  x0 + 0        ok  64 giant steps, 1 candidates
+  x0 + 1        ok  64 giant steps, 1 candidates
+  x0 + 4194303  ok  256 giant steps, 1 candidates
+  x0 + 3916799  ok  2112 giant steps, 1 candidates
+  x0 + 2956145  ok  1664 giant steps, 1 candidates
+ALL PASSED
+=== ./test_bsgs_25519_fast ===
+gpu/ecc BSGS CPU test: curve=curve25519 FP_FAST=1
+[table] insert / look-up
+  12000 entries, 0 false positives in 200k absent probes
+[steppers] batched<4> vs reference, T=3
+  5040 baby steps, 1790 giant rounds, 1 candidates, all identical
+[contents] every j in [1, 3000) found from x(jG)
+[coverage] every x in small intervals, both layouts
+[solve] skipped (group too large for a CPU-only run)
+[solve] skipped (group too large for a CPU-only run)
+[iters] skipped (group too large for a CPU-only run)
+[multi] skipped (group too large for a CPU-only run)
+[interval] 2^22-wide interval at a random offset on curve25519
+  x0 + 0        ok  64 giant steps, 1 candidates
+  x0 + 1        ok  64 giant steps, 1 candidates
+  x0 + 4194303  ok  256 giant steps, 1 candidates
+  x0 + 3916799  ok  2112 giant steps, 1 candidates
+  x0 + 2956145  ok  1664 giant steps, 1 candidates
+ALL PASSED
+Saving image...
+Image saved, took 1.08s
+Built image im-Dxu4EmfdPj0gUdt6HUV9Od in 164.09s
+✓ Created objects.
+├── 🔨 Created mount 
+│   /Volumes/SSD990-2/crypto/rtx6000-sweeps-20261017/gpu/ecc/modal_app.py
+├── 🔨 Created mount /Volumes/SSD990-2/crypto/rtx6000-sweeps-20261017/gpu/ecc
+├── 🔨 Created function runSelftest.
+├── 🔨 Created function runBench.
+├── 🔨 Created function runTune.
+└── 🔨 Created function runBsgs.
+GPU: NVIDIA RTX PRO 6000 Blackwell Server Edition (2430 MHz, 97887 MiB), sm_120
+=== portable: 733.0 Mstep/s ===
+device: NVIDIA RTX PRO 6000 Blackwell Server Edition  sm_120  188 SMs  2.4 GHz  102.0 GB  L2 134.2 MB
+        1536 threads/SM, 100 KB shared/SM, 99 KB shared/block (opt-in)
+        Blackwell class: see OPTIMIZATION_BLACKWELL.md
+  385024 walks (48128 threads x 8), r=2^8, dp=2^20, fold=6, max_steps=8388608, variant=lowmem
+  376 blocks x 128 threads, 17408 B shared
+  0.733 Gstep/s  (99 M steps in 0.135 s)
+  1.4 ns/step/walk
+  fruitless cycles per step:  length 2: 128090 (1.30e-03)  length 3: 164 (1.66e-06)  length 4: 72 (7.30e-07)  length 5: 0 (0.00e+00)  length 6: 0 (0.00e+00)
+  0 walks aborted at max_steps (0.00e+00 per step) -- longer cycles, if not ~0
+=== portable minBlocks=2: 754.0 Mstep/s ===
+device: NVIDIA RTX PRO 6000 Blackwell Server Edition  sm_120  188 SMs  2.4 GHz  102.0 GB  L2 134.2 MB
+        1536 threads/SM, 100 KB shared/SM, 99 KB shared/block (opt-in)
+        Blackwell class: see OPTIMIZATION_BLACKWELL.md
+  385024 walks (48128 threads x 8), r=2^8, dp=2^20, fold=6, max_steps=8388608, variant=lowmem
+  376 blocks x 128 threads, 17408 B shared
+  0.754 Gstep/s  (99 M steps in 0.131 s)
+  1.3 ns/step/walk
+  fruitless cycles per step:  length 2: 128090 (1.30e-03)  length 3: 164 (1.66e-06)  length 4: 72 (7.30e-07)  length 5: 0 (0.00e+00)  length 6: 0 (0.00e+00)
+  0 walks aborted at max_steps (0.00e+00 per step) -- longer cycles, if not ~0
+=== portable minBlocks=3: 769.0 Mstep/s ===
+device: NVIDIA RTX PRO 6000 Blackwell Server Edition  sm_120  188 SMs  2.4 GHz  102.0 GB  L2 134.2 MB
+        1536 threads/SM, 100 KB shared/SM, 99 KB shared/block (opt-in)
+        Blackwell class: see OPTIMIZATION_BLACKWELL.md
+  385024 walks (48128 threads x 8), r=2^8, dp=2^20, fold=6, max_steps=8388608, variant=lowmem
+  376 blocks x 128 threads, 17408 B shared
+  0.769 Gstep/s  (99 M steps in 0.128 s)
+  1.3 ns/step/walk
+  fruitless cycles per step:  length 2: 128090 (1.30e-03)  length 3: 164 (1.66e-06)  length 4: 72 (7.30e-07)  length 5: 0 (0.00e+00)  length 6: 0 (0.00e+00)
+  0 walks aborted at max_steps (0.00e+00 per step) -- longer cycles, if not ~0
+=== portable minBlocks=4: 791.0 Mstep/s ===
+device: NVIDIA RTX PRO 6000 Blackwell Server Edition  sm_120  188 SMs  2.4 GHz  102.0 GB  L2 134.2 MB
+        1536 threads/SM, 100 KB shared/SM, 99 KB shared/block (opt-in)
+        Blackwell class: see OPTIMIZATION_BLACKWELL.md
+  385024 walks (48128 threads x 8), r=2^8, dp=2^20, fold=6, max_steps=8388608, variant=lowmem
+  376 blocks x 128 threads, 17408 B shared
+  0.791 Gstep/s  (99 M steps in 0.125 s)
+  1.3 ns/step/walk
+  fruitless cycles per step:  length 2: 128090 (1.30e-03)  length 3: 164 (1.66e-06)  length 4: 72 (7.30e-07)  length 5: 0 (0.00e+00)  length 6: 0 (0.00e+00)
+  0 walks aborted at max_steps (0.00e+00 per step) -- longer cycles, if not ~0
+=== FP_PTX=1: 1336.0 Mstep/s ===
+device: NVIDIA RTX PRO 6000 Blackwell Server Edition  sm_120  188 SMs  2.4 GHz  102.0 GB  L2 134.2 MB
+        1536 threads/SM, 100 KB shared/SM, 99 KB shared/block (opt-in)
+        Blackwell class: see OPTIMIZATION_BLACKWELL.md
+  385024 walks (48128 threads x 8), r=2^8, dp=2^20, fold=6, max_steps=8388608, variant=lowmem
+  376 blocks x 128 threads, 17408 B shared
+  1.336 Gstep/s  (99 M steps in 0.074 s)
+  0.7 ns/step/walk
+  fruitless cycles per step:  length 2: 128090 (1.30e-03)  length 3: 164 (1.66e-06)  length 4: 72 (7.30e-07)  length 5: 0 (0.00e+00)  length 6: 0 (0.00e+00)
+  0 walks aborted at max_steps (0.00e+00 per step) -- longer cycles, if not ~0
+=== FP_PTX=1 minBlocks=2: 1377.0 Mstep/s ===
+device: NVIDIA RTX PRO 6000 Blackwell Server Edition  sm_120  188 SMs  2.4 GHz  102.0 GB  L2 134.2 MB
+        1536 threads/SM, 100 KB shared/SM, 99 KB shared/block (opt-in)
+        Blackwell class: see OPTIMIZATION_BLACKWELL.md
+  385024 walks (48128 threads x 8), r=2^8, dp=2^20, fold=6, max_steps=8388608, variant=lowmem
+  376 blocks x 128 threads, 17408 B shared
+  1.377 Gstep/s  (99 M steps in 0.072 s)
+  0.7 ns/step/walk
+  fruitless cycles per step:  length 2: 128090 (1.30e-03)  length 3: 164 (1.66e-06)  length 4: 72 (7.30e-07)  length 5: 0 (0.00e+00)  length 6: 0 (0.00e+00)
+  0 walks aborted at max_steps (0.00e+00 per step) -- longer cycles, if not ~0
+=== FP_PTX=1 minBlocks=3: 1372.0 Mstep/s ===
+device: NVIDIA RTX PRO 6000 Blackwell Server Edition  sm_120  188 SMs  2.4 GHz  102.0 GB  L2 134.2 MB
+        1536 threads/SM, 100 KB shared/SM, 99 KB shared/block (opt-in)
+        Blackwell class: see OPTIMIZATION_BLACKWELL.md
+  385024 walks (48128 threads x 8), r=2^8, dp=2^20, fold=6, max_steps=8388608, variant=lowmem
+  376 blocks x 128 threads, 17408 B shared
+  1.372 Gstep/s  (99 M steps in 0.072 s)
+  0.7 ns/step/walk
+  fruitless cycles per step:  length 2: 128090 (1.30e-03)  length 3: 164 (1.66e-06)  length 4: 72 (7.30e-07)  length 5: 0 (0.00e+00)  length 6: 0 (0.00e+00)
+  0 walks aborted at max_steps (0.00e+00 per step) -- longer cycles, if not ~0
+=== FP_PTX=1 minBlocks=4: 1256.0 Mstep/s ===
+device: NVIDIA RTX PRO 6000 Blackwell Server Edition  sm_120  188 SMs  2.4 GHz  102.0 GB  L2 134.2 MB
+        1536 threads/SM, 100 KB shared/SM, 99 KB shared/block (opt-in)
+        Blackwell class: see OPTIMIZATION_BLACKWELL.md
+  385024 walks (48128 threads x 8), r=2^8, dp=2^20, fold=6, max_steps=8388608, variant=lowmem
+  376 blocks x 128 threads, 17408 B shared
+  1.256 Gstep/s  (99 M steps in 0.078 s)
+  0.8 ns/step/walk
+  fruitless cycles per step:  length 2: 128090 (1.30e-03)  length 3: 164 (1.66e-06)  length 4: 72 (7.30e-07)  length 5: 0 (0.00e+00)  length 6: 0 (0.00e+00)
+  0 walks aborted at max_steps (0.00e+00 per step) -- longer cycles, if not ~0
+============================================================
+  FP_PTX=1 minBlocks=2                   1377.0 Mstep/s
+  FP_PTX=1 minBlocks=3                   1372.0 Mstep/s
+  FP_PTX=1                               1336.0 Mstep/s
+  FP_PTX=1 minBlocks=4                   1256.0 Mstep/s
+  portable minBlocks=4                    791.0 Mstep/s
+  portable minBlocks=3                    769.0 Mstep/s
+  portable minBlocks=2                    754.0 Mstep/s
+  portable                                733.0 Mstep/s
+  best: FP_PTX=1 minBlocks=2
+  Update the RHO_MIN_BLOCKS recommendation in
+  OPTIMIZATION_BLACKWELL.md section 3 with this, per architecture:
+  the offline register figures do not decide it.
+[modal-client] 2026-10-17T13:45:21-0700 Timed out waiting for final app logs.
+✓ App completed. View run at 
+https://modal.com/apps/a-buran28/main/ap-ELJJSCBc7W12zY6d6NlRdk
