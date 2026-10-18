@@ -1,13 +1,14 @@
-# Where the ECDLP exponent can move, and where it cannot (assessment, 2026-10-18)
+# Where the ECDLP exponent can move, and where it cannot
 
-**Status.** Assessment from committed evidence; no new speedup is claimed.
+**Status (assessment, 2026-10-18).** Assessment from committed evidence; no new speedup is claimed.
 Every number below cites a frozen artefact in this repository. Fitted
 exponents are quoted with their intervals and the sizes they were fitted
 on; a `toy`-tier figure is never carried to another tier
 (`docs/bounds/README.md`). The companion sweep
 (`research/ecbench_comprehensive_sweep_20261018/`) refits the generic
-methods on prime-field curves at 2 targets × 3 rounds over eight sizes and
-is cited in §5 once its session is sealed.
+methods on prime-field and Koblitz curves at 2 targets × 3 rounds over
+nine and six sizes, and a fixed-base index calculus over six; its three
+sessions are sealed and replayed, and §5 reads them.
 
 Cost is written `gae = C · r^α` in ecbench's counted unit (group-addition
 equivalents), `r` the prime subgroup order. "Moving the exponent" means
@@ -153,7 +154,7 @@ constants (§2) and accounting.**
    program can label *exponent-level* honestly.
 3. **Generic constants to the floor.** The toy-tier generic rows sit
    3–10× above `√(π r / 2A)`; the medium-tier Koblitz rho is at 1.09×.
-   The companion sweep quantifies the prime-field gap at `2^16–2^30`
+   The companion sweep quantifies the prime-field gap at `2^16–2^32`
    (§5). Start-up (two scalar multiplications per walk), distinguished
    point density and the jump-table build are the whole of that gap;
    none is an exponent, all are improvements under the success criterion.
@@ -161,20 +162,54 @@ constants (§2) and accounting.**
    passes of this date on the Rust and C kernels): wall-clock only, no
    change to any `S`, recorded as engineering.
 
-## 5. Companion sweep (filled from the sealed session)
+## 5. Companion sweep (filled from the sealed sessions)
 
-See `research/ecbench_comprehensive_sweep_20261018/README.md` for the
-fitted `α` of `rho.negation`, `rho.plain`, `rho.frozen_reference`,
-`bsgs.textbook`, `bsgs.interleaved`, `bsgs.negation`, `kangaroo.vow` and
-`ic.pipeline` (prime-abscissa 32, MITM) over the prime-field sizes that
-completed on this host, with standard errors and `n`.
+`research/ecbench_comprehensive_sweep_20261018/README.md` holds three
+sealed sessions of this date, every run verified and every measured run
+replayed identically (`ECBS1ha345d9b7f6b2`, `ECBS1h88c58e3e8c89`,
+`ECBS1hec2206c6baf4`; 702 measured runs, 702 replays). Descriptive OLS
+exponents, `α ± se`:
+
+| domain | method | `α` ± se (sizes) | mean `S` range across sizes |
+|:--|:--|--:|:--|
+| prime, `2^16 … 2^32` | `rho.plain` | 0.474 ± 0.013 (9) | 2.07 → 1.35 (floor 0.886) |
+| prime | `rho.negation` | 0.447 ± 0.012 (9) | 1.91 → 0.91 |
+| prime | `bsgs.textbook` | 0.499 ± 0.014 (9) | 1.14 … 1.82 |
+| prime | `bsgs.interleaved` | 0.501 ± 0.023 (9) | 0.85 … 1.84 |
+| prime | `bsgs.negation` | 0.498 ± 0.022 (9) | 0.64 … 1.32 |
+| prime | `kangaroo.vow` | 0.487 ± 0.032 (9) | 1.07 … 3.00 |
+| Koblitz `K_1`, `2^15 … 2^37` | `rho.signed_frobenius_strong` | 0.248 ± 0.015 (6) | 4.54 → 0.11 (floor 0.215 → 0.129) |
+| Koblitz | `rho.negation` | 0.430 ± 0.029 (6) | 1.97 → 1.08 |
+| Koblitz | `bsgs.negation` | 0.511 ± 0.015 (6) | 0.84 … 1.35 |
+| Koblitz | `kangaroo.vow` | 0.562 ± 0.021 (6) | 0.79 … 2.97 |
+| prime, `2^16 … 2^25` | `ic.pipeline`, prime-abscissa 32, MITM | 0.757 ± 0.051 (6) | 10.9 → 59.0; 5.7× → 43× `rho.negation` |
+| prime | `rho.frozen_reference` | 0.404 ± 0.037 (6) | 5.24 → 2.17 |
+
+Reading. The BSGS and kangaroo fits contain `1/2`. The two rho fits below
+`1/2` are the start-up artefact of §1: `S` falls across the range while
+the floor is constant, because the two scalar multiplications per walk and
+the jump-table build are a larger share at `2^16` than at `2^32`. The
+Koblitz strong reference shows it at scale (32 lanes of start-up before a
+step; 20× the floor at `2^16`, at the floor by `2^32`), so its `0.248` is
+not an exponent and the medium-tier frontier fit `0.451 [0.399, 0.512]`
+on `2^32 … 2^47` stands as the admitted value. The fixed-base
+index-calculus row fits above `1/2`, consistent with the frontier's
+`0.841 [0.500, 1.024]` on the same configuration, and its gap to rho
+widens with `r`. Nothing in the sweep moves an exponent; it quantifies the
+generic constants recommendation 3 names: at `2^28 … 2^32` the tuned rho
+arms are within their own model's expectation (1.25 and 0.89) and the gap
+to the floor is 1.0 – 1.5× in the counted unit.
 
 ## 6. Graphs
 
-`exponent_map.svg` (beside this file, with `exponent_map.diagram.json`):
-the exponent `α` per domain and method with its interval against the
-`1/2` line, labelled by evidence class (measured / fitted / heuristic /
-closed on paper). `REPORT.pdf` embeds it.
+`exponent_map.svg` (beside this file, from `exponent_map.py`, with the
+plotted values in `exponent_map.diagram.json`): the exponent `α` per domain
+and method with its interval against the `1/2` line, by evidence class
+(frontier bound with its bootstrap interval, this sweep with `± 1.96 se`,
+fitted without a published interval, on paper). `REPORT.pdf` embeds it. The
+sweep's own graphs (mean `S` per arm and size, distributions, phases,
+scaling fits) are under
+`research/ecbench_comprehensive_sweep_20261018/reports/*/`.
 
 ## References inside this repository
 

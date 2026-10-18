@@ -1,14 +1,9 @@
 {
   "schema": "ecbench.spec/v1",
-  "label": "comprehensive generic sweep, Koblitz K_1 over F_2^n, n = 13..37",
-  "description": "Method × size scaling study (koblitz curves, degrees n of K_a/F_2^n 13,17,19,23,29,31,37; 2 independent single-target workload(s) per curve, 3 interleaved round(s)). One curve per size so `ecbench bound fit` and `ecbench report` can fit cost against r. Counted group operations; a measurement, not a performance claim.",
+  "label": "comprehensive generic sweep, Koblitz K_1 over F_2^n, n in {17,19,23,29,43,47}",
+  "description": "Method × size scaling study (koblitz curves, degrees n of K_a/F_2^n 17,19,23,29,43,47; 2 independent single-target workload(s) per curve, 3 interleaved round(s)). One curve per size so `ecbench bound fit` and `ecbench report` can fit cost against r. Counted group operations; a measurement, not a performance claim.",
   "workloads": {
     "curves": [
-      {
-        "kind": "koblitz",
-        "a": 1,
-        "n": 13
-      },
       {
         "kind": "koblitz",
         "a": 1,
@@ -32,12 +27,12 @@
       {
         "kind": "koblitz",
         "a": 1,
-        "n": 31
+        "n": 43
       },
       {
         "kind": "koblitz",
         "a": 1,
-        "n": 37
+        "n": 47
       }
     ],
     "targets_per_curve": 2,
