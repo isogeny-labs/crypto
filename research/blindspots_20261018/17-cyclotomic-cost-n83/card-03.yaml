@@ -15,7 +15,7 @@ commands:
     success_exit_codes: [0]
   - id: build
     argv: [prlimit, --as=4294967296, rustc, --edition, "2021", -C, opt-level=3, -C, codegen-units=1, -o, target/blindspots-17/card-03/b17, examples/blindspots_17_cyclo_cost.rs]
-    timeout_seconds: 90
+    timeout_seconds: 60
     success_exit_codes: [0]
     stdout: research/blindspots_20261018/17-cyclotomic-cost-n83/raw/card-03-build.stdout.log
     stderr: research/blindspots_20261018/17-cyclotomic-cost-n83/raw/card-03-build.stderr.log
