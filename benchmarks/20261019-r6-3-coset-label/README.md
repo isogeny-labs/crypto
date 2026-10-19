@@ -6,4 +6,4 @@ Browse copy of the result. Full derivation, certificates, raw samples, and limit
 - Constant-time `is_in_4e` variants cost 2.5–5.0× the table version in contended wall time and 2.0–3.7× in counted word operations; they miss the predeclared <2× bar and are not proposed as the default. Against the library implementation, best CT wall ratios are 1.23–1.57×.
 - Toy curve only; large fields are sampled; timings were contended and no deployed-curve security claim is made.
 
-Figures: `labels.svg` summarizes coset labels; `cost.svg` shows the test cost comparisons.
+Figures include SVG and PNG renders: `labels` summarizes coset labels; `cost` shows the test cost comparisons.

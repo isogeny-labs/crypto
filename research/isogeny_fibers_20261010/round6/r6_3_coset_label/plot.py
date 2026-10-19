@@ -53,6 +53,7 @@ for s in ax.spines.values():
     s.set_visible(False)
 fig.tight_layout()
 fig.savefig(os.path.join(D, "labels.svg"), facecolor=SURF)
+fig.savefig(os.path.join(D, "labels.png"), facecolor=SURF, dpi=160)
 
 # Cost: two panels, separate axes (wall contended; counted word ops), members of 4E.
 bn = [r["n"] for r in be["per_n"]]
@@ -88,6 +89,7 @@ axs[0].legend(frameon=False, fontsize=7.5, loc="upper left")
 fig.suptitle("4E test on members of 4E (no early exit), bench.json", fontsize=9, x=0.01, ha="left")
 fig.tight_layout()
 fig.savefig(os.path.join(D, "cost.svg"), facecolor=SURF)
+fig.savefig(os.path.join(D, "cost.png"), facecolor=SURF, dpi=160)
 json.dump({"labels": {"n": ns, "coset_label_index": grid}, "cost_members": out},
           open(os.path.join(D, "plot_data.json"), "w"), indent=1)
 print("ok")
