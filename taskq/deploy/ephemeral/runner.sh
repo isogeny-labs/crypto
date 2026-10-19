@@ -505,6 +505,8 @@ if [ "$TOOLCHAIN" = rust ] && [ "$(job 'if .cache == false then "off" else "on" 
     cache_restore
 fi
 
+export EPHEMERAL_JOB_ID=$EPHEMERAL_JOB EPHEMERAL_OUT=$OUT EPHEMERAL_SRC=$SRC
+export EPHEMERAL_RESUME_DIR=${RESUME_JOB:+$W/resume}
 SETUP=$(job '.setup // ""')
 if [ -n "$SETUP" ]; then
     say "setup: $SETUP"
@@ -516,8 +518,6 @@ if [ -f "$W/spot-interrupt" ]; then
 fi
 
 # ---- run ------------------------------------------------------------------
-export EPHEMERAL_JOB_ID=$EPHEMERAL_JOB EPHEMERAL_OUT=$OUT EPHEMERAL_SRC=$SRC
-export EPHEMERAL_RESUME_DIR=${RESUME_JOB:+$W/resume}
 set -a
 # shellcheck disable=SC1091
 . "$W/env"
@@ -529,7 +529,7 @@ BUDGET=$((EPHEMERAL_DEADLINE - $(date +%s) - 600))
 status running "$(job '.command_display')"
 cd "$WORKDIR" || exit 1
 setsid /usr/bin/time -v -o "$W/rusage.txt" \
-    timeout --signal=TERM --kill-after=60 "$BUDGET" bash "$W/cmd.sh" &
+    timeout --foreground --signal=TERM --kill-after=60 "$BUDGET" bash "$W/cmd.sh" &
 CMD_PID=$!
 printf '%s\n' "$CMD_PID" >"$W/command.pid"
 wait "$CMD_PID"

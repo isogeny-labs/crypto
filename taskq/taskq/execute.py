@@ -251,16 +251,43 @@ def _sha256(path: Path) -> str:
 
 def _resume_checkpoint(root: Path, task_id: str, attempt: int,
                        filename: str) -> Path | None:
-    """Choose the newest complete prior attempt; ignore torn writes."""
+    """Copy and verify a prior checkpoint into this attempt before use.
+
+    Returning a prior worker's live path would allow it to replace the bytes
+    after verification. Hash the exact bytes copied to the new attempt instead.
+    Legacy payload/marker pairs are still readable through the same snapshot.
+    """
+    root = root.resolve()
+    current = root / task_id / f"attempt-{attempt}"
+    current.mkdir(parents=True, exist_ok=True)
     for n in range(attempt - 1, 0, -1):
         path = root / task_id / f"attempt-{n}" / filename
         digest = path.with_name(path.name + ".sha256")
+        snapshot = None
         try:
             expected = digest.read_text().strip()
-            if len(expected) == 64 and _sha256(path) == expected:
-                return path
-        except OSError:
+            if len(expected) != 64 or any(c not in "0123456789abcdef" for c in expected):
+                continue
+            generation = path.with_name(f".{path.name}.{expected}.snapshot")
+            candidate = generation if generation.exists() else path
+            fd, name = tempfile.mkstemp(prefix=f".resume-{filename}.", dir=current)
+            snapshot = Path(name)
+            actual = hashlib.sha256()
+            with os.fdopen(fd, "wb") as out, candidate.open("rb") as inp:
+                for chunk in iter(lambda: inp.read(1 << 20), b""):
+                    out.write(chunk)
+                    actual.update(chunk)
+                out.flush()
+                os.fsync(out.fileno())
+            if actual.hexdigest() == expected:
+                verified = snapshot
+                snapshot = None
+                return verified
+        except (OSError, UnicodeError):
             continue
+        finally:
+            if snapshot is not None:
+                snapshot.unlink(missing_ok=True)
     return None
 
 
@@ -418,6 +445,7 @@ def execute(spec: dict[str, Any], task_id: str, attempt: int,
         if checkpoint:
             if checkpoint_root is None:
                 raise InfraError("checkpoint requested but no durable checkpoint directory is configured")
+            checkpoint_root = checkpoint_root.resolve()
             filename = checkpoint["file"]
             current_dir = checkpoint_root / task_id / f"attempt-{attempt}"
             current_dir.mkdir(parents=True, exist_ok=True)

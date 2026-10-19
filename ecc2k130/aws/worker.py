@@ -1633,6 +1633,41 @@ class Worker:
         return dropped
 
     # ---- durable copies ---------------------------------------------------
+    def snapshotCovered(self, snap):
+        """Retain the DP prefix a snapshot needs, including across crashes.
+
+        An empty spool alone is insufficient: the process may have stopped
+        after linking the snapshot but before committing the delta manifest.
+        Keep the boundary once observed so later DP appends do not starve it.
+        """
+        marker = snap + ".pending.json"
+        digest = sha256File(snap)
+        pending = readJson(marker, {})
+        if not isinstance(pending, dict) or (pending and (
+                        not isinstance(pending.get("streamId"), str)
+                        or type(pending.get("dpEnd")) is not int
+                        or pending["dpEnd"] < 0
+                        or type(pending.get("covered")) is not bool)):
+            raise RuntimeError("invalid snapshot DP boundary: %s" % marker)
+        if pending.get("snapshotSha256") != digest:
+            size = os.path.getsize(self.dpPath) if os.path.exists(self.dpPath) else 0
+            base, stride = dpStride(self.dpPath)
+            whole = size - (size - base) % stride if size > base else base
+            pending = {"snapshotSha256": digest, "streamId": self.streamId,
+                       "dpEnd": whole, "covered": False}
+            writeJson(marker, pending)
+        if not pending["covered"] and pending["streamId"] == self.streamId:
+            if int(self.state.get("dpOffset", 0)) >= pending["dpEnd"] and not self.spoolPending():
+                pending["covered"] = True
+                writeJson(marker, pending)
+        return pending["covered"]
+
+    def removeSnapshot(self, snap):
+        os.remove(snap)
+        marker = snap + ".pending.json"
+        if os.path.exists(marker):
+            os.remove(marker)
+
     def publishSnapshot(self, slot, snap):
         """Commit a snapshot only after all earlier DP bytes reached the store."""
         it = checkpointIter(snap)
@@ -1687,21 +1722,24 @@ class Worker:
             raise RuntimeError("store unreachable: %d bytes of points still spooled"
                                % self.spoolBytes())
         snap = self.ckptPath + ".snap"
-        if os.path.exists(snap):
+        attemptedSnap = False
+        if os.path.exists(snap) and self.snapshotCovered(snap):
             # A prior delta was still validating when this snapshot was cut.
             # The spool has now drained, so publish its checkpoint before
             # cutting another delta that may itself remain pending.  Otherwise
             # every cycle discards the old snapshot and starves checkpoints.
             try:
+                attemptedSnap = True
                 self.publishSnapshot(slot, snap)
             except PendingUpload:
                 log("checkpoint validation pending; continuing DP uploads")
             else:
-                os.remove(snap)
-        haveSnap = False
+                self.removeSnapshot(snap)
         if not os.path.exists(snap) and os.path.exists(self.ckptPath):
             os.link(self.ckptPath, snap)
-            haveSnap = True
+            attemptedSnap = False
+            # Commit the required prefix before the first fallible delta cut.
+            self.snapshotCovered(snap)
         size = os.path.getsize(self.dpPath) if os.path.exists(self.dpPath) else 0
         base, stride = dpStride(self.dpPath)
         whole = size - (size - base) % stride if size > base else 0
@@ -1745,13 +1783,13 @@ class Worker:
                 for path in (delta, delta + ".json"):
                     if os.path.exists(path):
                         os.remove(path)
-        if haveSnap:
+        if os.path.exists(snap) and not attemptedSnap and self.snapshotCovered(snap):
             try:
                 self.publishSnapshot(slot, snap)
             except PendingUpload:
                 log("checkpoint validation pending; retaining snapshot")
             else:
-                os.remove(snap)
+                self.removeSnapshot(snap)
 
     def reportRds(self, deltaPath, slot):
         """Copy new GPU records into rho-dp, including each walk's starting seed.
@@ -1929,6 +1967,10 @@ class Worker:
         into a loss."""
         if self.spoolPending():
             log("not rotating dp.bin: %d bytes of points are still unsent" % self.spoolBytes())
+            return
+        snap = self.ckptPath + ".snap"
+        if os.path.exists(snap) and not self.snapshotCovered(snap):
+            log("not rotating dp.bin: a retained checkpoint still needs its DP prefix")
             return
         if os.path.exists(self.dpPath):
             size = os.path.getsize(self.dpPath)

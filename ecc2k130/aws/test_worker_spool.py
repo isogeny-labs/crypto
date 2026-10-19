@@ -208,6 +208,43 @@ class SpoolCase(unittest.TestCase):
 
 
 class PendingValidation(SpoolCase):
+    def test_invalid_snapshot_boundary_does_not_publish_checkpoint(self):
+        w, slot = self.claimed()
+        self.appendDp(w, 5)
+        with open(w.ckptPath, "wb") as out:
+            out.write(struct.pack("<8s6IQ", CKPT_MAGIC, 1, 131, 1, 32, 64, 1, 99))
+        snap = w.ckptPath + ".snap"
+        os.link(w.ckptPath, snap)
+        worker.writeJson(snap + ".pending.json", {"snapshotSha256": sha256File(snap),
+                                                  "covered": "true"})
+        _, error = quiet(w.uploadCycle, slot)
+        self.assertRegex(str(error), "invalid snapshot DP boundary")
+        self.assertFalse(w.store.exists(w.ckptKey(slot)))
+
+    def test_snapshot_cannot_skip_dp_when_delta_manifest_was_not_committed(self):
+        """A crash after linking the snapshot does not prove its DPs landed."""
+        w, slot = self.claimed()
+        self.appendDp(w, 5)
+        with open(w.ckptPath, "wb") as out:
+            out.write(struct.pack("<8s6IQ", CKPT_MAGIC, 1, 131, 1, 32, 64, 1, 99))
+        healthy = w.store
+        with mock.patch.object(w, "spoolDelta", side_effect=OSError("interrupted before manifest")):
+            _, error = quiet(w.uploadCycle, slot)
+        self.assertRegex(str(error), "before manifest")
+        self.assertTrue(os.path.exists(w.ckptPath + ".snap"))
+        self.assertFalse(w.spoolPending())
+
+        w.store = BrokenStore(healthy)
+        _, error = quiet(w.uploadCycle, slot)
+        self.assertIsNotNone(error)
+        self.assertEqual(w.state["ckptIter"], -1)
+        self.assertFalse(healthy.exists(w.ckptKey(slot)))
+        w.store = healthy
+        _, error = quiet(w.uploadCycle, slot)
+        self.assertIsNone(error)
+        self.assertEqual(len(storedRecords(self.storeRoot)), 5)
+        self.assertEqual(w.state["ckptIter"], 99)
+
     def test_pending_dp_validation_publishes_saved_checkpoint_next_cycle(self):
         """A fresh DP cut must not starve a snapshot whose points landed."""
         w, slot = self.claimed()

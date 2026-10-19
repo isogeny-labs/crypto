@@ -284,12 +284,17 @@ EFS results volume and supplies these variables to the command:
 |---|---|
 | `TASKQ_CHECKPOINT_FILE` | Destination for this attempt's `state.bin` |
 | `TASKQ_CHECKPOINT_DIR` | This attempt's durable checkpoint directory |
-| `TASKQ_RESUME_FILE` | Newest hash-verified checkpoint from an earlier attempt, or empty |
+| `TASKQ_RESUME_FILE` | This attempt's verified copy of the newest complete prior checkpoint, or empty |
 
 The application decides what state to save and when. Write a complete local
 snapshot, then run `taskq checkpoint save /path/to/snapshot` periodically and
-from its SIGTERM handler. The helper copies it to EFS and atomically publishes
-the file plus a SHA-256 marker. On retry, the application reads
+from its SIGTERM handler. The helper copies it to an immutable generation on
+EFS, then atomically publishes its SHA-256 marker. The stable destination is
+maintained separately, so a later write cannot invalidate that generation.
+Each attempt keeps its current and preceding committed generations; older
+generations are removed only after the replacement is fully published.
+On retry, taskq copies and verifies the chosen bytes into the new attempt;
+the application reads
 `TASKQ_RESUME_FILE` and continues from that state. Taskq ignores incomplete or
 corrupt checkpoint pairs. A checkpoint written by a prior attempt is never
 overwritten by the new attempt, including when an old worker loses its lease.
