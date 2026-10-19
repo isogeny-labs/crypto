@@ -1,0 +1,43 @@
+Factor-base designs, Amendment 6 (T1, T2): A0 on the sparse tower engine; rows from research/factor_base_designs_20261015/runs
+
+T1, admission: 26 of 26 systems complete on the tower engine with the committed D,
+  no derived 1 and the planted solution kept (26 required)  →  ADMITTED
+
+════ A0 m = 3 p1
+
+── A0 m = 3, f4_fp cells only
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  2   2.000  7      8      [5, 5]        368,368              0.0,0.0               ok,ok
+  3   3.000  10     11     [6, 6]        3285,3285            0.6,0.6               ok,ok
+  4   4.000  13     14     [6, 6]        12314,12314          16.6,14.9             ok,ok
+  5   5.000  16     17     []            97456,97456          304.2,301.6           timeout,timeout
+  completed cells 3: σ = 0.5000  →  no middle ground at this arity (σ ≥ 0.5);  Δlog₂ max_cols/Δb = 2.532 (secondary, descriptive)
+
+── A0 m = 3, with the T2 (tower-engine) cell
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  2   2.000  7      8      [5, 5]        368,368              0.0,0.0               ok,ok
+  3   3.000  10     11     [6, 6]        3285,3285            0.6,0.6               ok,ok
+  4   4.000  13     14     [6, 6]        12314,12314          16.6,14.9             ok,ok
+  5   5.000  16     17     [7, 7]        34706,35617          383.5,377.5           ok,ok
+  completed cells 4: σ = 0.6000  →  no middle ground at this arity (σ ≥ 0.5);  Δlog₂ max_cols/Δb = 2.164 (secondary, descriptive)
+  (the width slope on the line above mixes f4_fp and tower-engine columns, which count different
+   things; it is not registered for T2 and is not used. D and σ are engine-independent here: T1.)
+
+════ A0 m = 4 p1
+
+── A0 m = 4, f4_fp cells only
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  2   2.000  10     11     [6, 6]        1911,1911            0.3,0.3               ok,ok
+  3   3.000  14     15     [7, 7]        21619,21619          96.4,93.8             ok,ok
+  completed cells 2: σ = 1.0000  →  inconclusive (fewer than 3 completed cells);  Δlog₂ max_cols/Δb = 3.500 (secondary, descriptive)
+
+── A0 m = 4, with the T2 (tower-engine) cell
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  2   2.000  10     11     [6, 6]        1911,1911            0.3,0.3               ok,ok
+  3   3.000  14     15     [7, 7]        21619,21619          96.4,93.8             ok,ok
+  4   4.000  18     19     []            88925,170036         3600.1,3600.4         timeout,timeout
+  completed cells 2: σ = 1.0000  →  inconclusive (fewer than 3 completed cells);  Δlog₂ max_cols/Δb = 3.500 (secondary, descriptive)
+  (the width slope on the line above mixes f4_fp and tower-engine columns, which count different
+   things; it is not registered for T2 and is not used. D and σ are engine-independent here: T1.)
+
+m = 3, t = 5 (descriptive): A11 D 5.0 (F3, f4_fp) against A0 D 7.0 (T2, tower engine): difference -2.0
