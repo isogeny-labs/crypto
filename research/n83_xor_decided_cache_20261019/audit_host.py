@@ -15,7 +15,7 @@ from panel_supervisor import PLAN
 ROOT = Path(__file__).resolve().parent
 ATTEMPT = ROOT / 'attempt-02'
 SOURCE = '8cde893f774cace3e022438e168a0485b7268a57'
-BINARY = 'e95658ff67c876a6ae80d9c9c6cd89726b32947d48c653208efadbc1cc2950c3'
+BINARY = '95ba4f997237e1fb201e52446bc6aced32e3597105ba43e92cfc936e44fd5f8b'
 ARCHIVES = {
     'U': ('2457a977ea9c05a11cc60878bdb3b29f6d905dc8db9aa26e52913a702d308369',
           '1aa70cc1571f4cb25af42936699378329128a869f2ae8ad35efb375663d4e59d',
