@@ -1,13 +1,30 @@
-
-thread 'main' (31127) panicked at examples/structure_aware_curves.rs:119:9:
-assertion `left == right` failed: unverified runs in research/structure_aware_ic_20261019/sessions/tune_j0_32.band.json
-  left: Number(4)
- right: Number(1)
-stack backtrace:
-   0: __rustc::rust_begin_unwind
-   1: core::panicking::panic_fmt
-   2: core::panicking::assert_failed_inner
-   3: core::panicking::assert_failed::<serde_json::value::Value, serde_json::value::Value>
-   4: structure_aware_curves::band
-   5: structure_aware_curves::main
-note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+  inadmissible (unverified runs): "icv1-fp32-tm100763-1546d358" "ic-a2-8"
+  inadmissible (unverified runs): "icv1-fp32-tm17105-164911b8" "ic-a2-8"
+  inadmissible (unverified runs): "icv1-fp32-t64801-082475e4" "ic-a2-8"
+  inadmissible (unverified runs): "icv1-fp32-t55395-81841389" "ic-a2-8"
+  ic-a6-8: sum S(w=0.1) over 2 curves = 776.34
+  ic-a6-16: sum S(w=0.1) over 2 curves = 291.76
+  ic-a6-32: sum S(w=0.1) over 2 curves = 181.89
+  ic-a6-64: sum S(w=0.1) over 2 curves = 79.83
+  ic-a6-128: sum S(w=0.1) over 2 curves = 39.65
+  ic-a6-256: sum S(w=0.1) over 2 curves = 39.02
+  ic-a6-512: sum S(w=0.1) over 2 curves = 90.41
+  ic-a6-1024: sum S(w=0.1) over 2 curves = 329.96
+  ic-a2-16: sum S(w=0.1) over 2 curves = 2857.80
+  ic-a2-32: sum S(w=0.1) over 2 curves = 1334.32
+  ic-a2-64: sum S(w=0.1) over 2 curves = 702.73
+  ic-a2-128: sum S(w=0.1) over 2 curves = 314.19
+  ic-a2-256: sum S(w=0.1) over 2 curves = 163.52
+  ic-a2-512: sum S(w=0.1) over 2 curves = 82.10
+  ic-a2-1024: sum S(w=0.1) over 2 curves = 72.02
+  ic-a2-2048: sum S(w=0.1) over 2 curves = 162.58
+  ic-a2-4096: sum S(w=0.1) over 2 curves = 587.84
+  ic-a2-16: sum S(w=0.1) over 2 curves = 2679.17
+  ic-a2-32: sum S(w=0.1) over 2 curves = 1610.13
+  ic-a2-64: sum S(w=0.1) over 2 curves = 596.72
+  ic-a2-128: sum S(w=0.1) over 2 curves = 250.77
+  ic-a2-256: sum S(w=0.1) over 2 curves = 132.62
+  ic-a2-512: sum S(w=0.1) over 2 curves = 70.67
+  ic-a2-1024: sum S(w=0.1) over 2 curves = 74.77
+  ic-a2-2048: sum S(w=0.1) over 2 curves = 175.84
+  ic-a2-4096: sum S(w=0.1) over 2 curves = 652.08
