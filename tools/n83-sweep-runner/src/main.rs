@@ -155,20 +155,39 @@ fn retained_panel(manifest: &Value, columns: u64) -> R<()> {
         "retained primary hash-policy row missing or ambiguous",
     )
 }
+fn docker_rpc_timeout(args: &[&str]) -> &'static str {
+    // A slow daemon inspection must not discard a completed worker's evidence.
+    // Mutating operations retain their original deadline and are never retried.
+    if args.first() == Some(&"inspect") {
+        "60s"
+    } else {
+        "15s"
+    }
+}
 fn docker(args: &[&str]) -> R<Output> {
     let out = Command::new("timeout")
-        .args(["--kill-after=2s", "15s", "docker"])
+        .args(["--kill-after=2s", docker_rpc_timeout(args), "docker"])
         .args(args)
         .output()?;
     require(
         out.status.success(),
         &format!(
-            "docker {:?}: {}",
+            "docker {:?}: status {}; stderr {}",
             args,
+            out.status,
             String::from_utf8_lossy(&out.stderr)
         ),
     )?;
     Ok(out)
+}
+
+#[test]
+fn longer_inspection_wait_does_not_extend_or_retry_mutations() {
+    assert_eq!(docker_rpc_timeout(&["inspect", "container"]), "60s");
+    for operation in ["run", "kill", "rm", "logs", "ps", "image", ""] {
+        assert_eq!(docker_rpc_timeout(&[operation]), "15s");
+    }
+    assert_eq!(docker_rpc_timeout(&[]), "15s");
 }
 fn inspect(name: &str) -> R<Value> {
     let out=docker(&["inspect","--format", "{\"host\":{{json .HostConfig}},\"mounts\":{{json .Mounts}},\"state\":{{json .State}},\"image\":{{json .Image}}}",name])?;
