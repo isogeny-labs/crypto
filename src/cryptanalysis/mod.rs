@@ -336,6 +336,7 @@ pub mod sparse_macaulay;
 pub mod statistical;
 pub mod subfield_fp3;
 pub mod symmetrized_semaev;
+pub mod three_leads;
 pub mod tls12_kdf;
 pub mod tls13_kdf;
 pub mod two_sylow_search;
