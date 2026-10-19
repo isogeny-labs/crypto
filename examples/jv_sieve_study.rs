@@ -21,8 +21,26 @@ const SIZES: [u64; 5] = [251, 503, 1009, 1511, 1823];
 const B: usize = 10_000;
 
 fn load(dir: &str, name: &str) -> Option<Vec<Value>> {
-    let s = fs::read_to_string(format!("{dir}/raw/{name}.json")).ok()?;
-    serde_json::from_str(&s).ok()
+    if let Ok(s) = fs::read_to_string(format!("{dir}/raw/{name}.json")) {
+        return serde_json::from_str(&s).ok();
+    }
+    // per-instance rho jobs: `<name>_s<seed>.json`, merged in seed order
+    let mut out: Vec<(u64, Vec<Value>)> = vec![];
+    for e in fs::read_dir(format!("{dir}/raw")).ok()?.flatten() {
+        let fname = e.file_name().to_string_lossy().to_string();
+        let Some(rest) = fname.strip_prefix(&format!("{name}_s")) else { continue };
+        let Some(seed) = rest.strip_suffix(".json").and_then(|x| x.parse::<u64>().ok()) else { continue };
+        if !e.path().with_extension("done").exists() {
+            continue; // an unfinished job
+        }
+        let v: Vec<Value> = serde_json::from_str(&fs::read_to_string(e.path()).ok()?).ok()?;
+        out.push((seed, v));
+    }
+    if out.is_empty() {
+        return None;
+    }
+    out.sort_by_key(|x| x.0);
+    Some(out.into_iter().flat_map(|x| x.1).collect())
 }
 fn f(v: &Value, k: &str) -> f64 {
     v[k].as_f64().unwrap_or(f64::NAN)
