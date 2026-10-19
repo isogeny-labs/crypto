@@ -4336,6 +4336,11 @@ pub struct FactorBase<E> {
     pub cost: PhaseCost,
     /// Subspace basis (single words) when the base is a linear subspace.
     pub subspace_basis: Option<Vec<u64>>,
+    /// The logarithm (base the instance generator, modulo `r`) of each
+    /// column's unknown, when the construction fixes them: the
+    /// `known-log` base.  Present, the pipeline skips linear algebra, since
+    /// one verified relation names the target's logarithm directly.
+    pub known_logs: Option<Vec<u64>>,
 }
 
 impl<E: Copy> FactorBase<E> {
@@ -4361,6 +4366,7 @@ impl<E: Copy> FactorBase<E> {
             point_index: fast_map(0),
             cost: PhaseCost::default(),
             subspace_basis: None,
+            known_logs: None,
         }
     }
 
@@ -5539,6 +5545,69 @@ impl RelationSolver for IncrementalGauss {
     }
     fn work(&self) -> (u64, &'static str) {
         (self.row_ops, "row_ops")
+    }
+}
+
+/// The relation "matrix" of a factor base whose column logarithms are
+/// known (`FactorBase::known_logs`): there is nothing to eliminate.  A row
+/// `Σ cᵥ·xᵥ − h·b·d = h·a` has one unknown, so `d` is read off it
+/// directly, at a handful of word operations that no counter prices and
+/// zero group operations and zero `row_ops`.  The loop's own verification
+/// (`[d]G = target`) still certifies the answer.
+pub struct KnownLogSolver {
+    logs: Vec<u64>,
+    modulus: u64,
+    d: Option<u64>,
+    dependent: u64,
+}
+
+impl KnownLogSolver {
+    pub fn new(logs: Vec<u64>, modulus: u64) -> Self {
+        Self {
+            logs,
+            modulus,
+            d: None,
+            dependent: 0,
+        }
+    }
+}
+
+impl RelationSolver for KnownLogSolver {
+    fn add_row(&mut self, row: Vec<u64>, rhs: u64) -> RowStatus {
+        let m = self.modulus;
+        let d_col = self.logs.len();
+        let mut sum = 0u64;
+        for (c, &x) in self.logs.iter().enumerate() {
+            if row[c] != 0 {
+                sum = addmod(sum, mulmod(row[c], x % m, m), m);
+            }
+        }
+        match invmod(row[d_col], m) {
+            Some(inv) => {
+                self.d = Some(mulmod(submod(rhs, sum, m), inv, m));
+                RowStatus::Independent
+            }
+            None => {
+                self.dependent += 1;
+                RowStatus::Dependent
+            }
+        }
+    }
+    fn pinned(&self, col: usize) -> Option<u64> {
+        if col == self.logs.len() {
+            self.d
+        } else {
+            self.logs.get(col).copied()
+        }
+    }
+    fn rank(&self) -> usize {
+        usize::from(self.d.is_some())
+    }
+    fn dependent(&self) -> u64 {
+        self.dependent
+    }
+    fn work(&self) -> (u64, &'static str) {
+        (0, "row_ops")
     }
 }
 

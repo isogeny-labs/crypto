@@ -10,6 +10,7 @@
 //! | name | regime | what it is |
 //! |:--|:--|:--|
 //! | `prime-abscissa` | prime | the smallest abscissae carrying a point, one column each |
+//! | `known-log` | prime | `±[i]G` for `1 ≤ i ≤ size`, one column each, every logarithm known: no linear algebra |
 //! | `binary-subspace` | binary, Koblitz | points whose abscissa lies in an `F_2`-subspace |
 //! | `koblitz-orbit` | Koblitz | the same, each signed Frobenius orbit folded onto one column |
 //! | `compact-orbit-scan` | Koblitz | deterministic raw-abscissa scan, subgroup projection and signed Frobenius closure |
@@ -369,6 +370,90 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeProjectedAbscissaBase<'_> {
         fb.cost.count("projected_base_duplicate_points", duplicates);
         fb.cost
             .count("projected_base_column_map_entries_uncharged", 2 * size);
+        Ok(fb)
+    }
+}
+
+/// **The known-log base:** `F_G(B) = { ±[i]G : 1 ≤ i ≤ B }`, one column
+/// per `i`, the column's unknown being `log_G([i]G) = i`.
+///
+/// Every logarithm is free, so one verified relation
+/// `[a]G + [b]Q = Σ ±[iⱼ]G` gives `k` directly and the pipeline skips
+/// linear algebra (`FactorBase::known_logs`).  Construction is `B`
+/// incremental additions, charged to the base's `PhaseCost`.  The points
+/// all lie in `⟨G⟩`, so on a cofactor-`h` curve no class condition applies.
+///
+/// This is a generic precomputation table (Bernstein–Lange shape): with a
+/// membership-testing oracle it is an arbitrary set of `B` points and it
+/// cannot beat `√r`.  It is measured against the abscissa base to show how
+/// much of that base's cost is its algebra.  No security statement.
+pub struct KnownLogBase;
+
+impl FactorBaseBuilder<PrimeCurve> for KnownLogBase {
+    fn name(&self) -> &str {
+        "known-log"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "±[i]G for 1 ≤ i ≤ {}, one column each, every logarithm known",
+            params.get("size").unwrap_or("?")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[(
+            "size",
+            "multiples [i]G, 1 ≤ i ≤ size (need 2·size < r); the family optimum is about #E^(1/3)",
+        )]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<PrimePoint>, String> {
+        let size = params.u64("size")?;
+        if size == 0 {
+            return Err("factor base size must be positive".into());
+        }
+        if size.checked_mul(2).is_none_or(|t| t >= ctx.r) {
+            return Err(format!(
+                "known-log size {size} needs 2·size < r = {}, so that ±[i]G are distinct",
+                ctx.r
+            ));
+        }
+        let start = Instant::now();
+        let g = ctx.group;
+        let mut points = Vec::with_capacity(2 * size as usize);
+        let mut col_of = Vec::with_capacity(2 * size as usize);
+        let mut coef_of = Vec::with_capacity(2 * size as usize);
+        let mut multiple = ctx.generator;
+        for i in 1..=size {
+            if i > 1 {
+                multiple = g.add(ops, multiple, ctx.generator);
+            }
+            points.push(multiple);
+            col_of.push((i - 1) as usize);
+            coef_of.push(1);
+            points.push(g.neg(multiple));
+            col_of.push((i - 1) as usize);
+            coef_of.push(ctx.r - 1);
+        }
+        let mut fb = FactorBase::from_column_map(
+            format!("±[i]G, 1 ≤ i ≤ {size}"),
+            points,
+            col_of,
+            coef_of,
+            size as usize,
+            |p| g.key(p),
+            |p| g.key(&g.neg(*p)),
+            |p| p.x,
+        )?;
+        fb.known_logs = Some((1..=size).collect());
+        fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
+        fb.cost.count("known_log_additions", size.saturating_sub(1));
         Ok(fb)
     }
 }

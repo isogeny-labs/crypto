@@ -2122,8 +2122,10 @@ fn solve_ic_prime(
     let kummer = PrimeKummerBase { instance: inst };
     let isogeny = PrimeIsogenyBase { instance: inst };
     let cm_orbit = CmOrbitBase { instance: inst };
+    let known_log = crate::cryptanalysis::ic_framework::plugins::KnownLogBase;
     let base: &dyn FactorBaseBuilder<_> = match fb_name.as_str() {
         "prime-abscissa" => &abscissa,
+        "known-log" => &known_log,
         "prime-projected-abscissa" => &projected,
         "glv-orbit" => &orbit,
         "prime-kummer" => &kummer,

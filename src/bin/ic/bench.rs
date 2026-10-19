@@ -28,7 +28,7 @@ use crypto_lib::cryptanalysis::ic_boundary::{
 use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
 use crypto_lib::cryptanalysis::ic_framework::plugins::{
     BinarySubspaceBase, CompactOrbitScanBase, DescentAlgebraicOracle, FrobeniusMitmOracle,
-    GlvOrbitBase, KoblitzClosureBase, KoblitzOrbitBase, KoblitzSymmetrisedBase,
+    GlvOrbitBase, KnownLogBase, KoblitzClosureBase, KoblitzOrbitBase, KoblitzSymmetrisedBase,
     KoblitzTraceZeroBase, MitmOracle, PrimeAbscissaBase, SubtractOracle, SymmetrisedOracle,
 };
 use crypto_lib::cryptanalysis::ic_framework::solvers::{
@@ -226,6 +226,8 @@ fn listing() -> Value {
                 "plugins": [
                     {"name": "prime-abscissa", "regimes": ["prime"],
                      "parameters": [{"name": "size", "means": "abscissae in the base; the family optimum is about #E^(1/3)"}]},
+                    {"name": "known-log", "regimes": ["prime"],
+                     "parameters": [{"name": "size", "means": "multiples [i]G, 1 <= i <= size, one column each, every logarithm known so linear algebra is skipped"}]},
                     {"name": "glv-orbit", "regimes": ["prime"],
                      "parameters": [
                         {"name": "size", "means": "seed abscissae; the base is their closure under the curve's automorphism group"},
@@ -531,12 +533,14 @@ fn run_prime(
     let or_name = spec.oracle.as_str();
     let abscissa = PrimeAbscissaBase { instance: inst };
     let orbit = GlvOrbitBase { instance: inst };
+    let known_log = KnownLogBase;
     let base: &dyn FactorBaseBuilder<_> = match fb_name {
         "prime-abscissa" => &abscissa,
         "glv-orbit" => &orbit,
+        "known-log" => &known_log,
         other => {
             return Err(format!(
-                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa or glv-orbit"
+                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa, glv-orbit or known-log"
             ))
         }
     };
