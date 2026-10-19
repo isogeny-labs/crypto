@@ -1,5 +1,9 @@
 # Primary N83 chained-S3 XCNF control
 
+The [K1182/866 same-query gate](K1182_RESULT.md) evaluates the larger
+signed-Frobenius domains against the first ordinary public query. Its
+presealed 5,000, 100,000, and 1,000,000-conflict calls and independent
+receipt audit preserve the bounded point-decomposition outcome.
 The [paired K600 ordinary-query gate](NATURAL_RESULT.md) extends this
 known-witness control to the same first public query on Gray and hash pools.
 Its sealed one-million-conflict calls preserve both bounded outcomes and
