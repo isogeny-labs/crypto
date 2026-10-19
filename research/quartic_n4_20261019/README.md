@@ -101,7 +101,7 @@ phase exponents (B0): fb=0.67 relations=1.07 linear_algebra=1.15 log_recovery=0.
 
 Predictions: P1 (all verified) holds. P2 (rho `1.50 +- 0.10`) holds (1.485). P3 (IC-B0 in [1.0, 1.4]) holds
 (1.083 primary, 0.998 all sizes; phase exponents: factor base 0.69, relations 1.11, linear algebra 1.13,
-descent 0.48). P4 (A0 about 2 and above B0 for q >= 991) holds (A0r 1.985). P5 (crossover) holds: rho is cheaper below
+descent 0.48). P4 (A0 about 2 and above B0 for q >= 991) holds (A0r 1.9855). P5 (crossover) holds: rho is cheaper below
 q about 2000, the arms are unresolved at 2011 (w = 1 favours IC, w = 0 does not), IC is band-resolved lower from
 q = 4051 on.
 
@@ -110,7 +110,7 @@ relations 13% to 25% to 27%; descent falls from 55% to 13% to 1%; factor base 9%
 (`reports/phases.svg`).
 
 **Improvement over the baseline.** IC-B0 / IC-A0r cost: A0r is 2.4x B0 at q = 223, 12x at 991, 46x at 2011 and 53x at 4051
-(M-eq, from the two tables above), and 0.998 against 1.985 in exponent: reduced factor base with a large prime
+(M-eq, from the two tables above), and 0.998 against 1.9855 in exponent: reduced factor base with a large prime
 is a measured improvement of the (first valid) baseline. **Distance to rho** is the column above (ratio, with its
 interval); it is below 1 for q >= 4051 in this family.
 
