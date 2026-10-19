@@ -46,6 +46,7 @@ mod gluing;
 #[path = "../../../../src/cryptanalysis/identity_certificate.rs"]
 mod identity_certificate;
 mod klein_transfer;
+mod large_field;
 #[path = "../../../../src/cryptanalysis/curve_construction/lpoly.rs"]
 mod lpoly;
 mod modular_geometry;
@@ -53,6 +54,8 @@ mod modular_screen;
 mod n5_relations;
 mod polarized;
 mod quotient_geometry;
+mod quotients06;
+mod reverse06;
 mod round02;
 mod round03_record;
 mod round04;
@@ -60,6 +63,8 @@ mod round04_record;
 mod round04_verify;
 mod round05;
 mod round05_record;
+mod round06;
+mod round06_record;
 mod round_record;
 
 fn pow(mut a: u64, mut k: u64, p: u64) -> u64 {
@@ -336,6 +341,98 @@ fn run(out: &std::path::Path) {
     );
 }
 fn main() {
+    let round06args: Vec<String> = std::env::args().collect();
+    if round06args.get(1).map(String::as_str) == Some("--record-round06") {
+        round06_record::record(std::path::Path::new(
+            round06args.get(2).expect("fresh round records"),
+        ));
+        return;
+    }
+    if round06args.get(1).map(String::as_str) == Some("--verify-round06") {
+        let p = std::path::Path::new(round06args.get(2).expect("fresh checker outputs"));
+        quotients06::verify(p);
+        reverse06::verify(p);
+        round06::matrix_check(p);
+        return;
+    }
+    if round06args.get(1).map(String::as_str) == Some("--round06-reverse-divisor") {
+        reverse06::divisor(std::path::Path::new(
+            round06args.get(2).expect("fresh outputs"),
+        ));
+        return;
+    }
+    if round06args.get(1).map(String::as_str) == Some("--round06-split-fiber") {
+        reverse06::split_fiber(
+            std::path::Path::new(round06args.get(2).expect("fresh outputs")),
+            false,
+        );
+        return;
+    }
+    if round06args.get(1).map(String::as_str) == Some("--round06-split-fiber-negative") {
+        reverse06::split_fiber(
+            std::path::Path::new(round06args.get(2).expect("fresh outputs")),
+            true,
+        );
+        return;
+    }
+    if round06args.get(1).map(String::as_str) == Some("--round06-lean") {
+        quotients06::lean(std::path::Path::new(
+            round06args.get(2).expect("fresh outputs"),
+        ));
+        return;
+    }
+    if round06args.get(1).map(String::as_str) == Some("--round06-reverse-screen") {
+        reverse06::screen(
+            std::path::Path::new(round06args.get(2).expect("fresh outputs")),
+            false,
+        );
+        return;
+    }
+    if round06args.get(1).map(String::as_str) == Some("--round06-reverse-screen-negative") {
+        reverse06::screen(
+            std::path::Path::new(round06args.get(2).expect("fresh outputs")),
+            true,
+        );
+        return;
+    }
+    if round06args.get(1).map(String::as_str) == Some("--round06-reverse-algebras") {
+        reverse06::algebras(
+            std::path::Path::new(round06args.get(2).expect("fresh outputs")),
+            false,
+        );
+        return;
+    }
+    if round06args.get(1).map(String::as_str) == Some("--round06-reverse-algebras-negative") {
+        reverse06::algebras(
+            std::path::Path::new(round06args.get(2).expect("fresh outputs")),
+            true,
+        );
+        return;
+    }
+    if round06args.get(1).map(String::as_str) == Some("--round06-seven-fibers") {
+        round06::seven_fibers(std::path::Path::new(
+            round06args.get(2).expect("fresh outputs"),
+        ));
+        return;
+    }
+    if round06args.get(1).map(String::as_str) == Some("--round06-check-images") {
+        round06::check_images(std::path::Path::new(
+            round06args.get(2).expect("fresh outputs"),
+        ));
+        return;
+    }
+    if round06args.get(1).map(String::as_str) == Some("--round06-quotients") {
+        quotients06::run(std::path::Path::new(
+            round06args.get(2).expect("fresh outputs"),
+        ));
+        return;
+    }
+    if round06args.get(1).map(String::as_str) == Some("--round06-images") {
+        round06::images(std::path::Path::new(
+            round06args.get(2).expect("fresh outputs"),
+        ));
+        return;
+    }
     let newargs: Vec<String> = std::env::args().collect();
     if newargs.get(1).map(String::as_str) == Some("--round05-poles") {
         round05::poles(std::path::Path::new(

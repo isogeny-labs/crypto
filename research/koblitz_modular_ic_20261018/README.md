@@ -1,14 +1,17 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [05](rounds/05/README.md), with its
-[report](rounds/05/REPORT.md), [PDF](rounds/05/report.pdf),
-[proof map](rounds/05/PROOF_MAP.md), [ledger](rounds/05/ledger.json)
-and exact replay. It derives the integral n=5 reverse correspondence and
-11-primary splitting, five canonical polarized quotient constructions,
-and a level-dependent divisor with a symbolic projected row raising rank
-to 5 on 588 columns. The 44 new column images remain unevaluated; the
-evaluated matrix stays rank 4/544. Other graph equations, reverse-divisor
-evaluation and individual descent remain open. The user assesses IC implications.
+The current round is [06](rounds/06/README.md), with its
+[report](rounds/06/REPORT.md), [PDF](rounds/06/report.pdf),
+[proof map](rounds/06/PROOF_MAP.md), [ledger](rounds/06/ledger.json)
+and exact replay. All 44 degree-210 images are zero for both signs.
+The evaluated matrix has rank 5/588; its nonzero-image submatrices remain
+rank 4 on 510/520 columns. All ten frozen determinant-5 graphs now have
+split quotient equations and effective F2 descent. The even reverse map
+on one order-11 generator is evaluated as an unreduced divisor with all
+20 fibers in split/etale coordinates, degree 6,600 on each side.
+Independent pointwise forward norms, Jacobian reduction, the odd reverse
+divisor and determinant-19 quotients remain open. Fourteen new named Lean
+theorems pass. The user assesses IC implications; no timing is measured.
 
 Earlier evidence stays frozen:
 
@@ -19,6 +22,8 @@ Earlier evidence stays frozen:
   census exclusion through genus 6, polarized kernels and n=5 F32 controls.
 - [Round 04](rounds/04/README.md): natural quotient equations, global
   minimum certificates and evaluated modular rows of rank 4/544.
+- [Round 05](rounds/05/README.md): integral reverse correspondence and
+  11-primary splitting, canonical quotient constructions and symbolic rank 5/588.
 - [Open construction problem](../../problems/koblitz-modular-carrier-transfer.md):
   current obligations, exact scope, and next discriminating experiments.
 

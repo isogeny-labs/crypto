@@ -17,7 +17,7 @@ fn eta(f: Field, p: Pt) -> Option<(u32, u32)> {
     };
     Some((x, f.mul(f.sq(x) ^ x ^ 1, y) ^ x ^ 1))
 }
-fn triple(f: Field, p: Pt) -> Option<[u32; 3]> {
+pub(crate) fn triple(f: Field, p: Pt) -> Option<[u32; 3]> {
     let (x, y) = eta(f, p)?;
     if y == 0 {
         return None;
@@ -190,7 +190,7 @@ fn quotient_b(f: Field, b: u32, k: &[u32]) -> u32 {
     let t = k[k.len() - 2];
     b ^ t ^ f.sq(t)
 }
-fn kernels7(f: Field, b: u32, target: u32) -> Vec<Poly> {
+pub(crate) fn kernels7(f: Field, b: u32, target: u32) -> Vec<Poly> {
     let delta = b ^ f.inv(target);
     let Some(t) = f.quadratic(delta) else {
         return vec![];
@@ -568,7 +568,7 @@ fn weil(c: Curve, p: Pt, q: Pt) -> u32 {
     }
     panic!("Miller auxiliary budget")
 }
-fn paired_basis(c: Curve, p: Pt, q: Pt, zeta: u32) -> (Pt, u32) {
+pub(crate) fn paired_basis(c: Curve, p: Pt, q: Pt, zeta: u32) -> (Pt, u32) {
     let value = weil(c, p, q);
     assert_ne!(value, 1);
     assert_eq!(weil(c, q, p), c.f.inv(value));

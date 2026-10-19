@@ -239,3 +239,38 @@ separates18 new named Lean theorems from geometric arguments. Next gates:
 evaluate and replay the44 new images and their relation; evaluate a nonzero
 reverse pullback divisor; construct a specified unmatched graph quotient.
 No n=131 transfer, individual modular descent or IC efficiency claim follows.
+
+## Round 06: evaluated zero columns and explicit reverse coordinates
+
+[Round 06](../research/koblitz_modular_ic_20261018/rounds/06/REPORT.md)
+evaluates all 44 degree-210 columns. Both signs give zero on every column;
+the relative 14-term traces already vanish. Eight degree-7 fibers have
+constant target sum T=(0,1), checked for all 12 maps. Thus evaluated rank
+5/588 adds no constraint on the old nonzero-image columns: those matrices
+remain rank 4 on 510/520 columns. This resolves the prior image-evaluation
+gate but leaves the original richer-relation requirement open.
+
+All ten frozen determinant-5 graphs now have split E^5 equations, explicit
+torsion basis binding, effective F2 descent and positive principal
+polarizations. Their 250 kernel points and rational additions are checked.
+The old direct-natural-kernel mismatches are preserved. Expanded F2
+projective ideals, determinant-19 mixed quotients and Jacobian realization
+remain open; no bounded mismatch is treated as a nonexistence proof.
+
+The even reverse map on one order-11 generator is now evaluated as an
+unreduced divisor with all 20 pullback fibers in explicit coordinates.
+The positive seed splits into 660 points over F2^120; the negative seed
+uses 60 irreducible degree-11 point algebras. Frobenius and deck changes
+give 7,200 entries and degree 6,600 on each side, with F2 descent checked.
+The forward check uses the round05 Gram identity and evaluated targets.
+It does not independently norm-evaluate all components or reduce the
+genus-2841 Jacobian class. The odd reverse divisor also remains open.
+
+The [proof map](../research/koblitz_modular_ic_20261018/rounds/06/PROOF_MAP.md)
+records 14 new named Lean proofs and the remaining geometric bridges.
+Both failed fiber-splitting assumptions are retained. Next acceptance gates:
+independently norm-evaluate target functions on the degree-11 components;
+produce a complete principal row with nonzero new projected images from
+functions separating second-7 choices; construct and verify a mixed
+determinant-19 quotient. These are implementation/construction obligations,
+not proved obstructions. No IC timing or n=131 transfer is supplied.
