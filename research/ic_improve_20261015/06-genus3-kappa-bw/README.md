@@ -1,6 +1,6 @@
 # Round 2, item 06: a kappa schedule and block Wiedemann for genus-3 IC after the cubic GHS transfer
 
-> **R10 re-rate (2026-10-19):** the block-Wiedemann exponent claim regresses versus tuned-LP by +0.027 over 12..21; its constant gain remains but is smaller. The combination regresses by +0.042 over 16..21. The schedule's constant gain nearly vanishes. See [`pinned ledger`](../../../ic_tool_program/ledger/r10-20261019/README.md).
+> **R10 re-rate (2026-10-19):** the block-Wiedemann exponent claim regresses versus tuned-LP by +0.027 over 12..21; its constant gain remains but is smaller. The combination regresses by +0.042 over 16..21. The schedule's constant gain nearly vanishes. See [`pinned ledger`](../../ic_tool_program/ledger/r10-20261019/README.md).
 
 2026-10-15. Round rules: [../RULES.md](../RULES.md) (this item ran alone: 3 single-threaded jobs, 8 GB, 60 min each).
 Protocol, frozen before data, with amendments B0-B2: [PROTOCOL.md](PROTOCOL.md). Prior work:
