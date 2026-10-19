@@ -27,6 +27,7 @@ use crypto_lib::cryptanalysis::sat::{
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use serde_json::{json, Value};
+use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, HashSet};
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Write};
@@ -368,6 +369,100 @@ fn load_panel_selected(
 
 fn load_panel(root: &Path, columns: usize) -> Result<(PrimaryBase, Value, String)> {
     load_panel_selected(root, columns, "public_x_hash", SEEDS[0])
+}
+
+const D18_OBJECT_BLAKE3: &str = "e0c24980207cbb15fa57ec76bcfc6a628a763a80834cba1117ca83ea04678682";
+const D18_OBJECT_SHA256: &str = "347d465bef217ae5f76e9b664710440a735a26211bf3957c4be4bcb4b46345a7";
+const D18_POINT_SET_BLAKE3: &str =
+    "8c1c245cda15bdd0019b487a5535a3b7eac642c259c4dc0bae25875d87d345b0";
+const D18_SOURCE_COMMIT: &str = "b901026b6b05cd1fe9b909620d6746a5a931520c";
+
+fn load_d18_export(export_root: &Path, evidence_root: &Path) -> Result<(PrimaryBase, Value)> {
+    let manifest_bytes = fs::read(export_root.join("manifest.json"))?;
+    let replay_bytes = fs::read(export_root.join("replay.json"))?;
+    if manifest_bytes != fs::read(evidence_root.join("manifest.json"))?
+        || replay_bytes != fs::read(evidence_root.join("replay.json"))?
+    {
+        return Err("d18 export and committed evidence copies differ".into());
+    }
+    let manifest: Value = serde_json::from_slice(&manifest_bytes)?;
+    let replay: Value = serde_json::from_slice(&replay_bytes)?;
+    let custody: Value = serde_json::from_slice(&fs::read(evidence_root.join("s3-custody.json"))?)?;
+    let object = format!("objects/{D18_OBJECT_BLAKE3}.jsonl.gz");
+    let uri = format!("{PREFIX}/{STUDY}/d18-direct-subgroup-v1/a0/{object}");
+    if manifest["schema"] != "n83.direct-subgroup-orbit-export/v1"
+        || manifest["status"] != "EXPORTED_UNREPLAYED"
+        || manifest["study"] != STUDY
+        || manifest["curve_id"] != "icv1-f2m83-tm6151469093347-debefd74"
+        || manifest["policy"] != "direct_subgroup_x_d18"
+        || manifest["source_commit"] != D18_SOURCE_COMMIT
+        || manifest["columns"] != 16_627
+        || manifest["points"] != 2_760_082
+        || manifest["object"] != object
+        || manifest["compressed_blake3"] != D18_OBJECT_BLAKE3
+        || manifest["compressed_sha256"] != D18_OBJECT_SHA256
+        || manifest["point_set_blake3"] != D18_POINT_SET_BLAKE3
+        || manifest["bytes"] != 81_844_623u64
+        || manifest["selected_best_total_runtime"] != Value::Null
+        || replay["schema"] != "n83.direct-subgroup-orbit-replay/v1"
+        || replay["status"] != "PASS"
+        || replay["object"] != object
+        || replay["compressed_blake3"] != D18_OBJECT_BLAKE3
+        || replay["compressed_sha256"] != D18_OBJECT_SHA256
+        || replay["point_set_blake3"] != D18_POINT_SET_BLAKE3
+        || replay["representatives_checked"] != 16_627
+        || replay["points_checked"] != 2_760_082
+        || replay["selected_best_total_runtime"] != Value::Null
+        || custody["schema"] != "n83.d18-s3-custody/v1"
+        || custody["status"] != "PASS"
+        || custody["s3_uri"] != uri
+        || custody["source_commit"] != D18_SOURCE_COMMIT
+        || custody["curve_id"] != manifest["curve_id"]
+        || custody["manifest_expected"]["blake3"] != D18_OBJECT_BLAKE3
+        || custody["manifest_expected"]["sha256"] != D18_OBJECT_SHA256
+        || custody["manifest_expected"]["bytes"] != 81_844_623u64
+        || custody["local"] != custody["manifest_expected"]
+        || custody["fresh_get"] != custody["manifest_expected"]
+        || custody["head_content_length"] != 81_844_623u64
+        || custody["server_side_encryption"] != "AES256"
+    {
+        return Err("d18 export, replay or S3 custody binding differs".into());
+    }
+    let compressed = fs::read(export_root.join(&object))?;
+    if compressed.len() != 81_844_623
+        || format!("{:x}", Sha256::digest(&compressed)) != D18_OBJECT_SHA256
+    {
+        return Err("d18 archive length or SHA-256 differs".into());
+    }
+    let row = json!({
+        "a":0, "columns":16_627, "points":2_760_082,
+        "policy":"direct_subgroup_x_d18", "seed":0,
+        "object":object, "compressed_blake3":D18_OBJECT_BLAKE3,
+        "plain_blake3":manifest["plain_blake3"],
+        "point_set_blake3":D18_POINT_SET_BLAKE3
+    });
+    let base = from_record(&row, &load_object(export_root, &row)?)?;
+    Ok((base, row))
+}
+
+pub(super) fn check_d18_export(export_root: &Path, evidence_root: &Path) -> Result<Value> {
+    let started = Instant::now();
+    let (base, row) = load_d18_export(export_root, evidence_root)?;
+    Ok(json!({
+        "schema":"n83.primary-d18-factor-base-adapter/v1", "status":"PASS",
+        "curve_id":"icv1-f2m83-tm6151469093347-debefd74",
+        "source_commit":D18_SOURCE_COMMIT, "policy":row["policy"],
+        "adapter_source_blake3":blake3::hash(include_bytes!("primary_adapter.rs")).to_hex().to_string(),
+        "object":row["object"], "compressed_blake3":D18_OBJECT_BLAKE3,
+        "point_set_blake3":D18_POINT_SET_BLAKE3,
+        "orbit_columns":16_627, "points":base.factor_base.points.len(),
+        "frobenius_orbits":base.factor_base.orbits.len(),
+        "signed_frobenius_orbits":base.factor_base.signed_orbits.len(),
+        "import_elapsed_ms_informational_L0":started.elapsed().as_secs_f64()*1000.0,
+        "solver_stage_executed":false,
+        "total_index_calculus_runtime_ms":Value::Null,
+        "selected_best_total_runtime":Value::Null
+    }))
 }
 
 pub(super) fn check_panel(root: &Path, columns: usize) -> Result<Value> {
