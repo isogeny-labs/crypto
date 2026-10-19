@@ -2680,7 +2680,7 @@ mod tests {
     fn small(e: Elliptic, family: &str, parameter: u64) -> Option<StudyInstance> {
         let order = exhaustive_order(&e);
         let &(r, exp) = factor(order).last()?;
-        if r < 5 || exp != 1 || order / r % r == 0 {
+        if r < 5 || exp != 1 || (order / r).is_multiple_of(r) {
             return None;
         }
         let h = order / r;

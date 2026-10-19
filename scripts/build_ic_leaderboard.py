@@ -49,6 +49,7 @@ LEDGER = "research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md"
 LEDGER_COVERED_THROUGH = 23
 
 SOURCES = {
+    "three_leads": "research/three_leads_e2e_20261018/results/dashboard.json",
     "round5": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "matched_rho": "research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json",
     "matched_rho_analysis": "research/ic_rho_reference_20260923/analysis.json",
@@ -553,8 +554,11 @@ def roster(names: Names, measured: set[str]) -> list[dict]:
     for c in names.reg["curves"]:
         p = c["params"]
         if c["family"] == "prime":
-            field = f"GF(p), p = {p['p']}" if len(p["p"]) < 40 else f"GF(p), {int(p['p']).bit_length()}-bit p"
-            coeff = f"a = {p['a']}, b = {p['b']}" if len(p["p"]) < 40 else "standard coefficients"
+            field = f"GF(p), p = {p['p']}" if len(str(p["p"])) < 40 else f"GF(p), {int(p['p']).bit_length()}-bit p"
+            coeff = f"a = {p['a']}, b = {p['b']}" if len(str(p["p"])) < 40 else "standard coefficients"
+        elif c["family"] == "extension":
+            field = f"GF({p['p']}^{p.get('degree', p.get('n'))})"
+            coeff = f"a = {p.get('a')}, b = {p.get('b')}"
         else:
             m = p.get("n", p.get("m"))
             field = f"GF(2^{m})"
@@ -1068,6 +1072,7 @@ def build() -> dict:
         # Native analysis computes these observations; this view only copies
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
+        "three_leads_study": load(SOURCES["three_leads"]),
         "linear_algebra_component": la_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
@@ -1408,6 +1413,23 @@ def markdown(doc: dict) -> str:
           "its target-dependent walk and ends with scalar verification. "
           "This wall-time panel is kept separate from Tables A–C and their "
           "operation-unit S rankings.", ""]
+    study = doc["three_leads_study"]
+    L += ["", "## Three leads: fresh complete solves", "",
+          "23,952 primary solves verify, including two separate 1,260-target genus-2 cohorts. "
+          "Another 84 independent/unfiltered and 168 trace-filter controls verify. "
+          "These rows select the best tested curve/recipe after observation at S/M=.75, I/M=10. "
+          "Native work is unpriced; these cold arithmetic diagnostics sit outside Tables A–C. "
+          "All other curves and price cells remain in the frozen report.", "",
+          "| Regime | Curve/recipe | Targets | Default IC/rho-neg | 12-price band |",
+          "|:--|:--|--:|--:|--:|"]
+    for row in study["rows"]:
+        L.append(f"| {row['label']} | `{row['group']}` / {row['candidate']} | "
+                 f"{row['matched_targets']} | {row['ratio_text']} | {row['arithmetic_band_text']} |")
+    L += ["", "At actual 40-bit subgroup size the 180-target genus IC/rho-neg band is "
+          "1.421–18.362; rho wins all 12 arithmetic cells. Complete instrumented "
+          "retired-instruction ratio is 7.487 [6.657,8.372], with an identical-rho A/A "
+          "range of 0.9999703–1.0000121. No qualified wall-speed claim follows. "
+          "[Every original claim and verdict](../../research/three_leads_e2e_20261018/CLAIMS.md).", ""]
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
         L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
@@ -2061,6 +2083,25 @@ def page(doc: dict, standalone: bool) -> str:
              'This Tier 1 wall-time panel uses its own unit and sits outside the '
              'operation-unit S rankings.</p>' +
              gh(n83["source"], 'Frozen IC1 rows and candidate identities') + '</section>')
+
+    study = doc["three_leads_study"]
+    P.append('<section class="panel" id="three-leads-e2e"><h2>Three leads: fresh complete solves</h2>'
+             '<p>23,952 primary solves verify, including two separate 1,260-target genus-2 cohorts. '
+             'Another 84 independent/unfiltered and 168 trace-filter controls verify. '
+             'The table selects the best tested curve/recipe after observation at S/M=.75, I/M=10. '
+             'Native work is unpriced; these cold arithmetic diagnostics are outside Tables A–C. '
+             'All curves and prices remain visible in the frozen report.</p>'
+             '<div class="scroll"><table><thead><tr><th>Regime</th><th>Curve/recipe</th>'
+             '<th>Targets</th><th>Default IC/rho-neg</th><th>12-price band</th></tr></thead><tbody>')
+    for row in study["rows"]:
+        P.append(f'<tr><td>{esc(row["label"])}</td><td><code>{esc(row["group"])}</code> / '
+                 f'{esc(row["candidate"])}</td><td>{row["matched_targets"]}</td>'
+                 f'<td>{esc(row["ratio_text"])}</td><td>{esc(row["arithmetic_band_text"])}</td></tr>')
+    P.append('</tbody></table></div><p>At actual 40-bit subgroup size, the 180-target genus '
+             'IC/rho-neg arithmetic band is 1.421–18.362; rho wins all 12 cells. Complete '
+             'instrumented retired-instruction ratio is 7.487 [6.657,8.372], with identical-rho '
+             'A/A range 0.9999703–1.0000121. No qualified wall-speed claim follows.</p>' +
+             gh('research/three_leads_e2e_20261018/CLAIMS.md','Every original claim and verdict') + '</section>')
 
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '

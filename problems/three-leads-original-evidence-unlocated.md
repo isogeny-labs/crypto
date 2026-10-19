@@ -1,10 +1,12 @@
 # Original evidence for three supplied ECDLP leads is unlocated
 
 - **Status:** open
-- **Kind:** evidence provenance gap; incomplete numerical audit
+- **Kind:** historical evidence provenance gap; fresh end-to-end rebuild complete
 - **Affected work:** [three-leads audit](../research/three_leads_audit_20261018/README.md)
-- **Next action owner:** unassigned; source identification requested in the originating chat
-- **Last updated:** 2026-10-18
+- **Next action owner:** original evidence owner, if historical authentication is needed
+- **Last updated:** 2026-10-19
+
+The [fresh rebuild](../research/three_leads_e2e_20261018/README.md) completes all three requested routes and two 1,260-target genus-2 cohorts. Its [claim verdicts](../research/three_leads_e2e_20261018/CLAIMS.md) replace the unverified numbers with reproducible observations. This problem remains open only for exact authentication of the historical producer and raw statistics; it no longer blocks fresh implementation or cost comparisons. The earlier gap assessment below is retained as provenance.
 
 ## Problem
 

@@ -1,5 +1,7 @@
 # Audit of three ECDLP index-calculus leads
 
+2026-10-19 follow-up: [fresh end-to-end experiments](../three_leads_e2e_20261018/README.md) now include all three routes, two separate 1,260-target genus-2 cohorts, complete cold costs and [a verdict on every supplied claim](../three_leads_e2e_20261018/CLAIMS.md). This historical audit and its frozen evidence remain unchanged below; the new executions supersede its implementation gap, while the original historical raw records remain unlocated.
+
 2026-10-18. Correctness, literature and evidence audit. No new timing or
 end-to-end speedup claim. Repository base: `1e2bf0715a2a927afc92e6730d6e65b59f15ab9e`.
 
