@@ -177,6 +177,17 @@ pub fn load(root: &Path, id: &str) -> Result<(Manifest, Vec<Point>)> {
         m.point_count <= 2_000_000 && m.objects.len() <= 2_000_000,
         "archive exceeds supported limits"
     );
+    let totals = m
+        .objects
+        .iter()
+        .try_fold((0usize, 0usize), |(points, bytes), o| {
+            Some((points.checked_add(o.points)?, bytes.checked_add(o.bytes)?))
+        })
+        .context("archive totals overflow")?;
+    ensure!(
+        totals.0 == m.point_count && totals.1 <= 2_000_000_000,
+        "shard totals disagree with manifest or exceed archive cap"
+    );
     valid_id(&m.source_sha256)?;
     ensure!(
         m.curve_sha256 == digest(&canonical(&m.config.curve)?)

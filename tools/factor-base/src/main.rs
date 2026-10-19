@@ -141,6 +141,13 @@ fn compare(receipts: &[Value]) -> Result<Value> {
             .into_iter()
             .max()
             .unwrap();
+        anyhow::ensure!(
+            s["relation_yield"]
+                .as_f64()
+                .is_some_and(|y| (0.0..=1.0).contains(&y))
+                && s["base_points"].as_u64().is_some_and(|n| n > 0),
+            "invalid yield or base size in receipt"
+        );
         eligible.push(json!({"manifest_sha256":s["manifest_sha256"],"yield":s["relation_yield"],"max_measured_regularity":d,"base_points":s["base_points"]}));
     }
     let frontier = eligible

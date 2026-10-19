@@ -83,6 +83,17 @@ separate observations throughout this implementation.
 
 ## Why these designs may change the work
 
+A planning model makes the size/arity tradeoff explicit. Let B be the actual
+number of signed subgroup points and M the number of admissible m-multisets.
+Under an independent uniform-sum hypothesis, a fixed nonidentity target has
+coverage `1 - (1 - 1/(r-1))^M`, approximately `1 - exp(-M/(r-1))`.
+For large B at fixed m, `M` is roughly `B^m/m!` before inverse-pair and degeneracy
+corrections. This is a hypothesis for budgeting candidate sizes, not an
+independence claim about elliptic-curve sums. Orbit correlations, repeated sums,
+subgroup filtering, and useful matrix rank must be measured. Materialized
+Frobenius images already count in B; multiplying by the orbit size again would
+double count their contribution.
+
 Subspace and trace restrictions can reduce the variable support and eliminate
 some unproductive x-coordinates. Geometric spaces can have small multiplicative
 span. Affine shifts can change rational/subgroup retention and cover different

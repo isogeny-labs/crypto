@@ -370,6 +370,11 @@ fn archive_rejects_rehashed_false_metadata() {
     let false_id = digest(&bytes);
     write_once(&manifest_path(&root, &false_id).unwrap(), &bytes).unwrap();
     assert!(verify(&root, &false_id).is_err());
+    m.objects[0].points += 1;
+    let bytes = canonical(&m).unwrap();
+    let bad_count = digest(&bytes);
+    write_once(&manifest_path(&root, &bad_count).unwrap(), &bytes).unwrap();
+    assert!(load(&root, &bad_count).is_err());
     std::fs::remove_dir_all(root).unwrap();
 }
 #[test]
@@ -470,6 +475,10 @@ fn regularity_and_comparison_keep_missing_values() {
         .as_array()
         .unwrap()
         .is_empty());
+    let mut malformed = r.clone();
+    malformed["semantic"]["base_points"] = json!("invalid");
+    malformed["semantic_sha256"] = json!(digest(&canonical(&malformed["semantic"]).unwrap()));
+    assert!(compare(&[malformed]).is_err());
     let mut w = workload();
     w.regularity_variable_cap = 2;
     let missing = evaluate(&root, &id, &w).unwrap();

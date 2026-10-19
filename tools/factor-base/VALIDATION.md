@@ -55,6 +55,25 @@ checks; no matched large-field yield or regularity improvement is asserted.
 All recorded wall times are unqualified implementation diagnostics. They were
 not measured on an isolated benchmark host and are not used for comparisons.
 
+## Frozen producer source
+
+The four S3 archives record construction source digest
+`160dc6381095685772a6cf699d1da73459b467676c6bbe31fea63a6fbec7609d`.
+The exact Rust sources, tests, Cargo manifest, and lockfile are retained in
+`validation/source-160dc6381095685772a6cf699d1da73459b467676c6bbe31fea63a6fbec7609d.tar.gz`,
+whose archive SHA-256 is
+`1726d36761e3d42febf4446f850cbeda20a8fe07de125d25dfcb10d1ccbce098`.
+The final working package removes an extra blank line and adds early archive-total
+and malformed-comparison checks. Its source digest differs while the construction
+and measurement algorithms are unchanged. The original producer snapshot and
+published artifacts remain intact; replay with the final source is recorded
+separately.
+
+The source bundle and `validation/catalog.json` remain local pending explicit
+approval for the additional S3 upload. Automatic approval review rejected that
+upload as additional source/payload disclosure beyond the factor-base data.
+The catalog's source key is a proposed destination, not an uploaded-object claim.
+
 ## Separate repository publication gate
 
 The enclosing repository's required `cargo test --release --lib --offline` was
