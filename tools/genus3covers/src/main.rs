@@ -95,6 +95,19 @@ fn int_list(v: &Value, expected: Option<usize>) -> bool {
     }
 }
 
+fn field_polynomial_shape(v: &Value) -> bool {
+    let Value::List(items) = v else {
+        return false;
+    };
+    // Magma's Coefficients returns constant-first coefficients through the
+    // actual degree. A zero last coefficient cannot describe that degree;
+    // in particular [0,0] must not pass as a degree-one field polynomial.
+    int_list(v, None)
+        && (2..=5).contains(&items.len())
+        && matches!(items.last(), Some(Value::Int(n))
+            if n.trim_start_matches('-').bytes().any(|digit| digit != b'0'))
+}
+
 fn parse_row(line: &str) -> Result<Row, String> {
     let f = top_fields(line)?;
     let job_id = f[0].parse::<u64>().map_err(|_| "invalid job id")?;
@@ -124,9 +137,10 @@ fn parse_row(line: &str) -> Result<Row, String> {
     if conductor == 0 || discriminant == 0 || !int_list(&elliptic, Some(5)) {
         return Err("invalid elliptic model, conductor, or discriminant".into());
     }
-    let degree_ok = matches!(&field_polynomial, Value::List(items) if (2..=5).contains(&items.len()) && items.iter().all(|item| matches!(item, Value::Int(_))));
-    if !degree_ok {
-        return Err("field polynomial must have degree 1 to 4".into());
+    if !field_polynomial_shape(&field_polynomial) {
+        return Err(
+            "field polynomial must have degree 1 to 4 with a nonzero leading coefficient".into(),
+        );
     }
     let (whole, fraction) = f[8].split_once('.').unwrap_or((f[8], ""));
     if whole.is_empty()
@@ -232,6 +246,35 @@ mod tests {
         assert!(parse_row(&SAMPLE.replace(":256:", ":0:")).is_err());
         assert!(parse_row(&SAMPLE.replace("[0,1,-4", "[0,?,-4")).is_err());
         assert!(parse_row(&SAMPLE.replace("0.050", "-1.0")).is_err());
+    }
+
+    #[test]
+    fn rejects_zero_or_untrimmed_field_polynomials() {
+        for coefficients in [
+            "[]",
+            "[1]",
+            "[0,0]",
+            "[0,-0]",
+            "[0,00]",
+            "[0,1,0]",
+            "[0,1,-000]",
+            "[0,1,2,3,4,5]",
+        ] {
+            let row = SAMPLE.replace(":1:[0,1]:", &format!(":1:{coefficients}:"));
+            let err = parse_row(&row).unwrap_err();
+            assert!(err.contains("field polynomial"), "{coefficients}: {err}");
+        }
+        // The guard is a degree/representation check, not an integer-size
+        // limit or an irreducibility certificate.
+        for coefficients in [
+            "[0,1]",
+            "[1,0,-1]",
+            "[0,0,0,0,1]",
+            "[0,1844674407370955161600000000000000000001]",
+        ] {
+            let row = SAMPLE.replace(":1:[0,1]:", &format!(":1:{coefficients}:"));
+            parse_row(&row).unwrap_or_else(|err| panic!("{coefficients}: {err}"));
+        }
     }
 
     #[test]

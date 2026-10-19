@@ -44,3 +44,10 @@ The importer exits with code 2 on invalid input and identifies the first bad
 line. `source_line` in JSONL is one-based. Each imported row is a candidate
 record; connecting it to a repository curve identity, a checked map, Prym
 arithmetic, or an ECDLP transfer requires separate validation.
+
+The field-polynomial coefficient list is constant-first and ends at a
+nonzero leading coefficient, as Magma's `Coefficients` does. Zero polynomials
+and lists padded with high-degree zeroes are rejected, including `-0` and
+`00` spellings. This checks degree representation, not irreducibility.
+See the [dated review](../../research/genus3covers_upstream_20261018/REVIEW-20261019.md)
+and [visual report](../../research/genus3covers_upstream_20261018/review-20261019.pdf).

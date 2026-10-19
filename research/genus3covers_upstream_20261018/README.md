@@ -1,5 +1,9 @@
 # Genus3Covers ingestion record
 
+Review follow-up: [source/parser audit](REVIEW-20261019.md),
+[candidate-count and validation-boundary figure](review-20261019.svg),
+and [PDF](review-20261019.pdf). Original upstream artifacts are unchanged.
+
 ## Scope and provenance
 
 Upstream: [AndrewVSutherland/Genus3Covers](https://github.com/AndrewVSutherland/Genus3Covers),
