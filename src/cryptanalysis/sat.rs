@@ -1771,12 +1771,63 @@ impl Solver {
     where
         F: FnMut(&[Option<bool>]) -> Option<Vec<Vec<Lit>>>,
     {
+        let trace = (std::env::var("N83_SAT_PHASE_TRACE").as_deref() == Ok("1"))
+            .then(std::time::Instant::now);
+        self.trace_solve_phase(trace, "solve_enter", None);
+        let outcome = self.solve_with_lazy_clauses_inner(trigger_vars, theory, trace);
+        self.trace_solve_phase(trace, "solve_return", Some(outcome));
+        outcome
+    }
+
+    /// Opt-in diagnostic snapshots. Timers and counters are cumulative for this
+    /// solver instance; elapsed time is relative to this particular solve call.
+    /// Writing only at boundaries and every 1,000 conflicts avoids a per-step
+    /// trace cost. A killed worker's last snapshot is not a terminal counter.
+    fn trace_solve_phase(
+        &self,
+        started: Option<std::time::Instant>,
+        phase: &str,
+        outcome: Option<SolveResult>,
+    ) {
+        if let Some(started) = started {
+            use std::io::Write;
+            let record = serde_json::json!({
+                "schema":"n83.sat-phase/v1", "phase":phase,
+                "elapsed_ms":started.elapsed().as_secs_f64()*1000.0,
+                "outcome":outcome.map(|v| format!("{v:?}")),
+                "counter_scope":"solver_instance_cumulative",
+                "conflicts":self.stats.conflicts, "decisions":self.stats.decisions,
+                "propagations":self.stats.propagations, "xor_passes":self.stats.xor_passes,
+                "xor_propagations":self.stats.xor_propagations,
+                "ns_propagate_clauses":self.stats.ns_propagate_clauses,
+                "ns_propagate_xors":self.stats.ns_propagate_xors,
+                "ns_analyze":self.stats.ns_analyze, "ns_minimize":self.stats.ns_minimize,
+                "ns_reduce_db":self.stats.ns_reduce_db,
+            });
+            let mut stderr = std::io::stderr().lock();
+            let _ = writeln!(stderr, "{record}");
+            let _ = stderr.flush();
+        }
+    }
+
+    fn solve_with_lazy_clauses_inner<F>(
+        &mut self,
+        trigger_vars: &[u32],
+        theory: &mut F,
+        trace: Option<std::time::Instant>,
+    ) -> SolveResult
+    where
+        F: FnMut(&[Option<bool>]) -> Option<Vec<Vec<Lit>>>,
+    {
         if self.is_unsat {
             return SolveResult::Unsat;
         }
         // Initial propagation at level 0 catches trivial UNSAT from
         // unit clauses.
-        if self.propagate().is_some() {
+        self.trace_solve_phase(trace, "initial_propagation_begin", None);
+        let initial_conflict = self.propagate().is_some();
+        self.trace_solve_phase(trace, "initial_propagation_complete", None);
+        if initial_conflict {
             return SolveResult::Unsat;
         }
         if self.max_learnts == 0 {
@@ -1786,10 +1837,16 @@ impl Solver {
         let mut luby_index = 1u64;
         let mut restart_limit = 100u64 * luby(luby_index);
         let mut pending_conflict = None;
+        self.trace_solve_phase(trace, "cdcl_enter", None);
         loop {
             if let Some(conflict_idx) = pending_conflict.take().or_else(|| self.propagate()) {
                 self.conflicts += 1;
                 self.stats.conflicts += 1;
+                if trace.is_some()
+                    && (self.stats.conflicts == 1 || self.stats.conflicts % 1000 == 0)
+                {
+                    self.trace_solve_phase(trace, "conflict_snapshot", None);
+                }
                 let lvl = self.trail_lim.len() as u64;
                 self.stats.conflict_level_sum += lvl;
                 self.stats.max_level = self.stats.max_level.max(lvl);

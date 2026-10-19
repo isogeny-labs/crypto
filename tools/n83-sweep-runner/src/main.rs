@@ -13,12 +13,15 @@ use std::{
     time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 type R<T> = Result<T, Box<dyn Error>>;
-const SOURCES: [&str; 5] = [
+const SOURCES: [&str; 8] = [
     "examples/koblitz_n83_factor_base_export.rs",
     "research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs",
     "src/cryptanalysis/binary_semaev_chain_sat.rs",
     "src/cryptanalysis/koblitz_index_calculus.rs",
     "research/koblitz_n83_factor_base_sweep_20261008/size-frontier-v2.json",
+    "src/cryptanalysis/sat.rs",
+    "examples/koblitz_n83_fixed_witness_control.rs",
+    "examples/koblitz_n83_selector_witness_control.rs",
 ];
 fn require(ok: bool, msg: &str) -> R<()> {
     if !ok {
@@ -45,6 +48,58 @@ fn text<'a>(v: &'a Value, k: &str) -> R<&'a str> {
 fn number(v: &Value, k: &str) -> R<u64> {
     v[k].as_u64()
         .ok_or_else(|| format!("missing integer {k}").into())
+}
+// A single solve's completed boundaries or valid killed-worker prefix.
+// Snapshot counters remain observations; only solve_return is terminal.
+fn sat_trace(raw: &str) -> R<Value> {
+    let mut events = Vec::new();
+    let mut state = 0;
+    let mut last_ms = 0.;
+    let mut last_conflicts = 0;
+    for line in raw.lines() {
+        let Ok(v) = serde_json::from_str::<Value>(line) else {
+            continue;
+        };
+        if v["schema"] != "n83.sat-phase/v1" {
+            continue;
+        }
+        let phase = text(&v, "phase")?;
+        let next = match (state, phase) {
+            (0, "solve_enter") => 1,
+            (1, "initial_propagation_begin") => 2,
+            (2, "initial_propagation_complete") => 3,
+            (3, "cdcl_enter") => 4,
+            (4, "conflict_snapshot") => 4,
+            (1 | 3 | 4, "solve_return") => 5,
+            _ => return Err("invalid SAT phase sequence".into()),
+        };
+        let ms = v["elapsed_ms"].as_f64().ok_or("missing SAT time")?;
+        let conflicts = number(&v, "conflicts")?;
+        require(
+            ms.is_finite() && ms >= last_ms && conflicts >= last_conflicts,
+            "SAT trace time/counter regressed",
+        )?;
+        require(
+            v["counter_scope"] == "solver_instance_cumulative",
+            "SAT counter scope differs",
+        )?;
+        if next == 5 {
+            require(
+                ["Sat", "Unsat", "Unknown"].contains(&text(&v, "outcome")?),
+                "SAT outcome missing",
+            )?;
+        } else {
+            require(v["outcome"].is_null(), "premature SAT outcome")?;
+        }
+        state = next;
+        last_ms = ms;
+        last_conflicts = conflicts;
+        events.push(v);
+    }
+    require(!events.is_empty(), "no native SAT trace")?;
+    Ok(
+        json!({"schema":"n83.sat-trace-audit/v1","status":if state==5 {"COMPLETE"} else {"VALID_PREFIX_NONTERMINAL"},"events":events,"terminal_counters":if state==5 {events.last().cloned()} else {None}}),
+    )
 }
 fn inventory(root: &Path) -> R<BTreeMap<String, String>> {
     fn walk(root: &Path, p: &Path, m: &mut BTreeMap<String, String>) -> R<()> {
@@ -315,12 +370,29 @@ fn audit(dir: &Path) -> R<Value> {
     )?;
     let raw = fs::read_to_string(dir.join("stderr.log"))?;
     if cfg["columns"] == 0 {
+        let sat = sat_trace(&raw)?;
         if out["wall_censored"] == true {
             return Ok(
-                json!({"schema":"n83.native-audit/v1","status":"UNKNOWN_CONTROL_WALL_CAP","terminal_counters":null,"outer_wall_ms":out["outer_wall_ms"],"selected_best_total_runtime":null}),
+                json!({"schema":"n83.native-audit/v1","status":"UNKNOWN_CONTROL_WALL_CAP","sat_trace":sat,"terminal_counters":null,"outer_wall_ms":out["outer_wall_ms"],"selected_best_total_runtime":null}),
             );
         }
         let result: Value = serde_json::from_slice(&fs::read(dir.join("stdout.log"))?)?;
+        if cfg["control_variant"] == "fixed_coordinates_free_selectors"
+            && result["status"] == "UNKNOWN_conflict_cap"
+        {
+            require(
+                sat["status"] == "COMPLETE"
+                    && sat["terminal_counters"]["outcome"] == "Unknown"
+                    && result["conflicts"] == cfg["conflicts"]
+                    && sat["terminal_counters"]["conflicts"] == cfg["conflicts"]
+                    && out["exit_code"] == 0,
+                "control cap/trace disagree",
+            )?;
+            return Ok(
+                json!({"schema":"n83.native-audit/v1","status":"UNKNOWN_CONTROL_CONFLICT_CAP","sat_trace":sat,"control":result,"outer_wall_ms":out["outer_wall_ms"],"selected_best_total_runtime":null}),
+            );
+        }
+        require(cfg["control_variant"] != "fixed_coordinates_free_selectors", "free-selector positive terminal requires independent decoded selector replay; preserved but not admitted")?;
         let panel = Path::new(text(&cfg, "panel")?);
         let fixture_bytes = fs::read(panel.join("fixture.json"))?;
         require(
@@ -391,7 +463,7 @@ fn audit(dir: &Path) -> R<Value> {
             "control capped or conflicts exceeded",
         )?;
         return Ok(
-            json!({"schema":"n83.native-audit/v1","status":"PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM","control":result,"outer_wall_ms":out["outer_wall_ms"],"natural_relations":null,"selected_best_total_runtime":null}),
+            json!({"schema":"n83.native-audit/v1","status":"PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM","sat_trace":sat,"control":result,"outer_wall_ms":out["outer_wall_ms"],"natural_relations":null,"selected_best_total_runtime":null}),
         );
     }
     let ps = phases(&raw)?;
@@ -638,6 +710,7 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         "--tmpfs=/tmp:rw,noexec,nosuid,size=64m".into(),
         "--env=ICV1_FROZEN_SOURCE_DIR=/source".into(),
         "--env=N83_CHAIN_PHASE_TRACE=1".into(),
+        "--env=N83_SAT_PHASE_TRACE=1".into(),
     ];
     let owner = fs::metadata(&dir)?;
     cmd.extend(["--user".into(), format!("{}:{}", owner.uid(), owner.gid())]);
@@ -750,6 +823,10 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
 fn main() -> R<()> {
     let a: Vec<_> = std::env::args().collect();
     match a.get(1).map(String::as_str) {
+        Some("check-sat-trace") if a.len() == 3 => {
+            println!("{}", sat_trace(&fs::read_to_string(&a[2])?)?);
+            Ok(())
+        }
         Some("check-positive-trace") if a.len() == 3 => {
             let raw = fs::read_to_string(&a[2])?;
             let mut group = String::new();
@@ -795,7 +872,11 @@ fn main() -> R<()> {
             }
         }
         Some("card-check") if a.len() == 4 => card::check(Path::new(&a[2]), Path::new(&a[3])),
-        Some("freeze") if a.len() == 12 => {
+        Some("freeze") | Some("freeze-free-selector") if a.len() == 12 => {
+            require(
+                a[1] != "freeze-free-selector" || a[7] == "0",
+                "free-selector freeze requires control columns=0",
+            )?;
             let checkout = fs::canonicalize(&a[2])?;
             let commit = Command::new("git")
                 .args(["rev-parse", "HEAD"])
@@ -807,7 +888,7 @@ fn main() -> R<()> {
             let worker = fs::canonicalize(&a[5])?;
             write(
                 &a[11],
-                &json!({"control_variant":if a[7]=="0" {"fixed_coordinates_representatives_and_phases"}else{"retained_natural_query"},"checkout":checkout,"panel":panel,"fixtures":fixtures,"worker":worker,"image":a[6],"columns":a[7].parse::<u64>()?,"conflicts":a[8].parse::<u64>()?,"wall_seconds":a[9].parse::<u64>()?,"protocol_sha256":a[10],"source_commit":String::from_utf8(commit.stdout)?.trim(),"worker_blake3":hash(&worker)?,"runner_blake3":hash(std::env::current_exe()?)?,"panel_blake3":inventory(&panel)?,"fixtures_blake3":inventory(&fixtures)?}),
+                &json!({"control_variant":if a[1]=="freeze-free-selector" {"fixed_coordinates_free_selectors"}else if a[7]=="0" {"fixed_coordinates_representatives_and_phases"}else{"retained_natural_query"},"checkout":checkout,"panel":panel,"fixtures":fixtures,"worker":worker,"image":a[6],"columns":a[7].parse::<u64>()?,"conflicts":a[8].parse::<u64>()?,"wall_seconds":a[9].parse::<u64>()?,"protocol_sha256":a[10],"source_commit":String::from_utf8(commit.stdout)?.trim(),"worker_blake3":hash(&worker)?,"runner_blake3":hash(std::env::current_exe()?)?,"panel_blake3":inventory(&panel)?,"fixtures_blake3":inventory(&fixtures)?}),
             )
         }
         Some("run") if a.len() == 4 => run(Path::new(&a[2]), Path::new(&a[3])),
@@ -868,4 +949,49 @@ mod tests {
         }
         assert!(zero_counters(&r, 999).is_err());
     }
+}
+#[test]
+fn sat_trace_distinguishes_censoring_and_rejects_forged_order() {
+    let event = |phase: &str, ms: f64, conflicts: u64, outcome: Value| {
+        json!({"schema":"n83.sat-phase/v1","phase":phase,"elapsed_ms":ms,"conflicts":conflicts,"outcome":outcome,"counter_scope":"solver_instance_cumulative"}).to_string()
+    };
+    let enter = event("solve_enter", 0., 0, Value::Null);
+    let begin = event("initial_propagation_begin", 1., 0, Value::Null);
+    let complete = event("initial_propagation_complete", 2., 0, Value::Null);
+    let cdcl = event("cdcl_enter", 3., 0, Value::Null);
+    let snapshot = event("conflict_snapshot", 4., 1000, Value::Null);
+    let returned = event("solve_return", 5., 1000, json!("Unknown"));
+    let prefix = [
+        enter.clone(),
+        begin.clone(),
+        complete.clone(),
+        cdcl.clone(),
+        snapshot.clone(),
+    ]
+    .join("\n");
+    let audit = sat_trace(&prefix).unwrap();
+    assert_eq!(audit["status"], "VALID_PREFIX_NONTERMINAL");
+    assert!(audit["terminal_counters"].is_null());
+    assert_eq!(
+        sat_trace(&format!("{prefix}\n{returned}")).unwrap()["terminal_counters"]["conflicts"],
+        1000
+    );
+    assert!(sat_trace(&[enter.clone(), cdcl.clone()].join("\n")).is_err());
+    assert!(sat_trace(&format!(
+        "{prefix}\n{}",
+        event("conflict_snapshot", 5., 999, Value::Null)
+    ))
+    .is_err());
+    assert!(sat_trace(
+        &[
+            enter,
+            begin,
+            complete,
+            cdcl,
+            event("solve_return", 1., 0, json!("Sat"))
+        ]
+        .join("\n")
+    )
+    .is_err());
+    assert!(sat_trace("").is_err());
 }

@@ -1,5 +1,10 @@
 # Degree-83 factor-base sweep: observed evidence
 
+The [approved 49 MB native bundle](verification/native-phase-publication-20261019/RESULT.md)
+is now published to `setec-astronomy-artifacts`: a fresh download verified
+the archive, manifest and all 308 payload files. Frozen earlier pending
+and rejected-publication records remain historical.
+
 The [19 October native continuation](verification/native-phase-20261019-v3/RESULT.md)
 completed matched retained K2048 and K4096 diagnostics at 1,000 conflicts,
 with zero models, relations and rank in each. Actual public-query replay,

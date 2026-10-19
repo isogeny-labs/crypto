@@ -1,5 +1,8 @@
 # Factor-base sweep for degree-83 Koblitz index calculus
 
+Storage addendum: the [approved 49 MB native evidence bundle](verification/native-phase-publication-20261019/RESULT.md)
+is published and all 308 payload files passed fresh-download verification.
+
 Latest: the [19 October native retained-base continuation](verification/native-phase-20261019-v3/RESULT.md)
 completed K2048/K4096 at the matched 1,000-conflict bound with zero models,
 relations and rank. The [approved historical raw ZIP](verification/raw-approved-publication-20261019/RESULT.md)
