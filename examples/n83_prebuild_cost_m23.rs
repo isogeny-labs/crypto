@@ -24,6 +24,7 @@ const U_OBJECT: &str = "1aa70cc1571f4cb25af42936699378329128a869f2ae8ad35efb3756
 const D_OBJECT: &str = "e0c24980207cbb15fa57ec76bcfc6a628a763a80834cba1117ca83ea04678682";
 const U_POINT_SET: &str = "564c6bb72b346b73112240bb0bddc4ef68b7525f7ef2556d6046e52c32f976e0";
 const D_POINT_SET: &str = "8c1c245cda15bdd0019b487a5535a3b7eac642c259c4dc0bae25875d87d345b0";
+const D_LABELED_ROWS: &str = "805d1cbc65cac0a74ebf49315b8c17b0d5229bdceba5725ba4349fb1cc6c9e9c";
 const PUBLIC_SHA256: &str = "2895a78d28935a992d8d6155492eae928e165eafcc622e6c866080b8f91e70b5";
 const PUBLIC_0: Words = (1834913121178197242856238, 8797964190732846213981377);
 
@@ -531,6 +532,7 @@ fn pair_words(seed: u64, target: u32, ordinal: u64) -> (usize, usize) {
 }
 
 fn probe(
+    prepare_mode: &str,
     arm: &str,
     root: &Path,
     corpus: &Path,
@@ -540,6 +542,11 @@ fn probe(
 ) -> Result<()> {
     if ![2, 3].contains(&m) || target_index >= 8 {
         return Err("m or target outside protocol".into());
+    }
+    if !matches!(prepare_mode, "prebuilt" | "ondemand")
+        || (prepare_mode == "ondemand" && arm != "D")
+    {
+        return Err("base preparation mode outside protocol".into());
     }
     let started = Instant::now();
     let progress = PathBuf::from(format!("{}.progress.jsonl", output.display()));
@@ -555,18 +562,31 @@ fn probe(
     serde_json::to_writer(
         &mut progress_file,
         &json!({
-            "schema":"n83.m23-progress/v1","phase":"import",
+            "schema":"n83.m23-progress/v1","phase":if prepare_mode=="prebuilt" {"import"} else {"prepare"},
             "arm":arm,"m":m,"target_index":target_index,"completed":0,
+            "base_prepare_mode":prepare_mode,
             "elapsed_ms":0.0
         }),
     )?;
     progress_file.write_all(b"\n")?;
     progress_file.sync_all()?;
-    let base = load_base(arm, root)?;
-    let import_ms = started.elapsed().as_secs_f64() * 1000.0;
+    let (base, enumeration_ms, closure_index_ms) = if prepare_mode == "ondemand" {
+        generate_d18()?
+    } else {
+        (load_base(arm, root)?, 0.0, 0.0)
+    };
+    let prepare_ms = started.elapsed().as_secs_f64() * 1000.0;
+    let label_validation_started = Instant::now();
+    let label_hash = labeled_rows_hash(&base);
+    if arm == "D" && label_hash != D_LABELED_ROWS {
+        return Err("D labeled-row digest differs".into());
+    }
+    let label_validation_ms = label_validation_started.elapsed().as_secs_f64() * 1000.0;
+    let public_validation_started = Instant::now();
     let public = public_targets(corpus)?;
     let target = public[target_index];
     let (kc, fast) = curve()?;
+    let public_validation_ms = public_validation_started.elapsed().as_secs_f64() * 1000.0;
     let mut rank = RankTracker::new(kc.subgroup_order.clone());
     let mut seen = HashSet::<Vec<usize>>::new();
     let mut checked = 0usize;
@@ -588,6 +608,7 @@ fn probe(
     )?;
     progress_file.write_all(b"\n")?;
     progress_file.sync_all()?;
+    let query_started = Instant::now();
     for ordinal in 0..total {
         let pair = if m == 2 {
             None
@@ -658,13 +679,19 @@ fn probe(
     } else {
         "UNKNOWN_budget"
     };
+    let query_ms = query_started.elapsed().as_secs_f64() * 1000.0;
     let (peak_rss_bytes, process_cpu_seconds) = resource_usage();
     write_new_json(
         output,
         &json!({"schema":"n83.m23-probe/v1", "status":status,
         "arm":arm,"m":m,"target_index":target_index,"completed":checked,"total":total,
         "relations":relations,"duplicate_relation_hits":duplicate,
-        "independent_rows":independent,"rank":rank.rank(),"base_import_index_ms":import_ms,
+        "independent_rows":independent,"rank":rank.rank(),
+        "base_prepare_mode":prepare_mode,"base_prepare_ms":prepare_ms,
+        "base_import_index_ms":if prepare_mode=="prebuilt" {Some(prepare_ms)} else {None},
+        "on_demand_enumeration_ms":enumeration_ms,"on_demand_closure_index_ms":closure_index_ms,
+        "label_validation_ms":label_validation_ms,"labeled_rows_blake3":label_hash,
+        "public_validation_ms":public_validation_ms,"query_ms":query_ms,
         "progress_file":progress.file_name().ok_or("progress name")?.to_string_lossy(),
         "relation_receipts_file":relation_receipts.file_name().ok_or("relation receipt name")?.to_string_lossy(),
         "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
@@ -691,6 +718,12 @@ fn replay(arm: &str, root: &Path, corpus: &Path, worker: &Path, output: &Path) -
     {
         return Err("worker receipt identity or status differs".into());
     }
+    let prepare_mode = receipt["base_prepare_mode"].as_str().unwrap_or("prebuilt");
+    if !matches!(prepare_mode, "prebuilt" | "ondemand")
+        || (prepare_mode == "ondemand" && arm != "D")
+    {
+        return Err("worker base preparation mode differs".into());
+    }
     let expected_total = if m == 2 { POINTS } else { 1 << 20 };
     let completed = receipt["completed"]
         .as_u64()
@@ -707,7 +740,7 @@ fn replay(arm: &str, root: &Path, corpus: &Path, worker: &Path, output: &Path) -
         .map(|line| Ok(serde_json::from_str::<Value>(&line?)?))
         .collect::<Result<_>>()?;
     if progress_lines.len() < 2
-        || progress_lines[0]["phase"] != "import"
+        || !["import", "prepare"].contains(&progress_lines[0]["phase"].as_str().unwrap_or(""))
         || progress_lines[1]["phase"] != "query"
         || progress_lines
             .last()
@@ -737,6 +770,11 @@ fn replay(arm: &str, root: &Path, corpus: &Path, worker: &Path, output: &Path) -
         || receipt["point_set_blake3"] != base.point_set_blake3
     {
         return Err("worker base identity differs".into());
+    }
+    if receipt["labeled_rows_blake3"].is_string()
+        && receipt["labeled_rows_blake3"] != labeled_rows_hash(&base)
+    {
+        return Err("worker labeled rows differ from independent archive".into());
     }
     let public = public_targets(corpus)?;
     let target = public[target_index];
@@ -873,11 +911,13 @@ fn main() -> Result<()> {
     match args.get(1).map(String::as_str) {
         Some("targets") if args.len()==4 => targets(Path::new(&args[2]),Path::new(&args[3])),
         Some("setup") if args.len()==5 => setup(&args[2],Path::new(&args[3]),Path::new(&args[4])),
-        Some("probe") if args.len()==8 => probe(&args[2],Path::new(&args[3]),Path::new(&args[4]),
+        Some("probe") if args.len()==8 => probe("prebuilt",&args[2],Path::new(&args[3]),Path::new(&args[4]),
             args[5].parse()?,args[6].parse()?,Path::new(&args[7])),
+        Some("probe-mode") if args.len()==9 => probe(&args[2],&args[3],Path::new(&args[4]),Path::new(&args[5]),
+            args[6].parse()?,args[7].parse()?,Path::new(&args[8])),
         Some("replay") if args.len()==7 => replay(&args[2],Path::new(&args[3]),Path::new(&args[4]),Path::new(&args[5]),Path::new(&args[6])),
         Some("control") if args.len()==6 => control(&args[2],Path::new(&args[3]),args[4].parse()?,Path::new(&args[5])),
-        _ => Err("usage: n83_prebuild_cost_m23 targets NEW_PUBLIC_JSON NEW_VALIDATION_JSON | setup prebuilt|ondemand D_BASE_DIR NEW_RESULT_JSON | probe U|D BASE_DIR PUBLIC_JSON TARGET_INDEX 2|3 NEW_RESULT_JSON | replay U|D BASE_DIR PUBLIC_JSON WORKER_JSON NEW_REPLAY_JSON | control U|D BASE_DIR 2|3 NEW_RESULT_JSON".into())
+        _ => Err("usage: n83_prebuild_cost_m23 targets NEW_PUBLIC_JSON NEW_VALIDATION_JSON | setup prebuilt|ondemand D_BASE_DIR NEW_RESULT_JSON | probe U|D BASE_DIR PUBLIC_JSON TARGET_INDEX 2|3 NEW_RESULT_JSON | probe-mode prebuilt|ondemand D BASE_DIR PUBLIC_JSON TARGET_INDEX 2|3 NEW_RESULT_JSON | replay U|D BASE_DIR PUBLIC_JSON WORKER_JSON NEW_REPLAY_JSON | control U|D BASE_DIR 2|3 NEW_RESULT_JSON".into())
     }
 }
 
