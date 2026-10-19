@@ -36,3 +36,16 @@ models. Missing references/isolation limit claims rather than cancel work.
 No natural-yield or full-cold winner follows from this profile. Record the
 run in a source-linked visual/PDF and publish the complete raw archive to
 the user-selected S3 bucket with fresh-download verification.
+
+## Separate early-work diagnostic (2026-10-19)
+
+The original 180-second profile was censored with unknown terminal counters;
+its stopped card, logs and cleanup evidence remain unchanged. Freeze one
+additional diagnostic with exactly one conflict and a 90-second wall cap,
+otherwise identical constraints and worker. Allocation 90 seconds; command
+cap150 seconds. Expected native disposition UNKNOWN_CONTROL_CONFLICT_CAP;
+runner exit1 is accepted only as a recorded diagnostic termination, never a
+positive SAT control. Inspect the typed audit before interpreting counters.
+This is a distinct workload, not a retry or timing comparison. No reruns.
+Later matched baseline/candidate controls use a separately declared360-second
+cap so the earlier censored observation cannot be silently discarded.
