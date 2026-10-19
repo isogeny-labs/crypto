@@ -26,7 +26,7 @@ string key(CSV& f,const vector<string>& columns){string k;for(auto c:columns)k+=
 struct Group {array<vector<double>,6> v;set<int> targets;};
 void check_stats(CSV& f,vector<double> a) {
     sort(a.begin(),a.end());long double sum=0;for(auto x:a)sum+=x;double mean=sum/a.size();
-    double median=(a[(a.size()-1)/2]+a[a.size()/2])/2;long double sq=0;for(auto x:a)sq+=(x-mean)*(x-mean);
+    double median=static_cast<double>((static_cast<long double>(a[(a.size()-1)/2])+a[a.size()/2])/2);long double sq=0;for(auto x:a){long double delta=static_cast<long double>(x)-mean;sq+=delta*delta;}
     double sd=sqrt(double(sq/(a.size()-1)));
     check(int(f.d("n"))==int(a.size()),"summary n");
     check(close(f.d("min"),a.front())&&close(f.d("max"),a.back()),"summary extrema");
