@@ -27,11 +27,26 @@ impl Reservation {
             eviction,
             original,
         };
-        let preflight = iso::preflight(&guard.plan, &iso::Thresholds::default());
+        // Preflight samples are readiness observations, never worker retries.
+        // Hold the reservation while transient kernel activity settles, with
+        // a strict bound; preserve every sample, including failed ones.
+        let settle_started = std::time::Instant::now();
+        let mut preflights = Vec::new();
+        let preflight = loop {
+            let sample = iso::preflight(&guard.plan, &iso::Thresholds::default());
+            let ready = sample.quiet;
+            preflights.push(serde_json::to_value(&sample)?);
+            if ready
+                || guard.eviction.summary.failed_user_threads != 0
+                || settle_started.elapsed().as_secs() >= 30
+            {
+                break sample;
+            }
+        };
         write(
             dir.join("isolation-before.json"),
             &json!({
-                "plan":guard.plan,"eviction":guard.eviction.summary,"preflight":preflight,
+                "plan":guard.plan,"eviction":guard.eviction.summary,"preflight":preflight,"preflight_samples":preflights,
                 "settings":iso::cpu_settings(guard.plan.run_cpu),
                 "uid":unsafe { libc::geteuid() },
                 "grade":"recorded reservation; timing eligibility assessed from observations, no automatic L2 claim"
