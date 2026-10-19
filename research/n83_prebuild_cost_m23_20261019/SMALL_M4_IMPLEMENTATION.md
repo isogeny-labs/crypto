@@ -56,6 +56,17 @@ suite passed nine tests and the archived-orbit test passed. The final
 whole-suite rerun is `small-m4-release-lib-3.log`; earlier logs remain
 retained and are not presented as passing gates.
 
+The final full release-library gate passed **4,395 tests, zero failures,
+118 ignored**, in 164.65 seconds. The isolated worker/verifier suite passed
+**3 + 2 tests**. Both constructed receipts passed separate general-field
+replay on Linux x86_64 and macOS arm64. Shell syntax, staged diff whitespace,
+all 78 archived file digests, deterministic archive repacking and byte
+identity of benchmark/report copies were checked. The rendered one-page
+PDF was visually inspected. No test was skipped or disabled to repair the
+sparse-checkout failures. These checks validate the implementation and
+controls; the [public-card observation](small-m4-v1/STATUS.md) remains a
+separate partial execution record.
+
 ## Inherited PR gate
 
 At the 2026-10-19 18:31 UTC refresh, PR #2271's certificate job failed in
