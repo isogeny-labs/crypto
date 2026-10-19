@@ -40,7 +40,12 @@ def verify(snapshot_path, strata, head_sha):
     if (len({pod['pod_id'] for pod in pods.values()}) != 2 or
             len({pod['machine_id'] for pod in pods.values()}) != 2 or
             any(pod['desired_status'] != 'RUNNING' or
-                not 0 < pod['cost_per_hr'] <= 0.28 or
+                not 0 < pod['cost_per_hr'] <= 0.24 or
+                pod.get('cloud_type') != 'COMMUNITY' or
+                pod.get('compute_type') != 'GPU' or
+                pod.get('gpu_type_id') not in
+                ('NVIDIA RTX A2000', 'Tesla V100-PCIE-16GB') or
+                pod.get('gpu_count') != 1 or
                 pod.get('vcpu_count', 0) < 4 or
                 pod.get('memory_in_gb', 0) < 32 or
                 not 0 < (timestamp(pod['stop_after_utc']) -
@@ -69,6 +74,7 @@ def verify(snapshot_path, strata, head_sha):
                 any(allocation.get(key) != pod.get(key) for key in
                     ('pod_id', 'machine_id', 'desired_status', 'cost_per_hr',
                      'image_name', 'vcpu_count', 'memory_in_gb',
+                     'cloud_type', 'compute_type', 'gpu_type_id', 'gpu_count',
                      'created_utc', 'stop_after_utc')) or
                 allocation.get('source_head_sha') != head_sha or
                 allocation.get('snapshot_sha256') != digest(snapshot_path) or

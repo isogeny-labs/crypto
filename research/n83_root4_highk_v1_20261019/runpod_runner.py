@@ -88,7 +88,12 @@ def read_provider(path, expected_stratum):
             not receipt['machine_id'] or
             receipt.get('desired_status') != 'RUNNING' or
             not isinstance(receipt.get('cost_per_hr'), (int, float)) or
-            not 0 < receipt['cost_per_hr'] <= 0.28 or
+            not 0 < receipt['cost_per_hr'] <= 0.24 or
+            receipt.get('cloud_type') != 'COMMUNITY' or
+            receipt.get('compute_type') != 'GPU' or
+            receipt.get('gpu_type_id') not in
+            ('NVIDIA RTX A2000', 'Tesla V100-PCIE-16GB') or
+            receipt.get('gpu_count') != 1 or
             receipt.get('vcpu_count', 0) < 4 or
             receipt.get('memory_in_gb', 0) < 32 or
             not isinstance(receipt.get('snapshot_sha256'), str) or
@@ -106,7 +111,11 @@ def bind_provider(receipt, head_sha):
     original_host_receipt = runner.parent.host_receipt
     original_write_json = runner.parent.write_json
     adapter_sha256 = runner.parent.digest(Path(__file__))
-    v1_snapshot()  # Fail before a timed child if the required counters are absent.
+    preflight = v1_snapshot()  # Fail before a timed child if counters are absent.
+    quota, period = preflight['cpu.max'].split()
+    if (quota == 'max' or int(quota) < 4 * int(period) or
+            int(preflight['memory.max']) < 24 * 1024**3 + 256 * 1024**2):
+        raise ValueError('RunPod cgroup quota or memory limit below frozen envelope')
     runner.parent.cgroup_snapshot = lambda _group: v1_snapshot()
 
     def host_receipt(group):

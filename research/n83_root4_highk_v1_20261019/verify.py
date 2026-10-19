@@ -41,6 +41,9 @@ def v1_snapshot_consistent(snapshot):
         quota = int(raw['cpu.cfs_quota_us'])
         period = int(raw['cpu.cfs_period_us'])
         failcnt = int(raw['memory.failcnt'])
+        if (quota == -1 or quota < 4 * period or
+                int(raw['memory.limit_in_bytes']) < 24 * 1024**3 + 256 * 1024**2):
+            return False
         return (snapshot['cpu.stat'] == raw['cpu.stat'] + '\n' and
                 snapshot['cpu.max'] ==
                 f'{"max" if quota == -1 else quota} {period}\n' and

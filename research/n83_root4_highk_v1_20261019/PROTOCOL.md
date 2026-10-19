@@ -22,20 +22,25 @@ the sealed answer sidecar SHA-256 is
 found zero overlap with 31,536 distinct points in the prior sealed fixture
 inventory, including all 16 points in the stopped cgroup-v2-only diagnostic.
 
-Two distinct, concurrent Secure Cloud RunPod CPU Pods each receive one fixed
-eight-point stratum. Require at least four visible CPUs, 24 GiB child RSS
-headroom plus 256 MiB, 3 GiB free disk, and distinct machine IDs. Use the
-4-vCPU/32-GiB memory-optimized CPU class if its live price is at most $0.28
-per Pod hour; the diagnostic K4405 child peaked at 22.35 GB RSS under the
-same 24-GiB child cap. Record the cgroup v1 memory limit at preflight;
-freeze the actual allocation, price, image, source commit and two Pod IDs
-before starting. The six stopped prior allocations cost an estimated $0.657459;
-`prior_attempts.json` reserves $0.70 against the approved **$5 combined cap**.
-The new pair has a $4.30 hard spend cap and a 26,100-second allocation cap;
-each producer stops before 25,200 seconds. At the $0.28 per-Pod hourly ceiling,
-the pair's maximum is $4.06 and the conservative campaign total is $4.76.
-The controller stops both Pods before either cap. Keep every partial receipt.
-No API key is sent to a Pod or stored in the artifacts.
+Two distinct, concurrent RunPod Community Cloud GPU Pods execute CPU-only
+children, each on one fixed eight-point stratum. The capacity probe established
+two suitable classes: `NVIDIA RTX A2000` and `Tesla V100-PCIE-16GB`, both with
+5.1 CPUs of cgroup quota, at least 47 GB cgroup memory and cgroup v1 counters.
+Freeze the actual GPU class and CPU model for each Pod. The classes can differ
+between strata because every arm and rho reference for a point execute on the
+same Pod; retain separate stratum results and the complete observed envelope.
+Require at least four visible CPUs and four CPUs of cgroup quota, 24 GiB child
+RSS headroom plus 256 MiB, 3 GiB free disk, and distinct machine IDs. The
+diagnostic K4405 child peaked at 22.35 GB RSS under the same 24-GiB child cap.
+Freeze the allocation, price, image, source commit and two Pod IDs before
+starting. The six stopped earlier allocations cost an estimated $0.657459;
+two stopped capacity probes add an estimated $0.016894. `prior_attempts.json`
+reserves $0.75 against the approved **$5 combined cap**. The new pair has a
+$4.30 hard spend cap and a 26,100-second allocation cap; each producer stops
+before 25,200 seconds. At the $0.24 per-Pod hourly ceiling, the pair's maximum
+is $3.48 and the conservative campaign total is $4.23. The controller stops
+both Pods before either cap. Keep every partial receipt. No API key is sent
+to a Pod or stored in the artifacts.
 
 For each point, rotate the three arms, alternate IC/rho order, and run three
 same-point rho calibration children before and after each pair. Execute every
