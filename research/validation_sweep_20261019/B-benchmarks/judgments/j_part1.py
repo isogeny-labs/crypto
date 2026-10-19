@@ -45,8 +45,10 @@ row(18,
  cl("pk_degree_test wall 0.79 vs 1.28 s (L1), 2.72 vs 5.54 s (L3), 6.84 vs 13.34 s (L5)", True, "attack-cost accounting", "accounting", "L0 (shared VM, unpinned), n=7/3/3", "no", U,
     "Numbers recompute but n=3 at L3/L5 on an unpinned shared VM cannot support a wall-time comparison. The deterministic chain-length ratio above carries the finding."))
 row(19,
- cl("P-256 rho seeding 0.66 vs 11.53 ms/seed (17.4x) by an inversion-free Jacobian ladder; inversions per seed ~750 -> 1", "partial", "op-count reduction, wall corroboration", "engineering (setup-only)", "L0 (stated: no isolation receipt, no PMU)", "no", C,
-    "The inversion count reduction (750 -> 1) is structural and the ratio recomputes from benchmarks/.../data.csv. The wall figure at L0 with no A/A is corroboration only, as the row says. Identical-output check: 400 rows compared, 0 differ, versus 3,000 seeds claimed (only 400 in the committed data). Row stresses it is setup-only."))
+ cl("gpu/nist rho seeding: field inversions per seed ~750 -> 1 (P-384 ~1150 -> 1) by an inversion-free Jacobian ladder", True, "op-count reduction", "engineering (setup-only, structural)", "counts (inversion count; P-384 test-verified, not timed)", "no", C,
+    "Structural count; identical-output check: 400 rows compared in the committed data.csv with 0 differing (3,000 seeds are claimed, only 400 are in the repo). The row stresses setup-only (reseeds are rare against walk steps)."),
+ cl("P-256 seeding 0.66 vs 11.53 ms/seed (17.4x)", "partial", "wall corroboration", "engineering (setup-only)", "L0 (stated: 4 vCPU cloud VM, no isolation receipt, no PMU)", "no", U,
+    "A wall-time ratio at L0 with no A/A: unvalidated; the row itself calls it corroboration, 'not an isolated, PMU/IPC-grade timing'. It recomputes from benchmarks/20261017-gpu-nist-jac-seed/data.csv."))
 row(21,
  cl("Direct pack on by default: 1.006-2.173x on every F5 cell", False, "engineering", "engineering", "L0 (shared, unpinned, wall)", "no explicit A/A arm; 'on' vs 'off' arms, 3 then 15 rounds", U,
     "Recomputed min over 28 F5 cells is 0.9974 (f5_n12_m12_d4, 4 threads), not 1.006: at least one cell regresses by 0.3%, contradicting 'every cell'. Wall at L0 with no A/A. Outputs exact (77/77 equal). Decision rule committed before run 2 per README; order not provable from git."))

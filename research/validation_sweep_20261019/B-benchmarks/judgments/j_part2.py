@@ -3,8 +3,8 @@ row(25,
  cl("Cached-separator / shared-left whole-cold median 1.383x; actual GF83 support-only 1.141x (historical Python)", True, "no qualified claim (stated)", "engineering", "L0 (isolation unqualified, 1 CPU/4 GiB per worker)", "no (README: no A/A, no matched genuine F4/F5/F6 panel)", U,
     "3/3 recompute, but the row itself states there is no qualified wall claim; a wall-time ratio on an unqualified host with no A/A cannot validate a speedup."))
 row(26,
- cl("find_prime_order_curve plan time 217.6 s -> 0.137 s at 26 bits (1,592x) by stepping one point over the Hasse interval instead of counting points", "partial", "engineering (setup only)", "engineering (algorithmic: O(p) -> O(sqrt p) in curve selection)", "L0 (shared, unpinned)", "no", C,
-    "The ratio is an asymptotic, ten-thousand-fold change, far outside any L0 noise, so the direction and order of magnitude are safe; exact seconds are not. 7/7 recompute, 1 claim no_raw. Identical-curve claim (288 workload IDs re-plan) is partial: only the committed replan-check record was read, the re-plan was not re-run. No measured result changes."))
+ cl("find_prime_order_curve plan time 217.6 s -> 0.137 s at 26 bits (1,592x) by stepping one point over the Hasse interval instead of counting points", "partial", "engineering (setup only)", "engineering (algorithmic: O(p) -> O(sqrt p) in curve selection)", "L0 (shared, unpinned)", "no", U,
+    "Unvalidated under the tier rule (wall-time speedup at L0). The ratio is an asymptotic, ten-thousand-fold change, far outside any L0 noise, so the direction and order of magnitude are not in doubt; exact seconds are not supported. 7/7 recompute, 1 claim no_raw. Identical-curve claim (288 workload IDs re-plan) is partial: only the committed replan-check record was read, the re-plan was not re-run. No measured result changes."))
 row(27,
  cl("Instructions per rho step 781 -> 718 (-8.1%, 1.09x), outputs identical at n=41,53,61", True, "engineering", "engineering", "counts (callgrind Ir, deterministic)", "n/a for Ir", V,
     "Ir is deterministic and recomputes; outputs identical (4/4 comparisons, baseline records absent at n41/n61 so partial there)."),
