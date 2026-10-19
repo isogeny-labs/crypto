@@ -912,7 +912,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
 <tr><td>2026-10-07</td><td>Weak elliptic class: cover and decomposition on E(F_p^6)</td><td>Isogeny walk stage from a non-weak start eight moves from a weak curve, p = 1,009 (subgroup 2^57.9)</td><td class="n">0.0002&times;</td><td>stage</td><td><span class="chip">accounting</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md">source</a> (&sect;17)</td></tr>
 <tr><td>2026-10-12</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Large-prime conductor-gap IC, ell = 8209, fixed floor, eight one-target workloads</td><td class="n">19.7311&times; <small>bounded count diagnostic</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#conductor-gap-ic37-20261012">panel</a> · <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_conductor_gap_20261012/README.md">source</a></td></tr>
 <tr><td>2026-10-12</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Large-prime conductor-gap IC, ell = 131101, fixed floor, eight one-target workloads</td><td class="n">45.0827&times; <small>bounded count diagnostic</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#conductor-gap-ic37-20261012">panel</a> · <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_conductor_gap_20261012/README.md">source</a></td></tr>
-<tr><td>2026-10-14</td><td>Elliptic curve, whole method, cold, one target</td><td>Frobenius-orbit IC, fully priced, stride-renew, vs rho-frob: best cell <code>icv1-f2m29-tm40309-30c52b96</code> (r = 2<sup>15.4</sup>)</td><td class="n">1.566&times; <small>S; [0.992, 2.347]; 18.2&times; at r = 2<sup>39</sup></small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#lab-ecbench-all">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_frobenius_orbit_vs_rho_20261014/README.md">source</a></td></tr>
+<tr><td>2026-10-15</td><td>Elliptic curve, whole method, cold, one target</td><td>Frobenius-orbit IC, fully priced, stride-renew, vs rho-frob: best cell <code>icv1-f2m29-tm40309-30c52b96</code> (r = 2<sup>15.4</sup>)</td><td class="n">1.566&times; <small>S; [0.992, 2.347]; 18.2&times; at r = 2<sup>39</sup></small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#lab-ecbench-all">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_frobenius_orbit_vs_rho_20261014/README.md">source</a></td></tr>
 <tr><td>2026-10-14</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Prime rootfinding B48 batch-8 buffer reuse, registered 20-bit subgroup</td><td class="n">6.8747&times; <small>counted GAE lower-bound diagnostic; not a speed bound</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#rootfinding-buffers-20261014">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_rootfinding_alloc_20261014/REPORT.md">source</a></td></tr>
 <tr><td>2026-10-17</td><td>Elliptic curve, whole method, cold, one target</td><td>Volcano projected size-16 MITM, two targets; <code>icv1-fp57-t536870914-6cabb0c9</code></td><td class="n">19.215&times; <small>quotient of incomplete GAE lower bounds; diagnostic, no cost-direction claim</small></td><td>matched; L0/debug</td><td><span class="chip">accounting</span></td><td><a href="#lab-volcano-ic">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json">native comparison</a></td></tr>
 <tr><td>2026-10-18</td><td>Elliptic curve, whole method, cold, one target</td><td>Lazy orbit-member index, fully priced, stride-renew, vs rho-frob: best cell <code>icv1-f2m29-tm40309-30c52b96</code> (r = 2<sup>15.4</sup>)</td><td class="n">1.272&times; <small>S; [0.770, 1.803]; was 1.566&times; (eager table, other seeds)</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#lazy-orbit-members-20261018">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_orbit_members_20261018/REPORT.pdf">source</a></td></tr>
@@ -1059,7 +1059,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
     {
      "anchor": "#lab-ecbench-all",
      "class": "accounting",
-     "date": "2026-10-14",
+     "date": "2026-10-15",
      "detail": "Orbit factor base (compact-orbit-scan, mitm-frobenius-counted m = 2) with every native priced, paired against the fully priced signed-Frobenius rho on 16 targets x 3 rounds per curve: 1.566 [0.992, 2.347] at the best cell (interval reaches 1; rho-frob heavy-tailed there), 2.96 at n = 13, 3.85 at r = 2^21, 18.2 at r = 2^39; never below 1. Slope of ln ratio 0.165 [0.117, 0.213] per ln r with ln n fitted (model 1/6): constant-only.",
      "label": "Frobenius-orbit IC, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)",
      "reference": "matched",
@@ -2114,7 +2114,11 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
       but only genus 4 has a fitted exponent behind it. Genus 3&rsquo;s exponent claim was
       withdrawn once the linear algebra was priced. That is a toy-size result
       (<code>p &le; 251</code>) whose reference needed correcting, not a statement about
-      any deployed curve. The newer binary-field solver, the
+      any deployed curve, and under &sect;5a it is now a <strong>lower-bound comparison, unranked</strong>:
+      neither arm emits its unpriced work, and that rho walk ran 45&ndash;68% above its ideal at the
+      two largest rows because of its own 8-bit branch coefficients (round twelve: full-width
+      coefficients bring it to 1.21 and 1.48, so the old reference was up to 1.5&times; slow there and
+      flattered index calculus by as much; the ratios are to be re-measured, not rescaled). The newer binary-field solver, the
       Crossbred decomposition oracle, the WDSat Riemann-Roch panel, the Weil-descent SAT round on the challenge curve and the
       parameter-sweep pilots are explicitly uncalibrated: their component counts
       do not establish an end-to-end speedup or belong in that normalized claim.</p>
@@ -5786,6 +5790,28 @@ Increasing factor-base dimension remains the next scaling test.</p></div></div>
     <code>p<sup>2</sup></code> against rho&rsquo;s <code>p<sup>1.5</sup></code> at genus 3, which is
     why the literature shrinks the factor base at small genus (Th&eacute;riault 2003; Gaudry,
     Thom&eacute;, Th&eacute;riault and Diem 2007).</p>
+    <p><strong>Rounds ten to twelve: the reference was slow, and why.</strong> A strongly mixed
+    walk hash did not fix the large rows (round ten, H1 falsified). The same walk on the
+    integers mod <code>N</code> showed the same excess (round eleven), so the cause was shared walk
+    logic, not the Jacobian. Round twelve found it: the reference drew its branch coefficients from
+    8 bits, which keeps a walk&rsquo;s displacement on a small 2-D set and delays its collision at
+    large <code>N</code>. With full-width coefficients, registered W1&ndash;W4 all hold: Jacobian median
+    <code>S_walk</code> 1.390 over the 7 rows with <code>N</code> &ge; 10<sup>5</sup>, and the largest row drops
+    from 2.100 to 1.481. The full-width walk is now the default reference. Every IC/rho ratio above
+    measured against the 8-bit walk at <code>N</code> &ge; 10<sup>5</sup> flattered index calculus by up to
+    1.5&times; and is to be re-measured. <span class="chip">accounting</span> Frozen source:
+    <a href="https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/round12/run1/R12.txt">round twelve</a>.</p>
+    <p><strong>Round nine: the reference itself is the open question.</strong> Index calculus here
+    folds <code>&plusmn;P</code>; the rho reference did not. A negation-map rho, registered with
+    look-ahead against fruitless cycles and every extra step counted, works on small groups
+    (0.67&ndash;0.89 of the plain walk, ideal 0.71) and fails on the largest: registered R1 falsified,
+    median 0.968 over the 7 rows with <code>N</code> &ge; 10<sup>5</sup>. The plain walk there is itself
+    at 1.82 and 2.10 against its 1.25 ideal. The reference is unchanged until that is understood; a
+    weakly mixed branch hash is the hypothesis under test next. And under the current &sect;5a and
+    &sect;12, every IC/rho ratio in this section is a <strong>lower-bound comparison, unranked</strong>:
+    neither arm emits its unpriced counters, and the hyperelliptic family is not yet in
+    <code>ecbench</code>. <span class="chip">accounting</span> Frozen source:
+    <a href="https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/round9/run5/R9.txt">round nine</a>.</p>
     <p><strong>Round eight tested the textbook remedy and it does not pay here.</strong> A
     reduced factor base with single large primes (Th&eacute;riault) was registered with per-row
     predictions and measured on 11 instances, including genus 2 up to <code>p</code> = 4001 where the
