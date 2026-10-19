@@ -63,6 +63,11 @@
 //!     --distinct-targets --file 'G1-{arm}-m{m}' --out-dir $R
 //! $B analyze $R --g1                            # the G1 series and verdicts
 //! $B compare-rows A.jsonl B.jsonl               # two runs of the same systems, row by row
+//! # Amendment 6 (T1, T2): A0 on the sparse tower engine, under an admission rule.
+//! $B admit-tower $R                             # T1: 26 committed A0 systems, D must match
+//! $B run --engine tower --arms A0 --m 3 --t-min 5 --t-max 5 --budget 3600 --grace 300 \
+//!     --vmem-kb 15000000 --file 'T2-{arm}-m{m}' --out-dir $R   # T2, only if admitted (and m = 4, t = 4)
+//! $B analyze $R --tower                         # T1 verdict and A0's extended series
 //! ```
 //!
 //! A stage diagnostic of the solver axis (`AGENTS.md` §2): it prices no
@@ -75,6 +80,7 @@ use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
 use crypto_lib::cryptanalysis::f4_fp::{self, F4Options, Ordering, Poly};
+use crypto_lib::cryptanalysis::f4_fp_tower::{self, SquareRule, TowerF4Options, TowerRing};
 use crypto_lib::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -1389,6 +1395,128 @@ fn measure(eqs: &[Pol], n: usize, p: u64, sol: &[u64], budget: Duration) -> Valu
     })
 }
 
+/// Amendment 6: an A0 system on the sparse tower engine. The Kummer
+/// equations become the ring's square rules (`y_{j+1} = y_j²`,
+/// `y_{t−1}² = 1`, summand by summand, the chain unknowns free); the
+/// summation equations, reduced into the ring, are the input. Every
+/// equation is checked at the planted solution, and every tower equation
+/// is checked to vanish in the ring, before the engine runs.
+fn measure_tower(
+    eqs: &[Pol],
+    n: usize,
+    m: usize,
+    t: usize,
+    p: u64,
+    sol: &[u64],
+    budget: Duration,
+) -> Value {
+    for (k, e) in eqs.iter().enumerate() {
+        assert_eq!(
+            e.eval(sol, p),
+            0,
+            "equation {k} does not vanish at the planted solution"
+        );
+    }
+    assert_eq!(
+        n,
+        m * t + (m - 2),
+        "an A0 layout: m towers of depth t, then the chain"
+    );
+    let mut rules = Vec::with_capacity(m * t);
+    for i in 0..m {
+        for j in 0..t {
+            rules.push(if j + 1 < t {
+                SquareRule {
+                    next: Some((i * t + j + 1) as u8),
+                    a: 0,
+                    b: 1,
+                    c: 0,
+                    d: 0,
+                }
+            } else {
+                SquareRule {
+                    next: None,
+                    a: 0,
+                    b: 0,
+                    c: 0,
+                    d: 1,
+                }
+            });
+        }
+    }
+    let ring = TowerRing {
+        p,
+        rules,
+        n_free: m - 2,
+    };
+    ring.check();
+    let raw = |e: &Pol| -> Vec<(Vec<u32>, u64)> {
+        e.terms.iter().map(|(k, v)| (k.clone(), *v)).collect()
+    };
+    // A0's system: the m − 1 summation equations, then m·t tower equations.
+    let n_sum = m - 1;
+    assert_eq!(eqs.len(), n_sum + m * t, "an A0 system");
+    for (k, e) in eqs.iter().enumerate().skip(n_sum) {
+        assert!(
+            ring.from_raw(&raw(e)).is_empty(),
+            "tower equation {k} is not zero in the ring"
+        );
+    }
+    let input: Vec<_> = eqs[..n_sum]
+        .iter()
+        .map(|e| ring.from_raw(&raw(e)))
+        .filter(|f| !f.is_empty())
+        .collect();
+    let d_in: Vec<u32> = eqs.iter().map(Pol::degree).collect();
+    let d_max = d_in.iter().copied().max().unwrap_or(1);
+    let max_degree = n as u32 + d_max + 6;
+    let opts = TowerF4Options::new(max_degree).with_budget(budget);
+    let started = Instant::now();
+    let r = f4_fp_tower::f4_tower(&input, &ring, &opts);
+    let wall = started.elapsed().as_secs_f64();
+    let stopped = r.timed_out || r.oversize;
+    let planted_ok = !r.inconsistent && r.basis.iter().all(|f| ring.eval(f, sol) == 0);
+    let status = if stopped {
+        "timeout"
+    } else if !planted_ok {
+        "planted_violation"
+    } else {
+        "ok"
+    };
+    let reason = match status {
+        "timeout" => Value::from(format!("tower engine budget of {} s", budget.as_secs())),
+        "planted_violation" => Value::from("the planted solution fails the engine's basis"),
+        _ => Value::Null,
+    };
+    json!({
+        "engine": "f4_fp_tower",
+        "input_degrees": d_in,
+        "max_degree_bound": max_degree,
+        "D": r.solving_degree_max,
+        "solving_degree_max": r.solving_degree_max,
+        "last_productive_degree": r.last_productive_degree,
+        "degree_reached": r.degree_reached,
+        "max_cols_to_solution": r.max_cols_to_solution,
+        "steps_to_solution": r.steps_to_solution,
+        "inconsistent": r.inconsistent,
+        "basis_len": r.basis.len(),
+        "steps": r.steps,
+        "max_rows": r.max_rows,
+        "max_cols": r.max_cols,
+        "max_nnz": r.max_nnz,
+        "field_ops": null,
+        "muladds": r.muladds,
+        "f4_ms": r.ms,
+        "time": wall,
+        "timed_out": stopped,
+        "oversize": r.oversize,
+        "pairs_above_bound": r.pairs_above_bound,
+        "planted_ok": planted_ok,
+        "status": status,
+        "failure_reason": reason,
+    })
+}
+
 fn merge(into: &mut Value, from: &Value) {
     if let (Some(a), Some(b)) = (into.as_object_mut(), from.as_object()) {
         for (k, v) in b {
@@ -1409,6 +1537,7 @@ fn target_seed(cell: u64, k: usize) -> u64 {
 
 /// Build and measure one system; prints a description line (`"phase":
 /// "built"`) before F4 runs, and the row after.
+#[allow(clippy::too_many_arguments)]
 fn one(
     prime: usize,
     arm: Arm,
@@ -1417,13 +1546,19 @@ fn one(
     k: usize,
     budget: Duration,
     distinct: bool,
+    tower: bool,
 ) -> Value {
     let (mut row, eqs, n, sol) = build_system(prime, arm, m, t, k, distinct);
     let mut built = row.clone();
     merge(&mut built, &json!({"phase": "built"}));
     println!("{built}");
     std::io::stdout().flush().ok();
-    let r = measure(&eqs, n, prime_of(prime), &sol, budget);
+    let r = if tower {
+        assert_eq!(arm, Arm::A0, "the tower engine runs A0 only (Amendment 6)");
+        measure_tower(&eqs, n, m, t, prime_of(prime), &sol, budget)
+    } else {
+        measure(&eqs, n, prime_of(prime), &sol, budget)
+    };
     merge(&mut row, &r);
     row
 }
@@ -1634,6 +1769,8 @@ struct RunArgs {
     file: String,
     /// Amendment 5, G2: redraw a target whose system repeats an earlier one.
     distinct: bool,
+    /// Amendment 6: measure on the sparse tower engine (A0 only).
+    tower: bool,
 }
 
 /// Run one system in a child under `ulimit -v` and a hard wall limit of
@@ -1660,6 +1797,11 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
             &a.budget.to_string(),
         ])
         .args(a.distinct.then_some("--distinct-targets"))
+        .args(if a.tower {
+            vec!["--engine", "tower"]
+        } else {
+            vec![]
+        })
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
@@ -2421,9 +2563,10 @@ impl Cell2 {
 /// committed p₁ rows of the first run.
 fn group_of(file: &str) -> &str {
     match file.get(..3) {
-        Some(g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-" | "G1-")) => {
-            &g[..2]
-        }
+        Some(
+            g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-" | "G1-" | "T1-"
+            | "T2-"),
+        ) => &g[..2],
         _ => "p1",
     }
 }
@@ -2568,6 +2711,79 @@ fn analyze_g1(dir: &str) {
         }
     );
     println!("  A11: no prediction");
+}
+
+/// Amendment 6: the T1 admission verdict, then A0's `m = 3` and `m = 4`
+/// series with and without the T2 cells, and A0's `m = 3`, `t = 5` cell
+/// beside A11's (F3).
+fn analyze_tower(dir: &str) {
+    let rows = read_rows(dir);
+    println!(
+        "Factor-base designs, Amendment 6 (T1, T2): A0 on the sparse tower engine; rows from {dir}"
+    );
+    let t1: Vec<&Value> = rows
+        .iter()
+        .filter(|(f, _)| group_of(f) == "T1")
+        .map(|(_, r)| r)
+        .collect();
+    let matched = t1.iter().filter(|r| r["admission_match"] == true).count();
+    let admitted = !t1.is_empty() && matched == t1.len() && t1.len() == 26;
+    println!();
+    println!(
+        "T1, admission: {matched} of {} systems complete on the tower engine with the committed D,",
+        t1.len()
+    );
+    println!(
+        "  no derived 1 and the planted solution kept (26 required)  →  {}",
+        if admitted { "ADMITTED" } else { "NOT ADMITTED" }
+    );
+    for r in t1.iter().filter(|r| r["admission_match"] != true) {
+        println!(
+            "  mismatch: {} m={} t={} target={}: tower D {} vs {}, {}",
+            r["admission_of"],
+            r["m"],
+            r["t"],
+            r["target"],
+            r["D"],
+            r["committed"]["D"],
+            r["status"]
+        );
+    }
+    let t2_3 = cells2(&rows, "T2", "A0", 3);
+    let t2_4 = cells2(&rows, "T2", "A0", 4);
+    if t2_3.is_empty() && t2_4.is_empty() {
+        println!();
+        println!("T2: no rows (run only if T1 admits the engine).");
+        return;
+    }
+    let base3 = cells2(&rows, "p1", "A0", 3);
+    let base4: Vec<Cell2> = cells2(&rows, "F4", "A0", 4)
+        .into_iter()
+        .filter(|c| c.t <= 3)
+        .collect();
+    for (m, base, ext) in [(3usize, base3, t2_3), (4, base4, t2_4)] {
+        println!();
+        println!("════ A0 m = {m} p1");
+        show_series(&format!("A0 m = {m}, f4_fp cells only"), &base);
+        let mut all = base;
+        all.extend(ext);
+        all.sort_by_key(|c| c.t);
+        show_series(
+            &format!("A0 m = {m}, with the T2 (tower-engine) cell"),
+            &all,
+        );
+    }
+    let a11 = cells2(&rows, "F3", "A11", 3);
+    let a0 = cells2(&rows, "T2", "A0", 3);
+    if let (Some(x), Some(y)) = (find(&a11, 5), find(&a0, 5)) {
+        println!();
+        println!(
+            "m = 3, t = 5 (descriptive): A11 D {:.1} (F3, f4_fp) against A0 D {:.1} (T2, tower engine): difference {:+.1}",
+            x.d_mean(),
+            y.d_mean(),
+            x.d_mean() - y.d_mean()
+        );
+    }
 }
 
 fn analyze2(dir: &str) {
@@ -2865,6 +3081,113 @@ fn completed_rows<'a>(rows: &'a [(String, Value)], groups: &[&str]) -> Vec<&'a (
         .collect()
 }
 
+/// Amendment 6, T1: every planted A0 system of a completed `f4_fp` cell on
+/// p₁ (the first run at `m = 2, 3`; F4 at `m = 4`, `t ≤ 3`) measured again on
+/// the tower engine, in a child under the committed row's own limits. The
+/// engine is admitted if every system completes with the committed D, does
+/// not derive 1 and keeps its planted solution. Returns the verdict.
+fn admit_tower(dir: &str, out: &str) -> bool {
+    let rows = read_rows(dir);
+    let sel: Vec<&(String, Value)> = completed_rows(&rows, &["p1", "F4"])
+        .into_iter()
+        .filter(|(f, r)| {
+            r["arm"] == "A0"
+                && row_prime(r) == 0
+                && match group_of(f) {
+                    "F4" => r["m"] == 4 && r["t"].as_u64().unwrap_or(99) <= 3,
+                    _ => r["m"] == 2 || r["m"] == 3,
+                }
+        })
+        .collect();
+    let commit = git_commit();
+    let host = host();
+    let mut file = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(format!("{dir}/{out}.jsonl"))
+        .expect("open rows");
+    let mut log = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(format!("{dir}/{out}.log"))
+        .expect("open log");
+    writeln!(
+        log,
+        "== T1 (Amendment 6): {} A0 systems on the tower engine; commit {commit}, started {}",
+        sel.len(),
+        utc_now()
+    )
+    .ok();
+    let mut fails: Vec<String> = Vec::new();
+    for (f, c) in &sel {
+        let m = c["m"].as_u64().expect("m") as usize;
+        let t = c["t"].as_u64().expect("t") as usize;
+        let k = c["target"].as_u64().expect("a target") as usize;
+        let budget = c["budget_s"].as_u64().unwrap_or(300);
+        let a = RunArgs {
+            arms: vec![Arm::A0],
+            ms: vec![m],
+            t_min: t,
+            t_max: t,
+            targets: 1,
+            budget,
+            vmem_kb: c["ulimit_v_kb"].as_u64().unwrap_or(13_000_000),
+            grace: if budget > 300 { 300 } else { 120 },
+            out_dir: dir.to_string(),
+            prime: 0,
+            file: String::new(),
+            distinct: c["distinct_targets"] == true,
+            tower: true,
+        };
+        let mut row = run_child(&a, Arm::A0, m, t, k, &mut log);
+        let same = row["status"] == "ok"
+            && row["D"] == c["D"]
+            && row["inconsistent"] == false
+            && row["planted_ok"] == true;
+        if !same {
+            fails.push(format!("{f} m={m} t={t} target={k}"));
+        }
+        merge(
+            &mut row,
+            &json!({"git_commit": commit, "host": host, "admission_of": f,
+                    "committed": {"D": c["D"], "max_cols": c["max_cols"], "engine": "f4_fp"},
+                    "admission_match": same}),
+        );
+        let line = format!(
+            "{f} A0 m={m} t={t} target={k}: tower D {} (f4_fp {}), max_cols {} (f4_fp {}), muladds {}, {:.1} s, {} {}",
+            row["D"],
+            c["D"],
+            row["max_cols"],
+            c["max_cols"],
+            row["muladds"],
+            row["time"].as_f64().unwrap_or(f64::NAN),
+            row["status"].as_str().unwrap_or("?"),
+            if same { "MATCH" } else { "MISMATCH" }
+        );
+        eprintln!("{line}");
+        writeln!(log, "{line}").ok();
+        writeln!(file, "{row}").expect("write a row");
+        file.flush().ok();
+        log.flush().ok();
+    }
+    let admitted = fails.is_empty() && sel.len() == 26;
+    let msg = format!(
+        "== T1: {} of {} systems match{}; {}; ended {}",
+        sel.len() - fails.len(),
+        sel.len(),
+        if fails.is_empty() {
+            String::new()
+        } else {
+            format!(" (failing: {})", fails.join("; "))
+        },
+        if admitted { "ADMITTED" } else { "NOT ADMITTED" },
+        utc_now()
+    );
+    eprintln!("{msg}");
+    writeln!(log, "{msg}").ok();
+    admitted
+}
+
 /// Re-measure every system of a completed cell in `groups`, in a child
 /// process under the same limits as its committed row, at the row's own
 /// prime (`prime = None`, C1) or at another prime (`Some`, C3). Each new row
@@ -2922,6 +3245,7 @@ fn replay(dir: &str, out: &str, groups: &[&str], prime: Option<usize>, only_prim
             file: String::new(),
             // Rebuild the row the way it was drawn (Amendment 5, G2).
             distinct: c["distinct_targets"] == true,
+            tower: c["engine"] == "f4_fp_tower",
         };
         let mut row = run_child(&a, arm, m, t, k, &mut log);
         let fields = ["D", "max_cols", "max_rows", "steps"];
@@ -3490,7 +3814,17 @@ fn main() {
             let budget = flag(&args, "--budget").map_or(300, |s| s.parse().unwrap());
             let prime = flag(&args, "--prime").map_or(0, |s| parse_prime(&s));
             let distinct = args.iter().any(|a| a == "--distinct-targets");
-            let row = one(prime, arm, m, t, k, Duration::from_secs(budget), distinct);
+            let tower = flag(&args, "--engine").is_some_and(|e| e == "tower");
+            let row = one(
+                prime,
+                arm,
+                m,
+                t,
+                k,
+                Duration::from_secs(budget),
+                distinct,
+                tower,
+            );
             println!("{row}");
         }
         "run" => {
@@ -3515,6 +3849,7 @@ fn main() {
                 prime: flag(&args, "--prime").map_or(0, |s| parse_prime(&s)),
                 file: flag(&args, "--file").unwrap_or_else(|| "{arm}-m{m}".into()),
                 distinct: args.iter().any(|a| a == "--distinct-targets"),
+                tower: flag(&args, "--engine").is_some_and(|e| e == "tower"),
             };
             assert!(a.t_min >= 2, "t starts at 2");
             let two = (prime_of(a.prime) - 1).trailing_zeros() as usize;
@@ -3532,7 +3867,9 @@ fn main() {
         }
         "analyze" => {
             let dir = args.get(1).expect("a runs directory");
-            if args.iter().any(|a| a == "--g1") {
+            if args.iter().any(|a| a == "--tower") {
+                analyze_tower(dir);
+            } else if args.iter().any(|a| a == "--g1") {
                 analyze_g1(dir);
             } else if args.iter().any(|a| a == "--amendment4") {
                 analyze4(dir);
@@ -3559,6 +3896,13 @@ fn main() {
                 std::process::exit(1);
             }
         }
+        "admit-tower" => {
+            let dir = args.get(1).expect("a runs directory");
+            let out = flag(&args, "--file").unwrap_or_else(|| "T1-admission".into());
+            if !admit_tower(dir, &out) {
+                std::process::exit(1);
+            }
+        }
         "compare-rows" => {
             let (a, b) = (args.get(1).expect("rows A"), args.get(2).expect("rows B"));
             if !compare_rows(a, b) {
@@ -3577,7 +3921,7 @@ fn main() {
         }
         _ => {
             eprintln!(
-                "usage: fb_designs_slope run|one|repro|analyze|check-p2|regress|compare-rows …  (see the module docs)"
+                "usage: fb_designs_slope run|one|repro|analyze|check-p2|regress|compare-rows|admit-tower …  (see the module docs)"
             );
             std::process::exit(2);
         }

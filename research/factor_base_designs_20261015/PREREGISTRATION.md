@@ -414,3 +414,63 @@ equal `max_cols`; the exception is A1g at `m = 3`, `t = 3`.
 - No prediction for A11's σ or width (item 3). The draft's width prediction
   rested on widths of systems the budget cut off, so it is dropped.
 - A0's `t = 4` systems may hit the memory limit (F3).
+
+### Amendment 6, 2026-10-19: the sparse tower engine for A0's memory-bound cells (T1, T2), before any of their rows
+
+Registered by the experiment lane before any T1 or T2 row exists. It adds a
+second instrument for one arm, under an admission rule. It changes no
+committed row, verdict, threshold, decision rule or prediction.
+
+**Why.** Two of the incumbent's cells are missing for memory under `f4_fp`.
+- A0 at `m = 3`, `t = 5` aborted at 13 GB in F3. That is the cell where A11
+  shows the largest measured gap: it completes at D = 5 in about 565 s.
+- A0 at `m = 4`, `t = 4` aborted at 13 GB in C2 and at 15 GB in G1
+  (Amendment 5), so A0's `m = 4` σ prediction (Amendments 2 and 5) is
+  undecided.
+- The repository's sparse tower engine `f4_fp_tower` (pilot round 2,
+  `research/pkm_tower_round2_20260925/`) works in the Kummer quotient ring
+  and needs far less memory. Round 2 completed Kummer `m = 3`, `t = 5`
+  systems with D = 7, but only for random targets. This study uses planted
+  targets, whose certification is heavier, so the engine's reach here is
+  untested.
+
+**The instrument.** `f4_fp_tower::f4_tower`, degree bound `n + d_max + 6`,
+with no `--max-nnz` and no staircase stop. A0's tower equations become the
+ring's square rules (`y_{j+1} = y_j²`, `y_{t−1}² = 1`). The summation
+equations, reduced into the ring, are the input. D is the engine's
+`solving_degree_max`. Its cost counter (`muladds`) is a different unit from
+`f4_fp`'s `field_ops`, so κ is not extended by this engine; `muladds` is
+recorded descriptively. Seeds and constructions are A0's own (Amendments
+1–2): the systems are identical to the `f4_fp` systems, and only the solver
+differs. Every system's planted solution is checked before measuring, and
+every tower equation is checked to vanish in the ring.
+
+**T1, admission (p₁).** Every planted A0 system that completed under
+`f4_fp` on p₁ is measured again with the tower engine, under the same
+per-system limits as its original row (300 s for the first run and F4). That
+is 26 systems (13 cells): the first run's `m = 2`, `t = 2–9` and `m = 3`, `t = 2–4`,
+and F4's `m = 4`, `t = 2, 3`. The engine is **admitted** if, on every one of
+them, it completes, its D equals the committed D, it does not derive 1, and
+the planted solution satisfies its basis. If any compared system fails, it
+is **not admitted**, T2 is not run, and the failures are reported.
+
+**T2, the missing cells (only if admitted).** A0 at `m = 3`, `t = 5` and A0
+at `m = 4`, `t = 4`, on p₁, 2 planted targets each, F4 budget 3600 s, hard
+kill 3900 s, `ulimit -v 15000000`. Each is a single cell, not a rising
+series. A cell whose two systems both complete joins A0's σ fit for its
+`m`, labelled as an admitted-engine cell, and the fit is reported with and
+without it. A system that hits a limit is recorded with its reason.
+
+**Decision rules.**
+- T1: admitted / not admitted, as above.
+- T2: the σ verdicts of §1 for A0 at `m = 3` and `m = 4` over the extended
+  series, scored against the standing predictions, including "A0's σ ≥ 0.5 at
+  `m = 4`". At `m = 3`, `t = 5`, A0's cell D is reported beside A11's (F3,
+  D = 5) as a difference, descriptively.
+
+**Predictions.**
+- T1: admitted. Round 2's cross-checks found the engines in agreement.
+- T2, `m = 3`: completes with D = 7, so A0's `m = 3` series reads 5, 6, 6, 7
+  (σ = 0.6, *no middle ground*).
+- T2, `m = 4`: does not complete within the limits. Round 2's random-target
+  system at this cell ran out of memory after 29 minutes at 14 GB.
