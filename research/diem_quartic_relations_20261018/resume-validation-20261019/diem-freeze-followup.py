@@ -153,7 +153,7 @@ def main(config_path):
         failures=[]
         for test in tests:
             if processes(w3b): raise RuntimeError('W3b process appeared; refusing duplicate validation')
-            command('w3b-renew-'+test,['conductor','task','claim',cfg['w3b_task']],root)
+            command('w3b-check-'+test,['conductor','check','--summary','Continue the existing Smith validation controls','--scope','dir:'+str(w3b)],root)
             try:
                 command('w3b-'+test,[cfg['w3b_binary'],'--exact','cryptanalysis::smith_isogeny::tests::'+test,
                         '--nocapture','--test-threads=1'],w3b,120 if test=='debug_p7' else 600,'24,25')
