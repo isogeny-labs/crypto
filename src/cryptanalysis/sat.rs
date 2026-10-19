@@ -201,6 +201,10 @@ pub struct SolverStats {
     pub xor_row_ops: u64,
     /// Rows examined in the parity read-off, each `O(words)`.
     pub xor_row_scans: u64,
+    /// Actual 64-bit matrix updates (dense or indexed engine).
+    pub xor_word_updates: u64,
+    /// Word positions visited while merging nonzero supports.
+    pub xor_support_visits: u64,
     /// Literals written into parity reason clauses.
     pub xor_reason_lits: u64,
     /// Clauses examined by watched-literal propagation.
@@ -505,6 +509,11 @@ pub struct Solver {
     /// chasing a pointer per row.
     matrix: Vec<u64>,
     matrix_rhs: Vec<bool>,
+    /// Sorted exact nonzero word positions; never a stale superset.
+    matrix_support: Vec<Vec<usize>>,
+    indexed_xors: bool,
+    xor_support_src: Vec<usize>,
+    xor_support_merge: Vec<usize>,
     /// `pivot[i]` is row `i`'s basic variable; `None` once the row has
     /// no unassigned variable left.
     pivot: Vec<Option<u32>>,
@@ -628,6 +637,10 @@ impl Solver {
             xor_conflict: Vec::new(),
             matrix: Vec::new(),
             matrix_rhs: Vec::new(),
+            matrix_support: Vec::new(),
+            indexed_xors: true,
+            xor_support_src: Vec::new(),
+            xor_support_merge: Vec::new(),
             pivot: Vec::new(),
             xor_src: Vec::new(),
             seen: vec![false; n],
@@ -1120,7 +1133,15 @@ impl Solver {
             self.stats.xor_repivots += 1;
 
             let row_i = i * words..(i + 1) * words;
-            match self.lowest_unassigned(&self.matrix[row_i.clone()]) {
+            let next_pivot = if self.indexed_xors {
+                self.matrix_support[i].iter().find_map(|&w| {
+                    let free = self.matrix[i * words + w] & !self.assigned_w[w];
+                    (free != 0).then(|| (w * 64) as u32 + free.trailing_zeros())
+                })
+            } else {
+                self.lowest_unassigned(&self.matrix[row_i.clone()])
+            };
+            match next_pivot {
                 None => {
                     // No unassigned variable left: the row is decided.
                     self.pivot[i] = None;
@@ -1143,8 +1164,19 @@ impl Solver {
                     let (pw, pbit) = (p as usize / 64, 1u64 << (p % 64));
                     let src_rhs = self.matrix_rhs[i];
                     let mut src = std::mem::take(&mut self.xor_src);
-                    src.clear();
-                    src.extend_from_slice(&self.matrix[row_i]);
+                    let mut support = std::mem::take(&mut self.xor_support_src);
+                    let mut merged = std::mem::take(&mut self.xor_support_merge);
+                    if self.indexed_xors {
+                        src.resize(words, 0);
+                        support.clear();
+                        support.extend_from_slice(&self.matrix_support[i]);
+                        for &w in &support {
+                            src[w] = self.matrix[i * words + w];
+                        }
+                    } else {
+                        src.clear();
+                        src.extend_from_slice(&self.matrix[row_i]);
+                    }
                     let matrix = &mut self.matrix[..rows * words];
                     let matrix_rhs = &mut self.matrix_rhs[..rows];
                     let mut row_ops = 0u64;
@@ -1154,10 +1186,45 @@ impl Solver {
                         }
                         row_ops += 1;
                         matrix_rhs[j] ^= src_rhs;
-                        xor_into(&mut matrix[j * words..(j + 1) * words], &src);
+                        let target = &mut matrix[j * words..(j + 1) * words];
+                        if self.indexed_xors {
+                            for &w in &support {
+                                target[w] ^= src[w];
+                            }
+                            self.stats.xor_word_updates += support.len() as u64;
+                            // Merge the sorted supports after cancellation, preserving
+                            // ascending word/pivot/reason order exactly.
+                            merged.clear();
+                            let old = &self.matrix_support[j];
+                            let (mut a, mut b) = (0, 0);
+                            while a < old.len() || b < support.len() {
+                                let w = match (old.get(a), support.get(b)) {
+                                    (Some(&x), Some(&y)) => x.min(y),
+                                    (Some(&x), None) => x,
+                                    (None, Some(&y)) => y,
+                                    _ => unreachable!(),
+                                };
+                                if old.get(a) == Some(&w) {
+                                    a += 1;
+                                }
+                                if support.get(b) == Some(&w) {
+                                    b += 1;
+                                }
+                                self.stats.xor_support_visits += 1;
+                                if target[w] != 0 {
+                                    merged.push(w);
+                                }
+                            }
+                            std::mem::swap(&mut self.matrix_support[j], &mut merged);
+                        } else {
+                            xor_into(target, &src);
+                            self.stats.xor_word_updates += words as u64;
+                        }
                     }
                     self.stats.xor_row_ops += row_ops;
                     self.xor_src = src;
+                    self.xor_support_src = support;
+                    self.xor_support_merge = merged;
                 }
             }
         }
@@ -1174,25 +1241,14 @@ impl Solver {
                 None => continue, // decided in phase 1
             };
             self.stats.xor_row_scans += 1;
-            let row = &self.matrix[i * words..(i + 1) * words];
-            let mut parity = self.matrix_rhs[i];
-            for (w, ((&m, &assigned), &value)) in row
-                .iter()
-                .zip(&self.assigned_w)
-                .zip(&self.value_w)
-                .enumerate()
-            {
-                if m == 0 {
-                    continue;
-                }
-                let free = m & !assigned;
-                if free.count_ones() > 1
-                    || (free != 0 && free.trailing_zeros() + (w * 64) as u32 != p)
-                {
-                    continue 'rows;
-                }
-                parity ^= ((m & assigned & value).count_ones() & 1) == 1;
-            }
+            let parity = if self.indexed_xors {
+                self.unit_parity(i, words, p, self.matrix_support[i].iter().copied())
+            } else {
+                self.unit_parity(i, words, p, 0..words)
+            };
+            let Some(parity) = parity else {
+                continue 'rows;
+            };
 
             let lit = if parity {
                 (p + 1) as Lit
@@ -1239,24 +1295,75 @@ impl Solver {
     fn rebuild_matrix(&mut self) {
         self.matrix.clear();
         self.matrix_rhs.clear();
+        self.matrix_support.clear();
         for row in &self.xors {
             self.matrix.extend_from_slice(&row.mask);
             self.matrix_rhs.push(row.rhs);
+            self.matrix_support.push(if self.indexed_xors {
+                row.mask
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(w, &m)| (m != 0).then_some(w))
+                    .collect()
+            } else {
+                Vec::new()
+            });
         }
         self.pivot.clear();
         self.pivot.resize(self.matrix_rhs.len(), None);
+    }
+
+    /// Select the dense reference or exact nonzero-word engine. Resetting the
+    /// matrix preserves the original constraints and trail.
+    pub fn set_indexed_xors(&mut self, indexed: bool) {
+        self.indexed_xors = indexed;
+        self.clear_matrix();
+        self.xor_epoch = u64::MAX;
     }
 
     /// Drop the working matrix; the next pass rebuilds it from `xors`.
     fn clear_matrix(&mut self) {
         self.matrix.clear();
         self.matrix_rhs.clear();
+        self.matrix_support.clear();
+    }
+
+    fn unit_parity(
+        &self,
+        i: usize,
+        words: usize,
+        p: u32,
+        positions: impl Iterator<Item = usize>,
+    ) -> Option<bool> {
+        let mut parity = self.matrix_rhs[i];
+        for w in positions {
+            let m = self.matrix[i * words + w];
+            if m == 0 {
+                continue;
+            }
+            let free = m & !self.assigned_w[w];
+            if free.count_ones() > 1 || (free != 0 && free.trailing_zeros() + (w * 64) as u32 != p)
+            {
+                return None;
+            }
+            parity ^= ((m & self.assigned_w[w] & self.value_w[w]).count_ones() & 1) == 1;
+        }
+        Some(parity)
     }
 
     /// `rhs ⊕ parity(assigned-true variables of the row)` — zero when a
     /// fully assigned row is satisfied.
     fn row_residual(&self, i: usize, words: usize) -> bool {
         let mut parity = self.matrix_rhs[i];
+        if self.indexed_xors {
+            for &w in &self.matrix_support[i] {
+                parity ^= ((self.matrix[i * words + w] & self.assigned_w[w] & self.value_w[w])
+                    .count_ones()
+                    & 1)
+                    == 1;
+            }
+            return parity;
+        }
         for (w, &m) in self.matrix[i * words..(i + 1) * words].iter().enumerate() {
             if m != 0 {
                 parity ^= ((m & self.assigned_w[w] & self.value_w[w]).count_ones() & 1) == 1;
@@ -2372,6 +2479,107 @@ mod tests {
     ///
     /// A silent incompleteness here would show up as a missed
     /// propagation, not a crash, so it is worth checking explicitly.
+    #[test]
+    fn indexed_words_match_dense_across_growth_and_blocking() {
+        let mut rng = 0x83a9_47d2_1bce_7731u64;
+        fn next(rng: &mut u64) -> u64 {
+            *rng ^= *rng << 13;
+            *rng ^= *rng >> 7;
+            *rng ^= *rng << 17;
+            *rng
+        }
+        for n in [1u32, 63, 64, 65, 127, 130] {
+            for _ in 0..12 {
+                let mut dense = Solver::new(n);
+                dense.set_indexed_xors(false);
+                let mut indexed = Solver::new(n);
+                let truth: Vec<bool> = (0..n).map(|_| next(&mut rng) & 1 != 0).collect();
+                for _ in 0..40 {
+                    let vars: Vec<u32> = (0..5)
+                        .map(|_| 1 + (next(&mut rng) % n as u64) as u32)
+                        .collect();
+                    let rhs = vars.iter().fold(false, |p, &v| p ^ truth[v as usize - 1]);
+                    assert_eq!(dense.add_xor(&vars, rhs), indexed.add_xor(&vars, rhs));
+                }
+                for _ in 0..40 {
+                    let mut clause: Vec<Lit> = (0..4)
+                        .map(|_| {
+                            let v = (1 + next(&mut rng) % n as u64) as Lit;
+                            if next(&mut rng) & 1 == 0 {
+                                v
+                            } else {
+                                -v
+                            }
+                        })
+                        .collect();
+                    if !clause
+                        .iter()
+                        .any(|&l| truth[l.unsigned_abs() as usize - 1] == (l > 0))
+                    {
+                        clause[0] = -clause[0];
+                    }
+                    assert_eq!(dense.add_clause(clause.clone()), indexed.add_clause(clause));
+                }
+                for _ in 0..3 {
+                    dense.conflict_budget = 1000;
+                    indexed.conflict_budget = 1000;
+                    let a = dense.solve();
+                    let b = indexed.solve();
+                    assert_eq!(a, b, "width {n}");
+                    assert_eq!(dense.model(), indexed.model());
+                    assert_eq!(
+                        (
+                            dense.stats.conflicts,
+                            dense.stats.decisions,
+                            dense.stats.xor_row_ops,
+                            dense.stats.xor_passes,
+                            dense.stats.xor_reason_lits
+                        ),
+                        (
+                            indexed.stats.conflicts,
+                            indexed.stats.decisions,
+                            indexed.stats.xor_row_ops,
+                            indexed.stats.xor_passes,
+                            indexed.stats.xor_reason_lits
+                        )
+                    );
+                    let words = bs_words(indexed.n_vars);
+                    for (i, support) in indexed.matrix_support.iter().enumerate() {
+                        let exact: Vec<_> = indexed.matrix[i * words..(i + 1) * words]
+                            .iter()
+                            .enumerate()
+                            .filter_map(|(w, &m)| (m != 0).then_some(w))
+                            .collect();
+                        assert_eq!(*support, exact);
+                    }
+                    if a != SolveResult::Sat {
+                        break;
+                    }
+                    let block: Vec<_> = dense
+                        .model()
+                        .iter()
+                        .enumerate()
+                        .map(|(v, &t)| if t { -((v + 1) as Lit) } else { (v + 1) as Lit })
+                        .collect();
+                    dense.reset_search();
+                    indexed.reset_search();
+                    assert_eq!(dense.add_clause(block.clone()), indexed.add_clause(block));
+                }
+                // Widen the already-used matrix across another word boundary.
+                dense.reset_search();
+                indexed.reset_search();
+                dense.add_vars(65);
+                indexed.add_vars(65);
+                assert_eq!(
+                    dense.add_xor(&[n, n + 1, n + 65], true),
+                    indexed.add_xor(&[n, n + 1, n + 65], true)
+                );
+                assert_eq!(dense.solve(), indexed.solve());
+                assert_eq!(dense.model(), indexed.model());
+            }
+        }
+    }
+
     #[test]
     fn incremental_matrix_matches_full_elimination() {
         let n_vars = 12u32;

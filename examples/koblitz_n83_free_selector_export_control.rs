@@ -86,6 +86,15 @@ fn export_selectors(
     end: u32,
 ) -> Result<Vec<Value>> {
     let model = enc.solver.model();
+    export_selectors_from_model(&model, domains, first, end)
+}
+
+fn export_selectors_from_model(
+    model: &[bool],
+    domains: &[Vec<BigUint>],
+    first: u32,
+    end: u32,
+) -> Result<Vec<Value>> {
     let mut next = first;
     let mut assignments = Vec::new();
     for domain in domains {
@@ -96,7 +105,7 @@ fn export_selectors(
             return Err("duplicate representatives".into());
         }
         let phase_first = next + 2 * reps.len() as u32 - 1 + 83;
-        let (index, phase) = decode_selector(&model, next, phase_first, reps.len())?;
+        let (index, phase) = decode_selector(model, next, phase_first, reps.len())?;
         assignments.push(json!({"representative":reps[index].to_string(),"index":index,"phase":phase,"domain_size":reps.len(),"selector_first_wire":next,"phase_first_wire":phase_first}));
         next += u32::try_from(
             frobenius_orbit_domain_size(83, 1, reps.len())
@@ -222,6 +231,62 @@ fn run(path: &str, conflicts: u64) -> Result<Value> {
         })
     );
     enc.solver.conflict_budget = conflicts;
+    let engine = std::env::var("N83_XOR_ENGINE").unwrap_or_else(|_| "indexed_words".into());
+    match engine.as_str() {
+        "dense" => enc.solver.set_indexed_xors(false),
+        "indexed_words" => enc.solver.set_indexed_xors(true),
+        _ => return Err("unknown N83_XOR_ENGINE".into()),
+    }
+    if let Ok(cms) = std::env::var("N83_CMS_PATH") {
+        let dimacs = crypto_lib::cryptanalysis::sat::to_dimacs_xor(&enc.solver);
+        fs::write("/out/witness.cnf", &dimacs)?;
+        let start = Instant::now();
+        let output = std::process::Command::new(cms)
+            .args([
+                "--threads=1",
+                "--verb=1",
+                "--maxtime=360",
+                &format!("--maxconfl={conflicts}"),
+                "--dumpresult=/out/cms.model",
+                "/out/witness.cnf",
+            ])
+            .output()?;
+        let process_ms = start.elapsed().as_secs_f64() * 1000.0;
+        fs::write("/out/cms.stdout", &output.stdout)?;
+        fs::write("/out/cms.stderr", &output.stderr)?;
+        if output.status.code() != Some(10) {
+            return Err(format!(
+                "external SAT reference did not return SAT: {:?}; raw output retained",
+                output.status.code()
+            )
+            .into());
+        }
+        let model_raw = fs::read_to_string("/out/cms.model")?;
+        let model = parse_external_model(&model_raw, variables as usize)?;
+        check_external_formula(&dimacs, &model)?;
+        let assignments = export_selectors_from_model(&model, &domains, domain_first, domain_end)?;
+        return Ok(json!({
+            "schema":"n83.fixed-witness-sat-control/v1", "scope":"known_answer_encoding_control_only",
+            "control_variant":"fixed_coordinates_free_selectors", "status":"SAT_verified_witness_x", "model_verified":true,
+            "external_solver":"CryptoMiniSat5.17.0", "external_process_ms":process_ms,
+            "selector_assignments":assignments,"selector_export":"decoded_from_sat_model_after_solve",
+            "input_blake3":blake3::hash(&raw).to_hex().to_string(), "fixture_sha256":FIXTURE_SHA256,"fixture_blake3":FIXTURE_BLAKE3,
+            "fixed_x_blocks":8,"identity_mask":0,"variables":variables,"clauses":clauses,"xors":enc.solver.n_xors(),
+            "conflict_cap":conflicts,"conflicts":Value::Null,"natural_relations":Value::Null,"selected_best_total_runtime":Value::Null,
+            "dimacs_blake3":blake3::hash(dimacs.as_bytes()).to_hex().to_string()
+        }));
+    }
+    if let Ok(path) = std::env::var("N83_EXPORT_DIMACS_PATH") {
+        fs::write(
+            &path,
+            crypto_lib::cryptanalysis::sat::to_dimacs_xor(&enc.solver),
+        )?;
+        if std::env::var("N83_EXPORT_ONLY").as_deref() == Ok("1") {
+            return Ok(
+                json!({"status":"EXPORTED_ONLY", "variables":variables, "clauses":clauses, "xors":enc.solver.n_xors(), "dimacs_path":path}),
+            );
+        }
+    }
     // Untimed input-shape census, outside the solve-entry clock. Retain the
     // original rows so word padding can be distinguished from XOR algebra.
     let rows = enc.solver.xor_rows();
@@ -258,6 +323,9 @@ fn run(path: &str, conflicts: u64) -> Result<Value> {
         "selector_assignments":selector_assignments,
         "selector_export":"decoded_from_sat_model_after_solve",
         "xor_profile":{
+            "engine":engine,
+            "xor_word_updates":enc.solver.stats.xor_word_updates,
+            "xor_support_visits":enc.solver.stats.xor_support_visits,
             "rows":rows.len(), "words_per_dense_row":variables.div_ceil(64),
             "original_nonzero_words":original_nonzero_words,
             "decisions":enc.solver.stats.decisions,"restarts":enc.solver.stats.restarts,
@@ -290,6 +358,64 @@ fn run(path: &str, conflicts: u64) -> Result<Value> {
     }))
 }
 
+fn parse_external_model(raw: &str, n: usize) -> Result<Vec<bool>> {
+    let mut model = vec![None; n];
+    for line in raw.lines() {
+        if line.starts_with('c') || line == "SAT" || line == "s SATISFIABLE" {
+            continue;
+        }
+        for token in line.split_whitespace().filter(|&s| s != "v") {
+            let lit: i64 = token.parse()?;
+            if lit == 0 {
+                continue;
+            }
+            let i = usize::try_from(lit.unsigned_abs())?
+                .checked_sub(1)
+                .ok_or("zero wire")?;
+            let slot = model.get_mut(i).ok_or("external wire outside model")?;
+            if slot.replace(lit > 0).is_some() {
+                return Err("duplicate external model wire".into());
+            }
+        }
+    }
+    model
+        .into_iter()
+        .map(|v| v.ok_or_else(|| "incomplete external model".into()))
+        .collect()
+}
+
+fn check_external_formula(raw: &str, model: &[bool]) -> Result<()> {
+    for line in raw.lines() {
+        if line.starts_with('p') || line.starts_with('c') || line.trim().is_empty() {
+            continue;
+        }
+        let xor = line.starts_with('x');
+        let text = if xor { &line[1..] } else { line };
+        let mut value = false;
+        let mut terminated = false;
+        for token in text.split_whitespace() {
+            let lit: i64 = token.parse()?;
+            if lit == 0 {
+                terminated = true;
+                break;
+            }
+            let i = usize::try_from(lit.unsigned_abs())?
+                .checked_sub(1)
+                .ok_or("zero wire")?;
+            let bit = *model.get(i).ok_or("formula outside model")? == (lit > 0);
+            if xor {
+                value ^= bit;
+            } else {
+                value |= bit;
+            }
+        }
+        if !terminated || !value {
+            return Err("external model fails original CNF/XOR constraint".into());
+        }
+    }
+    Ok(())
+}
+
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
     if args.len() != 3 {
@@ -307,6 +433,20 @@ fn main() -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn external_model_replay_rejects_forgery_and_incomplete_assignments() {
+        let formula = "p cnf 3 3\n1 0\n-1 2 0\nx -1 2 3 0\n";
+        let model = parse_external_model("SAT\n1 2 -3 0\n", 3).unwrap();
+        check_external_formula(formula, &model).unwrap();
+        for bit in 0..3 {
+            let mut forged = model.clone();
+            forged[bit] = !forged[bit];
+            assert!(check_external_formula(formula, &forged).is_err());
+        }
+        assert!(parse_external_model("SAT\n1 2 0\n", 3).is_err());
+        assert!(parse_external_model("SAT\n1 2 -3 1 0\n", 3).is_err());
+        assert!(parse_external_model("SAT\n1 2 -4 0\n", 3).is_err());
+    }
     #[test]
     fn selector_decoder_rejects_absent_multiple_bad_phase_and_bounds() {
         let mut model = vec![false; 10];

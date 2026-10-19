@@ -1,6 +1,18 @@
 //! Native bounded diagnostic runner. Deliberately admits no scalar recovery or runtime winner.
 use serde_json::{json, Value};
 mod card;
+#[allow(dead_code)]
+#[path = "../../../src/cryptanalysis/ecbench/isolation.rs"]
+mod native_isolation;
+#[allow(dead_code)]
+#[path = "../../../src/cryptanalysis/ecbench/signals.rs"]
+pub mod native_signals;
+mod cryptanalysis {
+    pub mod ecbench {
+        pub use crate::native_signals as signals;
+    }
+}
+mod reservation;
 use std::{
     collections::BTreeMap,
     error::Error,
@@ -371,13 +383,23 @@ fn audit(dir: &Path) -> R<Value> {
     )?;
     let raw = fs::read_to_string(dir.join("stderr.log"))?;
     if cfg["columns"] == 0 {
-        let sat = sat_trace(&raw)?;
+        let external = cfg["external_solver_blake3"].is_string();
+        let sat = if external {
+            json!({"status":"EXTERNAL_NO_INTERNAL_TRACE"})
+        } else {
+            sat_trace(&raw)?
+        };
         if out["wall_censored"] == true {
             return Ok(
                 json!({"schema":"n83.native-audit/v1","status":"UNKNOWN_CONTROL_WALL_CAP","sat_trace":sat,"terminal_counters":null,"outer_wall_ms":out["outer_wall_ms"],"selected_best_total_runtime":null}),
             );
         }
         let result: Value = serde_json::from_slice(&fs::read(dir.join("stdout.log"))?)?;
+        let external_model = if external {
+            Some(external_replay(dir)?)
+        } else {
+            None
+        };
         if cfg["control_variant"] == "fixed_coordinates_free_selectors"
             && result["status"] == "UNKNOWN_conflict_cap"
         {
@@ -412,9 +434,10 @@ fn audit(dir: &Path) -> R<Value> {
         require(
             result["status"] == "SAT_verified_witness_x"
                 && result["model_verified"] == true
-                && sat["status"] == "COMPLETE"
-                && sat["terminal_counters"]["outcome"] == "Sat"
-                && sat["terminal_counters"]["conflicts"] == result["conflicts"]
+                && (external
+                    || (sat["status"] == "COMPLETE"
+                        && sat["terminal_counters"]["outcome"] == "Sat"
+                        && sat["terminal_counters"]["conflicts"] == result["conflicts"]))
                 && result["conflict_cap"] == cfg["conflicts"]
                 && result["fixed_x_blocks"] == 8
                 && result["identity_mask"] == 0
@@ -440,6 +463,31 @@ fn audit(dir: &Path) -> R<Value> {
                 "selector witness variant differs",
             )?;
             for (i, a) in assignments.iter().enumerate() {
+                if let Some(model) = &external_model {
+                    let first = number(a, "selector_first_wire")? as usize;
+                    let phase_first = number(a, "phase_first_wire")? as usize;
+                    let count = number(a, "domain_size")? as usize;
+                    let index = number(a, "index")? as usize;
+                    for k in 0..count {
+                        require(
+                            model.get(first + k - 1) == Some(&(k == index)),
+                            "external selector bit differs",
+                        )?;
+                    }
+                    let mut actual_phase = 0;
+                    for k in 0..7 {
+                        if *model
+                            .get(phase_first + k - 1)
+                            .ok_or("phase wire outside model")?
+                        {
+                            actual_phase |= 1 << k;
+                        }
+                    }
+                    require(
+                        actual_phase == number(a, "phase")?,
+                        "external phase bits differ",
+                    )?;
+                }
                 let source = if i < 3 { "small_reps" } else { "residual_reps" };
                 let mut reps = input[source]
                     .as_array()
@@ -471,11 +519,18 @@ fn audit(dir: &Path) -> R<Value> {
             }
         }
         require(
-            number(&result, "conflicts")? <= number(&cfg, "conflicts")?
+            (external || number(&result, "conflicts")? <= number(&cfg, "conflicts")?)
                 && out["exit_code"] == 0
                 && out["wall_censored"] == false,
             "control capped or conflicts exceeded",
         )?;
+        if external {
+            require(
+                result["external_solver"] == "CryptoMiniSat5.17.0"
+                    && result["dimacs_blake3"] == hash(dir.join("witness.cnf"))?,
+                "external formula custody differs",
+            )?;
+        }
         return Ok(
             json!({"schema":"n83.native-audit/v1","status":"PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM","sat_trace":sat,"control":result,"outer_wall_ms":out["outer_wall_ms"],"natural_relations":null,"selected_best_total_runtime":null}),
         );
@@ -620,6 +675,92 @@ fn audit(dir: &Path) -> R<Value> {
         json!({"schema":"n83.native-audit/v1","status":status,"columns":cfg["columns"],"phases":ps,"queries":queries,"terminal_counters":counters,"outer_wall_ms":out["outer_wall_ms"],"selected_best_total_runtime":null}),
     )
 }
+fn external_replay(dir: &Path) -> R<Vec<bool>> {
+    let formula = fs::read_to_string(dir.join("witness.cnf"))?;
+    let mut lines = formula.lines();
+    let header: Vec<_> = lines
+        .next()
+        .ok_or("no DIMACS header")?
+        .split_whitespace()
+        .collect();
+    require(
+        header.len() == 4 && header[0] == "p" && header[1] == "cnf",
+        "bad DIMACS header",
+    )?;
+    let n: usize = header[2].parse()?;
+    let count: usize = header[3].parse()?;
+    let mut assignments = vec![None; n];
+    for line in fs::read_to_string(dir.join("cms.model"))?.lines() {
+        if ["SAT", "s SATISFIABLE"].contains(&line) || line.starts_with('c') {
+            continue;
+        }
+        for token in line.split_whitespace().filter(|&x| x != "v") {
+            let l: i64 = token.parse()?;
+            if l == 0 {
+                continue;
+            }
+            let index = usize::try_from(l.unsigned_abs())?
+                .checked_sub(1)
+                .ok_or("zero literal")?;
+            let slot = assignments.get_mut(index).ok_or("model out of bounds")?;
+            require(slot.replace(l > 0).is_none(), "duplicate model literal")?;
+        }
+    }
+    let model: Vec<bool> = assignments
+        .into_iter()
+        .map(|x| x.ok_or("incomplete model"))
+        .collect::<Result<_, _>>()?;
+    let mut checked = 0;
+    for line in lines {
+        if line.starts_with('c') || line.trim().is_empty() {
+            continue;
+        }
+        let xor = line.starts_with('x');
+        let mut satisfied = false;
+        let mut terminated = false;
+        for token in line.trim_start_matches('x').split_whitespace() {
+            let l: i64 = token.parse()?;
+            if l == 0 {
+                terminated = true;
+                break;
+            }
+            let index = usize::try_from(l.unsigned_abs())?
+                .checked_sub(1)
+                .ok_or("zero literal")?;
+            let literal = *model.get(index).ok_or("formula out of bounds")? == (l > 0);
+            satisfied = if xor {
+                satisfied ^ literal
+            } else {
+                satisfied || literal
+            };
+        }
+        require(
+            terminated && satisfied,
+            "independent external CNF/XOR replay fails",
+        )?;
+        checked += 1;
+    }
+    require(checked == count, "DIMACS constraint count differs")?;
+    let cfg = read(dir.join("config.json"))?;
+    let domains = read(Path::new(text(&cfg, "panel")?).join("domains.json"))?;
+    for (block, x) in domains["ordered_xs"]
+        .as_array()
+        .ok_or("xs")?
+        .iter()
+        .chain(domains["partial_xs"].as_array().ok_or("partials")?)
+        .enumerate()
+    {
+        let x = decimal(x, 1 << 83)?;
+        for bit in 0..83 {
+            require(
+                model.get(block * 83 + bit) == Some(&((x >> bit) & 1 != 0)),
+                "external fixed coordinate differs",
+            )?;
+        }
+    }
+    Ok(model)
+}
+
 fn run(spec: &Path, dir: &Path) -> R<()> {
     let s = read(spec)?;
     let wall = number(&s, "wall_seconds")?;
@@ -633,6 +774,7 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
     require((1..=100000).contains(&conflicts), "invalid conflicts")?;
     let checkout = fs::canonicalize(text(&s, "checkout")?)?;
     let clean = Command::new("git")
+        .args(["-c", &format!("safe.directory={}", checkout.display())])
         .args(["status", "--porcelain"])
         .current_dir(&checkout)
         .output()?;
@@ -641,6 +783,7 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         "checkout not clean",
     )?;
     let commit = Command::new("git")
+        .args(["-c", &format!("safe.directory={}", checkout.display())])
         .args(["rev-parse", "HEAD"])
         .current_dir(&checkout)
         .output()?;
@@ -674,6 +817,11 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
     )?;
     fs::create_dir(dir)?;
     let dir = fs::canonicalize(dir)?;
+    let reservation = if s["isolate"] == true {
+        Some(reservation::Reservation::acquire(&dir)?)
+    } else {
+        None
+    };
     fs::copy(spec, dir.join("spec.json"))?;
     let source = dir.join("source");
     for p in SOURCES {
@@ -690,7 +838,7 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         std::process::id(),
         SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos()
     );
-    let cfg = json!({"schema":"n83.native-run-config/v1","control_variant":s["control_variant"],"columns":columns,"conflicts":conflicts,"wall_seconds":wall,"panel":panel,"fixtures":fixtures,"worker":worker,"image":image,"source_commit":commit,"panel_blake3":inventory(&panel)?,"fixtures_blake3":inventory(&fixtures)?,"source_blake3":inventory(&source)?,"worker_blake3":hash(&worker)?,"runner_blake3":hash(std::env::current_exe()?)?,"spec_blake3":hash(spec)?,"container_name":name});
+    let cfg = json!({"schema":"n83.native-run-config/v1","control_variant":s["control_variant"],"columns":columns,"conflicts":conflicts,"wall_seconds":wall,"panel":panel,"fixtures":fixtures,"worker":worker,"image":image,"source_commit":commit,"panel_blake3":inventory(&panel)?,"fixtures_blake3":inventory(&fixtures)?,"source_blake3":inventory(&source)?,"worker_blake3":hash(&worker)?,"runner_blake3":hash(std::env::current_exe()?)?,"spec_blake3":hash(spec)?,"container_name":name,"isolate":s["isolate"],"xor_engine":s["xor_engine"],"external_solver_blake3":s["external_solver_blake3"]});
     write(dir.join("config.json"), &cfg)?;
     write(
         dir.join("custody.json"),
@@ -727,6 +875,30 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         "--env=N83_SAT_PHASE_TRACE=1".into(),
     ];
     let owner = fs::metadata(&dir)?;
+    if s["external_solver"].is_string() {
+        let external = fs::canonicalize(text(&s, "external_solver")?)?;
+        require(
+            hash(&external)? == text(&s, "external_solver_blake3")?,
+            "external solver differs",
+        )?;
+        cmd.extend([
+            "--mount".into(),
+            format!("type=bind,src={},dst=/cms,readonly", external.display()),
+            "--env=N83_CMS_PATH=/cms".into(),
+        ]);
+    }
+    if let Some(r) = &reservation {
+        cmd.push(format!("--cpuset-cpus={}", r.plan.run_cpu));
+    }
+    if !s["xor_engine"].is_null() {
+        let engine = text(&s, "xor_engine")?;
+        require(
+            ["dense", "indexed_words"].contains(&engine),
+            "invalid XOR engine",
+        )?;
+        cmd.push(format!("--env=N83_XOR_ENGINE={engine}"));
+    }
+    cmd.push("--env=RAYON_NUM_THREADS=1".into());
     cmd.extend(["--user".into(), format!("{}:{}", owner.uid(), owner.gid())]);
     for m in &mounts {
         cmd.extend(["--mount".into(), m.clone()]);
@@ -764,6 +936,12 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         let live = inspect(&name)?;
         write(dir.join("inspect-live.json"), &live)?;
         isolation(&live, image)?;
+        if let Some(r) = &reservation {
+            require(
+                live["host"]["CpusetCpus"] == r.plan.run_cpu.to_string(),
+                "CPU pin differs",
+            )?;
+        }
         let mut censored = false;
         loop {
             let v = inspect(&name)?;
@@ -816,6 +994,9 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         )?;
     }
     attempt?;
+    if let Some(r) = &reservation {
+        r.finish(&dir)?;
+    }
     let a = match audit(&dir) {
         Ok(a) => a,
         Err(e) => {
