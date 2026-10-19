@@ -12,7 +12,7 @@ for dir in $R/k*n*; do
   curve=$(jq -r .curve $dir/M1/r1-baseline.price.json)
   for id in $(for j in 1 2 3 4; do for i in 1 2 3 4 5; do for arm in baseline candidate; do [ -f "$dir/M$j/r$i-$arm.price.json" ] && echo "M$j/r$i-$arm"; done; done; done | $here/sample.sh "C:$curve" 3); do
     arch="$dir/$id.price.json"; params=$(jq -r .params "$arch")
-    safe=$(echo "$kn-$id" | tr '/' '_'); out="$OUT/$safe.json"; rm -f "$out"
+    safe=$(echo "$curve-$id" | tr '/' '_'); out="$OUT/$safe.json"; rm -f "$out"
     RAYON_NUM_THREADS=1 "$IC" price --params "$params" --json --out "$out" >/dev/null 2>"$OUT/$safe.err"
     jq -n --arg run "$kn/$id" --slurpfile n "$out" --slurpfile o "$arch" '
       {run:$run, all_verified:$n[0].all_verified, recovered_equal:($n[0].recovered==$o[0].recovered),

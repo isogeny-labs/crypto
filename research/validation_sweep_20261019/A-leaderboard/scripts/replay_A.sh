@@ -18,8 +18,8 @@ for d in $base/k*n*; do
     done | "$CV"
     # (2) native re-execution
     seed=$(jq -r '.rho_policy.seed' "$p")
-    out="$OUT/$kn-$f.replay.json"; rm -f "$out"
-    RAYON_NUM_THREADS=1 "$IC" price --params "$d/$t.params.json" --single-target --rho-seed "$seed" --json --out "$out" >/dev/null 2>"$OUT/$kn-$f.replay.err"
+    out="$OUT/$curve-$f.replay.json"; rm -f "$out"
+    RAYON_NUM_THREADS=1 "$IC" price --params "$d/$t.params.json" --single-target --rho-seed "$seed" --json --out "$out" >/dev/null 2>"$OUT/$curve-$f.replay.err"
     jq -n --arg id "$kn/$f" --slurpfile n "$out" --slurpfile o "$p" '
       def sub($a;$b): ($a|tojson) as $x | true;  # placeholder, replaced below
       ($o[0].counts.pass|to_entries) as $oe |
