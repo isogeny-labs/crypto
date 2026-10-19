@@ -57,7 +57,9 @@
 //!   it and formed again, a block at a time, when it is eliminated, so a
 //!   step's memory is `B'` rather than the matrix. The scan keeps the
 //!   products it forms for the elimination to read back, up to `2²³` terms a
-//!   step (64 MiB); the rest of a larger step is formed again.
+//!   step (64 MiB of stored term payload; the vectors' spare capacity comes
+//!   on top, see `PRODUCT_CACHE_TERMS`); the rest of a larger step is
+//!   formed again.
 //! - **The basis keeps the echelon's rows.** A new element is the pivot row
 //!   the elimination leaves, dense over the step's columns without a divisor
 //!   from its lead on, and the elements a step adds share that column list:
@@ -1897,11 +1899,14 @@ struct RowDesc {
 
 /// The most terms a step keeps of the products its symbolic preprocessing
 /// forms. A term costs eight bytes (a `u32` column number and a `u32`
-/// coefficient), so the cache is at most 64 MiB however large the step,
-/// small beside the working set of the steps whose products do not fit in
-/// memory together, which is why a row is formed on demand at all. A product
-/// that would pass the limit is not kept and is formed again when its row is
-/// eliminated.
+/// coefficient), so the stored payload is at most 64 MiB however large the
+/// step. This bounds `len`, not allocated memory: the two vectors grow by
+/// doubling, so their capacity (and, while one reallocates, the old and new
+/// buffers together) can exceed that, by up to about twice in the worst
+/// case. That is still small beside the working set of the steps whose
+/// products do not fit in memory together, which is why a row is formed on
+/// demand at all. A product that would pass the limit is not kept and is
+/// formed again when its row is eliminated.
 const PRODUCT_CACHE_TERMS: usize = 1 << 23;
 
 /// The products a step's scan has formed, one after another, so that the
