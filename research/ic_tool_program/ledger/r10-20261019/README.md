@@ -37,9 +37,9 @@ The ledger is `research/ic_tool_program/baselines.json`, key `pinned_r10`.
 
 | entry | curve family, sizes | pinned configuration | commit, binary | unit | distance to matched rho |
 |:--|:--|:--|:--|:--|:--|
-| suite sizes (`baselines[]`) | ic tool programme, 11 suite curves | v3 (R07, `995ea207`) on main; rule v3 for one-target cold | `9c332039…` | ledger S = time / (unit_ns·√r) | cold 7.66 / 13.24 / 20.97× at k0n41 / k0n53 / k0n61 (rule v3). Open #1978/#2277 add v4–v8 and rule v7 (3.43–11.51×); they become the pin when merged. |
+| suite sizes (`baselines[]`) | ic tool programme, 11 suite curves | v3 (R07, `995ea207`) on main; rule v3 for one-target cold | `9c332039…` | ledger S = time / (unit_ns·√r) | cold 7.66 / 13.24 / 20.97× at icv1-f2m41-tm2308219-7f48b14a / icv1-f2m53-tm56619371-dac20a85 / icv1-f2m61-t158598901-ab42b6c5 (rule v3). Open #1978/#2277 add v4–v8 and rule v7 (3.43–11.51×); they become the pin when merged. |
 | `g3ghs-v1` | genus 3 after cubic GHS, curves 0–2, q = 2^10..2^22 | round 4 **C4** (`c4:lpsgebw2o100c+C1C2`) at 2^13..2^22; round 4 C1 at 2^12; round 2 `main:lpsgewd` at 2^10..2^11 | `225211fef`, `9f4cb966…` (2^10..2^11: `0a724dc8…`) | F_q-mult equivalents per solve | counted: 2.19 / 1.80 at 2^10 / 2^11; 0.25–0.79 at 2^12..2^20 (E0 rho, negation; uncharged work listed; §5a band not applied) |
-| `kob-orbit-v1` | compact-orbit Koblitz IC, k0n41 / k0n53 / k0n61 | `construct:<n>:0` default: free relations on, K = 125 / 280 / 500 | `e15ef5dfe` over `80184d522`, `31ba5945…` | S3 root solves per solve (+ wall, + ledger S cross-host) | cold wall 9.49 / 24.93 / 48.40× strong rho (item 09, cross-run); online 26 / 37 / 10× precomputed rho |
+| `kob-orbit-v1` | compact-orbit Koblitz IC, icv1-f2m41-tm2308219-7f48b14a / icv1-f2m53-tm56619371-dac20a85 / icv1-f2m61-t158598901-ab42b6c5 | `construct:<n>:0` default: free relations on, K = 125 / 280 / 500 | `e15ef5dfe` over `80184d522`, `31ba5945…` | S3 root solves per solve (+ wall, + ledger S cross-host) | cold wall 9.49 / 24.93 / 48.40× strong rho (item 09, cross-run); online 26 / 37 / 10× precomputed rho |
 | `kgb-harvest-v1` | Koblitz Gröbner oracle, 12 pipeline cells (component) | `KIC_LINEAR_HARVEST` default `root,gpv=0.9607,rank=331`, except **off** at (17,9) m2 | `9e69f57ef`, not recorded | thread CPU s per production decomposition | component, none |
 | `d4fp4-v1` | k = 4 on E(F_{p⁴}), D₄ y-line, p = 101..1601 | `d4-ed` (ecbench `yline-d4-ed`, C₄ = 2.54e10) | `d3d4f191a`, `9c4210f8…` | S = GAE / √r | 1.34e8× (p = 101) to 6.27e6× (p = 1601) |
 | `la-engine-v1` | IC linear algebra, synthetic m = 3 matrices (component) | legacy filter below 4,096 columns; CADO-style filter from 8,192 | `ae8ac7df9`, not recorded | solve_s | component, none |
@@ -54,7 +54,7 @@ The ledger is `research/ic_tool_program/baselines.json`, key `pinned_r10`.
 ### Three findings of the pin itself
 
 1. **On the ledger's own curves, the compact-orbit example is not the best IC.**
-   - `construct:41/53/61:0` are k0n41, k0n53 and k0n61: r and log₂ r agree.
+   - `construct:41/53/61:0` are icv1-f2m41-tm2308219-7f48b14a, icv1-f2m53-tm56619371-dac20a85 and icv1-f2m61-t158598901-ab42b6c5: r and log₂ r agree.
    - There, the ic tool pipeline is 7.66 / 13.24 / 20.97× rho cold (rule v3, in-process).
    - The compact-orbit default is 9.49 / 24.93 / 48.40× item 09's strong rho (cross-run).
    - In the ledger's unit the compact-orbit default reads S = 79 / 103 / 149, against 11.2 / 17.0 / 24.9 for rule v3. These are cross-host values, recorded and not ranked.
