@@ -61,7 +61,8 @@ def main(config_path):
 
     def command(name, args, cwd, seconds=120, cores=None, output=None):
         if args[0] == 'conductor':
-            args = list(args) + ['--project', cfg['conductor_project']]
+            pos = 3 if args[1] == 'task' else 2
+            args = list(args[:pos]) + ['--project', cfg['conductor_project']] + list(args[pos:])
         row = {'name':name,'command':list(map(str,args)),'started_at':now(),'timeout_seconds':seconds}
         state['steps'].append(row)
         target = Path(output) if output else out/(name+'.log')
