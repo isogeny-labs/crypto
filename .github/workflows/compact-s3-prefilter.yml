@@ -76,7 +76,9 @@ jobs:
         run: |
           python3 -m py_compile research/notes/ecc2k130/compact_s3_prefilter_20260930/*.py
           python3 -c 'import sys; sys.path.insert(0, "research/notes/ecc2k130/compact_s3_prefilter_20260930"); from verify_panel import freeze; freeze()'
-      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock && bash .github/scripts/frozen-lock-source.sh
+      # The materializer already restored the pinned source and manifest.
+      # This tree has no Git metadata and must not receive another source overlay.
+      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
         working-directory: ${{ runner.temp }}/s3-prefilter-frozen-src
       - name: Build and test the exact evaluation source
         working-directory: ${{ runner.temp }}/s3-prefilter-frozen-src
