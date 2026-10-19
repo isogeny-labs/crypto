@@ -31,9 +31,11 @@ def run(binary, folder, point_file, extra):
     env.update(extra)
     out = folder / "targets_result.jsonl"
     t = time.time()
-    subprocess.run([str(binary), "construct:83:1:1120", str(point_file), "29", str(out)],
-                   env=env, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    done = subprocess.run([str(binary), "construct:83:1:1120", str(point_file), "29", str(out)],
+                          env=env, check=True, capture_output=True, text=True)
+    (folder / "stdout.jsonl").write_text(done.stdout)
     rows = [json.loads(l) for l in out.read_text().splitlines() if l.strip()]
+    rows += [json.loads(l) for l in done.stdout.splitlines() if l.startswith("{")]
     return rows, time.time() - t
 
 
