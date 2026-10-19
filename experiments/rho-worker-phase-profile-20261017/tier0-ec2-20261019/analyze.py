@@ -6,7 +6,7 @@ import base64
 import binascii
 from hashlib import sha256
 import json
-from math import exp, isfinite, log
+from math import ceil, exp, isfinite, log
 from pathlib import Path
 import random
 import statistics
@@ -20,6 +20,15 @@ PAIR_FIELDS = {
     'walk_steps', 'distinguished_points', 'dead_trails',
     'units_completed', 'checkins', 'q_index', 'q_hex',
     'dp_bits', 'step_cap', 'checkin_every',
+}
+NOISE_POLICY = {
+    'allowed_local_interrupt_sources': ['LOC', 'IWI', 'RES', 'CAL', 'TLB'],
+    'max_local_interrupts_per_second': 5,
+    'max_local_interrupts_fixed': 10,
+    'max_cpu_pressure_usec': 1000,
+    'max_involuntary_switches': 2,
+    'max_major_faults': 0,
+    'max_external_interrupts': 0,
 }
 
 
@@ -37,6 +46,41 @@ def interval(q_logs):
                                           for _ in range(Q_COUNT)))
                    for _ in range(10000))
     return [draws[250], draws[9749]]
+
+
+def check_noise(row):
+    before, after = row['before'], row['after']
+    elapsed = (after['monotonic_ns'] - before['monotonic_ns']) / 1_000_000_000
+    problems = []
+    if elapsed <= 0:
+        problems.append('nonpositive counter interval')
+    local_limit = NOISE_POLICY['max_local_interrupts_fixed'] + ceil(
+        NOISE_POLICY['max_local_interrupts_per_second'] * max(elapsed, 0))
+    local = external = 0
+    for cpu, old_sources in before['interrupts_by_source'].items():
+        new_sources = after['interrupts_by_source'][cpu]
+        source_total = 0
+        for source in set(old_sources) | set(new_sources):
+            delta = new_sources.get(source, 0) - old_sources.get(source, 0)
+            if delta < 0:
+                problems.append('interrupt counter reset')
+            source_total += delta
+            if source in NOISE_POLICY['allowed_local_interrupt_sources']:
+                local += delta
+            else:
+                external += delta
+        if source_total != after['interrupts'][cpu] - before['interrupts'][cpu]:
+            problems.append('interrupt source sum mismatch')
+    if external > NOISE_POLICY['max_external_interrupts'] or local > local_limit:
+        problems.append('interrupt envelope exceeded')
+    for kind in ('some', 'full'):
+        delta = after['cpu_pressure_total'].get(kind, 0) - before['cpu_pressure_total'].get(kind, 0)
+        if delta < 0 or delta > NOISE_POLICY['max_cpu_pressure_usec']:
+            problems.append('CPU pressure envelope exceeded')
+    if (row['child_involuntary_switches'] > NOISE_POLICY['max_involuntary_switches'] or
+            row['child_major_faults'] > NOISE_POLICY['max_major_faults']):
+        problems.append('child scheduling or fault envelope exceeded')
+    return problems
 
 
 def audit(folder, strict_runner):
@@ -59,7 +103,9 @@ def audit(folder, strict_runner):
             set(manifest.get('pair_fields', [])) != PAIR_FIELDS or
             plan['workload']['walkers_requested'] != 128 or
             plan['workload']['checkin_every'] != 64 or
-            plan['workload']['batch_width'] != 32):
+            plan['workload']['batch_width'] != 32 or
+            plan['workload'].get('direct_strict_output') is not True or
+            manifest.get('noise_gate') != NOISE_POLICY):
         issues.append('frozen plan shape mismatch')
     host = preflight.get('evidence', {})
     if not preflight.get('ok') or host.get('virtualization') != 'none':
@@ -95,15 +141,17 @@ def audit(folder, strict_runner):
         by_key[key] = row
         if row.get('serial') != serial or row.get('status') != 'valid' or row.get('issues'):
             arm_issues.append('strict runner marked arm invalid')
-        if row.get('child_involuntary_switches') or row.get('child_major_faults'):
-            arm_issues.append('child scheduling or major fault event')
+        try:
+            arm_issues.extend(check_noise(row))
+        except (KeyError, TypeError, ValueError):
+            arm_issues.append('noise counters incomplete')
         if not row.get('postflight', {}).get('ok'):
             arm_issues.append('postflight failed')
         try:
             case = next(x for x in plan['cases'] if x['id'] == row['case'])
             variant = row['variant']
             manifest_case = next(x for x in manifest['cases'] if x['id'] == row['case'])
-            if row['command'] != manifest_case[variant] or row['command'][1:] != case[variant]:
+            if row['command'] != manifest_case[variant] or row['command'] != case[variant]:
                 arm_issues.append('command differs from frozen plan')
             raw_line = (folder / row['stdout_file']).read_text().strip()
             parsed = dict(word.split('=', 1) for word in raw_line.split())

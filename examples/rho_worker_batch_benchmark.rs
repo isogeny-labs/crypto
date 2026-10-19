@@ -5,6 +5,7 @@ use std::fs;
 use std::sync::Mutex;
 use std::time::Instant;
 
+use base64::Engine;
 use crypto_lib::cryptanalysis::pollard_collab::job::JobSpec;
 use crypto_lib::cryptanalysis::pollard_collab::state::SharedState;
 use crypto_lib::cryptanalysis::pollard_collab::worker::{run_lane, LaneOptions};
@@ -37,8 +38,8 @@ fn peak_rss_kib() -> Option<u64> {
 fn main() {
     let args = std::env::args().collect::<Vec<_>>();
     assert!(
-        matches!(args.len(), 8 | 9),
-        "usage: rho_worker_batch_benchmark MANIFEST Q_INDEX serial|batch WALKERS DP_BITS STEP_CAP BATCH_WIDTH [CHECKIN_EVERY]"
+        matches!(args.len(), 8 | 9 | 10),
+        "usage: rho_worker_batch_benchmark MANIFEST Q_INDEX serial|batch WALKERS DP_BITS STEP_CAP BATCH_WIDTH [CHECKIN_EVERY] [--strict-output]"
     );
     let manifest_bytes = fs::read(&args[1]).expect("read frozen Q manifest");
     let manifest_sha256 = hex::encode(sha256(&manifest_bytes));
@@ -58,6 +59,8 @@ fn main() {
     let checkin_every: u64 = args
         .get(8)
         .map_or(8, |word| word.parse().expect("checkin every"));
+    let strict_output = args.get(9).is_some_and(|word| word == "--strict-output");
+    assert!(args.len() != 10 || strict_output, "unknown output format");
     assert!(walkers > 0 && walkers <= 256 && step_cap > 0);
     assert!((2..32).contains(&dp_bits));
     assert!(batch_width > 0 && batch_width <= walkers as usize);
@@ -133,38 +136,60 @@ fn main() {
     } else {
         "early_stop_or_solution"
     };
-    println!(
-        "{}",
-        json!({
-            "schema": "rho-worker-batch-benchmark-v1",
-            "status": status,
-            "tier": "unclassified_host_receipt_required",
-            "curve": "secp256k1",
-            "fixture_manifest_sha256": manifest_sha256,
-            "q_index": q_index,
-            "q_hex": q_hex,
-            "mode": mode,
-            "batch_width": batch_width,
-            "job_id": ctx.job_id,
-            "seed": SEED,
-            "walkers_requested": walkers,
-            "dp_bits": dp_bits,
-            "step_cap": step_cap,
-            "checkin_every": options.checkin_every,
-            "setup_ns": setup_ns,
-            "walk_ns": walk_ns,
-            "total_charged_ns": setup_ns + walk_ns,
-            "verification_ns_uncharged": verify_ns,
-            "peak_rss_kib": peak_rss_kib,
-            "walkers_done": summary.walkers,
-            "walk_steps": summary.steps,
-            "distinguished_points": summary.dps,
-            "verified_distinguished_points": verified_dps,
-            "dead_trails": summary.dead_trails,
-            "units_completed": summary.units_completed,
-            "checkins": summary.checkins,
-            "checkin_blake3_time_normalized": checkin_blake3,
-            "solution_hex": summary.solution.map(|v| format!("{v:x}")),
-        })
-    );
+    let report = json!({
+        "schema": "rho-worker-batch-benchmark-v1",
+        "status": status,
+        "tier": "unclassified_host_receipt_required",
+        "curve": "secp256k1",
+        "fixture_manifest_sha256": manifest_sha256,
+        "q_index": q_index,
+        "q_hex": q_hex,
+        "mode": mode,
+        "batch_width": batch_width,
+        "job_id": ctx.job_id,
+        "seed": SEED,
+        "walkers_requested": walkers,
+        "dp_bits": dp_bits,
+        "step_cap": step_cap,
+        "checkin_every": options.checkin_every,
+        "setup_ns": setup_ns,
+        "walk_ns": walk_ns,
+        "total_charged_ns": setup_ns + walk_ns,
+        "verification_ns_uncharged": verify_ns,
+        "peak_rss_kib": peak_rss_kib,
+        "walkers_done": summary.walkers,
+        "walk_steps": summary.steps,
+        "distinguished_points": summary.dps,
+        "verified_distinguished_points": verified_dps,
+        "dead_trails": summary.dead_trails,
+        "units_completed": summary.units_completed,
+        "checkins": summary.checkins,
+        "checkin_blake3_time_normalized": checkin_blake3,
+        "solution_hex": summary.solution.map(|v| format!("{v:x}")),
+    });
+    if strict_output {
+        assert_eq!(status, "complete_frozen_work");
+        let raw_b64 = base64::engine::general_purpose::URL_SAFE.encode(report.to_string());
+        println!(
+            "job_id={} checkin_blake3_time_normalized={} walkers_done={} walk_steps={} distinguished_points={} dead_trails={} units_completed={} checkins={} q_index={} q_hex={} dp_bits={} step_cap={} checkin_every={} verified=1 online_ms={:.6} peak_rss_kib={} raw_b64={}",
+            report["job_id"].as_str().unwrap(),
+            report["checkin_blake3_time_normalized"].as_str().unwrap(),
+            summary.walkers,
+            summary.steps,
+            summary.dps,
+            summary.dead_trails,
+            summary.units_completed,
+            summary.checkins,
+            q_index,
+            q_hex,
+            dp_bits,
+            step_cap,
+            options.checkin_every,
+            (setup_ns + walk_ns) as f64 / 1_000_000.0,
+            peak_rss_kib.expect("Linux peak RSS"),
+            raw_b64,
+        );
+    } else {
+        println!("{report}");
+    }
 }

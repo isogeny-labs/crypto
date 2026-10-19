@@ -14,7 +14,8 @@ def main():
     args = p.parse_args()
     plan_path = Path(args.plan).resolve(strict=True)
     plan = json.loads(plan_path.read_text())
-    if (plan['measurement_tier'] != 'tier1_instance' or
+    direct = plan['workload'].get('direct_strict_output') is True
+    if (plan['measurement_tier'] != ('tier0_physical_host' if direct else 'tier1_instance') or
             plan['workload']['checkin_every'] != 64 or
             plan['workload']['walkers_requested'] != 128 or
             len(plan['cases']) != 96 or plan['repetitions'] != 4):
@@ -22,15 +23,18 @@ def main():
     wrapper = str(Path(args.wrapper).resolve(strict=True))
     strict_runner = str(Path(args.strict_runner).resolve(strict=True))
     artifacts = list(dict.fromkeys([
-        *plan['artifacts'], str(plan_path), wrapper, strict_runner,
+        *plan['artifacts'], str(plan_path), strict_runner,
         str(Path(args.allocation).resolve(strict=True)),
         str(Path(args.host_probe).resolve(strict=True)),
+        str(Path(__file__).resolve(strict=True)),
+        *([str((Path(strict_runner).parent / 'isolated_bench.py').resolve(strict=True))] if direct else []),
+        *([] if direct else [wrapper]),
     ]))
     cases = []
     for case in plan['cases']:
         cases.append({'id': case['id'],
-                      'reference': [wrapper, *case['reference']],
-                      'candidate': [wrapper, *case['candidate']]})
+                      'reference': case['reference'] if direct else [wrapper, *case['reference']],
+                      'candidate': case['candidate'] if direct else [wrapper, *case['candidate']]})
     manifest = {
         'schema': 1,
         'measurement_tier': 'tier0_physical_host',
@@ -48,6 +52,16 @@ def main():
         'worker_plan': str(plan_path),
         'claim_gate': plan['claim_gate'],
     }
+    if direct:
+        manifest['noise_gate'] = {
+            'allowed_local_interrupt_sources': ['LOC', 'IWI', 'RES', 'CAL', 'TLB'],
+            'max_local_interrupts_per_second': 5,
+            'max_local_interrupts_fixed': 10,
+            'max_cpu_pressure_usec': 1000,
+            'max_involuntary_switches': 2,
+            'max_major_faults': 0,
+            'max_external_interrupts': 0,
+        }
     output = Path(args.out)
     output.write_text(json.dumps(manifest, sort_keys=True, indent=2) + '\n')
     print(json.dumps({'manifest': str(output), 'cases': len(cases),

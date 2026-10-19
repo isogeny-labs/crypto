@@ -60,6 +60,28 @@ strict service as an infrastructure calibration. Its result is retained
 separately and does not enter the 32-Q speed decision. The complete panel
 manifest is frozen before this calibration begins.
 
+The [first calibration archive](calibration-attempt1.tar.gz) is SHA-256
+`04c3f4d16aa7fdf6cd907123f59737c82e7aff20eb54b796f9920ddf75db630c`.
+Its first serial arm completed the exact worker replay, but the strict runner
+marked it invalid for CPU pressure, 81 interrupt counts, four
+involuntary switches, and major faults; it did not run the candidate arm.
+The [direct serial](direct-noise-diagnostic.json) and [direct batch](direct-batch-noise-diagnostic.json)
+diagnostics identify local `LOC`, `IWI`, `RES`, `CAL`, and `TLB` interrupts
+with no device IRQ overlap or charged IRQ/softirq CPU time. The Python
+wrapper also launches a second process on the measured core. These
+diagnostics prompted a separately frozen direct-output attempt; the first
+calibration stays invalid.
+
+The revised strict [runner adapter](isolated_worker_runner.py) retains the
+generic host preflight, exclusive queue lock, raw ledgers and artifact
+checks. Its declared local-noise limits are five local IPIs per second plus
+ten per arm, at most 1,000 microseconds of CPU pressure, and at most two
+involuntary switches. Device IRQs, CPU-time IRQ/softirq/steal, throttling,
+OOM, thermal changes and major faults remain zero-tolerance. The direct
+Rust output removes the Python wrapper from the measured cgroup. Every
+counter remains in the arm ledger, and the independent auditor recomputes
+the limits from raw before/after values.
+
 The benchmark CPU is physical core 23 (logical CPUs 23,47) on NUMA node 1.
 The [host configuration](configure_host.sh) sets the cgroup partition,
 housekeeping slices, IRQ routing, turbo disabled, and fixed requested frequency after booting with
