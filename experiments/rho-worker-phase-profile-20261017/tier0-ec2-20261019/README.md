@@ -92,6 +92,16 @@ partial run has no aggregate. The next frozen policy classifies numeric
 architectural counters, with the same local-count and pressure bounds. It
 retains every source delta and still requires zero numeric device IRQs.
 
+The next full dispatch was stopped after 9 arms and 4 pairs. Its
+[complete partial archive](full-r4-aborted.tar.gz) is SHA-256
+`418171de4cc309a3ee0487db0fc553bd5eee13507b55249831e88a6ba3cba7e6`.
+Arm 2 was invalid because the separately sampled `/proc/stat` total
+increased by 13 while the `/proc/interrupts` per-source counters increased
+by 14 on CPU 23. The r5 policy uses the per-source counters as the IRQ gate's
+authority; it retains the total as diagnostic evidence without requiring
+atomic agreement between the two files. The numeric device IRQ limit remains
+zero. The r4 panel has no aggregate.
+
 The revised [source archive](source-r3.tar.gz) was generated twice with the
 same SHA-256 `e369360087a53f44362043ce6f10d5a884f07da09142c0387c70a05708aa5c72`.
 Its rebuilt binary SHA-256 is

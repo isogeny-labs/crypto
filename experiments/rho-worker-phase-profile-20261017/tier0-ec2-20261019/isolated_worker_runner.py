@@ -21,6 +21,7 @@ import isolated_bench as base
 
 POLICY = {
     'local_interrupt_classification': 'nonnumeric_proc_interrupt_label',
+    'interrupt_source_authority': 'proc_interrupts',
     'max_local_interrupts_per_second': 5,
     'max_local_interrupts_fixed': 10,
     'max_cpu_pressure_usec': 1000,
@@ -71,18 +72,14 @@ def noise(before, after, usage_before, usage_after):
     for cpu in before['per_cpu']:
         old_sources = before['interrupts_by_source'].get(cpu, {})
         new_sources = after['interrupts_by_source'].get(cpu, {})
-        source_total = 0
         for source in set(old_sources) | set(new_sources):
             delta = new_sources.get(source, 0) - old_sources.get(source, 0)
             if delta < 0:
                 problems.append(f'CPU {cpu} interrupt counter reset: {source}')
-            source_total += delta
             if source.isdigit():
                 external_count += delta
             else:
                 local_count += delta
-        if source_total != after['interrupts'].get(cpu, 0) - before['interrupts'].get(cpu, 0):
-            problems.append(f'CPU {cpu} interrupt source sum mismatch')
     if external_count > POLICY['max_external_interrupts']:
         problems.append(f'external interrupt count {external_count}')
     if local_count > local_limit:

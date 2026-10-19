@@ -23,6 +23,7 @@ PAIR_FIELDS = {
 }
 NOISE_POLICY = {
     'local_interrupt_classification': 'nonnumeric_proc_interrupt_label',
+    'interrupt_source_authority': 'proc_interrupts',
     'max_local_interrupts_per_second': 5,
     'max_local_interrupts_fixed': 10,
     'max_cpu_pressure_usec': 1000,
@@ -59,18 +60,14 @@ def check_noise(row):
     local = external = 0
     for cpu, old_sources in before['interrupts_by_source'].items():
         new_sources = after['interrupts_by_source'][cpu]
-        source_total = 0
         for source in set(old_sources) | set(new_sources):
             delta = new_sources.get(source, 0) - old_sources.get(source, 0)
             if delta < 0:
                 problems.append('interrupt counter reset')
-            source_total += delta
             if source.isdigit():
                 external += delta
             else:
                 local += delta
-        if source_total != after['interrupts'][cpu] - before['interrupts'][cpu]:
-            problems.append('interrupt source sum mismatch')
     if external > NOISE_POLICY['max_external_interrupts'] or local > local_limit:
         problems.append('interrupt envelope exceeded')
     for kind in ('some', 'full'):
