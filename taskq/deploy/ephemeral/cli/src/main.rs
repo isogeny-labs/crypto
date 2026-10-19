@@ -671,9 +671,8 @@ impl Ctx {
 
         eprintln!("ephemeral: job {id}");
         eprintln!(
-            "ephemeral:   {}{} {iid} ({ami_ref}), ttl {ttl} (terminates by {})",
+            "ephemeral:   {} spot {iid} ({ami_ref}), ttl {ttl} (terminates by {})",
             a.instance_type,
-            " spot",
             utc_of(deadline)
         );
         let source = if commit.is_empty() {

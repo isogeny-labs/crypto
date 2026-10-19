@@ -3,6 +3,7 @@ import json
 import os
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
@@ -105,6 +106,42 @@ def test_repeated_saves_bound_storage_and_keep_current_and_previous(tmp_path):
     assert {path.read_bytes() for path in generations} == {b"third", b"fourth"}
     resumed = _resume_checkpoint(tmp_path, "T-checkpoint", 2, "state.bin")
     assert resumed.read_bytes() == b"fourth"
+
+
+def test_overlapping_saves_cannot_remove_the_committed_generation(tmp_path, monkeypatch):
+    destination = tmp_path / "T-checkpoint" / "attempt-1" / "state.bin"
+    first, second = tmp_path / "first", tmp_path / "second"
+    first.write_bytes(b"periodic checkpoint")
+    second.write_bytes(b"SIGTERM checkpoint")
+    entered, release, second_started = (threading.Event() for _ in range(3))
+    replace = os.replace
+
+    def pause_first_marker(src, dst):
+        if dst == destination.with_name("state.bin.sha256") and not entered.is_set():
+            entered.set()
+            assert release.wait(5)
+        return replace(src, dst)
+
+    def publish_second():
+        second_started.set()
+        return save(second, destination)
+
+    monkeypatch.setattr(os, "replace", pause_first_marker)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        a = pool.submit(save, first, destination)
+        try:
+            assert entered.wait(5)
+            b = pool.submit(publish_second)
+            assert second_started.wait(5)
+            # B must not publish a marker while A can still prune generations.
+            time.sleep(0.05)
+            assert not b.done()
+        finally:
+            release.set()
+        a.result(timeout=5)
+        b.result(timeout=5)
+    resumed = _resume_checkpoint(tmp_path, "T-checkpoint", 2, "state.bin")
+    assert resumed.read_bytes() == b"SIGTERM checkpoint"
 
 
 def test_invalid_utf8_marker_falls_back_to_older_checkpoint(tmp_path):

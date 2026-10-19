@@ -7,6 +7,7 @@ workers resume only from a matching marker from an earlier attempt.
 from __future__ import annotations
 
 import hashlib
+import fcntl
 import os
 import shutil
 import tempfile
@@ -21,6 +22,15 @@ def save(source: Path, destination: Path) -> str:
     can therefore never invalidate a previously committed checkpoint.
     """
     destination.parent.mkdir(parents=True, exist_ok=True)
+    # Periodic publication and a SIGTERM handler may overlap. Serialize the
+    # marker, stable-copy and retention steps so one writer cannot remove the
+    # generation another writer just committed. Locks release on process exit.
+    with destination.with_name(f".{destination.name}.lock").open("a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        return _save(source, destination)
+
+
+def _save(source: Path, destination: Path) -> str:
     marker = destination.with_name(destination.name + ".sha256")
     try:
         previous = marker.read_text().strip()

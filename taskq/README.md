@@ -293,6 +293,7 @@ EFS, then atomically publishes its SHA-256 marker. The stable destination is
 maintained separately, so a later write cannot invalidate that generation.
 Each attempt keeps its current and preceding committed generations; older
 generations are removed only after the replacement is fully published.
+Overlapping saves to one destination are serialized with a filesystem lock.
 On retry, taskq copies and verifies the chosen bytes into the new attempt;
 the application reads
 `TASKQ_RESUME_FILE` and continues from that state. Taskq ignores incomplete or

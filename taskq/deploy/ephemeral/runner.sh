@@ -528,10 +528,13 @@ BUDGET=$((EPHEMERAL_DEADLINE - $(date +%s) - 600))
 [ "$BUDGET" -gt 60 ] || fail "no time left before the deadline"
 status running "$(job '.command_display')"
 cd "$WORKDIR" || exit 1
-setsid /usr/bin/time -v -o "$W/rusage.txt" \
-    timeout --foreground --signal=TERM --kill-after=60 "$BUDGET" bash "$W/cmd.sh" &
+# Keep time outside the command session. Record the timeout session's own
+# group, so Spot signals reach the app and timeout can still stop descendants.
+/usr/bin/time -v -o "$W/rusage.txt" setsid bash -c \
+    'printf "%s\n" "$$" > "$1"; shift; exec "$@"' \
+    ephemeral-command "$W/command.pid" \
+    timeout --signal=TERM --kill-after=60 "$BUDGET" bash "$W/cmd.sh" &
 CMD_PID=$!
-printf '%s\n' "$CMD_PID" >"$W/command.pid"
 wait "$CMD_PID"
 EXIT_CODE=$?
 say "command exited $EXIT_CODE"

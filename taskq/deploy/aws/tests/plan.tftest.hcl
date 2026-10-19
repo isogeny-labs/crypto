@@ -35,6 +35,9 @@ mock_provider "aws" {
   }
 }
 mock_provider "kubernetes" {}
+mock_provider "aws" {
+  alias = "us_east_1"
+}
 mock_provider "helm" {}
 mock_provider "random" {}
 mock_provider "tls" {}
