@@ -1,5 +1,4 @@
-mod solver;
-use solver::{field::Result, Limits};
+use generalized_rootfinder::solver::{self, field::Result, Limits};
 fn run() -> Result<()> {
     let args = std::env::args().collect::<Vec<_>>();
     let path=args.get(1).ok_or("usage: generalized-rootfinder INPUT.json [--max-work N --max-table N --max-solutions N --max-domain N --max-degree N --max-trials N --seed N]")?;

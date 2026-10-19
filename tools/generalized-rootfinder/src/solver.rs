@@ -47,21 +47,122 @@ pub struct Search {
     pub method: String,
 }
 
+fn boolean_candidates(
+    forms: &[crypto_lib::cryptanalysis::mq_fes::QuadraticForm],
+    n: usize,
+    explicit_wide: bool,
+) -> Result<(Vec<u64>, &'static str)> {
+    use crypto_lib::cryptanalysis::mq_fes::{gray_find_all_wide, gray_incremental_find_all};
+    // Native ablations favor scalar at16 variables and wide at22. Keep
+    // smaller, unqualified sizes conservative; explicit native_boolean
+    // still permits the wide route for controlled comparisons.
+    if (n >= 22 || explicit_wide)
+        && std::env::var("KIC_GENERALIZED_SCALAR_GRAY").as_deref() != Ok("1")
+    {
+        if let Some((roots, _)) = gray_find_all_wide(forms, usize::MAX) {
+            return Ok((roots, "native_boolean_gray_wide"));
+        }
+    }
+    gray_incremental_find_all(forms, usize::MAX)
+        .map(|roots| (roots, "native_boolean_gray"))
+        .ok_or("native Boolean backend refused input".into())
+}
+
+/// Complete roots of already native quadratic Boolean polynomials. The
+/// field/domain are fixed by the input type; no JSON or BigUint conversion
+/// is needed. Count remains exact when output is truncated. Errors never
+/// represent a complete empty set.
+#[derive(Clone, Debug)]
+pub struct BooleanRoots {
+    pub roots: Vec<u64>,
+    pub count_exact: u64,
+    pub output_truncated: bool,
+    pub work: u64,
+    pub method: &'static str,
+}
+pub fn solve_boolean_polynomials(
+    equations: &[crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly],
+    n: usize,
+    limits: &Limits,
+) -> Result<BooleanRoots> {
+    use crypto_lib::cryptanalysis::mq_fes::QuadraticForm;
+    if n == 0 || n > 32 || equations.is_empty() || equations.len() > 64 {
+        return Err("typed Boolean route requires1..32 variables and1..64 equations".into());
+    }
+    if equations.iter().any(|e| {
+        e.n_vars != n
+            || e.terms
+                .iter()
+                .any(|t| t.mask >> n != 0 || t.mask.count_ones() > 2)
+    }) {
+        return Err("typed Boolean input has invalid arity, mask or degree".into());
+    }
+    let forms = equations
+        .iter()
+        .map(|p| QuadraticForm::from_poly(p).ok_or("invalid Boolean form".into()))
+        .collect::<Result<Vec<_>>>()?;
+    let constant =
+        |f: &QuadraticForm| !f.linear.iter().any(|&b| b) && !f.quad.iter().flatten().any(|&b| b);
+    if forms.iter().any(|f| f.constant && constant(f)) {
+        return Ok(BooleanRoots {
+            roots: vec![],
+            count_exact: 0,
+            output_truncated: false,
+            work: 0,
+            method: "constant_boolean",
+        });
+    }
+    let assignments = 1u64 << n;
+    if forms.iter().all(constant) {
+        let keep = assignments.min(limits.max_solutions as u64);
+        return Ok(BooleanRoots {
+            roots: (0..keep).collect(),
+            count_exact: assignments,
+            output_truncated: keep < assignments,
+            work: 0,
+            method: "constant_boolean",
+        });
+    }
+    if assignments > limits.max_work {
+        return Err("typed Boolean assignment budget exceeded".into());
+    }
+    let (mut roots, method) = boolean_candidates(&forms, n, false)?;
+    roots.sort_unstable();
+    if roots.windows(2).any(|w| w[0] == w[1])
+        || roots
+            .iter()
+            .any(|&x| x >> n != 0 || equations.iter().any(|p| p.eval(x) != 0))
+    {
+        return Err("original typed Boolean root verification failed".into());
+    }
+    let count_exact = roots.len() as u64;
+    roots.truncate(limits.max_solutions);
+    Ok(BooleanRoots {
+        output_truncated: (roots.len() as u64) < count_exact,
+        roots,
+        count_exact,
+        work: assignments,
+        method,
+    })
+}
+
 pub fn evaluate(f: &Field, e: &Equation, x: &[N]) -> N {
     e.iter().fold(N::zero(), |sum, t| {
-        f.add(
-            &sum,
-            &t.powers
-                .iter()
-                .zip(x)
-                .fold(t.coefficient.clone(), |a, (&p, x)| {
-                    if p == 0 {
-                        a
-                    } else {
-                        f.mul(&a, &f.pow(x, &N::from(p)))
-                    }
-                }),
-        )
+        let mut term = t.coefficient.clone();
+        for (&p, x) in t.powers.iter().zip(x) {
+            if p == 0 || x.is_one() {
+                continue;
+            }
+            if x.is_zero() {
+                return sum;
+            }
+            term = if p == 1 {
+                f.mul(&term, x)
+            } else {
+                f.mul(&term, &f.pow(x, &N::from(p)))
+            };
+        }
+        f.add(&sum, &term)
     })
 }
 fn add_solution(out: &mut Search, x: Vec<N>, limit: usize) -> Result<()> {
@@ -173,7 +274,7 @@ pub fn search(
         && (1u64 << n) <= limits.max_work
     {
         use crypto_lib::cryptanalysis::{
-            mq_fes::{gray_incremental_find_all, QuadraticForm},
+            mq_fes::QuadraticForm,
             pq_groebner_f2::{F2BoolMono, F2BoolPoly},
         };
         let mut binary = Vec::new();
@@ -225,8 +326,9 @@ pub fn search(
                 .iter()
                 .map(|p| QuadraticForm::from_poly(p).unwrap())
                 .collect::<Vec<_>>();
-            gray_incremental_find_all(&forms, usize::MAX)
-                .ok_or("native Boolean backend refused input")?
+            let (roots, method) = boolean_candidates(&forms, n, method == "native_boolean")?;
+            out.method = method.into();
+            roots
         };
         for bits in candidates {
             let x = (0..n).map(|i| N::from((bits >> i) & 1)).collect::<Vec<_>>();
@@ -630,11 +732,16 @@ pub fn solve_json(problem: &Value, limits: &Limits) -> Result<Value> {
         return Err("duplicate variable".into());
     }
     let n = variables.len();
-    let raw = problem
-        .get("equations")
-        .cloned()
-        .unwrap_or_else(|| json!([problem["f"]]));
-    let equations = normalize(&f, &raw, n)?;
+    // Borrow the sparse tree: cloning it allocates every powers vector and
+    // JSON object before normalization, even though parsing is read-only.
+    let fallback;
+    let raw = if let Some(raw) = problem.get("equations") {
+        raw
+    } else {
+        fallback = json!([problem["f"]]);
+        &fallback
+    };
+    let equations = normalize(&f, raw, n)?;
     let domain = match domain(&f, &problem["L"], limits) {
         Ok(d) => d,
         Err(reason) => {

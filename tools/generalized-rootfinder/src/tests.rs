@@ -258,6 +258,244 @@ fn native_boolean_and_component_mitm_return_every_original_tuple() {
         vec![vec![N::zero(), N::zero()]]
     );
 }
+
+#[test]
+fn optimized_evaluation_preserves_zero_one_and_higher_power_semantics() {
+    for f in [p(2), p(5), binary(3, 11)] {
+        let q = f.order.to_u64_digits()[0];
+        let equations = vec![
+            Term {
+                coefficient: N::from(q - 1),
+                powers: vec![0, 3, 2],
+            },
+            Term {
+                coefficient: N::one(),
+                powers: vec![5, 0, 1],
+            },
+            Term {
+                coefficient: N::from(2u8) % &f.order,
+                powers: vec![1, 4, 0],
+            },
+            Term {
+                coefficient: N::one(),
+                powers: vec![0, 0, 0],
+            },
+        ];
+        for a in 0..q {
+            for b in 0..q {
+                for c in 0..q {
+                    let x = [N::from(a), N::from(b), N::from(c)];
+                    // Independent field-power definition, including 0^0 = 1.
+                    let mut reference = N::zero();
+                    for t in &equations {
+                        let mut v = t.coefficient.clone();
+                        for (&power, x) in t.powers.iter().zip(&x) {
+                            v = f.mul(&v, &f.pow(x, &N::from(power)));
+                        }
+                        reference = f.add(&reference, &v);
+                    }
+                    assert_eq!(solver::evaluate(&f, &equations, &x), reference);
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn typed_boolean_entry_preserves_complete_roots_exact_counts_and_error_boundaries() {
+    use crypto_lib::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+    let poly = |n, masks: &[u64]| {
+        F2BoolPoly::from_monos(
+            masks.iter().copied().map(F2BoolMono::from_mask).collect(),
+            n,
+        )
+    };
+    let equations = vec![
+        poly(10, &[0, 3, 4]),
+        poly(10, &[8, 16]),
+        poly(10, &[0, 1, 512]),
+    ];
+    let expected = (0..1u64 << 10)
+        .filter(|&x| equations.iter().all(|p| p.eval(x) == 0))
+        .collect::<Vec<_>>();
+    let limits = Limits {
+        max_work: 1 << 10,
+        max_solutions: 3,
+        ..Default::default()
+    };
+    let result = solver::solve_boolean_polynomials(&equations, 10, &limits).unwrap();
+    assert_eq!(result.roots, expected[..3]);
+    assert_eq!(result.count_exact, expected.len() as u64);
+    assert!(result.output_truncated);
+    assert!(solver::solve_boolean_polynomials(
+        &equations,
+        10,
+        &Limits {
+            max_work: 1,
+            ..limits.clone()
+        }
+    )
+    .is_err());
+    assert!(solver::solve_boolean_polynomials(&[poly(10, &[7])], 10, &limits).is_err());
+    assert!(solver::solve_boolean_polynomials(&[poly(10, &[1 << 11])], 10, &limits).is_err());
+    let zero = solver::solve_boolean_polynomials(
+        &[poly(32, &[])],
+        32,
+        &Limits {
+            max_work: 0,
+            ..limits.clone()
+        },
+    )
+    .unwrap();
+    assert_eq!(zero.roots, vec![0, 1, 2]);
+    assert_eq!(zero.count_exact, 1u64 << 32);
+    assert_eq!(zero.work, 0);
+    assert!(zero.output_truncated);
+    let empty = solver::solve_boolean_polynomials(
+        &[poly(32, &[0])],
+        32,
+        &Limits {
+            max_work: 0,
+            ..limits
+        },
+    )
+    .unwrap();
+    assert_eq!(empty.count_exact, 0);
+    assert!(empty.roots.is_empty());
+    assert!(!empty.output_truncated);
+    // Independent linear equations pin one exact22-coordinate assignment;
+    // this also exercises wide dispatch at the measured large-size boundary.
+    let target = 0x2a9537u64;
+    let linear = (0..22)
+        .map(|i| {
+            poly(
+                22,
+                &if target >> i & 1 == 1 {
+                    vec![1 << i, 0]
+                } else {
+                    vec![1 << i]
+                },
+            )
+        })
+        .collect::<Vec<_>>();
+    let pinned = solver::solve_boolean_polynomials(
+        &linear,
+        22,
+        &Limits {
+            max_work: 1 << 22,
+            max_solutions: 1,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(pinned.roots, vec![target]);
+    assert_eq!(pinned.count_exact, 1);
+    assert!(!pinned.output_truncated);
+}
+
+#[test]
+fn wide_dispatch_preserves_all_roots_and_checks_unpacked_equations() {
+    for n in [8usize, 10, 12] {
+        for many in [false, true] {
+            let f = binary(3, 11);
+            let mut equations = Vec::new();
+            for j in 0..if many { 70 } else { 7 } {
+                let mut powers = vec![0; n];
+                if many {
+                    // First64 packed equations constrain only x0. Later
+                    // equations constrain x1 and must still be verified.
+                    powers[usize::from(j >= 64)] = 1 + (j % 3) as u32;
+                } else {
+                    powers[j % n] = 1 + (j % 3) as u32;
+                    powers[(j + 3) % n] = 2;
+                }
+                let coefficient = 1u8 << (j % 3);
+                let planted = 0b1010_0110_1101u64;
+                let constant = if powers
+                    .iter()
+                    .enumerate()
+                    .all(|(i, &p)| p == 0 || planted >> i & 1 == 1)
+                {
+                    coefficient
+                } else {
+                    0
+                };
+                equations.push(vec![
+                    Term {
+                        coefficient: N::from(coefficient),
+                        powers,
+                    },
+                    Term {
+                        coefficient: N::from(constant),
+                        powers: vec![0; n],
+                    },
+                ]);
+            }
+            // A Boolean polynomial can cancel terms with different exponents.
+            let mut a = vec![0; n];
+            a[0] = 1;
+            let mut b = a.clone();
+            b[0] = 2;
+            equations.push(vec![
+                Term {
+                    coefficient: N::one(),
+                    powers: a,
+                },
+                Term {
+                    coefficient: N::one(),
+                    powers: b,
+                },
+            ]);
+            let mut expected = Vec::new();
+            for bits in 0..1u64 << n {
+                if equations.iter().all(|e| {
+                    let mut coefficient = 0u64;
+                    for t in e {
+                        if t.powers
+                            .iter()
+                            .enumerate()
+                            .all(|(i, &p)| p == 0 || bits >> i & 1 == 1)
+                        {
+                            coefficient ^=
+                                t.coefficient.to_u64_digits().first().copied().unwrap_or(0);
+                        }
+                    }
+                    coefficient == 0
+                }) {
+                    expected.push((0..n).map(|i| N::from(bits >> i & 1)).collect::<Vec<_>>());
+                }
+            }
+            expected.sort();
+            assert!(!expected.is_empty());
+            let limits = Limits {
+                max_work: 1 << n,
+                max_solutions: usize::MAX,
+                ..Default::default()
+            };
+            for method in ["auto", "native_boolean"] {
+                let got = solver::search(&f, &equations, n, &domain(2), &limits, method).unwrap();
+                assert!(got.complete);
+                assert_eq!(got.count, Some(expected.len() as u64));
+                assert_eq!(got.solutions, expected);
+                let capped = solver::search(
+                    &f,
+                    &equations,
+                    n,
+                    &domain(2),
+                    &Limits {
+                        max_solutions: 3,
+                        ..limits
+                    },
+                    method,
+                )
+                .unwrap();
+                assert_eq!(capped.count, Some(expected.len() as u64));
+                assert_eq!(capped.solutions.len(), 3.min(expected.len()));
+                assert!(capped.solutions.iter().all(|x| expected.contains(x)));
+            }
+        }
+    }
+}
 #[test]
 fn truncation_and_budget_failures_cannot_masquerade_as_complete_empty_sets() {
     let input = json!({"field":{"kind":"prime","characteristic":3},"variables":["x","y"],"equations":[[]],"L":{"coefficients":[0]}});

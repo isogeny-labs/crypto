@@ -5,6 +5,15 @@ archived in `research/generalized_rootfinding_20261016/historical/rootfinder`.
 It does not use Python. All returned tuples retain their original variable
 coordinates. Complete enumeration, component meet-in-the-middle and the native
 Boolean quadratic route return exact counts independently of the output cap.
+Supported Boolean systems use the existing AVX2/AVX-512 Gray kernel at22
+or more variables when available. Native ablations found scalar faster at16;
+the default keeps smaller sizes scalar, with full original-equation verification.
+`KIC_GENERALIZED_SCALAR_GRAY=1` forces scalar enumeration for comparisons.
+Explicit `method: "native_boolean"` permits wide enumeration at smaller sizes
+for ablation. The native Rust `solve_boolean_polynomials` entry accepts
+quadratic `F2BoolPoly` inputs directly, retaining exact counts and original
+bit coordinates without JSON or BigUint conversion. Output caps never
+truncate the counted search; unsupported input/budgets return an error.
 
 ```sh
 cargo run --release --manifest-path tools/generalized-rootfinder/Cargo.toml -- \

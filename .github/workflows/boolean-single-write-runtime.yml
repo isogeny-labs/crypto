@@ -5,6 +5,8 @@ on:
   pull_request:
     paths:
       - src/cryptanalysis/gf2_elim.rs
+      - src/cryptanalysis/ic_boundary.rs
+      - src/cryptanalysis/ic_framework/rootfind.rs
       - examples/f4_f5_boolean_perf.rs
       - tools/generalized-rootfinder/**
       - .github/workflows/boolean-single-write-runtime.yml
@@ -13,6 +15,17 @@ permissions:
   contents: read
 
 jobs:
+  batch-setup-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Exact table keys, witnesses and group ledger
+        run: cargo test --release --locked --lib folded_callback_batches_preserve_every_key_witness_and_group_charge
+      - name: Binary and prime m2/m3 oracle controls
+        run: cargo test --release --locked --lib cryptanalysis::ic_framework::rootfind::tests
   native-solver:
     runs-on: ubuntu-latest
     timeout-minutes: 25

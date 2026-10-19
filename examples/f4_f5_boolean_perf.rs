@@ -17,7 +17,7 @@ use crypto_lib::cryptanalysis::{
         groebner_decompose_f6_ic_pair_index, KoblitzCurve, PairSumTable,
     },
     matrix_f5_f2::{canonical_row_space_fingerprint, matrix_f5_f2_timed},
-    mq_fes::{gray_incremental_find_all, moebius_find_all, QuadraticForm},
+    mq_fes::{gray_find_all_wide, gray_incremental_find_all, moebius_find_all, QuadraticForm},
     mq_monica::monica_find_all,
     pq_f4_f2::{groebner_basis_f4, solutions_from_reduced_basis},
     pq_groebner_f2::F2BoolPoly,
@@ -89,6 +89,7 @@ fn main() {
     let arm = flag("--arm", "matrix-f4");
     let degree: u32 = flag("--degree", "4").parse().unwrap();
     let target_count: usize = flag("--targets", "1").parse().unwrap();
+    let explicit_wide = flag("--explicit-wide", "0") == "1";
     let kc = KoblitzCurve::new(1, n).unwrap();
     let fb = build_frobenius_factor_base(&kc, 0).unwrap();
     let st = FieldStructure::new(n, &kc.curve.irreducible);
@@ -163,7 +164,7 @@ fn main() {
             "variables":(0..sys.n_vars).map(|i|format!("x{i}")).collect::<Vec<_>>(),
             "equations":sys.equations.iter().map(|p|p.terms.iter().map(|t|json!({"coefficient":1,
                 "powers":(0..sys.n_vars).map(|i|(t.mask>>i)&1).collect::<Vec<_>>()})).collect::<Vec<_>>()).collect::<Vec<_>>(),
-            "L":{"coefficients":[0,1,1]},"method":"auto"});
+            "L":{"coefficients":[0,1,1]},"method":if explicit_wide{"native_boolean"}else{"auto"}});
         for r in 0..repeat {
             f4_profile_reset();
             let mut row = json!({"arm":arm,"n":n,"seed":seed,"target":target_id,
@@ -171,6 +172,11 @@ fn main() {
                 "input_digest":input,"random":flag("--random","0")=="1"});
             row["table_write_once"] =
                 json!(std::env::var("KIC_GF2_WRITE_TABLE_ONCE").as_deref() == Ok("1"));
+            row["vector_tables"] =
+                json!(std::env::var("KIC_GF2_VECTOR_TABLES").as_deref() == Ok("1"));
+            row["scalar_generalized"] =
+                json!(std::env::var("KIC_GENERALIZED_SCALAR_GRAY").as_deref() == Ok("1"));
+            row["explicit_wide"] = json!(explicit_wide);
             if arm.starts_with("matrix-") {
                 let started = Instant::now();
                 profile_start();
@@ -235,31 +241,54 @@ fn main() {
                         SolverEngine::default(),
                         20_000,
                     ),
-                    "decomp-generalized" => {
+                    "decomp-generalized" | "decomp-generalized-typed" => {
                         let fresh =
                             build_decomposition_system(&fb.subspace_basis, x, &kc.curve.b, 2, &st)
                                 .unwrap();
-                        let problem = json!({"field":{"kind":"prime","characteristic":2},
+                        let limits = generalized::Limits {
+                            max_work: 1u64 << fresh.n_vars,
+                            max_solutions: usize::MAX,
+                            ..Default::default()
+                        };
+                        let packed_roots = if arm == "decomp-generalized-typed" {
+                            let result = generalized::solve_boolean_polynomials(
+                                &fresh.equations,
+                                fresh.n_vars,
+                                &limits,
+                            )
+                            .unwrap();
+                            row["generalized_method"] = json!(result.method);
+                            row["certificate"] = json!({"search_complete":true,"solution_count_exact":result.count_exact,"returned_tuples_verified":true,"output_truncated":result.output_truncated});
+                            result.roots
+                        } else {
+                            let problem = json!({"field":{"kind":"prime","characteristic":2},
                             "variables":(0..fresh.n_vars).map(|i|format!("x{i}")).collect::<Vec<_>>(),
                             "equations":fresh.equations.iter().map(|p|p.terms.iter().map(|t|json!({"coefficient":1,
                                 "powers":(0..fresh.n_vars).map(|i|(t.mask>>i)&1).collect::<Vec<_>>()})).collect::<Vec<_>>()).collect::<Vec<_>>(),
-                            "L":{"coefficients":[0,1,1]}});
-                        let result = generalized::solve_json(
-                            &problem,
-                            &generalized::Limits {
-                                max_work: 1u64 << fresh.n_vars,
-                                max_solutions: usize::MAX,
-                                ..Default::default()
-                            },
-                        )
-                        .unwrap();
-                        assert_eq!(result["status"], "complete");
+                                "L":{"coefficients":[0,1,1]},"method":if explicit_wide{"native_boolean"}else{"auto"}});
+                            let result = generalized::solve_json(&problem, &limits).unwrap();
+                            assert_eq!(result["status"], "complete");
+                            row["certificate"] = result["certificate"].clone();
+                            result["solutions"]
+                                .as_array()
+                                .unwrap()
+                                .iter()
+                                .map(|root| {
+                                    root.as_array().unwrap().iter().enumerate().fold(
+                                        0u64,
+                                        |mask, (i, v)| {
+                                            if v == "0x1" {
+                                                mask | (1u64 << i)
+                                            } else {
+                                                mask
+                                            }
+                                        },
+                                    )
+                                })
+                                .collect::<Vec<_>>()
+                        };
                         let mut found = None;
-                        'roots: for root in result["solutions"].as_array().unwrap() {
-                            let bits = root.as_array().unwrap().iter().enumerate().fold(
-                                0u64,
-                                |mask, (i, v)| if v == "0x1" { mask | (1u64 << i) } else { mask },
-                            );
+                        'roots: for bits in packed_roots {
                             let xs = (0..2)
                                 .map(|i| fresh.summand_x(&fb.subspace_basis, bits, i, n))
                                 .collect::<Vec<_>>();
@@ -278,7 +307,6 @@ fn main() {
                                 }
                             }
                         }
-                        row["certificate"] = result["certificate"].clone();
                         (found, Default::default())
                     }
                     "rootfind-table" => (
@@ -327,6 +355,21 @@ fn main() {
                 let started = Instant::now();
                 profile_start();
                 let roots = match arm.as_str() {
+                    "generalized-typed" => {
+                        let result = generalized::solve_boolean_polynomials(
+                            &sys.equations,
+                            sys.n_vars,
+                            &generalized::Limits {
+                                max_work: 1u64 << sys.n_vars,
+                                max_solutions: usize::MAX,
+                                ..Default::default()
+                            },
+                        )
+                        .unwrap();
+                        row["generalized_method"] = json!(result.method);
+                        row["certificate"] = json!({"search_complete":true,"solution_count_exact":result.count_exact,"returned_tuples_verified":true,"output_truncated":result.output_truncated});
+                        result.roots
+                    }
                     "generalized-native" => {
                         let limits = generalized::Limits {
                             max_work: 1u64 << sys.n_vars,
@@ -394,7 +437,7 @@ fn main() {
                         solutions_from_reduced_basis(&gb, sys.n_vars, sys.n_vars, &mut 0)
                             .expect("reduced basis")
                     }
-                    "roots-moebius" | "roots-gray" | "roots-monica" => {
+                    "roots-moebius" | "roots-gray" | "roots-wide" | "roots-monica" => {
                         let forms: Vec<_> = sys
                             .equations
                             .iter()
@@ -403,6 +446,16 @@ fn main() {
                         match arm.as_str() {
                             "roots-moebius" => moebius_find_all(&forms, usize::MAX).unwrap(),
                             "roots-gray" => gray_incremental_find_all(&forms, usize::MAX).unwrap(),
+                            "roots-wide" => {
+                                if let Some((roots, lanes)) = gray_find_all_wide(&forms, usize::MAX)
+                                {
+                                    row["wide_lanes"] = json!(lanes);
+                                    roots
+                                } else {
+                                    row["wide_lanes"] = json!(0);
+                                    gray_incremental_find_all(&forms, usize::MAX).unwrap()
+                                }
+                            }
                             _ => monica_find_all(&forms, usize::MAX).unwrap(),
                         }
                     }

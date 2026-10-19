@@ -4847,6 +4847,69 @@ impl PairTable {
         }
     }
 
+    /// The folded table with a caller-provided ordered batch adder. Each
+    /// chunk holds at most256 pairs with the same first point. Insertion
+    /// order, keys and first witnesses match `build_negation_folded` exactly.
+    /// The callback appends one sum per operand and charges every addition.
+    pub(crate) fn build_negation_folded_with<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        mut add_many: impl FnMut(&mut GroupOps, G::Elt, &[G::Elt], &mut Vec<G::Elt>),
+    ) -> Self {
+        const CHUNK: usize = 256;
+        let start = Instant::now();
+        let groups: Vec<&Vec<usize>> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+            .collect();
+        let mut ops = GroupOps::default();
+        let mut map: FastMap<(u32, u32)> = fast_map(groups.len() * groups.len() + 1);
+        let mut indices = Vec::with_capacity(CHUNK);
+        let mut points = Vec::with_capacity(CHUNK);
+        let mut sums = Vec::with_capacity(CHUNK);
+        let mut flush = |i: usize, indices: &[usize], points: &[G::Elt], sums: &mut Vec<G::Elt>| {
+            sums.clear();
+            add_many(&mut ops, fb.points[i], points, sums);
+            assert_eq!(
+                sums.len(),
+                indices.len(),
+                "one ordered sum per batch operand"
+            );
+            for (&j, s) in indices.iter().zip(sums.iter()) {
+                if !g.is_identity(s) {
+                    map.entry(g.key(s) >> 1).or_insert((i as u32, j as u32));
+                }
+            }
+        };
+        for ai in 0..groups.len() {
+            let i = groups[ai][0];
+            for group in groups.iter().skip(ai) {
+                for &j in group.iter() {
+                    indices.push(j);
+                    points.push(fb.points[j]);
+                    if indices.len() == CHUNK {
+                        flush(i, &indices, &points, &mut sums);
+                        indices.clear();
+                        points.clear();
+                    }
+                }
+            }
+            if !indices.is_empty() {
+                flush(i, &indices, &points, &mut sums);
+                indices.clear();
+                points.clear();
+            }
+        }
+        Self {
+            kind: "negation_folded",
+            entries: map.len() as u64,
+            map,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+        }
+    }
+
     /// Prime-field version of the same folded table. A row shares one
     /// inversion across its doubling and all later abscissae; each signed
     /// pair uses the same inverse. Only the sum's x coordinate is needed
@@ -10042,6 +10105,63 @@ mod tests {
         assert_eq!(batch.build_ops.doubles, scalar.build_ops.doubles);
         assert_eq!(batch.build_ops.field_ops.invs, fb.abscissae as u64);
         assert!(batch.build_ops.field_ops.invs < scalar.build_ops.field_ops.invs);
+    }
+
+    #[test]
+    fn folded_callback_batches_preserve_every_key_witness_and_group_charge() {
+        use crate::cryptanalysis::ic_framework::rootfind::PairedAdd;
+        fn check<G: PairedAdd>(g: &G, fb: &FactorBase<G::Elt>) {
+            let scalar = PairTable::build_negation_folded(g, fb);
+            let mut counters = OracleCounters::default();
+            let batched = PairTable::build_negation_folded_with(g, fb, |ops, p, qs, out| {
+                g.add_many(ops, &mut counters, p, qs, out);
+            });
+            assert_eq!(scalar.map, batched.map, "first witness for every sum key");
+            assert_eq!(scalar.entries, batched.entries);
+            assert_eq!(scalar.kind, batched.kind);
+            assert_eq!(scalar.build_ops.adds, batched.build_ops.adds);
+            assert_eq!(scalar.build_ops.doubles, batched.build_ops.doubles);
+            assert_eq!(scalar.build_ops, batched.build_ops, "complete group ledger");
+            let mut ops = GroupOps::default();
+            let mut lookups = 0;
+            for i in 0..fb.points.len().min(16) {
+                for &p in &fb.points {
+                    let target = g.add(&mut ops, fb.points[i], p);
+                    assert_eq!(
+                        scalar.probe(g, fb, &mut ops, &mut lookups, target),
+                        batched.probe(g, fb, &mut ops, &mut lookups, target)
+                    );
+                }
+            }
+        }
+        let inst = koblitz_instance(1, 17).unwrap();
+        let g = BinaryGroup(&inst.fast);
+        for bits in [3, 7, 9] {
+            let points = (0..1 << bits)
+                .flat_map(|x| inst.points_with_x(x))
+                .collect::<Vec<_>>();
+            assert!(
+                points.iter().any(|p| p.x == 0),
+                "include the self-negative2-torsion point"
+            );
+            let n = points.len();
+            let fb = FactorBase::from_column_map(
+                "explicit binary batch control".into(),
+                points,
+                (0..n).collect(),
+                vec![1; n],
+                n,
+                |p| p.pack(),
+                |p| g.neg(*p).pack(),
+                |p| p.x,
+            )
+            .unwrap();
+            check(&g, &fb);
+        }
+        let prime = prime_instance_for(18, 7);
+        for size in [1, 24, 140] {
+            check(&prime.curve, &prime_factor_base(&prime, size));
+        }
     }
 
     #[test]

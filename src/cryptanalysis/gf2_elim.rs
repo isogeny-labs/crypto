@@ -69,6 +69,11 @@ fn write_table_once_enabled() -> bool {
     *ENABLED.get_or_init(|| std::env::var("KIC_GF2_WRITE_TABLE_ONCE").as_deref() == Ok("1"))
 }
 
+fn vector_tables_enabled() -> bool {
+    static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ENABLED.get_or_init(|| std::env::var("KIC_GF2_VECTOR_TABLES").as_deref() == Ok("1"))
+}
+
 /// Build only addressable entries, initializing each exactly once. The
 /// previous entry `g & (g - 1)` is always below `g`, so every read observes
 /// an initialized entry. The last table can be shorter than `table_size`:
@@ -81,6 +86,7 @@ fn build_tables_once(
     range: std::ops::Range<usize>,
     table: &mut Vec<u64>,
     word_ops: &mut u64,
+    simd: SimdKind,
 ) {
     let suffix = range.len();
     let table_size = 1usize << bits;
@@ -99,14 +105,13 @@ fn build_tables_once(
         for g in 1usize..(1 << group_len) {
             let prev = g & (g - 1);
             let src = &matrix[block_start + t * bits + g.trailing_zeros() as usize][range.clone()];
-            for (i, &word) in src.iter().enumerate() {
-                // SAFETY: `prev < g` names an initialized earlier entry
-                // of this table. Destination and source entries are disjoint
-                // and every destination index is strictly below `len`.
-                unsafe {
-                    let old = out.add(base + prev * suffix + i).read();
-                    out.add(base + g * suffix + i).write(old ^ word);
-                }
+            // SAFETY: `prev < g` is initialized, the destination is disjoint,
+            // and reserve covers both entries. ISA was checked by simd_kind.
+            // The output remains raw storage until every word is written.
+            unsafe {
+                let dst = out.add(base + g * suffix);
+                let previous = out.add(base + prev * suffix);
+                write_table_entry(dst, previous, src, simd);
             }
             *word_ops += suffix as u64;
         }
@@ -114,6 +119,54 @@ fn build_tables_once(
     // SAFETY: all `len` entries have been initialized. No unused tail
     // entries are included in the vector or in the slice handed to clears.
     unsafe { table.set_len(len) };
+}
+
+/// Initialize an entry without forming a reference to uninitialized u64s.
+unsafe fn write_table_entry(dst: *mut u64, previous: *const u64, src: &[u64], simd: SimdKind) {
+    #[cfg(target_arch = "x86_64")]
+    match simd {
+        SimdKind::Avx512 => return write_table_entry_avx512(dst, previous, src),
+        SimdKind::Avx2 => return write_table_entry_avx2(dst, previous, src),
+        SimdKind::Scalar => {}
+    }
+    let _ = simd;
+    for (i, &word) in src.iter().enumerate() {
+        dst.add(i).write(previous.add(i).read() ^ word);
+    }
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn write_table_entry_avx2(dst: *mut u64, previous: *const u64, src: &[u64]) {
+    use std::arch::x86_64::*;
+    let mut i = 0;
+    while i + 4 <= src.len() {
+        let a = _mm256_loadu_si256(previous.add(i).cast());
+        let b = _mm256_loadu_si256(src.as_ptr().add(i).cast());
+        _mm256_storeu_si256(dst.add(i).cast(), _mm256_xor_si256(a, b));
+        i += 4;
+    }
+    while i < src.len() {
+        dst.add(i).write(previous.add(i).read() ^ src[i]);
+        i += 1;
+    }
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx512f")]
+unsafe fn write_table_entry_avx512(dst: *mut u64, previous: *const u64, src: &[u64]) {
+    use std::arch::x86_64::*;
+    let mut i = 0;
+    while i + 8 <= src.len() {
+        let a = _mm512_loadu_si512(previous.add(i).cast());
+        let b = _mm512_loadu_si512(src.as_ptr().add(i).cast());
+        _mm512_storeu_si512(dst.add(i).cast(), _mm512_xor_si512(a, b));
+        i += 8;
+    }
+    while i < src.len() {
+        dst.add(i).write(previous.add(i).read() ^ src[i]);
+        i += 1;
+    }
 }
 
 /// Largest pattern width of one Gray-code table.
@@ -783,6 +836,11 @@ fn clear_block(
             first_word..end_word,
             table,
             word_ops,
+            if vector_tables_enabled() {
+                simd
+            } else {
+                SimdKind::Scalar
+            },
         );
     } else {
         if !reuse_table {
@@ -1075,40 +1133,54 @@ mod tests {
         let mut table = vec![u64::MAX; 200_000];
         for bits in 1..=8 {
             for pivots in 1..=4 * bits {
-                for suffix in [1, 2, 7, 133] {
+                for suffix in [1, 2, 3, 4, 5, 7, 8, 9, 15, 16, 17, 31, 32, 33, 133] {
                     let matrix: Vec<Vec<u64>> = (0..pivots + 3)
                         .map(|_| (0..suffix + 4).map(|_| rng.gen()).collect())
                         .collect();
                     let mut ops = 17;
-                    build_tables_once(
-                        &matrix,
-                        3,
-                        pivots,
-                        bits,
-                        2..suffix + 2,
-                        &mut table,
-                        &mut ops,
-                    );
-                    let tables = pivots.div_ceil(bits);
-                    let size = 1usize << bits;
-                    let expected_len =
-                        ((tables - 1) * size + (1 << (pivots - (tables - 1) * bits))) * suffix;
-                    assert_eq!(table.len(), expected_len);
-                    let mut expected_ops = 17;
-                    for t in 0..tables {
-                        let group = bits.min(pivots - t * bits);
-                        for g in 0..1usize << group {
-                            for i in 0..suffix {
-                                let expected = (0..group)
-                                    .filter(|&j| g >> j & 1 != 0)
-                                    .fold(0, |acc, j| acc ^ matrix[3 + t * bits + j][i + 2]);
-                                assert_eq!(table[(t * size + g) * suffix + i], expected);
-                            }
+                    let mut variants = vec![SimdKind::Scalar];
+                    #[cfg(target_arch = "x86_64")]
+                    {
+                        if std::is_x86_feature_detected!("avx2") {
+                            variants.push(SimdKind::Avx2);
                         }
-                        expected_ops += ((1u64 << group) - 1) * suffix as u64;
+                        if std::is_x86_feature_detected!("avx512f") {
+                            variants.push(SimdKind::Avx512);
+                        }
                     }
-                    assert_eq!(ops, expected_ops);
-                    table.fill(u64::MAX);
+                    for simd in variants {
+                        build_tables_once(
+                            &matrix,
+                            3,
+                            pivots,
+                            bits,
+                            2..suffix + 2,
+                            &mut table,
+                            &mut ops,
+                            simd,
+                        );
+                        let tables = pivots.div_ceil(bits);
+                        let size = 1usize << bits;
+                        let expected_len =
+                            ((tables - 1) * size + (1 << (pivots - (tables - 1) * bits))) * suffix;
+                        assert_eq!(table.len(), expected_len);
+                        let mut expected_ops = 17;
+                        for t in 0..tables {
+                            let group = bits.min(pivots - t * bits);
+                            for g in 0..1usize << group {
+                                for i in 0..suffix {
+                                    let expected = (0..group)
+                                        .filter(|&j| g >> j & 1 != 0)
+                                        .fold(0, |acc, j| acc ^ matrix[3 + t * bits + j][i + 2]);
+                                    assert_eq!(table[(t * size + g) * suffix + i], expected);
+                                }
+                            }
+                            expected_ops += ((1u64 << group) - 1) * suffix as u64;
+                        }
+                        assert_eq!(ops, expected_ops);
+                        table.fill(u64::MAX);
+                        ops = 17;
+                    }
                 }
             }
         }
