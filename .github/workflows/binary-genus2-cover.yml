@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'tools/binary-genus2-cover/**'
+      - 'tools/volcano-cli/**'
+      - 'isogeny_algos/**'
       - 'tools/ecdlp-surfaces/**'
       - 'docs/ecdlp-surfaces/certificates/**'
       - 'src/binary_ecc/**'
@@ -45,6 +47,8 @@ jobs:
             /cuda/
             /tools/ecdlp-surfaces/
             /tools/binary-genus2-cover/
+            /tools/volcano-cli/
+            /isogeny_algos/
             /docs/ecdlp-surfaces/certificates/
             /docs/curves/registry.json
             /docs/ecbench/schema.sql
