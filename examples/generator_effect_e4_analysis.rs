@@ -165,7 +165,7 @@ fn heterogeneity(
         for per in &cells {
             let mut labels: Vec<usize> = use_cells
                 .iter()
-                .flat_map(|&c| std::iter::repeat(c).take(per[c].len()))
+                .flat_map(|&c| std::iter::repeat_n(c, per[c].len()))
                 .collect();
             labels.shuffle(rng);
             let members = use_cells.iter().flat_map(|&c| per[c].iter());
