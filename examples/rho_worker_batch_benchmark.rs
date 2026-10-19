@@ -17,6 +17,8 @@ use num_bigint::BigUint;
 use serde_json::{json, Value};
 
 const MANIFEST_SHA256: &str = "f46ad43788b7f9241927904541cbeb03ea70a96ca95aa84d527a9b22ba8d12b8";
+const CONFIRMATION_MANIFEST_SHA256: &str =
+    "546fe0b842a2f559395c9ac5d74ced12b96ce366e41322387eb0baec5dcb3adc";
 const SEED: u64 = 0x71cc_2026_1017;
 
 fn hex_big(s: &str) -> BigUint {
@@ -43,7 +45,10 @@ fn main() {
     );
     let manifest_bytes = fs::read(&args[1]).expect("read frozen Q manifest");
     let manifest_sha256 = hex::encode(sha256(&manifest_bytes));
-    assert_eq!(manifest_sha256, MANIFEST_SHA256, "Q manifest changed");
+    assert!(
+        manifest_sha256 == MANIFEST_SHA256 || manifest_sha256 == CONFIRMATION_MANIFEST_SHA256,
+        "Q manifest changed"
+    );
     let manifest: Value = serde_json::from_slice(&manifest_bytes).expect("valid Q manifest");
     assert_eq!(required(&manifest, "curve"), "secp256k1");
     let fixtures = manifest["fixtures"].as_array().expect("fixture array");
