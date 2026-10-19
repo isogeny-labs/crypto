@@ -79,9 +79,9 @@ registered before timing.
 - **Over `64 ≤ n ≤ 81` four reach 50 bits**, registered here as the
   candidates, in the order of preference: `icv1-f2m71-t48653080717-2cafaea3`
   (K_0, 52.29 bits), `icv1-f2m73-tm184271214331-9d25cc67` (K_0, 56.26),
-  `icv1-f2m73-t184271214331-83f9f5e9` (K_1, 62.22) and
-  `icv1-f2m79-t420247971347-dc997574` (K_1, 69.69). Also listed:
-  `icv1-f2m65-t12115575461-d3d0406c` (48.57), `icv1-f2m71-tm48653080717-f25c4638`
+  `K_1` over `GF(2^73)` (62.22 bits) and
+  `K_1` over `GF(2^79)` (69.69). Also listed:
+  `K_0` over `GF(2^65)` (48.57), `icv1-f2m71-tm48653080717-f25c4638`
   (49.06). (`roster_n64_n81.txt`; the scan was stopped after `n = 81`, and `roster_n31_n63.txt` is the `n ≤ 63` list.)
 - **None can be timed by this pipeline.** `ic price --single-target` on a
   `K_0` over `GF(2^71)` stops with "no single-word Koblitz instance for this
@@ -226,3 +226,11 @@ comparisons keep the strict test. `icprog` is rebuilt from the commit that
 makes this change: SHA-256
 `15e4a84352563b59efe2eda2aa28a997ba5e3034f22699ce218de0888d1c16e7`. The
 other hashes above stand. The cards are recompiled for the new commit.
+
+## Amendment 2 (2026-10-19, after the rows): three names
+
+The names check (`scripts/check_curve_names.py`) rejected three slugs in
+"The ≥ 50-bit curve" for curves that are not in `docs/curves/registry.json`
+(K_1 over GF(2^73) and GF(2^79), K_0 over GF(2^65)); they are named there
+by field and `a` instead, and their slugs stay in `roster_n64_n81.txt`.
+Nothing else changes; every row ran before this edit.
