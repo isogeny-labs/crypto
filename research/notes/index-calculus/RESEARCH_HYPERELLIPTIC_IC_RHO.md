@@ -1762,3 +1762,33 @@ largest row (0.216·√N), reported as precomputation and not in `S_walk`.
   negation fold's failure at large `N` (R1) and the mixed-hash failure
   (H1) were measured on the slow walk. The fold is the next thing to
   re-test on the full-width walk.
+
+## Round thirteen: the negation fold on the full-width walk — protocol, written before measuring
+
+**Question.** Round nine's fold failed at large `N` (R1 = 0.968), but it
+was measured on the 8-bit walk, which round twelve showed is slow there
+for its own reasons. Does the `±` fold give its `√2` on the full-width
+walk?
+
+**Arms.** Plain full-width DP rho (`DistinguishedPointsFullWidth`, the
+reference) and the same walk folded on `±` classes with round nine's
+look-ahead (`DistinguishedPointsNegationFullWidth`): canonical
+representative by the leading coefficient of `v`, `(a, b)` negated with
+it, every look-ahead trial and gap escape a counted operation. Same 18
+instances, same 40 seeds, counted operations only.
+
+**Registered hypotheses.**
+
+- **N1.** Median folded/plain walk operations over the 7 rows with
+  `N ≥ 10⁵` is **≤ 0.80** (ideal 0.707).
+- **N2.** The fruitless share (look-ahead trials plus escapes) of the
+  folded walk is **≤ 10%** on every row.
+- **N3.** Folded `S_walk` median over the rows with `N ≥ 10⁵` is
+  **≤ 1.05** (ideal √(π/4) = 0.886).
+- **N4.** Every run recovers the planted `k`.
+
+If N1–N4 hold, the folded full-width walk becomes the reference, because
+index calculus already folds `±P` in its factor base (class
+**accounting**, against index calculus: the reference gets cheaper by the
+measured ratio). If N1 fails, the fold has a defect of its own, examined
+next.
