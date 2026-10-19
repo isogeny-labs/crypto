@@ -6,6 +6,8 @@ Its sealed one-million-conflict calls preserve both bounded outcomes and
 their full raw receipts.
 The [phase-prefix gate](PHASE_RESULT.md) measures how many known Frobenius
 phases the external solver can leave free on the same fixed witness.
+The [external Gauss panel](GAUSS_RESULT.md) checks native-XOR matrix settings
+against bracketed default calls on the unpinned witness formula.
 
 The existing 5-summand, signed-Frobenius-domain chained-S3 encoding exports
 to native-XOR XCNF, and CryptoMiniSat 5.14.7 returns a model when the known
