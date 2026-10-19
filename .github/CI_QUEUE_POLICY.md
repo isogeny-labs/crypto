@@ -83,6 +83,16 @@ audit covers all 431 workflow files on the checked main revision, plus these
 four branch-only workflows seen in the live queue/running snapshot. It does
 not claim to have audited every inactive branch revision.
 
+The live cleanup selected 152 queued automatic runs in the disabled lanes or
+superseded automatic groups. Immediately before each cancellation it re-read
+the run state: eight had already left `queued` and were preserved; 144 were
+cancelled. All 144 were subsequently verified `completed` / `cancelled`, and
+all 18 workflows listed above were verified `disabled_manually` (15 disabled
+in this task and three already disabled). The queue snapshots fell from 356
+to 215 during cleanup; concurrent arrivals and completions mean that snapshot
+delta is distinct from the 144 verified cancellations. Existing artifacts and
+run records were retained.
+
 ## Evidence and limits
 
 The initial live snapshot on 2026-10-19 found 354 queued runs and 15 in-progress
