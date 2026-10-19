@@ -23,14 +23,6 @@
       "Type": "String",
       "Default": "eipalloc-00c2a8a867901bf7d"
     },
-    "Capacity": {
-      "Type": "Number",
-      "Default": 0,
-      "AllowedValues": [
-        0,
-        1
-      ]
-    },
     "LifecycleEnabled": {
       "Type": "String",
       "Default": "false",
@@ -47,7 +39,7 @@
     },
     "RuntimeDigest": {
       "Type": "String",
-      "Default": "8a1f23fc4a42552d2f85f951ebeb2efbc4f78154b7a3aacdb50e8f269cd8e1f7",
+      "Default": "4e9e3899571becd92a001dd545bfadca6aa26419c4b7b24f2d0bfc611b447eb2",
       "AllowedPattern": "([a-f0-9]{64}|unpublished)"
     },
     "NodeProject": {
@@ -483,7 +475,7 @@
           ],
           "UserData": {
             "Fn::Base64": {
-              "Fn::Sub": "#!/bin/bash\nset -euo pipefail\ndnf install -y amazon-efs-utils python3 awscli2 postgresql17-server\nmkdir -p /srv/experiments\necho '${FileSystem}:/ /srv/experiments efs _netdev,tls,iam,noresvport 0 0' >> /etc/fstab\nmount /srv/experiments\nchown ec2-user:ec2-user /srv/experiments\n# Fail closed if the operator has not finished durable migration and the job manifest.\ntest -f '${WorkRoot}/jobs.json'\naws s3 cp 's3://${RuntimeBucket}/runtime/${RuntimeDigest}.tar.gz' /tmp/spot-runtime.tar.gz --region '${AWS::Region}'\necho '${RuntimeDigest}  /tmp/spot-runtime.tar.gz' | sha256sum -c -\nmkdir -p /opt/spot\ntar -xzf /tmp/spot-runtime.tar.gz -C /opt/spot\n# Reusing existing private host keys requires explicit operator authorization.\n# The default keeps each replacement's own keys; verify fingerprints through SSM.\nif [ '${PreserveHostKeys}' = 'true' ]; then\n  test -f /srv/experiments/ssh-host-keys/ssh_host_ed25519_key\n  cp -a /srv/experiments/ssh-host-keys/ssh_host_* /etc/ssh/\n  restorecon -R /etc/ssh\n  systemctl restart sshd\nfi\nmkdir -p '${NodeProject}'\nchown ec2-user:ec2-user '${NodeProject}'\nrunuser -u ec2-user -- python3 /opt/spot/runner.py --root '${WorkRoot}' --validate\n# Prove durable checkpoint selection/restore before publishing readiness.\n# The private temporary workspace is separate from registered workloads.\nrunuser -u ec2-user -- env SPOT_SELFTEST_RUNTIME=/opt/spot SPOT_SELFTEST_PARENT='${WorkRoot}' /opt/spot/bin/checkpoint-selftest --exact supervisor_restores_a_discovered_generation_after_abrupt_worker_death --nocapture > /var/log/spot-checkpoint-selftest.log 2>&1\npython3 /opt/spot/install_services.py --root '${WorkRoot}' --project '${NodeProject}' --table '${ControllerLock}' --region '${AWS::Region}'\nnode_ready=0\nfor attempt in $(seq 150); do\n  if curl -fsS --max-time 2 http://127.0.0.1:9180/health >/dev/null && curl -fsS --max-time 2 http://127.0.0.1:8080/ >/dev/null; then\n    node_ready=1\n    break\n  fi\n  sleep 2\ndone\ntest \"$node_ready\" -eq 1\nsystemctl is-active --quiet sshd\nsystemctl is-active --quiet spot-experiments\nsystemctl is-active --quiet spot-activity\nsystemctl is-active --quiet spot-checkpoint-discovery.timer\nTOKEN=$(curl -fsS --max-time 3 -X PUT -H 'X-aws-ec2-metadata-token-ttl-seconds: 60' http://169.254.169.254/latest/api/token)\nINSTANCE=$(curl -fsS --max-time 3 -H \"X-aws-ec2-metadata-token: $TOKEN\" http://169.254.169.254/latest/meta-data/instance-id)\naws ec2 create-tags --region '${AWS::Region}' --resources \"$INSTANCE\" --tags Key=SpotReady,Value=true\n"
+              "Fn::Sub": "#!/bin/bash\nset -euo pipefail\n# AL2023 supplies /usr/bin/aws in the AMI; there is no awscli2 RPM.\ncommand -v aws\ndnf install -y amazon-efs-utils python3 postgresql17-server\nmkdir -p /srv/experiments\necho '${FileSystem}:/ /srv/experiments efs _netdev,tls,iam,noresvport 0 0' >> /etc/fstab\nmount /srv/experiments\nchown ec2-user:ec2-user /srv/experiments\n# Fail closed if the operator has not finished durable migration and the job manifest.\ntest -f '${WorkRoot}/jobs.json'\naws s3 cp 's3://${RuntimeBucket}/runtime/${RuntimeDigest}.tar.gz' /tmp/spot-runtime.tar.gz --region '${AWS::Region}'\necho '${RuntimeDigest}  /tmp/spot-runtime.tar.gz' | sha256sum -c -\nmkdir -p /opt/spot\ntar -xzf /tmp/spot-runtime.tar.gz -C /opt/spot\n# Reusing existing private host keys requires explicit operator authorization.\n# The default keeps each replacement's own keys; verify fingerprints through SSM.\nif [ '${PreserveHostKeys}' = 'true' ]; then\n  test -f /srv/experiments/ssh-host-keys/ssh_host_ed25519_key\n  cp -a /srv/experiments/ssh-host-keys/ssh_host_* /etc/ssh/\n  restorecon -R /etc/ssh\n  systemctl restart sshd\nfi\nmkdir -p '${NodeProject}'\nchown ec2-user:ec2-user '${NodeProject}'\nrunuser -u ec2-user -- python3 /opt/spot/runner.py --root '${WorkRoot}' --validate\n# Prove durable checkpoint selection/restore before publishing readiness.\n# The private temporary workspace is separate from registered workloads.\nrunuser -u ec2-user -- env SPOT_SELFTEST_RUNTIME=/opt/spot SPOT_SELFTEST_PARENT='${WorkRoot}' /opt/spot/bin/checkpoint-selftest --exact supervisor_restores_a_discovered_generation_after_abrupt_worker_death --nocapture > /var/log/spot-checkpoint-selftest.log 2>&1\nrunuser -u ec2-user -- env SPOT_NATIVE_TEST_PARENT='${WorkRoot}' /opt/spot/bin/solver-checkpoint-selftest --exact cryptanalysis::koblitz_groebner::checkpoint::tests::real_solver_recovers_after_sigkill_and_rejects_corruption --nocapture > /var/log/spot-native-checkpoint-selftest.log 2>&1\n# Future jobs reference this immutable runtime path, not the live legacy binary.\nmkdir -p '${WorkRoot}/bin/${RuntimeDigest}'\ninstall -m 755 /opt/spot/bin/factor-base-shape-ladder '${WorkRoot}/bin/${RuntimeDigest}/factor_base_shape_ladder'\npython3 /opt/spot/install_services.py --root '${WorkRoot}' --project '${NodeProject}' --table '${ControllerLock}' --region '${AWS::Region}'\nnode_ready=0\nfor attempt in $(seq 150); do\n  if curl -fsS --max-time 2 http://127.0.0.1:9180/health >/dev/null && curl -fsS --max-time 2 http://127.0.0.1:8080/ >/dev/null; then\n    node_ready=1\n    break\n  fi\n  sleep 2\ndone\ntest \"$node_ready\" -eq 1\nsystemctl is-active --quiet sshd\nsystemctl is-active --quiet spot-experiments\nsystemctl is-active --quiet spot-activity\nsystemctl is-active --quiet spot-checkpoint-discovery.timer\nTOKEN=$(curl -fsS --max-time 3 -X PUT -H 'X-aws-ec2-metadata-token-ttl-seconds: 60' http://169.254.169.254/latest/api/token)\nINSTANCE=$(curl -fsS --max-time 3 -H \"X-aws-ec2-metadata-token: $TOKEN\" http://169.254.169.254/latest/meta-data/instance-id)\naws ec2 create-tags --region '${AWS::Region}' --resources \"$INSTANCE\" --tags Key=SpotReady,Value=true\n"
             }
           }
         }
@@ -493,9 +485,6 @@
       "Type": "AWS::AutoScaling::AutoScalingGroup",
       "Properties": {
         "MinSize": "0",
-        "DesiredCapacity": {
-          "Ref": "Capacity"
-        },
         "MaxSize": "2",
         "CapacityRebalance": true,
         "VPCZoneIdentifier": {
