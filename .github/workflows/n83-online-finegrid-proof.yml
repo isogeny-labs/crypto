@@ -1,17 +1,15 @@
+# Long research runs require explicit manual dispatch.
 name: N83 K3114 fine-grid capacity proof
 
 on:
-  push:
-    branches: [codex/n83-online-range-20261016]
-    paths:
-      - .github/workflows/n83-online-finegrid-proof.yml
-      - research/n83_online_finegrid_20261016/Capacity.lean
-      - research/n83_online_finegrid_20261016/lean-toolchain
-      - research/n83_online_finegrid_20261016/proof_check.log
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   proof-check:

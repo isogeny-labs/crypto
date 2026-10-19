@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 1000-point factor-base refinement
 
 on:
-  push:
-    branches: [codex/n83-factor-base-refine-20261014]
-    paths:
-      - .github/workflows/n83-factor-base-refine.yml
-      - research/n83_factor_base_refine_20261014/**
-      - examples/koblitz_orbit_dlp_fast.rs
   workflow_dispatch:
 
 permissions:

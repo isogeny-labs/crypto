@@ -1,13 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 one-point cold neighborhood screen
 
 on:
-  push:
-    branches: [codex/n83-cold-neighborhood-20261016]
-    paths:
-      - .github/workflows/n83-cold-neighborhood.yml
-      - research/n83_cold_neighborhood_20261016/PROTOCOL.md
-      - research/n83_cold_neighborhood_20261016/run.py
-      - research/n83_cold_neighborhood_20261016/verify.py
   workflow_dispatch:
 
 permissions:

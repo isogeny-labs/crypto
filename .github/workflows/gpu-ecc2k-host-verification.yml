@@ -47,13 +47,14 @@ on:
       - '.github/workflows/gpu-ecc2k-host-verification.yml'
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push' }}
+
 jobs:
   host-tests:
     runs-on: ubuntu-24.04
     # Most of this is one `cargo build --release` to generate the
     # vectors; the C++ itself is seconds.
-    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (github.event_name == 'pull_request' && 25 || 30) || 15 }}
     permissions:
       contents: read
     steps:
@@ -107,7 +108,7 @@ jobs:
   # with warnings as errors.  Compile only: no GPU, no driver.
   nvcc-compile:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (20) || 15 }}
     permissions:
       contents: read
     steps:

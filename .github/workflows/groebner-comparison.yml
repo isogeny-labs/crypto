@@ -8,8 +8,8 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push' }}
 
 jobs:
   protocol:
@@ -46,7 +46,7 @@ jobs:
         run: python -m unittest groebner_compare.test_research.SolverTrials.test_upstream_m5gb_basis -v
   julia-adapter:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (20) || 15 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

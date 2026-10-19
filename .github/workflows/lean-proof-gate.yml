@@ -32,15 +32,15 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push' }}
 
 jobs:
   selftest:
     # Known-good and known-bad fixtures: the gate must pass and fail them
     # exactly as expected, so it is exercised even with no proofs in the repo.
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (20) || 15 }}
     steps:
       - uses: actions/checkout@v4
       - name: Install elan
@@ -65,7 +65,7 @@ jobs:
     needs: discover
     if: ${{ needs.discover.outputs.targets != '[]' }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (25) || 15 }}
     strategy:
       fail-fast: false
       matrix:

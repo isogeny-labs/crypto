@@ -15,10 +15,14 @@ on:
       - 'research/notes/ecc2k130/rotated_subspace_support_20260925/**'
       - '.github/workflows/ecc2k130-rotated-slot-placement.yml'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push' }}
+
 jobs:
   replay:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (20) || 15 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

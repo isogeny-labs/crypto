@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 root11 K-neighborhood sealed replay
 
 on:
-  push:
-    branches: [codex/n83-k-neighborhood-20261015]
-    paths:
-      - .github/workflows/n83-k-neighborhood.yml
-      - research/n83_k_neighborhood_20261015/**
-      - research/n83_k_neighborhood_results_20261015/**
   workflow_dispatch:
 
 permissions:

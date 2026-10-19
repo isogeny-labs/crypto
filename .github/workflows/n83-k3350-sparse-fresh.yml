@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 sparse K3300 versus K3350 fresh sealed replay
 
 on:
-  push:
-    branches: [codex/n83-k3350-sparse-fresh-20261015]
-    paths:
-      - .github/workflows/n83-k3350-sparse-fresh.yml
-      - research/n83_k3350_sparse_fresh_20261015/**
-      - research/n83_k3350_sparse_fresh_results_20261015/**
   workflow_dispatch:
 
 permissions:

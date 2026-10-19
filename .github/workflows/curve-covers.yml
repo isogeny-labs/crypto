@@ -1,92 +1,15 @@
+# Expensive work runs on schedule/manual dispatch; keep the push/PR queue short.
 name: Curve cover certificates
 on:
-  pull_request:
-    paths:
-      - '.gitattributes'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'src/lib.rs'
-      - 'src/bin/curve_standards.rs'
-      - 'src/bin/curve_standards/**'
-      - 'src/bin/curve_cover_check.rs'
-      - 'src/bin/curve_cover_check/**'
-      - 'src/bin/hyperelliptic_cover.rs'
-      - 'src/bin/ecdlp_audit.rs'
-      - 'src/bin/ecdlp_audit/**'
-      - 'src/binary_ecc/**'
-      - 'src/prime_hyperelliptic/**'
-      - 'src/cryptanalysis/ecc2k130_guard.rs'
-      - 'src/cryptanalysis/mod.rs'
-      - 'src/hash/mod.rs'
-      - 'src/hash/sha256.rs'
-      - 'src/utils/**'
-      - 'docs/curves/**'
-      - 'docs/ecdlp-audit/**'
-      - 'docs/ECDLP_ATTACK_MATRIX.md'
-      - 'docs/ic/boundary_targets.json'
-      - 'docs/browser/**'
-      - 'scripts/build_lab_browser.py'
-      - 'scripts/test_build_lab_browser.py'
-      - 'scripts/test_cover_catalog.py'
-      - 'scripts/update_curve_standards.py'
-      - 'scripts/build_curve_registry.py'
-      - 'scripts/build_cover_transfer_assessments.mjs'
-      - 'research/cover_transfer_assessment_20261013/**'
-      - 'research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md'
-      - 'research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.pdf'
-      - 'problems/catalog-cover-subgroup-certificates-incomplete.md'
-      - 'research/hyperelliptic_cover_infrastructure_20261006/evidence.json'
-      - 'research/hyperelliptic_cover_infrastructure_20261006/README.md'
-      - '.github/workflows/curve-covers.yml'
-      - '.github/workflows/release.yml'
-  push:
-    branches: [main]
-    paths:
-      - '.gitattributes'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'src/lib.rs'
-      - 'src/bin/curve_standards.rs'
-      - 'src/bin/curve_standards/**'
-      - 'src/bin/curve_cover_check.rs'
-      - 'src/bin/curve_cover_check/**'
-      - 'src/bin/hyperelliptic_cover.rs'
-      - 'src/bin/ecdlp_audit.rs'
-      - 'src/bin/ecdlp_audit/**'
-      - 'src/binary_ecc/**'
-      - 'src/prime_hyperelliptic/**'
-      - 'src/cryptanalysis/ecc2k130_guard.rs'
-      - 'src/cryptanalysis/mod.rs'
-      - 'src/hash/mod.rs'
-      - 'src/hash/sha256.rs'
-      - 'src/utils/**'
-      - 'docs/curves/**'
-      - 'docs/ecdlp-audit/**'
-      - 'docs/ECDLP_ATTACK_MATRIX.md'
-      - 'docs/ic/boundary_targets.json'
-      - 'docs/browser/**'
-      - 'scripts/build_lab_browser.py'
-      - 'scripts/test_build_lab_browser.py'
-      - 'scripts/test_cover_catalog.py'
-      - 'scripts/update_curve_standards.py'
-      - 'scripts/build_curve_registry.py'
-      - 'scripts/build_cover_transfer_assessments.mjs'
-      - 'research/cover_transfer_assessment_20261013/**'
-      - 'research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md'
-      - 'research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.pdf'
-      - 'problems/catalog-cover-subgroup-certificates-incomplete.md'
-      - 'research/hyperelliptic_cover_infrastructure_20261006/evidence.json'
-      - 'research/hyperelliptic_cover_infrastructure_20261006/README.md'
-      - '.github/workflows/curve-covers.yml'
-      - '.github/workflows/release.yml'
   workflow_dispatch:
+  schedule:
+    - cron: '37 5 * * *'
+
 permissions:
   contents: read
-# A newer push to the same pull request cancels this workflow's run for the older commit.
-# Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   certificates:

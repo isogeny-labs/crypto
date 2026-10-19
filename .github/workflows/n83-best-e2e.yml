@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 three-pipeline end-to-end factor-base comparison
 
 on:
-  push:
-    branches: [codex/n83-best-e2e-20261015]
-    paths:
-      - .github/workflows/n83-best-e2e.yml
-      - research/n83_best_e2e_20261015/**
   workflow_dispatch:
 
 permissions:

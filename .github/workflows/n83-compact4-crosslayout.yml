@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 compact4 cross-layout fresh panel
 
 on:
-  push:
-    branches: [codex/n83-compact4-crosslayout-20261016]
-    paths:
-      - .github/workflows/n83-compact4-crosslayout.yml
-      - research/n83_compact4_crosslayout_20261016/**
   workflow_dispatch:
 
 permissions:

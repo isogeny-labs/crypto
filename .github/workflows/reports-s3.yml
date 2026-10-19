@@ -38,7 +38,7 @@ concurrency:
 jobs:
   upload:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (45) || 15 }}
     env:
       BUCKET: ${{ vars.REPORTS_S3_BUCKET || 'crypto-autoresearcher' }}
       AWS_REGION: ${{ vars.REPORTS_AWS_REGION || 'us-west-2' }}

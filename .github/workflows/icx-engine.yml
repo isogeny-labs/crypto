@@ -39,11 +39,9 @@ on:
 permissions:
   contents: read
 
-# A newer push to the same pull request cancels this workflow's run for the older commit.
-# Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push' }}
 
 jobs:
   build-and-run:
@@ -59,7 +57,7 @@ jobs:
           - runner: macos-14
             arch: macos-arm64
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (github.event_name == 'pull_request' && 25 || 30) || 15 }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -148,7 +146,7 @@ jobs:
   gpu-fes-cuda:
     name: GPU FES CUDA compile-check
     runs-on: ubuntu-24.04
-    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (github.event_name == 'pull_request' && 25 || 30) || 15 }}
     env:
       CUDA_PKG_VERSION: 12-8
       CUDA_DIR_VERSION: "12.8"

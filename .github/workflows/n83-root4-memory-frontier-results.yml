@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 root4 memory-frontier sealed result replay
 
 on:
-  push:
-    branches: [codex/n83-root4-memory-frontier-20261015]
-    paths:
-      - research/n83_root4_memory_frontier_results_20261015/records_index.json
-      - research/n83_root4_memory_frontier_results_20261015/selection.json
-      - research/n83_root4_memory_frontier_results_20261015/measurements.json.gz
   workflow_dispatch:
 
 permissions:

@@ -31,8 +31,9 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: ic-measurement-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push' }}
+
 defaults:
   run:
     shell: bash
@@ -69,7 +70,7 @@ jobs:
 
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 40 }}
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && ((github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 40) || 15 }}
     needs: standard
     steps:
       - uses: actions/checkout@v4

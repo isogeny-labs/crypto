@@ -1,16 +1,15 @@
+# Long research runs require explicit manual dispatch.
 name: N83 opt-in 30-bit indexed root state
 
 on:
-  push:
-    branches: [codex/n83-indexed5-id30-20261016]
-    paths:
-      - examples/koblitz_orbit_dlp_fast.rs
-      - research/n83_indexed5_id30_20261016/**
-      - .github/workflows/n83-indexed5-id30.yml
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   exact-root-example:

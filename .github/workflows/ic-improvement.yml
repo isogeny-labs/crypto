@@ -36,7 +36,7 @@ concurrency:
 jobs:
   candidate-controls:
     runs-on: ubuntu-24.04
-    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 35 }}
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (github.event_name == 'pull_request' && 25 || 35) || 15 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -101,7 +101,7 @@ jobs:
           if-no-files-found: warn
   round2-candidate-controls:
     runs-on: ubuntu-24.04
-    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 35 }}
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (github.event_name == 'pull_request' && 25 || 35) || 15 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

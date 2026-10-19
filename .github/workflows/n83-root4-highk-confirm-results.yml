@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 root4 high-K confirmation sealed result replay
 
 on:
-  push:
-    branches: [codex/n83-root4-highk-confirm-20261016]
-    paths:
-      - .github/workflows/n83-root4-highk-confirm-results.yml
-      - research/n83_root4_highk_confirm_results_20261016/**
   workflow_dispatch:
 
 permissions:

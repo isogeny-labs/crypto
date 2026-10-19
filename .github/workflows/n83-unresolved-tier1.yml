@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 unresolved finalists one-target Tier 1 IC rho diagnostic
 
 on:
-  push:
-    branches: [codex/n83-final-tournament-20261015]
-    paths:
-      - .github/workflows/n83-unresolved-tier1.yml
-      - research/n83_unresolved_tier1_20261015/PROTOCOL.md
   workflow_dispatch:
 
 permissions:

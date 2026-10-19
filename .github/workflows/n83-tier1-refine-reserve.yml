@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 selected K3300 refinement reserve-point Tier 1 paired IC versus rho
 
 on:
-  push:
-    branches: [codex/n83-tier1-refine-reserve-20261015]
-    paths:
-      - .github/workflows/n83-tier1-refine-reserve.yml
-      - research/n83_tier1_refine_reserve_20261015/**
-      - research/n83_tier1_refine_reserve_results_20261015/**
   workflow_dispatch:
 
 permissions:

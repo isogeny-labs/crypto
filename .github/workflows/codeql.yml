@@ -1,3 +1,4 @@
+# Expensive work runs on schedule/manual dispatch; keep the push/PR queue short.
 # For most projects, this workflow file will not need changing; you simply need
 # to commit it to your repository.
 #
@@ -12,18 +13,13 @@
 name: "CodeQL Advanced"
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-  merge_group:
   workflow_dispatch:
   schedule:
     - cron: '41 2 * * 3'
 
 concurrency:
-  group: codeql-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   scope:
@@ -70,13 +66,9 @@ jobs:
   analyze:
     if: always() && !cancelled() && github.event_name != 'workflow_dispatch'
     needs: [scope, build-rust-database, warm-rust-cache]
-    # Routine Rust scans consume the database finalized by the first job and
-    # the evaluation cache the second job warmed; queries retain this existing
-    # job identity and /language:rust category.
-    # The Rust queries over the whole repository outgrew the 25-minute routine
-    # cap (cancelled at 25 minutes on several PRs, 2026-10-17), so every event
-    # gets 60 minutes; check-pr-budgets.py names this job as its one exception.
-    # The warmed cache leaves this job far below that cap on PRs.
+    # The weekly scan initializes and analyzes each language in this job.
+    # Full Rust queries need the long scheduled budget. The old PR database
+    # handoff jobs below remain dormant without PR/merge-group triggers.
     timeout-minutes: 60
     name: Analyze (${{ matrix.language }})
     # Runner size impacts CodeQL analysis time. To learn more, please see:

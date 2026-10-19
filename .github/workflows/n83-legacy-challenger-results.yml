@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 root22 root21 challenger sealed result replay
 
 on:
-  push:
-    branches: [codex/n83-final-tournament-20261015]
-    paths:
-      - .github/workflows/n83-legacy-challenger-results.yml
-      - research/n83_legacy_challenger_results_20261015/**
   workflow_dispatch:
 
 permissions:

@@ -1,14 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 final tournament sealed result replay
 
 on:
-  push:
-    branches: [codex/n83-final-tournament-20261015]
-    paths:
-      - .github/workflows/n83-final-tournament-results.yml
-      - research/n83_final_tournament_results_20261015/records_index.json
-      - research/n83_final_tournament_results_20261015/selection.json
-      - research/n83_final_tournament_results_20261015/measurements.json.gz
-      - research/n83_final_tournament_results_20261015/materialize.py
   workflow_dispatch:
 
 permissions:

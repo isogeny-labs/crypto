@@ -56,14 +56,15 @@ permissions:
   contents: read
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push' }}
+
 jobs:
   # The trait build takes several minutes, and both `check` and the
   # altered-file rejection rebuild it, so each runs in its own job to stay
   # within the 25-minute PR budget (.github/scripts/check-pr-budgets.py).
   traits:
     runs-on: ubuntu-24.04
-    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (github.event_name == 'pull_request' && 25 || 45) || 15 }}
     strategy:
       fail-fast: false
       matrix:

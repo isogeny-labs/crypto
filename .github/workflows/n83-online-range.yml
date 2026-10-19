@@ -1,17 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 one-point online factor-base range screen
 
 on:
-  push:
-    branches: [codex/n83-online-range-20261016]
-    paths:
-      - .github/workflows/n83-online-range.yml
-      - research/n83_online_range_20261016/PROTOCOL.md
-      - research/n83_online_range_20261016/run.py
-      - research/n83_online_range_20261016/verify.py
-      - research/n83_online_range_20261016/OnlineRangeCapacity.lean
-      - research/n83_online_range_20261016/PROOF_MAP.md
-      - research/n83_online_range_20261016/lean-toolchain
-      - research/n83_online_range_20261016/proof_check.log
   workflow_dispatch:
 
 permissions:

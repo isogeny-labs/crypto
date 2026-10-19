@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 root4 Bloom factor-base screen
 
 on:
-  push:
-    branches: [codex/n83-root4-bloom-20261015]
-    paths:
-      - .github/workflows/n83-root4-bloom.yml
-      - research/n83_root4_bloom_20261015/**
   workflow_dispatch:
 
 permissions:

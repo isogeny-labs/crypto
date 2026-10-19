@@ -42,8 +42,9 @@ permissions:
   actions: read
 
 concurrency:
-  group: boolean-f5-support-aware-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push' }}
+
 env:
   KIC_F5_DIRECT_PACK: '1'
   KIC_F5_UNPACK_DIRECT: '1'
@@ -55,7 +56,7 @@ env:
 jobs:
   correctness:
     runs-on: ubuntu-24.04
-    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 360 }}
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (github.event_name == 'pull_request' && 25 || 360) || 15 }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable

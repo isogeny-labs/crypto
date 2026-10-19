@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 secondary factor-base selection panel
 
 on:
-  push:
-    branches: [codex/n83-base-panel-20261014]
-    paths:
-      - .github/workflows/n83-factor-base-panel.yml
-      - research/n83_factor_base_panel_20261014/**
-      - examples/koblitz_orbit_dlp_fast.rs
   workflow_dispatch:
 
 permissions:

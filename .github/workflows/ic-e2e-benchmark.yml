@@ -33,15 +33,16 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: ic-e2e-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push' }}
+
 env:
   IC_E2E_REFERENCE: docs/ic/ci/ic-e2e-reference-v6.json
   IC_E2E_OUTPUT: /tmp/ic-e2e
 jobs:
   e2e-benchmark:
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 40 }}
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && ((github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 40) || 15 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

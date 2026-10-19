@@ -1,23 +1,14 @@
+# Expensive work runs on schedule/manual dispatch; keep the push/PR queue short.
 name: Polynomial reuse correctness
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - 'src/cryptanalysis/algebra_cache.rs'
-      - 'src/cryptanalysis/polynomial_reuse.rs'
-      - 'src/cryptanalysis/koblitz_groebner.rs'
-      - 'src/cryptanalysis/f4_rref_tests.rs'
-      - 'src/cryptanalysis/weil_charts.rs'
-      - 'examples/weil_factor_composition.rs'
-      - 'examples/preprocessing_cost.rs'
-      - 'examples/gb_probe.rs'
-      - 'research/weil_factor_composition_20260914/**'
-      - 'research/f4_linear_algebra_20260914/contract.json'
-      - 'src/cryptanalysis/pq_groebner_f2.rs'
-      # Feeds the cache fingerprint and supplies the cached symbolic
-      # summation polynomials, so a change here changes every key.
-      - 'src/cryptanalysis/semaev_leading_form.rs'
-      - '.github/workflows/polynomial-reuse.yml'
+  schedule:
+    - cron: '43 9 * * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   correctness:
     runs-on: ubuntu-latest
