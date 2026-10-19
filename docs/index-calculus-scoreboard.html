@@ -2098,7 +2098,11 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
       but only genus 4 has a fitted exponent behind it. Genus 3&rsquo;s exponent claim was
       withdrawn once the linear algebra was priced. That is a toy-size result
       (<code>p &le; 251</code>) whose reference needed correcting, not a statement about
-      any deployed curve. The newer binary-field solver, the
+      any deployed curve, and under &sect;5a it is now a <strong>lower-bound comparison, unranked</strong>:
+      neither arm emits its unpriced work, and that rho walk ran 45&ndash;68% above its ideal at the
+      two largest rows because of its own 8-bit branch coefficients (round twelve: full-width
+      coefficients bring it to 1.21 and 1.48, so the old reference was up to 1.5&times; slow there and
+      flattered index calculus by as much; the ratios are to be re-measured, not rescaled). The newer binary-field solver, the
       Crossbred decomposition oracle, the WDSat Riemann-Roch panel, the Weil-descent SAT round on the challenge curve and the
       parameter-sweep pilots are explicitly uncalibrated: their component counts
       do not establish an end-to-end speedup or belong in that normalized claim.</p>
@@ -5809,6 +5813,28 @@ Increasing factor-base dimension remains the next scaling test.</p></div></div>
     <code>p<sup>2</sup></code> against rho&rsquo;s <code>p<sup>1.5</sup></code> at genus 3, which is
     why the literature shrinks the factor base at small genus (Th&eacute;riault 2003; Gaudry,
     Thom&eacute;, Th&eacute;riault and Diem 2007).</p>
+    <p><strong>Rounds ten to twelve: the reference was slow, and why.</strong> A strongly mixed
+    walk hash did not fix the large rows (round ten, H1 falsified). The same walk on the
+    integers mod <code>N</code> showed the same excess (round eleven), so the cause was shared walk
+    logic, not the Jacobian. Round twelve found it: the reference drew its branch coefficients from
+    8 bits, which keeps a walk&rsquo;s displacement on a small 2-D set and delays its collision at
+    large <code>N</code>. With full-width coefficients, registered W1&ndash;W4 all hold: Jacobian median
+    <code>S_walk</code> 1.390 over the 7 rows with <code>N</code> &ge; 10<sup>5</sup>, and the largest row drops
+    from 2.100 to 1.481. The full-width walk is now the default reference. Every IC/rho ratio above
+    measured against the 8-bit walk at <code>N</code> &ge; 10<sup>5</sup> flattered index calculus by up to
+    1.5&times; and is to be re-measured. <span class="chip">accounting</span> Frozen source:
+    <a href="https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/round12/run1/R12.txt">round twelve</a>.</p>
+    <p><strong>Round nine: the reference itself is the open question.</strong> Index calculus here
+    folds <code>&plusmn;P</code>; the rho reference did not. A negation-map rho, registered with
+    look-ahead against fruitless cycles and every extra step counted, works on small groups
+    (0.67&ndash;0.89 of the plain walk, ideal 0.71) and fails on the largest: registered R1 falsified,
+    median 0.968 over the 7 rows with <code>N</code> &ge; 10<sup>5</sup>. The plain walk there is itself
+    at 1.82 and 2.10 against its 1.25 ideal. The reference is unchanged until that is understood; a
+    weakly mixed branch hash is the hypothesis under test next. And under the current &sect;5a and
+    &sect;12, every IC/rho ratio in this section is a <strong>lower-bound comparison, unranked</strong>:
+    neither arm emits its unpriced counters, and the hyperelliptic family is not yet in
+    <code>ecbench</code>. <span class="chip">accounting</span> Frozen source:
+    <a href="https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/round9/run5/R9.txt">round nine</a>.</p>
     <p><strong>Round eight tested the textbook remedy and it does not pay here.</strong> A
     reduced factor base with single large primes (Th&eacute;riault) was registered with per-row
     predictions and measured on 11 instances, including genus 2 up to <code>p</code> = 4001 where the
