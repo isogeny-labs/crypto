@@ -376,6 +376,74 @@ const D18_OBJECT_SHA256: &str = "347d465bef217ae5f76e9b664710440a735a26211bf3957
 const D18_POINT_SET_BLAKE3: &str =
     "8c1c245cda15bdd0019b487a5535a3b7eac642c259c4dc0bae25875d87d345b0";
 const D18_SOURCE_COMMIT: &str = "b901026b6b05cd1fe9b909620d6746a5a931520c";
+const PAIRED_CORPUS_SHA256: &str =
+    "760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd";
+const PAIRED_VALIDATION_SHA256: &str =
+    "1c6d3a45c8b4654ff208751258fa2e34f0cc60e1c30ba48e9214db62be60472f";
+
+fn file_sha256(path: &Path) -> Result<String> {
+    Ok(format!("{:x}", Sha256::digest(&fs::read(path)?)))
+}
+
+fn load_paired_base(
+    arm: &str,
+    root: &Path,
+    evidence_root: &Path,
+) -> Result<(PrimaryBase, Value, String, &'static str, &'static str)> {
+    match arm {
+        "U" => {
+            let (base, row, manifest_hash) =
+                load_panel_selected(root, 16_627, "public_x_hash", 2026100801)?;
+            if row["object"] != format!("objects/{K16627_OBJECT_BLAKE3}.jsonl.gz")
+                || row["point_set_blake3"] != K16627_POINT_SET_BLAKE3
+                || file_sha256(&root.join("manifest.json"))?
+                    != "0c09f62bde61d3c3e987644508c53ab56fd3f545219013b9bde925ba29969275"
+                || file_sha256(&root.join("replay.json"))?
+                    != "75b3bc17d8366e258e1b8f3f8de5f42911eb893c3d029a2e40c65b9e59cffe60"
+                || file_sha256(&root.join("upload-receipt.json"))?
+                    != "70e82dfef4ad735a6974b46a4d6bca726dba4cc68be5f35ca354fab3262b445b"
+                || file_sha256(&root.join("probe-corpus.json"))? != PAIRED_CORPUS_SHA256
+                || file_sha256(&root.join(format!("objects/{K16627_OBJECT_BLAKE3}.jsonl.gz")))?
+                    != "2457a977ea9c05a11cc60878bdb3b29f6d905dc8db9aa26e52913a702d308369"
+            {
+                return Err("uniform paired input differs from frozen panel".into());
+            }
+            Ok((
+                base,
+                row,
+                manifest_hash,
+                K16627_OBJECT_BLAKE3,
+                K16627_POINT_SET_BLAKE3,
+            ))
+        }
+        "D" => {
+            let (base, row) = load_d18_export(root, &evidence_root.join("export-v1"))?;
+            let imported: Value =
+                serde_json::from_slice(&fs::read(evidence_root.join("import-v1/import.json"))?)?;
+            if imported["schema"] != "n83.primary-d18-factor-base-adapter/v1"
+                || imported["status"] != "PASS"
+                || imported["object"] != row["object"]
+                || imported["point_set_blake3"] != D18_POINT_SET_BLAKE3
+                || imported["orbit_columns"] != 16_627
+                || imported["points"] != 2_760_082
+                || imported["selected_best_total_runtime"] != Value::Null
+            {
+                return Err("d18 paired import receipt differs".into());
+            }
+            let manifest_hash = blake3::hash(&fs::read(root.join("manifest.json"))?)
+                .to_hex()
+                .to_string();
+            Ok((
+                base,
+                row,
+                manifest_hash,
+                D18_OBJECT_BLAKE3,
+                D18_POINT_SET_BLAKE3,
+            ))
+        }
+        _ => Err("paired arm must be U or D".into()),
+    }
+}
 
 fn load_d18_export(export_root: &Path, evidence_root: &Path) -> Result<(PrimaryBase, Value)> {
     let manifest_bytes = fs::read(export_root.join("manifest.json"))?;
@@ -907,6 +975,8 @@ struct WitnessPhases {
     next_sequence: u32,
     source_commit: String,
     schema: &'static str,
+    object_blake3: &'static str,
+    point_set_blake3: &'static str,
 }
 
 impl WitnessPhases {
@@ -915,6 +985,8 @@ impl WitnessPhases {
         start: Instant,
         source_commit: String,
         schema: &'static str,
+        object_blake3: &'static str,
+        point_set_blake3: &'static str,
     ) -> Result<Self> {
         if output.exists() {
             return Err("complete-witness output already exists".into());
@@ -933,6 +1005,8 @@ impl WitnessPhases {
             next_sequence: 0,
             source_commit,
             schema,
+            object_blake3,
+            point_set_blake3,
         })
     }
 
@@ -947,8 +1021,8 @@ impl WitnessPhases {
             "elapsed_wall_ms":self.start.elapsed().as_secs_f64()*1000.0,
             "memory_current_bytes":memory_current_bytes,
             "source_commit":self.source_commit,
-            "object_blake3":K16627_OBJECT_BLAKE3,
-            "point_set_blake3":K16627_POINT_SET_BLAKE3,
+            "object_blake3":self.object_blake3,
+            "point_set_blake3":self.point_set_blake3,
             "details":details,
         });
         serde_json::to_writer(&mut self.file, &record)?;
@@ -1229,7 +1303,14 @@ fn chain_witness_impl(
     } else {
         "n83.k16627-m4-witness-phase/v1"
     };
-    let mut phases = WitnessPhases::create(output, start, source_commit.clone(), phase_schema)?;
+    let mut phases = WitnessPhases::create(
+        output,
+        start,
+        source_commit.clone(),
+        phase_schema,
+        K16627_OBJECT_BLAKE3,
+        K16627_POINT_SET_BLAKE3,
+    )?;
     let (base, base_row, manifest_hash) =
         load_panel_selected(root, 16_627, "public_x_hash", 2026100801)?;
     if base_row["object"] != format!("objects/{K16627_OBJECT_BLAKE3}.jsonl.gz")
@@ -2201,6 +2282,510 @@ pub(super) fn run_chain_cli(
         run_dir,
         Some(&config),
     )
+}
+
+/// Same native m=4 model and verifier for the two frozen K=16,627 point sets.
+/// The supervisor supplies the independent 1,800-second wall cap and the
+/// read-only, one-CPU, 4-GiB, zero-swap container envelope.
+pub(super) fn paired_orbit_cli(
+    mode: &str,
+    arm: &str,
+    root: &Path,
+    evidence_root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    if !["preflight", "positive", "natural"].contains(&mode) || !["U", "D"].contains(&arm) {
+        return Err("paired mode or arm outside frozen protocol".into());
+    }
+    if output.exists() {
+        return Err("paired output already exists".into());
+    }
+    let memory_limit_bytes = checked_cgroup_memory_limit(4096)?;
+    let (source_commit, source_attestation_mode) = frozen_chain_source()?;
+    let binary_sha256 = file_sha256(&std::env::current_exe()?)?;
+    let started = Instant::now();
+    let cap_path = PathBuf::from(format!("{}.cap.json", output.display()));
+    let cap_arm = arm.to_owned();
+    let cap_mode = mode.to_owned();
+    std::thread::spawn(move || {
+        std::thread::sleep(Duration::from_secs(1790));
+        let cap = json!({
+            "schema":"n83.paired-orbit-cap/v1", "status":"UNKNOWN_budget",
+            "arm":cap_arm, "mode":cap_mode,
+            "budget_seconds":1790,
+            "elapsed_process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
+            "selected_best_total_runtime":Value::Null
+        });
+        if write_new_json(&cap_path, &cap).is_err() {
+            std::process::exit(125);
+        }
+        std::process::exit(124);
+    });
+    let import_start = Instant::now();
+    let (base, row, manifest_hash, object_blake3, point_set_blake3) =
+        load_paired_base(arm, root, evidence_root)?;
+    let import_ms = import_start.elapsed().as_secs_f64() * 1000.0;
+    if file_sha256(&fixture_root.join("probe-corpus.json"))? != PAIRED_CORPUS_SHA256 {
+        return Err("paired public corpus differs".into());
+    }
+    let target_start = Instant::now();
+    let (public, corpus_hash) = public_target(fixture_root, &base.curve)?;
+    let target_validation_ms = target_start.elapsed().as_secs_f64() * 1000.0;
+    if planted_point_json(&public)
+        != json!({
+            "x_decimal":"1834913121178197242856238",
+            "y_decimal":"8797964190732846213981377"
+        })
+    {
+        return Err("paired public fixture point differs".into());
+    }
+    let fb = &base.factor_base;
+    if fb.points.len() != 2_760_082 || fb.signed_orbits.len() != 16_627 {
+        return Err("paired factor-base dimensions differ".into());
+    }
+    if mode == "preflight" {
+        let receipt = json!({
+            "schema":"n83.paired-orbit-worker/v1", "status":"PASS_PREFLIGHT",
+            "arm":arm, "mode":mode, "source_commit":source_commit,
+            "source_attestation_mode":source_attestation_mode,
+            "source_adapter_blake3":blake3::hash(include_bytes!("primary_adapter.rs")).to_hex().to_string(),
+            "source_example_blake3":blake3::hash(include_bytes!("../../examples/koblitz_n83_factor_base_export.rs")).to_hex().to_string(),
+            "binary_sha256":binary_sha256, "object_blake3":object_blake3,
+            "point_set_blake3":point_set_blake3, "manifest_blake3":manifest_hash,
+            "policy":row["policy"], "seed":row["seed"],
+            "public_corpus_blake3":corpus_hash, "public_point":planted_point_json(&public),
+            "columns":fb.signed_orbits.len(), "points":fb.points.len(),
+            "memory_cgroup_limit_bytes":memory_limit_bytes,
+            "base_import_ms":import_ms, "target_validation_ms":target_validation_ms,
+            "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
+            "solver_stage_executed":false,
+            "total_index_calculus_runtime_ms":Value::Null,
+            "selected_best_total_runtime":Value::Null
+        });
+        write_new_json(output, &receipt)?;
+        return Ok(receipt);
+    }
+
+    let prepare_start = Instant::now();
+    let representatives: Vec<BigUint> = fb
+        .signed_orbits
+        .iter()
+        .map(|orbit| match &fb.points[orbit[0]] {
+            BinaryPoint::Affine { x, .. } => Ok(x.to_biguint()),
+            BinaryPoint::Infinity => Err("paired orbit representative is infinity"),
+        })
+        .collect::<std::result::Result<_, _>>()?;
+    let mut positive_indices = None;
+    let mut positive_xs = None;
+    let mut positive_row = None;
+    let target = if mode == "positive" {
+        let indices: [usize; 4] = std::array::from_fn(|column| fb.signed_orbits[column][0]);
+        let mut sum = BinaryPoint::Infinity;
+        let mut partial = Vec::with_capacity(4);
+        let mut summand_xs = Vec::with_capacity(4);
+        for &index in &indices {
+            let BinaryPoint::Affine { x, .. } = &fb.points[index] else {
+                return Err("positive representative is infinity".into());
+            };
+            summand_xs.push(x.clone());
+            sum = base.curve.add(&sum, &fb.points[index]);
+            partial.push(sum.clone());
+        }
+        if partial
+            .iter()
+            .any(|point| !matches!(point, BinaryPoint::Affine { .. }))
+            || summand_xs
+                .iter()
+                .map(F2mElement::to_biguint)
+                .collect::<HashSet<_>>()
+                .len()
+                != 4
+        {
+            return Err("paired positive control is not affine and distinct".into());
+        }
+        let row = checked_primary_relation_row(&base.curve, fb, &indices, &sum)?;
+        let mut rank = WideRankTracker::new(&base.curve.subgroup_order, fb.unknowns());
+        let tamper = base.curve.add(&sum, base.curve.generator());
+        if rank.insert(row.clone()) != 1
+            || checked_primary_relation_row(&base.curve, fb, &indices, &tamper).is_ok()
+        {
+            return Err("paired positive group/rank/tamper preflight failed".into());
+        }
+        positive_indices = Some(indices);
+        positive_xs = Some((summand_xs, partial));
+        positive_row = Some(row);
+        sum
+    } else {
+        public.clone()
+    };
+    let BinaryPoint::Affine { x: target_x, .. } = &target else {
+        return Err("paired target is infinity".into());
+    };
+    let target_hash = blake3::hash(&serde_json::to_vec(&planted_point_json(&target))?)
+        .to_hex()
+        .to_string();
+    let preparation_ms = prepare_start.elapsed().as_secs_f64() * 1000.0;
+    let mut phases = WitnessPhases::create(
+        output,
+        started,
+        source_commit.clone(),
+        "n83.paired-orbit-phase/v1",
+        object_blake3,
+        point_set_blake3,
+    )?;
+    phases.mark(
+        "inputs_checked",
+        json!({
+            "arm":arm, "mode":mode, "binary_sha256":binary_sha256,
+            "target_blake3":target_hash, "public_corpus_blake3":corpus_hash,
+            "manifest_blake3":manifest_hash, "base_import_ms":import_ms,
+            "target_validation_ms":target_validation_ms,
+            "domain_preparation_ms":preparation_ms,
+        }),
+    )?;
+    let model_start = Instant::now();
+    let mut enc = ChainedS3Encoding::build(
+        4,
+        &base.curve.curve.irreducible,
+        &base.curve.curve.b,
+        Some(target_x),
+        0,
+        300_000,
+    )
+    .map_err(|_| "paired chained-S3 model build failed")?;
+    enc.constrain_frobenius_orbit_summands(&representatives, 300_000, 8_000_000)
+        .map_err(|_| "paired orbit-domain install failed")?;
+    let model_ms = model_start.elapsed().as_secs_f64() * 1000.0;
+    phases.mark(
+        "model_domain_done",
+        json!({
+            "model_ms":model_ms, "variables":enc.solver.n_vars(),
+            "clauses":enc.solver.n_clauses(), "xor_rows":enc.solver.n_xors(),
+        }),
+    )?;
+    let pin_start = Instant::now();
+    if let Some((summand_xs, partial)) = &positive_xs {
+        let mut pinned = summand_xs.clone();
+        for point in &partial[1..3] {
+            let BinaryPoint::Affine { x, .. } = point else {
+                return Err("positive partial sum is infinity".into());
+            };
+            pinned.push(x.clone());
+        }
+        // Four summands, x(S2), x(S3), x(target): seven named blocks.
+        let pinned = [
+            pinned[0].clone(),
+            pinned[1].clone(),
+            pinned[2].clone(),
+            pinned[3].clone(),
+            pinned[4].clone(),
+            pinned[5].clone(),
+            target_x.clone(),
+        ];
+        for (block, x) in pinned.iter().enumerate() {
+            enc.pin_x_block(block, x)
+                .map_err(|_| "positive x-block pin failed")?;
+        }
+        let mut sorted = representatives.clone();
+        sorted.sort_unstable();
+        let handles = enc
+            .orbit_choice_wires()
+            .ok_or("positive selector wires absent")?;
+        if handles.len() != 4 || sorted.windows(2).any(|pair| pair[0] == pair[1]) {
+            return Err("positive orbit selectors differ".into());
+        }
+        let mut choices = Vec::with_capacity(4);
+        for (slot, x) in summand_xs.iter().enumerate() {
+            let position = sorted
+                .binary_search(&x.to_biguint())
+                .map_err(|_| "positive representative missing")?;
+            let handle = &handles[slot];
+            if handle.selectors.len() != sorted.len() || handle.phase.len() != 7 {
+                return Err("positive selector wires differ".into());
+            }
+            choices.push((handle.selectors[position], handle.phase.clone()));
+        }
+        for (selector, phase) in choices {
+            if !enc.solver.add_clause(vec![selector as i32]) {
+                return Err("positive selector pin failed".into());
+            }
+            for wire in phase {
+                if !enc.solver.add_clause(vec![-(wire as i32)]) {
+                    return Err("positive phase-zero pin failed".into());
+                }
+            }
+        }
+        phases.mark(
+            "positive_choices_pinned",
+            json!({"selectors":4,"phases":28}),
+        )?;
+    }
+    let positive_pin_ms = if mode == "positive" {
+        pin_start.elapsed().as_secs_f64() * 1000.0
+    } else {
+        0.0
+    };
+    enc.solver.conflict_budget = 100_000;
+    enc.solver.deadline = Some(started + Duration::from_secs(1790));
+    phases.mark(
+        "root_propagation_entered",
+        json!({"stats":root_phase_stats(&enc.solver.stats)}),
+    )?;
+    let root_start = Instant::now();
+    let root_result = enc.solver.propagate_root();
+    let root_ms = root_start.elapsed().as_secs_f64() * 1000.0;
+    phases.mark(
+        "root_propagation_returned",
+        json!({
+            "result":format!("{root_result:?}"), "root_ms":root_ms,
+            "stats":root_phase_stats(&enc.solver.stats),
+        }),
+    )?;
+    let search_start = Instant::now();
+    let answer = if root_result == RootPropagationResult::Unsat {
+        SolveResult::Unsat
+    } else {
+        phases.mark(
+            "sat_entered",
+            json!({"conflict_budget":100_000,"max_models":1}),
+        )?;
+        let progress = Arc::new(SolverProgress::default());
+        enc.solver.set_progress_observer(Arc::clone(&progress));
+        let sampler = ProgressSampler::start(
+            output,
+            started,
+            "n83.paired-orbit-progress/v1",
+            source_commit.clone(),
+            object_blake3,
+            point_set_blake3,
+            progress,
+        )?;
+        let result = enc.solver.solve();
+        sampler.finish()?;
+        result
+    };
+    let search_ms = search_start.elapsed().as_secs_f64() * 1000.0;
+    phases.mark(
+        "sat_returned",
+        json!({
+            "answer":format!("{answer:?}"), "search_ms":search_ms,
+            "conflicts":enc.solver.conflicts(),
+        }),
+    )?;
+    let mut relation = Value::Null;
+    let mut relation_check_ms = 0.0;
+    let mut rank_ms = 0.0;
+    let status = match answer {
+        SolveResult::Unknown => "UNKNOWN_search_cap",
+        SolveResult::Unsat if mode == "positive" => "INVALID_POSITIVE_CONTROL",
+        SolveResult::Unsat => "UNVERIFIED_MODEL_UNSAT",
+        SolveResult::Sat => {
+            let checked = Instant::now();
+            let xs = enc.decode_x_blocks();
+            let result = if !enc.verify_model() || xs.len() != 7 || xs[6] != *target_x {
+                "INVALID_MODEL"
+            } else if let Some((indices, row)) =
+                checked_four_x_lift(&base.curve, fb, &xs[..4], &target)?
+            {
+                let rank_start = Instant::now();
+                let mut rank = WideRankTracker::new(&base.curve.subgroup_order, fb.unknowns());
+                let rank_after_insert = rank.insert(row.clone());
+                rank_ms = rank_start.elapsed().as_secs_f64() * 1000.0;
+                let changed_target = base.curve.add(&target, base.curve.generator());
+                let tamper_rejected =
+                    checked_primary_relation_row(&base.curve, fb, &indices, &changed_target)
+                        .is_err();
+                let dense: Vec<_> = row.iter().map(ToString::to_string).collect();
+                relation = json!({
+                    "point_indices":indices,
+                    "dense_decimal_blake3":blake3::hash(&serde_json::to_vec(&dense)?).to_hex().to_string(),
+                    "rank_after_insert":rank_after_insert,
+                    "group_verified":true, "tamper_rejected":tamper_rejected,
+                    "matches_constructed_row":positive_row.as_ref().map(|prior| prior == &row),
+                    "matches_constructed_indices":positive_indices.map(|prior| prior == indices),
+                });
+                phases.mark("relation_checked", relation.clone())?;
+                if rank_after_insert != 1 || !tamper_rejected {
+                    "INVALID_RELATION"
+                } else if mode == "positive" && positive_row.as_ref() != Some(&row) {
+                    "INVALID_POSITIVE_CONTROL"
+                } else if mode == "positive" {
+                    "PASS_CONSTRUCTED_CONTROL"
+                } else {
+                    "PASS_NATURAL_RELATION_PENDING_REPLAY"
+                }
+            } else {
+                "INVALID_GROUP_LIFT"
+            };
+            relation_check_ms = checked.elapsed().as_secs_f64() * 1000.0 - rank_ms;
+            result
+        }
+    };
+    let memory_cgroup_peak_bytes: u64 = fs::read_to_string(cgroup_v2_file("memory.peak")?)?
+        .trim()
+        .parse()?;
+    let receipt = json!({
+        "schema":"n83.paired-orbit-worker/v1", "status":status,
+        "arm":arm, "mode":mode, "source_commit":source_commit,
+        "source_attestation_mode":source_attestation_mode,
+        "source_adapter_blake3":blake3::hash(include_bytes!("primary_adapter.rs")).to_hex().to_string(),
+        "source_example_blake3":blake3::hash(include_bytes!("../../examples/koblitz_n83_factor_base_export.rs")).to_hex().to_string(),
+        "binary_sha256":binary_sha256, "object_blake3":object_blake3,
+        "point_set_blake3":point_set_blake3, "manifest_blake3":manifest_hash,
+        "policy":row["policy"], "seed":row["seed"],
+        "public_corpus_blake3":corpus_hash, "target_blake3":target_hash,
+        "target":planted_point_json(&target),
+        "columns":fb.signed_orbits.len(), "points":fb.points.len(),
+        "base_import_ms":import_ms, "target_validation_ms":target_validation_ms,
+        "domain_preparation_ms":preparation_ms, "model_domain_ms":model_ms,
+        "positive_pin_ms":positive_pin_ms, "root_propagation_ms":root_ms,
+        "search_ms":search_ms, "relation_check_ms":relation_check_ms,
+        "rank_ms":rank_ms, "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
+        "process_usage":process_usage(), "memory_cgroup_limit_bytes":memory_limit_bytes,
+        "memory_cgroup_peak_bytes":memory_cgroup_peak_bytes,
+        "sat_variables":enc.solver.n_vars(), "sat_clauses":enc.solver.n_clauses(),
+        "sat_xor_rows":enc.solver.n_xors(), "relation":relation,
+        "candidate_id":Value::Null,
+        "total_index_calculus_runtime_ms":Value::Null,
+        "selected_best_total_runtime":Value::Null
+    });
+    write_new_json(output, &receipt)?;
+    Ok(receipt)
+}
+
+/// A separate process rereads the exact base and worker result before a
+/// returned row can count as a natural relation or positive control.
+pub(super) fn paired_relation_replay_cli(
+    arm: &str,
+    root: &Path,
+    evidence_root: &Path,
+    fixture_root: &Path,
+    worker_path: &Path,
+    output: &Path,
+) -> Result<Value> {
+    if output.exists() {
+        return Err("paired replay output already exists".into());
+    }
+    let (source_commit, source_attestation_mode) = frozen_chain_source()?;
+    let started = Instant::now();
+    let (base, row, manifest_hash, object_blake3, point_set_blake3) =
+        load_paired_base(arm, root, evidence_root)?;
+    let worker: Value = serde_json::from_slice(&fs::read(worker_path)?)?;
+    let mode = worker["mode"].as_str().ok_or("paired worker mode absent")?;
+    if !["positive", "natural"].contains(&mode)
+        || worker["schema"] != "n83.paired-orbit-worker/v1"
+        || worker["arm"] != arm
+        || worker["status"]
+            != if mode == "positive" {
+                "PASS_CONSTRUCTED_CONTROL"
+            } else {
+                "PASS_NATURAL_RELATION_PENDING_REPLAY"
+            }
+        || worker["object_blake3"] != object_blake3
+        || worker["point_set_blake3"] != point_set_blake3
+        || worker["manifest_blake3"] != manifest_hash
+        || worker["policy"] != row["policy"]
+        || worker["seed"] != row["seed"]
+        || worker["source_commit"]
+            .as_str()
+            .is_none_or(|commit| commit.len() != 40)
+        || worker["source_adapter_blake3"]
+            != blake3::hash(include_bytes!("primary_adapter.rs"))
+                .to_hex()
+                .to_string()
+        || worker["source_example_blake3"]
+            != blake3::hash(include_bytes!(
+                "../../examples/koblitz_n83_factor_base_export.rs"
+            ))
+            .to_hex()
+            .to_string()
+        || worker["selected_best_total_runtime"] != Value::Null
+    {
+        return Err("paired worker identity or success receipt differs".into());
+    }
+    let (public, corpus_hash) = public_target(fixture_root, &base.curve)?;
+    if file_sha256(&fixture_root.join("probe-corpus.json"))? != PAIRED_CORPUS_SHA256
+        || worker["public_corpus_blake3"] != corpus_hash
+    {
+        return Err("paired replay public corpus differs".into());
+    }
+    let fb = &base.factor_base;
+    let target = if mode == "positive" {
+        (0..4).fold(BinaryPoint::Infinity, |sum, column| {
+            base.curve
+                .add(&sum, &fb.points[fb.signed_orbits[column][0]])
+        })
+    } else {
+        public
+    };
+    let target_hash = blake3::hash(&serde_json::to_vec(&planted_point_json(&target))?)
+        .to_hex()
+        .to_string();
+    if worker["target"] != planted_point_json(&target) || worker["target_blake3"] != target_hash {
+        return Err("paired replay target differs".into());
+    }
+    let stored = worker["relation"]["point_indices"]
+        .as_array()
+        .ok_or("paired point indices absent")?;
+    if stored.len() != 4 {
+        return Err("paired point count differs".into());
+    }
+    let mut indices = [0usize; 4];
+    for (slot, value) in stored.iter().enumerate() {
+        indices[slot] = usize::try_from(value.as_u64().ok_or("paired point index absent")?)?;
+        if indices[slot] >= fb.points.len() {
+            return Err("paired point index outside base".into());
+        }
+    }
+    let checked = Instant::now();
+    let dense = checked_primary_relation_row(&base.curve, fb, &indices, &target)?;
+    let dense_strings: Vec<_> = dense.iter().map(ToString::to_string).collect();
+    let dense_hash = blake3::hash(&serde_json::to_vec(&dense_strings)?)
+        .to_hex()
+        .to_string();
+    let mut rank = WideRankTracker::new(&base.curve.subgroup_order, fb.unknowns());
+    let rank_after_insert = rank.insert(dense.clone());
+    let mut changed_indices = indices;
+    changed_indices[0] ^= 1;
+    let changed_point_rejected =
+        checked_primary_relation_row(&base.curve, fb, &changed_indices, &target).is_err();
+    let mut changed_row = dense;
+    changed_row[0] = (&changed_row[0] + BigUint::one()) % &base.curve.subgroup_order;
+    let changed_strings: Vec<_> = changed_row.iter().map(ToString::to_string).collect();
+    let changed_row_rejected = blake3::hash(&serde_json::to_vec(&changed_strings)?)
+        .to_hex()
+        .as_str()
+        != worker["relation"]["dense_decimal_blake3"]
+            .as_str()
+            .ok_or("paired dense row digest absent")?;
+    if worker["relation"]["dense_decimal_blake3"] != dense_hash
+        || worker["relation"]["rank_after_insert"] != 1
+        || rank_after_insert != 1
+        || !changed_point_rejected
+        || !changed_row_rejected
+    {
+        return Err("paired relation, rank or tamper replay failed".into());
+    }
+    let receipt = json!({
+        "schema":"n83.paired-orbit-replay/v1", "status":"PASS",
+        "arm":arm, "mode":mode, "replay_source_commit":source_commit,
+        "worker_source_commit":worker["source_commit"],
+        "source_attestation_mode":source_attestation_mode,
+        "worker_sha256":file_sha256(worker_path)?,
+        "object_blake3":object_blake3, "point_set_blake3":point_set_blake3,
+        "target_blake3":target_hash, "point_indices":indices,
+        "dense_decimal_blake3":dense_hash, "rank_after_insert":rank_after_insert,
+        "changed_point_rejected":changed_point_rejected,
+        "changed_row_rejected":changed_row_rejected,
+        "relation_replay_ms":checked.elapsed().as_secs_f64()*1000.0,
+        "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
+        "candidate_id":Value::Null,
+        "total_index_calculus_runtime_ms":Value::Null,
+        "selected_best_total_runtime":Value::Null
+    });
+    write_new_json(output, &receipt)?;
+    Ok(receipt)
 }
 
 #[allow(clippy::too_many_arguments)]
