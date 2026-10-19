@@ -3,19 +3,9 @@
 
 import hashlib
 import json
-import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-# This experiment also has select.py; load the standard extension before a
-# direct script invocation can shadow it during subprocess polling.
-if Path(sys.path[0]).resolve() == HERE:
-    script_path = sys.path.pop(0)
-    import select  # noqa: F401
-    import subprocess
-    sys.path.insert(0, script_path)
-else:
-    import subprocess
 ROOT = HERE.parents[1]
 AUDIT = HERE / "fresh_exclusion_audit.json"
 FINALISTS_HEAD = "9b9a0f3842de6cf921e38573cb99fcaed2a4683c"
@@ -57,12 +47,12 @@ def audit():
                             "sha256": digest(blob), "point_rows": len(rows)})
         prior_points.update(rows)
     prior_overlap = len(set(new) & prior_points)
-    complete = subprocess.run(
-        ["git", "show", f"{FINALISTS_HEAD}:{FINALISTS_PATH}"],
-        cwd=ROOT, capture_output=True, check=True)
-    if digest(complete.stdout) != FINALISTS_SHA256:
-        raise ValueError("live finalist fixture hash differs")
-    finalist_rows = points(complete.stdout)
+    # Preserve the historical fixture bytes in this checkout. The original
+    # source commit may not be present in a shallow Actions checkout.
+    complete = (HERE / "historical_finalist_targets.jsonl").read_bytes()
+    if digest(complete) != FINALISTS_SHA256:
+        raise ValueError("historical finalist fixture hash differs")
+    finalist_rows = points(complete)
     finalist_overlap = len(set(new) & set(finalist_rows))
     result = {
         "schema": "n83.final-extended-exclusion/v1",

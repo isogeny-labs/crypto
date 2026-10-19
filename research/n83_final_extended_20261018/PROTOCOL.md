@@ -19,6 +19,14 @@ and zero overlap with the separately archived 32-point finalist fixture.
 The target-file SHA-256 is
 `10a0cb758b3dfcff8b79e06a2437c3786ee03049dba7e096e7858024cdd9e811`.
 
+The 32-point finalist fixture is retained byte-for-byte in
+[`historical_finalist_targets.jsonl`](historical_finalist_targets.jsonl),
+from commit `9b9a0f3842de6cf921e38573cb99fcaed2a4683c` at
+`research/n83_root11_finalists_tier1_20261017/targets.jsonl`. Its SHA-256 is
+`4eb139e73c99f0921041a911d30698997913d1e71155a8e09035ffa647e02a58`.
+The exclusion audit checks those bytes before comparing points, so the sealed
+runner needs only the current shallow checkout.
+
 The exact implementation is the same IC source as the six-arm panel:
 SHA-256 `4a94e4e570f0cc4e39ba5c0846e411a6c43820c28119f7b9802e549023596507`.
 All arms use `KIC_INDEX_ROOT_BATCH=1`, two target workers, cooperative
