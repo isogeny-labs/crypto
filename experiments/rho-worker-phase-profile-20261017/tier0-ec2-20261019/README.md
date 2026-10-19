@@ -23,15 +23,27 @@ Graviton 2 or later. It produced zero benchmark arms. The replacement x86
 host was launched after the first host released its quota; the panel remains
 unmeasured until it passes the strict preflight.
 
-The frozen source archive SHA-256 is
+The frozen [source archive](source-64.tar.gz) SHA-256 is
 `f32992105d47d63c78a7ba5bb02021ba6ba150e4c388cec55715b979d697f722`.
 It was built from PR #2137 with optional `CHECKIN_EVERY=64`, so the requested
 batch width 32 is reachable. The 32 public Q fixtures retain SHA-256
 `f46ad43788b7f9241927904541cbeb03ea70a96ca95aa84d527a9b22ba8d12b8`.
 The replacement host rebuilt the binary with SHA-256
 `4882b89d974e27bf9073272cdcc461e1bc33162fd9bb0caf93fd554ae309dce2`.
-Before isolation, an untimed serial q00 wrapper check returned
+The [build log](build.log) records the release build. Before isolation, an
+[untimed serial q00 wrapper check](q00-serial-smoke.txt) returned
 `verified=1`, 128 walkers, and `checkin_every=64`.
+
+The complete [worker plan](worker-plan.json) SHA-256 is
+`237a24501204b69208eb4467151eeca088887b4d896bcd326c02edc9de0bd0d3`;
+the strict [host manifest](manifest.json) SHA-256 is
+`a24f3fb6b703a99d99910238a8c9e8899ddac83d4f89540dd985fadce5de0cfc`.
+The [host probe](host-probe.json), [configuration log](configure-host.log),
+and [strict preflight](preflight.json) were captured after the isolation
+reboot. Preflight passed with no problems: `cpuset.cpus.partition=isolated`
+on CPUs `23,47`, zero effective IRQ overlaps, no CPU quota, physical host
+detection, NUMA node 1, and 3,800,000 kHz `performance` min/max readbacks
+on both benchmark CPUs.
 
 The [wrapper](worker_wrapper.py) checks every worker's exact DP replay and
 charged phase sum, and exposes the raw worker JSON to the strict host runner.
