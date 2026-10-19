@@ -3382,6 +3382,45 @@ fn analyze5(dir: &str) {
             / rs.len() as f64
     };
 
+    // A SIGKILL the harness did not send (it sends one only at the hard
+    // wall limit, recorded as `timeout`) is attributed from the kernel log
+    // copied beside the rows, if one is there.
+    let oom = |file: &str| -> Option<String> {
+        let log = std::fs::read_to_string(format!("{dir}/{file}")).ok()?;
+        let kills = log
+            .lines()
+            .filter(|l| l.contains("Memory cgroup out of memory: Killed process"))
+            .count();
+        let lim = log
+            .lines()
+            .find(|l| l.contains("] memory: usage"))
+            .and_then(|l| l.split("limit ").nth(1))
+            .and_then(|x| x.split(',').next())
+            .unwrap_or("?")
+            .to_string();
+        Some(format!(
+            "memory cgroup: {kills} kernel OOM kills at the cgroup limit {lim} (below ulimit -v; {file})"
+        ))
+    };
+    let limit = |rs: &[&Value], dmesg: &str| -> String {
+        let mut v: Vec<String> = rs
+            .iter()
+            .filter(|r| r["status"] != "ok")
+            .map(|r| {
+                let why = r["failure_reason"].as_str().unwrap_or("");
+                if why.contains("memory") {
+                    "memory (ulimit -v)".to_string()
+                } else if why.contains("signal: 9") {
+                    oom(dmesg).unwrap_or_else(|| "SIGKILL from outside the harness".into())
+                } else {
+                    r["status"].as_str().unwrap_or("?").to_string()
+                }
+            })
+            .collect();
+        v.dedup();
+        v.join(",")
+    };
+
     // Series. A0: F4 + L1 (L1 re-measures C2's A0 systems under the raised
     // limits, so C2's aborted rows do not enter). A11: F4 + C2 + L2.
     let a0: Vec<&Value> = f4("A0").into_iter().chain(l1.iter().copied()).collect();
@@ -3441,7 +3480,8 @@ fn analyze5(dir: &str) {
         println!("  R2: NOT DECIDED (L2 has {} of 2 rows)", l2.len());
     } else {
         println!(
-            "  L2 hit a limit (rows above); the {n11}-cell verdicts stand: κ = {} ({}), σ = {} ({})",
+            "  L2 did not complete (limit: {}); the {n11}-cell verdicts stand: κ = {} ({}), σ = {} ({})",
+            limit(&l2, "L2-A11-m4-t5.dmesg.txt"),
             k11.map_or("-".into(), |x| format!("{x:.3}")),
             kappa_verdict(n11, k11, 4),
             s11.map_or("-".into(), |x| format!("{x:.4}")),
@@ -3458,22 +3498,6 @@ fn analyze5(dir: &str) {
 
     println!();
     println!("════ Predictions scorecard (Amendment 5)");
-    let limit = |rs: &[&Value]| -> String {
-        let mut v: Vec<String> = rs
-            .iter()
-            .filter(|r| r["status"] != "ok")
-            .map(|r| {
-                let why = r["failure_reason"].as_str().unwrap_or("");
-                if why.contains("memory") {
-                    "memory".to_string()
-                } else {
-                    r["status"].as_str().unwrap_or("?").to_string()
-                }
-            })
-            .collect();
-        v.dedup();
-        v.join(",")
-    };
     let l1_mem = l1.iter().any(|r| {
         r["failure_reason"]
             .as_str()
@@ -3481,7 +3505,11 @@ fn analyze5(dir: &str) {
     });
     println!(
         "  L1: A0 aborts for memory again: completed {l1_done}, limit {}  →  {}",
-        if l1_done { "none".into() } else { limit(&l1) },
+        if l1_done {
+            "none".into()
+        } else {
+            limit(&l1, "L1-A0-m4-t4.dmesg.txt")
+        },
         if l1.len() < 2 {
             "not decided"
         } else if !l1_done && l1_mem {
@@ -3497,15 +3525,21 @@ fn analyze5(dir: &str) {
     });
     println!(
         "  L2: A11 does not complete within 14.5 GB: completed {l2_done}, limit {}  →  {}",
-        if l2_done { "none".into() } else { limit(&l2) },
+        if l2_done {
+            "none".into()
+        } else {
+            limit(&l2, "L2-A11-m4-t5.dmesg.txt")
+        },
         if l2.len() < 2 {
             "not decided"
         } else if l2_done {
             "did not hold"
         } else if l2_mem {
             "held"
+        } else if oom("L2-A11-m4-t5.dmesg.txt").is_some() {
+            "not decided as registered (did not complete, but the binding limit was the host's memory cgroup, below the registered 14.5 GB)"
         } else {
-            "held in part (did not complete, but the limit was time, not memory)"
+            "held in part (did not complete, but the limit was not memory)"
         }
     );
 }
