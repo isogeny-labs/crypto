@@ -474,3 +474,40 @@ without it. A system that hits a limit is recorded with its reason.
   (σ = 0.6, *no middle ground*).
 - T2, `m = 4`: does not complete within the limits. Round 2's random-target
   system at this cell ran out of memory after 29 minutes at 14 GB.
+
+### Amendment 7, 2026-10-19: the `m = 3`, `t = 5` cell on p₂ (T3), before any of its rows
+
+Registered by the experiment lane before any T3 row exists. It replicates
+the one cell where A11 and A0 differ most (T2 and F3: A11 D = 5, A0 D = 7)
+on the second prime, as §5 requires of a reading before it is described as
+more than single-prime. It changes no committed row, verdict, threshold,
+decision rule or prediction.
+
+**T3a, admission of the tower engine on p₂.** Amendment 6 admitted the
+engine on p₁ only. Every completed planted A0 system on p₂ (F1: `m = 2`,
+`t = 2–9` and `m = 3`, `t = 2–4`; 22 systems) is measured again on
+`f4_fp_tower`, under its committed limits. The engine is **admitted on p₂**
+if all 22 complete with the committed D, do not derive 1, and keep their
+planted solution. If any fails, T3b is not run and the failures are
+reported.
+
+**T3b, the cell (only if admitted).** A0 on the tower engine and A11 on
+`f4_fp`, `m = 3`, `t = 5`, p₂ = 2013265921, 2 planted targets each, F4
+budget 3600 s, hard kill 3900 s, `ulimit -v 15000000`, seeds as in
+Amendment 2 (p₂ index), no G2 rule (as F1). A system that hits a limit is
+recorded with its reason. A cell joins a series only if both of its
+systems complete.
+
+**Decision rules.**
+- *The gap replicates* if both cells complete and each arm's cell D on p₂
+  equals its p₁ cell D (A0: 7, A11: 5). *Fails to replicate* if a completed
+  cell's D differs from its p₁ value. *Inconclusive* if a cell does not
+  complete.
+- Per §1, σ on p₂ for `m = 3` over each arm's completed cells (F1's
+  `t = 2–4` plus the T3 cell), reported with and without the cell.
+
+**Predictions.** Both cells complete (A0 about 380 s and A11 about 570 s
+per system on p₁), with D = 7 and D = 5. The gap replicates. A0's `m = 3`
+σ on p₂ is 0.6000 on 4 cells (*no middle ground*), and A11's is 0.3000 on 4
+(*weak*). The basis is that all 44 systems completed on both primes so far
+have equal D (Amendment 2 report), not a new argument.

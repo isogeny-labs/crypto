@@ -2565,7 +2565,7 @@ fn group_of(file: &str) -> &str {
     match file.get(..3) {
         Some(
             g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-" | "G1-" | "T1-"
-            | "T2-"),
+            | "T2-" | "T3-"),
         ) => &g[..2],
         _ => "p1",
     }
@@ -2718,37 +2718,48 @@ fn analyze_g1(dir: &str) {
 /// beside A11's (F3).
 fn analyze_tower(dir: &str) {
     let rows = read_rows(dir);
-    println!(
-        "Factor-base designs, Amendment 6 (T1, T2): A0 on the sparse tower engine; rows from {dir}"
-    );
-    let t1: Vec<&Value> = rows
-        .iter()
-        .filter(|(f, _)| group_of(f) == "T1")
-        .map(|(_, r)| r)
-        .collect();
-    let matched = t1.iter().filter(|r| r["admission_match"] == true).count();
-    let admitted = !t1.is_empty() && matched == t1.len() && t1.len() == 26;
-    println!();
-    println!(
-        "T1, admission: {matched} of {} systems complete on the tower engine with the committed D,",
-        t1.len()
-    );
-    println!(
-        "  no derived 1 and the planted solution kept (26 required)  →  {}",
-        if admitted { "ADMITTED" } else { "NOT ADMITTED" }
-    );
-    for r in t1.iter().filter(|r| r["admission_match"] != true) {
+    println!("Factor-base designs, Amendments 6 and 7 (T1, T2, T3): A0 on the sparse tower engine; rows from {dir}");
+    let mut admitted_p: [bool; 2] = [false; 2];
+    for (prime, need) in [(0usize, 26usize), (1, 22)] {
+        let t1: Vec<&Value> = rows
+            .iter()
+            .filter(|(f, r)| group_of(f) == "T1" && row_prime(r) == prime)
+            .map(|(_, r)| r)
+            .collect();
+        if t1.is_empty() {
+            continue;
+        }
+        let matched = t1.iter().filter(|r| r["admission_match"] == true).count();
+        admitted_p[prime] = matched == t1.len() && t1.len() == need;
+        println!();
         println!(
-            "  mismatch: {} m={} t={} target={}: tower D {} vs {}, {}",
-            r["admission_of"],
-            r["m"],
-            r["t"],
-            r["target"],
-            r["D"],
-            r["committed"]["D"],
-            r["status"]
+            "{} admission at {}: {matched} of {} systems complete on the tower engine with the committed D,",
+            if prime == 0 { "T1" } else { "T3a" },
+            prime_label(prime),
+            t1.len()
         );
+        println!(
+            "  no derived 1 and the planted solution kept ({need} required)  →  {}",
+            if admitted_p[prime] {
+                "ADMITTED"
+            } else {
+                "NOT ADMITTED"
+            }
+        );
+        for r in t1.iter().filter(|r| r["admission_match"] != true) {
+            println!(
+                "  mismatch: {} m={} t={} target={}: tower D {} vs {}, {}",
+                r["admission_of"],
+                r["m"],
+                r["t"],
+                r["target"],
+                r["D"],
+                r["committed"]["D"],
+                r["status"]
+            );
+        }
     }
+    analyze_t3(&rows);
     let t2_3 = cells2(&rows, "T2", "A0", 3);
     let t2_4 = cells2(&rows, "T2", "A0", 4);
     if t2_3.is_empty() && t2_4.is_empty() {
@@ -2791,6 +2802,58 @@ fn analyze_tower(dir: &str) {
             x.d_mean() - y.d_mean()
         );
     }
+}
+
+/// Amendment 7: the `m = 3`, `t = 5` cell on p₂ (A0 on the tower engine, A11
+/// on `f4_fp`) against its p₁ values, and the p₂ σ fits with the cell.
+fn analyze_t3(rows: &[(String, Value)]) {
+    let a0 = cells2(rows, "T3", "A0", 3);
+    let a11 = cells2(rows, "T3", "A11", 3);
+    if a0.is_empty() && a11.is_empty() {
+        return;
+    }
+    println!();
+    println!("════ T3: m = 3, t = 5 on p2 (A0 on the tower engine, A11 on f4_fp)");
+    show_series("T3 A0 m = 3 t = 5 p2", &a0);
+    show_series("T3 A11 m = 3 t = 5 p2", &a11);
+    let p1_d =
+        |a: &str, g: &str| -> Option<f64> { find(&cells2(rows, g, a, 3), 5).map(|x| x.d_mean()) };
+    let (p1_a0, p1_a11) = (p1_d("A0", "T2"), p1_d("A11", "F3"));
+    println!();
+    println!(
+        "p1 cell D (T2, F3): A0 {}, A11 {}",
+        p1_a0.map_or("-".into(), |d| format!("{d:.1}")),
+        p1_a11.map_or("-".into(), |d| format!("{d:.1}"))
+    );
+    let verdict = match (find(&a0, 5), find(&a11, 5), p1_a0, p1_a11) {
+        (Some(x), Some(y), Some(px), Some(py)) => {
+            if x.d_mean() == px && y.d_mean() == py {
+                "THE GAP REPLICATES (each arm's p2 cell D equals its p1 cell D)"
+            } else {
+                "FAILS TO REPLICATE (a completed cell's D differs from its p1 value)"
+            }
+        }
+        _ => "INCONCLUSIVE (a cell did not complete)",
+    };
+    println!("T3 rule: {verdict}");
+    for (a, t3) in [("A0", &a0), ("A11", &a11)] {
+        let mut base = cells2(rows, "F1", a, 3);
+        println!();
+        show_series(&format!("{a} m = 3 p2, F1 cells only"), &base);
+        base.retain(|c| c.complete() || !t3.iter().any(|e| e.t == c.t));
+        base.extend(t3.iter().map(|c| Cell2 {
+            t: c.t,
+            b: c.b,
+            d: c.d.clone(),
+            cols: c.cols.clone(),
+            time: c.time.clone(),
+            status: c.status.clone(),
+            shape: c.shape,
+        }));
+        base.sort_by_key(|c| c.t);
+        show_series(&format!("{a} m = 3 p2, with the T3 cell"), &base);
+    }
+    println!("  (the width slopes above mix engines for A0 and are not used)");
 }
 
 fn analyze2(dir: &str) {
@@ -3093,13 +3156,20 @@ fn completed_rows<'a>(rows: &'a [(String, Value)], groups: &[&str]) -> Vec<&'a (
 /// the tower engine, in a child under the committed row's own limits. The
 /// engine is admitted if every system completes with the committed D, does
 /// not derive 1 and keeps its planted solution. Returns the verdict.
-fn admit_tower(dir: &str, out: &str) -> bool {
+fn admit_tower(dir: &str, out: &str, prime: usize) -> bool {
     let rows = read_rows(dir);
-    let sel: Vec<&(String, Value)> = completed_rows(&rows, &["p1", "F4"])
+    // p₁ (Amendment 6, T1): the first run and F4, 26 systems. p₂
+    // (Amendment 7, T3a): F1's A0 series, 22 systems.
+    let (groups, need): (&[&str], usize) = if prime == 0 {
+        (&["p1", "F4"], 26)
+    } else {
+        (&["F1"], 22)
+    };
+    let sel: Vec<&(String, Value)> = completed_rows(&rows, groups)
         .into_iter()
         .filter(|(f, r)| {
             r["arm"] == "A0"
-                && row_prime(r) == 0
+                && row_prime(r) == prime
                 && match group_of(f) {
                     "F4" => r["m"] == 4 && r["t"].as_u64().unwrap_or(99) <= 3,
                     _ => r["m"] == 2 || r["m"] == 3,
@@ -3120,8 +3190,9 @@ fn admit_tower(dir: &str, out: &str) -> bool {
         .expect("open log");
     writeln!(
         log,
-        "== T1 (Amendment 6): {} A0 systems on the tower engine; commit {commit}, started {}",
+        "== T1/T3a (Amendments 6, 7): {} A0 systems on the tower engine at {}; commit {commit}, started {}",
         sel.len(),
+        prime_label(prime),
         utc_now()
     )
     .ok();
@@ -3141,7 +3212,7 @@ fn admit_tower(dir: &str, out: &str) -> bool {
             vmem_kb: c["ulimit_v_kb"].as_u64().unwrap_or(13_000_000),
             grace: if budget > 300 { 300 } else { 120 },
             out_dir: dir.to_string(),
-            prime: 0,
+            prime,
             file: String::new(),
             distinct: c["distinct_targets"] == true,
             tower: true,
@@ -3177,7 +3248,7 @@ fn admit_tower(dir: &str, out: &str) -> bool {
         file.flush().ok();
         log.flush().ok();
     }
-    let admitted = fails.is_empty() && sel.len() == 26;
+    let admitted = fails.is_empty() && sel.len() == need;
     let msg = format!(
         "== T1: {} of {} systems match{}; {}; ended {}",
         sel.len() - fails.len(),
@@ -3906,7 +3977,8 @@ fn main() {
         "admit-tower" => {
             let dir = args.get(1).expect("a runs directory");
             let out = flag(&args, "--file").unwrap_or_else(|| "T1-admission".into());
-            if !admit_tower(dir, &out) {
+            let prime = flag(&args, "--prime").map_or(0, |s| parse_prime(&s));
+            if !admit_tower(dir, &out, prime) {
                 std::process::exit(1);
             }
         }
