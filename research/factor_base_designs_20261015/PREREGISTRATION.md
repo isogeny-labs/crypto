@@ -335,3 +335,213 @@ cells per arm. Nothing yet says which part of A11 makes it cheaper.
 **Predictions.** C1: every arm cost-unfavourable at m ∈ {2, 3}. C2: A11's
 cell completes and A0's does not. C3: p₃ admitted. C4: the curve relation
 carries it.
+
+### Amendment 6, 2026-10-19: E-K1, a Gauss-period window in `s = x + 1/x` on Koblitz analogues, before any of its rows
+
+Registered by the E-K1 lane (`examples/fb_koblitz_ek1.rs`) before any row of
+`runs/K1-*` exists. §4 left E-K1 "designed, not run; gets its own amendment
+before running"; this is that amendment. **Numbering and the score.**
+Amendment 5, appended in another checkout and merged with this one by the
+coordinator, makes κ = Δlog₂ field_ops/Δb the primary score for every later
+round. This amendment follows that rule: κ is primary here, σ is secondary.
+The text of this amendment does not depend on Amendment 5's wording; it
+restates κ, the break-even `m − 1` and Amendment 4's thresholds below. It
+changes no earlier row, verdict, threshold or prediction.
+
+**Why E-K1 needs a design of its own.** The instrument of §2 is `f4_fp` over
+`F_p`. E-K1 lives in characteristic 2, on the Weil restriction of a
+summation polynomial over `F_{2^n}`, so the engine is the repository's Boolean
+F4 (below). The prime-field arms, seeds and budgets are not reused, but the
+rules of §1, Amendment 1 item 4–5 (completed cell, stop at the first limit) and
+Amendment 4 (κ, trace replay) are, with the changes stated here.
+
+**1. Exact facts established before any measurement** (class: exact
+computation; the harness subcommand `check` proves each one or aborts, and its
+log is `runs/K1-check.txt`).
+
+1. *The s-line polynomial is Semaev's polynomial in `x`.* Write
+   `w = u² + u` with `u = 1/(x + 1)`, so `s = x + 1/x = 1/w`. Eliminating the
+   linear `s`-variable of `koblitz_symmetrised::symmetrised_terms` (σ in the
+   code: `F = P(w) + σ·Q(w)`, `σ² + σ = Σw`) gives
+   `G = P² + PQ + (Σw)Q²`. The check verifies
+   `G(1/s₁,…,1/s_{m+1})·(Π s_i)^k = S_{m+1}(s₁,…,s_{m+1})`, the polynomial of `plain_terms(m)`
+   (`b = 1`; `k = 2` at `m = 2`, `k = 4` at `m = 3`) on a full 6-per-variable
+   grid at `n = 11` and `n = 23`. Both sides have degree ≤ 4 in each variable,
+   so 5 values per variable already prove the identity; 6 are used. **So the
+   `S` and `X` arms below have the same equations.** They differ only in which
+   target field elements occur (`s_R` against `x_R`) and in which curve points
+   the window contains.
+2. *The set.* `n ∈ {11, 23}`: `p = 2n + 1 ∈ {23, 47}` is prime, `p | 2^n − 1`
+   (`2` has order `n` mod `p`), so `ζ` of order `p` lies in `F_{2^n}` and
+   `c_i = ζ^i + ζ^{−i}`, `1 ≤ i ≤ n`, are checked to be independent
+   (rank `n`), Frobenius-permuted (`c_i² = c_{2i}`), to satisfy
+   `c_i c_j = c_{i+j} + c_{|i−j|}` for all `i, j ≤ n` (the Lean `dickson_mul`)
+   and to sum to 1. `ζ` is `g^{(2^n−1)/p}` for the least `g = 2, 3, …` with
+   `ζ ≠ 1`. This fixes one of the two window classes (`ζ ↦ ζ^k`, `k` a
+   non-residue mod `p`, gives the other); only the first is run.
+3. *The curve.* `K_0: y² + xy = x³ + 1` over `F_{2^n}` (`a = 0`), with the
+   repository's `find_irreducible_sparse(n)` modulus. `KoblitzCurve::new`
+   rejects `K_0` at `n = 11` because `#E = 4·23²` (`r² | #E`), so the
+   `KoblitzCurve` is built directly. Nothing here uses its prime-order
+   subgroup. The model is confirmed at both `n` by counting every abscissa
+   (`x = 0` gives `T`, other `x` give 0 or 2 points) and comparing
+   `1 + count` with the Koblitz-recurrence `#E` (2116 and 8383412).
+4. *Word field.* The harness's 64-bit field arithmetic equals `F2mElement` on
+   200 random products and inverses per `n`; it is used for counts and for a
+   second, independent evaluation of every polynomial at every planted point.
+
+**2. Instrument (same on every arm).**
+`pq_f4_f2::groebner_basis_f4`, the repository's Boolean F4 over
+`F_2[v]/(v² − v)` with the Gebauer–Möller criteria and field pairs, on the
+Weil restriction of each decomposition system, `F4_F2_*` environment unset.
+`D = F4Stats::solving_degree` (highest step degree at which the basis gained an
+element), `max_cols = matrix_cols_max`, `max_rows = matrix_rows_max`,
+`steps = steps`, `field_ops = word_xors` (64-bit XORs the row-by-row
+eliminations perform; the engine's counted unit; the matrix construction is not
+in it). Budget 300 s per system (F4's cooperative deadline), a child process per
+system under `ulimit -v 13000000`, killed at 420 s. A system is *ok* only if F4
+returned, did not set `timed_out` or `oversize`, did not derive 1, and every
+element of its basis vanishes at the planted point. The unit of `field_ops`
+(Boolean word XORs) is not that of Amendment 4 (`F_p` multiplications); κ is a
+slope on a log scale, compared with `m − 1` and across arms of this
+amendment only.
+
+**3. Arms** (`m` planted summands; the *window* `W_ℓ` has dimension `ℓ`).
+`|F|` is the exact number of affine curve points whose frame coordinate lies in
+the window (counted for the whole window, so every target of a cell shares it),
+and `b = log₂|F|` is the per-summand entropy used by the scores.
+
+| arm | set | frame coordinate | equations |
+|:--|:--|:--|:--|
+| **S** | `P` with `s(P) = x + 1/x ∈ G_ℓ = span(c_1…c_ℓ)` | `s` | `plain_terms(m)` in `(s₁…s_m, s_R)`, direct, `mℓ` unknowns |
+| **X** | `x(P) ∈ G_ℓ` | `x` | the same polynomial in `(x₁…x_m, x_R)`, `mℓ` unknowns |
+| **XR** | `x(P) ∈ R_ℓ`, a random `ℓ`-dimensional subspace | `x` | as X (the repository's standard `x`-window) |
+| **U** | `u(P) ∈ V`, `V ∋ 1` random of dimension `ℓ` | `u = 1/(x+1)` | `build_symmetrised_system`, `m(ℓ−1)+1` unknowns (the repository's `u`-frame) |
+| **NS** | as S | `s` | S's polynomial with an independent uniform non-zero `F_{2^n}` coefficient on every non-constant term of `plain_terms(m)`, plus a constant chosen so the planted point is a zero (as N and N11) |
+| **PC** | as X | `x` | positive control, `m = 3` only: `build_decomposition_system`, two chained `S₃` links with `n` intermediate unknowns (the repository's production `x` system) |
+
+`G_ℓ` is the Gauss-period window of E-K1. Its *set* equals a scaled power
+window (Lean `window_eq`); what E-K1 tests is the *presentation* in `s`
+(S) against the same window in `x` (X), a random window in `x` (XR), the
+`u`-frame (U), and the null (NS). The coordinate basis in which the output
+equations are written cannot change F4's trace (its initial echelon form of
+the inputs is the same), so equations are written in the repository's
+polynomial basis for every arm. The window's unknown basis is `c_1…c_ℓ` for S,
+X, NS, PC; a basis of `R_ℓ` or `V` drawn from the cell seed for XR and U.
+**Not run:** a `u`-frame with a Gauss-derived `V`, `a = 1`, the other window
+class, `m ≥ 4`.
+
+**4. Cells, ranges, seeds.** `n ∈ {11, 23}`, `m ∈ {2, 3}`, `ℓ` rising from 3
+(from 4 at `m = 3`, see §10) until a limit (at most `n`; at most 64 Boolean unknowns, the repository's
+`MAX_VARS`). 2 planted targets per cell. A cell where the window holds no
+planted decomposition with `m` distinct summands (20000 draws) is not a cell
+(row status `no_plant`, skipped, not a limit). Seeds:
+`cell = 0x454B31 ⊕ n≪48 ⊕ arm≪40 ⊕ m≪32 ⊕ ℓ≪16` with arm indices
+S=0, X=1, XR=2, U=3, NS=4, PC=5; target `k` is planted from
+`cell ⊕ (k+1)≪8`. NS plants from S's seed and PC from X's (so each pair
+shares its planted decompositions); NS's coefficients come from
+`cell(NS) ⊕ (k+1)≪8`; XR's and U's window from `cell ⊕ 0x5B5≪32`. A planted
+decomposition is `m` random window values with distinct coordinates (distinct
+`w` in the `u`-frame), one of the 2 or 4 curve points over each chosen at
+random, `R` their sum, with `x_R ∉ {0, 1}` (so `u_R` is finite and non-zero);
+a redraw is counted in the row. Every series stops after the first cell in
+which any system hits a limit or fails (`timeout`, `oversize`, `aborted`,
+`layout_limit`); that cell is recorded and counts as missing. Series are run
+in order `n = 11` before `n = 23`, `m = 2` before `m = 3`.
+
+**5. Checks before any measurement** (a failure aborts the child; never a
+measurement). Window basis independent (and `1 ∈ V` for U); every planted point
+on the curve; its frame coordinate equals the window combination of the planted
+bits; the points sum to `R`; the polynomial vanishes at the planted coordinates
+in the word field; the Weil-restricted Boolean equations all vanish at the
+planted bit-vector (a second evaluation through the repository's arithmetic);
+for PC the intermediate point `P₁ + P₂` is the planted intermediate unknown. The
+exact point count `|F|` equals the count by `points_with_x` on `F2mElement`
+wherever that is cheap (`check`).
+
+**6. Scores, per (arm, `n`, `m`).** A cell is *completed* when both targets are
+ok (and, once the replay file exists, reproduced; below). The cell's `D`,
+`field_ops` and `max_cols` are the means of its two systems, as in Amendment 1
+item 4. **κ** is the least-squares slope of `log₂` cell `field_ops` on `b` over
+completed cells; **σ** that of cell `D` on `b`. Break-even `m − 1`.
+*Verdict on κ* (Amendment 4): **cost-favourable** if κ < `m − 1` on ≥ 3
+completed cells; **cost-unfavourable** if κ ≥ `m − 1` on ≥ 3; else
+**inconclusive**. *σ* is read by §1's table. Secondary and descriptive:
+κ over the completed cells with `excess_bits = (unknowns) − n ≥ 0`, the regime
+where a planted target has more than one expected decomposition.
+
+**7. Trace replay (standard, Amendment 4's check).** After the series, every
+completed system is rebuilt from its seed and measured once more
+(`replay`). Its `D`, `max_cols`, `max_rows` and `steps` must equal the row's.
+A mismatch is recorded, and that system is excluded from every score. The
+replay of `field_ops` is reported (equal or not) but is not a gate.
+
+**8. Decision rules, fixed now** (`analyze` prints each one).
+
+- **R1 (cost verdict):** κ as in §6, per (arm, `n`, `m`).
+- **R2 (S against X, same equations):** **tied** if, over ≥ 3 shared completed
+  cells, `|D_S − D_X| ≤ 1` at every shared cell and `|κ_S − κ_X| < 0.25`; else
+  **differs**; fewer than 3 shared cells: inconclusive.
+- **R3 (S against XR, and against U):** with ≥ 3 completed cells in both
+  series, **S lower** if κ_S ≤ κ_other − 0.25, **S higher** if
+  κ_S ≥ κ_other + 0.25, else **tied**. Descriptive beside it: at the shared
+  `ℓ`, the number of cells where the other arm's `field_ops` is ≥ 2× S's, and
+  where it is ≤ ½.
+- **R4 (outcome per (`n`, `m`)):** **no advance** if S is cost-unfavourable on
+  ≥ 3 cells, or if S is not slope-lower than both XR and U. **Advances** only
+  if S is cost-favourable and slope-lower than both XR and U. A series with
+  fewer than 3 completed cells makes the outcome **inconclusive**. An
+  "advances" at one `n` is a single-field reading until the other `n` agrees
+  (§5's replication rule).
+- **R5 (null, over shared completed cells of S and NS, ≥ 3):** **shape, not
+  structure** if NS's `D` equals S's in every shared cell; **structure beyond
+  shape** if NS's `D` exceeds S's by ≥ 1 in ≥ 2 shared cells; else **mixed**
+  (Amendment 2's rule). Descriptive: cells where NS's `field_ops` is ≥ 2× or
+  ≤ ½ S's.
+- **R6 (positive control):** *PC1*, the known difference between the
+  repository's two presentations at `m = 3` (direct `S₄`, Boolean degree 6, on
+  a random `x`-window, against the `u`-frame, degree 4; the gap the
+  `koblitz_symmetrised` module documents): over completed cells that XR and U
+  share at `m = 3` (both `n` pooled), the instrument **detects** if XR's
+  `field_ops` is ≥ 2× U's in ≥ 2 of them. If there are ≥ 2 shared cells and it
+  does not detect, **the instrument is blind to this difference and every
+  verdict above is invalid**. With fewer than 2 shared cells, PC1 is *not
+  evaluable* and every verdict stands as a reading only. *PC2*, descriptive:
+  PC against X on the same window and planted points (chained against
+  direct), the number of shared cells where `|Δlog₂ field_ops| ≥ 1` or
+  `|ΔD| ≥ 1`.
+- **R7 (window structure, descriptive, not a verdict):** X against XR at equal
+  `ℓ`: the number of shared cells where XR's `field_ops` is ≥ 2× X's, and where
+  it is ≤ ½.
+
+**9. Predictions, recorded now.**
+P1 the identity of §1.1 holds (an exact fact; a failing `check` would have
+stopped this amendment). P2 S is **tied** with X in every (`n`, `m`) where R2 is
+evaluable (same equations, so equal `D` within ±1, and equal slope up to the
+target distribution). P3 no arm is cost-favourable on ≥ 3 completed cells
+(Amendment 4's C1 prediction, carried over). P4 PC1 detects, with XR dearer than
+U in every shared cell. P5 R4 is **no advance** for S wherever evaluable. P6 R5
+reads **structure beyond shape**. P7 the Gauss `x`-window is cheaper than the
+random one (`c_i c_j = c_{i+j} + c_{|i−j|}` keeps products in `G_{2ℓ}`): XR
+≥ 2× X's `field_ops` in at least half of the shared cells where R7 is evaluable.
+P8 at `m = 3` the series of S, X, XR and NS at `n = 11` have fewer than 3 completed cells. No prediction is made for the size of any κ.
+
+**10. Disclosure, and scope.** Before this amendment a dry run on scratch
+output (not in `runs/`; one system per line, 1 target, budget 60–300 s)
+measured: n = 11, `m = 2`, `ℓ = 6`: S `D = 3`, 6 steps, `field_ops` 86406; X `D = 3`, 85321; U `D = 3`, 52528 (milliseconds each).
+n = 11, `m = 3`, `ℓ = 5`: S `D = 7`, 14 steps, `field_ops` 2.1·10¹⁰, 26 s; XR `D = 7`, 2.1·10¹⁰, 24 s; U `D = 5`, 6.3·10⁷, 0.27 s; PC `D = 4`, 4.3·10⁹, 57 s.
+n = 11, `m = 3`, `ℓ = 6`, S: no result in the 300 s budget (9 steps, peak resident memory 11.9 GB).
+n = 23, `m = 2`: S `ℓ = 10` `D = 3`, 0.1 s; S `ℓ = 13` and `ℓ = 16` no result in 60 s budgets; U `ℓ = 13` `D = 4`, 25 s.
+It showed that at `m = 3` the direct degree-6 systems
+(S, X, XR, NS) complete at `ℓ ≤ 5` and hit the limit at `ℓ = 6`
+(`n = 11`), and, in `check`, that no arm has a planted decomposition with `m = 3`
+distinct summands at `ℓ = 3` at either `n` (so `m = 3` series start at `ℓ = 4`),
+and that at `m = 2` only U at `n = 23` has none at `ℓ = 3`. Expected from this:
+at `m = 3` the series of S, X, XR and NS have at most 2 completed cells (`ℓ = 4,
+5`) at `n = 11`, so their κ is inconclusive there by the rule of §6; the
+m = 3 runs are kept because PC1 needs them. These are the only measurements
+seen. The conclusions
+licensed are per (`n`, `m`) series at toy sizes (`n ≤ 23`, `ℓ ≤ 13`); they are
+solver-axis stage diagnostics of a Boolean F4, not costs of a pipeline, and say
+nothing about `n = 131`, other `a`, other window classes or other engines.
+Nothing here prices a pipeline or reports `S` in the repository's sense.
