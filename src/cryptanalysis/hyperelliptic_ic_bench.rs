@@ -255,6 +255,9 @@ pub enum RhoVariant {
     /// twelve.
     #[default]
     DistinguishedPointsFullWidth,
+    /// [`Self::DistinguishedPointsNegation`] on the full-width walk
+    /// (round thirteen).
+    DistinguishedPointsNegationFullWidth,
 }
 
 /// Outcome of one rho run.
@@ -427,6 +430,9 @@ pub fn pollard_rho_jacobian_with(
         }
         RhoVariant::DistinguishedPointsFullWidth => {
             rho_dp(curve, d1, d2, n, seed, max_steps, false, false, true)
+        }
+        RhoVariant::DistinguishedPointsNegationFullWidth => {
+            rho_dp(curve, d1, d2, n, seed, max_steps, true, false, true)
         }
     }
 }
@@ -1472,6 +1478,17 @@ mod tests {
             );
             assert_eq!(r.k.as_ref(), Some(&k), "jacobian seed {seed}");
             assert_eq!(r.precompute_ops % (2 * (n.bits() as usize + 1)), 0);
+            let f = pollard_rho_jacobian_with(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                seed,
+                5_000_000,
+                &RhoVariant::DistinguishedPointsNegationFullWidth,
+            );
+            assert_eq!(f.k.as_ref(), Some(&k), "folded jacobian seed {seed}");
+            assert!(f.fruitless_ops <= f.walk_ops);
         }
         for (nn, kk) in [(61667u64, 20562u64), (4620611, 1540210)] {
             for seed in 0..8u64 {
