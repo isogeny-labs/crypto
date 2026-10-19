@@ -1256,9 +1256,32 @@ fn main() -> Result<()> {
             )?;
             println!("{receipt}");
         },
+        Some("primary-mixed-xor-cache-m4")=>{
+            if args.len()!=11 { return Err("primary-mixed-xor-cache-m4 off|on preflight|positive|natural UUUU|UUDD|DDUU|DDDD FIXTURE_INDEX U_BASE_DIR D_BASE_DIR EVIDENCE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (requires matching ICV1_XOR_DECIDED_CACHE and hard 8-GiB cgroup)".into()); }
+            let cache = match args[2].as_str() {
+                "off" => false,
+                "on" => true,
+                _ => return Err("XOR cache setting must be off or on".into()),
+            };
+            let receipt=primary_adapter::mixed_xor_cache_cli(
+                &args[3],&args[4],args[5].parse()?,Path::new(&args[6]),
+                Path::new(&args[7]),Path::new(&args[8]),Path::new(&args[9]),
+                Path::new(&args[10]),cache,
+            )?;
+            println!("{receipt}");
+        },
         Some("primary-mixed-replay-m4")=>{
             if args.len()!=9 { return Err("primary-mixed-replay-m4 UUUU|UUDD|DDUU|DDDD U_BASE_DIR D_BASE_DIR EVIDENCE_DIR FIXTURE_DIR WORKER_JSON NEW_OUTPUT_JSON".into()); }
             let receipt=primary_adapter::mixed_relation_replay_cli(
+                &args[2],Path::new(&args[3]),Path::new(&args[4]),
+                Path::new(&args[5]),Path::new(&args[6]),Path::new(&args[7]),
+                Path::new(&args[8]),
+            )?;
+            println!("{receipt}");
+        },
+        Some("primary-mixed-xor-cache-replay-m4")=>{
+            if args.len()!=9 { return Err("primary-mixed-xor-cache-replay-m4 UUUU|UUDD|DDUU|DDDD U_BASE_DIR D_BASE_DIR EVIDENCE_DIR FIXTURE_DIR WORKER_JSON NEW_OUTPUT_JSON".into()); }
+            let receipt=primary_adapter::mixed_xor_cache_replay_cli(
                 &args[2],Path::new(&args[3]),Path::new(&args[4]),
                 Path::new(&args[5]),Path::new(&args[6]),Path::new(&args[7]),
                 Path::new(&args[8]),

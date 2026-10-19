@@ -4259,6 +4259,62 @@ mod tests {
 }
 
 const MIXED_ADAPTER_SOURCE: &[u8] = include_bytes!("primary_adapter.rs");
-const MIXED_EXAMPLE_SOURCE: &[u8] = include_bytes!("../../examples/koblitz_n83_factor_base_export.rs");
-const MIXED_WORKER_SOURCE: &[u8] = include_bytes!("../n83_d18_subgroup_orbit_census_20261018/mixed-v1/worker.rs");
+const MIXED_EXAMPLE_SOURCE: &[u8] =
+    include_bytes!("../../examples/koblitz_n83_factor_base_export.rs");
+const MIXED_WORKER_SOURCE: &[u8] =
+    include_bytes!("../n83_d18_subgroup_orbit_census_20261018/mixed-v1/worker.rs");
 include!("../n83_d18_subgroup_orbit_census_20261018/mixed-v1/worker.rs");
+
+mod xor_cache_worker {
+    use super::*;
+
+    const MIXED_WORKER_SOURCE: &[u8] =
+        include_bytes!("../n83_xor_decided_cache_20261019/worker.rs");
+    include!("../n83_xor_decided_cache_20261019/worker.rs");
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn mixed_xor_cache_cli(
+    mode: &str,
+    shape: &str,
+    fixture_index: u64,
+    u_root: &Path,
+    d_root: &Path,
+    evidence_root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+    cache_enabled: bool,
+) -> Result<Value> {
+    xor_cache_worker::mixed_orbit_cli(
+        mode,
+        shape,
+        fixture_index,
+        u_root,
+        d_root,
+        evidence_root,
+        fixture_root,
+        output,
+        cache_enabled,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn mixed_xor_cache_replay_cli(
+    shape: &str,
+    u_root: &Path,
+    d_root: &Path,
+    evidence_root: &Path,
+    fixture_root: &Path,
+    worker_path: &Path,
+    output: &Path,
+) -> Result<Value> {
+    xor_cache_worker::mixed_relation_replay_cli(
+        shape,
+        u_root,
+        d_root,
+        evidence_root,
+        fixture_root,
+        worker_path,
+        output,
+    )
+}
