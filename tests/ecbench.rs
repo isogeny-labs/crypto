@@ -913,7 +913,13 @@ fn pdp3_matrix_runtime_and_generalized_recover_and_replay() {
     let dir = scratch("matrix-runtime-generalized");
     let mut arms = Vec::new();
     for engine in ["matrix-f4", "matrix-f5"] {
-        for policy in ["baseline", "prepared", "quadratic-tail"] {
+        for policy in [
+            "baseline",
+            "prepared",
+            "quadratic-tail",
+            "adaptive-prepared",
+            "adaptive-quadratic-tail",
+        ] {
             arms.push(serde_json::json!({"name":format!("{engine}-{policy}"),"role":"candidate",
                 "method":{"id":"ic.pipeline","params":{
                     "factor_base":"binary-standard-subspace:dimension=4",
@@ -943,7 +949,7 @@ fn pdp3_matrix_runtime_and_generalized_recover_and_replay() {
         .lines()
         .map(|line| serde_json::from_str(line).unwrap())
         .collect();
-    assert_eq!(records.len(), 32);
+    assert_eq!(records.len(), 48);
     let mut tails = 0;
     for record in &records {
         assert_eq!(record["outcome"]["status"], "verified", "{record}");

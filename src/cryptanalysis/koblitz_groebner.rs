@@ -1437,14 +1437,17 @@ enum F4PackedMatrix {
 
 /// Explicit, identity-bound matrix implementation, leaving historical defaults
 /// untouched. Baseline includes the three previously qualified GF2 switches;
-/// Prepared adds exact active layouts/top-degree/linear-tail/direct packing;
-/// QuadraticTail additionally finishes small quadratic recursive branches.
+/// Prepared/QuadraticTail retain the initial all-width scheduling for replay.
+/// Adaptive variants keep cheap early degrees below sixteen variables.
+/// The quadratic-tail variants additionally finish bounded recursive branches.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum MatrixRuntime {
     Baseline,
     Prepared,
     QuadraticTail,
+    AdaptivePrepared,
+    AdaptiveQuadraticTail,
 }
 
 thread_local! {
@@ -1457,8 +1460,10 @@ impl MatrixRuntime {
             "baseline" => Ok(Self::Baseline),
             "prepared" => Ok(Self::Prepared),
             "quadratic-tail" => Ok(Self::QuadraticTail),
+            "adaptive-prepared" => Ok(Self::AdaptivePrepared),
+            "adaptive-quadratic-tail" => Ok(Self::AdaptiveQuadraticTail),
             _ => Err(format!(
-                "unknown matrix runtime `{value}`; expected baseline, prepared or quadratic-tail"
+                "unknown matrix runtime `{value}`; expected baseline, prepared, quadratic-tail, adaptive-prepared or adaptive-quadratic-tail"
             )),
         }
     }
@@ -1468,7 +1473,12 @@ fn prepared_matrix_runtime() -> bool {
     MATRIX_RUNTIME.with(|slot| {
         matches!(
             slot.get(),
-            Some(MatrixRuntime::Prepared | MatrixRuntime::QuadraticTail)
+            Some(
+                MatrixRuntime::Prepared
+                    | MatrixRuntime::QuadraticTail
+                    | MatrixRuntime::AdaptivePrepared
+                    | MatrixRuntime::AdaptiveQuadraticTail
+            )
         )
     })
 }
@@ -5100,7 +5110,11 @@ impl SolverEngine {
             }
         });
         let highest_only = (matches!(self, Self::MatrixF4 { .. } | Self::MatrixF5 { .. })
-            && prepared_matrix_runtime())
+            && prepared_matrix_runtime()
+            // Tiny overdetermined Semaev systems usually refute at degree
+            // two. Paying for degree three on every relation query regresses
+            // the complete pipeline, even when wider complete-root calls win.
+            && (n_vars >= 16 || MATRIX_RUNTIME.with(|slot| matches!(slot.get(), Some(MatrixRuntime::Prepared | MatrixRuntime::QuadraticTail)))))
             || forced.unwrap_or(n_vars >= 24);
         let first = if highest_only { top } else { base };
         Some(first..=top)
@@ -6777,7 +6791,12 @@ fn solve_rec(
                 opts.engine,
                 SolverEngine::MatrixF4 { .. } | SolverEngine::MatrixF5 { .. }
             )
-            && MATRIX_RUNTIME.with(|slot| slot.get() == Some(MatrixRuntime::QuadraticTail))
+            && MATRIX_RUNTIME.with(|slot| {
+                matches!(
+                    slot.get(),
+                    Some(MatrixRuntime::QuadraticTail | MatrixRuntime::AdaptiveQuadraticTail)
+                )
+            })
         {
             if let Some((variables, roots)) = quadratic_tail_roots(&system, &assignment) {
                 stats.tail_enumerations += 1;
@@ -7117,6 +7136,51 @@ mod tests {
     }
 
     #[test]
+    fn matrix_runtime_small_systems_keep_cheap_degree_ladder() {
+        for runtime in [
+            MatrixRuntime::AdaptivePrepared,
+            MatrixRuntime::AdaptiveQuadraticTail,
+        ] {
+            with_matrix_runtime(runtime, || {
+                for engine in [
+                    SolverEngine::MatrixF4 { max_degree: 3 },
+                    SolverEngine::MatrixF5 { max_degree: 3 },
+                ] {
+                    for n in [8, 10, 12, 15] {
+                        assert_eq!(engine.degree_ladder(2, n).unwrap(), 2..=3);
+                    }
+                    for n in [16, 22] {
+                        assert_eq!(engine.degree_ladder(2, n).unwrap(), 3..=3);
+                    }
+                }
+                assert_eq!(
+                    SolverEngine::InheritedF4 { max_degree: 3 }
+                        .degree_ladder(2, 12)
+                        .unwrap(),
+                    2..=3
+                );
+            });
+        }
+        // Previously recorded method identities retain their exact ladder.
+        for runtime in [MatrixRuntime::Prepared, MatrixRuntime::QuadraticTail] {
+            with_matrix_runtime(runtime, || {
+                assert_eq!(
+                    SolverEngine::MatrixF4 { max_degree: 3 }
+                        .degree_ladder(2, 12)
+                        .unwrap(),
+                    3..=3
+                );
+                assert_eq!(
+                    SolverEngine::MatrixF5 { max_degree: 3 }
+                        .degree_ladder(2, 10)
+                        .unwrap(),
+                    3..=3
+                );
+            });
+        }
+    }
+
+    #[test]
     fn matrix_runtime_direct_lookup_handles_high_variable_masks() {
         let high = 1u64 << 63;
         let equations = [F2BoolPoly::from_monos(
@@ -7186,13 +7250,17 @@ mod tests {
                         let (want, _) = with_matrix_runtime(MatrixRuntime::Baseline, || {
                             solve_boolean_system(&system, n, &opts)
                         });
-                        let (got, stats) =
-                            with_matrix_runtime(MatrixRuntime::QuadraticTail, || {
+                        for runtime in [
+                            MatrixRuntime::QuadraticTail,
+                            MatrixRuntime::AdaptiveQuadraticTail,
+                        ] {
+                            let (got, stats) = with_matrix_runtime(runtime, || {
                                 solve_boolean_system(&system, n, &opts)
                             });
-                        assert!(!stats.exhausted);
-                        assert_eq!(got, want);
-                        assert_eq!(got, literal.iter().take(cap).copied().collect::<Vec<_>>());
+                            assert!(!stats.exhausted);
+                            assert_eq!(got, want);
+                            assert_eq!(got, literal.iter().take(cap).copied().collect::<Vec<_>>());
+                        }
                     }
                 }
             }
