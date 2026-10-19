@@ -4173,8 +4173,10 @@ mod wide {
         }
     }
 
-    static PADD_FALLBACK_STATES: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
-    static PADD_IRREGULAR_INPUTS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    static PADD_FALLBACK_STATES: std::sync::atomic::AtomicU64 =
+        std::sync::atomic::AtomicU64::new(0);
+    static PADD_IRREGULAR_INPUTS: std::sync::atomic::AtomicU64 =
+        std::sync::atomic::AtomicU64::new(0);
     static PADD_RESOLVED_HITS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
     static PADD_SWAPPED_PAIRS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
     static PADD_CHECKED_INPUTS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
@@ -4431,7 +4433,9 @@ mod wide {
         let mut product = 1u128;
         for shift in 0..n {
             for k in 0..2 {
-                let xs = basis.to_poly.apply(basis.rotate(state.normal_roots[k], shift));
+                let xs = basis
+                    .to_poly
+                    .apply(basis.rotate(state.normal_roots[k], shift));
                 let ys = basis.to_poly.apply(basis.rotate(yn[k], shift));
                 // Exactly the S3 batch's exceptional inputs (zero denominator).
                 let regular = xs != tx && xs != 0 && tx != 0;
@@ -4493,14 +4497,16 @@ mod wide {
                     continue;
                 }
                 let inverse = scan.padd.inverse[i];
-                let lambda = basis
-                    .to_normal
-                    .apply(gf.mul(ty ^ scan.padd.ys[i], inverse));
+                let lambda = basis.to_normal.apply(gf.mul(ty ^ scan.padd.ys[i], inverse));
                 let lambda2 = lambda ^ basis.to_normal.apply(gf.mul(absolute, inverse));
                 let c = normal_c ^ basis.rotate(state.normal_roots[k], shift);
                 let plus = basis.rotate(lambda, 1) ^ lambda ^ c;
                 let minus = basis.rotate(lambda2, 1) ^ lambda2 ^ c;
-                let emitted_normal = if swapped { [plus, minus] } else { [minus, plus] };
+                let emitted_normal = if swapped {
+                    [plus, minus]
+                } else {
+                    [minus, plus]
+                };
                 let emitted = [
                     basis.to_poly.apply(emitted_normal[0]),
                     basis.to_poly.apply(emitted_normal[1]),
@@ -4570,7 +4576,15 @@ mod wide {
         relation_check_ns: &mut u128,
     ) -> Option<Relation128> {
         extract128_with(
-            gf, fast, basis, solver, index, base, target, start, relation_check_ns,
+            gf,
+            fast,
+            basis,
+            solver,
+            index,
+            base,
+            target,
+            start,
+            relation_check_ns,
             RankSolve::S3,
         )
     }
@@ -4598,13 +4612,36 @@ mod wide {
             let state = index.states.get((start + offset) % index.states.len());
             let relation = if solve == RankSolve::S3 {
                 scan_state128(
-                    gf, fast, basis, solver, index, base, target, target_x, &state, &mut scan,
-                    &mut lift_scratch, &mut probes, relation_check_ns,
+                    gf,
+                    fast,
+                    basis,
+                    solver,
+                    index,
+                    base,
+                    target,
+                    target_x,
+                    &state,
+                    &mut scan,
+                    &mut lift_scratch,
+                    &mut probes,
+                    relation_check_ns,
                 )
             } else {
                 scan_state128_padd(
-                    gf, fast, basis, solver, index, base, target, target_x, &state, &mut scan,
-                    &mut lift_scratch, &mut probes, relation_check_ns, solve,
+                    gf,
+                    fast,
+                    basis,
+                    solver,
+                    index,
+                    base,
+                    target,
+                    target_x,
+                    &state,
+                    &mut scan,
+                    &mut lift_scratch,
+                    &mut probes,
+                    relation_check_ns,
+                    solve,
                 )
             };
             if let Some(relation) = relation {
@@ -5296,7 +5333,14 @@ mod wide {
 
         fn small_instance(
             columns: usize,
-        ) -> (FastBinaryCurve128, Gf2_128, NormalBasis128, S3Solver128, Base128, Vec<u128>) {
+        ) -> (
+            FastBinaryCurve128,
+            Gf2_128,
+            NormalBasis128,
+            S3Solver128,
+            Base128,
+            Vec<u128>,
+        ) {
             let curve = KoblitzCurve::new(1, 83).unwrap();
             let fast = FastBinaryCurve128::new(&curve.curve.irreducible, 1).unwrap();
             let gf = Gf2_128::new(&curve.curve.irreducible);
@@ -5308,7 +5352,12 @@ mod wide {
                 by_x.entry(point.unwrap().0).or_default().push(i);
             }
             let reps: Vec<u128> = reps.iter().map(|p| p.unwrap()[0]).collect();
-            let base = Base128 { points, labels, by_x, columns };
+            let base = Base128 {
+                points,
+                labels,
+                by_x,
+                columns,
+            };
             let basis = NormalBasis128::new(&gf);
             let solver = S3Solver128::new(&gf, b);
             (fast, gf, basis, solver, base, reps)
@@ -5322,15 +5371,23 @@ mod wide {
             let mut seed = 0x0123_4567_89AB_CDEFu64;
             let mut checked = 0u64;
             for _ in 0..4000 {
-                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+                seed = seed
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
                 let r = base.points[(seed >> 20) as usize % base.points.len()];
-                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+                seed = seed
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
                 let t = fast.add(r, base.points[(seed >> 20) as usize % base.points.len()]);
-                let (Some((rx, ry)), Some((tx, _))) = (r, t) else { continue };
+                let (Some((rx, ry)), Some((tx, _))) = (r, t) else {
+                    continue;
+                };
                 if rx == tx {
                     continue;
                 }
-                let exact = solver.roots(&gf, &basis, rx, tx).expect("S3 roots of two points");
+                let exact = solver
+                    .roots(&gf, &basis, rx, tx)
+                    .expect("S3 roots of two points");
                 let plus = fast.add(t, r).unwrap().0;
                 let minus = fast.add(t, FastBinaryCurve128::neg(r)).unwrap().0;
                 assert!(exact == [plus, minus] || exact == [minus, plus]);
@@ -5355,7 +5412,9 @@ mod wide {
             let swapped_before = PADD_SWAPPED_PAIRS.load(std::sync::atomic::Ordering::Relaxed);
             for _ in 0..40u64 {
                 let mut pick = || {
-                    seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+                    seed = seed
+                        .wrapping_mul(6364136223846793005)
+                        .wrapping_add(1442695040888963407);
                     (seed >> 20) as usize % base.points.len()
                 };
                 let mut target = base.points[pick()];
@@ -5366,12 +5425,18 @@ mod wide {
                 let start = (tx ^ ty.rotate_left(29)) as usize;
                 let run = |mode: RankSolve| {
                     let mut ns = 0u128;
-                    extract128_with(&gf, &fast, &basis, &solver, &index, &base, target, start, &mut ns, mode)
-                        .map(|r| (r.point_indices, r.x_codes, r.intermediates, r.probes))
+                    extract128_with(
+                        &gf, &fast, &basis, &solver, &index, &base, target, start, &mut ns, mode,
+                    )
+                    .map(|r| (r.point_indices, r.x_codes, r.intermediates, r.probes))
                 };
                 let want = run(RankSolve::S3);
                 assert!(want.is_some(), "a planted four-point target decomposes");
-                for mode in [RankSolve::Padd, RankSolve::PaddCheck, RankSolve::PaddSwapped] {
+                for mode in [
+                    RankSolve::Padd,
+                    RankSolve::PaddCheck,
+                    RankSolve::PaddSwapped,
+                ] {
                     assert_eq!(run(mode), want, "{mode:?} differs from the S3 scan");
                 }
                 solved += 1;
