@@ -149,8 +149,8 @@ fn main() {
                 let dg = mulp(p, a, d, Some(g));
                 println!("{}\t{}\ton_curve={} rG_is_O={} dG_eq_Q={}", id, if ok_on && rg.is_none() && dg == Some(q) { "VERIFIED" } else { "FAILED" }, ok_on, rg.is_none(), dg == Some(q));
             }
-            "gf2m" | "gf2m?" => {
-                let (n, polys): (u32, Vec<u128>) = if kind == "gf2m" {
+            "gf2m" | "gf2m?" | "gf2mpoly" => {
+                let (n, polys): (u32, Vec<u128>) = if kind == "gf2mpoly" { let mut it = fp.split(':'); let n: u32 = it.next().unwrap().parse().unwrap(); let poly = parse(it.next().unwrap()); (n, vec![poly ^ (1u128 << n)]) } else if kind == "gf2m" {
                     let mut it = fp.split(':');
                     let n: u32 = it.next().unwrap().parse().unwrap();
                     let mut red = 1u128;
