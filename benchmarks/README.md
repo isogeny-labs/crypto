@@ -7,6 +7,15 @@ raw records, sources and inputs and is the source of truth; the files here
 are copies for browsing (AGENTS.md "Performance results also land in
 `benchmarks/`"). Not to be confused with `benches/` (Cargo bench sources).
 
+**Validation gate (owner, 2026-10-19).** A row is listed here only with a replay
+certificate, a validator report and a matched rho reference named by its
+directory's `VALIDATION.json` (AGENTS.md, "Validation gate";
+[`docs/VALIDATION_GATE.md`](../docs/VALIDATION_GATE.md)). Every row below that
+predates the gate is frozen in [`PRE_GATE.json`](PRE_GATE.json) and is
+**unvalidated (pre-gate)** until a validation sweep verdict or a
+`VALIDATION.json` validates it. `python3 scripts/validation_gate.py check`
+lists each row's standing.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-18 | [`20261018-hec-rho-negation`](20261018-hec-rho-negation/) | DP Pollard rho on hyperelliptic Jacobians (genus 2/3/4, 18 instances, N 1321 to 16790591, 40 seeds each), walk on divisors vs on ±-classes with look-ahead; counted group operations | folded/plain walk ops 0.67 to 0.89 at N ≤ 6·10^4; median 0.968 at N ≥ 10^5 (registered R1, ≤ 0.80, falsified); plain S_walk 1.82 and 2.10 vs ideal 1.2533 at the two largest rows; every run verified | 4 vCPU Xeon 2.80 GHz, isolated_bench reserved CPU 3, uncontended (counts are contention-independent) | [`research/notes/index-calculus/round9/`](../research/notes/index-calculus/round9/) |
