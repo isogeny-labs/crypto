@@ -24,7 +24,7 @@ From the repository root, download the K4250 base gzip into one directory and ru
 
     python3 research/n83_root4_frontier_current_20261018/highk_fresh4096_k4250_20261019/scripts/verify_portable.py --repo . --base-dir /path/to/base-gz-directory
 
-The exact executed local runner and first independent verifier are retained under scripts. portable_replay_receipt.json and statistics_replay_receipt.json record the package checks.
+The exact executed local runner and first independent verifier are retained under scripts. portable_replay_receipt.json and statistics_replay_receipt.json record the package checks. The exact branch passed 4,162/4,162 release library tests (117 ignored) and 21/21 packed-root example tests; verification_receipt.json pins the logs and hashes.
 
 ## Next experiment
 
