@@ -227,13 +227,27 @@ fn named_curves() -> Result<Vec<Value>> {
                 .iter()
                 .find(|t| t["icv1"] == id)
                 .ok_or("Oakley transfer record absent")?;
-            let best = transfer["best_route"]
-                .as_u64()
-                .ok_or("Oakley best route absent")? as usize;
-            let route = &transfer["routes"][best];
-            if route["kind"] != "ghs_weil_descent" || route["evidence"] != "exact_invariant" {
-                return Err("Oakley best route is not an exact GHS invariant".into());
-            }
+            // The finding is about the degree-five GHS tower, not about which
+            // route is cheapest: since the measured Jacobian costs (#1983) a
+            // same-field cover undercuts it on Oakley Group 3, so select the
+            // exact GHS route itself rather than the transfer's best route.
+            let route = transfer["routes"]
+                .as_array()
+                .ok_or("Oakley routes absent")?
+                .iter()
+                .filter(|r| {
+                    r["kind"] == "ghs_weil_descent"
+                        && r["evidence"] == "exact_invariant"
+                        && r["invariants"]["relative_degree"] == 5
+                })
+                .filter(|r| r["cost"]["log2_total"].as_f64().is_some())
+                .min_by(|a, b| {
+                    a["cost"]["log2_total"]
+                        .as_f64()
+                        .unwrap()
+                        .total_cmp(&b["cost"]["log2_total"].as_f64().unwrap())
+                })
+                .ok_or("Oakley has no exact degree-five GHS route")?;
             let (
                 expected_degree,
                 expected_b,
