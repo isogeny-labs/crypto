@@ -1,0 +1,20 @@
+{
+  "stack": "spot-experiments",
+  "region": "us-east-2",
+  "parameters": {
+    "WorkRoot": "/srv/experiments/spot-worker",
+    "NodeProject": "/srv/experiments/spot-worker/work",
+    "LifecycleEnabled": "true",
+    "Cutover": "false",
+    "PreserveHostKeys": "false",
+    "IdleSeconds": "1800"
+  },
+  "runtime_digest_file": "runtime.tar.sha256",
+  "spot_quota": {
+    "service_code": "ec2",
+    "quota_code": "L-34B43A08",
+    "minimum_vcpus_during_migration": 64,
+    "vcpus_for_legacy_plus_rebalance_overlap": 96
+  },
+  "phase": "compute-enabled-protected-original"
+}

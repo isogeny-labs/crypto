@@ -51,14 +51,19 @@ fn list_after(s: &str, key: &str) -> Vec<u64> {
     let k = format!("\"{key}\":[");
     let i = s.find(&k).expect(key) + k.len();
     let j = s[i..].find(']').unwrap() + i;
-    s[i..j].split(',').map(|v| v.trim().parse().unwrap()).collect()
+    s[i..j]
+        .split(',')
+        .map(|v| v.trim().parse().unwrap())
+        .collect()
 }
 
 fn read_logs(paths: &[String]) -> Vec<Dec> {
     let mut out = Vec::new();
     for path in paths {
         for line in fs::read_to_string(path).expect("log").lines() {
-            let Some(i) = line.find("LPLOG ") else { continue };
+            let Some(i) = line.find("LPLOG ") else {
+                continue;
+            };
             let s = &line[i + 6..];
             let v = list_after(s, "idx");
             assert_eq!(v.len(), M);
@@ -83,7 +88,9 @@ fn ln_choose(n: usize, k: usize) -> f64 {
     if k > n {
         return f64::NEG_INFINITY;
     }
-    (0..k).map(|i| ((n - i) as f64).ln() - ((i + 1) as f64).ln()).sum()
+    (0..k)
+        .map(|i| ((n - i) as f64).ln() - ((i + 1) as f64).ln())
+        .sum()
 }
 
 /// P(exactly `k` of the six distinct points lie outside F'), `|F| = n`, `|F'| = nf`.
@@ -143,7 +150,13 @@ struct Matching {
 const NONE: usize = usize::MAX;
 impl Matching {
     fn new(cols: usize) -> Matching {
-        Matching { adj: vec![], col_row: vec![NONE; cols], stamp: vec![0; cols], cur: 0, size: 0 }
+        Matching {
+            adj: vec![],
+            col_row: vec![NONE; cols],
+            stamp: vec![0; cols],
+            cur: 0,
+            size: 0,
+        }
     }
     fn dfs(&mut self, r: usize) -> bool {
         for k in 0..self.adj[r].len() {
@@ -251,11 +264,7 @@ impl State {
                         self.rel += 1;
                     }
                 }
-                2 => {
-                    if !self.uf.union(lps[0], lps[1]) {
-                        self.rel += 1;
-                    }
-                }
+                2 => self.rel += usize::from(!self.uf.union(lps[0], lps[1])),
                 _ => {}
             },
             Scheme::Generic => {
@@ -436,7 +445,8 @@ fn cmd_yields(args: &[String]) {
         let mut graph = vec![];
         for &f in &[0.5, 0.7, 0.8, 0.9, 0.95] {
             for scheme in [Scheme::Single, Scheme::Double, Scheme::Generic] {
-                let (mut real, mut model, mut real_t, mut model_t, mut cnt) = (0f64, 0f64, 0f64, 0f64, 0f64);
+                let (mut real, mut model, mut real_t, mut model_t, mut cnt) =
+                    (0f64, 0f64, 0f64, 0f64, 0f64);
                 for ds in seeds.values() {
                     let n = ds[0].base;
                     let nf = ((f * n as f64).round() as usize).clamp(1, n);
@@ -461,7 +471,8 @@ fn cmd_yields(args: &[String]) {
                         let (r, t) = relations_from(&list, n, nf, scheme);
                         real += r as f64;
                         real_t += t as f64;
-                        let sim: Vec<[usize; M]> = (0..list.len()).map(|_| six(&mut rng, n)).collect();
+                        let sim: Vec<[usize; M]> =
+                            (0..list.len()).map(|_| six(&mut rng, n)).collect();
                         let (r, t) = relations_from(&sim, n, nf, scheme);
                         model += r as f64;
                         model_t += t as f64;
@@ -473,8 +484,10 @@ fn cmd_yields(args: &[String]) {
                     "mean_touched_Fprime_real": real_t / cnt, "mean_touched_Fprime_model": model_t / cnt}));
             }
         }
-        report.push(json!({"p": p, "seeds": seeds.len(), "decompositions": group.len(),
-            "uniformity": unif, "yields": rows, "relation_counts": graph}));
+        report.push(
+            json!({"p": p, "seeds": seeds.len(), "decompositions": group.len(),
+            "uniformity": unif, "yields": rows, "relation_counts": graph}),
+        );
     }
     fs::write(&out, serde_json::to_string_pretty(&json!(report)).unwrap()).unwrap();
     println!("wrote {out}");
@@ -514,23 +527,38 @@ fn cmd_curves(args: &[String]) {
         let mean = |v: &[f64]| v.iter().sum::<f64>() / v.len() as f64;
         let sd = |v: &[f64]| {
             let m = mean(v);
-            (v.iter().map(|x| (x - m).powi(2)).sum::<f64>() / (v.len() as f64 - 1.0).max(1.0)).sqrt()
+            (v.iter().map(|x| (x - m).powi(2)).sum::<f64>() / (v.len() as f64 - 1.0).max(1.0))
+                .sqrt()
         };
         let mut rows = vec![];
         for &f in &grid {
             let mut cell = serde_json::Map::new();
             cell.insert("f".into(), json!(f));
-            for (name, scheme) in [("single", Scheme::Single), ("double", Scheme::Double), ("generic", Scheme::Generic)] {
+            for (name, scheme) in [
+                ("single", Scheme::Single),
+                ("double", Scheme::Double),
+                ("generic", Scheme::Generic),
+            ] {
                 // cap: 1-LP needs about f^-5 N; stop at 80 N and report as not reached
                 let cap = 80 * n;
-                let r = if matches!(scheme, Scheme::Generic) { (reps / 3).max(4) } else { reps };
+                let r = if matches!(scheme, Scheme::Generic) {
+                    (reps / 3).max(4)
+                } else {
+                    reps
+                };
                 let v: Vec<f64> = (0..r)
                     .filter_map(|_| trial(n, f, scheme, &mut rng, cap).map(|x| x as f64 / n as f64))
                     .collect();
                 if v.len() == r {
-                    cell.insert(name.into(), json!({"mean": mean(&v), "sd": sd(&v), "reps": r}));
+                    cell.insert(
+                        name.into(),
+                        json!({"mean": mean(&v), "sd": sd(&v), "reps": r}),
+                    );
                 } else {
-                    cell.insert(name.into(), json!({"mean": null, "reps": r, "reached": v.len()}));
+                    cell.insert(
+                        name.into(),
+                        json!({"mean": null, "reps": r, "reached": v.len()}),
+                    );
                 }
             }
             rows.push(Value::Object(cell));
@@ -632,11 +660,14 @@ fn cmd_cost(args: &[String]) {
     let t_ci = (t_hat / decs.sqrt() * 1.96, decs);
     let c_test_101 = c_test_sum / c_test_n;
     let la_const = 16.0 * la_ops_sum / u2_sum; // F_p mults per unknown^2
-    // C_cov growth with p from the pre-#1717 ccov record (ratio), post-#1717 anchor at 101
+                                               // C_cov growth with p from the pre-#1717 ccov record (ratio), post-#1717 anchor at 101
     let old: Value = serde_json::from_str(&fs::read_to_string(&ccov_path).unwrap()).unwrap();
     let mut old_by_p: HashMap<u64, Vec<f64>> = HashMap::new();
     for r in old.as_array().unwrap() {
-        old_by_p.entry(r["p"].as_u64().unwrap()).or_default().push(r["c_cov"]["mean"].as_f64().unwrap());
+        old_by_p
+            .entry(r["p"].as_u64().unwrap())
+            .or_default()
+            .push(r["c_cov"]["mean"].as_f64().unwrap());
     }
     let om = |p: u64| old_by_p[&p].iter().sum::<f64>() / old_by_p[&p].len() as f64;
     let slope_per_log2 = (om(1511) - om(101)) / om(101) / (1511f64 / 101.0).log2();
@@ -647,7 +678,8 @@ fn cmd_cost(args: &[String]) {
             let mut r = 1.0;
             for w in known.windows(2) {
                 if p >= w[0] as f64 && p <= w[1] as f64 {
-                    let t = (p.ln() - (w[0] as f64).ln()) / ((w[1] as f64).ln() - (w[0] as f64).ln());
+                    let t =
+                        (p.ln() - (w[0] as f64).ln()) / ((w[1] as f64).ln() - (w[0] as f64).ln());
                     r = (om(w[0]) * (1.0 - t) + om(w[1]) * t) / om(101);
                 }
             }
@@ -668,15 +700,28 @@ fn cmd_cost(args: &[String]) {
             .as_array()
             .unwrap()
             .iter()
-            .filter_map(|r| r[scheme]["mean"].as_f64().map(|m| (r["f"].as_f64().unwrap(), m)))
+            .filter_map(|r| {
+                r[scheme]["mean"]
+                    .as_f64()
+                    .map(|m| (r["f"].as_f64().unwrap(), m))
+            })
             .collect();
         rows.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
         // f = 1 is the method as run: N + 1 solutions
-        rows.push((1.0, (c["N"].as_f64().unwrap() + 1.0) / c["N"].as_f64().unwrap()));
-        (rows, c["plain"]["mean"].as_f64().unwrap(), c["N"].as_u64().unwrap() as usize)
+        rows.push((
+            1.0,
+            (c["N"].as_f64().unwrap() + 1.0) / c["N"].as_f64().unwrap(),
+        ));
+        (
+            rows,
+            c["plain"]["mean"].as_f64().unwrap(),
+            c["N"].as_u64().unwrap() as usize,
+        )
     };
 
-    let ps: Vec<f64> = vec![101.0, 251.0, 1009.0, 4096.0, 12000.0, 1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e12];
+    let ps: Vec<f64> = vec![
+        101.0, 251.0, 1009.0, 4096.0, 12000.0, 1e5, 1e6, 1e7, 1e8, 1e9, 1e10, 1e12,
+    ];
     let mut table = vec![];
     for &p in &ps {
         let n = p / 2.0;
@@ -699,7 +744,7 @@ fn cmd_cost(args: &[String]) {
                 let u = f * n;
                 let s = x * rel_unit + la_const * u * u;
                 step_no += 1;
-                if step_no % 4 == 0 {
+                if step_no.is_multiple_of(4) {
                     sweep.push(json!({"f": f, "alpha": (u.max(1.0)).ln() / n.ln(), "X_over_N": x / n, "S_over_Sfull": s / s_full}));
                 }
                 if s < best_s {
@@ -742,8 +787,14 @@ fn cmd_cost(args: &[String]) {
         "p_at_LA_share": thresholds,
     });
     fs::write(&out, serde_json::to_string_pretty(&rep).unwrap()).unwrap();
-    println!("{}", serde_json::to_string_pretty(&rep["constants"]).unwrap());
-    println!("{}", serde_json::to_string_pretty(&rep["p_at_LA_share"]).unwrap());
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&rep["constants"]).unwrap()
+    );
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&rep["p_at_LA_share"]).unwrap()
+    );
     println!("wrote {out}");
 }
 
