@@ -113,6 +113,28 @@ class FencingTests(unittest.TestCase):
                 with patch.object(recovery.os,'chown'), self.assertRaises(ValueError):
                     recovery.extract(zipped,root/'extracted')
 
+    def test_archive_root_metadata_cannot_change_private_staging_directory(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);archive=root/'fixture.tar';zipped=root/'fixture.tar.zst'
+            with tarfile.open(archive,'w') as t:
+                directory=tarfile.TarInfo('.')
+                directory.type=tarfile.DIRTYPE
+                directory.mode=0o777
+                directory.uid=1234
+                directory.gid=1234
+                t.addfile(directory)
+                item=tarfile.TarInfo('safe')
+                item.size=1
+                t.addfile(item,io.BytesIO(b'x'))
+            subprocess.run(['zstd','-q',str(archive),'-o',str(zipped)],check=True)
+            target=root/'extracted'
+            with patch.object(recovery.os,'chown') as chown:
+                recovery.extract(zipped,target)
+            self.assertEqual((target.stat().st_mode & 0o777),0o700)
+            self.assertNotIn(str(target),[call.args[0] for call in chown.call_args_list])
+            self.assertEqual((target/'safe').read_bytes(),b'x')
+
     def test_jsonl_completion_rejects_old_partial_and_live_outputs(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);out=root/'stdout';out.write_text('human readable progress\n')
