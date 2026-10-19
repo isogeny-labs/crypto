@@ -71,6 +71,21 @@ fn inventory(root: &Path) -> R<BTreeMap<String, String>> {
     walk(root, root, &mut m)?;
     Ok(m)
 }
+fn retained_panel(manifest: &Value, columns: u64) -> R<()> {
+    let rows = manifest["bases"].as_array().ok_or("panel bases missing")?;
+    require(
+        rows.iter()
+            .filter(|r| {
+                r["a"] == 0
+                    && r["columns"] == columns
+                    && r["policy"] == "public_x_hash"
+                    && r["seed"] == 2026100801u64
+            })
+            .count()
+            == 1,
+        "retained primary hash-policy row missing or ambiguous",
+    )
+}
 fn docker(args: &[&str]) -> R<Output> {
     let out = Command::new("timeout")
         .args(["--kill-after=2s", "15s", "docker"])
@@ -425,6 +440,8 @@ fn audit(dir: &Path) -> R<Value> {
         let wc = read(dir.join("run/config.json"))?;
         require(
             wc["source_commit"] == cfg["source_commit"]
+                && wc["policy"] == "public_x_hash"
+                && wc["seed"] == 2026100801u64
                 && wc["orbit_columns"] == cfg["columns"]
                 && wc["strategy"] == "orbit-chain-s3"
                 && wc["summands"] == 5
@@ -550,6 +567,9 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
     let panel = fs::canonicalize(text(&s, "panel")?)?;
     let fixtures = fs::canonicalize(text(&s, "fixtures")?)?;
     let worker = fs::canonicalize(text(&s, "worker")?)?;
+    if columns != 0 {
+        retained_panel(&read(panel.join("manifest.json"))?, columns)?;
+    }
     require(
         hash(&worker)? == text(&s, "worker_blake3")?
             && hash(std::env::current_exe()?)? == text(&s, "runner_blake3")?,
@@ -639,7 +659,7 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
             "/panel".into(),
             "/fixtures".into(),
             columns.to_string(),
-            "public_x_sequential".into(),
+            "public_x_hash".into(),
             "2026100801".into(),
             "5".into(),
             "1".into(),
@@ -801,6 +821,16 @@ fn main() -> R<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn retained_policy_preflight_rejects_wrong_or_ambiguous_rows() {
+        let row = json!({"a":0,"columns":2048,"policy":"public_x_hash","seed":2026100801u64});
+        retained_panel(&json!({"bases":[row.clone()]}), 2048).unwrap();
+        assert!(retained_panel(&json!({"bases":[row.clone()]}), 4096).is_err());
+        assert!(retained_panel(&json!({"bases":[row.clone(),row.clone()]}), 2048).is_err());
+        let mut wrong = row;
+        wrong["policy"] = json!("public_x_sequential");
+        assert!(retained_panel(&json!({"bases":[wrong]}), 2048).is_err());
+    }
     #[test]
     fn original_group_and_query_forgery() {
         let g = json!(["5402229379304697578719232", "3600185575789834070382019"]);
