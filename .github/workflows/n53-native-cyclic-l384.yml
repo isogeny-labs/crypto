@@ -77,6 +77,7 @@ jobs:
       - name: Build two pinned producers before timing
         run: |
           cp research/sat_factor_base_review_20260908/autolab_n53_native_cyclic_l384_20260929/Cargo.lock Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh
           rustc --version | grep '^rustc 1.93.1 '
           cargo --version | grep '^cargo 1.93.1 '
           python3 research/sat_factor_base_review_20260908/autolab_n53_native_cyclic_l384_20260929/build.py --panel /tmp/n53-native-cyclic-l384-panel
