@@ -1,4 +1,5 @@
-//! Frozen paired transport experiment: see research/isogeny_torsion_fibers_20261012/paired_round/PROTOCOL.md.
+//! Paired transport experiment; see paired_round/REVIEW-20261019.md for the
+//! target-stream correction and the status of the frozen historical records.
 use crypto_lib::cryptanalysis::ic_boundary::{
     rho_walk_with, CountedGroup, GroupOps, NegationClasses, PrimeCurve, PrimePoint, RhoWalk,
 };
@@ -141,8 +142,8 @@ fn targets(curve: &PrimeCurve) -> Vec<PrimePoint> {
     let mut seen = BTreeSet::new();
     while pts.len() < 8 {
         let x = stream.next() % curve.p;
-        let sign = stream.next() & 1;
         if let Some(y0) = curve.sqrt(curve.rhs(x)) {
+            let sign = stream.next() & 1;
             let y = y0.min(curve.p - y0);
             let pt = PrimePoint::affine(x, if sign == 1 && y != 0 { curve.p - y } else { y });
             if seen.insert(curve.key(&pt)) {
@@ -151,6 +152,32 @@ fn targets(curve: &PrimeCurve) -> Vec<PrimePoint> {
         }
     }
     pts
+}
+
+#[cfg(test)]
+mod target_tests {
+    use super::*;
+
+    #[test]
+    fn rejected_abscissa_does_not_consume_a_sign_word() {
+        let curve = PrimeCurve { p: 13, a: 0, b: 2 };
+        let points = targets(&curve);
+        // Protocol target 3 (one-based) distinguishes the lift-then-sign stream from the
+        // historical runner, which consumed a sign even for an unliftable x.
+        assert_eq!(points[2], PrimePoint::affine(5, 7));
+        assert_eq!(points.len(), 8);
+        assert_eq!(
+            points
+                .iter()
+                .map(|p| curve.key(p))
+                .collect::<BTreeSet<_>>()
+                .len(),
+            8
+        );
+        assert!(points
+            .iter()
+            .all(|p| !p.infinity && curve.rhs(p.x) == mul(p.y, p.y, curve.p)));
+    }
 }
 
 fn factor_base(curve: &PrimeCurve, size: usize, out: &mut Solve) -> Vec<PrimePoint> {

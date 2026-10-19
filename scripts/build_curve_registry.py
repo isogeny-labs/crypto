@@ -489,7 +489,10 @@ def harvest_curve_records(reg: Registry) -> None:
     """EC1 records the threads keep (curve_records.json, written by
     examples/koblitz_curve_records.rs): each is one exact representation,
     taken verbatim so its UID is the thread's."""
-    for path in tracked("*curve_records.json"):
+    # Some frozen studies retained the complete EC1 record in curve_ids.json
+    # but their separate curve_records.json contains a different curve set.
+    # Read both shapes rather than dropping a recorded representation.
+    for path in tracked("*curve_records.json", "*curve_ids.json"):
         rel = str(path.relative_to(REPO))
         try:
             doc = json.loads(path.read_text())
@@ -501,6 +504,10 @@ def harvest_curve_records(reg: Registry) -> None:
             if (f.get("characteristic") != 2 or not isinstance(coeff, list) or len(coeff) != 5
                     or coeff[0] != 1 or coeff[2] or coeff[3] or not order):
                 continue
+            curve = {k: v for k, v in c.items() if k != "curve_id"}
+            identity = ec1.curve_identity(f, curve, "x")
+            if rec.get("curve_uid") is not None and rec["curve_uid"] != identity["curve_uid"]:
+                raise ValueError(f"{rel}: recorded curve UID does not match its field/curve record")
             m = f["degree"]
             modulus = sum(1 << e for e in f["modulus_exponents"])
             a, b = coeff[1], coeff[4]
@@ -510,7 +517,7 @@ def harvest_curve_records(reg: Registry) -> None:
                       if koblitz else {"m": m, "modulus": cid._hex(modulus), "a": cid._hex(a), "b": cid._hex(b)})
             reg.add(ident, "koblitz" if koblitz else "binary", params, rel,
                     koblitz_aliases(a, m) if koblitz else [])
-            reg.represent(ident, f, {k: v for k, v in c.items() if k != "curve_id"}, rel)
+            reg.represent(ident, f, curve, rel)
 
 
 def harvest_bench(reg: Registry) -> None:

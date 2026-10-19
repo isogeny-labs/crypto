@@ -2,7 +2,7 @@
   "schema": "jacobian-transfers/2",
   "generated_by": "cargo run --release --bin jacobian_transfers -- build",
   "what_this_is": "Every known route from each registered curve's discrete logarithm into a Jacobian, priced by one frozen formula-level cost model against Pollard rho on the same subgroup; see docs/curves/JACOBIAN_TRANSFERS.md. Rows are formulas and leads, never measurements or security claims.",
-  "registry_sha256": "5f5482683b51d5c3f6b4be52316d9a83db33607c52edbb415b3ea2bcfe12e7c7",
+  "registry_sha256": "d7e183d9c5c62c326c0bc240660bc4e690caa55a725d3b8e251b0fa5f678fd8a",
   "factor_budget": 200000,
   "cost_model": {
     "karatsuba_exponent": 1.585,
@@ -43095,175 +43095,6 @@
       ]
     },
     {
-      "slug": "icv1-fp8-tm1-1ed3feb7",
-      "icv1": "ICV1:fp-223:-1:225:13:unk:unk:r:1ed3feb75d9f",
-      "standard_names": [],
-      "family": "prime",
-      "field": {
-        "kind": "prime",
-        "degree": 1,
-        "log2_size": 7.801,
-        "log2_base": 7.801
-      },
-      "trace": "-1",
-      "subgroup": {
-        "order": "5",
-        "bits": 2.322,
-        "status": "largest_prime_of_order"
-      },
-      "reference_log2": 9.007,
-      "verdict": "boundary",
-      "best_route": 0,
-      "routes": [
-        {
-          "kind": "same_field_cover",
-          "label": "same-field genus-2 cover H -> E of degree 2 over GF(p) (prime_quadratic_pullback_v1)",
-          "evidence": "construction",
-          "invariants": {
-            "construction": "docs/curves/COVERS.md prime characteristic > 3",
-            "map_degree": 2
-          },
-          "destination": {
-            "object": "Jac(C)",
-            "genus": "2",
-            "log2_genus": 1.0,
-            "field_bits": 7.801,
-            "log2_order": 15.602
-          },
-          "transport": "carried_if_coprime_to_degree",
-          "cost": {
-            "log2_search": null,
-            "log2_transfer": 9.019,
-            "destination": {
-              "solver": "rho_on_jacobian",
-              "log2_cost": 13.048,
-              "log2_leading": 1.161,
-              "considered": [
-                [
-                  "rho_on_jacobian",
-                  13.048
-                ],
-                [
-                  "hyperelliptic_index_calculus",
-                  22.447
-                ],
-                [
-                  "enge_gaudry_smoothness",
-                  19.993
-                ]
-              ],
-              "enge_gaudry_hypothesis_holds": false
-            },
-            "log2_total": 13.134,
-            "ratio_log2": -4.128,
-            "exponent_ratio_log2": 0.0
-          },
-          "class": "boundary",
-          "notes": [
-            "the Jacobian over the same field is larger than E: its best solver is rho or q^(2-2/g) index calculus, both at or above rho on E"
-          ]
-        },
-        {
-          "kind": "base_change_descent",
-          "label": "base change to GF(p^2) then descent to a genus-2 cover over GF(p)",
-          "evidence": "proposed",
-          "invariants": {
-            "extension_degree": 2,
-            "genus_lower_bound": 2
-          },
-          "destination": {
-            "object": "Jac(C)",
-            "genus": "2",
-            "log2_genus": 1.0,
-            "field_bits": 7.801,
-            "log2_order": 15.602
-          },
-          "transport": "same_group",
-          "cost": {
-            "log2_search": null,
-            "log2_transfer": 9.019,
-            "destination": {
-              "solver": "rho_on_jacobian",
-              "log2_cost": 13.048,
-              "log2_leading": 1.161,
-              "considered": [
-                [
-                  "rho_on_jacobian",
-                  13.048
-                ],
-                [
-                  "hyperelliptic_index_calculus",
-                  22.447
-                ],
-                [
-                  "enge_gaudry_smoothness",
-                  19.993
-                ]
-              ],
-              "enge_gaudry_hypothesis_holds": false
-            },
-            "log2_total": 13.134,
-            "ratio_log2": -4.128,
-            "exponent_ratio_log2": 0.0
-          },
-          "class": "boundary",
-          "notes": [
-            "GF(p) has no proper subfield; any descent must first base-change, and a cover over GF(p) of the Weil restriction has genus >= k (existence for this curve not established)",
-            "priced at the most favourable genus the literature allows, g = k, so the row is a lower bound on the route"
-          ]
-        },
-        {
-          "kind": "base_change_descent",
-          "label": "base change to GF(p^3) then descent to a genus-3 cover over GF(p)",
-          "evidence": "proposed",
-          "invariants": {
-            "extension_degree": 3,
-            "genus_lower_bound": 3
-          },
-          "destination": {
-            "object": "Jac(C)",
-            "genus": "3",
-            "log2_genus": 1.585,
-            "field_bits": 7.801,
-            "log2_order": 23.403
-          },
-          "transport": "same_group",
-          "cost": {
-            "log2_search": null,
-            "log2_transfer": 9.604,
-            "destination": {
-              "solver": "rho_on_jacobian",
-              "log2_cost": 14.089,
-              "log2_leading": 1.161,
-              "considered": [
-                [
-                  "rho_on_jacobian",
-                  14.089
-                ],
-                [
-                  "hyperelliptic_index_calculus",
-                  26.823
-                ],
-                [
-                  "enge_gaudry_smoothness",
-                  22.503
-                ]
-              ],
-              "enge_gaudry_hypothesis_holds": false
-            },
-            "log2_total": 14.152,
-            "ratio_log2": -5.145,
-            "exponent_ratio_log2": 0.0
-          },
-          "class": "boundary",
-          "notes": [
-            "GF(p) has no proper subfield; any descent must first base-change, and a cover over GF(p) of the Weil restriction has genus >= k (existence for this curve not established)",
-            "priced at the most favourable genus the literature allows, g = k, so the row is a lower bound on the route"
-          ]
-        }
-      ]
-    },
-    {
       "slug": "icv1-fp8-tm11-7caf6b43",
       "icv1": "ICV1:fp-199:-11:211:0:unk:unk:r:7caf6b4364e5",
       "standard_names": [],
@@ -43591,6 +43422,175 @@
             },
             "log2_total": 16.749,
             "ratio_log2": -5.092,
+            "exponent_ratio_log2": 0.0
+          },
+          "class": "boundary",
+          "notes": [
+            "GF(p) has no proper subfield; any descent must first base-change, and a cover over GF(p) of the Weil restriction has genus >= k (existence for this curve not established)",
+            "priced at the most favourable genus the literature allows, g = k, so the row is a lower bound on the route"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "icv1-fp8-tm1-1ed3feb7",
+      "icv1": "ICV1:fp-223:-1:225:13:unk:unk:r:1ed3feb75d9f",
+      "standard_names": [],
+      "family": "prime",
+      "field": {
+        "kind": "prime",
+        "degree": 1,
+        "log2_size": 7.801,
+        "log2_base": 7.801
+      },
+      "trace": "-1",
+      "subgroup": {
+        "order": "5",
+        "bits": 2.322,
+        "status": "largest_prime_of_order"
+      },
+      "reference_log2": 9.007,
+      "verdict": "boundary",
+      "best_route": 0,
+      "routes": [
+        {
+          "kind": "same_field_cover",
+          "label": "same-field genus-2 cover H -> E of degree 2 over GF(p) (prime_quadratic_pullback_v1)",
+          "evidence": "construction",
+          "invariants": {
+            "construction": "docs/curves/COVERS.md prime characteristic > 3",
+            "map_degree": 2
+          },
+          "destination": {
+            "object": "Jac(C)",
+            "genus": "2",
+            "log2_genus": 1.0,
+            "field_bits": 7.801,
+            "log2_order": 15.602
+          },
+          "transport": "carried_if_coprime_to_degree",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": 9.019,
+            "destination": {
+              "solver": "rho_on_jacobian",
+              "log2_cost": 13.048,
+              "log2_leading": 1.161,
+              "considered": [
+                [
+                  "rho_on_jacobian",
+                  13.048
+                ],
+                [
+                  "hyperelliptic_index_calculus",
+                  22.447
+                ],
+                [
+                  "enge_gaudry_smoothness",
+                  19.993
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 13.134,
+            "ratio_log2": -4.128,
+            "exponent_ratio_log2": 0.0
+          },
+          "class": "boundary",
+          "notes": [
+            "the Jacobian over the same field is larger than E: its best solver is rho or q^(2-2/g) index calculus, both at or above rho on E"
+          ]
+        },
+        {
+          "kind": "base_change_descent",
+          "label": "base change to GF(p^2) then descent to a genus-2 cover over GF(p)",
+          "evidence": "proposed",
+          "invariants": {
+            "extension_degree": 2,
+            "genus_lower_bound": 2
+          },
+          "destination": {
+            "object": "Jac(C)",
+            "genus": "2",
+            "log2_genus": 1.0,
+            "field_bits": 7.801,
+            "log2_order": 15.602
+          },
+          "transport": "same_group",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": 9.019,
+            "destination": {
+              "solver": "rho_on_jacobian",
+              "log2_cost": 13.048,
+              "log2_leading": 1.161,
+              "considered": [
+                [
+                  "rho_on_jacobian",
+                  13.048
+                ],
+                [
+                  "hyperelliptic_index_calculus",
+                  22.447
+                ],
+                [
+                  "enge_gaudry_smoothness",
+                  19.993
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 13.134,
+            "ratio_log2": -4.128,
+            "exponent_ratio_log2": 0.0
+          },
+          "class": "boundary",
+          "notes": [
+            "GF(p) has no proper subfield; any descent must first base-change, and a cover over GF(p) of the Weil restriction has genus >= k (existence for this curve not established)",
+            "priced at the most favourable genus the literature allows, g = k, so the row is a lower bound on the route"
+          ]
+        },
+        {
+          "kind": "base_change_descent",
+          "label": "base change to GF(p^3) then descent to a genus-3 cover over GF(p)",
+          "evidence": "proposed",
+          "invariants": {
+            "extension_degree": 3,
+            "genus_lower_bound": 3
+          },
+          "destination": {
+            "object": "Jac(C)",
+            "genus": "3",
+            "log2_genus": 1.585,
+            "field_bits": 7.801,
+            "log2_order": 23.403
+          },
+          "transport": "same_group",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": 9.604,
+            "destination": {
+              "solver": "rho_on_jacobian",
+              "log2_cost": 14.089,
+              "log2_leading": 1.161,
+              "considered": [
+                [
+                  "rho_on_jacobian",
+                  14.089
+                ],
+                [
+                  "hyperelliptic_index_calculus",
+                  26.823
+                ],
+                [
+                  "enge_gaudry_smoothness",
+                  22.503
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 14.152,
+            "ratio_log2": -5.145,
             "exponent_ratio_log2": 0.0
           },
           "class": "boundary",
@@ -49700,7 +49700,7 @@
       "subgroup": {
         "order": "342833",
         "bits": 18.387,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 19.0,
       "verdict": "boundary",
@@ -49869,7 +49869,7 @@
       "subgroup": {
         "order": "342833",
         "bits": 18.387,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 19.0,
       "verdict": "boundary",
@@ -54263,7 +54263,7 @@
       "subgroup": {
         "order": "1579297",
         "bits": 20.591,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 20.361,
       "verdict": "boundary",
@@ -54432,7 +54432,7 @@
       "subgroup": {
         "order": "1579297",
         "bits": 20.591,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 20.361,
       "verdict": "boundary",
@@ -112906,7 +112906,7 @@
       "subgroup": {
         "order": "5325000430993249",
         "bits": 52.242,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.315,
       "verdict": "boundary",
@@ -113075,7 +113075,7 @@
       "subgroup": {
         "order": "5325000430993249",
         "bits": 52.242,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.315,
       "verdict": "boundary",
@@ -113244,7 +113244,7 @@
       "subgroup": {
         "order": "5329566926474017",
         "bits": 52.243,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.316,
       "verdict": "boundary",
@@ -113413,7 +113413,7 @@
       "subgroup": {
         "order": "5329566926474017",
         "bits": 52.243,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.316,
       "verdict": "boundary",
@@ -113582,7 +113582,7 @@
       "subgroup": {
         "order": "5335003567636577",
         "bits": 52.244,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.316,
       "verdict": "boundary",
@@ -113751,7 +113751,7 @@
       "subgroup": {
         "order": "5335003567636577",
         "bits": 52.244,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.316,
       "verdict": "boundary",
@@ -113920,7 +113920,7 @@
       "subgroup": {
         "order": "5338626303715217",
         "bits": 52.245,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.317,
       "verdict": "boundary",
@@ -114089,7 +114089,7 @@
       "subgroup": {
         "order": "5338626303715217",
         "bits": 52.245,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.317,
       "verdict": "boundary",
@@ -114258,7 +114258,7 @@
       "subgroup": {
         "order": "5345146059579409",
         "bits": 52.247,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.318,
       "verdict": "boundary",
@@ -114427,7 +114427,7 @@
       "subgroup": {
         "order": "5345146059579409",
         "bits": 52.247,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.318,
       "verdict": "boundary",
@@ -114596,7 +114596,7 @@
       "subgroup": {
         "order": "5349150641031697",
         "bits": 52.248,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.318,
       "verdict": "boundary",
@@ -114765,7 +114765,7 @@
       "subgroup": {
         "order": "5349150641031697",
         "bits": 52.248,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.318,
       "verdict": "boundary",
@@ -114934,7 +114934,7 @@
       "subgroup": {
         "order": "5353453744137313",
         "bits": 52.249,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.319,
       "verdict": "boundary",
@@ -115103,7 +115103,7 @@
       "subgroup": {
         "order": "5353453744137313",
         "bits": 52.249,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.319,
       "verdict": "boundary",
@@ -115272,7 +115272,7 @@
       "subgroup": {
         "order": "5358535456803857",
         "bits": 52.251,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.32,
       "verdict": "boundary",
@@ -115441,7 +115441,7 @@
       "subgroup": {
         "order": "5358535456803857",
         "bits": 52.251,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.32,
       "verdict": "boundary",
@@ -115610,7 +115610,7 @@
       "subgroup": {
         "order": "5363297015484257",
         "bits": 52.252,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.321,
       "verdict": "boundary",
@@ -115779,7 +115779,7 @@
       "subgroup": {
         "order": "5363297015484257",
         "bits": 52.252,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.321,
       "verdict": "boundary",
@@ -115948,7 +115948,7 @@
       "subgroup": {
         "order": "5368688617364257",
         "bits": 52.253,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.321,
       "verdict": "boundary",
@@ -116117,7 +116117,7 @@
       "subgroup": {
         "order": "5368688617364257",
         "bits": 52.253,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.321,
       "verdict": "boundary",
@@ -116286,7 +116286,7 @@
       "subgroup": {
         "order": "5629830654216971",
         "bits": 52.322,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.359,
       "verdict": "boundary",
@@ -116455,7 +116455,7 @@
       "subgroup": {
         "order": "5629830654216971",
         "bits": 52.322,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.359,
       "verdict": "boundary",
@@ -116624,7 +116624,7 @@
       "subgroup": {
         "order": "5629830654216971",
         "bits": 52.322,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.359,
       "verdict": "boundary",
@@ -116793,7 +116793,7 @@
       "subgroup": {
         "order": "5629830654216971",
         "bits": 52.322,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.359,
       "verdict": "boundary",
@@ -116962,7 +116962,7 @@
       "subgroup": {
         "order": "5634268897169963",
         "bits": 52.323,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.359,
       "verdict": "boundary",
@@ -117131,7 +117131,7 @@
       "subgroup": {
         "order": "5634268897169963",
         "bits": 52.323,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.359,
       "verdict": "boundary",
@@ -117300,7 +117300,7 @@
       "subgroup": {
         "order": "5644895021199883",
         "bits": 52.326,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.361,
       "verdict": "boundary",
@@ -117469,7 +117469,7 @@
       "subgroup": {
         "order": "5644895021199883",
         "bits": 52.326,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.361,
       "verdict": "boundary",
@@ -117638,7 +117638,7 @@
       "subgroup": {
         "order": "5652826127785451",
         "bits": 52.328,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.362,
       "verdict": "boundary",
@@ -117807,7 +117807,7 @@
       "subgroup": {
         "order": "5652826127785451",
         "bits": 52.328,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.362,
       "verdict": "boundary",
@@ -117976,7 +117976,7 @@
       "subgroup": {
         "order": "5673227297036011",
         "bits": 52.333,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.365,
       "verdict": "boundary",
@@ -118145,7 +118145,7 @@
       "subgroup": {
         "order": "5673227297036011",
         "bits": 52.333,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.365,
       "verdict": "boundary",
@@ -118314,7 +118314,7 @@
       "subgroup": {
         "order": "5680230443139883",
         "bits": 52.335,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.366,
       "verdict": "boundary",
@@ -118483,7 +118483,7 @@
       "subgroup": {
         "order": "5680230443139883",
         "bits": 52.335,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.366,
       "verdict": "boundary",
@@ -118652,7 +118652,7 @@
       "subgroup": {
         "order": "5697485802290731",
         "bits": 52.339,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.368,
       "verdict": "boundary",
@@ -118821,7 +118821,7 @@
       "subgroup": {
         "order": "5697485802290731",
         "bits": 52.339,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.368,
       "verdict": "boundary",
@@ -118990,7 +118990,7 @@
       "subgroup": {
         "order": "5707159099014283",
         "bits": 52.342,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.37,
       "verdict": "boundary",
@@ -119159,7 +119159,7 @@
       "subgroup": {
         "order": "5707159099014283",
         "bits": 52.342,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.37,
       "verdict": "boundary",
@@ -119328,7 +119328,7 @@
       "subgroup": {
         "order": "5731515695764811",
         "bits": 52.348,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.373,
       "verdict": "boundary",
@@ -119497,7 +119497,7 @@
       "subgroup": {
         "order": "5731515695764811",
         "bits": 52.348,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.373,
       "verdict": "boundary",
@@ -119666,7 +119666,7 @@
       "subgroup": {
         "order": "5750662274380843",
         "bits": 52.353,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.375,
       "verdict": "boundary",
@@ -119835,7 +119835,7 @@
       "subgroup": {
         "order": "5750662274380843",
         "bits": 52.353,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.375,
       "verdict": "boundary",
@@ -120004,7 +120004,7 @@
       "subgroup": {
         "order": "5750662274380843",
         "bits": 52.353,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.375,
       "verdict": "boundary",
@@ -120173,7 +120173,7 @@
       "subgroup": {
         "order": "5750662274380843",
         "bits": 52.353,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.375,
       "verdict": "boundary",
@@ -120342,7 +120342,7 @@
       "subgroup": {
         "order": "5750662274380843",
         "bits": 52.353,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.375,
       "verdict": "boundary",
@@ -120511,7 +120511,7 @@
       "subgroup": {
         "order": "5750662274380843",
         "bits": 52.353,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.375,
       "verdict": "boundary",
@@ -120680,7 +120680,7 @@
       "subgroup": {
         "order": "5752086733898443",
         "bits": 52.353,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.375,
       "verdict": "boundary",
@@ -120849,7 +120849,7 @@
       "subgroup": {
         "order": "5752086733898443",
         "bits": 52.353,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.375,
       "verdict": "boundary",
@@ -121018,7 +121018,7 @@
       "subgroup": {
         "order": "5759069135396683",
         "bits": 52.355,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.377,
       "verdict": "boundary",
@@ -121187,7 +121187,7 @@
       "subgroup": {
         "order": "5759069135396683",
         "bits": 52.355,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.377,
       "verdict": "boundary",
@@ -121356,7 +121356,7 @@
       "subgroup": {
         "order": "5765884620356491",
         "bits": 52.356,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.377,
       "verdict": "boundary",
@@ -121525,7 +121525,7 @@
       "subgroup": {
         "order": "5765884620356491",
         "bits": 52.356,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.377,
       "verdict": "boundary",
@@ -121694,7 +121694,7 @@
       "subgroup": {
         "order": "5770050037772203",
         "bits": 52.358,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.378,
       "verdict": "boundary",
@@ -121863,7 +121863,7 @@
       "subgroup": {
         "order": "5770050037772203",
         "bits": 52.358,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.378,
       "verdict": "boundary",
@@ -122032,7 +122032,7 @@
       "subgroup": {
         "order": "5770050037772203",
         "bits": 52.358,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.378,
       "verdict": "boundary",
@@ -122201,7 +122201,7 @@
       "subgroup": {
         "order": "5770050037772203",
         "bits": 52.358,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.378,
       "verdict": "boundary",
@@ -122370,7 +122370,7 @@
       "subgroup": {
         "order": "5770050037772203",
         "bits": 52.358,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.378,
       "verdict": "boundary",
@@ -122539,7 +122539,7 @@
       "subgroup": {
         "order": "5770050037772203",
         "bits": 52.358,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.378,
       "verdict": "boundary",
@@ -122708,7 +122708,7 @@
       "subgroup": {
         "order": "5773969565750891",
         "bits": 52.358,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.378,
       "verdict": "boundary",
@@ -122877,7 +122877,7 @@
       "subgroup": {
         "order": "5773969565750891",
         "bits": 52.358,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.378,
       "verdict": "boundary",
@@ -123046,7 +123046,7 @@
       "subgroup": {
         "order": "5780441600434411",
         "bits": 52.36,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.379,
       "verdict": "boundary",
@@ -123215,7 +123215,7 @@
       "subgroup": {
         "order": "5780441600434411",
         "bits": 52.36,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.379,
       "verdict": "boundary",
@@ -123384,7 +123384,7 @@
       "subgroup": {
         "order": "5788279514859563",
         "bits": 52.362,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.38,
       "verdict": "boundary",
@@ -123553,7 +123553,7 @@
       "subgroup": {
         "order": "5788279514859563",
         "bits": 52.362,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.38,
       "verdict": "boundary",
@@ -123722,7 +123722,7 @@
       "subgroup": {
         "order": "5793730136163691",
         "bits": 52.363,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.381,
       "verdict": "boundary",
@@ -123891,7 +123891,7 @@
       "subgroup": {
         "order": "5793730136163691",
         "bits": 52.363,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.381,
       "verdict": "boundary",
@@ -124060,7 +124060,7 @@
       "subgroup": {
         "order": "5794302028303531",
         "bits": 52.364,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.381,
       "verdict": "boundary",
@@ -124229,7 +124229,7 @@
       "subgroup": {
         "order": "5794302028303531",
         "bits": 52.364,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.381,
       "verdict": "boundary",
@@ -124398,7 +124398,7 @@
       "subgroup": {
         "order": "5796761486117323",
         "bits": 52.364,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.381,
       "verdict": "boundary",
@@ -124567,7 +124567,7 @@
       "subgroup": {
         "order": "5796761486117323",
         "bits": 52.364,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.381,
       "verdict": "boundary",
@@ -124736,7 +124736,7 @@
       "subgroup": {
         "order": "5797073381559851",
         "bits": 52.364,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.381,
       "verdict": "boundary",
@@ -124905,7 +124905,7 @@
       "subgroup": {
         "order": "5797073381559851",
         "bits": 52.364,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.381,
       "verdict": "boundary",
@@ -125074,7 +125074,7 @@
       "subgroup": {
         "order": "5799790904230091",
         "bits": 52.365,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.382,
       "verdict": "boundary",
@@ -125243,7 +125243,7 @@
       "subgroup": {
         "order": "5799790904230091",
         "bits": 52.365,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.382,
       "verdict": "boundary",
@@ -125412,7 +125412,7 @@
       "subgroup": {
         "order": "5811841484570603",
         "bits": 52.368,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.384,
       "verdict": "boundary",
@@ -125581,7 +125581,7 @@
       "subgroup": {
         "order": "5811841484570603",
         "bits": 52.368,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.384,
       "verdict": "boundary",
@@ -125750,7 +125750,7 @@
       "subgroup": {
         "order": "5816198089174411",
         "bits": 52.369,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.384,
       "verdict": "boundary",
@@ -125919,7 +125919,7 @@
       "subgroup": {
         "order": "5816198089174411",
         "bits": 52.369,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.384,
       "verdict": "boundary",
@@ -126088,7 +126088,7 @@
       "subgroup": {
         "order": "5816198089174411",
         "bits": 52.369,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.384,
       "verdict": "boundary",
@@ -126257,7 +126257,7 @@
       "subgroup": {
         "order": "5816198089174411",
         "bits": 52.369,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.384,
       "verdict": "boundary",
@@ -126426,7 +126426,7 @@
       "subgroup": {
         "order": "5816198089174411",
         "bits": 52.369,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.384,
       "verdict": "boundary",
@@ -126595,7 +126595,7 @@
       "subgroup": {
         "order": "5816198089174411",
         "bits": 52.369,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.384,
       "verdict": "boundary",
@@ -126764,7 +126764,7 @@
       "subgroup": {
         "order": "5823895014951691",
         "bits": 52.371,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.385,
       "verdict": "boundary",
@@ -126933,7 +126933,7 @@
       "subgroup": {
         "order": "5823895014951691",
         "bits": 52.371,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.385,
       "verdict": "boundary",
@@ -127102,7 +127102,7 @@
       "subgroup": {
         "order": "5845552809230891",
         "bits": 52.376,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.388,
       "verdict": "boundary",
@@ -127271,7 +127271,7 @@
       "subgroup": {
         "order": "5845552809230891",
         "bits": 52.376,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.388,
       "verdict": "boundary",
@@ -127440,7 +127440,7 @@
       "subgroup": {
         "order": "5854016403076043",
         "bits": 52.378,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.389,
       "verdict": "boundary",
@@ -127609,7 +127609,7 @@
       "subgroup": {
         "order": "5854016403076043",
         "bits": 52.378,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.389,
       "verdict": "boundary",
@@ -127778,7 +127778,7 @@
       "subgroup": {
         "order": "5857765818072491",
         "bits": 52.379,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.39,
       "verdict": "boundary",
@@ -127947,7 +127947,7 @@
       "subgroup": {
         "order": "5857765818072491",
         "bits": 52.379,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.39,
       "verdict": "boundary",
@@ -128116,7 +128116,7 @@
       "subgroup": {
         "order": "5858012261967851",
         "bits": 52.379,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.39,
       "verdict": "boundary",
@@ -128285,7 +128285,7 @@
       "subgroup": {
         "order": "5858012261967851",
         "bits": 52.379,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.39,
       "verdict": "boundary",
@@ -128454,7 +128454,7 @@
       "subgroup": {
         "order": "5858903610667883",
         "bits": 52.38,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.39,
       "verdict": "boundary",
@@ -128623,7 +128623,7 @@
       "subgroup": {
         "order": "5858903610667883",
         "bits": 52.38,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.39,
       "verdict": "boundary",
@@ -128792,7 +128792,7 @@
       "subgroup": {
         "order": "5871821393772011",
         "bits": 52.383,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.392,
       "verdict": "boundary",
@@ -128961,7 +128961,7 @@
       "subgroup": {
         "order": "5871821393772011",
         "bits": 52.383,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.392,
       "verdict": "boundary",
@@ -129130,7 +129130,7 @@
       "subgroup": {
         "order": "5871939279719563",
         "bits": 52.383,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.392,
       "verdict": "boundary",
@@ -129299,7 +129299,7 @@
       "subgroup": {
         "order": "5871939279719563",
         "bits": 52.383,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.392,
       "verdict": "boundary",
@@ -129468,7 +129468,7 @@
       "subgroup": {
         "order": "5885976156668651",
         "bits": 52.386,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.393,
       "verdict": "boundary",
@@ -129637,7 +129637,7 @@
       "subgroup": {
         "order": "5885976156668651",
         "bits": 52.386,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.393,
       "verdict": "boundary",
@@ -129806,7 +129806,7 @@
       "subgroup": {
         "order": "5893796006143723",
         "bits": 52.388,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.395,
       "verdict": "boundary",
@@ -129975,7 +129975,7 @@
       "subgroup": {
         "order": "5893796006143723",
         "bits": 52.388,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.395,
       "verdict": "boundary",
@@ -130144,7 +130144,7 @@
       "subgroup": {
         "order": "5899199895014411",
         "bits": 52.389,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.395,
       "verdict": "boundary",
@@ -130313,7 +130313,7 @@
       "subgroup": {
         "order": "5899199895014411",
         "bits": 52.389,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.395,
       "verdict": "boundary",
@@ -130482,7 +130482,7 @@
       "subgroup": {
         "order": "5899199895014411",
         "bits": 52.389,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.395,
       "verdict": "boundary",
@@ -130651,7 +130651,7 @@
       "subgroup": {
         "order": "5899199895014411",
         "bits": 52.389,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.395,
       "verdict": "boundary",
@@ -130820,7 +130820,7 @@
       "subgroup": {
         "order": "5899199895014411",
         "bits": 52.389,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.395,
       "verdict": "boundary",
@@ -130989,7 +130989,7 @@
       "subgroup": {
         "order": "5899199895014411",
         "bits": 52.389,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.395,
       "verdict": "boundary",
@@ -131158,7 +131158,7 @@
       "subgroup": {
         "order": "5900575301078443",
         "bits": 52.39,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.396,
       "verdict": "boundary",
@@ -131327,7 +131327,7 @@
       "subgroup": {
         "order": "5900575301078443",
         "bits": 52.39,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.396,
       "verdict": "boundary",
@@ -131496,7 +131496,7 @@
       "subgroup": {
         "order": "5905597374872971",
         "bits": 52.391,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.396,
       "verdict": "boundary",
@@ -131665,7 +131665,7 @@
       "subgroup": {
         "order": "5905597374872971",
         "bits": 52.391,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.396,
       "verdict": "boundary",
@@ -131834,7 +131834,7 @@
       "subgroup": {
         "order": "5912219769939083",
         "bits": 52.393,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.397,
       "verdict": "boundary",
@@ -132003,7 +132003,7 @@
       "subgroup": {
         "order": "5912219769939083",
         "bits": 52.393,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.397,
       "verdict": "boundary",
@@ -132172,7 +132172,7 @@
       "subgroup": {
         "order": "5912219769939083",
         "bits": 52.393,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.397,
       "verdict": "boundary",
@@ -132341,7 +132341,7 @@
       "subgroup": {
         "order": "5912219769939083",
         "bits": 52.393,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.397,
       "verdict": "boundary",
@@ -132510,7 +132510,7 @@
       "subgroup": {
         "order": "5912219769939083",
         "bits": 52.393,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.397,
       "verdict": "boundary",
@@ -132679,7 +132679,7 @@
       "subgroup": {
         "order": "5912219769939083",
         "bits": 52.393,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.397,
       "verdict": "boundary",
@@ -132848,7 +132848,7 @@
       "subgroup": {
         "order": "5923868833233163",
         "bits": 52.395,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.398,
       "verdict": "boundary",
@@ -133017,7 +133017,7 @@
       "subgroup": {
         "order": "5923868833233163",
         "bits": 52.395,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.398,
       "verdict": "boundary",
@@ -133186,7 +133186,7 @@
       "subgroup": {
         "order": "5926960201178603",
         "bits": 52.396,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.399,
       "verdict": "boundary",
@@ -133355,7 +133355,7 @@
       "subgroup": {
         "order": "5926960201178603",
         "bits": 52.396,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.399,
       "verdict": "boundary",
@@ -133524,7 +133524,7 @@
       "subgroup": {
         "order": "5935658910784651",
         "bits": 52.398,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.4,
       "verdict": "boundary",
@@ -133693,7 +133693,7 @@
       "subgroup": {
         "order": "5935658910784651",
         "bits": 52.398,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.4,
       "verdict": "boundary",
@@ -133862,7 +133862,7 @@
       "subgroup": {
         "order": "5936452775430283",
         "bits": 52.399,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.4,
       "verdict": "boundary",
@@ -134031,7 +134031,7 @@
       "subgroup": {
         "order": "5936452775430283",
         "bits": 52.399,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.4,
       "verdict": "boundary",
@@ -134200,7 +134200,7 @@
       "subgroup": {
         "order": "5937685024650091",
         "bits": 52.399,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.4,
       "verdict": "boundary",
@@ -134369,7 +134369,7 @@
       "subgroup": {
         "order": "5937685024650091",
         "bits": 52.399,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.4,
       "verdict": "boundary",
@@ -134538,7 +134538,7 @@
       "subgroup": {
         "order": "5939318572215211",
         "bits": 52.399,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.4,
       "verdict": "boundary",
@@ -134707,7 +134707,7 @@
       "subgroup": {
         "order": "5939318572215211",
         "bits": 52.399,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.4,
       "verdict": "boundary",
@@ -134876,7 +134876,7 @@
       "subgroup": {
         "order": "5946442637227723",
         "bits": 52.401,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.402,
       "verdict": "boundary",
@@ -135045,7 +135045,7 @@
       "subgroup": {
         "order": "5946442637227723",
         "bits": 52.401,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.402,
       "verdict": "boundary",
@@ -135214,7 +135214,7 @@
       "subgroup": {
         "order": "5947482782363051",
         "bits": 52.401,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.402,
       "verdict": "boundary",
@@ -135383,7 +135383,7 @@
       "subgroup": {
         "order": "5947482782363051",
         "bits": 52.401,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.402,
       "verdict": "boundary",
@@ -135552,7 +135552,7 @@
       "subgroup": {
         "order": "5947697996161643",
         "bits": 52.401,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.402,
       "verdict": "boundary",
@@ -135721,7 +135721,7 @@
       "subgroup": {
         "order": "5947697996161643",
         "bits": 52.401,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.402,
       "verdict": "boundary",
@@ -135890,7 +135890,7 @@
       "subgroup": {
         "order": "5947697996161643",
         "bits": 52.401,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.402,
       "verdict": "boundary",
@@ -136059,7 +136059,7 @@
       "subgroup": {
         "order": "5947697996161643",
         "bits": 52.401,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.402,
       "verdict": "boundary",
@@ -136228,7 +136228,7 @@
       "subgroup": {
         "order": "5947697996161643",
         "bits": 52.401,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.402,
       "verdict": "boundary",
@@ -136397,7 +136397,7 @@
       "subgroup": {
         "order": "5947697996161643",
         "bits": 52.401,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.402,
       "verdict": "boundary",
@@ -136566,7 +136566,7 @@
       "subgroup": {
         "order": "5950747276617163",
         "bits": 52.402,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.402,
       "verdict": "boundary",
@@ -136735,7 +136735,7 @@
       "subgroup": {
         "order": "5950747276617163",
         "bits": 52.402,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.402,
       "verdict": "boundary",
@@ -136904,7 +136904,7 @@
       "subgroup": {
         "order": "5957655888887723",
         "bits": 52.404,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.403,
       "verdict": "boundary",
@@ -137073,7 +137073,7 @@
       "subgroup": {
         "order": "5957655888887723",
         "bits": 52.404,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.403,
       "verdict": "boundary",
@@ -137242,7 +137242,7 @@
       "subgroup": {
         "order": "5957655888887723",
         "bits": 52.404,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.403,
       "verdict": "boundary",
@@ -137411,7 +137411,7 @@
       "subgroup": {
         "order": "5957655888887723",
         "bits": 52.404,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.403,
       "verdict": "boundary",
@@ -137580,7 +137580,7 @@
       "subgroup": {
         "order": "5957655888887723",
         "bits": 52.404,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.403,
       "verdict": "boundary",
@@ -137749,7 +137749,7 @@
       "subgroup": {
         "order": "5957655888887723",
         "bits": 52.404,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.403,
       "verdict": "boundary",
@@ -137918,7 +137918,7 @@
       "subgroup": {
         "order": "5960906600066251",
         "bits": 52.404,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.403,
       "verdict": "boundary",
@@ -138087,7 +138087,7 @@
       "subgroup": {
         "order": "5960906600066251",
         "bits": 52.404,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.403,
       "verdict": "boundary",
@@ -138256,7 +138256,7 @@
       "subgroup": {
         "order": "5964948439623083",
         "bits": 52.405,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.404,
       "verdict": "boundary",
@@ -138425,7 +138425,7 @@
       "subgroup": {
         "order": "5964948439623083",
         "bits": 52.405,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.404,
       "verdict": "boundary",
@@ -138594,7 +138594,7 @@
       "subgroup": {
         "order": "5972762491702411",
         "bits": 52.407,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.405,
       "verdict": "boundary",
@@ -138763,7 +138763,7 @@
       "subgroup": {
         "order": "5972762491702411",
         "bits": 52.407,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.405,
       "verdict": "boundary",
@@ -138932,7 +138932,7 @@
       "subgroup": {
         "order": "5972949129573931",
         "bits": 52.407,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.405,
       "verdict": "boundary",
@@ -139101,7 +139101,7 @@
       "subgroup": {
         "order": "5972949129573931",
         "bits": 52.407,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.405,
       "verdict": "boundary",
@@ -139270,7 +139270,7 @@
       "subgroup": {
         "order": "5973323796621803",
         "bits": 52.407,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.405,
       "verdict": "boundary",
@@ -139439,7 +139439,7 @@
       "subgroup": {
         "order": "5973323796621803",
         "bits": 52.407,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.405,
       "verdict": "boundary",
@@ -139608,7 +139608,7 @@
       "subgroup": {
         "order": "5973488322027211",
         "bits": 52.407,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.405,
       "verdict": "boundary",
@@ -139777,7 +139777,7 @@
       "subgroup": {
         "order": "5973488322027211",
         "bits": 52.407,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.405,
       "verdict": "boundary",
@@ -139946,7 +139946,7 @@
       "subgroup": {
         "order": "5975520881548651",
         "bits": 52.408,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.405,
       "verdict": "boundary",
@@ -140115,7 +140115,7 @@
       "subgroup": {
         "order": "5975520881548651",
         "bits": 52.408,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.405,
       "verdict": "boundary",
@@ -140284,7 +140284,7 @@
       "subgroup": {
         "order": "5982443855366411",
         "bits": 52.41,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.406,
       "verdict": "boundary",
@@ -140453,7 +140453,7 @@
       "subgroup": {
         "order": "5982443855366411",
         "bits": 52.41,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.406,
       "verdict": "boundary",
@@ -140622,7 +140622,7 @@
       "subgroup": {
         "order": "5987600304145643",
         "bits": 52.411,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.407,
       "verdict": "boundary",
@@ -140791,7 +140791,7 @@
       "subgroup": {
         "order": "5987600304145643",
         "bits": 52.411,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.407,
       "verdict": "boundary",
@@ -140960,7 +140960,7 @@
       "subgroup": {
         "order": "5989218552753451",
         "bits": 52.411,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.407,
       "verdict": "boundary",
@@ -141129,7 +141129,7 @@
       "subgroup": {
         "order": "5989218552753451",
         "bits": 52.411,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.407,
       "verdict": "boundary",
@@ -141298,7 +141298,7 @@
       "subgroup": {
         "order": "5990846712090283",
         "bits": 52.412,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.408,
       "verdict": "boundary",
@@ -141467,7 +141467,7 @@
       "subgroup": {
         "order": "5990846712090283",
         "bits": 52.412,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.408,
       "verdict": "boundary",
@@ -141636,7 +141636,7 @@
       "subgroup": {
         "order": "5993858559243883",
         "bits": 52.412,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.408,
       "verdict": "boundary",
@@ -141805,7 +141805,7 @@
       "subgroup": {
         "order": "5993858559243883",
         "bits": 52.412,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.408,
       "verdict": "boundary",
@@ -141974,7 +141974,7 @@
       "subgroup": {
         "order": "5993858559243883",
         "bits": 52.412,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.408,
       "verdict": "boundary",
@@ -142143,7 +142143,7 @@
       "subgroup": {
         "order": "5993858559243883",
         "bits": 52.412,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.408,
       "verdict": "boundary",
@@ -142312,7 +142312,7 @@
       "subgroup": {
         "order": "5993858559243883",
         "bits": 52.412,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.408,
       "verdict": "boundary",
@@ -142481,7 +142481,7 @@
       "subgroup": {
         "order": "5993858559243883",
         "bits": 52.412,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.408,
       "verdict": "boundary",
@@ -142650,7 +142650,7 @@
       "subgroup": {
         "order": "6000355646785163",
         "bits": 52.414,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.409,
       "verdict": "boundary",
@@ -142819,7 +142819,7 @@
       "subgroup": {
         "order": "6000355646785163",
         "bits": 52.414,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.409,
       "verdict": "boundary",
@@ -142988,7 +142988,7 @@
       "subgroup": {
         "order": "6005218988959051",
         "bits": 52.415,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.409,
       "verdict": "boundary",
@@ -143157,7 +143157,7 @@
       "subgroup": {
         "order": "6005218988959051",
         "bits": 52.415,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.409,
       "verdict": "boundary",
@@ -143326,7 +143326,7 @@
       "subgroup": {
         "order": "6010003866828683",
         "bits": 52.416,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.41,
       "verdict": "boundary",
@@ -143495,7 +143495,7 @@
       "subgroup": {
         "order": "6010003866828683",
         "bits": 52.416,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.41,
       "verdict": "boundary",
@@ -143664,7 +143664,7 @@
       "subgroup": {
         "order": "6011272851517163",
         "bits": 52.417,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.41,
       "verdict": "boundary",
@@ -143833,7 +143833,7 @@
       "subgroup": {
         "order": "6011272851517163",
         "bits": 52.417,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.41,
       "verdict": "boundary",
@@ -144002,7 +144002,7 @@
       "subgroup": {
         "order": "6024768425716363",
         "bits": 52.42,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.412,
       "verdict": "boundary",
@@ -144171,7 +144171,7 @@
       "subgroup": {
         "order": "6024768425716363",
         "bits": 52.42,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.412,
       "verdict": "boundary",
@@ -144340,7 +144340,7 @@
       "subgroup": {
         "order": "6026780526869131",
         "bits": 52.42,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.412,
       "verdict": "boundary",
@@ -144509,7 +144509,7 @@
       "subgroup": {
         "order": "6026780526869131",
         "bits": 52.42,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.412,
       "verdict": "boundary",
@@ -144678,7 +144678,7 @@
       "subgroup": {
         "order": "6032281150423051",
         "bits": 52.422,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.413,
       "verdict": "boundary",
@@ -144847,7 +144847,7 @@
       "subgroup": {
         "order": "6032281150423051",
         "bits": 52.422,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.413,
       "verdict": "boundary",
@@ -145016,7 +145016,7 @@
       "subgroup": {
         "order": "6035082431677963",
         "bits": 52.422,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.413,
       "verdict": "boundary",
@@ -145185,7 +145185,7 @@
       "subgroup": {
         "order": "6035082431677963",
         "bits": 52.422,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.413,
       "verdict": "boundary",
@@ -145354,7 +145354,7 @@
       "subgroup": {
         "order": "6043032660821771",
         "bits": 52.424,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.414,
       "verdict": "boundary",
@@ -145523,7 +145523,7 @@
       "subgroup": {
         "order": "6043032660821771",
         "bits": 52.424,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.414,
       "verdict": "boundary",
@@ -145692,7 +145692,7 @@
       "subgroup": {
         "order": "6044680635050891",
         "bits": 52.425,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.415,
       "verdict": "boundary",
@@ -145861,7 +145861,7 @@
       "subgroup": {
         "order": "6044680635050891",
         "bits": 52.425,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.415,
       "verdict": "boundary",
@@ -146030,7 +146030,7 @@
       "subgroup": {
         "order": "6046148007914251",
         "bits": 52.425,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.415,
       "verdict": "boundary",
@@ -146199,7 +146199,7 @@
       "subgroup": {
         "order": "6046148007914251",
         "bits": 52.425,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.415,
       "verdict": "boundary",
@@ -146368,7 +146368,7 @@
       "subgroup": {
         "order": "6051185719934923",
         "bits": 52.426,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.415,
       "verdict": "boundary",
@@ -146537,7 +146537,7 @@
       "subgroup": {
         "order": "6051185719934923",
         "bits": 52.426,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.415,
       "verdict": "boundary",
@@ -146706,7 +146706,7 @@
       "subgroup": {
         "order": "6051358271940491",
         "bits": 52.426,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.415,
       "verdict": "boundary",
@@ -146875,7 +146875,7 @@
       "subgroup": {
         "order": "6051358271940491",
         "bits": 52.426,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.415,
       "verdict": "boundary",
@@ -147044,7 +147044,7 @@
       "subgroup": {
         "order": "6060352470014443",
         "bits": 52.428,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.416,
       "verdict": "boundary",
@@ -147213,7 +147213,7 @@
       "subgroup": {
         "order": "6060352470014443",
         "bits": 52.428,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.416,
       "verdict": "boundary",
@@ -147382,7 +147382,7 @@
       "subgroup": {
         "order": "6064167379978891",
         "bits": 52.429,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.417,
       "verdict": "boundary",
@@ -147551,7 +147551,7 @@
       "subgroup": {
         "order": "6064167379978891",
         "bits": 52.429,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.417,
       "verdict": "boundary",
@@ -147720,7 +147720,7 @@
       "subgroup": {
         "order": "6065581388204171",
         "bits": 52.43,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.417,
       "verdict": "boundary",
@@ -147889,7 +147889,7 @@
       "subgroup": {
         "order": "6065581388204171",
         "bits": 52.43,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.417,
       "verdict": "boundary",
@@ -148058,7 +148058,7 @@
       "subgroup": {
         "order": "6070367949245291",
         "bits": 52.431,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -148227,7 +148227,7 @@
       "subgroup": {
         "order": "6070367949245291",
         "bits": 52.431,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -148396,7 +148396,7 @@
       "subgroup": {
         "order": "6070806986024171",
         "bits": 52.431,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -148565,7 +148565,7 @@
       "subgroup": {
         "order": "6070806986024171",
         "bits": 52.431,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -148734,7 +148734,7 @@
       "subgroup": {
         "order": "6074954227511371",
         "bits": 52.432,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -148903,7 +148903,7 @@
       "subgroup": {
         "order": "6074954227511371",
         "bits": 52.432,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -149072,7 +149072,7 @@
       "subgroup": {
         "order": "6074954227511371",
         "bits": 52.432,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -149241,7 +149241,7 @@
       "subgroup": {
         "order": "6074954227511371",
         "bits": 52.432,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -149410,7 +149410,7 @@
       "subgroup": {
         "order": "6074954227511371",
         "bits": 52.432,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -149579,7 +149579,7 @@
       "subgroup": {
         "order": "6074954227511371",
         "bits": 52.432,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -149748,7 +149748,7 @@
       "subgroup": {
         "order": "6075435259752811",
         "bits": 52.432,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -149917,7 +149917,7 @@
       "subgroup": {
         "order": "6075435259752811",
         "bits": 52.432,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -150086,7 +150086,7 @@
       "subgroup": {
         "order": "6075813127419083",
         "bits": 52.432,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -150255,7 +150255,7 @@
       "subgroup": {
         "order": "6075813127419083",
         "bits": 52.432,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -150424,7 +150424,7 @@
       "subgroup": {
         "order": "6075813127419083",
         "bits": 52.432,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -150593,7 +150593,7 @@
       "subgroup": {
         "order": "6075813127419083",
         "bits": 52.432,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -150762,7 +150762,7 @@
       "subgroup": {
         "order": "6075813127419083",
         "bits": 52.432,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -150931,7 +150931,7 @@
       "subgroup": {
         "order": "6075813127419083",
         "bits": 52.432,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.418,
       "verdict": "boundary",
@@ -151100,7 +151100,7 @@
       "subgroup": {
         "order": "6090621954628331",
         "bits": 52.436,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.421,
       "verdict": "boundary",
@@ -151269,7 +151269,7 @@
       "subgroup": {
         "order": "6090621954628331",
         "bits": 52.436,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.421,
       "verdict": "boundary",
@@ -151438,7 +151438,7 @@
       "subgroup": {
         "order": "6097806829575371",
         "bits": 52.437,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.421,
       "verdict": "boundary",
@@ -151607,7 +151607,7 @@
       "subgroup": {
         "order": "6097806829575371",
         "bits": 52.437,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.421,
       "verdict": "boundary",
@@ -151776,7 +151776,7 @@
       "subgroup": {
         "order": "6107674249670923",
         "bits": 52.44,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.423,
       "verdict": "boundary",
@@ -151945,7 +151945,7 @@
       "subgroup": {
         "order": "6107674249670923",
         "bits": 52.44,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.423,
       "verdict": "boundary",
@@ -152114,7 +152114,7 @@
       "subgroup": {
         "order": "6108665485010411",
         "bits": 52.44,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.423,
       "verdict": "boundary",
@@ -152283,7 +152283,7 @@
       "subgroup": {
         "order": "6108665485010411",
         "bits": 52.44,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.423,
       "verdict": "boundary",
@@ -152452,7 +152452,7 @@
       "subgroup": {
         "order": "6121738014423851",
         "bits": 52.443,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.424,
       "verdict": "boundary",
@@ -152621,7 +152621,7 @@
       "subgroup": {
         "order": "6121738014423851",
         "bits": 52.443,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.424,
       "verdict": "boundary",
@@ -152790,7 +152790,7 @@
       "subgroup": {
         "order": "6126693697069931",
         "bits": 52.444,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.425,
       "verdict": "boundary",
@@ -152959,7 +152959,7 @@
       "subgroup": {
         "order": "6126693697069931",
         "bits": 52.444,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.425,
       "verdict": "boundary",
@@ -153128,7 +153128,7 @@
       "subgroup": {
         "order": "6135694644313163",
         "bits": 52.446,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.426,
       "verdict": "boundary",
@@ -153297,7 +153297,7 @@
       "subgroup": {
         "order": "6135694644313163",
         "bits": 52.446,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.426,
       "verdict": "boundary",
@@ -153466,7 +153466,7 @@
       "subgroup": {
         "order": "6139386017339051",
         "bits": 52.447,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.427,
       "verdict": "boundary",
@@ -153635,7 +153635,7 @@
       "subgroup": {
         "order": "6139386017339051",
         "bits": 52.447,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.427,
       "verdict": "boundary",
@@ -153804,7 +153804,7 @@
       "subgroup": {
         "order": "6146629040866763",
         "bits": 52.449,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.428,
       "verdict": "boundary",
@@ -153973,7 +153973,7 @@
       "subgroup": {
         "order": "6146629040866763",
         "bits": 52.449,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.428,
       "verdict": "boundary",
@@ -154142,7 +154142,7 @@
       "subgroup": {
         "order": "6151165464615851",
         "bits": 52.45,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.428,
       "verdict": "boundary",
@@ -154311,7 +154311,7 @@
       "subgroup": {
         "order": "6151165464615851",
         "bits": 52.45,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.428,
       "verdict": "boundary",
@@ -154480,7 +154480,7 @@
       "subgroup": {
         "order": "6155130945209483",
         "bits": 52.451,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.429,
       "verdict": "boundary",
@@ -154649,7 +154649,7 @@
       "subgroup": {
         "order": "6155130945209483",
         "bits": 52.451,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.429,
       "verdict": "boundary",
@@ -154818,7 +154818,7 @@
       "subgroup": {
         "order": "6166207656847531",
         "bits": 52.453,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.43,
       "verdict": "boundary",
@@ -154987,7 +154987,7 @@
       "subgroup": {
         "order": "6166207656847531",
         "bits": 52.453,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.43,
       "verdict": "boundary",
@@ -155156,7 +155156,7 @@
       "subgroup": {
         "order": "6167675657331371",
         "bits": 52.454,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.43,
       "verdict": "boundary",
@@ -155325,7 +155325,7 @@
       "subgroup": {
         "order": "6167675657331371",
         "bits": 52.454,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.43,
       "verdict": "boundary",
@@ -155494,7 +155494,7 @@
       "subgroup": {
         "order": "6189556191558923",
         "bits": 52.459,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.433,
       "verdict": "boundary",
@@ -155663,7 +155663,7 @@
       "subgroup": {
         "order": "6189556191558923",
         "bits": 52.459,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.433,
       "verdict": "boundary",
@@ -155832,7 +155832,7 @@
       "subgroup": {
         "order": "6208492588194763",
         "bits": 52.463,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.435,
       "verdict": "boundary",
@@ -156001,7 +156001,7 @@
       "subgroup": {
         "order": "6208492588194763",
         "bits": 52.463,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.435,
       "verdict": "boundary",
@@ -156170,7 +156170,7 @@
       "subgroup": {
         "order": "6209923322970443",
         "bits": 52.463,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.435,
       "verdict": "boundary",
@@ -156339,7 +156339,7 @@
       "subgroup": {
         "order": "6209923322970443",
         "bits": 52.463,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.435,
       "verdict": "boundary",
@@ -156508,7 +156508,7 @@
       "subgroup": {
         "order": "6220407246599531",
         "bits": 52.466,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.437,
       "verdict": "boundary",
@@ -156677,7 +156677,7 @@
       "subgroup": {
         "order": "6220407246599531",
         "bits": 52.466,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.437,
       "verdict": "boundary",
@@ -156846,7 +156846,7 @@
       "subgroup": {
         "order": "6224437319730923",
         "bits": 52.467,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.437,
       "verdict": "boundary",
@@ -157015,7 +157015,7 @@
       "subgroup": {
         "order": "6224437319730923",
         "bits": 52.467,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 38.437,
       "verdict": "boundary",
@@ -176619,7 +176619,7 @@
       "subgroup": {
         "order": "5764837078436569643",
         "bits": 62.322,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 43.759,
       "verdict": "boundary",
@@ -176788,7 +176788,7 @@
       "subgroup": {
         "order": "5764837078436569643",
         "bits": 62.322,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 43.759,
       "verdict": "boundary",
@@ -176957,7 +176957,7 @@
       "subgroup": {
         "order": "5902977611275912361963",
         "bits": 72.322,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 49.099,
       "verdict": "boundary",
@@ -177126,7 +177126,7 @@
       "subgroup": {
         "order": "5902977611275912361963",
         "bits": 72.322,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 49.099,
       "verdict": "boundary",
@@ -177295,7 +177295,7 @@
       "subgroup": {
         "order": "6044629414103578152673771",
         "bits": 82.322,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 54.395,
       "verdict": "boundary",
@@ -177464,7 +177464,7 @@
       "subgroup": {
         "order": "6044629414103578152673771",
         "bits": 82.322,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 54.395,
       "verdict": "boundary",
@@ -177633,7 +177633,7 @@
       "subgroup": {
         "order": "1547425079971652962506254123",
         "bits": 90.322,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 58.607,
       "verdict": "boundary",
@@ -177802,7 +177802,7 @@
       "subgroup": {
         "order": "1547425079971652962506254123",
         "bits": 90.322,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 58.607,
       "verdict": "boundary",
@@ -177971,7 +177971,7 @@
       "subgroup": {
         "order": "24758800862535356025825959563",
         "bits": 94.322,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 60.706,
       "verdict": "boundary",
@@ -178140,7 +178140,7 @@
       "subgroup": {
         "order": "72000000142054560070067701451",
         "bits": 95.862,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 61.513,
       "verdict": "boundary",
@@ -178309,7 +178309,7 @@
       "subgroup": {
         "order": "78125000378223500457769651051",
         "bits": 95.98,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 61.575,
       "verdict": "boundary",
@@ -178478,7 +178478,7 @@
       "subgroup": {
         "order": "78125000378223500457769651051",
         "bits": 95.98,
-        "status": "registry_representation"
+        "status": "largest_prime_of_order"
       },
       "reference_log2": 61.575,
       "verdict": "boundary",

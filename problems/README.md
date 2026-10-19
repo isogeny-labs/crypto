@@ -9,8 +9,13 @@ explain the gap and what would let the work move past it.
 
 Keep resolved and superseded records in the index.
 
+2026-10-19: the [isogeny-fiber cost record](nonrational-isogeny-fiber-dlp-cost-gap.md)
+also tracks the paired-round target-stream mismatch, native ecbench admission
+gap and missing paired IDC1 certificate; the historical records are preserved.
+
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Running legacy Spot process recovery](legacy-spot-process-recovery.md) | investigating | automatic off-host recovery of five processes started before native checkpoints | five private exports and compatible-worker copy restores passed; recurring-export authorization and automatic fenced ownership remain |
 | [Photographed-volcano checkpoints unavailable](photo-volcano-checkpoints-unavailable.md) | open | resuming and independently auditing the original 46-curve, 100-problem-per-curve campaign | exact original archives, manifest and checkpoint verification, durable immutable readback, then resume-path validation |
 | [Generalized rootfinding complete all-roots8x qualification](generalized-rootfinding-all-roots-8x.md) | open | novel qualified8x over matched genuine all-roots F4/F5/F6 across requested fields | native complete-output integration, independent replay, strongest external references and the unchanged hard gate |
 | [Prime61 exhaustive horizontal class memory](prime61-horizontal-class-memory.md) | open; disk-backed pilot verified | certified full-class coverage and all-class workload execution; retained-vector requirement removed on the new path | certified degree-set coverage, provisioned disk/compute envelope and replayed remaining workloads |

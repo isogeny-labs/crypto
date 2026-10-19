@@ -1,5 +1,20 @@
 # Complete DLP cost after non-rational-kernel isogeny transfer
 
+**2026-10-19 paired-round review:** the historical paired runner drew a sign
+even for unliftable abscissae, violating its frozen target-stream protocol.
+The [versioned correction](../research/isogeny_torsion_fibers_20261012/paired_round/REVIEW-20261019.md)
+preserves all historical records. Source correction is not replacement
+evidence. Before admitting this paired comparison, complete a separately
+versioned native ecbench protocol/session with controls and verified answers,
+and supply the required paired IDC1 identity certificate and faithful proof
+bridge. Other torsion-study certificates are not substitutes. These are
+implementation/evidence gaps, not proved mathematical obstructions.
+Next step: register the corrected stream and exact two-curve workload in the
+native harness before execution; retain all failed/capped rows and require
+native audit and independent replay. A mismatch blocks comparison; success
+would validate only this bounded workload, leaving general cost/scaling open.
+No replacement campaign or new timing is recorded by this review.
+
 - **Status:** open
 - **Kind:** implementation and measurement gap; no mathematical
   nonexistence claim
