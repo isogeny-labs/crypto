@@ -77,3 +77,16 @@ instance list before running cost cells. W2b still depends on W1 and W2a landing
 
 The full repository library suite is a separate publication gate. The focused
 Linux check and the isolated tests do not replace that suite.
+
+## Linux validation and confirmed resumption
+
+At 18:43:43 UTC the driver was generating, with exactly one generator process
+(PID 607388, affinity 26–28). All six Diem library controls and all nine checkpoint
+tests passed on Linux, including killed-writer recovery. Build and preflight also
+passed. The first 37 of 52 durable records were copied locally and their payload
+checksums, source identities and keys verified. This is a progress snapshot, not
+a completed grid or a final frozen list. See `linux/` for receipts and logs.
+
+The full repository test binary is separately running with two test threads on
+cores 24–25, a 30-minute outer bound and a durable receipt. Publication remains
+pending that integration result. The existing generation process is left running.
