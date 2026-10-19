@@ -32,7 +32,7 @@ Run from the repository root after obtaining the three published base gzip files
 
     python3 research/n83_root4_frontier_current_20261018/highk_fresh4096_20261019/scripts/verify_portable.py --repo . --base-dir /path/to/base-gz-directory
 
-The exact executed local runner and verifier scripts are retained under scripts. Their absolute source and output paths record this run; verify_portable.py is the portable independent replay. paired_analysis.json and extension_analysis.json retain the fixed resampling outputs. scripts/recompute_statistics.py recalculates their intervals from the committed target certificates. portable_replay_receipt.json records the repository package replay.
+The exact executed local runner and verifier scripts are retained under scripts. Their absolute source and output paths record this run; verify_portable.py is the portable independent replay. paired_analysis.json and extension_analysis.json retain the fixed resampling outputs. scripts/recompute_statistics.py recalculates their intervals from the committed target certificates. portable_replay_receipt.json records the repository package replay. The exact branch passed 4,162/4,162 release library tests (117 ignored) and 21/21 packed-root example tests; verification_receipt.json pins deterministic gzip logs and their hashes.
 
 ## Next experiment
 
