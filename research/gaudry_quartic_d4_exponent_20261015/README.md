@@ -208,7 +208,7 @@ relations-slope band still contains the model's value.
 
 ## Predictions (PROTOCOL.md)
 
-- **P1 (verified, replays): held.** 312/312 verified; the replays of the first 60 sessions all reproduced, those of the last 12 are in progress (see "Audit").
+- **P1 (verified, replays): held.** 312/312 verified; 290 of 290 replays reproduced, 72/72 audits OK (see "Audit" for the scope).
 - **P2 (relations `β ∈ [0.9, 1.3]`): held.** 0.96.
 - **P3 (Wiedemann `β ∈ [1.6, 2.4]`): held.** 2.04.
 - **P4 (dense elimination `β ∈ [2.4, 3.3]`): not held.** 2.34 (2.12–2.56).
@@ -224,28 +224,24 @@ relations-slope band still contains the model's value.
 
 ## Audit
 
-**Status, 2026-10-19:** the audit below was made on the first 60 sessions
-(commit `9fb5c60e6`). The 12 sessions run after the stop are being audited
-under the same scope (`run_audits.sh` is resumable); this section is replaced
-when those receipts are in.
-
-`ecbench verify` on all 60 sessions (receipts `audits/<job>.audit.json`, list
-`audits/AUDITS.txt`; scope fixed by amendment 2): **audit OK on all 60, 288
+`ecbench verify` on all 72 sessions (receipts `audits/<job>.audit.json`, list
+`audits/AUDITS.txt`; scope fixed by amendment 2): **audit OK on all 72, 312
 records, 0 problems.**
 
-- **Full replay (`--replay-all`), 50 sessions:** every session with
+- **Full replay (`--replay-all`), 61 sessions:** every session with
   `p ≤ 197` (all three arms), every rho-only session, and the two upper-rung
-  spot checks `main-p293-t0` and `main-p401-t0`. **268 replays reproduced
-  exactly**: 76 in the IC specs (IC and paired rho) and 192 rho-only.
-- **Integrity only, 10 sessions** (the stored `[d]G = Q` checks, every
+  spot checks `main-p293-t0` and `main-p401-t0`. **290 replays reproduced
+  exactly**: 98 in the IC specs (IC and paired rho) and 192 rho-only.
+- **Integrity only, 11 sessions** (the stored `[d]G = Q` checks, every
   planned run recorded, hashes; not re-executed): `main-p1009-t0/t1`,
   `main-p701-t0/t1`, `main-p509-t0/t1`, `main-p401-t1`, `main-p293-t1/t2`,
-  `lp2-p293-t0`.
+  `lp2-p293-t0`, `lp2-p293-t1`.
 
-The audit was stopped twice by infrastructure (once deliberately while
-amendment 3's relaunch ran, once by a container restart) and resumed;
-`audits/AUDITS.aborted-1.txt` lists the lines from the stopped first run.
-Every session in it was audited again and passed.
+The audit was interrupted twice by infrastructure (stopped deliberately while
+amendment 3's relaunch ran, and by a container restart) and resumed; the runner
+skips sessions already recorded as passing, and `audits/AUDITS.aborted-1.txt`
+lists the lines from the stopped first run. The first 60 sessions were audited
+by 2026-10-16 and the last 12 on 2026-10-19, with the same `ecbench` binary.
 
 ## What did not run, and what was not tried
 

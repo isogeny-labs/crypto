@@ -146,7 +146,7 @@ headline because it uses the full planned set.
 
 = Predictions
 
-P1: 312/312 verified; replays of the first 60 sessions all reproduced, the last 12 are being audited (§Audit). P2 held (0.96 ∈ [0.9, 1.3]). P3 held (2.04).
+P1 held: 312/312 verified, 290/290 replays reproduced. P2 held (0.96 ∈ [0.9, 1.3]). P3 held (2.04).
 *P4 not held* (dense elimination 2.34 < 2.4). P5 held (1.93; $S_"rho"$ slope
 −0.15). P6: crossover $2^(97.9) in [2^(88), 2^(115)]$ held; *"no dense crossover
 below $2^(200)$" not held* ($2^(98.9)$, recrossing at $2^(128)$). P7 held (1.70;
@@ -154,17 +154,15 @@ below $2^(200)$" not held* ($2^(98.9)$, recrossing at $2^(128)$). P7 held (1.70;
 
 = Audit
 
-_Status 2026-10-19:_ the audit below was made on the first 60 sessions. The 12
-sessions run after the stop are being audited under the same scope; this section
-is replaced when those receipts are in.
-
-`ecbench verify` on all 60 sessions (receipts `audits/<job>.audit.json`; scope
-fixed by amendment 2): *audit OK on all 60, 288 records, 0 problems.* Full replay
-(`--replay-all`) on 50 sessions, every session with $p <= 197$, every rho-only
-session and the spot checks `main-p293-t0` and `main-p401-t0`: *268 replays
+`ecbench verify` on all 72 sessions (receipts `audits/<job>.audit.json`; scope
+fixed by amendment 2): *audit OK on all 72, 312 records, 0 problems.* Full replay
+(`--replay-all`) on 61 sessions, every session with $p <= 197$, every rho-only
+session and the spot checks `main-p293-t0` and `main-p401-t0`: *290 replays
 reproduced exactly*. Integrity only (stored $[d]G = Q$ checks, every planned run
-recorded, hashes) on the other 10: `main-p1009-t0/t1`, `main-p701-t0/t1`,
-`main-p509-t0/t1`, `main-p401-t1`, `main-p293-t1/t2`, `lp2-p293-t0`.
+recorded, hashes) on the other 11: `main-p1009-t0/t1`, `main-p701-t0/t1`,
+`main-p509-t0/t1`, `main-p401-t1`, `main-p293-t1/t2`, `lp2-p293-t0`,
+`lp2-p293-t1`. The first 60 sessions were audited on 2026-10-16 and the last 12 on
+2026-10-19, with the same `ecbench` binary.
 
 = Limits
 
@@ -174,4 +172,4 @@ set by curve-to-curve scatter in the relation rate. The large-prime fits rest on
 two targets per rung over $p <= 293$. $S$ is a count on one host class;
 wall time is not admitted. No `docs/bounds` domain exists for $FF_(p^4)$ curves,
 so there is no challenge verdict. Study files: `README.md`, `raw/summary.json`,
-`sessions/`, run report `reports/run-20261015T0457Z/`.
+`sessions/`, run reports `reports/run-20261015T0457Z/` and `reports/run-20261019T1612Z/`.
