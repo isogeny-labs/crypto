@@ -4,13 +4,13 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 use serde_json::{json, Value};
 use std::path::Path;
-fn decode(f: &F, v: &Value) -> E {
+pub(crate) fn decode(f: &F, v: &Value) -> E {
     E::from_biguint(
         &BigUint::parse_bytes(v.as_str().unwrap().as_bytes(), 16).unwrap(),
         f.m(),
     )
 }
-fn dp(f: &F, v: &Value) -> P {
+pub(crate) fn dp(f: &F, v: &Value) -> P {
     if v.is_array() {
         P::Affine {
             x: decode(f, &v[0]),
@@ -20,16 +20,16 @@ fn dp(f: &F, v: &Value) -> P {
         P::Infinity
     }
 }
-fn poly(f: &F, v: &Value) -> Poly {
+pub(crate) fn poly(f: &F, v: &Value) -> Poly {
     v.as_array().unwrap().iter().map(|v| decode(f, v)).collect()
 }
-fn px(p: &P) -> E {
+pub(crate) fn px(p: &P) -> E {
     match p {
         P::Affine { x, .. } => x.clone(),
         _ => panic!("finite point"),
     }
 }
-fn image_point(f: &F, c: &crate::binary_ecc::BinaryCurve, g: &P, p: &P) -> P {
+pub(crate) fn image_point(f: &F, c: &crate::binary_ecc::BinaryCurve, g: &P, p: &P) -> P {
     let mut x = px(p);
     let mut y = match p {
         P::Affine { y, .. } => y.clone(),
@@ -98,7 +98,7 @@ fn miller(f: &F, c: &crate::binary_ecc::BinaryCurve, p: &P, r: &P) -> Option<E> 
     assert_eq!(v, P::Infinity);
     Some(a)
 }
-fn weil(f: &F, c: &crate::binary_ecc::BinaryCurve, p: &P, q: &P) -> E {
+pub(crate) fn weil(f: &F, c: &crate::binary_ecc::BinaryCurve, p: &P, q: &P) -> E {
     for x in 1..1024 {
         let Some(s) = f.point(c, &f.e(x)) else {
             continue;
@@ -272,48 +272,48 @@ pub fn screen(dir: &Path, negative: bool) {
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-struct A {
-    u: Poly,
-    v: Poly,
+pub(crate) struct A {
+    pub(crate) u: Poly,
+    pub(crate) v: Poly,
 }
 #[derive(Clone, PartialEq, Eq, Debug)]
-enum AP {
+pub(crate) enum AP {
     O,
     Pt(A, A),
 }
-struct R<'a> {
-    f: &'a F,
-    p: Poly,
-    a: E,
-    b: E,
-    fx: Poly,
+pub(crate) struct R<'a> {
+    pub(crate) f: &'a F,
+    pub(crate) p: Poly,
+    pub(crate) a: E,
+    pub(crate) b: E,
+    pub(crate) fx: Poly,
 }
 impl<'a> R<'a> {
-    fn red(&self, p: Poly) -> Poly {
+    pub(crate) fn red(&self, p: Poly) -> Poly {
         div(self.f, &p, &self.p).1
     }
-    fn z(&self) -> A {
+    pub(crate) fn z(&self) -> A {
         A {
             u: vec![],
             v: vec![],
         }
     }
-    fn o(&self) -> A {
+    pub(crate) fn o(&self) -> A {
         self.c(&self.f.o())
     }
-    fn c(&self, e: &E) -> A {
+    pub(crate) fn c(&self, e: &E) -> A {
         A {
             u: if e.is_zero() { vec![] } else { vec![e.clone()] },
             v: vec![],
         }
     }
-    fn add(&self, a: &A, b: &A) -> A {
+    pub(crate) fn add(&self, a: &A, b: &A) -> A {
         A {
             u: add(&a.u, &b.u),
             v: add(&a.v, &b.v),
         }
     }
-    fn mul(&self, a: &A, b: &A) -> A {
+    pub(crate) fn mul(&self, a: &A, b: &A) -> A {
         if a.v.is_empty() && b.v.is_empty() {
             return A {
                 u: self.red(mul(self.f, &a.u, &b.u)),
@@ -329,7 +329,7 @@ impl<'a> R<'a> {
             )),
         }
     }
-    fn sq(&self, a: &A) -> A {
+    pub(crate) fn sq(&self, a: &A) -> A {
         if a.v.is_empty() {
             return A {
                 u: self.red(square(self.f, &a.u)),
@@ -338,7 +338,7 @@ impl<'a> R<'a> {
         }
         self.mul(a, a)
     }
-    fn inv(&self, a: &A) -> A {
+    pub(crate) fn inv(&self, a: &A) -> A {
         if a.v.is_empty() {
             return A {
                 u: invmod(self.f, &a.u, &self.p),
@@ -359,7 +359,7 @@ impl<'a> R<'a> {
             v: self.red(mul(self.f, &a.v, &ni)),
         }
     }
-    fn pow(&self, a: &A, n: u64) -> A {
+    pub(crate) fn pow(&self, a: &A, n: u64) -> A {
         let mut v = self.o();
         for i in (0..64 - u64::leading_zeros(n)).rev() {
             v = self.sq(&v);
@@ -369,19 +369,19 @@ impl<'a> R<'a> {
         }
         v
     }
-    fn cp(&self, p: &P) -> AP {
+    pub(crate) fn cp(&self, p: &P) -> AP {
         match p {
             P::Infinity => AP::O,
             P::Affine { x, y } => AP::Pt(self.c(x), self.c(y)),
         }
     }
-    fn neg(&self, p: &AP) -> AP {
+    pub(crate) fn neg(&self, p: &AP) -> AP {
         match p {
             AP::O => AP::O,
             AP::Pt(x, y) => AP::Pt(x.clone(), self.add(x, y)),
         }
     }
-    fn plus(&self, p: &AP, q: &AP) -> AP {
+    pub(crate) fn plus(&self, p: &AP, q: &AP) -> AP {
         let (AP::Pt(x, y), AP::Pt(u, v)) = (p, q) else {
             return if *p == AP::O { q.clone() } else { p.clone() };
         };
@@ -400,7 +400,7 @@ impl<'a> R<'a> {
         let ny = self.add(&self.add(&self.mul(&l, &self.add(x, &nx)), &nx), y);
         AP::Pt(nx, ny)
     }
-    fn times(&self, p: &AP, n: u64) -> AP {
+    pub(crate) fn times(&self, p: &AP, n: u64) -> AP {
         let mut v = AP::O;
         for i in (0..64 - u64::leading_zeros(n)).rev() {
             v = self.plus(&v, &v);
@@ -410,7 +410,7 @@ impl<'a> R<'a> {
         }
         v
     }
-    fn line(&self, p: &AP, q: &AP, r: &AP) -> A {
+    pub(crate) fn line(&self, p: &AP, q: &AP, r: &AP) -> A {
         let (AP::Pt(x, y), AP::Pt(u, v), AP::Pt(rx, ry)) = (p, q, r) else {
             panic!("Miller finite evaluation")
         };
@@ -428,7 +428,7 @@ impl<'a> R<'a> {
             AP::Pt(s, _) => self.mul(&val, &self.inv(&self.add(rx, &s))),
         }
     }
-    fn miller(&self, p: &AP, r: &AP) -> A {
+    pub(crate) fn miller(&self, p: &AP, r: &AP) -> A {
         let mut v = p.clone();
         let mut z = self.o();
         for bit in [0, 1, 1] {
@@ -442,7 +442,7 @@ impl<'a> R<'a> {
         assert_eq!(v, AP::O);
         z
     }
-    fn weil(&self, p: &AP, q: &AP, s: &AP) -> A {
+    pub(crate) fn weil(&self, p: &AP, q: &AP, s: &AP) -> A {
         let ns = self.neg(s);
         let x = self.miller(p, &self.plus(q, s));
         let y = self.miller(q, &ns);
@@ -675,7 +675,7 @@ struct Seed {
     qx: Poly,
     qy: Poly,
 }
-fn finite_polys(_f: &F, p: &P) -> (Poly, Poly) {
+pub(crate) fn finite_polys(_f: &F, p: &P) -> (Poly, Poly) {
     match p {
         P::Affine { x, y } => (
             if x.is_zero() { vec![] } else { vec![x.clone()] },
@@ -696,10 +696,10 @@ fn seed_point(_r: &R, p: (&Poly, &Poly)) -> AP {
         },
     )
 }
-fn scalar_coefficients(f: &F, p: &[E], n: u32) -> Poly {
+pub(crate) fn scalar_coefficients(f: &F, p: &[E], n: u32) -> Poly {
     p.iter().map(|x| f.frob(x, n)).collect()
 }
-fn basiskey(base: &P, p: &P, q: &P) -> String {
+pub(crate) fn basiskey(base: &P, p: &P, q: &P) -> String {
     let a = format!("{}:{}:{}", pj(base), pj(p), pj(q));
     let b = format!("{}:{}:{}", pj(base), pj(&neg(p)), pj(&neg(q)));
     a.min(b)

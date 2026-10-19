@@ -1,17 +1,18 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [06](rounds/06/README.md), with its
-[report](rounds/06/REPORT.md), [PDF](rounds/06/report.pdf),
-[proof map](rounds/06/PROOF_MAP.md), [ledger](rounds/06/ledger.json)
-and exact replay. All 44 degree-210 images are zero for both signs.
-The evaluated matrix has rank 5/588; its nonzero-image submatrices remain
-rank 4 on 510/520 columns. All ten frozen determinant-5 graphs now have
-split quotient equations and effective F2 descent. The even reverse map
-on one order-11 generator is evaluated as an unreduced divisor with all
-20 fibers in split/etale coordinates, degree 6,600 on each side.
-Independent pointwise forward norms, Jacobian reduction, the odd reverse
-divisor and determinant-19 quotients remain open. Fourteen new named Lean
-theorems pass. The user assesses IC implications; no timing is measured.
+The current round is [07](rounds/07/README.md), with its
+[report](rounds/07/REPORT.md), [PDF](rounds/07/report.pdf),
+[proof map](rounds/07/PROOF_MAP.md), [ledger](rounds/07/ledger.json)
+and exact replay. Two complete full-map norm relations raise nonzero-image
+rank to 6 for both signs, on 675/678 columns. The full evaluated matrix
+has rank 7/768. Independent pointwise forward norms return the source for
+both even and odd reverse generators. The corrected odd divisor has all
+20 fibers in explicit coordinates, degree 6,600 on each side, with formal
+F2 descent. Four mixed determinant-19 translation atlases and expanded
+supersingular [19] cover equations are checked. The intrinsic mixed
+quotient image ideal, Jacobian reduction and individual descent remain
+open. Seventeen new named Lean results pass. The user assesses IC
+implications; no timing is measured.
 
 Earlier evidence stays frozen:
 
@@ -24,6 +25,8 @@ Earlier evidence stays frozen:
   minimum certificates and evaluated modular rows of rank 4/544.
 - [Round 05](rounds/05/README.md): integral reverse correspondence and
   11-primary splitting, canonical quotient constructions and symbolic rank 5/588.
+- [Round 06](rounds/06/README.md): 44 evaluated zero-image columns,
+  all ten determinant-5 quotient graphs and explicit even reverse fibers.
 - [Open construction problem](../../problems/koblitz-modular-carrier-transfer.md):
   current obligations, exact scope, and next discriminating experiments.
 

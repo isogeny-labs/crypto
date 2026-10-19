@@ -40,8 +40,10 @@ mod hash {
     }
 }
 mod census;
+mod cofactor07;
 mod delpezzo;
 mod delpezzo_conic;
+mod forward07;
 mod gluing;
 #[path = "../../../../src/cryptanalysis/identity_certificate.rs"]
 mod identity_certificate;
@@ -52,9 +54,11 @@ mod lpoly;
 mod modular_geometry;
 mod modular_screen;
 mod n5_relations;
+mod odd07;
 mod polarized;
 mod quotient_geometry;
 mod quotients06;
+mod quotients07;
 mod reverse06;
 mod round02;
 mod round03_record;
@@ -65,6 +69,7 @@ mod round05;
 mod round05_record;
 mod round06;
 mod round06_record;
+mod round07_record;
 mod round_record;
 
 fn pow(mut a: u64, mut k: u64, p: u64) -> u64 {
@@ -341,7 +346,71 @@ fn run(out: &std::path::Path) {
     );
 }
 fn main() {
+    let args07: Vec<String> = std::env::args().collect();
+    if args07.get(1).map(String::as_str) == Some("--verify-round07-next") {
+        forward07::verify_next(std::path::Path::new(args07.get(2).expect("fresh outputs")));
+        forward07::verify_bases(std::path::Path::new(args07.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args07.get(1).map(String::as_str) == Some("--verify-round07-bases") {
+        forward07::verify_bases(std::path::Path::new(args07.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args07.get(1).map(String::as_str) == Some("--verify-round07-odd") {
+        odd07::verify(std::path::Path::new(args07.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args07.get(1).map(String::as_str) == Some("--round07-odd-targets") {
+        odd07::target_norms(std::path::Path::new(args07.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args07.get(1).map(String::as_str) == Some("--round07-odd-divisor") {
+        odd07::divisor(std::path::Path::new(args07.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args07.get(1).map(String::as_str) == Some("--round07-cofactor-equations") {
+        cofactor07::run(std::path::Path::new(args07.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args07.get(1).map(String::as_str) == Some("--round07-relations-next") {
+        forward07::relations_next(std::path::Path::new(args07.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args07.get(1).map(String::as_str) == Some("--verify-round07-relations") {
+        forward07::verify(std::path::Path::new(args07.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args07.get(1).map(String::as_str) == Some("--round07-quotients") {
+        quotients07::run(std::path::Path::new(args07.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args07.get(1).map(String::as_str) == Some("--round07-odd-screen") {
+        odd07::screen(std::path::Path::new(args07.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args07.get(1).map(String::as_str) == Some("--round07-odd-algebras") {
+        odd07::algebras(std::path::Path::new(args07.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args07.get(1).map(String::as_str) == Some("--round07-forward") {
+        forward07::even(std::path::Path::new(args07.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args07.get(1).map(String::as_str) == Some("--round07-relations") {
+        forward07::relations(std::path::Path::new(args07.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args07.get(1).map(String::as_str) == Some("--round07-norm-seeds") {
+        forward07::seeds(std::path::Path::new(args07.get(2).expect("fresh outputs")));
+        return;
+    }
     let round06args: Vec<String> = std::env::args().collect();
+    if round06args.get(1).map(String::as_str) == Some("--record-round07") {
+        round07_record::record(std::path::Path::new(
+            round06args.get(2).expect("fresh round records"),
+        ));
+        return;
+    }
     if round06args.get(1).map(String::as_str) == Some("--record-round06") {
         round06_record::record(std::path::Path::new(
             round06args.get(2).expect("fresh round records"),

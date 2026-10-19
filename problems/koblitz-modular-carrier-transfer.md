@@ -274,3 +274,50 @@ produce a complete principal row with nonzero new projected images from
 functions separating second-7 choices; construct and verify a mixed
 determinant-19 quotient. These are implementation/construction obligations,
 not proved obstructions. No IC timing or n=131 transfer is supplied.
+
+## Round07: independent norms, odd transfer and nonzero-image rank6
+
+[Round07](../research/koblitz_modular_ic_20261018/rounds/07/REPORT.md)
+checks every even reverse entry by actual modular target coordinates and
+finite-algebra point traces, independently of the Gram calculation.
+The corrected odd seed has55 split points and55 degree11 components over
+F2^660. Its formally antisymmetric representative [8T]−[−8T] yields all20
+pullbacks with2200 coordinate entries, degree6600 each side and checked
+formal F2 descent. Its independent forward image returns the source.
+General genus2841 Jacobian reduction remains an implementation gap.
+
+Two complete full-map principal functions have ordinary zero degrees6600
+and13200 and poles at modular cusps with zero projected images. They add
+60 and120 closed columns of degrees60/660. Verified geometric identity
+checks find no joins to the prior columns. Evaluated rank is7/768;
+nonzero-image ranks are6 on675/678 columns. The row sums, source degrees,
+etale Galois steps and ranks have separate checks. This meets the requested
+rank-beyond-five experiment, while collection costs, further families and
+individual descent remain open.
+
+All four frozen determinant19 graphs now have actual mixed ordinary/
+supersingular coordinates, matching pairing bases and361-point Frobenius
+checks. The finite etale translation atlases and factored invariant circuits
+are explicit. The supersingular cofactor[19] cover is expanded into
+rational polynomials of degrees361/360 and540/540, with a kernel-checked
+binary polynomial identity and pointwise tests for both cofactor traces.
+
+**The full mixed invariant image ideal is still uncomputed.** These cover
+equations and translation atlases do not supply an intrinsic global
+five-dimensional quotient equation system. This is a construction and
+elimination implementation gap, not a mathematical nonexistence result.
+To close it, produce explicit generators and relations for a separating
+mixed invariant coordinate algebra or a verified theta embedding, include
+its saturation and projective charts, descend it to F2, and verify the
+four specified graph kernels and polarization pullbacks on that model.
+Computing only the cofactor cover does not meet this acceptance condition.
+
+The initial odd adapter used an incorrect q-mod11 entry and a degree5
+embedding for a degree10 parameter. Those probes produced no accepted
+fiber; interrupted attempts and the stopped stale process are retained.
+The corrected adapter checks full group orders and bounds primary loops.
+Seventeen new named Lean results pass, with geometric bridges specified in
+the [proof map](../research/koblitz_modular_ic_20261018/rounds/07/PROOF_MAP.md).
+The next discriminating quotient step is the mixed invariant image ideal;
+the next relation step is a complete function family with checked new
+nonzero images and collection accounting. No IC efficiency verdict follows.
