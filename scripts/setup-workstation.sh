@@ -189,8 +189,70 @@ install_go() {
   if [ "$PKG" = brew ]; then run brew install go; return; fi
   local os=linux; [ "$OS" = Darwin ] && os=darwin
   local tgz="go${GO_VERSION}.${os}-${GOARCH}.tar.gz"
-  run sh -c "curl -fsSL https://go.dev/dl/$tgz -o /tmp/$tgz"
-  as_root rm -rf /usr/local/go && as_root tar -C /usr/local -xzf "/tmp/$tgz" && run rm -f "/tmp/$tgz"
+  if [ "$DRY_RUN" = 1 ]; then
+    log "would verify and stage $tgz before replacing /usr/local/go"
+    return
+  fi
+  local download expected
+  download="$(mktemp -d "${TMPDIR:-/tmp}/go-download.XXXXXXXX")" || return 1
+  # The official release index supplies the checksum for this exact archive.
+  # A failed download or validation must leave the installed toolchain intact.
+  if ! curl -fsSL --retry 2 "https://go.dev/dl/?mode=json&include=all" -o "$download/releases.json" ||
+     ! curl -fsSL --retry 2 "https://go.dev/dl/$tgz" -o "$download/$tgz"; then
+    rm -rf "$download"
+    warn "Go download failed; existing installation preserved"
+    return 1
+  fi
+  expected="$(jq -er --arg name "$tgz" \
+    '[.[].files[] | select(.filename == $name) | .sha256] | if length == 1 then .[0] else error("archive not found uniquely") end' \
+    "$download/releases.json")"
+  if [[ ! "$expected" =~ ^[0-9a-f]{64}$ ]]; then
+    rm -rf "$download"
+    warn "Go release checksum unavailable; existing installation preserved"
+    return 1
+  fi
+  # All renames occur on /usr/local's filesystem. Keep the old installation
+  # until checksum, extraction and the staged binary's version all pass. The
+  # lock also serializes setup hooks from sibling repositories.
+  if ! as_root bash -c '
+    set -euo pipefail
+    archive=$1 expected=$2 version=$3 root=$4
+    exec 9>"$root/.go-install.lock"
+    flock -x 9
+    stage=$(mktemp -d "$root/.go-install.XXXXXXXX")
+    cleanup() {
+      status=$?
+      trap - EXIT
+      if [ "$status" -ne 0 ] && { [ -e "$stage/previous" ] || [ -L "$stage/previous" ]; }; then
+        if [ ! -e "$root/go" ] && [ ! -L "$root/go" ]; then
+          if ! mv -T "$stage/previous" "$root/go"; then
+            echo "Go rollback failed; original installation retained at $stage/previous" >&2
+            exit 1
+          fi
+        else
+          echo "Go destination changed; original installation retained at $stage/previous" >&2
+          exit 1
+        fi
+      fi
+      rm -rf "$stage"
+      exit "$status"
+    }
+    trap cleanup EXIT
+    trap "exit 1" HUP INT TERM
+    cp "$archive" "$stage/archive.tar.gz"
+    printf "%s  %s\n" "$expected" "$stage/archive.tar.gz" | sha256sum -c -
+    tar -C "$stage" -xzf "$stage/archive.tar.gz"
+    [ "$(env GOROOT="$stage/go" "$stage/go/bin/go" env GOVERSION)" = "go$version" ]
+    if [ -e "$root/go" ] || [ -L "$root/go" ]; then
+      mv -T "$root/go" "$stage/previous"
+    fi
+    mv -T "$stage/go" "$root/go"
+  ' workstation-go "$download/$tgz" "$expected" "$GO_VERSION" /usr/local; then
+    rm -rf "$download"
+    warn "Go installation failed; prior installation preserved or rollback location reported above"
+    return 1
+  fi
+  rm -rf "$download"
   persist_path 'export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"'
   have go && ok "$(go version)"
 }
