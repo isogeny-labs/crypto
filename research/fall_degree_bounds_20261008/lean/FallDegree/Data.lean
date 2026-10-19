@@ -184,18 +184,32 @@ def rows : List Row := [
   { kind := 2, m := 3, n := 7, ell := 3, shape := 23, value := some 4, cap := 5, dstar := none, dstarAtLeast := false },  -- n7l3
   { kind := 2, m := 3, n := 7, ell := 3, shape := 23, value := some 4, cap := 5, dstar := none, dstarAtLeast := false },  -- n7l3
   { kind := 2, m := 3, n := 7, ell := 3, shape := 23, value := some 4, cap := 5, dstar := none, dstarAtLeast := false },  -- n7l3
-  { kind := 3, m := 0, n := 23, ell := 0, shape := 24, value := none, cap := 6, dstar := none, dstarAtLeast := false },  -- n11l4
-  { kind := 3, m := 0, n := 23, ell := 0, shape := 24, value := none, cap := 6, dstar := none, dstarAtLeast := false },  -- n11l4
-  { kind := 3, m := 0, n := 23, ell := 0, shape := 24, value := none, cap := 6, dstar := none, dstarAtLeast := false },  -- n11l4
-  { kind := 3, m := 0, n := 23, ell := 0, shape := 24, value := none, cap := 6, dstar := none, dstarAtLeast := false },  -- n11l4
-  { kind := 3, m := 0, n := 11, ell := 0, shape := 25, value := some 5, cap := 6, dstar := none, dstarAtLeast := false },  -- n5l2
-  { kind := 3, m := 0, n := 11, ell := 0, shape := 25, value := some 5, cap := 6, dstar := none, dstarAtLeast := false },  -- n5l2
-  { kind := 3, m := 0, n := 11, ell := 0, shape := 25, value := some 5, cap := 6, dstar := none, dstarAtLeast := false },  -- n5l2
-  { kind := 3, m := 0, n := 11, ell := 0, shape := 25, value := some 5, cap := 6, dstar := none, dstarAtLeast := false },  -- n5l2
-  { kind := 3, m := 0, n := 16, ell := 0, shape := 26, value := some 6, cap := 6, dstar := none, dstarAtLeast := false },  -- n7l3
-  { kind := 3, m := 0, n := 16, ell := 0, shape := 26, value := some 6, cap := 6, dstar := none, dstarAtLeast := false },  -- n7l3
-  { kind := 3, m := 0, n := 16, ell := 0, shape := 26, value := some 6, cap := 6, dstar := none, dstarAtLeast := false },  -- n7l3
-  { kind := 3, m := 0, n := 16, ell := 0, shape := 26, value := some 6, cap := 6, dstar := none, dstarAtLeast := false }  -- n7l3
+  { kind := 4, m := 5, n := 11, ell := 3, shape := 24, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n11l3m5
+  { kind := 4, m := 5, n := 11, ell := 3, shape := 24, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n11l3m5
+  { kind := 4, m := 5, n := 11, ell := 3, shape := 24, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n11l3m5
+  { kind := 4, m := 5, n := 11, ell := 3, shape := 24, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n11l3m5
+  { kind := 4, m := 5, n := 13, ell := 3, shape := 25, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n13l3m5
+  { kind := 4, m := 5, n := 13, ell := 3, shape := 25, value := some 3, cap := 4, dstar := none, dstarAtLeast := false },  -- n13l3m5
+  { kind := 4, m := 6, n := 8, ell := 2, shape := 26, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n8l2m6
+  { kind := 4, m := 6, n := 8, ell := 2, shape := 26, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n8l2m6
+  { kind := 4, m := 6, n := 8, ell := 2, shape := 26, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n8l2m6
+  { kind := 4, m := 6, n := 8, ell := 2, shape := 26, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n8l2m6
+  { kind := 4, m := 6, n := 9, ell := 2, shape := 27, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n9l2m6
+  { kind := 4, m := 6, n := 9, ell := 2, shape := 27, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n9l2m6
+  { kind := 4, m := 6, n := 9, ell := 2, shape := 27, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n9l2m6
+  { kind := 4, m := 6, n := 9, ell := 2, shape := 27, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n9l2m6
+  { kind := 3, m := 0, n := 23, ell := 0, shape := 28, value := none, cap := 6, dstar := none, dstarAtLeast := false },  -- n11l4
+  { kind := 3, m := 0, n := 23, ell := 0, shape := 28, value := none, cap := 6, dstar := none, dstarAtLeast := false },  -- n11l4
+  { kind := 3, m := 0, n := 23, ell := 0, shape := 28, value := none, cap := 6, dstar := none, dstarAtLeast := false },  -- n11l4
+  { kind := 3, m := 0, n := 23, ell := 0, shape := 28, value := none, cap := 6, dstar := none, dstarAtLeast := false },  -- n11l4
+  { kind := 3, m := 0, n := 11, ell := 0, shape := 29, value := some 5, cap := 6, dstar := none, dstarAtLeast := false },  -- n5l2
+  { kind := 3, m := 0, n := 11, ell := 0, shape := 29, value := some 5, cap := 6, dstar := none, dstarAtLeast := false },  -- n5l2
+  { kind := 3, m := 0, n := 11, ell := 0, shape := 29, value := some 5, cap := 6, dstar := none, dstarAtLeast := false },  -- n5l2
+  { kind := 3, m := 0, n := 11, ell := 0, shape := 29, value := some 5, cap := 6, dstar := none, dstarAtLeast := false },  -- n5l2
+  { kind := 3, m := 0, n := 16, ell := 0, shape := 30, value := some 6, cap := 6, dstar := none, dstarAtLeast := false },  -- n7l3
+  { kind := 3, m := 0, n := 16, ell := 0, shape := 30, value := some 6, cap := 6, dstar := none, dstarAtLeast := false },  -- n7l3
+  { kind := 3, m := 0, n := 16, ell := 0, shape := 30, value := some 6, cap := 6, dstar := none, dstarAtLeast := false },  -- n7l3
+  { kind := 3, m := 0, n := 16, ell := 0, shape := 30, value := some 6, cap := 6, dstar := none, dstarAtLeast := false }  -- n7l3
 ]
 
 end FallDegree
