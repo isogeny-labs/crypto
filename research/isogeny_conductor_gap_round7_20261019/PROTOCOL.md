@@ -73,3 +73,11 @@ Frozen 2026-10-19, before any round-7 measurement.  Status and background:
 - Work ratios are ratios of sums.  The audited session is priced across
   the §5a band (weights 0, 0.1, 1).
 - Every IC row reports its distance to matched rho.
+
+## Amendment 1 (2026-10-19, before any E10 or E11 data)
+
+- **Why.** `random_binary_instance(n, seed, max_cofactor)` draws `a` from
+  its seed, so "a ∈ {0, 1}, seeds 1–2" cannot be chosen.
+- **Change.** E11a uses seeds 1–4 for each n ∈ {19, 23}, with
+  `max_cofactor = 4`, and keeps each curve with the `a` it draws.
+- **No prediction changes.**
