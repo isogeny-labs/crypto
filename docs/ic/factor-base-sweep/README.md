@@ -70,6 +70,26 @@ literally. Invalid, dependent or out-of-field basis words are rejected.
 Supplied public-target fixtures are refused: this search generates matched
 public known-answer probes and does not solve a user-supplied discrete log.
 
+Compare the three additional decomposition leads with that same installed
+CLI (the plan and its small input bundle must be available):
+
+```sh
+factor-base-sweep compare-leads \
+  --plan research/factor_base_oracle_leads_20261019/plan.json \
+  --out runs/oracle-leads
+factor-base-sweep verify --run runs/oracle-leads
+```
+
+This bounded comparison tests asymmetric chart branches, exact selector
+membership, and a torsion quotient whose answers are lifted and checked on
+the original curve. It retains each system, all roots and worker events,
+disjoint training/holdout probes, positive controls, resource stops and a
+hash seal. Training rank collapses equal signed cofactor projections.
+The live lines report solver degree, matrix dimensions and reduction
+counts. The [frozen protocol](../../../research/factor_base_oracle_leads_20261019/PROTOCOL.md)
+defines six small-field cases and their limits. These component counts
+do not establish total speed or certified degree of regularity.
+
 ## What the live lines mean
 
 `Info:` lines are flushed as stages, candidates and trials complete. F4 emits

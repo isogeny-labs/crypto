@@ -1,0 +1,20 @@
+{
+  "schema": "factor_base_sweep.leads/v1",
+  "seed": 20261019,
+  "train": 12,
+  "holdout": 12,
+  "positives": 4,
+  "max_degree": 4,
+  "solve_millis": 750,
+  "hard_millis": 2000,
+  "max_matrix_cells": 1000000,
+  "memory_mib": 1024,
+  "cases": [
+    {"id":"n7-small","kind":"charts","left":"inputs/n7-coordinate.json","right":"inputs/n7-gp.json","left_take":2,"right_take":1},
+    {"id":"n7-full","kind":"charts","left":"inputs/n7-coordinate.json","right":"inputs/n7-gp.json","left_take":0,"right_take":0},
+    {"id":"n13-small","kind":"charts","left":"inputs/n13-main.json","right":"inputs/n13-aux.json","left_take":2,"right_take":1},
+    {"id":"n13-graft","kind":"charts","left":"inputs/n13-main.json","right":"inputs/n13-aux.json","left_take":0,"right_take":0},
+    {"id":"n7-torsion","kind":"torsion","left":"inputs/n7-coordinate.json","right":null,"left_take":0,"right_take":0},
+    {"id":"n13-torsion","kind":"torsion","left":"inputs/n13-main.json","right":null,"left_take":0,"right_take":0}
+  ]
+}

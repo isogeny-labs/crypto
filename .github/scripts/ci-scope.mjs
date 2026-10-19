@@ -69,6 +69,7 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
     result.release_cuda ||= client || releaseAttributes;
     result.ecbench_replay ||= root
       || /^research\/factor_base_shape_leads_20261018\//.test(file) && !prose.test(file)
+      || /^research\/factor_base_oracle_leads_20261019\//.test(file) && !prose.test(file)
       || /^docs\/(ecbench|bounds)\//.test(file) && !prose.test(file)
       || /^research\/(ecbench_[^/]+|ghs_curve_comparison_20261009)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))
       || /^research\/notes\/ecc2k130\/(cold_compact_orbit_ic_20261003|full_rank_compact_orbit_ic_20261003)\//.test(file) && (!prose.test(file) || file.includes('/sessions/'))

@@ -60,6 +60,11 @@ test('dependencies, workflow edits and frozen evidence remain applicable', () =>
     assert.equal(classify([`research/factor_base_shape_leads_20261018/${file}`]).ecbench_replay, true, file);
   }
   assert.equal(classify(['research/factor_base_shape_leads_20261018/README.md']).ecbench_replay, false);
+  for (const file of ['audit/src/main.rs', 'audit/Cargo.toml', 'audit/Cargo.lock',
+    'runs.tar.xz', 'analysis.json', 'plan.json', 'inputs/models.json']) {
+    assert.equal(classify([`research/factor_base_oracle_leads_20261019/${file}`]).ecbench_replay, true, file);
+  }
+  assert.equal(classify(['research/factor_base_oracle_leads_20261019/README.md']).ecbench_replay, false);
   assert.equal(classify(['research/fixture.json'], new Set(['research/fixture.json'])).rust_root, true);
 });
 

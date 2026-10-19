@@ -3,6 +3,10 @@
 mod audit;
 #[path = "factor_base_sweep/engine.rs"]
 mod engine;
+#[path = "factor_base_sweep/leads.rs"]
+mod leads;
+#[path = "factor_base_sweep/leads_algebra.rs"]
+mod leads_algebra;
 #[path = "factor_base_sweep/model.rs"]
 mod model;
 #[path = "factor_base_sweep/polynomials.rs"]
@@ -61,6 +65,18 @@ impl Tuning {
 }
 #[derive(Subcommand)]
 enum Action {
+    /// Compare asymmetric, selector and torsion-quotient decomposition leads.
+    CompareLeads {
+        #[arg(long)]
+        plan: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    #[command(hide = true)]
+    LeadsWorker {
+        #[arg(long)]
+        job: PathBuf,
+    },
     /// Launch or resume a bounded sweep. Human progress is streamed to stderr.
     Run {
         #[arg(long)]
@@ -188,7 +204,16 @@ fn dispatch() -> Result<()> {
             model::write_new(&out, &p)?;
             println!("{}", out.display());
         }
-        Action::Verify { run } => println!("{}", run::verify(&run)?),
+        Action::CompareLeads { plan, out } => println!("{}", leads::run(&plan, &out)?),
+        Action::LeadsWorker { job } => leads::worker(&job)?,
+        Action::Verify { run } => println!(
+            "{}",
+            if run.join("leads-manifest.json").exists() {
+                leads::verify(&run)?
+            } else {
+                run::verify(&run)?
+            }
+        ),
         Action::Worker { attempt } => {
             let request = model::read(&attempt.join("request.json"))?;
             engine::run(&request, &attempt)?;

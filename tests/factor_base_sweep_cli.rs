@@ -147,6 +147,63 @@ fn binary_and_prime_probes_replay_and_resume_without_overwriting() {
         assert!(String::from_utf8_lossy(&bad.stderr).contains("hash/member mismatch"));
     }
 }
+
+#[test]
+fn all_three_lead_paths_return_checked_point_witnesses_and_seal_outputs() {
+    let t = Temp::new();
+    let p = plan(&t, false);
+    let source = t.0.join("source");
+    assert!(launch(&p, &source).status.success());
+    let base = attempt(&source).join("base.json");
+    let plan_path = t.0.join("leads.json");
+    let spec = json!({"schema":"factor_base_sweep.leads/v1","seed":99,"train":1,"holdout":1,"positives":1,"max_degree":4,"solve_millis":500,"hard_millis":2000,"max_matrix_cells":1000000,"memory_mib":1024,"cases":[
+        {"id":"charts","kind":"charts","left":base,"right":base,"left_take":2,"right_take":1},
+        {"id":"torsion","kind":"torsion","left":base,"right":null,"left_take":0,"right_take":0}
+    ]});
+    fs::write(&plan_path, serde_json::to_vec_pretty(&spec).unwrap()).unwrap();
+    let output = t.0.join("comparison");
+    let args = [
+        "compare-leads",
+        "--plan",
+        plan_path.to_str().unwrap(),
+        "--out",
+        output.to_str().unwrap(),
+    ];
+    let run = call(&args);
+    assert!(
+        run.status.success(),
+        "{}",
+        String::from_utf8_lossy(&run.stderr)
+    );
+    let summary = value(&output.join("summary.json"));
+    let trials = summary["cases"][0]["trials"].as_array().unwrap();
+    for arm in [
+        "product-membership",
+        "asymmetric-branches",
+        "selector-membership",
+    ] {
+        let trial = trials
+            .iter()
+            .find(|v| v["phase"] == "positive-control" && v["arm"] == arm)
+            .unwrap();
+        assert!(!trial["original_witness"].is_null(), "{trial}");
+    }
+    let quotient = summary["cases"][1]["trials"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|v| v["phase"] == "positive-control" && v["arm"] == "torsion-quotient")
+        .unwrap();
+    assert!(!quotient["original_witness"].is_null(), "{quotient}");
+    assert!(call(&["verify", "--run", output.to_str().unwrap()])
+        .status
+        .success());
+    assert!(!call(&args).status.success(), "must refuse existing output");
+    fs::write(output.join("charts/inventory.json"), b"tampered").unwrap();
+    assert!(!call(&["verify", "--run", output.to_str().unwrap()])
+        .status
+        .success());
+}
 #[test]
 fn matrix_caps_are_retained_as_exhaustion_not_refutation() {
     let t = Temp::new();

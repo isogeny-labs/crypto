@@ -126,6 +126,7 @@ jobs:
             /isogeny_algos/
             /docs/
             /research/factor_base_shape_leads_20261018/
+            /research/factor_base_oracle_leads_20261019/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
       - name: Materialize native fixture inputs
@@ -166,6 +167,26 @@ jobs:
           cmp "$study/exact-coverage.json" "$replay/coverage.json"
           "$CARGO_TARGET_DIR/release/factor-base-lead-audit" --coverage "$replay/runs" docs/curves/registry.json subgroup-guard > "$replay/guard-coverage.json"
           cmp "$replay/runs/guard-coverage.json" "$replay/guard-coverage.json"
+      - name: Check all three oracle leads and replay independent point/root evidence
+        env:
+          CARGO_TARGET_DIR: ${{ github.workspace }}/target
+        run: |
+          set -euo pipefail
+          study=research/factor_base_oracle_leads_20261019
+          manifest="$study/audit/Cargo.toml"
+          cargo fmt --manifest-path "$manifest" -- --check
+          cargo test --locked --release --manifest-path "$manifest"
+          cargo clippy --locked --release --manifest-path "$manifest" --all-targets -- -D warnings
+          cargo build --locked --release --manifest-path "$manifest"
+          replay="$RUNNER_TEMP/factor-base-oracle-evidence"
+          mkdir -p "$replay"
+          sha256sum -c "$study/SOURCE_SHA256SUMS"
+          (cd "$study" && sha256sum -c runs.tar.xz.sha256)
+          tar -xJf "$study/runs.tar.xz" -C "$replay"
+          (cd "$replay" && sha256sum -c runs/SHA256SUMS)
+          "$CARGO_TARGET_DIR/release/factor-base-sweep" verify --run "$replay/runs/experiment"
+          "$CARGO_TARGET_DIR/release/factor-base-oracle-audit" "$replay/runs/experiment" "$study/inputs/models.json" > "$replay/independent-audit.json"
+          cmp "$study/analysis.json" "$replay/independent-audit.json"
 
   harness:
     if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
