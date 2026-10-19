@@ -38,3 +38,21 @@ cargo run --release --locked --offline --example walk_diagnostic
 The offline commands require the lockfile's dependencies to be cached. `original-source-manifest.json` identifies the source before correction. `SHA256SUMS` covers the saved evidence. The final module's hash and toolchain are in `validation.json`.
 
 The full original repository library suite is a separate integration gate. It was started locally after restoring the original branch and required source fixtures; its final result is recorded separately in the top-level recovery directory. The 29-test result is not a substitute for that full suite. No branch is merged by this recovery.
+
+## Full repository integration validation
+
+The original branch with the corrected Smith module completed the full release
+library suite on 2026-10-19: **4,394 passed, 8 failed, 118 ignored**. All eight
+failures reported missing archived runtime data omitted by the sparse checkout.
+The files were restored from the same original Git revision; assertions and
+scientific inputs were not changed. The exact compact-orbit test then passed,
+and all nine chain-set tests passed, covering the seven other failed tests plus
+two additional controls. Thus every failure from the full run has a passing
+rerun. This is a full run plus focused repairs and reruns, not a second single
+all-green full-suite invocation. The 118 ignored tests remain unexecuted.
+
+`cargo test --release --locked --offline --example smith_elliptic_walk -j2 --
+--test-threads=1` also succeeded. That example contains zero tests, so this is
+compilation coverage. No Python implementation was changed in this correction.
+The original full log, terminal receipt and all rerun receipts are preserved in
+`integration/`, with checksums.
