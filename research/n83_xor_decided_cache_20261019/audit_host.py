@@ -13,6 +13,7 @@ import subprocess
 from panel_supervisor import PLAN
 
 ROOT = Path(__file__).resolve().parent
+ATTEMPT = ROOT / 'attempt-02'
 SOURCE = '8cde893f774cace3e022438e168a0485b7268a57'
 BINARY = 'e95658ff67c876a6ae80d9c9c6cd89726b32947d48c653208efadbc1cc2950c3'
 ARCHIVES = {
@@ -43,8 +44,8 @@ def utc(text: str) -> datetime:
 
 
 def audit() -> dict:
-    setup = ROOT / 'host-setup'
-    panel = ROOT / 'panel-01'
+    setup = ATTEMPT / 'host-setup'
+    panel = ATTEMPT / 'panel-01'
     package = read_json(ROOT / 'source-package.json')
     snapshot = read_json(ROOT / 'snapshot-attestation.json')
     require(snapshot['source_commit'] == SOURCE and snapshot['status_clean'] is True,
@@ -158,7 +159,7 @@ def audit() -> dict:
     require(0 < arm_wall < provisioned, 'host accounting interval')
     price = read_json(setup / 'spot-price-observed.json')['SpotPriceHistory']
     require(len(price) == 1 and price[0]['InstanceType'] == 'c7i.2xlarge'
-            and price[0]['AvailabilityZone'] == 'us-west-2b',
+            and price[0]['AvailabilityZone'] == 'us-west-2d',
             'spot observation identity')
     point_price = float(price[0]['SpotPrice'])
     report = {
@@ -185,7 +186,7 @@ def audit() -> dict:
         'candidate_id': None, 'total_index_calculus_runtime_ms': None,
         'selected_best_total_runtime': None,
     }
-    (ROOT / 'host-audit.json').write_text(json.dumps(report, sort_keys=True, indent=2) + '\n')
+    (ATTEMPT / 'host-audit.json').write_text(json.dumps(report, sort_keys=True, indent=2) + '\n')
     return report
 
 
