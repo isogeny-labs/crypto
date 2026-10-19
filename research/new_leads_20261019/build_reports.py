@@ -26,6 +26,8 @@ fig.supxlabel('q and t are residues modulo ell. C = companion; S = scalar.\nSour
 fig.savefig(root/'figures/kernel-counts.svg')
 fig.savefig(root/'figures/kernel-counts.png', dpi=150)
 plt.close(fig)
+svg_path = root/'figures/kernel-counts.svg'
+svg_path.write_text('\n'.join(line.rstrip() for line in svg_path.read_text().splitlines())+'\n')
 (root/'figures/evidence-chain.svg').write_text('''<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="205" viewBox="0 0 1000 205">
 <rect width="1000" height="205" fill="white"/>
 <text x="15" y="24" font-family="DejaVu Sans" font-size="18" fill="#17394a">A kernel-screen hit leaves three construction and solver gates open</text>
