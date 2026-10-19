@@ -104,3 +104,37 @@ otherwise `unresolved` (§5a: orders are ranked only where they hold across the 
 
 Reported with every row: distance to the matched rho (ratio), the backend's
 measured per-addition (M, S, I), and the break-even addition cost per cell.
+
+---
+
+# Amendment 1 (written 2026-10-19 after run 1, before run 2)
+
+Run 1 (`results/run-20261019T1700Z`, seed tag 0, 10 targets × 16 instances = 160
+targets) executed the protocol above unchanged. Its outcome, recorded as it came:
+all 2,112 rows verified; exact-replay A/A (`Rr` = `R`) and the 10 % replay pass
+(192 rows) identical; positive control Pl/R in [1.389, 1.405], CI > 1; rho
+calibration 1.03 / 1.01; but the independent-seed A/A `Rp`/`R` = 0.938 (CI contains 1 in
+all 36 combinations) **failed my own tolerance |ratio − 1| < 0.03**. That tolerance was
+set without the sampling variance of 160 geometric-length rho walks (standard error
+of a ratio of sums ≈ 4 %). Under the frozen rule, run 1 yields **no decision**. It is
+retained as a failed-control record; its numbers are not used for the decision.
+
+Changes (all fixed before run 2; nothing else changes):
+
+1. **A/A pass criterion** is now: all 36 `Rp`/`R` intervals contain 1, plus exact-replay
+   equality. The point tolerance is dropped and replaced by reporting the A/A ratio and
+   interval half-width as the resolution of the instrument.
+2. **Run 2** uses fresh seeds (`N2_SEEDTAG=1`), the same 16-instance design (8 at 36, 8 at 40
+   bits) and 20 targets per instance (320 targets), so no run-1 data enter run 2.
+   Everything else in the protocol, the pricing, the comparator rule, the controls
+   (other than item 1) and the decision rule is unchanged and applies to run 2.
+3. **Pre-declared secondary analyses** (seen-motivated by run 1, so labelled secondary,
+   never used for the decision): (a) Legendre-test sensitivity: the primary prices the
+   test at one inversion per degree-2 divisor (inherited from #2170 H3, which makes
+   it ι-dependent); secondary variants price it at 0 (the sqrt table already answers
+   residuosity, its build is charged) and at 30 M (a ~20-bit exponentiation). (b) break-even
+   Jacobian addition cost per cell and native price ν. (c) a hypothetical column
+   that replaces the walk's Jacobian addition by 22 M + I (the break-even named in #2170;
+   not built) and reports which cells would flip. None of these changes a verdict;
+   if a secondary variant would flip the decision rule's branch, the report says
+   "decision sensitive to Legendre pricing".
