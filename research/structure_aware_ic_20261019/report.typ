@@ -16,13 +16,8 @@ Both tests are constants, not exponents; neither moves a row of the leaderboard.
 *Setup.* Three new random binary curves, $a = 1$, cofactor 2 (seed 7001, n = 19, 21, 23), 8 targets each.
 Half base = `dimension=8,trace_kernel=1` (degree $d-1$) against default `dimension=9`; MITM primary, F4 secondary.
 
-*Frozen verdict: not falsified.* Half is below default across the whole band on 3 of 3 curves.
-MITM $Sigma S$(half)/$Sigma S$(default) = 0.282 [0.271, 0.299]; per curve 0.261 [0.259, 0.264], 0.273 [0.269, 0.277], 0.385 [0.363, 0.411].
-Controls: the repeated default arm is identical to the count (ratio 1.0000); `rho.plain`/`rho.negation` at $w=0$ is 1.30 pooled (theory 1.41, intervals overlap).
-
-*But the frozen baseline was mistuned.* That ratio (2.6--3.8x) exceeds the ~2x ceiling because default degree 9 is past the MITM optimum.
-At equal point count (default 8 against half 9) the ratio is 0.98, 0.83, 0.72 (post hoc session `e11b_x_decomp`).
-Amendment 3 therefore tunes both families on fresh curves (seed 8001), then tests tuned against tuned on the original curves:
+*Headline (tuned against tuned, Amendment 3): not falsified, about 1.45x.* Both families were tuned on fresh a=1 curves (seed 8001), then tested on these curves.
+The half base is below the tuned default across the whole band on 3 of 3 curves:
 
 #table(columns: 6, align: (left, left, right, right, right, right),
 [*curve*], [*arms (default / half)*], [*S ratio*], [*95% (cluster)*], [*band $w=0, 0.1, 1$ half < default*], [*half S at $w=0.1$ / rho.neg*],
@@ -30,7 +25,14 @@ Amendment 3 therefore tunes both families on fresh curves (seed 8001), then test
 [n=21], [d7 / half d7], [0.653], [0.559 -- 0.766], [yes, yes, yes], [9.0x],
 [n=23], [d8 / half d8], [0.725], [0.651 -- 0.819], [yes, yes, yes], [12.4x],
 )
-Pooled over the three curves $Sigma S$(half)/$Sigma S$(default) = 0.690, 0.685, 0.666 at $w = 0, 0.1, 1$ (derived from the band report): *about 1.45x, below the 2x ceiling*.
+Pooled $Sigma S$(half)/$Sigma S$(default) = 0.690, 0.685, 0.666 at $w = 0, 0.1, 1$ (derived from the band report): about 1.45x, below the 2x ceiling.
+The chosen dimensions came from 4 targets of one curve per n, and the n=19 pair differs in degree (d7 against half d6), as the rule dictated.
+
+*Secondary (frozen comparison, against a mistuned default): 0.282 [0.271, 0.299].* The pre-registered pair was half at degree 8 against default degree 9; half is below default on 3 of 3 curves (0.261, 0.273, 0.385).
+*Caveat, stated with the number:* default degree 9 is past the MITM optimum, so this ratio (2.6--3.8x, beyond the ~2x ceiling) overstates the gain over the best default; it is not an improvement over the baseline.
+At equal point count (default 8 against half 9) the ratio is 0.98, 0.83, 0.72 (post hoc session `e11b_x_decomp`).
+Controls: the repeated default arm is identical to the count; `rho.plain`/`rho.negation` at $w=0$ is 1.30 pooled (theory 1.41, intervals overlap).
+
 F4 pair (secondary): 1.014 [0.942, 1.090] pooled; 0.89, 1.04, 1.10 per curve; the order holds across the band only at n=19. *Null for F4.*
 
 *Class: engineering* (a verified constant-factor gain of about 1.45x in whole-method S of the MITM pipeline over a tuned default; every answer verified).
