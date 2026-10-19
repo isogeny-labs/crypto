@@ -1706,3 +1706,59 @@ index-calculus walk keeps its short coefficients: it looks for smooth
 points, not collisions, so the argument above does not reach it. If W1
 holds and W2 fails, the Jacobian adds its own excess and is examined
 next. If W1 fails, the short coefficients are not the cause.
+
+## Round twelve: measured — the short branch coefficients were the cause
+
+Registered run: card `CARD-HEIC-ROUND12-1` (commit `be98f8e7`, binary
+sha256 `9ca561b5…391e63`), receipt
+`research/notes/index-calculus/round12/run1/receipt.json` (completed,
+nine commands exit 0), output `run1/R12.txt`, isolation record
+uncontended on reserved CPU 3 (529 s). Four arms × 18 instances × 40
+seeds, every `k` verified. The 8-bit columns reproduce rounds nine and
+eleven exactly.
+
+| | registered test | result |
+|--|--|--|
+| W1 | integer model, full width, `N ≥ 10⁵`: median in [1.10, 1.40], two largest ≤ 1.55 | **holds**: median 1.303; largest rows 1.505, 1.303 |
+| W2 | Jacobian, full width: the same bounds | **holds**: median 1.390; largest rows 1.481, 1.212 |
+| W3 | control, `N ≤ 6·10⁴`: Jacobian median moves < 0.15 | holds: 0.025 |
+| W4 | every run verified | holds |
+
+Rows with `N ≥ 10⁵` (`S_walk`, ideal 1.2533):
+
+| g | `p` | `N` | Jacobian 8-bit | Jacobian full | 8-bit / full | integer 8-bit | integer full |
+|--:|--:|--:|--:|--:|--:|--:|--:|
+| 3 | 61 | 124459 | 1.477 | 1.390 | 1.063 | 1.521 | 1.347 |
+| 3 | 101 | 364747 | 1.407 | 1.484 | 0.948 | 1.406 | 1.219 |
+| 3 | 151 | 1180351 | 1.706 | 1.457 | 1.171 | 1.514 | 1.331 |
+| 3 | 211 | 4620611 | 1.820 | 1.212 | 1.502 | 1.752 | 1.303 |
+| 4 | 31 | 239753 | 1.303 | 1.287 | 1.012 | 1.549 | 1.239 |
+| 4 | 41 | 333041 | 1.344 | 1.327 | 1.013 | 1.259 | 1.173 |
+| 4 | 61 | 16790591 | 2.100 | 1.481 | 1.418 | 2.171 | 1.505 |
+
+Full-width branches cost `2·(bits(N) + 1)` operations each, 884 on the
+largest row (0.216·√N), reported as precomputation and not in `S_walk`.
+
+**What it means.**
+
+- The reference rho's large-`N` excess came from its own step rule:
+  "short coefficients cost rho nothing" (the comment on `RHO_STEP_BITS`)
+  was wrong for a collision walk. It holds for the index-calculus walk,
+  which looks for smooth points, not collisions.
+- The excess grows with `N`: 1.06 at `N = 1.2·10⁵`, 1.42–1.50 at the two
+  largest rows. Below `6·10⁴` it is absent (W3).
+- **Class: accounting, against index calculus.** Every thread IC/rho ratio
+  measured against the 8-bit reference at `N ≥ 10⁵` flattered index
+  calculus by that row's 8-bit/full factor. Those ratios were already
+  labelled lower-bound and unranked (§5a/§12 amendment); they now also
+  carry a reference that was slow by up to 1.5×, and are to be
+  re-measured against the full-width reference rather than corrected by
+  arithmetic. This is not an improvement to index calculus; it is a
+  correction to its baseline, which moves the gap to rho the other way.
+- The reference is replaced: `RhoVariant`'s default is now
+  `DistinguishedPointsFullWidth`. `DistinguishedPoints` keeps its 8-bit
+  meaning, so every frozen example and round still reproduces exactly.
+- Rounds nine and ten are re-read in this light, not re-run: the
+  negation fold's failure at large `N` (R1) and the mixed-hash failure
+  (H1) were measured on the slow walk. The fold is the next thing to
+  re-test on the full-width walk.

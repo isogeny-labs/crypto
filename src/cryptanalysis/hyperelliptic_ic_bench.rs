@@ -191,14 +191,17 @@ pub fn thread_instance(
 /// index calculus by handicapping its reference.
 const RHO_BRANCHES: usize = 16;
 
-/// Bit length of the rho branch coefficients `a_j, b_j`.
+/// Bit length of the short rho branch coefficients `a_j, b_j`
+/// ([`RhoVariant::DistinguishedPoints`] and the other short-step walks).
 ///
 /// The index-calculus walk builds its steps from short coefficients
-/// because precomputation is its largest term once a trial costs one
-/// operation.  The same trick is available to rho and costs it nothing,
-/// so the reference gets it too: optimising one side's precomputation
-/// and not the other's would be a rigged comparison, and the rigging
-/// would favour the side under study.
+/// because precomputation is its largest term, and it looks for smooth
+/// points, so nothing is lost.  Rho was given the same trick on the
+/// argument that it cost nothing; round twelve measured otherwise.  With
+/// short coefficients a walk's displacement `ΔA + ΔB·k` stays on a small
+/// 2-D set, and at `N ≈ 1.7·10⁷` the walk needed 1.42× the steps of the
+/// full-width walk ([`RhoVariant::DistinguishedPointsFullWidth`], now the
+/// default).
 const RHO_STEP_BITS: u32 = 8;
 
 /// Which rho to run as the reference.
@@ -216,9 +219,10 @@ pub enum RhoVariant {
     /// Distinguished points: store the walk positions whose hash ends
     /// in `theta_bits` zero bits, and stop when one repeats.  One
     /// operation per step, at the price of a table — this is the rho
-    /// anyone attacking a real curve would run, so it is the default
-    /// reference.
-    #[default]
+    /// anyone attacking a real curve would run.  Its branch
+    /// coefficients are `RHO_STEP_BITS` bits, which round twelve showed
+    /// slows the collision at large `N`; kept for the frozen rounds, and
+    /// no longer the default.
     DistinguishedPoints,
     /// Distinguished points on `±` classes: after every step the
     /// position is replaced by a canonical representative of `{D, −D}`,
@@ -247,7 +251,9 @@ pub enum RhoVariant {
     /// `a_j, b_j` uniform in `[0, N)` instead of `RHO_STEP_BITS`-bit ones
     /// (round twelve).  With short coefficients a walk's displacement
     /// `ΔA + ΔB·k` concentrates on a small 2-D set, which can delay its
-    /// rho collision at large `N`.
+    /// rho collision at large `N`.  The default reference since round
+    /// twelve.
+    #[default]
     DistinguishedPointsFullWidth,
 }
 
