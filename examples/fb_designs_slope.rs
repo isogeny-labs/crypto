@@ -2372,6 +2372,9 @@ impl Cell2 {
 /// Which study group a row file belongs to: `F1` … `F4`, or `p1` for the
 /// committed p₁ rows of the first run.
 fn group_of(file: &str) -> &str {
+    if file.starts_with("L2r-") {
+        return "L2r";
+    }
     match file.get(..3) {
         Some(
             g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-" | "L1-" | "L2-"),
@@ -3544,6 +3547,207 @@ fn analyze5(dir: &str) {
     );
 }
 
+/// Amendment 6: L2r, the L2 systems rerun under an address-space limit
+/// below the host's memory cgroup; the attribution check against the kernel
+/// log copied beside the rows, R2 applied to L2r, and the prediction.
+fn analyze6(dir: &str) {
+    let rows = read_rows(dir);
+    let group = |g: &'static str| -> Vec<&Value> {
+        rows.iter()
+            .filter(|(f, _)| group_of(f) == g)
+            .map(|(_, r)| r)
+            .collect()
+    };
+    let (c1, c2, l2, l2r) = (group("C1"), group("C2"), group("L2"), group("L2r"));
+    println!("Factor-base designs, Amendment 6 (L2r): rows from {dir}");
+    println!("(L2r = L2's two A11 m = 4, t = 5 systems under ulimit -v V below the memory cgroup. A system's");
+    println!(" limit is attributable only if its row is a ulimit -v malloc failure or a timeout and the kernel");
+    println!(" log beside the rows has no OOM kill. peak_rss_kb is descriptive only.)");
+
+    let dmesg = std::fs::read_to_string(format!("{dir}/L2r-A11-m4-t5.dmesg.txt")).ok();
+    let kills: Vec<String> = dmesg
+        .as_deref()
+        .unwrap_or("")
+        .lines()
+        .filter(|l| l.contains("Memory cgroup out of memory: Killed process"))
+        .map(String::from)
+        .collect();
+    let preflight: Vec<String> = dmesg
+        .as_deref()
+        .unwrap_or("")
+        .lines()
+        .filter(|l| l.starts_with("# pre-flight"))
+        .map(String::from)
+        .collect();
+
+    println!();
+    println!(
+        "════ Pre-flight and kernel log ({})",
+        if dmesg.is_some() {
+            "runs/L2r-A11-m4-t5.dmesg.txt"
+        } else {
+            "MISSING"
+        }
+    );
+    for l in &preflight {
+        println!("  {}", l.trim_start_matches("# "));
+    }
+    println!("  kernel OOM kills recorded: {}", kills.len());
+    for k in &kills {
+        println!("    {k}");
+    }
+
+    println!();
+    println!("════ L2r: A11 m = 4, t = 5, p1, budget 14400 s + grace 600 s");
+    if l2r.is_empty() {
+        println!("  no rows");
+    }
+    let mut attributable = Vec::new();
+    for r in &l2r {
+        let why = r["failure_reason"].as_str().unwrap_or("");
+        let v = r["ulimit_v_kb"].as_u64().unwrap_or(0);
+        let ok = r["status"] == "ok";
+        let attr = dmesg.is_some()
+            && kills.is_empty()
+            && (ok
+                || r["status"] == "timeout"
+                || why.contains(&format!("memory allocation failed under ulimit -v {v}")));
+        attributable.push(attr);
+        println!(
+            "  A11 t={} target {}: status {}, D {}, max_cols {}, field_ops {}, time {:.1} s, peak_rss_kb {}, ulimit_v_kb {}, budget {} s{}  →  limit {}",
+            r["t"],
+            r["target"],
+            r["status"].as_str().unwrap_or("?"),
+            r["D"],
+            r["max_cols"],
+            r["field_ops"],
+            r["time"].as_f64().unwrap_or(f64::NAN),
+            r["peak_rss_kb"],
+            r["ulimit_v_kb"],
+            r["budget_s"],
+            r["failure_reason"].as_str().map(|s| format!(" ({s})")).unwrap_or_default(),
+            if ok { "none (completed)" } else if attr { "attributable (the registered one)" } else { "NOT ATTRIBUTABLE" }
+        );
+    }
+    let same = l2r
+        .iter()
+        .filter(|r| {
+            l2.iter().any(|c| {
+                c["target"] == r["target"]
+                    && [
+                        "cell_seed",
+                        "target_seed",
+                        "n_vars",
+                        "n_eqs",
+                        "planted_x",
+                        "x_r",
+                        "curve",
+                        "set",
+                    ]
+                    .iter()
+                    .all(|k| c[*k] == r[*k])
+            })
+        })
+        .count();
+    println!(
+        "  identity with L2's systems (cell_seed, target_seeds, n_vars, n_eqs, planted_x, x_r, curve, set): {same} of {} L2r systems match",
+        l2r.len()
+    );
+    for r in &l2 {
+        println!(
+            "  L2 (prior attempt) target {}: {} at {:.1} s, peak_rss_kb {} ({})",
+            r["target"],
+            r["status"].as_str().unwrap_or("?"),
+            r["time"].as_f64().unwrap_or(f64::NAN),
+            r["peak_rss_kb"],
+            r["failure_reason"].as_str().unwrap_or("")
+        );
+    }
+
+    // R2 on L2r: A11 series F4 (via C1) + C2 + L2r.
+    let a11: Vec<&Value> = c1
+        .iter()
+        .copied()
+        .filter(|r| {
+            r["arm"] == "A11"
+                && r["m"] == 4
+                && r["replay_of"]
+                    .as_str()
+                    .is_some_and(|f| f.starts_with("F4-"))
+        })
+        .chain(of_arm(&c2, "A11"))
+        .chain(l2r.iter().copied())
+        .collect();
+    println!();
+    println!("════ σ and κ at m = 4, p1");
+    let (n, s, k) = show4(
+        "A11 m = 4 p1 (F4 via C1, C2's t = 4 cell, L2r's t = 5 cell)",
+        4,
+        &cells4(a11.into_iter()),
+    );
+    let done = l2r.len() == 2
+        && l2r
+            .iter()
+            .all(|r| r["status"] == "ok" && r["field_ops"].is_u64());
+    let v = l2r
+        .first()
+        .and_then(|r| r["ulimit_v_kb"].as_u64())
+        .unwrap_or(0);
+    println!();
+    println!("════ R2 applied to L2r");
+    let outcome = if l2r.len() < 2 {
+        format!("NOT DECIDED (L2r has {} of 2 rows)", l2r.len())
+    } else if done {
+        format!(
+            "L2r completed: the {n}-cell series gives κ = {} ({}), σ = {} ({})",
+            k.map_or("-".into(), |x| format!("{x:.3}")),
+            kappa_verdict(n, k, 4),
+            s.map_or("-".into(), |x| format!("{x:.4}")),
+            verdict(n, s)
+        )
+    } else if attributable.iter().all(|x| *x) {
+        format!(
+            "A11 NOT MEASURABLE AT m = 4, t = 5 WITHIN {v} kB AND 4 h; the {n}-cell verdicts stand: κ = {} ({}), σ = {} ({})",
+            k.map_or("-".into(), |x| format!("{x:.3}")),
+            kappa_verdict(n, k, 4),
+            s.map_or("-".into(), |x| format!("{x:.4}")),
+            verdict(n, s)
+        )
+    } else {
+        "NOT DECIDED (a limit is not attributable; see the rows above)".to_string()
+    };
+    println!("  R2: {outcome}");
+    println!(
+        "  Amendment 5's L2 prediction keeps its recorded outcome (not decided as registered)."
+    );
+
+    println!();
+    println!("════ Predictions scorecard (Amendment 6)");
+    let mut held = l2r.len() == 2;
+    for r in &l2r {
+        let t = r["target"].as_u64().unwrap_or(9);
+        let prior = l2
+            .iter()
+            .find(|c| c["target"] == t)
+            .and_then(|c| c["time"].as_f64())
+            .unwrap_or(f64::NAN);
+        let why = r["failure_reason"].as_str().unwrap_or("");
+        let malloc = why.contains(&format!("memory allocation failed under ulimit -v {v}"));
+        let time = r["time"].as_f64().unwrap_or(f64::NAN);
+        let ok = malloc && kills.is_empty() && dmesg.is_some() && time < prior;
+        println!(
+            "  target {t}: ulimit -v malloc failure {malloc}, no OOM kill {}, time {time:.1} s against L2's {prior:.1} s  →  {}",
+            dmesg.is_some() && kills.is_empty(),
+            if ok { "as predicted" } else { "not as predicted" }
+        );
+        held &= ok;
+    }
+    println!(
+        "  L2r: both systems abort under ulimit -v V, no OOM kill, each before its L2 kill time  →  {}",
+        if l2r.len() < 2 { "not decided" } else if held { "held" } else { "did not hold" }
+    );
+}
+
 // ── Arguments ──────────────────────────────────────────────────────
 
 fn flag(args: &[String], name: &str) -> Option<String> {
@@ -3608,7 +3812,9 @@ fn main() {
         }
         "analyze" => {
             let dir = args.get(1).expect("a runs directory");
-            if args.iter().any(|a| a == "--amendment5") {
+            if args.iter().any(|a| a == "--amendment6") {
+                analyze6(dir);
+            } else if args.iter().any(|a| a == "--amendment5") {
                 analyze5(dir);
             } else if args.iter().any(|a| a == "--amendment4") {
                 analyze4(dir);
