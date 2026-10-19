@@ -141,7 +141,7 @@ fn smooth_split(n: u64) -> Option<(u64, u64)> {
     let mut c = n;
     let mut d = 2u64;
     while d < 4096 && d * d <= c {
-        while c % d == 0 && c > d {
+        while c.is_multiple_of(d) && c > d {
             c /= d;
         }
         d += 1;
