@@ -1545,7 +1545,14 @@ fn read_rows(dir: &str) -> Vec<(String, Value)> {
 
 /// Every completed system is measured once more from its seed. The trace
 /// (D, max_cols, max_rows, steps) must equal the committed row's.
-fn replay(dir: &str, out: &str, budget: u64, grace: u64, vmem_kb: u64) {
+fn replay(
+    dir: &str,
+    out: &str,
+    budget: u64,
+    grace: u64,
+    vmem_kb: u64,
+    only: (Option<String>, Option<u64>, Option<u64>),
+) {
     let rows = read_rows(dir);
     let path = format!("{dir}/{out}");
     let mut outf = OpenOptions::new()
@@ -1562,6 +1569,12 @@ fn replay(dir: &str, out: &str, budget: u64, grace: u64, vmem_kb: u64) {
     let (mut total, mut matched) = (0usize, 0usize);
     for (_, r) in &rows {
         if r["status"] != "ok" {
+            continue;
+        }
+        if only.0.as_deref().is_some_and(|a| r["arm"] != a)
+            || only.1.is_some_and(|n| r["n"] != n)
+            || only.2.is_some_and(|m| r["m"] != m)
+        {
             continue;
         }
         let arm = Arm::parse(r["arm"].as_str().expect("arm"));
@@ -2198,6 +2211,11 @@ fn main() {
                 flag(&args, "--budget").map_or(300, |s| s.parse().unwrap()),
                 flag(&args, "--grace").map_or(120, |s| s.parse().unwrap()),
                 flag(&args, "--vmem-kb").map_or(13_000_000, |s| s.parse().unwrap()),
+                (
+                    flag(&args, "--arm"),
+                    flag(&args, "--n").map(|s| s.parse().unwrap()),
+                    flag(&args, "--m").map(|s| s.parse().unwrap()),
+                ),
             );
         }
         "analyze" => {
