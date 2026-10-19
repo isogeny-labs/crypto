@@ -5364,7 +5364,7 @@ mod wide {
                 }
                 let Some((tx, ty)) = target else { continue };
                 let start = (tx ^ ty.rotate_left(29)) as usize;
-                let mut run = |mode: RankSolve| {
+                let run = |mode: RankSolve| {
                     let mut ns = 0u128;
                     extract128_with(&gf, &fast, &basis, &solver, &index, &base, target, start, &mut ns, mode)
                         .map(|r| (r.point_indices, r.x_codes, r.intermediates, r.probes))
