@@ -205,3 +205,24 @@ at v3 and are not retuned; no claim that the index calculus beats rho.
 [`run.sh`](run.sh) runs, in order, for `v8` then `v8c` (with
 `KIC_RHO_CANON=scalar`): `manifest`, `all`, `reference`, `claims`,
 `analyse`, then `icprog rule matched --comparison v8`.
+
+## Amendment 1 (2026-10-19, before any timed row): the pin
+
+The first attempt (card `CARD-RULEV8-20261019-1`) stopped at the pin, as
+"Stop" declares, with no timed row run (the pin is untimed;
+`runs/attempt-1-stopped-at-pin/`). At all six sizes the pin differed in one
+output, `counts`, and in no other: `status`, both recovered logarithms,
+`rho_counts`, `all_verified` and `ic_and_rho_agree` equal §23's `T01-R1`.
+The difference is two counters, `row_ops` (498 and 852 at `n = 47`) in the
+index calculus's pass counts, which the 2026-09-30 reference output predates:
+main's drift added the counter after §23. It is a change of accounting
+schema, not of what the binary decides.
+
+**Change** (the harness only; the `ic` binary is unchanged): for rule v8 and
+v8c the pin requires every counter the earlier output has to match exactly
+and lists the counters only the new output has
+(`counters_added_since_the_earlier_output` in `pin.json`). Frozen
+comparisons keep the strict test. `icprog` is rebuilt from the commit that
+makes this change: SHA-256
+`15e4a84352563b59efe2eda2aa28a997ba5e3034f22699ce218de0888d1c16e7`. The
+other hashes above stand. The cards are recompiled for the new commit.
