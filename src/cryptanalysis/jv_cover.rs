@@ -3102,6 +3102,9 @@ pub fn run_stop_study(
     for &c in chunks {
         modes.push((format!("hilbert_chunk{c}"), jv_options(24, 300.0).stopping_by_hilbert(c)));
     }
+    for (_, opts) in &mut modes {
+        *opts = opts.clone().capturing_run_log();
+    }
     let mut out = Vec::new();
     for (k, (r, pl)) in jobs.iter().enumerate() {
         if r.u.len() != 4 {

@@ -377,6 +377,8 @@ pub struct F4Options {
     /// degree.  With [`F4Options::stop_staircase`] it lets the staircase
     /// check run between batches of one degree.
     pub max_pairs_per_step: Option<usize>,
+    /// Collect per-step diagnostics for explicit research runs. Disabled by default.
+    pub capture_run_log: bool,
 }
 
 impl F4Options {
@@ -390,6 +392,7 @@ impl F4Options {
             stop_hilbert: None,
             hilbert_expect: None,
             max_pairs_per_step: None,
+            capture_run_log: false,
         }
     }
     /// Block-aware reduction by the given `Z/3`-weights.
@@ -423,6 +426,11 @@ impl F4Options {
     /// `F4Report::hilbert` says which path ran.  Not combined with traces.
     pub fn stopping_by_hilbert(mut self, chunk: usize) -> Self {
         self.stop_hilbert = Some(chunk.max(1));
+        self
+    }
+    /// Record the next F4 run's per-step research diagnostics.
+    pub fn capturing_run_log(mut self) -> Self {
+        self.capture_run_log = true;
         self
     }
 }
@@ -2289,7 +2297,7 @@ fn f4_with_arithmetic(
                 );
             }
         }
-        let ops_step0 = field_ops_now();
+        let ops_step0 = opts.capture_run_log.then(field_ops_now);
         let tp0 = Instant::now();
         // symbolic preprocessing
         let mut rows_poly: Vec<(usize, Vec<u32>)> = Vec::new(); // (basis index, multiplier)
@@ -2817,7 +2825,7 @@ fn f4_with_arithmetic(
                 lm_packed.as_mut(),
             );
         }
-        {
+        if let Some(ops_step0) = ops_step0 {
             let lms: Vec<&[u32]> = basis
                 .iter()
                 .zip(&alive)
