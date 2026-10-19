@@ -1,0 +1,53 @@
+{
+  "kind": "t20_n73_k600_e2e_protocol",
+  "frozen_utc": "2026-10-19",
+  "frozen_before_timing": true,
+  "task": "T20 of RESEARCH_IC_LEADS_ASSESSMENT_20261018.md (PR #2156)",
+  "class": "engineering (same algorithm, same relations; native speed only)",
+  "baseline_row": {
+    "description": "the landed n=73, K=600 single-target IC row: experiments/koblitz-single-target-n73-20261003 (R1 rank-stage wall 18,398,763 ms, 457,561 target probes, rho/IC online 184.9x)",
+    "curve": "Koblitz a=0, b=1 over GF(2^73), x^73+x^4+x^3+x^2+1, subgroup r=86020738150056119",
+    "base_file": "experiments/koblitz-single-target-n73-20261002/base_n73_K600.jsonl",
+    "base_file_sha256": "a65776025e4b9ebc4a1e074f9304d834ac12cd533afc7d89a1d3ee72a2a766cc",
+    "base_hash_internal": "37f22aed4a55e30058bcdf9eb48a38238287b6fa6aec686a4bbe310016685c56",
+    "target_file": "experiments/koblitz-single-target-n73-20261003/frozen/target_points.jsonl",
+    "target_file_sha256": "f813c261330dfa7b0dfaeb010c7d14828f596b32b3b08b908dbbed1250beb83b",
+    "fixture_sidecar": "experiments/koblitz-single-target-n73-20261003/frozen/fixture.json (validation only; never an input to either arm)",
+    "fixture_sidecar_sha256": "43b93188f74dfa0e00c18e3f6966e4c8af2065e4df7620ace1cb581127add988",
+    "known_answer": "12345678901234567",
+    "rank_seed": 7,
+    "note": "R1 ran the sequential rank path; the arms here use the documented parallel guided rank (KIC_RANK_THREADS=3), whose per-column scalars differ from R1's, so the relation set and probe counts differ from R1 and the R1 wall is a historical anchor on another host, not an arm."
+  },
+  "binaries": {
+    "ic": "target/release/examples/koblitz_orbit_dlp_fast sha256 bd9c3f0dc8c3113ed6ffba4a85bef4249fdfa39d1d3454dff82624ba4767edb4 (source = PR #2156 head 655afd43e + KIC_RANK_TRACE per-column trace, observation only)",
+    "rho": "target/release/examples/koblitz_rho_fixture sha256 9e0aa26c772947748e427300c5530a84a6770166057292ed55edff11e20fe8de (args: 73 0 signed_frobenius 1 packed, one worker)",
+    "rustc": "1.97.0"
+  },
+  "arms": {
+    "O (old producer)": "KIC_LAZY_CANON=0 KIC_PREFETCH=0, serial index build, KIC_RANK_THREADS=3, same binary",
+    "N (landed producer)": "binary defaults (KIC_LAZY_CANON=1 KIC_PREFETCH=1) + KIC_INDEX_THREADS=3 KIC_INDEX_BATCH_INV=1 (the two opt-in index switches are part of the landed gains), KIC_RANK_THREADS=3, same binary",
+    "run_order": "scan positive control (3 rounds of old/new), rho draws 1-10, N1, O1, N2, rho draws 11-20",
+    "A/A": "N1 vs N2 (same arm twice, bracketing O1); no second O run (cost: one old run is about 2 h): drift of O1 is bracketed, not estimated"
+  },
+  "host": "this container: 4 vCPU Xeon 2.80 GHz KVM guest, 15 GiB, no PMU; IC pinned to cores 1-3 and rho to core 1 through tools/isolated_bench.py (core 0 for the system); contended flag recorded per run",
+  "metrics": {
+    "primary": "end-to-end cold wall = bash real of the whole process (process start, base load, basis, index build, rank stage, linear algebra, target, exit), ratio O1 / mean(N1,N2)",
+    "uncertainty": "bootstrap (10,000 resamples, 95% percentile) over the 600 rank columns stratified by thread class (column mod 3), the same resampled columns in both arms; rank wall = max over strata of summed per-column ns; non-rank phases as measured. Run-to-run noise: the A/A N1/N2 ratio with the same estimator.",
+    "secondary": ["rank-stage wall", "rank-stage cpu (column-sum)", "per-phase seconds", "IC/rho wall and cpu with bootstrap over the 20 rho draws"],
+    "counted_S": "identical by construction (same probes and relations); verified by per-column probe/attempt equality across arms; priced across the 5a band w in {0, 0.1, 1} GAE per native op"
+  },
+  "verification": "every IC arm: targets_solved=1, rank=600, group_verified, recovered scalar equals the sidecar answer; independent replay with examples/t20_replay.rs (own GF(2^73) arithmetic); every rho draw verified=true",
+  "controls": {
+    "A/A": "N1 vs N2",
+    "positive_scan": "3 interleaved rounds of the 20,000-state scan, old vs new, at the real base: harness must see new/old well below 1 (the engineering note measured 0.38 at K=600 on a loaded guest)",
+    "positive_analyzer": "N1 columns scaled by 1.10 vs N2 columns: the estimator must report a CI excluding 1 around 1.10",
+    "matched_rho": "20 draws, walk seeds 910000001..910000020, same frozen target, same host, interleaved around the IC runs"
+  },
+  "decision_rules": {
+    "kill": "point estimate of the end-to-end wall ratio O1 / mean(N1,N2) below 1.1 => record that the component gains do not reach the row",
+    "support": "ratio >= 1.1 and the bootstrap CI lower bound above 1.0 and above the A/A spread",
+    "invalid": "any arm unverified, outputs not identical across arms, A/A CI excluding 1 with width comparable to the claimed effect, scan positive control not detected",
+    "reported_not_gated": "IC/rho (distance remaining)"
+  },
+  "inadmissible": ["changing K, base, target, seed or switches after timing", "dropping a run for being slow", "pooling contended and uncontended runs", "headline wall time without the counted-S statement"]
+}
