@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/ec2-user/crypto-leads-audit/scripts/build_ic_leaderboard.py", line 2178, in <module>
+    sys.exit(main())
+  File "/home/ec2-user/crypto-leads-audit/scripts/build_ic_leaderboard.py", line 2150, in main
+    doc = build()
+  File "/home/ec2-user/crypto-leads-audit/scripts/build_ic_leaderboard.py", line 1067, in build
+    for c in roster(names, measured)],
+  File "/home/ec2-user/crypto-leads-audit/scripts/build_ic_leaderboard.py", line 557, in roster
+    field = f"GF(p), p = {p['p']}" if len(p["p"]) < 40 else f"GF(p), {int(p['p']).bit_length()}-bit p"
+TypeError: object of type 'int' has no len()

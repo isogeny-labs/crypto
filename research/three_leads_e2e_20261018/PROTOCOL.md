@@ -100,6 +100,14 @@ trials are an additional control on one target per curve at every size;
 their scalar-generation cost is charged in full. Do not equate one such
 trial with one walk addition.
 
+Before primary runs, add a control against a trivial walk-collision explanation:
+the primary collector discards repeated divisor classes up to sign and restarts
+the walk when such a relation repeats. It cannot extract k from those duplicate
+relations. Record every discard and the complete restart cost. A separate
+unfiltered diagnostic on one target per curve measures how much permitting
+duplicate relations changes the stopping count. Both that diagnostic and the
+independent-trial control remain separate from the 1,260 primary workloads.
+
 Certify larger source orders using a Hasse-interval BSGS witness and exact
 prime-factor/order checks. Small instances additionally use exhaustive
 point and Jacobian enumerations. Stop a fixture on an arithmetic/map/order
@@ -118,3 +126,54 @@ claim: confirmed with stated scope, contradicted under fresh conditions,
 replaced by measured values, or still unresolved with a precise reason.
 Update the existing PR and evidence-gap record. Do not mark the task complete
 until all three end-to-end paths have executed and their answers passed.
+
+Final eligibility and statistics (before primary coverage execution): reject
+singular models, and retain rejected candidate records. Binary and PKM DLP
+fixtures require an odd prime factor r>=5 occurring once, gcd(h,r)=1 and a
+nonzero projected generator. Binary coefficients advance deterministically
+from (a,b)=(3,2); choose the first three eligible non-descended-b models at
+each q. PKM uses the fixed short model y²=x³+2x+3 and first 23 eligible primes
+in each declared interval. These eligibility tests do not examine coverage.
+For each cell report the mean structured-minus-matched-random coverage over
+curve/prime clusters, its paired standard error and standardized mean z.
+Use a native deterministic cluster bootstrap for confidence intervals. Failure
+to reject zero alone is not evidence of equivalence: also report intervals
+against an explicitly declared ±0.05 absolute coverage margin.
+
+Pre-primary-v2 correction: the first 1,260-target execution exposed exhausted
+v1 walks trapped in cycles containing only unsplit divisors. Preserve that
+entire diagnostic batch, including failures. The corrected v2 method checks
+all visited walk divisors, restarts on a repeat without extracting a scalar
+from it, and charges the complete restart. Split-relation deduplication and
+signed elimination are unchanged. Reuse the same 21 models, 1,260 targets,
+algorithm seeds and caps for a separately sealed primary-v2 batch. Register
+v2 under a new method identity, and replay v1 with its original implementation.
+
+Pre-decomposition-v2 correction: fixed-jump walks need not map onto every
+point. Testing only after a step can miss the entire tiny pair sumset even
+when restarts sample it. v2 tests the initial and restarted points before
+stepping away from them. Preserve every exhausted v1 run; freeze corrected
+specs under a new method identity, using identical models, targets and caps.
+This is a correction to the implemented sampling route, not evidence that
+factor-base structure makes decomposition impossible.
+The final v2 decomposition collector also uses a fresh seeded uniform choice
+among the 16 counted jumps on each step. Every RNG draw is retained. This
+avoids a fixed point-partition map excluding small pair sumsets from its
+image; it changes the sampler, not the factor base or S3 oracle. v1 stays
+available for exact replay. The corrected odd-characteristic census uses
+short-model coefficient placement (c0,c1,c2,c3)=(b,a,0,1); the earlier general
+cubic census remains a diagnostic and supplies no short-model DLP fixtures.
+
+Supplementary diagnostics (not replacements for the frozen primary cohort):
+add opposite-trace-coset and descended-coefficient binary controls, and odd
+curves descended from the base field. Also measure uniform random x sets with
+exactly the structured x-set cardinality, without conditioning the number of
+rational lifts. This second null addresses the original "random x-sets"
+wording; keep it separate from the predeclared sign-orbit/torsion-matched
+point-count null. These diagnostics were added after the first conditional
+coverage analysis and carry no claim to a blind significance test.
+
+The decomposition pipeline permits a direct identity exit. A verified return
+before its first successful decomposition is a generic identity hit, including
+empty-base cases, and must not be reported as evidence of relation-based IC.
+Retain this mechanism separately from the verified-answer and cost totals.

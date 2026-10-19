@@ -1,0 +1,12 @@
+    Checking three-leads-study v0.1.0 (/home/ec2-user/crypto-leads-audit/research/three_leads_e2e_20261018/native)
+error: useless conversion to the same type: `std::string::String`
+   --> analysis.rs:420:24
+    |
+420 | ...   controls.entry(mode.into()).or_default().push(json!({"p":field,"r":v["workload"]["curve_spec"]["r"],"workload":id,"primary_tr...
+    |                      ^^^^^^^^^^^ help: consider removing `.into()`: `mode`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#useless_conversion
+    = note: `-D clippy::useless-conversion` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::useless_conversion)]`
+
+error: could not compile `three-leads-study` (bin "three-leads-study") due to 1 previous error

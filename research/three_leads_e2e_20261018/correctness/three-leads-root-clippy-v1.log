@@ -1,0 +1,40 @@
+    Blocking waiting for file lock on build directory
+    Checking crypto v0.1.0 (/home/ec2-user/crypto-leads-audit)
+error: this `if` statement can be collapsed
+   --> src/cryptanalysis/ecbench/three_leads.rs:121:5
+    |
+121 | /     if m.id.contains("genus2") || m.id == "rho.three_leads_jacobian_v1" {
+122 | |         if inst.family != "scholten" {
+123 | |             return Err("genus-2 methods require the certified Scholten family".into());
+124 | |         }
+125 | |     }
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+121 ~     if (m.id.contains("genus2") || m.id == "rho.three_leads_jacobian_v1") {
+122 ~         && inst.family != "scholten" {
+123 |             return Err("genus-2 methods require the certified Scholten family".into());
+124 ~         }
+    |
+
+error: possible buggy implementation of `bit_width`
+   --> src/symmetric/modes/pmac.rs:112:9
+    |
+112 |         (usize::BITS - (m as u32 - 1).leading_zeros()) as usize
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: in order to calculate the bit width, `T::BITS` should match the type of the value calling `.leading_zeros()`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#mismatched_bit_width_type
+    = note: `-D clippy::mismatched-bit-width-type` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::mismatched_bit_width_type)]`
+help: if you meant to use `u32::BITS`, use
+    |
+112 -         (usize::BITS - (m as u32 - 1).leading_zeros()) as usize
+112 +         (m as u32 - 1).bit_width() as usize
+    |
+
+error: could not compile `crypto` (lib) due to 2 previous errors
