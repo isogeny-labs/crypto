@@ -74,7 +74,7 @@ null. The [post-run script](postrun-audit-and-archive.sh) checked both
 terminal summaries and ran the auditors only after both timed services
 stopped.
 
-## Production check-in confirmation, frozen but not dispatched
+## Production check-in confirmation, running
 
 The worker's ordinary `LaneOptions` checks in every 64 walkers. A separate
 [128-walker plan](worker-production-plan.json), SHA-256
@@ -82,6 +82,9 @@ The worker's ordinary `LaneOptions` checks in every 64 walkers. A separate
 and [independent auditor](analyze_production.py) preserve the same 32 Q
 points, four repetitions, exact-output and host gates, and prospective A/A
 policy while exercising 128 walkers with a check-in every 64. It is a
-deployment gate if the 32-walker full-width result supports changing default
-routing. It was frozen before any of its own arms and has not been launched;
-the current worker default remains serial.
+deployment gate for changing default routing. The frozen plan was launched on
+the same separate EC2 instance at 2026-10-19 21:09:32 UTC, with results under
+run ID `17f520f4a4f94a3ca8f0d49829e4ab8b`. The
+[post-run script](postrun-production-audit-and-archive.sh) requires a terminal
+service and complete stable results before auditing and archiving. The worker
+default remains serial pending the independent audit.
