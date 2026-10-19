@@ -397,12 +397,12 @@ fn concurrent_claims_resolve_to_one_holder_after_sync() {
         assert_eq!(cols[1], "held", "{row}");
         assert_eq!(cols[3], "1", "one contended claim: {row}");
         holders.push(cols[2].to_string());
-        // The other shard was never claimed.
+        // Status lists shards with claim records; an untouched shard has no row.
         assert!(
-            text.lines()
-                .any(|l| l.starts_with("XP-20261015-pkm-m3-n21-m4-n20/shard-1")
-                    && l.contains("unclaimed")),
-            "{text}"
+            !text
+                .lines()
+                .any(|l| l.starts_with("XP-20261015-pkm-m3-n21-m4-n20/shard-1")),
+            "the other shard must have no claim record:\n{text}"
         );
     }
     assert_eq!(holders[0], holders[1], "both replicas agree on the holder");
