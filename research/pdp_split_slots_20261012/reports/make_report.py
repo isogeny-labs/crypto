@@ -43,7 +43,7 @@ def main():
         sj = json.loads((Path(s) / "session.json").read_text())
         spec = json.loads((Path(s) / "spec.json").read_text())
         lines += [
-            f"- `{esc(Path(s).name)}`: session `{sj.get('session_id')}`, spec `{sj.get('spec_id')}` "
+            f"- `{Path(s).name}`: session `{sj.get('session_id')}`, spec `{sj.get('spec_id')}` "
             f"({esc(spec.get('label', ''))}); status `{sj.get('status')}`, "
             f"{sj.get('executions_planned')} executions planned, status counts `{json.dumps(sj.get('status_counts'))}`; "
             f"commit `{sj.get('git_commit')}` (dirty: {sj.get('git_dirty')}), binary SHA-256 `{str(sj.get('binary_sha256'))[:16]}…`; "
@@ -68,7 +68,9 @@ def main():
               "and one that understates F4's per-call work. Table arms (`mitm-frobenius`) are fully charged. Wall time is descriptive only (L0).", ""]
     for f in figs:
         lines += [f'#figure(image("{Path(f).name}", width: 100%), caption: [Recorded values from ANALYSIS.json; layout `reports/plot_ecbench.py`.])', ""]
-    lines += ["== Raw records", "", ", ".join(f"`{esc(s)}/records.jsonl`" for s in sessions) + "; audits under `audits/`."]
+    lines += ["== Raw records", "", ", ".join(f"`{s}/records.jsonl`" for s in sessions) + "; audits under `audits/`.", "",
+              "A session marked dirty ran with untracked or modified files in the checkout (drafts of this study's own reports and protocols); "
+              "the binary SHA-256 above is the one `BINARIES.sha256` records, and `ecbench verify` replays against it."]
     out.write_text("\n".join(lines) + "\n")
 
 
