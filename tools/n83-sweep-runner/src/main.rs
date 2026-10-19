@@ -793,11 +793,11 @@ fn external_replay(dir: &Path) -> R<Vec<bool>> {
 
 fn validate_run_budget(columns: u64, external: bool, conflicts: u64, wall: u64) -> R<()> {
     let natural = columns != 0 && !external;
-    let wall_ceiling = if natural { 1200 } else { 900 };
+    let wall_ceiling = if natural { 2400 } else { 900 };
     let conflict_ceiling = if external {
         1_000_000
     } else if natural {
-        200_000
+        400_000
     } else {
         100_000
     };
@@ -1258,13 +1258,14 @@ fn sat_trace_distinguishes_censoring_and_rejects_forged_order() {
 }
 
 #[test]
-fn natural_budget_admits_200k_but_stays_bounded() {
+fn natural_budget_admits_400k_but_stays_bounded() {
     for columns in [2048, 4096] {
         assert!(validate_run_budget(columns, false, 200_000, 1200).is_ok());
-        assert!(validate_run_budget(columns, false, 200_001, 1200).is_err());
-        assert!(validate_run_budget(columns, false, 200_000, 1201).is_err());
-        assert!(validate_run_budget(columns, false, 0, 1200).is_err());
-        assert!(validate_run_budget(columns, false, 200_000, 0).is_err());
+        assert!(validate_run_budget(columns, false, 400_000, 2400).is_ok());
+        assert!(validate_run_budget(columns, false, 400_001, 2400).is_err());
+        assert!(validate_run_budget(columns, false, 400_000, 2401).is_err());
+        assert!(validate_run_budget(columns, false, 0, 2400).is_err());
+        assert!(validate_run_budget(columns, false, 400_000, 0).is_err());
     }
 }
 
