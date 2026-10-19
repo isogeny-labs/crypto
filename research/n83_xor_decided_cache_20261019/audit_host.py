@@ -13,9 +13,9 @@ import subprocess
 from panel_supervisor import PLAN
 
 ROOT = Path(__file__).resolve().parent
-ATTEMPT = ROOT / 'attempt-02'
+ATTEMPT = ROOT / 'attempt-03'
 SOURCE = '8cde893f774cace3e022438e168a0485b7268a57'
-BINARY = '95ba4f997237e1fb201e52446bc6aced32e3597105ba43e92cfc936e44fd5f8b'
+BINARY = '23b1a36ea18b7a723678fbaea51342beda742ad96598f38ceee4001c1e0b3dc9'
 ARCHIVES = {
     'U': ('2457a977ea9c05a11cc60878bdb3b29f6d905dc8db9aa26e52913a702d308369',
           '1aa70cc1571f4cb25af42936699378329128a869f2ae8ad35efb375663d4e59d',
@@ -159,7 +159,7 @@ def audit() -> dict:
     require(0 < arm_wall < provisioned, 'host accounting interval')
     price = read_json(setup / 'spot-price-observed.json')['SpotPriceHistory']
     require(len(price) == 1 and price[0]['InstanceType'] == 'c7i.2xlarge'
-            and price[0]['AvailabilityZone'] == 'us-west-2d',
+            and price[0]['AvailabilityZone'] == 'us-east-1f',
             'spot observation identity')
     point_price = float(price[0]['SpotPrice'])
     report = {
