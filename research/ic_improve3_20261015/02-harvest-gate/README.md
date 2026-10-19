@@ -131,7 +131,7 @@ Below, I is harvest off and R is the ungated root harvest. "Root share" is the r
   | (23,12) | 0.953 [0.846, 1.068] | 0.928 [0.823, 1.036] |
 
 - **At the cells the new gate adds,** the root share is small (≤ 7 %). The rebuild is amortised even in early-stopping solves, so the production call keeps most of the gain: 1.06–1.30×. End to end it delivers 1.20× and 1.14×.
-- **Follow-up, not done here.** In production, G0's own firing at small m = 2 (rank < 331) costs word operations, but its CPU MATCHES. A gate trained on the production call might drop G0's gpv clause. That needs its own protocol, because it changes cells where this item was required to keep the incumbent's path.
+- **Follow-up, not done here.** In production, G0's own firing at small m = 2 (rank < 331) regresses in both word operations and CPU against harvest off at (17,9); the CPU ratio is 0.873 [0.783, 0.974]. R10 records this as the regression at that cell. That needs its own protocol, because it changes cells where this item was required to keep the incumbent's path.
 
 ## 4. The change (`src/cryptanalysis/koblitz_groebner.rs`, gate only)
 
