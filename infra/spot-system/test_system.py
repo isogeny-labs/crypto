@@ -11,12 +11,41 @@ from unittest.mock import Mock, patch
 from types import SimpleNamespace
 
 from build_template import build
-from controller import handler, reconcile
+from controller import handler, reconcile, retain_confirmed_termination
 from runner import read_jobs
 from install_services import discovery_units, units
 
 
 class AddressTests(unittest.TestCase):
+    def test_only_confirmed_termination_is_recorded_with_current_owner_condition(self):
+        for state in ['running','stopped','shutting-down','terminated']:
+            db,ec2=Mock(),Mock()
+            ec2.describe_instances.return_value={'Reservations':[{'Instances':[{'State':{'Name':state}}]}]}
+            record={'Owner':{'S':'source'},'Origin':{'S':'source'},'Complete':{'BOOL':True}}
+            retain_confirmed_termination(db,ec2,'table','source',{'legacy-owner':record})
+            if state!='terminated':db.update_item.assert_not_called()
+            else:
+                call=db.update_item.call_args.kwargs
+                self.assertEqual(call['ConditionExpression'],'#owner = :owner AND #origin = :origin')
+                self.assertNotIn('Complete',call['UpdateExpression'])
+                self.assertTrue(record['OwnerTerminated']['BOOL'])
+                self.assertTrue(record['Complete']['BOOL'])
+
+    def test_unconfirmed_absence_never_records_death(self):
+        db,ec2=Mock(),Mock()
+        ec2.describe_instances.return_value={'Reservations':[]}
+        with self.assertRaises(RuntimeError):
+            retain_confirmed_termination(db,ec2,'table','source',{'legacy-owner':{'Owner':{'S':'source'}}})
+        db.update_item.assert_not_called()
+
+    def test_durable_origin_and_owner_deaths_need_no_ec2_lookup(self):
+        db,ec2=Mock(),Mock()
+        record={'Owner':{'S':'previous'},'Origin':{'S':'source'},
+                'OriginTerminated':{'BOOL':True},'OwnerTerminated':{'BOOL':True}}
+        retain_confirmed_termination(db,ec2,'table','source',{'legacy-owner':record})
+        ec2.describe_instances.assert_not_called()
+        db.update_item.assert_not_called()
+
     def setUp(self):
         self.ec2, self.asg = Mock(), Mock()
         self.asg.describe_auto_scaling_groups.return_value = {"AutoScalingGroups": [{"Instances": [
@@ -55,6 +84,37 @@ class AddressTests(unittest.TestCase):
         self.asg.describe_auto_scaling_groups.return_value["AutoScalingGroups"][0]["Instances"] = []
         self.assertEqual(reconcile(self.ec2, self.asg, "g", "e", True)["state"], "waiting-for-capacity")
         self.ec2.associate_address.assert_not_called()
+
+    def test_protected_running_source_keeps_ip_even_with_ready_replacements(self):
+        self.ec2.describe_instances.return_value = {'Reservations':[{'Instances':[{'InstanceId':'source','State':{'Name':'running'}}]}]}
+        result = reconcile(self.ec2,self.asg,'g','e',True,'source',{})
+        self.assertEqual(result['state'],'protected-source-active')
+        self.ec2.associate_address.assert_not_called()
+        self.asg.set_desired_capacity.assert_not_called()
+
+    def test_terminated_source_requires_matching_recovery_owner_and_readiness(self):
+        ownership={'OriginTerminated':{'BOOL':True},'Owner':{'S':'i-old'},'Ready':{'BOOL':True}}
+        self.ec2.describe_instances.return_value['Reservations'][0]['Instances'][0]['Tags'].append({'Key':'LegacyReady','Value':'true'})
+        result=reconcile(self.ec2,self.asg,'g','e',True,'source',ownership)
+        self.assertEqual(result['instance'],'i-old')
+        self.ec2.associate_address.assert_not_called()
+        self.asg.set_desired_capacity.assert_called_once()
+
+    def test_legacy_not_ready_cannot_receive_ip(self):
+        ownership={'OriginTerminated':{'BOOL':True},'Owner':{'S':'i-new'}}
+        self.assertEqual(reconcile(self.ec2,self.asg,'g','e',True,'source',ownership)['state'],'waiting-for-bootstrap')
+        self.ec2.associate_address.assert_not_called()
+
+    def test_every_incomplete_namespace_must_be_ready_on_same_worker(self):
+        for instance in self.ec2.describe_instances.return_value['Reservations'][0]['Instances']:
+            instance['Tags'].append({'Key':'LegacyReady','Value':'true'})
+        def owner(instance,ready=True):
+            return {'OriginTerminated':{'BOOL':True},'Owner':{'S':instance},'Ready':{'BOOL':ready}}
+        for owners in [[owner('i-old'),owner('i-new')], [owner('i-new'),owner('i-new',False)]]:
+            self.assertEqual(reconcile(self.ec2,self.asg,'g','e',True,'source',owners)['state'],'waiting-for-bootstrap')
+            self.ec2.associate_address.assert_not_called()
+        self.assertEqual(reconcile(self.ec2,self.asg,'g','e',True,'source',
+            [{'Complete':{'BOOL':True}},owner('i-new')])['instance'],'i-new')
 
 
 WORKLOAD = '''import json,os,time

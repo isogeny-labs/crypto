@@ -11,9 +11,11 @@ def package(destination=None, binary_dir=None):
     destination = destination or here / 'runtime.tar.gz'
     binary_dir = binary_dir or Path.home() / '.local/bin'
     sources = [(here/name, name) for name in ['runner.py', 'activity.py', 'worker_state.py', 'node_service.py', 'install_services.py']]
+    sources += [(here/name, name) for name in ['criu_local.py','criu_export.py','legacy_recovery.py',
+        'spot-legacy-backup.service','spot-legacy-backup.timer','spot-diem-backup.service','spot-diem-backup.timer']]
     sources += [(binary_dir/name, 'bin/'+name) for name in
                 ['cairn', 'conductor', 'conductord', 'conductor-mcp', 'checkpoint-discovery',
-                 'checkpoint-selftest', 'solver-checkpoint-selftest', 'factor-base-shape-ladder']]
+                 'checkpoint-selftest', 'solver-checkpoint-selftest', 'factor-base-shape-ladder', 'criu-4.2.1']]
     for source, _ in sources:
         if not source.is_file():
             raise FileNotFoundError(source)

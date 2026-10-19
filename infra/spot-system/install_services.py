@@ -7,7 +7,7 @@ import pwd
 import subprocess
 
 
-def units(runtime, binaries, project, table='', region='us-east-2', root=Path('/srv/experiments')):
+def units(runtime, binaries, project, table='', region='us-east-2', root=Path('/srv/experiments'), legacy_origin=''):
     common = '[Unit]\nAfter=network-online.target\nRequiresMountsFor=/srv/experiments\n[Service]\nUser=ec2-user\n'
     node = common + f'''RuntimeDirectory=spot-postgresql
 RuntimeDirectoryMode=0700
@@ -20,6 +20,8 @@ KillMode=mixed
 WantedBy=multi-user.target
 '''
     environment = f'Environment=AWS_REGION={region}\nEnvironment=SPOT_ACTIVITY_TABLE={table}\n'
+    if legacy_origin:
+        environment += 'Environment=SPOT_LEGACY_ENABLED=true\n'
     experiment = common + environment + f'''ExecStart=/usr/bin/python3 {runtime}/runner.py --root {root}
 Restart=on-failure
 RestartSec=20
@@ -35,7 +37,27 @@ TimeoutStopSec=30
 [Install]
 WantedBy=multi-user.target
 '''
-    return {'spot-nodes': node, 'spot-experiments': experiment, 'spot-activity': activity}
+    result = {'spot-nodes': node, 'spot-experiments': experiment, 'spot-activity': activity}
+    if legacy_origin:
+        result['spot-legacy-recovery'] = f'''[Unit]
+After=network-online.target
+[Service]
+Type=simple
+User=root
+UMask=0077
+RuntimeDirectory=spot-legacy
+RuntimeDirectoryMode=0755
+ExecStart=/usr/bin/python3 /opt/spot-criu/legacy_recovery.py --origin {legacy_origin} --table {table} --status /run/spot-legacy/status.json
+Restart=on-failure
+RestartSec=15
+KillMode=process
+[Install]
+WantedBy=multi-user.target
+'''
+        result['spot-diem-recovery']=result['spot-legacy-recovery'].replace(
+            '--origin '+legacy_origin, '--root /var/lib/spot-criu-diem --owner-key legacy-owner-diem --pointer-key checkpoints/criu/diem/latest.json --backup-timer spot-diem-backup.timer --origin '+legacy_origin).replace('/run/spot-legacy/status.json','/run/spot-legacy/diem.json')
+        result['spot-activity']=result['spot-activity'].replace('Environment=SPOT_LEGACY_ENABLED=true','Environment=SPOT_LEGACY_ENABLED=true\nEnvironment=SPOT_LEGACY_STATUS_FILES=/run/spot-legacy/status.json:/run/spot-legacy/diem.json')
+    return result
 
 
 def discovery_units(runtime, search_roots, root=Path('/srv/experiments')):
@@ -78,6 +100,7 @@ if __name__ == '__main__':
     p.add_argument('--root', type=Path, default=Path('/srv/experiments'))
     p.add_argument('--table', default='')
     p.add_argument('--region', default='us-east-2')
+    p.add_argument('--legacy-origin', default='')
     p.add_argument('--nodes-only', action='store_true')
     p.add_argument('--discovery-only', action='store_true')
     p.add_argument('--search-root', type=Path, action='append', default=[])
@@ -98,7 +121,7 @@ if __name__ == '__main__':
         os.chown(node_root, identity.pw_uid, identity.pw_gid)
     names = []
     if not a.discovery_only:
-        for name, text in units(a.runtime, a.binaries, a.project, a.table, a.region, a.root).items():
+        for name, text in units(a.runtime, a.binaries, a.project, a.table, a.region, a.root, a.legacy_origin).items():
             if a.nodes_only and name != 'spot-nodes':
                 continue
             Path('/etc/systemd/system/'+name+'.service').write_text(text)

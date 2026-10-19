@@ -2,7 +2,7 @@
   "python": "3.9.25",
   "system_tests": {
     "command": "python3 -m unittest discover -s infra/spot-system -p 'test_*.py'",
-    "passed": 52,
+    "passed": 72,
     "result": "passed"
   },
   "python_compile": "passed",
@@ -16,29 +16,34 @@
     "passed": 4399,
     "failed": 0,
     "ignored": 118,
-    "duration_seconds": 545.48
+    "duration_seconds": 214.5,
+    "latest_full_log": "failover-evidence.tar.gz: cargo-library-latest.txt"
   },
   "s3_download_sha256": "passed",
   "files": {
-    "activity.py": "c22c969706fb9f2ab629b887f56dc309657896ed69e1ae7cf3dd39a38ee39d73",
-    "build_client.py": "5aa065eaf99233dc3a2540d6f0a954d7df45d7046157db269d38a9830af83122",
-    "build_template.py": "1ede87aecd1b5f74c089d29f044ce75d50419c98e3b213f52d9ba50a6c807544",
-    "controller.py": "ac6b8b029cc08d91bbd3f719c93ed73adaf0992a96c17dbf362d53be1ba99792",
-    "criu_export.py": "393ba2f2513792fa49a394de41d971c5547305c024b40bd9947c30bf099bb20e",
-    "criu_local.py": "f125eeb5c641c3e1fca261248b37efaa4fc61c55b4454876cabdd3a998cd9f4c",
-    "install_hooks.py": "37c58155b5f0989ea72815f844c48fa4edd4c6434f35799a9d7702931b63d115",
-    "install_services.py": "c338a222d5309ea33a01e0a7c00e89363f1dce5059a47272b3d32bc95c92cacf",
-    "lifecycle.py": "eff1c23cd3fbee416e570de12af55f24b33155b7d423ad5d0d87c1813817c3ed",
+    "activity.py": "a9213818cf29b7c84559959f1b1633cb487d8c401b800525aae1ea2ddb3edf13",
+    "build_client.py": "a0a6d47b04672d92cd648248f9288253b7ef50522e29a2d58e142bbf655c5ca1",
+    "build_template.py": "ef65bc8af579571bab7143e3ebac7ce5287f072666df308c324e87a59d128f77",
+    "controller.py": "365b52c916060be839ce9b57ec251eef965156b2fcacb9c95a0f810d0e81234b",
+    "criu_export.py": "b1c97c7a531f479bd6042db521f121a94adb0a551d62cc90c29e900b2175443f",
+    "criu_local.py": "8ec6680f60dde916726be0acd69cde9022f5312328d456b3e40bd27d5ec726bf",
+    "install_hooks.py": "0a2ead994cbd9a407272213862e6341db4e4c0dafb8d0ef2d4d2a1485313405e",
+    "install_services.py": "d881e05c8bed19905a93c57d3fa23c2f17a1faac6ab3ad23415f2112729868c1",
+    "legacy_recovery.py": "850b0945fe801723f1c6afbed66f9bb383e7e0da3f953519574196d4ee403800",
+    "lifecycle.py": "8b1118991f7e414d37a8dbc1f28bf2d784bcb09e6e167e24fdecf12d400d6ac2",
     "node_service.py": "be0d8740852066c8fc3a8e43a037631a11e65fdb8260b4045210b414722ce73a",
-    "package_runtime.py": "d74930aa1336a4446f489ef0ea37e0826e6d97a2a0bff9419d448195fc2efad1",
+    "package_runtime.py": "4eee921b4cba2fd4ccbc1fd31e65ff315485e17b01b2b4eeb416f847512eafd3",
     "prices.py": "42614be936e747efbd9af78e057117797a823dc67549aa79be36162376b74ea6",
     "runner.py": "1411fe068afcd55ddf6d9766ec8bc60792ef97e7cf1229d0ad7dca143655f0aa",
+    "ssh_proxy.py": "3827ec2289e395fd4fcc8bb4a0943e2dd94af679f58eef7085c295887ba00548",
     "test_activity.py": "d20c6517ed491acf7169278e0585f8f48290a3ada6dec53c0173f065bd0972d7",
     "test_criu_export.py": "aa8f58e9e9c76f1fca5a6b7d5f8e25bdef34a193a68ceefb5a3a101e85f97d21",
-    "test_criu_local.py": "24049e4479f7b45d3750b60e474cec2bb49e8c654c37cdb7cac0053ad7f889e4",
+    "test_criu_local.py": "8e2b1f50e15d08fb3de9de813deddbe137201dcb566120e5e8817a7620364895",
+    "test_legacy_recovery.py": "dd5441232e08c56e22b85a07cf5280ab501f0f0763f01aca97304c57a792851e",
     "test_lifecycle.py": "cb89f42a0ed0eeded02172d97ac7b6de5c397f35d303cbae0839df426060786a",
-    "test_system.py": "2c84f0ba39e34fdc2b3c80f16166ec4182cc7f863e775dcd5e39ad44a3bc06ae",
-    "wake.py": "7531a30115452e754040948659e46432cd961b9edea5acd934f45efbd7acce40",
+    "test_ssh_proxy.py": "c8d67dbfeca428ff755148ca2d0b0d9b26ffd55188ee5cade82f8d44865cb7ce",
+    "test_system.py": "36ff4bb9e357fd59841822bc9cf312eab6aeaa7988edfcf9fa3ff64569c71494",
+    "wake.py": "272ac64280e8d2c3975f86a6110ed2c5618a9ad88c87279293d2f5c4ce6e968a",
     "worker_state.py": "3218ba2f9627f80e9afb076efae9abe7acf35cb073eb1fe63e7b5a2b6e0e8329"
   },
   "checkpoint_discovery": {
@@ -61,13 +66,13 @@
   "aws_deployment": {
     "configuration": "applied",
     "lifecycle": "enabled",
-    "ip_cutover": "disabled",
+    "ip_cutover": "armed with protected-source guard",
     "efs_bootstrap_recovery": "passed",
     "managed_cold_boot": "passed",
     "evidence": "aws-deployment.json",
     "live_idle_shutdown": "passed",
     "native_cross_worker_recovery": "passed",
-    "legacy_criu_recovery": "five compatible-worker copy restores passed; automatic legacy failover not implemented"
+    "legacy_criu_recovery": "automatic two-hop rehearsal passed; independent Diem copy restore passed"
   },
   "experiment_tests": {
     "example": "factor_base_shape_ladder",
@@ -92,14 +97,20 @@
     "src/cryptanalysis/koblitz_groebner/checkpoint.rs": "8e5e2aa1d121feb0168ba1ad035d87b36a5ffe5dc713a047408d7644856ddcf9"
   },
   "legacy_criu": {
-    "registered_live_processes": 5,
+    "registered_live_processes": 1,
     "initial_snapshots": "passed",
     "local_checksums_and_directory_metadata": "passed",
     "local_discovery_and_corruption_fallback": "passed",
-    "timer": "active; 900 seconds after completion",
+    "timer": "OnCalendar=*:0/15",
     "actual_live_restore": "passed: all five copies on separate m8i with matching kernel and libraries; two healthy threads and CPU progress",
     "memory_export": "passed: five explicitly authorized private AES256 archives; all full-download SHA-256 verified",
-    "recurring_memory_export": "disabled: separate permission pending after automatic approval review",
-    "automatic_recovery": "not implemented; fenced source ownership and cutover remain open"
+    "recurring_memory_export": "authorized and enabled, private AES256 plus full-download SHA-256",
+    "automatic_recovery": "deployed; two-hop disposable rehearsal and Diem copy restore passed",
+    "completed_original_processes": 5
+  },
+  "laptop_hooks": {
+    "temporary_home_tests": "passed",
+    "actual_laptop_event": "not executed: no laptop access",
+    "codex_trust_required": true
   }
 }

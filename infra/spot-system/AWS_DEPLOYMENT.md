@@ -1,108 +1,95 @@
-# AWS deployment
+# Applied AWS deployment
 
-The `spot-experiments` stack in `us-east-2` has the configuration in
-`aws-config.json` applied. The managed compute lifecycle is enabled separately
-from IP cutover. Spot-only placement, 32 vCPUs/128 GiB, price-capacity-optimized
-allocation, capacity rebalancing and the 1,800-second idle timeout remain set.
+`spot-experiments` in `us-east-2` is deployed with `LifecycleEnabled=true`,
+`Cutover=true`, `IdleSeconds=1800`, and protected source `i-01f85a6c905181498`.
+The IP controller is armed, but explicitly refuses to move `3.134.144.201` while
+that source is running. Live invocation returns `protected-source-active`.
+The original host is outside the managed ASG and cannot be scaled down by its
+idle controller. Its 2 TiB root volume has `DeleteOnTermination=false`.
 
-The managed workspace is `/srv/experiments/spot-worker`, its initial `jobs.json`
-is empty, and new node data goes under its `nodes/` directory. The original
-node database, project and five running experiments are separate. No legacy
-experiment was registered with the native supervisor or restarted by this deployment.
-Separate authorized CRIU exports and copy-only restores of all five passed on
-2026-10-19; automatic legacy recovery remains disabled. See [CRIU_LOCAL.md](CRIU_LOCAL.md).
-Workers require the existing manifest and EFS mount; bootstrap does not create
-an empty replacement manifest if durable state is missing.
+The applied Standard Spot quota (`L-34B43A08`) is **96 vCPUs**, exceeding the
+requested 64. A quota request's case status can remain open after another
+increase applies; the applied value is the operational check. There is no
+On-Demand fallback. Spot gaps remain possible.
 
-`LifecycleEnabled=true` enables prompt wake/idle control. `Cutover=false` keeps
-`3.134.144.201` on the original host. Lifecycle status reports `compute_ready`
-separately from `ssh_endpoint_ready`, so a healthy managed worker cannot be
-mistaken for a migrated SSH endpoint. `--wait` still waits for the SSH endpoint.
-Do not enable cutover until the original jobs finish or support tested recovery
-and workspace/dependency migration is complete.
+## Placement, durable state and readiness
 
-## Capacity and cold start
+The ASG requests one 32-vCPU/128-GiB x86_64 host, min zero/max two for rebalance,
+with price-capacity-optimized Spot placement. It ordinarily admits m6i, m6a, m7i,
+m7a, m8i and m8a families. While any registered legacy memory image is unfinished,
+the controller restricts new placement to m8i, without refreshing existing workers.
+The wider pool is restored only after all legacy completion receipts commit.
+The 60% price protection compares to AWS's optimal matching On-Demand price;
+it does not guarantee the globally cheapest host or move a healthy worker for
+every quote change.
 
-The applied Standard Spot quota is now **96 vCPUs**, checked directly with
-`get-service-quota`. This meets the requested minimum of 64 and permits the
-original 32-vCPU host plus two 32-vCPU managed workers during rebalance.
-Earlier launches failed while only 32 was applied; that history remains in
-the earlier release and scaling activity records. The minimum-64 request's
-case can remain open even after the separate 96 limit is applied. No
-On-Demand fallback was introduced, and quota does not guarantee Spot capacity.
+Encrypted retained EFS `fs-001b57936c90979ed` is mounted with TLS/IAM. Managed
+work lives at `/srv/experiments/spot-worker`, project `.../work`, nodes `.../nodes`.
+Its current `jobs.json` is empty. Legacy source workspaces/node data remain
+separate. Native checkpoints and managed outputs go to EFS. Legacy CRIU memory
+backups use the private/versioned/AES256 S3 bucket and independent namespaces in
+[CRIU_LOCAL.md](CRIU_LOCAL.md). Memory images are excluded from Git/software bundles.
 
-The first managed worker needed a bootstrap repair: AL2023 supplies
-`/usr/bin/aws`, but has no `awscli2` RPM. The corrected script verifies the
-existing CLI and installs EFS/PostgreSQL packages. A subsequent
-`m7a.8xlarge` completed unattended cold boot, mounted EFS, passed the packaged
-kill/corrupt/restore self-test, started all four service units, and reported
-idle with no unknown probes. AWS then issued a real rebalance recommendation
-and launched an `m8i.8xlarge` replacement. The original host and IP stayed put.
+Bootstrap verifies its content-addressed runtime, mounts EFS, prepares a sparse
+pinned Git workspace and Rust toolchain, and runs generic and actual solver
+kill/corrupt/restore gates before `SpotReady=true`. Root recovery separately
+verifies/restores legacy images. The IP moves only when EC2 checks, bootstrap,
+and every unfinished legacy ownership/readiness record agree on one replacement.
+After client installation, new SSH connections wake compute and pin its public host key through authenticated
+SSM/Lambda. Private host keys are never copied into EFS or the client package.
 
-The template no longer specifies ASG `DesiredCapacity`. Creation defaults to
-`MinSize=0`; wake/idle owns demand thereafter. The old `Capacity=0` property
-reset a demand-driven group during updates and replaced an idle canary. It
-has been removed so stack updates do not reapply a zero desired capacity.
-Do not add a rolling replacement policy or instance refresh over active work
-without verified checkpoint support and a deliberate drain.
+Cairn, Conductor and PostgreSQL are supervised by `spot-nodes.service`; node state
+survives on EFS and a lifetime writer lock serializes normal replacements. This
+is a private node deployment, not a funded/public executor network. General
+network-partition-safe database fencing is not established by an NFS lock.
 
-AWS Support's case API required a Premium Support subscription, so the closure
-reason could not be read through that API. A closed quota case is not evidence
-of approval: check `get-service-quota` for the actual applied value.
+## Wake and idle
+
+Laptop hook events invoke only the lifecycle Lambda, without prompt/transcript
+contents. A prompt wakes desired capacity one; release leaves the 30-minute
+idle timer in charge. Running/pending jobs, registered recovered processes,
+Cairn/Conductor work and unknown/stale activity block shutdown. Node daemons alone
+do not keep the worker awake. The ASG's desired capacity is intentionally absent
+from CloudFormation, so stack updates preserve live demand.
+
+Laptops need authenticated AWS CLI access and client installation. The package
+is ready; this EC2 session has no laptop execution access. Codex requires review
+and trust of the new definitions through `/hooks`.
+
+## Executed checks
+
+Earlier AMD/Intel cold starts, actual rebalance, native cross-worker recovery and
+30-minute scale-to-zero passed. Later validation proved guarded source IP,
+automatic legacy recovery, new-owner backups, and a second successive recovery
+from a time-namespace image. The newest managed m8i cold boot passed all recovery
+bootstrap gates; the independent Diem service/runtime was then installed on that
+idle standby, and a copy restore passed. The original source was never terminated
+or migrated to demonstrate this. See [VALIDATION.md](VALIDATION.md).
+
+Earlier failures are retained: quota 32, nonexistent `awscli2` RPM, missing build
+assets/OpenSSL, packaged CRIU restore failure, and namespace experiments. AMI
+AL2023 already supplies `/usr/bin/aws`; bootstrap checks it rather than installing
+that nonexistent RPM. EFS-backed Cargo checkouts include required assets and
+build dependencies. In-place updates refuse an active managed manifest.
+
+## Reapply and rollback
+
+Build/upload the runtime first, verify full download SHA-256, then regenerate
+`template.json` and update `RuntimeDigest`, preserving other stack parameters.
+`aws-config.json` records the currently applied settings. Run tests and cfn-lint.
+Review replacements before any stack change; do not add a rolling refresh over
+active experiments. Old runtime/source bundles remain available for rollback.
 
 ```bash
+python3 infra/spot-system/package_runtime.py
+python3 infra/spot-system/build_template.py > infra/spot-system/template.json
+python3 -m unittest discover -s infra/spot-system
+cfn-lint infra/spot-system/template.json
 aws service-quotas get-service-quota --region us-east-2 \
   --service-code ec2 --quota-code L-34B43A08
-aws autoscaling describe-scaling-activities --region us-east-2 \
-  --auto-scaling-group-name GROUP_FROM_STACK_OUTPUTS --max-items 3
 ```
 
-Spot requests and running instances share the regional vCPU quota. See
-[AWS Spot quotas](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-spot-limits.html).
-New-worker cold boot and the packaged recovery gate have passed. Actual
-application checkpoints, cross-worker recovery, and idle shutdown have separate
-evidence entries; bootstrap success alone does not establish them.
-
-## Bootstrap recovery gate
-
-The runtime includes `bin/checkpoint-selftest`, built from the native recovery
-test target with `target-cpu=x86-64`. Before starting the worker services or
-setting `SpotReady=true`, bootstrap runs its kill/corrupt/restore test in a
-private temporary directory under `WorkRoot`. It uses the packaged production
-supervisor and scanner, then removes its synthetic state. Failure blocks
-readiness. Output goes to `/var/log/spot-checkpoint-selftest.log`.
-
-The exact packaged test passed on mounted EFS on both original and managed
-hosts, including AMD and Intel workers. The existing factor-base processes
-still run their older executable and have no native checkpoint interface.
-
-Build/install both native executables before `package_runtime.py`:
-
-```bash
-RUSTFLAGS='-C target-cpu=x86-64' cargo build --release --locked \
-  --manifest-path infra/spot-system/checkpoint-discovery/Cargo.toml
-RUSTFLAGS='-C target-cpu=x86-64' cargo test --release --locked --no-run \
-  --test recovery --message-format=json \
-  --manifest-path infra/spot-system/checkpoint-discovery/Cargo.toml > /tmp/checkpoint-build.jsonl
-```
-
-Install `target/release/checkpoint-discovery` as
-`~/.local/bin/checkpoint-discovery`. The Cargo JSON `compiler-artifact` with
-`target.name=recovery` supplies the recovery target's `executable` path;
-install it as `~/.local/bin/checkpoint-selftest`. This keeps the runtime
-package independent of Cargo's generated executable suffix.
-
-## Reapply configuration
-
-Build the template, upload its digest-pinned runtime, and create a CloudFormation
-change set with `aws-config.json`'s parameters plus `RuntimeDigest` from
-`runtime.tar.sha256`. Preserve other current stack parameters. Review resource
-replacements before execution; retain the original instance, EFS and S3 data.
-Use a separate workspace for validation and check for active managed work before
-an update that changes desired capacity. Demand-driven desired capacity belongs
-to the lifecycle controller and is intentionally absent from the template.
-
-The deployed wake function is the stack's `LifecycleFunctionArn` output.
-Its `wake`, `status` and `release` actions require IAM `lambda:InvokeFunction`.
-Workstation hook installation/trust remains a client-side step; hooks installed
-only on a stopped worker cannot wake that worker.
+To stop IP reconciliation during an operational rollback, set `Cutover=false`
+first. Never move the address or terminate the protected source as a validation
+shortcut. Retained volumes, EFS, snapshots, S3 and IPv4 continue to incur charges
+when compute is off; no retention expiry policy was added.

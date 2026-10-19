@@ -1,56 +1,61 @@
-# Publication validation
+# Validation and requirement status
 
-This change adds native application-state checkpointing and deploys the managed
-Spot runtime. It makes no scientific or performance claim. Public tiny-field
-fixtures below validate durability and replay, not the research scorer's verdicts.
-Full test/build/disposable-probe logs are preserved byte-for-byte in
-`validation/raw-evidence.tar.gz`, with member hashes in `raw-evidence.json`.
-The adjacent text files are summaries. The archive contains no live memory images.
-The later export validation logs and exact executed copy-restore scripts are in
-`validation/private-export-evidence.tar.gz`, with member hashes in
-`private-export-evidence.json`; this archive also contains no process memory.
+This infrastructure change makes no research, mathematical or performance claim.
+The original evidence archives remain immutable. `raw-evidence.tar.gz` and
+`private-export-evidence.tar.gz` preserve earlier tests and failures. The later
+`failover-evidence.tar.gz` preserves full validation logs and exact executed
+metadata/probe scripts; none contains process-memory images or credentials.
 
-| Requirement | Status and evidence |
+| Requirement | Observed status and evidence |
 | --- | --- |
-| Publish complete deployable system to S3 | Uploaded; immutable object locations, SHA-256 and sizes in `artifacts.json` |
-| Publish source to aburan28/crypto | This directory contains controllers, worker services, client tooling, tests and the staged template |
-| Preserve private credentials and keys | Only explicitly allowlisted source/artifact files were packaged; no credential/key directories, PEM/key files or database state included |
-| Standalone infrastructure tests | 52 passed, including export encryption/hash checks, identity/grant binding, local CRIU integrity/path/fallback; `validation/system-tests.txt` |
-| Native checkpoint discovery | 20 tests passed, including actual supervisor kill/restore with corrupt-generation fallback; `validation/checkpoint-tests.txt` |
-| Live discovery | Read-only timer installed and run successfully; five workers identified without a checkpoint interface; `validation/current-host-discovery.json` |
-| Python compilation and CloudFormation schema | Passed; exact source hashes/tool version in `validation/results.json` |
-| Repository release library gate | `cargo test --release --lib`: 4,399 passed, 0 failed, 118 ignored; `validation/cargo-library-tests.txt` |
-| AWS configuration | Applied; independent wake/idle lifecycle enabled, original IP protected; `validation/aws-deployment.json` |
-| Native solver state | Exact pivot-column round-trips, actual SIGKILL/restart and corruption rejection passed; full library log |
-| Touched example | 2 scoring replay tests passed; built-in selftest passed 104 checks; `validation/experiment-selftest.txt` |
-| Exact packaged recovery gates | Generic and actual sparse-solver kill/restore gates passed on AMD; `validation/final-native-cold-boot.json` |
-| Managed save/replay | Actual supervisor job wrote native generations, reused them on a second attempt, and scored one logical target; `validation/managed-native-save-replay.json` |
-| Applied Spot quota | 96 vCPUs; the separate minimum-64 request can remain open; `validation/aws-deployment.json` |
-| Managed worker launch/replacement | AMD and Intel cold starts passed; real AWS rebalance replaced a worker; activity evidence retained |
-| Cross-worker native recovery | Disposable solver was SIGKILLed, its host terminated, and its automatic replacement restored column 1 and matched the reference; `validation/native-cross-host-restore.json` |
-| Real idle shutdown | Replacement idle around 22:00, controller scaled to zero at 22:30:32 UTC; `validation/managed-rebalance-activities.json` |
-| Existing process snapshots | Five leave-running dumps and scheduled local generations; `validation/live-criu-snapshots.json`, `local-criu-producer.json` |
-| Actual legacy process restore | All five copies restored on separate m8i with matching kernel/libraries and CPU checks; two healthy threads and advancing CPU ticks; `validation/legacy-criu-cross-host-restore.json` |
-| S3 process-memory export | Five explicitly authorized archives, 6,923,934,633 bytes; private AES256 objects and full-download SHA-256 verified; `validation/private-criu-export.json` |
-| Recurring memory export | Disabled: separate authorization pending after automatic approval review rejected future uploads under the one-time grant |
-| Fixed IP and original host | IP still attached to the original host; no original process was restarted, terminated or migrated |
+| Spot quota at least 64 vCPUs | Verified: applied 96; `aws-deployment.json` |
+| Spot-only similar capacity | Deployed 32 vCPU/128 GiB, price-capacity optimized, three AZs; temporarily m8i while legacy CRIU work remains |
+| Preserve running experiments | Original source/IP remain; five factor jobs finished naturally, Diem PID 400334 continues with leave-running backups |
+| Recurring private S3 backups | Enabled at :00/:15/:30/:45, including authorized future sensitive images; full download SHA-256 and AES256 checks; `recurring-private-backups.json` |
+| Checkpoint discovery | Native inventory/generation validation, corrupt fallback and supervisor restore; 20 native tests; earlier live inventory is explicitly partial |
+| Native application checkpoints | Actual solver SIGKILL/restore, cross-worker reference equality, AMD gate and managed replay; earlier native evidence retained |
+| Legacy copy restore | All five factor copies passed on compatible m8i; Diem four-thread copy also passed; `legacy-criu-cross-host-restore.json`, `diem-copy-restore.json` |
+| Automatic legacy failover | Passed disposable-source/first-owner/second-owner rehearsal, including newer backups and time namespace recovery; `automatic-failover.json` |
+| Fenced ownership | EC2 termination plus conditional owner transfer; no timeout-based stealing; all unfinished groups must share ready owner before IP |
+| Fixed IP | Deployed/armed with source guard; live response protects original; no forced original-host handoff was attempted |
+| Cairn/Conductor | Deployed on source and managed workspace; health/restart identity checks and managed cold boot passed |
+| Idle shutdown | Real managed worker scaled to zero after 30 minutes; earlier activity record retained; original protected host excluded |
+| Laptop hooks and SSH wake | Installer/tests ready and AWS invocation/public-key checks passed; actual laptop installation/event remains blocked by missing laptop access |
+| Infrastructure tests | 72 passed; compilation, shell syntax and cfn-lint passed; `results.json`, full logs in new archive |
+| Repository release library gate | 4,399 passed, 0 failed, 118 ignored, 214.50 s; latest full log in new archive |
+| Touched example gate | 2 tests passed; prior built-in 104 checks retained |
+| S3/GitHub publication | Content-addressed private release and source PR; `artifacts.json` |
 
-The S3 objects were checked for matching lengths, stored SHA-256 metadata and
-AES256 server-side encryption. The deployment bundle's local whole-file hash
-and allowlisted archive paths were independently checked before upload. A full
-download from S3 matched its SHA-256 in `artifacts.json`.
+## Recovery rehearsal scope
 
-The original quota-blocked record is preserved in
-`validation/aws-deployment-before-quota-increase.json`. Initial remote-build
-dependency failures and the sandbox-only socket failures remain as evidence.
-The full suite passed after enabling local sockets. The later managed tests
-also preserved PostgreSQL cluster identity across a real worker replacement.
+Only disposable validation hosts were terminated. The original running source
+and real experiments were never killed/restarted. A separate test prefix and
+DynamoDB key modeled predecessor death. The first recovery waited for source
+termination, restored a real coordinate image, then made its own encrypted
+backup. The second waited for the first's termination and restored its newer
+image. Thread health and CPU progress passed after both hops, and elapsed
+monotonic time excluded the downtime. All test hosts were cleaned up.
 
-The live discovery inventory is explicitly partial: the historical archive
-exceeds the traversal limit, some same-user processes deny procfs access, and
-the original host has no managed jobs manifest. Durable state and live working
-directories are prioritized; this report is not evidence that every checkpoint
-on the entire disk was examined. The five current factor-base workers still
-require automatic recovery and fenced ownership handoff before replacement/
-cutover. The five manual copy restores establish the tested compatible-host
-scope; they do not establish automatic recovery or arbitrary CPU portability.
+This proves the exercised legacy recovery path, not transparent migration of
+arbitrary processes, arbitrary CPU/kernel portability, exactly-once external
+side effects, or a real original-source failure that has not occurred. Source
+completion after its most recent checkpoint but before an abrupt loss may be
+recomputed from that checkpoint; completed verified receipts are never replayed.
+
+The new Diem namespace uses the same fenced state machine and separate production
+backup contract. Its copy restore passed on the managed standby after verifying
+kernel, library and image integrity. Its terminal record count is an infrastructure
+completion signal; no research output was independently verified here.
+
+## Retained failures and limits
+
+Earlier quota, dependency, sandbox-socket, CRIU 3.17.1 and namespace restore
+failures remain in frozen archives. Later successful tests do not erase them.
+The live native inventory cannot exhaust the entire historical archive and some
+procfs entries are inaccessible. Discovery is partial, not universal protection.
+Only explicitly enrolled and restore-tested legacy processes have memory recovery;
+future managed workloads must implement/test a native checkpoint contract.
+
+Laptop execution access is the remaining activation gap. The package merges
+existing client settings and configures strict SSH verification. Codex's `/hooks`
+trust step is deliberately left to the user. No client trust store is bypassed.
