@@ -96,3 +96,25 @@ whole band.
 - **Not claimed.** No exponent, no deployed curve, no wall time.  Complete
   solves: every run's recovered logarithm is verified by ecbench, and sessions
   are re-audited with `ecbench verify --replay 12`.
+
+## Amendment 3 (2026-10-19, after Test A's session and a post hoc size decomposition)
+
+- **What was seen.** The frozen Test A comparison (half base at degree d−1 =
+  `dimension=8,trace_kernel=1`, against default `dimension=9`) gave
+  Σ S(half)/Σ S(default) = 0.282 [0.271, 0.299] for MITM, 2.6–3.8× per curve,
+  beyond the stated ~2× ceiling.  A post hoc session (`e11b_x_decomp`)
+  showed why: the default base's S grows steeply with its size and
+  `dimension=9` is past the minimum; at *equal point count* (`default8`, 256
+  points, against `half9`) the ratio is 0.98, 0.83, 0.72.  Per-system the default
+  was mistuned, so the frozen comparison overstates the gain over the best
+  default.  This is reported as the primary result *and* as mistuned.
+- **Baseline per the success criterion.** The baseline is the best current
+  pipeline, so the tuned default.  Rule: on fresh a = 1 curves (seed 8001,
+  one per n ∈ {19, 21, 23}, 4 targets) run MITM at default dimensions 5–10 and
+  trace-kernel dimensions 4–9 (`e11b_tune_dims`); for each n pick, separately for
+  each family, the dimension minimising mean S at w = 0.1.  Chosen: n = 19
+  default d = 7, half d = 6; n = 21: 7, 7; n = 23: 8, 8.  The tuning session was
+  read before this amendment was written; the test (`e11b_tuned`, Test A's three
+  curves, same targets) is the first run of these arms on those curves.
+- **Tuned verdict.** Same rule as Test A (half below default across the band on
+  ≥ 2 of 3 curves), with the interval from `ecbench compare`.
