@@ -18,6 +18,8 @@ This is infrastructure validation, not an experiment or performance claim.
 | Harness RBAC | Live impersonation check: create Jobs in `isolab` allowed, read Secrets denied |
 | Local checks | ShellCheck, Bash syntax, cfn-lint, eksctl dry-run, exact-version Karpenter CRD schemas, live Kubernetes admission validation passed |
 | Repository checks | `cargo test --release --lib`: 4,405 passed, 0 failed, 118 existing ignored tests; no tests were disabled |
+| Native MCP connector | Six tools loaded into Codex; Rust unit tests (5/5), Clippy with warnings denied, formatting and ShellCheck passed |
+| MCP live smoke | `mcp-plan-20261019-183708`: stdio submission, duplicate rejection, successful private-image plan, logs, downloaded S3 hash, intentional exit-7 failure and cancellation passed; see `mcp.json` and `mcp-artifacts.json` |
 
 The first full library run lacked eight runtime fixture inputs in the sparse
 checkout. The tracked fixtures were materialized, and the full suite was rerun
@@ -33,8 +35,9 @@ native plan. Fetch with `aws s3 cp URI FILE` and verify the hash. Compact cloud
 receipts are committed beside this file. The smoke commands are in `../smoke.sh`
 and the native plan example in `../README.md`.
 
-The existing Iso Lab NATS/MCP execution backend has **not** been migrated to
-Kubernetes. A restricted pod on an EC2 VM does not meet its strict/bare-metal
+The native `isolab_k8s_*` tools provide the Kubernetes harness path. The existing
+Iso Lab NATS/MCP execution contract has **not** been migrated to Kubernetes.
+A restricted pod on an EC2 VM does not meet its strict/bare-metal
 fidelity policy. GPU pools, checkpoint/restart integration and live PVC
 provisioning tests were not part of this verification. The installed EBS driver
 and its IAM role are healthy; durable output was verified through S3.

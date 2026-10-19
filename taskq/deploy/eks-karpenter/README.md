@@ -68,6 +68,75 @@ expiration and drift replacement are disabled to protect long running jobs.
 
 ## Submit from the harness
 
+### Native MCP connector
+
+`mcp/` is a Rust stdio MCP server for this deployment. It uses the same Job
+manifest as the shell launcher and exposes six tools: `isolab_k8s_overview`,
+`isolab_k8s_run`, `isolab_k8s_status`, `isolab_k8s_logs`, `isolab_k8s_cancel`,
+and `isolab_k8s_results`. Results lists S3 keys for each attempt; retrieve their
+contents with `aws s3 cp`. The server never launches a workload on the harness
+host. It requires Bash, GNU timeout, jq, kubectl and AWS CLI on PATH, a reachable
+Kubernetes endpoint, and an authorized AWS identity. Building requires Rust.
+
+From this deployment directory, install and register on the current host:
+
+```sh
+./install-mcp.sh /home/ec2-user/ops/eks-isolab/mcp
+codex mcp add isolab-eks \
+  --env KUBECONFIG=/home/ec2-user/ops/eks-isolab/kubeconfig \
+  --env ISOLAB_KUBE_CONTEXT=i-01f85a6c905181498@isolab.us-east-2.eksctl.io \
+  --env PATH=/home/ec2-user/.local/bin:/usr/local/bin:/usr/bin:/bin \
+  -- /home/ec2-user/ops/eks-isolab/mcp/isolab-eks-mcp
+```
+
+If the tools do not appear after registration, start a new Codex session to load
+the connection. This registers with the Codex installation on this host; another
+harness needs its own MCP configuration and network/authentication access. See the
+[official Codex MCP configuration documentation](https://developers.openai.com/codex/mcp).
+For other stdio clients use the same executable and environment. No key is
+stored in the MCP configuration. `ISOLAB_KUBE_CONTEXT` is required explicitly
+so changing the kubeconfig's current context cannot redirect a submission.
+
+Example `isolab_k8s_run` arguments (the default image is pinned in `image.json`):
+
+```json
+{
+  "job_name": "my-ecbench-plan-001",
+  "cpu": 2,
+  "memory": "1Gi",
+  "seconds": 900,
+  "command": ["/bin/sh", "-ec", "mkdir -p \"$ISOLAB_OUTPUT_DIR\"; ecbench plan --spec /opt/isolab/specs/smoke-prime.json --json > \"$ISOLAB_OUTPUT_DIR/plan.json\"; aws s3 cp \"$ISOLAB_OUTPUT_DIR/\" \"$ISOLAB_RESULTS_URI\" --recursive"]
+}
+```
+
+Run returns promptly; use status until the Job is terminal, then logs/results.
+Use a unique Job name for each intended run. If a submission times out, inspect
+that name before retrying: Kubernetes rejects duplicate names while the Job
+exists, but names become reusable after deletion or TTL cleanup. The tool does
+not retry submissions automatically. Commands are argv arrays; a shell only
+runs when requested explicitly, as above. Custom images must use SHA-256 digests.
+Cancel deletes the Job and its pods, including temporary data; uploaded S3
+artifacts survive. Retries use separate pod result prefixes.
+
+For diagnostics without an MCP client, set the same environment and run
+`isolab-eks-mcp tools` or
+`isolab-eks-mcp call isolab_k8s_overview '{}'`. Each external command has a
+25-second deadline; status/logs can make two such calls. The MCP server handles
+requests sequentially and does not offer a blocking wait or streaming logs.
+The implementation follows the
+[MCP stdio protocol](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports).
+
+Connector validation: `cargo test --locked --manifest-path mcp/Cargo.toml` and
+`cargo clippy --locked --manifest-path mcp/Cargo.toml --all-targets -- -D warnings`.
+For a live check (creates short Spot Jobs), set the two connection variables
+above plus `ISOLAB_MCP_BIN` to the installed executable, then run
+`mcp/smoke.sh /absolute/path/to/evidence`. It verifies submission over stdio,
+duplicate rejection, success/failure, logs, a downloaded S3 result hash, and
+cancellation. It retains successful and intentionally failed Job records until
+the normal one-day TTL; idle workers are removed by Karpenter.
+
+### Shell launcher
+
 The thin shell launcher can be called by Codex, another harness, or a CI runner:
 
 ```sh
@@ -138,12 +207,13 @@ counters and bare-metal checks. Ordinary restricted Kubernetes pods on EC2 VMs
 do not establish that tier. Static CPU allocation and one lab job per node do
 not prove absence of host noise or hypervisor contention.
 
-This deployment does not migrate the existing NATS hub or change `isolab_run`
-into a Kubernetes backend. Native tools such as ecbench can run as pod commands,
-with their recorded fidelity kept honest. A future native Iso Lab adapter must
-preserve leases, fencing, result commits, retry semantics and fidelity checks;
-privileged host workers need a separate reviewed design. Existing deployments
-and running experiments are unchanged.
+The native connector provides the `isolab_k8s_*` pod workflow. It does not
+migrate the existing NATS hub or change the legacy `isolab_run` contract. Native
+tools such as ecbench run as pod commands, with their recorded fidelity kept
+honest. Compatibility with the NATS worker contract would additionally require
+its leases, fencing, result commits, retry semantics and fidelity checks;
+privileged host workers need a separate design. Existing deployments and
+running experiments are unchanged.
 
 For an in-cluster harness, use the `harness` ServiceAccount and enable a projected
 Kubernetes API token on that harness pod explicitly. External AWS roles can be
