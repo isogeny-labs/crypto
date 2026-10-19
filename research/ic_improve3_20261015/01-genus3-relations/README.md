@@ -12,6 +12,10 @@ Protocol, frozen before test data, with amendments C0-C2: [PROTOCOL.md](PROTOCOL
   - gates: [gate0.md](results/run/gate0.md) and [acct.md](results/run/acct.md);
   - training: [results/train/](results/train/) ([diag.md](results/train/diag.md), [r2rule.md](results/train/r2rule.md), [gatetrain.md](results/train/gatetrain.md)).
 
+## R10 re-rate (2026-10-19)
+
+Against tuned-LP, R2's exponent is 1.435 versus 1.371 over 12..21 (+0.064, REGRESSES); the constant-cost result remains. This re-rates the comparison in this report's original protocol. See [`pinned ledger`](../../ic_tool_program/ledger/r10-20261019/README.md).
+
 ## Verdict
 
 **Incumbent:** item 06's cheapest frozen arm at large q, the combination **`sched:lpsgebw2`**:
