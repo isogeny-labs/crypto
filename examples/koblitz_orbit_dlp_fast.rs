@@ -5144,12 +5144,6 @@ mod wide {
             "rank_relations":rank_relations,
             "rank_failures":rank_failures,
             "rank_rows_without_gain":rank_rows_without_gain,
-            "rank_solve":rank_solve_name,
-            "rank_padd_fallback_states":PADD_FALLBACK_STATES.load(std::sync::atomic::Ordering::Relaxed),
-            "rank_padd_irregular_inputs":PADD_IRREGULAR_INPUTS.load(std::sync::atomic::Ordering::Relaxed),
-            "rank_padd_resolved_hits":PADD_RESOLVED_HITS.load(std::sync::atomic::Ordering::Relaxed),
-            "rank_padd_swapped_pairs":PADD_SWAPPED_PAIRS.load(std::sync::atomic::Ordering::Relaxed),
-            "rank_padd_checked_inputs":PADD_CHECKED_INPUTS.load(std::sync::atomic::Ordering::Relaxed),
             "rank_policy": if rank_policy_parallel {
                 "guided parallel: every column anchors [a]G - R_j with a scheduling-independent scalar; logs are the unique full-rank solution"
             } else {
@@ -5165,6 +5159,15 @@ mod wide {
             "target_threads":target_threads,
             "scope":"public synthetic Koblitz fixtures; shared-factor-log DLP with every stage timed in one process; no external points or key recovery",
         });
+        {
+            use std::sync::atomic::Ordering::Relaxed;
+            summary["rank_solve"] = json!(rank_solve_name);
+            summary["rank_padd_fallback_states"] = json!(PADD_FALLBACK_STATES.load(Relaxed));
+            summary["rank_padd_irregular_inputs"] = json!(PADD_IRREGULAR_INPUTS.load(Relaxed));
+            summary["rank_padd_resolved_hits"] = json!(PADD_RESOLVED_HITS.load(Relaxed));
+            summary["rank_padd_swapped_pairs"] = json!(PADD_SWAPPED_PAIRS.load(Relaxed));
+            summary["rank_padd_checked_inputs"] = json!(PADD_CHECKED_INPUTS.load(Relaxed));
+        }
         summary["root_bloom_profile"] = json!(index
             .table
             .bloom
