@@ -395,6 +395,27 @@ fn audit(dir: &Path) -> R<Value> {
                 json!({"schema":"n83.native-audit/v1","status":"UNKNOWN_CONTROL_WALL_CAP","sat_trace":sat,"terminal_counters":null,"outer_wall_ms":out["outer_wall_ms"],"selected_best_total_runtime":null}),
             );
         }
+        // The frozen reference worker retains raw CMS output and exits1 on
+        // an unresolved backend. Preserve a typed unknown instead of trying
+        // to parse its absent positive-control stdout as JSON.
+        if external
+            && out["exit_code"] == 1
+            && fs::read_to_string(dir.join("cms.model"))?.trim() == "s INDETERMINATE"
+        {
+            let cms = fs::read_to_string(dir.join("cms.stdout"))?;
+            let conflicts = cms_conflicts(&cms).ok_or("missing external conflict count")?;
+            let cap = number(&cfg, "conflicts")?;
+            require(
+                (cap..=cap + 1).contains(&conflicts)
+                    && raw.contains("external SAT reference did not return SAT: Some(15)"),
+                "external unknown is not the declared conflict boundary",
+            )?;
+            return Ok(
+                json!({"schema":"n83.native-audit/v1","status":"UNKNOWN_EXTERNAL_CONFLICT_CAP",
+                "external_reported_conflicts":conflicts,"model_verified":null,"terminal_counters":null,
+                "outer_wall_ms":out["outer_wall_ms"],"selected_best_total_runtime":null}),
+            );
+        }
         let result: Value = serde_json::from_slice(&fs::read(dir.join("stdout.log"))?)?;
         let external_model = if external {
             Some(external_replay(dir)?)
@@ -676,6 +697,14 @@ fn audit(dir: &Path) -> R<Value> {
         json!({"schema":"n83.native-audit/v1","status":status,"columns":cfg["columns"],"phases":ps,"queries":queries,"terminal_counters":counters,"outer_wall_ms":out["outer_wall_ms"],"selected_best_total_runtime":null}),
     )
 }
+fn cms_conflicts(raw: &str) -> Option<u64> {
+    raw.lines().find_map(|line| {
+        let rest = line.strip_prefix("c conflicts")?;
+        let value = rest.trim().strip_prefix(':')?.split_whitespace().next()?;
+        value.parse().ok()
+    })
+}
+
 fn external_replay(dir: &Path) -> R<Vec<bool>> {
     let formula = fs::read_to_string(dir.join("witness.cnf"))?;
     let mut lines = formula.lines();
@@ -773,7 +802,12 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         "only retained diagnostic sizes admitted",
     )?;
     let conflicts = number(&s, "conflicts")?;
-    require((1..=100000).contains(&conflicts), "invalid conflicts")?;
+    let ceiling = if s["external_solver"].is_string() {
+        1_000_000
+    } else {
+        100_000
+    };
+    require((1..=ceiling).contains(&conflicts), "invalid conflicts")?;
     let checkout = fs::canonicalize(text(&s, "checkout")?)?;
     let clean = Command::new("git")
         .args(["-c", &format!("safe.directory={}", checkout.display())])
@@ -1106,6 +1140,15 @@ fn main() -> R<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn external_conflict_parser_requires_exact_summary_label() {
+        assert_eq!(
+            cms_conflicts("c decisions/conflicts : 2.3\nc conflicts : 5001\n"),
+            Some(5001)
+        );
+        assert_eq!(cms_conflicts("c conflicts/s : 5001\n"), None);
+        assert_eq!(cms_conflicts("c conflicts : nope\n"), None);
+    }
     #[test]
     fn retained_policy_preflight_rejects_wrong_or_ambiguous_rows() {
         let row = json!({"a":0,"columns":2048,"policy":"public_x_hash","seed":2026100801u64});
