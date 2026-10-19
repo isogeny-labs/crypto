@@ -29,9 +29,14 @@ def unzip(source, output):
 
 def main():
     protocol = json.loads((HERE / 'phase_protocol.json').read_text())
+    extension = json.loads((HERE / 'phase_extension.json').read_text())
     require(protocol['status'] == 'FROZEN_BEFORE_SOLVER_CALLS' and
             protocol['selected_best_total_runtime'] is None and
-            sha256(HERE / 'phase_prefix.py') == protocol['generator_source_sha256'],
+            sha256(HERE / 'phase_prefix.py') == protocol['generator_source_sha256'] and
+            extension['status'] == 'FROZEN_BEFORE_SOLVER_CALL' and
+            extension['phase_prefix'] == 3 and
+            extension['conflict_cap'] == 1000000 and
+            extension['xcnf_sha256'] == protocol['formulas'][2]['xcnf_sha256'],
             'phase protocol or generator differs')
     with tempfile.TemporaryDirectory(prefix='n83-phase-audit-') as temporary:
         temporary = Path(temporary)
@@ -60,8 +65,9 @@ def main():
             exports[k] = EVIDENCE / f'phase/k{k}_export.json'
             formulas[k] = formula
         for k in (4, 3, 2, 1):
-            for cap in (5000, 100000) if k < 4 else (5000,):
-                label = '5k' if cap == 5000 else '100k'
+            for cap in ((5000, 100000, 1000000) if k == 3 else
+                        (5000, 100000) if k < 4 else (5000,)):
+                label = {5000: '5k', 100000: '100k', 1000000: '1m'}[cap]
                 folder = EVIDENCE / f'phase/cms_k{k}_{label}'
                 receipt = json.loads((folder / 'run.json').read_text())
                 sat = k == 4 and cap == 5000
@@ -73,6 +79,7 @@ def main():
                 stderr = folder / 'solver.stderr'
                 require(receipt['xcnf_sha256'] == sha256(formulas[k]) and
                         receipt['cap_conflicts'] == cap and
+                        receipt['cap_seconds'] == (180 if cap == 1000000 else 60) and
                         receipt['status'] == ('SAT_unverified' if sat else 'UNKNOWN_solver_cap') and
                         receipt['solver_status'] == ('SATISFIABLE' if sat else 'INDETERMINATE') and
                         receipt['exit_code'] == (10 if sat else 15) and

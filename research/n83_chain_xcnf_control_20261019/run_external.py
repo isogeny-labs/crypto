@@ -10,6 +10,13 @@ import subprocess
 import time
 from pathlib import Path
 
+GAUSS_PROFILES = {
+    'default': (),
+    'wide': ('--maxmatrixrows=10000', '--maxmatrixcols=50000'),
+    'forced': ('--maxmatrixrows=10000', '--maxmatrixcols=50000',
+               '--autodisablegauss=0', '--gaussusefulcutoff=0'),
+}
+
 
 def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -21,6 +28,8 @@ def main():
     parser.add_argument('output', type=Path)
     parser.add_argument('--seconds', type=int, default=300)
     parser.add_argument('--conflicts', type=int, default=5000)
+    parser.add_argument('--gauss-profile', choices=tuple(GAUSS_PROFILES),
+                        default='default')
     args = parser.parse_args()
     if not 1 <= args.seconds <= 1200 or not 1 <= args.conflicts <= 10000000:
         raise ValueError('cap out of bounded range')
@@ -33,7 +42,7 @@ def main():
                              text=True, check=True).stdout
     command = [str(solver), '--verb=0', '--threads=1',
                f'--maxtime={args.seconds}', f'--maxconfl={args.conflicts}',
-               str(args.xcnf.resolve())]
+               *GAUSS_PROFILES[args.gauss_profile], str(args.xcnf.resolve())]
     start = time.monotonic()
     before = resource.getrusage(resource.RUSAGE_CHILDREN)
     try:
@@ -74,6 +83,7 @@ def main():
         'command': command,
         'cap_seconds': args.seconds,
         'cap_conflicts': args.conflicts,
+        'gauss_profile': args.gauss_profile,
         'elapsed_wall_ms': (time.monotonic() - start) * 1000,
         'child_user_cpu_seconds': after.ru_utime - before.ru_utime,
         'child_system_cpu_seconds': after.ru_stime - before.ru_stime,
