@@ -108,6 +108,11 @@ def extract(archive, target, max_bytes=68719476736):
                 if not actual.resolve().is_relative_to(target.resolve()):
                     raise ValueError('Escaped checkpoint archive')
                 if entry.isdir():
+                    # Tar writers commonly include "." as a root-directory
+                    # record. Keep the private staging directory's ownership
+                    # and mode instead of applying archive metadata to it.
+                    if rel == Path('.'):
+                        continue
                     actual.mkdir(parents=True, exist_ok=True, mode=0o700)
                     directories.append((actual, entry))
                     continue
