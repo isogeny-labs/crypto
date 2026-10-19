@@ -37,8 +37,8 @@ def main():
     for d in dirs:
         name = d.name
         if "-ext" in name:
-            b = int(name.split("-P")[1].split("-ext")[0])
-            fam = json.loads((d / "spec.json").read_text())["arms"][1]["name"].split("-N")[0]
+            b_s, fam, _ = name.split("-P")[1].split("-")
+            b = int(b_s)
             exts[(b, fam)] += 1
     for line in out.splitlines():
         r = json.loads(line)

@@ -4,7 +4,7 @@
     python3 make_specs.py train            # specs/train-P<b>.json, Phase A
     python3 make_specs.py holdout          # specs/holdout-P<b>.json, Phase B (needs params.json)
     python3 make_specs.py ext <b> <arm> <size>[,<size>...] <n>
-                                           # specs/train-P<b>-ext<n>.json, one selection extension
+                                           # specs/train-P<b>-<arm>-ext<n>.json, one selection extension
 
 Every value comes from PROTOCOL.md; nothing here is a choice.
 """
@@ -123,7 +123,7 @@ def main():
         pair = sizes if arm == "pair" else []
         rf = sizes if arm == "rf3" else []
         write(
-            SPECS / f"train-P{b}-ext{n}.json",
+            SPECS / f"train-P{b}-{arm}-ext{n}.json",
             spec(
                 f"bitop ladder train panel extension {n}: {b}-bit a=-3 prime-order curve",
                 cs[b],

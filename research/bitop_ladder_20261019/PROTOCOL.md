@@ -140,3 +140,9 @@ about 3,000× the floor and 7 s a run at 32 bits; the fixed-b32 arm stops at
    Each card is sized to finish under the harness's 2-hour maximum, and the
    executor is dispatched with that maximum as its background timeout. No
    spec, seed, grid or rule changed.
+2. **Extension file names (2026-10-19, after the train panel).** The first
+   selection pass needed extensions for both arms at 24–28 bits, and
+   `make_specs.py` named both `train-P<b>-ext<n>.json`. Extensions are now
+   named `train-P<b>-<arm>-ext<n>.json`, and `select.py` reads the arm from
+   the name. Only the file names changed; each extension spec holds the
+   values the rule above prescribes.
