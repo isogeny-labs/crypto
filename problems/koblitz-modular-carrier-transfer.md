@@ -321,3 +321,39 @@ the [proof map](../research/koblitz_modular_ic_20261018/rounds/07/PROOF_MAP.md).
 The next discriminating quotient step is the mixed invariant image ideal;
 the next relation step is a complete function family with checked new
 nonzero images and collection accounting. No IC efficiency verdict follows.
+
+## Round08: complete line norms and global Kummer atlases
+
+[Round08](../research/koblitz_modular_ic_20261018/rounds/08/REPORT.md)
+completes the nonzero-line norm family and the fixed line∞. Its exact
+geometric joins use full split bases and primitive-generator presentations
+of degree11 components. Six additional functions beyond the first round07
+row give final evaluated rank12/1308 and nonzero-image rank11 on1165/1160
+columns. Separate small-field arithmetic checks every image coordinate
+and principal sum; independent elimination agrees with the ranks. The
+larger rank comes with540 additional columns. Collection costs and
+individual descent remain unmeasured/unimplemented.
+
+For the four determinant19 mixed quotients, the actual graph generators
+give40 explicit Miller functions. Their denominators reduce to1, with
+degrees9 and8 in A(x)+B(x)y. Exact divisor checks and a written
+dual-isogeny/Kummer argument identify two intrinsic equations per quotient
+chart over F2^360. Six translated charts cover the global quotient;200
+exact rational identities and verified19th roots give their transitions.
+The parsed checks include100 curve identities and400 point translations.
+Lean proves the six-chart coverage and cocycle implications, along with
+the Miller-divisor and Kummer identities.
+
+This discharges the missing intrinsic chart and explicit global gluing
+over the splitting field. **Effective F2 equations and a closed projective
+embedding remain open.** The polarized fivefold has not been identified
+as a Jacobian. General genus2841 reduction and individual modular descent
+also remain open. These are construction gaps, not nonexistence results.
+
+The next quotient experiment must compute Frobenius on the actual Kummer
+coordinates, verify its compatibility with the200 transitions, and produce
+an effective F2 model whose base change recovers this atlas and the retained
+polarization pullback. The next direct-relation experiment must use coupled
+functions beyond the now-complete single-line norm family, with complete
+zero support, geometric joins and projected pole accounting. Neither
+experiment is represented as already executed.

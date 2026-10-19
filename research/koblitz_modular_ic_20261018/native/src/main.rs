@@ -48,6 +48,7 @@ mod gluing;
 #[path = "../../../../src/cryptanalysis/identity_certificate.rs"]
 mod identity_certificate;
 mod klein_transfer;
+mod kummer08;
 mod large_field;
 #[path = "../../../../src/cryptanalysis/curve_construction/lpoly.rs"]
 mod lpoly;
@@ -59,6 +60,7 @@ mod polarized;
 mod quotient_geometry;
 mod quotients06;
 mod quotients07;
+mod relations08;
 mod reverse06;
 mod round02;
 mod round03_record;
@@ -70,6 +72,7 @@ mod round05_record;
 mod round06;
 mod round06_record;
 mod round07_record;
+mod round08_record;
 mod round_record;
 
 fn pow(mut a: u64, mut k: u64, p: u64) -> u64 {
@@ -346,6 +349,43 @@ fn run(out: &std::path::Path) {
     );
 }
 fn main() {
+    let args08: Vec<String> = std::env::args().collect();
+    if args08.get(1).map(String::as_str) == Some("--record-round08") {
+        round08_record::record(std::path::Path::new(
+            args08.get(2).expect("fresh round records"),
+        ));
+        return;
+    }
+    if args08.get(1).map(String::as_str) == Some("--verify-round08-kummer-glue") {
+        kummer08::verify_glue(std::path::Path::new(args08.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args08.get(1).map(String::as_str) == Some("--round08-kummer-glue") {
+        kummer08::glue(std::path::Path::new(args08.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args08.get(1).map(String::as_str) == Some("--verify-round08-relations") {
+        let dir = std::path::Path::new(args08.get(2).expect("fresh outputs"));
+        relations08::verify(dir, false);
+        relations08::verify(dir, true);
+        return;
+    }
+    if args08.get(1).map(String::as_str) == Some("--verify-round08-kummer") {
+        kummer08::verify(std::path::Path::new(args08.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args08.get(1).map(String::as_str) == Some("--round08-infinity") {
+        relations08::infinity(std::path::Path::new(args08.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args08.get(1).map(String::as_str) == Some("--round08-kummer") {
+        kummer08::run(std::path::Path::new(args08.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args08.get(1).map(String::as_str) == Some("--round08-relations") {
+        relations08::run(std::path::Path::new(args08.get(2).expect("fresh outputs")));
+        return;
+    }
     let args07: Vec<String> = std::env::args().collect();
     if args07.get(1).map(String::as_str) == Some("--verify-round07-next") {
         forward07::verify_next(std::path::Path::new(args07.get(2).expect("fresh outputs")));

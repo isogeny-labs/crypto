@@ -1,18 +1,16 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [07](rounds/07/README.md), with its
-[report](rounds/07/REPORT.md), [PDF](rounds/07/report.pdf),
-[proof map](rounds/07/PROOF_MAP.md), [ledger](rounds/07/ledger.json)
-and exact replay. Two complete full-map norm relations raise nonzero-image
-rank to 6 for both signs, on 675/678 columns. The full evaluated matrix
-has rank 7/768. Independent pointwise forward norms return the source for
-both even and odd reverse generators. The corrected odd divisor has all
-20 fibers in explicit coordinates, degree 6,600 on each side, with formal
-F2 descent. Four mixed determinant-19 translation atlases and expanded
-supersingular [19] cover equations are checked. The intrinsic mixed
-quotient image ideal, Jacobian reduction and individual descent remain
-open. Seventeen new named Lean results pass. The user assesses IC
-implications; no timing is measured.
+The current round is [08](rounds/08/README.md), with its
+[report](rounds/08/REPORT.md), [PDF](rounds/08/report.pdf),
+[proof map](rounds/08/PROOF_MAP.md), [ledger](rounds/08/ledger.json)
+and exact replay. The complete line-norm family raises nonzero-image rank
+to 11 for both signs, on 1165/1160 columns; evaluated rank is 12/1308.
+Exact geometric joins and separate small-field checks pass. Four mixed
+determinant-19 quotients have intrinsic Kummer equations and six explicit
+covering charts each over F2^360, with 200 exact transition identities.
+Sixteen new named Lean results pass, including chart coverage and cocycles.
+Effective F2 coordinate descent, a closed projective embedding, Jacobian
+identification and individual descent remain open. No timing is measured.
 
 Earlier evidence stays frozen:
 
@@ -27,6 +25,8 @@ Earlier evidence stays frozen:
   11-primary splitting, canonical quotient constructions and symbolic rank 5/588.
 - [Round 06](rounds/06/README.md): 44 evaluated zero-image columns,
   all ten determinant-5 quotient graphs and explicit even reverse fibers.
+- [Round 07](rounds/07/README.md): independent forward norms, corrected odd
+  reverse divisor, nonzero-image rank6 and determinant-19 cofactor covers.
 - [Open construction problem](../../problems/koblitz-modular-carrier-transfer.md):
   current obligations, exact scope, and next discriminating experiments.
 
