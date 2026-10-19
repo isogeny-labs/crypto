@@ -13,6 +13,7 @@ mod cryptanalysis {
     }
 }
 mod reservation;
+mod xor_summary;
 use std::{
     collections::BTreeMap,
     error::Error,
@@ -1023,6 +1024,9 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
 fn main() -> R<()> {
     let a: Vec<_> = std::env::args().collect();
     match a.get(1).map(String::as_str) {
+        Some("summarize-xor") if a.len() == 4 => {
+            xor_summary::summarize(Path::new(&a[2]), Path::new(&a[3]))
+        }
         Some("check-sat-trace") if a.len() == 3 => {
             println!("{}", sat_trace(&fs::read_to_string(&a[2])?)?);
             Ok(())
