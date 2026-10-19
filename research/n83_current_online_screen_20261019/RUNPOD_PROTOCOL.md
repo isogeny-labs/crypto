@@ -15,7 +15,9 @@ do not copy it to the Pod, source tree or artifacts. Preserve every failed
 allocation and partial run. Require the actual Pod ID, machine ID, cost and
 source commit in an allocation receipt before computation.
 
-The Pod clones the exact pushed commit with sparse checkout, verifies every
+The Pod clones the exact pushed commit with cone-mode sparse checkout,
+including tracked root Cargo files and the `docs` files compiled into the
+library, then verifies every
 hash in `runpod_dispatch.json`, records OS/CPU/build receipts, compiles and
 tests the pinned IC producer, and runs six fresh processes with the same
 1,500-second per-arm cap. The global runner cap is 7,200 seconds, leaving

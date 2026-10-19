@@ -62,7 +62,8 @@ cargo --version > "$EVIDENCE/cargo-version.txt"
 
 git clone --filter=blob:none --depth 1 --branch "$BRANCH" --sparse \
   https://github.com/aburan28/crypto.git "$WORK"
-git -C "$WORK" sparse-checkout set src examples \
+git -C "$WORK" sparse-checkout init --cone
+git -C "$WORK" sparse-checkout set src examples docs \
   research/n83_current_online_screen_20261019 \
   research/n83_root4_20261014 \
   research/n83_indexed5_20261013 \
