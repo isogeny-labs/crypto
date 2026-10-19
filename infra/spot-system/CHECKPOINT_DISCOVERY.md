@@ -103,8 +103,9 @@ uncommitted checkpoint files as unverified.
 
 The runtime archive includes the executable. `install_services.py` installs a
 `spot-checkpoint-discovery.timer` that refreshes
-`/srv/experiments/discovery/current-host.json` every 60 seconds after a scan
-finishes. `--discovery-only` installs only this service/timer and requires an
+`/srv/experiments/discovery/current-host.json` every 900 seconds after a scan
+finishes, with an explicit 64-GiB hashing budget for native matrices.
+`--discovery-only` installs only this service/timer and requires an
 existing durable mount. For the original host, add
 `--search-root /home/ec2-user/crypto`; new workers search the durable root.
 Node state and active experiments are not restarted by this installation.
