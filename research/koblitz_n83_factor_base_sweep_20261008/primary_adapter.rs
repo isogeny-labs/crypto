@@ -1110,6 +1110,22 @@ fn run_with_config(
     if budget_seconds == 0 || budget_seconds > 86_400 {
         return Err("primary wall cap must be 1..86400 seconds".into());
     }
+    let trace_chained_s3_phases = match std::env::var("N83_CHAIN_PHASE_TRACE") {
+        Ok(value) if value == "1" => true,
+        Ok(value) if value == "0" => false,
+        Err(std::env::VarError::NotPresent) => false,
+        _ => return Err("N83_CHAIN_PHASE_TRACE must be 0 or 1".into()),
+    };
+    if trace_chained_s3_phases
+        && (!matches!(
+            strategy,
+            DecompositionStrategy::ChainedS3
+                | DecompositionStrategy::ChainedS3FrobeniusOrbit
+                | DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
+        ) || max_trials != 1)
+    {
+        return Err("N83 phase trace requires one chained-S3 trial".into());
+    }
     let start = Instant::now();
     fs::create_dir(run_dir)?;
     write_new_json(
@@ -1121,6 +1137,7 @@ fn run_with_config(
             "curve_a":0, "fixture":0, "orbit_columns":columns,
             "summands":m, "strategy":strategy_name, "max_trials":max_trials,
             "budget_seconds":budget_seconds, "allow_direct_relation":false,
+            "trace_chained_s3_phases":trace_chained_s3_phases,
             "source_adapter_blake3":blake3::hash(include_bytes!("primary_adapter.rs")).to_hex().to_string(),
             "source_commit":chain.map(|config| config.source_commit.as_str()),
             "source_attestation_mode":chain.map(|config| config.source_attestation_mode),

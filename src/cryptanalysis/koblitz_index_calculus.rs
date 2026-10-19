@@ -126,6 +126,7 @@
 
 use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
+use std::io::Write;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, OnceLock};
@@ -8536,7 +8537,7 @@ pub fn sat_decompose_chained_s3(
     m: usize,
     limits: ChainS3Limits,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
-    sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, false, false)
+    sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, false, false, false)
 }
 
 /// Use one signed-Frobenius representative per column to constrain the same
@@ -8550,7 +8551,7 @@ pub fn sat_decompose_chained_s3_frobenius_orbit(
     m: usize,
     limits: ChainS3Limits,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
-    sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, true, false)
+    sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, true, false, false)
 }
 
 /// An opt-in symmetry arm for the same exact signed-Frobenius domain.
@@ -8563,7 +8564,32 @@ pub fn sat_decompose_chained_s3_frobenius_orbit_ordered(
     m: usize,
     limits: ChainS3Limits,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
-    sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, true, true)
+    sat_decompose_chained_s3_with_domain(kc, fb, target, m, limits, true, true, false)
+}
+
+/// Emit a flushed, machine-readable diagnostic before work that may outlive
+/// the outer watchdog. The caller opts in; ordinary IC runs do no I/O here.
+fn emit_chain_s3_phase(
+    enabled: bool,
+    started: &std::time::Instant,
+    phase: &str,
+    counts: &[(&str, u64)],
+) {
+    if !enabled {
+        return;
+    }
+    let mut row = serde_json::json!({
+        "schema": "n83.chain-s3-phase/v1",
+        "phase": phase,
+        "elapsed_ms": started.elapsed().as_secs_f64() * 1000.0,
+    });
+    for (name, value) in counts {
+        row[*name] = serde_json::json!(*value);
+    }
+    eprintln!("N83_CHAIN_PHASE {row}");
+    std::io::stderr()
+        .flush()
+        .expect("chain-S3 phase receipt must reach stderr");
 }
 
 fn sat_decompose_chained_s3_with_domain(
@@ -8574,11 +8600,23 @@ fn sat_decompose_chained_s3_with_domain(
     limits: ChainS3Limits,
     frobenius_orbits: bool,
     order_first_pair: bool,
+    trace_phases: bool,
 ) -> (Option<Vec<usize>>, ChainS3Stats) {
     use crate::cryptanalysis::binary_semaev_chain_sat::{
         finite_domain_clause_count, frobenius_orbit_domain_size, ChainBuildError, ChainedS3Encoding,
     };
     let mut stats = ChainS3Stats::default();
+    let phase_started = std::time::Instant::now();
+    emit_chain_s3_phase(
+        trace_phases,
+        &phase_started,
+        "entry",
+        &[
+            ("points", fb.points.len() as u64),
+            ("orbits", fb.signed_orbits.len() as u64),
+            ("summands", m as u64),
+        ],
+    );
     if !(5..=6).contains(&m)
         || limits.max_models == 0
         || limits.conflict_budget == 0
@@ -8592,6 +8630,7 @@ fn sat_decompose_chained_s3_with_domain(
             .enumerate()
             .any(|(bit, basis)| *basis != F2mElement::from_bit_positions(&[bit as u32], kc.n))
     {
+        emit_chain_s3_phase(trace_phases, &phase_started, "input_rejected", &[]);
         stats.exhausted = true;
         return (None, stats);
     }
@@ -8605,11 +8644,18 @@ fn sat_decompose_chained_s3_with_domain(
         .collect();
     codes.sort_unstable();
     codes.dedup();
+    emit_chain_s3_phase(
+        trace_phases,
+        &phase_started,
+        "x_domain_ready",
+        &[("x_coordinates", codes.len() as u64)],
+    );
     if codes.is_empty() || codes.iter().any(|code| code.bits() > u64::from(kc.n)) {
         stats.exhausted = true;
         return (None, stats);
     }
     let representatives: Vec<BigUint> = if frobenius_orbits {
+        emit_chain_s3_phase(trace_phases, &phase_started, "closure_started", &[]);
         let mut reps = Vec::with_capacity(fb.signed_orbits.len());
         for orbit in &fb.signed_orbits {
             let Some(BinaryPoint::Affine { x, .. }) =
@@ -8634,9 +8680,24 @@ fn sat_decompose_chained_s3_with_domain(
             || reps.iter().collect::<HashSet<_>>().len() != reps.len()
             || !closure.iter().eq(codes.iter())
         {
+            emit_chain_s3_phase(
+                trace_phases,
+                &phase_started,
+                "closure_rejected",
+                &[("closure_x_coordinates", closure.len() as u64)],
+            );
             stats.exhausted = true;
             return (None, stats);
         }
+        emit_chain_s3_phase(
+            trace_phases,
+            &phase_started,
+            "closure_ready",
+            &[
+                ("closure_x_coordinates", closure.len() as u64),
+                ("representatives", reps.len() as u64),
+            ],
+        );
         reps
     } else {
         Vec::new()
@@ -8647,15 +8708,29 @@ fn sat_decompose_chained_s3_with_domain(
         finite_domain_clause_count(&codes, kc.n, m)
     };
     let Some(domain_clauses) = domain_clauses else {
+        emit_chain_s3_phase(trace_phases, &phase_started, "domain_count_failed", &[]);
         stats.exhausted = true;
         return (None, stats);
     };
+    emit_chain_s3_phase(
+        trace_phases,
+        &phase_started,
+        "domain_counted",
+        &[("domain_clauses", domain_clauses as u64)],
+    );
     if domain_clauses > limits.max_domain_clauses {
+        emit_chain_s3_phase(trace_phases, &phase_started, "domain_capped", &[]);
         stats.exhausted = true;
         return (None, stats);
     }
     stats.domain_clauses = domain_clauses;
     let index_of = fb.index_map();
+    emit_chain_s3_phase(
+        trace_phases,
+        &phase_started,
+        "index_ready",
+        &[("entries", index_of.len() as u64)],
+    );
     let target_x = match target {
         BinaryPoint::Affine { x, .. } => Some(x),
         BinaryPoint::Infinity => None,
@@ -8665,6 +8740,12 @@ fn sat_decompose_chained_s3_with_domain(
             stats.exhausted = true;
             return (None, stats);
         }
+        emit_chain_s3_phase(
+            trace_phases,
+            &phase_started,
+            "model_build_started",
+            &[("identity_mask", u64::from(identity_mask))],
+        );
         let mut enc = match ChainedS3Encoding::build(
             m,
             &kc.curve.irreducible,
@@ -8679,10 +8760,32 @@ fn sat_decompose_chained_s3_with_domain(
                 | ChainBuildError::DomainClauseCap { .. }
                 | ChainBuildError::Unsupported,
             ) => {
+                emit_chain_s3_phase(
+                    trace_phases,
+                    &phase_started,
+                    "model_build_rejected",
+                    &[("identity_mask", u64::from(identity_mask))],
+                );
                 stats.exhausted = true;
                 return (None, stats);
             }
         };
+        emit_chain_s3_phase(
+            trace_phases,
+            &phase_started,
+            "model_built",
+            &[
+                ("identity_mask", u64::from(identity_mask)),
+                ("variables", u64::from(enc.solver.n_vars())),
+                ("clauses", enc.solver.n_clauses() as u64),
+            ],
+        );
+        emit_chain_s3_phase(
+            trace_phases,
+            &phase_started,
+            "domain_install_started",
+            &[("identity_mask", u64::from(identity_mask))],
+        );
         let installed = if frobenius_orbits {
             enc.constrain_frobenius_orbit_summands(
                 &representatives,
@@ -8694,6 +8797,12 @@ fn sat_decompose_chained_s3_with_domain(
             enc.constrain_summands(&codes, limits.max_domain_clauses)
         };
         if installed != Ok(domain_clauses) {
+            emit_chain_s3_phase(
+                trace_phases,
+                &phase_started,
+                "domain_install_rejected",
+                &[("identity_mask", u64::from(identity_mask))],
+            );
             stats.exhausted = true;
             return (None, stats);
         }
@@ -8705,22 +8814,64 @@ fn sat_decompose_chained_s3_with_domain(
         stats.peak_variables = stats.peak_variables.max(enc.solver.n_vars());
         stats.peak_clauses = stats.peak_clauses.max(enc.solver.n_clauses());
         stats.peak_xors = stats.peak_xors.max(enc.solver.n_xors());
+        emit_chain_s3_phase(
+            trace_phases,
+            &phase_started,
+            "domain_installed",
+            &[
+                ("identity_mask", u64::from(identity_mask)),
+                ("variables", u64::from(enc.solver.n_vars())),
+                ("clauses", enc.solver.n_clauses() as u64),
+                ("xors", enc.solver.n_xors() as u64),
+            ],
+        );
         let earlier_conflicts = stats.conflicts;
         enc.solver.conflict_budget = limits.conflict_budget - earlier_conflicts;
         loop {
             stats.solver_calls += 1;
+            emit_chain_s3_phase(
+                trace_phases,
+                &phase_started,
+                "solver_enter",
+                &[
+                    ("identity_mask", u64::from(identity_mask)),
+                    ("solver_calls", stats.solver_calls as u64),
+                    (
+                        "remaining_conflicts",
+                        limits.conflict_budget - earlier_conflicts,
+                    ),
+                ],
+            );
             let outcome = enc.solver.solve();
             stats.conflicts = earlier_conflicts.saturating_add(enc.solver.conflicts());
             match outcome {
                 SolveResult::Unsat => {
+                    emit_chain_s3_phase(
+                        trace_phases,
+                        &phase_started,
+                        "solver_unsat",
+                        &[("conflicts", stats.conflicts)],
+                    );
                     stats.patterns_refuted += 1;
                     break;
                 }
                 SolveResult::Unknown => {
+                    emit_chain_s3_phase(
+                        trace_phases,
+                        &phase_started,
+                        "solver_unknown",
+                        &[("conflicts", stats.conflicts)],
+                    );
                     stats.exhausted = true;
                     return (None, stats);
                 }
                 SolveResult::Sat => {
+                    emit_chain_s3_phase(
+                        trace_phases,
+                        &phase_started,
+                        "solver_sat",
+                        &[("conflicts", stats.conflicts)],
+                    );
                     let xs = enc.decode_summands();
                     stats.models += 1;
                     if !enc.verify_model()
@@ -8733,8 +8884,20 @@ fn sat_decompose_chained_s3_with_domain(
                         return (None, stats);
                     }
                     if let Some(indices) = lift_candidate(kc, fb, &index_of, &xs, target) {
+                        emit_chain_s3_phase(
+                            trace_phases,
+                            &phase_started,
+                            "group_lift_accepted",
+                            &[("models", stats.models as u64)],
+                        );
                         return (Some(indices), stats);
                     }
+                    emit_chain_s3_phase(
+                        trace_phases,
+                        &phase_started,
+                        "group_lift_rejected",
+                        &[("models", stats.models as u64)],
+                    );
                     stats.group_rejected_models += 1;
                     if stats.models >= limits.max_models {
                         stats.exhausted = true;
@@ -9666,6 +9829,16 @@ pub enum KoblitzIcEvent {
         first_trial: usize,
         trials: usize,
     },
+    /// Emitted before decomposition when native chain-S3 tracing is enabled.
+    /// Coordinates and coefficients are decimal strings for direct replay.
+    RelationQueryStarted {
+        trial: usize,
+        coefficient_a: String,
+        coefficient_b: String,
+        target_x: String,
+        target_y: String,
+        target_infinity: bool,
+    },
     /// Exact completion record for one generated relation candidate.
     RelationAttemptFinished {
         trial: usize,
@@ -10015,6 +10188,7 @@ fn koblitz_index_calculus_dlp_observed(
         Some(verified)
     };
 
+    let trace_chained_s3_phases = std::env::var("N83_CHAIN_PHASE_TRACE").as_deref() == Ok("1");
     progress(KoblitzIcEvent::RelationCollectionStarted { wanted });
     while relations.len() < wanted && report.trials < opts.max_trials {
         let remaining_trials = opts.max_trials - report.trials;
@@ -10044,6 +10218,31 @@ fn koblitz_index_calculus_dlp_observed(
             .collect();
         report.trials += attempts.len();
         report.relation_batches += 1;
+        if matches!(
+            opts.strategy,
+            DecompositionStrategy::ChainedS3
+                | DecompositionStrategy::ChainedS3FrobeniusOrbit
+                | DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
+        ) {
+            for (offset, (a, b, target)) in attempts.iter().enumerate() {
+                let (target_x, target_y, target_infinity) = match target {
+                    BinaryPoint::Affine { x, y } => (
+                        x.to_biguint().to_string(),
+                        y.to_biguint().to_string(),
+                        false,
+                    ),
+                    BinaryPoint::Infinity => ("0".into(), "0".into(), true),
+                };
+                progress(KoblitzIcEvent::RelationQueryStarted {
+                    trial: report.trials - attempts.len() + offset + 1,
+                    coefficient_a: a.to_string(),
+                    coefficient_b: b.to_string(),
+                    target_x,
+                    target_y,
+                    target_infinity,
+                });
+            }
+        }
 
         let evaluate = |(_, _, target): &(BigUint, BigUint, BinaryPoint)| {
             if *target == BinaryPoint::Infinity {
@@ -10159,27 +10358,41 @@ fn koblitz_index_calculus_dlp_observed(
                     RelationAttemptOutcome::Sat(idxs, stats)
                 }
                 DecompositionStrategy::ChainedS3 => {
-                    let (idxs, stats) =
-                        sat_decompose_chained_s3(kc, fb, target, opts.m, opts.chain_s3_limits);
-                    RelationAttemptOutcome::ChainedS3(idxs, stats)
-                }
-                DecompositionStrategy::ChainedS3FrobeniusOrbit => {
-                    let (idxs, stats) = sat_decompose_chained_s3_frobenius_orbit(
+                    let (idxs, stats) = sat_decompose_chained_s3_with_domain(
                         kc,
                         fb,
                         target,
                         opts.m,
                         opts.chain_s3_limits,
+                        false,
+                        false,
+                        trace_chained_s3_phases,
+                    );
+                    RelationAttemptOutcome::ChainedS3(idxs, stats)
+                }
+                DecompositionStrategy::ChainedS3FrobeniusOrbit => {
+                    let (idxs, stats) = sat_decompose_chained_s3_with_domain(
+                        kc,
+                        fb,
+                        target,
+                        opts.m,
+                        opts.chain_s3_limits,
+                        true,
+                        false,
+                        trace_chained_s3_phases,
                     );
                     RelationAttemptOutcome::ChainedS3(idxs, stats)
                 }
                 DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered => {
-                    let (idxs, stats) = sat_decompose_chained_s3_frobenius_orbit_ordered(
+                    let (idxs, stats) = sat_decompose_chained_s3_with_domain(
                         kc,
                         fb,
                         target,
                         opts.m,
                         opts.chain_s3_limits,
+                        true,
+                        true,
+                        trace_chained_s3_phases,
                     );
                     RelationAttemptOutcome::ChainedS3(idxs, stats)
                 }
@@ -16297,8 +16510,54 @@ mod tests {
             },
             ..KoblitzIcOptions::default()
         };
-        let report = koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &opts).unwrap();
+        let mut queries = Vec::new();
+        let report = koblitz_index_calculus_dlp_with_factor_base_and_progress(
+            &kc,
+            &target,
+            &fb,
+            &opts,
+            &mut |event| {
+                if let KoblitzIcEvent::RelationQueryStarted {
+                    trial,
+                    coefficient_a,
+                    coefficient_b,
+                    target_x,
+                    target_y,
+                    target_infinity,
+                } = event
+                {
+                    queries.push((
+                        trial,
+                        coefficient_a,
+                        coefficient_b,
+                        target_x,
+                        target_y,
+                        target_infinity,
+                    ));
+                }
+            },
+        )
+        .unwrap();
         assert_eq!(report.log, Some(known), "{report:?}");
+        assert!(!queries.is_empty());
+        assert_eq!(queries.len(), report.trials);
+        for (index, (trial, a, b, x, y, infinity)) in queries.iter().enumerate() {
+            assert_eq!(*trial, index + 1);
+            let a = BigUint::parse_bytes(a.as_bytes(), 10).unwrap();
+            let b = BigUint::parse_bytes(b.as_bytes(), 10).unwrap();
+            let public_query = kc.add(&kc.mul(kc.generator(), &a), &kc.mul(&target, &b));
+            match public_query {
+                BinaryPoint::Affine {
+                    x: actual_x,
+                    y: actual_y,
+                } => {
+                    assert!(!*infinity);
+                    assert_eq!(x, &actual_x.to_biguint().to_string());
+                    assert_eq!(y, &actual_y.to_biguint().to_string());
+                }
+                BinaryPoint::Infinity => assert!(*infinity),
+            }
+        }
         assert!(report.sat_calls > 0);
         assert!(report.independent_relations > 0);
         assert!(report.linear_solve_attempts > 0);
