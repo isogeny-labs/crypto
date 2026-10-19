@@ -21,6 +21,9 @@ for irq in /proc/irq/[0-9]*; do
     printf '%s\n' "$housekeeping" > "$irq/smp_affinity_list" || true
 done
 
+test -w /sys/devices/system/cpu/intel_pstate/no_turbo
+printf '%s\n' 1 > /sys/devices/system/cpu/intel_pstate/no_turbo
+test "$(cat /sys/devices/system/cpu/intel_pstate/no_turbo)" = 1
 for cpu in 23 47; do
     base=/sys/devices/system/cpu/cpu${cpu}/cpufreq
     printf '%s\n' performance > "$base/scaling_governor"
