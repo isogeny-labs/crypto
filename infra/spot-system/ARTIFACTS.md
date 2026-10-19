@@ -17,6 +17,8 @@ identity keys, Conductor credentials, or database files are in these artifacts.
   in the runtime. Its runbook is `CHECKPOINT_DISCOVERY.md`.
 - `checkpoint_selftest`: the native kill/corrupt/restore bootstrap gate, also
   included in the runtime. Its build/deployment instructions are in `AWS_DEPLOYMENT.md`.
+- `solver_checkpoint_selftest`: the real sparse-solver kill/restore bootstrap gate.
+- `native_experiment`: the portable checkpoint-capable factor-base executable.
 
 The release's `artifacts.json` sits beside the deployment bundle and is also
 committed here. It is excluded from the bundle to avoid a circular self-hash.
@@ -41,14 +43,21 @@ do not replace a bundle's content under another bundle's digest.
 ## Deployment status
 
 The applied stack enables managed wake/idle scaling in an isolated workspace;
-IP cutover is disabled. The first Spot launch was quota-blocked. The separate
+IP cutover is disabled. The applied Standard Spot quota is 96 vCPUs; cold boot,
+actual native state replay, worker replacement and 30-minute idle shutdown have
+passed. The separate
 original host still runs its existing experiments and local Cairn/Conductor
 node bundle. `AWS_DEPLOYMENT.md` and `validation/aws-deployment.json` record the
 applied settings, quota requests and validation limits.
 
 Before activation, complete the recovery, workload migration, node writer-lock
 handoff and client installation gates in `README.md`. Existing non-checkpointed
-experiments do not acquire RAM recovery from these uploads.
+experiments do not acquire RAM recovery from these software uploads. Their
+approved CRIU memory snapshots remain private on the original retained disk
+and in the explicitly authorized private S3 checkpoint prefix. All five copy
+restores passed on a separate compatible m8i host. Automatic legacy recovery,
+ownership handoff and recurring-export permission remain separate open gates.
+Memory archives are excluded from the software release and GitHub.
 
 ## Validation
 
