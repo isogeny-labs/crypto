@@ -50,8 +50,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: Install frozen dependency lock
-        run: cp research/weil_factor_composition_20260914/validation/dependencies.lock.txt Cargo.lock
+      # This job builds current-source operational smoke. Its smoke profile
+      # binds the committed workspace lock; production keeps its archived lock.
+      # Do not replace Cargo.lock with a historical experiment dependency graph.
       - name: Test Python control plane
         run: python3 scripts/test_koblitz_unknown_scalar_panel.py
       - name: Test compact terminal-evidence verifier
