@@ -1,10 +1,19 @@
 # Physical-host worker panel
 
-This panel uses a dedicated EC2 `m5zn.metal` host to test the full rho
-worker with physical core ownership. The host is separate from the user's
-active research instance. The [replacement allocation](aws-r2-allocation.json)
-is `i-06792af749cbdd584` in `us-east-2b`; its scheduled shutdown is
-2026-10-19 05:30 UTC, and it is configured to terminate on shutdown.
+The dedicated `m5zn.metal` panel completed 768 exact-output worker arms
+and 384 same-point pairs on an isolated physical core. The independent
+[r5 audit](audit-r5.json) found no invalid arms, invalid pairs, structural
+errors, or memory failures. One of 256 A/A controls exceeded the frozen
+`[0.90, 1.11]` interval, so the qualified speedup remains unknown. The
+[complete archive](full-r5-evidence.tar.gz) is SHA-256
+`768068ba6c24c4f5dc1d92a08d6092b3ace9783f7ff3b8f5c204f3df68d10c73`.
+
+The host is separate from the user's active research instance. The
+[replacement allocation](aws-r2-allocation.json) is
+`i-06792af749cbdd584` in `us-east-2b`; the shutdown deadline was extended
+from 05:30 to 06:00 UTC to allow the full audit and archive transfer.
+The instance is configured to terminate on shutdown; its root EBS volume
+was retained until the evidence copy was verified.
 
 The first `m5zn.metal` host (`i-047f22d5f7ea716c2`, `us-east-2a`) lost
 AWS system reachability during its isolation reboot (`impaired` since
@@ -20,8 +29,42 @@ transition. The host was then terminated and its empty root volume deleted.
 An attempt to boot the smaller `a1.metal` host with Amazon Linux 2023 was
 [rejected by glibc at boot](a1-al2023-boot-failure.txt): that image requires
 Graviton 2 or later. It produced zero benchmark arms. The replacement x86
-host was launched after the first host released its quota; the panel remains
-unmeasured until it passes the strict preflight.
+host was launched after the first host released its quota; its strict
+preflight passed before measurement.
+
+## Completed r5 panel
+
+The [r5 manifest](manifest-r5.json) SHA-256 is
+`62dd66897ca1e4b16e255fbe27369d523385dca49fe0349d9709102544715cce`.
+Its [preflight](preflight-r5.json) passed. The [passing calibration](calibration-r5-complete.tar.gz)
+preceded the full run and was excluded from the 384 pairs. The full run's
+source archive SHA-256 is
+`e369360087a53f44362043ce6f10d5a884f07da09142c0387c70a05708aa5c72`;
+its rebuilt binary SHA-256 is
+`d6970ff60594f015fd3331c3d6cff3942d539a7ccad237604cf2ec33d73b79ea`.
+The postrun service preserved the plan, preflight, source, build log, raw
+arm and pair ledgers, stdout and stderr for every arm, summary, and audit
+in the archive. The local archive hash matches the host's hash.
+
+| Full worker, 32 frozen Q points | Recorded result |
+| --- | ---: |
+| Arms / same-point pairs | 768 / 384 |
+| Valid arms / valid pairs | 768 / 384 |
+| Comparison pairs / A/A controls | 128 / 256 |
+| A/A controls outside `[0.90, 1.11]` | 1: `q04-aa_serial`, repeat 1, ratio 1.123159 |
+| Memory failures | 0 |
+| Median charged serial / batch arm | 20.725 / 4.057 s |
+| Median peak RSS serial / batch arm | 5,536 / 5,556 KiB |
+| Qualified speedup | Unknown: A/A gate failed |
+
+The independent [descriptive computation](diagnostic_r5.py) and its
+[receipt](diagnostic-r5.json) report the comparison-only median Q-cluster
+ratio as 5.110 and its diagnostic 95% Q-cluster bootstrap interval as
+`[5.041, 5.165]`. These numbers describe the 128 comparison pairs;
+the failed A/A gate prevents selecting or automatically routing the batch
+worker from this run. The frozen source and exact replay support a fresh,
+prospectively gated confirmation panel. The 256 A/A controls and their
+single excursion are retained rather than removed or relabeled.
 
 The frozen [source archive](source-64.tar.gz) SHA-256 is
 `f32992105d47d63c78a7ba5bb02021ba6ba150e4c388cec55715b979d697f722`.
