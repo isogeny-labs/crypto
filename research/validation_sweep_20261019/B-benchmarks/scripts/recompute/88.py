@@ -40,7 +40,8 @@ for n in NS:
     floor[n] = statistics.fmean(r['ns'] for r in t['rows']) / p   # (p c_yes + (1-p) c_no) / p over the pool
     recs = [json.loads(l) for l in (W4 / ('arm-wide-chain-m4-n%d-d%d.jsonl' % (n, D[n]))).read_text().splitlines() if l.strip()]
     fin = [r for r in recs if not r['censored']]
-    wide[n] = dict(all=statistics.fmean(r['wall_ns'] for r in recs) / p, cens=sum(1 for r in recs if r['censored']), n=len(recs))
+    cy = statistics.fmean(r['wall_ns'] for r in recs if r['truth_yes']); cn = statistics.fmean(r['wall_ns'] for r in recs if not r['truth_yes'])
+    wide[n] = dict(all=(p * cy + (1 - p) * cn) / p, cens=sum(1 for r in recs if r['censored']), n=len(recs))
 
 L2 = lambda v: math.log2(v)
 meas = [n for n in NS if n <= 23]
@@ -50,15 +51,15 @@ all_slope = ols(NS, [L2(wide[n]['all']) for n in NS])
 claim('wide-chain slope 0.805 [0.717, 0.872] log2 ns/relation per unit n (n = 11-23)', 'OLS slope of log2 C_wide on n over n=11,13,17,19,23 = %.4f (C = mean wall_ns / p)' % wide_slope,
       'OLS of log2(mean wall_ns over the 12 targets / p) on n over measured cells; bootstrap interval not recomputed (2,000 replicates, seed not stated)',
       [W4], [('0.805', 0.805, wide_slope)], interval_undefined=True)
-claim('floor slope 0.333 on the same cells', 'OLS slope of log2 C_floor on n over the same cells = %.4f (C = mean pool ns / p)' % floor_slope,
-      'OLS of log2(mean ns over 1,024-target pool / p) on n, n=11..23', [M4], [('0.333', 0.333, floor_slope)], interval_undefined=True)
-claim('Delta [0.433, 0.504]: wide-chain minus floor slope', 'slope difference = %.4f (interval not recomputed)' % (wide_slope - floor_slope),
-      'wide slope minus floor slope on the same measured cells', [W4, M4], [('0.469', 0.469, wide_slope - floor_slope)], interval_undefined=True, status=None)
+claim('floor slope 0.333 on the same cells', 'OLS slope of log2 C_floor on n over the same cells = %.4f without the table-build term (not determinable from text read)' % floor_slope,
+      'OLS of log2(mean ns over pool / p) on n; README floor includes a table-build term whose spread rule is not fully stated', [M4], [('0.333', 0.333, floor_slope)], status='cannot_define')
+claim('Delta [0.433, 0.504]: wide-chain minus floor slope', 'slope difference = %.4f (floor part without table-build term; interval not recomputed)' % (wide_slope - floor_slope),
+      'wide slope minus floor slope on the same measured cells', [W4, M4], [], status='cannot_define')
 r11 = wide[11]['all'] / floor[11]; r23 = wide[23]['all'] / floor[23]
-claim('wide-chain / floor 5.5e2 at n = 11', 'ratio of C_wide to C_floor at n=11 = %.1f' % r11, 'C_wide / C_floor, n=11',
-      [W4, M4], [('550', 550.0, r11)])
-claim('wide-chain / floor 3.1e4 at n = 23', 'ratio of C_wide to C_floor at n=23 = %.1f' % r23, 'C_wide / C_floor, n=23',
-      [W4, M4], [('31000', 31000.0, r23)])
+claim('wide-chain / floor 5.5e2 at n = 11', 'ratio of C_wide to C_floor at n=11 = %.1f (floor without table-build term)' % r11, 'C_wide / C_floor, n=11',
+      [W4, M4], [], status='cannot_define')
+claim('wide-chain / floor 3.1e4 at n = 23', 'ratio of C_wide to C_floor at n=23 = %.1f (floor without table-build term)' % r23, 'C_wide / C_floor, n=23',
+      [W4, M4], [], status='cannot_define')
 cens_txt = ', '.join('n=%d censored %d of %d' % (n, wide[n]['cens'], wide[n]['n']) for n in (29, 31))
 claim('n = 29 and n = 31 wide-chain / floor >= 1.2e5 and >= 1.3e5 (censored lower bounds)',
       'censoring: %s; the censored-value rule for the bound is not stated in README or AMENDMENT_1, so the bound is not recomputed' % cens_txt,

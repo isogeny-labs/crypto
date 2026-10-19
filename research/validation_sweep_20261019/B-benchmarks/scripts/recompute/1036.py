@@ -113,7 +113,8 @@ def main():
              'their source is research/isogeny_catalogue_setup_20261009 (RESULTS.md table and PROFILE_SUMMARY.json). '
              'verify-p224 is the source label for the headline "replay" figure. '
              'PROFILE_SUMMARY.json unit: "Callgrind Ir, ARM Linux, all traced processes"; wall_time_claim false. '
-             'protocol: PROTOCOL.md at the study root.')
+             'protocol: PROTOCOL.md at the study root. offrepo_refs is capped at 200 lines. '
+             'PROTOCOL.md and PROFILE_SUMMARY.json both show the same add commit, so the add-commit order does not show which came first.')
     out = {
         'row_no': 1000 + 36,
         'slug': SLUG,

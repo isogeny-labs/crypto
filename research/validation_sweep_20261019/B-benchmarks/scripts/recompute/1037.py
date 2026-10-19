@@ -15,7 +15,7 @@ SCRIPT = 'research/validation_sweep_20261019/B-benchmarks/scripts/recompute/1037
 
 OFF_RX = re.compile(r'drive\.google\.com|/Volumes|SSD|/Users|s3://|gs://|store:[A-Za-z0-9_./-]+|Modal volume|not committed|scratch')
 AA_RX = re.compile(r'\bA/A\b|null[- ]control|negative control|\bnull (?:result|control|arm)|\bctrl\b', re.I)
-ISO_RX = re.compile(r'isolat|isolcpus|nohz|CPU pinning|frequency control|governor|shared cloud|bare metal|threads|cores', re.I)
+ISO_RX = re.compile(r'isolat|isolcpus|nohz|CPU pinning|frequency control|governor|bare metal|wall times advisory', re.I)
 
 
 def files_under(paths, exts=('.md', '.typ', '.txt', '.json', '.sh', '.py')):
@@ -151,7 +151,7 @@ def main():
              'and its registered window is [0, 1] per PREREGISTRATION.md. '
              'the verdict "neither" is not recomputed (it is printed by analyze.py). '
              'protocol: PREREGISTRATION.md at the study root. '
-             'first raw: runs/registered/K0n61l4.jsonl (earliest file name; add date from git).')
+             'first_raw = runs/registered/K0n61l4.jsonl, chosen as the first registered file by name.')
     out = {
         'row_no': 1000 + 37,
         'slug': SLUG,
