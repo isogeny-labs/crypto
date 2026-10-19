@@ -37,6 +37,10 @@ impl Reservation {
                 "grade":"recorded reservation; timing eligibility assessed from observations, no automatic L2 claim"
             }),
         )?;
+        super::require(
+            preflight.quiet && guard.eviction.summary.failed_user_threads == 0,
+            "CPU reservation preflight failed; observations retained, no timed worker launched",
+        )?;
         Ok(guard)
     }
     pub fn finish(&self, dir: &Path) -> R<()> {
