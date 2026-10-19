@@ -1,0 +1,84 @@
+{
+  "audit_scope": "provider_ZIP_CRC_analysis_and_job_log_binding",
+  "frozen_protocol_sha256": "5c6209d7e2e689a6c40bccf9710c6ca3c4c879c1499476ebc40c7626c4a6670c",
+  "provider_run_conclusion": "failure",
+  "provider_snapshot_sha256": "f6631176ce80e1effff33c3e9d1779d4fb4e4e5ba1f1d4b3074e92973b5726d9",
+  "raw_arm_reexecution_performed_here": false,
+  "run_attempt": 1,
+  "run_head_sha": "448a07d5e6554592425af1d089be527986de5737",
+  "run_id": 39253164581,
+  "schema": "n83.final-extended-attempt-audit/v1",
+  "selected_best_total_runtime": null,
+  "selected_candidate_id": null,
+  "selection_admitted": false,
+  "status": "FROZEN_CALIBRATION_GATE_FAIL",
+  "strata": [
+    {
+      "aa_status": "PASS_10_PERCENT_PER_PAIR",
+      "archived_analysis_sha256": "ef05b6b05999df78be96ab8ce55a9f18736feb5b0d3e37c6bbe295b1a5550049",
+      "calibration_pairs": 40,
+      "download_sha256_status": "PASS",
+      "evidence_status_reported_by_provider": "PASS_INDEPENDENT_REPLAY",
+      "github_artifact_id": 12196822837,
+      "ic_replay_rows": 40,
+      "job_id": 118061740677,
+      "job_log_sha256": "43c461722d6bf24f590c728d1c94027909fd5d0d1b7d59859f1f94ceee6c7d5e",
+      "noisy_pairs": [],
+      "passing_calibration_pairs": 40,
+      "point_count": 8,
+      "provider_artifact_bytes": 293340831,
+      "provider_artifact_sha256": "fa2252377835ec0db62a773001770ad01998a9b64fc2b1924c8e04e45bb49e20",
+      "rho_replay_rows": 40,
+      "s3_etag": "\"b6f2cf79453ea0e66b08e1bc10f65401-35\"",
+      "s3_last_modified": "2026-10-19T15:14:40+00:00",
+      "s3_uri": "s3://crypto-autoresearcher/factor-bases/icv1/etc/n83_final_extended_attempt_20261019/a1/provider-artifacts/fa2252377835ec0db62a773001770ad01998a9b64fc2b1924c8e04e45bb49e20.zip",
+      "status": "STRATUM_ADMITTED",
+      "stratum": 0,
+      "tier_status": "PASS_TIER1",
+      "zip_crc_status": "PASS",
+      "zip_member_count": 2320
+    },
+    {
+      "aa_status": "NOISY_OR_INCOMPLETE",
+      "archived_analysis_sha256": "9ff32637d3c27ff715f3f3ce6f9b9b2330dd9654a5f2f0c772cf0e98e248d91a",
+      "calibration_pairs": 40,
+      "download_sha256_status": "PASS",
+      "evidence_status_reported_by_provider": "PASS_INDEPENDENT_REPLAY",
+      "github_artifact_id": 12194257314,
+      "ic_replay_rows": 40,
+      "job_id": 118061741036,
+      "job_log_sha256": "d3692d3a5013f3e01ef6b24900fc6dc306d158baacdb59f010bd6d09546eff53",
+      "noisy_pairs": [
+        {
+          "after_repetitions_ms": [
+            457.30824,
+            472.402794,
+            463.630622
+          ],
+          "before_repetitions_ms": [
+            516.339528,
+            522.34201,
+            506.684372
+          ],
+          "candidate_id": "IC1N83Ckb1a1fb169984PDP4rootRCguidedLAgaussTDdirectISO0h644bda8bfc36",
+          "point_index": 14,
+          "relative_spread": 0.10757247248806498,
+          "status": "NOISY_10_PERCENT"
+        }
+      ],
+      "passing_calibration_pairs": 39,
+      "point_count": 8,
+      "provider_artifact_bytes": 293338727,
+      "provider_artifact_sha256": "56bf5856e9b86d03a5bafec50f62fb33fe35116347cbf24a68216f2ec3a8c8e4",
+      "rho_replay_rows": 40,
+      "s3_etag": "\"d0cdb68235594c89cf5072617386ea8f-35\"",
+      "s3_last_modified": "2026-10-19T15:14:55+00:00",
+      "s3_uri": "s3://crypto-autoresearcher/factor-bases/icv1/etc/n83_final_extended_attempt_20261019/a1/provider-artifacts/56bf5856e9b86d03a5bafec50f62fb33fe35116347cbf24a68216f2ec3a8c8e4.zip",
+      "status": "BOUNDED_UNKNOWN",
+      "stratum": 1,
+      "tier_status": "NOT_ADMITTED",
+      "zip_crc_status": "PASS",
+      "zip_member_count": 2320
+    }
+  ]
+}
