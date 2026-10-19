@@ -383,3 +383,89 @@ C2).
 already exceed 102 516 columns at 300 s). L2: A11 does not complete within
 14.5 GB (its width grows about 6 bits per bit at m = 4). Neither failure
 would change a recorded verdict.
+
+### Amendment 6, 2026-10-19: L2 rerun under a limit the host can honour (L2r), before any of its rows
+
+Registered after Amendment 5's run (`reports/run-20261019T1633Z`) and before
+any L2r row exists. It adds one cell and changes no existing row, verdict,
+threshold or prediction. Instrument, seeds, the completed-cell rule, σ, κ and
+rules R1 and R2 are unchanged. L1 and L2 stay as recorded.
+
+**Why.** Amendment 5 registered `ulimit -v 14500000` for L2 and checked only
+`MemTotal` (16 479 424 kB). The container also has a memory cgroup on the
+shell's processes, with a limit of 14 007 508 kB (14 343 688 192 B). That is
+below the registered limit. Both L2 systems were killed by the kernel's
+memory-cgroup OOM killer at 97.3 s and 108.0 s, with peak RSS 13 974 324 kB
+(`runs/L2-A11-m4-t5.dmesg.txt`). So L2's binding limit was not the one
+registered, and its prediction was scored *not decided as registered*. L1 is
+not affected: both of its systems hit `ulimit -v` first (malloc failure,
+peak RSS 12.8 GB), and the kernel log has no OOM kill for them. This
+amendment reruns L2 under an address-space limit set below the cgroup limit.
+The registered limit is then the one that binds, and the cell's outcome can
+be attributed to it.
+
+**What it can and cannot decide.** L2 already passed 13.97 GB resident
+without finishing, and F4's memory path is deterministic up to the small
+`field_ops` jitter seen in replays. So L2r is not expected to complete under
+any limit below 14.0 GB. The rerun cannot decide whether A11 at m = 4, t = 5
+completes within 14.5 GB: no host available to this study gives it 14.5 GB.
+It can only record the cell as not measurable within a stated and honoured
+limit. The rerun's value is attribution, not a new cost point. A11's 3-cell
+m = 4 verdicts (κ = 14.886, cost-unfavourable; σ = 1.5) stand unless L2r
+completes.
+
+- **Pre-flight, before the first row.** Read the memory cgroup limit of the
+  lane's own shell. Take the path from the `memory:` line of
+  `/proc/self/cgroup`, then read
+  `/sys/fs/cgroup/memory/<path>/memory.limit_in_bytes`, or `memory.max` under
+  cgroup v2. Record it, with `MemTotal` and `nproc`, in the run log and the
+  report. If neither file is readable, do not run: report the blocker.
+- **Limit.** `V = min(14500000, cgroup_limit_kB − 524288, MemTotal_kB − 524288)`
+  kB, where 524 288 kB (0.5 GiB) is headroom for the harness parent, shell,
+  kernel memory and page cache that the cgroup also charges. On the current
+  host this is 14 007 508 − 524 288 = **13 483 220 kB**. If the pre-flight
+  reads a different cgroup limit, use the formula and record the value.
+- **L2r, A11 m = 4, t = 5, p₁.** The same two planted systems as L2 (the seeds
+  are unchanged, so the systems are identical). Budget 14400 s, grace 600 s,
+  `--vmem-kb V`, rows in `runs/L2r-A11-m4-t5.{jsonl,log}`:
+  `run --arms A11 --m 4 --t-min 5 --t-max 5 --budget 14400 --grace 600 --vmem-kb V --file 'L2r-{arm}-m4-t5'`.
+  One system at a time on an otherwise idle host, detached from the session.
+  Each row records `field_ops`, `max_cols`, D, wall time, `ulimit_v_kb` and
+  `peak_rss_kb` (descriptive).
+- **Attribution check, after each system.** Copy the kernel log's OOM lines
+  (`invoked oom-killer`, `memory: usage`, `Memory cgroup out of memory`)
+  verbatim to `runs/L2r-A11-m4-t5.dmesg.txt`, or record that there are none.
+  A system's limit counts as the registered one only if its row says
+  `memory allocation failed under ulimit -v V` (or `timeout`) and the kernel
+  log has no OOM kill for its process. Otherwise the row is recorded as
+  *limit not attributable*, and the cell is reported with that status.
+- **Analysis.** L2r rows form their own group (prefix `L2r-`, not merged with
+  `L2-`). The Amendment 5 analysis is extended, or `analyze --amendment6`
+  added, to report L2r beside L2: rows, limits, the attribution check, and
+  identity with L2's systems (cell seed, target seeds, `n_vars`, `n_eqs`,
+  planted x, x_R, curve, set). `analyze --amendment2`, `--amendment4` and
+  `--amendment5` must still reproduce their committed outputs byte for byte.
+
+**Decision rule, fixed now.**
+- **R2 applied to L2r.** If both L2r systems complete, the cell joins A11's
+  m = 4 series as a fourth point, and σ and κ are recomputed with their
+  verdicts, exactly as Amendment 5's R2 states. If not, and both systems'
+  limits are attributable, the outcome is *A11 not measurable at m = 4, t = 5
+  within V kB and 4 h*. It is reported with the limit and the partial values
+  (wall time, peak RSS), and the 3-cell verdicts stand. If a limit is not
+  attributable, the outcome is *not decided*, with the reason.
+- Amendment 5's L2 prediction keeps its recorded outcome (*not decided as
+  registered*). It is not re-scored from L2r, whose limit is lower.
+
+**Prediction.** L2r: both systems abort under `ulimit -v V` (malloc failure,
+no OOM kill), each before its own L2 kill time (target 0 by 97.3 s, target 1
+by 108.0 s). V is below the resident size each L2 system had reached at its
+kill, and address space is never smaller than resident size. That would make the outcome *A11 not
+measurable at m = 4, t = 5 within 13 483 220 kB and 4 h*.
+
+**Not in this amendment.** A run that could decide the 14.5 GB question
+needs a host whose cgroup limit is at least 15 GB (e.g. the independent lab
+runner, still unavailable from this container). A memory abort leaves no F4
+counters. A per-degree progress record would leave partial `max_cols` and
+`field_ops`, but it would change the harness's output and needs its own
+amendment.
