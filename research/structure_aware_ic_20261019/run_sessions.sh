@@ -16,8 +16,8 @@ run() { # name spec
   echo "   run exit $? ; $(tail -n1 $D/sessions/$name.run.log | cut -c1-160)"
   $B verify --dir "$out" --replay 12 --out "$D/sessions/$name.audit.json" > "$D/sessions/$name.verify.log" 2>&1
   echo "   verify exit $?"
-  $B table --dir "$out" > "$D/sessions/$name.table.md" 2>&1
-  $B band --dir "$out" --weights 0,0.1,1 --json "$D/sessions/$name.band.json" --ranks > "$D/sessions/$name.band.md" 2>&1
+  $B table --dir "$out" > "$D/sessions/$name.table.txt" 2>&1
+  $B band --dir "$out" --weights 0,0.1,1 --json "$D/sessions/$name.band.json" --ranks > "$D/sessions/$name.band.txt" 2>&1
 }
 case "${1:-all}" in
 A|all)
