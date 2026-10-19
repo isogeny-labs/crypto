@@ -1,0 +1,6 @@
+Act as executor-mechanical. From /home/ec2-user/crypto-n83-resume execute exactly the shell command below using an elevated exec tool for Docker access. Do not modify the card, compute results, retry, or run Python. If the tool yields a running session, wait for that session. The frozen shell redirection saves actual stdout verbatim as the relay; do not regenerate it. Return the relay path and its SHA256 only. The command enforces frozen deadlines and writes the receipt. Read no unrelated files.
+
+set -o noclobber
+'/usr/bin/sudo' '-n' 'env' 'PATH=/home/ec2-user/scratch/n83-docker-sweep-20261018/bin:/home/ec2-user/.cargo/bin:/home/ec2-user/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin' '/home/ec2-user/scratch/n83-natural-200k-20261019/bin/runner-v8' 'card-run' '/home/ec2-user/scratch/n83-natural-200k-20261019/cards/k4096-v8.json' > 'research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-200k-20261019/exec/k4096-v8.relay.json'
+
+Card SHA256: 1a78f9e60118f90de008d4f41a69095a3fcc4f44693fe37f806627e85a6ad5c0
