@@ -26,8 +26,9 @@ covers or sampled performance. Magma is unavailable and was not run. No
 finite-field model/map, subgroup transfer, ECDLP cost, timing or speedup is
 promoted. Canonical covers/browser/scoreboard/timeline and benchmark claims
 are unaffected; adding such claims still needs their native proof and
-admission gates. Full release library validation and final-head CI remain
-pending at this review checkpoint.
+admission gates. The required full release library suite passed: 4,396
+passed, zero failed, 118 existing ignored, no filtering. Final-head GitHub
+CI remains pending.
 
 Sources, metadata TSV, upstream SHA-256/blob receipts, editable figure and
 reproduction commands are beside this PDF in REVIEW-20261019.md and the
