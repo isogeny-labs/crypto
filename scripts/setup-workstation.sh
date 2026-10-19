@@ -32,6 +32,10 @@
 #   WITH_GEMINI=1       also install @google/gemini-cli
 #   WITH_LATEX=1        also install a TeX Live (papers/, iacr-eprint skill)
 #   WITH_RUST_BUILD=1   also `cargo build --release` the crypto workspace (slow)
+#   CLONE_REPOS         space-separated repos to clone when missing (all three);
+#                       repos already in $WORKSPACE are set up either way
+#
+# .claude/hooks/session-start.sh runs this in cloud sessions (docs/CONDUCTOR.md).
 set -uo pipefail   # no -e: one failed component warns and the rest still run
 
 case "${WORKSPACE_OFFLINE:-0}" in
@@ -50,6 +54,7 @@ GO_VERSION="${GO_VERSION:-1.26.9}"
 GO_MIN="1.25"
 NODE_MAJOR="${NODE_MAJOR:-22}"
 REPOS=(crypto cryptanalysis crypto-autoresearcher)
+CLONE_REPOS="${CLONE_REPOS-${REPOS[*]}}"
 
 DRY_RUN=0
 declare -A SKIP=()
@@ -105,9 +110,13 @@ LOCAL_BIN="$HOME/.local/bin"
 mkdir -p "$LOCAL_BIN"
 export PATH="$LOCAL_BIN:$HOME/.cargo/bin:/usr/local/go/bin:$HOME/go/bin:$PATH"
 
-# Every PATH entry this script relies on, written once to the user's shell rc.
+# Every PATH entry this script relies on, written once to the user's shell rc,
+# and to $CLAUDE_ENV_FILE when a Claude Code SessionStart hook runs this.
 persist_path() {
   local line="$1" rc
+  if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
+    grep -qxF "$line" "$CLAUDE_ENV_FILE" 2>/dev/null || run sh -c "printf '%s\n' '$line' >> '$CLAUDE_ENV_FILE'"
+  fi
   for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
     [ -f "$rc" ] || [ "$rc" = "$HOME/.bashrc" ] || continue
     grep -qxF "$line" "$rc" 2>/dev/null || run sh -c "printf '%s\n' '$line' >> '$rc'"
@@ -126,6 +135,12 @@ install_system() {
         pari-gp libpari-dev postgresql postgresql-contrib libpq-dev
         poppler-utils ghostscript graphviz)
       [ "${WITH_LATEX:-0}" = 1 ] && pkgs+=(texlive-latex-extra texlive-science texlive-fonts-recommended latexmk)
+      local missing=() p
+      for p in "${pkgs[@]}"; do
+        dpkg-query -W -f='${Status}' "$p" 2>/dev/null | grep -q 'install ok installed' || missing+=("$p")
+      done
+      if [ "${#missing[@]}" -eq 0 ]; then ok "all ${#pkgs[@]} apt packages present"; return; fi
+      pkgs=("${missing[@]}")
       as_root env DEBIAN_FRONTEND=noninteractive apt-get update -qq || true
       as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends "${pkgs[@]}" \
         || warn "some apt packages failed; re-run or install them by hand"
@@ -153,8 +168,13 @@ install_rust() {
     run sh -c 'curl --proto =https --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile default'
     export PATH="$HOME/.cargo/bin:$PATH"
   fi
-  run rustup toolchain install stable --profile default --component clippy,rustfmt
-  run rustup default stable
+  # Install a toolchain only when there is none: re-running must not move an
+  # existing one to a newer stable under a session's builds.
+  if ! rustup show active-toolchain >/dev/null 2>&1; then
+    run rustup toolchain install stable --profile default
+    run rustup default stable
+  fi
+  run rustup component add clippy rustfmt
   have cargo-deny || run cargo install --locked cargo-deny || warn "cargo-deny not installed (cryptanalysis 'make suite-lint')"
   persist_path 'export PATH="$HOME/.cargo/bin:$PATH"'
   have cargo && ok "$(cargo --version)"
@@ -291,6 +311,11 @@ install_agents() {
 clone_repo() {
   local name="$1" dir="$WORKSPACE/$1"
   if [ -d "$dir/.git" ]; then ok "$name present at $dir"; return; fi
+  case " $CLONE_REPOS " in *" $name "*) ;; *) return 0 ;; esac
+  local free_kb; free_kb="$(df -Pk "$WORKSPACE" 2>/dev/null | awk 'NR==2{print $4}')"
+  if [ -n "$free_kb" ] && [ "$free_kb" -lt 5242880 ]; then
+    warn "<5 GiB free under $WORKSPACE, not cloning $name"; return 1
+  fi
   run git clone "https://github.com/$GITHUB_OWNER/$name.git" "$dir" || { warn "clone of $name failed"; return 1; }
 }
 
