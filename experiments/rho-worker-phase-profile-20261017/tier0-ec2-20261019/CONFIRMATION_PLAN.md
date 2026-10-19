@@ -70,8 +70,10 @@ fresh target digest and emits the exact 96-case plan after allocation.
 The [confirmation auditor](analyze_confirmation.py) reuses the r5
 arm-by-arm structural audit and applies the new aggregate A/A gate.
 The builder passed a 768-arm shape check and rejected the prior target
-manifest. The host source bundle, allocation receipt, binary hash, and
-concrete dispatch manifest are not yet frozen. Their hashes must be
-committed before a timed confirmation begins. AWS quota for another
-dedicated host remains pending; do not dispatch on the busy existing
-research host.
+manifest. The deterministic public
+[source bundle](confirmation-source.tar.gz) and its
+[repeat-build receipt](confirmation-source-receipt.json) are retained.
+The host allocation receipt, rebuilt binary hash, and concrete dispatch
+manifest remain pending. Their hashes must be committed before a timed
+confirmation begins. AWS quota for another dedicated host remains
+pending; do not dispatch on the busy existing research host.
