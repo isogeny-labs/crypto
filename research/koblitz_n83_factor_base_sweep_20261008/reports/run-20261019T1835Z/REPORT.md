@@ -20,7 +20,10 @@ five summands, identity mask0, exact retained K2048/K4096 panels.
 
 ## Outcomes
 
-Measured outcomes are inserted only after native audits complete. Native
+Both new trials reached100000conflicts with zero models, relations and rank.
+Native query/custody replay and director receipt/output-digest checks passed.
+Neither reached the900-second wall limit or OOM. The exact measurements are
+listed in the measured-outcomes table below. Native
 solver intervals are derived in Rust as return-phase elapsed minus entry-phase
 elapsed. Supervised outer wall includes other costs. Missing terminal data
 from a killed prefix remains null. Unknown does not mean UNSAT or absent
@@ -79,6 +82,8 @@ Python only renders recorded values and inspects PDFs.
 The native summary helper also emits known-witness comparison fields, which
 are null/false here because no new A/B/E controls are in this continuation.
 Those unused fields do not change the separate per-natural-run audit statuses.
+Its generic engineering label comes from the original XOR-component schema;
+this higher-cap round is a bounded diagnostic, not an algorithm improvement.
 No external-tool timing comparison is attempted for these bounded-search
 observations; no algorithm-change or IC/rho speed ratio is claimed.
 
