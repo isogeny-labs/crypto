@@ -988,7 +988,7 @@ impl FrobeniusCanon {
             }
             if img != 0 {
                 basis.push((img, pre));
-                basis.sort_by(|a, b| b.0.cmp(&a.0));
+                basis.sort_by_key(|a| std::cmp::Reverse(a.0));
             }
         }
         let (mut w, mut x) = (word, 0u64);
