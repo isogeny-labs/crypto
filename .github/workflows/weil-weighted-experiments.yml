@@ -1,0 +1,88 @@
+name: Weighted Weil experiments
+
+on:
+  pull_request:
+    paths:
+      - 'examples/weil_weighted_decomposition.rs'
+      - 'src/cryptanalysis/gaudry_cubic.rs'
+      - 'src/cryptanalysis/residual_walk.rs'
+      - '.github/workflows/weil-weighted-experiments.yml'
+  workflow_dispatch:
+    inputs:
+      primes:
+        description: Comma-separated base primes (p mod 3 = 1, p < 2^20)
+        default: '31,61,127,241,499,1009'
+        required: true
+      queries:
+        description: Matched PDP targets per curve
+        default: '128'
+        required: true
+      dlp_max_p:
+        description: Largest base prime for full synthetic recoveries
+        default: '1009'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  native-controls:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98'
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - run: rustfmt --edition 2021 --check examples/weil_weighted_decomposition.rs
+      - run: cargo test --release --example weil_weighted_decomposition
+  diagnostic:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      PRIMES: ${{ inputs.primes }}
+      QUERIES: ${{ inputs.queries }}
+      DLP_MAX_P: ${{ inputs.dlp_max_p }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98'
+      - uses: Swatinem/rust-cache@v2
+      - name: Check native correctness and budgets
+        run: cargo test --release --example weil_weighted_decomposition
+      - name: Build native runner
+        run: cargo build --release --example weil_weighted_decomposition
+      - name: Record source and host
+        run: |
+          mkdir -p artifacts
+          git rev-parse HEAD > artifacts/source-commit.txt
+          uname -a > artifacts/host.txt
+          rustc --version >> artifacts/host.txt
+          sha256sum target/release/examples/weil_weighted_decomposition Cargo.lock > artifacts/source-hashes.txt
+      - name: Run matched synthetic fixtures
+        run: |
+          target/release/examples/weil_weighted_decomposition \
+            --primes "$PRIMES" --seeds 20261019,936451 --queries "$QUERIES" \
+            --dlp-max-p "$DLP_MAX_P" --max-residuals 10000 \
+            --max-pair-tests 5000000 --out artifacts/run > artifacts/stdout.log 2> artifacts/stderr.log
+          target/release/examples/weil_weighted_decomposition --summarize artifacts/run
+      - name: Render recorded values and PDF
+        run: |
+          python3 -m pip install matplotlib==3.10.8
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq pandoc texlive-latex-base texlive-latex-recommended fonts-lmodern
+          python3 research/weil_weighted_decomposition_20261019/render.py artifacts/run
+          cd artifacts/run
+          pandoc REPORT.md -o REPORT.pdf --pdf-engine=pdflatex
+      - name: Retain successes, failures and budget exhaustion
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: weighted-weil-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 30

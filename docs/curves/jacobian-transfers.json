@@ -2,7 +2,7 @@
   "schema": "jacobian-transfers/2",
   "generated_by": "cargo run --release --bin jacobian_transfers -- build",
   "what_this_is": "Every known route from each registered curve's discrete logarithm into a Jacobian, priced by one frozen formula-level cost model against Pollard rho on the same subgroup; see docs/curves/JACOBIAN_TRANSFERS.md. Rows are formulas and leads, never measurements or security claims.",
-  "registry_sha256": "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf",
+  "registry_sha256": "29d9cf851e853353fa0b475487ce60df1b5fc965fb0c291b357b06e988570099",
   "factor_budget": 200000,
   "cost_model": {
     "karatsuba_exponent": 1.585,
@@ -78,17 +78,17 @@
     ]
   },
   "summary": {
-    "curves": 2572,
-    "routes": 6565,
+    "curves": 2584,
+    "routes": 6589,
     "by_class": {
-      "boundary": 1917,
+      "boundary": 1929,
       "formula_advantage": 598,
       "formula_marginal": 57
     },
     "by_route_kind": {
       "base_change_descent": 2166,
-      "cover_descent": 1324,
-      "extension_index_calculus": 1324,
+      "cover_descent": 1336,
+      "extension_index_calculus": 1336,
       "ghs_isogeny_extension": 199,
       "ghs_weil_descent": 304,
       "same_field_cover": 1248
@@ -386642,6 +386642,1434 @@
           "notes": [
             "existence of a cover over GF(p) of the priced genus is not established for this curve; odd-characteristic GHS and Diem's genus-3 covers need extra structure (for k = 3, rational 2-torsion is the usual precondition, recorded as an exact invariant)",
             "priced at g = 9, the least genus of any GHS cover of E/GF(p^6) when F_p(j(E)) = GF(p^6) (research/odd_char_descent_genus3_20261014/); Joux–Vitse (Eurocrypt 2012, App. C) shapes 12/13 give 9 as the minimum genus, not the existence of a genus-9 cover for this curve, so the row is conditional on such a cover being exhibited.  Until 2026-10-15 the row was priced at g = 6, which no GHS cover has, and was formula_advantage (+19.6 bits against rho).  A curve whose j lies in a proper subfield, or a non-GHS cover, could have a smaller genus, so the row is a lower bound on the GHS route only"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "icv1-fp5k3-tm255-0a630377",
+      "icv1": "ICV1:fpk-31-3-e005187b:-255:30047:6,17,20:unk:unk:r:0a6303770f5e",
+      "standard_names": [],
+      "family": "extension",
+      "field": {
+        "kind": "extension",
+        "degree": 3,
+        "log2_size": 14.863,
+        "log2_base": 4.954
+      },
+      "trace": "-255",
+      "subgroup": {
+        "order": "30047",
+        "bits": 14.875,
+        "status": "registry_representation"
+      },
+      "reference_log2": 16.757,
+      "verdict": "boundary",
+      "best_route": 1,
+      "routes": [
+        {
+          "kind": "extension_index_calculus",
+          "label": "Gaudry–Diem decomposition index calculus on E(GF(p^3)) with factor base from GF(p)",
+          "evidence": "construction",
+          "invariants": {
+            "decomposition_bezout_log2": 6,
+            "decomposition_solve_basis": "measured",
+            "decomposition_solve_log2_fp_mults": 19.741,
+            "decomposition_trials_log2": 9.191,
+            "extension_degree": 3,
+            "relations_exponent": 1.333
+          },
+          "destination": {
+            "object": "E(GF(p^3))",
+            "genus": "1",
+            "log2_genus": 0.0,
+            "field_bits": 14.863,
+            "log2_order": 14.863
+          },
+          "transport": "same_group",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": null,
+            "destination": {
+              "solver": "extension_index_calculus",
+              "log2_cost": 32.59,
+              "log2_leading": 28.931,
+              "considered": [
+                [
+                  "extension_index_calculus",
+                  32.59
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 32.59,
+            "ratio_log2": -15.833,
+            "exponent_ratio_log2": -21.494
+          },
+          "class": "boundary",
+          "notes": [
+            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system, a floor on the Gröbner/FGLM solve",
+            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; the measured C_3 = 0.876e6 and C_4 = 1.227e12 lie above D^3, so rows at other k remain lower bounds and a formula advantage here is a lead, not a measurement"
+          ]
+        },
+        {
+          "kind": "cover_descent",
+          "label": "descent to a genus-3 cover C/GF(p) of E/GF(p^3)",
+          "evidence": "proposed",
+          "invariants": {
+            "extension_degree": 3,
+            "genus_basis": "weil_restriction",
+            "genus_lower_bound": 3,
+            "rational_two_torsion_point": false
+          },
+          "destination": {
+            "object": "Jac(C)",
+            "genus": "3",
+            "log2_genus": 1.585,
+            "field_bits": 4.954,
+            "log2_order": 14.863
+          },
+          "transport": "size_admits",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": 11.078,
+            "destination": {
+              "solver": "enge_gaudry_smoothness",
+              "log2_cost": 18.66,
+              "log2_leading": 9.654,
+              "considered": [
+                [
+                  "rho_on_jacobian",
+                  19.327
+                ],
+                [
+                  "hyperelliptic_index_calculus",
+                  22.116
+                ],
+                [
+                  "enge_gaudry_smoothness",
+                  18.66
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 18.667,
+            "ratio_log2": -1.91,
+            "exponent_ratio_log2": -2.216
+          },
+          "class": "boundary",
+          "notes": [
+            "existence of a cover over GF(p) of the priced genus is not established for this curve; odd-characteristic GHS and Diem's genus-3 covers need extra structure (for k = 3, rational 2-torsion is the usual precondition, recorded as an exact invariant)",
+            "priced at the most favourable genus, g = k, so the row is a lower bound on the route"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "icv1-fp5k3-t163-eaf4ea4d",
+      "icv1": "ICV1:fpk-31-3-511c0573:163:29629:12,26,22:unk:unk:r:eaf4ea4d26f2",
+      "standard_names": [],
+      "family": "extension",
+      "field": {
+        "kind": "extension",
+        "degree": 3,
+        "log2_size": 14.863,
+        "log2_base": 4.954
+      },
+      "trace": "163",
+      "subgroup": {
+        "order": "29629",
+        "bits": 14.855,
+        "status": "registry_representation"
+      },
+      "reference_log2": 16.747,
+      "verdict": "boundary",
+      "best_route": 1,
+      "routes": [
+        {
+          "kind": "extension_index_calculus",
+          "label": "Gaudry–Diem decomposition index calculus on E(GF(p^3)) with factor base from GF(p)",
+          "evidence": "construction",
+          "invariants": {
+            "decomposition_bezout_log2": 6,
+            "decomposition_solve_basis": "measured",
+            "decomposition_solve_log2_fp_mults": 19.741,
+            "decomposition_trials_log2": 9.191,
+            "extension_degree": 3,
+            "relations_exponent": 1.333
+          },
+          "destination": {
+            "object": "E(GF(p^3))",
+            "genus": "1",
+            "log2_genus": 0.0,
+            "field_bits": 14.863,
+            "log2_order": 14.863
+          },
+          "transport": "same_group",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": null,
+            "destination": {
+              "solver": "extension_index_calculus",
+              "log2_cost": 32.59,
+              "log2_leading": 28.931,
+              "considered": [
+                [
+                  "extension_index_calculus",
+                  32.59
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 32.59,
+            "ratio_log2": -15.843,
+            "exponent_ratio_log2": -21.504
+          },
+          "class": "boundary",
+          "notes": [
+            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system, a floor on the Gröbner/FGLM solve",
+            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; the measured C_3 = 0.876e6 and C_4 = 1.227e12 lie above D^3, so rows at other k remain lower bounds and a formula advantage here is a lead, not a measurement"
+          ]
+        },
+        {
+          "kind": "cover_descent",
+          "label": "descent to a genus-3 cover C/GF(p) of E/GF(p^3)",
+          "evidence": "proposed",
+          "invariants": {
+            "extension_degree": 3,
+            "genus_basis": "weil_restriction",
+            "genus_lower_bound": 3,
+            "rational_two_torsion_point": false
+          },
+          "destination": {
+            "object": "Jac(C)",
+            "genus": "3",
+            "log2_genus": 1.585,
+            "field_bits": 4.954,
+            "log2_order": 14.863
+          },
+          "transport": "size_admits",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": 11.078,
+            "destination": {
+              "solver": "enge_gaudry_smoothness",
+              "log2_cost": 18.659,
+              "log2_leading": 9.654,
+              "considered": [
+                [
+                  "rho_on_jacobian",
+                  19.317
+                ],
+                [
+                  "hyperelliptic_index_calculus",
+                  22.116
+                ],
+                [
+                  "enge_gaudry_smoothness",
+                  18.659
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 18.667,
+            "ratio_log2": -1.92,
+            "exponent_ratio_log2": -2.226
+          },
+          "class": "boundary",
+          "notes": [
+            "existence of a cover over GF(p) of the priced genus is not established for this curve; odd-characteristic GHS and Diem's genus-3 covers need extra structure (for k = 3, rational 2-torsion is the usual precondition, recorded as an exact invariant)",
+            "priced at the most favourable genus, g = k, so the row is a lower bound on the route"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "icv1-fp6k3-tm911-c5ae7464",
+      "icv1": "ICV1:fpk-61-3-d6fe0265:-911:227893:39,39,5:unk:unk:r:c5ae74644abe",
+      "standard_names": [],
+      "family": "extension",
+      "field": {
+        "kind": "extension",
+        "degree": 3,
+        "log2_size": 17.792,
+        "log2_base": 5.931
+      },
+      "trace": "-911",
+      "subgroup": {
+        "order": "227893",
+        "bits": 17.798,
+        "status": "registry_representation"
+      },
+      "reference_log2": 18.63,
+      "verdict": "boundary",
+      "best_route": 1,
+      "routes": [
+        {
+          "kind": "extension_index_calculus",
+          "label": "Gaudry–Diem decomposition index calculus on E(GF(p^3)) with factor base from GF(p)",
+          "evidence": "construction",
+          "invariants": {
+            "decomposition_bezout_log2": 6,
+            "decomposition_solve_basis": "measured",
+            "decomposition_solve_log2_fp_mults": 19.741,
+            "decomposition_trials_log2": 10.493,
+            "extension_degree": 3,
+            "relations_exponent": 1.333
+          },
+          "destination": {
+            "object": "E(GF(p^3))",
+            "genus": "1",
+            "log2_genus": 0.0,
+            "field_bits": 17.792,
+            "log2_order": 17.792
+          },
+          "transport": "same_group",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": null,
+            "destination": {
+              "solver": "extension_index_calculus",
+              "log2_cost": 34.304,
+              "log2_leading": 30.233,
+              "considered": [
+                [
+                  "extension_index_calculus",
+                  34.304
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 34.304,
+            "ratio_log2": -15.674,
+            "exponent_ratio_log2": -21.334
+          },
+          "class": "boundary",
+          "notes": [
+            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system, a floor on the Gröbner/FGLM solve",
+            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; the measured C_3 = 0.876e6 and C_4 = 1.227e12 lie above D^3, so rows at other k remain lower bounds and a formula advantage here is a lead, not a measurement"
+          ]
+        },
+        {
+          "kind": "cover_descent",
+          "label": "descent to a genus-3 cover C/GF(p) of E/GF(p^3)",
+          "evidence": "proposed",
+          "invariants": {
+            "extension_degree": 3,
+            "genus_basis": "weil_restriction",
+            "genus_lower_bound": 3,
+            "rational_two_torsion_point": false
+          },
+          "destination": {
+            "object": "Jac(C)",
+            "genus": "3",
+            "log2_genus": 1.585,
+            "field_bits": 5.931,
+            "log2_order": 17.792
+          },
+          "transport": "size_admits",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": 11.49,
+            "destination": {
+              "solver": "enge_gaudry_smoothness",
+              "log2_cost": 20.265,
+              "log2_leading": 11.534,
+              "considered": [
+                [
+                  "rho_on_jacobian",
+                  21.2
+                ],
+                [
+                  "hyperelliptic_index_calculus",
+                  23.778
+                ],
+                [
+                  "enge_gaudry_smoothness",
+                  20.265
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 20.268,
+            "ratio_log2": -1.638,
+            "exponent_ratio_log2": -2.635
+          },
+          "class": "boundary",
+          "notes": [
+            "existence of a cover over GF(p) of the priced genus is not established for this curve; odd-characteristic GHS and Diem's genus-3 covers need extra structure (for k = 3, rational 2-torsion is the usual precondition, recorded as an exact invariant)",
+            "priced at the most favourable genus, g = k, so the row is a lower bound on the route"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "icv1-fp6k3-tm129-25b03ce0",
+      "icv1": "ICV1:fpk-61-3-c0273879:-129:227111:46,27,45:unk:unk:r:25b03ce08d28",
+      "standard_names": [],
+      "family": "extension",
+      "field": {
+        "kind": "extension",
+        "degree": 3,
+        "log2_size": 17.792,
+        "log2_base": 5.931
+      },
+      "trace": "-129",
+      "subgroup": {
+        "order": "227111",
+        "bits": 17.793,
+        "status": "registry_representation"
+      },
+      "reference_log2": 18.628,
+      "verdict": "boundary",
+      "best_route": 1,
+      "routes": [
+        {
+          "kind": "extension_index_calculus",
+          "label": "Gaudry–Diem decomposition index calculus on E(GF(p^3)) with factor base from GF(p)",
+          "evidence": "construction",
+          "invariants": {
+            "decomposition_bezout_log2": 6,
+            "decomposition_solve_basis": "measured",
+            "decomposition_solve_log2_fp_mults": 19.741,
+            "decomposition_trials_log2": 10.493,
+            "extension_degree": 3,
+            "relations_exponent": 1.333
+          },
+          "destination": {
+            "object": "E(GF(p^3))",
+            "genus": "1",
+            "log2_genus": 0.0,
+            "field_bits": 17.792,
+            "log2_order": 17.792
+          },
+          "transport": "same_group",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": null,
+            "destination": {
+              "solver": "extension_index_calculus",
+              "log2_cost": 34.304,
+              "log2_leading": 30.233,
+              "considered": [
+                [
+                  "extension_index_calculus",
+                  34.304
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 34.304,
+            "ratio_log2": -15.676,
+            "exponent_ratio_log2": -21.337
+          },
+          "class": "boundary",
+          "notes": [
+            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system, a floor on the Gröbner/FGLM solve",
+            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; the measured C_3 = 0.876e6 and C_4 = 1.227e12 lie above D^3, so rows at other k remain lower bounds and a formula advantage here is a lead, not a measurement"
+          ]
+        },
+        {
+          "kind": "cover_descent",
+          "label": "descent to a genus-3 cover C/GF(p) of E/GF(p^3)",
+          "evidence": "proposed",
+          "invariants": {
+            "extension_degree": 3,
+            "genus_basis": "weil_restriction",
+            "genus_lower_bound": 3,
+            "rational_two_torsion_point": false
+          },
+          "destination": {
+            "object": "Jac(C)",
+            "genus": "3",
+            "log2_genus": 1.585,
+            "field_bits": 5.931,
+            "log2_order": 17.792
+          },
+          "transport": "size_admits",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": 11.49,
+            "destination": {
+              "solver": "enge_gaudry_smoothness",
+              "log2_cost": 20.265,
+              "log2_leading": 11.534,
+              "considered": [
+                [
+                  "rho_on_jacobian",
+                  21.197
+                ],
+                [
+                  "hyperelliptic_index_calculus",
+                  23.778
+                ],
+                [
+                  "enge_gaudry_smoothness",
+                  20.265
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 20.268,
+            "ratio_log2": -1.64,
+            "exponent_ratio_log2": -2.637
+          },
+          "class": "boundary",
+          "notes": [
+            "existence of a cover over GF(p) of the priced genus is not established for this curve; odd-characteristic GHS and Diem's genus-3 covers need extra structure (for k = 3, rational 2-torsion is the usual precondition, recorded as an exact invariant)",
+            "priced at the most favourable genus, g = k, so the row is a lower bound on the route"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "icv1-fp7k3-t451-0eeb360c",
+      "icv1": "ICV1:fpk-127-3-ff0321e6:451:2047933:85,90,79:unk:unk:r:0eeb360cdfe9",
+      "standard_names": [],
+      "family": "extension",
+      "field": {
+        "kind": "extension",
+        "degree": 3,
+        "log2_size": 20.966,
+        "log2_base": 6.989
+      },
+      "trace": "451",
+      "subgroup": {
+        "order": "2047933",
+        "bits": 20.966,
+        "status": "registry_representation"
+      },
+      "reference_log2": 20.589,
+      "verdict": "boundary",
+      "best_route": 1,
+      "routes": [
+        {
+          "kind": "extension_index_calculus",
+          "label": "Gaudry–Diem decomposition index calculus on E(GF(p^3)) with factor base from GF(p)",
+          "evidence": "construction",
+          "invariants": {
+            "decomposition_bezout_log2": 6,
+            "decomposition_solve_basis": "measured",
+            "decomposition_solve_log2_fp_mults": 19.741,
+            "decomposition_trials_log2": 11.903,
+            "extension_degree": 3,
+            "relations_exponent": 1.333
+          },
+          "destination": {
+            "object": "E(GF(p^3))",
+            "genus": "1",
+            "log2_genus": 0.0,
+            "field_bits": 20.966,
+            "log2_order": 20.966
+          },
+          "transport": "same_group",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": null,
+            "destination": {
+              "solver": "extension_index_calculus",
+              "log2_cost": 36.09,
+              "log2_leading": 31.644,
+              "considered": [
+                [
+                  "extension_index_calculus",
+                  36.09
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 36.09,
+            "ratio_log2": -15.5,
+            "exponent_ratio_log2": -21.161
+          },
+          "class": "boundary",
+          "notes": [
+            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system, a floor on the Gröbner/FGLM solve",
+            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; the measured C_3 = 0.876e6 and C_4 = 1.227e12 lie above D^3, so rows at other k remain lower bounds and a formula advantage here is a lead, not a measurement"
+          ]
+        },
+        {
+          "kind": "cover_descent",
+          "label": "descent to a genus-3 cover C/GF(p) of E/GF(p^3)",
+          "evidence": "proposed",
+          "invariants": {
+            "extension_degree": 3,
+            "genus_basis": "weil_restriction",
+            "genus_lower_bound": 3,
+            "rational_two_torsion_point": false
+          },
+          "destination": {
+            "object": "Jac(C)",
+            "genus": "3",
+            "log2_genus": 1.585,
+            "field_bits": 6.989,
+            "log2_order": 20.966
+          },
+          "transport": "size_admits",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": 11.865,
+            "destination": {
+              "solver": "enge_gaudry_smoothness",
+              "log2_cost": 22.02,
+              "log2_leading": 13.606,
+              "considered": [
+                [
+                  "rho_on_jacobian",
+                  23.159
+                ],
+                [
+                  "hyperelliptic_index_calculus",
+                  25.518
+                ],
+                [
+                  "enge_gaudry_smoothness",
+                  22.02
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 22.021,
+            "ratio_log2": -1.431,
+            "exponent_ratio_log2": -3.123
+          },
+          "class": "boundary",
+          "notes": [
+            "existence of a cover over GF(p) of the priced genus is not established for this curve; odd-characteristic GHS and Diem's genus-3 covers need extra structure (for k = 3, rational 2-torsion is the usual precondition, recorded as an exact invariant)",
+            "priced at the most favourable genus, g = k, so the row is a lower bound on the route"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "icv1-fp7k3-t271-2e1c80d5",
+      "icv1": "ICV1:fpk-127-3-d24d1632:271:2048113:2,103,61:unk:unk:r:2e1c80d5844c",
+      "standard_names": [],
+      "family": "extension",
+      "field": {
+        "kind": "extension",
+        "degree": 3,
+        "log2_size": 20.966,
+        "log2_base": 6.989
+      },
+      "trace": "271",
+      "subgroup": {
+        "order": "2048113",
+        "bits": 20.966,
+        "status": "registry_representation"
+      },
+      "reference_log2": 20.589,
+      "verdict": "boundary",
+      "best_route": 1,
+      "routes": [
+        {
+          "kind": "extension_index_calculus",
+          "label": "Gaudry–Diem decomposition index calculus on E(GF(p^3)) with factor base from GF(p)",
+          "evidence": "construction",
+          "invariants": {
+            "decomposition_bezout_log2": 6,
+            "decomposition_solve_basis": "measured",
+            "decomposition_solve_log2_fp_mults": 19.741,
+            "decomposition_trials_log2": 11.903,
+            "extension_degree": 3,
+            "relations_exponent": 1.333
+          },
+          "destination": {
+            "object": "E(GF(p^3))",
+            "genus": "1",
+            "log2_genus": 0.0,
+            "field_bits": 20.966,
+            "log2_order": 20.966
+          },
+          "transport": "same_group",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": null,
+            "destination": {
+              "solver": "extension_index_calculus",
+              "log2_cost": 36.09,
+              "log2_leading": 31.644,
+              "considered": [
+                [
+                  "extension_index_calculus",
+                  36.09
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 36.09,
+            "ratio_log2": -15.5,
+            "exponent_ratio_log2": -21.161
+          },
+          "class": "boundary",
+          "notes": [
+            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system, a floor on the Gröbner/FGLM solve",
+            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; the measured C_3 = 0.876e6 and C_4 = 1.227e12 lie above D^3, so rows at other k remain lower bounds and a formula advantage here is a lead, not a measurement"
+          ]
+        },
+        {
+          "kind": "cover_descent",
+          "label": "descent to a genus-3 cover C/GF(p) of E/GF(p^3)",
+          "evidence": "proposed",
+          "invariants": {
+            "extension_degree": 3,
+            "genus_basis": "weil_restriction",
+            "genus_lower_bound": 3,
+            "rational_two_torsion_point": false
+          },
+          "destination": {
+            "object": "Jac(C)",
+            "genus": "3",
+            "log2_genus": 1.585,
+            "field_bits": 6.989,
+            "log2_order": 20.966
+          },
+          "transport": "size_admits",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": 11.865,
+            "destination": {
+              "solver": "enge_gaudry_smoothness",
+              "log2_cost": 22.02,
+              "log2_leading": 13.606,
+              "considered": [
+                [
+                  "rho_on_jacobian",
+                  23.159
+                ],
+                [
+                  "hyperelliptic_index_calculus",
+                  25.518
+                ],
+                [
+                  "enge_gaudry_smoothness",
+                  22.02
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 22.021,
+            "ratio_log2": -1.431,
+            "exponent_ratio_log2": -3.123
+          },
+          "class": "boundary",
+          "notes": [
+            "existence of a cover over GF(p) of the priced genus is not established for this curve; odd-characteristic GHS and Diem's genus-3 covers need extra structure (for k = 3, rational 2-torsion is the usual precondition, recorded as an exact invariant)",
+            "priced at the most favourable genus, g = k, so the row is a lower bound on the route"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "icv1-fp8k3-t4453-86e97ca8",
+      "icv1": "ICV1:fpk-241-3-b89631b5:4453:13993069:25,194,171:unk:unk:r:86e97ca8dbf6",
+      "standard_names": [],
+      "family": "extension",
+      "field": {
+        "kind": "extension",
+        "degree": 3,
+        "log2_size": 23.739,
+        "log2_base": 7.913
+      },
+      "trace": "4453",
+      "subgroup": {
+        "order": "13993069",
+        "bits": 23.738,
+        "status": "registry_representation"
+      },
+      "reference_log2": 22.259,
+      "verdict": "boundary",
+      "best_route": 1,
+      "routes": [
+        {
+          "kind": "extension_index_calculus",
+          "label": "Gaudry–Diem decomposition index calculus on E(GF(p^3)) with factor base from GF(p)",
+          "evidence": "construction",
+          "invariants": {
+            "decomposition_bezout_log2": 6,
+            "decomposition_solve_basis": "measured",
+            "decomposition_solve_log2_fp_mults": 19.741,
+            "decomposition_trials_log2": 13.135,
+            "extension_degree": 3,
+            "relations_exponent": 1.333
+          },
+          "destination": {
+            "object": "E(GF(p^3))",
+            "genus": "1",
+            "log2_genus": 0.0,
+            "field_bits": 23.739,
+            "log2_order": 23.739
+          },
+          "transport": "same_group",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": null,
+            "destination": {
+              "solver": "extension_index_calculus",
+              "log2_cost": 37.606,
+              "log2_leading": 32.876,
+              "considered": [
+                [
+                  "extension_index_calculus",
+                  37.606
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 37.606,
+            "ratio_log2": -15.347,
+            "exponent_ratio_log2": -21.007
+          },
+          "class": "boundary",
+          "notes": [
+            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system, a floor on the Gröbner/FGLM solve",
+            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; the measured C_3 = 0.876e6 and C_4 = 1.227e12 lie above D^3, so rows at other k remain lower bounds and a formula advantage here is a lead, not a measurement"
+          ]
+        },
+        {
+          "kind": "cover_descent",
+          "label": "descent to a genus-3 cover C/GF(p) of E/GF(p^3)",
+          "evidence": "proposed",
+          "invariants": {
+            "extension_degree": 3,
+            "genus_basis": "weil_restriction",
+            "genus_lower_bound": 3,
+            "rational_two_torsion_point": false
+          },
+          "destination": {
+            "object": "Jac(C)",
+            "genus": "3",
+            "log2_genus": 1.585,
+            "field_bits": 7.913,
+            "log2_order": 23.739
+          },
+          "transport": "size_admits",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": 12.149,
+            "destination": {
+              "solver": "enge_gaudry_smoothness",
+              "log2_cost": 23.633,
+              "log2_leading": 15.434,
+              "considered": [
+                [
+                  "rho_on_jacobian",
+                  24.829
+                ],
+                [
+                  "hyperelliptic_index_calculus",
+                  27.001
+                ],
+                [
+                  "enge_gaudry_smoothness",
+                  23.633
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 23.634,
+            "ratio_log2": -1.374,
+            "exponent_ratio_log2": -3.565
+          },
+          "class": "boundary",
+          "notes": [
+            "existence of a cover over GF(p) of the priced genus is not established for this curve; odd-characteristic GHS and Diem's genus-3 covers need extra structure (for k = 3, rational 2-torsion is the usual precondition, recorded as an exact invariant)",
+            "priced at the most favourable genus, g = k, so the row is a lower bound on the route"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "icv1-fp8k3-tm3735-36ca5915",
+      "icv1": "ICV1:fpk-241-3-3b8ff384:-3735:14001257:133,55,120:unk:unk:r:36ca5915fa2b",
+      "standard_names": [],
+      "family": "extension",
+      "field": {
+        "kind": "extension",
+        "degree": 3,
+        "log2_size": 23.739,
+        "log2_base": 7.913
+      },
+      "trace": "-3735",
+      "subgroup": {
+        "order": "14001257",
+        "bits": 23.739,
+        "status": "registry_representation"
+      },
+      "reference_log2": 22.26,
+      "verdict": "boundary",
+      "best_route": 1,
+      "routes": [
+        {
+          "kind": "extension_index_calculus",
+          "label": "Gaudry–Diem decomposition index calculus on E(GF(p^3)) with factor base from GF(p)",
+          "evidence": "construction",
+          "invariants": {
+            "decomposition_bezout_log2": 6,
+            "decomposition_solve_basis": "measured",
+            "decomposition_solve_log2_fp_mults": 19.741,
+            "decomposition_trials_log2": 13.135,
+            "extension_degree": 3,
+            "relations_exponent": 1.333
+          },
+          "destination": {
+            "object": "E(GF(p^3))",
+            "genus": "1",
+            "log2_genus": 0.0,
+            "field_bits": 23.739,
+            "log2_order": 23.739
+          },
+          "transport": "same_group",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": null,
+            "destination": {
+              "solver": "extension_index_calculus",
+              "log2_cost": 37.606,
+              "log2_leading": 32.876,
+              "considered": [
+                [
+                  "extension_index_calculus",
+                  37.606
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 37.606,
+            "ratio_log2": -15.346,
+            "exponent_ratio_log2": -21.007
+          },
+          "class": "boundary",
+          "notes": [
+            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system, a floor on the Gröbner/FGLM solve",
+            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; the measured C_3 = 0.876e6 and C_4 = 1.227e12 lie above D^3, so rows at other k remain lower bounds and a formula advantage here is a lead, not a measurement"
+          ]
+        },
+        {
+          "kind": "cover_descent",
+          "label": "descent to a genus-3 cover C/GF(p) of E/GF(p^3)",
+          "evidence": "proposed",
+          "invariants": {
+            "extension_degree": 3,
+            "genus_basis": "weil_restriction",
+            "genus_lower_bound": 3,
+            "rational_two_torsion_point": false
+          },
+          "destination": {
+            "object": "Jac(C)",
+            "genus": "3",
+            "log2_genus": 1.585,
+            "field_bits": 7.913,
+            "log2_order": 23.739
+          },
+          "transport": "size_admits",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": 12.149,
+            "destination": {
+              "solver": "enge_gaudry_smoothness",
+              "log2_cost": 23.633,
+              "log2_leading": 15.434,
+              "considered": [
+                [
+                  "rho_on_jacobian",
+                  24.83
+                ],
+                [
+                  "hyperelliptic_index_calculus",
+                  27.001
+                ],
+                [
+                  "enge_gaudry_smoothness",
+                  23.633
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 23.634,
+            "ratio_log2": -1.374,
+            "exponent_ratio_log2": -3.565
+          },
+          "class": "boundary",
+          "notes": [
+            "existence of a cover over GF(p) of the priced genus is not established for this curve; odd-characteristic GHS and Diem's genus-3 covers need extra structure (for k = 3, rational 2-torsion is the usual precondition, recorded as an exact invariant)",
+            "priced at the most favourable genus, g = k, so the row is a lower bound on the route"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "icv1-fp9k3-t2341-433c7cd1",
+      "icv1": "ICV1:fpk-499-3-6a692377:2341:124249159:431,157,133:unk:unk:r:433c7cd12bf4",
+      "standard_names": [],
+      "family": "extension",
+      "field": {
+        "kind": "extension",
+        "degree": 3,
+        "log2_size": 26.889,
+        "log2_base": 8.963
+      },
+      "trace": "2341",
+      "subgroup": {
+        "order": "124249159",
+        "bits": 26.889,
+        "status": "registry_representation"
+      },
+      "reference_log2": 24.12,
+      "verdict": "boundary",
+      "best_route": 1,
+      "routes": [
+        {
+          "kind": "extension_index_calculus",
+          "label": "Gaudry–Diem decomposition index calculus on E(GF(p^3)) with factor base from GF(p)",
+          "evidence": "construction",
+          "invariants": {
+            "decomposition_bezout_log2": 6,
+            "decomposition_solve_basis": "measured",
+            "decomposition_solve_log2_fp_mults": 19.741,
+            "decomposition_trials_log2": 14.535,
+            "extension_degree": 3,
+            "relations_exponent": 1.333
+          },
+          "destination": {
+            "object": "E(GF(p^3))",
+            "genus": "1",
+            "log2_genus": 0.0,
+            "field_bits": 26.889,
+            "log2_order": 26.889
+          },
+          "transport": "same_group",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": null,
+            "destination": {
+              "solver": "extension_index_calculus",
+              "log2_cost": 39.291,
+              "log2_leading": 34.276,
+              "considered": [
+                [
+                  "extension_index_calculus",
+                  39.291
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 39.291,
+            "ratio_log2": -15.171,
+            "exponent_ratio_log2": -20.832
+          },
+          "class": "boundary",
+          "notes": [
+            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system, a floor on the Gröbner/FGLM solve",
+            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; the measured C_3 = 0.876e6 and C_4 = 1.227e12 lie above D^3, so rows at other k remain lower bounds and a formula advantage here is a lead, not a measurement"
+          ]
+        },
+        {
+          "kind": "cover_descent",
+          "label": "descent to a genus-3 cover C/GF(p) of E/GF(p^3)",
+          "evidence": "proposed",
+          "invariants": {
+            "extension_degree": 3,
+            "genus_basis": "weil_restriction",
+            "genus_lower_bound": 3,
+            "rational_two_torsion_point": false
+          },
+          "destination": {
+            "object": "Jac(C)",
+            "genus": "3",
+            "log2_genus": 1.585,
+            "field_bits": 8.963,
+            "log2_order": 26.889
+          },
+          "transport": "size_admits",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": 12.434,
+            "destination": {
+              "solver": "enge_gaudry_smoothness",
+              "log2_cost": 25.597,
+              "log2_leading": 17.522,
+              "considered": [
+                [
+                  "rho_on_jacobian",
+                  26.69
+                ],
+                [
+                  "hyperelliptic_index_calculus",
+                  28.656
+                ],
+                [
+                  "enge_gaudry_smoothness",
+                  25.597
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 25.597,
+            "ratio_log2": -1.477,
+            "exponent_ratio_log2": -4.078
+          },
+          "class": "boundary",
+          "notes": [
+            "existence of a cover over GF(p) of the priced genus is not established for this curve; odd-characteristic GHS and Diem's genus-3 covers need extra structure (for k = 3, rational 2-torsion is the usual precondition, recorded as an exact invariant)",
+            "priced at the most favourable genus, g = k, so the row is a lower bound on the route"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "icv1-fp9k3-tm10023-39b2162d",
+      "icv1": "ICV1:fpk-499-3-ed8d3e27:-10023:124261523:350,244,204:unk:unk:r:39b2162d0f8c",
+      "standard_names": [],
+      "family": "extension",
+      "field": {
+        "kind": "extension",
+        "degree": 3,
+        "log2_size": 26.889,
+        "log2_base": 8.963
+      },
+      "trace": "-10023",
+      "subgroup": {
+        "order": "124261523",
+        "bits": 26.889,
+        "status": "registry_representation"
+      },
+      "reference_log2": 24.12,
+      "verdict": "boundary",
+      "best_route": 1,
+      "routes": [
+        {
+          "kind": "extension_index_calculus",
+          "label": "Gaudry–Diem decomposition index calculus on E(GF(p^3)) with factor base from GF(p)",
+          "evidence": "construction",
+          "invariants": {
+            "decomposition_bezout_log2": 6,
+            "decomposition_solve_basis": "measured",
+            "decomposition_solve_log2_fp_mults": 19.741,
+            "decomposition_trials_log2": 14.535,
+            "extension_degree": 3,
+            "relations_exponent": 1.333
+          },
+          "destination": {
+            "object": "E(GF(p^3))",
+            "genus": "1",
+            "log2_genus": 0.0,
+            "field_bits": 26.889,
+            "log2_order": 26.889
+          },
+          "transport": "same_group",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": null,
+            "destination": {
+              "solver": "extension_index_calculus",
+              "log2_cost": 39.291,
+              "log2_leading": 34.276,
+              "considered": [
+                [
+                  "extension_index_calculus",
+                  39.291
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 39.291,
+            "ratio_log2": -15.171,
+            "exponent_ratio_log2": -20.832
+          },
+          "class": "boundary",
+          "notes": [
+            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system, a floor on the Gröbner/FGLM solve",
+            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; the measured C_3 = 0.876e6 and C_4 = 1.227e12 lie above D^3, so rows at other k remain lower bounds and a formula advantage here is a lead, not a measurement"
+          ]
+        },
+        {
+          "kind": "cover_descent",
+          "label": "descent to a genus-3 cover C/GF(p) of E/GF(p^3)",
+          "evidence": "proposed",
+          "invariants": {
+            "extension_degree": 3,
+            "genus_basis": "weil_restriction",
+            "genus_lower_bound": 3,
+            "rational_two_torsion_point": false
+          },
+          "destination": {
+            "object": "Jac(C)",
+            "genus": "3",
+            "log2_genus": 1.585,
+            "field_bits": 8.963,
+            "log2_order": 26.889
+          },
+          "transport": "size_admits",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": 12.434,
+            "destination": {
+              "solver": "enge_gaudry_smoothness",
+              "log2_cost": 25.597,
+              "log2_leading": 17.522,
+              "considered": [
+                [
+                  "rho_on_jacobian",
+                  26.69
+                ],
+                [
+                  "hyperelliptic_index_calculus",
+                  28.656
+                ],
+                [
+                  "enge_gaudry_smoothness",
+                  25.597
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 25.597,
+            "ratio_log2": -1.477,
+            "exponent_ratio_log2": -4.078
+          },
+          "class": "boundary",
+          "notes": [
+            "existence of a cover over GF(p) of the priced genus is not established for this curve; odd-characteristic GHS and Diem's genus-3 covers need extra structure (for k = 3, rational 2-torsion is the usual precondition, recorded as an exact invariant)",
+            "priced at the most favourable genus, g = k, so the row is a lower bound on the route"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "icv1-fp10k3-t57679-5996862e",
+      "icv1": "ICV1:fpk-1009-3-0ad33356:57679:1027186051:689,96,338:unk:unk:r:5996862eb5d9",
+      "standard_names": [],
+      "family": "extension",
+      "field": {
+        "kind": "extension",
+        "degree": 3,
+        "log2_size": 29.936,
+        "log2_base": 9.979
+      },
+      "trace": "57679",
+      "subgroup": {
+        "order": "1027186051",
+        "bits": 29.936,
+        "status": "registry_representation"
+      },
+      "reference_log2": 25.889,
+      "verdict": "boundary",
+      "best_route": 1,
+      "routes": [
+        {
+          "kind": "extension_index_calculus",
+          "label": "Gaudry–Diem decomposition index calculus on E(GF(p^3)) with factor base from GF(p)",
+          "evidence": "construction",
+          "invariants": {
+            "decomposition_bezout_log2": 6,
+            "decomposition_solve_basis": "measured",
+            "decomposition_solve_log2_fp_mults": 19.741,
+            "decomposition_trials_log2": 15.89,
+            "extension_degree": 3,
+            "relations_exponent": 1.333
+          },
+          "destination": {
+            "object": "E(GF(p^3))",
+            "genus": "1",
+            "log2_genus": 0.0,
+            "field_bits": 29.936,
+            "log2_order": 29.936
+          },
+          "transport": "same_group",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": null,
+            "destination": {
+              "solver": "extension_index_calculus",
+              "log2_cost": 40.891,
+              "log2_leading": 35.63,
+              "considered": [
+                [
+                  "extension_index_calculus",
+                  40.891
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 40.891,
+            "ratio_log2": -15.002,
+            "exponent_ratio_log2": -20.662
+          },
+          "class": "boundary",
+          "notes": [
+            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system, a floor on the Gröbner/FGLM solve",
+            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; the measured C_3 = 0.876e6 and C_4 = 1.227e12 lie above D^3, so rows at other k remain lower bounds and a formula advantage here is a lead, not a measurement"
+          ]
+        },
+        {
+          "kind": "cover_descent",
+          "label": "descent to a genus-3 cover C/GF(p) of E/GF(p^3)",
+          "evidence": "proposed",
+          "invariants": {
+            "extension_degree": 3,
+            "genus_basis": "weil_restriction",
+            "genus_lower_bound": 3,
+            "rational_two_torsion_point": false
+          },
+          "destination": {
+            "object": "Jac(C)",
+            "genus": "3",
+            "log2_genus": 1.585,
+            "field_bits": 9.979,
+            "log2_order": 29.936
+          },
+          "transport": "size_admits",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": 12.679,
+            "destination": {
+              "solver": "enge_gaudry_smoothness",
+              "log2_cost": 27.619,
+              "log2_leading": 19.548,
+              "considered": [
+                [
+                  "rho_on_jacobian",
+                  28.459
+                ],
+                [
+                  "hyperelliptic_index_calculus",
+                  30.232
+                ],
+                [
+                  "enge_gaudry_smoothness",
+                  27.619
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 27.619,
+            "ratio_log2": -1.73,
+            "exponent_ratio_log2": -4.58
+          },
+          "class": "boundary",
+          "notes": [
+            "existence of a cover over GF(p) of the priced genus is not established for this curve; odd-characteristic GHS and Diem's genus-3 covers need extra structure (for k = 3, rational 2-torsion is the usual precondition, recorded as an exact invariant)",
+            "priced at the most favourable genus, g = k, so the row is a lower bound on the route"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "icv1-fp10k3-tm43071-46ac8002",
+      "icv1": "ICV1:fpk-1009-3-d716f217:-43071:1027286801:552,385,689:unk:unk:r:46ac80026d7b",
+      "standard_names": [],
+      "family": "extension",
+      "field": {
+        "kind": "extension",
+        "degree": 3,
+        "log2_size": 29.936,
+        "log2_base": 9.979
+      },
+      "trace": "-43071",
+      "subgroup": {
+        "order": "1027286801",
+        "bits": 29.936,
+        "status": "registry_representation"
+      },
+      "reference_log2": 25.889,
+      "verdict": "boundary",
+      "best_route": 1,
+      "routes": [
+        {
+          "kind": "extension_index_calculus",
+          "label": "Gaudry–Diem decomposition index calculus on E(GF(p^3)) with factor base from GF(p)",
+          "evidence": "construction",
+          "invariants": {
+            "decomposition_bezout_log2": 6,
+            "decomposition_solve_basis": "measured",
+            "decomposition_solve_log2_fp_mults": 19.741,
+            "decomposition_trials_log2": 15.89,
+            "extension_degree": 3,
+            "relations_exponent": 1.333
+          },
+          "destination": {
+            "object": "E(GF(p^3))",
+            "genus": "1",
+            "log2_genus": 0.0,
+            "field_bits": 29.936,
+            "log2_order": 29.936
+          },
+          "transport": "same_group",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": null,
+            "destination": {
+              "solver": "extension_index_calculus",
+              "log2_cost": 40.891,
+              "log2_leading": 35.63,
+              "considered": [
+                [
+                  "extension_index_calculus",
+                  40.891
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 40.891,
+            "ratio_log2": -15.002,
+            "exponent_ratio_log2": -20.662
+          },
+          "class": "boundary",
+          "notes": [
+            "no transfer: the method works on E itself with a subfield factor base; each of the k! * p^(2-2/k) decomposition attempts is priced at the measured C_k F_p multiplications (k = 3, 4) or, elsewhere, at D^3 with D = 2^(k(k-1)) the Bézout bound of the Semaev system, a floor on the Gröbner/FGLM solve",
+            "until 2026-10-16 the solve was priced at D elliptic operations with no k! trial factor; the measured C_3 = 0.876e6 and C_4 = 1.227e12 lie above D^3, so rows at other k remain lower bounds and a formula advantage here is a lead, not a measurement"
+          ]
+        },
+        {
+          "kind": "cover_descent",
+          "label": "descent to a genus-3 cover C/GF(p) of E/GF(p^3)",
+          "evidence": "proposed",
+          "invariants": {
+            "extension_degree": 3,
+            "genus_basis": "weil_restriction",
+            "genus_lower_bound": 3,
+            "rational_two_torsion_point": false
+          },
+          "destination": {
+            "object": "Jac(C)",
+            "genus": "3",
+            "log2_genus": 1.585,
+            "field_bits": 9.979,
+            "log2_order": 29.936
+          },
+          "transport": "size_admits",
+          "cost": {
+            "log2_search": null,
+            "log2_transfer": 12.679,
+            "destination": {
+              "solver": "enge_gaudry_smoothness",
+              "log2_cost": 27.619,
+              "log2_leading": 19.548,
+              "considered": [
+                [
+                  "rho_on_jacobian",
+                  28.459
+                ],
+                [
+                  "hyperelliptic_index_calculus",
+                  30.232
+                ],
+                [
+                  "enge_gaudry_smoothness",
+                  27.619
+                ]
+              ],
+              "enge_gaudry_hypothesis_holds": false
+            },
+            "log2_total": 27.619,
+            "ratio_log2": -1.73,
+            "exponent_ratio_log2": -4.58
+          },
+          "class": "boundary",
+          "notes": [
+            "existence of a cover over GF(p) of the priced genus is not established for this curve; odd-characteristic GHS and Diem's genus-3 covers need extra structure (for k = 3, rational 2-torsion is the usual precondition, recorded as an exact invariant)",
+            "priced at the most favourable genus, g = k, so the row is a lower bound on the route"
           ]
         }
       ]

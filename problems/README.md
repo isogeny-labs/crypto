@@ -11,6 +11,8 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Cover-assessment catalog population](catalog-cover-assessment-population-stale.md) | open | current catalog-wide assessment freshness check | review current model membership, update older population guards and regenerate typed evidence bindings |
+| [Weighted Weil complete cost and rho reference](weil-weighted-complete-cost.md) | open | interpreting larger cubic-field decomposition gains as a full IC speedup | complete native accounting, matched ecbench strong rho, independent-host replay and external solver comparison |
 | [Running legacy Spot process recovery](legacy-spot-process-recovery.md) | investigating | automatic off-host recovery of five processes started before native checkpoints | five private exports and compatible-worker copy restores passed; recurring-export authorization and automatic fenced ownership remain |
 | [Photographed-volcano checkpoints unavailable](photo-volcano-checkpoints-unavailable.md) | open | resuming and independently auditing the original 46-curve, 100-problem-per-curve campaign | exact original archives, manifest and checkpoint verification, durable immutable readback, then resume-path validation |
 | [Generalized rootfinding complete all-roots8x qualification](generalized-rootfinding-all-roots-8x.md) | open | novel qualified8x over matched genuine all-roots F4/F5/F6 across requested fields | native complete-output integration, independent replay, strongest external references and the unchanged hard gate |

@@ -1844,7 +1844,9 @@ mod tests {
             .iter()
             .filter(|curve| matches!(&curve.model, Model::Extension { .. }))
             .collect();
-        assert_eq!(extensions.len(), 1324);
+        // The existing 1324 models plus the twelve native weighted-Weil
+        // fixtures in docs/curves/sources/weil-weighted-20261019.json.
+        assert_eq!(extensions.len(), 1336);
         for curve in extensions {
             let Model::Extension {
                 p,
