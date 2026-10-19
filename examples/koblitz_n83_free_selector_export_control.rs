@@ -222,6 +222,18 @@ fn run(path: &str, conflicts: u64) -> Result<Value> {
         })
     );
     enc.solver.conflict_budget = conflicts;
+    // Untimed input-shape census, outside the solve-entry clock. Retain the
+    // original rows so word padding can be distinguished from XOR algebra.
+    let rows = enc.solver.xor_rows();
+    let original_nonzero_words: usize = rows
+        .iter()
+        .map(|(vars, _)| {
+            vars.iter()
+                .map(|v| (v - 1) / 64)
+                .collect::<std::collections::BTreeSet<_>>()
+                .len()
+        })
+        .sum();
     let outcome = enc.solver.solve();
     // Decode only after solve returns; never install selector assumptions.
     let selector_assignments = if outcome == SolveResult::Sat {
@@ -245,6 +257,17 @@ fn run(path: &str, conflicts: u64) -> Result<Value> {
         "control_variant":"fixed_coordinates_free_selectors",
         "selector_assignments":selector_assignments,
         "selector_export":"decoded_from_sat_model_after_solve",
+        "xor_profile":{
+            "rows":rows.len(), "words_per_dense_row":variables.div_ceil(64),
+            "original_nonzero_words":original_nonzero_words,
+            "decisions":enc.solver.stats.decisions,"restarts":enc.solver.stats.restarts,
+            "xor_passes":enc.solver.stats.xor_passes,"xor_repivots":enc.solver.stats.xor_repivots,
+            "xor_row_ops":enc.solver.stats.xor_row_ops,"xor_row_scans":enc.solver.stats.xor_row_scans,
+            "xor_reason_lits":enc.solver.stats.xor_reason_lits,
+            "ns_propagate_xors":enc.solver.stats.ns_propagate_xors,
+            "ns_propagate_clauses":enc.solver.stats.ns_propagate_clauses,
+            "scope":"existing_solver_counters_and_original_row_word_census"
+        },
         "status":match outcome {
             SolveResult::Sat if model_verified => "SAT_verified_witness_x",
             SolveResult::Sat => "PRODUCER_FAILURE_invalid_model",
