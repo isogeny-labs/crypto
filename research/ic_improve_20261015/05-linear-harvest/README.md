@@ -7,7 +7,7 @@ This is round 2, item 05 ([`../RULES.md`](../RULES.md)). The protocol is [`PROTO
 
 ## Verdict
 
-**The frozen candidate G ADVANCES at the constant level and REGRESSES nowhere. It wins under the bar, so it is now the engine's default. `KIC_LINEAR_HARVEST=0` opts out and restores the previous engine counter for counter.**
+**Historical result:** the frozen candidate G advanced under its original comparator and became the engine default. **R10 re-rate:** production regresses versus harvest off at (17,9) m2 (CPU 0.872 [0.771, 0.988], word operations 0.765). See [`pinned ledger`](../../../ic_tool_program/ledger/r10-20261019/README.md).
 
 - **What G is.** At the root only, in solves with fewer than 0.9607 non-zero generators per occurring variable (gpv), it appends the root basis's multi-variable linear rows to the system. The existing linear elimination then substitutes them away.
 - **Held-out test**, 96 targets on 9 pipeline cells:
@@ -17,7 +17,7 @@ This is round 2, item 05 ([`../RULES.md`](../RULES.md)). The protocol is [`PROTO
   | where G fires | 3 | **ADVANCES**, 1.07–1.17× |
   | elsewhere | 6 | MATCHES, the same code path |
 
-  No cell regresses at the CI level.
+  R10 identifies a production regression at (17,9) m2 versus harvest off; the prior no-regressions headline is superseded.
 - **Correctness.** Root sets are identical for every arm on every target: 0 failures in 96 test, 32 training and 142 identity rows. A new unit test, `linear_harvest_keeps_every_root`, checks every configuration against brute force.
 - **End-to-end at m = 2, (19,10) and (23,12).**
   - Logarithms are verified in all 12 runs, with identical relations, trials and disposition hashes.
