@@ -1172,3 +1172,47 @@ field. Full-width solving retains the existing feasibility and iteration
 budgets. The tests check both published points on each curve and verify
 `[n]G = [n]Q = O`; interval tests recover planted scalars. This adds parameter
 and arithmetic coverage; it does not establish a full-width challenge solution.
+
+All three requested solvers also share an exact-curve entry point:
+
+```sh
+cargo run --release --bin icx -- solve ECC2-130 --method bsgs --secret 12345 --interval-width 65536 --json
+cargo run --release --bin icx -- solve ECCp-130 --method rho --challenge --max-iterations 16 --max-restarts 0 --json
+cargo run --release --bin icx -- solve ECC2-130 --method index-calculus --challenge --factor-base-size 16 --max-iterations 32 --json
+```
+
+Each method accepts either challenge and aliases. `icx solve` uses the exact
+published field, curve, generator, subgroup order and target; `icx run` remains
+the separate smaller-analogue experiment interface. `--point X,Y` supplies an
+external target and `--secret K` constructs a known-answer target. Scalars,
+coordinates, interval bounds and matrix coefficients retain their full width.
+Unfinished searches report `budget_exhausted`, no scalar, and a nonzero exit.
+BSGS caps its baby table with `--max-table-entries`; rho's iteration limit is
+per restart. IC caps relation and descent queries separately and bounds its
+signed-point table and dense matrix with `--max-table-entries` and
+`--max-matrix-entries`.
+
+The native [solver API](src/cryptanalysis/certicom_dlp/mod.rs) exposes `rho`,
+`bsgs`, and `index_calculus`. IC constructs a cofactor-cleared low-x factor
+base, decomposes public queries into signed pairs, collects verified relations,
+solves their full-width system modulo the subgroup order, checks every base
+log by scalar replay, and descends the target. It requires full matrix rank;
+it never substitutes rho or BSGS for a failed IC stage.
+
+For externally prepared IC work, `--preparation FILE.json` accepts these fields:
+
+| field | contents |
+| --- | --- |
+| `curve` | The exact challenge name or its alias. |
+| `factor_base` | An array of `{ "x": "0x...", "y": "0x..." }` public subgroup points. |
+| `relation_queries` | Integer strings `a` whose points `[a]G` are decomposed to build the relation matrix. |
+| `descent_shifts` | Integer strings `a` for the target queries `Q + [a]G`. |
+| `label` | Optional provenance text retained in the output. |
+
+Integers accept decimal or `0x` hex. Preparation files contain no factor-base
+logs or target log. Points, subgroup membership, duplicate sign orbits, matrix
+rank and scalar replay are checked. See the [functional tests](tests/certicom_solvers.rs)
+for constructed examples on both exact curves: BSGS recovers a scalar above
+`2^100`, rho recovers the special known answer `Q = -G`, and IC learns three
+base logs through a full-rank relation system and performs target descent.
+These are correctness fixtures, not natural-target yield or speed measurements.
