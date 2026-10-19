@@ -133,3 +133,9 @@ limit and the p=7 diagnostic with a 120-second outer limit, retaining failures
 and timeouts. These bounded controls do not complete W3b's registered study.
 No W2a cost cell or W2b pipeline is launched by this continuation. The checkpoint
 change and final input freeze are not a measured performance claim.
+
+## Post-freeze ownership correction, 2026-10-19 22:00 UTC
+
+The queued T-7 reservation was reported as a conflict even to its own continuation. The worker now parses Conductor JSON and accepts only a clear result or the exact configured task UUID, reference, owner, directory, mode and ready/claimed status. Any other holder, duplicate, missing identity or ambiguous outcome stops the handoff. An atomic task claim still follows the check. All 52 saved instances, successful generation, no live generator, full validation and a frozen commit remain prerequisites for Smith.
+
+Five Python regression tests pass, including changed identity/scope, mixed holders, duplicates and the unchanged completion gate. This modifies only orchestration; the scientific source, binaries and previous 4,402-pass full-library receipt are unchanged. The idle waiter was replaced with its supersession receipt preserved; generation was not restarted.

@@ -24,6 +24,30 @@ def digest(path):
 def complete_gate(state, count, generator_live):
     return state.get('status') == 'generation_complete' and count == 52 and not generator_live
 
+def owns_reservation(decision, task_ref, task_id, owner, scope):
+    """Accept only a clear check or this exact task's own reserved directory.
+
+    The CLI's JSON mode exits zero even on conflicts. Inspect the decision,
+    and never interpret an unrelated holder or duplicate as authorization.
+    This helper grants no lease; the existing atomic task claim still follows.
+    """
+    conflicts = decision.get('conflicts', [])
+    if decision.get('duplicates'):
+        return False
+    if decision.get('outcome') == 'allow':
+        return not conflicts
+    if decision.get('outcome') != 'block_conflict' or not conflicts:
+        return False
+    scope = 'dir:' + str(scope).lstrip('/')
+    return all(c.get('holder_task_ref') == task_ref
+               and c.get('holder_task_id') == task_id
+               and c.get('holder_owner') == owner
+               and c.get('holder_status') in ('ready', 'claimed')
+               and c.get('kind') == 'scope_overlap'
+               and c.get('holder_mode') == 'write_exclusive'
+               and c.get('resource') == scope
+               and c.get('requested') == scope for c in conflicts)
+
 def processes(root, generator_only=False):
     found = []
     for proc in Path('/proc').iterdir():
@@ -85,6 +109,14 @@ def main(config_path):
     def git(*args):
         return subprocess.check_output(['git','-C',str(freeze),*args],text=True).strip()
 
+    def ownership_check(name, summary, scope, task):
+        command(name, ['conductor','check','--summary',summary,
+                      '--scope','dir:'+str(scope),'--json'], root)
+        decision = json.loads((out/(name+'.log')).read_text())
+        if not owns_reservation(decision, cfg[task+'_task'], cfg[task+'_task_id'],
+                                cfg['conductor_owner'], scope):
+            raise RuntimeError(name+': unrelated or ambiguous ownership; no dependent work launched')
+
     def check_sources():
         for path, sha in cfg['source_hashes'].items():
             if digest(root/path) != sha: raise RuntimeError('generator source changed: '+path)
@@ -108,7 +140,7 @@ def main(config_path):
             if time.monotonic()>deadline: raise RuntimeError('24-hour continuation wait exhausted')
             time.sleep(10)
         check_sources()
-        command('freeze-conflict-check',['conductor','check','--summary','Validate and commit complete Diem inputs','--scope','dir:'+str(freeze)],root)
+        ownership_check('freeze-conflict-check','Validate and commit complete Diem inputs',freeze,'freeze')
         command('freeze-claim',['conductor','task','claim',cfg['freeze_task']],root)
         if git('rev-parse','HEAD') != cfg['freeze_base'] or git('status','--porcelain'):
             raise RuntimeError('isolated freeze checkout changed; inspect before committing')
@@ -146,14 +178,14 @@ def main(config_path):
             raise RuntimeError('W3b source changed; existing work needs reconciliation')
         if digest(cfg['w3b_binary'])!=cfg['w3b_binary_sha256']:
             raise RuntimeError('W3b validation binary changed')
-        command('w3b-conflict-check',['conductor','check','--summary','Resume interrupted Smith divisor-map validation','--scope','dir:'+str(w3b)],w3b)
+        ownership_check('w3b-conflict-check','Resume interrupted Smith divisor-map validation',w3b,'w3b')
         command('w3b-claim',['conductor','task','claim',cfg['w3b_task']],w3b)
         state['status']='validating_w3b';save()
         tests=['example1_quartic_and_counts','example1_pic_group_law','example1_verify','debug_p7']
         failures=[]
         for test in tests:
             if processes(w3b): raise RuntimeError('W3b process appeared; refusing duplicate validation')
-            command('w3b-check-'+test,['conductor','check','--summary','Continue the existing Smith validation controls','--scope','dir:'+str(w3b)],root)
+            ownership_check('w3b-check-'+test,'Continue the existing Smith validation controls',w3b,'w3b')
             try:
                 command('w3b-'+test,[cfg['w3b_binary'],'--exact','cryptanalysis::smith_isogeny::tests::'+test,
                         '--nocapture','--test-threads=1'],w3b,120 if test=='debug_p7' else 600,'24,25')
