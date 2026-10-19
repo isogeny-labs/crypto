@@ -16,8 +16,8 @@
     "passed": 4399,
     "failed": 0,
     "ignored": 118,
-    "duration_seconds": 214.5,
-    "latest_full_log": "failover-evidence.tar.gz: cargo-library-latest.txt"
+    "duration_seconds": 169.4,
+    "latest_full_log": "portability-evidence.tar.gz: library-after-portability.txt"
   },
   "s3_download_sha256": "passed",
   "files": {
@@ -112,5 +112,77 @@
     "temporary_home_tests": "passed",
     "actual_laptop_event": "not executed: no laptop access",
     "codex_trust_required": true
+  },
+  "windows_checkpoint_compilation": {
+    "schema": "spot.checkpoint-platform-compatibility/v1",
+    "observed_utc": "2026-10-19T06:23:36.404449+00:00",
+    "regression": "Windows release E0433 std::os::unix and E0599 OpenOptions::mode in checkpoint.rs",
+    "fix": "cfg(unix) import and permission setter; Linux creation retains mode 0600",
+    "native_runtime_source_commit": "fa8948a7f90b05c1fb127a908ac083ef5be69208",
+    "native_runtime_changed": false,
+    "scope": "compilation portability; Windows checkpoint runtime correctness not claimed",
+    "linux_release_library": {
+      "passed": 4399,
+      "failed": 0,
+      "ignored": 118,
+      "seconds": 169.4
+    },
+    "example_tests_passed": 2,
+    "infrastructure_tests_passed": 72,
+    "rustfmt": "passed",
+    "local_windows_crosscheck": {
+      "command": "CARGO_BUILD_JOBS=4 CARGO_TARGET_DIR=/home/ec2-user/ops/spot-windows-compat-check cargo check --locked --target x86_64-pc-windows-gnu --lib --no-default-features",
+      "result": "blocked by missing MinGW C compiler for bundled SQLite",
+      "exit_code": 101,
+      "missing_tool": "x86_64-w64-mingw32-gcc"
+    },
+    "windows_release_ci": "required; pending on follow-up PR",
+    "archive": {
+      "path": "portability-evidence.tar.gz",
+      "bytes": 89133,
+      "sha256": "8317673b7da2dd1dbca389da4301505fae640e2ca8b0a4c98ad3378943551465"
+    },
+    "files": [
+      {
+        "path": "checkpoint-portability.patch",
+        "bytes": 1113,
+        "sha256": "77bd133236da8280f1907a29b2bc49e29e8910467d98d02bc7aa4e10b0c0321e"
+      },
+      {
+        "path": "client-release.json",
+        "bytes": 54,
+        "sha256": "21473d8fd93ff462c44778cb9fe238c00c8964b4ed6cbf84c5849265894a02f1"
+      },
+      {
+        "path": "client-wake.json",
+        "bytes": 99,
+        "sha256": "12b268532f27d56b9fdb54286a3f90717a36b91a1ae7533f7d1ee370d279fea1"
+      },
+      {
+        "path": "example-after-portability.txt",
+        "bytes": 576,
+        "sha256": "c5245796a97141a74cb1e4e9e84a9d420e6488c766dc8015d23a16cd596ae764"
+      },
+      {
+        "path": "infrastructure-after-portability.txt",
+        "bytes": 581,
+        "sha256": "b4c050f59220284aadcb1bd59e61cb32324ab71072ff1f04372a96a1c07926e8"
+      },
+      {
+        "path": "library-after-portability.txt",
+        "bytes": 379101,
+        "sha256": "8020b2fc572f211d97be4d174811f50e2313695c336e8c2d26dd099ffdb0347e"
+      },
+      {
+        "path": "windows-local-crosscheck-missing-toolchain.txt",
+        "bytes": 4398,
+        "sha256": "ca58ed10eefb031b093b092289521dcd2e1689e1d055c75769ce32ebb941fdf5"
+      },
+      {
+        "path": "windows-release-failure.txt",
+        "bytes": 74178,
+        "sha256": "ba151e911c240bbc2780885faa083689c3e922d709793065753f142a68ca30dd"
+      }
+    ]
   }
 }

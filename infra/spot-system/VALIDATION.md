@@ -22,7 +22,7 @@ metadata/probe scripts; none contains process-memory images or credentials.
 | Idle shutdown | Real managed worker scaled to zero after 30 minutes; earlier activity record retained; original protected host excluded |
 | Laptop hooks and SSH wake | Installer/tests ready and AWS invocation/public-key checks passed; actual laptop installation/event remains blocked by missing laptop access |
 | Infrastructure tests | 72 passed; compilation, shell syntax and cfn-lint passed; `results.json`, full logs in new archive |
-| Repository release library gate | 4,399 passed, 0 failed, 118 ignored, 214.50 s; latest full log in new archive |
+| Repository release library gate | 4,399 passed, 0 failed, 118 ignored, 169.40 s after portability fix; full log in `portability-evidence.tar.gz` |
 | Touched example gate | 2 tests passed; prior built-in 104 checks retained |
 | S3/GitHub publication | Content-addressed private release and source PR; `artifacts.json` |
 
@@ -59,3 +59,15 @@ future managed workloads must implement/test a native checkpoint contract.
 Laptop execution access is the remaining activation gap. The package merges
 existing client settings and configures strict SSH verification. Codex's `/hooks`
 trust step is deliberately left to the user. No client trust store is bypassed.
+
+## Follow-up platform compatibility
+
+The previous PR #2232 had already merged. A subsequent release check exposed an
+unconditional Unix import and file-mode setter in the checkpoint module. The
+follow-up guards both with `cfg(unix)`, retaining Linux mode 0600. The release
+library, example and 72 infrastructure tests passed again. The deployed Linux
+native binary remains the pinned, previously validated artifact; no algorithm
+or serialized state format changed. Full Windows cross-checking on this host
+is blocked by the absent MinGW C compiler needed for bundled SQLite; Windows
+release CI remains a merge gate, not a claimed local pass. Exact failures and
+new test logs are retained in `portability-evidence.tar.gz` and its JSON receipt.
