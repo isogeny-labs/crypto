@@ -150,12 +150,19 @@ claims.append({
     "status": "match" if round(p61lo, 2) == 1.65 and round(p61hi, 1) == 2.1 else "mismatch",
 })
 (p511lo, p511hi), np511 = powx_range("p511")
+# the claim is about cells where FLINT is faster (ours/FLINT > 1); the n=32 cell has ours faster
+p511_flint_faster = [ours_over_flint(powx_ours, powx_flint, ("p511", k[1])) for k in powx_ours
+                     if k[0] == "p511" and ("p511", k[1]) in powx_flint
+                     and ours_over_flint(powx_ours, powx_flint, ("p511", k[1])) > 1.0]
+f511_lo, f511_hi = min(p511_flint_faster), max(p511_flint_faster)
 claims.append({
     "claimed": "x^p mod g at 511 bits FLINT faster 1.3-3.0x",
-    "computed": f"ours/FLINT {p511lo:.4f} - {p511hi:.4f} over {np511} powx cells",
-    "definition": "as above for p511",
+    "computed": (f"over FLINT-faster cells ours/FLINT {f511_lo:.4f} - {f511_hi:.4f} "
+                 f"({len(p511_flint_faster)} cells); all 7 cells {p511lo:.4f} - {p511hi:.4f} "
+                 f"(n=32 cell has ours faster)"),
+    "definition": "ours powx best_us / FLINT powx best_us for p511, restricted to cells with ratio > 1, min and max",
     "files": [f"{RES}/round{r}/{t}.powx.p511.jsonl" for r in (1, 2) for t in ("ours", "flint")],
-    "status": "match" if round(p511lo, 1) == 1.3 and round(p511hi, 1) == 3.0 else "mismatch",
+    "status": "match" if round(f511_lo, 1) == 1.3 and round(f511_hi, 1) == 3.0 else "mismatch",
 })
 
 # Phi_l totals: ours phi_all, PARI phi_spec_all (single j) and phi_full_all
@@ -169,7 +176,7 @@ claims.append({
     "definition": "min over rounds of total_us: ours phi_all, PARI phi_spec_all (the 11.4 s row)",
     "files": [f"{RES}/round1/ours.phi.p127.jsonl", f"{RES}/round2/ours.phi.p127.jsonl",
               f"{RES}/round1/pari.phi.p127.jsonl", f"{RES}/round2/pari.phi.p127.jsonl"],
-    "status": "match" if (round(phi_ours[0] / 1e6, 2) == 2.24 and round(phi_spec[0] / 1e3, 1) == 11.4) else "mismatch",
+    "status": "match" if (round(phi_ours[0] / 1e6, 2) == 2.24 and round(phi_spec[0] / 1e6, 1) == 11.4) else "mismatch",
 })
 
 

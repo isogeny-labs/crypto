@@ -52,7 +52,6 @@ rep = json.load(open(REPLAY))['replays']
 n_id = sum(1 for x in rep if x.get('reproduced') and x.get('detail') == 'identical')
 claims.append(dict(claimed='96/96 identical measured replays', computed=f"{n_id}/{len(rep)}", definition='replays[] reproduced and detail identical in replay-all.json', files=[REPLAY],
                    status='match' if n_id == len(rep) == 96 else 'mismatch'))
-claims.append(dict(claimed='B64/B32 measured exact pairs (8 targets x 3 rounds per arm)', computed='see n', definition='paired count not stated as a headline claim; not computed', files=[REC], status='cannot_define'))
 off, off_n = scan(r'drive\.google\.com|/Volumes|SSD|/Users|s3://|gs://|store:[A-Za-z0-9_\-]+|Modal volume|not committed|scratch')
 aa, aa_n = scan(r'A/A|A-A|null control|null-control|aa control|rho-neg-aa')
 iso, iso_n = scan(r'isolat|reserved core|\bL[012]\b|NUMA|pinned|shared|14 logical')

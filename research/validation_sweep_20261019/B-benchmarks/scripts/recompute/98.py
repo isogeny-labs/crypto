@@ -75,7 +75,6 @@ claims.append(dict(claimed='3/3 replays identical', computed=f"{n_id}/{len(rep)}
                    status='match' if n_id == len(rep) == 3 else 'mismatch'))
 claims.append(dict(claimed='within 2× of §11.16 model', computed='', definition='theoretical S from §11.16 is not in the committed raw records of this study',
                    files=[REC], status='cannot_define'))
-claims.append(dict(claimed='633 trials (headline count, repeat)', computed='', definition='duplicate of the above, not computed', files=[REC], status='cannot_define'))
 
 off, off_n = scan(r'drive\.google\.com|/Volumes|SSD|/Users|s3://|gs://|store:[A-Za-z0-9_\-]+|Modal volume|not committed|scratch')
 aa, aa_n = scan(r'A/A|A-A|null control|null-control|aa control|rho-neg-aa')

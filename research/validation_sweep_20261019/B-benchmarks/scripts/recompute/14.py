@@ -192,6 +192,29 @@ add('26/438 runs contended, left out',
     'run.contended == true in isolation.jsonl over non-PARI labels', [RUN + 'raw/isolation.jsonl'],
     n_contended_nonpari == 26 and len(n_nonpari) == 438)
 
+merged = []
+i = 0
+while i < len(claims):
+    c = claims[i]
+    if c['claimed'].endswith(', low end'):
+        h = claims[i + 1]
+        assert h['claimed'].endswith(', high end')
+        merged.append({'claimed': c['claimed'][:-len(', low end')],
+                       'computed': c['computed'] + ' ; ' + h['computed'],
+                       'definition': c['definition'],
+                       'files': c['files'],
+                       'status': 'match' if (c['status'] == 'match' and h['status'] == 'match') else 'mismatch'})
+        i += 2
+    else:
+        merged.append(c)
+        i += 1
+claims = merged
+
+for c in claims:
+    if c['claimed'].startswith('vs PARI'):
+        c['status'] = 'cannot_define'
+        c['definition'] += ('; PROTOCOL states ratio of medians only for A/B and A/A2 and does not state how PARI rounds are paired or ranged, so this range is cannot_define')
+
 # identical check: A vs B pairs, all runs (contention does not affect identity)
 pinned_bsgs1 = ['answers_digest', 'table_entries', 'baby_steps', 'giant_steps', 'candidates', 'false_candidates']
 pinned_bsgs_t = ['answers_digest']

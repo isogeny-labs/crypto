@@ -46,15 +46,46 @@ C4C1C2 = lambda b: "c4:lpsgebw2o100c@16+C1C2"
 C1C3 = lambda b: "r2:lpsgebw2o70c@32+C1"
 WCTRL = lambda b: "w:lpsgebw2@16" if b <= 17 else "w:lpsgebw2@8"
 
+
+# Gate 0: round-4 incumbent records vs round-3 R2 records (r2:lpsgebw2 family), per (bits, curve)
+R3 = "research/ic_improve3_20261015/01-genus3-relations/results/run"
+r3 = {}
+for f in sorted(glob.glob(os.path.join(C.REPO, R3, "b*_*.jsonl"))):
+    for line in open(f):
+        if not line.strip():
+            continue
+        rr = json.loads(line)
+        for x in rr["results"]:
+            if x["arm"].startswith("r2:lpsgebw2@") and x["arm"].endswith("+R1"):
+                r3[(rr["bits"], rr["curve"])] = x
+g_cmp = g_eq = g_diff = 0
+g_missing = []
+for b in range(12, 23):
+    for k in sorted(cost[INC(b)][b].keys()):
+        key = (b, k)
+        g_cmp += 1
+        if key not in r3:
+            g_missing.append(key)
+            g_diff += 1
+            continue
+        # round-4 record cost field vs round-3 cost field
+        r4cost = cost[INC(b)][b][k]
+        if r4cost == r3[key]["cost"]:
+            g_eq += 1
+        else:
+            g_diff += 1
+GATE0 = {"n_compared": g_cmp, "n_equal": g_eq, "n_differ": g_diff, "missing_round3": g_missing}
+
 B = list(range(12, 23))
 S = {}
-for nm, fn in [("inc", INC), ("C1", C1), ("AA", AA), ("C1C2", C1C2W), ("C2", C2W), ("C3", C3), ("C4C1C2", C4C1C2), ("C1C3", C1C3), ("Wctrl", WCTRL)]:
+for nm, fn in [("inc", INC), ("C1", C1), ("C1C2", C1C2W), ("C2", C2W), ("C3", C3), ("C4C1C2", C4C1C2), ("C1C3", C1C3), ("Wctrl", WCTRL)]:
     S[nm] = {b: mean_cost(fn(b), b) for b in B}
+S["AA"] = {b: mean_cost(AA(b), b) for b in range(12, 22)}  # aa arms exist for 12..21 only
 
 def ratio22(nm):
     return S[nm][22] / S["inc"][22]
 
-sl = {nm: {"12_22": slope(S[nm], 12, 22), "16_22": slope(S[nm], 16, 22)} for nm in S}
+sl = {nm: {"12_22": slope(S[nm], 12, 22), "16_22": slope(S[nm], 16, 22)} for nm in S if nm != "AA"}
 claims = []
 claims.append({"claimed": "C1 whole ratio 0.756 at 2^22", "computed": f"{ratio22('C1'):.4f}",
                "definition": "mean over curves 0,1,2 of cost(C1 arm) / cost(incumbent arm) at 22 bits (arms r2:lpsgebw2@8 family)",
@@ -102,9 +133,10 @@ claims.append({"claimed": "per-trial log slope 9.75 to 2.71 units per bit; per-t
                "computed": "not recomputed: per-trial primitive cost tables (pertrial_*.json) are not re-derived here",
                "definition": "units per trial by primitive; needs the unit model from the study", "files": [f"{RUN}/pertrial_r2.json"],
                "status": "cannot_define"})
-claims.append({"claimed": "Gate 0: 41/41 r2:lpsgebw2 records equal round 3",
-               "computed": "not recomputed in this row (round-3 records compared only through gate0.md)",
-               "definition": "field-by-field equality against round-3 records", "files": [f"{RUN}/gate0.md"], "status": "cannot_define"})
+claims.append({"claimed": "Gate 0: 41/41 r2:lpsgebw2 records equal round 3 (cost field)",
+               "computed": f"{GATE0['n_equal']}/{GATE0['n_compared']} equal on the cost field; missing round-3 pairs {GATE0['missing_round3']}",
+               "definition": "per (bits, curve) cost equality between round-4 r2:lpsgebw2 and round-3 r2:lpsgebw2+R1; only the cost field is compared, not k, relation cost, LA counters or steps",
+               "files": [f"{RUN}/gate0.md", R3], "status": "partial"})
 
 offrepo = C.grep_lines([STUDY], C.OFFREPO_PAT)
 aa_lines = C.grep_lines([f"{RUN}/analysis_aa.md", f"{STUDY}/README.md"], C.AA_PAT, cap=40)
@@ -115,8 +147,9 @@ row = {
     "row_no": 45,
     "slug": "20261015-ic-improve4-01-genus3-relations",
     "claims": claims,
-    "identical": {"claimed": True, "n_compared": None, "n_equal": None, "n_differ": None,
-                  "files": [f"{RUN}/gate0.md"], "status": "cannot_define"},
+    "identical": {"claimed": True, "n_compared": GATE0["n_compared"], "n_equal": GATE0["n_equal"], "n_differ": GATE0["n_differ"],
+                  "files": [f"{RUN}/b*_*_r2.jsonl (round 4, arm r2:lpsgebw2@16/@8)", f"{R3}/b*_*.jsonl (round 3, arm r2:lpsgebw2@16/@8+R1)"],
+                  "status": "match" if GATE0["n_differ"] == 0 else "mismatch"},
     "offrepo_refs": offrepo,
     "aa_lines": aa_lines,
     "isolation_lines": iso_lines,

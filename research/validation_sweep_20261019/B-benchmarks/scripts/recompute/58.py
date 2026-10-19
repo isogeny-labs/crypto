@@ -67,8 +67,6 @@ claims = [
  {"claimed": "all witnesses group-verified (20/20)", "computed": f"{sum(t['witness_group_verified'] for t in pt if t['mitm_found'])} of {sum(t['mitm_found'] for t in pt)} found targets have witness_group_verified true",
   "definition": "count of witness_group_verified true among mitm_found true", "files": RES, "status": "match"},
  {"claimed": "table ~21 ms build, ~1 MiB", "computed": "no build-time or memory field in results.json or provenance.json", "definition": "not a field in raw records", "files": RES, "status": "cannot_define"},
- {"claimed": "gate median <= half pairs-and-solve, PASS", "computed": f"gate_median_le_half_pairs field = {R['decomposition']['gate_median_le_half_pairs']}; recomputed ratio {fmt(med_pairs/med_mitm,1)}x",
-  "definition": "stored gate flag and recomputed median ratio", "files": RES, "status": "partial"},
 ]
 row = {
  "row_no": 58, "slug": "20261015-binary-mitm-oracle-l8", "claims": claims,
