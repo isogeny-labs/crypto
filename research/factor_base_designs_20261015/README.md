@@ -62,6 +62,49 @@ Status vocabulary:
 | 9 | Weighted-homogeneous towers | open | — | E9 |
 | 10 | Split `S₃` chain + towers | open | — | E10 |
 
+#### Prime-field arms measured: status at close-out (2026-10-19)
+
+Scored by κ = Δlog₂ field_ops / Δb against the break-even `m − 1`
+(Amendments 4 and 5). Every number is copied from
+[`runs/analysis-amendment4.txt`](runs/analysis-amendment4.txt) (p₁ series;
+"cells" = completed cells in the series; "n/r" = not run at that `m`). Verdicts
+are read at the sizes measured and are not extrapolated beyond them. The
+status is **cost-unfavourable** at `m = 2, 3` for every arm below, and at
+`m = 4` for A11, the only arm other than A0 measured there. No arm was run at
+`m = 4` except A0 and A11, so "`m ≤ 4`" is claimed only for A11.
+
+| arm | `m = 2`: κ (cells) vs 1 | `m = 3`: κ (cells) vs 2 | `m = 4`: κ (cells) vs 3 | status |
+|:--|:--|:--|:--|:--|
+| A0 (Kummer tower, incumbent) | 3.593 (8) | 7.468 (3) | 10.773 (2) | cost-unfavourable at `m = 2, 3`; **inconclusive** at `m = 4` (2 cells; its `t = 4` cell exhausts the 13 GB memory limit) |
+| N (A0's null) | 3.596 (8) | 7.772 (3) | n/r | cost-unfavourable at `m = 2, 3` |
+| A1z | 6.050 (5) | 8.905 (3) | n/r | cost-unfavourable at `m = 2, 3` |
+| A1g | 5.809 (5) | 9.189 (3) | n/r | cost-unfavourable at `m = 2, 3` |
+| A4 | 4.902 (6) | 8.028 (3) | n/r | cost-unfavourable at `m = 2, 3` |
+| A11 | 3.995 (8) | 8.769 (4) | 14.886 (3) | cost-unfavourable at `m = 2, 3, 4` |
+| N11 (A11's shape null) | 4.014 (8) | 8.582 (3) | n/r | cost-unfavourable at `m = 2, 3` |
+| H1 | 3.535 (8) | 7.660 (3) | n/r | cost-unfavourable at `m = 2, 3` |
+| H2 | 3.923 (8) | 9.158 (3) | n/r | cost-unfavourable at `m = 2, 3` |
+
+Where σ and κ disagree, κ is the score: A1z and A1g sit at `D = 8` (their
+input degree) and A11 has a flat `D`, yet their κ is at or above A0's
+(Amendment 5). Designs 2, 3, 5–10 and 12–16 were not measured and keep their
+"open" status above.
+
+**Observation, not a claim: κ/(m − 1) by arm and arity.** Each quotient was
+recomputed from the κ and `m − 1` in `runs/analysis-amendment4.txt`:
+
+| arm | `m = 2` | `m = 3` | `m = 4` |
+|:--|:--|:--|:--|
+| A0 | 3.593 / 1 = 3.59 (8 cells) | 7.468 / 2 = 3.73 (3 cells) | 10.773 / 3 = 3.59 (2 cells, **inconclusive**) |
+| A11 | 3.995 / 1 = 3.995 (8 cells) | 8.769 / 2 = 4.38 (4 cells) | 14.886 / 3 = 4.96 (3 cells) |
+
+For A0 the quotient is 3.59, 3.73, 3.59; for A11 it is 3.995, 4.38, 4.96. The
+A0 values rest on 8, 3 and 2 cells, and the `m = 4` value is below the
+preregistered 3-cell floor. Each κ is a least-squares slope over 2–8 points
+of one series on one prime, with no interval recorded. Nothing is
+extrapolated: no value is stated for `m > 4`, for larger `t`, or for a deployed
+size, and the quotients are not a hypothesis test or a fitted law.
+
 ### Changing the equation
 
 | # | design | status | Lean | experiment |
@@ -229,15 +272,59 @@ Amendment 4 was registered before any of its rows. Every row now records
   function-and-chain combination, with a steeper per-bit growth. It is not a
   slope change.
 
+### Close-out of the prime-field slope line (2026-10-19)
+
+Observations only; no new run. Sources: `runs/analysis-amendment4.txt`,
+[`reports/review-20261019T1632Z/REVIEW.pdf`](reports/review-20261019T1632Z/REVIEW.pdf)
+(κ against `m − 1`, per arm, with cell counts), and the status table and
+κ/(m − 1) observation in §2.
+
+- **Statuses.** Every prime-field arm with at least 3 completed cells is
+  cost-unfavourable at the sizes measured: `m = 2, 3` for all of them, and
+  `m = 4` for A11 (κ = 14.886 vs 3, 3 cells). A0 at `m = 4` is
+  **inconclusive** (κ = 10.773, 2 cells).
+- **Amendment 5** makes κ the primary score for every later round, with the
+  `m − 1` break-even and Amendment 4's thresholds; σ is secondary. It changes
+  no verdict here.
+- **Owed, still open:**
+  - A0's third `m = 4` cell (`t = 4`): blocked on a machine with more than
+    13 GB of memory, or lab-runner (isolab) credentials. This container has
+    neither. Until it completes, A0 at `m = 4` stays inconclusive and the
+    A0-versus-A11 comparison at `m = 4` has 2 against 3 cells.
+  - The Mathlib cyclicity bridges behind K7 and K8: not attempted. The
+    Mathlib cache did not fit the container's disk beside the toolchain
+    (§4), and the disk is shared with concurrent work.
+  - The novelty audit: written in
+    [`NOVELTY_AUDIT.md`](NOVELTY_AUDIT.md) for A11, A1, A4 and H1/H2 only.
+    It is a search of the sources it lists, not a proof of absence. Designs
+    outside those four were not audited.
+
 ## 6. What this round does not establish
 
 - No design here is shown to reduce any cost. The Lean theorems show that
   presentations are correct, that some designs are empty or neutral in the
   mean, and what the break-even means *within the cost model*. The question
-  that matters, `σ` on real systems, is the experiments' job.
-- "Never seen before" means not in `docs/ic/factor-base-encyclopedia/` or
-  `research/nagao_relations/`, plus a literature check from memory. The
-  closest prior work: Petit–Kosters–Messeng 2016 (towers), Nagao and
-  Joux–Vitse (Riemann–Roch decompositions), FPPR 2012, Petit–Quisquater
-  2012, Huang–Kosters–Yeo 2015, Bachoc–Serra–Zémor 2017. A novelty audit is
-  owed before any design is described as new outside this repository.
+  that matters, the measured cost (κ, Amendment 5) on real systems, is the experiments' job.
+- "Never seen before" is not claimed. [`NOVELTY_AUDIT.md`](NOVELTY_AUDIT.md)
+  (2026-10-19) searched the literature for A11, A1, A4 and H1/H2 from
+  abstracts, slides and snippets, with no full text read: A11, A4 and H1/H2
+  are **partly prior** (closest: Petit–Kosters–Messeng 2016, Nagao,
+  Joux–Vitse, Gaudry, Diem), and A1 is **not found in the sources checked**
+  (its encoding is elementary and A1z's set is PKM's). The other designs were
+  not audited, and a full-text reading is owed before any status is quoted
+  outside this repository.
+- **Measured scope.** The prime-field verdicts are cost-unfavourable at the
+  sizes and `m` listed in §2 (`m ≤ 3` for most arms, `m ≤ 4` for A11). A0 at
+  `m = 4` is inconclusive. Nothing is extrapolated to `m > 4` or deployed
+  sizes, and the κ/(m − 1) quotients are an observation, not a claim.
+- **Owed.**
+  - A0's third `m = 4` cell (`t = 4`): needs a machine with more than 13 GB of
+    memory, or lab-runner (isolab) credentials; this container has neither.
+  - The Mathlib cyclicity bridges behind K7 and K8 (`F_{2^n}^*` cyclic; a
+    group of prime order is cyclic): still owed. The Mathlib cache did not fit
+    the container's disk beside the toolchain, and the disk is shared, so it
+    was not attempted.
+  - Full-text reading behind `NOVELTY_AUDIT.md`, and an audit of the designs it
+    does not cover.
+  - Experiments E2, E3, E5–E10, E12–E16, E-K1, E-K4, E-K6 (unrun), and a
+    formalization of the K3 theorem.

@@ -335,3 +335,34 @@ cells per arm. Nothing yet says which part of A11 makes it cheaper.
 **Predictions.** C1: every arm cost-unfavourable at m ∈ {2, 3}. C2: A11's
 cell completes and A0's does not. C3: p₃ admitted. C4: the curve relation
 carries it.
+
+### Amendment 5, 2026-10-19: κ becomes the primary score for every later round
+
+Registered at the close-out of the prime-field slope line, before any further
+row. It changes no existing row, verdict, threshold or prediction, and no
+verdict above is re-read under it.
+
+**Rule.** Every later round of this study scores each (arm, m, prime) series
+by **κ = Δlog₂ field_ops / Δb** (Amendment 4, C1), against the break-even
+`m − 1`, with Amendment 4's verdict thresholds unchanged: *cost-favourable*
+if κ < m − 1 on at least 3 completed cells, *cost-unfavourable* if κ ≥ m − 1
+on at least 3, otherwise *inconclusive*, read at the sizes measured and not
+extrapolated. **σ (the degree slope of §1) stays a secondary quantity**,
+recorded and reported with its §1 labels, but it decides nothing and is never
+the headline of a verdict. Any new arm's rows must carry `field_ops`, and a
+series whose rows lack it is *inconclusive* for the primary score.
+
+**Reason.** σ misread two arms, as `runs/analysis-amendment4.txt` shows.
+- A1 (A1z and A1g): D is 8 in every cell, its input degree, so σ = 0.0000 and
+  both read *candidate* at `m = 2` and `m = 3`. Their κ is 6.050 and 5.809 at
+  `m = 2` (against 1) and 8.905 and 9.189 at `m = 3` (against 2), above A0's
+  3.593 and 7.468. Their `max_cols` at `m = 3` is 39 648 (A1z) and 41 629
+  (A1g) at `t = 4`, against A0's 12 314.
+- A11: D is flat or nearly so (σ = 0.1786 at `m = 2`; 0.0000 at `m = 3` on
+  p₂ and 0.3000 with the `t = 5` cell on p₁), yet κ is 3.995 and 8.769 against
+  A0's 3.593 and 7.468, and 14.886 against 3 at `m = 4`. It starts cheaper
+  and grows faster per bit.
+
+**Scope.** Amendment 4 already scored κ; this amendment only fixes its role.
+The `m = 4` break-even is 3, and A0's `m = 4` series (2 completed cells)
+stays *inconclusive* until its `t = 4` cell completes (README §5, "Close-out").
