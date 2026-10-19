@@ -254,6 +254,9 @@ fn recover(
         .map(|d| inst.curve.mul(&inst.curve.g, d) == inst.q)
         .unwrap_or(false);
     let check_ops = inst.curve.ops() - check_start;
+    if recovered.is_some() && !verified {
+        return Err("linear algebra returned an invalid scalar".into());
+    }
     Ok(
         json!({"coefficient":c,"residuals":residuals,"rank":system.rank(),
         "unknowns":base.len()+1,"recovered_scalar":recovered,"verified":verified,
@@ -286,6 +289,7 @@ fn analyze(directory: &str) -> Result<(), Box<dyn std::error::Error>> {
     let mut exhausted = 0;
     let mut point_commands = String::new();
     let mut identities = Vec::new();
+    let mut registry_rows = Vec::new();
     let mut recovery_rows=String::from("\n# Synthetic one-target recoveries\n\n| p | seed | weight | residuals | independent rank | status |\n|---:|---:|---:|---:|---:|:---|\n");
     for record in &records {
         let p = record["p"].as_u64().unwrap();
@@ -336,16 +340,40 @@ fn analyze(directory: &str) -> Result<(), Box<dyn std::error::Error>> {
         point_commands.push_str(&format!("{{p={p};z=ffgen(Mod(1,p)*(x^3-{}),'z);E=ellinit([{},{}]);P=[{},{}];Q=[{},{}];[ellcard(E)=={n},ellmul(E,P,{n})==[0],ellmul(E,P,{})==Q]}}\n",
             curve["field"]["c"],coord(&curve["a"]),coord(&curve["b"]),coord(&g["x"]),coord(&g["y"]),coord(&q["x"]),coord(&q["y"]),record["known_answer"]));
         identities.push(record["curve_id"].clone());
+        let id = &record["curve_id"];
+        let parts: Vec<_> = id["icv1"].as_str().unwrap().split(':').collect();
+        let model: Value = serde_json::from_str(id["model_json"].as_str().unwrap())?;
+        registry_rows.push(json!({
+            "slug":id["slug"], "icv1":id["icv1"], "model_json":id["model_json"],
+            "trace":parts[2].parse::<i64>()?, "order":n.to_string(),
+            "j":parts[4], "end":parts[5], "family":"extension",
+            "params":{"p":model["p"],"k":3,"modulus":model["modulus"],
+                "a":model["a"],"b":model["b"]},
+            "representations":[{
+                "field":{"characteristic":p,"degree":3,"representation":"polynomial",
+                    "modulus":[(p-curve["field"]["c"].as_u64().unwrap())%p,0,0,1],
+                    "element_encoding":"decimal coefficient list [e_0, ..., e_{k-1}] of e_0 + e_1 t + ... + e_{k-1} t^{k-1} modulo the monic modulus"},
+                "curve":{"model":"short Weierstrass","coefficients":[[0,0,0],[0,0,0],[0,0,0],curve["a"],curve["b"]],
+                    "subgroup_order":n.to_string(),"cofactor":1,"generator":[g["x"],g["y"]],
+                    "target_group":"prime-order subgroup"}}],
+            "construction":{"function":"generate_instance3","p":p,"seed":seed},
+            "evidence":format!("{directory}/records.jsonl")
+        }));
     }
     report.push_str(&recovery_rows);
     report.push_str(&format!("\nCompleted {completed} recoveries; {exhausted} budget-exhausted recoveries. Total independently checked PDP decisions, including A/A controls and recovery attempts: {total_checks}. The independent comparison is against a separate dictionary, not an independent host.\n"));
-    report.push_str("\n# Limits and next checks\n\nThe legacy pair API does not emit internal lookup, polynomial addition/division, allocation or RNG counts. Its F_p multiplication counter also uses legacy inverse accounting. These missing counts prevent a complete pricing band, S, or ranking against rho. No strongest-external-solver comparison was run: Magma, msolve and FGb are unavailable here. The reusable base/dictionary and all excluded verification/setup ledgers are explicit in the raw records. No binary-field or ECC2K transfer was tested.\n\nThe next discriminating step is complete native counters plus matched ecbench one-target rho measurements, with independent-host replay and the fastest available external algebraic reference. These obligations remain open; verified recoveries alone do not discharge them.\n\n# Reproduction and provenance\n\nSee config.json, host.txt, SHA256SUMS, records.jsonl, the committed PROTOCOL.md and examples/weil_weighted_decomposition.rs. Seed 936451 is the holdout. Inputs and outputs are public synthetic fixtures. Histories from the earlier Python experiment remain historical and are not runtime baselines. All A/A decisions and deterministic counters were asserted equal.\n");
+    report.push_str("\n# Limits and next checks\n\nThe legacy pair API does not emit internal lookup, polynomial addition/division, allocation or RNG counts. Its F_p multiplication counter also uses legacy inverse accounting. These missing counts prevent a complete pricing band, S, or ranking against rho. No strongest-external-solver comparison was run: Magma, msolve and FGb were not run here. Base and weighted-slot setup, verification group operations, residual-generation group operations and modular elimination multiplications have separate ledgers. Dictionary construction, reference arithmetic and fixture generation are excluded validation/setup work without complete operation ledgers. No binary-field or ECC2K transfer was tested.\n\nThe next discriminating step is complete native counters plus matched ecbench one-target rho measurements, with independent-host replay and the fastest available external algebraic reference. These obligations remain open; verified recoveries alone do not discharge them.\n\n# Reproduction and provenance\n\nSee config.json, host.txt, SHA256SUMS, records.jsonl, the committed PROTOCOL.md and examples/weil_weighted_decomposition.rs. Seed 936451 is the holdout. Inputs and outputs are public synthetic fixtures. Histories from the earlier Python experiment remain historical and are not runtime baselines. All A/A decisions and deterministic counters were asserted equal.\n");
     fs::write(root.join("REPORT.md"), &report)?;
     fs::write(root.join("RUN_REPORT.md"), &report)?;
     fs::write(root.join("pari_checks.gp"), point_commands)?;
     fs::write(
         root.join("curve-identities.json"),
         serde_json::to_vec_pretty(&identities)?,
+    )?;
+    fs::write(
+        root.join("native-registry.json"),
+        serde_json::to_vec_pretty(&json!({
+        "schema":"weil-weighted.native_registry/v1","curves":registry_rows}))?,
     )?;
     fs::write(
         root.join("summary.json"),
@@ -366,7 +394,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return analyze(&summary_dir);
     }
     if args.iter().any(|a| a == "--help") {
-        println!("--primes 31,61,127,241,499,1009 --seeds 20261019,936451 --queries 128 --dlp-max-p 241 --max-residuals 10000 --max-pair-tests 5000000 --out NEW_DIR");
+        println!("--primes 31,61,127,241,499,1009 --seeds 20261019,936451 --queries 128 --dlp-max-p 241 --max-residuals 10000 --max-pair-tests 5000000 --out NEW_DIR\n--summarize EXISTING_RUN_DIR");
         return Ok(());
     }
     let primes: Vec<u64> = args_list(&args, "--primes", "31,61,127,241,499,1009")
@@ -483,6 +511,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn pair_budget_stops_inside_a_residual() {
+        let original = generate_instance3(31, 20261019);
+        let inst = Instance3 {
+            curve: original.curve,
+            q: original.q,
+            d: 0,
+        };
+        let base = SubspaceBase::build(&inst, &mut StdRng::seed_from_u64(321));
+        let pairs = pair_reference(&inst, &base);
+        let result = recover(&inst, &base, &pairs, 1, 71, 10000, 1).unwrap();
+        assert_eq!(result["verified"], false);
+        assert_eq!(result["status"], "budget_exhausted");
+        assert_eq!(result["counts"]["pair_tests"], 1);
+    }
+
     #[test]
     fn exhaustive_weighted_decisions_match_independent_dictionary() {
         for seed in [7, 19] {

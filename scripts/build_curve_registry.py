@@ -714,6 +714,22 @@ def harvest_native_factor_base_history(reg: Registry) -> None:
         reg.add(ident, row["family"], row["params"], str(path.relative_to(REPO)), [])
 
 
+def harvest_native_weighted_weil(reg: Registry) -> None:
+    """Join Rust-exported model identities and exact representations; no arithmetic."""
+    rel = "docs/curves/sources/weil-weighted-20261019.json"
+    path = REPO / rel
+    if not path.exists():
+        return
+    doc = json.loads(path.read_text())
+    if doc.get("schema") != "weil-weighted.native_registry/v1":
+        raise ValueError("unsupported weighted Weil native registry")
+    for row in doc["curves"]:
+        ident = dict(row, model_sha256=hashlib.sha256(row["model_json"].encode()).hexdigest())
+        reg.add(ident, row["family"], row["params"], rel, [])
+        for representation in row["representations"]:
+            reg.represent(ident, representation["field"], representation["curve"], rel)
+
+
 def build() -> tuple[dict, list[str], list[str]]:
     reg, problems, fatal = Registry(), [], []
     harvest_standards(reg)
@@ -723,6 +739,7 @@ def build() -> tuple[dict, list[str], list[str]]:
     harvest_text_koblitz(reg)
     harvest_native_standards(reg)
     harvest_native_factor_base_history(reg)
+    harvest_native_weighted_weil(reg)
     harvest_programme_extensions(reg)
     carry_forward(reg)
     ambiguous = sorted(f"{reg.alias_text[k]!r} -> {len(v)} models"
