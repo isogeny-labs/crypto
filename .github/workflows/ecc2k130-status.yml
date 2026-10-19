@@ -14,10 +14,6 @@ on:
         description: "Read the original rho-dp endpoint and secret reference; do not publish Pages"
         type: boolean
         default: false
-      source_report_certificate:
-        description: "PEM public recipient certificate for encrypting the connection report"
-        type: string
-        default: ""
   pull_request:
     paths:
       - ".github/workflows/ecc2k130-status.yml"
@@ -102,7 +98,6 @@ jobs:
           allowed-account-ids: "590183823895"
       - name: Read source connection metadata
         env:
-          RHO_SOURCE_REPORT_CERT: ${{ inputs.source_report_certificate }}
           RHO_SOURCE_REPORT_DEST: s3://ecc-challenges-data-104186811093/connection-checks/ecc2k130-20261019/6626ec30ad72464ddcd61618d5a9f261.pem
         run: |
           export RHO_SOURCE_REPORT_CERT="${RHO_SOURCE_REPORT_CERT:-$(cat scripts/rho_status/source_connection_recipient.pem)}"
