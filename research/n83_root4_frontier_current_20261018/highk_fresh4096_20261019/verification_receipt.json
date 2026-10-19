@@ -1,0 +1,34 @@
+{
+  "binary_sha256": "68a8f51df94be895e1a189f950da9304ecb1689b9b74dd72994ec1ca2a1f46d0",
+  "example_summary": "21 passed; 0 failed",
+  "example_test": "TMPDIR=/Volumes/SSD990-2/tmp CARGO_TARGET_DIR=/Volumes/SSD990-2/tmp/n83_id30_current_build cargo test --release --offline --example koblitz_orbit_dlp_fast",
+  "identity_audit_sha256": "81f21ca4b6121389fad0e7ededcd6a5e5d85bdef607d0bb2f617216ca80b83d7",
+  "library_summary": "4162 passed; 0 failed; 117 ignored",
+  "library_test": "TMPDIR=/Volumes/SSD990-2/tmp CARGO_TARGET_DIR=/Volumes/SSD990-2/tmp/n83_id30_current_build cargo test --release --offline --lib -- --test-threads=2",
+  "logs": [
+    {
+      "gzip_bytes": 65742,
+      "gzip_sha256": "91ce8b245d68837c4a859e0ce06ffc0af11256a7da4f9bfcd538a47dab878cd4",
+      "name": "cargo_lib",
+      "raw_bytes": 356304,
+      "raw_sha256": "038f3f1d7ed20e56c61a0ef38d8f0722bfe40d9610187d067d6012c7bd2aaac8"
+    },
+    {
+      "gzip_bytes": 686,
+      "gzip_sha256": "a1e7a77b128add8176ddc1f21ee121088e5c7ebbae1b5e3c4d0bea09843e5c34",
+      "name": "cargo_example",
+      "raw_bytes": 2199,
+      "raw_sha256": "13246f6d2cce93da04e79efdac0bd8fee69fe0817c2209bb313b4f522715d63b"
+    }
+  ],
+  "portable_replay_receipt_sha256": "2499ec210a7e1d29b107430a3935b19d4f0739ca00e775077bed1961c90e15e0",
+  "python_checks": [
+    "python3 -m py_compile scripts/*.py",
+    "scripts/verify_portable.py --repo . --base-dir <published-base-dir>",
+    "scripts/recompute_statistics.py --evidence <evidence-dir>"
+  ],
+  "schema": "n83.wide3-fresh4096-verification/v1",
+  "source_sha256": "4a94e4e570f0cc4e39ba5c0846e411a6c43820c28119f7b9802e549023596507",
+  "statistics_replay_receipt_sha256": "e587f0f4a8879648148cd00c7da2bacf5f5062232088a3b100ef41d658eec30b",
+  "status": "PASS"
+}
