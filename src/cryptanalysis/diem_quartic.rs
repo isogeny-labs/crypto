@@ -2921,7 +2921,7 @@ fn ceil_i(x: f64) -> i64 {
 
 /// Execute one IC cell: relation phase, structured elimination, Wiedemann, with the
 /// protocol's verification and ell-part tests. `wall_cap_s` bounds relation + LA wall time.
-pub fn run_ic_cell(inst: &Inst, arm: Arm, kappa: f64, seed: u64, wall_cap_s: f64, do_rank_profile: bool) -> IcCell {
+pub fn run_ic_cell(inst: &Inst, arm: Arm, kappa: f64, seed: u64, wall_cap_s: f64, do_rank_profile: bool, skip_la: bool) -> IcCell {
     let start = std::time::Instant::now();
     let deadline = start + std::time::Duration::from_secs_f64(wall_cap_s);
     let mont = Mont::new(inst.ell);
@@ -2951,6 +2951,12 @@ pub fn run_ic_cell(inst: &Inst, arm: Arm, kappa: f64, seed: u64, wall_cap_s: f64
         col.ctr.elim_ops += eo;
         col.ctr.elim_entries += ee;
         cell.rows_after_elim = rows.len();
+        if skip_la {
+            cell.la_wall_s += t.elapsed().as_secs_f64();
+            cell.status = "rel_only".into();
+            cell.target_final = target;
+            break;
+        }
         if std::env::var("DQ_DEBUG").is_ok() {
             eprintln!("[dq] elim done rows={} ops={} t={:.2}", rows.len(), eo, t.elapsed().as_secs_f64());
         }
@@ -3144,7 +3150,7 @@ mod tests {
     #[test]
     fn full_cell_k8() {
         let inst = gen_instance(8, 0);
-        let c = run_ic_cell(&inst, Arm::Full, 1.0, 11, 300.0, true);
+        let c = run_ic_cell(&inst, Arm::Full, 1.0, 11, 300.0, true, false);
         eprintln!("{}", c.to_json());
         assert_eq!(c.ctr.verify_failed, 0);
         assert_eq!(c.push_fail, 0);
@@ -3157,7 +3163,7 @@ mod tests {
     fn slp_dlp_cells_k10() {
         let inst = gen_instance(10, 0);
         for (arm, kappa) in [(Arm::Slp, 2.0), (Arm::Dlp, 4.0)] {
-            let c = run_ic_cell(&inst, arm, kappa, 5, 300.0, false);
+            let c = run_ic_cell(&inst, arm, kappa, 5, 300.0, false, false);
             eprintln!("{}", c.to_json());
             assert_eq!(c.ctr.verify_failed, 0);
             assert_eq!(c.push_fail, 0);
