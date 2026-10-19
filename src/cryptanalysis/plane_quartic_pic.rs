@@ -230,7 +230,6 @@ struct Quot {
     free_rank: Vec<Option<usize>>,
     /// For a pivot position `p` (row index `r`): coordinates of `e_p` mod `W`.
     red: Vec<Vec<u32>>,
-    pivrow: Vec<usize>,
     qdim: usize,
 }
 
@@ -252,7 +251,6 @@ pub struct PlaneQuartic {
     /// Coefficients of `F` in the order of `mons_of_degree(4)`.
     f: [u32; 15],
     mons: Vec<Vec<(u8, u8, u8)>>,
-    midx: Vec<Vec<usize>>,
     dim: Vec<usize>,
     std_mon: Vec<Vec<usize>>,
     nf: Vec<Vec<Vec<(usize, u32)>>>,
@@ -280,8 +278,16 @@ pub fn smoothness_certificate(q: u32, f: &[u32; 15]) -> bool {
     let m4 = mons_of_degree(4);
     let m3 = mons_of_degree(3);
     let m7 = mons_of_degree(7);
-    let m7i: HashMap<(u8, u8), usize> = m7.iter().enumerate().map(|(i, m)| ((m.0, m.1), i)).collect();
-    let m3i: HashMap<(u8, u8), usize> = m3.iter().enumerate().map(|(i, m)| ((m.0, m.1), i)).collect();
+    let m7i: HashMap<(u8, u8), usize> = m7
+        .iter()
+        .enumerate()
+        .map(|(i, m)| ((m.0, m.1), i))
+        .collect();
+    let m3i: HashMap<(u8, u8), usize> = m3
+        .iter()
+        .enumerate()
+        .map(|(i, m)| ((m.0, m.1), i))
+        .collect();
     // partials
     let mut part = vec![vec![0u32; 10]; 3];
     for (i, &(a, b, c)) in m4.iter().enumerate() {
@@ -360,12 +366,12 @@ impl Fq {
 
 /// Is `q` an odd prime below `2^31`?
 pub fn is_odd_prime_below_2_31(q: u64) -> bool {
-    if q < 3 || q >= (1u64 << 31) || q % 2 == 0 {
+    if !(3..(1u64 << 31)).contains(&q) || q.is_multiple_of(2) {
         return false;
     }
     let mut d = 3u64;
     while d * d <= q {
-        if q % d == 0 {
+        if q.is_multiple_of(d) {
             return false;
         }
         d += 2;
@@ -414,7 +420,8 @@ impl PlaneQuartic {
         let mut nf: Vec<Vec<Vec<(usize, u32)>>> = vec![vec![]; MAXD + 1];
         for n in 0..=MAXD {
             let ms = &mons[n];
-            let is_std = |m: &(u8, u8, u8)| !(n >= 4 && m.0 >= lead.0 && m.1 >= lead.1 && m.2 >= lead.2);
+            let is_std =
+                |m: &(u8, u8, u8)| !(n >= 4 && m.0 >= lead.0 && m.1 >= lead.1 && m.2 >= lead.2);
             let mut pos = vec![usize::MAX; ms.len()];
             for (i, m) in ms.iter().enumerate() {
                 if is_std(m) {
@@ -474,7 +481,6 @@ impl PlaneQuartic {
             q,
             f,
             mons,
-            midx,
             dim,
             std_mon,
             nf,
@@ -558,7 +564,8 @@ impl PlaneQuartic {
                 continue;
             }
             let t = self.fq.mulu(
-                self.fq.mulu(self.fq.powu(p[0], a as u64), self.fq.powu(p[1], b as u64)),
+                self.fq
+                    .mulu(self.fq.powu(p[0], a as u64), self.fq.powu(p[1], b as u64)),
                 self.fq.powu(p[2], c as u64),
             );
             s = (s as u64 + self.fq.mulu(t, self.f[i]) as u64).rem_euclid(self.q as u64) as u32;
@@ -578,7 +585,8 @@ impl PlaneQuartic {
             .map(|&mi| {
                 let (a, b, c) = self.mons[n][mi];
                 self.fq.mulu(
-                    self.fq.mulu(self.fq.powu(p[0], a as u64), self.fq.powu(p[1], b as u64)),
+                    self.fq
+                        .mulu(self.fq.powu(p[0], a as u64), self.fq.powu(p[1], b as u64)),
                     self.fq.powu(p[2], c as u64),
                 )
             })
@@ -675,16 +683,13 @@ impl PlaneQuartic {
             }
         }
         let mut red = vec![vec![]; n];
-        let mut pivrow = vec![usize::MAX; n];
         for (r, &p) in piv.iter().enumerate() {
-            pivrow[p] = r;
             red[p] = free.iter().map(|&f| self.fq.neg(rows[r][f])).collect();
         }
         Quot {
             rows,
             free_rank,
             red,
-            pivrow,
             qdim: free.len(),
         }
     }
@@ -713,7 +718,11 @@ impl PlaneQuartic {
         let mut out = vec![0u32; qt.qdim];
         for &(i, vi) in v {
             if let Some(k) = qt.free_rank[i] {
-                out[k] = if vi == 1 { self.fq.add(out[k], 1) } else { self.fq.add(out[k], vi) };
+                out[k] = if vi == 1 {
+                    self.fq.add(out[k], 1)
+                } else {
+                    self.fq.add(out[k], vi)
+                };
             } else {
                 for (k, &rk) in qt.red[i].iter().enumerate() {
                     if rk != 0 {
@@ -792,7 +801,11 @@ impl PlaneQuartic {
             .map(|i| self.mul_forms(cn, c, t, &self.unit(t, i)))
             .collect();
         let qt = self.quot_from(crows, self.dim[n]);
-        assert_eq!(qt.rows.len(), self.dim[t], "multiplication by c not injective");
+        assert_eq!(
+            qt.rows.len(),
+            self.dim[t],
+            "multiplication by c not injective"
+        );
         let nm = self.dim[m];
         let qd = qt.qdim;
         let mut eqs = vec![vec![0u32; nm]; vs.len() * qd];
@@ -877,7 +890,11 @@ impl PlaneQuartic {
                 k,
                 dz
             );
-            assert!(k + 1 < MAXD, "generating space did not complete by degree {}", MAXD - 1);
+            assert!(
+                k + 1 < MAXD,
+                "generating space did not complete by degree {}",
+                MAXD - 1
+            );
             if first {
                 self.bump(|s| s.lifts += 1);
                 first = false;
@@ -920,21 +937,24 @@ impl PlaneQuartic {
             if a > 0 {
                 let t = self.fq.mulu(
                     self.fq.mulu(co, a as u32),
-                    self.fq.mulu(self.fq.mulu(pw(a - 1, p0[0]), pw(b, p0[1])), pw(c, p0[2])),
+                    self.fq
+                        .mulu(self.fq.mulu(pw(a - 1, p0[0]), pw(b, p0[1])), pw(c, p0[2])),
                 );
                 grad[0] = ((grad[0] as u64 + t as u64) % self.q as u64) as u32;
             }
             if b > 0 {
                 let t = self.fq.mulu(
                     self.fq.mulu(co, b as u32),
-                    self.fq.mulu(self.fq.mulu(pw(a, p0[0]), pw(b - 1, p0[1])), pw(c, p0[2])),
+                    self.fq
+                        .mulu(self.fq.mulu(pw(a, p0[0]), pw(b - 1, p0[1])), pw(c, p0[2])),
                 );
                 grad[1] = ((grad[1] as u64 + t as u64) % self.q as u64) as u32;
             }
             if c > 0 {
                 let t = self.fq.mulu(
                     self.fq.mulu(co, c as u32),
-                    self.fq.mulu(self.fq.mulu(pw(a, p0[0]), pw(b, p0[1])), pw(c - 1, p0[2])),
+                    self.fq
+                        .mulu(self.fq.mulu(pw(a, p0[0]), pw(b, p0[1])), pw(c - 1, p0[2])),
                 );
                 grad[2] = ((grad[2] as u64 + t as u64) % self.q as u64) as u32;
             }
@@ -1017,7 +1037,11 @@ impl PlaneQuartic {
         let mut r = rows;
         let n = self.dim[2];
         let piv = self.rref(&mut r, n);
-        assert_eq!(piv.len(), 3, "conic space of a degree-3 divisor must have dimension 3");
+        assert_eq!(
+            piv.len(),
+            3,
+            "conic space of a degree-3 divisor must have dimension 3"
+        );
         let mut m = [[0u32; 6]; 3];
         for i in 0..3 {
             m[i].copy_from_slice(&r[i]);
@@ -1164,7 +1188,13 @@ impl PlaneQuartic {
                 .collect()
         } else {
             self.bump(|s| s.p0_in_support += 1);
-            let g = self.gen_mul(&Gen { k, rows: w.rows.clone() }, &self.lines_p0);
+            let g = self.gen_mul(
+                &Gen {
+                    k,
+                    rows: w.rows.clone(),
+                },
+                &self.lines_p0,
+            );
             let (k2, w2) = self.complete(g, 7);
             let v = self.forms_through(&w2, k2, 3);
             e7 = Some((k2, w2));
@@ -1180,7 +1210,13 @@ impl PlaneQuartic {
             let (k2, w2) = match e7 {
                 Some(x) => x,
                 None => {
-                    let g = self.gen_mul(&Gen { k, rows: w.rows.clone() }, &self.lines_p0);
+                    let g = self.gen_mul(
+                        &Gen {
+                            k,
+                            rows: w.rows.clone(),
+                        },
+                        &self.lines_p0,
+                    );
                     self.complete(g, 7)
                 }
             };
@@ -1193,7 +1229,10 @@ impl PlaneQuartic {
         }
         assert_eq!(conics.len(), 0, "more than one conic through E7");
         let c = v3q.rows[aux].clone();
-        let others: Vec<Vec<u32>> = (0..3).filter(|&i| i != aux).map(|i| v3q.rows[i].clone()).collect();
+        let others: Vec<Vec<u32>> = (0..3)
+            .filter(|&i| i != aux)
+            .map(|i| v3q.rows[i].clone())
+            .collect();
         let qp = self.colon(&c, 3, &others, 3, 2);
         assert_eq!(qp.len(), 1, "conic through R5");
         let q1 = qp[0].clone();
@@ -1204,7 +1243,9 @@ impl PlaneQuartic {
             .iter()
             .map(|v| self.mul_forms(2, &q1, 3, v))
             .collect();
-        let gs = self.solve_multi(&cols, &rhs).expect("g_v exist and are unique");
+        let gs = self
+            .solve_multi(&cols, &rhs)
+            .expect("g_v exist and are unique");
         let mut rows = vec![q1];
         rows.extend(gs);
         self.class_from_conics(rows)
@@ -1442,7 +1483,11 @@ pub fn poly_roots(q: u32, c: &[u32], rng: &mut u64) -> Vec<u32> {
     }
     diff[1] = (diff[1] + q - 1) % q;
     pmod_trim(&mut diff);
-    let g1 = if diff.is_empty() { g.clone() } else { pmod_gcd(q, &g, &diff) };
+    let g1 = if diff.is_empty() {
+        g.clone()
+    } else {
+        pmod_gcd(q, &g, &diff)
+    };
     let mut roots = Vec::new();
     let mut stack = vec![g1];
     while let Some(h) = stack.pop() {
@@ -1462,7 +1507,11 @@ pub fn poly_roots(q: u32, c: &[u32], rng: &mut u64) -> Vec<u32> {
             }
             t1[0] = (t1[0] + q - 1) % q;
             pmod_trim(&mut t1);
-            let d = if t1.is_empty() { h.clone() } else { pmod_gcd(q, &h, &t1) };
+            let d = if t1.is_empty() {
+                h.clone()
+            } else {
+                pmod_gcd(q, &h, &t1)
+            };
             if d.len() > 1 && d.len() < h.len() {
                 // divide h by d
                 let mut quo = vec![0u64; h.len() - d.len() + 1];
@@ -1514,7 +1563,6 @@ pub fn find_rational_point(q: u32, f: &[u32; 15], rng: &mut u64, max_tries: usiz
     None
 }
 
-
 /// First rational point in the canonical order `[1,x,y]` (by `x`, then `y`),
 /// then `[0,1,y]`, then `[0,0,1]` (brute force; small `q`).
 pub fn first_rational_point_canonical(q: u32, f: &[u32; 15]) -> Option<Pt> {
@@ -1534,7 +1582,7 @@ pub fn first_rational_point_canonical(q: u32, f: &[u32; 15]) -> Option<Pt> {
             );
             s += fq.mulu(t, f[i]) as u64;
         }
-        s % q as u64 == 0
+        s.is_multiple_of(q as u64)
     };
     for x in 0..q {
         for y in 0..q {
@@ -1607,7 +1655,7 @@ pub(crate) mod tests {
         let mut piv = vec![];
         let mut r = 0;
         for c in 0..n {
-            let Some(p) = (r..rows.len()).find(|&i| rows[i][c] % q != 0) else {
+            let Some(p) = (r..rows.len()).find(|&i| !rows[i][c].is_multiple_of(q)) else {
                 continue;
             };
             rows.swap(r, p);
@@ -1655,14 +1703,16 @@ pub(crate) mod tests {
             let m = match k {
                 1 => [0, 0, 0],
                 2 => {
-                    let n = (2..qq).find(|&n| pw(qq, n, (qq - 1) / 2) == qq - 1).unwrap();
+                    let n = (2..qq)
+                        .find(|&n| pw(qq, n, (qq - 1) / 2) == qq - 1)
+                        .unwrap();
                     [qq - n, 0, 0]
                 }
                 3 => {
                     let mut found = None;
                     'o: for a in 0..qq {
                         for b in 1..qq {
-                            if (0..qq).all(|x| (x * x % qq * x + a * x + b) % qq != 0) {
+                            if (0..qq).all(|x| !(x * x % qq * x + a * x + b).is_multiple_of(qq)) {
                                 found = Some([b, a, 0]);
                                 break 'o;
                             }
@@ -1725,7 +1775,7 @@ pub(crate) mod tests {
         pub fn frob(&self, a: &E) -> E {
             self.pow(a, self.q)
         }
-        pub fn from_fq(&self, c: u32) -> E {
+        pub fn embed_fq(&self, c: u32) -> E {
             [c, 0, 0]
         }
         pub fn is_zero(&self, a: &E) -> bool {
@@ -1767,7 +1817,7 @@ pub(crate) mod tests {
             for (i, &(a, b, c)) in m4.iter().enumerate() {
                 let _ = a;
                 if f[i] != 0 {
-                    let t = ext.mul(&ext.from_fq(f[i]), &yp[b as usize]);
+                    let t = ext.mul(&ext.embed_fq(f[i]), &yp[b as usize]);
                     a_c[c as usize] = ext.add(&a_c[c as usize], &t);
                 }
             }
@@ -1794,7 +1844,7 @@ pub(crate) mod tests {
             }
             for (i, &(a, _b, c)) in m4.iter().enumerate() {
                 if a == 0 && f[i] != 0 {
-                    acc = ext.add(&acc, &ext.mul(&ext.from_fq(f[i]), &zpows[c as usize]));
+                    acc = ext.add(&acc, &ext.mul(&ext.embed_fq(f[i]), &zpows[c as usize]));
                 }
             }
             if ext.is_zero(&acc) {
@@ -1811,7 +1861,11 @@ pub(crate) mod tests {
 
     pub fn jac_order(q: u32, n1: u64, n2: u64, n3: u64) -> i128 {
         let q = q as i128;
-        let (t1, t2, t3) = (q + 1 - n1 as i128, q * q + 1 - n2 as i128, q * q * q + 1 - n3 as i128);
+        let (t1, t2, t3) = (
+            q + 1 - n1 as i128,
+            q * q + 1 - n2 as i128,
+            q * q * q + 1 - n3 as i128,
+        );
         let e1 = t1;
         let e2 = (t1 * t1 - t2) / 2;
         let e3 = (t1 * t1 * t1 - 3 * t1 * t2 + 2 * t3) / 6;
@@ -1879,7 +1933,19 @@ pub(crate) mod tests {
         assert_eq!(n2, n1 + 2 * pairs.len() as u64);
         assert_eq!(n3, n1 + 3 * triples.len() as u64);
         let jac = jac_order(q, n1, n2, n3);
-        Enum { q, f: *f, pts1, pairs, triples, n1, n2, n3, e2, e3, jac }
+        Enum {
+            q,
+            f: *f,
+            pts1,
+            pairs,
+            triples,
+            n1,
+            n2,
+            n3,
+            e2,
+            e3,
+            jac,
+        }
     }
 
     impl Enum {
@@ -1893,17 +1959,29 @@ pub(crate) mod tests {
                         for &x in &[i, j, k] {
                             *m.entry(self.pts1[x]).or_insert(0) += 1;
                         }
-                        out.push(Div { rat: m.into_iter().collect(), pair: None, triple: None });
+                        out.push(Div {
+                            rat: m.into_iter().collect(),
+                            pair: None,
+                            triple: None,
+                        });
                     }
                 }
             }
             for p in &self.pts1 {
                 for pr in &self.pairs {
-                    out.push(Div { rat: vec![(*p, 1)], pair: Some(*pr), triple: None });
+                    out.push(Div {
+                        rat: vec![(*p, 1)],
+                        pair: Some(*pr),
+                        triple: None,
+                    });
                 }
             }
             for t in &self.triples {
-                out.push(Div { rat: vec![], pair: None, triple: Some(*t) });
+                out.push(Div {
+                    rat: vec![],
+                    pair: None,
+                    triple: Some(*t),
+                });
             }
             out
         }
@@ -1924,7 +2002,10 @@ pub(crate) mod tests {
         if m == 1 {
             return vec![mons
                 .iter()
-                .map(|&(a, b, c)| pw(qq, pp[0], a as u64) * pw(qq, pp[1], b as u64) % qq * pw(qq, pp[2], c as u64) % qq)
+                .map(|&(a, b, c)| {
+                    pw(qq, pp[0], a as u64) * pw(qq, pp[1], b as u64) % qq * pw(qq, pp[2], c as u64)
+                        % qq
+                })
                 .collect()];
         }
         // gradient and Hessian of F at p
@@ -2117,7 +2198,12 @@ pub(crate) mod tests {
                     .unwrap();
                 let poly = restrict_line(en.q, &en.f, p, [pu[0], pu[1], pu[2]]);
                 let ml = poly.iter().position(|&x| x != 0).unwrap() as u8;
-                let md = d.rat.iter().find(|(pt, _)| *pt == p).map(|x| x.1).unwrap_or(0);
+                let md = d
+                    .rat
+                    .iter()
+                    .find(|(pt, _)| *pt == p)
+                    .map(|x| x.1)
+                    .unwrap_or(0);
                 assert!(ml >= md, "divisor not contained in line section");
                 if ml > md {
                     assert_eq!(ml, md + 1);
@@ -2129,7 +2215,10 @@ pub(crate) mod tests {
         }
         let conics = nullspace_ind(q, div_conditions(en, d, 2), 6);
         assert_eq!(conics.len(), 3);
-        let rows: Vec<Vec<u32>> = conics.iter().map(|r| r.iter().map(|&x| x as u32).collect()).collect();
+        let rows: Vec<Vec<u32>> = conics
+            .iter()
+            .map(|r| r.iter().map(|&x| x as u32).collect())
+            .collect();
         (c.class_from_conics(rows), false)
     }
 
@@ -2145,7 +2234,9 @@ pub(crate) mod tests {
     }
 
     pub fn ghs_instances() -> Vec<Inst> {
-        let text = include_str!("../../research/ghs_cubic_genus3_build_20261012/results/run-20261013T0320Z.jsonl");
+        let text = include_str!(
+            "../../research/ghs_cubic_genus3_build_20261012/results/run-20261013T0320Z.jsonl"
+        );
         let m4 = mons_of_degree(4);
         let mut out = Vec::new();
         for line in text.lines() {
@@ -2168,7 +2259,8 @@ pub(crate) mod tests {
                 let idx = m4.iter().position(|&m| m == mon).unwrap();
                 f[idx] = (t[3].as_u64().unwrap() % q as u64) as u32;
             }
-            let p0 = first_rational_point_canonical(q, &f).expect("GHS quartic has a rational point");
+            let p0 =
+                first_rational_point_canonical(q, &f).expect("GHS quartic has a rational point");
             out.push(Inst {
                 name: format!("ghs-q{}-{}", q, v["kind"].as_str().unwrap()),
                 q,
@@ -2184,7 +2276,12 @@ pub(crate) mod tests {
         (0..count)
             .map(|i| {
                 let (f, p0) = next_smooth_quartic_with_point(q, &mut rng);
-                Inst { name: format!("rand-q{}-{}", q, i), q, f, p0 }
+                Inst {
+                    name: format!("rand-q{}-{}", q, i),
+                    q,
+                    f,
+                    p0,
+                }
             })
             .collect()
     }
@@ -2230,7 +2327,15 @@ pub(crate) mod tests {
                 classes.push(cl.clone());
             }
         }
-        Full { inst, c, en, divs, classes, collinear, class_of }
+        Full {
+            inst,
+            c,
+            en,
+            divs,
+            classes,
+            collinear,
+            class_of,
+        }
     }
 
     // ------------------------------------------------------------------
@@ -2250,15 +2355,27 @@ pub(crate) mod tests {
     #[test]
     fn v5_smoothness_certificate() {
         for inst in small_instances() {
-            assert!(smoothness_certificate(inst.q, &inst.f), "{} should be smooth", inst.name);
+            assert!(
+                smoothness_certificate(inst.q, &inst.f),
+                "{} should be smooth",
+                inst.name
+            );
         }
         for &q in &[5u32, 7, 11, 13, 101] {
             // node at (0:0:1): Z^2 X Y + X^4 + Y^4
             let node = poly_from_terms(q, &[((1, 1, 2), 1), ((4, 0, 0), 1), ((0, 4, 0), 1)]);
-            assert!(!smoothness_certificate(q, &node), "node accepted at q={}", q);
+            assert!(
+                !smoothness_certificate(q, &node),
+                "node accepted at q={}",
+                q
+            );
             // cusp at (0:0:1): Y^2 Z^2 + X^3 Z + X^4
             let cusp = poly_from_terms(q, &[((0, 2, 2), 1), ((3, 0, 1), 1), ((4, 0, 0), 1)]);
-            assert!(!smoothness_certificate(q, &cusp), "cusp accepted at q={}", q);
+            assert!(
+                !smoothness_certificate(q, &cusp),
+                "cusp accepted at q={}",
+                q
+            );
             // two conics: (X^2+Y^2+Z^2)(X^2 + 2 Y^2 + 3 Z^2) expanded
             let mut tc = vec![];
             let a = [(2u8, 0u8, 0u8, 1u32), (0, 2, 0, 1), (0, 0, 2, 1)];
@@ -2270,23 +2387,40 @@ pub(crate) mod tests {
             }
             let two = poly_from_terms(q, &tc);
             // reducible, possibly with intersection points: must be singular (4 nodes over closure)
-            assert!(!smoothness_certificate(q, &two), "reducible accepted at q={}", q);
+            assert!(
+                !smoothness_certificate(q, &two),
+                "reducible accepted at q={}",
+                q
+            );
             // quadruple line
             let line4 = poly_from_terms(q, &[((4, 0, 0), 1)]);
             assert!(!smoothness_certificate(q, &line4));
             // Fermat quartic is smooth for q odd, q != 2
             let fermat = poly_from_terms(q, &[((4, 0, 0), 1), ((0, 4, 0), 1), ((0, 0, 4), 1)]);
-            assert!(smoothness_certificate(q, &fermat), "Fermat rejected at q={}", q);
+            assert!(
+                smoothness_certificate(q, &fermat),
+                "Fermat rejected at q={}",
+                q
+            );
         }
     }
 
     #[test]
     fn constructor_errors() {
         let f = poly_from_terms(7, &[((1, 1, 2), 1), ((4, 0, 0), 1), ((0, 4, 0), 1)]);
-        assert_eq!(PlaneQuartic::new(7, f, [0, 0, 1]).err(), Some(PicError::NotSmooth));
-        assert_eq!(PlaneQuartic::new(8, f, [0, 0, 1]).err(), Some(PicError::BadField));
+        assert_eq!(
+            PlaneQuartic::new(7, f, [0, 0, 1]).err(),
+            Some(PicError::NotSmooth)
+        );
+        assert_eq!(
+            PlaneQuartic::new(8, f, [0, 0, 1]).err(),
+            Some(PicError::BadField)
+        );
         let fermat = poly_from_terms(7, &[((4, 0, 0), 1), ((0, 4, 0), 1), ((0, 0, 4), 1)]);
-        assert_eq!(PlaneQuartic::new(7, fermat, [1, 1, 1]).err(), Some(PicError::NoPoint));
+        assert_eq!(
+            PlaneQuartic::new(7, fermat, [1, 1, 1]).err(),
+            Some(PicError::NoPoint)
+        );
     }
 
     // ------------------------------------------------------------------
@@ -2300,7 +2434,12 @@ pub(crate) mod tests {
             let name = inst.name.clone();
             let fu = full(inst);
             let en = &fu.en;
-            assert_eq!(fu.divs.len() as u64, en.zeta_c3(), "{}: divisors enumerated vs zeta coefficient", name);
+            assert_eq!(
+                fu.divs.len() as u64,
+                en.zeta_c3(),
+                "{}: divisors enumerated vs zeta coefficient",
+                name
+            );
             assert_eq!(
                 fu.classes.len() as i128,
                 en.jac,
@@ -2312,7 +2451,11 @@ pub(crate) mod tests {
                 en.n2,
                 en.n3
             );
-            let exc = fu.classes.iter().filter(|c| matches!(c, PicClass::Exc(_))).count();
+            let exc = fu
+                .classes
+                .iter()
+                .filter(|c| matches!(c, PicClass::Exc(_)))
+                .count();
             assert_eq!(exc as u64, en.n1, "{}: exceptional classes = #C(F_q)", name);
             rows.push(format!(
                 "{} q={} N=({},{},{}) #Jac={} divisors={} keys={} exceptional={}",
@@ -2346,9 +2489,13 @@ pub(crate) mod tests {
                 by_key.entry(cl.key()).or_default().push(i);
             }
             // key equal => equal divisors or both collinear with same residual point
-            for (_k, idxs) in &by_key {
+            for idxs in by_key.values() {
                 if idxs.len() > 1 {
-                    assert!(idxs.iter().all(|&i| fu.collinear[i]), "{}: non-collinear divisors share a key", name);
+                    assert!(
+                        idxs.iter().all(|&i| fu.collinear[i]),
+                        "{}: non-collinear divisors share a key",
+                        name
+                    );
                 }
                 // all in a group give the same exceptional point (key equality)
             }
@@ -2362,19 +2509,29 @@ pub(crate) mod tests {
                     assert!(!fu.collinear[i]);
                 }
             }
-            for (_p, idxs) in &by_point {
+            for idxs in by_point.values() {
                 let k0 = fu.class_of[idxs[0]].key();
                 assert!(idxs.iter().all(|&i| fu.class_of[i].key() == k0));
                 total_pairs += (idxs.len() * idxs.len()) as u64;
             }
             // distinct divisors, non-collinear => distinct keys
             let distinct: HashSet<&Div> = fu.divs.iter().collect();
-            assert_eq!(distinct.len(), fu.divs.len(), "{}: enumeration produced duplicates", name);
+            assert_eq!(
+                distinct.len(),
+                fu.divs.len(),
+                "{}: enumeration produced duplicates",
+                name
+            );
             let noncol = fu.collinear.iter().filter(|&&c| !c).count();
             let typ_keys = by_key.iter().filter(|(k, _)| k.0[0] == 1).count();
             assert_eq!(noncol, typ_keys, "{}", name);
             // every point of C has a collinear divisor (the line section minus the point) hence an Exc key
-            assert_eq!(by_point.len() as u64, fu.en.n1, "{}: Exc keys vs rational points", name);
+            assert_eq!(
+                by_point.len() as u64,
+                fu.en.n1,
+                "{}: Exc keys vs rational points",
+                name
+            );
         }
         eprintln!("V3 PASS ({} same-residual pairs checked)", total_pairs);
     }
@@ -2433,10 +2590,16 @@ pub(crate) mod tests {
             let zero = c.zero();
             assert!(keyset.contains(&zero.key()));
             let mut rng = 0x9E3779B97F4A7C15u64 ^ (q as u64);
-            let mut pick = |rng: &mut u64| -> &PicClass { &fu.classes[(xorshift_next(rng) % n as u64) as usize] };
+            let pick = |rng: &mut u64| -> &PicClass {
+                &fu.classes[(xorshift_next(rng) % n as u64) as usize]
+            };
             let mut n_exc_ops = 0u64;
             for t in 0..300 {
-                let (a, b, d) = (pick(&mut rng).clone(), pick(&mut rng).clone(), pick(&mut rng).clone());
+                let (a, b, d) = (
+                    pick(&mut rng).clone(),
+                    pick(&mut rng).clone(),
+                    pick(&mut rng).clone(),
+                );
                 let ab = c.add(&a, &b);
                 let ba = c.add(&b, &a);
                 assert_eq!(ab, ba, "{}: commutativity", name);
@@ -2455,9 +2618,22 @@ pub(crate) mod tests {
                 // doubling vs add
                 assert_eq!(c.double(&a), c.add(&a, &a));
                 // representative independence for exceptional operands
-                let (vx, vy) = ((xorshift_next(&mut rng) % q as u64) as u32, (xorshift_next(&mut rng) % q as u64) as u32);
-                assert_eq!(c.add_with(&a, &b, vx, vy), ab, "{}: representative independence", name);
-                assert_eq!(c.neg_with(&a, vx), na, "{}: neg representative independence", name);
+                let (vx, vy) = (
+                    (xorshift_next(&mut rng) % q as u64) as u32,
+                    (xorshift_next(&mut rng) % q as u64) as u32,
+                );
+                assert_eq!(
+                    c.add_with(&a, &b, vx, vy),
+                    ab,
+                    "{}: representative independence",
+                    name
+                );
+                assert_eq!(
+                    c.neg_with(&a, vx),
+                    na,
+                    "{}: neg representative independence",
+                    name
+                );
                 if matches!(a, PicClass::Exc(_)) || matches!(b, PicClass::Exc(_)) {
                     n_exc_ops += 1;
                 }
@@ -2465,7 +2641,13 @@ pub(crate) mod tests {
                 if !c.is_zero(&a) && !c.is_zero(&b) {
                     let z6 = c.gen_mul(&c.gen_of_with(&a, 0), &c.gen_of_with(&b, 0));
                     for aux in 1..3 {
-                        assert_eq!(c.reduce_deg6_aux(&z6, aux), ab, "{}: auxiliary cubic {} changes the class", name, aux);
+                        assert_eq!(
+                            c.reduce_deg6_aux(&z6, aux),
+                            ab,
+                            "{}: auxiliary cubic {} changes the class",
+                            name,
+                            aux
+                        );
                     }
                 }
                 // second reduction path
@@ -2514,7 +2696,10 @@ pub(crate) mod tests {
                     .en
                     .pts1
                     .iter()
-                    .filter(|p| (l[0] * p[0] as u64 + l[1] * p[1] as u64 + l[2] * p[2] as u64) % qn == 0)
+                    .filter(|p| {
+                        (l[0] * p[0] as u64 + l[1] * p[1] as u64 + l[2] * p[2] as u64)
+                            .is_multiple_of(qn)
+                    })
                     .cloned()
                     .collect();
                 if on.len() == 4 {
@@ -2527,7 +2712,11 @@ pub(crate) mod tests {
                     nlines += 1;
                 }
             }
-            assert!(sums.len() <= 1, "{}: line sections not all equivalent", name);
+            assert!(
+                sums.len() <= 1,
+                "{}: line sections not all equivalent",
+                name
+            );
             // point classes: [P - P0] + Exc(P) = 0
             for p in &fu.en.pts1 {
                 assert_eq!(c.add(&c.point_class(*p), &c.exceptional(*p)), zero);
@@ -2544,7 +2733,6 @@ pub(crate) mod tests {
             report.join("\n")
         );
     }
-
 
     #[test]
     fn v2_exceptional_and_paths() {
@@ -2567,7 +2755,11 @@ pub(crate) mod tests {
                 assert_eq!(c.add(x, &nx), zero, "{}: x+(-x)", name);
             }
             let mut rng = 77u64 + q as u64;
-            let excs: Vec<&PicClass> = fu.classes.iter().filter(|x| matches!(x, PicClass::Exc(_))).collect();
+            let excs: Vec<&PicClass> = fu
+                .classes
+                .iter()
+                .filter(|x| matches!(x, PicClass::Exc(_)))
+                .collect();
             for e in &excs {
                 for _ in 0..60.min(n) {
                     let y = &fu.classes[(xorshift_next(&mut rng) % n as u64) as usize];
@@ -2575,11 +2767,19 @@ pub(crate) mod tests {
                     let s = c.add(e, y);
                     assert!(keyset.contains(&s.key()));
                     assert_eq!(s, c.add(y, e));
-                    assert_eq!(c.add(&s, z), c.add(e, &c.add(y, z)), "{}: assoc with exceptional", name);
+                    assert_eq!(
+                        c.add(&s, z),
+                        c.add(e, &c.add(y, z)),
+                        "{}: assoc with exceptional",
+                        name
+                    );
                     if matches!(s, PicClass::Exc(_)) {
                         exc_sum_results += 1;
                     }
-                    let (vx, vy) = ((xorshift_next(&mut rng) % q as u64) as u32, (xorshift_next(&mut rng) % q as u64) as u32);
+                    let (vx, vy) = (
+                        (xorshift_next(&mut rng) % q as u64) as u32,
+                        (xorshift_next(&mut rng) % q as u64) as u32,
+                    );
                     assert_eq!(c.add_with(e, y, vx, vy), s);
                     pairs_checked += 1;
                 }
@@ -2598,14 +2798,27 @@ pub(crate) mod tests {
             tot.neg_pencil += st.neg_pencil;
             tot.exc_operands += st.exc_operands;
         }
-        eprintln!("V2 exceptional PASS: pairs {} exceptional results {} ; path counters {:?}", pairs_checked, exc_sum_results, tot);
-        assert!(tot.exc_results > 0 && tot.neg_pencil > 0 && tot.p0_in_support > 0 && tot.exc_operands > 0);
+        eprintln!(
+            "V2 exceptional PASS: pairs {} exceptional results {} ; path counters {:?}",
+            pairs_checked, exc_sum_results, tot
+        );
+        assert!(
+            tot.exc_results > 0
+                && tot.neg_pencil > 0
+                && tot.p0_in_support > 0
+                && tot.exc_operands > 0
+        );
     }
 
     #[test]
     fn v2_cayley_table_q5() {
         let mut insts = vec![random_instances(5, 1).pop().unwrap()];
-        insts.push(ghs_instances().into_iter().find(|i| i.q == 5 && i.name.ends_with("split")).unwrap());
+        insts.push(
+            ghs_instances()
+                .into_iter()
+                .find(|i| i.q == 5 && i.name.ends_with("split"))
+                .unwrap(),
+        );
         for inst in insts {
             cayley_table_check(inst);
         }
@@ -2615,7 +2828,12 @@ pub(crate) mod tests {
         let fu = full(inst);
         let c = &fu.c;
         let n = fu.classes.len();
-        let idx: HashMap<PicKey, usize> = fu.classes.iter().enumerate().map(|(i, x)| (x.key(), i)).collect();
+        let idx: HashMap<PicKey, usize> = fu
+            .classes
+            .iter()
+            .enumerate()
+            .map(|(i, x)| (x.key(), i))
+            .collect();
         let mut t = vec![vec![0usize; n]; n];
         for i in 0..n {
             for j in 0..n {
@@ -2638,7 +2856,11 @@ pub(crate) mod tests {
         for i in 0..n {
             for j in 0..n {
                 for k in 0..n {
-                    assert_eq!(t[t[i][j]][k], t[i][t[j][k]], "associativity ({},{},{})", i, j, k);
+                    assert_eq!(
+                        t[t[i][j]][k], t[i][t[j][k]],
+                        "associativity ({},{},{})",
+                        i, j, k
+                    );
                 }
             }
         }
@@ -2653,7 +2875,13 @@ pub(crate) mod tests {
             }
             *orders.entry(o).or_insert(0) += 1;
         }
-        eprintln!("Cayley table {}: #Jac={} full associativity ({} triples) PASS; element orders {:?}", fu.inst.name, n, n * n * n, orders);
+        eprintln!(
+            "Cayley table {}: #Jac={} full associativity ({} triples) PASS; element orders {:?}",
+            fu.inst.name,
+            n,
+            n * n * n,
+            orders
+        );
     }
 
     #[test]
@@ -2666,7 +2894,7 @@ pub(crate) mod tests {
             let (f, p0) = next_smooth_quartic_with_point(q, &mut rng);
             let c = PlaneQuartic::new(q, f, p0).unwrap();
             let mut prng = 0xC0FFEEu64 + k as u64;
-            let mut rand_class = |prng: &mut u64| -> PicClass {
+            let rand_class = |prng: &mut u64| -> PicClass {
                 let mut x = c.zero();
                 for _ in 0..4 {
                     let p = find_rational_point(q, &f, prng, 100_000).unwrap();
@@ -2675,9 +2903,18 @@ pub(crate) mod tests {
                 x
             };
             for _ in 0..25 {
-                let (a, b, d) = (rand_class(&mut prng), rand_class(&mut prng), rand_class(&mut prng));
+                let (a, b, d) = (
+                    rand_class(&mut prng),
+                    rand_class(&mut prng),
+                    rand_class(&mut prng),
+                );
                 assert_eq!(c.add(&a, &b), c.add(&b, &a));
-                assert_eq!(c.add(&c.add(&a, &b), &d), c.add(&a, &c.add(&b, &d)), "assoc q={}", q);
+                assert_eq!(
+                    c.add(&c.add(&a, &b), &d),
+                    c.add(&a, &c.add(&b, &d)),
+                    "assoc q={}",
+                    q
+                );
                 assert_eq!(c.add(&a, &c.neg(&a)), c.zero());
                 assert_eq!(c.sub(&c.add(&a, &b), &b), a);
                 assert_eq!(c.mul_scalar(&a, 7), {
@@ -2685,7 +2922,10 @@ pub(crate) mod tests {
                     let a4 = c.double(&a2);
                     c.add(&c.add(&a4, &a2), &a)
                 });
-                assert_eq!(c.mul_scalar(&c.add(&a, &b), 12345), c.add(&c.mul_scalar(&a, 12345), &c.mul_scalar(&b, 12345)));
+                assert_eq!(
+                    c.mul_scalar(&c.add(&a, &b), 12345),
+                    c.add(&c.mul_scalar(&a, 12345), &c.mul_scalar(&b, 12345))
+                );
             }
             let p = find_rational_point(q, &f, &mut prng, 100_000).unwrap();
             assert_eq!(c.add(&c.point_class(p), &c.exceptional(p)), c.zero());
@@ -2696,7 +2936,7 @@ pub(crate) mod tests {
     // M1-M3: operation cost sweep (ignored by default; run explicitly)
     // ------------------------------------------------------------------
 
-    fn median_iqr(v: &mut Vec<f64>) -> (f64, f64, f64) {
+    fn median_iqr(v: &mut [f64]) -> (f64, f64, f64) {
         v.sort_by(|a, b| a.partial_cmp(b).unwrap());
         let n = v.len();
         let at = |p: f64| -> f64 {
@@ -2713,7 +2953,12 @@ pub(crate) mod tests {
     /// median of 9 repetitions.
     fn inv_mul_ratio(q: u32) -> (f64, f64) {
         let qq = q as u64;
-        let fq = Fq { q: qq, c_mul: Cell::new(0), c_inv: Cell::new(0), c_add: Cell::new(0) };
+        let fq = Fq {
+            q: qq,
+            c_mul: Cell::new(0),
+            c_inv: Cell::new(0),
+            c_add: Cell::new(0),
+        };
         let med = |mut v: Vec<f64>| -> f64 {
             v.sort_by(|a, b| a.partial_cmp(b).unwrap());
             v[v.len() / 2]
@@ -2748,13 +2993,17 @@ pub(crate) mod tests {
     #[ignore]
     fn m1_cost_sweep() {
         use std::io::Write;
-        let out_dir = std::env::var("W1_OUT").unwrap_or_else(|_| "research/quartic_pic_canonical_20261018/results".to_string());
+        let out_dir = std::env::var("W1_OUT")
+            .unwrap_or_else(|_| "research/quartic_pic_canonical_20261018/results".to_string());
         std::fs::create_dir_all(&out_dir).unwrap();
         let ks: Vec<u32> = match std::env::var("W1_KS") {
             Ok(v) => v.split(',').map(|x| x.parse().unwrap()).collect(),
             Err(_) => vec![8, 12, 16, 20, 24, 28, 31],
         };
-        let npairs: usize = std::env::var("W1_PAIRS").ok().and_then(|v| v.parse().ok()).unwrap_or(200);
+        let npairs: usize = std::env::var("W1_PAIRS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(200);
         let mut raw = std::fs::File::create(format!("{}/m1_raw.jsonl", out_dir)).unwrap();
         let mut summ = std::fs::File::create(format!("{}/m1_summary.jsonl", out_dir)).unwrap();
         // (op, log2 q, median mul, median priced mul-equivalents, median ns)
@@ -2786,10 +3035,10 @@ pub(crate) mod tests {
             .unwrap();
             // ---- classes from random rational points ----
             let mut prng = 0xDEADBEEFu64 ^ (k as u64 * 7919);
-            let mut random_pt = |prng: &mut u64| -> Pt {
+            let random_pt = |prng: &mut u64| -> Pt {
                 find_rational_point(q, &f, prng, 100_000).expect("rational point")
             };
-            let mut typical = |prng: &mut u64| -> PicClass {
+            let typical = |prng: &mut u64| -> PicClass {
                 let mut x = c.zero();
                 for _ in 0..6 {
                     let p = random_pt(prng);
@@ -2815,9 +3064,15 @@ pub(crate) mod tests {
             for _ in 0..npairs {
                 es.push(c.exceptional(random_pt(&mut prng)));
             }
-            let scalars: Vec<u64> = (0..npairs).map(|_| xorshift_next(&mut prng) | (1u64 << 63)).collect();
+            let scalars: Vec<u64> = (0..npairs)
+                .map(|_| xorshift_next(&mut prng) | (1u64 << 63))
+                .collect();
             // helper to time and record one operation
-            let mut record = |op: &str, i: usize, f: &mut dyn FnMut() -> PicClass, raw: &mut std::fs::File| -> (f64, f64, f64, f64, f64, PicStats) {
+            let record = |op: &str,
+                          i: usize,
+                          f: &mut dyn FnMut() -> PicClass,
+                          raw: &mut std::fs::File|
+             -> (f64, f64, f64, f64, f64, PicStats) {
                 c.reset_counter();
                 let t = std::time::Instant::now();
                 let r = f();
@@ -2831,26 +3086,40 @@ pub(crate) mod tests {
                     k, q, op, i, cnt.mul, cnt.inv, cnt.add, ns as u64, st.lifts, st.p0_in_support, st.exc_results, st.neg_pencil, st.exc_operands, st.norm_mul, st.norm_inv, st.ops
                 )
                 .unwrap();
-                (cnt.mul as f64, cnt.inv as f64, cnt.add as f64, ns, (st.lifts > 0) as u8 as f64, st)
+                (
+                    cnt.mul as f64,
+                    cnt.inv as f64,
+                    cnt.add as f64,
+                    ns,
+                    (st.lifts > 0) as u8 as f64,
+                    st,
+                )
             };
             let mut results: Vec<(String, Vec<(f64, f64, f64, f64, f64, PicStats)>)> = Vec::new();
-            let mut run_op = |name: &str, f: &mut dyn FnMut(usize) -> PicClass, raw: &mut std::fs::File| {
-                let mut v = Vec::new();
-                for i in 0..npairs {
-                    let mut g = || f(i);
-                    v.push(record(name, i, &mut g, raw));
-                }
-                results.push((name.to_string(), v));
-            };
+            let mut run_op =
+                |name: &str, f: &mut dyn FnMut(usize) -> PicClass, raw: &mut std::fs::File| {
+                    let mut v = Vec::new();
+                    for i in 0..npairs {
+                        let mut g = || f(i);
+                        v.push(record(name, i, &mut g, raw));
+                    }
+                    results.push((name.to_string(), v));
+                };
             run_op("add_generic", &mut |i| c.add(&xs[i], &ys[i]), &mut raw);
-            run_op("add_exceptional_operand", &mut |i| c.add(&es[i], &ys[i]), &mut raw);
+            run_op(
+                "add_exceptional_operand",
+                &mut |i| c.add(&es[i], &ys[i]),
+                &mut raw,
+            );
             run_op("double", &mut |i| c.double(&xs[i]), &mut raw);
             run_op("negate", &mut |i| c.neg(&xs[i]), &mut raw);
             run_op(
                 "key_encoding",
                 &mut |i| {
                     // re-encode a scrambled conic basis (random invertible 3x3 combination)
-                    let PicClass::Typ(m) = &xs[i] else { unreachable!() };
+                    let PicClass::Typ(m) = &xs[i] else {
+                        unreachable!()
+                    };
                     let mut st = 0xABCDEFu64 ^ i as u64;
                     let rows: Vec<Vec<u32>> = loop {
                         let mut mix = [[0u32; 3]; 3];
@@ -2863,7 +3132,10 @@ pub(crate) mod tests {
                         for a in 0..3 {
                             for b in 0..3 {
                                 for t in 0..6 {
-                                    out[a][t] = ((out[a][t] as u64 + mix[a][b] as u64 * m[b][t] as u64) % q as u64) as u32;
+                                    out[a][t] = ((out[a][t] as u64
+                                        + mix[a][b] as u64 * m[b][t] as u64)
+                                        % q as u64)
+                                        as u32;
                                 }
                             }
                         }
@@ -2871,12 +3143,19 @@ pub(crate) mod tests {
                             let m = &mix;
                             let qq = q as u128;
                             let t = |a: u32, b: u32| a as u128 * b as u128 % qq;
-                            let d = (t(m[0][0], ((t(m[1][1], m[2][2]) + qq - t(m[1][2], m[2][1])) % qq) as u32)
-                                + qq
-                                - t(m[0][1], ((t(m[1][0], m[2][2]) + qq - t(m[1][2], m[2][0])) % qq) as u32)
-                                + t(m[0][2], ((t(m[1][0], m[2][1]) + qq - t(m[1][1], m[2][0])) % qq) as u32))
-                                % qq;
-                            d
+                            (t(
+                                m[0][0],
+                                ((t(m[1][1], m[2][2]) + qq - t(m[1][2], m[2][1])) % qq) as u32,
+                            ) + qq
+                                - t(
+                                    m[0][1],
+                                    ((t(m[1][0], m[2][2]) + qq - t(m[1][2], m[2][0])) % qq) as u32,
+                                )
+                                + t(
+                                    m[0][2],
+                                    ((t(m[1][0], m[2][1]) + qq - t(m[1][1], m[2][0])) % qq) as u32,
+                                ))
+                                % qq
                         };
                         if det != 0 {
                             break out;
@@ -2908,7 +3187,10 @@ pub(crate) mod tests {
                 let (nm, n1, n3) = median_iqr(&mut col(3));
                 let used_lift = v.iter().filter(|t| t.5.lifts > 0).count();
                 let used_p0 = v.iter().filter(|t| t.5.p0_in_support > 0).count();
-                let used_exc = v.iter().filter(|t| t.5.exc_results > 0 || t.5.neg_pencil > 0).count();
+                let used_exc = v
+                    .iter()
+                    .filter(|t| t.5.exc_results > 0 || t.5.neg_pencil > 0)
+                    .count();
                 let used_excop = v.iter().filter(|t| t.5.exc_operands > 0).count();
                 writeln!(
                     summ,
@@ -2923,19 +3205,26 @@ pub(crate) mod tests {
         // M2: OLS fits against log2 q with a 95% t-interval (n-2 degrees of freedom)
         let tcrit = |df: usize| -> f64 {
             // two-sided 95% critical values
-            [12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228][df.saturating_sub(1).min(9)]
+            [
+                12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228,
+            ][df.saturating_sub(1).min(9)]
         };
         let mut fits = std::fs::File::create(format!("{}/m2_fits.jsonl", out_dir)).unwrap();
         let mut ops: Vec<String> = series.iter().map(|t| t.0.clone()).collect();
         ops.sort();
         ops.dedup();
         for op in &ops {
-            let pts: Vec<&(String, f64, f64, f64, f64)> = series.iter().filter(|t| &t.0 == op).collect();
+            let pts: Vec<&(String, f64, f64, f64, f64)> =
+                series.iter().filter(|t| &t.0 == op).collect();
             let n = pts.len();
             if n < 3 {
                 continue;
             }
-            for (metric, sel) in [("mul_median", 2usize), ("priced_mul_equiv_median", 3), ("ns_median", 4)] {
+            for (metric, sel) in [
+                ("mul_median", 2usize),
+                ("priced_mul_equiv_median", 3),
+                ("ns_median", 4),
+            ] {
                 let xs: Vec<f64> = pts.iter().map(|t| t.1).collect();
                 let ys: Vec<f64> = pts
                     .iter()
@@ -2951,7 +3240,11 @@ pub(crate) mod tests {
                 let sxy: f64 = xs.iter().zip(&ys).map(|(x, y)| (x - mx) * (y - my)).sum();
                 let slope = sxy / sxx;
                 let icpt = my - slope * mx;
-                let rss: f64 = xs.iter().zip(&ys).map(|(x, y)| (y - icpt - slope * x).powi(2)).sum();
+                let rss: f64 = xs
+                    .iter()
+                    .zip(&ys)
+                    .map(|(x, y)| (y - icpt - slope * x).powi(2))
+                    .sum();
                 let se = (rss / (n as f64 - 2.0) / sxx).sqrt();
                 let hw = tcrit(n - 2) * se;
                 writeln!(
@@ -3009,7 +3302,13 @@ pub(crate) mod tests {
                         .as_array()
                         .unwrap()
                         .iter()
-                        .map(|r| r.as_array().unwrap().iter().map(|x| x.as_u64().unwrap() as u32).collect())
+                        .map(|r| {
+                            r.as_array()
+                                .unwrap()
+                                .iter()
+                                .map(|x| x.as_u64().unwrap() as u32)
+                                .collect()
+                        })
                         .collect(),
                 }),
                 _ => {}
@@ -3022,7 +3321,11 @@ pub(crate) mod tests {
         let mut f = [0u32; 15];
         for t in h["quartic"].as_array().unwrap() {
             let t = t.as_array().unwrap();
-            let m = (t[0].as_u64().unwrap() as u8, t[1].as_u64().unwrap() as u8, t[2].as_u64().unwrap() as u8);
+            let m = (
+                t[0].as_u64().unwrap() as u8,
+                t[1].as_u64().unwrap() as u8,
+                t[2].as_u64().unwrap() as u8,
+            );
             f[m4.iter().position(|&x| x == m).unwrap()] = t[3].as_u64().unwrap() as u32 % q;
         }
         let p0 = first_rational_point_canonical(q, &f).unwrap();
@@ -3034,11 +3337,18 @@ pub(crate) mod tests {
             .iter()
             .map(|m| {
                 let m = m.as_array().unwrap();
-                (m[0].as_u64().unwrap() as u8, m[1].as_u64().unwrap() as u8, m[2].as_u64().unwrap() as u8)
+                (
+                    m[0].as_u64().unwrap() as u8,
+                    m[1].as_u64().unwrap() as u8,
+                    m[2].as_u64().unwrap() as u8,
+                )
             })
             .collect();
         let mine = mons_of_degree(3);
-        let perm: Vec<usize> = theirs.iter().map(|m| mine.iter().position(|x| x == m).unwrap()).collect();
+        let perm: Vec<usize> = theirs
+            .iter()
+            .map(|m| mine.iter().position(|x| x == m).unwrap())
+            .collect();
         let hn: Vec<PicClass> = recs
             .iter()
             .map(|r| {
@@ -3056,7 +3366,8 @@ pub(crate) mod tests {
                 c.reduce_deg6(&Gen { k: 3, rows })
             })
             .collect();
-        let idx_of_n: HashMap<u64, usize> = recs.iter().enumerate().map(|(i, r)| (r.n, i)).collect();
+        let idx_of_n: HashMap<u64, usize> =
+            recs.iter().enumerate().map(|(i, r)| (r.n, i)).collect();
         // base shift B = h(a) + h(b) - h(a+b), constant over all triples
         let mut bshift: Option<PicClass> = None;
         let mut triples = 0usize;
@@ -3135,7 +3446,11 @@ pub(crate) mod tests {
                 if same_c && recs[i].deg6_key != recs[j].deg6_key {
                     canon_eq_d6_differ += 1;
                 }
-                if !same_c && recs[i].pic3_deg == 3 && recs[j].pic3_deg == 3 && recs[i].pic3_key == recs[j].pic3_key {
+                if !same_c
+                    && recs[i].pic3_deg == 3
+                    && recs[j].pic3_deg == 3
+                    && recs[i].pic3_key == recs[j].pic3_key
+                {
                     pic3_resolved += 1;
                 }
             }
@@ -3161,9 +3476,24 @@ pub(crate) mod tests {
     #[test]
     fn v4_ghs_transfer_agreement() {
         let dumps: [(u32, &str); 3] = [
-            (5, include_str!("../../research/quartic_pic_canonical_20261018/results/v4_dump_q5.jsonl")),
-            (7, include_str!("../../research/quartic_pic_canonical_20261018/results/v4_dump_q7.jsonl")),
-            (11, include_str!("../../research/quartic_pic_canonical_20261018/results/v4_dump_q11.jsonl")),
+            (
+                5,
+                include_str!(
+                    "../../research/quartic_pic_canonical_20261018/results/v4_dump_q5.jsonl"
+                ),
+            ),
+            (
+                7,
+                include_str!(
+                    "../../research/quartic_pic_canonical_20261018/results/v4_dump_q7.jsonl"
+                ),
+            ),
+            (
+                11,
+                include_str!(
+                    "../../research/quartic_pic_canonical_20261018/results/v4_dump_q11.jsonl"
+                ),
+            ),
         ];
         for (q, text) in dumps {
             let r = v4_run(q, text);
