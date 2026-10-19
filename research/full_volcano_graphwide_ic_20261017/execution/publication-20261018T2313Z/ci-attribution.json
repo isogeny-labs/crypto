@@ -1,0 +1,56 @@
+{
+  "head": "39ebf63386db3f04cc55caf2864e9f5e5bc130e4",
+  "base": "1e2bf0715a2a927afc92e6730d6e65b59f15ab9e",
+  "current_scope_script_blob": "0359c428d5aee3409ed303ae7ce835879cf6a938",
+  "historical_duplicate_root_diagnosis": "Not current: upstream scope script changed; do not reuse old cause.",
+  "identical_inputs": [
+    {
+      "path": "src/bin/hyperelliptic_cover.rs",
+      "head_and_base_blob": "5041317bcff0bc0c676530839ed489c6478cfc62"
+    },
+    {
+      "path": "scripts/build_cover_transfer_assessments.mjs",
+      "head_and_base_blob": "3fcb6ab9cd82c8e1d745b6365e8a21ec1505baf7"
+    },
+    {
+      "path": "docs/curves/covers.json",
+      "head_and_base_blob": "022b411a2bb35644155c2b1c36c07c7c78281382"
+    },
+    {
+      "path": "docs/curves/cover-links.yaml",
+      "head_and_base_blob": "751bfa2a9da16e70efa30c2e044eff50d7854114"
+    },
+    {
+      "path": "docs/curves/registry.json",
+      "head_and_base_blob": "e0c176272b03cbe15f3a3c24b78d23e826ca8d51"
+    },
+    {
+      "path": "tests/backlog_cli.rs",
+      "head_and_base_blob": "5c8fdcc2f2a74d1802172815e09624d53c46c20d"
+    },
+    {
+      "path": "backlog/XP-20261017-quintic-support-frobenius/card.json",
+      "head_and_base_blob": "7789a2821deb79218e4144b1993ddb64bfa14c72"
+    }
+  ],
+  "observed_failures": [
+    {
+      "job": 117802157372,
+      "cause": "Cover assertions actual2572 vs2100 and140 vs134;11pass2fail"
+    },
+    {
+      "job": 117802157616,
+      "cause": "Node assessment unexpected covers row count"
+    },
+    {
+      "job": 117802157785,
+      "cause": "XP-20261017-quintic-support-frobenius outputs.verify unbound {artifact}"
+    },
+    {
+      "job": 117802157535,
+      "cause": "Backlog12pass3fail:2invalid-card failures and concurrent_claims_resolve_to_one_holder_after_sync missing expected row at tests/backlog_cli.rs:401"
+    }
+  ],
+  "attribution": "These code/catalog/card/test inputs equal base; no change-specific cause established. No unrelated patches, guard/test weakening, rerun commits or merge.",
+  "other_results": "curve-names SUCCESS, FreeLLM workflow SUCCESS is not GitHub APPROVED review, Rust lint/ecbench/all-targets queued, CodeQL in progress at captured check. No new approval or inline thread established."
+}

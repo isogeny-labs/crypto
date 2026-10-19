@@ -6,7 +6,7 @@
 - **Affected work:** [fixed five-class protocol](../research/full_volcano_classes_20261016/PROTOCOL.md)
 - **Next action owner:** current implementation session for code and controls;
   full-run infrastructure owner unassigned
-- **Last updated:** 2026-10-18
+- **Last updated:** 2026-10-19
 
 ## Problem
 
@@ -191,3 +191,5 @@ snapshot session payloads. This removes one redundant packaging payload copy,
 not the native snapshot or original-class storage/implementation requirements.
 No mathematical source, binary, queue or child budget changed. All larger
 completion gaps and the unavailable S3 runtime identity remain open.
+
+19 October publication: [7,937-vertex checkpoint](../research/full_volcano_graphwide_ic_20261017/execution/publication-20261018T2313Z/README.md),126,992 records/all51 strata,81,666 verified/39,550 exhausted/5,776 timeout,4,117,173 relations/193,153,057 actual calls. Frozen runtime source/binaries/queue/budgets preserved; owner main merge changed only the study repository driver copy, not the campaign source. Full original classes/matrix/independent arithmetic/large-k implementation and S3 identity/working-volume gaps remain open.

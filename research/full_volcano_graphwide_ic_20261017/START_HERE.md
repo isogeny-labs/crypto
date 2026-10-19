@@ -1,5 +1,14 @@
 # Volcano experiment downloads, 17 October 2026
 
+Latest immutable publication: **7,937 /24,823 audited vertices**, all51 strata
+sampled;126,992 records (81,666 verified /39,550 exhausted /5,776 timeout),
+4,117,173 relations /193,153,057 actual decomposition calls.
+[Archive, CSV, inspected report, viewer and exact verification scope](execution/publication-20261018T2313Z/README.md).
+Clean stop; no new interruption. Frozen runtime source/binaries/queue unchanged.
+Native archive hash/manifest/source checks pass; outer repack not rechecked for
+this publication. Original A/C/D/E/full matrix/independent arithmetic/large-k IC
+remain open. Older entries below are immutable historical snapshots.
+
 [Download guide v6: 6,137-vertex dataset, all downloads and actual guarded resume](https://drive.google.com/file/d/1XyB-FgGQ3vxC90RbE_Z41T787RONHHQQ/view).
 
 Latest immutable publication, 18 October: **6,137 / 24,823 audited vertices**,
