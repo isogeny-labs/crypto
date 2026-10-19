@@ -6,7 +6,7 @@
 
 = Factor-base designs: G1, the m = 4 series on p#sub[1] (run-20261016T0558Z)
 
-*Kind:* solver-axis stage diagnostic (AGENTS.md §2). Observations only: nothing here prices a pipeline, reports S or shows a speedup. *Protocol:* PREREGISTRATION.md Amendment 4 (registered in commit #raw("113f31659") before any G1 row), with Amendments 1–3 for everything it does not change.
+*Kind:* solver-axis stage diagnostic (AGENTS.md §2). Observations only: nothing here prices a pipeline, reports S or shows a speedup. *Protocol:* PREREGISTRATION.md Amendment 5 (registered as "Amendment 4" in commit #raw("113f31659"), before any G1 row; renumbered when the lanes were merged, see the note at the end), with Amendments 1–3 for everything it does not change.
 
 == Run
 
@@ -16,7 +16,7 @@
 - *Window:* 2026-10-16 05:58Z to about 06:39Z (UTC).
 - *Limits:* F4 budget 3600 s, hard kill 3900 s, #raw("ulimit -v 15000000") per child. The session also runs inside a memory cgroup that the harness does not set. Its OOM killer ended two systems at about 14 GB resident (below).
 - *Seeds:* as in Amendment 2, with G2 on (#raw("--distinct-targets")). G2 redrew nothing (#raw("target_redraws") = 0 on every row). #raw("compare-rows") confirms that the t = 4 systems are the F4 systems that stopped at 300 s (#raw("runs/G1-vs-F4-crosscheck.txt")).
-- *Records:* #raw("runs/G1-{A0,A11}-m4.jsonl") and #raw(".log"), #raw("runs/analysis-amendment4.txt") (native #raw("analyze --amendment4")) and #raw("runs/G1-oom-kernel-log.txt").
+- *Records:* #raw("runs/G1-{A0,A11}-m4.jsonl") and #raw(".log"), #raw("runs/analysis-g1.txt") (native #raw("analyze --g1")) and #raw("runs/G1-oom-kernel-log.txt").
 
 == Graph
 
@@ -39,7 +39,7 @@
 - *A0, t = 4:* both systems aborted on an allocation failure under #raw("ulimit -v 15000000") (SIGABRT), at about 405 s. F4 had stopped the same systems at 300 s, at partial D = 7.
 - *A11, t = 5:* both systems were killed with SIGKILL after 66–74 s. The kernel log shows the memory-cgroup OOM killer (#raw("CONSTRAINT_MEMCG")), at 13.97 GB resident, below the 15 GB address-space limit. The same OOM event also killed an idle shell of the session that was waiting on the run. That shell was not part of the measurement.
 
-== Verdicts (Amendment 4, G1; §1 thresholds)
+== Verdicts (Amendment 5, G1; §1 thresholds)
 
 #table(columns: 5, align: (left, center, center, center, left), stroke: 0.4pt + gray,
   [*arm*], [*completed cells (t)*], [*σ*], [*Δlog#sub[2] max_cols/Δb*], [*verdict*],
@@ -47,7 +47,7 @@
   [A11], [3 (2–4)], [1.5000], [5.675], [no middle ground at this arity (σ ≥ 0.5)],
 )
 
-- *Prediction "A0's σ ≥ 0.5 at m = 4":* not decided (2 completed cells). Amendment 4 makes no further budget or memory change without a new amendment.
+- *Prediction "A0's σ ≥ 0.5 at m = 4":* not decided (2 completed cells). Amendment 5 makes no further budget or memory change without a new amendment.
 - *A11:* no prediction was registered. Its m = 4 series is D = 3, 5, 6 over t = 2–4.
 - *Width (secondary, descriptive):* A11's #raw("max_cols") over A0's is 0.018 at t = 2 and 0.100 at t = 3. There is no shared completed cell at t = 4.
 
@@ -59,4 +59,10 @@
 
 == Deviations
 
-None in the protocol. The amendment's memory limit took effect as written, but a memory cgroup this lane did not set ended two systems below it. Amendment 4 already counts an OOM kill as an abort, and those rows record #raw("child exited: signal: 9") as their reason. The kernel log is committed beside them.
+None in the protocol. The amendment's memory limit took effect as written, but a memory cgroup this lane did not set ended two systems below it. Amendment 5 already counts an OOM kill as an abort, and those rows record #raw("child exited: signal: 9") as their reason. The kernel log is committed beside them.
+
+== Numbering and a parallel run (note added 2026-10-19)
+
+Two amendments were registered independently as "Amendment 4" on 2026-10-16: this one (G1, G2) at 05:58Z, and C1–C4 on the experiments-2 lane at 06:16Z (commit #raw("025746fd5")). The study's main line carries C1–C4 as Amendment 4, so this one is Amendment 5 in the merged preregistration. Its text is unchanged under a numbering note. The analysis file is #raw("runs/analysis-g1.txt"), renamed from this lane's #raw("analysis-amendment4.txt"), a name C1–C4 also uses; apart from the amendment number its content is the same.
+
+C2 of that amendment ran the same m = 4, t = 4 systems as G1, with a 13 GB limit instead of 15 GB. #raw("compare-rows") finds all four shared systems identical (#raw("runs/G1-vs-C2-crosscheck.txt")): both A0 systems abort for memory under either limit, and both A11 systems complete with the same D and #raw("max_cols"). The rows only G1 holds are the A11 t = 5 OOM kills.
