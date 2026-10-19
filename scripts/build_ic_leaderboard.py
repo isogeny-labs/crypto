@@ -40,6 +40,59 @@ REPO = cid.REPO
 OUT_JSON = REPO / "docs/ic/leaderboard.json"
 OUT_MD = REPO / "docs/ic/LEADERBOARD.md"
 OUT_HTML = REPO / "docs/ic-leaderboard.html"
+NATIVE_XOR_SOURCE = "research/koblitz_n83_factor_base_sweep_20261008/verification/native-xor-indexed-20261019/SUMMARY.json"
+
+
+def native_xor_component() -> dict:
+    """Load native result generation; Python only renders the frozen values."""
+    frozen = load(NATIVE_XOR_SOURCE)
+    if not (frozen["complete_comparison_coverage"] and frozen["identical_search_and_selector_signature"]):
+        raise ValueError("native XOR coverage or independent equivalence incomplete")
+    return {"source": NATIVE_XOR_SOURCE, "sha256": sha256(NATIVE_XOR_SOURCE),
+            "summary": {k: frozen[k] for k in ("baseline_solver_ms", "candidate_solver_ms",
+                       "external_algorithm_cpu_ms", "pairs")}}
+
+
+def native_xor_text(doc: dict) -> list[str]:
+    s = doc["native_xor_component"]["summary"]
+    a, b, e = s["baseline_solver_ms"], s["candidate_solver_ms"], s["external_algorithm_cpu_ms"]
+    return [
+        "Native N83 indexed XOR component (2026-10-19), outside tables A–C",
+        "Engineering component on icv1-f2m83-tm6151469093347-debefd74 (a=0). "
+        "Seven verified observations per solver; all native search and selector signatures agree. "
+        "Actual models, original constraints and original group sums replay independently.",
+        f"Dense native solve wall: median {a['median']:.6f} ms, range {a['min']:.6f}–{a['max']:.6f} ms. "
+        f"Indexed native solve wall: median {b['median']:.6f} ms, range {b['min']:.6f}–{b['max']:.6f} ms. "
+        "Five paired dense/indexed ratios: " + ", ".join(f"{p['solver_a_over_b']:.6f}" for p in s["pairs"]) + ".",
+        "Counted indexed word updates: 14,064,862 versus native-derived dense 5,551,462,287 "
+        "(row operations × words per row); ratio " + f"{s['pairs'][0]['word_updates_a_over_b']:.6f}. "
+        "This is deterministic component work, not total IC cost.",
+        f"CryptoMiniSat 5.17.0 is faster: reported solve/simplify CPU {e['min']:.0f}–{e['max']:.0f} ms. "
+        "Candidate solve wall / external algorithm CPU ratios: " +
+        ", ".join(f"{p['candidate_wall_over_external_algorithm_cpu']:.6f}" for p in s["pairs"]) +
+        ". These are different timer kinds; external process parsing/startup is separate. No fastest-tool claim.",
+        "Same host, one thread, CPU15/SMT31 reservation, quiet preflight, 1CPU/4GiB guarded Docker. "
+        "Wall observations are descriptive: A/A drift and missing worker context-switch/fault accounting "
+        "prevent an automatic L2 claim. Natural K2048/K4096 trials at 1000 and separately 10000 conflicts "
+        "each returned zero models, relations and rank. No natural winner, full-cold runtime or matched-rho ratio."
+    ]
+
+
+def native_xor_markdown(doc: dict) -> str:
+    lines = native_xor_text(doc)
+    c = doc["native_xor_component"]
+    return ("<!-- native-xor-component:begin -->\n## " + lines[0] + "\n\n" +
+            "\n\n".join(lines[1:]) + f"\n\n[Native frozen summary](../../{c['source']}) "
+            f"— SHA256 `{c['sha256']}`.\n<!-- native-xor-component:end -->\n\n")
+
+
+def native_xor_html(doc: dict) -> str:
+    lines = native_xor_text(doc)
+    c = doc["native_xor_component"]
+    return ('<!-- native-xor-component:begin -->\n<section id="native-n83-xor"><h2>' +
+            html.escape(lines[0]) + '</h2>' + ''.join('<p>' + html.escape(t) + '</p>' for t in lines[1:]) +
+            '<p>' + gh(c['source'], 'Native frozen summary') + ' · SHA256 <code>' +
+            c['sha256'] + '</code></p></section>\n<!-- native-xor-component:end -->')
 
 # The ledger section the page is current through (AGENTS.md §7b).  A round
 # that adds a later section must update the page, or confirm that the round
@@ -1021,6 +1074,7 @@ def build() -> dict:
                                        "ratio_rho": top["best"]["ratio_rho"]}}
     return {
         "schema_version": 1,
+        "native_xor_component": native_xor_component(),
         "generated_by": "scripts/build_ic_leaderboard.py",
         "unit": "none: the board has three families, each with its own unit, reference and floor "
                 "(families[*].unit, .reference, .floor); S, ratio to reference and ratio to floor "
@@ -1408,7 +1462,7 @@ def markdown(doc: dict) -> str:
           "its target-dependent walk and ends with scalar verification. "
           "This wall-time panel is kept separate from Tables A–C and their "
           "operation-unit S rankings.", ""]
-    L += ["", "## Sources", ""]
+    L += ["", native_xor_markdown(doc), "## Sources", ""]
     for k, v in doc["sources"].items():
         L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
     return "\n".join(L) + "\n"
@@ -2062,6 +2116,7 @@ def page(doc: dict, standalone: bool) -> str:
              'operation-unit S rankings.</p>' +
              gh(n83["source"], 'Frozen IC1 rows and candidate identities') + '</section>')
 
+    P.append(native_xor_html(doc))
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '
              'here was measured for this page, and nothing is a speedup. Records kept in other units, wall-clock '
@@ -2108,7 +2163,28 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--artifact", type=Path)
+    ap.add_argument("--render-native-component", action="store_true",
+                    help="Render native frozen component only; preserve historical calculation outputs")
     args = ap.parse_args()
+    if args.render_native_component:
+        doc = json.loads(OUT_JSON.read_text())
+        doc.pop("native_xor_component", None)
+        doc = {"schema_version": doc.pop("schema_version"),
+               "native_xor_component": native_xor_component(), **doc}
+        marker = r"<!-- native-xor-component:begin -->.*?<!-- native-xor-component:end -->\n*"
+        old_html = re.sub(marker, "", OUT_HTML.read_text(), flags=re.S)
+        old_md = re.sub(marker, "", OUT_MD.read_text(), flags=re.S)
+        if "\n<footer>" not in old_html or "## Sources\n" not in old_md:
+            raise ValueError("frozen leaderboard rendering anchors missing")
+        outs = {OUT_JSON: json.dumps(stable(doc), indent=1, ensure_ascii=False) + "\n",
+                OUT_HTML: old_html.replace("\n<footer>", "\n" + native_xor_html(doc) + "\n<footer>", 1),
+                OUT_MD: old_md.replace("## Sources\n", native_xor_markdown(doc) + "\n## Sources\n", 1)}
+        if args.check:
+            return int(any(p.read_text() != t for p, t in outs.items()))
+        for p, t in outs.items():
+            p.write_text(t)
+            print(f"rendered native component in {p.relative_to(REPO)}")
+        return 0
     doc = build()
     # Round only the JSON: rendering compares recipe rows by identity.
     outs = {OUT_JSON: json.dumps(stable(doc), indent=1, ensure_ascii=False) + "\n",

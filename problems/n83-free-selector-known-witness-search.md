@@ -104,3 +104,20 @@ fixed with a byte-preserving native report and regression test.
 controls pass, and both retained natural K2048/K4096 trials have verified
 1,000-conflict zero-relation terminals. The bounded natural terminal
 observability problem is resolved independently of this control gap.
+
+## Indexed XOR continuation (2026-10-19)
+
+The [native matched comparison](../research/koblitz_n83_factor_base_sweep_20261008/verification/native-xor-indexed-20261019/RESULT.md)
+retains the exact solved control and independent actual-model/group replay.
+Seven verified observations per native arm preserve all search signatures;
+five dense/indexed wall ratios9.95866828830–12.1636332262 are descriptive,
+and counted word updates fall394.704355222×. CryptoMiniSat5.17.0 remains
+faster (candidate wall / CMS algorithm CPU6.27411646961–6.34929032028,
+different timers). Next-round goal: reduce repeated decided-row scans with
+backjump-safe invalidation and fresh differential/external comparison.
+
+Native natural K2048/K4096 each completed1000 and separately10000 conflicts
+with zero models, relations and rank. Their query/custody audits pass;
+this does not establish UNSAT or absent decompositions. Natural positive
+relation/rank/scalar verification, useful yield and full cold-runtime base
+selection remain unresolved. The known-witness control stays resolved.

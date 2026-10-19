@@ -234,6 +234,23 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 [Frozen IC1 rows and candidate identities](../../research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json). The cold process includes base and index construction, relation rank, target recovery and producer verification. Rho's interval starts with its target-dependent walk and ends with scalar verification. This wall-time panel is kept separate from Tables A–C and their operation-unit S rankings.
 
 
+<!-- native-xor-component:begin -->
+## Native N83 indexed XOR component (2026-10-19), outside tables A–C
+
+Engineering component on icv1-f2m83-tm6151469093347-debefd74 (a=0). Seven verified observations per solver; all native search and selector signatures agree. Actual models, original constraints and original group sums replay independently.
+
+Dense native solve wall: median 182074.425421 ms, range 177459.286074–216393.804510 ms. Indexed native solve wall: median 17767.144183 ms, range 17731.849428–17862.255509 ms. Five paired dense/indexed ratios: 12.163633, 9.994469, 9.958668, 10.169527, 10.193249.
+
+Counted indexed word updates: 14,064,862 versus native-derived dense 5,551,462,287 (row operations × words per row); ratio 394.704355. This is deterministic component work, not total IC cost.
+
+CryptoMiniSat 5.17.0 is faster: reported solve/simplify CPU 2810–2840 ms. Candidate solve wall / external algorithm CPU ratios: 6.286300, 6.274116, 6.349290, 6.278143, 6.289527. These are different timer kinds; external process parsing/startup is separate. No fastest-tool claim.
+
+Same host, one thread, CPU15/SMT31 reservation, quiet preflight, 1CPU/4GiB guarded Docker. Wall observations are descriptive: A/A drift and missing worker context-switch/fault accounting prevent an automatic L2 claim. Natural K2048/K4096 trials at 1000 and separately 10000 conflicts each returned zero models, relations and rank. No natural winner, full-cold runtime or matched-rho ratio.
+
+[Native frozen summary](../../research/koblitz_n83_factor_base_sweep_20261008/verification/native-xor-indexed-20261019/SUMMARY.json) — SHA256 `ab4c77811a681437494b184c12eabd9fdc834eba1c524de79c8b4b664087f41c`.
+<!-- native-xor-component:end -->
+
+
 ## Sources
 
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
