@@ -74,6 +74,7 @@ SOURCES = {
     "la_engines": "research/la_engines_20261014/summary.json",
     "boolean_solver_component": "research/f4_f5_boolean_perf_20261018/component.json",
     "boolean_native_solver_component": "research/f4_f5_boolean_runtime_20261019/component.json",
+    "boolean_recursive_solver_component": "research/f4_f5_ecbench_20261019/component.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -1073,6 +1074,7 @@ def build() -> dict:
         "linear_algebra_component": la_component(),
         "boolean_solver_component": load(SOURCES["boolean_solver_component"]),
         "boolean_native_solver_component": load(SOURCES["boolean_native_solver_component"]),
+        "boolean_recursive_solver_component": load(SOURCES["boolean_recursive_solver_component"]),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -1127,6 +1129,50 @@ def native_ratio_text(comparison: dict) -> str:
             if "reference_over_candidate" in comparison else "inconclusive")
 
 
+def recursive_tables(component: dict) -> list:
+    """Format Rust-prepared observations without recomputing admission or results."""
+    tables = []
+    tables.append(("Latest complete roots and decomposition: n23 cold native milliseconds",
+        ["Boundary", "Method", "Target", "Median ms", "Min ms", "Max ms", "Samples"],
+        [[r["boundary"], r["arm"], "generator" if r["random"] else "planted",
+          *[f"{r['cold'][k]:.4f}" if r["cold"].get(k) is not None else "missing"
+            for k in ["median_ms", "min_ms", "max_ms"]], str(r["cold"]["n"])]
+         for r in component["costs_n23"]]))
+    tables.append(("Matched F4/F5 baseline versus final opt-in policy",
+        ["Method", "Field degree", "Target", "Before ms", "Candidate ms", "Paired ratio", "Decision"],
+        [[r["arm"], str(r["n"]), "generator" if r["random"] else "planted",
+          *[f"{r[k]['median_ms']:.4f}" if r[k].get("median_ms") is not None else "missing"
+            for k in ["before", "candidate"]], native_ratio_text(r["comparison"]),
+          r["comparison"]["decision"]] for r in component["improvements"]]))
+    tables.append(("Four-worker unchanged-path controls",
+        ["Method", "Field degree", "Before ms", "Candidate ms", "Paired ratio", "Decision"],
+        [[r["arm"], str(r["n"]),
+          *[f"{r[k]['median_ms']:.4f}" if r[k].get("median_ms") is not None else "missing" for k in ["before", "after"]],
+          native_ratio_text(r["comparison"]),
+          r["comparison"]["decision"]] for r in component["four_worker_controls"]]))
+    tables.append(("Full Semaev table: four-worker cold-call controls",
+        ["Method", "Field degree", "Before ms", "Candidate ms", "Paired ratio", "Decision"],
+        [[r["arm"], str(r["n"]),
+          *[f"{r[k]['median_ms']:.4f}" if r[k].get("median_ms") is not None else "missing" for k in ["before", "after"]],
+          native_ratio_text(r["comparison"]), r["comparison"]["decision"]]
+         for r in component.get("full_table_four_worker_controls", [])]))
+    for session in component["ecbench"]:
+        tables.append((f"Full cold DLP recovery through ecbench: n{session['n']}",
+            ["Method", "Solve median ms", "Process median ms", "Admitted / requested", "Charged S", "S / rho diagnostic", "Partly priced"],
+            [[a["name"],
+              *[f"{a[k]['median_ms']:.4f}" if a[k].get("median_ms") is not None else "missing"
+                for k in ["cold_solve", "process"]],
+              f"{a['admitted']} / {a['requested']}", g3(a["s_charged_mean"]),
+              g3(a["s_over_rho_diagnostic"]), str(a["lower_bound"])] for a in session["arms"]]))
+        tables.append((f"ecbench n{session['n']} native comparison admission (B / A elapsed time)",
+            ["Pair", "Admission", "Outside A/A noise", "B / A", "95% interval", "Pairs / below L2"],
+            [[c["pair"], str(wall.get("status", "missing")),
+              str(wall.get("outside_noise", "missing")),
+              g3(wall.get("median_ratio")), str(wall.get("ci95", "missing")),
+              f'{wall.get("pairs", "missing")} / {wall.get("pairs_below_level", "missing")}'] for c in session["comparisons"] for wall in [c.get("wall") or {}]]))
+    return tables
+
+
 def markdown(doc: dict) -> str:
     fams = doc["families"]
     L = ["# Index-calculus leaderboard", "",
@@ -1138,6 +1184,19 @@ def markdown(doc: dict) -> str:
          "`× reference` and `× floor` are comparable within a table and nowhere else.  The same slug "
          "can appear in two tables with different `S`, because the unit, the reference and the number "
          "of targets differ.", ""]
+    recursive = doc["boolean_recursive_solver_component"]
+    L += ["## Latest F4/F5 recursion and full ecbench recovery", "", recursive["scope"], "",
+          "Cold solver time includes algorithm setup. ecbench solve time includes all DLP phases; "
+          "process time additionally includes common workload construction and startup. "
+          "Only admitted native comparisons establish paired improvements. S and S/rho remain "
+          "partly priced diagnostics; they do not rank these methods in tables A–C.", ""]
+    for title, headers, rows in recursive_tables(recursive):
+        L += ["### " + title, "", "| " + " | ".join(headers) + " |",
+              "| " + " | ".join([":--"] * len(headers)) + " |"]
+        L += ["| " + " | ".join(row) + " |" for row in rows]
+        L.append("")
+    L += [recursive["limits"], "", f"[Latest report](../../{recursive['report']}) · "
+          f"[Raw evidence and four-worker controls](../../{recursive['study']})", ""]
     native = doc["boolean_native_solver_component"]
     L += ["## Native Boolean solvers, outside tables A–C", "", native["scope"], "",
           "All values below are native cold milliseconds, five admitted samples per method. "
@@ -2099,6 +2158,17 @@ def page(doc: dict, standalone: bool) -> str:
              'operation-unit S rankings.</p>' +
              gh(n83["source"], 'Frozen IC1 rows and candidate identities') + '</section>')
 
+    recursive = doc["boolean_recursive_solver_component"]
+    P.append('<section id="boolean-recursive-solvers"><h2>Latest F4/F5 recursion and full ecbench recovery</h2><p>'
+             + esc(recursive["scope"]) + '</p><p>Cold solver time includes setup. ecbench solve time includes all DLP phases; '
+             'process time also includes common workload construction and startup. S/rho is a partly priced diagnostic, '
+             'outside tables A–C. Paired native admission is authoritative.</p>')
+    for title, headers, rows in recursive_tables(recursive):
+        P.append('<h3>' + esc(title) + '</h3><div class="scroll"><table><thead><tr>'
+                 + ''.join('<th>' + esc(h) + '</th>' for h in headers) + '</tr></thead><tbody>'
+                 + ''.join('<tr>' + ''.join('<td>' + esc(cell) + '</td>' for cell in row) + '</tr>' for row in rows)
+                 + '</tbody></table></div>')
+    P.append('<p>' + esc(recursive["limits"]) + ' ' + gh(recursive["report"], 'Latest report and complete controls') + '</p></section>')
     native = doc["boolean_native_solver_component"]
     native_rows = "".join(
         f"<tr><td>{esc(r['boundary'])}</td><td>{esc(r['arm'])}</td>"

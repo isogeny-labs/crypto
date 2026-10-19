@@ -59,8 +59,13 @@ on:
       - 'research/la_engines_20261014/summary.json'
       - 'research/f4_f5_boolean_perf_20261018/component.json'
       - 'research/f4_f5_boolean_runtime_20261019/component.json'
+      - 'research/f4_f5_ecbench_20261019/component.json'
+      - 'research/f4_f5_ecbench_20261019/runs.tar.xz'
+      - 'research/f4_f5_ecbench_20261019/runs.tar.xz.sha256'
       - '.github/workflows/ic-leaderboard.yml'
       - 'scripts/build_lab_browser.py'
+      - 'scripts/test_build_lab_browser.py'
+      - 'scripts/test_lab_browser_cost_admission.py'
       - 'docs/browser/**'
       - 'research/ecbench_*/sessions/**'
       - 'research/full_volcano_graphwide_ic_*/execution/campaigns/**'
@@ -113,8 +118,13 @@ on:
       - 'research/la_engines_20261014/summary.json'
       - 'research/f4_f5_boolean_perf_20261018/component.json'
       - 'research/f4_f5_boolean_runtime_20261019/component.json'
+      - 'research/f4_f5_ecbench_20261019/component.json'
+      - 'research/f4_f5_ecbench_20261019/runs.tar.xz'
+      - 'research/f4_f5_ecbench_20261019/runs.tar.xz.sha256'
       - '.github/workflows/ic-leaderboard.yml'
       - 'scripts/build_lab_browser.py'
+      - 'scripts/test_build_lab_browser.py'
+      - 'scripts/test_lab_browser_cost_admission.py'
       - 'docs/browser/**'
       - 'research/ecbench_*/sessions/**'
       - 'research/full_volcano_graphwide_ic_*/execution/campaigns/**'
@@ -149,3 +159,7 @@ jobs:
         run: python3 scripts/build_ic_leaderboard.py --check
       - name: The lab browser's index is current with the registry, sessions and rounds (AGENTS.md §7c)
         run: python3 scripts/build_lab_browser.py --check
+      - name: Sparse archives and incomplete-price UI controls
+        run: |
+          python3 scripts/test_build_lab_browser.py
+          python3 scripts/test_lab_browser_cost_admission.py

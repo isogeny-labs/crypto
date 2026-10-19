@@ -16,7 +16,7 @@ Questions fixed before candidate timings:
    the existing exact scalar Gray kernel avoid repeated descendant matrices?
    Enumerate the entire bounded cube, restore original coordinates, preserve
    lowest-variable DFS root order and caps, and verify original equations.
-   Other split rules, higher-degree systems and custom node oracles retain
+   Other split rules, nonquadratic branches and custom node oracles retain
    recursion. Preserve budget exhaustion as exhaustion.
    Require at least one algebraic root reduction before considering a tail.
    Before candidate execution, inspection of the baseline tree changed the

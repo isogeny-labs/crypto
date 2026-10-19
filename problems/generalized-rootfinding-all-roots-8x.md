@@ -79,3 +79,20 @@ requested prime/extension coverage, fastest external comparison or qualified8x
 gain. The full native S3 separator is functionally implemented, but its m5
 performance is not measured by this m2 comparison. The original exit criteria
 and open status remain unchanged.
+
+Later 2026-10-19: The [recursive/matrix continuation](../research/f4_f5_ecbench_20261019/README.md)
+adds explicit prepared construction, a bounded quadratic tail and an adaptive
+small-system schedule. The current native SDK still passes13 tests; the
+complete library passes4414 tests, and integration covers48 verified/replayed
+policy and generalized recoveries. These are bounded correctness receipts,
+not the missing hard-case runtime qualification. The initial full-DLP panel
+regressed despite faster original complete-root calls; that negative result
+and the separately frozen corrected runs remain separate evidence. The
+original hard-family, external comparison, independent-host and8x exit
+criteria remain open.
+
+Final corrected-source receipt: all32 paired F4/F5 changes improve and all72
+native comparison cells have five admitted samples. The generalized typed
+entry is included on the exact same original root systems; the separate full
+ecbench recovery sessions also verify and replay. These small m2 fixtures
+still do not discharge the hard20-case, strongest-external or8x requirements.

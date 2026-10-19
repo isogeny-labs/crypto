@@ -5,10 +5,15 @@ on:
   pull_request:
     paths:
       - src/cryptanalysis/gf2_elim.rs
+      - src/cryptanalysis/koblitz_groebner.rs
+      - src/cryptanalysis/koblitz_index_calculus.rs
+      - src/cryptanalysis/ecbench/methods.rs
+      - src/bin/ecbench/pdp3_koblitz.rs
       - src/cryptanalysis/ic_boundary.rs
       - src/cryptanalysis/ic_framework/rootfind.rs
       - examples/f4_f5_boolean_perf.rs
       - tools/generalized-rootfinder/**
+      - research/f4_f5_ecbench_20261019/**
       - .github/workflows/boolean-single-write-runtime.yml
 
 permissions:
@@ -26,6 +31,10 @@ jobs:
         run: cargo test --release --locked --lib folded_callback_batches_preserve_every_key_witness_and_group_charge
       - name: Binary and prime m2/m3 oracle controls
         run: cargo test --release --locked --lib cryptanalysis::ic_framework::rootfind::tests
+      - name: Exact matrix construction and recursive-tail controls
+        run: cargo test --release --locked --lib matrix_runtime_ -- --test-threads=1
+      - name: Full pair table serial and four-worker tuples, witnesses and budgets
+        run: cargo test --release --locked --lib full_pair_table_single_worker_matches_parallel_entries_and_budgets -- --test-threads=1
       - name: GF2 reference equality with serial clearing disabled and enabled
         shell: bash
         run: |

@@ -1,0 +1,75 @@
+   Compiling crypto v0.1.0 (/home/ec2-user/crypto-boolean-perf)
+    Finished `release` profile [optimized] target(s) in 18.93s
+     Running unittests src/bin/ecbench.rs (/home/ec2-user/crypto-boolean-perf-target/release/deps/ecbench-fe95751347e8d36e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/ecbench.rs (/home/ec2-user/crypto-boolean-perf-target/release/deps/ecbench-8e1732e88ad3a50c)
+
+running 17 tests
+test a_candidate_session_compares_against_a_baseline_session ... ok
+test a_factor_base_dump_carries_its_points ... ok
+test a_public_target_session_yields_a_checked_vs_rho_claim ... ok
+test a_resealed_hand_edited_figure_is_caught ... ok
+test a_session_runs_verifies_compares_and_loads ... ok
+test bad_specs_are_refused_before_anything_runs ... ok
+test bounds_a_frontier_and_challenge_verdicts_round_trip ... ok
+test counted_ic_sat_replays_with_different_solver_wall_times ... ok
+test field_operations_are_counted_bounded_and_judged ... ok
+test online_windows_split_into_exclusive_claim_phases ... ok
+test pdp3_binary_runs_every_engine_on_a_generic_binary_curve ... FAILED
+test pdp3_koblitz_f4_and_f6_verify_on_one_query_stream ... FAILED
+test pdp3_koblitz_rootfind_engine_follows_f4_query_stream_without_a_solver ... FAILED
+test pdp3_koblitz_rootfind_window_shortens_m3_scan_and_records_window_len ... FAILED
+test pdp3_matrix_runtime_and_generalized_recover_and_replay ... FAILED
+test the_database_refuses_a_slug_with_another_identity ... ok
+test two_sessions_queued_for_one_directory_cannot_both_write_it ... session ECBS1hf015a357b1fd complete -> /tmp/ecbench-test-437647-race/s (48 records: {"verified": 48})
+ecbench: /tmp/ecbench-test-437647-race/s exists; a session never overwrites another
+ok
+
+failures:
+
+---- pdp3_binary_runs_every_engine_on_a_generic_binary_curve stdout ----
+
+thread 'pdp3_binary_runs_every_engine_on_a_generic_binary_curve' (443423) panicked at tests/ecbench.rs:1035:5:
+replay: audit FAILED: 4 records, 4 verified, 0 replays reproduced, 4 problems
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- pdp3_koblitz_f4_and_f6_verify_on_one_query_stream stdout ----
+
+thread 'pdp3_koblitz_f4_and_f6_verify_on_one_query_stream' (444104) panicked at tests/ecbench.rs:908:5:
+replay: audit FAILED: 4 records, 4 verified, 0 replays reproduced, 4 problems
+
+
+---- pdp3_koblitz_rootfind_engine_follows_f4_query_stream_without_a_solver stdout ----
+
+thread 'pdp3_koblitz_rootfind_engine_follows_f4_query_stream_without_a_solver' (444155) panicked at tests/ecbench.rs:1164:5:
+replay: audit FAILED: 10 records, 8 verified, 0 replays reproduced, 8 problems
+
+
+---- pdp3_koblitz_rootfind_window_shortens_m3_scan_and_records_window_len stdout ----
+
+thread 'pdp3_koblitz_rootfind_window_shortens_m3_scan_and_records_window_len' (444278) panicked at tests/ecbench.rs:1296:5:
+replay: audit FAILED: 8 records, 4 verified, 0 replays reproduced, 4 problems
+
+
+---- pdp3_matrix_runtime_and_generalized_recover_and_replay stdout ----
+
+thread 'pdp3_matrix_runtime_and_generalized_recover_and_replay' (444347) panicked at tests/ecbench.rs:974:5:
+audit FAILED: 32 records, 32 verified, 0 replays reproduced, 32 problems
+
+
+
+failures:
+    pdp3_binary_runs_every_engine_on_a_generic_binary_curve
+    pdp3_koblitz_f4_and_f6_verify_on_one_query_stream
+    pdp3_koblitz_rootfind_engine_follows_f4_query_stream_without_a_solver
+    pdp3_koblitz_rootfind_window_shortens_m3_scan_and_records_window_len
+    pdp3_matrix_runtime_and_generalized_recover_and_replay
+
+test result: FAILED. 12 passed; 5 failed; 0 ignored; 0 measured; 0 filtered out; finished in 121.76s
+
+error: test failed, to rerun pass `--test ecbench`
