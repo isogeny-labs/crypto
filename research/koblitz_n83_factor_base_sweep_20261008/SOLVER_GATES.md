@@ -1,5 +1,12 @@
 # N83 solver availability and capacity gates
 
+The [native free-selector follow-up](verification/native-selector-export-20261019/RESULT.md)
+passes the original control at 787 conflicts / 167.34 s under the unchanged
+5000-conflict/180 s envelope. Actual domain indices/phases and original-group
+sum replay independently. Initial propagation finishes at 192.85 ms; XOR
+propagation records 167.10 s. This resolves the exact witness control;
+the earlier stage descriptions below retain their historical scope.
+
 ## Native phase and terminal gate, 2026-10-19
 
 The [fully native continuation](verification/native-phase-20261019-v3/RESULT.md)
@@ -10,8 +17,9 @@ Closure-relative domain completion was 494.015683 ms for K2048 and
 the bounded observability requirement. Internal preprocessing/search costs,
 natural useful rank and full cold runtime remain unknown. The separate
 [free-selector known-witness control](../../problems/n83-free-selector-known-witness-search.md)
-remains wall-censored; fully pinned selector controls prove encoding
-consistency only. No factor-base or performance winner is selected.
+was wall-censored at that stage; the later follow-up above resolves its
+exact scope. Fully pinned controls remain a different workload. No
+factor-base or performance winner is selected.
 
 ## Native guarded continuation, 2026-10-18
 

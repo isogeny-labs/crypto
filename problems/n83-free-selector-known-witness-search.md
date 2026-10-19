@@ -1,12 +1,21 @@
 # N83 free-selector known-witness search
 
-- **Status:** investigating
-- **Kind:** empirical solver bottleneck; internal cause unknown
+- **Status:** resolved for the exact original known-witness control
+- **Kind:** bounded control verification; measured XOR propagation cost
 - **Affected work:** [native N83 continuation](../research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v3/RESULT.md)
 - **Next action owner:** N83 sweep maintainer
 - **Last updated:** 2026-10-19
 
 ## Problem
+
+Resolved by the [native post-solve export](../research/koblitz_n83_factor_base_sweep_20261008/verification/native-selector-export-20261019/RESULT.md):
+the original free-selector workload returns SAT at787conflicts /167.34s
+worker wall under unchanged5000conflicts /180s,1CPU/4GiB. Actual model
+representative indices/phases and original-group sum replay independently;
+a coherently rehashed phase forgery is rejected. This resolves this control
+only. Natural yield/rank and full cold-runtime selection remain open.
+
+The original observed problem and failures below remain historical:
 
 The original public N83 known-witness SAT control fixes eight x-coordinate
 blocks but leaves representative and Frobenius selectors free. It does not
@@ -44,17 +53,29 @@ fixture SHA256 is
 
 ## What would unblock it
 
-- [ ] Return and independently verify the original fixed-coordinate,
+- [x] Return and independently verify the original fixed-coordinate,
   free-selector witness under its declared search/resource envelope, with
   original-group and selected-domain replay. Do not add selector knowledge
   without declaring a separate control workload.
-- [ ] If a correction is proposed, preserve the failed baseline and freeze
+- [x] If a correction is proposed, preserve the failed baseline and freeze
   its matched native baseline/candidate validation before measurement.
 
 This would establish this specific known-witness search control. Natural
 relation yield, useful rank and full cold runtime would remain separate.
 
 ## Next discriminating step
+
+The boundary diagnostic and separate post-solve export are complete. Initial
+propagation ends at192.850022ms, CDCL enters at193.136020ms, and SAT returns
+at167259.951266ms; returned timers record167102070169ns XOR propagation
+and70147211ns clause propagation, with35307decisions /36757XOR passes.
+These observations localize cost to XOR work during search. They establish
+no speedup over the older censoring; all observations are L0 and the extra
+export adds no solver assumptions. Next is a frozen native XOR-engine
+profile/candidate comparison, while positive natural-relation/rank/scalar
+replay remains a separate implementation gap. Neither is launched here.
+
+The following was the preregistered next step before those runs:
 
 Instrument initial level-zero propagation and CDCL entry/return in
 [`Solver::solve_with_lazy_clauses`](../src/cryptanalysis/sat.rs#L1766), then
@@ -70,6 +91,14 @@ unknowns. This step is proposed, not launched or scheduled here. Apply
 normal protocol/card/budget gates before execution.
 
 ## Resolution and history
+
+2026-10-19: Boundary source5e9ee5d4 returns original SAT at787conflicts,
+but its frozen auditor deliberately stops without decoded-selector export.
+Separate sourcecbe8e44da adds only post-solve model export and independently
+audits the same workload at787conflicts within180s. Both runs and the
+earlier180s censoring remain intact. The fully pinned gate also passes;
+its initial native receipt-checker float-roundtrip defect is preserved and
+fixed with a byte-preserving native report and regression test.
 
 2026-10-19: Original control remains censored. Fully specified selector
 controls pass, and both retained natural K2048/K4096 trials have verified

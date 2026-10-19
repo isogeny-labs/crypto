@@ -1,5 +1,10 @@
 # N83 signed-orbit size frontier: exact design extension
 
+The [native free-selector follow-up](verification/native-selector-export-20261019/RESULT.md)
+passes the original witness at 787 conflicts /167.34 s, actual selectors
+replayed. This does not change the size frontier, natural yield or unknown
+full-cold winner.
+
 The [19 October native diagnostic](verification/native-phase-20261019-v3/RESULT.md)
 now supplies independently replayed 1,000-conflict terminals for both retained
 K2048 and K4096, with zero models, relations and rank. This resolves bounded

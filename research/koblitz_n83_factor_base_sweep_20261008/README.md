@@ -1,5 +1,10 @@
 # Factor-base sweep for degree-83 Koblitz index calculus
 
+Latest control: [native free-selector witness verified](verification/native-selector-export-20261019/RESULT.md),
+787 conflicts / 167.34 s worker wall, actual model selectors and original
+group sum independently replayed. XOR propagation dominates this control;
+natural yield/rank and full-cold base selection remain open.
+
 Storage addendum: the [approved 49 MB native evidence bundle](verification/native-phase-publication-20261019/RESULT.md)
 is published and all 308 payload files passed fresh-download verification.
 

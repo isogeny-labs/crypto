@@ -1,5 +1,12 @@
 # Degree-83 factor-base sweep: observed evidence
 
+The [native free-selector witness follow-up](verification/native-selector-export-20261019/RESULT.md)
+passes independent model/domain/group replay at 787 conflicts and 167.34 s
+worker wall within the unchanged 180 s cap. Initial propagation completes
+at 192.85 ms; XOR propagation records 167.10 s. This resolves the exact
+known-witness control gate. Natural yield/rank and full-cold base selection
+remain open; earlier audit and receipt-checker failures are preserved.
+
 The [approved 49 MB native bundle](verification/native-phase-publication-20261019/RESULT.md)
 is now published to `setec-astronomy-artifacts`: a fresh download verified
 the archive, manifest and all 308 payload files. Frozen earlier pending

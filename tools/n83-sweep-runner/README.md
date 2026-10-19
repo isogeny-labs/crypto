@@ -1,5 +1,20 @@
 # Native N83 diagnostic runner
 
+`freeze-free-selector` selects the separate original fixed-coordinate /
+free-selector workload. The post-solve export worker now exports actual
+model selector bits; native audit independently replays each index/phase
+and the original group equation. It never adds selector assumptions.
+`check-sat-trace FILE` validates a single solve's native boundary trace or
+valid killed prefix; only solve_return supplies terminal counters. Docker
+sets N83_SAT_PHASE_TRACE=1. Initial propagation and CDCL entry are separate,
+with existing cumulative engine timers and conflict snapshots. Historical
+workers without this trace use their own frozen runner.
+
+Native card reports preserve original receipt bytes after checking identity;
+they never reserialize floating-point seconds for relay comparison. The
+exact problematic float spelling has a native regression test. The original
+failed check and both corrected assessments remain preserved in the study.
+
 Rust replacement for the bounded retained-base phase observation path. It
 uses no Python. Build/test with `cargo test --offline --manifest-path
  tools/n83-sweep-runner/Cargo.toml` (remove the line-wrap space when entering).
