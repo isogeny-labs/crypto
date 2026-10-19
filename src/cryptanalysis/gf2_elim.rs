@@ -74,6 +74,13 @@ fn vector_tables_enabled() -> bool {
     *ENABLED.get_or_init(|| std::env::var("KIC_GF2_VECTOR_TABLES").as_deref() == Ok("1"))
 }
 
+/// Experimental removal of parallel iterator plumbing in a one-worker pool.
+/// Multiworker pools retain the original scheduling and work accounting.
+fn serial_clear_enabled() -> bool {
+    static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ENABLED.get_or_init(|| std::env::var("KIC_GF2_SERIAL_CLEAR").as_deref() == Ok("1"))
+}
+
 /// Build only addressable entries, initializing each exactly once. The
 /// previous entry `g & (g - 1)` is always below `g`, so every read observes
 /// an initialized entry. The last table can be shorter than `table_size`:
@@ -899,7 +906,9 @@ fn clear_block(
     } else {
         &mut []
     };
-    if (above.len() + below.len()) * suffix >= config.parallel_words {
+    if (above.len() + below.len()) * suffix >= config.parallel_words
+        && !(serial_clear_enabled() && rayon::current_num_threads() == 1)
+    {
         *word_ops += above
             .par_iter_mut()
             .chain(below.par_iter_mut())
