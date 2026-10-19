@@ -334,7 +334,14 @@ fn ecbench_summary(dirs: &[String], calibration: &Value) -> (Value, String) {
             );
             let verified = r["outcome"]["status"] == "verified";
             let s = r["cost"]["s"].as_f64().unwrap_or(f64::NAN);
-            let xors = r["solver"]["ops"].as_f64();
+            // Only a word-XOR count has a pinned XOR price; a SAT conflict
+            // or other unit stays unpriced (priced S = recorded S, flagged).
+            let unit = r["solver"]["op_unit"].as_str().unwrap_or("");
+            let xors = if unit.starts_with("word XORs") {
+                r["solver"]["ops"].as_f64()
+            } else {
+                None
+            };
             let systems = r["solver"]["extra"]["systems"].as_f64();
             let priced = match (xors, ratio) {
                 (Some(x), Some(q)) => s + x * q / rr.sqrt(),
