@@ -240,12 +240,12 @@ fn main() {
             }
             o / t
         };
-        let all = identity(&curves);
+        let all = identity(curves);
         let strat: Vec<Draw> = (0..RESAMPLES)
-            .map(|_| stratified(&mut rng, &curves))
+            .map(|_| stratified(&mut rng, curves))
             .collect();
         let two: Vec<Draw> = (0..RESAMPLES)
-            .map(|_| two_level(&mut rng, &curves))
+            .map(|_| two_level(&mut rng, curves))
             .collect();
         let mut yield_ratios = serde_json::Map::new();
         for (name, num, den, pred_key) in [
