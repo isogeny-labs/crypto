@@ -4132,6 +4132,7 @@ mod wide {
     struct StateScan128 {
         inputs: Vec<(u128, u128)>,
         batch: RootBatch128,
+        padd: PaddScratch128,
     }
 
     impl StateScan128 {
@@ -4140,8 +4141,85 @@ mod wide {
             Self {
                 inputs: Vec::with_capacity(entries),
                 batch: RootBatch128::with_capacity(entries),
+                padd: PaddScratch128::with_capacity(entries),
             }
         }
+    }
+
+    /// Partner-root solve of the rank stage (`KIC_RANK_SOLVE`).  `S3` is the
+    /// batched S3 root solve of [`scan_state128`]; `Padd` gets each
+    /// candidate's two partner roots `x(T + R)` and `x(T - R)` by point
+    /// addition ([`scan_state128_padd`]), exact to `S3` (same candidates,
+    /// probes, first hit and relation).  `PaddCheck` is `Padd` plus the
+    /// removed S3 batch solve, compared with the pair on every candidate (a
+    /// panic on any difference): the planted control for timing.
+    /// `PaddSwapped` (tests only) emits each pair in the other order to force
+    /// the exact-order resolution.
+    #[derive(Clone, Copy, PartialEq, Eq, Debug)]
+    #[allow(dead_code)]
+    enum RankSolve {
+        S3,
+        Padd,
+        PaddCheck,
+        PaddSwapped,
+    }
+
+    fn rank_solve_from_env() -> (RankSolve, &'static str) {
+        match std::env::var("KIC_RANK_SOLVE").as_deref() {
+            Err(_) | Ok("") | Ok("s3") => (RankSolve::S3, "s3"),
+            Ok("padd") => (RankSolve::Padd, "padd"),
+            Ok("padd_check") => (RankSolve::PaddCheck, "padd_check"),
+            Ok(other) => panic!("unknown KIC_RANK_SOLVE {other}"),
+        }
+    }
+
+    static PADD_FALLBACK_STATES: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    static PADD_IRREGULAR_INPUTS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    static PADD_RESOLVED_HITS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    static PADD_SWAPPED_PAIRS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    static PADD_CHECKED_INPUTS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+    /// Per-state scratch of [`scan_state128_padd`].
+    struct PaddScratch128 {
+        ys: Vec<u128>,
+        prefix: Vec<u128>,
+        inverse: Vec<u128>,
+        regular: Vec<bool>,
+    }
+
+    impl PaddScratch128 {
+        fn with_capacity(entries: usize) -> Self {
+            Self {
+                ys: Vec::with_capacity(entries),
+                prefix: Vec::with_capacity(entries),
+                inverse: Vec::with_capacity(entries),
+                regular: Vec::with_capacity(entries),
+            }
+        }
+    }
+
+    /// The normal-basis y of a point of E with normal-basis x `xn`
+    /// (`y = x * HT(x + a + b / x^2)`), or `None` when `x = 0` or `x` is not
+    /// the x of a point of E over the field.
+    #[inline(always)]
+    fn padd_root_y(
+        gf: &Gf2_128,
+        basis: &NormalBasis128,
+        solver: &S3Solver128,
+        a: u128,
+        xn: u128,
+    ) -> Option<u128> {
+        let xp = basis.to_poly.apply(xn);
+        if xp == 0 {
+            return None;
+        }
+        let xi = invert128(gf, basis, xp);
+        let rhs = xp ^ a ^ gf.mul(solver.b, gf.sqr(xi));
+        if (rhs & solver.trace_mask).count_ones() & 1 == 1 {
+            return None;
+        }
+        let u = solver.half_trace.apply(rhs);
+        Some(basis.to_normal.apply(gf.mul(xp, u)))
     }
 
     /// Scan one index state against `target` in the sequential candidate
@@ -4224,6 +4302,262 @@ mod wide {
         None
     }
 
+    /// The sequential probe loop of [`scan_state128`] over one candidate's
+    /// partner pair, in the given order (probe, table lookup, lift).
+    #[inline(always)]
+    #[allow(clippy::too_many_arguments)]
+    fn probe_candidate128(
+        gf: &Gf2_128,
+        fast: &FastBinaryCurve128,
+        basis: &NormalBasis128,
+        index: &Index128,
+        base: &Base128,
+        target: FastPoint128,
+        left_x: u128,
+        right_x: u128,
+        absolute: u128,
+        partners: [u128; 2],
+        lift_scratch: &mut LiftScratch128,
+        probes: &mut u64,
+        relation_check_ns: &mut u128,
+    ) -> Option<Relation128> {
+        let n = gf.n;
+        for partner in partners {
+            *probes += 1;
+            let (canonical, partner_shift) =
+                basis.canonical_selected(basis.to_normal.apply(partner));
+            let Some(value) = index
+                .table
+                .get_with_context(canonical, &index.states, basis)
+            else {
+                continue;
+            };
+            let (left2, right2, relative2, stored_shift) = unpack(value);
+            let left_shift2 = ((stored_shift + n - partner_shift) % n) as usize;
+            let right_shift2 = (left_shift2 + relative2) % n as usize;
+            let codes = [
+                left_x,
+                right_x,
+                index.shifted[left2][left_shift2],
+                index.shifted[right2][right_shift2],
+            ];
+            let lift_started = Instant::now();
+            let lifted = lift128(fast, base, &codes, target, lift_scratch);
+            *relation_check_ns += lift_started.elapsed().as_nanos();
+            if let Some(point_indices) = lifted {
+                return Some(Relation128 {
+                    point_indices,
+                    x_codes: codes,
+                    intermediates: [absolute, partner],
+                    probes: *probes,
+                });
+            }
+        }
+        None
+    }
+
+    /// [`scan_state128`] with the partner roots by point addition: the same
+    /// candidates (shift outer, stored root inner), the same probe positions,
+    /// the same first hit and relation.
+    ///
+    /// For a stored root `R` (the x of a point of E) and the target `T` with
+    /// `x(R) != x(T)`, the two roots of `S3(x(R), x(T), X)` are exactly
+    /// `x(T + R)` and `x(T - R)`; the Frobenius conjugates of `R` are points
+    /// of E because E is defined over F_2.  The loop recovers each stored
+    /// root's y once, then for every shift gets both roots from one shared
+    /// inversion of `x(T) + x(R_s)`: `lambda = (y(T) + y(R_s)) / D`,
+    /// `lambda' = lambda + x(R_s) / D`, `x = lambda^2 + lambda + x(T) +
+    /// x(R_s) + a`, written in the normal basis, where squaring is a
+    /// rotation.  Only the order inside a pair could differ from the S3
+    /// solver's, so a candidate with a table hit among its two keys is
+    /// re-resolved by the S3 solver and probed in the S3 order.  Inputs that
+    /// are exceptional for the S3 batch (`x(R_s) = x(T)`, `x(R_s) = 0`,
+    /// `x(T) = 0`) are solved by the S3 solver itself, and a state whose
+    /// stored root fails the curve check falls back to [`scan_state128`].
+    #[inline(always)]
+    #[allow(clippy::too_many_arguments)]
+    fn scan_state128_padd(
+        gf: &Gf2_128,
+        fast: &FastBinaryCurve128,
+        basis: &NormalBasis128,
+        solver: &S3Solver128,
+        index: &Index128,
+        base: &Base128,
+        target: FastPoint128,
+        target_x: u128,
+        state: &State128,
+        scan: &mut StateScan128,
+        lift_scratch: &mut LiftScratch128,
+        probes: &mut u64,
+        relation_check_ns: &mut u128,
+        solve: RankSolve,
+    ) -> Option<Relation128> {
+        use std::sync::atomic::Ordering;
+        let n = gf.n;
+        let (tx, ty) = target?;
+        debug_assert_eq!(tx, target_x);
+        let a = fast.a;
+        let mut yn = [0u128; 2];
+        for (k, &root) in state.normal_roots.iter().enumerate() {
+            match padd_root_y(gf, basis, solver, a, root) {
+                Some(y) => yn[k] = y,
+                None => {
+                    PADD_FALLBACK_STATES.fetch_add(1, Ordering::Relaxed);
+                    return scan_state128(
+                        gf,
+                        fast,
+                        basis,
+                        solver,
+                        index,
+                        base,
+                        target,
+                        target_x,
+                        state,
+                        scan,
+                        lift_scratch,
+                        probes,
+                        relation_check_ns,
+                    );
+                }
+            }
+        }
+        let swapped = solve == RankSolve::PaddSwapped;
+        let check = solve == RankSolve::PaddCheck;
+        scan.inputs.clear();
+        let pad = &mut scan.padd;
+        pad.ys.clear();
+        pad.prefix.clear();
+        pad.regular.clear();
+        let mut product = 1u128;
+        for shift in 0..n {
+            for k in 0..2 {
+                let xs = basis.to_poly.apply(basis.rotate(state.normal_roots[k], shift));
+                let ys = basis.to_poly.apply(basis.rotate(yn[k], shift));
+                // Exactly the S3 batch's exceptional inputs (zero denominator).
+                let regular = xs != tx && xs != 0 && tx != 0;
+                scan.inputs.push((xs, tx));
+                pad.ys.push(ys);
+                pad.prefix.push(product);
+                pad.regular.push(regular);
+                if regular {
+                    product = gf.mul(product, xs ^ tx);
+                }
+            }
+        }
+        let count = scan.inputs.len();
+        pad.inverse.clear();
+        pad.inverse.resize(count, 0);
+        // A product of non-zero field elements is non-zero.
+        let mut inverse = invert128(gf, basis, product);
+        for i in (0..count).rev() {
+            if pad.regular[i] {
+                pad.inverse[i] = gf.mul(inverse, pad.prefix[i]);
+                inverse = gf.mul(inverse, scan.inputs[i].0 ^ tx);
+            }
+        }
+        if check {
+            scan.batch.solve(gf, basis, solver, &scan.inputs);
+        }
+        let normal_c = basis.to_normal.apply(tx ^ a);
+        let mut candidate = 0usize;
+        for shift in 0..n {
+            let left_x = index.shifted[state.left as usize][shift as usize];
+            let right_x = index.shifted[state.right as usize]
+                [(shift as usize + state.relative as usize) % n as usize];
+            for k in 0..2 {
+                let i = candidate;
+                candidate += 1;
+                let absolute = scan.inputs[i].0;
+                if !scan.padd.regular[i] {
+                    PADD_IRREGULAR_INPUTS.fetch_add(1, Ordering::Relaxed);
+                    let Some(partners) = solver.roots(gf, basis, absolute, tx) else {
+                        continue;
+                    };
+                    if let Some(relation) = probe_candidate128(
+                        gf,
+                        fast,
+                        basis,
+                        index,
+                        base,
+                        target,
+                        left_x,
+                        right_x,
+                        absolute,
+                        partners,
+                        lift_scratch,
+                        probes,
+                        relation_check_ns,
+                    ) {
+                        return Some(relation);
+                    }
+                    continue;
+                }
+                let inverse = scan.padd.inverse[i];
+                let lambda = basis
+                    .to_normal
+                    .apply(gf.mul(ty ^ scan.padd.ys[i], inverse));
+                let lambda2 = lambda ^ basis.to_normal.apply(gf.mul(absolute, inverse));
+                let c = normal_c ^ basis.rotate(state.normal_roots[k], shift);
+                let plus = basis.rotate(lambda, 1) ^ lambda ^ c;
+                let minus = basis.rotate(lambda2, 1) ^ lambda2 ^ c;
+                let emitted_normal = if swapped { [plus, minus] } else { [minus, plus] };
+                let emitted = [
+                    basis.to_poly.apply(emitted_normal[0]),
+                    basis.to_poly.apply(emitted_normal[1]),
+                ];
+                if check {
+                    let s3 = scan.batch.results[i].expect("S3 roots of a regular candidate");
+                    assert!(
+                        emitted == s3 || [emitted[1], emitted[0]] == s3,
+                        "point-addition partners differ from the S3 roots"
+                    );
+                    PADD_CHECKED_INPUTS.fetch_add(1, Ordering::Relaxed);
+                }
+                let hit = |value: u128| {
+                    let (canonical, _) = basis.canonical_selected(value);
+                    index
+                        .table
+                        .get_with_context(canonical, &index.states, basis)
+                        .is_some()
+                };
+                if !hit(emitted_normal[0]) && !hit(emitted_normal[1]) {
+                    *probes += 2;
+                    continue;
+                }
+                PADD_RESOLVED_HITS.fetch_add(1, Ordering::Relaxed);
+                let exact = solver
+                    .roots(gf, basis, absolute, tx)
+                    .expect("S3 roots of a regular candidate");
+                if emitted != exact {
+                    assert_eq!(
+                        [emitted[1], emitted[0]],
+                        exact,
+                        "point-addition partners differ from the S3 roots"
+                    );
+                    PADD_SWAPPED_PAIRS.fetch_add(1, Ordering::Relaxed);
+                }
+                if let Some(relation) = probe_candidate128(
+                    gf,
+                    fast,
+                    basis,
+                    index,
+                    base,
+                    target,
+                    left_x,
+                    right_x,
+                    absolute,
+                    exact,
+                    lift_scratch,
+                    probes,
+                    relation_check_ns,
+                ) {
+                    return Some(relation);
+                }
+            }
+        }
+        None
+    }
+
     fn extract128(
         gf: &Gf2_128,
         fast: &FastBinaryCurve128,
@@ -4235,6 +4569,26 @@ mod wide {
         start: usize,
         relation_check_ns: &mut u128,
     ) -> Option<Relation128> {
+        extract128_with(
+            gf, fast, basis, solver, index, base, target, start, relation_check_ns,
+            RankSolve::S3,
+        )
+    }
+
+    /// [`extract128`] with the partner-root solve selected; every
+    /// `RankSolve` returns the same relation and probe count.
+    fn extract128_with(
+        gf: &Gf2_128,
+        fast: &FastBinaryCurve128,
+        basis: &NormalBasis128,
+        solver: &S3Solver128,
+        index: &Index128,
+        base: &Base128,
+        target: FastPoint128,
+        start: usize,
+        relation_check_ns: &mut u128,
+        solve: RankSolve,
+    ) -> Option<Relation128> {
         let (target_x, _) = target?;
         let mut probes = 0u64;
         let mut scan = StateScan128::new(gf.n);
@@ -4242,21 +4596,18 @@ mod wide {
         let start = start % index.states.len().max(1);
         for offset in 0..index.states.len() {
             let state = index.states.get((start + offset) % index.states.len());
-            if let Some(relation) = scan_state128(
-                gf,
-                fast,
-                basis,
-                solver,
-                index,
-                base,
-                target,
-                target_x,
-                &state,
-                &mut scan,
-                &mut lift_scratch,
-                &mut probes,
-                relation_check_ns,
-            ) {
+            let relation = if solve == RankSolve::S3 {
+                scan_state128(
+                    gf, fast, basis, solver, index, base, target, target_x, &state, &mut scan,
+                    &mut lift_scratch, &mut probes, relation_check_ns,
+                )
+            } else {
+                scan_state128_padd(
+                    gf, fast, basis, solver, index, base, target, target_x, &state, &mut scan,
+                    &mut lift_scratch, &mut probes, relation_check_ns, solve,
+                )
+            };
+            if let Some(relation) = relation {
                 return Some(relation);
             }
         }
@@ -4496,6 +4847,9 @@ mod wide {
         let index_ms = index_started.elapsed().as_secs_f64() * 1000.0;
         let setup_ms = setup_started.elapsed().as_secs_f64() * 1000.0;
 
+        // KIC_RANK_SOLVE: the rank stage's partner-root solve (the target
+        // scan always uses the S3 solve).
+        let (rank_solve, rank_solve_name) = rank_solve_from_env();
         let rank_started = Instant::now();
         let mut echelon = super::Echelon {
             r,
@@ -4551,7 +4905,7 @@ mod wide {
                                     FastBinaryCurve128::neg(rep),
                                 );
                                 thread_attempts += 1;
-                                match extract128(
+                                match extract128_with(
                                     gf,
                                     fast,
                                     basis,
@@ -4561,6 +4915,7 @@ mod wide {
                                     point,
                                     start,
                                     &mut thread_relation_check_ns,
+                                    rank_solve,
                                 ) {
                                     Some(relation) => {
                                         let probes = relation.probes;
@@ -4616,7 +4971,7 @@ mod wide {
                 );
                 rank_attempts += 1;
                 let mut unused_relation_check_ns = 0u128;
-                match extract128(
+                match extract128_with(
                     &gf,
                     &fast,
                     &basis,
@@ -4626,6 +4981,7 @@ mod wide {
                     point,
                     (rank_seed >> 20) as usize,
                     &mut unused_relation_check_ns,
+                    rank_solve,
                 ) {
                     Some(relation) => {
                         rank_relations += 1;
@@ -4788,6 +5144,12 @@ mod wide {
             "rank_relations":rank_relations,
             "rank_failures":rank_failures,
             "rank_rows_without_gain":rank_rows_without_gain,
+            "rank_solve":rank_solve_name,
+            "rank_padd_fallback_states":PADD_FALLBACK_STATES.load(std::sync::atomic::Ordering::Relaxed),
+            "rank_padd_irregular_inputs":PADD_IRREGULAR_INPUTS.load(std::sync::atomic::Ordering::Relaxed),
+            "rank_padd_resolved_hits":PADD_RESOLVED_HITS.load(std::sync::atomic::Ordering::Relaxed),
+            "rank_padd_swapped_pairs":PADD_SWAPPED_PAIRS.load(std::sync::atomic::Ordering::Relaxed),
+            "rank_padd_checked_inputs":PADD_CHECKED_INPUTS.load(std::sync::atomic::Ordering::Relaxed),
             "rank_policy": if rank_policy_parallel {
                 "guided parallel: every column anchors [a]G - R_j with a scheduling-independent scalar; logs are the unique full-rank solution"
             } else {
@@ -4922,6 +5284,101 @@ mod wide {
                 decode_point_list128(&encoded),
                 vec![Some([1u128 << 64, 9]), None]
             );
+        }
+    }
+
+    #[cfg(test)]
+    mod padd_rank_tests {
+        use super::*;
+
+        fn small_instance(
+            columns: usize,
+        ) -> (FastBinaryCurve128, Gf2_128, NormalBasis128, S3Solver128, Base128, Vec<u128>) {
+            let curve = KoblitzCurve::new(1, 83).unwrap();
+            let fast = FastBinaryCurve128::new(&curve.curve.irreducible, 1).unwrap();
+            let gf = Gf2_128::new(&curve.curve.irreducible);
+            let b = gf.from_element(&curve.curve.b);
+            let r = curve.subgroup_order.to_u64().unwrap();
+            let (points, labels, reps, _) = construct_base128(&fast, &curve, b, columns, r);
+            let mut by_x: HashMap<u128, Vec<usize>> = HashMap::new();
+            for (i, point) in points.iter().enumerate() {
+                by_x.entry(point.unwrap().0).or_default().push(i);
+            }
+            let reps: Vec<u128> = reps.iter().map(|p| p.unwrap()[0]).collect();
+            let base = Base128 { points, labels, by_x, columns };
+            let basis = NormalBasis128::new(&gf);
+            let solver = S3Solver128::new(&gf, b);
+            (fast, gf, basis, solver, base, reps)
+        }
+
+        /// For two points R, T of E the two roots of S3(x(R), x(T), X) are
+        /// x(T + R) and x(T - R), and the recovered y gives the same pair.
+        #[test]
+        fn point_addition_pairs_are_the_s3_roots() {
+            let (fast, gf, basis, solver, base, _) = small_instance(9);
+            let mut seed = 0x0123_4567_89AB_CDEFu64;
+            let mut checked = 0u64;
+            for _ in 0..4000 {
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+                let r = base.points[(seed >> 20) as usize % base.points.len()];
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+                let t = fast.add(r, base.points[(seed >> 20) as usize % base.points.len()]);
+                let (Some((rx, ry)), Some((tx, _))) = (r, t) else { continue };
+                if rx == tx {
+                    continue;
+                }
+                let exact = solver.roots(&gf, &basis, rx, tx).expect("S3 roots of two points");
+                let plus = fast.add(t, r).unwrap().0;
+                let minus = fast.add(t, FastBinaryCurve128::neg(r)).unwrap().0;
+                assert!(exact == [plus, minus] || exact == [minus, plus]);
+                let y = basis.to_poly.apply(
+                    padd_root_y(&gf, &basis, &solver, fast.a, basis.to_normal.apply(rx)).unwrap(),
+                );
+                assert!(y == ry || y == (rx ^ ry));
+                checked += 1;
+            }
+            assert!(checked > 3000);
+        }
+
+        /// Every padd mode reproduces the S3 scan's relation, intermediates
+        /// and probe count, on the folded-free plain index, for rotated
+        /// starts, including the order-swapped emission.
+        #[test]
+        fn padd_scan_finds_the_s3_relation_with_the_s3_probes() {
+            let (fast, gf, basis, solver, base, reps) = small_instance(9);
+            let index = build_index128_with_symmetry(&gf, &basis, &solver, &reps, false, false);
+            let mut seed = 0xA076_1D64_78BD_642Fu64;
+            let mut solved = 0usize;
+            let swapped_before = PADD_SWAPPED_PAIRS.load(std::sync::atomic::Ordering::Relaxed);
+            for _ in 0..40u64 {
+                let mut pick = || {
+                    seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+                    (seed >> 20) as usize % base.points.len()
+                };
+                let mut target = base.points[pick()];
+                for _ in 0..3 {
+                    target = fast.add(target, base.points[pick()]);
+                }
+                let Some((tx, ty)) = target else { continue };
+                let start = (tx ^ ty.rotate_left(29)) as usize;
+                let mut run = |mode: RankSolve| {
+                    let mut ns = 0u128;
+                    extract128_with(&gf, &fast, &basis, &solver, &index, &base, target, start, &mut ns, mode)
+                        .map(|r| (r.point_indices, r.x_codes, r.intermediates, r.probes))
+                };
+                let want = run(RankSolve::S3);
+                assert!(want.is_some(), "a planted four-point target decomposes");
+                for mode in [RankSolve::Padd, RankSolve::PaddCheck, RankSolve::PaddSwapped] {
+                    assert_eq!(run(mode), want, "{mode:?} differs from the S3 scan");
+                }
+                solved += 1;
+            }
+            assert!(solved >= 30);
+            assert!(
+                PADD_SWAPPED_PAIRS.load(std::sync::atomic::Ordering::Relaxed) > swapped_before,
+                "the swapped mode must exercise the exact-order resolution"
+            );
+            assert!(PADD_CHECKED_INPUTS.load(std::sync::atomic::Ordering::Relaxed) > 0);
         }
     }
 }
