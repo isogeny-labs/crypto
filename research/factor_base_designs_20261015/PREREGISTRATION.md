@@ -335,3 +335,51 @@ cells per arm. Nothing yet says which part of A11 makes it cheaper.
 **Predictions.** C1: every arm cost-unfavourable at m ∈ {2, 3}. C2: A11's
 cell completes and A0's does not. C3: p₃ admitted. C4: the curve relation
 carries it.
+
+### Amendment 5, 2026-10-19: the m = 4 longer-budget follow-up (L1, L2), before any of their rows
+
+Registered after Amendment 4's run (`reports/run-20261016T0616Z`) and before
+any row of L1 or L2 exists. It adds two cells. It changes no existing row,
+verdict, threshold or prediction. Instrument, seeds, the completed-cell rule
+and the scores σ (§1) and κ (Amendment 4, C1) are unchanged. The only changes
+are the budget and the memory limit stated below.
+
+**Why.** The open question from the Amendment 2 review is whether A11's
+constant-factor advantage survives at m = 4 for t ≥ 4. At m = 4, A0 has only 2
+completed cells: its t = 4 systems (C2) aborted for memory at about 525 s,
+well inside their 3600 s budget, under `ulimit -v 13000000`. A11's t = 4 cell
+completed in about 1030 s. A longer budget alone cannot complete A0's cell, so
+this amendment raises the memory limit to what the host allows. The
+independent lab runner is still unavailable from this container (Amendment 4,
+C2).
+
+- **L1, A0 m = 4, t = 4, p₁.** The same two planted systems as C2 (the seeds
+  are unchanged, so the systems are identical). Budget 14400 s, grace 600 s,
+  `ulimit -v 14500000` (the host has 15 GB; the lane checks `MemTotal` first and
+  records it). This is the one memory change.
+- **L2, A11 m = 4, t = 5, p₁.** 2 planted systems, seeds by the existing rule.
+  Budget 14400 s, grace 600 s, `ulimit -v 14500000`.
+- One system at a time, L1 before L2, on an otherwise idle host. Each row
+  records `field_ops`, `max_cols`, D, wall time and `ulimit_v_kb`. If the
+  harness can read the child's peak resident memory (`getrusage`), it is
+  recorded too, as descriptive only.
+
+**Decision rules, fixed now.**
+- **R1, does A11's constant factor survive at m = 4, t = 4?** This applies
+  only if both L1 systems complete. *Survives* if A11's t = 4 cell mean
+  `field_ops` (C2, committed) is below A0's L1 cell mean `field_ops`. *Crossed*
+  otherwise. If L1 does not complete, the outcome is *A0 not measurable at
+  t = 4 within 14.5 GB and 4 h*, reported with its limit and its partial
+  values. No cost comparison is made from a cell that did not complete.
+- **R2, A11 at m = 4, t = 5.** If both L2 systems complete, the cell joins
+  A11's m = 4 series as a fourth point, and σ and κ are recomputed with their
+  verdicts (§1 and Amendment 4: cost-favourable iff κ < m − 1 = 3 on ≥ 3
+  cells). If not, it is recorded with its limit, and the 3-cell verdicts
+  stand (σ = 1.5, κ = 14.9: cost-unfavourable).
+- If L1 completes, A0's m = 4 series gains a third cell, and its σ and κ
+  verdicts are computed for the first time.
+
+**Predictions.** L1: A0 aborts for memory again (its matrices at t = 4
+already exceed 102 516 columns at 300 s). L2: A11 does not complete within
+14.5 GB (its width grows about 6 bits per bit at m = 4). Neither failure
+would change a recorded verdict.
