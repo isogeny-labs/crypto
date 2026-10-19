@@ -50,6 +50,7 @@ LEDGER_COVERED_THROUGH = 23
 
 SOURCES = {
     "three_leads": "research/three_leads_e2e_20261018/results/dashboard.json",
+    "three_leads_instructions": "research/three_leads_e2e_20261018/results/retired-instruction-summary.json",
     "round5": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "matched_rho": "research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json",
     "matched_rho_analysis": "research/ic_rho_reference_20260923/analysis.json",
@@ -1073,6 +1074,7 @@ def build() -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "three_leads_study": load(SOURCES["three_leads"]),
+        "three_leads_instructions": load(SOURCES["three_leads_instructions"]),
         "linear_algebra_component": la_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
@@ -1430,6 +1432,10 @@ def markdown(doc: dict) -> str:
           "retired-instruction ratio is 7.487 [6.657,8.372], with an identical-rho A/A "
           "range of 0.9999703–1.0000121. No qualified wall-speed claim follows. "
           "[Every original claim and verdict](../../research/three_leads_e2e_20261018/CLAIMS.md).", ""]
+    L += ["Instruction counts are a separate unit and favor some tiny subfield pipelines:", ""]
+    for row in doc["three_leads_instructions"]:
+        if row["candidate"] == "structured_ic" and row["reference"] == "rho_neg" and row["group"] in {"binary-q8-v2", "binary-q16-v2", "odd-p5-v2", "odd-p7-v2"}:
+            L.append(f"- `{row['group']}`: {row['instruction_ratio']:.4f}× rho-neg (instrumented backend; no qualified wall claim).")
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
         L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
@@ -2102,6 +2108,15 @@ def page(doc: dict, standalone: bool) -> str:
              'instrumented retired-instruction ratio is 7.487 [6.657,8.372], with identical-rho '
              'A/A range 0.9999703–1.0000121. No qualified wall-speed claim follows.</p>' +
              gh('research/three_leads_e2e_20261018/CLAIMS.md','Every original claim and verdict') + '</section>')
+
+    P.append('<section class="panel" id="three-leads-instructions"><h2>Tiny subfield instruction controls</h2>'
+             '<p>Instruction counts are a separate unit and favor some tiny subfield pipelines '
+             'despite their arithmetic-model losses. These instrumented backend observations '
+             'include native and accounting overhead; they establish no qualified wall-speed claim.</p><ul>')
+    for row in doc["three_leads_instructions"]:
+        if row["candidate"] == "structured_ic" and row["reference"] == "rho_neg" and row["group"] in {"binary-q8-v2", "binary-q16-v2", "odd-p5-v2", "odd-p7-v2"}:
+            P.append(f'<li><code>{esc(row["group"])}</code>: {row["instruction_ratio"]:.4f}× rho-neg.</li>')
+    P.append('</ul>' + gh(SOURCES["three_leads_instructions"], 'All frozen instruction observations') + '</section>')
 
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '

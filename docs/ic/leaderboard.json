@@ -14,6 +14,10 @@
    "path": "research/three_leads_e2e_20261018/results/dashboard.json",
    "sha256": "686c03b185c2b838fa6b3d36f1d4c0c861e3517b285c2eb6a2c6631d54162df7"
   },
+  "three_leads_instructions": {
+   "path": "research/three_leads_e2e_20261018/results/retired-instruction-summary.json",
+   "sha256": "e37064968f9478e5be2543ded43be4e549e21cb950c55d80611ab83acd5ea447"
+  },
   "round5": {
    "path": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "sha256": "28aadc91af9e4c0b84eefcd4c940c27f178c5d63a69bc03058eab52d327225c7"
@@ -50741,6 +50745,2636 @@
   "trace_filter_controls": 168,
   "unit": "Cold arithmetic model; S/M=.75, I/M=10; native unpriced; L0"
  },
+ "three_leads_instructions": [
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 295090238,
+   "curves": 3,
+   "group": "binary-q128-v2",
+   "instruction_ratio": 2.54727466131,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.60345364837,
+    4.52108428269
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 115845473,
+   "unqualified_wall_ratio": 0.346994792124,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 295090238,
+   "curves": 3,
+   "group": "binary-q128-v2",
+   "instruction_ratio": 1.79863299249,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.29864887924,
+    2.8082712654
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 164063619,
+   "unqualified_wall_ratio": 0.203646540009,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 25563131,
+   "curves": 3,
+   "group": "binary-q16-v2",
+   "instruction_ratio": 0.494207671406,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    0.331254313627,
+    0.675231482305
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 51725484,
+   "unqualified_wall_ratio": 0.0460928304138,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 25563131,
+   "curves": 3,
+   "group": "binary-q16-v2",
+   "instruction_ratio": 0.289554213394,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    0.175724966365,
+    0.575982667016
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 88284438,
+   "unqualified_wall_ratio": 0.0336363958433,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 722371861,
+   "curves": 3,
+   "group": "binary-q256-v2",
+   "instruction_ratio": 10.6214043073,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    6.80107203341,
+    13.8031160084
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 68010956,
+   "unqualified_wall_ratio": 1.1407601599,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 722371861,
+   "curves": 3,
+   "group": "binary-q256-v2",
+   "instruction_ratio": 8.99006657264,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    5.6669924961,
+    13.5546011283
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 80352226,
+   "unqualified_wall_ratio": 1.20523332557,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 54623882,
+   "curves": 3,
+   "group": "binary-q32-v2",
+   "instruction_ratio": 1.54522532152,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.4071155088,
+    1.73024091713
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 35350108,
+   "unqualified_wall_ratio": 0.108242027449,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 54623882,
+   "curves": 3,
+   "group": "binary-q32-v2",
+   "instruction_ratio": 0.957556191555,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    0.491790746792,
+    1.88282541886
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 57045093,
+   "unqualified_wall_ratio": 0.0939962810675,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 1868191357,
+   "curves": 3,
+   "group": "binary-q512-v2",
+   "instruction_ratio": 10.531699361,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    3.64845288745,
+    43.5144269219
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 177387456,
+   "unqualified_wall_ratio": 1.19786507291,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 1868191357,
+   "curves": 3,
+   "group": "binary-q512-v2",
+   "instruction_ratio": 10.4698865402,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    3.62876402436,
+    43.2054056078
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 178434728,
+   "unqualified_wall_ratio": 1.47420199835,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 114197829,
+   "curves": 3,
+   "group": "binary-q64-v2",
+   "instruction_ratio": 3.4508198361,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    3.16616700649,
+    4.01369721748
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 33092956,
+   "unqualified_wall_ratio": 0.354349027637,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 114197829,
+   "curves": 3,
+   "group": "binary-q64-v2",
+   "instruction_ratio": 2.32591402216,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.3127523623,
+    3.69178991411
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 49098044,
+   "unqualified_wall_ratio": 0.248352148577,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 14591809,
+   "curves": 3,
+   "group": "binary-q8-v2",
+   "instruction_ratio": 0.449091771406,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    0.40644196664,
+    0.514726492722
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 32491820,
+   "unqualified_wall_ratio": 0.0534883251105,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 14591809,
+   "curves": 3,
+   "group": "binary-q8-v2",
+   "instruction_ratio": 0.445171847979,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    0.397438618774,
+    0.513549250822
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 32777924,
+   "unqualified_wall_ratio": 0.0458623763241,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 5443547166,
+   "curves": 3,
+   "group": "genus-16-v2",
+   "instruction_ratio": 2.27665697998,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.19824945444,
+    2.39626592035
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 2391026498,
+   "unqualified_wall_ratio": 1.07421233082,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 5443547166,
+   "curves": 3,
+   "group": "genus-16-v2",
+   "instruction_ratio": 2.2212834417,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.1523523984,
+    2.29413601827
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 2450631497,
+   "unqualified_wall_ratio": 1.12769465971,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 4970500640,
+   "curves": 3,
+   "group": "genus-16-v2",
+   "instruction_ratio": 2.078814536,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.00937817466,
+    2.16954449415
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 2391026498,
+   "unqualified_wall_ratio": 1.05801842766,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 4970500640,
+   "curves": 3,
+   "group": "genus-16-v2",
+   "instruction_ratio": 2.02825298136,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.9513791419,
+    2.10484221618
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 2450631497,
+   "unqualified_wall_ratio": 1.11069450286,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 6095517318,
+   "curves": 3,
+   "group": "genus-20-v2",
+   "instruction_ratio": 2.42943591334,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.31228546773,
+    2.57145799194
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 2509025772,
+   "unqualified_wall_ratio": 0.931708019096,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 6095517318,
+   "curves": 3,
+   "group": "genus-20-v2",
+   "instruction_ratio": 2.32332398084,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.22590319676,
+    2.41697975162
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 2623619163,
+   "unqualified_wall_ratio": 0.936086984364,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 5174506154,
+   "curves": 3,
+   "group": "genus-20-v2",
+   "instruction_ratio": 2.062356717,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.00993213621,
+    2.13450554937
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 2509025772,
+   "unqualified_wall_ratio": 0.883662887826,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 5174506154,
+   "curves": 3,
+   "group": "genus-20-v2",
+   "instruction_ratio": 1.97227792317,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.93752175403,
+    2.01615948854
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 2623619163,
+   "unqualified_wall_ratio": 0.887816044195,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 7418077155,
+   "curves": 3,
+   "group": "genus-24-v2",
+   "instruction_ratio": 2.77327064175,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.68169065428,
+    2.87330959448
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 2674847901,
+   "unqualified_wall_ratio": 1.00255248548,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 7418077155,
+   "curves": 3,
+   "group": "genus-24-v2",
+   "instruction_ratio": 2.73445731817,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.63525799493,
+    2.85228754729
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 2712815119,
+   "unqualified_wall_ratio": 1.0556300731,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 5407532167,
+   "curves": 3,
+   "group": "genus-24-v2",
+   "instruction_ratio": 2.02162230046,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.99410229863,
+    2.06299787263
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 2674847901,
+   "unqualified_wall_ratio": 0.930949348923,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 5407532167,
+   "curves": 3,
+   "group": "genus-24-v2",
+   "instruction_ratio": 1.99332867512,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.97735967529,
+    2.01086607239
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 2712815119,
+   "unqualified_wall_ratio": 0.980236090863,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 14164628337,
+   "curves": 3,
+   "group": "genus-28-v2",
+   "instruction_ratio": 4.16212227641,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    3.5379733821,
+    4.60792288168
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 3403222538,
+   "unqualified_wall_ratio": 1.22259402136,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 14164628337,
+   "curves": 3,
+   "group": "genus-28-v2",
+   "instruction_ratio": 3.68053842287,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    3.44875910013,
+    3.87497156559
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 3848520708,
+   "unqualified_wall_ratio": 1.25209771564,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 8788642049,
+   "curves": 3,
+   "group": "genus-28-v2",
+   "instruction_ratio": 2.5824470633,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.05424829137,
+    3.08174023731
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 3403222538,
+   "unqualified_wall_ratio": 0.925689904989,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 8788642049,
+   "curves": 3,
+   "group": "genus-28-v2",
+   "instruction_ratio": 2.28364161605,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.02283816761,
+    2.5367304609
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 3848520708,
+   "unqualified_wall_ratio": 0.948028695689,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 38524952489,
+   "curves": 3,
+   "group": "genus-32-v2",
+   "instruction_ratio": 7.87954992424,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    7.25692765472,
+    8.56812467468
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 4889232616,
+   "unqualified_wall_ratio": 2.27658012746,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 38524952489,
+   "curves": 3,
+   "group": "genus-32-v2",
+   "instruction_ratio": 6.57739382909,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    6.04230055662,
+    7.42231824522
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 5857175880,
+   "unqualified_wall_ratio": 2.11396791625,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 16713770201,
+   "curves": 3,
+   "group": "genus-32-v2",
+   "instruction_ratio": 3.41848537668,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.72179877964,
+    3.79975355685
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 4889232616,
+   "unqualified_wall_ratio": 1.22416919553,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 16713770201,
+   "curves": 3,
+   "group": "genus-32-v2",
+   "instruction_ratio": 2.85355443364,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.62942559628,
+    3.07577902184
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 5857175880,
+   "unqualified_wall_ratio": 1.13672889094,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 64922034645,
+   "curves": 3,
+   "group": "genus-36-v2",
+   "instruction_ratio": 11.4297214341,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    9.93674244005,
+    12.975407448
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 5680106468,
+   "unqualified_wall_ratio": 3.60030539787,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 64922034645,
+   "curves": 3,
+   "group": "genus-36-v2",
+   "instruction_ratio": 9.44678088836,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    7.87985583734,
+    11.9833927395
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 6872397636,
+   "unqualified_wall_ratio": 3.27017300948,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 18545146923,
+   "curves": 3,
+   "group": "genus-36-v2",
+   "instruction_ratio": 3.26492945642,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.38235140631,
+    3.70930976206
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 5680106468,
+   "unqualified_wall_ratio": 1.25921494577,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 18545146923,
+   "curves": 3,
+   "group": "genus-36-v2",
+   "instruction_ratio": 2.6984973666,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.22269559232,
+    3.08069184222
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 6872397636,
+   "unqualified_wall_ratio": 1.14375039718,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 141113801006,
+   "curves": 3,
+   "group": "genus-40-v2",
+   "instruction_ratio": 16.1855731807,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    14.8262803578,
+    18.2817984931
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 8718492662,
+   "unqualified_wall_ratio": 5.882011384,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 141113801006,
+   "curves": 3,
+   "group": "genus-40-v2",
+   "instruction_ratio": 14.3194484279,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    13.1585251548,
+    16.0607407865
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 9854695292,
+   "unqualified_wall_ratio": 5.44126443537,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 30938662983,
+   "curves": 3,
+   "group": "genus-40-v2",
+   "instruction_ratio": 3.54862522485,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.73671642208,
+    3.90358923443
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 8718492662,
+   "unqualified_wall_ratio": 1.45538670375,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 30938662983,
+   "curves": 3,
+   "group": "genus-40-v2",
+   "instruction_ratio": 3.13948448595,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.41177159813,
+    3.48810716385
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 9854695292,
+   "unqualified_wall_ratio": 1.34633263927,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 10939572,
+   "curves": 2,
+   "group": "odd-p5-v2",
+   "instruction_ratio": 0.436303150503,
+   "matched_targets": 16,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    0.405898036564,
+    0.46298411265
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 25073328,
+   "unqualified_wall_ratio": 0.0678256250889,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 10939572,
+   "curves": 2,
+   "group": "odd-p5-v2",
+   "instruction_ratio": 0.436134825154,
+   "matched_targets": 16,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    0.405799175994,
+    0.463127631653
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 25083005,
+   "unqualified_wall_ratio": 0.0515590664363,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 18006300,
+   "curves": 3,
+   "group": "odd-p7-v2",
+   "instruction_ratio": 0.485402502927,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    0.399693449212,
+    0.585517921362
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 37095606,
+   "unqualified_wall_ratio": 0.0646153268589,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 18006300,
+   "curves": 3,
+   "group": "odd-p7-v2",
+   "instruction_ratio": 0.481717395832,
+   "matched_targets": 24,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    0.399445101215,
+    0.569940243614
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 37379385,
+   "unqualified_wall_ratio": 0.0596839108516,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 6247805144,
+   "curves": 3,
+   "group": "order-genus-16",
+   "instruction_ratio": 2.33589803196,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.24984706677,
+    2.4176511367
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 2674690872,
+   "unqualified_wall_ratio": 0.929127791162,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 6247805144,
+   "curves": 3,
+   "group": "order-genus-16",
+   "instruction_ratio": 2.3003158167,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.23135320717,
+    2.36843220952
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 2716064072,
+   "unqualified_wall_ratio": 0.960990364132,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 5473317442,
+   "curves": 3,
+   "group": "order-genus-16",
+   "instruction_ratio": 2.04633645678,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.01383371321,
+    2.09003363829
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 2674690872,
+   "unqualified_wall_ratio": 0.937406171189,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 5473317442,
+   "curves": 3,
+   "group": "order-genus-16",
+   "instruction_ratio": 2.01516506861,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.9920664237,
+    2.04803233184
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 2716064072,
+   "unqualified_wall_ratio": 0.969552634588,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 9111298872,
+   "curves": 3,
+   "group": "order-genus-20",
+   "instruction_ratio": 2.9192953777,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.84044980301,
+    2.99812677069
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 3121060973,
+   "unqualified_wall_ratio": 0.986905857636,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 9111298872,
+   "curves": 3,
+   "group": "order-genus-20",
+   "instruction_ratio": 2.76959155476,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.66569826292,
+    2.86914301359
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 3289762657,
+   "unqualified_wall_ratio": 1.12492941577,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 7168174312,
+   "curves": 3,
+   "group": "order-genus-20",
+   "instruction_ratio": 2.29671075766,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.23299659133,
+    2.3590700668
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 3121060973,
+   "unqualified_wall_ratio": 0.894052446878,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 7168174312,
+   "curves": 3,
+   "group": "order-genus-20",
+   "instruction_ratio": 2.17893357648,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.103771944,
+    2.26187976463
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 3289762657,
+   "unqualified_wall_ratio": 1.01909000636,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 18225201645,
+   "curves": 3,
+   "group": "order-genus-24",
+   "instruction_ratio": 4.21452840466,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.02972475336,
+    4.40004389557
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 4324375089,
+   "unqualified_wall_ratio": 1.28816642285,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 18225201645,
+   "curves": 3,
+   "group": "order-genus-24",
+   "instruction_ratio": 3.72002846261,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    3.45464513744,
+    3.96800473456
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 4899210269,
+   "unqualified_wall_ratio": 1.24967050744,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 12807944994,
+   "curves": 3,
+   "group": "order-genus-24",
+   "instruction_ratio": 2.96180251028,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.69232205115,
+    3.24302577803
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 4324375089,
+   "unqualified_wall_ratio": 1.11869696974,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 12807944994,
+   "curves": 3,
+   "group": "order-genus-24",
+   "instruction_ratio": 2.61428766898,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.31016142693,
+    2.89542641844
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 4899210269,
+   "unqualified_wall_ratio": 1.08526552552,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 59230165996,
+   "curves": 3,
+   "group": "order-genus-28",
+   "instruction_ratio": 6.24308528487,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    5.68719303094,
+    6.80720991768
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 9487322901,
+   "unqualified_wall_ratio": 2.32489225053,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 59230165996,
+   "curves": 3,
+   "group": "order-genus-28",
+   "instruction_ratio": 4.98866757606,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.59015732149,
+    5.4231126239
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 11872943044,
+   "unqualified_wall_ratio": 2.25023222758,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 35913503133,
+   "curves": 3,
+   "group": "order-genus-28",
+   "instruction_ratio": 3.78542013461,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    3.35912348712,
+    4.23974350659
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 9487322901,
+   "unqualified_wall_ratio": 1.46252783939,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 35913503133,
+   "curves": 3,
+   "group": "order-genus-28",
+   "instruction_ratio": 3.02481895179,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.73521577498,
+    3.35480413968
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 11872943044,
+   "unqualified_wall_ratio": 1.41556120598,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 203302630144,
+   "curves": 3,
+   "group": "order-genus-32",
+   "instruction_ratio": 7.00286785302,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    6.24184756843,
+    7.87035021269
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 29031338933,
+   "unqualified_wall_ratio": 4.29779936721,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 203302630144,
+   "curves": 3,
+   "group": "order-genus-32",
+   "instruction_ratio": 5.30398124812,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.84522384055,
+    5.8324018375
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 38330193987,
+   "unqualified_wall_ratio": 3.61756620709,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 120864256538,
+   "curves": 3,
+   "group": "order-genus-32",
+   "instruction_ratio": 4.16323397336,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    3.65376081607,
+    4.80478820411
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 29031338933,
+   "unqualified_wall_ratio": 2.07235594928,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 120864256538,
+   "curves": 3,
+   "group": "order-genus-32",
+   "instruction_ratio": 3.15323884296,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.67724395795,
+    3.66549353579
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 38330193987,
+   "unqualified_wall_ratio": 1.74435431034,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 852203032203,
+   "curves": 3,
+   "group": "order-genus-36",
+   "instruction_ratio": 7.65432881379,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    7.08899906912,
+    8.36753757722
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 111336088759,
+   "unqualified_wall_ratio": 6.51340271858,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 852203032203,
+   "curves": 3,
+   "group": "order-genus-36",
+   "instruction_ratio": 5.58577522049,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    5.08591878538,
+    6.15648555493
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 152566653430,
+   "unqualified_wall_ratio": 4.76944069042,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 486480333373,
+   "curves": 3,
+   "group": "order-genus-36",
+   "instruction_ratio": 4.36947569109,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    3.88991385573,
+    4.98123067301
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 111336088759,
+   "unqualified_wall_ratio": 2.61869238892,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 486480333373,
+   "curves": 3,
+   "group": "order-genus-36",
+   "instruction_ratio": 3.18864130815,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.84281684836,
+    3.61232166193
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 152566653430,
+   "unqualified_wall_ratio": 1.91753812486,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 3475540068271,
+   "curves": 3,
+   "group": "order-genus-40",
+   "instruction_ratio": 7.48684003934,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    6.65709301772,
+    8.37163684536
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 464219891170,
+   "unqualified_wall_ratio": 6.45653895297,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "genus_ic",
+   "candidate_instructions": 3475540068271,
+   "curves": 3,
+   "group": "order-genus-40",
+   "instruction_ratio": 5.78230653871,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    5.21505879205,
+    6.4285668181
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 601064652143,
+   "unqualified_wall_ratio": 5.04655702813,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 1762594736002,
+   "curves": 3,
+   "group": "order-genus-40",
+   "instruction_ratio": 3.79689618978,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    3.38338533533,
+    4.2855721255
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 464219891170,
+   "unqualified_wall_ratio": 2.20146300748,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "jac_rho",
+   "candidate_instructions": 1762594736002,
+   "curves": 3,
+   "group": "order-genus-40",
+   "instruction_ratio": 2.93245448675,
+   "matched_targets": 180,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.59190495346,
+    3.29614985484
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 601064652143,
+   "unqualified_wall_ratio": 1.72070651064,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 10612896983,
+   "curves": 23,
+   "group": "pkm_dickson-d2-lo16384-v2",
+   "instruction_ratio": 7.43345653188,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    5.51936691475,
+    10.6322457799
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1427720326,
+   "unqualified_wall_ratio": 1.13674513285,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 10612896983,
+   "curves": 23,
+   "group": "pkm_dickson-d2-lo16384-v2",
+   "instruction_ratio": 6.70232556756,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    5.07732493886,
+    9.43631172159
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1583464855,
+   "unqualified_wall_ratio": 0.961623003936,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 10387213944,
+   "curves": 23,
+   "group": "pkm_dickson-d2-lo16384-v2",
+   "instruction_ratio": 7.27538422956,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    5.33605328931,
+    10.4146644175
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1427720326,
+   "unqualified_wall_ratio": 1.13070206075,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 10387213944,
+   "curves": 23,
+   "group": "pkm_dickson-d2-lo16384-v2",
+   "instruction_ratio": 6.55980075036,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.91992415098,
+    9.11072247711
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1583464855,
+   "unqualified_wall_ratio": 0.956510901862,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 2673747259,
+   "curves": 23,
+   "group": "pkm_dickson-d2-lo4096-v2",
+   "instruction_ratio": 3.04742567639,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.13624510828,
+    4.86974791626
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 877378989,
+   "unqualified_wall_ratio": 0.37278581735,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 2673747259,
+   "curves": 23,
+   "group": "pkm_dickson-d2-lo4096-v2",
+   "instruction_ratio": 2.63470617759,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.87399033236,
+    4.02415639213
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1014818002,
+   "unqualified_wall_ratio": 0.341520405193,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 2703137289,
+   "curves": 23,
+   "group": "pkm_dickson-d2-lo4096-v2",
+   "instruction_ratio": 3.08092320752,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.16485661387,
+    4.96026589854
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 877378989,
+   "unqualified_wall_ratio": 0.395176511509,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 2703137289,
+   "curves": 23,
+   "group": "pkm_dickson-d2-lo4096-v2",
+   "instruction_ratio": 2.6636670651,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.94070283772,
+    4.01028505043
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1014818002,
+   "unqualified_wall_ratio": 0.362033199903,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 4711027915,
+   "curves": 23,
+   "group": "pkm_dickson-d2-lo8192-v2",
+   "instruction_ratio": 3.75015734587,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.6058334506,
+    5.71317546546
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1256221401,
+   "unqualified_wall_ratio": 0.499580052914,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 4711027915,
+   "curves": 23,
+   "group": "pkm_dickson-d2-lo8192-v2",
+   "instruction_ratio": 3.07603691829,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.25223311135,
+    4.36284174442
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1531525154,
+   "unqualified_wall_ratio": 0.44919283517,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 4777911905,
+   "curves": 23,
+   "group": "pkm_dickson-d2-lo8192-v2",
+   "instruction_ratio": 3.80339954501,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.70663304527,
+    5.73178108333
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1256221401,
+   "unqualified_wall_ratio": 0.528967594965,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 4777911905,
+   "curves": 23,
+   "group": "pkm_dickson-d2-lo8192-v2",
+   "instruction_ratio": 3.11970841127,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.33167806932,
+    4.3763341176
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1531525154,
+   "unqualified_wall_ratio": 0.475616374812,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 10846372867,
+   "curves": 23,
+   "group": "pkm_dickson-d3-lo16384-v2",
+   "instruction_ratio": 8.70175429672,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    6.086662662,
+    13.3733371035
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1246458185,
+   "unqualified_wall_ratio": 1.26400422808,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 10846372867,
+   "curves": 23,
+   "group": "pkm_dickson-d3-lo16384-v2",
+   "instruction_ratio": 7.17963720835,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    5.31282225442,
+    10.1011576535
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1510713223,
+   "unqualified_wall_ratio": 1.023098173,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 10208213321,
+   "curves": 23,
+   "group": "pkm_dickson-d3-lo16384-v2",
+   "instruction_ratio": 8.18977599397,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    5.86485754877,
+    12.4595851367
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1246458185,
+   "unqualified_wall_ratio": 1.06023466739,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 10208213321,
+   "curves": 23,
+   "group": "pkm_dickson-d3-lo16384-v2",
+   "instruction_ratio": 6.75721451668,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    5.13106650461,
+    9.43238734891
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1510713223,
+   "unqualified_wall_ratio": 0.858164970544,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 2753682076,
+   "curves": 23,
+   "group": "pkm_dickson-d3-lo4096-v2",
+   "instruction_ratio": 2.6977553998,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.93750280983,
+    4.11149654467
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1020730818,
+   "unqualified_wall_ratio": 0.344280636434,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 2753682076,
+   "curves": 23,
+   "group": "pkm_dickson-d3-lo4096-v2",
+   "instruction_ratio": 2.19900418681,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.61351703318,
+    3.18891294988
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1252240488,
+   "unqualified_wall_ratio": 0.296136482007,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 2639420145,
+   "curves": 23,
+   "group": "pkm_dickson-d3-lo4096-v2",
+   "instruction_ratio": 2.58581410344,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.84578768311,
+    4.0076296791
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1020730818,
+   "unqualified_wall_ratio": 0.350212334157,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 2639420145,
+   "curves": 23,
+   "group": "pkm_dickson-d3-lo4096-v2",
+   "instruction_ratio": 2.10775819045,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.55948505274,
+    3.05502861571
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1252240488,
+   "unqualified_wall_ratio": 0.301238691977,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 5219104888,
+   "curves": 23,
+   "group": "pkm_dickson-d3-lo8192-v2",
+   "instruction_ratio": 4.05563365565,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.92238560136,
+    6.09755972884
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1286877793,
+   "unqualified_wall_ratio": 0.502933055883,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 5219104888,
+   "curves": 23,
+   "group": "pkm_dickson-d3-lo8192-v2",
+   "instruction_ratio": 3.53089855883,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.55032266325,
+    5.20809505553
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1478123713,
+   "unqualified_wall_ratio": 0.414609406539,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 5142150154,
+   "curves": 23,
+   "group": "pkm_dickson-d3-lo8192-v2",
+   "instruction_ratio": 3.99583408927,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.94675109375,
+    5.81540742842
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1286877793,
+   "unqualified_wall_ratio": 0.498564334645,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 5142150154,
+   "curves": 23,
+   "group": "pkm_dickson-d3-lo8192-v2",
+   "instruction_ratio": 3.47883611417,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.59007189348,
+    5.03051054255
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1478123713,
+   "unqualified_wall_ratio": 0.411007907495,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 7363425637,
+   "curves": 23,
+   "group": "pkm_dickson-d4-lo16384-v2",
+   "instruction_ratio": 6.38082908716,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.60695399301,
+    9.88068610697
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1153991987,
+   "unqualified_wall_ratio": 0.802250852044,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 7363425637,
+   "curves": 23,
+   "group": "pkm_dickson-d4-lo16384-v2",
+   "instruction_ratio": 5.1957147591,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    3.9959845275,
+    7.22689399815
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1417211294,
+   "unqualified_wall_ratio": 0.713462565806,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 7298499855,
+   "curves": 23,
+   "group": "pkm_dickson-d4-lo16384-v2",
+   "instruction_ratio": 6.32456718696,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.70084030203,
+    9.59256525487
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1153991987,
+   "unqualified_wall_ratio": 0.734498638276,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 7298499855,
+   "curves": 23,
+   "group": "pkm_dickson-d4-lo16384-v2",
+   "instruction_ratio": 5.14990240757,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.0605148659,
+    7.03362937281
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1417211294,
+   "unqualified_wall_ratio": 0.653208758471,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 1903723789,
+   "curves": 23,
+   "group": "pkm_dickson-d4-lo4096-v2",
+   "instruction_ratio": 1.91793299892,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.47296438847,
+    2.70938685236
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 992591394,
+   "unqualified_wall_ratio": 0.224456081594,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 1903723789,
+   "curves": 23,
+   "group": "pkm_dickson-d4-lo4096-v2",
+   "instruction_ratio": 1.525436848,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.207750588,
+    2.00350850114
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1247985973,
+   "unqualified_wall_ratio": 0.187028012839,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 2057737867,
+   "curves": 23,
+   "group": "pkm_dickson-d4-lo4096-v2",
+   "instruction_ratio": 2.07309662308,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.59683931139,
+    2.88765840594
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 992591394,
+   "unqualified_wall_ratio": 0.294483706262,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 2057737867,
+   "curves": 23,
+   "group": "pkm_dickson-d4-lo4096-v2",
+   "instruction_ratio": 1.64884695142,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.32947756229,
+    2.15078755665
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1247985973,
+   "unqualified_wall_ratio": 0.245378525744,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 3834088807,
+   "curves": 23,
+   "group": "pkm_dickson-d4-lo8192-v2",
+   "instruction_ratio": 3.08294834105,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.34066891526,
+    4.43885560405
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1243643546,
+   "unqualified_wall_ratio": 0.369363370574,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 3834088807,
+   "curves": 23,
+   "group": "pkm_dickson-d4-lo8192-v2",
+   "instruction_ratio": 2.81154883048,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.17055246333,
+    3.90801589591
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1363692768,
+   "unqualified_wall_ratio": 0.331214380174,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 3910450750,
+   "curves": 23,
+   "group": "pkm_dickson-d4-lo8192-v2",
+   "instruction_ratio": 3.14435013359,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.32087781046,
+    4.58532853335
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1243643546,
+   "unqualified_wall_ratio": 0.388875363514,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 3910450750,
+   "curves": 23,
+   "group": "pkm_dickson-d4-lo8192-v2",
+   "instruction_ratio": 2.86754527248,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.17236442253,
+    4.05154070598
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1363692768,
+   "unqualified_wall_ratio": 0.348711114183,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 9177453211,
+   "curves": 23,
+   "group": "pkm_kummer-d2-lo16384-v2",
+   "instruction_ratio": 6.42803361047,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.90661941074,
+    9.02828739354
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1427723277,
+   "unqualified_wall_ratio": 0.937272252149,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 9177453211,
+   "curves": 23,
+   "group": "pkm_kummer-d2-lo16384-v2",
+   "instruction_ratio": 5.79579573606,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.52737670114,
+    7.84934485042
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1583467332,
+   "unqualified_wall_ratio": 0.88210466694,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 9116093810,
+   "curves": 23,
+   "group": "pkm_kummer-d2-lo16384-v2",
+   "instruction_ratio": 6.385056514,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.71291998837,
+    9.30496070994
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1427723277,
+   "unqualified_wall_ratio": 0.918970490901,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 9116093810,
+   "curves": 23,
+   "group": "pkm_kummer-d2-lo16384-v2",
+   "instruction_ratio": 5.75704570961,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.32091248133,
+    8.14374285371
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1583467332,
+   "unqualified_wall_ratio": 0.86488014229,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 2474325644,
+   "curves": 23,
+   "group": "pkm_kummer-d2-lo4096-v2",
+   "instruction_ratio": 2.82013246065,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.93917785142,
+    4.60922490504
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 877379229,
+   "unqualified_wall_ratio": 0.391211940177,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 2474325644,
+   "curves": 23,
+   "group": "pkm_kummer-d2-lo4096-v2",
+   "instruction_ratio": 2.43819804194,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.68644213599,
+    3.82814819475
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1014817337,
+   "unqualified_wall_ratio": 0.269411417451,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 2460822459,
+   "curves": 23,
+   "group": "pkm_kummer-d2-lo4096-v2",
+   "instruction_ratio": 2.80474209744,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.93342465976,
+    4.65220573548
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 877379229,
+   "unqualified_wall_ratio": 0.35961923038,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 2460822459,
+   "curves": 23,
+   "group": "pkm_kummer-d2-lo4096-v2",
+   "instruction_ratio": 2.4248920168,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.69515790723,
+    3.81546360217
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1014817337,
+   "unqualified_wall_ratio": 0.247654830155,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 4588613203,
+   "curves": 23,
+   "group": "pkm_kummer-d2-lo8192-v2",
+   "instruction_ratio": 3.65271226415,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.70381118314,
+    5.39775627311
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1256220822,
+   "unqualified_wall_ratio": 0.562975496626,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 4588613203,
+   "curves": 23,
+   "group": "pkm_kummer-d2-lo8192-v2",
+   "instruction_ratio": 2.99610603645,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.26389200367,
+    4.21623478095
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1531525636,
+   "unqualified_wall_ratio": 0.452265935306,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 4392713823,
+   "curves": 23,
+   "group": "pkm_kummer-d2-lo8192-v2",
+   "instruction_ratio": 3.49676883719,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.56998419342,
+    5.20064330075
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1256220822,
+   "unqualified_wall_ratio": 0.506869772926,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 4392713823,
+   "curves": 23,
+   "group": "pkm_kummer-d2-lo8192-v2",
+   "instruction_ratio": 2.86819477242,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.1998107731,
+    3.99896556904
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1531525636,
+   "unqualified_wall_ratio": 0.407193445016,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 8471505521,
+   "curves": 23,
+   "group": "pkm_kummer-d3-lo16384-v2",
+   "instruction_ratio": 6.79645494045,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.90404185463,
+    10.3859265726
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1246459455,
+   "unqualified_wall_ratio": 0.987446518499,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 8471505521,
+   "curves": 23,
+   "group": "pkm_kummer-d3-lo16384-v2",
+   "instruction_ratio": 5.60760912048,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.24589639573,
+    7.74603653275
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1510716125,
+   "unqualified_wall_ratio": 0.861799407213,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 9479920604,
+   "curves": 23,
+   "group": "pkm_kummer-d3-lo16384-v2",
+   "instruction_ratio": 7.60547851434,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    5.68049829887,
+    11.080323779
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1246459455,
+   "unqualified_wall_ratio": 1.14447731812,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 9479920604,
+   "curves": 23,
+   "group": "pkm_kummer-d3-lo16384-v2",
+   "instruction_ratio": 6.27511710977,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.85973580092,
+    8.55388042165
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1510716125,
+   "unqualified_wall_ratio": 0.998848905583,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 2266957682,
+   "curves": 23,
+   "group": "pkm_kummer-d3-lo4096-v2",
+   "instruction_ratio": 2.22091644723,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.65476961563,
+    3.2322399983
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1020730737,
+   "unqualified_wall_ratio": 0.323989038234,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 2266957682,
+   "curves": 23,
+   "group": "pkm_kummer-d3-lo4096-v2",
+   "instruction_ratio": 1.81032047994,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.37720086151,
+    2.548242877
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1252241085,
+   "unqualified_wall_ratio": 0.282385280617,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 2331179005,
+   "curves": 23,
+   "group": "pkm_kummer-d3-lo4096-v2",
+   "instruction_ratio": 2.28383345431,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.67444430329,
+    3.44372115136
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1020730737,
+   "unqualified_wall_ratio": 0.374447743294,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 2331179005,
+   "curves": 23,
+   "group": "pkm_kummer-d3-lo4096-v2",
+   "instruction_ratio": 1.86160559091,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.4246700329,
+    2.59521040264
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1252241085,
+   "unqualified_wall_ratio": 0.326364532711,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 4379910879,
+   "curves": 23,
+   "group": "pkm_kummer-d3-lo8192-v2",
+   "instruction_ratio": 3.40352012719,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.61253560671,
+    4.80170522602
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1286876738,
+   "unqualified_wall_ratio": 0.384308835168,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 4379910879,
+   "curves": 23,
+   "group": "pkm_kummer-d3-lo8192-v2",
+   "instruction_ratio": 2.96315409738,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.32172210671,
+    4.05944288273
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1478124571,
+   "unqualified_wall_ratio": 0.327825493733,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 4567919942,
+   "curves": 23,
+   "group": "pkm_kummer-d3-lo8192-v2",
+   "instruction_ratio": 3.54961730764,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.57309306028,
+    5.32233303747
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1286876738,
+   "unqualified_wall_ratio": 0.486616317816,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 4567919942,
+   "curves": 23,
+   "group": "pkm_kummer-d3-lo8192-v2",
+   "instruction_ratio": 3.09034842639,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.29144412067,
+    4.53370769021
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1478124571,
+   "unqualified_wall_ratio": 0.415096453811,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 7086438214,
+   "curves": 23,
+   "group": "pkm_kummer-d4-lo16384-v2",
+   "instruction_ratio": 6.14080335375,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.46716706911,
+    9.4400550128
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1153992044,
+   "unqualified_wall_ratio": 0.749112351698,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 7086438214,
+   "curves": 23,
+   "group": "pkm_kummer-d4-lo16384-v2",
+   "instruction_ratio": 5.00026089502,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    3.87010128123,
+    7.03276905794
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1417213694,
+   "unqualified_wall_ratio": 0.616522680998,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 7578221523,
+   "curves": 23,
+   "group": "pkm_kummer-d4-lo16384-v2",
+   "instruction_ratio": 6.56696167222,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.93268236985,
+    9.74991642006
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1153992044,
+   "unqualified_wall_ratio": 0.823185394315,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 7578221523,
+   "curves": 23,
+   "group": "pkm_kummer-d4-lo16384-v2",
+   "instruction_ratio": 5.34726806203,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    4.28986875287,
+    7.1901134784
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1417213694,
+   "unqualified_wall_ratio": 0.67748511303,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 2010977955,
+   "curves": 23,
+   "group": "pkm_kummer-d4-lo4096-v2",
+   "instruction_ratio": 2.02598690155,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.51014184443,
+    2.88731447368
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 992591785,
+   "unqualified_wall_ratio": 0.208389495626,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 2010977955,
+   "curves": 23,
+   "group": "pkm_kummer-d4-lo4096-v2",
+   "instruction_ratio": 1.61137927573,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.24694254598,
+    2.14131687082
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1247985490,
+   "unqualified_wall_ratio": 0.173948630972,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 1913734892,
+   "curves": 23,
+   "group": "pkm_kummer-d4-lo4096-v2",
+   "instruction_ratio": 1.92801806434,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.46031683216,
+    2.76085287929
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 992591785,
+   "unqualified_wall_ratio": 0.210089468268,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 1913734892,
+   "curves": 23,
+   "group": "pkm_kummer-d4-lo4096-v2",
+   "instruction_ratio": 1.53345924879,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    1.1990616982,
+    2.02531904083
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1247985490,
+   "unqualified_wall_ratio": 0.175367646422,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 3610103049,
+   "curves": 23,
+   "group": "pkm_kummer-d4-lo8192-v2",
+   "instruction_ratio": 2.90284384603,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.2232213682,
+    4.16066909407
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1243643558,
+   "unqualified_wall_ratio": 0.373189361694,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "random_ic",
+   "candidate_instructions": 3610103049,
+   "curves": 23,
+   "group": "pkm_kummer-d4-lo8192-v2",
+   "instruction_ratio": 2.64729900581,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.04594384202,
+    3.65575657114
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1363692972,
+   "unqualified_wall_ratio": 0.367640832303,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 3588939728,
+   "curves": 23,
+   "group": "pkm_kummer-d4-lo8192-v2",
+   "instruction_ratio": 2.8858266542,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.20306402513,
+    4.11420408994
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_neg",
+   "reference_instructions": 1243643558,
+   "unqualified_wall_ratio": 0.349175038132,
+   "wall_qualified": false
+  },
+  {
+   "candidate": "structured_ic",
+   "candidate_instructions": 3588939728,
+   "curves": 23,
+   "group": "pkm_kummer-d4-lo8192-v2",
+   "instruction_ratio": 2.63177988131,
+   "matched_targets": 184,
+   "meaning": "Retired instructions of the complete instrumented solve, including native work and ledger/report overhead; wall ratios remain descriptive at L0",
+   "paired_curve_and_target_bootstrap_95": [
+    2.06428016501,
+    3.58517361782
+   ],
+   "pmu_quality": "user-space calling-process counters; same frozen binary; positive counts; time_enabled=time_running for both arms",
+   "reference": "rho_plain",
+   "reference_instructions": 1363692972,
+   "unqualified_wall_ratio": 0.343983550484,
+   "wall_qualified": false
+  }
+ ],
  "linear_algebra_component": {
   "rows": [
    {

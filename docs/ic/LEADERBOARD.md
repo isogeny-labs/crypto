@@ -248,10 +248,17 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 
 At actual 40-bit subgroup size the 180-target genus IC/rho-neg band is 1.421–18.362; rho wins all 12 arithmetic cells. Complete instrumented retired-instruction ratio is 7.487 [6.657,8.372], with an identical-rho A/A range of 0.9999703–1.0000121. No qualified wall-speed claim follows. [Every original claim and verdict](../../research/three_leads_e2e_20261018/CLAIMS.md).
 
+Instruction counts are a separate unit and favor some tiny subfield pipelines:
+
+- `binary-q16-v2`: 0.4942× rho-neg (instrumented backend; no qualified wall claim).
+- `binary-q8-v2`: 0.4491× rho-neg (instrumented backend; no qualified wall claim).
+- `odd-p5-v2`: 0.4363× rho-neg (instrumented backend; no qualified wall claim).
+- `odd-p7-v2`: 0.4854× rho-neg (instrumented backend; no qualified wall claim).
 
 ## Sources
 
 - `research/three_leads_e2e_20261018/results/dashboard.json` — sha256 `686c03b185c2b838…`
+- `research/three_leads_e2e_20261018/results/retired-instruction-summary.json` — sha256 `e37064968f9478e5…`
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`

@@ -81,3 +81,6 @@
 
 
 #text("The complete ")#link("https://github.com/aburan28/crypto/blob/codex/three-leads-audit-20261018/research/three_leads_e2e_20261018/EVIDENCE.md")[#text("evidence and reproduction guide")]#text(" documents the deterministic raw archive, exact replay commands, source snapshots and validation limits. Actual field/subgroup bit lengths and cofactors for all 42 genus models are in ")#link("https://github.com/aburan28/crypto/blob/codex/three-leads-audit-20261018/research/three_leads_e2e_20261018/results/genus-fixture-sizes.csv")[#text("genus-fixture-sizes.csv")]#text(".")
+
+
+#text("Retired instructions favor the tiny subfield pipeline in some cases despite its arithmetic-model loss: binary q=8 gives 0.4491× rho-neg, q=16 gives 0.4942×; odd p=5 gives 0.4363× and p=7 gives 0.4854×. All 18 structured PKM cell instruction ratios exceed one (1.928–8.190). These complete instrumented-backend observations are a separate unit; they establish no qualified wall-speed or fastest-implementation claim.")

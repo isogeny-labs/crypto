@@ -78,3 +78,5 @@ At actual 40-bit subgroup size, complete instrumented solves retire 7.4868 times
 All 945 sealed study sessions pass their audits. Every one of 42,862 successful measured records replays identically. The 134 exhausted development records were separately rerun and reproduce their exhaustion and exact counters; the standard replay command skips unsuccessful records. The A/A session adds ten measured records and two warmups separately.
 
 The complete [evidence and reproduction guide](EVIDENCE.md) documents the deterministic raw archive, exact replay commands, source snapshots and validation limits. Actual field/subgroup bit lengths and cofactors for all 42 genus models are in [genus-fixture-sizes.csv](results/genus-fixture-sizes.csv).
+
+Retired instructions favor the tiny subfield pipeline in some cases despite its arithmetic-model loss: binary q=8 gives 0.4491× rho-neg, q=16 gives 0.4942×; odd p=5 gives 0.4363× and p=7 gives 0.4854×. All 18 structured PKM cell instruction ratios exceed one (1.928–8.190). These complete instrumented-backend observations are a separate unit; they establish no qualified wall-speed or fastest-implementation claim.
