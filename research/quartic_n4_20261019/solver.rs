@@ -468,37 +468,42 @@ pub struct RhoOut {
 }
 
 pub fn rho(inst: &Inst, k_true: u64, seed: u64) -> RhoOut {
+    // Plain Pollard rho: one trail, r-adding walk (R = 16 steps M_j = a_j G or b_j Q), distinguished
+    // points stored by full point; a repeated DP closes the trail. No negation map.
     let ell = inst.ell;
     let ec = &inst.ec;
-    let kf = &ec.kf;
     let mut rng = Rng::new(seed ^ 0xABCDEF);
     let b0 = snap();
     let t0 = std::time::Instant::now();
     let target = ec.mul(&inst.g, k_true as u128);
-    const R: usize = 32;
+    const R: usize = 16;
     let mut ma = [0u64; R];
     let mut mb = [0u64; R];
     let mut mp = [EP::Inf; R];
     for j in 0..R {
-        ma[j] = rng.below(ell);
-        mb[j] = rng.below(ell);
-        mp[j] = ec.add(&ec.mul(&inst.g, ma[j] as u128), &ec.mul(&target, mb[j] as u128));
+        if j % 2 == 0 {
+            ma[j] = 1 + rng.below(ell - 1);
+            mp[j] = ec.mul(&inst.g, ma[j] as u128);
+        } else {
+            mb[j] = 1 + rng.below(ell - 1);
+            mp[j] = ec.mul(&target, mb[j] as u128);
+        }
     }
     let dbits = {
         let s = (ell as f64).sqrt() / 64.0;
         (s.max(4.0).log2().floor() as u32).max(1)
     };
     let mask = (1u64 << dbits) - 1;
-    let mut table: HashMap<[u64; 3], (u64, u64)> = HashMap::new();
+    let mut table: HashMap<[u64; 6], (u64, u64)> = HashMap::new();
     let mut steps = 0u64;
     let mut dps = 0u64;
     let maxlen = 20u64 << dbits;
     loop {
         let (mut a, mut b) = (rng.below(ell), rng.below(ell));
         let mut p = ec.add(&ec.mul(&inst.g, a as u128), &ec.mul(&target, b as u128));
-        let mut len = 0u64;
+        let mut since_dp = 0u64;
         loop {
-            let (x, _y) = match &p {
+            let (x, y) = match &p {
                 EP::Inf => break,
                 EP::A(x, y) => (*x, *y),
             };
@@ -507,32 +512,31 @@ pub fn rho(inst: &Inst, k_true: u64, seed: u64) -> RhoOut {
             if (h >> 20) & mask == 0 {
                 dps += 1;
                 bump_hash(1);
-                if let Some(&(a2, b2)) = table.get(&x) {
+                let key = [x[0], x[1], x[2], y[0], y[1], y[2]];
+                if let Some(&(a2, b2)) = table.get(&key) {
                     if b2 != b {
-                        // a + b k = a2 + b2 k
                         let num = ls(a, a2, ell);
                         let den = ls(b2, b, ell);
                         let k = lm(num, inv_mod_u64(den, ell), ell);
                         let ok = ec.mul(&inst.g, k as u128) == target;
                         return RhoOut { ok, steps, dps, cnt: snap().since(&b0), wall: t0.elapsed().as_secs_f64() };
                     }
-                    break;
                 } else {
-                    table.insert(x, (a, b));
+                    table.insert(key, (a, b));
                 }
-                break;
+                since_dp = 0;
             }
             let j = (h as usize) % R;
             p = ec.add(&p, &mp[j]);
             a = la(a, ma[j], ell);
             b = la(b, mb[j], ell);
             steps += 1;
-            len += 1;
-            if len > maxlen {
-                break;
+            since_dp += 1;
+            if since_dp > maxlen {
+                break; // trapped in a short cycle without a distinguished point: restart
             }
         }
-        if steps > 40 * (ell as f64).sqrt() as u64 + 100000 {
+        if steps > 60 * (ell as f64).sqrt() as u64 + 200000 {
             return RhoOut { ok: false, steps, dps, cnt: snap().since(&b0), wall: t0.elapsed().as_secs_f64() };
         }
     }

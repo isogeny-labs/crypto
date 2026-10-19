@@ -6,6 +6,7 @@ mod common;
 mod ghs;
 mod ic;
 mod solver;
+mod summ;
 #[path = "../../src/cryptanalysis/plane_quartic_pic.rs"]
 mod pic;
 
@@ -248,32 +249,52 @@ fn solve_cmd(q: u64, seed: u64, nfb: usize, rows_mult: f64, verify: bool) {
     );
 }
 
-/// One protocol unit: instance (q, seed); IC with N = ceil(c q^0.6) (c grows by 0.4 on failure,
-/// every attempt charged); `nrho` matched-rho runs on the same instance with independent k.
+fn flat_cnt(prefix: &str, c: &Cnt, out: &mut Vec<String>) {
+    out.push(format!("\"{p}.mul\":{},\"{p}.inv\":{},\"{p}.add\":{},\"{p}.lmul\":{},\"{p}.ladd\":{},\"{p}.hash\":{},\"{p}.cmp\":{}", c.mul, c.inv, c.add, c.lmul, c.ladd, c.hash, c.cmp, p = prefix));
+}
+
+/// One protocol unit: instance (q, seed); IC arm B0 with N = ceil(c q^0.6) (c grows by 0.4 on
+/// failure, every attempt charged) or arm A0 (c0 <= 0: all rational points); `nrho` matched-rho
+/// runs on the same instance with independent k. Output: flat JSON records.
 fn unit_cmd(q: u64, seed: u64, c0: f64, nrho: usize, rows_mult: f64) {
+    let arm = if c0 > 0.0 { "B0" } else { "A0" };
     let inst = Inst::search(q, seed, 200000).expect("no instance");
     let (r_inv, r_l, gae) = ratios(&inst);
-    println!("{{\"rec\":\"ratios\",\"q\":{},\"seed\":{},\"ell\":{},\"order\":{},\"r_inv\":{:.3},\"r_lmul\":{:.3},\"gae_meq\":{:.2}}}", q, seed, inst.ell, inst.order, r_inv, r_l, gae);
+    // counted E0 addition, for the group-addition equivalent
     let mut rng = Rng::new(seed ^ 0x1234);
+    let (gm, gi) = {
+        let p = inst.ec.rand_point(&mut rng);
+        let p2 = inst.ec.rand_point(&mut rng);
+        let b = snap();
+        let mut acc = p;
+        for _ in 0..100 {
+            acc = inst.ec.add(&acc, &p2);
+        }
+        let d = snap().since(&b);
+        (d.mul as f64 / 100.0, d.inv as f64 / 100.0)
+    };
+    println!("{{\"rec\":\"ratios\",\"arm\":\"{}\",\"q\":{},\"seed\":{},\"ell\":{},\"order\":{},\"r_inv\":{:.4},\"r_lmul\":{:.4},\"gae_mul\":{:.3},\"gae_inv\":{:.3}}}", arm, q, seed, inst.ell, inst.order, r_inv, r_l, gm, gi);
     let k = rng.below(inst.ell - 1) + 1;
     let mut c = c0;
     let mut attempt = 0;
     loop {
         attempt += 1;
-        let nfb = ((c * (q as f64).powf(0.6)).ceil() as usize).min(q as usize + 1);
+        let nfb = if c0 > 0.0 { ((c * (q as f64).powf(0.6)).ceil() as usize).min(q as usize + 1) } else { 0 };
         let prm = solver::Params { nfb, rows_mult, max_desc: 100000 };
-        let t = std::time::Instant::now();
-        let rep = solver::ic_solve(&inst, &prm, k, seed * 100 + attempt, false);
-        let mut ph = Vec::new();
+        let rep = solver::ic_solve(&inst, &prm, k, seed * 100 + attempt, true);
+        let mut f: Vec<String> = Vec::new();
         for (n, cc, w) in &rep.phases {
-            ph.push(format!("{{\"phase\":\"{}\",\"cnt\":{},\"wall\":{:.4}}}", n, cnt_json(cc), w));
+            flat_cnt(n, cc, &mut f);
+            f.push(format!("\"{}.wall\":{:.4}", n, w));
         }
-        let st: Vec<String> = rep.stats.iter().map(|(k, v)| format!("\"{}\":{}", k, v)).collect();
+        for (k2, v) in &rep.stats {
+            f.push(format!("\"s.{}\":{}", k2, v));
+        }
         println!(
-            "{{\"rec\":\"ic\",\"q\":{},\"seed\":{},\"attempt\":{},\"c\":{:.2},\"nfb\":{},\"ell\":{},\"k\":{},\"ok\":{},\"fail\":\"{}\",\"phases\":[{}],\"stats\":{{{}}}}}",
-            q, seed, attempt, c, nfb, inst.ell, k, rep.ok, rep.fail, ph.join(","), st.join(",")
+            "{{\"rec\":\"ic\",\"arm\":\"{}\",\"q\":{},\"seed\":{},\"attempt\":{},\"c\":{:.2},\"nfb\":{},\"ell\":{},\"k\":{},\"ok\":{},\"fail\":\"{}\",{}}}",
+            arm, q, seed, attempt, c, nfb, inst.ell, k, rep.ok, rep.fail, f.join(",")
         );
-        if rep.ok || attempt >= 6 {
+        if rep.ok || attempt >= 6 || c0 <= 0.0 {
             break;
         }
         c += 0.4;
@@ -281,9 +302,11 @@ fn unit_cmd(q: u64, seed: u64, c0: f64, nrho: usize, rows_mult: f64) {
     for i in 0..nrho {
         let kk = rng.below(inst.ell - 1) + 1;
         let r = solver::rho(&inst, kk, seed * 1000 + i as u64);
+        let mut f = Vec::new();
+        flat_cnt("c", &r.cnt, &mut f);
         println!(
-            "{{\"rec\":\"rho\",\"q\":{},\"seed\":{},\"i\":{},\"ok\":{},\"steps\":{},\"dps\":{},\"cnt\":{},\"wall\":{:.4}}}",
-            q, seed, i, r.ok, r.steps, r.dps, cnt_json(&r.cnt), r.wall
+            "{{\"rec\":\"rho\",\"q\":{},\"seed\":{},\"i\":{},\"ok\":{},\"steps\":{},\"dps\":{},\"wall\":{:.4},{}}}",
+            q, seed, i, r.ok, r.steps, r.dps, r.wall, f.join(",")
         );
     }
 }
@@ -291,6 +314,7 @@ fn unit_cmd(q: u64, seed: u64, c0: f64, nrho: usize, rows_mult: f64) {
 fn main() {
     let a: Vec<String> = std::env::args().collect();
     match a.get(1).map(|s| s.as_str()) {
+        Some("summarize") => summ::run(&a[2..]),
         Some("unit") => unit_cmd(a[2].parse().unwrap(), a[3].parse().unwrap(), a[4].parse().unwrap(), a[5].parse().unwrap(), a[6].parse().unwrap()),
         Some("solve") => solve_cmd(a[2].parse().unwrap(), a[3].parse().unwrap(), a[4].parse().unwrap(), a[5].parse().unwrap(), a.get(6).is_some()),
         Some("check") => check(a[2].parse().unwrap(), a[3].parse().unwrap()),
