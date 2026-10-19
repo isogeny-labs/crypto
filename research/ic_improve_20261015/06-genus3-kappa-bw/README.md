@@ -1,5 +1,7 @@
 # Round 2, item 06: a kappa schedule and block Wiedemann for genus-3 IC after the cubic GHS transfer
 
+> **R10 re-rate (2026-10-19):** the block-Wiedemann exponent claim regresses versus tuned-LP by +0.027 over 12..21; its constant gain remains but is smaller. The combination regresses by +0.042 over 16..21. The schedule's constant gain nearly vanishes. See [`pinned ledger`](../../../ic_tool_program/ledger/r10-20261019/README.md).
+
 2026-10-15. Round rules: [../RULES.md](../RULES.md) (this item ran alone: 3 single-threaded jobs, 8 GB, 60 min each).
 Protocol, frozen before data, with amendments B0-B2: [PROTOCOL.md](PROTOCOL.md). Prior work:
 [item 01](../01-genus3-linalg/README.md).
@@ -35,8 +37,8 @@ The A/A noise floors (`aa:lpsgewd` against `main:lpsgewd`, 3 curves):
 |---|---|---|---|---|
 | incumbent `main:lpsgewd` | 1.408 [1.405, 1.410] | 1 (6.54e10) | local exponent 20-21: 1.423; trend +0.0082/bit | - |
 | **(1) kappa schedule** `sched:lpsgewd` | 1.435; **+0.0275 [+0.0258, +0.0293]** (REGRESSES); 16..21: -0.0024 [-0.0037, -0.0009] (MATCHES, inside eps 0.0056) | **0.968 [0.968, 0.969]** (ADVANCES); <= 1 at every size, 0.83 at 2^12 | relation phase +0.097 and LA phase -0.154 (exponent, 16..21); `c_ell = 9`: -0.051 [-0.056, -0.047] (ADVANCES) | **TRADES** (exponent REGRESSES, constant ADVANCES) |
-| **(2) block Wiedemann** `main:lpsgebw2@8` | 1.399; **-0.0082 [-0.0083, -0.0081]** (ADVANCES, small) | **0.945 [0.945, 0.945]** (ADVANCES) | primitive, LA ratio **0.889 [0.888, 0.889]** (ADVANCES); trend difference +0.0005 (no flattening) | **ADVANCES** (exponent, constant, primitive) |
-| **(3) combination** `sched:lpsgebw2` | 1.431; **+0.0236 [+0.0219, +0.0253]** (REGRESSES); 16..21: +0.0003 [-0.0010, +0.0018] (MATCHES) | **0.929 [0.928, 0.930]** (ADVANCES) | LA ratio 0.636 at 2^21 | **TRADES** (exponent REGRESSES, constant ADVANCES) |
+| **(2) block Wiedemann** `main:lpsgebw2@8` | 1.399; **-0.0082 [-0.0083, -0.0081]** (historical comparison; R10 exponent REGRESSES vs tuned-LP) | **0.945 [0.945, 0.945]** (ADVANCES) | primitive, LA ratio **0.889 [0.888, 0.889]** (ADVANCES); trend difference +0.0005 (no flattening) | **ADVANCES** (exponent, constant, primitive) |
+| **(3) combination** `sched:lpsgebw2` | 1.431; **+0.0236 [+0.0219, +0.0253]** (REGRESSES); R10 re-rate 16..21: +0.042 vs tuned-LP (REGRESSES) | **0.929 [0.928, 0.930]** (ADVANCES) | LA ratio 0.636 at 2^21 | **TRADES** (exponent REGRESSES, constant ADVANCES) |
 
 **Does the local-exponent trend flatten toward 4/3?** Yes for the schedule and the combination, no for block
 Wiedemann alone.
