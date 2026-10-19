@@ -791,23 +791,34 @@ fn external_replay(dir: &Path) -> R<Vec<bool>> {
     Ok(model)
 }
 
+fn validate_run_budget(columns: u64, external: bool, conflicts: u64, wall: u64) -> R<()> {
+    let natural = columns != 0 && !external;
+    let wall_ceiling = if natural { 1200 } else { 900 };
+    let conflict_ceiling = if external {
+        1_000_000
+    } else if natural {
+        200_000
+    } else {
+        100_000
+    };
+    require((1..=wall_ceiling).contains(&wall), "invalid wall budget")?;
+    require(
+        (1..=conflict_ceiling).contains(&conflicts),
+        "invalid conflicts",
+    )
+}
+
 fn run(spec: &Path, dir: &Path) -> R<()> {
     native_signals::install();
     let s = read(spec)?;
     let wall = number(&s, "wall_seconds")?;
-    require((1..=900).contains(&wall), "wall must be 1..900")?;
     let columns = number(&s, "columns")?;
     require(
         [0, 2048, 4096].contains(&columns),
         "only retained diagnostic sizes admitted",
     )?;
     let conflicts = number(&s, "conflicts")?;
-    let ceiling = if s["external_solver"].is_string() {
-        1_000_000
-    } else {
-        100_000
-    };
-    require((1..=ceiling).contains(&conflicts), "invalid conflicts")?;
+    validate_run_budget(columns, s["external_solver"].is_string(), conflicts, wall)?;
     let checkout = fs::canonicalize(text(&s, "checkout")?)?;
     let clean = Command::new("git")
         .args(["-c", &format!("safe.directory={}", checkout.display())])
@@ -1241,4 +1252,25 @@ fn sat_trace_distinguishes_censoring_and_rejects_forged_order() {
     )
     .is_err());
     assert!(sat_trace("").is_err());
+}
+
+#[test]
+fn natural_budget_admits_200k_but_stays_bounded() {
+    for columns in [2048, 4096] {
+        assert!(validate_run_budget(columns, false, 200_000, 1200).is_ok());
+        assert!(validate_run_budget(columns, false, 200_001, 1200).is_err());
+        assert!(validate_run_budget(columns, false, 200_000, 1201).is_err());
+        assert!(validate_run_budget(columns, false, 0, 1200).is_err());
+        assert!(validate_run_budget(columns, false, 200_000, 0).is_err());
+    }
+}
+
+#[test]
+fn witness_and_external_budgets_keep_their_old_boundaries() {
+    assert!(validate_run_budget(0, false, 100_000, 900).is_ok());
+    assert!(validate_run_budget(0, false, 100_001, 900).is_err());
+    assert!(validate_run_budget(0, false, 100_000, 901).is_err());
+    assert!(validate_run_budget(0, true, 1_000_000, 900).is_ok());
+    assert!(validate_run_budget(0, true, 1_000_001, 900).is_err());
+    assert!(validate_run_budget(0, true, 1_000_000, 901).is_err());
 }
