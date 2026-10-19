@@ -1,0 +1,178 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "E11b Amendment 3 tuning (post hoc): MITM base-dimension grid on fresh a=1 curves",
+ "description": "Added after Test A and its size decomposition showed the default dimension-9 base is mistuned. Fresh curves (seed 8001), 4 targets; the rule picks, per n, the dimension minimising S at w=0.1 for each family.",
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "mitm-def-d5",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=5",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "mitm-def-d6",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=6",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "mitm-def-d7",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=7",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "mitm-def-d8",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=8",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "mitm-def-d9",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=9",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "mitm-def-d10",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=10",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "mitm-half-d4",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=4,trace_kernel=1",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "mitm-half-d5",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=5,trace_kernel=1",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "mitm-half-d6",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=6,trace_kernel=1",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "mitm-half-d7",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=7,trace_kernel=1",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "mitm-half-d8",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=8,trace_kernel=1",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "mitm-half-d9",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=9,trace_kernel=1",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 1,
+  "seed": 1,
+  "timeout_seconds": 3600,
+  "warmup": 0
+ },
+ "workloads": {
+  "curves": [
+   {
+    "kind": "binary_random",
+    "n": 19,
+    "seed": 8001,
+    "max_cofactor": 2
+   },
+   {
+    "kind": "binary_random",
+    "n": 21,
+    "seed": 8001,
+    "max_cofactor": 2
+   },
+   {
+    "kind": "binary_random",
+    "n": 23,
+    "seed": 8001,
+    "max_cofactor": 2
+   }
+  ],
+  "target_seed": 8001,
+  "targets_per_curve": 4
+ }
+}
