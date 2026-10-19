@@ -6,6 +6,7 @@ import hashlib
 import io
 import json
 import re
+import subprocess
 import tarfile
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -90,6 +91,11 @@ with tarfile.open(reading_archive,'r:xz') as tar:
     assert completed==full_objects and sum(sizes[obj] for obj in completed)==1117504
 external=json.loads((ROOT/'evidence/external-reading.json').read_text())
 assert len(external)==8 and all(e['reading_status']=='model_read_entire_returned_text' for e in external)
+post=json.loads((ROOT/'evidence/post-integration-reading.json').read_text())
+assert len(post)==2
+assert all(1<=e['start_line']<=e['end_line']<=e['total_lines'] for e in post)
+assert post[0]['start_line']==1 and post[0]['end_line']==post[0]['total_lines']==529
+assert post[1]['start_line']==1352 and post[1]['end_line']==1794
 archive=ROOT/'evidence/catalogue.tar.xz'
 expected=(ROOT/'evidence/catalogue.tar.xz.sha256').read_text().split()[0]
 assert hashlib.sha256(archive.read_bytes()).hexdigest()==expected
@@ -115,7 +121,15 @@ for source in sources:
     if 'repo' not in source or 'sha256' not in source:continue
     local=repo_parent/source['repo']/source['path']
     if local.is_file():
-        assert hashlib.sha256(local.read_bytes()).hexdigest()==source['sha256'], 'changed source '+source['key']
+        # Integration can advance a sibling checkout after the scientific pin.
+        # Check the cited committed bytes, not unrelated current worktree bytes.
+        if 'commit' in source:
+            result=subprocess.run(['git','-C',str(repo_parent/source['repo']),
+                                   'show',source['commit']+':'+source['path']],
+                                  check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+            data=result.stdout
+        else:data=local.read_bytes()
+        assert hashlib.sha256(data).hexdigest()==source['sha256'], 'changed source '+source['key']
         checked+=1
 receipt={'check':'manuscript metadata and recorded-data consistency',
          'source_entries':len(keys),'cited_keys':len(used),'locally_rechecked_source_files':checked,

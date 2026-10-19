@@ -19,14 +19,14 @@
   "canonical_graph_reason": "Retrospective of existing evidence, no new cryptographic measurement or official status transition",
   "conductor": "Unavailable (127); no reservation claimed",
   "manuscript_validation": {
-    "pdf_pages": 47,
+    "pdf_pages": 48,
     "figure_sets": 10,
-    "source_entries": 94,
-    "locally_rechecked_source_hashes": 78,
+    "source_entries": 96,
+    "locally_rechecked_source_hashes": 80,
     "make_check": "pass: references/citations resolved; no LaTeX errors or overfull boxes",
-    "recorded_data_check": "pass: original catalogue, new reading CSV/event coverage, archives and copied values checked",
-    "visual_review": "All 47 pages rendered; all four contact sheets inspected; new figure sets and pages 20,22,25,36 inspected directly. Caption positions and literal file names corrected before final inspection.",
-    "pdf_sha256": "611bf62df5cb75b47eddaf0dad1e27082006cd822661134f205fb8fa0bdea6bc"
+    "recorded_data_check": "pass: catalogue, full reading CSV/event coverage, post-integration ranges and copied values checked",
+    "visual_review": "All 48 pages rendered; all four final contact sheets inspected, with new plots and selected technical/coverage pages also examined directly.",
+    "pdf_sha256": "1440076a68f465f8f2d0dc837db760dfa537805fd7e5aa401307312fff7c049f"
   },
   "initial_manuscript_validation": {
     "pdf_pages": 39,
@@ -39,7 +39,7 @@
     "pdf_sha256": "7271631051f4bdd93c4a83e56292b514a07679f66c2319b220e50fb9c3867a4f"
   },
   "expanded_review": {
-    "recorded_at": "2026-10-19T04:11:12.687105+00:00",
+    "recorded_at": "2026-10-19T04:22:05.829795+00:00",
     "pinned_full_read_files": 94,
     "prior_focused_sources": 50,
     "tracked_entries_without_reading_receipts": 305223,
@@ -50,6 +50,18 @@
       "original_c_full_point_order_manifest_entries": 125
     },
     "scientific_replay": "No new cryptographic solver or mathematical replay in expanded pass; original native test receipts retained separately.",
-    "open_record": "problems/ecdlp-portfolio-reading-coverage.md"
+    "open_record": "problems/ecdlp-portfolio-reading-coverage.md",
+    "post_integration_sources": {
+      "full_source_reads": 1,
+      "partial_source_ranges": 1,
+      "revision": "8e4c99759fd8d9594ed207d793b07b59ebaf19f7"
+    }
+  },
+  "integration_validation": {
+    "main_revision": "8e4c99759fd8d9594ed207d793b07b59ebaf19f7",
+    "conflict": "problems/README.md: preserved both entries; placed portfolio row at end of index",
+    "source_check": "Checks cited Git revision bytes after current worktree advances.",
+    "whitespace_check": "PR scope against integration base passes. Global staged merge comparison reported pre-existing upstream PDF/SVG whitespace; those frozen upstream bytes remain unchanged.",
+    "new_scientific_tests": "None; imported upstream implementation changes are not authored by this PR."
   }
 }

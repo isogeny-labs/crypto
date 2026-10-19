@@ -57,6 +57,14 @@ hashes. PDF extraction does not independently inspect every visual or
 certify that an embedded artifact is complete. Those external texts are
 not silently counted as pinned Git files.
 
+Two post-snapshot Git sources were reviewed separately when integrating
+main at \path{8e4c99759fd8d9594ed207d793b07b59ebaf19f7}: the 529-line
+R6.10 literature report in full, and lines 1,352--1,794 of the
+hyperelliptic rho note (its appended rounds, not the whole 1,794-line
+file). Their separate \file{evidence/post-integration-reading.json}
+retains hashes and exact ranges. They do not change the frozen
+nineteen-tree denominator or its ninety-four full-read receipts.
+
 The earlier 2,935-vertex archive, later 7,937-vertex archive and separate C
 archive have 29,409, 79,462 and 125 checked manifest entries respectively.
 Hash-checking all those entries does not mean all archive content has been
