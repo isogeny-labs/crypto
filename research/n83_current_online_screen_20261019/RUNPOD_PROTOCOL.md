@@ -26,6 +26,10 @@ time for verification and archive transfer before the 165-minute watchdog.
 `runpod_verify.py` independently replays all bases, relations, scalars and
 resource gates. Archive the raw results and build receipts, split into 48 MiB
 parts, and record every part SHA-256 and the full archive SHA-256.
+Use `runpod_retrieve.py --user <authenticated-pod-host-id> --output
+<local-evidence-directory>` after the final part manifest is written. The
+retriever uses the RunPod SSH gateway, verifies every part and the assembled
+archive, and extracts only regular files under `results/` or `evidence/`.
 
 After retrieval, `runpod_aggregate.py` validates all transfer hashes and
 archive members, confirms the provider allocation against embedded host and
