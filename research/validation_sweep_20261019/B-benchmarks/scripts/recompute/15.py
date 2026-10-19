@@ -117,13 +117,13 @@ out = {
     'identical': identical,
     'offrepo_refs': [],
     'aa_lines': [],
-    'isolation_lines': [line(README, 128)],
+    'isolation_lines': [],
     'protocol_git_date': gd(PROTO),
     'first_raw_git_date': gd(BEFORE),
     'script': SCRIPT,
     'notes': ('identical units: 3 no-negation collab pairs (fields dead_trails, dead_steps, dp_steps, dps, dps_verified) '
               f'and {len(bp)} PH recovered-answer pairs; n_compared={n_cmp}. '
-              'The README says nothing timed; the isolation_lines entry is the nearest README line about scoreboard and figures, not an isolation statement. '
+              'The study states no timing or isolation line; isolation_lines is empty. '
               'Protocol path used: ' + PROTO + '. First raw file used: ' + BEFORE + ' (first listed candidate).'),
 }
 print(json.dumps(out, ensure_ascii=False))

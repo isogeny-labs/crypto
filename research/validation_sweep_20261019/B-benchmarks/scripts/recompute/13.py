@@ -85,7 +85,7 @@ out = {
     'protocol_git_date': gd(PROTO),
     'first_raw_git_date': gd(INV),
     'script': SCRIPT,
-    'notes': ('Protocol path used: ' + PROTO + ' (the row does not name one). First raw file used: ' + INV +
+    'notes': ('Classification counts in evidence/release-pilot-match.json: ' + str(dict(cls)) + '. Protocol path used: ' + PROTO + ' (the row does not name one). First raw file used: ' + INV +
               ' (first listed candidate). Completed-comparison and censored counts read from evidence/release-pilot-match.json, '
               'which is not in the card candidate list. Off-repo refs are the Drive links in the same README.'),
 }

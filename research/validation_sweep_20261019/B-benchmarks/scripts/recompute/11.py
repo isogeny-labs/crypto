@@ -62,7 +62,7 @@ out = {
     'protocol_git_date': gd(STUDY),
     'first_raw_git_date': gd(INV),
     'script': SCRIPT,
-    'notes': ('Study file is WATCHDOG_REPAIR_PROTOCOL.md (protocol text only; lines 21 and 23 are protocol text, not a result). '
+    'notes': ('Classification counts in watchdog-repair/pilot-match.json: ' + str(dict(cls)) + '. Study file is WATCHDOG_REPAIR_PROTOCOL.md (protocol text only; lines 21 and 23 are protocol text, not a result). '
               'Claimed raw candidates were listed as the release/survey summaries; the 60-attempt and 58/2 pair aggregates were read from '
               'repaired-qa-summary-v2 and watchdog-repair/pilot-match.json. First raw file used: recovery-20261017T1450Z/inventory.json (first listed candidate).'),
 }

@@ -64,3 +64,9 @@ for cls_name, denom in [("koblitz", "rho-frob"), ("prime", "rho-neg")]:
             rr = ks[0]["workload"]["curve"]["r"]
             out.append((cls_name, slug, round(math.log2(rr), 3), arm, len(ks), [round(x, 4) for x in row_r]))
 for o in out: print(o)
+# D. replay-all audits
+aud = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(ROOT, "phase1/audits/*.json")))]
+print("audits", len(aud), "ok True", sum(1 for a in aud if a.get("ok")), "records sum", sum(a["records"] for a in aud), "verified_records sum", sum(a["verified_records"] for a in aud))
+rep = [x for a in aud for x in a.get("replays", [])]
+print("replays", len(rep), "reproduced True", sum(1 for x in rep if x.get("reproduced")), "detail identical", sum(1 for x in rep if x.get("detail") == "identical"), "regraded True", sum(1 for a in aud if a.get("regraded")))
+print("replay-all? replays per audit", sorted(set(len(a.get("replays", [])) for a in aud)), "records per audit", sorted(set(a["records"] for a in aud))[:5])

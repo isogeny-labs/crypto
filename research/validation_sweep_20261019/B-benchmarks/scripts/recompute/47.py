@@ -10,7 +10,7 @@ BD = os.path.join(C.REPO, BENCH)
 
 def recs(group, arm):
     out = []
-    for f in sorted(glob.glob(os.path.join(BD, f"{group}.{arm}.*.jsonl"))):
+    for f in sorted(glob.glob(os.path.join(BD, f"{group}.{arm}.jsonl"))):
         for line in open(f):
             if line.strip():
                 out.append(json.loads(line))
@@ -19,10 +19,17 @@ def recs(group, arm):
 # ---- profile_ntt table (p14-round5.txt) ----
 prof = {}
 cur = None
+in_ntt = False
 for line in open(os.path.join(C.REPO, PROF)):
+    if line.startswith("## "):
+        in_ntt = "profile_ntt" in line
+        cur = None
+        continue
+    if not in_ntt:
+        continue
     m = re.match(r"# (FpM\d) \(", line)
     if m:
-        cur = m.group(1); prof[cur] = {}; continue
+        cur = m.group(1); prof.setdefault(cur, {}); continue
     m = re.match(r"^\s+(\d+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*$", line)
     if m and cur:
         prof[cur][int(m.group(1))] = (float(m.group(2)), float(m.group(3)), float(m.group(4)))
@@ -41,16 +48,17 @@ phi_b = [int(r["ns"]) for r in by_key(sea_br, "sea_phi_precompute", "FpM2_127")]
 phi_ratio_min = min(phi_m) / min(phi_b)
 phi_ratio_all = [round(x / 1e9, 3) for x in phi_m], [round(x / 1e9, 3) for x in phi_b]
 
-# ---- SEA point count over FpM2_127 ----
-pc_main = {}; pc_br = {}
-for r in by_key(sea_main, "sea_point_count", "FpM2_127"):
-    pc_main.setdefault((r.get("instance"), r.get("cycle_degree")), []).append(int(r["ns"]))
-for r in by_key(sea_br, "sea_point_count", "FpM2_127"):
-    pc_br.setdefault((r.get("instance"), r.get("cycle_degree")), []).append(int(r["ns"]))
-keys = sorted(set(pc_main) & set(pc_br))
-pc_ratios = [min(pc_main[k]) / min(pc_br[k]) for k in keys]
+# ---- SEA point count over FpM2_127: records paired by run index (main.k with round5-pre-bmss.k), 24 per arm ----
+def pc(arm_file):
+    return [r for r in recs_file(arm_file) if r.get("algo") == "sea_point_count" and r.get("field") == "FpM2_127"]
+def recs_file(name):
+    return [json.loads(l) for l in open(os.path.join(BD, name)) if l.strip()]
+pm = pc("sea.main.1.jsonl") + pc("sea.main.2.jsonl")
+pb = pc("sea.round5-pre-bmss.1.jsonl") + pc("sea.round5-pre-bmss.2.jsonl")
+pc_ratios = [int(a["ns"]) / int(b["ns"]) for a, b in zip(pm, pb)]
 pc_geo = math.exp(sum(math.log(x) for x in pc_ratios) / len(pc_ratios))
-pc_sum_main = sum(min(v) for v in pc_main.values()); pc_sum_br = sum(min(v) for v in pc_br.values())
+pc_sum_main = sum(int(r["ns"]) for r in pm); pc_sum_br = sum(int(r["ns"]) for r in pb)
+pc_sum_ratio = pc_sum_main / pc_sum_br
 
 # ---- BMSS linear algebra ell = 101 ----
 bm_main = recs("bmss", "main.1") + recs("bmss", "main.2") + recs("bmss", "main.3") + recs("bmss", "main.4")
@@ -59,8 +67,13 @@ def bmss_ns(rs, bits):
     rows = [r for r in rs if r.get("algo") == "linear_algebra" and str(r.get("ell")) == "101" and str(r.get("p_bits")) == str(bits)]
     return [int(r["median_ns"]) for r in rows]
 bm_ratio = {}
+big_all_main = recs("big", "main.1") + recs("big", "main.2")
+big_all_br = recs("big", "round5.1")
 for bits in (40, 256, 511):
     m = bmss_ns(bm_main, bits); b = bmss_ns(bm_br, bits)
+    if not m or not b:
+        m = [int(r["median_ns"]) for r in big_all_main if r.get("algo") == "linear_algebra" and str(r.get("ell")) == "101" and str(r.get("p_bits")) == str(bits)]
+        b = [int(r["median_ns"]) for r in big_all_br if r.get("algo") == "linear_algebra" and str(r.get("ell")) == "101" and str(r.get("p_bits")) == str(bits)]
     bm_ratio[bits] = (m, b, (min(m) / min(b)) if m and b else None)
 
 # ---- Kohel from kernel polynomial ell = 1009 (big group) ----
@@ -85,9 +98,10 @@ claims = [
      "files": [f"{BENCH}/sea.main.1.jsonl", f"{BENCH}/sea.main.2.jsonl", f"{BENCH}/sea.round5-pre-bmss.1.jsonl", f"{BENCH}/sea.round5-pre-bmss.2.jsonl"],
      "status": "match" if abs(phi_ratio_min - 4.1) / 4.1 <= 0.03 else "mismatch"},
     {"claimed": "SEA point count over 2^127-1, 1.14x geomean (0.82-1.42)",
-     "computed": f"geomean of per-record min-ratio {pc_geo:.4f} over {len(pc_ratios)} records; min {min(pc_ratios):.3f} max {max(pc_ratios):.3f}; sum main {pc_sum_main/1e9:.3f} s, sum branch {pc_sum_br/1e9:.3f} s, sum ratio {pc_sum_main/pc_sum_br:.3f}",
-     "definition": "sea_point_count FpM2_127, paired by (instance, cycle_degree), min over runs per arm", "files": [f"{BENCH}/sea.main.1.jsonl", f"{BENCH}/sea.round5-pre-bmss.1.jsonl"],
-     "status": "match" if abs(pc_geo - 1.14) / 1.14 <= 0.01 else "mismatch"},
+     "computed": f"geomean of per-record ratio (main.k record i over round5.k record i, 24 pairs) {pc_geo:.4f}; range {min(pc_ratios):.3f} to {max(pc_ratios):.3f}; sum main {pc_sum_main/1e9:.3f} s, sum branch {pc_sum_br/1e9:.3f} s over 24 records each (sum ratio {pc_sum_ratio:.3f}); REPORT sums 2.12 s / 1.81 s",
+     "definition": "sea_point_count FpM2_127, run-index paired records (24 per arm); geomean and range as the REPORT labels them",
+     "files": [f"{BENCH}/sea.main.1.jsonl", f"{BENCH}/sea.main.2.jsonl", f"{BENCH}/sea.round5-pre-bmss.1.jsonl", f"{BENCH}/sea.round5-pre-bmss.2.jsonl"],
+     "status": "mismatch" if (abs(pc_geo - 1.14) / 1.14 > 0.01 or abs(min(pc_ratios) - 0.82) > 0.02 or abs(max(pc_ratios) - 1.42) > 0.02) else "match"},
     {"claimed": "BMSS linear algebra ell=101 at 40-bit: 40x", "computed": f"min main {min(bm_ratio[40][0])/1e9:.4f} s / min branch {min(bm_ratio[40][1])/1e6:.3f} ms = {bm_ratio[40][2]:.2f}" if bm_ratio[40][2] else "no records",
      "definition": "bmss linear_algebra ell 101 p_bits 40, min over runs of median_ns", "files": [f"{BENCH}/bmss.main.1.jsonl", f"{BENCH}/bmss.round5.1.jsonl"],
      "status": "match" if bm_ratio[40][2] and abs(bm_ratio[40][2] - 40) / 40 <= 0.05 else "mismatch"},
@@ -128,11 +142,12 @@ row = {
     "first_raw_git_date": C.git_first_add(PROF) + " | " + C.git_first_add(f"{BENCH}/sea.main.1.jsonl"),
     "script": "research/validation_sweep_20261019/B-benchmarks/scripts/recompute/47.py",
     "notes": ("Card RAW CANDIDATES was empty; the REPORT names committed raw records results/p14-bench/*.jsonl and "
-              "results/p14-round5.txt, which are used here. The REPORT's own table states 'minimum of two runs per "
-              "binary (four for bmss on main)'; bmss on the branch has two runs (round5.1, round5.2 files, the bmss "
-              "round5.2 file is read). Identical claims (bit-identical NTT) have no equality field in the committed "
-              "profiles. The 'SEA 1.14x geomean' value is recomputed per record as min-over-runs ratio; the study's "
-              "row sums are shown in the claim text. Note the REPORT's '1.14x' is a geomean while the sum ratio is "
-              "shown separately. Host: 4 vCPU shared VM, one run per profile (REPORT)."),
+              "results/p14-round5.txt, which are used here. Profile table read from the profile_ntt section only "
+              "(later sections of p14-round5.txt reuse the FpM headers). Benchmark ratios use the minimum over the "
+              "runs of median_ns per arm (REPORT: min of two runs; bmss main has four). The SEA claim is checked "
+              "two ways: run-index paired geomean and the REPORT's stated sums; neither reproduces the REPORT's "
+              "2.12 s / 1.81 s sums or its 0.82-1.42 range. The identical claim (bit-identical NTT output) has no "
+              "equality field in the committed profiles. Host: 4 vCPU shared VM, one run per profile (REPORT)."
+              ),
 }
 print(json.dumps(row, ensure_ascii=False))
