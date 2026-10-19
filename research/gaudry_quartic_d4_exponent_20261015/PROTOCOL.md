@@ -191,3 +191,27 @@ Those 20 (`sessions/jobs3.txt`) were relaunched at 16:31Z by
 deadline (20:57Z). Audits (amendment 2) had started and were stopped; they
 are rerun from the start after the queue (`audits/AUDITS.aborted-1.txt`
 lists the two that had finished).
+
+## Amendment 4 (2026-10-19, after the stop; at the owner's request)
+
+**Correction of a count.** The README, REPORT, run report and PR text said
+59 of 72 jobs ran and 13 did not start. It is **60 ran, 12 did not start**
+(48 IC sessions and 12 rho-only sessions on disk, 60 audited; the 20
+relaunched jobs of amendment 3 were 8 completed and 12 not started).
+
+**Extension.** The owner asked for the 12 jobs that missed the 16 h stop to
+be run and the fits redone. They are: `main-p{29,37,53,61,197}-t2` and
+`lp2-p{29,37,53,61,149,197,293}-t1`. They run from the same specs
+(`specs/SPEC-<job>.json`, unchanged since `08722a2b7`) with the same
+`ecbench` binary (sha256 `8627cd29…0aa3`, rebuilt from nothing), by
+`run_queue4.sh` (`sessions/jobs4.txt`, one worker per allowed CPU, no start
+deadline). No job is dropped or rerun because of its result. Audits follow
+amendment 2's scope by size (`run_audits.sh` is resumable; `lp2-p293-t1`
+is audited without replay, as `lp2-p293-t0` was).
+
+**What this does not hide.** The first fit (60 jobs, commit `9fb5c60e6`;
+`raw/summary-60-jobs.json`) was computed and seen before this decision. It
+is kept and reported beside the new one. The analysis, predictions and
+intervals are unchanged; the headline numbers become the 72-job fit, which
+uses the full planned set, and every statement in the README that quotes the
+60-job fit says so.
