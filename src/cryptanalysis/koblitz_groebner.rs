@@ -1215,7 +1215,7 @@ pub fn matrix_f4_f2_blocked(
     for row in matrix.iter().take(rank) {
         let monos = row_monos(row, &cols);
         if !monos.is_empty() {
-            out.push(F2BoolPoly::from_monos(monos, n_vars_out));
+            out.push(poly_from_column_order(monos, n_vars_out));
         }
     }
     Some((out, word_ops))
@@ -1242,6 +1242,16 @@ fn row_monos(row: &[u64], cols: &[u64]) -> Vec<F2BoolMono> {
         }
     }
     monos
+}
+
+/// Adopt terms read from unique, descending Macaulay columns. Set-bit
+/// readback preserves that order, so sorting and cancelling again would
+/// only copy the terms into another allocation.
+fn poly_from_column_order(terms: Vec<F2BoolMono>, n_vars: usize) -> F2BoolPoly {
+    debug_assert!(terms
+        .windows(2)
+        .all(|pair| cmp_mono(pair[0], pair[1]).is_gt()));
+    F2BoolPoly { terms, n_vars }
 }
 
 // ── Matrix-F4 over the Boolean ring ────────────────────────────────
@@ -1577,7 +1587,7 @@ fn matrix_f4_f2_counted_impl(
                     monos.push(F2BoolMono::from_mask(cols[column]));
                 }
             }
-            let poly = F2BoolPoly::from_monos(monos, n_vars_out);
+            let poly = poly_from_column_order(monos, n_vars_out);
             if is_constant_one(&poly) || forced_assignment(&poly).is_some() {
                 out.push(poly);
             }
@@ -1602,7 +1612,7 @@ fn matrix_f4_f2_counted_impl(
                     }
                 }
                 if monos.len() <= 2 {
-                    let poly = F2BoolPoly::from_monos(monos, n_vars_out);
+                    let poly = poly_from_column_order(monos, n_vars_out);
                     if is_constant_one(&poly) || forced_assignment(&poly).is_some() {
                         out.push(poly);
                     }
@@ -1610,7 +1620,7 @@ fn matrix_f4_f2_counted_impl(
             } else {
                 let monos = row_monos(row, &cols);
                 if !monos.is_empty() {
-                    out.push(F2BoolPoly::from_monos(monos, n_vars_out));
+                    out.push(poly_from_column_order(monos, n_vars_out));
                 }
             }
         }
@@ -2108,13 +2118,33 @@ pub(crate) fn f5_rows_monos_with_mask(
 
 /// Pack monomial rows as bit-rows over `cols` (descending monomial order).
 pub(crate) fn pack_rows(rows_monos: &[Vec<u64>], cols: &[u64]) -> Vec<Vec<u64>> {
+    let words = cols.len().div_ceil(64).max(1);
+    if std::env::var("KIC_F4_HASH_COLUMN_INDEX").as_deref() != Ok("1") {
+        if let Some(index) = F4ColumnIndex::dense_table(cols) {
+            return pack_rows_with_lookup(rows_monos, words, |monomial| {
+                let mask = usize::try_from(*monomial).expect("monomial exceeds dense column range");
+                let column = index[mask];
+                assert_ne!(column, u16::MAX, "monomial missing from column layout");
+                usize::from(column)
+            });
+        }
+    }
     let index: crate::cryptanalysis::fx_hash::MaskMap<usize> =
         cols.iter().enumerate().map(|(i, m)| (*m, i)).collect();
-    let words = cols.len().div_ceil(64).max(1);
+    pack_rows_with_lookup(rows_monos, words, |monomial| index[monomial])
+}
+
+// Choose the representation before packing. Separate monomorphisations avoid
+// an enum branch for every term on the sparse/high-bit hash fallback.
+fn pack_rows_with_lookup(
+    rows_monos: &[Vec<u64>],
+    words: usize,
+    lookup: impl Fn(&u64) -> usize + Sync,
+) -> Vec<Vec<u64>> {
     let pack = |monos: &Vec<u64>| {
         let mut row = vec![0u64; words];
         for m in monos {
-            let c = index[m];
+            let c = lookup(m);
             row[c / 64] |= 1u64 << (c % 64);
         }
         row
@@ -2450,7 +2480,6 @@ fn visit_macaulay_rows_counted<const COUNT_PRUNED: bool>(
     let mut full_count = 0usize;
     let mut schedules: Vec<Option<std::rc::Rc<[u64]>>> = vec![None; degree as usize + 1];
     let mut all: Vec<u64> = Vec::new();
-    let mut row: Vec<u64> = Vec::new();
     for (i, p) in polys.iter().enumerate() {
         let pdeg = p
             .terms
@@ -2480,22 +2509,25 @@ fn visit_macaulay_rows_counted<const COUNT_PRUNED: bool>(
             all.clear();
             all.extend(p.terms.iter().map(|t| t.mask | mult));
             all.sort_unstable();
-            row.clear();
             let mut i = 0;
+            let mut kept = 0;
             while i < all.len() {
                 let mut j = i;
                 while j < all.len() && all[j] == all[i] {
                     j += 1;
                 }
                 if (j - i) % 2 == 1 {
-                    row.push(all[i]);
+                    // The write cursor never passes the unread suffix.
+                    all[kept] = all[i];
+                    kept += 1;
                 }
                 i = j;
             }
-            if !row.is_empty() {
+            all.truncate(kept);
+            if !all.is_empty() {
                 full_count += 1;
                 if !pruned {
-                    visit(&row);
+                    visit(&all);
                     selected_count += 1;
                 }
             }
@@ -2516,10 +2548,27 @@ fn visit_macaulay_rows_counted<const COUNT_PRUNED: bool>(
 /// what makes "leading column index ≥ the degree-≤1 boundary" equivalent
 /// to "this row is a linear consequence".
 pub(crate) fn macaulay_columns(rows_monos: &[Vec<u64>]) -> Option<Vec<u64>> {
-    let mut cols: Vec<u64> = rows_monos.iter().flatten().copied().collect();
-    cols.sort_unstable();
-    cols.dedup();
-    if cols.len() > max_f4_cols() {
+    let cap = max_f4_cols();
+    let mut cols: Vec<u64> = if rows_monos.len() <= 1 {
+        // A single row has no repeated support across rows to eliminate.
+        let mut cols: Vec<u64> = rows_monos.iter().flatten().copied().collect();
+        cols.sort_unstable();
+        cols.dedup();
+        cols
+    } else {
+        // Retain each column once rather than sorting the entire matrix's
+        // nonzeros. The mask hasher also handles support in high variables.
+        let mut seen: crate::cryptanalysis::fx_hash::MaskMap<()> = Default::default();
+        for row in rows_monos {
+            for &mask in row {
+                if seen.insert(mask, ()).is_none() && seen.len() > cap {
+                    return None;
+                }
+            }
+        }
+        seen.into_keys().collect()
+    };
+    if cols.len() > cap {
         return None;
     }
     // `mono_key` orders exactly as `cmp_mono`; the masks are distinct
@@ -2937,7 +2986,7 @@ fn pack_rows_with_layout(
     for monos in rows_monos {
         let mut row = vec![0u64; words];
         for monomial in monos {
-            let &column = layout.index.get(monomial)?;
+            let column = layout.index.get(monomial)?;
             row[column / 64] |= 1 << (column % 64);
             if let Some(seen) = &mut seen {
                 seen[column] = true;
@@ -2972,7 +3021,7 @@ fn pack_rows_flat_with_layout(
     for (row_index, monos) in rows_monos.iter().enumerate() {
         let row = &mut data[row_index * words..(row_index + 1) * words];
         for monomial in monos {
-            let &column = layout.index.get(monomial)?;
+            let column = layout.index.get(monomial)?;
             row[column / 64] |= 1 << (column % 64);
             if let Some(seen) = &mut seen {
                 seen[column] = true;
@@ -3062,7 +3111,7 @@ fn pack_polynomials_flat_fused(
             data.resize(start + words, 0);
             let row = &mut data[start..start + words];
             for monomial in &product[..write] {
-                let &column = layout.index.get(monomial)?;
+                let column = layout.index.get(monomial)?;
                 row[column / 64] |= 1 << (column % 64);
                 seen[column] = true;
             }
@@ -3127,7 +3176,7 @@ fn pack_polynomials_nested_fused<const DIRECT: bool>(
                 let mut row = vec![0u64; words];
                 for term in &polynomial.terms {
                     let monomial = term.mask | multiplier;
-                    let &column = layout.index.get(&monomial)?;
+                    let column = layout.index.get(&monomial)?;
                     row[column / 64] ^= 1 << (column % 64);
                 }
                 if row.iter().all(|&word| word == 0) {
@@ -3170,7 +3219,7 @@ fn pack_polynomials_nested_fused<const DIRECT: bool>(
             }
             let mut row = vec![0u64; words];
             for monomial in &product[..write] {
-                let &column = layout.index.get(monomial)?;
+                let column = layout.index.get(monomial)?;
                 row[column / 64] |= 1 << (column % 64);
                 seen[column] = true;
             }
@@ -3462,6 +3511,12 @@ impl F4ColumnLayout {
                     .map(|(column, &monomial)| (monomial, column))
                     .collect(),
             )
+        } else if let Some(dense) = (std::env::var("KIC_F4_HASH_COLUMN_INDEX").as_deref()
+            != Ok("1"))
+        .then(|| F4ColumnIndex::dense(&columns))
+        .flatten()
+        {
+            dense
         } else {
             let mut index = FastColumnMap::with_capacity_and_hasher(
                 columns.len(),
@@ -3473,7 +3528,7 @@ impl F4ColumnLayout {
                     .enumerate()
                     .map(|(column, &monomial)| (monomial, column)),
             );
-            F4ColumnIndex::Fast(index)
+            F4ColumnIndex::Fast(F4FastColumnIndex::Hashed(index))
         };
         Self { columns, index }
     }
@@ -3481,14 +3536,54 @@ impl F4ColumnLayout {
 
 enum F4ColumnIndex {
     Standard(std::collections::HashMap<u64, usize>),
-    Fast(FastColumnMap),
+    Fast(F4FastColumnIndex),
+}
+
+// Nest the fast representations so the outer enum retains the original
+// hash-only metadata size, including on high-bit fallback layouts.
+enum F4FastColumnIndex {
+    Hashed(FastColumnMap),
+    Dense(Vec<u16>),
 }
 
 impl F4ColumnIndex {
-    fn get(&self, monomial: &u64) -> Option<&usize> {
+    /// Direct lookup only when it uses at most the entry bytes the hash
+    /// map must store, excluding its spare buckets and control bytes.
+    /// High-bit or sparse ranges fall back before allocating a table.
+    fn dense(columns: &[u64]) -> Option<Self> {
+        Self::dense_table(columns).map(|index| Self::Fast(F4FastColumnIndex::Dense(index)))
+    }
+
+    fn dense_table(columns: &[u64]) -> Option<Vec<u16>> {
+        if columns.len() > u16::MAX as usize {
+            return None;
+        }
+        let slots = usize::try_from(columns.iter().copied().max()?)
+            .ok()?
+            .checked_add(1)?;
+        let bytes = slots.checked_mul(std::mem::size_of::<u16>())?;
+        let hash_entry_bytes = columns
+            .len()
+            .checked_mul(std::mem::size_of::<(u64, usize)>())?;
+        if bytes > hash_entry_bytes {
+            return None;
+        }
+        let mut index = vec![u16::MAX; slots];
+        for (column, &monomial) in columns.iter().enumerate() {
+            index[monomial as usize] = column as u16;
+        }
+        Some(index)
+    }
+
+    fn get(&self, monomial: &u64) -> Option<usize> {
         match self {
-            Self::Standard(index) => index.get(monomial),
-            Self::Fast(index) => index.get(monomial),
+            Self::Standard(index) => index.get(monomial).copied(),
+            Self::Fast(F4FastColumnIndex::Hashed(index)) => index.get(monomial).copied(),
+            Self::Fast(F4FastColumnIndex::Dense(index)) => index
+                .get(usize::try_from(*monomial).ok()?)
+                .copied()
+                .filter(|&column| column != u16::MAX)
+                .map(usize::from),
         }
     }
 }
@@ -4267,7 +4362,7 @@ pub fn first_fall_degree(
 /// A refutation or full pinning is sufficient to decide this diagnostic.
 /// Multi-solution SAT ideals may already have a complete Gröbner basis
 /// while remaining unresolved by this test.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct SolvingProfile {
     /// Degree the matrix was built at.
     pub degree: u32,
@@ -4518,6 +4613,23 @@ pub fn solving_profile_sparse(
         eliminate_high_columns(rows, n_cols, low_start)
     };
 
+    Some(finish_sparse_profile(
+        polys, degree, &cols, n_rows, low_start, elim,
+    ))
+}
+
+/// Durable checkpoints for the all-sparse bounded Macaulay diagnostic.
+pub mod checkpoint;
+
+fn finish_sparse_profile(
+    polys: &[F2BoolPoly],
+    degree: u32,
+    cols: &[u64],
+    n_rows: usize,
+    low_start: usize,
+    elim: crate::cryptanalysis::sparse_macaulay::SparseElimination,
+) -> SolvingProfile {
+    let n_cols = cols.len();
     // The surviving linear consequences span `cols[low_start..]` only.
     // Echelon form is not enough to read off a pinned variable — `{v+w,
     // w}` must reduce to `{v, w}` first — so reduce this block densely.
@@ -4568,7 +4680,7 @@ pub fn solving_profile_sparse(
         }
     }
 
-    Some(SolvingProfile {
+    SolvingProfile {
         degree,
         rows: n_rows,
         cols: n_cols,
@@ -4576,7 +4688,7 @@ pub fn solving_profile_sparse(
         vars_determined: (determined & occurring).count_ones() as usize,
         vars_occurring: occurring.count_ones() as usize,
         refuted,
-    })
+    }
 }
 
 /// Legacy name for the first **bounded-Macaulay resolution degree**:
@@ -4853,6 +4965,43 @@ pub fn split_rule_default() -> SplitRule {
     }
 }
 
+/// Gate threshold of [`fall_row_gate_augment`]: generators per occurring
+/// variable, trained and frozen in
+/// `research/ic_improve_20261015/03-fallrow-gate/runs/gate.json`.
+pub const FALL_ROW_GATE_THETA: f64 = 2.1583;
+
+/// Is the gated fall-row augmentation on (`KIC_FALLROW_GATE=1`)?  Off by
+/// default; read once per process.
+pub fn fall_row_gate_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("KIC_FALLROW_GATE").as_deref() == Ok("1"))
+}
+
+/// **Gated fall-row augmentation** (round 2, item 03).  When the system is
+/// overdetermined — non-zero generators per occurring variable at least
+/// [`FALL_ROW_GATE_THETA`], found by counting alone — run one degree-3
+/// Macaulay pass and return the generators with every reduced row of
+/// degree `< 3` appended.  Otherwise `None`: solve the system as given.
+/// The appended rows lie in the ideal, so the roots are unchanged.
+pub fn fall_row_gate_augment(system: &[F2BoolPoly], n_vars: usize) -> Option<Vec<F2BoolPoly>> {
+    let gens = system.iter().filter(|p| !p.is_zero()).count();
+    let occurring = system
+        .iter()
+        .flat_map(|p| p.terms.iter())
+        .fold(0u64, |acc, t| acc | t.mask)
+        .count_ones();
+    if occurring == 0 || (gens as f64) < FALL_ROW_GATE_THETA * occurring as f64 {
+        return None;
+    }
+    let (rows, _) = matrix_f4_f2_counted_with(system, n_vars, 3, RowCriterion::None)?;
+    let mut out = system.to_vec();
+    out.extend(
+        rows.into_iter()
+            .filter(|p| p.terms.iter().all(|t| t.mask.count_ones() < 3)),
+    );
+    Some(out)
+}
+
 /// Pick the variable to split on among those still unassigned.
 ///
 /// Returns `None` only when every variable is assigned.  A free
@@ -4963,7 +5112,6 @@ pub struct SolveStats {
     pub propagations: usize,
     /// Splitting decisions made.
     pub splits: usize,
-    /// Split nodes that deferred an F4 reduction.
     /// Number of algebraically reduced nodes closed by direct enumeration of
     /// the remaining small Boolean cube.
     #[serde(default)]
@@ -5346,6 +5494,459 @@ fn closure_rounds() -> u32 {
     })
 }
 
+thread_local! {
+    /// Root bases built ahead by [`prebuild_inherited_roots_lanes`], each
+    /// with the system, degree and multiplier policy it was built for.
+    static LANE_ROOTS: std::cell::RefCell<Vec<(Vec<F2BoolPoly>, u32, bool, ReducedBasis, InheritCost)>> =
+        const { std::cell::RefCell::new(Vec::new()) };
+}
+
+/// Take the root basis built ahead for exactly this system, if any.
+fn take_lane_root(
+    system: &[F2BoolPoly],
+    degree: u32,
+    support_local: bool,
+) -> Option<(ReducedBasis, InheritCost)> {
+    LANE_ROOTS.with(|roots| {
+        let mut roots = roots.borrow_mut();
+        if roots.is_empty() {
+            return None;
+        }
+        let i = roots.iter().position(|(s, d, local, _, _)| {
+            *d == degree && *local == support_local && s == system
+        })?;
+        let (_, _, _, basis, cost) = roots.swap_remove(i);
+        Some((basis, cost))
+    })
+}
+
+/// Root bases built ahead and not yet consumed on this thread.
+pub fn lane_roots_pending() -> usize {
+    LANE_ROOTS.with(|roots| roots.borrow().len())
+}
+
+/// Drop every root basis built ahead on this thread.
+pub fn clear_lane_roots() {
+    LANE_ROOTS.with(|roots| roots.borrow_mut().clear());
+}
+
+/// `KIC_F4_LANES=k`: how many decomposition roots a caller builds together
+/// with [`prebuild_inherited_roots_lanes`] (`1`, the default, builds each
+/// on its own).  Read once; capped at 64.
+pub fn f4_lanes() -> usize {
+    static LANES: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    *LANES.get_or_init(|| {
+        std::env::var("KIC_F4_LANES")
+            .ok()
+            .and_then(|v| v.parse::<usize>().ok())
+            .unwrap_or(1)
+            .clamp(1, 64)
+    })
+}
+
+/// **Lane-batched root replay** (lit2026 W5).  Build the inherited-F4 root
+/// bases of up to 64 solves at once with
+/// [`ReducedBasis::from_systems_lanes`] and keep them for the solves, whose
+/// first from-scratch build of an identical system at the same degree takes
+/// its basis instead of building one ([`take_lane_root`]).  `systems` are
+/// the equations each solve is handed.  A system the root would not reduce
+/// as it stands — one holding `1`, a linear generator the solver eliminates
+/// first, or a degree ladder of more than one rung — gets no basis and its
+/// solve builds as before; so does any lane the batch could not hold.
+///
+/// Exact: a lane's basis is the reduced row echelon form of its own root
+/// Macaulay row space, which is what the from-scratch root computes under
+/// `KIC_F4_INHERIT_ROOT=rref` and spans the same space as the default
+/// echelon root, so every refutation, forced variable, split and root is
+/// the same.  Returns the batch's [`crate::cryptanalysis::inherited_f4::LaneStats`]
+/// and how many lanes got a basis.
+pub fn prebuild_inherited_roots_lanes(
+    systems: &[Vec<F2BoolPoly>],
+    n_vars: usize,
+    engine: SolverEngine,
+) -> (crate::cryptanalysis::inherited_f4::LaneStats, usize) {
+    let engine = engine.effective();
+    let none = (crate::cryptanalysis::inherited_f4::LaneStats::default(), 0);
+    if !matches!(engine, SolverEngine::InheritedF4 { .. }) || closure_rounds() != 0 {
+        return none;
+    }
+    let policy = InheritPolicy::resolve(engine);
+    let mut eligible: Vec<(usize, Vec<F2BoolPoly>, u32)> = Vec::new();
+    for (i, s) in systems.iter().enumerate() {
+        let system: Vec<F2BoolPoly> = s.iter().filter(|p| !p.is_zero()).cloned().collect();
+        if system.is_empty()
+            || system.iter().any(is_constant_one)
+            || (policy.linear_elimination && system.iter().any(is_linear_generator))
+        {
+            continue;
+        }
+        let Some(ladder) = engine.degree_ladder(system_degree(&system), n_vars) else {
+            continue;
+        };
+        if ladder.start() != ladder.end() {
+            continue;
+        }
+        eligible.push((i, system, *ladder.end()));
+    }
+    let mut total = crate::cryptanalysis::inherited_f4::LaneStats::default();
+    let mut placed = 0usize;
+    let mut degrees: Vec<u32> = eligible.iter().map(|e| e.2).collect();
+    degrees.sort_unstable();
+    degrees.dedup();
+    for d in degrees {
+        let group: Vec<&(usize, Vec<F2BoolPoly>, u32)> =
+            eligible.iter().filter(|e| e.2 == d).collect();
+        let slices: Vec<&[F2BoolPoly]> = group.iter().map(|e| e.1.as_slice()).collect();
+        let (bases, stats) =
+            ReducedBasis::from_systems_lanes(&slices, n_vars, d, policy.support_local);
+        total.lanes += stats.lanes;
+        total.lane_bits = total.lane_bits.max(stats.lane_bits);
+        total.rows += stats.rows;
+        total.columns += stats.columns;
+        total.pivot_columns += stats.pivot_columns;
+        total.pivot_passes += stats.pivot_passes;
+        total.shared_columns += stats.shared_columns;
+        total.lane_word_ops += stats.lane_word_ops;
+        total.word_equivalent += stats.word_equivalent;
+        total.oversize |= stats.oversize;
+        LANE_ROOTS.with(|roots| {
+            let mut roots = roots.borrow_mut();
+            for (e, basis) in group.iter().zip(bases) {
+                if let Some((basis, cost)) = basis {
+                    roots.push((e.1.clone(), d, policy.support_local, basis, cost));
+                    placed += 1;
+                }
+            }
+        });
+    }
+    (total, placed)
+}
+
+/// Gate-first order: when a node's reduction forces variables, assign
+/// them and ask the node oracle (the F6-IC geometry gate) **before**
+/// specialising the node's bases by them, instead of after.  The oracle
+/// reads only the assignment and the defined variables, so it decides the
+/// same way either way; a refuted node then never pays for the
+/// specialisations, and a continuing one specialises exactly as before
+/// and is not asked again.  Every verdict, root, counter of the solve and
+/// call of the oracle is unchanged; only the stage unit drops.
+///
+/// On by default (`research/f6_gate_first_x86_20261016`: F6-IC with the
+/// pair index 1.34–1.73× fewer word XORs and 1.56–2.12× less CPU on nine
+/// cells, x86 with the eager rewrite; 1.57–1.78× on aarch64 in
+/// `research/lit2026_w5_lane_batched_f4_20261011`).  `KIC_F6_GATE_FIRST=0`
+/// restores the specialise-then-ask order as a same-binary control;
+/// [`set_gate_first`] overrides it on the calling thread.
+fn gate_first() -> bool {
+    static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    if let Some(v) = GATE_FIRST_OVERRIDE.with(|c| c.get()) {
+        return v;
+    }
+    *ENABLED.get_or_init(|| std::env::var("KIC_F6_GATE_FIRST").as_deref() != Ok("0"))
+}
+
+thread_local! {
+    static GATE_FIRST_OVERRIDE: std::cell::Cell<Option<bool>> = const { std::cell::Cell::new(None) };
+    /// Nodes the gate refuted before their forced variables were
+    /// specialised in, and the specialisations so skipped.
+    static GATE_FIRST_SKIPS: std::cell::Cell<(u64, u64)> = const { std::cell::Cell::new((0, 0)) };
+    /// Per-node trace for the lane lockstep diagnostic.
+    static NODE_TRACE: std::cell::RefCell<Option<Vec<NodeTraceEvent>>> =
+        const { std::cell::RefCell::new(None) };
+}
+
+/// Override `KIC_F6_GATE_FIRST` on this thread (`None` restores it).
+pub fn set_gate_first(enabled: Option<bool>) {
+    GATE_FIRST_OVERRIDE.with(|c| c.set(enabled));
+}
+
+/// `(nodes, specialisations)` the gate-first order skipped on this thread.
+pub fn gate_first_skips_thread() -> (u64, u64) {
+    GATE_FIRST_SKIPS.with(|c| c.get())
+}
+
+/// **In-engine linear harvest** (round 2, item 05).  Every inherited-F4
+/// reduction reads the node basis's whole linear tail
+/// ([`ReducedBasis::linear_tail`]) and keeps only the decisive rows — `1`,
+/// `v`, `v + 1`.  With a harvest configured, a node whose reduction forces
+/// nothing (the solver would split next) instead appends the tail's
+/// multi-variable rows with at most `max_vars` variables to its system as
+/// generators, and the node's linear elimination
+/// ([`eliminate_linear_generators`]) substitutes them away and rebuilds the
+/// node's bases.  Each row is in the ideal of the node system, so the
+/// roots are unchanged; every root is still verified against the original
+/// equations.
+///
+/// **On by default** since round 2 item 05
+/// (`research/ic_improve_20261015/05-linear-harvest/`), with the gate
+/// widened in round 3 item 02
+/// (`research/ic_improve3_20261015/02-harvest-gate/`): the default is
+/// [`LINEAR_HARVEST_DEFAULT`] — root only, in solves with fewer than
+/// 0.961 non-zero generators per occurring variable (item 05's gate) **or**
+/// whose root basis has rank ≥ 331 (item 02's frozen size gate, which adds
+/// the large cells where the rebuild is amortised and leaves out the small
+/// over-determined (13,4) m3 system, where it is not).
+/// **Opt out with `KIC_LINEAR_HARVEST=0`**, which restores the
+/// pre-harvest engine exactly (identical counters); `KIC_LINEAR_HARVEST=gpv`
+/// restores item 05's gpv-only gate ([`LINEAR_HARVEST_GPV`]); `every`
+/// harvests at every node (measured: regresses), and other specifications
+/// are parsed by [`parse_linear_harvest`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct LinearHarvest {
+    /// Harvest rows with at most this many variables (`2..`).
+    pub max_vars: u32,
+    /// Harvest only at the root (before the first split).
+    pub root_only: bool,
+    /// Harvest only at a node with at least this many unassigned variables.
+    pub min_free: u32,
+    /// Harvest only in a solve whose input has fewer than
+    /// `gpv_below_milli / 1000` non-zero generators per occurring variable
+    /// (`u32::MAX`: no gate).  Counted on the original equations.
+    pub gpv_below_milli: u32,
+    /// Also harvest (OR with the gpv gate) in a solve whose input has at
+    /// least this many occurring variables (`u32::MAX`: never by this
+    /// route).  Round 3 item 02.
+    pub or_occ_at_least: u32,
+    /// Also harvest (OR with the gpv gate) where the basis the rows were
+    /// read from has at least this rank (`u32::MAX`: never by this route).
+    /// Round 3 item 02.
+    pub or_rank_at_least: u32,
+}
+
+/// The default harvest (also `KIC_LINEAR_HARVEST=1`): root only, gated on
+/// generators per occurring variable `< 0.961` (item 05's frozen θ =
+/// 0.9607) **or** root basis rank `≥ 331` (round 3 item 02's frozen θ), as
+/// `parse_linear_harvest("root,gpv=0.9607,rank=331")` stores it.
+pub const LINEAR_HARVEST_DEFAULT: LinearHarvest = LinearHarvest {
+    max_vars: u32::MAX,
+    root_only: true,
+    min_free: 0,
+    gpv_below_milli: 961,
+    or_occ_at_least: u32::MAX,
+    or_rank_at_least: 331,
+};
+
+/// Item 05's default before round 3 item 02 (`KIC_LINEAR_HARVEST=gpv`):
+/// root only, gated on generators per occurring variable `< 0.961` alone,
+/// as `parse_linear_harvest("root,gpv=0.9607")` stores it.
+pub const LINEAR_HARVEST_GPV: LinearHarvest = LinearHarvest {
+    or_rank_at_least: u32::MAX,
+    ..LINEAR_HARVEST_DEFAULT
+};
+
+/// Every node, every multi-variable row, no gate (`KIC_LINEAR_HARVEST=every`);
+/// also the base that [`parse_linear_harvest`]'s modifiers start from.
+pub const LINEAR_HARVEST_EVERY_NODE: LinearHarvest = LinearHarvest {
+    max_vars: u32::MAX,
+    root_only: false,
+    min_free: 0,
+    gpv_below_milli: u32::MAX,
+    or_occ_at_least: u32::MAX,
+    or_rank_at_least: u32::MAX,
+};
+
+thread_local! {
+    static LINEAR_HARVEST_OVERRIDE: std::cell::Cell<Option<Option<LinearHarvest>>> =
+        const { std::cell::Cell::new(None) };
+    /// `(harvest events, rows harvested)` on this thread.
+    static LINEAR_HARVEST_COUNTS: std::cell::Cell<(u64, u64)> = const { std::cell::Cell::new((0, 0)) };
+}
+
+/// Parse a harvest specification: `1` for [`LINEAR_HARVEST_DEFAULT`],
+/// `gpv` for [`LINEAR_HARVEST_GPV`], `every` for
+/// [`LINEAR_HARVEST_EVERY_NODE`], or modifiers of the latter,
+/// comma-separated `k=<max vars>`, `root`, `free=<min free>`,
+/// `gpv=<generators per variable bound>`, and the OR-ed size gates
+/// `rank=<root basis rank>` and `occ=<occurring variables>`; `0` or empty
+/// is off.
+pub fn parse_linear_harvest(spec: &str) -> Option<LinearHarvest> {
+    let spec = spec.trim();
+    if spec.is_empty() || spec == "0" {
+        return None;
+    }
+    if spec == "1" {
+        return Some(LINEAR_HARVEST_DEFAULT);
+    }
+    if spec == "gpv" {
+        return Some(LINEAR_HARVEST_GPV);
+    }
+    let mut h = LINEAR_HARVEST_EVERY_NODE;
+    if spec == "every" {
+        return Some(h);
+    }
+    for part in spec.split(',') {
+        let part = part.trim();
+        if part == "root" {
+            h.root_only = true;
+        } else if let Some(k) = part.strip_prefix("k=") {
+            h.max_vars = k.parse().ok()?;
+        } else if let Some(f) = part.strip_prefix("free=") {
+            h.min_free = f.parse().ok()?;
+        } else if let Some(g) = part.strip_prefix("gpv=") {
+            let g: f64 = g.parse().ok()?;
+            h.gpv_below_milli = (g * 1000.0).round() as u32;
+        } else if let Some(o) = part.strip_prefix("occ=") {
+            h.or_occ_at_least = o.parse().ok()?;
+        } else if let Some(r) = part.strip_prefix("rank=") {
+            h.or_rank_at_least = r.parse().ok()?;
+        } else if part != "1" {
+            return None;
+        }
+    }
+    Some(h)
+}
+
+/// The harvest in force on this thread: [`set_linear_harvest`]'s override,
+/// else `KIC_LINEAR_HARVEST` (read once): unset means
+/// [`LINEAR_HARVEST_DEFAULT`], `0` turns the harvest off (the engine before
+/// item 05, counter for counter), `gpv` is item 05's gate
+/// ([`LINEAR_HARVEST_GPV`]), anything else is [`parse_linear_harvest`]d.
+pub fn linear_harvest() -> Option<LinearHarvest> {
+    static ENV: std::sync::OnceLock<Option<LinearHarvest>> = std::sync::OnceLock::new();
+    if let Some(v) = LINEAR_HARVEST_OVERRIDE.with(|c| c.get()) {
+        return v;
+    }
+    *ENV.get_or_init(|| match std::env::var("KIC_LINEAR_HARVEST") {
+        Err(_) => Some(LINEAR_HARVEST_DEFAULT),
+        Ok(s) => parse_linear_harvest(&s),
+    })
+}
+
+/// Override `KIC_LINEAR_HARVEST` on this thread (`None` restores it;
+/// `Some(None)` forces it off).
+pub fn set_linear_harvest(cfg: Option<Option<LinearHarvest>>) {
+    LINEAR_HARVEST_OVERRIDE.with(|c| c.set(cfg));
+}
+
+/// `(harvest events, rows harvested)` on this thread so far.
+pub fn linear_harvest_counts_thread() -> (u64, u64) {
+    LINEAR_HARVEST_COUNTS.with(|c| c.get())
+}
+
+/// Reset [`linear_harvest_counts_thread`].
+pub fn linear_harvest_counts_reset() {
+    LINEAR_HARVEST_COUNTS.with(|c| c.set((0, 0)));
+}
+
+/// The harvest's per-solve gate: non-zero generators per occurring
+/// variable of `system` below `gpv_below_milli / 1000`.
+fn linear_harvest_gate(system: &[F2BoolPoly], gpv_below_milli: u32) -> bool {
+    if gpv_below_milli == u32::MAX {
+        return true;
+    }
+    let gens = system.iter().filter(|p| !p.is_zero()).count() as u64;
+    let occurring = system
+        .iter()
+        .flat_map(|p| p.terms.iter())
+        .fold(0u64, |acc, t| acc | t.mask)
+        .count_ones() as u64;
+    gens * 1000 < gpv_below_milli as u64 * occurring
+}
+
+/// The harvest's size gate (round 3 item 02), OR-ed with the gpv gate:
+/// the input has at least `or_occ_at_least` occurring variables, or the
+/// node's largest basis has rank at least `or_rank_at_least`.
+fn linear_harvest_size_gate(
+    system: &[F2BoolPoly],
+    bases: &InheritedBases,
+    h: &LinearHarvest,
+) -> bool {
+    if h.or_rank_at_least != u32::MAX
+        && bases
+            .bases
+            .iter()
+            .map(ReducedBasis::rank)
+            .max()
+            .unwrap_or(0) as u64
+            >= h.or_rank_at_least as u64
+    {
+        return true;
+    }
+    h.or_occ_at_least != u32::MAX
+        && system
+            .iter()
+            .flat_map(|p| p.terms.iter())
+            .fold(0u64, |acc, t| acc | t.mask)
+            .count_ones()
+            >= h.or_occ_at_least
+}
+
+/// The decisive-row test of [`ReducedBasis::decisive_rows`]: `1`, or one
+/// variable with an optional constant.
+fn is_decisive_tail_row(p: &F2BoolPoly) -> bool {
+    (p.terms.len() == 1 && p.terms[0].mask == 0)
+        || (p.terms.len() <= 2
+            && p.terms.iter().filter(|t| t.mask.count_ones() == 1).count() == 1
+            && p.terms.iter().all(|t| t.mask.count_ones() <= 1))
+}
+
+/// Split a linear tail into its decisive rows (in order, as
+/// [`ReducedBasis::decisive_rows`] returns them) and, into `harvest`, the
+/// multi-variable rows with at most `max_vars` variables.
+fn split_linear_tail(
+    tail: Vec<F2BoolPoly>,
+    max_vars: u32,
+    harvest: &mut Vec<F2BoolPoly>,
+) -> Vec<F2BoolPoly> {
+    harvest.clear();
+    let mut decisive = Vec::new();
+    for p in tail {
+        if is_decisive_tail_row(&p) {
+            decisive.push(p);
+        } else {
+            let vars = p.terms.iter().filter(|t| t.mask != 0).count() as u32;
+            if vars <= max_vars {
+                harvest.push(p);
+            }
+        }
+    }
+    decisive
+}
+
+/// One reduction of the splitting tree, as the lane lockstep diagnostic
+/// sees it: which variables were assigned (or eliminated) and to what, and
+/// the thread's stage-unit total when the node reduced.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct NodeTraceEvent {
+    pub assigned: u64,
+    pub values: u64,
+    pub word_ops: u64,
+}
+
+/// Start (`true`) or stop recording [`NodeTraceEvent`]s on this thread.
+pub fn set_node_trace(enabled: bool) {
+    NODE_TRACE.with(|t| *t.borrow_mut() = enabled.then(Vec::new));
+}
+
+/// Take the events recorded so far, leaving the trace on and empty.
+pub fn take_node_trace() -> Vec<NodeTraceEvent> {
+    NODE_TRACE.with(|t| {
+        t.borrow_mut()
+            .as_mut()
+            .map(std::mem::take)
+            .unwrap_or_default()
+    })
+}
+
+fn note_node(assignment: &[Option<bool>]) {
+    NODE_TRACE.with(|t| {
+        if let Some(events) = t.borrow_mut().as_mut() {
+            let (mut assigned, mut values) = (0u64, 0u64);
+            for (v, a) in assignment.iter().enumerate() {
+                if let Some(x) = a {
+                    assigned |= 1u64 << v;
+                    values |= u64::from(*x) << v;
+                }
+            }
+            events.push(NodeTraceEvent {
+                assigned,
+                values,
+                word_ops: f4_word_ops_thread(),
+            });
+        }
+    });
+}
+
 /// The inherited engine's reduction: read the decisive rows off the node's
 /// bases, building a basis from scratch only for a degree no ancestor has
 /// reached.  Mirrors `reduce_system_uncached`'s ladder, decisiveness test
@@ -5358,8 +5959,12 @@ fn reduce_inherited(
     support_local: bool,
     bases: &mut InheritedBases,
     stats: &mut SolveStats,
+    mut harvest: Option<(u32, &mut Vec<F2BoolPoly>)>,
 ) -> Option<Vec<F2BoolPoly>> {
     stats.reductions += 1;
+    if let Some((_, buf)) = harvest.as_mut() {
+        buf.clear();
+    }
     dump_node_system(system, n_vars, engine);
     // A canonical polynomial lists its terms highest degree first, so its
     // degree is its first term's; otherwise scan every term.
@@ -5393,8 +5998,21 @@ fn reduce_inherited(
                         .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                 }
                 let rounds = if d == top { closure_rounds() } else { 0 };
-                let built =
-                    ReducedBasis::from_system_closed_with(system, n_vars, d, rounds, support_local);
+                let prebuilt = if rounds == 0 {
+                    take_lane_root(system, d, support_local)
+                } else {
+                    None
+                };
+                let built = match prebuilt {
+                    Some(root) => Some(root),
+                    None => ReducedBasis::from_system_closed_with(
+                        system,
+                        n_vars,
+                        d,
+                        rounds,
+                        support_local,
+                    ),
+                };
                 if profile {
                     inherited_basis_counters::ROOT_NS.fetch_add(
                         started.elapsed().as_nanos() as u64,
@@ -5428,7 +6046,12 @@ fn reduce_inherited(
         );
         let started = std::time::Instant::now();
         let mut cost = InheritCost::default();
-        let rows = basis.decisive_rows(&mut cost);
+        let rows = match harvest.as_mut() {
+            None => basis.decisive_rows(&mut cost),
+            Some((max_vars, buf)) => {
+                split_linear_tail(basis.linear_tail(&mut cost), *max_vars, buf)
+            }
+        };
         let word_ops = cost.word_ops();
         charge_word_ops(word_ops);
         let (rank, columns) = (basis.rank() as u64, basis.columns() as u64);
@@ -5811,6 +6434,12 @@ fn solve_rec(
         _ => (InheritedBases::default(), std::rc::Rc::new(system)),
     };
     let inherit = matches!(opts.engine, SolverEngine::InheritedF4 { .. });
+    let harvest_cfg = if inherit && policy.linear_elimination {
+        linear_harvest()
+    } else {
+        None
+    };
+    let mut harvested: Vec<F2BoolPoly> = Vec::new();
 
     // Reduce, propagate, repeat until the algebra stops learning.
     loop {
@@ -5894,6 +6523,7 @@ fn solve_rec(
                 }
             }
         }
+        note_node(&assignment);
         let reduced = if inherit {
             reduce_inherited(
                 &system,
@@ -5903,6 +6533,10 @@ fn solve_rec(
                 policy.support_local,
                 &mut bases,
                 stats,
+                match harvest_cfg {
+                    Some(h) => Some((h.max_vars, &mut harvested)),
+                    None => None,
+                },
             )
         } else {
             reduce_system(&system, n_vars, opts.engine, stats)
@@ -5917,7 +6551,76 @@ fn solve_rec(
         }
         let forced: Vec<(u32, bool)> = reduced.iter().filter_map(forced_assignment).collect();
         if forced.is_empty() {
+            if let Some(h) = harvest_cfg {
+                if !harvested.is_empty()
+                    && (!h.root_only || parent.is_none())
+                    && assignment.iter().filter(|a| a.is_none()).count() as u32 >= h.min_free
+                    && (linear_harvest_gate(original, h.gpv_below_milli)
+                        || linear_harvest_size_gate(original, &bases, &h))
+                {
+                    // Hand the tail's multi-variable rows to the linear
+                    // elimination at the top of the loop.
+                    let rows = harvested.len() as u64;
+                    LINEAR_HARVEST_COUNTS.with(|c| {
+                        let (e, r) = c.get();
+                        c.set((e + 1, r + rows));
+                    });
+                    std::rc::Rc::make_mut(&mut system).append(&mut harvested);
+                    continue;
+                }
+            }
             break;
+        }
+        if inherit && gate_first() {
+            // Assign first, in the same order and with the same checks;
+            // then ask the gate, and specialise only if it continues.
+            let mut fresh: Vec<(u32, bool)> = Vec::with_capacity(forced.len());
+            for (v, val) in forced {
+                match assignment[v as usize] {
+                    Some(existing) if existing != val => {
+                        stats.infeasible_branches += 1;
+                        return;
+                    }
+                    Some(_) => {}
+                    None => {
+                        stats.propagations += 1;
+                        assignment[v as usize] = Some(val);
+                        fresh.push((v, val));
+                    }
+                }
+            }
+            if stats.reductions >= opts.node_budget {
+                stats.exhausted = true;
+                return;
+            }
+            let defined_mask = defined
+                .iter()
+                .fold(0u64, |mask, &(v, _, _)| mask | (1u64 << v));
+            match node_oracle(&assignment, defined_mask) {
+                NodeOracleDecision::Continue => oracle_decided = true,
+                NodeOracleDecision::Refute => {
+                    GATE_FIRST_SKIPS.with(|c| {
+                        let (n, s) = c.get();
+                        c.set((n + 1, s + fresh.len() as u64));
+                    });
+                    stats.geometric_refutations += 1;
+                    return;
+                }
+                NodeOracleDecision::Witness => {
+                    stats.geometric_witnesses += 1;
+                    *stop = true;
+                    return;
+                }
+            }
+            for (v, val) in fresh {
+                let substituted: Vec<F2BoolPoly> = system
+                    .iter()
+                    .map(|p| substitute_in_solve(p, v, val, canonical))
+                    .collect();
+                (bases, system) = bases.specialise_owned(v, val, substituted, policy);
+                drop_zeros(&mut system);
+            }
+            continue;
         }
         for (v, val) in forced {
             match assignment[v as usize] {
@@ -6295,6 +6998,253 @@ mod tests {
     use crate::binary_ecc::BinaryCurve;
     use crate::cryptanalysis::binary_semaev::binary_semaev_s3;
     use crate::cryptanalysis::koblitz_index_calculus::{find_irreducible, KoblitzCurve};
+
+    #[test]
+    fn macaulay_products_preserve_boolean_cancellation_and_row_order() {
+        let n_vars = 5;
+        let degree = 4;
+        let mask = all_variable_mask(n_vars);
+        let polys = [
+            F2BoolPoly::zero(n_vars),
+            F2BoolPoly::one(n_vars),
+            F2BoolPoly::from_monos(
+                [0, 1, 2, 3, 4, 5, 7, 16]
+                    .into_iter()
+                    .map(F2BoolMono::from_mask)
+                    .collect(),
+                n_vars,
+            ),
+        ];
+        let mut expected = Vec::new();
+        for p in &polys {
+            let pdeg = p.terms.iter().map(|t| t.degree()).max().unwrap_or(0);
+            for multiplier in monomials_up_to_mask(mask, degree - pdeg) {
+                let product = p.mul_mono(F2BoolMono::from_mask(multiplier));
+                if !product.is_zero() {
+                    let mut row: Vec<u64> = product.terms.iter().map(|t| t.mask).collect();
+                    row.sort_unstable();
+                    expected.push(row);
+                }
+            }
+        }
+        assert_eq!(
+            macaulay_rows_monos_with_mask(&polys, n_vars, degree, mask, None).unwrap(),
+            expected
+        );
+    }
+
+    #[test]
+    fn macaulay_columns_deduplicate_high_bit_support_in_monomial_order() {
+        let a = 1u64 << 61;
+        let b = 1u64 << 63;
+        let rows = vec![vec![b, a | b, 0], vec![a, b, a | b], vec![b, 0]];
+        assert_eq!(macaulay_columns(&rows), Some(vec![a | b, a, b, 0]));
+        assert_eq!(macaulay_columns(&[vec![b, b, 0]]), Some(vec![b, 0]));
+        assert_eq!(macaulay_columns(&[]), Some(Vec::new()));
+    }
+
+    #[test]
+    fn packed_rows_match_column_positions_for_dense_sparse_and_parallel_inputs() {
+        // Reconstruct each bit from its column position, without lookup tables.
+        let reference = |rows: &[Vec<u64>], columns: &[u64]| -> Vec<Vec<u64>> {
+            rows.iter()
+                .map(|row| {
+                    let mut packed = vec![0; columns.len().div_ceil(64).max(1)];
+                    for (column, mask) in columns.iter().enumerate() {
+                        if row.contains(mask) {
+                            packed[column / 64] |= 1 << (column % 64);
+                        }
+                    }
+                    packed
+                })
+                .collect()
+        };
+        for columns in [
+            Vec::new(),
+            vec![0],
+            (0..137).map(|i| (i * 13) % 256).collect(),
+            vec![1 << 63, 0, 1 << 52, (1 << 63) | (1 << 52)],
+            vec![0, 1 << 20],
+            (0..u16::MAX as u64).collect(),
+            (0..=u16::MAX as u64).collect(),
+        ] {
+            let rows = vec![
+                Vec::new(),
+                columns.iter().copied().step_by(31).collect(),
+                columns
+                    .iter()
+                    .enumerate()
+                    .filter(|(i, _)| matches!(i % 128, 0 | 63 | 64 | 127))
+                    .flat_map(|(_, &mask)| [mask, mask])
+                    .collect(),
+                columns.iter().copied().rev().take(3).collect(),
+            ];
+            assert_eq!(pack_rows(&rows, &columns), reference(&rows, &columns));
+        }
+
+        // Wide rows cross the Rayon threshold without hundreds of thousands
+        // of small row allocations in this correctness test.
+        let columns: Vec<u64> = (0..u16::MAX as u64).collect();
+        let template = vec![columns[0], columns[63], columns[64], columns[65534]];
+        let words = columns.len().div_ceil(64);
+        let rows = vec![template.clone(); M4RI_PARALLEL_WORDS / words + 1];
+        let expected = reference(&[template], &columns).pop().unwrap();
+        assert!(pack_rows(&rows, &columns)
+            .iter()
+            .all(|row| *row == expected));
+        let index: crate::cryptanalysis::fx_hash::MaskMap<usize> = columns
+            .iter()
+            .enumerate()
+            .map(|(column, &mask)| (mask, column))
+            .collect();
+        assert!(pack_rows_with_lookup(&rows, words, |mask| index[mask])
+            .iter()
+            .all(|row| *row == expected));
+    }
+
+    #[test]
+    fn dense_column_lookup_matches_a_map_and_preserves_missing_masks() {
+        #[allow(dead_code)]
+        enum OriginalHashIndex {
+            Standard(std::collections::HashMap<u64, usize>),
+            Fast(FastColumnMap),
+        }
+        assert!(
+            std::mem::size_of::<F4ColumnIndex>() <= std::mem::size_of::<OriginalHashIndex>(),
+            "index metadata must not enlarge heap-resident fallback layouts"
+        );
+        let columns = [9, 0, 1, 7, 3, 5, 8];
+        let reference: std::collections::HashMap<_, _> = columns
+            .iter()
+            .enumerate()
+            .map(|(column, &mask)| (mask, column))
+            .collect();
+        let dense = F4ColumnIndex::dense(&columns).unwrap();
+        for mask in (0..32).chain([1 << 63, u64::MAX]) {
+            assert_eq!(dense.get(&mask), reference.get(&mask).copied());
+        }
+        assert!(F4ColumnIndex::dense(&[]).is_none());
+        assert!(F4ColumnIndex::dense(&[0, 1 << 20]).is_none());
+        assert!(F4ColumnIndex::dense(&[0, 1 << 63]).is_none());
+        assert!(F4ColumnIndex::dense(&[u64::MAX]).is_none());
+
+        // The largest encodable index is one below the missing sentinel.
+        let columns: Vec<_> = (0..u16::MAX as u64).collect();
+        let dense = F4ColumnIndex::dense(&columns).unwrap();
+        assert_eq!(dense.get(&(u16::MAX as u64 - 1)), Some(65534));
+        assert_eq!(dense.get(&(u16::MAX as u64)), None);
+        let too_many: Vec<_> = (0..=u16::MAX as u64).collect();
+        assert!(F4ColumnIndex::dense(&too_many).is_none());
+    }
+
+    #[test]
+    fn packed_readback_preserves_canonical_order_across_words_and_padding() {
+        let support = [0, 2, 7, 18, 52, 60, 63];
+        let mut cols: Vec<u64> = (0..128u64)
+            .map(|subset| {
+                support.iter().enumerate().fold(0, |mask, (i, bit)| {
+                    mask | if subset & (1 << i) != 0 { 1 << bit } else { 0 }
+                })
+            })
+            .collect();
+        cols.sort_unstable_by(|&a, &b| {
+            cmp_mono(F2BoolMono::from_mask(b), F2BoolMono::from_mask(a))
+        });
+        cols.truncate(117);
+        // Include boundary columns 63/64/116, padding from column 117,
+        // an extra padding word, empty rows and every valid column.
+        for row in [
+            [0, 0, 0],
+            [0, 0, u64::MAX],
+            [1 << 63, (1 << 52) | (1 << 53) | 1, u64::MAX],
+            [u64::MAX, u64::MAX, u64::MAX],
+            [0xaaaa_5555_aaaa_5555, 0x5555_aaaa_5555_aaaa, 0],
+        ] {
+            let expected = F2BoolPoly::from_monos(
+                cols.iter()
+                    .enumerate()
+                    .filter(|(i, _)| row[i / 64] & (1 << (i % 64)) != 0)
+                    .map(|(_, &mask)| F2BoolMono::from_mask(mask))
+                    .collect(),
+                64,
+            );
+            let actual = poly_from_column_order(row_monos(&row, &cols), 64);
+            assert_eq!(actual, expected);
+            assert!(actual
+                .terms
+                .windows(2)
+                .all(|pair| cmp_mono(pair[0], pair[1]).is_gt()));
+        }
+    }
+
+    #[test]
+    fn fused_f5_count_matches_polynomial_products_at_every_cap_boundary() {
+        let n_vars = 6;
+        let mask = all_variable_mask(n_vars);
+        let from_masks = |masks: &[u64]| {
+            F2BoolPoly::from_monos(
+                masks.iter().copied().map(F2BoolMono::from_mask).collect(),
+                64,
+            )
+        };
+        let polys = [
+            F2BoolPoly::zero(64),
+            from_masks(&[1, 3]), // Multiplication by x_1 cancels this row.
+            from_masks(&[3, 4, 0]),
+            from_masks(&[(1 << 63) | 4, 1 << 52, 0]),
+            F2BoolPoly::one(64),
+        ];
+        for degree in 0..=4 {
+            let criterion = F5Criterion::new(&polys, n_vars, degree, mask);
+            let mut full = 0;
+            let mut expected = Vec::new();
+            for (i, polynomial) in polys.iter().enumerate() {
+                let polynomial_degree = polynomial
+                    .terms
+                    .iter()
+                    .map(|term| term.degree())
+                    .max()
+                    .unwrap_or(0);
+                // Enumerate the whole small Boolean multiplier universe
+                // independently of the builder's cached row schedules.
+                for multiplier in 0..=mask {
+                    if polynomial_degree + multiplier.count_ones() > degree {
+                        continue;
+                    }
+                    let product = polynomial.mul_mono(F2BoolMono::from_mask(multiplier));
+                    if product.is_zero() {
+                        continue;
+                    }
+                    full += 1;
+                    if !criterion.prunes(i, multiplier) {
+                        let mut row: Vec<_> = product.terms.iter().map(|term| term.mask).collect();
+                        row.sort_unstable();
+                        expected.push(row);
+                    }
+                }
+            }
+            expected.sort_unstable();
+            for cap in 0..=full + 1 {
+                let mut rows = Vec::new();
+                let result = visit_macaulay_rows_counted::<true>(
+                    &polys,
+                    n_vars,
+                    degree,
+                    mask,
+                    Some(&criterion),
+                    cap,
+                    |row| rows.push(row.to_vec()),
+                );
+                if cap < full {
+                    assert!(result.is_none(), "degree {degree}, cap {cap}, full {full}");
+                } else {
+                    assert_eq!(result, Some((expected.len(), full)));
+                    rows.sort_unstable();
+                    assert_eq!(rows, expected, "degree {degree}, cap {cap}");
+                }
+            }
+        }
+    }
 
     #[test]
     fn fused_f5_count_applies_the_full_f4_row_cap() {
@@ -7164,9 +8114,227 @@ mod tests {
         }
     }
 
+    /// The systems the word-XOR determinism probe solves: 24 random small
+    /// Boolean systems, fixed by a seed so every process builds the same ones.
+    fn inherited_f4_word_xor_probe_systems() -> Vec<(Vec<F2BoolPoly>, usize)> {
+        let mut seed = 0x5eed_f4f4_0123_4567u64;
+        let mut next = || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+        let mut systems = Vec::new();
+        for trial in 0..24 {
+            let n_vars = 7 + (trial % 4);
+            let system: Vec<F2BoolPoly> = (0..5 + trial % 3)
+                .map(|k| {
+                    let deg = if k % 3 == 2 { 1 } else { 2 };
+                    let monos = (0..3 + (next() % 6) as usize)
+                        .map(|_| {
+                            let d = (next() % (deg + 1)) as u32;
+                            let mut mask = 0u64;
+                            for _ in 0..d {
+                                mask |= 1u64 << (next() % n_vars as u64);
+                            }
+                            F2BoolMono::from_mask(mask)
+                        })
+                        .collect();
+                    F2BoolPoly::from_monos(monos, n_vars)
+                })
+                .filter(|p| !p.is_zero())
+                .collect();
+            systems.push((system, n_vars));
+        }
+        systems
+    }
+
+    /// One configuration of the word-XOR determinism probe.  It runs in its
+    /// own process (see the test below) because the hash salt is a
+    /// process-wide setting: set in a shared test process it would change
+    /// the hash iteration order every concurrently running test sees.
+    /// `KIC_TEST_THREADS` is the rayon pool size and `KIC_TEST_SALT` the
+    /// hasher salt; one `XORS <word_ops> <roots>` line per system is printed.
+    #[test]
+    #[ignore = "driven by inherited_f4_word_xors_ignore_thread_count_and_hash_salt"]
+    fn inherited_f4_word_xors_probe() {
+        use std::sync::atomic::Ordering::Relaxed;
+        let threads: usize = std::env::var("KIC_TEST_THREADS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(1);
+        let salt: u64 = std::env::var("KIC_TEST_SALT")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(0);
+        crate::cryptanalysis::fx_hash::TEST_SALT.store(salt, Relaxed);
+        let systems = inherited_f4_word_xor_probe_systems();
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()
+            .unwrap();
+        let rows: Vec<(u64, usize)> = pool.install(|| {
+            systems
+                .iter()
+                .map(|(system, n_vars)| {
+                    let opts = SolveOptions {
+                        max_solutions: 1 << 12,
+                        engine: SolverEngine::InheritedF4 { max_degree: 3 },
+                        ..SolveOptions::default()
+                    };
+                    let before = f4_word_ops_thread();
+                    let (roots, _) = solve_boolean_system(system, *n_vars, &opts);
+                    (f4_word_ops_thread() - before, roots.len())
+                })
+                .collect()
+        });
+        for (ops, roots) in rows {
+            println!("XORS {ops} {roots}");
+        }
+    }
+
+    /// The counted word XORs of inherited F4 do not depend on the rayon
+    /// pool size the caller runs in, nor on the hash layout of the engine's
+    /// maps (two salts of the monomial hashers).  Replay-all of
+    /// `research/ecbench_frontier_20261013` found the counter unreproducible
+    /// across hosts; this pins the two within-host sources it could have been.
+    /// Each configuration runs `inherited_f4_word_xors_probe` in a child
+    /// process so the process-wide salt never leaks into other tests.
+    #[test]
+    fn inherited_f4_word_xors_ignore_thread_count_and_hash_salt() {
+        let run = |threads: usize, salt: u64| -> Vec<(u64, usize)> {
+            let out = std::process::Command::new(std::env::current_exe().unwrap())
+                .args([
+                    "--exact",
+                    "--ignored",
+                    "--test-threads=1",
+                    "--nocapture",
+                    "cryptanalysis::koblitz_groebner::tests::inherited_f4_word_xors_probe",
+                ])
+                .env("KIC_TEST_THREADS", threads.to_string())
+                .env("KIC_TEST_SALT", salt.to_string())
+                .output()
+                .expect("spawn the probe");
+            assert!(
+                out.status.success(),
+                "probe threads={threads} salt={salt:#x} failed:\n{}",
+                String::from_utf8_lossy(&out.stderr)
+            );
+            let rows: Vec<(u64, usize)> = String::from_utf8_lossy(&out.stdout)
+                .lines()
+                // Under --nocapture libtest prints "test … ... " without a
+                // newline before the test's own output, so the marker can
+                // sit mid-line.
+                .filter_map(|l| l.split("XORS ").nth(1))
+                .map(|l| {
+                    let mut it = l.split_whitespace();
+                    (
+                        it.next().unwrap().parse().unwrap(),
+                        it.next().unwrap().parse().unwrap(),
+                    )
+                })
+                .collect();
+            assert_eq!(
+                rows.len(),
+                24,
+                "probe threads={threads} salt={salt:#x}: rows"
+            );
+            rows
+        };
+        let base = run(1, 0);
+        assert!(base.iter().any(|&(ops, _)| ops > 0), "counter never moved");
+        assert_eq!(base, run(4, 0), "thread count changed the counters");
+        assert_eq!(
+            base,
+            run(1, 0x9e37_79b9_7f4a_7c15),
+            "hash salt changed the counters"
+        );
+        assert_eq!(
+            base,
+            run(4, 0x1234_5678_9abc_def1),
+            "threads+salt changed the counters"
+        );
+    }
+
     /// Linear elimination changes the tree, never the roots: on random
     /// systems with linear generators mixed in, every engine and split
     /// rule, with either degree-drop rule, returns exactly the variety.
+    #[test]
+    fn linear_harvest_keeps_every_root() {
+        // Underdetermined quadratic and cubic systems (gpv < 1, so the
+        // default's gate fires): every harvest configuration must find
+        // exactly the brute-force roots.
+        let mut seed = 0x0a5e_57ed_11ea_7a11u64;
+        let mut next = || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+        let mut harvested = 0u64;
+        for trial in 0..60 {
+            let n_vars = 7 + (trial % 6);
+            let m = n_vars - 1 - (trial % 3);
+            let system: Vec<F2BoolPoly> = (0..m)
+                .map(|k| {
+                    let deg = 2 + (k % 2) as u64;
+                    let terms = 4 + (next() % 8) as usize;
+                    let monos = (0..terms)
+                        .map(|_| {
+                            let d = (next() % (deg + 1)) as u32;
+                            let mut mask = 0u64;
+                            for _ in 0..d {
+                                mask |= 1u64 << (next() % n_vars as u64);
+                            }
+                            F2BoolMono::from_mask(mask)
+                        })
+                        .collect();
+                    F2BoolPoly::from_monos(monos, n_vars)
+                })
+                .filter(|p| !p.is_zero())
+                .collect();
+            let brute: Vec<u64> = (0..(1u64 << n_vars))
+                .filter(|pt| system.iter().all(|e| e.eval(*pt) == 0))
+                .collect();
+            for cfg in [
+                None,
+                Some(LINEAR_HARVEST_DEFAULT),
+                Some(LINEAR_HARVEST_GPV),
+                Some(LINEAR_HARVEST_EVERY_NODE),
+                parse_linear_harvest("root"),
+                parse_linear_harvest("k=2"),
+                // The size gates alone (gpv gate closed).
+                parse_linear_harvest("root,gpv=0,rank=1"),
+                parse_linear_harvest("root,gpv=0,occ=1"),
+            ] {
+                set_linear_harvest(Some(cfg));
+                linear_harvest_counts_reset();
+                let opts = SolveOptions {
+                    max_solutions: 1 << 13,
+                    ..SolveOptions::default()
+                };
+                let (mut got, _) = solve_boolean_system(&system, n_vars, &opts);
+                harvested += linear_harvest_counts_thread().0;
+                set_linear_harvest(None);
+                got.sort_unstable();
+                got.dedup();
+                assert_eq!(got, brute, "trial {trial} {cfg:?}: roots differ");
+            }
+        }
+        assert!(harvested > 0, "no harvest fired");
+        assert_eq!(parse_linear_harvest("0"), None);
+        assert_eq!(parse_linear_harvest("1"), Some(LINEAR_HARVEST_DEFAULT));
+        assert_eq!(
+            parse_linear_harvest("root,gpv=0.9607,rank=331"),
+            Some(LINEAR_HARVEST_DEFAULT)
+        );
+        assert_eq!(parse_linear_harvest("gpv"), Some(LINEAR_HARVEST_GPV));
+        assert_eq!(
+            parse_linear_harvest("root,gpv=0.9607"),
+            Some(LINEAR_HARVEST_GPV)
+        );
+    }
+
     #[test]
     fn linear_elimination_keeps_every_root() {
         let mut seed = 0x51ce_d00d_0bad_f00du64;
@@ -8639,4 +9807,179 @@ mod reference_equivalence_tests {
             }
         }
     }
+}
+
+/// Collected on the calling thread while [`set_refutation_degree_trace`] is
+/// on; read and cleared with [`refutation_degree_trace_take`].  Every field
+/// counts nodes (attempts, for `root_first_refutation_degree`) and is
+/// exact.  The `*_first_degree` fields are a diagnostic the trace pays for:
+/// at every inherited-engine reduction the node's own system is also
+/// reduced from scratch, with the engine's multiplier policy, at degree 2
+/// and, unless that refutes, at the engine's top degree; the node is filed
+/// under the first degree whose row space holds `1` (refuted) or, failing
+/// that, a forced variable (forced), else as stalled.  The trace changes no
+/// decision of the solver.
+#[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize)]
+pub struct RefutationDegreeTrace {
+    /// Inherited-engine reductions whose top basis was built from scratch
+    /// at this node (the root, or a node whose linear elimination dropped
+    /// its parent's bases), and those whose top basis was specialised from
+    /// the parent's.
+    pub reductions_fresh: u64,
+    pub reductions_inherited: u64,
+    /// The engine's own verdict at those reductions: `1` in the row space,
+    /// a forced variable and no `1`, or neither (the solver splits).
+    pub refuted_fresh: u64,
+    pub refuted_inherited: u64,
+    pub forced_fresh: u64,
+    pub forced_inherited: u64,
+    pub stalled_fresh: u64,
+    pub stalled_inherited: u64,
+    /// Diagnostic, indexed by degree (0 … 4): first degree of the node's
+    /// own from-scratch Macaulay space holding `1`, split by whether the
+    /// engine's basis at the node was fresh or inherited.
+    pub refuted_first_degree_fresh: [u64; 5],
+    pub refuted_first_degree_inherited: [u64; 5],
+    /// Diagnostic: the same for a forced variable, at nodes no degree up
+    /// to the top refutes; and the nodes neither decides.
+    pub forced_first_degree: [u64; 5],
+    pub stalled_from_scratch: u64,
+    /// Diagnostic: the from-scratch top-degree space refutes a node the
+    /// engine's basis did not, or the reverse (the inherited basis is a
+    /// documented subspace of it under the production policy).
+    pub scratch_refutes_engine_does_not: u64,
+    pub engine_refutes_scratch_does_not: u64,
+    /// Nodes refuted before any Macaulay matrix: the substituted system
+    /// holds `1` (degree 0), or linear elimination found a contradiction
+    /// (degree 1).
+    pub refuted_constant: u64,
+    pub refuted_linear: u64,
+    /// A forced value read off a reduction or an elimination contradicts
+    /// the assignment.
+    pub refuted_forced_conflict: u64,
+    /// Nodes the IC node oracle refuted.
+    pub refuted_oracle: u64,
+    /// Fully assigned points checked against the input, and how many were
+    /// solutions (each is certified by evaluation, degree 1).
+    pub leaves_checked: u64,
+    pub leaves_solutions: u64,
+    /// Early abort ([`early_abort_mode`]): degree-2 probes run, how many
+    /// refuted their node, and the probes' word operations (charged to the
+    /// stage unit like any reduction).
+    pub early_abort_probes: u64,
+    pub early_abort_refutations: u64,
+    pub early_abort_word_ops: u64,
+    /// Attempt-level diagnostic, once per inherited-engine solve: index `d`
+    /// in 2 … 4 counts root systems whose degree-`d` support-local Macaulay
+    /// space is the first to hold `1`; index 0 counts roots no degree ≤ 4
+    /// refutes; index 1 roots whose matrix exceeded the size caps before a
+    /// refutation.
+    pub root_first_refutation_degree: [u64; 5],
+    /// Where the stage unit goes: nodes that end refuted (any cause) and
+    /// nodes that end in a split, with the word operations each class spent
+    /// from node entry to its end (children excluded; with the trace on,
+    /// the trace's own from-scratch reductions are not charged).
+    pub nodes_refuted: u64,
+    pub word_ops_refuted_nodes: u64,
+    pub nodes_split: u64,
+    pub word_ops_split_nodes: u64,
+}
+
+thread_local! {
+    static REFUTATION_TRACE: std::cell::RefCell<Option<RefutationDegreeTrace>> =
+        const { std::cell::RefCell::new(None) };
+}
+
+/// Turn the refutation-degree trace on or off on this thread (off drops it).
+pub fn set_refutation_degree_trace(enabled: bool) {
+    REFUTATION_TRACE.with(|t| *t.borrow_mut() = enabled.then(RefutationDegreeTrace::default));
+}
+
+/// The trace collected on this thread since the last take, leaving it
+/// running and cleared; `None` when the trace is off.
+pub fn refutation_degree_trace_take() -> Option<RefutationDegreeTrace> {
+    REFUTATION_TRACE.with(|t| t.borrow_mut().as_mut().map(std::mem::take))
+}
+
+// KNOWN GAP (needs the W4 author): the engine call sites of these helpers (and
+// of the early-abort probes) were added in acd95f18f (lit2026 W4) and dropped
+// by the merge ca6c5d42e into the W4 branch, which took main's rewritten solver
+// (#1714). Until they are re-wired, f4_refutation_degree_probe emits an empty
+// trace. The allow is only to keep clippy -D warnings green, not a retirement.
+#[allow(dead_code)]
+fn trace_on() -> bool {
+    REFUTATION_TRACE.with(|t| t.borrow().is_some())
+}
+
+/// Charge the stage-unit word operations a node spent since `w0` (its
+/// entry, children excluded) to the refuted or the split nodes.
+#[allow(dead_code)]
+fn trace_cost(w0: Option<u64>, refuted: bool) {
+    let Some(w0) = w0 else { return };
+    let spent = f4_word_ops_thread().wrapping_sub(w0);
+    trace(|t| {
+        if refuted {
+            t.nodes_refuted += 1;
+            t.word_ops_refuted_nodes += spent;
+        } else {
+            t.nodes_split += 1;
+            t.word_ops_split_nodes += spent;
+        }
+    });
+}
+
+#[allow(dead_code)]
+fn trace(f: impl FnOnce(&mut RefutationDegreeTrace)) {
+    REFUTATION_TRACE.with(|t| {
+        if let Some(trace) = t.borrow_mut().as_mut() {
+            f(trace);
+        }
+    });
+}
+
+/// Early abort at the refutation degree (lit2026 W4), `KIC_F4_EARLY_ABORT`,
+/// read once per process:
+///
+/// - `0` or unset: off, the engine as it was.
+/// - `1`: before a node builds its top-degree basis from scratch, and only
+///   when its ladder skips degree 2 (wide systems run the top degree
+///   alone), reduce the node's degree-2 Macaulay space with the same
+///   multiplier policy; if it holds `1`, the node is refuted without the
+///   top-degree build.  Exact and tree-preserving: the degree-2 rows are
+///   rows of the degree-`D` matrix under either policy, so the top build
+///   refutes the same node; a probe that does not refute is dropped and
+///   the build runs as before.
+/// - `2`: a child about to specialise its parent's bases, whose first act
+///   would be that reduction, first reduces its own degree-2 Macaulay
+///   space; `1` there refutes it without the specialisation, and the probe
+///   is counted as the node's reduction.  Exact (`1` in a sub-ideal is `1`
+///   in the ideal).  The tree is the same wherever the inherited top basis
+///   refutes every node the degree-2 space does; the inherited basis is a
+///   documented subspace of the from-scratch one, so where it does not, the
+///   tree only loses refuted subtrees
+///   (`RefutationDegreeTrace::scratch_refutes_engine_does_not`).
+/// - `3`: both.
+///
+/// [`set_early_abort_mode`] overrides the environment on the calling thread.
+pub fn early_abort_mode() -> u8 {
+    if let Some(mode) = EARLY_ABORT_OVERRIDE.with(|m| m.get()) {
+        return mode;
+    }
+    static MODE: std::sync::OnceLock<u8> = std::sync::OnceLock::new();
+    *MODE.get_or_init(|| {
+        std::env::var("KIC_F4_EARLY_ABORT")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(0)
+    })
+}
+
+thread_local! {
+    static EARLY_ABORT_OVERRIDE: std::cell::Cell<Option<u8>> = const { std::cell::Cell::new(None) };
+}
+
+/// Set (`Some`) or clear (`None`) this thread's override of
+/// `KIC_F4_EARLY_ABORT`; a same-binary control for tests and harnesses.
+pub fn set_early_abort_mode(mode: Option<u8>) {
+    EARLY_ABORT_OVERRIDE.with(|m| m.set(mode));
 }
