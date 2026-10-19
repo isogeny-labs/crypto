@@ -1,6 +1,6 @@
-# Protocol addendum: a 45-bit replica of the prime-field class (P2)
+# Protocol addendum: a replica of the prime-field class at a 46-bit group order (P2)
 
-Version 1, frozen 2026-10-18 before any measurement of the run it governs.
+Version 1, frozen 2026-10-19 before any measurement of the run it governs.
 This is a new experiment directory; the committed protocol and run in
 `research/isogeny-class-rho/` are not changed. Instrument: `isoclass-rho`
 (`src/bin/isoclass_rho/`, pull request #2174), the same binary and the same
@@ -38,15 +38,15 @@ class P1 and so gives the same twelve endomorphism-ring strata:
 
 | id | field | root curve | n | class |
 |:--|:--|:--|:--|:--|
-| P2 | `F_p`, `p = ROOT_P` | `a = ROOT_A`, `b = ROOT_B` | `ROOT_N` (ROOT_NBITS bits), `#E = ROOT_COF * n` | `D = 315^2 * (-416214539)`, `h(D_K) = 8332`, class size 2,624,580 |
+| P2 | `F_p`, `p = 46339417407469` | `a = 4184642753251`, `b = 42214793703111` | `46339405405021` (46 bits), `#E = n`, prime, cofactor 1 | `D = 315^2 * (-416214539)`, `h(D_K) = 8332`, class size 2,624,580 |
 
 ## 3. Design (inherited, scaled)
 
 Walk, from the repository root, executed once:
 
 ```sh
-R=research/isogeny-class-rho-n45/runs/RUN
-target/release/isoclass-rho walk --curve ROOT_P,ROOT_A,ROOT_B --ells 2,3,5,7,11,13,17,19 --hard-ells 23,29,31,37,41,43,47,53,59,61 --hard-from 3 --radius 3 --max-vertices 5000 --per-stratum 3 --hard 4 --sources 2 --seed 20261018 --out $R/P2
+R=research/isogeny-class-rho-n45/runs/run-20261019-n45
+target/release/isoclass-rho walk --curve 46339417407469,4184642753251,42214793703111 --ells 2,3,5,7,11,13,17,19 --hard-ells 23,29,31,37,41,43,47,53,59,61 --hard-from 3 --radius 3 --max-vertices 5000 --per-stratum 3 --hard 4 --sources 2 --seed 20261018 --out $R/P2
 ```
 
 Measurements (seed 20261018 as in the first run):
