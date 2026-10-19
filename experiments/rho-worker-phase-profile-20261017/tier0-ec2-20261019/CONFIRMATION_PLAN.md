@@ -59,13 +59,19 @@ The predeclared confirmation gate requires:
    the gate.
 4. Compute each Q's median of four log(serial charged time / batch
    charged time) values. Bootstrap the 32 Q clusters with 10,000 draws
-   and a fixed seed, then exponentiate. Enable default secp256k1 batch
+   and fixed integer seed `125121526632471`, then exponentiate.
+   Enable default secp256k1 batch
    routing only if the 95% lower bound exceeds 1.05 and all preceding
    gates pass. Keep serial routing for other curves and as an explicit
    override.
 
-The new source bundle, confirmation runner/auditor implementation and
-its bootstrap seed, allocation receipt, binary hash, and concrete
-dispatch manifest are not yet frozen. Their hashes must be committed
-before a timed confirmation begins. AWS quota for another dedicated
-host remains pending; do not dispatch on the busy existing research host.
+The [confirmation plan builder](build_confirmation_plan.py) checks the
+fresh target digest and emits the exact 96-case plan after allocation.
+The [confirmation auditor](analyze_confirmation.py) reuses the r5
+arm-by-arm structural audit and applies the new aggregate A/A gate.
+The builder passed a 768-arm shape check and rejected the prior target
+manifest. The host source bundle, allocation receipt, binary hash, and
+concrete dispatch manifest are not yet frozen. Their hashes must be
+committed before a timed confirmation begins. AWS quota for another
+dedicated host remains pending; do not dispatch on the busy existing
+research host.
