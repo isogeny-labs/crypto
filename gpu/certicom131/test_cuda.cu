@@ -1,5 +1,6 @@
 #include <cuda_runtime.h>
 
+#include <cstdlib>
 #include <iostream>
 
 #include "fixtures.hpp"

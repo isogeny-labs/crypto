@@ -94,8 +94,8 @@ C131_VERIFY_HD int verify_all(const Fixtures &f) {
     for (int i = 0; i < SCALAR_VECTOR_COUNT; ++i) {
         if (!fp_point_matches(fp_scalar_mul(u160_from_words(f.vpk[i]), pg), f.vpkg[i])) return 6100 + i;
     }
-    if (!fp_scalar_mul(FP_ORDER, pg).infinity) return 6201;
-    if (!fp_scalar_mul(FP_ORDER, pq).infinity) return 6202;
+    if (!fp_scalar_mul(fp_order(), pg).infinity) return 6201;
+    if (!fp_scalar_mul(fp_order(), pq).infinity) return 6202;
 
     const F2Point bg = f2_generator();
     const F2Point bq = f2_target();
@@ -108,8 +108,8 @@ C131_VERIFY_HD int verify_all(const Fixtures &f) {
     for (int i = 0; i < SCALAR_VECTOR_COUNT; ++i) {
         if (!f2_point_matches(f2_scalar_mul(u160_from_u64_words(f.vbk[i]), bg), f.vbkg[i])) return 7100 + i;
     }
-    if (!f2_scalar_mul(F2_ORDER, bg).infinity) return 7201;
-    if (!f2_scalar_mul(F2_ORDER, bq).infinity) return 7202;
+    if (!f2_scalar_mul(f2_order(), bg).infinity) return 7201;
+    if (!f2_scalar_mul(f2_order(), bq).infinity) return 7202;
     return 0;
 }
 

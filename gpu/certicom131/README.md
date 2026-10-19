@@ -29,4 +29,5 @@ make cuda-test
 
 The recovered `oracle131.py` is retained byte-for-byte as historical
 provenance.  It is not invoked by the build, tests, or verifier.  See
-`PROTOCOL.md` for frozen hashes, acceptance criteria, and claim boundaries.
+`PROTOCOL.md` for frozen hashes, acceptance criteria, and claim boundaries,
+and `RESULT.md` for the host result and the exact CUDA validation blocker.

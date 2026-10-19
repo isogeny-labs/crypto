@@ -21,17 +21,17 @@ struct Fp {
     uint32_t v[5];
 };
 
-static constexpr Fp FP_MOD = P131_P;
-static constexpr Fp FP_R1 = P131_R1;
-static constexpr Fp FP_R2 = P131_R2;
-static constexpr Fp FP_PM2 = P131_PM2;
-static constexpr Fp FP_A_CANON = P131_A;
-static constexpr Fp FP_B_CANON = P131_B;
-static constexpr Fp FP_GX_CANON = P131_GX;
-static constexpr Fp FP_GY_CANON = P131_GY;
-static constexpr Fp FP_QX_CANON = P131_QX;
-static constexpr Fp FP_QY_CANON = P131_QY;
-static constexpr U160 FP_ORDER = P131_N;
+C131_HD Fp fp_modulus() { const Fp x = P131_P; return x; }
+C131_HD Fp fp_r1() { const Fp x = P131_R1; return x; }
+C131_HD Fp fp_r2() { const Fp x = P131_R2; return x; }
+C131_HD Fp fp_pm2() { const Fp x = P131_PM2; return x; }
+C131_HD Fp fp_a_canonical() { const Fp x = P131_A; return x; }
+C131_HD Fp fp_b_canonical() { const Fp x = P131_B; return x; }
+C131_HD Fp fp_gx_canonical() { const Fp x = P131_GX; return x; }
+C131_HD Fp fp_gy_canonical() { const Fp x = P131_GY; return x; }
+C131_HD Fp fp_qx_canonical() { const Fp x = P131_QX; return x; }
+C131_HD Fp fp_qy_canonical() { const Fp x = P131_QY; return x; }
+C131_HD U160 fp_order() { const U160 x = P131_N; return x; }
 
 C131_HD Fp fp_zero() {
     return Fp{{0, 0, 0, 0, 0}};
@@ -78,9 +78,10 @@ C131_HD Fp fp_add(const Fp &a, const Fp &b) {
     fp_add_raw(out, a, b);
     // Inputs are reduced below a 131-bit modulus, so their sum fits in 132
     // bits and cannot overflow the five-limb container.
-    if (fp_ge(out, FP_MOD)) {
+    const Fp modulus = fp_modulus();
+    if (fp_ge(out, modulus)) {
         Fp reduced;
-        fp_sub_raw(reduced, out, FP_MOD);
+        fp_sub_raw(reduced, out, modulus);
         out = reduced;
     }
     return out;
@@ -90,7 +91,7 @@ C131_HD Fp fp_sub(const Fp &a, const Fp &b) {
     Fp out;
     if (fp_sub_raw(out, a, b)) {
         Fp corrected;
-        fp_add_raw(corrected, out, FP_MOD);
+        fp_add_raw(corrected, out, fp_modulus());
         out = corrected;
     }
     return out;
@@ -120,7 +121,7 @@ C131_HD Fp fp_mont_mul(const Fp &a, const Fp &b) {
         uint64_t carry = 0;
         for (int j = 0; j < 5; ++j) {
             const uint64_t uv = static_cast<uint64_t>(t[i + j])
-                              + static_cast<uint64_t>(m) * FP_MOD.v[j] + carry;
+                              + static_cast<uint64_t>(m) * fp_modulus().v[j] + carry;
             t[i + j] = static_cast<uint32_t>(uv);
             carry = uv >> 32;
         }
@@ -132,20 +133,21 @@ C131_HD Fp fp_mont_mul(const Fp &a, const Fp &b) {
     }
 
     Fp out{{t[5], t[6], t[7], t[8], t[9]}};
-    if (fp_ge(out, FP_MOD)) {
+    const Fp modulus = fp_modulus();
+    if (fp_ge(out, modulus)) {
         Fp reduced;
-        fp_sub_raw(reduced, out, FP_MOD);
+        fp_sub_raw(reduced, out, modulus);
         out = reduced;
     }
     return out;
 }
 
 C131_HD Fp fp_from_canonical(const Fp &a) {
-    return fp_mont_mul(a, FP_R2);
+    return fp_mont_mul(a, fp_r2());
 }
 
 C131_HD Fp fp_to_canonical(const Fp &a) {
-    static constexpr Fp one{{1, 0, 0, 0, 0}};
+    const Fp one{{1, 0, 0, 0, 0}};
     return fp_mont_mul(a, one);
 }
 
@@ -154,7 +156,7 @@ C131_HD bool u160_bit(const U160 &a, int bit) {
 }
 
 C131_HD Fp fp_pow(const Fp &a, const U160 &exponent) {
-    Fp out = FP_R1;
+    Fp out = fp_r1();
     for (int bit = 159; bit >= 0; --bit) {
         out = fp_mont_mul(out, out);
         if (u160_bit(exponent, bit)) out = fp_mont_mul(out, a);
@@ -163,7 +165,8 @@ C131_HD Fp fp_pow(const Fp &a, const U160 &exponent) {
 }
 
 C131_HD Fp fp_inv(const Fp &a) {
-    const U160 exponent{{FP_PM2.v[0], FP_PM2.v[1], FP_PM2.v[2], FP_PM2.v[3], FP_PM2.v[4]}};
+    const Fp pm2 = fp_pm2();
+    const U160 exponent{{pm2.v[0], pm2.v[1], pm2.v[2], pm2.v[3], pm2.v[4]}};
     return fp_pow(a, exponent);
 }
 
@@ -193,17 +196,17 @@ C131_HD FpPoint fp_point_from_canonical(const Fp &x, const Fp &y) {
 }
 
 C131_HD FpPoint fp_generator() {
-    return fp_point_from_canonical(FP_GX_CANON, FP_GY_CANON);
+    return fp_point_from_canonical(fp_gx_canonical(), fp_gy_canonical());
 }
 
 C131_HD FpPoint fp_target() {
-    return fp_point_from_canonical(FP_QX_CANON, FP_QY_CANON);
+    return fp_point_from_canonical(fp_qx_canonical(), fp_qy_canonical());
 }
 
 C131_HD bool fp_on_curve(const FpPoint &p) {
     if (p.infinity) return true;
-    const Fp aa = fp_from_canonical(FP_A_CANON);
-    const Fp bb = fp_from_canonical(FP_B_CANON);
+    const Fp aa = fp_from_canonical(fp_a_canonical());
+    const Fp bb = fp_from_canonical(fp_b_canonical());
     const Fp y2 = fp_mont_mul(p.y, p.y);
     const Fp x2 = fp_mont_mul(p.x, p.x);
     const Fp x3 = fp_mont_mul(x2, p.x);
@@ -212,7 +215,7 @@ C131_HD bool fp_on_curve(const FpPoint &p) {
 
 C131_HD FpPoint fp_double(const FpPoint &p) {
     if (p.infinity || fp_is_zero(p.y)) return fp_infinity();
-    const Fp aa = fp_from_canonical(FP_A_CANON);
+    const Fp aa = fp_from_canonical(fp_a_canonical());
     const Fp numerator = fp_add(fp_mul_small(fp_mont_mul(p.x, p.x), 3), aa);
     const Fp denominator = fp_mul_small(p.y, 2);
     const Fp lambda = fp_mont_mul(numerator, fp_inv(denominator));
@@ -252,13 +255,13 @@ struct F2m {
     uint64_t v[3];
 };
 
-static constexpr F2m F2_A = B131_A;
-static constexpr F2m F2_B = B131_B;
-static constexpr F2m F2_GX = B131_GX;
-static constexpr F2m F2_GY = B131_GY;
-static constexpr F2m F2_QX = B131_QX;
-static constexpr F2m F2_QY = B131_QY;
-static constexpr U160 F2_ORDER = B131_N;
+C131_HD F2m f2_a() { const F2m x = B131_A; return x; }
+C131_HD F2m f2_b() { const F2m x = B131_B; return x; }
+C131_HD F2m f2_gx() { const F2m x = B131_GX; return x; }
+C131_HD F2m f2_gy() { const F2m x = B131_GY; return x; }
+C131_HD F2m f2_qx() { const F2m x = B131_QX; return x; }
+C131_HD F2m f2_qy() { const F2m x = B131_QY; return x; }
+C131_HD U160 f2_order() { const U160 x = B131_N; return x; }
 
 C131_HD F2m f2_zero() {
     return F2m{{0, 0, 0}};
@@ -342,25 +345,25 @@ C131_HD bool f2_point_eq(const F2Point &p, const F2Point &q) {
 }
 
 C131_HD F2Point f2_generator() {
-    return F2Point{F2_GX, F2_GY, 0};
+    return F2Point{f2_gx(), f2_gy(), 0};
 }
 
 C131_HD F2Point f2_target() {
-    return F2Point{F2_QX, F2_QY, 0};
+    return F2Point{f2_qx(), f2_qy(), 0};
 }
 
 C131_HD bool f2_on_curve(const F2Point &p) {
     if (p.infinity) return true;
     const F2m x2 = f2_square(p.x);
     const F2m left = f2_add(f2_square(p.y), f2_mul(p.x, p.y));
-    const F2m right = f2_add(f2_add(f2_mul(x2, p.x), f2_mul(F2_A, x2)), F2_B);
+    const F2m right = f2_add(f2_add(f2_mul(x2, p.x), f2_mul(f2_a(), x2)), f2_b());
     return f2_eq(left, right);
 }
 
 C131_HD F2Point f2_double(const F2Point &p) {
     if (p.infinity || f2_is_zero(p.x)) return f2_infinity();
     const F2m lambda = f2_add(p.x, f2_mul(p.y, f2_inv(p.x)));
-    const F2m x3 = f2_add(f2_add(f2_square(lambda), lambda), F2_A);
+    const F2m x3 = f2_add(f2_add(f2_square(lambda), lambda), f2_a());
     const F2m y3 = f2_add(f2_square(p.x), f2_mul(f2_add(lambda, f2_one()), x3));
     return F2Point{x3, y3, 0};
 }
@@ -373,7 +376,7 @@ C131_HD F2Point f2_add_point(const F2Point &p, const F2Point &q) {
         return f2_infinity();
     }
     const F2m lambda = f2_mul(f2_add(p.y, q.y), f2_inv(f2_add(p.x, q.x)));
-    const F2m x3 = f2_add(f2_add(f2_add(f2_add(f2_square(lambda), lambda), p.x), q.x), F2_A);
+    const F2m x3 = f2_add(f2_add(f2_add(f2_add(f2_square(lambda), lambda), p.x), q.x), f2_a());
     const F2m y3 = f2_add(f2_add(f2_mul(lambda, f2_add(p.x, x3)), x3), p.y);
     return F2Point{x3, y3, 0};
 }
