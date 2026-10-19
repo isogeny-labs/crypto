@@ -41,6 +41,13 @@ no computation) and were relaunched (amendment 3); 7 of them completed, 13 are
 the ones above. From 16:31Z to 20:34Z the relaunched jobs ran pinned to one CPU
 (wall only).
 
+*Erratum, 2026-10-19.* The counts above are wrong: *60* jobs ran and *12* did
+not start before the stop, not 59 and 13 (48 IC and 12 rho-only sessions on disk;
+the 20 relaunched jobs were 8 completed and 12 not started, not 7 and 13). The 12
+were run on 2026-10-19; see `reports/run-20261019T1612Z/`. The original text is
+left as written. The table below lists the 48 index-calculus sessions of the
+first 60 jobs, and the rho-only runs are counted in `runs.tsv`.
+
 #figure(image("s_by_run.svg", width: 100%),
   caption: [Every verified run's `S` by arm against `p` (48 IC runs; rho as rung
   means of the 219 distinct runs). Sessions under `sessions/`; summary

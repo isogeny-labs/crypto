@@ -148,19 +148,22 @@ ax.set_xlabel("fitted exponent β in cost ∝ p^β (95 % interval: union of OLS-
 save(fig, "slopes")
 print("ok", file=sys.stderr)
 
-# 5. Run report: every recorded S, by arm, against p.
+# 5. Run report of 2026-10-15: every recorded S of the first 60 jobs, by arm, against p
+# (drawn from the 60-job summary, so that report keeps showing what it described).
+S60 = json.loads((HERE.parent / "raw/summary-60-jobs.json").read_text())
+rho60 = S60["rho"]
 RUN = HERE.parent / "reports/run-20261015T0457Z"
 RUN.mkdir(parents=True, exist_ok=True)
 fig, ax = plt.subplots(figsize=(7.2, 4.2))
 for arm, col, mk, lab in (("ic-d4-w", C["rel"], "o", "ic-d4-w"), ("ic-d4-lp2", C["lp2"], "s", "ic-d4-lp2"), ("ic-d4-lp1", C["lp1"], "^", "ic-d4-lp1")):
-    if arm not in S["arms"]:
+    if arm not in S60["arms"]:
         continue
     xs, ys = [], []
-    for r in S["arms"][arm]["per_rung"]:
+    for r in S60["arms"][arm]["per_rung"]:
         xs += [r["p"]] * len(r["s_values"])
         ys += r["s_values"]
     ax.scatter(xs, ys, s=16, color=col, marker=mk, label=f"{lab} ({len(ys)} runs)", zorder=3)
-ax.scatter([r["p"] for r in rho["per_rung"]], [r["s"] for r in rho["per_rung"]], s=16, color=C["rho"], marker="D", label=f"rho-neg, rung mean ({rho['records']} distinct runs)")
+ax.scatter([r["p"] for r in rho60["per_rung"]], [r["s"] for r in rho60["per_rung"]], s=16, color=C["rho"], marker="D", label=f"rho-neg, rung mean ({rho60['records']} distinct runs)")
 ax.set_xscale("log")
 ax.set_yscale("log")
 ax.set_xlabel("p")
@@ -171,4 +174,43 @@ ax.legend(fontsize=7, frameon=False, loc="center right")
 fig.tight_layout()
 fig.savefig(RUN / "s_by_run.svg")
 fig.savefig(RUN / "s_by_run.png", dpi=150)
+plt.close(fig)
+
+# 6. Run report of 2026-10-19: the 12 jobs run after the stop, among all IC runs.
+import glob
+
+RUN2 = HERE.parent / "reports/run-20261019T1612Z"
+RUN2.mkdir(parents=True, exist_ok=True)
+new_jobs = [l.strip() for l in (HERE.parent / "sessions/jobs4.txt").read_text().split() if l.strip()]
+
+
+def ic_points(job_dirs):
+    pts = []
+    for d in job_dirs:
+        for line in (d / "records.jsonl").read_text().splitlines():
+            r = json.loads(line)
+            if r["arm"].startswith("ic-d4"):
+                pts.append((r["arm"], r["workload"]["curve_spec"]["p"], float(r["cost"]["s"])))
+    return pts
+
+
+all_dirs = [Path(d) for d in sorted(glob.glob(str(HERE.parent / "sessions/*/"))) if (Path(d) / "records.jsonl").exists()]
+new_dirs = [HERE.parent / "sessions" / j for j in new_jobs]
+old_dirs = [d for d in all_dirs if d.name not in new_jobs]
+fig, ax = plt.subplots(figsize=(7.2, 4.2))
+op = ic_points(old_dirs)
+ax.scatter([p for _, p, _ in op], [s for _, _, s in op], s=14, color=C["grid"], edgecolors=C["muted"], linewidths=0.5, label=f"the first 60 jobs ({len(op)} IC runs)", zorder=2)
+for arm, col, mk, lab in (("ic-d4-w", C["rel"], "o", "ic-d4-w"), ("ic-d4-lp2", C["lp2"], "s", "ic-d4-lp2")):
+    q = [(p, s) for a, p, s in ic_points(new_dirs) if a == arm]
+    ax.scatter([p for p, _ in q], [s for _, s in q], s=30, color=col, marker=mk, label=f"run after the stop: {lab} ({len(q)})", zorder=3)
+ax.set_xscale("log")
+ax.set_yscale("log")
+ax.set_xlabel("p")
+ax.set_ylabel("S (GAE / √r), counted")
+ax.set_title("The 12 jobs run after the stop (coloured) among all index-calculus runs", fontsize=9, color=C["ink"])
+grid(ax)
+ax.legend(fontsize=7, frameon=False, loc="upper right")
+fig.tight_layout()
+fig.savefig(RUN2 / "s_new_runs.svg")
+fig.savefig(RUN2 / "s_new_runs.png", dpi=150)
 plt.close(fig)
