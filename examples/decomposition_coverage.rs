@@ -13,6 +13,15 @@
 //! Usage: `decomposition_coverage <out-dir> [mult|subgroup]`; env `DC_THREADS`, `DC_SCALE`.
 //! `mult` runs the Amendment D diagnostic (binary `n = 2` coverage deficit).
 #![allow(dead_code)]
+#![allow(
+    clippy::manual_is_multiple_of,
+    clippy::manual_div_ceil,
+    clippy::too_many_arguments,
+    clippy::type_complexity,
+    clippy::needless_range_loop,
+    clippy::unusual_byte_groupings,
+    clippy::write_with_newline
+)]
 
 use std::collections::BTreeMap;
 use std::fs::File;

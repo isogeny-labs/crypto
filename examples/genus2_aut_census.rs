@@ -16,6 +16,15 @@
 //!
 //! std-only; `rustc --edition 2021 -O examples/genus2_aut_census.rs`.
 //! Usage: `genus2_aut_census <out-dir> [p ...]` (default 5 7 11 13).
+#![allow(
+    clippy::manual_is_multiple_of,
+    clippy::manual_div_ceil,
+    clippy::too_many_arguments,
+    clippy::type_complexity,
+    clippy::needless_range_loop,
+    clippy::unusual_byte_groupings,
+    clippy::write_with_newline
+)]
 
 use std::collections::BTreeMap;
 use std::fmt::Write as _;
@@ -54,7 +63,10 @@ struct F2 {
 impl F2 {
     fn mul(&self, x: (u64, u64), y: (u64, u64)) -> (u64, u64) {
         let p = self.p;
-        ((x.0 * y.0 + self.k * (x.1 * y.1 % p)) % p, (x.0 * y.1 + x.1 * y.0) % p)
+        (
+            (x.0 * y.0 + self.k * (x.1 * y.1 % p)) % p,
+            (x.0 * y.1 + x.1 * y.0) % p,
+        )
     }
     fn add(&self, x: (u64, u64), y: (u64, u64)) -> (u64, u64) {
         ((x.0 + y.0) % self.p, (x.1 + y.1) % self.p)
@@ -81,7 +93,8 @@ fn transform(a: u64, b: u64, c: u64, d: u64, p: u64) -> [[u64; 7]; 7] {
             // from (aX+bZ)^i: X^u Z^{i−u}
             let c1 = binom(i, u) % p * pw(a, u as u32, p) % p * pw(b, (i - u) as u32, p) % p;
             for v in 0..=(6 - i) {
-                let c2 = binom(6 - i, v) % p * pw(c, v as u32, p) % p * pw(d, (6 - i - v) as u32, p) % p;
+                let c2 =
+                    binom(6 - i, v) % p * pw(c, v as u32, p) % p * pw(d, (6 - i - v) as u32, p) % p;
                 let j = (u + v) as usize;
                 t[j][i as usize] = (t[j][i as usize] + c1 * c2) % p;
             }
@@ -91,7 +104,9 @@ fn transform(a: u64, b: u64, c: u64, d: u64, p: u64) -> [[u64; 7]; 7] {
 }
 
 fn idx(f: &[u64; 7], p: u64) -> usize {
-    f.iter().rev().fold(0usize, |a, &c| a * p as usize + c as usize)
+    f.iter()
+        .rev()
+        .fold(0usize, |a, &c| a * p as usize + c as usize)
 }
 
 fn from_idx(mut i: usize, p: u64) -> [u64; 7] {
@@ -238,28 +253,48 @@ fn census(p: u64) -> (String, String) {
         let _ = writeln!(
             rows,
             "{p},{},{orbit},{aut},{n1},{n2},{a1},{a2},{even},{split},{}",
-            f.iter().map(|c| c.to_string()).collect::<Vec<_>>().join(" "),
+            f.iter()
+                .map(|c| c.to_string())
+                .collect::<Vec<_>>()
+                .join(" "),
             if even { (-a2).to_string() } else { "-".into() }
         );
     }
-    let mut sum = format!("H5 p={p}: genus-2 mass sum 1/|Aut| = {mass:.4} (expected p^3 = {})\n", p * p * p);
+    let mut sum = format!(
+        "H5 p={p}: genus-2 mass sum 1/|Aut| = {mass:.4} (expected p^3 = {})\n",
+        p * p * p
+    );
     for ((even, split, aut), n) in &hist {
         if *even {
             let _ = writeln!(
                 sum,
                 "H5 p={p}: a1=0 {} |Aut|={aut}: {n} classes",
-                if *split { "split over F_p" } else { "SIMPLE over F_p (Res-shaped)" }
+                if *split {
+                    "split over F_p"
+                } else {
+                    "SIMPLE over F_p (Res-shaped)"
+                }
             );
         }
     }
-    let nonsplit_extra: u64 = hist.iter().filter(|((e, s, a), _)| *e && !*s && *a > 2).map(|(_, n)| n).sum();
-    let _ = writeln!(sum, "H5 p={p}: simple Res-shaped classes with |Aut| > 2: {nonsplit_extra}");
+    let nonsplit_extra: u64 = hist
+        .iter()
+        .filter(|((e, s, a), _)| *e && !*s && *a > 2)
+        .map(|(_, n)| n)
+        .sum();
+    let _ = writeln!(
+        sum,
+        "H5 p={p}: simple Res-shaped classes with |Aut| > 2: {nonsplit_extra}"
+    );
     (rows, sum)
 }
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let out = Path::new(args.get(1).expect("usage: genus2_aut_census <out-dir> [p ...]"));
+    let out = Path::new(
+        args.get(1)
+            .expect("usage: genus2_aut_census <out-dir> [p ...]"),
+    );
     std::fs::create_dir_all(out).unwrap();
     let ps: Vec<u64> = if args.len() > 2 {
         args[2..].iter().map(|s| s.parse().unwrap()).collect()

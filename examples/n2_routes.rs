@@ -22,7 +22,15 @@
 //! Usage: `n2_routes <out-dir> [run|check|control|summarize|hsweep|memsweep|hsummarize|gluecheck|glue|gluesummarize]`; env `N2_THREADS`, `N2_SIZES`
 //! (comma-separated `log2 #E` targets, default `20,24,28,32,36,40`).
 #![allow(dead_code)]
-#![allow(clippy::needless_range_loop)]
+#![allow(
+    clippy::manual_is_multiple_of,
+    clippy::manual_div_ceil,
+    clippy::too_many_arguments,
+    clippy::type_complexity,
+    clippy::needless_range_loop,
+    clippy::unusual_byte_groupings,
+    clippy::write_with_newline
+)]
 
 use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
@@ -3585,7 +3593,7 @@ fn glue_checks(out: &Path) {
                 };
                 log.push_str(&format!(
                     "G p={} N={} h={} ell={} t={}: t2=sigma(s2) {} lambda^2 in F_p {} lambda in F_p {} | twist {} | G1 #C(F_p)={} (p+1={}) #C(F_p2)={} (p^2+1-2t={}) | G2 assoc {} inverse {} N*A=0 {} | G3 hom {} nonzero {} ell*tau=0 {}\n",
-                    g.p, g.n, g.h, g.ell, t as i64 - 0, g.diag[0], g.diag[1], g.diag[2], g.twist, nc, g.p + 1,
+                    g.p, g.n, g.h, g.ell, t as i64, g.diag[0], g.diag[1], g.diag[2], g.twist, nc, g.p + 1,
                     nc2.map(|c| c.to_string()).unwrap_or("-".into()),
                     (g.p * g.p + 1) as i64 - 2 * (t as i64), assoc, inv, ordn, hom, nz, ordl
                 ));

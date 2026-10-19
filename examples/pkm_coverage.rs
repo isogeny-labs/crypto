@@ -12,6 +12,15 @@
 //! std-only; `rustc --edition 2021 -O examples/pkm_coverage.rs`.
 //! Usage: `pkm_coverage <out-dir>`; env `PKM_THREADS`, `PKM_SCALE` (0..1, shrinks the ranges for smoke runs).
 #![allow(dead_code)]
+#![allow(
+    clippy::manual_is_multiple_of,
+    clippy::manual_div_ceil,
+    clippy::too_many_arguments,
+    clippy::type_complexity,
+    clippy::needless_range_loop,
+    clippy::unusual_byte_groupings,
+    clippy::write_with_newline
+)]
 
 use std::collections::BTreeMap;
 use std::fs::File;
