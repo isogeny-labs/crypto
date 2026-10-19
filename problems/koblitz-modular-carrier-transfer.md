@@ -357,3 +357,47 @@ polarization pullback. The next direct-relation experiment must use coupled
 functions beyond the now-complete single-line norm family, with complete
 zero support, geometric joins and projected pole accounting. Neither
 experiment is represented as already executed.
+
+## Round09: explicit Frobenius and invariant rational generators
+
+[Round09](../research/koblitz_modular_ic_20261018/rounds/09/REPORT.md)
+computes the Frobenius lift on each of the four intrinsic Kummer quotients.
+The split dual base carries B=D^(-transpose), rather than D. All correction
+factors are explicit rational circuits. Forty-eight univariate identities,
+40 coefficient-Frobenius identities and80 exact slices pass. The parsed
+checker verifies576 chart squares and repeats the two360-step cocycles
+per graph. A written constant-deck argument explains why those fixtures
+fix the global cocycle, using connectedness of the retained Kummer cover.
+
+A trace-dual power basis gives4,320 invariant rational generating circuits
+per quotient. All129,600 trace-pairing entries and360 idempotent sums pass;
+5,760 sampled invariant values yield16 coordinate recoveries and128
+Frobenius-equivariance checks. Seventeen new named Lean lemmas prove the
+linear/matrix, root, orbit-sum and recovery implications. Native field
+semantics and the global geometric bridges remain written, not fully Lean.
+
+**Remaining quotient gap:** compute a manageable polynomial relation ideal
+for an explicit invariant generating set, saturate its denominators,
+verify the base-change isomorphism to all six charts, and carry the retained
+polarization to that F2 model. Rational generating circuits do not supply
+this ideal or a closed embedding. Jacobian identification remains separate.
+The next discriminating experiment is to reduce the trace-generator family
+using a Frobenius-adapted base coordinate system, then eliminate the two
+root variables on one declared open chart with exact inverse substitutions.
+Success must include denominator saturation and gluing; a degree/resource
+failure is recorded without a nonexistence conclusion.
+
+All50 signed diagonal-twist/reflection controls are negative for retaining
+the known A5 component in an F2-stable reflection quotient. The stable
+case collapses the known module to E^4 and its fixed part to E^2. This is
+not a full Jacobian-factor exclusion. Actual reflection quotient equations
+and genus, other factors and other carrier families remain open.
+
+Eight coupled functions are nonzero on all720 known norm columns.
+Outside zeros, multiplicities and poles have not been computed, so no
+complete new relation is promoted. Existing ranks remain12/1308 and11 on
+1165/1160 nonzero-image columns. The next direct-relation step must locate
+complete outside support for a coupled function with checked pole degree,
+then evaluate and join every new column before reporting its rank. General
+Jacobian reduction and individual descent remain open. The user assesses
+IC efficiency; this round contains no timing or solver measurement.

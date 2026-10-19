@@ -2,6 +2,8 @@
 use crate::{large_field::*, reverse06::dp, round02, round04};
 use serde_json::{json, Value};
 use std::path::Path;
+#[path = "descent09.rs"]
+pub(crate) mod descent09;
 #[derive(Clone)]
 struct Fn {
     a: Poly,

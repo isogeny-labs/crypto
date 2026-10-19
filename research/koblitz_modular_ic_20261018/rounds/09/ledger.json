@@ -1,0 +1,254 @@
+{
+  "audited_declarations": 17,
+  "date": "2026-10-19 UTC",
+  "failed_and_partial_runs": [
+    {
+      "files": [
+        "build-01.log",
+        "controls-01.log"
+      ],
+      "reason": "json array index parsing error;stale binary then rejected output path;no accepted arithmetic output"
+    },
+    {
+      "files": [
+        "lean-build-03.log"
+      ],
+      "reason": "missing DecidableEq J in generic trace-recovery statement;fixed before final build/audit"
+    },
+    {
+      "files": [
+        "lean-build-02.log"
+      ],
+      "reason": "preceding append used wrong relative path;this successful build checks previous15-lemma source only"
+    }
+  ],
+  "identity_certificates": [
+    {
+      "extra_checker_points": 128,
+      "file": "identity-dual-pairing.json",
+      "id": "IDC1h3c67f258c5f1bbca",
+      "issuer_points": 64
+    },
+    {
+      "extra_checker_points": 128,
+      "file": "identity-weil-five-plus.json",
+      "id": "IDC1h121ce479a75ebf1c",
+      "issuer_points": 64
+    }
+  ],
+  "low_genus": {
+    "actual_quotient_equations": false,
+    "conditional_reflection_genus_upper_bound": 1421,
+    "scope": "known augmentation component only;not full Jacobian-factor exclusion",
+    "signed_controls": 50,
+    "stable_and_known_component_retained": 0
+  },
+  "new_named_lean_theorems": 17,
+  "parent_commit": "92688745f0ffadf854367ad1d2f33fa05bf7ce2a",
+  "performance_measured": false,
+  "quotients": {
+    "F2_polynomial_relations": false,
+    "Jacobian_identification": false,
+    "additional_point_steps": 1440,
+    "chart_pair_checks": 576,
+    "closed_projective_embedding": false,
+    "cocycle_argument": "written constant-deck argument with two nonzero-root fixtures per graph",
+    "coordinate_recoveries": 16,
+    "direct_trace_controls": 64,
+    "equivariance_checks": 128,
+    "exact_slice_identities": 80,
+    "explicit_semilinear_coordinate_circuits": true,
+    "field_degree": 360,
+    "graphs": 4,
+    "invariant_rational_generators_per_graph": 4320,
+    "old_transition_sigma_checks": 400,
+    "parsed_semilinear_iterations": 2880,
+    "sampled_invariant_values": 5760,
+    "saturation": false,
+    "semilinear_iterations": 2880,
+    "separability_idempotent_sums": 360,
+    "sigma_Miller_identities": 40,
+    "trace_duality_entries": 129600,
+    "univariate_class_identities": 48
+  },
+  "raw_sha256": {
+    "base-merge-check-01.log": "c6e0b548dc57c719d8e5acda19ff258bf3f3469b84bc13bfb34b07a8a4205c1f",
+    "build-01.log": "eb036c349505db34794b803914a59071bf5e452c78a9cb946aa09d2abc7bf261",
+    "build-02.log": "339800200596571c8b6265447e74cd4a1fd067f5e193c29b670be2fdebcf0bb7",
+    "build-03.log": "c0128539cf1dffd99615adf40853d164018445f8b5d17fd4ba3477e82e86aba2",
+    "build-04.log": "745f344e0ec48436b8fcf836171279cc8de9fa470e58e6d8568e6b30c6af0574",
+    "build-05.log": "d4701f54921c562837e75a9e87753a619248d131bab62f7554c9dba98bb77db9",
+    "build-06.log": "23c4fbda31b5556fc3650f9b62d379de26a00160658853930fb4a48e69cdc04f",
+    "controls-01.log": "a6bb94527b22f7817117ec618a5e615a18ddfb3766ba94c4a8e49c1e3ba8327f",
+    "controls-02.log": "55df713eb13e86bce36cf53bc236e3e2f359fde7ec18c4bc43dd99a78ff01dcd",
+    "dashboard-check-01.log": "f0c4941e52d412a29f1819726d378a41946001831ecd9a6cef11f627ff5e42d3",
+    "dashboard-render-01.log": "6c744b1b4f2669263260eb6f865c638d6429cfec0648633287b7a675c249babb",
+    "descent-01.log": "430629d6cc6834d08cc3e91248a86054f0ff78d7d83e9f4fd000406165ec9e47",
+    "descent-check-01.log": "0240a2b650d5dc1e48310f56e6528776a41da2c22d2711cd29b3afe9fd0e36e5",
+    "invariants-01.log": "5b96d7e9bef3d35bd02fd72cc53a31e820c4d45b19047b60c8ec060ce75f9f75",
+    "l7-diagonal-twist-reflection-controls.json": "28c1956738d887568d61171ee18fea2cc09d6f378f6610930d16599fa84c2ed7",
+    "lean-axioms-01.log": "c4a1a7d3c6abf4066fba93b3459e8d762b7f13804e61acd3874c44350f785bbe",
+    "lean-axioms-02.log": "ab87867bd410ca6989113e276bc34b1b1eeb78c7d7c54d0d776136f65b979c71",
+    "lean-build-01.log": "a82910026afe6238db067e303f83ab75bc8e1255a35b1bd610b83bf13e43f72e",
+    "lean-build-02.log": "fbdc07b2aad837a0c3f08270d42612cf04b5b12e7379ec1afcd75b2a4a0ef826",
+    "lean-build-03.log": "a155999c12aa554f71b122709462a6356de821fdfa6b5ebc4e4cc5fd75871f81",
+    "lean-build-04.log": "53c88593c4e966e628961411e79bbfae750acb440bcf1e08cf3f23b04fea67e1",
+    "lean-full-gate-01.log": "6ff1c622b0a538ec0d98a4673a7f9ee1468486b377fa90b60581a59932b115f1",
+    "lean-full-project-audit-01.log": "41fb78a314e9e6c2c23cca9ab4e1c0ef56c14c3e5f3eeceefd928f7e2f36d72f",
+    "lean-full-project-build-01.log": "e0fe97cfaca7a9112bb02b7e534aa38dd22ff8d86c6c1731e26f7d555157d125",
+    "lean-full-project-cache-01.log": "29e284dc7d8024aa6a333a92d0b23035028d78ada47b37f7dd77d8e1a0293483",
+    "m10-full-line-family.json": "ac76be3b424aa31442990b1306a8c73320906f52259bbd443581fe3faf3d1119",
+    "m11-fixed-infinity-row.json": "f8a0b3dad7ce5bf48f98a39c048b5433060378f91588763f679a19e1b07eaa3f",
+    "m12-coupled-function-restrictions.json": "289cc6e87875e8dd6de0879ee9bd54b008ef10b8f7647dd816bbca8f0183f487",
+    "m8-full-map-principal-row.json": "97dac82a984aeb7c6253199a17dc4c5fb29746d534fcd03aee531fe211c61065",
+    "n4-independent-seed-targets.json": "547183a48ae51d3ab2ecbacfc4051a4af67d88a8601ff4b44c5d5e74f536ac87",
+    "native-tests-01.log": "4b108e2bbc3b4a30973e100668a7b4f4f00fd6d0181c8c69110195a175a911bb",
+    "prior-round08-replay-01.log": "d9065f921f2a71b24b44a4153cf0ecfa57aaa99678f4b5b36093f535b17f180c",
+    "q6-intrinsic-Kummer-charts.json": "2980ba6da87406f1756d1cccab68902f2e52bd023a0b12b6b7ec4c8e05263c3d",
+    "q6c-global-chart-gluing.json": "6e03242e540e36e79f7cabd4b2b9a1dcc06026a31002824615dee71f5b7f2675",
+    "q7-Frobenius-coordinate-circuits.json": "f75c4fb6ea485314234171d8b883a810bc1c890747259f93077a28d5a6f9c1d7",
+    "q7b-parsed-descent-chart-check.json": "27dd9de42283bd59d924eacfebee350e96cf583de07cd24e9c58f3f72838e46e",
+    "q7c-invariant-rational-generators.json": "72f4dabfc9f91c13511b841b2398ff4e979c2aeb6f7f11361613a6fefb7edb05",
+    "r3b-complete-split-fiber.json": "837e9df8f69cef3dd459f315a7e13a18f7fe68b8eaad080eaf346106f62bda6c",
+    "r3b-negative-fiber-neighbor-00.json": "236c75d277fee332d0dcab284d526550e8feaca8e4fad1c66f091b2d0344f34b",
+    "r3b-negative-fiber-neighbor-01.json": "3cfbe01e885f5bc8075f58d781082ace2128b559bc9636f42e1e2885a3032f79",
+    "r3b-negative-fiber-neighbor-02.json": "5190bd54d63feff5d467dbe50798ea8c303f34ab44c677e46b2248e843646d87",
+    "r3b-negative-fiber-neighbor-03.json": "8db1733ddff00fd6cd1b1e6654fd3f6e94e37206228e2915f7876ef5a53e9774",
+    "r3b-negative-fiber-neighbor-04.json": "ccde6b98fef8791555aaefd2f2e8b37d4c0404d27d994ab342c8214471773b07",
+    "r3b-negative-fiber-neighbor-05.json": "761194c1535a3b31b2f6daa40ee119ee92e55511065d5a61d3afecc8ef42c52a",
+    "r3b-negative-fiber-neighbor-06.json": "1a4cf932f842c02345da45cf06c02a9e396a1d7e676199f0f590597a9f520c3f",
+    "r3b-negative-fiber-neighbor-07.json": "f62636fdf896139b17808a672fd499dbb3847b0ded5d16b86f1f04ba5b97ffde",
+    "r3b-negative-fiber-neighbor-08.json": "b0b800a1177abdf9ceff9d8718b613d87d980695e99debaf9c180e23691466ee",
+    "r3b-negative-fiber-neighbor-09.json": "6742d5984b5b6e67dc6eaa18f3d54cb278b2a28352c092473e15944f8a8b2e4d",
+    "r3b-negative-fiber-neighbor-10.json": "7988e368ccccc600b8f2fd753011183742b842dddc5640e80051c7f46d6f9058",
+    "r3b-negative-fiber-neighbor-11.json": "292b0f03ff3013e56c7fc7721ab1461a4dc036fd8e7af5d07c17dcf2cae37504",
+    "replay-01.log": "1119d4a5c2f8d739356d0e6cf22985df3b20b18dff6b93efc35abee4cb702fd9",
+    "root-lib-tests-01.log": "e1dfa16adde0ffbc2158077f8a49f1ce9bff8aa3402db3823708d0a48cfc0a85",
+    "site-tests-01.log": "25a87393bd26f88134ebd648ba57557c1d7e3c5d1dd927f67ffe2a0634787acb",
+    "workflow-tests-01.log": "19971af436e657664ce6aad087137616ed2964fe269f5e1c66c94d70f3a746ad"
+  },
+  "relations": {
+    "complete_new_principal_divisors": false,
+    "component_function_evaluations": 40320,
+    "coupled_functions": 8,
+    "known_columns_tested": 720,
+    "known_zero_columns_each": 0,
+    "rank_promoted": false,
+    "retained_columns": 1308,
+    "retained_evaluated_rank": 12,
+    "retained_nonzero_image_columns": [
+      1165,
+      1160
+    ],
+    "retained_nonzero_image_ranks": [
+      11,
+      11
+    ]
+  },
+  "requirements": [
+    {
+      "open": "F2 polynomial relation ideal,saturation,closed embedding and polarization verification on that model;Jacobian identification",
+      "status": "partial",
+      "track": "remaining determinant19 quotient equations",
+      "verified": "explicit dual-base Frobenius circuits,chart compatibility,cocycle and4320 invariant rational generating circuits per graph"
+    },
+    {
+      "open": "actual reflection quotient equations/genus;other Jacobian factors and other carrier families",
+      "status": "partial",
+      "track": "lower-genus carriers",
+      "verified": "all50 signed diagonal-twist/reflection controls have no stable quotient retaining the known A5 component"
+    },
+    {
+      "open": "outside zero support,multiplicities,poles;no new complete relation or rank",
+      "status": "partial",
+      "track": "direct relations beyond rank11",
+      "verified": "eight coupled functions are nonzero on720 known norm columns"
+    },
+    {
+      "open": "native finite-field semantics and global modular/Picard/Galois geometry",
+      "status": "partial",
+      "track": "Lean proofs",
+      "verified": "17 named kernel proofs and transitive audit;no custom axioms/native trust"
+    },
+    {
+      "open": "general Jacobian reduction and individual descent",
+      "status": "partial",
+      "track": "reverse transfer and individual descent",
+      "verified": "prior corrected odd divisor and independent forward norms remain frozen"
+    },
+    {
+      "reason": "user assesses efficiency;no timings or solver run",
+      "status": "not attempted",
+      "track": "IC efficiency"
+    }
+  ],
+  "schema": "koblitz.round09-ledger/v1",
+  "scope": "same-agent native exact checks,fresh replay and separate parser with shared primitives;written global theory not fully Lean;no external audit or IC speed verdict",
+  "source_sha256": {
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRelations.lean": "38febde27b80bc8783c9fc014f39ef36a4c2c00ac32b19f1aafb1f5c30719835",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound03.lean": "cbf32205f263a982b80c0ac50c9148d042355ddbb9cd1038b2871abc8d25925c",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound04.lean": "dd6466228c1ccbb86717ef967056a5ad66ceea77f3e42bebc2bbf011077a3489",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound05.lean": "3851b3c2e8792fefc7c570dff66d6b41663e4c6652cffdc6e89d1514f2e6a904",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound05Quotients.lean": "21277858836a0a1975e70122641817fd798659c4484ace56da089c16f2a8d3a3",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound06.lean": "12351319504ded38db74c4c88ac1a817d44087621c9aee15ceab38c63e6e3e8d",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound06Matrices.lean": "31eef6aad8b21310d803b001710bf34bc9e2ae3471e09cf165d2a052db62996f",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound07.lean": "5134bf37042f4bc93069ed0be9a1bbf30c32a0e7e2e5fd3c67ddf0bb81943d97",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound07Cofactor.lean": "f3b8fa05054caf55024ad479bdc59545567894bec41aa3faa629a45bfdc29787",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound08.lean": "dfae13c82c955eed366fb2bceaf2c6863624a065a5065dfb32a5b0df11154bf9",
+    "research/koblitz_modular_ic_20261018/lean/KoblitzRound09.lean": "093e2978e7fc695f7ee60cf151bcb4dc5a7f667d41f9e9d20c76036f7556a3b4",
+    "research/koblitz_modular_ic_20261018/lean/lake-manifest.json": "dd6855f919d952755062d0a96ab10b510c4e8bdcd237b1926cef3787bbb1fc4e",
+    "research/koblitz_modular_ic_20261018/lean/lakefile.toml": "70797692ff0f373dd698306a327b73bf75e8c4ae044d3c882a30515c786f2181",
+    "research/koblitz_modular_ic_20261018/lean/lean-toolchain": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b",
+    "research/koblitz_modular_ic_20261018/native/Cargo.lock": "faa6768a05ea62e43872b76d917c03daa005e3e66fb411e1acbad983d5d447cf",
+    "research/koblitz_modular_ic_20261018/native/Cargo.toml": "e40f354535b1dfdba71099cea508ba2adc9d2a69c5958b72774302aeaa7d80c1",
+    "research/koblitz_modular_ic_20261018/native/src/census.rs": "d0aa1d5e1990f23d98e6a8534131fbaeaa01a371068213f273261af29b4d1b16",
+    "research/koblitz_modular_ic_20261018/native/src/cofactor07.rs": "466558f678c8fc7809241832539371de5a194d5c2b41cc4dd2a57159bc076b06",
+    "research/koblitz_modular_ic_20261018/native/src/controls09.rs": "e4232279b3c41432e5856e6375105080a7b5475ddb06d8456748b11a1e3a17ef",
+    "research/koblitz_modular_ic_20261018/native/src/delpezzo.rs": "61997725ce39c1dbefc2c333a5849002b338748f2c50de68a30437f6cb0f5fac",
+    "research/koblitz_modular_ic_20261018/native/src/delpezzo_conic.rs": "8fd0d10cba53383d5558735738dfdb422157201c2892da94b4e11043a7b248c8",
+    "research/koblitz_modular_ic_20261018/native/src/descent09.rs": "ade54eebd29977171210e4bf3f5ead411e82c1205d35080f6251d770640ceeeb",
+    "research/koblitz_modular_ic_20261018/native/src/forward07.rs": "38613d2eb8adc00397d533d04335c8f37bc7c1ae8279927194b574451d7736b9",
+    "research/koblitz_modular_ic_20261018/native/src/gluing.rs": "b0a85d943bc93bf836089df4c58ed3a47c6619f25e24225aad35c6fefada2d53",
+    "research/koblitz_modular_ic_20261018/native/src/klein_transfer.rs": "007814c025dd856c198754a9bff53c1c22313424b8e72a33caa10893f071cc12",
+    "research/koblitz_modular_ic_20261018/native/src/kummer08.rs": "47896070c7d26f780f49fbe50f146161a5016f2a8eacb03467a17085dd5dfdd4",
+    "research/koblitz_modular_ic_20261018/native/src/large_field.rs": "5c3065650d2e14bb0d2c4b67e022440932614bfe9285445c2ea344bd6de4140a",
+    "research/koblitz_modular_ic_20261018/native/src/main.rs": "e91c3171fd683ff292ce1f35dd304f9720e2f98b2438d69f475555660e27ff6a",
+    "research/koblitz_modular_ic_20261018/native/src/modular_geometry.rs": "48a9846f64555b6956dda3079a769e3bcb8a2ab72c2809e0b2d081e31b53549e",
+    "research/koblitz_modular_ic_20261018/native/src/modular_screen.rs": "05bdf66c216a9cc4464c26b0aca72dac5a2f480b34c2c600e2c4c2f1f996763d",
+    "research/koblitz_modular_ic_20261018/native/src/n5_relations.rs": "180df20d5738d2c4b4fe43114c18fa31239450d6865577eeb1b451c267f4ea8d",
+    "research/koblitz_modular_ic_20261018/native/src/odd07.rs": "7f926a55d412c55e90b719e1f8666929fe4d9e5428a762ce564b479fb894fb69",
+    "research/koblitz_modular_ic_20261018/native/src/polarized.rs": "acc7e659b66a2717eb1ffe840deeb779cda3776744a5b53dffc4f20259f588be",
+    "research/koblitz_modular_ic_20261018/native/src/quotient_geometry.rs": "0c43e248899f0a432330b796eac8cc8ade400504c1ac26fc89aad1db83b77d82",
+    "research/koblitz_modular_ic_20261018/native/src/quotients06.rs": "72b3e213870ee0b01446370665d46bee68dc706cf9dffa0359fb088ea8dea43d",
+    "research/koblitz_modular_ic_20261018/native/src/quotients07.rs": "ec7d97d0058a94e9d5166c83169abab27bc7619b37d4b41d6e81bd8872b47e3e",
+    "research/koblitz_modular_ic_20261018/native/src/relations08.rs": "982780b8403bbb26a9565fd4102088eca8fb307bc8277226ed870930e21a84e7",
+    "research/koblitz_modular_ic_20261018/native/src/reverse06.rs": "8163028dfb31ed4d987724228f50db52e1803adf77ff2db81d1031f78a045bb3",
+    "research/koblitz_modular_ic_20261018/native/src/round02.rs": "57edff50eba8d500f6bb8c41c5b9d3e6a8ca26644ac985a399ccf838e15d2c02",
+    "research/koblitz_modular_ic_20261018/native/src/round03_record.rs": "f1a8ed8032d3ee5e1322baa9bb90e15a2a10c70ac7e24a4d5736e0bd1b7fe79c",
+    "research/koblitz_modular_ic_20261018/native/src/round04.rs": "e5218295472d9a0a856883feab99618e945215783818a5e464d07602353d642b",
+    "research/koblitz_modular_ic_20261018/native/src/round04_record.rs": "e20e8f45555a9e508f79f2b749860e22e534d3dafc68e5bc0fabc411826a24a7",
+    "research/koblitz_modular_ic_20261018/native/src/round04_verify.rs": "a92696d7b480e8e16f503003909f222f7bf132eb85c47468ac1e187c42737265",
+    "research/koblitz_modular_ic_20261018/native/src/round05.rs": "d4dab2e06a977ad9d9ad8fde4d1194cb598047270b7c2eaf679544c54739424e",
+    "research/koblitz_modular_ic_20261018/native/src/round05_record.rs": "b7480de28b751c803b2aa66629acece6488d5a21046a753ee1c92157fbd57a28",
+    "research/koblitz_modular_ic_20261018/native/src/round06.rs": "31969068a29455e452ab4723a13f3c7837dc38ee86dd7df928c39e6a8ae3f629",
+    "research/koblitz_modular_ic_20261018/native/src/round06_record.rs": "29619bd535365cd08e6f078916b81694cf4c6284861cf24559db6f6591f7be8e",
+    "research/koblitz_modular_ic_20261018/native/src/round07_record.rs": "3e19baecd1c1a3519305a4ef70121342ef0579c8472d4760c602f2f095868174",
+    "research/koblitz_modular_ic_20261018/native/src/round08_record.rs": "88266811e4e66102858030c509e8c15cf72f4e23c3fb9dce5eb4565697ddc4c5",
+    "research/koblitz_modular_ic_20261018/native/src/round09_record.rs": "217dab35209210615fcce71c63f79e7260870f7320336d1f48406b8bd558f850",
+    "research/koblitz_modular_ic_20261018/native/src/round_record.rs": "1df832a5136ae05c423efc8d2a8c6b5f4d59f85836468d766cd986502f1f9502",
+    "research/koblitz_modular_ic_20261018/rounds/09/PROTOCOL.md": "273e39df8dbb778ce1f2adc2fe2a6bef96128ba54e0916af7599fc83287d8bf2",
+    "research/koblitz_modular_ic_20261018/rounds/09/REPLAY.sh": "b3b8d5dcd6dfd3497f094ef929a77d8a03002d15b84be1b65911a15d3b29dc67",
+    "src/binary_ecc/cover_transfer.rs": "6e801f14abf087b2a6610aa320faf602d176ac764f5eee8e9d88611cdacfa896",
+    "src/binary_ecc/curve.rs": "ceb94d849e17ec0ae678463f2d8a0a3f970f6de6713003abf0544395eb1dcd62",
+    "src/binary_ecc/f2m.rs": "cd25cffcb1d904be8fd8da059f4f0379c1bb60e566592f741e5ca3ee68223548",
+    "src/binary_ecc/hyperelliptic.rs": "09ce8a689aa8e190f51c871f9e94467271ea731b9629f69d322ae716de507c5c",
+    "src/binary_ecc/mod.rs": "84ece02cbf6f897317b236239c47efb0738d0e8e9f3d8530d2d4793609426099",
+    "src/binary_ecc/poly_f2m.rs": "4d76cd2e1fefe1a0decc2b118b12b896577e1fed30c9ee37fece6104487ce55c",
+    "src/cryptanalysis/curve_construction/gf2k.rs": "5c65e8789ce137643e7d256b11b0d1fca9a7770b34d492527749d8ff8efe011e",
+    "src/cryptanalysis/curve_construction/lpoly.rs": "d49576745ec42d9090807a88edb89b6372bfa2c43532240a66017becd31c5ccf",
+    "src/cryptanalysis/curve_construction/modular.rs": "048d106dec860cfbd5ef7b0a49095132c35c07a3ea2265e4c3995dfd5c970871",
+    "src/cryptanalysis/curve_construction/weil.rs": "9f1148e1ecd60e8d77470380639c8dd73856bb22ae2163a2fca23d6e37ddabf4",
+    "src/cryptanalysis/identity_certificate.rs": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270",
+    "src/hash/sha256.rs": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf"
+  }
+}

@@ -1,15 +1,21 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [08](rounds/08/README.md), with its
-[report](rounds/08/REPORT.md), [PDF](rounds/08/report.pdf),
-[proof map](rounds/08/PROOF_MAP.md), [ledger](rounds/08/ledger.json)
-and exact replay. The complete line-norm family raises nonzero-image rank
-to 11 for both signs, on 1165/1160 columns; evaluated rank is 12/1308.
-Exact geometric joins and separate small-field checks pass. Four mixed
-determinant-19 quotients have intrinsic Kummer equations and six explicit
-covering charts each over F2^360, with 200 exact transition identities.
-Sixteen new named Lean results pass, including chart coverage and cocycles.
-Effective F2 coordinate descent, a closed projective embedding, Jacobian
+The current round is [09](rounds/09/README.md), with its
+[report](rounds/09/REPORT.md), [PDF](rounds/09/report.pdf),
+[proof map](rounds/09/PROOF_MAP.md), [ledger](rounds/09/ledger.json)
+and exact replay. All four determinant-19 quotients have explicit
+Frobenius coordinate circuits over F2^360 and 4,320 invariant rational
+generating circuits each. The dual base uses inverse-transpose descent;
+80 exact slices, 576 chart squares and the written constant-deck argument
+check the lift. Trace-dual recovery checks pass. Seventeen new named Lean
+results pass their kernel build and transitive audit.
+
+All 50 signed diagonal-twist/reflection controls fail to give a stable
+quotient retaining the known trace-zero component. This is a bounded
+component test. Eight coupled functions are nonzero on all 720 tested norm
+columns; their complete divisors remain open. No relation rank is promoted:
+evaluated rank stays 12/1308, with nonzero-image rank 11 on 1165/1160 columns.
+F2 polynomial relations, saturation, a closed embedding, Jacobian
 identification and individual descent remain open. No timing is measured.
 
 Earlier evidence stays frozen:
@@ -27,6 +33,8 @@ Earlier evidence stays frozen:
   all ten determinant-5 quotient graphs and explicit even reverse fibers.
 - [Round 07](rounds/07/README.md): independent forward norms, corrected odd
   reverse divisor, nonzero-image rank6 and determinant-19 cofactor covers.
+- [Round 08](rounds/08/README.md): complete line-norm family and four
+  intrinsic Kummer quotients with six covering charts and exact transitions.
 - [Open construction problem](../../problems/koblitz-modular-carrier-transfer.md):
   current obligations, exact scope, and next discriminating experiments.
 

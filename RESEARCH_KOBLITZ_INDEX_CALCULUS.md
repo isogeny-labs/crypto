@@ -11,6 +11,20 @@ pre-registered hypotheses)
 *On index calculus algorithms for subfield curves*, SAC 2020
 (ePrint 2020/1315).
 
+**Modular and low-genus carrier follow-up (2026-10-19):**
+[Round09](research/koblitz_modular_ic_20261018/rounds/09/REPORT.md)
+gives explicit Frobenius coordinate circuits and 4,320 invariant rational
+generating circuits for each of four determinant-19 quotients. F2 polynomial
+relations, saturation and a closed embedding remain open. All 50 signed
+diagonal-twist/reflection controls fail to retain the known trace-zero
+component in a stable quotient; other Jacobian factors remain untested.
+Eight coupled functions are nonzero on all 720 tested norm columns, without
+complete new divisors or rank promotion. Evaluated rank remains 12/1308,
+and nonzero-image rank 11 on 1165/1160 columns. Seventeen new named Lean
+results pass; global geometric bridges remain written. See the
+[construction problem](problems/koblitz-modular-carrier-transfer.md) for
+the exact remaining obligations. No IC cost is measured in this follow-up.
+
 ## The setting
 
 A Koblitz curve `K_a : y² + xy = x³ + a x² + 1`, `a ∈ {0, 1}`, is
