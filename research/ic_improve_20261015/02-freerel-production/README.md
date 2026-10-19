@@ -2,7 +2,7 @@
 
 ## Verdict
 
-**Historical tuned-vs-tuned result; R10 re-rate: ADVANCES only at n = 61.** At the same default K, n = 41 and n = 53 MATCH; their intervals include 1. The primary comparison (b) uses each arm's own tuned K. See [`R10 ledger`](../../../ic_tool_program/ledger/r10-20261019/README.md).
+**Historical tuned-vs-tuned result; R10 re-rate: ADVANCES only at n = 61.** At the same default K, n = 41 and n = 53 MATCH; their intervals include 1. The primary comparison (b) uses each arm's own tuned K. See [`R10 ledger`](../../ic_tool_program/ledger/r10-20261019/README.md).
 
 - **Pooled:** free relations cost **0.960× [0.946, 0.976]** of the tuned incumbent in the counted unit (S3 root solves per complete solve per target). Wall clock agrees: 0.941× [0.922, 0.961].
 - **Per size, in comparison (b):** each tuned-vs-tuned interval excludes 1, but this does not isolate free relations from the different tuned K. The R10 same-K default-vs-off comparison matches at n = 41/53 and advances only at n = 61.
