@@ -118,8 +118,9 @@ jobs:
       - name: Source-bound generic build and mixed-adapter tournament control
         if: matrix.reference == 'scaled'
         run: |
+          cp research/ic_candidate_tournament_20260915/ci/Cargo.lock Cargo.lock
           cargo fetch --locked
-          python research/ic_candidate_tournament_20260915/generic_build_v2.py \
+          python research/ic_candidate_tournament_20260915/generic_build.py \
             --out "$RUNNER_TEMP/ic-generic-driver-build"
           env -u IC_SOURCE_MANIFEST_SHA256 RAYON_NUM_THREADS=1 cargo test --locked --release --no-default-features \
             --example ic_tournament_worker prepared_target_tests -- --ignored --test-threads=1
@@ -181,8 +182,9 @@ jobs:
           shared-key: ic-generic-reference-qualification
       - name: Build the source-bound generic worker
         run: |
+          cp research/ic_candidate_tournament_20260915/ci/Cargo.lock Cargo.lock
           cargo fetch --locked
-          python research/ic_candidate_tournament_20260915/generic_build_v2.py \
+          python research/ic_candidate_tournament_20260915/generic_build.py \
             --out "$RUNNER_TEMP/ic-generic-qualification-build"
       - name: Execute the registered comparison and whole-mode observer study
         run: |
