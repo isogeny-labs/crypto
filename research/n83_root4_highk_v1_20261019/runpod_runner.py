@@ -92,7 +92,8 @@ def read_provider(path, expected_stratum):
             receipt.get('cloud_type') != 'COMMUNITY' or
             receipt.get('compute_type') != 'GPU' or
             receipt.get('gpu_type_id') not in
-            ('NVIDIA RTX A2000', 'Tesla V100-PCIE-16GB') or
+            ('NVIDIA RTX A2000', 'Tesla V100-PCIE-16GB',
+             'Tesla V100-SXM2-16GB') or
             receipt.get('gpu_count') != 1 or
             receipt.get('vcpu_count', 0) < 4 or
             receipt.get('memory_in_gb', 0) < 32 or

@@ -44,7 +44,8 @@ def verify(snapshot_path, strata, head_sha):
                 pod.get('cloud_type') != 'COMMUNITY' or
                 pod.get('compute_type') != 'GPU' or
                 pod.get('gpu_type_id') not in
-                ('NVIDIA RTX A2000', 'Tesla V100-PCIE-16GB') or
+                ('NVIDIA RTX A2000', 'Tesla V100-PCIE-16GB',
+             'Tesla V100-SXM2-16GB') or
                 pod.get('gpu_count') != 1 or
                 pod.get('vcpu_count', 0) < 4 or
                 pod.get('memory_in_gb', 0) < 32 or
