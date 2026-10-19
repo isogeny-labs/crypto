@@ -3406,12 +3406,62 @@ fn pack_polynomials_flat_direct(
     layout: &F4ColumnLayout,
     criterion: Option<&F5Criterion>,
 ) -> Option<FlatF2Matrix> {
-    let words = layout.columns.len().div_ceil(64);
+    // Select the representation once, not once for each term of every
+    // product. The three monomorphisations preserve the same exact-support
+    // rejection and ordinary-builder fallback.
+    let columns = layout.columns.len();
+    match &layout.index {
+        F4ColumnIndex::Standard(index) => pack_polynomials_flat_lookup(
+            polys,
+            n_vars,
+            degree,
+            multiplier_mask,
+            columns,
+            criterion,
+            |mask| index.get(&mask).copied(),
+        ),
+        F4ColumnIndex::Fast(F4FastColumnIndex::Hashed(index)) => pack_polynomials_flat_lookup(
+            polys,
+            n_vars,
+            degree,
+            multiplier_mask,
+            columns,
+            criterion,
+            |mask| index.get(&mask).copied(),
+        ),
+        F4ColumnIndex::Fast(F4FastColumnIndex::Dense(index)) => pack_polynomials_flat_lookup(
+            polys,
+            n_vars,
+            degree,
+            multiplier_mask,
+            columns,
+            criterion,
+            |mask| {
+                index
+                    .get(usize::try_from(mask).ok()?)
+                    .copied()
+                    .filter(|&column| column != u16::MAX)
+                    .map(usize::from)
+            },
+        ),
+    }
+}
+
+fn pack_polynomials_flat_lookup(
+    polys: &[F2BoolPoly],
+    n_vars: usize,
+    degree: u32,
+    multiplier_mask: u64,
+    columns: usize,
+    criterion: Option<&F5Criterion>,
+    lookup: impl Fn(u64) -> Option<usize>,
+) -> Option<FlatF2Matrix> {
+    let words = columns.div_ceil(64);
     if words == 0 {
         return None;
     }
     let mut schedules: Vec<Option<std::rc::Rc<[u64]>>> = vec![None; degree as usize + 1];
-    let mut seen = vec![false; layout.columns.len()];
+    let mut seen = vec![false; columns];
     let mut data = Vec::new();
     let mut rows = 0;
     let row_cap = max_f4_rows();
@@ -3436,7 +3486,7 @@ fn pack_polynomials_flat_direct(
             data.resize(start + words, 0u64);
             let row = &mut data[start..];
             for term in &polynomial.terms {
-                let column = layout.index.get(&(term.mask | multiplier))?;
+                let column = lookup(term.mask | multiplier)?;
                 row[column / 64] ^= 1u64 << (column % 64);
             }
             if row.iter().all(|word| *word == 0) {
@@ -7027,6 +7077,30 @@ mod tests {
                     .unwrap();
                     assert_eq!(got.data, want.data);
                     assert_eq!((got.rows, got.words), (want.rows, want.words));
+                    for index in [
+                        F4ColumnIndex::Standard(
+                            columns.iter().enumerate().map(|(i, &m)| (m, i)).collect(),
+                        ),
+                        F4ColumnIndex::Fast(F4FastColumnIndex::Hashed(
+                            columns.iter().enumerate().map(|(i, &m)| (m, i)).collect(),
+                        )),
+                    ] {
+                        let layout = F4ColumnLayout {
+                            columns: columns.clone(),
+                            index,
+                        };
+                        let got = pack_polynomials_flat_direct(
+                            &equations,
+                            n,
+                            degree,
+                            mask,
+                            &layout,
+                            f5.as_ref(),
+                        )
+                        .unwrap();
+                        assert_eq!(got.data, want.data);
+                        assert_eq!((got.rows, got.words), (want.rows, want.words));
+                    }
                     let stale = F4ColumnLayout::new(columns[1..].to_vec());
                     assert!(pack_polynomials_flat_direct(
                         &equations,
@@ -7039,6 +7113,33 @@ mod tests {
                     .is_none());
                 }
             }
+        }
+    }
+
+    #[test]
+    fn matrix_runtime_direct_lookup_handles_high_variable_masks() {
+        let high = 1u64 << 63;
+        let equations = [F2BoolPoly::from_monos(
+            vec![
+                F2BoolMono::from_mask(high | 1),
+                F2BoolMono::from_mask(high),
+                F2BoolMono::from_mask(1),
+            ],
+            64,
+        )];
+        for criterion in [RowCriterion::None, RowCriterion::F5] {
+            let f5 = (criterion == RowCriterion::F5)
+                .then(|| F5Criterion::new(&equations, 64, 3, high | 1));
+            let rows =
+                macaulay_rows_monos_with_mask(&equations, 64, 3, high | 1, f5.as_ref()).unwrap();
+            let columns = macaulay_columns(&rows).unwrap();
+            let layout = F4ColumnLayout::new(columns);
+            let want = pack_rows_flat_with_layout(&rows, &layout, false).unwrap();
+            let got =
+                pack_polynomials_flat_direct(&equations, 64, 3, high | 1, &layout, f5.as_ref())
+                    .unwrap();
+            assert_eq!(got.data, want.data);
+            assert_eq!((got.rows, got.words), (want.rows, want.words));
         }
     }
 
