@@ -6,9 +6,15 @@ active research instance. The [replacement allocation](aws-r2-allocation.json)
 is `i-06792af749cbdd584` in `us-east-2b`; its scheduled shutdown is
 2026-10-19 05:30 UTC, and it is configured to terminate on shutdown.
 
-The first `m5zn.metal` host (`i-047f22d5f7ea716c2`, `us-east-2a`) failed AWS system reachability after the isolation reboot
-(`impaired` since 2026-10-19 01:08 UTC); the [CloudWatch metric](aws-system-reachability.json)
-reports `StatusCheckFailed_System=1` at 01:10–01:16 UTC. It produced zero benchmark arms.
+The first `m5zn.metal` host (`i-047f22d5f7ea716c2`, `us-east-2a`) lost
+AWS system reachability during its isolation reboot (`impaired` since
+2026-10-19 01:08 UTC); the [CloudWatch metric](aws-system-reachability.json)
+reports `StatusCheckFailed_System=1` at 01:10–01:16 UTC. [AWS documents](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html)
+that this check can fail temporarily during a bare metal restart, and
+[bare metal initialization](https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-nitro-instances.html)
+can take 20 minutes or more. This host was stopped and terminated before
+recovery could be assessed. It produced zero benchmark arms; its receipt is
+an interrupted setup, not a diagnosed hardware failure.
 The [EC2 state receipt](aws-stopping.json) records the subsequent stop
 transition. The host was then terminated and its empty root volume deleted.
 An attempt to boot the smaller `a1.metal` host with Amazon Linux 2023 was
