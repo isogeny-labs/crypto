@@ -762,6 +762,7 @@ fn external_replay(dir: &Path) -> R<Vec<bool>> {
 }
 
 fn run(spec: &Path, dir: &Path) -> R<()> {
+    native_signals::install();
     let s = read(spec)?;
     let wall = number(&s, "wall_seconds")?;
     require((1..=900).contains(&wall), "wall must be 1..900")?;
@@ -944,6 +945,10 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         }
         let mut censored = false;
         loop {
+            require(
+                native_signals::interrupted().is_none(),
+                "interrupted; cleanup and affinity restoration required",
+            )?;
             let v = inspect(&name)?;
             if v["state"]["Running"] == false {
                 if start.elapsed() >= Duration::from_secs(wall) && v["state"]["ExitCode"] == 137 {
