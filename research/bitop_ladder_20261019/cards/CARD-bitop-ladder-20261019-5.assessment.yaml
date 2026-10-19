@@ -1,0 +1,12 @@
+card_id: CARD-bitop-ladder-20261019-5
+relay_verbatim: not_verified_by_tool
+outcome: executed_as_specified
+stopped_at_step: null
+recommendation: proceed_to_analysis
+reasons:
+  - "Receipt cards/CARD-bitop-ladder-20261019-5.receipt.json (sha256 bfa60680c6cab6f4d14a2974a5f90e99e3641dcfe9a39fbd92057e1192374d6d): status completed, one command train-panel, exit_code 0, attempts 1, timed_out false, seconds 2.929, commit 5175f9f1e06656fd379c1202e1abaa5255104fe3, argv and outputs list equal to the card's."
+  - "cards/CARD-bitop-ladder-20261019-5.run.stdout sha256 matches the receipt's stdout_sha256; it holds exactly 3 lines, DONE train-P27-rf3-ext2, DONE train-P26-rf3-ext2, DONE train-P28-rf3-ext2; no FAILED line; stderr empty."
+  - "The 3 output digests in the receipt (P26 e2984d5c..., P27 fad33060..., P28 d448c355...) equal the sha256 of sessions/<name>/verify.json on disk. Each has ok true, session_status complete, problems empty, 16 of 16 records verified, and spec.json byte-identical to specs/<name>.json."
+  - "git status --porcelain shows no tracked modification and no path outside research/bitop_ladder_20261019/; the receipt's dirty_after lists only paths under it."
+  - "Relay: the dispatch says card text plus the Deviation 1 timeout note; the executor's full text was not provided and check-relay was not run, so verbatim relay is recorded from the dispatch only. The figures quoted in the dispatch (exit 0, 2.929 s, receipt sha256, 3 DONE lines) equal the receipt."
+interpretation: not_assessed
