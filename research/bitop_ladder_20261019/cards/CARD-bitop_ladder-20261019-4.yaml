@@ -1,0 +1,97 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-bitop-ladder-20261019-4
+experiment_id: bitop_ladder_20261019
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: f3661ed3e3f4b94db9bd2e8c89181fb11670d738
+receipt: research/bitop_ladder_20261019/cards/CARD-bitop-ladder-20261019-4.receipt.json
+binds:
+  - {path: research/bitop_ladder_20261019/PROTOCOL.md, sha256: 867247a2528d1ddd0fbdbee7c031e86ae6e2ad268bfc5c93dc4bac5b8958aeff}
+  - {path: research/bitop_ladder_20261019/run_sessions.sh, sha256: 31f4061ab352c1d02b597394adbd3095102e916a6b4077fa81a5281d145910e7}
+  - {path: research/bitop_ladder_20261019/specs/train-P16-pair-ext1.json, sha256: 7017be0c4344dbdb2db00f57d9bb94b0cdd7f31c30e8333f9fd9784df67accc9}
+  - {path: research/bitop_ladder_20261019/specs/train-P18-pair-ext1.json, sha256: 6f2ce3eb3dcfd01ebb39da3f79bb57ba826b323027e7760d41d9a624952469c5}
+  - {path: research/bitop_ladder_20261019/specs/train-P21-pair-ext1.json, sha256: a4ce2e539bcb2172908225bfb5ef2019cab707c25ca28ad1281ce94f63c6c91a}
+  - {path: research/bitop_ladder_20261019/specs/train-P22-pair-ext1.json, sha256: efc756d3b76b048960864153dbc60cfc70edc988a215c4842c72e39603fcb1c0}
+  - {path: research/bitop_ladder_20261019/specs/train-P23-pair-ext1.json, sha256: af4cf1f5b0998cc3240bc50aec5f8b51271acad408b863f830e70ffc39ccadad}
+  - {path: research/bitop_ladder_20261019/specs/train-P24-pair-ext1.json, sha256: af38a679cfe51e6f6d3ab601cf3f4591f976a85d3d671f6aeee46b4d9dea6918}
+  - {path: research/bitop_ladder_20261019/specs/train-P24-rf3-ext1.json, sha256: 1132fa8fa0133b767be8b6542b3785de0f5c6e5fa517b75057e54f06416773ad}
+  - {path: research/bitop_ladder_20261019/specs/train-P25-pair-ext1.json, sha256: 1e2a150efb100d57c6d1b652c8938a34db5b9448a3d706f8aef405137ba8d429}
+  - {path: research/bitop_ladder_20261019/specs/train-P25-rf3-ext1.json, sha256: b3dd181e23b0b35c41706c9e0fbc212f0cd6b703726b616f6e096ae21549a957}
+  - {path: research/bitop_ladder_20261019/specs/train-P26-pair-ext1.json, sha256: 92aa5ec4e13444e78d1af41ed32643d387940f475dc5b2520e67e30a7bd9fbd2}
+  - {path: research/bitop_ladder_20261019/specs/train-P26-rf3-ext1.json, sha256: 4c415c7bd53b9d50e588a5d326b72cc1b4d48238b352bad0e0b572492ef721b0}
+  - {path: research/bitop_ladder_20261019/specs/train-P27-pair-ext1.json, sha256: f0fdd30824e3c6d587e88b5604b009aa334bc3a1d14b4f0c031fb741fe2062f1}
+  - {path: research/bitop_ladder_20261019/specs/train-P27-rf3-ext1.json, sha256: 223b4bc79ea1c9dd82fc28922f2c4095279a6780735f07168a413bb85313ee0d}
+  - {path: research/bitop_ladder_20261019/specs/train-P28-rf3-ext1.json, sha256: 6a9d579b508a4a9431f924a5eab8190a9799c1fee3b645f2ffe51c8831c03d82}
+  - {path: research/bitop_ladder_20261019/specs/train-P31-pair-ext1.json, sha256: b5fc2a576ff7643ee99853e5d5f4aaab135f4071ae3b42c0743258c94daf0622}
+  - {path: research/bitop_ladder_20261019/specs/train-P34-pair-ext1.json, sha256: f5920ddbd05d5a4b736dfac1897b70c0618cc23997fcc43e36cadfeb14a5e088}
+  - {path: research/bitop_ladder_20261019/specs/train-P35-pair-ext1.json, sha256: 16311b5bfe85dae2fad29c3302378bb4ee3e665e117e450ac82d253535135b78}
+  - {path: target/release/ecbench, sha256: 372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a}
+must_not_exist:
+  - research/bitop_ladder_20261019/sessions/train-P16-pair-ext1
+  - research/bitop_ladder_20261019/sessions/train-P18-pair-ext1
+  - research/bitop_ladder_20261019/sessions/train-P21-pair-ext1
+  - research/bitop_ladder_20261019/sessions/train-P22-pair-ext1
+  - research/bitop_ladder_20261019/sessions/train-P23-pair-ext1
+  - research/bitop_ladder_20261019/sessions/train-P24-pair-ext1
+  - research/bitop_ladder_20261019/sessions/train-P24-rf3-ext1
+  - research/bitop_ladder_20261019/sessions/train-P25-pair-ext1
+  - research/bitop_ladder_20261019/sessions/train-P25-rf3-ext1
+  - research/bitop_ladder_20261019/sessions/train-P26-pair-ext1
+  - research/bitop_ladder_20261019/sessions/train-P26-rf3-ext1
+  - research/bitop_ladder_20261019/sessions/train-P27-pair-ext1
+  - research/bitop_ladder_20261019/sessions/train-P27-rf3-ext1
+  - research/bitop_ladder_20261019/sessions/train-P28-rf3-ext1
+  - research/bitop_ladder_20261019/sessions/train-P31-pair-ext1
+  - research/bitop_ladder_20261019/sessions/train-P34-pair-ext1
+  - research/bitop_ladder_20261019/sessions/train-P35-pair-ext1
+commands:
+  - id: train-panel
+    cwd: research/bitop_ladder_20261019
+    argv:
+      - ./run_sessions.sh
+      - specs/train-P16-pair-ext1.json
+      - specs/train-P18-pair-ext1.json
+      - specs/train-P21-pair-ext1.json
+      - specs/train-P22-pair-ext1.json
+      - specs/train-P23-pair-ext1.json
+      - specs/train-P24-pair-ext1.json
+      - specs/train-P24-rf3-ext1.json
+      - specs/train-P25-pair-ext1.json
+      - specs/train-P25-rf3-ext1.json
+      - specs/train-P26-pair-ext1.json
+      - specs/train-P26-rf3-ext1.json
+      - specs/train-P27-pair-ext1.json
+      - specs/train-P27-rf3-ext1.json
+      - specs/train-P28-rf3-ext1.json
+      - specs/train-P31-pair-ext1.json
+      - specs/train-P34-pair-ext1.json
+      - specs/train-P35-pair-ext1.json
+    timeout_seconds: 7000
+    success_exit_codes: [0]
+    stdout: research/bitop_ladder_20261019/cards/CARD-bitop-ladder-20261019-4.run.stdout
+    outputs:
+      - research/bitop_ladder_20261019/sessions/train-P16-pair-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P18-pair-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P21-pair-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P22-pair-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P23-pair-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P24-pair-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P24-rf3-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P25-pair-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P25-rf3-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P26-pair-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P26-rf3-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P27-pair-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P27-rf3-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P28-rf3-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P31-pair-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P34-pair-ext1/verify.json
+      - research/bitop_ladder_20261019/sessions/train-P35-pair-ext1/verify.json
+bus_address: executor-mechanical-bitop-ladder
+background: true
+write_scope:
+  - research/bitop_ladder_20261019/
+stop_when:
+  - The train-panel command exits with a status other than 0.
+  - Any path listed under must_not_exist already exists before the command starts.

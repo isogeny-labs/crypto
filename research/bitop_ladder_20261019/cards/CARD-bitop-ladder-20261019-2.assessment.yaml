@@ -13,3 +13,4 @@ interpretation: not_assessed
 observations:
   - "sessions/train-P39/verify.json reports ok true, 0 problems, 2 replays reproduced, but records 32 and verified_records 31 (logs/train-P39.verify.log: 'audit OK: 32 records, 31 verified, 2 replays reproduced, 0 problems'). Every other session has verified_records equal to records. Reported for the analysis tier; the select.py rule 'train runs all verified' depends on it."
   - "Executor ran with a 7,200,000 ms Bash timeout, as the dispatch note says; the card's own step timeout was 7000 s and the run took 5575.943 s."
+relay_note: "Per the coordinator (compile dispatch of 2026-10-19): the relay was the verbatim prompt text plus one appended dispatch note (Bash timeout 7200000, PROTOCOL.md Deviation 1). Recorded from the dispatch, not checked by tool."
