@@ -1247,6 +1247,24 @@ fn main() -> Result<()> {
             )?;
             println!("{receipt}");
         },
+        Some("primary-mixed-orbit-m4")=>{
+            if args.len()!=10 { return Err("primary-mixed-orbit-m4 preflight|positive|natural UUUU|UUDD|DDUU|DDDD FIXTURE_INDEX U_BASE_DIR D_BASE_DIR EVIDENCE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (requires hard 8-GiB cgroup and 610-s outer cap)".into()); }
+            let receipt=primary_adapter::mixed_orbit_cli(
+                &args[2],&args[3],args[4].parse()?,Path::new(&args[5]),
+                Path::new(&args[6]),Path::new(&args[7]),Path::new(&args[8]),
+                Path::new(&args[9]),
+            )?;
+            println!("{receipt}");
+        },
+        Some("primary-mixed-replay-m4")=>{
+            if args.len()!=9 { return Err("primary-mixed-replay-m4 UUUU|UUDD|DDUU|DDDD U_BASE_DIR D_BASE_DIR EVIDENCE_DIR FIXTURE_DIR WORKER_JSON NEW_OUTPUT_JSON".into()); }
+            let receipt=primary_adapter::mixed_relation_replay_cli(
+                &args[2],Path::new(&args[3]),Path::new(&args[4]),
+                Path::new(&args[5]),Path::new(&args[6]),Path::new(&args[7]),
+                Path::new(&args[8]),
+            )?;
+            println!("{receipt}");
+        },
         Some("primary-paired-replay-m5")=>{
             if args.len()!=8 { return Err("primary-paired-replay-m5 U|D BASE_DIR EVIDENCE_DIR FIXTURE_DIR WORKER_JSON NEW_OUTPUT_JSON".into()); }
             let receipt=primary_adapter::paired_relation_m5_replay_cli(

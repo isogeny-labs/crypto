@@ -4257,3 +4257,8 @@ mod tests {
         fs::remove_dir_all(root).unwrap();
     }
 }
+
+const MIXED_ADAPTER_SOURCE: &[u8] = include_bytes!("primary_adapter.rs");
+const MIXED_EXAMPLE_SOURCE: &[u8] = include_bytes!("../../examples/koblitz_n83_factor_base_export.rs");
+const MIXED_WORKER_SOURCE: &[u8] = include_bytes!("../n83_d18_subgroup_orbit_census_20261018/mixed-v1/worker.rs");
+include!("../n83_d18_subgroup_orbit_census_20261018/mixed-v1/worker.rs");
