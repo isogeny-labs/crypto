@@ -1,10 +1,10 @@
-# Qualified full-worker rho timing needs host-level CPU control
+# Full-worker rho confirmation after the physical-host panel
 
 - **Status:** `open`
-- **Kind:** empirical measurement and host-isolation gap
+- **Kind:** prospective empirical confirmation
 - **Affected work:** [worker experiment and decision table](../experiments/rho-worker-phase-profile-20261017/README.md), [worker PR #2137](https://github.com/aburan28/crypto/pull/2137), and [arithmetic PR #920](https://github.com/aburan28/cryptanalysis/pull/920)
-- **Next action owner:** workspace owner for an administratively controlled Linux host and SSH access; rho worker task for frozen replay and independent audit
-- **Last updated:** 2026-10-18
+- **Next action owner:** AWS quota review for another dedicated host; rho worker task for fresh-target frozen replay and independent audit
+- **Last updated:** 2026-10-19
 
 ## Result so far
 
@@ -20,15 +20,31 @@ Five hosted attempts ran on RunPod Pod `94uxi8f876o5gz`. The [decision table](..
 | [4](../experiments/rho-worker-phase-profile-20261017/tier1-pod-20261018-r4/README.md) | 8 / 4 | Host-parent `runc` was eligible on those CPUs before the observer armed |
 | [5](../experiments/rho-worker-phase-profile-20261017/tier1-pod-20261018-r5/README.md) | 96 / 48 | Host-parent `runc` became eligible about 701 seconds after barrier release; observer stopped the run |
 
-Attempt 5 had no A/A exception in its completed pairs. Its host-affinity observation still invalidates the aggregate. The charged worker-time ratio, interval, and memory acceptance result remain unknown. Serial routing remains the default. All five archives were copied off the Pod and committed to PR #2137. The Pod had no persistent volume, was idle after the fifth audit, and was stopped through the RunPod API; a subsequent API read reported `EXITED`.
+Attempt 5 had no A/A exception in its completed pairs. Its host-affinity observation still invalidates the aggregate. All five archives were copied off the Pod and committed to PR #2137. The Pod had no persistent volume, was idle after the fifth audit, and was stopped through the RunPod API; a subsequent API read reported `EXITED`.
+
+The [physical-host r5 panel](../experiments/rho-worker-phase-profile-20261017/tier0-ec2-20261019/README.md)
+then ran on a dedicated `m5zn.metal` core with NUMA, IRQ, frequency,
+exclusive-cgroup, and per-arm noise receipts. Its
+[independent audit](../experiments/rho-worker-phase-profile-20261017/tier0-ec2-20261019/audit-r5.json)
+checked all 768 arms and 384 pairs: no invalid arms, invalid pairs,
+structural issues, or memory failures. One of 256 frozen A/A controls
+had ratio 1.123159, above the 1.11 limit, so the aggregate decision is
+`unknown_gate_failed`. The comparison-only diagnostic median Q-cluster
+ratio was 5.110, with diagnostic 95% interval `[5.041, 5.165]`.
+These diagnostics focus the next experiment on confirming the batch walk
+speedup; serial routing remains the default until a prospective gate passes.
 
 ## What would unblock it
 
-- [ ] Provide SSH access to a Linux host with administrative control of benchmark CPUs, their SMT siblings, NUMA memory placement, IRQ routing, frequency policy, and background services. Record the actual host-level isolation configuration and its verification, rather than inferring exclusivity from a container affinity mask.
-- [ ] Rebuild the pinned source on that host and freeze allocation, binary, fixture, and source hashes before dispatch. Confirm exact replay and the queue lock there.
-- [ ] Run the frozen 128-walker panel with 32 public Q points, `dp_bits=12`, an 8,192-step cap, four repetitions, serial/batch and A/A pairs, one child at a time. Retain every failed or interrupted arm and independently audit ordered check-ins, distinguished points, phase sums, A/A, memory, throttling, steal time, and host noise.
-- [ ] Apply the declared integration gate: a Q-cluster bootstrap paired 95% lower serial/batch charged-time bound above 1.05, exact replay, and added peak RSS within both 10% and 64 MiB. A qualified lower result keeps serial routing and closes the worker decision; a failed isolation or A/A gate leaves the speed result unknown.
+- [x] Establish and audit physical-host CPU, SMT, NUMA, IRQ, frequency, and per-arm noise isolation; preserve the r5 raw archive and failed A/A control.
+- [x] Generate 32 fresh public Q points with zero overlap and independently replay all 4,096 expected outputs. The [confirmation plan](../experiments/rho-worker-phase-profile-20261017/tier0-ec2-20261019/CONFIRMATION_PLAN.md) freezes a new aggregate A/A rule that applies only to a new panel.
+- [ ] Wait for AWS quota and allocate a separate dedicated host; keep the existing research jobs running. Rebuild the pinned source there and commit the allocation, binary, fixture, plan, and source hashes before timing.
+- [ ] Run the new 768-arm, 384-pair panel through one shared queue and independently audit exact replay, A/A, memory, host noise, and the 32-Q paired interval. A qualified 95% lower bound above 1.05 permits curve-guarded batch routing; otherwise retain serial routing and the complete failure ledger.
 
 ## Resolution and history
 
-Unresolved. The previously recorded need for a RunPod key and source-transfer approval was satisfied when the Pod was launched and the public bundle was uploaded; it is no longer the access blocker. The current blocker is host-level interference on the measurement CPUs. CI for PR #2137 was still queued at the last check; PR #920's reported checks passed. Recheck the source hash and PR status before dispatch or merge.
+Open pending a fresh physical-host confirmation. The prior Pod access
+and host-isolation gaps were addressed. The r5 A/A excursion is
+preserved under its original gate. AWS's additional on-demand quota
+request remains open at the last check; termination of the dedicated
+r5 host was requested after its complete archive was copied and verified.
