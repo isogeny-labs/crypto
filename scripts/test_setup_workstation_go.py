@@ -21,6 +21,9 @@ class GoInstallTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory(prefix="workstation-go-test-")
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
+        self.profile_root = self.root / "profile's home"
+        self.profile_root.mkdir()
+        (self.profile_root / ".zshrc").touch()
         self.destination = self.root / "local"
         (self.destination / "go").mkdir(parents=True)
         (self.destination / "go" / "original").write_text("retained toolchain\n")
@@ -60,6 +63,9 @@ os.rename(src,dst)
         if not shutil.which("jq"):
             self.skipTest("jq is required by the installer")
         source = SCRIPT.read_text()
+        persist = source.split("persist_path() {", 1)[1].split(
+            "# ----------------------------------------------------------------- system", 1
+        )[0]
         function = source.split("install_go() {", 1)[1].split(
             "# ------------------------------------------------------------------- node", 1
         )[0]
@@ -72,15 +78,15 @@ warn() { printf '%s\\n' "$*" >&2; }
 have() { command -v "$1" >/dev/null 2>&1; }
 go() { printf 'go1.24.0\\n'; }
 version_ge() { return 1; }
-persist_path() { :; }
-as_root() { local args=("$@"); args[${#args[@]}-1]="$TEST_DESTINATION"; "${args[@]}"; }
+run() { if [ "$DRY_RUN" = 1 ]; then return; fi; "$@"; }
+as_root() { "$@"; }
 GO_MIN=1.25
 GO_VERSION=1.26.9
 GOARCH=amd64
 PKG=apt
 OS=Linux
 DRY_RUN=${TEST_DRY_RUN:-0}
-install_go() {""" + function + "\ninstall_go\n")
+persist_path() {""" + persist + "\ninstall_go() {" + function + "\ninstall_go\n")
 
     def stub(self, name, contents):
         path = self.bin / name
@@ -104,11 +110,14 @@ install_go() {""" + function + "\ninstall_go\n")
     def run_installer(self, **overrides):
         env = dict(os.environ, PATH=str(self.bin) + os.pathsep + os.environ["PATH"],
                    TEST_ARCHIVE=str(self.archive), TEST_METADATA=str(self.metadata),
-                   TEST_DESTINATION=str(self.destination), TMPDIR=str(self.root), **overrides)
+                   GO_INSTALL_DIR=str(self.destination / "go"), TMPDIR=str(self.root), **overrides)
+        # Only the child process sees these isolated profile paths.
+        env["HOME"] = str(self.profile_root)
+        env["CLAUDE_ENV_FILE"] = str(self.profile_root / "hook's environment")
         if sys.platform.startswith("linux"):
             env["TEST_NATIVE_MV"] = shutil.which("mv")
         return subprocess.run(["bash", str(self.harness)], env=env,
-                              capture_output=True, text=True, timeout=20)
+                              cwd=self.root, capture_output=True, text=True, timeout=20)
 
     def assert_original(self):
         self.assertEqual((self.destination / "go/original").read_text(), "retained toolchain\n")
@@ -165,6 +174,23 @@ install_go() {""" + function + "\ninstall_go\n")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assert_original()
         self.assertFalse((self.destination / ".go-install.lock").exists())
+
+    def test_quoted_destination_is_persisted_literally(self):
+        self.destination = self.root / "space's $(touch injected) `touch injected2`"
+        self.destination.mkdir()
+        result = self.run_installer()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for profile in [self.profile_root / ".bashrc", self.profile_root / ".zshrc",
+                        self.profile_root / "hook's environment"]:
+            result = subprocess.run(
+                ["bash", "-c", '. "$1"; printf "%s" "$PATH"', "profile-check", str(profile)],
+                env=dict(os.environ, HOME=str(self.profile_root)), cwd=self.root,
+                capture_output=True, text=True, timeout=20)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.split(os.pathsep)[:2],
+                             [str(self.destination / "go/bin"), str(self.profile_root / "go/bin")])
+        self.assertFalse((self.root / "injected").exists())
+        self.assertFalse((self.root / "injected2").exists())
 
 
 if __name__ == "__main__":

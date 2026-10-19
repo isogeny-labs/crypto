@@ -28,6 +28,7 @@
 #   SAGE_VERSION        SageMath version                       (10.9)
 #   SAGE_PREFIX         micromamba root for the Sage env       (/opt/conda-sage, or ~/.local/conda-sage without root)
 #   GO_VERSION          Go installed when go is missing/old    (1.26.9)
+#   GO_INSTALL_DIR      where that Go goes                     (/usr/local/go)
 #   NODE_MAJOR          Node.js major version                  (22)
 #   WITH_GEMINI=1       also install @google/gemini-cli
 #   WITH_LATEX=1        also install a TeX Live (papers/, iacr-eprint skill)
@@ -115,11 +116,11 @@ export PATH="$LOCAL_BIN:$HOME/.cargo/bin:/usr/local/go/bin:$HOME/go/bin:$PATH"
 persist_path() {
   local line="$1" rc
   if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
-    grep -qxF "$line" "$CLAUDE_ENV_FILE" 2>/dev/null || run sh -c "printf '%s\n' '$line' >> '$CLAUDE_ENV_FILE'"
+    grep -qxF -- "$line" "$CLAUDE_ENV_FILE" 2>/dev/null || run sh -c 'printf "%s\n" "$1" >> "$2"' sh "$line" "$CLAUDE_ENV_FILE"
   fi
   for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
     [ -f "$rc" ] || [ "$rc" = "$HOME/.bashrc" ] || continue
-    grep -qxF "$line" "$rc" 2>/dev/null || run sh -c "printf '%s\n' '$line' >> '$rc'"
+    grep -qxF -- "$line" "$rc" 2>/dev/null || run sh -c 'printf "%s\n" "$1" >> "$2"' sh "$line" "$rc"
   done
 }
 
@@ -188,9 +189,9 @@ install_go() {
   if [ -n "$cur" ] && version_ge "$cur" "$GO_MIN"; then ok "go $cur"; return; fi
   if [ "$PKG" = brew ]; then run brew install go; return; fi
   local os=linux; [ "$OS" = Darwin ] && os=darwin
-  local tgz="go${GO_VERSION}.${os}-${GOARCH}.tar.gz"
+  local tgz="go${GO_VERSION}.${os}-${GOARCH}.tar.gz" dest="${GO_INSTALL_DIR:-/usr/local/go}"
   if [ "$DRY_RUN" = 1 ]; then
-    log "would verify and stage $tgz before replacing /usr/local/go"
+    log "would verify and stage $tgz before replacing $dest"
     return
   fi
   local download expected
@@ -211,21 +212,25 @@ install_go() {
     warn "Go release checksum unavailable; existing installation preserved"
     return 1
   fi
-  # All renames occur on /usr/local's filesystem. Keep the old installation
+  # All renames occur on the destination filesystem. Keep the old installation
   # until checksum, extraction and the staged binary's version all pass. The
   # lock also serializes setup hooks from sibling repositories.
   if ! as_root bash -c '
     set -euo pipefail
-    archive=$1 expected=$2 version=$3 root=$4
-    exec 9>"$root/.go-install.lock"
+    archive=$1 expected=$2 version=$3 dest=$4
+    root=$(dirname "$dest")
+    name=$(basename "$dest")
+    case "$name" in .|..|/) echo "invalid Go installation directory" >&2; exit 1 ;; esac
+    mkdir -p "$root"
+    exec 9>"$root/.$name-install.lock"
     flock -x 9
     stage=$(mktemp -d "$root/.go-install.XXXXXXXX")
     cleanup() {
       status=$?
       trap - EXIT
       if [ "$status" -ne 0 ] && { [ -e "$stage/previous" ] || [ -L "$stage/previous" ]; }; then
-        if [ ! -e "$root/go" ] && [ ! -L "$root/go" ]; then
-          if ! mv -T "$stage/previous" "$root/go"; then
+        if [ ! -e "$dest" ] && [ ! -L "$dest" ]; then
+          if ! mv -T "$stage/previous" "$dest"; then
             echo "Go rollback failed; original installation retained at $stage/previous" >&2
             exit 1
           fi
@@ -243,17 +248,20 @@ install_go() {
     printf "%s  %s\n" "$expected" "$stage/archive.tar.gz" | sha256sum -c -
     tar -C "$stage" -xzf "$stage/archive.tar.gz"
     [ "$(env GOROOT="$stage/go" "$stage/go/bin/go" env GOVERSION)" = "go$version" ]
-    if [ -e "$root/go" ] || [ -L "$root/go" ]; then
-      mv -T "$root/go" "$stage/previous"
+    if [ -e "$dest" ] || [ -L "$dest" ]; then
+      mv -T "$dest" "$stage/previous"
     fi
-    mv -T "$stage/go" "$root/go"
-  ' workstation-go "$download/$tgz" "$expected" "$GO_VERSION" /usr/local; then
+    mv -T "$stage/go" "$dest"
+  ' workstation-go "$download/$tgz" "$expected" "$GO_VERSION" "$dest"; then
     rm -rf "$download"
     warn "Go installation failed; prior installation preserved or rollback location reported above"
     return 1
   fi
   rm -rf "$download"
-  persist_path 'export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"'
+  local escaped_bin
+  printf -v escaped_bin '%q' "$dest/bin"
+  persist_path "export PATH=$escaped_bin:\"\$HOME/go/bin:\$PATH\""
+  export PATH="$dest/bin:$PATH"
   have go && ok "$(go version)"
 }
 
