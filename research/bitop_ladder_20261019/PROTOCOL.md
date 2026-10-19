@@ -128,4 +128,15 @@ about 3,000× the floor and 7 s a run at 32 bits; the fixed-b32 arm stops at
 
 ## Deviations
 
-None yet.
+1. **Train panel split across cards (2026-10-19).** The first card
+   (`cards/CARD-bitop_ladder-20261019-1.yaml`, all 25 train specs) was
+   stopped after 30 minutes by the agent harness's limit on a background
+   command, which is independent of the card's own 6-hour timeout. By then
+   `train-P36` and `train-P37` were complete and verified; `train-P35`,
+   `train-P38`, `train-P39` and `train-P40` were interrupted mid-session, and
+   no other spec had started. The interrupted sessions were set aside
+   uncommitted and are re-run unchanged from their frozen specs (same targets,
+   same seeds) by a second card. The remaining specs run in a third card.
+   Each card is sized to finish under the harness's 2-hour maximum, and the
+   executor is dispatched with that maximum as its background timeout. No
+   spec, seed, grid or rule changed.
