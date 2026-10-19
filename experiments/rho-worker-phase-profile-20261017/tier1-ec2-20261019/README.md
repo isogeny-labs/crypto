@@ -28,7 +28,8 @@ decision.
 The run was launched as `rho-worker-freshq.service` at 2026-10-19 20:09:11
 UTC, with its service on CPU 0 and timed children on CPU 4. Its active output
 directory is `/home/ec2-user/rho/results/b9a2ed25901949fa8a888bf97117c1ed`.
-The final raw archive and independent audit will be added after completion.
+Its [raw archive](first-raw.tar.gz) and [independent audit](first-audit.json)
+preserve the complete result.
 
 ## Prospective full-width confirmation
 
@@ -38,8 +39,9 @@ eight, even though the requested batch width is 32. A second
 `4a5e38e2f1ed29bce319b34f7bc521cd91b82c231ad6c2e2bad7b933bda3d5a4`,
 was frozen before its first arm. It retains all 32 Q points, 32 walkers,
 four repetitions, exact-output fields and charged interval, and changes the
-check-in interval to 32 so the batch lane can hold all 32 walkers. It will
-start after the first panel completes, preserving one timed job at a time.
+check-in interval to 32 so the batch lane can hold all 32 walkers. It
+started only after the first panel completed, preserving one timed job at a
+time. The [service journal](service-journal.txt) records the ordering.
 
 Its [independent auditor](analyze_fullwidth.py) requires zero invalid arms,
 complete exact replay and no disqualifying host or memory event. The A/A
@@ -49,6 +51,28 @@ outside [0.90, 1.11], none outside [0.80, 1.25], both mode medians within
 integration threshold remains a Q-cluster bootstrap lower 95% bound above
 1.05. Failed gates retain the raw result and leave the qualified aggregate
 unknown.
+
+## Completed Tier 1 results
+
+The first panel completed all 768 arms and 384 exact-output pairs, with no
+invalid arm, invalid pair, structural issue or memory failure. One frozen
+batch A/A control (`q06`, repetition 1) had reference/candidate ratio
+1.437258 outside [0.90, 1.11]. Its decision is `unknown_gate_failed`.
+The raw archive SHA-256 is
+`cebef51fc31edf69946a3365f6c69a300c1a235f2bc1ecaf1458f1b2d1904cee`.
+
+The [full-width raw archive](fullwidth-raw.tar.gz), SHA-256
+`78260d94fe31a1f13766a3ac5011f9a7beece8a2c16c084bcdb19889664ed479`,
+contains all 768 arms and 384 pairs. One reference arm of the `q12` batch
+A/A control in repetition 3 recorded one CPU-steal tick; the runner marked
+that arm and pair invalid. The other 383 pairs were valid, and no memory
+gate failed. Its [independent audit](fullwidth-audit.json) reports
+`unknown_gate_failed` under the frozen all-arms host gate. For diagnosis
+only, the 32-Q comparison median reference/candidate ratio was 4.4912
+with Q-cluster 95% interval [4.4069, 4.6637]. Its qualified interval is
+null. The [post-run script](postrun-audit-and-archive.sh) checked both
+terminal summaries and ran the auditors only after both timed services
+stopped.
 
 ## Production check-in confirmation, frozen but not dispatched
 
