@@ -558,7 +558,7 @@ def roster(names: Names, measured: set[str]) -> list[dict]:
             field = f"GF(p), p = {p['p']}" if len(str(p["p"])) < 40 else f"GF(p), {int(p['p']).bit_length()}-bit p"
             coeff = f"a = {p['a']}, b = {p['b']}" if len(str(p["p"])) < 40 else "standard coefficients"
         elif c["family"] == "extension":
-            field = f"GF({p['p']}^{p.get('degree', p.get('n'))})"
+            field = f"GF({p['p']}^{p.get('degree', p.get('k', p.get('n')))})"
             coeff = f"a = {p.get('a')}, b = {p.get('b')}"
         else:
             m = p.get("n", p.get("m"))
