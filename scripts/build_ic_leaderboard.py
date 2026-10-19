@@ -614,7 +614,14 @@ def la_component() -> dict:
         })
     return {"rows": rows, "study": "research/la_engines_20261014/",
             "report": "research/la_engines_20261014/REPORT.pdf",
-            "class": "engineering"}
+            "class": "engineering",
+            # Rule G5 of the 2026-10-16 audit: the R10 ledger re-rated this claim.
+            "annotation_20261019": (
+                "R10 ledger (research/ic_tool_program/ledger/r10-20261019/README.md): "
+                "the 10.40x at 262,144 columns holds at >= 8,192 synthetic columns. "
+                "Below 4,096 the shipped `ic logs` default (CADO-style filter) is the "
+                "slower one (0.40x at 1,024), and the default is unvalidated at the "
+                "sizes real IC matrices have (repair R11).")}
 
 
 def latest_frontier_audit() -> dict:

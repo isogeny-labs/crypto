@@ -99,7 +99,7 @@ paired on instance, target and walk.
 **Rho reference** (item 04's records on the same instances; not part of any verdict):
 
 - At 2^20, measured negation-map rho costs 2.01e10 and the model costs 1.46e10.
-- The best arm here costs 2.44e10, which is 1.21 times measured rho. At the 19-20 local exponents (1.38-1.42 against rho's 1.5), the crossover with measured rho would be near 2^22 to 2^23. That is an extrapolation, not a measurement.
+- The best arm here costs 2.44e10, which is 1.21 times measured rho. At the 19-20 local exponents (1.38-1.42 against rho's 1.5), the crossover with measured rho would be near 2^22 to 2^23. That is an extrapolation, not a measurement. **Annotation 2026-10-19 ([R10 ledger](../../ic_tool_program/ledger/r10-20261019/README.md)):** the extrapolation is SUPERSEDED by a measured counted ratio below 1: round 4's C4 costs 0.25–0.79× E0 negation rho at 2^13–2^20 (0.49 at 2^20). Not a beat: large-prime bookkeeping, mod-ℓ inversions and ±1 SGE products are uncharged and the §5a band was not applied.
 
 ![cost, local exponents and paired ratios](cost_vs_q.svg)
 
