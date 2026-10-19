@@ -1,0 +1,7 @@
+RUST_TEST_THREADS=4 CARGO_BUILD_JOBS=4 CARGO_TARGET_DIR=/home/ec2-user/ops/spot-system-validation-target cargo test --release --offline --lib
+Local socket access enabled after the preserved sandbox-only failures.
+4399 passed; 0 failed; 118 ignored; 423.15 seconds.
+No performance claim. Full raw log preserved in raw-evidence.tar.gz.
+
+2026-10-19 export follow-up recheck: 4399 passed; 0 failed; 118 ignored;
+545.48 seconds. Full raw recheck log is in private-export-evidence.tar.gz.
