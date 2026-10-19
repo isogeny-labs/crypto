@@ -86,7 +86,7 @@ contracts; it does not establish the old hard-family 8x research target.
 
 Baseline main: `1e2bf0715a2a927afc92e6730d6e65b59f15ab9e`.
 The primary fixture is exactly `bool_gb/matrix_f4_deg4_m2_n23` and its F5
-counterpart: K_1/GF(2^23), m=2, divisor index 0, seed 230, 22 Boolean unknowns,
+counterpart: icv1-f2m23-tm5197-1f85e9e1, m=2, divisor index 0, seed 230, 22 Boolean unknowns,
 degree 4. Its matrix has 8,449 columns, F4 5,842 rows, F5 5,566 rows, rank 5,289.
 F5 prunes 276 rows. F4 performs 90,002,176 word XORs; F5 performs 83,289,643,
 including 856 criterion XORs. Neither count changes under the candidate.
