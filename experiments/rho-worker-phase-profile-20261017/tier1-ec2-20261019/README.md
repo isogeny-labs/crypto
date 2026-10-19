@@ -49,3 +49,15 @@ outside [0.90, 1.11], none outside [0.80, 1.25], both mode medians within
 integration threshold remains a Q-cluster bootstrap lower 95% bound above
 1.05. Failed gates retain the raw result and leave the qualified aggregate
 unknown.
+
+## Production check-in confirmation, frozen but not dispatched
+
+The worker's ordinary `LaneOptions` checks in every 64 walkers. A separate
+[128-walker plan](worker-production-plan.json), SHA-256
+`3caf3cd9c5b4aab90a53bdbdc44c9fe7f9f72920c28f336004cce135c36fbcfc`,
+and [independent auditor](analyze_production.py) preserve the same 32 Q
+points, four repetitions, exact-output and host gates, and prospective A/A
+policy while exercising 128 walkers with a check-in every 64. It is a
+deployment gate if the 32-walker full-width result supports changing default
+routing. It was frozen before any of its own arms and has not been launched;
+the current worker default remains serial.
