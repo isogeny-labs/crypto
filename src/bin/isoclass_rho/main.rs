@@ -107,11 +107,14 @@ const HELP: &str = "isoclass-rho: ECDLP cost across an isogeny class (prime, bin
 
   isoclass-rho search --bits 38 --want 3,5,7 [--max-cofactor 64] [--j0] [--count 3] [--seed 1]
   isoclass-rho search --binary --m 41 --want 3,5 [--max-cofactor 64] [--count 3] [--seed 1]
-  isoclass-rho koblitz-table [--m-lo 20] [--m-hi 60]
+  isoclass-rho koblitz-table [--m-lo 20] [--m-hi 60]  (class summaries support |D| <= i64::MAX)
   isoclass-rho walk --curve P,A,B [--order N] --ells 2,3,5,7,37 [--radius 3] [--max-vertices 4000]
                     [--per-stratum 8] [--hard 6] [--sources 4] [--route elkies|division] [--seed 1]
                     [--max-psi-degree 1500] [--sample-kernels 3] [--hard-ells 23,31 --hard-from 2] --out DIR
   isoclass-rho walk --binary --curve M,A,B [--poly-index 0] [--order N] --ells 3,5,7 ... --out DIR
+
+Field arithmetic and Hasse checks support 5..62-bit fields; class-number processing rejects |D| > i64::MAX.
+The random curve-search command limits fields to 61 bits so it can find class-number-supported inputs.
   isoclass-rho measure --walk DIR/walk.json --mode class|generators|shift [--trials 100] [--generators 64]
                     [--vertices 0,5,9] [--max-vertices 8] [--controls 3] [--plants] [--folds] [--r 32]
                     [--dp-bits auto] [--seed 1] --out DIR
@@ -130,7 +133,12 @@ fn main() {
     match cmd.as_str() {
         "search" => cmd_search(&o),
         "koblitz-table" => {
-            let t = search::koblitz_table(o.get("m-lo", 20), o.get("m-hi", 60));
+            let m_lo = o.get("m-lo", 20);
+            let m_hi = o.get("m-hi", 60);
+            if !(1..=m_hi).contains(&m_lo) || m_hi > 60 {
+                die("Koblitz class summaries require 1 <= m-lo <= m-hi <= 60");
+            }
+            let t = search::koblitz_table(m_lo, m_hi);
             println!("{}", serde_json::to_string_pretty(&t).unwrap());
         }
         "walk" => cmd_walk(&o, command),
@@ -150,8 +158,11 @@ fn cmd_search(o: &Opts) {
     for _ in 0..count {
         if o.flag("binary") {
             let m: u32 = o.get("m", 41);
+            if m.is_multiple_of(2) || !(5..=61).contains(&m) {
+                die("binary fields: M odd, 5 <= M <= 61");
+            }
             let (f, found) = search::search_binary(m, &want, max_cof, &mut rng);
-            let class = classno::class_summary(found.t, 2f64.powi(m as i32), found.d_abs, false);
+            let class = classno::class_summary(found.t, 1u64 << m, found.d_abs, false);
             println!(
                 "{}",
                 json!({"field": {"kind": "binary", "m": m, "poly": format!("{:#x}", f.poly)},
@@ -161,8 +172,11 @@ fn cmd_search(o: &Opts) {
             );
         } else {
             let bits: u32 = o.get("bits", 38);
+            if !(5..=61).contains(&bits) {
+                die("prime curve search: 5 <= bits <= 61 for class-number support");
+            }
             let (f, found) = search::search_prime(bits, &want, max_cof, o.flag("j0"), &mut rng);
-            let class = classno::class_summary(found.t, f.p as f64, found.d_abs, false);
+            let class = classno::class_summary(found.t, f.p, found.d_abs, false);
             println!(
                 "{}",
                 json!({"field": {"kind": "prime", "p": f.p},
@@ -207,16 +221,16 @@ fn cmd_walk(o: &Opts, command: String) {
         if e.b == 0 || e.b >> m != 0 || e.a >> m != 0 {
             die("binary curve: A, B must be field elements, B != 0");
         }
-        let q = 2f64.powi(m as i32);
-        let order = match o.map.get("order") {
-            Some(v) => v.parse().unwrap(),
-            None => search::group_order(&f, q, &e, &mut rng)
-                .unwrap_or_else(|| die("point counting did not converge; pass --order")),
-        };
+        let q = 1u64 << m;
+        let claimed_order = o.map.get("order").map(|v| {
+            v.parse()
+                .unwrap_or_else(|_| die("--order must be a positive integer"))
+        });
+        let order = resolve_order(&f, q, &e, claimed_order, &mut rng).unwrap_or_else(|e| die(&e));
         if !search::order_holds(&f, &e, order, &mut rng) {
             die("--order is not #E");
         }
-        let found = search::describe(&f, q, e, order, 0);
+        let found = search::describe(&f, q, e, order, 0).unwrap_or_else(|e| die(e));
         eprintln!("binary curve over F_2^{m} (poly {:#x}): a={} b={} #E={} n={} h={} t={} D=-{} = {}^2 * {}",
             poly, e.a, e.b, order, found.n, found.cofactor, found.t, found.d_abs, found.f, found.dk);
         let fj = json!({"kind": "binary", "m": m, "poly": format!("{:#x}", poly), "poly_index": o.get::<usize>("poly-index", 0),
@@ -232,22 +246,50 @@ fn cmd_walk(o: &Opts, command: String) {
         if f.ec_j(&e).is_none() {
             die("singular curve");
         }
-        let order = match o.map.get("order") {
-            Some(v) => v.parse().unwrap(),
-            None => search::group_order(&f, p as f64, &e, &mut rng)
-                .unwrap_or_else(|| die("point counting did not converge; pass --order")),
-        };
+        let claimed_order = o.map.get("order").map(|v| {
+            v.parse()
+                .unwrap_or_else(|_| die("--order must be a positive integer"))
+        });
+        let order = resolve_order(&f, p, &e, claimed_order, &mut rng).unwrap_or_else(|e| die(&e));
         if !search::order_holds(&f, &e, order, &mut rng) {
             die("--order is not #E");
         }
-        let found = search::describe(&f, p as f64, e, order, 0);
+        let found = search::describe(&f, p, e, order, 0).unwrap_or_else(|e| die(e));
         eprintln!(
             "curve: p={} a={} b={} #E={} n={} h={} t={} D=-{} = {}^2 * {}",
             p, e.a, e.b, order, found.n, found.cofactor, found.t, found.d_abs, found.f, found.dk
         );
         let fj = json!({"kind": "prime", "p": p});
-        walk::run_walk(&f, p as f64, found, &params, fj, &out);
+        walk::run_walk(&f, p, found, &params, fj, &out);
     }
+}
+
+/// Count the curve order independently even when the caller supplies one.
+/// An annihilator check alone only proves that sampled point orders divide
+/// the supplied value; a proper multiple can pass while corrupting the trace
+/// and isogeny-class summary.
+fn resolve_order<F: Fq>(
+    f: &F,
+    q: u64,
+    e: &Curve,
+    claimed: Option<u64>,
+    rng: &mut SmallRng,
+) -> Result<u64, String> {
+    if let Some(claimed) = claimed {
+        if !search::hasse_admissible(q, claimed) {
+            return Err(format!(
+                "--order {claimed} is outside the Hasse interval for q = {q}"
+            ));
+        }
+    }
+    let actual = search::group_order(f, q, e, rng)
+        .ok_or_else(|| "point counting did not converge; cannot verify --order".to_string())?;
+    if let Some(claimed) = claimed {
+        if claimed == 0 || claimed != actual {
+            return Err(format!("--order {claimed} does not equal #E = {actual}"));
+        }
+    }
+    Ok(actual)
 }
 
 fn cmd_measure(o: &Opts, command: String) {
@@ -270,11 +312,25 @@ fn cmd_measure(o: &Opts, command: String) {
         folds: o.flag("folds"),
         seed: o.get("seed", 1),
         r: o.get("r", 32),
-        dp_bits: o.map.get("dp-bits").map(|v| v.parse().unwrap()),
+        dp_bits: o.map.get("dp-bits").map(|v| {
+            v.parse()
+                .unwrap_or_else(|_| die("--dp-bits must be an integer"))
+        }),
         command,
     };
     if !params.r.is_power_of_two() || params.r < 4 {
         die("--r must be a power of two >= 4");
+    }
+    if params.trials == 0 {
+        die("--trials must be positive");
+    }
+    if let Some(bits) = params.dp_bits {
+        if !(1..=24).contains(&bits) {
+            die("--dp-bits must be between 1 and 24");
+        }
+    }
+    if !matches!(params.mode.as_str(), "class" | "generators" | "shift") {
+        die("--mode must be class, generators, or shift");
     }
     let out = PathBuf::from(o.str("out", "isoclass-measure-out"));
     let field = &w["field"];
@@ -333,7 +389,7 @@ fn selftest(seed: u64) {
         a: 690282649366,
         b: 1050606678233,
     };
-    let order = search::group_order(&f, p as f64, &c, &mut rng).unwrap();
+    let order = search::group_order(&f, p, &c, &mut rng).unwrap();
     check(
         "prime: #E of volcano-rho curve A = 1090993806052",
         order == 1090993806052,
@@ -368,7 +424,7 @@ fn selftest(seed: u64) {
         );
     }
     // kernels by both routes on curve A (ℓ = 3: f = 54 = 2·27, so 4 kernels at a non-floor vertex)
-    let found = search::describe(&f, p as f64, c, order, 0);
+    let found = search::describe(&f, p, c, order, 0).unwrap();
     let ks3 = isogeny::kernels_division(&f, &c, 3, &mut rng);
     let lf = isogeny::lib_field(p);
     let phi3 =
@@ -564,7 +620,7 @@ fn selftest(seed: u64) {
     );
     // Koblitz curve over F_2^31
     let ck = Curve { a: 1, b: 1 };
-    let ok_order = search::group_order(&f2, 2f64.powi(31), &ck, &mut rng).unwrap();
+    let ok_order = search::group_order(&f2, 1u64 << 31, &ck, &mut rng).unwrap();
     let tk = classno::koblitz_trace(1, 31);
     check(
         &format!(
@@ -617,7 +673,7 @@ fn selftest(seed: u64) {
             &mut fails,
         );
     }
-    let kf = search::describe(&f2, 2f64.powi(31), ck, ok_order, 0);
+    let kf = search::describe(&f2, 1u64 << 31, ck, ok_order, 0).unwrap();
     println!(
         "     Koblitz E_1/F_2^31: #E = {}, n = {}, t = {}, D = -{} = {}² · {}",
         kf.order, kf.n, kf.t, kf.d_abs, kf.f, kf.dk
@@ -652,8 +708,8 @@ fn selftest(seed: u64) {
         a: f2.frandom(&mut rng),
         b: f2.frandom(&mut rng),
     };
-    let og = search::group_order(&f2, 2f64.powi(31), &cg, &mut rng).unwrap();
-    let gf = search::describe(&f2, 2f64.powi(31), cg, og, 0);
+    let og = search::group_order(&f2, 1u64 << 31, &cg, &mut rng).unwrap();
+    let gf = search::describe(&f2, 1u64 << 31, cg, og, 0).unwrap();
     println!(
         "     generic E/F_2^31: #E = {}, n = {}, t = {}, D = -{} = {}² · {}",
         gf.order, gf.n, gf.t, gf.d_abs, gf.f, gf.dk
@@ -861,5 +917,28 @@ fn selftest(seed: u64) {
     let _ = rng.gen::<u64>();
     if fails > 0 {
         std::process::exit(1);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn supplied_group_order_must_be_exact() {
+        // E: y² = x³ + 4x + 2 over F₅ has three points.  The incorrect
+        // candidate 6 is still Hasse-admissible and kills every point, so
+        // an annihilator-only check cannot distinguish it.
+        let f = Fp { p: 5 };
+        let curve = Curve { a: 4, b: 2 };
+        let mut rng = SmallRng::seed_from_u64(1);
+        assert_eq!(search::group_order(&f, 5, &curve, &mut rng), Some(3));
+        assert!(search::hasse_admissible(5, 6));
+        assert!(search::order_holds(&f, &curve, 6, &mut rng));
+        assert_eq!(resolve_order(&f, 5, &curve, Some(3), &mut rng), Ok(3));
+        assert_eq!(
+            resolve_order(&f, 5, &curve, Some(6), &mut rng),
+            Err("--order 6 does not equal #E = 3".to_string())
+        );
     }
 }

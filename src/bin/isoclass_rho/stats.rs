@@ -59,17 +59,26 @@ pub fn bootstrap_ci(v: &[f64], reps: usize, seed: u64) -> (f64, f64) {
     )
 }
 
-/// Two-sample Kolmogorov–Smirnov `D` and its asymptotic two-sided p-value.
+/// Two-sample Kolmogorov–Smirnov `D` and its continuous-null asymptotic
+/// two-sided p-value. `D` is computed after consuming every tie at a value;
+/// iteration counts are discrete, so the p-value remains an approximation.
 pub fn ks(a: &[f64], b: &[f64]) -> (f64, f64) {
     let mut x = a.to_vec();
     let mut y = b.to_vec();
     x.sort_by(|p, q| p.partial_cmp(q).unwrap());
     y.sort_by(|p, q| p.partial_cmp(q).unwrap());
     let (mut i, mut j, mut d) = (0usize, 0usize, 0f64);
-    while i < x.len() && j < y.len() {
-        if x[i] <= y[j] {
+    while i < x.len() || j < y.len() {
+        let value = match (x.get(i), y.get(j)) {
+            (Some(a), Some(b)) => (*a).min(*b),
+            (Some(a), None) => *a,
+            (None, Some(b)) => *b,
+            (None, None) => break,
+        };
+        while i < x.len() && x[i] == value {
             i += 1;
-        } else {
+        }
+        while j < y.len() && y[j] == value {
             j += 1;
         }
         d = d.max((i as f64 / x.len() as f64 - j as f64 / y.len() as f64).abs());
@@ -114,7 +123,16 @@ pub fn mann_whitney_z(a: &[f64], b: &[f64]) -> f64 {
     let (na, nb) = (a.len() as f64, b.len() as f64);
     let u = ra - na * (na + 1.0) / 2.0;
     let mu = na * nb / 2.0;
-    let sigma = (na * nb * (na + nb + 1.0) / 12.0).sqrt();
+    let n = all.len();
+    let tie_sum: f64 = tie_sizes(&all.iter().map(|v| v.0).collect::<Vec<_>>())
+        .into_iter()
+        .map(|t| (t.pow(3) - t) as f64)
+        .sum();
+    let sigma2 = na * nb / 12.0 * (na + nb + 1.0 - tie_sum / (n as f64 * (n - 1) as f64));
+    if sigma2 <= 0.0 {
+        return 0.0;
+    }
+    let sigma = sigma2.sqrt();
     (u - mu) / sigma
 }
 
@@ -148,8 +166,32 @@ pub fn kruskal_wallis(groups: &[Vec<f64>]) -> (f64, usize, f64) {
             .map(|(g, v)| rank_sum[g].powi(2) / v.len() as f64)
             .sum::<f64>()
         - 3.0 * (n + 1.0);
+    let tie_sum: f64 = tie_sizes(&all.iter().map(|v| v.0).collect::<Vec<_>>())
+        .into_iter()
+        .map(|t| (t.pow(3) - t) as f64)
+        .sum();
+    let correction = 1.0 - tie_sum / (n.powi(3) - n);
+    let h = if correction > 0.0 {
+        h / correction
+    } else {
+        0.0
+    };
     let df = groups.len() - 1;
     (h, df, chi2_sf(h, df as f64))
+}
+
+fn tie_sizes(sorted_values: &[f64]) -> Vec<usize> {
+    let mut sizes = Vec::new();
+    let mut i = 0;
+    while i < sorted_values.len() {
+        let mut j = i + 1;
+        while j < sorted_values.len() && sorted_values[j] == sorted_values[i] {
+            j += 1;
+        }
+        sizes.push(j - i);
+        i = j;
+    }
+    sizes
 }
 
 /// One-way ANOVA F statistic over groups with its p-value, and the
@@ -330,4 +372,29 @@ pub fn normal_two_sided(z: f64) -> f64 {
                                         + t * (-0.822_152_23 + t * 0.170_872_77)))))))))
             .exp();
     y.min(1.0)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn ks_consumes_tied_values_as_one_ecdf_step() {
+        assert_eq!(ks(&[1.0, 1.0], &[1.0, 1.0]), (0.0, 1.0));
+        let (d, _) = ks(&[1.0, 1.0], &[2.0, 2.0]);
+        assert_eq!(d, 1.0);
+    }
+
+    #[test]
+    fn rank_tests_apply_tie_corrections() {
+        assert_eq!(mann_whitney_z(&[1.0, 1.0], &[1.0, 1.0]), 0.0);
+        let z = mann_whitney_z(&[1.0, 2.0], &[3.0, 3.0]);
+        assert!((z + 2.0 / 1.5f64.sqrt()).abs() < 1e-12);
+        let (h, df, p) = kruskal_wallis(&[vec![1.0, 1.0], vec![1.0, 1.0]]);
+        assert_eq!(df, 1);
+        assert_eq!(h, 0.0);
+        assert_eq!(p, 1.0);
+        let (h, _, _) = kruskal_wallis(&[vec![1.0, 2.0], vec![3.0, 3.0]]);
+        assert!((h - 8.0 / 3.0).abs() < 1e-12);
+    }
 }

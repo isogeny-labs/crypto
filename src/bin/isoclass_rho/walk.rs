@@ -75,7 +75,7 @@ pub struct EllInfo {
 
 pub struct Walker<'a, F: Fq> {
     pub f: &'a F,
-    pub q: f64,
+    pub q: u64,
     pub found: Found,
     pub ells: Vec<EllInfo>,
     pub vs: Vec<Vertex>,
@@ -103,7 +103,7 @@ pub struct Walker<'a, F: Fq> {
 }
 
 impl<'a, F: Fq> Walker<'a, F> {
-    pub fn new(f: &'a F, q: f64, found: Found, requested: &[u64], seed: u64, route: &str) -> Self {
+    pub fn new(f: &'a F, q: u64, found: Found, requested: &[u64], seed: u64, route: &str) -> Self {
         let is_prime = (f as &dyn Any).downcast_ref::<Fp>().is_some();
         let lib = if is_prime && route != "division" {
             let p = (f as &dyn Any).downcast_ref::<Fp>().unwrap().p;
@@ -244,7 +244,7 @@ impl<'a, F: Fq> Walker<'a, F> {
         } else if ((ell * ell - 1) / 2) as usize > self.max_psi_degree {
             // too large for the division route: sample kernels through
             // ℓ-torsion abscissae in F_{q^d}
-            let q = self.q as u64;
+            let q = self.q;
             let d = isogeny::eigen_orbit(self.found.t, q, ell);
             eprintln!(
                 "  torsion route at v{v}, ℓ = {ell}: F_q^{d}, {} kernels wanted",
@@ -662,10 +662,9 @@ impl<'a, F: Fq> Walker<'a, F> {
                 .get(&(par, ell))
                 .expect("torsion context of a sampled edge")
                 .clone();
-            isogeny::dual_torsion(self.f, &pc, &edge, &ctx, self.found.t, self.q as u64)
-                .unwrap_or_else(|e| {
-                    panic!("dual of the sampled edge v{par} → v{v} (ℓ = {ell}): {e}")
-                })
+            isogeny::dual_torsion(self.f, &pc, &edge, &ctx, self.found.t, self.q).unwrap_or_else(
+                |e| panic!("dual of the sampled edge v{par} → v{v} (ℓ = {ell}): {e}"),
+            )
         } else {
             let ks = self.kernels_at(v, ell);
             ks.into_iter()
@@ -711,7 +710,7 @@ impl<'a, F: Fq> Walker<'a, F> {
 /// Run the whole walk and write `walk.json`.
 pub fn run_walk<F: Fq>(
     f: &F,
-    q: f64,
+    q: u64,
     found: Found,
     params: &WalkParams,
     field_json: serde_json::Value,
@@ -964,7 +963,7 @@ pub fn run_walk<F: Fq>(
             let (ms, cnt) = w.ell_ms.get(&e.ell).copied().unwrap_or((0.0, 0));
             json!({"ell": e.ell, "active": e.active, "reason": e.reason, "depth": e.depth, "crater": e.crater,
                    "expected_neighbours": e.expected_neighbours, "kernel_calls": cnt, "mean_find_ms": if cnt > 0 { ms / cnt as f64 } else { 0.0 },
-                   "sampled": w.sampled.contains(&e.ell), "eigen_orbit_degree": isogeny::eigen_orbit(found.t, q as u64, e.ell)})
+                   "sampled": w.sampled.contains(&e.ell), "eigen_orbit_degree": isogeny::eigen_orbit(found.t, q, e.ell)})
         })
         .collect();
     let per_ell_edges: HashMap<String, u64> =

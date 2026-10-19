@@ -10,6 +10,10 @@ use super::field::{factor, gcd};
 
 /// `(D_K, f)` with `−d_abs = f²·D_K`, `D_K` fundamental.
 pub fn fundamental(d_abs: u64) -> (i64, u64) {
+    assert!(
+        d_abs <= i64::MAX as u64,
+        "class-number pipeline requires |D| <= i64::MAX"
+    );
     let (mut core, mut f) = (1u64, 1u64);
     for (q, e) in factor(d_abs) {
         core *= q.pow(e % 2);
@@ -129,7 +133,11 @@ pub fn divisors_sorted(n: u64) -> Vec<u64> {
 
 /// The isogeny class: `D`, `D_K`, `f`, `h(D_K)`, every stratum's class
 /// number, their sum, and the per-prime volcano depths and crater kinds.
-pub fn class_summary(t: i64, q_big: f64, d_abs: u64, h_full_check: bool) -> serde_json::Value {
+pub fn class_summary(t: i64, q: u64, d_abs: u64, h_full_check: bool) -> serde_json::Value {
+    assert!(
+        d_abs <= i64::MAX as u64,
+        "class-number pipeline requires |D| <= i64::MAX"
+    );
     let (dk, f) = fundamental(d_abs);
     let h_k = class_number(dk);
     let strata: Vec<serde_json::Value> = divisors_sorted(f)
@@ -156,7 +164,7 @@ pub fn class_summary(t: i64, q_big: f64, d_abs: u64, h_full_check: bool) -> serd
         .map(|&(ell, e)| json!({"ell": ell, "depth": e, "crater": crater_kind(kronecker(dk, ell))}))
         .collect();
     json!({
-        "trace": t, "q": q_big, "disc": -(d_abs as i64), "fundamental_disc": dk,
+        "trace": t, "q": q, "disc": -(d_abs as i64), "fundamental_disc": dk,
         "conductor": f, "conductor_factored": factor(f),
         "h_fundamental": h_k, "strata": strata, "class_size": total,
         "h_full_order_counted": h_full,

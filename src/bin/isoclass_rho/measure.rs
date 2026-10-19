@@ -641,6 +641,11 @@ pub fn run_measure<F: Fq>(f: &F, walk: &Value, params: &MeasureParams, out: &Pat
                    "folds": params.folds, "seed": params.seed, "r": params.r, "dp_bits": dp_bits, "vertices": params.vertices},
         "walk": {"root": walk["root"], "field": walk["field"], "class": walk["class"], "ells": walk["ells"], "walk": walk["walk"]},
         "host": {"cpu": host, "threads": rayon::current_num_threads()},
+        "statistical_test_scope": {
+            "ks_p": "two-sided continuous-null asymptotic approximation; D consumes ties together, but iteration counts are discrete",
+            "rank_tests": "normal/chi-square asymptotic p-values with standard tie-variance corrections",
+            "welch": "independent-sample Welch z; arms reuse trial seeds, so cross-arm covariance is not modeled",
+        },
         "rho": {"walk": format!("{}-adding (Teske), single walker, distinguished points, no negation map unless folded", params.r),
                 "expected_iters_sqrt_pi_n_over_2": expected, "expected_with_r_adding": expected * r_factor,
                 "expected_iters_negation_sqrt_pi_n_over_4": (std::f64::consts::PI * n as f64 / 4.0).sqrt(),

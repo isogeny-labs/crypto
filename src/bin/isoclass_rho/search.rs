@@ -13,10 +13,24 @@ use super::field::{factor, is_prime, Curve, F2m, Fp, Fq, Pt};
 
 /// `#E(F_q)` by BSGS on random points, intersected until one Hasse
 /// candidate remains; `None` after ten points.
-pub fn group_order<F: Fq>(f: &F, q: f64, e: &Curve, rng: &mut SmallRng) -> Option<u64> {
-    let s = (4.0 * q.sqrt()).ceil() as u64 + 2;
-    let lo = (q as u64 + 1).saturating_sub(s / 2);
-    let m = (s as f64).sqrt().ceil() as u64 + 1;
+pub fn group_order<F: Fq>(f: &F, q: u64, e: &Curve, rng: &mut SmallRng) -> Option<u64> {
+    if q <= 256 {
+        // For tiny fields, annihilator intersections can leave several
+        // Hasse-admissible multiples (e.g. #E(F₅)=3 and 6). Enumerate all
+        // points so the native result is an exact count in this regime.
+        let mut order = 1u64; // the point at infinity
+        for x in 0..q {
+            for y in 0..q {
+                if f.ec_on(e, Some((x, y))) {
+                    order += 1;
+                }
+            }
+        }
+        return Some(order);
+    }
+    let s = isqrt_ceil(16 * q as u128) as u64 + 2;
+    let lo = (q + 1).saturating_sub(s / 2);
+    let m = isqrt_ceil(s as u128) as u64 + 1;
     let mut cands: Option<HashSet<u64>> = None;
     for _ in 0..10 {
         let p = Some(f.ec_random(e, rng));
@@ -43,13 +57,48 @@ pub fn group_order<F: Fq>(f: &F, q: f64, e: &Curve, rng: &mut SmallRng) -> Optio
         let hasse: Vec<u64> = c
             .iter()
             .copied()
-            .filter(|&v| ((v as f64) - (q + 1.0)).powi(2) <= 4.0 * q)
+            .filter(|&v| hasse_admissible(q, v))
             .collect();
         if hasse.len() == 1 {
             return Some(hasse[0]);
         }
     }
     None
+}
+
+fn isqrt_floor(n: u128) -> u128 {
+    if n < 2 {
+        return n;
+    }
+    let bits = 128 - n.leading_zeros() as usize;
+    let mut lo = 0u128;
+    let mut hi = 1u128 << bits.div_ceil(2);
+    while lo < hi {
+        let mid = lo + (hi - lo).div_ceil(2);
+        if mid <= n / mid {
+            lo = mid;
+        } else {
+            hi = mid - 1;
+        }
+    }
+    lo
+}
+
+fn isqrt_ceil(n: u128) -> u128 {
+    let floor = isqrt_floor(n);
+    if floor * floor == n {
+        floor
+    } else {
+        floor + 1
+    }
+}
+
+pub fn hasse_admissible(q: u64, order: u64) -> bool {
+    if order == 0 {
+        return false;
+    }
+    let radius = isqrt_floor(4 * q as u128);
+    (q as i128 + 1 - order as i128).unsigned_abs() <= radius
 }
 
 /// Check a claimed order: eight random points vanish under it.
@@ -75,17 +124,21 @@ pub struct Found {
     pub tried: u64,
 }
 
-pub fn describe<F: Fq>(fq: &F, q: f64, e: Curve, order: u64, tried: u64) -> Found {
-    let t = (q as i128 + 1 - order as i128) as i64;
-    let d_abs = {
-        // exact: 4q − t² in i128 when q < 2^62
-        let q_int = q as u128;
-        (4 * q_int as i128 - (t as i128) * (t as i128)) as u64
-    };
+pub fn describe<F: Fq>(
+    fq: &F,
+    q: u64,
+    e: Curve,
+    order: u64,
+    tried: u64,
+) -> Result<Found, &'static str> {
+    let (t, d_abs) = trace_and_discriminant(q, order)?;
+    if d_abs > i64::MAX as u64 {
+        return Err("exact q/Hasse arithmetic supports fields through 62 bits, but the class-number pipeline requires |D| <= i64::MAX");
+    }
     let n = largest_prime_factor(order);
     let (dk, f) = classno::fundamental(d_abs);
     let _ = fq;
-    Found {
+    Ok(Found {
         curve: e,
         order,
         n,
@@ -95,7 +148,18 @@ pub fn describe<F: Fq>(fq: &F, q: f64, e: Curve, order: u64, tried: u64) -> Foun
         dk,
         f,
         tried,
+    })
+}
+
+fn trace_and_discriminant(q: u64, order: u64) -> Result<(i64, u64), &'static str> {
+    let trace = q as i128 + 1 - order as i128;
+    let trace = i64::try_from(trace).map_err(|_| "trace does not fit i64")?;
+    let disc = 4 * q as i128 - trace as i128 * trace as i128;
+    if disc < 0 {
+        return Err("curve order violates the Hasse bound");
     }
+    let disc = u64::try_from(disc).map_err(|_| "discriminant magnitude does not fit u64")?;
+    Ok((trace, disc))
 }
 
 /// Whether `f` is divisible by every `ℓ^e` in `want`, with `n` prime to every `ℓ`.
@@ -139,10 +203,12 @@ pub fn search_prime(
                 Some(j) if !j0 && j != 0 && j != 1728 % p => {}
                 _ => continue,
             }
-            let Some(order) = group_order(&f, p as f64, &e, rng) else {
+            let Some(order) = group_order(&f, p, &e, rng) else {
                 continue;
             };
-            let found = describe(&f, p as f64, e, order, tried);
+            let Ok(found) = describe(&f, p, e, order, tried) else {
+                continue;
+            };
             if wanted(&found, want, max_cofactor, 20) {
                 return (f, found);
             }
@@ -160,7 +226,7 @@ pub fn search_binary(
     rng: &mut SmallRng,
 ) -> (F2m, Found) {
     let f = F2m::new(m, F2m::irreducible_poly(m, 0));
-    let q = 2f64.powi(m as i32);
+    let q = 1u64 << m;
     let mut tried = 0u64;
     loop {
         tried += 1;
@@ -174,7 +240,9 @@ pub fn search_binary(
         let Some(order) = group_order(&f, q, &e, rng) else {
             continue;
         };
-        let found = describe(&f, q, e, order, tried);
+        let Ok(found) = describe(&f, q, e, order, tried) else {
+            continue;
+        };
         if wanted(&found, want, max_cofactor, 20) {
             return (f, found);
         }
@@ -200,4 +268,38 @@ pub fn koblitz_table(m_lo: u32, m_hi: u32) -> Vec<serde_json::Value> {
         }
     }
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn trace_and_discriminant_keep_q_exact_above_f64_integer_precision() {
+        let q = 9_007_199_254_740_997u64;
+        assert_eq!(trace_and_discriminant(q, q + 1 - 7), Ok((7, 4 * q - 49)));
+    }
+
+    #[test]
+    fn trace_and_discriminant_fit_at_supported_field_boundary() {
+        let q = (1u64 << 62) - 1;
+        let order = q + 1;
+        assert_eq!(trace_and_discriminant(q, order), Ok((0, 4 * q)));
+        let f = Fp { p: q };
+        let curve = Curve { a: 0, b: 1 };
+        assert!(describe(&f, q, curve, order, 0).is_err());
+        let outside = q + 1 + 4_294_967_296;
+        assert!(trace_and_discriminant(q, outside).is_err());
+        assert!(!hasse_admissible(q, outside));
+    }
+
+    #[test]
+    fn hasse_interval_uses_exact_integer_field_size() {
+        let q = 9_007_199_254_740_997u64;
+        assert!(hasse_admissible(q, q + 1 + 189_812_531));
+        assert!(!hasse_admissible(q, q + 1 + 189_812_532));
+
+        let q = (1u64 << 62) - 1;
+        assert!(hasse_admissible(q, q + 1 + 4_294_967_295));
+    }
 }
