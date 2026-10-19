@@ -7,4 +7,4 @@ Browse copy of the counted-work study. Full source, raw data, commands, and limi
 - Generic kernel-finding exponent was 2.582 (NTT) vs 2.587 (Karatsuba), effectively unchanged. Rational-kernel crossover remains beyond ℓ_max=2√p in the listed extrapolations.
 - Synthetic toy instances only; single contended host, generic runs capped at ℓ=863; crossover values extrapolate many octaves. No sub-rho or deployed-curve claim.
 
-Figures: `fig1` counted cost, `fig2` local exponent, `fig3` generic kernel finding, `fig4` threshold, `fig5` crossover.
+Figures are included as SVG and PNG: `fig1` counted cost, `fig2` local exponent, `fig3` generic kernel finding, `fig4` threshold, `fig5` crossover.

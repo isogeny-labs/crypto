@@ -8,7 +8,7 @@ from pathlib import Path
 
 import matplotlib
 
-matplotlib.use("svg")
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 D = Path(sys.argv[1] if len(sys.argv) > 1 else ".")
@@ -72,6 +72,7 @@ ax.legend(fontsize=8, frameon=False)
 ax.grid(alpha=0.25)
 fig.tight_layout()
 fig.savefig(D / "fig1_sqrtvelu_cost.svg")
+fig.savefig(D / "fig1_sqrtvelu_cost.png", dpi=160)
 
 # Figure 2: local exponents over 4-octave windows.
 fig, ax = plt.subplots(figsize=(7.2, 3.6))
@@ -91,6 +92,7 @@ ax.legend(fontsize=8, frameon=False)
 ax.grid(alpha=0.25)
 fig.tight_layout()
 fig.savefig(D / "fig2_local_exponent.svg")
+fig.savefig(D / "fig2_local_exponent.png", dpi=160)
 
 # Figure 3: generic kernel finding per attempt and F_p^k product cost.
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.2, 3.4))
@@ -110,6 +112,7 @@ for a in (a1, a2):
     a.legend(fontsize=7, frameon=False)
 fig.tight_layout()
 fig.savefig(D / "fig3_generic.svg")
+fig.savefig(D / "fig3_generic.png", dpi=160)
 
 # Figure 4: threshold measurement (count ratio and contended wall ratio).
 fig, ax = plt.subplots(figsize=(7.2, 3.4))
@@ -130,6 +133,7 @@ ax.legend(fontsize=7, frameon=False)
 ax.grid(alpha=0.25)
 fig.tight_layout()
 fig.savefig(D / "fig4_threshold.svg")
+fig.savefig(D / "fig4_threshold.png", dpi=160)
 
 # Figure 5: crossover table (g = 6).
 fig, ax = plt.subplots(figsize=(7.2, 4.0))
@@ -148,4 +152,5 @@ ax.set_xlabel("log₂ ℓ* (DERIVED, extrapolated; dotted: ℓ_max = 2√p)")
 ax.legend(fontsize=7, frameon=False, loc="lower right")
 fig.tight_layout()
 fig.savefig(D / "fig5_crossover.svg")
+fig.savefig(D / "fig5_crossover.png", dpi=160)
 print("ok")
