@@ -3898,6 +3898,22 @@ mod tests {
     }
 
     #[test]
+    fn run_log_is_opt_in() {
+        let sys = random_quadrics(3, 101, 19);
+        let _ = take_run_log();
+        let _ = f4(&sys, 3, 101, &F4Options::new(Ordering::Grevlex, 16));
+        assert!(take_run_log().steps.is_empty());
+
+        let _ = f4(
+            &sys,
+            3,
+            101,
+            &F4Options::new(Ordering::Grevlex, 16).capturing_run_log(),
+        );
+        assert!(!take_run_log().steps.is_empty());
+    }
+
+    #[test]
     fn hilbert_stop_gives_the_same_reduced_basis_as_the_plain_run() {
         let p = 101;
         let (mut applied, mut cheaper) = (0, 0);
