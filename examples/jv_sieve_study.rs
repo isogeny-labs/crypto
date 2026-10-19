@@ -41,7 +41,7 @@ fn sd(x: &[f64]) -> f64 {
     (x.iter().map(|v| (v - m).powi(2)).sum::<f64>() / (x.len() - 1) as f64).sqrt()
 }
 fn pct(mut v: Vec<f64>, q: f64) -> f64 {
-    v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    v.sort_by(|a, b| a.total_cmp(b));
     v[((v.len() - 1) as f64 * q).round() as usize]
 }
 
@@ -164,6 +164,9 @@ fn slope(x: &[f64], y: &[f64]) -> f64 {
 }
 /// Slope with a stratified bootstrap (instances resampled within each size).
 fn fit(groups: &[(Vec<f64>, Vec<f64>)], seed: u64) -> Value {
+    if groups.len() < 2 {
+        return Value::Null;
+    }
     let flat = |g: &[(Vec<f64>, Vec<f64>)]| {
         let mut x = vec![];
         let mut y = vec![];
@@ -371,6 +374,10 @@ fn main() {
     summary.insert("exponent_ic_muls_vs_l".into(), fit(&fit_ic, 77));
     summary.insert("exponent_rho_R3_harness_muls_vs_l".into(), fit(&fit_r3, 78));
     summary.insert("exponent_rho_R3_tuned_muls_vs_l".into(), fit(&fit_r3t, 79));
+    // POST HOC (not in PROTOCOL.md): the sizes where the sieve runs at m = 9 (p >= 1009)
+    let tail = |g: &Vec<(Vec<f64>, Vec<f64>)>| g.iter().skip(g.len().saturating_sub(3)).cloned().collect::<Vec<_>>();
+    summary.insert("exponent_ic_muls_vs_l_p_ge_1009_POST_HOC".into(), fit(&tail(&fit_ic), 80));
+    summary.insert("exponent_rho_R3_harness_muls_vs_l_p_ge_1009_POST_HOC".into(), fit(&tail(&fit_r3), 81));
     // local exponents between adjacent sizes (means)
     let mut local = vec![];
     for w in fit_ic.windows(2) {
