@@ -99,6 +99,9 @@ fn lint(c: &Value) -> R<()> {
         relative(s.as_str().ok_or("scope string")?)?;
     }
     scoped(c, text(c, "receipt")?)?;
+    if let Some(relay) = c.get("relay_stdout") {
+        scoped(c, relay.as_str().ok_or("relay_stdout string")?)?;
+    }
     bind(c)?;
     let cmds = c["commands"].as_array().ok_or("commands array")?;
     require(!cmds.is_empty(), "empty commands")?;
@@ -194,7 +197,13 @@ pub fn dispatch(mode: &str, path: &Path) -> R<()> {
             "card-run".into(),
             path.to_str().ok_or("card UTF8")?.to_owned(),
         ];
-        println!("Act as executor-mechanical. From /home/ec2-user/crypto-n83-resume execute exactly the shell command below using an elevated exec tool for Docker access. Do not modify the card, compute results, retry, or run Python. Return final stdout verbatim, without prose or code fences. The repository native-only rule requires this native replacement for tools/task_card.py. If the tool yields a running session, wait for that session. The command enforces the frozen deadlines and writes the receipt. Read no unrelated files.\n\n{}\n\nCard SHA256: {}",argv.iter().map(|s|quote(s)).collect::<Vec<_>>().join(" "),original_sha);
+        let command = argv.iter().map(|s| quote(s)).collect::<Vec<_>>().join(" ");
+        if let Some(relay) = c.get("relay_stdout") {
+            let relay = relay.as_str().ok_or("relay_stdout string")?;
+            println!("Act as executor-mechanical. From /home/ec2-user/crypto-n83-resume execute exactly the shell command below using an elevated exec tool for Docker access. Do not modify the card, compute results, retry, or run Python. If the tool yields a running session, wait for that session. The frozen shell redirection saves actual stdout verbatim as the relay; do not regenerate it. Return the relay path and its SHA256 only. The command enforces frozen deadlines and writes the receipt. Read no unrelated files.\n\n{} > {}\n\nCard SHA256: {}", command, quote(relay), original_sha);
+        } else {
+            println!("Act as executor-mechanical. From /home/ec2-user/crypto-n83-resume execute exactly the shell command below using an elevated exec tool for Docker access. Do not modify the card, compute results, retry, or run Python. Return final stdout verbatim, without prose or code fences. The repository native-only rule requires this native replacement for tools/task_card.py. If the tool yields a running session, wait for that session. The command enforces the frozen deadlines and writes the receipt. Read no unrelated files.\n\n{}\n\nCard SHA256: {}",command,original_sha);
+        }
         return Ok(());
     }
     require(mode == "card-run", "unknown card mode")?;
