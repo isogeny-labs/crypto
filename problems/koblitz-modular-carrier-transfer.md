@@ -204,3 +204,38 @@ Next actions have checkable acceptance conditions:
 These steps do not resolve the original n=131 construction or establish a
 cost advantage. The user assesses IC implications; no timing protocol or
 background execution is scheduled by this record.
+
+## Round 05: reverse composition and a level-dependent divisor
+
+[Round 05](../research/koblitz_modular_ic_20261018/rounds/05/REPORT.md)
+derives the Gram matrix of the twelve degree-660 maps: diagonal660,
+off-diagonal20, using the two-transitive deck action and Hecke sum [4].
+For both signed maps, the polarized adjoint composition is [32000],
+including the actual H=I+ones target polarization of degree25. This is a
+unit at11, yielding a written integral reverse correspondence and a split,
+11-saturated Tate-module image. Lean checks the exact matrices and the
+conditional torsion/Bezout implications. The reverse divisor formula has
+positive/negative degree at most6600; its fibers and reduced Jacobian
+class remain unevaluated. Full moduli/adjunction geometry is written.
+
+All five determinant5 forms have explicit integral equivalences to the
+natural form, with Lean inverse/pairing certificates. Their transported
+diagonal graphs use the natural quotient equations. Only one of the ten
+frozen first graphs matches that kernel directly, so nine remain open;
+the determinant19 mixed quotient equations are still open.
+
+The polynomial psi11(1,b) is irreducible of degree15. Its point-rational
+twist has trace231. Maximal-order Frobenius on cyclic49 subgroups and
+normalized eleven-complements yields44 closed zeros of degree210.
+A supersingular deformation gives3080 poles, each of order3, with
+zero projected images since the six target base points are killed by8
+and A5(F2) has order11. This supplies one written level-dependent
+principal relation beyond the four-fiber span. Its symbolic projected
+matrix has rank5 on588 columns. New44 column coordinates/images have
+not been evaluated; the evaluated matrix remains rank4/544.
+
+The [proof map](../research/koblitz_modular_ic_20261018/rounds/05/PROOF_MAP.md)
+separates18 new named Lean theorems from geometric arguments. Next gates:
+evaluate and replay the44 new images and their relation; evaluate a nonzero
+reverse pullback divisor; construct a specified unmatched graph quotient.
+No n=131 transfer, individual modular descent or IC efficiency claim follows.

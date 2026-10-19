@@ -58,6 +58,8 @@ mod round03_record;
 mod round04;
 mod round04_record;
 mod round04_verify;
+mod round05;
+mod round05_record;
 mod round_record;
 
 fn pow(mut a: u64, mut k: u64, p: u64) -> u64 {
@@ -334,6 +336,47 @@ fn run(out: &std::path::Path) {
     );
 }
 fn main() {
+    let newargs: Vec<String> = std::env::args().collect();
+    if newargs.get(1).map(String::as_str) == Some("--round05-poles") {
+        round05::poles(std::path::Path::new(
+            newargs.get(2).expect("fresh pole/relation output"),
+        ));
+        return;
+    }
+    if newargs.get(1).map(String::as_str) == Some("--record-round05") {
+        round05_record::record(std::path::Path::new(
+            newargs.get(2).expect("new round directory"),
+        ));
+        return;
+    }
+    if newargs.get(1).map(String::as_str) == Some("--round05-lean") {
+        round05::lean(std::path::Path::new(
+            newargs.get(2).expect("fresh proof output"),
+        ));
+        return;
+    }
+    if newargs.get(1).map(String::as_str) == Some("--round05-extend") {
+        round05::extend(std::path::Path::new(
+            newargs.get(2).expect("fresh extended outputs"),
+        ));
+        return;
+    }
+    if newargs.get(1).map(String::as_str) == Some("--round05-resume") {
+        round05::resume(std::path::Path::new(
+            newargs.get(2).expect("fresh remaining outputs"),
+        ));
+        return;
+    }
+    if newargs.get(1).map(String::as_str) == Some("--round05") {
+        round05::run(std::path::Path::new(
+            newargs.get(2).expect("fresh run directory"),
+        ));
+        return;
+    }
+    if newargs.get(1).map(String::as_str) == Some("--verify-round05") {
+        round05::verify(std::path::Path::new(newargs.get(2).expect("run directory")));
+        return;
+    }
     let args: Vec<_> = std::env::args().collect();
     if args.get(1).map(String::as_str) == Some("--quotient-lattices") {
         quotient_geometry::lattices(std::path::Path::new(args.get(2).expect("output")));
