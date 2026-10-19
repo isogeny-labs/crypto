@@ -31,9 +31,8 @@
 \DeclareRobustCommand{\art}[1]{\texttt{\detokenize{#1}}}
 \newcommand{\run}{\art{crypto:research/isogeny-class-rho/runs/run-20261018T0857Z}}
 
-\title{The Elliptic-Curve Discrete Logarithm Does Not Know Which Curve It Is On:\\
-  Pollard Rho Across Whole Isogeny Classes of Prime, Binary and Koblitz Curves\\[2pt]
-  {\large (with isogenies of degree 409 and 1721 found through torsion abscissae)}}
+\title{Pollard Rho Across Isogeny Classes of Prime, Binary and Koblitz Curves:\\
+  Historical Measurements and Review Limits}
 \author{Anonymous}
 \date{}
 
@@ -43,8 +42,9 @@
 \begin{abstract}
 An $\FF_q$-rational isogeny of degree prime to $n$ restricts to an isomorphism of
 the prime-order subgroup $\langle P\rangle$ on which an elliptic-curve
-discrete-logarithm instance $Q = kP$ lives, so a generic algorithm should cost
-the same on every curve of the isogeny class. We test this in the only way an
+discrete-logarithm instance $Q = kP$ lives. This preserves the operation
+distribution of a coupled algorithm in a unit-cost oracle model; concrete
+hash-partitioned walks need separate evidence. We compare them
 empirical statement about ``which curve'' can be tested: by carrying one
 instance, through explicit and verified isogenies, to many curves of its class
 and running the same Pollard rho on each, under a protocol frozen before the
@@ -57,29 +57,54 @@ isogenies of degree $3$ to $61$), a $j = 0$ class ($45$ curves), a class of
 $327{,}080$ curves over $\FF_{2^{37}}$ ($40$ curves) and the class of the
 Koblitz curve $y^2 + xy = x^3 + 1$ over $\FF_{2^{41}}$ ($708{,}153$ curves,
 $11$ measured over all four strata). In $85{,}425$ solves, every one returning
-the planted logarithm, no curve, endomorphism-ring stratum, volcano level,
-isogeny degree, kernel-field degree, choice of generator ($100$ or $64$ per
-curve with the same secret) or source curve of the instance left the
-preregistered Bonferroni band, and no across-curve test detected
-heterogeneity; the planted negation fold ($0.63$ to $0.77$ of the unfolded mean,
+the planted logarithm, the primary class-mode curve comparisons stayed within
+their reported Bonferroni bands. Ancillary analyses recorded one flagged B1
+generator, two flagged P1 source--target cells, one flagged P0 source--target
+cell, and an all-arm B1 generator Kruskal--Wallis $p=0.039$; these exceptions
+preclude a blanket statement that no test fired. The historical planted
+negation fold ($0.63$ to $0.77$ of the unfolded mean,
 expected $0.707$) and the $4$-adding walk ($1.27$ to $1.36$) were detected every
-time. The only real effects are the crater curves' own endomorphisms: the
+time. Historical structural-fold comparisons report that the
 order-$6$ automorphism fold at $j = 0$ cost $0.439$ $[0.401, 0.481]$ of the plain
 walk (expected $1/\sqrt{6} = 0.408$), and the Frobenius fold on the Koblitz
 crater $0.155$ $[0.141, 0.170]$ (expected $1/\sqrt{41}$), $0.113$ with negation
-(expected $1/\sqrt{82}$), still $1.7$ to $2.2$ times faster in wall time at
-$41$ extra squarings per step. Every isogeny leads away from the one curve that
+(expected $1/\sqrt{82}$). The recorded $1.7$ to $2.2$ wall-time ratio is an
+unisolated shared-VM observation, not an admitted performance result.
+Every measured off-crater isogeny leads away from the curve that
 has them. On the way we record that, for odd $m$, every prime dividing the
-conductor of a curve over $\FF_{2^m}$ is $\pm 1 \bmod 8$, so the Koblitz curve
-over $\FF_{2^{41}}$ has no isogeny off its crater of degree below $409$; we
+conductor of a curve over $\FF_{2^m}$ is $\pm 1 \bmod 8$. For the Koblitz curve
+over $\FF_{2^{41}}$, its recorded conductor factorization
+$703889=409\cdot1721$ additionally rules out smaller off-crater degrees; we
 find its $409$- and $1721$-isogenies (division polynomials of degree
 $83{,}640$ and $1{,}480{,}920$) in about one and five minutes each through
 $\ell$-torsion abscissae in $\FF_{2^{41\cdot 204}}$ and $\FF_{2^{41\cdot 215}}$,
 and we derive and verify an explicit V\'elu map on points for ordinary curves
-in characteristic two. This is a null result with passing positive controls,
-rho against rho; it is not an index-calculus result and makes no claim about
-any deployed curve. All code, records and raw per-solve rows are released.
+in characteristic two. The inferential null is provisional: source review
+found tied-sample statistical defects, and the shared-seed Welch design
+requires a covariance assessment and corrected native reanalysis.
+Native-harness admission and concrete formal-proof bridges also remain open.
+This is rho against rho, not an index-calculus result or a claim about any
+deployed curve. Code, historical records and raw per-solve rows are released.
 \end{abstract}
+
+\paragraph{Review status, 2026-10-19.}
+The numerical tables and figures below retain the historical analysis.
+Companion source review found a tied-sample KS defect: identical samples
+$[1,1]$ and $[1,1]$ return $D=1$ instead of $0$. Rank-test tie corrections
+and the covariance induced by shared seeds also require review. Corrected
+native analysis, traceable to the frozen rows and source revision, is still
+owed; no historical $p$-value or inferred null is promoted as corrected here.
+Native ecbench admission and concrete Lean proof bridges remain open.
+The versioned review and proof map live beside this manuscript.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{figures/review-boundary-20261019.pdf}
+\caption{Review boundary. Checked algebraic dependencies do not close
+the concrete-model or experiment-admission gaps. Historical statistical
+figures below retain their original values and provisional inference.}
+\label{fig:review-boundary}
+\end{figure}
 
 \section{Introduction}
 
@@ -91,9 +116,11 @@ group of $\OO$~\cite{Kohel1996,FouquetMorain2002,Sutherland2013}. It is
 natural to ask whether some curve in the class is a \emph{better} place to
 solve a discrete logarithm than another, and the question has two very
 different answers depending on what ``solve'' means. For a \emph{generic}
-algorithm the answer is a theorem (Section~\ref{sec:null}): the cost depends
-only on the group $\langle P\rangle$, which an isogeny of degree prime to $n$
-carries isomorphically. For algorithms that use a curve's structure the answer
+algorithm in a coupled unit-cost oracle model, the transport argument is
+algebraic (Section~\ref{sec:null}): an isogeny of degree prime to $n$ carries
+$\langle P\rangle$ isomorphically. Injectivity of an arbitrary encoding
+alone does not equate concrete hash-partitioned walks or machine costs.
+For algorithms that use a curve's structure the answer
 is yes in at least two known ways, both on the \emph{crater}: the
 automorphisms of $j \in \{0, 1728\}$ fold rho by $\sqrt{3}$ or
 $\sqrt{2}$~\cite{DuursmaGaudryMorain1999,WienerZuccherato1998}, and the
@@ -125,10 +152,10 @@ did not find it stated.
 None of this says what a measurement would show, and a measurement is what a
 claim of the form ``curve $X$ solves faster'' or ``no curve solves faster''
 needs. Such claims are comparative: one number on one curve has no reference.
-This paper is the measurement, done with the discipline a comparative claim
-requires: a frozen protocol, a null population, positive controls that prove
-the detector can see an effect of the size claimed absent, one instrument on
-every arm, and verdicts fixed by preregistered decision rules.
+The historical study used a frozen protocol, a null population, planted
+controls, one instrument on every arm, and preregistered decision rules.
+The review identified statistical and admission gaps; those safeguards
+alone do not validate the reported inference.
 
 \paragraph{Contributions.}
 \begin{enumerate}
@@ -150,26 +177,29 @@ every arm, and verdicts fixed by preregistered decision rules.
   solves, with isomorphic and field-basis controls, an A/A replica, two
   planted effects and three structural folds (Sections~\ref{sec:design}
   and~\ref{sec:results}).
-\item The result: within the stated resolution (about $18\%$ per curve,
-  $6.5\%$ per stratum and $2\%$ class-wide), nothing about the curve, its
-  stratum, its level in any volcano, the route by which it was reached, the
-  generator of $\langle P\rangle$ or the curve the instance was drawn on
-  changes the cost of a generic walk, while the crater curves' folds are
-  measured at their predicted sizes, down to $0.113$ of the plain walk on the
-  Koblitz crater (Section~\ref{sec:results}).
+\item A historical comparison with reported resolution of about $18\%$
+  per curve, $6.5\%$ per stratum and $2\%$ class-wide. Primary class
+  comparisons remained within their reported bands, while ancillary
+  generator and shift comparisons include exceptions. Reported crater
+  folds include $0.113$ of the plain walk on the Koblitz crater.
+  These statistical conclusions are provisional pending corrected native
+  analysis, covariance assessment and the admission checks described above
+  (Section~\ref{sec:results}).
 \item Two side results: for odd $m$ every prime of the conductor of a curve
   over $\FF_{2^m}$ is $\equiv \pm 1 \pmod 8$ (Proposition~\ref{prop:mod8}),
-  which is why the Koblitz curve over $\FF_{2^{41}}$ has no isogeny off its
-  crater of degree below $409$; and the torsion route that finds such
+  together with the recorded conductor factorization $703889=409\cdot1721$
+  and stated volcano hypotheses, this identifies the off-crater degrees
+  of the Koblitz class over $\FF_{2^{41}}$; and the torsion route that finds such
   $409$- and $1721$-isogenies in minutes (Section~\ref{sec:torsion}).
 \end{enumerate}
 
 \paragraph{What this paper is not.} It is not an attack, not an
 index-calculus result, and not a statement about any standardised curve.
 Its positive effects are the well-known crater folds, measured as positive
-controls; its main content is a null result whose detector demonstrably works.
+controls. Its main content is a historical comparison whose statistical
+inference and experiment admission remain under review.
 
-\section{The null is a theorem; what could still differ}
+\section{Algebraic transport and the generic-model boundary}
 \label{sec:null}
 
 Let $E/\FF_q$ be ordinary, $P \in E(\FF_q)$ of prime order $n$, $Q = kP$, and
@@ -177,18 +207,22 @@ $\varphi\colon E \to E'$ an $\FF_q$-rational isogeny of degree $\ell$ with
 $\ell \nmid n$. Then $\varphi$ restricted to $\langle P\rangle$ is injective
 (its kernel has order $\ell$), so $\varphi(P)$ has order $n$ and
 $\varphi(Q) = k\,\varphi(P)$: the instance moves to $E'$ with the same
-logarithm. A \emph{generic} algorithm---one that touches group elements only
-through the group law and an injective encoding---has an expected cost that
-depends only on $(\langle P\rangle, P, Q)$ up to isomorphism, so its expected
-cost on $E'$ equals its cost on $E$. For Pollard rho with an $r$-adding
+logarithm. In a \emph{generic unit-cost oracle model}, with encodings and
+random choices transported through the same isomorphism, an algorithm has
+the same group-operation distribution on the two presentations. This is a
+model statement: injectivity alone does not identify the hash partitions of
+two concrete rho implementations or their wall costs. The checked Lean
+dependencies prove scalar transport and reflection of answers under explicit
+homomorphism and injectivity hypotheses; the concrete curve and oracle-cost
+bridges remain open (the proof map records them). For Pollard rho with an $r$-adding
 walk~\cite{Pollard1978,Teske2001,vanOorschotWiener1999} the expectation is
 about $\sqrt{\pi n/2}$ group operations, times roughly $1/\sqrt{1 - 1/r}$
 ($1.016$ at $r = 32$), and times $1/\sqrt{|G|}$ when the walk is folded by a
 group $G$ of cheap maps on $\langle P\rangle$ whose orbits it canonicalises.
 
-What can differ between curves is therefore only (i) the cost of a group
-operation, which depends on the coordinate representation and the field,
-not on the curve's position in the class; and (ii) the cheap maps a curve
+Concrete comparisons can additionally reflect (i) the cost of a group
+operation, which depends on the coordinate representation, field and curve
+coefficients; and (ii) the cheap maps a curve
 admits: $\Aut(E)$ beyond $\pm 1$ at $j \in \{0, 1728\}$, and the $2$-power
 Frobenius $\tau\colon (x, y) \mapsto (x^2, y^2)$ when $E$ is defined over
 $\FF_2$. Both live on the crater: a curve with $\Aut(E) \ne \pm 1$ has
@@ -196,8 +230,10 @@ $\End(E) = \OO_K$ for $K = \QQ(\sqrt{-3})$ or $\QQ(\sqrt{-4})$, and a curve
 whose coefficients lie in $\FF_2$ has $\End(E) \ni \tau$ with
 $\ZZ[\tau] = \OO_K$ for $K = \QQ(\sqrt{-7})$. Every other curve of the class
 has lost the map (its $j$ is not special; its coefficients are not in
-$\FF_2$), while the generic cost is unchanged. The experiment below is
-designed to measure both halves of this statement.
+$\FF_2$). The coupled unit-cost model preserves the transported algorithm's
+operation distribution; concrete walks require separate measurement.
+The historical experiment attempted that comparison, subject to the
+statistical and admission limits now recorded.
 
 \section{The tool}
 \label{sec:tool}
@@ -310,6 +346,13 @@ $\ell \mid f$ implies $t^2 \equiv 2^{m+2} \pmod{\ell^2}$, so $2^{m+2} = 4 \cdot
 $2$; and $2$ is a quadratic residue modulo an odd prime $\ell$ exactly when
 $\ell \equiv \pm 1 \pmod 8$.
 \end{proof}
+The number-theoretic implication is checked by
+\code{ConductorModEight.primeDivisorModEight} in the pinned Lean project:
+for an odd prime $p$, odd $m$, $p\mid f$ and the supplied integer identity
+$t^2-4\cdot2^m=f^2D$, it proves $p\bmod8\in\{1,7\}$.
+It uses Mathlib's quadratic-residue characterization of $2$.
+Certifying the concrete curve's $t,f,D$ and the volcano interpretation
+remains a separate bridge; the theorem does not read the native records.
 
 So a binary curve over an odd-degree field has no $3$-, $5$-, $11$- or
 $13$-isogeny off any crater; the first candidates are $7, 17, 23, 31, 41, \ldots$
@@ -566,8 +609,10 @@ crater at $0.439$ against $0.408$ (within the $15\%$ tolerance of R4), the
 Frobenius fold on the Koblitz crater at $0.155$ against $0.156$ and, with
 negation, $0.113$ against $0.110$. The Koblitz folds cost $1.92$ and
 $2.05$\,\textmu s per step against $0.50$ (forty-one squarings to find the
-orbit's minimum) and still win in wall time, $275$ and $212$ ms per solve
-against $459$ ms. Neither fold exists on any other curve of its class:
+orbit's minimum), with recorded wall means of $275$ and $212$ ms per solve
+against $459$ ms. These shared-VM observations were not isolated and are not
+admitted wall-performance results. Neither fold exists on any other measured
+curve of its class:
 $\Aut = \pm 1$ away from $j = 0$, and $\tau$ is an endomorphism only when the
 curve is defined over $\FF_2$, which only the crater curve is. The plain walk
 costs the same on all of them.
@@ -586,8 +631,10 @@ generators), B1 ($384$) and K ($192$) read the same (variance ratios
 $0.81$--$1.26$ per curve), with one cell of $384$ on B1 beyond the band on the
 low side ($0.677$ $[0.535, 0.829]$ at $25$ seeds, Mann--Whitney $z = -3.3$),
 the low tail of $384$ small means and not repeated by that curve's other $63$
-generators or by its features. Which generator carries the instance does not
-matter.
+generators or by its features. The original all-arm B1 generator
+Kruskal--Wallis result is $p=0.039$. These are recorded exceptions, not
+grounds for a categorical claim that the generator cannot matter; their
+interpretation awaits the corrected native analysis described above.
 
 Instances drawn on five source curves of P1 (the root and four others) and
 carried to all $104$ targets, $25$ seeds per cell ($13{,}000$ solves): the
@@ -596,14 +643,17 @@ the source, Kruskal--Wallis $p = 0.19$ by target and $0.37$ by source, and
 the five sources' pooled means are $1.007$--$1.029$ of the reference. Two of
 the $520$ cells lie beyond the Bonferroni band on the low side; both targets
 are unremarkable in the other four rows and in the class mode ($1.013$,
-$1.036$), so these are the low tail of many $25$-solve means. P0, B1 and K
-read the same ($\eta^2_{\mathrm{source}} \le 0.0012$ everywhere). Where the
-instance was drawn does not matter either.
+$1.036$). P0 also has one flagged cell of $180$; B1 and K have no flagged
+shift cell in the original report
+($\eta^2_{\mathrm{source}} \le 0.0012$ everywhere). The flags and the
+shared-seed covariance must be retained in a corrected analysis before
+inferring source independence.
 
-\subsection{End to end: the only route-dependent cost is finding the isogeny}
+\subsection{Historical end-to-end costs}
 
-Carrying an instance to a curve costs the isogenies on the way; solving it
-costs the same everywhere. On P1 the Elkies edges cost $0.6$ ms ($\ell = 3$)
+Carrying an instance to a curve costs the isogenies on the way. The following
+are historical, unisolated wall observations, not an admitted end-to-end
+comparison. On P1 the Elkies edges cost $0.6$ ms ($\ell = 3$)
 to $5.5$ s ($\ell = 61$, dominated by building $\Phi_{61}$ once) and a solve
 $98$ ms; the transport to any measured curve was under $74$ ms. On B1 the
 $23$- and $31$-isogenies cost $1.3$--$2.4$ s each by the division route
@@ -646,17 +696,14 @@ and structural folds outside it. Records: \run\art{/P0/}, \run\art{/K/}.}
 
 \section{Discussion}
 
-\paragraph{What the result says.} Within the resolution the budgets buy, the
-position of a curve in its isogeny class is invisible to a generic walk:
-not the endomorphism-ring stratum, not the level in any volcano, not the
-degree or kernel field of the isogeny that reached it, not the generator,
-not the curve the instance came from. The effects that do exist are the two
-the theory names, the crater's automorphisms and the Koblitz Frobenius, and
-they are measured at their predicted sizes. The experiment therefore supports
-the operational reading of random self-reducibility~\cite{JaoMillerVenkatesan2005}
-from the other side: not only can an instance be moved anywhere in the class,
-nothing is gained generically by moving it, and the one thing that can be
-lost is the crater's structure.
+\paragraph{What the record says.} The historical primary class-mode
+comparisons stayed within their reported per-curve bands and detected the
+planted and structural controls. Ancillary generator and source--target
+flags remain visible above. Tied-sample inference, shared-seed covariance,
+native-harness admission and concrete proof bridges are unresolved, so this
+draft does not promote the historical analysis to a general empirical
+invariance conclusion. Random self-reducibility~\cite{JaoMillerVenkatesan2005}
+is the cited theoretical context, not a substitute for those gates.
 
 \paragraph{What it does not say.} It does not say that no curve of a class
 is easier for some non-generic method; index calculus on a curve with a
@@ -669,8 +716,10 @@ speed-ups'': they are the crater curve's own endomorphisms, which an isogeny
 takes away.
 
 \paragraph{Hard isogenies.} The Koblitz class is the instructive case. Its
-reachable neighbours are at degrees $409$ and $1721$ because
-Proposition~\ref{prop:mod8} forbids small ones, and division polynomials of
+reachable off-crater neighbours are at degrees $409$ and $1721$ because the
+recorded conductor is $703889=409\cdot1721$ with the stated volcano-edge
+conditions. Proposition~\ref{prop:mod8} restricts prime residues but alone
+does not rule out all smaller primes, such as $7$ or $17$. Division polynomials of
 degree $10^5$--$10^6$ put the naive route out of reach; the torsion route
 reaches them in minutes because above the floor the Frobenius is a scalar and
 the kernel field is as small as $\operatorname{ord}(\pm\lambda)$ allows. The
@@ -679,8 +728,9 @@ Koblitz curve's group and none of its structure: in practice, a $1721$-isogeny
 is a way to turn a Koblitz instance into a non-Koblitz one, and nothing else.
 
 \paragraph{Classification.} In the vocabulary of the companion repository this
-is a null result with passing positive controls, rho against rho on one
-instrument. It is not a change to any index-calculus baseline and is not a
+is a historical bounded comparison with reported positive controls and
+provisional inference, rho against rho on one instrument. It is not a
+change to any index-calculus baseline and is not a
 speed-up claim.
 
 \section{Reproducibility}

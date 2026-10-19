@@ -1,7 +1,7 @@
-# The Elliptic-Curve Discrete Logarithm Does Not Know Which Curve It Is On
+# Pollard Rho Across Isogeny Classes: Historical Measurements and Review Limits
 
 `isogeny_class_rho.tex` (built: [`isogeny_class_rho.pdf`](isogeny_class_rho.pdf),
-11 pages, A4) is the manuscript of the isogeny-class rho study in
+13 pages, A4) is the manuscript of the isogeny-class rho study in
 [`research/isogeny-class-rho/`](../../research/isogeny-class-rho/): one
 ECDLP instance carried through explicit, verified isogenies to many curves of
 its class, the same Pollard rho run on each, with a protocol frozen before
@@ -15,59 +15,52 @@ not cleared**. Target venue: IACR Cryptology ePrint Archive, category
 form generator; see "Before submission" below. The authors are supplied by
 the owner, never invented.
 
-**Change class** (per `AGENTS.md`): none. The paper reports a **null result
-with passing positive controls**, rho against rho on four isogeny classes.
-It is not an index-calculus result, claims no speedup, and makes no
-statement about any deployed curve. The one positive finding (the Frobenius
-fold on the Koblitz crater, 1.7–2.2× in wall time) is the known Koblitz
-speed-up measured, not a new one.
+**Review, 2026-10-19:** this manuscript preserves historical results; its
+inferential null is provisional. See [the dated review](REVIEW-20261019.md)
+and [the proof map](PROOF-MAP.md). Companion source review reproduced a
+KS defect (`[1,1]` against itself gives D=1 rather than 0), missing rank-test
+tie corrections, and unassessed covariance from shared seeds. Corrected
+native analysis tied to the frozen rows and the actual producer revision is
+required; the historical p-values and graphs have not been recomputed.
 
-## What it says
+**Change class**: a correction to research claims and their proof boundary.
+No admitted speedup or new experiment is claimed. The recorded 1.7–2.2×
+wall-time ratio comes from an unisolated shared VM and is not an admitted
+performance result.
 
-- **The null is a theorem** (§2): an $\mathbb{F}_q$-rational isogeny of
-  degree prime to $n$ is an isomorphism on $\langle P\rangle$, so a generic
-  algorithm costs the same on every curve of the class; what could still
-  differ (coordinates, field basis, automorphisms, Frobenius, implementation
-  constants) is what the experiment controls or measures.
-- **The tool** (§3) and **the torsion route** (§4): three routes to an
-  $\ell$-kernel (Elkies via $\Phi_\ell$, division-polynomial factoring,
-  $\ell$-torsion abscissae in $\mathbb{F}_{q^d}$), verified maps on points
-  over $\mathbb{F}_p$ (Kohel) and in characteristic two (derived in the
-  appendix), and the proposition that for odd $m$ every prime of the
-  conductor of a curve over $\mathbb{F}_{2^m}$ is $\pm 1 \bmod 8$, which is
-  why the Koblitz class over $\mathbb{F}_{2^{41}}$ needs isogenies of degree
-  409 and 1721 (found in about one and five minutes).
-- **Design** (§5): four classes (P1 prime, 347,004 curves; P0 $j=0$; B1
-  binary, 327,080 curves; K Koblitz, 708,153 curves), 100 seeds per curve,
-  Bonferroni per-curve band, Kruskal–Wallis and ANOVA across curves,
-  negative controls (isomorphic and other-basis copies, A/A replica),
-  planted effects (negation fold 0.707, 4-adding walk 1.137), structural
-  folds as positive controls, a generator sweep (100 or 64 generators per
-  curve, same secret) and a source×target shift matrix.
-- **Results** (§6): 85,425 solves, every answer verified; 200 curves over
-  all reachable endomorphism-ring strata; no curve, stratum, level, degree,
-  kernel field, generator or source left the band and no heterogeneity
-  test fired; every plant detected; the $j=0$ fold cost 0.439 [0.401, 0.481]
-  (expected $1/\sqrt 6$), the Koblitz Frobenius fold 0.155 [0.141, 0.170]
-  (expected $1/\sqrt{41}$) and 0.113 with negation. The only
-  route-dependent cost end to end is finding the isogeny.
-- **Reproducibility** (§8): the Rust tool, frozen protocol, command cards,
-  per-solve rows and exact replays, all in this repository.
+## What the historical record says
 
-## What it does not say
+- Scalar transport preserves the logarithm under an injective group
+  homomorphism. Equality of an algorithm's operation distribution additionally
+  needs coupled oracles, encodings and random choices. Arbitrary injective
+  encodings do not make concrete hash-partitioned walks or machine costs equal.
+- The study records 85,425 solves on 200 curves across four classes, with
+  primary class comparisons inside their reported bands. Ancillary analyses
+  include one B1 generator flag, two P1 source–target flags, one P0
+  source–target flag and all-arm B1 generator Kruskal–Wallis p=0.039.
+  Consequently, “no test fired” is false even before corrected analysis.
+- Historical structural-fold ratios include 0.439 [0.401, 0.481] for j=0,
+  0.155 [0.141, 0.170] for Koblitz Frobenius and 0.113 with negation.
+  These are historical estimates, with inference and admission still under
+  review. The reported resolution does not certify detector sensitivity
+  after a statistical defect is found.
+- The odd-exponent conductor argument restricts prime factors to ±1 modulo 8.
+  The Koblitz degrees 409 and 1721 additionally depend on the recorded
+  factorization 703889=409·1721 and the stated volcano hypotheses; the mod-8
+  restriction alone permits smaller primes such as 7 and 17.
+- The Rust source is in companion PR #2174, not contained in this paper's
+  branch ancestry. The evidence is in parent PR #2186. Neither relationship
+  substitutes for source/producer binding or native-harness admission.
 
-- Nothing about index calculus, nothing sub-rho, nothing about any
-  standardised curve; the instances are 33–40 bits, chosen so that whole
-  classes could be measured, not for cryptographic size.
-- Not a new attack and not a new speed-up: the crater folds it detects are
-  the known automorphism and Frobenius equivalence classes.
-- Not a proof that no isogeny-dependent structure exists at any size; it
-  is a bounded, preregistered search that found none where the theorem
-  says there should be none, with the sensitivity of Section 5: at 100 seeds
-  per curve a per-curve effect of about 18 %, a stratum effect of about
-  6.5 % and a class-wide shift of about 2 % are resolved; the 29 % plant and
-  the 14 % plant were both detected in every class. Smaller per-curve effects
-  are not excluded.
+## What remains open
+
+This is a bounded historical study on small instances, with known crater
+folds as controls. It establishes no claim about deployed curves, no new
+attack, and no admitted performance improvement. Required follow-up includes
+correct native statistical analysis, shared-seed covariance assessment,
+source/row lineage, sealed native experiment/control/answer/audit records,
+and the concrete proof bridges enumerated in the proof map. Frozen raw rows,
+protocols and historical receipts remain unchanged.
 
 ## How to build
 
@@ -108,7 +101,7 @@ Owed, in order:
 2. **Form material.** `python3 .claude/skills/iacr-eprint/scripts/eprint_form.py
    papers/isogeny-class-rho --category "Attacks and cryptanalysis"
    --keywords "…" --license "CC BY"` must exit 0; on the anonymized build
-   (2026-10-18) its only failures were the three author rules (anonymous
+   (2026-10-19) its only failures were the three author rules (anonymous
    author block, anonymous page 1, no email), and the abstract, title,
    keywords and page size passed. `eprint-abstract.txt` is the paste-ready
    abstract from that run.
@@ -128,10 +121,11 @@ Owed, in order:
    review by an author (Sutherland, Galbraith, Kohel and Lercier–Sirvent
    style isogeny-class computations, and Koblitz-curve isogeny papers),
    before any priority claim.
-4. **Measurements still owed.** None for the claims made. Optional
-   strengthening: a second independent host for the wall-time rows of §6.4,
-   and a larger-$n$ replica (45–50 bits) of one class to show the null is
-   not a small-$n$ artefact.
+4. **Evidence still owed.** Corrected native analysis and covariance
+   assessment, exact producer lineage, sealed native-harness admission and
+   concrete proof bridges. Any performance comparison also requires a
+   qualified host and the repository’s isolation/admission controls. A second
+   unqualified host does not satisfy those gates.
 5. **Consent.** Every named author agrees to the irrevocable ePrint
    license; an author presses Submit, not an agent.
 
