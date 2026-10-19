@@ -9736,6 +9736,16 @@ pub enum KoblitzIcEvent {
         first_trial: usize,
         trials: usize,
     },
+    /// Emitted before decomposition when native chain-S3 tracing is enabled.
+    /// Coordinates and coefficients are decimal strings for direct replay.
+    RelationQueryStarted {
+        trial: usize,
+        coefficient_a: String,
+        coefficient_b: String,
+        target_x: String,
+        target_y: String,
+        target_infinity: bool,
+    },
     /// Exact completion record for one generated relation candidate.
     RelationAttemptFinished {
         trial: usize,
@@ -10114,6 +10124,31 @@ fn koblitz_index_calculus_dlp_observed(
             .collect();
         report.trials += attempts.len();
         report.relation_batches += 1;
+        if matches!(
+            opts.strategy,
+            DecompositionStrategy::ChainedS3
+                | DecompositionStrategy::ChainedS3FrobeniusOrbit
+                | DecompositionStrategy::ChainedS3FrobeniusOrbitOrdered
+        ) {
+            for (offset, (a, b, target)) in attempts.iter().enumerate() {
+                let (target_x, target_y, target_infinity) = match target {
+                    BinaryPoint::Affine { x, y } => (
+                        x.to_biguint().to_string(),
+                        y.to_biguint().to_string(),
+                        false,
+                    ),
+                    BinaryPoint::Infinity => ("0".into(), "0".into(), true),
+                };
+                progress(KoblitzIcEvent::RelationQueryStarted {
+                    trial: report.trials - attempts.len() + offset + 1,
+                    coefficient_a: a.to_string(),
+                    coefficient_b: b.to_string(),
+                    target_x,
+                    target_y,
+                    target_infinity,
+                });
+            }
+        }
 
         let evaluate = |(a, b, target): &(BigUint, BigUint, BinaryPoint)| {
             if std::env::var_os("N83_CHAIN_PHASE_TRACE").as_deref()
@@ -16382,8 +16417,54 @@ mod tests {
             },
             ..KoblitzIcOptions::default()
         };
-        let report = koblitz_index_calculus_dlp_with_factor_base(&kc, &target, &fb, &opts).unwrap();
+        let mut queries = Vec::new();
+        let report = koblitz_index_calculus_dlp_with_factor_base_and_progress(
+            &kc,
+            &target,
+            &fb,
+            &opts,
+            &mut |event| {
+                if let KoblitzIcEvent::RelationQueryStarted {
+                    trial,
+                    coefficient_a,
+                    coefficient_b,
+                    target_x,
+                    target_y,
+                    target_infinity,
+                } = event
+                {
+                    queries.push((
+                        trial,
+                        coefficient_a,
+                        coefficient_b,
+                        target_x,
+                        target_y,
+                        target_infinity,
+                    ));
+                }
+            },
+        )
+        .unwrap();
         assert_eq!(report.log, Some(known), "{report:?}");
+        assert!(!queries.is_empty());
+        assert_eq!(queries.len(), report.trials);
+        for (index, (trial, a, b, x, y, infinity)) in queries.iter().enumerate() {
+            assert_eq!(*trial, index + 1);
+            let a = BigUint::parse_bytes(a.as_bytes(), 10).unwrap();
+            let b = BigUint::parse_bytes(b.as_bytes(), 10).unwrap();
+            let public_query = kc.add(&kc.mul(kc.generator(), &a), &kc.mul(&target, &b));
+            match public_query {
+                BinaryPoint::Affine {
+                    x: actual_x,
+                    y: actual_y,
+                } => {
+                    assert!(!*infinity);
+                    assert_eq!(x, &actual_x.to_biguint().to_string());
+                    assert_eq!(y, &actual_y.to_biguint().to_string());
+                }
+                BinaryPoint::Infinity => assert!(*infinity),
+            }
+        }
         assert!(report.sat_calls > 0);
         assert!(report.independent_relations > 0);
         assert!(report.linear_solve_attempts > 0);
