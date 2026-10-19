@@ -429,3 +429,21 @@ Unknowns: `N = (m − 2)·n + m·ℓ`. Memory is dominated by the degree-4 echel
 - Wall time and per-degree closure dimensions are recorded. They are not scored.
 
 Nothing from any E7 cell has been computed, and no E7 draw has been generated.
+
+## Amendment 8 (2026-10-19, after the E7 local tier; before any draw of the cell it moves)
+
+- **Observation.** The local tier finished well inside its budget. The N = 48 cells took
+  90–553 s per draw on 4 threads, and no draw needed more than 15 GB.
+- **Change.** The m = 5, (13, 3), N = 54 cell moves from the large-host tier to the local
+  tier. Its dense basis is ≈ 7.3 GB, which fits the 15 GB host.
+- **Unchanged:**
+  - the binary (sha256 `24cf10d6…`, which passed the Amendment 7 gate);
+  - the draw rule, `keep = 4` and `cmax = 4`;
+  - the reading rule.
+- **Peak memory.** It is recorded with `/usr/bin/time -v` if available.
+- **If the run is killed** by memory or by a container restart, the cell is reported as
+  **not completed**, together with whatever draws finished. A finished draw is never
+  rerun selectively.
+- **Still large-host.** (6, 10, 3) N = 58 and (5, 15, 3) N = 60 stay in the large-host tier.
+
+No draw of the (13, 3) m = 5 cell has been generated.
