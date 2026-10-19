@@ -44,7 +44,11 @@ fn scoped(c: &Value, s: &str) -> R<PathBuf> {
     Ok(p)
 }
 fn git(args: &[&str]) -> R<String> {
-    let o = Command::new("git").args(args).output()?;
+    let cwd = std::env::current_dir()?;
+    let o = Command::new("git")
+        .args(["-c", &format!("safe.directory={}", cwd.display())])
+        .args(args)
+        .output()?;
     require(o.status.success(), "card git failed")?;
     Ok(String::from_utf8(o.stdout)?.trim().to_owned())
 }
@@ -187,7 +191,7 @@ pub fn dispatch(mode: &str, path: &Path) -> R<()> {
     lint(&c)?;
     if mode == "card-prompt" {
         let quote = |s: &str| format!("'{}'", s.replace('\'', "'\\''"));
-        let argv = [
+        let mut argv = vec![
             "env".to_owned(),
             format!("PATH={}", std::env::var("PATH")?),
             std::env::current_exe()?
@@ -197,6 +201,13 @@ pub fn dispatch(mode: &str, path: &Path) -> R<()> {
             "card-run".into(),
             path.to_str().ok_or("card UTF8")?.to_owned(),
         ];
+        if c["root_executor"] == true {
+            require(
+                unsafe { libc::geteuid() } == 0,
+                "root-executor card prompt must be validated as root",
+            )?;
+            argv.splice(0..0, ["/usr/bin/sudo".to_owned(), "-n".to_owned()]);
+        }
         let command = argv.iter().map(|s| quote(s)).collect::<Vec<_>>().join(" ");
         if let Some(relay) = c.get("relay_stdout") {
             let relay = relay.as_str().ok_or("relay_stdout string")?;
