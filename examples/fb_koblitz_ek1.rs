@@ -35,7 +35,7 @@
 //! $B one --arm S --n 11 --m 2 --ell 4 --target 0
 //! $B run --n 11,23 --m 2,3 --out-dir research/factor_base_designs_20261015/runs
 //! $B replay research/factor_base_designs_20261015/runs --out K1-replay.jsonl
-//! $B analyze research/factor_base_designs_20261015/runs
+//! $B analyze research/factor_base_designs_20261015/runs --replay K1-replay.jsonl  # path relative to the runs dir
 //! ```
 
 use std::collections::{BTreeMap, HashMap};
