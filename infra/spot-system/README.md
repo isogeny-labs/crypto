@@ -4,6 +4,11 @@ Source and tests live here. Download the complete private deployment bundle,
 compiled runtime and workstation installer using [ARTIFACTS.md](ARTIFACTS.md)
 and its SHA-256 manifest. Publication checks are in [VALIDATION.md](VALIDATION.md).
 
+[Run records](RUN_RECORDS.md) describe each managed experiment in versioned,
+harness-independent JSON. Codex, Claude, OpenCode or a terminal can submit
+`experiment-runner --root ROOT --resume state/JOB/run.json`; the background
+service resumes the latest valid checkpoint without the original agent session.
+
 [Checkpoint discovery](CHECKPOINT_DISCOVERY.md) inventories live experiments and
 checkpoint candidates. New manifest-contract jobs validate generation checksums
 and automatically select the newest valid state before resuming. A read-only

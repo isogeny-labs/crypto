@@ -9,7 +9,7 @@ import tempfile
 import time
 
 
-def invoke(config, action):
+def invoke(config, action, **payload):
     for attempt in range(config.get('attempts',5)):
         with tempfile.NamedTemporaryFile() as output:
             command = ['aws', '--region', config['region'], '--cli-connect-timeout', '3',
@@ -18,7 +18,7 @@ def invoke(config, action):
                 command += ['--profile', config['profile']]
             command += ['lambda', 'invoke', '--function-name', config['function'],
                         '--cli-binary-format', 'raw-in-base64-out',
-                        '--payload', json.dumps({'action': action}), output.name]
+                        '--payload', json.dumps({'action': action, **payload}), output.name]
             result = subprocess.run(command, capture_output=True, text=True, timeout=18)
             if result.returncode:
                 raise RuntimeError('AWS wake request failed; check the client AWS profile and InvokeFunction permission')

@@ -13,6 +13,7 @@ metadata/probe scripts; none contains process-memory images or credentials.
 | Preserve running experiments | Original source/IP remain; five factor jobs finished naturally, Diem PID 400334 continues with leave-running backups |
 | Recurring private S3 backups | Enabled at :00/:15/:30/:45, including authorized future sensitive images; full download SHA-256 and AES256 checks; `recurring-private-backups.json` |
 | Checkpoint discovery | Native inventory/generation validation, corrupt fallback and supervisor restore; 20 native tests; earlier live inventory is explicitly partial |
+| Harness-independent restart | Deployed `experiment.run/v1`, JSON Schema and `experiment-runner`; native kill/restore under different synthetic launcher sessions; actual worker-IAM resume restored progress 3 and finished at 12; `run-records.json` |
 | Native application checkpoints | Actual solver SIGKILL/restore, cross-worker reference equality, AMD gate and managed replay; earlier native evidence retained |
 | Legacy copy restore | All five factor copies passed on compatible m8i; Diem four-thread copy also passed; `legacy-criu-cross-host-restore.json`, `diem-copy-restore.json` |
 | Automatic legacy failover | Passed disposable-source/first-owner/second-owner rehearsal, including newer backups and time namespace recovery; `automatic-failover.json` |
@@ -21,8 +22,8 @@ metadata/probe scripts; none contains process-memory images or credentials.
 | Cairn/Conductor | Deployed on source and managed workspace; health/restart identity checks and managed cold boot passed |
 | Idle shutdown | Real managed worker scaled to zero after 30 minutes; earlier activity record retained; original protected host excluded |
 | Laptop hooks and SSH wake | Installer/tests ready and AWS invocation/public-key checks passed; actual laptop installation/event remains blocked by missing laptop access |
-| Infrastructure tests | 72 passed; compilation, shell syntax and cfn-lint passed; `results.json`, full logs in new archive |
-| Repository release library gate | 4,399 passed, 0 failed, 118 ignored, 169.40 s after portability fix; full log in `portability-evidence.tar.gz` |
+| Infrastructure tests | 83 passed; compilation and cfn-lint passed; `results.json`, full logs in `run-record-evidence.tar.gz` |
+| Repository release library gate | 4,399 passed, 0 failed, 118 ignored, 168.66 s for portable-record change; full log in `run-record-evidence.tar.gz` |
 | Touched example gate | 2 tests passed; prior built-in 104 checks retained |
 | S3/GitHub publication | Content-addressed private release and source PR; `artifacts.json` |
 
@@ -71,3 +72,27 @@ or serialized state format changed. Full Windows cross-checking on this host
 is blocked by the absent MinGW C compiler needed for bundled SQLite; Windows
 release CI remains a merge gate, not a claimed local pass. Exact failures and
 new test logs are retained in `portability-evidence.tar.gz` and its JSON receipt.
+
+## Portable execution records
+
+Managed runs atomically emit private `state/JOB/run.json` records. The stable CLI
+validates durable identity and current checkpoints before admitting a resume-only
+request; missing state cannot silently start a fresh run. It reconstructs a
+missing jobs manifest and lets the background service own execution. Region,
+admission-table and managed-wake settings persist with the workspace, so the
+resuming agent does not need the original launcher's environment.
+
+The deployed role invoked managed wake and resumed a disposable native worker
+after its process was killed and its original job list removed. Progress resumed
+at 3 and completed at 12. The native integration suite separately exercised
+fallback from corrupt newer generations under changed synthetic Claude/Codex
+environment values. These are CLI and process recovery proofs; interactive
+Claude/Codex/OpenCode applications were not automated. No inherited session or
+secret values were serialized. Existing saved-run descriptors were backfilled
+without launching them; the original source process and fixed IP were preserved.
+
+The new archive retains the inline-template size rejection, an SSM test-script
+permission failure, and a test against a replacement's older runtime, followed
+by corrected successful deployment/test evidence. The replacement was upgraded
+only after confirming its main job queue was empty. See
+[`RUN_RECORDS.md`](RUN_RECORDS.md) for the format, commands and compatibility limits.

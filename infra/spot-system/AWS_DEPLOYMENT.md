@@ -76,13 +76,16 @@ build dependencies. In-place updates refuse an active managed manifest.
 
 Build/upload the runtime first, verify full download SHA-256, then regenerate
 `template.json` and update `RuntimeDigest`, preserving other stack parameters.
+Use `build_template.py --compact` for the AWS inline template-body API; the
+readable generated template can exceed its 51,200-byte limit. Both encodings
+describe the same resources.
 `aws-config.json` records the currently applied settings. Run tests and cfn-lint.
 Review replacements before any stack change; do not add a rolling refresh over
 active experiments. Old runtime/source bundles remain available for rollback.
 
 ```bash
 python3 infra/spot-system/package_runtime.py
-python3 infra/spot-system/build_template.py > infra/spot-system/template.json
+python3 infra/spot-system/build_template.py --compact > /tmp/spot-apply-template.json
 python3 -m unittest discover -s infra/spot-system
 cfn-lint infra/spot-system/template.json
 aws service-quotas get-service-quota --region us-east-2 \

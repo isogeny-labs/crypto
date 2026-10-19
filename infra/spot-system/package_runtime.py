@@ -11,6 +11,9 @@ def package(destination=None, binary_dir=None):
     destination = destination or here / 'runtime.tar.gz'
     binary_dir = binary_dir or Path.home() / '.local/bin'
     sources = [(here/name, name) for name in ['runner.py', 'activity.py', 'worker_state.py', 'node_service.py', 'install_services.py']]
+    sources.append((here/'experiment-run.schema.json', 'experiment-run.schema.json'))
+    sources.append((here/'experiment-runner', 'experiment-runner'))
+    sources.append((here/'wake.py', 'wake.py'))
     sources += [(here/name, name) for name in ['criu_local.py','criu_export.py','legacy_recovery.py',
         'spot-legacy-backup.service','spot-legacy-backup.timer','spot-diem-backup.service','spot-diem-backup.timer']]
     sources += [(binary_dir/name, 'bin/'+name) for name in
@@ -25,7 +28,7 @@ def package(destination=None, binary_dir=None):
                 info = archive.gettarinfo(str(source), arcname=name)
                 info.mtime = info.uid = info.gid = 0
                 info.uname = info.gname = ''
-                info.mode = 0o755 if name.startswith('bin/') else 0o644
+                info.mode = 0o755 if name.startswith('bin/') or name == 'experiment-runner' else 0o644
                 with source.open('rb') as data:
                     archive.addfile(info, data)
     digest = hashlib.sha256(destination.read_bytes()).hexdigest()

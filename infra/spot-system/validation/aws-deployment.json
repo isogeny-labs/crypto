@@ -1,10 +1,10 @@
 {
   "schema": "spot.aws-deployment/v2",
-  "observed_utc": "2026-10-19T06:09:31.933934+00:00",
+  "observed_utc": "2026-10-19T07:10:19.210918+00:00",
   "stack": "spot-experiments",
   "region": "us-east-2",
   "stack_status": "UPDATE_COMPLETE",
-  "runtime_sha256": "4e41994b108d49cb32b1a0f7fcc441840c0737be6b5ec738ff6e3481a3fa1cd9",
+  "runtime_sha256": "fb8949d0ebe04eefffd0bbaa3a987468c497a92d49314b242814d8638a7f1932",
   "work_root": "/srv/experiments/spot-worker",
   "node_project": "/srv/experiments/spot-worker/work",
   "lifecycle_enabled": true,
@@ -14,7 +14,7 @@
   "desired_capacity": 1,
   "managed_instances": [
     {
-      "InstanceId": "i-0a6466bc0b69106b2",
+      "InstanceId": "i-041ce6f4d176afe48",
       "InstanceType": "m8i.8xlarge",
       "AvailabilityZone": "us-east-2b",
       "AvailabilityZoneId": "use2-az2",
@@ -23,7 +23,7 @@
       "LaunchTemplate": {
         "LaunchTemplateId": "lt-0a663a3e15a051473",
         "LaunchTemplateName": "Template_mQUD6gyzx0rc",
-        "Version": "12"
+        "Version": "15"
       },
       "ProtectedFromScaleIn": false
     }
@@ -111,7 +111,7 @@
   },
   "ip_source_protection_enabled": true,
   "applied_parameters": {
-    "RuntimeDigest": "4e41994b108d49cb32b1a0f7fcc441840c0737be6b5ec738ff6e3481a3fa1cd9",
+    "RuntimeDigest": "fb8949d0ebe04eefffd0bbaa3a987468c497a92d49314b242814d8638a7f1932",
     "AllocationId": "eipalloc-00c2a8a867901bf7d",
     "IdleSeconds": "1800",
     "Cutover": "true",
@@ -128,6 +128,33 @@
     "AlarmTopicArn": ""
   },
   "latest_managed_cold_boot": {
+    "instance_id": "i-041ce6f4d176afe48",
+    "cloud_init": "done",
+    "runtime_in_place": "fb8949d0ebe04eefffd0bbaa3a987468c497a92d49314b242814d8638a7f1932",
+    "deployment_method": "idle queue assertion; native recovery gate passed; only spot-experiments restarted",
+    "future_launch_template": "16",
+    "independent_recovery_units": "all active; source protected",
+    "portable_cli": "/usr/local/bin/experiment-runner",
+    "durable_worker_config": true,
+    "live_record_handoff": {
+      "schema": "experiment.cloud-handoff-proof/v1",
+      "record_schema": "experiment.run/v1",
+      "restored_progress": 3,
+      "final_progress": 12,
+      "original_jobs_manifest_removed": true,
+      "launcher_session_not_required": true,
+      "inherited_credentials_not_serialized": true,
+      "worker_iam_and_managed_wake": "passed",
+      "runtime_config_used_without_original_environment": true,
+      "original_source_untouched": true
+    }
+  },
+  "laptop_hooks": {
+    "installer": "prepared and temporary-home tested",
+    "installed_on_laptop": false,
+    "remaining": "laptop execution access or local installer run, plus Codex /hooks trust"
+  },
+  "previous_managed_cold_boot_before_run_records": {
     "instance_id": "i-0a6466bc0b69106b2",
     "launch_template_version": "12",
     "cloud_init": "done",
@@ -160,9 +187,10 @@
       }
     }
   },
-  "laptop_hooks": {
-    "installer": "prepared and temporary-home tested",
-    "installed_on_laptop": false,
-    "remaining": "laptop execution access or local installer run, plus Codex /hooks trust"
+  "portable_run_records": {
+    "schema": "experiment.run/v1",
+    "deployed": true,
+    "cloud_handoff": "passed",
+    "evidence": "run-records.json"
   }
 }

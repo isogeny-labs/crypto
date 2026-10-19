@@ -8,10 +8,10 @@
   "managed_worker_ready": true,
   "managed_worker_bootstrap_verified": true,
   "deployment_bundle": {
-    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/releases/efb4f1418e49e22a64b346ca211756dec94dbc304d69935538c71f6934279be3/spot-system.tar.gz",
-    "sha256": "efb4f1418e49e22a64b346ca211756dec94dbc304d69935538c71f6934279be3",
-    "bytes": 102944441,
-    "description": "Applied AWS compute configuration, native solver checkpoint runtime, recovery gates and managed-worker validation evidence"
+    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/releases/a21275dc4f62d8befacfaf7dfed7bc2c24553f619acbafc01a935afb103d0407/spot-system.tar.gz",
+    "sha256": "a21275dc4f62d8befacfaf7dfed7bc2c24553f619acbafc01a935afb103d0407",
+    "bytes": 103061242,
+    "description": "Applied AWS configuration, harness-independent run records, native checkpoint runtime and recovery validation evidence"
   },
   "client_installer": {
     "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/clients/396ba76f289b52a575c494a7d11935656711c981094426f92379e5798d40d818/spot-client.tar.gz",
@@ -19,9 +19,9 @@
     "bytes": 4665
   },
   "runtime": {
-    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/runtime/4e41994b108d49cb32b1a0f7fcc441840c0737be6b5ec738ff6e3481a3fa1cd9.tar.gz",
-    "sha256": "4e41994b108d49cb32b1a0f7fcc441840c0737be6b5ec738ff6e3481a3fa1cd9",
-    "bytes": 103029241
+    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/runtime/fb8949d0ebe04eefffd0bbaa3a987468c497a92d49314b242814d8638a7f1932.tar.gz",
+    "sha256": "fb8949d0ebe04eefffd0bbaa3a987468c497a92d49314b242814d8638a7f1932",
+    "bytes": 103047719
   },
   "checkpoint_discovery": {
     "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/tools/9c6a9fc1291c95ccee2c402fdeafbbaa8b94a84d4dd21a6b70a22df7af242cee/checkpoint-discovery",
@@ -30,9 +30,9 @@
     "target": "x86_64-unknown-linux-gnu, target-cpu=x86-64, AL2023"
   },
   "checkpoint_selftest": {
-    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/tools/86283cd84373226364186b2043ef9c939f4e2eca90a29cee90cf6359cf9f8e2e/checkpoint-selftest",
-    "sha256": "86283cd84373226364186b2043ef9c939f4e2eca90a29cee90cf6359cf9f8e2e",
-    "bytes": 1514456,
+    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/tools/f175db867007e3ece0546e069638ebe1ba69d9895bd7eb63ce87dfb242fe89a2/checkpoint-selftest",
+    "sha256": "f175db867007e3ece0546e069638ebe1ba69d9895bd7eb63ce87dfb242fe89a2",
+    "bytes": 1542840,
     "description": "Portable bootstrap recovery test; also included in runtime"
   },
   "solver_checkpoint_selftest": {

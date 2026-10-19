@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Build a staged CloudFormation deployment using the inspected Ohio network."""
 import json
+import argparse
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -72,7 +73,7 @@ runuser -u ec2-user -- env SPOT_NATIVE_TEST_PARENT='${WorkRoot}' /opt/spot/bin/s
 # Future jobs reference this immutable runtime path, not the live legacy binary.
 mkdir -p '${WorkRoot}/bin/${RuntimeDigest}'
 install -m 755 /opt/spot/bin/factor-base-shape-ladder '${WorkRoot}/bin/${RuntimeDigest}/factor_base_shape_ladder'
-python3 /opt/spot/install_services.py --root '${WorkRoot}' --project '${NodeProject}' --table '${ControllerLock}' --region '${AWS::Region}' --legacy-origin '${ProtectedSource}'
+python3 /opt/spot/install_services.py --root '${WorkRoot}' --project '${NodeProject}' --table '${ControllerLock}' --region '${AWS::Region}' --legacy-origin '${ProtectedSource}' --stack '${AWS::StackName}'
 node_ready=0
 for attempt in $(seq 150); do
   if curl -fsS --max-time 2 http://127.0.0.1:9180/health >/dev/null && curl -fsS --max-time 2 http://127.0.0.1:8080/ >/dev/null; then
@@ -138,6 +139,9 @@ aws ec2 create-tags --region '${AWS::Region}' --resources "$INSTANCE" --tags Key
                 {"Effect":"Allow","Action":["s3:PutObject","s3:AbortMultipartUpload"],"Resource":sub("${RuntimeBucket.Arn}/checkpoints/criu/*")},
                 {"Effect":"Allow","Action":"ec2:DescribeInstances","Resource":"*"},
                 {"Effect": "Allow", "Action": "autoscaling:DescribeAutoScalingInstances", "Resource": "*"},
+                {"Effect":"Allow","Action":"cloudformation:DescribeStacks","Resource":ref('AWS::StackId')},
+                {"Effect":"Allow","Action":"lambda:InvokeFunction",
+                 "Resource":sub('arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-Lifecycle-*')},
                 {"Effect": "Allow", "Action": "dynamodb:PutItem",
                  "Resource": {"Fn::GetAtt": ["ControllerLock", "Arn"]},
                  "Condition": {"ForAllValues:StringLike": {"dynamodb:LeadingKeys": ["activity#*", "lifecycle-lock", "legacy-owner*"]}}},
@@ -288,4 +292,8 @@ aws ec2 create-tags --region '${AWS::Region}' --resources "$INSTANCE" --tags Key
 
 
 if __name__ == "__main__":
-    print(json.dumps(build(), indent=2))
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--compact', action='store_true', help='fit the inline CloudFormation template body limit')
+    args = parser.parse_args()
+    print(json.dumps(build(), separators=(',', ':') if args.compact else None,
+                     indent=None if args.compact else 2))

@@ -93,7 +93,8 @@ def run(db, autoscaling, event, owner, now, table, group, enabled, idle_seconds=
 
 def handler(event, context):
     import boto3
-    if os.environ.get('PROTECTED_SOURCE') and event.get('action') == 'wake':
+    if (os.environ.get('PROTECTED_SOURCE') and event.get('action') == 'wake'
+            and event.get('managed_work') is not True):
         status = handler({'action':'status'}, context)
         if status.get('protected_source_active'):
             return {'state':'ready','endpoint_instance_id':status['endpoint_instance_id'],'protected_source_active':True}

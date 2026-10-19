@@ -100,6 +100,7 @@ if __name__ == '__main__':
     p.add_argument('--root', type=Path, default=Path('/srv/experiments'))
     p.add_argument('--table', default='')
     p.add_argument('--region', default='us-east-2')
+    p.add_argument('--stack', help='load the managed-wake function from this stack output')
     p.add_argument('--legacy-origin', default='')
     p.add_argument('--nodes-only', action='store_true')
     p.add_argument('--discovery-only', action='store_true')
@@ -127,6 +128,25 @@ if __name__ == '__main__':
             Path('/etc/systemd/system/'+name+'.service').write_text(text)
             names.append(name+'.service')
     if not a.nodes_only:
+        if not a.discovery_only:
+            entrypoint = Path('/usr/local/bin/experiment-runner')
+            target = a.runtime / 'experiment-runner'
+            if entrypoint.exists() or entrypoint.is_symlink():
+                if not entrypoint.is_symlink() or entrypoint.resolve() != target.resolve():
+                    raise SystemExit('Existing experiment-runner belongs to another installation')
+            else:
+                entrypoint.symlink_to(target)
+        if a.table:
+            import json
+            from runner import atomic_json
+            config = a.root / 'runner-config.json'
+            settings = {'schema':'experiment.worker-config/v1', 'region':a.region, 'activity_table':a.table}
+            if a.stack:
+                outputs = json.loads(subprocess.check_output(['aws','--region',a.region,'cloudformation',
+                    'describe-stacks','--stack-name',a.stack,'--query','Stacks[0].Outputs','--output','json'],text=True))
+                settings['lifecycle_function'] = next(o['OutputValue'] for o in outputs if o['OutputKey']=='LifecycleFunctionArn')
+            atomic_json(config, settings)
+            os.chown(config, identity.pw_uid, identity.pw_gid)
         discovery_root = a.root / 'discovery'
         discovery_root.mkdir(exist_ok=True, mode=0o700)
         os.chown(discovery_root, identity.pw_uid, identity.pw_gid)
