@@ -4,7 +4,12 @@
 = Boolean F4/F5/F6 and native generalized roots
 Instruction measurements, 2026-10-18. Native runtime qualification is separate.
 
-#text("The opt-in single-write Gray-table builder reduces complete matrix-F4/F5
+#text("Correction dated2026-10-19: the old `random=true` rows are fixed generator
+controls. The original raw flags and numeric results are preserved. See
+[the correction](../f4_f5_boolean_runtime_20261019/TARGET_LABEL_CORRECTION.md)
+and [the native continuation](../f4_f5_boolean_runtime_20261019/REPORT.md).
+
+The opt-in single-write Gray-table builder reduces complete matrix-F4/F5
 instruction work on the linked 22-variable fixture, with identical reduced
 rows, rank and word-XOR accounting. These are Callgrind instruction results,
 not admitted native runtime speedups. The production default is unchanged.
@@ -23,7 +28,7 @@ contracts; it does not establish the old hard-family 8x research target.
 
 #pagebreak()
 = Complete matrix step
-K1 n23, 22 Boolean variables, degree 4. Five alternating pairs; exact output and XOR accounting. Callgrind 3.19, merged workers, simulated AVX2. Fresh-seed and scaling records are retained in summary.json.
+ICV1 n23 (icv1-f2m23-tm5197-1f85e9e1), 22 Boolean variables, degree 4. Five alternating pairs; exact output and XOR accounting. Callgrind 3.19, merged workers, simulated AVX2. Fresh-seed and scaling records are retained in summary.json.
 
 #image("matrix-instructions.svg", width: 100%)
 
@@ -40,7 +45,7 @@ First complete call on the same n23 planted system. All original roots checked e
 
 #pagebreak()
 = Cold same-target decomposition
-One planted and one random n23 target. Table setup is added once; online query data remain separate. F6 and the generic solver can return different verified witnesses for the same verdict. No IC/rho result follows.
+One planted and one unplanted generator n23 target. Table setup is added once; online query data remain separate. F6 and the generic solver can return different verified witnesses for the same verdict. No IC/rho result follows.
 
 #image("cold-decomposition.svg", width: 100%)
 

@@ -63,6 +63,7 @@ fn run(root: &Path) -> Value {
             let mut combined = Vec::new();
             let mut vector = Vec::new();
             let mut single = Vec::new();
+            let mut total = Vec::new();
             let mut sources = Vec::new();
             for round in 0..5 {
                 let before = select(root, &format!("paired/{case}-{round}-a"), &mut rejected);
@@ -94,12 +95,14 @@ fn run(root: &Path) -> Value {
                         assert_eq!(old.row["table_write_once"], false);
                         legacy.push(old.query);
                         single.push(old.query / before.query);
+                        total.push(old.query / after.query);
                     }
                     sources.push(json!([before.name, after.name]));
                 }
             }
             matrices.push(json!({"arm":arm,"n":n,"seed":230,"before":spread(&a),"after":spread(&b),"portable_candidate":spread(&p),"legacy":spread(&legacy),
-                "combined":comparison(&combined,noise),"vector_only":comparison(&vector,noise),"original_single_write":comparison(&single,noise),"sources":sources}));
+                "combined":comparison(&combined,noise),"vector_only":comparison(&vector,noise),"original_single_write":comparison(&single,noise),
+                "legacy_to_candidate":comparison(&total,noise),"sources":sources}));
         }
     }
     for n in [17u32, 23] {
@@ -280,7 +283,12 @@ fn run(root: &Path) -> Value {
             holdouts.push(json!({"arm":arm,"n":23,"seed":seed,"before":spread(&before_values),"after":spread(&after_values),"comparison":comparison(&ratios,noise),"sources":sources}));
         }
     }
-    json!({"schema":"boolean-native-optimization/v1","baseline":"1340a6176","matrices":matrices,"changes":changes,"final_costs":final_costs,"holdouts":holdouts,
+    let cpu = fs::read_to_string(root.join("cpu.txt")).unwrap_or_default();
+    let model = cpu
+        .lines()
+        .find_map(|l| l.trim().strip_prefix("Model name:").map(str::trim));
+    let host = json!({"cpu_model":model,"cpu_manifest":cpu,"compiler":fs::read_to_string(root.join("compiler.txt")).ok(),"reserved_cpus":fs::read_to_string(root.join("reserved-cpus.txt")).ok()});
+    json!({"schema":"boolean-native-optimization/v1","baseline":"1340a6176","host":host,"matrices":matrices,"changes":changes,"final_costs":final_costs,"holdouts":holdouts,
         "controls":controls,"rejected_attempts":rejected,"scope":"same-host paired builds; one Rayon worker; exact complete roots or checked decomposition verdict; cold oracle setup included",
         "source_sha256":fs::read_to_string(root.join("source.sha256")).ok(),"binary_sha256":fs::read_to_string(root.join("binaries.sha256")).ok()})
 }

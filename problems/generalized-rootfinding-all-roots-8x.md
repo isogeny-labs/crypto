@@ -4,7 +4,7 @@
 - **Kind:** implementation and empirical qualification gaps
 - **Affected work:** [native bounded solver](../tools/generalized-rootfinder/README.md), [Boolean comparison](../research/f4_f5_boolean_perf_20261018/REPORT.md), [theory cycle](../research/quintic_cached_frobenius_20261017_v1/README.md), [next experiment](../backlog/XP-20261017-quintic-support-frobenius/README.md)
 - **Next action owner:** generalized-rootfinding research program
-- **Last updated:**2026-10-18
+- **Last updated:**2026-10-19
 
 ## Problem
 A novel exact generalized solver with qualified8x end-to-end gain over the
@@ -22,11 +22,15 @@ even for repeated H. A GF4 coefficient counterexample rejects a K-linear
 implementation. The specified dense operation model predicts at most34/21
 from that local change, not a measured gain or universal runtime bound.
 
-Missing: native integration and independent replay, fastest-external
+Historical checkpoint gaps before the native continuation: native integration and independent replay, fastest-external
 comparisons, complete hard all-roots matched panel, novelty review and formal
 bridge. The managed executor being offline additionally prevents execution
 and recovery of the unfinished native checkpoint upload in this cycle.
 No bounded failure proves the research program impossible.
+
+The bounded native integration and access status have since changed; see the
+dated history below. The hard-family gate, external comparison and independent
+qualification remain open.
 
 ## What would unblock it
 - Complete canonical original-root output, including exceptional and auxiliary
@@ -62,3 +66,16 @@ contracts. It does not close hard implicit-domain search, the original
 or the requested 8x qualification. Those conditions remain unchanged.
 Unresolved. This record and its PR keep the original requirement visible;
 they do not stop the continuing program or close the goal.
+
+2026-10-19: Dedicated native Boolean comparisons and optimizations are recorded
+in [the runtime continuation](../research/f4_f5_boolean_runtime_20261019/REPORT.md).
+The m2 measurements keep complete-root and first-witness boundaries separate,
+charge cold Semaev table setup, and check original outputs. Native execution is
+available again. The generalized solver now has a typed Boolean entry, scalar
+fallback below the measured wide-kernel crossover, exact counts independent of
+output caps, and13 passing standalone tests. These fixtures have16/22 Boolean
+variables; they do not supply the20 hard >=1-second completed all-roots cases,
+requested prime/extension coverage, fastest external comparison or qualified8x
+gain. The full native S3 separator is functionally implemented, but its m5
+performance is not measured by this m2 comparison. The original exit criteria
+and open status remain unchanged.

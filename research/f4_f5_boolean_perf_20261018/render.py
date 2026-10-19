@@ -222,7 +222,7 @@ Instruction measurements, 2026-10-18. Native runtime qualification is separate.
 '''
 source += '\n' + '#text("' + typ_escape(report.split("## Workload")[0].split("\n\n", 1)[1]) + '")\n'
 for title, graph, description in [
-    ("Complete matrix step", "matrix-instructions.svg", "K1 n23, 22 Boolean variables, degree 4. Five alternating pairs; exact output and XOR accounting. Callgrind 3.19, merged workers, simulated AVX2. Fresh-seed and scaling records are retained in summary.json."),
+    ("Complete matrix step", "matrix-instructions.svg", "ICV1 n23 (icv1-f2m23-tm5197-1f85e9e1), 22 Boolean variables, degree 4. Five alternating pairs; exact output and XOR accounting. Callgrind 3.19, merged workers, simulated AVX2. Fresh-seed and scaling records are retained in summary.json."),
     ("Every Boolean root", "complete-roots.svg", "First complete call on the same n23 planted system. All original roots checked equal. The general API includes certification and normalization; direct Gray enumeration remains cheaper. Generic F4-basis profiling timed out on this fixture."),
     ("Cold same-target decomposition", "cold-decomposition.svg", "One planted and one unplanted generator n23 target. Table setup is added once; online query data remain separate. F6 and the generic solver can return different verified witnesses for the same verdict. No IC/rho result follows.")]:
     source += '\n#pagebreak()\n= ' + title + '\n' + description + '\n\n#image("' + graph + '", width: 100%)\n'

@@ -17,7 +17,8 @@ pub(crate) fn spread(v: &[f64]) -> Value {
         return json!({"n":0});
     }
     json!({"n":v.len(),"median_ns":median(v),"min_ns":v.iter().copied().fold(f64::INFINITY,f64::min),
-        "max_ns":v.iter().copied().fold(0.0,f64::max),"samples_ns":v})
+        "max_ns":v.iter().copied().fold(0.0,f64::max),"median_ms":median(v)/1e6,
+        "min_ms":v.iter().copied().fold(f64::INFINITY,f64::min)/1e6,"max_ms":v.iter().copied().fold(0.0,f64::max)/1e6,"samples_ns":v})
 }
 pub(crate) fn comparison(ratios: &[f64], noise: f64) -> Value {
     if ratios.len() != 5 || !noise.is_finite() {
@@ -136,11 +137,18 @@ pub(crate) fn select(root: &Path, prefix: &str, rejections: &mut Vec<Value>) -> 
     }
     None
 }
-fn noise(root: &Path, arm: &str, n: u32, random: u8, rejections: &mut Vec<Value>) -> (f64, Value) {
+fn noise(
+    root: &Path,
+    directory: &str,
+    arm: &str,
+    n: u32,
+    random: u8,
+    rejections: &mut Vec<Value>,
+) -> (f64, Value) {
     let mut ratios = Vec::new();
     let mut fingerprint = None;
     for round in 0..5 {
-        let prefix = format!("controls/{arm}-n{n}-r{random}-{round}");
+        let prefix = format!("{directory}/{arm}-n{n}-r{random}-{round}");
         let a = select(root, &format!("{prefix}-a"), rejections);
         let b = select(root, &format!("{prefix}-b"), rejections);
         if let (Some(a), Some(b)) = (a, b) {
@@ -165,10 +173,16 @@ fn noise(root: &Path, arm: &str, n: u32, random: u8, rejections: &mut Vec<Value>
     )
 }
 fn analyze(root: &Path) -> Value {
+    let policy_run = root.join("policy-phase.status").exists();
+    let final_run = root.join("final-phase.status").exists() || policy_run;
     let mut rejected = Vec::new();
     let mut matrices = Vec::new();
     let mut controls = Vec::new();
-    for arm in ["matrix-f4", "matrix-f5"] {
+    for arm in if final_run {
+        vec![]
+    } else {
+        vec!["matrix-f4", "matrix-f5"]
+    } {
         let mut aa = Vec::new();
         for round in 0..5 {
             let a = select(root, &format!("matrix/{arm}-aa-{round}-a"), &mut rejected);
@@ -228,7 +242,7 @@ fn analyze(root: &Path) -> Value {
                 (
                     "complete_roots",
                     "solve-f4",
-                    "roots-gray",
+                    if final_run { "solve-f4" } else { "roots-gray" },
                     vec![
                         "solve-f4",
                         "solve-f5",
@@ -255,10 +269,32 @@ fn analyze(root: &Path) -> Value {
                     ],
                 ),
             ] {
-                let (aa_noise, aa) = noise(root, control, n, random, &mut rejected);
+                let (aa_noise, aa) = noise(
+                    root,
+                    if final_run {
+                        "reference-controls"
+                    } else {
+                        "controls"
+                    },
+                    control,
+                    n,
+                    random,
+                    &mut rejected,
+                );
                 controls.push(aa);
                 let mut rows = BTreeMap::<&str, Vec<Option<Sample>>>::new();
                 let mut fingerprint = None;
+                let mut arms = arms;
+                if final_run && boundary == "complete_roots" {
+                    arms.push("roots-wide");
+                }
+                if policy_run {
+                    arms.push(if boundary == "complete_roots" {
+                        "generalized-typed"
+                    } else {
+                        "decomp-generalized-typed"
+                    });
+                }
                 for arm in arms {
                     let mut samples = Vec::new();
                     for round in 0..5 {
@@ -297,15 +333,41 @@ fn analyze(root: &Path) -> Value {
                             s.as_ref().zip(r.as_ref()).map(|(s, r)| r.cold / s.cold)
                         })
                         .collect::<Vec<_>>();
+                    let f6_ratios = if boundary == "decomposition" {
+                        samples
+                            .iter()
+                            .zip(&rows["decomp-f6"])
+                            .filter_map(|(s, r)| {
+                                s.as_ref().zip(r.as_ref()).map(|(s, r)| r.cold / s.cold)
+                            })
+                            .collect::<Vec<_>>()
+                    } else {
+                        Vec::new()
+                    };
+                    let mut phases = serde_json::Map::new();
+                    for key in ["build_ns", "reduce_ns", "readback_ns"] {
+                        let v = samples
+                            .iter()
+                            .flatten()
+                            .map(|s| s.row["profile"][key].as_u64().unwrap_or(0) as f64)
+                            .collect::<Vec<_>>();
+                        phases.insert(key.into(), spread(&v));
+                    }
                     costs.push(json!({"boundary":boundary,"arm":arm,"n":n,"random":random,"query":spread(&query),"cold":spread(&cold),
                     "reference":reference,"comparison":comparison(&ratios,aa_noise),"sources":samples.iter().flatten().map(|s|&s.name).collect::<Vec<_>>(),
+                    "verified_output":samples.iter().flatten().next().map(|s| json!({"input_digest":s.row["input_digest"],"roots":s.row["roots"],"hit":s.row["hit"],"target_x":s.row["target_x"]})),
+                    "f6_over_candidate":comparison(&f6_ratios,aa_noise),"phase_medians":phases,
                     "phase_profiles":samples.iter().flatten().map(|s|&s.row["profile"]).collect::<Vec<_>>()}));
                 }
             }
         }
     }
     // Admission refusals are retained as failures, never accepted timings.
-    for arm in ["matrix-f4", "matrix-f5"] {
+    for arm in if final_run {
+        vec![]
+    } else {
+        vec!["matrix-f4", "matrix-f5"]
+    } {
         for state in 0..2 {
             let sample = select(
                 root,
@@ -318,7 +380,48 @@ fn analyze(root: &Path) -> Value {
             );
         }
     }
-    json!({"schema":"boolean-native-comparison/v1","baseline":"1340a6176701b3f541a36112a02a3d4a90d1075a",
+    let mut batching = Vec::new();
+    if final_run && !policy_run {
+        for n in [17u32, 23] {
+            for random in [0u8, 1] {
+                let (aa_noise, aa) =
+                    noise(root, "controls", "rootfind-mitm", n, random, &mut rejected);
+                controls.push(aa);
+                let (mut before, mut after, mut ratios, mut sources) =
+                    (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+                let (mut before_query, mut after_query) = (Vec::new(), Vec::new());
+                for round in 0..5 {
+                    let prefix = format!("paired/rootfind-mitm-n{n}-r{random}-{round}");
+                    let a = select(root, &format!("{prefix}-a"), &mut rejected);
+                    let b = select(root, &format!("{prefix}-b"), &mut rejected);
+                    if let (Some(a), Some(b)) = (a, b) {
+                        assert_eq!(stable(&a.row), stable(&b.row));
+                        assert_eq!(a.row["indices"], b.row["indices"]);
+                        assert_eq!(a.row["setup_group_ops"], b.row["setup_group_ops"]);
+                        for key in ["pair_table_entries", "abscissae"] {
+                            assert_eq!(a.row["setup_counts"][key], b.row["setup_counts"][key]);
+                        }
+                        assert_eq!(b.row["setup_counts"]["pair_table_batch_setup"], 1);
+                        before.push(a.cold);
+                        after.push(b.cold);
+                        before_query.push(a.query);
+                        after_query.push(b.query);
+                        ratios.push(a.cold / b.cold);
+                        sources.push(json!([a.name, b.name]));
+                    }
+                }
+                batching.push(json!({"n":n,"random":random,"before":spread(&before),"after":spread(&after),"before_query":spread(&before_query),"after_query":spread(&after_query),"comparison":comparison(&ratios,aa_noise),"sources":sources}));
+            }
+        }
+    }
+    let cpu = fs::read_to_string(root.join("cpu.txt")).unwrap_or_default();
+    let cpu_model = cpu
+        .lines()
+        .find_map(|line| line.trim().strip_prefix("Model name:").map(str::trim));
+    let host = json!({"cpu_model":cpu_model,"cpu_manifest":cpu,"compiler":fs::read_to_string(root.join("compiler.txt")).ok(),
+        "reserved_cpus":fs::read_to_string(root.join("reserved-cpus.txt")).ok(),"memory_manifest":fs::read_to_string(root.join("memory.txt")).ok(),
+        "binary_sha256":fs::read_to_string(root.join("binaries.sha256")).ok(),"source_sha256":fs::read_to_string(root.join("source.sha256")).ok()});
+    json!({"schema":"boolean-native-comparison/v1","baseline":if policy_run {"frozen-iteration1 for policy pairs; candidate-only18-arm costs"}else{"1340a6176701b3f541a36112a02a3d4a90d1075a"},"final_run":final_run,"policy_run":policy_run,"batching":batching,"host":host,
         "matrices":matrices,"costs":costs,"controls":controls,"rejected_attempts":rejected,
         "bootstrap":"all3125 resamplings of five paired ratios; percentiles78/3046",
         "scope":"one worker, dedicated x86-64 VM, original matched public fixtures; cold oracle setup charged; no full IC/rho ratio"})

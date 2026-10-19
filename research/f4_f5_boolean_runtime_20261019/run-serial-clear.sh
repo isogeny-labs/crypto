@@ -19,9 +19,10 @@ iso=target/release/isolated_bench
 cp "$bin" "$out/candidate-benchmark"
 sha256sum "$bin" "$iso" > "$out/binaries.sha256"
 sha256sum src/cryptanalysis/gf2_elim.rs examples/f4_f5_boolean_perf.rs > "$out/source.sha256"
-mapfile -t last_cpus < <(lscpu -p=CPU | sed '/^#/d' | tail -2)
-single=$(cat "/sys/devices/system/cpu/cpu${last_cpus[1]}/topology/thread_siblings_list")
-other=$(cat "/sys/devices/system/cpu/cpu${last_cpus[0]}/topology/thread_siblings_list")
+mapfile -t core_sets < <(lscpu -p=CPU | sed '/^#/d' | while read -r cpu; do cat "/sys/devices/system/cpu/cpu$cpu/topology/thread_siblings_list"; done | sort -u)
+[ "${#core_sets[@]}" -ge 3 ]
+single=${core_sets[-1]}
+other=${core_sets[-2]}
 multi=$single,$other
 printf 'one=%s\nfour=%s\n' "$single" "$multi" > "$out/reserved-cpus.txt"
 sleep 60

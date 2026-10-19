@@ -26,6 +26,15 @@ jobs:
         run: cargo test --release --locked --lib folded_callback_batches_preserve_every_key_witness_and_group_charge
       - name: Binary and prime m2/m3 oracle controls
         run: cargo test --release --locked --lib cryptanalysis::ic_framework::rootfind::tests
+      - name: GF2 reference equality with serial clearing disabled and enabled
+        shell: bash
+        run: |
+          for workers in 1 4; do
+            for state in 0 1; do
+              RAYON_NUM_THREADS="$workers" KIC_GF2_WRITE_TABLE_ONCE=1 KIC_GF2_VECTOR_TABLES=1 KIC_GF2_SERIAL_CLEAR="$state" \
+                cargo test --release --locked --lib cryptanalysis::gf2_elim::tests -- --test-threads=1
+            done
+          done
   native-solver:
     runs-on: ubuntu-latest
     timeout-minutes: 25
