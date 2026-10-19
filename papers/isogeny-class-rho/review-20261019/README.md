@@ -34,7 +34,11 @@ manifest and native counterexample sources. There is no `sorryAx` in the
 successful final axiom audit. See the adjacent proof map for exact scope and
 open concrete bridges.
 
-`library-validation.json` and `library-release.log` record the successful
+`library-validation.json` and `library-release.log.gz` record the successful
 required whole-library release suite on the exact tested source tree. This
 local validation does not close the empirical/proof bridges or replace
 final-head GitHub CI.
+
+The gzip receipt preserves the complete raw test output, including its final
+blank line; `gzip -dc library-release.log.gz` restores the bytes bound by
+`log_sha256` in the validation receipt.
