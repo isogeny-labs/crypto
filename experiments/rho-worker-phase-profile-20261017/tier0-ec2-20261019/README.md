@@ -43,6 +43,11 @@ artifact hashes, paired fields, A/A `[0.90, 1.11]`, peak RSS, host preflight,
 and a 32-Q cluster bootstrap. The improvement threshold is a 95% lower
 bound greater than 1.05 with every arm and pair valid.
 
+Before the full dispatch, one q00 serial/batch pair is run with the same
+strict service as an infrastructure calibration. Its result is retained
+separately and does not enter the 32-Q speed decision. The complete panel
+manifest is frozen before this calibration begins.
+
 The benchmark CPU is physical core 23 (logical CPUs 23,47) on NUMA node 1.
 The [host configuration](configure_host.sh) sets the cgroup partition,
 housekeeping slices, IRQ routing, turbo disabled, and fixed requested frequency after booting with
