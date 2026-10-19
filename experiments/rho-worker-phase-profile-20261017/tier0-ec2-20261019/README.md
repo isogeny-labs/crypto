@@ -34,7 +34,7 @@ The [build log](build.log) records the release build. Before isolation, an
 [untimed serial q00 wrapper check](q00-serial-smoke.txt) returned
 `verified=1`, 128 walkers, and `checkin_every=64`.
 
-The complete [worker plan](worker-plan.json) SHA-256 is
+The initial wrapper-based [worker plan](worker-plan.json) SHA-256 is
 `237a24501204b69208eb4467151eeca088887b4d896bcd326c02edc9de0bd0d3`;
 the strict [host manifest](manifest.json) SHA-256 is
 `a24f3fb6b703a99d99910238a8c9e8899ddac83d4f89540dd985fadce5de0cfc`.
@@ -81,6 +81,21 @@ OOM, thermal changes and major faults remain zero-tolerance. The direct
 Rust output removes the Python wrapper from the measured cgroup. Every
 counter remains in the arm ledger, and the independent auditor recomputes
 the limits from raw before/after values.
+
+The revised [source archive](source-r3.tar.gz) was generated twice with the
+same SHA-256 `e369360087a53f44362043ce6f10d5a884f07da09142c0387c70a05708aa5c72`.
+Its rebuilt binary SHA-256 is
+`d6970ff60594f015fd3331c3d6cff3942d539a7ccad237604cf2ec33d73b79ea`;
+the [build log](build-r3.log) and separate [serial](q00-serial-direct-smoke.txt)
+and [batch](q00-batch-direct-smoke.txt) exact-output checks are retained.
+The revised [worker plan](worker-plan-r3.json) SHA-256 is
+`7b36aa4eee850ebff38f85ea849d2f692b3526603b7d31d80e303fe10c9b45f7`;
+the full [Tier 0 manifest](manifest-r3.json) SHA-256 is
+`e6d77a75e090bd41cb972e09e8337fdd74de7b871a413f609f60de18e2f7ccfd`.
+The [full preflight](preflight-r3.json) passed with no problems. The separate
+[second calibration manifest](calibration-manifest-r3.json) SHA-256 is
+`aec4c0536385c36f061ac689fcb2f18936a17cfdd70c7dba6eb85d733337179c`;
+its [preflight](calibration-preflight-r3.json) also passed.
 
 The benchmark CPU is physical core 23 (logical CPUs 23,47) on NUMA node 1.
 The [host configuration](configure_host.sh) sets the cgroup partition,
