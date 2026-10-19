@@ -65,6 +65,8 @@ def audit(folder, strict_runner):
             any(len(values) != 4 for values in aa_by_q_mode.values()) or
             any(len(values) != 4 for values in comparisons.values())):
         issues.append('incomplete Q repetitions')
+    if outliers != structural['aa_failures']:
+        issues.append('A/A control list differs from arm-level independent audit')
     aa_mode_medians = {
         mode: exp(statistics.median(log(ratio) for ratio in values))
         for mode, values in aa_by_mode.items() if values
