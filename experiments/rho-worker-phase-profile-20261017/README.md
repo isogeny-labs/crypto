@@ -284,7 +284,7 @@ measurements.
 
 ## Hosted worker decision
 
-All five Pod attempts preserve their ordered raw ledgers, exact-output
+All five Pod attempts and the dedicated EC2 instance attempt preserve their ordered raw ledgers, exact-output
 receipts, frozen plans, source and binary hashes, failed controls, and
 independent audits. The current decision is **keep serial default routing**:
 no hosted attempt passed its complete timing and host gate.
@@ -296,6 +296,7 @@ no hosted attempt passed its complete timing and host gate.
 | [3](tier1-pod-20261018-r3/README.md) | 47/23 | Web-terminal threads eligible on CPU `5,29`; stopped | `unknown_gate_failed` |
 | [4](tier1-pod-20261018-r4/README.md) | 8/4 | Host-parent `runc` eligible on CPU `5,29` before observer armed; stopped | `unknown_gate_failed` |
 | [5](tier1-pod-20261018-r5/README.md) | 96/48 | Host-parent `runc` eligible on CPU `5,29` about 701 seconds after barrier release; stopped | `unknown_gate_failed` |
+| [6](tier1-ec2-20261018/README.md) | 768/384 | One arm recorded CPU steal; four A/A ratios outside range | `unknown_gate_failed` |
 
 The second attempt's process-pinning receipt was a snapshot. The later
 thread-level audit showed that a process-leader mask did not cover all
@@ -307,3 +308,8 @@ worker speedup. A further default-routing comparison requires an allocation
 with enforceable host-level CPU and IRQ placement, plus the same frozen
 exact-output, A/A, memory, and 95% lower-bound gates. The source and
 opt-in batch lane remain reviewable independently of that timing decision.
+
+The EC2 guest observer found no competing guest task eligible on its measured
+CPU, while its independent audit still recorded host noise. The next panel
+uses the [physical-host manifest and auditor](tier0-ec2-20261019/) with a
+64-step check-in interval, so requested width 32 is exercised in full.
