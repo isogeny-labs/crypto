@@ -1878,6 +1878,7 @@ fn analyze(dir: &str, replay_file: Option<&str>) {
     let mut p5_any = false;
     let mut p6: Vec<String> = Vec::new();
     let mut p7: Vec<String> = Vec::new();
+    let mut p7_ok: Vec<bool> = Vec::new();
     for &n in &ns {
         for m in [2usize, 3] {
             println!();
@@ -2050,6 +2051,9 @@ fn analyze(dir: &str, replay_file: Option<&str>) {
                 p7.push(format!(
                     "n={n} m={m}: {random_dearer} of {shared} shared cells with the random window ≥ 2× dearer"
                 ));
+                if shared > 0 {
+                    p7_ok.push(random_dearer * 2 >= shared);
+                }
             }
         }
     }
@@ -2142,14 +2146,45 @@ fn analyze(dir: &str, replay_file: Option<&str>) {
         "  P5 S does not advance in any (n, m): {}",
         mark(p5_any.then_some(!p5_viol))
     );
-    println!("  P6 null reads \"structure beyond shape\" in every (n, m):");
+    let p6_eval: Vec<&String> = p6.iter().filter(|l| !l.contains("inconclusive")).collect();
+    println!(
+        "  P6 null reads \"structure beyond shape\" in every evaluable (n, m): {}",
+        mark(if p6_eval.is_empty() {
+            None
+        } else {
+            Some(p6_eval.iter().all(|l| l.contains("structure beyond shape")))
+        })
+    );
     for l in &p6 {
         println!("       {l}");
     }
-    println!("  P7 the Gauss x-window is cheaper than the random x-window at equal ℓ (random ≥ 2× dearer in at least half of the shared cells):");
+    println!(
+        "  P7 the Gauss x-window is cheaper than the random x-window at equal ℓ (random ≥ 2× dearer in at least half of the shared cells, in every (n, m)): {}",
+        mark(if p7_ok.is_empty() {
+            None
+        } else {
+            Some(p7_ok.iter().all(|&b| b))
+        })
+    );
     for l in &p7 {
         println!("       {l}");
     }
+    let p8: Vec<(String, usize)> = ["S", "X", "XR", "NS"]
+        .iter()
+        .filter_map(|a| fit_of(a, 11, 3).map(|f| (a.to_string(), f.cells)))
+        .collect();
+    println!(
+        "  P8 at m = 3, n = 11, S, X, XR and NS each have fewer than 3 completed cells: {} (cells: {})",
+        mark(if p8.is_empty() {
+            None
+        } else {
+            Some(p8.iter().all(|x| x.1 < 3))
+        }),
+        p8.iter()
+            .map(|x| format!("{} {}", x.0, x.1))
+            .collect::<Vec<_>>()
+            .join(", ")
+    );
 }
 
 fn flag(args: &[String], name: &str) -> Option<String> {
