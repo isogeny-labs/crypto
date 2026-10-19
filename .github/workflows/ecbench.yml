@@ -22,9 +22,11 @@ name: ecbench
 # lives: a directory whose session.json has schema `ecbench.session/v1`,
 # wherever it is in the tree (sheriff case SHF-20261016-3caa6f, E2: 167
 # sessions outside research/ecbench_*/sessions/ were never re-verified).
-# Each is integrity-audited (hashes, seals, plan, answers, derived figures,
-# grading; --replay 0) on ecbench pull requests and in the weekly/manual
-# lane, and is evidence that is never edited.  An interrupted session,
+# Each complete or interrupted session is integrity-audited (hashes, seals,
+# plan, answers, derived figures, grading; --replay 0) on ecbench pull
+# requests and in the weekly/manual lane, and is evidence that is never
+# edited. Four scratch sessions lacking spec/host capsules are hash-pinned in
+# docs/ecbench/INCOMPLETE_SESSIONS.tsv and reported separately. An interrupted session,
 # including one whose runner was killed before it could mark it (still
 # `running`), is accepted by --allow-interrupted as evidence of the
 # interruption: every per-record check still applies.
@@ -403,8 +405,8 @@ jobs:
         timeout-minutes: 12
         run: |
           bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
-          echo 'PR evidence validation: every committed ecbench session (by schema) hash/seal/answer audited. Fresh smoke sessions exercise deterministic replay; exhaustive historical replay belongs to the weekly/manual lane.' >> "$GITHUB_STEP_SUMMARY"
-      - name: Every committed ecbench session passes integrity
+          echo 'PR evidence validation: every committed ecbench session with complete inputs (by schema) hash/seal/answer audited; four hash-pinned scratch sessions lacking spec/host capsules remain incomplete. Fresh smoke sessions exercise deterministic replay; exhaustive historical replay belongs to the weekly/manual lane.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Audit complete and interrupted sessions; pin incomplete scratch evidence
         if: (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
         run: bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
       - name: Committed evidence reproduces exhaustively on this host
