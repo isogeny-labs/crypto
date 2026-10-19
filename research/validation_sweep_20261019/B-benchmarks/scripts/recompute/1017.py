@@ -6,7 +6,7 @@ summ = json.load(open(ROOT + RUN + "summary.json"))
 T = summ["timing"]
 def wx(cell, eng, arm): return T[cell][eng][arm]["counters"]["word_xors"]
 rows = {}
-for cell in ["k1n17", "k0n23", "k0n31"]:
+for cell in sorted(T):  # the three cells recorded in summary.json "timing"
     for eng in ["f4", "f6p"]:
         o = wx(cell, eng, "orig")
         rows[(cell, eng)] = (o / wx(cell, eng, "cand1"), o / wx(cell, eng, "cand2"))
