@@ -1,7 +1,60 @@
-Factor-base designs, Amendment 6 (T1, T2): A0 on the sparse tower engine; rows from research/factor_base_designs_20261015/runs
+Factor-base designs, Amendments 6 and 7 (T1, T2, T3): A0 on the sparse tower engine; rows from research/factor_base_designs_20261015/runs
 
-T1, admission: 26 of 26 systems complete on the tower engine with the committed D,
+T1 admission at p1: 26 of 26 systems complete on the tower engine with the committed D,
   no derived 1 and the planted solution kept (26 required)  →  ADMITTED
+
+T3a admission at p2: 22 of 22 systems complete on the tower engine with the committed D,
+  no derived 1 and the planted solution kept (22 required)  →  ADMITTED
+
+════ T3: m = 3, t = 5 on p2 (A0 on the tower engine, A11 on f4_fp)
+
+── T3 A0 m = 3 t = 5 p2
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  5   5.000  16     17     [7, 7]        37306,35617          368.6,370.4           ok,ok
+  completed cells 1: σ = -  →  inconclusive (fewer than 3 completed cells);  Δlog₂ max_cols/Δb = - (secondary, descriptive)
+
+── T3 A11 m = 3 t = 5 p2
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  5   5.000  30     31     [5, 5]        40486,40486          486.3,498.5           ok,ok
+  completed cells 1: σ = -  →  inconclusive (fewer than 3 completed cells);  Δlog₂ max_cols/Δb = - (secondary, descriptive)
+
+p1 cell D (T2, F3): A0 7.0, A11 5.0
+T3 rule: THE GAP REPLICATES (each arm's p2 cell D equals its p1 cell D)
+
+
+── A0 m = 3 p2, F1 cells only
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  2   2.000  7      8      [5, 5]        368,368              0.0,0.0               ok,ok
+  3   3.000  10     11     [6, 6]        3285,3285            0.6,0.7               ok,ok
+  4   4.000  13     14     [6, 6]        12314,12314          16.9,16.5             ok,ok
+  5   5.000  16     17     []            97456,97456          305.4,305.6           timeout,timeout
+  completed cells 3: σ = 0.5000  →  no middle ground at this arity (σ ≥ 0.5);  Δlog₂ max_cols/Δb = 2.532 (secondary, descriptive)
+
+── A0 m = 3 p2, with the T3 cell
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  2   2.000  7      8      [5, 5]        368,368              0.0,0.0               ok,ok
+  3   3.000  10     11     [6, 6]        3285,3285            0.6,0.7               ok,ok
+  4   4.000  13     14     [6, 6]        12314,12314          16.9,16.5             ok,ok
+  5   5.000  16     17     [7, 7]        37306,35617          368.6,370.4           ok,ok
+  completed cells 4: σ = 0.6000  →  no middle ground at this arity (σ ≥ 0.5);  Δlog₂ max_cols/Δb = 2.180 (secondary, descriptive)
+
+
+── A11 m = 3 p2, F1 cells only
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  2   2.000  15     16     [4, 4]        62,62                0.0,0.0               ok,ok
+  3   3.000  20     21     [4, 4]        781,781              0.1,0.1               ok,ok
+  4   4.000  25     26     [4, 4]        3096,3096            1.9,1.8               ok,ok
+  5   5.000  30     31     []            40486,40486          301.0,301.0           timeout,timeout
+  completed cells 3: σ = 0.0000  →  candidate (σ ≤ 0.25 on ≥ 3 cells);  Δlog₂ max_cols/Δb = 2.821 (secondary, descriptive)
+
+── A11 m = 3 p2, with the T3 cell
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  2   2.000  15     16     [4, 4]        62,62                0.0,0.0               ok,ok
+  3   3.000  20     21     [4, 4]        781,781              0.1,0.1               ok,ok
+  4   4.000  25     26     [4, 4]        3096,3096            1.9,1.8               ok,ok
+  5   5.000  30     31     [5, 5]        40486,40486          486.3,498.5           ok,ok
+  completed cells 4: σ = 0.3000  →  weak (0.25 < σ < 0.5);  Δlog₂ max_cols/Δb = 3.004 (secondary, descriptive)
+  (the width slopes above mix engines for A0 and are not used)
 
 ════ A0 m = 3 p1
 
