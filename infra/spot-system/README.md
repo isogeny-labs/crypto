@@ -136,8 +136,11 @@ Hook schema references: [Codex hooks and trust](https://learn.chatgpt.com/docs/h
 - No existing Auto Scaling membership was present.
 - Five running `factor_base_shape_ladder` jobs were found. The launcher has
   no native checkpoint, resume, or signal handling implementation. Approved
-  leave-running CRIU snapshots now exist locally and are refreshed by a timer;
-  actual legacy restore remains unverified. Do not terminate this host to test recovery.
+  leave-running CRIU snapshots exist locally and are refreshed by a timer.
+  Five explicitly authorized images were uploaded to private encrypted S3 and
+  restored successfully as copies on another m8i host. Automatic legacy recovery
+  and fenced ownership remain open; recurring S3 export awaits a separate grant.
+  Do not terminate this host to test recovery. See [CRIU_LOCAL.md](CRIU_LOCAL.md).
 
 ## Architecture and limits
 

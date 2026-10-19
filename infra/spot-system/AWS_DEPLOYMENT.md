@@ -8,7 +8,9 @@ allocation, capacity rebalancing and the 1,800-second idle timeout remain set.
 The managed workspace is `/srv/experiments/spot-worker`, its initial `jobs.json`
 is empty, and new node data goes under its `nodes/` directory. The original
 node database, project and five running experiments are separate. No legacy
-experiment was registered, restarted or declared recoverable by this deployment.
+experiment was registered with the native supervisor or restarted by this deployment.
+Separate authorized CRIU exports and copy-only restores of all five passed on
+2026-10-19; automatic legacy recovery remains disabled. See [CRIU_LOCAL.md](CRIU_LOCAL.md).
 Workers require the existing manifest and EFS mount; bootstrap does not create
 an empty replacement manifest if durable state is missing.
 

@@ -53,8 +53,11 @@ applied settings, quota requests and validation limits.
 Before activation, complete the recovery, workload migration, node writer-lock
 handoff and client installation gates in `README.md`. Existing non-checkpointed
 experiments do not acquire RAM recovery from these software uploads. Their
-approved CRIU memory snapshots remain private on the original retained disk;
-S3 memory export and actual legacy restore have separate unresolved gates.
+approved CRIU memory snapshots remain private on the original retained disk
+and in the explicitly authorized private S3 checkpoint prefix. All five copy
+restores passed on a separate compatible m8i host. Automatic legacy recovery,
+ownership handoff and recurring-export permission remain separate open gates.
+Memory archives are excluded from the software release and GitHub.
 
 ## Validation
 

@@ -3,13 +3,14 @@
   "bucket": "spot-experiments-runtimebucket-g8acwaz3kewm",
   "region": "us-east-2",
   "staged": false,
-  "deployment_phase": "managed-compute-ready-original-protected",
+  "deployment_phase": "managed-lifecycle-enabled-original-protected",
   "ip_cutover_enabled": false,
-  "managed_worker_ready": true,
+  "managed_worker_ready": false,
+  "managed_worker_bootstrap_verified": true,
   "deployment_bundle": {
-    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/releases/46000717286134315d639ec7f3940ab13fc5e9aee3af07b1a4e4a00bf7a683a6/spot-system.tar.gz",
-    "sha256": "46000717286134315d639ec7f3940ab13fc5e9aee3af07b1a4e4a00bf7a683a6",
-    "bytes": 99857730,
+    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/releases/0d147a8f63af342a7579fcae0c618a994cf6dcd24d0b9bc89b40abe12a05ee94/spot-system.tar.gz",
+    "sha256": "0d147a8f63af342a7579fcae0c618a994cf6dcd24d0b9bc89b40abe12a05ee94",
+    "bytes": 99939388,
     "description": "Applied AWS compute configuration, native solver checkpoint runtime, recovery gates and managed-worker validation evidence"
   },
   "client_installer": {

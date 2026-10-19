@@ -6,13 +6,16 @@ fixtures below validate durability and replay, not the research scorer's verdict
 Full test/build/disposable-probe logs are preserved byte-for-byte in
 `validation/raw-evidence.tar.gz`, with member hashes in `raw-evidence.json`.
 The adjacent text files are summaries. The archive contains no live memory images.
+The later export validation logs and exact executed copy-restore scripts are in
+`validation/private-export-evidence.tar.gz`, with member hashes in
+`private-export-evidence.json`; this archive also contains no process memory.
 
 | Requirement | Status and evidence |
 | --- | --- |
 | Publish complete deployable system to S3 | Uploaded; immutable object locations, SHA-256 and sizes in `artifacts.json` |
 | Publish source to aburan28/crypto | This directory contains controllers, worker services, client tooling, tests and the staged template |
 | Preserve private credentials and keys | Only explicitly allowlisted source/artifact files were packaged; no credential/key directories, PEM/key files or database state included |
-| Standalone infrastructure tests | 48 passed, including local CRIU identity/integrity/path/fallback cases; `validation/system-tests.txt` |
+| Standalone infrastructure tests | 52 passed, including export encryption/hash checks, identity/grant binding, local CRIU integrity/path/fallback; `validation/system-tests.txt` |
 | Native checkpoint discovery | 20 tests passed, including actual supervisor kill/restore with corrupt-generation fallback; `validation/checkpoint-tests.txt` |
 | Live discovery | Read-only timer installed and run successfully; five workers identified without a checkpoint interface; `validation/current-host-discovery.json` |
 | Python compilation and CloudFormation schema | Passed; exact source hashes/tool version in `validation/results.json` |
@@ -27,8 +30,9 @@ The adjacent text files are summaries. The archive contains no live memory image
 | Cross-worker native recovery | Disposable solver was SIGKILLed, its host terminated, and its automatic replacement restored column 1 and matched the reference; `validation/native-cross-host-restore.json` |
 | Real idle shutdown | Replacement idle around 22:00, controller scaled to zero at 22:30:32 UTC; `validation/managed-rebalance-activities.json` |
 | Existing process snapshots | Five leave-running dumps and scheduled local generations; `validation/live-criu-snapshots.json`, `local-criu-producer.json` |
-| Actual legacy process restore | Unverified: private local namespace probes stalled; see `problems/legacy-spot-process-recovery.md` |
-| S3 process-memory export | Not performed; automatic approval review requires explicit destination authorization because memory may contain credentials |
+| Actual legacy process restore | All five copies restored on separate m8i with matching kernel/libraries and CPU checks; two healthy threads and advancing CPU ticks; `validation/legacy-criu-cross-host-restore.json` |
+| S3 process-memory export | Five explicitly authorized archives, 6,923,934,633 bytes; private AES256 objects and full-download SHA-256 verified; `validation/private-criu-export.json` |
+| Recurring memory export | Disabled: separate authorization pending after automatic approval review rejected future uploads under the one-time grant |
 | Fixed IP and original host | IP still attached to the original host; no original process was restarted, terminated or migrated |
 
 The S3 objects were checked for matching lengths, stored SHA-256 metadata and
@@ -47,5 +51,6 @@ exceeds the traversal limit, some same-user processes deny procfs access, and
 the original host has no managed jobs manifest. Durable state and live working
 directories are prioritized; this report is not evidence that every checkpoint
 on the entire disk was examined. The five current factor-base workers still
-require validated legacy restore and ownership handoff before replacement/
-cutover; taking a dump is insufficient.
+require automatic recovery and fenced ownership handoff before replacement/
+cutover. The five manual copy restores establish the tested compatible-host
+scope; they do not establish automatic recovery or arbitrary CPU portability.

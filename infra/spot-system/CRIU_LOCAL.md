@@ -3,8 +3,11 @@
 The five original processes were started from an executable without native
 checkpoint support. The user explicitly authorized brief CRIU snapshot pauses.
 CRIU 4.2.1 produced leave-running dumps of all five; the first measured freezes
-were 0.46–1.29 seconds. All sources continued. This does not yet establish a
-working legacy restore or automatic legacy failover.
+were 0.46–1.29 seconds. All sources continued. This does not yet establish
+automatic legacy failover. On 2026-10-19, copies of all five images restored on
+a separate `m8i.8xlarge` with matching kernel and library hashes. Both threads
+of each copy ran and its CPU ticks advanced during a 10-second check; only the
+copies were stopped. See [the cross-host evidence](validation/legacy-criu-cross-host-restore.json).
 
 `criu_local.py` is a generic infrastructure producer for those explicitly
 registered PIDs. It checks the executable, process start ticks, command digest
@@ -38,18 +41,36 @@ directory-permission mismatches, which the producer now fixes. Later private
 PID/mount/network-namespace probes stalled at CRIU's restoration barrier. Their
 namespaces were cleaned up; original processes were never stopped or replaced.
 [The remaining recovery obligation](../../problems/legacy-spot-process-recovery.md)
-tracks compatible-worker validation, clocks, ownership and cutover.
+tracks clocks, ownership, automatic recovery and cutover. Subsequent direct
+restores on the separate compatible worker passed; the earlier namespace
+failures remain recorded and their cause is not established.
 
-Snapshots are on the original retained EBS volume, not on a replacement's
-disposable root. A new host does not automatically attach this volume. Cross-AZ
-recovery needs a disk snapshot/copy or explicitly authorized off-host export.
-No memory image is in GitHub or the software deployment bundle.
+Local snapshots remain on the original retained EBS volume. A new host does not
+automatically attach that volume. The user explicitly authorized export of the
+five current memory images, including possible inherited credentials, to the
+private bucket `spot-experiments-runtimebucket-g8acwaz3kewm`. All five archives
+were uploaded under `checkpoints/criu/20261019T011736Z-7bad660db8bb/`, with AES256
+server-side encryption, SHA-256 metadata and full download/hash verification.
+The 6,923,934,633-byte batch commits its index after verifying every archive.
+`checkpoints/criu/latest.json` points to the verified index. See
+[the export receipt](validation/private-criu-export.json).
 
-Automatic approval review blocked S3 memory export because full process images
-can include inherited credentials. Explicit permission for the private bucket
-has been requested. Until resolved, the producer has no export code or enabled
-export path. Do not treat general permission to upload software as permission
-to publish process memory. Credentials and snapshots must never enter public Git.
+`criu_export.py` takes a private copy of the newest fully verified generations
+under the producer lock, then releases that lock before compression and upload.
+It requires a root-owned private authorization file bound to the bucket and
+registered process identities. A one-time grant also binds exact generation
+names; future generations require separate recurring authorization. An index
+and discovery pointer are published only after every archive passes encryption,
+size, metadata and full-download SHA-256 checks. Failed staging stays private
+for diagnosis. Completed staging is removed; S3 archives are retained.
+
+Automatic approval review initially blocked memory export; the user's explicit
+grant resolved the one-time export. Review separately rejected enabling future
+scheduled exports because it interpreted that grant as covering only the five
+current images. Recurring permission has been requested. The export service
+and timer are provided for review but are not installed or enabled. The existing
+15-minute local snapshot timer continues. No memory image is in GitHub or the
+software deployment bundle; credentials and snapshots must never enter public Git.
 
 ## Reproduce installation
 

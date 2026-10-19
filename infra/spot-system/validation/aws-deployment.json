@@ -1,6 +1,6 @@
 {
   "schema": "spot.aws-deployment/v2",
-  "observed_utc": "2026-10-18T23:18:43.066294+00:00",
+  "observed_utc": "2026-10-19T01:27:23.550136+00:00",
   "stack": "spot-experiments",
   "region": "us-east-2",
   "stack_status": "UPDATE_COMPLETE",
@@ -11,23 +11,8 @@
   "ip_cutover_enabled": false,
   "idle_seconds": 1800,
   "desired_capacity_managed_by": "lifecycle-only; template DesiredCapacity removed",
-  "desired_capacity": 1,
-  "managed_instances": [
-    {
-      "InstanceId": "i-03b522c4152a4d83c",
-      "InstanceType": "m6a.8xlarge",
-      "AvailabilityZone": "us-east-2c",
-      "AvailabilityZoneId": "use2-az3",
-      "LifecycleState": "InService",
-      "HealthStatus": "Healthy",
-      "LaunchTemplate": {
-        "LaunchTemplateId": "lt-0a663a3e15a051473",
-        "LaunchTemplateName": "Template_mQUD6gyzx0rc",
-        "Version": "11"
-      },
-      "ProtectedFromScaleIn": false
-    }
-  ],
+  "desired_capacity": 0,
+  "managed_instances": [],
   "distribution": {
     "OnDemandAllocationStrategy": "lowest-price",
     "OnDemandBaseCapacity": 0,
@@ -66,22 +51,9 @@
   },
   "lifecycle_status": {
     "state": "enabled",
-    "control": {
-      "Id": {
-        "S": "control"
-      },
-      "WakeUntil": {
-        "N": "1792366204"
-      },
-      "IdleSince": {
-        "N": "1792364971"
-      }
-    },
-    "desired": 1,
-    "compute_ready": true,
-    "ready_instance_ids": [
-      "i-03b522c4152a4d83c"
-    ],
+    "desired": 0,
+    "compute_ready": false,
+    "ready_instance_ids": [],
     "cutover_enabled": false,
     "ssh_endpoint_ready": false
   },
@@ -97,14 +69,20 @@
   "criu": {
     "packaged_3_17_1": "dump succeeded; disposable restore failed sys_rseq -22",
     "upstream_4_2_1": "disposable same-host dump/kill/restore passed; counter advanced",
-    "live_experiments": "no snapshots or signals; pause decision pending"
+    "live_experiments": "five approved leave-running snapshots; all original processes preserved"
   },
   "live_criu": {
     "snapshots": "five approved leave-running snapshots plus scheduled checksummed local generations",
     "private_store": "/var/lib/spot-criu-managed",
     "interval_seconds_after_run": 900,
     "retained_generations_per_pid": 2,
-    "off_host_memory_export": "blocked by automatic approval review pending explicit destination authorization",
-    "live_restore": "private same-host namespace probe stalled; no off-host/live recovery claim"
+    "off_host_memory_export": "five authorized private AES256 archives; full download SHA-256 verified",
+    "live_restore": "all five copies restored and ran on separate compatible m8i; copies stopped and validator terminated",
+    "automatic_recovery": false,
+    "recurring_memory_export_enabled": false,
+    "evidence": [
+      "private-criu-export.json",
+      "legacy-criu-cross-host-restore.json"
+    ]
   }
 }
