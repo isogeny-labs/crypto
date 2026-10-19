@@ -2663,7 +2663,7 @@ impl ReducedBasis {
             (n_old as u64).div_ceil(2)
                 + 2 * self.rows.len() as u64
                 + self.history.len() as u64
-                + if eager_rewrite() {
+                + if eager_mode() != EagerMode::Off {
                     2 * n_old.div_ceil(64) as u64
                 } else {
                     0
