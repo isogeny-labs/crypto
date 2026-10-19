@@ -1151,3 +1151,24 @@ See [the Gröbner comparison protocol](groebner_compare/README.md) for the bound
 Boolean worker runner, independent basis certificates, learn/apply fallback
 accounting, and immutable diagnostic receipts. These are solver-stage controls;
 no full-DLP speedup or research-state transition is implied.
+
+## Certicom ECC2-131 and ECCp-131
+
+The random binary ECC2-131 and prime-field ECCp-131 challenges are in the
+curve catalog. `ECC2-130` and `ECCp-130` are accepted aliases for these
+published 131-bit names. ECC2K-130 retains its separate Koblitz parameters.
+Both challenge loaders in [`src/ecc/certicom.rs`](src/ecc/certicom.rs)
+return the published generator, subgroup order, cofactor, and target Q from
+[Certicom's parameter list](https://www.certicom.com/en/curves-list).
+
+```sh
+cargo run --release --bin icx -- inspect ECC2-130 --json
+cargo run --release --bin icx -- inspect ECCp-130 --json
+cargo run --release --bin ecdlp-nist -- solve ECCp-130 --secret 42 --interval-bits 8 --method bsgs --json
+```
+
+`ecdlp-nist solve <curve> --challenge` selects the published Q for either
+field. Full-width solving retains the existing feasibility and iteration
+budgets. The tests check both published points on each curve and verify
+`[n]G = [n]Q = O`; interval tests recover planted scalars. This adds parameter
+and arithmetic coverage; it does not establish a full-width challenge solution.
