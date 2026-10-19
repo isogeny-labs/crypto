@@ -150,7 +150,9 @@ impl Kummer {
             }
         };
         let g = rng.gen_range(2..p);
-        let v = (0..1u64 << t).map(|k| mulm(g, powm(zeta, k, p), p)).collect();
+        let v = (0..1u64 << t)
+            .map(|k| mulm(g, powm(zeta, k, p), p))
+            .collect();
         Ok(Kummer { t, g, v })
     }
 
@@ -373,7 +375,9 @@ impl Engine {
             "sig-f5" => Ok(Engine::SigF5),
             "f6" => Ok(Engine::F6),
             "enum" => Ok(Engine::Enum),
-            other => Err(format!("pkm-tower engine `{other}`: use f4, sig-f5, f6 or enum")),
+            other => Err(format!(
+                "pkm-tower engine `{other}`: use f4, sig-f5, f6 or enum"
+            )),
         }
     }
 }
@@ -468,7 +472,9 @@ impl<'i> PkmTowerOracle<'i> {
         }
         let engine = self.engine;
         let solve = || match engine {
-            Engine::SigF5 => sig_fp_tower::sig_f4_tower_with(&input, ring, &opts, SigOptions::default()).report,
+            Engine::SigF5 => {
+                sig_fp_tower::sig_f4_tower_with(&input, ring, &opts, SigOptions::default()).report
+            }
             _ => f4_fp_tower::f4_tower(&input, ring, &opts),
         };
         let start = Instant::now();
@@ -542,7 +548,9 @@ impl<'i> PkmTowerOracle<'i> {
         for &x1 in xs {
             self.tally.closure_candidates += 1;
             counters.lookups += 1;
-            let Some(above) = fb.x_index.get(&x1) else { continue };
+            let Some(above) = fb.x_index.get(&x1) else {
+                continue;
+            };
             let i = above[0];
             let p1 = fb.points[i];
             for (sign_i, q) in [
@@ -592,7 +600,11 @@ impl<'i> PkmTowerOracle<'i> {
                     let inv = powm(mulm(2, qa, p), p - 2, p);
                     let r1 = mulm(subm(s, qb, p), inv, p);
                     let r2 = mulm(subm(subm(0, s, p), qb, p), inv, p);
-                    if r1 == r2 { vec![r1] } else { vec![r1, r2] }
+                    if r1 == r2 {
+                        vec![r1]
+                    } else {
+                        vec![r1, r2]
+                    }
                 }
             }
         };
@@ -683,8 +695,14 @@ impl DecompositionOracle<PrimeCurve> for PkmTowerOracle<'_> {
             ("seed", "tower seed, as the base's (default 1)"),
             ("engine", "f4, sig-f5, f6 or enum (default f4)"),
             ("degree", "tower engines' degree cap (default 20)"),
-            ("cap", "f6: close a node with at most this many candidates (default 4)"),
-            ("budget_ms", "per-node solver deadline; 0 = none (default 0)"),
+            (
+                "cap",
+                "f6: close a node with at most this many candidates (default 4)",
+            ),
+            (
+                "budget_ms",
+                "per-node solver deadline; 0 = none (default 0)",
+            ),
         ]
     }
 
@@ -696,7 +714,10 @@ impl DecompositionOracle<PrimeCurve> for PkmTowerOracle<'_> {
         _ops: &mut GroupOps,
     ) -> Result<(), String> {
         if self.summands != 2 {
-            return Err(format!("pkm-tower decomposes into m = 2 points, not {}", self.summands));
+            return Err(format!(
+                "pkm-tower decomposes into m = 2 points, not {}",
+                self.summands
+            ));
         }
         self.engine = Engine::parse(params.get("engine").unwrap_or("f4"))?;
         self.max_degree = params.u64_or("degree", 20)? as u32;
@@ -716,7 +737,11 @@ impl DecompositionOracle<PrimeCurve> for PkmTowerOracle<'_> {
         // The base must be this tower's: every abscissa of it in V.
         let mut v = tower.v.clone();
         v.sort_unstable();
-        if let Some(x) = fb.abscissa_list.iter().find(|x| v.binary_search(x).is_err()) {
+        if let Some(x) = fb
+            .abscissa_list
+            .iter()
+            .find(|x| v.binary_search(x).is_err())
+        {
             return Err(format!(
                 "base abscissa {x} is not in the oracle's tower (t = {t}, seed {seed}): use prime-tower with the same t and seed"
             ));
@@ -743,7 +768,11 @@ impl DecompositionOracle<PrimeCurve> for PkmTowerOracle<'_> {
                 .map_err(|e| format!("tower engine pool: {e}"))?,
         );
         self.totals = SolverTotals {
-            solver: format!("pkm-tower {} (degree {})", params.get("engine").unwrap_or("f4"), self.max_degree),
+            solver: format!(
+                "pkm-tower {} (degree {})",
+                params.get("engine").unwrap_or("f4"),
+                self.max_degree
+            ),
             op_unit: MULADD_UNIT.into(),
             ..SolverTotals::default()
         };
@@ -819,13 +848,22 @@ mod tests {
         let tower = Kummer::new(p, 6, 1).unwrap();
         o.ring = Some(tower.ring(p));
         o.tower = Some(tower);
-        for (x_r, c) in [(5u64, None), (5, Some((5usize, 1u64))), (5, Some((5, p - 1))), (99, Some((5, 1))), (99, Some((5, p - 1))), (300, Some((5, 1))), (300, Some((5, p - 1)))] {
+        for (x_r, c) in [
+            (5u64, None),
+            (5, Some((5usize, 1u64))),
+            (5, Some((5, p - 1))),
+            (99, Some((5, 1))),
+            (99, Some((5, p - 1))),
+            (300, Some((5, 1))),
+            (300, Some((5, p - 1))),
+        ] {
             let input = o.system(x_r, c);
             let ring = o.ring.as_ref().unwrap();
             for d in [8u32, 12, 20] {
                 let opts = TowerF4Options::new(d);
                 let f4 = f4_fp_tower::f4_tower(&input, ring, &opts);
-                let sig = sig_fp_tower::sig_f4_tower_with(&input, ring, &opts, SigOptions::default());
+                let sig =
+                    sig_fp_tower::sig_f4_tower_with(&input, ring, &opts, SigOptions::default());
                 eprintln!(
                     "x_R {x_r} {c:?} cap {d}: f4 inc {} D {} reached {} | sig inc {} D {} reached {} steps {} timed {} over {} basis {}",
                     f4.inconsistent, f4.solving_degree_max, f4.degree_reached,
@@ -854,12 +892,18 @@ mod tests {
             field_degree: None,
         };
         let params = Params::parse_spec("x:t=6,seed=1,engine=f4").unwrap().1;
-        let fb = PrimeTowerBase { instance: &inst }.build(&ctx, &params, &mut base_ops).unwrap();
+        let fb = PrimeTowerBase { instance: &inst }
+            .build(&ctx, &params, &mut base_ops)
+            .unwrap();
         let run = |threads: usize| -> u64 {
-            let pool = rayon::ThreadPoolBuilder::new().num_threads(threads).build().unwrap();
+            let pool = rayon::ThreadPoolBuilder::new()
+                .num_threads(threads)
+                .build()
+                .unwrap();
             pool.install(|| {
                 let mut o = PkmTowerOracle::new(2, &inst);
-                o.prepare(&ctx, &fb, &params, &mut GroupOps::default()).unwrap();
+                o.prepare(&ctx, &fb, &params, &mut GroupOps::default())
+                    .unwrap();
                 // Whole decompositions: deep nodes reduce enough rows for
                 // the chunking to matter (the shallow ones do not).
                 let mut ops = GroupOps::default();
@@ -872,7 +916,11 @@ mod tests {
                 o.totals.ops
             })
         };
-        assert_eq!(run(1), run(4), "the oracle's count depends on the caller's threads");
+        assert_eq!(
+            run(1),
+            run(4),
+            "the oracle's count depends on the caller's threads"
+        );
     }
 
     #[test]

@@ -59,7 +59,10 @@ fn read(dir: &str) -> Result<(String, Vec<Run>), String> {
             .and_then(|p| p["wall_ns"].as_u64());
         runs.push(Run {
             arm: r["arm"].as_str().unwrap_or("?").to_string(),
-            workload: r["workload"]["workload_id"].as_str().unwrap_or("?").to_string(),
+            workload: r["workload"]["workload_id"]
+                .as_str()
+                .unwrap_or("?")
+                .to_string(),
             status: r["outcome"]["status"].as_str().unwrap_or("?").to_string(),
             slug: curve["slug"].as_str().unwrap_or("?").to_string(),
             bits: curve["field_bits"].as_u64().unwrap_or(0),
@@ -109,7 +112,9 @@ fn cell(slug: &str, runs: &[&Run]) -> Value {
     let first = runs[0];
     let mut by: BTreeMap<&str, BTreeMap<&str, &Run>> = BTreeMap::new();
     for r in runs {
-        by.entry(r.arm.as_str()).or_default().insert(r.workload.as_str(), r);
+        by.entry(r.arm.as_str())
+            .or_default()
+            .insert(r.workload.as_str(), r);
     }
     let mut arms = serde_json::Map::new();
     let mut failed = Vec::new();
@@ -163,13 +168,17 @@ fn cell(slug: &str, runs: &[&Run]) -> Value {
         let (Some(ra), Some(rb)) = (by.get(a), by.get(b)) else {
             return Vec::new();
         };
-        if !medians_ok.get(a).copied().unwrap_or(false) || !medians_ok.get(b).copied().unwrap_or(false) {
+        if !medians_ok.get(a).copied().unwrap_or(false)
+            || !medians_ok.get(b).copied().unwrap_or(false)
+        {
             return Vec::new();
         }
         ra.iter()
             .filter_map(|(w, x)| {
                 let y = rb.get(w)?;
-                (x.status == "verified" && y.status == "verified").then(|| f(x, y)).flatten()
+                (x.status == "verified" && y.status == "verified")
+                    .then(|| f(x, y))
+                    .flatten()
             })
             .collect()
     };
@@ -180,7 +189,10 @@ fn cell(slug: &str, runs: &[&Run]) -> Value {
     let f5f4 = paired("sig-f5", "f4", &|x, y| Some(x.w? as f64 / y.w? as f64));
     if !f5f4.is_empty() {
         let same = paired("sig-f5", "f4", &|x, y| {
-            Some((x.tree == y.tree && x.trials == y.trials && x.relations == y.relations) as u8 as f64)
+            Some(
+                (x.tree == y.tree && x.trials == y.trials && x.relations == y.relations) as u8
+                    as f64,
+            )
         });
         let all_same = same.iter().all(|&v| v == 1.0);
         let verdict = if failed_cell {
@@ -192,7 +204,9 @@ fn cell(slug: &str, runs: &[&Run]) -> Value {
         } else {
             "mixed"
         };
-        let wall = paired("sig-f5", "f4", &|x, y| Some(x.wall_ns? as f64 / y.wall_ns? as f64));
+        let wall = paired("sig-f5", "f4", &|x, y| {
+            Some(x.wall_ns? as f64 / y.wall_ns? as f64)
+        });
         q.insert(
             "q1_sig_f5_over_f4_muladds".into(),
             json!({"ratio": summary(&f5f4), "same_tree_on_every_target": all_same,
@@ -235,7 +249,10 @@ fn cell(slug: &str, runs: &[&Run]) -> Value {
         } else {
             "mixed"
         };
-        q3.insert(arm.into(), json!({"s_ratio": summary(&v), "verdict": verdict}));
+        q3.insert(
+            arm.into(),
+            json!({"s_ratio": summary(&v), "verdict": verdict}),
+        );
     }
     if !q3.is_empty() {
         q.insert("q3_s_over_rho_negation".into(), Value::Object(q3));
@@ -247,7 +264,9 @@ fn cell(slug: &str, runs: &[&Run]) -> Value {
         let priced = paired(arm, "enum", &|x, y| {
             Some((x.s? + x.w? as f64 / MULADDS_PER_GAE / x.r.sqrt()) / y.s?)
         });
-        let wall = paired(arm, "enum", &|x, y| Some(x.wall_ns? as f64 / y.wall_ns? as f64));
+        let wall = paired(arm, "enum", &|x, y| {
+            Some(x.wall_ns? as f64 / y.wall_ns? as f64)
+        });
         if !s.is_empty() {
             q4.insert(
                 arm.into(),
@@ -316,7 +335,10 @@ fn main() -> Result<(), String> {
                 ys.push(m.log2());
             }
         }
-        q5.insert(arm.into(), json!({"cells": xs.len(), "slope_log2_s_per_log2_r": slope(&xs, &ys)}));
+        q5.insert(
+            arm.into(),
+            json!({"cells": xs.len(), "slope_log2_s_per_log2_r": slope(&xs, &ys)}),
+        );
     }
     let out = json!({
         "schema": "pkm-tower-prime-analysis/v1",

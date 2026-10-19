@@ -41,7 +41,8 @@ use crate::cryptanalysis::gaudry_quartic_d4::{
 use crate::cryptanalysis::ic_boundary::{
     price_phase, rho_cap, rho_reference, rho_walk_with, signed_frobenius_rho_tuned, BinaryGroup,
     BinaryInstance, Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses,
-    PhaseCost, PointClasses, PrimeCurve, PrimeInstance, PrimePoint, QuarticClasses, RhoResult, RhoWalk,
+    PhaseCost, PointClasses, PrimeCurve, PrimeInstance, PrimePoint, QuarticClasses, RhoResult,
+    RhoWalk,
 };
 use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
 use crate::cryptanalysis::ic_framework::fiber::{
