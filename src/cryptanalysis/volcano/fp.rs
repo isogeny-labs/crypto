@@ -71,11 +71,22 @@ pub fn find_instance(
     smooth_slack: Option<u32>,
 ) -> Result<Instance, String> {
     class_one_j(d).ok_or("D must be a class-number-one fundamental discriminant")?;
+    if !is_prime_u64(ell) {
+        return Err("ell must be prime".into());
+    }
     if !(3..=62).contains(&bits) || m > k {
         return Err("need 3 <= bits <= 62 and m <= k".into());
     }
-    let f = ell.pow(k) as i128;
+    let f = ell
+        .checked_pow(k)
+        .ok_or("conductor ell^k exceeds the supported integer range")? as i128;
     let dd = d as i128;
+    // Bound f before squaring: the lower end of the requested p-bit interval
+    // requires |D| f² < 2^(bits+1), and the check must not itself overflow.
+    let max_f = isqrt((1i128 << (bits + 1)) / -dd);
+    if f > max_f {
+        return Err("bits too small for this depth: need p >= |D| f² / 4".into());
+    }
     if (d.rem_euclid(8) == 1) && f % 2 == 1 {
         return Err(
             "local obstruction: D ≡ 1 (mod 8) with odd f makes N(π) even; use an even conductor"
@@ -639,6 +650,14 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn invalid_isogeny_degree_and_conductor_overflow_are_rejected() {
+        assert!(find_instance(0, -7, 1, 0, 40, 7, None).is_err());
+        assert!(find_instance(1, -7, 1, 0, 40, 7, None).is_err());
+        assert!(find_instance(4, -7, 1, 0, 40, 7, None).is_err());
+        assert!(find_instance(2, -7, 128, 0, 40, 7, None).is_err());
     }
 
     #[test]
