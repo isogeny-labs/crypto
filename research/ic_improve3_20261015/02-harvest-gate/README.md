@@ -8,10 +8,10 @@ This is round 3, item 02 ([`../RULES.md`](../RULES.md)). The protocol is [`PROTO
 
 ## Verdict
 
-**C ADVANCES at the constant level and REGRESSES nowhere. It is now the engine's default.**
+**Historical result:** C advanced against G0 under the original protocol. **R10 re-rate:** production regresses versus harvest off at (17,9) m2 (CPU 0.872 [0.771, 0.988], word operations 0.765); see [`pinned ledger`](../../../ic_tool_program/ledger/r10-20261019/README.md).
 
 - **The bar is met.**
-  - No cell regresses against G0, in the oracle bench or in the production call.
+  - Under the original G0 comparator no cell regressed. R10 identifies a regression at (17,9) m2 when compared with harvest off.
   - (29,15) m2 advances **1.41× [1.32, 1.52]** in CPU and 1.29× in word operations.
   - Root sets are identical on every target and every arm: 0 failures in 248 test, 144 training and 142 identity rows.
 - **Default and opt-outs.**
