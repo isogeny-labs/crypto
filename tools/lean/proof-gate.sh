@@ -88,7 +88,7 @@ run_target() {
       # sources compile directly into a private directory and are audited too,
       # so frozen Lake configurations need no edits. Tools and fixtures are outside
       # the proof inventory. Nested Lake projects are owned by their own gate.
-      local source rel owner aux auxfile probe
+      local source rel module owner aux auxfile probe
       aux="$log/aux"
       mkdir -p "$aux"
       : > "$log/sources.log"
@@ -103,7 +103,11 @@ run_target() {
         [ "$t" = . ] && rel=$source
         printf '%s\n' "$rel" >> "$log/sources.log"
         probe="$log/source-target.log"
-        if ! (cd "$root/$t" && lake build "$rel") > "$probe" 2>&1; then
+        # Lake takes a module target here. Passing "Foo.lean" asks it for
+        # Foo/lean.lean, so convert the tracked source path to Foo.Bar.
+        module=${rel%.lean}
+        module=${module//\//.}
+        if ! (cd "$root/$t" && lake build "$module") > "$probe" 2>&1; then
           if grep -q 'unknown target' "$probe"; then
             printf 'direct source compile: %s\n' "$rel" >> "$log/build.log"
             auxfile="$aux/${rel%.lean}.olean"
@@ -132,7 +136,7 @@ run_target() {
         : # Do not turn an omitted/unbuildable source into an audit success.
       elif [ -z "$mods" ]; then
         status=FAIL_no_modules
-      elif ! (cd "$root/$t" && LEAN_PATH="$aux:${LEAN_PATH:-}" lake env lean --run "$audit" "${trust_args[@]}" $mods) > "$log/audit.log" 2>&1; then
+      elif ! (cd "$root/$t" && LEAN_PATH="$aux:${LEAN_PATH:-}" lake env lean --run "$audit" -- ${trust_args[@]+"${trust_args[@]}"} $mods) > "$log/audit.log" 2>&1; then
         status=FAIL_audit
       fi
     fi
@@ -145,7 +149,7 @@ run_target() {
     toolchain=$(cat "$(dirname "$root/$t")/lean-toolchain" 2>/dev/null || true)
     if ! (cd "$(dirname "$root/$t")" && lean -o "$dir/$mod.olean" "$root/$t") > "$log/build.log" 2>&1; then
       status=FAIL_build
-    elif ! (cd "$(dirname "$root/$t")" && LEAN_PATH="$dir:${LEAN_PATH:-}" lean --run "$audit" "${trust_args[@]}" "$mod") > "$log/audit.log" 2>&1; then
+    elif ! (cd "$(dirname "$root/$t")" && LEAN_PATH="$dir:${LEAN_PATH:-}" lean --run "$audit" -- ${trust_args[@]+"${trust_args[@]}"} "$mod") > "$log/audit.log" 2>&1; then
       status=FAIL_audit
     fi
     [ -n "$toolchain" ] && echo "toolchain pin: $toolchain" >> "$log/build.log"
