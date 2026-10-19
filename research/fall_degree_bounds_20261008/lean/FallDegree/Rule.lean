@@ -13,6 +13,8 @@ The registered rules of `PREREGISTRATION.md` that are integer statements:
   every unsatisfiable draw has `d_F ≤ 4` and every satisfiable draw has
   `d_last ≤ 4`; "Semaev-specific" (Part D′) if every control shape has
   median `d_last ≥ 5`.
+- **Amendment 7/8 reading** (E7, exploratory): "bounded through m = 6" if
+  every E7 draw has `d_F ≤ 4`; "grows" if some E7 cell has median `d_F ≥ 5`.
 
 The LOG/LIN model comparison of E3 uses logarithms and is computed in Rust,
 not here. A censored value (`none`) is "above the cap", recorded as the cap
@@ -22,7 +24,8 @@ plus one, so a censored draw can never satisfy a `≤` bound it might break.
 namespace FallDegree
 
 /-- One measured draw: `kind` 0 = E3 (m = 2), 1 = E4/extension/Part A/B
-(unsat, ladder), 2 = Part C (sat), 3 = Part D′ control. `value` is `d_F`
+(unsat, ladder), 2 = Part C (sat), 3 = Part D′ control, 4 = E7 (unsat,
+`m ≥ 5`, new draws). `value` is `d_F`
 or `d_last`; `none` = censored above `cap`. `dstar` is the ladder's plain
 `D*` where recorded (a lower bound when `dstarAtLeast`). -/
 structure Row where
@@ -100,6 +103,14 @@ def semaevSpecific (rs : List Row) : Bool :=
   let c := rs.filter (·.kind == 3)
   !c.isEmpty && (keys c).all fun k => decide (5 ≤ medianOf c k)
 
+def e7 (rs : List Row) : List Row := rs.filter (·.kind == 4)
+
+def e7Bounded (rs : List Row) : Bool :=
+  !(e7 rs).isEmpty && (e7 rs).all fun r => decide (r.v ≤ 4)
+
+def e7Grows (rs : List Row) : Bool :=
+  (keys (e7 rs)).any fun k => decide (5 ≤ medianOf (e7 rs) k)
+
 structure Report where
   p3a : Bool
   p3b : Bool
@@ -107,11 +118,14 @@ structure Report where
   p4b : Bool
   bounded : Bool
   semaevSpecific : Bool
+  e7Bounded : Bool
+  e7Grows : Bool
   deriving DecidableEq, Repr
 
 def report (rs : List Row) : Report :=
   { p3a := p3a rs, p3b := p3b rs, p4a := p4a rs, p4b := p4b rs,
-    bounded := boundedAtToySize rs, semaevSpecific := semaevSpecific rs }
+    bounded := boundedAtToySize rs, semaevSpecific := semaevSpecific rs,
+    e7Bounded := e7Bounded rs, e7Grows := e7Grows rs }
 
 -- sanity on hand-made rows
 private def r0 (n v : Nat) : Row := { kind := 0, m := 2, n, ell := n / 2, shape := n, value := some v, cap := 6, dstar := none, dstarAtLeast := false }
