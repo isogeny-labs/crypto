@@ -82,6 +82,7 @@ Limits: toy curves (p $<= 2^32$), 6 $j=0$ curves per size (curve-level intervals
 == Deviations and disclosures
 - Amendments 1--4 (`PROTOCOL.md`): fresh a=1 curves; tuned-against-tuned baseline; inadmissible exhausted arms and a doubled grid at 32 bits (before any 32-bit test spec).
 - The model-tier card / relay (AGENTS.md "Model tiers") was not used; the main session ran the frozen script `run_sessions.sh` directly.
-- New curves are not yet in the curve registry (`registered=false`); they are identified by explicit parameters in the specs.
+- The new curves are registered (`docs/curves/sources/specs.txt` and `generated.json`, registry regenerated); the sessions were run before registration, so their records say `registered=false`.
+- CI check `canonical identities and upstream mirror` fails on the IC semantic mirror drift, which this PR does not touch (see the PR comment; fix in \#2253).
 - Pilot runs on other curves (seed 9001) preceded the freeze; discarded.
 - Bugbot declined to review the PR (size, from committed session records).
