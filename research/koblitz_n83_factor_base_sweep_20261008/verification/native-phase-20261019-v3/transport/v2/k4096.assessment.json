@@ -1,0 +1,26 @@
+{
+  "card_id": "CARD-n83-native-phase-20261019-v2-k4096",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "outcome": "stopped",
+  "stopped_at_step": "k4096",
+  "recommendation": "respecify",
+  "interpretation": "not_assessed",
+  "reasons": [
+    "Native card-check independently verified the actual relay verbatim and all recorded stream/output digests; receipt status stopped at command1.",
+    "Frozen argv executed once without command timeout; worker exited1; runner rejected missing terminal without wall censoring; required audit.json is absent.",
+    "Worker stderr reports requested primary base absent. Frozen runner uses public_x_sequential; retained K4096 manifest reports public_x_hash. This is a specification/workload-selection failure before search, not a bounded search outcome.",
+    "outer.json reports exit_code1,wall_censored=false,cleanup_verified=true,outer_wall_ms1091.1417219999998; raw failure evidence remains preserved.",
+    "Receipt card_changed=false and dirty_before/dirty_after are empty; no executor deviation observed.",
+    "Both independently requested v2 retained cards were attempted after completed v2 controls. Their pre-search failures remain distinct records. A corrected policy requires an explicit new freeze and cards."
+  ],
+  "evidence": {
+    "card": "/home/ec2-user/scratch/n83-native-phase-20261019/v2/cards/k4096.json",
+    "relay": "/home/ec2-user/scratch/n83-native-phase-20261019/v2/k4096-relay.txt",
+    "relay_sha256": "b27bbf2908df273c58d7054502757e5fe039264b43985d504afefd0dd0825028",
+    "receipt": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/k4096.receipt.json",
+    "raw_error": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/k4096/stderr.log"
+  },
+  "search_completed": false,
+  "performance_or_scalar_promotion": false
+}

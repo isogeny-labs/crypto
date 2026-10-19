@@ -1,5 +1,17 @@
 # Degree-83 factor-base sweep: observed evidence
 
+The [19 October native continuation](verification/native-phase-20261019-v3/RESULT.md)
+completed matched retained K2048 and K4096 diagnostics at 1,000 conflicts,
+with zero models, relations and rank in each. Actual public-query replay,
+phase traces, resources and cleanup passed native audit. This resolves the
+bounded terminal-observability gate; full cold selection remains unknown.
+The original free-selector positive-control timeout and two wrong-policy
+launch failures are retained separately. The [visual report and inspected
+PDF](reports/run-20261019T0140Z/REPORT.md) document the controls and limits.
+The [approved raw ZIP publication](verification/raw-approved-publication-20261019/RESULT.md)
+also completed: all 224 entries verified after a fresh S3 download. It
+supersedes the pending-upload state recorded in older frozen reports.
+
 The [visual run report and inspected PDF](reports/run-20261018T2130Z/REPORT.md)
 qualify historical supervision tooling and separate frozen-source validation
 from post-merge native integration checks.
@@ -13,7 +25,8 @@ K4096's installed model has 131,958 variables and 2,021,197 clauses. Both
 zero relations and rank zero; K4096's short control was wall-censored at
 180 seconds. Censored final counters remain unknown. The
 [K4096 observability gate](../../problems/n83-native-k4096-terminal-observability.md)
-and full cold-runtime selection remain unresolved.
+was unresolved at that stage; the later native continuation above resolves
+its bounded scope. Full cold-runtime selection remains unresolved.
 
 The [user-selected S3 publication](verification/setec-publication-20261018/RESULT.md)
 uploaded the exact reconstructed primary K2048 archive and compact public

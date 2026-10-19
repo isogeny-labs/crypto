@@ -1,5 +1,11 @@
 # Factor-base sweep for degree-83 Koblitz index calculus
 
+Latest: the [19 October native retained-base continuation](verification/native-phase-20261019-v3/RESULT.md)
+completed K2048/K4096 at the matched 1,000-conflict bound with zero models,
+relations and rank. The [approved historical raw ZIP](verification/raw-approved-publication-20261019/RESULT.md)
+is uploaded and verified in `setec-astronomy-artifacts`. Full cold-runtime
+selection and the full finite-grid sweep remain open.
+
 Date: 2026-10-08. The primary objective is the lowest fully charged index-calculus runtime for one public known-answer target. Construction, orbit/index preparation, failed relation attempts, lifting, partial-relation processing, linear algebra, individual logarithm, verification and artifact I/O all belong in the cold cost. Reusable online-only cost is a separate secondary measurement. A candidate is a factor base together with its oracle, solver and resource configuration; a base cannot be selected by cardinality or relation yield alone.
 
 The exact primary model is `icv1-f2m83-tm6151469093347-debefd74`, with equation `y^2 + xy = x^3 + 1`, polynomial-basis modulus `z^83 + z^45 + z^2 + z + 1`, subgroup order `2417851639230796216685689`, and cofactor 4. Its generator is pinned in the native exporter. The diagnostic model is `icv1-f2m83-t6151469093347-cdcc5432`, with `a=1`, the same modulus, subgroup order `8569786107849059`, and cofactor `1128547018`. These are different workloads: an 81-bit subgroup and a 53-bit subgroup. The degree alone does not identify a workload. The slugs were checked against the registry at `c70c32d486a3ac7531fe27f7193d9f09caa58344`; exact representations, generators and subgroup parameters are retained in every exported header.

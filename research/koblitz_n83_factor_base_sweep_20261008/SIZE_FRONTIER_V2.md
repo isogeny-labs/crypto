@@ -1,5 +1,11 @@
 # N83 signed-orbit size frontier: exact design extension
 
+The [19 October native diagnostic](verification/native-phase-20261019-v3/RESULT.md)
+now supplies independently replayed 1,000-conflict terminals for both retained
+K2048 and K4096, with zero models, relations and rank. This resolves bounded
+observability, without selecting a size by full cold runtime or changing
+the frozen design and support bounds below.
+
 The frozen v1 design stops at 900 public-x orbit columns. The primary
 `a=0` subgroup has order `2417851639230796216685689`. For a successfully
 constructed signed-Frobenius base with `K` full, distinct orbit columns,

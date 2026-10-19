@@ -1,0 +1,51 @@
+{
+  "card_changed": false,
+  "card_id": "CARD-n83-native-phase-20261019-v3-k2048",
+  "card_path": "/home/ec2-user/scratch/n83-native-phase-20261019/v3/cards/k2048.json",
+  "card_sha256": "520201a16bb246d72d6173dcf78bff7525e49a3c5d0d35f653f5286a07ab8210",
+  "commands": [
+    {
+      "argv": [
+        "/home/ec2-user/scratch/n83-native-phase-20261019/runner-v3-target/release/n83-sweep-runner",
+        "run",
+        "/home/ec2-user/scratch/n83-native-phase-20261019/v3/specs/k2048.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 163.731476684,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "k2048",
+      "index": 1,
+      "outputs": {
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048/audit.json": "6e67698ea14226bab5d3f132f313bac9aa101bb87f6db9f21f0cd50d174ffda4",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048/config.json": "5dbb1498035e31c6a73e20493073c884e9e06e1691d5a8e70ffdb7a08fd90ff0",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048/inspect-final.json": "704adf3e532a75815f79be6e54da14667164d5f0a0049f90d4675b08b4c387c1",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048/inspect-live.json": "22c69afba21e257e6d6ee37c1c66f48377ba2e43b607a59e1edef938ab7fa717",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048/outer.json": "723fbc16e102a094587bce9eab405f0569a8406c47515fda44238c6fff0c1cd3"
+      },
+      "seconds": 163.731476684,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e31cf4ffba6f969e73f952d4b99bd40f3a6e3760ba94cdf89f3d41f051e24bc6",
+      "stdout_tail": [
+        "{\"columns\":2048,\"outer_wall_ms\":163378.646436,\"phases\":[{\"data\":{\"points\":339968,\"summands\":5,\"target\":[\"6261116474805304534310590\",\"4505575220639647215230954\"]},\"elapsed_ms\":0.005878,\"phase\":\"closure_begin\",\"schema\":\"n83.chain-phase/v1\"},{\"data\":{\"domain_clauses\":892470,\"representatives\":2048},\"elapsed_ms\":234.784555,\"phase\":\"closure_complete\",\"schema\":\"n83.chain-phase/v1\"},{\"data\":{},\"elapsed_ms\":354.26135600000003,\"phase\":\"index_complete\",\"schema\":\"n83.chain-phase/v1\"},{\"data\":{\"identity_mask\":0},\"elapsed_ms\":354.56095,\"phase\":\"encoding_begin\",\"schema\":\"n83.chain-phase/v1\"},{\"data\":{\"identity_mask\":0,\"variables\":84743},\"elapsed_ms\":376.757444,\"phase\":\"circuit_complete\",\"schema\":\"n83.chain-phase/v1\"},{\"data\":{\"clauses\":1140557,\"domain_clauses\":892470,\"identity_mask\":0,\"variables\":111478},\"elapsed_ms\":494.015683,\"phase\":\"domain_complete\",\"schema\":\"n83.chain-phase/v1\"},{\"data\":{\"call\":1,\"conflict_budget\":1000,\"identity_mask\":0},\"elapsed_ms\":494.522973,\"phase\":\"solver_enter\",\"schema\":\"n83.chain-phase/v1\"},{\"data\":{\"conflicts\":1000,\"identity_mask\":0,\"outcome\":\"Unknown\"},\"elapsed_ms\":150836.78276,\"phase\":\"solver_return\",\"schema\":\"n83.chain-phase/v1\"}],\"queries\":[{\"a\":\"555041861612817674392871\",\"b\":\"1880544021900751415145556\",\"schema\":\"n83.chain-query/v1\",\"target\":[\"6261116474805304534310590\",\"4505575220639647215230954\"]}],\"schema\":\"n83.native-audit/v1\",\"selected_best_total_runtime\":null,\"status\":\"PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY\",\"terminal_counters\":{\"conflicts\":1000,\"models\":0,\"rank\":0,\"relations\":0}}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 1,
+  "commit": "27d17bd17b9fe9c6b4ce04e0c9206706b2b5c804",
+  "dirty_after": "",
+  "dirty_before": "",
+  "native_executor": "n83-sweep-runner strict frozen-command subset/v1",
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

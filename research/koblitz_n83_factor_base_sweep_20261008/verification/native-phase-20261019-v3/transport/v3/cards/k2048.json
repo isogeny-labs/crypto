@@ -1,0 +1,114 @@
+{
+  "schema": "crypto.autoresearch.mechanical-task-card.v1",
+  "card_id": "CARD-n83-native-phase-20261019-v3-k2048",
+  "experiment_id": "n83-native-phase-20261019-v3",
+  "author_role": "experiment-director",
+  "executor_role": "executor-mechanical",
+  "kind": "frozen_command",
+  "commit": "27d17bd17b9fe9c6b4ce04e0c9206706b2b5c804",
+  "receipt": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048.receipt.json",
+  "binds": [
+    {
+      "path": "/home/ec2-user/scratch/n83-native-phase-20261019/runner-v3-target/release/n83-sweep-runner",
+      "sha256": "a5a197666256c50ed0e2487ab8758f1cf379bdcc74b266d1512a2eb77cfa870f"
+    },
+    {
+      "path": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v3/PROTOCOL.md",
+      "sha256": "acdc2d3b118d9747c59a5a376534c19c5d0efd655c7e96348de282500ff4787f"
+    },
+    {
+      "path": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/PROTOCOL.md",
+      "sha256": "639d970dbc80300c2aedf3150cbf8344793d00da85977047c082a1e44f7ba6e8"
+    },
+    {
+      "path": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019/PROTOCOL.md",
+      "sha256": "1d6e938544bfe503b2265c58c27966d6da4603eef083e06de7f55751c7355aef"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/bin/docker",
+      "sha256": "be7b67b49e885cf85867da63de8fae7021178b89e056c97dce34707657fd3d54"
+    },
+    {
+      "path": "/home/ec2-user/crypto-n83-resume/examples/koblitz_n83_selector_witness_control.rs",
+      "sha256": "8e88ad07d21844d0fb1a8be2a0763a38e75152d06809cb606ad9a55780937e54"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-native-phase-20261019/v3/specs/k2048.json",
+      "sha256": "0084c10aae8f0cbc278cfae06826d6480d3c9363771cd7f11dbfc550457e8d08"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/integration-target/release/examples/koblitz_n83_factor_base_export",
+      "sha256": "1d2e4f9bc3c532a58729f3dd541d3e0fef59099f33fa2c8a5bef4a1197693c96"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/k2048/manifest.json",
+      "sha256": "68b43524198394a2f0d112f86df0d1c1f69ea1ff817695cf21efe2767b7d17b8"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/k2048/objects/82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851.jsonl.gz",
+      "sha256": "aacb62784dee0c9f5e06328dbb85a4b6a1c7243e778328da82900e7284f3a74a"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/k2048/probe-corpus.json",
+      "sha256": "760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/k2048/replay.json",
+      "sha256": "5ad374ef0042b2ebd6562746b7ca67e46c6b0f4d46c4ba25abae83fd2dd411e2"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/k2048/upload-receipt.json",
+      "sha256": "f1139c1dd61beac0e1d9e80a1d02e983f98c7b1abc6887f1816f013d4693bf4c"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/fixtures/probe-corpus.json",
+      "sha256": "760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/fixtures/probe-validation.json",
+      "sha256": "1c6d3a45c8b4654ff208751258fa2e34f0cc60e1c30ba48e9214db62be60472f"
+    }
+  ],
+  "must_not_exist": [
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048-run.stdout",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048-run.stderr",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048.receipt.json"
+  ],
+  "commands": [
+    {
+      "id": "k2048",
+      "argv": [
+        "/home/ec2-user/scratch/n83-native-phase-20261019/runner-v3-target/release/n83-sweep-runner",
+        "run",
+        "/home/ec2-user/scratch/n83-native-phase-20261019/v3/specs/k2048.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048"
+      ],
+      "timeout_seconds": 660,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048-run.stdout",
+      "stderr": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048-run.stderr",
+      "outputs": [
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048/audit.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048/config.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048/outer.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048/inspect-live.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048/inspect-final.json"
+      ]
+    }
+  ],
+  "bus_address": "executor-mechanical-n83-v3-k2048",
+  "background": true,
+  "write_scope": [
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/"
+  ],
+  "stop_when": [
+    "Native card validation refuses execution.",
+    "A bound digest differs or the pinned commit differs from HEAD.",
+    "A command fails or times out or a declared output is missing."
+  ],
+  "notes": "Parent dispatch requires a completed v3 controls card. Natural public_x_hash trial has no selector pins. Same retained archives and seed2026100801. Preserve all earlier failures. Empty censored traces establish zero phase observations. No scalar, natural-yield or performance promotion.",
+  "native_path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/bin:/home/ec2-user/.codex/packages/standalone/releases/0.163.0-x86_64-unknown-linux-musl/codex-path:/home/ec2-user/.elan/bin:/home/ec2-user/.codex/tmp/arg0-linux/codex-arg0eEJtgH:/home/ec2-user/.codex/packages/standalone/releases/0.163.0-x86_64-unknown-linux-musl/codex-path:/home/ec2-user/.local/bin:/home/ec2-user/.elan/bin:/home/ec2-user/.cargo/bin:/home/ec2-user/.local/bin:/home/ec2-user/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin"
+}

@@ -1,12 +1,20 @@
 # Native N83 K4096 terminal-receipt observability
 
-- **Status:** investigating
+- **Status:** resolved
 - **Kind:** empirical bottleneck with unknown internal phase; instrumentation gap
 - **Affected work:** [native K2048/K4096 continuation](../research/koblitz_n83_factor_base_sweep_20261008/verification/cloud-matched-k2048-k4096-20261018/RESULT.md)
 - **Next action owner:** N83 sweep maintainer
-- **Last updated:** 2026-10-18
+- **Last updated:** 2026-10-19
 
-## Problem
+The [19 October native continuation](../research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v3/RESULT.md)
+now supplies flushed phases, independently replayed actual public queries,
+positive controls and terminal receipts for both retained bases under the
+same declared bounds. Each returns 1,000 conflicts, zero models, zero
+relations and rank zero. This resolves bounded terminal observability only.
+The [free-selector known-witness search](n83-free-selector-known-witness-search.md),
+full cold runtime and the wider finite-grid sweep remain open.
+
+## Historical problem (18 October)
 
 This native host/worker's primary a=0, GF(2^83), K4096 five-summand path has no terminal
 solver-counter receipt within either the 100000-conflict/600-second attempt
@@ -14,7 +22,7 @@ or the separate 1000-conflict/180-second control. This prevents a completed
 matched-query comparison with the K2048 short control and does not identify
 which internal phase consumed the budget.
 
-## Evidence and uncertainty
+## Historical evidence and uncertainty
 
 - **Observed:** exact K4096 input reconstruction, generic replay of all
   679936 points, fresh setec S3 custody and guarded model construction pass.
@@ -44,12 +52,12 @@ which internal phase consumed the budget.
 
 ## What would unblock it
 
-- [ ] Emit flushed phase markers and actual query coefficients/point before
+- [x] Emit flushed phase markers and actual query coefficients/point before
   the blocking work; distinguish closure, model construction, solver entry
   and terminal disposition on the same exact retained input.
-- [ ] Validate those markers on a public positive control and preserve
+- [x] Validate those markers on a public positive control and preserve
   capped/failed outcomes under a protocol frozen before execution.
-- [ ] Obtain terminal, independently group-replayed query receipts for both
+- [x] Obtain terminal, independently group-replayed query receipts for both
   retained bases under a matched declared envelope, or identify the measured
   blocking phase without treating censoring as a conflict or relation count.
 
@@ -58,7 +66,7 @@ comparison. Natural useful rank, verified column logs, individual-log work,
 matched references and complete cold runtime would still be required to
 select a factor base.
 
-## Next discriminating step
+## Historical next step
 
 Use the repository's now-required native harness for further comparisons.
 The present receipts preserve a historical Python supervisor around a Rust
@@ -77,3 +85,13 @@ This step is proposed, not launched by the present rung.
 2026-10-18: Docker and S3 access are restored, two construction gates pass,
 three search attempts are outer-wall censored, and the K2048 short control
 has a complete solver-cap receipt. The K4096 phase/counter gap remains open.
+
+2026-10-19: Native source 27d17bd17b9fe9c6b4ce04e0c9206706b2b5c804
+completes K2048/K4096 on the same independently replayed public query.
+Outer wall is 163378.646436/337901.101152 ms; both solver calls return at
+1,000 conflicts. Small-field original-group controls and distinct fully
+specified N83 selector controls pass. All failed/censored earlier controls
+and wrong-policy launches remain. Native audits, verified mechanical relays,
+resources and cleanup satisfy the three exit conditions within this bounded
+scope. No stage speed comparison or cold winner is established; internal
+solver preprocessing/search costs remain unsplit.

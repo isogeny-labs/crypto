@@ -1,0 +1,22 @@
+{
+  "schema": "n83.raw-artifact-plan/v1",
+  "status": "AUTO_REVIEW_REJECTED_NOT_EXECUTED",
+  "archive_path": "/home/ec2-user/scratch/n83-native-phase-20261019/runs.tar.xz",
+  "archive_sha256": "bef8a03c355b2238282638e326dd571bd91dd6873f5ed1df5fe12db2f0dcd5c3",
+  "archive_bytes": 49012484,
+  "manifest_sha256": "30b56a3960e48b164dc354e779d32a5c6fc251a2eafb938d17af380bf2084004",
+  "payload_files_verified": 308,
+  "manifest_files": 1,
+  "local_extract_all_file_sha256_check": "PASS",
+  "deterministic_repack": "PASS_BYTE_IDENTICAL",
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "proposed_remote": "s3://setec-astronomy-artifacts/store",
+  "proposed_key": "store/sha256/be/bef8a03c355b2238282638e326dd571bd91dd6873f5ed1df5fe12db2f0dcd5c3",
+  "logical_name": "evidence/n83/native-phase-20261019/runs.tar.xz",
+  "upload_executed": false,
+  "contents": "All seven container attempts, native binaries and test executable, three frozen source archives, exact public bases and witness inputs, native mechanical cards/relays/assessments, raw logs and validation logs; post-merge integration logs excluded and recorded separately",
+  "review_reason": "Automatic approval review considered the new source/binary/input/raw-record payload outside approval for the prior exact ZIP; explicit approval required before this new upload",
+  "earlier_approved_zip_publication": "PASS; independent object unchanged",
+  "publication_command": "CRYPTO_STORE_REMOTE=s3://setec-astronomy-artifacts/store CRYPTO_STORE_INDEX=<study>/verification/native-phase-20261019-v3/store/index.json ecbench store push <archive_path> --name evidence/n83/native-phase-20261019/runs.tar.xz --description <description> --provenance <collect-evidence.sh, three frozen revisions, deterministic tar/xz> --json"
+}

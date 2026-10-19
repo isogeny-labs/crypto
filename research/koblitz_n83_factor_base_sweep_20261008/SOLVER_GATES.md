@@ -1,5 +1,18 @@
 # N83 solver availability and capacity gates
 
+## Native phase and terminal gate, 2026-10-19
+
+The [fully native continuation](verification/native-phase-20261019-v3/RESULT.md)
+returned checked terminal receipts for both retained bases on the same public
+query: 1,000 conflicts, zero models, zero relations and rank zero each.
+Closure-relative domain completion was 494.015683 ms for K2048 and
+1245.847022 ms for K4096; both emitted solver entry and return. This resolves
+the bounded observability requirement. Internal preprocessing/search costs,
+natural useful rank and full cold runtime remain unknown. The separate
+[free-selector known-witness control](../../problems/n83-free-selector-known-witness-search.md)
+remains wall-censored; fully pinned selector controls prove encoding
+consistency only. No factor-base or performance winner is selected.
+
 ## Native guarded continuation, 2026-10-18
 
 The [restored Docker gate](verification/cloud-matched-k2048-k4096-20261018/RESULT.md)
@@ -8,8 +21,8 @@ variables and 2,021,197 clauses under one CPU, 4 GiB, zero swap and no
 network. The two 100,000-conflict attempts were outer-wall censored at
 600 seconds; final counters are unknown. A separate K2048 short control
 completed at 1,000 conflicts with zero models, relations and rank. K4096's
-short control was wall-censored at 180 seconds. The remaining discriminating
-step is [K4096 phase/counter observability](../../problems/n83-native-k4096-terminal-observability.md),
+short control was wall-censored at 180 seconds. The next step at that stage
+was [K4096 phase/counter observability](../../problems/n83-native-k4096-terminal-observability.md),
 not a completed natural-yield or full-runtime factor-base ranking.
 
 ## Historical source inventory
