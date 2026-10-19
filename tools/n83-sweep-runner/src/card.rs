@@ -166,9 +166,12 @@ fn tail(bytes: &[u8]) -> Vec<String> {
     lines[lines.len().saturating_sub(20)..].to_vec()
 }
 fn report(c: &Value) -> R<String> {
-    let r = read(text(c, "receipt")?)?;
+    let raw = fs::read_to_string(text(c, "receipt")?)?;
+    let r: Value = serde_json::from_str(&raw)?;
     require(r["card_id"] == c["card_id"], "receipt card mismatch")?;
-    Ok(serde_json::to_string_pretty(&r)?)
+    // The originally written receipt is the relay authority. Reparsing and
+    // serializing floats can change their spelling, even for an exact relay.
+    Ok(raw.strip_suffix('\n').unwrap_or(&raw).to_owned())
 }
 pub fn dispatch(mode: &str, path: &Path) -> R<()> {
     let original_bytes = fs::read(path)?;

@@ -6,6 +6,22 @@ use std::{
     process::Command,
     time::{SystemTime, UNIX_EPOCH},
 };
+#[test]
+fn card_report_preserves_original_float_bytes() {
+    let (p, card, _) = setup("/usr/bin/true", vec![], 1);
+    let raw =
+        b"{\n  \"card_id\": \"CARD-n83-native-test-1\",\n  \"seconds\": 1.1790702610000001\n}\n";
+    fs::write(p.join("exec/receipt.json"), raw).unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_n83-sweep-runner"))
+        .current_dir(&p)
+        .arg("card-report")
+        .arg(&card)
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    assert_eq!(output.stdout, raw);
+    fs::remove_dir_all(p).unwrap();
+}
 fn git(p: &PathBuf, args: &[&str]) {
     assert!(Command::new("git")
         .arg("-C")

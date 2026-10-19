@@ -13,7 +13,7 @@ use std::{
     time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 type R<T> = Result<T, Box<dyn Error>>;
-const SOURCES: [&str; 8] = [
+const SOURCES: [&str; 9] = [
     "examples/koblitz_n83_factor_base_export.rs",
     "research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs",
     "src/cryptanalysis/binary_semaev_chain_sat.rs",
@@ -22,6 +22,7 @@ const SOURCES: [&str; 8] = [
     "src/cryptanalysis/sat.rs",
     "examples/koblitz_n83_fixed_witness_control.rs",
     "examples/koblitz_n83_selector_witness_control.rs",
+    "examples/koblitz_n83_free_selector_export_control.rs",
 ];
 fn require(ok: bool, msg: &str) -> R<()> {
     if !ok {
@@ -392,7 +393,6 @@ fn audit(dir: &Path) -> R<Value> {
                 json!({"schema":"n83.native-audit/v1","status":"UNKNOWN_CONTROL_CONFLICT_CAP","sat_trace":sat,"control":result,"outer_wall_ms":out["outer_wall_ms"],"selected_best_total_runtime":null}),
             );
         }
-        require(cfg["control_variant"] != "fixed_coordinates_free_selectors", "free-selector positive terminal requires independent decoded selector replay; preserved but not admitted")?;
         let panel = Path::new(text(&cfg, "panel")?);
         let fixture_bytes = fs::read(panel.join("fixture.json"))?;
         require(
@@ -412,11 +412,25 @@ fn audit(dir: &Path) -> R<Value> {
         require(
             result["status"] == "SAT_verified_witness_x"
                 && result["model_verified"] == true
+                && sat["status"] == "COMPLETE"
+                && sat["terminal_counters"]["outcome"] == "Sat"
+                && sat["terminal_counters"]["conflicts"] == result["conflicts"]
+                && result["conflict_cap"] == cfg["conflicts"]
+                && result["fixed_x_blocks"] == 8
+                && result["identity_mask"] == 0
                 && result["input_blake3"] == hash(panel.join("domains.json"))?
                 && result["fixture_blake3"] == blake3::hash(&fixture_bytes).to_hex().as_str(),
             "positive control not verified",
         )?;
-        if cfg["control_variant"] == "fixed_coordinates_representatives_and_phases" {
+        if cfg["control_variant"] == "fixed_coordinates_representatives_and_phases"
+            || cfg["control_variant"] == "fixed_coordinates_free_selectors"
+        {
+            if cfg["control_variant"] == "fixed_coordinates_free_selectors" {
+                require(
+                    result["selector_export"] == "decoded_from_sat_model_after_solve",
+                    "missing actual model selector export",
+                )?;
+            }
             let input = read(panel.join("domains.json"))?;
             let assignments = result["selector_assignments"]
                 .as_array()
