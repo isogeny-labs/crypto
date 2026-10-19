@@ -1,0 +1,101 @@
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: cpu
+spec:
+  amiFamily: AL2023
+  amiSelectorTerms:
+    - id: ami-082b570a48503ea93 # EKS 1.36 AL2023, v20261012, us-east-2
+  role: KarpenterNodeRole-isolab
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: isolab
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: isolab
+  metadataOptions:
+    httpEndpoint: enabled
+    httpProtocolIPv6: disabled
+    httpPutResponseHopLimit: 1
+    httpTokens: required
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        volumeSize: 80Gi
+        volumeType: gp3
+        encrypted: true
+        deleteOnTermination: true
+  kubelet:
+    kubeReserved:
+      cpu: 500m
+      memory: 512Mi
+      ephemeral-storage: 1Gi
+    systemReserved:
+      cpu: 500m
+      memory: 512Mi
+      ephemeral-storage: 1Gi
+  userData: |
+    apiVersion: node.eks.aws/v1alpha1
+    kind: NodeConfig
+    spec:
+      kubelet:
+        config:
+          cpuManagerPolicy: static
+          cpuManagerPolicyOptions:
+            full-pcpus-only: "true"
+          topologyManagerPolicy: single-numa-node
+  tags:
+    project: isolab
+    managed-by: karpenter
+---
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: cpu-spot
+spec:
+  template:
+    metadata:
+      labels:
+        isolab.dev/role: worker
+        isolab.dev/pool: cpu-spot
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: cpu
+      taints:
+        - key: isolab.dev/workload
+          value: cpu
+          effect: NoSchedule
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: [amd64]
+        - key: kubernetes.io/os
+          operator: In
+          values: [linux]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: [spot]
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values: [c, m, r]
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values: ["5"]
+        - key: karpenter.k8s.aws/instance-cpu
+          operator: In
+          values: ["4", "8", "16", "32"]
+      expireAfter: Never
+      terminationGracePeriod: 1h
+  limits:
+    cpu: "64"
+    memory: 256Gi
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 2m
+    budgets:
+      - nodes: "0"
+        reasons: [Drifted]
+      - nodes: "100%"
+        reasons: [Empty]
