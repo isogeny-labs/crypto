@@ -13,7 +13,7 @@ The old plane-quartic "pure IC" was subgroup enumeration (T1), so no earlier pla
 index-calculus cost. A real pipeline (relation collection on lines, Lanczos mod `ell`, descent through the
 canonical `Pic^0` arithmetic, no enumeration) solves every instance (51 of 51 IC-B0 units verified: 5 instances at each q <= 65479, 3 at q = 131071 and 262111) and costs, cold and
 end to end, `IC/rho = 0.122 [0.10, 0.16]` at q = 262111 (`ell` about 4.5e15), below rho and band-resolved for all
-q >= 4051, with a measured exponent of **1.083 [1.040, 1.128] against rho's 1.485 [1.437, 1.525]** on the primary
+q >= 4051, with a measured exponent of **1.083 [1.040, 1.129] against rho's 1.485 [1.437, 1.525]** on the primary
 range q >= 4051 (0.998 [0.971, 1.023] against 1.486 over all 11 sizes q = 223..262111). By the frozen decision
 rule the lead N4 stays **open**, it is not closed. The scope is the GHS-weak family only (`E0/F_{q^3}`, `4 | #E0`,
 special `m = 2` form), plain rho, a shared VM: no generic-curve, prime-order, deployed-curve or key-recovery claim.
