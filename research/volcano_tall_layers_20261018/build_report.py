@@ -130,18 +130,36 @@ if "--no-pdf" not in sys.argv:
     print("wrote", f"{OUT}/report.pdf")
     if os.path.exists(f"{HERE}/RESULT.md"):
         r = pre.replace("flipped: true", "flipped: false")
-        for line in open(f"{HERE}/RESULT.md").read().splitlines():
-            if line.startswith("# "):
-                r += f"= {esc(line[2:])}\n"
-            elif line.startswith("## "):
-                r += f"== {esc(line[3:])}\n"
-            elif line.startswith("|"):
+        def inline(t):
+            t = esc(t.replace("`", ""))
+            return re.sub(r"\\\*\\\*(.+?)\\\*\\\*", r"*\1*", t)
+        lines = open(f"{HERE}/RESULT.md").read().splitlines()
+        table = []
+        for line in lines + [""]:
+            if line.startswith("|"):
                 if not re.match(r"^\|[-:| ]+\|$", line):
-                    r += esc(line) + " \\\n"
+                    table.append([c.strip() for c in line.strip("|").split("|")])
+                continue
+            if table:
+                cells = ", ".join(f"[{inline(c)}]" for row in table for c in row)
+                r += f"#table(columns: {len(table[0])}, inset: 3pt, stroke: 0.4pt + gray, {cells})\n\n"
+                table = []
+            if line.startswith("- "):
+                r += "- " + inline(line[2:]) + "\n"
+                continue
+            if line.startswith("  - "):
+                r += "  - " + inline(line[4:]) + "\n"
+                continue
+            if line.startswith("# "):
+                r += f"= {inline(line[2:])}\n"
+            elif line.startswith("## "):
+                r += f"== {inline(line[3:])}\n"
             elif line.startswith("!["):
                 r += '#figure(image("fig_levels.svg", width: 100%))\n'
             elif line:
-                r += esc(line) + "\n\n"
+                r += inline(line) + "\n\n"
+            else:
+                r += "\n"
         open(f"{HERE}/RESULT.typ", "w").write(r)
         typst.compile(f"{HERE}/RESULT.typ", output=f"{HERE}/RESULT.pdf")
         print("wrote", f"{HERE}/RESULT.pdf")
