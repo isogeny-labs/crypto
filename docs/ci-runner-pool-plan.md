@@ -33,7 +33,7 @@ label/schedule-triggered, so they were left running on every PR.
 
 ## 2. Changes in this PR
 
-Added the repo's existing PR-cancelling concurrency block to 13 PR-triggered workflows that had none
+Added the repo's existing PR-cancelling concurrency block to 12 PR-triggered workflows that had none
 (superseded commits on the same PR stop; push, schedule, dispatch and merge-queue runs are never cancelled).
 No test was skipped and no `paths:` filter was added or loosened.
 
