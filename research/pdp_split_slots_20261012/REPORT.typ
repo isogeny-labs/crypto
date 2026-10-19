@@ -20,7 +20,8 @@ Every ecbench run recorded verified `[k]G = Q` (Parts A and C); all 576 Part B r
 
 #table(columns: (auto, 1fr), align: left,
   [Closure vs standard], [On all four curves the closure solved 2.0–3.2× fewer systems per IC run and cost 0.35–0.54× in priced S (R1, R2 held), with 1.5–4.5× the yield per system and the same solving degree (R3, R4 held).],
-  [Against rho], [Best F4 arm (closure, unsplit, g = 4): 36× strong rho at n = 11, 60× at 13, 889× at 19, 25,257× at 17 (ℓ = 5). No arm came close (R5 held).],
+  [Against rho], [At the pinned XOR ratio the best F4 arm (closure, unsplit, g = 4) is 36× strong rho at n = 11, 60× at 13, 889× at 19 and 25,257× at 17 (ℓ = 5). Under the AGENTS.md §5a band (0 / 0.1 / 1 GAE per unpriced op, every arm), every F4 and SAT arm is *unresolved* against rho: 0.78–0.94× at w = 0, 1,215× and up at w = 0.1. Rankable arms (pair table, standard at n = 13 and 19) are all dearer than rho.],
+  [§5a, closure vs standard], [The closure is cheaper at every weight on every workload for unsplit at n = 11, 13, 17 and the chain at n = 11. At n = 13 (chain) and n = 19 (unsplit), one workload reverses at w ≥ 0.1, though the medians favour the closure at every weight.],
   [Part C, n = 17], [On the dimension-9 invariant base the fully charged pair table (`mitm-frobenius:m=2`) costs 4.18× strong rho; `pdp-split` m = 2 prices at 46× (g = 4) and 2,919× (g = 0); the SAT arm's lower bound is 0.86× (R7 held).],
   [Accounting], [Every F4/SAT arm's recorded S is at or below strong rho because solver work is uncharged: a lower bound, not a win.],
 )
