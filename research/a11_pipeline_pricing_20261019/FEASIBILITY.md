@@ -63,7 +63,7 @@ compatibility (2 days), preregistered session plus audit (2-3 days on this
 
 `field_ops` per F4 system, m = 3, p1, from
 `research/factor_base_designs_20261015/runs/analysis-amendment4.txt:19-24,106-112`
-(see `reports/run-20261019T000000Z/` for the graph): A11 is lower than A0 at
+(see `reports/run-20261019T1634Z/` for the graph): A11 is lower than A0 at
 t = 2, 3, 4 (4663 vs 508104; 4788601 vs 238512767; 855071386 vs
 15920614779) and its fitted cost growth per bit is steeper (kappa 8.769 vs
 7.468). This is a stage diagnostic of the solver axis (`AGENTS.md` section
