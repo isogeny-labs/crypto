@@ -210,7 +210,7 @@ if [ "$PAID_SERVICE" = 1 ]; then
     # standard-library operator module, including during venv/pip startup.
     EXEC_START="/opt/rho-ingest/venv/bin/python3 /opt/rho-ingest/cairn_ingest_operator.py --replica-id %H --evidence-dir /var/lib/rho-ingest/evidence --status-url https://$STATUS_BUCKET.s3.$REGION.amazonaws.com/status.json --period-seconds $PERIOD_SECONDS -- /opt/rho-ingest/venv/bin/python3 /opt/rho-ingest/dp_ingest.py --replica-id %H --bucket $BUCKET --status-bucket $STATUS_BUCKET --threads $THREADS --metric-namespace ECC2K130/Ingest"
     STOP_POST=ExecStopPost=/usr/local/bin/rho-ingest-logship
-    EVIDENCE_SHIP="aws s3 sync /var/lib/rho-ingest/evidence/ s3://$BUCKET/logs/rho-ingest-\${IID}/evidence/ --exclude current-period.json --exclude operator.lock --only-show-errors"
+    EVIDENCE_SHIP="aws s3 sync /var/lib/rho-ingest/evidence/ s3://$BUCKET/logs/rho-ingest-\${IID}/evidence/ --exclude current-period.json --exclude operator.lock --exclude '*.tmp' --only-show-errors"
     echo "published Cairn operator $OPERATOR_SHA; period ${PERIOD_SECONDS}s"
 fi
 

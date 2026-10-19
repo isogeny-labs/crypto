@@ -152,6 +152,7 @@ esac
         self.assertIn("aws s3 sync /var/lib/rho-ingest/evidence/", unit)
         self.assertIn("rho-ingest-${IID}/evidence/", unit)
         self.assertIn("--exclude current-period.json --exclude operator.lock", unit)
+        self.assertIn("--exclude '*.tmp'", unit)
         self.assertIn("CairnService,Value=1", args)
         self.assertNotIn("aws_access_key_id", unit)
         syntax = subprocess.run(["bash", "-n", str(self.root / "user-data")],
