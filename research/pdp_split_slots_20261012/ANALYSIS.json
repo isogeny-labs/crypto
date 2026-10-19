@@ -4238,11 +4238,22 @@
     }
   ],
   "ecbench": {
-    "pricing": "priced S = recorded S + F4 word XORs * pinned ns_per_word_xor (docs/ic/calibration.json, another host) / sqrt(r); a sensitivity, not the recorded S",
+    "pricing": "priced S = recorded S + F4 word XORs * pinned ns_per_word_xor (docs/ic/calibration.json, another host) / sqrt(r); a sensitivity, not the recorded S. AGENTS.md 5a band: S_w = recorded S + w * (every unpriced op of the arm) / sqrt(r), w in {0, 0.1, 1}, every arm alike, rho included; an order is reported only if it holds at every weight on every workload",
     "rows": [
       {
         "arm": "clo-chain-g4",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m11-t67-05f5aa36",
+        "median_band_over_strong_rho": [
+          0.80291196471445,
+          39744.42048568456,
+          310711.7878115147
+        ],
         "median_f4_word_xors": 257738757.5,
         "median_priced_over_signed_frobenius_rho": 8481.970918270306,
         "median_priced_over_standard_twin": 0.43445517238521336,
@@ -4250,69 +4261,118 @@
         "median_priced_s": 22449.378856836287,
         "median_s_recorded": 16.33945703945886,
         "median_systems": 25.5,
+        "median_unpriced_ops": 257738757.5,
         "n": 11,
         "per_workload": [
           {
+            "band_s": [
+              16.492650865424697,
+              1447034.6267819097,
+              14470197.833961308
+            ],
             "f4_word_xors": 455523515.0,
             "priced_s": 39664.78952605604,
             "s": 16.492650865424697,
             "systems": 36.0,
+            "unpriced_ops": 455523515.0,
             "verified": true,
             "workload": "W1f06e384c722"
           },
           {
+            "band_s": [
+              15.174895907605206,
+              732841.4061718199,
+              7328277.48765503
+            ],
             "f4_word_xors": 230694815.0,
             "priced_s": 20094.6136328676,
             "s": 15.174895907605206,
             "systems": 22.0,
+            "unpriced_ops": 230694815.0,
             "verified": true,
             "workload": "W4edeb4fd1189"
           },
           {
+            "band_s": [
+              16.531305856085044,
+              879388.3170644778,
+              8793734.388892073
+            ],
             "f4_word_xors": 276827579.0,
             "priced_s": 24111.31823564232,
             "s": 16.531305856085044,
             "systems": 27.0,
+            "unpriced_ops": 276827579.0,
             "verified": true,
             "workload": "W76e18ba069eb"
           },
           {
+            "band_s": [
+              16.587322738508544,
+              859127.2863392291,
+              8591123.577487644
+            ],
             "f4_word_xors": 270449358.0,
             "priced_s": 23556.22047579035,
             "s": 16.587322738508544,
             "systems": 27.0,
+            "unpriced_ops": 270449358.0,
             "verified": true,
             "workload": "W90e84b08c7a1"
           },
           {
+            "band_s": [
+              15.460790329700615,
+              385949.8811755005,
+              3859359.664642037
+            ],
             "f4_word_xors": 121492744.0,
             "priced_s": 10590.063908883378,
             "s": 15.460790329700615,
             "systems": 12.0,
+            "unpriced_ops": 121492744.0,
             "verified": true,
             "workload": "Wde89e2befaef"
           },
           {
+            "band_s": [
+              15.53919801853797,
+              778373.1318937734,
+              7783591.466155567
+            ],
             "f4_word_xors": 245028157.0,
             "priced_s": 21342.53723788222,
             "s": 15.53919801853797,
             "systems": 24.0,
+            "unpriced_ops": 245028157.0,
             "verified": true,
             "workload": "We8002db974c1"
           },
           {
+            "band_s": [
+              16.551799085921314,
+              712890.1605312846,
+              7128752.639121072
+            ],
             "f4_word_xors": 224413699.0,
             "priced_s": 19549.288678348163,
             "s": 16.551799085921314,
             "systems": 21.0,
+            "unpriced_ops": 224413699.0,
             "verified": true,
             "workload": "We8808aea44eb"
           },
           {
+            "band_s": [
+              16.186263213493024,
+              955985.5107958781,
+              9559709.431589859
+            ],
             "f4_word_xors": 300940601.0,
             "priced_s": 26209.7457554085,
             "s": 16.186263213493024,
             "systems": 30.0,
+            "unpriced_ops": 300940601.0,
             "verified": true,
             "workload": "Wf543c53d19c0"
           }
@@ -4333,7 +4393,18 @@
       },
       {
         "arm": "clo-unsplit-g4",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m11-t67-05f5aa36",
+        "median_band_over_strong_rho": [
+          0.80291196471445,
+          1214.9938776826175,
+          9975.066326557808
+        ],
         "median_f4_word_xors": 7807501.5,
         "median_priced_over_signed_frobenius_rho": 270.09853726869505,
         "median_priced_over_standard_twin": 0.40351896252601344,
@@ -4341,69 +4412,118 @@
         "median_priced_s": 695.6659078041617,
         "median_s_recorded": 16.33945703945886,
         "median_systems": 23.0,
+        "median_unpriced_ops": 7807501.5,
         "n": 11,
         "per_workload": [
           {
+            "band_s": [
+              16.492650865424697,
+              42632.67759353255,
+              426178.3420775367
+            ],
             "f4_word_xors": 13415640.0,
             "priced_s": 1184.1761182945038,
             "s": 16.492650865424697,
             "systems": 36.0,
+            "unpriced_ops": 13415640.0,
             "verified": true,
             "workload": "W1f06e384c722"
           },
           {
+            "band_s": [
+              15.174895907605206,
+              23799.49107854551,
+              237858.33672228662
+            ],
             "f4_word_xors": 7487339.0,
             "priced_s": 666.8651593118836,
             "s": 15.174895907605206,
             "systems": 22.0,
+            "unpriced_ops": 7487339.0,
             "verified": true,
             "workload": "W4edeb4fd1189"
           },
           {
+            "band_s": [
+              16.531305856085044,
+              28988.287419646334,
+              289734.0924437585
+            ],
             "f4_word_xors": 9120353.0,
             "priced_s": 810.3574233739378,
             "s": 16.531305856085044,
             "systems": 27.0,
+            "unpriced_ops": 9120353.0,
             "verified": true,
             "workload": "W76e18ba069eb"
           },
           {
+            "band_s": [
+              16.678863273519273,
+              24240.427479090824,
+              242254.16502144656
+            ],
             "f4_word_xors": 7625673.0,
             "priced_s": 680.4095753469134,
             "s": 16.678863273519273,
             "systems": 22.0,
+            "unpriced_ops": 7625673.0,
             "verified": true,
             "workload": "W90e84b08c7a1"
           },
           {
+            "band_s": [
+              15.460790329700615,
+              13399.265087419719,
+              133853.5037612299
+            ],
             "f4_word_xors": 4213242.0,
             "priced_s": 382.1770280699671,
             "s": 15.460790329700615,
             "systems": 12.0,
+            "unpriced_ops": 4213242.0,
             "verified": true,
             "workload": "Wde89e2befaef"
           },
           {
+            "band_s": [
+              15.53919801853797,
+              25394.48234556862,
+              253804.97067351936
+            ],
             "f4_word_xors": 7989330.0,
             "priced_s": 710.9222402614101,
             "s": 15.53919801853797,
             "systems": 24.0,
+            "unpriced_ops": 7989330.0,
             "verified": true,
             "workload": "We8002db974c1"
           },
           {
+            "band_s": [
+              16.551799085921314,
+              22674.504314157028,
+              226596.07694979696
+            ],
             "f4_word_xors": 7132758.0,
             "priced_s": 637.3796979988696,
             "s": 16.551799085921314,
             "systems": 21.0,
+            "unpriced_ops": 7132758.0,
             "verified": true,
             "workload": "We8808aea44eb"
           },
           {
+            "band_s": [
+              16.186263213493024,
+              33068.29110124321,
+              330537.2346435106
+            ],
             "f4_word_xors": 10404853.0,
             "priced_s": 921.8139357755069,
             "s": 16.186263213493024,
             "systems": 30.0,
+            "unpriced_ops": 10404853.0,
             "verified": true,
             "workload": "Wf543c53d19c0"
           }
@@ -4424,7 +4544,18 @@
       },
       {
         "arm": "rho-frob",
+        "band_order_vs_strong_rho": "arm cheaper at every weight",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m11-t67-05f5aa36",
+        "median_band_over_strong_rho": [
+          0.13275852162378693,
+          0.13246057533962746,
+          0.13359173996182133
+        ],
         "median_f4_word_xors": null,
         "median_priced_over_signed_frobenius_rho": 1.0,
         "median_priced_over_standard_twin": null,
@@ -4432,69 +4563,118 @@
         "median_priced_s": 2.700113986456633,
         "median_s_recorded": 2.700113986456633,
         "median_systems": null,
+        "median_unpriced_ops": 20.0,
         "n": 11,
         "per_workload": [
           {
+            "band_s": [
+              2.7318800333561226,
+              2.792235522465153,
+              3.335434924446429
+            ],
             "f4_word_xors": null,
             "priced_s": 2.7318800333561226,
             "s": 2.7318800333561226,
             "systems": null,
+            "unpriced_ops": 19.0,
             "verified": true,
             "workload": "W1f06e384c722"
           },
           {
+            "band_s": [
+              2.700113986456633,
+              2.7541162661857657,
+              3.2401367837479595
+            ],
             "f4_word_xors": null,
             "priced_s": 2.700113986456633,
             "s": 2.700113986456633,
             "systems": null,
+            "unpriced_ops": 17.0,
             "verified": true,
             "workload": "W4edeb4fd1189"
           },
           {
+            "band_s": [
+              2.7636460802556124,
+              2.836707988124439,
+              3.4942651589438776
+            ],
             "f4_word_xors": null,
             "priced_s": 2.7636460802556124,
             "s": 2.7636460802556124,
             "systems": null,
+            "unpriced_ops": 23.0,
             "verified": true,
             "workload": "W76e18ba069eb"
           },
           {
+            "band_s": [
+              2.858944220954082,
+              2.947889152272653,
+              3.748393534139796
+            ],
             "f4_word_xors": null,
             "priced_s": 2.858944220954082,
             "s": 2.858944220954082,
             "systems": null,
+            "unpriced_ops": 28.0,
             "verified": true,
             "workload": "W90e84b08c7a1"
           },
           {
+            "band_s": [
+              2.668347939557143,
+              2.7382332427360208,
+              3.367200971345919
+            ],
             "f4_word_xors": null,
             "priced_s": 2.668347939557143,
             "s": 2.668347939557143,
             "systems": null,
+            "unpriced_ops": 22.0,
             "verified": true,
             "workload": "Wde89e2befaef"
           },
           {
+            "band_s": [
+              2.0647930484668366,
+              2.1029123047462246,
+              2.4459856112607143
+            ],
             "f4_word_xors": null,
             "priced_s": 2.0647930484668366,
             "s": 2.0647930484668366,
             "systems": null,
+            "unpriced_ops": 12.0,
             "verified": true,
             "workload": "We8002db974c1"
           },
           {
+            "band_s": [
+              2.700113986456633,
+              2.7668226849455615,
+              3.367200971345919
+            ],
             "f4_word_xors": null,
             "priced_s": 2.700113986456633,
             "s": 2.700113986456633,
             "systems": null,
+            "unpriced_ops": 21.0,
             "verified": true,
             "workload": "We8808aea44eb"
           },
           {
+            "band_s": [
+              2.2553893298637755,
+              2.2871553767632653,
+              2.5730497988586736
+            ],
             "f4_word_xors": null,
             "priced_s": 2.2553893298637755,
             "s": 2.2553893298637755,
             "systems": null,
+            "unpriced_ops": 10.0,
             "verified": true,
             "workload": "Wf543c53d19c0"
           }
@@ -4515,7 +4695,18 @@
       },
       {
         "arm": "rho-strong",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m11-t67-05f5aa36",
+        "median_band_over_strong_rho": [
+          1.0,
+          1.0,
+          1.0
+        ],
         "median_f4_word_xors": null,
         "median_priced_over_signed_frobenius_rho": 7.5401048120211565,
         "median_priced_over_standard_twin": null,
@@ -4523,69 +4714,118 @@
         "median_priced_s": 19.743199017971648,
         "median_s_recorded": 19.743199017971648,
         "median_systems": null,
+        "median_unpriced_ops": 165.0,
         "n": 11,
         "per_workload": [
           {
+            "band_s": [
+              31.782530792878283,
+              34.520764035614306,
+              59.16486322023849
+            ],
             "f4_word_xors": null,
             "priced_s": 31.782530792878283,
             "s": 31.782530792878283,
             "systems": null,
+            "unpriced_ops": 862.0,
             "verified": true,
             "workload": "W1f06e384c722"
           },
           {
+            "band_s": [
+              19.71143297107216,
+              20.23239614022379,
+              24.921064662588485
+            ],
             "f4_word_xors": null,
             "priced_s": 19.71143297107216,
             "s": 19.71143297107216,
             "systems": null,
+            "unpriced_ops": 164.0,
             "verified": true,
             "workload": "W4edeb4fd1189"
           },
           {
+            "band_s": [
+              19.77496506487114,
+              20.30228144340267,
+              25.048128850186444
+            ],
             "f4_word_xors": null,
             "priced_s": 19.77496506487114,
             "s": 19.77496506487114,
             "systems": null,
+            "unpriced_ops": 166.0,
             "verified": true,
             "workload": "W76e18ba069eb"
           },
           {
+            "band_s": [
+              17.646639922605324,
+              17.757821086753538,
+              18.758451564087466
+            ],
             "f4_word_xors": null,
             "priced_s": 17.646639922605324,
             "s": 17.646639922605324,
             "systems": null,
+            "unpriced_ops": 35.0,
             "verified": true,
             "workload": "W90e84b08c7a1"
           },
           {
+            "band_s": [
+              20.75971251875532,
+              21.48397838806369,
+              28.002371211838994
+            ],
             "f4_word_xors": null,
             "priced_s": 20.75971251875532,
             "s": 20.75971251875532,
             "systems": null,
+            "unpriced_ops": 228.0,
             "verified": true,
             "workload": "Wde89e2befaef"
           },
           {
+            "band_s": [
+              281.9083840794609,
+              334.6686113748235,
+              809.5106570330869
+            ],
             "f4_word_xors": null,
             "priced_s": 281.9083840794609,
             "s": 281.9083840794609,
             "systems": null,
+            "unpriced_ops": 16609.0,
             "verified": true,
             "workload": "We8002db974c1"
           },
           {
+            "band_s": [
+              18.663153423388994,
+              18.974460683003993,
+              21.776226019538996
+            ],
             "f4_word_xors": null,
             "priced_s": 18.663153423388994,
             "s": 18.663153423388994,
             "systems": null,
+            "unpriced_ops": 98.0,
             "verified": true,
             "workload": "We8808aea44eb"
           },
           {
+            "band_s": [
+              17.646639922605324,
+              17.757821086753538,
+              18.758451564087466
+            ],
             "f4_word_xors": null,
             "priced_s": 17.646639922605324,
             "s": 17.646639922605324,
             "systems": null,
+            "unpriced_ops": 35.0,
             "verified": true,
             "workload": "Wf543c53d19c0"
           }
@@ -4606,7 +4846,18 @@
       },
       {
         "arm": "std-chain-g4",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m11-t67-05f5aa36",
+        "median_band_over_strong_rho": [
+          1.0229734901156573,
+          94261.74358220253,
+          809324.5828560176
+        ],
         "median_f4_word_xors": 626351488.0,
         "median_priced_over_signed_frobenius_rho": 21239.11088295141,
         "median_priced_over_standard_twin": null,
@@ -4614,69 +4865,118 @@
         "median_priced_s": 54535.83637508795,
         "median_s_recorded": 18.813663177943447,
         "median_systems": 53.5,
+        "median_unpriced_ops": 626351488.0,
         "n": 11,
         "per_workload": [
           {
+            "band_s": [
+              18.612895265382082,
+              2199008.0031057955,
+              21989912.515000567
+            ],
             "f4_word_xors": 692245213.0,
             "priced_s": 60270.92218703391,
             "s": 18.612895265382082,
             "systems": 59.0,
+            "unpriced_ops": 692245213.0,
             "verified": true,
             "workload": "W1f06e384c722"
           },
           {
+            "band_s": [
+              21.28379487618852,
+              2646166.112979478,
+              26461469.5756409
+            ],
             "f4_word_xors": 833010427.0,
             "priced_s": 72525.65211453427,
             "s": 21.28379487618852,
             "systems": 74.0,
+            "unpriced_ops": 833010427.0,
             "verified": true,
             "workload": "W4edeb4fd1189"
           },
           {
+            "band_s": [
+              19.861906559982216,
+              1613283.677463642,
+              16132658.017477382
+            ],
             "f4_word_xors": 507857909.0,
             "priced_s": 44223.29045282403,
             "s": 19.861906559982216,
             "systems": 43.0,
+            "unpriced_ops": 507857909.0,
             "verified": true,
             "workload": "W76e18ba069eb"
           },
           {
+            "band_s": [
+              18.37986551734424,
+              1704890.9098997887,
+              17048743.68020823
+            ],
             "f4_word_xors": 536696472.0,
             "priced_s": 46731.88718845637,
             "s": 18.37986551734424,
             "systems": 48.0,
+            "unpriced_ops": 536696472.0,
             "verified": true,
             "workload": "W90e84b08c7a1"
           },
           {
+            "band_s": [
+              17.558339128024144,
+              1987603.1186355907,
+              19875873.16130375
+            ],
             "f4_word_xors": 625694965.0,
             "priced_s": 54477.402691251096,
             "s": 17.558339128024144,
             "systems": 52.0,
+            "unpriced_ops": 625694965.0,
             "verified": true,
             "workload": "Wde89e2befaef"
           },
           {
+            "band_s": [
+              18.69975408863472,
+              2074486.4122880294,
+              20744695.825093497
+            ],
             "f4_word_xors": 653045599.0,
             "priced_s": 56859.11507751861,
             "s": 18.69975408863472,
             "systems": 59.0,
+            "unpriced_ops": 653045599.0,
             "verified": true,
             "workload": "We8002db974c1"
           },
           {
+            "band_s": [
+              20.139537362637192,
+              1991776.727915544,
+              19917586.023319177
+            ],
             "f4_word_xors": 627008011.0,
             "priced_s": 54594.270058924805,
             "s": 20.139537362637192,
             "systems": 54.0,
+            "unpriced_ops": 627008011.0,
             "verified": true,
             "workload": "We8808aea44eb"
           },
           {
+            "band_s": [
+              18.927572267252177,
+              1937441.7670517343,
+              19374247.322366934
+            ],
             "f4_word_xors": 609903664.0,
             "priced_s": 53104.31337400463,
             "s": 18.927572267252177,
             "systems": 53.0,
+            "unpriced_ops": 609903664.0,
             "verified": true,
             "workload": "Wf543c53d19c0"
           }
@@ -4697,7 +4997,18 @@
       },
       {
         "arm": "std-unsplit-g4",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m11-t67-05f5aa36",
+        "median_band_over_strong_rho": [
+          1.0229734901156573,
+          3013.7288271494026,
+          25295.606721422846
+        ],
         "median_f4_word_xors": 19924848.5,
         "median_priced_over_signed_frobenius_rho": 669.2694165996579,
         "median_priced_over_standard_twin": null,
@@ -4705,69 +5016,118 @@
         "median_priced_s": 1753.7718158654118,
         "median_s_recorded": 18.813663177943447,
         "median_systems": 53.5,
+        "median_unpriced_ops": 19924848.5,
         "n": 11,
         "per_workload": [
           {
+            "band_s": [
+              18.612895265382082,
+              68247.41520307993,
+              682306.6359734108
+            ],
             "f4_word_xors": 21478531.0,
             "priced_s": 1888.0820784995005,
             "s": 18.612895265382082,
             "systems": 59.0,
+            "unpriced_ops": 21478531.0,
             "verified": true,
             "workload": "W1f06e384c722"
           },
           {
+            "band_s": [
+              21.28379487618852,
+              85741.99947240569,
+              857228.4405701711
+            ],
             "f4_word_xors": 26985012.0,
             "priced_s": 2370.0314044404963,
             "s": 21.28379487618852,
             "systems": 74.0,
+            "unpriced_ops": 26985012.0,
             "verified": true,
             "workload": "W4edeb4fd1189"
           },
           {
+            "band_s": [
+              19.861906559982216,
+              51505.7815241308,
+              514879.05808226805
+            ],
             "f4_word_xors": 16207846.0,
             "priced_s": 1430.5761040814223,
             "s": 19.861906559982216,
             "systems": 43.0,
+            "unpriced_ops": 16207846.0,
             "verified": true,
             "workload": "W76e18ba069eb"
           },
           {
+            "band_s": [
+              18.37986551734424,
+              56956.23305053972,
+              569396.9117157412
+            ],
             "f4_word_xors": 17924123.0,
             "priced_s": 1578.477042786957,
             "s": 18.37986551734424,
             "systems": 48.0,
+            "unpriced_ops": 17924123.0,
             "verified": true,
             "workload": "W90e84b08c7a1"
           },
           {
+            "band_s": [
+              17.558339128024144,
+              60586.30245080898,
+              605704.9994559377
+            ],
             "f4_word_xors": 19067133.0,
             "priced_s": 1677.1419277880823,
             "s": 17.558339128024144,
             "systems": 52.0,
+            "unpriced_ops": 19067133.0,
             "verified": true,
             "workload": "Wde89e2befaef"
           },
           {
+            "band_s": [
+              18.69975408863472,
+              68344.76016769536,
+              683279.3038901557
+            ],
             "f4_word_xors": 21509148.0,
             "priced_s": 1890.8338094214587,
             "s": 18.69975408863472,
             "systems": 59.0,
+            "unpriced_ops": 21509148.0,
             "verified": true,
             "workload": "We8002db974c1"
           },
           {
+            "band_s": [
+              20.139537362637192,
+              63083.652378527855,
+              630655.2679490148
+            ],
             "f4_word_xors": 19852490.0,
             "priced_s": 1748.079789210564,
             "s": 20.139537362637192,
             "systems": 54.0,
+            "unpriced_ops": 19852490.0,
             "verified": true,
             "workload": "We8808aea44eb"
           },
           {
+            "band_s": [
+              18.927572267252177,
+              63542.14911434783,
+              635251.1429930729
+            ],
             "f4_word_xors": 19997207.0,
             "priced_s": 1759.4638425202595,
             "s": 18.927572267252177,
             "systems": 53.0,
+            "unpriced_ops": 19997207.0,
             "verified": true,
             "workload": "Wf543c53d19c0"
           }
@@ -4788,7 +5148,18 @@
       },
       {
         "arm": "clo-chain-g4",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m13-t181-515ee569",
+        "median_band_over_strong_rho": [
+          0.9403226008767647,
+          129894.15284560766,
+          1184046.2218550667
+        ],
         "median_f4_word_xors": 839112589.0,
         "median_priced_over_signed_frobenius_rho": 24033.58747610465,
         "median_priced_over_standard_twin": 0.5084580604062916,
@@ -4796,69 +5167,118 @@
         "median_priced_s": 43211.08509009397,
         "median_s_recorded": 13.364286767603044,
         "median_systems": 36.0,
+        "median_unpriced_ops": 839112589.0,
         "n": 13,
         "per_workload": [
           {
+            "band_s": [
+              13.735501516248027,
+              1440411.6915475868,
+              14403993.295962224
+            ],
             "f4_word_xors": 644648492.0,
             "priced_s": 33200.50440881772,
             "s": 13.735501516248027,
             "systems": 30.0,
+            "unpriced_ops": 644648492.0,
             "verified": true,
             "workload": "W1f28a79105f0"
           },
           {
+            "band_s": [
+              12.916330658329299,
+              1876125.3288507778,
+              18761137.041531853
+            ],
             "f4_word_xors": 839652009.0,
             "priced_s": 43238.54631512189,
             "s": 12.916330658329299,
             "systems": 34.0,
+            "unpriced_ops": 839652009.0,
             "verified": true,
             "workload": "W23ba9e23440f"
           },
           {
+            "band_s": [
+              12.850432046318005,
+              1787749.0055946698,
+              17877374.40205828
+            ],
             "f4_word_xors": 800099314.0,
             "priced_s": 41202.291446993164,
             "s": 12.850432046318005,
             "systems": 35.0,
+            "unpriced_ops": 800099314.0,
             "verified": true,
             "workload": "W64816adc49fa"
           },
           {
+            "band_s": [
+              13.533006517271447,
+              1873715.3931865862,
+              18737032.134807207
+            ],
             "f4_word_xors": 838573169.0,
             "priced_s": 43183.62386506606,
             "s": 13.533006517271447,
             "systems": 37.0,
+            "unpriced_ops": 838573169.0,
             "verified": true,
             "workload": "W95edb6f874c1"
           },
           {
+            "band_s": [
+              13.117048287200566,
+              1491621.0146752312,
+              14916092.093317727
+            ],
             "f4_word_xors": 667567444.0,
             "priced_s": 34379.76300961199,
             "s": 13.117048287200566,
             "systems": 31.0,
+            "unpriced_ops": 667567444.0,
             "verified": true,
             "workload": "W9bc06e650236"
           },
           {
+            "band_s": [
+              13.697820961669168,
+              2518586.855617189,
+              25185745.275783233
+            ],
             "f4_word_xors": 1127184596.0,
             "priced_s": 58041.623376586744,
             "s": 13.697820961669168,
             "systems": 47.0,
+            "unpriced_ops": 1127184596.0,
             "verified": true,
             "workload": "Wbc0a8b42e97e"
           },
           {
+            "band_s": [
+              13.332555362086806,
+              2131651.2778327805,
+              21316392.785329543
+            ],
             "f4_word_xors": 954012175.0,
             "priced_s": 49126.27081455381,
             "s": 13.332555362086806,
             "systems": 39.0,
+            "unpriced_ops": 954012175.0,
             "verified": true,
             "workload": "Wf17ab86df609"
           },
           {
+            "band_s": [
+              13.396018173119284,
+              2050962.5168725892,
+              20509504.604562335
+            ],
             "f4_word_xors": 917899982.0,
             "priced_s": 47267.26376265886,
             "s": 13.396018173119284,
             "systems": 41.0,
+            "unpriced_ops": 917899982.0,
             "verified": true,
             "workload": "Wfc5408d7f052"
           }
@@ -4879,7 +5299,18 @@
       },
       {
         "arm": "clo-unsplit-g4",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m13-t181-515ee569",
+        "median_band_over_strong_rho": [
+          0.9403226008767647,
+          2550.0167027166804,
+          23260.708554988527
+        ],
         "median_f4_word_xors": 16877847.5,
         "median_priced_over_signed_frobenius_rho": 466.873488463842,
         "median_priced_over_standard_twin": 0.4002571852528629,
@@ -4887,69 +5318,118 @@
         "median_priced_s": 882.0702346063537,
         "median_s_recorded": 13.364286767603044,
         "median_systems": 36.0,
+        "median_unpriced_ops": 16877847.5,
         "n": 13,
         "per_workload": [
           {
+            "band_s": [
+              13.735501516248027,
+              29742.624555250684,
+              297302.62603886065
+            ],
             "f4_word_xors": 13305131.0,
             "priced_s": 698.6891053142895,
             "s": 13.735501516248027,
             "systems": 30.0,
+            "unpriced_ops": 13305131.0,
             "verified": true,
             "workload": "W1f28a79105f0"
           },
           {
+            "band_s": [
+              12.916330658329299,
+              35145.81846098705,
+              351341.9376339455
+            ],
             "f4_word_xors": 15723691.0,
             "priced_s": 822.378395741103,
             "s": 12.916330658329299,
             "systems": 34.0,
+            "unpriced_ops": 15723691.0,
             "verified": true,
             "workload": "W23ba9e23440f"
           },
           {
+            "band_s": [
+              12.850432046318005,
+              36889.06828685875,
+              368775.0289801706
+            ],
             "f4_word_xors": 16503910.0,
             "priced_s": 862.4784914211963,
             "s": 12.850432046318005,
             "systems": 35.0,
+            "unpriced_ops": 16503910.0,
             "verified": true,
             "workload": "W64816adc49fa"
           },
           {
+            "band_s": [
+              13.533006517271447,
+              38560.797384739475,
+              385486.1767887393
+            ],
             "f4_word_xors": 17251785.0,
             "priced_s": 901.661977791511,
             "s": 13.533006517271447,
             "systems": 37.0,
+            "unpriced_ops": 17251785.0,
             "verified": true,
             "workload": "W95edb6f874c1"
           },
           {
+            "band_s": [
+              13.117048287200566,
+              30256.973316315234,
+              302451.6797285675
+            ],
             "f4_word_xors": 13535604.0,
             "priced_s": 709.9354967025664,
             "s": 13.117048287200566,
             "systems": 31.0,
+            "unpriced_ops": 13535604.0,
             "verified": true,
             "workload": "W9bc06e650236"
           },
           {
+            "band_s": [
+              13.697820961669168,
+              49458.96735086512,
+              494466.3931199961
+            ],
             "f4_word_xors": 22129175.0,
             "priced_s": 1152.9168309306444,
             "s": 13.697820961669168,
             "systems": 47.0,
+            "unpriced_ops": 22129175.0,
             "verified": true,
             "workload": "Wbc0a8b42e97e"
           },
           {
+            "band_s": [
+              13.332555362086806,
+              41010.40532092869,
+              409984.0602110281
+            ],
             "f4_word_xors": 18348194.0,
             "priced_s": 957.9051118807413,
             "s": 13.332555362086806,
             "systems": 39.0,
+            "unpriced_ops": 18348194.0,
             "verified": true,
             "workload": "Wf17ab86df609"
           },
           {
+            "band_s": [
+              13.396018173119284,
+              41278.312153153995,
+              412662.5573679819
+            ],
             "f4_word_xors": 18468067.0,
             "priced_s": 964.1396859230786,
             "s": 13.396018173119284,
             "systems": 41.0,
+            "unpriced_ops": 18468067.0,
             "verified": true,
             "workload": "Wfc5408d7f052"
           }
@@ -4970,7 +5450,18 @@
       },
       {
         "arm": "rho-frob",
+        "band_order_vs_strong_rho": "arm cheaper at every weight",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m13-t181-515ee569",
+        "median_band_over_strong_rho": [
+          0.12543392175204174,
+          0.1260227409321772,
+          0.13060301414490824
+        ],
         "median_f4_word_xors": null,
         "median_priced_over_signed_frobenius_rho": 1.0,
         "median_priced_over_standard_twin": null,
@@ -4978,69 +5469,118 @@
         "median_priced_s": 1.7986862127292262,
         "median_s_recorded": 1.7986862127292262,
         "median_systems": null,
+        "median_unpriced_ops": 16.5,
         "n": 13,
         "per_workload": [
           {
+            "band_s": [
+              1.7204824643496945,
+              1.753998356512351,
+              2.0556413859762586
+            ],
             "f4_word_xors": null,
             "priced_s": 1.7204824643496945,
             "s": 1.7204824643496945,
             "systems": null,
+            "unpriced_ops": 15.0,
             "verified": true,
             "workload": "W1f28a79105f0"
           },
           {
+            "band_s": [
+              1.921577817325633,
+              1.9640312807316644,
+              2.3461124513859475
+            ],
             "f4_word_xors": null,
             "priced_s": 1.921577817325633,
             "s": 1.921577817325633,
             "systems": null,
+            "unpriced_ops": 19.0,
             "verified": true,
             "workload": "W23ba9e23440f"
           },
           {
+            "band_s": [
+              2.100329242193134,
+              2.1606578480859153,
+              2.7036153011209487
+            ],
             "f4_word_xors": null,
             "priced_s": 2.100329242193134,
             "s": 2.100329242193134,
             "systems": null,
+            "unpriced_ops": 27.0,
             "verified": true,
             "workload": "W64816adc49fa"
           },
           {
+            "band_s": [
+              1.6087628238075067,
+              1.6445131087810068,
+              1.9662656735425081
+            ],
             "f4_word_xors": null,
             "priced_s": 1.6087628238075067,
             "s": 1.6087628238075067,
             "systems": null,
+            "unpriced_ops": 16.0,
             "verified": true,
             "workload": "W95edb6f874c1"
           },
           {
+            "band_s": [
+              1.6311067519159443,
+              1.6489818944026944,
+              1.809858176783445
+            ],
             "f4_word_xors": null,
             "priced_s": 1.6311067519159443,
             "s": 1.6311067519159443,
             "systems": null,
+            "unpriced_ops": 8.0,
             "verified": true,
             "workload": "W9bc06e650236"
           },
           {
+            "band_s": [
+              1.8768899611087577,
+              1.9171090317039454,
+              2.2790806670606343
+            ],
             "f4_word_xors": null,
             "priced_s": 1.8768899611087577,
             "s": 1.8768899611087577,
             "systems": null,
+            "unpriced_ops": 18.0,
             "verified": true,
             "workload": "Wbc0a8b42e97e"
           },
           {
+            "band_s": [
+              1.921577817325633,
+              1.959562495109977,
+              2.301424595169072
+            ],
             "f4_word_xors": null,
             "priced_s": 1.921577817325633,
             "s": 1.921577817325633,
             "systems": null,
+            "unpriced_ops": 17.0,
             "verified": true,
             "workload": "Wf17ab86df609"
           },
           {
+            "band_s": [
+              1.4523553270484435,
+              1.4769336479677249,
+              1.698138536241257
+            ],
             "f4_word_xors": null,
             "priced_s": 1.4523553270484435,
             "s": 1.4523553270484435,
             "systems": null,
+            "unpriced_ops": 11.0,
             "verified": true,
             "workload": "Wfc5408d7f052"
           }
@@ -5061,7 +5601,18 @@
       },
       {
         "arm": "rho-strong",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m13-t181-515ee569",
+        "median_band_over_strong_rho": [
+          1.0,
+          1.0,
+          1.0
+        ],
         "median_f4_word_xors": null,
         "median_priced_over_signed_frobenius_rho": 7.988525783154136,
         "median_priced_over_standard_twin": null,
@@ -5069,69 +5620,118 @@
         "median_priced_s": 14.318373493370782,
         "median_s_recorded": 14.318373493370782,
         "median_systems": null,
+        "median_unpriced_ops": 100.0,
         "n": 13,
         "per_workload": [
           {
+            "band_s": [
+              14.363061349587657,
+              14.59096941629372,
+              16.64214201664829
+            ],
             "f4_word_xors": null,
             "priced_s": 14.363061349587657,
             "s": 14.363061349587657,
             "systems": null,
+            "unpriced_ops": 102.0,
             "verified": true,
             "workload": "W1f28a79105f0"
           },
           {
+            "band_s": [
+              13.603367793900778,
+              13.690509113523685,
+              14.474780990129844
+            ],
             "f4_word_xors": null,
             "priced_s": 13.603367793900778,
             "s": 13.603367793900778,
             "systems": null,
+            "unpriced_ops": 39.0,
             "verified": true,
             "workload": "W23ba9e23440f"
           },
           {
+            "band_s": [
+              14.34071742147922,
+              14.564156702563595,
+              16.575110232322977
+            ],
             "f4_word_xors": null,
             "priced_s": 14.34071742147922,
             "s": 14.34071742147922,
             "systems": null,
+            "unpriced_ops": 100.0,
             "verified": true,
             "workload": "W64816adc49fa"
           },
           {
+            "band_s": [
+              15.100410977166097,
+              15.47578896938785,
+              18.854190899383614
+            ],
             "f4_word_xors": null,
             "priced_s": 15.100410977166097,
             "s": 15.100410977166097,
             "systems": null,
+            "unpriced_ops": 168.0,
             "verified": true,
             "workload": "W95edb6f874c1"
           },
           {
+            "band_s": [
+              14.318373493370782,
+              14.541812774455158,
+              16.55276630421454
+            ],
             "f4_word_xors": null,
             "priced_s": 14.318373493370782,
             "s": 14.318373493370782,
             "systems": null,
+            "unpriced_ops": 100.0,
             "verified": true,
             "workload": "W9bc06e650236"
           },
           {
+            "band_s": [
+              14.318373493370782,
+              14.541812774455158,
+              16.55276630421454
+            ],
             "f4_word_xors": null,
             "priced_s": 14.318373493370782,
             "s": 14.318373493370782,
             "systems": null,
+            "unpriced_ops": 100.0,
             "verified": true,
             "workload": "Wbc0a8b42e97e"
           },
           {
+            "band_s": [
+              14.318373493370782,
+              14.539578381644313,
+              16.530422376106102
+            ],
             "f4_word_xors": null,
             "priced_s": 14.318373493370782,
             "s": 14.318373493370782,
             "systems": null,
+            "unpriced_ops": 99.0,
             "verified": true,
             "workload": "Wf17ab86df609"
           },
           {
+            "band_s": [
+              13.603367793900778,
+              13.686040327901997,
+              14.430093133912969
+            ],
             "f4_word_xors": null,
             "priced_s": 13.603367793900778,
             "s": 13.603367793900778,
             "systems": null,
+            "unpriced_ops": 37.0,
             "verified": true,
             "workload": "Wfc5408d7f052"
           }
@@ -5152,7 +5752,18 @@
       },
       {
         "arm": "std-chain-g4",
+        "band_order_vs_strong_rho": "rho cheaper at every weight",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m13-t181-515ee569",
+        "median_band_over_strong_rho": [
+          1.1492959692595563,
+          228224.81627394247,
+          2005158.5191984447
+        ],
         "median_f4_word_xors": 1486441521.5,
         "median_priced_over_signed_frobenius_rho": 42563.69391832521,
         "median_priced_over_standard_twin": null,
@@ -5160,69 +5771,118 @@
         "median_priced_s": 76539.0883099655,
         "median_s_recorded": 16.887131657657754,
         "median_systems": 70.5,
+        "median_unpriced_ops": 1486441521.5,
         "n": 13,
         "per_workload": [
           {
+            "band_s": [
+              18.145129242156006,
+              3263553.6386396303,
+              32635373.080233123
+            ],
             "f4_word_xors": 1460591655.0,
             "priced_s": 75210.0028997215,
             "s": 18.145129242156006,
             "systems": 70.0,
+            "unpriced_ops": 1460591655.0,
             "verified": true,
             "workload": "W1f28a79105f0"
           },
           {
+            "band_s": [
+              18.32026508429664,
+              3991216.999953627,
+              39912005.11715051
+            ],
             "f4_word_xors": 1786256499.0,
             "priced_s": 91975.53784510832,
             "s": 18.32026508429664,
             "systems": 84.0,
+            "unpriced_ops": 1786256499.0,
             "verified": true,
             "workload": "W23ba9e23440f"
           },
           {
+            "band_s": [
+              16.373174120787525,
+              3269735.977791939,
+              32697212.4193523
+            ],
             "f4_word_xors": 1463359347.0,
             "priced_s": 75350.71286451531,
             "s": 16.373174120787525,
             "systems": 69.0,
+            "unpriced_ops": 1463359347.0,
             "verified": true,
             "workload": "W64816adc49fa"
           },
           {
+            "band_s": [
+              17.209828901355753,
+              3994157.1593067124,
+              39941416.704607
+            ],
             "f4_word_xors": 1787572861.0,
             "priced_s": 92042.19426487011,
             "s": 17.209828901355753,
             "systems": 84.0,
+            "unpriced_ops": 1787572861.0,
             "verified": true,
             "workload": "W95edb6f874c1"
           },
           {
+            "band_s": [
+              17.800996686186103,
+              5128777.439359383,
+              51287614.184623644
+            ],
             "f4_word_xors": 2295370632.0,
             "priced_s": 118184.4230645627,
             "s": 17.800996686186103,
             "systems": 107.0,
+            "unpriced_ops": 2295370632.0,
             "verified": true,
             "workload": "W9bc06e650236"
           },
           {
+            "band_s": [
+              16.56443441395976,
+              3372885.458575114,
+              33728705.50584142
+            ],
             "f4_word_xors": 1509523696.0,
             "priced_s": 77727.4637554157,
             "s": 16.56443441395976,
             "systems": 71.0,
+            "unpriced_ops": 1509523696.0,
             "verified": true,
             "workload": "Wbc0a8b42e97e"
           },
           {
+            "band_s": [
+              15.621088091679441,
+              3201579.1105589303,
+              32015650.515796475
+            ],
             "f4_word_xors": 1432856154.0,
             "priced_s": 73779.6438854998,
             "s": 15.621088091679441,
             "systems": 69.0,
+            "unpriced_ops": 1432856154.0,
             "verified": true,
             "workload": "Wf17ab86df609"
           },
           {
+            "band_s": [
+              14.20652077116013,
+              1688195.2784513577,
+              16881824.925826635
+            ],
             "f4_word_xors": 755543548.0,
             "priced_s": 38909.898418051875,
             "s": 14.20652077116013,
             "systems": 37.0,
+            "unpriced_ops": 755543548.0,
             "verified": true,
             "workload": "Wfc5408d7f052"
           }
@@ -5243,7 +5903,18 @@
       },
       {
         "arm": "std-unsplit-g4",
+        "band_order_vs_strong_rho": "rho cheaper at every weight",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m13-t181-515ee569",
+        "median_band_over_strong_rho": [
+          1.1492959692595563,
+          6007.978770948123,
+          52776.73392526245
+        ],
         "median_f4_word_xors": 39123114.0,
         "median_priced_over_signed_frobenius_rho": 1129.6627686109307,
         "median_priced_over_standard_twin": null,
@@ -5251,69 +5922,118 @@
         "median_priced_s": 2030.5427676204295,
         "median_s_recorded": 16.887131657657754,
         "median_systems": 70.5,
+        "median_unpriced_ops": 39123114.0,
         "n": 13,
         "per_workload": [
           {
+            "band_s": [
+              18.145129242156006,
+              85840.64120826196,
+              858243.1059194403
+            ],
             "f4_word_xors": 38409762.0,
             "priced_s": 1995.4954389027723,
             "s": 18.145129242156006,
             "systems": 70.0,
+            "unpriced_ops": 38409762.0,
             "verified": true,
             "workload": "W1f28a79105f0"
           },
           {
+            "band_s": [
+              18.32026508429664,
+              105974.49649041193,
+              1059580.0825183606
+            ],
             "f4_word_xors": 47420568.0,
             "priced_s": 2459.5505653158452,
             "s": 18.32026508429664,
             "systems": 84.0,
+            "unpriced_ops": 47420568.0,
             "verified": true,
             "workload": "W23ba9e23440f"
           },
           {
+            "band_s": [
+              16.373174120787525,
+              86002.09611675837,
+              859873.6026004965
+            ],
             "f4_word_xors": 38482814.0,
             "priced_s": 1997.4842307191573,
             "s": 16.373174120787525,
             "systems": 69.0,
+            "unpriced_ops": 38482814.0,
             "verified": true,
             "workload": "W64816adc49fa"
           },
           {
+            "band_s": [
+              17.209828901355753,
+              105403.2606190069,
+              1053877.7177299568
+            ],
             "f4_word_xors": 47165409.0,
             "priced_s": 2445.3044391053872,
             "s": 17.209828901355753,
             "systems": 84.0,
+            "unpriced_ops": 47165409.0,
             "verified": true,
             "workload": "W95edb6f874c1"
           },
           {
+            "band_s": [
+              17.800996686186103,
+              135654.7441577811,
+              1356387.2326076352
+            ],
             "f4_word_xors": 60704162.0,
             "priced_s": 3142.8761671178127,
             "s": 17.800996686186103,
             "systems": 107.0,
+            "unpriced_ops": 60704162.0,
             "verified": true,
             "workload": "W9bc06e650236"
           },
           {
+            "band_s": [
+              16.56443441395976,
+              88863.65081061806,
+              888487.4281964548
+            ],
             "f4_word_xors": 39763414.0,
             "priced_s": 2063.601304521702,
             "s": 16.56443441395976,
             "systems": 71.0,
+            "unpriced_ops": 39763414.0,
             "verified": true,
             "workload": "Wbc0a8b42e97e"
           },
           {
+            "band_s": [
+              15.621088091679441,
+              83879.85508861743,
+              838657.9610933491
+            ],
             "f4_word_xors": 37533344.0,
             "priced_s": 1947.8530394637926,
             "s": 15.621088091679441,
             "systems": 69.0,
+            "unpriced_ops": 37533344.0,
             "verified": true,
             "workload": "Wf17ab86df609"
           },
           {
+            "band_s": [
+              14.20652077116013,
+              44024.460773829866,
+              440116.7490513582
+            ],
             "f4_word_xors": 19696740.0,
             "priced_s": 1028.2027787616328,
             "s": 14.20652077116013,
             "systems": 37.0,
+            "unpriced_ops": 19696740.0,
             "verified": true,
             "workload": "Wfc5408d7f052"
           }
@@ -5334,7 +6054,18 @@
       },
       {
         "arm": "clo-unsplit-g4",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m17-tm101-00378d4e",
+        "median_band_over_strong_rho": [
+          0.8473822911959888,
+          1226535.6748309932,
+          8766433.343758162
+        ],
         "median_f4_word_xors": 15086268454.0,
         "median_priced_over_signed_frobenius_rho": 124729.96925686739,
         "median_priced_over_standard_twin": 0.3492839297903235,
@@ -5342,69 +6073,118 @@
         "median_priced_s": 115109.52197295125,
         "median_s_recorded": 3.631016859445239,
         "median_systems": 156.5,
+        "median_unpriced_ops": 15086268454.0,
         "n": 17,
         "per_workload": [
           {
+            "band_s": [
+              3.5519482322767333,
+              7280679.162846166,
+              72806759.66092756
+            ],
             "f4_word_xors": 18645780389.0,
             "priced_s": 142267.9533851779,
             "s": 3.5519482322767333,
             "systems": 192.0,
+            "unpriced_ops": 18645780389.0,
             "verified": true,
             "workload": "W09f7ae3e1049"
           },
           {
+            "band_s": [
+              3.634440062895068,
+              4890980.158777752,
+              48909768.87781695
+            ],
             "f4_word_xors": 12525770826.0,
             "priced_s": 95573.31572562133,
             "s": 3.634440062895068,
             "systems": 131.0,
+            "unpriced_ops": 12525770826.0,
             "verified": true,
             "workload": "W204a3eeb3073"
           },
           {
+            "band_s": [
+              3.581839853734984,
+              3873562.2891620565,
+              38735590.65506187
+            ],
             "f4_word_xors": 9920167968.0,
             "priced_s": 75692.91898092956,
             "s": 3.581839853734984,
             "systems": 105.0,
+            "unpriced_ops": 9920167968.0,
             "verified": true,
             "workload": "W2fc62a9fa05a"
           },
           {
+            "band_s": [
+              3.784555824499619,
+              4334770.211102999,
+              43347668.050027564
+            ],
             "f4_word_xors": 11101319046.0,
             "priced_s": 84705.12053055628,
             "s": 3.784555824499619,
             "systems": 117.0,
+            "unpriced_ops": 11101319046.0,
             "verified": true,
             "workload": "W6b3ce015e984"
           },
           {
+            "band_s": [
+              3.9194424207628833,
+              7207547.733449393,
+              72075442.05951214
+            ],
             "f4_word_xors": 18458490157.0,
             "priced_s": 140839.325568117,
             "s": 3.9194424207628833,
             "systems": 190.0,
+            "unpriced_ops": 18458490157.0,
             "verified": true,
             "workload": "W94089fe4d824"
           },
           {
+            "band_s": [
+              3.519770632929992,
+              5146140.028156275,
+              51461368.60362705
+            ],
             "f4_word_xors": 13179234499.0,
             "priced_s": 100559.02714448838,
             "s": 3.519770632929992,
             "systems": 138.0,
+            "unpriced_ops": 13179234499.0,
             "verified": true,
             "workload": "Wb860575f453d"
           },
           {
+            "band_s": [
+              3.6275936559954105,
+              8711938.675474213,
+              87119354.10639922
+            ],
             "f4_word_xors": 22311229939.0,
             "priced_s": 170234.83842924208,
             "s": 3.6275936559954105,
             "systems": 226.0,
+            "unpriced_ops": 22311229939.0,
             "verified": true,
             "workload": "Wd3eca550d191"
           },
           {
+            "band_s": [
+              3.7650802681352746,
+              6635431.181720288,
+              66354277.93148045
+            ],
             "f4_word_xors": 16993302409.0,
             "priced_s": 129660.0168014141,
             "s": 3.7650802681352746,
             "systems": 175.0,
+            "unpriced_ops": 16993302409.0,
             "verified": true,
             "workload": "Wdf152c64e538"
           }
@@ -5425,7 +6205,18 @@
       },
       {
         "arm": "ic-mitm-frob",
+        "band_order_vs_strong_rho": "rho cheaper at every weight",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m17-tm101-00378d4e",
+        "median_band_over_strong_rho": [
+          4.179212251354105,
+          4.025550243197424,
+          3.0258172329317743
+        ],
         "median_f4_word_xors": null,
         "median_priced_over_signed_frobenius_rho": 18.29060577859314,
         "median_priced_over_standard_twin": null,
@@ -5433,69 +6224,118 @@
         "median_priced_s": 17.098694386581585,
         "median_s_recorded": 17.098694386581585,
         "median_systems": null,
+        "median_unpriced_ops": 0.0,
         "n": 17,
         "per_workload": [
           {
+            "band_s": [
+              17.055722404471634,
+              17.055722404471634,
+              17.055722404471634
+            ],
             "f4_word_xors": null,
             "priced_s": 17.055722404471634,
             "s": 17.055722404471634,
             "systems": null,
+            "unpriced_ops": 0.0,
             "verified": true,
             "workload": "W060ff29f5a49"
           },
           {
+            "band_s": [
+              17.109956731827666,
+              17.109956731827666,
+              17.109956731827666
+            ],
             "f4_word_xors": null,
             "priced_s": 17.109956731827666,
             "s": 17.109956731827666,
             "systems": null,
+            "unpriced_ops": 0.0,
             "verified": true,
             "workload": "W172d54fbb598"
           },
           {
+            "band_s": [
+              17.121895485809883,
+              17.121895485809883,
+              17.121895485809883
+            ],
             "f4_word_xors": null,
             "priced_s": 17.121895485809883,
             "s": 17.121895485809883,
             "systems": null,
+            "unpriced_ops": 0.0,
             "verified": true,
             "workload": "W2b297827a860"
           },
           {
+            "band_s": [
+              17.05185882936795,
+              17.05185882936795,
+              17.05185882936795
+            ],
             "f4_word_xors": null,
             "priced_s": 17.05185882936795,
             "s": 17.05185882936795,
             "systems": null,
+            "unpriced_ops": 0.0,
             "verified": true,
             "workload": "W5a3db0c5255e"
           },
           {
+            "band_s": [
+              17.145261673158785,
+              17.145261673158785,
+              17.145261673158785
+            ],
             "f4_word_xors": null,
             "priced_s": 17.145261673158785,
             "s": 17.145261673158785,
             "systems": null,
+            "unpriced_ops": 0.0,
             "verified": true,
             "workload": "W94ef488a8f88"
           },
           {
+            "band_s": [
+              17.19371785381814,
+              17.19371785381814,
+              17.19371785381814
+            ],
             "f4_word_xors": null,
             "priced_s": 17.19371785381814,
             "s": 17.19371785381814,
             "systems": null,
+            "unpriced_ops": 0.0,
             "verified": true,
             "workload": "Wc28a3fa54b4c"
           },
           {
+            "band_s": [
+              17.035995867619587,
+              17.035995867619587,
+              17.035995867619587
+            ],
             "f4_word_xors": null,
             "priced_s": 17.035995867619587,
             "s": 17.035995867619587,
             "systems": null,
+            "unpriced_ops": 0.0,
             "verified": true,
             "workload": "We6255589f628"
           },
           {
+            "band_s": [
+              17.087432041335507,
+              17.087432041335507,
+              17.087432041335507
+            ],
             "f4_word_xors": null,
             "priced_s": 17.087432041335507,
             "s": 17.087432041335507,
             "systems": null,
+            "unpriced_ops": 0.0,
             "verified": true,
             "workload": "Wfa3967bfcd34"
           }
@@ -5516,7 +6356,18 @@
       },
       {
         "arm": "ic-sat-xor",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m17-tm101-00378d4e",
+        "median_band_over_strong_rho": [
+          0.8569600964348728,
+          8.390940631364023,
+          59.54433521036201
+        ],
         "median_f4_word_xors": null,
         "median_priced_over_signed_frobenius_rho": 3.677006824142423,
         "median_priced_over_standard_twin": null,
@@ -5524,69 +6375,118 @@
         "median_priced_s": 3.42959200554649,
         "median_s_recorded": 3.42959200554649,
         "median_systems": null,
+        "median_unpriced_ops": 82005.5,
         "n": 17,
         "per_workload": [
           {
+            "band_s": [
+              3.4471301417845734,
+              36.412430866717784,
+              333.1001373911166
+            ],
             "f4_word_xors": null,
             "priced_s": 3.4471301417845734,
             "s": 3.4471301417845734,
             "systems": null,
+            "unpriced_ops": 84424.0,
             "verified": true,
             "workload": "W060ff29f5a49"
           },
           {
+            "band_s": [
+              3.473468106636082,
+              36.45868295950651,
+              333.32561663534034
+            ],
             "f4_word_xors": null,
             "priced_s": 3.473468106636082,
             "s": 3.473468106636082,
             "systems": null,
+            "unpriced_ops": 84475.0,
             "verified": true,
             "workload": "W172d54fbb598"
           },
           {
+            "band_s": [
+              3.519318820414406,
+              43.28744183793961,
+              401.2005489956664
+            ],
             "f4_word_xors": null,
             "priced_s": 3.519318820414406,
             "s": 3.519318820414406,
             "systems": null,
+            "unpriced_ops": 101846.0,
             "verified": true,
             "workload": "W2b297827a860"
           },
           {
+            "band_s": [
+              3.3146119874231155,
+              23.778526044945856,
+              207.9537525626505
+            ],
             "f4_word_xors": null,
             "priced_s": 3.3146119874231155,
             "s": 3.3146119874231155,
             "systems": null,
+            "unpriced_ops": 52408.0,
             "verified": true,
             "workload": "W5a3db0c5255e"
           },
           {
+            "band_s": [
+              3.3662069157860053,
+              19.063615880571376,
+              160.34029656363967
+            ],
             "f4_word_xors": null,
             "priced_s": 3.3662069157860053,
             "s": 3.3662069157860053,
             "systems": null,
+            "unpriced_ops": 40201.0,
             "verified": true,
             "workload": "W94ef488a8f88"
           },
           {
+            "band_s": [
+              3.577325902736531,
+              44.99051207711457,
+              417.70918764651685
+            ],
             "f4_word_xors": null,
             "priced_s": 3.577325902736531,
             "s": 3.577325902736531,
             "systems": null,
+            "unpriced_ops": 106059.0,
             "verified": true,
             "workload": "Wc28a3fa54b4c"
           },
           {
+            "band_s": [
+              3.412053869308407,
+              32.47613788403116,
+              294.0528940165359
+            ],
             "f4_word_xors": null,
             "priced_s": 3.412053869308407,
             "s": 3.412053869308407,
             "systems": null,
+            "unpriced_ops": 74433.0,
             "verified": true,
             "workload": "We6255589f628"
           },
           {
+            "band_s": [
+              3.326803279880696,
+              34.40338563555277,
+              314.0926268366015
+            ],
             "f4_word_xors": null,
             "priced_s": 3.326803279880696,
             "s": 3.326803279880696,
             "systems": null,
+            "unpriced_ops": 79587.0,
             "verified": true,
             "workload": "Wfa3967bfcd34"
           }
@@ -5607,7 +6507,18 @@
       },
       {
         "arm": "pdp-m2-g0",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m17-tm101-00378d4e",
+        "median_band_over_strong_rho": [
+          0.8491638357759712,
+          142344.05765340503,
+          1089550.4350293041
+        ],
         "median_f4_word_xors": 1650078244.5,
         "median_priced_over_signed_frobenius_rho": 11705.063711831219,
         "median_priced_over_standard_twin": null,
@@ -5615,69 +6526,118 @@
         "median_priced_s": 12593.320029783958,
         "median_s_recorded": 3.432226588053985,
         "median_systems": 21.5,
+        "median_unpriced_ops": 1650078244.5,
         "n": 17,
         "per_workload": [
           {
+            "band_s": [
+              3.43932067984841,
+              658780.2046315648,
+              6587771.092429529
+            ],
             "f4_word_xors": 1687124595.0,
             "priced_s": 12875.93731485454,
             "s": 3.43932067984841,
             "systems": 22.0,
+            "unpriced_ops": 1687124595.0,
             "verified": true,
             "workload": "W060ff29f5a49"
           },
           {
+            "band_s": [
+              3.4136362068669888,
+              511515.53123924776,
+              5115124.589666615
+            ],
             "f4_word_xors": 1309980436.0,
             "priced_s": 9998.360414170285,
             "s": 3.4136362068669888,
             "systems": 17.0,
+            "unpriced_ops": 1309980436.0,
             "verified": true,
             "workload": "W172d54fbb598"
           },
           {
+            "band_s": [
+              3.535099470433969,
+              749484.5920481342,
+              7494814.104586108
+            ],
             "f4_word_xors": 1919417914.0,
             "priced_s": 14648.394952247321,
             "s": 3.535099470433969,
             "systems": 25.0,
+            "unpriced_ops": 1919417914.0,
             "verified": true,
             "workload": "W2b297827a860"
           },
           {
+            "band_s": [
+              3.306802525486952,
+              389140.26324438554,
+              3891372.8712211265
+            ],
             "f4_word_xors": 996578150.0,
             "priced_s": 7607.042931399433,
             "s": 3.306802525486952,
             "systems": 13.0,
+            "unpriced_ops": 996578150.0,
             "verified": true,
             "workload": "W5a3db0c5255e"
           },
           {
+            "band_s": [
+              3.422038664676351,
+              515130.7012278177,
+              5151276.213930195
+            ],
             "f4_word_xors": 1319238850.0,
             "priced_s": 10069.009074020725,
             "s": 3.422038664676351,
             "systems": 17.0,
+            "unpriced_ops": 1319238850.0,
             "verified": true,
             "workload": "W94ef488a8f88"
           },
           {
+            "band_s": [
+              3.52052379696277,
+              629849.0794243298,
+              6298459.1095291255
+            ],
             "f4_word_xors": 1613031894.0,
             "priced_s": 12310.702744713373,
             "s": 3.52052379696277,
             "systems": 21.0,
+            "unpriced_ops": 1613031894.0,
             "verified": true,
             "workload": "Wc28a3fa54b4c"
           },
           {
+            "band_s": [
+              3.429319168327192,
+              690689.0832771842,
+              6906859.968899326
+            ],
             "f4_word_xors": 1768843128.0,
             "priced_s": 13499.426997507955,
             "s": 3.429319168327192,
             "systems": 23.0,
+            "unpriced_ops": 1768843128.0,
             "verified": true,
             "workload": "We6255589f628"
           },
           {
+            "band_s": [
+              3.435134007780778,
+              688955.2889715557,
+              6889521.973509486
+            ],
             "f4_word_xors": 1764402873.0,
             "priced_s": 13465.554357993464,
             "s": 3.435134007780778,
             "systems": 23.0,
+            "unpriced_ops": 1764402873.0,
             "verified": true,
             "workload": "Wfa3967bfcd34"
           }
@@ -5698,7 +6658,18 @@
       },
       {
         "arm": "pdp-m2-g4",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m17-tm101-00378d4e",
+        "median_band_over_strong_rho": [
+          0.8462376691677911,
+          2219.429112557155,
+          16818.069889811824
+        ],
         "median_f4_word_xors": 24262294.0,
         "median_priced_over_signed_frobenius_rho": 222.34152500955878,
         "median_priced_over_standard_twin": null,
@@ -5706,69 +6677,118 @@
         "median_priced_s": 188.53093694263902,
         "median_s_recorded": 3.415608193624144,
         "median_systems": 19.0,
+        "median_unpriced_ops": 24262294.0,
         "n": 17,
         "per_workload": [
           {
+            "band_s": [
+              3.3640067873125785,
+              8199.448584551323,
+              81964.20978442741
+            ],
             "f4_word_xors": 20990139.0,
             "priced_s": 163.51549943682133,
             "s": 3.3640067873125785,
             "systems": 17.0,
+            "unpriced_ops": 20990139.0,
             "verified": true,
             "workload": "W060ff29f5a49"
           },
           {
+            "band_s": [
+              3.3980172829946618,
+              8770.44407139282,
+              87673.85855838124
+            ],
             "f4_word_xors": 22452369.0,
             "priced_s": 174.70609718030065,
             "s": 3.3980172829946618,
             "systems": 17.0,
+            "unpriced_ops": 22452369.0,
             "verified": true,
             "workload": "W172d54fbb598"
           },
           {
+            "band_s": [
+              3.5752001593880456,
+              14118.703615435323,
+              141154.85935291872
+            ],
             "f4_word_xors": 36148786.0,
             "priced_s": 279.3848093938797,
             "s": 3.5752001593880456,
             "systems": 27.0,
+            "unpriced_ops": 36148786.0,
             "verified": true,
             "workload": "W2b297827a860"
           },
           {
+            "band_s": [
+              3.3146119874231155,
+              6871.5212341668475,
+              68685.38083378167
+            ],
             "f4_word_xors": 17589449.0,
             "priced_s": 137.51936938480904,
             "s": 3.3146119874231155,
             "systems": 13.0,
+            "unpriced_ops": 17589449.0,
             "verified": true,
             "workload": "W5a3db0c5255e"
           },
           {
+            "band_s": [
+              3.429955944044005,
+              7039.317440085802,
+              70362.30479736162
+            ],
             "f4_word_xors": 18018879.0,
             "priced_s": 140.91119738417393,
             "s": 3.429955944044005,
             "systems": 17.0,
+            "unpriced_ops": 18018879.0,
             "verified": true,
             "workload": "W94ef488a8f88"
           },
           {
+            "band_s": [
+              3.573757021583745,
+              12730.65973148363,
+              127274.43350164205
+            ],
             "f4_word_xors": 32594015.0,
             "priced_s": 252.2610169625721,
             "s": 3.573757021583745,
             "systems": 26.0,
+            "unpriced_ops": 32594015.0,
             "verified": true,
             "workload": "Wc28a3fa54b4c"
           },
           {
+            "band_s": [
+              3.428804876211386,
+              10183.928898467104,
+              101808.42974078511
+            ],
             "f4_word_xors": 26072219.0,
             "priced_s": 202.3557767049774,
             "s": 3.428804876211386,
             "systems": 21.0,
+            "unpriced_ops": 26072219.0,
             "verified": true,
             "workload": "We6255589f628"
           },
           {
+            "band_s": [
+              3.402411511036902,
+              10779.199045787022,
+              107761.36875427088
+            ],
             "f4_word_xors": 27596771.0,
             "priced_s": 213.96147774478965,
             "s": 3.402411511036902,
             "systems": 21.0,
+            "unpriced_ops": 27596771.0,
             "verified": true,
             "workload": "Wfa3967bfcd34"
           }
@@ -5789,7 +6809,18 @@
       },
       {
         "arm": "rho-frob",
+        "band_order_vs_strong_rho": "arm cheaper at every weight",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m17-tm101-00378d4e",
+        "median_band_over_strong_rho": [
+          0.21376183596468884,
+          0.21308727322485538,
+          0.20886343409666436
+        ],
         "median_f4_word_xors": null,
         "median_priced_over_signed_frobenius_rho": 1.0,
         "median_priced_over_standard_twin": null,
@@ -5797,133 +6828,230 @@
         "median_priced_s": 0.9781351075044737,
         "median_s_recorded": 0.9781351075044737,
         "median_systems": null,
+        "median_unpriced_ops": 85.5,
         "n": 17,
         "per_workload": [
           {
+            "band_s": [
+              1.089419940094803,
+              1.14135286197029,
+              1.6087491588496734
+            ],
             "f4_word_xors": null,
             "priced_s": 1.089419940094803,
             "s": 1.089419940094803,
             "systems": null,
+            "unpriced_ops": 133.0,
             "verified": true,
             "workload": "W060ff29f5a49"
           },
           {
+            "band_s": [
+              0.9996111278289233,
+              1.0324108679608097,
+              1.3276085291477888
+            ],
             "f4_word_xors": null,
             "priced_s": 0.9996111278289233,
             "s": 0.9996111278289233,
             "systems": null,
+            "unpriced_ops": 84.0,
             "verified": true,
             "workload": "W09f7ae3e1049"
           },
           {
+            "band_s": [
+              0.7106610361908751,
+              0.726279960063202,
+              0.8668502749141443
+            ],
             "f4_word_xors": null,
             "priced_s": 0.7106610361908751,
             "s": 0.7106610361908751,
             "systems": null,
+            "unpriced_ops": 40.0,
             "verified": true,
             "workload": "W172d54fbb598"
           },
           {
+            "band_s": [
+              0.8980881226587982,
+              0.9269831318226031,
+              1.1870382142968463
+            ],
             "f4_word_xors": null,
             "priced_s": 0.8980881226587982,
             "s": 0.8980881226587982,
             "systems": null,
+            "unpriced_ops": 74.0,
             "verified": true,
             "workload": "W204a3eeb3073"
           },
           {
+            "band_s": [
+              0.9176117774992069,
+              0.9508019907279016,
+              1.249513909786154
+            ],
             "f4_word_xors": null,
             "priced_s": 0.9176117774992069,
             "s": 0.9176117774992069,
             "systems": null,
+            "unpriced_ops": 85.0,
             "verified": true,
             "workload": "W2b297827a860"
           },
           {
+            "band_s": [
+              1.0698962852543943,
+              1.1198768416458404,
+              1.569701849168856
+            ],
             "f4_word_xors": null,
             "priced_s": 1.0698962852543943,
             "s": 1.0698962852543943,
             "systems": null,
+            "unpriced_ops": 128.0,
             "verified": true,
             "workload": "W2fc62a9fa05a"
           },
           {
+            "band_s": [
+              0.6638042645738943,
+              0.6751279843813314,
+              0.7770414626482645
+            ],
             "f4_word_xors": null,
             "priced_s": 0.6638042645738943,
             "s": 0.6638042645738943,
             "systems": null,
+            "unpriced_ops": 29.0,
             "verified": true,
             "workload": "W5a3db0c5255e"
           },
           {
+            "band_s": [
+              0.6638042645738943,
+              0.6680994686387842,
+              0.7067563052227933
+            ],
             "f4_word_xors": null,
             "priced_s": 0.6638042645738943,
             "s": 0.6638042645738943,
             "systems": null,
+            "unpriced_ops": 11.0,
             "verified": true,
             "workload": "W6b3ce015e984"
           },
           {
+            "band_s": [
+              1.1558003665521925,
+              1.2104666001053368,
+              1.702462702083635
+            ],
             "f4_word_xors": null,
             "priced_s": 1.1558003665521925,
             "s": 1.1558003665521925,
             "systems": null,
+            "unpriced_ops": 140.0,
             "verified": true,
             "workload": "W94089fe4d824"
           },
           {
+            "band_s": [
+              0.9566590871800241,
+              0.990239773505527,
+              1.292465950435053
+            ],
             "f4_word_xors": null,
             "priced_s": 0.9566590871800241,
             "s": 0.9566590871800241,
             "systems": null,
+            "unpriced_ops": 86.0,
             "verified": true,
             "workload": "W94ef488a8f88"
           },
           {
+            "band_s": [
+              1.046467899445904,
+              1.0874675746107623,
+              1.4564646510944859
+            ],
             "f4_word_xors": null,
             "priced_s": 1.046467899445904,
             "s": 1.046467899445904,
             "systems": null,
+            "unpriced_ops": 105.0,
             "verified": true,
             "workload": "Wb860575f453d"
           },
           {
+            "band_s": [
+              1.062086823318231,
+              1.1077721756447874,
+              1.5189403465837936
+            ],
             "f4_word_xors": null,
             "priced_s": 1.062086823318231,
             "s": 1.062086823318231,
             "systems": null,
+            "unpriced_ops": 117.0,
             "verified": true,
             "workload": "Wc28a3fa54b4c"
           },
           {
+            "band_s": [
+              0.6911373813504664,
+              0.7020706280610953,
+              0.800469848456755
+            ],
             "f4_word_xors": null,
             "priced_s": 0.6911373813504664,
             "s": 0.6911373813504664,
             "systems": null,
+            "unpriced_ops": 28.0,
             "verified": true,
             "workload": "Wd3eca550d191"
           },
           {
+            "band_s": [
+              1.003515858797005,
+              1.0421726953810142,
+              1.3900842246370964
+            ],
             "f4_word_xors": null,
             "priced_s": 1.003515858797005,
             "s": 1.003515858797005,
             "systems": null,
+            "unpriced_ops": 99.0,
             "verified": true,
             "workload": "Wdf152c64e538"
           },
           {
+            "band_s": [
+              0.8278029652333271,
+              0.8535741896226665,
+              1.0855152091267213
+            ],
             "f4_word_xors": null,
             "priced_s": 0.8278029652333271,
             "s": 0.8278029652333271,
             "systems": null,
+            "unpriced_ops": 66.0,
             "verified": true,
             "workload": "We6255589f628"
           },
           {
+            "band_s": [
+              1.1870382142968463,
+              1.2479520173989214,
+              1.7961762453175965
+            ],
             "f4_word_xors": null,
             "priced_s": 1.1870382142968463,
             "s": 1.1870382142968463,
             "systems": null,
+            "unpriced_ops": 156.0,
             "verified": true,
             "workload": "Wfa3967bfcd34"
           }
@@ -5952,7 +7080,18 @@
       },
       {
         "arm": "rho-strong",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m17-tm101-00378d4e",
+        "median_band_over_strong_rho": [
+          1.0,
+          1.0,
+          1.0
+        ],
         "median_f4_word_xors": null,
         "median_priced_over_signed_frobenius_rho": 4.678507405511854,
         "median_priced_over_standard_twin": null,
@@ -5960,133 +7099,230 @@
         "median_priced_s": 4.160720909224707,
         "median_s_recorded": 4.160720909224707,
         "median_systems": null,
+        "median_unpriced_ops": 434.5,
         "n": 17,
         "per_workload": [
           {
+            "band_s": [
+              4.037721883730132,
+              4.180244564065116,
+              5.4629486870799635
+            ],
             "f4_word_xors": null,
             "priced_s": 4.037721883730132,
             "s": 4.037721883730132,
             "systems": null,
+            "unpriced_ops": 365.0,
             "verified": true,
             "workload": "W060ff29f5a49"
           },
           {
+            "band_s": [
+              4.787430229601824,
+              5.082237417691995,
+              7.735502110503532
+            ],
             "f4_word_xors": null,
             "priced_s": 4.787430229601824,
             "s": 4.787430229601824,
             "systems": null,
+            "unpriced_ops": 755.0,
             "verified": true,
             "workload": "W09f7ae3e1049"
           },
           {
+            "band_s": [
+              3.787819101772902,
+              3.8795802795228225,
+              4.705430879272109
+            ],
             "f4_word_xors": null,
             "priced_s": 3.787819101772902,
             "s": 3.787819101772902,
             "systems": null,
+            "unpriced_ops": 235.0,
             "verified": true,
             "workload": "W172d54fbb598"
           },
           {
+            "band_s": [
+              4.162673274708747,
+              4.3309671794330695,
+              5.8456123219519736
+            ],
             "f4_word_xors": null,
             "priced_s": 4.162673274708747,
             "s": 4.162673274708747,
             "systems": null,
+            "unpriced_ops": 431.0,
             "verified": true,
             "workload": "W204a3eeb3073"
           },
           {
+            "band_s": [
+              4.408671325697897,
+              4.626164840620049,
+              6.583606474919422
+            ],
             "f4_word_xors": null,
             "priced_s": 4.408671325697897,
             "s": 4.408671325697897,
             "systems": null,
+            "unpriced_ops": 557.0,
             "verified": true,
             "workload": "W2b297827a860"
           },
           {
+            "band_s": [
+              3.658962979826205,
+              3.72417198699317,
+              4.311053051495854
+            ],
             "f4_word_xors": null,
             "priced_s": 3.658962979826205,
             "s": 3.658962979826205,
             "systems": null,
+            "unpriced_ops": 167.0,
             "verified": true,
             "workload": "W2fc62a9fa05a"
           },
           {
+            "band_s": [
+              4.287624665687363,
+              4.482470740994642,
+              6.2360854187601475
+            ],
             "f4_word_xors": null,
             "priced_s": 4.287624665687363,
             "s": 4.287624665687363,
             "systems": null,
+            "unpriced_ops": 499.0,
             "verified": true,
             "workload": "W5a3db0c5255e"
           },
           {
+            "band_s": [
+              4.03381715276205,
+              4.176339833097034,
+              5.459043956111882
+            ],
             "f4_word_xors": null,
             "priced_s": 4.03381715276205,
             "s": 4.03381715276205,
             "systems": null,
+            "unpriced_ops": 365.0,
             "verified": true,
             "workload": "W6b3ce015e984"
           },
           {
+            "band_s": [
+              3.78391437080482,
+              3.874504129264316,
+              4.689811955399781
+            ],
             "f4_word_xors": null,
             "priced_s": 3.78391437080482,
             "s": 3.78391437080482,
             "systems": null,
+            "unpriced_ops": 232.0,
             "verified": true,
             "workload": "W94089fe4d824"
           },
           {
+            "band_s": [
+              3.787819101772902,
+              3.8807516988132473,
+              4.717145072176354
+            ],
             "f4_word_xors": null,
             "priced_s": 3.787819101772902,
             "s": 3.787819101772902,
             "systems": null,
+            "unpriced_ops": 238.0,
             "verified": true,
             "workload": "W94ef488a8f88"
           },
           {
+            "band_s": [
+              4.283719934719281,
+              4.475051752155286,
+              6.19703810907933
+            ],
             "f4_word_xors": null,
             "priced_s": 4.283719934719281,
             "s": 4.283719934719281,
             "systems": null,
+            "unpriced_ops": 490.0,
             "verified": true,
             "workload": "Wb860575f453d"
           },
           {
+            "band_s": [
+              4.158768543740666,
+              4.3297957601426456,
+              5.8690407077604645
+            ],
             "f4_word_xors": null,
             "priced_s": 4.158768543740666,
             "s": 4.158768543740666,
             "systems": null,
+            "unpriced_ops": 438.0,
             "verified": true,
             "workload": "Wc28a3fa54b4c"
           },
           {
+            "band_s": [
+              4.908476889612358,
+              5.2263219904142115,
+              8.086927897630888
+            ],
             "f4_word_xors": null,
             "priced_s": 4.908476889612358,
             "s": 4.908476889612358,
             "systems": null,
+            "unpriced_ops": 814.0,
             "verified": true,
             "workload": "Wd3eca550d191"
           },
           {
+            "band_s": [
+              4.795239691537988,
+              5.0919992451122,
+              7.762835227280104
+            ],
             "f4_word_xors": null,
             "priced_s": 4.795239691537988,
             "s": 4.795239691537988,
             "systems": null,
+            "unpriced_ops": 760.0,
             "verified": true,
             "workload": "Wdf152c64e538"
           },
           {
+            "band_s": [
+              3.9088657617834355,
+              4.023664852245038,
+              5.056856666399464
+            ],
             "f4_word_xors": null,
             "priced_s": 3.9088657617834355,
             "s": 3.9088657617834355,
             "systems": null,
+            "unpriced_ops": 294.0,
             "verified": true,
             "workload": "We6255589f628"
           },
           {
+            "band_s": [
+              4.678097762495536,
+              4.9486956185836,
+              7.384076323376176
+            ],
             "f4_word_xors": null,
             "priced_s": 4.678097762495536,
             "s": 4.678097762495536,
             "systems": null,
+            "unpriced_ops": 693.0,
             "verified": true,
             "workload": "Wfa3967bfcd34"
           }
@@ -6115,7 +7351,18 @@
       },
       {
         "arm": "std-unsplit-g4",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m17-tm101-00378d4e",
+        "median_band_over_strong_rho": [
+          1.3030323701908308,
+          3325813.0073694517,
+          26499695.897022992
+        ],
         "median_f4_word_xors": 40515592413.5,
         "median_priced_over_signed_frobenius_rho": 324788.35873275285,
         "median_priced_over_standard_twin": null,
@@ -6123,69 +7370,118 @@
         "median_priced_s": 309133.01971101307,
         "median_s_recorded": 5.358883667017325,
         "median_systems": 398.0,
+        "median_unpriced_ops": 40515592413.5,
         "n": 17,
         "per_workload": [
           {
+            "band_s": [
+              4.189791857866757,
+              11093823.798250904,
+              110938200.27438232
+            ],
             "f4_word_xors": 28411226533.0,
             "priced_s": 216777.42494114765,
             "s": 4.189791857866757,
             "systems": 277.0,
+            "unpriced_ops": 28411226533.0,
             "verified": true,
             "workload": "W09f7ae3e1049"
           },
           {
+            "band_s": [
+              5.260043063642495,
+              15106574.792020723,
+              151065700.57981965
+            ],
             "f4_word_xors": 38687862635.0,
             "priced_s": 295187.62869790714,
             "s": 5.260043063642495,
             "systems": 379.0,
+            "unpriced_ops": 38687862635.0,
             "verified": true,
             "workload": "W204a3eeb3073"
           },
           {
+            "band_s": [
+              4.9119504563925,
+              11707450.314179048,
+              117074458.93423638
+            ],
             "f4_word_xors": 29982719675.0,
             "priced_s": 228768.3951100031,
             "s": 4.9119504563925,
             "systems": 299.0,
+            "unpriced_ops": 29982719675.0,
             "verified": true,
             "workload": "W2fc62a9fa05a"
           },
           {
+            "band_s": [
+              6.744904601275919,
+              25904567.30319113,
+              259045612.32776988
+            ],
             "f4_word_xors": 66341473382.0,
             "priced_s": 506181.85821351997,
             "s": 6.744904601275919,
             "systems": 644.0,
+            "unpriced_ops": 66341473382.0,
             "verified": true,
             "workload": "W6b3ce015e984"
           },
           {
+            "band_s": [
+              5.795136364643432,
+              18980638.810722664,
+              189806335.95099935
+            ],
             "f4_word_xors": 48609323333.0,
             "priced_s": 370887.3642609209,
             "s": 5.795136364643432,
             "systems": 475.0,
+            "unpriced_ops": 48609323333.0,
             "verified": true,
             "workload": "W94089fe4d824"
           },
           {
+            "band_s": [
+              5.263005434648203,
+              13995836.49080999,
+              139958317.54105097
+            ],
             "f4_word_xors": 35843266392.0,
             "priced_s": 273483.8051967356,
             "s": 5.263005434648203,
             "systems": 355.0,
+            "unpriced_ops": 35843266392.0,
             "verified": true,
             "workload": "Wb860575f453d"
           },
           {
+            "band_s": [
+              5.454761899386448,
+              16533933.600218384,
+              165339286.9093267
+            ],
             "f4_word_xors": 42343322192.0,
             "priced_s": 323078.41072411905,
             "s": 5.454761899386448,
             "systems": 417.0,
+            "unpriced_ops": 42343322192.0,
             "verified": true,
             "workload": "Wd3eca550d191"
           },
           {
+            "band_s": [
+              6.5953098752575565,
+              25419359.036713965,
+              254193531.00935078
+            ],
             "f4_word_xors": 65098857384.0,
             "priced_s": 496700.74201491114,
             "s": 6.5953098752575565,
             "systems": 634.0,
+            "unpriced_ops": 65098857384.0,
             "verified": true,
             "workload": "Wdf152c64e538"
           }
@@ -6206,7 +7502,18 @@
       },
       {
         "arm": "clo-chain-g4",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m19-tm797-9c54981b",
+        "median_band_over_strong_rho": [
+          0.7797232575659896,
+          35010134.755748406,
+          251713800.62953436
+        ],
         "median_f4_word_xors": 451890889141.0,
         "median_priced_over_signed_frobenius_rho": 1869950.990755865,
         "median_priced_over_standard_twin": null,
@@ -6214,37 +7521,62 @@
         "median_priced_s": 1393448.8648153578,
         "median_s_recorded": 1.8787846305765146,
         "median_systems": 2218.0,
+        "median_unpriced_ops": 451890889141.0,
         "n": 19,
         "per_workload": [
           {
+            "band_s": [
+              1.9341728849891038,
+              100721717.67975616,
+              1007217159.3900057
+            ],
             "f4_word_xors": 516087495985.0,
             "priced_s": 1591405.042953101,
             "s": 1.9341728849891038,
             "systems": 2532.0,
+            "unpriced_ops": 516087495985.0,
             "verified": true,
             "workload": "W1c21372a1280"
           },
           {
+            "band_s": [
+              1.984782868186828,
+              127993634.82778724,
+              1279936330.4148264
+            ],
             "f4_word_xors": 655825935718.0,
             "priced_s": 2022301.383702337,
             "s": 1.984782868186828,
             "systems": 3216.0,
+            "unpriced_ops": 655825935718.0,
             "verified": true,
             "workload": "Wa15cccedfe3a"
           },
           {
+            "band_s": [
+              1.8233963761639256,
+              75663980.51208237,
+              756639788.7102562
+            ],
             "f4_word_xors": 387694282297.0,
             "priced_s": 1195492.6866776147,
             "s": 1.8233963761639256,
             "systems": 1904.0,
+            "unpriced_ops": 387694282297.0,
             "verified": true,
             "workload": "Waafe0c6ff03b"
           },
           {
+            "band_s": [
+              1.7840698169957914,
+              49425110.42705596,
+              494251088.2139313
+            ],
             "f4_word_xors": 253249067190.0,
             "priced_s": 780918.5006289982,
             "s": 1.7840698169957914,
             "systems": 1251.0,
+            "unpriced_ops": 253249067190.0,
             "verified": true,
             "workload": "Wfcca45aeb56d"
           }
@@ -6261,7 +7593,18 @@
       },
       {
         "arm": "clo-unsplit-g4",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m19-tm797-9c54981b",
+        "median_band_over_strong_rho": [
+          0.8023946927364207,
+          53786.182022685716,
+          386660.29756184685
+        ],
         "median_f4_word_xors": 694485445.0,
         "median_priced_over_signed_frobenius_rho": 2951.7401676666673,
         "median_priced_over_standard_twin": 0.5374323705733116,
@@ -6269,45 +7612,76 @@
         "median_priced_s": 2143.4437129799776,
         "median_s_recorded": 1.8351062179867754,
         "median_systems": 2532.0,
+        "median_unpriced_ops": 694485445.0,
         "n": 19,
         "per_workload": [
           {
+            "band_s": [
+              1.9341728849891038,
+              135540.51265990958,
+              1355387.719043131
+            ],
             "f4_word_xors": 694485445.0,
             "priced_s": 2143.4437129799776,
             "s": 1.9341728849891038,
             "systems": 2532.0,
+            "unpriced_ops": 694485445.0,
             "verified": true,
             "workload": "W1c21372a1280"
           },
           {
+            "band_s": [
+              1.984782868186828,
+              172045.66493508773,
+              1720438.7863050636
+            ],
             "f4_word_xors": 881533753.0,
             "priced_s": 2720.2749292732556,
             "s": 1.984782868186828,
             "systems": 3216.0,
+            "unpriced_ops": 881533753.0,
             "verified": true,
             "workload": "Wa15cccedfe3a"
           },
           {
+            "band_s": [
+              1.8351062179867754,
+              93953.38851126585,
+              939517.3691566966
+            ],
             "f4_word_xors": 481397895.0,
             "priced_s": 1486.269650017743,
             "s": 1.8351062179867754,
             "systems": 1761.0,
+            "unpriced_ops": 481397895.0,
             "verified": true,
             "workload": "Waafe0c6ff03b"
           },
           {
+            "band_s": [
+              1.8342979578647949,
+              173432.9519359333,
+              1734313.010677712
+            ],
             "f4_word_xors": 888642837.0,
             "priced_s": 2742.0459566378763,
             "s": 1.8342979578647949,
             "systems": 3244.0,
+            "unpriced_ops": 888642837.0,
             "verified": true,
             "workload": "Wfb6729b09e53"
           },
           {
+            "band_s": [
+              1.7840698169957914,
+              66751.14813978139,
+              667495.424769461
+            ],
             "f4_word_xors": 342016733.0,
             "priced_s": 1056.4240221224331,
             "s": 1.7840698169957914,
             "systems": 1251.0,
+            "unpriced_ops": 342016733.0,
             "verified": true,
             "workload": "Wfcca45aeb56d"
           }
@@ -6325,7 +7699,18 @@
       },
       {
         "arm": "rho-frob",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m19-tm797-9c54981b",
+        "median_band_over_strong_rho": [
+          0.2186315331536496,
+          0.21812025061198775,
+          0.21574162751261589
+        ],
         "median_f4_word_xors": null,
         "median_priced_over_signed_frobenius_rho": 1.0,
         "median_priced_over_standard_twin": null,
@@ -6333,53 +7718,90 @@
         "median_priced_s": 0.5220637812687217,
         "median_s_recorded": 0.5220637812687217,
         "median_systems": null,
+        "median_unpriced_ops": 103.0,
         "n": 19,
         "per_workload": [
           {
+            "band_s": [
+              2.18778878056911,
+              2.3757317418258497,
+              4.067218393136508
+            ],
             "f4_word_xors": null,
             "priced_s": 2.18778878056911,
             "s": 2.18778878056911,
             "systems": null,
+            "unpriced_ops": 963.0,
             "verified": true,
             "workload": "W1c21372a1280"
           },
           {
+            "band_s": [
+              0.4566838310911434,
+              0.4713211333697057,
+              0.6030568538767663
+            ],
             "f4_word_xors": null,
             "priced_s": 0.4566838310911434,
             "s": 0.4566838310911434,
             "systems": null,
+            "unpriced_ops": 75.0,
             "verified": true,
             "workload": "Wa15cccedfe3a"
           },
           {
+            "band_s": [
+              0.5035231983825427,
+              0.5214782891775791,
+              0.6830741063329068
+            ],
             "f4_word_xors": null,
             "priced_s": 0.5035231983825427,
             "s": 0.5035231983825427,
             "systems": null,
+            "unpriced_ops": 92.0,
             "verified": true,
             "workload": "Waafe0c6ff03b"
           },
           {
+            "band_s": [
+              0.370811657723578,
+              0.3760810865438604,
+              0.4235059459264022
+            ],
             "f4_word_xors": null,
             "priced_s": 0.370811657723578,
             "s": 0.370811657723578,
             "systems": null,
+            "unpriced_ops": 27.0,
             "verified": true,
             "workload": "Wfb6729b09e53"
           },
           {
+            "band_s": [
+              0.5718306090158334,
+              0.5970067689349605,
+              0.8235922082071048
+            ],
             "f4_word_xors": null,
             "priced_s": 0.5718306090158334,
             "s": 0.5718306090158334,
             "systems": null,
+            "unpriced_ops": 129.0,
             "verified": true,
             "workload": "Wfcca45aeb56d"
           },
           {
+            "band_s": [
+              0.5406043641549005,
+              0.5628530636183152,
+              0.7630913587890473
+            ],
             "f4_word_xors": null,
             "priced_s": 0.5406043641549005,
             "s": 0.5406043641549005,
             "systems": null,
+            "unpriced_ops": 114.0,
             "verified": true,
             "workload": "Wfe878ab56b16"
           }
@@ -6398,7 +7820,18 @@
       },
       {
         "arm": "rho-strong",
+        "band_order_vs_strong_rho": "unresolved in band",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m19-tm797-9c54981b",
+        "median_band_over_strong_rho": [
+          1.0,
+          1.0,
+          1.0
+        ],
         "median_f4_word_xors": null,
         "median_priced_over_signed_frobenius_rho": 4.578707652695323,
         "median_priced_over_standard_twin": null,
@@ -6406,53 +7839,90 @@
         "median_priced_s": 2.3460964658755277,
         "median_s_recorded": 2.3460964658755277,
         "median_systems": null,
+        "median_unpriced_ops": 495.0,
         "n": 19,
         "per_workload": [
           {
+            "band_s": [
+              2.4105005959012016,
+              2.5199876169448476,
+              3.5053708063376607
+            ],
             "f4_word_xors": null,
             "priced_s": 2.4105005959012016,
             "s": 2.4105005959012016,
             "systems": null,
+            "unpriced_ops": 561.0,
             "verified": true,
             "workload": "W1c21372a1280"
           },
           {
+            "band_s": [
+              2.1587389967099306,
+              2.21728820582418,
+              2.7442310878524223
+            ],
             "f4_word_xors": null,
             "priced_s": 2.1587389967099306,
             "s": 2.1587389967099306,
             "systems": null,
+            "unpriced_ops": 300.0,
             "verified": true,
             "workload": "Wa15cccedfe3a"
           },
           {
+            "band_s": [
+              2.4085489555973933,
+              2.5178408126106584,
+              3.5014675257300443
+            ],
             "f4_word_xors": null,
             "priced_s": 2.4085489555973933,
             "s": 2.4085489555973933,
             "systems": null,
+            "unpriced_ops": 560.0,
             "verified": true,
             "workload": "Waafe0c6ff03b"
           },
           {
+            "band_s": [
+              2.1587389967099306,
+              2.217093041793799,
+              2.742279447548614
+            ],
             "f4_word_xors": null,
             "priced_s": 2.1587389967099306,
             "s": 2.1587389967099306,
             "systems": null,
+            "unpriced_ops": 299.0,
             "verified": true,
             "workload": "Wfb6729b09e53"
           },
           {
+            "band_s": [
+              2.5334539350411247,
+              2.669092936155802,
+              3.889843946187897
+            ],
             "f4_word_xors": null,
             "priced_s": 2.5334539350411247,
             "s": 2.5334539350411247,
             "systems": null,
+            "unpriced_ops": 695.0,
             "verified": true,
             "workload": "Wfcca45aeb56d"
           },
           {
+            "band_s": [
+              2.2836439761536615,
+              2.3675645092174187,
+              3.122849306791233
+            ],
             "f4_word_xors": null,
             "priced_s": 2.2836439761536615,
             "s": 2.2836439761536615,
             "systems": null,
+            "unpriced_ops": 430.0,
             "verified": true,
             "workload": "Wfe878ab56b16"
           }
@@ -6471,7 +7941,18 @@
       },
       {
         "arm": "std-unsplit-g4",
+        "band_order_vs_strong_rho": "rho cheaper at every weight",
+        "band_weights_gae_per_op": [
+          0.0,
+          0.1,
+          1.0
+        ],
         "curve_slug": "icv1-f2m19-tm797-9c54981b",
+        "median_band_over_strong_rho": [
+          8.355336208187182,
+          101095.54086578515,
+          721270.9915905017
+        ],
         "median_f4_word_xors": 1263878924.0,
         "median_priced_over_signed_frobenius_rho": 6674.8308502875425,
         "median_priced_over_standard_twin": null,
@@ -6479,53 +7960,90 @@
         "median_priced_s": 3916.8731493239575,
         "median_s_recorded": 19.586614728564903,
         "median_systems": 8113.0,
+        "median_unpriced_ops": 1263878924.0,
         "n": 19,
         "per_workload": [
           {
+            "band_s": [
+              19.22985157885335,
+              242473.2425342111,
+              2424559.3566779015
+            ],
             "f4_word_xors": 1242308904.0,
             "priced_s": 3850.0032519644433,
             "s": 19.22985157885335,
             "systems": 7959.0,
+            "unpriced_ops": 1242308904.0,
             "verified": true,
             "workload": "W1c21372a1280"
           },
           {
+            "band_s": [
+              12.32768315805539,
+              136252.7782807578,
+              1362416.8336591555
+            ],
             "f4_word_xors": 698081764.0,
             "priced_s": 2164.926802600132,
             "s": 12.32768315805539,
             "systems": 4487.0,
+            "unpriced_ops": 698081764.0,
             "verified": true,
             "workload": "Wa15cccedfe3a"
           },
           {
+            "band_s": [
+              15.829262645944874,
+              189607.29639144966,
+              1895930.500550683
+            ],
             "f4_word_xors": 971446771.0,
             "priced_s": 3011.374443281043,
             "s": 15.829262645944874,
             "systems": 6222.0,
+            "unpriced_ops": 971446771.0,
             "verified": true,
             "workload": "Waafe0c6ff03b"
           },
           {
+            "band_s": [
+              24.718446412369904,
+              321379.42499121645,
+              3213571.7838944537
+            ],
             "f4_word_xors": 1646587775.0,
             "priced_s": 5102.1228098202755,
             "s": 24.718446412369904,
             "systems": 10597.0,
+            "unpriced_ops": 1646587775.0,
             "verified": true,
             "workload": "Wfb6729b09e53"
           },
           {
+            "band_s": [
+              22.663203228388006,
+              292097.93273435166,
+              2920775.358514461
+            ],
             "f4_word_xors": 1496563014.0,
             "priced_s": 4637.452461820135,
             "s": 22.663203228388006,
             "systems": 9620.0,
+            "unpriced_ops": 1496563014.0,
             "verified": true,
             "workload": "Wfcca45aeb56d"
           },
           {
+            "band_s": [
+              19.943377878276454,
+              250893.34013770078,
+              2508753.910976103
+            ],
             "f4_word_xors": 1285448944.0,
             "priced_s": 3983.7430466834717,
             "s": 19.943377878276454,
             "systems": 8267.0,
+            "unpriced_ops": 1285448944.0,
             "verified": true,
             "workload": "Wfe878ab56b16"
           }

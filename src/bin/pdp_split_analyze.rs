@@ -310,7 +310,7 @@ fn median(xs: &mut [f64]) -> Option<f64> {
 /// standard twin (`clo-X` ↔ `std-X`).  Everything is read from records.
 fn ecbench_summary(dirs: &[String], calibration: &Value) -> (Value, String) {
     // (n, arm) -> workload -> (s, priced, xors, systems, verified)
-    type Row = (f64, f64, Option<f64>, Option<f64>, bool);
+    type Row = (f64, f64, Option<f64>, Option<f64>, bool, [f64; 3], f64);
     let mut by: BTreeMap<(u64, String), BTreeMap<String, Row>> = BTreeMap::new();
     let mut meta: BTreeMap<u64, (String, f64, Option<f64>)> = BTreeMap::new();
     for d in dirs {
@@ -334,6 +334,25 @@ fn ecbench_summary(dirs: &[String], calibration: &Value) -> (Value, String) {
             );
             let verified = r["outcome"]["status"] == "verified";
             let s = r["cost"]["s"].as_f64().unwrap_or(f64::NAN);
+            // AGENTS.md §5a: every unpriced native operation of every arm —
+            // the `*_uncharged` counters, and the solver's own count when the
+            // record lists it as unpriced — for the 0 / 0.1 / 1 GAE band.
+            let mut unpriced_ops = 0f64;
+            if let Some(c) = r["counters"].as_object() {
+                for (k, v) in c {
+                    if k.ends_with("_uncharged") {
+                        unpriced_ops += v.as_f64().unwrap_or(0.0);
+                    }
+                }
+            }
+            let solver_unpriced = r["cost"]["unpriced"].as_array().is_some_and(|a| {
+                a.iter()
+                    .any(|x| x.as_str().is_some_and(|t| t.starts_with("solver_")))
+            });
+            if solver_unpriced {
+                unpriced_ops += r["solver"]["ops"].as_f64().unwrap_or(0.0);
+            }
+            let band = [0.0f64, 0.1, 1.0].map(|w| s + w * unpriced_ops / rr.sqrt());
             // Only a word-XOR count has a pinned XOR price; a SAT conflict
             // or other unit stays unpriced (priced S = recorded S, flagged).
             let unit = r["solver"]["op_unit"].as_str().unwrap_or("");
@@ -350,15 +369,16 @@ fn ecbench_summary(dirs: &[String], calibration: &Value) -> (Value, String) {
             };
             let arm = r["arm"].as_str().expect("arm").to_string();
             let wid = w["workload_id"].as_str().expect("workload_id").to_string();
-            by.entry((n, arm))
-                .or_default()
-                .insert(wid, (s, priced, xors, systems, verified));
+            by.entry((n, arm)).or_default().insert(
+                wid,
+                (s, priced, xors, systems, verified, band, unpriced_ops),
+            );
         }
     }
     let mut out = Vec::new();
     let mut table = String::from(
-        "\n| curve | arm | verified | median S (recorded) | median F4 XORs | median systems | median priced S | priced ÷ strong rho S, median (min–max) | priced ÷ signed-Frobenius rho S, median | priced ÷ standard twin, median |\n\
-         |---|---|--:|--:|--:|--:|--:|---|--:|--:|\n",
+        "\n| curve | arm | verified | median S (recorded) | median unpriced ops | median F4 XORs | median systems | median priced S | priced ÷ strong rho S, median (min–max) | priced ÷ signed-Frobenius rho S, median | priced ÷ standard twin, median | §5a ÷ strong rho at w = 0 / 0.1 / 1 | §5a order vs strong rho |\n\
+         |---|---|--:|--:|--:|--:|--:|--:|---|--:|--:|---|---|\n",
     );
     for ((n, arm), rows) in &by {
         let (slug, _, ratio) = meta[n].clone();
@@ -377,6 +397,37 @@ fn ecbench_summary(dirs: &[String], calibration: &Value) -> (Value, String) {
                 .filter_map(|(w, r)| o.get(w).map(|q| r.1 / q.1))
                 .filter(|v| v.is_finite())
                 .collect()
+        };
+        let band_vs = |other: &str| -> Vec<[f64; 3]> {
+            let Some(o) = by.get(&(*n, other.to_string())) else {
+                return Vec::new();
+            };
+            rows.iter()
+                .filter_map(|(w, r)| o.get(w).map(|q| [0, 1, 2].map(|i| r.5[i] / q.5[i])))
+                .collect()
+        };
+        let band_strong = band_vs("rho-strong");
+        let band_med: Vec<Option<f64>> = (0..3)
+            .map(|i| {
+                median(
+                    &mut band_strong
+                        .iter()
+                        .map(|b| b[i])
+                        .filter(|v| v.is_finite())
+                        .collect::<Vec<_>>(),
+                )
+            })
+            .collect();
+        // The order against strong rho holds only if every workload's ratio
+        // is on one side of 1 at every weight.
+        let order = if band_strong.is_empty() {
+            "—"
+        } else if band_strong.iter().all(|b| b.iter().all(|&x| x > 1.0)) {
+            "rho cheaper at every weight"
+        } else if band_strong.iter().all(|b| b.iter().all(|&x| x < 1.0)) {
+            "arm cheaper at every weight"
+        } else {
+            "unresolved in band"
         };
         let mut vs_strong = paired("rho-strong");
         let mut vs_frob = paired("rho-frob");
@@ -398,9 +449,10 @@ fn ecbench_summary(dirs: &[String], calibration: &Value) -> (Value, String) {
         let f = |x: Option<f64>| x.map_or("—".to_string(), |v| format!("{v:.4}"));
         let e = |x: Option<f64>| x.map_or("—".to_string(), |v| format!("{v:.3e}"));
         table.push_str(&format!(
-            "| {slug} | {arm} | {verified}/{} | {} | {} | {} | {} | {} ({}) | {} | {} |\n",
+            "| {slug} | {arm} | {verified}/{} | {} | {} | {} | {} | {} | {} ({}) | {} | {} | {} | {} |\n",
             rows.len(),
             f(ms),
+            e(median(&mut col(&|r| Some(r.6)))),
             e(mx),
             f(msys),
             f(mp),
@@ -412,6 +464,8 @@ fn ecbench_summary(dirs: &[String], calibration: &Value) -> (Value, String) {
             },
             f(m_frob),
             f(m_twin),
+            band_med.iter().map(|x| e(*x)).collect::<Vec<_>>().join(" / "),
+            order,
         ));
         vs_strong.sort_by(|a, b| a.partial_cmp(b).unwrap());
         out.push(json!({
@@ -423,15 +477,19 @@ fn ecbench_summary(dirs: &[String], calibration: &Value) -> (Value, String) {
             "median_priced_over_strong_rho": m_strong,
             "median_priced_over_signed_frobenius_rho": m_frob,
             "median_priced_over_standard_twin": m_twin,
+            "band_weights_gae_per_op": [0.0, 0.1, 1.0],
+            "median_band_over_strong_rho": band_med,
+            "band_order_vs_strong_rho": order,
+            "median_unpriced_ops": median(&mut col(&|r| Some(r.6))),
             "per_workload": rows.iter().map(|(w, r)| json!({
                 "workload": w, "s": r.0, "priced_s": r.1, "f4_word_xors": r.2,
-                "systems": r.3, "verified": r.4})).collect::<Vec<_>>(),
+                "systems": r.3, "verified": r.4, "band_s": r.5, "unpriced_ops": r.6})).collect::<Vec<_>>(),
         }));
     }
     (
         json!({
             "sessions": dirs,
-            "pricing": "priced S = recorded S + F4 word XORs * pinned ns_per_word_xor (docs/ic/calibration.json, another host) / sqrt(r); a sensitivity, not the recorded S",
+            "pricing": "priced S = recorded S + F4 word XORs * pinned ns_per_word_xor (docs/ic/calibration.json, another host) / sqrt(r); a sensitivity, not the recorded S. AGENTS.md 5a band: S_w = recorded S + w * (every unpriced op of the arm) / sqrt(r), w in {0, 0.1, 1}, every arm alike, rho included; an order is reported only if it holds at every weight on every workload",
             "rows": out,
         }),
         if dirs.is_empty() {

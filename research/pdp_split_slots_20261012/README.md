@@ -49,6 +49,42 @@ closure chain; the rest is censored by container lifetime. The 20
 (workload, arm) pairs the two sessions share are bit-identical in group
 additions, XORs, systems and recovered logarithm.
 
+### The §5a pricing band (AGENTS.md, owner rule 2026-10-15)
+
+Every arm's unpriced native work is priced at w = 0, 0.1 and 1
+group-addition equivalents per operation, rho included. For rho that is
+canonicalisations, partition hashes and table inserts and queries. For the
+F4 arms it is the solver's word XORs, for SAT its conflicts. A ranking
+stands only where it holds at every weight.
+
+- **IC arms against strong rho: unresolved.** Every F4 and SAT arm sits
+  below strong rho at w = 0 (0.78–0.94× median) and far above it at
+  w = 0.1 and 1 (1,215× to over 10⁸×). By §5a, none can be ranked against
+  rho, in either direction.
+- **Rankable arms.** Only the fully charged pair table (`ic-mitm-frob`,
+  3.0–4.2× strong rho at every weight) and the standard-subspace arms at
+  n = 13 and 19 (1.1× and 8.4× at w = 0, more above) are rankable, and rho
+  is cheaper than all of them. Signed-Frobenius rho is cheaper than strong
+  rho at every weight on n = 11, 13 and 17.
+- **Closure against standard, same plan.** The median ratio at w = 0 / 0.1
+  / 1 is:
+
+  | curve | plan | ratio at w = 0 / 0.1 / 1 | workloads reversing at w ≥ 0.1 |
+  |---|---|---|---|
+  | n = 11 | unsplit | 0.84 / 0.40 / 0.40 | 0/8 |
+  | n = 11 | chain | 0.84 / 0.43 / 0.43 | 0/8 |
+  | n = 13 | unsplit | 0.79 / 0.40 / 0.40 | 0/8 |
+  | n = 13 | chain | 0.79 / 0.51 / 0.51 | 1/8 |
+  | n = 17 | unsplit | 0.67 / 0.35 / 0.35 | 0/8 |
+  | n = 19 | unsplit | 0.10 / 0.54 / 0.54 | 1/5 |
+
+  So the closure ranks below standard at every weight on every workload
+  for unsplit at n = 11, 13 and 17 and for the chain at n = 11. The other
+  two cases are unresolved per workload, though their medians favour the
+  closure at every weight.
+- The "priced" column above uses the pinned XOR ratio: one further
+  calibrated point beside the band, never a replacement for it.
+
 ## Part B — stage diagnostic on the closure (576 runs, all complete and exact)
 
 Six round-1 cells, four targets × four slot tuples, `g ∈ {0, 2, 4}`, plans
@@ -95,10 +131,10 @@ the cheapest complete IC on this curve, as before.
 | | prediction | outcome |
 |---|---|---|
 | R1 | closure unsplit solves ≥ 1.5× fewer systems than standard on every curve | **held**: 2.3×, 2.0×, 2.5×, 3.2× (n = 11, 13, 17, 19) |
-| R2 | closure unsplit's priced S below standard's on every curve | **held**: median per-workload ratio 0.40, 0.40, 0.35, 0.54 |
+| R2 | closure unsplit's priced S below standard's on every curve | **held** at the pinned ratio (0.40, 0.40, 0.35, 0.54). Under the §5a band it holds on every workload at n = 11, 13 and 17. At n = 19, 1 of 5 workloads reverses at w ≥ 0.1, though the median is 0.10 / 0.54 / 0.54 |
 | R3 | λ per system on the closure ≥ 1.5× standard λ where both nonzero | **held**: 2.0–4.5× (n = 19: 1.5×, on 3 hits in 512 systems) |
 | R4 | solving degree equal on both bases (±1) | **held**: 36/36 |
-| R5 | no IC arm's median priced S below strong rho's median S | **held**: closest is closure unsplit at n = 11, 36× |
+| R5 | no IC arm's median priced S below strong rho's median S | **held** at the pinned ratio (closest: closure unsplit at n = 11, 36×). Under §5a the F4 and SAT arms are **unresolved** against rho: below it at w = 0, far above at w ≥ 0.1 |
 | R6 | every ecbench run verifies; every Part B run complete and exact | **held** for every run recorded; n = 19 has censored workloads (amendments 2–3) |
 | R7 | no `pdp-m2` arm's priced S below `ic-mitm-frob`'s S | **held**: 189 vs 17.1 |
 
@@ -108,10 +144,12 @@ the cheapest complete IC on this curve, as before.
   the same per-system cost and degree, 1.5–4.5× more decompositions per
   system, so 2–3× fewer systems per relation and 0.35–0.54× the priced cost.
   That is the full effect predicted before the run (≤ m!), not more.
-- It does not change the comparison with rho. The best F4 arm stays 36×
-  (n = 11) to 25,000× (n = 17, ℓ = 5) above strong rho in priced S, and the
-  fully charged pair table on the invariant base (4.2×) beats every F4 arm
-  on the one curve where both ran.
+- It does not change the comparison with rho. Distance remaining (owner
+  success criterion, 2026-10-15): the best F4 arm sits 36× (n = 11) to
+  25,000× (n = 17, ℓ = 5) above strong rho at the pinned ratio, and
+  1,215×–1.2·10⁶× at w = 0.1. The fully charged pair table on the
+  invariant base (3.0–4.2× at every weight) beats every F4 arm on the one
+  curve where both ran.
 - **Recorded S below rho is an accounting artefact.** Every F4 and SAT arm's
   recorded S sits at or below strong rho because their solver work is not
   charged. Those figures are lower bounds; they must not be read as wins.
