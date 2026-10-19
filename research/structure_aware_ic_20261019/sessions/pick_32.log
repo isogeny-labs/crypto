@@ -1,0 +1,13 @@
+
+thread 'main' (31127) panicked at examples/structure_aware_curves.rs:119:9:
+assertion `left == right` failed: unverified runs in research/structure_aware_ic_20261019/sessions/tune_j0_32.band.json
+  left: Number(4)
+ right: Number(1)
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: core::panicking::assert_failed_inner
+   3: core::panicking::assert_failed::<serde_json::value::Value, serde_json::value::Value>
+   4: structure_aware_curves::band
+   5: structure_aware_curves::main
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.

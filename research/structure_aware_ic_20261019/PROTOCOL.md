@@ -118,3 +118,22 @@ whole band.
   curves, same targets) is the first run of these arms on those curves.
 - **Tuned verdict.** Same rule as Test A (half below default across the band on
   ≥ 2 of 3 curves), with the interval from `ecbench compare`.
+
+## Amendment 4 (2026-10-19, during Test B, before any 32-bit test spec was generated)
+
+- **What was seen.** In the 32-bit tuning sessions (a) `ic-a2-8` hit the
+  step cap ("exhausted", 3 of 4 runs per curve) and the frozen `pick` rule
+  aborted on the unverified runs; (b) the A = 2 optimum sat on the upper grid
+  edge (s = 1024; S fell 93 → 46 → 36 from 256 → 512 → 1024 on the first
+  curve), so the frozen grid would truncate the A = 2 arm and bias Q downward.
+  The 20-, 24- and 28-bit optima are interior (a6 16/32/64, a2 on j = 0 32/128/256,
+  a2 on random 64/128/256), so those sizes are unaffected.
+- **Rules added.**
+  1. An arm with any unverified run on a tuning curve is inadmissible (infinite
+     cost); it cannot be chosen.  (Tuning only; any unverified run in a test
+     session still aborts the analysis.)
+  2. If the optimum is on the upper edge of the grid, the grid is extended by
+     doubling (s = 2048, 4096) on the same tuning curves and targets
+     (`tune_{j0,rand}_32x`), and the rule is applied to the union.
+- **Effect.** Changes only the choice of s at 32 bits; test curves, targets and
+  statistics are unchanged.

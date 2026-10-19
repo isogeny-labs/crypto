@@ -26,6 +26,7 @@ use serde_json::{json, Value};
 use std::collections::BTreeMap;
 
 const GRID: [u64; 8] = [8, 16, 32, 64, 128, 256, 512, 1024];
+const EXT_GRID: [u64; 2] = [2048, 4096];
 const TUNE_SEED: u64 = 5001;
 const TEST_J0_SEED: u64 = 101;
 const TEST_RAND_A_SEED: u64 = 201;
@@ -112,11 +113,20 @@ fn spec(label: &str, desc: &str, arms: Vec<Value>, curves: Vec<Value>, tseed: u6
 
 /// (curve, arm) -> mean_s[3] from an `ecbench.band/v1` report.
 fn band(path: &str) -> BTreeMap<(String, String), [f64; 3]> {
+    band_with(path, true)
+}
+
+/// `strict = false` drops arms with any unverified run (inadmissible in tuning: infinite cost).
+fn band_with(path: &str, strict: bool) -> BTreeMap<(String, String), [f64; 3]> {
     let v: Value = serde_json::from_str(&std::fs::read_to_string(path).unwrap_or_else(|e| panic!("{path}: {e}"))).unwrap();
     let mut m = BTreeMap::new();
     for r in v["rows"].as_array().unwrap() {
         let s = r["mean_s"].as_array().unwrap();
-        assert_eq!(r["runs"], r["verified"], "unverified runs in {path}");
+        if r["runs"] != r["verified"] {
+            assert!(!strict, "unverified runs in {path}");
+            eprintln!("  inadmissible (unverified runs): {} {}", r["curve"], r["arm"]);
+            continue;
+        }
         m.insert(
             (r["curve"].as_str().unwrap().to_string(), r["arm"].as_str().unwrap().to_string()),
             [s[0].as_f64().unwrap(), s[1].as_f64().unwrap(), s[2].as_f64().unwrap()],
@@ -130,19 +140,30 @@ fn sums(b: &BTreeMap<(String, String), [f64; 3]>, arm: &str) -> Vec<[f64; 3]> {
 }
 
 fn pick(bits: u32, dir: &str) {
-    let j = band(&format!("{dir}/tune_j0_{bits}.band.json"));
-    let r = band(&format!("{dir}/tune_rand_{bits}.band.json"));
+    let mut j = band_with(&format!("{dir}/tune_j0_{bits}.band.json"), false);
+    let mut r = band_with(&format!("{dir}/tune_rand_{bits}.band.json"), false);
+    // Amendment 4: grid extensions (`tune_*_<bits>x`) are merged when present.
+    for (m, tag) in [(&mut j, "j0"), (&mut r, "rand")] {
+        let p = format!("{dir}/tune_{tag}_{bits}x.band.json");
+        if std::path::Path::new(&p).exists() {
+            m.extend(band_with(&p, false));
+        }
+    }
     let best = |b: &BTreeMap<(String, String), [f64; 3]>, prefix: &str| -> u64 {
         let mut best = (f64::INFINITY, 0u64);
-        for &sz in &GRID {
+        for &sz in GRID.iter().chain(EXT_GRID.iter()) {
             let rows = sums(b, &format!("{prefix}{sz}"));
+            // an arm missing a curve (unverified run there) is inadmissible
+            if rows.len() < TUNE_CURVES {
+                continue;
+            }
             let tot: f64 = rows.iter().map(|v| v[TUNE_W_INDEX]).sum();
             eprintln!("  {prefix}{sz}: sum S(w=0.1) over {} curves = {tot:.2}", rows.len());
             if !rows.is_empty() && tot < best.0 {
                 best = (tot, sz);
             }
         }
-        if best.1 == GRID[0] || best.1 == GRID[GRID.len() - 1] {
+        if best.1 == GRID[0] || best.1 == EXT_GRID[EXT_GRID.len() - 1] {
             eprintln!("  NOTE {prefix}: optimum at the edge of the grid");
         }
         best.1
@@ -307,6 +328,19 @@ fn main() {
             write(dir, &format!("tune_rand_{bits}.json"), &spec(
                 &format!("tuning, random, {bits} bits"), "structure_aware_ic_20261019 PROTOCOL.md B-tune",
                 ar, curves("rand", bits, TUNE_CURVES, TUNE_SEED), TUNE_SEED, TUNE_TARGETS));
+        }
+        "spec-ext" => {
+            // Amendment 4: the A = 2 grid extended past 1024 on the same tuning curves.
+            let (bits, dir) = (num(2) as u32, args[3].as_str());
+            let mut arms = vec![rho_arm("rho-neg", "reference", "rho.negation")];
+            for &sz in &EXT_GRID {
+                arms.push(ic_arm(&format!("ic-a2-{sz}"), "control", "negation", sz));
+            }
+            for (tag, mode) in [("j0", "j0"), ("rand", "rand")] {
+                write(dir, &format!("tune_{tag}_{bits}x.json"), &spec(
+                    &format!("tuning grid extension, {tag}, {bits} bits"), "structure_aware_ic_20261019 PROTOCOL.md Amendment 4: the A=2 optimum was on the grid edge",
+                    arms.clone(), curves(mode, bits, TUNE_CURVES, TUNE_SEED), TUNE_SEED, TUNE_TARGETS));
+            }
         }
         "pick" => pick(num(2) as u32, &args[3]),
         "spec-test" => {
