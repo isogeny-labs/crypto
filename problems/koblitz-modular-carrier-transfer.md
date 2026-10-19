@@ -451,3 +451,38 @@ These are implementation and proof gaps,not nonexistence results.
 Relation ranks remain12/1308 and nonzero11 on1165/1160 columns. General
 Jacobian reduction,individual descent and Jacobian identification remain
 open. No solver or timing run is supplied;the user assesses IC efficiency.
+
+## Round11: diagonal gap resolved; whole-divisor and quotient exits remain
+
+[Round11](../research/koblitz_modular_ic_20261018/rounds/11/REPORT.md)
+resolves the previous460 gap using explicit characteristic2 local series,
+not an imported odd-residue-field formula or a fit to the total degree.
+The400 labels have contacts1,2,6,14 with counts260,100,20,20. The sum860
+exhausts the retained diagonal residual degree. All40 closed degree10
+orbits carry exact multiplicities. Actual11-torsion coordinates,unit
+bindings and twelve quaternion/Velu maps are checked;the local moduli
+bridge is written and explicit49-torsion coordinates remain open.
+
+A coupled multiplication/two-inverse graph has a five-quadric h-saturated
+projective ideal,ten S-pair checks and six dehomogenized charts. This
+discharges the specified prototype only. The whole quotient exit criterion
+from round10 still requires an actual coefficient-circuit boundary,
+saturation,all retained charts and a verified polarization on a proper
+model. No nonexistence is inferred from the uncomputed full ideals.
+
+All seven whole noncuspidal supports remain open. The x-sum diagonal860
+is complete,leaving antidiagonal1240. The product-plus-one function is
+exactly two translated T-fibers of degrees1280 and1360 with polar terms;
+these fibers are not evaluated. The x-sum-plus-one ambient normalization
+has explicit AS equations and genus3;no cover or transfer to it has been
+constructed. Equal-y factors into the diagonal and a degree2680 residual
+curve after pullback,before common polar cancellation.
+
+Next acceptance tests: enumerate the antidiagonal and translated T-fiber
+closed support with local lengths and projected point images;construct a
+full finite principal divisor before adding a row. For quotient geometry,
+certify a boundary chart on an actual expanded graph and verify its
+transition to the retained Kummer atlas. Twenty-two additional Lean
+proofs pass;the full gate checks168 theorems. Native semantics and global
+moduli/deformation geometry remain written obligations. Relation ranks
+and IC assessment are unchanged.

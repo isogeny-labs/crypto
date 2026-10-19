@@ -1,0 +1,400 @@
+{
+  "id": "IDC1h850da2c65dd293bb",
+  "independence": "same-agent native issuance plus128 extra checks;universal Lean identity",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound11.lean",
+    "sha256": "5df97051cfad5ed166a52cec78fbd1efe9131b85b2800c39cc12faaff89bf54c"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610191101,
+  "statement": {
+    "degree_bound": 3,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": "y",
+                              "op": "var"
+                            },
+                            {
+                              "args": "y",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "u",
+                              "op": "var"
+                            },
+                            {
+                              "args": "y",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": -1,
+                          "op": "const"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "u",
+                              "op": "var"
+                            },
+                            {
+                              "args": "u",
+                              "op": "var"
+                            },
+                            {
+                              "args": "u",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": -1,
+                      "op": "const"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "u",
+                          "op": "var"
+                        },
+                        {
+                          "args": "u",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": 1,
+                  "op": "const"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": [
+            {
+              "args": -1,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "args": "y",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "y",
+                                  "op": "var"
+                                }
+                              ],
+                              "op": "mul"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "args": "x",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "y",
+                                  "op": "var"
+                                }
+                              ],
+                              "op": "mul"
+                            }
+                          ],
+                          "op": "add"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": -1,
+                              "op": "const"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "args": "x",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "x",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "x",
+                                  "op": "var"
+                                }
+                              ],
+                              "op": "mul"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": -1,
+                          "op": "const"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "x",
+                              "op": "var"
+                            },
+                            {
+                              "args": "x",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": -1,
+                      "op": "const"
+                    },
+                    {
+                      "args": 1,
+                      "op": "const"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "name": "equal-y-correspondence",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": "u",
+              "op": "var"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": "x",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": "y",
+                              "op": "var"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "args": -1,
+                                  "op": "const"
+                                },
+                                {
+                                  "args": [
+                                    {
+                                      "args": "u",
+                                      "op": "var"
+                                    },
+                                    {
+                                      "args": "u",
+                                      "op": "var"
+                                    }
+                                  ],
+                                  "op": "mul"
+                                }
+                              ],
+                              "op": "mul"
+                            }
+                          ],
+                          "op": "add"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": -1,
+                              "op": "const"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "args": "u",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": "x",
+                                  "op": "var"
+                                }
+                              ],
+                              "op": "mul"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": -1,
+                          "op": "const"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "x",
+                              "op": "var"
+                            },
+                            {
+                              "args": "x",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": -1,
+                      "op": "const"
+                    },
+                    {
+                      "args": "u",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": "x",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "mul"
+    },
+    "source": "KoblitzRound11.equal_y_factorization",
+    "variables": [
+      "x",
+      "u",
+      "y"
+    ]
+  },
+  "value_digest": "b8ba919527dc3d8e8426b4b5c078e034e197662b26f8c14251b0e3d9e53dbe52"
+}

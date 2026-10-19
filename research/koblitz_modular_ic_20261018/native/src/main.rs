@@ -64,6 +64,7 @@ mod quotient_geometry;
 mod quotients06;
 mod quotients07;
 mod relations08;
+mod relations11;
 mod reverse06;
 mod round02;
 mod round03_record;
@@ -78,8 +79,10 @@ mod round07_record;
 mod round08_record;
 mod round09_record;
 mod round10_record;
+mod round11_record;
 mod round_record;
 mod saturation10;
+mod saturation11;
 mod ss10;
 
 fn pow(mut a: u64, mut k: u64, p: u64) -> u64 {
@@ -357,6 +360,28 @@ fn run(out: &std::path::Path) {
 }
 fn main() {
     let args10: Vec<String> = std::env::args().collect();
+    if args10.get(1).map(String::as_str) == Some("--record-round11") {
+        round11_record::record(std::path::Path::new(
+            args10.get(2).expect("fresh round records"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--verify-round11-local") {
+        ss10::local11::verify(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round11-relations") {
+        relations11::run(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round11-saturation") {
+        saturation11::run(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round11-local") {
+        ss10::local11::run(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        return;
+    }
     if args10.get(1).map(String::as_str) == Some("--record-round10") {
         round10_record::record(std::path::Path::new(
             args10.get(2).expect("fresh round records"),

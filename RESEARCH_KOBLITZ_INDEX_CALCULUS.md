@@ -12,20 +12,21 @@ pre-registered hypotheses)
 (ePrint 2020/1315).
 
 **Modular and low-genus carrier follow-up (2026-10-19):**
-[Round10](research/koblitz_modular_ic_20261018/rounds/10/REPORT.md)
-gives explicit quadratic F2 polynomial presentations and closed affine
-embeddings of descended dense opens of four determinant-19 quotients.
-Inverse witnesses give denominator-norm saturation. Saturation and gluing
-of the whole projective boundary remain open. The coupled divisor x0*xinf
-is complete on 22 closed cusps; all eight pole divisors and cuspidal zeros
-are computed. Seven noncuspidal supports remain open. The diagonal search
-locates 400 supersingular moduli labels but leaves 460 total multiplicity
-unresolved. Evaluated rank remains 12/1308, and nonzero-image rank 11 on
-1165/1160 columns. Twenty-three new named Lean results pass; global
-geometric bridges remain written. Earlier bounded low-genus tests remain
-frozen, with other Jacobian factors and families open. See the
-[construction problem](problems/koblitz-modular-carrier-transfer.md) for
-the exact remaining obligations. No IC cost is measured in this follow-up.
+[Round11](research/koblitz_modular_ic_20261018/rounds/11/REPORT.md)
+closes the 460 diagonal multiplicity gap by direct characteristic-2 local
+series: 400 supersingular labels have contacts 1, 2, 6, 14 with weighted
+degree 860. The complete diagonal uses a written moduli/deformation bridge;
+actual 11-torsion and quaternion/Velu maps are bound, while explicit
+49-torsion point coordinates remain open. A five-quadric coupled graph has
+certified projective saturation and six charts. The full proper quotient
+embeddings remain open beyond the four explicit affine open F2 models.
+Translated T-fibers, a genus-3 ambient x-sum correspondence and an equal-y
+residual curve are exact, but all seven whole noncuspidal divisors remain
+incomplete; the antidiagonal has degree 1,240 left to enumerate. Ranks stay
+12/1308 and nonzero-image 11 on 1165/1160 columns. Twenty-two new Lean
+results pass, with 168 project theorems audited. Earlier evidence remains
+frozen. See the [construction problem](problems/koblitz-modular-carrier-transfer.md)
+for exact exit criteria. No IC cost is measured or assessed.
 
 ## The setting
 

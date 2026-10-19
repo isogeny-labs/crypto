@@ -323,3 +323,6 @@ pub fn run(dir: &Path) {
     );
     println!("M15:{} matching SS labels,lower multiplicity sum{lower},remaining diagonal degree{remaining},complete={complete}",match_keys.len());
 }
+
+#[path = "local11.rs"]
+pub(crate) mod local11;

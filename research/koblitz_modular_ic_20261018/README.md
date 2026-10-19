@@ -1,23 +1,25 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [10](rounds/10/README.md), with its
-[report](rounds/10/REPORT.md), [PDF](rounds/10/report.pdf),
-[proof map](rounds/10/PROOF_MAP.md), [ledger](rounds/10/ledger.json)
-and exact replay. All four determinant-19 quotients have explicit quadratic
-F2 polynomial presentations and closed affine embeddings of specified
-descended dense opens. Inverse witnesses give denominator-norm saturation.
-The systems have 424,080 or 415,800 equations per graph in a lossless
-coefficient-block format. Whole-quotient projective saturation, boundary
-gluing and closed projective embeddings remain open.
+The current round is [11](rounds/11/README.md), with its
+[report](rounds/11/REPORT.md), [PDF](rounds/11/report.pdf),
+[proof map](rounds/11/PROOF_MAP.md), [ledger](rounds/11/ledger.json)
+and exact replay. The 460 diagonal multiplicity gap is closed: 400
+supersingular labels have contacts 1, 2, 6, 14 with counts 260, 100, 20, 20,
+weighted degree 860. Forty degree-10 closed points form the complete
+noncuspidal diagonal under the written characteristic-2 moduli bridge.
+Actual 11-torsion and quaternion/Velu maps are bound; explicit 49-torsion
+point coordinates remain open.
 
-The coupled divisor x0*xinf is complete on 22 closed cusp points, with
-zero and pole degrees 2,640. All eight pole divisors and cuspidal zeros
-are computed; seven noncuspidal supports remain open. The diagonal search
-finds 400 supersingular moduli labels in 40 degree-10 orbits, but its
-multiplicity lower sum leaves 460 unaccounted for. No rank is promoted:
-evaluated rank stays 12/1308 and nonzero-image rank 11 on 1165/1160 columns.
-Twenty-three new named Lean proofs pass; global geometric bridges remain
-written. No IC cost is measured.
+A coupled multiplication/two-inverse graph has an exact five-quadric
+projective saturation and six charts. The four determinant-19 quotient
+affine open models remain available; whole proper quotient saturation,
+boundary gluing and projective embeddings remain open. Translated T-fibers,
+a genus-3 ambient x-sum correspondence and an equal-y residual curve add
+structure to the seven still incomplete noncuspidal divisors. The
+antidiagonal has unresolved degree 1,240. Ranks stay 12/1308 and nonzero
+11 on 1165/1160 columns. Twenty-two new Lean results pass, with 168 project
+theorems audited. Global geometric bridges remain written. No IC cost is
+measured or assessed.
 
 Earlier evidence stays frozen:
 
@@ -38,6 +40,8 @@ Earlier evidence stays frozen:
   intrinsic Kummer quotients with six covering charts and exact transitions.
 - [Round 09](rounds/09/README.md): explicit Frobenius circuits, trace-dual
   rational generators and bounded twist/reflection and coupled-function controls.
+- [Round 10](rounds/10/README.md): explicit quadratic F2 open models,
+  complete product cusp divisor and the then-unresolved diagonal multiplicity gap.
 - [Open construction problem](../../problems/koblitz-modular-carrier-transfer.md):
   current obligations, exact scope, and next discriminating experiments.
 
