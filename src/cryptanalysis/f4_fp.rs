@@ -22,7 +22,8 @@
 //! echelon form of only what is left, on the columns no reducer leads —
 //! the same rows the whole matrix's echelon form would give, from a much
 //! smaller dense block.  Rows run in parallel once a step is large enough
-//! to repay the dispatch.  The product criterion prunes pairs;
+//! to repay the dispatch. Gebauer–Möller criteria B, M and F supplement
+//! the product criterion when pruning pairs;
 //! polynomials whose leading monomial becomes divisible by a new one are
 //! dropped.
 //!
@@ -35,14 +36,22 @@
 //! and stops cooperatively at a deadline, so a budget never leaves a
 //! thread behind.
 //!
+//! [`interreduce`] and [`autoreduce`] reduce every element of a set by the
+//! others over and over; with at most 16 unknowns and every exponent at most
+//! 127 they do it on packed monomials (one `u128` each), and hand whatever
+//! does not pack to the exponent-vector code, which gives the same answer.
+//! A step too small to repay a hand-off to the thread pool builds its sparse
+//! rows on the calling thread; `solve`'s recursion runs many such steps.
+//!
 //! ## Honest scope
 //!
 //! Small primes (`p < 2³²`), a few unknowns, degrees in the tens: the
-//! residual matrices are dense.  No Gebauer–Möller chain criterion, no F5
-//! signatures, no sugar; this is the plain algorithm, written so that
+//! residual matrices are dense. Gebauer–Möller pruning is enabled by
+//! default (`F4_FP_GM=0` retains the product criterion alone). There are
+//! no F5 signatures or sugar selection; this module was written so that
 //! the descent systems of the coordinate thread can be timed at `m = 3`.
 
-use std::collections::{BTreeMap, HashSet};
+use std::collections::HashSet;
 use std::sync::atomic::{AtomicU64, Ordering as AtomicOrdering};
 use std::time::{Duration, Instant};
 
@@ -88,6 +97,22 @@ fn mulmod(a: u64, b: u64, p: u64) -> u64 {
 
 fn invmod(a: u64, p: u64) -> u64 {
     // p prime, a != 0
+    if (2..1 << 32).contains(&p) {
+        // the same powers, each product reduced by Barrett's method
+        // instead of a 128-bit division
+        let fp = Barrett::new(p);
+        let mut r = 1u64;
+        let mut base = a % p;
+        let mut e = p - 2;
+        while e > 0 {
+            if e & 1 == 1 {
+                r = fp.reduce(r * base);
+            }
+            base = fp.reduce(base * base);
+            e >>= 1;
+        }
+        return r;
+    }
     let mut r = 1u64;
     let mut base = a % p;
     let mut e = p - 2;
@@ -172,25 +197,54 @@ fn total_degree(m: &[u32]) -> u32 {
     m.iter().sum()
 }
 
+/// Scale `f` (non-empty, coefficients below `p`) to be monic.
+fn scale_monic(f: &mut Poly, p: u64) {
+    let inv = invmod(f[0].1, p);
+    if (2..1 << 32).contains(&p) {
+        let fp = Barrett::new(p);
+        for (_, c) in f.iter_mut() {
+            *c = fp.reduce(*c * inv);
+        }
+    } else {
+        for (_, c) in f.iter_mut() {
+            *c = mulmod(*c, inv, p);
+        }
+    }
+}
+
 /// Normalise: merge duplicate monomials, drop zeros, sort leading-first,
 /// make monic.
 pub fn normalise(terms: &[(Vec<u32>, u64)], p: u64, ord: Ordering) -> Poly {
-    let mut map: BTreeMap<Vec<u32>, u64> = BTreeMap::new();
-    for (e, c) in terms {
-        let c = c % p;
-        if c == 0 {
-            continue;
+    normalise_owned(
+        terms.iter().filter(|(_, c)| c % p != 0).cloned().collect(),
+        p,
+        ord,
+    )
+}
+
+/// [`normalise`] of terms the caller has no further use for, so that their
+/// exponent vectors are moved, not cloned.  Sorting and merging replace the
+/// ordered map the merge used to go through; the terms that come out are
+/// the same.
+fn normalise_owned(mut out: Poly, p: u64, ord: Ordering) -> Poly {
+    out.retain_mut(|(_, c)| {
+        *c %= p;
+        *c != 0
+    });
+    // The sort need not keep equal monomials in their order: they are
+    // adjacent either way, and merged by a sum that has no order.
+    out.sort_unstable_by(|(a, _), (b, _)| cmp_monomial(b, a, ord));
+    out.dedup_by(|later, kept| {
+        let same = later.0 == kept.0;
+        if same {
+            kept.1 = (kept.1 + later.1) % p;
         }
-        let v = map.entry(e.clone()).or_insert(0);
-        *v = (*v + c) % p;
-    }
-    let mut out: Poly = map.into_iter().filter(|(_, c)| *c != 0).collect();
-    out.sort_by(|(a, _), (b, _)| cmp_monomial(b, a, ord));
-    if let Some((_, lc)) = out.first() {
-        let inv = invmod(*lc, p);
-        for (_, c) in out.iter_mut() {
-            *c = mulmod(*c, inv, p);
-        }
+        same
+    });
+    // drop the sums that cancelled
+    out.retain(|(_, c)| *c != 0);
+    if !out.is_empty() {
+        scale_monic(&mut out, p);
     }
     out
 }
@@ -585,11 +639,465 @@ fn rref_blocked<T: Copy + Default + PartialEq + Send>(
     Some(pivots)
 }
 
+/// Pack an exponent vector into 8-bit fields of a `u128` (variable `i` in
+/// bits `8i..8i + 7`).  With every exponent below 128 the product of two
+/// monomials whose degree stays below 128 is the sum of their packings,
+/// and the top bit of every field is free to guard divisibility tests.
+fn pack(e: &[u32]) -> u128 {
+    e.iter()
+        .enumerate()
+        .fold(0u128, |acc, (i, &x)| acc | (x as u128) << (8 * i))
+}
+
+fn unpack(x: u128, n: usize) -> Vec<u32> {
+    (0..n).map(|i| ((x >> (8 * i)) & 0xff) as u32).collect()
+}
+
+/// Whether large steps run symbolic preprocessing on several threads
+/// ([`Packed::symbolic_par`]); `F4_FP_SYMBOLIC_PAR=0` keeps it sequential.
+fn symbolic_parallel() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_SYMBOLIC_PAR").as_deref() != Ok("0"))
+}
+
+/// Whether symbolic preprocessing and the matrix build use packed
+/// monomials ([`Packed`]); `F4_FP_PACKED=0` keeps the `Vec<u32>` path as a
+/// same-binary control.  The rows, columns and reducers are the same.
+fn packed_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_PACKED").as_deref() != Ok("0"))
+}
+
+/// The hasher of maps keyed by packed monomials.  [`FxHasher`]'s generic
+/// path copies a `u128` byte by byte, and its final multiply leaves the low
+/// bits (which pick the bucket) as poorly mixed as the key's own: packed
+/// monomials, small values in a few bytes, then crowd into a few buckets.
+/// Folding both words and finishing with splitmix64 spreads every key bit
+/// over every hash bit.
+#[derive(Default, Clone, Copy)]
+struct PackedHasher(u64);
+
+impl PackedHasher {
+    #[inline]
+    fn mix(mut z: u64) -> u64 {
+        z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+        z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+        z ^ (z >> 31)
+    }
+}
+
+impl std::hash::Hasher for PackedHasher {
+    fn write(&mut self, bytes: &[u8]) {
+        for &b in bytes {
+            self.0 = Self::mix(self.0 ^ u64::from(b));
+        }
+    }
+    #[inline]
+    fn write_u64(&mut self, x: u64) {
+        self.0 = Self::mix(self.0 ^ x);
+    }
+    #[inline]
+    fn write_usize(&mut self, x: usize) {
+        self.write_u64(x as u64);
+    }
+    #[inline]
+    fn write_u128(&mut self, x: u128) {
+        let (lo, hi) = (x as u64, (x >> 64) as u64);
+        self.0 = Self::mix(self.0 ^ lo ^ hi.wrapping_mul(0x9e37_79b9_7f4a_7c15));
+    }
+    #[inline]
+    fn finish(&self) -> u64 {
+        self.0
+    }
+}
+
+type PkBuild = std::hash::BuildHasherDefault<PackedHasher>;
+type PkMap<K, V> = std::collections::HashMap<K, V, PkBuild>;
+type PkSet<K> = std::collections::HashSet<K, PkBuild>;
+
+/// Packed monomials of the basis for grevlex runs with at most 15
+/// variables and every degree below 128: products are additions, a
+/// divisibility test is one guarded subtraction, and hashing and sorting
+/// work on one machine word pair instead of a heap vector.
+struct Packed {
+    n: usize,
+    /// The top bit of every used field.
+    guard: u128,
+    /// Every basis element's terms, packed, in the element's order.
+    terms: Vec<Vec<u128>>,
+    lms: Vec<u128>,
+}
+
+impl Packed {
+    fn new(n: usize) -> Self {
+        let guard = (0..n).fold(0u128, |g, i| g | 0x80u128 << (8 * i));
+        Self {
+            n,
+            guard,
+            terms: Vec::new(),
+            lms: Vec::new(),
+        }
+    }
+
+    /// Pack the basis elements added since the last call.
+    fn extend(&mut self, basis: &[Poly]) {
+        while self.terms.len() < basis.len() {
+            let t: Vec<u128> = basis[self.terms.len()]
+                .iter()
+                .map(|(e, _)| pack(e))
+                .collect();
+            self.lms.push(t[0]);
+            self.terms.push(t);
+        }
+    }
+
+    /// Does `a` divide `b`?  Each field of `b | guard` minus `a`'s keeps
+    /// its guard bit exactly when it does not borrow.
+    #[inline]
+    fn divides(&self, a: u128, b: u128) -> bool {
+        ((b | self.guard) - a) & self.guard == self.guard
+    }
+
+    /// A key ordered as `cmp_monomial(·, ·, Grevlex)`: the degree above
+    /// `127 − e_i` with the last variable most significant (a smaller last
+    /// exponent is the larger monomial).
+    fn grevlex_key(&self, x: u128) -> u128 {
+        let mut deg = 0u128;
+        let mut key = 0u128;
+        for i in 0..self.n {
+            let e = (x >> (8 * i)) & 0xff;
+            deg += e;
+            key |= (127 - e) << (8 * i);
+        }
+        deg << (8 * self.n) | key
+    }
+
+    /// [`Packed::symbolic`] spread over threads, for large steps: the
+    /// reducer rows are found round by round (the rows of one round
+    /// introduce the monomials whose reducers form the next).  Within a
+    /// round every row's terms are looked up in the monomial table in
+    /// parallel, read-only; the few monomials not yet in it are inserted
+    /// afterwards in sorted order, and their reducers (the same first alive
+    /// divisor) are found in parallel.  The rows are the same set as the
+    /// sequential pass produces, possibly in another order (reducers by
+    /// round), which the reduction does not depend on: it orders reducers
+    /// by leading column.  Columns and their order are the same.
+    fn symbolic_par(
+        &self,
+        seeds: &[(usize, Vec<u32>)],
+        alive: &[bool],
+    ) -> (Vec<(usize, u128)>, Vec<u128>, Vec<Vec<u32>>) {
+        const UNKNOWN: u32 = u32::MAX;
+        let alive_idx: Vec<usize> = (0..self.lms.len()).filter(|&i| alive[i]).collect();
+        let mut ids: PkMap<u128, u32> = PkMap::default();
+        let mut monos: Vec<u128> = Vec::new();
+        let mut is_lead: Vec<bool> = Vec::new();
+        let mut rows: Vec<Vec<u32>> = Vec::new();
+        let mut extra: Vec<(usize, u128)> = Vec::new();
+        let mut frontier: Vec<(usize, u128)> = seeds.iter().map(|(i, m)| (*i, pack(m))).collect();
+        while !frontier.is_empty() {
+            // the frontier rows' terms against the monomials known so far
+            let known = &ids;
+            let mut frows: Vec<Vec<u32>> = frontier
+                .par_iter()
+                .map(|&(idx, m)| {
+                    self.terms[idx]
+                        .iter()
+                        .map(|&e| known.get(&(e + m)).copied().unwrap_or(UNKNOWN))
+                        .collect()
+                })
+                .collect();
+            // the monomials not met before, deduplicated per thread first
+            // (in the first round every term is new)
+            let mut new: Vec<u128> = frontier
+                .par_iter()
+                .zip(&frows)
+                .fold(PkSet::<u128>::default, |mut set, (&(idx, m), row)| {
+                    for (&e, &id) in self.terms[idx].iter().zip(row) {
+                        if id == UNKNOWN {
+                            set.insert(e + m);
+                        }
+                    }
+                    set
+                })
+                .reduce(PkSet::<u128>::default, |mut a, b| {
+                    if a.len() < b.len() {
+                        return b.into_iter().fold(a, |mut b2, x| {
+                            b2.insert(x);
+                            b2
+                        });
+                    }
+                    a.extend(b);
+                    a
+                })
+                .into_iter()
+                .collect();
+            new.sort_unstable();
+            let first_new = monos.len();
+            for &x in &new {
+                ids.insert(x, monos.len() as u32);
+                monos.push(x);
+                is_lead.push(false);
+            }
+            let known = &ids;
+            frows
+                .par_iter_mut()
+                .zip(&frontier)
+                .for_each(|(row, &(idx, m))| {
+                    for (id, &e) in row.iter_mut().zip(&self.terms[idx]) {
+                        if *id == UNKNOWN {
+                            *id = known[&(e + m)];
+                        }
+                    }
+                });
+            for row in &frows {
+                is_lead[row[0] as usize] = true;
+            }
+            rows.extend(frows);
+            // the reducers of this round's new monomials: the next round
+            let lead = &is_lead;
+            let next: Vec<(usize, u128)> = (first_new..monos.len())
+                .into_par_iter()
+                .filter(|&id| !lead[id])
+                .filter_map(|id| {
+                    let mono = monos[id];
+                    alive_idx
+                        .iter()
+                        .find(|&&i| self.divides(self.lms[i], mono))
+                        .map(|&i| (i, mono - self.lms[i]))
+                })
+                .collect();
+            extra.extend(next.iter().copied());
+            frontier = next;
+        }
+        let mut order: Vec<(u128, u32)> = monos
+            .iter()
+            .enumerate()
+            .map(|(id, &m)| (self.grevlex_key(m), id as u32))
+            .collect();
+        order.par_sort_unstable_by(|a, b| b.0.cmp(&a.0));
+        let mut col_of_id = vec![0u32; order.len()];
+        for (col, &(_, id)) in order.iter().enumerate() {
+            col_of_id[id as usize] = col as u32;
+        }
+        rows.par_iter_mut().for_each(|row| {
+            for x in row.iter_mut() {
+                *x = col_of_id[*x as usize];
+            }
+        });
+        let cols = order
+            .into_iter()
+            .map(|(_, id)| monos[id as usize])
+            .collect();
+        (extra, cols, rows)
+    }
+
+    /// Symbolic preprocessing over packed monomials, exactly as the
+    /// unpacked loop does it (same queue order, same first alive divisor as
+    /// reducer).  Returns the reducer rows `(element, multiplier)` it adds,
+    /// the matrix's monomials in decreasing order, and every row's terms
+    /// (the seeds', then the reducers') as column indices: each monomial is
+    /// hashed once, when it is first met, and its column is read off the
+    /// sort instead of a second lookup.
+    fn symbolic(
+        &self,
+        seeds: &[(usize, Vec<u32>)],
+        alive: &[bool],
+    ) -> (Vec<(usize, u128)>, Vec<u128>, Vec<Vec<u32>>) {
+        struct Interned {
+            ids: PkMap<u128, u32>,
+            monos: Vec<u128>,
+            done: Vec<bool>,
+            queue: Vec<u32>,
+        }
+        impl Interned {
+            fn id(&mut self, x: u128) -> u32 {
+                match self.ids.entry(x) {
+                    std::collections::hash_map::Entry::Occupied(o) => *o.get(),
+                    std::collections::hash_map::Entry::Vacant(v) => {
+                        let id = self.monos.len() as u32;
+                        v.insert(id);
+                        self.monos.push(x);
+                        self.done.push(false);
+                        self.queue.push(id);
+                        id
+                    }
+                }
+            }
+        }
+        let seeds: Vec<(usize, u128)> = seeds.iter().map(|(i, m)| (*i, pack(m))).collect();
+        let mut seen: PkSet<(usize, u128)> = seeds.iter().copied().collect();
+        let mut t = Interned {
+            ids: PkMap::default(),
+            monos: Vec::new(),
+            done: Vec::new(),
+            queue: Vec::new(),
+        };
+        let mut rows: Vec<Vec<u32>> = Vec::with_capacity(seeds.len());
+        for &(idx, m) in &seeds {
+            let row: Vec<u32> = self.terms[idx].iter().map(|&e| t.id(e + m)).collect();
+            t.done[row[0] as usize] = true;
+            rows.push(row);
+        }
+        let alive_idx: Vec<usize> = (0..self.lms.len()).filter(|&i| alive[i]).collect();
+        let mut extra: Vec<(usize, u128)> = Vec::new();
+        while let Some(id) = t.queue.pop() {
+            if t.done[id as usize] {
+                continue;
+            }
+            t.done[id as usize] = true;
+            let mono = t.monos[id as usize];
+            if let Some(&idx) = alive_idx.iter().find(|&&i| self.divides(self.lms[i], mono)) {
+                let m = mono - self.lms[idx];
+                if seen.insert((idx, m)) {
+                    let row: Vec<u32> = self.terms[idx].iter().map(|&e| t.id(e + m)).collect();
+                    rows.push(row);
+                    extra.push((idx, m));
+                }
+            }
+        }
+        let mut order: Vec<(u128, u32)> = t
+            .monos
+            .iter()
+            .enumerate()
+            .map(|(id, &m)| (self.grevlex_key(m), id as u32))
+            .collect();
+        order.sort_unstable_by_key(|a| std::cmp::Reverse(a.0));
+        let mut col_of_id = vec![0u32; order.len()];
+        for (col, &(_, id)) in order.iter().enumerate() {
+            col_of_id[id as usize] = col as u32;
+        }
+        for row in &mut rows {
+            for x in row.iter_mut() {
+                *x = col_of_id[*x as usize];
+            }
+        }
+        let cols = order
+            .into_iter()
+            .map(|(_, id)| t.monos[id as usize])
+            .collect();
+        (extra, cols, rows)
+    }
+}
+
 struct Pair {
     i: usize,
     j: usize,
     lcm: Vec<u32>,
+    /// `lcm` packed, when the run packs its monomials (else 0).
+    lcm_p: u128,
     degree: u32,
+}
+
+/// The top bit of every 8-bit field of a packed monomial.
+const PACKED_GUARD: u128 = 0x8080_8080_8080_8080_8080_8080_8080_8080;
+/// The low bit of every field.
+const PACKED_ONES: u128 = 0x0101_0101_0101_0101_0101_0101_0101_0101;
+
+#[inline]
+fn packed_divides(a: u128, b: u128) -> bool {
+    ((b | PACKED_GUARD) - a) & PACKED_GUARD == PACKED_GUARD
+}
+
+/// Per field `max(a, b)`: the guard bit survives `(a | G) − b` exactly where
+/// `a ≥ b`, and spreading it over its field selects `a` there.
+#[inline]
+fn packed_lcm(a: u128, b: u128) -> u128 {
+    let ge = ((a | PACKED_GUARD) - b) & PACKED_GUARD;
+    let sel = (ge >> 7) * 0xff;
+    (a & sel) | (b & !sel)
+}
+
+/// No variable in both: the nonzero fields of `a` and `b` are disjoint.
+#[inline]
+fn packed_coprime(a: u128, b: u128) -> bool {
+    let nz = |x: u128| ((x | PACKED_GUARD) - PACKED_ONES) & PACKED_GUARD;
+    nz(a) & nz(b) == 0
+}
+
+/// The Gebauer–Möller update for a new leading monomial `h` (Becker and
+/// Weispfenning's UPDATE), over any monomial representation: criterion B
+/// on the pending pairs (and those held above the degree bound), the
+/// `alive` flags of elements `h` makes redundant, and the new pairs
+/// `(g, lcm)` that survive criteria M and F and the product criterion
+/// (all of them, bar the coprime ones, when `gm` is off).
+#[allow(clippy::too_many_arguments)]
+fn gm_update<K: PartialEq>(
+    h: &K,
+    lm: impl Fn(usize) -> K,
+    pairs: &mut Vec<Pair>,
+    above: &mut Vec<Pair>,
+    pair_lcm: impl Fn(&Pair) -> K,
+    alive: &mut [bool],
+    k: usize,
+    gm: bool,
+    div: impl Fn(&K, &K) -> bool,
+    lcmf: impl Fn(&K, &K) -> K,
+    coprime: impl Fn(&K, &K) -> bool,
+) -> Vec<(usize, K)> {
+    if gm {
+        // Criterion B: an old pair (g1, g2) whose lcm `h` divides is covered
+        // by (g1, h) and (h, g2) unless one of those has the same lcm.  Pairs
+        // held above the degree bound are tested too: a pair the criterion
+        // retires was never needed.
+        let keep = |pr: &Pair| {
+            let l = pair_lcm(pr);
+            !div(h, &l) || lcmf(&lm(pr.i), h) == l || lcmf(&lm(pr.j), h) == l
+        };
+        pairs.retain(|pr| keep(pr));
+        above.retain(|pr| keep(pr));
+    }
+    // the new pairs (h, g) with every alive g
+    let mut cand: Vec<(usize, K, bool)> = Vec::new();
+    for i in 0..k {
+        if !alive[i] {
+            continue;
+        }
+        let lmi = lm(i);
+        if div(h, &lmi) {
+            // `basis[i]` is redundant in the final basis, but its pair with
+            // the new element must still be processed (Buchberger's
+            // criterion is about the generating set, not the reduced one);
+            // only its role as an output element ends here.
+            alive[i] = false;
+        }
+        let cp = coprime(h, &lmi);
+        cand.push((i, lcmf(h, &lmi), cp));
+    }
+    let mut kept = vec![true; cand.len()];
+    if gm {
+        // Criteria M and F: drop (h, g1) when another pair (h, g2) still
+        // standing has an lcm dividing its own; of several with equal lcms
+        // the last one stays.  A coprime pair is never dropped here (it may
+        // drop others) and never kept below.
+        for a in 0..cand.len() {
+            if cand[a].2 {
+                continue;
+            }
+            if (0..cand.len()).any(|b| b != a && kept[b] && div(&cand[b].1, &cand[a].1)) {
+                kept[a] = false;
+            }
+        }
+    }
+    cand.into_iter()
+        .zip(kept)
+        .filter(|((_, _, cp), keep)| !cp && *keep)
+        .map(|((i, l, _), _)| (i, l))
+        .collect()
+}
+
+fn lcm(a: &[u32], b: &[u32]) -> Vec<u32> {
+    a.iter().zip(b).map(|(x, y)| *x.max(y)).collect()
+}
+
+/// Whether new pairs pass the Gebauer–Möller criteria (Buchberger's chain
+/// criterion as criteria B, M and F) on top of the product criterion.  On
+/// `quad_n9_p65521` the basis is complete at degree 10 and every later step
+/// only reduces redundant pairs to zero.  `F4_FP_GM=0` keeps the product
+/// criterion alone, as a same-binary control; the reduced basis is the same.
+fn gebauer_moeller() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_GM").as_deref() != Ok("0"))
 }
 
 /// Rows × columns of remaining elimination work below which a pivot's
@@ -1051,6 +1559,18 @@ fn reduce_pairs_fl(
             bprime[k] = acc.iter().map(|&x| fp.reduce(x) as u32).collect();
         }
     }
+    if fl_blocked_pairs() {
+        return reduce_pairs_blocked(
+            pair_rows,
+            &bprime,
+            &bstart,
+            reducer_at,
+            &free_index,
+            n_free,
+            fp,
+            deadline,
+        );
+    }
     let reduce_pair = |r: &Vec<(u32, u64)>| -> Option<Vec<u32>> {
         if deadline.is_some_and(|d| Instant::now() > d) {
             return None;
@@ -1077,6 +1597,128 @@ fn reduce_pairs_fl(
         pair_rows.par_iter().map(reduce_pair).collect()
     } else {
         pair_rows.iter().map(reduce_pair).collect()
+    }
+}
+
+/// `F4_FP_FL_BLOCKED=0` reduces each pair row on its own against `B'`, as
+/// before the blocked product; a same-binary control.
+fn fl_blocked_pairs() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_FL_BLOCKED").as_deref() != Ok("0"))
+}
+
+/// Pair rows reduced together in [`reduce_pairs_blocked`].
+const FL_PAIR_BLOCK: usize = 64;
+
+/// Free columns per tile in [`reduce_pairs_blocked`]: a block's
+/// accumulators over one tile (64 × 256 × 8 bytes) stay in L2.
+const FL_PAIR_TILE: usize = 256;
+
+/// `D − C·B'` for the pair rows `C | D`, a block of rows and a tile of
+/// free columns at a time.
+///
+/// Each pair row is one dense update per entry at a reducer column, by
+/// that reducer's row of `B'`.  Row by row, every update streams its `B'`
+/// row from memory; here the block's updates are grouped by reducer, so a
+/// tile of a `B'` row is read once and added into every row of the block
+/// that needs it, while the block's accumulators over the tile stay in
+/// cache.  The updates and their sum are unchanged; only their order is,
+/// and the sum is exact (below): every reduced row is the same.
+///
+/// With `p ≤ 2¹⁶` (the only arithmetic this runs under) every product is
+/// below `2³²` and an entry receives at most one per reducer, so the
+/// 64-bit accumulators cannot overflow without four billion reducers;
+/// they are reduced once, at the end.
+#[allow(clippy::too_many_arguments)]
+fn reduce_pairs_blocked(
+    pair_rows: &[Vec<(u32, u64)>],
+    bprime: &[Vec<u32>],
+    bstart: &[usize],
+    reducer_at: &[u32],
+    free_index: &[u32],
+    n_free: usize,
+    fp: Barrett,
+    deadline: Option<Instant>,
+) -> Option<Vec<Vec<u32>>> {
+    const NONE: u32 = u32::MAX;
+    assert!(
+        fp.p <= 1 << 16 && bprime.len() < 1 << 31,
+        "accumulator bound"
+    );
+    let simd = lazy_simd_kind();
+    let block = |rows: &[Vec<(u32, u64)>]| -> Option<Vec<Vec<u32>>> {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
+        let mut acc: Vec<Vec<u64>> = vec![vec![0u64; n_free]; rows.len()];
+        // (reducer, row of the block, factor), grouped by reducer
+        let mut hits: Vec<(u32, u32, u64)> = Vec::new();
+        for (i, r) in rows.iter().enumerate() {
+            for &(c, v) in r {
+                let fi = free_index[c as usize];
+                if fi != NONE {
+                    acc[i][fi as usize] += v;
+                } else {
+                    hits.push((reducer_at[c as usize], i as u32, fp.p - v));
+                }
+            }
+        }
+        hits.sort_unstable_by_key(|&(j, i, _)| (j, i));
+        let mut from = 0;
+        while from < n_free {
+            let to = (from + FL_PAIR_TILE).min(n_free);
+            for &(j, i, factor) in &hits {
+                let j = j as usize;
+                let start = bstart[j].max(from);
+                if start >= to {
+                    continue;
+                }
+                add_lazy_range(&mut acc[i as usize], &bprime[j], start, to, factor, simd);
+            }
+            from = to;
+        }
+        count_ops(
+            hits.iter()
+                .map(|&(j, _, _)| n_free - bstart[j as usize])
+                .sum(),
+        );
+        Some(
+            acc.into_iter()
+                .map(|a| a.into_iter().map(|x| fp.reduce(x) as u32).collect())
+                .collect(),
+        )
+    };
+    let blocks: Vec<Option<Vec<Vec<u32>>>> = if pair_rows.len() * n_free > PAR_WORK {
+        pair_rows.par_chunks(FL_PAIR_BLOCK).map(block).collect()
+    } else {
+        pair_rows.chunks(FL_PAIR_BLOCK).map(block).collect()
+    };
+    let mut out = Vec::with_capacity(pair_rows.len());
+    for b in blocks {
+        out.extend(b?);
+    }
+    Some(out)
+}
+
+/// [`add_lazy`] over the columns `from..to` only, uncounted (the caller
+/// counts the whole update once).
+#[inline]
+fn add_lazy_range(acc: &mut [u64], pivot: &[u32], from: usize, to: usize, factor: u64, simd: u8) {
+    let (acc, pivot) = (&mut acc[..to], &pivot[..to]);
+    #[cfg(target_arch = "x86_64")]
+    if simd == 0 {
+        add_lazy_scalar(acc, pivot, from, factor);
+    } else if simd == 2 {
+        // SAFETY: `lazy_simd_kind` verified AVX-512F and AVX2.
+        unsafe { add_lazy_avx512(acc, pivot, from, factor) };
+    } else {
+        // SAFETY: `lazy_simd_kind` verified AVX2 before this call.
+        unsafe { add_lazy_avx2(acc, pivot, from, factor) };
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        let _ = simd;
+        add_lazy_scalar(acc, pivot, from, factor);
     }
 }
 
@@ -1175,6 +1817,17 @@ fn f4_with_arithmetic(
     let mut alive: Vec<bool> = Vec::new();
     let mut pairs: Vec<Pair> = Vec::new();
     let mut pairs_above_bound = 0usize;
+    // Pairs over the degree bound, kept so Gebauer–Möller can retire them:
+    // `pairs_above_bound` counts the ones still standing.
+    let mut above: Vec<Pair> = Vec::new();
+    let gm = gebauer_moeller();
+    let mut packed = (matches!(ord, Ordering::Grevlex)
+        && n_vars <= 15
+        && opts.max_degree < 128
+        && input.iter().flatten().all(|(e, _)| total_degree(e) < 128)
+        && packed_enabled())
+    .then(|| Packed::new(n_vars));
+    let mut lm_packed: Option<Vec<u128>> = packed.as_ref().map(|_| Vec::new());
     // `learned` is (solving_degree_max, max_cols_to_solution, steps_to_solution).
     let report = |basis: &[Poly],
                   alive: &[bool],
@@ -1219,47 +1872,79 @@ fn f4_with_arithmetic(
         }
     };
 
-    // add a polynomial to the basis: pairs with the product criterion
-    // and the degree bound; drop basis elements it makes redundant
+    // add a polynomial to the basis: pairs under the Gebauer–Möller
+    // criteria (or the product criterion alone, `F4_FP_GM=0`) and the
+    // degree bound; drop basis elements it makes redundant.  With `lmp`
+    // (the packed leading monomials, kept in step with `basis`) every test
+    // runs on packed monomials.
+    #[allow(clippy::too_many_arguments)]
     fn add(
         f: Poly,
         basis: &mut Vec<Poly>,
         alive: &mut Vec<bool>,
         pairs: &mut Vec<Pair>,
+        above: &mut Vec<Pair>,
         max_degree: u32,
         pairs_above_bound: &mut usize,
+        gm: bool,
+        lmp: Option<&mut Vec<u128>>,
     ) {
-        let lm = f[0].0.clone();
         let k = basis.len();
-        for i in 0..k {
-            if !alive[i] {
-                continue;
+        let n = f[0].0.len();
+        let new: Vec<(usize, Vec<u32>, u128)> = match lmp {
+            Some(lmp) => {
+                let h = pack(&f[0].0);
+                let lms: &[u128] = lmp;
+                let new = gm_update(
+                    &h,
+                    |i| lms[i],
+                    pairs,
+                    above,
+                    |pr| pr.lcm_p,
+                    alive,
+                    k,
+                    gm,
+                    |a, b| packed_divides(*a, *b),
+                    |a, b| packed_lcm(*a, *b),
+                    |a, b| packed_coprime(*a, *b),
+                );
+                lmp.push(h);
+                new.into_iter().map(|(i, l)| (i, unpack(l, n), l)).collect()
             }
-            let lmi = &basis[i][0].0;
-            if divides(&lm, lmi) {
-                // `basis[i]` is redundant in the final basis, but its pair
-                // with `f` must still be processed (Buchberger's criterion
-                // is about the generating set, not the reduced one); only
-                // its role as an output element ends here.
-                alive[i] = false;
+            None => {
+                let h = f[0].0.clone();
+                let new = gm_update(
+                    &h,
+                    |i| basis[i][0].0.clone(),
+                    pairs,
+                    above,
+                    |pr| pr.lcm.clone(),
+                    alive,
+                    k,
+                    gm,
+                    |a, b| divides(a, b),
+                    |a, b| lcm(a, b),
+                    |a, b| a.iter().zip(b).all(|(x, y)| *x == 0 || *y == 0),
+                );
+                new.into_iter().map(|(i, l)| (i, l, 0)).collect()
             }
-            // product criterion: coprime leading monomials
-            if lm.iter().zip(lmi).all(|(a, b)| *a == 0 || *b == 0) {
-                continue;
-            }
-            let l: Vec<u32> = lm.iter().zip(lmi).map(|(a, b)| *a.max(b)).collect();
+        };
+        for (i, l, lp) in new {
             let d = total_degree(&l);
-            if d > max_degree {
-                *pairs_above_bound += 1;
-                continue;
-            }
-            pairs.push(Pair {
+            let pair = Pair {
                 i,
                 j: k,
                 lcm: l,
+                lcm_p: lp,
                 degree: d,
-            });
+            };
+            if d > max_degree {
+                above.push(pair);
+            } else {
+                pairs.push(pair);
+            }
         }
+        *pairs_above_bound = above.len();
         basis.push(f);
         alive.push(true);
     }
@@ -1277,8 +1962,11 @@ fn f4_with_arithmetic(
             &mut basis,
             &mut alive,
             &mut pairs,
+            &mut above,
             opts.max_degree,
             &mut pairs_above_bound,
+            gm,
+            lm_packed.as_mut(),
         );
     }
     let input_lms_now: Vec<Vec<u32>> = basis.iter().map(|f| f[0].0.clone()).collect();
@@ -1362,6 +2050,7 @@ fn f4_with_arithmetic(
                 );
             }
         }
+        let tp0 = Instant::now();
         // symbolic preprocessing
         let mut rows_poly: Vec<(usize, Vec<u32>)> = Vec::new(); // (basis index, multiplier)
         let mut seen: FxSet<(usize, Vec<u32>)> = FxSet::default();
@@ -1421,84 +2110,127 @@ fn f4_with_arithmetic(
             }
         }
         let n_pair_rows = rows_poly.len();
-        let mut monomials: FxSet<Vec<u32>> = FxSet::default();
-        let mut done: FxSet<Vec<u32>> = FxSet::default();
-        let mut queue: Vec<Vec<u32>> = Vec::new();
-        // One scratch monomial; a heap copy only for a monomial not seen.
-        let mut em: Vec<u32> = vec![0; n_vars];
-        for (idx, m) in &rows_poly {
-            for (e, _) in &basis[*idx] {
-                for (k, x) in em.iter_mut().enumerate() {
-                    *x = e[k] + m[k];
-                }
-                if !monomials.contains(em.as_slice()) {
-                    monomials.insert(em.clone());
-                    queue.push(em.clone());
-                }
-            }
-            let lm: Vec<u32> = basis[*idx][0].0.iter().zip(m).map(|(x, y)| x + y).collect();
-            done.insert(lm);
-        }
-        while let Some(mono) = queue.pop() {
-            if done.contains(&mono) {
-                continue;
-            }
-            done.insert(mono.clone());
-            // one reducer: the alive basis element with the largest leading
-            // monomial dividing it (any would do)
-            if let Some(idx) =
-                (0..basis.len()).find(|&i| alive[i] && divides(&basis[i][0].0, &mono))
-            {
-                let m: Vec<u32> = mono
-                    .iter()
-                    .zip(&basis[idx][0].0)
-                    .map(|(a, b)| a - b)
-                    .collect();
-                if seen.insert((idx, m.clone())) {
-                    for (e, _) in &basis[idx] {
-                        for (k, x) in em.iter_mut().enumerate() {
-                            *x = e[k] + m[k];
-                        }
-                        if !monomials.contains(em.as_slice()) {
-                            monomials.insert(em.clone());
-                            queue.push(em.clone());
-                        }
-                    }
-                    rows_poly.push((idx, m));
-                }
-            }
-        }
-        // matrix: columns in decreasing monomial order, rows sparse
-        let mut cols: Vec<Vec<u32>> = monomials.into_iter().collect();
-        cols.sort_unstable_by(|a, b| cmp_monomial(b, a, ord));
-        let col_of: FxMap<&[u32], u32> = cols
-            .iter()
-            .enumerate()
-            .map(|(i, m)| (m.as_slice(), i as u32))
-            .collect();
-        let n_cols = cols.len();
-        // `(column, coefficient)` in increasing column order, so the
-        // leading term first; every row is monic
-        let to_sparse = |(idx, m): &(usize, Vec<u32>)| -> Vec<(u32, u64)> {
-            let mut em = vec![0u32; n_vars];
-            basis[*idx]
+        let (cols, sparse, tp1): (Vec<Vec<u32>>, Vec<Vec<(u32, u64)>>, Instant) = if let Some(pk) =
+            packed.as_mut()
+        {
+            pk.extend(&basis);
+            let pk = &*pk;
+            let (extra, cols_packed, row_cols) =
+                if symbolic_parallel() && rayon::current_num_threads() > 1 && rows_poly.len() >= 64
+                {
+                    pk.symbolic_par(&rows_poly, &alive)
+                } else {
+                    pk.symbolic(&rows_poly, &alive)
+                };
+            let tp1 = Instant::now();
+            let idxs: Vec<usize> = rows_poly
                 .iter()
-                .map(|(e, c)| {
+                .map(|(i, _)| *i)
+                .chain(extra.iter().map(|&(i, _)| i))
+                .collect();
+            rows_poly.extend(extra.iter().map(|&(i, m)| (i, unpack(m, n_vars))));
+            // Small steps (most of them, and all of `solve`'s specialised
+            // runs) are cheaper on one thread than handed to the pool: the
+            // hand-off wakes a worker and waits for it, which costs more than
+            // building a few short rows.
+            let to_sparse = |(rc, &idx): (Vec<u32>, &usize)| -> Vec<(u32, u64)> {
+                rc.into_iter()
+                    .zip(&basis[idx])
+                    .map(|(c, (_, v))| (c, *v))
+                    .collect()
+            };
+            let sparse: Vec<Vec<(u32, u64)>> = if row_cols.len() * cols_packed.len() > PAR_WORK {
+                row_cols.into_par_iter().zip(&idxs).map(to_sparse).collect()
+            } else {
+                row_cols.into_iter().zip(&idxs).map(to_sparse).collect()
+            };
+            let cols = cols_packed.iter().map(|&m| unpack(m, n_vars)).collect();
+            (cols, sparse, tp1)
+        } else {
+            let mut monomials: FxSet<Vec<u32>> = FxSet::default();
+            let mut done: FxSet<Vec<u32>> = FxSet::default();
+            let mut queue: Vec<Vec<u32>> = Vec::new();
+            // One scratch monomial; a heap copy only for a monomial not seen.
+            let mut em: Vec<u32> = vec![0; n_vars];
+            for (idx, m) in &rows_poly {
+                for (e, _) in &basis[*idx] {
                     for (k, x) in em.iter_mut().enumerate() {
                         *x = e[k] + m[k];
                     }
-                    (col_of[em.as_slice()], *c)
-                })
-                .collect()
+                    if !monomials.contains(em.as_slice()) {
+                        monomials.insert(em.clone());
+                        queue.push(em.clone());
+                    }
+                }
+                let lm: Vec<u32> = basis[*idx][0].0.iter().zip(m).map(|(x, y)| x + y).collect();
+                done.insert(lm);
+            }
+            while let Some(mono) = queue.pop() {
+                if done.contains(&mono) {
+                    continue;
+                }
+                done.insert(mono.clone());
+                // one reducer: the alive basis element with the largest leading
+                // monomial dividing it (any would do)
+                if let Some(idx) =
+                    (0..basis.len()).find(|&i| alive[i] && divides(&basis[i][0].0, &mono))
+                {
+                    let m: Vec<u32> = mono
+                        .iter()
+                        .zip(&basis[idx][0].0)
+                        .map(|(a, b)| a - b)
+                        .collect();
+                    if seen.insert((idx, m.clone())) {
+                        for (e, _) in &basis[idx] {
+                            for (k, x) in em.iter_mut().enumerate() {
+                                *x = e[k] + m[k];
+                            }
+                            if !monomials.contains(em.as_slice()) {
+                                monomials.insert(em.clone());
+                                queue.push(em.clone());
+                            }
+                        }
+                        rows_poly.push((idx, m));
+                    }
+                }
+            }
+            let tp1 = Instant::now();
+            // matrix: columns in decreasing monomial order, rows sparse
+            let mut cols: Vec<Vec<u32>> = monomials.into_iter().collect();
+            cols.sort_unstable_by(|a, b| cmp_monomial(b, a, ord));
+            let col_of: FxMap<&[u32], u32> = cols
+                .iter()
+                .enumerate()
+                .map(|(i, m)| (m.as_slice(), i as u32))
+                .collect();
+            let n_cols = cols.len();
+            // `(column, coefficient)` in increasing column order, so the
+            // leading term first; every row is monic
+            let to_sparse = |(idx, m): &(usize, Vec<u32>)| -> Vec<(u32, u64)> {
+                let mut em = vec![0u32; n_vars];
+                basis[*idx]
+                    .iter()
+                    .map(|(e, c)| {
+                        for (k, x) in em.iter_mut().enumerate() {
+                            *x = e[k] + m[k];
+                        }
+                        (col_of[em.as_slice()], *c)
+                    })
+                    .collect()
+            };
+            // small steps (most of them, and all of `solve`'s specialised
+            // runs) are cheaper on one thread than dispatched
+            let parallel = rows_poly.len() * n_cols > PAR_WORK;
+            let sparse: Vec<Vec<(u32, u64)>> = if parallel {
+                rows_poly.par_iter().map(to_sparse).collect()
+            } else {
+                rows_poly.iter().map(to_sparse).collect()
+            };
+            (cols, sparse, tp1)
         };
-        // small steps (most of them, and all of `solve`'s specialised
-        // runs) are cheaper on one thread than dispatched
+        let n_cols = cols.len();
         let parallel = rows_poly.len() * n_cols > PAR_WORK;
-        let sparse: Vec<Vec<(u32, u64)>> = if parallel {
-            rows_poly.par_iter().map(to_sparse).collect()
-        } else {
-            rows_poly.iter().map(to_sparse).collect()
-        };
+        let tp2 = Instant::now();
         let mut input_lm = vec![false; n_cols];
         for r in &sparse {
             input_lm[r[0].0 as usize] = true;
@@ -1751,6 +2483,7 @@ fn f4_with_arithmetic(
                 blocked_steps,
             );
         };
+        let tp3 = Instant::now();
         // new polynomials: rows whose pivot column is not an input leading monomial
         let mut new_polys: Vec<Poly> = Vec::new();
         for (row, &c) in rows.iter().zip(&pivots) {
@@ -1829,8 +2562,20 @@ fn f4_with_arithmetic(
                 &mut basis,
                 &mut alive,
                 &mut pairs,
+                &mut above,
                 opts.max_degree,
                 &mut pairs_above_bound,
+                gm,
+                lm_packed.as_mut(),
+            );
+        }
+        if debug {
+            eprintln!(
+                "f4 step {steps} ms: symbolic {:.2} matrix {:.2} reduce {:.2} update {:.2}",
+                (tp1 - tp0).as_secs_f64() * 1e3,
+                (tp2 - tp1).as_secs_f64() * 1e3,
+                (tp3 - tp2).as_secs_f64() * 1e3,
+                tp3.elapsed().as_secs_f64() * 1e3
             );
         }
         if let (Some(bound), true) = (opts.stop_staircase, learned_now && !pairs.is_empty()) {
@@ -1856,7 +2601,12 @@ fn f4_with_arithmetic(
         .filter(|(_, &a)| a)
         .map(|(f, _)| f.clone())
         .collect();
-    reduced = interreduce(&reduced, p, ord);
+    let ti = Instant::now();
+    reduced = interreduce_linear(&reduced, n_vars, p, ord)
+        .unwrap_or_else(|| interreduce(&reduced, p, ord));
+    if debug {
+        eprintln!("f4 interreduce ms: {:.2}", ti.elapsed().as_secs_f64() * 1e3);
+    }
     F4Report {
         basis: reduced,
         inconsistent: false,
@@ -1876,6 +2626,137 @@ fn f4_with_arithmetic(
         blocked_steps,
         trace_mismatch: mismatch,
     }
+}
+
+/// Whether the final interreduction runs as one matrix step
+/// ([`interreduce_linear`]); `F4_FP_LINEAR_INTERREDUCE=0` keeps the
+/// polynomial-by-polynomial [`interreduce`] as a same-binary control.
+fn linear_interreduce_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_LINEAR_INTERREDUCE").as_deref() != Ok("0"))
+}
+
+/// [`interreduce`] as one F4 step: the minimal basis and, from symbolic
+/// preprocessing, a reducer for every non-leading monomial some leading
+/// monomial divides are already an echelon form (every row monic, leading
+/// columns distinct), so the Faugère–Lachartre reduction of the basis rows
+/// by the reducers followed by the reduced echelon form of what remains
+/// is the reduced Gröbner basis.  On `quad_n9_p65521` the polynomial
+/// interreduction was 43 % of the whole run.  `None` outside the narrow
+/// deferred arithmetic (`p ≤ 2¹⁶`), where the caller interreduces as before.
+fn interreduce_linear(basis: &[Poly], n_vars: usize, p: u64, ord: Ordering) -> Option<Vec<Poly>> {
+    if !linear_interreduce_enabled() || p > 1 << 16 || arithmetic_mode() != 2 || basis.is_empty() {
+        return None;
+    }
+    // the same minimal subset as `interreduce`
+    let keep: Vec<&Poly> = basis
+        .iter()
+        .enumerate()
+        .filter(|&(i, f)| {
+            !basis
+                .iter()
+                .enumerate()
+                .any(|(j, g)| j != i && divides(&g[0].0, &f[0].0) && (g[0].0 != f[0].0 || j < i))
+        })
+        .map(|(_, f)| f)
+        .collect();
+    let mut rows_poly: Vec<(usize, Vec<u32>)> =
+        (0..keep.len()).map(|i| (i, vec![0u32; n_vars])).collect();
+    let mut seen: FxSet<(usize, Vec<u32>)> = rows_poly.iter().cloned().collect();
+    let mut monomials: FxSet<Vec<u32>> = FxSet::default();
+    let mut done: FxSet<Vec<u32>> = keep.iter().map(|f| f[0].0.clone()).collect();
+    let mut queue: Vec<Vec<u32>> = Vec::new();
+    for f in &keep {
+        for (e, _) in f.iter() {
+            if monomials.insert(e.clone()) {
+                queue.push(e.clone());
+            }
+        }
+    }
+    let mut em: Vec<u32> = vec![0; n_vars];
+    while let Some(mono) = queue.pop() {
+        if !done.insert(mono.clone()) {
+            continue;
+        }
+        if let Some(idx) = (0..keep.len()).find(|&i| divides(&keep[i][0].0, &mono)) {
+            let m: Vec<u32> = mono
+                .iter()
+                .zip(&keep[idx][0].0)
+                .map(|(a, b)| a - b)
+                .collect();
+            if seen.insert((idx, m.clone())) {
+                for (e, _) in keep[idx].iter() {
+                    for (k, x) in em.iter_mut().enumerate() {
+                        *x = e[k] + m[k];
+                    }
+                    if !monomials.contains(em.as_slice()) {
+                        monomials.insert(em.clone());
+                        queue.push(em.clone());
+                    }
+                }
+                rows_poly.push((idx, m));
+            }
+        }
+    }
+    let mut cols: Vec<Vec<u32>> = monomials.into_iter().collect();
+    cols.sort_unstable_by(|a, b| cmp_monomial(b, a, ord));
+    let col_of: FxMap<&[u32], u32> = cols
+        .iter()
+        .enumerate()
+        .map(|(i, m)| (m.as_slice(), i as u32))
+        .collect();
+    let n_cols = cols.len();
+    let sparse: Vec<Vec<(u32, u64)>> = rows_poly
+        .iter()
+        .map(|(idx, m)| {
+            let mut em = vec![0u32; n_vars];
+            keep[*idx]
+                .iter()
+                .map(|(e, c)| {
+                    for (k, x) in em.iter_mut().enumerate() {
+                        *x = e[k] + m[k];
+                    }
+                    (col_of[em.as_slice()], *c)
+                })
+                .collect()
+        })
+        .collect();
+    let (pair_rows, reducers) = sparse.split_at(keep.len());
+    const NONE: u32 = u32::MAX;
+    let mut reducer_at = vec![NONE; n_cols];
+    for (k, r) in reducers.iter().enumerate() {
+        reducer_at[r[0].0 as usize] = k as u32;
+    }
+    let free_cols: Vec<usize> = (0..n_cols).filter(|&c| reducer_at[c] == NONE).collect();
+    if reducers.len().saturating_mul(free_cols.len()) > FL_MAX_ENTRIES {
+        return None;
+    }
+    let fp = Barrett::new(p);
+    let mut rows = reduce_pairs_fl(
+        pair_rows,
+        reducers,
+        &reducer_at,
+        &free_cols,
+        n_cols,
+        fp,
+        None,
+    )?;
+    let pivots = rref32_deferred(&mut rows, Barrett32::new(p), fp, None)?;
+    if pivots.len() != keep.len() {
+        return None; // not full rank: cannot happen for a minimal basis
+    }
+    let mut out: Vec<Poly> = rows
+        .iter()
+        .map(|row| {
+            row.iter()
+                .enumerate()
+                .filter(|(_, &v)| v != 0)
+                .map(|(j, &v)| (cols[free_cols[j]].clone(), v as u64))
+                .collect()
+        })
+        .collect();
+    out.sort_by(|a, b| cmp_monomial(&a[0].0, &b[0].0, ord));
+    Some(out)
 }
 
 /// A monomial ordered by `cmp_monomial` under a fixed ordering, for the
@@ -1901,11 +2782,12 @@ impl Ord for Keyed<'_> {
 
 /// Reduce `f` by `basis` (full reduction of every term).
 pub fn reduce(f: &Poly, basis: &[Poly], p: u64, ord: Ordering) -> Poly {
-    reduce_skipping(f, basis, usize::MAX, p, ord)
+    reduce_skipping_vecs(f, basis, usize::MAX, p, ord)
 }
 
-/// [`reduce`] by every element of `basis` except `basis[skip]`.
-fn reduce_skipping(f: &Poly, basis: &[Poly], skip: usize, p: u64, ord: Ordering) -> Poly {
+/// [`reduce`] by every element of `basis` except `basis[skip]`, on exponent
+/// vectors.
+fn reduce_skipping_vecs(f: &Poly, basis: &[Poly], skip: usize, p: u64, ord: Ordering) -> Poly {
     // coefficients of the pending terms, and a max-heap of their
     // monomials; a reduction only adds monomials below the one it
     // removes, so each monomial leaves the heap once
@@ -1955,9 +2837,267 @@ fn reduce_skipping(f: &Poly, basis: &[Poly], skip: usize, p: u64, ord: Ordering)
     out
 }
 
+// ── Reducing a set on packed monomials ─────────────────────────────
+//
+// `interreduce` and `autoreduce` reduce every element of a set by the others
+// again and again; on exponent vectors each reduction allocates a vector per
+// term, hashes it and compares it element by element.  With at most 16
+// unknowns and every exponent at most 127 a monomial is one `u128` (a byte
+// per exponent, as in `Packed`) and the same walk is a few word operations.
+// The terms popped, the divisors chosen and the coefficients that come out
+// are those of `reduce_skipping_vecs`; whatever does not pack is handed back
+// to it.
+
+/// The most unknowns a monomial of this section holds.
+const SET_PACK_VARS: usize = 16;
+
+/// The largest exponent it holds.  The top bit of every byte stays clear,
+/// which is what lets `packed_divides` test all the exponents at once and
+/// `set_mul` see an exponent leave the range.
+const SET_PACK_EXP: u32 = 127;
+
+/// A leading monomial that divides nothing: its byte 0 is 128, which no
+/// packed monomial reaches.  It stands for a set element whose *leading*
+/// monomial does not pack, which divides no monomial that does.
+const SET_NEVER: u128 = 0x80;
+
+fn set_pack(e: &[u32]) -> Option<u128> {
+    if e.len() > SET_PACK_VARS {
+        return None;
+    }
+    let mut x = 0u128;
+    for (k, &v) in e.iter().enumerate() {
+        if v > SET_PACK_EXP {
+            return None;
+        }
+        x |= u128::from(v) << (8 * k);
+    }
+    Some(x)
+}
+
+/// The monomials of `f` packed, if each has `n_vars` exponents and all pack.
+fn set_pack_poly(f: &Poly, n_vars: usize) -> Option<Vec<u128>> {
+    if f.iter().any(|(e, _)| e.len() != n_vars) {
+        return None;
+    }
+    f.iter().map(|(e, _)| set_pack(e)).collect()
+}
+
+/// The packed leading monomial of `f`, or [`SET_NEVER`] when it does not
+/// pack (or `f` has no terms).
+///
+/// It is kept apart from [`set_pack_poly`] on purpose.  A polynomial can
+/// have a lead that packs and a tail that does not (under lex a tail can
+/// carry a bigger exponent than the lead; any order can run past degree 127
+/// in the tail), and then it still divides the monomials its lead divides,
+/// as it does for the exponent-vector code.  The caller finds it as the
+/// divisor it is and, having no packed terms to multiply, gives the
+/// reduction up to the exponent-vector code; passing it by, as if its lead
+/// did not pack, would change what is reduced.
+fn set_lead_word(f: &Poly, n_vars: usize) -> u128 {
+    match f.first() {
+        Some((e, _)) if e.len() == n_vars => set_pack(e).unwrap_or(SET_NEVER),
+        _ => SET_NEVER,
+    }
+}
+
+/// `a · b` as monomials, or `None` when an exponent would pass 127.
+#[inline(always)]
+fn set_mul(a: u128, b: u128) -> Option<u128> {
+    // every byte is at most 127 + 127, so no carry leaves its byte
+    let s = a + b;
+    (s & PACKED_GUARD == 0).then_some(s)
+}
+
+/// The total degree: the sum of the 16 bytes.
+#[inline(always)]
+fn set_degree(x: u128) -> u32 {
+    const LO: u64 = 0x00ff_00ff_00ff_00ff;
+    // 16-bit lanes of at most 2·127, then of at most 4·127
+    let pairs = |w: u64| (w & LO) + ((w >> 8) & LO);
+    let t = pairs(x as u64) + pairs((x >> 64) as u64);
+    // the top lane of `t · (1 + 2¹⁶ + 2³² + 2⁴⁸)` is the sum of the four,
+    // at most 16·127
+    (t.wrapping_mul(0x0001_0001_0001_0001) >> 48) as u32
+}
+
+/// A key that sorts ascending where [`cmp_monomial`] sorts descending.
+/// Graded orders compare the degree first.  Grevlex then compares from the
+/// last variable and the smaller exponent wins, which is the numeric order
+/// of the packed word (variable 15 is its top byte); lex and grlex compare
+/// from the first variable and the larger exponent wins, the numeric order
+/// of the byte-reversed word, inverted.
+#[inline(always)]
+fn set_order_key(ord: Ordering, x: u128) -> (u32, u128) {
+    match ord {
+        Ordering::Grevlex => (!set_degree(x), x),
+        Ordering::Grlex => (!set_degree(x), !x.swap_bytes()),
+        Ordering::Lex => (0, !x.swap_bytes()),
+    }
+}
+
+/// The monomial a [`set_order_key`] came from.
+#[inline(always)]
+fn set_from_order_key(ord: Ordering, key: (u32, u128)) -> u128 {
+    match ord {
+        Ordering::Grevlex => key.1,
+        _ => (!key.1).swap_bytes(),
+    }
+}
+
+/// A list of polynomials with their monomials packed, kept beside it for
+/// the many reductions of [`interreduce`] and [`autoreduce`].
+struct PackedSet {
+    n_vars: usize,
+    /// Per polynomial, its monomials in its order, or `None` when one does
+    /// not pack.
+    terms: Vec<Option<Vec<u128>>>,
+    /// Their leading monomials ([`set_lead_word`]): [`SET_NEVER`] where the
+    /// lead does not pack, but not where only a tail monomial does not.
+    lms: Vec<u128>,
+}
+
+impl PackedSet {
+    /// `None` when the polynomials do not all have the same number of
+    /// unknowns (the exponent-vector code compares what the shorter has).
+    fn new(polys: &[Poly]) -> Option<Self> {
+        // the number of unknowns is read off the first term there is: a
+        // lone empty polynomial has no unknowns to count
+        let n_vars = polys
+            .iter()
+            .find_map(|f| f.first())
+            .map_or(0, |(e, _)| e.len());
+        if polys.iter().flatten().any(|(e, _)| e.len() != n_vars) {
+            return None;
+        }
+        let mut s = PackedSet {
+            n_vars,
+            terms: Vec::new(),
+            lms: Vec::new(),
+        };
+        for f in polys {
+            s.push(f);
+        }
+        Some(s)
+    }
+
+    fn push(&mut self, f: &Poly) {
+        self.lms.push(set_lead_word(f, self.n_vars));
+        self.terms.push(set_pack_poly(f, self.n_vars));
+    }
+
+    fn replace(&mut self, i: usize, f: &Poly) {
+        self.lms[i] = set_lead_word(f, self.n_vars);
+        self.terms[i] = set_pack_poly(f, self.n_vars);
+    }
+
+    fn remove(&mut self, i: usize) {
+        self.terms.remove(i);
+        self.lms.remove(i);
+    }
+}
+
+/// The index of the first of `lms`, other than `skip`, that divides `x`.
+fn first_divisor(lms: &[u128], skip: usize, x: u128) -> Option<usize> {
+    let cut = skip.min(lms.len());
+    let find = |part: &[u128]| part.iter().position(|&l| packed_divides(l, x));
+    find(&lms[..cut]).or_else(|| {
+        let rest = lms.get(cut + 1..)?;
+        find(rest).map(|j| cut + 1 + j)
+    })
+}
+
+/// [`reduce_skipping_vecs`] on packed monomials, the polynomials `set`
+/// being packed in `ps`.  Every monomial it forms, in the heap and in the
+/// work map, is a packed word: the same terms are popped in the same
+/// order, and the same coefficients come out.  `None` when `f` or a product
+/// does not pack, or when the divisor chosen for a monomial has a tail that
+/// does not (its lead packs, or it would divide nothing here), and the
+/// caller reduces on exponent vectors.  A set element whose lead does not
+/// pack is passed by, which is exact: it divides no packed monomial.
+fn reduce_skipping_packed(
+    f: &Poly,
+    set: &[Poly],
+    ps: &PackedSet,
+    skip: usize,
+    p: u64,
+    ord: Ordering,
+) -> Option<Poly> {
+    // below 2³² and for reduced coefficients, one Barrett step is the
+    // remainder of `v + neg · gc`, which fits a `u64`
+    let fp = (2..1 << 32).contains(&p).then(|| Barrett::new(p));
+    let mut work: PkMap<u128, u64> = PkMap::default();
+    // a min-heap of order keys: the greatest monomial first
+    let mut heap: std::collections::BinaryHeap<std::cmp::Reverse<(u32, u128)>> =
+        std::collections::BinaryHeap::new();
+    for (x, (_, c)) in set_pack_poly(f, ps.n_vars)?.into_iter().zip(f) {
+        let v = work.entry(x).or_insert_with(|| {
+            heap.push(std::cmp::Reverse(set_order_key(ord, x)));
+            0
+        });
+        *v = (*v + c % p) % p;
+    }
+    let mut out: Poly = Vec::new();
+    while let Some(std::cmp::Reverse(key)) = heap.pop() {
+        let x = set_from_order_key(ord, key);
+        let Some(c) = work.remove(&x) else {
+            continue;
+        };
+        if c == 0 {
+            continue;
+        }
+        let Some(j) = first_divisor(&ps.lms, skip, x) else {
+            out.push((unpack(x, ps.n_vars), c));
+            continue;
+        };
+        // `set[j]` is monic: `x − c·m·set[j]` cancels the leading term
+        // (already removed from `work`) and adds the shifted tail
+        let g = &set[j];
+        // `None` here is the element whose lead packs and whose tail does
+        // not, which the vector code reduces by and is not ours to skip
+        let tg = ps.terms[j].as_deref()?;
+        let m = x - tg[0];
+        let neg = p - c;
+        for (&e, &(_, gc)) in tg[1..].iter().zip(&g[1..]) {
+            let em = set_mul(e, m)?;
+            let v = work.entry(em).or_insert_with(|| {
+                heap.push(std::cmp::Reverse(set_order_key(ord, em)));
+                0
+            });
+            *v = match fp {
+                Some(fp) if gc < p => fp.reduce(*v + neg * gc),
+                _ => (*v + mulmod(neg, gc, p)) % p,
+            };
+        }
+    }
+    // popped in decreasing order: already leading-first
+    Some(out)
+}
+
+/// [`reduce_skipping_vecs`] of `set[i]` by the rest of `set`, on packed
+/// monomials when `ps` (the packed form of `set`) is given and they hold.
+fn reduce_skipping(set: &[Poly], ps: Option<&PackedSet>, i: usize, p: u64, ord: Ordering) -> Poly {
+    ps.and_then(|ps| reduce_skipping_packed(&set[i], set, ps, i, p, ord))
+        .unwrap_or_else(|| reduce_skipping_vecs(&set[i], set, i, p, ord))
+}
+
+/// Scale a reduction's output to be monic.  [`reduce_skipping`] returns
+/// distinct monomials in decreasing order with non-zero coefficients below
+/// `p`, which is all of [`normalise`] that remains to be done.
+fn make_monic(mut f: Poly, p: u64) -> Poly {
+    scale_monic(&mut f, p);
+    f
+}
+
 /// Interreduce a basis: drop elements whose leading monomial another
 /// divides, then reduce every tail by the others.
 pub fn interreduce(basis: &[Poly], p: u64, ord: Ordering) -> Vec<Poly> {
+    interreduce_with(basis, p, ord, true)
+}
+
+/// [`interreduce`], on packed monomials or (`packed` false) exponent vectors
+/// only, the control the tests compare the packed path with.
+fn interreduce_with(basis: &[Poly], p: u64, ord: Ordering, packed: bool) -> Vec<Poly> {
     let mut keep: Vec<Poly> = Vec::new();
     for (i, f) in basis.iter().enumerate() {
         let redundant = basis
@@ -1969,10 +3109,14 @@ pub fn interreduce(basis: &[Poly], p: u64, ord: Ordering) -> Vec<Poly> {
         }
     }
     let mut out = keep;
+    let mut ps = if packed { PackedSet::new(&out) } else { None };
     for i in 0..out.len() {
-        let r = reduce_skipping(&out[i], &out, i, p, ord);
+        let r = reduce_skipping(&out, ps.as_ref(), i, p, ord);
         if !r.is_empty() {
-            out[i] = normalise(&r, p, ord);
+            out[i] = make_monic(r, p);
+            if let Some(ps) = ps.as_mut() {
+                ps.replace(i, &out[i]);
+            }
         }
     }
     out.sort_by(|a, b| cmp_monomial(&a[0].0, &b[0].0, ord));
@@ -1985,23 +3129,37 @@ pub fn interreduce(basis: &[Poly], p: u64, ord: Ordering) -> Vec<Poly> {
 /// not redundant — their difference is a new generator with a smaller
 /// one — which is what distinguishes this from [`interreduce`].
 pub fn autoreduce(polys: &[Poly], p: u64, ord: Ordering) -> Vec<Poly> {
+    autoreduce_with(polys, p, ord, true)
+}
+
+/// [`autoreduce`], on packed monomials or (`packed` false) exponent vectors
+/// only.
+fn autoreduce_with(polys: &[Poly], p: u64, ord: Ordering, packed: bool) -> Vec<Poly> {
     let mut set: Vec<Poly> = polys
         .iter()
         .map(|f| normalise(f, p, ord))
         .filter(|f| !f.is_empty())
         .collect();
+    let mut ps = if packed { PackedSet::new(&set) } else { None };
     loop {
         let mut changed = false;
         let mut i = 0;
         while i < set.len() {
-            let r = normalise(&reduce_skipping(&set[i], &set, i, p, ord), p, ord);
+            let r = reduce_skipping(&set, ps.as_ref(), i, p, ord);
+            let r = if r.is_empty() { r } else { make_monic(r, p) };
             if r != set[i] {
                 changed = true;
                 if r.is_empty() {
                     set.remove(i);
+                    if let Some(ps) = ps.as_mut() {
+                        ps.remove(i);
+                    }
                     continue;
                 }
                 set[i] = r;
+                if let Some(ps) = ps.as_mut() {
+                    ps.replace(i, &set[i]);
+                }
             }
             i += 1;
         }
@@ -2229,7 +3387,7 @@ fn solve_rec(
         let sub: Vec<Poly> = r
             .basis
             .iter()
-            .map(|g| normalise(&specialise(g, var, a, p), p, opts.order))
+            .map(|g| normalise_owned(specialise(g, var, a, p), p, opts.order))
             .filter(|g| !g.is_empty())
             .collect();
         match solve_rec(
@@ -2279,6 +3437,7 @@ pub fn eval(f: &Poly, x: &[u64], p: u64) -> u64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::collections::BTreeMap;
 
     #[cfg(target_arch = "x86_64")]
     #[test]
@@ -2608,6 +3767,83 @@ mod tests {
         }
     }
 
+    /// The blocked `D − C·B'` equals the product computed entry by entry,
+    /// across tile boundaries, late-starting `B'` rows and several blocks.
+    #[test]
+    fn blocked_pair_reduction_matches_direct_product() {
+        let mut x = 0x9e37_79b9_7f4a_7c15u64;
+        let mut next = || {
+            x ^= x << 13;
+            x ^= x >> 7;
+            x ^= x << 17;
+            x
+        };
+        for p in [31u64, 65_521] {
+            let fp = Barrett::new(p);
+            for (n_red, n_free, n_pairs) in [(3, 5, 2), (40, 300, 70), (90, 600, 130)] {
+                // reducers lead columns 0..n_red; the free columns follow
+                let n_cols = n_red + n_free;
+                let reducer_at: Vec<u32> = (0..n_cols)
+                    .map(|c| if c < n_red { c as u32 } else { u32::MAX })
+                    .collect();
+                let free_index: Vec<u32> = (0..n_cols)
+                    .map(|c| {
+                        if c < n_red {
+                            u32::MAX
+                        } else {
+                            (c - n_red) as u32
+                        }
+                    })
+                    .collect();
+                let bstart: Vec<usize> = (0..n_red).map(|_| next() as usize % n_free).collect();
+                let bprime: Vec<Vec<u32>> = bstart
+                    .iter()
+                    .map(|&b| {
+                        (0..n_free)
+                            .map(|i| if i < b { 0 } else { (next() % p) as u32 })
+                            .collect()
+                    })
+                    .collect();
+                let mut pair_rows: Vec<Vec<(u32, u64)>> = Vec::new();
+                for _ in 0..n_pairs {
+                    let mut row = Vec::new();
+                    for c in 0..n_cols {
+                        if next() % 3 == 0 {
+                            row.push((c as u32, 1 + next() % (p - 1)));
+                        }
+                    }
+                    pair_rows.push(row);
+                }
+                let got = reduce_pairs_blocked(
+                    &pair_rows,
+                    &bprime,
+                    &bstart,
+                    &reducer_at,
+                    &free_index,
+                    n_free,
+                    fp,
+                    None,
+                )
+                .unwrap();
+                for (r, row) in pair_rows.iter().zip(&got) {
+                    let mut want = vec![0u64; n_free];
+                    for &(c, v) in r {
+                        let c = c as usize;
+                        if c >= n_red {
+                            want[c - n_red] = (want[c - n_red] + v) % p;
+                        } else {
+                            for (w, &b) in want.iter_mut().zip(&bprime[c]) {
+                                *w = (*w + (p - v) * u64::from(b)) % p;
+                            }
+                        }
+                    }
+                    let row: Vec<u64> = row.iter().map(|&v| u64::from(v)).collect();
+                    assert_eq!(row, want, "p={p} n_red={n_red} n_free={n_free}");
+                }
+            }
+        }
+    }
+
     #[test]
     fn narrow_arithmetic_matches_wide_rref() {
         let mut x = 0x0123_4567_89ab_cdefu64;
@@ -2819,5 +4055,623 @@ mod degree_bound_solve_tests {
             "{:?}",
             s.verdict
         );
+    }
+}
+
+/// `interreduce`, `autoreduce` and `normalise` on packed monomials and sorted
+/// terms, against the exponent-vector and ordered-map code they replace.
+#[cfg(test)]
+mod packed_set_tests {
+    use super::tests::poly;
+    use super::*;
+    use std::collections::BTreeMap;
+    use std::hash::Hasher;
+
+    /// A small deterministic generator.
+    struct Xs(u64);
+
+    impl Xs {
+        fn next(&mut self) -> u64 {
+            self.0 ^= self.0 << 13;
+            self.0 ^= self.0 >> 7;
+            self.0 ^= self.0 << 17;
+            self.0
+        }
+        fn below(&mut self, n: u64) -> u64 {
+            self.next() % n
+        }
+    }
+
+    /// Every exponent vector of total degree at most `d` in `n` variables.
+    fn monomials_up_to(n: usize, d: u32) -> Vec<Vec<u32>> {
+        fn go(k: usize, left: u32, cur: &mut Vec<u32>, out: &mut Vec<Vec<u32>>) {
+            if k == cur.len() {
+                out.push(cur.clone());
+                return;
+            }
+            for e in 0..=left {
+                cur[k] = e;
+                go(k + 1, left - e, cur, out);
+            }
+            cur[k] = 0;
+        }
+        let mut out = Vec::new();
+        go(0, d, &mut vec![0; n], &mut out);
+        out
+    }
+
+    /// `m` dense random polynomials of degree at most `d` in `n` variables.
+    fn random_dense(n: usize, m: usize, d: u32, p: u64, rng: &mut Xs) -> Vec<Poly> {
+        let monos = monomials_up_to(n, d);
+        (0..m)
+            .map(|_| {
+                let f: Vec<_> = monos.iter().map(|e| (e.clone(), rng.below(p))).collect();
+                normalise(&f, p, Ordering::Grevlex)
+            })
+            .collect()
+    }
+
+    #[test]
+    fn packed_monomials_behave_like_exponent_vectors() {
+        let mut rng = Xs(0xfeed_beef);
+        for n in [1usize, 2, 3, 7, 8, 9, 12, 15, 16] {
+            let mono = |rng: &mut Xs, top: u64| -> Vec<u32> {
+                (0..n).map(|_| rng.below(top) as u32).collect()
+            };
+            for _ in 0..400 {
+                // small exponents, so that equal and dividing pairs occur
+                let (a, b) = (mono(&mut rng, 4), mono(&mut rng, 4));
+                let (pa, pb) = (set_pack(&a).unwrap(), set_pack(&b).unwrap());
+                assert_eq!(unpack(pa, n), a);
+                assert_eq!(set_degree(pa), total_degree(&a));
+                assert_eq!(packed_divides(pa, pb), divides(&a, &b), "{a:?} | {b:?}");
+                assert!(!packed_divides(SET_NEVER, pa));
+                let prod: Vec<u32> = a.iter().zip(&b).map(|(x, y)| x + y).collect();
+                assert_eq!(set_mul(pa, pb), Some(set_pack(&prod).unwrap()));
+                if divides(&a, &b) {
+                    let q: Vec<u32> = b.iter().zip(&a).map(|(x, y)| x - y).collect();
+                    assert_eq!(pb - pa, set_pack(&q).unwrap());
+                }
+                for ord in [Ordering::Lex, Ordering::Grlex, Ordering::Grevlex] {
+                    // the key sorts ascending where cmp_monomial sorts descending
+                    assert_eq!(
+                        set_order_key(ord, pa).cmp(&set_order_key(ord, pb)),
+                        cmp_monomial(&b, &a, ord),
+                        "{ord:?}: {a:?} vs {b:?}"
+                    );
+                    assert_eq!(set_from_order_key(ord, set_order_key(ord, pa)), pa);
+                }
+            }
+            // exponents up to 127 pack, with the degree up to 16 · 127
+            let top = vec![127u32; n];
+            let ptop = set_pack(&top).unwrap();
+            assert_eq!(unpack(ptop, n), top);
+            assert_eq!(set_degree(ptop), 127 * n as u32);
+            assert!(packed_divides(ptop, ptop));
+            assert!(!packed_divides(SET_NEVER, ptop));
+            // and the first that does not
+            let mut over = vec![0u32; n];
+            over[n - 1] = 128;
+            assert_eq!(set_pack(&over), None);
+            assert_eq!(set_mul(ptop, set_pack(&vec![1; n]).unwrap()), None);
+            assert_eq!(
+                set_mul(
+                    set_pack(&vec![64; n]).unwrap(),
+                    set_pack(&vec![64; n]).unwrap()
+                ),
+                None
+            );
+            let mut small = vec![0u32; n];
+            small[0] = 64;
+            assert!(set_mul(set_pack(&small).unwrap(), set_pack(&small).unwrap()).is_none());
+            small[0] = 63;
+            assert!(set_mul(set_pack(&small).unwrap(), set_pack(&small).unwrap()).is_some());
+        }
+        assert_eq!(set_pack(&[0; 17]), None);
+        assert_eq!(set_pack(&[0; 16]), Some(0));
+        // the hasher the work map uses spreads neighbouring monomials
+        let mut seen = HashSet::new();
+        for a in 0..8u32 {
+            for b in 0..8u32 {
+                for c in 0..8u32 {
+                    let mut h = PackedHasher::default();
+                    h.write_u128(set_pack(&[a, b, c, 0, 0, 0, 0, 0, 0]).unwrap());
+                    seen.insert(h.finish() & 0x3ff);
+                }
+            }
+        }
+        // 512 keys into 1024 buckets: a random function leaves about 403
+        assert!(
+            seen.len() > 340,
+            "{} of 512 monomials hash apart",
+            seen.len()
+        );
+    }
+
+    #[test]
+    fn first_divisor_skips_only_the_skipped() {
+        let lm = |e: &[u32]| set_pack(e).unwrap();
+        let lms = [
+            lm(&[2, 0]),
+            SET_NEVER,
+            lm(&[1, 0]),
+            lm(&[1, 1]),
+            lm(&[0, 0]),
+        ];
+        let x = lm(&[1, 1]);
+        assert_eq!(first_divisor(&lms, usize::MAX, x), Some(2));
+        assert_eq!(first_divisor(&lms, 2, x), Some(3));
+        assert_eq!(first_divisor(&lms, 3, x), Some(2));
+        assert_eq!(first_divisor(&lms, 4, x), Some(2));
+        assert_eq!(first_divisor(&lms, 5, x), Some(2));
+        assert_eq!(first_divisor(&lms[..3], 2, lm(&[0, 5])), None);
+        assert_eq!(first_divisor(&lms, 4, lm(&[0, 5])), None);
+        assert_eq!(first_divisor(&[], 0, x), None);
+    }
+
+    /// Reduction by a set with its monomials packed against the vector one,
+    /// for sets that reduce a good deal (multiples of one another).
+    #[test]
+    fn packed_reduction_matches_the_vector_reduction() {
+        let mut rng = Xs(0x1357_9bdf_2468_ace0);
+        for (n, p, ord) in [
+            (4usize, 31u64, Ordering::Grevlex),
+            (5, 65_521, Ordering::Grevlex),
+            (3, 13, Ordering::Grlex),
+            (3, 786_433, Ordering::Lex),
+            (3, 4_294_967_291, Ordering::Grevlex),
+        ] {
+            let monos = monomials_up_to(n, 3);
+            let gens: Vec<Poly> = (0..5)
+                .map(|_| {
+                    let k = 2 + rng.below(5) as usize;
+                    let f: Vec<_> = (0..k)
+                        .map(|_| {
+                            (
+                                monos[rng.below(monos.len() as u64) as usize].clone(),
+                                1 + rng.below(p - 1),
+                            )
+                        })
+                        .collect();
+                    normalise(&f, p, ord)
+                })
+                .filter(|f| !f.is_empty())
+                .collect();
+            // the generators and their multiples by the monomials of degree <= 1
+            let mut set = gens.clone();
+            for f in &gens {
+                for m in monomials_up_to(n, 1) {
+                    let g: Vec<_> = f
+                        .iter()
+                        .map(|(e, c)| (e.iter().zip(&m).map(|(a, b)| a + b).collect(), *c))
+                        .collect();
+                    set.push(normalise(&g, p, ord));
+                }
+            }
+            let what = format!("n={n} p={p} {ord:?}");
+            assert_eq!(
+                autoreduce_with(&set, p, ord, true),
+                autoreduce_with(&set, p, ord, false),
+                "autoreduce {what}"
+            );
+            let basis = f4(&gens, n, p, &F4Options::new(Ordering::Grevlex, 8)).basis;
+            if !basis.is_empty() && ord == Ordering::Grevlex {
+                assert_eq!(
+                    interreduce_with(&basis, p, ord, true),
+                    interreduce_with(&basis, p, ord, false),
+                    "interreduce {what}"
+                );
+            }
+            // one reduction at a time, skipping each element in turn
+            let ps = PackedSet::new(&set).unwrap();
+            for i in 0..set.len() {
+                assert_eq!(
+                    reduce_skipping_packed(&set[i], &set, &ps, i, p, ord).unwrap(),
+                    reduce_skipping_vecs(&set[i], &set, i, p, ord),
+                    "{what}: element {i}"
+                );
+            }
+            // `make_monic` is what `normalise` leaves to do
+            for i in 0..set.len() {
+                let r = reduce_skipping_vecs(&set[i], &set, i, p, ord);
+                if !r.is_empty() {
+                    assert_eq!(make_monic(r.clone(), p), normalise(&r, p, ord), "{what}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn reduction_by_what_does_not_pack_falls_back() {
+        let p = 31;
+        let ord = Ordering::Grevlex;
+        // an exponent above 127 in the set, and in the polynomial reduced
+        let set = vec![
+            poly(&[(&[130, 0], 1), (&[0, 1], 3)]),
+            poly(&[(&[0, 2], 1), (&[0, 0], 5)]),
+            poly(&[(&[1, 1], 1), (&[0, 0], 1)]),
+        ];
+        let ps = PackedSet::new(&set).unwrap();
+        assert!(ps.terms[0].is_none() && ps.lms[0] == SET_NEVER);
+        assert!(ps.terms[1].is_some());
+        let f = poly(&[(&[0, 3], 2), (&[1, 1], 4)]);
+        let want = reduce_skipping_vecs(&f, &set, usize::MAX, p, ord);
+        assert_eq!(
+            reduce_skipping_packed(&f, &set, &ps, usize::MAX, p, ord),
+            Some(want)
+        );
+        let big = poly(&[(&[131, 0], 2)]);
+        assert_eq!(
+            reduce_skipping_packed(&big, &set, &ps, usize::MAX, p, ord),
+            None
+        );
+        // the dispatcher gives the vector answer
+        let mut sets = set.clone();
+        sets.push(big);
+        let ps = PackedSet::new(&sets).unwrap();
+        let last = sets.len() - 1;
+        assert_eq!(
+            reduce_skipping(&sets, Some(&ps), last, p, ord),
+            reduce_skipping_vecs(&sets[last], &sets, last, p, ord)
+        );
+        assert_eq!(
+            autoreduce_with(&sets, p, ord, true),
+            autoreduce_with(&sets, p, ord, false)
+        );
+    }
+
+    /// Polynomials in different numbers of unknowns are not packed at all
+    /// (the exponent-vector code compares only what the shorter has): the
+    /// result is the vector code's.
+    #[test]
+    fn a_set_of_mixed_widths_is_not_packed() {
+        let p = 31;
+        let ord = Ordering::Grevlex;
+        let set = vec![
+            poly(&[(&[1, 1], 1), (&[0, 0], 1)]),
+            poly(&[(&[1, 0, 0], 1), (&[0, 0, 1], 3)]),
+        ];
+        assert!(PackedSet::new(&set).is_none());
+        assert_eq!(
+            interreduce_with(&set, p, ord, true),
+            interreduce_with(&set, p, ord, false)
+        );
+        assert_eq!(
+            autoreduce_with(&set, p, ord, true),
+            autoreduce_with(&set, p, ord, false)
+        );
+    }
+
+    /// A set element whose lead packs and whose tail does not (under lex a
+    /// tail can carry a bigger exponent than the lead) still divides
+    /// monomials of the others, so the packed reduction must not pass it by.
+    #[test]
+    fn an_element_with_an_unpackable_tail_still_reduces_the_others() {
+        let p = 31;
+        let ord = Ordering::Lex;
+        // x·y + z²⁰⁰ and x² + x·y·z, whose term x·y·z is divisible by x·y
+        let g = poly(&[(&[1, 1, 0], 1), (&[0, 0, 200], 1)]);
+        let h = poly(&[(&[2, 0, 0], 1), (&[1, 1, 1], 1)]);
+        let set = vec![g, h];
+        let want = interreduce_with(&set, p, ord, false);
+        assert!(want.contains(&poly(&[(&[2, 0, 0], 1), (&[0, 0, 201], p - 1)])));
+        assert_eq!(interreduce_with(&set, p, ord, true), want);
+        assert_eq!(interreduce(&set, p, ord), want);
+        assert_eq!(
+            autoreduce_with(&set, p, ord, true),
+            autoreduce_with(&set, p, ord, false)
+        );
+    }
+
+    /// Under lex the exponents of a run's basis grow far past the degrees of
+    /// the input (here to about 110, in an ordinary dense system with a small
+    /// degree bound; one degree more takes them to the thousands, and the
+    /// run to minutes), and `f4` ends by interreducing it.  That basis is
+    /// interreduced already, so the exponent-vector interreduction leaves it
+    /// as it is, and so does the packed one.
+    #[test]
+    fn lex_bases_with_large_exponents_are_interreduced() {
+        let p = 536_870_909;
+        let ord = Ordering::Lex;
+        let sys = random_dense(4, 5, 2, p, &mut Xs(0xd1ff_000a));
+        let r = f4(&sys, 4, p, &F4Options::new(ord, 9));
+        let top = r.basis.iter().flatten().flat_map(|(e, _)| e).max();
+        assert!(top > Some(&64), "the exponents did not grow: {top:?}");
+        assert_eq!(interreduce_with(&r.basis, p, ord, false), r.basis);
+        assert_eq!(interreduce_with(&r.basis, p, ord, true), r.basis);
+    }
+
+    /// An element that packs only in its lead keeps that lead in the packed
+    /// set, where one whose lead does not pack has none.
+    #[test]
+    fn a_lead_that_packs_is_kept_when_the_tail_does_not() {
+        let set = vec![
+            poly(&[(&[1, 1, 0], 1), (&[0, 0, 200], 1)]),
+            poly(&[(&[130, 0, 0], 1), (&[0, 0, 1], 3)]),
+            poly(&[(&[2, 0, 0], 1), (&[0, 1, 1], 5)]),
+        ];
+        let ps = PackedSet::new(&set).unwrap();
+        assert!(ps.terms[0].is_none() && ps.lms[0] == set_pack(&[1, 1, 0]).unwrap());
+        assert!(ps.terms[1].is_none() && ps.lms[1] == SET_NEVER);
+        assert!(ps.terms[2].is_some() && ps.lms[2] == set_pack(&[2, 0, 0]).unwrap());
+        // a replacement is looked at again
+        let mut ps = ps;
+        ps.replace(0, &poly(&[(&[1, 1, 0], 1), (&[0, 0, 2], 1)]));
+        assert!(ps.terms[0].is_some() && ps.lms[0] == set_pack(&[1, 1, 0]).unwrap());
+        ps.replace(2, &poly(&[(&[200, 0, 0], 1)]));
+        assert!(ps.terms[2].is_none() && ps.lms[2] == SET_NEVER);
+        ps.remove(1);
+        assert_eq!((ps.terms.len(), ps.lms.len()), (2, 2));
+    }
+
+    /// The packed reduction gives the vector reduction's answer or gives up,
+    /// and gives up exactly when the divisor it would take has a tail that
+    /// does not pack.
+    #[test]
+    fn a_tail_that_does_not_pack_only_matters_to_the_element_that_divides() {
+        let p = 31;
+        let ord = Ordering::Lex;
+        let hole = poly(&[(&[1, 1, 0], 1), (&[0, 0, 200], 1)]); // lead x·y
+        let plain = poly(&[(&[1, 0, 0], 1), (&[0, 0, 1], 3)]); // x + 3z
+        let g = poly(&[(&[1, 1, 1], 1), (&[0, 1, 0], 2)]); // x·y·z + 2y
+
+        // x·y·z is divided by x + 3z first, so the hole behind it is not taken
+        let set = vec![plain.clone(), hole.clone(), g.clone()];
+        let ps = PackedSet::new(&set).unwrap();
+        let want = reduce_skipping_vecs(&set[2], &set, 2, p, ord);
+        assert_eq!(
+            reduce_skipping_packed(&set[2], &set, &ps, 2, p, ord),
+            Some(want)
+        );
+        // and by the hole first when it comes first
+        let set = vec![hole.clone(), plain, g];
+        let ps = PackedSet::new(&set).unwrap();
+        assert_eq!(reduce_skipping_packed(&set[2], &set, &ps, 2, p, ord), None);
+        // the hole itself has a monomial that does not pack, and is not reduced
+        assert_eq!(reduce_skipping_packed(&set[0], &set, &ps, 0, p, ord), None);
+        // the dispatcher takes the vector answer
+        assert_eq!(
+            reduce_skipping(&set, Some(&ps), 2, p, ord),
+            reduce_skipping_vecs(&set[2], &set, 2, p, ord)
+        );
+        assert_ne!(reduce_skipping(&set, Some(&ps), 2, p, ord), set[2]);
+    }
+
+    /// Sets whose exponents straddle the packed range, under each order, so
+    /// that leads and tails that do and do not pack are mixed: the packed
+    /// code agrees with the vector code on every reduction it takes, and
+    /// `interreduce` and `autoreduce` are the same with the packed code off.
+    #[test]
+    fn exponents_straddling_the_packed_range_agree_across_the_paths() {
+        let mut rng = Xs(0x5712_adde_0127_0128);
+        let n = 3;
+        let mut with_a_hole = 0;
+        let mut declined = 0;
+        let mut taken = 0;
+        for (ord, p) in [
+            (Ordering::Lex, 31u64),
+            (Ordering::Grlex, 31),
+            (Ordering::Grevlex, 31),
+            (Ordering::Lex, 536_870_909),
+        ] {
+            for _ in 0..8 {
+                let gens: Vec<Poly> = (0..3)
+                    .map(|_| {
+                        let k = 2 + rng.below(2) as usize;
+                        let f: Vec<_> = (0..k)
+                            .map(|_| {
+                                // small exponents, the first variable the smallest
+                                // so that under lex the leads pack and the tails
+                                // may not; and often one exponent at the edge of
+                                // the packed range or past it (never two: a
+                                // reduction would then run through millions of
+                                // monomials, in both codes)
+                                let mut e: Vec<u32> = (0..n)
+                                    .map(|v| rng.below(if v == 0 { 3 } else { 4 }) as u32)
+                                    .collect();
+                                if rng.below(5) == 0 {
+                                    let v = rng.below(n as u64) as usize;
+                                    e[v] = [127, 128, 129, 130][rng.below(4) as usize];
+                                }
+                                (e, 1 + rng.below(p - 1))
+                            })
+                            .collect();
+                        normalise(&f, p, ord)
+                    })
+                    .filter(|f| !f.is_empty())
+                    .collect();
+                // the generators and their multiples by each variable
+                let mut set = gens.clone();
+                for f in &gens {
+                    for v in 0..n {
+                        let g: Vec<_> = f
+                            .iter()
+                            .map(|(e, c)| {
+                                let mut e = e.clone();
+                                e[v] += 1;
+                                (e, *c)
+                            })
+                            .collect();
+                        set.push(normalise(&g, p, ord));
+                    }
+                }
+                if set.is_empty() {
+                    continue;
+                }
+                let what = format!("{ord:?} p={p}");
+                let ps = PackedSet::new(&set).unwrap();
+                with_a_hole += (0..set.len())
+                    .filter(|&j| ps.terms[j].is_none() && ps.lms[j] != SET_NEVER)
+                    .count();
+                for i in 0..set.len() {
+                    let want = reduce_skipping_vecs(&set[i], &set, i, p, ord);
+                    match reduce_skipping_packed(&set[i], &set, &ps, i, p, ord) {
+                        Some(got) => {
+                            taken += 1;
+                            assert_eq!(got, want, "{what}: element {i}");
+                        }
+                        None => declined += 1,
+                    }
+                    assert_eq!(reduce_skipping(&set, Some(&ps), i, p, ord), want);
+                }
+                // one pass of interreduction over the whole set, and
+                // autoreduction (which runs until nothing changes, and on
+                // a set with far exponents and all those multiples can run
+                // a long time) over the generators alone
+                assert_eq!(
+                    interreduce_with(&set, p, ord, true),
+                    interreduce_with(&set, p, ord, false),
+                    "interreduce {what}"
+                );
+                assert_eq!(
+                    autoreduce_with(&gens, p, ord, true),
+                    autoreduce_with(&gens, p, ord, false),
+                    "autoreduce {what}"
+                );
+            }
+        }
+        // the corpus must leave the packed range for the test to say anything
+        assert!(with_a_hole > 0, "no lead packed with a tail that did not");
+        assert!(
+            taken > 0 && declined > 0,
+            "{taken} taken, {declined} declined"
+        );
+    }
+
+    /// Inputs the polynomial type allows and a field does not: an empty
+    /// polynomial and a modulus of 1.  The exponent-vector code takes both
+    /// without a panic (a lone empty polynomial comes back from `interreduce`
+    /// as it is, and modulo 1 every coefficient is zero), so the packed paths
+    /// must read no term that is not there and build no Barrett step, which
+    /// needs `p >= 2`.
+    #[test]
+    fn empty_polynomials_and_a_modulus_of_one_are_taken_as_before() {
+        let empty: Poly = Vec::new();
+        let x = poly(&[(&[1], 1)]);
+        let (lone_empty, lone_x) = (std::slice::from_ref(&empty), std::slice::from_ref(&x));
+        for ord in [Ordering::Lex, Ordering::Grlex, Ordering::Grevlex] {
+            for p in [2u64, 3, 7, 65_521, 4_294_967_291, (1 << 61) - 1] {
+                for packed in [false, true] {
+                    assert_eq!(
+                        interreduce_with(lone_empty, p, ord, packed),
+                        vec![empty.clone()],
+                        "interreduce of one empty polynomial, p = {p}, {ord:?}"
+                    );
+                }
+                assert_eq!(interreduce(lone_empty, p, ord), vec![empty.clone()]);
+                assert!(autoreduce(lone_empty, p, ord).is_empty());
+                assert!(reduce(&empty, lone_x, p, ord).is_empty());
+            }
+            for packed in [false, true] {
+                assert_eq!(
+                    interreduce_with(lone_x, 1, ord, packed),
+                    vec![x.clone()],
+                    "interreduce modulo 1, {ord:?}"
+                );
+                let ps = if packed { PackedSet::new(lone_x) } else { None };
+                assert!(reduce_skipping(lone_x, ps.as_ref(), 0, 1, ord).is_empty());
+            }
+            assert!(autoreduce(lone_x, 1, ord).is_empty());
+            assert!(reduce(&x, lone_x, 1, ord).is_empty());
+            assert!(normalise(&x, 1, ord).is_empty());
+        }
+    }
+
+    /// [`normalise`] as it was before it sorted instead of building a map.
+    fn normalise_with_a_map(terms: &[(Vec<u32>, u64)], p: u64, ord: Ordering) -> Poly {
+        let mut map: BTreeMap<Vec<u32>, u64> = BTreeMap::new();
+        for (e, c) in terms {
+            let c = c % p;
+            if c == 0 {
+                continue;
+            }
+            let v = map.entry(e.clone()).or_insert(0);
+            *v = (*v + c) % p;
+        }
+        let mut out: Poly = map.into_iter().filter(|(_, c)| *c != 0).collect();
+        out.sort_by(|(a, _), (b, _)| cmp_monomial(b, a, ord));
+        if let Some((_, lc)) = out.first() {
+            let mut inv = 1u64;
+            let mut base = lc % p;
+            let mut e = p - 2;
+            while e > 0 {
+                if e & 1 == 1 {
+                    inv = mulmod(inv, base, p);
+                }
+                base = mulmod(base, base, p);
+                e >>= 1;
+            }
+            for (_, c) in out.iter_mut() {
+                *c = mulmod(*c, inv, p);
+            }
+        }
+        out
+    }
+
+    #[test]
+    fn normalise_matches_the_map_based_original() {
+        let mut rng = Xs(0x6e6f_726d);
+        for p in [
+            2u64,
+            3,
+            5,
+            31,
+            65_521,
+            786_433,
+            4_294_967_291,
+            (1 << 61) - 1,
+        ] {
+            for ord in [Ordering::Lex, Ordering::Grlex, Ordering::Grevlex] {
+                for _ in 0..60 {
+                    let n = 1 + rng.below(4) as usize;
+                    let k = rng.below(14) as usize;
+                    // few distinct monomials, so that terms repeat and cancel;
+                    // coefficients beyond p, and multiples of p
+                    let terms: Vec<(Vec<u32>, u64)> = (0..k)
+                        .map(|_| {
+                            let e = (0..n).map(|_| rng.below(3) as u32).collect();
+                            let c = match rng.below(4) {
+                                0 => 0,
+                                1 => p * rng.below(3),
+                                _ => rng.below(p.saturating_mul(2).max(2)),
+                            };
+                            (e, c)
+                        })
+                        .collect();
+                    assert_eq!(
+                        normalise(&terms, p, ord),
+                        normalise_with_a_map(&terms, p, ord),
+                        "p = {p}, {ord:?}, {terms:?}"
+                    );
+                    assert_eq!(
+                        normalise_owned(terms.clone(), p, ord),
+                        normalise_with_a_map(&terms, p, ord),
+                        "owned: p = {p}, {ord:?}, {terms:?}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn invmod_inverts() {
+        let mut rng = Xs(0x1234_5678_9abc_def1);
+        for p in [
+            2u64,
+            3,
+            5,
+            31,
+            65_521,
+            786_433,
+            4_294_967_291,
+            (1 << 61) - 1,
+        ] {
+            for a in (1..40u64).chain((0..200).map(|_| 1 + rng.next() % (u64::MAX - 1))) {
+                if a % p == 0 {
+                    continue;
+                }
+                assert_eq!(mulmod(a % p, invmod(a, p), p), 1, "{a}^-1 mod {p}");
+            }
+        }
     }
 }

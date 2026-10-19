@@ -3,6 +3,11 @@ name: n37 four-policy support replay
 on:
   pull_request:
     paths:
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'build.rs'
+      - '.cargo/**'
+      - 'rust-toolchain*'
       - '.github/workflows/n37-four-policy-support.yml'
       - 'examples/n37_four_policy_support.rs'
       - 'examples/n37_four_policy_support_replay.rs'
@@ -14,7 +19,6 @@ on:
       - 'src/cryptanalysis/binary_velu.rs'
       - 'src/cryptanalysis/koblitz_fast.rs'
       - 'src/cryptanalysis/koblitz_index_calculus.rs'
-      - 'docs/index-calculus-scoreboard.html'
   workflow_dispatch:
 
 permissions:
@@ -29,18 +33,21 @@ concurrency:
 jobs:
   replay:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             Cargo.toml
+            tools/volcano-cli/
+            isogeny_algos/
             src
             examples/n37_four_policy_support.rs
             examples/n37_four_policy_support_replay.rs
             examples/support/n37_policy_common.rs
             docs/curves/registry.json
+            docs/curves/standards/parameters.json
             docs/ecbench/schema.sql
             docs/ic/calibration.json
             docs/ic/boundary_targets.json
@@ -48,6 +55,7 @@ jobs:
             research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json
             research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz
             research/notes/ecc2k130/n37_four_policy_support_20261003
+      - uses: Swatinem/rust-cache@v2
       - name: Use frozen native lockfile
         run: cp research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock Cargo.lock
       - name: Check the changed Rust files
