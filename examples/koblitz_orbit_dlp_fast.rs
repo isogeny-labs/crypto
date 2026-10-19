@@ -3525,17 +3525,81 @@ mod wide {
         let mut states_wide = Vec::new();
         let mut root_batch = RootBatch128::with_capacity(n);
         let mut root_inputs = Vec::with_capacity(n);
+        let root_threads: usize = match std::env::var("KIC_INDEX_ROOT_THREADS") {
+            Ok(value) => {
+                let threads: usize = value
+                    .parse()
+                    .expect("KIC_INDEX_ROOT_THREADS must be an integer from 1 to 8");
+                assert!(
+                    (1..=8).contains(&threads),
+                    "KIC_INDEX_ROOT_THREADS must be from 1 to 8"
+                );
+                threads
+            }
+            Err(std::env::VarError::NotPresent) => 1,
+            Err(error) => panic!("invalid KIC_INDEX_ROOT_THREADS: {error}"),
+        };
         for left in 0..reps.len() {
-            for right in 0..reps.len() {
-                if symmetric_states && left > right {
-                    continue;
-                }
+            let right_start = if symmetric_states { left } else { 0 };
+            // Compute each left row concurrently, then insert states and exact
+            // root keys in the original right/relative order.  The latter
+            // preserves stable state IDs and the first-witness table rule.
+            let parallel_roots: Vec<Option<[u128; 2]>> = if root_threads > 1 {
+                std::thread::scope(|scope| {
+                    let count = reps.len() - right_start;
+                    let workers = root_threads.min(count);
+                    let chunk_width = count.div_ceil(workers);
+                    let mut handles = Vec::with_capacity(workers);
+                    let shifted = &shifted;
+                    for first in (right_start..reps.len()).step_by(chunk_width) {
+                        let last = (first + chunk_width).min(reps.len());
+                        handles.push(scope.spawn(move || {
+                            let mut batch = RootBatch128::with_capacity(n);
+                            let mut inputs = Vec::with_capacity(n);
+                            let mut roots = Vec::with_capacity((last - first) * n);
+                            for right in first..last {
+                                let relative_count = if symmetric_states && left == right {
+                                    n / 2 + 1
+                                } else {
+                                    n
+                                };
+                                if batch_roots {
+                                    inputs.clear();
+                                    for relative in 0..relative_count {
+                                        inputs.push((shifted[left][0], shifted[right][relative]));
+                                    }
+                                    batch.solve(gf, basis, solver, &inputs);
+                                    roots.extend_from_slice(&batch.results);
+                                } else {
+                                    roots.extend((0..relative_count).map(|relative| {
+                                        solver.roots(
+                                            gf,
+                                            basis,
+                                            shifted[left][0],
+                                            shifted[right][relative],
+                                        )
+                                    }));
+                                }
+                            }
+                            roots
+                        }));
+                    }
+                    handles
+                        .into_iter()
+                        .flat_map(|handle| handle.join().expect("root worker panicked"))
+                        .collect()
+                })
+            } else {
+                Vec::new()
+            };
+            let mut root_cursor = 0;
+            for right in right_start..reps.len() {
                 let relative_count = if symmetric_states && left == right {
                     n / 2 + 1
                 } else {
                     n
                 };
-                if batch_roots {
+                if batch_roots && root_threads == 1 {
                     root_inputs.clear();
                     for relative in 0..relative_count {
                         root_inputs.push((shifted[left][0], shifted[right][relative]));
@@ -3543,7 +3607,9 @@ mod wide {
                     root_batch.solve(gf, basis, solver, &root_inputs);
                 }
                 for relative in 0..relative_count {
-                    let roots = if batch_roots {
+                    let roots = if root_threads > 1 {
+                        parallel_roots[root_cursor + relative]
+                    } else if batch_roots {
                         root_batch.results[relative]
                     } else {
                         solver.roots(gf, basis, shifted[left][0], shifted[right][relative])
@@ -3602,6 +3668,10 @@ mod wide {
                         }
                     }
                 }
+                root_cursor += relative_count;
+            }
+            if root_threads > 1 {
+                assert_eq!(root_cursor, parallel_roots.len());
             }
         }
         let states = if packed_state83 {
