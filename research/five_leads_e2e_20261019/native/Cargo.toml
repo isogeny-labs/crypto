@@ -1,0 +1,25 @@
+[package]
+name = "five-leads-study"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[lib]
+path = "lib.rs"
+
+[[bin]]
+name = "tian-cubic-kernel"
+path = "tian_cubic_kernel.rs"
+
+[[bin]]
+name = "mixed-fiber-census"
+path = "mixed_fiber_census.rs"
+
+[[bin]]
+name = "genus2-model-gate"
+path = "genus2_model_gate.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

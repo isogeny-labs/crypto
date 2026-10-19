@@ -174,6 +174,11 @@ pub fn solve(
                 .parse()
                 .map_err(|_| "invalid base_seed")?,
         ),
+        "ic.three_leads_genus2_choice2_v1" => {
+            crate::cryptanalysis::three_leads_followup::solve_genus2_choice2(
+                inst, target, seed, cap,
+            )
+        }
         "ic.three_leads_genus2_v2" => engine::solve_genus2_v2(
             inst,
             target,

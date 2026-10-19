@@ -269,6 +269,7 @@ const IC_COUNTED_PARAMS: &[ParamDecl] = &[
 /// in [`solve`]; nothing else changes.
 pub fn registry() -> &'static [MethodDecl] {
     &[
+        MethodDecl{id:"ic.three_leads_genus2_choice2_v1",family:"ic",summary:"Two-choice component-directed genus2 relation walk; both candidate additions, roots and valid relation insertions charged",entry:"three_leads_followup::solve_genus2_choice2",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
         MethodDecl{id:"rho.three_leads_plain_v1",family:"rho",summary:"Fully counted memoized r-adding rho on frozen finite-extension study inputs; collision-table memory reported",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
         MethodDecl{id:"rho.three_leads_negation_v1",family:"rho",summary:"Fully counted memoized negation rho with fruitless-two-cycle look-ahead and charged escape/restarts",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
         MethodDecl{id:"rho.three_leads_jacobian_v1",family:"rho",summary:"Explicit Scholten transfer followed by the matched generic Jacobian negation rho, every primitive counted",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
