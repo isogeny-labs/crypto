@@ -190,6 +190,8 @@ def rows : List Row := [
   { kind := 4, m := 5, n := 11, ell := 3, shape := 24, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n11l3m5
   { kind := 4, m := 5, n := 13, ell := 3, shape := 25, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n13l3m5
   { kind := 4, m := 5, n := 13, ell := 3, shape := 25, value := some 3, cap := 4, dstar := none, dstarAtLeast := false },  -- n13l3m5
+  { kind := 4, m := 5, n := 13, ell := 3, shape := 25, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n13l3m5
+  { kind := 4, m := 5, n := 13, ell := 3, shape := 25, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n13l3m5
   { kind := 4, m := 6, n := 8, ell := 2, shape := 26, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n8l2m6
   { kind := 4, m := 6, n := 8, ell := 2, shape := 26, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n8l2m6
   { kind := 4, m := 6, n := 8, ell := 2, shape := 26, value := some 4, cap := 4, dstar := none, dstarAtLeast := false },  -- n8l2m6
