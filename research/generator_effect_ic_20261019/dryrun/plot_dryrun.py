@@ -14,7 +14,7 @@ cols = {"factor_base": "#6b8e23", "oracle_setup": "#4c78a8", "relations": "#e0a0
 names = {"factor_base": "base construction", "oracle_setup": "pair-table build",
          "relations": "target draw + probes", "linear_algebra": "linear algebra",
          "verify": "verify"}
-fig, ax = plt.subplots(1, 3, figsize=(16, 5.2), constrained_layout=True)
+fig, ax = plt.subplots(1, 2, figsize=(11, 5.2), constrained_layout=True)
 
 # A: stacked per-phase S, abscissa vs knownlog, w = 0 and 1, both curves
 a = ax[0]
@@ -56,27 +56,8 @@ b.set_ylabel("relations found / targets tried (90% CI)")
 b.set_title("B. Online yield")
 b.legend(fontsize=8)
 
-# C: S per key vs T (model from measured parts)
-cc = ax[2]
-for ci, c in enumerate(cur):
-    mm = c["knownlog_over_abscissa"]["multi_target_model"]
-    for w, ls in ((0.0, "-"), (1.0, "--")):
-        pts = [m for m in mm if m["w"] == w]
-        T = [m["T"] for m in pts]
-        cc.plot(T, [m["abscissa_s_per_key"] for m in pts], ls, color="#4c78a8", marker="o",
-                alpha=1 if ci == 0 else 0.45, label=f"abscissa w={w:g}" if ci == 0 else None)
-        cc.plot(T, [m["knownlog_s_per_key"] for m in pts], ls, color="#c0392b", marker="s",
-                alpha=1 if ci == 0 else 0.45, label=f"known-log w={w:g}" if ci == 0 else None)
-    for w, ls in ((0.0, ":"), (1.0, "-.")):
-        wi = [0.0, 0.1, 1.0].index(w)
-        cc.axhline(c["rho_neg_s_mean_by_weight"][wi], color="black", ls=ls, lw=0.8, alpha=1 if ci == 0 else 0.4,
-                   label=f"rho-neg w={w:g}" if ci == 0 else None)
-cc.set_xscale("log", base=2); cc.set_yscale("log")
-cc.set_xlabel("keys T under one G"); cc.set_ylabel("S per key (derived from measured parts)")
-cc.set_title("C. S per key vs T (c1 solid, c2 faded)")
-cc.legend(fontsize=7)
 fig.suptitle("SCRATCH dry run, not data. Generator-effect E1, two 24-bit a=-3 prime-order curves, "
              "16 planted_shared targets x 2 rounds, mitm negation_folded m=2. Sessions ECBS1hdfb4b2694578, ECBS1h3e4cb8782f3c.",
-             fontsize=8)
+             fontsize=7)
 fig.savefig("dryrun.svg")
 fig.savefig("dryrun.png", dpi=150)

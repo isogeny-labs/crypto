@@ -215,6 +215,53 @@ Scope: 24–40-bit prime-order curves with `a = −3`, MITM and (E3) Semaev
 oracles, the `prime-abscissa` and `known-log` bases. Nothing about
 P-192/P-224 beyond E5's free checks and a model projection.
 
+## Amendment 1 (2026-10-19, after the E1 dry run; PR #2297, `DRYRUN.md`)
+
+The dry run falsified §2's equal-yield prediction, and the reason is
+elementary: `{±[i]G : i ≤ B}` is an arithmetic progression, so its pair
+sums are the multiples `[j]G` with `|j| ≤ 2B`, about `4B + 1` distinct
+points instead of about `2B²`. Measured yield ratio known-log / abscissa was
+0.0097 [0.0074, 0.0130] and 0.0092 [0.0072, 0.0126] on the two curves, and
+`(4B + 1)/r` matches the measured hit rate on both. The base as written is
+a baby-step table, and the dry run says so.
+
+Two other readings change the plan:
+
+- the baseline's set-up plus linear algebra is 0–2.5% of total S; the
+  pair table is 51–77%. There was never a phase worth removing.
+- at ±3% on yield, 64 targets per curve gives about ±30%; about 3,000 are
+  needed.
+
+**Changes to the experiments.**
+
+1. **Sumset law replaces equal yield.** For any known-log base
+   `{±[s_i]G}` the `m`-sum yield is `|mΣ S| / r` where `S = {±s_i}` and
+   `mΣ` is the `m`-fold sumset. The progression is the minimum
+   (`|2Σ| = 4B + 1`); a generic set gives `|2Σ| ≈ 2B²`. This is the
+   pre-registered prediction for every known-log arm, checked against the
+   measured hit rate.
+2. **New arm `known-log:scalars=random`:** `s_i` uniform in `[1, r − 1]`,
+   built by `B` scalar multiplications (charged) or by a chained
+   pseudo-random increment walk `P_{i+1} = P_i + [d_i]G` with `d_i` from a
+   small precomputed set (charged as additions). Predicted yield equals the
+   abscissa base's at equal `B` on prime-order curves, with linear algebra
+   at 0. This is the object §2 meant; it is Bernstein–Lange's table with
+   known logs, and the honest framing in §2 stands.
+3. **Comparator added:** `bsgs.negation` at equal memory, since the
+   progression base is a BSGS table and the random-scalar base is a
+   randomised one. Both known-log arms are reported against rho and BSGS
+   through the §5a band.
+4. **Sample size:** 3,000 targets per curve on P0 for the yield metric;
+   64 remain for the per-phase S readings.
+5. **E1's decision rule** now reads: improvement only if total S of
+   `known-log:scalars=random` is below the abscissa baseline's at every
+   band weight and below `bsgs.negation` at equal memory. Given the 0–2.5%
+   set-up share, the prediction is "accounting, no improvement" at `T = 1`;
+   the multi-target block is where any difference can appear.
+
+The remaining experiments (E0, E2–E5) are unchanged. `PROTOCOL.md` is
+frozen after this amendment's dry run of arm 2 on the same two curves.
+
 ## Appendix: the earlier draft (2026-10-19, superseded)
 
 The first draft of this file asked whether changing the generator changes

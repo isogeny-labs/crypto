@@ -222,39 +222,6 @@ fn main() {
                 "online_s_ratio": ron(&all), "online_s_ratio_ci90": [cio.0, cio.1],
             }));
         }
-        // Multi-target model built from the measured parts: the first key is
-        // the measured run (set-up, table and all); each further key under
-        // the same G costs the relations phase per relation found, because
-        // the base's logarithms are then in hand (the abscissa matrix has
-        // been solved, the known-log base never needed one).
-        let per_key = |x: &[Run], i: &[usize], w: f64| {
-            i.iter()
-                .map(|&j| phase_s(&x[j], "relations", w) + phase_s(&x[j], "verify", w))
-                .sum::<f64>()
-                / i.iter().map(|&j| x[j].found).sum::<f64>()
-        };
-        let first = |x: &[Run], i: &[usize], w: f64| {
-            mean(&i.iter().map(|&j| s_at(&x[j], w)).collect::<Vec<_>>())
-        };
-        let mut multi = Vec::new();
-        for &w in &WEIGHTS {
-            for t in [1.0f64, 4.0, 16.0, 64.0] {
-                let cost =
-                    |x: &[Run], i: &[usize]| (first(x, i, w) + (t - 1.0) * per_key(x, i, w)) / t;
-                let all: Vec<usize> = (0..a.len()).collect();
-                let ratio = |i: &[usize]| cost(k, i) / cost(a, i);
-                let ci = boot(&mut rng, a.len(), ratio);
-                multi.push(json!({
-                    "w": w, "T": t,
-                    "abscissa_s_per_key": cost(a, &all),
-                    "knownlog_s_per_key": cost(k, &all),
-                    "ratio_knownlog_over_abscissa": ratio(&all),
-                    "ratio_ci90": [ci.0, ci.1],
-                    "abscissa_online_s_per_key_limit": per_key(a, &all, w),
-                    "knownlog_online_s_per_key_limit": per_key(k, &all, w),
-                }));
-            }
-        }
         let ratio_y = |ia: &[usize], ik: &[usize]| {
             let ya = ia.iter().map(|&j| a[j].found).sum::<f64>()
                 / ia.iter().map(|&j| a[j].tried).sum::<f64>();
@@ -290,7 +257,6 @@ fn main() {
                 "yield_ratio": ratio_y(&all, &all),
                 "yield_ratio_ci90": [v[RESAMPLES * 5 / 100], v[RESAMPLES * 95 / 100]],
                 "s_ratios": ratios,
-                "multi_target_model": multi,
             },
             "rho_neg_s_mean_by_weight": s_ref,
         }));

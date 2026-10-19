@@ -1,0 +1,20 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "SCRATCH dry run 2 (PLAN Amendment 1), curve c1, 3000-target yield block (not data, PROTOCOL.md not frozen)",
+  "description": "Scratch dry run for research/generator_effect_ic_20261019/PLAN.md Amendment 1. One 24-bit a=-3 prime-order curve, 3000 planted_shared targets, 1 measured round(s). Arms: rho-neg, ic-abscissa, ic-knownlog (progression), ic-knownlog-random (known-log:scalars=random), bsgs-neg-B (baby table of B+1 classes, equal to the base size) and bsgs-neg-tbl (baby table of B(B+1)+1 classes, equal to the pair-table entries). Not a measurement of record.",
+  "workloads": {
+    "curves": [{"kind": "prime_explicit", "p": 8582641, "a": 8582638, "b": 6723661, "group_order": 8580037, "r": 8580037, "gx": 1, "gy": 4004158}],
+    "targets_per_curve": 3000,
+    "target_seed": 20261019,
+    "target_kind": "planted_shared"
+  },
+  "arms": [
+    {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "ic-abscissa", "role": "baseline", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=205", "oracle": "mitm:negation_folded=1,m=2"}}},
+    {"name": "ic-knownlog", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "known-log:size=205", "oracle": "mitm:negation_folded=1,m=2"}}},
+    {"name": "ic-knownlog-random", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "known-log:size=205,scalars=random", "oracle": "mitm:negation_folded=1,m=2"}}},
+    {"name": "bsgs-neg-B", "role": "candidate", "method": {"id": "bsgs.negation_table", "params": {"baby": "205"}}},
+    {"name": "bsgs-neg-tbl", "role": "candidate", "method": {"id": "bsgs.negation_table", "params": {"baby": "42230"}}}
+  ],
+  "measurement": {"rounds": 1, "warmup": 0, "order": "alternate", "seed": 20261019, "isolation_required": "L0", "timeout_seconds": 600}
+}

@@ -25,7 +25,7 @@ use crate::cryptanalysis::ecbench::claw::{pair_claw, pair_claw_wide, ClawOutcome
 use crate::cryptanalysis::ecbench::fp4::{self as fp4, Fp4Group, Fp4Instance, K4Base, K4Params};
 use crate::cryptanalysis::ecbench::full_price;
 use crate::cryptanalysis::ecbench::generic::{
-    bsgs_interleaved, bsgs_negation, bsgs_textbook, kangaroo, GenericOutcome,
+    bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook, kangaroo, GenericOutcome,
 };
 use crate::cryptanalysis::ecbench::workload::{CurveFacts, Instance, WideInstance};
 use crate::cryptanalysis::ecbench_large_prime::{
@@ -371,6 +371,18 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ecbench::generic::bsgs_negation",
             applies: Applies::Any,
             params: &[],
+        },
+        MethodDecl {
+            id: "bsgs.negation_table",
+            family: "bsgs",
+            summary: "bsgs.negation with the baby table's half-width m given (m + 1 classes, giant stride 2m + 1): the equal-memory comparator for a known-log base",
+            entry: "ecbench::generic::bsgs_negation_table",
+            applies: Applies::Any,
+            params: &[ParamDecl {
+                name: "baby",
+                default: Some("0"),
+                help: "baby table half-width m (table entries m + 1); 0 means ceil(sqrt(r)/2), which is bsgs.negation",
+            }],
         },
         MethodDecl {
             id: "kangaroo.vow",
@@ -1050,6 +1062,15 @@ fn solve_generic<G: CountedGroup>(
         }
         "bsgs.negation" => {
             let o = bsgs_negation(g, gen, target, r);
+            generic(o, t.elapsed().as_nanos() as u64, 2)
+        }
+        "bsgs.negation_table" => {
+            let baby = param_u64(m, "baby")?;
+            let o = if baby == 0 {
+                bsgs_negation(g, gen, target, r)
+            } else {
+                bsgs_negation_table(g, gen, target, r, baby)
+            };
             generic(o, t.elapsed().as_nanos() as u64, 2)
         }
         "kangaroo.vow" => {

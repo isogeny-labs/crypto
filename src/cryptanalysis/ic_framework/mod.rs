@@ -773,6 +773,58 @@ mod tests {
         assert_eq!(report.decomposition.relations_found, 1);
     }
 
+    /// **`scalars=random`**: `B` seeded uniform scalars, charged as scalar
+    /// multiplications, every column's stored log is the scalar, the same
+    /// seed gives the same base, and the pipeline recovers `k` with zero
+    /// linear-algebra operations.
+    #[test]
+    fn known_log_random_scalars_recover_logs_with_zero_linear_algebra() {
+        use super::plugins::KnownLogBase;
+        use crate::cryptanalysis::ic_boundary::prime_instance_for;
+        let inst = prime_instance_for(24, 5);
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let mut spec = known_log_spec(120);
+        spec.factor_base_params.set("scalars", "random");
+        let mut ops = GroupOps::default();
+        let fb = KnownLogBase
+            .build(&ctx, &spec.factor_base_params, &mut ops)
+            .unwrap();
+        let logs = fb.known_logs.clone().expect("known logs");
+        assert_eq!(logs.len(), 120);
+        assert_eq!(ops.scalar_mults, 120, "B scalar multiplications, charged");
+        assert!(
+            logs.iter().any(|&s| s > 120),
+            "uniform scalars, not a progression"
+        );
+        for (i, (&col, &coef)) in fb.col_of.iter().zip(&fb.coef_of).enumerate() {
+            let e = ((coef as u128 * logs[col] as u128) % inst.r as u128) as u64;
+            let mut scratch = GroupOps::default();
+            let expect = CountedGroup::mul(&inst.curve, &mut scratch, ctx.generator, e);
+            assert_eq!(fb.points[i], expect, "point {i} is [coef·log]G");
+        }
+        let mut ops2 = GroupOps::default();
+        let fb2 = KnownLogBase
+            .build(&ctx, &spec.factor_base_params, &mut ops2)
+            .unwrap();
+        assert_eq!(fb2.known_logs, fb.known_logs, "same seed, same base");
+        let mut oracle = MitmOracle::new(2);
+        let report = run_pipeline(
+            &ctx,
+            &spec,
+            &KnownLogBase,
+            &mut oracle,
+            planted,
+            &Calibration::default(),
+            None,
+        )
+        .expect("the configuration should run");
+        assert!(report.verified);
+        assert_eq!(report.recovered, Some(planted));
+        assert_eq!(report.linear_algebra.work, 0);
+        assert_eq!(report.linear_algebra.cost.get("row_ops"), 0);
+        assert_eq!(report.linear_algebra.cost.group_ops.adds, 0);
+    }
+
     /// The base is a function of `G` and `B` alone: the same `G` gives the
     /// same point set, another `G` another one.
     #[test]

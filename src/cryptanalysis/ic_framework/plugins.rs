@@ -10,7 +10,7 @@
 //! | name | regime | what it is |
 //! |:--|:--|:--|
 //! | `prime-abscissa` | prime | the smallest abscissae carrying a point, one column each |
-//! | `known-log` | prime | `±[i]G` for `1 ≤ i ≤ size`, one column each, every logarithm known: no linear algebra |
+//! | `known-log` | prime | `±[s_i]G`, one column each, every logarithm known so there is no linear algebra; `scalars=progression` (default) is `s_i = i`, `scalars=random` seeded uniform scalars |
 //! | `binary-subspace` | binary, Koblitz | points whose abscissa lies in an `F_2`-subspace |
 //! | `koblitz-orbit` | Koblitz | the same, each signed Frobenius orbit folded onto one column |
 //! | `compact-orbit-scan` | Koblitz | deterministic raw-abscissa scan, subgroup projection and signed Frobenius closure |
@@ -44,6 +44,7 @@ use std::collections::{BTreeMap, BTreeSet, HashSet};
 use std::time::{Duration, Instant};
 
 use num_traits::ToPrimitive;
+use rand::SeedableRng;
 
 use super::large_prime::{LargePrimeCollector, LargePrimeConfig};
 use super::stages::{
@@ -395,17 +396,33 @@ impl FactorBaseBuilder<PrimeCurve> for KnownLogBase {
     }
 
     fn describe(&self, params: &Params) -> String {
-        format!(
-            "±[i]G for 1 ≤ i ≤ {}, one column each, every logarithm known",
-            params.get("size").unwrap_or("?")
-        )
+        match params.get("scalars") {
+            Some("random") => format!(
+                "±[s_i]G for {} seeded uniform scalars s_i, one column each, every logarithm known",
+                params.get("size").unwrap_or("?")
+            ),
+            _ => format!(
+                "±[i]G for 1 ≤ i ≤ {}, one column each, every logarithm known",
+                params.get("size").unwrap_or("?")
+            ),
+        }
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
-        &[(
-            "size",
-            "multiples [i]G, 1 ≤ i ≤ size (need 2·size < r); the family optimum is about #E^(1/3)",
-        )]
+        &[
+            (
+                "size",
+                "columns B (need 2·B < r); the family optimum is about #E^(1/3)",
+            ),
+            (
+                "scalars",
+                "progression (default): s_i = i, built by B−1 additions; random: s_i uniform in [1, r−1], one charged scalar multiplication each",
+            ),
+            (
+                "seed",
+                "random only: seed of the scalar stream (default 20261019); the base is fixed per (G, size, seed)",
+            ),
+        ]
     }
 
     fn build(
@@ -424,16 +441,45 @@ impl FactorBaseBuilder<PrimeCurve> for KnownLogBase {
                 ctx.r
             ));
         }
+        let random = match params.get("scalars") {
+            None | Some("progression") => false,
+            Some("random") => true,
+            Some(other) => {
+                return Err(format!(
+                    "known-log scalars is progression or random, not {other}"
+                ))
+            }
+        };
         let start = Instant::now();
         let g = ctx.group;
         let mut points = Vec::with_capacity(2 * size as usize);
         let mut col_of = Vec::with_capacity(2 * size as usize);
         let mut coef_of = Vec::with_capacity(2 * size as usize);
+        let mut logs = Vec::with_capacity(size as usize);
         let mut multiple = ctx.generator;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(params.u64_or("seed", 20261019)?);
+        let mut used = HashSet::new();
         for i in 1..=size {
-            if i > 1 {
-                multiple = g.add(ops, multiple, ctx.generator);
-            }
+            let s = if random {
+                // Distinct classes {s, r − s}, so ±[s]G never repeats a point.
+                loop {
+                    let s = rand::Rng::gen_range(&mut rng, 1..ctx.r);
+                    if !used.contains(&s) && !used.contains(&(ctx.r - s)) {
+                        used.insert(s);
+                        break s;
+                    }
+                }
+            } else {
+                i
+            };
+            multiple = if random {
+                g.mul(ops, ctx.generator, s)
+            } else if i > 1 {
+                g.add(ops, multiple, ctx.generator)
+            } else {
+                multiple
+            };
+            logs.push(s);
             points.push(multiple);
             col_of.push((i - 1) as usize);
             coef_of.push(1);
@@ -442,7 +488,11 @@ impl FactorBaseBuilder<PrimeCurve> for KnownLogBase {
             coef_of.push(ctx.r - 1);
         }
         let mut fb = FactorBase::from_column_map(
-            format!("±[i]G, 1 ≤ i ≤ {size}"),
+            if random {
+                format!("±[s_i]G, {size} seeded uniform scalars")
+            } else {
+                format!("±[i]G, 1 ≤ i ≤ {size}")
+            },
             points,
             col_of,
             coef_of,
@@ -451,9 +501,13 @@ impl FactorBaseBuilder<PrimeCurve> for KnownLogBase {
             |p| g.key(&g.neg(*p)),
             |p| p.x,
         )?;
-        fb.known_logs = Some((1..=size).collect());
+        fb.known_logs = Some(logs);
         fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
-        fb.cost.count("known_log_additions", size.saturating_sub(1));
+        if random {
+            fb.cost.count("known_log_scalar_mults", size);
+        } else {
+            fb.cost.count("known_log_additions", size.saturating_sub(1));
+        }
         Ok(fb)
     }
 }
