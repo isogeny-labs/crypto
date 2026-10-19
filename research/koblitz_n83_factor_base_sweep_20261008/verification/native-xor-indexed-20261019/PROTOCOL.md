@@ -78,33 +78,3 @@ is established, and raw bundle including both stopped and completed profiles,
 full source/build inputs, ELFs, command cards, exact relays and validations.
 Upload to the authorized bucket and verify fresh download, archive hash and
 every payload hash. Keep old publication rejections/evidence unchanged.
-
-## Separately frozen reference budget correction (2026-10-19T1652Z)
-
-The four A/A controls completed with identical model/search signatures. Their
-workers are unchanged. The first E control reached5001 reported conflicts at
-maxconfl5000 and returned exit15 / s INDETERMINATE in about3.15s outer wall.
-Its producer returned1; the original audit failed parsing absent positive
-stdout. Preserve the stopped original card/relay and every raw file. This is
-an unresolved external solve, not SAT and not an external speed comparison.
-The second original E control was not attempted. All original remaining E
-cards stay unexecuted drafts, superseded by this budget correction.
-
-Freeze fresh E A/A controls and five E round observations with1000000
-conflicts /360 wall seconds, same solver/options/host/constraints/guard.
-A solver-specific conflict cap is not a matched computational-work budget;
-the resource and wall envelope remains matched. The frozen reference worker
-already accepts this cap. No library, encoder, A or B worker changes. Rebind
-only the native controller and clean source identity; A/B original worker
-hashes and all four completed controls remain fixed. Native audit now types
-CLI15 + s INDETERMINATE + reported conflicts at cap or cap+1 as
-UNKNOWN_EXTERNAL_CONFLICT_CAP, with null model/terminal counters. E commands
-may accept runner exit1 only with the complete declared typed audit/raw
-outputs; this never admits a speed comparison. Other failures still stop.
-
-Fresh E ids aa-e1-v3 and aa-e2-v3; r1..r5 E ids retain their planned names
-because none ran. A/B five-round order and natural K2048/K4096 remain as
-above, with fresh versioned controller specs/cards. No automatic retries.
-Maximum allocated executed-arm wall:14 A/B*360 +7 corrected E*360 +1 old
-E*360 +2 natural*600 =9120s; the old E2 allocation is not executed. Keep the
-initial profiling allocations and interrupted validation as separate records.
