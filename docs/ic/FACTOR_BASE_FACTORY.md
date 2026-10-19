@@ -86,7 +86,7 @@ separate observations throughout this implementation.
 A planning model makes the size/arity tradeoff explicit. Let B be the actual
 number of signed subgroup points and M the number of admissible m-multisets.
 Under an independent uniform-sum hypothesis, a fixed nonidentity target has
-coverage `1 - (1 - 1/(r-1))^M`, approximately `1 - exp(-M/(r-1))`.
+coverage `1 - (1 - 1/r)^M`, approximately `1 - exp(-M/r)`.
 For large B at fixed m, `M` is roughly `B^m/m!` before inverse-pair and degeneracy
 corrections. This is a hypothesis for budgeting candidate sizes, not an
 independence claim about elliptic-curve sums. Orbit correlations, repeated sums,

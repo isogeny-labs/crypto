@@ -80,9 +80,14 @@ The enclosing repository's required `cargo test --release --lib --offline` was
 started on the unchanged library sources at base commit
 `f125e2315d2fafc44b93c415bdeb540371e373b2`. Its initial build target on the mounted
 workspace progressed slowly and was interrupted, then restarted with a local
-SSD target. The final result is recorded below once available. This gate is
-separate from the passing standalone package tests.
+SSD target. The completed run exited 101: **3,790 passed, 23 failed, 110 ignored**.
+Its complete output is `validation/local/repository-lib-test.log`. The failures
+include unchanged curve-registry parsing, construction and algebraic assertions,
+a missing archived fixture, one timeout, and nine local-socket permission errors
+from the sandbox. This gate is separate from the passing standalone package tests.
 
 GitHub CLI authentication was invalid in this session; the connected GitHub app
-could read repository metadata. No PR or merge is claimed without a recorded
-successful publication result.
+could read repository metadata. The repository's AGENTS.md requires the whole
+release-library gate to pass before pushing. Therefore the implementation is
+committed locally, and PR publication and merge remain blocked by that gate.
+The unrelated library paths were not changed to obtain a passing result.
