@@ -134,6 +134,8 @@ enum Comparison {
     V3,
     V6,
     V7,
+    V8,
+    V8C,
 }
 
 #[derive(Subcommand)]
@@ -873,6 +875,8 @@ fn rule(step: &str, args: RuleArgs) -> Result<String, String> {
         Comparison::V3 => ("research/ic_tool_program/rule/v3", &rule::V3),
         Comparison::V6 => ("research/ic_tool_program/rule/v6", &rule::V6),
         Comparison::V7 => ("research/ic_tool_program/rule/v7", &rule::V7),
+        Comparison::V8 => ("research/ic_tool_program/rule/v8", &rule::V8),
+        Comparison::V8C => ("research/ic_tool_program/rule/v8c", &rule::V8C),
     };
     let here = abs(&args.dir.clone().unwrap_or_else(|| root.join(default_dir)))?;
     let comparison = rule::Comparison {

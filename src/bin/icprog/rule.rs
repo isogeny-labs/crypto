@@ -223,6 +223,37 @@ pub const V7: Constants = Constants {
     ..V6
 };
 
+/// The rule's comparison at baseline v8 (`research/ic_tool_program/rule/v8`):
+/// rule v7's protocol on v8's index calculus (R12) with the matched rho:
+/// the signed-Frobenius walk's canonicalisation batched sixteen lanes at a
+/// time by GFNI and funnel shifts, as the index calculus's scan key is
+/// (`FrobeniusCanon::frobenius_reps`).  The walks are the same walks; only
+/// the time a step takes changes.
+pub const V8: Constants = Constants {
+    what_this_is:
+        "The rule's comparison at baseline v8, rho matched: §23's figures, from the checked rows.",
+    against: Against::Earlier {
+        analysis: "research/ic_single_target_20260930/analysis.json",
+        key: "s23_then_v8",
+    },
+    process: "one process: the index calculus, then rho with its canonicalisation batched \
+              (the default), both rebuilt each repetition",
+    ..V6
+};
+
+/// Rule v8's same-binary control: the rho arm of rule v7, whose
+/// canonicalisation reads per-point tables (`KIC_RHO_CANON=scalar`).
+pub const V8C: Constants = Constants {
+    what_this_is: "The rule's comparison at baseline v8, rho as at rule v7: §23's figures, from the checked rows.",
+    against: Against::Earlier {
+        analysis: "research/ic_single_target_20260930/analysis.json",
+        key: "s23_then_v8c",
+    },
+    process: "one process: the index calculus, then rho with its canonicalisation by per-point \
+              tables (KIC_RHO_CANON=scalar, as rule v7), both rebuilt each repetition",
+    ..V6
+};
+
 /// Where a comparison lives and what it writes.
 pub struct Comparison {
     /// The repository: the ledger, and what record paths are relative to.
