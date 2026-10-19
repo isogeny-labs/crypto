@@ -1216,3 +1216,23 @@ for constructed examples on both exact curves: BSGS recovers a scalar above
 `2^100`, rho recovers the special known answer `Q = -G`, and IC learns three
 base logs through a full-rank relation system and performs target descent.
 These are correctness fixtures, not natural-target yield or speed measurements.
+
+The same three methods support portable CPUs, NVIDIA CUDA and Apple Metal.
+CPU execution is the default. Build the matching native worker and select it
+explicitly:
+
+```sh
+make -C gpu/certicom cuda ARCH=sm_80
+target/release/icx solve ECCp-130 --method rho --challenge --max-iterations 16 --max-restarts 0 --backend cuda --gpu-worker gpu/certicom/certicom_cuda --json
+# On a Mac with Metal:
+make -C gpu/certicom metal
+target/release/icx solve ECC2-130 --method bsgs --secret 12345 --interval-width 65536 --backend metal --gpu-worker gpu/certicom/certicom_metal --json
+```
+
+Explicit GPU selection fails if the requested device is unavailable.
+`--backend auto` may choose CPU and reports its choice; `gpu-emulator` is
+explicitly labelled host execution. GPU rho runs parallel full-width walks;
+BSGS batches point generation; IC offloads query generation and decomposition
+while its modular linear algebra and independent verification stay on CPU.
+See [GPU setup and hardware qualification](gpu/certicom/README.md) for build
+requirements, device ordinals, batch/walk budgets, deadlines and tests.
