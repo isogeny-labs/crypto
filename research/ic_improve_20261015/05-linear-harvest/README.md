@@ -7,7 +7,7 @@ This is round 2, item 05 ([`../RULES.md`](../RULES.md)). The protocol is [`PROTO
 
 ## Verdict
 
-**Historical result:** the frozen candidate G advanced under its original comparator and became the engine default. **R10 re-rate:** production regresses versus harvest off at (17,9) m2 (CPU 0.872 [0.771, 0.988], word operations 0.765). See [`pinned ledger`](../../../ic_tool_program/ledger/r10-20261019/README.md).
+**Historical result:** the frozen candidate G advanced under its original comparator and became the engine default. **R10 re-rate:** production regresses versus harvest off at (17,9) m2 (CPU 0.872 [0.771, 0.988], word operations 0.765). See [`pinned ledger`](../../ic_tool_program/ledger/r10-20261019/README.md).
 
 - **What G is.** At the root only, in solves with fewer than 0.9607 non-zero generators per occurring variable (gpv), it appends the root basis's multi-variable linear rows to the system. The existing linear elimination then substitutes them away.
 - **Held-out test**, 96 targets on 9 pipeline cells:
