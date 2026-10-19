@@ -909,6 +909,72 @@ fn pdp3_koblitz_f4_and_f6_verify_on_one_query_stream() {
 }
 
 #[test]
+fn pdp3_matrix_runtime_and_generalized_recover_and_replay() {
+    let dir = scratch("matrix-runtime-generalized");
+    let mut arms = Vec::new();
+    for engine in ["matrix-f4", "matrix-f5"] {
+        for policy in ["baseline", "prepared", "quadratic-tail"] {
+            arms.push(serde_json::json!({"name":format!("{engine}-{policy}"),"role":"candidate",
+                "method":{"id":"ic.pipeline","params":{
+                    "factor_base":"binary-standard-subspace:dimension=4",
+                    "oracle":format!("pdp3-binary:m=2,engine={engine},degree=3,node_budget=20000,matrix_runtime={policy}")}}}));
+        }
+    }
+    arms.push(serde_json::json!({"name":"generalized","role":"candidate","method":{"id":"ic.pipeline","params":{
+        "factor_base":"binary-standard-subspace:dimension=4",
+        "oracle":"pdp3-binary:m=2,engine=generalized,work_budget=256"}}}));
+    arms.push(serde_json::json!({"name":"f6-native","role":"reference","method":{"id":"ic.pipeline","params":{
+        "factor_base":"binary-standard-subspace:dimension=4",
+        "oracle":"pdp3-binary:m=2,engine=f6-ic,degree=3,node_budget=20000,kernel_runtime=native-v1"}}}));
+    let spec = serde_json::json!({"schema":"ecbench.spec/v1","label":"explicit matrix runtime and generalized replay",
+        "workloads":{"curves":[{"kind":"koblitz","a":1,"n":11},{"kind":"binary_random","n":11,"seed":59297,"max_cofactor":8}],
+            "targets_per_curve":2,"target_seed":230,"target_kind":"public"},
+        "arms":arms,"measurement":{"rounds":1,"warmup":0,"seed":19,"isolation_required":"L0","timeout_seconds":120}});
+    std::fs::write(
+        dir.join("spec.json"),
+        serde_json::to_vec_pretty(&spec).unwrap(),
+    )
+    .unwrap();
+    let out = dir.join("s");
+    let (ok, err) = run_spec(&dir, &out, &[]);
+    assert!(ok, "{err}");
+    let records: Vec<Value> = std::fs::read_to_string(out.join("records.jsonl"))
+        .unwrap()
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect();
+    assert_eq!(records.len(), 32);
+    let mut tails = 0;
+    for record in &records {
+        assert_eq!(record["outcome"]["status"], "verified", "{record}");
+        for key in [
+            "quadratic_tail_assignments_uncharged",
+            "generalized_assignments_uncharged",
+        ] {
+            let count = record["solver"]["extra"][key].as_u64().unwrap_or(0);
+            if count > 0 {
+                tails += 1;
+                assert_eq!(record["cost"]["lower_bound"], true, "{record}");
+                assert!(record["cost"]["unpriced"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .any(|v| v == key));
+            }
+        }
+    }
+    assert!(tails > 0);
+    let (ok, _, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "{err}");
+}
+
+#[test]
 fn pdp3_binary_runs_every_engine_on_a_generic_binary_curve() {
     // The PDP3 plug-in on a random binary curve (b ∉ F_2, no Frobenius
     // endomorphism) through its Frobenius-free view, with all four engines:

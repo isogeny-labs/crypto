@@ -54,6 +54,32 @@
 
 use rayon::prelude::*;
 
+/// Explicit per-caller policy for harnesses whose method identity binds the
+/// kernel configuration. It never changes environment variables or defaults.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct KernelPolicy {
+    pub single_write: bool,
+    pub vector_tables: bool,
+    pub serial_one_worker: bool,
+}
+
+thread_local! {
+    static KERNEL_POLICY: std::cell::Cell<Option<KernelPolicy>> = const { std::cell::Cell::new(None) };
+}
+
+/// Scope a policy to synchronous work on this thread; nested scopes and panic
+/// unwinding restore the previous value. Rayon workers retain their own policy.
+pub fn with_kernel_policy<T>(policy: KernelPolicy, work: impl FnOnce() -> T) -> T {
+    struct Restore(Option<KernelPolicy>);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            KERNEL_POLICY.with(|slot| slot.set(self.0));
+        }
+    }
+    let _restore = Restore(KERNEL_POLICY.with(|slot| slot.replace(Some(policy))));
+    work()
+}
+
 /// Whether table buffers are reused across pivot blocks (see the module
 /// documentation); off unless `KIC_GF2_REUSE_TABLE=1`.
 fn reuse_table_enabled() -> bool {
@@ -65,11 +91,17 @@ fn reuse_table_enabled() -> bool {
 /// establish less initialization work, but cannot establish native speed;
 /// retain the historical default until isolated runtime comparisons exist.
 fn write_table_once_enabled() -> bool {
+    if let Some(policy) = KERNEL_POLICY.with(std::cell::Cell::get) {
+        return policy.single_write;
+    }
     static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *ENABLED.get_or_init(|| std::env::var("KIC_GF2_WRITE_TABLE_ONCE").as_deref() == Ok("1"))
 }
 
 fn vector_tables_enabled() -> bool {
+    if let Some(policy) = KERNEL_POLICY.with(std::cell::Cell::get) {
+        return policy.vector_tables;
+    }
     static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *ENABLED.get_or_init(|| std::env::var("KIC_GF2_VECTOR_TABLES").as_deref() == Ok("1"))
 }
@@ -78,6 +110,9 @@ fn vector_tables_enabled() -> bool {
 /// configured one-worker process. Avoid querying/initializing the global
 /// registry in multiworker configurations; nested pools are checked below.
 fn serial_clear_enabled() -> bool {
+    if let Some(policy) = KERNEL_POLICY.with(std::cell::Cell::get) {
+        return policy.serial_one_worker;
+    }
     static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *ENABLED.get_or_init(|| {
         let one_worker = std::env::var("RAYON_NUM_THREADS").as_deref() == Ok("1");
@@ -1138,6 +1173,37 @@ pub fn simd_available() -> bool {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn explicit_kernel_policy_is_nested_thread_local_and_unwind_safe() {
+        use super::*;
+        let off = KernelPolicy {
+            single_write: false,
+            vector_tables: false,
+            serial_one_worker: false,
+        };
+        let on = KernelPolicy {
+            single_write: true,
+            vector_tables: true,
+            serial_one_worker: true,
+        };
+        assert!(KERNEL_POLICY.with(std::cell::Cell::get).is_none());
+        with_kernel_policy(off, || {
+            assert!(
+                !write_table_once_enabled() && !vector_tables_enabled() && !serial_clear_enabled()
+            );
+            with_kernel_policy(on, || {
+                assert!(
+                    write_table_once_enabled() && vector_tables_enabled() && serial_clear_enabled()
+                );
+                std::thread::spawn(|| assert!(KERNEL_POLICY.with(std::cell::Cell::get).is_none()))
+                    .join()
+                    .unwrap();
+            });
+            let _ = std::panic::catch_unwind(|| with_kernel_policy(on, || panic!("scope test")));
+            assert_eq!(KERNEL_POLICY.with(std::cell::Cell::get), Some(off));
+        });
+        assert!(KERNEL_POLICY.with(std::cell::Cell::get).is_none());
+    }
     use super::*;
     use rand::{rngs::StdRng, Rng, SeedableRng};
 

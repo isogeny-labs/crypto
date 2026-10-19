@@ -123,8 +123,12 @@ use crypto_lib::cryptanalysis::ic_framework::stages::{
 };
 use crypto_lib::cryptanalysis::koblitz_fast::FastPoint;
 use crypto_lib::cryptanalysis::koblitz_groebner::{
-    f4_word_ops_thread, FieldStructure, SolveStats, SolverEngine,
+    build_decomposition_system, f4_word_ops_thread, with_matrix_runtime, FieldStructure,
+    MatrixRuntime, SolveStats, SolverEngine,
 };
+#[path = "../../../tools/generalized-rootfinder/src/solver.rs"]
+#[allow(dead_code)]
+mod generalized;
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_standard_subspace_factor_base, groebner_decompose, groebner_decompose_f6_ic, point_key,
     FrobeniusFactorBase, KoblitzCurve, PairSumTable,
@@ -319,6 +323,8 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for KoblitzStandardSubspaceBase<'_> 
 /// reduction kernel on a shared tree.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Pdp3Engine {
+    /// Complete typed quadratic Boolean roots, followed by exact sign lifting.
+    Generalized,
     /// `groebner_decompose` with inherited F4: the control.
     InheritedF4,
     /// `groebner_decompose_f6_ic`: inherited F4 with the geometric gate.
@@ -347,6 +353,7 @@ pub enum Pdp3Engine {
 impl Pdp3Engine {
     pub fn parse(s: &str) -> Result<Self, String> {
         match s {
+            "generalized" => Ok(Self::Generalized),
             "inherited-f4" => Ok(Self::InheritedF4),
             "f6-ic" => Ok(Self::F6Ic),
             "matrix-f4" => Ok(Self::MatrixF4),
@@ -364,6 +371,7 @@ impl Pdp3Engine {
 
     pub fn name(self) -> &'static str {
         match self {
+            Self::Generalized => "generalized",
             Self::InheritedF4 => "inherited-f4",
             Self::F6Ic => "f6-ic",
             Self::MatrixF4 => "matrix-f4",
@@ -377,7 +385,7 @@ impl Pdp3Engine {
 
     /// Whether the engine solves an algebraic system at all.
     pub fn is_groebner(self) -> bool {
-        !self.is_rootfind()
+        !self.is_rootfind() && self != Self::Generalized
     }
 
     /// Whether the engine builds and probes a pair-sum table (full or
@@ -409,7 +417,8 @@ impl Pdp3Engine {
             Self::InheritedF4 | Self::F6Ic => Some(SolverEngine::InheritedF4 { max_degree }),
             Self::MatrixF4 => Some(SolverEngine::MatrixF4 { max_degree }),
             Self::MatrixF5 => Some(SolverEngine::MatrixF5 { max_degree }),
-            Self::Rootfind
+            Self::Generalized
+            | Self::Rootfind
             | Self::RootfindWindow
             | Self::RootfindNegfold
             | Self::RootfindWindowNegfold => None,
@@ -459,6 +468,13 @@ fn stats_extra(s: &SolveStats) -> BTreeMap<String, u64> {
     put("exhausted", u64::from(s.exhausted));
     put("unsupported", u64::from(s.unsupported));
     put("max_degree_built_max", u64::from(s.max_degree_built));
+    if s.tail_enumerations > 0 {
+        put("tail_enumerations", s.tail_enumerations as u64);
+        put(
+            "quadratic_tail_assignments_uncharged",
+            s.tail_assignments_tested as u64,
+        );
+    }
     put("geometric_refutations", s.geometric_refutations as u64);
     put("geometric_witnesses", s.geometric_witnesses as u64);
     put("geometric_support_checks", s.geometric_support_checks);
@@ -483,6 +499,9 @@ pub struct Pdp3KoblitzOracle<'i> {
     summands: u32,
     view: Result<View<'i>, String>,
     engine: Pdp3Engine,
+    matrix_runtime: Option<MatrixRuntime>,
+    native_kernel: bool,
+    generalized_work_budget: u64,
     solver: SolverEngine,
     node_budget: usize,
     frob: Option<FrobeniusFactorBase>,
@@ -517,6 +536,9 @@ impl<'i> Pdp3KoblitzOracle<'i> {
             summands,
             view: View::of(instance),
             engine: Pdp3Engine::InheritedF4,
+            matrix_runtime: None,
+            native_kernel: false,
+            generalized_work_budget: 0,
             solver: SolverEngine::InheritedF4 { max_degree: 3 },
             node_budget: 0,
             frob: None,
@@ -659,6 +681,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
 
     fn describe(&self, params: &Params) -> String {
         match params.get("engine") {
+            Some("generalized") => format!("complete typed quadratic Boolean rootfinding, work_budget={}, followed by exact sign lifting; m=2", params.get("work_budget").unwrap_or("?")),
             Some("rootfind") => format!(
                 "root finding over the standard subspace: the pair-sum table of \
                  DecompositionStrategy::PairTable, probed once per target (m = 2) or once \
@@ -696,6 +719,9 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
 
     fn parameters(&self) -> &[(&str, &str)] {
         &[
+            ("matrix_runtime", "matrix-f4/f5 only: baseline, prepared or quadratic-tail; explicit GF2/layout/search implementation"),
+            ("kernel_runtime", "Groebner engines only: native-v1 enables single-write/vector tables and one-worker serial clears"),
+            ("work_budget", "required for generalized: maximum Boolean assignments; m=2 and at most32 Boolean variables"),
             (
                 "m",
                 "summands; #1333 ran 3 (Semaev S4); rootfind and rootfind-negfold take 2 or 3; \
@@ -759,6 +785,34 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
              rootfind, rootfind-window, rootfind-negfold or rootfind-window-negfold",
         )?;
         self.engine = Pdp3Engine::parse(engine)?;
+        self.native_kernel = match params.get("kernel_runtime") {
+            None => false,
+            Some("native-v1") if self.engine.is_groebner() => true,
+            _ => return Err("kernel_runtime accepts native-v1 on Groebner engines only".into()),
+        };
+        self.generalized_work_budget = match params.get("work_budget") {
+            Some(value) if self.engine == Pdp3Engine::Generalized => value
+                .parse()
+                .map_err(|_| "invalid generalized work_budget")?,
+            None if self.engine != Pdp3Engine::Generalized => 0,
+            _ => {
+                return Err(
+                    "work_budget is required for generalized and refused for other engines".into(),
+                )
+            }
+        };
+        if self.engine == Pdp3Engine::Generalized && self.summands != 2 {
+            return Err("generalized currently takes m=2 quadratic systems only".into());
+        }
+        self.matrix_runtime = params
+            .get("matrix_runtime")
+            .map(MatrixRuntime::parse)
+            .transpose()?;
+        if self.matrix_runtime.is_some()
+            && !matches!(self.engine, Pdp3Engine::MatrixF4 | Pdp3Engine::MatrixF5)
+        {
+            return Err("matrix_runtime is only supported by matrix-f4 and matrix-f5".into());
+        }
         let mut max_degree = 0u32;
         if self.engine.is_groebner() {
             let degree = params
@@ -936,6 +990,9 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             .map(|(i, p)| (point_key(p), i))
             .collect();
         self.st = Some(FieldStructure::new(kc.n, &kc.curve.irreducible));
+        if self.engine == Pdp3Engine::Generalized && self.summands * frob.ell > 32 {
+            return Err("generalized supports at most32 Boolean variables".into());
+        }
         // Every system on one base has one shape: m·d unknowns and n
         // equations.  The degree columns stay empty; the solver reports
         // the degree it built in `extra`.
@@ -946,12 +1003,19 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
             semi_regular_degree: None,
         });
         self.totals = SolverTotals {
-            solver: format!(
-                "pdp3-koblitz {} (cap {}, budget {})",
-                self.engine.name(),
-                max_degree,
-                self.node_budget
-            ),
+            solver: if self.engine == Pdp3Engine::Generalized {
+                format!(
+                    "pdp3-koblitz generalized typed (work budget {})",
+                    self.generalized_work_budget
+                )
+            } else {
+                format!(
+                    "pdp3-koblitz {} (cap {}, budget {})",
+                    self.engine.name(),
+                    max_degree,
+                    self.node_budget
+                )
+            },
             ..Default::default()
         };
         self.frob = Some(frob);
@@ -975,22 +1039,89 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for Pdp3KoblitzOracle<'_> {
         let view = self.view.as_ref().ok()?;
         let kc = view.curve();
         let target = view.instance().fast.lower(point);
+        if self.engine == Pdp3Engine::Generalized {
+            let crypto_lib::binary_ecc::BinaryPoint::Affine { x, .. } = &target else {
+                return None;
+            };
+            let started = Instant::now();
+            let system = build_decomposition_system(&frob.subspace_basis, x, &kc.curve.b, 2, st)?;
+            let limits = generalized::Limits {
+                max_work: self.generalized_work_budget,
+                max_solutions: usize::MAX,
+                ..Default::default()
+            };
+            let result =
+                generalized::solve_boolean_polynomials(&system.equations, system.n_vars, &limits);
+            let (work, roots, failed) = match result {
+                Ok(result) => (result.work, result.roots, false),
+                Err(_) => (0, Vec::new(), true),
+            };
+            let mut found = None;
+            for bits in roots {
+                let xs: Vec<_> = (0..2)
+                    .map(|i| {
+                        let x = system.summand_x(&frob.subspace_basis, bits, i, kc.n);
+                        x.raw_bits().first().copied().unwrap_or(0)
+                    })
+                    .collect();
+                if let Some(indices) = lift_abscissae(ctx.group, fb, ops, &xs, point) {
+                    found = Some(indices);
+                    break;
+                }
+            }
+            let cost = SolverCost {
+                ops: work,
+                op_unit: "Boolean Gray assignments (uncharged)".into(),
+                wall_ns: started.elapsed().as_nanos() as u64,
+                peak_bytes: 0,
+                degree_reached: Some(2),
+                solving_degree: None,
+                timed_out: failed,
+                extra: BTreeMap::from([
+                    ("generalized_assignments_uncharged".into(), work),
+                    ("search_complete".into(), u64::from(!failed)),
+                ]),
+            };
+            self.totals.absorb(shape, Some(&cost), failed);
+            return found;
+        }
         let decompose = match self.engine {
             Pdp3Engine::F6Ic => groebner_decompose_f6_ic,
             _ => groebner_decompose,
         };
         let before = f4_word_ops_thread();
         let started = Instant::now();
-        let (indices, stats) = decompose(
-            kc,
-            frob,
-            &self.index_of,
-            st,
-            &target,
-            self.summands as usize,
-            self.solver,
-            self.node_budget,
-        );
+        let run = || {
+            decompose(
+                kc,
+                frob,
+                &self.index_of,
+                st,
+                &target,
+                self.summands as usize,
+                self.solver,
+                self.node_budget,
+            )
+        };
+        let run = || {
+            if let Some(policy) = self.matrix_runtime {
+                with_matrix_runtime(policy, run)
+            } else {
+                run()
+            }
+        };
+        let (indices, stats) = if self.native_kernel {
+            crypto_lib::cryptanalysis::gf2_elim::with_kernel_policy(
+                crypto_lib::cryptanalysis::gf2_elim::KernelPolicy {
+                    single_write: true,
+                    vector_tables: true,
+                    serial_one_worker: std::env::var("RAYON_NUM_THREADS").as_deref() == Ok("1"),
+                },
+                run,
+            )
+        } else {
+            run()
+        };
         let word_xors = f4_word_ops_thread().wrapping_sub(before);
         let wall_ns = started.elapsed().as_nanos() as u64;
         // The gate's point additions are group work: charge them.
