@@ -41,9 +41,11 @@ mod hash {
 }
 mod census;
 mod cofactor07;
+mod collision10;
 mod controls09;
 mod delpezzo;
 mod delpezzo_conic;
+mod divisors10;
 mod forward07;
 mod gluing;
 #[path = "../../../../src/cryptanalysis/identity_certificate.rs"]
@@ -75,7 +77,10 @@ mod round06_record;
 mod round07_record;
 mod round08_record;
 mod round09_record;
+mod round10_record;
 mod round_record;
+mod saturation10;
+mod ss10;
 
 fn pow(mut a: u64, mut k: u64, p: u64) -> u64 {
     let mut b = 1;
@@ -351,6 +356,47 @@ fn run(out: &std::path::Path) {
     );
 }
 fn main() {
+    let args10: Vec<String> = std::env::args().collect();
+    if args10.get(1).map(String::as_str) == Some("--record-round10") {
+        round10_record::record(std::path::Path::new(
+            args10.get(2).expect("fresh round records"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round10-diagonal") {
+        ss10::run(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round10-expand") {
+        kummer08::descent09::polynomial10::expand(std::path::Path::new(
+            args10.get(2).expect("fresh outputs"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round10-collision") {
+        collision10::run(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round10-projective-control") {
+        saturation10::run(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round10-divisors") {
+        divisors10::run(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round10-polynomials") {
+        kummer08::descent09::polynomial10::run(std::path::Path::new(
+            args10.get(2).expect("fresh outputs"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--verify-round10-polynomials") {
+        kummer08::descent09::polynomial10::verify(std::path::Path::new(
+            args10.get(2).expect("fresh outputs"),
+        ));
+        return;
+    }
     let args09: Vec<String> = std::env::args().collect();
     if args09.get(1).map(String::as_str) == Some("--record-round09") {
         round09_record::record(std::path::Path::new(

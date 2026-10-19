@@ -1,5 +1,7 @@
 //! Child of kummer08: explicit dual-base Frobenius circuits and exact checks.
 use super::*;
+#[path = "polynomial10.rs"]
+pub(crate) mod polynomial10;
 fn negate_fn(c: &Curve, p: &Fn) -> Fn {
     c.reduce(add(&p.a, &mul(c.f, &p.b, &c.h())), p.b.clone(), p.d.clone())
 }

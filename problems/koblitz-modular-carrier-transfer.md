@@ -401,3 +401,53 @@ complete outside support for a coupled function with checked pole degree,
 then evaluate and join every new column before reporting its rank. General
 Jacobian reduction and individual descent remain open. The user assesses
 IC efficiency; this round contains no timing or solver measurement.
+
+## Round10: F2 polynomial models and the remaining boundary/intersection gaps
+
+[Round10](../research/koblitz_modular_ic_20261018/rounds/10/REPORT.md)
+supplies four explicit quadratic F2 polynomial systems for specified
+descended dense opens of the determinant19 quotients. Two have424080
+scalar equations each and two415800. The lossless coefficient-block
+format contains every operation,coefficient reduction and residual;
+72 literal expanded equations and4608 controls supplement it. Inverse
+witnesses give saturation by the product of denominator norms. The
+scheme-theoretic equalizer/base-change argument is written separately
+from the exact split-fixture checks. Coefficient variables are indeterminates,
+with no Boolean equations. Twenty-three new named Lean proofs pass.
+
+**Quotient exit criterion still open:** compute a global projective
+presentation whose saturated boundary recovers all six retained charts
+and whose polarization pullback is verified. The new affine graph model
+discharges the missing effective F2 open equations and localized closed
+embedding,not that global obligation. An eliminated ideal in only the
+original4320 coefficient variables is also uncomputed. A two-gate prototype
+has an explicit false point under naive homogenization;its repaired
+three-generator ideal has a full Groebner saturation certificate. The full
+quotient's homogenizing-variable saturation is not inferred from it.
+The next discriminating geometry step is a controlled elimination and
+boundary chart on one graph,with exact inverse substitutions and h-saturation.
+
+The exact divisor of x0*xinf is complete on22 closed cusp points,with
+zero/pole degrees2640 each and every projected image zero. All eight pole
+divisors and all cuspidal zeros are known. The other seven residual
+noncuspidal zero degrees are2100,2520,3420,3780,2640,3450,3900,including
+possible supersingular points. None is promoted as a complete new row.
+
+The equal-map component has degree1280 and cuspidal degree420. Its
+collision resultant is exactlyj^88*(j+1)^8. The ordinaryj=1 case has
+zero matching cyclic49 lines among56,with the finite exclusion in Lean.
+The actual supersingular automorphisms are bound to Hurwitz units by
+point identities and a global degree bound;the torsion-module bridge is
+written. Enumeration of3080 moduli classes finds400 matching labels in
+40 degree10 Frobenius orbits. Their current multiplicity lower sum is400
+against860 required. **The degree-exhaustion attempt fails with a460 gap.**
+The labels are not explicit49/11 torsion coordinates. The next discriminating
+calculation is the local deformation/intersection multiplicity at those40
+closed labels,with an exact local model or a verified applicable CM
+length theorem. It must account for the460 gap before claiming that
+component complete. The antidiagonal component remains separate.
+
+These are implementation and proof gaps,not nonexistence results.
+Relation ranks remain12/1308 and nonzero11 on1165/1160 columns. General
+Jacobian reduction,individual descent and Jacobian identification remain
+open. No solver or timing run is supplied;the user assesses IC efficiency.

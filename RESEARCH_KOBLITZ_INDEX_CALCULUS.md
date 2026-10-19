@@ -12,16 +12,18 @@ pre-registered hypotheses)
 (ePrint 2020/1315).
 
 **Modular and low-genus carrier follow-up (2026-10-19):**
-[Round09](research/koblitz_modular_ic_20261018/rounds/09/REPORT.md)
-gives explicit Frobenius coordinate circuits and 4,320 invariant rational
-generating circuits for each of four determinant-19 quotients. F2 polynomial
-relations, saturation and a closed embedding remain open. All 50 signed
-diagonal-twist/reflection controls fail to retain the known trace-zero
-component in a stable quotient; other Jacobian factors remain untested.
-Eight coupled functions are nonzero on all 720 tested norm columns, without
-complete new divisors or rank promotion. Evaluated rank remains 12/1308,
-and nonzero-image rank 11 on 1165/1160 columns. Seventeen new named Lean
-results pass; global geometric bridges remain written. See the
+[Round10](research/koblitz_modular_ic_20261018/rounds/10/REPORT.md)
+gives explicit quadratic F2 polynomial presentations and closed affine
+embeddings of descended dense opens of four determinant-19 quotients.
+Inverse witnesses give denominator-norm saturation. Saturation and gluing
+of the whole projective boundary remain open. The coupled divisor x0*xinf
+is complete on 22 closed cusps; all eight pole divisors and cuspidal zeros
+are computed. Seven noncuspidal supports remain open. The diagonal search
+locates 400 supersingular moduli labels but leaves 460 total multiplicity
+unresolved. Evaluated rank remains 12/1308, and nonzero-image rank 11 on
+1165/1160 columns. Twenty-three new named Lean results pass; global
+geometric bridges remain written. Earlier bounded low-genus tests remain
+frozen, with other Jacobian factors and families open. See the
 [construction problem](problems/koblitz-modular-carrier-transfer.md) for
 the exact remaining obligations. No IC cost is measured in this follow-up.
 
