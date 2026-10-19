@@ -77,3 +77,9 @@ Host metadata observed after the runs: Intel Xeon 6975P-C, x86_64,
 [kernel](host-kernel.txt). This supplemental observation and final integration
 logs are outside the already frozen raw archive. They do not establish
 exclusive-core timing isolation.
+
+Final merged-code native validation also passes: 4,397 library tests,
+118 ignored, 19 exporter tests, 1 selector-control test, explicit exit 0.
+The [validation addendum](VALIDATION.md) preserves the parallel timeout,
+localhost sandbox denials, interrupted attempt and successful serial rerun.
+This post-merge validation is separate from the frozen worker observations.

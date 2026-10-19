@@ -18,5 +18,5 @@
   "contents": "All seven container attempts, native binaries and test executable, three frozen source archives, exact public bases and witness inputs, native mechanical cards/relays/assessments, raw logs and validation logs; post-merge integration logs excluded and recorded separately",
   "review_reason": "Automatic approval review considered the new source/binary/input/raw-record payload outside approval for the prior exact ZIP; explicit approval required before this new upload",
   "earlier_approved_zip_publication": "PASS; independent object unchanged",
-  "publication_command": "CRYPTO_STORE_REMOTE=s3://setec-astronomy-artifacts/store CRYPTO_STORE_INDEX=<study>/verification/native-phase-20261019-v3/store/index.json ecbench store push <archive_path> --name evidence/n83/native-phase-20261019/runs.tar.xz --description <description> --provenance <collect-evidence.sh, three frozen revisions, deterministic tar/xz> --json"
+  "publication_command": "AWS_DEFAULT_REGION=us-east-2 CRYPTO_STORE_REMOTE=s3://setec-astronomy-artifacts/store CRYPTO_STORE_INDEX=<study>/verification/native-phase-20261019-v3/store/index.json ecbench store push <archive_path> --name evidence/n83/native-phase-20261019/runs.tar.xz --description <description> --provenance <collect-evidence.sh, three frozen revisions, deterministic tar/xz> --json"
 }

@@ -101,7 +101,7 @@ A separate upstream c7i.xlarge diagnostic at frozen source
 at 1,000 conflicts with zero models, relations and rank. Its reported
 solver interval is 137.457 seconds, with installed model complete at 780.945 ms
 from decomposition entry. See its [own result and retained failed launches](../research/koblitz_n83_factor_base_sweep_20261008/verification/k4096-native-phases-20261018/RESULT.md).
-This is a different source/host with historical Python supervision/audits,
+This is a different source/host with separate Python audits/tests,
 not rerun by the new native path. It cannot substitute for either matched
 arm here or establish a cross-host throughput ratio. Its original evidence
 and amended protocols remain unchanged.

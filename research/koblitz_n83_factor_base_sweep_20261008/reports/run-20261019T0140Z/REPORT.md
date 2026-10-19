@@ -108,3 +108,13 @@ remains uploaded and verified. Final integration tests are documented in the
 Supplemental [host metadata](../../verification/native-phase-20261019-v3/host-cpu.json)
 observed after the runs identifies Intel Xeon 6975P-C, x86_64, 32 logical CPUs;
 this does not establish exclusive-core isolation.
+
+The merged upstream c7i.xlarge receipt has its [own separately sourced visual
+report and inspected PDF](../run-20261019T0208Z/REPORT.md). Its worker/source,
+Bash supervisor and Python audit/test provenance differ. Those reported
+values are not combined with either matched native arm here.
+
+Final [merged-code validation](../../verification/native-phase-20261019-v3/integration-validation.json)
+passes with explicit exit 0: 4397 library tests,118 ignored, 19 exporter tests and
+1 selector-control test. The initial parallel timeout and localhost sandbox
+denials remain in the validation addendum. No time cap or assertion changed.
