@@ -20,7 +20,7 @@ cp "$evidence/fixtures/probe-corpus.json" \
    "$evidence/fixtures/probe-validation.json" "$fixture/"
 object="$panel/objects/a84572e6ca52efa7867082261bf0543723d52c0d136061a45c970970716aa779.jsonl.gz"
 aws s3api get-object --bucket ephemeral-runs-104186811093-us-east-1 \
-  --key n83-frozen-inputs/ccc1196d75de406b1daba634b8011f08308c37bd1e674758f9efeabb0ff0bcad.jsonl.gz \
+  --key jobs/20261019-015400-n83-k4096-phases-5438e8/input/ccc1196d75de406b1daba634b8011f08308c37bd1e674758f9efeabb0ff0bcad.jsonl.gz \
   --region us-east-1 "$object" > "$out/s3-get.json"
 
 python3 - "$panel" "$fixture" "$source_commit" "$snapshot" <<'PY'
