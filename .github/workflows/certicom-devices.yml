@@ -30,7 +30,7 @@ concurrency:
 jobs:
   cpu-cross-check:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -65,7 +65,7 @@ jobs:
           done
   metal-build:
     runs-on: macos-14
-    timeout-minutes: 45
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - name: Compile native Metal shader and worker
