@@ -137,6 +137,26 @@ pub fn run(args: &[String]) {
         if ic_vals.is_empty() || rho_vals.is_empty() {
             continue;
         }
+        let ic_wall = {
+            let mut tot = 0.0;
+            let mut n = 0.0;
+            for sd in seeds {
+                let mut w = 0.0;
+                let mut any = false;
+                for r in recs.iter().filter(|r| r.get("rec").map(|s| s.as_str()) == Some("ic") && r["arm"] == *arm && r["q"] == q.to_string() && r["seed"] == sd.to_string()) {
+                    any = true;
+                    for p in PHASES.iter() {
+                        w += f(r, &format!("{p}.wall"));
+                    }
+                }
+                if any { tot += w; n += 1.0; }
+            }
+            tot / n
+        };
+        let rho_wall = {
+            let v: Vec<f64> = recs.iter().filter(|r| r.get("rec").map(|s| s.as_str()) == Some("rho") && r["q"] == q.to_string() && seeds.iter().any(|s| r["seed"] == s.to_string())).map(|r| f(r, "wall")).collect();
+            mean(&v)
+        };
         let ell_mean = mean(&rr.iter().map(|r| f(r, "ell").sqrt()).collect::<Vec<_>>());
         let ic_m: [f64; 3] = [0, 1, 2].map(|b| mean(&ic_vals.iter().map(|v| v[b]).collect::<Vec<_>>()));
         let rho_m: [f64; 3] = [0, 1, 2].map(|b| mean(&rho_vals.iter().map(|v| v[b]).collect::<Vec<_>>()));
@@ -166,13 +186,13 @@ pub fn run(args: &[String]) {
             ic_m[0] / rho_m[0], ci[0].0, ci[0].1, ic_m[1] / rho_m[1], ci[1].0, ci[1].1, ic_m[2] / rho_m[2], ci[2].0, ci[2].1, resolved
         );
         js.push(format!(
-            "{{\"arm\":\"{}\",\"q\":{},\"units\":{},\"units_ok\":{},\"rho_runs\":{},\"rho_ok\":{},\"r_inv\":{:.4},\"r_lmul\":{:.4},\"gae_meq\":{:.3},\"ic_meq\":[{:.6e},{:.6e},{:.6e}],\"rho_meq\":[{:.6e},{:.6e},{:.6e}],\"ratio\":[{:.5},{:.5},{:.5}],\"ratio_lo\":[{:.5},{:.5},{:.5}],\"ratio_hi\":[{:.5},{:.5},{:.5}],\"resolved\":\"{}\",\"phase_meq\":[{}],\"s_ic\":{:.4},\"s_rho\":{:.4},\"rho_steps_mean\":{:.1},\"attempts_mean\":{:.2}}}",
+            "{{\"arm\":\"{}\",\"q\":{},\"units\":{},\"units_ok\":{},\"rho_runs\":{},\"rho_ok\":{},\"r_inv\":{:.4},\"r_lmul\":{:.4},\"gae_meq\":{:.3},\"ic_meq\":[{:.6e},{:.6e},{:.6e}],\"rho_meq\":[{:.6e},{:.6e},{:.6e}],\"ratio\":[{:.5},{:.5},{:.5}],\"ratio_lo\":[{:.5},{:.5},{:.5}],\"ratio_hi\":[{:.5},{:.5},{:.5}],\"resolved\":\"{}\",\"phase_meq\":[{}],\"ic_wall_s\":{:.3},\"rho_wall_s\":{:.3},\"ic_meq_descent_free\":{:.6e},\"ic_meq_descent_div20\":{:.6e},\"s_ic\":{:.4},\"s_rho\":{:.4},\"rho_steps_mean\":{:.1},\"attempts_mean\":{:.2}}}",
             arm, q, units.len(), ok_units, rho_vals.len(), nrho_ok, r_inv, r_l, gae,
             ic_m[0], ic_m[1], ic_m[2], rho_m[0], rho_m[1], rho_m[2],
             ic_m[0] / rho_m[0], ic_m[1] / rho_m[1], ic_m[2] / rho_m[2],
             ci[0].0, ci[1].0, ci[2].0, ci[0].1, ci[1].1, ci[2].1, resolved,
             phase_m.iter().map(|x| format!("{:.5e}", x)).collect::<Vec<_>>().join(","),
-            ic_m[0] / (gae * ell_mean), rho_m[0] / (gae * ell_mean),
+            ic_wall, rho_wall, ic_m[0] - phase_m[5], ic_m[0] - phase_m[5] * 0.95, ic_m[0] / (gae * ell_mean), rho_m[0] / (gae * ell_mean),
             mean(&rho_runs.iter().map(|x| x[2]).collect::<Vec<_>>()),
             mean(&units.iter().map(|u| u.attempts as f64).collect::<Vec<_>>())
         ));

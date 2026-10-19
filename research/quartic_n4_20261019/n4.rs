@@ -142,9 +142,17 @@ fn check(q: u64, seed: u64) {
     println!("hom triples {} failures {}", trip, fails);
     assert!(trip >= 3 && fails == 0);
     // Jacobian order: random classes killed by 4*ell, and (for most) not by 4
-    let pts = cv.rational_points_bruteforce();
-    println!("C(F_q) points by pic: {}", pts.len());
-    assert_eq!(pts.len() as u64, q + 1);
+    let pts: Vec<pic::Pt> = if q <= 8191 {
+        let p = cv.rational_points_bruteforce();
+        println!("C(F_q) points by pic: {}", p.len());
+        assert_eq!(p.len() as u64, q + 1);
+        p
+    } else {
+        // above 8191 the O(q^2) enumeration is infeasible: use sampled points
+        let curve = ic::Curve::new(q, &inst.f);
+        let mut r2 = Rng::new(seed ^ 99);
+        solver::sample_points(&curve, 200, &mut r2).iter().map(|p| [p[0] as u32, p[1] as u32, p[2] as u32]).collect()
+    };
     let mut bad = 0;
     for _ in 0..10 {
         let mut x = cv.zero();
@@ -257,7 +265,9 @@ fn flat_cnt(prefix: &str, c: &Cnt, out: &mut Vec<String>) {
 /// failure, every attempt charged) or arm A0 (c0 <= 0: all rational points); `nrho` matched-rho
 /// runs on the same instance with independent k. Output: flat JSON records.
 fn unit_cmd(q: u64, seed: u64, c0: f64, nrho: usize, rows_mult: f64) {
-    let arm = if c0 > 0.0 { "B0" } else { "A0" };
+    let arm = if c0 > 0.0 { "B0" } else if rows_mult < 0.0 { "A0r" } else { "A0" };
+    let retry_rows = rows_mult < 0.0; // post-hoc arm A0r: rows_mult = -m, +0.3 per retry
+    let rows_mult = rows_mult.abs();
     let inst = Inst::search(q, seed, 200000).expect("no instance");
     let (r_inv, r_l, gae) = ratios(&inst);
     // counted E0 addition, for the group-addition equivalent
@@ -280,7 +290,8 @@ fn unit_cmd(q: u64, seed: u64, c0: f64, nrho: usize, rows_mult: f64) {
     loop {
         attempt += 1;
         let nfb = if c0 > 0.0 { ((c * (q as f64).powf(0.6)).ceil() as usize).min(q as usize + 1) } else { 0 };
-        let prm = solver::Params { nfb, rows_mult, max_desc: 100000 };
+        let rm = if retry_rows { rows_mult + 0.3 * (attempt as f64 - 1.0) } else { rows_mult };
+        let prm = solver::Params { nfb, rows_mult: rm, max_desc: 100000 };
         let rep = solver::ic_solve(&inst, &prm, k, seed * 100 + attempt, true);
         let mut f: Vec<String> = Vec::new();
         for (n, cc, w) in &rep.phases {
@@ -294,10 +305,12 @@ fn unit_cmd(q: u64, seed: u64, c0: f64, nrho: usize, rows_mult: f64) {
             "{{\"rec\":\"ic\",\"arm\":\"{}\",\"q\":{},\"seed\":{},\"attempt\":{},\"c\":{:.2},\"nfb\":{},\"ell\":{},\"k\":{},\"ok\":{},\"fail\":\"{}\",{}}}",
             arm, q, seed, attempt, c, nfb, inst.ell, k, rep.ok, rep.fail, f.join(",")
         );
-        if rep.ok || attempt >= 6 || c0 <= 0.0 {
+        if rep.ok || attempt >= 6 || (c0 <= 0.0 && !retry_rows) {
             break;
         }
-        c += 0.4;
+        if c0 > 0.0 {
+            c += 0.4;
+        }
     }
     for i in 0..nrho {
         let kk = rng.below(inst.ell - 1) + 1;
