@@ -35,6 +35,8 @@ use super::suite::{self, Row};
 /// §23's sizes, `(a, n)` in the order of `r`.
 pub const SIZES: [(u8, u32); 6] = [(1, 47), (0, 57), (0, 41), (0, 53), (1, 59), (0, 61)];
 const TARGET_SEED_BASE: i128 = 23000;
+mod matched;
+
 const BOOT: usize = 10_000;
 const BOOT_SEED: u128 = 2_309_300;
 const BL_PRODUCT: f64 = 1.93 * 1.21;

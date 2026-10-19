@@ -950,8 +950,25 @@ fn rule(step: &str, args: RuleArgs) -> Result<String, String> {
         }
         "claims" => comparison.claims(),
         "analyse" => comparison.analyse().map(|doc| json::dumps(&doc, 1)),
+        "matched" => {
+            if args.comparison != Comparison::V8 {
+                return Err("matched reads rule v8 against its control v8c: --comparison v8".into());
+            }
+            let here = comparison.root.join("research/ic_tool_program/rule/v8c");
+            let control = rule::Comparison {
+                root: comparison.root.clone(),
+                git: comparison.git.clone(),
+                runs: here.join("runs"),
+                out: here.clone(),
+                here,
+                constants: &rule::V8C,
+            };
+            comparison
+                .matched(&control)
+                .map(|doc| json::dumps(&doc, 1))
+        }
         other => Err(format!(
-            "unknown step {other:?}: manifest, pin, size, all, reference, claims or analyse"
+            "unknown step {other:?}: manifest, pin, size, all, reference, claims, analyse or matched"
         )),
     }
 }
