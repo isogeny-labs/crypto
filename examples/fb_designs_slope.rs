@@ -2765,13 +2765,20 @@ fn analyze_tower(dir: &str) {
         println!();
         println!("════ A0 m = {m} p1");
         show_series(&format!("A0 m = {m}, f4_fp cells only"), &base);
-        let mut all = base;
+        // A T2 cell replaces the f4_fp cell at its t when that one did not
+        // complete (it is the cell the engine was admitted to measure).
+        let mut all: Vec<Cell2> = base
+            .into_iter()
+            .filter(|c| c.complete() || !ext.iter().any(|e| e.t == c.t))
+            .collect();
         all.extend(ext);
         all.sort_by_key(|c| c.t);
         show_series(
             &format!("A0 m = {m}, with the T2 (tower-engine) cell"),
             &all,
         );
+        println!("  (the width slope on the line above mixes f4_fp and tower-engine columns, which count different");
+        println!("   things; it is not registered for T2 and is not used. D and σ are engine-independent here: T1.)");
     }
     let a11 = cells2(&rows, "F3", "A11", 3);
     let a0 = cells2(&rows, "T2", "A0", 3);
