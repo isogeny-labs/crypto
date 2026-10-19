@@ -108,7 +108,10 @@ pub struct Fp3 {
 
 impl Fp3 {
     pub fn new(p: u64) -> Fp3 {
-        assert!(p % 2 == 1 && (5..(1 << 30)).contains(&p), "odd prime 5 <= p < 2^30");
+        assert!(
+            p % 2 == 1 && (5..(1 << 30)).contains(&p),
+            "odd prime 5 <= p < 2^30"
+        );
         let (m0, m1) = Self::find_modulus(p);
         let mut k = Fp3 {
             p,
@@ -539,9 +542,9 @@ impl Tables {
         let mut m = qm1;
         let mut f = 2;
         while f * f <= m {
-            if m % f == 0 {
+            if m.is_multiple_of(f) {
                 fs.push(f);
-                while m % f == 0 {
+                while m.is_multiple_of(f) {
                     m /= f;
                 }
             }
@@ -708,9 +711,7 @@ pub fn velu3(k: &Fp3, a: &El, b: &El, x0: &El) -> (El, El) {
 pub fn roots_cubic_scan(k: &Fp3, a: &El, b: &El) -> Vec<El> {
     (0..k.size() as usize)
         .map(|i| k.el(i))
-        .filter(|x| {
-            k.add(&k.add(&k.mul(&k.mul(x, x), x), &k.mul(a, x)), b) == ZERO
-        })
+        .filter(|x| k.add(&k.add(&k.mul(&k.mul(x, x), x), &k.mul(a, x)), b) == ZERO)
         .collect()
 }
 
@@ -1064,13 +1065,18 @@ pub fn exhaustive(p: u64, with_l: bool, graph3: bool, unreduced: bool) -> Exhaus
     let mut memo: HashMap<Vec<u64>, HOut> = HashMap::new();
     let mut tcache: HashMap<Key, i64> = HashMap::new();
 
-    let mut node_of = |a: &El, b: &El, key: Key, nodes: &mut Vec<NodeRec>, tcache: &mut HashMap<Key, i64>| -> usize {
+    let mut node_of = |a: &El,
+                       b: &El,
+                       key: Key,
+                       nodes: &mut Vec<NodeRec>,
+                       tcache: &mut HashMap<Key, i64>|
+     -> usize {
         if let Some(&i) = keys.get(&key) {
             return i;
         }
-        let t = *tcache.entry(key).or_insert_with(|| {
-            (k.size() as i64) + 1 - count_ec(&k, &tab, a, b) as i64
-        });
+        let t = *tcache
+            .entry(key)
+            .or_insert_with(|| (k.size() as i64) + 1 - count_ec(&k, &tab, a, b) as i64);
         nodes.push(NodeRec {
             a: *a,
             b: *b,
@@ -1381,7 +1387,7 @@ fn comp_stats(nodes: &[NodeRec], use3: bool) -> CompStats {
     let mut s = CompStats::default();
     let mut weak_total = 0u64;
     let mut weak_with_pass = 0u64;
-    for (_, &(w, pa, sz)) in by.iter() {
+    for &(w, pa, sz) in by.values() {
         if w == 0 {
             continue;
         }
@@ -1425,7 +1431,8 @@ pub fn summarize(x: &Exhaustive) -> Summary {
         s.kinds[m.spec.kind as usize] += 1;
     }
     let mut ct: HashMap<String, u64> = HashMap::new();
-    let (mut tr, mut p2, mut full, mut ok, mut p2n, mut p4_given) = (0u64, 0u64, 0u64, 0u64, 0u64, 0u64);
+    let (mut tr, mut p2, mut full, mut ok, mut p2n, mut p4_given) =
+        (0u64, 0u64, 0u64, 0u64, 0u64, 0u64);
     for m in &x.models {
         if !m.out.ok {
             s.models_smith_none += 1;
@@ -1452,7 +1459,11 @@ pub fn summarize(x: &Exhaustive) -> Summary {
     s.share_h_tractable = tr as f64 / okf;
     s.share_h_prop2 = p2 as f64 / okf;
     s.share_h_full = full as f64 / okf;
-    s.share_prop4_given_prop2 = if p2n > 0 { p4_given as f64 / p2n as f64 } else { 0.0 };
+    s.share_prop4_given_prop2 = if p2n > 0 {
+        p4_given as f64 / p2n as f64
+    } else {
+        0.0
+    };
     let mut cts: Vec<(String, u64)> = ct.into_iter().collect();
     cts.sort();
     s.cycle_types = cts;
@@ -1470,7 +1481,11 @@ pub fn summarize(x: &Exhaustive) -> Summary {
     s.share_e_models_disagree = weak
         .iter()
         .filter(|n| {
-            let v: Vec<bool> = n.models.iter().map(|&m| x.models[m].out.full_success).collect();
+            let v: Vec<bool> = n
+                .models
+                .iter()
+                .map(|&m| x.models[m].out.full_success)
+                .collect();
             v.iter().any(|&b| b) && v.iter().any(|&b| !b)
         })
         .count() as f64
@@ -1834,7 +1849,10 @@ mod tests {
                 assert_eq!(k.frob(&k.frob(&k.frob(&a))), a);
                 if a != ZERO {
                     assert_eq!(k.mul(&a, &k.inv(&a)), ONE);
-                    assert_eq!(k.norm(&a), k.pow(&a, ((p * p * p - 1) / (p - 1)) as u128)[0]);
+                    assert_eq!(
+                        k.norm(&a),
+                        k.pow(&a, ((p * p * p - 1) / (p - 1)) as u128)[0]
+                    );
                 }
                 // trace is the sum of conjugates
                 let s = k.add(&k.add(&a, &k.frob(&a)), &k.frob(&k.frob(&a)));
@@ -1932,10 +1950,14 @@ mod tests {
             let mut kinds = [0; 3];
             // Stratify by model kind: the previous fixed sample happened to
             // select no linear models at p=11 and failed its coverage check.
-            let sampled: Vec<&ModelSpec> = (0..3).flat_map(|kind| {
-                let group: Vec<_> = models.iter().filter(|m| m.kind == kind).collect();
-                (0..8).map(|_| group[rng.below(group.len() as u64) as usize]).collect::<Vec<_>>()
-            }).collect();
+            let sampled: Vec<&ModelSpec> = (0..3)
+                .flat_map(|kind| {
+                    let group: Vec<_> = models.iter().filter(|m| m.kind == kind).collect();
+                    (0..8)
+                        .map(|_| group[rng.below(group.len() as u64) as usize])
+                        .collect::<Vec<_>>()
+                })
+                .collect();
             for m in sampled {
                 let (a, b, _) = weak_key(&k, &tab, m).unwrap();
                 let t = k.size() as i64 + 1 - count_ec(&k, &tab, &a, &b) as i64;
@@ -1979,10 +2001,7 @@ mod tests {
             if let Some((nx, _)) = step(&k, &node, &mut rng) {
                 // the claimed roots are roots, and distinct
                 for r in &nx.roots {
-                    let v = k.add(
-                        &k.add(&k.mul(&k.mul(r, r), r), &k.mul(&nx.a, r)),
-                        &nx.b,
-                    );
+                    let v = k.add(&k.add(&k.mul(&k.mul(r, r), r), &k.mul(&nx.a, r)), &nx.b);
                     assert_eq!(v, ZERO);
                 }
                 assert_ne!(nx.roots[0], nx.roots[1]);
@@ -2065,7 +2084,11 @@ mod tests {
         };
         assert_eq!(sigs(&red), sigs(&full));
         let pass = |x: &Exhaustive| -> std::collections::BTreeMap<Key, bool> {
-            x.nodes.iter().filter(|n| n.weak).map(|n| (n.key, n.pass)).collect()
+            x.nodes
+                .iter()
+                .filter(|n| n.weak)
+                .map(|n| (n.key, n.pass))
+                .collect()
         };
         assert_eq!(pass(&red), pass(&full));
     }

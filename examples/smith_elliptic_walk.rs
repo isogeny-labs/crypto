@@ -57,7 +57,12 @@ fn exhaustive(args: &[String]) {
     let out = PathBuf::from(arg(args, "--out").unwrap());
     fs::create_dir_all(&out).unwrap();
     let t0 = Instant::now();
-    let x = w::exhaustive(p, !flag(args, "--no-l"), flag(args, "--graph3"), flag(args, "--unreduced"));
+    let x = w::exhaustive(
+        p,
+        !flag(args, "--no-l"),
+        flag(args, "--graph3"),
+        flag(args, "--unreduced"),
+    );
     let wall = t0.elapsed().as_secs_f64();
     let s = w::summarize(&x);
     // per-weak-curve rows and per-model rows (compact)
@@ -97,8 +102,10 @@ fn exhaustive(args: &[String]) {
             .nodes
             .iter()
             .enumerate()
-            .map(|(i, n)| json!({"id": i, "weak": n.weak, "pass": n.pass, "jv": n.jv_weak, "t": n.t,
-                                 "comp2": n.comp2, "comp23": n.comp23}))
+            .map(|(i, n)| {
+                json!({"id": i, "weak": n.weak, "pass": n.pass, "jv": n.jv_weak, "t": n.t,
+                                 "comp2": n.comp2, "comp23": n.comp23})
+            })
             .collect();
         let mut e2 = vec![];
         let mut e3 = vec![];
@@ -115,7 +122,11 @@ fn exhaustive(args: &[String]) {
             }
         }
         let g = json!({"p": p, "nodes": nodes, "edges2": e2, "edges3": e3});
-        fs::write(out.join(format!("graph_p{p}.json")), serde_json::to_string(&g).unwrap()).unwrap();
+        fs::write(
+            out.join(format!("graph_p{p}.json")),
+            serde_json::to_string(&g).unwrap(),
+        )
+        .unwrap();
     }
     println!(
         "p={p} wall={wall:.1}s models={} weak={} explored={} share_H_full={:.4} share_E_pass={:.4} C2={:.4} C23={:.4} Ct={:.4} controls={}",
@@ -140,14 +151,26 @@ fn walk_cmd(args: &[String]) {
     };
     let arm = arg(args, "--arm").unwrap_or("A".into());
     let walks: u64 = arg(args, "--walks").unwrap().parse().unwrap();
-    let seed: u64 = arg(args, "--seed").map(|s| s.parse().unwrap()).unwrap_or(20261018);
-    let max_nodes: u64 = arg(args, "--max-nodes").map(|s| s.parse().unwrap()).unwrap_or(20_000_000);
-    let max_secs: f64 = arg(args, "--max-secs").map(|s| s.parse().unwrap()).unwrap_or(3300.0);
-    let cell_secs: f64 = arg(args, "--cell-secs").map(|s| s.parse().unwrap()).unwrap_or(3300.0);
+    let seed: u64 = arg(args, "--seed")
+        .map(|s| s.parse().unwrap())
+        .unwrap_or(20261018);
+    let max_nodes: u64 = arg(args, "--max-nodes")
+        .map(|s| s.parse().unwrap())
+        .unwrap_or(20_000_000);
+    let max_secs: f64 = arg(args, "--max-secs")
+        .map(|s| s.parse().unwrap())
+        .unwrap_or(3300.0);
+    let cell_secs: f64 = arg(args, "--cell-secs")
+        .map(|s| s.parse().unwrap())
+        .unwrap_or(3300.0);
     let out = PathBuf::from(arg(args, "--out").unwrap());
     fs::create_dir_all(&out).unwrap();
     let path = out.join(format!("walk_{arm}_p{p}.jsonl"));
-    let mut f = fs::OpenOptions::new().create(true).append(true).open(&path).unwrap();
+    let mut f = fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&path)
+        .unwrap();
     let k = w::Fp3::new(p);
     let cell = Instant::now();
     let mut rejected_starts = 0u64;
@@ -157,7 +180,9 @@ fn walk_cmd(args: &[String]) {
             eprintln!("cell budget reached after {i} walks");
             break;
         }
-        let mut rng = sp::SplitMix64(seed ^ p.wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ i.wrapping_mul(0xD1B5_4A32_D192_ED03));
+        let mut rng = sp::SplitMix64(
+            seed ^ p.wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ i.wrapping_mul(0xD1B5_4A32_D192_ED03),
+        );
         rng.next_u64();
         let t0 = Instant::now();
         let (res, start_info) = if arm == "A" {
@@ -183,7 +208,10 @@ fn walk_cmd(args: &[String]) {
                 true,
                 false,
             );
-            (r, json!({"rejected_starts_so_far": rejected_starts, "start_trials_so_far": start_trials}))
+            (
+                r,
+                json!({"rejected_starts_so_far": rejected_starts, "start_trials_so_far": start_trials}),
+            )
         } else {
             let start = w::random_full2_start(&k, &mut rng);
             k.reset();
@@ -199,11 +227,15 @@ fn walk_cmd(args: &[String]) {
             (r, json!({}))
         };
         let wall = t0.elapsed().as_secs_f64();
-        let line = json!({"p": p, "arm": arm, "walk": i, "wall_s": wall, "res": res, "start": start_info});
+        let line =
+            json!({"p": p, "arm": arm, "walk": i, "wall_s": wall, "res": res, "start": start_info});
         writeln!(f, "{}", serde_json::to_string(&line).unwrap()).unwrap();
         f.flush().unwrap();
     }
-    println!("p={p} arm={arm} done in {:.1}s", cell.elapsed().as_secs_f64());
+    println!(
+        "p={p} arm={arm} done in {:.1}s",
+        cell.elapsed().as_secs_f64()
+    );
 }
 
 fn calib(args: &[String]) {
@@ -231,7 +263,11 @@ fn calib(args: &[String]) {
     }
     times.sort_by(|a, b| a.partial_cmp(b).unwrap());
     let v = json!({"rows": rows, "smith_median_s_p65537": times[times.len() / 2], "smith_calls": times.len()});
-    fs::write(out.join("calib.json"), serde_json::to_string_pretty(&v).unwrap()).unwrap();
+    fs::write(
+        out.join("calib.json"),
+        serde_json::to_string_pretty(&v).unwrap(),
+    )
+    .unwrap();
     println!("{}", serde_json::to_string_pretty(&v).unwrap());
 }
 
@@ -250,7 +286,8 @@ fn ols(x: &[f64], y: &[f64]) -> (f64, f64) {
 
 fn fit(args: &[String]) {
     let dir = PathBuf::from(arg(args, "--dir").unwrap());
-    let calib: Value = serde_json::from_str(&fs::read_to_string(dir.join("calib.json")).unwrap()).unwrap();
+    let calib: Value =
+        serde_json::from_str(&fs::read_to_string(dir.join("calib.json")).unwrap()).unwrap();
     let t_mul = calib["rows"][1]["sec_per_fp_mul"].as_f64().unwrap();
     let inv_ratio = calib["rows"][1]["inv_over_mul"].as_f64().unwrap();
     let mut per: std::collections::BTreeMap<(String, u64), Vec<Value>> = Default::default();
@@ -260,16 +297,22 @@ fn fit(args: &[String]) {
         if name.starts_with("walk_") && name.ends_with(".jsonl") {
             for line in fs::read_to_string(e.path()).unwrap().lines() {
                 let v: Value = serde_json::from_str(line).unwrap();
-                per.entry((v["arm"].as_str().unwrap().to_string(), v["p"].as_u64().unwrap()))
-                    .or_default()
-                    .push(v);
+                per.entry((
+                    v["arm"].as_str().unwrap().to_string(),
+                    v["p"].as_u64().unwrap(),
+                ))
+                .or_default()
+                .push(v);
             }
         }
     }
     let mut rows = vec![];
     for ((arm, p), ws) in &per {
         let n = ws.len() as f64;
-        let succ = ws.iter().filter(|v| v["res"]["passed"].as_bool().unwrap()).count() as f64;
+        let succ = ws
+            .iter()
+            .filter(|v| v["res"]["passed"].as_bool().unwrap())
+            .count() as f64;
         let g = |v: &Value, path: &[&str]| -> f64 {
             let mut c = v;
             for s in path {
@@ -327,14 +370,26 @@ fn fit(args: &[String]) {
             continue;
         }
         for (metric, f) in [
-            ("steps", &(|v: &Value| v["res"]["steps"].as_f64().unwrap()) as &dyn Fn(&Value) -> f64),
-            ("nodes", &(|v: &Value| v["res"]["nodes_tested"].as_f64().unwrap())),
-            ("cost", &(|v: &Value| {
-                let g = |c: &str, f: &str| v["res"][c][f].as_f64().unwrap_or(0.0);
-                let m = g("cost_step", "mults") + g("cost_test", "mults") + g("cost_descent", "mults");
-                let iv = g("cost_step", "invs") + g("cost_test", "invs") + g("cost_descent", "invs");
-                m + iv * inv_ratio + v["res"]["smith_ns"].as_f64().unwrap_or(0.0) * 1e-9 / t_mul
-            })),
+            (
+                "steps",
+                &(|v: &Value| v["res"]["steps"].as_f64().unwrap()) as &dyn Fn(&Value) -> f64,
+            ),
+            (
+                "nodes",
+                &(|v: &Value| v["res"]["nodes_tested"].as_f64().unwrap()),
+            ),
+            (
+                "cost",
+                &(|v: &Value| {
+                    let g = |c: &str, f: &str| v["res"][c][f].as_f64().unwrap_or(0.0);
+                    let m = g("cost_step", "mults")
+                        + g("cost_test", "mults")
+                        + g("cost_descent", "mults");
+                    let iv =
+                        g("cost_step", "invs") + g("cost_test", "invs") + g("cost_descent", "invs");
+                    m + iv * inv_ratio + v["res"]["smith_ns"].as_f64().unwrap_or(0.0) * 1e-9 / t_mul
+                }),
+            ),
         ] {
             let est = |sel: &dyn Fn(&Vec<Value>) -> Vec<Value>| -> (f64, f64) {
                 let mut xs = vec![];
@@ -342,7 +397,10 @@ fn fit(args: &[String]) {
                 for &p in &ps {
                     let ws = &per[&(arm.to_string(), p)];
                     let ws = sel(ws);
-                    let succ = ws.iter().filter(|v| v["res"]["passed"].as_bool().unwrap()).count() as f64;
+                    let succ = ws
+                        .iter()
+                        .filter(|v| v["res"]["passed"].as_bool().unwrap())
+                        .count() as f64;
                     if succ == 0.0 {
                         continue;
                     }
@@ -357,7 +415,9 @@ fn fit(args: &[String]) {
             let mut slopes = vec![];
             for _ in 0..2000 {
                 let (s, _) = est(&|ws: &Vec<Value>| {
-                    (0..ws.len()).map(|_| ws[rng_below(&mut rng.borrow_mut(), ws.len())].clone()).collect()
+                    (0..ws.len())
+                        .map(|_| ws[rng_below(&mut rng.borrow_mut(), ws.len())].clone())
+                        .collect()
                 });
                 if s.is_finite() {
                     slopes.push(s);
@@ -373,12 +433,18 @@ fn fit(args: &[String]) {
             } else {
                 "Theta~(p)"
             };
-            fits.push(json!({"arm": arm, "metric": metric, "exponent": a, "intercept": b,
-                              "ci95": [lo, hi], "verdict": verdict, "n_primes": ps.len()}));
+            fits.push(
+                json!({"arm": arm, "metric": metric, "exponent": a, "intercept": b,
+                              "ci95": [lo, hi], "verdict": verdict, "n_primes": ps.len()}),
+            );
         }
     }
     let v = json!({"t_mul_s": t_mul, "inv_over_mul": inv_ratio, "rows": rows, "fits": fits});
-    fs::write(dir.join("fit.json"), serde_json::to_string_pretty(&v).unwrap()).unwrap();
+    fs::write(
+        dir.join("fit.json"),
+        serde_json::to_string_pretty(&v).unwrap(),
+    )
+    .unwrap();
     println!("{}", serde_json::to_string_pretty(&v).unwrap());
 }
 
