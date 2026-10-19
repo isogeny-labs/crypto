@@ -46,5 +46,34 @@ The [second plan](plan-r2.json) is SHA-256
 the [second allocation](allocation-r2.json) is SHA-256
 `19ac8cda5d1af7ecd8298b26d9e4a55b6dad379c7ef35e0d063abfab2610db1d`.
 The second [launch procedure](launch-r2.sh) was committed before dispatch.
-Its preflight passed. The raw ledger, observer result, independent audit,
-and routing decision will be appended after the panel ends.
+Its preflight passed. The complete [raw archive](attempt2-complete.tar.gz)
+contains 768 arms, 384 pairs, all stdout/stderr, the source bundle and
+Linux executable, build log, allocation, observer, barrier, and runner
+receipts. Its SHA-256 is
+`577c6b6c4a8ee78f95eebc6a91a1b4d583907f58bd394cd3329000343bccd4d9`;
+the transferred copy matched the VM hash and its 1,565 members were checked.
+The end-state [allocation receipt](allocation-r2-end.json) again found no
+guest IRQ affinity on CPU 15.
+
+The [independent audit](audit-r2.json) found no structural or peak-memory
+failures and 31 valid Q clusters. One arm recorded CPU steal time and was
+marked invalid (arm 553, `q28-comparison`, serial, repetition 2). Four A/A
+ratios fell outside the frozen `[0.90, 1.11]` interval:
+
+| Case | Repetition | Reference/candidate ratio |
+| --- | ---: | ---: |
+| `q18-aa_batch` | 1 | 1.2771 |
+| `q28-aa_serial` | 2 | 1.1720 |
+| `q26-aa_batch` | 3 | 0.8620 |
+| `q29-aa_batch` | 3 | 1.3502 |
+
+The process-affinity observer completed with `passed`; it did not see a
+guest user-space task eligible on CPU 15 during measured work. The runner
+reported `completed` for all scheduled arms, with 383 valid exact-output
+pairs and one pair containing the CPU-steal arm. The independent decision is
+`unknown_gate_failed`, with the aggregate ratio and interval null. The
+diagnostic medians for valid arms were 10.576 seconds serial and 3.836
+seconds batch; the batch peak RSS median was 5,556 KiB versus 5,560 KiB
+serial. Those medians do not select default routing. The next comparison
+uses the physical-host isolation gate and `checkin_every=64` to exercise
+the full requested batch width.
