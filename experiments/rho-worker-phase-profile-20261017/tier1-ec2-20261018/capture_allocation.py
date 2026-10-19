@@ -14,6 +14,8 @@ ROOT = Path('/home/ec2-user/rho-worker-tier1-20261018')
 CPU = 15
 parser = argparse.ArgumentParser()
 parser.add_argument('--source-bundle', type=Path, default=ROOT / 'source.tar.gz')
+parser.add_argument('--binary', type=Path,
+                    default=ROOT / 'source/target/release/examples/rho_worker_batch_benchmark')
 parser.add_argument('--out', type=Path, default=ROOT / 'allocation.json')
 args = parser.parse_args()
 
@@ -91,7 +93,7 @@ receipt = {
     'hard_stop_schedule': command('systemctl', 'cat', 'rho-hard-stop.timer'),
     'build': {
         'source_bundle_sha256': sha256(args.source_bundle),
-        'binary_sha256': sha256(ROOT / 'source/target/release/examples/rho_worker_batch_benchmark'),
+        'binary_sha256': sha256(args.binary),
         'q_manifest_sha256': sha256(ROOT / 'source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json'),
         'rustc': command('rustc', '--version'),
         'cargo': command('cargo', '--version'),
