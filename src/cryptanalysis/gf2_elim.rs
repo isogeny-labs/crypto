@@ -74,11 +74,16 @@ fn vector_tables_enabled() -> bool {
     *ENABLED.get_or_init(|| std::env::var("KIC_GF2_VECTOR_TABLES").as_deref() == Ok("1"))
 }
 
-/// Experimental removal of parallel iterator plumbing in a one-worker pool.
-/// Multiworker pools retain the original scheduling and work accounting.
+/// Experimental removal of parallel iterator plumbing with an explicitly
+/// configured one-worker process. Avoid querying/initializing the global
+/// registry in multiworker configurations; nested pools are checked below.
 fn serial_clear_enabled() -> bool {
     static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    *ENABLED.get_or_init(|| std::env::var("KIC_GF2_SERIAL_CLEAR").as_deref() == Ok("1"))
+    *ENABLED.get_or_init(|| {
+        let one_worker = std::env::var("RAYON_NUM_THREADS").as_deref() == Ok("1");
+        let enabled = std::env::var("KIC_GF2_SERIAL_CLEAR").as_deref() == Ok("1");
+        one_worker && enabled
+    })
 }
 
 /// Build only addressable entries, initializing each exactly once. The
