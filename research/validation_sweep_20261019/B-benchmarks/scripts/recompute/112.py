@@ -39,8 +39,15 @@ bin_v = jl(S + '/raw/bin_verify.jsonl') + jl(S + '/raw/bin_verify_fp.jsonl')
 def uncontended(rows):
     return [r for r in rows if r.get('label') not in contended_labels]
 
+def is_ell_row(r, arm, l):
+    # ℓ-rung rows of the README table: label roundN-<arm>-l<ℓ> (ℓ=10 baseline also pools roundN-aa<k>-baseline-l10);
+    # the (23, 8) cell carries the label suffix n23l<ℓ> and is not part of these rungs
+    lab = r.get('label', '')
+    pat = r'round\d+-(aa\d-)?%s-l%d' % (re.escape(arm), l)
+    return r['arm'] == arm and r['l'] == l and re.fullmatch(pat, lab) is not None
+
 def med_ns(rows, arm, l=None):
-    v = [r['ns_per_target'] for r in rows if r['arm'] == arm and (l is None or r['l'] == l) and r.get('ns_per_target') is not None]
+    v = [r['ns_per_target'] for r in rows if is_ell_row(r, arm, l) and r.get('ns_per_target') is not None]
     return (statistics.median(v) if v else None), len(v)
 
 bt = uncontended(bin_time)
@@ -72,7 +79,9 @@ if len(set(xs)) >= 2:
     slope = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / sxx
 
 # prime m=3 at t=6, mitm3 per target multiplications
-p197 = [r['mul_per_target'] for r in prime_l3 if r['arm'] == 'mitm3' and r.get('m') == 3 and r.get('t') == 6]
+prime_rows_all = jl(S + '/raw/prime_rows.jsonl')
+p197 = [a['mul'] for r in prime_rows_all if r.get('m') == 3 and r.get('t') == 6 for a in r.get('arms', []) if a['arm'] == 'mitm3']
+p197_ladder = [r['mul_per_target'] for r in prime_l3 if r['arm'] == 'mitm3' and r.get('m') == 3 and r.get('t') == 6]
 pt13 = uncontended(prime_time)
 mitm3_t13 = [r['ns_per_target'] for r in pt13 if r['arm'] == 'mitm3' and r.get('t') == 13 and r.get('m') == 3 and r.get('ns_per_target') is not None]
 
@@ -139,10 +148,10 @@ claims = [
      'files': [S + '/raw/bin_count.jsonl', S + '/README.md'],
      'status': 'cannot_define'},
     {'claimed': '197 multiplications per target for mitm3 at N = 18 (m = 3, t = 6)',
-     'computed': 'prime_ladder_m3 mitm3 mul_per_target at m=3 t=6: %s' % p197,
-     'definition': 'mul_per_target values of the mitm3 rows at m=3 and t=6',
-     'files': [S + '/raw/prime_ladder_m3.jsonl'],
-     'status': 'match' if (p197 and all(round(x) == 197 for x in p197)) else 'mismatch'},
+     'computed': 'prime_rows mitm3 mul over %d rows at m=3 t=6: %s (median %s) ; the single prime_ladder_m3 counts-pass row at the same cell gives %s' % (len(p197), sorted(set(p197)), statistics.median(p197) if p197 else None, p197_ladder),
+     'definition': 'mul field of the mitm3 arm entries of prime_rows.jsonl rows at m=3 t=6; the ladder file row is a different pass (label counts-pass) and is reported as a fact only',
+     'files': [S + '/raw/prime_rows.jsonl', S + '/raw/prime_ladder_m3.jsonl'],
+     'status': 'match' if (p197 and statistics.median(p197) == 197) else 'mismatch'},
     {'claimed': 'mitm3 306.5 µs per full scan at t = 13',
      'computed': 'median ns_per_target of uncontended prime_time rows, arm mitm3, m=3, t=13: %s µs over %d rows' % ((f1(statistics.median(mitm3_t13) / 1000) if mitm3_t13 else 'none'), len(mitm3_t13)),
      'definition': 'median ns_per_target over uncontended prime_time rows, converted to µs',
@@ -180,7 +189,7 @@ row = {
     'protocol_git_date': 'PROTOCOL.md: %s' % git_add(S + '/PROTOCOL.md'),
     'first_raw_git_date': 'raw/bin_time.jsonl: %s' % git_add(S + '/raw/bin_time.jsonl'),
     'script': 'research/validation_sweep_20261019/B-benchmarks/scripts/recompute/112.py',
-    'notes': 'Empty raw files in the study (no rows): raw/f6_ic_probe_n24_dim8.jsonl. Wall medians use all rows whose label is not flagged contended; the README states the per-row round counts, which this script does not re-derive from the ANALYSIS.md tables. Identical block compares digest fields against corpus digests in bin_verify.jsonl and bin_verify_fp.jsonl.',
+    'notes': 'Empty raw file in the study (no rows): raw/f6_ic_probe_n24_dim8.jsonl. Wall medians use rows labelled roundN-<arm>-l<ell> (the l10 baseline also pools roundN-aaK-baseline-l10), excluding the seven runs flagged contended in isolated.jsonl: round2-aa2-baseline-l10, round2-baseline-l8, round2-group-scalar-l9, round2-rf-mitm-l12, round4-baseline-l8, round4-rf-pairs-l9, round4-rf-mitm-l10. Fact: the median of all four round l8 baseline rows, including the two flagged ones, is %.4f ms; the README figure 9.3 ms (4 rounds) matches that set. Digest mismatch: raw/bin_verify_fp.jsonl, arm rf-mitm, l 8, n 23, root_sets_checked 79 of 80, digest_roots "-" against corpus digest d659bad77f1bc4f116aa334d50311d2fca57de3d92ca60ee9be64e579a46fb5e; the mismatches field is 0.' % (statistics.median([r['ns_per_target'] for r in bin_time if r['arm'] == 'baseline' and r['l'] == 8 and 're.fullmatch' and re.fullmatch(r'round\d+-baseline-l8', r['label'])]) / 1e6),
 }
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
