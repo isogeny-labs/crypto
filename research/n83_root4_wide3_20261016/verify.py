@@ -125,7 +125,7 @@ def verify_arm(output, arm, k, variant, profile, points, scalars):
             or summary["root_bloom_enabled"] is not (profile != "off")
             or (summary["root_bloom_profile"], summary["root_bloom_hashes"],
                 summary["root_bloom_bits_per_request"], summary["root_bloom_bytes"]) !=
-               (("wide3", 3, 16, 1073741824) if profile == "wide3"
+               (("wide3", 3, 16, 2147483648) if profile == "wide3"
                 else ("standard", 3, 8, 1073741824) if profile == "standard"
                 else ("none", 0, 0, 0))
             or (k in BASE_HASHES and summary["base_hash"] != BASE_HASHES[k])
