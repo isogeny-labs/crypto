@@ -23,7 +23,8 @@ This is infrastructure validation, not an experiment or performance claim.
 
 The first full library run lacked eight runtime fixture inputs in the sparse
 checkout. The tracked fixtures were materialized, and the full suite was rerun
-successfully. No Rust source was changed. Both logs are retained in S3.
+successfully. Fixing the fixture failures required no cryptographic library
+changes. Both logs are retained in S3.
 
 Native plan SHA-256:
 `e37b221bfe4d4460099c3129dc42bc63cd217eff31cf38cee928c5da6b5a7e84`.
