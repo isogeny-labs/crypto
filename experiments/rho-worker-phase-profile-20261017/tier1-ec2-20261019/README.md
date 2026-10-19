@@ -29,3 +29,23 @@ The run was launched as `rho-worker-freshq.service` at 2026-10-19 20:09:11
 UTC, with its service on CPU 0 and timed children on CPU 4. Its active output
 directory is `/home/ec2-user/rho/results/b9a2ed25901949fa8a888bf97117c1ed`.
 The final raw archive and independent audit will be added after completion.
+
+## Prospective full-width confirmation
+
+The first plan's check-in every eight walkers limits the active lane group to
+eight, even though the requested batch width is 32. A second
+[plan](worker-fullwidth-plan.json), SHA-256
+`4a5e38e2f1ed29bce319b34f7bc521cd91b82c231ad6c2e2bad7b933bda3d5a4`,
+was frozen before its first arm. It retains all 32 Q points, 32 walkers,
+four repetitions, exact-output fields and charged interval, and changes the
+check-in interval to 32 so the batch lane can hold all 32 walkers. It will
+start after the first panel completes, preserving one timed job at a time.
+
+Its [independent auditor](analyze_fullwidth.py) requires zero invalid arms,
+complete exact replay and no disqualifying host or memory event. The A/A
+policy, specified before this panel, permits at most two of 256 controls
+outside [0.90, 1.11], none outside [0.80, 1.25], both mode medians within
+[0.98, 1.02], and each Q-by-mode median within [0.95, 1.05]. The worker
+integration threshold remains a Q-cluster bootstrap lower 95% bound above
+1.05. Failed gates retain the raw result and leave the qualified aggregate
+unknown.
