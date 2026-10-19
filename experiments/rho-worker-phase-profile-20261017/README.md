@@ -297,6 +297,8 @@ no hosted attempt passed its complete timing and host gate.
 | [4](tier1-pod-20261018-r4/README.md) | 8/4 | Host-parent `runc` eligible on CPU `5,29` before observer armed; stopped | `unknown_gate_failed` |
 | [5](tier1-pod-20261018-r5/README.md) | 96/48 | Host-parent `runc` eligible on CPU `5,29` about 701 seconds after barrier release; stopped | `unknown_gate_failed` |
 | [6](tier1-ec2-20261018/README.md) | 768/384 | One arm recorded CPU steal; four A/A ratios outside range | `unknown_gate_failed` |
+| [7](tier1-ec2-20261019/README.md) | 768/384 | One batch A/A ratio was 1.437258 outside range | `unknown_gate_failed` |
+| [8](tier1-ec2-20261019/README.md) | 768/384 | One reference arm recorded CPU steal; 383 pairs valid | `unknown_gate_failed` |
 
 The second attempt's process-pinning receipt was a snapshot. The later
 thread-level audit showed that a process-leader mask did not cover all
@@ -313,3 +315,23 @@ The EC2 guest observer found no competing guest task eligible on its measured
 CPU, while its independent audit still recorded host noise. The next panel
 uses the [physical-host manifest and auditor](tier0-ec2-20261019/) with a
 64-step check-in interval, so requested width 32 is exercised in full.
+
+## Fresh-Q cloud-instance follow-up
+
+The separate `c7i.4xlarge` host completed two serialized Tier 1 panels on
+the independently verified 32-Q fixture. The
+[raw archives, source hashes, service journal, and independent audits](tier1-ec2-20261019/README.md)
+are retained. The first panel checked in every eight walkers; all 384 pairs
+were exact-output valid, but one batch A/A control had ratio 1.437258
+outside the frozen [0.90, 1.11] range. The second panel allowed a full
+32-walker batch and had 383 valid pairs; one reference arm of a batch A/A
+control recorded one CPU-steal tick. Its diagnostic comparison-only 32-Q
+ratio was 4.4912 with interval [4.4069, 4.6637], but its qualified
+interval is null under the frozen all-arms host gate. Both decisions remain
+`unknown_gate_failed`, and default routing remains serial.
+
+A [production check-in plan](tier1-ec2-20261019/worker-production-plan.json)
+was frozen before dispatch with 128 walkers and check-ins every 64. It is
+running serially on the same host after both earlier panels completed. Its
+own raw receipts and independent audit will determine whether default
+routing can be considered under the unchanged 1.05 lower-bound threshold.
