@@ -74,3 +74,12 @@ not establish present CI cause after upstream changed the scope-script blob.
 Rearm same one-off ~4h if unfinished/guards permit, reset activity count only
 for substantive data/head/CI/review changes. Pause after3 unchanged checks;
 notify only meaningful deliveries/recoveries/new blockers, not duplicate status.
+
+Current launch/readback: resumed-launch.json and resumed-verified.json.
+PID196273 at2026-10-19T01:43:59UTC;7943→7945 newly audited after this launch.
+Always verify afresh. Before relative-guard launch compute remaining seconds
+AFTER all filesystem traversals, immediately before launch, with5sec admission
+margin. Verify actual worker.started_ms+1000*max_seconds<=1792527222570; if not,
+request owned clean STOP and preserve receipts. First resume PID195750 stopped
+cleanly after6vertices for2,264ms setup drift; correction records remain loose
+because guide/status explicitly name them. No new interrupted attempt.

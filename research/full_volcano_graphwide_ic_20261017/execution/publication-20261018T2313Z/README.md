@@ -96,3 +96,12 @@ The immutable report/scientific archive predate this subsequent check.
 Publication receipt archive: 1,776,220 bytes,58 manifest entries; SHA-256
 `8a4822fab5780c43e700b850e240a92c6fb9b807b1643056a6b8c6bcbc23439b`. Fresh extraction, every entry,
 exact file population and byte-identical receipt repack pass.
+
+[Guide v7](https://drive.google.com/file/d/1Tm1_reS7F8XAuifUeVUi7geFO3Cr8Xf9/view) is6,619bytes, local SHA256
+`7221345129fb0ecbb34bb0d7377df5f7011faf0c14a79515e1f40db235e980b6`;
+remote name/size/parent readback pass, not remote content hashing.
+Corrected workerPID196273 was verified at2026-10-19T01:43:59.491840+00:00 with NEW audited
+progress7943→7945; see resumed-verified.json. Guard end
+is4,098ms before originaldeadline; frozen budgets/cap unchanged. Actual admission
+timing correction and clean first stop are [retained](resume-guard-correction/README.md).
+Only light metadata authoring/upload followed the restart; no heavy validation.

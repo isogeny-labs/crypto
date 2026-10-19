@@ -1,5 +1,7 @@
 # Volcano experiment downloads, 17 October 2026
 
+[Download guide v7: current7,937-vertex delivery and verified bounded continuation](https://drive.google.com/file/d/1Tm1_reS7F8XAuifUeVUi7geFO3Cr8Xf9/view).
+
 Latest immutable publication: **7,937 /24,823 audited vertices**, all51 strata
 sampled;126,992 records (81,666 verified /39,550 exhausted /5,776 timeout),
 4,117,173 relations /193,153,057 actual decomposition calls.
