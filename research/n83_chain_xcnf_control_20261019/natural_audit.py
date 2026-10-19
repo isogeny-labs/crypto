@@ -4,6 +4,8 @@ import contextlib
 import gzip
 import io
 import json
+import hashlib
+import subprocess
 import tempfile
 from pathlib import Path
 
@@ -14,6 +16,7 @@ HERE = Path(__file__).resolve().parent
 EVIDENCE = HERE / 'evidence/natural'
 PLAN = (HERE.parent / 'koblitz_n83_factor_base_sweep_20261008/verification/'
         'k600-gray-hash-paired-protocol-20261014/plan.json')
+FROZEN_EXPORTER_COMMIT = '1e7b35ddaafebd277083a24b741bd26bd7d7316e'
 
 
 def require(condition, message):
@@ -33,12 +36,15 @@ def scalar_mul(point, scalar):
 
 def main():
     protocol = json.loads((HERE / 'natural_protocol.json').read_text())
+    frozen_source = subprocess.run(
+        ['git', 'show', f'{FROZEN_EXPORTER_COMMIT}:examples/n83_chain_xcnf_control.rs'],
+        cwd=HERE.parent.parent, check=True, capture_output=True,
+    ).stdout
     require(protocol['status'] == 'FROZEN_BEFORE_1M_CALLS' and
             protocol['selected_best_total_runtime'] is None and
             sha256(PLAN) == protocol['plan_sha256'] and
             sha256(HERE / 'natural_domains.py') == protocol['domain_extractor_source_sha256'] and
-            sha256(HERE.parent.parent / 'examples/n83_chain_xcnf_control.rs') ==
-            protocol['exporter_source_sha256'],
+            hashlib.sha256(frozen_source).hexdigest() == protocol['exporter_source_sha256'],
             'sealed protocol or source bytes differ')
     plan = json.loads(PLAN.read_text())
     generator = (int('477f77103dfad59850800', 16),

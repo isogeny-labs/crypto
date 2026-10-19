@@ -73,6 +73,19 @@ phases without witness information on frozen ordinary queries, retaining all
 verified natural relations and useful rank per query, followed by matrix
 solving and one-target descent before a factor-base selection.
 
+An exact coordinate-set encoding was also tried on these same two domains.
+Its [source patch and capacity receipt](evidence/coordinate/) are retained.
+The semantic release test passed for mixed exact domains. The Gray formula
+required 11,049,398 domain clauses and exported to 2,342,336,502 bytes on
+the SSD-backed volume (SHA-256
+`3da161af44200910dc3e03142a140002c5da08d04aee3f73cc5585e0efe55214`).
+The hash formula required 16,559,758 domain clauses and stopped at the
+12,000,000-clause preflight. The first Gray output attempt on `/private/tmp`
+failed with `PRODUCER_FAILURE_storage` and wrote zero bytes. No external
+solver call was made for either coordinate-set formula. The source patch was
+preserved as an experiment artifact and the active library/exporter source
+was restored to the compact orbit encoding.
+
 Recheck from the repository root with:
 
 ```sh
