@@ -17,6 +17,31 @@ from install_services import discovery_units, units
 
 
 class AddressTests(unittest.TestCase):
+    def test_release_retains_successor_death_without_claiming_source_terminated(self):
+        db,ec2=Mock(),Mock()
+        ec2.describe_instances.return_value={'Reservations':[{'Instances':[{'State':{'Name':'terminated'}}]}]}
+        record={'Owner':{'S':'previous'},'Origin':{'S':'source'},
+                'OriginReleased':{'BOOL':True},'ReleaseReceipt':{'S':'a'*64}}
+        retain_confirmed_termination(db,ec2,'table','source',{'legacy-owner':record})
+        ec2.describe_instances.assert_called_once_with(InstanceIds=['previous'])
+        self.assertTrue(record['OwnerTerminated']['BOOL'])
+        self.assertNotIn('OriginTerminated',record)
+
+    def test_released_source_still_requires_ready_matching_recovery_owner(self):
+        owner={'Origin':{'S':'source'},'OriginReleased':{'BOOL':True},
+               'ReleaseReceipt':{'S':'a'*64},'Owner':{'S':'i-new'},'Ready':{'BOOL':True}}
+        self.ec2.describe_instances.return_value['Reservations'][0]['Instances'][1]['Tags'].append({'Key':'LegacyReady','Value':'true'})
+        result=reconcile(self.ec2,self.asg,'g','e',True,'source',owner)
+        self.assertEqual(result['instance'],'i-new')
+        self.asg.set_desired_capacity.assert_called_once()
+
+    def test_partial_release_never_moves_protected_source_address(self):
+        self.ec2.describe_instances.return_value={'Reservations':[{'Instances':[{'State':{'Name':'running'}}]}]}
+        released={'Origin':{'S':'source'},'OriginReleased':{'BOOL':True},'ReleaseReceipt':{'S':'a'*64}}
+        result=reconcile(self.ec2,self.asg,'g','e',True,'source',[released,{'Origin':{'S':'source'}}])
+        self.assertEqual(result['state'],'protected-source-active')
+        self.ec2.associate_address.assert_not_called()
+
     def test_only_confirmed_termination_is_recorded_with_current_owner_condition(self):
         for state in ['running','stopped','shutting-down','terminated']:
             db,ec2=Mock(),Mock()
@@ -235,6 +260,14 @@ class ResumeTests(unittest.TestCase):
 
 
 class DeploymentTests(unittest.TestCase):
+    def test_legacy_restore_waits_for_codex_workspace_readiness(self):
+        services=units(Path('/opt/spot'),Path('/opt/spot/bin'),Path('/srv/experiments/work'),legacy_origin='i-source')
+        self.assertIn('Type=notify',services['spot-codex-recovery'])
+        self.assertIn('ConditionPathExists=/srv/experiments/agent-migration/agent.json',services['spot-codex-recovery'])
+        for name in ['spot-legacy-recovery','spot-diem-recovery']:
+            self.assertIn('After=network-online.target spot-codex-recovery.service',services[name])
+            self.assertIn('Requires=spot-codex-recovery.service',services[name])
+
     def test_compute_lifecycle_is_independent_of_ip_cutover(self):
         template = build()
         self.assertEqual(template['Conditions']['LifecycleActive'],

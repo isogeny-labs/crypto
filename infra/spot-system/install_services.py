@@ -38,9 +38,29 @@ TimeoutStopSec=30
 WantedBy=multi-user.target
 '''
     result = {'spot-nodes': node, 'spot-experiments': experiment, 'spot-activity': activity}
+    result['spot-codex-recovery'] = f'''[Unit]
+Description=Recover enrolled Codex chats from verified durable state
+After=network-online.target
+RequiresMountsFor=/srv/experiments
+ConditionPathExists=/srv/experiments/agent-migration/agent.json
+[Service]
+User=root
+Type=notify
+NotifyAccess=main
+TimeoutStartSec=0
+UMask=0077
+ExecStart=/usr/bin/python3 {runtime}/codex_recovery.py --config /srv/experiments/agent-migration/agent.json
+Restart=on-failure
+RestartSec=20
+TimeoutStopSec=120
+KillMode=control-group
+[Install]
+WantedBy=multi-user.target
+'''
     if legacy_origin:
         result['spot-legacy-recovery'] = f'''[Unit]
-After=network-online.target
+After=network-online.target spot-codex-recovery.service
+Requires=spot-codex-recovery.service
 [Service]
 Type=simple
 User=root

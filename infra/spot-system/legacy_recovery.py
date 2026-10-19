@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Fenced recovery of the explicitly configured legacy experiment set.
 
-Never fences by time alone: a successor needs EC2-confirmed termination of the
-previous owner. All application outputs are restored into private local copies.
+Never fences by time alone: a successor needs EC2-confirmed termination or an
+explicit, receipted release of the original workload. Stopped instances alone
+are not a fence. All application outputs are restored into private local copies.
 """
 import argparse
 import base64
@@ -10,6 +11,7 @@ import ctypes
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import signal
 import subprocess
@@ -54,24 +56,35 @@ def state(ec2, instance):
     return instances[0]['State']['Name']
 
 
+def origin_released(record, origin):
+    """Only the operator's quiesced-source handoff can replace source death."""
+    return (record.get('Origin', {}).get('S') == origin
+            and record.get('OriginReleased', {}).get('BOOL') is True
+            and re.fullmatch(r'[0-9a-f]{64}', record.get('ReleaseReceipt', {}).get('S', '')) is not None)
+
+
 def acquire(db, ec2, table, key, origin, owner):
     """A failed heartbeat or an expired timestamp never permits stealing work."""
     if owner==origin:
         return False
     current = db('get-item', table_name=table, key={'Id':{'S':key}}, consistent_read=True).get('Item', {})
     prior = current.get('Owner', {}).get('S', origin)
-    if prior==owner and current.get('Origin',{}).get('S')==origin and current.get('OriginTerminated',{}).get('BOOL') is True:
+    released = origin_released(current, origin)
+    origin_dead = current.get('OriginTerminated', {}).get('BOOL') is True
+    if prior==owner and current.get('Origin',{}).get('S')==origin and (origin_dead or released):
         return True
     prior_dead = (current.get('OwnerTerminated', {}).get('BOOL') is True or
-                  (prior == origin and current.get('OriginTerminated', {}).get('BOOL') is True))
+                  (prior == origin and (origin_dead or released)))
     if prior != owner and not prior_dead and state(ec2, prior) != 'terminated':
         return False
     # A node may not resurrect old source work while its source remains alive.
-    if (owner != origin and current.get('OriginTerminated', {}).get('BOOL') is not True
+    if (owner != origin and not origin_dead and not released
             and state(ec2, origin) != 'terminated'):
         return False
     kwargs = {'table_name':table, 'item':{'Id':{'S':key}, 'Owner':{'S':owner},
-              'Origin':{'S':origin}, 'OriginTerminated':{'BOOL':True}}}
+              'Origin':{'S':origin}, 'OriginTerminated':{'BOOL':not released or origin_dead}}}
+    if released:
+        kwargs['item'].update(OriginReleased={'BOOL':True}, ReleaseReceipt=current['ReleaseReceipt'])
     if current:
         if current.get('Origin', {}).get('S') != origin:
             raise ValueError('Recovery namespace belongs to another origin')

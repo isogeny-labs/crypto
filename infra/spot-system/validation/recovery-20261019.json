@@ -1,0 +1,44 @@
+{
+  "schema": "spot.public-recovery-validation/v1",
+  "operational_identifiers": "omitted; retained privately",
+  "linux_infrastructure_tests": {
+    "passed": 101,
+    "failed": 0
+  },
+  "unchanged_source_library_revision": "c687cda18f2a0b14255d3f8e14b6d938ee15f3e4",
+  "library_serial_tests": {
+    "passed": 4399,
+    "failed": 0,
+    "ignored": 118,
+    "seconds": 659.43
+  },
+  "initial_parallel_library_failure": {
+    "test": "cryptanalysis::koblitz_groebner::tests::support_local_timers_preserve_rows_and_count_delegation",
+    "expected_calls": 1,
+    "observed_calls": 2,
+    "disposition": "full serial suite passed; shared process-global counters"
+  },
+  "isolated_codex_restore": {
+    "sqlite_integrity_checks_passed": 5,
+    "packaged_executable_started": true,
+    "saved_chat_read": true,
+    "turns_started": 0,
+    "authentication_present": false,
+    "validation_processes_remaining": 0
+  },
+  "experiment_checkpoint": {
+    "full_download_hash_verified": true,
+    "manifest_validated": true,
+    "process_restored": false
+  },
+  "prepared_runtime": {
+    "full_download_hash_verified_with_worker_role": true,
+    "deployed": false
+  },
+  "acceptance": {
+    "ownership_handoff": "pending",
+    "authenticated_agent_migration": "pending",
+    "combined_live_replacement_drill": "not_run"
+  },
+  "source_comparison": "All 30 Python files were hash-compared with the Linux-validated source and matched; detailed hashes retained privately."
+}

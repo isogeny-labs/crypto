@@ -1,6 +1,7 @@
 """Scheduled Elastic IP reconciliation. AWS Lambda supplies boto3."""
 import logging
 import os
+import re
 import time
 
 log = logging.getLogger(__name__)
@@ -25,6 +26,9 @@ def release_legacy_cpu_restriction(autoscaling, group, complete=True):
 def source_state(ec2, source, ownership):
     if ownership.get('OriginTerminated', {}).get('BOOL') is True:
         return 'terminated'
+    if (ownership.get('OriginReleased', {}).get('BOOL') is True
+            and re.fullmatch(r'[0-9a-f]{64}', ownership.get('ReleaseReceipt', {}).get('S', ''))):
+        return 'released'
     instances = [i for r in ec2.describe_instances(InstanceIds=[source])['Reservations'] for i in r['Instances']]
     if len(instances) != 1:
         raise RuntimeError('Protected source state is unknown')
@@ -39,9 +43,14 @@ def retain_confirmed_termination(db, ec2, table, source, records):
     """
     confirmed = {'OriginTerminated': {'BOOL': any(
         record.get('OriginTerminated', {}).get('BOOL') is True for record in records.values())}}
-    if source_state(ec2, source, confirmed) != 'terminated':
+    released = [r for r in records.values() if origin_released(r, source)]
+    if released and all(r.get('Complete', {}).get('BOOL') is True or
+                        origin_released(r, source) for r in records.values()):
+        confirmed.update(OriginReleased={'BOOL':True}, ReleaseReceipt=released[0]['ReleaseReceipt'])
+    original_state = source_state(ec2, source, confirmed)
+    if original_state not in {'terminated', 'released'}:
         return
-    states = {source: 'terminated'}
+    states = {source: original_state}
     for key, record in records.items():
         if not record:
             continue
@@ -54,7 +63,7 @@ def retain_confirmed_termination(db, ec2, table, source, records):
                 states[owner] = source_state(ec2, owner, {})
             dead = states[owner] == 'terminated'
         changes = {}
-        if record.get('OriginTerminated', {}).get('BOOL') is not True:
+        if original_state == 'terminated' and record.get('OriginTerminated', {}).get('BOOL') is not True:
             changes['OriginTerminated'] = {'BOOL': True}
         if dead and record.get('OwnerTerminated', {}).get('BOOL') is not True:
             changes['OwnerTerminated'] = {'BOOL': True}
@@ -68,6 +77,12 @@ def retain_confirmed_termination(db, ec2, table, source, records):
             record.update(changes)
 
 
+def origin_released(record, source):
+    return (record.get('Origin', {}).get('S') == source
+            and record.get('OriginReleased', {}).get('BOOL') is True
+            and re.fullmatch(r'[0-9a-f]{64}', record.get('ReleaseReceipt', {}).get('S', '')) is not None)
+
+
 def reconcile(ec2, autoscaling, group, allocation, enabled, source='', ownership=None):
     if not enabled:
         return {"state": "staged"}
@@ -76,8 +91,12 @@ def reconcile(ec2, autoscaling, group, allocation, enabled, source='', ownership
         raise ValueError('Legacy ownership origin mismatch')
     ownership={'OriginTerminated':{'BOOL':any(o.get('OriginTerminated',{}).get('BOOL') is True for o in owners)},
                'Complete':{'BOOL':all(o.get('Complete',{}).get('BOOL') is True for o in owners)}}
+    released = [o for o in owners if origin_released(o, source)]
+    if released and all(o.get('Complete',{}).get('BOOL') is True or
+                        origin_released(o, source) for o in owners):
+        ownership.update(OriginReleased={'BOOL':True}, ReleaseReceipt=released[0]['ReleaseReceipt'])
     if source:
-        if source_state(ec2, source, ownership) != 'terminated':
+        if source_state(ec2, source, ownership) not in {'terminated', 'released'}:
             return {'state':'protected-source-active','instance':source}
         if ownership.get('Complete', {}).get('BOOL') is not True:
             # Demand persists through Spot capacity gaps; root recovery uses the
@@ -136,6 +155,13 @@ def handler(event, context):
         owner_keys = os.environ.get('LEGACY_OWNER_KEYS','legacy-owner').split(',')
         records = {name:db.get_item(TableName=os.environ['LOCK_TABLE'],Key={'Id':{'S':name}},
             ConsistentRead=True).get('Item',{}) for name in [*owner_keys,'legacy-owner-host']} if os.environ.get('PROTECTED_SOURCE') else {}
+        # Codex is optional. Once enrolled, its ownership must also retain
+        # confirmed successor death across long capacity gaps and gate cutover.
+        if records:
+            codex = db.get_item(TableName=os.environ['LOCK_TABLE'],
+                Key={'Id':{'S':'legacy-owner-codex'}}, ConsistentRead=True).get('Item',{})
+            if codex:
+                records['legacy-owner-codex'] = codex
         ec2 = boto3.client('ec2')
         if records:
             retain_confirmed_termination(db, ec2, os.environ['LOCK_TABLE'], os.environ['PROTECTED_SOURCE'], records)
@@ -143,6 +169,8 @@ def handler(event, context):
         autoscaling = boto3.client('autoscaling')
         if os.environ.get('PROTECTED_SOURCE'):
             release_legacy_cpu_restriction(autoscaling, os.environ['GROUP'], all(o.get('Complete',{}).get('BOOL') is True for o in ownership))
+        if 'legacy-owner-codex' in records:
+            ownership.append(records['legacy-owner-codex'])
         return reconcile(ec2, autoscaling,
                          os.environ["GROUP"], os.environ["ALLOCATION"], True,
                          os.environ.get('PROTECTED_SOURCE',''), ownership)

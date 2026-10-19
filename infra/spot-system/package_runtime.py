@@ -14,6 +14,7 @@ def package(destination=None, binary_dir=None):
     sources.append((here/'experiment-run.schema.json', 'experiment-run.schema.json'))
     sources.append((here/'experiment-runner', 'experiment-runner'))
     sources.append((here/'wake.py', 'wake.py'))
+    sources += [(here/name, name) for name in ['codex_rpc.py','codex_snapshot.py','codex_recovery.py']]
     sources += [(here/name, name) for name in ['criu_local.py','criu_export.py','legacy_recovery.py',
         'spot-legacy-backup.service','spot-legacy-backup.timer','spot-diem-backup.service','spot-diem-backup.timer']]
     sources += [(binary_dir/name, 'bin/'+name) for name in

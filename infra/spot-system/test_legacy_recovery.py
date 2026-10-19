@@ -13,6 +13,34 @@ import criu_export
 
 
 class FencingTests(unittest.TestCase):
+    def test_receipted_source_release_allows_handoff_without_fabricating_death(self):
+        writes=[]
+        current={'Owner':{'S':'origin'},'Origin':{'S':'origin'},
+                 'OriginReleased':{'BOOL':True},'ReleaseReceipt':{'S':'a'*64}}
+        def db(op,**kw):
+            if op=='get-item':return {'Item':current}
+            writes.append(kw);return {}
+        def no_lookup(**kw):self.fail('Released source needs no death assertion')
+        self.assertTrue(recovery.acquire(db,no_lookup,'table','key','origin','successor'))
+        self.assertFalse(writes[0]['item']['OriginTerminated']['BOOL'])
+        self.assertEqual(writes[0]['item']['ReleaseReceipt'],current['ReleaseReceipt'])
+        self.assertEqual(writes[0]['expression_attribute_values'][':prior'],{'S':'origin'})
+
+    def test_release_does_not_allow_stealing_a_running_successor(self):
+        current={'Owner':{'S':'previous'},'Origin':{'S':'origin'},
+                 'OriginReleased':{'BOOL':True},'ReleaseReceipt':{'S':'a'*64}}
+        def db(op,**kw):
+            self.assertEqual(op,'get-item');return {'Item':current}
+        ec2=lambda **kw:{'Reservations':[{'Instances':[{'State':{'Name':'running'}}]}]}
+        self.assertFalse(recovery.acquire(db,ec2,'table','key','origin','successor'))
+
+    def test_release_without_receipt_is_not_a_fence(self):
+        current={'Owner':{'S':'origin'},'Origin':{'S':'origin'},'OriginReleased':{'BOOL':True}}
+        def db(op,**kw):
+            self.assertEqual(op,'get-item');return {'Item':current}
+        ec2=lambda **kw:{'Reservations':[{'Instances':[{'State':{'Name':'stopped'}}]}]}
+        self.assertFalse(recovery.acquire(db,ec2,'table','key','origin','successor'))
+
     def test_expired_original_deadline_never_restores_with_a_fresh_budget(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);real_stat=Path.stat
