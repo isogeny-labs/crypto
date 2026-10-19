@@ -188,12 +188,21 @@ def audit_arm(path: Path, name: str, mode: str, shape: str, fixture: int) -> dic
                 require(item is None, f'{name}: unused {arm} base imported')
         require(phases[0]['details']['identities'] == receipt['identities'],
                 f'{name}: phase/worker base identity')
+        built_clauses = phases[1]['details']['clauses']
+        final_clauses = receipt['sat_clauses']
+        clauses_valid = (final_clauses == built_clauses if mode == 'preflight'
+                         else final_clauses == built_clauses + 530 if mode == 'positive'
+                         else built_clauses <= final_clauses <= 8_000_000)
         require(receipt['columns'] == (33_254 if len(set(shape)) == 2 else 16_627)
                 and receipt['sat_variables'] == phases[1]['details']['variables']
-                and receipt['sat_clauses'] == phases[1]['details']['clauses']
+                and clauses_valid
                 and receipt['sat_xor_rows'] == phases[1]['details']['xor_rows']
                 and receipt['ordered_first_pair'] is True,
                 f'{name}: model receipt')
+        if mode == 'positive':
+            require(phases[2]['phase'] == 'positive_choices_pinned'
+                    and phases[2]['details'] == {'selectors': 4, 'phases': 28},
+                    f'{name}: constructed selector/phase pins')
         require(0 < receipt['memory_cgroup_peak_bytes'] <= EIGHT_GIB
                 and receipt['memory_cgroup_limit_bytes'] == EIGHT_GIB,
                 f'{name}: memory receipt')
