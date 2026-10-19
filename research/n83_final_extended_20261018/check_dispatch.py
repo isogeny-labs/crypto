@@ -35,6 +35,7 @@ def required_paths(chosen):
             'pilots/k1024.tar.gz', 'pilots/k3300.tar.gz',
             'test_arms.py', 'test_preflight.py',
             'test_select.py', 'test_provider_jobs.py',
+            'historical_finalist_targets.jsonl',
             'fresh_manifest.json', 'fresh_targets.jsonl', 'fresh_answers.jsonl',
             'fresh_exclusion_audit.json', 'generate_fresh.py', 'audit_fresh.py',
             'upstream_validated.json', 'upstream_selection.json')],
