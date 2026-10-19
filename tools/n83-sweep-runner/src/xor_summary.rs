@@ -26,6 +26,27 @@ fn cms_seconds(raw: &str, prefix: &str) -> Option<f64> {
         })
         .filter(|s| s.is_finite() && *s >= 0.)
 }
+fn unadmitted_status(
+    exists: bool,
+    launcher_failed: bool,
+    has_outer: bool,
+    before: Option<&Value>,
+) -> &'static str {
+    if launcher_failed {
+        "LAUNCH_FAILED_NO_AUDIT"
+    } else if !has_outer
+        && before.is_some_and(|b| {
+            b["preflight"]["quiet"] == false
+                || b["eviction"]["failed_user_threads"].as_u64().unwrap_or(0) > 0
+        })
+    {
+        "PREFLIGHT_REFUSED_NO_WORKER"
+    } else if exists {
+        "FAILED_NO_AUDIT"
+    } else {
+        "NOT_ATTEMPTED"
+    }
+}
 pub fn summarize(manifest: &Path, output: &Path) -> R<()> {
     let m = read(manifest)?;
     let mut rows = Vec::new();
@@ -38,14 +59,14 @@ pub fn summarize(manifest: &Path, output: &Path) -> R<()> {
     for plan in m.as_array().ok_or("manifest must be an array")? {
         let dir = Path::new(plan["dir"].as_str().ok_or("run path")?);
         if !dir.join("audit.json").exists() {
-            let status =
-                if dir.join("isolation-before.json").exists() && !dir.join("outer.json").exists() {
-                    "PREFLIGHT_REFUSED_NO_WORKER"
-                } else if dir.exists() {
-                    "FAILED_NO_AUDIT"
-                } else {
-                    "NOT_ATTEMPTED"
-                };
+            let before = dir.join("isolation-before.json");
+            let before = before.exists().then(|| read(before)).transpose()?;
+            let status = unadmitted_status(
+                dir.exists(),
+                dir.join("launcher-error.json").exists(),
+                dir.join("outer.json").exists(),
+                before.as_ref(),
+            );
             rows.push(json!({"id":plan["id"],"arm":plan["arm"],"dir":plan["dir"],"status":status,"planned_status":plan["status"]}));
             continue;
         }
@@ -138,6 +159,32 @@ pub fn summarize(manifest: &Path, output: &Path) -> R<()> {
         && pairs.iter().all(|p| p["solver_a_over_b"].is_number());
     let summary = json!({"schema":"n83.native-xor-summary/v2","class":"engineering","scope":"known-witness SAT component and separately bounded natural trials","manifest":manifest,"rows":rows,"complete_comparison_coverage":complete,"identical_search_and_selector_signature":complete && all_identical && expected.is_some(),"signature":expected,"baseline_solver_ms":range(&a_times),"candidate_solver_ms":range(&b_times),"external_process_ms":range(&e_times),"external_algorithm_cpu_ms":range(&e_cpu),"pairs":pairs,"timing_scope":"descriptive recorded conditions; no automatic L2 or full-cold timing admission; missing worker context-switch/fault accounting","natural_yield_winner":Value::Null,"total_index_calculus_runtime_ms":Value::Null});
     write(output, &summary)
+}
+
+#[test]
+fn passed_preflight_does_not_mislabel_docker_failure() {
+    let quiet = json!({"preflight":{"quiet":true},"eviction":{"failed_user_threads":0}});
+    let refused = json!({"preflight":{"quiet":false},"eviction":{"failed_user_threads":4}});
+    assert_eq!(
+        unadmitted_status(true, true, false, Some(&quiet)),
+        "LAUNCH_FAILED_NO_AUDIT"
+    );
+    assert_eq!(
+        unadmitted_status(true, false, false, Some(&refused)),
+        "PREFLIGHT_REFUSED_NO_WORKER"
+    );
+    assert_eq!(
+        unadmitted_status(true, false, false, Some(&quiet)),
+        "FAILED_NO_AUDIT"
+    );
+    assert_eq!(
+        unadmitted_status(true, false, true, Some(&refused)),
+        "FAILED_NO_AUDIT"
+    );
+    assert_eq!(
+        unadmitted_status(false, false, false, None),
+        "NOT_ATTEMPTED"
+    );
 }
 
 #[test]
