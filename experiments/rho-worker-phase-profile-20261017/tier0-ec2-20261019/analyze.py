@@ -22,7 +22,7 @@ PAIR_FIELDS = {
     'dp_bits', 'step_cap', 'checkin_every',
 }
 NOISE_POLICY = {
-    'allowed_local_interrupt_sources': ['LOC', 'IWI', 'RES', 'CAL', 'TLB'],
+    'local_interrupt_classification': 'nonnumeric_proc_interrupt_label',
     'max_local_interrupts_per_second': 5,
     'max_local_interrupts_fixed': 10,
     'max_cpu_pressure_usec': 1000,
@@ -65,10 +65,10 @@ def check_noise(row):
             if delta < 0:
                 problems.append('interrupt counter reset')
             source_total += delta
-            if source in NOISE_POLICY['allowed_local_interrupt_sources']:
-                local += delta
-            else:
+            if source.isdigit():
                 external += delta
+            else:
+                local += delta
         if source_total != after['interrupts'][cpu] - before['interrupts'][cpu]:
             problems.append('interrupt source sum mismatch')
     if external > NOISE_POLICY['max_external_interrupts'] or local > local_limit:

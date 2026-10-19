@@ -82,6 +82,16 @@ Rust output removes the Python wrapper from the measured cgroup. Every
 counter remains in the arm ledger, and the independent auditor recomputes
 the limits from raw before/after values.
 
+The first full direct-output dispatch was stopped after 19 arms and 9 pairs;
+the [complete partial archive](full-r3-aborted.tar.gz) is SHA-256
+`2c999e38d98919e516fdeece34c91dfaf3c959e0c0e80e93536db1dad030a29b`.
+Its eighth arm counted one `MCP` event on each logical CPU and was marked
+invalid by the listed-source rule; no numeric device IRQ changed. This
+partial run has no aggregate. The next frozen policy classifies numeric
+`/proc/interrupts` labels as device IRQs and named labels as local
+architectural counters, with the same local-count and pressure bounds. It
+retains every source delta and still requires zero numeric device IRQs.
+
 The revised [source archive](source-r3.tar.gz) was generated twice with the
 same SHA-256 `e369360087a53f44362043ce6f10d5a884f07da09142c0387c70a05708aa5c72`.
 Its rebuilt binary SHA-256 is

@@ -54,7 +54,7 @@ def main():
     }
     if direct:
         manifest['noise_gate'] = {
-            'allowed_local_interrupt_sources': ['LOC', 'IWI', 'RES', 'CAL', 'TLB'],
+            'local_interrupt_classification': 'nonnumeric_proc_interrupt_label',
             'max_local_interrupts_per_second': 5,
             'max_local_interrupts_fixed': 10,
             'max_cpu_pressure_usec': 1000,
