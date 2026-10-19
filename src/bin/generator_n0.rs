@@ -81,7 +81,11 @@ fn manifest(root: &str) -> HashMap<String, String> {
 
 type Key = (u64, u64, u64, u64, u64);
 fn curve_key(cs: &Value) -> Key {
-    let u = |k: &str| cs[k].as_u64().unwrap_or_else(|| die(&format!("curve_spec.{k}")));
+    let u = |k: &str| {
+        cs[k]
+            .as_u64()
+            .unwrap_or_else(|| die(&format!("curve_spec.{k}")))
+    };
     (u("p"), u("a"), u("b"), u("gx"), u("gy"))
 }
 fn key_str(k: &Key) -> String {
@@ -91,7 +95,11 @@ fn key_str(k: &Key) -> String {
 // ---------------------------------------------------------------- census
 
 fn census(argv: &[String]) {
-    let get = |k: &str| argv.iter().position(|a| a == k).and_then(|i| argv.get(i + 1));
+    let get = |k: &str| {
+        argv.iter()
+            .position(|a| a == k)
+            .and_then(|i| argv.get(i + 1))
+    };
     let root = get("--root").map_or(DEFAULT_ROOT, |s| s.as_str());
     let out = get("--out").unwrap_or_else(|| die("census needs --out"));
     let man = manifest(root);
@@ -200,7 +208,10 @@ fn load(root: &str, n0: &str) -> Vec<W> {
     for r in doc["rows"].as_array().unwrap() {
         wmap.insert(
             r["key"].as_str().unwrap().into(),
-            (r["n0_over_r_m2"].as_f64().unwrap(), r["h"].as_u64().unwrap()),
+            (
+                r["n0_over_r_m2"].as_f64().unwrap(),
+                r["h"].as_u64().unwrap(),
+            ),
         );
     }
     let man = manifest(root);
@@ -344,7 +355,11 @@ fn contrast(
 }
 
 fn regress(argv: &[String]) {
-    let get = |k: &str| argv.iter().position(|a| a == k).and_then(|i| argv.get(i + 1));
+    let get = |k: &str| {
+        argv.iter()
+            .position(|a| a == k)
+            .and_then(|i| argv.get(i + 1))
+    };
     let root = get("--root").map_or(DEFAULT_ROOT, |s| s.as_str());
     let n0 = get("--n0").unwrap_or_else(|| die("regress needs --n0"));
     let out = get("--out").unwrap_or_else(|| die("regress needs --out"));
@@ -361,22 +376,39 @@ fn regress(argv: &[String]) {
     }
     let cl: Vec<&Vec<usize>> = clusters.values().collect();
     let floor: Vec<u64> = (0..6)
-        .map(|c| ws.iter().filter(|w| w.class == c).map(|w| w.level).max().unwrap())
+        .map(|c| {
+            ws.iter()
+                .filter(|w| w.class == c)
+                .map(|w| w.level)
+                .max()
+                .unwrap()
+        })
         .collect();
 
     // G1: the point estimates and the cluster bootstrap. Groups: 0 for
     // none, class for class fixed effects, the draw index for curve ones.
     let view = |sel: &[usize], g: &dyn Fn(usize, &W) -> usize| -> Vec<(usize, usize)> {
-        sel.iter().enumerate().map(|(pos, &i)| (i, g(pos, &ws[i]))).collect()
+        sel.iter()
+            .enumerate()
+            .map(|(pos, &i)| (i, g(pos, &ws[i])))
+            .collect()
     };
     let est = |sel: &[usize], draws: &[usize]| -> [f64; 4] {
         let mk = |g: &dyn Fn(usize, &W) -> usize| -> Vec<(&W, usize)> {
-            view(sel, g).into_iter().map(|(i, gg)| (&ws[i], gg)).collect()
+            view(sel, g)
+                .into_iter()
+                .map(|(i, gg)| (&ws[i], gg))
+                .collect()
         };
         let none = mk(&|_, _| 0);
         let byclass = mk(&|_, w| w.class);
         let bycurve = mk(&|pos, _| draws[pos]);
-        [ols(&none), slope(&none, false), slope(&byclass, true), slope(&bycurve, true)]
+        [
+            ols(&none),
+            slope(&none, false),
+            slope(&byclass, true),
+            slope(&bycurve, true),
+        ]
     };
     let all: Vec<usize> = (0..ws.len()).collect();
     let draws: Vec<usize> = all
@@ -474,9 +506,15 @@ fn regress(argv: &[String]) {
                 }
             }
         }
-        let q = |v: &Vec<f64>, x: f64| if v.is_empty() { f64::NAN } else { quantile(&mut v.clone(), x) };
+        let q = |v: &Vec<f64>, x: f64| {
+            if v.is_empty() {
+                f64::NAN
+            } else {
+                quantile(&mut v.clone(), x)
+            }
+        };
         let explained = raw.zip(adj).map(|(r, a)| 1.0 - a / r);
-        let testable = br.len() > 0 && !(q(&br, 0.025) <= 0.0 && q(&br, 0.975) >= 0.0);
+        let testable = !br.is_empty() && !(q(&br, 0.025) <= 0.0 && q(&br, 0.975) >= 0.0);
         g4.push(json!({
             "set": name, "classes": set.iter().map(|&c| CLASSES[c].0).collect::<Vec<_>>(),
             "c_raw": raw, "c_raw_ci95": [q(&br, 0.025), q(&br, 0.975)],
@@ -517,7 +555,14 @@ fn regress(argv: &[String]) {
         for w in &ws {
             s.push_str(&format!(
                 "{},{},{},{},{},{:.9e},{},{},{:.9e}\n",
-                CLASSES[w.class].0, w.vertex, w.model, w.level, w.h, w.w, w.rel, w.tries,
+                CLASSES[w.class].0,
+                w.vertex,
+                w.model,
+                w.level,
+                w.h,
+                w.w,
+                w.rel,
+                w.tries,
                 w.rel / w.tries
             ));
         }
