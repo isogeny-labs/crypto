@@ -2373,7 +2373,9 @@ impl Cell2 {
 /// committed p₁ rows of the first run.
 fn group_of(file: &str) -> &str {
     match file.get(..3) {
-        Some(g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-")) => &g[..2],
+        Some(
+            g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-" | "L1-" | "L2-"),
+        ) => &g[..2],
         _ => "p1",
     }
 }
@@ -3260,6 +3262,254 @@ fn analyze4(dir: &str) {
     }
 }
 
+/// Amendment 5: the m = 4 longer-budget cells L1 (A0, t = 4) and L2 (A11,
+/// t = 5), rules R1 and R2, σ and κ for A0 and A11 at m = 4 with every
+/// completed cell (F4 through its C1 replays, C2, L1, L2), and the
+/// predictions scorecard.
+fn of_arm<'a>(rs: &[&'a Value], a: &str) -> Vec<&'a Value> {
+    rs.iter().copied().filter(|r| r["arm"] == a).collect()
+}
+
+fn analyze5(dir: &str) {
+    let rows = read_rows(dir);
+    let group = |g: &'static str| -> Vec<&Value> {
+        rows.iter()
+            .filter(|(f, _)| group_of(f) == g)
+            .map(|(_, r)| r)
+            .collect()
+    };
+    let (c1, c2, l1, l2) = (group("C1"), group("C2"), group("L1"), group("L2"));
+    let f4 = |a: &str| -> Vec<&Value> {
+        c1.iter()
+            .copied()
+            .filter(|r| {
+                r["arm"] == a
+                    && r["m"] == 4
+                    && r["replay_of"]
+                        .as_str()
+                        .is_some_and(|f| f.starts_with("F4-"))
+            })
+            .collect()
+    };
+    println!("Factor-base designs, Amendment 5 (L1, L2): rows from {dir}");
+    println!("(field_ops = F_p multiplications in F4's row reduction; κ = least-squares slope of log₂ of a cell's mean");
+    println!(" field_ops on b; σ = least-squares slope of D on b. F4's cells enter through their C1 replays, whose");
+    println!(" traces matched. A cell counts only if both of its systems are ok. peak_rss_kb is descriptive only.)");
+
+    let show_rows = |title: &str, rs: &[&Value]| {
+        println!();
+        println!("════ {title}");
+        if rs.is_empty() {
+            println!("  no rows");
+        }
+        for r in rs {
+            println!(
+                "  {} t={} target {}: status {}, D {}, degree_reached {}, max_cols {}, field_ops {}, time {:.1} s, peak_rss_kb {}, ulimit_v_kb {}, budget {} s{}",
+                r["arm"].as_str().unwrap_or("?"),
+                r["t"],
+                r["target"],
+                r["status"].as_str().unwrap_or("?"),
+                r["D"],
+                r["degree_reached"],
+                r["max_cols"],
+                r["field_ops"],
+                r["time"].as_f64().unwrap_or(f64::NAN),
+                r["peak_rss_kb"],
+                r["ulimit_v_kb"],
+                r["budget_s"],
+                r["failure_reason"]
+                    .as_str()
+                    .map(|s| format!(" ({s})"))
+                    .unwrap_or_default()
+            );
+        }
+    };
+    show_rows("L1: A0 m = 4, t = 4, p1, budget 14400 s + grace 600 s", &l1);
+
+    // L1 and C2 must be the same systems.
+    let a0_c2 = of_arm(&c2, "A0");
+    let same: Vec<bool> = l1
+        .iter()
+        .map(|r| {
+            a0_c2.iter().any(|c| {
+                c["target"] == r["target"]
+                    && [
+                        "cell_seed",
+                        "target_seed",
+                        "n_vars",
+                        "n_eqs",
+                        "planted_x",
+                        "x_r",
+                        "curve",
+                        "set",
+                    ]
+                    .iter()
+                    .all(|k| c[*k] == r[*k])
+            })
+        })
+        .collect();
+    println!(
+        "  identity with C2's A0 systems (cell_seed, target_seed, n_vars, n_eqs, planted_x, x_r, curve, set): {} of {} L1 systems match",
+        same.iter().filter(|x| **x).count(),
+        l1.len()
+    );
+    for c in &a0_c2 {
+        println!(
+            "  C2 (prior attempt) A0 t=4 target {}: {} under ulimit -v {}, {:.1} s",
+            c["target"],
+            c["status"].as_str().unwrap_or("?"),
+            c["ulimit_v_kb"],
+            c["time"].as_f64().unwrap_or(f64::NAN)
+        );
+    }
+    show_rows(
+        "L2: A11 m = 4, t = 5, p1, budget 14400 s + grace 600 s",
+        &l2,
+    );
+
+    let cell_done = |rs: &[&Value]| -> bool {
+        rs.len() == 2
+            && rs
+                .iter()
+                .all(|r| r["status"] == "ok" && r["field_ops"].is_u64())
+    };
+    let l1_done = cell_done(&l1);
+    let l2_done = cell_done(&l2);
+    let mean_ops = |rs: &[&Value]| {
+        rs.iter()
+            .map(|r| r["field_ops"].as_u64().unwrap_or(0) as f64)
+            .sum::<f64>()
+            / rs.len() as f64
+    };
+
+    // Series. A0: F4 + L1 (L1 re-measures C2's A0 systems under the raised
+    // limits, so C2's aborted rows do not enter). A11: F4 + C2 + L2.
+    let a0: Vec<&Value> = f4("A0").into_iter().chain(l1.iter().copied()).collect();
+    let a11: Vec<&Value> = f4("A11")
+        .into_iter()
+        .chain(of_arm(&c2, "A11"))
+        .chain(l2.iter().copied())
+        .collect();
+    println!();
+    println!("════ σ and κ at m = 4, p1");
+    let (n0, s0, k0) = show4(
+        "A0 m = 4 p1 (F4 via C1, L1's t = 4 cell)",
+        4,
+        &cells4(a0.into_iter()),
+    );
+    let (n11, s11, k11) = show4(
+        "A11 m = 4 p1 (F4 via C1, C2's t = 4 cell, L2's t = 5 cell)",
+        4,
+        &cells4(a11.into_iter()),
+    );
+
+    println!();
+    println!("════ R1: does A11's constant factor survive at m = 4, t = 4?");
+    let a11_t4 = of_arm(&c2, "A11");
+    if l1_done && cell_done(&a11_t4) {
+        let (x, y) = (mean_ops(&a11_t4), mean_ops(&l1));
+        println!(
+            "  A11 t = 4 (C2) mean field_ops {x:.0} (log₂ {:.3}); A0 t = 4 (L1) mean field_ops {y:.0} (log₂ {:.3})",
+            x.log2(),
+            y.log2()
+        );
+        println!(
+            "  R1: {}",
+            if x < y {
+                "SURVIVES (A11 below A0)"
+            } else {
+                "CROSSED (A11 not below A0)"
+            }
+        );
+    } else if l1.len() < 2 {
+        println!("  R1: NOT DECIDED (L1 has {} of 2 rows)", l1.len());
+    } else {
+        println!("  R1: A0 NOT MEASURABLE AT t = 4 WITHIN 14.5 GB AND 4 h (limit and partial values in L1 above); no cost comparison");
+    }
+
+    println!();
+    println!("════ R2: A11 at m = 4, t = 5");
+    if l2_done {
+        println!(
+            "  L2 completed: the 4-cell series gives κ = {} ({}), σ = {} ({})",
+            k11.map_or("-".into(), |x| format!("{x:.3}")),
+            kappa_verdict(n11, k11, 4),
+            s11.map_or("-".into(), |x| format!("{x:.4}")),
+            verdict(n11, s11)
+        );
+    } else if l2.len() < 2 {
+        println!("  R2: NOT DECIDED (L2 has {} of 2 rows)", l2.len());
+    } else {
+        println!(
+            "  L2 hit a limit (rows above); the {n11}-cell verdicts stand: κ = {} ({}), σ = {} ({})",
+            k11.map_or("-".into(), |x| format!("{x:.3}")),
+            kappa_verdict(n11, k11, 4),
+            s11.map_or("-".into(), |x| format!("{x:.4}")),
+            verdict(n11, s11)
+        );
+    }
+    println!(
+        "  A0 m = 4: {n0} completed cells: κ = {} ({}), σ = {} ({})",
+        k0.map_or("-".into(), |x| format!("{x:.3}")),
+        kappa_verdict(n0, k0, 4),
+        s0.map_or("-".into(), |x| format!("{x:.4}")),
+        verdict(n0, s0)
+    );
+
+    println!();
+    println!("════ Predictions scorecard (Amendment 5)");
+    let limit = |rs: &[&Value]| -> String {
+        let mut v: Vec<String> = rs
+            .iter()
+            .filter(|r| r["status"] != "ok")
+            .map(|r| {
+                let why = r["failure_reason"].as_str().unwrap_or("");
+                if why.contains("memory") {
+                    "memory".to_string()
+                } else {
+                    r["status"].as_str().unwrap_or("?").to_string()
+                }
+            })
+            .collect();
+        v.dedup();
+        v.join(",")
+    };
+    let l1_mem = l1.iter().any(|r| {
+        r["failure_reason"]
+            .as_str()
+            .is_some_and(|s| s.contains("memory"))
+    });
+    println!(
+        "  L1: A0 aborts for memory again: completed {l1_done}, limit {}  →  {}",
+        if l1_done { "none".into() } else { limit(&l1) },
+        if l1.len() < 2 {
+            "not decided"
+        } else if !l1_done && l1_mem {
+            "held"
+        } else {
+            "did not hold"
+        }
+    );
+    let l2_mem = l2.iter().any(|r| {
+        r["failure_reason"]
+            .as_str()
+            .is_some_and(|s| s.contains("memory"))
+    });
+    println!(
+        "  L2: A11 does not complete within 14.5 GB: completed {l2_done}, limit {}  →  {}",
+        if l2_done { "none".into() } else { limit(&l2) },
+        if l2.len() < 2 {
+            "not decided"
+        } else if l2_done {
+            "did not hold"
+        } else if l2_mem {
+            "held"
+        } else {
+            "held in part (did not complete, but the limit was time, not memory)"
+        }
+    );
+}
+
 // ── Arguments ──────────────────────────────────────────────────────
 
 fn flag(args: &[String], name: &str) -> Option<String> {
@@ -3324,7 +3574,9 @@ fn main() {
         }
         "analyze" => {
             let dir = args.get(1).expect("a runs directory");
-            if args.iter().any(|a| a == "--amendment4") {
+            if args.iter().any(|a| a == "--amendment5") {
+                analyze5(dir);
+            } else if args.iter().any(|a| a == "--amendment4") {
                 analyze4(dir);
             } else if args.iter().any(|a| a == "--amendment2") {
                 analyze2(dir);
