@@ -35,3 +35,9 @@ The ignored study exec workspace permits sequential cards to retain raw
 outputs while the source checkout stays clean. Compact evidence is added
 explicitly after audit; source snapshots and raw binary copies are not
 silently staged into Git. See the study native-phase-20261019 protocol.
+
+The v2 selector-witness control additionally replays each declared domain
+index and Frobenius phase with independent polynomial-word arithmetic. A
+wall-censored control now emits a typed UNKNOWN_CONTROL_WALL_CAP audit and
+still fails its positive gate. The original free-selector control is retained
+as censored; the fully specified witness is a distinct workload.

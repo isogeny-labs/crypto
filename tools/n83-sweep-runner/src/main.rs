@@ -300,6 +300,11 @@ fn audit(dir: &Path) -> R<Value> {
     )?;
     let raw = fs::read_to_string(dir.join("stderr.log"))?;
     if cfg["columns"] == 0 {
+        if out["wall_censored"] == true {
+            return Ok(
+                json!({"schema":"n83.native-audit/v1","status":"UNKNOWN_CONTROL_WALL_CAP","terminal_counters":null,"outer_wall_ms":out["outer_wall_ms"],"selected_best_total_runtime":null}),
+            );
+        }
         let result: Value = serde_json::from_slice(&fs::read(dir.join("stdout.log"))?)?;
         let panel = Path::new(text(&cfg, "panel")?);
         let fixture_bytes = fs::read(panel.join("fixture.json"))?;
@@ -324,6 +329,46 @@ fn audit(dir: &Path) -> R<Value> {
                 && result["fixture_blake3"] == blake3::hash(&fixture_bytes).to_hex().as_str(),
             "positive control not verified",
         )?;
+        if cfg["control_variant"] == "fixed_coordinates_representatives_and_phases" {
+            let input = read(panel.join("domains.json"))?;
+            let assignments = result["selector_assignments"]
+                .as_array()
+                .ok_or("missing selector witness")?;
+            require(
+                assignments.len() == 5 && result["control_variant"] == cfg["control_variant"],
+                "selector witness variant differs",
+            )?;
+            for (i, a) in assignments.iter().enumerate() {
+                let source = if i < 3 { "small_reps" } else { "residual_reps" };
+                let mut reps = input[source]
+                    .as_array()
+                    .ok_or("domain representatives")?
+                    .iter()
+                    .map(|r| decimal(r, 1 << 83))
+                    .collect::<R<Vec<_>>>()?;
+                reps.sort_unstable();
+                let index = number(a, "index")? as usize;
+                require(
+                    index < reps.len() && a["domain_size"] == reps.len(),
+                    "selector index/size differs",
+                )?;
+                let representative = decimal(&a["representative"], 1 << 83)?;
+                require(
+                    representative == reps[index],
+                    "selector representative differs",
+                )?;
+                let phase = number(a, "phase")?;
+                require(phase < 83, "phase outside83")?;
+                let mut x = representative;
+                for _ in 0..phase {
+                    x = mul(x, x);
+                }
+                require(
+                    x == decimal(&input["ordered_xs"][i], 1 << 83)?,
+                    "independent selector/phase replay mismatch",
+                )?;
+            }
+        }
         require(
             number(&result, "conflicts")? <= number(&cfg, "conflicts")?
                 && out["exit_code"] == 0
@@ -539,7 +584,7 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         std::process::id(),
         SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos()
     );
-    let cfg = json!({"schema":"n83.native-run-config/v1","columns":columns,"conflicts":conflicts,"wall_seconds":wall,"panel":panel,"fixtures":fixtures,"worker":worker,"image":image,"source_commit":commit,"panel_blake3":inventory(&panel)?,"fixtures_blake3":inventory(&fixtures)?,"source_blake3":inventory(&source)?,"worker_blake3":hash(&worker)?,"runner_blake3":hash(std::env::current_exe()?)?,"spec_blake3":hash(spec)?,"container_name":name});
+    let cfg = json!({"schema":"n83.native-run-config/v1","control_variant":s["control_variant"],"columns":columns,"conflicts":conflicts,"wall_seconds":wall,"panel":panel,"fixtures":fixtures,"worker":worker,"image":image,"source_commit":commit,"panel_blake3":inventory(&panel)?,"fixtures_blake3":inventory(&fixtures)?,"source_blake3":inventory(&source)?,"worker_blake3":hash(&worker)?,"runner_blake3":hash(std::env::current_exe()?)?,"spec_blake3":hash(spec)?,"container_name":name});
     write(dir.join("config.json"), &cfg)?;
     write(
         dir.join("custody.json"),
@@ -676,6 +721,10 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
     };
     write(dir.join("audit.json"), &a)?;
     println!("{}", a);
+    require(
+        columns != 0 || a["status"] == "PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM",
+        "positive-control gate not met",
+    )?;
     Ok(())
 }
 fn main() -> R<()> {
@@ -738,7 +787,7 @@ fn main() -> R<()> {
             let worker = fs::canonicalize(&a[5])?;
             write(
                 &a[11],
-                &json!({"checkout":checkout,"panel":panel,"fixtures":fixtures,"worker":worker,"image":a[6],"columns":a[7].parse::<u64>()?,"conflicts":a[8].parse::<u64>()?,"wall_seconds":a[9].parse::<u64>()?,"protocol_sha256":a[10],"source_commit":String::from_utf8(commit.stdout)?.trim(),"worker_blake3":hash(&worker)?,"runner_blake3":hash(std::env::current_exe()?)?,"panel_blake3":inventory(&panel)?,"fixtures_blake3":inventory(&fixtures)?}),
+                &json!({"control_variant":if a[7]=="0" {"fixed_coordinates_representatives_and_phases"}else{"retained_natural_query"},"checkout":checkout,"panel":panel,"fixtures":fixtures,"worker":worker,"image":a[6],"columns":a[7].parse::<u64>()?,"conflicts":a[8].parse::<u64>()?,"wall_seconds":a[9].parse::<u64>()?,"protocol_sha256":a[10],"source_commit":String::from_utf8(commit.stdout)?.trim(),"worker_blake3":hash(&worker)?,"runner_blake3":hash(std::env::current_exe()?)?,"panel_blake3":inventory(&panel)?,"fixtures_blake3":inventory(&fixtures)?}),
             )
         }
         Some("run") if a.len() == 4 => run(Path::new(&a[2]), Path::new(&a[3])),
