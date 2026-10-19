@@ -33,3 +33,8 @@ three modules. `sources.sha256` binds the project sources, toolchain,
 manifest and native counterexample sources. There is no `sorryAx` in the
 successful final axiom audit. See the adjacent proof map for exact scope and
 open concrete bridges.
+
+`library-validation.json` and `library-release.log` record the successful
+required whole-library release suite on the exact tested source tree. This
+local validation does not close the empirical/proof bridges or replace
+final-head GitHub CI.
