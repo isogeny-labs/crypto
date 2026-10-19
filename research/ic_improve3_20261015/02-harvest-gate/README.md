@@ -8,7 +8,7 @@ This is round 3, item 02 ([`../RULES.md`](../RULES.md)). The protocol is [`PROTO
 
 ## Verdict
 
-**Historical result:** C advanced against G0 under the original protocol. **R10 re-rate:** production regresses versus harvest off at (17,9) m2 (CPU 0.872 [0.771, 0.988], word operations 0.765); see [`pinned ledger`](../../../ic_tool_program/ledger/r10-20261019/README.md).
+**Historical result:** C advanced against G0 under the original protocol. **R10 re-rate:** production regresses versus harvest off at (17,9) m2 (CPU 0.872 [0.771, 0.988], word operations 0.765); see [`pinned ledger`](../../ic_tool_program/ledger/r10-20261019/README.md).
 
 - **The bar is met.**
   - Under the original G0 comparator no cell regressed. R10 identifies a regression at (17,9) m2 when compared with harvest off.
