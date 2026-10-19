@@ -16,7 +16,8 @@ of the existing `taskq/deploy/aws` Redis/managed-worker stack.
 - Karpenter 1.15.0, two replicas on system nodes, scoped controller IAM,
   node access entry, SQS interruption queue and EventBridge interruption rules.
 - `cpu-spot` NodePool: x86-64 Linux, Spot only, C/M/R generation 6+, instances
-  with 4/8/16/32 vCPUs, aggregate limits of 64 vCPUs and 256 GiB RAM.
+  with 8/16/32 vCPUs, excluding Flex families, aggregate limits of 64 vCPUs
+  and 256 GiB RAM. CPU 0's whole physical core is reserved for housekeeping.
   No GPU or automatic On-Demand fallback is enabled.
 - VPC CNI with network-policy support, CoreDNS, kube-proxy, metrics-server,
   EBS CSI, an encrypted `gp3` StorageClass and seven-day control-plane logs.
@@ -68,11 +69,14 @@ expiration and drift replacement are disabled to protect long running jobs.
 
 ## Submit from the harness
 
+For the versioned request/result schemas, portable AWS launcher and GitHub
+Actions trigger, see [the end-to-end harness contract](HARNESS.md).
+
 ### Native MCP connector
 
 `mcp/` is a Rust stdio MCP server for this deployment. It uses the same Job
-manifest as the shell launcher and exposes six tools: `isolab_k8s_overview`,
-`isolab_k8s_run`, `isolab_k8s_status`, `isolab_k8s_logs`, `isolab_k8s_cancel`,
+manifest as the shell launcher and exposes seven tools: `isolab_k8s_overview`,
+`isolab_k8s_run`, `isolab_k8s_benchmark`, `isolab_k8s_status`, `isolab_k8s_logs`, `isolab_k8s_cancel`,
 and `isolab_k8s_results`. Results lists S3 keys for each attempt; retrieve their
 contents with `aws s3 cp`. The server never launches a workload on the harness
 host. It requires Bash, GNU timeout, jq, kubectl and AWS CLI on PATH, a reachable
@@ -82,9 +86,11 @@ From this deployment directory, install and register on the current host:
 
 ```sh
 ./install-mcp.sh /home/ec2-user/ops/eks-isolab/mcp
+mkdir -p /home/ec2-user/ops/eks-isolab/tmp
 codex mcp add isolab-eks \
   --env KUBECONFIG=/home/ec2-user/ops/eks-isolab/kubeconfig \
   --env ISOLAB_KUBE_CONTEXT=i-01f85a6c905181498@isolab.us-east-2.eksctl.io \
+  --env TMPDIR=/home/ec2-user/ops/eks-isolab/tmp \
   --env PATH=/home/ec2-user/.local/bin:/usr/local/bin:/usr/bin:/bin \
   -- /home/ec2-user/ops/eks-isolab/mcp/isolab-eks-mcp
 ```
@@ -142,7 +148,7 @@ The thin shell launcher can be called by Codex, another harness, or a CI runner:
 ```sh
 export KUBECONFIG=/home/ec2-user/ops/eks-isolab/kubeconfig
 ./submit-job --image YOUR_IMAGE_DIGEST --cpu 6 --memory 12Gi --seconds 14400 \
-  -- /usr/local/bin/ecbench run --spec /inputs/spec.json --out /work/results --cpus inherit
+  -- /usr/local/bin/ecbench run --spec /inputs/spec.json --out /work/results --cpus auto
 kubectl -n isolab get jobs,pods
 kubectl -n isolab logs -f job/JOB_NAME
 kubectl -n isolab delete job JOB_NAME    # cancel a run
@@ -162,7 +168,7 @@ Each job gets even integer CPU requests equal to limits, equal memory requests
 and limits, whole-core static CPU allocation and pod anti-affinity to keep lab
 jobs on separate nodes. DaemonSets still run on these nodes. Jobs use UID/GID
 1000, a read-only root filesystem and writable `/work` and `/tmp`. Set images up
-for those constraints. CPU values are 2..30; the largest node is 32 vCPUs and
+for those constraints. CPU values are 2..28; the largest node is 32 vCPUs and
 system services reserve capacity. Memory requests must fit a permitted node.
 
 `ISOLAB_OUTPUT_DIR=/work/results` is temporary storage; the command must create
@@ -195,11 +201,115 @@ binary's Cargo fingerprint has no custom Rust flags.
 
 No retries occur by default; `--retries N` permits up to N Kubernetes retries.
 Every retry has a separate Pod UID/result prefix. The Job deadline includes time
-waiting for capacity. Finished Jobs/logs are retained for one day, while S3
-results remain until deliberately removed. Persist important logs/results before
-the pod exits. Namespace Jobs quota includes finished Jobs until TTL cleanup.
+waiting for capacity. Finished Job objects are retained for one day. Pods and
+their logs can disappear when Karpenter removes the empty worker after two
+minutes; S3 results remain until deliberately removed. Persist important
+logs/results before the pod exits. Namespace Jobs quota includes finished Jobs
+until TTL cleanup.
 
 ## Iso Lab fidelity and integration boundary
+
+### L2 benchmark jobs
+
+Use `isolab_k8s_benchmark` for crypto measurements:
+
+```json
+{"job_name":"crypto-l2-001","seconds":900,"instance_type":"c8i.2xlarge"}
+```
+
+For a worker with **no SMT/hyperthreading**, use the existing instance selector:
+
+```json
+{"job_name":"crypto-nosmt-001","seconds":900,"instance_type":"c8a.2xlarge"}
+```
+
+The following x86-64 sizes report eight physical cores and one thread per core
+in the regional EC2 API. They fit the current pool and the existing amd64 image:
+
+| Instance sizes | Physical cores / vCPUs | Memory |
+| --- | --- | --- |
+| `c7a.2xlarge`, `c8a.2xlarge` | 8 / 8 | 16 GiB |
+| `m7a.2xlarge`, `m8a.2xlarge` | 8 / 8 | 32 GiB |
+| `r7a.2xlarge`, `r8a.2xlarge` | 8 / 8 | 64 GiB |
+
+All six sizes are offered in us-east-2a/b/c as checked on 2026-10-19; this does
+not guarantee available Spot capacity. `c8a.4xlarge` supplies 16 physical cores
+and 32 GiB when a larger job needs them. AWS also explicitly documents
+[C8a's one-vCPU-per-physical-core design](https://aws.amazon.com/ec2/instance-types/c8a/).
+An unpinned request still permits SMT instances; pin the type when no SMT is a
+requirement. The private lab results retain the actual topology, L2 audit and
+S3 checks; use the results tool to locate the desired Job's artifacts.
+
+An EKS managed node group can instead use a custom EC2 launch template with
+`CpuOptions.ThreadsPerCore: 1`. For example, a `c8i.4xlarge` template can set
+`CpuOptions: {CoreCount: 8, ThreadsPerCore: 1}` to expose eight logical CPUs
+instead of its default sixteen. This is an alternative for selecting an Intel
+host without SMT; it is documented here, not provisioned. See
+[EKS custom launch templates](https://docs.aws.amazon.com/eks/latest/userguide/launch-templates.html)
+and [EC2 CPU options](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-specify-cpu-options.html).
+The installed Karpenter CRD exposes only nested virtualization under cpuOptions,
+not threadsPerCore; do not patch Karpenter-generated launch templates. A managed
+group would need separate scaling and integration with the shared capacity
+budget. For these Linux instances, disabling SMT does not lower the instance
+price or EC2 vCPU quota accounting, per [AWS CPU-option pricing and limits](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-optimize-cpu.html).
+
+Omitting `spec` uses `l2-validation.json`: the registered public 20-bit fixture,
+nine arms, two targets, one warmup and five measured rounds. Supply an ecbench
+spec object to measure another workload. It must require L2, include a reference
+and matching A/A control, and use at least five rounds and one warmup. The
+default fixture validates isolation and correctness; it establishes no scaling
+or algorithm speed claim. Larger workloads need a suitable timeout.
+The optional `instance_type` pins hardware within the existing Spot pool;
+omitting it lets Karpenter choose a permitted instance. There is no fallback
+to another type when a specific type is requested and unavailable.
+
+The tool requests four exclusive vCPUs, selects bootstrap profile `v4`, and runs
+`run-ecbench` with `--cpus auto`. One whole physical core measures the child;
+the remaining allocated CPUs accommodate the parent shell and harness. `--cpus inherit` would
+reserve the entire pod allocation and leave those processes nowhere to go.
+The pod remains restricted and unprivileged. Each lab job has its own node.
+
+Worker bootstrap confines OS services to CPU 0's physical core, reserves it with
+Kubernetes' static/full-core/strict CPU manager, and routes movable IRQs and
+unbound workqueues to housekeeping. This includes AL2023's separate
+`runtime.slice` for kubelet/containerd. It discovers sibling topology at boot.
+The kernel also boots with managed-IRQ isolation, full tickless
+CPUs and offloaded RCU callbacks on workload CPUs. Fresh workers reboot once
+before joining; a persistent service checks the kernel arguments and reapplies
+runtime affinity before every kubelet start. Kubelet refuses to start if this
+service fails. The AL2023 reserved-cgroup defaults
+are cleared because they conflict with `reservedSystemCPUs`; pod resource
+accounting and reservations remain enforced. DaemonSets share the remaining
+unallocated CPUs. No measurement thresholds or native grader rules change.
+Scheduler-domain load balancing remains enabled so ordinary multithreaded
+jobs can use their allocated CPUs. Each measured ecbench child is separately
+pinned by the native harness. Live validation and retained private failure
+artifacts include 108/108 L2 records on the final v4 profile, complete S3 replay, and
+4,405 passing library tests on a separate multithreaded job.
+
+After a 60-second startup settle, the native quiet preflight must pass. Every
+record, including warmups, must earn L2 or L3, and all measured executions must
+replay identically. The tool also records an admitted A/A comparison. Any
+below-L2 record fails the Job with exit 42; missing admitted controls fail with
+43. All available raw records, audits, rejection reasons, exit status and a
+SHA256SUMS manifest upload to the Pod UID's S3 prefix, including on failure.
+There are no automatic retries. An interrupted node can still lose unuploaded
+data; missing artifacts never count as a successful benchmark.
+
+L2 is earned by the recorded execution, not guaranteed by a node label. Spot
+VMs can experience host contention or interruptions; preserve and investigate
+rejections instead of rerunning until green. Compare methods within a session
+on the same host, retain A/A intervals, and do not pool wall times across
+different instance types. This does not establish bare-metal L3 or the legacy
+Iso Lab strict tier.
+
+Configuration references: [Kubernetes CPU policies](https://kubernetes.io/docs/tasks/administer-cluster/cpu-management-policies/),
+[reserved system CPUs](https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/),
+[AL2023 dynamic nodeadm configuration](https://docs.aws.amazon.com/eks/latest/userguide/al2023.html#al2023-nodeadm),
+[Karpenter 1.15 user data](https://karpenter.sh/v1.15/concepts/nodeclasses/#specuserdata).
+Kernel details: [Linux CPU isolation](https://www.kernel.org/doc/html/latest/admin-guide/cpu-isolation.html).
+
+### Legacy worker boundary
 
 Existing `isolab` uses NATS JetStream plus host-level workers. Its strict policy
 requires mechanisms such as host cgroup partitions, IRQ placement, hardware

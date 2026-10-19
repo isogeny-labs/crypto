@@ -27,10 +27,15 @@ fn tools() -> Vec<Value> {
     let name = json!({"type":"string","pattern":"^[a-z0-9]([-a-z0-9]*[a-z0-9])?$","maxLength":55});
     vec![
         tool("isolab_k8s_overview", "List lab Jobs and their current Kubernetes state. Workers scale from zero when Jobs arrive.", json!({}), &[], true, false),
+        tool("isolab_k8s_benchmark", "Run a native ecbench specification with four exclusive vCPUs on a worker configured for CPU isolation. Requires L2, at least five rounds, a warmup, reference and matching A/A control. Audits and replays all measured executions, rejects ANY record below L2, and uploads all artifacts (including failures) to S3. No automatic retries. Job success is an isolation/correctness check, not a speed claim.",
+            json!({"job_name":name,"spec":{"type":"object","description":"ecbench.spec/v1 specification; defaults to the supplied 20-bit validation fixture"},
+                "instance_type":{"type":"string","description":"Optional fixed EC2 type for repeatable hardware, e.g. c8i.2xlarge; must fit the existing Spot NodePool"},
+                "memory":{"type":"string","pattern":"^[1-9][0-9]*(Mi|Gi)$","default":"4Gi"},
+                "seconds":{"type":"integer","minimum":1,"maximum":9999999,"default":3600}}), &["job_name"], false, false),
         tool("isolab_k8s_run", "Submit a Job without waiting. job_name is the retry key: reusing it cannot create a second Job while the original exists. Use a digest-pinned image with UID 1000 support and an argv array; no shell is inserted. Defaults to the supplied ecbench image. Upload durable outputs to ISOLAB_RESULTS_URI.",
             json!({"job_name":name,"command":{"type":"array","items":{"type":"string"},"minItems":1,"maxItems":256},
                 "image":{"type":"string","description":"OCI image URI ending @sha256:<64 lowercase hex digits>"},
-                "cpu":{"type":"integer","minimum":2,"maximum":30,"multipleOf":2,"default":2},
+                "cpu":{"type":"integer","minimum":2,"maximum":28,"multipleOf":2,"default":2},
                 "memory":{"type":"string","pattern":"^[1-9][0-9]*(Mi|Gi)$","default":"4Gi"},
                 "seconds":{"type":"integer","minimum":1,"maximum":9999999,"default":3600},
                 "retries":{"type":"integer","minimum":0,"maximum":9,"default":0}}), &["job_name","command"], false, false),
@@ -204,7 +209,7 @@ fn submission_args(args: &Value) -> Result<Vec<String>> {
     {
         return Err("invalid image digest".into());
     }
-    let cpu = integer(args, "cpu", 2, 2, 30)?;
+    let cpu = integer(args, "cpu", 2, 2, 28)?;
     if cpu % 2 != 0 {
         return Err("cpu must be even for whole SMT cores".into());
     }
@@ -256,6 +261,62 @@ fn submission_args(args: &Value) -> Result<Vec<String>> {
     Ok(out)
 }
 
+fn benchmark_args(args: &Value) -> Result<Vec<String>> {
+    let default_spec: Value =
+        serde_json::from_str(include_str!("../../l2-validation.json")).unwrap();
+    let spec = args.get("spec").unwrap_or(&default_spec);
+    let arms = spec["arms"]
+        .as_array()
+        .ok_or("spec.arms must be an array")?;
+    let has_aa = arms.iter().any(|c| {
+        c["role"] == "control"
+            && arms.iter().any(|a| {
+                a["role"] != "control" && a["name"] != c["name"] && a["method"] == c["method"]
+            })
+    });
+    if spec["schema"] != "ecbench.spec/v1"
+        || spec["measurement"]["isolation_required"] != "L2"
+        || spec["measurement"]["rounds"].as_u64().unwrap_or(0) < 5
+        || spec["measurement"]["warmup"].as_u64().unwrap_or(0) < 1
+        || !arms.iter().any(|a| a["role"] == "reference")
+        || !has_aa
+    {
+        return Err("benchmark requires an L2 spec, >=5 rounds, >=1 warmup, reference and matching A/A control".into());
+    }
+    let mut run = args.clone();
+    run.as_object_mut().unwrap().remove("spec");
+    run.as_object_mut().unwrap().remove("instance_type");
+    run["cpu"] = json!(4);
+    run["retries"] = json!(0);
+    run["command"] = json!([
+        "bash",
+        "-c",
+        include_str!("../../run-ecbench"),
+        "isolab-ecbench",
+        serde_json::to_string(spec).unwrap()
+    ]);
+    let mut argv = submission_args(&run)?;
+    argv.splice(0..0, ["--isolation-profile".into(), "l2".into()]);
+    if args.get("instance_type").is_some() {
+        let instance = text_arg(args, "instance_type")?;
+        let (family, size) = instance.split_once('.').ok_or("invalid instance_type")?;
+        if family.is_empty()
+            || !family.as_bytes()[0].is_ascii_lowercase()
+            || !family
+                .bytes()
+                .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+            || size.is_empty()
+            || !size
+                .bytes()
+                .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit())
+        {
+            return Err("invalid instance_type".into());
+        }
+        argv.splice(0..0, ["--instance-type".into(), instance.into()]);
+    }
+    Ok(argv)
+}
+
 fn call(name: &str, args: &Value) -> Result<Value> {
     validate(name, args)?;
     match name {
@@ -274,8 +335,12 @@ fn call(name: &str, args: &Value) -> Result<Value> {
                 json!({"namespace":"isolab","node_pool":"cpu-spot","configured_vcpu_limit":64,"jobs":jobs,"guidance":GUIDANCE}),
             )
         }
-        "isolab_k8s_run" => {
-            let argv = submission_args(args)?;
+        "isolab_k8s_run" | "isolab_k8s_benchmark" => {
+            let argv = if name == "isolab_k8s_benchmark" {
+                benchmark_args(args)?
+            } else {
+                submission_args(args)?
+            };
             let dir = std::env::var_os("ISOLAB_DEPLOY_DIR")
                 .map(PathBuf::from)
                 .unwrap_or_else(|| {
@@ -522,7 +587,7 @@ mod tests {
                 .as_array()
                 .unwrap()
                 .len(),
-            6
+            7
         );
         assert_eq!(
             s.dispatch(
@@ -547,14 +612,56 @@ mod tests {
                 "'quoted'"
             ]
         );
-        for cpu in [json!(1), json!(3), json!(32), json!(2.5), json!("2")] {
+        for cpu in [
+            json!(1),
+            json!(3),
+            json!(30),
+            json!(32),
+            json!(2.5),
+            json!("2"),
+        ] {
             input["cpu"] = cpu;
             assert!(submission_args(&input).is_err());
         }
-        input["cpu"] = json!(30);
+        input["cpu"] = json!(28);
         assert!(submission_args(&input).is_ok());
         input["image"] = json!("busybox:latest");
         assert!(submission_args(&input).is_err());
+    }
+    #[test]
+    fn benchmark_requires_auditable_controls_and_keeps_spec_literal() {
+        let mut input = json!({"job_name":"l2-check"});
+        let argv = benchmark_args(&input).unwrap();
+        assert_eq!(&argv[..2], &["--isolation-profile", "l2"]);
+        input["instance_type"] = json!("c8i.2xlarge");
+        assert_eq!(
+            &benchmark_args(&input).unwrap()[..2],
+            &["--instance-type", "c8i.2xlarge"]
+        );
+        input["instance_type"] = json!("c8i.2xlarge; true");
+        assert!(benchmark_args(&input).is_err());
+        input.as_object_mut().unwrap().remove("instance_type");
+        input["spec"] = serde_json::from_str(include_str!("../../l2-validation.json")).unwrap();
+        input["spec"]["label"] = json!("$(touch /tmp/not-executed)\n'quoted'");
+        let argv = benchmark_args(&input).unwrap();
+        let decoded: Value = serde_json::from_str(argv.last().unwrap()).unwrap();
+        assert_eq!(decoded, input["spec"]);
+        input["spec"]["measurement"]["isolation_required"] = json!("L0");
+        assert!(benchmark_args(&input).is_err());
+        input["spec"]["measurement"]["isolation_required"] = json!("L2");
+        input["spec"]["measurement"]["rounds"] = json!(4);
+        assert!(benchmark_args(&input).is_err());
+        input["spec"]["measurement"]["rounds"] = json!(5);
+        input["spec"]["arms"]
+            .as_array_mut()
+            .unwrap()
+            .retain(|a| a["role"] != "control");
+        assert!(benchmark_args(&input).is_err());
+        assert!(validate(
+            "isolab_k8s_benchmark",
+            &json!({"job_name":"l2-check","retries":1})
+        )
+        .is_err());
     }
     #[test]
     fn names_cannot_be_cli_options_or_paths() {

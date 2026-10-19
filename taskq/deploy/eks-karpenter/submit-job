@@ -5,6 +5,7 @@ usage() {
   cat <<'EOF'
 Usage: submit-job --image IMAGE [--name NAME] [--cpu EVEN_INTEGER]
                   [--memory QUANTITY] [--seconds N] [--retries N]
+                  [--isolation-profile standard|l2] [--instance-type TYPE]
                   [--wait | --dry-run] -- COMMAND [ARG ...]
 
 Defaults: 2 CPUs, 4Gi memory, 3600 seconds, no retries. Set KUBECONFIG
@@ -17,11 +18,19 @@ EOF
 image=''
 name="run-$(date -u +%Y%m%d-%H%M%S)-$(od -An -N3 -tx1 /dev/urandom | tr -d ' \n')"
 cpu=2 memory=4Gi seconds=3600 retries=0 mode=submit
+isolation_profile=standard
+instance_type=''
 while (($#)); do
   case "$1" in
     --image|--name|--cpu|--memory|--seconds|--retries)
       (($# >= 2)) || { usage >&2; exit 2; }
       key=${1#--}; printf -v "$key" '%s' "$2"; shift 2 ;;
+    --isolation-profile)
+      (($# >= 2)) || { usage >&2; exit 2; }
+      isolation_profile=$2; shift 2 ;;
+    --instance-type)
+      (($# >= 2)) || { usage >&2; exit 2; }
+      instance_type=$2; shift 2 ;;
     --wait) mode='wait'; shift ;;
     --dry-run) mode=dry; shift ;;
     -h|--help) usage; exit 0 ;;
@@ -31,12 +40,18 @@ while (($#)); do
 done
 [[ -n "$image" && $# -gt 0 ]] || { usage >&2; exit 2; }
 [[ "$name" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$ && ${#name} -le 55 ]] || { echo 'Invalid job name' >&2; exit 2; }
-[[ "$cpu" =~ ^([2468]|[12][02468]|30)$ ]] || { echo 'CPU must be even, 2..30 (whole SMT cores)' >&2; exit 2; }
+[[ "$cpu" =~ ^([2468]|[12][02468])$ ]] || { echo 'CPU must be even, 2..28 (whole SMT cores, with system headroom)' >&2; exit 2; }
 [[ "$seconds" =~ ^[1-9][0-9]{0,6}$ && "$retries" =~ ^[0-9]$ ]] || { echo 'Invalid deadline or retry count' >&2; exit 2; }
 [[ "$memory" =~ ^[1-9][0-9]*(Mi|Gi)$ ]] || { echo 'Memory must be an integer Mi or Gi quantity' >&2; exit 2; }
+[[ "$isolation_profile" == standard || "$isolation_profile" == l2 ]] || { echo 'Unknown isolation profile' >&2; exit 2; }
+[[ -z "$instance_type" || "$instance_type" =~ ^[a-z][a-z0-9-]*\.[a-z0-9]+$ ]] || { echo 'Invalid EC2 instance type' >&2; exit 2; }
+if [[ "$isolation_profile" == l2 && ( "$cpu" -lt 4 || "$retries" != 0 ) ]]; then
+  echo 'L2 profile requires at least 4 CPUs and no automatic retries' >&2; exit 2
+fi
 manifest=$(mktemp)
 trap 'rm -f "$manifest"' EXIT
-jq -n --arg name "$name" --arg image "$image" --arg cpu "$cpu" \
+jq -n --arg name "$name" --arg image "$image" --arg cpu "$cpu" --arg profile "$isolation_profile" \
+  --arg instance_type "$instance_type" \
   --arg memory "$memory" --argjson seconds "$seconds" --argjson retries "$retries" \
   --args '$ARGS.positional as $command | {
   apiVersion:"batch/v1",kind:"Job",metadata:{name:$name,namespace:"isolab",labels:{"isolab.dev/job":"true"}},
@@ -44,7 +59,9 @@ jq -n --arg name "$name" --arg image "$image" --arg cpu "$cpu" \
     template:{metadata:{labels:{"isolab.dev/job":"true"},annotations:{"karpenter.sh/do-not-disrupt":"true"}},
       spec:{restartPolicy:"Never",serviceAccountName:"runner",automountServiceAccountToken:false,
         terminationGracePeriodSeconds:60,
-        nodeSelector:{"isolab.dev/pool":"cpu-spot"},
+        nodeSelector:({"isolab.dev/pool":"cpu-spot"}
+          + (if $profile == "l2" then {"isolab.dev/cpu-isolation":"v4"} else {} end)
+          + (if $instance_type != "" then {"node.kubernetes.io/instance-type":$instance_type} else {} end)),
         tolerations:[{key:"isolab.dev/workload",value:"cpu",operator:"Equal",effect:"NoSchedule"}],
         affinity:{podAntiAffinity:{requiredDuringSchedulingIgnoredDuringExecution:[{
           labelSelector:{matchLabels:{"isolab.dev/job":"true"}},topologyKey:"kubernetes.io/hostname"}]}},
