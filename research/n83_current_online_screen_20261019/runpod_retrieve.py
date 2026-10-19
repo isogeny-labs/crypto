@@ -20,13 +20,14 @@ def sha256(path):
     return digest.hexdigest()
 
 
-def fetch(user, remote, output, expected=None):
+def fetch(user, remote, output, identity, known_hosts, expected=None):
     if output.exists():
         if expected is None or sha256(output) == expected:
             return
         raise ValueError(f'existing artifact differs: {output}')
     command = [sys.executable, str(FETCH), '--user', user,
-               '--remote', remote, '--output', str(output)]
+               '--remote', remote, '--output', str(output),
+               '--identity', str(identity), '--known-hosts', str(known_hosts)]
     if expected:
         command.extend(['--sha256', expected])
     for attempt in range(1, 4):
@@ -44,11 +45,16 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--user', required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--identity', type=Path,
+                        default=Path.home() / '.ssh/id_ed25519')
+    parser.add_argument('--known-hosts', type=Path,
+                        default=Path.home() / '.ssh/known_hosts')
     args = parser.parse_args()
     root = args.output.resolve()
     root.mkdir(parents=True, exist_ok=True)
     manifest = root / 'raw_parts_manifest.json'
-    fetch(args.user, '/workspace/raw_parts_manifest.json', manifest)
+    fetch(args.user, '/workspace/raw_parts_manifest.json', manifest,
+          args.identity, args.known_hosts)
     record = json.loads(manifest.read_text())
     if record.get('schema') != 'n83.current-online-screen-runpod-raw-parts/v1':
         raise ValueError('unexpected raw part manifest')
@@ -58,7 +64,8 @@ def main():
         if not name.startswith('raw.part.') or not name[9:].isdigit():
             raise ValueError('unexpected part name')
         path = root / name
-        fetch(args.user, '/workspace/' + name, path, part['sha256'])
+        fetch(args.user, '/workspace/' + name, path,
+              args.identity, args.known_hosts, part['sha256'])
         if path.stat().st_size != part['bytes']:
             raise ValueError(f'part size differs: {name}')
     if not archive.exists():

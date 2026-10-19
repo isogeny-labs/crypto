@@ -14,6 +14,10 @@ def main():
     parser.add_argument('--remote', required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--sha256')
+    parser.add_argument('--identity', type=Path,
+                        default=Path.home() / '.ssh/id_ed25519')
+    parser.add_argument('--known-hosts', type=Path,
+                        default=Path.home() / '.ssh/known_hosts')
     args = parser.parse_args()
     if not (args.remote == '/workspace/raw_parts_manifest.json' or (args.remote.startswith('/workspace/raw.part.') and args.remote.removeprefix('/workspace/raw.part.').isdigit())):
         raise ValueError('remote path must be an N83 screen raw part or manifest')
@@ -23,10 +27,10 @@ def main():
         raise FileExistsError(args.output)
     begin, end = b'N83_RAW_BEGIN_7b8e6a2f', b'N83_RAW_END_7b8e6a2f'
     ssh = [
-        'ssh', '-tt', '-i', '/Users/adamburan/.ssh/id_ed25519',
+        'ssh', '-tt', '-i', str(args.identity),
         '-o', 'IdentitiesOnly=yes', '-o', 'BatchMode=yes',
         '-o', 'ConnectTimeout=8', '-o',
-        'UserKnownHostsFile=/private/tmp/n83_runpod_known_hosts',
+        f'UserKnownHostsFile={args.known_hosts}',
         '-o', 'StrictHostKeyChecking=accept-new',
         f'{args.user}@ssh.runpod.io',
     ]

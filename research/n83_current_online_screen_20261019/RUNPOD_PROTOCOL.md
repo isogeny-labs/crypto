@@ -30,6 +30,7 @@ Use `runpod_retrieve.py --user <authenticated-pod-host-id> --output
 <local-evidence-directory>` after the final part manifest is written. The
 retriever uses the RunPod SSH gateway, verifies every part and the assembled
 archive, and extracts only regular files under `results/` or `evidence/`.
+Pass `--identity` and `--known-hosts` when using nondefault SSH files.
 
 After retrieval, `runpod_aggregate.py` validates all transfer hashes and
 archive members, confirms the provider allocation against embedded host and
