@@ -186,7 +186,7 @@ pub fn run(args: &[String]) {
             ic_m[0] / rho_m[0], ci[0].0, ci[0].1, ic_m[1] / rho_m[1], ci[1].0, ci[1].1, ic_m[2] / rho_m[2], ci[2].0, ci[2].1, resolved
         );
         js.push(format!(
-            "{{\"arm\":\"{}\",\"q\":{},\"units\":{},\"units_ok\":{},\"rho_runs\":{},\"rho_ok\":{},\"r_inv\":{:.4},\"r_lmul\":{:.4},\"gae_meq\":{:.3},\"ic_meq\":[{:.6e},{:.6e},{:.6e}],\"rho_meq\":[{:.6e},{:.6e},{:.6e}],\"ratio\":[{:.5},{:.5},{:.5}],\"ratio_lo\":[{:.5},{:.5},{:.5}],\"ratio_hi\":[{:.5},{:.5},{:.5}],\"resolved\":\"{}\",\"phase_meq\":[{}],\"ic_wall_s\":{:.3},\"rho_wall_s\":{:.3},\"ic_meq_descent_free\":{:.6e},\"ic_meq_descent_div20\":{:.6e},\"s_ic\":{:.4},\"s_rho\":{:.4},\"rho_steps_mean\":{:.1},\"attempts_mean\":{:.2}}}",
+            "{{\"arm\":\"{}\",\"q\":{},\"units\":{},\"units_ok\":{},\"rho_runs\":{},\"rho_ok\":{},\"r_inv\":{:.4},\"r_lmul\":{:.4},\"gae_meq\":{:.3},\"ic_meq\":[{:.6e},{:.6e},{:.6e}],\"rho_meq\":[{:.6e},{:.6e},{:.6e}],\"ratio\":[{:.5},{:.5},{:.5}],\"ratio_lo\":[{:.5},{:.5},{:.5}],\"ratio_hi\":[{:.5},{:.5},{:.5}],\"resolved\":\"{}\",\"phase_meq\":[{}],\"ic_wall_s\":{:.3},\"rho_wall_s\":{:.3},\"ic_meq_descent_free\":{:.6e},\"ic_meq_descent_div20\":{:.6e},\"s_ic\":{:.4},\"s_rho\":{:.4},\"rho_steps_mean\":{:.1},\"rho_steps_over_sqrt_ell\":{:.4},\"attempts_mean\":{:.2}}}",
             arm, q, units.len(), ok_units, rho_vals.len(), nrho_ok, r_inv, r_l, gae,
             ic_m[0], ic_m[1], ic_m[2], rho_m[0], rho_m[1], rho_m[2],
             ic_m[0] / rho_m[0], ic_m[1] / rho_m[1], ic_m[2] / rho_m[2],
@@ -194,6 +194,7 @@ pub fn run(args: &[String]) {
             phase_m.iter().map(|x| format!("{:.5e}", x)).collect::<Vec<_>>().join(","),
             ic_wall, rho_wall, ic_m[0] - phase_m[5], ic_m[0] - phase_m[5] * 0.95, ic_m[0] / (gae * ell_mean), rho_m[0] / (gae * ell_mean),
             mean(&rho_runs.iter().map(|x| x[2]).collect::<Vec<_>>()),
+            mean(&rho_runs.iter().map(|x| x[2]).collect::<Vec<_>>()) / ell_mean,
             mean(&units.iter().map(|u| u.attempts as f64).collect::<Vec<_>>())
         ));
         if *q < minq {
