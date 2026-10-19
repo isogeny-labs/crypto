@@ -1,0 +1,31 @@
+{
+  "review_date": "2026-10-19",
+  "native_source_commit": "6e170e48882e1ba21dc90f95e6eba07f3879eabc",
+  "configuration": "Release; CUDA OFF; cuPQC OFF; tools OFF",
+  "compiler": "GCC 14.2.0",
+  "cmake": "4.4",
+  "configured_native_tests": 17,
+  "initial_passes": 15,
+  "initial_environment_failures": [
+    "coord: local sockets denied",
+    "ecc2k130-usecase: tracked sparse files not yet materialized"
+  ],
+  "environment_repair": "Materialized original tracked use-case files; reran only the two failed tests with network permission. Both passed.",
+  "native_coverage": "17/17 configured tests covered across initial and repaired-environment runs; CPU-only GPU test is emulation",
+  "lean_kernel_rebuilt": false,
+  "rust_library_check": "Cargo is unavailable; no Rust implementation changed",
+  "scientific_experiments_rerun": "No full historical performance corpus; fresh native correctness tests only",
+  "canonical_graphs_changed": false,
+  "canonical_graph_reason": "Retrospective of existing evidence, no new cryptographic measurement or official status transition",
+  "conductor": "Unavailable (127); no reservation claimed",
+  "manuscript_validation": {
+    "pdf_pages": 39,
+    "figure_sets": 8,
+    "source_entries": 72,
+    "locally_rechecked_source_hashes": 65,
+    "make_check": "pass: references/citations resolved; no LaTeX errors or overfull boxes",
+    "recorded_data_check": "pass, including catalogue manifest",
+    "visual_review": "All 39 pages rendered; text extracted and page contact sheets inspected; all eight figure sets inspected",
+    "pdf_sha256": "7271631051f4bdd93c4a83e56292b514a07679f66c2319b220e50fb9c3867a4f"
+  }
+}

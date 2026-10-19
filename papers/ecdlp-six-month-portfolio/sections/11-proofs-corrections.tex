@@ -1,0 +1,122 @@
+\section{What is proved, observed, conditional, or still unproved}\label{sec:proofs}
+
+\subsection{A proof map with explicit bridges}
+
+The portfolio has moved from isolated Lean files toward a shared
+\texttt{CryptoLean} library and a repository-wide proof gate. The shared
+library pins Lean 4.35.0 and a Mathlib revision; historical dependency-free
+projects can use other pins, such as the scoped torsion workspace's
+4.22.0. A blanket statement that every proof uses one verified toolchain
+would therefore be incorrect.\src{LEAN}\src{TORSION}
+
+The gate builds targets and audits transitive axioms, accepting standard
+foundations and rejecting \texttt{sorryAx}, unlisted native evaluation and
+user axioms. Its README correctly states that passing this gate does
+not establish that the formal theorem is the report's theorem. A faithful
+mathematical bridge and an independent statement review remain needed.
+This review inspected central proof sources and receipts, but did not
+run a fresh Lean kernel build; it does not issue a new kernel certificate.
+
+\begin{longtable}{@{}p{3cm}p{5cm}p{5.4cm}@{}}\toprule
+Result or argument & Supported statement & Remaining boundary \\\midrule\endhead
+Semaev $S_3$ roots & The committed Lean source proves the displayed
+affine algebraic factorisation and root equivalence under curve equations
+and distinct abscissae. & Coordinate/chord definitions are visible; exceptional
+points and the relevant curve-model interpretation still belong to the
+implementation contract. No fresh kernel build here. \src{RF-PROOF} \\
+Odd-torsion translation & Under the stated additive laws, odd $r$,
+$[r]P=0$ and nonzero two-torsion $T$ imply $[r](P+T)=T\ne0$. & The new
+generic proof is distinct from the imported curve application. No concrete
+point model or factor-base membership checker is imported by that file.
+\src{TORSION} \\
+Transport conservation & A homomorphism with a complete rational-pullback
+base has the stated kernel-fibre decomposition count. & It is a scoped
+written argument, not a new audited Lean theorem here or an exclusion of
+all different bases and reductions. \src{TRANSFER} \\
+Coprime group orders & A homomorphism between finite groups of coprime
+orders has trivial image; the register applies a finite order check to
+named source/destination pairs. & It excludes those homomorphism routes,
+not every higher-genus destination or every reduction. \src{TEN} \\
+Smith/twist and Humbert laws & Explicit identities, published-equation
+comparisons and finite certificates support the stated populations. &
+Zero finite counterexamples and a checked interpolation do not alone prove
+every global mathematical extension. \src{ML-TWIST}\src{ML-HUMBERT} \\
+Structural completeness & A seven-family taxonomy and case-analysis
+proof sketches with an explicit October correction. & Independent review
+and stronger proofs remain due; no universal security theorem is
+established. \src{STRUCTURAL} \\
+Degree plateaus and exponent fits & Exact outcomes on frozen bounded
+systems; fitted exponents on named size ranges. & No proved global degree
+law or cryptographic-scale asymptotic improvement. \src{DREG}\src{FRONTIER} \\\bottomrule
+\end{longtable}
+
+The shared library itself lists unfinished bridges, including the
+relation between its concrete binary-polynomial computation and the
+Mathlib polynomial object, group-level isogeny and generic-group
+definitions, and additional Semaev/degree material. These omissions are
+explicit research obligations, not proof failures to hide.\src{LEAN}
+
+\subsection{Corrections that change the scientific reading}
+
+\begin{enumerate}
+\item \textbf{A solver label was wrong.} The several-thousand-fold NIST
+query ratios are against Buchberger, not the claimed F4 comparator.
+The large effect remains a stage observation with the corrected label.
+\src{RF-AUDIT}
+\item \textbf{A complete-solve label hid composition.} The larger prime
+msolve totals were composed estimates from sampled per-query cost, unlike
+the directly timed 16-bit comparison.\src{RF-AUDIT}
+\item \textbf{Unpriced algebra changed the ranking.} F4 XORs and F6
+geometry can dominate cost after being included. A lower algebraic
+counter is not a lower total.\src{GB}\src{C-RULES}
+\item \textbf{Online preparation changed the comparator.} The historical
+IC online ratios remain observations, but matched preprocessing rho
+removes the claimed advantage under the later controls. The exact wide
+equal-bytes protocol is still distinct and unrun.\src{EQUAL}\src{EQUAL83}\src{WIDE}
+\item \textbf{Relation count was not rank.} The free-collision census
+finds far fewer independent rows than collision counts suggest. A later
+tuned production improvement survives on a smaller constant boundary.
+\src{EQUAL}\src{ROUND2}
+\item \textbf{A trace-zero control sampled the wrong population.} The
+apparent 50\% rejection does not apply to the production odd-order IC
+targets. The integrated filter makes zero rejections in 29,624 checks
+and contributes no such gain.\src{ROUND1}
+\item \textbf{LLL failures were misattributed.} The corrected note
+withdraws curve-specificity and identifies floating-point overflow for
+the relevant cases. It also withdraws an unsupported P-521 mechanism:
+the fixed-point recovery stands, but the scaled-floating failure's exact
+cause remains unresolved. Repeated deterministic probes are not distinct
+instances.\src{LLL}
+\item \textbf{The structural proof was overstated.} The manuscript now
+admits proof sketches rather than an independently reviewed unconditional
+theorem.\src{STRUCTURAL}
+\item \textbf{An Semaev expression defect may affect historical results.}
+An open matched legacy/repaired rerun is designed around the archived
+call sites. Some trial packages exist; the final validation and ledger
+transition are not complete in the observed PR snapshot. Older exposed
+results remain integrity-qualified until that audit resolves them.
+\src{PR2412}
+\item \textbf{A simulated campaign is not a measured one.} The open
+synthetic-volcano PR explicitly labels its 130,410 observations as
+invented cost-model records with no actual curves or recovered logs.
+It is useful planning and presentation tooling and is excluded from
+this paper's empirical attempt counts.\src{PR2236}
+\end{enumerate}
+
+These corrections should remain searchable beside their original
+claims. Suppressing superseded evidence would make future reviewers
+repeat the same misinterpretations. Conversely, a correction does not
+erase a separately valid measured improvement whose boundary was never
+the corrected one.
+
+\subsection{What the combined record does not prove}
+
+No inspected evidence establishes a general classical prime-field
+ECDLP algorithm with exponent below one half, a cryptographic-scale IC
+solution of ECC2K-130, or a method that recovers a standard deployed
+curve's arbitrary unknown logarithm from the public point alone. The
+record also does not prove the security of those curves or the
+impossibility of a future non-generic attack. Generic-model bounds,
+finite search failures, component improvements and implementation
+limits have different logical force and must not be substituted for
+one another.

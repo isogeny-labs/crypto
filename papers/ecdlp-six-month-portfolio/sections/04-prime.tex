@@ -1,0 +1,155 @@
+\section{Prime-field research: sparse sets, root finding, and algebraic bases}\label{sec:prime}
+
+Prime fields are the most demanding generalisation target in this
+portfolio. Coordinate arithmetic is efficient, but the subfield
+conditions used by extension-field IC are absent. The programme tests
+several substitutes rather than treating this absence as a proof that no
+alternative can exist.\src{PRIME}
+
+\subsection{What the smallness experiments actually learned}
+
+The dedicated smallness repository asks whether an inexpensive
+coordinate-defined set behaves additively better than a matched random
+set. Its experiments include intervals in $x$ and $y$, slopes, affine and
+M\"obius images, Hamming weight, Farey heights, multiplicative subgroups,
+random windows, Fourier spectra, low-degree polynomial sweeps,
+Coppersmith constructions, Witt carries and learned log-bit predictors.
+The main closure panel uses three roughly 20-bit prime-order toy curves.
+\src{SMALL}
+
+An illustrative observation is especially clear. For a base near size
+2,048, ordinary coordinate predicates have pooled two-sum closure ratios
+near one: $x<2048$ gives about 1.04, a subgroup predicate about 0.95, and
+matched random sets about 0.98--1.00. A log-interval positive control,
+which uses unavailable discrete-log information to define the set, gives
+256.4 against a predicted 256.5. The control shows that the instrument
+can see strong additive structure; the measured cheap predicates do not
+show that structure on the tested panel.
+
+The null comparison must match sign closure as well as cardinality.
+Negation-closed sets have correlated pair sums, so a naive Poisson error
+bar understates their spread. Random-window maxima must also be compared
+with maxima from the same-size null search. The lesson is a concrete
+experimental discipline, not a universal theorem that every inexpensive
+predicate is random.
+
+The Witt-carry and small-root studies examine why tempting analogues of
+extension coordinates become expensive. Their polynomial degrees and
+success thresholds belong to the specific constructions tested. A
+failed learned log-bit predictor is similarly evidence about the models,
+features, labels and curve sizes used. It does not prove that no
+computational representation of prime-field structure can help.
+
+\subsection{A useful reduction of the two-summand oracle}
+
+For a short-Weierstrass model $y^2=x^3+ax+b$ in characteristic other
+than two or three, and affine points $R,F$ with
+$x_R\ne x_F$, the familiar chord formulas yield
+\[
+ S_3(x_R,x_F,X)=(x_R-x_F)^2
+       \bigl(X-x(R+F)\bigr)\bigl(X-x(R-F)\bigr).
+\]
+Thus, once $F$ is fixed, the roots needed for two-summand decomposition
+are already group-law expressions. One can subtract $F$ and test base
+membership, handling signs and exceptional points explicitly, rather than
+compute a fresh Gr\"obner basis. The proof source formalises the affine
+algebraic identity; its coordinate definitions and hypotheses are visible
+in the Lean file.\src{RF-PROOF}
+
+This is an implementation opportunity, not a new general summation-law
+theorem or a prime-field ECDLP breakthrough. The source audit explicitly
+identifies prior sum-and-membership algorithms. It also corrects the
+manuscript's broad lower-bound language: a reusable pair table can make a
+repeated query constant-time after quadratic setup, so an unqualified
+linear-per-query lower bound would be false.\src{RF-AUDIT}
+
+The implementation family includes batched inversions for direct prime
+subtraction, binary pair-sum tables, three- and four-summand meet-in-the-middle
+variants, windowed scans, dense root indexes, Kummer-base variants and a
+CUDA root-finding kernel. The prime and binary models use their own group
+laws. The short-Weierstrass identity should not be silently substituted
+for the generalized binary model $y^2+xy=x^3+ax^2+b$.\src{RF-PDP}
+\src{RF-GPU}
+
+\subsection{Measured improvements, with the comparator repaired}
+
+The source audit reports binary per-decomposition ratios of 383 and
+1,535 against matrix F4 at field degrees nine and thirteen. The
+precomputed pair-table build is excluded from those query ratios. At
+degree 23 a complete binary solve is reported 122 times faster with the
+pair table, while F4 is faster at degrees five, nine and thirteen. This
+reversal is evidence that setup and scale matter.\src{RF-AUDIT}
+
+On five NIST P-curves the six-point-base query ratios are
+3,021--5,802 against the benchmark's Buchberger implementation. The printed
+benchmark label said ``F4'', but the timed source calls
+\texttt{groebner\_f4::buchberger}. The corrected comparator belongs in
+every reuse of those ratios. These experiments perform tiny-base oracle
+work on large field parameters; they do not solve an unknown NIST-curve
+logarithm.
+
+The complete prime-DLP comparison against msolve has two evidence tiers.
+At 16 bits, both totals are directly measured. At 20 and 24 bits, the F4
+totals are composed from sampled per-query CPU cost and the root-finder's
+measured query count. The reported factors of about 100, 105 and 50 must
+not all be described as directly timed complete solves. Nor are any of
+them comparisons against the strongest generic rho method.
+
+The ecbench audit supplies a different view. On one registered 20-bit
+prime subgroup, a pair table reduces the counted IC $S$ from 1,524.511 to
+28.753 relative to direct subtraction. Its paired counted ratio is
+0.018861. Native work remains unpriced on those prime arms, so that
+quotient does not bound a complete-cost ratio. On a degree-17 Koblitz
+instance, the corresponding IC comparison is fully priced in that
+study's calibration: $356.894\to20.360$, paired ratio 0.057047. Even
+there, the rho comparison has unpriced work and cannot be promoted into
+a complete-cost speed claim.\src{RF-AUDIT}
+
+\subsection{Kummer towers and the remaining algebraic question}
+
+Petit--Kosters--Messeng-style bases use multiplicative and tower
+structure to give summation systems more algebraic organisation.
+\cite{pkm2016} In the recorded five-curve ecbench root-finding panel,
+896 runs verify and the IC/rho ratios remain about 29--141. Changing a
+plain base to a tower base of the same size changes that table-based
+oracle's cost by roughly one percent. The conclusion is narrow: the
+tower's algebraic structure is not exploited by that particular
+enumeration/table mechanism. It says nothing decisive about a genuinely
+algebraic tower solver.\src{PKM}
+
+The large-memory work now addresses that distinction. At the pinned main
+snapshot, several larger tower cells remain bounded or resource-limited.
+An open branch subsequently records the $m=3,N=21$ run on a 124-GB,
+32-vCPU host. Both targets finish all degree-seven reductions without a
+refutation, then stop at the first degree-eight step under the frozen
+dense-cap rule. The demanded $B'$ has 79,330,205,871 entries, approximately
+317 GB at four bytes per entry; the recorded peak resident memory is
+67.1 GB. The two runs take 6,445 and 6,416 seconds.\src{PR2160}
+
+This is real execution progress relative to an unrun memory-gated card.
+It does not supply a completed degree or a productive degree-eight
+refutation. The branch's results explicitly leave the interpretation
+between the protocol's inconclusive and lower-bound cases to the
+coordinator. It would be inaccurate either to keep calling the cell
+``never run'' or to call it a successful degree-eight solve.
+
+Another open branch integrates prime tower F4, signature F5, an F6-style
+closure and enumeration into ecbench. It reports 140 verified runs on
+four 9--15-bit prime-order curves. F5 reduces the emitted F4 work on the
+same trees, while F6's closures save essentially no total work. The
+author-reported priced comparisons still favour enumeration and rho.
+The first attempt is explicitly voided for thread-dependent replay.
+These are unmerged engineering observations at their pinned PR head,
+not an update silently applied to main's frontier.\src{PR2223}
+
+\subsection{Earlier prime-curve structural work}
+
+The May--August record also includes $p$-adic lifts, anomalous-curve
+techniques applied outside their usual setting, CM analysis, GLV/HNP
+lattices, twists and coordinate correlations. Its value includes
+identifying which proposed bridge was absent. An efficient scalar
+decomposition, a low-height coordinate or a numerical lattice anomaly
+does not automatically yield an efficient unknown-scalar recovery
+algorithm. The later LLL correction makes this especially tangible:
+apparent differences between named curves can be implementation
+artefacts.\src{HNP}\src{LLL}\src{STRUCTURAL}
