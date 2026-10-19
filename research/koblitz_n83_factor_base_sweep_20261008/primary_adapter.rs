@@ -981,6 +981,8 @@ fn write_progress_sample(
     start: Instant,
     schema: &str,
     source_commit: &str,
+    object_blake3: &str,
+    point_set_blake3: &str,
     progress: &SolverProgress,
     sample_kind: &str,
 ) -> io::Result<()> {
@@ -996,8 +998,8 @@ fn write_progress_sample(
         "elapsed_wall_ms":start.elapsed().as_secs_f64()*1000.0,
         "memory_current_bytes":memory_current_bytes,
         "source_commit":source_commit,
-        "object_blake3":K16627_OBJECT_BLAKE3,
-        "point_set_blake3":K16627_POINT_SET_BLAKE3,
+        "object_blake3":object_blake3,
+        "point_set_blake3":point_set_blake3,
         "phase":format!("{:?}",snapshot.phase),
         "completed_decisions":snapshot.decisions,
         "completed_conflicts":snapshot.conflicts,
@@ -1027,6 +1029,8 @@ impl ProgressSampler {
         start: Instant,
         schema: &'static str,
         source_commit: String,
+        object_blake3: &'static str,
+        point_set_blake3: &'static str,
         progress: Arc<SolverProgress>,
     ) -> Result<Self> {
         let mut path = output.as_os_str().to_os_string();
@@ -1042,6 +1046,8 @@ impl ProgressSampler {
             start,
             schema,
             &source_commit,
+            object_blake3,
+            point_set_blake3,
             &progress,
             "entered",
         )?;
@@ -1054,6 +1060,8 @@ impl ProgressSampler {
                     start,
                     schema,
                     &source_commit,
+                    object_blake3,
+                    point_set_blake3,
                     &progress,
                     "periodic",
                 )?,
@@ -1064,6 +1072,8 @@ impl ProgressSampler {
                         start,
                         schema,
                         &source_commit,
+                        object_blake3,
+                        point_set_blake3,
                         &progress,
                         "returned",
                     )?;
@@ -1459,6 +1469,8 @@ fn chain_witness_impl(
                     "n83.k16627-m4-search-progress/v1"
                 },
                 source_commit.clone(),
+                K16627_OBJECT_BLAKE3,
+                K16627_POINT_SET_BLAKE3,
                 progress,
             )?)
         } else {
