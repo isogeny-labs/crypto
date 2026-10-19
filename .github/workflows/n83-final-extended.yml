@@ -24,6 +24,8 @@ jobs:
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Replay sealed points choice and dispatch
         shell: bash
