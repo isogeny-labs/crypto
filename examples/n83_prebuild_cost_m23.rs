@@ -14,6 +14,9 @@ use std::io::{BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
+#[path = "../research/n83_prebuild_cost_m23_20261019/small_m4.rs"]
+mod small_m4;
+
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 type Words = (u128, u128);
 const CURVE: &str = "icv1-f2m83-tm6151469093347-debefd74";
@@ -976,6 +979,7 @@ fn control(arm: &str, root: &Path, m: usize, output: &Path) -> Result<()> {
 fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().collect();
     match args.get(1).map(String::as_str) {
+        Some("small-m4") if args.len()==8 => small_m4::run(&args[2],&args[3],Path::new(&args[4]),Path::new(&args[5]),args[6].parse()?,Path::new(&args[7])),
         Some("targets") if args.len()==4 => targets(Path::new(&args[2]),Path::new(&args[3])),
         Some("setup") if args.len()==5 => setup(&args[2],Path::new(&args[3]),Path::new(&args[4])),
         Some("probe") if args.len()==8 => probe("prebuilt",&args[2],Path::new(&args[3]),Path::new(&args[4]),
@@ -984,7 +988,7 @@ fn main() -> Result<()> {
             args[6].parse()?,args[7].parse()?,Path::new(&args[8])),
         Some("replay") if args.len()==7 => replay(&args[2],Path::new(&args[3]),Path::new(&args[4]),Path::new(&args[5]),Path::new(&args[6])),
         Some("control") if args.len()==6 => control(&args[2],Path::new(&args[3]),args[4].parse()?,Path::new(&args[5])),
-        _ => Err("usage: n83_prebuild_cost_m23 targets NEW_PUBLIC_JSON NEW_VALIDATION_JSON | setup prebuilt|ondemand D_BASE_DIR NEW_RESULT_JSON | probe U|D|K2048|D12 BASE_DIR PUBLIC_JSON TARGET_INDEX 2|3 NEW_RESULT_JSON | probe-mode prebuilt|ondemand D BASE_DIR PUBLIC_JSON TARGET_INDEX 2|3 NEW_RESULT_JSON | replay U|D|K2048|D12 BASE_DIR PUBLIC_JSON WORKER_JSON NEW_REPLAY_JSON | control U|D|K2048|D12 BASE_DIR 2|3 NEW_RESULT_JSON".into())
+        _ => Err("usage: n83_prebuild_cost_m23 targets NEW_PUBLIC_JSON NEW_VALIDATION_JSON | setup prebuilt|ondemand D_BASE_DIR NEW_RESULT_JSON | probe U|D|K2048|D12 BASE_DIR PUBLIC_JSON TARGET_INDEX 2|3 NEW_RESULT_JSON | probe-mode prebuilt|ondemand D BASE_DIR PUBLIC_JSON TARGET_INDEX 2|3 NEW_RESULT_JSON | replay U|D|K2048|D12 BASE_DIR PUBLIC_JSON WORKER_JSON NEW_REPLAY_JSON | control U|D|K2048|D12 BASE_DIR 2|3 NEW_RESULT_JSON | small-m4 preflight|positive|natural K2048|D12 BASE_DIR PUBLIC_JSON 0 NEW_RESULT_JSON".into())
     }
 }
 

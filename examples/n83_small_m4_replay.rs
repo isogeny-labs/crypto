@@ -1,0 +1,272 @@
+//! Independent general-field replay for the frozen K2048/D12 m=4 gate.
+use crypto_lib::binary_ecc::curve::point_neg;
+use crypto_lib::binary_ecc::{BinaryPoint, F2mElement};
+use crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
+use flate2::read::GzDecoder;
+use num_bigint::BigUint;
+use serde_json::{json, Value};
+use sha2::{Digest, Sha256};
+use std::collections::{BTreeMap, BTreeSet};
+use std::error::Error;
+use std::fs::{self, OpenOptions};
+use std::io::{BufRead, BufReader, Write};
+use std::path::Path;
+
+type Result<T> = std::result::Result<T, Box<dyn Error>>;
+const CURVE: &str = "icv1-f2m83-tm6151469093347-debefd74";
+const CORPUS: &str = "2895a78d28935a992d8d6155492eae928e165eafcc622e6c866080b8f91e70b5";
+
+fn point(v: &Value) -> Result<BinaryPoint> {
+    let a = v.as_array().ok_or("point pair absent")?;
+    if a.len() != 2 {
+        return Err("point pair width".into());
+    }
+    let parse = |v: &Value| -> Result<BigUint> {
+        let s = v.as_str().ok_or("coordinate string absent")?;
+        let n: BigUint = s.parse()?;
+        if n.bits() > 83 || n.to_string() != s {
+            return Err("noncanonical coordinate".into());
+        }
+        Ok(n)
+    };
+    Ok(BinaryPoint::Affine {
+        x: F2mElement::from_biguint(&parse(&a[0])?, 83),
+        y: F2mElement::from_biguint(&parse(&a[1])?, 83),
+    })
+}
+
+fn contract(receipt: &Value) -> Result<(&str, &str, usize, usize)> {
+    let mode = receipt["mode"].as_str().ok_or("mode absent")?;
+    let arm = receipt["arm"].as_str().ok_or("arm absent")?;
+    let expected = match mode {
+        "positive" => "PASS_CONSTRUCTED_PENDING_REPLAY",
+        "natural" => "PASS_NATURAL_PENDING_REPLAY",
+        _ => return Err("unsupported mode".into()),
+    };
+    if receipt["schema"] != "n83.small-m4-worker/v1"
+        || receipt["status"] != expected
+        || receipt["curve_id"] != CURVE
+        || receipt["m"] != 4
+        || receipt["target_index"] != 0
+        || receipt["rank"] != 1
+        || receipt["group_verified"] != true
+        || receipt["changed_target_rejected"] != true
+        || receipt["changed_row_rejected"] != true
+        || receipt["public_corpus_sha256"] != CORPUS
+    {
+        return Err("worker contract differs".into());
+    }
+    let (columns, points) = match arm {
+        "K2048" => (2048, 339968),
+        "D12" => (2001, 332166),
+        _ => return Err("arm outside frozen policy".into()),
+    };
+    if receipt["columns"] != columns || receipt["points"] != points {
+        return Err("base dimensions differ".into());
+    }
+    Ok((mode, arm, columns, points))
+}
+
+fn replay(base: &Path, corpus: &Path, receipt_path: &Path, output: &Path) -> Result<()> {
+    let bytes = fs::read(receipt_path)?;
+    let receipt: Value = serde_json::from_slice(&bytes)?;
+    let (mode, arm, columns, points) = contract(&receipt)?;
+    let (object, set, sha) = if arm == "K2048" {
+        (
+            "82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851",
+            "d528f5828a05a00add4252212bc909ece481f33093e4074ff7dd8c6a51d3c97e",
+            "aacb62784dee0c9f5e06328dbb85a4b6a1c7243e778328da82900e7284f3a74a",
+        )
+    } else {
+        (
+            "aea278aff2d79a592d5164d7437ddde8f8e9377fa481058dfc16afa176a31389",
+            "fb8ea2ecfeb245a90fecd5506dfc01592916b4ebec756d5fea7cbdd0c25537ce",
+            "c5de0b26e84ad80bfb7be6a214b89c9682e356effb6079c7abf28cd1151ffb03",
+        )
+    };
+    if receipt["object_blake3"] != object || receipt["point_set_blake3"] != set {
+        return Err("object or set identity differs".into());
+    }
+    let public_bytes = fs::read(corpus)?;
+    if format!("{:x}", Sha256::digest(&public_bytes)) != CORPUS {
+        return Err("corpus hash differs".into());
+    }
+    let public: Value = serde_json::from_slice(&public_bytes)?;
+    let target = point(&receipt["target"])?;
+    if mode == "natural" && target != point(&public["points"][0])? {
+        return Err("natural target differs from corpus".into());
+    }
+    let indices: Vec<usize> = receipt["point_indices"]
+        .as_array()
+        .ok_or("indices absent")?
+        .iter()
+        .map(|v| {
+            v.as_u64()
+                .and_then(|n| usize::try_from(n).ok())
+                .ok_or("index malformed")
+        })
+        .collect::<std::result::Result<_, _>>()?;
+    if indices.len() != 4
+        || indices.windows(2).any(|p| p[0] > p[1])
+        || indices.iter().any(|&i| i >= points)
+        || (mode == "positive" && indices != [0, 166, 332, 498])
+    {
+        return Err("indices outside receipt contract".into());
+    }
+    let compressed = fs::read(base.join(format!("objects/{object}.jsonl.gz")))?;
+    if blake3::hash(&compressed).to_hex().as_str() != object
+        || format!("{:x}", Sha256::digest(&compressed)) != sha
+    {
+        return Err("archive digest differs".into());
+    }
+    let mut reader = BufReader::new(GzDecoder::new(compressed.as_slice()));
+    let mut line = String::new();
+    reader.read_line(&mut line)?;
+    let header: Value = serde_json::from_str(&line)?;
+    if header["curve_slug"] != CURVE
+        || header["orbit_columns"] != columns
+        || header["point_count"] != points
+    {
+        return Err("archive header differs".into());
+    }
+    let mut needed: BTreeSet<usize> = indices.iter().copied().collect();
+    for &i in &indices {
+        needed.insert((i / 166) * 166);
+    }
+    let mut rows = BTreeMap::new();
+    for ordinal in 0..=*needed.last().ok_or("no selected rows")? {
+        line.clear();
+        if reader.read_line(&mut line)? == 0 {
+            return Err("archive truncated".into());
+        }
+        if needed.contains(&ordinal) {
+            rows.insert(ordinal, serde_json::from_str::<Value>(&line)?);
+        }
+    }
+    let kc = KoblitzCurve::known_n83_k0().ok_or("curve absent")?;
+    if kc.label() != CURVE || kc.subgroup_order.to_string() != "2417851639230796216685689" {
+        return Err("subgroup identity differs".into());
+    }
+    let mut sum = BinaryPoint::Infinity;
+    let mut sparse = BTreeMap::<usize, BigUint>::new();
+    let mut selected = Vec::new();
+    for &i in &indices {
+        let row = &rows[&i];
+        let column = i / 166;
+        let phase = (i % 166) / 2;
+        let negative = i % 2 == 1;
+        if row["column"] != column || row["phase"] != phase || row["negative"] != negative {
+            return Err("row labels differ".into());
+        }
+        let p = point(&row["point"])?;
+        let representative = point(&rows[&(column * 166)]["point"])?;
+        if !kc.curve.is_on_curve(&p)
+            || !kc.curve.is_on_curve(&representative)
+            || kc.mul(&p, &kc.subgroup_order) != BinaryPoint::Infinity
+        {
+            return Err("point not on subgroup curve".into());
+        }
+        let mut expected = representative;
+        for _ in 0..phase {
+            expected = kc.frobenius(&expected);
+        }
+        if negative {
+            expected = point_neg(&expected);
+        }
+        if p != expected {
+            return Err("point phase or sign differs".into());
+        }
+        let mut coefficient = kc.lambda.modpow(&BigUint::from(phase), &kc.subgroup_order);
+        if negative {
+            coefficient = &kc.subgroup_order - coefficient;
+        }
+        if row["coefficient"] != coefficient.to_string() {
+            return Err("coefficient label differs".into());
+        }
+        let entry = sparse.entry(column).or_default();
+        *entry = (&*entry + coefficient) % &kc.subgroup_order;
+        sum = kc.add(&sum, &p);
+        selected.push(p);
+    }
+    sparse.retain(|_, v| *v != BigUint::from(0u8));
+    let canonical: Vec<_> = sparse.iter().map(|(&c, v)| (c, v.to_string())).collect();
+    if sparse.is_empty()
+        || receipt["sparse_row"] != json!(canonical)
+        || receipt["sparse_row_blake3"]
+            != blake3::hash(&serde_json::to_vec(&canonical)?)
+                .to_hex()
+                .as_str()
+    {
+        return Err("sparse row or rank differs".into());
+    }
+    if sum != target || !kc.curve.is_on_curve(&target) {
+        return Err("group sum differs".into());
+    }
+    let changed_target = kc.add(&target, kc.generator());
+    let mut changed_sum = point_neg(&selected[0]);
+    for p in selected.iter().skip(1) {
+        changed_sum = kc.add(&changed_sum, p);
+    }
+    if sum == changed_target || changed_sum == target {
+        return Err("tamper control accepted".into());
+    }
+    let mut changed_row = canonical.clone();
+    changed_row[0].1 = ((&sparse[&changed_row[0].0] + 1u8) % &kc.subgroup_order).to_string();
+    if json!(changed_row) == receipt["sparse_row"] {
+        return Err("coefficient tamper accepted".into());
+    }
+    let mut file = OpenOptions::new()
+        .create_new(true)
+        .write(true)
+        .open(output)?;
+    serde_json::to_writer_pretty(
+        &mut file,
+        &json!({"schema":"n83.small-m4-general-replay/v1","status":"PASS",
+        "curve_id":CURVE,"arm":arm,"mode":mode,"worker_blake3":blake3::hash(&bytes).to_hex().to_string(),
+        "object_blake3":object,"public_corpus_sha256":CORPUS,"point_indices":indices,
+        "rank_lower_bound":1,"rows_checked":4,"changed_target_rejected":true,"changed_point_rejected":true,
+        "changed_coefficient_rejected":true,"candidate_id":Value::Null,"selected_best_total_runtime":Value::Null}),
+    )?;
+    file.write_all(b"\n")?;
+    file.sync_all()?;
+    Ok(())
+}
+
+fn main() -> Result<()> {
+    let a: Vec<_> = std::env::args().collect();
+    if a.len() != 5 {
+        return Err(
+            "usage: n83_small_m4_replay BASE_DIR PUBLIC_JSON WORKER_JSON NEW_REPLAY_JSON".into(),
+        );
+    }
+    replay(
+        Path::new(&a[1]),
+        Path::new(&a[2]),
+        Path::new(&a[3]),
+        Path::new(&a[4]),
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn capped_control_and_wrong_mode_cannot_pass_replay_contract() {
+        let mut r = json!({"schema":"n83.small-m4-worker/v1","status":"PASS_CONSTRUCTED_PENDING_REPLAY",
+            "mode":"positive","curve_id":CURVE,"arm":"D12","m":4,"target_index":0,"rank":1,
+            "group_verified":true,"changed_target_rejected":true,"changed_row_rejected":true,
+            "public_corpus_sha256":CORPUS,"columns":2001,"points":332166});
+        assert!(contract(&r).is_ok());
+        r["status"] = json!("UNKNOWN_budget");
+        assert!(contract(&r).is_err());
+        r["status"] = json!("PASS_CONSTRUCTED_PENDING_REPLAY");
+        r["mode"] = json!("natural");
+        assert!(contract(&r).is_err());
+    }
+    #[test]
+    fn point_parser_rejects_noncanonical_and_outside_field_coordinates() {
+        assert!(point(&json!(["00", "1"])).is_err());
+        assert!(point(&json!([(BigUint::from(1u8) << 83usize).to_string(), "1"])).is_err());
+        assert!(point(&json!(["0", "1"])).is_ok());
+    }
+}
