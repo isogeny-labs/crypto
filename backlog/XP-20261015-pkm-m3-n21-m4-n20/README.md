@@ -18,8 +18,8 @@ the `m = 3, N = 21` cell is still inconclusive there (`D ≥ 7`, stopped by the
 wall before any degree-8 round) and is what remains.
 
 Blocked on hardware (a 256 GB host for `m = 3`) or on a disk-backed `B'`
-reducer that is not built, and on PR #1893, whose head commit `17c5663` the
-card pins. Funding 1,000,000.
+reducer that is not built. PR #1893 merged on 2026-10-15, and the card pins
+its merge commit `3074507842`. Funding 1,000,000.
 
 ## Question
 
@@ -47,7 +47,7 @@ depth checks) are worth their cost only if this answer is "bounded".
 - A host with 192–256 GB (`m = 3`) or about 512 GB (`m = 4`) of RAM, or a
   disk-backed `B'` streamed from NVMe (not built; would need 130–380 GB of
   disk and one read of `B'` per pass; I/O cost not measured).
-- `pkm_tower_pilot` at `17c5663` (PR #1893), or that PR's merge commit.
+- `pkm_tower_pilot` at PR #1893's merge commit `3074507842` (pinned).
 - `PROTOCOL.md` in this directory, frozen before the card is ready: the
   `--budget`/`--max-nnz` caps (or `--max-dense` and the address-space cap),
   targets per cell, and the checks. `pkm_tower_check verify` can search
