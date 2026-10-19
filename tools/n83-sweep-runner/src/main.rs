@@ -865,7 +865,10 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
     fs::create_dir(dir)?;
     let dir = fs::canonicalize(dir)?;
     let reservation = if s["isolate"] == true {
-        Some(reservation::Reservation::acquire(&dir)?)
+        Some(reservation::Reservation::acquire(
+            &dir,
+            s.get("cpu_reservation"),
+        )?)
     } else {
         None
     };

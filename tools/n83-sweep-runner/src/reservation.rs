@@ -3,6 +3,21 @@ use super::{native_isolation as iso, write, R};
 use serde_json::json;
 use std::path::Path;
 
+fn cpu_request(value: Option<&serde_json::Value>) -> R<iso::CpuRequest> {
+    match value {
+        None => Ok(iso::CpuRequest::Auto),
+        Some(value) => {
+            let cpus: Vec<u32> = serde_json::from_value(value.clone())?;
+            super::require(
+                !cpus.is_empty() && cpus.windows(2).all(|w| w[0] < w[1]),
+                "cpu_reservation must be a nonempty ascending list without duplicates",
+            )?;
+            // plan_cpus also checks online/cgroup membership and all SMT siblings.
+            Ok(iso::CpuRequest::Explicit(cpus))
+        }
+    }
+}
+
 pub struct Reservation {
     pub plan: iso::CpuPlan,
     _lock: iso::BenchLock,
@@ -10,10 +25,10 @@ pub struct Reservation {
     original: Vec<u32>,
 }
 impl Reservation {
-    pub fn acquire(dir: &Path) -> R<Self> {
+    pub fn acquire(dir: &Path, cpus: Option<&serde_json::Value>) -> R<Self> {
         let lock = iso::BenchLock::acquire("/tmp/crypto-bench.lock", false)?;
         let plan = iso::plan_cpus(
-            &iso::CpuRequest::Auto,
+            &cpu_request(cpus)?,
             &iso::topology(),
             iso::allowed_cpus().as_deref(),
         )?
@@ -63,6 +78,30 @@ impl Reservation {
             dir.join("isolation-after.json"),
             &json!({"conditions":iso::conditions(&self.plan.observed_cpus())}),
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn explicit_reservation_preserves_strict_requests() {
+        assert_eq!(cpu_request(None).unwrap(), iso::CpuRequest::Auto);
+        assert_eq!(
+            cpu_request(Some(&json!([14, 30]))).unwrap(),
+            iso::CpuRequest::Explicit(vec![14, 30])
+        );
+        for value in [
+            json!([]),
+            json!([14, 14]),
+            json!([30, 14]),
+            json!([-1]),
+            json!("none"),
+            json!(null),
+        ] {
+            assert!(cpu_request(Some(&value)).is_err());
+        }
     }
 }
 impl Drop for Reservation {
