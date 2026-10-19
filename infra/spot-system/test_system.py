@@ -202,12 +202,14 @@ class DeploymentTests(unittest.TestCase):
         self.assertIn('User=ec2-user', service)
         self.assertIn('--search-root "/work/with spaces"', service)
         self.assertIn('--output /srv/experiments/discovery/current-host.json', service)
-        self.assertIn('OnUnitInactiveSec=60', units['spot-checkpoint-discovery.timer'])
+        self.assertIn('OnUnitInactiveSec=900', units['spot-checkpoint-discovery.timer'])
+        self.assertIn('--max-hash-bytes 68719476736', units['spot-checkpoint-discovery.service'])
         self.assertNotIn('runner.py', service)
 
     def test_safe_staging_and_durable_storage(self):
         t = build()
-        self.assertEqual(t['Parameters']['Capacity']['Default'], 0)
+        self.assertNotIn('DesiredCapacity', t['Resources']['Group']['Properties'])
+        self.assertEqual(t['Resources']['Group']['Properties']['MinSize'], '0')
         self.assertEqual(t['Parameters']['Cutover']['Default'], 'false')
         self.assertEqual(t['Parameters']['PreserveHostKeys']['Default'], 'false')
         self.assertEqual(t['Resources']['FileSystem']['DeletionPolicy'], 'Retain')

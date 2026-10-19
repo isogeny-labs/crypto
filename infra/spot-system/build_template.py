@@ -17,7 +17,9 @@ def sub(value):
 def build():
     bootstrap = """#!/bin/bash
 set -euo pipefail
-dnf install -y amazon-efs-utils python3 awscli2 postgresql17-server
+# AL2023 supplies /usr/bin/aws in the AMI; there is no awscli2 RPM.
+command -v aws
+dnf install -y amazon-efs-utils python3 postgresql17-server
 mkdir -p /srv/experiments
 echo '${FileSystem}:/ /srv/experiments efs _netdev,tls,iam,noresvport 0 0' >> /etc/fstab
 mount /srv/experiments
@@ -42,6 +44,10 @@ runuser -u ec2-user -- python3 /opt/spot/runner.py --root '${WorkRoot}' --valida
 # Prove durable checkpoint selection/restore before publishing readiness.
 # The private temporary workspace is separate from registered workloads.
 runuser -u ec2-user -- env SPOT_SELFTEST_RUNTIME=/opt/spot SPOT_SELFTEST_PARENT='${WorkRoot}' /opt/spot/bin/checkpoint-selftest --exact supervisor_restores_a_discovered_generation_after_abrupt_worker_death --nocapture > /var/log/spot-checkpoint-selftest.log 2>&1
+runuser -u ec2-user -- env SPOT_NATIVE_TEST_PARENT='${WorkRoot}' /opt/spot/bin/solver-checkpoint-selftest --exact cryptanalysis::koblitz_groebner::checkpoint::tests::real_solver_recovers_after_sigkill_and_rejects_corruption --nocapture > /var/log/spot-native-checkpoint-selftest.log 2>&1
+# Future jobs reference this immutable runtime path, not the live legacy binary.
+mkdir -p '${WorkRoot}/bin/${RuntimeDigest}'
+install -m 755 /opt/spot/bin/factor-base-shape-ladder '${WorkRoot}/bin/${RuntimeDigest}/factor_base_shape_ladder'
 python3 /opt/spot/install_services.py --root '${WorkRoot}' --project '${NodeProject}' --table '${ControllerLock}' --region '${AWS::Region}'
 node_ready=0
 for attempt in $(seq 150); do
@@ -131,7 +137,10 @@ aws ec2 create-tags --region '${AWS::Region}' --resources "$INSTANCE" --tags Key
         "UserData": {"Fn::Base64": sub(bootstrap)},
     }})
     resource("Group", "AWS::AutoScaling::AutoScalingGroup", {
-        "MinSize": "0", "DesiredCapacity": ref("Capacity"), "MaxSize": "2",
+        # The wake/idle controller owns desired capacity. Including a zero
+        # here reapplies it on stack updates and terminates active workers.
+        # Creation defaults to MinSize; later updates preserve current demand.
+        "MinSize": "0", "MaxSize": "2",
         "CapacityRebalance": True, "VPCZoneIdentifier": ref("Subnets"),
         "HealthCheckType": "EC2", "HealthCheckGracePeriod": 600,
         "MixedInstancesPolicy": {"InstancesDistribution": {
@@ -214,7 +223,6 @@ aws ec2 create-tags --region '${AWS::Region}' --resources "$INSTANCE" --tags Key
             "ImageId": {"Type": "AWS::EC2::Image::Id", "Default": "ami-0d31a22b09ceec4db",
                 "Description": "AL2023 x86_64 AMI; bootstrap installs the supervisor. Install workload dependencies before cutover."},
             "AllocationId": {"Type": "String", "Default": "eipalloc-00c2a8a867901bf7d"},
-            "Capacity": {"Type": "Number", "Default": 0, "AllowedValues": [0, 1]},
             'LifecycleEnabled': {'Type': 'String', 'Default': 'false', 'AllowedValues': ['false', 'true']},
             'IdleSeconds': {'Type': 'Number', 'Default': 1800, 'MinValue': 300, 'MaxValue': 86400},
             'RuntimeDigest': {'Type': 'String', 'Default': (HERE/'runtime.tar.sha256').read_text().strip()
