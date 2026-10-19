@@ -593,7 +593,10 @@ pub fn quartic_to_weierstrass(k: &Fp3, c: &[El; 5]) -> (El, El) {
     j = k.sub(&j, &k.mulf(&eb2, 27));
     j = k.sub(&j, &k.mulf(&c3, 2));
     let p = k.p;
-    (k.mulf(&i_, ng(27, p)), k.mulf(&j, ng(27, p)))
+    // ng expects a reduced field element. For p < 27, negating the
+    // unreduced integer underflows and changes the Jacobian's point count.
+    let minus_27 = ng(27 % p, p);
+    (k.mulf(&i_, minus_27), k.mulf(&j, minus_27))
 }
 
 /// The quartic `h(x) (x - alpha)(x - sigma alpha)`, coefficients low to high.
@@ -1006,11 +1009,10 @@ pub fn l_check(k: &Fp3, tab: &Tables, f: &[u64], t: i64) -> bool {
             n2 += 1 + sp::chi(nrm, p) as i64;
         }
     }
-    n2 += if d == 8 {
-        1 + sp::chi(f[8], p) as i64
-    } else {
-        1
-    };
+    // Every nonzero base-field element is a square over F_{p^2}.
+    // Thus an even-degree model has two points at infinity over F_{p^2},
+    // including when its leading coefficient is nonsquare over F_p.
+    n2 += if d == 8 { 2 } else { 1 };
     let mut n3: i64 = 0;
     for i in 0..k.size() as usize {
         let x = k.el(i);
@@ -1928,8 +1930,13 @@ mod tests {
             assert_eq!(models.len() as u64, 2 * p * p);
             let mut rng = sp::SplitMix64(5);
             let mut kinds = [0; 3];
-            for _ in 0..24 {
-                let m = &models[rng.below(models.len() as u64) as usize];
+            // Stratify by model kind: the previous fixed sample happened to
+            // select no linear models at p=11 and failed its coverage check.
+            let sampled: Vec<&ModelSpec> = (0..3).flat_map(|kind| {
+                let group: Vec<_> = models.iter().filter(|m| m.kind == kind).collect();
+                (0..8).map(|_| group[rng.below(group.len() as u64) as usize]).collect::<Vec<_>>()
+            }).collect();
+            for m in sampled {
                 let (a, b, _) = weak_key(&k, &tab, m).unwrap();
                 let t = k.size() as i64 + 1 - count_ec(&k, &tab, &a, &b) as i64;
                 let f = descend(&k, &m.h, &m.alpha).unwrap();
@@ -2067,10 +2074,24 @@ mod tests {
     fn walk_reaches_a_weak_curve_at_small_p() {
         let p = 61;
         let k = Fp3::new(p);
-        let mut rng = sp::SplitMix64(8);
+        // Seed 2 reaches a weak node in this component. Seed 8, formerly
+        // used here, belongs to a closed four-class component with no weak
+        // node; preserve that case as a censoring control below.
+        let mut rng = sp::SplitMix64(2);
         let start = random_full2_start(&k, &mut rng);
         let r = walk(&k, start, &mut rng, 200_000, u128::MAX, false, true);
         assert!(r.passed && !r.censored, "{r:?}");
         assert!(r.jv_weak_hits == 1);
+    }
+
+    #[test]
+    fn walk_preserves_censoring_when_component_has_no_weak_node() {
+        let k = Fp3::new(61);
+        let mut rng = sp::SplitMix64(8);
+        let start = random_full2_start(&k, &mut rng);
+        let r = walk(&k, start, &mut rng, 200_000, u128::MAX, false, true);
+        assert!(r.censored && !r.passed, "{r:?}");
+        assert_eq!(r.nodes_tested, 200_000);
+        assert_eq!(r.jv_weak_hits, 0);
     }
 }
