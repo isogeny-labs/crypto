@@ -137,3 +137,9 @@ Automatic timeout expressions and preserved manual/scheduled values were
 evaluated independently. GitHub execution after merge is still needed to
 measure the resulting queue and identify checks that need splitting to fit
 the new limit.
+
+The required `cargo test --release --lib` completed with 4,390 passing tests,
+118 pre-existing ignored tests, and nine failures caused by denied localhost
+socket binds in the sandbox. Rerunning the entire `pollard_collab` module from
+the same release test binary outside that sandbox passed all 38 tests,
+including all nine failures. No Rust sources or test expectations were changed.
