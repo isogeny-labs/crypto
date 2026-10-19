@@ -150,7 +150,7 @@ fn bits_of(n: &BigUint) -> u64 {
 }
 
 fn isqrt(n: &BigUint) -> BigUint {
-    let mut x = BigUint::one() << ((n.bits() + 1) / 2);
+    let mut x = BigUint::one() << n.bits().div_ceil(2);
     loop {
         let y = (&x + n / &x) >> 1u32;
         if y >= x {
@@ -249,7 +249,7 @@ fn j0_traces(p: &BigUint) -> Option<Vec<BigUint>> {
         return None;
     }
     let t1 = t1 >> 1u32;
-    let mut t2 = if BigUint::from(9u32) * &m >= l {
+    let t2 = if BigUint::from(9u32) * &m >= l {
         BigUint::from(9u32) * &m - l.clone()
     } else {
         l.clone() - BigUint::from(9u32) * &m
@@ -347,19 +347,14 @@ fn secg_j0_curves() -> Vec<J0Curve> {
         - (BigUint::one() << 4u32)
         - BigUint::from(2u32)
         - BigUint::one();
-    let p256 = (BigUint::one() << 256u32)
-        - (BigUint::one() << 32u32)
-        - BigUint::from(977u32);
+    let p256 = (BigUint::one() << 256u32) - (BigUint::one() << 32u32) - BigUint::from(977u32);
     vec![
         J0Curve {
             name: "secp192k1",
             p: p192,
             b: BigUint::from(3u32),
-            n: BigUint::parse_bytes(
-                b"FFFFFFFFFFFFFFFFFFFFFFFE26F2FC170F69466A74DEFD8D",
-                16,
-            )
-            .unwrap(),
+            n: BigUint::parse_bytes(b"FFFFFFFFFFFFFFFFFFFFFFFE26F2FC170F69466A74DEFD8D", 16)
+                .unwrap(),
         },
         J0Curve {
             name: "secp224k1",
@@ -398,14 +393,17 @@ fn j0_orders(p: &BigUint) -> Option<Vec<BigUint>> {
 
 fn run_census(json: bool) -> i32 {
     // Fixture: round A SEA census (SageMath), committed as census.json.
-    let fixture = std::fs::read_to_string(
-        "research/safecurves_trapdoor_slots_20261017/census.json",
-    )
-    .expect("census.json fixture (run from repository root)");
+    let fixture =
+        std::fs::read_to_string("research/safecurves_trapdoor_slots_20261017/census.json")
+            .expect("census.json fixture (run from repository root)");
     let rows: serde_json::Value = serde_json::from_str(&fixture).unwrap();
     let mut ok = true;
     let mut report = Vec::new();
     for curve in secg_j0_curves() {
+        assert!(
+            !curve.b.is_zero() && curve.b < curve.p,
+            "invalid j=0 coefficient"
+        );
         let computed = j0_orders(&curve.p).expect("CM representation");
         let mut sea_orders: Vec<BigUint> = Vec::new();
         let row = rows
@@ -415,7 +413,10 @@ fn run_census(json: bool) -> i32 {
             .find(|r| r["curve"] == curve.name)
             .unwrap();
         for c in row["classes"].as_array().unwrap() {
-            sea_orders.push(BigUint::parse_bytes(c["order"].to_string().trim_matches('"').as_bytes(), 10).unwrap());
+            sea_orders.push(
+                BigUint::parse_bytes(c["order"].to_string().trim_matches('"').as_bytes(), 10)
+                    .unwrap(),
+            );
         }
         sea_orders.sort();
         let mut sea_sorted = sea_orders.clone();
@@ -424,7 +425,7 @@ fn run_census(json: bool) -> i32 {
         let match_all = computed.len() == sea_sorted.len()
             && computed.iter().zip(sea_sorted.iter()).all(|(a, b)| a == b);
         // published order must appear in the computed orbit
-        let has_published = computed.iter().any(|o| *o == curve.n);
+        let has_published = computed.contains(&curve.n);
         ok &= match_all && has_published;
         report.push(serde_json::json!({
             "curve": curve.name,
@@ -448,10 +449,7 @@ fn run_census(json: bool) -> i32 {
     let qts = j1728_traces(&q).expect("j1728 CM");
     let mut qts_sorted = qts.clone();
     qts_sorted.sort();
-    let expected = vec![
-        BigUint::from(13320148u64),
-        BigUint::from(30797298u64),
-    ];
+    let expected = vec![BigUint::from(13320148u64), BigUint::from(30797298u64)];
     let q_ok = qts_sorted == expected;
     ok &= q_ok;
     if !json {
@@ -538,7 +536,7 @@ fn run_grind(bits: u64, max_primes: u64, rho_iters: u64, json: bool, probe: bool
                                     published_lf_bits: bits_of(lf_pub),
                                     twist_order: orders[i].clone(),
                                     twist_lf_bits: bits_of(lf_tw),
-                                    weak_order: if &lfs[5 - j] <= &lfs[j] {
+                                    weak_order: if lfs[5 - j] <= lfs[j] {
                                         orders[5 - j].clone()
                                     } else {
                                         orders[j].clone()
@@ -615,7 +613,10 @@ fn emit_hit(hit: &GrindHit, bits: u64, json: bool) {
             .unwrap()
         );
     } else {
-        println!("# {} bits (found after {} primes = 1 mod 6)", bits, hit.scanned);
+        println!(
+            "# {} bits (found after {} primes = 1 mod 6)",
+            bits, hit.scanned
+        );
         println!("- p = {}", hit.p);
         println!(
             "- published order {}, largest factor {} bits",
@@ -672,9 +673,7 @@ mod tests {
     #[test]
     fn cornacchia_j0_secp256k1() {
         // Round-A fixture: the six SEA orders of secp256k1's sextic orbit.
-        let p = (BigUint::one() << 256u32)
-            - (BigUint::one() << 32u32)
-            - BigUint::from(977u32);
+        let p = (BigUint::one() << 256u32) - (BigUint::one() << 32u32) - BigUint::from(977u32);
         let orders = j0_orders(&p).expect("CM orbit");
         assert_eq!(orders.len(), 6);
         // published order (SEC 2) must be in the orbit
@@ -694,7 +693,10 @@ mod tests {
         let q = BigUint::from(281474976710677u64);
         let mut ts = j1728_traces(&q).expect("quartic CM");
         ts.sort();
-        assert_eq!(ts, vec![BigUint::from(13320148u64), BigUint::from(30797298u64)]);
+        assert_eq!(
+            ts,
+            vec![BigUint::from(13320148u64), BigUint::from(30797298u64)]
+        );
     }
 
     #[test]
@@ -719,7 +721,8 @@ mod tests {
             )
         );
         let orders = j0_orders(&p192).expect("orbit");
-        let n192 = BigUint::parse_bytes(b"FFFFFFFFFFFFFFFFFFFFFFFE26F2FC170F69466A74DEFD8D", 16).unwrap();
+        let n192 =
+            BigUint::parse_bytes(b"FFFFFFFFFFFFFFFFFFFFFFFE26F2FC170F69466A74DEFD8D", 16).unwrap();
         assert!(orders.contains(&n192));
     }
 
