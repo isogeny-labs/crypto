@@ -15,14 +15,22 @@ pub struct Mont {
 
 impl Mont {
     pub fn new(n: u64) -> Self {
-        assert!(n & 1 == 1 && n < (1u64 << 63) && n > 2, "modulus must be odd, 2 < n < 2^63");
+        assert!(
+            n & 1 == 1 && n < (1u64 << 63) && n > 2,
+            "modulus must be odd, 2 < n < 2^63"
+        );
         let mut inv: u64 = n;
         for _ in 0..6 {
             inv = inv.wrapping_mul(2u64.wrapping_sub(n.wrapping_mul(inv)));
         }
         let r = ((1u128 << 64) % n as u128) as u64;
         let r2 = ((r as u128 * r as u128) % n as u128) as u64;
-        Mont { n, ninv: inv.wrapping_neg(), r2, one: r }
+        Mont {
+            n,
+            ninv: inv.wrapping_neg(),
+            r2,
+            one: r,
+        }
     }
     #[inline(always)]
     pub fn one(&self) -> u64 {
@@ -126,7 +134,7 @@ impl Mont {
         // Tonelli-Shanks
         let mut s = 0u32;
         let mut q = n - 1;
-        while q % 2 == 0 {
+        while q.is_multiple_of(2) {
             q /= 2;
             s += 1;
         }
@@ -137,7 +145,7 @@ impl Mont {
         let mut m = s;
         let mut c = self.pow(z, q);
         let mut t = self.pow(a, q);
-        let mut r = self.pow(a, (q + 1) / 2);
+        let mut r = self.pow(a, q.div_ceil(2));
         while t != self.one {
             let mut i = 0u32;
             let mut tt = t;
@@ -167,13 +175,13 @@ pub fn is_prime_u64(n: u64) -> bool {
         return false;
     }
     for p in [2u64, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
-        if n % p == 0 {
+        if n.is_multiple_of(p) {
             return n == p;
         }
     }
     let mut d = n - 1;
     let mut s = 0;
-    while d % 2 == 0 {
+    while d.is_multiple_of(2) {
         d /= 2;
         s += 1;
     }
@@ -209,7 +217,7 @@ pub fn is_prime_u64(n: u64) -> bool {
 #[derive(Clone, Debug)]
 pub struct Rng(pub u64);
 impl Rng {
-    pub fn next(&mut self) -> u64 {
+    pub fn next_u64(&mut self) -> u64 {
         let mut x = self.0;
         x ^= x >> 12;
         x ^= x << 25;
@@ -241,17 +249,16 @@ impl Ec {
             None => return p,
             Some(v) => v,
         };
-        let lam;
-        if x1 == x2 {
+        let lam = if x1 == x2 {
             if f.add(y1, y2) == 0 {
                 return None;
             }
             let xx = f.mul(x1, x1);
             let num = f.add(f.add(f.add(xx, xx), xx), self.a);
-            lam = f.mul(num, f.inv(f.add(y1, y1)));
+            f.mul(num, f.inv(f.add(y1, y1)))
         } else {
-            lam = f.mul(f.sub(y2, y1), f.inv(f.sub(x2, x1)));
-        }
+            f.mul(f.sub(y2, y1), f.inv(f.sub(x2, x1)))
+        };
         let x3 = f.sub(f.sub(f.mul(lam, lam), x1), x2);
         let y3 = f.sub(f.mul(lam, f.sub(x1, x3)), y1);
         Some((x3, y3))
@@ -274,7 +281,7 @@ impl Ec {
     pub fn random_point(&self, rng: &mut Rng) -> Pt {
         let f = &self.f;
         loop {
-            let x = f.to_mont(rng.next());
+            let x = f.to_mont(rng.next_u64());
             let rhs = f.add(f.add(f.mul(f.mul(x, x), x), f.mul(self.a, x)), self.b);
             if let Some(y) = f.sqrt(rhs) {
                 if y != 0 {
@@ -295,8 +302,8 @@ mod tests {
         let f = Mont::new(q);
         let mut r = Rng(12345);
         for _ in 0..1000 {
-            let a = r.next() % q;
-            let b = r.next() % q;
+            let a = r.next_u64() % q;
+            let b = r.next_u64() % q;
             let want = ((a as u128 * b as u128) % q as u128) as u64;
             assert_eq!(f.from_mont(f.mul(f.to_mont(a), f.to_mont(b))), want);
         }
@@ -330,12 +337,22 @@ mod tests {
     fn group_law_order() {
         // Count points of y^2 = x^3 + 2x + 3 over F_97 by brute force, then check [N]P = O.
         let f = Mont::new(97);
-        let e = Ec { f, a: f.to_mont(2), b: f.to_mont(3) };
+        let e = Ec {
+            f,
+            a: f.to_mont(2),
+            b: f.to_mont(3),
+        };
         let mut n = 1u64;
         for x in 0..97u64 {
             let xm = f.to_mont(x);
             let rhs = f.add(f.add(f.mul(f.mul(xm, xm), xm), f.mul(e.a, xm)), e.b);
-            n += if rhs == 0 { 1 } else if f.sqrt(rhs).is_some() { 2 } else { 0 };
+            n += if rhs == 0 {
+                1
+            } else if f.sqrt(rhs).is_some() {
+                2
+            } else {
+                0
+            };
         }
         let mut r = Rng(7);
         for _ in 0..20 {

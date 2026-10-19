@@ -94,7 +94,15 @@ const Q_HI: i128 = 1 << 62;
 
 impl PrimeGen {
     pub fn new(d: i64, ell: u64) -> Self {
-        let mut g = PrimeGen { d, ell: ell as i128, v: 0, side: 1, x: 1, x_end: 0, seen: HashSet::new() };
+        let mut g = PrimeGen {
+            d,
+            ell: ell as i128,
+            v: 0,
+            side: 1,
+            x: 1,
+            x_end: 0,
+            seen: HashSet::new(),
+        };
         g.advance_range();
         g
     }
@@ -123,14 +131,13 @@ impl PrimeGen {
                 (self.search(xs, false, Q_HI), self.search(xs, false, Q_LO))
             };
             // right: x in [lo, hi); left: x in [lo, hi) with lo<hi after mirroring
-            let (a, b) = if self.side == 0 { (lo, hi) } else { (lo, hi) };
-            if a >= b {
+            if lo >= hi {
                 continue;
             }
-            // first x >= a with x ≡ 1 (mod ell)
-            let r = (1 - a).rem_euclid(self.ell);
-            self.x = a + r;
-            self.x_end = b;
+            // first x >= lo with x ≡ 1 (mod ell)
+            let r = (1 - lo).rem_euclid(self.ell);
+            self.x = lo + r;
+            self.x_end = hi;
             return;
         }
     }
@@ -236,7 +243,7 @@ pub fn eval_at_prime(d: i64, j0: i64, ell: u64, fr: Frob, seed: u64) -> Result<V
     let f = Mont::new(q);
     let t = 2 * fr.x + (d as i128) * fr.y;
     let n_ord = (q as i128 + 1 - t) as u64;
-    if n_ord % (ell * ell) != 0 {
+    if !n_ord.is_multiple_of(ell * ell) {
         return Err(format!("order {} not divisible by ell^2", n_ord));
     }
     let mut rng = Rng(seed ^ q ^ 0x9E37_79B9_7F4A_7C15);
@@ -245,7 +252,7 @@ pub fn eval_at_prime(d: i64, j0: i64, ell: u64, fr: Frob, seed: u64) -> Result<V
     // --- E[ell] basis ---
     let mut e = 0u32;
     let mut cof = n_ord;
-    while cof % ell == 0 {
+    while cof.is_multiple_of(ell) {
         cof /= ell;
         e += 1;
     }
@@ -364,7 +371,7 @@ pub fn eval_at_prime(d: i64, j0: i64, ell: u64, fr: Frob, seed: u64) -> Result<V
         num[s] = f.mul(c1728m, fa);
         den[s] = f.add(fa, f.mul(c27, f.mul(b2, b2)));
     }
-    if den.iter().any(|&v| v == 0) {
+    if den.contains(&0) {
         return Err("singular codomain".into());
     }
     f.batch_inv(&mut den, &mut scratch);
@@ -372,14 +379,12 @@ pub fn eval_at_prime(d: i64, j0: i64, ell: u64, fr: Frob, seed: u64) -> Result<V
     // --- product of (X - j') ---
     let mut c = vec![0u64; nsub + 1];
     c[0] = f.one();
-    let mut deg = 0usize;
-    for &r in &roots {
+    for (deg, &r) in roots.iter().enumerate() {
         c[deg + 1] = 0;
         for k in (1..=deg + 1).rev() {
             c[k] = f.sub(c[k - 1], f.mul(r, c[k]));
         }
         c[0] = f.neg(f.mul(r, c[0]));
-        deg += 1;
     }
     // c[nsub] must be 1 (monic)
     debug_assert_eq!(c[nsub], f.one());
@@ -414,9 +419,14 @@ fn sym_residue(val: &BigUint, m: &BigUint, q: u64) -> u64 {
 
 /// `Φ_ℓ(X, j₀)` with `j₀ = j(O_K)`, coefficients low degree first, length `ℓ + 2`
 /// (monic).  `batch` primes are evaluated in parallel per round.
-pub fn phi_at_crater(d: i64, ell: u64, batch: usize, progress: bool) -> Result<(Vec<BigInt>, Level1Report), String> {
+pub fn phi_at_crater(
+    d: i64,
+    ell: u64,
+    batch: usize,
+    progress: bool,
+) -> Result<(Vec<BigInt>, Level1Report), String> {
     let j0 = class_one_j(d).ok_or("D must be a class-number-one fundamental discriminant")?;
-    if ell < 3 || ell % 2 == 0 || !is_prime_u64(ell) {
+    if ell < 3 || ell.is_multiple_of(2) || !is_prime_u64(ell) {
         return Err("ell must be an odd prime".into());
     }
     let start = Instant::now();
@@ -444,7 +454,8 @@ pub fn phi_at_crater(d: i64, ell: u64, batch: usize, progress: bool) -> Result<(
         // convergence test against the whole fresh batch
         if used > 0 {
             let all_ok = (0..ncoef).into_par_iter().all(|k| {
-                res.iter().all(|(q, r)| sym_residue(&vals[k], &m, *q) == r[k])
+                res.iter()
+                    .all(|(q, r)| sym_residue(&vals[k], &m, *q) == r[k])
             });
             if all_ok {
                 let mut out: Vec<BigInt> = Vec::with_capacity(ncoef + 1);
@@ -569,7 +580,6 @@ mod tests {
         }
     }
 
-
     /// Independent native cross-check: the repository's own `Φ_ℓ mod p` (computed from the
     /// `q`-expansion of `j`, `isogeny_walk::modpoly`) evaluated at `j₀ mod p` must equal our
     /// integer polynomial reduced mod `p`.  Covers the special craters `j = 0` and `j = 1728`.
@@ -578,8 +588,13 @@ mod tests {
         use crate::cryptanalysis::isogeny_walk::field::Field;
         use crate::cryptanalysis::isogeny_walk::modpoly::modular_polynomial;
         let primes: [u64; 3] = [1_000_003, 998_244_353, 4_611_686_018_427_387_847];
-        let cases: [(i64, &[u64]); 5] =
-            [(-7, &[5, 7, 11, 13, 17, 19]), (-3, &[5, 7, 11]), (-4, &[5, 7, 13]), (-8, &[5, 11]), (-163, &[5, 7])];
+        let cases: [(i64, &[u64]); 5] = [
+            (-7, &[5, 7, 11, 13, 17, 19]),
+            (-3, &[5, 7, 11]),
+            (-4, &[5, 7, 13]),
+            (-8, &[5, 11]),
+            (-163, &[5, 7]),
+        ];
         for (d, ells) in cases {
             let j0 = class_one_j(d).unwrap();
             for &ell in ells {
@@ -591,7 +606,11 @@ mod tests {
                     assert_eq!(theirs.len(), ours.len(), "degree, D={d} ell={ell} p={p}");
                     for (k, c) in ours.iter().enumerate() {
                         let want = c.mod_floor(&BigInt::from(p)).to_biguint().unwrap();
-                        assert_eq!(f.to_big(&theirs[k]), want, "coefficient {k}, D={d} ell={ell} p={p}");
+                        assert_eq!(
+                            f.to_big(&theirs[k]),
+                            want,
+                            "coefficient {k}, D={d} ell={ell} p={p}"
+                        );
                     }
                 }
             }

@@ -56,10 +56,14 @@ impl F2Poly {
     }
     /// Degree, `None` for the zero polynomial.
     pub fn deg(&self) -> Option<usize> {
-        self.w.last().map(|&l| (self.w.len() - 1) * 64 + 63 - l.leading_zeros() as usize)
+        self.w
+            .last()
+            .map(|&l| (self.w.len() - 1) * 64 + 63 - l.leading_zeros() as usize)
     }
     pub fn coeff(&self, i: usize) -> bool {
-        self.w.get(i / 64).is_some_and(|&v| (v >> (i % 64)) & 1 == 1)
+        self.w
+            .get(i / 64)
+            .is_some_and(|&v| (v >> (i % 64)) & 1 == 1)
     }
     pub fn bits(&self) -> Vec<bool> {
         match self.deg() {
@@ -100,8 +104,14 @@ impl F2Poly {
         if self.is_zero() || o.is_zero() {
             return Self::zero();
         }
-        let (a, b) = if self.deg() >= o.deg() { (self, o) } else { (o, self) };
-        let mut r = F2Poly { w: vec![0; a.w.len() + b.w.len() + 1] };
+        let (a, b) = if self.deg() >= o.deg() {
+            (self, o)
+        } else {
+            (o, self)
+        };
+        let mut r = F2Poly {
+            w: vec![0; a.w.len() + b.w.len() + 1],
+        };
         for (wi, &word) in b.w.iter().enumerate() {
             let mut v = word;
             while v != 0 {
@@ -127,7 +137,9 @@ impl F2Poly {
     pub fn divrem(&self, f: &Self) -> (Self, Self) {
         let df = f.deg().expect("division by zero polynomial");
         let mut r = self.clone();
-        let mut q = F2Poly { w: vec![0; self.w.len() + 1] };
+        let mut q = F2Poly {
+            w: vec![0; self.w.len() + 1],
+        };
         while let Some(dr) = r.deg() {
             if dr < df {
                 break;
@@ -209,7 +221,9 @@ pub fn squarefree(f: &F2Poly) -> Vec<(F2Poly, u64)> {
         }
         let d = f.derivative();
         if d.is_zero() {
-            let g = f.sqrt_if_square().expect("zero derivative implies a square in characteristic 2");
+            let g = f
+                .sqrt_if_square()
+                .expect("zero derivative implies a square in characteristic 2");
             rec(&g, mult * 2, out);
             return;
         }
@@ -227,7 +241,11 @@ pub fn squarefree(f: &F2Poly) -> Vec<(F2Poly, u64)> {
             i += 1;
         }
         if c.deg().unwrap_or(0) > 0 {
-            rec(&c.sqrt_if_square().expect("remaining part is a square"), mult * 2, out);
+            rec(
+                &c.sqrt_if_square().expect("remaining part is a square"),
+                mult * 2,
+                out,
+            );
         }
     }
     let mut out = Vec::new();
@@ -283,7 +301,9 @@ pub fn edf(g: &F2Poly, d: usize, rng: &mut u64) -> Vec<F2Poly> {
         // random a of degree < dg
         let mut bits = vec![false; dg];
         for b in bits.iter_mut() {
-            *rng = rng.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            *rng = rng
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
             *b = (*rng >> 33) & 1 == 1;
         }
         let a = F2Poly::from_bits(&bits).rem(g);
@@ -318,7 +338,7 @@ pub fn rational_factors(f: &F2Poly, n: usize) -> RationalFactors {
     let mut leftover = 0usize;
     for (g, mult) in squarefree(f) {
         for (prod, d) in ddf(&g, n) {
-            if d != 0 && n % d == 0 {
+            if d != 0 && n.is_multiple_of(d) {
                 for irr in edf(&prod, d, &mut rng) {
                     factors.push((irr, d, mult));
                 }
@@ -328,7 +348,10 @@ pub fn rational_factors(f: &F2Poly, n: usize) -> RationalFactors {
         }
     }
     factors.sort_by(|a, b| a.0.cmp_key(&b.0));
-    RationalFactors { factors, leftover_deg: leftover }
+    RationalFactors {
+        factors,
+        leftover_deg: leftover,
+    }
 }
 
 #[cfg(test)]

@@ -97,7 +97,10 @@ impl Volcano {
 fn normalise(levels: &BTreeMap<u32, Vec<Vec<f64>>>) -> BTreeMap<u32, Vec<f64>> {
     let all: Vec<f64> = levels.values().flatten().flatten().copied().collect();
     let g = mean(&all);
-    levels.iter().map(|(&l, cs)| (l, cs.iter().flatten().map(|x| x / g).collect())).collect()
+    levels
+        .iter()
+        .map(|(&l, cs)| (l, cs.iter().flatten().map(|x| x / g).collect()))
+        .collect()
 }
 
 struct Stats {
@@ -125,10 +128,18 @@ fn stats(vols: &[(&Volcano, BTreeMap<u32, Vec<f64>>)]) -> Stats {
         }
     }
     let n = pts.len() as f64;
-    let (mx, my) = (pts.iter().map(|p| p.0).sum::<f64>() / n, pts.iter().map(|p| p.1).sum::<f64>() / n);
+    let (mx, my) = (
+        pts.iter().map(|p| p.0).sum::<f64>() / n,
+        pts.iter().map(|p| p.1).sum::<f64>() / n,
+    );
     let sxx: f64 = pts.iter().map(|p| (p.0 - mx).powi(2)).sum();
     let sxy: f64 = pts.iter().map(|p| (p.0 - mx) * (p.1 - my)).sum();
-    Stats { crater: mean(&c), middle: mean(&m), floor: mean(&f), slope: 100.0 * sxy / sxx / my }
+    Stats {
+        crater: mean(&c),
+        middle: mean(&m),
+        floor: mean(&f),
+        slope: 100.0 * sxy / sxx / my,
+    }
 }
 
 fn ks(a: &[f64], b: &[f64]) -> f64 {
@@ -163,7 +174,11 @@ fn reading(lo: f64, hi: f64, null: f64, margin_lo: f64, margin_hi: f64) -> &'sta
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let get = |k: &str| args.iter().position(|a| a == k).map(|i| args[i + 1].clone());
+    let get = |k: &str| {
+        args.iter()
+            .position(|a| a == k)
+            .map(|i| args[i + 1].clone())
+    };
     let study = get("--study").expect("--study DIR");
     let margin: f64 = get("--margin").map(|s| s.parse().unwrap()).unwrap_or(0.05);
     let mut vids: Vec<String> = std::fs::read_dir(format!("{study}/specs"))
@@ -174,15 +189,26 @@ fn main() {
         .collect();
     vids.sort();
     let mut sessions: Vec<String> = std::fs::read_dir(format!("{study}/sessions"))
-        .map(|rd| rd.filter_map(|e| e.ok()).filter(|e| e.path().join("records.jsonl").exists()).map(|e| e.file_name().to_string_lossy().to_string()).collect())
+        .map(|rd| {
+            rd.filter_map(|e| e.ok())
+                .filter(|e| e.path().join("records.jsonl").exists())
+                .map(|e| e.file_name().to_string_lossy().to_string())
+                .collect()
+        })
         .unwrap_or_default();
     sessions.sort();
     let mut vols = Vec::new();
     // control pairs per tier: (workload, round) -> (neg S, plain S), grouped by curve
-    let mut control: BTreeMap<char, BTreeMap<String, BTreeMap<(String, u64), (Option<f64>, Option<f64>)>>> = BTreeMap::new();
+    let mut control: BTreeMap<
+        char,
+        BTreeMap<String, BTreeMap<(String, u64), (Option<f64>, Option<f64>)>>,
+    > = BTreeMap::new();
     let mut unverified: Vec<String> = Vec::new();
     for vid in &vids {
-        let meta: Value = serde_json::from_str(&std::fs::read_to_string(format!("{study}/specs/{vid}/vertices.json")).unwrap()).unwrap();
+        let meta: Value = serde_json::from_str(
+            &std::fs::read_to_string(format!("{study}/specs/{vid}/vertices.json")).unwrap(),
+        )
+        .unwrap();
         let mut level_of = BTreeMap::new();
         let mut n1 = BTreeMap::new();
         for v in meta["vertices"].as_array().unwrap() {
@@ -192,9 +218,13 @@ fn main() {
         }
         let tier = vid.chars().next().unwrap();
         let mut per_curve: BTreeMap<(u32, (u64, u64)), Vec<f64>> = BTreeMap::new();
-        for s in sessions.iter().filter(|s| s.split("__").next() == Some(vid.as_str())) {
+        for s in sessions
+            .iter()
+            .filter(|s| s.split("__").next() == Some(vid.as_str()))
+        {
             let is_control = s.ends_with("__control");
-            let text = std::fs::read_to_string(format!("{study}/sessions/{s}/records.jsonl")).unwrap();
+            let text =
+                std::fs::read_to_string(format!("{study}/sessions/{s}/records.jsonl")).unwrap();
             for line in text.lines() {
                 let r: Value = serde_json::from_str(line).unwrap();
                 if r["warmup"].as_bool().unwrap_or(false) {
@@ -202,7 +232,10 @@ fn main() {
                 }
                 let arm = r["arm"].as_str().unwrap();
                 if r["outcome"]["status"] != "verified" {
-                    unverified.push(format!("{s} {arm} {} round {}: {}", r["workload"]["workload_id"], r["round"], r["outcome"]["status"]));
+                    unverified.push(format!(
+                        "{s} {arm} {} round {}: {}",
+                        r["workload"]["workload_id"], r["round"], r["outcome"]["status"]
+                    ));
                     continue;
                 }
                 let cs = &r["workload"]["curve_spec"];
@@ -210,8 +243,17 @@ fn main() {
                 let rr = cs["r"].as_f64().unwrap();
                 let sv = r["cost"]["total_gae"].as_f64().unwrap() / rr.sqrt();
                 if is_control {
-                    let key = (r["workload"]["workload_id"].as_str().unwrap().to_string(), r["round"].as_u64().unwrap());
-                    let e = control.entry(tier).or_default().entry(format!("{vid}:{ab:?}")).or_default().entry(key).or_insert((None, None));
+                    let key = (
+                        r["workload"]["workload_id"].as_str().unwrap().to_string(),
+                        r["round"].as_u64().unwrap(),
+                    );
+                    let e = control
+                        .entry(tier)
+                        .or_default()
+                        .entry(format!("{vid}:{ab:?}"))
+                        .or_default()
+                        .entry(key)
+                        .or_insert((None, None));
                     match arm {
                         "rho-neg" => e.0 = Some(sv),
                         "rho-plain" => e.1 = Some(sv),
@@ -254,10 +296,39 @@ fn main() {
     writeln!(md, "## Volcanoes\n\n| id | ℓ | D | depth | m | p | r (bits) | curves | solves | mean S | crater S | floor S |\n|---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|").unwrap();
     for v in &vols {
         let all: Vec<f64> = v.levels.values().flatten().flatten().copied().collect();
-        let cr: Vec<f64> = v.levels.get(&0).into_iter().flatten().flatten().copied().collect();
-        let fl: Vec<f64> = v.levels.get(&v.depth).into_iter().flatten().flatten().copied().collect();
+        let cr: Vec<f64> = v
+            .levels
+            .get(&0)
+            .into_iter()
+            .flatten()
+            .flatten()
+            .copied()
+            .collect();
+        let fl: Vec<f64> = v
+            .levels
+            .get(&v.depth)
+            .into_iter()
+            .flatten()
+            .flatten()
+            .copied()
+            .collect();
         let nc: usize = v.levels.values().map(|c| c.len()).sum();
-        writeln!(md, "| {} | {} | {} | {} | {} | {} | {:.1} | {nc} | {} | {:.4} | {:.4} | {:.4} |", v.id, v.ell, v.d, v.depth, v.m, v.p, (v.r as f64).log2(), all.len(), mean(&all), mean(&cr), mean(&fl)).unwrap();
+        writeln!(
+            md,
+            "| {} | {} | {} | {} | {} | {} | {:.1} | {nc} | {} | {:.4} | {:.4} | {:.4} |",
+            v.id,
+            v.ell,
+            v.d,
+            v.depth,
+            v.m,
+            v.p,
+            (v.r as f64).log2(),
+            all.len(),
+            mean(&all),
+            mean(&cr),
+            mean(&fl)
+        )
+        .unwrap();
         let lv: Vec<Value> = v
             .levels
             .iter()
@@ -273,7 +344,10 @@ fn main() {
     let mut tiers: Vec<(String, Vec<&Volcano>)> = Vec::new();
     let tier_set: std::collections::BTreeSet<char> = vols.iter().map(|v| v.tier).collect();
     for t in &tier_set {
-        tiers.push((format!("tier {t}"), vols.iter().filter(|v| v.tier == *t).collect()));
+        tiers.push((
+            format!("tier {t}"),
+            vols.iter().filter(|v| v.tier == *t).collect(),
+        ));
     }
     if tier_set.len() > 1 {
         tiers.push(("all volcanoes".into(), vols.iter().collect()));
@@ -284,24 +358,74 @@ fn main() {
     writeln!(md, "## Level comparisons\n\n| scope | volcanoes | solves (crater / middle / floor) | comparison | estimate | 95% interval | reading |\n|---|--:|---|---|--:|---|---|").unwrap();
     let mut rng = Rng(0x7A11_B0CA);
     for (name, vs) in &tiers {
-        let point = stats(&vs.iter().map(|v| (*v, normalise(&v.levels))).collect::<Vec<_>>());
-        let boots: Vec<Stats> = (0..B).map(|_| stats(&vs.iter().map(|v| (*v, normalise(&v.resample(&mut rng)))).collect::<Vec<_>>())).collect();
-        let count = |f: &dyn Fn(&Volcano, u32) -> bool| -> usize { vs.iter().map(|v| v.levels.iter().filter(|(l, _)| f(v, **l)).map(|(_, cs)| cs.iter().map(|c| c.len()).sum::<usize>()).sum::<usize>()).sum() };
-        let ns = format!("{} / {} / {}", count(&|_, l| l == 0), count(&|v, l| l > 0 && l < v.depth), count(&|v, l| l == v.depth));
+        let point = stats(
+            &vs.iter()
+                .map(|v| (*v, normalise(&v.levels)))
+                .collect::<Vec<_>>(),
+        );
+        let boots: Vec<Stats> = (0..B)
+            .map(|_| {
+                stats(
+                    &vs.iter()
+                        .map(|v| (*v, normalise(&v.resample(&mut rng))))
+                        .collect::<Vec<_>>(),
+                )
+            })
+            .collect();
+        let count = |f: &dyn Fn(&Volcano, u32) -> bool| -> usize {
+            vs.iter()
+                .map(|v| {
+                    v.levels
+                        .iter()
+                        .filter(|(l, _)| f(v, **l))
+                        .map(|(_, cs)| cs.iter().map(|c| c.len()).sum::<usize>())
+                        .sum::<usize>()
+                })
+                .sum()
+        };
+        let ns = format!(
+            "{} / {} / {}",
+            count(&|_, l| l == 0),
+            count(&|v, l| l > 0 && l < v.depth),
+            count(&|v, l| l == v.depth)
+        );
         let mut entry = json!({"scope": name, "volcanoes": vs.iter().map(|v| v.id.clone()).collect::<Vec<_>>(), "rows": []});
         for (cmp, pt, f) in [
-            ("floor / crater", point.floor / point.crater, (|s: &Stats| s.floor / s.crater) as fn(&Stats) -> f64),
-            ("middle / crater", point.middle / point.crater, |s: &Stats| s.middle / s.crater),
-            ("floor / middle", point.floor / point.middle, |s: &Stats| s.floor / s.middle),
+            (
+                "floor / crater",
+                point.floor / point.crater,
+                (|s: &Stats| s.floor / s.crater) as fn(&Stats) -> f64,
+            ),
+            (
+                "middle / crater",
+                point.middle / point.crater,
+                |s: &Stats| s.middle / s.crater,
+            ),
+            ("floor / middle", point.floor / point.middle, |s: &Stats| {
+                s.floor / s.middle
+            }),
         ] {
             let (lo, hi) = ci(boots.iter().map(f).collect());
             let rd = reading(lo, hi, 1.0, mlo, mhi);
-            writeln!(md, "| {name} | {} | {ns} | {cmp} | {pt:.4} | [{lo:.4}, {hi:.4}] | {rd} |", vs.len()).unwrap();
-            entry["rows"].as_array_mut().unwrap().push(json!({"comparison": cmp, "estimate": pt, "lo": lo, "hi": hi, "reading": rd}));
+            writeln!(
+                md,
+                "| {name} | {} | {ns} | {cmp} | {pt:.4} | [{lo:.4}, {hi:.4}] | {rd} |",
+                vs.len()
+            )
+            .unwrap();
+            entry["rows"].as_array_mut().unwrap().push(
+                json!({"comparison": cmp, "estimate": pt, "lo": lo, "hi": hi, "reading": rd}),
+            );
         }
         let (lo, hi) = ci(boots.iter().map(|s| s.slope).collect());
         let rd = reading(lo, hi, 0.0, -100.0 * margin, 100.0 * margin);
-        writeln!(md, "| {name} | {} | {ns} | crater→floor slope, % | {:.2} | [{lo:.2}, {hi:.2}] | {rd} |", vs.len(), point.slope).unwrap();
+        writeln!(
+            md,
+            "| {name} | {} | {ns} | crater→floor slope, % | {:.2} | [{lo:.2}, {hi:.2}] | {rd} |",
+            vs.len(),
+            point.slope
+        )
+        .unwrap();
         entry["rows"].as_array_mut().unwrap().push(json!({"comparison": "slope_percent", "estimate": point.slope, "lo": lo, "hi": hi, "reading": rd}));
         // distribution: KS crater vs floor, permutation within volcano
         if !name.starts_with("volcano") {
@@ -309,10 +433,17 @@ fn main() {
                 .iter()
                 .map(|v| {
                     let n = normalise(&v.levels);
-                    (n.get(&0).cloned().unwrap_or_default(), n.get(&v.depth).cloned().unwrap_or_default())
+                    (
+                        n.get(&0).cloned().unwrap_or_default(),
+                        n.get(&v.depth).cloned().unwrap_or_default(),
+                    )
                 })
                 .collect();
-            let flat = |k: usize| -> Vec<f64> { norm.iter().flat_map(|x| if k == 0 { x.0.clone() } else { x.1.clone() }).collect() };
+            let flat = |k: usize| -> Vec<f64> {
+                norm.iter()
+                    .flat_map(|x| if k == 0 { x.0.clone() } else { x.1.clone() })
+                    .collect()
+            };
             let d0 = ks(&flat(0), &flat(1));
             let mut ge = 0usize;
             for _ in 0..B {
@@ -337,9 +468,17 @@ fn main() {
             writeln!(md, "| {name} | {} | {ns} | KS crater vs floor (p by permutation) | D = {d0:.4} | p = {pv:.3} | quantiles 10/50/90%: crater {:.3}/{:.3}/{:.3}, floor {:.3}/{:.3}/{:.3} |", vs.len(), qa.0, qa.1, qa.2, qb.0, qb.1, qb.2).unwrap();
             entry["ks"] = json!({"d": d0, "p": pv, "crater_q": [qa.0, qa.1, qa.2], "floor_q": [qb.0, qb.1, qb.2]});
             // raw (unnormalised) mean S with interval: the size check
-            let raw = |lv: &[BTreeMap<u32, Vec<Vec<f64>>>]| -> f64 { mean(&lv.iter().flat_map(|m| m.values().flatten().flatten().copied()).collect::<Vec<_>>()) };
+            let raw = |lv: &[BTreeMap<u32, Vec<Vec<f64>>>]| -> f64 {
+                mean(
+                    &lv.iter()
+                        .flat_map(|m| m.values().flatten().flatten().copied())
+                        .collect::<Vec<_>>(),
+                )
+            };
             let pt = raw(&vs.iter().map(|v| v.levels.clone()).collect::<Vec<_>>());
-            let (lo, hi) = ci((0..B / 4).map(|_| raw(&vs.iter().map(|v| v.resample(&mut rng)).collect::<Vec<_>>())).collect());
+            let (lo, hi) = ci((0..B / 4)
+                .map(|_| raw(&vs.iter().map(|v| v.resample(&mut rng)).collect::<Vec<_>>()))
+                .collect());
             writeln!(md, "| {name} | {} | {ns} | mean raw S of rho.negation (floor √(π/4) = 0.8862) | {pt:.4} | [{lo:.4}, {hi:.4}] | descriptive |", vs.len()).unwrap();
             entry["raw_s"] = json!({"estimate": pt, "lo": lo, "hi": hi});
         }
@@ -349,9 +488,20 @@ fn main() {
     // ---------------------------------------------------------------- positive control
     writeln!(md, "## Positive control: rho.plain against rho.negation on the same workloads and seeds\n\n| scope | curves | pairs | Σ S(plain) / Σ S(neg) | 95% interval | reading |\n|---|--:|--:|--:|---|---|").unwrap();
     for (t, curves) in &control {
-        let cs: Vec<Vec<(f64, f64)>> = curves.values().map(|m| m.values().filter_map(|(a, b)| Some(((*a)?, (*b)?))).collect::<Vec<_>>()).filter(|v: &Vec<(f64, f64)>| !v.is_empty()).collect();
+        let cs: Vec<Vec<(f64, f64)>> = curves
+            .values()
+            .map(|m| {
+                m.values()
+                    .filter_map(|(a, b)| Some(((*a)?, (*b)?)))
+                    .collect::<Vec<_>>()
+            })
+            .filter(|v: &Vec<(f64, f64)>| !v.is_empty())
+            .collect();
         let ratio = |cs: &[Vec<(f64, f64)>]| -> f64 {
-            let (sa, sb) = cs.iter().flatten().fold((0.0, 0.0), |acc, p| (acc.0 + p.0, acc.1 + p.1));
+            let (sa, sb) = cs
+                .iter()
+                .flatten()
+                .fold((0.0, 0.0), |acc, p| (acc.0 + p.0, acc.1 + p.1));
             sb / sa
         };
         let pt = ratio(&cs);
@@ -367,11 +517,29 @@ fn main() {
             })
             .collect());
         let pairs: usize = cs.iter().map(|c| c.len()).sum();
-        let rd = if lo > mhi { "difference detected, larger than the margin" } else { "CONTROL FAILED: the design does not resolve the known difference" };
-        writeln!(md, "| tier {t} | {} | {pairs} | {pt:.4} | [{lo:.4}, {hi:.4}] | {rd} |", cs.len()).unwrap();
+        let rd = if lo > mhi {
+            "difference detected, larger than the margin"
+        } else {
+            "CONTROL FAILED: the design does not resolve the known difference"
+        };
+        writeln!(
+            md,
+            "| tier {t} | {} | {pairs} | {pt:.4} | [{lo:.4}, {hi:.4}] | {rd} |",
+            cs.len()
+        )
+        .unwrap();
         out["control"].as_array_mut().unwrap().push(json!({"tier": t.to_string(), "curves": cs.len(), "pairs": pairs, "ratio": pt, "lo": lo, "hi": hi, "reading": rd}));
     }
-    writeln!(md, "\nMeasured records that did not verify (excluded above, listed here): {}", if out["unverified"].as_array().unwrap().is_empty() { "none".to_string() } else { out["unverified"].as_array().unwrap().len().to_string() }).unwrap();
+    writeln!(
+        md,
+        "\nMeasured records that did not verify (excluded above, listed here): {}",
+        if out["unverified"].as_array().unwrap().is_empty() {
+            "none".to_string()
+        } else {
+            out["unverified"].as_array().unwrap().len().to_string()
+        }
+    )
+    .unwrap();
     for u in out["unverified"].as_array().unwrap() {
         writeln!(md, "- {}", u.as_str().unwrap()).unwrap();
     }
