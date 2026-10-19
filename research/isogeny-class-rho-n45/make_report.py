@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 run = Path(sys.argv[1])
-CLASSES = [c for c in ["P1", "P0", "B1", "K"] if (run / c / "walk.json").exists()]
+CLASSES = [c for c in ["P2"] if (run / c / "walk.json").exists()]
 
 
 def f0(x):
