@@ -545,3 +545,21 @@ licensed are per (`n`, `m`) series at toy sizes (`n ≤ 23`, `ℓ ≤ 13`); they
 solver-axis stage diagnostics of a Boolean F4, not costs of a pipeline, and say
 nothing about `n = 131`, other `a`, other window classes or other engines.
 Nothing here prices a pipeline or reports `S` in the repository's sense.
+
+### Amendment 6, erratum, 2026-10-19 (after the rows; changes no rule, threshold, prediction or row)
+
+§10 says that no arm has a planted decomposition with `m = 3` distinct
+summands at `ℓ = 3`, at either `n`, and expects at most 2 completed cells for
+S, X, XR and NS at `m = 3`. That sentence was read from the `check` listing of
+the arms S, X, U, NS and PC, and XR was not in it. XR's window is a random
+subspace drawn per (`n`, `m`, `ℓ`), and at `ℓ = 3` it holds a planted
+decomposition at both `n`. XR at `m = 3` therefore has cells at `ℓ = 3, 4, 5`
+(3 completed cells) while S, X and NS have `ℓ = 4, 5`. Prediction P8, as
+registered ("S, X, XR and NS each have fewer than 3 completed cells"), is
+scored **failed** on XR; the analysis prints it so. Also not stated in §3: the
+random windows of XR and U are drawn independently for each `ℓ` (they are
+not nested), so their `b` is not monotone in `ℓ` and can repeat
+(XR, `n = 23`, `m = 3`: `|F| = 19` at `ℓ = 4` and at `ℓ = 5`). That is how §3
+defines them, and it is read as such in the report. After the rows, the
+analysis harness gained the printed marks for P6, P7 and P8; no rule R1–R7
+changed.

@@ -229,6 +229,55 @@ Amendment 4 was registered before any of its rows. Every row now records
   function-and-chain combination, with a steeper per-bit growth. It is not a
   slope change.
 
+### Amendment 6: E-K1, a Gauss-period window in `s = x + 1/x` (run-20261019T1712Z)
+
+Rows: `runs/K1-*.jsonl` (306). Check log: `runs/K1-check.txt`. Analysis:
+`runs/analysis-amendment6.txt`. Run report:
+[`reports/run-20261019T1712Z/REPORT.pdf`](reports/run-20261019T1712Z/REPORT.pdf).
+Amendment 6 was registered before any row and follows the κ-primary rule of
+Amendment 5. Instrument: the repository's Boolean F4
+(`pq_f4_f2::groebner_basis_f4`) on the Weil restriction of each system;
+`field_ops` is its count of 64-bit XORs. Curve `K_0` over `F_{2^n}`,
+`n = 11, 23`; arms S (Gauss window in `s`), X (same window in `x`), XR
+(random `x`-window), U (random `u`-frame), NS (null of S's shape), PC
+(positive control, `m = 3`).
+
+- **The `s`-line polynomial is Semaev's `S_{m+1}` in `x`** (exact, checked on a
+  degree-exact grid at both `n`, `m = 2, 3`). So S and X have the same
+  equations. They differ in the target value and in which points the window
+  holds.
+- **R1: every decided series is cost-unfavourable** (prediction held). 14
+  series with at least 3 completed cells: κ = 2.42–3.93 at `m = 2` (break-even
+  1; 10 series) and 6.15–18.71 at `m = 3` (break-even 2; XR and U at both `n`).
+  S: κ = 3.93 (`n = 11`) and 2.79 (`n = 23`) at `m = 2`.
+- **R4: S does not advance** at `m = 2` for either `n` (cost-unfavourable). At
+  `m = 3` it is inconclusive: the direct degree-6 systems complete only
+  `ℓ = 4, 5` (time or the 1 GiB matrix cap at `ℓ = 6`), so S, X and NS have 2
+  cells.
+- **R2, S against X: differs** at `m = 2`, though D is within ±1 at every
+  shared cell. κ differs by 0.35 (`n = 11`) and 0.37 (`n = 23`), above the 0.25
+  margin. P2 failed.
+- **R3, S against XR: tied** at both `n`. **Against U:** S's κ is higher at
+  `n = 11` (3.93 vs 3.64) and lower at `n = 23` (2.79 vs 3.08). The level at
+  equal `ℓ` favours U at `n = 11` (U at least 2× cheaper in 6 of 9 cells).
+- **R5, null: mixed** at `m = 2` for both `n`. NS is not harder than S in D:
+  at `n = 23` it is lower at `ℓ = 3–6`, higher by 1 at `ℓ = 8` and equal in the
+  other six cells; at `n = 11` it differs only at `ℓ = 3, 4`. P6 failed.
+- **R6, positive control: detected.** At `m = 3` the random `x`-window's direct
+  `S_4` (degree 6) costs 132–390× the `u`-frame's `field_ops` in all 4 shared
+  cells (D 7 vs 5).
+- **R7, Gauss `x`-window against random:** cheaper at `n = 23`, `m = 2` (random
+  window 30–170× dearer at `ℓ = 7–11`, 6 of 11 cells at least 2×), not at
+  `n = 11` (1 of 9). P7 failed as registered (all four `(n, m)`).
+- **Trace replay: 250 of 250** completed systems reproduce D, `max_cols`,
+  `max_rows` and `steps` (and `field_ops`) from their seed.
+- **Registration slips:** P8 failed on XR (its random `ℓ = 3` window was
+  plantable at `m = 3`); the erratum is in `PREREGISTRATION.md`.
+- **Reading:** a window in `s` at the Gauss-period dimensions does not change
+  the cost curve of the Boolean F4 beyond the arm-to-arm spread in κ (about
+  0.4); no arm is cost-favourable at `m ≤ 3`, `n ≤ 23`. This is a toy-size
+  diagnostic of one engine, not a statement about `n = 131`.
+
 ## 6. What this round does not establish
 
 - No design here is shown to reduce any cost. The Lean theorems show that
