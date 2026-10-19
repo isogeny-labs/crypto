@@ -153,6 +153,7 @@ rows.append({"row_no": 1010, "slug": "20261011-pdp-split-hybrid",
   "script": SC + "1010.py",
   "notes": "ANALYSIS.json stores replica_runs_compared 192 and replica_runs_mismatched 3; README.md:63-66 states the 3 differences are verified counts. 'Exact' is taken as the complete_and_exact flag. The minimum ratios are at the same cell and variant; the study's README table row 3:1:11:4 unsplit g=4 gives 22.8 and 391. Projection uses a pinned ns_per_word_xor calibrated on another host (README.md:154). No A/A or null-control line found in README, PROTOCOL or AMENDMENT."})
 
+rows = [dict(t) for t in sorted({r["row_no"]: r for r in rows}.values(), key=lambda r: r["row_no"])]
 with open(OUT, "w") as f:
     for r in rows:
         f.write(json.dumps(r, ensure_ascii=False) + "\n")

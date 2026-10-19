@@ -132,10 +132,19 @@ def main():
          'status': 'match' if max_abs is not None and max_abs <= 0.84 else 'mismatch'},
     ]
 
+    # cross-check of the recomputed alloc_mem against the study's own summary table (not used as input)
+    summ = {}
+    for line in open(RUN + '/records/ctprobe_summary.txt', encoding='utf-8'):
+        parts = line.split()
+        if len(parts) == 4 and parts[0].startswith('cg.'):
+            summ[parts[0]] = (int(parts[1]), int(parts[2]), int(parts[3]))
+    agree = all(summ.get(n[:-3]) == (t, a, r) for n, t, a, r in rows) and len(summ) == 12
+
     studyfiles = files_under(STUDY)
     notes = ('protocol: no PROTOCOL/PREREGISTRATION/spec file in the run or study tree, so protocol_git_date is empty; '
              'the ctprobe_summary.txt values are not used as input; '
              f'raw t(raw) = {ts_raw}; '
+             f'recomputed total/alloc_mem/rest agree with records/ctprobe_summary.txt for all 12 files: {agree}; '
              'run README "Isolation" text is in isolation_lines (shared cloud VM).')
     out = {
         'row_no': 1000 + 33,
