@@ -53,7 +53,7 @@ and the table arms' recorded S, which is complete. Specs
 
 ## Part B — the cost-per-unknown ladder (stage driver, closure, n = 23)
 
-`K_0 / GF(2^23)` (`icv1-f2m23-t5197-69e76b73`), `--base closure`, plan `3`,
+`icv1-f2m23-t5197-69e76b73` (`icv1-f2m23-t5197-69e76b73`), `--base closure`, plan `3`,
 two targets, two slot tuples per target, seed `20261018`, `--max-free 24`,
 `--budget-secs 120` per branch for ℓ ≤ 8 and `600` for ℓ = 9 (a timed-out
 branch censors its run; it is reported, never dropped):
@@ -74,7 +74,7 @@ exploration's ℓ = 8 point took 7 min per target; ℓ = 9 is expected at
 
 ## Part C — invariant base at n = 15 (ecbench, spec-only)
 
-`K_0 / GF(2^15)` (`icv1-f2m15-tm275-2d22ff5d`, r ≈ 2^9.6) is the only
+`icv1-f2m15-tm275-2d22ff5d` (`icv1-f2m15-tm275-2d22ff5d`, r ≈ 2^9.6) is the only
 Koblitz size ecbench builds that has Frobenius-invariant subspaces of
 dimension 4 and 5 (2-cyclotomic cosets of 15 have sizes 1, 4, 4, 2, 4).
 Four public targets, `max_trials = 2000` (the bases are tiny), seeds
