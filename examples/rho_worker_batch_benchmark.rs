@@ -38,7 +38,7 @@ fn peak_rss_kib() -> Option<u64> {
 fn main() {
     let args = std::env::args().collect::<Vec<_>>();
     assert!(
-        matches!(args.len(), 8 | 9 | 10),
+        matches!(args.len(), 8..=10),
         "usage: rho_worker_batch_benchmark MANIFEST Q_INDEX serial|batch WALKERS DP_BITS STEP_CAP BATCH_WIDTH [CHECKIN_EVERY] [--strict-output]"
     );
     let manifest_bytes = fs::read(&args[1]).expect("read frozen Q manifest");
