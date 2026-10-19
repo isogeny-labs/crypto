@@ -123,7 +123,7 @@ main `cb2ec6873`] (`raw/replay_all/`):
   [`f6_ic_ecbench_ladder_20261005__n19`],
   [24 / 72],
   [`f6_ic_ecbench_ladder_20261005__n23`],
-  [not finished when the audit closed],
+  [24 / 72],
 )
 ]
 
@@ -152,8 +152,7 @@ shows 301,961 word XORs now against 300,531 archived).
   [F6-IC E\_0 ladder, m \= 13, 19, 23 (F4 and F6-IC S/rho, median log2
   W4/W6)],
   [inherited-F4 and F6-IC solver counters directly],
-  [m \= 13, 19: replay fails on every IC row. m \= 23: replay-all had
-  not finished; not covered],
+  [replay fails on every IC row at m \= 13, 19 and 23 (24/72 each)],
   [F4/F5/F6 cross-family (inherited F4 S, F6-IC S, W F5/F4, W F4
   matrix/inherited, median log2 W inh/W F6)],
   [the same counters],
@@ -286,9 +285,8 @@ rho. This audit claims no improvement.
 
 = Demotion flags (not applied)
 <demotion-flags-not-applied>
-+ #strong[F6-IC ladder, m \= 13, 19 (23 pending):] counters do not
-  replay; freeze not demonstrable. Mark as historical, not
-  current-binary evidence.
++ #strong[F6-IC ladder, m \= 13, 19, 23:] counters do not replay; freeze
+  not demonstrable. Mark as historical, not current-binary evidence.
 + #strong[F4/F5/F6 cross-family:] see table above (counters do not
   replay on current main); freeze not demonstrable.
 + #strong[Frontier replay-block statement:] replace "48 inherited-F4

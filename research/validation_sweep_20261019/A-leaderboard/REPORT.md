@@ -56,7 +56,8 @@ Conductor: `conductor check` reported the scope clear; `coord_start_work` return
 | `f4_f5_f6_cross_family_20261011__R19` | 8 / 24 |
 | `f6_ic_ecbench_ladder_20261005__n13` | 24 / 72 |
 | `f6_ic_ecbench_ladder_20261005__n19` | 24 / 72 |
-| `f6_ic_ecbench_ladder_20261005__n23` | not finished when the audit closed |
+| `f6_ic_ecbench_ladder_20261005__n23` | 24 / 72 |
+
 
 Every failing row is an IC row (inherited-f4, f6-ic, and at K13 the matrix engines). All rho rows replay. In the root-finder session the four failing arms are ic-f4-m2, ic-f4-m3, ic-rootfind-m2 and ic-rootfind-m3, 24 rows each, so the root-finder arms fail too, which the published receipt says they did not. The committed ladder and cross-family audits passed on their own binaries, so the drift came with later code or a different host class; I did not bisect it. The same current binary adds a `row_ops` counter to `ic price`, which is the one counter difference I saw in the Table A and C replays and which changes nothing archived.
 
@@ -66,7 +67,7 @@ Every failing row is an IC row (inherited-f4, f6-ic, and at K13 the matrix engin
 
 | board row | consumes | status after the fresh replay |
 |:--|:--|:--|
-| F6-IC E_0 ladder, m = 13, 19, 23 (F4 and F6-IC S/rho, median log2 W4/W6) | inherited-F4 and F6-IC solver counters directly | m = 13, 19: replay fails on every IC row. m = 23: replay-all had not finished; not covered |
+| F6-IC E_0 ladder, m = 13, 19, 23 (F4 and F6-IC S/rho, median log2 W4/W6) | inherited-F4 and F6-IC solver counters directly | replay fails on every IC row at m = 13, 19 and 23 (24/72 each) |
 | F4/F5/F6 cross-family (inherited F4 S, F6-IC S, W F5/F4, W F4 matrix/inherited, median log2 W inh/W F6) | the same counters | replay fails on every inherited-F4 and F6-IC row (K13 also matrix F4 and F5): 16/48, 16/32, 24/40, 8/24 identical |
 | Latest frontier audit, replay block | reports the failure | says 48 F4 rows; fresh replay shows the wider failure |
 | n9 F6-IC control | its own `phase_closure` replay certificate, not the ecbench counters | not affected by this failure; not replayed here |
@@ -111,7 +112,7 @@ n37 K16 against strong rho: 5.03 counted (lower bounds), 4.70 complete-solve ins
 
 # Demotion flags (not applied)
 
-1. **F6-IC ladder, m = 13, 19 (23 pending):** counters do not replay; freeze not demonstrable. Mark as historical, not current-binary evidence.
+1. **F6-IC ladder, m = 13, 19, 23:** counters do not replay; freeze not demonstrable. Mark as historical, not current-binary evidence.
 2. **F4/F5/F6 cross-family:** see table above (counters do not replay on current main); freeze not demonstrable.
 3. **Frontier replay-block statement:** replace "48 inherited-F4 counter mismatches" with the fresh scope.
 4. **n61 compact-orbit online bar:** keep as unvalidated until the 2026-10-12 sessions are linked from the board's sources.
