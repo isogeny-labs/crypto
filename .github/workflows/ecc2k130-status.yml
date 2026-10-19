@@ -95,7 +95,6 @@ jobs:
           aws-region: us-west-2
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          allowed-account-ids: "590183823895"
       - name: Read source connection metadata
         env:
           RHO_SOURCE_REPORT_DEST: s3://ecc-challenges-data-104186811093/connection-checks/ecc2k130-20261019/6626ec30ad72464ddcd61618d5a9f261.pem
