@@ -52,15 +52,20 @@ for ax, random in zip(axes, [False, True]):
     ax.set_xscale("log")
     ax.xaxis.set_major_formatter(EngFormatter())
     ax.set_xlabel("Cold instructions (setup + query)")
-    ax.set_title("random target" if random else "planted target")
+    ax.set_title("generator control" if random else "planted target")
 fig.tight_layout()
 save(fig, "cold-decomposition")
 
 matrix_table = "\n".join(f"| {r['case'][0]} | {r['case'][1]} | {r['case'][2]} | {r['reference_median_ir']:,.0f} | {r['candidate_median_ir']:,.0f} | {r['reduction_percent']:.3f}% | {r['reference_samples']}/{r['candidate_samples']} |" for r in data["comparisons"])
 aa_text = "; ".join(f"{r['key'][0]}: {r['min_ir']:,}–{r['max_ir']:,} Ir ({r['spread_percent']:.3f}% spread; n={r['n']})" for r in data["summaries"] if r["key"][5] == "aa")
 root_table = "\n".join(f"| {r['key'][0]} | {r['first_ir']:,} | {r['n']} |" for r in root_rows)
-decomp_table = "\n".join(f"| {r['key'][0]} | {'random' if r['key'][3] else 'planted'} | {r['median_ir']:,} |" for r in data["cold_summaries"] if r["key"][1:3] == [23, 230] and r["key"][5] == "comparison" and r["key"][0].startswith(("decomp-", "rootfind-")))
+decomp_table = "\n".join(f"| {r['key'][0]} | {'generator' if r['key'][3] else 'planted'} | {r['median_ir']:,} |" for r in data["cold_summaries"] if r["key"][1:3] == [23, 230] and r["key"][5] == "comparison" and r["key"][0].startswith(("decomp-", "rootfind-")))
 report = f"""# Native generalized roots and Boolean F4/F5/F6 comparison
+
+Correction dated2026-10-19: the old `random=true` rows are fixed generator
+controls. The original raw flags and numeric results are preserved. See
+[the correction](../f4_f5_boolean_runtime_20261019/TARGET_LABEL_CORRECTION.md)
+and [the native continuation](../f4_f5_boolean_runtime_20261019/REPORT.md).
 
 The opt-in single-write Gray-table builder reduces complete matrix-F4/F5
 instruction work on the linked 22-variable fixture, with identical reduced
@@ -137,7 +142,7 @@ The general API includes field/domain certification, input normalization,
 backend dispatch and its complete result. Direct Gray search is cheaper;
 the new solver dispatches to that existing backend for Boolean quadratics.
 This is integration and completion, not a novel exhaustive-search algorithm.
-Four root fixtures cover one planted and one random target at each n17/n23.
+Four root fixtures cover one planted and one unplanted generator control at each n17/n23.
 The generic Boolean F4-basis arm hit its 50-second profiling budget on n23's
 planted fixture; its cost is unknown, and the failed run is retained. Its
 other three completed root sets match. A profile timeout is not a no-root
@@ -219,7 +224,7 @@ source += '\n' + '#text("' + typ_escape(report.split("## Workload")[0].split("\n
 for title, graph, description in [
     ("Complete matrix step", "matrix-instructions.svg", "K1 n23, 22 Boolean variables, degree 4. Five alternating pairs; exact output and XOR accounting. Callgrind 3.19, merged workers, simulated AVX2. Fresh-seed and scaling records are retained in summary.json."),
     ("Every Boolean root", "complete-roots.svg", "First complete call on the same n23 planted system. All original roots checked equal. The general API includes certification and normalization; direct Gray enumeration remains cheaper. Generic F4-basis profiling timed out on this fixture."),
-    ("Cold same-target decomposition", "cold-decomposition.svg", "One planted and one random n23 target. Table setup is added once; online query data remain separate. F6 and the generic solver can return different verified witnesses for the same verdict. No IC/rho result follows.")]:
+    ("Cold same-target decomposition", "cold-decomposition.svg", "One planted and one unplanted generator n23 target. Table setup is added once; online query data remain separate. F6 and the generic solver can return different verified witnesses for the same verdict. No IC/rho result follows.")]:
     source += '\n#pagebreak()\n= ' + title + '\n' + description + '\n\n#image("' + graph + '", width: 100%)\n'
     if title == "Complete matrix step":
         source += '\n#table(columns: 4, [Engine], [Reference Ir], [Candidate Ir], [Reduction],\n'

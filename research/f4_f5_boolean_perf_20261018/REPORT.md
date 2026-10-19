@@ -1,5 +1,10 @@
 # Native generalized roots and Boolean F4/F5/F6 comparison
 
+Correction dated2026-10-19: the old `random=true` rows are fixed generator
+controls. The original raw flags and numeric results are preserved. See
+[the correction](../f4_f5_boolean_runtime_20261019/TARGET_LABEL_CORRECTION.md)
+and [the native continuation](../f4_f5_boolean_runtime_20261019/REPORT.md).
+
 The opt-in single-write Gray-table builder reduces complete matrix-F4/F5
 instruction work on the linked 22-variable fixture, with identical reduced
 rows, rank and word-XOR accounting. These are Callgrind instruction results,
@@ -88,7 +93,7 @@ The general API includes field/domain certification, input normalization,
 backend dispatch and its complete result. Direct Gray search is cheaper;
 the new solver dispatches to that existing backend for Boolean quadratics.
 This is integration and completion, not a novel exhaustive-search algorithm.
-Four root fixtures cover one planted and one random target at each n17/n23.
+Four root fixtures cover one planted and one unplanted generator control at each n17/n23.
 The generic Boolean F4-basis arm hit its 50-second profiling budget on n23's
 planted fixture; its cost is unknown, and the failed run is retained. Its
 other three completed root sets match. A profile timeout is not a no-root
@@ -102,19 +107,19 @@ eight-target `boolean-solver.pdf` workload.
 | method | target kind, n23 | cold Ir |
 |:--|:--|--:|
 | decomp-f4 | planted | 369,843,120 |
-| decomp-f4 | random | 5,324,766,383 |
+| decomp-f4 | generator | 5,324,766,383 |
 | decomp-f5 | planted | 371,711,269 |
-| decomp-f5 | random | 5,354,145,741 |
+| decomp-f5 | generator | 5,354,145,741 |
 | decomp-f6 | planted | 85,755,496 |
-| decomp-f6 | random | 223,325,152 |
+| decomp-f6 | generator | 223,325,152 |
 | decomp-f6-pairs | planted | 85,758,949 |
-| decomp-f6-pairs | random | 223,328,344 |
+| decomp-f6-pairs | generator | 223,328,344 |
 | decomp-generalized | planted | 158,458,617 |
-| decomp-generalized | random | 150,711,349 |
+| decomp-generalized | generator | 150,711,349 |
 | rootfind-mitm | planted | 677,747,599 |
-| rootfind-mitm | random | 677,746,987 |
+| rootfind-mitm | generator | 677,746,987 |
 | rootfind-table | planted | 766,095,496 |
-| rootfind-table | random | 765,718,612 |
+| rootfind-table | generator | 765,718,612 |
 
 F6 uses exact factor-base geometry inside inherited F4; it has no standalone
 matrix-step entry point. Its first verified decomposition is compared at
