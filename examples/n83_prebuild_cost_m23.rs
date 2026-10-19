@@ -25,6 +25,10 @@ const D_OBJECT: &str = "e0c24980207cbb15fa57ec76bcfc6a628a763a80834cba1117ca83ea
 const U_POINT_SET: &str = "564c6bb72b346b73112240bb0bddc4ef68b7525f7ef2556d6046e52c32f976e0";
 const D_POINT_SET: &str = "8c1c245cda15bdd0019b487a5535a3b7eac642c259c4dc0bae25875d87d345b0";
 const D_LABELED_ROWS: &str = "805d1cbc65cac0a74ebf49315b8c17b0d5229bdceba5725ba4349fb1cc6c9e9c";
+const K2048_OBJECT: &str = "82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851";
+const D12_OBJECT: &str = "aea278aff2d79a592d5164d7437ddde8f8e9377fa481058dfc16afa176a31389";
+const K2048_SET: &str = "d528f5828a05a00add4252212bc909ece481f33093e4074ff7dd8c6a51d3c97e";
+const D12_SET: &str = "fb8ea2ecfeb245a90fecd5506dfc01592916b4ebec756d5fea7cbdd0c25537ce";
 const PUBLIC_SHA256: &str = "2895a78d28935a992d8d6155492eae928e165eafcc622e6c866080b8f91e70b5";
 const PUBLIC_0: Words = (1834913121178197242856238, 8797964190732846213981377);
 
@@ -82,14 +86,66 @@ fn point_set_hash(points: &mut [Words]) -> String {
 }
 
 fn load_base(arm: &str, root: &Path) -> Result<Base> {
-    let (expected_object, expected_set, policy, seed) = match arm {
-        "U" => (U_OBJECT, U_POINT_SET, "public_x_hash", 2026100801u64),
-        "D" => (D_OBJECT, D_POINT_SET, "direct_subgroup_x_d18", 0u64),
-        _ => return Err("arm must be U or D".into()),
+    let (
+        expected_object,
+        expected_set,
+        policy,
+        seed,
+        columns,
+        point_count,
+        manifest_schema,
+        header_schema,
+        expected_sha,
+    ) = match arm {
+        "U" => (
+            U_OBJECT,
+            U_POINT_SET,
+            "public_x_hash",
+            2026100801u64,
+            COLUMNS,
+            POINTS,
+            "n83.factor-base-panel/v2-size-frontier",
+            "n83.factor-base/v1",
+            None,
+        ),
+        "D" => (
+            D_OBJECT,
+            D_POINT_SET,
+            "direct_subgroup_x_d18",
+            0u64,
+            COLUMNS,
+            POINTS,
+            "n83.direct-subgroup-orbit-export/v1",
+            "n83.factor-base/v1",
+            Some("347d465bef217ae5f76e9b664710440a735a26211bf3957c4be4bcb4b46345a7"),
+        ),
+        "K2048" => (
+            K2048_OBJECT,
+            K2048_SET,
+            "public_x_hash",
+            2026100801u64,
+            2048,
+            339968,
+            "n83.factor-base-panel/v2-size-frontier",
+            "n83.factor-base/v1",
+            Some("aacb62784dee0c9f5e06328dbb85a4b6a1c7243e778328da82900e7284f3a74a"),
+        ),
+        "D12" => (
+            D12_OBJECT,
+            D12_SET,
+            "",
+            0u64,
+            2001,
+            332166,
+            "n83.structured-orbit-panel/v1",
+            "n83.structured-orbit-base/v1",
+            Some("c5de0b26e84ad80bfb7be6a214b89c9682e356effb6079c7abf28cd1151ffb03"),
+        ),
+        _ => return Err("arm must be U, D, K2048 or D12".into()),
     };
     let manifest: Value = serde_json::from_slice(&fs::read(root.join("manifest.json"))?)?;
-    let selected = if arm == "U" {
-        if manifest["schema"] != "n83.factor-base-panel/v2-size-frontier" {
+    let selected = if matches!(arm, "U" | "K2048") {
+        if manifest["schema"] != manifest_schema {
             return Err("uniform panel schema differs".into());
         }
         let rows = manifest["bases"]
@@ -98,7 +154,7 @@ fn load_base(arm: &str, root: &Path) -> Result<Base> {
         let matching: Vec<_> = rows
             .iter()
             .filter(|row| {
-                row["columns"] == COLUMNS && row["policy"] == policy && row["seed"] == seed
+                row["columns"] == columns && row["policy"] == policy && row["seed"] == seed
             })
             .collect();
         if matching.len() != 1 {
@@ -106,8 +162,8 @@ fn load_base(arm: &str, root: &Path) -> Result<Base> {
         }
         matching[0]
     } else {
-        if manifest["schema"] != "n83.direct-subgroup-orbit-export/v1" {
-            return Err("direct-subgroup manifest schema differs".into());
+        if manifest["schema"] != manifest_schema {
+            return Err("direct or structured manifest schema differs".into());
         }
         &manifest
     };
@@ -119,32 +175,31 @@ fn load_base(arm: &str, root: &Path) -> Result<Base> {
     if blake3::hash(&compressed).to_hex().as_str() != expected_object {
         return Err("compressed object digest differs".into());
     }
-    if arm == "D"
-        && format!("{:x}", Sha256::digest(&compressed))
-            != "347d465bef217ae5f76e9b664710440a735a26211bf3957c4be4bcb4b46345a7"
-    {
-        return Err("D compressed SHA-256 differs".into());
+    if let Some(expected_sha) = expected_sha {
+        if format!("{:x}", Sha256::digest(&compressed)) != expected_sha {
+            return Err("compressed SHA-256 differs".into());
+        }
     }
     let mut reader = BufReader::new(GzDecoder::new(compressed.as_slice()));
     let mut line = String::new();
     reader.read_line(&mut line)?;
     let header: Value = serde_json::from_str(&line)?;
-    if header["schema"] != "n83.factor-base/v1"
+    if header["schema"] != header_schema
         || header["curve_slug"] != CURVE
-        || header["policy"] != policy
-        || header["seed"] != seed
+        || (arm != "D12" && header["policy"] != policy)
+        || (arm != "D12" && header["seed"] != seed)
         || header["subgroup_order"] != ORDER
-        || header["orbit_columns"] != COLUMNS
-        || header["point_count"] != POINTS
+        || header["orbit_columns"] != columns
+        || header["point_count"] != point_count
         || header["closure"] != "signed_frobenius"
     {
         return Err("factor-base header identity differs".into());
     }
-    let mut rows = Vec::with_capacity(POINTS);
-    let mut index = HashMap::with_capacity(POINTS);
-    let mut points = Vec::with_capacity(POINTS);
+    let mut rows = Vec::with_capacity(point_count);
+    let mut index = HashMap::with_capacity(point_count);
+    let mut points = Vec::with_capacity(point_count);
     let subgroup_order = BigUint::parse_bytes(ORDER.as_bytes(), 10).ok_or("subgroup order")?;
-    for ordinal in 0..POINTS {
+    for ordinal in 0..point_count {
         line.clear();
         if reader.read_line(&mut line)? == 0 {
             return Err("factor-base row missing".into());
@@ -510,7 +565,7 @@ fn verify_relation(
     Ok((rank.insert(row), digest))
 }
 
-fn pair_words(seed: u64, target: u32, ordinal: u64) -> (usize, usize) {
+fn pair_words(seed: u64, target: u32, ordinal: u64, point_count: usize) -> (usize, usize) {
     let mut input = Vec::from(&b"N83-M3-PAIRS-v1"[..]);
     input.extend_from_slice(&seed.to_le_bytes());
     input.extend_from_slice(&target.to_le_bytes());
@@ -520,10 +575,10 @@ fn pair_words(seed: u64, target: u32, ordinal: u64) -> (usize, usize) {
     let mut reader = xof.finalize_xof();
     let mut word = [0u8; 8];
     reader.fill(&mut word);
-    let first = (u64::from_le_bytes(word) % POINTS as u64) as usize;
+    let first = (u64::from_le_bytes(word) % point_count as u64) as usize;
     let second = loop {
         reader.fill(&mut word);
-        let candidate = (u64::from_le_bytes(word) % POINTS as u64) as usize;
+        let candidate = (u64::from_le_bytes(word) % point_count as u64) as usize;
         if candidate != first {
             break candidate;
         }
@@ -593,7 +648,7 @@ fn probe(
     let mut duplicate = 0usize;
     let mut relations = 0usize;
     let mut independent = 0usize;
-    let total = if m == 2 { POINTS } else { 1 << 20 };
+    let total = if m == 2 { base.rows.len() } else { 1 << 20 };
     let mut last_flush = Instant::now();
     let (peak_rss_bytes, process_cpu_seconds) = resource_usage();
     serde_json::to_writer(
@@ -613,7 +668,12 @@ fn probe(
         let pair = if m == 2 {
             None
         } else {
-            Some(pair_words(20261019, target_index as u32, ordinal as u64))
+            Some(pair_words(
+                20261019,
+                target_index as u32,
+                ordinal as u64,
+                base.rows.len(),
+            ))
         };
         let first = pair.map_or(ordinal, |value| value.0);
         let mut complement = fast.add(
@@ -724,7 +784,13 @@ fn replay(arm: &str, root: &Path, corpus: &Path, worker: &Path, output: &Path) -
     {
         return Err("worker base preparation mode differs".into());
     }
-    let expected_total = if m == 2 { POINTS } else { 1 << 20 };
+    let expected_points = match arm {
+        "U" | "D" => POINTS,
+        "K2048" => 339_968,
+        "D12" => 332_166,
+        _ => return Err("replay arm outside frozen bases".into()),
+    };
+    let expected_total = if m == 2 { expected_points } else { 1 << 20 };
     let completed = receipt["completed"]
         .as_u64()
         .ok_or("completed count absent")?;
@@ -814,11 +880,12 @@ fn replay(arm: &str, root: &Path, corpus: &Path, worker: &Path, output: &Path) -
         let expected = if m == 2 {
             vec![ordinal as usize]
         } else {
-            let (first, second) = pair_words(20261019, target_index as u32, ordinal);
+            let (first, second) =
+                pair_words(20261019, target_index as u32, ordinal, expected_points);
             vec![first, second]
         };
         if indices.len() != m
-            || indices.iter().any(|&index| index >= POINTS)
+            || indices.iter().any(|&index| index >= expected_points)
             || indices.windows(2).any(|pair| pair[0] > pair[1])
             || expected.iter().any(|index| !indices.contains(index))
             || !seen.insert(indices.clone())
@@ -837,7 +904,7 @@ fn replay(arm: &str, root: &Path, corpus: &Path, worker: &Path, output: &Path) -
             return Err("changed target was accepted".into());
         }
         let mut changed_indices = indices.clone();
-        changed_indices[0] = (changed_indices[0] + 1) % POINTS;
+        changed_indices[0] = (changed_indices[0] + 1) % expected_points;
         if verify_relation(&fast, &base, target, &changed_indices, &mut disposable).is_ok() {
             return Err("changed row was accepted".into());
         }
@@ -917,7 +984,7 @@ fn main() -> Result<()> {
             args[6].parse()?,args[7].parse()?,Path::new(&args[8])),
         Some("replay") if args.len()==7 => replay(&args[2],Path::new(&args[3]),Path::new(&args[4]),Path::new(&args[5]),Path::new(&args[6])),
         Some("control") if args.len()==6 => control(&args[2],Path::new(&args[3]),args[4].parse()?,Path::new(&args[5])),
-        _ => Err("usage: n83_prebuild_cost_m23 targets NEW_PUBLIC_JSON NEW_VALIDATION_JSON | setup prebuilt|ondemand D_BASE_DIR NEW_RESULT_JSON | probe U|D BASE_DIR PUBLIC_JSON TARGET_INDEX 2|3 NEW_RESULT_JSON | probe-mode prebuilt|ondemand D BASE_DIR PUBLIC_JSON TARGET_INDEX 2|3 NEW_RESULT_JSON | replay U|D BASE_DIR PUBLIC_JSON WORKER_JSON NEW_REPLAY_JSON | control U|D BASE_DIR 2|3 NEW_RESULT_JSON".into())
+        _ => Err("usage: n83_prebuild_cost_m23 targets NEW_PUBLIC_JSON NEW_VALIDATION_JSON | setup prebuilt|ondemand D_BASE_DIR NEW_RESULT_JSON | probe U|D|K2048|D12 BASE_DIR PUBLIC_JSON TARGET_INDEX 2|3 NEW_RESULT_JSON | probe-mode prebuilt|ondemand D BASE_DIR PUBLIC_JSON TARGET_INDEX 2|3 NEW_RESULT_JSON | replay U|D|K2048|D12 BASE_DIR PUBLIC_JSON WORKER_JSON NEW_REPLAY_JSON | control U|D|K2048|D12 BASE_DIR 2|3 NEW_RESULT_JSON".into())
     }
 }
 
@@ -926,11 +993,16 @@ mod tests {
     use super::*;
     #[test]
     fn deterministic_pairs_are_distinct_and_stable() {
-        assert_eq!(pair_words(20261019, 0, 17), pair_words(20261019, 0, 17));
-        for ordinal in 0..1000 {
-            let (a, b) = pair_words(20261019, 0, ordinal);
-            assert_ne!(a, b);
-            assert!(a < POINTS && b < POINTS);
+        assert_eq!(
+            pair_words(20261019, 0, 17, POINTS),
+            pair_words(20261019, 0, 17, POINTS)
+        );
+        for size in [POINTS, 339_968, 332_166] {
+            for ordinal in 0..1000 {
+                let (a, b) = pair_words(20261019, 0, ordinal, size);
+                assert_ne!(a, b);
+                assert!(a < size && b < size);
+            }
         }
     }
     #[test]
