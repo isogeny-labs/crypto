@@ -74,7 +74,7 @@ null. The [post-run script](postrun-audit-and-archive.sh) checked both
 terminal summaries and ran the auditors only after both timed services
 stopped.
 
-## Production check-in confirmation, running
+## Production check-in confirmation
 
 The worker's ordinary `LaneOptions` checks in every 64 walkers. A separate
 [128-walker plan](worker-production-plan.json), SHA-256
@@ -86,5 +86,24 @@ deployment gate for changing default routing. The frozen plan was launched on
 the same separate EC2 instance at 2026-10-19 21:09:32 UTC, with results under
 run ID `17f520f4a4f94a3ca8f0d49829e4ab8b`. The
 [post-run script](postrun-production-audit-and-archive.sh) requires a terminal
-service and complete stable results before auditing and archiving. The worker
-default remains serial pending the independent audit.
+service and 768 stable arm receipts and 384 pair receipts before auditing and
+archiving. It preserves invalid arms and pairs for independent audit.
+
+The service completed with 768 arms and 384 pairs. The
+[raw archive](production-raw.tar.gz), SHA-256
+`802906a343e29b103c9f6dcce2634dcf9e6c72847d0ad2fc3405e2e995158f1b`,
+and [service journal](production-service-journal.txt), SHA-256
+`823e9ecad4f8d429f705081f7a753e2b3d0d2ce88433784d0211e7fe2d647f7a`,
+retain the terminal output. The [independent audit](production-audit.json),
+SHA-256
+`8ed33daa6af4516ec8ec55322ae089338e86f1f988ccf5e3194fbf777675ef89`,
+reports `unknown_gate_failed`: reference arm 691 of `q19-comparison`,
+repetition 3, recorded one CPU-steal tick. The runner marked that arm and its
+pair invalid, leaving 383 valid pairs. No memory gate failed. The two A/A
+outliers were within the plan's allowed count and extreme bounds, and the
+A/A mode and Q medians passed. The comparison-only median ratio over valid
+pairs was 4.9216; the qualified interval and speedup remain null. At 128
+walkers, the median serial charged interval was 12.930 s, of which 0.103 s
+was setup; the batch median was 2.615 s, with 0.103 s setup. Median peak
+RSS was 5,600 KiB serial and 5,612 KiB batch. The worker default remains
+serial under the frozen integration gate.
