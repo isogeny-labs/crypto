@@ -22,6 +22,31 @@ recorded small-curve comparisons, but its advantage relative to another
 IC construction is not a claim that it beats matched rho.\src{COMPACT}
 \src{FRONTIER}
 
+\subsection{Correctness improvements underneath the speedups}
+
+The September development record includes a consequential root-kernel
+repair. A previous combined-inversion implementation treated equal or
+zero abscissae as rootless, although the specialised $S_3$ equation becomes
+linear or a square equation in those cases. Exceptional scans consequently
+installed false nogoods. The repaired kernel handles those degeneracies;
+its source includes exhaustive root-set comparison for all 16,384
+abscissa pairs over $\F_{2^7}$ and larger-field checks through degree 53.
+The historical degree-53 SAT example retains the same planted relation and
+3,631 conflicts while removing 39,856 false nogoods. Pre-repair certificate
+schemas fail closed rather than being silently accepted.\src{KOBLITZ}
+\src{KOBLITZ-ARITH}
+
+The same record repairs a nonmonic-pivot rank-tracker error. These are
+correctness gains even when a headline solve time does not change.
+Word arithmetic, batched inversions and cofactor projections then reduce
+allocation and field-operation costs. The recorded Itoh--Tsujii schedule
+uses seven rather than fifty-one multiplications at degree 53, but its
+microbenchmark difference is below that host's timing noise. Lexicographic
+SAT symmetry breaking increased conflicts and was left disabled. Such
+rejected and inconclusive changes belong beside successful optimisations.
+The source reads in this review are not fresh Rust test executions.
+\src{KOBLITZ}\src{S3-COST}
+
 \subsection{Production improvements that survive a narrow reading}
 
 Free relations harvested from the root table are a concrete example of a
@@ -55,6 +80,13 @@ $y^2+xy=x^3+x^2+1$, prime subgroup order
 $r=8,569,786,107,849,059$ and cofactor 1,128,547,018.
 The subgroup has about 53 bits; ``N83'' is the field degree, not an
 83-bit prime-order subgroup.\src{N83}\src{N83-ROWS}
+
+It is also a different model from the exact E0 degree-83 fidelity gate
+in the repository contract: $y^2+xy=x^3+1$, subgroup order
+2,417,851,639,230,796,216,685,689 and cofactor four. That E0 subgroup
+has about 81 bits. The E1 holdout above is useful evidence for its own
+workload, but matching field degree alone does not discharge that exact
+E0/ECC2K-130 fidelity obligation.\src{C-RULES}
 
 \begin{table}[htbp]\small
 \caption{Recorded five-point cold-process means. The baseline's two

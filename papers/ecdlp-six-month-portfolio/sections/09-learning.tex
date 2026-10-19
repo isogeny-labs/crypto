@@ -14,7 +14,7 @@ over field sizes mainly 16--24 bits. It distinguishes the counted cost of
 the C library's rho, an exact two-sum yield label, planted structural
 labels, and within-class residual versions of those quantities. Whole
 isogeny classes, field families and larger sizes can be held out.
-\src{ML-HARD}
+\src{ML-HARD}\src{ML-PLAN}
 
 A large global $R^2$ is not evidence of a new hardness predictor. For
 plain-rho cost on the isogeny-class split, the full model's $R^2$ is
@@ -29,6 +29,15 @@ $R^2=0.914$ for the planted-safe model against 0.918 for its oracle;
 other planted folds are recovered strongly. Thus the experiment can
 detect a deliberately supplied structural law. It does not find a
 corresponding blind law that improves the measured IC pipeline.
+
+One gate nevertheless fails: \texttt{Q1\_control\_no\_skill} reports
+a tiny positive plain-rho within-class skill of 0.00034, interval
+[0.00011,0.00058]. Its scientific effect is small, but it prevents a
+blanket ``all no-skill controls pass'' statement. Some centred-label
+power-table rows have means near $10^{-17}$ and display enormous relative
+minimum detectable effects. Their scale and interpretation require audit
+before quantitative reuse. A successful planted control does not validate
+every other gate.\src{ML-HARD}\src{ML-PLAN}
 
 \begin{figure}[htbp]
 \centering\includegraphics[width=\linewidth]{figures/ml-controls.pdf}
@@ -99,6 +108,28 @@ it produces a readable candidate rule and a certificate boundary.
 Finite validation remains distinct from a proof for all permitted
 curves.\src{ML-TWIST}
 
+The accompanying theory note supplies more than a finite fit. For
+nondegenerate rational trigonal maps in characteristic greater than three,
+it gives a written argument for
+$\varepsilon=\chi(\operatorname{lc}(F)\operatorname{Res}(D_1,D_2))$,
+using the cited Smith proposition and explicit algebraic identities.
+It distinguishes handwritten identity proofs from an exact symbolic
+integer-polynomial check. This review has read that argument; it has not
+produced a new kernel certificate or independently completed its literature
+audit.\src{ML-TWIST-THEORY}
+
+The extension to conjugate maps remains conditional on the note's
+Lemma~D, descent in families. Its sketch uses a normal connected good
+locus, trivial automorphisms, smooth codomains and an \'etale torsor;
+a complete pointwise cocycle argument remains missing. A finite example
+chooses a binary ambiguity within that argument rather than replacing
+the geometric lemma. The 4,246 certified conjugate-map cases have no
+counterexample; the combined certified population is 8,309, including
+2,498 earlier and 5,811 later cases. Degenerate and extra-automorphism
+loci are not covered. Thus the rational-map written proof and the
+conjugate-map conjectural extension receive different statuses.
+\src{ML-TWIST-THEORY}
+
 The Humbert-surface work recovers equations for $H_4,H_5,H_8,H_{12},H_{13}$
 from structured source points, checks them against published equations,
 and tests fresh primes. The recorded least weights are 30, 24, 60, 120
@@ -108,6 +139,35 @@ Humbert equations. It also corrects an overgeneralisation: rational real
 multiplication in a particular family cannot be inferred for every
 point of a Humbert surface from the residue symbol $(D/p)$ alone.
 \src{ML-HUMBERT}
+
+\subsection{Streaming scale and feature-selection experiments}
+
+The full lab record documents deterministic resumable Parquet shards,
+hash manifests, streaming learners, class-held-out graph datasets and
+train-only arithmetic-feature selection. It reports validation on one
+million 64-bit curves---the first twenty shards of a planned 100-million
+campaign, not a completed 100-million-curve run. Eighteen shards train
+the models and two test them.\src{ML-LAB}
+
+On the torsion-rank task, quadratic-character features give accuracy
+0.833 and balanced accuracy 0.667. Adding the known Cardano character
+gives reported accuracy 1.000 for both a sampled GBDT and a streaming MLP;
+permuted-label controls remain near chance. In a planted Legendre-parity
+task, an unselected feature library gives near-chance scores (0.497 and
+0.504), while thirty-two train-selected features recover the planted rule.
+The selector is refit inside the permutation null. Cubic-character
+features similarly recover their planted cubic law while the quadratic
+library does not. These demonstrate representation and discovery
+capability on explicit labels, not a learned ECDLP solver.
+\src{ML-LAB}
+
+Graph learning also has mixed results. A forty-eight-class structural
+task reports 0.926 for a GNN against 0.774 for a tree model, whereas
+another exact held-out-class panel finds graph augmentation worsens
+squared error by roughly 31--39\%. The plan preserves an earlier empty
+graph-block bug and its correction. Different dataset versions overlap;
+their node totals are not added as independent experiments. Large future
+dataset sizes and core-hour projections remain plans.\src{ML-LAB}\src{ML-PLAN}
 
 \subsection{Assessment of the learning leads}
 

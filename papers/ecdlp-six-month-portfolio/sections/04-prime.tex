@@ -6,6 +6,17 @@ conditions used by extension-field IC are absent. The programme tests
 several substitutes rather than treating this absence as a proof that no
 alternative can exist.\src{PRIME}
 
+The sparse-prime/SNFS audit makes the missing bridge precise. Small
+number-field norms yield multiplicative relations, whereas IC here needs
+verified additive point decompositions. Factoring a lifted abscissa does
+not supply one. A small embedding degree can provide an established
+pairing route, but the audit finds none up to 1,024 for the five named
+NIST prime groups. Its 66-curve dataset also has only five prime-order
+groups; the other sixty-one controls have composite orders and cannot
+silently become a matched prime-order experiment. These bounded checks
+do not compute every exact embedding degree or exclude every future
+representation-based solver.\src{FIELD-EFFECTS}
+
 \subsection{What the smallness experiments actually learned}
 
 The dedicated smallness repository asks whether an inexpensive

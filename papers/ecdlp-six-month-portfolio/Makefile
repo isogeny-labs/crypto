@@ -7,6 +7,7 @@ include ../paper.mk
 .PHONY: figures review-check
 figures:
 	python3 figures/render.py
+	python3 figures/render-expanded.py
 
 review-check:
 	python3 tools/check.py

@@ -32,6 +32,10 @@ replay receipts are inspected, not rerun by a new Rust binary here.
 manifested regular files. All manifested file hashes match, with no
 missing entries or unmanifested extra regular files. This is integrity
 verification rather than mathematical validation.
+The expanded pass also checks all 79,462 manifest entries of the later
+7,937-vertex archive and all 125 entries of the separate original-C
+full-point-order archive, against their published outer hashes. Their
+receipts are separate and neither archive's programs are executed.
 \item The cryptanalysis native library builds with GCC 14.2.0 and CMake
 4.4, Release configuration, CUDA and cuPQC disabled. Fifteen of seventeen
 configured tests pass initially; the use-case test is missing its sparse
@@ -55,23 +59,25 @@ branch manifests; private or uncommitted material is not inferred \\
 Measure six months of recorded work & Complete for the defined metadata
 metrics & Exact window, pins, counting rules and catalogues; not a measure
 of labour, money or global historical rank \\
-Explain fields, implementations and experiments & Comprehensive
+Explain fields, implementations and experiments & Expanded
 synthesis with selective deep audit & Main technical chapters plus
 4,075 directory records and source register; not every run independently
 re-executed \\
 Show concrete progress & Complete at the stated boundaries & Held-out
 IC configuration changes, solver and GPU stages, complete toy pipelines,
 structural discovery, native validation and archive checks \\
-Distinguish proofs from hypotheses & Complete as a scoped proof map &
+Distinguish proofs from hypotheses & Scoped proof map; broader review open &
 Central source statements and missing bridges named; fresh Lean builds
 and full independent semantic review remain open \\
-Cover isogenies and graphs & Complete for accessible summaries and
-the checked delivery & Exact graph/measurement populations and outcomes;
+Cover isogenies and graphs & Expanded summaries and three checked
+deliveries & Exact graph/measurement populations and outcomes;
 private packets and larger unfinished campaigns remain explicit \\
 Review everything in every branch and external archive & Partial &
-All captured branch commit metadata is indexed, while branch contents and
-raw experiment replay are selective; the historical 51-GB mirror and
-private ten-lead packets are unavailable \\\bottomrule
+All captured branch commit metadata is indexed; only 94 pinned files have
+full reading receipts, with 50 earlier focused sources and 305,223 entries
+without reading receipts. Branch content and raw replay remain selective;
+the 51-GB mirror and private packets are unavailable. See
+Appendix~\ref{app:reading}. \\\bottomrule
 \end{longtable}
 
 \subsection{Before external submission}

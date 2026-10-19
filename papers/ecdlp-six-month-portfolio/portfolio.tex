@@ -47,9 +47,10 @@ endomorphisms, GPU arithmetic, learning, and formal verification. Concrete
 progress includes substantially cheaper decomposition and elimination
 stages, complete toy pipelines, modest held-out improvements to production
 IC, a 2.645-second cold-process saving in an N83 holdout, and reproducible
-structural-discovery experiments. A downloaded isogeny checkpoint contains
-46,960 attempts at 2,935 audited vertices; all 29,409 archive-manifest
-entries pass a fresh byte check. Nineteen frontier sessions have 3,178
+structural-discovery experiments. A later downloaded isogeny checkpoint contains
+126,992 accepted attempts at 7,937 audited vertices; all 79,462 archive-manifest
+entries pass a fresh byte check. A separate smooth-order diagnostic verifies
+3,738 targets in both arms. Nineteen frontier sessions have 3,178
 verified measured executions and 54 exhausted executions, with matching
 record hashes. These checks are distinguished from fresh cryptographic
 replay.
@@ -63,6 +64,9 @@ arguments and checked-proof claims are kept separate. Open branches are
 reported independently, including large-memory PKM runs and an Semaev
 defect-impact audit. The result is an evidence map, an assessment of leads,
 and a set of explicit next proof and measurement obligations.
+The review is not an exhaustive reading of the archive: a line-range ledger
+records 94 pinned files read in full and 50 previously focused sources,
+while remaining files and historical content lack complete reading receipts.
 \end{abstract}
 \tableofcontents
 \clearpage
@@ -80,6 +84,7 @@ and a set of explicit next proof and measurement obligations.
 \input{sections/12-assessment}
 \appendix
 \input{sections/13-reproduction}
+\input{sections/14-reading-coverage}
 \clearpage
 \section{Pinned source register}\label{app:sources}
 The keys used throughout the paper resolve below to immutable repository
