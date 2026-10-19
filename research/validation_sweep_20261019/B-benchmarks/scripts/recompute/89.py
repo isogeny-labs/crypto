@@ -8,7 +8,7 @@ import os
 
 REPO = "/home/user/crypto"
 DATA = os.path.join(REPO, "research/secg_small_x_20261014/data")
-OUT = os.path.join(REPO, "research/validation_sweep_20261019/B-benchmarks/recompute/SWB-RECOMPUTE-12.jsonl")
+OUT = os.path.join(REPO, "research/validation_sweep_20261019/B-benchmarks/recompute/rows_swb12/89.json")
 SCRIPT = "research/validation_sweep_20261019/B-benchmarks/scripts/recompute/89.py"
 
 
@@ -30,7 +30,7 @@ def rel_ok(claimed, computed, decimals):
 def make_claim(claimed_str, pairs, definition, files):
     # pairs: list of (claimed_number, computed_number, decimals)
     ok = all(rel_ok(c, v, d) for c, v, d in pairs)
-    computed = ", ".join(f"{v:.{d}f}" for _, v, d in pairs)
+    computed = ", ".join((f"{v:.{d}f}" if d >= 0 else f"{v:.6g}") for _, v, d in pairs)
     return {
         "claimed": claimed_str,
         "computed": computed,
@@ -162,6 +162,8 @@ for c in claims:
 identical_files = [os.path.relpath(p, REPO) for p in files_4096 + files_1024]
 identical_status = "match" if (n_differ == 0 and n_compared > 0) else "mismatch"
 if toy_with_s3 == 0:
+    # the toy-field part of the identical claim has no raw S3 field in repo
+    identical_status = "partial" if identical_status == "match" else identical_status
     toy_note = "toy-field decision check: no toy record in data/ carries an s3 field (toy files: %d); not verifiable from these records" % len(toy_files)
 else:
     toy_note = "toy-field decision check: %d toy records with s3 field, %d disagreements" % (toy_with_s3, toy_disagree)
@@ -200,6 +202,6 @@ row = {
 }
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
-with open(OUT, "a") as fh:
+with open(OUT, "w") as fh:
     fh.write(json.dumps(row, ensure_ascii=False) + "\n")
 print("appended row 89 to", OUT)

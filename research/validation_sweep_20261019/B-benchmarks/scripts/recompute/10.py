@@ -28,7 +28,7 @@ verified = sum(1 for r in rows if r['status'] == 'verified')
 requested = p['summary']['requested']
 rel_sum = sum(r['relation_report']['relation_count'] for r in rows)
 q_sum = sum(r['relation_report']['queries'] for r in rows)
-e2e = [r['end_to_end_ns'] for r in rows]
+e2e = [int(r['end_to_end_ns']) for r in rows]
 e2e_mean = sum(e2e) / len(e2e)
 exact = [g for g in stats['groups'] if g['conductor'] is not None]
 null = [g for g in stats['groups'] if g['conductor'] is None]

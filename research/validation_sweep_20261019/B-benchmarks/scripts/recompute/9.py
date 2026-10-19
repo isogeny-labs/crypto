@@ -49,12 +49,13 @@ v5 = load(V5)
 v7 = load(V7)
 
 wall = proc['wall_seconds']
-timeout = prereg.get('timeout_seconds')
+timeout = prereg['spec']['timeout_seconds']
+assert prereg['identity']['timeout_seconds'] == timeout
 claims = []
 claims.append({
     'claimed': '60 s hard search',
-    'computed': f'process.json wall_seconds={wall:.2f}; preregistration.json timeout_seconds={timeout}',
-    'definition': 'wall_seconds (process.json) and timeout_seconds (preregistration.json) of the norm-primary CDCL attempt 0001',
+    'computed': f'process.json wall_seconds={wall:.2f}; preregistration.json spec.timeout_seconds={timeout}',
+    'definition': 'wall_seconds (process.json) and spec.timeout_seconds (preregistration.json; identity.timeout_seconds equal) of the norm-primary CDCL attempt 0001',
     'files': [PROC, PREREG],
     'status': 'mismatch' if abs(wall - 60) / 60 > 0.01 else 'match',
 })
@@ -121,7 +122,7 @@ out = {
     'first_raw_git_date': gd(RECEIPT),
     'script': SCRIPT,
     'notes': (f'Study README line 3 says the search ran "after60seconds"; process.json wall_seconds={wall}; '
-              f'preregistration timeout_seconds={timeout}. The README and HEADLINE name no protocol path; '
+              f'preregistration spec.timeout_seconds={timeout}. The README and HEADLINE name no protocol path; '
               f'PREREG used as protocol path, RECEIPT (first listed candidate) as first raw file. '
               f'The aa_lines are the control statements; the study README has no A/A or null arm. '
               f'The README has no isolation statement.'),

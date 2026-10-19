@@ -178,7 +178,7 @@ out = {
         'n_equal': ident_eq,
         'n_differ': ident_n - ident_eq,
         'files': [RAW + 'abl_committed.jsonl', RAW + 'abl_wcsr.jsonl'],
-        'status': 'partial'
+        'status': 'match' if ident_n and ident_eq == ident_n else 'mismatch'
     },
     'offrepo_refs': off,
     'aa_lines': aa,
