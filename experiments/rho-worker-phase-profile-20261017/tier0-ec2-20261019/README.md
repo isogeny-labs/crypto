@@ -96,6 +96,13 @@ The [full preflight](preflight-r3.json) passed with no problems. The separate
 [second calibration manifest](calibration-manifest-r3.json) SHA-256 is
 `aec4c0536385c36f061ac689fcb2f18936a17cfdd70c7dba6eb85d733337179c`;
 its [preflight](calibration-preflight-r3.json) also passed.
+The [complete second calibration archive](calibration-r3-complete.tar.gz)
+is SHA-256 `0c5d33005ba814627cba8db5a5aa550e5ebc1b45a1fa5fb3332fd7b2abfc9e99`.
+Both arms and their exact-output pair passed the strict service. The serial
+arm recorded 66 local interrupt counts, 3 microseconds of CPU pressure,
+zero involuntary switches and zero major faults; batch recorded 15, 8,
+zero and zero respectively. The full 32-Q panel uses the already frozen
+manifest and a fresh serialized queue.
 
 The benchmark CPU is physical core 23 (logical CPUs 23,47) on NUMA node 1.
 The [host configuration](configure_host.sh) sets the cgroup partition,
