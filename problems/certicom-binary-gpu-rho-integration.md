@@ -28,8 +28,8 @@ The affected groups are ECC2K-130 and ECC2-131 over GF(2^131); ECC2K-163 and ECC
   parameters and vectors and adds one native host/CUDA implementation and a
   stable verifier.  The host verifier passed 256 field-vector sets per curve,
   16 scalar vectors per curve, point identities, and four subgroup checks;
-  the complete Rust library suite passed 4,390 tests after two tracked sparse
-  fixtures were materialized.  CUDA device replay is not complete: an
+  the final merged-head Rust library suite passed 4,399 tests after two
+  tracked sparse fixtures were materialized.  CUDA device replay is not complete: an
   approved 30-minute `g7e.2xlarge` correctness job was rejected before
   instance creation because the AWS GPU vCPU quota is zero.  This establishes
   host arithmetic for these two exact curves only; it does not establish a

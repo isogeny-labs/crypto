@@ -33,7 +33,7 @@ Environment:
 Observed result:
 
 ```text
-CERTICOM131 HOST VERIFY: PASS prime_field_vectors=256 binary_field_vectors=256 scalar_vectors_per_curve=16 subgroup_checks=4 elapsed_s=0.800012
+CERTICOM131 HOST VERIFY: PASS prime_field_vectors=256 binary_field_vectors=256 scalar_vectors_per_curve=16 subgroup_checks=4 elapsed_s=1.14681
 ```
 
 The verifier checked every frozen prime multiplication/inversion vector,
@@ -57,10 +57,12 @@ tracked frozen inputs excluded by the inherited sparse-checkout rules:
 - `research/cryptopro_b_chain_sweep_20261006/frozen_inputs/chains.constants.json`.
 
 After materialising those exact tracked files with the repository sparse
-checkout helper, all ten targeted tests passed, and the complete rerun was:
+checkout helper, all ten targeted tests passed.  The complete rerun on the
+initial candidate was 4,390 passing tests.  After merging the latest main,
+the required final-head rerun was:
 
 ```text
-test result: ok. 4390 passed; 0 failed; 118 ignored; 0 measured; 0 filtered out
+test result: ok. 4399 passed; 0 failed; 118 ignored; 0 measured; 0 filtered out
 ```
 
 ## CUDA validation gate
