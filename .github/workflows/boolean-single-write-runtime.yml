@@ -15,7 +15,7 @@ permissions:
 jobs:
   native-solver:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -26,7 +26,7 @@ jobs:
         run: cargo test --release --locked --manifest-path tools/generalized-rootfinder/Cargo.toml
   runtime:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
