@@ -65,6 +65,24 @@ its test file is reserved by T-4258. This patch verifies the new 15-minute
 configuration separately. Tightening that guard remains follow-up work; a pass
 from the older guard alone does not prove compliance with this document.
 
+Three additional active workflows were found in the queued/in-progress snapshot
+on branches, without a workflow file on this `main` revision, and disabled:
+
+| Workflow | Observed configuration |
+| --- | --- |
+| `boolean-single-write-runtime.yml` | Three PR jobs allow 25 minutes; source `6f0b8518f68cb51815039bf719bc384c0fe15074` |
+| `koblitz-modular-carriers.yml` | PR/push replay allows 25 minutes; source `539325b5e66719f4cea7ee1315659808103d5bcb` |
+| `n83-padd-rank.yml` | Branch-push panel allows 330 minutes; source `4b2b3efa6210ce3724f1350c3a9b1cc2df1309fd`; its sampled running job had already executed for 114 minutes |
+
+Their branch contents are unchanged. They require an explicit routing/budget
+migration before re-enabling. The other queued branch-only workflow inspected,
+`validation-gate.yml`, already has a 10-minute budget and remains enabled.
+The registered-workflow inventory included 524 entries (including historical
+branches and two GitHub-managed dynamic workflows); the source configuration
+audit covers all 431 workflow files on the checked main revision, plus these
+four branch-only workflows seen in the live queue/running snapshot. It does
+not claim to have audited every inactive branch revision.
+
 ## Evidence and limits
 
 The initial live snapshot on 2026-10-19 found 354 queued runs and 15 in-progress
