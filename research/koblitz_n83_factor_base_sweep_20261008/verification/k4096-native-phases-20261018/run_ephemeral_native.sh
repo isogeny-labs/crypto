@@ -15,7 +15,8 @@ source_commit=$(git rev-parse HEAD)
 test "$(uname -m)" = x86_64
 
 cp "$evidence/panel/manifest.json" "$evidence/panel/replay.json" \
-   "$evidence/panel/upload-receipt.json" "$panel/"
+   "$evidence/panel/upload-receipt.json" \
+   "$evidence/panel/probe-corpus.json" "$panel/"
 cp "$evidence/fixtures/probe-corpus.json" \
    "$evidence/fixtures/probe-validation.json" "$fixture/"
 object="$panel/objects/a84572e6ca52efa7867082261bf0543723d52c0d136061a45c970970716aa779.jsonl.gz"

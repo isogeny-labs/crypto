@@ -95,3 +95,13 @@ and wrong-policy launches remain. Native audits, verified mechanical relays,
 resources and cleanup satisfy the three exit conditions within this bounded
 scope. No stage speed comparison or cold winner is established; internal
 solver preprocessing/search costs remain unsplit.
+
+A separate upstream c7i.xlarge diagnostic at frozen source
+8856f2eb36e1aa132af2c0c20c9d422789ab0774 also returned a K4096 terminal
+at 1,000 conflicts with zero models, relations and rank. Its reported
+solver interval is 137.457 seconds, with installed model complete at 780.945 ms
+from decomposition entry. See its [own result and retained failed launches](../research/koblitz_n83_factor_base_sweep_20261008/verification/k4096-native-phases-20261018/RESULT.md).
+This is a different source/host with historical Python supervision/audits,
+not rerun by the new native path. It cannot substitute for either matched
+arm here or establish a cross-host throughput ratio. Its original evidence
+and amended protocols remain unchanged.

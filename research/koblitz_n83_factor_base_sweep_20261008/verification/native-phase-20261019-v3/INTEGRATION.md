@@ -19,3 +19,12 @@ fresh release validation of the merged source is recorded in validation/
 when complete. No measured worker binary is replaced by that build. No
 Python research harness/auditor/test is run in this continuation; upstream
 Python provenance and files are preserved without being extended or rerun.
+
+A second merge preserves upstream 02792dec6c078a48fe861959a4f200978a573c60,
+including its separate c7i.xlarge K4096 diagnostic and failed launch records.
+There are no additional Rust/Cargo changes after integration 0dbd1fdf, so the
+fresh merged-code release run covers the final code. Its K4096 timing and
+Python supervision/audit provenance are separate from the seven native
+cards reported here. We preserve, but do not execute, those Python paths.
+The bounded matched-query result here does not settle a multi-query/full
+cold comparison. No historical receipt or timing is rewritten or combined.
