@@ -1,6 +1,6 @@
 # N83 prebuilt factor-base cost and bounded natural queries
 
-**Evidence status:** D18 export and full-object replay pass; the paired D prebuilt/on-demand m=2 and m=3 finite-query panel is complete; the smaller-base panel is a separate pending card. All timing here is shared-host L0. `candidate_id: null`; `selected_best_total_runtime: null`. No complete index-calculus or matched-rho runtime is established.
+**Evidence status:** D18 export and full-object replay pass; the paired D prebuilt/on-demand m=2 and m=3 finite-query panel is complete; the separate K2048/D12 m=2/m=3 panel completed with one preserved Spot interruption and a frozen retry. The [smaller-base m=4 gate](SMALL_M4_PROTOCOL.md) is now frozen. All timing here is shared-host L0. `candidate_id: null`; `selected_best_total_runtime: null`. No complete index-calculus or matched-rho runtime is established.
 
 ## Exact objects and boundaries
 
@@ -44,4 +44,16 @@ The [small-base raw tree](runs/small-base-v1/), [file manifest](runs/small-base-
 
 ## Open obligations
 
-The K2048 and D12 m=4 resource-feasible policies remain to be frozen separately. The completed m=2/m=3 finite events supplied no natural rank, and the m=4 paired SAT card was censored/incomplete. Consequently useful-rank rate beyond these exact events, linear algebra, target verification, complete cold and genuinely amortized IC runtime, same-point matched rho, and any base selection remain open. The [problem record](../../problems/n83-prebuilt-base-quality-m2-m4.md) tracks the exit criteria. No canonical leaderboard row moves on this L0 bounded evidence.
+The [smaller-base m=4 controls](reports/run-small-m4-controls-20261019/RUN_REPORT.md)
+passed exact import, pinned SAT/group/rank checking and separate native
+general-field replay on x86_64 and arm64. K2048 and D12 each produced one
+checked constructed rank-one row. Their worker walls were 672.997 and
+651.126 ms (one L0 observation each); their SAT models had 84,966 and
+84,590 variables. All six SSH preflight/control/replay containers exited
+zero without OOM. [Sealed control evidence](small-m4-v1/controls/README.md)
+is retained separately from the public query card, which started at
+2026-10-19 18:54:41 UTC and entered unpinned K1 search after both controls
+and their replays passed. Its four natural-arm outcomes remain pending at
+that control boundary; constructed rows are excluded from natural counts.
+
+The K2048 and D12 m=4 resource-feasible policies are frozen in [SMALL_M4_PROTOCOL.md](SMALL_M4_PROTOCOL.md); execution and independent replay determine their status. The completed m=2/m=3 finite events supplied no natural rank, and the earlier U/D m=4 paired SAT card was censored/incomplete. Consequently useful-rank rate beyond these exact events, linear algebra, target verification, complete cold and genuinely amortized IC runtime, same-point matched rho, and any base selection remain open. The [problem record](../../problems/n83-prebuilt-base-quality-m2-m4.md) tracks the exit criteria. No canonical leaderboard row moves on this L0 bounded evidence.
