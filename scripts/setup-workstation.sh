@@ -28,6 +28,7 @@
 #   SAGE_VERSION        SageMath version                       (10.9)
 #   SAGE_PREFIX         micromamba root for the Sage env       (/opt/conda-sage, or ~/.local/conda-sage without root)
 #   GO_VERSION          Go installed when go is missing/old    (1.26.9)
+#   GO_INSTALL_DIR      where that Go goes                     (/usr/local/go)
 #   NODE_MAJOR          Node.js major version                  (22)
 #   WITH_GEMINI=1       also install @google/gemini-cli
 #   WITH_LATEX=1        also install a TeX Live (papers/, iacr-eprint skill)
@@ -188,10 +189,39 @@ install_go() {
   if [ -n "$cur" ] && version_ge "$cur" "$GO_MIN"; then ok "go $cur"; return; fi
   if [ "$PKG" = brew ]; then run brew install go; return; fi
   local os=linux; [ "$OS" = Darwin ] && os=darwin
-  local tgz="go${GO_VERSION}.${os}-${GOARCH}.tar.gz"
-  run sh -c "curl -fsSL https://go.dev/dl/$tgz -o /tmp/$tgz"
-  as_root rm -rf /usr/local/go && as_root tar -C /usr/local -xzf "/tmp/$tgz" && run rm -f "/tmp/$tgz"
-  persist_path 'export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"'
+  local tgz="go${GO_VERSION}.${os}-${GOARCH}.tar.gz" dest="${GO_INSTALL_DIR:-/usr/local/go}"
+  local url="https://dl.google.com/go/$tgz"
+  if [ "$DRY_RUN" = 1 ]; then
+    printf '   + fetch %s, check its sha256, unpack, then replace %s\n' "$url" "$dest"; return
+  fi
+  # Nothing in $dest is touched until the archive is downloaded, matches the
+  # published sha256 and unpacks: a failed download must not delete a working Go.
+  local tmp want got
+  tmp="$(mktemp -d)" || { warn "go: mktemp failed"; return 1; }
+  if ! curl -fsSL "$url" -o "$tmp/$tgz" || ! want="$(curl -fsSL "$url.sha256")"; then
+    warn "go: download of $tgz failed; $dest left as it was"; rm -rf "$tmp"; return 1
+  fi
+  got="$( (sha256sum "$tmp/$tgz" 2>/dev/null || shasum -a 256 "$tmp/$tgz") | awk '{print $1}')"
+  if [ -z "$want" ] || [ "${want%% *}" != "$got" ]; then
+    warn "go: $tgz sha256 mismatch (want ${want%% *}, got $got); $dest left as it was"; rm -rf "$tmp"; return 1
+  fi
+  if ! tar -C "$tmp" -xzf "$tmp/$tgz" || [ ! -x "$tmp/go/bin/go" ]; then
+    warn "go: $tgz did not unpack; $dest left as it was"; rm -rf "$tmp"; return 1
+  fi
+  # Swap, keeping the old tree until the new one is in place.
+  as_root rm -rf "$dest.old"
+  if [ -e "$dest" ] && ! as_root mv "$dest" "$dest.old"; then
+    warn "go: could not move $dest aside"; rm -rf "$tmp"; return 1
+  fi
+  if as_root mkdir -p "$(dirname "$dest")" && as_root mv "$tmp/go" "$dest"; then
+    as_root rm -rf "$dest.old"
+  else
+    warn "go: install into $dest failed; restoring the previous one"
+    [ -e "$dest.old" ] && as_root rm -rf "$dest" && as_root mv "$dest.old" "$dest"
+  fi
+  rm -rf "$tmp"
+  persist_path "export PATH=\"$dest/bin:\$HOME/go/bin:\$PATH\""
+  export PATH="$dest/bin:$PATH"
   have go && ok "$(go version)"
 }
 
