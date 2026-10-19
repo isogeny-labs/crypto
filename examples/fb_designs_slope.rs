@@ -66,6 +66,7 @@
 use std::collections::{BTreeMap, HashMap};
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
+use std::os::unix::process::ExitStatusExt;
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
@@ -1578,6 +1579,8 @@ struct RunArgs {
 
 /// Run one system in a child under `ulimit -v` and a hard wall limit of
 /// budget + grace; the row, or a failure row with its reason.
+// The child is reaped by `wait4`, which clippy cannot see.
+#[allow(clippy::zombie_processes)]
 fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File) -> Value {
     let exe = std::env::current_exe().expect("current exe");
     let mut child = Command::new("sh")
@@ -1618,17 +1621,26 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
     let started = Instant::now();
     let limit = Duration::from_secs(a.budget + a.grace);
     let mut killed = false;
+    // `wait4` rather than `try_wait`, so the child's own peak resident set
+    // (`ru_maxrss`, kB on Linux) comes back with its status. The `sh`
+    // wrapper execs, so the pid is the system's process.
+    let pid = child.id() as libc::pid_t;
+    let mut ru: libc::rusage = unsafe { std::mem::zeroed() };
+    let mut raw: libc::c_int = 0;
     let status = loop {
-        if let Some(st) = child.try_wait().expect("wait") {
-            break st;
+        let r = unsafe { libc::wait4(pid, &mut raw, libc::WNOHANG, &mut ru) };
+        if r == pid {
+            break std::process::ExitStatus::from_raw(raw);
         }
         if started.elapsed() > limit {
             child.kill().ok();
             killed = true;
-            break child.wait().expect("wait");
+            unsafe { libc::wait4(pid, &mut raw, 0, &mut ru) };
+            break std::process::ExitStatus::from_raw(raw);
         }
         std::thread::sleep(Duration::from_millis(200));
     };
+    let peak_rss_kb = ru.ru_maxrss as u64;
     let wall = started.elapsed().as_secs_f64();
     let stdout = out_t.join().unwrap_or_default();
     let stderr = err_t.join().unwrap_or_default();
@@ -1685,7 +1697,8 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
     };
     merge(
         &mut row,
-        &json!({"process_wall_s": wall, "budget_s": a.budget, "ulimit_v_kb": a.vmem_kb}),
+        &json!({"process_wall_s": wall, "budget_s": a.budget, "ulimit_v_kb": a.vmem_kb,
+                "peak_rss_kb": peak_rss_kb}),
     );
     row
 }
