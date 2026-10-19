@@ -1,5 +1,10 @@
 # Primary N83 chained-S3 XCNF control
 
+The [paired K600 ordinary-query gate](NATURAL_RESULT.md) extends this
+known-witness control to the same first public query on Gray and hash pools.
+Its sealed one-million-conflict calls preserve both bounded outcomes and
+their full raw receipts.
+
 The existing 5-summand, signed-Frobenius-domain chained-S3 encoding exports
 to native-XOR XCNF, and CryptoMiniSat 5.14.7 returns a model when the known
 witness's orbit choices are supplied. An independent Python verifier checks
