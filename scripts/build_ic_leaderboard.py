@@ -221,7 +221,11 @@ def curve_records() -> dict:
     status) from the file's fixed two-space layout, and refuses to build if
     the layout is not the one it expects.
     """
-    lines = (REPO / SOURCES["curves_yaml"]).read_text().splitlines()
+    return parse_curve_records((REPO / SOURCES["curves_yaml"]).read_text().splitlines())
+
+
+def parse_curve_records(lines: list[str]) -> tuple[dict, int]:
+    """Parse the leaderboard fields from curves.yaml: (records by ICV1 slug, total)."""
     if "schema_version: 1" not in lines or "curves:" not in lines:
         raise SystemExit(f"{SOURCES['curves_yaml']}: expected schema_version 1 with a top-level curves map")
     recs, cur, in_icv1, in_refs = [], None, False, False
@@ -236,7 +240,7 @@ def curve_records() -> dict:
             continue
         if cur is None:
             continue
-        if re.fullmatch(r"    [A-Za-z_]+:.*", line):
+        if re.fullmatch(r"    [A-Za-z0-9_]+:.*", line):
             in_icv1 = line == "    icv1_identity:"
             in_refs = False
             m = re.fullmatch(r"    factor_base_refs:(.*)", line)
@@ -257,7 +261,15 @@ def curve_records() -> dict:
             cur["factor_base_refs"].append(m.group(1).strip().strip("'\""))
     if not recs or any(r["factor_base_refs"] is None or r["factor_base_link_status"] is None for r in recs):
         raise SystemExit(f"{SOURCES['curves_yaml']}: every record needs factor_base_refs and factor_base_link_status")
-    return {r["slug"]: r for r in recs if r["slug"]}, len(recs)
+    by_slug = {}
+    for record in recs:
+        slug = record["slug"]
+        if not slug:
+            continue
+        if slug in by_slug:
+            raise SystemExit(f"{SOURCES['curves_yaml']}: duplicate ICV1 slug {slug}")
+        by_slug[slug] = record
+    return by_slug, len(recs)
 
 
 def curve_record(records: dict, slug: str) -> dict:

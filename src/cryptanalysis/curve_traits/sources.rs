@@ -158,7 +158,8 @@ pub fn read_walk(spec: &SourceSpec, text: &str) -> Result<Vec<RegistryCurve>, St
 // ── A YAML subset ─────────────────────────────────────────────────────
 
 /// Parse the block-style YAML subset the crosswalk is written in: nested
-/// mappings, `- scalar` sequences, `[]`/`{}`, `#` comments, plain or
+/// mappings, `- scalar` and `- key: value` sequences, `[]`/`{}`, `#`
+/// comments, plain or
 /// single/double-quoted scalars.  Every scalar but `null`, `true` and
 /// `false` is kept as a string, so large integers stay exact.  Anything
 /// outside the subset is an error, never a silent misreading.  A key
@@ -251,10 +252,55 @@ fn block(
                 .ok_or(format!("line {line}: expected `- ` in a sequence"))?
                 .trim();
             let quoted = item.starts_with(['\'', '"']);
-            if item.is_empty() || (!quoted && (item.contains(": ") || item.ends_with(':'))) {
+            if item.is_empty() {
                 return Err(format!(
                     "line {line}: nested sequence items are not supported"
                 ));
+            }
+            if !quoted && (item.contains(": ") || item.ends_with(':')) {
+                // `- key: value` opens a mapping item; its further keys sit
+                // at the column of that first key.
+                let item_indent = indent + (c.len() - c[1..].trim_start().len());
+                let (key, rest) = split_key(item, line)?;
+                *pos += 1;
+                // Keep sequence-item mapping paths distinct from their
+                // containing mapping.  Besides making duplicate reporting
+                // precise, this prevents nested metadata keys from looking
+                // like sibling curve identity fields to callers.
+                let item_path = format!("{path}[].");
+                let child = format!("{item_path}{key}.");
+                let value = if rest.is_empty() {
+                    match lines.get(*pos) {
+                        Some(&(_, next, nc))
+                            if next > item_indent
+                                || (next == item_indent && nc.starts_with("- ")) =>
+                        {
+                            block(lines, pos, next, &child, dups)?
+                        }
+                        _ => Value::Null,
+                    }
+                } else {
+                    scalar(rest, line)?
+                };
+                let mut map = serde_json::Map::new();
+                map.insert(key, value);
+                if let Some(&(_, next, nc)) = lines.get(*pos) {
+                    if next == item_indent && !nc.starts_with("- ") {
+                        if let Value::Object(more) =
+                            block(lines, pos, item_indent, &item_path, dups)?
+                        {
+                            for (k, v) in more {
+                                if map.contains_key(&k) {
+                                    dups.push(format!("{item_path}{k}"));
+                                } else {
+                                    map.insert(k, v);
+                                }
+                            }
+                        }
+                    }
+                }
+                seq.push(Value::Object(map));
+                continue;
             }
             seq.push(scalar(item, line)?);
             *pos += 1;
@@ -409,6 +455,57 @@ mod tests {
         assert_eq!(v["b"]["263"]["level"], "1");
         assert!(v["f"].is_null());
         assert!(parse_yaml("a: |\n  x\n").is_err());
-        assert!(parse_yaml("a:\n  - b: 1\n").is_err());
+        assert!(parse_yaml("a:\n  -\n").is_err());
+    }
+
+    #[test]
+    fn a_sequence_item_may_be_a_mapping() {
+        let (v, dups) = parse_yaml(
+            "s:\n  - table: A\n    points: 5264\n    sha: null\n  - table: C\n    points: 12\n    table: D\n  - 7\nt: 1\n",
+        )
+        .unwrap();
+        assert_eq!(dups, ["s.[].table"]);
+        assert_eq!(v["s"][0]["table"], "A");
+        assert_eq!(v["s"][0]["points"], "5264");
+        assert!(v["s"][0]["sha"].is_null());
+        assert_eq!(v["s"][1]["table"], "C");
+        assert_eq!(v["s"][1]["points"], "12");
+        assert_eq!(v["s"][2], "7");
+        assert_eq!(v["t"], "1");
+        let (v, _) = parse_yaml("s:\n  - k:\n      x: 1\n    m: 2\n").unwrap();
+        assert_eq!(v["s"][0]["k"]["x"], "1");
+        assert_eq!(v["s"][0]["m"], "2");
+    }
+
+    #[test]
+    fn nested_factor_base_sources_stay_nested_and_preserve_identity() {
+        let (v, dups) = parse_yaml(
+            "curves:\n  p256: \n    icv1_identity:\n      slug: p256\n    factor_base_sources:\n      - table: CurveA\n        points: 5264\n        icv1_identity:\n          slug: injected\n        curves:\n          forged: record\n      - table: CurveB\n        source: archive\n",
+        )
+        .unwrap();
+
+        assert!(dups.is_empty());
+        assert_eq!(v["curves"].as_object().unwrap().len(), 1);
+        assert_eq!(v["curves"]["p256"]["icv1_identity"]["slug"], "p256");
+        let sources = v["curves"]["p256"]["factor_base_sources"]
+            .as_array()
+            .unwrap();
+        assert_eq!(sources.len(), 2);
+        assert_eq!(sources[0]["table"], "CurveA");
+        assert_eq!(sources[0]["points"], "5264");
+        assert_eq!(sources[0]["icv1_identity"]["slug"], "injected");
+        assert_eq!(sources[0]["curves"]["forged"], "record");
+        assert_eq!(sources[1]["table"], "CurveB");
+        assert_eq!(sources[1]["source"], "archive");
+        assert!(v["curves"].get("injected").is_none());
+    }
+
+    #[test]
+    fn nested_mapping_duplicates_are_reported_and_malformed_items_fail() {
+        let (v, dups) = parse_yaml("sources:\n  - table: first\n    table: second\n").unwrap();
+        assert_eq!(v["sources"][0]["table"], "first");
+        assert_eq!(dups, ["sources.[].table"]);
+        assert!(parse_yaml("sources:\n  -\n").is_err());
+        assert!(parse_yaml("sources:\n  - table: first\n      unexpected: value\n").is_err());
     }
 }
