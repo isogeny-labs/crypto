@@ -33,3 +33,30 @@ for arm in sorted(set(r["arm"] for r in rows)):
     print("arm %s: filter_rejections total %d ; rank_attempts total %d ; count rows %d" % (arm, fr, ra, sum(1 for r in rows if r["arm"] == arm)))
 tt = [json.loads(x) for x in open(D + "/data/trace_theory.jsonl") if x.strip()]
 print("trace_theory rows:", len(tt), "keys:", sorted(tt[0].keys())[:20] if tt else None)
+# size-normalised pooling (the study's stored rule: each pair divided by its size's mean A; sums over all pairs)
+def byk(n, arm): return {int(r["seed"]): r for r in rows if int(r["n"]) == n and r["arm"] == arm}
+def snorm(arm, col):
+    num = den = 0.0
+    for n in sizes:
+        A = byk(n, "A"); X = byk(n, arm)
+        seeds = sorted(set(A) & set(X))
+        ma = statistics.fmean(float(A[s][col]) for s in seeds)
+        num += sum(float(X[s][col]) / ma for s in seeds)
+        den += sum(float(A[s][col]) / ma for s in seeds)
+    return num / den
+for arm in ["R", "FR", "F"]:
+    print("size-normalised %s counted_total=%.6f wall_total=%.6f" % (arm, snorm(arm, "c_total"), snorm(arm, "w_total")))
+# free rank per size (arm R)
+for n in sizes:
+    fr = [int(float(r["free_rank"])) for r in rows if int(r["n"]) == n and r["arm"] == "R"]
+    print("R free_rank n=%d mean=%.2f" % (n, statistics.fmean(fr)))
+# A/A: inc vs A counted equality per seed
+for n in sizes:
+    A = byk(n, "A"); I = byk(n, "inc")
+    seeds = sorted(set(A) & set(I))
+    eq = sum(1 for s in seeds if A[s]["c_total"] == I[s]["c_total"] and A[s]["rank_attempts"] == I[s]["rank_attempts"] and A[s]["c_index"] == I[s]["c_index"])
+    print("A/A inc vs A n=%d pairs=%d equal(counted_total, rank_attempts, c_index)=%d" % (n, len(seeds), eq))
+# verified targets in one raw file
+rec = [json.loads(x) for x in open(D + "/data/n61_K500_s15_R.jsonl") if x.strip()]
+print("n61_K500_s15_R.jsonl target records:", len(rec), "group_verified true:", sum(1 for r in rec if r.get("group_verified")), "filter_rejected sum:", sum(int(r.get("filter_rejected") or 0) for r in rec))
+print("PROTOCOL line 102:", open(D + "/PROTOCOL.md").read().split("\n")[101][:300])

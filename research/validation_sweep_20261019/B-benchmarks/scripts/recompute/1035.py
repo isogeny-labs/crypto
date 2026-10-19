@@ -60,6 +60,14 @@ def within(claimed, computed):
     return abs(computed - claimed) / claimed <= 0.01
 
 
+def status(lo, hi, rand, allt):
+    if within(lo, allt[0]) and within(hi, allt[1]):
+        return 'match'
+    if within(lo, rand[0]) and within(hi, rand[1]):
+        return 'partial'
+    return 'mismatch'
+
+
 def jl(path):
     with open(path, encoding='utf-8') as h:
         return [json.loads(x) for x in h if x.strip()]
@@ -106,9 +114,6 @@ def main():
     cmin, cmax = min(e5_comb_wall.values()), max(e5_comb_wall.values())
     bmin, bmax = min(e5_blind_wall.values()), max(e5_blind_wall.values())
 
-    def fmt(k, d):
-        return {kk: round(vv, 4) for kk, vv in d.items()}
-
     claims = [
         {'claimed': 'E4 direct/quotient F_p row-reduction multiplication ratio 4.12-4.26 (order 2)',
          'computed': (f'random-target ratio min={r2r[0]:.4f} max={r2r[1]:.4f} n={r2r[2]}; '
@@ -117,18 +122,14 @@ def main():
                         '(subgroup_order 2) with the same pair, curve_key, role, target_kind, target_index and base_size '
                         '(matched B); range over random targets as in the README table; all-target range also given'),
          'files': [E4],
-         'status': ('partial' if within(4.12, r2r[0]) and within(4.26, r2r[1]) and not (
-             within(4.12, r2a[0]) and within(4.26, r2a[1])) else
-             ('match' if within(4.12, r2a[0]) and within(4.26, r2a[1]) else 'mismatch'))},
+         'status': status(4.12, 4.26, r2r, r2a)},
         {'claimed': 'E4 direct/quotient F_p row-reduction multiplication ratio 17.6-19.6 (order 4)',
          'computed': (f'random-target ratio min={r4r[0]:.4f} max={r4r[1]:.4f} n={r4r[2]}; '
                       f'all-target ratio min={r4a[0]:.4f} max={r4a[1]:.4f} n={r4a[2]}'),
          'definition': ('as above with subgroup_order 4; range over random targets as in the README table; '
                         'all-target range also given'),
          'files': [E4],
-         'status': ('partial' if within(17.6, r4r[0]) and within(19.6, r4r[1]) and not (
-             within(17.6, r4a[0]) and within(19.6, r4a[1])) else
-             ('match' if within(17.6, r4a[0]) and within(19.6, r4a[1]) else 'mismatch'))},
+         'status': status(17.6, 19.6, r4r, r4a)},
         {'claimed': '1,128 systems complete',
          'computed': f'system records={n_sys}; timed_out false={n_done}',
          'definition': 'count of kind=system records in e4/records.jsonl and count with timed_out false',
@@ -153,10 +154,11 @@ def main():
     ]
 
     studyfiles = files_under([STUDY_DIR + '/README.md', STUDY_DIR + '/reports', STUDY_DIR + '/PROTOCOL.md'])
-    notes = ('E4 ratio: field_ops is the row-reduction multiplication count in the README table (B=32 random target direct = 145,630, which matches). '
-             'E5 blind wall: online.wall_ns (solve_wall_ns agrees to 1 ms). '
-             f'E5 ratio per run (combined/blind): {fmt(None, {})} ').strip()
-    notes = notes.replace(" {}", "")
+    notes = ('E4 ratio: field_ops is the row-reduction multiplication count in the README table '
+             '(B=32 random-target direct = 145,630, which matches). '
+             'status partial = the random-target range matches but the all-target range does not; the claim text does not name the target population. '
+             'E5 blind wall: online.wall_ns (solve_wall_ns agrees to about 1 ms). '
+             'protocol: PROTOCOL.md at the study root. sessions/*/spec.json are the E5 session specs and are not used as the protocol.')
     out = {
         'row_no': 1000 + 35,
         'slug': SLUG,

@@ -90,42 +90,43 @@ claims.append({
 })
 
 
-# (3) SEA point count over 2^127-1 (field FpM2_127): sum over instances, and geomean of per-instance ratios
-def sea_by(arm_glob):
-    per = {}
-    for path, recs in load(arm_glob):
+# (3) SEA point count over 2^127-1 (field FpM2_127), 24 records per arm (2 runs x 12 records)
+def sea_records(arm_glob):
+    out = []  # (run_index, key, ns, path)
+    for ridx, (path, recs) in enumerate(load(arm_glob)):
         for r in recs:
             if r.get("algo") == "sea_point_count" and r.get("field") == "FpM2_127":
-                per.setdefault((r["instance"], r["cycle_degree"]), []).append((r["ns"], path))
-    return per
+                out.append((ridx, (r["instance"], r["cycle_degree"]), r["ns"], path))
+    return out
 
 
-sm = sea_by("sea.main.*.jsonl")
-sb = sea_by("sea.round5-pre-bmss.*.jsonl")
-keys = sorted(set(sm) & set(sb), key=lambda x: (int(x[0]), int(x[1])))
-main_sum = sum(min(v for v, _ in sm[k]) for k in keys)
-br_sum = sum(min(v for v, _ in sb[k]) for k in keys)
-ratios = [min(v for v, _ in sm[k]) / min(v for v, _ in sb[k]) for k in keys]
-geo = math.exp(sum(math.log(x) for x in ratios) / len(ratios))
-sea_files = sorted({p for k in keys for _v, p in sm[k]} | {p for k in keys for _v, p in sb[k]})
-n_recs_main = sum(len(sm[k]) for k in keys)
+sm = sea_records("sea.main.*.jsonl")
+sb = sea_records("sea.round5-pre-bmss.*.jsonl")
+sum_main = sum(x[2] for x in sm)
+sum_br = sum(x[2] for x in sb)
+bmap = {(x[0], x[1]): x[2] for x in sb}
+pairs = [(x[2] / bmap[(x[0], x[1])]) for x in sm if (x[0], x[1]) in bmap]
+geo = math.exp(sum(math.log(v) for v in pairs) / len(pairs))
+sea_files = sorted({x[3] for x in sm} | {x[3] for x in sb})
+minrun_main = sum(min(x[2] for x in sm if x[1] == k) for k in {x[1] for x in sm})
+minrun_br = sum(min(x[2] for x in sb if x[1] == k) for k in {x[1] for x in sb})
 claims.append({
     "claimed": "SEA point count over 2^127-1 (24 records, sum): 2.12 s -> 1.81 s",
-    "computed": (f"per instance min over runs, summed over {len(keys)} instances: main {main_sum / 1e9:.3f} s, "
-                 f"branch {br_sum / 1e9:.3f} s; total main records {n_recs_main}"),
-    "definition": "sum over instances of min-over-runs sea_point_count ns, field FpM2_127",
+    "computed": (f"sum over all {len(sm)} main records {sum_main / 1e9:.3f} s; sum over all {len(sb)} branch records "
+                 f"{sum_br / 1e9:.3f} s; (min-over-runs per instance: main {minrun_main / 1e9:.3f} s, "
+                 f"branch {minrun_br / 1e9:.3f} s)"),
+    "definition": "sum of sea_point_count ns over all 24 records per arm, field FpM2_127 (the study's '24 records (sum)')",
     "files": sea_files,
-    "status": rel(round(main_sum / 1e9, 2) == 2.12 and round(br_sum / 1e9, 2) == 1.81),
+    "status": rel(round(sum_main / 1e9, 2) == 2.12 and round(sum_br / 1e9, 2) == 1.81),
 })
 claims.append({
     "claimed": "SEA point count geomean speedup 1.14 (range 0.82-1.42)",
-    "computed": (f"geomean main/branch {geo:.4f}; range {min(ratios):.4f}-{max(ratios):.4f} "
-                 f"over {len(ratios)} instances"),
-    "definition": "geometric mean and min/max of per-instance min-over-runs ratio main/branch",
+    "computed": (f"geomean of {len(pairs)} paired record ratios (main/branch, paired by run index, instance, "
+                 f"cycle_degree) = {geo:.4f}; range {min(pairs):.4f}-{max(pairs):.4f}"),
+    "definition": "geometric mean and min/max over the 24 paired per-record ratios main/branch",
     "files": sea_files,
-    "status": rel(round(geo, 2) == 1.14 and round(min(ratios), 2) == 0.82 and round(max(ratios), 2) == 1.42),
+    "status": rel(round(geo, 2) == 1.14 and round(min(pairs), 2) == 0.82 and round(max(pairs), 2) == 1.42),
 })
-
 
 # (4) BMSS linear algebra ell = 101: 40-bit in bmss.* group; 256/511-bit in big.* group (linear_algebra)
 def bmss_arm(arm_glob, pbits, group_algo_filter):
@@ -165,21 +166,24 @@ for arm_glob, arm in (("big.main.*.jsonl", "main"), ("big.round5.*.jsonl", "bran
                 kohel.setdefault((str(r.get("p_bits")), r.get("task"), arm), []).append((r["median_ns"], path))
 tasks = sorted({k[1] for k in kohel})
 kohel_text = []
+kohel_ratio = {}
 for pbits in ("256", "511"):
     for t in tasks:
         m = kohel.get((pbits, t, "main"))
         b = kohel.get((pbits, t, "branch"))
         if m and b:
+            kr = min(v for v, _ in m) / min(v for v, _ in b)
+            kohel_ratio[pbits] = kr
             kohel_text.append(f"{pbits}-bit task {t}: main min {min(v for v, _ in m)} ns, branch min {min(v for v, _ in b)} ns, "
-                              f"ratio {min(v for v, _ in m) / min(v for v, _ in b):.2f}")
+                              f"ratio {kr:.4f}")
 kohel_files = sorted({p for lst in kohel.values() for _v, p in lst})
 claims.append({
     "claimed": "Kohel from kernel polynomial ell=1009, 256/511-bit: 2.4x / 2.0x (10.2 / 24.9 ms -> 4.2 / 12.4 ms)",
     "computed": "; ".join(kohel_text) if kohel_text else "no matched kohel task present in main and branch",
     "definition": "kohel_given_h median_ns, ell 1009, task codomain, p_bits 256/511; min over runs per arm; ratio main/branch",
     "files": kohel_files,
-    "status": ("match" if kohel_text and all(
-        round(float(x.split("ratio ")[1]), 1) in (2.4, 2.0) for x in kohel_text) else "mismatch") if kohel_text else "cannot_define",
+    "status": ("match" if kohel_ratio.get("256") and round(kohel_ratio["256"], 1) == 2.4
+               and kohel_ratio.get("511") and round(kohel_ratio["511"], 1) == 2.0 else "mismatch") if kohel_text else "cannot_define",
 })
 
 claims = claims[:10]
