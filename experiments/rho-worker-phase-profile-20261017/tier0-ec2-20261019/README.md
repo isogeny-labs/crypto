@@ -23,7 +23,10 @@ and a 32-Q cluster bootstrap. The improvement threshold is a 95% lower
 bound greater than 1.05 with every arm and pair valid.
 
 The benchmark CPU is physical core 23 (logical CPUs 23,47) on NUMA node 1.
-Boot isolation, the cgroup v2 isolated partition, housekeeping affinity,
+The [host configuration](configure_host.sh) sets the cgroup partition,
+housekeeping slices, IRQ routing, and fixed frequency after booting with
+`isolcpus=managed_irq,domain,23,47 nohz_full=23,47 rcu_nocbs=23,47`
+and housekeeping `irqaffinity`. Boot isolation, the cgroup v2 isolated partition, housekeeping affinity,
 IRQ routing, fixed frequency, memory binding, and per-arm noise are checked
 by the repository's `scripts/isolated_bench.py`. A failed preflight or arm
 remains in the raw ledger with the aggregate decision unknown.
