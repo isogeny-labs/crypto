@@ -69,13 +69,14 @@ have 4 draws each, and the Semaev cells 3–8.
 
 ---
 
-# Results: E5, E3, E4 and E6 (2026-10-12)
+# Results: E5, E3, E4, E6 (2026-10-12) and E7 (2026-10-19)
 
-These results come from the native engine and the amendments registered before each run
-(Amendments 2–6 of `PREREGISTRATION.md`).
-- Run report, graph and PDF: [reports/run-20261012/](reports/run-20261012/).
+These results come from the native engines and the amendments registered before each run
+(Amendments 2–8 of `PREREGISTRATION.md`).
+- Run reports, graphs and PDFs: [reports/run-20261012/](reports/run-20261012/) (E3–E6) and
+  [reports/run-20261019/](reports/run-20261019/) (E7, the E6 completion).
 - Lean scoring: [lean/](lean/).
-- Records: `e3/`, `e4/`, `e5/`, `e6/`.
+- Records: `e3/`, `e4/`, `e5/`, `e6/`, `e7/`.
 - Provenance notes, including three in-place rebuilds and one container restart, with why
   none changes a value: `e3/PROVENANCE.md`, `e6/PROVENANCE.md`.
 
@@ -170,6 +171,34 @@ plain refutation degree reproduced the recorded `D*` on every draw.
 - **Amendment 3 reading rule** (`d_F ≤ D* − 2` at the largest ℓ for both `m`): **"`d_F` flat
   while `D*` rises".**
 
+## E7: `m = 5, 6`, ℓ up to 3, `N = 44–54` (Amendments 7 and 8)
+
+The engine is `examples/hky_par.rs`, the parallel and chunked closure. The gate was run on
+the exact binary that ran E7 (sha256 `24cf10d6…`):
+- it reproduces `d_F` and every per-degree closure dimension of the validated engine on 24
+  committed draws (`e7/validate.log`: `AGREE 24 DISAGREE 0`);
+- it reproduces all four m = 5 (10, 2) draws of E6 Part B bit for bit
+  (`e7/gate_B_5-10-2.jsonl`).
+
+| `m` | `(n, ℓ)` | `N` | columns `≤ 4` | `d_F` | degree-4 closure, s (4 threads) |
+|--:|:--|--:|--:|:--|:--|
+| 6 | (8, 2) | 44 | 149,986 | 4 4 4 4 | 68–172 |
+| 5 | **(11, 3)** | 48 | 213,053 | 4 4 4 4 | 334–553 |
+| 6 | (9, 2) | 48 | 213,053 | 4 4 4 4 | 90–124 |
+| 5 | **(13, 3)** | 54 | 342,541 | 4 3 4 4 | 728–839 |
+
+- **Reading (Amendment 7): "`d_F` bounded through `m = 6`".** All 16 draws have
+  `d_F ≤ 4`, on both the local tier and the moved N = 54 cell.
+- **The degree-4 closure is the whole space.** `1 ∈ V_{F,4}` on every draw with
+  `d_F = 4`. The one `d_F = 3` draw refutes at degree 3 in 2 s.
+- **Memory.** The N = 54 cell peaked at 12.6 GB (VmHWM, `e7/peak_5-13-3.txt`) on the
+  15 GB host.
+- **Not run:** the large-host tier, (6, 10, 3) N = 58 and (5, 15, 3) N = 60. No host with
+  ≥ 64 GB was available, because AWS credentials are incomplete in this environment.
+  These cells are not extrapolated.
+- **N ≈ 100 is out of reach** of dense degree-4 elimination: 4.1M columns, a ≈ 1 TB
+  basis. It needs a sparse or structured method.
+
 ## E6 Part C: satisfiable draws (`m = 3`)
 
 - `d_last = 4` on all 6 satisfiable draws available: 4 from (7, 3) and 2 from (11, 4). The
@@ -196,15 +225,19 @@ it rises with `N` while the Semaev systems stay at 4.
 
 ## Lean and cairn
 
-- **`lean/FallDegree/Verdict.lean`**, kernel `decide` over 190 rows, proves
-  `report rows = ⟨p3a, p3b, p4a, p4b, bounded, semaevSpecific⟩ = all true`. The 190 rows are
-  generated from `e3/`, `e4/` and `e6/` by `examples/fall_degree_lean_data.rs`. Changing one
+- **`lean/FallDegree/Verdict.lean`**, kernel `decide` over 206 rows, proves
+  `report rows = ⟨p3a, p3b, p4a, p4b, bounded, semaevSpecific⟩ = all true`. The 206 rows are
+  generated from `e3/`, `e4/`, `e6/` and `e7/` by `examples/fall_degree_lean_data.rs`. Changing one
   verdict fails the build.
 - **Disclosure.** `Rule.lean` transcribes the prose rules of the pre-registration and
-  Amendments 2–6. The transcription was written after part of the data had been seen. The
+  Amendments 2–8. The transcription was written after part of the data had been seen. The
   prose rules it encodes were not.
-- **cairn.** The result objective `sha256:fc828009…` is the same theorem, over `Rule.lean`
-  and `Data.lean`. cairn's Lean jail accepted it. `CAIRN_EPOCH_SECONDS=5 cairn --log
+- **E7 in Lean.** E7 rows are kind 4. `e7Bounded = true` and `e7Grows = false` are part of
+  the same `decide` theorem. Changing one E7 draw to 5 fails the build.
+- **cairn.** The result objective `sha256:fc828009…` (E3/E4/E6) and its E7 successor
+  `sha256:16fc1da8…` (206 rows) are the same theorem, over `Rule.lean` and `Data.lean`.
+  The first E7 attempt returned "unavailable", because `lean` was not on cairn's PATH. It
+  is recorded in the log; the retry was accepted. cairn's Lean jail accepted it. `CAIRN_EPOCH_SECONDS=5 cairn --log
   cairn/log.jsonl audit` reports "chain intact".
 
 ## What this does and does not show
@@ -216,8 +249,8 @@ it rises with `N` while the Semaev systems stay at 4.
     `m = 4` (9, 3) takes about 100 s with 31,931 columns, against the plain tower's
     degree-7 matrix of 2.1M × 2.8M.
 - **It does not show** that `d_F` is bounded. HKYY's conditional says it cannot stay
-  bounded for `m ≈ n^{1/3}` unless binary ECDLP is subexponential. Here `m ≤ 5` and
-  `N ≤ 42`.
+  bounded for `m ≈ n^{1/3}` unless binary ECDLP is subexponential. Here `m ≤ 6` and
+  `N ≤ 54`.
 - **Conditional model** (`e6/crossover_model.md`, `examples/fall_degree_crossover.rs`). If
   `d_F = 4` held at every size, and one dense elimination in `V_{F,4}` cost `M(4)^ω`:
   - IC would beat rho only from `n ≈ 283` (ω = 2.81) or `n ≈ 233` (ω = 2.37);
@@ -226,5 +259,9 @@ it rises with `N` while the Semaev systems stay at 4.
   That gives the sizes where the bounded-`d_F` question would start to matter for
   security: the NIST binary curves K-233 and K-283 and up. It does not say that they are
   at risk.
-- **Next decisive measurement:** `d_F` at `m ≥ 5` with ℓ ≥ 3, and `N` ≈ 60–100. That is
-  `M(4)` ≈ 0.5–4M columns, so it needs a sparse closure engine or a large host.
+- **Next decisive measurement:** E7 measured `m = 5` with ℓ = 3 up to `N = 54`, and
+  `d_F` stayed 4. What remains:
+  - the registered large-host cells, `N = 58–60`;
+  - `N ≈ 100`, which needs a sparse closure engine rather than more RAM;
+  - and, more informative than raw `N`, larger `m` at fixed `n`, since HKYY's growth is
+    in `m`.
