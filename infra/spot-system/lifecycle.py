@@ -93,6 +93,34 @@ def run(db, autoscaling, event, owner, now, table, group, enabled, idle_seconds=
 
 def handler(event, context):
     import boto3
+    if (os.environ.get('PROTECTED_SOURCE') and event.get('action') == 'wake'
+            and event.get('managed_work') is not True):
+        status = handler({'action':'status'}, context)
+        if status.get('protected_source_active'):
+            return {'state':'ready','endpoint_instance_id':status['endpoint_instance_id'],'protected_source_active':True}
+    if event.get('action') == 'ssh-key':
+        status = handler({'action':'status'}, context)
+        if status.get('state') != 'ready':
+            return {'state':'waiting-for-endpoint'}
+        target = status['endpoint_instance_id']
+        ssm = boto3.client('ssm')
+        command = ssm.send_command(InstanceIds=[target], DocumentName='AWS-RunShellScript',
+            Parameters={'commands':['cat /etc/ssh/ssh_host_ed25519_key.pub']},
+            Comment='Read public SSH host key for fixed-IP authentication')['Command']['CommandId']
+        for _ in range(10):
+            try:
+                response = ssm.get_command_invocation(CommandId=command, InstanceId=target)
+                if response['Status'] == 'Success':
+                    key = response['StandardOutputContent'].strip().split()
+                    if len(key) < 2 or key[0] != 'ssh-ed25519':
+                        raise RuntimeError('Unexpected public SSH host key')
+                    return {'state':'ready','instance_id':target,'host_key':' '.join(key[:2])}
+                if response['Status'] in {'Failed','Cancelled','TimedOut'}:
+                    raise RuntimeError('Could not read the public SSH host key')
+            except ssm.exceptions.InvocationDoesNotExist:
+                pass
+            time.sleep(.5)
+        return {'state':'waiting-for-host-key'}
     result = run(boto3.client("dynamodb"), boto3.client("autoscaling"), event,
                context.aws_request_id, int(time.time()), os.environ["TABLE"],
                os.environ["GROUP"], os.environ.get("ENABLED") == "true",
@@ -112,6 +140,15 @@ def handler(event, context):
         result['ready_instance_ids'] = [i['InstanceId'] for i in ready]
         result['cutover_enabled'] = os.environ.get('CUTOVER') == 'true'
         result['ssh_endpoint_ready'] = target in result['ready_instance_ids']
+        source = os.environ.get('PROTECTED_SOURCE')
+        if source and target == source:
+            original = [i for r in ec2.describe_instances(InstanceIds=[source])['Reservations'] for i in r['Instances']]
+            if len(original) == 1 and original[0]['State']['Name'] == 'running':
+                result['ssh_endpoint_ready'] = True
+                result['endpoint_instance_id'] = source
+                result['protected_source_active'] = True
+        elif result['ssh_endpoint_ready']:
+            result['endpoint_instance_id'] = target
         if result['ssh_endpoint_ready']:
             result['state'] = 'ready'
     return result
