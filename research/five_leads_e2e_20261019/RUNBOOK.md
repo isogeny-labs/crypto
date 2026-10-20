@@ -35,6 +35,21 @@ The first command supplies one-infinity equations on 15 curves. The second
 validates a mapped point, `[3]D+[5]D=[8]D` and `[p]D+D=[p+1]D` with the checked native CLI
 on each. Neither performs an odd-kernel screen or isogeny construction.
 
+External Magma calculator control and bounded holdout probe (submitted code
+and raw API responses are retained in each JSON receipt):
+
+```sh
+python3 research/five_leads_e2e_20261019/magma_smith_group_probe.py --control > research/five_leads_e2e_20261019/correctness/magma-tian-f257-group-control-v1.json
+python3 research/five_leads_e2e_20261019/magma_f257_frobenius_control.py > research/five_leads_e2e_20261019/correctness/magma-f257-frobenius-control-v1.json
+python3 research/five_leads_e2e_20261019/magma_smith_group_probe.py --index 2 --timeout 10 > research/five_leads_e2e_20261019/correctness/magma-smith-index2-group-probe-10s-v1.json
+```
+
+The F257 control has a Frobenius-stable subgroup of order 27 with only one
+factor of 3 in the rational Jacobian order, so rational 3-torsion rank is
+not a valid general odd-kernel screen. The holdout request timed out and
+does not establish a negative result. Calculator code is logged by its
+operator; all submitted curves here are public synthetic fixtures.
+
 The Tian source-map coefficient fixture is reproducibly extracted from the
 original [arXiv v1 source](https://arxiv.org/abs/2012.07173v1). The extractor
 rejects a TeX SHA-256 mismatch; its six function arrays and the denominator

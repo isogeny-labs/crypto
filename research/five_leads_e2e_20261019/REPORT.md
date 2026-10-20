@@ -324,6 +324,20 @@ qualified wall-speed measurements. The extension-field kernel generators,
 quotient-from-kernel proof, exceptional point handling and 20-input
 Smith-negative odd-kernel screen remain open.
 
+The [public Magma calculator](https://magma-maths.org/calc/) [order/Euler-factor replay](correctness/magma-tian-f257-group-control-v1.json)
+returns `#Jac(C_1)(F_257)=16,565,088`, divisible by the checked
+source-point order 690,212 with cofactor 24. The
+[Frobenius control](correctness/magma-f257-frobenius-control-v1.json)
+shows that this order has 3-adic valuation one, even though the separately
+checked order-27 3-torsion subgroup over `F_257^6` is Frobenius-stable.
+Its Frobenius matrix has a one-dimensional fixed subspace. Thus a screen
+demanding three *rational* independent 3-torsion generators would reject
+the positive control; the holdout screen needs extension torsion, stability
+and isotropy checks. The matrix's characteristic polynomial also divides
+Magma's full Jacobian Frobenius polynomial modulo three, an independent
+compatibility check. The published subgroup's isotropy remains unchecked
+independently.
+
 A [20-input holdout](fixtures/smith-negative-holdout-v1.json) was frozen
 before odd-kernel testing from the prior \(p=2^{31}-1\) Smith census:
 ten with no tractable two-torsion kernel and ten with a trigonal candidate
@@ -347,6 +361,10 @@ have no rational branch point and still
 require a two-infinity or extension-field adapter. These 15 arithmetic
 checks do not test 3- or 5-torsion: the requested odd-kernel screen,
 quotient, mapped holdout DLP and cost comparison all remain unexecuted.
+The [public-calculator probe](correctness/magma-smith-index2-group-probe-10s-v1.json)
+on frozen Smith index 2 returned no bytes before its ten-second timeout;
+an initial direct request also timed out after 90 seconds. No order,
+Euler factor, odd-kernel verdict or cost follows from these timeouts.
 
 ## Mixed-fiber PKM systems
 
