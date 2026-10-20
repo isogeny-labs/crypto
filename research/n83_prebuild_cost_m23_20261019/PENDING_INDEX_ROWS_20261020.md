@@ -6,6 +6,11 @@ As of 2026-10-20 06:56 UTC, Conductor blocks these two index edits:
   Joining that task for the two append-only rows also returned `block_conflict`.
 - `problems/README.md`: task **T-4547**.
 
+**Update, 07:09 UTC:** the problem-index scope became available. Task
+T-4557 reserved it and applied the exact row below. Only the two
+benchmark-index rows remain pending; no override was used for the
+problem-index edit.
+
 The finished reports and browsing copies are committed in this PR.
 The required index changes remain pending until their scopes are released
 or the owner provides an explicit coordination override. This is a
