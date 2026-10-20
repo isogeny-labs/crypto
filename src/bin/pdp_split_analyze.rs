@@ -500,23 +500,89 @@ fn ecbench_summary(dirs: &[String], calibration: &Value) -> (Value, String) {
     )
 }
 
-/// The F4 cost-per-unknown ladder (round 3, Part B): per (cell, plan, g),
+/// The F4 cost-per-unknown ladder (round 3, Part B): per independent series,
+/// cell and plan,
 /// the residual unknowns `k = n_vars − g` after guessing, the mean F4 word
 /// XORs per branch and per target, the mean F4 wall per branch
-/// (descriptive), the solving degree, and — between consecutive `k` of one
-/// (n, ℓ-independent) series — the growth factor per residual unknown,
-/// `(cost_k2 / cost_k1)^(1/(k2−k1))`.  Enumeration grows by 2 per unknown;
+/// (descriptive), the solving degree, and — between adjacent protocol steps of one
+/// series — the growth factor `(current / previous)^(1/|Δk|)`. Enumeration grows by 2 per unknown;
 /// a factor above 2 means F4 is dearer than enumeration on that step.
+#[derive(Default)]
+struct LadderRow {
+    ell: u64,
+    g: u64,
+    k: u64,
+    complete_branch_xors: Vec<f64>,
+    complete_target_xors: Vec<f64>,
+    complete_branch_wall_s: Vec<f64>,
+    solving_degree: Vec<u64>,
+    censored: Vec<Value>,
+}
+
+/// The protocol gives each independent ladder series its own named file.
+/// Keep the two series separate even where they have the same (n, plan, k).
+fn ladder_series(path: &Path) -> &'static str {
+    let stem = path.file_stem().and_then(|s| s.to_str()).unwrap_or("");
+    let Some(rest) = stem.strip_prefix("ell") else {
+        panic!(
+            "ladder input must be a named round-3 stage file (ellN or ellN-gN): {}",
+            path.display()
+        );
+    };
+    let digits = rest.chars().take_while(|c| c.is_ascii_digit()).count();
+    if digits == 0 {
+        panic!("invalid ladder stage filename: {}", path.display());
+    }
+    match &rest[digits..] {
+        "" => "ell-series",
+        suffix
+            if suffix.starts_with("-g")
+                && suffix[2..].chars().all(|c| c.is_ascii_digit())
+                && suffix.len() > 2 =>
+        {
+            "g-series"
+        }
+        _ => panic!("invalid ladder stage filename: {}", path.display()),
+    }
+}
+
+fn run_censor_reasons(r: &Value) -> Vec<&'static str> {
+    let mut reasons = Vec::new();
+    if r["complete_and_exact"].as_bool() != Some(true) {
+        reasons.push("not_marked_complete_and_exact");
+    }
+    if r["branches_timed_out"].as_u64() != Some(0) {
+        reasons.push("timed_out_or_timeout_count_missing");
+    }
+    if r["branches_unresolved"].as_u64() != Some(0) {
+        reasons.push("unresolved_or_unresolved_count_missing");
+    }
+    let branches = r["branches"].as_u64();
+    match (branches, r["per_branch"].as_array()) {
+        (Some(n), Some(per_branch)) if n > 0 && per_branch.len() == n as usize => {
+            if per_branch
+                .iter()
+                .any(|b| b["timed_out"].as_bool() != Some(false))
+            {
+                reasons.push("branch_timeout_or_timeout_status_missing");
+            }
+        }
+        _ => reasons.push("branch_evidence_missing_or_count_mismatch"),
+    }
+    reasons
+}
+
 fn ladder_summary(files: &[String]) -> (Value, String) {
-    // (n, plan, k) -> (ell, g, per-branch XORs, per-target XORs, per-branch wall s, sd, cells)
-    let mut rows: BTreeMap<(u64, String, u64), (u64, u64, Vec<f64>, Vec<f64>, Vec<f64>, Vec<u64>)> =
-        BTreeMap::new();
+    // (series, n, plan, protocol-order) prevents overlap and preserves each
+    // series' declared step order (the g-series has decreasing residual k).
+    let mut rows: BTreeMap<(String, u64, String, u64), LadderRow> = BTreeMap::new();
     let mut cells = Vec::new();
     for f in files {
+        let series = ladder_series(Path::new(f));
         for r in read_jsonl(Path::new(f)) {
             if r["kind"] == "cell" {
                 cells.push(json!({
-                    "file": f, "n": r["n"], "ell": r["ell"], "base": r["base"],
+                    "file": f, "series": series, "n": r["n"], "ell": r["ell"], "base": r["base"],
                     "closure_abscissae": r["closure_abscissae"], "closure_columns": r["closure_columns"],
                     "lambda_per_system": r["lambda_system_decompositions"].as_f64().unwrap_or(0.0)
                         / r["lambda_systems"].as_f64().unwrap_or(1.0).max(1.0),
@@ -528,57 +594,216 @@ fn ladder_summary(files: &[String]) -> (Value, String) {
             }
             let (n, ell, g) = (u(&r, "n"), u(&r, "ell"), u(&r, "g"));
             let n_vars = u(&r, "n_vars");
-            let branches = u(&r, "branches").max(1) as f64;
-            let xors = u(&r, "word_xors") as f64;
-            let wall = u(&r, "f4_wall_ns") as f64 * 1e-9;
+            let branches = u(&r, "branches");
+            assert!(n_vars >= g, "guess count exceeds variable count in {}", f);
+            let plan = r["plan"].as_str().expect("run plan").to_string();
+            let k = n_vars - g;
+            let order = if series == "g-series" {
+                u64::MAX - k
+            } else {
+                k
+            };
             let e = rows
-                .entry((n, r["plan"].as_str().unwrap().to_string(), n_vars - g))
-                .or_insert((ell, g, Vec::new(), Vec::new(), Vec::new(), Vec::new()));
-            e.2.push(xors / branches);
-            e.3.push(xors);
-            e.4.push(wall / branches);
-            e.5.push(u(&r, "solving_degree_max"));
+                .entry((series.to_string(), n, plan, order))
+                .or_default();
+            (e.ell, e.g, e.k) = (ell, g, k);
+            let reasons = run_censor_reasons(&r);
+            if reasons.is_empty() {
+                assert!(branches > 0, "complete run has zero branches in {}", f);
+                let xors = u(&r, "word_xors") as f64;
+                let wall = u(&r, "f4_wall_ns") as f64 * 1e-9;
+                e.complete_branch_xors.push(xors / branches as f64);
+                e.complete_target_xors.push(xors);
+                e.complete_branch_wall_s.push(wall / branches as f64);
+                e.solving_degree.push(u(&r, "solving_degree_max"));
+            } else {
+                e.censored
+                    .push(json!({"file": f, "record": r, "reasons": reasons}));
+            }
         }
     }
     let mut out = Vec::new();
     let mut table = String::from(
-        "\n| n | plan | ℓ | g | residual k | runs | mean XORs / branch | mean XORs / target | mean F4 wall / branch (s, descriptive) | solving degree | growth per unknown vs previous k |\n\
-         |--:|---|--:|--:|--:|--:|--:|--:|--:|---|--:|\n",
+        "\n| series | n | plan | ℓ | g | residual k | complete runs | censored runs | mean XORs / branch | mean XORs / target | mean F4 wall / branch (s, descriptive) | solving degree | growth per unknown vs previous k |\n\
+         |---|--:|---|--:|--:|--:|--:|--:|--:|--:|--:|---|--:|\n",
     );
-    let mut prev: Option<((u64, String), u64, f64)> = None;
-    for ((n, plan, k), (ell, g, pb, pt, pw, sd)) in &rows {
-        let mpb = mean(pb).unwrap_or(0.0);
-        let growth = match &prev {
-            Some((key, k1, c1)) if *key == (*n, plan.clone()) && *k > *k1 && *c1 > 0.0 => {
-                Some((mpb / c1).powf(1.0 / (*k - *k1) as f64))
-            }
-            _ => None,
-        };
-        prev = Some(((*n, plan.clone()), *k, mpb));
-        let sds: Vec<String> = sd.iter().map(|d| d.to_string()).collect();
+    let mut prev: BTreeMap<(String, u64, String), (u64, Option<f64>)> = BTreeMap::new();
+    for ((series, n, plan, _order), row) in &rows {
+        let mpb = mean(&row.complete_branch_xors);
+        let growth = prev
+            .get(&(series.clone(), *n, plan.clone()))
+            .and_then(|(k1, c1)| {
+                let distance = row.k.abs_diff(*k1);
+                if distance > 0 {
+                    Some((mpb? / c1?).powf(1.0 / distance as f64))
+                } else {
+                    None
+                }
+            });
+        prev.insert((series.clone(), *n, plan.clone()), (row.k, mpb));
+        let sds: Vec<String> = row.solving_degree.iter().map(|d| d.to_string()).collect();
         table.push_str(&format!(
-            "| {n} | {plan} | {ell} | {g} | {k} | {} | {:.3e} | {:.3e} | {:.4} | {} | {} |\n",
-            pb.len(),
-            mpb,
-            mean(pt).unwrap_or(0.0),
-            mean(pw).unwrap_or(0.0),
+            "| {series} | {n} | {plan} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} |\n",
+            row.ell,
+            row.g,
+            row.k,
+            row.complete_branch_xors.len(),
+            row.censored.len(),
+            mpb.map_or("—".to_string(), |x| format!("{x:.3e}")),
+            mean(&row.complete_target_xors).map_or("—".to_string(), |x| format!("{x:.3e}")),
+            mean(&row.complete_branch_wall_s).map_or("—".to_string(), |x| format!("{x:.4}")),
             sds.join(","),
             growth.map_or("—".to_string(), |x| format!("{x:.2}")),
         ));
         out.push(json!({
-            "n": n, "plan": plan, "ell": ell, "g": g, "residual_unknowns": k, "runs": pb.len(),
-            "mean_xors_per_branch": mpb, "mean_xors_per_target": mean(pt),
-            "mean_f4_wall_s_per_branch_descriptive": mean(pw),
-            "solving_degree_per_run": sd, "growth_per_unknown_vs_previous_k": growth,
+            "series": series, "n": n, "plan": plan, "ell": row.ell, "g": row.g,
+            "residual_unknowns": row.k, "complete_runs": row.complete_branch_xors.len(),
+            "censored_runs": row.censored.len(), "censored_records": row.censored,
+            "mean_xors_per_branch": mpb, "mean_xors_per_target": mean(&row.complete_target_xors),
+            "mean_f4_wall_s_per_branch_descriptive": mean(&row.complete_branch_wall_s),
+            "solving_degree_per_run": row.solving_degree,
+            "growth_per_unknown_vs_previous_k": growth,
         }));
     }
     (
         json!({"files": files, "cells": cells, "rows": out,
-               "rule": "growth = (cost_k2/cost_k1)^(1/(k2-k1)) on mean XORs per branch; enumeration is 2"}),
+               "rule": "growth = (current/previous mean XORs per branch)^(1/abs(delta k)) on adjacent protocol steps with complete exact runs only; censored runs are retained separately and excluded; series are independent by stage filename; enumeration is 2"}),
         if files.is_empty() {
             String::new()
         } else {
             table
         },
     )
+}
+
+#[cfg(test)]
+mod ladder_tests {
+    use super::*;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn run(k: u64, g: u64, xors: u64, complete: bool, timed_out: u64) -> Value {
+        json!({
+            "kind":"run", "n":23, "ell":7, "g":g, "n_vars":k+g,
+            "plan":"3", "branches":1, "word_xors":xors,
+            "f4_wall_ns":1000, "solving_degree_max":4,
+            "complete_and_exact":complete, "branches_timed_out":timed_out,
+            "branches_unresolved":0,
+            "per_branch":[{"timed_out":timed_out != 0}],
+        })
+    }
+
+    fn fixture_dir() -> std::path::PathBuf {
+        let nonce = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!("pdp-ladder-{}-{nonce}", std::process::id()));
+        fs::create_dir_all(&path).unwrap();
+        path
+    }
+
+    #[test]
+    fn overlapping_series_are_separate_and_censored_rows_do_not_enter_growth() {
+        let dir = fixture_dir();
+        let ell = dir.join("ell7.jsonl");
+        let g8 = dir.join("ell7-g8.jsonl");
+        let g10 = dir.join("ell7-g10.jsonl");
+        let ell_rows = [
+            run(7, 8, 100, true, 0),
+            run(10, 8, 800, true, 0),
+            run(10, 8, 80_000, false, 1),
+            run(13, 8, 1_600, true, 0),
+        ];
+        fs::write(
+            &ell,
+            ell_rows
+                .iter()
+                .map(Value::to_string)
+                .collect::<Vec<_>>()
+                .join("\n")
+                + "\n",
+        )
+        .unwrap();
+        fs::write(&g8, run(13, 8, 25, true, 0).to_string() + "\n").unwrap();
+        fs::write(&g10, run(11, 10, 100, true, 0).to_string() + "\n").unwrap();
+
+        let (summary, table) = ladder_summary(&[
+            ell.to_string_lossy().into_owned(),
+            g8.to_string_lossy().into_owned(),
+            g10.to_string_lossy().into_owned(),
+        ]);
+        let rows = summary["rows"].as_array().unwrap();
+        let ell_k7 = rows
+            .iter()
+            .find(|r| r["series"] == "ell-series" && r["residual_unknowns"] == 7)
+            .unwrap();
+        let ell_k10 = rows
+            .iter()
+            .find(|r| r["series"] == "ell-series" && r["residual_unknowns"] == 10)
+            .unwrap();
+        let ell_k13 = rows
+            .iter()
+            .find(|r| r["series"] == "ell-series" && r["residual_unknowns"] == 13)
+            .unwrap();
+        let g_k13 = rows
+            .iter()
+            .find(|r| r["series"] == "g-series" && r["residual_unknowns"] == 13)
+            .unwrap();
+        let g_k11 = rows
+            .iter()
+            .find(|r| r["series"] == "g-series" && r["residual_unknowns"] == 11)
+            .unwrap();
+
+        assert_eq!(ell_k7["complete_runs"], 1);
+        assert_eq!(g_k13["complete_runs"], 1);
+        assert_eq!(g_k11["complete_runs"], 1);
+        assert_eq!(ell_k7["mean_xors_per_branch"], 100.0);
+        assert_eq!(g_k13["mean_xors_per_branch"], 25.0);
+        assert_eq!(g_k11["mean_xors_per_branch"], 100.0);
+        assert!((g_k11["growth_per_unknown_vs_previous_k"].as_f64().unwrap() - 2.0).abs() < 1e-12);
+        assert_eq!(ell_k10["complete_runs"], 1);
+        assert_eq!(ell_k10["censored_runs"], 1);
+        assert_eq!(ell_k10["mean_xors_per_branch"], 800.0);
+        assert_eq!(
+            ell_k10["censored_records"][0]["record"]["word_xors"],
+            80_000
+        );
+        assert!(
+            (ell_k10["growth_per_unknown_vs_previous_k"]
+                .as_f64()
+                .unwrap()
+                - 2.0)
+                .abs()
+                < 1e-12
+        );
+        assert_eq!(ell_k13["mean_xors_per_branch"], 1_600.0);
+        assert!(
+            (ell_k13["growth_per_unknown_vs_previous_k"]
+                .as_f64()
+                .unwrap()
+                - 2.0)
+                .abs()
+                < 1e-12
+        );
+        assert!(table.contains("ell-series") && table.contains("g-series"));
+
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn incomplete_only_cell_has_no_complete_mean_or_growth() {
+        let dir = fixture_dir();
+        let file = dir.join("ell9.jsonl");
+        let mut incomplete = run(19, 8, 99_999, false, 1);
+        incomplete.as_object_mut().unwrap().remove("word_xors");
+        incomplete.as_object_mut().unwrap().remove("f4_wall_ns");
+        fs::write(&file, incomplete.to_string() + "\n").unwrap();
+        let (summary, _) = ladder_summary(&[file.to_string_lossy().into_owned()]);
+        let row = &summary["rows"][0];
+        assert_eq!(row["complete_runs"], 0);
+        assert_eq!(row["censored_runs"], 1);
+        assert!(row["mean_xors_per_branch"].is_null());
+        assert!(row["growth_per_unknown_vs_previous_k"].is_null());
+        fs::remove_dir_all(dir).unwrap();
+    }
 }
