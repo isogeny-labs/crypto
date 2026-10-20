@@ -1,5 +1,7 @@
 # ECBench ECDLP performance frontier, 2026-10-13
 
+> **Correction 2026-10-20 (validation sweep B, verdicts 108.1 and 110.1: contradicted).** The n=61 13.9x and N83 18.528x online ratios below compare against a rho with an empty distinguished-point table. They are superseded and are not improvements: Bernstein-Lange rho at equal advice is 53-317x faster (`benchmarks/20261014-ic-next10-09-equal-advice`) and precomputed rho beats the N83 IC (`benchmarks/20261016-n83-precomputed-rho-control`). The within-IC K1798 vs K1500 comparison stands. The 120/168 replay-all is likewise superseded by 72/168 on current main (sweep A).
+
 **Decision.** The cold, one-target, setup-inclusive frontier is still generic
 rho. None of the measured index-calculus candidates beats its matched rho arm
 in the repository's counted unit. The retained-preprocessing frontier is
