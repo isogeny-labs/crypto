@@ -125,10 +125,18 @@ def watch(allocation_path, trigger_path, host, port, root, key):
             status = ""
         if status.startswith("DONE "):
             print(status, flush=True)
-            if spool(ssh, root) and archive_ready(root):
+            transferred = spool(ssh, root)
+            if transferred and archive_ready(root):
                 print("ARCHIVE_SHA256_PASS", flush=True)
                 retire(pod_id, key, root)
                 return 0
+            write(root / "archive_failure.json", {
+                "recorded_utc": now().isoformat(), "pod_id": pod_id,
+                "status": status, "spool_succeeded": transferred,
+                "archive_ready": archive_ready(root)})
+            retire(pod_id, key, root)
+            print("ARCHIVE_MISSING_OR_INVALID", flush=True)
+            return 2
         time.sleep(20)
     try:
         spool(ssh, root)
