@@ -721,9 +721,40 @@ fn nonsingular(a: u64, b: u64, p: u64) -> bool {
 }
 
 /// A target curve on which at least `need` elements of `V` are abscissae.
+/// Amendment 8, K1: the curve family of the target curve, fixed per process
+/// (0 = generic: `a` and `b` uniform, as in every earlier run; 1 = `a = 0`;
+/// 2 = `a = −3`). Children get it with `--family`.
+static FAMILY: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+/// Amendment 8, T4: stop the tower engine once at most this many standard
+/// monomials remain (0 = never, as in every earlier run). Children get it
+/// with `--stop-below`.
+static STOP_BELOW: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+
+fn family() -> usize {
+    FAMILY.load(std::sync::atomic::Ordering::Relaxed)
+}
+
+fn family_name(f: usize) -> &'static str {
+    ["generic", "a0", "am3"][f]
+}
+
+fn parse_family(s: &str) -> usize {
+    ["generic", "a0", "am3"]
+        .iter()
+        .position(|n| *n == s)
+        .unwrap_or_else(|| panic!("unknown curve family `{s}` (generic, a0, am3)"))
+}
+
 fn target_curve(p: u64, v: &[u64], need: usize, rng: &mut StdRng) -> (PrimeCurve, Vec<u64>) {
     loop {
-        let a = rng.gen_range(0..p);
+        // `a` is always drawn, so the stream of the generic family is the
+        // one every earlier run used; a family then overrides it.
+        let drawn = rng.gen_range(0..p);
+        let a = match family() {
+            1 => 0,
+            2 => p - 3,
+            _ => drawn,
+        };
         let b = rng.gen_range(1..p);
         if !nonsingular(a, b, p) {
             continue;
@@ -1470,7 +1501,11 @@ fn measure_tower(
     let d_in: Vec<u32> = eqs.iter().map(Pol::degree).collect();
     let d_max = d_in.iter().copied().max().unwrap_or(1);
     let max_degree = n as u32 + d_max + 6;
-    let opts = TowerF4Options::new(max_degree).with_budget(budget);
+    let mut opts = TowerF4Options::new(max_degree).with_budget(budget);
+    let stop = STOP_BELOW.load(std::sync::atomic::Ordering::Relaxed);
+    if stop > 0 {
+        opts = opts.stopping_below(stop);
+    }
     let started = Instant::now();
     let r = f4_fp_tower::f4_tower(&input, &ring, &opts);
     let wall = started.elapsed().as_secs_f64();
@@ -1504,6 +1539,8 @@ fn measure_tower(
         "max_rows": r.max_rows,
         "max_cols": r.max_cols,
         "max_nnz": r.max_nnz,
+        "stop_below": if stop > 0 { json!(stop) } else { Value::Null },
+        "staircase_at_stop": r.staircase_at_stop,
         "field_ops": null,
         "muladds": r.muladds,
         "f4_ms": r.ms,
@@ -1528,7 +1565,13 @@ fn merge(into: &mut Value, from: &Value) {
 /// Amendment 1 item 3, with Amendment 2's prime index (`p₁ = 0`, so every
 /// `p₁` seed is unchanged).
 fn cell_seed(prime: usize, arm: Arm, m: usize, t: usize) -> u64 {
-    SEED ^ ((prime as u64) << 48) ^ (arm.id() << 40) ^ ((m as u64) << 32) ^ ((t as u64) << 16)
+    // Amendment 8: the curve family joins the seed at bit 52 (generic = 0,
+    // so every earlier seed is unchanged).
+    SEED ^ ((family() as u64) << 52)
+        ^ ((prime as u64) << 48)
+        ^ (arm.id() << 40)
+        ^ ((m as u64) << 32)
+        ^ ((t as u64) << 16)
 }
 
 fn target_seed(cell: u64, k: usize) -> u64 {
@@ -1692,6 +1735,7 @@ fn build_system(
         "cell_seed": cs,
         "target_seed": ts,
         "curve": {"a": curve.a, "b": curve.b},
+        "curve_family": family_name(family()),
         "x_r": target.x_r,
         "planted_x": target.pts.iter().map(|pt| pt.x).collect::<Vec<_>>(),
         "set": d.info,
@@ -1797,6 +1841,19 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
             &a.budget.to_string(),
         ])
         .args(a.distinct.then_some("--distinct-targets"))
+        .args(if family() > 0 {
+            vec!["--family".to_string(), family_name(family()).to_string()]
+        } else {
+            vec![]
+        })
+        .args({
+            let st = STOP_BELOW.load(std::sync::atomic::Ordering::Relaxed);
+            if st > 0 {
+                vec!["--stop-below".to_string(), st.to_string()]
+            } else {
+                vec![]
+            }
+        })
         .args(if a.tower {
             vec!["--engine", "tower"]
         } else {
@@ -2565,7 +2622,7 @@ fn group_of(file: &str) -> &str {
     match file.get(..3) {
         Some(
             g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-" | "G1-" | "T1-"
-            | "T2-" | "T3-"),
+            | "T2-" | "T3-" | "T4-" | "K1-" | "X1-"),
         ) => &g[..2],
         _ => "p1",
     }
@@ -3160,8 +3217,9 @@ fn admit_tower(dir: &str, out: &str, prime: usize) -> bool {
     let rows = read_rows(dir);
     // p₁ (Amendment 6, T1): the first run and F4, 26 systems. p₂
     // (Amendment 7, T3a): F1's A0 series, 22 systems.
+    let stop_mode = STOP_BELOW.load(std::sync::atomic::Ordering::Relaxed) > 0;
     let (groups, need): (&[&str], usize) = if prime == 0 {
-        (&["p1", "F4"], 26)
+        (&["p1", "F4"], if stop_mode { 4 } else { 26 })
     } else {
         (&["F1"], 22)
     };
@@ -3197,6 +3255,8 @@ fn admit_tower(dir: &str, out: &str, prime: usize) -> bool {
     )
     .ok();
     let mut fails: Vec<String> = Vec::new();
+    let mut gating = 0usize;
+    let stop = STOP_BELOW.load(std::sync::atomic::Ordering::Relaxed);
     for (f, c) in &sel {
         let m = c["m"].as_u64().expect("m") as usize;
         let t = c["t"].as_u64().expect("t") as usize;
@@ -3222,14 +3282,21 @@ fn admit_tower(dir: &str, out: &str, prime: usize) -> bool {
             && row["D"] == c["D"]
             && row["inconsistent"] == false
             && row["planted_ok"] == true;
-        if !same {
+        // With a staircase stop (Amendment 8, T4) only the `m = 4` systems,
+        // the arity the stop is used at, gate the verdict; `m = 2, 3` are
+        // reported.
+        let gates = stop == 0 || m >= 4;
+        if gates {
+            gating += 1;
+        }
+        if !same && gates {
             fails.push(format!("{f} m={m} t={t} target={k}"));
         }
         merge(
             &mut row,
             &json!({"git_commit": commit, "host": host, "admission_of": f,
                     "committed": {"D": c["D"], "max_cols": c["max_cols"], "engine": "f4_fp"},
-                    "admission_match": same}),
+                    "admission_match": same, "gating": gates}),
         );
         let line = format!(
             "{f} A0 m={m} t={t} target={k}: tower D {} (f4_fp {}), max_cols {} (f4_fp {}), muladds {}, {:.1} s, {} {}",
@@ -3248,7 +3315,7 @@ fn admit_tower(dir: &str, out: &str, prime: usize) -> bool {
         file.flush().ok();
         log.flush().ok();
     }
-    let admitted = fails.is_empty() && sel.len() == need;
+    let admitted = fails.is_empty() && gating == need;
     let msg = format!(
         "== T1: {} of {} systems match{}; {}; ended {}",
         sel.len() - fails.len(),
@@ -3882,6 +3949,15 @@ fn list(s: &str) -> Vec<usize> {
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
+    if let Some(f) = flag(&args, "--family") {
+        FAMILY.store(parse_family(&f), std::sync::atomic::Ordering::Relaxed);
+    }
+    if let Some(b) = flag(&args, "--stop-below") {
+        STOP_BELOW.store(
+            b.parse().expect("--stop-below"),
+            std::sync::atomic::Ordering::Relaxed,
+        );
+    }
     let cmd = args.first().map(String::as_str).unwrap_or("");
     match cmd {
         "one" => {

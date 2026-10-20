@@ -511,3 +511,106 @@ per system on p₁), with D = 7 and D = 5. The gap replicates. A0's `m = 3`
 σ on p₂ is 0.6000 on 4 cells (*no middle ground*), and A11's is 0.3000 on 4
 (*weak*). The basis is that all 44 systems completed on both primes so far
 have equal D (Amendment 2 report), not a new argument.
+
+### Amendment 8, 2026-10-20: three tests of what is left (T4, K1, X1), before any of their rows
+
+Registered by the experiment lane before any T4, K1 or X1 row exists. It
+changes no committed row, verdict, threshold, decision rule or prediction.
+Instrument, limits, seeds and the completed-cell and σ rules are those of
+Amendments 1–7, except as stated. A new curve-family index joins the seed at
+bit 52 (generic = 0, so every earlier seed is unchanged).
+
+**What is left.** (1) A0 at `m = 4`, `t = 4` has no completed cell: `f4_fp`
+runs out of memory (13 and 15 GB), and the tower engine stops at 3600 s at
+partial D = 7 (T2). A0's `m = 4` σ prediction is therefore undecided. (2)
+Every instance so far is a random short-Weierstrass curve over one of two
+primes, on the dense `f4_fp` path or the tower engine. Replicating a cell on
+a second prime (T3) shows the prime does not matter, not that the curve or
+the code path does not.
+
+**A fact that bounds (1).** A partial D at a timeout is the highest degree F4
+has learned something at so far, so a completed cell's D is at least that.
+T2's two `t = 4` systems reached partial D = 7. A0's `m = 4` series is D = 6,
+7 at `t = 2, 3` (F4). With a completed `t = 4` cell the least-squares slope
+over `b = 2, 3, 4` is `(D₄ − 6)/2`, which is at least 0.5 for any `D₄ ≥ 7`.
+So *if* A0's `m = 4`, `t = 4` cell completes, its σ is ≥ 0.5 (*no middle
+ground*), whatever D₄ is. This is a consequence of the bound, not a
+measurement: no verdict is read from it until a cell completes.
+
+**T4, a staircase stop on the tower engine, for A0 at `m = 4`.** The tower
+engine's `stopping_below(k)` ends a run once the leading monomials leave at
+most `k` standard monomials. A planted system at `m = 4` has at least 24
+solutions (every ordering of the decomposition), so the certification that
+follows is the slow part (pilot round 2, G2b). Its D is then **stop-bounded**:
+the highest degree at which F4 learned something before the stop. It is not
+the certified D of the other rows, and every T4 row says so.
+- *T4a, admission.* Threshold `k = 64`. Every completed planted A0 system at
+  `m = 4` on p₁ (F4, `t = 2, 3`; 4 systems) is measured again with the stop.
+  The stop is **admitted** if all 4 complete, with the committed D, without
+  deriving 1, and with the planted solution kept. The completed `m = 3`
+  (6) and `m = 2` (16) systems are measured too, and reported, not gating.
+  If the stop is not admitted, T4b is not run.
+- *T4b, the cell (only if admitted).* A0, `m = 4`, `t = 4`, p₁, tower engine,
+  `k = 64`, 2 planted targets, budget 3600 s, hard kill 3900 s,
+  `ulimit -v 15000000`. A system that does not reach the stop is recorded
+  with its reason. If both systems stop with at most 64 standard monomials,
+  the cell joins A0's `m = 4` σ fit, labelled stop-bounded, and the fit is
+  reported with and without it.
+
+**K1, other curve families (the instance, not the prime).** A0 and A11, p₁,
+`f4_fp`, with the target curve drawn from a family: `a0` (`a = 0`, `b`
+uniform; `j = 0`) and `am3` (`a = −3`, `b` uniform; the P-256 shape).
+`m = 2`, `t = 2–9` and `m = 3`, `t = 2–4` (the largest `t` the generic family
+completed), 2 planted targets, 300 s budget, hard kill 420 s,
+`ulimit -v 13000000`, as in the first run. Files `runs/K1-{arm}-{family}-m{m}`.
+The reference is the first run's committed A0 and A11 rows (generic family).
+The seeds differ, so towers and curves differ; D is compared by
+`(arm, m, t)`.
+- A family is **curve-independent** if, at every shared completed
+  `(arm, m, t)`, the cell D equals the generic cell D. It is
+  **curve-dependent** if any shared completed cell differs; the cells are
+  listed.
+- **The gap holds** in a family if, at `m = 3` and every shared completed `t`,
+  A11's cell D ≤ A0's cell D − 1.
+- `max_cols` against the generic cell is reported (descriptive).
+
+**X1, a third prime on the narrow code path.** p₃ = 40961 = 5·2¹³ + 1 is below
+2¹⁶, so `f4_fp` takes its 32-bit narrow path, which holds half the memory per
+entry. Amendment 4 (C3) did not admit p₃ because 2 of 194 systems differed on
+D, max_cols, max_rows and steps. Both were A1g, `m = 3`, `t = 3` (a set with
+no fixed coset shape). Every one of its 26 A0 and 30 A11 systems matched. p₃
+is therefore **admitted for A0 and A11 only**, on C3's committed rows. No A1g
+row is read from p₃. The cells, p₃, `f4_fp`, 2 planted targets each, budget
+3600 s, hard kill 3900 s, `ulimit -v 15000000`, G2 off, files
+`runs/X1-{arm}-m{m}-p3`:
+- A0 at `m = 3`, `t = 5`;
+- A0 at `m = 4`, `t = 4`;
+- A11 at `m = 4`, `t = 4`.
+
+(A11 at `m = 3`, `t = 6`, which C3 also listed, is not run here: it is not
+needed for either open item, and its cost is large.) A cell that completes
+extends the p₁ series for its arm, labelled as an admitted-p₃ reading, and
+the fit is reported with and without it.
+- *Cross-engine check.* A0 at `m = 3`, `t = 5` is the cell whose D = 7
+  rests on the tower engine (T2, T3). If `f4_fp` completes it on p₃, its D
+  is compared: **confirms** if D = 7, **contradicts** if not, and
+  **inconclusive** if it does not complete.
+
+**Decision rules.** T4a and T4b as above. K1: curve-independent or
+curve-dependent per family, and the gap per family. X1: the cross-engine
+check, and for `m = 4` the σ rule of §1 with and without the p₃ cell. A0's
+`m = 4` series may gain a completed cell from either T4b or X1. It is read
+as the bound above says, and each source is labelled.
+
+**Predictions.**
+- T4a: admitted (the pilot's G2b stopped at 24–43 standard monomials at `m = 4`,
+  `t ≤ 3` and kept every planted solution). T4b: no prediction on whether
+  both systems reach the stop in 3600 s. If a cell completes, its D = 7.
+- K1: both families are curve-independent, and the gap holds in both. For
+  `am3`, whose support equals the generic family's, `max_cols` equals the
+  generic cell's at every shared cell. For `a0`, whose summation polynomial
+  has fewer terms, `max_cols` is at most the generic cell's at every shared
+  cell.
+- X1: A0 at `m = 3`, `t = 5` completes with D = 7 (*confirms*). A0 at `m = 4`,
+  `t = 4` does not complete in 15 GB and 3600 s. A11 at `m = 4`, `t = 4`
+  completes with D = 6, as on p₁.
