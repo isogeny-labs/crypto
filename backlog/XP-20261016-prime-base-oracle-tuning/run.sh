@@ -21,6 +21,20 @@ SIZES=${PBO_SIZES:-20 24 28 32}   # override only for a dry test, never in a mea
 mkdir -p "$OUT/sessions" "$OUT/specs" "$OUT/select" "$OUT/audits" "$OUT/analysis" "$OUT/host"
 log() { printf '%s %s\n' "$(date -u +%FT%TZ)" "$*" | tee -a "$OUT/progress.txt"; }
 
+check_frozen() {
+  (cd "$OUT" && sha256sum -c --quiet select/FROZEN.sha256) || {
+    log "selection changed after freeze"; exit 1;
+  }
+}
+
+keep_receipt() { # A receipt's existence does not establish successful replay.
+  if [ -e "$1" ]; then
+    prior=$(mktemp "$1.previous.XXXXXX")
+    mv "$1" "$prior"
+    log "kept prior audit receipt $prior"
+  fi
+}
+
 session() { # SPEC NAME
   d="$OUT/sessions/$2"
   if [ -f "$d/session.json" ] && [ "$(jq -r .status "$d/session.json")" = complete ]; then
@@ -50,7 +64,7 @@ stage_host() {
 stage_identity() { # §5.1: the incumbent's frozen sessions replay exactly
   for b in $SIZES; do
     r="$OUT/audits/identity-frontier-P$b.json"
-    [ -f "$r" ] && continue
+    keep_receipt "$r"
     taskset -c "$CPU" "$E" verify --dir "research/ic_frontier_campaign_20261015/phase1/sessions/P$b" \
       --replay-all --exit-code --out "$r" > /dev/null || { log "IDENTITY FAILED P$b"; exit 1; }
     log "identity P$b ok"
@@ -58,6 +72,9 @@ stage_identity() { # §5.1: the incumbent's frozen sessions replay exactly
 }
 
 stage_train() {
+  if [ -f "$OUT/select/FROZEN.sha256" ]; then
+    check_frozen; log "skip training (selection frozen)"; return 0
+  fi
   for b in $SIZES; do session "$CARD/specs/train-P$b.json" "train-P$b"; done
   for b in $SIZES; do extend "$b"; done
 }
@@ -66,7 +83,7 @@ band_rows() { # BITS -> eligible rows as JSON lines {fam,n,s0,s1,s2,arm}
   dirs=$(ls -d "$OUT/sessions/train-P$1" "$OUT/sessions/train-ext-P$1-"* 2>/dev/null | grep -v interrupted)
   # shellcheck disable=SC2086
   "$E" band --dir $dirs --json "$OUT/select/band-train-P$1.json" > "$OUT/select/band-train-P$1.md"
-  jq -c '.rows[] | select(.arm != "rho-neg" and .runs == .verified and .runs > 0
+  jq -c '.rows[] | select(.arm != "rho-neg" and .runs == 8 and .verified == 8
            and (.uncounted | length) == 0)
          | {arm, fam: (.arm | split("-n")[0]), n: (.arm | split("-n")[1] | tonumber),
             s0: .mean_s[0], s1: .mean_s[1], s2: .mean_s[2]}' "$OUT/select/band-train-P$1.json"
@@ -84,7 +101,10 @@ extend() { # §4.3 edge rule, per oracle family, at most k = ±4
         n=$(nk "$n0" $k)
         { [ "$best" = "$hi" ] && [ $k -gt 0 ] && [ "$n" -gt "$hi" ]; } || { [ "$best" = "$lo" ] && [ $k -lt 0 ] && [ "$n" -lt "$lo" ] && [ "$n" -ge 2 ]; } || continue
         name="train-ext-P$b-$fam-n$n"; spec="$OUT/specs/$name.json"
-        [ -d "$OUT/sessions/$name" ] && [ -f "$OUT/sessions/$name/session.json" ] && continue
+        if [ -f "$OUT/sessions/$name/session.json" ] &&
+           [ "$(jq -r .status "$OUT/sessions/$name/session.json")" = complete ]; then
+          continue
+        fi
         jq --arg f "$fam" --argjson n "$n" '
           first(.arms[] | select(.name | startswith($f + "-n"))) as $t
           | .label += " (edge extension)"
@@ -99,10 +119,16 @@ extend() { # §4.3 edge rule, per oracle family, at most k = ±4
 }
 
 stage_select() { # §4.4; writes the holdout specs, then nothing may change
+  if [ -f "$OUT/select/FROZEN.sha256" ]; then
+    check_frozen; log "skip selection (frozen)"; return 0
+  fi
   for b in $SIZES; do
     rows=$(band_rows "$b" | jq -s .)
     pick() { echo "$rows" | jq -c "$1 | sort_by(.s1, (if .fam == \"mitm2\" then 0 else 1 end), .n) | .[0]"; }
     sel=$(pick '.'); size=$(pick 'map(select(.fam == "mitm2"))')
+    [ "$sel" != null ] && [ "$size" != null ] || {
+      log "BLOCKED P$b: selection requires eligible 8/8 candidate and size-control cells"; exit 1;
+    }
     oracle=$(jq -r --arg a "$(echo "$sel" | jq -r .arm)" '.arms[] | select(.name == $a) | .method.params.oracle' \
       "$CARD/specs/train-P$b.json" $(ls "$OUT/specs/train-ext-P$b-"*.json 2>/dev/null) | head -1)
     nsel=$(echo "$sel" | jq .n); nsize=$(echo "$size" | jq .n)
@@ -117,13 +143,15 @@ stage_select() { # §4.4; writes the holdout specs, then nothing may change
     "$E" plan --spec "$OUT/specs/holdout-P$b.json" > "$OUT/specs/holdout-P$b.plan.txt"
     log "selected P$b: $(echo "$sel" | jq -r .arm) ($oracle); size-only n$nsize; holdout spec $(sha256sum "$OUT/specs/holdout-P$b.json" | cut -c1-16)"
   done
-  (cd "$OUT" && sha256sum select/selection-P*.json specs/holdout-P*.json > select/FROZEN.sha256)
+  (cd "$OUT" && sha256sum select/selection-P*.json select/band-train-P*.json \
+    specs/holdout-P*.json > select/FROZEN.sha256.tmp &&
+    mv select/FROZEN.sha256.tmp select/FROZEN.sha256)
   log "selection frozen: $(sha256sum "$OUT/select/FROZEN.sha256" | cut -c1-16)"
 }
 
 stage_holdout() {
   [ -f "$OUT/select/FROZEN.sha256" ] || { log "select first"; exit 1; }
-  (cd "$OUT" && sha256sum -c --quiet select/FROZEN.sha256) || { log "selection changed after freeze"; exit 1; }
+  check_frozen
   for b in $SIZES; do session "$OUT/specs/holdout-P$b.json" "holdout-P$b"; done
 }
 
@@ -133,7 +161,7 @@ stage_audit() { # §6: every measured run re-executed, identical counts required
   for d in "$OUT"/sessions/*; do
     case $d in *.interrupted-*) continue;; esac
     s=$(basename "$d"); r="$OUT/audits/$s.json"
-    [ -f "$r" ] && continue
+    keep_receipt "$r"
     taskset -c "$CPU" "$E" verify --dir "$d" --replay-all --exit-code --out "$r" > /dev/null \
       || { log "AUDIT FAILED $s (receipt kept)"; exit 1; }
     log "audit $s ok $(sha256sum "$r" | cut -c1-16)"

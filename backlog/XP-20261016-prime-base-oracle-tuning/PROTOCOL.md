@@ -329,6 +329,17 @@ every table. They make a cell ineligible (train) or a size incomplete
 land as one deterministic `runs.tar.xz` (AGENTS.md §13a). The exception is
 any record a receipt names by path.
 
+Rerunning identity or audit stages executes the native verifier again and
+retains the prior receipt under a unique `.previous.*` name. A receipt's
+existence alone never permits a stage to succeed. Incomplete edge-extension
+sessions follow the same archive-and-retry rule as initial training sessions.
+Selection accepts exactly eight verified measured runs per eligible cell.
+The selection freeze binds the training-band JSON as well as the selection
+and holdout specifications. Once it exists, rerunning training or selection
+verifies and reuses the freeze; a mismatch stops before any session runs.
+These control paths are checked by `test_runner.py` with mocked commands;
+the tests execute no measurement or scientific replay.
+
 ## 9. Inadmissible after freezing
 
 - Changing curves, seeds, target counts, rounds, the `N` grid or its
