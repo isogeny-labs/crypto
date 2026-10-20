@@ -54,7 +54,7 @@ def read_allocation(path, trigger_path):
     created = datetime.fromisoformat(receipt["created_utc"].replace("Z", "+00:00"))
     stop = datetime.fromisoformat(receipt["stop_after_utc"].replace("Z", "+00:00"))
     if (created.tzinfo is None or stop.tzinfo is None or
-            not 0 < (stop - created).total_seconds() <= 5 * 3600):
+            not 0 < (stop - created).total_seconds() <= 4 * 3600):
         raise ValueError("tie-break RunPod stop cap differs")
     return receipt
 

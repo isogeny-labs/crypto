@@ -17,7 +17,7 @@ python3 -m research.n83_highk_online_tiebreak_20261020.run --fixture-preflight \
 cpus=$(python3 -c 'import json; p=json.load(open("/tmp/n83_tiebreak_allocation_s0.json")); ids=p["cpu_affinity_ids"]; assert len(ids)==4 and ids==sorted(set(ids)) and all(isinstance(i,int) and i>=0 for i in ids); print(",".join(map(str,ids)))') || exit 73
 printf 'START %s\n' "$(date -u +%FT%TZ)" > "$base/run.status"
 
-timeout --signal=TERM --kill-after=30s 14400 taskset -c "$cpus" \
+timeout --signal=TERM --kill-after=30s 12600 taskset -c "$cpus" \
   python3 -m research.n83_highk_online_tiebreak_20261020.runpod_runner \
   --binary /workspace/n83_target/release/examples/koblitz_orbit_dlp_fast \
   --rho-binary /workspace/n83_target/release/examples/n83_rho_optimization_eval \
