@@ -45,30 +45,30 @@ below 1 is the sieve cheaper):
   inset: 6pt,
   [p], [S, harness], [S, tuned], [S⁺, harness], [S⁺, tuned],
   [251],
-  [18.5 \[5.4, 47\]],
-  [44 \[13, 109\]],
-  [37 \[12, 89\]],
-  [73 \[23, 176\]],
+  [18.5 \[5.3, 47\]],
+  [44.4 \[13, 109\]],
+  [36.5 \[12, 88\]],
+  [71.8 \[23, 173\]],
   [503],
-  [0.48 \[0.35, 0.64\]],
-  [1.15 \[0.84, 1.53\]],
-  [1.34 \[0.94, 1.82\]],
-  [2.65 \[1.85, 3.62\]],
+  [0.478 \[0.35, 0.64\]],
+  [1.15 \[0.84, 1.5\]],
+  [1.33 \[0.93, 1.8\]],
+  [2.61 \[1.8, 3.6\]],
   [1009],
-  [0.024 \[0.019, 0.031\]],
-  [0.058 \[0.044, 0.074\]],
-  [0.067 \[0.053, 0.084\]],
-  [0.132 \[0.105, 0.165\]],
+  [0.0242 \[0.018, 0.031\]],
+  [0.0581 \[0.044, 0.074\]],
+  [0.0662 \[0.053, 0.083\]],
+  [0.13 \[0.1, 0.16\]],
   [1511],
-  [0.0090 \[0.0070, 0.012\]],
-  [0.022 \[0.017, 0.029\]],
-  [0.028 \[0.022, 0.036\]],
-  [0.055 \[0.044, 0.071\]],
+  [0.00902 \[0.007, 0.012\]],
+  [0.0217 \[0.017, 0.029\]],
+  [0.0274 \[0.022, 0.036\]],
+  [0.0539 \[0.043, 0.07\]],
   [1823],
-  [0.0042 \[0.0032, 0.0058\]],
-  [0.010 \[0.0078, 0.014\]],
-  [0.015 \[0.0125, 0.020\]],
-  [0.030 \[0.025, 0.038\]],
+  [0.00424 \[0.0032, 0.0058\]],
+  [0.0102 \[0.0078, 0.014\]],
+  [0.0152 \[0.012, 0.019\]],
+  [0.03 \[0.024, 0.038\]],
 )
 ]
 
@@ -76,9 +76,9 @@ The pre-registered kill rules did not fire: K1 (S⁺ ratio interval
 reaching 1 at any `p ≥ 1009`, harness price) and K2 (the same in the
 tuned price or inside the §5a band) both hold at 1009, 1511 and 1823.
 Against the cheapest rho in the tuned price (R2, post hoc) the 1009
-ratios are 0.062 \[0.045, 0.082\] (S) and 0.137 \[0.104, 0.183\] (S⁺).
-The distance remaining is therefore a factor of about 65 (S⁺, harness)
-to 33 (S⁺, tuned) at `p = 1823`.
+ratios are 0.0615 \[0.0454, 0.0822\] (S) and 0.135 \[0.103, 0.180\]
+(S⁺). The distance remaining is therefore a factor of about 66 (S⁺,
+harness) to 33 (S⁺, tuned) at `p = 1823`.
 
 #strong[2. The crossover moves up against a strong rho.] The ledger\'s
 crossover against the weak rho was `p ≈ 333–430`. Against the strong rho
@@ -91,7 +91,7 @@ non-multiplication work including `F_p` additions; B: without them), the
 sieve side carrying an upper bound for the F4/linear-algebra additions
 it does not emit (#link("TABLES.md")[T2]). The sieve ranks below rho at
 every weight and in all four columns at `p = 1009, 1511, 1823` (layer A,
-`w = 1`, tuned: 0.37 \[0.29, 0.46\], 0.16 \[0.13, 0.21\], 0.088 \[0.072,
+`w = 1`, tuned: 0.35 \[0.28, 0.44\], 0.15 \[0.12, 0.20\], 0.084 \[0.068,
 0.11\]). At `p = 251` rho ranks below; at `p = 503` the order changes
 inside the band, so the pair is #strong[unresolved] there.
 
@@ -131,6 +131,42 @@ end-to-end `S` 1.014× (251) to 1.126× (1009, 1511) cheaper, 1.096× at
 0.4–7.5 times per run; that cost is counted. This is an engineering gain
 on a route that already beats rho; it moves no ranking.
 
+== Provenance, review repairs and controls
+- #strong[Source identity of the measurements.] Every raw run was
+  produced by the `jv_cover` binary built from commit `8f21253f7` (the
+  rho engine there equals later commits up to rustfmt). No run was
+  repeated after any repair below; `summary.json` carries this in
+  `provenance`.
+- #strong[Repairs made after the owner\'s review] (the runs are not
+  relabelled as coming from repaired code): (1) the engine\'s DP table
+  keyed by `x` only, so two non-negation walks meeting at
+  #emph[opposite] points would have been read as equal points and
+  returned a wrong scalar. The engine now stores `y` and resolves both
+  cases (`recover_dlog`, with a regression on the reviewer\'s order-101
+  example, `d = 7`, `(1,1)` and `(79,2)`, which the equal-point formula
+  reads as 23). Every recorded run recovered the planted logarithm and
+  an opposite-point meeting at two distinguished points has probability
+  below 10⁻⁵ per run, so no recorded run was affected. (2) The recorded
+  `hash` counter held only the partition hash; the DP-check hash and,
+  with the negation map, two cycle-window hashes were evaluated but not
+  counted. The analysis adds them back, derived from the recorded step
+  count (1 per step plain, 3 with negation); this moves rho\'s S⁺ by
+  under 1 % and no verdict (`S_plus_harness_as_recorded` keeps the
+  recorded scope). The engine now counts them where they happen. (3) The
+  analysis read the K2 flag from the wrong place (fixed before the final
+  numbers), and it now gates every verdict: an arm or the sieve sample
+  that is not the frozen one, or contains an incorrect or capped run, is
+  reported with its status and its comparisons are withheld; invalid and
+  partial data stay in the summary explicitly. (4) The post hoc
+  `p ≥ 1009` fit now filters by `p`, not by position.
+- #strong[Controls] (all pass, `summary.json` → `controls`): the plain
+  arm\'s S interval contains the ledger\'s 1.3 at every size; rho A/A
+  and sieve A/A at `p = 1009`; identical descent digests dense against
+  sparse at all sizes; the strong rho\'s fitted exponent interval
+  contains 1/2. If any fails, every verdict and kill-rule decision is
+  withheld. A scratch copy with one run flagged incorrect and one job
+  missing withheld exactly those two sizes.
+
 == Limits
 - Weak class only; `p ≤ 1823` (`ℓ < 2^63`). Harness unit throughout;
   wall time is an observation (sieve 4 threads, rho one core: at
@@ -141,9 +177,12 @@ on a route that already beats rho; it moves no ranking.
   strong rho is not asserted here.
 - The tuned price is a cost model, not a faster implementation; rho\'s
   native work (canonicalisation, hashing, DP checks, scalar updates,
-  cycle-window comparisons) is counted and priced in S⁺ and the band.
-  The sieve\'s F4 additions are not emitted by the harness
-  (implementation gap): the band uses an upper bound, labelled as such.
+  cycle-window comparisons) is counted and priced in S⁺ and the band;
+  the hash evaluations the runs did not count are added back from the
+  recorded step count (above), a derived correction, not a
+  re-measurement. The sieve\'s F4 additions are not emitted by the
+  harness (implementation gap): the band uses an upper bound, labelled
+  as such.
 - The post hoc fit and the R2 comparison are labelled post hoc and were
   not in the protocol.
 
@@ -191,55 +230,55 @@ below 1 is the sieve cheaper. 95% bootstrap over instances.
   [15.28 \[4.63, 34.6\]],
   [35.84 \[11.9, 78.9\]],
   [0.827 / 0.344],
-  [0.975 / 0.492],
+  [0.982 / 0.499],
   [18.47 \[5.35, 46.6\]],
   [44.41 \[12.9, 109\]],
-  [36.76 \[11.7, 88.6\]],
-  [72.9 \[22.9, 176\]],
+  [36.49 \[11.6, 87.9\]],
+  [71.81 \[22.6, 173\]],
   [503],
   [51.8],
   [16],
   [0.3625 \[0.264, 0.471\]],
   [1.195 \[0.839, 1.59\]],
   [0.758 / 0.315],
-  [0.893 / 0.451],
+  [0.900 / 0.458],
   [0.4783 \[0.348, 0.64\]],
   [1.149 \[0.842, 1.53\]],
-  [1.338 \[0.935, 1.82\]],
-  [2.652 \[1.85, 3.62\]],
+  [1.328 \[0.928, 1.81\]],
+  [2.612 \[1.82, 3.57\]],
   [1009],
   [57.9],
   [16],
   [0.01954 \[0.0161, 0.0231\]],
   [0.06346 \[0.0554, 0.0711\]],
   [0.808 / 0.336],
-  [0.952 / 0.480],
+  [0.959 / 0.488],
   [0.02419 \[0.0185, 0.0311\]],
   [0.05814 \[0.0444, 0.0741\]],
-  [0.06666 \[0.0532, 0.0837\]],
-  [0.1321 \[0.105, 0.165\]],
+  [0.06615 \[0.0528, 0.0831\]],
+  [0.1301 \[0.103, 0.162\]],
   [1511],
   [61.4],
   [16],
   [0.007043 \[0.00613, 0.00819\]],
   [0.0254 \[0.0236, 0.0273\]],
   [0.780 / 0.325],
-  [0.920 / 0.464],
+  [0.927 / 0.471],
   [0.009024 \[0.00703, 0.012\]],
   [0.02169 \[0.0169, 0.0289\]],
-  [0.02762 \[0.0221, 0.036\]],
-  [0.05473 \[0.0439, 0.0713\]],
+  [0.02741 \[0.022, 0.0357\]],
+  [0.05391 \[0.0433, 0.0702\]],
   [1823],
   [63.0],
   [16],
   [0.003761 \[0.00323, 0.00434\]],
   [0.01605 \[0.0148, 0.0174\]],
   [0.887 / 0.369],
-  [1.045 / 0.527],
+  [1.053 / 0.535],
   [0.004241 \[0.00324, 0.00575\]],
   [0.01019 \[0.00779, 0.0138\]],
-  [0.01535 \[0.0125, 0.0196\]],
-  [0.03043 \[0.0249, 0.0384\]],
+  [0.01524 \[0.0124, 0.0194\]],
+  [0.02997 \[0.0245, 0.0379\]],
 )
 ]
 
@@ -261,23 +300,23 @@ columns.
   [251],
   [0.0],
   [18.5 \[5.4, 46\]],
-  [44.4 \[13, 1.1e+02\]],
+  [44.4 \[13, 109\]],
   [18.5 \[5.3, 45\]],
-  [44.4 \[13, 1.1e+02\]],
+  [44.4 \[13, 110\]],
   [no],
   [],
   [0.1],
-  [126 \[44, 2.9e+02\]],
-  [138 \[48, 3.1e+02\]],
-  [15.9 \[5.9, 35\]],
-  [21.1 \[8, 47\]],
+  [121 \[42, 280\]],
+  [132 \[46, 300\]],
+  [14.2 \[5.2, 31\]],
+  [18.1 \[6.9, 41\]],
   [],
   [],
   [1.0],
-  [142 \[50, 3.3e+02\]],
-  [144 \[50, 3.3e+02\]],
-  [14.4 \[6.3, 29\]],
-  [15 \[6.7, 31\]],
+  [136 \[48, 313\]],
+  [137 \[48, 312\]],
+  [12 \[5.2, 24\]],
+  [12.4 \[5.5, 26\]],
   [],
   [503],
   [0.0],
@@ -288,17 +327,17 @@ columns.
   [no],
   [],
   [0.1],
-  [5.81 \[4.1, 8\]],
-  [6.35 \[4.5, 8.6\]],
-  [0.686 \[0.49, 0.93\]],
-  [0.907 \[0.64, 1.2\]],
+  [5.57 \[4, 7.6\]],
+  [6.06 \[4.3, 8.2\]],
+  [0.61 \[0.43, 0.82\]],
+  [0.778 \[0.55, 1.1\]],
   [],
   [],
   [1.0],
-  [6.61 \[4.7, 9.1\]],
-  [6.68 \[4.7, 9.1\]],
-  [0.811 \[0.56, 1.1\]],
-  [0.844 \[0.59, 1.2\]],
+  [6.3 \[4.5, 8.6\]],
+  [6.36 \[4.5, 8.6\]],
+  [0.676 \[0.47, 0.92\]],
+  [0.698 \[0.49, 0.95\]],
   [],
   [1009],
   [0.0],
@@ -309,17 +348,17 @@ columns.
   [yes],
   [],
   [0.1],
-  [0.32 \[0.25, 0.4\]],
-  [0.35 \[0.28, 0.44\]],
-  [0.0307 \[0.025, 0.038\]],
-  [0.0405 \[0.033, 0.05\]],
+  [0.307 \[0.24, 0.38\]],
+  [0.334 \[0.27, 0.42\]],
+  [0.0272 \[0.022, 0.034\]],
+  [0.0348 \[0.028, 0.043\]],
   [],
   [],
   [1.0],
-  [0.365 \[0.29, 0.46\]],
-  [0.368 \[0.29, 0.46\]],
-  [0.0345 \[0.028, 0.043\]],
-  [0.036 \[0.029, 0.044\]],
+  [0.347 \[0.28, 0.44\]],
+  [0.35 \[0.28, 0.44\]],
+  [0.0288 \[0.023, 0.036\]],
+  [0.0297 \[0.024, 0.037\]],
   [],
   [1511],
   [0.0],
@@ -330,17 +369,17 @@ columns.
   [yes],
   [],
   [0.1],
-  [0.136 \[0.11, 0.18\]],
-  [0.149 \[0.12, 0.19\]],
-  [0.0128 \[0.01, 0.017\]],
-  [0.0169 \[0.014, 0.022\]],
+  [0.131 \[0.1, 0.17\]],
+  [0.142 \[0.11, 0.19\]],
+  [0.0113 \[0.0091, 0.015\]],
+  [0.0145 \[0.012, 0.019\]],
   [],
   [],
   [1.0],
-  [0.156 \[0.12, 0.2\]],
-  [0.157 \[0.13, 0.2\]],
-  [0.015 \[0.012, 0.019\]],
-  [0.0156 \[0.013, 0.02\]],
+  [0.148 \[0.12, 0.19\]],
+  [0.15 \[0.12, 0.19\]],
+  [0.0125 \[0.01, 0.016\]],
+  [0.0129 \[0.01, 0.017\]],
   [],
   [1823],
   [0.0],
@@ -351,17 +390,17 @@ columns.
   [yes],
   [],
   [0.1],
-  [0.0761 \[0.062, 0.097\]],
-  [0.0832 \[0.068, 0.11\]],
-  [0.00708 \[0.0058, 0.009\]],
-  [0.00936 \[0.0076, 0.012\]],
+  [0.073 \[0.059, 0.093\]],
+  [0.0794 \[0.065, 0.1\]],
+  [0.00629 \[0.0052, 0.008\]],
+  [0.00803 \[0.0066, 0.01\]],
   [],
   [],
   [1.0],
-  [0.0869 \[0.071, 0.11\]],
-  [0.0878 \[0.071, 0.11\]],
-  [0.00879 \[0.0073, 0.011\]],
-  [0.00914 \[0.0076, 0.011\]],
+  [0.0828 \[0.067, 0.11\]],
+  [0.0835 \[0.068, 0.11\]],
+  [0.00732 \[0.0061, 0.0092\]],
+  [0.00757 \[0.0062, 0.0095\]],
   [],
 )
 ]
@@ -388,7 +427,7 @@ harness price; n per cell)
   [1.24 \[0.94, 1.5\]],
   [1.24 \[0.94, 1.5\]],
   [0.517 \[0.39, 0.64\]],
-  [1.41 \[1.1, 1.8\]],
+  [1.42 \[1.1, 1.8\]],
   [3],
   [251],
   [R2 negation],
@@ -396,7 +435,7 @@ harness price; n per cell)
   [1.01 \[0.81, 1.2\]],
   [1.02 \[0.81, 1.2\]],
   [0.394 \[0.31, 0.48\]],
-  [1.2 \[0.96, 1.5\]],
+  [1.21 \[0.97, 1.5\]],
   [3],
   [251],
   [R3 negation + batched],
@@ -404,7 +443,7 @@ harness price; n per cell)
   [0.822 \[0.63, 1\]],
   [0.827 \[0.64, 1\]],
   [0.344 \[0.27, 0.42\]],
-  [0.975 \[0.74, 1.2\]],
+  [0.982 \[0.75, 1.2\]],
   [2],
   [503],
   [R0 plain],
@@ -412,7 +451,7 @@ harness price; n per cell)
   [1.17 \[0.91, 1.5\]],
   [1.17 \[0.9, 1.5\]],
   [0.453 \[0.35, 0.56\]],
-  [1.33 \[1, 1.7\]],
+  [1.34 \[1, 1.7\]],
   [26],
   [503],
   [R1 batched],
@@ -428,7 +467,7 @@ harness price; n per cell)
   [0.971 \[0.71, 1.2\]],
   [0.974 \[0.71, 1.2\]],
   [0.377 \[0.27, 0.48\]],
-  [1.15 \[0.84, 1.5\]],
+  [1.16 \[0.84, 1.5\]],
   [24],
   [503],
   [R3 negation + batched],
@@ -436,7 +475,7 @@ harness price; n per cell)
   [0.757 \[0.59, 0.91\]],
   [0.758 \[0.6, 0.91\]],
   [0.315 \[0.25, 0.38\]],
-  [0.893 \[0.7, 1.1\]],
+  [0.9 \[0.71, 1.1\]],
   [14],
   [1009],
   [R0 plain],
@@ -452,7 +491,7 @@ harness price; n per cell)
   [1.3 \[1.1, 1.6\]],
   [1.3 \[1.1, 1.6\]],
   [0.542 \[0.44, 0.65\]],
-  [1.48 \[1.2, 1.8\]],
+  [1.49 \[1.2, 1.8\]],
   [186],
   [1009],
   [R2 negation],
@@ -460,7 +499,7 @@ harness price; n per cell)
   [0.82 \[0.65, 0.99\]],
   [0.822 \[0.65, 1\]],
   [0.318 \[0.25, 0.39\]],
-  [0.968 \[0.77, 1.2\]],
+  [0.976 \[0.77, 1.2\]],
   [160],
   [1009],
   [R3 negation + batched],
@@ -468,7 +507,7 @@ harness price; n per cell)
   [0.808 \[0.69, 0.94\]],
   [0.808 \[0.69, 0.94\]],
   [0.336 \[0.29, 0.39\]],
-  [0.952 \[0.82, 1.1\]],
+  [0.959 \[0.82, 1.1\]],
   [120],
   [1009],
   [R0 A/A repeat],
@@ -484,7 +523,7 @@ harness price; n per cell)
   [0.824 \[0.57, 1.1\]],
   [0.823 \[0.58, 1.1\]],
   [0.343 \[0.24, 0.46\]],
-  [0.971 \[0.68, 1.3\]],
+  [0.978 \[0.68, 1.3\]],
   [121],
   [1511],
   [R0 plain],
@@ -492,7 +531,7 @@ harness price; n per cell)
   [1.14 \[0.92, 1.4\]],
   [1.14 \[0.91, 1.4\]],
   [0.44 \[0.35, 0.53\]],
-  [1.29 \[1, 1.6\]],
+  [1.3 \[1, 1.6\]],
   [722],
   [1511],
   [R3 negation + batched],
@@ -500,7 +539,7 @@ harness price; n per cell)
   [0.781 \[0.6, 0.96\]],
   [0.78 \[0.6, 0.96\]],
   [0.325 \[0.25, 0.4\]],
-  [0.92 \[0.71, 1.1\]],
+  [0.927 \[0.72, 1.1\]],
   [373],
   [1823],
   [R0 plain],
@@ -508,7 +547,7 @@ harness price; n per cell)
   [1.45 \[0.82, 2.1\]],
   [1.45 \[0.82, 2.1\]],
   [0.56 \[0.32, 0.81\]],
-  [1.65 \[0.93, 2.4\]],
+  [1.65 \[0.94, 2.4\]],
   [1609],
   [1823],
   [R3 negation + batched],

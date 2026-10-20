@@ -91,13 +91,13 @@ This accounting synthesis is published on every performance handoff. It does not
 
 | p | log2 l | S sieve | S+ sieve | S rho (harness / tuned) | S+ rho (harness / tuned) | sieve/rho, S (harness) | sieve/rho, S (tuned) | sieve/rho, S+ (harness) | sieve/rho, S+ (tuned) | ranked over the 5a band | ok |
 |--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|:--|
-| 251 | 45.8 | 15.28 [4.634, 34.62] | 35.84 [11.89, 78.94] | 0.827 / 0.344 | 0.975 / 0.492 | 18.47 [5.345, 46.6] | 44.41 [12.86, 108.5] | 36.76 [11.71, 88.56] | 72.9 [22.93, 175.6] | unresolved at some weight | ✓ |
-| 503 | 51.8 | 0.3625 [0.2644, 0.4708] | 1.195 [0.8394, 1.589] | 0.758 / 0.315 | 0.893 / 0.451 | 0.4783 [0.3482, 0.6398] | 1.149 [0.8418, 1.532] | 1.338 [0.9349, 1.82] | 2.652 [1.853, 3.624] | unresolved at some weight | ✓ |
-| 1009 | 57.9 | 0.01954 [0.01607, 0.02313] | 0.06346 [0.05539, 0.0711] | 0.808 / 0.336 | 0.952 / 0.480 | 0.02419 [0.01848, 0.03108] | 0.05814 [0.04443, 0.07413] | 0.06666 [0.05317, 0.08372] | 0.1321 [0.1047, 0.1648] | sieve below rho at every weight | ✓ |
-| 1511 | 61.4 | 0.007043 [0.00613, 0.008193] | 0.0254 [0.02363, 0.02732] | 0.780 / 0.325 | 0.920 / 0.464 | 0.009024 [0.007029, 0.01203] | 0.02169 [0.01686, 0.02891] | 0.02762 [0.02214, 0.03598] | 0.05473 [0.04392, 0.07129] | sieve below rho at every weight | ✓ |
-| 1823 | 63.0 | 0.003761 [0.003228, 0.004337] | 0.01605 [0.0148, 0.01736] | 0.887 / 0.369 | 1.045 / 0.527 | 0.004241 [0.003238, 0.005753] | 0.01019 [0.00779, 0.01381] | 0.01535 [0.01246, 0.01959] | 0.03043 [0.02486, 0.03843] | sieve below rho at every weight | ✓ |
+| 251 | 45.8 | 15.28 [4.634, 34.62] | 35.84 [11.89, 78.94] | 0.827 / 0.344 | 0.982 / 0.499 | 18.47 [5.345, 46.6] | 44.41 [12.86, 108.5] | 36.49 [11.62, 87.89] | 71.81 [22.58, 173] | unresolved at some weight | ✓ |
+| 503 | 51.8 | 0.3625 [0.2644, 0.4708] | 1.195 [0.8394, 1.589] | 0.758 / 0.315 | 0.900 / 0.458 | 0.4783 [0.3482, 0.6398] | 1.149 [0.8418, 1.532] | 1.328 [0.9278, 1.806] | 2.612 [1.825, 3.57] | unresolved at some weight | ✓ |
+| 1009 | 57.9 | 0.01954 [0.01607, 0.02313] | 0.06346 [0.05539, 0.0711] | 0.808 / 0.336 | 0.959 / 0.488 | 0.02419 [0.01848, 0.03108] | 0.05814 [0.04443, 0.07413] | 0.06615 [0.05276, 0.08308] | 0.1301 [0.1031, 0.1624] | sieve below rho at every weight | ✓ |
+| 1511 | 61.4 | 0.007043 [0.00613, 0.008193] | 0.0254 [0.02363, 0.02732] | 0.780 / 0.325 | 0.927 / 0.471 | 0.009024 [0.007029, 0.01203] | 0.02169 [0.01686, 0.02891] | 0.02741 [0.02197, 0.0357] | 0.05391 [0.04326, 0.07022] | sieve below rho at every weight | ✓ |
+| 1823 | 63.0 | 0.003761 [0.003228, 0.004337] | 0.01605 [0.0148, 0.01736] | 0.887 / 0.369 | 1.053 / 0.535 | 0.004241 [0.003238, 0.005753] | 0.01019 [0.00779, 0.01381] | 0.01524 [0.01236, 0.01944] | 0.02997 [0.02449, 0.03785] | sieve below rho at every weight | ✓ |
 
-Fitted exponent of total F_p multiplications against l over the sizes above: sieve -0.122 [-0.165, -0.084] (theory 1/3), strong rho 0.508 [0.480, 0.538] (theory 1/2). Pre-registered kill rules: K1 fired at p = none; K2 narrowed at p = none.
+Fitted exponent of total F_p multiplications against l over the sizes above: sieve -0.122 [-0.165, -0.084] (theory 1/3), strong rho 0.508 [0.480, 0.538] (theory 1/2). Pre-registered kill rules: K1 fired at p = none; K2 narrowed at p = none; decisions withheld at p = none. Controls all pass: yes. Raw runs: produced by the jv_cover binary built from commit 8f21253f7 (jv_rho_strong.rs there is identical to later commits up to rustfmt); no run was repeated after code repairs.
 
 ## Phases, as a share of S
 
@@ -261,7 +261,7 @@ Copied from native analysis: eight independent one-target workloads per fixed cu
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `765f6e8d05ebbf75…`
-- `research/jv_sieve_strong_rho_20261019/summary.json` — sha256 `8e4857c4b4603e34…`
+- `research/jv_sieve_strong_rho_20261019/summary.json` — sha256 `590cbfaa566efbb6…`
 - `docs/curves/registry.json` — sha256 `03f63efa54482b2e…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `ab4891397fe07fca…`

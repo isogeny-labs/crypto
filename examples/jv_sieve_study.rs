@@ -159,20 +159,19 @@ struct Rho {
     mt: f64,
     steps: f64,
     fp_adds: f64,
+    /// native work as the run recorded it
+    native_rec: f64,
+    /// plus the `hash_x` evaluations the run did not count (derived, see PROTOCOL.md)
     native: f64,
     wall: f64,
     ok: bool,
+    correct: bool,
+    capped: bool,
 }
 fn rho_rows(v: &[Value]) -> Vec<Rho> {
     v.iter()
-        .map(|r| Rho {
-            seed: r["seed"].as_u64().unwrap(),
-            l: r["l"].as_f64().unwrap(),
-            mh: f(r, "muls_harness"),
-            mt: f(r, "muls_tuned"),
-            steps: f(r, "steps"),
-            fp_adds: fo(r, "fp_adds"),
-            native: [
+        .map(|r| {
+            let native_rec: f64 = [
                 "canon_cmp",
                 "hash",
                 "dp_check",
@@ -182,11 +181,44 @@ fn rho_rows(v: &[Value]) -> Vec<Rho> {
             ]
             .iter()
             .map(|k| fo(r, k))
-            .sum(),
-            wall: f(r, "wall_ms"),
-            ok: r["correct"].as_bool() == Some(true) && r["capped"].as_bool() != Some(true),
+            .sum();
+            // The runs (commit 8f21253f7) counted one `hash_x` per step (the partition
+            // hash).  They also evaluated it for the DP check (every arm) and, with the
+            // negation map, twice more for the cycle window: 1 or 3 uncounted per step.
+            let neg = r["negation"].as_bool() == Some(true);
+            let steps = f(r, "steps");
+            let correct = r["correct"].as_bool() == Some(true);
+            let capped = r["capped"].as_bool() == Some(true);
+            Rho {
+                seed: r["seed"].as_u64().unwrap(),
+                l: r["l"].as_f64().unwrap(),
+                mh: f(r, "muls_harness"),
+                mt: f(r, "muls_tuned"),
+                steps,
+                fp_adds: fo(r, "fp_adds"),
+                native_rec,
+                native: native_rec + steps * if neg { 3.0 } else { 1.0 },
+                wall: f(r, "wall_ms"),
+                ok: correct && !capped,
+                correct,
+                capped,
+            }
         })
         .collect()
+}
+
+/// The frozen sample of each cell (PROTOCOL.md): 16 per arm per size, except R0 at
+/// p = 1511 (8) and p = 1823 (4); R1, R2 at p <= 1009; the A/A arms at p = 1009.
+fn expected_n(p: u64, arm: &str) -> usize {
+    match (arm, p) {
+        ("R3", _) => 16,
+        ("R0", 1511) => 8,
+        ("R0", 1823) => 4,
+        ("R0", _) => 16,
+        ("R1" | "R2", 251 | 503 | 1009) => 16,
+        ("R0_aa" | "R3_aa", 1009) => 16,
+        _ => 0,
+    }
 }
 
 /// OLS slope of ln y on ln x.
@@ -237,10 +269,10 @@ fn fit(groups: &[(Vec<f64>, Vec<f64>)], seed: u64) -> Value {
 fn main() {
     let dir = std::env::args().nth(1).expect("study directory");
     let mut summary = BTreeMap::<String, Value>::new();
-    let mut per_size = vec![];
-    let mut fit_ic: Vec<(Vec<f64>, Vec<f64>)> = vec![];
-    let mut fit_r3: Vec<(Vec<f64>, Vec<f64>)> = vec![];
-    let mut fit_r3t: Vec<(Vec<f64>, Vec<f64>)> = vec![];
+    let mut per_size: Vec<Value> = vec![];
+    let mut fit_ic: Vec<(u64, Vec<f64>, Vec<f64>)> = vec![];
+    let mut fit_r3: Vec<(u64, Vec<f64>, Vec<f64>)> = vec![];
+    let mut fit_r3t: Vec<(u64, Vec<f64>, Vec<f64>)> = vec![];
     for &p in &SIZES {
         let sd_ = p;
         let sparse = load(&dir, &format!("ic_{p}_sparse")).map(|v| ic_rows(&v));
@@ -260,6 +292,9 @@ fn main() {
             let sq = l.sqrt();
             let g = |fx: &dyn Fn(&Ic) -> f64| ic.iter().map(fx).collect::<Vec<f64>>();
             entry.insert("ic_all_correct".into(), json!(ic.iter().all(|r| r.ok)));
+            let ic_valid = ic.len() == 16 && ic.iter().all(|r| r.ok);
+            entry.insert("ic_n".into(), json!(ic.len()));
+            entry.insert("ic_valid_and_complete".into(), json!(ic_valid));
             entry.insert("ic_S".into(), mean_ci(&g(&|r| r.s), sd_ + 1));
             entry.insert("ic_muls".into(), mean_ci(&g(&|r| r.muls), sd_ + 7));
             entry.insert("ic_S_plus".into(), mean_ci(&g(&|r| r.s_plus), sd_ + 2));
@@ -328,7 +363,22 @@ fn main() {
                     .collect();
                 let steps: Vec<f64> = rs.iter().map(|r| r.steps / sq).collect();
                 let mut e = serde_json::Map::new();
+                let want = expected_n(p, name);
+                let n_bad = rs.iter().filter(|r| !r.correct).count();
+                let n_capped = rs.iter().filter(|r| r.capped).count();
+                let arm_complete = rs.len() == want && n_bad == 0 && n_capped == 0;
                 e.insert("all_correct".into(), json!(rs.iter().all(|r| r.ok)));
+                e.insert("n_expected".into(), json!(want));
+                e.insert("n_incorrect".into(), json!(n_bad));
+                e.insert("n_capped".into(), json!(n_capped));
+                e.insert(
+                    "status".into(),
+                    json!(if arm_complete {
+                        "complete".to_string()
+                    } else {
+                        format!("INCOMPLETE OR INVALID: {} of {} runs, {} incorrect, {} capped; comparisons withheld", rs.len(), want, n_bad, n_capped)
+                    }),
+                );
                 e.insert("steps_over_sqrt_l".into(), mean_ci(&steps, sd_ + 10));
                 e.insert("S_harness".into(), mean_ci(&h, sd_ + 11));
                 e.insert(
@@ -342,6 +392,15 @@ fn main() {
                 e.insert("S_tuned".into(), mean_ci(&t, sd_ + 12));
                 e.insert("S_plus_harness".into(), mean_ci(&hp, sd_ + 13));
                 e.insert("S_plus_tuned".into(), mean_ci(&tp, sd_ + 14));
+                // as the runs recorded it (hash evaluations outside the counter left out)
+                let hp_rec: Vec<f64> = rs
+                    .iter()
+                    .map(|r| (r.mh + r.fp_adds + r.native_rec) / (GAE * sq))
+                    .collect();
+                e.insert(
+                    "S_plus_harness_as_recorded".into(),
+                    mean_ci(&hp_rec, sd_ + 18),
+                );
                 e.insert(
                     "wall_s".into(),
                     mean_ci(
@@ -383,7 +442,7 @@ fn main() {
                     .filter(|r| seeds_r.contains(&r.seed))
                     .map(|r| rs.iter().find(|x| x.seed == r.seed).unwrap())
                     .collect();
-                if !rho_sorted.is_empty() {
+                if !rho_sorted.is_empty() && arm_complete && ic_valid {
                     let ic_s = pick(&|r| r.s);
                     let ic_sp = pick(&|r| r.s_plus);
                     let rh: Vec<f64> = rho_sorted.iter().map(|r| r.mh / (GAE * sq)).collect();
@@ -460,18 +519,49 @@ fn main() {
                 }
                 rho_out.insert(name.clone(), Value::Object(e));
             }
+            if p == 1009 {
+                // A/A: the same arm re-run with new walk randomness on the same instances
+                let mut aa = serde_json::Map::new();
+                for (a, b) in [("R0", "R0_aa"), ("R3", "R3_aa")] {
+                    if let (Some(x), Some(y)) = (arms.get(a), arms.get(b)) {
+                        let sx: Vec<f64> = x.iter().map(|r| r.mh / (GAE * sq)).collect();
+                        let sy: Vec<f64> = y.iter().map(|r| r.mh / (GAE * sq)).collect();
+                        let rc = ratio_ci(&sx, &sy, sd_ + 40);
+                        let (lo, hi) = (
+                            rc["ci95"][0].as_f64().unwrap(),
+                            rc["ci95"][1].as_f64().unwrap(),
+                        );
+                        let pass = x.len() == 16 && y.len() == 16 && lo <= 1.0 && 1.0 <= hi;
+                        aa.insert(
+                            a.into(),
+                            json!({"ratio_first_over_repeat": rc, "pass": pass}),
+                        );
+                    } else {
+                        aa.insert(a.into(), json!({"pass": false, "reason": "arm missing"}));
+                    }
+                }
+                entry.insert("rho_aa".into(), Value::Object(aa));
+            }
             entry.insert("rho".into(), Value::Object(rho_out));
             // exponent data
-            fit_ic.push((
-                ic.iter().map(|r| r.l).collect(),
-                ic.iter().map(|r| r.muls).collect(),
-            ));
-            if let Some(r3) = arms.get("R3") {
+            if ic_valid {
+                fit_ic.push((
+                    p,
+                    ic.iter().map(|r| r.l).collect(),
+                    ic.iter().map(|r| r.muls).collect(),
+                ));
+            }
+            if let Some(r3) = arms
+                .get("R3")
+                .filter(|r| r.len() == expected_n(p, "R3") && r.iter().all(|x| x.ok))
+            {
                 fit_r3.push((
+                    p,
                     r3.iter().map(|r| r.l).collect(),
                     r3.iter().map(|r| r.mh).collect(),
                 ));
                 fit_r3t.push((
+                    p,
                     r3.iter().map(|r| r.l).collect(),
                     r3.iter().map(|r| r.mt).collect(),
                 ));
@@ -479,18 +569,96 @@ fn main() {
         }
         per_size.push(Value::Object(entry));
     }
+    // ---- controls (PROTOCOL.md): every comparative decision is withheld unless they pass
+    let groups = |g: &Vec<(u64, Vec<f64>, Vec<f64>)>, min_p: u64| -> Vec<(Vec<f64>, Vec<f64>)> {
+        g.iter()
+            .filter(|x| x.0 >= min_p)
+            .map(|x| (x.1.clone(), x.2.clone()))
+            .collect()
+    };
+    let exp_ic = fit(&groups(&fit_ic, 0), 77);
+    let exp_r3 = fit(&groups(&fit_r3, 0), 78);
+    let exp_r3t = fit(&groups(&fit_r3t, 0), 79);
+    let at = |v: &Value, i: usize| v["ci95"][i].as_f64().unwrap_or(f64::NAN);
+    // positive control: the plain arm reproduces the ledger's S ~ 1.3 wherever it ran
+    let pos: Vec<Value> = per_size
+        .iter()
+        .filter_map(|e| {
+            let r0 = e["rho"].get("R0")?;
+            let (lo, hi) = (at(&r0["S_harness"], 0), at(&r0["S_harness"], 1));
+            Some(json!({"p": e["p"], "n": r0["S_harness"]["n"], "ci95": r0["S_harness"]["ci95"],
+                        "contains_ledger_1_3": lo <= 1.3 && 1.3 <= hi, "arm_complete": r0["status"] == json!("complete")}))
+        })
+        .collect();
+    let pos_ok = !pos.is_empty()
+        && pos
+            .iter()
+            .all(|x| x["contains_ledger_1_3"] == json!(true) && x["arm_complete"] == json!(true));
+    let e1009 = per_size.iter().find(|e| e["p"] == json!(1009));
+    let aa_ok = e1009
+        .and_then(|e| e.get("rho_aa"))
+        .map(|a| ["R0", "R3"].iter().all(|k| a[*k]["pass"] == json!(true)))
+        .unwrap_or(false);
+    let ic_aa_ok = e1009
+        .and_then(|e| e.get("ic_aa"))
+        .map(|a| a["pairs"] == json!(16) && a["identical_counts"] == json!(16))
+        .unwrap_or(false);
+    let digest_ok = per_size.iter().all(|e| {
+        e.get("dense_vs_sparse")
+            .map(|d| {
+                d["pairs"] == json!(16)
+                    && d["identical_descent_digest"] == json!(16)
+                    && d["identical_outcome"] == json!(16)
+            })
+            .unwrap_or(false)
+    });
+    let exp_ok = !exp_r3.is_null() && at(&exp_r3, 0) <= 0.5 && 0.5 <= at(&exp_r3, 1);
+    let controls_pass = pos_ok && aa_ok && ic_aa_ok && digest_ok && exp_ok;
+    summary.insert(
+        "controls".into(),
+        json!({"positive_control_plain_rho_reproduces_ledger": {"pass": pos_ok, "rows": pos},
+               "rho_A_A_p1009": {"pass": aa_ok}, "sieve_A_A_p1009_identical_counts": {"pass": ic_aa_ok},
+               "dense_sparse_identical_descent_all_sizes": {"pass": digest_ok},
+               "instrument_exponent_contains_one_half": {"pass": exp_ok},
+               "all_pass": controls_pass}),
+    );
+    if !controls_pass {
+        for e in per_size.iter_mut() {
+            if let Some(rho) = e["rho"].as_object_mut() {
+                for r in rho.values_mut() {
+                    if let Some(o) = r.as_object_mut() {
+                        o.insert(
+                            "verdict".into(),
+                            json!("withheld: control validation failed"),
+                        );
+                        o.insert("ranked_across_band_ic_below_rho".into(), Value::Null);
+                    }
+                }
+            }
+        }
+    }
     // pre-registered rules (PROTOCOL.md): K1 on the harness S⁺ at p >= 1009, K2 on the
-    // tuned price or the band
+    // tuned price or the band; a size whose arm or sieve sample is not the frozen one,
+    // or any run of which is invalid, is withheld, not decided
     let mut k1 = vec![];
     let mut k2 = vec![];
+    let mut withheld = vec![];
     for e in &per_size {
         let p = e["p"].as_u64().unwrap();
-        let Some(r3) = e["rho"].get("R3") else {
-            continue;
-        };
         if p < 1009 {
             continue;
         }
+        let r3 = e["rho"].get("R3");
+        let decided = controls_pass
+            && r3
+                .map(|r| r["status"] == json!("complete") && r.get("ic_over_rho").is_some())
+                .unwrap_or(false)
+            && e["ic_valid_and_complete"] == json!(true);
+        if !decided {
+            withheld.push(p);
+            continue;
+        }
+        let r3 = r3.unwrap();
         let hi = |k: &str| r3["ic_over_rho"][k]["ci95"][1].as_f64().unwrap();
         if hi("S_plus_harness") >= 1.0 {
             k1.push(p);
@@ -501,33 +669,36 @@ fn main() {
     }
     summary.insert("K1_killed_at_p".into(), json!(k1));
     summary.insert("K2_narrowed_at_p".into(), json!(k2));
+    summary.insert("K_withheld_at_p".into(), json!(withheld));
     summary.insert("sizes".into(), json!(per_size));
-    summary.insert("exponent_ic_muls_vs_l".into(), fit(&fit_ic, 77));
-    summary.insert("exponent_rho_R3_harness_muls_vs_l".into(), fit(&fit_r3, 78));
-    summary.insert("exponent_rho_R3_tuned_muls_vs_l".into(), fit(&fit_r3t, 79));
-    // POST HOC (not in PROTOCOL.md): the sizes where the sieve runs at m = 9 (p >= 1009)
-    let tail = |g: &Vec<(Vec<f64>, Vec<f64>)>| {
-        g.iter()
-            .skip(g.len().saturating_sub(3))
-            .cloned()
-            .collect::<Vec<_>>()
-    };
+    summary.insert("exponent_ic_muls_vs_l".into(), exp_ic);
+    summary.insert("exponent_rho_R3_harness_muls_vs_l".into(), exp_r3);
+    summary.insert("exponent_rho_R3_tuned_muls_vs_l".into(), exp_r3t);
+    // POST HOC (not in PROTOCOL.md): the sizes where the sieve runs at m = 9, chosen by p
     summary.insert(
         "exponent_ic_muls_vs_l_p_ge_1009_POST_HOC".into(),
-        fit(&tail(&fit_ic), 80),
+        fit(&groups(&fit_ic, 1009), 80),
     );
     summary.insert(
         "exponent_rho_R3_harness_muls_vs_l_p_ge_1009_POST_HOC".into(),
-        fit(&tail(&fit_r3), 81),
+        fit(&groups(&fit_r3, 1009), 81),
     );
     // local exponents between adjacent sizes (means)
     let mut local = vec![];
     for w in fit_ic.windows(2) {
         let (a, b) = (&w[0], &w[1]);
-        local.push(json!({"from_l": mean(&a.0), "to_l": mean(&b.0),
-            "ic": (mean(&b.1) / mean(&a.1)).ln() / (mean(&b.0) / mean(&a.0)).ln()}));
+        local.push(
+            json!({"p_from": a.0, "p_to": b.0, "from_l": mean(&a.1), "to_l": mean(&b.1),
+            "ic": (mean(&b.2) / mean(&a.2)).ln() / (mean(&b.1) / mean(&a.1)).ln()}),
+        );
     }
     summary.insert("local_exponents_ic".into(), json!(local));
+    summary.insert(
+        "provenance".into(),
+        json!({"raw_runs": "produced by the jv_cover binary built from commit 8f21253f7 (jv_rho_strong.rs there is identical to later commits up to rustfmt); no run was repeated after code repairs",
+               "hash_scope": "the recorded `hash` counter holds the partition hash only; the DP-check hash (all arms) and the two cycle-window hashes (negation arms) were evaluated but not counted. Native work used for S+ and the 5a band adds them, derived from the recorded step count (1 per step plain, 3 per step with negation); S_plus_harness_as_recorded keeps the recorded scope",
+               "dp_table": "runs before the repair keyed the DP table by x only; opposite points at one x would have been read as equal. Every recorded run recovered the planted logarithm, so none was affected; the repaired engine stores y and handles both cases"}),
+    );
     summary.insert("protocol".into(), json!("PROTOCOL.md"));
     summary.insert("gae_f_p_mults".into(), json!(GAE));
     fs::write(

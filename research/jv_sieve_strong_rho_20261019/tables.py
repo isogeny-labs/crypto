@@ -4,8 +4,10 @@ tables. Layout only: every number is copied from the file. Usage: tables.py <dir
 import json, sys
 d = sys.argv[1]
 sm = json.load(open(f"{d}/summary.json"))
-ci = lambda x, p=4: f"{x['mean']:.{p}g} [{x['ci95'][0]:.{p-1}g}, {x['ci95'][1]:.{p-1}g}]"
-rc = lambda x, p=4: f"{x['ratio']:.{p}g} [{x['ci95'][0]:.{p-1}g}, {x['ci95'][1]:.{p-1}g}]"
+def fm(v, p):
+    return f"{v:.0f}" if abs(v) >= 10 ** p else f"{v:.{p}g}"
+ci = lambda x, p=4: f"{fm(x['mean'], p)} [{fm(x['ci95'][0], p-1)}, {fm(x['ci95'][1], p-1)}]"
+rc = lambda x, p=4: f"{fm(x['ratio'], p)} [{fm(x['ci95'][0], p-1)}, {fm(x['ci95'][1], p-1)}]"
 out = []
 w = out.append
 w("## T1. Sieve against the strong rho (R3), paired by instance\n")
@@ -15,6 +17,9 @@ w("|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|")
 for e in sm["sizes"]:
     r = e.get("rho", {}).get("R3")
     if not r: continue
+    if "ic_over_rho" not in r:
+        w(f"| {e['p']} | {e['log2_l']:.1f} | {r['S_harness']['n']} | withheld: {r['status']} |||||||||")
+        continue
     io = r["ic_over_rho"]
     w(f"| {e['p']} | {e['log2_l']:.1f} | {r['S_harness']['n']} | {ci(e['ic_S'])} | {ci(e['ic_S_plus'])} | {r['S_harness']['mean']:.3f} / {r['S_tuned']['mean']:.3f} | {r['S_plus_harness']['mean']:.3f} / {r['S_plus_tuned']['mean']:.3f} | {rc(io['S_harness'])} | {rc(io['S_tuned'])} | {rc(io['S_plus_harness'])} | {rc(io['S_plus_tuned'])} |")
 w("\n## T2. §5a band: sieve/rho with native work priced at w GAE per operation on every arm\n")
@@ -58,3 +63,18 @@ if aa: w(f"\nIC A/A (sparse, p = 1009, run twice): {aa[0]['identical_counts']}/{
 w(f"\nPre-registered kill rules: K1 fired at p = {sm['K1_killed_at_p'] or 'none'}; K2 narrowed at p = {sm['K2_narrowed_at_p'] or 'none'}.")
 open(f"{d}/TABLES.md", "w").write("\n".join(out) + "\n")
 print("wrote TABLES.md")
+
+# compact T1 spliced into README.md between its markers
+rows = ["| p | S, harness | S, tuned | S⁺, harness | S⁺, tuned |", "|--:|--:|--:|--:|--:|"]
+for e in sm["sizes"]:
+    r = e.get("rho", {}).get("R3")
+    if not r: continue
+    if "ic_over_rho" not in r:
+        rows.append(f"| {e['p']} | withheld ({r['status']}) | | | |"); continue
+    io = r["ic_over_rho"]
+    rows.append(f"| {e['p']} | {rc(io['S_harness'],3)} | {rc(io['S_tuned'],3)} | {rc(io['S_plus_harness'],3)} | {rc(io['S_plus_tuned'],3)} |")
+rd = open(f"{d}/README.md").read()
+a, b = "<!-- T1:begin -->", "<!-- T1:end -->"
+if a in rd and b in rd:
+    rd = rd[:rd.index(a) + len(a)] + "\n" + "\n".join(rows) + "\n" + rd[rd.index(b):]
+    open(f"{d}/README.md", "w").write(rd)

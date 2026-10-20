@@ -341,6 +341,29 @@ fn from_x6(x: &X6) -> E6 {
     E6([E2([x[0], x[1]]), E2([x[2], x[3]]), E2([x[4], x[5]])])
 }
 
+/// The logarithm from two walks that met at the same `x`: the points
+/// `a₁G + b₁Q` and `a₂G + b₂Q` are equal (`opposite = false`) or negatives of
+/// each other (`opposite = true`).  `None` when the coefficients carry no
+/// information (the denominator vanishes mod `n`).
+pub fn recover_dlog(n: u64, a1: u64, b1: u64, a2: u64, b2: u64, opposite: bool) -> Option<u64> {
+    if opposite {
+        // a₁ + b₁d = −(a₂ + b₂d)  ⇒  d = −(a₁ + a₂)/(b₁ + b₂)
+        let den = (b1 + b2) % n;
+        if den == 0 {
+            return None;
+        }
+        let num = (n - (a1 + a2) % n) % n;
+        Some(mm(num, inv_mod(den, n), n))
+    } else {
+        // a₁ + b₁d = a₂ + b₂d  ⇒  d = (a₂ − a₁)/(b₁ − b₂)
+        let den = (b1 + n - b2) % n;
+        if den == 0 {
+            return None;
+        }
+        Some(mm((a2 + n - a1) % n, inv_mod(den, n), n))
+    }
+}
+
 #[inline(always)]
 fn hash_x(x: &X6) -> u64 {
     let mut h = 0u64;
@@ -473,7 +496,8 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
     let mask = (1u64 << o.dp_bits) - 1;
     let tail_cap = 20u64 << o.dp_bits;
     let cap = 64 * (n as f64).sqrt() as u64 + 1_000_000;
-    let mut table: HashMap<X6, (u64, u64)> = HashMap::new();
+    // keyed by x; the stored y tells equal points from opposite ones
+    let mut table: HashMap<X6, (u64, u64, X6)> = HashMap::new();
     let mut found: Option<u64> = None;
     let mut steps = 0u64;
     let (mut restarts, mut cycles_found, mut self_coll) = (0u64, 0u64, 0u64);
@@ -563,7 +587,8 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
             // the last CYCLE_WINDOW points of this walker; a cycle is left by
             // doubling its point of smallest x (Bos–Kleinjung–Lenstra)
             if o.negation {
-                let hn = hash_x(&npt.x);
+                let mut hn = hash_x(&npt.x);
+                ar.c.hash += 1;
                 ar.c.cycle_cmp += ws[i].hist.len() as u64;
                 // hist[0] is the newest; distance d means P_{t+1} = P_{t+1-d}
                 let hit = ws[i]
@@ -589,8 +614,10 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
                         b = db;
                     }
                     ws[i].hist.clear();
+                    hn = hash_x(&npt.x);
+                    ar.c.hash += 1;
                 }
-                ws[i].hist.push_front((hash_x(&npt.x), npt, a, b));
+                ws[i].hist.push_front((hn, npt, a, b));
                 ws[i].hist.truncate(CYCLE_WINDOW);
             }
             ws[i].pt = npt;
@@ -599,13 +626,13 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
             ws[i].tail += 1;
             ar.c.dp_check += 1;
             let h = hash_x(&npt.x);
+            ar.c.hash += 1;
             if (h >> 20) & mask == 0 {
                 ar.c.table_ops += 1;
-                if let Some(&(a2, b2)) = table.get(&npt.x) {
-                    let db = (ws[i].b + n - b2) % n;
-                    if db != 0 {
-                        let da = (a2 + n - ws[i].a) % n;
-                        found = Some(mm(da, inv_mod(db, n), n));
+                if let Some(&(a2, b2, y2)) = table.get(&npt.x) {
+                    let opposite = y2 != npt.y;
+                    if let Some(d) = recover_dlog(n, ws[i].a, ws[i].b, a2, b2, opposite) {
+                        found = Some(d);
                         break 'main;
                     }
                     self_coll += 1;
@@ -613,7 +640,7 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
                     ws[i] = new_walker(&mut ar, &mut rng, &mut setup_ops);
                     continue;
                 }
-                table.insert(npt.x, (ws[i].a, ws[i].b));
+                table.insert(npt.x, (ws[i].a, ws[i].b, npt.y));
                 ws[i].tail = 0;
             } else if ws[i].tail > tail_cap {
                 restarts += 1;
@@ -701,6 +728,51 @@ mod tests {
             let h2 = ec.add(&ec.mul(&spec.g, k), &spec.q);
             let n = ar.mul_scalar(&g, k).unwrap();
             assert_eq!(ar.add_full(&n, &q).unwrap().y, to_x6(&h2.y));
+        }
+    }
+
+    #[test]
+    fn opposite_points_are_not_read_as_equal_points() {
+        // order 101, d = 7: (1,1) is 8G and (79,2) is 79 + 14 = 93 = -8 mod 101,
+        // so the two walks met at opposite points; the equal-point formula gives 23
+        let (n, d) = (101u64, 7u64);
+        let (a1, b1, a2, b2) = (1, 1, 79, 2);
+        assert_eq!((a1 + b1 * d) % n, 8);
+        assert_eq!((a2 + b2 * d) % n, n - 8);
+        assert_eq!(recover_dlog(n, a1, b1, a2, b2, false), Some(23));
+        assert_eq!(recover_dlog(n, a1, b1, a2, b2, true), Some(d));
+        // equal points: (5, 3) and (26, 0) both represent 26
+        assert_eq!(recover_dlog(n, 5, 3, 26, 0, false), Some(d));
+        // no information: the same coefficients
+        assert_eq!(recover_dlog(n, 4, 9, 4, 9, false), None);
+        assert_eq!(recover_dlog(n, 4, 9, 100 - 4 + 1, 101 - 9, true), None);
+    }
+
+    #[test]
+    fn a_meeting_at_opposite_points_in_the_real_group_is_resolved() {
+        // P = aG + bQ and -P = (n-a)G + (n-b)Q carry opposite points with different
+        // coefficient pairs when they come from different walks: take the harness
+        // group and check recover_dlog against the planted logarithm on both signs
+        let spec = generate_spec(53, 2);
+        let n = spec.l;
+        let mut rng = StdRng::seed_from_u64(11);
+        for _ in 0..200 {
+            let (a1, b1) = (rng.gen_range(0..n), rng.gen_range(1..n));
+            let t = (a1 as u128 + b1 as u128 * spec.d as u128) % n as u128; // the point's multiple of G
+                                                                            // a second representation of -P: pick b2, solve a2 = -t - b2 d
+            let b2 = rng.gen_range(1..n);
+            let a2 = ((n as u128 + n as u128 - t - (b2 as u128 * spec.d as u128) % n as u128)
+                % n as u128) as u64;
+            if (b1 + b2) % n == 0 {
+                continue;
+            }
+            assert_eq!(recover_dlog(n, a1, b1, a2, b2, true), Some(spec.d));
+            // and an equal-point representation of P
+            let a3 =
+                ((t + n as u128 - (b2 as u128 * spec.d as u128) % n as u128) % n as u128) as u64;
+            if b1 != b2 {
+                assert_eq!(recover_dlog(n, a1, b1, a3, b2, false), Some(spec.d));
+            }
         }
     }
 

@@ -654,8 +654,8 @@ def jv_sieve_table() -> dict:
     rows = []
     for e in sm["sizes"]:
         r3 = e["rho"].get("R3")
-        if r3 is None:
-            continue
+        if r3 is None or "ic_over_rho" not in r3:
+            continue  # absent or withheld by the analysis (see K_withheld_at_p)
         rows.append({
             "p": e["p"], "log2_l": e["log2_l"], "ic_all_correct": e["ic_all_correct"],
             "ic_S": e["ic_S"], "ic_S_plus": e["ic_S_plus"], "ic_wall_s": e["ic_wall_s"],
@@ -681,6 +681,8 @@ def jv_sieve_table() -> dict:
         "exponent_rho_tuned": sm["exponent_rho_R3_tuned_muls_vs_l"],
         "local_exponents_ic": sm["local_exponents_ic"],
         "K1_killed_at_p": sm["K1_killed_at_p"], "K2_narrowed_at_p": sm["K2_narrowed_at_p"],
+        "K_withheld_at_p": sm["K_withheld_at_p"], "controls_all_pass": sm["controls"]["all_pass"],
+        "provenance": sm["provenance"]["raw_runs"],
     }
 
 
@@ -1157,7 +1159,8 @@ def markdown(doc: dict) -> str:
           f"{ex['slope']:.3f} [{ex['ci95'][0]:.3f}, {ex['ci95'][1]:.3f}] (theory 1/3), strong rho "
           f"{er['slope']:.3f} [{er['ci95'][0]:.3f}, {er['ci95'][1]:.3f}] (theory 1/2). "
           f"Pre-registered kill rules: K1 fired at p = {D['K1_killed_at_p'] or 'none'}; "
-          f"K2 narrowed at p = {D['K2_narrowed_at_p'] or 'none'}.", ""]
+          f"K2 narrowed at p = {D['K2_narrowed_at_p'] or 'none'}; decisions withheld at p = {D['K_withheld_at_p'] or 'none'}. "
+          f"Controls all pass: {'yes' if D['controls_all_pass'] else 'NO (every verdict withheld)'}. Raw runs: {D['provenance']}.", ""]
     L += ["## Phases, as a share of S", "",
           "Shares are fractions of each row's own `S`, so they carry no unit; read each row in the "
           "table named in its first column.", "",
@@ -1826,7 +1829,8 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>Fitted exponent of total multiplications in ℓ: sieve {ex["slope"]:.3f} '
              f'[{ex["ci95"][0]:.3f}, {ex["ci95"][1]:.3f}] (theory 1/3); strong rho {er["slope"]:.3f} '
              f'[{er["ci95"][0]:.3f}, {er["ci95"][1]:.3f}] (theory 1/2). K1 fired at p = '
-             f'{esc(str(D["K1_killed_at_p"] or "none"))}; K2 narrowed at p = {esc(str(D["K2_narrowed_at_p"] or "none"))}. '
+             f'{esc(str(D["K1_killed_at_p"] or "none"))}; K2 narrowed at p = {esc(str(D["K2_narrowed_at_p"] or "none"))}; '
+             f'withheld at p = {esc(str(D["K_withheld_at_p"] or "none"))}; controls all pass: {"yes" if D["controls_all_pass"] else "NO"}. '
              f'Source: <a href="{GITHUB}{D["source"]}">{esc(D["source"])}</a>.</p></section>')
 
     # Every recipe, every curve (the ladder).

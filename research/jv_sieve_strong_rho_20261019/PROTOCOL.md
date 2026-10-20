@@ -75,3 +75,10 @@ Wall time is an observation only.
 4. Sample sizes are as registered: 16 per arm, except R0 at p = 1511 (8) and p = 1823 (4).
 5. The pre-registered rules were evaluated by `examples/jv_sieve_study.rs`: K1 and K2 did not
    fire at any size; the K3 exponent condition did fire (see README.md).
+6. **Owner review of 2026-10-20 (repairs, no new campaign).** (a) The DP table keyed by `x` only is
+   repaired to store `y` and handle opposite points (`recover_dlog`, regression test); (b) the analysis
+   gates every verdict on the frozen sample, run validity and the controls listed in the README, keeps
+   partial and invalid data explicit, and filters the post hoc fit by `p`; (c) the uncounted `hash_x`
+   evaluations are added to rho's native work in the analysis, derived from the recorded steps, and
+   counted in the engine from now on. The raw runs keep their source identity (commit `8f21253f7`) and
+   were not repeated; `summary.json` → `provenance` states it.

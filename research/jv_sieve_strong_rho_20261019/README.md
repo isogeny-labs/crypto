@@ -32,19 +32,21 @@ same instances and host. Every run was checked against the planted logarithm: al
 **1. The sieve still beats a strong rho, from about p = 1009 up, and the gap widens.** Paired
 sieve/rho ratios, 95 % bootstrap (n = 16; below 1 is the sieve cheaper):
 
+<!-- T1:begin -->
 | p | S, harness | S, tuned | S⁺, harness | S⁺, tuned |
 |--:|--:|--:|--:|--:|
-| 251 | 18.5 [5.4, 47] | 44 [13, 109] | 37 [12, 89] | 73 [23, 176] |
-| 503 | 0.48 [0.35, 0.64] | 1.15 [0.84, 1.53] | 1.34 [0.94, 1.82] | 2.65 [1.85, 3.62] |
-| 1009 | 0.024 [0.019, 0.031] | 0.058 [0.044, 0.074] | 0.067 [0.053, 0.084] | 0.132 [0.105, 0.165] |
-| 1511 | 0.0090 [0.0070, 0.012] | 0.022 [0.017, 0.029] | 0.028 [0.022, 0.036] | 0.055 [0.044, 0.071] |
-| 1823 | 0.0042 [0.0032, 0.0058] | 0.010 [0.0078, 0.014] | 0.015 [0.0125, 0.020] | 0.030 [0.025, 0.038] |
+| 251 | 18.5 [5.3, 47] | 44.4 [13, 109] | 36.5 [12, 88] | 71.8 [23, 173] |
+| 503 | 0.478 [0.35, 0.64] | 1.15 [0.84, 1.5] | 1.33 [0.93, 1.8] | 2.61 [1.8, 3.6] |
+| 1009 | 0.0242 [0.018, 0.031] | 0.0581 [0.044, 0.074] | 0.0662 [0.053, 0.083] | 0.13 [0.1, 0.16] |
+| 1511 | 0.00902 [0.007, 0.012] | 0.0217 [0.017, 0.029] | 0.0274 [0.022, 0.036] | 0.0539 [0.043, 0.07] |
+| 1823 | 0.00424 [0.0032, 0.0058] | 0.0102 [0.0078, 0.014] | 0.0152 [0.012, 0.019] | 0.03 [0.024, 0.038] |
+<!-- T1:end -->
 
 The pre-registered kill rules did not fire: K1 (S⁺ ratio interval reaching 1 at any `p ≥ 1009`,
 harness price) and K2 (the same in the tuned price or inside the §5a band) both hold at 1009, 1511
-and 1823. Against the cheapest rho in the tuned price (R2, post hoc) the 1009 ratios are 0.062
-[0.045, 0.082] (S) and 0.137 [0.104, 0.183] (S⁺). The distance remaining is therefore a factor of
-about 65 (S⁺, harness) to 33 (S⁺, tuned) at `p = 1823`.
+and 1823. Against the cheapest rho in the tuned price (R2, post hoc) the 1009 ratios are 0.0615
+[0.0454, 0.0822] (S) and 0.135 [0.103, 0.180] (S⁺). The distance remaining is therefore a factor of
+about 66 (S⁺, harness) to 33 (S⁺, tuned) at `p = 1823`.
 
 **2. The crossover moves up against a strong rho.** The ledger's crossover against the weak rho
 was `p ≈ 333–430`. Against the strong rho it is between `p = 251` and `p ≈ 503` in S (harness) and
@@ -54,8 +56,8 @@ unresolved at 503 in S⁺ or the tuned price, resolved by 1009.
 two layers (A: all non-multiplication work including `F_p` additions; B: without them), the sieve
 side carrying an upper bound for the F4/linear-algebra additions it does not emit
 ([T2](TABLES.md)). The sieve ranks below rho at every weight and in all four columns at
-`p = 1009, 1511, 1823` (layer A, `w = 1`, tuned: 0.37 [0.29, 0.46], 0.16 [0.13, 0.21],
-0.088 [0.072, 0.11]). At `p = 251` rho ranks below; at `p = 503` the order changes inside the
+`p = 1009, 1511, 1823` (layer A, `w = 1`, tuned: 0.35 [0.28, 0.44], 0.15 [0.12, 0.20],
+0.084 [0.068, 0.11]). At `p = 251` rho ranks below; at `p = 503` the order changes inside the
 band, so the pair is **unresolved** there.
 
 **4. The ℓ^{1/3} claim is not supported over the measured range (K3 fires).** Fitted exponent of total
@@ -84,6 +86,32 @@ linear stage is 2.08–2.20× cheaper, descent multiplications 1.28–1.29×, an
 fell back to the dense one 0.4–7.5 times per run; that cost is counted. This is an engineering gain
 on a route that already beats rho; it moves no ranking.
 
+## Provenance, review repairs and controls
+
+* **Source identity of the measurements.** Every raw run was produced by the `jv_cover` binary built
+  from commit `8f21253f7` (the rho engine there equals later commits up to rustfmt). No run was repeated
+  after any repair below; `summary.json` carries this in `provenance`.
+* **Repairs made after the owner's review** (the runs are not relabelled as coming from repaired code):
+  (1) the engine's DP table keyed by `x` only, so two non-negation walks meeting at *opposite* points would
+  have been read as equal points and returned a wrong scalar. The engine now stores `y` and resolves both
+  cases (`recover_dlog`, with a regression on the reviewer's order-101 example, `d = 7`, `(1,1)` and
+  `(79,2)`, which the equal-point formula reads as 23). Every recorded run recovered the planted
+  logarithm and an opposite-point meeting at two distinguished points has probability below 10⁻⁵ per run,
+  so no recorded run was affected. (2) The recorded `hash` counter held only the partition hash; the
+  DP-check hash and, with the negation map, two cycle-window hashes were evaluated but not counted. The
+  analysis adds them back, derived from the recorded step count (1 per step plain, 3 with negation); this
+  moves rho's S⁺ by under 1 % and no verdict (`S_plus_harness_as_recorded` keeps the recorded scope).
+  The engine now counts them where they happen. (3) The analysis read the K2 flag from the wrong place
+  (fixed before the final numbers), and it now gates every verdict: an arm or the sieve sample that is not
+  the frozen one, or contains an incorrect or capped run, is reported with its status and its comparisons
+  are withheld; invalid and partial data stay in the summary explicitly. (4) The post hoc `p ≥ 1009` fit
+  now filters by `p`, not by position.
+* **Controls** (all pass, `summary.json` → `controls`): the plain arm's S interval contains the ledger's
+  1.3 at every size; rho A/A and sieve A/A at `p = 1009`; identical descent digests dense against sparse
+  at all sizes; the strong rho's fitted exponent interval contains 1/2. If any fails, every verdict
+  and kill-rule decision is withheld. A scratch copy with one run flagged incorrect and one job missing
+  withheld exactly those two sizes.
+
 ## Limits
 
 * Weak class only; `p ≤ 1823` (`ℓ < 2^63`). Harness unit throughout; wall time is an observation
@@ -93,6 +121,7 @@ on a route that already beats rho; it moves no ranking.
   non-weak curve against the strong rho is not asserted here.
 * The tuned price is a cost model, not a faster implementation; rho's native work (canonicalisation,
   hashing, DP checks, scalar updates, cycle-window comparisons) is counted and priced in S⁺ and the
-  band. The sieve's F4 additions are not emitted by the harness (implementation gap): the band uses an
+  band; the hash evaluations the runs did not count are added back from the recorded step count (above), a
+  derived correction, not a re-measurement. The sieve's F4 additions are not emitted by the harness (implementation gap): the band uses an
   upper bound, labelled as such.
 * The post hoc fit and the R2 comparison are labelled post hoc and were not in the protocol.
