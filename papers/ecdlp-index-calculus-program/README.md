@@ -42,7 +42,7 @@ improvement it reports is *engineering* or *accounting*.
   modelled crossover `2^150 → 2^135`), **transfer routes** (§9: the
   transport-conservation lemma and the negative results).
 - **Frontier** (§10): a table of every measured improvement by boundary and
-  class; cold one-target frontier still rho; one admitted online point
+  class; cold one-target frontier still rho; one online point (13.9x, superseded 2026-10-20)
   (compact-orbit IC at Koblitz `n = 61`, 13.9× [9.8, 19.1] over strong rho —
   superseded, corrected 2026-10-20 by validation sweep B (verdict 108.1): rho had an
   empty table and Bernstein–Lange rho at equal advice is 53–317× faster online —
@@ -70,7 +70,7 @@ provenance:
 |:--|:--|:--|
 | P1. Root-finding decomposition | §5; extends `../rootfinding-decomposition/` with the PDP family, GPU, Kummer tower, ecbench loops and the audit corrections | novelty audit; Magma/msolve cross-check on every row; a GPU run on hardware; `m ≥ 3` prime measurements |
 | P2. ecbench: one unit for every ECDLP method | §3, Definition 1, corrections, isolation rubric, frontier synthesis | an L3 cross-host replay certificate; inherited-F4 counter drift resolved; a four-size bound per incumbent |
-| P3. Index calculus on Koblitz curves, measured | §7, compact orbit, online ladder, admitted `n = 61` panel, ECC2K-130 extrapolation | isolated panels at `n = 71, 73, 83`; the constant `C` reconciled; a cold `n = 83` session |
+| P3. Index calculus on Koblitz curves, measured | §7, compact orbit, online ladder, `n = 61` panel (13.9x online point superseded), ECC2K-130 extrapolation | isolated panels at `n = 71, 73, 83`; the constant `C` reconciled; a cold `n = 83` session |
 | P4. Symmetry at `k = 4` | §8.4 | a second prime and more seeds; the degenerate target explained; a measured end-to-end point |
 | P5. Negative results | §9, lit2026 negatives, SAT scaling, symmetrised bases, fibre-aware IC, Lemma 1 | literature check of Lemma 1; the conductor-gap yield experiment |
 
