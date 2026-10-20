@@ -29,6 +29,7 @@ fn tools() -> Vec<Value> {
         tool("isolab_k8s_overview", "List lab Jobs and their current Kubernetes state. Workers scale from zero when Jobs arrive.", json!({}), &[], true, false),
         tool("isolab_k8s_benchmark", "Run a native ecbench specification with four exclusive vCPUs on a worker configured for CPU isolation. Requires L2, at least five rounds, a warmup, reference and matching A/A control. Audits and replays all measured executions, rejects ANY record below L2, and uploads all artifacts (including failures) to S3. No automatic retries. Job success is an isolation/correctness check, not a speed claim.",
             json!({"job_name":name,"spec":{"type":"object","description":"ecbench.spec/v1 specification; defaults to the supplied 20-bit validation fixture"},
+                "build":build_schema(),
                 "instance_type":{"type":"string","description":"Optional fixed EC2 type for repeatable hardware, e.g. c8i.2xlarge; must fit the existing Spot NodePool"},
                 "memory":{"type":"string","pattern":"^[1-9][0-9]*(Mi|Gi)$","default":"4Gi"},
                 "seconds":{"type":"integer","minimum":1,"maximum":9999999,"default":3600}}), &["job_name"], false, false),
@@ -44,6 +45,67 @@ fn tools() -> Vec<Value> {
         tool("isolab_k8s_cancel", "Delete a lab Job and its pods. This stops running work and discards temporary files/logs. Already uploaded S3 artifacts remain.", json!({"job_name":name}), &["job_name"], false, true),
         tool("isolab_k8s_results", "List up to 100 S3 artifacts under a Job's result prefix, including separate attempt Pod UIDs. Works after Kubernetes TTL cleanup. Empty results do not establish success; commands must upload their outputs. Pass next_token to continue.", json!({"job_name":name,"next_token":{"type":"string"}}), &["job_name"], true, false),
     ]
+}
+
+fn build_schema() -> Value {
+    let default: Value = serde_json::from_str(include_str!("../../image.json")).unwrap();
+    let repository = default["image_uri"]
+        .as_str()
+        .unwrap()
+        .split('@')
+        .next()
+        .unwrap();
+    json!({"type":"object","additionalProperties":false,
+    "description":"Optional per-run image and native build identity; omission retains the deployed image",
+    "required":["image_uri","source_revision","ecbench_sha256"],
+    "properties":{
+            "image_uri":{"type":"string","maxLength":repository.len()+72,"pattern":format!("^{}@sha256:[a-f0-9]{{64}}$", repository.replace('.', "\\."))},
+            "source_revision":{"type":"string","minLength":40,"maxLength":40,"pattern":"^[a-f0-9]{40}$"},
+            "ecbench_sha256":{"type":"string","minLength":64,"maxLength":64,"pattern":"^[a-f0-9]{64}$"}
+    }})
+}
+
+fn benchmark_build(args: &Value) -> Result<Value> {
+    let default: Value = serde_json::from_str(include_str!("../../image.json")).unwrap();
+    let Some(build) = args.get("build") else {
+        return Ok(default);
+    };
+    let object = build.as_object().ok_or("build must be an object")?;
+    if object.len() != 3
+        || !["image_uri", "source_revision", "ecbench_sha256"]
+            .iter()
+            .all(|key| object.contains_key(*key))
+    {
+        return Err("build requires exactly image_uri, source_revision and ecbench_sha256".into());
+    }
+    for (key, size) in [("source_revision", 40), ("ecbench_sha256", 64)] {
+        let value = text_arg(build, key)?;
+        if value.len() != size
+            || !value
+                .bytes()
+                .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
+        {
+            return Err(format!("invalid build.{key}"));
+        }
+    }
+    let image = text_arg(build, "image_uri")?;
+    let repository = default["image_uri"]
+        .as_str()
+        .unwrap()
+        .split('@')
+        .next()
+        .unwrap();
+    let digest = image
+        .strip_prefix(&format!("{repository}@sha256:"))
+        .ok_or("benchmark image must use the configured ECR repository and a digest")?;
+    if digest.len() != 64
+        || !digest
+            .bytes()
+            .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
+    {
+        return Err("invalid build image digest".into());
+    }
+    Ok(build.clone())
 }
 
 fn text_arg<'a>(args: &'a Value, key: &str) -> Result<&'a str> {
@@ -262,6 +324,7 @@ fn submission_args(args: &Value) -> Result<Vec<String>> {
 }
 
 fn benchmark_args(args: &Value) -> Result<Vec<String>> {
+    let build = benchmark_build(args)?;
     let default_spec: Value =
         serde_json::from_str(include_str!("../../l2-validation.json")).unwrap();
     let spec = args.get("spec").unwrap_or(&default_spec);
@@ -286,6 +349,8 @@ fn benchmark_args(args: &Value) -> Result<Vec<String>> {
     let mut run = args.clone();
     run.as_object_mut().unwrap().remove("spec");
     run.as_object_mut().unwrap().remove("instance_type");
+    run.as_object_mut().unwrap().remove("build");
+    run["image"] = build["image_uri"].clone();
     run["cpu"] = json!(4);
     run["retries"] = json!(0);
     run["command"] = json!([
@@ -293,7 +358,9 @@ fn benchmark_args(args: &Value) -> Result<Vec<String>> {
         "-c",
         include_str!("../../run-ecbench"),
         "isolab-ecbench",
-        serde_json::to_string(spec).unwrap()
+        serde_json::to_string(spec).unwrap(),
+        build["source_revision"],
+        build["ecbench_sha256"]
     ]);
     let mut argv = submission_args(&run)?;
     argv.splice(0..0, ["--isolation-profile".into(), "l2".into()]);
@@ -644,7 +711,8 @@ mod tests {
         input["spec"] = serde_json::from_str(include_str!("../../l2-validation.json")).unwrap();
         input["spec"]["label"] = json!("$(touch /tmp/not-executed)\n'quoted'");
         let argv = benchmark_args(&input).unwrap();
-        let decoded: Value = serde_json::from_str(argv.last().unwrap()).unwrap();
+        let spec_index = argv.iter().position(|s| s == "isolab-ecbench").unwrap() + 1;
+        let decoded: Value = serde_json::from_str(&argv[spec_index]).unwrap();
         assert_eq!(decoded, input["spec"]);
         input["spec"]["measurement"]["isolation_required"] = json!("L0");
         assert!(benchmark_args(&input).is_err());
@@ -662,6 +730,30 @@ mod tests {
             &json!({"job_name":"l2-check","retries":1})
         )
         .is_err());
+    }
+    #[test]
+    fn benchmark_build_is_bound_to_commit_binary_and_repository() {
+        let default: Value = serde_json::from_str(include_str!("../../image.json")).unwrap();
+        let build = json!({"image_uri":default["image_uri"],"source_revision":"a".repeat(40),"ecbench_sha256":"b".repeat(64)});
+        let input = json!({"job_name":"commit-build","build":build});
+        let argv = benchmark_args(&input).unwrap();
+        assert!(argv
+            .windows(2)
+            .any(|a| a[0] == "--image" && a[1] == build["image_uri"].as_str().unwrap()));
+        assert_eq!(&argv[argv.len() - 2..], &["a".repeat(40), "b".repeat(64)]);
+        for bad in [
+            json!(null),
+            json!({}),
+            json!({"image_uri":"other.example/tasks@sha256:".to_owned()+&"a".repeat(64),"source_revision":"a".repeat(40),"ecbench_sha256":"b".repeat(64)}),
+            json!({"image_uri":default["image_uri"],"source_revision":"main","ecbench_sha256":"b".repeat(64)}),
+            json!({"image_uri":default["image_uri"],"source_revision":"a".repeat(40),"ecbench_sha256":"x".repeat(64)}),
+        ] {
+            assert!(benchmark_args(&json!({"job_name":"commit-build","build":bad})).is_err());
+        }
+        let mut extra = input.clone();
+        extra["build"]["command"] = json!("true");
+        assert!(benchmark_args(&extra).is_err());
+        assert!(benchmark_args(&json!({"job_name":"legacy-build"})).is_ok());
     }
     #[test]
     fn names_cannot_be_cli_options_or_paths() {

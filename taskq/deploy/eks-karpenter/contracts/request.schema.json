@@ -39,6 +39,35 @@
         "spec": {
           "description": "ecbench.spec/v1 specification; defaults to the supplied 20-bit validation fixture",
           "type": "object"
+        },
+        "build": {
+          "additionalProperties": false,
+          "description": "Optional per-run image and native build identity; omission retains the deployed image",
+          "properties": {
+            "ecbench_sha256": {
+              "maxLength": 64,
+              "minLength": 64,
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "image_uri": {
+              "maxLength": 129,
+              "pattern": "^104186811093\\.dkr\\.ecr\\.us-east-2\\.amazonaws\\.com/isolab/tasks@sha256:[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "source_revision": {
+              "maxLength": 40,
+              "minLength": 40,
+              "pattern": "^[a-f0-9]{40}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "image_uri",
+            "source_revision",
+            "ecbench_sha256"
+          ],
+          "type": "object"
         }
       },
       "required": [
@@ -59,6 +88,10 @@
           "maxLength": 2048
         },
         "run_url": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "workflow_revision": {
           "type": "string",
           "maxLength": 2048
         }

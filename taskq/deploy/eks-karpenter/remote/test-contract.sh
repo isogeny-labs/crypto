@@ -32,3 +32,35 @@ for change in "${cases[@]}"; do
   fi
 done
 printf 'Contract defaults and %s rejection cases passed\n' "${#cases[@]}"
+image=$(jq -r .image_uri "$here/../image.json")
+revision=$(printf 'a%.0s' {1..40})
+binary=$(printf 'b%.0s' {1..64})
+printf '%s\n' "$valid" | jq --arg image "$image" --arg revision "$revision" --arg binary "$binary" \
+  '.job.build={image_uri:$image,source_revision:$revision,ecbench_sha256:$binary}
+   | .provenance={source_revision:$revision}' > "$tmp/build-request.json"
+"$here/validate-request" "$tmp/build-request.json" >/dev/null
+cases=(
+  '.job.build=null'
+  '.job.build={}'
+  '.job.build.image_uri="busybox:latest"'
+  '.job.build.image_uri|=sub("104186811093";"123456789012")'
+  '.job.build.image_uri|=sub("/isolab/tasks";"/other/tasks")'
+  '.job.build.source_revision="main"'
+  '.job.build.ecbench_sha256="wrong"'
+  '.job.build.image_uri+="\n"'
+  '.job.build.source_revision+="\n" | .provenance.source_revision=.job.build.source_revision'
+  '.job.build.ecbench_sha256+="\n"'
+  '.job.build.image_uri|=sub("@sha256:";"@sha256:extra@sha256:")'
+  '.job.build.command="true"'
+  'del(.job.build.ecbench_sha256)'
+  'del(.provenance)'
+  '.provenance.source_revision="different"'
+)
+for change in "${cases[@]}"; do
+  jq "$change" "$tmp/build-request.json" > "$tmp/request.json"
+  if "$here/validate-request" "$tmp/request.json" >/dev/null 2>&1; then
+    printf 'Incorrectly accepted build: %s\n' "$change" >&2
+    exit 1
+  fi
+done
+printf 'Commit-build request and %s rejection cases passed\n' "${#cases[@]}"

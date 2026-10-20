@@ -263,6 +263,12 @@ The optional `instance_type` pins hardware within the existing Spot pool;
 omitting it lets Karpenter choose a permitted instance. There is no fallback
 to another type when a specific type is requested and unavailable.
 
+The [GitHub Actions entry point](HARNESS.md#github-actions) builds a new native
+image from the requested commit and submits its immutable digest automatically.
+The optional `build` object binds the image, source revision and executable
+SHA-256; both the pod and the launcher verify that identity. Callers that omit
+`build` retain the deployed default image.
+
 The tool requests four exclusive vCPUs, selects bootstrap profile `v4`, and runs
 `run-ecbench` with `--cpus auto`. One whole physical core measures the child;
 the remaining allocated CPUs accommodate the parent shell and harness. `--cpus inherit` would

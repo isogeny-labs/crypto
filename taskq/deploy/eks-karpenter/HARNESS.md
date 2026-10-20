@@ -49,12 +49,28 @@ The portable wrapper defaults to C8a without SMT, 4 GiB and 900 seconds, with a
 maximum deadline of 3,600 seconds. CPU count is four and measurement retries are
 zero. Requests are bounded to 64 KiB.
 
-The experiment image is digest-pinned by the deployed MCP build. Caller
-`source_revision` records who requested the experiment; it does **not** mean the
-pod runs newly compiled code from that commit. The result's native build-info
-and binary hash identify the code actually measured. Publish/redeploy a new
-image deliberately before measuring changed algorithm code. No source code or
-shell command from a request is executed by this benchmark interface.
+An optional `job.build` selects a per-run image:
+
+```json
+{
+  "image_uri": "ACCOUNT.dkr.ecr.REGION.amazonaws.com/isolab/tasks@sha256:IMAGE_DIGEST",
+  "source_revision": "FULL_40_CHARACTER_COMMIT_SHA",
+  "ecbench_sha256": "EXECUTABLE_SHA256"
+}
+```
+
+Use the deployed lab's ECR repository, a lowercase 64-character image digest
+and executable hash, and a lowercase 40-character commit SHA. In the portable
+envelope, `provenance.source_revision` must equal `job.build.source_revision`.
+GitHub Actions produces this object automatically. The pod checks the executable
+and build metadata before measuring. After downloading the results, the launcher
+checks the actual pod image digest, measured input spec, commit and executable
+hash again. A mismatch fails the experiment, even if the computation was correct.
+
+Omitting `build` preserves the deployed default image for existing callers.
+For those callers, `provenance.source_revision` identifies the caller, and the
+native build-info identifies the measured code. Neither interface executes
+source code or shell commands supplied in a benchmark request.
 
 ## Same-host MCP callers
 
@@ -106,10 +122,36 @@ operators, not a public unauthenticated service.
 ## GitHub Actions
 
 [Iso Lab experiment](../../../.github/workflows/isolab-experiment.yml) is a manual
-`workflow_dispatch` workflow. It checks out the trusted main revision, reads the
-selected repository spec, obtains temporary AWS credentials via OIDC, then calls
-the portable launcher. Workflow inputs are passed as data through environment
-variables. It is not triggered by pull requests, fork code or a schedule.
+`workflow_dispatch` workflow. `source_revision` accepts an exact commit SHA;
+omitting it builds the workflow commit. The selected spec is read from that same
+tested commit. Building changed algorithm code requires no manual image build
+or launcher deployment.
+
+```mermaid
+flowchart LR
+  S[Exact tested commit] --> B[Build job: read-only, no AWS identity]
+  B --> A[Native executable and build metadata]
+  A --> P[Trusted publisher: private ECR digest]
+  P --> C[VPC launcher]
+  C --> K[EKS pod: verify build, run L2 and replay]
+  K --> R[S3 artifacts and commit-bound receipt]
+```
+
+The build job uses Rust 1.99.1 and a static x86-64 musl executable so it runs in
+the existing runtime image independently of the GitHub runner's glibc version.
+Redis native TLS is disabled; ecbench does not use Redis TLS. Build settings
+and the compiler version are recorded in `build-info.json`.
+
+The separate publisher/experiment job runs only on the trusted main branch.
+It receives AWS credentials through OIDC, validates the build artifact as data,
+and uses the workflow revision's Dockerfile to publish the image. It never runs
+the tested executable on the AWS-authenticated GitHub runner. ECR tags include
+the commit, run ID and attempt; Kubernetes receives the resolved immutable digest.
+The request records both the tested source revision and the workflow revision.
+The build artifact is retained in GitHub for seven days; the image and S3
+experiment records are durable. A branch dispatch can validate the build job,
+but skips the AWS experiment job. Pull requests run contract checks only;
+image builds and experiments require an explicit workflow dispatch.
 
 Required repository Actions variables:
 
@@ -119,12 +161,14 @@ Required repository Actions variables:
 | `ISOLAB_RESULTS_BUCKET` | Private results bucket |
 | `ISOLAB_CODEBUILD_PROJECT` | CloudFormation `ProjectName` output |
 | `ISOLAB_TRIGGER_ROLE_ARN` | CloudFormation `TriggerRoleArn` output |
+| `ISOLAB_IMAGE_REPOSITORY` | CloudFormation `ImageRepositoryUri` output |
 
 Once the workflow is on the default branch, a harness with repository Actions
 write access can trigger it with GitHub's dispatch API or:
 
 ```sh
 gh workflow run isolab-experiment.yml --ref main \
+  -f source_revision="$(git rev-parse HEAD)" \
   -f spec_path=taskq/deploy/eks-karpenter/l2-validation.json \
   -f instance_type=c8a.2xlarge -f seconds=900
 ```
@@ -148,7 +192,9 @@ Success requires Kubernetes completion **and** the exact successful Pod UID's
 S3 manifest, payload hashes, zero exit code, accepted all-record L2 gate,
 authenticated/regraded native audit, reproduced measured replays and admitted
 A/A controls. The receipt includes Job/Pod identities, request hash and raw S3
-prefix. Raw artifacts are immutable by convention and the bucket is versioned.
+prefix. For a per-run image it also includes the verified `build` object;
+the client rejects a receipt for a different request or build.
+Raw artifacts are immutable by convention and the bucket is versioned.
 
 `failed`, `verification_failed`, `submission_unknown`, `identity_mismatch`,
 `launcher_failed` and `launcher_timed_out` are distinct non-success states.
@@ -172,6 +218,12 @@ container without privileged mode, the existing private subnets/NAT and a
 security group with no inbound rules. The EKS public endpoint allowlist stays
 unchanged. EKS access is scoped to the lab Job role plus named readiness reads.
 
+The one-time upgrade for commit builds deploys the new launcher and grants the
+existing GitHub role push access to the single configured ECR repository.
+The OIDC subject remains restricted to the repository's main branch.
+Subsequent algorithm commits only need a workflow dispatch. Changes to the
+launcher or infrastructure still need an explicit deployment.
+
 Set `AWS_REGION`, `ISOLAB_CLUSTER`, `ISOLAB_BUCKET`, `ISOLAB_MCP_BIN`,
 `ISOLAB_REMOTE_RUNTIME` (absolute private output directory),
 `ISOLAB_GITHUB_SUBJECT` (exact subject confirmed from GitHub), `KUBECONFIG` and
@@ -180,7 +232,8 @@ already exist in IAM. Run this from an authorized deployment host. Repackage and
 redeploy after changing the pinned image, MCP binary or orchestration scripts;
 changing GitHub workflow code alone does not update the deployed launcher.
 
-Validation: `remote/test-contract.sh`, ShellCheck, `cfn-lint remote/bridge.yaml`,
+Validation: `remote/test-contract.sh`, `remote/test-build-verification.sh`,
+`remote/test-publish-image.sh`, native MCP tests, ShellCheck, `cfn-lint remote/bridge.yaml`,
 and actionlint on the workflow. The portable smoke run must retain a request,
 CodeBuild status, readiness receipt, completed Job/Pod identities, native audit,
 S3 hash checks and final result. Test the actual Actions/OIDC path separately

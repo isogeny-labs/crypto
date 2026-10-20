@@ -28,13 +28,18 @@ trap finish EXIT
 trap 'exit 143' TERM
 trap 'exit 130' INT
 cp /opt/isolab/build-info.json "$ISOLAB_OUTPUT_DIR/build-info.json"
+sha256sum /usr/local/bin/ecbench > "$ISOLAB_OUTPUT_DIR/binary.sha256"
+# Validate build identity before any warmup or measured execution.
+jq -e --arg source "${2:?expected source revision}" --arg binary "${3:?expected binary hash}" \
+  '.source_revision==$source and .ecbench_sha256==$binary' \
+  "$ISOLAB_OUTPUT_DIR/build-info.json" >/dev/null || exit 44
+[[ $(cut -d' ' -f1 "$ISOLAB_OUTPUT_DIR/binary.sha256") == "$3" ]] || exit 44
 printf '%s\n' "$1" > "$ISOLAB_OUTPUT_DIR/input-spec.json"
 spec="$ISOLAB_OUTPUT_DIR/input-spec.json"
 jq -e '.schema == "ecbench.spec/v1" and .measurement.isolation_required == "L2"
   and .measurement.rounds >= 5 and .measurement.warmup >= 1
   and ([.arms[] | select(.role == "reference")] | length > 0)
   and ([.arms[] | select(.role == "control")] | length > 0)' "$spec" >/dev/null
-sha256sum /usr/local/bin/ecbench > "$ISOLAB_OUTPUT_DIR/binary.sha256"
 aws sts get-caller-identity > "$ISOLAB_OUTPUT_DIR/runner-identity.json"
 cat /proc/self/status > "$ISOLAB_OUTPUT_DIR/process-status.txt"
 cat /sys/fs/cgroup/cpuset.cpus.effective > "$ISOLAB_OUTPUT_DIR/pod-cpuset.txt"

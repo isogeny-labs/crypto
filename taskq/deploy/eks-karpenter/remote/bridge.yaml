@@ -19,6 +19,11 @@ Parameters:
   ProjectName:
     Type: String
     Default: isolab-experiment-launcher
+  ImageRepository:
+    Type: String
+    Default: isolab/tasks
+    Description: Existing private ECR repository for per-commit experiment images
+    AllowedPattern: '[a-z0-9]+([._/-][a-z0-9]+)*'
   GitHubSubject:
     Type: String
     Description: Exact GitHub OIDC subject, restricted to the trusted default branch
@@ -175,6 +180,12 @@ Resources:
               - Effect: Allow
                 Action: s3:GetObject
                 Resource: !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/launcher/*
+              - Effect: Allow
+                Action: ecr:GetAuthorizationToken
+                Resource: '*'
+              - Effect: Allow
+                Action: [ecr:BatchCheckLayerAvailability, ecr:InitiateLayerUpload, ecr:UploadLayerPart, ecr:CompleteLayerUpload, ecr:PutImage, ecr:BatchGetImage, ecr:DescribeImages]
+                Resource: !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ImageRepository}
 Outputs:
   ProjectName:
     Value: !Ref Project
@@ -182,3 +193,5 @@ Outputs:
     Value: !GetAtt GitHubRole.Arn
   LauncherRoleArn:
     Value: !GetAtt LauncherRole.Arn
+  ImageRepositoryUri:
+    Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.${AWS::URLSuffix}/${ImageRepository}
