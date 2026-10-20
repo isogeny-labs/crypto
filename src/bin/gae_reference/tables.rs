@@ -292,7 +292,7 @@ fn write_json(path: &str, v: &Value) -> Result<(), String> {
     std::fs::write(path, s).map_err(|e| format!("{path}: {e}"))
 }
 
-const ASSUMPTION: &str = "Legacy ratios were measured on another host (calibration.json: Intel Xeon @ 2.10 GHz; the K_0 / GF(2^23) row: Apple M4 Pro under load). The tuned ratio multiplies them by this host's R = ns_add_reference / ns_add_tuned and by the class (b) speedup F measured here, which assumes that (unit time) / (reference addition time) carries across hosts; derivation.<row>.units.<unit>.host_drift is this host's own ratio divided by the legacy one, and `sensitivity` summarises it.";
+const ASSUMPTION: &str = "Legacy ratios were measured on another host (calibration.json: Intel Xeon @ 2.10 GHz; the icv1-f2m23-t5197-69e76b73 row: Apple M4 Pro under load). The tuned ratio multiplies them by this host's R = ns_add_reference / ns_add_tuned and by the class (b) speedup F measured here, which assumes that (unit time) / (reference addition time) carries across hosts; derivation.<row>.units.<unit>.host_drift is this host's own ratio divided by the legacy one, and `sensitivity` summarises it.";
 
 pub fn retable_cli(args: &[String]) -> i32 {
     match retable(args) {
@@ -358,7 +358,7 @@ fn retable(args: &[String]) -> Result<(), String> {
         "host": host,
         "legacy_host": cal.get("host"),
         "assumption": ASSUMPTION,
-        "flags": {"koblitz/K_0 / GF(2^23)": "legacy ratios from an Apple M4 Pro under load 30-150, not the Xeon of every other row"},
+        "flags": {"icv1-f2m23-t5197-69e76b73": "legacy ratios from an Apple M4 Pro under load 30-150, not the Xeon of every other row"},
         "sources": sources,
         "fallback": cal.get("fallback"),
         "regenerate": "gae-reference field --from-calibration > research/tuned_gae_20261020/sweep/field.jsonl; gae-reference retable",

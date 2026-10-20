@@ -1,5 +1,5 @@
 {
-  "assumption": "Legacy ratios were measured on another host (calibration.json: Intel Xeon @ 2.10 GHz; the K_0 / GF(2^23) row: Apple M4 Pro under load). The tuned ratio multiplies them by this host's R = ns_add_reference / ns_add_tuned and by the class (b) speedup F measured here, which assumes that (unit time) / (reference addition time) carries across hosts; derivation.<row>.units.<unit>.host_drift is this host's own ratio divided by the legacy one, and `sensitivity` summarises it.",
+  "assumption": "Legacy ratios were measured on another host (calibration.json: Intel Xeon @ 2.10 GHz; the icv1-f2m23-t5197-69e76b73 row: Apple M4 Pro under load). The tuned ratio multiplies them by this host's R = ns_add_reference / ns_add_tuned and by the class (b) speedup F measured here, which assumes that (unit time) / (reference addition time) carries across hosts; derivation.<row>.units.<unit>.host_drift is this host's own ratio divided by the legacy one, and `sensitivity` summarises it.",
   "derivation": {
     "icv1-f2m13-t181-515ee569": {
       "R": 9.482899841592427,

@@ -829,7 +829,7 @@ mod tests {
         run_spec(&spec, &cfg).expect("collisions agree with the reference");
     }
 
-    /// `K_0 / GF(2^13)` from the repository's own constructor.
+    /// icv1-f2m13-t181-515ee569 (a = 0, n = 13) from the repository's own constructor.
     #[test]
     fn tuned_binary_add_matches_reference() {
         let inst = koblitz_instance(0, 13).expect("K_0 over GF(2^13)");

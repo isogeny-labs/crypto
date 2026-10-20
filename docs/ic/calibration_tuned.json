@@ -1,5 +1,5 @@
 {
-  "assumption": "Legacy ratios were measured on another host (calibration.json: Intel Xeon @ 2.10 GHz; the K_0 / GF(2^23) row: Apple M4 Pro under load). The tuned ratio multiplies them by this host's R = ns_add_reference / ns_add_tuned and by the class (b) speedup F measured here, which assumes that (unit time) / (reference addition time) carries across hosts; derivation.<row>.units.<unit>.host_drift is this host's own ratio divided by the legacy one, and `sensitivity` summarises it.",
+  "assumption": "Legacy ratios were measured on another host (calibration.json: Intel Xeon @ 2.10 GHz; the icv1-f2m23-t5197-69e76b73 row: Apple M4 Pro under load). The tuned ratio multiplies them by this host's R = ns_add_reference / ns_add_tuned and by the class (b) speedup F measured here, which assumes that (unit time) / (reference addition time) carries across hosts; derivation.<row>.units.<unit>.host_drift is this host's own ratio divided by the legacy one, and `sensitivity` summarises it.",
   "derivation": {
     "char2/random-binary-n15-b524b": {
       "R": 10.084331950905495,
@@ -1957,7 +1957,7 @@
   },
   "fallback": "An instance with no entry here keeps the factors measured on the host for that run, and the report names the units that fell back, so a row priced the old way says so.",
   "flags": {
-    "koblitz/K_0 / GF(2^23)": "legacy ratios from an Apple M4 Pro under load 30-150, not the Xeon of every other row"
+    "icv1-f2m23-t5197-69e76b73": "legacy ratios from an Apple M4 Pro under load 30-150, not the Xeon of every other row"
   },
   "gae_definition": "tuned-batched-affine-add/v1",
   "host": "Intel(R) Xeon(R) Processor @ 2.80GHz",
