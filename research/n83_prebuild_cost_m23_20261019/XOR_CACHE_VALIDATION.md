@@ -64,3 +64,27 @@ revision; their subsequent passing receipts are listed below.
 
 The broader catalog/PR checks remain separately blocked as recorded in
 `CI_STATUS_20261020.md`; N83 validation does not waive them.
+
+## Completed-card auditor and full-base continuation
+
+The new native `n83_xor_cache_audit` passed both release tests after a
+13m10s local library build (`xor-cache-audit-tests.log`). Direct native
+dependency-linked builds also passed both tests during development
+(`xor-cache-audit-direct-tests.log`, `xor-cache-audit-direct-tests-2.log`);
+the later Cargo run supplies the normal example gate. The auditor rejects
+changed models/search counters, broken visit conservation and promotion of
+unfinished progress; wall-capped endpoints receive no paired ratio.
+
+The explicit `full-m4` continuation was frozen in `FULL_M4_PROTOCOL.md`
+before implementation. `full-m4-local-tests.log` records passing release
+tests: worker **5**, general-field replay **2**, full-card fixtures **2**,
+and completed-card audit **2**. The fixtures exercise all 26 container
+calls, both native control comparisons, the prerequisite gate, a retained
+wall cap and output-reuse rejection. They copy fixture receipts and do
+not simulate cryptographic correctness. Full-base actual controls and
+replays are a separate mandatory launch gate.
+
+The continuation changes examples and study code only; the solver/library
+tree and Cargo dependencies remain identical to the fully tested Linux
+candidate. Its Linux binaries and final source hashes must be recorded
+after the current remote card ends, before the next timed run starts.

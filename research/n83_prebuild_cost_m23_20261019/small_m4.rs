@@ -1,9 +1,181 @@
-//! Frozen small-base m=4 gate; the parent owns the byte-pinned base importer.
+//! Explicit frozen m=4 policies; the parent owns the byte-pinned base importer.
 use super::*;
 use crypto_lib::cryptanalysis::binary_semaev_chain_sat::ChainedS3Encoding;
 use crypto_lib::cryptanalysis::sat::{RootPropagationResult, SolveResult, SolverProgress};
 use std::fs::File;
 use std::sync::{mpsc, Arc};
+
+#[derive(Clone, Copy)]
+enum Policy {
+    Legacy,
+    SmallCache(bool),
+    Full(bool),
+}
+impl Policy {
+    fn check(self, mode: &str, arm: &str, target: usize) -> Result<()> {
+        let valid = matches!(mode, "preflight" | "positive" | "natural")
+            && match self {
+                Self::Legacy => matches!(arm, "K2048" | "D12") && target == 0,
+                Self::SmallCache(_) => matches!(arm, "K2048" | "D12") && target <= 1,
+                Self::Full(cache) => {
+                    matches!(arm, "U" | "D")
+                        && target < 8
+                        && (mode != "positive" || target == 0)
+                        && (cache || mode == "positive")
+                }
+            };
+        if valid {
+            Ok(())
+        } else {
+            Err("m4 request outside frozen protocol".into())
+        }
+    }
+    fn cache(self) -> Option<bool> {
+        match self {
+            Self::Legacy => None,
+            Self::SmallCache(b) | Self::Full(b) => Some(b),
+        }
+    }
+    fn name(self) -> &'static str {
+        match self {
+            Self::Legacy => "small-m4/v1",
+            Self::SmallCache(_) => "small-m4-xor-cache/v1",
+            Self::Full(_) => "full-m4-common-public/v1",
+        }
+    }
+}
+fn cache_setting(cache: &str) -> Result<bool> {
+    match cache {
+        "off" => Ok(false),
+        "on" => Ok(true),
+        _ => Err("cache setting must be off or on".into()),
+    }
+}
+
+fn check_full_pair(off: &Value, on: &Value) -> Result<()> {
+    for (w, enabled) in [(off, false), (on, true)] {
+        if w["schema"] != "n83.small-m4-worker/v1"
+            || w["experiment_policy"] != "full-m4-common-public/v1"
+            || w["status"] != "PASS_CONSTRUCTED_PENDING_REPLAY"
+            || w["mode"] != "positive"
+            || w["curve_id"] != CURVE
+            || w["m"] != 4
+            || w["target_index"] != 0
+            || w["conflict_budget"] != 10000
+            || w["xor_decided_cache"] != enabled
+            || w["group_verified"] != true
+            || w["rank"] != 1
+            || w["columns"] != 16627
+            || w["points"] != 2760082
+            || w["public_corpus_sha256"] != PUBLIC_SHA256
+            || !matches!(w["arm"].as_str(), Some("U" | "D"))
+            || w["counters"]["phase"] != "Complete"
+            || !w["sat_model_blake3"]
+                .as_str()
+                .is_some_and(|s| s.len() == 64)
+        {
+            return Err("full-base control contract differs".into());
+        }
+        for k in ["candidate_id", "selected_best_total_runtime"] {
+            if w.get(k) != Some(&Value::Null) {
+                return Err("control selected candidate".into());
+            }
+        }
+    }
+    for k in [
+        "arm",
+        "source_commit",
+        "binary_sha256",
+        "source_module_blake3",
+        "source_worker_blake3",
+        "object_blake3",
+        "point_set_blake3",
+        "labeled_rows_blake3",
+        "target",
+        "sat_variables",
+        "sat_clauses",
+        "sat_xor_rows",
+        "sat_model_blake3",
+        "point_indices",
+        "sparse_row",
+        "sparse_row_blake3",
+    ] {
+        if off.get(k).is_none() || off[k] != on[k] {
+            return Err(format!("full-base control differs: {k}").into());
+        }
+    }
+    for k in [
+        "completed_conflicts",
+        "completed_decisions",
+        "completed_restarts",
+        "completed_xor_passes",
+        "completed_xor_row_ops",
+        "completed_xor_row_scans",
+    ] {
+        if off["counters"][k].as_u64().is_none() || off["counters"][k] != on["counters"][k] {
+            return Err("full-base control search differs".into());
+        }
+    }
+    let before = off["counters"]["completed_xor_repivots"]
+        .as_u64()
+        .ok_or("off visits")?;
+    let after = on["counters"]["completed_xor_repivots"]
+        .as_u64()
+        .ok_or("on visits")?;
+    let skipped = on["xor_decided_skips"].as_u64().ok_or("on skips")?;
+    if off["xor_decided_skips"] != 0 || after.checked_add(skipped) != Some(before) {
+        return Err("full-base cache conservation differs".into());
+    }
+    Ok(())
+}
+
+pub(super) fn full_control_pair(
+    off_path: &Path,
+    on_path: &Path,
+    off_replay: &Path,
+    on_replay: &Path,
+    output: &Path,
+) -> Result<()> {
+    let started = Instant::now();
+    let off_bytes = fs::read(off_path)?;
+    let on_bytes = fs::read(on_path)?;
+    let off: Value = serde_json::from_slice(&off_bytes)?;
+    let on: Value = serde_json::from_slice(&on_bytes)?;
+    check_full_pair(&off, &on)?;
+    for (w, bytes, path) in [(&off, &off_bytes, off_replay), (&on, &on_bytes, on_replay)] {
+        let r: Value = serde_json::from_slice(&fs::read(path)?)?;
+        if r["schema"] != "n83.small-m4-general-replay/v1"
+            || r["status"] != "PASS"
+            || r["rank_lower_bound"] != 1
+            || r["worker_blake3"] != blake3::hash(bytes).to_hex().as_str()
+            || r["changed_target_rejected"] != true
+            || r["changed_point_rejected"] != true
+            || r["changed_coefficient_rejected"] != true
+        {
+            return Err("full-base control replay differs".into());
+        }
+        for k in [
+            "arm",
+            "curve_id",
+            "mode",
+            "object_blake3",
+            "public_corpus_sha256",
+            "point_indices",
+        ] {
+            if r[k] != w[k] {
+                return Err("full-base replay identity differs".into());
+            }
+        }
+    }
+    write_new_json(
+        output,
+        &json!({"schema":"n83.full-m4-control-pair/v1","status":"PASS","arm":off["arm"],
+        "off_worker_blake3":blake3::hash(&off_bytes).to_hex().to_string(),"on_worker_blake3":blake3::hash(&on_bytes).to_hex().to_string(),
+        "binary_sha256":format!("{:x}",Sha256::digest(fs::read(std::env::current_exe()?)?)),
+        "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,"matched_model_and_row":true,"matched_search_work":true,
+        "row_visit_conservation":true,"candidate_id":null,"selected_best_total_runtime":null}),
+    )
+}
 
 fn append(file: &mut File, record: &Value) -> Result<()> {
     serde_json::to_writer(&mut *file, record)?;
@@ -71,7 +243,15 @@ pub(super) fn run(
     target_index: usize,
     output: &Path,
 ) -> Result<()> {
-    run_inner(mode, arm, root, corpus, target_index, output, None)
+    run_inner(
+        mode,
+        arm,
+        root,
+        corpus,
+        target_index,
+        output,
+        Policy::Legacy,
+    )
 }
 
 pub(super) fn cache_run(
@@ -83,12 +263,35 @@ pub(super) fn cache_run(
     target_index: usize,
     output: &Path,
 ) -> Result<()> {
-    let enabled = match cache {
-        "off" => false,
-        "on" => true,
-        _ => return Err("cache setting must be off or on".into()),
-    };
-    run_inner(mode, arm, root, corpus, target_index, output, Some(enabled))
+    run_inner(
+        mode,
+        arm,
+        root,
+        corpus,
+        target_index,
+        output,
+        Policy::SmallCache(cache_setting(cache)?),
+    )
+}
+
+pub(super) fn full_run(
+    cache: &str,
+    mode: &str,
+    arm: &str,
+    root: &Path,
+    corpus: &Path,
+    target_index: usize,
+    output: &Path,
+) -> Result<()> {
+    run_inner(
+        mode,
+        arm,
+        root,
+        corpus,
+        target_index,
+        output,
+        Policy::Full(cache_setting(cache)?),
+    )
 }
 
 fn run_inner(
@@ -98,14 +301,10 @@ fn run_inner(
     corpus: &Path,
     target_index: usize,
     output: &Path,
-    cache: Option<bool>,
+    policy: Policy,
 ) -> Result<()> {
-    if !matches!(mode, "preflight" | "positive" | "natural")
-        || !matches!(arm, "K2048" | "D12")
-        || target_index > usize::from(cache.is_some())
-    {
-        return Err("small m4 request outside frozen protocol".into());
-    }
+    policy.check(mode, arm, target_index)?;
+    let cache = policy.cache();
     if output.exists() {
         return Err("output already exists".into());
     }
@@ -123,7 +322,7 @@ fn run_inner(
         "candidate_id":Value::Null,"selected_best_total_runtime":Value::Null});
     let conflict_budget = if cache.is_some() { 10000 } else { 100000 };
     if let Some(enabled) = cache {
-        identity["experiment_policy"] = json!("small-m4-xor-cache/v1");
+        identity["experiment_policy"] = json!(policy.name());
         identity["xor_decided_cache"] = json!(enabled);
         identity["conflict_budget"] = json!(conflict_budget);
     }
@@ -385,6 +584,80 @@ fn run_inner(
     identity["cpu_seconds"] = json!(cpu);
     phase("worker_returned", identity.clone())?;
     write_new_json(output, &identity)
+}
+
+#[cfg(test)]
+mod policy_tests {
+    use super::*;
+    #[test]
+    fn full_policy_does_not_expand_old_commands_or_allow_off_natural_queries() {
+        for arm in ["U", "D"] {
+            for target in 0..8 {
+                assert!(Policy::Full(true).check("natural", arm, target).is_ok());
+            }
+            assert!(Policy::Full(true).check("natural", arm, 8).is_err());
+            assert!(Policy::Full(false).check("natural", arm, 0).is_err());
+            assert!(Policy::Full(false).check("positive", arm, 0).is_ok());
+            assert!(Policy::Full(true).check("positive", arm, 1).is_err());
+            assert!(Policy::SmallCache(true).check("natural", arm, 0).is_err());
+            assert!(Policy::Legacy.check("natural", arm, 0).is_err());
+        }
+        assert!(Policy::Full(true).check("natural", "D12", 0).is_err());
+        assert!(Policy::SmallCache(true).check("natural", "D12", 1).is_ok());
+        assert!(Policy::SmallCache(true).check("natural", "D12", 2).is_err());
+        assert!(Policy::Legacy.check("natural", "D12", 1).is_err());
+        assert!(cache_setting("default").is_err());
+    }
+    #[test]
+    fn full_control_gate_requires_model_work_and_cache_conservation() {
+        let mut off = json!({"schema":"n83.small-m4-worker/v1","experiment_policy":"full-m4-common-public/v1",
+            "status":"PASS_CONSTRUCTED_PENDING_REPLAY","mode":"positive","curve_id":CURVE,"arm":"U","m":4,"target_index":0,
+            "conflict_budget":10000,"xor_decided_cache":false,"group_verified":true,"rank":1,"columns":16627,"points":2760082,
+            "public_corpus_sha256":PUBLIC_SHA256,"sat_model_blake3":"0".repeat(64),"candidate_id":null,"selected_best_total_runtime":null,
+            "counters":{"phase":"Complete","completed_xor_repivots":100},"xor_decided_skips":0});
+        for k in [
+            "source_commit",
+            "binary_sha256",
+            "source_module_blake3",
+            "source_worker_blake3",
+            "object_blake3",
+            "point_set_blake3",
+            "labeled_rows_blake3",
+            "target",
+            "sat_variables",
+            "sat_clauses",
+            "sat_xor_rows",
+            "point_indices",
+            "sparse_row",
+            "sparse_row_blake3",
+        ] {
+            off[k] = json!("fixture");
+        }
+        for k in [
+            "completed_conflicts",
+            "completed_decisions",
+            "completed_restarts",
+            "completed_xor_passes",
+            "completed_xor_row_ops",
+            "completed_xor_row_scans",
+        ] {
+            off["counters"][k] = json!(0);
+        }
+        let mut on = off.clone();
+        on["xor_decided_cache"] = json!(true);
+        on["counters"]["completed_xor_repivots"] = json!(20);
+        on["xor_decided_skips"] = json!(80);
+        assert!(check_full_pair(&off, &on).is_ok());
+        let mut bad = on.clone();
+        bad["sat_model_blake3"] = json!("1".repeat(64));
+        assert!(check_full_pair(&off, &bad).is_err());
+        let mut bad = on.clone();
+        bad["xor_decided_skips"] = json!(79);
+        assert!(check_full_pair(&off, &bad).is_err());
+        let mut bad = on;
+        bad["counters"]["completed_conflicts"] = json!(1);
+        assert!(check_full_pair(&off, &bad).is_err());
+    }
 }
 
 #[cfg(test)]

@@ -1,4 +1,4 @@
-//! Independent general-field replay for the frozen K2048/D12 m=4 gate.
+//! Independent general-field replay for the explicit frozen N83 m=4 policies.
 use crypto_lib::binary_ecc::curve::point_neg;
 use crypto_lib::binary_ecc::{BinaryPoint, F2mElement};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
@@ -44,9 +44,18 @@ fn contract(receipt: &Value) -> Result<(&str, &str, usize, usize)> {
         _ => return Err("unsupported mode".into()),
     };
     let target_allowed = match receipt.get("experiment_policy") {
-        None => receipt["target_index"] == 0,
+        None => matches!(arm, "K2048" | "D12") && receipt["target_index"] == 0,
+        Some(p) if p == "full-m4-common-public/v1" => {
+            matches!(arm, "U" | "D")
+                && receipt["xor_decided_cache"].is_boolean()
+                && (mode == "positive" || receipt["xor_decided_cache"] == true)
+                && (mode != "positive" || receipt["target_index"] == 0)
+                && receipt["conflict_budget"] == 10000
+                && receipt["target_index"].as_u64().is_some_and(|n| n < 8)
+        }
         Some(p) => {
             p == "small-m4-xor-cache/v1"
+                && matches!(arm, "K2048" | "D12")
                 && receipt["xor_decided_cache"].is_boolean()
                 && receipt["conflict_budget"] == 10000
                 && receipt["target_index"].as_u64().is_some_and(|n| n <= 1)
@@ -68,6 +77,7 @@ fn contract(receipt: &Value) -> Result<(&str, &str, usize, usize)> {
     let (columns, points) = match arm {
         "K2048" => (2048, 339968),
         "D12" => (2001, 332166),
+        "U" | "D" => (16627, 2760082),
         _ => return Err("arm outside frozen policy".into()),
     };
     if receipt["columns"] != columns || receipt["points"] != points {
@@ -80,18 +90,28 @@ fn replay(base: &Path, corpus: &Path, receipt_path: &Path, output: &Path) -> Res
     let bytes = fs::read(receipt_path)?;
     let receipt: Value = serde_json::from_slice(&bytes)?;
     let (mode, arm, columns, points) = contract(&receipt)?;
-    let (object, set, sha) = if arm == "K2048" {
-        (
+    let (object, set, sha) = match arm {
+        "K2048" => (
             "82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851",
             "d528f5828a05a00add4252212bc909ece481f33093e4074ff7dd8c6a51d3c97e",
             "aacb62784dee0c9f5e06328dbb85a4b6a1c7243e778328da82900e7284f3a74a",
-        )
-    } else {
-        (
+        ),
+        "D12" => (
             "aea278aff2d79a592d5164d7437ddde8f8e9377fa481058dfc16afa176a31389",
             "fb8ea2ecfeb245a90fecd5506dfc01592916b4ebec756d5fea7cbdd0c25537ce",
             "c5de0b26e84ad80bfb7be6a214b89c9682e356effb6079c7abf28cd1151ffb03",
-        )
+        ),
+        "U" => (
+            "1aa70cc1571f4cb25af42936699378329128a869f2ae8ad35efb375663d4e59d",
+            "564c6bb72b346b73112240bb0bddc4ef68b7525f7ef2556d6046e52c32f976e0",
+            "2457a977ea9c05a11cc60878bdb3b29f6d905dc8db9aa26e52913a702d308369",
+        ),
+        "D" => (
+            "e0c24980207cbb15fa57ec76bcfc6a628a763a80834cba1117ca83ea04678682",
+            "8c1c245cda15bdd0019b487a5535a3b7eac642c259c4dc0bae25875d87d345b0",
+            "347d465bef217ae5f76e9b664710440a735a26211bf3957c4be4bcb4b46345a7",
+        ),
+        _ => return Err("base outside replay policy".into()),
     };
     if receipt["object_blake3"] != object || receipt["point_set_blake3"] != set {
         return Err("object or set identity differs".into());
@@ -278,6 +298,23 @@ mod tests {
         r["conflict_budget"] = json!(10000);
         assert!(contract(&r).is_ok());
         r["target_index"] = json!(2);
+        assert!(contract(&r).is_err());
+        r["experiment_policy"] = json!("full-m4-common-public/v1");
+        assert!(contract(&r).is_err());
+        r["arm"] = json!("D");
+        r["columns"] = json!(16627);
+        r["points"] = json!(2760082);
+        r["target_index"] = json!(7);
+        assert!(contract(&r).is_ok());
+        r["target_index"] = json!(8);
+        assert!(contract(&r).is_err());
+        r["target_index"] = json!(0);
+        r["xor_decided_cache"] = json!(false);
+        assert!(contract(&r).is_err());
+        r["mode"] = json!("positive");
+        r["status"] = json!("PASS_CONSTRUCTED_PENDING_REPLAY");
+        assert!(contract(&r).is_ok());
+        r["experiment_policy"] = json!("small-m4-xor-cache/v1");
         assert!(contract(&r).is_err());
         r["status"] = json!("PASS_CONSTRUCTED_PENDING_REPLAY");
         r["mode"] = json!("natural");
