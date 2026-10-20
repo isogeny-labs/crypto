@@ -69,6 +69,17 @@ the unchanged affine arm and is excluded from comparison. Reproduce the
 corrected run and native analysis with:
 
 ```sh
+cd research/five_leads_e2e_20261019
+tar --zstd -xf sessions_projective_chart_v2.tar.zst
+tar --zstd -xf sessions_projective_chart_unsealed_v1.tar.zst
+cd ../..
+```
+
+The archives preserve the raw runs. To rerun rather than audit their recorded
+outputs, choose new output directories; ecbench refuses to overwrite a sealed
+session. The original commands were:
+
+```sh
 sh research/five_leads_e2e_20261019/make_genus2_projective_specs.sh
 for bits in 16 20 24 28 32 36 40; do
   target/release/ecbench run --spec research/five_leads_e2e_20261019/specs/genus2-projective-chart-v1/order-genus-$bits.json --out research/five_leads_e2e_20261019/sessions_projective_chart_v2/order-genus-$bits --cpus none --allow-busy --settle 0 --lock /tmp/crypto-five-leads-projective-chart-v2-$bits.lock --quiet
