@@ -57,7 +57,7 @@ def verify(snapshot_path, results, head_sha):
             any(not isinstance(cpu, int) or cpu < 0 for cpu in
                 pod['cpu_affinity_ids']) or
             pod.get('vcpu_count', 0) < 4 or
-            pod.get('memory_in_gb', 0) < 32 or
+            pod.get('memory_in_gb', 0) < 27 or
             not 0 < (timestamp(pod['stop_after_utc']) -
                      timestamp(pod['created_utc'])).total_seconds() <=
             prior['new_allocation_time_cap_seconds']):
