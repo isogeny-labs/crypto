@@ -1,0 +1,17 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp29-t47-14392892 | 28.25 | ic-mitm | 8/8 | 20.374 | 23.693 | 53.566 | — |
+| icv1-fp29-t47-1f934956 | 28.25 | ic-mitm | 8/8 | 19.870 | 23.088 | 52.056 | — |
+| icv1-fp29-t47-14392892 | 28.25 | rho-neg | 8/8 | 0.934 | 1.025 | 1.846 | — |
+| icv1-fp29-t47-1f934956 | 28.25 | rho-neg | 8/8 | 1.007 | 1.106 | 1.993 | — |
+| icv1-fp29-t47-14392892 | 28.25 | rho-neg-aa | 8/8 | 0.934 | 1.025 | 1.846 | — |
+| icv1-fp29-t47-1f934956 | 28.25 | rho-neg-aa | 8/8 | 1.007 | 1.106 | 1.993 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp29-t47-14392892 | ic-mitm vs rho-neg | rho-neg < ic-mitm |
+| icv1-fp29-t47-14392892 | ic-mitm vs rho-neg-aa | rho-neg-aa < ic-mitm |
+| icv1-fp29-t47-1f934956 | ic-mitm vs rho-neg | rho-neg < ic-mitm |
+| icv1-fp29-t47-1f934956 | ic-mitm vs rho-neg-aa | rho-neg-aa < ic-mitm |
+| icv1-fp29-t47-14392892 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp29-t47-1f934956 | rho-neg vs rho-neg-aa | unresolved inside the band |
