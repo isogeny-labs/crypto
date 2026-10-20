@@ -84,6 +84,14 @@ def verify(root):
             source.get("hashes") != hashes or
             source.get("source_sha256") != runner.SOURCE_SHA256 or
             source.get("runner_sha256") != runner.parent.digest(HERE / "run.py") or
+            source.get("generator_sha256") !=
+            runner.parent.digest(HERE / "generate_fresh.py") or
+            source.get("selector_sha256") !=
+            runner.parent.digest(HERE / "select.py") or
+            source.get("trigger_guard_sha256") !=
+            runner.parent.digest(HERE / "check_trigger.py") or
+            source.get("pod_launcher_sha256") !=
+            runner.parent.digest(HERE / "launch_on_pod.sh") or
             source.get("screen_targets_sha256") != runner.SCREEN_TARGETS_SHA256 or
             source.get("screen_answers_sha256") != runner.SCREEN_ANSWERS_SHA256 or
             source.get("fixture_manifest_sha256") !=
