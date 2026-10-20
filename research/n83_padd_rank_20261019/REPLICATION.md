@@ -42,3 +42,15 @@ This run is frozen before its timing starts:
   permission) and does not work around a deliberate disable. The replication run has
   **not started**; it needs the owner to re-enable the workflow (or say which other
   way to run it). Nothing in this file is a result.
+
+## Correction (2026-10-20, after the second merge of `main`, head `058937890`)
+
+The note above says `main` changed neither `koblitz_index_calculus` nor the other
+modules the measured path calls. That held for the first merge (`0124cca3b`). The
+second merge brought in `src/cryptanalysis/koblitz_index_calculus.rs` changes
+(commits `aebe1f0f7`, `dcb07e6cd`). Every hunk is inside `PairSumTable`,
+`ScanScratch` or `mod tests` (the new struct fields and the folding-kernel scan
+path); none is in `KoblitzCurve::new` or `find_irreducible_sparse_wide`, the only
+functions of that file the producer calls. So the producer's executed path is
+unchanged, but the file is not, and the linked binary differs. This is another
+reason the replication on the merged head is wanted and is still not run.
