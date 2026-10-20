@@ -48,6 +48,15 @@ class AllocationPreflightTest(unittest.TestCase):
         self.assertGreater(allocate_runpod.FAILED_ALLOCATION_RESERVE_USD,
                            Decimal("0.025"))
 
+    def test_closed_campaign_rejects_before_provider_mutation(self):
+        at = dt.datetime(2026, 10, 20, 16, tzinfo=dt.timezone.utc)
+        with (mock.patch.object(allocate_runpod, "utc_now", return_value=at),
+              mock.patch.object(allocate_runpod, "provider_pods") as provider):
+            with self.assertRaisesRegex(ValueError, "campaign closed"):
+                allocate_runpod.allocate(self.aggregate, self.archive,
+                                         self.termination, self.output, "key")
+        provider.assert_not_called()
+
     def test_partial_provider_response_retires_allocated_pod(self):
         at = dt.datetime(2026, 10, 20, 4, 57, tzinfo=dt.timezone.utc)
         raw = {"id": "partial123", "createdAt": None, "costPerHr": 0.18}

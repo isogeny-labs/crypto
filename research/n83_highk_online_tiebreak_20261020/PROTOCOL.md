@@ -156,6 +156,17 @@ independent replay, provider identity and spend, exact trigger bytes, each
 target's scalar and four-point sum, resource receipts, and the selector.
 Keep `BOUNDED_UNKNOWN` if any replay or Tier 1 admission gate fails.
 
+The executed screen and its independent replay are recorded in
+`results/runpod_20261020/RESULT.md`. The Pod remained reachable beyond its
+requested stop time; its provider-absence receipt was recorded at
+`2026-10-20T15:58:56.317004Z`. The campaign's conservative upper spend then
+exceeded the approved $5 cap. The current allocator fails closed after that
+receipt. Historical snapshot verification uses the SHA-pinned
+`evidence/allocate_runpod_at_dispatch.py` bytes, retaining exact replay of
+the earlier allocation. A future cloud protocol must persist an external
+watchdog across agent turns and verify actual provider absence at the budget
+deadline rather than relying on the requested stop timestamp.
+
 ## Conditional one-target confirmation
 
 If and only if independent local replay of this tie-break records one

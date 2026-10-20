@@ -27,6 +27,7 @@ FAILED_V2_RESERVE_USD = Decimal("0.05")
 UNCERTAIN_ALLOCATION_READBACK_ATTEMPTS = 6
 UNCERTAIN_ALLOCATION_READBACK_DELAY_SECONDS = 2
 EVIDENCE = Path(__file__).with_name("evidence")
+CAMPAIGN_CLOSED_UTC = runpod_provider.timestamp("2026-10-20T15:58:56.317004+00:00")
 
 
 def utc_now():
@@ -95,6 +96,8 @@ def failed_v2_evidence(at):
 
 
 def preflight(prior_aggregate, prior_archive, prior_termination, output):
+    if utc_now() >= CAMPAIGN_CLOSED_UTC:
+        raise ValueError("N83 RunPod campaign closed after conservative $5 cap overrun")
     trigger = check_trigger.check(prior_aggregate, prior_archive)
     terminated = json.loads(prior_termination.read_text())
     unresolved = EVIDENCE / "unresolved_allocation.json"

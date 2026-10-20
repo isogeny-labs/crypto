@@ -27,8 +27,11 @@ def timestamp(value):
 
 
 def controller_digest():
-    path = Path(__file__).with_name("allocate_runpod.py")
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    path = Path(__file__).with_name("evidence") / "allocate_runpod_at_dispatch.py"
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    if digest != "50f00aa8f0cfb33728e26081a39fd191e06f5105536a4cf26a7a273357e202af":
+        raise ValueError("archived allocator differs from dispatch source")
+    return digest
 
 
 def verify(snapshot_path, results, head_sha):
