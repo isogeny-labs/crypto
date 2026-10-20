@@ -90,9 +90,10 @@ fn advance_counts(previous: &[BigUint], degree: usize, irreducibles: &BigUint) -
         .collect()
 }
 
-/// `CostModel::log2_jacobian_op_mults` replayed from the registry: linear in
-/// `log2 g` between the elliptic point and the measured genera, then the
-/// extrapolation exponent past the last one.
+/// `log2` of the field multiplications in one genus-`g` Jacobian operation,
+/// read from the measured `(g, mults)` points of the transfer report's cost
+/// model: linear in `log2 g` between points, `g^e` past the last one. An
+/// independent re-implementation of `CostModel::log2_jacobian_op_mults`.
 fn log2_jacobian_op_mults(model: &Value, log2_genus: f64) -> f64 {
     let elliptic = (
         0.0,
@@ -101,12 +102,11 @@ fn log2_jacobian_op_mults(model: &Value, log2_genus: f64) -> f64 {
     let measured = model["jacobian_group_op_mults_measured"]
         .as_array()
         .unwrap();
-    let points = std::iter::once(elliptic).chain(measured.iter().map(|pair| {
-        (
-            pair[0].as_f64().unwrap().log2(),
-            pair[1].as_f64().unwrap().log2(),
-        )
-    }));
+    let points = std::iter::once(elliptic).chain(
+        measured
+            .iter()
+            .map(|p| (p[0].as_f64().unwrap().log2(), p[1].as_f64().unwrap().log2())),
+    );
     let mut prev: Option<(f64, f64)> = None;
     for (x, y) in points {
         if log2_genus <= x + 1e-12 {
