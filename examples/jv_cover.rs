@@ -16,8 +16,8 @@ use std::fs;
 use crypto_lib::cryptanalysis::jv_cover::{
     run_cover_ccov, run_cover_dlp, run_rho_dp, CcovReport, CoverDlpReport, RhoDpReport,
 };
-use crypto_lib::cryptanalysis::jv_sieve::{run_cover_sieve_dlp, SieveDlpReport};
 use crypto_lib::cryptanalysis::jv_rho_strong::{run_strong_rho, StrongOpts, StrongRun};
+use crypto_lib::cryptanalysis::jv_sieve::{run_cover_sieve_dlp, SieveDlpReport};
 use rayon::prelude::*;
 use serde::Serialize;
 
@@ -100,7 +100,12 @@ fn main() {
     if exp == "rhostrong" {
         // one single-threaded run per instance seed, instances in parallel
         for &p in &sizes {
-            let opts = StrongOpts { negation: neg, batch, dp_bits, r: rwalk };
+            let opts = StrongOpts {
+                negation: neg,
+                batch,
+                dp_bits,
+                r: rwalk,
+            };
             let mut rs: Vec<StrongRun> = (first_seed..first_seed + seeds)
                 .into_par_iter()
                 .map(|seed| run_strong_rho(p, seed, run_idx, opts))

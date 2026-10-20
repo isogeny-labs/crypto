@@ -33,7 +33,7 @@ use rand::{Rng, SeedableRng};
 use serde::Serialize;
 
 use super::gaudry_cubic::mm;
-use super::jv_cover::{generate_spec, unit_costs, Ctx, EllE, Fq3, Fld, Spec, E2, E6, PtE6};
+use super::jv_cover::{generate_spec, unit_costs, Ctx, EllE, Fld, Fq3, PtE6, Spec, E2, E6};
 use super::residual_walk::{inv_mod, mix64};
 
 type X6 = [u64; 6];
@@ -285,7 +285,10 @@ impl Arith {
         }
         let x2 = self.sq(&p1.x);
         let a2x = self.mul(&self.add(&self.a2, &self.a2), &p1.x);
-        let num = self.add(&self.add(&self.add(&x2, &self.add(&x2, &x2)), &a2x), &self.a4);
+        let num = self.add(
+            &self.add(&self.add(&x2, &self.add(&x2, &x2)), &a2x),
+            &self.a4,
+        );
         let den = self.inv(&self.add(&p1.y, &p1.y));
         let lam = self.mul(&num, &den);
         let l2 = self.sq(&lam);
@@ -342,7 +345,9 @@ fn from_x6(x: &X6) -> E6 {
 fn hash_x(x: &X6) -> u64 {
     let mut h = 0u64;
     for (i, &v) in x.iter().enumerate() {
-        h ^= v.wrapping_mul(0x9E37_79B9_7F4A_7C15 >> (i * 3)).rotate_left(11 * i as u32);
+        h ^= v
+            .wrapping_mul(0x9E37_79B9_7F4A_7C15 >> (i * 3))
+            .rotate_left(11 * i as u32);
     }
     mix64(h)
 }
@@ -401,6 +406,21 @@ struct Walker {
 }
 const CYCLE_WINDOW: usize = 8;
 
+/// Recover from equal x coordinates, accounting for the two possible y signs.
+/// A zero denominator is an uninformative collision, not a recovered scalar.
+fn collision_scalar(n: u64, same_y: bool, a: u64, b: u64, a2: u64, b2: u64) -> Option<u64> {
+    let (num, den) = if same_y {
+        (
+            ((a2 as u128 + n as u128 - a as u128) % n as u128) as u64,
+            ((b as u128 + n as u128 - b2 as u128) % n as u128) as u64,
+        )
+    } else {
+        let sum = ((a as u128 + a2 as u128) % n as u128) as u64;
+        ((n - sum) % n, ((b as u128 + b2 as u128) % n as u128) as u64)
+    };
+    (den != 0).then(|| mm(num, inv_mod(den, n), n))
+}
+
 /// One run of an arm on the instance `(p, instance_seed)`.
 pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun {
     let start = Instant::now();
@@ -424,7 +444,9 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
     let g = to_pt(&spec.g);
     let q = to_pt(&spec.q);
     let mut rng = StdRng::seed_from_u64(
-        seed.wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ run.wrapping_mul(0xD1B5_4A32_D192_ED03) ^ 0x57_20,
+        seed.wrapping_mul(0x9E37_79B9_7F4A_7C15)
+            ^ run.wrapping_mul(0xD1B5_4A32_D192_ED03)
+            ^ 0x57_20,
     );
     // setup counted into setup_adds: take the delta of group operations
     let mut setup_ops = 0u64;
@@ -460,17 +482,13 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
         } else {
             ar.c.fp_adds += 6;
             ar.c.scalar_ops += 2;
-            (
-                Pt { x: pt.x, y: ny },
-                (n - a) % n,
-                (n - b) % n,
-            )
+            (Pt { x: pt.x, y: ny }, (n - a) % n, (n - b) % n)
         }
     };
     let mask = (1u64 << o.dp_bits) - 1;
     let tail_cap = 20u64 << o.dp_bits;
     let cap = 64 * (n as f64).sqrt() as u64 + 1_000_000;
-    let mut table: HashMap<X6, (u64, u64)> = HashMap::new();
+    let mut table: HashMap<X6, (X6, u64, u64)> = HashMap::new();
     let mut found: Option<u64> = None;
     let mut steps = 0u64;
     let (mut restarts, mut cycles_found, mut self_coll) = (0u64, 0u64, 0u64);
@@ -502,7 +520,9 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
             .map(|w| (hash_x(&w.pt.x) % o.r as u64) as usize)
             .collect();
         ar.c.hash += k as u64;
-        let dxs: Vec<X6> = (0..k).map(|i| ar.sub(&mults[js[i]].2.x, &ws[i].pt.x)).collect();
+        let dxs: Vec<X6> = (0..k)
+            .map(|i| ar.sub(&mults[js[i]].2.x, &ws[i].pt.x))
+            .collect();
         let special: Vec<bool> = dxs.iter().map(|d| *d == [0; 6]).collect();
         // Montgomery's trick over the non-special walkers
         let idx: Vec<usize> = (0..k).filter(|&i| !special[i]).collect();
@@ -559,6 +579,7 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
             // doubling its point of smallest x (Bos–Kleinjung–Lenstra)
             if o.negation {
                 let hn = hash_x(&npt.x);
+                ar.c.hash += 1;
                 ar.c.cycle_cmp += ws[i].hist.len() as u64;
                 // hist[0] is the newest; distance d means P_{t+1} = P_{t+1-d}
                 let hit = ws[i]
@@ -578,14 +599,14 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
                     }
                     if let Some(dd) = ar.dbl(&best.0) {
                         ar.c.scalar_ops += 2;
-                        let (dd, da, db) =
-                            canon(&mut ar, dd, (2 * best.1) % n, (2 * best.2) % n);
+                        let (dd, da, db) = canon(&mut ar, dd, (2 * best.1) % n, (2 * best.2) % n);
                         npt = dd;
                         a = da;
                         b = db;
                     }
                     ws[i].hist.clear();
                 }
+                ar.c.hash += 1;
                 ws[i].hist.push_front((hash_x(&npt.x), npt, a, b));
                 ws[i].hist.truncate(CYCLE_WINDOW);
             }
@@ -595,13 +616,13 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
             ws[i].tail += 1;
             ar.c.dp_check += 1;
             let h = hash_x(&npt.x);
+            ar.c.hash += 1;
             if (h >> 20) & mask == 0 {
                 ar.c.table_ops += 1;
-                if let Some(&(a2, b2)) = table.get(&npt.x) {
-                    let db = (ws[i].b + n - b2) % n;
-                    if db != 0 {
-                        let da = (a2 + n - ws[i].a) % n;
-                        found = Some(mm(da, inv_mod(db, n), n));
+                if let Some(&(y2, a2, b2)) = table.get(&npt.x) {
+                    if let Some(scalar) = collision_scalar(n, npt.y == y2, ws[i].a, ws[i].b, a2, b2)
+                    {
+                        found = Some(scalar);
                         break 'main;
                     }
                     self_coll += 1;
@@ -609,7 +630,7 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
                     ws[i] = new_walker(&mut ar, &mut rng, &mut setup_ops);
                     continue;
                 }
-                table.insert(npt.x, (ws[i].a, ws[i].b));
+                table.insert(npt.x, (npt.y, ws[i].a, ws[i].b));
                 ws[i].tail = 0;
             } else if ws[i].tail > tail_cap {
                 restarts += 1;
@@ -663,6 +684,30 @@ pub fn run_strong_rho(p: u64, seed: u64, run: u64, o: StrongOpts) -> StrongRun {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn opposite_points_recover_the_same_scalar() {
+        // With d=7 modulo 101, (1,1) is 8G and (79,2) is -8G.
+        // Treating them as equal points would return 23 instead of 7.
+        assert_eq!(collision_scalar(101, false, 1, 1, 79, 2), Some(7));
+        assert_eq!(collision_scalar(101, true, 1, 1, 95, 2), Some(7));
+        assert_eq!(collision_scalar(101, true, 1, 1, 1, 1), None);
+        assert_eq!(collision_scalar(101, false, 1, 1, 100, 100), None);
+        for a in 0..101 {
+            for b in 1..101 {
+                let a2 = 13;
+                // Independent brute-force point-coefficient oracle.
+                for same in [false, true] {
+                    let point = (a + 7 * b) % 101;
+                    let other = if same { point } else { (101 - point) % 101 };
+                    let b2 = (0..101).find(|&v| (a2 + 7 * v) % 101 == other).unwrap();
+                    if let Some(d) = collision_scalar(101, same, a, b, a2, b2) {
+                        assert_eq!(d, 7);
+                    }
+                }
+            }
+        }
+    }
 
     #[test]
     fn native_arithmetic_matches_the_harness() {
