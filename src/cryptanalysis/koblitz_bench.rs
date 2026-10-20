@@ -70,7 +70,7 @@ use crate::cryptanalysis::koblitz_index_calculus::{
     build_frobenius_factor_base, enumerate_decompose, groebner_decompose, invariant_subspace_basis,
     order_of_2_mod_n, sat_decompose, KoblitzCurve,
 };
-use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crate::cryptanalysis::pq_groebner_f2::{bit, F2BoolMono, F2BoolPoly, Mask, MASK_BITS};
 
 /// Unknowns in the chained `m`-point decomposition system: `m·ℓ`
 /// subspace coordinates plus `(m − 2)·n` for the intermediate points.
@@ -792,9 +792,9 @@ pub fn random_control_system(
             let monos: Vec<F2BoolMono> = (0..terms_per_eq.max(1))
                 .map(|_| {
                     let d = 1 + rng.gen::<u32>() % degree.max(1);
-                    let mut mask = 0u64;
+                    let mut mask: Mask = 0;
                     while mask.count_ones() < d {
-                        mask |= 1u64 << (rng.gen::<u32>() % n_vars as u32);
+                        mask |= bit(rng.gen::<u32>() % n_vars as u32);
                     }
                     F2BoolMono::from_mask(mask)
                 })
@@ -1592,8 +1592,9 @@ pub fn sparse_closure_refutes(
 
     // Higher degree first; ties by mask.  Rows are ascending in this order,
     // so the leading monomial is row[0].
-    let cmp = |a: &u64, b: &u64| -> Ordering { b.count_ones().cmp(&a.count_ones()).then(a.cmp(b)) };
-    let xor = |a: &[u64], b: &[u64]| -> Vec<u64> {
+    let cmp =
+        |a: &Mask, b: &Mask| -> Ordering { b.count_ones().cmp(&a.count_ones()).then(a.cmp(b)) };
+    let xor = |a: &[Mask], b: &[Mask]| -> Vec<Mask> {
         let mut out = Vec::with_capacity(a.len() + b.len());
         let (mut i, mut j) = (0, 0);
         while i < a.len() && j < b.len() {
@@ -1619,15 +1620,15 @@ pub fn sparse_closure_refutes(
     let occurring = system
         .iter()
         .flat_map(|p| p.terms.iter())
-        .fold(0u64, |acc, t| acc | t.mask);
-    let vars: Vec<u64> = (0..64)
+        .fold(0 as Mask, |acc, t| acc | t.mask);
+    let vars: Vec<Mask> = (0..MASK_BITS as u32)
         .filter(|i| occurring >> i & 1 == 1)
-        .map(|i| 1u64 << i)
+        .map(bit)
         .collect();
     // Monomials of degree 1..=k over the occurring variables.
-    let monomials_up_to = |k: u32| -> Vec<u64> {
+    let monomials_up_to = |k: u32| -> Vec<Mask> {
         let mut out = Vec::new();
-        let mut frontier = vec![(0u64, 0usize)];
+        let mut frontier = vec![(0 as Mask, 0usize)];
         for _ in 0..k {
             let mut next = Vec::new();
             for &(m, start) in &frontier {
@@ -1642,7 +1643,7 @@ pub fn sparse_closure_refutes(
     };
 
     let (cols, rows) = build_macaulay_sparse(system, n_vars, degree)?;
-    let mut pivots: HashMap<u64, Vec<u64>> = HashMap::new();
+    let mut pivots: HashMap<Mask, Vec<Mask>> = HashMap::new();
     let mut entries = 0usize;
     let mut out = SparseClosure {
         degree,
@@ -1653,17 +1654,17 @@ pub fn sparse_closure_refutes(
         products: 0,
         max_weight: 0,
     };
-    let mut queue: Vec<Vec<u64>> = Vec::new();
+    let mut queue: Vec<Vec<Mask>> = Vec::new();
 
     // Insert one row; a new fall goes on the queue.  `false` on the cap.
-    let mut insert = |mut row: Vec<u64>,
-                      pivots: &mut HashMap<u64, Vec<u64>>,
-                      queue: &mut Vec<Vec<u64>>,
+    let mut insert = |mut row: Vec<Mask>,
+                      pivots: &mut HashMap<Mask, Vec<Mask>>,
+                      queue: &mut Vec<Vec<Mask>>,
                       out: &mut SparseClosure|
      -> bool {
         row.sort_unstable_by(cmp);
         // Boolean products can repeat a monomial; equal pairs cancel.
-        let mut dedup: Vec<u64> = Vec::with_capacity(row.len());
+        let mut dedup: Vec<Mask> = Vec::with_capacity(row.len());
         for m in row {
             if dedup.last() == Some(&m) {
                 dedup.pop();
@@ -1699,7 +1700,7 @@ pub fn sparse_closure_refutes(
     };
 
     for r in rows {
-        let row: Vec<u64> = r.iter().map(|&c| cols[c as usize]).collect();
+        let row: Vec<Mask> = r.iter().map(|&c| cols[c as usize]).collect();
         if !insert(row, &mut pivots, &mut queue, &mut out) {
             return None;
         }
@@ -1708,7 +1709,7 @@ pub fn sparse_closure_refutes(
             return Some(out);
         }
     }
-    let mut multipliers: HashMap<u32, Vec<u64>> = HashMap::new();
+    let mut multipliers: HashMap<u32, Vec<Mask>> = HashMap::new();
     while let Some(fall) = queue.pop() {
         let room = degree - fall[0].count_ones();
         let ts = multipliers
@@ -1717,7 +1718,7 @@ pub fn sparse_closure_refutes(
             .clone();
         for t in ts {
             out.products += 1;
-            let product: Vec<u64> = fall.iter().map(|&m| m | t).collect();
+            let product: Vec<Mask> = fall.iter().map(|&m| m | t).collect();
             if !insert(product, &mut pivots, &mut queue, &mut out) {
                 return None;
             }
@@ -2025,6 +2026,10 @@ pub fn rref_f2_legacy(matrix: &mut [Vec<u64>], n_cols: usize, word_ops: &mut u64
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     /// The exact counter is the count an exhaustive evaluation of the
     /// built system gives, on every draw of every small cell -- the check
@@ -2047,7 +2052,7 @@ mod tests {
                 );
                 let sys = build_decomposition_system(&basis, &x_r, &b, 3, &st).unwrap();
                 let exhaustive = (0u64..1 << sys.n_vars)
-                    .filter(|&a| sys.equations.iter().all(|p| p.eval(a) == 0))
+                    .filter(|&a| sys.equations.iter().all(|p| p.eval(mask_from64(a)) == 0))
                     .count() as u64;
                 let counted = chained_s3_solution_count(&basis, &x_r, &b, &irr);
                 assert_eq!(counted, exhaustive, "n={n} ℓ={ell}");
@@ -2081,7 +2086,7 @@ mod tests {
                 let sys = build_decomposition_system(&basis, &x_r, &b, 4, &st).unwrap();
                 assert_eq!(sys.n_vars, 2 * n as usize + 4 * ell);
                 let exhaustive = (0u64..1 << sys.n_vars)
-                    .filter(|&a| sys.equations.iter().all(|p| p.eval(a) == 0))
+                    .filter(|&a| sys.equations.iter().all(|p| p.eval(mask_from64(a)) == 0))
                     .count() as u64;
                 let counted = chained_solution_count(4, &basis, &x_r, &b, &irr);
                 assert_eq!(counted, exhaustive, "n={n} ℓ={ell}");
@@ -2210,8 +2215,12 @@ mod tests {
         use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
         // The constructed control: closure refutes at 3, not at 2.
         let n = 9;
-        let x = |i: usize| F2BoolMono { mask: 1u64 << i };
-        let mono = |m: u64| F2BoolMono { mask: m };
+        let x = |i: usize| F2BoolMono {
+            mask: mask_from64(1u64 << i),
+        };
+        let mono = |m: u64| F2BoolMono {
+            mask: mask_from64(m),
+        };
         let poly = |terms: Vec<F2BoolMono>| F2BoolPoly { terms, n_vars: n };
         let t3 = |a: usize, b: usize, c: usize| mono((1 << a) | (1 << b) | (1 << c));
         let f1 = poly(vec![t3(0, 1, 2), t3(3, 4, 5)]);

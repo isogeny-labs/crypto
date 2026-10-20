@@ -49,6 +49,7 @@ use crypto_lib::cryptanalysis::koblitz_symmetrised::{
 };
 use crypto_lib::cryptanalysis::polynomial_reuse::build_decomposition_system_reusing;
 use crypto_lib::cryptanalysis::pq_descent_symbolic::descend;
+use crypto_lib::cryptanalysis::pq_groebner_f2::mask_low64;
 use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
 use crypto_lib::cryptanalysis::semaev_decomp::{Gf2, SubspaceOracle};
 use crypto_lib::cryptanalysis::semaev_leading_form::{semaev, F2Poly};
@@ -74,7 +75,7 @@ fn fp_decomp(fp: Fp, d: &Option<Vec<usize>>) -> Fp {
 fn fp_poly(fp: Fp, p: &F2BoolPoly) -> Fp {
     let mut fp = fp.usize(p.n_vars).usize(p.terms.len());
     for t in &p.terms {
-        fp = fp.u64(t.mask);
+        fp = fp.u64(mask_low64(t.mask));
     }
     fp
 }

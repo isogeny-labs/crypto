@@ -38,7 +38,7 @@ use crypto_lib::cryptanalysis::koblitz_groebner::{
     macaulay_profile, sym_semaev_s3, FieldStructure, SymElement,
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible;
-use crypto_lib::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crypto_lib::cryptanalysis::pq_groebner_f2::{mask_low64, F2BoolMono, F2BoolPoly};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
@@ -332,7 +332,7 @@ fn macaulay_shape(sys: &System, nv: usize, d: u32) -> (Vec<(u64, usize)>, HashSe
         let mut mults = Vec::new();
         monomials_up_to(nv, d - pdeg, &mut mults);
         for m in mults {
-            let mut all: Vec<u64> = p.terms.iter().map(|t| t.mask | m).collect();
+            let mut all: Vec<u64> = p.terms.iter().map(|t| mask_low64(t.mask) | m).collect();
             all.sort_unstable();
             let mut row_nonempty = false;
             let mut i = 0;
@@ -618,7 +618,7 @@ fn rank_bits(mut m: Vec<Vec<u64>>, cols: usize) -> usize {
 
 /// The columns (with parity cancellation) of one Macaulay row.
 fn row_columns(p: &F2BoolPoly, m: u64) -> Vec<u64> {
-    let mut all: Vec<u64> = p.terms.iter().map(|t| t.mask | m).collect();
+    let mut all: Vec<u64> = p.terms.iter().map(|t| mask_low64(t.mask) | m).collect();
     all.sort_unstable();
     let mut out = Vec::new();
     let mut i = 0;
@@ -849,10 +849,14 @@ fn main() {
                 let mut invariant = true;
                 for (ei, p) in sys.eqs.iter().enumerate() {
                     let target = &sys.eqs[shift_eq(&sys, &lay, ei, &index)];
-                    let mut shifted: Vec<u64> =
-                        p.terms.iter().map(|t| lay.shift_mask(t.mask)).collect();
+                    let mut shifted: Vec<u64> = p
+                        .terms
+                        .iter()
+                        .map(|t| lay.shift_mask(mask_low64(t.mask)))
+                        .collect();
                     shifted.sort_unstable();
-                    let mut tgt: Vec<u64> = target.terms.iter().map(|t| t.mask).collect();
+                    let mut tgt: Vec<u64> =
+                        target.terms.iter().map(|t| mask_low64(t.mask)).collect();
                     tgt.sort_unstable();
                     if shifted != tgt {
                         invariant = false;

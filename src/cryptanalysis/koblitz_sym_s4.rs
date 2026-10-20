@@ -31,7 +31,7 @@
 
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
 use crate::cryptanalysis::koblitz_groebner::{FieldStructure, SymElement, MAX_VARS};
-use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+use crate::cryptanalysis::pq_groebner_f2::{F2BoolPoly, Mask};
 
 /// The subspaces `W₁, W₂, W₃` holding `e₁, e₂, e₃`, as bases.
 #[derive(Clone, Debug)]
@@ -79,7 +79,7 @@ impl SymSpaces {
     }
 
     /// The values `(e₁, e₂, e₃)` a Boolean assignment `root` gives.
-    pub fn decode(&self, root: u64, n: u32) -> [F2mElement; 3] {
+    pub fn decode(&self, root: Mask, n: u32) -> [F2mElement; 3] {
         let off = self.offsets();
         std::array::from_fn(|k| {
             let mut acc = F2mElement::zero(n);
@@ -641,6 +641,10 @@ mod tests {
         build_decomposition_system, solve_boolean_system, SolveOptions, SolverEngine, SplitRule,
     };
     use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
     use rand::rngs::StdRng;
     use rand::{Rng, SeedableRng};
     use std::collections::BTreeSet;

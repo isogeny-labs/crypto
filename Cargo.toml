@@ -142,6 +142,11 @@ path = "research/full_volcano_graphwide_ic_20261017/execution/summarize.rs"
 # dependency when cross-building a static Linux binary.
 default = ["redis-native-tls"]
 redis-native-tls = ["redis/tls-native-tls"]
+# Boolean monomial bitmasks of 128 bits instead of 64, so the F2 Gröbner and
+# SAT decomposition engines accept up to 128 unknowns
+# (`pq_groebner_f2::Mask`).  Off by default: the 64-bit build, its counters
+# and its frozen benchmarks are unchanged.
+wide-vars = []
 f4-four-tables = []
 f4-five-tables = []
 f4-wide-tables = []

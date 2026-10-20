@@ -81,7 +81,7 @@ use crate::cryptanalysis::koblitz_groebner::{
     pack_rows, rref_f2_counted,
 };
 use crate::cryptanalysis::pq_groebner_f2::{
-    cmp_mono, sort_masks_descending, F2BoolMono, F2BoolPoly,
+    bit, cmp_mono, mask_fold64, sort_masks_descending, F2BoolMono, F2BoolPoly, Mask,
 };
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -133,7 +133,7 @@ pub fn macaulay_shape(
     let occurring = system
         .iter()
         .flat_map(|p| p.terms.iter())
-        .fold(0u64, |acc, t| acc | t.mask)
+        .fold(0 as Mask, |acc, t| acc | t.mask)
         & all_variable_mask(n_vars);
     let (columns, mut matrix) = if support_local {
         build_inherited_macaulay_support_local(&system, n_vars, degree, occurring, quadratic)?
@@ -210,7 +210,7 @@ pub fn root_replay_counts() -> (u64, u64, u64) {
     )
 }
 
-fn root_shape_key(columns: &[u64], rows: usize, degree: u32, support_local: bool) -> u64 {
+fn root_shape_key(columns: &[Mask], rows: usize, degree: u32, support_local: bool) -> u64 {
     use std::hash::{Hash, Hasher};
     let mut h = std::collections::hash_map::DefaultHasher::new();
     columns.hash(&mut h);
@@ -253,7 +253,7 @@ fn dependent_rows(matrix: &[Vec<u64>], word_ops: &mut u64) -> Vec<u32> {
 /// Apply root shape replay to a freshly built root: record its dependent
 /// rows, or drop the recorded ones.
 fn replay_root(
-    columns: &[u64],
+    columns: &[Mask],
     matrix: &mut Vec<Vec<u64>>,
     degree: u32,
     support_local: bool,
@@ -297,7 +297,7 @@ fn root_rref() -> bool {
 struct RootMatrix {
     system: Rc<Vec<F2BoolPoly>>,
     generator_degrees: Rc<Vec<u32>>,
-    columns: Vec<u64>,
+    columns: Vec<Mask>,
     matrix: Vec<Vec<u64>>,
 }
 
@@ -317,7 +317,7 @@ impl RootMatrix {
         let occurring = system
             .iter()
             .flat_map(|p| p.terms.iter())
-            .fold(0u64, |acc, t| acc | t.mask)
+            .fold(0 as Mask, |acc, t| acc | t.mask)
             & all_variable_mask(n_vars);
         let (columns, matrix) = if support_local {
             build_inherited_macaulay_support_local(
@@ -380,6 +380,7 @@ pub struct LaneStats {
 /// The bit-sliced Gauss–Jordan kernel of [`ReducedBasis::from_systems_lanes`].
 mod lanes {
     use super::{LaneStats, RootMatrix};
+    use crate::cryptanalysis::pq_groebner_f2::Mask;
 
     /// A lane word: one bit per instance.
     pub(super) trait Lane:
@@ -439,7 +440,7 @@ mod lanes {
         // Union layout: every lane's columns are in descending monomial
         // order, so their merge is too; a lane's leading column stays its
         // leading column.
-        let mut union: Vec<u64> = active
+        let mut union: Vec<Mask> = active
             .iter()
             .flat_map(|&l| roots[l].as_ref().expect("active").columns.iter().copied())
             .collect();
@@ -1056,7 +1057,7 @@ pub struct ChildSystem {
 /// Its comparisons are `cmp_mono`'s popcounts, and the baseline x86-64
 /// target has no `popcnt` instruction, so where the CPU has one the same
 /// merge runs compiled with it; the layout is identical either way.
-fn fold_layout(columns: &[u64], bit: u64, new_columns: &mut Vec<u64>, map: &mut [u32]) {
+fn fold_layout(columns: &[Mask], bit: Mask, new_columns: &mut Vec<Mask>, map: &mut [u32]) {
     #[cfg(target_arch = "x86_64")]
     {
         if std::arch::is_x86_feature_detected!("popcnt") {
@@ -1070,16 +1071,16 @@ fn fold_layout(columns: &[u64], bit: u64, new_columns: &mut Vec<u64>, map: &mut 
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "popcnt")]
 unsafe fn fold_layout_popcnt(
-    columns: &[u64],
-    bit: u64,
-    new_columns: &mut Vec<u64>,
+    columns: &[Mask],
+    bit: Mask,
+    new_columns: &mut Vec<Mask>,
     map: &mut [u32],
 ) {
     fold_layout_body(columns, bit, new_columns, map)
 }
 
 #[inline(always)]
-fn fold_layout_body(columns: &[u64], bit: u64, new_columns: &mut Vec<u64>, map: &mut [u32]) {
+fn fold_layout_body(columns: &[Mask], bit: Mask, new_columns: &mut Vec<Mask>, map: &mut [u32]) {
     let n_old = columns.len();
     let (mut i, mut j) = (0usize, 0usize);
     let next_keep = |i: &mut usize| -> Option<usize> {
@@ -1356,7 +1357,7 @@ struct CompletionBatch {
     /// Per id: the monomial, its column in the layout the batch was
     /// gathered against (`DELETED` if absent), and whether a kept row
     /// holds it.
-    monos: Vec<u64>,
+    monos: Vec<Mask>,
     old_column: Vec<u32>,
     used: Vec<bool>,
     /// One parity bit per id, zero between rows.
@@ -1370,7 +1371,7 @@ struct CompletionBatch {
 impl CompletionBatch {
     /// Gather the row with terms `monos` (repeats cancelling in pairs)
     /// against the layout `index`; kept only if something survives.
-    fn push_row(&mut self, monos: impl ExactSizeIterator<Item = u64>, index: &MaskMap<usize>) {
+    fn push_row(&mut self, monos: impl ExactSizeIterator<Item = Mask>, index: &MaskMap<usize>) {
         self.scratch.clear();
         let len = monos.len();
         self.scratch.reserve(len);
@@ -1411,7 +1412,7 @@ impl CompletionBatch {
     /// Grow `basis`'s layout by the monomials the kept rows hold and it
     /// lacks, and return every used id's column in the new layout.
     fn place(&self, basis: &mut ReducedBasis) -> Vec<u32> {
-        let mut missing: Vec<u64> = (0..self.monos.len())
+        let mut missing: Vec<Mask> = (0..self.monos.len())
             .filter(|&i| self.used[i] && self.old_column[i] == DELETED)
             .map(|i| self.monos[i])
             .collect();
@@ -1472,9 +1473,9 @@ fn xor_words(dst: &mut [u64], src: &[u64]) {
 /// differ only inside `t` meet and cancel.  Order does not matter to any
 /// caller (each packs the row by column or collects it into a set), so the
 /// parity is taken with a small hash table rather than by sorting.
-fn odd_terms(monos: impl ExactSizeIterator<Item = u64>) -> Vec<u64> {
+fn odd_terms(monos: impl ExactSizeIterator<Item = Mask>) -> Vec<Mask> {
     let len = monos.len();
-    let mut keys: Vec<u64> = Vec::with_capacity(len);
+    let mut keys: Vec<Mask> = Vec::with_capacity(len);
     let mut odd: Vec<bool> = Vec::with_capacity(len);
     ODD_SLOTS.with(|state| {
         let mut state = state.borrow_mut();
@@ -1491,7 +1492,8 @@ fn odd_terms(monos: impl ExactSizeIterator<Item = u64>) -> Vec<u64> {
         }
         let live = u64::from(*stamp) << 32;
         for m in monos {
-            let mut s = (m.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> (64 - bits)) as usize;
+            let mut s =
+                (mask_fold64(m).wrapping_mul(0x9E37_79B9_7F4A_7C15) >> (64 - bits)) as usize;
             loop {
                 let slot = slots[s];
                 if slot & !0xFFFF_FFFF != live {
@@ -1544,9 +1546,9 @@ pub struct ReducedBasis {
     /// Degree of each generator when the basis was last completed.
     generator_degrees: Rc<Vec<u32>>,
     /// Variables specialised away on the path from the root.
-    assigned: u64,
+    assigned: Mask,
     /// Column monomials of the current layout, in descending order.
-    columns: Vec<u64>,
+    columns: Vec<Mask>,
     /// Monomial → column, built only when a row has to be packed from
     /// monomials (completion), which most levels never do.
     column_index: Option<MaskMap<usize>>,
@@ -1682,7 +1684,7 @@ impl ReducedBasis {
         n_vars: usize,
         degree: u32,
         support_local: bool,
-        columns: Vec<u64>,
+        columns: Vec<Mask>,
         rows: Vec<Vec<u64>>,
     ) -> Self {
         let mut out = Self {
@@ -1990,7 +1992,7 @@ impl ReducedBasis {
             .system
             .iter()
             .flat_map(|p| p.terms.iter())
-            .fold(0u64, |acc, t| acc | t.mask)
+            .fold(0 as Mask, |acc, t| acc | t.mask)
             & all_variable_mask(n_vars);
         // Full MutantXL seeds every fall: a fall of the degree-`degree−1`
         // space times a monomial of degree two or more is not in general a
@@ -2006,7 +2008,7 @@ impl ReducedBasis {
         } else {
             Vec::new()
         };
-        let mut lower_leading: std::collections::HashSet<u64> = std::collections::HashSet::new();
+        let mut lower_leading: std::collections::HashSet<Mask> = std::collections::HashSet::new();
         if !lower.is_empty() {
             let columns = macaulay_columns(&lower)?;
             let mut matrix = pack_rows(&lower, &columns);
@@ -2034,7 +2036,7 @@ impl ReducedBasis {
     }
 
     /// Variables specialised away since the root, as a mask.
-    pub fn assigned(&self) -> u64 {
+    pub fn assigned(&self) -> Mask {
         self.assigned
     }
 
@@ -2467,7 +2469,7 @@ impl ReducedBasis {
 
     /// Adopt a new column layout: record the step, remap every pivot
     /// column and rebuild the pivot index.  Rows are left where they are.
-    fn adopt_layout(&mut self, columns: Vec<u64>, map: Vec<u32>) {
+    fn adopt_layout(&mut self, columns: Vec<Mask>, map: Vec<u32>) {
         let step = LayoutStep {
             map: Rc::new(map),
             to_here: RefCell::new(HashMap::default()),
@@ -2544,7 +2546,7 @@ impl ReducedBasis {
         child: &ChildSystem,
     ) -> (Self, InheritCost) {
         let mut cost = InheritCost::default();
-        let bit = 1u64 << var;
+        let bit = bit(var);
         if self.refuted {
             let mut out = self.clone();
             out.system = child.system.clone();
@@ -2567,7 +2569,7 @@ impl ReducedBasis {
         // lists and the old → new map falls out of the merge.
         let n_old = self.columns.len();
         let mut map: Vec<u32> = vec![DELETED; n_old];
-        let mut new_columns: Vec<u64> = Vec::with_capacity(n_old);
+        let mut new_columns: Vec<Mask> = Vec::with_capacity(n_old);
         if value {
             fold_layout(&self.columns, bit, &mut new_columns, &mut map);
         } else {
@@ -2669,7 +2671,7 @@ impl ReducedBasis {
                 .system
                 .iter()
                 .flat_map(|p| p.terms.iter())
-                .fold(0u64, |acc, t| acc | t.mask)
+                .fold(0 as Mask, |acc, t| acc | t.mask)
                 & all_variable_mask(out.n_vars);
             let mut batch = CompletionBatch::default();
             {
@@ -2680,7 +2682,7 @@ impl ReducedBasis {
                     let old_gap = self.degree - old_degree;
                     let new_gap = self.degree - new_degree;
                     let mask = if self.support_local {
-                        multiplier_mask & p.terms.iter().fold(0u64, |acc, t| acc | t.mask)
+                        multiplier_mask & p.terms.iter().fold(0 as Mask, |acc, t| acc | t.mask)
                     } else {
                         multiplier_mask
                     };
@@ -2775,14 +2777,14 @@ impl ReducedBasis {
             .system
             .iter()
             .flat_map(|p| p.terms.iter())
-            .fold(0u64, |acc, t| acc | t.mask)
+            .fold(0 as Mask, |acc, t| acc | t.mask)
             & all_variable_mask(self.n_vars);
         for _ in 0..self.closure_rounds {
             let work = std::mem::take(&mut self.pending);
             if work.is_empty() {
                 break;
             }
-            let mut products: Vec<Vec<u64>> = Vec::new();
+            let mut products: Vec<Vec<Mask>> = Vec::new();
             let mut read_words = 0u64;
             for r in work {
                 let r = r as usize;
@@ -2791,7 +2793,7 @@ impl ReducedBasis {
                 }
                 let gap = self.degree - self.columns[self.pivot_col[r] as usize].count_ones();
                 let q = self.current_row(r, cost);
-                let mut q_monos: Vec<u64> = Vec::new();
+                let mut q_monos: Vec<Mask> = Vec::new();
                 for (i, &word) in q.live().iter().enumerate() {
                     let base = (q.lead as usize + i) * 64;
                     let mut bits = word;
@@ -2894,13 +2896,13 @@ impl ReducedBasis {
     /// Add any monomials of `rows_monos` missing from the layout, keeping
     /// the descending column order.  A layout step like any other: rows
     /// are not touched.
-    fn extend_columns(&mut self, rows_monos: &[Vec<u64>]) {
+    fn extend_columns(&mut self, rows_monos: &[Vec<Mask>]) {
         let index = self.column_index();
         // The products share most of their new monomials, so collect each
         // distinct one once as it is first met and key only those into the
         // layout's order.
         let mut seen: MaskMap<()> = MaskMap::default();
-        let mut missing: Vec<u64> = Vec::new();
+        let mut missing: Vec<Mask> = Vec::new();
         for &m in rows_monos.iter().flatten() {
             if !index.contains_key(&m) && seen.insert(m, ()).is_none() {
                 missing.push(m);
@@ -2918,7 +2920,7 @@ impl ReducedBasis {
     /// of each.  The layout is already in descending order, so the new one
     /// is a merge of two sorted lists and the old → new map falls out of
     /// the merge, as in `fold_layout`.
-    fn insert_columns(&mut self, missing: &[u64]) -> Vec<u32> {
+    fn insert_columns(&mut self, missing: &[Mask]) -> Vec<u32> {
         let old = &self.columns;
         let mut columns = Vec::with_capacity(old.len() + missing.len());
         let mut map = vec![0u32; old.len()];
@@ -3027,6 +3029,10 @@ pub fn substitute(p: &F2BoolPoly, var: u32, value: bool) -> F2BoolPoly {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     /// A random column layout, random fold and delete steps composed into
     /// one map, random rows: the segment plan rewrites every row exactly as
@@ -3066,7 +3072,7 @@ mod tests {
                     continue;
                 }
                 used |= 1 << var;
-                let bit = 1u64 << var;
+                let bit = bit(var);
                 let mut map = vec![DELETED; layout.len()];
                 let mut new_layout = Vec::with_capacity(layout.len());
                 if next() % 2 == 0 {
@@ -3142,7 +3148,7 @@ mod tests {
 
     /// The sort-and-count parity the completion rows used before
     /// [`odd_terms`] and [`CompletionBatch`].
-    fn odd_by_sort(mut monos: Vec<u64>) -> Vec<u64> {
+    fn odd_by_sort(mut monos: Vec<Mask>) -> Vec<Mask> {
         monos.sort_unstable();
         let mut out = Vec::new();
         let mut i = 0;
@@ -3173,8 +3179,8 @@ mod tests {
             let len = (xorshift(&mut seed) % 90) as usize;
             // a small alphabet, so repeats of every multiplicity occur
             let alphabet = 1 + xorshift(&mut seed) % 40;
-            let monos: Vec<u64> = (0..len)
-                .map(|_| (xorshift(&mut seed) % alphabet) << (round % 7))
+            let monos: Vec<Mask> = (0..len)
+                .map(|_| mask_from64((xorshift(&mut seed) % alphabet) << (round % 7)))
                 .collect();
             let mut got = odd_terms(monos.iter().copied());
             got.sort_unstable();
@@ -3209,25 +3215,25 @@ mod tests {
             };
             // products of random monomials by random multipliers, some
             // cancelling, some reaching outside the layout
-            let products: Vec<Vec<u64>> = (0..12)
+            let products: Vec<Vec<Mask>> = (0..12)
                 .map(|_| {
                     let t = xorshift(&mut seed) & (0b111 << (xorshift(&mut seed) % 9));
                     (0..(xorshift(&mut seed) % 16))
-                        .map(|_| (xorshift(&mut seed) & 0xfff) | t)
+                        .map(|_| mask_from64((xorshift(&mut seed) & 0xfff) | t))
                         .collect()
                 })
                 .collect();
 
             // reference: cancel each row, extend by sorting, pack by index
             let mut reference = basis.clone();
-            let kept: Vec<Vec<u64>> = products
+            let kept: Vec<Vec<Mask>> = products
                 .iter()
                 .map(|p| odd_by_sort(p.clone()))
                 .filter(|r| !r.is_empty())
                 .collect();
-            let old: std::collections::HashSet<u64> = reference.columns.iter().copied().collect();
+            let old: std::collections::HashSet<Mask> = reference.columns.iter().copied().collect();
             let mut want_columns = reference.columns.clone();
-            let mut added: Vec<u64> = kept
+            let mut added: Vec<Mask> = kept
                 .iter()
                 .flatten()
                 .copied()
@@ -3255,7 +3261,7 @@ mod tests {
             let columns = batch.place(&mut out);
             assert_eq!(out.columns, want_columns);
             for (ids, want) in batch.rows.iter().zip(&kept) {
-                let mut got: Vec<u64> = ids
+                let mut got: Vec<Mask> = ids
                     .iter()
                     .map(|&id| out.columns[columns[id as usize] as usize])
                     .collect();
@@ -3279,7 +3285,7 @@ mod tests {
             for _ in 0..d {
                 mask |= 1u64 << (next() % n_vars as u64);
             }
-            monos.push(F2BoolMono::from_mask(mask));
+            monos.push(F2BoolMono::from_mask(mask_from64(mask)));
         }
         F2BoolPoly::from_monos(monos, n_vars)
     }
@@ -3292,7 +3298,7 @@ mod tests {
 
     /// RREF of a list of polynomials, as a canonical set.
     fn rref_polys(polys: &[F2BoolPoly], n_vars: usize) -> Vec<F2BoolPoly> {
-        let rows_monos: Vec<Vec<u64>> = polys
+        let rows_monos: Vec<Vec<Mask>> = polys
             .iter()
             .filter(|p| !p.is_zero())
             .map(|p| p.terms.iter().map(|t| t.mask).collect())
@@ -3326,7 +3332,7 @@ mod tests {
         system: &[F2BoolPoly],
         n_vars: usize,
         degree: u32,
-        mask: u64,
+        mask: Mask,
     ) -> Vec<F2BoolPoly> {
         use crate::cryptanalysis::koblitz_groebner::macaulay_rows_monos_with_mask;
         let rows = macaulay_rows_monos_with_mask(system, n_vars, degree, mask, None).unwrap();
@@ -3375,7 +3381,7 @@ mod tests {
             .any(|p| p.terms.len() == 1 && p.terms[0].mask == 0)
     }
 
-    fn occurring(system: &[F2BoolPoly]) -> u64 {
+    fn occurring(system: &[F2BoolPoly]) -> Mask {
         system
             .iter()
             .flat_map(|p| p.terms.iter())
@@ -3397,7 +3403,7 @@ mod tests {
         basis: &ReducedBasis,
         system: &[F2BoolPoly],
         n_vars: usize,
-        assigned: u64,
+        assigned: Mask,
         what: &str,
     ) {
         let rows = rref_polys(&basis_polys(basis), n_vars);
@@ -3584,7 +3590,7 @@ mod tests {
     /// Every point of `F_2^n_vars` on which the whole system vanishes.
     fn variety(system: &[F2BoolPoly], n_vars: usize) -> Vec<u64> {
         (0..1u64 << n_vars)
-            .filter(|&x| system.iter().all(|p| p.eval(x) == 0))
+            .filter(|&x| system.iter().all(|p| p.eval(mask_from64(x)) == 0))
             .collect()
     }
 
@@ -3595,14 +3601,14 @@ mod tests {
         basis: &ReducedBasis,
         system: &[F2BoolPoly],
         n_vars: usize,
-        assigned: u64,
+        assigned: Mask,
         what: &str,
     ) {
         let rows = basis_polys(basis);
         let roots = variety(system, n_vars);
         for p in &rows {
             assert!(
-                roots.iter().all(|&x| p.eval(x) == 0),
+                roots.iter().all(|&x| p.eval(mask_from64(x)) == 0),
                 "{what}: a closed row does not vanish on the variety"
             );
         }

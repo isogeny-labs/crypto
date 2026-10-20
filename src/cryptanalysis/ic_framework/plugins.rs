@@ -39,6 +39,7 @@
 //! The pair table is where memory buys time, and `mitm`'s
 //! `negation_folded` parameter halves the additions that build it.
 
+use crate::cryptanalysis::pq_groebner_f2::mask_low64;
 use std::collections::{BTreeMap, BTreeSet, HashSet};
 use std::time::{Duration, Instant};
 
@@ -146,6 +147,10 @@ mod projected_prime_tests {
     use crate::cryptanalysis::ic_boundary::Calibration;
     use crate::cryptanalysis::ic_framework::stages::Targets;
     use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     fn fixture() -> PrimeInstance {
         let curve = PrimeCurve {
@@ -2271,7 +2276,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for DescentAlgebraicOracle<'_> {
                 continue;
             };
             for v in solutions {
-                let xs = sys.lift(v);
+                let xs = sys.lift(mask_low64(v));
                 if let Some(indices) = crate::cryptanalysis::ic_boundary::lift_abscissae(
                     ctx.group, fb, ops, &xs, point,
                 ) {
@@ -2599,7 +2604,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for SymmetrisedOracle<'_> {
         let sys = build_symmetrised_system(kc, &fb_u, &g, self.summands as usize, &st).ok_or_else(
             || {
                 format!(
-                    "the symmetrised system for dimension {} at m = {} exceeds the 64-variable \
+                    "the symmetrised system for dimension {} at m = {} exceeds the Boolean-variable \
                      layout or the generator has u ∈ {{0, ∞}}",
                     fb_u.ell, self.summands
                 )
@@ -2709,6 +2714,10 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for SymmetrisedOracle<'_> {
 mod tests {
     use super::*;
     use crate::cryptanalysis::ic_boundary::koblitz_instance;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     /// The command-line form of a multi-factor divisor, end to end from
     /// the plug-in string to the indices both Koblitz bases read.

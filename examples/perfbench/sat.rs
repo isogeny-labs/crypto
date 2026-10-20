@@ -33,6 +33,7 @@ use crypto_lib::cryptanalysis::koblitz_groebner::{build_decomposition_system, Fi
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_frobenius_factor_base, KoblitzCurve,
 };
+use crypto_lib::cryptanalysis::pq_groebner_f2::mask_low64;
 use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
 use crypto_lib::cryptanalysis::sat::{check_model, Lit, SolveResult, Solver, SolverStats};
 use crypto_lib::cryptanalysis::semaev_corpus::{CorpusInstance, CORPUS};
@@ -315,7 +316,7 @@ fn koblitz_bool(
                 if res == SolveResult::Sat {
                     let a = enc.model_assignment();
                     assert!(eqs.iter().all(|e| e.eval(a) == 0), "bad model");
-                    fp = fp.u64(a);
+                    fp = fp.u64(mask_low64(a));
                 }
             }
             fp.finish()

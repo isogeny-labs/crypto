@@ -7,6 +7,7 @@ use super::{
     pq_groebner_f2::{read_columns, F2BoolMono, F2BoolPoly, MonoColumns},
 };
 use crate::binary_ecc::F2mElement;
+use crate::cryptanalysis::pq_groebner_f2::{low_bits, mask_low64, Mask};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -91,7 +92,7 @@ struct LastLink {
     /// polynomials hold 36 kB and these bitsets 16 kB against 64 kB of
     /// JSON, where column sets with their keys would hold at least 39 kB
     /// (at `n = 23`, `m = 2`, `ℓ = 11`: 317 kB and 41 kB against 579 kB).
-    monomials: Vec<u64>,
+    monomials: Vec<Mask>,
     starts: Vec<usize>,
     /// Equation `j` occupies words `offsets[j]..offsets[j + 1]` of a row.
     offsets: Vec<usize>,
@@ -342,11 +343,7 @@ impl DecompositionTemplate {
     /// original ideal. It need not preserve the Gröbner property: re-reduce.
     pub fn specialize_parameter_basis(&self, basis: &[F2BoolPoly], target: u64) -> Vec<F2BoolPoly> {
         assert!(self.n_vars + self.n as usize <= MAX_VARS);
-        let low = if self.n_vars == 64 {
-            u64::MAX
-        } else {
-            (1u64 << self.n_vars) - 1
-        };
+        let low: Mask = low_bits(self.n_vars);
         basis
             .iter()
             .map(|p| {
@@ -354,7 +351,7 @@ impl DecompositionTemplate {
                     p.terms
                         .iter()
                         .filter_map(|t| {
-                            let parameters = t.mask >> self.n_vars;
+                            let parameters = mask_low64(t.mask >> self.n_vars);
                             if parameters & !target == 0 {
                                 Some(F2BoolMono::from_mask(t.mask & low))
                             } else {
@@ -498,6 +495,10 @@ pub fn build_decomposition_system_reusing(
 mod tests {
     use super::*;
     use crate::binary_ecc::IrreduciblePoly;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
     fn field() -> FieldStructure {
         FieldStructure::new(
             3,

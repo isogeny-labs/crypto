@@ -164,7 +164,7 @@ use crate::cryptanalysis::koblitz_relation_solver::{
 use crate::cryptanalysis::koblitz_sparse_la::{
     SparseCoreSolver, SparseRows, SparseSolveOptions, SparseSolveOutcome, SparseSolveReport,
 };
-use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+use crate::cryptanalysis::pq_groebner_f2::{bit, mask_from64, F2BoolPoly, Mask};
 use crate::cryptanalysis::sat::SolveResult;
 use crate::cryptanalysis::semaev_sat::{encode_boolean_system_with, XorEncoding};
 use crate::utils::mod_inverse;
@@ -7307,10 +7307,10 @@ impl<'a> F6GeometricGate<'a> {
         vars: &[usize],
         code: u64,
         assignment: &[Option<bool>],
-        defined_mask: u64,
+        defined_mask: Mask,
     ) -> bool {
         vars.iter().enumerate().all(|(j, &var)| {
-            defined_mask & (1u64 << var) != 0
+            defined_mask & bit(var as u32) != 0
                 || assignment[var].is_none_or(|value| value == ((code >> j) & 1 != 0))
         })
     }
@@ -7320,7 +7320,7 @@ impl<'a> F6GeometricGate<'a> {
         remaining: usize,
         residual: &BinaryPoint,
         assignment: &[Option<bool>],
-        defined_mask: u64,
+        defined_mask: Mask,
     ) -> bool {
         let BinaryPoint::Affine { x, .. } = residual else {
             return false;
@@ -7353,7 +7353,7 @@ impl<'a> F6GeometricGate<'a> {
         &mut self,
         fixed: &(usize, BigUint),
         assignment: &[Option<bool>],
-        defined_mask: u64,
+        defined_mask: Mask,
     ) -> bool {
         if self.pair_index_enabled && self.fast.is_some() {
             // The index is a property of the base: take the one a previous
@@ -7420,7 +7420,7 @@ impl<'a> F6GeometricGate<'a> {
         &mut self,
         fixed: &(usize, BigUint),
         assignment: &[Option<bool>],
-        defined_mask: u64,
+        defined_mask: Mask,
     ) -> Option<[usize; 3]> {
         let fast = self.fast.as_ref()?;
         let index = self.pair_index.as_ref()?;
@@ -7468,7 +7468,7 @@ impl<'a> F6GeometricGate<'a> {
         &mut self,
         fixed: &(usize, BigUint),
         assignment: &[Option<bool>],
-        defined_mask: u64,
+        defined_mask: Mask,
     ) -> bool {
         if self.fast.is_some() {
             let packed = if self.batch_fast {
@@ -7521,7 +7521,7 @@ impl<'a> F6GeometricGate<'a> {
         &mut self,
         fixed: &(usize, BigUint),
         assignment: &[Option<bool>],
-        defined_mask: u64,
+        defined_mask: Mask,
     ) -> Option<[usize; 3]> {
         let fast = self.fast.as_ref()?;
         let free: Vec<_> = (0..3).filter(|&i| i != fixed.0).collect();
@@ -7573,7 +7573,7 @@ impl<'a> F6GeometricGate<'a> {
         &mut self,
         fixed: &(usize, BigUint),
         assignment: &[Option<bool>],
-        defined_mask: u64,
+        defined_mask: Mask,
     ) -> Option<[usize; 3]> {
         let fast = self.fast.as_ref()?;
         let free: Vec<_> = (0..3).filter(|&i| i != fixed.0).collect();
@@ -7648,7 +7648,7 @@ impl<'a> F6GeometricGate<'a> {
         sum: &BinaryPoint,
         chosen: &mut [usize],
         assignment: &[Option<bool>],
-        defined_mask: u64,
+        defined_mask: Mask,
     ) -> bool {
         if depth == positions.len() {
             self.group_additions += 1;
@@ -7684,7 +7684,7 @@ impl<'a> F6GeometricGate<'a> {
         false
     }
 
-    fn decide(&mut self, assignment: &[Option<bool>], defined_mask: u64) -> NodeOracleDecision {
+    fn decide(&mut self, assignment: &[Option<bool>], defined_mask: Mask) -> NodeOracleDecision {
         let mut fixed = Vec::with_capacity(self.vars.len());
         for (i, vars) in self.vars.iter().enumerate() {
             let mut x = F2mElement::zero(self.kc.n);
@@ -7695,7 +7695,7 @@ impl<'a> F6GeometricGate<'a> {
             let mut assigned_mask = 0u64;
             let mut assigned_code = 0u64;
             for (j, &var) in vars.iter().enumerate() {
-                if defined_mask & (1u64 << var) != 0 {
+                if defined_mask & bit(var as u32) != 0 {
                     complete = false;
                     continue;
                 }
@@ -8163,7 +8163,7 @@ pub fn crossbred_decompose(
     let (roots, stats) = solve_crossbred(&sys.equations, &xb, &CrossbredSearchOptions::default());
     for root in roots {
         let xs: Vec<F2mElement> = (0..m)
-            .map(|i| sys.summand_x(&fb.subspace_basis, root, i, kc.n))
+            .map(|i| sys.summand_x(&fb.subspace_basis, mask_from64(root), i, kc.n))
             .collect();
         if let Some(idxs) = lift_candidate(kc, fb, index_of, &xs, target) {
             return (Some(idxs), stats);
@@ -8558,7 +8558,7 @@ pub fn sat_decompose_with(
             (0..(1u64 << ell))
                 .filter(|&code| {
                     legal_x.contains(
-                        &sys.summand_x(&fb.subspace_basis, code, 0, kc.n)
+                        &sys.summand_x(&fb.subspace_basis, mask_from64(code), 0, kc.n)
                             .to_biguint(),
                     )
                 })
@@ -8571,7 +8571,7 @@ pub fn sat_decompose_with(
             add_coordinate_domain(&mut enc.solver, i * ell, ell, &codes);
         }
     }
-    let mut blocked: Vec<u64> = Vec::new();
+    let mut blocked: Vec<Mask> = Vec::new();
     loop {
         stats.solver_calls += 1;
         if enc.trivially_unsat {
@@ -14515,6 +14515,10 @@ impl<'a> IndividualLogSolver<'a> {
 mod tests {
     use super::*;
     use crate::cryptanalysis::koblitz_groebner::build_decomposition_system;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     #[test]
     fn live_collection_progress_preserves_swept_walked_and_aimed_queries() {
@@ -21177,10 +21181,10 @@ mod tests {
             let rows = matrix_f4_f2(&sys.equations, sys.n_vars, d).unwrap();
             solutions = 0;
             for pt in 0..(1u64 << sys.n_vars) {
-                if sys.equations.iter().all(|e| e.eval(pt) == 0) {
+                if sys.equations.iter().all(|e| e.eval(mask_from64(pt)) == 0) {
                     solutions += 1;
                     assert!(
-                        rows.iter().all(|e| e.eval(pt) == 0),
+                        rows.iter().all(|e| e.eval(mask_from64(pt)) == 0),
                         "a degree-{d} row rejected a real solution"
                     );
                 }
@@ -21499,6 +21503,10 @@ mod tests {
 mod isogenous_model_tests {
     use super::*;
     use crate::cryptanalysis::koblitz_fast_arith::FastBinaryCurve;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     /// Brute-force a floor curve of the class of `K_a / F_{2^n}`: the first
     /// `b ∉ F_2` whose model has the Koblitz point count.  (The class of
@@ -21595,6 +21603,10 @@ mod isogenous_model_tests {
 mod subfield_tests {
     use super::*;
     use crate::cryptanalysis::koblitz_factor_base_search::{search, Family, SearchOptions};
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     fn opts(m: usize) -> KoblitzIcOptions {
         KoblitzIcOptions {
@@ -21942,6 +21954,10 @@ mod subfield_tests {
 #[cfg(test)]
 mod admissibility_walk_differential {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     /// `m_can_decompose`'s walk for `m ≥ 2`, verbatim from bbb28fac.
     fn old_walk(kc: &KoblitzCurve, classes: &[BinaryPoint], m: usize) -> bool {
