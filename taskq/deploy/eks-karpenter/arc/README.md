@@ -12,7 +12,9 @@ separate from the `cpu-spot` Iso Lab measurement pool.
 | `crypto-eks-highmem` | 16 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 1 |
 
 The NodePool admits x86-64 M/R instances with 8, 16 or 32 vCPUs and caps
-aggregate provisioning at 128 vCPUs and 768 GiB. These are capacity limits, not
+aggregate provisioning at 64 vCPUs and 512 GiB. The account's On-Demand vCPU
+quota was 96 during the live test; a 128-vCPU pool cap caused EC2
+`VcpuLimitExceeded` while ARC jobs were queued. These are capacity limits, not
 spending limits. Worker EC2, EBS and NAT traffic are billed. The existing cluster's
 idle costs continue. Linux x64 jobs are the only migration candidates; ARM,
 macOS, Windows, GPU and hardware-isolated ecbench jobs remain on their current
@@ -54,12 +56,15 @@ restart the listener/controller as directed by ARC. Do not copy a personal
 `gh` OAuth token into the cluster. The script is idempotent and pins both Helm
 charts to `0.15.0`.
 
-The runner image is pinned separately in both scale set value files. Check
-[the current Actions runner release](https://github.com/actions/runner/releases)
-and update both pins regularly; GitHub rejected the older `2.333.1` image as
-`Outdated` during the live deployment test, while `2.338.0` accepted jobs.
+The runner image is built from the official `2.338.0` release with the tools
+used by ordinary crypto workflows, then pinned by its ECR digest in both scale
+set value files. Build and update it using the
+[runner image instructions](../../../../.github/docker/arc-runner/README.md).
+Check [the current Actions runner release](https://github.com/actions/runner/releases)
+regularly; GitHub rejected the older `2.333.1` image as `Outdated` during the
+live deployment test.
 
-After this branch lands on `main`, dispatch `eks-arc-smoke.yml` once per pool.
+After deployment, dispatch `eks-arc-smoke.yml` once per pool.
 Confirm both jobs pass, `kubectl get nodeclaims` shows a `gha-on-demand` node
 during a run, and GitHub's job log identifies the expected runner name. Check
 that an empty node disappears after the consolidation interval. Linux x64 jobs
@@ -72,6 +77,17 @@ The high-memory list takes precedence. Remove a filename to roll that workflow
 back. The routing script is `route_workflows.py`; it prepares new direct x64
 `runs-on` lines and is idempotent.
 
+`first-wave-workflows.txt` records the 392 workflow filenames enabled in the
+initial rollout. It excludes workloads requiring specialized GPU, Sage, Lean,
+perf, release or measurement hosts; the 38 deferred filenames are recorded in
+`deferred-workflows.txt` for individual validation. To restore the rollout
+variable after an accidental reset:
+
+```sh
+python3 -c 'from pathlib import Path; names=Path("taskq/deploy/eks-karpenter/arc/first-wave-workflows.txt").read_text().splitlines(); print("|"+"|".join(names)+"|", end="")' \
+  | gh variable set CRYPTO_EKS_WORKFLOWS --repo aburan28/crypto
+```
+
 The routing expression admits `push`, `schedule`, `release`, manual dispatch and
 same-repository `pull_request` events. Fork PRs, `pull_request_target`,
 `workflow_run` and other events retain their original GitHub-hosted labels.
@@ -79,9 +95,11 @@ This routing rule does not prevent a fork from editing a workflow file to name
 the self-hosted scale set directly.
 
 Existing queued runs keep the workflow revision they started with. They will
-not migrate automatically; re-trigger or re-run them only after checking the
-new revision and avoiding duplicate experiments. A GitHub rerun can still use
-the original workflow revision, so a fresh event may be necessary.
+not migrate automatically. For runs whose revision already has the routing
+expression, cancel and rerun the same run after updating the repository
+variable, then verify its new job labels. An older revision cannot gain the
+expression through rerun, so a fresh event is necessary. Check for duplicate
+experiments before replaying.
 
 ## Security and compatibility
 
@@ -94,11 +112,12 @@ on a cluster that also runs Iso Lab work. Do not enable untrusted PR workflows
 on this scale set without stronger isolation, such as a separate cluster or
 organization runner-group controls.
 
-The official ARC runner image is leaner than GitHub's `ubuntu-24.04` VM image.
-The smoke test validates the runner and Docker path, not every repository
-workflow's installed tools. The first migrations need tool-by-tool validation;
-Sage, perf, nested virtualization, macOS, ARM and GPU assumptions require their
-own runners or workflow changes. Spot is deliberately not used for this pool:
+The repo-specific image adds Node, Rust, C/C++, Python and common build
+libraries missing from the stock ARC image. The workflow parser, Rust/Clippy
+pilot and both pool smoke tests passed on EKS. The image still does not match
+every GitHub-hosted tool; Sage, perf, nested virtualization, macOS, ARM and GPU
+assumptions require their own runners or workflow changes. Spot is deliberately
+not used for this pool:
 interruption would fail long Actions jobs and require a new run.
 
 Sources: [GitHub ARC deployment](https://docs.github.com/en/actions/how-tos/manage-runners/use-actions-runner-controller/deploy-runner-scale-sets),
