@@ -1707,6 +1707,10 @@ mod wide {
         half_trace: Linear128,
         trace_mask: u128,
         b: u128,
+        /// KIC_ROOT_ALGEBRA: one batched inversion of `(l+r)·l·r` instead of
+        /// of `(l+r)²·(l·r)²`, the quotients recovered by squarings (linear);
+        /// 10 field multiplications per candidate instead of 11, same roots.
+        algebra: bool,
     }
 
     impl S3Solver128 {
@@ -1745,6 +1749,7 @@ mod wide {
                 half_trace: Linear128::from_images(&half_trace_images),
                 trace_mask,
                 b,
+                algebra: std::env::var("KIC_ROOT_ALGEBRA").is_ok_and(|v| v == "1"),
             }
         }
 
@@ -1757,7 +1762,13 @@ mod wide {
             let a = self.square.apply(left ^ right);
             let p = gf.mul(left, right);
             let ps = self.square.apply(p);
-            let denominator = if a == 0 || ps == 0 { 0 } else { gf.mul(a, ps) };
+            let denominator = if a == 0 || ps == 0 {
+                0
+            } else if self.algebra {
+                gf.mul(left ^ right, p)
+            } else {
+                gf.mul(a, ps)
+            };
             PreparedRoot128 {
                 left,
                 right,
@@ -1780,9 +1791,18 @@ mod wide {
             if prepared.denominator == 0 {
                 return s3_x_roots_128(gf, self.b, prepared.left, prepared.right);
             }
-            let q = gf.mul(prepared.p, gf.mul(prepared.ps, inverse));
             let c = prepared.ps ^ self.b;
-            let d = gf.mul(gf.mul(c, prepared.a), gf.mul(prepared.a, inverse));
+            let (q, d) = if self.algebra {
+                // inverse = 1/((l+r)·p): 1/(l+r) = inverse·p, so
+                // q = p/a = p·(inverse·p)², and d = c·a/p² = c·(inverse·a)².
+                let q = gf.mul(prepared.p, gf.sqr(gf.mul(inverse, prepared.p)));
+                let d = gf.mul(c, gf.sqr(gf.mul(inverse, prepared.a)));
+                (q, d)
+            } else {
+                let q = gf.mul(prepared.p, gf.mul(prepared.ps, inverse));
+                let d = gf.mul(gf.mul(c, prepared.a), gf.mul(prepared.a, inverse));
+                (q, d)
+            };
             if (d & self.trace_mask).count_ones() & 1 == 1 {
                 return None;
             }
@@ -2478,12 +2498,58 @@ mod wide {
     mod root_bloom_table_tests {
         use super::{
             build_index128_with_symmetry, symmetric_labels_for_ordinal, symmetric_state_prefix,
-            Gf2_128, NormalBasis128, PackedRootLayout, RootBloom, RootOnly11, RootOnly21,
-            RootOnly83, RootSlots128, RootTable128, S3Solver128, State128, State26, State83,
-            StateStore128,
+            Gf2_128, NormalBasis128, PackedRootLayout, RootBatch128, RootBloom, RootOnly11,
+            RootOnly21, RootOnly83, RootSlots128, RootTable128, S3Solver128, State128, State26,
+            State83, StateStore128,
         };
         use crate::mix_root_bloom;
         use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse_wide;
+
+        /// T21 root algebra (10 multiplications per candidate) returns exactly
+        /// the roots, in the same order, of the original formulation and of
+        /// the direct solver, on random and exceptional inputs, scalar and
+        /// batched.
+        #[test]
+        fn root_algebra_matches_original_roots_n73_n83() {
+            for n in [73u32, 83] {
+                let gf = Gf2_128::new(&find_irreducible_sparse_wide(n).unwrap());
+                let basis = NormalBasis128::new(&gf);
+                let mut on = S3Solver128::new(&gf, 1);
+                let mut off = S3Solver128::new(&gf, 1);
+                on.algebra = true;
+                off.algebra = false;
+                let mut state = 0x1234_5678_9ABC_DEF0_0FED_CBA9_8765_4321u128 ^ n as u128;
+                let mut step = || {
+                    state = state
+                        .wrapping_mul(0x2360_ED05_1FC6_5DA4_4385_DF64_9FCC_F645)
+                        .wrapping_add(0x1442_6950_4088_9634_07E6_F4B7_D32B_4C2Du128);
+                    state & basis.mask
+                };
+                let mut inputs: Vec<(u128, u128)> = vec![(0, 5), (5, 0), (7, 7), (0, 0), (1, 1)];
+                for _ in 0..4000 {
+                    inputs.push((step(), step()));
+                }
+                let mut batch_on = RootBatch128::with_capacity(256);
+                let mut batch_off = RootBatch128::with_capacity(256);
+                for chunk in inputs.chunks(256) {
+                    batch_on.solve(&gf, &basis, &on, chunk);
+                    batch_off.solve(&gf, &basis, &off, chunk);
+                    assert_eq!(batch_on.results, batch_off.results, "batch n={n}");
+                }
+                let mut some = 0;
+                for &(l, r) in &inputs {
+                    let want = off.roots(&gf, &basis, l, r);
+                    assert_eq!(on.roots(&gf, &basis, l, r), want, "n={n} l={l} r={r}");
+                    assert_eq!(
+                        want,
+                        crypto_lib::cryptanalysis::koblitz_fast_arith::s3_x_roots_128(&gf, 1, l, r),
+                        "direct n={n}"
+                    );
+                    some += want.is_some() as u32;
+                }
+                assert!(some > 1000, "too few solvable inputs: {some}");
+            }
+        }
 
         #[test]
         fn indexed_five_byte_slots_match_real_n83_s3_roots() {
@@ -5119,7 +5185,10 @@ mod wide {
             );
         }
         let fast = FastBinaryCurve128::new(&curve.curve.irreducible, a as u128).unwrap();
-        let gf = Gf2_128::new(&curve.curve.irreducible);
+        let mut gf = Gf2_128::new(&curve.curve.irreducible);
+        if std::env::var("KIC_SPARSE_REDUCE").is_ok_and(|v| v == "1") {
+            gf.set_sparse_reduce(true);
+        }
         let b = gf.from_element(&curve.curve.b);
         let generator: FastPoint128 = match curve.generator() {
             crypto_lib::binary_ecc::BinaryPoint::Affine { x, y } => {

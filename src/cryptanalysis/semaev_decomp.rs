@@ -827,6 +827,12 @@ pub struct Gf2_128 {
     /// `n + d ≤ 129` so the first fold fits one `u128`); zero selects
     /// the byte-table reduction.
     fold_tail: u64,
+    /// Modulus-specialised reduction (`reduce_fold` by constant shifts), off
+    /// until `set_sparse_reduce(true)`: 0 off, 1 for tail `{0,2,3,4}` (n = 73), 2 for tail `{0,2,4,7}`
+    /// (n = 83).  Only ever non-zero where `fold_tail` is, and equal to the
+    /// carry-less fold for every input.
+    sparse: u8,
+    sparse_detected: u8,
 }
 
 /// `x` times `cur`, reduced: one step of the `z^t mod irr` ladder.
@@ -928,6 +934,14 @@ impl Gf2_128 {
         } else {
             0
         };
+        let mut terms = irr.low_terms.clone();
+        terms.sort_unstable();
+        let sparse_detected = match (n, terms.as_slice()) {
+            _ if fold_tail == 0 => 0,
+            (73, [0, 2, 3, 4]) => 1,
+            (83, [0, 2, 4, 7]) => 2,
+            _ => 0,
+        };
 
         Self {
             n,
@@ -938,7 +952,15 @@ impl Gf2_128 {
             red_hi,
             has_clmul,
             fold_tail,
+            sparse: 0,
+            sparse_detected,
         }
+    }
+
+    /// Switch the modulus-specialised reduction on or off (same results
+    /// either way; the A/B control of the wide producer's T21 cut).
+    pub fn set_sparse_reduce(&mut self, on: bool) {
+        self.sparse = if on { self.sparse_detected } else { 0 };
     }
 
     /// `a·b mod irr` by two carry-less folds instead of the byte tables.
@@ -980,6 +1002,19 @@ impl Gf2_128 {
         // H = P >> n, at most n − 1 ≤ 126 bits (n ≤ 127 keeps the shift in range).
         let h = (lo >> n) | (hi << (128 - n));
         let acc = lo & self.mask;
+        match self.sparse {
+            1 => {
+                let ht = h ^ (h << 2) ^ (h << 3) ^ (h << 4);
+                let h1 = ht >> n;
+                return acc ^ (ht & self.mask) ^ h1 ^ (h1 << 2) ^ (h1 << 3) ^ (h1 << 4);
+            }
+            2 => {
+                let ht = h ^ (h << 2) ^ (h << 4) ^ (h << 7);
+                let h1 = ht >> n;
+                return acc ^ (ht & self.mask) ^ h1 ^ (h1 << 2) ^ (h1 << 4) ^ (h1 << 7);
+            }
+            _ => {}
+        }
         // H·t in one u128: n − 1 + d ≤ 128 bits.
         let ht = clmul_u64(h as u64, tail) ^ (clmul_u64((h >> 64) as u64, tail) << 64);
         // Above zⁿ at most d − 1 bits remain; their fold has degree < n.
@@ -3940,6 +3975,50 @@ mod wide_tests {
                     gf.from_element(&ea.flt_inverse(&irr).unwrap()),
                     "inv vs F2mElement"
                 );
+            }
+        }
+    }
+
+    /// The modulus-specialised reduction (n = 73 and 83) is detected on the
+    /// pentanomials the wide producer uses and agrees with the carry-less
+    /// fold, and with the byte tables, with the switch on and off.
+    #[test]
+    fn wide_sparse_reduction_matches_fold_and_table() {
+        for (n, kind) in [(73u32, 1u8), (83, 2)] {
+            let irr = crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse_wide(n)
+                .expect("sparse irreducible exists");
+            let mut on = Gf2_128::new(&irr);
+            let mut off = Gf2_128::new(&irr);
+            let table = Gf2_128::portable(&irr);
+            off.set_sparse_reduce(false);
+            on.set_sparse_reduce(true);
+            if on.fold_tail == 0 {
+                continue; // no carry-less multiply on this host
+            }
+            assert_eq!(on.sparse, kind, "n={n} tail {:?}", irr.low_terms);
+            assert_eq!(off.sparse, 0);
+            let mut state = 0xD1B5_4A32_D192_ED03_7F4A_7C15_9E37_79B9u128 ^ (n as u128);
+            let mut step = || {
+                state = state
+                    .wrapping_mul(0x2360_ED05_1FC6_5DA4_4385_DF64_9FCC_F645)
+                    .wrapping_add(0x1442_6950_4088_9634_07E6_F4B7_D32B_4C2Du128);
+                state & on.mask
+            };
+            for i in 0..20_000 {
+                let a = match i % 5 {
+                    0 => on.mask,
+                    1 => 1u128 << (n - 1),
+                    _ => step(),
+                };
+                let b = match i % 7 {
+                    0 => on.mask,
+                    1 => 0,
+                    _ => step(),
+                };
+                let want = off.mul(a, b);
+                assert_eq!(on.mul(a, b), want, "mul n={n}");
+                assert_eq!(table.mul(a, b), want, "table mul n={n}");
+                assert_eq!(on.sqr(a), off.sqr(a), "sqr n={n}");
             }
         }
     }

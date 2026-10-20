@@ -814,6 +814,36 @@ fn biguint_to_u128(v: &BigUint) -> Option<u128> {
 /// allocations.  `d * d` cannot overflow: `d ≤ √v < 2^64`.
 fn factorise_u128(mut v: u128) -> Vec<(u128, u32)> {
     let mut out: Vec<(u128, u32)> = Vec::new();
+    // The cofactor of a Koblitz order is small and the rest a large prime:
+    // once what is left fits a word and is prime, the trial division stops
+    // (it used to run to its square root, 2^28 divisions of a u128 for the
+    // n = 73 order, about 9 s of every process start).  The test runs only
+    // when a division changed the remainder, as in `factorise_u64`.
+    let word_prime = |v: u128| v >> 64 == 0 && is_prime_u64(v as u64);
+    let mut prime = word_prime(v);
+    let mut d = 2u128;
+    while !prime && d * d <= v {
+        let mut e = 0;
+        while v.is_multiple_of(d) {
+            v /= d;
+            e += 1;
+        }
+        if e > 0 {
+            out.push((d, e));
+            prime = word_prime(v);
+        }
+        d += 1;
+    }
+    if v > 1 {
+        out.push((v, 1));
+    }
+    out
+}
+
+/// The pre-T21 trial division to its square root, kept as the oracle.
+#[cfg(test)]
+fn factorise_u128_trial(mut v: u128) -> Vec<(u128, u32)> {
+    let mut out: Vec<(u128, u32)> = Vec::new();
     let mut d = 2u128;
     while d * d <= v {
         let mut e = 0;
@@ -14212,6 +14242,40 @@ impl<'a> IndividualLogSolver<'a> {
 
 #[cfg(test)]
 mod tests {
+    /// T21: the early stop returns the same factor list as the trial
+    /// division to the square root, on smooth, prime, semiprime and
+    /// Koblitz-shaped (small cofactor times a large prime) inputs, including
+    /// the n = 73 group order.
+    #[test]
+    fn factorise_u128_early_stop_matches_trial_division() {
+        let mut cases: Vec<u128> = vec![
+            1,
+            2,
+            3,
+            4,
+            12,
+            97,
+            1 << 40,
+            2u128.pow(61) - 1,
+            9_444_732_965_923_561_641_724,
+            4 * 1_000_003 * 999_983,
+            999_983 * 999_979,
+            2 * 3 * 5 * 7 * 11 * 13 * 17 * 19 * 23 * 29 * 31 * 37,
+        ];
+        let mut x = 0x9E37_79B9_7F4A_7C15u64;
+        for _ in 0..300 {
+            x = x
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            cases.push((x >> 24) as u128 + 2);
+        }
+        for v in cases {
+            if v < (1u128 << 52) || v == 9_444_732_965_923_561_641_724 {
+                assert_eq!(factorise_u128(v), factorise_u128_trial(v), "v = {v}");
+            }
+        }
+    }
+
     use super::*;
     use crate::cryptanalysis::koblitz_groebner::build_decomposition_system;
 
