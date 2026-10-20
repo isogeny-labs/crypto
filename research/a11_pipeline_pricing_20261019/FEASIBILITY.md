@@ -68,3 +68,29 @@ t = 2, 3, 4 (4663 vs 508104; 4788601 vs 238512767; 855071386 vs
 15920614779) and its fitted cost growth per bit is steeper (kappa 8.769 vs
 7.468). This is a stage diagnostic of the solver axis (`AGENTS.md` section
 2): it is not S, not a speedup, and not a pipeline price.
+
+## Paper bound, 2026-10-20: the oracle is not worth building to price A11
+
+Before building the oracle above, a bound from committed rows asked whether
+an A11 algebraic oracle could ever compete per discrete logarithm with the
+group-law oracle ecbench already runs. Native computation:
+`examples/a11_oracle_paper_bound.rs`. Output: `paper_bound.txt`. Report:
+`reports/run-20261020T0630Z/REPORT.pdf`.
+
+- **Measured group-law arm** (PKM20: `prime-kummer:t=8`,
+  `rootfind-mitm:m=3`, p = 946177, 32 verified solves): 27 015, 29 332 and
+  50 187 GAE per discrete logarithm, with its unpriced counters at 0, 0.1
+  and 1 GAE (§5a).
+- **Algebraic lower bound**, every term chosen in A11's favour:
+  - row-reduction multiplications only;
+  - 50 field multiplications per GAE;
+  - one relation per decomposable target;
+  - N + 1 relations per logarithm, with no linear algebra and no setup;
+  - t > 5 held at the t = 5 count.
+
+  Its cheapest point is 7.1·10⁹ GAE per logarithm (A11, t = 3).
+- **Verdict:** at least 1.4·10⁵ times the group-law arm at every weight in
+  the band. A three-order-of-magnitude error in the model would not change
+  the order. The 1.5–3-week oracle is not worth building to price A11.
+  A11 stays a constant-factor gain inside F4 that does not reach the
+  pipeline.
