@@ -49,6 +49,26 @@ def counters(blob):
     return dict(line.split(maxsplit=1) for line in blob.splitlines())
 
 
+def snapshot_ok(snapshot):
+    try:
+        quota, period = (int(v) for v in snapshot['cpu.max'].split())
+        cpu = counters(snapshot['cpu.stat'])
+        memory = counters(snapshot['memory.events'])
+        values = [int(snapshot[key]) for key in
+                  ('memory.current', 'memory.peak', 'memory.max')]
+        values += [int(cpu[key]) for key in
+                   ('usage_usec', 'nr_periods', 'nr_throttled')]
+        values += [int(memory[key]) for key in ('oom', 'oom_kill')]
+        return (snapshot['cgroup_interface'] == 'v2' and
+                quota >= 4 * period > 0 and
+                int(snapshot['memory.max']) >= RSS_CAP + 256 * 1024**2 and
+                int(snapshot['memory.current']) <=
+                int(snapshot['memory.peak']) <= int(snapshot['memory.max']) and
+                all(value >= 0 for value in values))
+    except (KeyError, TypeError, ValueError, AttributeError):
+        return False
+
+
 def resource_gate(record):
     before, after = record['cgroup_before'], record['cgroup_after']
     cpu_before, cpu_after = (counters(x['cpu.stat']) for x in (before, after))
@@ -61,6 +81,7 @@ def resource_gate(record):
     record['resource_status'] = ('PASS' if
         record['status'] == 'PASS_PROCESS' and
         record['peak_rss_bytes'] <= RSS_CAP and
+        snapshot_ok(before) and snapshot_ok(after) and
         (throttle, oom, kills) == (0, 0, 0) else 'FAILED_OR_INCOMPLETE')
 
 
@@ -168,6 +189,7 @@ def main():
             protocol['rust_source_commit'] or
             digest(SOURCE / 'examples/koblitz_orbit_dlp_fast.rs') !=
             protocol['rust_source_sha256'] or
+            digest(Path(__file__)) != protocol['runner_sha256'] or
             not binary.is_file() or
             not (SCREEN / 'run.status').read_text().startswith(
                 'DONE screen=0 screen_verify=0 ') or
