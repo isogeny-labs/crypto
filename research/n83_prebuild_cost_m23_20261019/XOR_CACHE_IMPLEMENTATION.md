@@ -39,7 +39,10 @@ must be pinned in the host card before execution. No experiment is reported
 as executed by this implementation note; validation and launch receipts
 are separate additions.
 
-Conductor allowed the source expansion with an advisory overlap on a
-read-only `src` reservation (T-861). The standalone checkout isolates this
-branch from other editors. A transient local control-plane connection
-failure preceded the successful MCP scope check.
+The original study/artifact and catalog-repair scope checks passed under
+the explicit Crypto project. Subsequent explicit-project source expansion
+checks could not reach the local control plane. A fallback MCP check
+reported an advisory read-only `src` overlap (T-861), but a later MCP claim
+used a different default project and timed out; it is not an exclusive
+Crypto lease. The standalone checkout isolates this branch from other
+editors. This coordination-service limitation is retained explicitly.
