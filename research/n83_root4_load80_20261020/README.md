@@ -15,6 +15,10 @@ under the same overhead. This is a sizing diagnostic; an actual K4500 or
 K4549 process must pass the 24 GiB RSS and exact-output gates before entering
 a timing comparison.
 
+The bounded local K64 debug process controls for load75 and load80 each
+reached the 180-second cap before an index receipt. Their status is
+`TIMEOUT_180S`; they provide no ordering or capacity measurement.
+
 The next comparison should first run K4405 under load75 and load80 on the
 same exact source and factor base, then compare K4500 and K4549 under load80
 on frozen public points. Each new base needs its enumerated point digest,
