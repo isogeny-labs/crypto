@@ -12,8 +12,10 @@ STUDY = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
 PROJECTIVE = json.loads((STUDY / "results/genus2-projective-summary.json").read_text())
 MIXED = json.loads((STUDY / "results/mixed-fiber-dlp-native-v3-summary.json").read_text())
+MIXED_POLY = json.loads((STUDY / "results/mixed-fiber-polynomial-dlp-summary.json").read_text())
 TIAN = json.loads((STUDY / "results/tian-km-arithmetic-gate-summary.json").read_text())
 LINEAR = json.loads((STUDY / "results/tian-km-linear-dlp-summary.json").read_text())
+SIEVE = json.loads((STUDY / "results/tian-quartic-line-sieve-summary.json").read_text())
 
 
 def plot(path, labels, values, title, ylabel, session, horizontal=False):
@@ -104,6 +106,11 @@ def results_report():
          [row["representative"]["candidate_over_rho"] for row in mixed],
          "Mixed-fiber pair-table DLP · 180 targets per arm", "candidate / source rho cost",
          "mixed-fiber-dlp/v2 · 540 candidate records")
+    polynomial = [row for row in MIXED_POLY["summary"] if row["kind"] == "all"]
+    plot(out / "mixed-fiber-polynomial-cost-ratios", [row["arm"] for row in polynomial],
+         [row["representative"]["candidate_over_rho"] for row in polynomial],
+         "Mixed-fiber Semaev-S4 DLP · 180 targets per arm", "candidate / source rho cost",
+         "540 source-verified polynomial all-roots records · no F4 comparison")
     gate = TIAN["representative"]
     plot(out / "tian-arithmetic-gate", ["One quartic double", "Known-scalar 1987S"],
          [gate["one_jacobian_double_over_mean_rho"], gate["known_scalar_1987_multiplication_over_mean_rho"]],
@@ -113,6 +120,10 @@ def results_report():
          [LINEAR["representative"]["cold_candidate_over_mean_rho"]],
          "Tian F523 destination DLP · published S,T only", "cold operation cost / mean source rho",
          "one source-verified fixed target · source map and index calculus unexecuted", horizontal=True)
+    plot(out / "tian-line-sieve", ["Published-class line sieve"],
+         [SIEVE["representative"]["cold_candidate_over_mean_rho"]],
+         "Tian F523 destination index calculus · published S,T", "cold operation cost / mean source rho",
+         "one source- and destination-verified target · source map unexecuted", horizontal=True)
     pooled = next(row for row in PROJECTIVE["summary"] if row["kind"] == "all")
     p = pooled["representative"]
     source = f'''#set page(paper: "a4", margin: 19mm)
@@ -127,19 +138,25 @@ The two-choice collector and the projective numerator chart each ran on all 1,26
 
 #figure(image("projective-cost-ratios.svg", width: 100%), caption: [Complete paired operation-cost ratios by order size; 180 targets at each size.])
 
-== Mixed fibers: end-to-end pair-table variant
+== Mixed fibers: pair table and polynomial all-roots solvers
 
-All 540 candidate records on nine eligible prime-order curves were source-verified; native reanalysis retained every price and curve. Homogeneous, mixed and matched-random pooled ratios to rho are {mixed[0]["representative"]["candidate_over_rho"]:.4f}×, {mixed[1]["representative"]["candidate_over_rho"]:.4f}× and {mixed[2]["representative"]["candidate_over_rho"]:.4f}×. This is a pair-table oracle solver; the proposed heterogeneous polynomial/F4 solver remains untested.
+All 540 pair-table candidate records on nine eligible prime-order curves were source-verified; native reanalysis retained every price and curve. Homogeneous, mixed and matched-random pooled ratios to rho are {mixed[0]["representative"]["candidate_over_rho"]:.4f}×, {mixed[1]["representative"]["candidate_over_rho"]:.4f}× and {mixed[2]["representative"]["candidate_over_rho"]:.4f}×.
+
+The Semaev-S4 exhaustive-polynomial solver also recovered all 540 scalars on the same 180 targets and checked every answer on the source. Homogeneous, mixed and matched-random pooled costs are {polynomial[0]["representative"]["candidate_over_rho"]:.4f}×, {polynomial[1]["representative"]["candidate_over_rho"]:.4f}× and {polynomial[2]["representative"]["candidate_over_rho"]:.4f}× rho. All 36 pooled price cells lose to rho and the corresponding pair-table arm. External F4/msolve is untested.
 
 #figure(image("mixed-fiber-cost-ratios.svg", width: 100%), caption: [Complete DLP cost ratios; 180 exact-order targets per arm.])
 
+#figure(image("mixed-fiber-polynomial-cost-ratios.svg", width: 76%), caption: [Complete Semaev-S4 all-roots DLP costs; 180 exact-order targets per arm; external F4 comparison outstanding.])
+
 == Cubic transfer and odd-kernel escape: unresolved attacks
 
-For Tian's published F523 cubic fixture, the 3-kernel and smooth quartic were checked. Native quartic Jacobian arithmetic verifies T=1987S and rS=0 from published classes; five optimized cubic-field source-rho seeds recover the source scalar. One quartic doubling costs {gate["one_jacobian_double_over_mean_rho"]:.3f}× mean source rho in this implementation. A bounded linear search received the published S,T without their scalar, recovered 1987 and source-verified it; its cold cost is {LINEAR["representative"]["cold_candidate_over_mean_rho"]:.2f}× mean rho. The source-to-Jacobian map and proposed genus-3 index calculus were not executed. The 20 Smith-negative genus-3 holdouts were materialized, but odd kernels and end-to-end attacks on them remain untested.
+For Tian's published F523 cubic fixture, the 3-kernel and smooth quartic were checked. Native quartic Jacobian arithmetic verifies T=1987S and rS=0 from published classes; five optimized cubic-field source-rho seeds recover the source scalar. One quartic doubling costs {gate["one_jacobian_double_over_mean_rho"]:.3f}× mean source rho in this implementation. A bounded linear search received the published S,T without their scalar, recovered 1987 and source-verified it; its cold cost is {LINEAR["representative"]["cold_candidate_over_mean_rho"]:.2f}× mean rho. A genuine line-sieve index calculus on those published classes also recovered 1987, verified both rational-divisor relations in the Jacobian, and source-verified the answer. At M+0.5S+10I+0.1A it costs {SIEVE["representative"]["cold_candidate_over_mean_rho"]:.2f}× mean source rho and loses in all 36 price cells. The source-to-Jacobian map was not executed. The 20 Smith-negative genus-3 holdouts were materialized, but odd kernels and end-to-end attacks on them remain untested.
 
-#figure(image("tian-arithmetic-gate.svg", width: 100%), caption: [Arithmetic diagnostic only; one quartic doubling and a known-scalar multiplication divided by the mean of five complete source-rho solves.])
+#figure(image("tian-arithmetic-gate.svg", width: 76%), caption: [Arithmetic diagnostic only; one quartic doubling and a known-scalar multiplication divided by the mean of five complete source-rho solves.])
 
-#figure(image("tian-linear-dlp.svg", width: 100%), caption: [Cold cost of one verified DLP on published destination classes; no source-to-Jacobian map or index calculus was run.])
+#figure(image("tian-linear-dlp.svg", width: 76%), caption: [Cold cost of one verified DLP on published destination classes; no source-to-Jacobian map or index calculus was run.])
+
+#figure(image("tian-line-sieve.svg", width: 76%), caption: [Cold cost of published-class line-sieve index calculus, including all relation and descent attempts. Source map absent; operation pricing includes modular additions.])
 
 *Evidence:* `REPORT.md`, `results/`, `correctness/`, `sessions_projective_chart_v2.tar.zst`, and the seven linked `reports/run-*` PDFs. Negative outcomes and unexecuted routes remain explicit in the report. Literature: #link("https://arxiv.org/html/2012.07173")[Tian's cubic transfer] and #link("https://arxiv.org/html/2007.03172")[Tian's genus-3 odd-isogeny construction].
 '''
@@ -182,6 +199,7 @@ The adapter inserted two zero-valued projective counters and an addition-backend
 
 
 def native_run_reports():
+    polynomial = [row for row in MIXED_POLY["summary"] if row["kind"] == "all"]
     mixed_out = STUDY / "reports/run-20261020T0609Z-mixed-fiber-dlp-v2"
     mixed_out.mkdir(parents=True, exist_ok=True)
     for extension in ("svg", "png"):
@@ -270,6 +288,47 @@ At M+0.5S+10I the complete cold candidate costs {linear["cold_candidate_GAE"]:.0
 The source-to-Jacobian map was not executed; the published S,T are direct inputs. The proposed genus-3 index-calculus solver was not run. This control does not establish a general cubic-transfer attack cost or an external-system speed comparison.
 '''
     compile_report(linear_out, linear_source)
+
+    sieve_out = STUDY / "reports/run-20261020T0745Z-tian-line-sieve"
+    sieve_out.mkdir(parents=True, exist_ok=True)
+    for extension in ("svg", "png"):
+        shutil.copyfile(HERE / f"tian-line-sieve.{extension}", sieve_out / f"cost-ratio.{extension}")
+    sieve = SIEVE["representative"]
+    sieve_source = f'''#set page(paper: "a4", margin: 22mm)
+#set text(font: "Liberation Sans", size: 10pt)
+= Tian quartic: published-class line-sieve DLP
+
+*Command:* `tian-quartic-km --line-sieve-dlp` and `tian-line-sieve-analyze` from `native/Cargo.toml`. *Host:* shared Intel Xeon 6975P-C; L0 operation counts only.
+
+The solver received only the published destination classes S,T, without 1987. It enumerated all 522 rational affine points of the quartic and 11,116 fully split lines, obtaining relation rank 521 modulo the prime subgroup order. A rational degree-three divisor split for S and another for 6T after five failed target attempts. The divisor relations were independently checked by constructing the rational divisor classes and comparing them in the Jacobian. The resulting scalar 1987 was verified on the destination and by recomputing 1987P=Q on the source.
+
+At M+0.5S+10I+0.1A, the full cold cost is {sieve["cold_candidate_GAE"]:.1f} multiplication equivalents versus {sieve["mean_source_rho_GAE"]:.2f} for the mean of five optimized source-rho solves, a {sieve["cold_candidate_over_mean_rho"]:.2f}× loss. Across 36 prices this solver loses in every cell ({SIEVE["cold_ratio_band"][0]:.2f}–{SIEVE["cold_ratio_band"][1]:.2f}×). Quartic enumeration, line relations, modular elimination, failed descents and both verifications are included. Allocation, comparisons and control flow are unpriced, so wall speed is unknown.
+
+#figure(image("cost-ratio.svg", width: 100%), caption: [Complete counted cold operation cost for one published-class destination DLP versus mean source rho.])
+
+*Raw receipt:* `correctness/tian-quartic-line-sieve-dlp-v1.json`. *Full 36-price grid:* `results/tian-quartic-line-sieve-price-grid.csv`. The source-to-Jacobian map was not executed: S,T were direct published inputs, so this is not a complete transferred source attack or a general-size result.
+'''
+    compile_report(sieve_out, sieve_source)
+
+    polynomial_out=STUDY / "reports/run-20261020T0750Z-mixed-fiber-polynomial"
+    polynomial_out.mkdir(parents=True,exist_ok=True)
+    for extension in ("svg","png"):
+        shutil.copyfile(HERE / f"mixed-fiber-polynomial-cost-ratios.{extension}",polynomial_out / f"cost-ratios.{extension}")
+    poly_source=f'''#set page(paper: "a4", margin: 22mm)
+#set text(font: "Liberation Sans", size: 10pt)
+= Mixed-fiber Semaev-S4 all-roots DLP
+
+*Command:* `mixed-fiber-polynomial-dlp` and `mixed-fiber-polynomial-analyze` from `native/Cargo.toml`. *Host:* shared Intel Xeon 6975P-C; L0 operation counts only.
+
+The native solver built the Semaev-S4 resultant for every tuple in each prescribed three-fiber system, enumerated all rational polynomial zeros, tested every sign lift, inserted only group-law-valid relations, solved the modular rank system, and recomputed kP for each recovered scalar. It completed all 540 candidate arm records on 180 exact-order targets across nine eligible prime-field curves. The same target/fiber/rho records match the earlier pair-table cohort exactly. It performed 3,783,011 polynomial evaluations, found 21,849 polynomial roots, and attempted 165,669 sign lifts, retaining failed lifts.
+
+At M+0.5S+10I and 0.1M per declared native logical operation, homogeneous/mixed/matched-random cost {polynomial[0]["representative"]["candidate_over_rho"]:.4f}×/{polynomial[1]["representative"]["candidate_over_rho"]:.4f}×/{polynomial[2]["representative"]["candidate_over_rho"]:.4f}× source rho. Against the corresponding pair-table arms the ratios are {polynomial[0]["representative"]["candidate_over_pair_table"]:.4f}×/{polynomial[1]["representative"]["candidate_over_pair_table"]:.4f}×/{polynomial[2]["representative"]["candidate_over_pair_table"]:.4f}×. All 36 pooled price cells lose to both references for all three arms.
+
+#figure(image("cost-ratios.svg", width: 100%), caption: [Complete cold operation-cost ratios versus matched source rho; 180 targets per arm.])
+
+*Raw records:* `correctness/mixed-fiber-polynomial-dlp-v1.jsonl`; *full 36-price per-curve grid:* `results/mixed-fiber-polynomial-dlp-price-grid.csv`. This exhaustive all-roots polynomial evaluator is not F4/msolve. The fastest external Gröbner comparison and qualified wall-speed comparison remain open.
+'''
+    compile_report(polynomial_out,poly_source)
 
 
 if __name__ == "__main__":

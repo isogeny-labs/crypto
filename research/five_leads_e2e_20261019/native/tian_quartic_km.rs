@@ -694,6 +694,42 @@ impl QuarticKm {
         assert_eq!(on_h.0.len(), 22);
         self.translate(&on_h, cubic)
     }
+    fn class_from_rational_triple(&self, triple: &[(u64, u64); 3]) -> Class {
+        let f = &self.f;
+        let mut constraints = Vec::new();
+        for &(x, y) in triple {
+            assert_eq!(quartic(f, x, y, 1), 0);
+            assert_ne!(self.line(x, y, 1), 0);
+            constraints.push(
+                self.mons
+                    .iter()
+                    .map(|&(i, j)| f.m(f.pow(x, i as u64), f.pow(y, j as u64)))
+                    .collect(),
+            );
+        }
+        for &(x, y) in &self.roots {
+            let parameter = if self.partial(x, y, 1, 0) != 0 { 1 } else { 0 };
+            let vars = local_series(
+                f,
+                (x, y, 1),
+                3,
+                parameter,
+                if parameter == 1 { 0 } else { 1 },
+            );
+            constraints.extend(monomial_jets(f, &self.mons, 9, &vars));
+        }
+        assert_eq!(constraints.len(), 12);
+        let coefficients = nullspace(f, constraints, self.mons.len());
+        assert_eq!(coefficients.len(), 22);
+        Class(row_basis(
+            f,
+            coefficients
+                .iter()
+                .map(|c| lincomb(f, c, &self.v, N))
+                .collect(),
+            N,
+        ))
+    }
     fn partial(&self, x: u64, y: u64, z: u64, variable: usize) -> u64 {
         let f = &self.f;
         QUARTIC.iter().fold(0, |sum, &(i, j, k, c)| {
@@ -825,7 +861,475 @@ fn linear_dlp_fixture() {
         "source_verification_counts":source.f.counts()})
     );
 }
+const R: u64 = 143_069_629;
+
+// A line section and the fixed hyperplane H have linearly equivalent
+// degree-four divisors.  With P0 on H, every fully split affine line gives
+// four-term relations among the rational-point classes [P-P0].
+fn line_sieve_rank(solve: bool) {
+    let f = F::default();
+    let mut points = Vec::new();
+    for x in 0..P {
+        for y in 0..P {
+            if quartic(&f, x, y, 1) == 0 {
+                points.push((x, y));
+            }
+        }
+    }
+    let mut infinity = Vec::new();
+    for x in 0..P {
+        if quartic(&f, x, 1, 0) == 0 {
+            infinity.push((x, 1));
+        }
+    }
+    if quartic(&f, 1, 0, 0) == 0 {
+        infinity.push((1, 0));
+    }
+    assert!(infinity.contains(&(359, 1)));
+    let mut h = None;
+    for c in 0..P {
+        let roots: Vec<_> = points
+            .iter()
+            .enumerate()
+            .filter(|(_, &(x, y))| f.a(f.sub(x, f.m(359, y)), c) == 0)
+            .map(|(idx, _)| idx)
+            .collect();
+        if roots.len() == 3 {
+            h = Some((c, roots));
+            break;
+        }
+    }
+    let (h_constant, h_roots) = h.expect("split hyperplane");
+    let width = points.len();
+    let mut pivots: BTreeMap<usize, Vec<u64>> = BTreeMap::new();
+    let mut full_lines = 0usize;
+    let mut count_scalar_mul = 0u64;
+    let mut count_scalar_add = 0u64;
+    let mut count_scalar_inv = 0u64;
+    let mut collect = |line: &[usize]| {
+        if line.len() != 4 {
+            return;
+        }
+        full_lines += 1;
+        let mut row = vec![0u64; width];
+        for &idx in line {
+            row[idx] += 1;
+        }
+        for &idx in &h_roots {
+            row[idx] = (row[idx] + R - 1) % R;
+        }
+        for (&pivot, prior) in &pivots {
+            if row[pivot] == 0 {
+                continue;
+            }
+            let c = row[pivot];
+            for j in pivot..width {
+                row[j] = (row[j] + R - c * prior[j] % R) % R;
+                count_scalar_mul += 1;
+                count_scalar_add += 1;
+            }
+        }
+        if let Some(pivot) = row.iter().position(|&x| x != 0) {
+            let inverse = scalar_pow(row[pivot], R - 2);
+            count_scalar_inv += 1;
+            for x in &mut row[pivot..] {
+                *x = *x * inverse % R;
+                count_scalar_mul += 1;
+            }
+            pivots.insert(pivot, row);
+        }
+    };
+    for slope in 0..P {
+        let mut lines = vec![Vec::new(); P as usize];
+        for (idx, &(x, y)) in points.iter().enumerate() {
+            let intercept = f.sub(y, f.m(slope, x));
+            lines[intercept as usize].push(idx);
+        }
+        // A line with a rational point at infinity can have at most three
+        // distinct affine intersections, hence it never reaches collect().
+        for line in &lines {
+            if line.len() == 4 {
+                assert_ne!(
+                    quartic(&f, 1, slope, 0),
+                    0,
+                    "split line has a fifth point at infinity"
+                );
+            }
+            collect(line);
+        }
+    }
+    let mut vertical = vec![Vec::new(); P as usize];
+    for (idx, &(x, _)) in points.iter().enumerate() {
+        vertical[x as usize].push(idx);
+    }
+    for line in &vertical {
+        if line.len() == 4 {
+            assert_ne!(quartic(&f, 0, 1, 0), 0);
+        }
+        collect(line);
+    }
+    let rank = pivots.len();
+    let descent = if solve {
+        Some(line_sieve_descent(&points, &h_roots, &pivots))
+    } else {
+        None
+    };
+    println!(
+        "{}",
+        json!({
+            "schema":if solve {"tian-quartic-line-sieve-dlp/v1"} else {"tian-quartic-line-sieve-rank/v1"}, "p":P,"r":R,
+            "affine_rational_points":width,"infinity_rational_points":infinity,
+            "h_constant":h_constant,"h_roots":h_roots.iter().map(|&i| points[i]).collect::<Vec<_>>(),
+            "fully_split_lines":full_lines,"relation_rank":rank,"nullity":width-rank,
+            "scalar_field_counts":{"multiplications":count_scalar_mul,"additions":count_scalar_add,"inversions":count_scalar_inv},
+            "curve_field_counts":f.counts(),"descent":descent,
+        })
+    );
+}
+fn invert_matrix(f: &F, matrix: &[Vec<u64>]) -> Vec<Vec<u64>> {
+    let n = matrix.len();
+    assert!(matrix.iter().all(|row| row.len() == n));
+    let mut a: Vec<Vec<u64>> = matrix
+        .iter()
+        .enumerate()
+        .map(|(i, row)| {
+            let mut v = row.clone();
+            v.extend((0..n).map(|j| u64::from(i == j)));
+            v
+        })
+        .collect();
+    for i in 0..n {
+        let pivot = (i..n)
+            .find(|&j| a[j][i] != 0)
+            .expect("singular evaluation matrix");
+        a.swap(i, pivot);
+        let inv = f.inv(a[i][i]);
+        for j in i..2 * n {
+            a[i][j] = f.m(a[i][j], inv);
+        }
+        for k in 0..n {
+            if k == i {
+                continue;
+            }
+            let c = a[k][i];
+            if c != 0 {
+                for j in i..2 * n {
+                    a[k][j] = f.sub(a[k][j], f.m(c, a[i][j]));
+                }
+            }
+        }
+    }
+    a.into_iter().map(|row| row[n..].to_vec()).collect()
+}
+struct RationalEvaluator {
+    columns: Vec<usize>,
+    weights: Vec<Vec<u64>>,
+    points: Vec<(u64, u64)>,
+    original_indices: Vec<usize>,
+}
+impl RationalEvaluator {
+    fn new(km: &QuarticKm, all: &[(u64, u64)]) -> Self {
+        let f = &km.f;
+        let mut cols = Vec::new();
+        let mut independent = Vec::new();
+        for col in 0..N {
+            let v: Vec<u64> = km.v.iter().map(|row| row[col]).collect();
+            let mut candidate = independent.clone();
+            candidate.push(v.clone());
+            if row_basis(f, candidate, km.v.len()).len() > independent.len() {
+                independent.push(v);
+                cols.push(col);
+                if cols.len() == km.v.len() {
+                    break;
+                }
+            }
+        }
+        assert_eq!(cols.len(), 34);
+        let a: Vec<Vec<u64>> =
+            km.v.iter()
+                .map(|row| cols.iter().map(|&j| row[j]).collect())
+                .collect();
+        let a_inv = invert_matrix(f, &a);
+        let mut points = Vec::new();
+        let mut original_indices = Vec::new();
+        let mut weights = Vec::new();
+        for (idx, &(x, y)) in all.iter().enumerate() {
+            let h = km.line(x, y, 1);
+            if h == 0 {
+                continue;
+            }
+            let h_inv9 = f.inv(f.pow(h, 9));
+            let monomial_values: Vec<u64> = km
+                .mons
+                .iter()
+                .map(|&(i, j)| f.m(f.m(f.pow(x, i as u64), f.pow(y, j as u64)), h_inv9))
+                .collect();
+            let lambda: Vec<u64> = a_inv
+                .iter()
+                .map(|row| f.dot(row, &monomial_values))
+                .collect();
+            for (j, basis) in km.v.iter().enumerate() {
+                let selected: Vec<u64> = cols.iter().map(|&c| basis[c]).collect();
+                assert_eq!(f.dot(&lambda, &selected), monomial_values[j]);
+            }
+            points.push((x, y));
+            original_indices.push(idx);
+            weights.push(lambda);
+        }
+        Self {
+            columns: cols,
+            weights,
+            points,
+            original_indices,
+        }
+    }
+    fn eval(&self, f: &F, row: &[u64], idx: usize) -> u64 {
+        let selected: Vec<u64> = self.columns.iter().map(|&j| row[j]).collect();
+        f.dot(&self.weights[idx], &selected)
+    }
+}
+fn fixed_descent_space(km: &QuarticKm) -> Vec<Vec<u64>> {
+    let f = &km.f;
+    let p0 = local_series(f, (359, 1, 0), 3, 0, 2);
+    let mut constraints = monomial_jets(f, &km.mons, 9, &p0);
+    for &(x, y) in &km.roots {
+        let parameter = if km.partial(x, y, 1, 0) != 0 { 1 } else { 0 };
+        let vars = local_series(
+            f,
+            (x, y, 1),
+            6,
+            parameter,
+            if parameter == 1 { 0 } else { 1 },
+        );
+        constraints.extend(monomial_jets(f, &km.mons, 9, &vars));
+    }
+    assert_eq!(constraints.len(), 21);
+    let coefficients = nullspace(f, constraints, km.mons.len());
+    assert_eq!(coefficients.len(), 13);
+    row_basis(
+        f,
+        coefficients
+            .iter()
+            .map(|c| lincomb(f, c, &km.v, N))
+            .collect(),
+        N,
+    )
+}
+fn residual_triple(
+    km: &QuarticKm,
+    fixed: &[Vec<u64>],
+    evaluator: &RationalEvaluator,
+    class: &Class,
+) -> Option<Vec<usize>> {
+    let intersection = intersection(&km.f, &class.0, fixed);
+    assert_eq!(intersection.len(), 1, "unexpected descent intersection");
+    let h = &intersection[0];
+    let mut roots = Vec::new();
+    for i in 0..evaluator.points.len() {
+        if evaluator.eval(&km.f, h, i) != 0 {
+            continue;
+        }
+        let basepoint = class.0.iter().all(|row| evaluator.eval(&km.f, row, i) == 0);
+        if !basepoint {
+            roots.push(evaluator.original_indices[i]);
+        }
+    }
+    if roots.len() == 3 {
+        let triple = [
+            evaluator.points[evaluator
+                .original_indices
+                .iter()
+                .position(|&j| j == roots[0])
+                .unwrap()],
+            evaluator.points[evaluator
+                .original_indices
+                .iter()
+                .position(|&j| j == roots[1])
+                .unwrap()],
+            evaluator.points[evaluator
+                .original_indices
+                .iter()
+                .position(|&j| j == roots[2])
+                .unwrap()],
+        ];
+        let rational_class = km.class_from_rational_triple(&triple);
+        assert!(
+            km.equivalent(&rational_class, &km.neg(class)),
+            "descent divisor relation failed"
+        );
+        Some(roots)
+    } else {
+        None
+    }
+}
+fn point_log_kernel(pivots: &BTreeMap<usize, Vec<u64>>, width: usize) -> (Vec<u64>, u64, u64) {
+    assert_eq!(pivots.len() + 1, width, "line rank must have nullity one");
+    let free = (0..width).find(|i| !pivots.contains_key(i)).unwrap();
+    let mut values = vec![0; width];
+    let mut multiplications = 0;
+    let mut additions = 0;
+    values[free] = 1;
+    for (&j, row) in pivots.iter().rev() {
+        let mut sum = 0;
+        for k in j + 1..width {
+            sum = (sum + row[k] * values[k] % R) % R;
+            multiplications += 1;
+            additions += 1;
+        }
+        values[j] = (R - sum) % R;
+    }
+    for row in pivots.values() {
+        assert_eq!(
+            row.iter()
+                .zip(&values)
+                .fold(0, |a, (&x, &y)| (a + x * y % R) % R),
+            0
+        );
+    }
+    (values, multiplications, additions)
+}
+fn line_sieve_descent(
+    points: &[(u64, u64)],
+    h_roots: &[usize],
+    pivots: &BTreeMap<usize, Vec<u64>>,
+) -> serde_json::Value {
+    let km = QuarticKm::new();
+    assert_eq!(km.roots.iter().all(|p| points.contains(p)), true);
+    assert_eq!(h_roots.len(), 3);
+    let moved_cubic = km.cubic_triple_at_p0();
+    let s = km.class_from_cubics([380, 3, 364, 1], [190, 302, 340, 1], &moved_cubic);
+    let t = km.class_from_cubics([25, 158, 205, 1], [491, 424, 108, 1], &moved_cubic);
+    let evaluator = RationalEvaluator::new(&km, points);
+    let fixed = fixed_descent_space(&km);
+    let (logs, kernel_multiplications, kernel_additions) = point_log_kernel(pivots, points.len());
+    let mut attempts = Vec::new();
+    let mut s_triple = None;
+    let mut t_triple = None;
+    // Public S,T are the only inputs; scalar 1987 is never used to form
+    // candidates. Small sequential translates are a deterministic descent.
+    let mut s_multiple = km.identity.clone();
+    let mut t_multiple = km.identity.clone();
+    for a in 0..=12u64 {
+        if a > 0 {
+            s_multiple = km.add(&s_multiple, &s);
+        }
+        if let Some(roots) = residual_triple(&km, &fixed, &evaluator, &s_multiple) {
+            let value = roots.iter().fold(0, |acc, &i| (acc + logs[i]) % R);
+            attempts.push(json!({"a":a,"b":0,"roots":roots,"kernel_sum":value}));
+            if a > 0 && value != 0 && s_triple.is_none() {
+                s_triple = Some((a, value));
+            }
+        } else {
+            attempts.push(json!({"a":a,"b":0,"roots":null}));
+        }
+        if s_triple.is_some() {
+            break;
+        }
+    }
+    for b in 1..=12u64 {
+        t_multiple = km.add(&t_multiple, &t);
+        if let Some(roots) = residual_triple(&km, &fixed, &evaluator, &t_multiple) {
+            let value = roots.iter().fold(0, |acc, &i| (acc + logs[i]) % R);
+            attempts.push(json!({"a":0,"b":b,"roots":roots,"kernel_sum":value}));
+            if t_triple.is_none() {
+                t_triple = Some((b, value));
+            }
+        } else {
+            attempts.push(json!({"a":0,"b":b,"roots":null}));
+        }
+        if s_triple.is_some() && t_triple.is_some() {
+            break;
+        }
+    }
+    let recovered = if let (Some((a, sv)), Some((b, tv))) = (s_triple, t_triple) {
+        assert_eq!(sv * scalar_pow(sv, R - 2) % R, 1);
+        assert_eq!(b * scalar_pow(b, R - 2) % R, 1);
+        let scale = (R - a) * scalar_pow(sv, R - 2) % R;
+        let k = (R - scale * tv % R) * scalar_pow(b, R - 2) % R;
+        Some(k)
+    } else {
+        None
+    };
+    let after_descent = km.f.counts();
+    let mut destination_verified = false;
+    let mut source_verified = false;
+    let mut source_counts = None;
+    if let Some(k) = recovered {
+        destination_verified = km.equivalent(&km.mul(&s, k), &t);
+        fn pack(a: u64, b: u64, c: u64) -> u64 {
+            a + 523 * b + 523 * 523 * c
+        }
+        let source = Elliptic {
+            f: Field::new(523, 3, 2),
+            c: [pack(243, 339, 359), pack(140, 92, 82), 0, 1],
+            binary: false,
+        };
+        let generator = Point::affine(7, pack(310, 306, 155));
+        let target = Point::affine(pack(38, 393, 311), pack(33, 167, 418));
+        source_verified =
+            source.valid(generator) && source.valid(target) && source.mul(generator, k) == target;
+        source_counts = Some(source.f.counts());
+        assert!(
+            destination_verified && source_verified,
+            "recovered log did not verify"
+        );
+    }
+    json!({"attempts":attempts,"recovered":recovered,"destination_verified":destination_verified,
+        "source_verified":source_verified,"source_verification_counts":source_counts,
+        "after_descent_curve_field_counts":after_descent,"after_verification_curve_field_counts":km.f.counts(),
+        "scalar_recovery_inversions":if recovered.is_some(){2}else{0},
+        "scalar_kernel_multiplications":kernel_multiplications,"scalar_kernel_additions":kernel_additions,
+        "factor_base_size":logs.len(),"fixed_dimension":fixed.len(),"off_h_evaluation_points":evaluator.points.len(),
+        "source_map_executed":false,"index_calculus_executed":true})
+}
+fn scalar_pow(mut x: u64, mut n: u64) -> u64 {
+    let mut y = 1u64;
+    while n > 0 {
+        if n & 1 != 0 {
+            y = y * x % R;
+        }
+        n >>= 1;
+        if n > 0 {
+            x = x * x % R;
+        }
+    }
+    y
+}
 fn main() {
+    if std::env::args().any(|arg| arg == "--line-sieve-dlp") {
+        line_sieve_rank(true);
+        return;
+    }
+    if std::env::args().any(|arg| arg == "--line-sieve-rank") {
+        line_sieve_rank(false);
+        return;
+    }
+    if std::env::args().any(|arg| arg == "--published-support") {
+        let f = F::default();
+        let support = |a: [u64; 4], b: [u64; 4]| -> Vec<(u64, u64)> {
+            let mut result = Vec::new();
+            for x in 0..P {
+                for y in 0..P {
+                    if quartic(&f, x, y, 1) != 0 {
+                        continue;
+                    }
+                    let cx = (a[0] + a[1] * x + a[2] * x * x + x * x * x) % P;
+                    let cy = (b[0] + b[1] * y + b[2] * y * y + y * y * y) % P;
+                    if cx == 0 && cy == 0 {
+                        result.push((x, y));
+                    }
+                }
+            }
+            result
+        };
+        println!(
+            "{}",
+            json!({"schema":"tian-published-divisor-support/v1",
+            "s_rational_support":support([380,3,364,1],[190,302,340,1]),
+            "t_rational_support":support([25,158,205,1],[491,424,108,1])})
+        );
+        return;
+    }
     if std::env::args().any(|arg| arg == "--dlp-linear") {
         linear_dlp_fixture();
         return;

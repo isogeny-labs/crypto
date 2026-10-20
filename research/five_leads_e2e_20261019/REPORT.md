@@ -3,8 +3,8 @@
 This is a follow-up to the five leads in
 [the lead register](../new_leads_20261019/README.md). Each result below names
 the operation that was actually run. The two genus-2 changes have full-cohort
-execution and replay. Mixed fibers have an end-to-end pair-table DLP control,
-but the proposed polynomial solver has not run. Neither odd-kernel route has
+execution and replay. Mixed fibers have end-to-end pair-table and exhaustive
+summation-polynomial DLP controls, but no F4/msolve comparison. Neither odd-kernel route has
 an end-to-end transfer DLP. All tested curves, points and scalars are public
 synthetic or published fixtures.
 
@@ -62,8 +62,37 @@ native logical work is unpriced on both arms. This is a verified DLP on *publish
 destination classes* for one unusually small scalar, not an executed
 source-to-Jacobian map or the proposed genus-3 index-calculus solver. No
 source point was mapped through the published quotient. The executable
-quotient, its actual kernel, rational descent and index-calculus costs remain
+quotient, its actual kernel, and complete source-transfer cost remain
 [an open problem](../../problems/odd-isogeny-quartic-transfer-execution.md).
+
+The new native [line-sieve solver](native/tian_quartic_km.rs) executes an
+index-calculus DLP on the same *published destination classes*. It enumerates
+522 affine rational quartic points and 11,116 fully split rational lines.
+The line divisor relations have rank 521 modulo the stated prime order,
+leaving one factor-base log scale. A degree-three rational-divisor descent
+splits (S) immediately and (6T) after five failed target attempts.
+Each successful descent is checked again by constructing the rational
+divisor's Jacobian class and comparing it to the negative input class.
+Solving the two resulting equations recovers **1987** without that scalar as
+a solver input. Both the destination group law and recomputation of
+(1987P=Q) on the source curve verify the answer
+([raw receipt](correctness/tian-quartic-line-sieve-dlp-v1.json)).
+
+The [native cold price grid](results/tian-quartic-line-sieve-price-grid.csv)
+includes quartic enumeration, all line relations, modular elimination,
+factor-base nullspace recovery, failed and successful descents, and source
+and destination verification. At (M+0.5S+10I+0.1A), with one modular
+addition priced at 0.1 multiplication, the candidate costs **606,292,001.4**
+base-field multiplication equivalents against **1,079,600.82** for the mean
+of five source-rho solves, a **561.59× loss**. Across the 36 (S,I,A)
+prices it loses in every cell; the ratio spans **40.85–684.92×**.
+The scalar-field and curve-field M/S/I/addition vectors are in the
+[analysis](results/tian-quartic-line-sieve-summary.json). Allocation,
+comparisons and control flow are unpriced, so this is an operation-cost
+comparison, not a qualified wall-speed result. The published (S,T) are
+still direct inputs: the paper's source-to-Jacobian map and quotient
+construction are not executable here. This result does not give a complete
+source-transfer attack cost or a general-size asymptotic claim.
 
 ## Genus-2 target-useful relations
 
@@ -214,8 +243,6 @@ work, including fiber selection. At the declared
 1.0108 for \(p=97,193,257\), respectively; mixed/random cost is
 0.8650, 0.8876 and 0.8952. These are **pair-table oracle ratios**.
 They are not costs for heterogeneous polynomial solving or a DLP.
-The complete polynomial all-roots/F4 comparison and source-to-answer run
-remain [open](../../problems/mixed-fiber-pkm-full-solver.md).
 
 A subsequent [native pair-table DLP](native/mixed_fiber_dlp.rs) selected nine
 eligible prime-order curves (three per field) and 20 distinct exact-order
@@ -235,7 +262,32 @@ none for \(p=193,257\). The
 [full native price grid](results/mixed-fiber-dlp-native-v3-price-grid.csv) retains every
 curve, price and loss. This measures an end-to-end **pair-table oracle**
 variant, not the proposed heterogeneous polynomial/F4 solver, so that
-specific lead remains open.
+specific F4 implementation remains open.
+
+A new native [Semaev (S_4) solver](native/mixed_fiber_polynomial_dlp.rs)
+evaluates the full resultant polynomial over every prescribed three-fiber
+tuple, enumerates every rational zero, tests all sign lifts, and inserts only
+group-law-valid relations. It reran the same 180 target points on all three
+arms: **540/540** candidate scalars and all matched rho controls verified on
+the source; no run exhausted. The raw
+[540-record receipt](correctness/mixed-fiber-polynomial-dlp-v1.jsonl) includes
+3,783,011 polynomial evaluations, 21,849 polynomial roots and 165,669 sign
+lifts, including failed lifts. A small-curve test checks every finite group
+sum against the (S_3,S_4) formulas; the native analyzer matches all 540
+targets, fibers and rho controls to the earlier pair-table cohort.
+
+At (M+0.5S+10I) and 0.1(M) per declared native logical operation, the
+[36-price analysis](results/mixed-fiber-polynomial-dlp-summary.json) gives
+homogeneous, mixed and random **57.8840×, 32.2975× and 34.4846×** rho.
+Each loses in all 36 pooled price cells. Against the prior pair-table solver
+on identical targets, the corresponding costs are **15.8869×, 10.0233× and
+9.2752×**; all 36 pooled cells lose for every arm. Mixed fibers beat
+homogeneous at this price but lose to matched random at (p=97); the
+[full grid](results/mixed-fiber-polynomial-dlp-price-grid.csv) retains
+per-prime and per-curve wins and losses. This is an exhaustive polynomial
+all-roots solver, **not F4 or msolve**. The fastest external Gröbner-system
+comparison and larger-size evidence remain
+[open](../../problems/mixed-fiber-pkm-full-solver.md).
 
 The [results report PDF](reports/results-20261020/report.pdf) contains the
 quantitative graphs and links the seven individual projective

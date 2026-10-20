@@ -91,7 +91,21 @@ research/five_leads_e2e_20261019/native/target/release/genus2-projective-analyze
 ```
 
 The native mixed-fiber analysis can be regenerated from the retained v2 DLP
-records with `mixed-fiber-dlp-analyze`. Tian's published quartic group-law
+records with `mixed-fiber-dlp-analyze`.
+The new exhaustive summation-polynomial arm uses the same 180 target points
+and three fiber choices, with all roots and sign lifts charged:
+
+```sh
+research/five_leads_e2e_20261019/native/target/release/mixed-fiber-polynomial-dlp > research/five_leads_e2e_20261019/correctness/mixed-fiber-polynomial-dlp-v1.jsonl
+research/five_leads_e2e_20261019/native/target/release/mixed-fiber-polynomial-analyze
+```
+
+The analyzer requires all 540 candidate and matched rho records to verify,
+matches every target and fiber to the pair-table cohort, and writes the
+36-price per-curve grid. This is complete exhaustive Semaev-S4 rational-root
+evaluation, not F4/msolve; an external Gröbner solver is not installed here.
+
+Tian's published quartic group-law
 checks, optimized cubic source rho, and the explicitly non-DLP arithmetic
 cost gate use `tian-quartic-km`, `tian-cubic-rho`, and
 `tian-km-gate-analyze` from the same native crate.
@@ -101,13 +115,29 @@ The published-class destination DLP control runs with
 `tian-km-linear-analyze`. This bounded linear search receives only the
 published destination classes, has a cap of 10,000, and source-verifies the
 recovered scalar. It does not execute the source-to-Jacobian map or the
-proposed quartic index calculus.
+separate quartic line-sieve index calculus described below.
 The initial `tian-cubic-rho-v1.jsonl` receipt expanded every cubic-field
 inversion into exponentiation and is excluded from cost comparisons; v2 uses
 the norm inversion and charges its base-field M/S/I vector. The initial
 `tian-quartic-km-v1.json` receipt lacked phase snapshots and group-law
 controls; v2 is the priced arithmetic gate. Both earlier receipts are
 retained as developmental evidence.
+
+The published-class quartic line-sieve DLP can be reproduced with:
+
+```sh
+research/five_leads_e2e_20261019/native/target/release/tian-quartic-km --line-sieve-dlp > research/five_leads_e2e_20261019/correctness/tian-quartic-line-sieve-dlp-v1.json
+research/five_leads_e2e_20261019/native/target/release/tian-line-sieve-analyze
+```
+
+The first command receives the published destination classes only. It
+enumerates every rational line relation, performs modular elimination,
+attempts rational-divisor descent and independently checks each successful
+divisor equality in the Jacobian before source and destination DLP checks.
+Its output records all failed attempts. The analyzer verifies the rank,
+answer and checks, prices the complete cold field-operation vectors across
+36 M/S/I/addition cells, and retains every loss to rho. The source map is
+not executed, and memory/control-flow work remains unpriced.
 
 Final verification commands:
 

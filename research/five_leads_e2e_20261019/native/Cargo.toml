@@ -29,8 +29,16 @@ name = "mixed-fiber-dlp"
 path = "mixed_fiber_dlp.rs"
 
 [[bin]]
+name = "mixed-fiber-polynomial-dlp"
+path = "mixed_fiber_polynomial_dlp.rs"
+
+[[bin]]
 name = "mixed-fiber-dlp-analyze"
 path = "mixed_fiber_dlp_analyze.rs"
+
+[[bin]]
+name = "mixed-fiber-polynomial-analyze"
+path = "mixed_fiber_polynomial_analyze.rs"
 
 [[bin]]
 name = "genus2-model-gate"
@@ -51,6 +59,10 @@ path = "tian_km_gate_analyze.rs"
 [[bin]]
 name = "tian-km-linear-analyze"
 path = "tian_km_linear_analyze.rs"
+
+[[bin]]
+name = "tian-line-sieve-analyze"
+path = "tian_line_sieve_analyze.rs"
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }

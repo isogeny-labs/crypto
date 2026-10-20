@@ -10,18 +10,24 @@ The two-choice collector and the projective numerator chart each ran on all 1,26
 
 #figure(image("projective-cost-ratios.svg", width: 100%), caption: [Complete paired operation-cost ratios by order size; 180 targets at each size.])
 
-== Mixed fibers: end-to-end pair-table variant
+== Mixed fibers: pair table and polynomial all-roots solvers
 
-All 540 candidate records on nine eligible prime-order curves were source-verified; native reanalysis retained every price and curve. Homogeneous, mixed and matched-random pooled ratios to rho are 3.6435×, 3.2222× and 3.7180×. This is a pair-table oracle solver; the proposed heterogeneous polynomial/F4 solver remains untested.
+All 540 pair-table candidate records on nine eligible prime-order curves were source-verified; native reanalysis retained every price and curve. Homogeneous, mixed and matched-random pooled ratios to rho are 3.6435×, 3.2222× and 3.7180×.
+
+The Semaev-S4 exhaustive-polynomial solver also recovered all 540 scalars on the same 180 targets and checked every answer on the source. Homogeneous, mixed and matched-random pooled costs are 57.8840×, 32.2975× and 34.4846× rho. All 36 pooled price cells lose to rho and the corresponding pair-table arm. External F4/msolve is untested.
 
 #figure(image("mixed-fiber-cost-ratios.svg", width: 100%), caption: [Complete DLP cost ratios; 180 exact-order targets per arm.])
 
+#figure(image("mixed-fiber-polynomial-cost-ratios.svg", width: 76%), caption: [Complete Semaev-S4 all-roots DLP costs; 180 exact-order targets per arm; external F4 comparison outstanding.])
+
 == Cubic transfer and odd-kernel escape: unresolved attacks
 
-For Tian's published F523 cubic fixture, the 3-kernel and smooth quartic were checked. Native quartic Jacobian arithmetic verifies T=1987S and rS=0 from published classes; five optimized cubic-field source-rho seeds recover the source scalar. One quartic doubling costs 14.043× mean source rho in this implementation. A bounded linear search received the published S,T without their scalar, recovered 1987 and source-verified it; its cold cost is 51979.77× mean rho. The source-to-Jacobian map and proposed genus-3 index calculus were not executed. The 20 Smith-negative genus-3 holdouts were materialized, but odd kernels and end-to-end attacks on them remain untested.
+For Tian's published F523 cubic fixture, the 3-kernel and smooth quartic were checked. Native quartic Jacobian arithmetic verifies T=1987S and rS=0 from published classes; five optimized cubic-field source-rho seeds recover the source scalar. One quartic doubling costs 14.043× mean source rho in this implementation. A bounded linear search received the published S,T without their scalar, recovered 1987 and source-verified it; its cold cost is 51979.77× mean rho. A genuine line-sieve index calculus on those published classes also recovered 1987, verified both rational-divisor relations in the Jacobian, and source-verified the answer. At M+0.5S+10I+0.1A it costs 561.59× mean source rho and loses in all 36 price cells. The source-to-Jacobian map was not executed. The 20 Smith-negative genus-3 holdouts were materialized, but odd kernels and end-to-end attacks on them remain untested.
 
-#figure(image("tian-arithmetic-gate.svg", width: 100%), caption: [Arithmetic diagnostic only; one quartic doubling and a known-scalar multiplication divided by the mean of five complete source-rho solves.])
+#figure(image("tian-arithmetic-gate.svg", width: 76%), caption: [Arithmetic diagnostic only; one quartic doubling and a known-scalar multiplication divided by the mean of five complete source-rho solves.])
 
-#figure(image("tian-linear-dlp.svg", width: 100%), caption: [Cold cost of one verified DLP on published destination classes; no source-to-Jacobian map or index calculus was run.])
+#figure(image("tian-linear-dlp.svg", width: 76%), caption: [Cold cost of one verified DLP on published destination classes; no source-to-Jacobian map or index calculus was run.])
+
+#figure(image("tian-line-sieve.svg", width: 76%), caption: [Cold cost of published-class line-sieve index calculus, including all relation and descent attempts. Source map absent; operation pricing includes modular additions.])
 
 *Evidence:* `REPORT.md`, `results/`, `correctness/`, `sessions_projective_chart_v2.tar.zst`, and the seven linked `reports/run-*` PDFs. Negative outcomes and unexecuted routes remain explicit in the report. Literature: #link("https://arxiv.org/html/2012.07173")[Tian's cubic transfer] and #link("https://arxiv.org/html/2007.03172")[Tian's genus-3 odd-isogeny construction].
