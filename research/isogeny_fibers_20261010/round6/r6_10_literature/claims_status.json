@@ -1,0 +1,371 @@
+{
+ "schema": "r6_10_claims_status/v1",
+ "date": "2026-10-18",
+ "legend": {
+  "confirmed": "bibliographic data from a fetched record, and the use we make of it matches fetched primary text or abstract",
+  "confirmed-secondary": "bibliographic data fetched; the use matches a fetched secondary source; primary text not opened",
+  "bib-only": "bibliographic data fetched; what we use it for was not checked against the source (unverified)",
+  "corrected": "the reference or its attribution was wrong; corrected reference in RESULTS.md",
+  "mismatch": "the source says something different from, or narrower than, what we use it for",
+  "unverified": "neither bibliographic data nor content could be fetched",
+  "withdrawn": "could not be confirmed and should be removed"
+ },
+ "rows": [
+  {
+   "id": "L1",
+   "group": "4E test",
+   "citation": "US 7,257,709 B2 / US 2004/0114760 A1 (Brown, Yamada; Certicom)",
+   "status": "mismatch",
+   "note": "h=4 test is Tr(x)=0, x!=0, Tr(x*H(b/x^2))=0: already sqrt-free and y-free; our difference is inversion-free, not sqrt-free"
+  },
+  {
+   "id": "L2",
+   "group": "4E test",
+   "citation": "King, PKC 2004, 333-345",
+   "status": "bib-only",
+   "note": "compression paper; cofactor-4 halving test (its Sec. 5 per an EGO snippet) not read"
+  },
+  {
+   "id": "L3",
+   "group": "4E test",
+   "citation": "Eagle-Galbraith-Ong, ePrint 2009/086",
+   "status": "corrected",
+   "note": "journal version Adv. Math. Commun. 5(1) (2011) 1-10; cofactor-4 test text not read (PDF 403)"
+  },
+  {
+   "id": "L4",
+   "group": "4E test",
+   "citation": "Knudsen, ASIACRYPT 1999, 135-149",
+   "status": "confirmed-secondary",
+   "note": "criterion Tr(x)=Tr(a) stated in FHLM 2004; Tr(a)=0 case deferred by FHLM to Knudsen/Schroeppel"
+  },
+  {
+   "id": "L5",
+   "group": "4E test",
+   "citation": "Fong-Hankerson-Lopez-Menezes, IEEE TC 53(8) 2004",
+   "status": "confirmed",
+   "note": "full text fetched"
+  },
+  {
+   "id": "L6",
+   "group": "4E test",
+   "citation": "'Schroeppel' (no reference given)",
+   "status": "corrected",
+   "note": "Schroeppel 2000 workshop talk and WO 01/35573 A1, per FHLM references; primaries not read"
+  },
+  {
+   "id": "L7",
+   "group": "4E test",
+   "citation": "Pornin, ePrint 2022/1164",
+   "status": "confirmed",
+   "note": "abstract: halving-based subgroup membership on twisted Edwards"
+  },
+  {
+   "id": "L8",
+   "group": "4E test",
+   "citation": "ePrint 2026/749 'Divide-and-Pair' as a survey",
+   "status": "corrected",
+   "note": "a method paper (Dai, El Housni, Koshelev, Reijnders), not a survey"
+  },
+  {
+   "id": "L9",
+   "group": "4E test",
+   "citation": "ECC2K-130 subgroup order r(131)",
+   "status": "confirmed",
+   "note": "equals l in 'Breaking ECC2K-130' (fetched)"
+  },
+  {
+   "id": "L10",
+   "group": "AGM",
+   "citation": "Fuchsbauer-Kiltz-Loss, CRYPTO 2018",
+   "status": "confirmed",
+   "note": "abstract: assumptions equivalent to DLog in AGM; Definition 1 text not read"
+  },
+  {
+   "id": "L11",
+   "group": "AGM",
+   "citation": "Fuchsbauer-Plouviez-Seurin, EUROCRYPT 2020",
+   "status": "bib-only",
+   "note": "AGM+ROM confirmed; 'representations for oracle-query elements' not checked"
+  },
+  {
+   "id": "L12",
+   "group": "AGM",
+   "citation": "Bauer-Fuchsbauer-Loss, CRYPTO 2020",
+   "status": "bib-only",
+   "note": "121-151"
+  },
+  {
+   "id": "L13",
+   "group": "AGM",
+   "citation": "Agrikola-Hofheinz-Kastner, EUROCRYPT 2020 (was recalled)",
+   "status": "bib-only",
+   "note": "96-126"
+  },
+  {
+   "id": "L14",
+   "group": "AGM",
+   "citation": "Zhandry, CRYPTO 2022 (was recalled)",
+   "status": "bib-only",
+   "note": "66-96"
+  },
+  {
+   "id": "L15",
+   "group": "AGM",
+   "citation": "Duman et al., PKC 2023 (was recalled)",
+   "status": "confirmed",
+   "note": "abstract: generic group action model for CSIDH-type actions"
+  },
+  {
+   "id": "L16",
+   "group": "AGM",
+   "citation": "Shoup 1997; Nechaev 1994; Maurer 2005",
+   "status": "bib-only",
+   "note": "standard; not re-read"
+  },
+  {
+   "id": "L17",
+   "group": "class invariance",
+   "citation": "Jao-Miller-Venkatesan, ASIACRYPT 2005; ePrint 2004/312",
+   "status": "confirmed",
+   "note": "random reducibility under GRH, (nearly) same End only; ePrint title differs; J. Number Theory 2009 version"
+  },
+  {
+   "id": "L18",
+   "group": "class invariance",
+   "citation": "Galbraith-Hess-Smart, EUROCRYPT 2002, LNCS 2332, 29-44",
+   "status": "confirmed",
+   "note": "abstract: isogeny to a GHS-weak curve"
+  },
+  {
+   "id": "L19",
+   "group": "class invariance",
+   "citation": "GHS02 transport cost 'O~(q^1/4)' (16.7 sec. 7.4)",
+   "status": "mismatch",
+   "note": "O(q^{n/4+eps}) is for two given curves; MMT: finding a weak isogenous curve may need a search of the weak set"
+  },
+  {
+   "id": "L20",
+   "group": "class invariance",
+   "citation": "Gaudry-Hess-Smart, J. Cryptology 15 (2002) 19-46",
+   "status": "confirmed",
+   "note": "abstract fetched; Thm (via MMT Thm 1): n odd or m=n or Tr(a)=0"
+  },
+  {
+   "id": "L21",
+   "group": "class invariance",
+   "citation": "Menezes-Teske-Weng, CT-RSA 2004 (was recalled)",
+   "status": "mismatch",
+   "note": "abstract: every instance over weak fields is easier than rho on hardest; not 'fields with many GHS-weak classes'"
+  },
+  {
+   "id": "L22",
+   "group": "class invariance",
+   "citation": "'Menezes-Qu condition' n odd or m=n or Tr(a)=0 (R5.2)",
+   "status": "corrected",
+   "note": "the condition is GHS02's theorem (MMT Thm 1); Menezes-Qu (CT-RSA 2001) analyse prime n"
+  },
+  {
+   "id": "L23",
+   "group": "class invariance",
+   "citation": "'cover genus >= 2^(N-1)-ish' for prime N (R5.4)",
+   "status": "mismatch",
+   "note": "MMT Thm 11 (from Menezes-Qu): least m>1 is t+1, t = ord_N(2)"
+  },
+  {
+   "id": "L24",
+   "group": "class invariance",
+   "citation": "Diem 2003, GHS in odd characteristic (was recalled)",
+   "status": "corrected",
+   "note": "J. Ramanujan Math. Soc. 18(1) (2003) 1-32 (bibtex fetched); content not read"
+  },
+  {
+   "id": "L25",
+   "group": "class invariance",
+   "citation": "Galbraith, LMS JCM 2 (1999) 118-138",
+   "status": "confirmed",
+   "note": "O(p^1/4 (ln p)^13/2) when conductor is smooth; worst O(p^3/2); prime fields"
+  },
+  {
+   "id": "L26",
+   "group": "class invariance",
+   "citation": "Teske J.Crypt 19; Kohel thesis 1996; Miret et al. AMC 176",
+   "status": "bib-only",
+   "note": "bibliographic data fetched; Kohel title page read"
+  },
+  {
+   "id": "L27",
+   "group": "image / symmetrised",
+   "citation": "Faugere-Huot-Joux-Renault-Vitse, EUROCRYPT 2014",
+   "status": "confirmed",
+   "note": "PRIOR WORK: Sec. 3.2 has the m^{n-1} decomposition loss and its compensation by easier systems"
+  },
+  {
+   "id": "L28",
+   "group": "image / symmetrised",
+   "citation": "Faugere-Gaudry-Huot-Renault, J. Cryptology 27 (2014) 595-635 (added)",
+   "status": "bib-only",
+   "note": "2-torsion symmetry in Edwards/Jacobi models, as credited by FHJRV; text not read"
+  },
+  {
+   "id": "L29",
+   "group": "image / symmetrised",
+   "citation": "Galbraith-Gebregiyorgis, INDOCRYPT 2014",
+   "status": "confirmed",
+   "note": "binary Edwards; rho still faster for prime degree; '4-torsion' (R5.4) not in abstract"
+  },
+  {
+   "id": "L30",
+   "group": "image / symmetrised",
+   "citation": "Huang-Petit-Shinohara-Takagi, IWSEC 2013 / PJMI 2015",
+   "status": "mismatch",
+   "note": "titles differ by venue; abstract: FPPR, prime degree, specialised base; no Edwards/4-torsion (R5.4 recollection)"
+  },
+  {
+   "id": "L31",
+   "group": "image / symmetrised",
+   "citation": "Semaev ePrint 2004/031; Gaudry JSC 2009; Diem Compositio 2011; Gorla-Massierer AMC 2015",
+   "status": "bib-only",
+   "note": "bibliographic data fetched; Semaev abstract read"
+  },
+  {
+   "id": "L32",
+   "group": "multi-target",
+   "citation": "Kuhn-Struik, SAC 2001, 212-229: sqrt(2Lr)",
+   "status": "confirmed-secondary",
+   "note": "Galbraith's book: sqrt(2rL) for 1 < L < r^1/4; holds at L=64 here"
+  },
+  {
+   "id": "L33",
+   "group": "multi-target",
+   "citation": "Fouque-Joux-Mavromati, ASIACRYPT 2014",
+   "status": "bib-only",
+   "note": "420-438"
+  },
+  {
+   "id": "L34",
+   "group": "multi-target",
+   "citation": "Bernstein-Lange, INDOCRYPT 2012",
+   "status": "confirmed",
+   "note": "T = l^1/3 table, 1.77 l^1/3 per DLP"
+  },
+  {
+   "id": "L35",
+   "group": "sqrt-elu",
+   "citation": "Bernstein-De Feo-Leroux-Smith, ANTS XIV 2020",
+   "status": "corrected",
+   "note": "add venue: Open Book Series 4 (2020) 39-55; O~(sqrt l) confirmed"
+  },
+  {
+   "id": "L36",
+   "group": "sqrt-elu",
+   "citation": "Velu, C. R. Acad. Sci. Paris 273 (1971)",
+   "status": "unverified",
+   "note": "not fetched; recalled"
+  },
+  {
+   "id": "L37",
+   "group": "genus 2 / costs",
+   "citation": "Gaudry, EUROCRYPT 2000, 19-34",
+   "status": "confirmed",
+   "note": "O~(q^2), g!q relation term (book)"
+  },
+  {
+   "id": "L38",
+   "group": "genus 2 / costs",
+   "citation": "'Gaudry g!*q^(2-2/g)' (R5.2 model M2)",
+   "status": "mismatch",
+   "note": "g! is Gaudry-2000's relation term; q^(2-2/g) is GTTD; product is our model"
+  },
+  {
+   "id": "L39",
+   "group": "genus 2 / costs",
+   "citation": "sec 13.4 'genus 2 costs O~(q) (Gaudry)'",
+   "status": "corrected",
+   "note": "O~(q) at g=2 is GTTD double large prime; Gaudry 2000 alone is O~(q^2)"
+  },
+  {
+   "id": "L40",
+   "group": "genus 2 / costs",
+   "citation": "Gaudry-Thome-Theriault-Diem, Math. Comp. 76 (2007)",
+   "status": "confirmed-secondary",
+   "note": "O~(q^(2-2/g)) per Galbraith's book"
+  },
+  {
+   "id": "L41",
+   "group": "genus 2 / costs",
+   "citation": "Enge-Gaudry L[1/2, sqrt2], Acta Arith. 102 (2002)",
+   "status": "confirmed-secondary",
+   "note": "constant in Galbraith's book and Chi-Dominguez et al. 2021; primary abstract has no constant"
+  },
+  {
+   "id": "L42",
+   "group": "genus 2 / costs",
+   "citation": "Nagao, ANTS IX 2010, 285-300",
+   "status": "bib-only",
+   "note": "extension-field factor base x in F_q (search summary only)"
+  },
+  {
+   "id": "L43",
+   "group": "membership",
+   "citation": "Koshelev, J. Cryptogr. Eng. 2023",
+   "status": "corrected",
+   "note": "13(1) 125-128 (online 2022) plus correction 14 (2024) 127-128; abstract supports use"
+  },
+  {
+   "id": "L44",
+   "group": "other sec 13-15",
+   "citation": "Jacobson-Koblitz-Silverman-Stein-Teske, DCC 20 (2000)",
+   "status": "mismatch",
+   "note": "obstruction is a bound on relation coefficients (from canonical heights), not 'height growth'"
+  },
+  {
+   "id": "L45a",
+   "group": "other sec 13-15",
+   "citation": "Duursma-Gaudry-Morain ASIACRYPT 1999; Galbraith-Gaudry DCC 78",
+   "status": "bib-only",
+   "note": "bibliographic data fetched"
+  },
+  {
+   "id": "L45b",
+   "group": "other sec 13-15",
+   "citation": "Castryck-Decru EUROCRYPT 2023; Kani J. reine angew. 485 (1997)",
+   "status": "bib-only",
+   "note": "added to section 18 (cited in 13.4)"
+  },
+  {
+   "id": "L45c",
+   "group": "other sec 13-15",
+   "citation": "Smart J.Crypt 1999; MOV IEEE IT 1993; Frey-Ruck Math.Comp. 1994",
+   "status": "bib-only",
+   "note": "added to section 18 (cited in 13.1-13.2)"
+  }
+ ],
+ "prior_work_searches": [
+  {
+   "claim": "oracle-dependence of the kernel-saturation penalty",
+   "verdict": "anticipated",
+   "where": "FHJRV EUROCRYPT 2014 Sec. 3.2 (decomposition probability / m^{n-1}, compensated by easier systems); FGHR J. Cryptology 2014"
+  },
+  {
+   "claim": "trace pair (Tr x, Tr(y + xH(x))) as an E/4E coset label",
+   "verdict": "nothing found",
+   "where": "queries listed in RESULTS.md; nearest: US 7,257,709 h=4 test (x-only)"
+  },
+  {
+   "claim": "isogeny-augmented generic group model (Thm 15.1)",
+   "verdict": "nothing found for isogenies; related",
+   "where": "Duman et al. PKC 2023 (group actions); Rupp et al. ASIACRYPT 2008 (extended generic operations)"
+  },
+  {
+   "claim": "AGM with point-evaluation isogeny oracles (R4 16.7)",
+   "verdict": "nothing found",
+   "where": "arXiv 2608.01675 checked: no such model"
+  },
+  {
+   "claim": "class-wide multi-target rho via isogeny transport",
+   "verdict": "nothing found",
+   "where": "queries listed in RESULTS.md"
+  }
+ ]
+}
