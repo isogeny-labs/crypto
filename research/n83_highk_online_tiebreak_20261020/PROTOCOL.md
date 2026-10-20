@@ -107,7 +107,7 @@ The conditional Pod implementation is `runpod_runner.py` and
 locally replayed aggregate and archive immediately before allocation and
 again immediately before dispatch. Its `n83.online-tiebreak-runpod-snapshot/v1`
 records the provider's single Pod, UTC creation and stop times, price,
-machine and CPU allocation, the confirmed earlier campaign charge, the $5
+machine and CPU allocation, the conservative earlier campaign spend, the $5
 combined cap, pinned source HEAD, and trigger receipt/aggregate/archive
 SHA-256 values. The matching `n83.online-tiebreak-runpod-allocation/v1`
 contains the same Pod fields, snapshot SHA-256, and trigger hashes. Copy the
@@ -115,6 +115,11 @@ frozen tie-break package to the pinned `e7634a8` checkout, validate the
 fixture there, then run the launcher with the allocation and trigger under
 the recorded four-CPU affinity. The runner rejects a changed trigger,
 checkout, price, affinity, or cgroup envelope before it starts a timed child.
+The snapshot must confirm the preceding distribution Pod is terminated.
+The budget verifier charges at least the frozen $3.57 earlier upper bound plus
+that Pod's full allocation-to-snapshot interval at $0.19/hour, then the new
+Pod's entire created-to-stop reservation. This deliberately overcharges any
+idle gap after the preceding Pod terminated.
 
 After `DONE`, transfer `results/` and `raw_results.tar.gz`, verify the
 Pod-side SHA-256, stop and terminate the Pod, and retain the provider charge
