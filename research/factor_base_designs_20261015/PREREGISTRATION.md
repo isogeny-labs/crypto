@@ -614,3 +614,68 @@ as the bound above says, and each source is labelled.
 - X1: A0 at `m = 3`, `t = 5` completes with D = 7 (*confirms*). A0 at `m = 4`,
   `t = 4` does not complete in 15 GB and 3600 s. A11 at `m = 4`, `t = 4`
   completes with D = 6, as on p₁.
+
+### Amendment 9, 2026-10-20: what was not yet shown (P4, Z1, M5), before any of their rows
+
+Registered by the experiment lane before any P4, Z1 or M5 row exists. It
+changes no committed row, verdict, threshold, decision rule or prediction.
+Instrument, limits, seeds and the completed-cell and σ rules are those of
+Amendments 1–8. The seed gains a prime index 3 (p₄) and a target-structure
+bit at bit 56 (random = 0, so every earlier seed is unchanged).
+
+**What the Amendment 8 report listed as untested:** other curve models
+(Edwards, binary-field curves), structured targets, `m ≥ 5`, and primes of a
+different 2-adic shape. This amendment takes the three that this harness can
+measure honestly, and says why it leaves the other.
+
+**P4, a prime of another 2-adic shape.** p₄ = 10 007 297 = 2⁸·39091 + 1, with
+p₄ − 1 = 2⁸·13·31·97: 2-adic valuation 8 (against 18, 27 and 13 for p₁, p₂,
+p₃), so `t ≤ 8`, and a smooth odd part. A0 and A11, generic random targets,
+`f4_fp`, `m = 2` (`t = 2–8`) and `m = 3` (`t = 2–4`), 2 planted targets, 300 s
+budget, hard kill 420 s, `ulimit -v 13000000`, as in the first run. Files
+`runs/P4-{arm}-m{m}`. Reference: the first run's committed p₁ rows.
+- *Rule:* **prime-independent** if, at every shared completed `(arm, m, t)`,
+  the cell D equals the p₁ cell D; **prime-dependent** if any differs. The gap
+  at `m = 3` (A11 D ≤ A0 D − 1 at every shared `t`) is reported. `max_cols`
+  against p₁ is descriptive.
+- *Prediction:* prime-independent, the gap holds, and `max_cols` equals p₁'s at
+  every shared cell, as p₂'s did.
+
+**Z1, structured targets.** The only way a target enters a system is through
+`x_R`, so a structured target can change the system only by changing
+`S₃`'s support. `x_R = 0` does: it removes every term in `x_R` (for `m = 2`,
+`S₃(x₁, x₂, 0) = (x₁x₂ − a)² − 4b(x₁ + x₂)`; for `m = 3` the last chain
+polynomial loses its `x_R` terms). A random curve rarely has a decomposition
+into points of `V` with `x_R = 0`, so each target brings its own curve,
+built around its points: for `m = 2`, `x₁ ≠ x₂` in `V` with `x₁ + x₂` a
+non-zero square, `y₂ = y₁ + λ(x₂ − x₁)` with `λ² = x₁ + x₂` and random `y₁`,
+and `a`, `b` from the two points, so that `x(P₁ + P₂) = λ² − x₁ − x₂ = 0`; for
+`m = 3`, `a`, `b` from random `P₁`, `P₂`, then `P₃` on that curve, searched
+until `x(P₁ + P₂ + P₃) = 0`. Every target is checked on its curve and by the
+group law, and every system at its planted solution, before F4 runs. A0 and
+A11, p₁, `f4_fp`, `m = 2` (`t = 2–9`) and `m = 3` (`t = 2–4`), 2 planted
+targets, 300 s budget, hard kill 420 s, `ulimit -v 13000000`. Files
+`runs/Z1-{arm}-m{m}`. Reference: the first run's generic p₁ rows.
+- *Rule:* **target-independent** if the cell D equals the generic cell D at
+  every shared completed cell; **target-dependent** if any differs. The gap at
+  `m = 3` is reported. `max_cols` against the generic cell is descriptive.
+- *Prediction:* target-independent, and the gap holds. No prediction on
+  widths (Amendment 8's width prediction for `a = 0` failed on one cell).
+
+**M5, `m = 5`.** A0 at `m = 5`, `t = 3`, the smallest cell (`m` summands need
+`|V| = 2^t ≥ m`, so `t = 2` has no cell): p₁, `f4_fp`, 2 planted targets,
+300 s, hard kill 420 s, `ulimit -v 13000000`. File `runs/M5-A0-m5`. A11 is not
+run: its function-and-chain form is written for `m ≤ 4`. One cell gives no
+σ. The reading is whether the cell completes and, if it does, its D.
+- *Prediction:* the cell does not complete within 300 s and 13 GB.
+
+**Not in this amendment.**
+- *Edwards curves* need their own summation polynomial, group law and planting,
+  each verified, in a new construction. This harness is built on the short
+  Weierstrass `S₃` over `F_p`.
+- *Binary-field curves* are a different field and solver. The repository's
+  binary Semaev code (`binary_semaev*.rs`, `gf2_elim.rs`) runs on its own
+  engines, so degrees from it would not be measured by this study's
+  instrument.
+- *Other structured targets* (an `x_R` other than 0, or `R` of small order)
+  and primes with a 2-adic valuation below 8 are not run here.

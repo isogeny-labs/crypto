@@ -95,19 +95,24 @@ const P2: u64 = 2_013_265_921;
 /// `p₃ = 5·2^13 + 1`, below 2^16: F4's narrow path (Amendment 4, C3).
 const P3: u64 = 40_961;
 
-/// A prime by its index in the seed rule (Amendments 2 and 4): `p₁ = 0`,
-/// `p₂ = 1`, `p₃ = 2`.
+/// `p₄ = 2⁸·39091 + 1` (`p₄ − 1 = 2⁸·13·31·97`): 2-adic valuation 8, so
+/// `t ≤ 8`, with a smooth odd part (Amendment 9, P4).
+const P4: u64 = 10_007_297;
+
+/// A prime by its index in the seed rule (Amendments 2, 4 and 9): `p₁ = 0`,
+/// `p₂ = 1`, `p₃ = 2`, `p₄ = 3`.
 fn prime_of(idx: usize) -> u64 {
     match idx {
         0 => P1,
         1 => P2,
         2 => P3,
+        3 => P4,
         _ => panic!("unknown prime index {idx}"),
     }
 }
 
 fn prime_label(idx: usize) -> &'static str {
-    ["p1", "p2", "p3"][idx]
+    ["p1", "p2", "p3", "p4"][idx]
 }
 
 fn parse_prime(s: &str) -> usize {
@@ -115,7 +120,8 @@ fn parse_prime(s: &str) -> usize {
         "p1" => 0,
         "p2" => 1,
         "p3" => 2,
-        _ => panic!("unknown prime `{s}` (p1, p2 or p3)"),
+        "p4" => 3,
+        _ => panic!("unknown prime `{s}` (p1, p2, p3 or p4)"),
     }
 }
 /// "FBDS", the preregistered seed base.
@@ -731,6 +737,15 @@ static FAMILY: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::
 /// with `--stop-below`.
 static STOP_BELOW: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
 
+/// Amendment 9, Z1: the structure of the planted target, fixed per process
+/// (0 = random, as in every earlier run; 1 = `x_R = 0`, with the curve built
+/// around the targeted points). Children get it with `--target-structure`.
+static TARGET: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+
+fn target_structure() -> usize {
+    TARGET.load(std::sync::atomic::Ordering::Relaxed)
+}
+
 fn family() -> usize {
     FAMILY.load(std::sync::atomic::Ordering::Relaxed)
 }
@@ -815,6 +830,122 @@ fn plant(curve: &PrimeCurve, m: usize, on: &[u64], rng: &mut StdRng) -> Option<T
         pts,
         partial,
     })
+}
+
+/// `P_1 + … + P_m` with the partial sums, as `plant` forms them; `None` when
+/// a partial sum is the identity.
+fn sum_target(curve: &PrimeCurve, pts: Vec<PrimePoint>) -> Option<Target> {
+    let mut ops = GroupOps::default();
+    let mut acc = pts[0];
+    let mut partial = Vec::new();
+    for pt in &pts[1..] {
+        acc = curve.add(&mut ops, acc, *pt);
+        if acc.infinity {
+            return None;
+        }
+        partial.push(acc.x);
+    }
+    Some(Target {
+        x_r: acc.x,
+        r: acc,
+        pts,
+        partial,
+    })
+}
+
+/// Amendment 9, Z1: a planted target with `x_R = 0`, on a curve built around
+/// its points. `m = 2`: with `x_1 ≠ x_2` in `V` and `x_1 + x_2` a non-zero
+/// square, `y_2 = y_1 + λ(x_2 − x_1)` with `λ² = x_1 + x_2` gives
+/// `x(P_1 + P_2) = λ² − x_1 − x_2 = 0`, and `a`, `b` follow from the two
+/// points. `m = 3`: `a`, `b` from `P_1`, `P_2` for random `y_1`, `y_2`, then
+/// `y_3` from the curve, searching until `x(P_1 + P_2 + P_3) = 0` (about `p`
+/// trials). The result is checked on the curve and by the group law.
+fn plant_x0(p: u64, v: &[u64], m: usize, rng: &mut StdRng) -> (PrimeCurve, Target) {
+    assert!(
+        m == 2 || m == 3,
+        "x_R = 0 targets are written for m ∈ {{2, 3}}"
+    );
+    let helper = PrimeCurve { p, a: 0, b: 1 };
+    let cube = |x: u64| mulm(x, mulm(x, x, p), p);
+    let from_two = |x1: u64, y1: u64, x2: u64, y2: u64| -> Option<(u64, u64)> {
+        let dx = subm(x2, x1, p);
+        let num = subm(
+            addm(subm(mulm(y2, y2, p), mulm(y1, y1, p), p), cube(x1), p),
+            cube(x2),
+            p,
+        );
+        let a = mulm(num, invm(dx, p), p);
+        let b = subm(subm(mulm(y1, y1, p), cube(x1), p), mulm(a, x1, p), p);
+        (nonsingular(a, b, p) && b != 0).then_some((a, b))
+    };
+    let mut trials = 0u64;
+    loop {
+        trials += 1;
+        assert!(
+            trials < 64 * p,
+            "plant_x0: no target with x_R = 0 after {trials} trials"
+        );
+        let mut xs: Vec<u64> = Vec::with_capacity(m);
+        while xs.len() < m {
+            let x = v[rng.gen_range(0..v.len())];
+            if !xs.contains(&x) {
+                xs.push(x);
+            }
+        }
+        let (x1, x2) = (xs[0], xs[1]);
+        let y1 = rng.gen_range(1..p);
+        if m == 2 {
+            let sum = addm(x1, x2, p);
+            if sum == 0 {
+                continue;
+            }
+            let Some(r) = helper.sqrt(sum).filter(|&r| r != 0) else {
+                continue;
+            };
+            let lam = if rng.gen::<bool>() { r } else { p - r };
+            let y2 = addm(y1, mulm(subm(x2, x1, p), lam, p), p);
+            let Some((a, b)) = from_two(x1, y1, x2, y2) else {
+                continue;
+            };
+            let curve = PrimeCurve { p, a, b };
+            let pts = vec![PrimePoint::affine(x1, y1), PrimePoint::affine(x2, y2)];
+            assert!(
+                pts.iter().all(|&q| curve.is_on_curve(q)),
+                "a point is off the curve"
+            );
+            let Some(tg) = sum_target(&curve, pts) else {
+                continue;
+            };
+            assert_eq!(tg.x_r, 0, "x(P_1 + P_2) is not 0");
+            return (curve, tg);
+        }
+        let y2 = rng.gen_range(1..p);
+        let Some((a, b)) = from_two(x1, y1, x2, y2) else {
+            continue;
+        };
+        let curve = PrimeCurve { p, a, b };
+        let x3 = xs[2];
+        let rhs = curve.rhs(x3);
+        let Some(y3) = curve.sqrt(rhs).filter(|&r| r != 0) else {
+            continue;
+        };
+        for y in [y3, p - y3] {
+            let pts = vec![
+                PrimePoint::affine(x1, y1),
+                PrimePoint::affine(x2, y2),
+                PrimePoint::affine(x3, y),
+            ];
+            if let Some(tg) = sum_target(&curve, pts) {
+                if tg.x_r == 0 {
+                    assert!(
+                        tg.pts.iter().all(|&q| curve.is_on_curve(q)),
+                        "a point is off the curve"
+                    );
+                    return (curve, tg);
+                }
+            }
+        }
+    }
 }
 
 // ── Systems ────────────────────────────────────────────────────────
@@ -1568,7 +1699,8 @@ fn merge(into: &mut Value, from: &Value) {
 fn cell_seed(prime: usize, arm: Arm, m: usize, t: usize) -> u64 {
     // Amendment 8: the curve family joins the seed at bit 52 (generic = 0,
     // so every earlier seed is unchanged).
-    SEED ^ ((family() as u64) << 52)
+    SEED ^ ((target_structure() as u64) << 56)
+        ^ ((family() as u64) << 52)
         ^ ((prime as u64) << 48)
         ^ (arm.id() << 40)
         ^ ((m as u64) << 32)
@@ -1625,11 +1757,18 @@ fn draw_target(
     curve: &PrimeCurve,
     on: &[u64],
     trng: &mut StdRng,
-) -> (Vec<Pol>, usize, Vec<u64>, Target, Value) {
+) -> (Vec<Pol>, usize, Vec<u64>, Target, Value, PrimeCurve) {
     loop {
-        let Some(tg) = plant(curve, m, on, trng) else {
-            continue;
+        // Amendment 9, Z1: a structured target brings its own curve.
+        let (cur, tg) = if target_structure() == 1 {
+            plant_x0(p, &d.v, m, trng)
+        } else {
+            let Some(tg) = plant(curve, m, on, trng) else {
+                continue;
+            };
+            (curve.clone(), tg)
         };
+        let curve = &cur;
         if arm == Arm::A11 || arm == Arm::N11 {
             let Shape::Kummer { g } = d.shape else {
                 unreachable!()
@@ -1654,7 +1793,7 @@ fn draw_target(
                     &json!({"null": "s-defining equations randomised", "null_eqs": m}),
                 );
             }
-            return (eqs, n, sol, tg, info);
+            return (eqs, n, sol, tg, info, cur.clone());
         }
         if arm == Arm::H1 || arm == Arm::H2 {
             let Shape::Kummer { g } = d.shape else {
@@ -1668,11 +1807,11 @@ fn draw_target(
             let Some((eqs, n, sol, info)) = built else {
                 continue;
             };
-            return (eqs, n, sol, tg, info);
+            return (eqs, n, sol, tg, info, cur.clone());
         }
         let null = (arm == Arm::N).then_some(&mut *trng);
         let (eqs, n, sol) = tower_system(d, curve, m, &tg, null);
-        return (eqs, n, sol, tg, Value::Null);
+        return (eqs, n, sol, tg, Value::Null, cur.clone());
     }
 }
 
@@ -1690,6 +1829,11 @@ fn build_system(
     let cs = cell_seed(prime, arm, m, t);
     let mut rng = StdRng::seed_from_u64(cs);
     let d = build_design(arm, p, t, &mut rng);
+    assert!(
+        d.v.len() >= m,
+        "m = {m} summands need |V| ≥ m distinct abscissae (t = {t} gives {})",
+        d.v.len()
+    );
     let (curve, on) = target_curve(p, &d.v, m.max(2), &mut rng);
     let ts = target_seed(cs, k);
     // Targets 0 … k in order, each from its own stream. With `distinct`
@@ -1716,10 +1860,11 @@ fn build_system(
             break;
         }
     }
-    let (eqs, n, sol, target, extra) = chosen.expect("target k drawn");
+    let (eqs, n, sol, target, extra, used) = chosen.expect("target k drawn");
     if arm == Arm::A11 || arm == Arm::N11 || arm == Arm::H2 {
         check_norm_chain(&d, m, p, &mut StdRng::seed_from_u64(ts ^ 0xC4EC));
     }
+    let structure_name = ["random", "xr0"][target_structure()];
     let row = json!({
         "arm": arm.name(),
         "m": m,
@@ -1735,8 +1880,9 @@ fn build_system(
         "seed_base": SEED,
         "cell_seed": cs,
         "target_seed": ts,
-        "curve": {"a": curve.a, "b": curve.b},
+        "curve": {"a": used.a, "b": used.b},
         "curve_family": family_name(family()),
+        "target_structure": structure_name,
         "x_r": target.x_r,
         "planted_x": target.pts.iter().map(|pt| pt.x).collect::<Vec<_>>(),
         "set": d.info,
@@ -1844,6 +1990,11 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
         .args(a.distinct.then_some("--distinct-targets"))
         .args(if family() > 0 {
             vec!["--family".to_string(), family_name(family()).to_string()]
+        } else {
+            vec![]
+        })
+        .args(if target_structure() > 0 {
+            vec!["--target-structure".to_string(), "xr0".to_string()]
         } else {
             vec![]
         })
@@ -2623,7 +2774,7 @@ fn group_of(file: &str) -> &str {
     match file.get(..3) {
         Some(
             g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-" | "G1-" | "T1-"
-            | "T2-" | "T3-" | "T4-" | "K1-" | "X1-"),
+            | "T2-" | "T3-" | "T4-" | "K1-" | "X1-" | "P4-" | "Z1-" | "M5-"),
         ) => &g[..2],
         _ => "p1",
     }
@@ -3152,6 +3303,119 @@ fn analyze_a8(dir: &str) {
         show_series(&format!("A0 m = 4, {label}"), &all);
     }
     println!("  (width slopes on lines above mix engines or primes where a source differs; D and σ are the readings)");
+}
+
+/// Amendment 9: P4 (a prime of another 2-adic shape), Z1 (structured
+/// targets, `x_R = 0`) and M5 (A0 at `m = 5`), each against its registered
+/// rule. The reference is the first run's committed generic cells on p₁.
+fn analyze_a9(dir: &str) {
+    let rows = read_rows(dir);
+    println!("Factor-base designs, Amendment 9 (P4, Z1, M5): rows from {dir}");
+    for (group, title, same, differs) in [
+        (
+            "P4",
+            "P4: p4 = 10007297 = 2^8 · 39091 + 1 (2-adic valuation 8), generic target, f4_fp",
+            "PRIME-INDEPENDENT (D equals the p1 D at every shared completed cell)",
+            "PRIME-DEPENDENT (a shared D differs from p1's)",
+        ),
+        (
+            "Z1",
+            "Z1: structured target x_R = 0, p1, f4_fp (the curve is built around each target)",
+            "TARGET-INDEPENDENT (D equals the generic D at every shared completed cell)",
+            "TARGET-DEPENDENT (a shared D differs from the generic D)",
+        ),
+    ] {
+        println!();
+        println!("════ {title}");
+        println!("  arm  m  t   D(new)  D(p1)   max_cols(new)  max_cols(p1)");
+        let (mut shared, mut indep, mut eq, mut lt, mut gt) =
+            (0usize, true, 0usize, 0usize, 0usize);
+        let mut d_at: BTreeMap<(String, usize), f64> = BTreeMap::new();
+        for arm in ["A0", "A11"] {
+            for m in [2usize, 3] {
+                let new = cells2(&rows, group, arm, m);
+                let gen = cells2(&rows, "p1", arm, m);
+                for c in new.iter().filter(|c| c.complete()) {
+                    d_at.insert((format!("{arm}{m}"), c.t), c.d_mean());
+                    let Some(g) = find(&gen, c.t) else { continue };
+                    shared += 1;
+                    let (dn, dg, wn, wg) = (c.d_mean(), g.d_mean(), c.cols_mean(), g.cols_mean());
+                    indep &= dn == dg;
+                    match wn.partial_cmp(&wg) {
+                        Some(std::cmp::Ordering::Equal) => eq += 1,
+                        Some(std::cmp::Ordering::Less) => lt += 1,
+                        _ => gt += 1,
+                    }
+                    println!(
+                        "  {arm:<4} {m}  {:<3} {dn:<7.1} {dg:<7.1} {wn:<14.0} {wg:.0}{}",
+                        c.t,
+                        if dn == dg { "" } else { "   D DIFFERS" }
+                    );
+                }
+                let missing: Vec<String> = new
+                    .iter()
+                    .filter(|c| !c.complete())
+                    .map(|c| format!("t={}:{}", c.t, c.status.join("/")))
+                    .collect();
+                if !missing.is_empty() {
+                    println!("  {arm} m={m}: not completed: {}", missing.join(", "));
+                }
+            }
+        }
+        println!(
+            "  rule: {shared} shared completed cells → {}",
+            if shared == 0 {
+                "INCONCLUSIVE (no shared cell)"
+            } else if indep {
+                same
+            } else {
+                differs
+            }
+        );
+        let mut gap = (0usize, true);
+        for t in 2..=4usize {
+            if let (Some(a11), Some(a0)) = (
+                d_at.get(&("A113".to_string(), t)),
+                d_at.get(&("A03".to_string(), t)),
+            ) {
+                gap.0 += 1;
+                gap.1 &= *a11 <= *a0 - 1.0;
+            }
+        }
+        println!(
+            "  gap at m = 3 (A11 D ≤ A0 D − 1 at every shared t): {} cells → {}",
+            gap.0,
+            if gap.0 == 0 {
+                "not measurable"
+            } else if gap.1 {
+                "HOLDS"
+            } else {
+                "does not hold"
+            }
+        );
+        println!(
+            "  max_cols against the p1 cell (descriptive): {eq} equal, {lt} smaller, {gt} larger"
+        );
+    }
+    println!();
+    println!("════ M5: A0 at m = 5, the smallest cell (t = 3: |V| = 8 ≥ 5), p1, f4_fp");
+    let m5 = cells2(&rows, "M5", "A0", 5);
+    if m5.is_empty() {
+        println!("M5: no rows.");
+    } else {
+        show_series("A0 m = 5 p1", &m5);
+        for c in &m5 {
+            println!(
+                "  t={}: {}",
+                c.t,
+                if c.complete() {
+                    format!("completed, D = {:.1}", c.d_mean())
+                } else {
+                    format!("did not complete ({})", c.status.join(", "))
+                }
+            );
+        }
+    }
 }
 
 fn analyze2(dir: &str) {
@@ -4193,6 +4457,14 @@ fn main() {
     if let Some(f) = flag(&args, "--family") {
         FAMILY.store(parse_family(&f), std::sync::atomic::Ordering::Relaxed);
     }
+    if let Some(ts) = flag(&args, "--target-structure") {
+        let v = match ts.as_str() {
+            "random" => 0,
+            "xr0" => 1,
+            other => panic!("unknown --target-structure `{other}` (random, xr0)"),
+        };
+        TARGET.store(v, std::sync::atomic::Ordering::Relaxed);
+    }
     if let Some(b) = flag(&args, "--stop-below") {
         STOP_BELOW.store(
             b.parse().expect("--stop-below"),
@@ -4262,7 +4534,9 @@ fn main() {
         }
         "analyze" => {
             let dir = args.get(1).expect("a runs directory");
-            if args.iter().any(|a| a == "--a8") {
+            if args.iter().any(|a| a == "--a9") {
+                analyze_a9(dir);
+            } else if args.iter().any(|a| a == "--a8") {
                 analyze_a8(dir);
             } else if args.iter().any(|a| a == "--tower") {
                 analyze_tower(dir);
