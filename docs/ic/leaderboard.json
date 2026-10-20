@@ -102,6 +102,10 @@
    "path": "research/la_engines_20261014/summary.json",
    "sha256": "b34650a95c5f106c8302dc5311194d8e1ffb798dff59b2669cda59818712f533"
   },
+  "pair_table_setup": {
+   "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
+   "sha256": "e6f6f56f9db4c125e23e22009247e80e60386238108db8822f20efc2e1fdd8aa"
+  },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
    "sha256": "0bc0d0f4401846519ff915db5cfb1f90ee638ba46555736de8a29e9e2888be7b"
@@ -49617,6 +49621,273 @@
   ],
   "study": "research/la_engines_20261014/",
   "report": "research/la_engines_20261014/REPORT.pdf",
+  "class": "engineering"
+ },
+ "pair_table_component": {
+  "schema": "ic_oracle_setup_blocked.result/v1",
+  "curve": "icv1-fp32-t7319-90da43e9",
+  "sessions": [
+   "ECBS1h9e263e582e51",
+   "ECBS1h90cd7a0dc213"
+  ],
+  "isolation": "L1",
+  "executions": 456,
+  "identical_executions": 456,
+  "equality_all_identical": true,
+  "aa_setup_ratio_sum": 1.01829543954,
+  "aa_setup_pair_ratio": [
+   0.695697834157,
+   1.45744483678
+  ],
+  "rows": [
+   {
+    "N": 1024,
+    "pairs": 40,
+    "setup_ms": {
+     "scalar": 216.4847054,
+     "batch": 117.47991105,
+     "blocked": 55.15085525
+    },
+    "run_ms": {
+     "scalar": 963.481533975,
+     "batch": 850.69512705,
+     "blocked": 873.593559375
+    },
+    "blocked_over_batch": {
+     "sum": 0.469449242488,
+     "min": 0.321818180008,
+     "max": 0.793568175276
+    },
+    "blocked_over_scalar": {
+     "sum": 0.254756358645,
+     "min": 0.150561326607,
+     "max": 0.43226066603
+    },
+    "batch_over_scalar": {
+     "sum": 0.542670720469,
+     "min": 0.307906329625,
+     "max": 1.0304893353
+    },
+    "run_blocked_over_batch": 1.02691731926,
+    "run_blocked_over_scalar": 0.906705036443,
+    "rss_gib": {
+     "scalar": 0.0927238464355,
+     "batch": 0.0927124023438,
+     "blocked": 0.0751457214355
+    },
+    "S_ratio_blocked_over_batch": {
+     "w0": 1,
+     "w0_1": 1,
+     "w1": 1
+    },
+    "S_w0": 31.8508644792,
+    "setup_gae": 1049600,
+    "gae": 2087376.475,
+    "gap_to_rho": {
+     "w0": 32.9550679408,
+     "w0_1": 32.9595038415,
+     "w1": 32.9795284417
+    }
+   },
+   {
+    "N": 2048,
+    "pairs": 40,
+    "setup_ms": {
+     "scalar": 1435.2949661,
+     "batch": 739.252516225,
+     "blocked": 237.94795745
+    },
+    "run_ms": {
+     "scalar": 1834.63993237,
+     "batch": 1136.57745603,
+     "blocked": 695.6308297
+    },
+    "blocked_over_batch": {
+     "sum": 0.321876425481,
+     "min": 0.189835324922,
+     "max": 0.444046344011
+    },
+    "blocked_over_scalar": {
+     "sum": 0.165783314977,
+     "min": 0.130079627338,
+     "max": 0.21936454013
+    },
+    "batch_over_scalar": {
+     "sum": 0.51505267815,
+     "min": 0.415550259353,
+     "max": 0.795597843775
+    },
+    "run_blocked_over_batch": 0.612039967899,
+    "run_blocked_over_scalar": 0.379164770931,
+    "rss_gib": {
+     "scalar": 0.185779571533,
+     "batch": 0.185802459717,
+     "blocked": 0.115337371826
+    },
+    "S_ratio_blocked_over_batch": {
+     "w0": 1,
+     "w0_1": 1,
+     "w1": 1
+    },
+    "S_w0": 71.8158040978,
+    "setup_gae": 4196352,
+    "gae": 4706516.525,
+    "gap_to_rho": {
+     "w0": 74.3055091899,
+     "w0_1": 69.0684556607,
+     "w1": 45.4272809988
+    }
+   },
+   {
+    "N": 4096,
+    "pairs": 40,
+    "setup_ms": {
+     "scalar": 8398.39837657,
+     "batch": 3816.77474975,
+     "blocked": 1036.5267769
+    },
+    "run_ms": {
+     "scalar": 8744.91070788,
+     "batch": 4148.2377343,
+     "blocked": 1429.26834437
+    },
+    "blocked_over_batch": {
+     "sum": 0.271571377632,
+     "min": 0.233611415973,
+     "max": 0.320110100836
+    },
+    "blocked_over_scalar": {
+     "sum": 0.123419577213,
+     "min": 0.10139178612,
+     "max": 0.154436621947
+    },
+    "batch_over_scalar": {
+     "sum": 0.454464598916,
+     "min": 0.348703846702,
+     "max": 0.546648591415
+    },
+    "run_blocked_over_batch": 0.344548320497,
+    "run_blocked_over_scalar": 0.163440015813,
+    "rss_gib": {
+     "scalar": 0.625324249268,
+     "batch": 0.625858306885,
+     "blocked": 0.34440612793
+    },
+    "S_ratio_blocked_over_batch": {
+     "w0": 1,
+     "w0_1": 1,
+     "w1": 1
+    },
+    "S_w0": 260.011478071,
+    "setup_gae": 16781312,
+    "gae": 17040097.7,
+    "gap_to_rho": {
+     "w0": 269.02553715,
+     "w0_1": 245.491008172,
+     "w1": 139.25113358
+    }
+   },
+   {
+    "N": 8192,
+    "pairs": 40,
+    "setup_ms": {
+     "scalar": 43599.3239527,
+     "batch": 20484.9251067,
+     "blocked": 5294.20863355
+    },
+    "run_ms": {
+     "scalar": 44203.583243,
+     "batch": 21102.5724954,
+     "blocked": 5918.8731119
+    },
+    "blocked_over_batch": {
+     "sum": 0.258444129328,
+     "min": 0.237098376072,
+     "max": 0.312811108428
+    },
+    "blocked_over_scalar": {
+     "sum": 0.121428686355,
+     "min": 0.108553280908,
+     "max": 0.14512823434
+    },
+    "batch_over_scalar": {
+     "sum": 0.469845017069,
+     "min": 0.423799287497,
+     "max": 0.522994618625
+    },
+    "run_blocked_over_batch": 0.280481117323,
+    "run_blocked_over_scalar": 0.133900301235,
+    "rss_gib": {
+     "scalar": 2.37266540527,
+     "batch": 2.37275314331,
+     "blocked": 1.24766540527
+    },
+    "S_ratio_blocked_over_batch": {
+     "w0": 1,
+     "w0_1": 1,
+     "w1": 1
+    },
+    "S_w0": 1026.13937386,
+    "setup_gae": 67117056,
+    "gae": 67249012.675,
+    "gap_to_rho": {
+     "w0": 1061.71349931,
+     "w0_1": 966.210545185,
+     "w1": 535.08987653
+    }
+   },
+   {
+    "N": 16384,
+    "pairs": 8,
+    "setup_ms": {
+     "scalar": 224141.725429,
+     "batch": 116518.995317,
+     "blocked": 28200.8154826
+    },
+    "run_ms": {
+     "scalar": 227916.430309,
+     "batch": 120399.147004,
+     "blocked": 29947.6510742
+    },
+    "blocked_over_batch": {
+     "sum": 0.2420276231,
+     "min": 0.220284488139,
+     "max": 0.260486706223
+    },
+    "blocked_over_scalar": {
+     "sum": 0.125816892989,
+     "min": 0.115080639339,
+     "max": 0.135882048543
+    },
+    "batch_over_scalar": {
+     "sum": 0.519845178735,
+     "min": 0.493623198288,
+     "max": 0.544789629813
+    },
+    "run_blocked_over_batch": 0.248736405693,
+    "run_blocked_over_scalar": 0.131397508436,
+    "rss_gib": {
+     "scalar": 9.1459197998,
+     "batch": 9.14622879028,
+     "blocked": 4.64671325684
+    },
+    "S_ratio_blocked_over_batch": {
+     "w0": 1,
+     "w0_1": 1,
+     "w1": 1
+    },
+    "S_w0": 4097.22600994,
+    "setup_gae": 268451840,
+    "gae": 268515574.875,
+    "gap_to_rho": {
+     "w0": 5110.28730377,
+     "w0_1": 4649.31623181,
+     "w1": 2567.06029454
+    }
+   }
+  ],
+  "study": "research/ic_oracle_setup_blocked_20261020/",
+  "report": "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
   "class": "engineering"
  },
  "phases": [

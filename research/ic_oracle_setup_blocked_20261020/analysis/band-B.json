@@ -1,0 +1,100 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "batch-16384",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        4097.226009938733,
+        4097.577891838142,
+        4100.744828932823
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "blocked-16384",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        4097.226009938733,
+        4097.577891838142,
+        4100.744828932823
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "rho-neg",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        0.801760403357206,
+        0.8813291433705095,
+        1.5974478034902422
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "log2_r": 31.99999754017573,
+      "arm": "scalar-16384",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        4097.226009938733,
+        4097.577891838142,
+        4100.744828932823
+      ],
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-16384",
+      "b": "blocked-16384",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-16384",
+      "b": "rho-neg",
+      "verdict": "rho-neg < batch-16384"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "batch-16384",
+      "b": "scalar-16384",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-16384",
+      "b": "rho-neg",
+      "verdict": "rho-neg < blocked-16384"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "blocked-16384",
+      "b": "scalar-16384",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp32-t7319-90da43e9",
+      "a": "rho-neg",
+      "b": "scalar-16384",
+      "verdict": "rho-neg < scalar-16384"
+    }
+  ]
+}
