@@ -146,8 +146,9 @@ def schedule():
             events.append({'name': f'p{point:02d}_cal_before_{repetition}',
                            'kind': 'calibration', 'point_index': point,
                            'seed': 2026101601})
-        kinds = (('ic', 4405), ('ic', 4549), ('rho', None)) if point == 0 else (
-            ('rho', None), ('ic', 4549), ('ic', 4405))
+        kinds = (('ic', 4405), ('ic', 4500), ('ic', 4549),
+                 ('rho', None)) if point == 0 else (
+            ('rho', None), ('ic', 4549), ('ic', 4500))
         for kind, k in kinds:
             name = f'p{point:02d}_{"k" + str(k) if k else "rho"}'
             events.append({'name': name, 'kind': kind, 'k': k,
@@ -196,7 +197,8 @@ def main():
     capacity_summary = json.loads(summary_path.read_text())
     if capacity_summary.get('status') != 'COMPLETE':
         raise ValueError('capacity panel was capped')
-    for name in ('p00_k4405_load80', 'p00_k4549_load80'):
+    for name in ('p00_k4405_load80', 'p00_k4500_load80',
+                 'p00_k4549_load80'):
         folder = capacity / 'runs' / name
         usage = json.loads((folder / 'usage.json').read_text())
         row = json.loads((folder / 'targets_result.jsonl').read_text())

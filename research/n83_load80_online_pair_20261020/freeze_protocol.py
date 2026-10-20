@@ -21,8 +21,9 @@ def schedule():
             events.append({'name': f'p{point:02d}_cal_before_{repetition}',
                            'kind': 'calibration', 'point_index': point,
                            'seed': 2026101601})
-        kinds = (('ic', 4405), ('ic', 4549), ('rho', None)) if point == 0 else (
-            ('rho', None), ('ic', 4549), ('ic', 4405))
+        kinds = (('ic', 4405), ('ic', 4500), ('ic', 4549),
+                 ('rho', None)) if point == 0 else (
+            ('rho', None), ('ic', 4549), ('ic', 4500))
         for kind, k in kinds:
             events.append({'name': f'p{point:02d}_{"k" + str(k) if k else "rho"}',
                            'kind': kind, 'k': k, 'point_index': point,
