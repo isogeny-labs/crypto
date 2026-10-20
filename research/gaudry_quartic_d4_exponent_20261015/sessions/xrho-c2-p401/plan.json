@@ -1,0 +1,744 @@
+{
+  "schema": "ecbench.plan/v1",
+  "spec_id": "ECS1h3dd2640faacb",
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation",
+        "family": "rho",
+        "params": {
+          "cap_multiple": "64"
+        },
+        "method_id": "ECM1hefea4e0ebe79",
+        "method_sha256": "efea4e0ebe79dadfedeb75106dab92e25fc26bfe282155ee0326380d4184e995",
+        "entry": "ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())"
+      }
+    }
+  ],
+  "workloads": [
+    {
+      "workload_id": "Wa585a1152c4a",
+      "workload_sha256": "a585a1152c4abcbef75c9595038468d1efcd2a3cbc920850956acfac7796f2df",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 0,
+      "target": [
+        "0x5e9ff6583",
+        "0x3ebbe688b"
+      ],
+      "planted": 537989178
+    },
+    {
+      "workload_id": "W113d634f5643",
+      "workload_sha256": "113d634f5643cb63806b488614b2f2a6083d166f2c31efabc71eaf58dae1ba64",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 1,
+      "target": [
+        "0x245b26fbd",
+        "0x5debf672c"
+      ],
+      "planted": 312804061
+    },
+    {
+      "workload_id": "We2e85dbacf08",
+      "workload_sha256": "e2e85dbacf080c4d97e757ad892d67c2b31e71b524f7d1ceaf2a1a1db43c4cad",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 2,
+      "target": [
+        "0x5dd87448d",
+        "0xf717272e"
+      ],
+      "planted": 71097889
+    },
+    {
+      "workload_id": "W92cafa04a1a6",
+      "workload_sha256": "92cafa04a1a6afc427b98608f7623d82879e4fc7473f9624082f989f7047cc1f",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 3,
+      "target": [
+        "0x4cad4496f",
+        "0xc7cafcd1"
+      ],
+      "planted": 437990815
+    },
+    {
+      "workload_id": "We03819a56cf7",
+      "workload_sha256": "e03819a56cf71ec3df602b30c1a4f22fa45ada8a51f83c26d90a941d560e66eb",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 4,
+      "target": [
+        "0x304d0831c",
+        "0x163399ca8"
+      ],
+      "planted": 440777558
+    },
+    {
+      "workload_id": "Wa6738761ee3e",
+      "workload_sha256": "a6738761ee3eec2fa9f6ee555897445b72b7016a927cc94f882b7ca48872accd",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 5,
+      "target": [
+        "0x5e1c10f89",
+        "0x2fb9a4da"
+      ],
+      "planted": 380641272
+    },
+    {
+      "workload_id": "W356ce486ed6b",
+      "workload_sha256": "356ce486ed6b6e0e7d87fe6449e18184784d1ba0aec4347f54629201835e5b0a",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 6,
+      "target": [
+        "0x413c54d4c",
+        "0x5e56307e6"
+      ],
+      "planted": 1213583258
+    },
+    {
+      "workload_id": "Wdd7e613b1344",
+      "workload_sha256": "dd7e613b1344fa1b6e9eedd9a387861a2aaec83dd4cc1cdc287ea74657d20db5",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 7,
+      "target": [
+        "0x3c103bfdf",
+        "0x3fbf3acab"
+      ],
+      "planted": 343050319
+    },
+    {
+      "workload_id": "W7ebf7651dc32",
+      "workload_sha256": "7ebf7651dc3210cefccb93f28f02e1549dd29b786f68e87db60664a3a0c5ea00",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 8,
+      "target": [
+        "0x445545b44",
+        "0x5182a5746"
+      ],
+      "planted": 1367821302
+    },
+    {
+      "workload_id": "W3a7e227dbc73",
+      "workload_sha256": "3a7e227dbc73852031565d423c383a95dbede301161485136f6b7ccee7019828",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 9,
+      "target": [
+        "0x374289dc6",
+        "0x568bd81ea"
+      ],
+      "planted": 870895033
+    },
+    {
+      "workload_id": "W5b9b7047d305",
+      "workload_sha256": "5b9b7047d3054aac07a965cf26478a637626a7712b6332e0661768142c458443",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 10,
+      "target": [
+        "0x50af184e6",
+        "0x4de9f96f2"
+      ],
+      "planted": 595770349
+    },
+    {
+      "workload_id": "W2560c22bfbe5",
+      "workload_sha256": "2560c22bfbe5eccf922c291b39cd899583b2c4e38760f7e0e4c8408c6ef0de4f",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 11,
+      "target": [
+        "0x5ffe444d1",
+        "0xf73f2610"
+      ],
+      "planted": 1325585556
+    },
+    {
+      "workload_id": "Wb8c98967859b",
+      "workload_sha256": "b8c98967859bedcd2f93c13855f2d97a14a6ab7eb4c93de62767a40390b68081",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 12,
+      "target": [
+        "0x55b17b5d4",
+        "0x76479fb6"
+      ],
+      "planted": 1135156484
+    },
+    {
+      "workload_id": "W210afc307e50",
+      "workload_sha256": "210afc307e505c29e275aafac2a788f5e977eed0b51a056816d6945532179b33",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 13,
+      "target": [
+        "0x529dd0f31",
+        "0x293fada79"
+      ],
+      "planted": 79191487
+    },
+    {
+      "workload_id": "W1d970fd30fd9",
+      "workload_sha256": "1d970fd30fd9e6df17712447d451504a425471db7143cb58a9ffb43f9c33b02e",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 14,
+      "target": [
+        "0x5d85e1ede",
+        "0x352416f02"
+      ],
+      "planted": 1140691197
+    },
+    {
+      "workload_id": "W401a61444cb1",
+      "workload_sha256": "401a61444cb15a5af54e0f335f5633e0daba0af667b5b58aa98f0904a6d66d98",
+      "curve_spec": {
+        "kind": "fp4_torsion",
+        "p": 401,
+        "seed": 13,
+        "max_cofactor": 16
+      },
+      "curve": {
+        "slug": "icv1-fp9k4-t106674-3257d083",
+        "icv1": "ICV1:fpk-401-4-ba73e66b:106674:25856854928:342,144,325,19:unk:unk:r:3257d083a9cc",
+        "family": "extension",
+        "construction": "gaudry_quartic_d4::find_d4_curve(401, 13, 16)",
+        "field_degree": null,
+        "field_bits": 9,
+        "group_order": 25856854928,
+        "r": 1616053433,
+        "cofactor": 16,
+        "generator": [
+          "0x22fcaa400",
+          "0x17fea5f95"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 2026103010401,
+      "target_index": 15,
+      "target": [
+        "0x4cd457bf3",
+        "0x27b485903"
+      ],
+      "planted": 25314395
+    }
+  ],
+  "executions": [
+    {
+      "seq": 0,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 0,
+      "algorithm_seed": 209466435195973010
+    },
+    {
+      "seq": 1,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 1,
+      "algorithm_seed": 2874355593881892615
+    },
+    {
+      "seq": 2,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 2,
+      "algorithm_seed": 4357522262920341030
+    },
+    {
+      "seq": 3,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 3,
+      "algorithm_seed": 8478972137449110893
+    },
+    {
+      "seq": 4,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 4,
+      "algorithm_seed": 3436618388006795589
+    },
+    {
+      "seq": 5,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 5,
+      "algorithm_seed": 4450754164540405215
+    },
+    {
+      "seq": 6,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 6,
+      "algorithm_seed": 10617811011948960328
+    },
+    {
+      "seq": 7,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 7,
+      "algorithm_seed": 15335791966436357412
+    },
+    {
+      "seq": 8,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 8,
+      "algorithm_seed": 8819186279081500424
+    },
+    {
+      "seq": 9,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 9,
+      "algorithm_seed": 8694880640244442052
+    },
+    {
+      "seq": 10,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 10,
+      "algorithm_seed": 235501260055225564
+    },
+    {
+      "seq": 11,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 11,
+      "algorithm_seed": 2585840682965476369
+    },
+    {
+      "seq": 12,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 12,
+      "algorithm_seed": 3345735715491689224
+    },
+    {
+      "seq": 13,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 13,
+      "algorithm_seed": 13545503495890826332
+    },
+    {
+      "seq": 14,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 14,
+      "algorithm_seed": 9110423858095142410
+    },
+    {
+      "seq": 15,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 15,
+      "algorithm_seed": 17557594293250693974
+    }
+  ]
+}
