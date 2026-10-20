@@ -221,6 +221,7 @@ pub mod jv_isogeny_walk;
 pub mod jv_quartic;
 pub mod jv_quintic;
 pub mod jv_quintic_edwards;
+pub mod jv_rho_strong;
 pub mod jv_sieve;
 pub mod koblitz_bench;
 pub mod koblitz_factor_base_search;

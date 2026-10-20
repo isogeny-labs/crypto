@@ -78,6 +78,7 @@ SOURCES = {
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
+    "jv_sieve_strong_rho": "research/jv_sieve_strong_rho_20261019/review-20261020/summary.json",
     "registry": "docs/curves/registry.json",
     "curves_schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
@@ -678,15 +679,17 @@ def latest_frontier_audit() -> dict:
             or effect.get("generated_audit_record_required") is not True
             or cold.get("method") != "rho.signed_frobenius_strong"
             or cold.get("bound_id") != "ECBND1h05a2ea918f3c"
-            or n61.get("status") != "admitted online"
+            or n61.get("status") != "superseded (empty-table rho)"
             or n61.get("targets") != 64
-            or n83.get("status") != "exploratory one point"
+            or n83.get("status") != "superseded (empty-table rho)"
             or n83.get("targets") != 1
             or "not a matched cold ratio" not in n83.get("setup_inclusive_class", "")
             or failed.get("ok") is not False
             or failed.get("replays_identical") != 120
             or failed.get("replays_total") != 168
-            or failed.get("failures") != 48):
+            or failed.get("failures") != 48
+            or failed.get("current_main_replay", {}).get("identical") != 72
+            or failed.get("current_main_replay", {}).get("total") != 168):
         raise SystemExit("review the ECBench frontier audit before updating the leaderboard")
     opt_callgrind = rho_opt.get("callgrind", {})
     opt_session = rho_opt.get("ecbench_session", {})
@@ -748,18 +751,62 @@ def latest_frontier_audit() -> dict:
             "label": n61["label"], "rho_over_ic": n61["online_rho_over_ic"],
             "ci95": n61["online_ci95"], "targets": n61["targets"],
             "setup_seconds_approx": n61["setup_seconds_approx"], "status": n61["status"],
+            "correction": n61["correction"],
         },
         "exploratory_online": {
             "label": n83["label"], "rho_over_ic": n83["online_rho_over_ic"],
             "targets": n83["targets"], "complete_process_seconds": n83["complete_process_seconds"],
             "setup_inclusive_class": n83["setup_inclusive_class"],
             "first_integer_break_even_under_model": n83["first_integer_break_even_under_model"],
-            "status": n83["status"],
+            "status": n83["status"], "correction": n83["correction"],
         },
         "replay_block": {
             "identical": failed["replays_identical"], "total": failed["replays_total"],
             "failures": failed["failures"], "scope": failed["failure_scope"],
+            "current": failed["current_main_replay"],
         },
+    }
+
+
+def jv_sieve_table() -> dict:
+    """Read qualified native analysis; retain descriptive fields without treating
+    missing control acceptance or incomplete original accounting as eligibility.
+    Table D stays outside the other tables because its weak class excludes
+    prime-order curves and uses its own reference and unit."""
+    sm = load(SOURCES["jv_sieve_strong_rho"])
+    rows = []
+    for e in sm["sizes"]:
+        r3 = e["rho"].get("R3")
+        if r3 is None:
+            continue
+        rows.append({
+            "p": e["p"], "log2_l": e["log2_l"], "ic_all_correct": e["ic_all_correct"],
+            "ic_S": e["ic_S"], "ic_S_plus": e["ic_S_plus"], "ic_wall_s": e["ic_wall_s"],
+            "rho_S_harness": r3["S_harness"], "rho_S_tuned": r3["S_tuned"],
+            "rho_S_plus_harness": r3["S_plus_harness"], "rho_S_plus_tuned": r3["S_plus_tuned"],
+            "rho_steps_over_sqrt_l": r3["steps_over_sqrt_l"], "rho_wall_s": r3["wall_s"],
+            "rho_all_correct": r3["all_correct"],
+            "ic_over_rho": r3["ic_over_rho"], "n_rho": r3["S_harness"]["n"], "verdict": r3["verdict"],
+            "band_ratio": r3["band_ratio_ic_over_rho"],
+            "ranked_across_band": r3["ranked_across_band_ic_below_rho"],
+            "dense_vs_sparse": e.get("dense_vs_sparse"),
+            "rho_arms": {k: v["S_harness"] for k, v in e["rho"].items()},
+        })
+    return {
+        "source": SOURCES["jv_sieve_strong_rho"],
+        "comparison_status": sm.get("comparison_status", "unqualified"),
+        "comparison_blockers": sm.get("comparison_blockers", []),
+        "qualification": "research/jv_sieve_strong_rho_20261019/review-20261020/README.md",
+        "class": "historical measurement with comparison withheld; weak curve class only",
+        "scope": "Curves y^2 = h(x)(x - a)(x - sigma a) over F_{p^6} with full rational 2-torsion whose "
+                 "isogeny class contains a weak curve (about 55-63% of such curves, ledger 18.5). The class "
+                 "never has prime order. The cover's Jacobian has genus 3. Not a statement about any "
+                 "prime-order or generic curve.",
+        "rows": rows,
+        "exponent_ic": sm["exponent_ic_muls_vs_l"], "exponent_rho_harness": sm["exponent_rho_R3_harness_muls_vs_l"],
+        "exponent_rho_tuned": sm["exponent_rho_R3_tuned_muls_vs_l"],
+        "local_exponents_ic": sm["local_exponents_ic"],
+        "K1_killed_at_p": sm.get("K1_killed_at_p"), "K2_narrowed_at_p": sm.get("K2_narrowed_at_p"),
     }
 
 
@@ -1074,6 +1121,7 @@ def build() -> dict:
         "families": families(board),
         "leaders": leaders, "board": board, "oracles": oracle_rows(names),
         "bounded_diagnostics": [bounded_diagnostic],
+        "jv_sieve_weak_class": jv_sieve_table(),
         "n37_k8_k16_confirmation": k8_confirmation,
         "n37_online_ir_diagnostic": online_ir_diagnostic,
         "n37_native_wall_diagnostic": native_wall_diagnostic,
@@ -1229,18 +1277,22 @@ def markdown(doc: dict) -> str:
           f"`{cold['bound_id']}`: {cold['ops_over_floor']:.3f}× floor "
           f"[{cold['ops_ci95'][0]:.3f}, {cold['ops_ci95'][1]:.3f}], "
           f"{cold['runs']} runs at {cold['sizes']} sizes | Standing rho boundary; not an IC row |",
-          f"| Retained-setup online, `{admitted['label']}` | rho/IC "
+          f"| Retained-setup online, `{admitted['label']}` | ~~rho/IC "
           f"{admitted['rho_over_ic']:.1f}× [{admitted['ci95'][0]:.1f}, "
           f"{admitted['ci95'][1]:.1f}], {admitted['targets']} unseen targets; about "
-          f"{admitted['setup_seconds_approx']:.0f} s setup excluded | Admitted online result; "
-          "kept separate from cold ranked rows |",
-          f"| Retained-setup online, `{exploratory['label']}` | rho/IC "
+          f"{admitted['setup_seconds_approx']:.0f} s setup excluded~~ | **Superseded** (rho had an empty "
+          f"table); not an improvement. {admitted['correction']} |",
+          f"| Retained-setup online, `{exploratory['label']}` | ~~rho/IC "
           f"{exploratory['rho_over_ic']:.6f}× on {exploratory['targets']} public point; complete IC "
-          f"process {exploratory['complete_process_seconds']:.3f} s | Exploratory shared-host result; "
-          "no matched cold ratio and no rank promotion |",
-          f"| Current-binary root-finder replay-all | {replay['identical']}/{replay['total']} identical; "
-          f"{replay['failures']} inherited-F4 counter mismatches | Failed replay retained; affected "
-          "stage counters blocked from promotion |", "",
+          f"process {exploratory['complete_process_seconds']:.3f} s~~ | **Superseded** (rho had an empty "
+          f"table); not an improvement. {exploratory['correction']} |",
+          f"| Current-binary root-finder replay-all | current main (2026-10-19): "
+          f"{replay['current']['identical']}/{replay['current']['total']} identical; "
+          f"{replay['current']['failures']} mismatches across all four IC arms; the 2026-10-13 receipt "
+          f"recorded {replay['identical']}/{replay['total']} with {replay['failures']} inherited-F4 "
+          "mismatches | **Open regression** under investigation (sweep D, PR #2290); root-finder rows "
+          "are not claimed to pass; affected stage counters blocked from promotion. "
+          f"{replay['current']['correction']} |", "",
           f"[Latest result data](../../{audit['source']}); "
           f"[prior full synthesis](../../{audit['previous_source']}). {audit['reason']}", ""]
     for code in ("A", "B", "C"):
@@ -1270,6 +1322,53 @@ def markdown(doc: dict) -> str:
                 "✓" if b["verified"] else "✗"]
             L.append("| " + " | ".join(cells) + " |")
         L.append("")
+    D = doc["jv_sieve_weak_class"]
+    if D["comparison_status"] != "eligible":
+        L += ["## Table D: Joux-Vitse historical study, weak class only", "",
+              f"**Comparison withheld.** {D['scope']}", "",
+              "The archived report predates corrected hash accounting and executable control acceptance. "
+              "Its ratios, price-band rankings and exponent estimates are historical observations; "
+              "K1/K2 and exponent qualification are withheld. Interrupted-attempt costs are incomplete.", "",
+              f"[Review qualification](../../{D['qualification']}) · [Native analysis](../../{D['source']})", ""]
+        L += ["- " + reason for reason in D["comparison_blockers"]]
+        L += ["", "| p | R3 retained rows | recorded IC / rho correctness | comparison |",
+              "|--:|--:|:--|:--|"]
+        for row in D["rows"]:
+            L.append(f"| {row['p']} | {row['n_rho']} | {row['ic_all_correct']} / {row['rho_all_correct']} | withheld |")
+        L.append("")
+    else:
+        L += [f"## Table D: Joux-Vitse sieve on E(F_p^6), weak class only (outside tables A-C)", "",
+              f"**Scope: {D['scope']}**", "",
+              "- **Unit:** S = F_p multiplications / (331 * sqrt(l)), the harness unit of ledger 6 (331 = one affine "
+              "addition on E(F_q^3)); S+ also charges every F_p addition, lookup and native operation one multiplication.",
+              "- **Reference:** `rho.R3`, Pollard rho with the negation map, batched inversion (k = 16) and distinguished "
+              "points, on the same instances and host, priced in the harness unit and in a tuned unit "
+              "(Karatsuba products, Chung-Hasan squarings) that credits rho alone; 16 runs per size.",
+              f"- **Source:** [`{D['source']}`](../../{D['source']}). Class: {D['class']}.",
+              "- Ratios are paired by instance; intervals are 95% bootstrap over instances. "
+              "A ratio below 1 is the sieve cheaper; the gap to the strong rho is the distance remaining, not a gate.",
+              "", "| p | log2 l | S sieve | S+ sieve | S rho (harness / tuned) | S+ rho (harness / tuned) | "
+              "sieve/rho, S (harness) | sieve/rho, S (tuned) | sieve/rho, S+ (harness) | sieve/rho, S+ (tuned) | "
+              "ranked over the 5a band | ok |",
+              "|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|:--|"]
+        def ci(x, k="mean"):
+            return f"{x[k]:.4g} [{x['ci95'][0]:.4g}, {x['ci95'][1]:.4g}]"
+        def rc(x):
+            return f"{x['ratio']:.4g} [{x['ci95'][0]:.4g}, {x['ci95'][1]:.4g}]"
+        for r in D["rows"]:
+            io = r["ic_over_rho"]
+            L.append(f"| {r['p']} | {r['log2_l']:.1f} | {ci(r['ic_S'])} | {ci(r['ic_S_plus'])} | "
+                     f"{r['rho_S_harness']['mean']:.3f} / {r['rho_S_tuned']['mean']:.3f} | "
+                     f"{r['rho_S_plus_harness']['mean']:.3f} / {r['rho_S_plus_tuned']['mean']:.3f} | "
+                     f"{rc(io['S_harness'])} | {rc(io['S_tuned'])} | {rc(io['S_plus_harness'])} | {rc(io['S_plus_tuned'])} | "
+                     f"{'sieve below rho at every weight' if r['ranked_across_band'] else 'unresolved at some weight'} | "
+                     f"{'✓' if r['ic_all_correct'] and r['rho_all_correct'] else '✗'} |")
+        ex, er = D["exponent_ic"], D["exponent_rho_harness"]
+        L += ["", f"Fitted exponent of total F_p multiplications against l over the sizes above: sieve "
+              f"{ex['slope']:.3f} [{ex['ci95'][0]:.3f}, {ex['ci95'][1]:.3f}] (theory 1/3), strong rho "
+              f"{er['slope']:.3f} [{er['ci95'][0]:.3f}, {er['ci95'][1]:.3f}] (theory 1/2). "
+              f"Pre-registered kill rules: K1 fired at p = {D['K1_killed_at_p'] or 'none'}; "
+              f"K2 narrowed at p = {D['K2_narrowed_at_p'] or 'none'}.", ""]
     L += ["## Phases, as a share of S", "",
           "Shares are fractions of each row's own `S`, so they carry no unit; read each row in the "
           "table named in its first column.", "",
@@ -1714,17 +1813,20 @@ def page(doc: dict, standalone: bool) -> str:
              f'{acold["ops_ci95"][1]:.3f}], {acold["runs"]} runs at {acold["sizes"]} sizes</td>'
              '<td>Standing rho boundary; not an IC row</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(admitted["label"])}</code></td>'
-             f'<td>rho/IC {admitted["rho_over_ic"]:.1f}× [{admitted["ci95"][0]:.1f}, '
+             f'<td><s>rho/IC {admitted["rho_over_ic"]:.1f}× [{admitted["ci95"][0]:.1f}, '
              f'{admitted["ci95"][1]:.1f}], {admitted["targets"]} unseen targets; about '
-             f'{admitted["setup_seconds_approx"]:.0f} s setup excluded</td>'
-             '<td>Admitted online result; separate from cold ranked rows</td></tr>'
+             f'{admitted["setup_seconds_approx"]:.0f} s setup excluded</s></td>'
+             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(admitted["correction"])}</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(exploratory["label"])}</code></td>'
-             f'<td>rho/IC {exploratory["rho_over_ic"]:.6f}× on {exploratory["targets"]} public point; '
-             f'complete IC process {exploratory["complete_process_seconds"]:.3f} s</td>'
-             '<td>Exploratory shared-host result; no matched cold ratio and no rank promotion</td></tr>'
-             f'<tr><td>Current-binary root-finder replay-all</td><td>{replay["identical"]}/'
-             f'{replay["total"]} identical; {replay["failures"]} inherited-F4 counter mismatches</td>'
-             '<td>Failed replay retained; affected stage counters blocked from promotion</td></tr>'
+             f'<td><s>rho/IC {exploratory["rho_over_ic"]:.6f}× on {exploratory["targets"]} public point; '
+             f'complete IC process {exploratory["complete_process_seconds"]:.3f} s</s></td>'
+             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(exploratory["correction"])}</td></tr>'
+             f'<tr><td>Current-binary root-finder replay-all</td><td>current main (2026-10-19): '
+             f'{replay["current"]["identical"]}/{replay["current"]["total"]} identical; '
+             f'{replay["current"]["failures"]} mismatches across all four IC arms; the 2026-10-13 receipt '
+             f'recorded {replay["identical"]}/{replay["total"]} with {replay["failures"]} inherited-F4 mismatches</td>'
+             '<td><b>Open regression</b> under investigation (sweep D, PR #2290); root-finder rows are not '
+             f'claimed to pass; affected stage counters blocked from promotion. {esc(replay["current"]["correction"])}</td></tr>'
              '</tbody></table></div>'
              f'<p>{esc(audit["reason"])} {gh(audit["source"], "Latest result data")} · '
              f'{gh(audit["previous_source"], "prior full synthesis")}.</p></section>')
@@ -1972,6 +2074,52 @@ def page(doc: dict, standalone: bool) -> str:
              + family_defs("C"))
     family_table("C")
     P.append('</section>')
+
+
+    # Table D: the Joux-Vitse sieve, a weak class, against a strong rho.
+    D = doc["jv_sieve_weak_class"]
+    if D["comparison_status"] != "eligible":
+        P.append('<section class="panel" id="jv-sieve"><h2>Table D · Joux–Vitse historical study</h2>'
+                 f'<p><strong>Comparison withheld.</strong> {esc(D["scope"])}</p>'
+                 '<p>The archived report predates corrected hash accounting and executable control acceptance. '
+                 'Its ratios, price-band rankings and exponent estimates are historical observations; '
+                 'K1/K2 and exponent qualification are withheld. Interrupted-attempt costs are incomplete.</p>'
+                 f'<p><a href="{GITHUB}{D["qualification"]}">Review qualification</a> · '
+                 f'<a href="{GITHUB}{D["source"]}">Native analysis with explicit eligibility</a></p><ul>')
+        P.extend(f'<li>{esc(reason)}</li>' for reason in D["comparison_blockers"])
+        P.append('</ul></section>')
+    else:
+        P.append('<section class="panel" id="jv-sieve"><h2>Table D · Joux–Vitse sieve on E(F<sub>p⁶</sub>), '
+                 'weak class only <span class="chip">outside tables A–C</span></h2>'
+                 f'<p><strong>{esc(D["scope"])}</strong></p>'
+                 '<p>S = F<sub>p</sub> multiplications / (331·√ℓ), the harness unit; S⁺ also charges every F<sub>p</sub> '
+                 'addition, lookup and native operation one multiplication. Reference: Pollard rho with the negation '
+                 'map, batched inversion and distinguished points on the same instances, in the harness price and in '
+                 'a tuned price that credits rho alone. Ratios are paired by instance, intervals are 95% bootstrap; '
+                 'below 1 is the sieve cheaper, and the gap is a distance, not a gate.</p>'
+                 '<div class="scroll"><table><thead><tr><th class="n">p</th><th class="n">log₂ ℓ</th><th class="n">S sieve</th>'
+                 '<th class="n">S⁺ sieve</th><th class="n">S rho (harness / tuned)</th><th class="n">sieve/rho S (harness)</th>'
+                 '<th class="n">sieve/rho S (tuned)</th><th class="n">sieve/rho S⁺ (harness)</th>'
+                 '<th class="n">sieve/rho S⁺ (tuned)</th><th>§5a band</th></tr></thead><tbody>')
+        def _ci(x):
+            return f"{x['mean']:.4g} [{x['ci95'][0]:.3g}, {x['ci95'][1]:.3g}]"
+        def _rc(x):
+            return f"{x['ratio']:.4g} [{x['ci95'][0]:.3g}, {x['ci95'][1]:.3g}]"
+        for r in D["rows"]:
+            io = r["ic_over_rho"]
+            P.append(f'<tr><td class="n">{r["p"]}</td><td class="n">{r["log2_l"]:.1f}</td><td class="n">{_ci(r["ic_S"])}</td>'
+                     f'<td class="n">{_ci(r["ic_S_plus"])}</td>'
+                     f'<td class="n">{r["rho_S_harness"]["mean"]:.3f} / {r["rho_S_tuned"]["mean"]:.3f}</td>'
+                     f'<td class="n">{_rc(io["S_harness"])}</td><td class="n">{_rc(io["S_tuned"])}</td>'
+                     f'<td class="n">{_rc(io["S_plus_harness"])}</td><td class="n">{_rc(io["S_plus_tuned"])}</td>'
+                     f'<td>{"sieve below rho at every weight" if r["ranked_across_band"] else "unresolved at some weight"}</td></tr>')
+        ex, er = D["exponent_ic"], D["exponent_rho_harness"]
+        P.append('</tbody></table></div>'
+                 f'<p>Fitted exponent of total multiplications in ℓ: sieve {ex["slope"]:.3f} '
+                 f'[{ex["ci95"][0]:.3f}, {ex["ci95"][1]:.3f}] (theory 1/3); strong rho {er["slope"]:.3f} '
+                 f'[{er["ci95"][0]:.3f}, {er["ci95"][1]:.3f}] (theory 1/2). K1 fired at p = '
+                 f'{esc(str(D["K1_killed_at_p"] or "none"))}; K2 narrowed at p = {esc(str(D["K2_narrowed_at_p"] or "none"))}. '
+                 f'Source: <a href="{GITHUB}{D["source"]}">{esc(D["source"])}</a>.</p></section>')
 
     # Every recipe, every curve (the ladder).
     ladder = [r for r in board if r["regime"] in ("prime", "char2")]

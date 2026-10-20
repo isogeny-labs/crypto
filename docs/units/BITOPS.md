@@ -1,19 +1,23 @@
 # `bitop/v1`: one unit of work for every ECDLP method
 
 Every ECDLP cost in this repository, in `aburan28/cryptanalysis` and in cairn's
-bound objectives is charged in one unit: the **bit operation**, one two-input
-Boolean gate (AND, XOR, OR) in the textbook circuit for the primitive. A
-method's cost is
+bound objectives is charged in one versioned accounting convention: the
+**bit operation** (`bitop/v1`). Its primitive weights are fixed
+gate-equivalent formulas. They define a reproducible accounting unit; they are
+not physical gate counts, circuit lower bounds, or estimates of a particular
+implementation's synthesized circuit. A method's cost is
 
 ```text
 work = Σ count(primitive) · gates(primitive, width)
 ```
 
-an exact integer that depends on the counts and this document, and on nothing
-else. No host, compiler or run enters it. The implementation is
-`src/cryptanalysis/bitops.rs`. `docs/units/bitop-v1.vectors.json` holds the
-gate count of every primitive at a spread of widths. Any other implementation
-must reproduce every row exactly.
+an exact integer under this convention, determined by the recorded counts,
+widths, and these formulas. No host, compiler or run enters the pricing. The
+implementation is `src/cryptanalysis/bitops.rs`.
+`docs/units/bitop-v1.vectors.json` freezes the formula weights for every
+primitive at a spread of widths. Any other implementation must reproduce every
+row exactly. The implementation and vector field named `gates` is retained for
+compatibility and means the convention's gate-equivalent weight.
 
 ## Why one unit
 
@@ -46,14 +50,14 @@ Throughout, `b` is the bit length of `p`, `n` the degree of `F_{2^n}`, and
 
 ### Integers
 
-| primitive | gates | derivation |
+| primitive | model units | derivation |
 |---|---|---|
 | `w`-bit addition | `5w` | ripple carry, a full adder is 2 XOR + 2 AND + 1 OR |
 | `w × w` product | `w² + 5w(w−1)` | `w²` partial-product ANDs, `w − 1` row additions |
 
 ### Prime field `F_p` (Montgomery representation)
 
-| primitive | gates |
+| primitive | model units |
 |---|---|
 | `field_add` | `2·5b + 3b = 13b`: an addition, a conditional subtraction of `p`, and a `b`-bit select |
 | `field_mul` | `2·(b² + 5b(b−1)) + 13b`: the product, the reduction's product, and the final subtraction |
@@ -68,7 +72,7 @@ Reduction is by a pentanomial, i.e. four low terms. A trinomial is cheaper;
 the convention takes the dearer modulus so that no curve is flattered by its
 own.
 
-| primitive | gates |
+| primitive | model units |
 |---|---|
 | `field_add` | `n` XORs |
 | `field_mul` | `n² + (n−1)² + 4(n−1)`: schoolbook carry-less product plus reduction |
@@ -79,7 +83,7 @@ own.
 
 ### `F_{p⁴}` (`ecbench::fp4`)
 
-| primitive | gates |
+| primitive | model units |
 |---|---|
 | `field_mul`, `field_sqr` | `16 · field_mul(F_p)` (schoolbook) |
 | `group_add`, `group_double` | `97 · field_mul(F_p)` (`ecbench::fp4`'s `C_ADD`, the extension inversion through the norm) |
@@ -98,7 +102,7 @@ way.
 
 ### Arithmetic modulo `r` and bit-packed work
 
-| primitive | gates |
+| primitive | model units |
 |---|---|
 | `modr_mul` | `field_mul` of `F_p` at `w` bits |
 | `modr_add` | `field_add` of `F_p` at `w` bits |
@@ -109,19 +113,21 @@ way.
 
 ## What the unit leaves out, and how that is caught
 
-The unit is a gate count. It deliberately leaves out several things, which are
-reported beside it and never folded in:
+The convention deliberately leaves out several things, which are reported
+beside it and never folded into the model-unit total:
 
 - **Memory.** Table sizes and peak resident memory.
 - **Control.** Branches, loop overhead and allocation.
 - **Uncounted work.** Anything a method does that no counter sees.
 
-The last of these is the dangerous one, and the **instruction audit** catches
-it. `ecbench audit-ir` replays a record under Callgrind and divides each
-phase's instructions by its counted bit operations. A phase whose ratio is far
-above the reference walk's is doing work its counters miss: an F4 elimination
-that counts its XORs but not its symbolic preprocessing, for example. A
-record that fails the audit is not admitted as a bound.
+The **instruction audit** is a diagnostic for missing counters, not proof that
+all work is counted or that the formula weights match an implementation's
+circuit. `ecbench audit-ir` replays a record under Callgrind and compares each
+phase's instructions per model unit with the reference walk's ratio. A phase
+whose ratio is far above the reference walk's may be doing work its counters
+miss, such as F4 symbolic preprocessing when only elimination XORs are
+counted. A record that fails the audit is not admitted as a bound; passing it
+does not validate the gate-equivalent formulas as physical gate counts.
 
 Work that was uncounted when sessions were committed is counted in a phase's
 `work_native` map, never in `native`, so committed records keep replaying
@@ -172,8 +178,8 @@ exclude each other.
 
 ## Changing the convention
 
-A committed figure must reprice to the same integer forever, so this version
-is frozen. A different convention gets a new name:
+A committed figure must reprice to the same integer forever, so these formulas
+and their weights are frozen. A different convention gets a new name:
 
 - `bitop/v2` for Karatsuba products;
 - a trinomial-aware reduction;
