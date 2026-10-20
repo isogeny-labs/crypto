@@ -71,6 +71,19 @@ was checked with the existing hyperelliptic CLI:
 target/release/hyperelliptic-cover arithmetic --input research/five_leads_e2e_20261019/fixtures/tian-genus3-f257-t1.json > research/five_leads_e2e_20261019/correctness/tian-genus3-f257-t1-result.json
 ```
 
+The paper's F257 map can be replayed from its SHA-checked original TeX.
+The extractor records a single emendation (`103x+207x` to `103+207x`)
+forced by both printed point images; the point gate checks all affine
+rational source points and records the two exceptional cuts:
+
+```sh
+mkdir -p /tmp/tian2007-source
+curl -L --fail https://export.arxiv.org/src/2007.03172 | tar -xz -C /tmp/tian2007-source
+python3 research/five_leads_e2e_20261019/extract_tian_genus3_map.py /tmp/tian2007-source/dlpiso.tex > research/five_leads_e2e_20261019/fixtures/tian-genus3-f257-map-v1.json
+python3 research/five_leads_e2e_20261019/tian_genus3_map_gate.py research/five_leads_e2e_20261019/fixtures/tian-genus3-f257-map-v1.json > research/five_leads_e2e_20261019/correctness/tian-genus3-f257-map-gate-v1.json
+target/release/hyperelliptic-cover arithmetic --input research/five_leads_e2e_20261019/fixtures/tian-genus3-f257-p1-scalar.json > research/five_leads_e2e_20261019/correctness/tian-genus3-f257-p1-scalar-result.json
+```
+
 For the exact-order collector cohort, the seven specifications were frozen
 from the original fixture specifications and then run once in ascending order.
 The historical Python spec generator is retained for provenance; reproduction

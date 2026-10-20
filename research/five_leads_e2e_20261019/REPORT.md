@@ -261,6 +261,22 @@ was partially replayed: a rational divisor \(T_1\) validates and
 The copied rational quartic passes the gradient-ideal smoothness check.
 Its extension-field generators, quotient and maps have not been checked.
 
+The original TeX of the same paper has SHA-256
+`46092fc37bc6bac7e0f42c67e6764150557f63ac4292da86d739980268d3eaae`.
+Its printed \(\mathbf C_1\) numerator says `103x+207x`; both of its
+explicit mapped divisor examples require `103+207x`. The
+[extractor](extract_tian_genus3_map.py) applies only this recorded
+emendation. The [point-map gate](correctness/tian-genus3-f257-map-gate-v1.json)
+reproduces both published cubic pairs exactly and enumerates every affine
+\(\mathbf F_{257}\)-point: 251 source points, no denominator zeros, 249
+degree-three intersection cuts (quartic multiplication rank six), and two
+exceptional rank-five cuts at (84,35) and (105,92). Corrupting one printed
+coefficient gives rank nine. Independently, the repo's Jacobian arithmetic
+checks the paper's source relation \(86241[(2,7)-\infty]=[(121,5)-\infty]\)
+([receipt](correctness/tian-genus3-f257-p1-scalar-result.json)). These
+checks do not establish the induced Jacobian homomorphism or solve a mapped
+DLP; the two rank-five cases require special divisor handling.
+
 A [20-input holdout](fixtures/smith-negative-holdout-v1.json) was frozen
 before odd-kernel testing from the prior \(p=2^{31}-1\) Smith census:
 ten with no tractable two-torsion kernel and ten with a trigonal candidate

@@ -24,6 +24,7 @@ requested frozen 20 Smith-negative odd-characteristic inputs at ell 3 and 5.
 - **Suspected explanation:** Unknown whether the holdout contains a rational odd-kernel exit; no negative search has been run.
 - **Missing capability:** extension-field genus-3 torsion and Weil-pairing arithmetic for L2, including the holdout's degree-eight two-infinity model; independent construction of the L1 quotient from the checked kernel, actual-kernel and dual-recovery checks, and exceptional-input handling; theta/Weil-set quotient construction and rational descent for L2; destination solver adaptation for L2 and full mapped-source cost accounting there.
 - **What this evidence does not establish:** The mapped cubic example does not prove the independently checked 3-kernel is the kernel of the published map, cover exceptional inputs, or establish a growing-size advantage. It gives no Smith-negative coverage or mapped genus-3 cost.
+- **F257 positive-control update:** The SHA-checked original TeX map reproduces both printed point images after an explicit `103x+207x` to `103+207x` correction supported by both examples. All 251 affine rational source points were enumerated: 249 ordinary degree-three quartic cuts, two rank-five exceptional cuts, and no denominator zeros. The paper's source scalar relation `86241 P1 = P2` checks independently. This is a point-map check, not a quotient/Jacobian homomorphism or DLP transfer; holdout odd-kernel testing is still absent.
 
 ## What would unblock it
 
