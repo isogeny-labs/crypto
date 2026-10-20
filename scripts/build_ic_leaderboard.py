@@ -72,6 +72,9 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "hec_bitop": "research/hec_bitop_20261020/analysis/analysis.json",
+    "hec_round7_rows": "experiments/hyperelliptic_sparse_solve_r7/fbwalk_rows.json",
+    "hec_round7_fits": "experiments/hyperelliptic_sparse_solve_r7/fits.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -618,6 +621,43 @@ def la_component() -> dict:
             "class": "engineering"}
 
 
+def hec_bitop() -> dict:
+    """The hyperelliptic genus-2/3/4 rows of round seven re-priced in bitop/v1
+    with both arms counted and a full-width rho walk: research/hec_bitop_20261020,
+    copied from its analysis.json (ratios, bootstrap intervals and slopes
+    computed there by examples/hec_bitop_analyse.rs).  The before mark is round
+    seven's renormalised in-situ genus-4 figure and fit, copied from its frozen
+    files.  Not an elliptic curve and a re-pricing (accounting): it moves no row
+    of tables A-C."""
+    an = load(SOURCES["hec_bitop"])
+    if an.get("schema") != "hec-bitop-analysis/v1":
+        raise SystemExit(f"{SOURCES['hec_bitop']}: unexpected schema {an.get('schema')!r}")
+    rows = [{
+        "genus": r["genus"], "p": r["p"], "n": int(r["n"]), "log2_n": r["log2_n"],
+        "ic_runs": r["ic_runs"], "rho_runs": r["rho_runs"], "verified": r["verified"],
+        "ic_over_rho": r["ic_over_rho"], "ic_over_rho_ci95": r["ic_over_rho_ci95"],
+        "excluding_validation": r["ic_over_rho_excluding_validation"],
+        "post_hoc_without_rho_precompute": r["post_hoc_ic_over_rho_without_rho_precompute"],
+        "post_hoc_oracle_doubled": r["post_hoc_ic_over_rho_oracle_doubled"],
+        "in_situ_full_width_rho": r["in_situ_s_ic_over_s_rho"],
+        "rho_precompute_share": r["rho_precompute_share"],
+    } for r in an["rows"]]
+    slopes = [{"genus": int(g), "rows": f["rows"], "slope": f["slope"], "slope_ci95": f["slope_ci95"],
+               "degenerate_resamples": f["degenerate_resamples"]}
+              for g, f in sorted(an["fits"].items(), key=lambda kv: int(kv[0]))]
+    r7 = next(r for r in load(SOURCES["hec_round7_rows"]) if r["genus"] == 4 and r["p"] == 61)
+    r7fit = load(SOURCES["hec_round7_fits"])["4"]["ratio_corr_B"]
+    return {"rows": rows, "slopes": slopes, "unit": an["unit"], "resamples": an["resamples"],
+            "before": {"genus": 4, "p": 61, "n": r7["N"], "ic_over_rho": r7["ratio_corr_B"],
+                       "unit": "in-situ group operations, wall-clock-calibrated linear algebra and oracle, "
+                               "rho renormalised to its ideal, 8-bit rho walk (round seven)",
+                       "slope": r7fit["slope"], "slope_ci95": r7fit["ci95"],
+                       "source": SOURCES["hec_round7_rows"], "fits_source": SOURCES["hec_round7_fits"]},
+            "study": "research/hec_bitop_20261020/", "readme": "research/hec_bitop_20261020/README.md",
+            "source": SOURCES["hec_bitop"], "protocol": "research/hec_bitop_20261020/PROTOCOL.md",
+            "class": "accounting"}
+
+
 def latest_frontier_audit() -> dict:
     """Copy the latest performance handoff into the generated board.
 
@@ -1117,6 +1157,7 @@ def build() -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "hyperelliptic_bitop_reprice": hec_bitop(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -1164,6 +1205,43 @@ def record_cell(r: dict) -> str:
 def rich(s) -> str:
     """Escaped text with `code` spans, for the family definitions shared with the Markdown."""
     return re.sub(r"`([^`]+)`", r"<code>\1</code>", esc(s))
+
+
+def fmt_ci(v: float, ci: list, f: str) -> tuple[str, str]:
+    return format(v, f), f"[{format(ci[0], f)}, {format(ci[1], f)}]"
+
+
+def hec_text(h: dict) -> dict:
+    """Prose the hyperelliptic bitop/v1 section shares between the Markdown and the page."""
+    head = next(r for r in h["rows"] if r["genus"] == 4 and r["p"] == 61)
+    if not head["ic_over_rho_ci95"][1] < 1:
+        raise SystemExit(f"{h['source']}: the genus-4 p = 61 row's upper bound is not below 1; "
+                         "the hyperelliptic section's lead says it is")
+    b = h["before"]
+    v, ci = fmt_ci(head["ic_over_rho"], head["ic_over_rho_ci95"], ".3f")
+    return {
+        "title": "Hyperelliptic Jacobians re-priced in bitop/v1, genus 2–4",
+        "lead": (f"Round seven's 18 fb-walk rows (index calculus seed 20260916 × 5 runs, rho seed 0xC0FFEE × 40 runs "
+                 f"per row) re-priced with both arms counted at the field, mod-N, hash and word level in `{h['unit']}`, "
+                 f"against the full-width rho walk. Genus 4 at p = 61, N = {head['n']:,}: IC/rho {v} {ci} "
+                 f"(95% bootstrap); the preregistered verdict is that the row survives (upper bound below 1). "
+                 f"Before: {b['ic_over_rho']:.2f}× in round seven's in-situ unit, with slope "
+                 f"{b['slope']:.2f} [{b['slope_ci95'][0]:.2f}, {b['slope_ci95'][1]:.2f}]."),
+        "class": h["class"],
+        "unit": h["unit"],
+        "convention": ("bitop/v1 is an accounting convention with frozen gate-equivalent weights, not a physical "
+                       "gate count; the Callgrind check is a relative coverage diagnostic. Known uncounted work "
+                       "(memory movement, generator internals, loop control) is disclosed in the protocol. "
+                       "No algorithm changed: the move from the before figure combines later code changes, "
+                       "the corrected rho walk and the unit."),
+        "scope": ("Toy hyperelliptic Jacobians (p ≤ 251, N ≤ 2^24), operation counts only; not an elliptic curve, "
+                  "and no deployed system is hyperelliptic."),
+        "rows_note": ("Per row: mean bitop/v1 of index calculus over rho's with its 95% bootstrap interval; the same "
+                      "ratio excluding validation; post hoc, without rho's fixed precomputation and with the IC oracle "
+                      "charged twice; and the in-situ ratio against the full-width rho. Every row verified."),
+        "slopes_note": ("Per genus: least-squares slope of log2(IC/rho) in bitop/v1 on log2 N, with a two-stage "
+                        "bootstrap 95% interval."),
+    }
 
 
 def markdown(doc: dict) -> str:
@@ -1507,6 +1585,27 @@ def markdown(doc: dict) -> str:
           "its target-dependent walk and ends with scalar verification. "
           "This wall-time panel is kept separate from Tables A–C and their "
           "operation-unit S rankings.", ""]
+    h = doc["hyperelliptic_bitop_reprice"]
+    t = hec_text(h)
+    L += ["", f"## {t['title']}, outside tables A–C", "",
+          t["lead"], "",
+          f"**Class:** {t['class']}.  **Unit:** `{t['unit']}`.  **Scope:** {t['scope']} {t['convention']} "
+          f"Read the [study](../../{h['readme']}), the [protocol](../../{h['protocol']}) and the "
+          f"[frozen analysis](../../{h['source']}); the before mark is from [round seven](../../{h['before']['source']}).", "",
+          t["rows_note"], "",
+          "| g | p | N | IC/rho bitop/v1 | 95% | excl. validation | post hoc: no rho precompute | "
+          "post hoc: IC oracle ×2 | in-situ, full-width rho |",
+          "|--:|--:|--:|--:|:--|--:|--:|--:|--:|"]
+    for r in h["rows"]:
+        v, ci = fmt_ci(r["ic_over_rho"], r["ic_over_rho_ci95"], ".3f")
+        L.append(f"| {r['genus']} | {r['p']} | {r['n']:,} | {v} | {ci} | {r['excluding_validation']:.3f} | "
+                 f"{r['post_hoc_without_rho_precompute']:.3f} | {r['post_hoc_oracle_doubled']:.3f} | "
+                 f"{r['in_situ_full_width_rho']:.3f} |")
+    L += ["", t["slopes_note"], "", "| genus | rows | slope | 95% |", "|--:|--:|--:|:--|"]
+    for f in h["slopes"]:
+        v, ci = fmt_ci(f["slope"], f["slope_ci95"], "+.3f")
+        L.append(f"| {f['genus']} | {f['rows']} | {v} | {ci} |")
+    L.append("")
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
         L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
@@ -2209,6 +2308,36 @@ def page(doc: dict, standalone: bool) -> str:
              'This Tier 1 wall-time panel uses its own unit and sits outside the '
              'operation-unit S rankings.</p>' +
              gh(n83["source"], 'Frozen IC1 rows and candidate identities') + '</section>')
+
+    h = doc["hyperelliptic_bitop_reprice"]
+    t = hec_text(h)
+    P.append(f'<section class="card" id="hyperelliptic-bitop"><h2>{esc(t["title"])}, outside the priced tables</h2>'
+             f'<p>{rich(t["lead"])}</p>'
+             f'<p><strong>Class:</strong> {esc(t["class"])}. <strong>Unit:</strong> <code>{esc(t["unit"])}</code>. '
+             f'<strong>Scope:</strong> {esc(t["scope"])} {esc(t["convention"])} '
+             f'{gh(h["readme"], "Study")} · {gh(h["protocol"], "Protocol")} · {gh(h["source"], "Frozen analysis")} · '
+             f'{gh(h["before"]["source"], "Round seven (before)")}.</p>'
+             f'<p>{rich(t["rows_note"])}</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">g</th><th class="n">p</th><th class="n">N</th>'
+             '<th class="n">IC/rho bitop/v1 [95%]</th><th class="n">Excl. validation</th>'
+             '<th class="n">Post hoc: no rho precompute</th><th class="n">Post hoc: IC oracle ×2</th>'
+             '<th class="n">In-situ, full-width rho</th></tr></thead><tbody>')
+    for r in h["rows"]:
+        v, ci = fmt_ci(r["ic_over_rho"], r["ic_over_rho_ci95"], ".3f")
+        P.append(f'<tr><td class="n">{r["genus"]}</td><td class="n">{r["p"]}</td><td class="n">{r["n"]:,}</td>'
+                 f'<td class="n">{v} <span class="muted">{ci}</span></td>'
+                 f'<td class="n">{r["excluding_validation"]:.3f}</td>'
+                 f'<td class="n">{r["post_hoc_without_rho_precompute"]:.3f}</td>'
+                 f'<td class="n">{r["post_hoc_oracle_doubled"]:.3f}</td>'
+                 f'<td class="n">{r["in_situ_full_width_rho"]:.3f}</td></tr>')
+    P.append(f'</tbody></table></div><p>{rich(t["slopes_note"])}</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Genus</th><th class="n">Rows</th>'
+             '<th class="n">Slope [95%]</th></tr></thead><tbody>')
+    for f in h["slopes"]:
+        v, ci = fmt_ci(f["slope"], f["slope_ci95"], "+.3f")
+        P.append(f'<tr><td class="n">{f["genus"]}</td><td class="n">{f["rows"]}</td>'
+                 f'<td class="n">{v} <span class="muted">{ci}</span></td></tr>')
+    P.append('</tbody></table></div></section>')
 
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '

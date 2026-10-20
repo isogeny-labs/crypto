@@ -750,6 +750,16 @@
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#genus-crossover",
      "value": 0.24
+    },
+    {
+     "anchor": "#genus-crossover",
+     "class": "accounting",
+     "date": "2026-10-20",
+     "detail": "Re-priced in bitop/v1 (an accounting convention, not a physical gate count) with both arms counted at the field, mod-N, hash and word level against a full-width rho walk, on round seven's 18 rows: genus 4, p = 61, N = 16,790,591 reads 0.114 [0.096, 0.138] (95% bootstrap; was 0.24 in-situ against an 8-bit walk). Genus-4 slope of log2(IC/rho) on log2 N: -0.232 [-0.320, -0.082] (round seven in-situ -0.29 [-0.42, -0.16]). No algorithm change.",
+     "label": "bitop/v1 re-pricing: both arms counted, full-width rho",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/hec_bitop_20261020/README.md",
+     "value": 0.114
     }
    ],
    "role": "context"
@@ -918,5 +928,5 @@
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-10-17"
+ "updated": "2026-10-20"
 }
