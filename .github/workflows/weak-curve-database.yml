@@ -18,6 +18,12 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+# A newer push to the same pull request cancels this workflow's run for the older commit.
+# Every other event (push, schedule, dispatch, merge queue) gets a group of its own and is never cancelled.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   database:
     runs-on: ubuntu-24.04
@@ -101,7 +107,6 @@ jobs:
   p192-lean-proof:
     runs-on: ubuntu-latest
     timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 35 || 25 }}
-    timeout-minutes: 25
     defaults:
       run:
         working-directory: research/p192_extension_cover_20261012/lean
@@ -115,7 +120,6 @@ jobs:
           use-mathlib-cache: true
           build: true
           build-args: 'CrossRatio SignedBase ScalarAnchor AdaptiveBase ShortSums DivisorSupport NonspecialSupport'
-          build-args: 'CrossRatio'
           test: false
           lint: false
           leanchecker: true
