@@ -46,6 +46,7 @@ def verify(snapshot_path, results, head_sha):
             PRIOR_DISTRIBUTION_POD_ID or
             snapshot.get("prior_distribution_status") != "TERMINATED" or
             termination.get("pod_present") is not False or
+            termination.get("pod_id") != PRIOR_DISTRIBUTION_POD_ID or
             snapshot.get("prior_termination_sha256") != prior.digest(termination_path) or
             snapshot.get("prior_pods_sha256") != prior.digest(prior_pods_path) or
             any(pod.get("id") == PRIOR_DISTRIBUTION_POD_ID or

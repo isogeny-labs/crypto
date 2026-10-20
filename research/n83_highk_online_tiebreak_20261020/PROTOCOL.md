@@ -107,7 +107,7 @@ replay every base, relation and scalar and recompute the selector from the
 archived bytes before promoting a result.
 
 The conditional Pod implementation is `allocate_runpod.py`,
-`runpod_runner.py`, and `launch_on_pod.sh`. The controller runs
+`runpod_runner.py`, `launch_on_pod.sh`, and `watch_runpod.py`. The controller runs
 `check_trigger.py` against the
 locally replayed aggregate and archive immediately before allocation and
 again immediately before dispatch. Its `n83.online-tiebreak-runpod-snapshot/v1`
@@ -130,6 +130,9 @@ out of files, shell arguments, Pod inputs and result archives. It requires
 the watchdog's prior termination receipt, queries the provider for the
 absence of that Pod, reserves the worst-case new charge before creating a
 Pod, and stops any allocation returned outside the frozen envelope.
+The watcher uses the same hidden prompt, verifies the transferred archive
+hash, calls `podStop` and the provider's `Void` `podTerminate` mutation,
+and records an absent-Pod receipt before the next allocation.
 
 After `DONE`, transfer `results/` and `raw_results.tar.gz`, verify the
 Pod-side SHA-256, stop and terminate the Pod, and retain the provider charge

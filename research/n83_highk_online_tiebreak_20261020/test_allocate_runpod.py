@@ -19,7 +19,8 @@ class AllocationPreflightTest(unittest.TestCase):
         self.output = root / "new_allocation"
         self.termination = root / "prior_termination.json"
         self.termination.write_text(json.dumps({
-            "recorded_utc": "2026-10-20T04:00:00Z", "pod_present": False}))
+            "recorded_utc": "2026-10-20T04:00:00Z", "pod_present": False,
+            "pod_id": "yajulte7twpr9p"}))
         TriggerTest.run_check(self)
 
     def test_worst_case_budget_and_termination_gate(self):
@@ -32,7 +33,8 @@ class AllocationPreflightTest(unittest.TestCase):
                              allocate_runpod.PRICE_CAP * Decimal(4),
                              Decimal("5.00"))
         self.termination.write_text(json.dumps({
-            "recorded_utc": "2026-10-20T04:00:00Z", "pod_present": True}))
+            "recorded_utc": "2026-10-20T04:00:00Z", "pod_present": True,
+            "pod_id": "yajulte7twpr9p"}))
         with mock.patch.object(allocate_runpod, "utc_now", return_value=at):
             with self.assertRaises(ValueError):
                 allocate_runpod.preflight(

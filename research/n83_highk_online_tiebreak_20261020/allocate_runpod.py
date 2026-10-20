@@ -58,6 +58,8 @@ def preflight(prior_aggregate, prior_archive, prior_termination, output):
     trigger = check_trigger.check(prior_aggregate, prior_archive)
     terminated = json.loads(prior_termination.read_text())
     if (terminated.get("pod_present") is not False or
+            terminated.get("pod_id") !=
+            runpod_provider.PRIOR_DISTRIBUTION_POD_ID or
             runpod_provider.timestamp(terminated["recorded_utc"]) > utc_now() or
             output.exists()):
         raise ValueError("prior Pod is not proven absent or output already exists")
