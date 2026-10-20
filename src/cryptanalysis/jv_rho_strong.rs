@@ -676,7 +676,21 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
     }
 }
 
+fn validate_options(o: StrongOpts) -> Result<(), &'static str> {
+    if o.batch == 0 {
+        return Err("batch must be positive");
+    }
+    if o.r == 0 {
+        return Err("r must be positive");
+    }
+    if o.dp_bits > 44 {
+        return Err("dp_bits must be at most 44");
+    }
+    Ok(())
+}
+
 pub fn run_strong_rho(p: u64, seed: u64, run: u64, o: StrongOpts) -> StrongRun {
+    validate_options(o).expect("invalid strong rho options");
     let spec = generate_spec(p, seed);
     strong_rho(&spec, seed, run, o)
 }
@@ -684,6 +698,21 @@ pub fn run_strong_rho(p: u64, seed: u64, run: u64, o: StrongOpts) -> StrongRun {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn strong_rho_options_reject_invalid_limits() {
+        let base = StrongOpts {
+            negation: true,
+            batch: 1,
+            dp_bits: 16,
+            r: 64,
+        };
+        assert!(validate_options(base).is_ok());
+        assert!(validate_options(StrongOpts { batch: 0, ..base }).is_err());
+        assert!(validate_options(StrongOpts { r: 0, ..base }).is_err());
+        assert!(validate_options(StrongOpts { dp_bits: 45, ..base }).is_err());
+        assert!(validate_options(StrongOpts { dp_bits: 44, ..base }).is_ok());
+    }
 
     #[test]
     fn opposite_points_recover_the_same_scalar() {
