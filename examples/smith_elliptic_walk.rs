@@ -37,7 +37,7 @@ fn is_prime(n: u64) -> bool {
     }
     let mut d = 2;
     while d * d <= n {
-        if n % d == 0 {
+        if n.is_multiple_of(d) {
             return false;
         }
         d += 1;
@@ -404,7 +404,7 @@ fn fit(args: &[String]) {
                     if succ == 0.0 {
                         continue;
                     }
-                    let tot: f64 = ws.iter().map(|v| f(v)).sum();
+                    let tot: f64 = ws.iter().map(f).sum();
                     xs.push((p as f64).ln());
                     ys.push((tot / succ).ln());
                 }
