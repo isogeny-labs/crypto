@@ -593,8 +593,15 @@ pub struct Solver {
     /// `pivot[i]` is row `i`'s basic variable; `None` once the row has
     /// no unassigned variable left.
     pivot: Vec<Option<u32>>,
+    /// Boolean invalidation policy used by `set_xor_decided_cache`.
+    /// At most one of the two explicit cache policies is enabled.
     cache_decided_xors: bool,
     xor_decided: Vec<bool>,
+    /// Opt-in: a fully assigned and satisfied row remains decided while the
+    /// assignment only grows. Backjumping invalidates these certificates.
+    decided_xor_row_cache: bool,
+    xor_assignment_generation: u64,
+    decided_xor_row_generation: Vec<Option<u64>>,
     /// Scratch copy of the row being pivoted on, reused across passes.
     xor_src: Vec<u64>,
     /// `analyze` scratch: which variables have been resolved on.  Only
@@ -719,6 +726,9 @@ impl Solver {
             pivot: Vec::new(),
             cache_decided_xors: false,
             xor_decided: Vec::new(),
+            decided_xor_row_cache: false,
+            xor_assignment_generation: 0,
+            decided_xor_row_generation: Vec::new(),
             xor_src: Vec::new(),
             seen: vec![false; n],
             seen_stack: Vec::new(),
@@ -736,11 +746,28 @@ impl Solver {
     /// Skip rechecking satisfied, fully assigned XOR rows until an
     /// unassignment or matrix mutation. Disabled by default. Changing the
     /// setting invalidates every cached row, including during incremental use.
+    /// Enabling this policy disables the generation-based policy.
     pub fn set_xor_decided_cache(&mut self, enabled: bool) {
         self.cache_decided_xors = enabled;
         self.xor_decided.clear();
         if enabled {
+            self.decided_xor_row_cache = false;
+            self.decided_xor_row_generation.clear();
             self.xor_decided.resize(self.matrix_rhs.len(), false);
+        }
+        self.xor_epoch = u64::MAX;
+    }
+
+    /// Skip rechecking satisfied XOR rows until an assignment is undone.
+    /// Default-off so existing solver traces and callers keep their behavior.
+    /// Call before search; switching modes clears every cached certificate.
+    /// Enabling this generation-based policy disables the boolean policy.
+    pub fn set_decided_xor_row_cache(&mut self, enabled: bool) {
+        self.decided_xor_row_cache = enabled;
+        self.decided_xor_row_generation = vec![None; self.matrix_rhs.len()];
+        if enabled {
+            self.cache_decided_xors = false;
+            self.xor_decided.clear();
         }
         self.xor_epoch = u64::MAX;
     }
@@ -1279,7 +1306,11 @@ impl Solver {
             }
             let intact = match self.pivot[i] {
                 Some(p) => self.var_value(p as usize).is_none(),
-                None => false,
+                None => {
+                    self.decided_xor_row_cache
+                        && self.decided_xor_row_generation[i]
+                            == Some(self.xor_assignment_generation)
+                }
             };
             if intact {
                 continue;
@@ -1304,9 +1335,15 @@ impl Solver {
                         // Backjump and every matrix mutation invalidate it.
                         self.xor_decided[i] = true;
                     }
+                    if self.decided_xor_row_cache {
+                        self.decided_xor_row_generation[i] = Some(self.xor_assignment_generation);
+                    }
                 }
                 Some(p) => {
                     self.pivot[i] = Some(p);
+                    if self.decided_xor_row_cache {
+                        self.decided_xor_row_generation[i] = None;
+                    }
                     // Clear `p` from every other row, so it lives in
                     // this one alone.  The row is copied out once, the
                     // matrix is walked through local slices with a local
@@ -1425,6 +1462,9 @@ impl Solver {
         if self.cache_decided_xors {
             self.xor_decided.resize(self.matrix_rhs.len(), false);
         }
+        if self.decided_xor_row_cache {
+            self.decided_xor_row_generation = vec![None; self.matrix_rhs.len()];
+        }
     }
 
     /// Drop the working matrix; the next pass rebuilds it from `xors`.
@@ -1432,6 +1472,7 @@ impl Solver {
         self.matrix.clear();
         self.matrix_rhs.clear();
         self.xor_decided.clear();
+        self.decided_xor_row_generation.clear();
     }
 
     /// `rhs ⊕ parity(assigned-true variables of the row)` — zero when a
@@ -1846,6 +1887,14 @@ impl Solver {
         self.trail_lim.truncate(level);
         self.qhead = target;
         self.epoch += 1;
+        if self.decided_xor_row_cache {
+            if let Some(next) = self.xor_assignment_generation.checked_add(1) {
+                self.xor_assignment_generation = next;
+            } else {
+                self.xor_assignment_generation = 0;
+                self.decided_xor_row_generation.fill(None);
+            }
+        }
     }
 
     /// Pick the unassigned variable with the highest activity.  Returns
@@ -2606,6 +2655,83 @@ mod tests {
         assert!(s.check_xors(&m));
     }
 
+    #[test]
+    fn xor_cache_policy_switch_rechecks_existing_matrix() {
+        let mut s = Solver::new(3);
+        assert!(s.add_xor(&[1, 2], false));
+        s.set_xor_decided_cache(true);
+        s.trail_lim.push(s.trail.len());
+        s.assign(1, Reason::Decision);
+        s.assign(2, Reason::Decision);
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert_eq!(s.xor_decided, vec![true]);
+
+        s.set_decided_xor_row_cache(true);
+        assert!(!s.cache_decided_xors);
+        assert!(s.xor_decided.is_empty());
+        assert!(s.decided_xor_row_cache);
+        assert_eq!(s.decided_xor_row_generation, vec![None]);
+        let visits = s.stats.xor_repivots;
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert_eq!(s.stats.xor_repivots, visits + 1);
+
+        s.set_xor_decided_cache(true);
+        assert!(!s.decided_xor_row_cache);
+        assert!(s.decided_xor_row_generation.is_empty());
+        assert_eq!(s.xor_decided, vec![false]);
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert_eq!(s.stats.xor_repivots, visits + 2);
+        s.backjump(0);
+        s.trail_lim.push(s.trail.len());
+        s.assign(1, Reason::Decision);
+        s.assign(-2, Reason::Decision);
+        assert!(matches!(s.propagate_xors(), XorStep::Conflict));
+    }
+
+    #[test]
+    fn generation_xor_cache_wraparound_cannot_reuse_old_certificate() {
+        let mut s = Solver::new(3);
+        s.set_decided_xor_row_cache(true);
+        assert!(s.add_xor(&[1, 2], false));
+        s.trail_lim.push(s.trail.len());
+        s.assign(1, Reason::Decision);
+        s.assign(2, Reason::Decision);
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert_eq!(s.decided_xor_row_generation, vec![Some(0)]);
+        s.xor_assignment_generation = u64::MAX;
+        s.backjump(0);
+        assert_eq!(s.xor_assignment_generation, 0);
+        assert_eq!(s.decided_xor_row_generation, vec![None]);
+        s.trail_lim.push(s.trail.len());
+        s.assign(1, Reason::Decision);
+        s.assign(-2, Reason::Decision);
+        assert!(matches!(s.propagate_xors(), XorStep::Conflict));
+    }
+
+    #[test]
+    fn decided_xor_cache_skips_only_until_unassignment_or_rebuild() {
+        let mut s = Solver::new(4);
+        s.set_decided_xor_row_cache(true);
+        assert!(s.add_xor(&[1, 2], false));
+        s.trail_lim.push(s.trail.len());
+        s.assign(1, Reason::Decision);
+        s.assign(2, Reason::Decision);
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        let repivots = s.stats.xor_repivots;
+        s.assign(3, Reason::Decision);
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert_eq!(s.stats.xor_repivots, repivots);
+
+        s.rebuild_matrix();
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert!(s.stats.xor_repivots > repivots);
+
+        s.backjump(0);
+        s.assign(1, Reason::Decision);
+        s.assign(-2, Reason::Decision);
+        assert!(matches!(s.propagate_xors(), XorStep::Conflict));
+    }
+
     /// **The incremental matrix must lose nothing.**
     ///
     /// The whole design rests on one claim: with every row carrying an
@@ -2714,37 +2840,40 @@ mod tests {
 
             let want = oracle(&rows, &fixed, n_vars);
 
-            let mut s = Solver::new(n_vars);
-            let mut trivial_unsat = false;
-            for (vars, rhs) in &rows {
-                if !s.add_xor(vars, *rhs) {
-                    trivial_unsat = true;
+            for cached in [false, true] {
+                let mut s = Solver::new(n_vars);
+                s.set_decided_xor_row_cache(cached);
+                let mut trivial_unsat = false;
+                for (vars, rhs) in &rows {
+                    if !s.add_xor(vars, *rhs) {
+                        trivial_unsat = true;
+                    }
                 }
-            }
-            for u in &units {
-                if !s.add_clause(vec![*u]) {
-                    trivial_unsat = true;
+                for u in &units {
+                    if !s.add_clause(vec![*u]) {
+                        trivial_unsat = true;
+                    }
                 }
-            }
-            // Drive propagation to fixpoint at level 0 without deciding.
-            let conflicted = trivial_unsat || s.propagate_to_fixpoint_for_test();
+                // Drive propagation to fixpoint at level 0 without deciding.
+                let conflicted = trivial_unsat || s.propagate_to_fixpoint_for_test();
 
-            match want {
-                None => assert!(
-                    conflicted,
-                    "trial {trial}: elimination says inconsistent, solver did not notice"
-                ),
-                Some(implied) => {
-                    assert!(
-                        !conflicted,
-                        "trial {trial}: solver reported a conflict where none exists"
-                    );
-                    for (v, val) in implied {
-                        assert_eq!(
-                            s.value_of_for_test(v),
-                            Some(val),
-                            "trial {trial}: variable {v} should have been forced to {val}"
+                match &want {
+                    None => assert!(
+                        conflicted,
+                        "trial {trial}, cached {cached}: elimination says inconsistent"
+                    ),
+                    Some(implied) => {
+                        assert!(
+                            !conflicted,
+                            "trial {trial}, cached {cached}: unexpected conflict"
                         );
+                        for &(v, val) in implied {
+                            assert_eq!(
+                                s.value_of_for_test(v),
+                                Some(val),
+                                "trial {trial}, cached {cached}: variable {v} should be {val}"
+                            );
+                        }
                     }
                 }
             }
@@ -2793,30 +2922,105 @@ mod tests {
                 }
             }
 
-            let mut s = Solver::new(n_vars);
-            let mut trivially_unsat = false;
-            for (vars, rhs) in &rows {
-                if !s.add_xor(vars, *rhs) {
-                    trivially_unsat = true;
+            for cached in [false, true] {
+                let mut s = Solver::new(n_vars);
+                s.set_decided_xor_row_cache(cached);
+                for (vars, rhs) in &rows {
+                    s.add_xor(vars, *rhs);
+                }
+                let res = s.solve();
+
+                if brute_sat {
+                    assert_eq!(
+                        res,
+                        SolveResult::Sat,
+                        "trial {trial}, cached {cached}: solver missed a model"
+                    );
+                    let m = s.model();
+                    assert!(
+                        s.check_xors(&m),
+                        "trial {trial}, cached {cached}: invalid model"
+                    );
+                } else {
+                    assert_eq!(
+                        res,
+                        SolveResult::Unsat,
+                        "trial {trial}, cached {cached}: solver invented a model"
+                    );
                 }
             }
-            let res = s.solve();
+        }
+    }
 
-            if brute_sat {
+    #[test]
+    fn decided_xor_cache_matches_brute_force_on_mixed_cnf_xor() {
+        let n_vars = 7u32;
+        let mut state = 0xB9C7_1F63_DAE2_5401u64;
+        let mut next = || {
+            state ^= state >> 12;
+            state ^= state << 25;
+            state ^= state >> 27;
+            state.wrapping_mul(0x2545_F491_4F6C_DD1D)
+        };
+        for trial in 0..200 {
+            let rows: Vec<(Vec<u32>, bool)> = (0..2 + next() % 6)
+                .map(|_| {
+                    let vars: Vec<u32> = (1..=n_vars).filter(|_| next() % 3 != 0).collect();
+                    (vars, next() % 2 == 0)
+                })
+                .collect();
+            let clauses: Vec<Vec<Lit>> = (0..3 + next() % 12)
+                .map(|_| {
+                    (0..1 + next() % 3)
+                        .map(|_| {
+                            let v = (1 + next() % n_vars as u64) as Lit;
+                            if next() % 2 == 0 {
+                                v
+                            } else {
+                                -v
+                            }
+                        })
+                        .collect()
+                })
+                .collect();
+            let expected_sat = (0..(1u32 << n_vars)).any(|assignment| {
+                rows.iter().all(|(vars, rhs)| {
+                    let parity = vars
+                        .iter()
+                        .filter(|v| assignment & (1 << (**v - 1)) != 0)
+                        .count()
+                        % 2
+                        == 1;
+                    parity == *rhs
+                }) && clauses.iter().all(|clause| {
+                    clause
+                        .iter()
+                        .any(|&lit| (assignment & (1 << var_of(lit)) != 0) == (lit > 0))
+                })
+            });
+            for cached in [false, true] {
+                let mut solver = Solver::new(n_vars);
+                solver.set_decided_xor_row_cache(cached);
+                for (vars, rhs) in &rows {
+                    solver.add_xor(vars, *rhs);
+                }
+                for clause in &clauses {
+                    solver.add_clause(clause.clone());
+                }
+                let answer = solver.solve();
                 assert_eq!(
-                    res,
-                    SolveResult::Sat,
-                    "trial {trial}: solver missed a model"
+                    answer == SolveResult::Sat,
+                    expected_sat,
+                    "trial {trial}, cached {cached}: wrong SAT classification"
                 );
-                let m = s.model();
-                assert!(s.check_xors(&m), "trial {trial}: model violates a row");
-            } else {
-                assert_eq!(
-                    res,
-                    SolveResult::Unsat,
-                    "trial {trial}: solver invented a model"
-                );
-                let _ = trivially_unsat;
+                if answer == SolveResult::Sat {
+                    let model = solver.model();
+                    assert!(solver.check_xors(&model), "trial {trial}, cached {cached}");
+                    assert!(
+                        check_model(&clauses, &model),
+                        "trial {trial}, cached {cached}"
+                    );
+                }
             }
         }
     }
