@@ -19,3 +19,7 @@ The protocol deviations record host reboots, killed attempts and runs restarted 
 ## Validation and publication
 
 The corrected library passed 4,405 release tests with 118 ignored; the log contains the new collision/counting tests. The standalone rho module passed 4 tests, the analyzer passed 7, and the touched jv_cover example compiled and ran its empty test suite. Original native-summary replay had zero structural differences. The current leaderboard consumes the qualified summary and displays the withheld status, while the original PDF, plots and tables remain an immutable historical record. The original prose and layout scripts are copied here before the current entrypoints are qualified. A future prospective protocol and complete accounting would be needed to establish a comparative result.
+
+## Later author correction
+
+The subsequent commit `f462a760ae2f7d8a4a90990dfe3fb3efe5f9588a` is retained in [a separate archive](author-correction-f462a760/README.md). Its native analyzer exactly reproduces its revised summary. The reconstructed omitted-hash accounting is derived from retained counts, while its newly chosen control thresholds do not resolve the frozen-protocol limitation. The current qualified analyzer, original artifact bytes, and withheld status are retained.
