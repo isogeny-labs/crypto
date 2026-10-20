@@ -1,4 +1,17 @@
-# XOR cache v2: live execution handoff
+# XOR cache v2: completed execution
+
+**Completed 2026-10-20 02:00:10 UTC.** All sixteen natural attempts
+returned `UNKNOWN_search_cap` at exactly 10,000 conflicts with normal
+exits and no OOM. The [native audit](final/audit.json) passes all 294
+archived files and the four matched ABBA cells. Checked row visits fall
+by 82.960–85.361%; the recorded L0 worker off/on ratios are
+1.321160–1.345360. Natural yield/rank remain censored, and the cache
+remains disabled by default. [Complete report](../reports/run-xor-cache-natural-20261020/RUN_REPORT.md).
+
+The gated [full-base panel](../full-m4-v1/STATUS.md) is the subsequent
+run. This completed card is immutable and must not be restarted.
+
+## Historical live observation, superseded by the final audit
 
 **Observed 2026-10-20 01:24:11 UTC: running.** Supervisor PID 57715 and
 container `n83-xor-cache-K2048-t0-b2` were active on the authorized SSH
@@ -36,6 +49,6 @@ checks. Preserve the earlier control/failure archives. Stop on incorrect
 results or instrumentation; a Spot interruption or further retry requires
 a new explicit continuation. Do not rerun into this directory.
 
-The SSH script continues independently of this chat. No automatic chat
+At that earlier observation the SSH script continued independently of the chat. No automatic chat
 check-in or PR-activity subscription is configured; none was available in
 this session. The PR's catalog evidence gates remain separate blockers.

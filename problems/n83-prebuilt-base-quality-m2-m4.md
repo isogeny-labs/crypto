@@ -94,12 +94,23 @@ A planned step is not a completed experiment.
 ### XOR cache implementation and experiment
 
 The [XOR cache continuation](../research/n83_prebuild_cost_m23_20261019/xor-cache-v2/STATUS.md)
-adds a tested implementation candidate and a live sixteen-attempt matched
+adds a tested implementation and a completed sixteen-attempt matched
 component card with public target 1 as a fresh holdout. Four constructed
-controls passed independent replay. The first two natural attempts were
-capped with matching search counts; the full paired comparison, useful
-rank and complete IC cost remain open. Both launch failures and their
-separately frozen fixes are retained.
+controls passed independent replay. All sixteen natural searches capped
+at 10,000 conflicts, and the 294-file native audit passes all four exact
+matched endpoints. Checked row visits fall by 82.960–85.361%; L0 worker
+off/on ratios are 1.321160–1.345360. Natural useful rank and qualified
+complete IC cost remain open. Both launch failures and their separately
+frozen fixes are retained.
+
+The [full-base common-public panel](../research/n83_prebuild_cost_m23_20261019/full-m4-v1/STATUS.md)
+started at 02:06:17 UTC on 2026-10-20 after four full-base controls,
+four independent replays and two native pair checks passed. Its already
+running card schedules eighteen natural attempts over all eight public
+points for U and D, each with 16,627 columns / 2,760,082 points. This
+addresses the original equal-size comparison; it does not close the
+natural-rank or complete-cost requirements before the actual receipts
+are collected and checked.
 
 ### Catalog evidence drift blocking the current PR
 

@@ -66,9 +66,24 @@ suite (4,403 passed), and four actual N83 controls with independent replay
 and identical off/on model/row digests. The
 [control and launch-history report](reports/run-xor-cache-controls-20261020/RUN_REPORT.md)
 retains a missing-image launch and a fixed shell-label failure. The
-[corrected sixteen-attempt card](xor-cache-v2/STATUS.md) was running at
-01:24:11 UTC on 2026-10-20, with two capped natural attempts complete.
-Its comparison is still pending; the default solver remains cache-off.
+[corrected sixteen-attempt card](reports/run-xor-cache-natural-20261020/RUN_REPORT.md)
+completed at **02:00:10 UTC on 2026-10-20**. All sixteen attempts returned
+`UNKNOWN_search_cap` at 10,000 conflicts. Its native audit passes 294
+files and all four ABBA cells: search work matches, while checked row
+visits fall by **82.960–85.361%**, with exact checked-plus-skipped
+conservation. Recorded worker off/on ratios are **1.321160–1.345360** on
+the shared L0 host. These are component work/timing observations; natural
+yield/rank remain censored and qualified timing remains open. The default
+solver remains cache-off.
+
+The [full-base common-public panel](full-m4-v1/STATUS.md) started at
+**02:06:17 UTC** after all implementation gates passed. Four actual U/D
+off/on controls, four independent replays and two native control-pair
+checks passed for the original **16,627-class / 2,760,082-point bases**.
+Its running card schedules eighteen natural attempts over all eight
+public points, with repeated U,D,D,U at target 0 and alternating base
+order thereafter. At the 02:10:07 observation, U target 0 was active.
+This panel's natural results and aggregate useful rank remain pending.
 
 Accounting clarification: the m=4 `process_wall_ms` field is elapsed time
 inside the worker before final receipt serialization. Container start/end
