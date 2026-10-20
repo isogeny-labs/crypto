@@ -99,6 +99,8 @@ most the owner's $5 campaign ceiling. Freeze its provider stop time and
 producer cap in the dispatch: at most four hours from allocation to provider
 stop and 3.5 hours for timed production, leaving at least 30 minutes for
 verification, archive transfer and stop.
+The conditional allocator applies a stricter $0.19/hour cap, matching the
+observed V100 class, so its four-hour worst-case reservation is $0.76.
 The allocation must not overlap another timed N83 run. Store the raw tree,
 archive SHA-256, provider snapshot and termination receipt. Independently
 replay every base, relation and scalar and recompute the selector from the

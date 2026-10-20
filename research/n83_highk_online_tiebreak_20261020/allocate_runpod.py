@@ -23,7 +23,7 @@ GPU_TYPES = (
 )
 POD_NAME = "n83-online-tiebreak-20261020"
 POD_CAP_SECONDS = 4 * 3600
-PRICE_CAP = Decimal("0.20")
+PRICE_CAP = Decimal("0.19")
 CAMPAIGN_CAP = Decimal("5.00")
 
 

@@ -33,7 +33,7 @@ def read_allocation(path, trigger_path):
             not isinstance(receipt.get("machine_id"), str) or
             not receipt["machine_id"] or
             not isinstance(receipt.get("cost_per_hr"), (int, float)) or
-            not 0 < receipt["cost_per_hr"] <= 0.20 or
+            not 0 < receipt["cost_per_hr"] <= 0.19 or
             receipt.get("vcpu_count", 0) < 4 or
             receipt.get("memory_in_gb", 0) < 27 or
             receipt.get("cpu_affinity_ids") !=

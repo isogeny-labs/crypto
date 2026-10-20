@@ -28,7 +28,8 @@ class AllocationPreflightTest(unittest.TestCase):
             trigger = allocate_runpod.preflight(
                 self.aggregate, self.archive, self.termination, self.output)
         self.assertEqual(trigger["status"], "PASS_ADMITTED_BOUNDED_UNKNOWN")
-        self.assertLessEqual(allocate_runpod.prior_upper(at) + Decimal("0.80"),
+        self.assertLessEqual(allocate_runpod.prior_upper(at) +
+                             allocate_runpod.PRICE_CAP * Decimal(4),
                              Decimal("5.00"))
         self.termination.write_text(json.dumps({
             "recorded_utc": "2026-10-20T04:00:00Z", "pod_present": True}))
