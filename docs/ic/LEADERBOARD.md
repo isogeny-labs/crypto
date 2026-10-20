@@ -268,6 +268,21 @@ Identity: KIC_VERIFY_INDEX identical at K=150 (1,642,500 states, 1,642,050 table
 [Frozen summary](../../benchmarks/20261018-wide-producer-engineering/summary.json), [report](../../docs/ic/perf/WIDE_PRODUCER_ENGINEERING_20261018.md).
 
 
+## Pipeline: n = 73, K = 600 cold end to end with the landed wide producer (engineering)
+
+Class **engineering**: cold end-to-end wall of the landed n=73 K=600 single-target IC row, old wide producer against the landed one, same binary, same frozen base, target and rank seed, 3 pinned cores, 20 matched rho draws; counted S unchanged (identical probes and relations), no rho win. 4 vCPU Xeon 2.80 GHz KVM guest, 15 GiB, no PMU; IC pinned to cores 1-3, rho to core 1 via tools/isolated_bench.py; 41 isolated runs, 0 flagged contended.
+
+| arm | wall s | cpu s | index build s | rank stage s |
+|:--|---:|---:|---:|---:|
+| O1_old | 9304.7 | 24853 | 92.4 | 9207.7 |
+| N1_landed | 4622.0 | 12331 | 60.1 | 4557.4 |
+| N2_landed_AA | 4559.4 | 12206 | 63.2 | 4491.7 |
+
+Old / landed end-to-end wall **2.027** (95% 2.014-2.037); A/A 1.014; counted S old/new 1.000. IC/rho (20 matched draws): landed wall 26.5 (20.1-35.7), cpu 71.3; old wall 53.7, cpu 144.5. Section 5a band: unresolved at w=0; rho ahead for w>=0.1; no cross-method win. Controls: A/A N1/N2 1.014; scan positive control new/old 0.458 (3 rounds); estimator positive control x1.10 recovered 1.113 (1.109-1.118); replay of all three rows passes. Caveats: one old-producer run (A/A on the landed arm only); rho draws 2-12 regenerated after the IC runs (records lost to a cleanup mistake), so rho does not bracket IC; N2 rerun after a container restart; IC 3 cores vs rho 1 core (cpu-second ratio is the matched one); IC group additions not emitted: IC S is a lower bound.
+
+[Frozen summary](../../benchmarks/20261019-t20-n73-k600-e2e/summary.json), [report](../../benchmarks/20261019-t20-n73-k600-e2e/t20_n73_k600_e2e_report.pdf).
+
+
 ## Component: ported rank-indexed Boolean F4 kernel (engineering)
 
 Class **engineering**: kernel level: no end-to-end S, no rho claim, all 20 timed draws undecided. Cell n = 15, m = 3, ell = 5 (30 variables), degree 4, 20 draws, same test binary, 4-vCPU KVM guest, Xeon 2.80 GHz, no PMU, shared (L0). This panel is outside Tables A–C and moves no ranked row.
@@ -311,6 +326,7 @@ Four runs: port F5 on is 5.6-6.0x the crate full path and 10.4-11.2x the crate s
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ic_techniques_20261012/sixsum_extraction/resolvent_summary.json` — sha256 `307771287ae19521…`
 - `benchmarks/20261018-wide-producer-engineering/summary.json` — sha256 `1f63f91e5f62cc43…`
+- `benchmarks/20261019-t20-n73-k600-e2e/summary.json` — sha256 `6f32026f6d26a84e…`
 - `benchmarks/20261018-f4-gf2-port/summary.json` — sha256 `a36b4262044654fb…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `765f6e8d05ebbf75…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
