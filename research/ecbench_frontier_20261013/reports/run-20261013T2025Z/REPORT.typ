@@ -183,7 +183,7 @@ hardware class `ECBHW1h7373da65e433`.
   [factor bases K17], [8/8 identical], [`9306d33e…`], [current-binary pass],
   [F4/F5/F6 K13], [7/7 identical], [`0304c496…`], [representative pass covering all six arms; not replay-all],
   [rootfinder K13 sample], [8/8 identical], [`4814136e…`], [sampler selected rho only],
-  [rootfinder K13 replay-all], [120/168 identical; 48 failures], [`6110727a…`], [all rootfinder/rho rows pass; every old inherited-F4 row differs in solver phase counts],
+  [rootfinder K13 replay-all], [120/168 identical; 48 failures (superseded 2026-10-20: 72/168 on current main)], [`6110727a…`], ["all rootfinder/rho rows pass" is superseded: 96 mismatches in all four IC arms on current main, an open regression (sweep D, PR \#2290); every old inherited-F4 row differs in solver phase counts],
 )
 
 The replay-all failure is preserved. It changes no scalar, factor base, trial
