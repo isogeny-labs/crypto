@@ -248,3 +248,10 @@ path = "research/conductor_gap_followups_20261016/native/followups.rs"
 [[example]]
 name = "conductor_gap_followup_posthoc"
 path = "research/conductor_gap_followups_20261016/native/posthoc.rs"
+
+# `gae-reference` — a tuned (Montgomery / carry-less, batched-inversion)
+# affine addition timed beside the CountedGroup addition that defines the GAE
+# unit, with a per-addition cross-check against it.
+[[bin]]
+name = "gae-reference"
+path = "src/bin/gae_reference.rs"
