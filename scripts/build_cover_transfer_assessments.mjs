@@ -1073,6 +1073,18 @@ async function buildSourceArtifacts() {
       "source-linked catalog-wide assessment report",
     ),
     integrityArtifact(
+      "examples/cover_catalog_transition_audit.rs",
+      "native exact catalog transition inventory and semantic-status guard",
+    ),
+    integrityArtifact(
+      "research/cover_transfer_assessment_20261013/catalog-transition-20261020-v2.json",
+      "exact retained, added and removed catalog identities at both pinned snapshots",
+    ),
+    integrityArtifact(
+      "research/cover_transfer_assessment_20261013/wrap-code.lua",
+      "PDF line wrapping for literal hashes and filenames; text is preserved",
+    ),
+    integrityArtifact(
       "research/cover_transfer_assessment_20261013/release_replay.txt",
       "published-artifact replay receipt and source/package boundary",
     ),

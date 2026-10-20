@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "2abd3f425b8af46ae913fc8e8e12651da380a3b2e96dfc9c1edf92176ccae132",
+      "sha256": "85119ac435526fa2e25b4efff00523e87559e321b64d8a4da2ceab4df73acc55",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -128,7 +128,7 @@
     },
     {
       "path": "src/bin/hyperelliptic_cover.rs",
-      "sha256": "f75dbfb50bce3b63a6dd2291320d006cfcf05bc4d7071731bf5bfef44a0c021d",
+      "sha256": "9088eb240c8132daffab9c78d046ed0eb466b5d7f1e5a5ad6c4a581773df2c2f",
       "role": "standalone CLI and native binary subgroup batch certificate",
       "freshness": {
         "status": "supported",
@@ -234,7 +234,7 @@
     },
     {
       "path": ".github/workflows/curve-covers.yml",
-      "sha256": "6b6fa958684898c17cca1bc821e4678f6a07488d6773a189dd97e283e6e50673",
+      "sha256": "24d68c9c56a3f7cabc19eea4132d665a891001938c97af7bcf58549edd01b26a",
       "role": "exact implementation-version dependency: .github/workflows/curve-covers.yml",
       "freshness": {
         "status": "supported",
@@ -484,7 +484,7 @@
     },
     {
       "path": "docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md",
-      "sha256": "b140b28e7cb40878ff7ee37520d9a606079607784f67deb3f003b2f3674abab9",
+      "sha256": "d57d27a4cbca25d992bc96efc98321d2de29dc92c9616a18f8f45884169e2567",
       "role": "standalone CLI and supported-model documentation",
       "freshness": {
         "status": "supported",
@@ -536,7 +536,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
-      "sha256": "3c2487e809350bbe74384952d588f0927a05b1951acac01377069543a9b62951",
+      "sha256": "1564f7f9417cc61743c6de90b8c51a651226ebb394dc337e7aac35b33bb0eaf5",
       "role": "independent catalog-wide assessment verifier",
       "freshness": {
         "status": "supported",
@@ -549,7 +549,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/README.md",
-      "sha256": "6b1183fad884e360aa0cd7205b6c7a953bead4748c37cc1f249e968ca3f99023",
+      "sha256": "4e7487df3020487a4f91fe77cd79aa2f0ee8c10ebe9333050c16688678569233",
       "role": "source-linked catalog-wide assessment report",
       "freshness": {
         "status": "supported",
@@ -557,6 +557,45 @@
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
           "research/cover_transfer_assessment_20261013/README.md"
+        ]
+      }
+    },
+    {
+      "path": "examples/cover_catalog_transition_audit.rs",
+      "sha256": "9923e3c15353c212f019b9ea007b02b7e1fd01df011baada7e75ec2aaf72579c",
+      "role": "native exact catalog transition inventory and semantic-status guard",
+      "freshness": {
+        "status": "supported",
+        "scope": "byte identity of this assessment artifact at the generated-ledger revision",
+        "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
+        "evidence_refs": [
+          "examples/cover_catalog_transition_audit.rs"
+        ]
+      }
+    },
+    {
+      "path": "research/cover_transfer_assessment_20261013/catalog-transition-20261020-v2.json",
+      "sha256": "47c33cbd76096230880691f2277753367e7f1a4772ddd71e6aeac963ea382652",
+      "role": "exact retained, added and removed catalog identities at both pinned snapshots",
+      "freshness": {
+        "status": "supported",
+        "scope": "byte identity of this assessment artifact at the generated-ledger revision",
+        "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
+        "evidence_refs": [
+          "research/cover_transfer_assessment_20261013/catalog-transition-20261020-v2.json"
+        ]
+      }
+    },
+    {
+      "path": "research/cover_transfer_assessment_20261013/wrap-code.lua",
+      "sha256": "052563815a8a06f693bc8a60fde653f38a9e8d2c461329c748b688fc4281fe8b",
+      "role": "PDF line wrapping for literal hashes and filenames; text is preserved",
+      "freshness": {
+        "status": "supported",
+        "scope": "byte identity of this assessment artifact at the generated-ledger revision",
+        "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
+        "evidence_refs": [
+          "research/cover_transfer_assessment_20261013/wrap-code.lua"
         ]
       }
     },
@@ -575,7 +614,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_correspondence.dot",
-      "sha256": "7ce45fc9ec6026def9c6f6ccb9444f488cd21945140c2a7cbdbc76c05b321110",
+      "sha256": "77cfee4ad38bbb8c08cd2fe70bd474ed30ce1476482fefeca5d243d92ce6d84e",
       "role": "assessment diagram source",
       "freshness": {
         "status": "supported",
@@ -588,7 +627,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_correspondence.svg",
-      "sha256": "44d5ea3e581cef33013ca40891d858767bceeed1c11476682abec3285dbe8326",
+      "sha256": "f92d3aa8a8a14651da7066660640a443fcb496071a37a81003fbbef34975e67a",
       "role": "rendered assessment diagram in SVG format",
       "freshness": {
         "status": "supported",
@@ -601,7 +640,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_correspondence.png",
-      "sha256": "25c216bb488099cbdb06bbbbe00abfab0223748f113c87081e61c59fc6303895",
+      "sha256": "13141baf1ddcfa514886043b24127e5fe7d891c7107e5777851a1d4fc54c63f4",
       "role": "rendered assessment diagram in PNG format",
       "freshness": {
         "status": "supported",
@@ -614,7 +653,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.dot",
-      "sha256": "896d7c7eeb6a79097e0f244f6db51e5ca96fcd38aa4a1de81a8e1bb13cb5d115",
+      "sha256": "e4ed3af71e9d8ff62fac0a523a246d6aa2b1af0d0906cccb30791194dd6cd0af",
       "role": "typed transfer-context diagram source",
       "freshness": {
         "status": "supported",
@@ -627,7 +666,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.svg",
-      "sha256": "2622bea9d64d70ff4f44eaaab36fc02e17c760d9df09cdd64b8553652b40c4bf",
+      "sha256": "b4aa4c5588d411fbdefb0855fe623554f277c41f38c07f5f6cf9ab4074bee698",
       "role": "rendered typed transfer-context diagram in SVG format",
       "freshness": {
         "status": "supported",
@@ -640,7 +679,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.png",
-      "sha256": "009045190603d83eb8705dbfb2617ce0e841b78585d3a01e50c46750becdc6a7",
+      "sha256": "7bf90207aaf6b66750bea022d4bf27d5ffe1dfcee19e9ecd050862e10ec1fc81",
       "role": "rendered typed transfer-context diagram in PNG format",
       "freshness": {
         "status": "supported",
@@ -653,7 +692,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
-      "sha256": "38e69d121cbc0294d0e30ed0b08a1f9a34ec3171768acd4bc1f9177374b0e581",
+      "sha256": "f4cbec1abe99e4c8085673829a3cc7c107d86abf67f9f4908d166073199c0556",
       "role": "rendered catalog-wide assessment PDF",
       "freshness": {
         "status": "supported",
