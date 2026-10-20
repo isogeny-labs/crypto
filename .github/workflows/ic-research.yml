@@ -20,7 +20,10 @@ concurrency:
 jobs:
   validate-cli:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    # A cold release build of `ic` alone takes about 6 minutes; whole runs
+    # took 7-10 minutes in October 2026 and a 10-minute limit cancelled
+    # passing runs mid-test.
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
