@@ -101,11 +101,22 @@ fn rho_arm(name: &str, role: &str, id: &str) -> Value {
 
 fn write(dir: &str, name: &str, v: &Value) {
     std::fs::create_dir_all(dir).unwrap();
-    std::fs::write(format!("{dir}/{name}"), serde_json::to_string_pretty(v).unwrap() + "\n").unwrap();
+    std::fs::write(
+        format!("{dir}/{name}"),
+        serde_json::to_string_pretty(v).unwrap() + "\n",
+    )
+    .unwrap();
     println!("wrote {dir}/{name}");
 }
 
-fn spec(label: &str, desc: &str, arms: Vec<Value>, curves: Vec<Value>, tseed: u64, targets: u64) -> Value {
+fn spec(
+    label: &str,
+    desc: &str,
+    arms: Vec<Value>,
+    curves: Vec<Value>,
+    tseed: u64,
+    targets: u64,
+) -> Value {
     json!({"schema":"ecbench.spec/v1","label":label,"description":desc,"arms":arms,
         "measurement":measurement(3600),
         "workloads":{"curves":curves,"target_seed":tseed,"targets_per_curve":targets}})
@@ -118,25 +129,41 @@ fn band(path: &str) -> BTreeMap<(String, String), [f64; 3]> {
 
 /// `strict = false` drops arms with any unverified run (inadmissible in tuning: infinite cost).
 fn band_with(path: &str, strict: bool) -> BTreeMap<(String, String), [f64; 3]> {
-    let v: Value = serde_json::from_str(&std::fs::read_to_string(path).unwrap_or_else(|e| panic!("{path}: {e}"))).unwrap();
+    let v: Value = serde_json::from_str(
+        &std::fs::read_to_string(path).unwrap_or_else(|e| panic!("{path}: {e}")),
+    )
+    .unwrap();
     let mut m = BTreeMap::new();
     for r in v["rows"].as_array().unwrap() {
         let s = r["mean_s"].as_array().unwrap();
         if r["runs"] != r["verified"] {
             assert!(!strict, "unverified runs in {path}");
-            eprintln!("  inadmissible (unverified runs): {} {}", r["curve"], r["arm"]);
+            eprintln!(
+                "  inadmissible (unverified runs): {} {}",
+                r["curve"], r["arm"]
+            );
             continue;
         }
         m.insert(
-            (r["curve"].as_str().unwrap().to_string(), r["arm"].as_str().unwrap().to_string()),
-            [s[0].as_f64().unwrap(), s[1].as_f64().unwrap(), s[2].as_f64().unwrap()],
+            (
+                r["curve"].as_str().unwrap().to_string(),
+                r["arm"].as_str().unwrap().to_string(),
+            ),
+            [
+                s[0].as_f64().unwrap(),
+                s[1].as_f64().unwrap(),
+                s[2].as_f64().unwrap(),
+            ],
         );
     }
     m
 }
 
 fn sums(b: &BTreeMap<(String, String), [f64; 3]>, arm: &str) -> Vec<[f64; 3]> {
-    b.iter().filter(|((_, a), _)| a == arm).map(|(_, v)| *v).collect()
+    b.iter()
+        .filter(|((_, a), _)| a == arm)
+        .map(|(_, v)| *v)
+        .collect()
 }
 
 fn pick(bits: u32, dir: &str) {
@@ -158,7 +185,10 @@ fn pick(bits: u32, dir: &str) {
                 continue;
             }
             let tot: f64 = rows.iter().map(|v| v[TUNE_W_INDEX]).sum();
-            eprintln!("  {prefix}{sz}: sum S(w=0.1) over {} curves = {tot:.2}", rows.len());
+            eprintln!(
+                "  {prefix}{sz}: sum S(w=0.1) over {} curves = {tot:.2}",
+                rows.len()
+            );
             if !rows.is_empty() && tot < best.0 {
                 best = (tot, sz);
             }
@@ -195,7 +225,8 @@ fn boot(rng: &mut StdRng, num: &[f64], den: &[f64]) -> (f64, f64, f64) {
 
 /// Bootstrap of (Σa/Σb) / (Σc/Σd) with independent curve resampling of the two families.
 fn boot_q(rng: &mut StdRng, a: &[f64], b: &[f64], c: &[f64], d: &[f64]) -> (f64, f64, f64) {
-    let point = (a.iter().sum::<f64>() / b.iter().sum::<f64>()) / (c.iter().sum::<f64>() / d.iter().sum::<f64>());
+    let point = (a.iter().sum::<f64>() / b.iter().sum::<f64>())
+        / (c.iter().sum::<f64>() / d.iter().sum::<f64>());
     let mut v: Vec<f64> = (0..10000)
         .map(|_| {
             let (mut x, mut y) = (0.0, 0.0);
@@ -223,7 +254,10 @@ fn col(rows: &[[f64; 3]], w: usize) -> Vec<f64> {
 
 /// Rows of one arm over curves, in curve (slug) order, so two arms line up.
 fn arm_by_curve(b: &BTreeMap<(String, String), [f64; 3]>, arm: &str) -> BTreeMap<String, [f64; 3]> {
-    b.iter().filter(|((_, a), _)| a == arm).map(|((c, _), v)| (c.clone(), *v)).collect()
+    b.iter()
+        .filter(|((_, a), _)| a == arm)
+        .map(|((c, _), v)| (c.clone(), *v))
+        .collect()
 }
 
 fn aligned(b: &BTreeMap<(String, String), [f64; 3]>, arm: &str, order: &[String]) -> Vec<[f64; 3]> {
@@ -238,7 +272,10 @@ fn analyze(dir: &str, bits: &[u32]) {
         let j = band(&format!("{dir}/test_j0_{n}.band.json"));
         let ra = band(&format!("{dir}/test_randA_{n}.band.json"));
         let rb = band(&format!("{dir}/test_randB_{n}.band.json"));
-        let sizes: Value = serde_json::from_str(&std::fs::read_to_string(format!("{dir}/sizes_{n}.json")).unwrap()).unwrap();
+        let sizes: Value = serde_json::from_str(
+            &std::fs::read_to_string(format!("{dir}/sizes_{n}.json")).unwrap(),
+        )
+        .unwrap();
         let (a6, a2j, a2r) = (
             sizes["a6"].as_u64().unwrap(),
             sizes["a2j"].as_u64().unwrap(),
@@ -261,11 +298,29 @@ fn analyze(dir: &str, bits: &[u32]) {
         let rhor = cat(&rhoa, &rhob);
         let mut per_w = Vec::new();
         for w in 0..3 {
-            let (q, ql, qh) = boot_q(&mut rng, &col(&ic6, w), &col(&rho6, w), &col(&ic2r, w), &col(&rhor, w));
+            let (q, ql, qh) = boot_q(
+                &mut rng,
+                &col(&ic6, w),
+                &col(&rho6, w),
+                &col(&ic2r, w),
+                &col(&rhor, w),
+            );
             let (gic, gicl, gich) = boot(&mut rng, &col(&ic2j, w), &col(&ic6, w));
             let (grho, grhol, grhoh) = boot(&mut rng, &col(&rhonj, w), &col(&rho6, w));
-            let (pop, popl, poph) = boot_q(&mut rng, &col(&ic2j, w), &col(&rhonj, w), &col(&ic2r, w), &col(&rhor, w));
-            let (aa, aal, aah) = boot_q(&mut rng, &col(&ic2a, w), &col(&rhoa, w), &col(&ic2b, w), &col(&rhob, w));
+            let (pop, popl, poph) = boot_q(
+                &mut rng,
+                &col(&ic2j, w),
+                &col(&rhonj, w),
+                &col(&ic2r, w),
+                &col(&rhor, w),
+            );
+            let (aa, aal, aah) = boot_q(
+                &mut rng,
+                &col(&ic2a, w),
+                &col(&rhoa, w),
+                &col(&ic2b, w),
+                &col(&rhob, w),
+            );
             let (pos, posl, posh) = boot(&mut rng, &col(&plaina, w), &col(&rhoa, w));
             let (rr, rrl, rrh) = boot(&mut rng, &col(&ic6, w), &col(&rho6, w));
             let (rf, rfl, rfh) = boot(&mut rng, &col(&ic2r, w), &col(&rhor, w));
@@ -283,13 +338,20 @@ fn analyze(dir: &str, bits: &[u32]) {
         }
         out.push(json!({"bits": n, "sizes": sizes, "curves_j0": jc.len(), "curves_random": rac.len() + rbc.len(), "band": per_w}));
     }
-    println!("{}", serde_json::to_string_pretty(&json!({"weights":[0.0,0.1,1.0],"results":out})).unwrap());
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&json!({"weights":[0.0,0.1,1.0],"results":out})).unwrap()
+    );
 }
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let mode = args.get(1).map(String::as_str).unwrap_or("");
-    let num = |i: usize| -> u64 { args.get(i).and_then(|s| s.parse().ok()).unwrap_or_else(|| panic!("argument {i}")) };
+    let num = |i: usize| -> u64 {
+        args.get(i)
+            .and_then(|s| s.parse().ok())
+            .unwrap_or_else(|| panic!("argument {i}"))
+    };
     match mode {
         "j0" | "rand" => {
             for c in curves(mode, num(2) as u32, num(3) as usize, num(4)) {
@@ -325,9 +387,18 @@ fn main() {
             write(dir, &format!("tune_j0_{bits}.json"), &spec(
                 &format!("tuning, j=0, {bits} bits"), "structure_aware_ic_20261019 PROTOCOL.md B-tune: size grid on tuning curves, never used for the result",
                 aj, curves("j0", bits, TUNE_CURVES, TUNE_SEED), TUNE_SEED, TUNE_TARGETS));
-            write(dir, &format!("tune_rand_{bits}.json"), &spec(
-                &format!("tuning, random, {bits} bits"), "structure_aware_ic_20261019 PROTOCOL.md B-tune",
-                ar, curves("rand", bits, TUNE_CURVES, TUNE_SEED), TUNE_SEED, TUNE_TARGETS));
+            write(
+                dir,
+                &format!("tune_rand_{bits}.json"),
+                &spec(
+                    &format!("tuning, random, {bits} bits"),
+                    "structure_aware_ic_20261019 PROTOCOL.md B-tune",
+                    ar,
+                    curves("rand", bits, TUNE_CURVES, TUNE_SEED),
+                    TUNE_SEED,
+                    TUNE_TARGETS,
+                ),
+            );
         }
         "spec-ext" => {
             // Amendment 4: the A = 2 grid extended past 1024 on the same tuning curves.
@@ -344,8 +415,13 @@ fn main() {
         }
         "pick" => pick(num(2) as u32, &args[3]),
         "spec-test" => {
-            let (bits, a6, a2j, a2r, dir) = (num(2) as u32, num(3), num(4), num(5), args[6].as_str());
-            write(dir, &format!("sizes_{bits}.json"), &json!({"a6":a6,"a2j":a2j,"a2r":a2r}));
+            let (bits, a6, a2j, a2r, dir) =
+                (num(2) as u32, num(3), num(4), num(5), args[6].as_str());
+            write(
+                dir,
+                &format!("sizes_{bits}.json"),
+                &json!({"a6":a6,"a2j":a2j,"a2r":a2r}),
+            );
             write(dir, &format!("test_j0_{bits}.json"), &spec(
                 &format!("test, j=0, {bits} bits"), "structure_aware_ic_20261019 PROTOCOL.md B-test: j=0 curves, six-fold rho and A=6 / A=2 IC at tuned sizes",
                 vec![rho_arm("rho-neg", "reference", "rho.negation"), rho_arm("rho-cubic", "control", "rho.cubic"),
