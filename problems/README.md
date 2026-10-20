@@ -40,6 +40,8 @@ Keep resolved and superseded records in the index.
 | [No class arithmetic on the Jacobian of a plane quartic](plane-quartic-jacobian-class-arithmetic-missing.md) | resolved (toy smokes) | executing the transfer homomorphism, relation collection and any cost comparison on plane-quartic Jacobians (blocked until the linear-equivalence routine landed, #1768) | done for the toy discriminating checks: `quartic_ic.rs` linear-equivalence checks and a pure IC target path; deg-3 canonical forms and any cost statement remain open |
 | [Binary decomposition systems capped at 64 Boolean unknowns](binary-boolean-system-64-variable-cap.md) | resolved | Gröbner/SAT decomposition arms on chain systems with `md + (m−2)n > 64` unknowns (the `m = 4`, n ≥ 23 cells of `research/ic_m3_algebraic_vs_mitm_20261014/`); the study itself was completed with the `u128` `wide_groebner` solver (amendment 1) | a ≥128-variable monomial type in `build_decomposition_system`, inherited F4 and the SAT encoder, agreeing with the floor on 12 targets at `m = 4`, n = 23 |
 
+| [ECDLP portfolio exhaustive-reading coverage](ecdlp-portfolio-reading-coverage.md) | open | certifying the owner's request to read all six-month portfolio sources and artifacts | complete acknowledged source coverage, branch/history reconciliation and access to named missing raw evidence; indexing and hashing remain separate |
+
 ## Add or update a problem
 
 1. Check this index and the affected work for an existing record. Reuse it when
