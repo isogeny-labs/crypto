@@ -82,6 +82,17 @@ These mixed, price-sensitive results do not establish a robust full-cohort
 improvement or a rho crossover. Operation counts are L0 evidence; they do
 not qualify a wall-speed claim.
 
+The dated [operation-cost report source](reports/choice2-operation-costs-20261019/report.tex),
+[SVG graph](reports/choice2-operation-costs-20261019/choice2-operation-cost-ratios.svg),
+[150 dpi PNG graph](reports/choice2-operation-costs-20261019/choice2-operation-cost-ratios.png),
+and [renderer source](reports/choice2-operation-costs-20261019/render.py)
+reproduce the fixed-price, per-size and pooled ratios from the frozen price grid.
+The browsing copy is in
+[`benchmarks/20261019-five-leads-choice2-costs/`](../../benchmarks/20261019-five-leads-choice2-costs/README.md).
+The PDF could not be rendered offline because the local Tectonic cache lacks
+`tuenc.def`; see the [build note](reports/choice2-operation-costs-20261019/PDF_BUILD_BLOCKER.md).
+No timing or performance-history entry is derived from these operation counts.
+
 The next collector test is an explicit target-coefficient rank score from
 the current signed linear system before branch selection. It must charge
 both provisional eliminations and every rejected relation, preserve the
