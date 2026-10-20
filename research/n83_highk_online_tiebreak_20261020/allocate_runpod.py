@@ -24,6 +24,8 @@ PRICE_CAP = Decimal("0.13")
 CAMPAIGN_CAP = Decimal("5.00")
 FAILED_ALLOCATION_RESERVE_USD = Decimal("0.05")
 FAILED_V2_RESERVE_USD = Decimal("0.05")
+UNCERTAIN_ALLOCATION_READBACK_ATTEMPTS = 6
+UNCERTAIN_ALLOCATION_READBACK_DELAY_SECONDS = 2
 EVIDENCE = Path(__file__).with_name("evidence")
 
 
@@ -95,6 +97,9 @@ def failed_v2_evidence(at):
 def preflight(prior_aggregate, prior_archive, prior_termination, output):
     trigger = check_trigger.check(prior_aggregate, prior_archive)
     terminated = json.loads(prior_termination.read_text())
+    unresolved = EVIDENCE / "unresolved_allocation.json"
+    if unresolved.exists():
+        raise ValueError("prior allocation outcome is unresolved; retry is prohibited")
     if (terminated.get("pod_present") is not False or
             terminated.get("pod_id") !=
             runpod_provider.PRIOR_DISTRIBUTION_POD_ID or
@@ -134,6 +139,49 @@ def allocated_record(pod_id, key, initial):
     raise ValueError("allocated Pod has no provider createdAt after readback")
 
 
+def discover_uncertain_allocation(key):
+    """Bounded readback for a create mutation whose response was lost."""
+    attempts = []
+    pod_ids = set()
+    for attempt in range(UNCERTAIN_ALLOCATION_READBACK_ATTEMPTS):
+        try:
+            matches = [pod for pod in provider_pods(key)
+                       if pod.get("name") == POD_NAME and pod.get("id")]
+            pod_ids.update(pod["id"] for pod in matches)
+            attempts.append({"attempt": attempt + 1,
+                             "matching_pod_ids": sorted(pod["id"] for pod in matches)})
+        except Exception as error:
+            attempts.append({"attempt": attempt + 1,
+                             "error_type": type(error).__name__,
+                             "error": str(error)[:180]})
+        if pod_ids:
+            break
+        if attempt + 1 < UNCERTAIN_ALLOCATION_READBACK_ATTEMPTS:
+            time.sleep(UNCERTAIN_ALLOCATION_READBACK_DELAY_SECONDS)
+    return sorted(pod_ids), attempts
+
+
+def write_unresolved_allocation(output, gpu, mutation_error, attempts,
+                                pod_ids=()):
+    """Persist uncertainty so this output cannot be treated as a clean failure."""
+    record = {
+        "schema": "n83.online-tiebreak-unresolved-allocation/v1",
+        "recorded_utc": utc_text(utc_now()),
+        "pod_name": POD_NAME,
+        "gpu_type_id": gpu,
+        "mutation_error_type": type(mutation_error).__name__,
+        "mutation_error": str(mutation_error)[:180],
+        "discovery_attempts": attempts,
+        "discovered_pod_ids": list(pod_ids),
+        "status": "UNRESOLVED_PROVIDER_MUTATION",
+        "retry_allocation_prohibited": True,
+    }
+    rendered = json.dumps(record, indent=2, sort_keys=True) + "\n"
+    (output / "unresolved_allocation.json").write_text(rendered)
+    EVIDENCE.mkdir(parents=True, exist_ok=True)
+    (EVIDENCE / "unresolved_allocation.json").write_text(rendered)
+
+
 def allocate(prior_aggregate, prior_archive, prior_termination, output, key):
     trigger = preflight(prior_aggregate, prior_archive, prior_termination,
                         output)
@@ -166,6 +214,8 @@ def allocate(prior_aggregate, prior_archive, prior_termination, output, key):
     errors = []
     for gpu in GPU_TYPES:
         allocated_pod_id = None
+        allocated_ids = []
+        discovery_attempts = []
         mutation_attempted = False
         query = (
             "mutation { podFindAndDeployOnDemand(input: { name: " +
@@ -260,25 +310,29 @@ def allocate(prior_aggregate, prior_archive, prior_termination, output, key):
             errors.append({"gpu": gpu, "type": type(error).__name__,
                            "message": str(error)[:180]})
             if mutation_attempted and not allocated_pod_id:
-                try:
-                    matches = [p for p in provider_pods(key)
-                               if p.get("name") == POD_NAME]
-                    if len(matches) == 1:
-                        allocated_pod_id = matches[0]["id"]
-                    elif len(matches) > 1:
+                allocated_ids, discovery_attempts = discover_uncertain_allocation(key)
+                if allocated_ids:
+                    allocated_pod_id = allocated_ids[0]
+                    if len(allocated_ids) > 1:
                         errors.append({"gpu": gpu, "type": "AmbiguousAllocation",
-                                       "message": "multiple Pods have the frozen name"})
-                except Exception as discovery_error:
-                    errors.append({"gpu": gpu, "type": "DiscoveryFailure",
-                                   "message": str(discovery_error)[:180]})
+                                       "message": "multiple Pods have the frozen name",
+                                       "pod_ids": allocated_ids})
+                else:
+                    write_unresolved_allocation(output, gpu, error,
+                                                discovery_attempts)
+                    errors.append({"gpu": gpu, "type": "UnresolvedAllocation",
+                                   "message": "provider create may have succeeded; allocation retry is prohibited"})
             if allocated_pod_id:
                 from research.n83_highk_online_tiebreak_20261020 import watch_runpod
-                try:
-                    watch_runpod.retire(allocated_pod_id, key, output)
-                except Exception as cleanup_error:
-                    errors.append({"gpu": gpu, "type": "CleanupFailure",
-                                   "message": str(cleanup_error)[:180],
-                                   "pod_id": allocated_pod_id})
+                for pod_id in allocated_ids or [allocated_pod_id]:
+                    try:
+                        watch_runpod.retire(pod_id, key, output)
+                    except Exception as cleanup_error:
+                        errors.append({"gpu": gpu, "type": "CleanupFailure",
+                                       "message": str(cleanup_error)[:180],
+                                       "pod_id": pod_id})
+                        write_unresolved_allocation(output, gpu, cleanup_error,
+                                                    discovery_attempts, [pod_id])
                 break
             if mutation_attempted:
                 break
