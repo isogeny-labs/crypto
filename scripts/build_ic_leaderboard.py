@@ -72,6 +72,7 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "bitop_ladder": "research/bitop_ladder_20261019/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -617,6 +618,41 @@ def la_component() -> dict:
             "class": "engineering"}
 
 
+# Arms and fit ranges the bitop/v1 prime-ladder section shows, in the order
+# research/bitop_ladder_20261019/PROTOCOL.md lists them.  rho-neg-aa is left
+# out: it is rho-neg run again by construction (the study's A/A control).
+BITOP_ARMS = ("rho-neg", "bsgs-neg", "kangaroo", "ic-pair-rule", "ic-pair-b32", "ic-rootfind-m3-rule")
+BITOP_FITS = ("16-26", "16-28", "16-32", "33-40")
+
+
+def bitop_ladder() -> dict:
+    """Index calculus with a per-size base on the 16-40-bit prime ladder in
+    bitop/v1: research/bitop_ladder_20261019, copied from its summary.json
+    (ecbench bound fits and per-curve mean bitop/v1 over rho-neg, both
+    computed there).  A parameter-selection result in its own unit: it moves
+    no row of tables A-C."""
+    sm = load(SOURCES["bitop_ladder"])
+    fits = []
+    for arm in BITOP_ARMS:
+        for rng_key in BITOP_FITS:
+            f = sm["fits"].get(f"{arm}-{rng_key}")
+            if f is None:
+                continue
+            fits.append({
+                "arm": arm, "bits": rng_key, "tier": f["tier"], "sizes": f["sizes"], "runs": f["runs"],
+                "alpha_additions": f["alpha_additions"], "alpha_additions_ci95": f["alpha_additions_ci95"],
+                "alpha_bitops": f["alpha_bitops"], "alpha_bitops_ci95": f["alpha_bitops_ci95"],
+                "ratio_to_floor": f["ratio_to_floor"], "ratio_to_floor_ci95": f["ratio_to_floor_ci95"],
+                "bound_id": f["bound_id"],
+            })
+    gap = sm["gap_to_rho"]
+    return {"fits": fits, "gap_to_rho": {"arms": gap["arms"], "rows": gap["rows"], "note": gap["note"]},
+            "before_arm": "ic-pair-b32", "after_arm": "ic-pair-rule", "unit": sm["unit"],
+            "study": "research/bitop_ladder_20261019/", "source": SOURCES["bitop_ladder"],
+            "protocol": "research/bitop_ladder_20261019/PROTOCOL.md",
+            "class": "parameter selection (base size per size, chosen on a separate train panel in bitop/v1)"}
+
+
 def latest_frontier_audit() -> dict:
     """Copy the latest performance handoff into the generated board.
 
@@ -1069,6 +1105,7 @@ def build() -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "bitop_prime_ladder": bitop_ladder(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -1116,6 +1153,41 @@ def record_cell(r: dict) -> str:
 def rich(s) -> str:
     """Escaped text with `code` spans, for the family definitions shared with the Markdown."""
     return re.sub(r"`([^`]+)`", r"<code>\1</code>", esc(s))
+
+
+def bitop_text(b: dict) -> dict:
+    """Prose and labels the bitop/v1 prime-ladder section shares between the Markdown and the page."""
+    for row in b["gap_to_rho"]["rows"]:
+        for arm, v in zip(b["gap_to_rho"]["arms"], row[1:]):
+            if arm.startswith("ic-") and v is not None and v <= 1:
+                raise SystemExit(f"{b['source']}: {arm} at {row[0]} bits is not above rho-neg; "
+                                 "the bitop ladder section's scope line says it is")
+    label = {b["before_arm"]: f"{b['before_arm']} (before: fixed 32-point base)",
+             b["after_arm"]: f"{b['after_arm']} (per-size base)"}
+    return {
+        "title": "Prime ladder in bitop/v1, 16–40 bits: index calculus with a per-size base",
+        "lead": ("The bitop/v1 study fixed every index-calculus base at 32 or 128 abscissae. This study lets "
+                 "the pair-table arm (`ic-pair-rule`) and the m = 3 root-finding arm (`ic-rootfind-m3-rule`) "
+                 "use, per bit size, the base with the smallest mean bitop/v1 cost on a separate train panel, "
+                 "frozen before the hold-out sessions, and measures every arm on 25 deterministic a = −3 "
+                 "prime-order curves from 16 to 40 bits. `ic-pair-b32` keeps the fixed 32-point base as the "
+                 "before mark."),
+        "class": b["class"],
+        "unit": b["unit"],
+        "scope": ("Public synthetic a = −3 prime-order curves and hash-to-subgroup targets; operation counts "
+                  "only, no security claim about any deployed curve. rho-neg is cheaper than every "
+                  "index-calculus arm at every size measured; the gap table is the distance remaining."),
+        "aa": "rho-neg-aa is omitted: it is rho-neg run again by construction (the A/A control), with identical fits.",
+        "fits_note": ("Exponents α of cost ∝ r^α fitted by `ecbench bound fit` in additions and in bitop/v1, "
+                      "and the ratio to the floor, each with its 95% interval, copied from the study's bound files."),
+        "gap_note": ("Per curve, each arm's mean bitop/v1 over rho-neg's (`ecbench work --counted`); "
+                     "— where the arm did not run at that size."),
+        "gap_labels": [label.get(a, a) for a in b["gap_to_rho"]["arms"]],
+    }
+
+
+def fmt_ci(v: float, ci: list, f: str) -> tuple[str, str]:
+    return format(v, f), f"[{format(ci[0], f)}, {format(ci[1], f)}]"
 
 
 def markdown(doc: dict) -> str:
@@ -1408,6 +1480,27 @@ def markdown(doc: dict) -> str:
           "its target-dependent walk and ends with scalar verification. "
           "This wall-time panel is kept separate from Tables A–C and their "
           "operation-unit S rankings.", ""]
+    b = doc["bitop_prime_ladder"]
+    t = bitop_text(b)
+    L += ["", f"## {t['title']}, outside tables A–C", "",
+          t["lead"], "",
+          f"**Class:** {t['class']}.  **Unit:** `{t['unit']}`.  **Scope:** {t['scope']} "
+          f"Read the [protocol](../../{b['protocol']}) and the [frozen summary](../../{b['source']}).", "",
+          t["fits_note"], "",
+          "| arm | bits | tier | sizes | runs | α additions | 95% | α bitop/v1 | 95% | × floor | 95% |",
+          "|:--|:--|:--|--:|--:|--:|:--|--:|:--|--:|:--|"]
+    for f in b["fits"]:
+        aa, aac = fmt_ci(f["alpha_additions"], f["alpha_additions_ci95"], ".3f")
+        ab, abc = fmt_ci(f["alpha_bitops"], f["alpha_bitops_ci95"], ".3f")
+        rf, rfc = fmt_ci(f["ratio_to_floor"], f["ratio_to_floor_ci95"], ".3g")
+        L.append(f"| {f['arm']} | {f['bits']} | {f['tier']} | {f['sizes']} | {f['runs']:,} | "
+                 f"{aa} | {aac} | {ab} | {abc} | {rf} | {rfc} |")
+    L += ["", t["aa"], "", t["gap_note"], "",
+          "| bits | " + " | ".join(t["gap_labels"]) + " |",
+          "|--:|" + "--:|" * len(t["gap_labels"])]
+    for row in b["gap_to_rho"]["rows"]:
+        L.append(f"| {row[0]} | " + " | ".join(g3(v) for v in row[1:]) + " |")
+    L.append("")
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
         L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
@@ -2061,6 +2154,33 @@ def page(doc: dict, standalone: bool) -> str:
              'This Tier 1 wall-time panel uses its own unit and sits outside the '
              'operation-unit S rankings.</p>' +
              gh(n83["source"], 'Frozen IC1 rows and candidate identities') + '</section>')
+
+    b = doc["bitop_prime_ladder"]
+    t = bitop_text(b)
+    P.append(f'<section class="card" id="bitop-prime-ladder"><h2>{esc(t["title"])}, outside the priced tables</h2>'
+             f'<p>{rich(t["lead"])}</p>'
+             f'<p><strong>Class:</strong> {esc(t["class"])}. <strong>Unit:</strong> <code>{esc(t["unit"])}</code>. '
+             f'<strong>Scope:</strong> {esc(t["scope"])} '
+             f'{gh(b["protocol"], "Protocol")} · {gh(b["source"], "Frozen summary")}.</p>'
+             f'<p>{rich(t["fits_note"])}</p>'
+             '<div class="scroll"><table><thead><tr><th>Arm</th><th>Bits</th><th>Tier</th><th class="n">Sizes</th>'
+             '<th class="n">Runs</th><th class="n">α additions [95%]</th><th class="n">α bitop/v1 [95%]</th>'
+             '<th class="n">× floor [95%]</th></tr></thead><tbody>')
+    for f in b["fits"]:
+        aa, aac = fmt_ci(f["alpha_additions"], f["alpha_additions_ci95"], ".3f")
+        ab, abc = fmt_ci(f["alpha_bitops"], f["alpha_bitops_ci95"], ".3f")
+        rf, rfc = fmt_ci(f["ratio_to_floor"], f["ratio_to_floor_ci95"], ".3g")
+        P.append(f'<tr><td><code>{esc(f["arm"])}</code></td><td>{esc(f["bits"])}</td><td>{esc(f["tier"])}</td>'
+                 f'<td class="n">{f["sizes"]}</td><td class="n">{f["runs"]:,}</td>'
+                 f'<td class="n">{aa} <span class="muted">{aac}</span></td>'
+                 f'<td class="n">{ab} <span class="muted">{abc}</span></td>'
+                 f'<td class="n">{rf} <span class="muted">{rfc}</span></td></tr>')
+    P.append(f'</tbody></table></div><p class="muted">{esc(t["aa"])}</p><p>{rich(t["gap_note"])}</p>'
+             '<div class="scroll"><table><thead><tr><th class="n">Bits</th>'
+             + "".join(f'<th class="n">{esc(x)}</th>' for x in t["gap_labels"]) + '</tr></thead><tbody>')
+    for row in b["gap_to_rho"]["rows"]:
+        P.append(f'<tr><td class="n">{row[0]}</td>' + "".join(f'<td class="n">{g3(v)}</td>' for v in row[1:]) + '</tr>')
+    P.append('</tbody></table></div></section>')
 
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '
