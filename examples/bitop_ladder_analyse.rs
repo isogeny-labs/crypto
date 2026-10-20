@@ -365,7 +365,7 @@ fn select(study: &Path, ecbench: &Path) -> i32 {
         let mut win: Option<(u64, f64)> = None;
         for (&s, m) in &ok {
             if let Some(m) = *m {
-                if win.map_or(true, |(_, w)| m < w) {
+                if win.is_none_or(|(_, w)| m < w) {
                     win = Some((s, m));
                 }
             }
