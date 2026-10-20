@@ -43,8 +43,8 @@ The final worker revision is
 The solver/library source and dependencies are unchanged from the first
 Linux build; changes add the baseline report/auditor, command usage and
 the complete SAT-model digest in the cache worker receipt. The final
-worker, verifier and receipt-auditor tests are still required at that
-revision. This record does not promote pending checks to passing checks.
+worker, verifier and receipt-auditor tests were required at that
+revision; their subsequent passing receipts are listed below.
 
 ## Completed Linux checks
 
