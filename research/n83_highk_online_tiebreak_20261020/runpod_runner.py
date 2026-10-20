@@ -25,7 +25,7 @@ def read_allocation(path, trigger_path):
             receipt.get("desired_status") != "RUNNING" or
             receipt.get("cloud_type") != "COMMUNITY" or
             receipt.get("compute_type") != "GPU" or
-            receipt.get("gpu_type_id") not in prior_adapter.runpod_provider.GPU_TYPES or
+            receipt.get("gpu_type_id") != "NVIDIA GeForce RTX 3070" or
             receipt.get("gpu_count") != 1 or
             receipt.get("source_head_sha") != SOURCE_HEAD_SHA or
             not isinstance(receipt.get("pod_id"), str) or
@@ -33,7 +33,7 @@ def read_allocation(path, trigger_path):
             not isinstance(receipt.get("machine_id"), str) or
             not receipt["machine_id"] or
             not isinstance(receipt.get("cost_per_hr"), (int, float)) or
-            not 0 < receipt["cost_per_hr"] <= 0.19 or
+            not 0 < receipt["cost_per_hr"] <= 0.13 or
             receipt.get("vcpu_count", 0) < 4 or
             receipt.get("memory_in_gb", 0) < 27 or
             receipt.get("cpu_affinity_ids") !=

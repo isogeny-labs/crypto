@@ -130,7 +130,9 @@ def verify(snapshot_path, results, head_sha):
                  Decimal(str((timestamp(pod["stop_after_utc"]) -
                               timestamp(pod["created_utc"])).total_seconds())) /
                  Decimal(3600))
-    if (projected <= 0 or
+    if (pod["gpu_type_id"] != "NVIDIA GeForce RTX 3070" or
+            Decimal(str(pod["cost_per_hr"])) > Decimal("0.13") or
+            projected <= 0 or
             prior_spend + projected > campaign_cap or campaign_cap != Decimal("5")):
         raise ValueError("tie-break allocation exceeds campaign cap")
     host = json.loads((results / "host.json").read_text())
