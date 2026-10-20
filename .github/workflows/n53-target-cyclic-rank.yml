@@ -14,6 +14,7 @@ on:
       - 'research/sat_factor_base_review_20260908/autolab_n53_rank_rotation_replay_20260928/**'
       - '.github/workflows/n53-target-cyclic-rank.yml'
       - '.github/scripts/*frozen-workflow-check*'
+      - '.github/scripts/n53-historical-cargo-lock-view-v1.json'
 
 permissions:
   contents: write
@@ -24,7 +25,7 @@ concurrency:
 
 jobs:
   hash-only:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n53-target-cyclic-rank.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n53-target-cyclic-rank.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 360 }}
     steps:
       - uses: actions/checkout@v4
@@ -34,14 +35,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify frozen scheduling metadata, source custody, target schedule and archive
+      - name: Verify frozen scheduling, historical source custody, current lockstep, targets and archive
         run: |
           node .github/scripts/frozen-workflow-check.mjs \
             --workflow .github/workflows/n53-target-cyclic-rank.yml \
             --revision aa0cee7bd1769222e5706e61b64478d5aad6d573 \
             --manifest research/sat_factor_base_review_20260908/autolab_n53_rank_rotation_replay_20260928/FROZEN.json \
+            --input-view-manifest .github/scripts/n53-historical-cargo-lock-view-v1.json \
             --root research/sat_factor_base_review_20260908/autolab_n53_rank_rotation_replay_20260928 \
             --root research/sat_factor_base_review_20260908/autolab_n53_rank_rotation_20260925 \
+            --root Cargo.lock \
             --root Cargo.toml \
             --root examples/koblitz_s5_sat_instance.rs \
             --root research/sat_factor_base_review_20260908/autolab_combined_l384_coldbase_n53_20260925/Cargo.lock \
@@ -69,7 +72,7 @@ jobs:
   outcome:
     if: github.event.action == 'labeled' && github.event.label.name == 'run-n53-rotation-once' && github.event.pull_request.head.repo.full_name == github.repository
     needs: hash-only
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n53-target-cyclic-rank.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n53-target-cyclic-rank.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 45
     concurrency:
       group: n53-target-cyclic-${{ github.event.pull_request.number }}

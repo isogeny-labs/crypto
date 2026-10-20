@@ -159,8 +159,8 @@ concurrency:
 
 jobs:
   reproduce-toy-controls:
-    runs-on: ubuntu-latest
-    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-sota-reproduction.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-sota-reproduction.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 45 || 50 }}
     steps:
       - uses: actions/checkout@v4
         with:

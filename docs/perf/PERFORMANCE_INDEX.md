@@ -27,8 +27,24 @@ renders `HISTORY.md`, `history.svg` and a machine-readable `history.json`
 from them.  The snapshots and the rendered files live on the
 [`perf-history`](https://github.com/aburan28/crypto/tree/perf-history/docs/perf)
 branch, appended by `.github/workflows/perf-history.yml` on every push to
-`main`; pull requests that touch measured code get a comparison against the
-latest snapshot in their job summary.
+`main`.  Pull requests that touch measured code only test the history
+machinery and compile both tools; the full instruction comparison of a branch
+runs through a `check_only` manual dispatch.
+
+Three pictures are rendered next to `HISTORY.md`:
+
+* `history.svg`: the overall index and one line per area since the first
+  snapshot.
+* `history-panels.svg`: one small panel per area, each kernel a thin line
+  and the area's index a thick one, so a single kernel that moved is visible
+  without the others drowning it; a kernel flagged as a regression in the
+  latest snapshot carries a red ring.
+* `factor-bases.svg`: one bar per index-calculus solve in the
+  `ic_factor_base` area (below), grouped by curve, its length the solve `Ir`
+  on a log scale, its colour the symmetry its factor base is closed under,
+  labelled with the base's size, next to the matched rho reference on the
+  same curve as a grey dashed line.  The distance from a bar to that line is
+  the distance still to go.
 
 ```bash
 git fetch origin perf-history
@@ -49,6 +65,54 @@ inlining follows), so one step under about 5 % on one kernel is build
 noise and a trend or an area index is the signal.  The wall column is one
 reading on the recording host and is informational.  Recording a snapshot
 takes about fifteen minutes of callgrind on four cores.
+
+### Regressions are surfaced, not enforced
+
+Neither a snapshot on `main` nor a pull-request check fails on a slower
+kernel (only a `check_only` dispatch with `PERF_HISTORY_FAIL_ON_REGRESSION`
+set can).  After each snapshot on `main`,
+`perfhistory.py regressions` compares every kernel with its own recent
+range: the previous 5 snapshots with the same fingerprint.  A kernel is
+flagged when its `Ir` rises more than 8 % above the highest of those (and
+reported as improved when it falls more than 8 % below the lowest).  Against
+the range rather than the previous snapshot, because several kernels flip
+between two codegen levels from build to build (`ct_scalar_mul` by about
+7 %): a plain 5 % step rule fires on 38 of the 74 recorded steps, the range
+rule on 3, each of them a real change.  A flag appears as a GitHub warning
+on the run, a table in its job summary, a callout at the top of
+`HISTORY.md` and one comment on the merged pull request that introduced it.
+
+```bash
+python3 scripts/perf/perfhistory.py regressions --history <perf-history>/docs/perf/history
+```
+
+### Factor bases
+
+The `ic_factor_base` area (weight 0: it never moves the overall index)
+tracks frozen index-calculus solves whose factor bases differ, with the
+matched rho reference on each curve.  Every row records the factor-base
+spec, its symmetry class as `docs/ecbench/FACTOR_BASE_PROTOCOL.md` names it,
+and the size the run's own report gives (columns, signed points):
+
+| curve | factor bases | symmetry |
+|---|---|---|
+| Koblitz a = 1, n = 17 | `koblitz-orbit`, `compact-orbit-scan` | signed Frobenius |
+| | `binary-subspace`, `koblitz-standard-subspace` | none |
+| prime, 20-bit, generic | `prime-abscissa`, `glv-orbit` | negation (a generic curve has no larger automorphism) |
+| prime, j = 0, p = 2345743 | `glv-orbit` `group=auto` | GLV (order 6) |
+| | `glv-orbit` `group=negation` | negation |
+
+The j = 0 curve and its arms are frozen in
+`docs/perf/ic-factor-base-j0.spec.json` (the E2 curve of
+`research/isogeny_conductor_gap_round2_20261011`, with an oracle that still
+runs on prime curves).  At this size the order-6 fold builds three times the
+signed points of the negation-only base for the same 32 columns (192
+against 64) and costs about 4 % more `Ir` in all (34.6 M against 33.2 M at
+`ca00c151`); on the larger j = 0 curve p = 22793761 it was about 9× cheaper
+(25.9 M against 234.3 M `Ir`, measured once with an older `ecbench` build,
+and too slow to repeat on every push).  Every index-calculus row is still
+tens of times above its rho reference at these sizes: the chart shows that
+distance, not a pass or fail.
 
 ### Separate F4/F5 groups
 
@@ -76,6 +140,27 @@ record 3.71% fewer complete-F5 instructions and 45.14% fewer criterion
 instructions; F4 is neutral. Its merged-worker profiler contract, native
 controls and live-byte intervals stay separate from earlier CI diagnostics.
 Runtime and process RSS remain unmeasured.
+
+The [native F4 indexing/F5 construction follow-up](../../research/f4_f5_fused_readback_20261012/REPORT.md)
+records 5.28% fewer complete-F4 instructions and 11.02% fewer complete-F5
+instructions on the same eleven-system suite. It adds paired instruction-history,
+allocation-request and peak-live-byte graphs, inspected PDFs and both rejected
+attempts. No final memory metric regresses. Three standalone criterion cases
+use more instructions: the original all-arm gate fails, while the explicitly
+clarified complete-call gate passes. The report retains that gate-scope change
+and every case verdict. Historical and current matched pairs are disconnected
+across intervening unrelated merges; no runtime, RSS or solver-speed claim is
+made.
+
+The [native F5 packing enhancement](../../research/f4_f5_dense_packing_20261012/REPORT.md)
+measures 3.95% fewer complete-F5 instructions and 2.03% fewer requested
+allocation bytes against the preceding candidate. F4 is neutral, exact outputs
+and accounting match, and no primary or paired memory metric regresses.
+Its gate was fixed for this F5-specific change before measurement. One standalone
+criterion case uses 15.45% more instructions and is retained as a diagnostic.
+The report adds a third matched history segment, per-case instruction intervals,
+requested-byte plots, group PDFs and benchmark-index copies. These instruction
+results do not establish elapsed-time, RSS or full-solver gains.
 
 ## What it measures, and what it does not
 
