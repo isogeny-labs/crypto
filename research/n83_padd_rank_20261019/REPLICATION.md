@@ -25,3 +25,13 @@ This run is frozen before its timing starts:
   such and the PR's claim is restated to cover both runs.
 - The canonical N83 row and the leaderboard section keep the first run until the
   second is analysed; no number is replaced before both are in.
+
+## Trigger log
+
+- `ae1819e56` (05:44Z) changed `trigger.txt` but no run of the panel workflow
+  appeared in 15 minutes (only the LLM review workflow fired); `workflow_dispatch`
+  is refused to this session (403). The trigger was pushed again below. Only one
+  panel run on the merged head is counted; if two start, the earlier one is used
+  and the other is reported.
+- Local check on the merged tree, before the run: `cargo test --release --example
+  koblitz_orbit_dlp_fast` 24 passed, 0 failed.
