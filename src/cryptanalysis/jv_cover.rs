@@ -31,7 +31,7 @@ use rayon::prelude::*;
 use serde::Serialize;
 
 use super::f4_fp::{self, F4Options, F4Trace, Ordering as F4Ordering};
-use super::gaudry_cubic::{PolyRing, SparseRel, UPoly, am, mm, sm, square_core, wiedemann_u64};
+use super::gaudry_cubic::{am, mm, sm, square_core, wiedemann_u64, PolyRing, SparseRel, UPoly};
 use super::residual_walk::{inv_mod, is_prime_u64, mix64, pow_mod};
 use std::sync::{Arc, Mutex, OnceLock};
 
@@ -2303,8 +2303,8 @@ pub fn rho_e(spec: &Spec, seed: u64) -> RhoRunE {
 /// steps restarts from a new random point.  Every group operation of every
 /// walker is charged, the walk's multipliers once per walker.
 pub fn rho_e_dp(spec: &Spec, seed: u64, dp_bits: u32, threads: usize) -> RhoRunE {
-    use std::sync::Mutex;
     use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+    use std::sync::Mutex;
     let n = spec.l;
     let r = 32usize;
     let scalars: Vec<(u64, u64)> = {
