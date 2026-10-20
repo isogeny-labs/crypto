@@ -9,6 +9,8 @@
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 
+use super::ops;
+
 /// A polynomial `Σ c_i · x^i` with coefficients in `F_p`.
 #[derive(Clone, Debug)]
 pub struct FpPoly {
@@ -97,6 +99,7 @@ impl FpPoly {
     pub fn add(&self, other: &Self) -> Self {
         debug_assert_eq!(self.p, other.p);
         let n = self.coeffs.len().max(other.coeffs.len());
+        ops::fp_add(n as u64);
         let mut out = Vec::with_capacity(n);
         for i in 0..n {
             out.push((self.coeff(i) + other.coeff(i)) % &self.p);
@@ -112,6 +115,7 @@ impl FpPoly {
     pub fn sub(&self, other: &Self) -> Self {
         debug_assert_eq!(self.p, other.p);
         let n = self.coeffs.len().max(other.coeffs.len());
+        ops::fp_add(n as u64);
         let mut out = Vec::with_capacity(n);
         for i in 0..n {
             let lhs = self.coeff(i);
@@ -128,6 +132,7 @@ impl FpPoly {
     }
 
     pub fn neg(&self) -> Self {
+        ops::fp_add(self.coeffs.iter().filter(|c| !c.is_zero()).count() as u64);
         let coeffs = self
             .coeffs
             .iter()
@@ -153,6 +158,8 @@ impl FpPoly {
         }
         let d1 = self.degree().unwrap();
         let d2 = other.degree().unwrap();
+        // A product of a polynomial with itself squares its diagonal terms.
+        let squaring = std::ptr::eq(self, other);
         let mut out = vec![BigUint::zero(); d1 + d2 + 1];
         for i in 0..=d1 {
             if self.coeffs[i].is_zero() {
@@ -162,6 +169,12 @@ impl FpPoly {
                 if other.coeffs[j].is_zero() {
                     continue;
                 }
+                if squaring && i == j {
+                    ops::fp_sqr(1);
+                } else {
+                    ops::fp_mul(1);
+                }
+                ops::fp_add(1);
                 let prod = (&self.coeffs[i] * &other.coeffs[j]) % &self.p;
                 out[i + j] = (&out[i + j] + prod) % &self.p;
             }
@@ -179,6 +192,7 @@ impl FpPoly {
         if s.is_zero() {
             return Self::zero(self.p.clone());
         }
+        ops::fp_mul(self.coeffs.len() as u64);
         let coeffs = self.coeffs.iter().map(|c| (c * &s) % &self.p).collect();
         Self {
             p: self.p.clone(),
@@ -208,11 +222,13 @@ impl FpPoly {
                 break;
             }
             let coef = (&r.coeffs[r_deg] * &d_lead_inv) % &p;
+            ops::fp_mul(1);
             let shift = r_deg - d_deg;
             if q.coeffs.len() <= shift {
                 q.coeffs.resize(shift + 1, BigUint::zero());
             }
             q.coeffs[shift] = (&q.coeffs[shift] + &coef) % &p;
+            ops::fp_add(1);
             // r -= coef · x^shift · divisor
             let mut sub_coeffs = vec![BigUint::zero(); d_deg + 1 + shift];
             for (i, dc) in divisor.coeffs.iter().enumerate() {
@@ -220,6 +236,7 @@ impl FpPoly {
                     continue;
                 }
                 sub_coeffs[i + shift] = (&coef * dc) % &p;
+                ops::fp_mul(1);
             }
             let sub = Self {
                 p: p.clone(),
@@ -308,6 +325,8 @@ impl FpPoly {
     /// Evaluate `self(x_val) ∈ F_p` via Horner's rule.
     pub fn eval(&self, x_val: &BigUint) -> BigUint {
         let mut acc = BigUint::zero();
+        ops::fp_mul(self.coeffs.len() as u64);
+        ops::fp_add(self.coeffs.len() as u64);
         for c in self.coeffs.iter().rev() {
             acc = (&acc * x_val + c) % &self.p;
         }
@@ -326,7 +345,10 @@ impl FpPoly {
         }
         match d1 {
             None => true,
-            Some(d) => (0..=d).all(|i| self.coeff(i) == other.coeff(i)),
+            Some(d) => (0..=d).all(|i| {
+                ops::word_op(1);
+                self.coeff(i) == other.coeff(i)
+            }),
         }
     }
 }
@@ -346,6 +368,9 @@ pub fn fp_inv(a: &BigUint, p: &BigUint) -> Option<BigUint> {
     if a.is_zero() {
         return None;
     }
+    // One inversion; the Fermat exponentiation below is how this
+    // implementation computes it, and `bitop/v1` prices the inversion.
+    ops::fp_inv(1);
     let exp = p - BigUint::from(2u32);
     Some(a.modpow(&exp, p))
 }

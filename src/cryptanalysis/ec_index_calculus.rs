@@ -91,6 +91,7 @@
 use crate::ecc::curve::CurveParams;
 use crate::ecc::field::FieldElement;
 use crate::ecc::point::Point;
+use crate::prime_hyperelliptic::ops as bitop_ops;
 use crate::utils::mod_inverse;
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
@@ -1147,6 +1148,9 @@ pub fn gaussian_eliminate_mod_n_particular(
         None => gaussian_eliminate_mod_biguint(matrix, rhs, n)?,
     };
     let rank = pivot_rows.iter().filter(|&&r| r != usize::MAX).count();
+    // Counted for the `bitop/v1` head-to-head: one word op per zero test
+    // and per determined-flag compare below.
+    bitop_ops::word_op((rhs.len().saturating_sub(rank)) as u64);
     // Rows below the pivots are all-zero on the left; a nonzero
     // right-hand side there is `0 = c`.
     if rhs.iter().skip(rank).any(|v| !(v % n).is_zero()) {
@@ -1161,6 +1165,7 @@ pub fn gaussian_eliminate_mod_n_particular(
             continue;
         }
         values[c] = rhs[pr].clone();
+        bitop_ops::word_op(free.len() as u64);
         determined[c] = free.iter().all(|&f| matrix[pr][f].is_zero());
     }
     Some(ModNSolution {
@@ -1188,6 +1193,7 @@ fn gaussian_eliminate_mod_biguint(
         // Find a row at index ≥ `row` with a non-zero entry in column `col`.
         let mut piv = None;
         for r in row..rows {
+            bitop_ops::word_op(1);
             if !matrix[r][col].is_zero() {
                 piv = Some(r);
                 break;
@@ -1209,7 +1215,9 @@ fn gaussian_eliminate_mod_biguint(
         // columns were eliminated from it, free columns were zero in
         // every row still below the diagonal), so every sweep starts
         // at `col`.
+        bitop_ops::modr_inv(1);
         let inv = mod_inverse(&matrix[row][col], n)?;
+        bitop_ops::modr_mul((m - col) as u64 + 1);
         for c in col..m {
             matrix[row][c] = (&matrix[row][c] * &inv) % n;
         }
@@ -1220,9 +1228,13 @@ fn gaussian_eliminate_mod_biguint(
             if r == row {
                 continue;
             }
+            bitop_ops::word_op(1);
             if matrix[r][col].is_zero() {
                 continue;
             }
+            // `m − col + 1` multiply-subtracts.
+            bitop_ops::modr_mul((m - col) as u64 + 1);
+            bitop_ops::modr_add((m - col) as u64 + 1);
             let factor = matrix[r][col].clone();
             for c in col..m {
                 let term = (&factor * &matrix[row][c]) % n;
@@ -1273,7 +1285,10 @@ fn gaussian_eliminate_mod_u64(
     let mut failed = false;
     let (mut row, mut col) = (0usize, 0usize);
     while row < rows && col < m {
-        let Some(piv) = (row..rows).find(|&r| a[r * m + col] != 0) else {
+        let Some(piv) = (row..rows).find(|&r| {
+            bitop_ops::word_op(1);
+            a[r * m + col] != 0
+        }) else {
             col += 1;
             continue;
         };
@@ -1285,10 +1300,12 @@ fn gaussian_eliminate_mod_u64(
             matrix.swap(row, piv);
         }
         pivot_rows[col] = row;
+        bitop_ops::modr_inv(1);
         let Some(inv) = inv_mod_u64(a[row * m + col], n) else {
             failed = true;
             break;
         };
+        bitop_ops::modr_mul((m - col) as u64 + 1);
         for c in col..m {
             a[row * m + c] = mulmod(a[row * m + c], inv);
         }
@@ -1300,9 +1317,13 @@ fn gaussian_eliminate_mod_u64(
         let brow = b[row];
         let eliminate = |target: &mut [u64], br: &mut u64| {
             let factor = target[col];
+            bitop_ops::word_op(1);
             if factor == 0 {
                 return;
             }
+            // The negation, then `m − col + 1` multiply-adds.
+            bitop_ops::modr_add((m - col) as u64 + 2);
+            bitop_ops::modr_mul((m - col) as u64 + 1);
             let neg = n - factor;
             for (t, &p) in target[col..].iter_mut().zip(prow) {
                 *t = ((*t as u128 + neg as u128 * p as u128) % n as u128) as u64;

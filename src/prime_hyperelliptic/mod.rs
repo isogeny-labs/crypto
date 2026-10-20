@@ -44,6 +44,7 @@
 pub mod curve;
 pub mod fp2;
 pub mod fp_poly;
+pub mod ops;
 
 pub use curve::{
     brute_force_jac_order, brute_force_jac_order_via_lpoly, count_points, count_points_fp2,
