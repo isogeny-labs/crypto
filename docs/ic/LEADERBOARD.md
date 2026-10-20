@@ -283,6 +283,23 @@ Old / landed end-to-end wall **2.027** (95% 2.014-2.037); A/A 1.014; counted S o
 [Frozen summary](../../benchmarks/20261019-t20-n73-k600-e2e/summary.json), [report](../../benchmarks/20261019-t20-n73-k600-e2e/t20_n73_k600_e2e_report.pdf).
 
 
+## Component: wide producer arithmetic cuts and process-start factorise (engineering)
+
+Class **engineering**: no end-to-end S claim; three arithmetic cuts of the wide (n=73) relation producer measured on the 20,000-state K=600 scan against a frozen 1.2x gate (none clears, not carried to end to end), and the process-start factorise cut measured old binary vs new. 4 vCPU Xeon 2.80 GHz KVM guest, no PMU; scan on cores 1-3, process start and callgrind on core 1 via tools/isolated_bench.py; 49 isolated runs, 0 flagged contended.
+
+| arm | median ns/probe | ratio to ctl (95%) |
+|:--|---:|---:|
+| ctl | 252.6 | 1 |
+| sparse | 245.6 | 0.972 (0.948-1.141) |
+| algebra | 264.9 | 1.049 (0.940-1.193) |
+| all | 243.1 | 0.962 (0.933-1.143) |
+| ctl2_AA | 240.9 | 0.954 (0.921-1.082) |
+
+Gate: median ratio <= 0.8333 and bootstrap upper bound <= 0.90; no cut clears; end-to-end stage not run. Process start (old vs new binary): 8.34 s to 0.20 s (ratio 0.024, 0.023-0.031; 8.1 s saved per process). Caveats: scan resolves differences above roughly 10% (A/A moves 4.6%); no A/A arm in the process-start stage; pilots during development excluded and disclosed; factorise early stop helps only while the post-cofactor remainder fits a word (n=73); no VPCLMULQDQ on this host.
+
+[Frozen summary](../../benchmarks/20261020-t21-wide-producer-arithmetic/summary.json), [report](../../benchmarks/20261020-t21-wide-producer-arithmetic/t21_wide_producer_arithmetic_report.pdf).
+
+
 ## Component: ported rank-indexed Boolean F4 kernel (engineering)
 
 Class **engineering**: kernel level: no end-to-end S, no rho claim, all 20 timed draws undecided. Cell n = 15, m = 3, ell = 5 (30 variables), degree 4, 20 draws, same test binary, 4-vCPU KVM guest, Xeon 2.80 GHz, no PMU, shared (L0). This panel is outside Tables A–C and moves no ranked row.
@@ -327,6 +344,7 @@ Four runs: port F5 on is 5.6-6.0x the crate full path and 10.4-11.2x the crate s
 - `research/ic_techniques_20261012/sixsum_extraction/resolvent_summary.json` — sha256 `307771287ae19521…`
 - `benchmarks/20261018-wide-producer-engineering/summary.json` — sha256 `1f63f91e5f62cc43…`
 - `benchmarks/20261019-t20-n73-k600-e2e/summary.json` — sha256 `6f32026f6d26a84e…`
+- `benchmarks/20261020-t21-wide-producer-arithmetic/summary.json` — sha256 `e2a7d4b2692c464a…`
 - `benchmarks/20261018-f4-gf2-port/summary.json` — sha256 `a36b4262044654fb…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `765f6e8d05ebbf75…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`

@@ -114,6 +114,10 @@
    "path": "benchmarks/20261019-t20-n73-k600-e2e/summary.json",
    "sha256": "6f32026f6d26a84e9fea24c2f2a444d027970a677daa27f35a520bf6418b28ba"
   },
+  "t21_arith": {
+   "path": "benchmarks/20261020-t21-wide-producer-arithmetic/summary.json",
+   "sha256": "e2a7d4b2692c464aa3dddb85dc26385ae10e755a39cc73fcb85e657c2670d67f"
+  },
   "f4_gf2_port": {
    "path": "benchmarks/20261018-f4-gf2-port/summary.json",
    "sha256": "a36b4262044654fb955277b5f68e5c3f69cc9677dcc7c62390225ef263fe543f"
@@ -48564,6 +48568,70 @@
    "N2 rerun after a container restart",
    "IC 3 cores vs rho 1 core (cpu-second ratio is the matched one)",
    "IC group additions not emitted: IC S is a lower bound"
+  ]
+ },
+ "t21_arith_component": {
+  "schema": "crypto.t21_wide_producer_arithmetic/v1",
+  "date": "2026-10-20",
+  "class": "engineering",
+  "claim": "no end-to-end S claim; three arithmetic cuts of the wide (n=73) relation producer measured on the 20,000-state K=600 scan against a frozen 1.2x gate (none clears, not carried to end to end), and the process-start factorise cut measured old binary vs new",
+  "n": 73,
+  "k": 600,
+  "host": "4 vCPU Xeon 2.80 GHz KVM guest, no PMU; scan on cores 1-3, process start and callgrind on core 1 via tools/isolated_bench.py; 49 isolated runs, 0 flagged contended",
+  "scan_ns_per_probe_median": {
+   "ctl": 252.6,
+   "sparse": 245.6,
+   "algebra": 264.9,
+   "all": 243.1,
+   "ctl2_AA": 240.9
+  },
+  "scan_ratio_to_ctl": {
+   "sparse": {
+    "point": 0.972,
+    "lo": 0.948,
+    "hi": 1.141
+   },
+   "algebra": {
+    "point": 1.049,
+    "lo": 0.94,
+    "hi": 1.193
+   },
+   "all": {
+    "point": 0.962,
+    "lo": 0.933,
+    "hi": 1.143
+   },
+   "ctl2_AA": {
+    "point": 0.954,
+    "lo": 0.921,
+    "hi": 1.082
+   }
+  },
+  "gate": "median ratio <= 0.8333 and bootstrap upper bound <= 0.90; no cut clears; end-to-end stage not run",
+  "callgrind_collected_ir_k40": {
+   "ctl": 2631640823,
+   "sparse": 2605735927,
+   "algebra": 2718726031,
+   "all": 2690355944
+  },
+  "process_start_s": {
+   "old_median": 8.339,
+   "new_median": 0.2,
+   "new_over_old": {
+    "point": 0.024,
+    "lo": 0.023,
+    "hi": 0.031
+   },
+   "saved_s_per_process": 8.14
+  },
+  "report": "benchmarks/20261020-t21-wide-producer-arithmetic/t21_wide_producer_arithmetic_report.pdf",
+  "study": "research/t21_wide_producer_arithmetic_20261020/",
+  "caveats": [
+   "scan resolves differences above roughly 10% (A/A moves 4.6%)",
+   "no A/A arm in the process-start stage",
+   "pilots during development excluded and disclosed",
+   "factorise early stop helps only while the post-cofactor remainder fits a word (n=73)",
+   "no VPCLMULQDQ on this host"
   ]
  },
  "f4_gf2_port_component": {

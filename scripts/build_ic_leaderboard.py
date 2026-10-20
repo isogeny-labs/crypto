@@ -75,6 +75,7 @@ SOURCES = {
     "sixsum_resolvent": "research/ic_techniques_20261012/sixsum_extraction/resolvent_summary.json",
     "wide_producer": "benchmarks/20261018-wide-producer-engineering/summary.json",
     "t20_e2e": "benchmarks/20261019-t20-n73-k600-e2e/summary.json",
+    "t21_arith": "benchmarks/20261020-t21-wide-producer-arithmetic/summary.json",
     "f4_gf2_port": "benchmarks/20261018-f4-gf2-port/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
@@ -762,6 +763,17 @@ def t20_e2e_component() -> dict:
     return sm
 
 
+def t21_arith_component() -> dict:
+    """T21: wide producer arithmetic cuts on the K = 600 scan against a frozen
+    1.2x gate (none clears) and the process-start factorise cut: frozen
+    summary of benchmarks/20261020-t21-wide-producer-arithmetic. Engineering;
+    no end-to-end S claim."""
+    sm = load(SOURCES["t21_arith"])
+    if sm.get("schema") != "crypto.t21_wide_producer_arithmetic/v1" or sm.get("class") != "engineering":
+        raise SystemExit("review the T21 summary before updating the leaderboard")
+    return sm
+
+
 def f4_gf2_port_component() -> dict:
     """The ported rank-indexed Boolean F4 kernel against this crate's
     matrix_f4_f2 family, same binary, on its own: the frozen summary of
@@ -1219,6 +1231,7 @@ def build() -> dict:
         "sixsum_resolvent_component": sixsum_resolvent_component(),
         "wide_producer_component": wide_producer_component(),
         "t20_e2e_component": t20_e2e_component(),
+        "t21_arith_component": t21_arith_component(),
         "f4_gf2_port_component": f4_gf2_port_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
@@ -1621,6 +1634,18 @@ def markdown(doc: dict) -> str:
           f"{ir['old_wall']['point']:.1f}, cpu {ir['old_cpu']['point']:.1f}. Section 5a band: {t['band_5a']['verdict']}. "
           f"Controls: {t['controls']}. Caveats: " + "; ".join(t["caveats"]) + ".",
           "", f"[Frozen summary](../../{SOURCES['t20_e2e']}), [report](../../{t['report']}).", ""]
+    u = doc["t21_arith_component"]
+    sr, ps = u["scan_ratio_to_ctl"], u["process_start_s"]
+    L += ["", "## Component: wide producer arithmetic cuts and process-start factorise (engineering)", "",
+          f"Class **{u['class']}**: {u['claim']}. {u['host']}.", "",
+          "| arm | median ns/probe | ratio to ctl (95%) |", "|:--|---:|---:|",
+          f"| ctl | {u['scan_ns_per_probe_median']['ctl']:.1f} | 1 |"]
+    for a in ("sparse", "algebra", "all", "ctl2_AA"):
+        L.append(f"| {a} | {u['scan_ns_per_probe_median'][a]:.1f} | {sr[a]['point']:.3f} ({sr[a]['lo']:.3f}-{sr[a]['hi']:.3f}) |")
+    L += ["", f"Gate: {u['gate']}. Process start (old vs new binary): {ps['old_median']:.2f} s to {ps['new_median']:.2f} s "
+          f"(ratio {ps['new_over_old']['point']:.3f}, {ps['new_over_old']['lo']:.3f}-{ps['new_over_old']['hi']:.3f}; "
+          f"{ps['saved_s_per_process']:.1f} s saved per process). Caveats: " + "; ".join(u["caveats"]) + ".",
+          "", f"[Frozen summary](../../{SOURCES['t21_arith']}), [report](../../{u['report']}).", ""]
     g = doc["f4_gf2_port_component"]
     ag = g["agreement"]
     L += ["", "## Component: ported rank-indexed Boolean F4 kernel (engineering)", "",
@@ -2362,6 +2387,21 @@ def page(doc: dict, standalone: bool) -> str:
              f'{ir["old_wall"]["point"]:.1f}, cpu {ir["old_cpu"]["point"]:.1f}. Section 5a band: {esc(t["band_5a"]["verdict"])}. '
              f'Controls: {esc(t["controls"])}. Caveats: ' + esc("; ".join(t["caveats"])) + '.</p>'
              + gh(SOURCES["t20_e2e"], 'Frozen summary') + '</section>')
+
+    u = doc["t21_arith_component"]
+    sr, ps = u["scan_ratio_to_ctl"], u["process_start_s"]
+    P.append('<section id="t21-wide-arithmetic-20261020"><h2>Wide producer arithmetic cuts and process-start factorise (engineering component)</h2>'
+             f'<p>Class <strong>{esc(u["class"])}</strong>: {esc(u["claim"])}. {esc(u["host"])}.</p>'
+             '<div class="scroll"><table><thead><tr><th>Arm</th><th>Median ns/probe</th><th>Ratio to ctl (95%)</th></tr></thead><tbody>'
+             f'<tr><td>ctl</td><td>{u["scan_ns_per_probe_median"]["ctl"]:.1f}</td><td>1</td></tr>')
+    for a in ("sparse", "algebra", "all", "ctl2_AA"):
+        P.append(f'<tr><td>{a}</td><td>{u["scan_ns_per_probe_median"][a]:.1f}</td>'
+                 f'<td>{sr[a]["point"]:.3f} ({sr[a]["lo"]:.3f}-{sr[a]["hi"]:.3f})</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>Gate: {esc(u["gate"])}. Process start (old vs new binary): {ps["old_median"]:.2f} s to {ps["new_median"]:.2f} s '
+             f'(ratio {ps["new_over_old"]["point"]:.3f}, {ps["new_over_old"]["lo"]:.3f}-{ps["new_over_old"]["hi"]:.3f}; '
+             f'{ps["saved_s_per_process"]:.1f} s saved per process). Caveats: ' + esc("; ".join(u["caveats"])) + '.</p>'
+             + gh(SOURCES["t21_arith"], 'Frozen summary') + '</section>')
 
     g = doc["f4_gf2_port_component"]
     ag = g["agreement"]
