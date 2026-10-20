@@ -251,6 +251,37 @@ The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-f
 | 8,192 | 43.6 s | 20.5 s | 5.29 s | 0.26 [0.24, 0.31] | 0.12 [0.11, 0.15] | 0.13 | 2.37 → 1.25 GiB |
 | 16,384 | 224 s | 117 s | 28.2 s | 0.24 [0.22, 0.26] | 0.13 [0.12, 0.14] | 0.13 | 9.15 → 4.65 GiB |
 
+## Tuned GAE unit (proposed, not canonical), outside tables A–C
+
+Definition `tuned-batched-affine-add/v1`: the group-addition equivalent is re-timed against a tuned affine addition (Montgomery u64 / pclmulqdq GF(2^n), 256-lane batched inversion, cross-checked addition by addition) instead of the untuned `CountedGroup::add`. The recorded operation counts do not change; each native unit is re-priced at the tuned ratio. Tables A–C above keep the legacy unit. **This is an accounting correction, not an improvement: every gap to the matched rho widens.** Each row is the legacy-best recipe of Table B re-priced; legacy S is reproduced from the ledger for every recipe (within 1e-9). The matched rho is unchanged (it counts group operations only). Cross-host assumption: the ratios were measured on this repository's Xeon @ 2.80 GHz, not on the host of the legacy table. Study: [research/tuned_gae_20261020/](../../research/tuned_gae_20261020/).
+
+| instance | recipe | S legacy | S tuned | tuned / legacy | gap to rho, legacy | gap to rho, tuned |
+|:--|:--|--:|--:|--:|--:|--:|
+| bench-10bit | mitm_m2_negfold_walk_balanced | 22.85 | 23.41 | 1.025 | 6.34× | 6.49× |
+| bench-12bit | mitm_m2_negfold_walk | 15.62 | 16.72 | 1.071 | 5.47× | 5.86× |
+| bench-14bit | mitm_m2_negfold_walk_balanced | 13.07 | 13.91 | 1.064 | 6.43× | 6.84× |
+| bench-16bit | mitm_m2_negfold_walk_balanced | 11.68 | 13.67 | 1.170 | 6.71× | 7.86× |
+| bench-18bit | mitm_m2_negfold_walk_balanced | 8.41 | 9.12 | 1.085 | 5.82× | 6.31× |
+| bench-20bit | mitm_m2_negfold_walk_balanced | 10.72 | 11.55 | 1.078 | 8.30× | 8.94× |
+| generated-22bit-3290411 | mitm_m2_negfold_walk_balanced | 12.77 | 13.92 | 1.090 | 10.50× | 11.45× |
+| generated-24bit-10935329 | mitm_m2_negfold_walk_balanced | 13.97 | 15.53 | 1.112 | 13.46× | 14.96× |
+| random-binary-n15-b524b | mitm_m2_negfold_walk | 26.31 | 27.39 | 1.041 | 13.07× | 13.60× |
+| random-binary-n18-b6507 | mitm_m2_negfold_walk_balanced | 21.30 | 23.91 | 1.122 | 10.62× | 11.92× |
+| random-binary-n21-b1b6f3b | mitm_m2_negfold_walk_balanced | 24.39 | 28.52 | 1.169 | 17.99× | 21.03× |
+| random-binary-n24-b5fc9da | mitm_m2_negfold_walk_balanced | 27.24 | 31.73 | 1.165 | 23.03× | 26.82× |
+| random-binary-n27-b845462 | mitm_m2_negfold_walk_balanced | 36.93 | 44.06 | 1.193 | 38.21× | 45.59× |
+
+### rho.prime_fast, the prime wall reference
+
+`rho.prime_fast` (`prime_fast::rho_parallel` with `RhoConfig::tuned`) against `rho.negation` on four prime-order curves, session `ECBS1h522578c510c4`, 1024/1024 records verified per arm, L0 (`--cpus none --allow-busy`). Operations (GAE, lower bound: canonicalisations unpriced on both): fast / negation = 1.027 [0.983, 1.075] over 1,024 pairs; mean S 0.937 vs 0.963. Wall, as the harness admitted at L0: median fast / negation = 0.218 (the recorded 95% interval is degenerate at that value). A speed-up of the rho reference implementation at equal counted work, class engineering; it moves no index-calculus row. Comparison: [research/tuned_gae_20261020/sessions/rho_prime_fast_v2_n256/comparisons/rho-neg__rho-fast.json](../../research/tuned_gae_20261020/sessions/rho_prime_fast_v2_n256/comparisons/rho-neg__rho-fast.json).
+
+| curve | log₂ r | pairs | ops fast / negation | 95% interval |
+|:--|--:|--:|--:|:--|
+| icv1-fp28-tm24531-24294e5d | 27.95 | 256 | 1.036 | [0.948, 1.126] |
+| icv1-fp32-t93403-ef655380 | 31.76 | 256 | 1.036 | [0.942, 1.140] |
+| icv1-fp36-t360541-9f646956 | 35.21 | 256 | 0.985 | [0.901, 1.078] |
+| icv1-fp40-tm62443-8b49d5b3 | 39.73 | 256 | 1.054 | [0.967, 1.156] |
+
 ## Large-prime conductor-gap counted diagnostics
 
 Copied from native analysis: eight independent one-target workloads per fixed curve; no transported targets. Counted S has unpriced native work. These observations do not enter tables A–C or change a full-cost ranking.
@@ -302,6 +333,8 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
+- `research/tuned_gae_20261020/reprice/table_b.json` — sha256 `631cca6dd754a0ca…`
+- `research/tuned_gae_20261020/sessions/rho_prime_fast_v2_n256/comparisons/rho-neg__rho-fast.json` — sha256 `aadcee6f5f3db1e5…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`

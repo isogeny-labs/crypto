@@ -34,7 +34,7 @@ a global.
 * `:6842`-`:6865` `price_phase`: unchanged. It multiplies counts by
   `ns_per_x / ns_per_add`, which `pin` has already set to the table's ratio.
 * Row-lookup keys are unchanged: the tuned tables use the legacy keys
-  (`prime/bench-10bit`, `koblitz/K_0 / GF(2^13)`, ...), so
+  (`prime/bench-10bit`, the Koblitz K_0 row of `icv1-f2m13-t181-515ee569`, ...), so
   `curve_id::same_curve` fallback at `:296` works on both.
 
 ## 2. Stamp the definition into every record
@@ -141,7 +141,7 @@ a global.
 3. Only then consider changing the default for new specs; never reinterpret
    a record without a stamp.
 4. Re-pin on the ledger's isolated host (the legacy ratios are from a 2.10 GHz
-   Xeon and, for `koblitz/K_0 / GF(2^23)`, an Apple M4 Pro under load) by
+   Xeon and, for the Koblitz K_0 row of `icv1-f2m23-t5197-69e76b73`, an Apple M4 Pro under load) by
    running `gae-reference --from-calibration`, `gae-reference field
    --from-calibration`, `gae-reference retable` there, so the tuned table's `R`
    and `F` and the legacy ratios come from one host.
