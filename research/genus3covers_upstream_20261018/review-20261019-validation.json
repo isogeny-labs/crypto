@@ -1,0 +1,46 @@
+{
+  "review_date": "2026-10-19",
+  "original_head": "33b3bb532ca2c044d37b1cc88ed3a7716dd4ec4d",
+  "source_sha256": "b28e7d5a3ede24c92dba98ec386212e7ec2900e9c2c43bb66a6e297d59be8ffb",
+  "native_tests_passed": 4,
+  "pinned_example_rows": 654,
+  "malformed_zero_polynomial_before": {
+    "exit": 0,
+    "emitted_rows": 1
+  },
+  "malformed_zero_polynomial_after": {
+    "exit": 2,
+    "stdout_bytes": 0
+  },
+  "valid_then_malformed_after": {
+    "exit": 2,
+    "stdout_bytes": 0,
+    "error_line": 2
+  },
+  "clippy": "release -Dwarnings passed",
+  "rustfmt": "passed",
+  "required_full_library_suite": {
+    "command": "cargo test --release --lib --locked",
+    "tested_commit": "a8277da4950b961d09dd275fb9ed248eee8a0755",
+    "tested_tree": "b6e0d5737d2c0bc44c74787cc05a0061b67cb8c7",
+    "passed": 4396,
+    "failed": 0,
+    "ignored": 118,
+    "filtered_out": 0,
+    "seconds": 281.55,
+    "network": "enabled for loopback tests",
+    "log_file": "review-20261019-library.log.gz",
+    "raw_log_sha256": "e5a6fd25137a83b99e1afc3bdff25df4422d30e102cd658513f82efa4cd8879e",
+    "compressed_log_sha256": "267a98ade28933ed6fed3900504e28a7904375aa75a7b2bc3c5960a09d36988c",
+    "initial_attempts": "Tracked sparse path dependency and embedded inputs initially unmaterialized; restored original tracked files, then final complete suite passed.",
+    "followup_scope": "review documentation and validation receipts only"
+  },
+  "github_ci": "pending",
+  "magma_search_executed": false,
+  "review_pdf": {
+    "file": "review-20261019.pdf",
+    "pages": 1,
+    "sha256": "2f24fb6f635cc4fb6bd75c0abbcdb16cc6d8fc241da8aed685393e030e807821",
+    "all_pages_rendered_and_visually_inspected": true
+  }
+}

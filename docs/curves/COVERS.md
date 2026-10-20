@@ -157,6 +157,12 @@ and function-field degree arguments above establish the geometric claims.
 
 ## References
 
+The pinned [Genus3Covers integration](../../tools/genus3covers/README.md)
+provides Magma source and a native importer for genus-3 double-cover and Prym
+candidate records over number fields. It is a separate construction family;
+its imported rows do not enter `covers.json` without field, model, map, and
+certificate validation.
+
 - Claus Diem, *Families of elliptic curves with genus 2 covers of degree 2*,
   [arXiv:math/0312413](https://arxiv.org/abs/math/0312413), background on
   genus-2 elliptic covers; the elementary pullback proof above is supplied here.
