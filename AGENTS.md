@@ -1226,10 +1226,10 @@ workloads, under the same isolation, into the same sealed records.
   untuned `rho.negation`: `rho.signed_frobenius_strong` on Koblitz curves
   (the only one `ecbench claim build` accepts today; it has no prime
   branch), `rho.prime_fast` (`prime_fast::rho_parallel`, negation map, one
-  thread, p < 2^62) on prime curves: 3.7x less wall per GAE than
-  `rho.negation` at 40 bits but 1.5–2.4x its operations
-  (`research/tuned_gae_20261020/`), so it is a wall reference only, never
-  the counted one.  A prime wall ratio is `rho.prime_fast` online wall over
+  thread, p < 2^62, `RhoConfig::tuned`) on prime curves: 1.03x
+  `rho.negation`'s operations [0.98, 1.08] at about 0.22x its median wall
+  on 28–40-bit curves (`research/tuned_gae_20261020/`).  It is the wall
+  reference; the counted reference stays `rho.negation`.  A prime wall ratio is `rho.prime_fast` online wall over
   IC online wall, priced under §5a, until a prime claim branch exists.
 - **Skills:** `ecbench-measure`, `ecbench-independent-runner` and
   `ecbench-extend` under `.agents/skills/`.

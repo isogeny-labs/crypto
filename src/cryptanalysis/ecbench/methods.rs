@@ -1346,8 +1346,9 @@ fn solve_inner(
 ///
 /// Charged: the table build (every `[u]G + [v]Q`: the `G + Q` sum, one
 /// doubling per bit below the top and one addition per nonzero bit pair),
-/// every walker start and restart, each walk step (one addition), each
-/// cycle-escape doubling, and each candidate collision check (a scalar
+/// every walker start (the stride's `[ta]G + [tb]Q`, then one addition a
+/// start) and restart, each walk addition (the look-ahead's rejected ones
+/// included), each cycle-escape doubling, and each candidate collision check (a scalar
 /// multiplication of `1.5·⌈log₂ r⌉` GAE, a model: the walk does not report
 /// the multiplier).  Counted, not charged: the sign canonicalisation of
 /// every step and the distinguished-point table probes.
@@ -1369,15 +1370,11 @@ fn solve_prime_fast(
     let g = fc.point(i.generator.0, i.generator.1);
     let q = fc.point(tx, ty);
     let bits = 64 - i.r.leading_zeros();
-    let mut cfg = RhoConfig::for_bits(bits, true);
-    // One thread, the whole walker population on it (the DP rate is set by
-    // walkers × threads, so it is unchanged).  A table of 2^k entries with
-    // k about half of log₂ of the expected steps keeps the build a few
-    // percent of the work on small curves.
-    cfg.walkers *= cfg.threads;
-    cfg.threads = 1;
+    // `RhoConfig::tuned`: one thread, negation map with look-ahead and
+    // windowed cycle escape, a short-coefficient table of 4..16 jumps,
+    // stride starts, and walkers × 2^dp_bits about 2% of the expected steps.
+    let mut cfg = RhoConfig::tuned(i.r);
     let expected = (std::f64::consts::PI * i.r as f64 / 4.0).sqrt();
-    cfg.table_bits = ((expected.log2() / 2.0).round() as i64).clamp(5, 10) as u32;
     cfg.seed = seed;
     cfg.max_steps = rho_cap(i.r, param_u64(m, "cap_multiple")? as f64);
     let t = Instant::now();
@@ -1392,6 +1389,7 @@ fn solve_prime_fast(
     let setup_adds = o.table_adds + o.initial_start_adds;
     let setup_doubles = o.table_doubles + o.initial_start_doubles;
     let search_adds = steps + o.restart_adds;
+    let la = o.look_ahead_adds;
     let search_doubles = o.restart_doubles + o.escape_doubles;
     let mk = |name: &str, a: u64, d: u64| PhaseRecord {
         name: name.into(),
@@ -1410,9 +1408,19 @@ fn solve_prime_fast(
     let total: f64 = phases.iter().map(|p| p.gae).sum();
     let mut counters = BTreeMap::new();
     for (k, v) in [
-        ("steps", steps),
+        ("steps", steps - la),
+        ("look_ahead_additions", la),
         ("distinguished_points", dps),
         ("table_bits", cfg.table_bits as u64),
+        ("cycles_length_2", o.cycles_2),
+        ("cycles_length_4", o.cycles_4),
+        ("cycles_other_length", o.cycles_other),
+        ("walks_abandoned_in_a_cycle", o.abandoned),
+        ("walks_capped", o.capped),
+        ("walk_restarts", o.restarts),
+        ("steps_on_trails_reaching_a_dp", o.dp_trail_steps),
+        ("steps_on_trails_restarted", o.lost_steps),
+        ("steps_on_trails_in_flight_at_end", o.in_flight_steps),
         ("walkers", cfg.walkers as u64),
         ("distinguished_point_bits", cfg.dp_bits as u64),
         ("setup_additions", setup_adds),
