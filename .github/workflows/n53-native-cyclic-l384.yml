@@ -49,6 +49,11 @@ jobs:
             --report "$RUNNER_TEMP/n53-source-selection.json"
           git diff --check
       - name: Check native materializer and one-shot gate without measurement
+        # The historical root has no Git metadata; its scripts record and
+        # gate on the checkout's head, as run_n53_frozen_sources.py does.
+        env:
+          GIT_DIR: ${{ github.workspace }}/.git
+          GIT_WORK_TREE: ${{ github.workspace }}
         run: |
           python3 -m unittest discover \
             -s "$RUNNER_TEMP/n53-historical-source/research/sat_factor_base_review_20260908/autolab_n53_native_cyclic_l384_20260929" \
