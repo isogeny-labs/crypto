@@ -39,6 +39,8 @@ on:
       - 'research/ic_single_target_20260930/runs/**'
       - 'research/ic_tool_program/rule/v3/analysis.json'
       - 'research/ic_tool_program/rule/v3/runs/**'
+      - 'research/jv_sieve_strong_rho_20261019/summary.json'
+      - 'research/jv_sieve_strong_rho_20261019/review-20261020/**'
       - 'research/ecbench_n37_rank_columns_20261004/RESULT.json'
       - 'research/ecbench_n37_k8_k16_20261004/DECISION.json'
       - 'research/ecbench_n37_online_ir_20261004/DECISION.json'
@@ -59,6 +61,7 @@ on:
       - 'research/three_leads_e2e_20261018/results/retired-instruction-summary.json'
       - 'research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json'
       - 'research/la_engines_20261014/summary.json'
+      - 'research/ic_oracle_setup_blocked_20261020/RESULT.json'
       - '.github/workflows/ic-leaderboard.yml'
       - 'scripts/build_lab_browser.py'
       - 'docs/browser/**'
@@ -93,6 +96,8 @@ on:
       - 'research/ic_single_target_20260930/runs/**'
       - 'research/ic_tool_program/rule/v3/analysis.json'
       - 'research/ic_tool_program/rule/v3/runs/**'
+      - 'research/jv_sieve_strong_rho_20261019/summary.json'
+      - 'research/jv_sieve_strong_rho_20261019/review-20261020/**'
       - 'research/ecbench_n37_rank_columns_20261004/RESULT.json'
       - 'research/ecbench_n37_k8_k16_20261004/DECISION.json'
       - 'research/ecbench_n37_online_ir_20261004/DECISION.json'
@@ -113,6 +118,7 @@ on:
       - 'research/three_leads_e2e_20261018/results/retired-instruction-summary.json'
       - 'research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json'
       - 'research/la_engines_20261014/summary.json'
+      - 'research/ic_oracle_setup_blocked_20261020/RESULT.json'
       - '.github/workflows/ic-leaderboard.yml'
       - 'scripts/build_lab_browser.py'
       - 'docs/browser/**'
@@ -134,7 +140,7 @@ concurrency:
 
 jobs:
   current:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-leaderboard.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-leaderboard.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4

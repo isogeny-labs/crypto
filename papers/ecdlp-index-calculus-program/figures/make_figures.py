@@ -195,12 +195,13 @@ def fig_engine():
     save(fig, "fig-engine")
 
 
-def fig_ladder():
-    """Candidate / incumbent ratios of the 14-15 October rounds (ladder.tsv)."""
+def fig_ladder(tsv="ladder.tsv", name="fig-ladder",
+               title="Index-calculus changes measured 14–15 October 2026 against their incumbents"):
+    """Candidate / incumbent ratios of one improvement period (a ladder TSV)."""
     import csv
-    rows = list(csv.DictReader(open(os.path.join(HERE, "ladder.tsv")), delimiter="\t"))
+    rows = list(csv.DictReader(open(os.path.join(HERE, tsv)), delimiter="\t"))
     colour = {"improves": C[2], "engineering": C[0], "regresses": C[5], "accounting": C[6]}
-    fig, ax = plt.subplots(figsize=(6.4, 3.9))
+    fig, ax = plt.subplots(figsize=(6.4, 0.75 + 0.22 * len(rows)))
     n = len(rows)
     for i, r in enumerate(rows):
         y = n - 1 - i
@@ -217,9 +218,8 @@ def fig_ladder():
         ax.plot([], [], "o", color=col, label=k)
     ax.plot([], [], "o", color=INK, mfc="white", label="stage only")
     ax.legend(fontsize=6.5, loc="center left", bbox_to_anchor=(1.01, 0.5), frameon=False)
-    ax.set_title("Index-calculus changes measured 14–15 October 2026 against their incumbents",
-                 fontsize=8.5)
-    save(fig, "fig-ladder")
+    ax.set_title(title, fontsize=8.5)
+    save(fig, name)
 
 
 if __name__ == "__main__":
@@ -231,4 +231,6 @@ if __name__ == "__main__":
     fig_prime()
     fig_engine()
     fig_ladder()
+    fig_ladder("ladder2.tsv", "fig-ladder2",
+               "Index-calculus changes landed 16–20 October 2026, against their incumbents")
     print("ok")

@@ -2,7 +2,7 @@
   "python": "3.9.25",
   "system_tests": {
     "command": "python3 -m unittest discover -s infra/spot-system -p 'test_*.py'",
-    "passed": 52,
+    "passed": 83,
     "result": "passed"
   },
   "python_compile": "passed",
@@ -16,29 +16,35 @@
     "passed": 4399,
     "failed": 0,
     "ignored": 118,
-    "duration_seconds": 545.48
+    "duration_seconds": 168.66,
+    "latest_full_log": "run-record-evidence.tar.gz: library.txt"
   },
   "s3_download_sha256": "passed",
   "files": {
-    "activity.py": "c22c969706fb9f2ab629b887f56dc309657896ed69e1ae7cf3dd39a38ee39d73",
-    "build_client.py": "5aa065eaf99233dc3a2540d6f0a954d7df45d7046157db269d38a9830af83122",
-    "build_template.py": "1ede87aecd1b5f74c089d29f044ce75d50419c98e3b213f52d9ba50a6c807544",
-    "controller.py": "ac6b8b029cc08d91bbd3f719c93ed73adaf0992a96c17dbf362d53be1ba99792",
-    "criu_export.py": "393ba2f2513792fa49a394de41d971c5547305c024b40bd9947c30bf099bb20e",
-    "criu_local.py": "f125eeb5c641c3e1fca261248b37efaa4fc61c55b4454876cabdd3a998cd9f4c",
-    "install_hooks.py": "37c58155b5f0989ea72815f844c48fa4edd4c6434f35799a9d7702931b63d115",
-    "install_services.py": "c338a222d5309ea33a01e0a7c00e89363f1dce5059a47272b3d32bc95c92cacf",
-    "lifecycle.py": "eff1c23cd3fbee416e570de12af55f24b33155b7d423ad5d0d87c1813817c3ed",
+    "activity.py": "a9213818cf29b7c84559959f1b1633cb487d8c401b800525aae1ea2ddb3edf13",
+    "build_client.py": "a0a6d47b04672d92cd648248f9288253b7ef50522e29a2d58e142bbf655c5ca1",
+    "build_template.py": "0d6a50d9024118fb180b6766c44cf0000fbcb6b070b82016dc8e080c4b807d84",
+    "controller.py": "365b52c916060be839ce9b57ec251eef965156b2fcacb9c95a0f810d0e81234b",
+    "criu_export.py": "b1c97c7a531f479bd6042db521f121a94adb0a551d62cc90c29e900b2175443f",
+    "criu_local.py": "8ec6680f60dde916726be0acd69cde9022f5312328d456b3e40bd27d5ec726bf",
+    "install_hooks.py": "0a2ead994cbd9a407272213862e6341db4e4c0dafb8d0ef2d4d2a1485313405e",
+    "install_services.py": "6daaa907bee576791e8cbc2b0caf1f3fa969d3b2d7f0d0065610fa7dcec9795b",
+    "legacy_recovery.py": "850b0945fe801723f1c6afbed66f9bb383e7e0da3f953519574196d4ee403800",
+    "lifecycle.py": "7cb0e4d396bdfdc9439fcf67641676bb6d68a90262fbdeeeae88cadcacbef954",
     "node_service.py": "be0d8740852066c8fc3a8e43a037631a11e65fdb8260b4045210b414722ce73a",
-    "package_runtime.py": "d74930aa1336a4446f489ef0ea37e0826e6d97a2a0bff9419d448195fc2efad1",
+    "package_runtime.py": "13cb9821d4fcc24cebfb8fd6ac76ee7b01b82365cf61b2b45e26301992907c34",
     "prices.py": "42614be936e747efbd9af78e057117797a823dc67549aa79be36162376b74ea6",
-    "runner.py": "1411fe068afcd55ddf6d9766ec8bc60792ef97e7cf1229d0ad7dca143655f0aa",
+    "runner.py": "4e985a75d9c9d24c68bffd6ea116c6b5405b907bfe544c3e8355e549648fdb7f",
+    "ssh_proxy.py": "3827ec2289e395fd4fcc8bb4a0943e2dd94af679f58eef7085c295887ba00548",
     "test_activity.py": "d20c6517ed491acf7169278e0585f8f48290a3ada6dec53c0173f065bd0972d7",
     "test_criu_export.py": "aa8f58e9e9c76f1fca5a6b7d5f8e25bdef34a193a68ceefb5a3a101e85f97d21",
-    "test_criu_local.py": "24049e4479f7b45d3750b60e474cec2bb49e8c654c37cdb7cac0053ad7f889e4",
-    "test_lifecycle.py": "cb89f42a0ed0eeded02172d97ac7b6de5c397f35d303cbae0839df426060786a",
-    "test_system.py": "2c84f0ba39e34fdc2b3c80f16166ec4182cc7f863e775dcd5e39ad44a3bc06ae",
-    "wake.py": "7531a30115452e754040948659e46432cd961b9edea5acd934f45efbd7acce40",
+    "test_criu_local.py": "8e2b1f50e15d08fb3de9de813deddbe137201dcb566120e5e8817a7620364895",
+    "test_legacy_recovery.py": "dd5441232e08c56e22b85a07cf5280ab501f0f0763f01aca97304c57a792851e",
+    "test_lifecycle.py": "3cebee70b7faa1e7fc1cd48571dbe0b9fcf691d97eabf50f11f91be32afc56f7",
+    "test_run_record.py": "ac615b06b3ca13e90d4c3645d297a4dc4c5068d734ac076f8d7c234eda54779f",
+    "test_ssh_proxy.py": "c8d67dbfeca428ff755148ca2d0b0d9b26ffd55188ee5cade82f8d44865cb7ce",
+    "test_system.py": "36ff4bb9e357fd59841822bc9cf312eab6aeaa7988edfcf9fa3ff64569c71494",
+    "wake.py": "9fea4aac4c900ae658a502485899ae48b3d74b91335434f51a610ede6e871c18",
     "worker_state.py": "3218ba2f9627f80e9afb076efae9abe7acf35cb073eb1fe63e7b5a2b6e0e8329"
   },
   "checkpoint_discovery": {
@@ -56,18 +62,18 @@
     "checkpoint-discovery/src/lib.rs": "85d726162fc55bcbd693336131bdab0d76ada8d1539101645d316e773c4511dd",
     "checkpoint-discovery/src/main.rs": "7d80ca59515f1574eaeb91128f323a3ff8aef277e233f654f75cfe830a8bf067",
     "checkpoint-discovery/tests/discovery.rs": "362a2c0ca7045bd47475d1e192122b3d1ff8191eea87e75a41fe1c8cfb485897",
-    "checkpoint-discovery/tests/recovery.rs": "ee4ab783c8899ad03a19027409516ab0067f8dad388455dbe95ae2d22d6781f3"
+    "checkpoint-discovery/tests/recovery.rs": "7f4444ecd0ffe3b061905e8588a4030f07efee29a1b0aa4023f52700b4c63f6c"
   },
   "aws_deployment": {
     "configuration": "applied",
     "lifecycle": "enabled",
-    "ip_cutover": "disabled",
+    "ip_cutover": "armed with protected-source guard",
     "efs_bootstrap_recovery": "passed",
     "managed_cold_boot": "passed",
     "evidence": "aws-deployment.json",
     "live_idle_shutdown": "passed",
     "native_cross_worker_recovery": "passed",
-    "legacy_criu_recovery": "five compatible-worker copy restores passed; automatic legacy failover not implemented"
+    "legacy_criu_recovery": "automatic two-hop rehearsal passed; independent Diem copy restore passed"
   },
   "experiment_tests": {
     "example": "factor_base_shape_ladder",
@@ -92,14 +98,268 @@
     "src/cryptanalysis/koblitz_groebner/checkpoint.rs": "8e5e2aa1d121feb0168ba1ad035d87b36a5ffe5dc713a047408d7644856ddcf9"
   },
   "legacy_criu": {
-    "registered_live_processes": 5,
+    "registered_live_processes": 1,
     "initial_snapshots": "passed",
     "local_checksums_and_directory_metadata": "passed",
     "local_discovery_and_corruption_fallback": "passed",
-    "timer": "active; 900 seconds after completion",
+    "timer": "OnCalendar=*:0/15",
     "actual_live_restore": "passed: all five copies on separate m8i with matching kernel and libraries; two healthy threads and CPU progress",
     "memory_export": "passed: five explicitly authorized private AES256 archives; all full-download SHA-256 verified",
-    "recurring_memory_export": "disabled: separate permission pending after automatic approval review",
-    "automatic_recovery": "not implemented; fenced source ownership and cutover remain open"
+    "recurring_memory_export": "authorized and enabled, private AES256 plus full-download SHA-256",
+    "automatic_recovery": "deployed; two-hop disposable rehearsal and Diem copy restore passed",
+    "completed_original_processes": 5
+  },
+  "laptop_hooks": {
+    "temporary_home_tests": "passed",
+    "actual_laptop_event": "not executed: no laptop access",
+    "codex_trust_required": true
+  },
+  "windows_checkpoint_compilation": {
+    "schema": "spot.checkpoint-platform-compatibility/v1",
+    "observed_utc": "2026-10-19T06:23:36.404449+00:00",
+    "regression": "Windows release E0433 std::os::unix and E0599 OpenOptions::mode in checkpoint.rs",
+    "fix": "cfg(unix) import and permission setter; Linux creation retains mode 0600",
+    "native_runtime_source_commit": "fa8948a7f90b05c1fb127a908ac083ef5be69208",
+    "native_runtime_changed": false,
+    "scope": "compilation portability; Windows checkpoint runtime correctness not claimed",
+    "linux_release_library": {
+      "passed": 4399,
+      "failed": 0,
+      "ignored": 118,
+      "seconds": 169.4
+    },
+    "example_tests_passed": 2,
+    "infrastructure_tests_passed": 72,
+    "rustfmt": "passed",
+    "local_windows_crosscheck": {
+      "command": "CARGO_BUILD_JOBS=4 CARGO_TARGET_DIR=/home/ec2-user/ops/spot-windows-compat-check cargo check --locked --target x86_64-pc-windows-gnu --lib --no-default-features",
+      "result": "blocked by missing MinGW C compiler for bundled SQLite",
+      "exit_code": 101,
+      "missing_tool": "x86_64-w64-mingw32-gcc"
+    },
+    "windows_release_ci": "required; pending on follow-up PR",
+    "archive": {
+      "path": "portability-evidence.tar.gz",
+      "bytes": 89133,
+      "sha256": "8317673b7da2dd1dbca389da4301505fae640e2ca8b0a4c98ad3378943551465"
+    },
+    "files": [
+      {
+        "path": "checkpoint-portability.patch",
+        "bytes": 1113,
+        "sha256": "77bd133236da8280f1907a29b2bc49e29e8910467d98d02bc7aa4e10b0c0321e"
+      },
+      {
+        "path": "client-release.json",
+        "bytes": 54,
+        "sha256": "21473d8fd93ff462c44778cb9fe238c00c8964b4ed6cbf84c5849265894a02f1"
+      },
+      {
+        "path": "client-wake.json",
+        "bytes": 99,
+        "sha256": "12b268532f27d56b9fdb54286a3f90717a36b91a1ae7533f7d1ee370d279fea1"
+      },
+      {
+        "path": "example-after-portability.txt",
+        "bytes": 576,
+        "sha256": "c5245796a97141a74cb1e4e9e84a9d420e6488c766dc8015d23a16cd596ae764"
+      },
+      {
+        "path": "infrastructure-after-portability.txt",
+        "bytes": 581,
+        "sha256": "b4c050f59220284aadcb1bd59e61cb32324ab71072ff1f04372a96a1c07926e8"
+      },
+      {
+        "path": "library-after-portability.txt",
+        "bytes": 379101,
+        "sha256": "8020b2fc572f211d97be4d174811f50e2313695c336e8c2d26dd099ffdb0347e"
+      },
+      {
+        "path": "windows-local-crosscheck-missing-toolchain.txt",
+        "bytes": 4398,
+        "sha256": "ca58ed10eefb031b093b092289521dcd2e1689e1d055c75769ce32ebb941fdf5"
+      },
+      {
+        "path": "windows-release-failure.txt",
+        "bytes": 74178,
+        "sha256": "ba151e911c240bbc2780885faa083689c3e922d709793065753f142a68ca30dd"
+      }
+    ]
+  },
+  "run_records": {
+    "schema": "spot.run-record-validation/v1",
+    "observed_utc": "2026-10-19T07:10:19.210918+00:00",
+    "requirements": {
+      "portable_record": "verified complete: experiment.run/v1 + Draft2020-12 JSON Schema",
+      "launcher_independent_resume": "verified complete: stable CLI, no original job list or launcher environment",
+      "corrupt_checkpoint_fallback": "verified complete: native Rust handoff test",
+      "resume_only_safety": "verified complete: refuses missing state and mismatched durable identity",
+      "aws_managed_admission": "verified complete: worker IAM/configuration and explicit managed wake",
+      "existing_experiments": "preserved; original process alive, source IP still protected",
+      "interactive_laptop_apps": "not executed; existing installer still requires laptop access and Codex trust"
+    },
+    "runtime_sha256": "fb8949d0ebe04eefffd0bbaa3a987468c497a92d49314b242814d8638a7f1932",
+    "managed_instance": "i-041ce6f4d176afe48",
+    "native_cloud_handoff": {
+      "schema": "experiment.cloud-handoff-proof/v1",
+      "record_schema": "experiment.run/v1",
+      "restored_progress": 3,
+      "final_progress": 12,
+      "original_jobs_manifest_removed": true,
+      "launcher_session_not_required": true,
+      "inherited_credentials_not_serialized": true,
+      "worker_iam_and_managed_wake": "passed",
+      "runtime_config_used_without_original_environment": true,
+      "original_source_untouched": true
+    },
+    "original_source_guard": {
+      "state": "ready",
+      "endpoint_instance_id": "i-01f85a6c905181498",
+      "protected_source_active": true
+    },
+    "source_cli": "/home/ec2-user/.local/bin/experiment-runner",
+    "existing_run_backfill": {
+      "id": "native-durability-smoke-20261018",
+      "phase": "complete",
+      "path": "state/native-durability-smoke-20261018/run.json",
+      "started_or_replayed": false
+    },
+    "tests": {
+      "infrastructure_passed": 83,
+      "native_passed": 20,
+      "release_library_passed": 4399,
+      "release_library_ignored": 118,
+      "example_passed": 2,
+      "clippy": "passed",
+      "cfn_lint": "passed",
+      "json_schema": "passed"
+    },
+    "archive": {
+      "path": "run-record-evidence.tar.gz",
+      "bytes": 78800,
+      "sha256": "44473ceec6eb69f93bbd2de8cde58505791d2c7ce6e0966c3109c60ddda605de"
+    },
+    "files": [
+      {
+        "path": "cfn-lint.txt",
+        "bytes": 204,
+        "sha256": "5dc52adfaa5c8acfda29be273b1e5dea61048c472ef8ec9d048bff074efedf31"
+      },
+      {
+        "path": "clippy.txt",
+        "bytes": 624,
+        "sha256": "d406480a2dba135336af400dfe39d1557f272018ceb4550c0ac90a5d2c0fb11f"
+      },
+      {
+        "path": "cloud-proof-command.json",
+        "bytes": 4113,
+        "sha256": "905027b18033f35545ba8bbc6aed82f5590e6e2cd84e46d302dacbba2f796796"
+      },
+      {
+        "path": "cloud-proof-permission-failure.json",
+        "bytes": 914,
+        "sha256": "8e057f3887f9be7996bd5a2c10e1739a6ed7432e96fa547ec1a5c32fbd4a8abc"
+      },
+      {
+        "path": "cloud-proof-result.json",
+        "bytes": 1195,
+        "sha256": "4b8ce958b2bada92e53785965876fb3540af3d849d92dee5554524f66208c702"
+      },
+      {
+        "path": "cloud-proof-stale-runtime-failure.json",
+        "bytes": 980,
+        "sha256": "1b015b61348b363ddd8ed1647a73f1adf34c4b0359b7a41e63351adc1c1bec13"
+      },
+      {
+        "path": "cloud-proof.py",
+        "bytes": 3718,
+        "sha256": "7e2e3f56d8f8719d5594c35f38e80b89130f112ccfaa10b07386a27a6d7a7421"
+      },
+      {
+        "path": "commands.json",
+        "bytes": 1730,
+        "sha256": "aa99fed654d3664068b8c704dbcca2dfdd63c88f819a0ee55a150cc70c312dbb"
+      },
+      {
+        "path": "example-run.json",
+        "bytes": 1220,
+        "sha256": "71d4f85cb03e1a864d96c60651464474c36a49b0ef6978f15f04d9e5044afb6e"
+      },
+      {
+        "path": "example.txt",
+        "bytes": 512,
+        "sha256": "362e7f7189059f7e81265f4d653940c78ad1ee86e6ee1c1be9c82665135d8752"
+      },
+      {
+        "path": "library.txt",
+        "bytes": 379037,
+        "sha256": "f4b8b2ba0a97be3ee2a6468badfd3cd870c5a73a997f13360f06c271d55e1ed3"
+      },
+      {
+        "path": "managed-final-result.json",
+        "bytes": 1376,
+        "sha256": "1405d4fabb1e03d10028080a3821ea6b85d8da9ff2e55bda7593221b9a95bb54"
+      },
+      {
+        "path": "managed-inspection-command.json",
+        "bytes": 788,
+        "sha256": "fd38ec6661894ceb695dfc47dfe58b092f9704515ab0bc6a6c3dfa0d89b2f8cb"
+      },
+      {
+        "path": "managed-inspection-result.json",
+        "bytes": 1257,
+        "sha256": "4ea2029a354bd07316aa06031ef46420191a834084262a4af025714554f49dbe"
+      },
+      {
+        "path": "managed-update-command.json",
+        "bytes": 2027,
+        "sha256": "3a4e125c1604fabf2f9e342efd629367a1420b7d4c715c6fcd3c3d478ac3bd02"
+      },
+      {
+        "path": "native.txt",
+        "bytes": 2500,
+        "sha256": "80bd7ecf4bffcac3f4f6a3006cf5cfcf679964bf88450df87b53ad1a54ff5ea6"
+      },
+      {
+        "path": "original-ip.json",
+        "bytes": 534,
+        "sha256": "ed62c91a116aceef6dd512a39f75f32392d86ec86666e4d0028c8cd5f0654b78"
+      },
+      {
+        "path": "original-process.txt",
+        "bytes": 32,
+        "sha256": "cee9f46fb66faf4fa6f4a7f07e2438b0c790dcb155d7030fbe7968fb748d1d88"
+      },
+      {
+        "path": "python.txt",
+        "bytes": 592,
+        "sha256": "5a06f92120ec272ff0b482e0ae14e1034668f4b86bc0d330db46235499a3ea1b"
+      },
+      {
+        "path": "runtime-deploy-result.txt",
+        "bytes": 321,
+        "sha256": "72557b56f62533cc9c76ae6b1d8b874c7d6085924d6d110557da0c46ad928daa"
+      },
+      {
+        "path": "schema-validation.txt",
+        "bytes": 122,
+        "sha256": "1a34e2ca6bf2d185f5cad373327366090ad2b8090182052a17b0e202758eb4a2"
+      },
+      {
+        "path": "source-guard.json",
+        "bytes": 98,
+        "sha256": "363744f6b24ffe544f8646ec651eb3f47a795847ea358fe0e5c2ad2eec8d1999"
+      },
+      {
+        "path": "template-size-failure.txt",
+        "bytes": 223,
+        "sha256": "60223615d4aa791c9c3709265d00130ba7c31dc467443f100ce37c5a0a48fd6d"
+      }
+    ],
+    "limits": [
+      "Metadata does not embed checkpoint data or install missing application dependencies",
+      "Legacy CRIU remains its separate tested recovery contract",
+      "Synthetic launcher labels do not establish interactive harness UI integration"
+    ]
   }
 }

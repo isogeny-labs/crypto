@@ -1,3 +1,5 @@
+> **Correction 2026-10-20 (validation sweep A, verdict: contradicted).** The 120/168 replay-all result and "all rootfinder/rho rows pass" below are the 2026-10-13 receipt, kept as history. Replay on current main is 72/168 identical with 96 mismatches across the four IC arms, an open regression (sweep D, PR #2290). Rows are not claimed to pass. See research/ecbench_frontier_20261013/README.md and research/validation_sweep_20261019/A-leaderboard/.
+
 # Frontier synthesis replay report
 
 Run id: `run-20261013T2025Z`. This was a native ECBench verification and
