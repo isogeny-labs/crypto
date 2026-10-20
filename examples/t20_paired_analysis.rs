@@ -123,6 +123,16 @@ fn other_wall(run: &IcRun) -> f64 {
     run.time.real - phase(run, "rank_stage")
 }
 
+/// Point estimate of the parallel rank wall from per-column traces, using the
+/// same thread strata as the paired bootstrap.
+fn rank_wall_from_columns(columns: &[(u64, u64, f64)]) -> f64 {
+    let mut sums = [0.0; THREADS];
+    for (column, (_, _, ns)) in columns.iter().enumerate() {
+        sums[column % THREADS] += ns;
+    }
+    sums.into_iter().fold(0.0, f64::max) / 1e9
+}
+
 /// Stratified (by column mod THREADS) paired bootstrap of the end-to-end wall
 /// ratio base/cand: the same resampled columns in both arms; rank wall is the
 /// maximum over thread strata of the summed per-column nanoseconds; the
@@ -318,13 +328,15 @@ fn main() {
     );
     // Analyzer positive control: scale new-run columns by 1.10 and re-detect.
     let scaled: Vec<(u64, u64, f64)> = n1.columns.iter().map(|c| (c.0, c.1, c.2 * 1.10)).collect();
+    let pc_scaled_wall = other_wall(&n1) + rank_wall_from_columns(&scaled);
+    let pc_control_wall = other_wall(&n2) + rank_wall_from_columns(&n2.columns);
     let pc = paired(
         &scaled,
         &n2.columns,
         other_wall(&n1),
         other_wall(&n2),
-        n1.time.real * 1.0,
-        n2.time.real,
+        pc_scaled_wall,
+        pc_control_wall,
         phase(&n1, "rank_stage") * 1.10,
         phase(&n2, "rank_stage"),
         15,
