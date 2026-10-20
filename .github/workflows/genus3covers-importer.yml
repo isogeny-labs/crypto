@@ -1,0 +1,36 @@
+name: Genus3Covers importer
+
+on:
+  pull_request:
+    paths:
+      - tools/genus3covers/**
+      - .github/workflows/genus3covers-importer.yml
+  push:
+    branches: [main]
+    paths:
+      - tools/genus3covers/**
+      - .github/workflows/genus3covers-importer.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: genus3covers-importer-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  importer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: Check formatting
+        run: cargo fmt --manifest-path tools/genus3covers/Cargo.toml -- --check
+      - name: Test parser and CLI
+        run: cargo test --release --offline --manifest-path tools/genus3covers/Cargo.toml
+      - name: Lint importer
+        run: cargo clippy --release --offline --all-targets --manifest-path tools/genus3covers/Cargo.toml -- -D warnings
