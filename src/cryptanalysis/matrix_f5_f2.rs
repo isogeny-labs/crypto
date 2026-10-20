@@ -595,7 +595,7 @@ fn certify_support_split_or_echelon(
     {
         return fallback(matrix, word_ops, 0, 0);
     }
-    let inner_mask: Mask = low_bits(inner_variables as usize);
+    let inner_mask: Mask = low_bits(inner_variables);
     let mut by_degree: [Vec<usize>; 5] = std::array::from_fn(|_| Vec::new());
     for (index, row) in matrix.iter().enumerate() {
         let first = row.iter().enumerate().find_map(|(word, &bits)| {
