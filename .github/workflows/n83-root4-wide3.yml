@@ -19,7 +19,7 @@ jobs:
   n83-root4-wide3-preflight:
     if: github.repository == 'aburan28/crypto'
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
     steps:
       - uses: actions/checkout@v4
       - name: Regenerate and verify fresh public fixture
