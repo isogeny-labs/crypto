@@ -261,6 +261,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: RHO_PARAMS,
         },
         MethodDecl {
+            id: "rho.prime_fast",
+            family: "rho",
+            summary: "the fast prime-field wall reference: prime_fast's lock-step batched-inversion Pollard rho on {P, −P} (A = 2), one thread, Montgomery arithmetic; prime curves with p < 2^62 only; expected S √(π/4) like rho.negation, with the table, walk starts, cycle escapes and collision checks charged",
+            entry: "prime_fast::rho_parallel (negation on, threads = 1)",
+            applies: Applies::Any,
+            params: RHO_PARAMS,
+        },
+        MethodDecl {
             id: "ic.k4_gaudry",
             family: "ic",
             summary: "Gaudry's k = 4 index calculus on E(F_{p⁴}) (fp4_translation curves only): x-line or D₄ Y-line base, optional double large primes (|F'| = ⌈|F|^lp_exponent⌉), filtering + Wiedemann; each trial charged the algebraic solve's measured cost c4 (F_p mults ÷ 97), its relations from an exact enumeration oracle whose own work is counted uncharged, so S is a lower bound; expected S ∝ r^{-1/2}·p·c4 until the linear algebra (∝ p², or p^{3/2} with large primes) dominates",
@@ -582,6 +590,7 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
     match id {
         "rho.frozen_reference" | "rho.plain" => Some((PI / 2.0).sqrt()),
         "rho.negation" => Some((PI / 4.0).sqrt()),
+        "rho.prime_fast" => Some((PI / 4.0).sqrt()),
         "rho.cubic" => Some((PI / 12.0).sqrt()),
         "rho.quartic" => Some((PI / 8.0).sqrt()),
         "rho.signed_frobenius"
@@ -1242,6 +1251,11 @@ fn solve_inner(
             // A Koblitz walk does not count its field operations: unknown.
             Ok(rho_report(res, t.elapsed().as_nanos() as u64, None))
         }
+        (Instance::Prime(i), _) if m.id == "rho.prime_fast" => solve_prime_fast(m, i, tx, ty, seed),
+        (_, _) if m.id == "rho.prime_fast" => Err(format!(
+            "`rho.prime_fast` runs on prime-field curves with p < 2^62 only; {} is {}",
+            curve.slug, curve.family
+        )),
         (Instance::Prime(i), _) if m.id == "rho.quartic" => {
             let t = Instant::now();
             measurement::begin_online(Phase::RhoSolve);
@@ -1325,6 +1339,112 @@ fn solve_inner(
         }
         (Instance::Wide(_), _) | (Instance::Fp4(_), _) => unreachable!("returned above"),
     }
+}
+
+/// `rho.prime_fast`: `prime_fast::rho_parallel` on one thread with the
+/// negation map, charged in group-addition equivalents.
+///
+/// Charged: the table build (every `[u]G + [v]Q`: the `G + Q` sum, one
+/// doubling per bit below the top and one addition per nonzero bit pair),
+/// every walker start and restart, each walk step (one addition), each
+/// cycle-escape doubling, and each candidate collision check (a scalar
+/// multiplication of `1.5·⌈log₂ r⌉` GAE, a model: the walk does not report
+/// the multiplier).  Counted, not charged: the sign canonicalisation of
+/// every step and the distinguished-point table probes.
+fn solve_prime_fast(
+    m: &ResolvedMethod,
+    i: &PrimeInstance,
+    tx: u64,
+    ty: u64,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    use crate::cryptanalysis::prime_fast::{rho_parallel, FastCurve, RhoConfig};
+    if i.curve.p >= (1u64 << 62) || i.r >= (1u64 << 62) {
+        return Err(format!(
+            "`rho.prime_fast` needs p < 2^62 and r < 2^62; p = {}, r = {}",
+            i.curve.p, i.r
+        ));
+    }
+    let fc = FastCurve::new(&i.name, i.curve.p, i.curve.a, i.curve.b, i.r);
+    let g = fc.point(i.generator.0, i.generator.1);
+    let q = fc.point(tx, ty);
+    let bits = 64 - i.r.leading_zeros();
+    let mut cfg = RhoConfig::for_bits(bits, true);
+    // One thread, the whole walker population on it (the DP rate is set by
+    // walkers × threads, so it is unchanged).  A table of 2^k entries with
+    // k about half of log₂ of the expected steps keeps the build a few
+    // percent of the work on small curves.
+    cfg.walkers *= cfg.threads;
+    cfg.threads = 1;
+    let expected = (std::f64::consts::PI * i.r as f64 / 4.0).sqrt();
+    cfg.table_bits = ((expected.log2() / 2.0).round() as i64).clamp(5, 10) as u32;
+    cfg.seed = seed;
+    cfg.max_steps = rho_cap(i.r, param_u64(m, "cap_multiple")? as f64);
+    let t = Instant::now();
+    measurement::begin_online(Phase::RhoSolve);
+    let out = rho_parallel(&fc, g, q, &cfg);
+    measurement::end_online();
+    let wall = t.elapsed().as_nanos() as u64;
+    let o = out.as_ref().map(|r| r.ops).unwrap_or_default();
+    let steps = out.as_ref().map(|r| r.total_steps).unwrap_or(0);
+    let dps = out.as_ref().map(|r| r.distinguished_points).unwrap_or(0);
+    let verify = (o.collision_checks as f64 * 1.5 * bits as f64) as u64;
+    let setup_adds = o.table_adds + o.initial_start_adds;
+    let setup_doubles = o.table_doubles + o.initial_start_doubles;
+    let search_adds = steps + o.restart_adds;
+    let search_doubles = o.restart_doubles + o.escape_doubles;
+    let mk = |name: &str, a: u64, d: u64| PhaseRecord {
+        name: name.into(),
+        adds: a,
+        doubles: d,
+        gae: (a + d) as f64,
+        ..Default::default()
+    };
+    let mut vp = mk("internal_verification", 0, 0);
+    vp.gae = verify as f64;
+    let phases = vec![
+        mk("setup", setup_adds, setup_doubles),
+        mk("search", search_adds, search_doubles),
+        vp,
+    ];
+    let total: f64 = phases.iter().map(|p| p.gae).sum();
+    let mut counters = BTreeMap::new();
+    for (k, v) in [
+        ("steps", steps),
+        ("distinguished_points", dps),
+        ("table_bits", cfg.table_bits as u64),
+        ("walkers", cfg.walkers as u64),
+        ("distinguished_point_bits", cfg.dp_bits as u64),
+        ("setup_additions", setup_adds),
+        ("setup_doublings", setup_doubles),
+        ("walk_start_additions", o.restart_adds),
+        ("walk_start_doublings", o.restart_doubles),
+        ("cycle_escape_doublings", o.escape_doubles),
+        ("collision_checks", o.collision_checks),
+        ("verification_operations", verify),
+        ("canonicalisations_uncharged", steps),
+        ("distinguished_point_probes_uncharged", dps),
+    ] {
+        counters.insert(k.to_string(), v);
+    }
+    Ok(SolveReport {
+        recovered: out.as_ref().map(|r| u128::from(r.log)),
+        exhausted: out.is_none(),
+        total_gae: total,
+        automorphisms_used: 2,
+        unpriced: unpriced_of(&counters),
+        counters,
+        phases,
+        deterministic: true,
+        nondeterminism: vec![],
+        solve_wall_ns: wall,
+        factor_base: None,
+        detail: json!({"method": "prime_fast::rho_parallel", "expected_steps": expected, "threads": 1}),
+        online: None,
+        online_error: None,
+        solver: None,
+        field_ops: None,
+    })
 }
 
 /// `E(F_{p⁴})`: `ic.k4_gaudry`, or a generic method on [`Fp4Group`].
@@ -3101,6 +3221,63 @@ mod tests {
         assert!(rep.field_ops.is_none(), "unknown is not zero");
         let v = serde_json::to_value(&rep).unwrap();
         assert!(v.get("field_ops").is_none(), "absent, not null");
+    }
+
+    /// `rho.prime_fast` solves and verifies through the ecbench entry
+    /// point on a registered small prime curve, charges its table, starts
+    /// and steps, replays bit for bit, and refuses a binary curve.
+    #[test]
+    fn rho_prime_fast_solves_replays_and_refuses_binary_curves() {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+        let m = resolve(&MethodSpec {
+            id: "rho.prime_fast".into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        let spec = CurveSpec::PrimeExplicit {
+            p: 53411,
+            a: 4589,
+            b: 186,
+            group_order: 53117,
+            r: 53117,
+            gx: 43982,
+            gy: 22687,
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Prime(prime) = &inst else {
+            unreachable!()
+        };
+        for (k, seed) in [(12345u64, 7u64), (777, 8), (50001, 9)] {
+            let mut scratch = GroupOps::default();
+            let target = prime.curve.mul(&mut scratch, prime.generator_point(), k);
+            let t = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
+            let rep = solve(&m, &inst, &facts, &t, seed).unwrap();
+            assert_eq!(rep.recovered, Some(u128::from(k)), "log {k}");
+            assert!(!rep.exhausted && rep.total_gae > 0.0);
+            assert_eq!(rep.automorphisms_used, 2);
+            assert!(rep.counters["steps"] > 0);
+            assert_eq!(rep.phases.iter().map(|p| p.gae).sum::<f64>(), rep.total_gae);
+            assert!(rep
+                .unpriced
+                .contains(&"canonicalisations_uncharged".to_string()));
+            // One thread and a seeded walk: the replay is identical.
+            let again = solve(&m, &inst, &facts, &t, seed).unwrap();
+            assert_eq!(again.counters, rep.counters);
+            assert_eq!(again.total_gae, rep.total_gae);
+        }
+        let koblitz = CurveSpec::Koblitz { a: 1, n: 17 };
+        let kinst = koblitz.build().unwrap();
+        let kfacts = kinst.facts(&koblitz);
+        let err = solve(
+            &m,
+            &kinst,
+            &kfacts,
+            &["0x1".to_string(), "0x2".to_string()],
+            1,
+        )
+        .unwrap_err();
+        assert!(err.contains("prime-field"), "{err}");
     }
 
     /// `rootfind-subtract` is `subtract`'s search on `prime_fast`'s

@@ -762,6 +762,40 @@ pub struct RhoResult {
     pub threads: usize,
     pub walkers_per_thread: usize,
     pub dp_bits: u32,
+    /// Group operations behind the walk, counted without touching it.
+    pub ops: RhoOpCounts,
+}
+
+/// Group operations of a [`rho_parallel`] run outside the walk steps
+/// (which are `total_steps` additions): the shared table, every walk
+/// start, the cycle-escape doublings and the collision checks.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct RhoOpCounts {
+    /// Additions/doublings of the table build (the `G + Q` sum included).
+    pub table_adds: u64,
+    pub table_doubles: u64,
+    /// The same for the first start of every walker.
+    pub initial_start_adds: u64,
+    pub initial_start_doubles: u64,
+    /// The same for every later restart (reset, cap, escape failure).
+    pub restart_adds: u64,
+    pub restart_doubles: u64,
+    /// Doublings of the 2-cycle escape.
+    pub escape_doubles: u64,
+    /// Candidate collisions checked by a scalar multiplication.
+    pub collision_checks: u64,
+}
+
+/// Additions and doublings [`FastCurve::combine`] performs for `[u]G + [v]Q`:
+/// the `G + Q` sum, then one doubling per bit below the top and one
+/// addition per nonzero bit pair below the top (the top pair is loaded).
+pub fn combine_ops(u: u64, v: u64) -> (u64, u64) {
+    let top = 64 - (u | v).leading_zeros();
+    if top == 0 {
+        return (0, 1);
+    }
+    let low = (u | v) & ((1u64 << (top - 1)) - 1);
+    (low.count_ones() as u64 + 1, (top - 1) as u64)
 }
 
 #[derive(Clone, Copy)]
@@ -777,6 +811,7 @@ struct Shared {
     answer: Mutex<Option<u64>>,
     total_steps: AtomicU64,
     dp_count: AtomicU64,
+    ops: Mutex<RhoOpCounts>,
 }
 
 #[inline(always)]
@@ -830,9 +865,13 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
     let mut rng = StdRng::seed_from_u64(cfg.seed ^ 0xA5A5_5A5A_1234_5678);
     let table_len = 1usize << cfg.table_bits;
     let mut table = Vec::with_capacity(table_len);
+    let mut table_ops = RhoOpCounts::default();
     while table.len() < table_len {
         let u = rng.gen_range(1..n);
         let v = rng.gen_range(1..n);
+        let (a, d) = combine_ops(u, v);
+        table_ops.table_adds += a;
+        table_ops.table_doubles += d;
         if let Some(pt) = curve.combine(g, q, u, v) {
             table.push(TableEntry { pt, u, v });
         }
@@ -843,6 +882,7 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
         answer: Mutex::new(None),
         total_steps: AtomicU64::new(0),
         dp_count: AtomicU64::new(0),
+        ops: Mutex::new(RhoOpCounts::default()),
     };
     std::thread::scope(|s| {
         for tid in 0..cfg.threads {
@@ -852,6 +892,9 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
         }
     });
     let log = (*shared.answer.lock().unwrap())?;
+    let mut ops = *shared.ops.lock().unwrap();
+    ops.table_adds = table_ops.table_adds;
+    ops.table_doubles = table_ops.table_doubles;
     let wall = started.elapsed().as_secs_f64();
     let total_steps = shared.total_steps.load(Ordering::Relaxed);
     Some(RhoResult {
@@ -863,6 +906,7 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
         threads: cfg.threads,
         walkers_per_thread: cfg.walkers,
         dp_bits: cfg.dp_bits,
+        ops,
     })
 }
 
@@ -892,6 +936,10 @@ fn rho_worker(
     let mut js = vec![0usize; w];
     let mut reset = vec![false; w];
     let mut scratch = Vec::with_capacity(w);
+    let counts = std::cell::Cell::new(RhoOpCounts::default());
+    let initial = std::cell::Cell::new(true);
+    let mut escape_doubles = 0u64;
+    let mut collision_checks = 0u64;
 
     let restart = |i: usize,
                    rng: &mut StdRng,
@@ -904,6 +952,16 @@ fn rho_worker(
         loop {
             let a = rng.gen_range(1..n);
             let b = rng.gen_range(1..n);
+            let (da, dd) = combine_ops(a, b);
+            let mut c = counts.get();
+            if initial.get() {
+                c.initial_start_adds += da;
+                c.initial_start_doubles += dd;
+            } else {
+                c.restart_adds += da;
+                c.restart_doubles += dd;
+            }
+            counts.set(c);
             if let Some(pt) = curve.combine(g, q, a, b) {
                 let (pt, flipped) = if cfg.negation {
                     curve.canonical_sign(pt)
@@ -925,6 +983,7 @@ fn rho_worker(
             i, &mut rng, &mut xs, &mut ys, &mut as_, &mut bs, &mut prev, &mut steps,
         );
     }
+    initial.set(false);
 
     let mut local_steps = 0u64;
     let mut local_dps = 0u64;
@@ -975,6 +1034,7 @@ fn rho_worker(
                 } else {
                     (x3, y3, a, b)
                 };
+                escape_doubles += 1;
                 match curve.double(Pt { x: cx, y: cy }) {
                     Some(pt) => {
                         let (pt, flipped) = if cfg.negation {
@@ -1011,6 +1071,7 @@ fn rho_worker(
                 match dps.get(&xs[i]) {
                     Some(&other) => {
                         if (other.1, other.2) != (as_[i], bs[i]) {
+                            collision_checks += 1;
                             if let Some(k) =
                                 solve_collision(curve, g, q, (ys[i], as_[i], bs[i]), other)
                             {
@@ -1044,6 +1105,14 @@ fn rho_worker(
     }
     shared.total_steps.fetch_add(local_steps, Ordering::Relaxed);
     shared.dp_count.fetch_add(local_dps, Ordering::Relaxed);
+    let mut tot = shared.ops.lock().unwrap();
+    let c = counts.get();
+    tot.initial_start_adds += c.initial_start_adds;
+    tot.initial_start_doubles += c.initial_start_doubles;
+    tot.restart_adds += c.restart_adds;
+    tot.restart_doubles += c.restart_doubles;
+    tot.escape_doubles += escape_doubles;
+    tot.collision_checks += collision_checks;
 }
 
 // ── Index calculus: factor base, pair table, relations, linear algebra ─

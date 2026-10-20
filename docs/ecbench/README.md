@@ -337,6 +337,7 @@ rho's expectation `√(π/2)`; the curve's floor is `√(π/2A)` (§3).
 | `rho.*` | jump-table set-up, walk starts, every step, cycle escapes, look-ahead additions, internal verification | canonicalisations (negation, signed Frobenius), Frobenius maps |
 | `rho.signed_frobenius_strong` | group additions exactly; each scalar multiplication (jump table, walk start stride, candidate checks) at `1.5·log₂ r` additions, `ic_boundary::signed_frobenius_rho`'s convention | canonicalisations, partition hashes, distinguished-point table queries and inserts |
 | `rho.signed_frobenius_strong_legacy` | identical to `rho.signed_frobenius_strong`; comparison-only implementation control | identical to `rho.signed_frobenius_strong` |
+| `rho.prime_fast` | group additions exactly (table build, walker starts and restarts, each step, cycle-escape doublings); candidate collision checks at `1.5·log₂ r` additions each; prime curves with `p < 2^62` only, one thread, the fast prime wall reference | sign canonicalisations, distinguished-point table probes, field operations (not counted) |
 | `bsgs.*` | baby steps, the giant stride, giant steps | table inserts and lookups |
 | `kangaroo.vow` | jump-table set-up, starts and restarts, every jump | table inserts and lookups |
 | `claw.pair_table` | the known-log base's seed scalar multiplications, every table addition `P_i + F_b`, both query additions `Q − (F_k + F_l)`, the addition that rebuilds a hit's table sum; phases `base`, `table`, `search`, `recover` | Frobenius maps, canonicalisations, table inserts and probes |
