@@ -68,6 +68,7 @@
 //! $B run --engine tower --arms A0 --m 3 --t-min 5 --t-max 5 --budget 3600 --grace 300 \
 //!     --vmem-kb 15000000 --file 'T2-{arm}-m{m}' --out-dir $R   # T2, only if admitted (and m = 4, t = 4)
 //! $B analyze $R --tower                         # T1 verdict and A0's extended series
+//! # Amendment 8 (T4, K1, X1): analyze $R --a8
 //! ```
 //!
 //! A stage diagnostic of the solver axis (`AGENTS.md` §2): it prices no
@@ -2629,9 +2630,16 @@ fn group_of(file: &str) -> &str {
 }
 
 fn cells2(rows: &[(String, Value)], group: &str, arm: &str, m: usize) -> Vec<Cell2> {
+    cells2_where(rows, |f, r| {
+        group_of(f) == group && r["arm"] == arm && r["m"] == m
+    })
+}
+
+/// The cells of the rows a predicate keeps, one per `t`.
+fn cells2_where(rows: &[(String, Value)], keep: impl Fn(&str, &Value) -> bool) -> Vec<Cell2> {
     let mut by_t: BTreeMap<usize, Cell2> = BTreeMap::new();
     for (f, r) in rows {
-        if group_of(f) != group || r["arm"] != arm || r["m"] != m {
+        if !keep(f, r) {
             continue;
         }
         let t = r["t"].as_u64().unwrap_or(0) as usize;
@@ -2911,6 +2919,239 @@ fn analyze_t3(rows: &[(String, Value)]) {
         show_series(&format!("{a} m = 3 p2, with the T3 cell"), &base);
     }
     println!("  (the width slopes above mix engines for A0 and are not used)");
+}
+
+/// Amendment 8: K1 (curve families), T4 (a staircase stop on the tower
+/// engine) and X1 (p₃ on the narrow path), each against its registered rule.
+fn analyze_a8(dir: &str) {
+    let rows = read_rows(dir);
+    println!("Factor-base designs, Amendment 8 (T4, K1, X1): rows from {dir}");
+
+    // ── K1 ─────────────────────────────────────────────────────────────
+    println!();
+    println!(
+        "════ K1: curve families, p1, f4_fp (generic = the first run's committed A0 and A11 rows)"
+    );
+    for fam in ["a0", "am3"] {
+        let mut indep = true;
+        let mut shared = 0usize;
+        let mut widths_eq = true;
+        let mut widths_le = true;
+        let mut gap_ok = true;
+        let mut gap_cells = 0usize;
+        let mut d_at: BTreeMap<(String, usize), f64> = BTreeMap::new();
+        println!();
+        println!("── family {fam}");
+        println!("  arm  m  t   D(fam)  D(generic)  max_cols(fam)  max_cols(generic)");
+        for arm in ["A0", "A11"] {
+            for m in [2usize, 3] {
+                let kf = cells2_where(&rows, |f, r| {
+                    group_of(f) == "K1"
+                        && r["curve_family"] == fam
+                        && r["arm"] == arm
+                        && r["m"] == m
+                });
+                let gen = cells2(&rows, "p1", arm, m);
+                for c in kf.iter().filter(|c| c.complete()) {
+                    d_at.insert((format!("{arm}{m}"), c.t), c.d_mean());
+                    let Some(g) = find(&gen, c.t) else { continue };
+                    shared += 1;
+                    let (df, dg, cf, cg) = (c.d_mean(), g.d_mean(), c.cols_mean(), g.cols_mean());
+                    indep &= df == dg;
+                    widths_eq &= cf == cg;
+                    widths_le &= cf <= cg;
+                    println!(
+                        "  {arm:<4} {m}  {:<3} {df:<7.1} {dg:<11.1} {cf:<14.0} {cg:.0}{}",
+                        c.t,
+                        if df == dg { "" } else { "   D DIFFERS" }
+                    );
+                }
+                let missing: Vec<String> = kf
+                    .iter()
+                    .filter(|c| !c.complete())
+                    .map(|c| format!("t={}:{}", c.t, c.status.join("/")))
+                    .collect();
+                if !missing.is_empty() {
+                    println!("  {arm} m={m}: not completed: {}", missing.join(", "));
+                }
+            }
+        }
+        for t in 2..=4usize {
+            if let (Some(a11), Some(a0)) = (
+                d_at.get(&("A113".to_string(), t)),
+                d_at.get(&("A03".to_string(), t)),
+            ) {
+                gap_cells += 1;
+                gap_ok &= *a11 <= *a0 - 1.0;
+            }
+        }
+        println!(
+            "  rule: {shared} shared completed cells → {}",
+            if shared == 0 {
+                "INCONCLUSIVE (no shared cell)"
+            } else if indep {
+                "CURVE-INDEPENDENT (every shared D equals the generic D)"
+            } else {
+                "CURVE-DEPENDENT (a shared D differs)"
+            }
+        );
+        println!(
+            "  gap at m = 3 (A11 D ≤ A0 D − 1 at every shared t): {gap_cells} cells → {}",
+            if gap_cells == 0 {
+                "not measurable"
+            } else if gap_ok {
+                "HOLDS"
+            } else {
+                "does not hold"
+            }
+        );
+        println!(
+            "  max_cols against generic (descriptive): equal at every shared cell: {widths_eq}; at most generic at every shared cell: {widths_le}"
+        );
+    }
+
+    // ── T4 ─────────────────────────────────────────────────────────────
+    println!();
+    println!("════ T4: a staircase stop (k = 64) on the tower engine, A0");
+    let adm: Vec<&Value> = rows
+        .iter()
+        .filter(|(f, r)| group_of(f) == "T4" && r.get("admission_match").is_some())
+        .map(|(_, r)| r)
+        .collect();
+    if adm.is_empty() {
+        println!("T4a: no rows.");
+    } else {
+        let gate: Vec<&&Value> = adm.iter().filter(|r| r["gating"] == true).collect();
+        let ok = gate.iter().filter(|r| r["admission_match"] == true).count();
+        println!(
+            "T4a, gating (m = 4, 4 systems): {ok} of {} complete with the committed D, no derived 1, planted solution kept  →  {}",
+            gate.len(),
+            if ok == gate.len() && gate.len() == 4 { "ADMITTED" } else { "NOT ADMITTED" }
+        );
+        for m in [2u64, 3, 4] {
+            let sub: Vec<&&Value> = adm.iter().filter(|r| r["m"] == m).collect();
+            let eq = sub.iter().filter(|r| r["admission_match"] == true).count();
+            let lower = sub
+                .iter()
+                .filter(|r| r["D"].as_u64() < r["committed"]["D"].as_u64())
+                .count();
+            println!(
+                "  m = {m}{}: {eq} of {} systems equal the committed D; {lower} lower under the stop",
+                if m == 4 { " (gating)" } else { " (reported)" },
+                sub.len()
+            );
+        }
+        for r in adm.iter().filter(|r| r["admission_match"] != true) {
+            println!(
+                "  mismatch: {} m={} t={} target={}: stop-bounded D {} vs {}, staircase {}, {}",
+                r["admission_of"],
+                r["m"],
+                r["t"],
+                r["target"],
+                r["D"],
+                r["committed"]["D"],
+                r["staircase_at_stop"],
+                r["status"]
+            );
+        }
+    }
+    let t4b = cells2_where(&rows, |f, r| {
+        group_of(f) == "T4" && r.get("admission_match").is_none() && r["arm"] == "A0" && r["m"] == 4
+    });
+    if t4b.is_empty() {
+        println!("T4b: no rows.");
+    }
+    for c in &t4b {
+        println!(
+            "T4b A0 m=4 t={}: D {:?} (stop-bounded), max_cols {:?}, time {:?}, {}",
+            c.t,
+            c.d,
+            c.cols,
+            c.time,
+            c.status.join(",")
+        );
+    }
+    for r in rows
+        .iter()
+        .filter(|(f, r)| group_of(f) == "T4" && r.get("admission_match").is_none())
+        .map(|(_, r)| r)
+    {
+        println!(
+            "  system target {}: staircase_at_stop {}, status {}, reason {}",
+            r["target"], r["staircase_at_stop"], r["status"], r["failure_reason"]
+        );
+    }
+
+    // ── X1 ─────────────────────────────────────────────────────────────
+    println!();
+    println!("════ X1: p3 = {P3} on the narrow f4_fp path (A0 and A11 only)");
+    for (arm, m) in [("A0", 3usize), ("A0", 4), ("A11", 4)] {
+        let c = cells2(&rows, "X1", arm, m);
+        if c.is_empty() {
+            println!("X1 {arm} m = {m}: no rows.");
+        } else {
+            show_series(&format!("X1 {arm} m = {m} p3"), &c);
+        }
+    }
+    let x_a0_3 = cells2(&rows, "X1", "A0", 3);
+    let tower_d = find(&cells2(&rows, "T2", "A0", 3), 5).map(|c| c.d_mean());
+    println!();
+    println!(
+        "Cross-engine check (A0, m = 3, t = 5): tower engine D (T2, p1) = {}; f4_fp on p3: {}  →  {}",
+        tower_d.map_or("-".into(), |d| format!("{d:.1}")),
+        find(&x_a0_3, 5).map_or("did not complete".into(), |c| format!("D = {:.1}", c.d_mean())),
+        match (find(&x_a0_3, 5), tower_d) {
+            (Some(c), Some(d)) if c.d_mean() == d => "CONFIRMS",
+            (Some(_), Some(_)) => "CONTRADICTS",
+            _ => "INCONCLUSIVE",
+        }
+    );
+    let a11_p1 = find(&cells2(&rows, "G1", "A11", 4), 4).map(|c| c.d_mean());
+    if let Some(c) = find(&cells2(&rows, "X1", "A11", 4), 4) {
+        println!(
+            "A11, m = 4, t = 4: p3 D = {:.1}, p1 D (G1) = {}",
+            c.d_mean(),
+            a11_p1.map_or("-".into(), |d| format!("{d:.1}"))
+        );
+    }
+
+    // ── A0's m = 4 series, with each source labelled ───────────────────
+    println!();
+    println!("════ A0 m = 4: the series with each source of a t = 4 cell (the bound: a completed t = 4 cell has σ ≥ 0.5)");
+    let base: Vec<Cell2> = cells2(&rows, "F4", "A0", 4)
+        .into_iter()
+        .filter(|c| c.t <= 3)
+        .collect();
+    let copy = |c: &Cell2| Cell2 {
+        t: c.t,
+        b: c.b,
+        d: c.d.clone(),
+        cols: c.cols.clone(),
+        time: c.time.clone(),
+        status: c.status.clone(),
+        shape: c.shape,
+    };
+    let extra: Vec<(&str, Vec<Cell2>)> = vec![
+        (
+            "with the T4b stop-bounded cell",
+            t4b.iter().map(copy).collect(),
+        ),
+        (
+            "with the X1 p3 cell",
+            cells2(&rows, "X1", "A0", 4).iter().map(copy).collect(),
+        ),
+    ];
+    show_series("A0 m = 4, F4 cells only", &base);
+    for (label, ex) in extra {
+        if ex.is_empty() {
+            continue;
+        }
+        let mut all: Vec<Cell2> = base.iter().map(copy).collect();
+        all.extend(ex);
+        all.sort_by_key(|c| c.t);
+        show_series(&format!("A0 m = 4, {label}"), &all);
+    }
+    println!("  (width slopes on lines above mix engines or primes where a source differs; D and σ are the readings)");
 }
 
 fn analyze2(dir: &str) {
@@ -4021,7 +4262,9 @@ fn main() {
         }
         "analyze" => {
             let dir = args.get(1).expect("a runs directory");
-            if args.iter().any(|a| a == "--tower") {
+            if args.iter().any(|a| a == "--a8") {
+                analyze_a8(dir);
+            } else if args.iter().any(|a| a == "--tower") {
                 analyze_tower(dir);
             } else if args.iter().any(|a| a == "--g1") {
                 analyze_g1(dir);
