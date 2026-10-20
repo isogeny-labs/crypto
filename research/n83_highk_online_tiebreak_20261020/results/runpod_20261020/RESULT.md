@@ -23,6 +23,11 @@ diagnostic. Its timed intervals exclude reusable base/index/log preparation.
 Each cold process value covers construction and its 768-point block and is
 reported separately from the per-point online interval; it is not a one-target
 cold-start comparison.
+The root-index build is the main cold-cost difference: K4300 took 545.973
+and 546.883 seconds in the two blocks; K4405 took 578.754 and 579.141
+seconds. Both used 10,737,418,240-byte root tables and completed rank and
+all 768 targets in each block. The archived child summaries retain the
+exclusive setup, rank, linear-algebra, and target phase timings.
 The conditional one-target IC/rho holdout was not dispatched because its
 frozen selector gate requires a single selected candidate.
 
