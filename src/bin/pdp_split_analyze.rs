@@ -635,7 +635,7 @@ fn ladder_summary(files: &[String]) -> (Value, String) {
             .and_then(|(k1, c1)| {
                 let distance = row.k.abs_diff(*k1);
                 if distance > 0 {
-                    Some((mpb? / c1?).powf(1.0 / distance as f64))
+                    Some((mpb? / (*c1)?).powf(1.0 / distance as f64))
                 } else {
                     None
                 }
@@ -712,7 +712,7 @@ mod ladder_tests {
             run(7, 8, 100, true, 0),
             run(10, 8, 800, true, 0),
             run(10, 8, 80_000, false, 1),
-            run(13, 8, 1_600, true, 0),
+            run(13, 8, 6_400, true, 0),
         ];
         fs::write(
             &ell,
@@ -776,7 +776,7 @@ mod ladder_tests {
                 .abs()
                 < 1e-12
         );
-        assert_eq!(ell_k13["mean_xors_per_branch"], 1_600.0);
+        assert_eq!(ell_k13["mean_xors_per_branch"], 6_400.0);
         assert!(
             (ell_k13["growth_per_unknown_vs_previous_k"]
                 .as_f64()
