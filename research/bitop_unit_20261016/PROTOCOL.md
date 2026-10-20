@@ -83,6 +83,18 @@ depend on the host or on isolation, and wall time is not used.
 
 ## Deviations
 
+### Post-study interpretation correction (2026-10-19)
+
+The frozen protocol described `bitop/v1` as two-input Boolean gates. That
+wording overstated what its formulas establish. The formulas and all recorded
+counts remain unchanged, but their interpretation is corrected: `bitop/v1`
+is a reproducible accounting convention whose weights are expressed as
+gate-equivalent model units. They are not physical gate counts, circuit lower
+bounds, or costs of a synthesized implementation. The instruction audit is a
+diagnostic for possible missing counters; it neither validates formula
+weights nor proves that every operation is instrumented. The report and unit
+definition use this corrected interpretation.
+
 1. **Sessions re-run after fixes.** Four fixes landed after the first
    sessions ran:
    - the fiber oracles' tables counted their insert attempts;

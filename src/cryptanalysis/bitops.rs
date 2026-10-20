@@ -7,30 +7,31 @@
 //! of those units cannot be divided, and an exponent fitted in one is not an
 //! exponent in another.
 //!
-//! This module is the replacement: a **bit operation** is one two-input
-//! Boolean gate (AND, XOR, OR) in the textbook circuit for the primitive.
+//! This module defines a versioned accounting convention: a **bit operation**
+//! (`bitop/v1`) is a gate-equivalent model unit. The frozen formulas below
+//! assign reproducible integer weights to counted primitives. They are not
+//! physical gate counts, circuit lower bounds, or synthesized circuit costs.
 //! Each primitive the methods count — a field multiplication, an affine
 //! addition, a multiply-subtract modulo `r`, a 64-bit word operation, a hash
-//! probe — has a frozen gate count that is a function of the operand width
+//! probe — has a frozen model weight that is a function of the operand width
 //! alone, so
 //!
 //! ```text
 //!     work = Σ  count(primitive) · gates(primitive, width)
 //! ```
 //!
-//! is an exact integer that depends on the counts and this file and on
-//! nothing else: not the host, not the compiler, not the run.  The
+//! is an exact integer under this convention, determined by the counts and
+//! these formulas: not the host, not the compiler, not the run. The
 //! conventions and their derivations are in `docs/units/BITOPS.md`; the
 //! test vectors in `docs/units/bitop-v1.vectors.json` are what any other
 //! implementation (the cryptanalysis repository's Python harness, cairn's
 //! evaluator) must reproduce.
 //!
-//! What the unit deliberately leaves out — memory traffic, table size, branch
-//! and loop overhead — is reported beside it, never folded in.  Work a method
-//! does that no counter sees is caught by the instruction audit
-//! (`ecbench audit-ir`): the Callgrind instructions per counted bit operation
-//! of a phase are compared with the reference walk's, and a phase far above
-//! it is doing work the counters miss.
+//! The `gates` API and vector field names are retained for compatibility; they
+//! mean model weights, not measured gates. Memory traffic, table size, branch
+//! and loop overhead are reported beside the total. The instruction audit
+//! (`ecbench audit-ir`) is diagnostic for missing counters, not proof of
+//! complete instrumentation or validation of the formula weights.
 //!
 //! A new convention is a new version (`bitop/v2`), never an edit of this one:
 //! a committed figure must reprice to the same integer forever.
@@ -52,13 +53,14 @@ pub enum Field {
     Fp4 { bits: u32 },
 }
 
-/// Gates of a `w`-bit ripple-carry addition: `w` full adders of five gates.
+/// `bitop/v1` model weight of a `w`-bit ripple-carry addition.
 pub fn int_add(w: u32) -> u128 {
     5 * w as u128
 }
 
-/// Gates of a `w × w`-bit schoolbook product: `w²` partial-product ANDs and
-/// `w − 1` additions of a `w`-bit row.
+/// `bitop/v1` model weight of a `w × w` schoolbook product: `w²` partial
+/// product terms and `w − 1` `w`-bit row-add weights. This frozen formula is
+/// an accounting convention, not a count from a synthesized multiplier.
 pub fn int_mul(w: u32) -> u128 {
     let w = w as u128;
     w * w + 5 * w * w.saturating_sub(1)
@@ -93,13 +95,13 @@ pub enum Prim {
     /// Inversion modulo `r` (binary extended Euclid at `r`'s width).
     ModrInv,
     /// One 64-bit word operation (XOR, AND, OR, compare) of a bit-packed
-    /// algorithm: 64 gates.
+    /// algorithm: 64 model units.
     WordOp,
     /// A hash-table probe or insert of a key as wide as a field element:
-    /// a fold-XOR hash, a key comparison and a select, `4κ` gates.  The
+    /// a fold-XOR hash, a key comparison and a select, `4κ` model units. The
     /// keys are field elements, already uniform, so no multiplier is needed;
     /// what a table really costs is memory, which the unit reports beside
-    /// the gates and never folds in.
+    /// model units and never folds in.
     HashProbe,
 }
 
@@ -178,7 +180,7 @@ impl std::fmt::Display for NoPrice {
 mod fp {
     use super::{int_add, int_mul};
     /// Addition, a conditional subtraction of `p`, and a `b`-bit select
-    /// (three gates a bit).
+    /// (three model units a bit).
     pub fn add(b: u32) -> u128 {
         2 * int_add(b) + 3 * b as u128
     }
@@ -237,7 +239,7 @@ mod f2 {
         n * n + n * (n - 1)
     }
     /// Normal-basis conversion (a matrix–vector product) and the least of
-    /// `n` rotations, two gates a compared bit.
+    /// `n` rotations, two model units a compared bit.
     pub fn canon(n: u32) -> u128 {
         as_solve(n) + 2 * (n as u128) * (n as u128)
     }
@@ -374,7 +376,7 @@ impl Widths {
     }
 }
 
-/// `log₂` of an exact gate count.
+/// `log₂` of an exact `bitop/v1` model weight.
 pub fn log2(x: u128) -> f64 {
     if x == 0 {
         return f64::NEG_INFINITY;
@@ -385,7 +387,7 @@ pub fn log2(x: u128) -> f64 {
 }
 
 /// The test vectors every implementation of `bitop/v1` must reproduce:
-/// each primitive's gates at a spread of widths in each field family.
+/// each primitive's formula weight at a spread of widths in each field family.
 pub fn vectors() -> serde_json::Value {
     let mut out = Vec::new();
     let fields = [
@@ -415,7 +417,7 @@ pub fn vectors() -> serde_json::Value {
     serde_json::json!({
         "schema": "bitop.vectors/v1",
         "unit": UNIT,
-        "what": "Gates of each bitop/v1 primitive at the listed widths. Generated by `ecbench bitop-vectors` from src/cryptanalysis/bitops.rs; any other implementation must reproduce every row exactly.",
+        "what": "Frozen bitop/v1 gate-equivalent model weights for each primitive at the listed widths. Generated by `ecbench bitop-vectors` from src/cryptanalysis/bitops.rs; these are convention weights, not physical gate counts. Any other implementation must reproduce every row exactly.",
         "vectors": out,
     })
 }
@@ -426,7 +428,8 @@ mod tests {
 
     #[test]
     fn small_widths_by_hand() {
-        // 8-bit integers: 64 ANDs and 7 eight-bit additions of 40 gates.
+        // Frozen model formula: 64 partial-product terms and 7 row-add
+        // weights of 40 each.
         assert_eq!(int_mul(8), 64 + 7 * 40);
         // F_{2^3}: 9 ANDs, 4 XORs, reduction 4·2.
         assert_eq!(f2::mul(3), 9 + 4 + 8);

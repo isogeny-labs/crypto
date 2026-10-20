@@ -5,12 +5,15 @@
 its deviations.
 **Unit:** [`docs/units/BITOPS.md`](../../docs/units/BITOPS.md).
 
-Every ECDLP method in the repository is now charged in `bitop/v1`: two-input
-gates per primitive, under frozen formulas. Every solver and pipeline step
-counts its work, and an instruction audit checks that the counters see it.
+Every ECDLP method in the repository is priced in `bitop/v1`: a reproducible
+accounting convention with frozen gate-equivalent formula weights per
+primitive. These are not physical gate counts, circuit lower bounds, or
+synthesized circuit costs. Every solver and pipeline step reports its modeled
+work, and an instruction audit diagnoses possible missing counters; it does
+not validate the formulas as circuit costs or prove complete instrumentation.
 What the study measured:
 
-- **The instrument works.** On a prime ladder of 11 curves (16 to 26 bits,
+- **The generic-method positive control matches the expected model scaling.** On a prime ladder of 11 curves (16 to 26 bits,
   528 verified runs), rho, BSGS and kangaroo fit exponents in additions of
   0.433 [0.320, 0.538], 0.474 [0.436, 0.508] and 0.472 [0.370, 0.567]. All
   three intervals contain the theoretical ½.
@@ -38,8 +41,8 @@ What the study measured:
 - **Exponents carry the digits their intervals allow.** About ±0.1 from 88
   runs. A third decimal place would take about 10⁴× the runs.
 
-Wall time is not used. Sessions ran at isolation L0, because bit-operation
-counts do not depend on the host. No security claim is made about any
+Wall time is not used. Sessions ran at isolation L0, because bitop/v1 formula
+weights do not depend on the host. No security claim is made about any
 deployed curve.
 
 | directory | what |
