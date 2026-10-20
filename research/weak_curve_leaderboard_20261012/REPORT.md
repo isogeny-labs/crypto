@@ -95,6 +95,8 @@ entry, rather than a completed attack comparison.
 
 ## Genus-128 binary GHS cost-stage audit
 
+**Historical prices below.** The [2026-10-19 refresh](reports/review-refresh-20261019/REPORT.md) reconciles the current measured-operation model: the two totals are 74.834885 and 74.879405 log2 modeled bit operations. The table below preserves the earlier quadratic-price results. The [previous receipt](reports/review-refresh-20261019/previous-audit.json) retains those values; the [current receipt](ghs_genus128_cost_audit.json) and website mirrors use the refreshed model.
+
 The exact-invariant `GF(4)` routes for `c2pnb176w1` and `c2pnb272w1` have
 magic number eight, Type II, and projected genus 128. An [independent
 integer audit](src/bin/ghs_genus128_cost_audit.rs) of the transfer registry's
@@ -102,7 +104,7 @@ conditional Enge–Gaudry smoothness model optimizes the factor-base degree
 over all 84 bounds examined. Both routes select degree bound 15. The count
 uses `I_d=(1/d)∑_{e|d} μ(e)4^(d/e)` monic irreducibles of degree `d` and
 counts degree-128 monic polynomials with all factors of degree at most 15.
-The [frozen receipt](ghs_genus128_cost_audit.json) pins the registry, cost-model, and native producer hashes,
+The [historical receipt](reports/review-refresh-20261019/previous-audit.json) pins the registry, cost-model, and native producer hashes,
 the exact polynomial counts, all degree-bound prices, and the two subgroup
 parameters.
 The [run report](reports/run-20261015T0854Z/REPORT.md),
@@ -111,18 +113,14 @@ The [run report](reports/run-20261015T0854Z/REPORT.md),
 The [later source-lock refresh](reports/run-20261015T0929Z/REPORT.md)
 updates the registry hashes and dependent site exports while preserving the
 same model prices.
-The totals below use the measured Jacobian group-operation counts that #1983
-put in the transfer registry's cost model (2^71.336 and 2^71.774 under the
-earlier `10 g²` price); smoothness, relation queries and the bound-15 optimum
-are unchanged.
 The [cover-source alignment](reports/run-20261015T0950Z/REPORT.md) updates
 the decomposition index's covers-inventory digest after the clean-runner
 validator exposed a third upstream source change.
 
 | Source curve | Nominal half-split base | Model smoothness | Model relation queries | Model total log2 bit cost | Registry cost |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `c2pnb176w1` | 48,921,052 places | `2^-26.328277` | `2^51.872229` | 74.834885 | 74.835 |
-| `c2pnb272w1` | 48,921,052 places | `2^-26.328277` | `2^51.872229` | 74.879405 | 74.879 |
+| `c2pnb176w1` | 48,921,052 places | `2^-26.328277` | `2^51.872229` | 71.336033 | 71.336 |
+| `c2pnb272w1` | 48,921,052 places | `2^-26.328277` | `2^51.872229` | 71.773568 | 71.774 |
 
 The smoothness numerator is exactly
 `1374288545819365998587940548442445318355469588992205247403709040067002`

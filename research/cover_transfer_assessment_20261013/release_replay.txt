@@ -83,25 +83,25 @@ Current-catalog compatibility boundary
 ======================================
 
 The successful 592-row catalog-export above concerns the registry bundled in
-v0.1.0-main.1371. It must not be extrapolated to the current 2,572-row
+v0.1.0-main.1371. It must not be extrapolated to the current 2,100-row
 registry.
 
 The current catalog is partitioned into these exact standalone-constructor
 input profiles:
 
-  165 binary ordinary models
-  1,053 direct short-Weierstrass prime-field models
+  160 binary ordinary models
+  586 direct short-Weierstrass prime-field models
   30 normalized prime-field Montgomery/Edwards models
   1,324 short-Weierstrass odd extension-field models
-  2,572 total
+  2,100 total
 
 Comparison of the pinned v0.1.0-main.1371 source allowlist with those current
-input forms classifies the first two profiles, 1,218 models total, inside its
+input forms classifies the first two profiles, 746 models total, inside its
 syntactic constructor domain and the other two, 1,354 models total, outside
 it. The outside population is exactly 30 normalized models plus 1,324
-extension-field models. This 1,218/1,354 result is a static
+extension-field models. This 746/1,354 result is a static
 source/applicability inference; no exact batch harness or receipt in this
-record ran every current input against the archived executable. It does
+record ran all 2,100 current inputs against the archived executable. It does
 not invalidate the artifact's direct replay against its own bundled data, and
 it is not evidence that any outside-domain cover fails to exist.
 
@@ -119,34 +119,29 @@ hyperelliptic-cover test binary exited 0 and reported:
   test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 
 That historical result supports source-level construction for the 2,091 model
-forms present at that checkpoint. A later replay on 2026-10-14 (Rust and
-Cargo 1.90.0, catalog snapshot ff48e2800f62b45c746b3f391540c07b16af4e75,
-registry SHA-256
-f926db9f9756509c484262b9e371739836afc841b64b67a495be6e6df8b9dedf) reported
-13 passed for the 2,100-row registry of that snapshot. Neither is a replay of
-the 2,572-row catalog.
+forms present at that checkpoint. It is not a replay of the later 2,100-row
+catalog.
 
-A separate current-worktree replay was run on 2026-10-18 with Rust and Cargo
-1.97.0:
+A separate current-worktree replay was run on 2026-10-14 with Rust and Cargo
+1.90.0:
 
   cargo test --locked --offline --bin hyperelliptic-cover -- \
     --test-threads=1
 
 Its inputs were bound as follows:
 
-  catalog snapshot: f8501268305c0c84d0e077a4ab9054c07ff74540
-  registry SHA-256: 584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf
+  catalog snapshot: ff48e2800f62b45c746b3f391540c07b16af4e75
+  registry SHA-256: f926db9f9756509c484262b9e371739836afc841b64b67a495be6e6df8b9dedf
   hyperelliptic-cover source SHA-256:
-    3cc84bf90685c63653b96b1d7f134efacbdb37e30ea8d8762bd3d28308df0a00
+    f75dbfb50bce3b63a6dd2291320d006cfcf05bc4d7071731bf5bfef44a0c021d
 
 The command exited 0 and reported:
 
   test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out;
-  finished in 126.84s
+  finished in 154.15s
 
-That result supports current source-level construction for all 2,572 model
-forms, and the binary test checked all 140 linked binary EC1 generators. It is
-not a clean-checkout or packaged-binary receipt. No standalone
+That result supports current source-level construction for all 2,100 model
+forms. It is not a clean-checkout or packaged-binary receipt. No standalone
 artifact containing the repair has yet been pinned and replayed here, so
 catalog-wide packaged-binary support remains an open obligation. Constructor
 acceptance also does not establish a general Jacobian norm, subgroup
