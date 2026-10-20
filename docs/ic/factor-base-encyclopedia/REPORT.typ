@@ -1652,6 +1652,7 @@ never landed: its evidence file is missing on `main`.
     #strong[IC/rho 218.03 \[172.36, 285.57\]]; prepared-online IC/rho
     1.382 \[1.036, 1.882\]. IC took 1,054.6 s per fresh process (1,047.9
     s of it reusable preparation; 5.8 GB peak) against 5.07 s for rho.
+  - #strong[Superseded 2026-10-20:] the 54.10 below compares against an empty-table rho with 580--640 s IC setup excluded; the matched Bernstein-Lange control (`research/20261016-n83-precomputed-rho-control/`, K3300 and K600, not K3240) has precomputed rho faster online in every matched arm (IC/rho 3.74x to 395x). Median of per-point ratios; ratio of means 44.09.
   - #emph[Online, Tier 1, K3240 `root21`]
     (#link("../../../research/n83_tier1_final_results_20261014/RESULT.md")[`n83_tier1_final_results_20261014/RESULT.md`],
     PR \#1824; five unseen public points, one GitHub Actions
