@@ -100,7 +100,7 @@ def read_provider(path, expected_stratum):
             any(not isinstance(cpu, int) or cpu < 0 for cpu in
                 receipt['cpu_affinity_ids']) or
             receipt.get('vcpu_count', 0) < 4 or
-            receipt.get('memory_in_gb', 0) < 32 or
+            receipt.get('memory_in_gb', 0) < 27 or
             not isinstance(receipt.get('snapshot_sha256'), str) or
             len(receipt['snapshot_sha256']) != 64):
         raise ValueError('RunPod allocation receipt is incomplete')

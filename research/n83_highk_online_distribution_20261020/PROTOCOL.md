@@ -113,7 +113,10 @@ A4000/A4500/A5000. All arithmetic is on the four frozen CPUs; the GPU is
 an allocation class. The selected Pod must cost no more than `$0.20/hour`.
 The first three class requests returned no eligible Pod on 2026-10-20; this
 pre-dispatch amendment broadens capacity without changing the source,
-targets, CPU/memory envelope, or statistical gate. Cap the provider
+targets, CPU/memory envelope, or statistical gate. The provider's coarse
+RAM filter is 27 GB; the runner checks the actual cgroup limit against
+24 GiB plus 256 MiB before any timed child. A 32 GB provider filter found
+no eligible Pod across the allowed classes. Cap the provider
 allocation at seven hours and the producer at six hours 40 minutes. Reserve
 at most `$1.40` for this allocation, `$2.07` for the completed high-K Pod,
 and `$1.50` for earlier attempts; their conservative combined upper bound is
