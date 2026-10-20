@@ -91,7 +91,7 @@ A planned step is not a completed experiment.
 
 ## Resolution and history
 
-### Catalog evidence drift blocking the current PR
+### XOR cache implementation and experiment
 
 The [XOR cache continuation](../research/n83_prebuild_cost_m23_20261019/xor-cache-v2/STATUS.md)
 adds a tested implementation candidate and a live sixteen-attempt matched
@@ -100,6 +100,8 @@ controls passed independent replay. The first two natural attempts were
 capped with matching search counts; the full paired comparison, useful
 rank and complete IC cost remain open. Both launch failures and their
 separately frozen fixes are retained.
+
+### Catalog evidence drift blocking the current PR
 
 The N83 continuation PR also contains earlier catalog maintenance commits.
 Its [CI/provenance record](../research/n83_prebuild_cost_m23_20261019/CI_STATUS_20261020.md)
