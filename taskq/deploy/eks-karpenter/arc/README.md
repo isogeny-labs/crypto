@@ -54,6 +54,11 @@ restart the listener/controller as directed by ARC. Do not copy a personal
 `gh` OAuth token into the cluster. The script is idempotent and pins both Helm
 charts to `0.15.0`.
 
+The runner image is pinned separately in both scale set value files. Check
+[the current Actions runner release](https://github.com/actions/runner/releases)
+and update both pins regularly; GitHub rejected the older `2.333.1` image as
+`Outdated` during the live deployment test, while `2.338.0` accepted jobs.
+
 After this branch lands on `main`, dispatch `eks-arc-smoke.yml` once per pool.
 Confirm both jobs pass, `kubectl get nodeclaims` shows a `gha-on-demand` node
 during a run, and GitHub's job log identifies the expected runner name. Check
