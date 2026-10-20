@@ -130,9 +130,16 @@ The installed SSH ProxyCommand wakes capacity and obtains the current public hos
 key through authenticated AWS before connecting. It retains strict host verification;
 no private host key is copied.
 
-These client hooks have been prepared and tested in temporary homes. They have
-not been installed on the user's workstation: this session controls the EC2
-host. Installing only on the Spot host cannot wake that same host while it is off.
+For desktop remote connections without coding-client hooks, run
+`python3 install_hooks.py --ssh-only --function FUNCTION --region REGION --profile PROFILE`
+on the client machine, using the deployment's lifecycle function and an existing
+authorized AWS profile. This installs the authenticated SSH proxy and preserves
+Claude, Codex and OpenCode hook settings. Reconnect the remote in the desktop
+app after repairing an earlier connection failure.
+
+The SSH-only recovery path has been installed and verified on the workstation.
+Coding-client hooks remain opt-in. Installing only on the Spot host cannot wake
+that same host while it is off.
 
 Hook schema references: [Codex hooks and trust](https://learn.chatgpt.com/docs/hooks),
 [Claude hook events](https://code.claude.com/docs/en/hooks),

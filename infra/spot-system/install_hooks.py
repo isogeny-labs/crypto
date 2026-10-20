@@ -8,12 +8,13 @@ import shlex
 import shutil
 
 
-def install(home, function, region='us-east-2', profile=None):
+def install(home, function, region='us-east-2', profile=None, ssh_only=False):
     runtime = home / '.local/share/spot-system'
     config_path = home / '.config/spot-system/client.json'
     # Validate all existing documents before making the first mutation.
     documents = {}
-    for relative in ['.claude/settings.json', '.codex/hooks.json']:
+    hook_paths = [] if ssh_only else ['.claude/settings.json', '.codex/hooks.json']
+    for relative in hook_paths:
         path = home / relative
         data = json.loads(path.read_text()) if path.exists() else {}
         if not isinstance(data, dict) or not isinstance(data.get('hooks', {}), dict):
@@ -39,7 +40,7 @@ def install(home, function, region='us-east-2', profile=None):
     config_path.parent.mkdir(parents=True, exist_ok=True)
     config_path.write_text(json.dumps({'function': function, 'region': region, 'profile': profile}, indent=2)+'\n')
     command = 'python3 '+shlex.quote(str(runtime/'wake.py'))+' --config '+shlex.quote(str(config_path))
-    for relative in ['.claude/settings.json', '.codex/hooks.json']:
+    for relative in hook_paths:
         path = home / relative
         data = documents[relative]
         original = json.dumps(data, sort_keys=True)
@@ -56,7 +57,6 @@ def install(home, function, region='us-east-2', profile=None):
                 shutil.copyfile(path, str(path)+'.spot-backup-'+datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f'))
             path.write_text(json.dumps(data, indent=2)+'\n')
     plugin = home / '.config/opencode/plugins/spot-system.js'
-    plugin.parent.mkdir(parents=True, exist_ok=True)
     code = '''import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 const execute = promisify(execFile);
@@ -72,16 +72,21 @@ export const SpotSystem = async () => ({
   }
 });
 '''.replace('SCRIPT', json.dumps(str(runtime/'wake.py'))).replace('CONFIG', json.dumps(str(config_path)))
-    if plugin.exists() and plugin.read_text() != code:
-        shutil.copyfile(plugin, str(plugin)+'.spot-backup-'+datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f'))
-    plugin.write_text(code)
+    if not ssh_only:
+        plugin.parent.mkdir(parents=True, exist_ok=True)
+        if plugin.exists() and plugin.read_text() != code:
+            shutil.copyfile(plugin, str(plugin)+'.spot-backup-'+datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f'))
+        plugin.write_text(code)
     known=home/'.config/spot-system/known_hosts'
     proxy='python3 '+shlex.quote(str(runtime/'ssh_proxy.py'))+' --config '+shlex.quote(str(config_path))+' --known-hosts '+shlex.quote(str(known))+' %h %p'
     block=start+'Host 3.134.144.201\n  ProxyCommand '+proxy+'\n  UserKnownHostsFile '+json.dumps(str(known))+'\n  StrictHostKeyChecking yes\nHost *\n'+end
     ssh.parent.mkdir(parents=True,exist_ok=True)
     if ssh.exists():shutil.copyfile(ssh,str(ssh)+'.spot-backup-'+datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f'))
     ssh.write_text(block+ssh_existing);ssh.chmod(0o600)
-    print('Hooks prepared in '+str(home)+'. Review Codex /hooks to trust the exact definitions.')
+    if ssh_only:
+        print('Spot SSH recovery installed in '+str(home)+'.')
+    else:
+        print('Hooks prepared in '+str(home)+'. Review Codex /hooks to trust the exact definitions.')
 
 
 if __name__ == '__main__':
@@ -90,5 +95,7 @@ if __name__ == '__main__':
     p.add_argument('--function', required=True)
     p.add_argument('--region', default='us-east-2')
     p.add_argument('--profile')
+    p.add_argument('--ssh-only', action='store_true',
+                   help='Install authenticated SSH recovery without coding-client hooks')
     a = p.parse_args()
-    install(a.home.expanduser(), a.function, a.region, a.profile)
+    install(a.home.expanduser(), a.function, a.region, a.profile, ssh_only=a.ssh_only)

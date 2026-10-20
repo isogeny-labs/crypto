@@ -33,3 +33,30 @@ class SshProxyTests(unittest.TestCase):
             self.assertIn('Host other\n  User alice',config)
             self.assertIn('StrictHostKeyChecking yes',config)
             self.assertTrue((home/'.local/share/spot-system/ssh_proxy.py').is_file())
+
+    def test_ssh_only_preserves_client_hooks_and_plugins(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home=Path(tmp)
+            paths=['.claude/settings.json','.codex/hooks.json',
+                   '.config/opencode/plugins/spot-system.js']
+            for relative in paths:
+                path=home/relative
+                path.parent.mkdir(parents=True,exist_ok=True)
+                path.write_text('existing client state')
+            install(home,'example-function',ssh_only=True)
+            install(home,'example-function',ssh_only=True)
+            for relative in paths:
+                self.assertEqual((home/relative).read_text(),'existing client state')
+            self.assertEqual((home/'.ssh/config').read_text().count(
+                '# BEGIN spot-system managed SSH'),1)
+
+    def test_ssh_only_rejects_another_deployment_before_mutation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home=Path(tmp)
+            config=home/'.config/spot-system/client.json'
+            config.parent.mkdir(parents=True)
+            config.write_text('{"function":"other","region":"us-east-2"}')
+            with self.assertRaises(ValueError):
+                install(home,'example-function',ssh_only=True)
+            self.assertFalse((home/'.ssh/config').exists())
+            self.assertFalse((home/'.local/share/spot-system').exists())
