@@ -21,7 +21,7 @@ const originalFreeze = 'research/rotation/FROZEN.json';
 const inputViewManifest = '.github/scripts/n53-historical-cargo-lock-view-v1.json';
 const sha = value => createHash('sha256').update(value).digest('hex');
 
-async function fixture(run, { withPinnedInput = false } = {}) {
+async function fixture(run, { withPinnedInput = false, manifestFormat = 'files-relative' } = {}) {
   const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-frozen-fixture-'));
   const write = (file, text) => {
     const target = path.join(cwd, file);
@@ -50,7 +50,11 @@ async function fixture(run, { withPinnedInput = false } = {}) {
     ].join('\n') + '\n');
     const files = Object.fromEntries(['input.json', 'check.mjs'].map(file => [file, sha(readFileSync(path.join(cwd, study, file)))]));
     files[workflow] = sha(historicalWorkflow);
-    write(manifest, JSON.stringify({ files }) + '\n');
+    const freeze = manifestFormat === 'sha256-root'
+      ? { sha256: Object.fromEntries(Object.entries(files).map(([file, digest]) =>
+        [file.startsWith('.github/') ? file : study + '/' + file, digest])) }
+      : { files };
+    write(manifest, JSON.stringify(freeze) + '\n');
     git('add', '.');
     git('-c', 'user.name=CI fixture', '-c', 'user.email=ci-fixture@example.invalid', 'commit', '-qm', 'original freeze');
     const revision = git('rev-parse', 'HEAD');
@@ -75,7 +79,7 @@ async function fixture(run, { withPinnedInput = false } = {}) {
     git('-c', 'user.name=CI fixture', '-c', 'user.email=ci-fixture@example.invalid', 'commit', '-qm', 'current interface and CI metadata');
     const current = git('rev-parse', 'HEAD');
     const marker = path.join(cwd, 'view-location.txt');
-    const options = { cwd, workflow, revision, manifest, roots: [study, 'src',
+    const options = { cwd, workflow, revision, manifest, manifestFormat, roots: [study, 'src',
       'research/archive', 'research/rotation', 'Cargo.lock'],
       command: [process.execPath, study + '/check.mjs', marker] };
     if (withPinnedInput) options.inputViewManifest = inputViewManifest;
@@ -93,6 +97,49 @@ test('historical metadata is isolated while current source and live checkout are
     assert.equal(existsSync(view), false, 'temporary source view must be cleaned up');
     assert.equal(readFileSync(path.join(cwd, workflow), 'utf8'), liveWorkflow);
     assert.equal(readFileSync(path.join(cwd, 'src/current.rs'), 'utf8'), liveSource);
+  });
+});
+
+test('root-relative sha256 manifest passes through the CLI without changing live inputs', async () => {
+  await fixture(async ({ cwd, options, marker }) => {
+    const helper = fileURLToPath(new URL('./frozen-workflow-check.mjs', import.meta.url));
+    execFileSync(process.execPath, [helper, '--workflow', workflow, '--revision', options.revision,
+      '--manifest', manifest, '--manifest-format', 'sha256-root', '--root', study,
+      '--root', 'src', '--root', 'research/archive', '--root', 'research/rotation',
+      '--root', 'Cargo.lock', '--', ...options.command],
+    { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
+    assert.equal(existsSync(readFileSync(marker, 'utf8')), false);
+    assert.equal(readFileSync(path.join(cwd, workflow), 'utf8'), liveWorkflow);
+    assert.equal(readFileSync(path.join(cwd, 'src/current.rs'), 'utf8'), liveSource);
+  }, { manifestFormat: 'sha256-root' });
+});
+
+test('root-relative frozen input drift is rejected before the validator executes', async () => {
+  await fixture(async ({ cwd, write, options, marker }) => {
+    write(study + '/input.json', '{"evidence":"replacement"}\n');
+    assert.throws(() => withFrozenWorkflow(options), /frozen input drift/);
+    assert.equal(existsSync(marker), false);
+    assert.equal(readFileSync(path.join(cwd, workflow), 'utf8'), liveWorkflow);
+  }, { manifestFormat: 'sha256-root' });
+});
+
+test('root-relative manifest cannot be repinned together with its input', async () => {
+  await fixture(async ({ cwd, write, options, marker }) => {
+    const replacement = '{"evidence":"replacement"}\n';
+    write(study + '/input.json', replacement);
+    const freeze = JSON.parse(readFileSync(path.join(cwd, manifest), 'utf8'));
+    freeze.sha256[study + '/input.json'] = sha(replacement);
+    write(manifest, JSON.stringify(freeze) + '\n');
+    assert.throws(() => withFrozenWorkflow(options), /original frozen manifest changed/);
+    assert.equal(existsSync(marker), false);
+  }, { manifestFormat: 'sha256-root' });
+});
+
+test('manifest layouts require an explicit supported format', async () => {
+  await fixture(async ({ options, marker }) => {
+    assert.throws(() => withFrozenWorkflow({ ...options, manifestFormat: 'guessed' }), /unsupported frozen manifest format/);
+    assert.throws(() => withFrozenWorkflow({ ...options, manifestFormat: 'sha256-root' }), /invalid frozen input digest map/);
+    assert.equal(existsSync(marker), false);
   });
 });
 

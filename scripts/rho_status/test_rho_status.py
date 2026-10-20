@@ -435,7 +435,14 @@ class WorkflowTests(unittest.TestCase):
         path = os.path.join(ROOT, ".github", "workflows", "ecc2k130-status.yml")
         with open(path, encoding="utf-8") as fh:
             text = fh.read()
-        self.assertIn("timeout-minutes: 35", text)
+        publish = text.split("\n  publish:\n", 1)[1]
+        # Scheduled/manual backfills retain 35 minutes; automatic pushes use
+        # the repository's 15-minute execution budget.
+        self.assertIn(
+            "timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || "
+            "github.event_name == 'schedule') && (35) || 15 }}",
+            publish,
+        )
         fetch = os.path.join(HERE, "fetch_via_walker.sh")
         with open(fetch, encoding="utf-8") as fh:
             script = fh.read()

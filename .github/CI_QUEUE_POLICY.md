@@ -38,6 +38,13 @@ daily snapshots instead of one snapshot for every main-branch push. These are
 intentional cadence changes. A scheduled check failure must still be investigated;
 moving the check does not establish that it passed.
 
+The native-m3 archive pins the workflow's original bytes. Its unchanged replay
+checker now runs in a temporary copy containing those exact historical workflow
+bytes and the current frozen inputs. The original manifest is checked against
+an immutable revision and every input digest is verified before execution.
+Only workflow metadata is substituted; the live checkout, archived evidence,
+and validator remain unchanged. A source or manifest mismatch still fails.
+
 ## Live disablement and migration
 
 The nine scheduled workflows were disabled through the Actions API during this
