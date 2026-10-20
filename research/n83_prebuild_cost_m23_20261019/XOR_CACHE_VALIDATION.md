@@ -88,3 +88,13 @@ The continuation changes examples and study code only; the solver/library
 tree and Cargo dependencies remain identical to the fully tested Linux
 candidate. Its Linux binaries and final source hashes must be recorded
 after the current remote card ends, before the next timed run starts.
+
+`full-m4-local-clippy.log` preserves the first lint failure: a new control
+predicate could be simplified, and an existing RSS conversion was an
+identity map on macOS. Both were corrected without changing units or
+policy. `full-m4-local-clippy-2.log` exits successfully; the local Clippy
+version still warns about the repository's pre-existing unknown
+`chunks_exact_to_as_chunks` allowance. No lint was disabled by this change.
+`full-m4-local-tests-2.log` repeats all **5 + 2 + 2 + 2** example checks
+successfully after the correction and the receipt auditor's directory
+symlink / root-UNSAT handling review.

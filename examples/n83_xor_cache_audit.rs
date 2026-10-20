@@ -87,6 +87,10 @@ fn safe_path(p: &str) -> Result<()> {
     )
 }
 fn inventory(root: &Path, dir: &Path, files: &mut BTreeSet<String>) -> Result<()> {
+    require(
+        !fs::symlink_metadata(dir)?.is_symlink(),
+        "symlink evidence directory",
+    )?;
     for e in fs::read_dir(dir)? {
         let e = e?;
         let t = e.file_type()?;
@@ -621,7 +625,9 @@ fn audit(root: &Path, archive: &str, manifest_hash: &str) -> Result<Value> {
                     "final phase binding",
                 )?;
                 require(
-                    w["counters"]["phase"] == "Complete"
+                    (w["counters"]["phase"] == "Complete"
+                        || (w["status"] == "UNVERIFIED_MODEL_UNSAT"
+                            && phases[5]["details"]["result"] == "Unsat"))
                         && number(&w, "memory_cgroup_peak_bytes")? <= 4294967296.0
                         && number(&w, "process_wall_ms")? < 1800000.0,
                     "final resources/counters",
@@ -646,7 +652,9 @@ fn audit(root: &Path, archive: &str, manifest_hash: &str) -> Result<Value> {
                     _ => return Err("invalid natural outcome".into()),
                 }
                 require(
-                    phases[5]["details"]["result"] == "Fixpoint"
+                    (phases[5]["details"]["result"] == "Fixpoint"
+                        || (w["status"] == "UNVERIFIED_MODEL_UNSAT"
+                            && phases[5]["details"]["result"] == "Unsat"))
                         && phases[7]["details"]["answer"]
                             == match w["status"].as_str().unwrap() {
                                 "UNKNOWN_search_cap" => "Unknown",

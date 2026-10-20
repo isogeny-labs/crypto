@@ -367,16 +367,9 @@ fn resource_usage() -> (Option<u64>, Option<f64>) {
     if unsafe { libc::getrusage(libc::RUSAGE_SELF, &mut usage) } != 0 {
         return (None, None);
     }
-    let rss = u64::try_from(usage.ru_maxrss).ok().map(|raw| {
-        #[cfg(target_os = "macos")]
-        {
-            raw
-        }
-        #[cfg(not(target_os = "macos"))]
-        {
-            raw.saturating_mul(1024)
-        }
-    });
+    let rss = u64::try_from(usage.ru_maxrss).ok();
+    #[cfg(not(target_os = "macos"))]
+    let rss = rss.map(|raw| raw.saturating_mul(1024));
     let tv = |t: libc::timeval| t.tv_sec as f64 + t.tv_usec as f64 * 1e-6;
     (rss, Some(tv(usage.ru_utime) + tv(usage.ru_stime)))
 }

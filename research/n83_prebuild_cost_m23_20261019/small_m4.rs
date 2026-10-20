@@ -70,9 +70,7 @@ fn check_full_pair(off: &Value, on: &Value) -> Result<()> {
             || w["public_corpus_sha256"] != PUBLIC_SHA256
             || !matches!(w["arm"].as_str(), Some("U" | "D"))
             || w["counters"]["phase"] != "Complete"
-            || !w["sat_model_blake3"]
-                .as_str()
-                .is_some_and(|s| s.len() == 64)
+            || w["sat_model_blake3"].as_str().is_none_or(|s| s.len() != 64)
         {
             return Err("full-base control contract differs".into());
         }
