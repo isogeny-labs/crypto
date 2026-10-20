@@ -156,6 +156,32 @@ independent replay, provider identity and spend, exact trigger bytes, each
 target's scalar and four-point sum, resource receipts, and the selector.
 Keep `BOUNDED_UNKNOWN` if any replay or Tier 1 admission gate fails.
 
+## Conditional one-target confirmation
+
+If and only if independent local replay of this tie-break records one
+`selected_candidate_id`, the primary confirmation uses the already sealed
+distribution holdout fixture (`holdout_targets_sha256 =
+e7dcb0fe5779f847d381017b3cb5fb7dd46b6a4a7e834611d200d7cbd6244f68`).
+Point `p00` is the primary previously unseen target; point `p01` supplies
+the reverse-order Tier 1 pair. Run IC then same-point rho on `p00`, and rho
+then same-point IC on `p01`, with three frozen calibration children before
+and after each pair. Charge each target's online IC interval from its first
+target-dependent query through scalar recovery and check, and rho from its
+first target-dependent walk through scalar recovery and check; keep cold IC
+setup and fixture construction separate. Replay both scalars and four-point
+group sums independently, preserve every failed child and resource receipt,
+and report each point's `rho_online_ms / IC_online_ms` separately. The `p00`
+ratio is the headline one-target result; `p01` checks order sensitivity.
+
+The confirmation may use a fresh Tier 1 RunPod only after the screen Pod has
+an absent-Pod receipt. Conservatively charge its full $0.52 four-hour
+reservation even if it terminates early, then reserve at most 80 minutes
+at $0.13/hour for an RTX 3070 instance, four frozen CPUs, at least 27 GB
+memory, a 65-minute producer cap, and 15 minutes for verification, transfer
+and provider termination. The resulting combined cap is below $5. A null
+tie-break selector leaves the confirmation undispatched and its result
+unknown.
+
 If the extension selects an arm, freeze fresh one-target public points and
 run an independently replayed Tier 1 IC/rho holdout in alternating order.
 Include complete cold and exclusive online costs, same-point scalar checks,
