@@ -35,3 +35,10 @@ This run is frozen before its timing starts:
   and the other is reported.
 - Local check on the merged tree, before the run: `cargo test --release --example
   koblitz_orbit_dlp_fast` 24 passed, 0 failed.
+
+- Finding at 06:00Z: the workflow `n83-padd-rank.yml` has state `disabled_manually`
+  (changed 2026-10-19T21:59:17Z, after the first run finished at 21:54Z), which is
+  why neither push started a run. This session cannot re-enable it (no Actions write
+  permission) and does not work around a deliberate disable. The replication run has
+  **not started**; it needs the owner to re-enable the workflow (or say which other
+  way to run it). Nothing in this file is a result.
