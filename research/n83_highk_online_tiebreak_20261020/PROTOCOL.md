@@ -102,6 +102,29 @@ archive SHA-256, provider snapshot and termination receipt. Independently
 replay every base, relation and scalar and recompute the selector from the
 archived bytes before promoting a result.
 
+The conditional Pod implementation is `runpod_runner.py` and
+`launch_on_pod.sh`. The controller must run `check_trigger.py` against the
+locally replayed aggregate and archive immediately before allocation and
+again immediately before dispatch. Its `n83.online-tiebreak-runpod-snapshot/v1`
+records the provider's single Pod, UTC creation and stop times, price,
+machine and CPU allocation, the confirmed earlier campaign charge, the $5
+combined cap, pinned source HEAD, and trigger receipt/aggregate/archive
+SHA-256 values. The matching `n83.online-tiebreak-runpod-allocation/v1`
+contains the same Pod fields, snapshot SHA-256, and trigger hashes. Copy the
+frozen tie-break package to the pinned `e7634a8` checkout, validate the
+fixture there, then run the launcher with the allocation and trigger under
+the recorded four-CPU affinity. The runner rejects a changed trigger,
+checkout, price, affinity, or cgroup envelope before it starts a timed child.
+
+After `DONE`, transfer `results/` and `raw_results.tar.gz`, verify the
+Pod-side SHA-256, stop and terminate the Pod, and retain the provider charge
+and termination receipt. Run `aggregate_runpod.py` with the snapshot, raw
+archive, extracted results, pinned source HEAD, and the same prior aggregate
+and archive used for dispatch. It checks archive bytes before and after
+independent replay, provider identity and spend, exact trigger bytes, each
+target's scalar and four-point sum, resource receipts, and the selector.
+Keep `BOUNDED_UNKNOWN` if any replay or Tier 1 admission gate fails.
+
 If the extension selects an arm, freeze fresh one-target public points and
 run an independently replayed Tier 1 IC/rho holdout in alternating order.
 Include complete cold and exclusive online costs, same-point scalar checks,

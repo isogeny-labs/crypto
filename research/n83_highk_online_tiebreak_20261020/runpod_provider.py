@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+"""Verify the tie-break allocation against its sealed provider snapshot."""
+
+import argparse
+import json
+from datetime import datetime
+from decimal import Decimal
+from pathlib import Path
+
+from research.n83_highk_online_distribution_20261020 import runpod_provider as prior
+from research.n83_highk_online_tiebreak_20261020 import runpod_runner
+
+
+def timestamp(value):
+    result = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if result.tzinfo is None:
+        raise ValueError("provider timestamp lacks timezone")
+    return result
+
+
+def verify(snapshot_path, results, head_sha):
+    snapshot = json.loads(snapshot_path.read_text())
+    trigger_path = results / "trigger.json"
+    allocation_path = results / "runpod_allocation.json"
+    trigger = runpod_runner.run.validate_trigger(trigger_path)
+    allocation = runpod_runner.read_allocation(allocation_path, trigger_path)
+    if (snapshot.get("schema") != "n83.online-tiebreak-runpod-snapshot/v1" or
+            snapshot.get("source_head_sha") != head_sha or
+            snapshot.get("trigger_receipt_sha256") != prior.digest(trigger_path) or
+            snapshot.get("trigger_aggregate_sha256") !=
+            trigger["trigger_aggregate_sha256"] or
+            snapshot.get("trigger_archive_sha256") !=
+            trigger["trigger_archive_sha256"] or
+            len(snapshot.get("pods", [])) != 1):
+        raise ValueError("tie-break provider snapshot differs")
+    pod = snapshot["pods"][0]
+    if (any(allocation.get(key) != pod.get(key) for key in
+            ("stratum", "pod_id", "machine_id", "desired_status", "cost_per_hr",
+             "image_name", "vcpu_count", "memory_in_gb", "cloud_type",
+             "compute_type", "gpu_type_id", "gpu_count", "created_utc",
+             "stop_after_utc", "cpu_affinity_ids")) or
+            allocation["source_head_sha"] != head_sha or
+            allocation["snapshot_sha256"] != prior.digest(snapshot_path)):
+        raise ValueError("allocation differs from provider snapshot")
+    prior_spend = Decimal(str(snapshot["confirmed_prior_spend_usd"]))
+    campaign_cap = Decimal(str(snapshot["approved_combined_cap_usd"]))
+    projected = (Decimal(str(pod["cost_per_hr"])) *
+                 Decimal(str((timestamp(pod["stop_after_utc"]) -
+                              timestamp(pod["created_utc"])).total_seconds())) /
+                 Decimal(3600))
+    if (prior_spend < 0 or projected <= 0 or
+            prior_spend + projected > campaign_cap or campaign_cap != Decimal("5")):
+        raise ValueError("tie-break allocation exceeds campaign cap")
+    host = json.loads((results / "host.json").read_text())
+    source = json.loads((results / "source.json").read_text())
+    after = json.loads((results / "screen/host_telemetry_after.json").read_text())
+    adapter_hash = prior.digest(Path(runpod_runner.__file__))
+    if (host.get("provider") != "runpod" or
+            host.get("git_sha") != head_sha or
+            host.get("runpod_pod_id") != pod["pod_id"] or
+            host.get("runpod_machine_id") != pod["machine_id"] or
+            host.get("runpod_frozen_cpu_affinity") != pod["cpu_affinity_ids"] or
+            host.get("visible_affinity") != pod["cpu_affinity_ids"] or
+            host.get("runpod_allocation_sha256") != prior.digest(allocation_path) or
+            host.get("runpod_adapter_sha256") != adapter_hash or
+            host.get("instance_id") !=
+            f"rp-{pod['pod_id']}-{pod['machine_id']}" or
+            source.get("runpod_allocation_sha256") != prior.digest(allocation_path) or
+            source.get("runpod_adapter_sha256") != adapter_hash or
+            not (timestamp(snapshot["recorded_utc"]) <=
+                 timestamp(host["recorded_utc"]) <=
+                 timestamp(after["recorded_utc"]) <=
+                 timestamp(pod["stop_after_utc"]))):
+        raise ValueError("tie-break provider binding differs")
+    return {"schema": "n83.online-tiebreak-runpod-provider-proof/v1",
+            "status": "PASS_SINGLE_RECORDED_RUNPOD_ALLOCATION",
+            "snapshot_sha256": prior.digest(snapshot_path),
+            "source_head_sha": head_sha,
+            "projected_new_spend_usd": str(projected),
+            "confirmed_prior_spend_usd": str(prior_spend),
+            "pod_id": pod["pod_id"], "machine_id": pod["machine_id"],
+            "cpu_affinity_ids": pod["cpu_affinity_ids"],
+            "allocation_sha256": prior.digest(allocation_path)}
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--snapshot", type=Path, required=True)
+    parser.add_argument("--results", type=Path, required=True)
+    parser.add_argument("--head-sha", required=True)
+    args = parser.parse_args()
+    print(json.dumps(verify(args.snapshot, args.results, args.head_sha), sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()
