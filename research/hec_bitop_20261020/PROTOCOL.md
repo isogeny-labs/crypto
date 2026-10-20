@@ -120,7 +120,13 @@ All recorded before any primary row was measured.
 1. **The instrument, fixed.**
    - **The harness:** `8e1ebba8c` adds `examples/hyperelliptic_ic_vs_rho_bitops.rs` and the counters (`src/prime_hyperelliptic/ops.rs`; counting rules in its module docs). It is run with `--arms fb-walk`, which is round seven's configuration, `--ic-trials 5 --rho-trials 40` and the default `--rho-variant full-width`.
    - **Seeds:** its defaults are round seven's: IC 20260916 and rho `0xC0FFEE` = 12648430.
-   - **The completeness check passed:** under Callgrind, instructions per counted gate on IC/rho were 1.01 (genus 2, `p = 41`, fb-walk), 0.99 (genus 2 baseline) and 1.16 (genus 3, `p = 23`), all below the 2× limit.
+   - **The coverage diagnostic met its threshold:** under Callgrind, instructions per counted gate on IC/rho were 1.01 (genus 2, `p = 41`, fb-walk), 0.99 (genus 2 baseline) and 1.16 (genus 3, `p = 23`), all below the 2× limit. As the amendment below says, this is a relative diagnostic, not proof that coverage is complete.
+   - **Known uncounted work, disclosed:**
+     - memory and data movement (clones into rho's table, the FB-walk's per-trial map, row swaps and merges, allocation);
+     - the internals of the random generator, which are charged one word operation per 64-bit draw and reported as `rng_words`;
+     - loop-control zero tests inside polynomial arithmetic, and per-call constants.
+
+     `fp_inv`'s exponentiation and the Tonelli loop are each priced as one `field_inv` or `field_sqrt` primitive, not step by step. Both arms execute all of these kinds of work.
    - **Rows seen while testing the instrument, with 1–2 trials, not used:**
      - genus 2 at `p = 41`, all three arms;
      - genus 3 at `p = 23`, fb-walk;
@@ -131,3 +137,22 @@ All recorded before any primary row was measured.
    - **Primary:** the primary measure counts it, because both arms execute it.
    - **Secondary:** a declared secondary ratio excludes it, using the JSON's `validation_subset`. It is reported beside the primary, and the verdicts use the primary.
 3. **Analysis in Rust.** The per-row ratios, bootstrap intervals and fits are computed by `examples/hec_bitop_analyse.rs`, not Python (AGENTS.md, "Implementation language").
+
+## Interpretation amendment (2026-10-20, before measurement)
+
+The frozen wording above is retained as the study plan. For clarity, it does
+not establish that all executed work is counted. `bitop/v1` is a reproducible
+accounting convention with frozen gate-equivalent model weights; “machine-
+independent” means only that the convention does not use a host's timing or
+instruction throughput to assign those weights. It is not a physical gate
+count, a synthesized-circuit cost, or a circuit lower bound. The formulas also
+make a declared choice of primitive cost model, including for multiplication;
+they do not establish that choice as a physical implementation cost.
+
+The Callgrind comparison is a relative coverage diagnostic between arms. A
+ratio within the protocol's 2× threshold does not prove complete
+instrumentation or validate the primitive prices. Any work known to be
+unpriced must be reported as a lower bound or under the stated §5a sensitivity
+band; missing or unverified counts cannot be treated as zero. Accordingly,
+the primary verdict is a comparison under the recorded `bitop/v1` convention
+and its disclosed coverage limits, not a claim about complete physical cost.
