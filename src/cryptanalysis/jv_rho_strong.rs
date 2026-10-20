@@ -423,6 +423,7 @@ fn collision_scalar(n: u64, same_y: bool, a: u64, b: u64, a2: u64, b2: u64) -> O
 
 /// One run of an arm on the instance `(p, instance_seed)`.
 pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun {
+    validate_options(o).expect("invalid strong rho options");
     let start = Instant::now();
     let p = spec.p;
     let n = spec.l;
@@ -720,6 +721,23 @@ mod tests {
             ..base
         })
         .is_ok());
+    }
+
+    #[test]
+    #[should_panic(expected = "invalid strong rho options")]
+    fn direct_strong_rho_rejects_empty_walker_batch() {
+        let spec = generate_spec(53, 1);
+        strong_rho(
+            &spec,
+            1,
+            0,
+            StrongOpts {
+                negation: true,
+                batch: 0,
+                dp_bits: 4,
+                r: 64,
+            },
+        );
     }
 
     #[test]
