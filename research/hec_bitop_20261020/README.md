@@ -54,7 +54,7 @@ reads 0.134 without it.
 
 **The code is not round seven's.** In the in-situ unit with the full-width
 rho, today's genus-4 ratios are 1.22, 0.87, 0.61, 0.62 and 0.13. Round seven's
-were 2.47, 1.79, 1.21, 1.16 and 0.15. So the move from 0.24× to 0.11× combines
+were 2.45, 1.79, 1.20, 1.15 and 0.15 (medians). So the move from 0.24× to 0.11× combines
 three things:
 - the algorithm changes made since round seven;
 - the corrected rho walk;

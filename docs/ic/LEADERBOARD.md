@@ -234,6 +234,44 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 [Frozen IC1 rows and candidate identities](../../research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json). The cold process includes base and index construction, relation rank, target recovery and producer verification. Rho's interval starts with its target-dependent walk and ends with scalar verification. This wall-time panel is kept separate from Tables A–C and their operation-unit S rankings.
 
 
+## Hyperelliptic Jacobians re-priced in bitop/v1, genus 2–4, outside tables A–C
+
+Round seven's 18 fb-walk rows (index calculus seed 20260916 × 5 runs, rho seed 0xC0FFEE × 40 runs per row) re-priced with both arms counted at the field, mod-N, hash and word level in `bitop/v1`, against the full-width rho walk. Genus 4 at p = 61, N = 16,790,591: IC/rho 0.114 [0.096, 0.138] (95% bootstrap); the preregistered verdict is that the row survives (upper bound below 1). Before: 0.24× in round seven's in-situ unit, with slope -0.29 [-0.42, -0.16].
+
+**Class:** accounting.  **Unit:** `bitop/v1`.  **Scope:** Toy hyperelliptic Jacobians (p ≤ 251, N ≤ 2^24), operation counts only; not an elliptic curve, and no deployed system is hyperelliptic. bitop/v1 is an accounting convention with frozen gate-equivalent weights, not a physical gate count; the Callgrind check is a relative coverage diagnostic. Known uncounted work (memory movement, generator internals, loop control) is disclosed in the protocol. No algorithm changed: the move from the before figure combines later code changes, the corrected rho walk and the unit. Read the [study](../../research/hec_bitop_20261020/README.md), the [protocol](../../research/hec_bitop_20261020/PROTOCOL.md) and the [frozen analysis](../../research/hec_bitop_20261020/analysis/analysis.json); the before mark is from [round seven](../../experiments/hyperelliptic_sparse_solve_r7/fbwalk_rows.json).
+
+Per row: mean bitop/v1 of index calculus over rho's with its 95% bootstrap interval; the same ratio excluding validation; post hoc, without rho's fixed precomputation and with the IC oracle charged twice; and the in-situ ratio against the full-width rho. Every row verified.
+
+| g | p | N | IC/rho bitop/v1 | 95% | excl. validation | post hoc: no rho precompute | post hoc: IC oracle ×2 | in-situ, full-width rho |
+|--:|--:|--:|--:|:--|--:|--:|--:|--:|
+| 2 | 41 | 1,321 | 0.207 | [0.164, 0.279] | 0.243 | 1.677 | 0.213 | 0.178 |
+| 2 | 61 | 1,399 | 0.221 | [0.198, 0.244] | 0.268 | 1.951 | 0.227 | 0.189 |
+| 2 | 101 | 4,663 | 0.299 | [0.281, 0.320] | 0.406 | 1.996 | 0.307 | 0.243 |
+| 2 | 151 | 7,949 | 0.430 | [0.393, 0.466] | 0.630 | 2.439 | 0.441 | 0.345 |
+| 2 | 211 | 11,813 | 0.556 | [0.518, 0.596] | 0.889 | 2.288 | 0.569 | 0.357 |
+| 2 | 251 | 61,667 | 0.524 | [0.467, 0.587] | 0.861 | 1.639 | 0.535 | 0.317 |
+| 3 | 23 | 6,299 | 0.200 | [0.170, 0.239] | 0.226 | 1.102 | 0.231 | 0.244 |
+| 3 | 31 | 7,333 | 0.257 | [0.223, 0.290] | 0.299 | 1.382 | 0.302 | 0.332 |
+| 3 | 41 | 6,679 | 0.305 | [0.267, 0.346] | 0.368 | 1.729 | 0.354 | 0.367 |
+| 3 | 61 | 124,459 | 0.301 | [0.270, 0.333] | 0.371 | 0.733 | 0.352 | 0.352 |
+| 3 | 101 | 364,747 | 0.357 | [0.318, 0.408] | 0.463 | 0.686 | 0.409 | 0.339 |
+| 3 | 151 | 1,180,351 | 0.431 | [0.370, 0.505] | 0.590 | 0.680 | 0.492 | 0.340 |
+| 3 | 211 | 4,620,611 | 0.454 | [0.401, 0.521] | 0.640 | 0.621 | 0.515 | 0.324 |
+| 4 | 17 | 5,639 | 0.767 | [0.595, 0.976] | 0.799 | 4.428 | 0.874 | 1.223 |
+| 4 | 23 | 30,223 | 0.535 | [0.467, 0.606] | 0.561 | 2.052 | 0.620 | 0.865 |
+| 4 | 31 | 239,753 | 0.385 | [0.340, 0.437] | 0.405 | 0.841 | 0.458 | 0.612 |
+| 4 | 41 | 333,041 | 0.437 | [0.375, 0.498] | 0.473 | 0.909 | 0.508 | 0.616 |
+| 4 | 61 | 16,790,591 | 0.114 | [0.096, 0.138] | 0.132 | 0.134 | 0.134 | 0.132 |
+
+Per genus: least-squares slope of log2(IC/rho) in bitop/v1 on log2 N, with a two-stage bootstrap 95% interval.
+
+| genus | rows | slope | 95% |
+|--:|--:|--:|:--|
+| 2 | 6 | +0.269 | [+0.138, +0.523] |
+| 3 | 7 | +0.095 | [+0.050, +0.148] |
+| 4 | 5 | -0.232 | [-0.320, -0.082] |
+
+
 ## Sources
 
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
@@ -259,6 +297,9 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
+- `research/hec_bitop_20261020/analysis/analysis.json` — sha256 `87615d6925b4ed8e…`
+- `experiments/hyperelliptic_sparse_solve_r7/fbwalk_rows.json` — sha256 `4772cf301a459700…`
+- `experiments/hyperelliptic_sparse_solve_r7/fits.json` — sha256 `4953de656e198a89…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `765f6e8d05ebbf75…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`

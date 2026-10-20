@@ -90,8 +90,8 @@ interpretation amendment.
   - At genus 4, $p = 61$, it is 14% of rho, and the row reads 0.134 without
     it.
 - *The code moved.* With the in-situ unit and the full-width rho, the genus-4
-  rows read 1.22, 0.87, 0.61, 0.62 and 0.13. Round seven read 2.47, 1.79, 1.21,
-  1.16 and 0.15.
+  rows read 1.22, 0.87, 0.61, 0.62 and 0.13. Round seven read 2.45, 1.79, 1.20,
+  1.15 and 0.15 (medians).
   - The move from 0.24 to 0.11 combines later algorithm changes, the corrected
     walk and the unit.
   - At the same head, the unit alone moves the row from 0.132 (in-situ) to
