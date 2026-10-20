@@ -7,7 +7,11 @@ with Deviations 1–4.
 (Phase A) and [`reports/run-20261019T2202Z-holdout/`](reports/run-20261019T2202Z-holdout/)
 (Phase B).
 **Unit:** `bitop/v1` ([`docs/units/BITOPS.md`](../../docs/units/BITOPS.md)), from
-PR #1970.
+PR #1970. It is a reproducible accounting convention with frozen model
+weights, not a physical gate count or synthesized-circuit cost. “Completely
+priced” means `ecbench` records no declared unpriced work; it does not prove
+every operation was instrumented. See the interpretation amendment in the
+protocol.
 
 Steps 1 and 2 of the bitop/v1 follow-ups:
 1. measure the exponents more precisely, on more runs and bigger curves;
@@ -18,7 +22,7 @@ Steps 1 and 2 of the bitop/v1 follow-ups:
 bit operations.
 **Phase B (hold-out):** 80 fresh targets a curve.
 - Every one of the 12,080 hold-out runs verified.
-- Every run is completely priced.
+- `ecbench` reports no declared unpriced work in each run; this status does not prove complete instrumentation.
 - Every session passes `ecbench verify --replay 2`.
 
 ## Results (hold-out, `ecbench bound fit --unit bitop/v1`)
@@ -50,7 +54,7 @@ any generic arm's interval excludes ½ by more than 0.05.
 **The fair test (step 2).**
 - **Verdict:** the per-size base *bends toward ½*, by the protocol's preregistered rule. Its 16–26 upper bound, 0.588, is below the bitop/v1 study's fixed-base 0.766.
 - **Same-study comparison:** its interval also lies entirely below the fixed base's from this same study (16–28: 0.573 [0.549, 0.600] against 0.838 [0.764, 0.921]).
-- **Success criterion:** this meets the protocol's success criterion, a verified, measured improvement over the index-calculus baseline in bitop/v1.
+- **Success criterion:** this meets the protocol's success criterion, a verified, measured improvement over the fixed-base index-calculus baseline under the declared bitop/v1 convention and recorded counters.
 - **Cost ratios:** the fixed base costs 1.0× (16 bits), 3.0× (24) and 8.4× (28) what the per-size base costs.
 - **Band:** the order holds across the AGENTS.md §5a band (weights 0, 0.1 and 1) at every size from 18 to 28 bits. At 17 bits the fixed base is cheaper, and at 16 bits the band does not separate them.
 
@@ -80,7 +84,7 @@ sizes and smaller at others.
 ## Scope and limits
 
 - **Curves and claims:** public synthetic curves and hash-to-subgroup targets; no security claim.
-- **What is measured:** bit-operation counts only, at isolation L0. Wall time is not used.
+- **What is measured:** captured bitop/v1 model counts at isolation L0. Wall time is not used; counter completeness and physical implementation cost are not established.
 - **Curve sample:** one curve per size, so curve-to-curve variation within a size is not sampled.
 - **Fits are per tier:** ecbench refuses a fit across its toy and medium tiers (Deviation 3).
 - **Selection crash:** one train run crashed. It was `pair-N617` at 39 bits, killed with signal 9 at 6.8 GB, most likely by the kernel's out-of-memory killer. That candidate was ineligible by the rule, and it is far from the selected 3,492.

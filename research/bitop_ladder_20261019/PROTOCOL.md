@@ -158,3 +158,24 @@ about 3,000× the floor and 7 s a run at 32 bits; the fixed-b32 arm stops at
    counted work it can detect nothing, and the A/A rule above is reported
    as uninformative, not as passed. (ecbench's A/A arm is a wall-time
    control; for counts, an A/A control needs a different seed.)
+
+
+## Interpretation amendment (2026-10-20)
+
+The frozen protocol and recorded outcomes are retained. Here, `bitop/v1` is
+a reproducible accounting convention with frozen gate-equivalent model
+weights. “Machine-independent” means that those weights are assigned by the
+convention rather than by host timing or instruction throughput. It does not
+mean a physical gate count, synthesized-circuit cost, or circuit lower bound;
+the primitive formulas, including the multiplication model, are declared
+choices rather than validated physical costs.
+
+“Completely priced” in the earlier protocol records the accounting status
+reported by `ecbench`: it means no unpriced work is declared by the captured
+counters. It does not prove every executed operation was instrumented. Replay
+validates the recorded session against its verifier, and the positive-control
+and A/A checks test specific consistency properties; none proves complete
+coverage or validates the formula weights. Consequently the reported fits,
+ratios, and success criterion are results under the stated `bitop/v1`
+convention and recorded counters, subject to these instrumentation limits.
+They make no physical-cost or security claim.

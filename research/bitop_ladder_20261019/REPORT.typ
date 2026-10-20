@@ -22,6 +22,15 @@ only. This study asks:
 
 Everything here was preregistered in `PROTOCOL.md`, including the verdict rules.
 
+*Interpretation.* `bitop/v1` is a reproducible accounting convention with
+frozen model weights, not a physical gate count, synthesized-circuit cost or
+circuit lower bound. “Completely priced” means `ecbench` reports no declared
+unpriced work in the captured counters; it does not prove that every executed
+operation was instrumented. Replay and the control checks validate specific
+properties of the records and comparisons, not full coverage or the physical
+validity of the primitive prices. Results below are comparisons under the
+stated convention and captured counters, with that limitation.
+
 = Method
 
 - *Curves.* One `a = −3` prime-order curve per size from 16 to 40 bits
@@ -31,14 +40,14 @@ Everything here was preregistered in `PROTOCOL.md`, including the verdict rules.
   34 bits, 4 from 35 to 40 bits.
   - Candidate bases come from a geometric grid with step $2^(1/2)$.
   - The winner is the base with the smallest mean bitop/v1 cost among bases
-    whose train runs all verified and are completely priced.
+    whose train runs all verified and have no declared unpriced work in the captured counters. This is not proof of complete instrumentation.
   - A winner at a grid edge triggers a one-step extension, at most three per
     size and arm.
   - It took 46 sessions and 2,296 runs: 2,295 verified, and one crashed (the
     kernel's out-of-memory killer, most likely, in a far-from-optimal
     candidate).
 - *Phase B, hold-out.* Target seed 20261019200, 80 targets a curve,
-  12,080 runs. Every run verified and is completely priced, and every
+  12,080 runs. Every run verified; `ecbench` reports no declared unpriced work in the captured counters. This does not prove complete instrumentation. Every
   session passes `ecbench verify --replay 2`.
 - *Arms.*
   - rho (negation): the reference;
@@ -106,8 +115,9 @@ copies (Deviation 4).
     bitop/v1 study's fixed-base 0.766.
   - Its 16–28-bit interval, [0.549, 0.600], lies below the fixed base's
     from this study, [0.764, 0.921].
-- *Success criterion: met.* This is a verified, measured improvement of the
-  index-calculus baseline in bitop/v1. The fixed base costs 1.0×, 3.0× and
+- *Success criterion: met.* This is a verified, measured improvement over the fixed-base
+  index-calculus baseline under the declared bitop/v1 convention and recorded
+  counters. The fixed base costs 1.0×, 3.0× and
   8.4× the per-size base at 16, 24 and 28 bits.
   - The §5a band orders the two at every size from 18 to 28 bits, at all
     three weights.
@@ -123,7 +133,7 @@ copies (Deviation 4).
 
 - *Curves and claims.* Public synthetic curves and targets; no security
   claim.
-- *Counts only.* No wall time is used.
+- *Counts only.* No wall time is used. Captured bitop/v1 model counts do not establish complete instrumentation or physical implementation cost.
 - *Curve sample.* One curve per size.
 - *Deviations.* Four are recorded in `PROTOCOL.md`: the cards were split by
   the agent harness's time limit, the extension files were renamed, the fits
