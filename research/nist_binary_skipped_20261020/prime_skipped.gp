@@ -1,6 +1,7 @@
 \\ Check the curve models of the prime-run candidates (Rust) against the
 \\ 2026-10-16 census. Inputs (prepended by prime_skipped.sh): MODELS, ORDERS,
 \\ RUN. Output: model <run> <i> <p> <b> <N> <recount = census> <N prime> <[N]P = O>
+default(parisizemax, 4000000000);
 {
 my(L=externstr(Str("cat ",MODELS)), O=externstr(Str("cat ",ORDERS)), rec=Map());
 for(k=1,#O, my(w=strsplit(O[k]," ")); mapput(rec, eval(w[1]), eval(w[2])));

@@ -29,7 +29,8 @@ subgroup order against `m`, with the FIPS security thresholds `n ≥ 2^{2s}`
 
 ```text
 research/nist_binary_skipped_20261020/census.sh     # about 30 s on one core
-cargo test --release --lib nist_seed_provenance     # 8 tests
+cargo test --release --lib nist_seed_provenance     # 9 tests
+research/nist_binary_skipped_20261020/prime_skipped.sh   # about 2 min
 ```
 
 - **Candidates (Rust).** `examples/nist_binary_seed_candidates.rs` reads
@@ -142,6 +143,49 @@ available here do not separate it from `m = 283`:
 almost-prime order there, with a 283-bit `n` against K₀'s 281 bits. FIPS took
 `K_0` anyway, which fits `a = 0` on the four large K-curves.
 
+### Prime curves: the 11 skipped candidates, named
+
+The 2026-10-16 census found 21 accepted candidates (prime order, `bitlen(n) ≤
+bitlen(p)`, not anomalous, MOV) across the six prime runs. 10 were published
+and 11 were not. To name those 11, each candidate needs its `b`, not only
+`b²`.
+
+- **The root rule** (`x962_b_root`): `b²^((p+1)/4)` when `p ≡ 3 (mod 4)`.
+  Otherwise, the negated Tonelli–Shanks root, with the least non-residue as
+  `z`. It reproduces all ten published `b` (test
+  `the_1997_root_rule_gives_every_published_prime_b`).
+- **Models** (Rust, `examples/nist_prime_candidate_models.rs`): the model
+  `y² = x³ − 3x + b` of each accepted candidate.
+- **Checks** (GP, `prime_skipped.gp`): `prime_skipped.sh` recounts each
+  model with `ellcard` and compares it with the census order.
+- **Measured** (`census/prime_models.txt`), on all 21 models:
+  - the recount equals the recorded census order;
+  - `N` is prime;
+  - `[N]P = O` at three random points.
+- **Positive control.** For each of the 10 published curves, the ICV1
+  identity computed here is already in the registry, model hash included.
+
+| field | run (`srand48`) | candidate | ICV1 |
+|---|---|---:|---|
+| p256 | 871696354 | 876 | `icv1-fp256-t105867235723906477692553525193676385009-a67f0bc0` |
+| p224 | 891607927 | 777 | `icv1-fp224-t3901553279810317031433354100437823-678d288d` |
+| p224 | 891607927 | 1485 | `icv1-fp224-t160144979725177297209579645503161-eb89557e` |
+| p224 | 891607927 | 5736 | `icv1-fp224-t3224555599954095973222272472665529-02fd4a93` |
+| p192 | 863966734 | 2198 | `icv1-fp192-t129206357909530666949855705783-7b13329f` |
+| p192 | 863966734 | 5405 | `icv1-fp192-t74833800813696691018643670623-451ee7e6` |
+| p239 | 863711343 | 36 | `icv1-fp239-t1372818672269960337649506790623857933-33e03c6d` |
+| p239 | 863711343 | 1562 | `icv1-fp239-tm212979043306305046992073578916190239-283a4bfa` |
+| p239 | 863711343 | 2491 | `icv1-fp239-tm282982696996081900270513229575094413-9c88d2da` |
+| p239 | 863711343 | 2682 | `icv1-fp239-tm115978852368569857142798214995901191-c8c51d61` |
+| p239 | 863711343 | 2863 | `icv1-fp239-t839727583499860327191657852262033049-6b52f54b` |
+
+- **p224.** `p ≡ 1 (mod 4)`, so `b` and `−b` give isomorphic curves with the
+  same order. The ICV1 model hash uses the root the rule gives.
+- **The other primes.** `−b` would give the quadratic twist, not the same
+  curve.
+- **The p239 rows.** These are skipped X9.62 `prime239` candidates, not NIST
+  P-curves.
+
 ## Derived (not measured)
 
 - **The prime runs.** Up to their last published seed, the six prime runs
@@ -164,14 +208,19 @@ almost-prime order there, with a 283-bit `n` against K₀'s 281 bits. FIPS took
 least sparse irreducible modulus, `koblitz: true`), so
 `scripts/build_curve_registry.py` registers it as
 `icv1-f2m277-t412886371405096939848969796546990392459541-c0810384`
-(`end = −7`). The B-curve runs skipped nothing,
-so they add no new curves.
+(`end = −7`). The same file
+records the 11 skipped prime-run candidates above (`end = unk`). The B-curve
+runs skipped nothing, so they add no new curves. The 12 entries are spliced
+into `main`'s `docs/curves/registry.json` and `src/cryptanalysis/curve_aliases.json`
+in the builder's order and format. A full rebuild of this tree writes about
+5,400 further curves that are unrelated to this study.
 
 ## Open
 
 - The B-163 seed.
 - The base points of the binary curves.
 - Why `m = 283` over `m = 277`. Nothing in this census explains it.
+- Why the 11 prime-run candidates were skipped. They are now named and registered, but the rule that skipped them is still unknown.
 - The prime-curve skip filter (unchanged).
 
 ## Files
@@ -186,5 +235,6 @@ so they add no new curves.
 | `census/orders_<curve>.txt` | `calib` line, then `cand i seed b_pb N prime mov checks` (GP) |
 | `census/summary.json` | per-run counts and accepted indices |
 | `census/koblitz_sweep.txt` | the Koblitz degree sweep (Rust) |
-| `census/registry_records.json` | the `m = 277` curve's model, the registry's source for it |
+| `census/registry_records.json` | the models of the 12 curves this study registers (registry source) |
+| `prime_skipped.sh`, `prime_skipped.gp`, `census/prime_models.txt` | prime-run models (Rust) recounted and checked (GP): `model run i p b N recount_ok prime mul_ok` |
 | `../../examples/nist_binary_seed_candidates.rs`, `../../examples/koblitz_degree_sweep.rs`, `../../src/cryptanalysis/nist_seed_provenance.rs` | native enumeration, sweep and tests |
