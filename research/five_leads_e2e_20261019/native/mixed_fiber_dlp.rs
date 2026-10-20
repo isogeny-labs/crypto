@@ -202,7 +202,6 @@ fn solve(
     xs: &[Vec<u64>; 3],
     seed: u64,
 ) -> serde_json::Value {
-    e.f.reset();
     let mut draw_count = 0;
     let points: [Vec<Point>; 3] = std::array::from_fn(|j| lifted(e, &xs[j]));
     let mut projected = BTreeSet::new();
@@ -279,7 +278,7 @@ fn solve(
 }
 fn main() {
     for (p, d) in [(97, 8), (193, 12), (257, 16)] {
-        for (a, b, order, r, chosen) in source_curves(p, d) {
+        for (a, b, order, r, _fixture_cosets) in source_curves(p, d) {
             let preparer = curve(p, a, b);
             let h = order / r;
             assert!(r >= 23 && h % r != 0, "ineligible source subgroup");
@@ -313,6 +312,7 @@ fn main() {
                 let rho_verify_counts = rho_check_curve.f.counts();
                 for arm in ["homogeneous", "mixed", "random"] {
                     let e = curve(p, a, b);
+                    let chosen = selected_cosets(&e, primitive(&e.f), d).expect("fixture cosets");
                     let mut xs: [Vec<u64>; 3] = std::array::from_fn(|j| {
                         if arm == "homogeneous" {
                             chosen[0].clone()
@@ -333,13 +333,15 @@ fn main() {
                             selection_draws += draws;
                         }
                     }
+                    let selection_counts = e.f.counts();
                     let out = solve(&e, g, target, h, r, &xs, rho_seed);
                     println!(
                         "{}",
-                        json!({"schema":"mixed-fiber-dlp/v1","p":p,"a":a,"b":b,"d":d,
+                        json!({"schema":"mixed-fiber-dlp/v2","p":p,"a":a,"b":b,"d":d,
                         "order":order,"r":r,"h":h,"generator":[g.x,g.y],"target_index":target_index,
                         "target":[target.x,target.y],"planted_scalar_check_only":secret,
                         "arm":arm,"fibers":xs,"selection_draws_uncharged":selection_draws,
+                        "selection_counts":selection_counts,
                         "candidate":out,"rho":{"recovered":rho.recovered,"verified":rho_correct,
                         "counts":rho.counts + rho_verify_counts,"native":rho.native}})
                     );
