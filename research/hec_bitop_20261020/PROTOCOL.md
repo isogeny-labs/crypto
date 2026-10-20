@@ -116,3 +116,22 @@ curves, and every instance here is a public toy.
 ## Deviations
 
 None yet.
+
+## Interpretation amendment (2026-10-20, before measurement)
+
+The frozen wording above is retained as the study plan. For clarity, it does
+not establish that all executed work is counted. `bitop/v1` is a reproducible
+accounting convention with frozen gate-equivalent model weights; “machine-
+independent” means only that the convention does not use a host's timing or
+instruction throughput to assign those weights. It is not a physical gate
+count, a synthesized-circuit cost, or a circuit lower bound. The formulas also
+make a declared choice of primitive cost model, including for multiplication;
+they do not establish that choice as a physical implementation cost.
+
+The Callgrind comparison is a relative coverage diagnostic between arms. A
+ratio within the protocol's 2× threshold does not prove complete
+instrumentation or validate the primitive prices. Any work known to be
+unpriced must be reported as a lower bound or under the stated §5a sensitivity
+band; missing or unverified counts cannot be treated as zero. Accordingly,
+the primary verdict is a comparison under the recorded `bitop/v1` convention
+and its disclosed coverage limits, not a claim about complete physical cost.
