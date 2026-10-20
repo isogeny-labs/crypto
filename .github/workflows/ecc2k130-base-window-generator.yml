@@ -40,6 +40,8 @@ jobs:
             /src/*
             /examples/koblitz_base_window.rs
             /research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
+            /.github/scripts/frozen-lock-source.sh
+            /.github/scripts/frozen-lock-source.files
             /research/notes/ecc2k130/base_window_screen_20261001/*
             /research/notes/ecc2k130/base_window_screen_20261001/development/*
             /research/notes/ecc2k130/disjoint_cold_v2_outcome_20261001/evidence_run_36803331080/raw/n41_L1024.tar.gz
@@ -59,6 +61,7 @@ jobs:
             ac5cd7a3459be776180afe1eb2975c76b1a88f84bd1e99aa20475927ec260a90 \
             research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock | sha256sum -c -
           cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh
           cargo build --locked --example koblitz_base_window
       - name: Replay frozen-source toy and archived n41 controls
         run: |
