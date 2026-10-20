@@ -6,6 +6,10 @@ on:
     paths:
       - .github/workflows/n83-root4-wide3.yml
       - research/n83_root4_wide3_20261016/**
+  pull_request:
+    branches: [main]
+    paths:
+      - research/n83_root4_wide3_20261016/**
   workflow_dispatch:
 
 permissions:
@@ -15,7 +19,7 @@ jobs:
   n83-root4-wide3-preflight:
     if: github.repository == 'aburan28/crypto'
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
     steps:
       - uses: actions/checkout@v4
       - name: Regenerate and verify fresh public fixture
