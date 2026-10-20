@@ -80,6 +80,25 @@ This accounting synthesis is published on every performance handoff. It does not
 | `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent | 0.261 | 0.0509 | **5.11×** | 0.0242 | 10.8× | ✓ |
 | `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent | 0.488 | 0.0531 | **9.2×** | 0.0225 | 21.7× | ✓ |
 
+## Table D: Joux-Vitse sieve on E(F_p^6), weak class only (outside tables A-C)
+
+**Scope: Curves y^2 = h(x)(x - a)(x - sigma a) over F_{p^6} with full rational 2-torsion whose isogeny class contains a weak curve (about 55-63% of such curves, ledger 18.5). The class never has prime order. The cover's Jacobian has genus 3. Not a statement about any prime-order or generic curve.**
+
+- **Unit:** S = F_p multiplications / (331 * sqrt(l)), the harness unit of ledger 6 (331 = one affine addition on E(F_q^3)); S+ also charges every F_p addition, lookup and native operation one multiplication.
+- **Reference:** `rho.R3`, Pollard rho with the negation map, batched inversion (k = 16) and distinguished points, on the same instances and host, priced in the harness unit and in a tuned unit (Karatsuba products, Chung-Hasan squarings) that credits rho alone; 16 runs per size.
+- **Source:** [`research/jv_sieve_strong_rho_20261019/summary.json`](../../research/jv_sieve_strong_rho_20261019/summary.json). Class: measurement of an existing algorithm against a strong reference; weak curve class only.
+- Ratios are paired by instance; intervals are 95% bootstrap over instances. A ratio below 1 is the sieve cheaper; the gap to the strong rho is the distance remaining, not a gate.
+
+| p | log2 l | S sieve | S+ sieve | S rho (harness / tuned) | S+ rho (harness / tuned) | sieve/rho, S (harness) | sieve/rho, S (tuned) | sieve/rho, S+ (harness) | sieve/rho, S+ (tuned) | ranked over the 5a band | ok |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|:--|
+| 251 | 45.8 | 15.28 [4.634, 34.62] | 35.84 [11.89, 78.94] | 0.827 / 0.344 | 0.975 / 0.492 | 18.47 [5.345, 46.6] | 44.41 [12.86, 108.5] | 36.76 [11.71, 88.56] | 72.9 [22.93, 175.6] | unresolved at some weight | ✓ |
+| 503 | 51.8 | 0.3625 [0.2644, 0.4708] | 1.195 [0.8394, 1.589] | 0.758 / 0.315 | 0.893 / 0.451 | 0.4783 [0.3482, 0.6398] | 1.149 [0.8418, 1.532] | 1.338 [0.9349, 1.82] | 2.652 [1.853, 3.624] | unresolved at some weight | ✓ |
+| 1009 | 57.9 | 0.01954 [0.01607, 0.02313] | 0.06346 [0.05539, 0.0711] | 0.808 / 0.336 | 0.952 / 0.480 | 0.02419 [0.01848, 0.03108] | 0.05814 [0.04443, 0.07413] | 0.06666 [0.05317, 0.08372] | 0.1321 [0.1047, 0.1648] | sieve below rho at every weight | ✓ |
+| 1511 | 61.4 | 0.007043 [0.00613, 0.008193] | 0.0254 [0.02363, 0.02732] | 0.780 / 0.325 | 0.920 / 0.464 | 0.009024 [0.007029, 0.01203] | 0.02169 [0.01686, 0.02891] | 0.02762 [0.02214, 0.03598] | 0.05473 [0.04392, 0.07129] | sieve below rho at every weight | ✓ |
+| 1823 | 63.0 | 0.003761 [0.003228, 0.004337] | 0.01605 [0.0148, 0.01736] | 0.887 / 0.369 | 1.045 / 0.527 | 0.004241 [0.003238, 0.005753] | 0.01019 [0.00779, 0.01381] | 0.01535 [0.01246, 0.01959] | 0.03043 [0.02486, 0.03843] | sieve below rho at every weight | ✓ |
+
+Fitted exponent of total F_p multiplications against l over the sizes above: sieve -0.122 [-0.165, -0.084] (theory 1/3), strong rho 0.508 [0.480, 0.538] (theory 1/2). Pre-registered kill rules: K1 fired at p = none; K2 narrowed at p = none.
+
 ## Phases, as a share of S
 
 Shares are fractions of each row's own `S`, so they carry no unit; read each row in the table named in its first column.
@@ -242,6 +261,7 @@ Copied from native analysis: eight independent one-target workloads per fixed cu
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `765f6e8d05ebbf75…`
+- `research/jv_sieve_strong_rho_20261019/summary.json` — sha256 `8e4857c4b4603e34…`
 - `docs/curves/registry.json` — sha256 `03f63efa54482b2e…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `ab4891397fe07fca…`

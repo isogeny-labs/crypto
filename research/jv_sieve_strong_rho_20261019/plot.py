@@ -65,8 +65,9 @@ ax.set_xticks(range(len(sizes)))
 ax.set_xticklabels([f"p={e['p']}" for e in sizes])
 ax.set_ylabel("S (harness price), mean ± 95% CI, n = 16")
 ax.set_title("Rho in this tower: what negation and batched inversion each buy", fontsize=9)
-ax.legend(fontsize=8)
+ax.legend(fontsize=8, ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.08))
 ax.grid(alpha=0.3)
+fig.tight_layout()
 save(fig, "rho_factorial")
 
 # 4. dense vs sparse

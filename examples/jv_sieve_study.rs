@@ -28,8 +28,15 @@ fn load(dir: &str, name: &str) -> Option<Vec<Value>> {
     let mut out: Vec<(u64, Vec<Value>)> = vec![];
     for e in fs::read_dir(format!("{dir}/raw")).ok()?.flatten() {
         let fname = e.file_name().to_string_lossy().to_string();
-        let Some(rest) = fname.strip_prefix(&format!("{name}_s")) else { continue };
-        let Some(seed) = rest.strip_suffix(".json").and_then(|x| x.parse::<u64>().ok()) else { continue };
+        let Some(rest) = fname.strip_prefix(&format!("{name}_s")) else {
+            continue;
+        };
+        let Some(seed) = rest
+            .strip_suffix(".json")
+            .and_then(|x| x.parse::<u64>().ok())
+        else {
+            continue;
+        };
         if !e.path().with_extension("done").exists() {
             continue; // an unfinished job
         }
@@ -74,7 +81,9 @@ fn boot<F: Fn(&[usize]) -> f64>(n: usize, seed: u64, stat: F) -> [f64; 2] {
     [pct(out.clone(), 0.025), pct(out, 0.975)]
 }
 fn mean_ci(x: &[f64], seed: u64) -> Value {
-    let ci = boot(x.len(), seed, |i| mean(&i.iter().map(|&j| x[j]).collect::<Vec<_>>()));
+    let ci = boot(x.len(), seed, |i| {
+        mean(&i.iter().map(|&j| x[j]).collect::<Vec<_>>())
+    });
     json!({"n": x.len(), "mean": mean(x), "sd": sd(x), "ci95": ci})
 }
 /// "IC<rho" when the whole interval of IC/rho lies below 1, "rho<IC" when above,
@@ -163,10 +172,17 @@ fn rho_rows(v: &[Value]) -> Vec<Rho> {
             mt: f(r, "muls_tuned"),
             steps: f(r, "steps"),
             fp_adds: fo(r, "fp_adds"),
-            native: ["canon_cmp", "hash", "dp_check", "scalar_ops", "table_ops", "cycle_cmp"]
-                .iter()
-                .map(|k| fo(r, k))
-                .sum(),
+            native: [
+                "canon_cmp",
+                "hash",
+                "dp_check",
+                "scalar_ops",
+                "table_ops",
+                "cycle_cmp",
+            ]
+            .iter()
+            .map(|k| fo(r, k))
+            .sum(),
             wall: f(r, "wall_ms"),
             ok: r["correct"].as_bool() == Some(true) && r["capped"].as_bool() != Some(true),
         })
@@ -175,9 +191,15 @@ fn rho_rows(v: &[Value]) -> Vec<Rho> {
 
 /// OLS slope of ln y on ln x.
 fn slope(x: &[f64], y: &[f64]) -> f64 {
-    let (lx, ly): (Vec<f64>, Vec<f64>) = (x.iter().map(|v| v.ln()).collect(), y.iter().map(|v| v.ln()).collect());
+    let (lx, ly): (Vec<f64>, Vec<f64>) = (
+        x.iter().map(|v| v.ln()).collect(),
+        y.iter().map(|v| v.ln()).collect(),
+    );
     let (mx, my) = (mean(&lx), mean(&ly));
-    lx.iter().zip(&ly).map(|(a, b)| (a - mx) * (b - my)).sum::<f64>()
+    lx.iter()
+        .zip(&ly)
+        .map(|(a, b)| (a - mx) * (b - my))
+        .sum::<f64>()
         / lx.iter().map(|a| (a - mx).powi(2)).sum::<f64>()
 }
 /// Slope with a stratified bootstrap (instances resampled within each size).
@@ -201,7 +223,10 @@ fn fit(groups: &[(Vec<f64>, Vec<f64>)], seed: u64) -> Value {
             .iter()
             .map(|(gx, gy)| {
                 let idx: Vec<usize> = (0..gx.len()).map(|_| rng.gen_range(0..gx.len())).collect();
-                (idx.iter().map(|&i| gx[i]).collect(), idx.iter().map(|&i| gy[i]).collect())
+                (
+                    idx.iter().map(|&i| gx[i]).collect(),
+                    idx.iter().map(|&i| gy[i]).collect(),
+                )
             })
             .collect();
         out.push(flat(&g));
@@ -243,9 +268,12 @@ fn main() {
             let mut band = vec![];
             for &w in &BAND {
                 let a_emit = g(&|r| (r.muls / GAE + w * (r.adds + r.lookups + r.enum_adds)) / sq);
-                let a_bound = g(&|r| (r.muls / GAE + w * (r.adds + r.lookups + r.enum_adds + r.unemitted_bound)) / sq);
+                let a_bound = g(&|r| {
+                    (r.muls / GAE + w * (r.adds + r.lookups + r.enum_adds + r.unemitted_bound)) / sq
+                });
                 let b_emit = g(&|r| (r.muls / GAE + w * r.lookups) / sq);
-                let b_bound = g(&|r| (r.muls / GAE + w * (r.lookups + r.unemitted_bound * 0.0)) / sq);
+                let b_bound =
+                    g(&|r| (r.muls / GAE + w * (r.lookups + r.unemitted_bound * 0.0)) / sq);
                 band.push(json!({"w": w, "A_emitted": mean(&a_emit), "A_with_unemitted_bound": mean(&a_bound),
                                  "B_emitted": mean(&b_emit), "B": mean(&b_bound)}));
             }
@@ -274,8 +302,15 @@ fn main() {
             }
             if p == 1009 {
                 if let Some(aa) = load(&dir, "ic_1009_sparse_aa").map(|v| ic_rows(&v)) {
-                    let same = ic.iter().zip(&aa).filter(|(a, b)| a.muls == b.muls && a.digest == b.digest).count();
-                    entry.insert("ic_aa".into(), json!({"pairs": ic.len().min(aa.len()), "identical_counts": same}));
+                    let same = ic
+                        .iter()
+                        .zip(&aa)
+                        .filter(|(a, b)| a.muls == b.muls && a.digest == b.digest)
+                        .count();
+                    entry.insert(
+                        "ic_aa".into(),
+                        json!({"pairs": ic.len().min(aa.len()), "identical_counts": same}),
+                    );
                 }
             }
             // rho arms
@@ -283,32 +318,65 @@ fn main() {
             for (name, rs) in &arms {
                 let h: Vec<f64> = rs.iter().map(|r| r.mh / (GAE * sq)).collect();
                 let t: Vec<f64> = rs.iter().map(|r| r.mt / (GAE * sq)).collect();
-                let hp: Vec<f64> = rs.iter().map(|r| (r.mh + r.fp_adds + r.native) / (GAE * sq)).collect();
-                let tp: Vec<f64> = rs.iter().map(|r| (r.mt + r.fp_adds + r.native) / (GAE * sq)).collect();
+                let hp: Vec<f64> = rs
+                    .iter()
+                    .map(|r| (r.mh + r.fp_adds + r.native) / (GAE * sq))
+                    .collect();
+                let tp: Vec<f64> = rs
+                    .iter()
+                    .map(|r| (r.mt + r.fp_adds + r.native) / (GAE * sq))
+                    .collect();
                 let steps: Vec<f64> = rs.iter().map(|r| r.steps / sq).collect();
                 let mut e = serde_json::Map::new();
                 e.insert("all_correct".into(), json!(rs.iter().all(|r| r.ok)));
                 e.insert("steps_over_sqrt_l".into(), mean_ci(&steps, sd_ + 10));
                 e.insert("S_harness".into(), mean_ci(&h, sd_ + 11));
-                e.insert("muls_harness".into(), mean_ci(&rs.iter().map(|r| r.mh).collect::<Vec<_>>(), sd_ + 16));
-                e.insert("muls_tuned".into(), mean_ci(&rs.iter().map(|r| r.mt).collect::<Vec<_>>(), sd_ + 17));
+                e.insert(
+                    "muls_harness".into(),
+                    mean_ci(&rs.iter().map(|r| r.mh).collect::<Vec<_>>(), sd_ + 16),
+                );
+                e.insert(
+                    "muls_tuned".into(),
+                    mean_ci(&rs.iter().map(|r| r.mt).collect::<Vec<_>>(), sd_ + 17),
+                );
                 e.insert("S_tuned".into(), mean_ci(&t, sd_ + 12));
                 e.insert("S_plus_harness".into(), mean_ci(&hp, sd_ + 13));
                 e.insert("S_plus_tuned".into(), mean_ci(&tp, sd_ + 14));
-                e.insert("wall_s".into(), mean_ci(&rs.iter().map(|r| r.wall / 1e3).collect::<Vec<_>>(), sd_ + 15));
+                e.insert(
+                    "wall_s".into(),
+                    mean_ci(
+                        &rs.iter().map(|r| r.wall / 1e3).collect::<Vec<_>>(),
+                        sd_ + 15,
+                    ),
+                );
                 let mut band = vec![];
                 for &w in &BAND {
-                    let a: Vec<f64> = rs.iter().map(|r| (r.mh / GAE + w * (r.native + r.fp_adds)) / sq).collect();
-                    let at: Vec<f64> = rs.iter().map(|r| (r.mt / GAE + w * (r.native + r.fp_adds)) / sq).collect();
-                    let b: Vec<f64> = rs.iter().map(|r| (r.mh / GAE + w * r.native) / sq).collect();
-                    let bt: Vec<f64> = rs.iter().map(|r| (r.mt / GAE + w * r.native) / sq).collect();
+                    let a: Vec<f64> = rs
+                        .iter()
+                        .map(|r| (r.mh / GAE + w * (r.native + r.fp_adds)) / sq)
+                        .collect();
+                    let at: Vec<f64> = rs
+                        .iter()
+                        .map(|r| (r.mt / GAE + w * (r.native + r.fp_adds)) / sq)
+                        .collect();
+                    let b: Vec<f64> = rs
+                        .iter()
+                        .map(|r| (r.mh / GAE + w * r.native) / sq)
+                        .collect();
+                    let bt: Vec<f64> = rs
+                        .iter()
+                        .map(|r| (r.mt / GAE + w * r.native) / sq)
+                        .collect();
                     band.push(json!({"w": w, "A_harness": mean(&a), "A_tuned": mean(&at), "B_harness": mean(&b), "B_tuned": mean(&bt)}));
                 }
                 e.insert("band".into(), json!(band));
                 // paired ratios against the sieve (same instance seeds)
                 let seeds_r: Vec<u64> = rs.iter().map(|r| r.seed).collect();
                 let pick = |fx: &dyn Fn(&Ic) -> f64| -> Vec<f64> {
-                    ic.iter().filter(|r| seeds_r.contains(&r.seed)).map(fx).collect()
+                    ic.iter()
+                        .filter(|r| seeds_r.contains(&r.seed))
+                        .map(fx)
+                        .collect()
                 };
                 let rho_sorted: Vec<&Rho> = ic
                     .iter()
@@ -320,25 +388,56 @@ fn main() {
                     let ic_sp = pick(&|r| r.s_plus);
                     let rh: Vec<f64> = rho_sorted.iter().map(|r| r.mh / (GAE * sq)).collect();
                     let rt: Vec<f64> = rho_sorted.iter().map(|r| r.mt / (GAE * sq)).collect();
-                    let rhp: Vec<f64> = rho_sorted.iter().map(|r| (r.mh + r.fp_adds + r.native) / (GAE * sq)).collect();
-                    let rtp: Vec<f64> = rho_sorted.iter().map(|r| (r.mt + r.fp_adds + r.native) / (GAE * sq)).collect();
-                    e.insert("ic_over_rho".into(), json!({
-                        "S_harness": ratio_ci(&ic_s, &rh, sd_ + 20),
-                        "S_tuned": ratio_ci(&ic_s, &rt, sd_ + 21),
-                        "S_plus_harness": ratio_ci(&ic_sp, &rhp, sd_ + 22),
-                        "S_plus_tuned": ratio_ci(&ic_sp, &rtp, sd_ + 23),
-                    }));
+                    let rhp: Vec<f64> = rho_sorted
+                        .iter()
+                        .map(|r| (r.mh + r.fp_adds + r.native) / (GAE * sq))
+                        .collect();
+                    let rtp: Vec<f64> = rho_sorted
+                        .iter()
+                        .map(|r| (r.mt + r.fp_adds + r.native) / (GAE * sq))
+                        .collect();
+                    e.insert(
+                        "ic_over_rho".into(),
+                        json!({
+                            "S_harness": ratio_ci(&ic_s, &rh, sd_ + 20),
+                            "S_tuned": ratio_ci(&ic_s, &rt, sd_ + 21),
+                            "S_plus_harness": ratio_ci(&ic_sp, &rhp, sd_ + 22),
+                            "S_plus_tuned": ratio_ci(&ic_sp, &rtp, sd_ + 23),
+                        }),
+                    );
                     // band ratios, layer A with the IC's unemitted bound (a fortiori rank)
                     let mut br = vec![];
                     for &w in &BAND {
-                        let ic_a: Vec<f64> = ic.iter().filter(|r| seeds_r.contains(&r.seed))
-                            .map(|r| (r.muls / GAE + w * (r.adds + r.lookups + r.enum_adds + r.unemitted_bound)) / sq).collect();
-                        let ic_b: Vec<f64> = ic.iter().filter(|r| seeds_r.contains(&r.seed))
-                            .map(|r| (r.muls / GAE + w * r.lookups) / sq).collect();
-                        let ra: Vec<f64> = rho_sorted.iter().map(|r| (r.mh / GAE + w * (r.native + r.fp_adds)) / sq).collect();
-                        let rat: Vec<f64> = rho_sorted.iter().map(|r| (r.mt / GAE + w * (r.native + r.fp_adds)) / sq).collect();
-                        let rb: Vec<f64> = rho_sorted.iter().map(|r| (r.mh / GAE + w * r.native) / sq).collect();
-                        let rbt: Vec<f64> = rho_sorted.iter().map(|r| (r.mt / GAE + w * r.native) / sq).collect();
+                        let ic_a: Vec<f64> = ic
+                            .iter()
+                            .filter(|r| seeds_r.contains(&r.seed))
+                            .map(|r| {
+                                (r.muls / GAE
+                                    + w * (r.adds + r.lookups + r.enum_adds + r.unemitted_bound))
+                                    / sq
+                            })
+                            .collect();
+                        let ic_b: Vec<f64> = ic
+                            .iter()
+                            .filter(|r| seeds_r.contains(&r.seed))
+                            .map(|r| (r.muls / GAE + w * r.lookups) / sq)
+                            .collect();
+                        let ra: Vec<f64> = rho_sorted
+                            .iter()
+                            .map(|r| (r.mh / GAE + w * (r.native + r.fp_adds)) / sq)
+                            .collect();
+                        let rat: Vec<f64> = rho_sorted
+                            .iter()
+                            .map(|r| (r.mt / GAE + w * (r.native + r.fp_adds)) / sq)
+                            .collect();
+                        let rb: Vec<f64> = rho_sorted
+                            .iter()
+                            .map(|r| (r.mh / GAE + w * r.native) / sq)
+                            .collect();
+                        let rbt: Vec<f64> = rho_sorted
+                            .iter()
+                            .map(|r| (r.mt / GAE + w * r.native) / sq)
+                            .collect();
                         br.push(json!({"w": w,
                             "A_harness": ratio_ci(&ic_a, &ra, sd_ + 30), "A_tuned": ratio_ci(&ic_a, &rat, sd_ + 31),
                             "B_harness": ratio_ci(&ic_b, &rb, sd_ + 32), "B_tuned": ratio_ci(&ic_b, &rbt, sd_ + 33)}));
@@ -352,18 +451,30 @@ fn main() {
                     e.insert("band_ratio_ic_over_rho".into(), json!(br));
                     e.insert("ranked_across_band_ic_below_rho".into(), json!(all_below));
                     let io = &e["ic_over_rho"];
-                    let vd: BTreeMap<&str, &str> = ["S_harness", "S_tuned", "S_plus_harness", "S_plus_tuned"]
-                        .iter().map(|k| (*k, verdict(&io[*k]))).collect();
+                    let vd: BTreeMap<&str, &str> =
+                        ["S_harness", "S_tuned", "S_plus_harness", "S_plus_tuned"]
+                            .iter()
+                            .map(|k| (*k, verdict(&io[*k])))
+                            .collect();
                     e.insert("verdict".into(), json!(vd));
                 }
                 rho_out.insert(name.clone(), Value::Object(e));
             }
             entry.insert("rho".into(), Value::Object(rho_out));
             // exponent data
-            fit_ic.push((ic.iter().map(|r| r.l).collect(), ic.iter().map(|r| r.muls).collect()));
+            fit_ic.push((
+                ic.iter().map(|r| r.l).collect(),
+                ic.iter().map(|r| r.muls).collect(),
+            ));
             if let Some(r3) = arms.get("R3") {
-                fit_r3.push((r3.iter().map(|r| r.l).collect(), r3.iter().map(|r| r.mh).collect()));
-                fit_r3t.push((r3.iter().map(|r| r.l).collect(), r3.iter().map(|r| r.mt).collect()));
+                fit_r3.push((
+                    r3.iter().map(|r| r.l).collect(),
+                    r3.iter().map(|r| r.mh).collect(),
+                ));
+                fit_r3t.push((
+                    r3.iter().map(|r| r.l).collect(),
+                    r3.iter().map(|r| r.mt).collect(),
+                ));
             }
         }
         per_size.push(Value::Object(entry));
@@ -374,7 +485,9 @@ fn main() {
     let mut k2 = vec![];
     for e in &per_size {
         let p = e["p"].as_u64().unwrap();
-        let Some(r3) = e["rho"].get("R3") else { continue };
+        let Some(r3) = e["rho"].get("R3") else {
+            continue;
+        };
         if p < 1009 {
             continue;
         }
@@ -382,7 +495,7 @@ fn main() {
         if hi("S_plus_harness") >= 1.0 {
             k1.push(p);
         }
-        if hi("S_plus_tuned") >= 1.0 || e["ranked_across_band_ic_below_rho"] != json!(true) {
+        if hi("S_plus_tuned") >= 1.0 || r3["ranked_across_band_ic_below_rho"] != json!(true) {
             k2.push(p);
         }
     }
@@ -393,9 +506,20 @@ fn main() {
     summary.insert("exponent_rho_R3_harness_muls_vs_l".into(), fit(&fit_r3, 78));
     summary.insert("exponent_rho_R3_tuned_muls_vs_l".into(), fit(&fit_r3t, 79));
     // POST HOC (not in PROTOCOL.md): the sizes where the sieve runs at m = 9 (p >= 1009)
-    let tail = |g: &Vec<(Vec<f64>, Vec<f64>)>| g.iter().skip(g.len().saturating_sub(3)).cloned().collect::<Vec<_>>();
-    summary.insert("exponent_ic_muls_vs_l_p_ge_1009_POST_HOC".into(), fit(&tail(&fit_ic), 80));
-    summary.insert("exponent_rho_R3_harness_muls_vs_l_p_ge_1009_POST_HOC".into(), fit(&tail(&fit_r3), 81));
+    let tail = |g: &Vec<(Vec<f64>, Vec<f64>)>| {
+        g.iter()
+            .skip(g.len().saturating_sub(3))
+            .cloned()
+            .collect::<Vec<_>>()
+    };
+    summary.insert(
+        "exponent_ic_muls_vs_l_p_ge_1009_POST_HOC".into(),
+        fit(&tail(&fit_ic), 80),
+    );
+    summary.insert(
+        "exponent_rho_R3_harness_muls_vs_l_p_ge_1009_POST_HOC".into(),
+        fit(&tail(&fit_r3), 81),
+    );
     // local exponents between adjacent sizes (means)
     let mut local = vec![];
     for w in fit_ic.windows(2) {
@@ -406,6 +530,10 @@ fn main() {
     summary.insert("local_exponents_ic".into(), json!(local));
     summary.insert("protocol".into(), json!("PROTOCOL.md"));
     summary.insert("gae_f_p_mults".into(), json!(GAE));
-    fs::write(format!("{dir}/summary.json"), serde_json::to_string_pretty(&summary).unwrap()).unwrap();
+    fs::write(
+        format!("{dir}/summary.json"),
+        serde_json::to_string_pretty(&summary).unwrap(),
+    )
+    .unwrap();
     println!("wrote {dir}/summary.json");
 }

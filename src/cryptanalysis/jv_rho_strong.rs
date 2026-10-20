@@ -33,7 +33,7 @@ use rand::{Rng, SeedableRng};
 use serde::Serialize;
 
 use super::gaudry_cubic::mm;
-use super::jv_cover::{generate_spec, unit_costs, Ctx, EllE, Fq3, Fld, Spec, E2, E6, PtE6};
+use super::jv_cover::{generate_spec, unit_costs, Ctx, EllE, Fld, Fq3, PtE6, Spec, E2, E6};
 use super::residual_walk::{inv_mod, mix64};
 
 type X6 = [u64; 6];
@@ -285,7 +285,10 @@ impl Arith {
         }
         let x2 = self.sq(&p1.x);
         let a2x = self.mul(&self.add(&self.a2, &self.a2), &p1.x);
-        let num = self.add(&self.add(&self.add(&x2, &self.add(&x2, &x2)), &a2x), &self.a4);
+        let num = self.add(
+            &self.add(&self.add(&x2, &self.add(&x2, &x2)), &a2x),
+            &self.a4,
+        );
         let den = self.inv(&self.add(&p1.y, &p1.y));
         let lam = self.mul(&num, &den);
         let l2 = self.sq(&lam);
@@ -342,7 +345,9 @@ fn from_x6(x: &X6) -> E6 {
 fn hash_x(x: &X6) -> u64 {
     let mut h = 0u64;
     for (i, &v) in x.iter().enumerate() {
-        h ^= v.wrapping_mul(0x9E37_79B9_7F4A_7C15 >> (i * 3)).rotate_left(11 * i as u32);
+        h ^= v
+            .wrapping_mul(0x9E37_79B9_7F4A_7C15 >> (i * 3))
+            .rotate_left(11 * i as u32);
     }
     mix64(h)
 }
@@ -424,7 +429,9 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
     let g = to_pt(&spec.g);
     let q = to_pt(&spec.q);
     let mut rng = StdRng::seed_from_u64(
-        seed.wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ run.wrapping_mul(0xD1B5_4A32_D192_ED03) ^ 0x57_20,
+        seed.wrapping_mul(0x9E37_79B9_7F4A_7C15)
+            ^ run.wrapping_mul(0xD1B5_4A32_D192_ED03)
+            ^ 0x57_20,
     );
     // setup counted into setup_adds: take the delta of group operations
     let mut setup_ops = 0u64;
@@ -460,11 +467,7 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
         } else {
             ar.c.fp_adds += 6;
             ar.c.scalar_ops += 2;
-            (
-                Pt { x: pt.x, y: ny },
-                (n - a) % n,
-                (n - b) % n,
-            )
+            (Pt { x: pt.x, y: ny }, (n - a) % n, (n - b) % n)
         }
     };
     let mask = (1u64 << o.dp_bits) - 1;
@@ -502,7 +505,9 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
             .map(|w| (hash_x(&w.pt.x) % o.r as u64) as usize)
             .collect();
         ar.c.hash += k as u64;
-        let dxs: Vec<X6> = (0..k).map(|i| ar.sub(&mults[js[i]].2.x, &ws[i].pt.x)).collect();
+        let dxs: Vec<X6> = (0..k)
+            .map(|i| ar.sub(&mults[js[i]].2.x, &ws[i].pt.x))
+            .collect();
         let special: Vec<bool> = dxs.iter().map(|d| *d == [0; 6]).collect();
         // Montgomery's trick over the non-special walkers
         let idx: Vec<usize> = (0..k).filter(|&i| !special[i]).collect();
@@ -578,8 +583,7 @@ pub fn strong_rho(spec: &Spec, seed: u64, run: u64, o: StrongOpts) -> StrongRun 
                     }
                     if let Some(dd) = ar.dbl(&best.0) {
                         ar.c.scalar_ops += 2;
-                        let (dd, da, db) =
-                            canon(&mut ar, dd, (2 * best.1) % n, (2 * best.2) % n);
+                        let (dd, da, db) = canon(&mut ar, dd, (2 * best.1) % n, (2 * best.2) % n);
                         npt = dd;
                         a = da;
                         b = db;
