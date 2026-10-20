@@ -5165,6 +5165,24 @@ impl PairSumTable {
     /// it, the build keys every pair twice (count, then fill) in place.
     const FOLD_PARTITION_BYTES: u128 = 2 << 30;
 
+    /// One filter becomes the retained table filter. Bound additional
+    /// worker copies by the temporary budget left after the stream buffers,
+    /// instead of multiplying a potentially large filter by every CPU.
+    fn fold_filter_runs(
+        parts: usize,
+        threads: usize,
+        stream_bytes: u128,
+        filter_words: usize,
+    ) -> usize {
+        let filter_bytes = filter_words as u128 * std::mem::size_of::<u64>() as u128;
+        let extra_copies =
+            Self::FOLD_PARTITION_BYTES.saturating_sub(stream_bytes) / filter_bytes.max(1);
+        threads
+            .max(1)
+            .min(parts)
+            .min((extra_copies + 1).min(usize::MAX as u128) as usize)
+    }
+
     /// The folded table's buckets, words and presence filter from rows
     /// keyed once.  Each pair's `(hash, word)` goes straight into one of
     /// 256 coarse partitions by the hash's top bits — appended to that
@@ -5250,7 +5268,26 @@ impl PairSumTable {
         let present_mask = (1u64 << filter_bits) - 1;
         let filter_words = (1usize << filter_bits) / 64;
         let per_part = buckets / parts;
-        let fill_runs = rayon::current_num_threads().clamp(1, parts);
+        // Capacity, not length: skewed partitions can grow their streams.
+        // This bounds the extra filter copies; it is not an RSS limit for
+        // the builder's other buffers or the allocator itself.
+        let stream_bytes = streams.capacity() as u128
+            * std::mem::size_of::<(Vec<Vec<u64>>, Vec<Vec<u32>>)>() as u128
+            + streams
+                .iter()
+                .map(|(hs, ws)| {
+                    hs.capacity() as u128 * std::mem::size_of::<Vec<u64>>() as u128
+                        + ws.capacity() as u128 * std::mem::size_of::<Vec<u32>>() as u128
+                        + hs.iter().map(|v| v.capacity() as u128 * 8).sum::<u128>()
+                        + ws.iter().map(|v| v.capacity() as u128 * 4).sum::<u128>()
+                })
+                .sum::<u128>();
+        let fill_runs = Self::fold_filter_runs(
+            parts,
+            rayon::current_num_threads(),
+            stream_bytes,
+            filter_words,
+        );
         let parts_per_run = parts.div_ceil(fill_runs);
         let mut bucket_start = vec![0u32; buckets + 1];
         let mut rests = vec![0u32; total];
@@ -18036,6 +18073,24 @@ mod tests {
                 assert_eq!(x, y, "K_{a}/2^{n} bucket {b}");
             }
         }
+    }
+
+    #[test]
+    fn partition_filter_copies_respect_remaining_temporary_budget() {
+        let budget = PairSumTable::FOLD_PARTITION_BYTES;
+        let filter_bytes = 256u128 << 20;
+        let words = (filter_bytes / 8) as usize;
+        // At this width the previous 128-worker allocation used 32 GiB
+        // just for the filters. Only one extra copy fits beside streams.
+        let streams = budget - filter_bytes;
+        let runs = PairSumTable::fold_filter_runs(256, 128, streams, words);
+        assert_eq!(runs, 2);
+        assert!(streams + (runs - 1) as u128 * filter_bytes <= budget);
+        for streams in [budget, budget + 1, budget + filter_bytes] {
+            assert_eq!(PairSumTable::fold_filter_runs(256, 128, streams, words), 1);
+        }
+        assert_eq!(PairSumTable::fold_filter_runs(256, 1, 0, words), 1);
+        assert_eq!(PairSumTable::fold_filter_runs(3, 128, 0, words), 3);
     }
 
     #[test]
