@@ -36,6 +36,7 @@
 
 use super::fp2::{is_prime_u64, Fp2, Fp2Ctx};
 use super::fp_poly::FpPoly;
+use super::ops;
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use std::fmt;
@@ -198,6 +199,8 @@ impl HyperellipticCurveP {
     /// calls this method before consuming a curve that may have been mutated
     /// or built with a struct literal.
     pub fn validate(&self) -> Result<(), PrimeHyperellipticError> {
+        // Counted in the current phase and in the validation subset.
+        let _validating = ops::validating();
         if self.p.bits() > u64::BITS as u64 {
             return Err(PrimeHyperellipticError::UnsupportedPrimeModulusSize {
                 maximum_bits: MAX_CHECKED_PRIME_BITS,
@@ -240,6 +243,7 @@ impl HyperellipticCurveP {
         if self.f.lead() != BigUint::one() {
             return Err(PrimeHyperellipticError::CurvePolynomialNotMonic);
         }
+        ops::fp_mul(expected as u64);
         let derivative = FpPoly::from_coeffs(
             (1..=expected)
                 .map(|i| (self.f.coeff(i) * BigUint::from(i)) % &self.p)
@@ -264,6 +268,7 @@ impl HyperellipticCurveP {
         if y >= &self.p {
             return Err(PrimeHyperellipticError::CoordinateOutOfRange { coordinate: "y" });
         }
+        ops::fp_sqr(1);
         let lhs = (y * y) % &self.p;
         let rhs = self.f.eval(x);
         Ok(lhs == rhs)
@@ -380,6 +385,7 @@ impl MumfordDivisorP {
     /// Validate the canonical reduced representative against this exact
     /// curve. This is also the domain check used by all checked operations.
     pub fn validate(&self, curve: &HyperellipticCurveP) -> Result<(), PrimeHyperellipticError> {
+        let _validating = ops::validating();
         curve.validate()?;
         Self::validate_polynomial(&self.u, curve, "u")?;
         Self::validate_polynomial(&self.v, curve, "v")?;
@@ -458,6 +464,7 @@ impl MumfordDivisorP {
             return Err(PrimeHyperellipticError::PointNotOnCurve);
         }
         let p = &curve.p;
+        ops::fp_add(1);
         let u = FpPoly::from_coeffs(vec![(p - x0) % p, BigUint::one()], p.clone());
         let v = FpPoly::constant(y0.clone(), p.clone());
         Self::try_from_polynomials(curve, u, v)

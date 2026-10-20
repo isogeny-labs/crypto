@@ -84,8 +84,67 @@ use rand::rngs::StdRng;
 use rand::{RngCore, SeedableRng};
 
 use crate::cryptanalysis::ec_index_calculus::{gaussian_eliminate_mod_n_particular, sqrt_mod_p};
+use crate::prime_hyperelliptic::ops as bitop_ops;
+use crate::prime_hyperelliptic::ops::{self, Phase};
 use crate::prime_hyperelliptic::{FpPoly, HyperellipticCurveP, MumfordDivisorP};
 use crate::utils::mod_inverse;
+
+/// [`sqrt_mod_p`] with its `bitop/v1` charge: a zero test (one word op),
+/// then the Euler test (`legendre`), then — for a residue — the root
+/// (`field_sqrt`).  For `p ≡ 1 (mod 4)` the implementation searches for a
+/// non-residue `z = 2, 3, …` on **every** call, one Euler test per
+/// candidate; those tests are executed work and are charged as
+/// `legendre`s too.
+fn sqrt_mod_p_counted(a: &BigUint, p: &BigUint) -> Option<BigUint> {
+    let r = sqrt_mod_p(a, p);
+    ops::word_op(1);
+    if !(a % p).is_zero() {
+        ops::legendre(1);
+        if r.is_some() {
+            ops::fp_sqrt(1);
+            ops::legendre(tonelli_nonresidue_tests(p));
+        }
+    }
+    r
+}
+
+/// Euler tests `sqrt_mod_p` runs to find its non-residue (0 when
+/// `p ≡ 3 (mod 4)`, which takes the shortcut).  Cached per thread and `p`;
+/// the count is a function of `p` alone.
+fn tonelli_nonresidue_tests(p: &BigUint) -> u64 {
+    use std::cell::RefCell;
+    thread_local! {
+        static CACHE: RefCell<HashMap<Vec<u64>, u64>> = RefCell::new(HashMap::new());
+    }
+    if (p % BigUint::from(4u32)) == BigUint::from(3u32) {
+        return 0;
+    }
+    CACHE.with(|c| {
+        *c.borrow_mut().entry(p.to_u64_digits()).or_insert_with(|| {
+            let p_minus_one = p - BigUint::one();
+            let half = &p_minus_one >> 1;
+            let mut z = BigUint::from(2u32);
+            let mut tests = 1u64;
+            while z.modpow(&half, p) != p_minus_one {
+                z += BigUint::one();
+                tests += 1;
+            }
+            tests
+        })
+    })
+}
+
+/// `mod_inverse(a, p)` charged as one `field_inv`.
+fn fp_inverse_counted(a: &BigUint, p: &BigUint) -> Option<BigUint> {
+    ops::fp_inv(1);
+    mod_inverse(a, p)
+}
+
+/// `mod_inverse(a, n)` modulo the subgroup order, charged as one `modr_inv`.
+fn modr_inverse_counted(a: &BigUint, n: &BigUint) -> Option<BigUint> {
+    ops::modr_inv(1);
+    mod_inverse(a, n)
+}
 
 // ── Factor base ────────────────────────────────────────────────────────
 
@@ -153,13 +212,20 @@ pub fn build_factor_base(curve: &HyperellipticCurveP, max_size: usize) -> HecFac
         }
         let x = BigUint::from(xi);
         let y_sq = curve.f.eval(&x);
-        let y = match sqrt_mod_p(&y_sq, p) {
+        let y = match sqrt_mod_p_counted(&y_sq, p) {
             Some(y) => y,
             None => continue,
         };
         // Canonical representative of the ± pair.
-        let y = if y > half { p - &y } else { y };
+        ops::word_op(1);
+        let y = if y > half {
+            ops::fp_add(1);
+            p - &y
+        } else {
+            y
+        };
         let divisor = mumford_of_place(curve, &x, &y);
+        ops::hash_probe(1);
         by_x.insert(x.to_u32_digits(), entries.len());
         entries.push(HecFactorBaseEntry { x, y, divisor });
     }
@@ -174,6 +240,7 @@ pub fn build_factor_base(curve: &HyperellipticCurveP, max_size: usize) -> HecFac
 fn mumford_of_place(curve: &HyperellipticCurveP, x0: &BigUint, y0: &BigUint) -> MumfordDivisorP {
     debug_assert!(curve.is_on_curve(x0, y0));
     let p = &curve.p;
+    ops::fp_add(1);
     let u = FpPoly::from_coeffs(vec![(p - x0) % p, BigUint::one()], p.clone());
     let v = FpPoly::constant(y0.clone(), p.clone());
     MumfordDivisorP { u, v }
@@ -278,6 +345,7 @@ fn x_pow_p_mod(u: &FpPoly, p: &BigUint, ops: &mut usize) -> FpPoly {
 
 /// Derivative of `f` over `F_p`.
 fn derivative(f: &FpPoly, p: &BigUint) -> FpPoly {
+    ops::fp_mul(f.coeffs.len().saturating_sub(1) as u64);
     let coeffs: Vec<BigUint> = f
         .coeffs
         .iter()
@@ -303,6 +371,7 @@ fn roots_of_split_poly(d: &FpPoly, p: &BigUint, ops: &mut usize) -> Option<Vec<B
         0 => Some(Vec::new()),
         1 => {
             // d = x + c  ⟹  root −c (d is monic here).
+            ops::fp_add(1);
             Some(vec![(p - &d.coeff(0)) % p])
         }
         2 => {
@@ -310,15 +379,23 @@ fn roots_of_split_poly(d: &FpPoly, p: &BigUint, ops: &mut usize) -> Option<Vec<B
             let a1 = d.coeff(1);
             let a0 = d.coeff(0);
             let disc = (&a1 * &a1 + p * p - (BigUint::from(4u32) * &a0) % p) % p;
+            // a₁², 4·a₀, and the subtraction (`+ p²` only keeps it
+            // non-negative).
+            ops::fp_sqr(1);
+            ops::fp_mul(1);
+            ops::fp_add(1);
             *ops += 2;
             // Tonelli–Shanks is a modular exponentiation: ~1.5·log₂ p
             // multiplications, the same order as the x^p step above.
             *ops += (p.bits() as usize * 3) / 2;
-            let root = sqrt_mod_p(&disc, p)?;
-            let two_inv = mod_inverse(&BigUint::from(2u32), p)?;
+            let root = sqrt_mod_p_counted(&disc, p)?;
+            let two_inv = fp_inverse_counted(&BigUint::from(2u32), p)?;
             let neg_a1 = (p - &a1) % p;
             let r1 = ((&neg_a1 + &root) % p * &two_inv) % p;
             let r2 = ((&neg_a1 + p - &root) % p * &two_inv) % p;
+            // −a₁, two sums, two products.
+            ops::fp_add(3);
+            ops::fp_mul(2);
             *ops += 2;
             Some(vec![r1, r2])
         }
@@ -331,6 +408,7 @@ fn roots_of_split_poly(d: &FpPoly, p: &BigUint, ops: &mut usize) -> Option<Vec<B
             let exp = (p - BigUint::one()) >> 1;
             for _ in 0..64 {
                 let b = rand_below(&mut rng, p);
+                ops::fp_mul(1);
                 let shifted = FpPoly::from_coeffs(vec![b, BigUint::one()], p.clone());
                 let powered = poly_powmod(&shifted, &exp, d, ops);
                 let h = powered.sub(&FpPoly::one(p.clone()));
@@ -346,6 +424,7 @@ fn roots_of_split_poly(d: &FpPoly, p: &BigUint, ops: &mut usize) -> Option<Vec<B
                 let other = d.divrem(&factor).0.monic();
                 let mut roots = roots_of_split_poly(&factor, p, ops)?;
                 roots.extend(roots_of_split_poly(&other, p, ops)?);
+                ops::word_op(ops::sort_cost(roots.len()));
                 roots.sort_unstable();
                 return Some(roots);
             }
@@ -390,6 +469,7 @@ fn resultant(a: &FpPoly, b: &FpPoly, ops: &mut usize) -> BigUint {
     let (da, db) = (a.degree().unwrap_or(0), b.degree().unwrap_or(0));
     if db == 0 {
         *ops += da;
+        ops::charge_pow(&BigUint::from(da as u64));
         return b.lead().modpow(&BigUint::from(da as u64), p);
     }
     let r = a.rem(b);
@@ -403,10 +483,13 @@ fn resultant(a: &FpPoly, b: &FpPoly, ops: &mut usize) -> BigUint {
     if r.is_zero() {
         return BigUint::zero();
     }
+    ops::charge_pow(&BigUint::from((da - dr) as u64));
     let factor = b.lead().modpow(&BigUint::from((da - dr) as u64), p);
     *ops += da - dr + 1;
+    ops::fp_mul(1);
     value = (value * factor) % p;
     if (da * db) % 2 == 1 {
+        ops::fp_add(1);
         value = (p - value) % p;
     }
     value
@@ -421,6 +504,7 @@ fn discriminant(u: &FpPoly, p: &BigUint, ops: &mut usize) -> BigUint {
     }
     let res = resultant(u, &du, ops);
     if (n * (n - 1) / 2) % 2 == 1 {
+        ops::fp_add(1);
         (p - res) % p
     } else {
         res
@@ -433,6 +517,7 @@ fn is_square_mod(a: &BigUint, p: &BigUint, ops: &mut usize) -> bool {
         return true;
     }
     *ops += (p.bits() as usize * 3) / 2;
+    ops::legendre(1);
     a.modpow(&((p - BigUint::one()) >> 1), p) == BigUint::one()
 }
 
@@ -504,6 +589,7 @@ fn split_by_gcd(u: &FpPoly, p: &BigUint, ops: &mut usize) -> Option<Vec<(BigUint
     let mut rest = u.clone();
     let mut total = 0usize;
     for x in roots {
+        ops::fp_add(1);
         let lin = FpPoly::from_coeffs(vec![(p - &x) % p, BigUint::one()], p.clone());
         let mut mult = 0usize;
         loop {
@@ -526,6 +612,7 @@ fn split_by_gcd(u: &FpPoly, p: &BigUint, ops: &mut usize) -> Option<Vec<(BigUint
     if total != deg {
         return None;
     }
+    ops::word_op(ops::sort_cost(out.len()));
     out.sort_unstable_by(|a, b| a.0.cmp(&b.0));
     Some(out)
 }
@@ -540,33 +627,44 @@ fn split_low_degree(u: &FpPoly, p: &BigUint, ops: &mut usize) -> Option<Vec<(Big
     match u.degree()? {
         1 => {
             // Monic x + c has the single root −c.
-            let inv_lead = mod_inverse(&u.coeff(1), p)?;
+            let inv_lead = fp_inverse_counted(&u.coeff(1), p)?;
             *ops += 1;
             let c = (&u.coeff(0) * &inv_lead) % p;
+            ops::fp_mul(1);
+            ops::fp_add(1);
             Some(vec![((p - c) % p, 1)])
         }
         2 => {
-            let lead_inv = mod_inverse(&u.coeff(2), p)?;
+            let lead_inv = fp_inverse_counted(&u.coeff(2), p)?;
             *ops += 2;
             let a1 = (&u.coeff(1) * &lead_inv) % p;
             let a0 = (&u.coeff(0) * &lead_inv) % p;
             let four_a0 = (BigUint::from(4u32) * &a0) % p;
             let disc = (&a1 * &a1 % p + p - four_a0) % p;
+            // a₁, a₀, 4·a₀, a₁², the subtraction, −a₁.
+            ops::fp_mul(3);
+            ops::fp_sqr(1);
+            ops::fp_add(2);
             *ops += 2;
             let neg_a1 = (p - &a1) % p;
-            let two_inv = mod_inverse(&BigUint::from(2u32), p)?;
+            let two_inv = fp_inverse_counted(&BigUint::from(2u32), p)?;
 
+            ops::word_op(1);
             if disc.is_zero() {
                 // Double root −a₁/2.
                 *ops += 1;
+                ops::fp_mul(1);
                 let r = (&neg_a1 * &two_inv) % p;
                 return Some(vec![(r, 2)]);
             }
             // One Euler/Tonelli exponentiation: ~1.5·log₂ p mul-mods.
             *ops += (p.bits() as usize * 3) / 2;
-            let root = sqrt_mod_p(&disc, p)?; // None ⟹ irreducible ⟹ not smooth
+            let root = sqrt_mod_p_counted(&disc, p)?; // None ⟹ irreducible ⟹ not smooth
             let r1 = ((&neg_a1 + &root) % p * &two_inv) % p;
             let r2 = ((&neg_a1 + p - &root) % p * &two_inv) % p;
+            ops::fp_add(2);
+            ops::fp_mul(2);
+            ops::word_op(1);
             *ops += 2;
             let (lo, hi) = if r1 <= r2 { (r1, r2) } else { (r2, r1) };
             Some(vec![(lo, 1), (hi, 1)])
@@ -595,10 +693,12 @@ fn split_by_scan(u: &FpPoly, p: &BigUint, ops: &mut usize) -> Option<Vec<(BigUin
         let x = BigUint::from(xi);
         // Horner: one multiplication per coefficient.
         *ops += rest.degree().unwrap_or(0);
+        ops::word_op(1);
         if !rest.eval(&x).is_zero() {
             continue;
         }
         // Divide out (x − xi) as often as it goes.
+        ops::fp_add(1);
         let lin = FpPoly::from_coeffs(vec![(p - &x) % p, BigUint::one()], p.clone());
         let mut mult = 0usize;
         loop {
@@ -700,6 +800,10 @@ pub fn classify_counted_with(
         *ops += d.v.degree().unwrap_or(0);
         let y = d.v.eval(&x);
         debug_assert!(curve.is_on_curve(&x, &y));
+        // The sign: one compare with (p−1)/2.  The factor-base lookup:
+        // one probe.
+        ops::word_op(1);
+        ops::hash_probe(1);
         let sign: i64 = if y.is_zero() || y <= half { 1 } else { -1 };
         let idx = match fb.index_of_x(&x) {
             Some(i) => i,
@@ -713,10 +817,12 @@ pub fn classify_counted_with(
             }
         };
         debug_assert_eq!(fb.entries[idx].y, if sign > 0 { y.clone() } else { p - &y });
+        ops::hash_probe(1);
         *acc.entry(idx).or_insert(0) += sign * mult as i64;
     }
 
     let mut out: Vec<(usize, i64)> = acc.into_iter().filter(|&(_, c)| c != 0).collect();
+    ops::word_op(ops::sort_cost(out.len()));
     out.sort_unstable_by_key(|&(i, _)| i);
     match off {
         None => Decomposition::Smooth(out),
@@ -747,13 +853,17 @@ pub fn decompose_counted_with(
         // `u | v² − f` guarantees this, but the attack is only as
         // sound as the representation it reads.
         debug_assert!(curve.is_on_curve(&x, &y));
+        ops::hash_probe(1);
         let idx = fb.index_of_x(&x)?;
+        ops::word_op(1);
         let sign: i64 = if y.is_zero() || y <= half { 1 } else { -1 };
         debug_assert_eq!(fb.entries[idx].y, if sign > 0 { y.clone() } else { p - &y });
+        ops::hash_probe(1);
         *acc.entry(idx).or_insert(0) += sign * mult as i64;
     }
 
     let mut out: Vec<(usize, i64)> = acc.into_iter().filter(|&(_, c)| c != 0).collect();
+    ops::word_op(ops::sort_cost(out.len()));
     out.sort_unstable_by_key(|&(i, _)| i);
     Some(out)
 }
@@ -1038,11 +1148,14 @@ fn subtract_steps(
     if taken.is_empty() {
         return decomposition;
     }
+    // One probe per entry inserted and per step merged in.
+    ops::hash_probe((decomposition.len() + taken.len()) as u64);
     let mut acc: HashMap<usize, i64> = decomposition.into_iter().collect();
     for (&idx, &count) in taken {
         *acc.entry(idx).or_insert(0) -= count;
     }
     let mut out: Vec<(usize, i64)> = acc.into_iter().filter(|&(_, c)| c != 0).collect();
+    ops::word_op(ops::sort_cost(out.len()));
     out.sort_unstable_by_key(|&(i, _)| i);
     out
 }
@@ -1050,6 +1163,8 @@ fn subtract_steps(
 /// Branch selector for the adding walk: a hash of the Mumford
 /// representation, so equal classes take equal steps.
 fn walk_branch(d: &MumfordDivisorP, branches: usize) -> usize {
+    // One word per absorbed limb, and one for the branch index.
+    ops::word_op(ops::divisor_hash_words(d) + 1);
     let mut acc: u64 = 0;
     for poly in [&d.u, &d.v] {
         for limb in poly.coeffs.iter().flat_map(|c| c.to_u64_digits()) {
@@ -1068,6 +1183,7 @@ fn walk_branch(d: &MumfordDivisorP, branches: usize) -> usize {
 /// material.
 fn rand_below(rng: &mut StdRng, n: &BigUint) -> BigUint {
     let bytes = (n.bits() as usize).div_ceil(8) + 8;
+    ops::rng_word(bytes.div_ceil(8) as u64);
     let mut buf = vec![0u8; bytes];
     rng.fill_bytes(&mut buf);
     BigUint::from_bytes_be(&buf) % n
@@ -1121,8 +1237,13 @@ pub fn collect_relations(
     let mut fb_steps: Vec<usize> = Vec::new();
     match params.search {
         RelationSearch::FactorBaseWalk { .. } => {
+            let _phase = ops::enter(Phase::Precompute);
             // Distinct places, so a step is never silently doubled.
             let mut chosen: Vec<usize> = (0..fb.len()).collect();
+            // A Fisher–Yates shuffle: one draw and one index reduction
+            // per position.
+            ops::rng_word(chosen.len().saturating_sub(1) as u64);
+            ops::word_op(chosen.len().saturating_sub(1) as u64);
             for i in (1..chosen.len()).rev() {
                 let j = (rng.next_u64() as usize) % (i + 1);
                 chosen.swap(i, j);
@@ -1130,9 +1251,12 @@ pub fn collect_relations(
             fb_steps = chosen.into_iter().take(branches).collect();
         }
         _ => {
+            let _phase = ops::enter(Phase::Precompute);
             for _ in 0..branches {
                 let a = rand_below(&mut rng, &step_bound) + BigUint::one();
                 let b = rand_below(&mut rng, &step_bound) + BigUint::one();
+                // Reducing by a power of two is a mask; `+ 1` an add.
+                ops::word_op(4);
                 let s = d1
                     .scalar_mul(&a, curve)
                     .add(&d2.scalar_mul(&b, curve), curve);
@@ -1161,6 +1285,7 @@ pub fn collect_relations(
     while relations.len() < wanted && report.trials < params.max_trials {
         report.trials += 1;
 
+        let walk_phase = ops::enter(Phase::Walk);
         let step_started = Instant::now();
         let mut pos = match current.take() {
             Some(pos) if walking => {
@@ -1171,18 +1296,28 @@ pub fn collect_relations(
                         // move through the factor base.  Both cost one
                         // group operation and nothing to prepare.
                         let roll = rng.next_u64() % d_step_in.max(2);
+                        // The draw and its reduction to a roll.
+                        ops::rng_word(1);
+                        ops::word_op(1);
                         let mut taken = pos.taken;
                         let (mut a, mut b) = (pos.a, pos.b);
                         let next = if roll == 0 {
+                            ops::modr_add(1);
                             a = (a + BigUint::one()) % n;
                             report.jacobian_ops += 1;
                             pos.r.add(d1, curve)
                         } else if roll == 1 {
+                            ops::modr_add(1);
                             b = (b + BigUint::one()) % n;
                             report.jacobian_ops += 1;
                             pos.r.add(d2, curve)
                         } else {
                             let idx = fb_steps[(rng.next_u64() as usize) % fb_steps.len()];
+                            // The draw, its reduction to a step index, and
+                            // the step-count table update.
+                            ops::rng_word(1);
+                            ops::word_op(1);
+                            ops::hash_probe(1);
                             *taken.entry(idx).or_insert(0) += 1;
                             report.jacobian_ops += 1;
                             pos.r.add(&fb.entries[idx].divisor, curve)
@@ -1198,6 +1333,7 @@ pub fn collect_relations(
                         let (aj, bj, sj) = &steps[walk_branch(&pos.r, steps.len())];
                         let next = pos.r.add(sj, curve);
                         report.jacobian_ops += 1;
+                        ops::modr_add(2);
                         Position {
                             a: (&pos.a + aj) % n,
                             b: (&pos.b + bj) % n,
@@ -1212,6 +1348,7 @@ pub fn collect_relations(
             // it starts at `D₁ + D₂` for one operation instead of two
             // scalar multiplications.
             _ if matches!(params.search, RelationSearch::FactorBaseWalk { .. }) => {
+                let _phase = ops::enter(Phase::Precompute);
                 report.jacobian_ops += 1;
                 report.precompute_ops += 1;
                 Position {
@@ -1222,8 +1359,12 @@ pub fn collect_relations(
                 }
             }
             _ => {
+                // A start is precomputation for a walk; for `Random` it
+                // is the trial itself.
+                let _phase = walking.then(|| ops::enter(Phase::Precompute));
                 let a = rand_below(&mut rng, n);
                 let b = rand_below(&mut rng, n);
+                ops::modr_mul(2);
                 let r = d1
                     .scalar_mul(&a, curve)
                     .add(&d2.scalar_mul(&b, curve), curve);
@@ -1246,19 +1387,24 @@ pub fn collect_relations(
         if walking && !matches!(params.search, RelationSearch::FactorBaseWalk { .. }) {
             since_restart += 1;
             if since_restart >= restart_interval {
+                let _phase = ops::enter(Phase::Precompute);
                 // Escape the orbit with one randomly chosen step: the
                 // index comes from the RNG rather than the position, so
                 // the next point is off the deterministic trajectory.
+                ops::rng_word(1);
+                ops::word_op(1);
                 match params.search {
                     RelationSearch::FactorBaseWalk { .. } => {
                         let idx = fb_steps[(rng.next_u64() as usize) % fb_steps.len()];
                         pos.r = pos.r.add(&fb.entries[idx].divisor, curve);
+                        ops::hash_probe(1);
                         *pos.taken.entry(idx).or_insert(0) += 1;
                     }
                     _ => {
                         let j = (rng.next_u64() as usize) % steps.len();
                         let (aj, bj, sj) = &steps[j];
                         pos.r = pos.r.add(sj, curve);
+                        ops::modr_add(2);
                         pos.a = (&pos.a + aj) % n;
                         pos.b = (&pos.b + bj) % n;
                     }
@@ -1288,12 +1434,18 @@ pub fn collect_relations(
             report.smooth_trials += 1;
             continue;
         }
+        drop(walk_phase);
         let mut field_ops = 0usize;
         // One oracle call per candidate.  The three outcomes come back
         // from that call rather than from re-running it on failure.
+        let oracle_phase = ops::enter(Phase::Oracle);
         let oracle_started = Instant::now();
         let classified = classify_counted_with(curve, &r, fb, &mut field_ops, &params.smoothness);
         report.smoothness_wall_ns += oracle_started.elapsed().as_nanos() as u64;
+        drop(oracle_phase);
+        // Recording a relation (`subtract_steps`, partial bookkeeping)
+        // is relation-stage work.
+        let _record_phase = ops::enter(Phase::Walk);
         report.smoothness_field_ops += field_ops;
         match classified {
             Decomposition::Smooth(entries) => {
@@ -1312,9 +1464,11 @@ pub fn collect_relations(
                     coef_b: b,
                     entries: subtract_steps(entries, &taken),
                 };
+                ops::hash_probe(1);
                 match partials.get(&x.to_u32_digits()) {
                     None => {
                         report.partial_relations += 1;
+                        ops::hash_probe(1);
                         partials.insert(x.to_u32_digits(), (rel, coef));
                     }
                     Some((first, first_coef)) => {
@@ -1352,8 +1506,10 @@ fn combine_partials(
     n: &BigUint,
 ) -> Option<HecRelation> {
     let scale = |v: &BigUint, k: i64| -> BigUint {
+        ops::modr_mul(1);
         let t = (v * BigUint::from(k.unsigned_abs())) % n;
         if k < 0 {
+            ops::modr_add(1);
             (n - t) % n
         } else {
             t
@@ -1361,6 +1517,8 @@ fn combine_partials(
     };
     let coef_a = (scale(&r1.coef_a, e2) + scale(&r2.coef_a, -e1)) % n;
     let coef_b = (scale(&r1.coef_b, e2) + scale(&r2.coef_b, -e1)) % n;
+    ops::modr_add(2);
+    ops::hash_probe((r1.entries.len() + r2.entries.len()) as u64);
     let mut acc: HashMap<usize, i64> = HashMap::new();
     for &(j, c) in &r1.entries {
         *acc.entry(j).or_insert(0) += e2 * c;
@@ -1369,6 +1527,7 @@ fn combine_partials(
         *acc.entry(j).or_insert(0) -= e1 * c;
     }
     let mut entries: Vec<(usize, i64)> = acc.into_iter().filter(|&(_, c)| c != 0).collect();
+    ops::word_op(ops::sort_cost(entries.len()));
     entries.sort_unstable_by_key(|&(j, _)| j);
     if entries.is_empty() && coef_a.is_zero() && coef_b.is_zero() {
         return None;
@@ -1397,7 +1556,10 @@ pub fn hec_index_calculus_dlp(
     params: &HecIndexCalculusParams,
 ) -> (Option<BigUint>, HecIndexCalculusReport) {
     let mut report = HecIndexCalculusReport::default();
-    let fb = build_factor_base(curve, params.fb_size);
+    let fb = {
+        let _phase = ops::enter(Phase::Precompute);
+        build_factor_base(curve, params.fb_size)
+    };
     report.factor_base_size = fb.len();
     if fb.is_empty() {
         return (None, report);
@@ -1418,9 +1580,12 @@ pub fn hec_index_calculus_dlp(
         if collected.len() < m + 1 {
             return (None, report);
         }
+        let solve_phase = ops::enter(Phase::LinearAlgebra);
         let solve_started = Instant::now();
         let solved = solve_for_logarithm(curve, &collected, m, n, params, &mut report);
         report.solve_wall_ns += solve_started.elapsed().as_nanos() as u64;
+        drop(solve_phase);
+        let _verify_phase = ops::enter(Phase::Verification);
         if let Some(candidate) = solved {
             if &d1.scalar_mul(&candidate, curve) == d2 {
                 k = Some(candidate);
@@ -1436,6 +1601,7 @@ pub fn hec_index_calculus_dlp(
         None => return (None, report),
     };
 
+    let _verify_phase = ops::enter(Phase::Verification);
     if &d1.scalar_mul(&k, curve) == d2 {
         report.solved = true;
         (Some(k), report)
@@ -1475,13 +1641,20 @@ fn sparse_solve_for_k(
     let mut col_count = vec![0usize; m + 1];
     let mut holders: Vec<Vec<usize>> = vec![Vec::new(); m + 1];
     for (i, row) in rows.iter().enumerate() {
+        // A column-count update and a holder push per entry.
+        bitop_ops::word_op(2 * row.len() as u64);
         for &(j, _) in row {
             col_count[j] += 1;
             holders[j].push(i);
         }
     }
     let mut eliminated = vec![false; rows.len()];
-    let has = |row: &[(usize, BigUint)], col: usize| row.binary_search_by_key(&col, |&(j, _)| j);
+    // A binary search over a row of `len` entries: `⌊log₂ len⌋ + 1`
+    // compares.
+    let has = |row: &[(usize, BigUint)], col: usize| {
+        bitop_ops::word_op((usize::BITS - row.len().leading_zeros()) as u64);
+        row.binary_search_by_key(&col, |&(j, _)| j)
+    };
 
     // Markowitz-lite: the factor-base column with the fewest live rows,
     // and within it the shortest row — this is what keeps fill-in from
@@ -1489,33 +1662,42 @@ fn sparse_solve_for_k(
     // lowest column, so the elimination order — and with it the mul-mod
     // count — is deterministic; the `HashMap` iteration it replaces was
     // not.  The loop ends when nothing is left but the k column.
-    while let Some(col) = (0..m)
-        .filter(|&j| col_count[j] > 0)
-        .min_by_key(|&j| col_count[j])
-    {
+    while let Some(col) = {
+        // The pivot-column scan reads every column count.
+        bitop_ops::word_op(m as u64);
+        (0..m)
+            .filter(|&j| col_count[j] > 0)
+            .min_by_key(|&j| col_count[j])
+    } {
         let mut live = std::mem::take(&mut holders[col]);
+        bitop_ops::word_op(live.len() as u64);
         live.retain(|&i| !eliminated[i] && has(&rows[i], col).is_ok());
         // A row that cancels out of `col` and later fills back into it is
         // pushed again while its stale entry is still here, so the list
         // can name a row twice.  Visiting it twice would find `col`
         // already gone on the second visit.
+        bitop_ops::word_op(bitop_ops::sort_cost(live.len()) + live.len() as u64);
         live.sort_unstable();
         live.dedup();
         debug_assert_eq!(live.len(), col_count[col]);
+        // The shortest-row choice.
+        bitop_ops::word_op(live.len() as u64);
         let pivot = *live.iter().min_by_key(|&&i| rows[i].len())?;
 
         // Normalise the pivot row.
         let at = has(&rows[pivot], col).ok()?;
-        let inv = mod_inverse(&rows[pivot][at].1, n)?;
+        let inv = modr_inverse_counted(&rows[pivot][at].1, n)?;
         for (_, v) in rows[pivot].iter_mut() {
             *v = (&*v * &inv) % n;
             ops += 1;
         }
         rhs[pivot] = (&rhs[pivot] * &inv) % n;
         ops += 1;
+        bitop_ops::modr_mul(rows[pivot].len() as u64 + 1);
         eliminated[pivot] = true;
         let pivot_row = std::mem::take(&mut rows[pivot]);
         let pivot_rhs = rhs[pivot].clone();
+        bitop_ops::word_op(pivot_row.len() as u64);
         for &(j, _) in &pivot_row {
             col_count[j] -= 1;
         }
@@ -1532,6 +1714,8 @@ fn sparse_solve_for_k(
             let mut merged: Vec<(usize, BigUint)> = Vec::with_capacity(old.len() + pivot_row.len());
             let (mut a, mut b) = (0, 0);
             while a < old.len() || b < pivot_row.len() {
+                // One merge step: compare two column indices.
+                bitop_ops::word_op(1);
                 let ja = old.get(a).map_or(usize::MAX, |e| e.0);
                 let jb = pivot_row.get(b).map_or(usize::MAX, |e| e.0);
                 if ja < jb {
@@ -1541,6 +1725,9 @@ fn sparse_solve_for_k(
                 }
                 let term = (&factor * &pivot_row[b].1) % n;
                 ops += 1;
+                // A multiply-subtract (or, on fill-in, a multiply-negate).
+                bitop_ops::modr_mul(1);
+                bitop_ops::modr_add(1);
                 let v = if ja == jb {
                     let v = (&old[a].1 + n - &term) % n;
                     a += 1;
@@ -1557,6 +1744,7 @@ fn sparse_solve_for_k(
                 }
                 b += 1;
             }
+            bitop_ops::word_op((old.len() + merged.len()) as u64);
             for &(j, _) in &old {
                 col_count[j] -= 1;
             }
@@ -1565,6 +1753,8 @@ fn sparse_solve_for_k(
             }
             rhs[i] = (&rhs[i] + n - &((&factor * &pivot_rhs) % n)) % n;
             ops += 1;
+            bitop_ops::modr_mul(1);
+            bitop_ops::modr_add(1);
             rows[i] = merged;
         }
     }
@@ -1574,9 +1764,11 @@ fn sparse_solve_for_k(
         if eliminated[i] {
             continue;
         }
+        bitop_ops::word_op(1);
         if row.len() == 1 && row[0].0 == m {
-            let inv = mod_inverse(&row[0].1, n)?;
+            let inv = modr_inverse_counted(&row[0].1, n)?;
             ops += 1;
+            bitop_ops::modr_mul(1);
             return Some(((&rhs[i] * &inv) % n, ops));
         }
     }
@@ -1604,12 +1796,19 @@ fn solve_for_logarithm(
     for rel in relations {
         let mut row: HashMap<usize, BigUint> = HashMap::new();
         for &(j, c) in &rel.entries {
+            // One probe, one accumulation mod N.
+            ops::hash_probe(1);
+            ops::modr_add(1);
             let e = row.entry(j).or_insert_with(BigUint::zero);
             *e = (&*e + signed_mod(c, n)) % n;
         }
+        // −b, and its insert.
+        ops::modr_add(1);
+        ops::hash_probe(1);
         row.insert(m, (n - &(&rel.coef_b % n)) % n);
         let mut sparse: Vec<(usize, BigUint)> =
             row.into_iter().filter(|(_, v)| !v.is_zero()).collect();
+        ops::word_op(ops::sort_cost(sparse.len()));
         sparse.sort_unstable_by_key(|&(j, _)| j);
         rows.push(sparse);
         rhs.push(&rel.coef_a % n);
@@ -1646,6 +1845,8 @@ fn signed_mod(v: i64, n: &BigUint) -> BigUint {
     if v >= 0 {
         BigUint::from(v as u64) % n
     } else {
+        // A negation mod N (the small `|v|` is already reduced).
+        ops::modr_add(1);
         (n - BigUint::from(v.unsigned_abs()) % n) % n
     }
 }
