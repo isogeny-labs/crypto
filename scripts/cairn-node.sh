@@ -59,13 +59,9 @@ mkdir -p "$home" && chmod 700 "$home"
 
 healthy() { curl -fsS --noproxy '*' --max-time 3 "http://$http/health" >/dev/null 2>&1; }
 
-# Without the reader `cairn --version` says "ui not embedded", which a bare
-# grep for "embedded" also matched, so the old binary was never rebuilt.
-has_reader() {
-  local v
-  v="$(cairn --version 2>/dev/null)" || return 1
-  grep -q 'embedded' <<<"$v" && ! grep -q 'not embedded' <<<"$v"
-}
+# `cairn --version` says "ui       embedded" or "ui       not embedded"; match
+# the first only, or a binary that cannot `run` passes.
+has_reader() { command -v cairn >/dev/null && cairn --version 2>/dev/null | grep -Eq '^ *ui +embedded'; }
 
 running() {
   [ -s "$supervisor_pid" ] && kill -0 "$(cat "$supervisor_pid")" 2>/dev/null
