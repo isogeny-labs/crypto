@@ -81,8 +81,14 @@ mkdir -p /tmp/tian2007-source
 curl -L --fail https://export.arxiv.org/src/2007.03172 | tar -xz -C /tmp/tian2007-source
 python3 research/five_leads_e2e_20261019/extract_tian_genus3_map.py /tmp/tian2007-source/dlpiso.tex > research/five_leads_e2e_20261019/fixtures/tian-genus3-f257-map-v1.json
 python3 research/five_leads_e2e_20261019/tian_genus3_map_gate.py research/five_leads_e2e_20261019/fixtures/tian-genus3-f257-map-v1.json > research/five_leads_e2e_20261019/correctness/tian-genus3-f257-map-gate-v1.json
+python3 research/five_leads_e2e_20261019/tian_genus3_kernel_gate.py /tmp/tian2007-source/dlpiso.tex > research/five_leads_e2e_20261019/correctness/tian-genus3-f257-kernel-gate-v1.json
 target/release/hyperelliptic-cover arithmetic --input research/five_leads_e2e_20261019/fixtures/tian-genus3-f257-p1-scalar.json > research/five_leads_e2e_20261019/correctness/tian-genus3-f257-p1-scalar-result.json
 ```
+
+The kernel gate independently implements degree-six extension-field Cantor
+arithmetic, checks the paper's three 3-torsion divisors, all 27 generated
+elements, the extension polynomial's irreducibility and Frobenius stability.
+It does not check the Weil pairing or construct the quotient.
 
 The published F257 pair then has a complete mapped DLP and counted source
 rho comparison. The line-sieve solver evaluates the map functions from the

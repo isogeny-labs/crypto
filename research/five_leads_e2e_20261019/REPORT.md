@@ -259,7 +259,13 @@ was partially replayed: a rational divisor \(T_1\) validates and
 \(3T_1=0\) in the repo's hyperelliptic arithmetic
 ([receipt](correctness/tian-genus3-f257-t1-result.json)).
 The copied rational quartic passes the gradient-ideal smoothness check.
-Its extension-field generators and quotient-from-kernel construction have
+Its [extension-field kernel gate](correctness/tian-genus3-f257-kernel-gate-v1.json)
+now verifies the defining polynomial for \(\mathbf F_{257^6}\) is
+irreducible, all three published generators satisfy \(3T_i=0\), their
+27 linear combinations are distinct, and Frobenius sends the three
+generators to subgroup coordinates \((1,0,0),(1,2,2),(2,1,0)\).
+Thus the listed subgroup is rational as a set. Its Weil-pairing isotropy,
+quotient-from-kernel construction and induced general Jacobian map have
 not been checked.
 
 The original TeX of the same paper has SHA-256
