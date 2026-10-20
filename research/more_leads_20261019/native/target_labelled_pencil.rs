@@ -1,10 +1,93 @@
 //! Target-labelled pencil geometry on a valid Scholten source fixture.
 //! Every accepted three-point relation is checked in the Jacobian; the first
 //! of each walk is also checked through the independent dual norm map.
-use pencil_relation_gate::three_leads::{Divisor, Point, Scholten};
+use pencil_relation_gate::three_leads::{Counts, Divisor, Point, Scholten};
+use serde::Serialize;
 use serde_json::{json, Value};
-use std::collections::BTreeSet;
+use std::cell::Cell;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
+use std::time::Instant;
+
+#[derive(Clone, Copy, Default, Serialize)]
+struct ArithmeticCounts {
+    base_adds: u64,
+    base_muls: u64,
+    base_inversions: u64,
+    scalar_adds: u64,
+    scalar_muls: u64,
+    scalar_inversions: u64,
+}
+impl ArithmeticCounts {
+    fn difference(self, before: Self) -> Self {
+        Self {
+            base_adds: self.base_adds - before.base_adds,
+            base_muls: self.base_muls - before.base_muls,
+            base_inversions: self.base_inversions - before.base_inversions,
+            scalar_adds: self.scalar_adds - before.scalar_adds,
+            scalar_muls: self.scalar_muls - before.scalar_muls,
+            scalar_inversions: self.scalar_inversions - before.scalar_inversions,
+        }
+    }
+    fn add_assign(&mut self, other: Self) {
+        self.base_adds += other.base_adds;
+        self.base_muls += other.base_muls;
+        self.base_inversions += other.base_inversions;
+        self.scalar_adds += other.scalar_adds;
+        self.scalar_muls += other.scalar_muls;
+        self.scalar_inversions += other.scalar_inversions;
+    }
+}
+#[derive(Default, Serialize)]
+struct PhaseTotals {
+    elapsed_ns: u128,
+    field: Counts,
+    arithmetic: ArithmeticCounts,
+}
+fn group_counts(s: &Scholten) -> Counts {
+    s.e.f.counts() + s.j.f.counts()
+}
+fn measured<T>(
+    s: &Scholten,
+    phases: &mut BTreeMap<&'static str, PhaseTotals>,
+    name: &'static str,
+    f: impl FnOnce() -> T,
+) -> T {
+    let before_field = group_counts(s);
+    let before_arithmetic = arithmetic_counts();
+    let start = Instant::now();
+    let result = f();
+    let elapsed_ns = start.elapsed().as_nanos();
+    let phase = phases.entry(name).or_default();
+    phase.elapsed_ns += elapsed_ns;
+    phase.field = phase.field + (group_counts(s) - before_field);
+    phase
+        .arithmetic
+        .add_assign(arithmetic_counts().difference(before_arithmetic));
+    result
+}
+thread_local! {
+    static PRICE_ACTIVE: Cell<bool> = const { Cell::new(false) };
+    static PRICE_COUNTS: Cell<ArithmeticCounts> = Cell::new(ArithmeticCounts::default());
+}
+fn charge(modulus: u64, action: impl FnOnce(&mut ArithmeticCounts)) {
+    PRICE_ACTIVE.with(|active| {
+        if active.get() {
+            PRICE_COUNTS.with(|counts| {
+                let mut c = counts.get();
+                assert!(modulus == 739 || modulus == 34147);
+                action(&mut c);
+                counts.set(c);
+            });
+        }
+    });
+}
+fn arithmetic_counts() -> ArithmeticCounts {
+    PRICE_COUNTS.with(Cell::get)
+}
+fn reset_arithmetic_counts() {
+    PRICE_COUNTS.with(|c| c.set(ArithmeticCounts::default()));
+}
 
 fn trim(mut a: Vec<u64>) -> Vec<u64> {
     while a.last() == Some(&0) {
@@ -13,15 +96,44 @@ fn trim(mut a: Vec<u64>) -> Vec<u64> {
     a
 }
 fn add(a: u64, b: u64, p: u64) -> u64 {
+    charge(p, |c| {
+        if p == 739 {
+            c.base_adds += 1
+        } else {
+            c.scalar_adds += 1
+        }
+    });
     (a + b) % p
 }
 fn sub(a: u64, b: u64, p: u64) -> u64 {
+    charge(p, |c| {
+        if p == 739 {
+            c.base_adds += 1
+        } else {
+            c.scalar_adds += 1
+        }
+    });
     (a + p - b) % p
 }
 fn mul(a: u64, b: u64, p: u64) -> u64 {
+    charge(p, |c| {
+        if p == 739 {
+            c.base_muls += 1
+        } else {
+            c.scalar_muls += 1
+        }
+    });
     (a * b) % p
 }
 fn pow(mut a: u64, mut n: u64, p: u64) -> u64 {
+    assert_eq!(n, p - 2);
+    charge(p, |c| {
+        if p == 739 {
+            c.base_inversions += 1
+        } else {
+            c.scalar_inversions += 1
+        }
+    });
     let mut out = 1;
     while n > 0 {
         if n & 1 != 0 {
@@ -98,11 +210,14 @@ fn point_sieve_candidates(
     usize,
     usize,
     usize,
+    Vec<Vec<u64>>,
 ) {
     let mut buckets = vec![Vec::<u64>::new(); p as usize];
     let mut point_probes = 0;
     let mut denominators = Vec::new();
     let mut exceptional_denominators = Vec::new();
+    let mut exceptional_points = Vec::new();
+    let mut all_lambda_points = Vec::new();
     let u = &d.u[..=d.degree];
     let v = &d.v[..d.degree];
     let (q0, _) = complement(d, 0, h, p);
@@ -116,9 +231,10 @@ fn point_sieve_candidates(
             let qx = peval(&q0, x, p);
             let slope = mul(2, vx, p);
             if slope != 0 {
-                exceptional_denominators.push((qx, slope));
+                exceptional_denominators.push((x, qx, slope));
             } else if qx == 0 {
                 exceptional.extend(0..p);
+                all_lambda_points.push(x);
             }
             continue;
         }
@@ -131,7 +247,7 @@ fn point_sieve_candidates(
     let all_denominators: Vec<u64> = denominators
         .iter()
         .map(|&(_, ux, _)| ux)
-        .chain(exceptional_denominators.iter().map(|&(_, slope)| slope))
+        .chain(exceptional_denominators.iter().map(|&(_, _, slope)| slope))
         .collect();
     let mut prefix = vec![1; all_denominators.len() + 1];
     let mut batch_multiplies = 0;
@@ -152,8 +268,10 @@ fn point_sieve_candidates(
         batch_multiplies += 2;
         assert_eq!(mul(inv, d_i, p), 1);
         if i >= ordinary_count {
-            let (qx, _) = exceptional_denominators[i - ordinary_count];
-            exceptional.insert(mul(sub(0, qx, p), inv, p));
+            let (x, qx, _) = exceptional_denominators[i - ordinary_count];
+            let lambda = mul(sub(0, qx, p), inv, p);
+            exceptional.insert(lambda);
+            exceptional_points.push((lambda, x));
             continue;
         }
         let (x, ux, vx) = denominators[i];
@@ -176,6 +294,14 @@ fn point_sieve_candidates(
             candidates.insert(lambda as u64);
         }
     }
+    for (lambda, x) in exceptional_points {
+        buckets[lambda as usize].push(x);
+    }
+    for x in all_lambda_points {
+        for bucket in &mut buckets {
+            bucket.push(x);
+        }
+    }
     (
         candidates,
         ordinary_count,
@@ -185,6 +311,7 @@ fn point_sieve_candidates(
         point_probes,
         collision_candidates,
         exceptional_count,
+        buckets,
     )
 }
 fn fixture() -> (u64, u64, Point, u64, u64) {
@@ -281,6 +408,14 @@ impl LinearSolver {
     }
 }
 fn main() {
+    if std::env::args().any(|arg| arg == "--price-scan") {
+        price_main(true);
+        return;
+    }
+    if std::env::args().any(|arg| arg == "--price") {
+        price_main(false);
+        return;
+    }
     let (p, r, generator, a_curve, b_curve) = fixture();
     assert_eq!(p % 4, 3);
     let s = Scholten::new(p);
@@ -367,6 +502,7 @@ fn main() {
                 point_probes,
                 collision_candidates,
                 exceptional_count,
+                sieve_root_buckets,
             ) = point_sieve_candidates(d, h, p, &rational_y);
             total_sieve_candidates += sieve_candidates.len();
             total_sieve_ordinary_denominators += ordinary_denominators;
@@ -383,6 +519,9 @@ fn main() {
                     continue;
                 }
                 assert!(sieve_candidates.contains(&lambda));
+                let mut sieve_roots = sieve_root_buckets[lambda as usize].clone();
+                sieve_roots.sort_unstable();
+                assert_eq!(sieve_roots, roots);
                 assert!(complete_lambdas.insert(lambda));
                 assert!(root_sets.insert(roots.clone()));
                 let mut sum = Divisor::O;
@@ -487,4 +626,140 @@ fn main() {
         "all_complete_relations_verified_in_jacobian":true,
         "first_relation_per_walk_verified_under_dual_norm":true})
     );
+}
+
+fn price_main(full_scan: bool) {
+    PRICE_ACTIVE.with(|active| active.set(true));
+    reset_arithmetic_counts();
+    let (p, r, generator, a_curve, b_curve) = fixture();
+    let setup_start = Instant::now();
+    let s = Scholten::new(p);
+    let source = s.short_curve();
+    assert_eq!(source.c, [b_curve, a_curve, 0, 1]);
+    assert!(source.valid(generator));
+    assert_eq!(source.mul(generator, r), Point::O);
+    let h = &s.j.polynomial;
+    let rational_y = rational_y_by_x(h, p);
+    let mut checked = 0;
+    for (x, ys) in rational_y.iter().enumerate() {
+        for &y in ys {
+            let projected = s.j.mul(s.j.point(x as u64, y), 16);
+            assert_eq!(s.j.mul(projected, r), Divisor::O);
+            checked += 1;
+        }
+    }
+    let setup_elapsed_ns = setup_start.elapsed().as_nanos();
+    println!(
+        "{}",
+        json!({"schema":"pencil-priced-setup/v1","p":p,"r":r,
+            "rational_curve_points":checked,"elapsed_ns":setup_elapsed_ns,
+            "field":group_counts(&s),"arithmetic":arithmetic_counts()})
+    );
+    for run_id in 0..60u64 {
+        let round = run_id / 20;
+        let target_index = run_id % 20;
+        let scalar = (123 + 1777 * target_index) % r;
+        let target = source.mul(generator, scalar);
+        s.e.f.reset();
+        s.j.f.reset();
+        reset_arithmetic_counts();
+        let online_start = Instant::now();
+        let mut phases = BTreeMap::new();
+        let mut solver = LinearSolver::new(p, r, &rational_y);
+        let mut recovered = None;
+        let mut walks = 0;
+        let mut candidate_lambdas = 0;
+        let mut rejected_candidates = 0;
+        let mut verified_relations = 0;
+        let mut point_probes = 0;
+        let mut batch_inversions = 0;
+        let mut batch_multiplies = 0;
+        let mut solution_key = None;
+        for walk_index in 0..5u64 {
+            let a = (2695 + 7919 * walk_index + 1741 * target_index) % r;
+            let b = (409 + 3151 * walk_index + 857 * target_index) % r;
+            assert_ne!(b, 0);
+            let d = measured(&s, &mut phases, "walk_generation", || {
+                let source_point = source.add(source.mul(generator, a), source.mul(target, b));
+                s.tau(s.from_short(source_point))
+            });
+            assert_eq!(d.degree, 2);
+            walks += 1;
+            let (candidates, _, _, inversions, multiplies, probes, _, _, sieve_root_buckets) =
+                measured(&s, &mut phases, "sieve", || {
+                    point_sieve_candidates(d, h, p, &rational_y)
+                });
+            candidate_lambdas += candidates.len();
+            point_probes += probes;
+            batch_inversions += inversions;
+            batch_multiplies += multiplies;
+            for lambda in candidates {
+                let points = measured(&s, &mut phases, "candidate_verification", || {
+                    let (quotient, w) = complement(d, lambda, h, p);
+                    assert_eq!(quotient.len(), 4);
+                    let roots: Vec<u64> = if full_scan {
+                        (0..p).filter(|&x| peval(&quotient, x, p) == 0).collect()
+                    } else {
+                        sieve_root_buckets[lambda as usize].clone()
+                    };
+                    if roots.len() != 3 {
+                        return None;
+                    }
+                    assert_eq!(roots.iter().copied().collect::<BTreeSet<_>>().len(), 3);
+                    let mut sum = Divisor::O;
+                    let mut points = Vec::with_capacity(3);
+                    for &x in &roots {
+                        assert_eq!(peval(&quotient, x, p), 0);
+                        let y = peval(&w, x, p);
+                        assert_eq!(mul(y, y, p), peval(h, x, p));
+                        let point = s.j.point(x, y);
+                        sum = s.j.add(sum, point);
+                        points.push([x, y]);
+                    }
+                    assert_eq!(s.j.add(d, sum), Divisor::O);
+                    Some(points)
+                });
+                let Some(points) = points else {
+                    rejected_candidates += 1;
+                    continue;
+                };
+                verified_relations += 1;
+                recovered = measured(&s, &mut phases, "elimination", || {
+                    solver.relation(&points, a, b)
+                });
+                if recovered.is_some() {
+                    solution_key = Some([walk_index, lambda]);
+                    break;
+                }
+            }
+            if recovered.is_some() {
+                break;
+            }
+        }
+        let recovered = recovered.expect("five walks must solve frozen target");
+        measured(&s, &mut phases, "recovery_check", || {
+            assert_eq!(source.mul(generator, recovered), target);
+        });
+        let online_elapsed_ns = online_start.elapsed().as_nanos();
+        assert_eq!(recovered, scalar);
+        assert_eq!(solver.inserted_relations as usize, verified_relations);
+        println!(
+            "{}",
+            json!({"schema":"pencil-priced-target/v1","round":round,"target_index":target_index,
+                "candidate_root_mode":if full_scan {"full_scan"} else {"witness_bucket"},
+                "scalar":scalar,"recovered":recovered,"walks":walks,
+                "solution_key":solution_key,"candidate_lambdas":candidate_lambdas,
+                "rejected_candidates":rejected_candidates,
+                "verified_relations":verified_relations,
+                "point_probes":point_probes,
+                "batch_inversions":batch_inversions,
+                "batch_multiplies":batch_multiplies,
+                "solver_nodes":solver.pivots.len(),"solver_rank":solver.rank,
+                "solver_row_updates":solver.row_updates,
+                "solver_inversions":solver.inversions,
+                "online_elapsed_ns":online_elapsed_ns,
+                "field":group_counts(&s),"arithmetic":arithmetic_counts(),
+                "phases":phases})
+        );
+    }
 }
