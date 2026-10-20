@@ -29,7 +29,9 @@ integer coefficient arrays, curve shape, elliptic model, field polynomial,
 and elapsed-time syntax. It emits one JSON object per input row with integer
 coefficients represented as decimal strings, retaining arbitrary precision.
 It parses the entire input before writing output, so a malformed row yields
-no partial JSONL. It does **not** certify that a row's curve is smooth, that
+no partial JSONL. Lists may nest at most two levels, matching the upstream
+curve-coefficient shape; deeper input is rejected before recursive parsing.
+It does **not** certify that a row's curve is smooth, that
 the elliptic conductor or field discriminant is correct, or that a Prym
 variety has the stated properties.
 

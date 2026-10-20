@@ -69,3 +69,20 @@ The first `cargo test --release --lib` run inside the sandbox returned exit
 with `Operation not permitted`, and 118 were ignored. Rerunning the required
 release library suite with local-socket access (`cargo test --release --lib
 --quiet`) returned exit 0: 4,390 passed, zero failed, 118 ignored.
+
+## Native parser follow-up, 2026-10-20
+
+Review of head `deb616a7565558321ffa9c5600fd8f61a3a84243` reproduced a
+stack-overflow abort on a curve field nested 50,000 levels deep. The reader
+now rejects nesting beyond two levels before recursive parsing, matching
+the upstream flat-list and pair-of-lists shapes. Five native tests pass;
+both a single malformed row and a valid row followed by the deeply nested
+row exit 2 with no stdout. All 654 example rows and the six recorded
+category counts remain unchanged. Release Clippy and rustfmt pass.
+
+The [source-bound control receipt](review-20261020-nesting-validation.json)
+records the reproduction, repaired CLI controls, and current source hash.
+All nine original upstream blob identities were checked against the pinned
+GitHub tree, and the historical library-log and PDF hashes were verified.
+The dated 2026-10-19 receipts and upstream files retain their original bytes.
+This follow-up changes input validation only and executes no Magma search.

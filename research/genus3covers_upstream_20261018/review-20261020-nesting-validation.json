@@ -1,0 +1,35 @@
+{
+  "original_head": "deb616a7565558321ffa9c5600fd8f61a3a84243",
+  "original_deep_nesting_exit": -6,
+  "original_deep_nesting_error": "stack overflow, aborting",
+  "source_sha256": "9f0a5a6324356190df909f2b7f17b79a733fa264bb026e51374a96d496cc7177",
+  "native_tests_passed": 5,
+  "cli_controls": [
+    {
+      "case": "deep",
+      "exit": 2,
+      "stdout_bytes": 0,
+      "error_line": 1,
+      "stderr": "line 1: coefficient lists may nest at most two levels"
+    },
+    {
+      "case": "valid_then_deep",
+      "exit": 2,
+      "stdout_bytes": 0,
+      "error_line": 2,
+      "stderr": "line 2: coefficient lists may nest at most two levels"
+    }
+  ],
+  "pinned_example_rows": 654,
+  "counts": {
+    "1:2": 40,
+    "1:3": 382,
+    "2:2": 92,
+    "2:3": 126,
+    "3:2": 4,
+    "3:3": 10
+  },
+  "upstream_git_commit": "221e74b7097a386527d3ebed68aa181b68954fd0",
+  "upstream_blobs_verified": 9,
+  "historical_receipt_hashes_verified": true
+}

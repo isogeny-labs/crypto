@@ -28,7 +28,14 @@ fn top_fields(line: &str) -> Result<Vec<&str>, String> {
     let mut fields = Vec::new();
     for (i, ch) in line.char_indices() {
         match ch {
-            '[' => depth += 1,
+            '[' => {
+                depth += 1;
+                // Valid rows contain flat integer lists or a pair of lists.
+                // Reject deeper input before entering the recursive parser.
+                if depth > 2 {
+                    return Err("coefficient lists may nest at most two levels".into());
+                }
+            }
             ']' => depth = depth.checked_sub(1).ok_or("unmatched closing bracket")?,
             ':' if depth == 0 => {
                 fields.push(line[start..i].trim());
@@ -284,6 +291,18 @@ mod tests {
             .enumerate()
         {
             parse_row(line).unwrap_or_else(|e| panic!("line {}: {e}", i + 1));
+        }
+    }
+
+    #[test]
+    fn rejects_deep_nesting_before_recursive_parsing() {
+        for depth in [3, 50_000] {
+            let coefficients = format!("{}0{}", "[".repeat(depth), "]".repeat(depth));
+            let row = SAMPLE.replace("[[0,1,-4,10,4,1],[]]", &coefficients);
+            assert_eq!(
+                parse_row(&row).unwrap_err(),
+                "coefficient lists may nest at most two levels"
+            );
         }
     }
 }
