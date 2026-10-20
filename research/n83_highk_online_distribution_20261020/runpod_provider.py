@@ -8,6 +8,14 @@ from decimal import Decimal
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+GPU_TYPES = (
+    'NVIDIA RTX A2000', 'Tesla V100-PCIE-16GB',
+    'NVIDIA GeForce RTX 3070', 'NVIDIA GeForce RTX 3080',
+    'NVIDIA GeForce RTX 3080 Ti', 'NVIDIA GeForce RTX 4070 Ti',
+    'NVIDIA RTX 4000 Ada Generation',
+    'NVIDIA RTX 4000 SFF Ada Generation',
+    'NVIDIA RTX A4000', 'NVIDIA RTX A4500', 'NVIDIA RTX A5000',
+)
 
 
 def digest(path):
@@ -41,9 +49,7 @@ def verify(snapshot_path, results, head_sha):
             Decimal(prior['new_per_pod_price_cap_usd']) or
             pod.get('cloud_type') != 'COMMUNITY' or
             pod.get('compute_type') != 'GPU' or
-            pod.get('gpu_type_id') not in
-            ('NVIDIA RTX A2000', 'Tesla V100-PCIE-16GB',
-             'Tesla V100-SXM2-16GB') or
+            pod.get('gpu_type_id') not in GPU_TYPES or
             pod.get('gpu_count') != 1 or
             not isinstance(pod.get('cpu_affinity_ids'), list) or
             len(pod['cpu_affinity_ids']) != 4 or
