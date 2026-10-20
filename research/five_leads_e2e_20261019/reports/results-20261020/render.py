@@ -13,6 +13,7 @@ HERE = Path(__file__).resolve().parent
 PROJECTIVE = json.loads((STUDY / "results/genus2-projective-summary.json").read_text())
 MIXED = json.loads((STUDY / "results/mixed-fiber-dlp-native-v3-summary.json").read_text())
 MIXED_POLY = json.loads((STUDY / "results/mixed-fiber-polynomial-dlp-summary.json").read_text())
+MIXED_F4 = json.loads((STUDY / "results/mixed-fiber-f4-dlp-lower-bound-summary.json").read_text())
 TIAN = json.loads((STUDY / "results/tian-km-arithmetic-gate-summary.json").read_text())
 LINEAR = json.loads((STUDY / "results/tian-km-linear-dlp-summary.json").read_text())
 SIEVE = json.loads((STUDY / "results/tian-quartic-line-sieve-summary.json").read_text())
@@ -110,7 +111,12 @@ def results_report():
     plot(out / "mixed-fiber-polynomial-cost-ratios", [row["arm"] for row in polynomial],
          [row["representative"]["candidate_over_rho"] for row in polynomial],
          "Mixed-fiber Semaev-S4 DLP · 180 targets per arm", "candidate / source rho cost",
-         "540 source-verified polynomial all-roots records · no F4 comparison")
+         "540 source-verified polynomial all-roots records · F4 separately measured")
+    f4 = [row for row in MIXED_F4["summary"] if row["kind"] == "all"]
+    plot(out / "mixed-fiber-f4-lower-bound", [row["arm"] for row in f4],
+         [row["representative"]["candidate_over_rho"] for row in f4],
+         "Mixed-fiber native F4 DLP · 540 verified records", "candidate lower bound / source rho cost",
+         "2,290 exact F4 query root sets · row-reduction field ops only", horizontal=True)
     gate = TIAN["representative"]
     plot(out / "tian-arithmetic-gate", ["One quartic double", "Known-scalar 1987S"],
          [gate["one_jacobian_double_over_mean_rho"], gate["known_scalar_1987_multiplication_over_mean_rho"]],
@@ -142,11 +148,15 @@ The two-choice collector and the projective numerator chart each ran on all 1,26
 
 All 540 pair-table candidate records on nine eligible prime-order curves were source-verified; native reanalysis retained every price and curve. Homogeneous, mixed and matched-random pooled ratios to rho are {mixed[0]["representative"]["candidate_over_rho"]:.4f}×, {mixed[1]["representative"]["candidate_over_rho"]:.4f}× and {mixed[2]["representative"]["candidate_over_rho"]:.4f}×.
 
-The Semaev-S4 exhaustive-polynomial solver also recovered all 540 scalars on the same 180 targets and checked every answer on the source. Homogeneous, mixed and matched-random pooled costs are {polynomial[0]["representative"]["candidate_over_rho"]:.4f}×, {polynomial[1]["representative"]["candidate_over_rho"]:.4f}× and {polynomial[2]["representative"]["candidate_over_rho"]:.4f}× rho. All 36 pooled price cells lose to rho and the corresponding pair-table arm. External F4/msolve is untested.
+The Semaev-S4 exhaustive-polynomial solver also recovered all 540 scalars on the same 180 targets and checked every answer on the source. Homogeneous, mixed and matched-random pooled costs are {polynomial[0]["representative"]["candidate_over_rho"]:.4f}×, {polynomial[1]["representative"]["candidate_over_rho"]:.4f}× and {polynomial[2]["representative"]["candidate_over_rho"]:.4f}× rho. All 36 pooled price cells lose to rho and the corresponding pair-table arm.
+
+The native F4 solver additionally returned exact rational root sets on 2,290 nonidentity DLP queries; 26 identity right-hand sides needed no polynomial system. Its replay recovered and source-verified all 540 scalars. Counting F4 row-reduction multiplications and collector costs gives homogeneous/mixed/random *{f4[0]["representative"]["candidate_over_rho"]:.0f}×/{f4[1]["representative"]["candidate_over_rho"]:.0f}×/{f4[2]["representative"]["candidate_over_rho"]:.0f}×* rho as lower bounds; all 36 pooled cells lose. Symbolic and substitution operations are uncounted, and external msolve remains unavailable.
 
 #figure(image("mixed-fiber-cost-ratios.svg", width: 100%), caption: [Complete DLP cost ratios; 180 exact-order targets per arm.])
 
-#figure(image("mixed-fiber-polynomial-cost-ratios.svg", width: 76%), caption: [Complete Semaev-S4 all-roots DLP costs; 180 exact-order targets per arm; external F4 comparison outstanding.])
+#figure(image("mixed-fiber-polynomial-cost-ratios.svg", width: 76%), caption: [Complete exhaustive Semaev-S4 all-roots DLP costs; 180 exact-order targets per arm.])
+
+#figure(image("mixed-fiber-f4-lower-bound.svg", width: 76%), caption: [F4-backed DLP lower bounds from counted row-reduction field multiplications; 180 targets per arm.])
 
 == Cubic transfer and odd-kernel escape: unresolved attacks
 
@@ -200,6 +210,7 @@ The adapter inserted two zero-valued projective counters and an addition-backend
 
 def native_run_reports():
     polynomial = [row for row in MIXED_POLY["summary"] if row["kind"] == "all"]
+    f4 = [row for row in MIXED_F4["summary"] if row["kind"] == "all"]
     mixed_out = STUDY / "reports/run-20261020T0609Z-mixed-fiber-dlp-v2"
     mixed_out.mkdir(parents=True, exist_ok=True)
     for extension in ("svg", "png"):
@@ -329,6 +340,26 @@ At M+0.5S+10I and 0.1M per declared native logical operation, homogeneous/mixed/
 *Raw records:* `correctness/mixed-fiber-polynomial-dlp-v1.jsonl`; *full 36-price per-curve grid:* `results/mixed-fiber-polynomial-dlp-price-grid.csv`. This exhaustive all-roots polynomial evaluator is not F4/msolve. The fastest external Gröbner comparison and qualified wall-speed comparison remain open.
 '''
     compile_report(polynomial_out,poly_source)
+
+    f4_out=STUDY / "reports/run-20261020T0814Z-mixed-fiber-f4"
+    f4_out.mkdir(parents=True,exist_ok=True)
+    for extension in ("svg","png"):
+        shutil.copyfile(HERE / f"mixed-fiber-f4-lower-bound.{extension}",f4_out / f"cost-ratios.{extension}")
+    f4_source=f'''#set page(paper: "a4", margin: 22mm)
+#set text(font: "Liberation Sans", size: 10pt)
+= Mixed-fiber F4-backed DLP: counted lower bounds
+
+*Commands:* `five_leads_mixed_f4 --dlp-cohort`, `mixed-fiber-polynomial-dlp --f4-replay`, and `mixed-fiber-f4-analyze`. *Host:* shared Intel Xeon 6975P-C; L0 operation counts and unqualified internal F4 wall times.
+
+The native F4 solver built the Semaev-S4 resultant plus three fiber equations and returned complete rational roots for 2,290 nonidentity relation queries across the 540 original one-target arms. Another 26 identity right-hand sides needed no polynomial system. Every F4 root set matched exhaustive polynomial enumeration; there were no timeouts or mismatches. The collector consumed these roots, sign-lifted them, recovered all 540 scalars and source-verified every answer. The analyzer matched each target, query list, relation count and answer to the pair-table and exhaustive-polynomial controls.
+
+F4 reported 467,482,105,353 prime-field row-reduction multiplications. At M+0.5S+10I and 0.1M per declared native logical operation, the resulting *lower bounds* against matched rho are {f4[0]["representative"]["candidate_over_rho"]:.0f}× homogeneous, {f4[1]["representative"]["candidate_over_rho"]:.0f}× mixed and {f4[2]["representative"]["candidate_over_rho"]:.0f}× matched random. All 36 pooled pricing cells lose to rho and the pair-table control. Mixed/homogeneous is {MIXED_F4["cross_arm"][0]["representative"]:.5f}× in the counted lower bound, with 36/36 losses.
+
+#figure(image("cost-ratios.svg", width: 100%), caption: [F4-backed DLP counted lower bounds versus matched source rho; 180 targets per arm.])
+
+*Raw F4 roots:* `correctness/mixed-fiber-f4-dlp-oracle-v1.jsonl`; *verified DLPs:* `correctness/mixed-fiber-f4-dlp-v1.jsonl`; *full grid:* `results/mixed-fiber-f4-dlp-lower-bound-price-grid.csv`. Symbolic preprocessing, substitution field operations, allocation and control flow are uncounted. The summed F4 internal wall time was 356.1 s on a busy host, not a qualified rho wall-time ratio. No external msolve comparison ran.
+'''
+    compile_report(f4_out,f4_source)
 
 
 if __name__ == "__main__":

@@ -105,6 +105,31 @@ matches every target and fiber to the pair-table cohort, and writes the
 36-price per-curve grid. This is complete exhaustive Semaev-S4 rational-root
 evaluation, not F4/msolve; an external Gröbner solver is not installed here.
 
+The native F4 route uses the repository's degree-bounded solver on the
+same Semaev-S4 resultant and three fiber equations. Reproduction requires
+the exhaustive-polynomial receipt above because it freezes every actual
+relation-query x-coordinate. Run from repository root:
+
+```sh
+cargo build --release --offline --locked --bin five_leads_mixed_f4
+target/release/five_leads_mixed_f4 --cohort > research/five_leads_e2e_20261019/correctness/mixed-fiber-f4-target-cohort-v1.jsonl
+target/release/five_leads_mixed_f4 --dlp-cohort > research/five_leads_e2e_20261019/correctness/mixed-fiber-f4-dlp-oracle-v1.jsonl
+research/five_leads_e2e_20261019/native/target/release/mixed-fiber-polynomial-dlp --f4-replay > research/five_leads_e2e_20261019/correctness/mixed-fiber-f4-dlp-v1.jsonl
+research/five_leads_e2e_20261019/native/target/release/mixed-fiber-f4-analyze
+```
+
+The first F4 run checks 540 target-coordinate root sets; the second checks
+2,290 polynomial systems among 2,316 actual DLP relation trials (26 have an
+identity right-hand side). Each F4 result is independently compared
+with exhaustive rational-root enumeration before being saved. The replay
+consumes those ordered roots, sign-lifts them, and source-verifies every
+scalar. The analyzer requires all 540 targets, rho controls, query lists,
+relation counts and answers to match, then writes a 36-price grid. Its
+F4 `field_ops` counter counts row-reduction multiplications but omits
+symbolic preprocessing and substitution arithmetic, so the computed ratios
+are *lower bounds*, not complete F4 costs. F4 internal wall times are
+unqualified on this busy host; no external msolve run was available.
+
 Tian's published quartic group-law
 checks, optimized cubic source rho, and the explicitly non-DLP arithmetic
 cost gate use `tian-quartic-km`, `tian-cubic-rho`, and
@@ -143,7 +168,7 @@ Final verification commands:
 
 ```sh
 cargo test --release --offline --locked --lib
-cargo test --release --offline --locked --bin tian_quartic_smoothness --bin smith_holdout_materialize
+cargo test --release --offline --locked --bin tian_quartic_smoothness --bin smith_holdout_materialize --bin five_leads_mixed_f4
 cargo test --release --offline --locked --manifest-path research/five_leads_e2e_20261019/native/Cargo.toml
 python3 -m py_compile research/five_leads_e2e_20261019/*.py
 rustfmt --check --edition 2021 src/cryptanalysis/three_leads.rs src/cryptanalysis/three_leads_followup.rs src/bin/smith_holdout_materialize.rs src/bin/tian_quartic_smoothness.rs research/five_leads_e2e_20261019/native/*.rs

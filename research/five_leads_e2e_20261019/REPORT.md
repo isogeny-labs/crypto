@@ -3,8 +3,9 @@
 This is a follow-up to the five leads in
 [the lead register](../new_leads_20261019/README.md). Each result below names
 the operation that was actually run. The two genus-2 changes have full-cohort
-execution and replay. Mixed fibers have end-to-end pair-table and exhaustive
-summation-polynomial DLP controls, but no F4/msolve comparison. Neither odd-kernel route has
+execution and replay. Mixed fibers have end-to-end pair-table, exhaustive
+summation-polynomial and native F4 DLP controls, but no external msolve
+comparison. Neither odd-kernel route has
 an end-to-end transfer DLP. All tested curves, points and scalars are public
 synthetic or published fixtures.
 
@@ -260,9 +261,8 @@ homogeneous in this implementation, but all three lose to rho in every
 pooled pricing cell. Mixed beats rho in 16/36 cells for the \(p=97\) slice and
 none for \(p=193,257\). The
 [full native price grid](results/mixed-fiber-dlp-native-v3-price-grid.csv) retains every
-curve, price and loss. This measures an end-to-end **pair-table oracle**
-variant, not the proposed heterogeneous polynomial/F4 solver, so that
-specific F4 implementation remains open.
+curve, price and loss. This measures the **pair-table oracle** variant; the
+polynomial and F4 implementations are reported below.
 
 A new native [Semaev (S_4) solver](native/mixed_fiber_polynomial_dlp.rs)
 evaluates the full resultant polynomial over every prescribed three-fiber
@@ -288,6 +288,41 @@ per-prime and per-curve wins and losses. This is an exhaustive polynomial
 all-roots solver, **not F4 or msolve**. The fastest external Gröbner-system
 comparison and larger-size evidence remain
 [open](../../problems/mixed-fiber-pkm-full-solver.md).
+
+The repository's [native F4 engine](../../src/bin/five_leads_mixed_f4.rs)
+also solved all 540 target-coordinate systems with exact root-set agreement
+against exhaustive enumeration and no timeout
+([receipt](correctness/mixed-fiber-f4-target-cohort-v1.jsonl)). For a real
+F4-backed DLP replay on the same 540 one-target arms, it then handled
+**2,316 actual relation trials**: F4 solved 2,290 nonidentity right-hand
+sides, while 26 identity right-hand sides needed no polynomial system.
+Every F4 root set was checked against the exhaustive polynomial oracle
+([query receipt](correctness/mixed-fiber-f4-dlp-oracle-v1.jsonl)).
+The collector consumed those ordered F4 roots, sign-lifted them, recovered
+**540/540** scalars and checked every (kP=Q) on the source
+([DLP receipt](correctness/mixed-fiber-f4-dlp-v1.jsonl)). The native
+[analyzer](native/mixed_fiber_f4_analyze.rs) matches every target, query,
+relation count and answer to the exhaustive polynomial and pair-table
+controls. There were zero F4 timeouts or root-set mismatches.
+
+F4 reports **467,482,105,353** prime-field multiplications in row reduction
+across the 540 DLP arms. Adding those to the collector's recorded
+field-operation and declared native counts yields a **lower bound** on cold
+cost. At (M+0.5S+10I) and 0.1(M) per native logical operation, the
+homogeneous, mixed and random lower bounds are **160,899×, 232,110× and
+239,616×** matched rho, respectively. All three lose in all 36 pooled
+pricing cells and also lose to the pair-table arms in all 36. Within this
+counted lower bound, mixed/homogeneous is **1.44258×** (36/36 losses),
+while mixed/random is **0.96868×** (36/36 wins). The
+[full grid](results/mixed-fiber-f4-dlp-lower-bound-price-grid.csv) includes
+the per-prime and per-curve rows; the
+[summary](results/mixed-fiber-f4-dlp-lower-bound-summary.json) includes
+cross-arm comparisons. F4 symbolic preprocessing,
+substitution arithmetic, allocation and control flow are not in its
+`field_ops` counter; the recorded **356.1 s** sum of F4 internal wall
+times is unqualified on a busy host and is not a rho wall-time ratio.
+Thus the lower bound suffices to establish a loss to rho on these small
+systems, but does not establish a complete F4 cost or external-tool ranking.
 
 The [results report PDF](reports/results-20261020/report.pdf) contains the
 quantitative graphs and links the seven individual projective

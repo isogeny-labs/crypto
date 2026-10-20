@@ -14,11 +14,15 @@ The two-choice collector and the projective numerator chart each ran on all 1,26
 
 All 540 pair-table candidate records on nine eligible prime-order curves were source-verified; native reanalysis retained every price and curve. Homogeneous, mixed and matched-random pooled ratios to rho are 3.6435×, 3.2222× and 3.7180×.
 
-The Semaev-S4 exhaustive-polynomial solver also recovered all 540 scalars on the same 180 targets and checked every answer on the source. Homogeneous, mixed and matched-random pooled costs are 57.8840×, 32.2975× and 34.4846× rho. All 36 pooled price cells lose to rho and the corresponding pair-table arm. External F4/msolve is untested.
+The Semaev-S4 exhaustive-polynomial solver also recovered all 540 scalars on the same 180 targets and checked every answer on the source. Homogeneous, mixed and matched-random pooled costs are 57.8840×, 32.2975× and 34.4846× rho. All 36 pooled price cells lose to rho and the corresponding pair-table arm.
+
+The native F4 solver additionally returned exact rational root sets on 2,290 nonidentity DLP queries; 26 identity right-hand sides needed no polynomial system. Its replay recovered and source-verified all 540 scalars. Counting F4 row-reduction multiplications and collector costs gives homogeneous/mixed/random *160899×/232110×/239616×* rho as lower bounds; all 36 pooled cells lose. Symbolic and substitution operations are uncounted, and external msolve remains unavailable.
 
 #figure(image("mixed-fiber-cost-ratios.svg", width: 100%), caption: [Complete DLP cost ratios; 180 exact-order targets per arm.])
 
-#figure(image("mixed-fiber-polynomial-cost-ratios.svg", width: 76%), caption: [Complete Semaev-S4 all-roots DLP costs; 180 exact-order targets per arm; external F4 comparison outstanding.])
+#figure(image("mixed-fiber-polynomial-cost-ratios.svg", width: 76%), caption: [Complete exhaustive Semaev-S4 all-roots DLP costs; 180 exact-order targets per arm.])
+
+#figure(image("mixed-fiber-f4-lower-bound.svg", width: 76%), caption: [F4-backed DLP lower bounds from counted row-reduction field multiplications; 180 targets per arm.])
 
 == Cubic transfer and odd-kernel escape: unresolved attacks
 

@@ -4,7 +4,9 @@ use five_leads_study::three_leads::{
     exhaustive_order, solve_rho, Elliptic, Field, Point, Ring, Rng, StudyInstance,
 };
 use serde_json::json;
+use serde_json::Value;
 use std::collections::{BTreeMap, BTreeSet};
+use std::fs;
 
 fn curve(p: u64, a: u64, b: u64) -> Elliptic {
     Elliptic {
@@ -222,6 +224,7 @@ fn solve(
     r: u64,
     xs: &[Vec<u64>; 3],
     seed: u64,
+    oracle: Option<&[Value]>,
 ) -> serde_json::Value {
     let mut draw_count = 0;
     let points: [Vec<Point>; 3] = std::array::from_fn(|j| lifted(e, &xs[j]));
@@ -243,6 +246,9 @@ fn solve(
     let mut elim = Elim::new(r, unknowns);
     let setup = e.f.counts();
     let mut rng = Rng(seed);
+    let mut query_xs: Vec<Option<u64>> = Vec::new();
+    let mut f4_field_ops = 0u64;
+    let mut f4_ms_unqualified = 0.0f64;
     let (mut trials, mut polynomial_checks, mut roots, mut lift_checks, mut relations) =
         (0, 0, 0, 0, 0);
     let mut recovered = None;
@@ -254,47 +260,84 @@ fn solve(
         let b = rng.next() % r;
         let rhs = e.add(e.mul(p, a), e.mul(q, b));
         if rhs.inf {
+            query_xs.push(None);
+            if let Some(queries) = oracle {
+                assert!(queries[(trials - 1) as usize]["x"].is_null());
+            }
             continue;
         }
-        for &x1 in &xs[0] {
-            for &x2 in &xs[1] {
-                for &x3 in &xs[2] {
-                    polynomial_checks += 1;
-                    if s4(e, x1, x2, x3, rhs.x) != 0 {
+        query_xs.push(Some(rhs.x));
+        let triples: Box<dyn Iterator<Item = [u64; 3]> + '_> = if let Some(queries) = oracle {
+            let item = &queries[(trials - 1) as usize];
+            assert_eq!(item["x"], rhs.x);
+            assert_eq!(item["complete_and_matching"], true);
+            f4_field_ops += item["field_ops"].as_u64().unwrap();
+            f4_ms_unqualified += item["ms_unqualified"].as_f64().unwrap();
+            let roots: Vec<_> = item["roots"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|r| {
+                    [
+                        r[0].as_u64().unwrap(),
+                        r[1].as_u64().unwrap(),
+                        r[2].as_u64().unwrap(),
+                    ]
+                })
+                .collect();
+            Box::new(roots.into_iter())
+        } else {
+            let mut cursor = 0usize;
+            let n2 = xs[1].len();
+            let n3 = xs[2].len();
+            let limit = xs[0].len() * n2 * n3;
+            let checks = &mut polynomial_checks;
+            Box::new(std::iter::from_fn(move || {
+                while cursor < limit {
+                    let i = cursor;
+                    cursor += 1;
+                    let x1 = xs[0][i / (n2 * n3)];
+                    let x2 = xs[1][i / n3 % n2];
+                    let x3 = xs[2][i % n3];
+                    *checks += 1;
+                    if s4(e, x1, x2, x3, rhs.x) == 0 {
+                        return Some([x1, x2, x3]);
+                    }
+                }
+                None
+            }))
+        };
+        for [x1, x2, x3] in triples {
+            roots += 1;
+            for &p1 in &points[0] {
+                if p1.x != x1 {
+                    continue;
+                }
+                for &p2 in &points[1] {
+                    if p2.x != x2 {
                         continue;
                     }
-                    roots += 1;
-                    for &p1 in &points[0] {
-                        if p1.x != x1 {
+                    for &p3 in &points[2] {
+                        if p3.x != x3 {
                             continue;
                         }
-                        for &p2 in &points[1] {
-                            if p2.x != x2 {
-                                continue;
+                        lift_checks += 1;
+                        if e.add(e.add(p1, p2), p3) != rhs {
+                            continue;
+                        }
+                        relations += 1;
+                        let mut row = vec![0; unknowns + 1];
+                        for pt in [p1, p2, p3] {
+                            let projection = e.mul(pt, h);
+                            if let Some(&col) = columns.get(&projection) {
+                                row[col] = elim.ring.add(row[col], 1);
                             }
-                            for &p3 in &points[2] {
-                                if p3.x != x3 {
-                                    continue;
-                                }
-                                lift_checks += 1;
-                                if e.add(e.add(p1, p2), p3) != rhs {
-                                    continue;
-                                }
-                                relations += 1;
-                                let mut row = vec![0; unknowns + 1];
-                                for pt in [p1, p2, p3] {
-                                    let projection = e.mul(pt, h);
-                                    if let Some(&col) = columns.get(&projection) {
-                                        row[col] = elim.ring.add(row[col], 1);
-                                    }
-                                }
-                                row[unknowns - 1] = elim.ring.neg(elim.ring.mul(h % r, b));
-                                row[unknowns] = elim.ring.mul(h % r, a);
-                                if let Some(k) = elim.insert(row) {
-                                    recovered = Some(k);
-                                    break 'search;
-                                }
-                            }
+                        }
+                        row[unknowns - 1] = elim.ring.neg(elim.ring.mul(h % r, b));
+                        row[unknowns] = elim.ring.mul(h % r, a);
+                        if let Some(k) = elim.insert(row) {
+                            recovered = Some(k);
+                            break 'search;
                         }
                     }
                 }
@@ -307,6 +350,8 @@ fn solve(
     let scalars = elim.ring.counts.get();
     json!({"recovered":recovered,"verified":verified,"exhausted":recovered.is_none(),
         "cap":cap,"trials":trials,"polynomial_checks":polynomial_checks,"polynomial_roots":roots,
+        "f4_field_ops":f4_field_ops,"f4_ms_unqualified":f4_ms_unqualified,
+        "query_xs":query_xs,
         "sign_lift_checks":lift_checks,"rejected_sign_lifts":lift_checks-relations,"relations":relations,
         "factor_columns":columns.len(),"rank":elim.rank,
         "rng_draws_uncharged":draw_count,
@@ -316,6 +361,22 @@ fn solve(
         "logical_matrix_entries":elim.pivots.len() * (unknowns + 1)})
 }
 fn main() {
+    let f4_mode = std::env::args().any(|arg| arg == "--f4-replay");
+    let f4_rows: Vec<Value> = if f4_mode {
+        fs::read_to_string(
+            "research/five_leads_e2e_20261019/correctness/mixed-fiber-f4-dlp-oracle-v1.jsonl",
+        )
+        .unwrap()
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect()
+    } else {
+        Vec::new()
+    };
+    if f4_mode {
+        assert_eq!(f4_rows.len(), 540);
+    }
+    let mut cursor = 0usize;
     for (p, d) in [(97, 8), (193, 12), (257, 16)] {
         for (a, b, order, r, _fixture_cosets) in source_curves(p, d) {
             let preparer = curve(p, a, b);
@@ -373,10 +434,24 @@ fn main() {
                         }
                     }
                     let selection_counts = e.f.counts();
-                    let out = solve(&e, g, target, h, r, &xs, rho_seed);
+                    let oracle = if f4_mode {
+                        let row = &f4_rows[cursor];
+                        assert_eq!(row["p"], p);
+                        assert_eq!(row["a"], a);
+                        assert_eq!(row["b"], b);
+                        assert_eq!(row["arm"], arm);
+                        assert_eq!(row["target_index"], target_index);
+                        assert_eq!(row["target"], json!([target.x, target.y]));
+                        assert_eq!(row["complete_and_matching"], true);
+                        Some(row["queries"].as_array().unwrap().as_slice())
+                    } else {
+                        None
+                    };
+                    let out = solve(&e, g, target, h, r, &xs, rho_seed, oracle);
+                    cursor += 1;
                     println!(
                         "{}",
-                        json!({"schema":"mixed-fiber-polynomial-dlp/v1","p":p,"a":a,"b":b,"d":d,
+                        json!({"schema":if f4_mode {"mixed-fiber-f4-dlp/v1"}else{"mixed-fiber-polynomial-dlp/v1"},"p":p,"a":a,"b":b,"d":d,
                         "order":order,"r":r,"h":h,"generator":[g.x,g.y],"target_index":target_index,
                         "target":[target.x,target.y],"planted_scalar_check_only":secret,
                         "arm":arm,"fibers":xs,"selection_draws_uncharged":selection_draws,
@@ -387,6 +462,9 @@ fn main() {
                 }
             }
         }
+    }
+    if f4_mode {
+        assert_eq!(cursor, 540);
     }
 }
 

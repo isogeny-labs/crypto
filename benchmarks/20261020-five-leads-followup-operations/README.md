@@ -24,3 +24,12 @@ control. Homogeneous, mixed and matched-random pooled costs are 57.88×,
 pricing cells lose to rho and to the pair table. This is an all-roots
 polynomial evaluator, not F4/msolve; the fastest external solver comparison
 and qualified wall timings remain open.
+
+The `run-mixed-fiber-f4` PDF adds the native F4-backed replay. All 2,290
+nonidentity relation-query root sets agreed with exhaustive enumeration, and all
+540 DLP answers were source-verified. Counting only F4 row-reduction
+multiplications and the collector's recorded costs yields homogeneous,
+mixed and matched-random lower bounds of 160,899×, 232,110× and 239,616×
+matched rho at the representative price. Each loses in all 36 pooled
+pricing cells. Full F4 primitive accounting and external msolve remain open;
+the 356.1 s sum of F4 internal wall times is unqualified on a busy host.
