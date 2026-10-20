@@ -7,19 +7,22 @@ point interval, 3.889450 ms. The frozen all-pairs selector returned
 their 1,536 same-point comparisons, against 754 for K4300, with exact
 two-sided sign `p = 0.4908866` (required corrected threshold `0.005`).
 
-| Base | Actual usable points | Folded columns | Geometric mean online ms | Median online ms |
-| --- | ---: | ---: | ---: | ---: |
-| K3072 root11 | 509,952 | 3,072 | 6.961543 | 7.998202 |
-| K3500 root4 | 581,000 | 3,500 | 5.832362 | 6.778854 |
-| K3300 wide3 | 547,800 | 3,300 | 6.064993 | 6.976049 |
-| K4300 wide3 | 713,800 | 4,300 | 3.889450 | 4.282397 |
-| K4405 wide3 | 731,230 | 4,405 | 3.945845 | 4.442195 |
+| Base | Actual usable points | Folded columns | Geometric mean online ms | Median online ms | Cold process s, block 0 / 1 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| K3072 root11 | 509,952 | 3,072 | 6.961543 | 7.998202 | 233.3 / 234.0 |
+| K3500 root4 | 581,000 | 3,500 | 5.832362 | 6.778854 | 406.7 / 404.2 |
+| K3300 wide3 | 547,800 | 3,300 | 6.064993 | 6.976049 | 334.2 / 337.1 |
+| K4300 wide3 | 713,800 | 4,300 | 3.889450 | 4.282397 | 580.1 / 581.6 |
+| K4405 wide3 | 731,230 | 4,405 | 3.945845 | 4.442195 | 614.1 / 615.2 |
 
 The curve is `EC1N83Ckb1a1haacb69ee9f37`, over
 `F₂[z]/(z⁸³ + z⁷ + z⁴ + z² + 1)` with subgroup order
 `8569786107849059`. Exact candidate IDs and the complete ten-pair table
 are in `screen_selection.json`. The screen is a shared-setup, per-point IC
 diagnostic. Its timed intervals exclude reusable base/index/log preparation.
+Each cold process value covers construction and its 768-point block and is
+reported separately from the per-point online interval; it is not a one-target
+cold-start comparison.
 The conditional one-target IC/rho holdout was not dispatched because its
 frozen selector gate requires a single selected candidate.
 
@@ -31,9 +34,11 @@ The local aggregate records `admission_status: PASS`, `PASS_TIER1`,
 the pinned source commit was `e7634a81c22b60ad37e5d6bdb817a3b84867ae86`.
 The raw 513-file archive SHA-256 is
 `352766bd9610615b10b0aa8f6a10d28a4880f0cb8851c33ee300a199bb9e6ece`.
-It and the extracted run tree are retained under
-`/Volumes/SSD990-2/tmp/n83_tiebreak_results_v2retry_20261020/` because the
-145 MB archive is not part of this Git commit. Reproduce the aggregate with
+The archive and provider allocation receipts are retained under
+`/Volumes/data/cryptanalysis/n83_highk_tiebreak_20261020_evidence/` with a
+matching archive hash. The extracted run tree is retained under
+`/Volumes/SSD990-2/tmp/n83_tiebreak_results_v2retry_20261020/`. The 145 MB
+archive is outside this Git commit. Reproduce the aggregate with
 `aggregate_runpod.py` using the pinned provider snapshot, this raw archive,
 the preceding distribution aggregate and archive, and the sealed source
 commit as specified in `PROTOCOL.md`.
