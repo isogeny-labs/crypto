@@ -1,0 +1,34 @@
+# Curve chains of the extension (PROTOCOL.md amendment 5). Columns: p, chain, start seed, instance seed, cofactor, r.
+# fp4_torsion(p, start seed, 16) returns the first curve at or after the start seed with a prime r = #E/h, h <= 16;
+# chain 1 is the original curve (start seed 1), chain c+1 starts one past chain c's instance seed.
+# Found with target/release/examples/gaudry_quartic_d4 --find 16 --targets 0 (2026-10-20), before any extension run.
+29	1	1	6	16	44263
+29	2	7	16	8	88379
+29	3	17	22	16	44279
+37	1	1	6	8	234193
+37	2	7	10	16	117127
+37	3	11	15	16	117167
+53	1	1	5	8	986599
+53	2	6	14	8	986507
+53	3	15	15	4	1971479
+61	1	1	3	16	865231
+61	2	4	7	8	1731221
+61	3	8	42	8	1730917
+101	1	1	10	16	6503839
+101	2	11	11	16	6503041
+101	3	12	23	12	8673293
+149	1	1	43	4	123228491
+149	2	44	50	12	41070671
+149	3	51	82	16	30803629
+197	1	1	18	4	376521863
+197	2	19	34	16	94133959
+197	3	35	63	8	188259083
+293	1	1	1	8	921273553
+293	2	2	2	16	460627523
+293	3	3	3	16	460623019
+401	1	1	12	4	6464183153
+401	2	13	20	16	1616053433
+401	3	21	24	8	3232118699
+509	1	1	2	4	16780752533
+509	2	3	5	16	4195174177
+509	3	6	18	8	8390403739

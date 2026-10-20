@@ -215,3 +215,76 @@ is kept and reported beside the new one. The analysis, predictions and
 intervals are unchanged; the headline numbers become the 72-job fit, which
 uses the full planned set, and every statement in the README that quotes the
 60-job fit says so.
+
+## Amendment 5 (2026-10-20): the extension, frozen before any extension run
+
+**Why.** The widest interval of the 72-job fit, the crossover's relations-slope
+band (`2^{82}`–`2^{127}` at `h = 4`), comes from the scatter of the trial rate
+between curves, and each rung has one curve, so more targets cannot narrow it.
+The owner asked for the further runs below. They add curves to the rungs, take
+the large-prime arms to higher `p`, and add third targets at the top rungs.
+
+**A finding that shaped the design.** `fp4_torsion(p, seed, 16)` is not a
+random curve per seed: it returns the first curve at or after `seed` that has a
+cofactor ≤ 16 and a prime `r`, so seeds 1–5 give the same curve at most `p`
+(`#E` and slugs checked before this amendment). Distinct curves come from
+chaining start seeds past the previous curve's instance seed. `curves.tsv` is
+that table (chain 1 is the original curve; the table was computed with
+`gaudry_quartic_d4 --find 16 --targets 0` before any extension run). The
+cofactor varies from 4 to 16 between curves; it does not enter the cost in GAE,
+and the crossover is still reported per assumed `h`.
+
+**Jobs (74 sessions, `jobs_ext.txt`, order frozen; `make_specs_ext.sh`).**
+
+| group | what | sessions |
+|:--|:--|:--|
+| A | chain-2 and chain-3 curves at `p = 29 … 509`: plain arm, 2 targets each (`xmain-c<c>-p<p>-t<t>`) | 40 |
+| A | rho-only, 16 targets on each of those 20 curves (`xrho-c<c>-p<p>`) | 20 |
+| B | `lp2` at `p = 401, 509, 701` and `lp1` at `p = 197, 293`, chain 1, targets 0 and 1, the target seeds of the matching plain sessions | 10 |
+| C | third plain target (`t2`) at `p = 401, 509, 701, 1009`, chain 1 | 4 |
+
+Same oracle, same arms and `max_trials`, same measurement seed, same `ecbench`
+binary (sha256 `8627cd29…0aa3`, not rebuilt). Run by `run_queue5.sh` (one worker
+per allowed CPU; resumable: a session left half-written by an interruption is
+moved to `sessions-interrupted/`, outside what any fit reads, and rerun).
+**Budget:** a job not started within **40 h** of the launch is not run and is
+listed in `sessions/NOT_RUN5.txt`. No job is dropped or rerun because of its
+result. Estimated 90–100 CPU-hours, so about a day on 4 CPUs.
+
+**Audits.** Amendment 2's scope: full replay for every session with `p ≤ 197`
+and every rho-only session, integrity otherwise, plus full replays of
+`xmain-c2-p293-t0` and `lp2-p401-t0` as spot checks of the upper rungs.
+
+**Analysis (frozen at the commit of this amendment).**
+`examples/gaudry_quartic_d4_exponent_fit_ext.rs` is the frozen fit with curves
+as a level of the design: a rung's value is the mean over its curves of each
+curve's mean over its targets; the fit is `ln(rung value)` on `ln p` as before;
+the interval is the union of the Student-`t` interval and a **cluster bootstrap**
+(per rung the curves with replacement, within each sampled curve the targets).
+On the existing 72 jobs (one curve per rung) it reproduces the frozen tool's
+point fits and `t` intervals exactly (checked on 18 fits and rho's, before any
+extension record existed). New outputs: the pooled between-curve standard
+deviation of `ln(trials per relation)`; the relations slope by curve chain
+index; the crossover and its relations-slope band from the extended fits, for
+`h = 2, 4, 16`. The 72-job fit (`raw/summary.json`) stays frozen and is reported
+beside the extended fit (`raw/summary-ext.json`, all curves and targets).
+
+**Predictions (written before the first extension run).**
+
+- **X1.** Every session verifies; every replayed session reproduces.
+- **X2.** The extended plain-arm relations slope is in `[0.75, 1.25]`.
+- **X3.** Its Student-`t` 95 % interval is narrower than the 72-job interval
+  (width 0.62): width < 0.50.
+- **X4.** The extended `h = 4` crossover (point) is in `[2^{88}, 2^{108}]`, and
+  its relations-slope band is narrower than the 72-job band (45 bits of group
+  size): width < 38 bits.
+- **X5.** The relations slope fitted on each chain separately is in `[0.5, 1.5]`.
+- **X6.** The pooled between-curve standard deviation of `ln(trials per
+  relation)` is in `[0.2, 1.0]`.
+- **X7.** `lp2` `S` is at least the plain arm's on every paired target at
+  `p = 401, 509, 701`.
+- **X8.** `lp1` `S` is at least 1.7 times the plain arm's on every paired target
+  at `p = 197, 293` (the 72-job range at `p ≥ 61`: 1.78–3.45).
+- **X9.** The extended `lp2` linear-algebra slope is in `[1.3, 2.0]`, and its
+  `h = 4` crossover is later than the plain arm's.
+- **X10.** Rho's `GAE` slope stays in `[1.6, 2.4]`.
