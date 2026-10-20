@@ -136,7 +136,7 @@
     {
      "anchor": "#lab-ecbench-all",
      "class": "accounting",
-     "date": "2026-10-14",
+     "date": "2026-10-15",
      "detail": "Orbit factor base (compact-orbit-scan, mitm-frobenius-counted m = 2) with every native priced, paired against the fully priced signed-Frobenius rho on 16 targets x 3 rounds per curve: 1.566 [0.992, 2.347] at the best cell (interval reaches 1; rho-frob heavy-tailed there), 2.96 at n = 13, 3.85 at r = 2^21, 18.2 at r = 2^39; never below 1. Slope of ln ratio 0.165 [0.117, 0.213] per ln r with ln n fitted (model 1/6): constant-only.",
      "label": "Frobenius-orbit IC, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)",
      "reference": "matched",
@@ -176,6 +176,16 @@
      "class": "accounting",
      "anchor": "#lab-volcano-ic",
      "source": "https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json"
+    },
+    {
+     "anchor": "#ic-tool-programme-20261001",
+     "class": "accounting",
+     "date": "2026-10-20",
+     "detail": "Rule v8: ledger section 23's six sizes (2^36.6-2^47.2, 64 public points and four A/A repeats a size, 408/408 rows checked in each of two runs of one binary) against a matched rho, the signed-Frobenius walk with its canonicalisation batched 16 lanes at a time by GFNI and funnel shifts; the control run, the same binary with rho as at rule v7, reads 3.59-11.56x. With the reusable set-up charged the index calculus costs 4.67-18.07x rho cold: 4.669x [4.34, 5.07] at 2^36.6, 18.07x [15.98, 20.58] at 2^47.2. Rho is still faster at every size. The two rho arms take identical walks on 64/64 targets a size; the index calculus's own online time is the same in both runs (0.976-1.033). The distance to rho is larger than rule v7 reported because rho was unmatched, not because the index calculus slowed; the ln-ln slope is 0.168 (t interval 0.128-0.208; rule v3: 0.176), not distinguishable from v3's. No curve with log2 r >= 50 is runnable by this single-word pipeline. Class: accounting (a corrected reference); the batched rho kernel is engineering; no advance.",
+     "label": "Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md",
+     "value": 4.669
     }
    ],
    "role": "emphasis"
@@ -867,7 +877,7 @@
    "note": "Index calculus with double large primes on Jac(C) of hyperelliptic GHS cubic covers (m = 3, r = 5) over prime F_q, q = 2^10-2^20, counted F_q plus mod-ell multiplications, one target cold, 12 paired instances per size. Rho is measured on the same Jac(C)[ell] in the same unit at q <= 2^14 only (4 single walks per size, renormalised to sqrt(pi/2)); it is not rho on the elliptic curve E0(F_q^3). The exponent result (total q^1.383 against GTTD's 4/3) is in the genus-crossover panel.",
    "points": [
     {
-     "date": "2026-10-15",
+     "date": "2026-10-17",
      "value": 0.252,
      "reference": "matched",
      "label": "Genus-3 GHS IC-2LP rebuilt baseline at q = 2^14 (04b)",
@@ -918,5 +928,5 @@
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-10-17"
+ "updated": "2026-10-20"
 }

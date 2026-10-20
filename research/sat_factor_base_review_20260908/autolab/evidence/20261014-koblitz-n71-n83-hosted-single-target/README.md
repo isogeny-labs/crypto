@@ -31,6 +31,8 @@ with that fix and reach `PENDING_INDEPENDENT_VALIDATION`.
 
 ## Headline (hosted, isolated)
 
+> **Superseded 2026-10-20 (validation sweep B, verdict 104.1: contradicted).** The 7.29x and 12.29x below compare against rho with an empty table while the IC 760 s setup was excluded. They are not improvements. Ratio of mean online times is 4.21x (n=71) and 2.80x (n=83); precomputed rho wins by the median paired ratio in every matched comparison (`benchmarks/20261016-n83-precomputed-rho-control`). Cold end to end the IC is 133.7x slower.
+
 | Beat | Run id | K | W | online speedup rho/IC (median, 95% CI bootstrap) | cold IC/rho | IC online median ms | rho online median ms |
 |---|---|---:|---:|---|---:|---:|---:|
 | n=71 a=0 | `gha-38585913645-1` | 600 (fixed) | 16 | **7.29x** (4.64–13.38) | 154.4 | 518.6 | 3764.5 |
