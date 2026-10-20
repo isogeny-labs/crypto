@@ -1,0 +1,124 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1hd4be3bde264b",
+  "label": "k=4 IC and rho on a chain 2 curve of E(F_197^4), target 1",
+  "spec_id": "ECS1heaf5b0d44cf6",
+  "spec_sha256": "eaf5b0d44cf65baae954b9977852c8d8a25dd4250feab9ea565c336be5ced977",
+  "env_class_id": "ECBENV2h5fe1cef4c9ff",
+  "host_sha256": "28ad868178eb1269989f4ce0583a86050d6ed746d3c0adc2a555f68579ccecbf",
+  "plan_sha256": "4f9d20f856a7e35150bfbda4791899d6db92f6d61937ffc069917d6327c8e321",
+  "binary_sha256": "8627cd29357150174e60d6c1d4bdeaec19c613b0ff048c258ae07ed0b25c0aa3",
+  "git_commit": "604b0bd9086df044e8507fa9a9c65e8cb76cbeb1",
+  "git_dirty": true,
+  "options": {
+    "cpus": {
+      "explicit": [
+        0
+      ]
+    },
+    "lock_path": "/tmp/ecbench-k4exp-0.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": {
+    "run_cpu": 0,
+    "reserved": [
+      0
+    ],
+    "node": 0,
+    "request": {
+      "explicit": [
+        0
+      ]
+    },
+    "unreserved_siblings": [],
+    "observed": [
+      0
+    ]
+  },
+  "preflight": {
+    "quiet": false,
+    "reasons": [
+      "PSI cpu some avg10 16.49 > 5.00"
+    ],
+    "settle_seconds": 2.0,
+    "reserved_busy_seconds": {
+      "0": 0.0
+    },
+    "before": {
+      "unix_ms": 1792501295872,
+      "loadavg": [
+        1.25634765625,
+        1.27783203125,
+        1.27099609375
+      ],
+      "psi_cpu_some_avg10": 18.81,
+      "psi_cpu_some_total_us": 4597218549,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "0": {
+          "busy": 2362847,
+          "idle": 219581,
+          "steal": 36866
+        }
+      }
+    },
+    "after": {
+      "unix_ms": 1792501297872,
+      "loadavg": [
+        1.1552734375,
+        1.25634765625,
+        1.26416015625
+      ],
+      "psi_cpu_some_avg10": 16.49,
+      "psi_cpu_some_total_us": 4597224558,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "0": {
+          "busy": 2362847,
+          "idle": 219781,
+          "steal": 36866
+        }
+      }
+    }
+  },
+  "eviction": {
+    "moved_count": 85,
+    "failed_user_threads": 0,
+    "failed_kernel_threads": 29
+  },
+  "runner_on_run_cpu": false,
+  "runner_cpus": [
+    1
+  ],
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792501297872,
+  "finished_unix_ms": 1792504034561,
+  "status": "complete",
+  "executions_planned": 2,
+  "records_written": 2,
+  "records_sha256": "0d08fa9e5be63d76bc427933da8ac1ceeff7dd7f0d333188a218aba56e56b222",
+  "status_counts": {
+    "verified": 2
+  }
+}
