@@ -1,0 +1,48 @@
+   Compiling version_check v0.9.5
+   Compiling typenum v1.20.1
+   Compiling generic-array v0.14.7
+   Compiling ahash v0.8.12
+   Compiling pkg-config v0.3.34
+   Compiling vcpkg v0.2.15
+   Compiling hashbrown v0.14.5
+   Compiling libsqlite3-sys v0.30.1
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling digest v0.10.7
+   Compiling hashlink v0.9.1
+   Compiling cpufeatures v0.2.17
+   Compiling fallible-iterator v0.3.0
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling sha2 v0.10.9
+   Compiling isogeny_algos v0.1.0 (/Volumes/SSD990/llm/tmp/factor-base-factory-main-20261019/isogeny_algos)
+   Compiling rusqlite v0.32.1
+   Compiling volcano-cli v0.1.0 (/Volumes/SSD990/llm/tmp/factor-base-factory-main-20261019/tools/volcano-cli)
+   Compiling crypto v0.1.0 (/Volumes/SSD990/llm/tmp/factor-base-factory-main-20261019)
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/claim.rs:1839:36
+     |
+1839 |           let records: Vec<Record> = include_str!(
+     |  ____________________________________^
+1840 | |             "../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl"
+1841 | |         )
+     | |_________^
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ecbench/runner.rs:919:27
+    |
+919 |           let record_line = include_str!(
+    |  ___________________________^
+920 | |             "../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl"
+921 | |         )
+    | |_________^
+
+error: couldn't read `src/cryptanalysis/../../research/f4_linear_algebra_20260914/contract.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/f4_rref_tests.rs:808:60
+    |
+808 |       let contract: serde_json::Value = serde_json::from_str(include_str!(
+    |  ____________________________________________________________^
+809 | |         "../../research/f4_linear_algebra_20260914/contract.json"
+810 | |     ))
+    | |_____^
+
+error: could not compile `crypto` (lib test) due to 3 previous errors
