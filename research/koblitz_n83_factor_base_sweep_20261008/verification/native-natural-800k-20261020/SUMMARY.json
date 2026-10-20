@@ -1,0 +1,1015 @@
+{
+  "baseline_solver_ms": null,
+  "candidate_solver_ms": null,
+  "class": "engineering",
+  "complete_comparison_coverage": false,
+  "external_algorithm_cpu_ms": null,
+  "external_process_ms": null,
+  "identical_search_and_selector_signature": false,
+  "manifest": "/home/ec2-user/scratch/n83-natural-800k-20261020/manifest.json",
+  "natural_yield_winner": null,
+  "pairs": [],
+  "rows": [
+    {
+      "admission_refusal": "OOM outcome cannot be admitted as search result",
+      "arm": "K2048",
+      "cleanup_verified": true,
+      "columns": 2048,
+      "conflict_cap": 800000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-800k-20261020/exec/k2048-v12",
+      "exit_code": 137,
+      "full_search_audit": false,
+      "id": "k2048-800k-4g-oom",
+      "last_recorded_event": {
+        "conflicts": 789000,
+        "counter_scope": "solver_instance_cumulative",
+        "decisions": 1615400,
+        "elapsed_ms": 2846933.8895730004,
+        "ns_analyze": 176986216475,
+        "ns_minimize": 61906609422,
+        "ns_propagate_clauses": 116655386065,
+        "ns_propagate_xors": 2520692006566,
+        "ns_reduce_db": 113810845,
+        "outcome": null,
+        "phase": "conflict_snapshot",
+        "propagations": 3040287351,
+        "schema": "n83.sat-phase/v1",
+        "xor_passes": 5750325,
+        "xor_propagations": 72171890
+      },
+      "memory_limit_bytes": 4294967296,
+      "natural_solver_ms": null,
+      "outer_scope": "failed attempt cost, not admitted search timing",
+      "outer_wall_ms": 2856001.340487,
+      "sat_trace_status": "VALID_PREFIX_NONTERMINAL",
+      "source_commit": "f94d5da32ecd9b6a8956749978cd5a771482a0ed",
+      "status": "OOM_CENSORED_NOT_ADMITTED",
+      "terminal_counters": null,
+      "wall_cap_seconds": 4800,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    },
+    {
+      "admission_refusal": "OOM outcome cannot be admitted as search result",
+      "arm": "K4096",
+      "cleanup_verified": true,
+      "columns": 4096,
+      "conflict_cap": 800000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-800k-20261020/exec/k4096-v12",
+      "exit_code": 137,
+      "full_search_audit": false,
+      "id": "k4096-800k-4g-oom",
+      "last_recorded_event": {
+        "conflicts": 702000,
+        "counter_scope": "solver_instance_cumulative",
+        "decisions": 1468534,
+        "elapsed_ms": 2565050.551479,
+        "ns_analyze": 151710025533,
+        "ns_minimize": 53611578020,
+        "ns_propagate_clauses": 99751488159,
+        "ns_propagate_xors": 2281657105372,
+        "ns_reduce_db": 110529507,
+        "outcome": null,
+        "phase": "conflict_snapshot",
+        "propagations": 2564593479,
+        "schema": "n83.sat-phase/v1",
+        "xor_passes": 5099098,
+        "xor_propagations": 60658453
+      },
+      "memory_limit_bytes": 4294967296,
+      "natural_solver_ms": null,
+      "outer_scope": "failed attempt cost, not admitted search timing",
+      "outer_wall_ms": 2575759.292233,
+      "sat_trace_status": "VALID_PREFIX_NONTERMINAL",
+      "source_commit": "f94d5da32ecd9b6a8956749978cd5a771482a0ed",
+      "status": "OOM_CENSORED_NOT_ADMITTED",
+      "terminal_counters": null,
+      "wall_cap_seconds": 4800,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    },
+    {
+      "arm": "K2048",
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-800k-20261020/exec/k2048-v13",
+      "id": "k2048-800k-v13-declaration-refusal",
+      "planned_status": null,
+      "status": "FAILED_NO_AUDIT"
+    },
+    {
+      "arm": "K2048",
+      "columns": 2048,
+      "conflict_cap": 800000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-800k-20261020/exec/k2048-v14",
+      "id": "k2048-800k-8g",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 68,
+          "failed_user_threads": 0,
+          "moved_count": 371
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            14,
+            30
+          ],
+          "request": {
+            "explicit": [
+              14,
+              30
+            ]
+          },
+          "reserved": [
+            14,
+            30
+          ],
+          "run_cpu": 14,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              15.65,
+              13.32,
+              10.27
+            ],
+            "psi_cpu_some_avg10": 4.76,
+            "psi_cpu_some_total_us": 144849896,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 837073,
+            "reserved_ticks": {
+              "14": {
+                "busy": 655985,
+                "idle": 2031759,
+                "steal": 13
+              },
+              "30": {
+                "busy": 112307,
+                "idle": 2573986,
+                "steal": 10
+              }
+            },
+            "unix_ms": 1792483864362
+          },
+          "before": {
+            "loadavg": [
+              15.65,
+              13.32,
+              10.27
+            ],
+            "psi_cpu_some_avg10": 5.16,
+            "psi_cpu_some_total_us": 144781104,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 837073,
+            "reserved_ticks": {
+              "14": {
+                "busy": 655978,
+                "idle": 2031567,
+                "steal": 13
+              },
+              "30": {
+                "busy": 112299,
+                "idle": 2573796,
+                "steal": 10
+              }
+            },
+            "unix_ms": 1792483862361
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "14": 0.07,
+            "30": 0.08
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                15.57,
+                13.18,
+                10.17
+              ],
+              "psi_cpu_some_avg10": 9.9,
+              "psi_cpu_some_total_us": 144349687,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655960,
+                  "idle": 2030391,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112279,
+                  "idle": 2572622,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483850360
+            },
+            "before": {
+              "loadavg": [
+                15.57,
+                13.18,
+                10.17
+              ],
+              "psi_cpu_some_avg10": 11.42,
+              "psi_cpu_some_total_us": 144275066,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655957,
+                  "idle": 2030195,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112273,
+                  "idle": 2572425,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483848359
+            },
+            "quiet": false,
+            "reasons": [
+              "PSI cpu some avg10 9.90 > 5.00"
+            ],
+            "reserved_busy_seconds": {
+              "14": 0.03,
+              "30": 0.06
+            },
+            "settle_seconds": 2.0
+          },
+          {
+            "after": {
+              "loadavg": [
+                14.88,
+                13.08,
+                10.16
+              ],
+              "psi_cpu_some_avg10": 8.64,
+              "psi_cpu_some_total_us": 144427595,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655964,
+                  "idle": 2030587,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112284,
+                  "idle": 2572816,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483852360
+            },
+            "before": {
+              "loadavg": [
+                15.57,
+                13.18,
+                10.17
+              ],
+              "psi_cpu_some_avg10": 9.9,
+              "psi_cpu_some_total_us": 144349687,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655960,
+                  "idle": 2030391,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112279,
+                  "idle": 2572622,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483850360
+            },
+            "quiet": false,
+            "reasons": [
+              "PSI cpu some avg10 8.64 > 5.00"
+            ],
+            "reserved_busy_seconds": {
+              "14": 0.04,
+              "30": 0.05
+            },
+            "settle_seconds": 2.0
+          },
+          {
+            "after": {
+              "loadavg": [
+                14.88,
+                13.08,
+                10.16
+              ],
+              "psi_cpu_some_avg10": 7.8,
+              "psi_cpu_some_total_us": 144508507,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655969,
+                  "idle": 2030779,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112290,
+                  "idle": 2573007,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483854360
+            },
+            "before": {
+              "loadavg": [
+                14.88,
+                13.08,
+                10.16
+              ],
+              "psi_cpu_some_avg10": 8.64,
+              "psi_cpu_some_total_us": 144427595,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655964,
+                  "idle": 2030587,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112284,
+                  "idle": 2572816,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483852360
+            },
+            "quiet": false,
+            "reasons": [
+              "PSI cpu some avg10 7.80 > 5.00"
+            ],
+            "reserved_busy_seconds": {
+              "14": 0.05,
+              "30": 0.06
+            },
+            "settle_seconds": 2.0
+          },
+          {
+            "after": {
+              "loadavg": [
+                16.58,
+                13.46,
+                10.3
+              ],
+              "psi_cpu_some_avg10": 6.93,
+              "psi_cpu_some_total_us": 144575721,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655969,
+                  "idle": 2030976,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112294,
+                  "idle": 2573204,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483856360
+            },
+            "before": {
+              "loadavg": [
+                14.88,
+                13.08,
+                10.16
+              ],
+              "psi_cpu_some_avg10": 7.8,
+              "psi_cpu_some_total_us": 144508507,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655969,
+                  "idle": 2030779,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112290,
+                  "idle": 2573007,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483854360
+            },
+            "quiet": false,
+            "reasons": [
+              "PSI cpu some avg10 6.93 > 5.00"
+            ],
+            "reserved_busy_seconds": {
+              "14": 0.0,
+              "30": 0.04
+            },
+            "settle_seconds": 2.0
+          },
+          {
+            "after": {
+              "loadavg": [
+                16.58,
+                13.46,
+                10.3
+              ],
+              "psi_cpu_some_avg10": 6.22,
+              "psi_cpu_some_total_us": 144642441,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655971,
+                  "idle": 2031173,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112295,
+                  "idle": 2573401,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483858361
+            },
+            "before": {
+              "loadavg": [
+                16.58,
+                13.46,
+                10.3
+              ],
+              "psi_cpu_some_avg10": 6.93,
+              "psi_cpu_some_total_us": 144575721,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655969,
+                  "idle": 2030976,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112294,
+                  "idle": 2573204,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483856360
+            },
+            "quiet": false,
+            "reasons": [
+              "PSI cpu some avg10 6.22 > 5.00"
+            ],
+            "reserved_busy_seconds": {
+              "14": 0.02,
+              "30": 0.01
+            },
+            "settle_seconds": 2.0
+          },
+          {
+            "after": {
+              "loadavg": [
+                16.58,
+                13.46,
+                10.3
+              ],
+              "psi_cpu_some_avg10": 5.63,
+              "psi_cpu_some_total_us": 144709157,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655974,
+                  "idle": 2031371,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112297,
+                  "idle": 2573598,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483860361
+            },
+            "before": {
+              "loadavg": [
+                16.58,
+                13.46,
+                10.3
+              ],
+              "psi_cpu_some_avg10": 6.22,
+              "psi_cpu_some_total_us": 144642441,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655971,
+                  "idle": 2031173,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112295,
+                  "idle": 2573401,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483858361
+            },
+            "quiet": false,
+            "reasons": [
+              "PSI cpu some avg10 5.63 > 5.00"
+            ],
+            "reserved_busy_seconds": {
+              "14": 0.03,
+              "30": 0.02
+            },
+            "settle_seconds": 2.0
+          },
+          {
+            "after": {
+              "loadavg": [
+                15.65,
+                13.32,
+                10.27
+              ],
+              "psi_cpu_some_avg10": 5.16,
+              "psi_cpu_some_total_us": 144781104,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655978,
+                  "idle": 2031567,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112299,
+                  "idle": 2573796,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483862361
+            },
+            "before": {
+              "loadavg": [
+                16.58,
+                13.46,
+                10.3
+              ],
+              "psi_cpu_some_avg10": 5.63,
+              "psi_cpu_some_total_us": 144709157,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655974,
+                  "idle": 2031371,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112297,
+                  "idle": 2573598,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483860361
+            },
+            "quiet": false,
+            "reasons": [
+              "PSI cpu some avg10 5.16 > 5.00"
+            ],
+            "reserved_busy_seconds": {
+              "14": 0.04,
+              "30": 0.02
+            },
+            "settle_seconds": 2.0
+          },
+          {
+            "after": {
+              "loadavg": [
+                15.65,
+                13.32,
+                10.27
+              ],
+              "psi_cpu_some_avg10": 4.76,
+              "psi_cpu_some_total_us": 144849896,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655985,
+                  "idle": 2031759,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112307,
+                  "idle": 2573986,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483864362
+            },
+            "before": {
+              "loadavg": [
+                15.65,
+                13.32,
+                10.27
+              ],
+              "psi_cpu_some_avg10": 5.16,
+              "psi_cpu_some_total_us": 144781104,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837073,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 655978,
+                  "idle": 2031567,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112299,
+                  "idle": 2573796,
+                  "steal": 10
+                }
+              },
+              "unix_ms": 1792483862361
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "14": 0.07,
+              "30": 0.08
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "memory_limit_bytes": 8589934592,
+      "natural_solver_ms": 2866110.318261,
+      "outer_wall_ms": 2871741.354358,
+      "phases": [
+        {
+          "data": {
+            "points": 339968,
+            "summands": 5,
+            "target": [
+              "6261116474805304534310590",
+              "4505575220639647215230954"
+            ]
+          },
+          "elapsed_ms": 0.003624,
+          "phase": "closure_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "domain_clauses": 892470,
+            "representatives": 2048
+          },
+          "elapsed_ms": 129.740321,
+          "phase": "closure_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {},
+          "elapsed_ms": 204.933005,
+          "phase": "index_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0
+          },
+          "elapsed_ms": 204.953099,
+          "phase": "encoding_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0,
+            "variables": 84743
+          },
+          "elapsed_ms": 218.685412,
+          "phase": "circuit_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "clauses": 1140557,
+            "domain_clauses": 892470,
+            "identity_mask": 0,
+            "variables": 111478
+          },
+          "elapsed_ms": 294.712419,
+          "phase": "domain_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "call": 1,
+            "conflict_budget": 800000,
+            "identity_mask": 0
+          },
+          "elapsed_ms": 294.740367,
+          "phase": "solver_enter",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "conflicts": 800000,
+            "identity_mask": 0,
+            "outcome": "Unknown"
+          },
+          "elapsed_ms": 2866405.058628,
+          "phase": "solver_return",
+          "schema": "n83.chain-phase/v1"
+        }
+      ],
+      "source_commit": "786a8af0f7f935f3e17e9be21b8930eaad113c61",
+      "status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+      "terminal_counters": {
+        "conflicts": 800000,
+        "models": 0,
+        "rank": 0,
+        "relations": 0
+      },
+      "wall_cap_seconds": 4800,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    },
+    {
+      "arm": "K4096",
+      "columns": 4096,
+      "conflict_cap": 800000,
+      "dir": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-800k-20261020/exec/k4096-v14",
+      "id": "k4096-800k-8g",
+      "isolation": {
+        "eviction": {
+          "failed_kernel_threads": 66,
+          "failed_user_threads": 0,
+          "moved_count": 333
+        },
+        "grade": "recorded reservation; timing eligibility assessed from observations, no automatic L2 claim",
+        "plan": {
+          "node": 0,
+          "observed": [
+            14,
+            30
+          ],
+          "request": {
+            "explicit": [
+              14,
+              30
+            ]
+          },
+          "reserved": [
+            14,
+            30
+          ],
+          "run_cpu": 14,
+          "unreserved_siblings": []
+        },
+        "preflight": {
+          "after": {
+            "loadavg": [
+              8.37,
+              6.85,
+              6.24
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 147125455,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 837231,
+            "reserved_ticks": {
+              "14": {
+                "busy": 943345,
+                "idle": 2047816,
+                "steal": 13
+              },
+              "30": {
+                "busy": 112972,
+                "idle": 2876577,
+                "steal": 11
+              }
+            },
+            "unix_ms": 1792486898901
+          },
+          "before": {
+            "loadavg": [
+              8.75,
+              6.9,
+              6.25
+            ],
+            "psi_cpu_some_avg10": 0.0,
+            "psi_cpu_some_total_us": 147125419,
+            "psi_memory_some_avg10": 0.0,
+            "psi_memory_some_total_us": 837231,
+            "reserved_ticks": {
+              "14": {
+                "busy": 943345,
+                "idle": 2047616,
+                "steal": 13
+              },
+              "30": {
+                "busy": 112972,
+                "idle": 2876377,
+                "steal": 11
+              }
+            },
+            "unix_ms": 1792486896901
+          },
+          "quiet": true,
+          "reasons": [],
+          "reserved_busy_seconds": {
+            "14": 0.0,
+            "30": 0.0
+          },
+          "settle_seconds": 2.0
+        },
+        "preflight_samples": [
+          {
+            "after": {
+              "loadavg": [
+                8.37,
+                6.85,
+                6.24
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 147125455,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837231,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 943345,
+                  "idle": 2047816,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112972,
+                  "idle": 2876577,
+                  "steal": 11
+                }
+              },
+              "unix_ms": 1792486898901
+            },
+            "before": {
+              "loadavg": [
+                8.75,
+                6.9,
+                6.25
+              ],
+              "psi_cpu_some_avg10": 0.0,
+              "psi_cpu_some_total_us": 147125419,
+              "psi_memory_some_avg10": 0.0,
+              "psi_memory_some_total_us": 837231,
+              "reserved_ticks": {
+                "14": {
+                  "busy": 943345,
+                  "idle": 2047616,
+                  "steal": 13
+                },
+                "30": {
+                  "busy": 112972,
+                  "idle": 2876377,
+                  "steal": 11
+                }
+              },
+              "unix_ms": 1792486896901
+            },
+            "quiet": true,
+            "reasons": [],
+            "reserved_busy_seconds": {
+              "14": 0.0,
+              "30": 0.0
+            },
+            "settle_seconds": 2.0
+          }
+        ],
+        "settings": {
+          "boost": null,
+          "governor": null,
+          "in_isolcpus": false,
+          "in_nohz_full": false,
+          "no_turbo": null,
+          "smt_control": "on"
+        },
+        "uid": 0
+      },
+      "memory_limit_bytes": 8589934592,
+      "natural_solver_ms": 2902661.855852,
+      "outer_wall_ms": 2913487.794923,
+      "phases": [
+        {
+          "data": {
+            "points": 679936,
+            "summands": 5,
+            "target": [
+              "6261116474805304534310590",
+              "4505575220639647215230954"
+            ]
+          },
+          "elapsed_ms": 0.0035429999999999997,
+          "phase": "closure_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "domain_clauses": 1773110,
+            "representatives": 4096
+          },
+          "elapsed_ms": 297.111984,
+          "phase": "closure_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {},
+          "elapsed_ms": 456.514818,
+          "phase": "index_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0
+          },
+          "elapsed_ms": 456.533236,
+          "phase": "encoding_begin",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "identity_mask": 0,
+            "variables": 84743
+          },
+          "elapsed_ms": 469.490794,
+          "phase": "circuit_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "clauses": 2021197,
+            "domain_clauses": 1773110,
+            "identity_mask": 0,
+            "variables": 131958
+          },
+          "elapsed_ms": 582.231194,
+          "phase": "domain_complete",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "call": 1,
+            "conflict_budget": 800000,
+            "identity_mask": 0
+          },
+          "elapsed_ms": 582.261245,
+          "phase": "solver_enter",
+          "schema": "n83.chain-phase/v1"
+        },
+        {
+          "data": {
+            "conflicts": 800000,
+            "identity_mask": 0,
+            "outcome": "Unknown"
+          },
+          "elapsed_ms": 2903244.117097,
+          "phase": "solver_return",
+          "schema": "n83.chain-phase/v1"
+        }
+      ],
+      "source_commit": "786a8af0f7f935f3e17e9be21b8930eaad113c61",
+      "status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+      "terminal_counters": {
+        "conflicts": 800000,
+        "models": 0,
+        "rank": 0,
+        "relations": 0
+      },
+      "wall_cap_seconds": 4800,
+      "worker_blake3": "9470bf4e009bcfe4dfbe642817282abea9dd116d170307d84f92451f725cd737"
+    }
+  ],
+  "schema": "n83.native-xor-summary/v2",
+  "scope": "known-witness SAT component and separately bounded natural trials",
+  "signature": null,
+  "timing_scope": "descriptive recorded conditions; no automatic L2 or full-cold timing admission; missing worker context-switch/fault accounting",
+  "total_index_calculus_runtime_ms": null
+}

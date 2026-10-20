@@ -11,7 +11,8 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
-| [N83 resume evidence and historical accounting](n83-resume-evidence-and-execution-access.md) | open | complete historical campaign charge accounting | reconcile prior intervals; Docker, guarded native continuation and new-bucket S3 custody now verified |
+| [N83 resume evidence and historical accounting](n83-resume-evidence-and-execution-access.md) | open | historical campaign accounting and current migrated-host S3 access | reconcile prior intervals; restore bucket permissions and verify new PUT/HEAD/GET/replay |
+| [Native N83 800K memory limit](n83-native-800k-memory-limit.md) | investigating | complete 800K terminals under retained4GiB envelope | separately frozen8GiB repeats with complete native and downloaded-record replay; preserve4GiB OOMs |
 | [Native N83 K4096 terminal observability](n83-native-k4096-terminal-observability.md) | resolved (bounded diagnostic) | matched 1,000-conflict terminal observability only | native phase/query controls and independently replayed K2048/K4096 terminals pass; full cold selection remains open |
 | [Native N83 Docker inspection audit gap](n83-native-docker-inspection-audit-gap.md) | resolved (bounded reacquisition) | initial K4096 400K final Docker state missing | failed attempt preserved; separately frozen repeat passes native/fresh S3 replay,172payload hashes and repack; root cause unknown |
 | [N83 free-selector known-witness search](n83-free-selector-known-witness-search.md) | resolved for the exact control | original N83 fixed-coordinate control with free orbit selectors | verified SAT787conflicts /167.34s within180s; actual model selectors and group replay; XOR propagation cost measured, natural yield/cold winner still open |

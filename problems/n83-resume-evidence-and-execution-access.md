@@ -1,15 +1,16 @@
 # N83 resume evidence, execution access and historical accounting
 
 - **Status:** open
-- **Kind:** resolved execution/storage access; historical accounting gap
+- **Kind:** current storage access regression; historical accounting gap
 - **Affected work:** [primary factor-base sweep](../research/koblitz_n83_factor_base_sweep_20261008/RESULT.md)
 - **Next action owner:** N83 sweep maintainer
-- **Last updated:** 2026-10-18
+- **Last updated:** 2026-10-20 UTC
 
 ## Problem
 
-The resumed primary `a=0` GF(2^83), 81-bit-subgroup study now has working
-guarded Docker execution and user-selected S3 storage. The historical
+The resumed primary `a=0` GF(2^83), 81-bit-subgroup study has working
+guarded Docker execution. Earlier S3 publications passed custody checks,
+but the migrated host's current role is denied S3 writes. The historical
 campaign charge ledger has not been fully reconciled here, so a whole-
 campaign balance or complete cold-runtime total is not asserted. Fresh
 bounded continuation is recorded separately from prior allowances.
@@ -89,3 +90,26 @@ permissions. Live container controls and cleanup now pass, and K4096 is also
 stored and freshly verified in the user-selected bucket. The previous
 startup/access obstruction is resolved; historical accounting and the new
 native K4096 counter-observability gap remain separate open obligations.
+
+### 2026-10-20 UTC: storage access regression on migrated host
+
+Docker readiness was restored by pulling the exact retained image digest;
+new native execution is available. S3 access is currently unverified/blocked:
+the migrated host role spot-experiments-WorkerRole-G1FZ84yk3gS6 in account
+104186811093 receives403 for the known400K raw object's HeadObject and
+AccessDenied for GetBucketLocation, explicitly naming a missing identity policy.
+No OIC identity selector or AWS profile is configured. Prior verified uploads
+remain historical evidence; their success does not establish current access.
+New800K raw evidence must remain local until authorized PUT plus fresh HEAD/GET,
+payload/native replay and repack succeed. Restore the intended AWS identity or
+bucket permissions for this role, then execute those checkable storage gates.
+The user has been asked to restore access; no credentials were inspected or replaced.
+
+A direct conditionalPutObject of the retained worker-hash evidence record now
+also returnsAccessDenied explicitly because no identity policy allows
+s3:PutObject. [Actual readiness receipts](../research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-800k-20261020/storage-direct-put-readiness.stderr)
+retain the action, role and exact content-addressed resource. Native store
+readiness failed earlier atHeadObject403. Upload completion remains open.
+Git CLI credentials are also absent; the connected GitHub app has verified
+repository Git-blob write access, so PR publication can use that authorized
+connector with exact local source commits preserved separately in a Git bundle.

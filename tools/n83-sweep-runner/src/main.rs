@@ -193,7 +193,61 @@ fn inspect(name: &str) -> R<Value> {
     let out=docker(&["inspect","--format", "{\"host\":{{json .HostConfig}},\"mounts\":{{json .Mounts}},\"state\":{{json .State}},\"image\":{{json .Image}}}",name])?;
     Ok(serde_json::from_slice(&out.stdout)?)
 }
-fn isolation(v: &Value, image: &str) -> R<()> {
+fn memory_limit(v: &Value) -> R<u64> {
+    let bytes = match v.get("memory_limit_bytes") {
+        None => 4u64 << 30,
+        Some(n) => n.as_u64().ok_or("invalid memory limit")?,
+    };
+    let extended = [2048, 4096].iter().any(|&k| v["columns"] == k)
+        && v["conflicts"] == 800000u64
+        && v["wall_seconds"] == 4800u64
+        && !v["external_solver"].is_string()
+        && !v["external_solver_blake3"].is_string();
+    require(
+        bytes == (4u64 << 30) || (bytes == (8u64 << 30) && extended),
+        "memory limit outside frozen natural diagnostic envelope",
+    )?;
+    Ok(bytes)
+}
+
+#[test]
+fn explicit_memory_extension_keeps_legacy_and_control_limits() {
+    assert_eq!(memory_limit(&json!({})).unwrap(), 4u64 << 30);
+    for k in [2048, 4096] {
+        let base = json!({"columns":k,"conflicts":800000,"wall_seconds":4800,"memory_limit_bytes":8u64<<30});
+        assert_eq!(memory_limit(&base).unwrap(), 8u64 << 30);
+        for (field, value) in [
+            ("columns", json!(0)),
+            ("conflicts", json!(800001)),
+            ("wall_seconds", json!(4801)),
+            ("external_solver", json!("solver")),
+            ("external_solver_blake3", json!("digest")),
+            ("memory_limit_bytes", json!(16u64 << 30)),
+            ("memory_limit_bytes", json!("8g")),
+            ("memory_limit_bytes", Value::Null),
+        ] {
+            let mut bad = base.clone();
+            bad[field] = value;
+            assert!(memory_limit(&bad).is_err());
+        }
+    }
+}
+
+#[test]
+fn live_memory_and_swap_must_both_match_frozen_limit() {
+    for memory in [4u64 << 30, 8u64 << 30] {
+        let mut v = json!({"host":{"CapDrop":["ALL"],"SecurityOpt":["no-new-privileges"],
+            "Memory":memory,"MemorySwap":memory,"NanoCpus":1000000000u64,
+            "NetworkMode":"none","ReadonlyRootfs":true,"PidsLimit":64},
+            "image":"sha256:test","mounts":[]});
+        assert!(isolation(&v, "sha256:test", memory).is_ok());
+        assert!(isolation(&v, "sha256:test", memory * 2).is_err());
+        v["host"]["MemorySwap"] = json!(memory * 2);
+        assert!(isolation(&v, "sha256:test", memory).is_err());
+    }
+}
+
+fn isolation(v: &Value, image: &str, memory: u64) -> R<()> {
     let h = &v["host"];
     require(
         h["CapDrop"]
@@ -205,8 +259,8 @@ fn isolation(v: &Value, image: &str) -> R<()> {
         "capability/security isolation mismatch",
     )?;
     require(
-        h["Memory"] == 4294967296u64
-            && h["MemorySwap"] == 4294967296u64
+        h["Memory"] == memory
+            && h["MemorySwap"] == memory
             && h["NanoCpus"] == 1000000000u64
             && h["NetworkMode"] == "none"
             && h["ReadonlyRootfs"] == true
@@ -374,13 +428,21 @@ fn audit(dir: &Path) -> R<Value> {
         hash(dir.join("spec.json"))? == text(&cfg, "spec_blake3")?,
         "spec changed",
     )?;
+    require(
+        memory_limit(&read(dir.join("spec.json"))?)? == memory_limit(&cfg)?,
+        "memory limit differs from frozen spec",
+    )?;
     require(out["cleanup_verified"] == true, "cleanup not verified")?;
     require(
         hash(dir.join("stdout.log"))? == text(&out, "stdout_blake3")?
             && hash(dir.join("stderr.log"))? == text(&out, "stderr_blake3")?,
         "raw log custody mismatch",
     )?;
-    isolation(&read(dir.join("inspect-live.json"))?, text(&cfg, "image")?)?;
+    isolation(
+        &read(dir.join("inspect-live.json"))?,
+        text(&cfg, "image")?,
+        memory_limit(&cfg)?,
+    )?;
     let final_state = read(dir.join("inspect-final.json"))?;
     require(
         final_state["state"]["OOMKilled"] == false,
@@ -630,7 +692,7 @@ fn audit(dir: &Path) -> R<Value> {
                 && wc["allow_direct_relation"] == false
                 && wc["max_trials"] == 1
                 && wc["budget_seconds"] == cfg["wall_seconds"]
-                && wc["memory_cgroup_limit_bytes"] == 4294967296u64
+                && wc["memory_cgroup_limit_bytes"] == memory_limit(&cfg)?
                 && wc["memory_cgroup_swap_limit_bytes"] == 0,
             "worker config differs from frozen diagnostic",
         )?;
@@ -812,11 +874,11 @@ fn external_replay(dir: &Path) -> R<Vec<bool>> {
 
 fn validate_run_budget(columns: u64, external: bool, conflicts: u64, wall: u64) -> R<()> {
     let natural = columns != 0 && !external;
-    let wall_ceiling = if natural { 2400 } else { 900 };
+    let wall_ceiling = if natural { 4800 } else { 900 };
     let conflict_ceiling = if external {
         1_000_000
     } else if natural {
-        400_000
+        800_000
     } else {
         100_000
     };
@@ -825,6 +887,53 @@ fn validate_run_budget(columns: u64, external: bool, conflicts: u64, wall: u64) 
         (1..=conflict_ceiling).contains(&conflicts),
         "invalid conflicts",
     )
+}
+
+fn natural_worker_args(columns: u64, conflicts: u64, wall: u64, memory: u64) -> Vec<String> {
+    vec![
+        "primary-orbit-chain-cold".into(),
+        "/panel".into(),
+        "/fixtures".into(),
+        columns.to_string(),
+        "public_x_hash".into(),
+        "2026100801".into(),
+        "5".into(),
+        "1".into(),
+        "150000".into(),
+        "2000000".into(),
+        "32".into(),
+        conflicts.to_string(),
+        wall.to_string(),
+        (memory >> 20).to_string(),
+        "/out/run".into(),
+    ]
+}
+
+#[test]
+fn natural_worker_declaration_matches_frozen_cgroup_bytes() {
+    for memory in [4u64 << 30, 8u64 << 30] {
+        for columns in [2048, 4096] {
+            let args = natural_worker_args(columns, 800000, 4800, memory);
+            assert_eq!(args.len(), 15);
+            assert_eq!(args[0], "primary-orbit-chain-cold");
+            assert_eq!(args[3], columns.to_string());
+            assert_eq!(
+                &args[4..11],
+                [
+                    "public_x_hash",
+                    "2026100801",
+                    "5",
+                    "1",
+                    "150000",
+                    "2000000",
+                    "32"
+                ]
+            );
+            assert_eq!(&args[11..13], ["800000", "4800"]);
+            assert_eq!(args[13].parse::<u64>().unwrap() * 1024 * 1024, memory);
+            assert_eq!(args[14], "/out/run");
+        }
+    }
 }
 
 fn run(spec: &Path, dir: &Path) -> R<()> {
@@ -838,6 +947,7 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
     )?;
     let conflicts = number(&s, "conflicts")?;
     validate_run_budget(columns, s["external_solver"].is_string(), conflicts, wall)?;
+    let memory = memory_limit(&s)?;
     let checkout = fs::canonicalize(text(&s, "checkout")?)?;
     let clean = Command::new("git")
         .args(["-c", &format!("safe.directory={}", checkout.display())])
@@ -907,7 +1017,7 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         std::process::id(),
         SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos()
     );
-    let cfg = json!({"schema":"n83.native-run-config/v1","control_variant":s["control_variant"],"columns":columns,"conflicts":conflicts,"wall_seconds":wall,"panel":panel,"fixtures":fixtures,"worker":worker,"image":image,"source_commit":commit,"panel_blake3":inventory(&panel)?,"fixtures_blake3":inventory(&fixtures)?,"source_blake3":inventory(&source)?,"worker_blake3":hash(&worker)?,"runner_blake3":hash(std::env::current_exe()?)?,"spec_blake3":hash(spec)?,"container_name":name,"isolate":s["isolate"],"xor_engine":s["xor_engine"],"external_solver_blake3":s["external_solver_blake3"]});
+    let cfg = json!({"schema":"n83.native-run-config/v1","control_variant":s["control_variant"],"columns":columns,"conflicts":conflicts,"wall_seconds":wall,"memory_limit_bytes":memory,"panel":panel,"fixtures":fixtures,"worker":worker,"image":image,"source_commit":commit,"panel_blake3":inventory(&panel)?,"fixtures_blake3":inventory(&fixtures)?,"source_blake3":inventory(&source)?,"worker_blake3":hash(&worker)?,"runner_blake3":hash(std::env::current_exe()?)?,"spec_blake3":hash(spec)?,"container_name":name,"isolate":s["isolate"],"xor_engine":s["xor_engine"],"external_solver_blake3":s["external_solver_blake3"]});
     write(dir.join("config.json"), &cfg)?;
     write(
         dir.join("custody.json"),
@@ -931,8 +1041,8 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         "--name".into(),
         name.clone(),
         "--network=none".into(),
-        "--memory=4g".into(),
-        "--memory-swap=4g".into(),
+        format!("--memory={memory}"),
+        format!("--memory-swap={memory}"),
         "--cpus=1".into(),
         "--pids-limit=64".into(),
         "--cap-drop=ALL".into(),
@@ -982,29 +1092,13 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
     if columns == 0 {
         cmd.extend(["/panel/domains.json".into(), conflicts.to_string()]);
     } else {
-        cmd.extend([
-            "primary-orbit-chain-cold".into(),
-            "/panel".into(),
-            "/fixtures".into(),
-            columns.to_string(),
-            "public_x_hash".into(),
-            "2026100801".into(),
-            "5".into(),
-            "1".into(),
-            "150000".into(),
-            "2000000".into(),
-            "32".into(),
-            conflicts.to_string(),
-            wall.to_string(),
-            "4096".into(),
-            "/out/run".into(),
-        ]);
+        cmd.extend(natural_worker_args(columns, conflicts, wall, memory));
     }
     let attempt = (|| -> R<()> {
         docker(&cmd.iter().map(String::as_str).collect::<Vec<_>>())?;
         let live = inspect(&name)?;
         write(dir.join("inspect-live.json"), &live)?;
-        isolation(&live, image)?;
+        isolation(&live, image, memory)?;
         if let Some(r) = &reservation {
             require(
                 live["host"]["CpusetCpus"] == r.plan.run_cpu.to_string(),
@@ -1210,7 +1304,7 @@ mod tests {
     }
     #[test]
     fn isolation_forgery_rejected() {
-        assert!(isolation(&json!({"host":{"Memory":0}}), "sha256:x").is_err());
+        assert!(isolation(&json!({"host":{"Memory":0}}), "sha256:x", 4u64 << 30).is_err());
     }
     #[test]
     fn zero_relation_forgery_rejected() {
@@ -1277,14 +1371,15 @@ fn sat_trace_distinguishes_censoring_and_rejects_forged_order() {
 }
 
 #[test]
-fn natural_budget_admits_400k_but_stays_bounded() {
+fn natural_budget_admits_800k_but_stays_bounded() {
     for columns in [2048, 4096] {
         assert!(validate_run_budget(columns, false, 200_000, 1200).is_ok());
-        assert!(validate_run_budget(columns, false, 400_000, 2400).is_ok());
-        assert!(validate_run_budget(columns, false, 400_001, 2400).is_err());
-        assert!(validate_run_budget(columns, false, 400_000, 2401).is_err());
+        assert!(validate_run_budget(columns, false, 400_000, 4800).is_ok());
+        assert!(validate_run_budget(columns, false, 800_000, 4800).is_ok());
+        assert!(validate_run_budget(columns, false, 800_001, 4800).is_err());
+        assert!(validate_run_budget(columns, false, 800_000, 4801).is_err());
         assert!(validate_run_budget(columns, false, 0, 2400).is_err());
-        assert!(validate_run_budget(columns, false, 400_000, 0).is_err());
+        assert!(validate_run_budget(columns, false, 800_000, 0).is_err());
     }
 }
 

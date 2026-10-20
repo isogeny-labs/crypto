@@ -59,6 +59,34 @@ pub fn summarize(manifest: &Path, output: &Path) -> R<()> {
     for plan in m.as_array().ok_or("manifest must be an array")? {
         let dir = Path::new(plan["dir"].as_str().ok_or("run path")?);
         if !dir.join("audit.json").exists() {
+            if dir.join("inspect-final.json").exists() {
+                let final_state = read(dir.join("inspect-final.json"))?;
+                if final_state["state"]["OOMKilled"] == true {
+                    let cfg = read(dir.join("config.json"))?;
+                    let outer = read(dir.join("outer.json"))?;
+                    let refusal = super::audit(dir)
+                        .err()
+                        .ok_or("OOM must never pass search admission")?
+                        .to_string();
+                    super::require(
+                        refusal == "OOM outcome cannot be admitted as search result",
+                        "OOM diagnostic failed earlier custody/resource checks",
+                    )?;
+                    let prefix =
+                        super::sat_trace(&std::fs::read_to_string(dir.join("stderr.log"))?)?;
+                    rows.push(json!({"id":plan["id"],"arm":plan["arm"],"dir":plan["dir"],
+                        "status":"OOM_CENSORED_NOT_ADMITTED","full_search_audit":false,
+                        "terminal_counters":null,"natural_solver_ms":null,
+                        "outer_wall_ms":outer["outer_wall_ms"],"outer_scope":"failed attempt cost, not admitted search timing",
+                        "exit_code":outer["exit_code"],"cleanup_verified":outer["cleanup_verified"],
+                        "memory_limit_bytes":super::memory_limit(&cfg)?,"columns":cfg["columns"],
+                        "conflict_cap":cfg["conflicts"],"wall_cap_seconds":cfg["wall_seconds"],
+                        "source_commit":cfg["source_commit"],"worker_blake3":cfg["worker_blake3"],
+                        "sat_trace_status":prefix["status"],"last_recorded_event":prefix["events"].as_array().and_then(|a|a.last()),
+                        "admission_refusal":refusal}));
+                    continue;
+                }
+            }
             let before = dir.join("isolation-before.json");
             let before = before.exists().then(|| read(before)).transpose()?;
             let status = unadmitted_status(
@@ -73,6 +101,7 @@ pub fn summarize(manifest: &Path, output: &Path) -> R<()> {
         let a = read(dir.join("audit.json"))?;
         let cfg = read(dir.join("config.json"))?;
         let mut row = json!({"id":plan["id"],"arm":plan["arm"],"dir":plan["dir"],"status":a["status"],"outer_wall_ms":a["outer_wall_ms"],"terminal_counters":a["terminal_counters"],"source_commit":cfg["source_commit"],"worker_blake3":cfg["worker_blake3"],"columns":cfg["columns"],"conflict_cap":cfg["conflicts"],"wall_cap_seconds":cfg["wall_seconds"]});
+        row["memory_limit_bytes"] = json!(super::memory_limit(&cfg)?);
         if let Some(ps) = a["phases"].as_array() {
             row["phases"] = a["phases"].clone();
             let start = ps
