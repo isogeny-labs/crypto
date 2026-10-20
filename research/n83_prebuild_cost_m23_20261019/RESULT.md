@@ -60,6 +60,21 @@ cache-off/on measurements required before any improvement claim.
 
 ## Open obligations
 
+The opt-in XOR-row cache has passed directed backjump/matrix tests,
+400 exhaustive mixed CNF/XOR comparisons, the full Linux release-library
+suite (4,403 passed), and four actual N83 controls with independent replay
+and identical off/on model/row digests. The
+[control and launch-history report](reports/run-xor-cache-controls-20261020/RUN_REPORT.md)
+retains a missing-image launch and a fixed shell-label failure. The
+[corrected sixteen-attempt card](xor-cache-v2/STATUS.md) was running at
+01:24:11 UTC on 2026-10-20, with two capped natural attempts complete.
+Its comparison is still pending; the default solver remains cache-off.
+
+Accounting clarification: the m=4 `process_wall_ms` field is elapsed time
+inside the worker before final receipt serialization. Container start/end
+receipts preserve the surrounding process interval. A complete cold-cost
+comparison must also charge that final output and custody boundary.
+
 The [smaller-base m=4 controls](reports/run-small-m4-controls-20261019/RUN_REPORT.md)
 passed exact import, pinned SAT/group/rank checking and separate native
 general-field replay on x86_64 and arm64. K2048 and D12 each produced one
