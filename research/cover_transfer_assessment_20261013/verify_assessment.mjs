@@ -363,11 +363,11 @@ function check(condition, message) {
   }
 }
 
-check(registry.curves.length === 2572, "unexpected registry row count");
-check(report.curves.length === 2572, "unexpected cover-report row count");
-check(graph.curves.length === 2572, "unexpected graph curve-node count");
-check(Object.keys(graph.maps).length === 2572, "unexpected CV1 map count");
-check(Object.keys(graph.covers).length === 2570, "unexpected HC1 cover count");
+check(registry.curves.length === 2584, "unexpected registry row count");
+check(report.curves.length === 2584, "unexpected cover-report row count");
+check(graph.curves.length === 2584, "unexpected graph curve-node count");
+check(Object.keys(graph.maps).length === 2584, "unexpected CV1 map count");
+check(Object.keys(graph.covers).length === 2582, "unexpected HC1 cover count");
 
 const registryBytes = fs.readFileSync(registryPath);
 check(report.registry_sha256 === sha256(registryBytes), "covers.json registry digest mismatch");
@@ -486,11 +486,11 @@ check(representationCount === 977, "unexpected EC1 representation count");
 check(ec1Aliases.size === 977, "unexpected unique EC1 count");
 check(curveUids.size === 977, "unexpected unique curve-UID count");
 check(
-  mapReferenceCounts.size === 2572 && [...mapReferenceCounts.values()].every((count) => count === 1),
+  mapReferenceCounts.size === 2584 && [...mapReferenceCounts.values()].every((count) => count === 1),
   "CV1 references are not bijective with curve nodes",
 );
 check(
-  coverReferenceCounts.size === 2570 &&
+  coverReferenceCounts.size === 2582 &&
     [...coverReferenceCounts.values()].every((count) => count === 1 || count === 2) &&
     [...coverReferenceCounts.values()].filter((count) => count === 2).length === 2,
   "unexpected HC1 sharing pattern",
@@ -784,10 +784,10 @@ for (const coverResult of report.curves) {
   }
 }
 
-check(constructionCounts.binary_cubic_pullback_v1 === 165, "unexpected binary-construction count");
-check(constructionCounts.prime_quadratic_pullback_v1 === 2407, "unexpected odd-construction count");
-check(arithmeticChecks.binary === 165, "unexpected binary arithmetic-replay count");
-check(arithmeticChecks.prime === 1083, "unexpected prime-field arithmetic-replay count");
+check(constructionCounts.binary_cubic_pullback_v1 === 166, "unexpected binary-construction count");
+check(constructionCounts.prime_quadratic_pullback_v1 === 2418, "unexpected odd-construction count");
+check(arithmeticChecks.binary === 166, "unexpected binary arithmetic-replay count");
+check(arithmeticChecks.prime === 1094, "unexpected prime-field arithmetic-replay count");
 check(arithmeticChecks.extension === 1324, "unexpected extension-field arithmetic-replay count");
 check(
   arithmeticChecks.normalized_target === 30,
@@ -795,7 +795,7 @@ check(
 );
 
 const expectedStatusVocabulary = ["unknown", "supported", "refuted", "not_applicable"];
-const expectedCatalogCommit = "8e4c99759fd8d9594ed207d793b07b59ebaf19f7";
+const expectedCatalogCommit = "6e3f8f5a5f857a11fce8e0bdb8878ab8e30304c0";
 const expectedRootKeys = [
   "assessment_date",
   "catalog_commit",
@@ -1022,10 +1022,10 @@ const expectedControlStatuses = {
 };
 const expectedSemanticDigests = {
   claim_contract: "36a2bb9524810994c02633462e71ae08ac88da6fbb520df72e66e05150628634",
-  result_templates: "1a4955b6d4dd016e0cad661afde21257ae6845904904917568414f2ae601f05e",
+  result_templates: "efe3998326740481740bbf919937a10c7bd1b675e2a0aee7c472069e44e05ab7",
   profiles: "807800e78066e8c3b0caa6634072a585cf4ae924a40b13817d9ca7a3c0aa3710",
-  controls: "f5e73ff82f722d7f3f435e3c4d238b856d2b613111a28012dffa5b8ef5e7d3c6",
-  open_obligations: "ba227bbd94320d317ccfbf71b1e0dd3f05854e7aa4e62693472dfdf34c8f2373",
+  controls: "afd4be13286c386563ae432c09dc8cdca609b6a1fc1d5151b4da4c5adeb9b573",
+  open_obligations: "684582b75467a199ea9f2b89d12d7508db3029d7d9b13c72a8517c22b664fa17",
   global_cost_accounting:
     "b3b77a401d4dd76cabfc9a65d5a738fcfb977fd1a3abc2db3733c41820304619",
 };
@@ -1661,10 +1661,10 @@ for (const [mapUid, context] of mapContexts) {
   });
 }
 
-check(expectedFieldBindings.size === 509, "unexpected declared-field context count");
-check(fieldUidByLabel.size === 509, "declared-field labels are not bijective with field contexts");
-check(expectedJacobianBindings.size === 2570, "unexpected Jacobian-context count");
-check(expectedTypedMapBindings.size === 2572, "unexpected typed-map binding count");
+check(expectedFieldBindings.size === 510, "unexpected declared-field context count");
+check(fieldUidByLabel.size === 510, "declared-field labels are not bijective with field contexts");
+check(expectedJacobianBindings.size === 2582, "unexpected Jacobian-context count");
+check(expectedTypedMapBindings.size === 2584, "unexpected typed-map binding count");
 check(
   canonicalJson(actualFieldBindings) === canonicalJson(sortedRecord(expectedFieldBindings)),
   "typed declared-field bindings are not the exact independently derived set",
@@ -1829,8 +1829,8 @@ check(
 );
 
 const expectedPredicateCounts = {
-  binary_cubic_same_field: 165,
-  odd_prime_quadratic_direct_same_field: 1053,
+  binary_cubic_same_field: 166,
+  odd_prime_quadratic_direct_same_field: 1064,
   odd_prime_quadratic_normalized_same_field: 30,
   odd_extension_quadratic_direct_same_field: 1324,
   linked_subgroup_degree3: 140,
@@ -2175,7 +2175,7 @@ check(
   typeof coverage.scope_note === "string" && coverage.scope_note.trim().length > 0,
   "coverage scope_note is empty",
 );
-check(coverage.assessed_maps === 2572 && coverage.unassessed_maps === 0, "map coverage is incomplete");
+check(coverage.assessed_maps === 2584 && coverage.unassessed_maps === 0, "map coverage is incomplete");
 check(
   coverage.assessed_subgroups === 977 && coverage.unassessed_subgroups === 0,
   "subgroup coverage is incomplete",
@@ -2406,8 +2406,8 @@ for (const [kind, relativePath] of Object.entries(reportArtifacts)) {
   if (kind === "context_graph_source") {
     const contents = bytes.toString("utf8");
     for (const marker of [
-      "509 fields / 2,570 Jacobian contexts / 2,572 maps",
-      "current-source test: 2,572 / 2,572",
+      "510 fields / 2,582 Jacobian contexts / 2,584 maps",
+      "current-source test: 2,584 / 2,584",
       "746 inside / 1,354 outside old allowlist",
     ]) {
       check(contents.includes(marker), `context graph lacks current marker: ${marker}`);
