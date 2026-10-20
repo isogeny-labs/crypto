@@ -2776,6 +2776,7 @@ mod tests {
         assert_eq!(n_vars_for(63, 6, 2), 12);
         assert_eq!(n_vars_for(63, 6, 3), 81);
         assert_eq!(max_m_within_budget(63, 6, 64), Some(2));
+        #[cfg(not(feature = "wide-vars"))]
         assert!(profile_system(63, 0, 3, 2, 1).is_none());
         assert!(profile_system(63, 0, 2, 2, 1).is_some());
     }

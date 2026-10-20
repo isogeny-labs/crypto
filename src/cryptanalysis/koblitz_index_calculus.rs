@@ -20255,6 +20255,7 @@ mod tests {
     /// factor base is deliberately never consulted: rejection must happen
     /// before any witness or factor-base semantics are considered.
     #[test]
+    #[cfg(not(feature = "wide-vars"))]
     fn pdp_admission_n19_m6_d2_layout_is_unsupported_not_refuted() {
         let kc = KoblitzCurve::new(0, 19).unwrap();
         let st = FieldStructure::new(kc.n, &kc.curve.irreducible);
@@ -22246,5 +22247,56 @@ mod admissibility_walk_differential {
             }
         }
         assert!(answers[0] > 0 && answers[1] > 0, "{answers:?}");
+    }
+
+    /// `wide-vars`: m = 4 over F_{2^23} with a six-dimensional subspace is a
+    /// 4·6 + 2·23 = 70-unknown chained system, past the 64-bit monomial
+    /// word.  Both inherited-F4 frontends must find a decomposition whose
+    /// points really sum to a target built as the sum of four base points.
+    #[cfg(feature = "wide-vars")]
+    #[test]
+    fn m4_n23_d6_seventy_unknowns_decompose_through_the_wide_engines() {
+        use crate::cryptanalysis::koblitz_groebner::{FieldStructure, SolverEngine};
+        let kc = KoblitzCurve::new(1, 23).unwrap();
+        let (fb, index_of) = crate::cryptanalysis::delta_method::standard_base(&kc, 6).unwrap();
+        let st = FieldStructure::new(kc.n, &kc.curve.irreducible);
+        assert_eq!(4 * 6 + 2 * kc.n as usize, 70);
+        let engine = SolverEngine::InheritedF4 { max_degree: 3 };
+        let planted = [1usize, 5, 11, 20];
+        let mut target = BinaryPoint::Infinity;
+        for &i in &planted {
+            target = kc.add(&target, &fb.points[i]);
+        }
+        assert!(matches!(target, BinaryPoint::Affine { .. }));
+        for f6 in [false, true] {
+            let (hit, stats) = if f6 {
+                groebner_decompose_f6_ic(
+                    &kc,
+                    &fb,
+                    &index_of,
+                    &st,
+                    &target,
+                    4,
+                    engine,
+                    usize::MAX / 2,
+                )
+            } else {
+                groebner_decompose(&kc, &fb, &index_of, &st, &target, 4, engine, usize::MAX / 2)
+            };
+            assert!(
+                !stats.unsupported,
+                "f6={f6}: system rejected above 64 unknowns"
+            );
+            let hit = hit.unwrap_or_else(|| panic!("f6={f6}: no decomposition found"));
+            assert_eq!(hit.len(), 4);
+            let mut sum = BinaryPoint::Infinity;
+            for &i in &hit {
+                sum = kc.add(&sum, &fb.points[i]);
+            }
+            assert_eq!(
+                sum, target,
+                "f6={f6}: decomposition does not sum to the target"
+            );
+        }
     }
 }

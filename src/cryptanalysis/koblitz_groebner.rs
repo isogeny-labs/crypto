@@ -10016,3 +10016,76 @@ thread_local! {
 pub fn set_early_abort_mode(mode: Option<u8>) {
     EARLY_ABORT_OVERRIDE.with(|m| m.set(mode));
 }
+
+/// Systems with more than 64 unknowns, which only the `wide-vars` build
+/// accepts.
+#[cfg(all(test, feature = "wide-vars"))]
+mod wide_tests {
+    use super::*;
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, mask_from64, sort_masks_descending, sum_by_monomial, Mask,
+    };
+
+    const N: usize = 100;
+
+    /// x_0 = 1, x_1 = 1, x_2 = 0 and x_i = x_{i-1} + x_{i-2}·x_{i-3} + 1:
+    /// a triangular quadratic system whose unique root has bits above 64.
+    fn planted() -> (Vec<F2BoolPoly>, Mask) {
+        let v = |k: usize| F2BoolMono::var(k as u32);
+        let mut eqs = vec![
+            F2BoolPoly::from_monos(vec![v(0), F2BoolMono::one()], N),
+            F2BoolPoly::from_monos(vec![v(1), F2BoolMono::one()], N),
+            F2BoolPoly::from_monos(vec![v(2)], N),
+        ];
+        let mut x = vec![1u8, 1, 0];
+        for i in 3..N {
+            eqs.push(F2BoolPoly::from_monos(
+                vec![
+                    v(i),
+                    v(i - 1),
+                    F2BoolMono::from_mask(bit(i as u32 - 2) | bit(i as u32 - 3)),
+                    F2BoolMono::one(),
+                ],
+                N,
+            ));
+            x.push(x[i - 1] ^ (x[i - 2] & x[i - 3]) ^ 1);
+        }
+        let root = x.iter().enumerate().fold(
+            0 as Mask,
+            |m, (i, &b)| if b == 1 { m | bit(i as u32) } else { m },
+        );
+        (eqs, root)
+    }
+
+    #[test]
+    fn a_hundred_unknown_triangular_system_has_its_planted_root() {
+        let (eqs, root) = planted();
+        assert!(root >> 64 != 0, "the planted root must use bits above 64");
+        for e in &eqs {
+            assert_eq!(e.eval(root), 0);
+        }
+        let (sols, stats) = solve_boolean_system(&eqs, N, &SolveOptions::default());
+        assert!(!stats.unsupported);
+        assert_eq!(sols, vec![root]);
+    }
+
+    #[test]
+    fn monomial_keys_and_sums_respect_bits_above_64() {
+        let a = bit(70);
+        let b = bit(3) | bit(65);
+        let mut masks = vec![mask_from64(5), b, a, bit(64)];
+        sort_masks_descending(&mut masks);
+        assert_eq!(masks.len(), 4);
+        for w in masks.windows(2) {
+            // graded order: sorted descending means never `Less`
+            let o = cmp_mono(F2BoolMono::from_mask(w[0]), F2BoolMono::from_mask(w[1]));
+            assert_ne!(o, std::cmp::Ordering::Less, "{:?}", masks);
+        }
+        for m in [a, b, bit(64), mask_from64(5)] {
+            assert!(masks.contains(&m));
+        }
+        let mut terms = vec![(a, 1u64), (b, 1), (a, 1), (b, 1), (bit(99), 1)];
+        sum_by_monomial(&mut terms);
+        assert_eq!(terms, vec![(bit(99), 1)]);
+    }
+}
