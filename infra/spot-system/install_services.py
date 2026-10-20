@@ -53,16 +53,16 @@ RequiresMountsFor=/srv/experiments
 [Service]
 Type=oneshot
 User=ec2-user
-ExecStart={quoted(runtime / 'bin/checkpoint-discovery')} --root {root}{extra} --output {root}/discovery/current-host.json
+ExecStart={quoted(runtime / 'bin/checkpoint-discovery')} --root {root}{extra} --max-hash-bytes 68719476736 --output {root}/discovery/current-host.json
 NoNewPrivileges=true
 Nice=10
-TimeoutStartSec=120
+TimeoutStartSec=1800
 '''
     timer = '''[Unit]
 Description=Refresh the durable checkpoint inventory
 [Timer]
 OnBootSec=30
-OnUnitInactiveSec=60
+OnUnitInactiveSec=900
 Unit=spot-checkpoint-discovery.service
 [Install]
 WantedBy=timers.target

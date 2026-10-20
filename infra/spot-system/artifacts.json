@@ -3,14 +3,15 @@
   "bucket": "spot-experiments-runtimebucket-g8acwaz3kewm",
   "region": "us-east-2",
   "staged": false,
-  "deployment_phase": "compute-enabled-quota-blocked",
+  "deployment_phase": "managed-lifecycle-enabled-original-protected",
   "ip_cutover_enabled": false,
   "managed_worker_ready": false,
+  "managed_worker_bootstrap_verified": true,
   "deployment_bundle": {
-    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/releases/3bd2168872da5568efb0e90fe440d15a7274ae948c77f3b5c5881e4df25d9f39/spot-system.tar.gz",
-    "sha256": "3bd2168872da5568efb0e90fe440d15a7274ae948c77f3b5c5881e4df25d9f39",
-    "bytes": 69213058,
-    "description": "Applied AWS compute configuration, checkpoint discovery, bootstrap recovery gate and quota-blocked deployment evidence"
+    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/releases/0d147a8f63af342a7579fcae0c618a994cf6dcd24d0b9bc89b40abe12a05ee94/spot-system.tar.gz",
+    "sha256": "0d147a8f63af342a7579fcae0c618a994cf6dcd24d0b9bc89b40abe12a05ee94",
+    "bytes": 99939388,
+    "description": "Applied AWS compute configuration, native solver checkpoint runtime, recovery gates and managed-worker validation evidence"
   },
   "client_installer": {
     "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/clients/8c3756b6408d6fde4255f515d225b311c19048dd3a28d83d1ecdb000d8b4ada9/spot-client.tar.gz",
@@ -18,9 +19,9 @@
     "bytes": 3069
   },
   "runtime": {
-    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/runtime/8a1f23fc4a42552d2f85f951ebeb2efbc4f78154b7a3aacdb50e8f269cd8e1f7.tar.gz",
-    "sha256": "8a1f23fc4a42552d2f85f951ebeb2efbc4f78154b7a3aacdb50e8f269cd8e1f7",
-    "bytes": 69603945
+    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/runtime/4e9e3899571becd92a001dd545bfadca6aa26419c4b7b24f2d0bfc611b447eb2.tar.gz",
+    "sha256": "4e9e3899571becd92a001dd545bfadca6aa26419c4b7b24f2d0bfc611b447eb2",
+    "bytes": 100199261
   },
   "checkpoint_discovery": {
     "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/tools/9c6a9fc1291c95ccee2c402fdeafbbaa8b94a84d4dd21a6b70a22df7af242cee/checkpoint-discovery",
@@ -33,5 +34,29 @@
     "sha256": "86283cd84373226364186b2043ef9c939f4e2eca90a29cee90cf6359cf9f8e2e",
     "bytes": 1514456,
     "description": "Portable bootstrap recovery test; also included in runtime"
+  },
+  "solver_checkpoint_selftest": {
+    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/tools/3fcc3455f1256a1d461492092294a435c8ae74765d480bb0a6efb6d2cfe34f41/solver-checkpoint-selftest",
+    "sha256": "3fcc3455f1256a1d461492092294a435c8ae74765d480bb0a6efb6d2cfe34f41",
+    "bytes": 103794560,
+    "description": "Native application checkpoint support; also included in runtime"
+  },
+  "native_experiment": {
+    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/tools/310449966b2c7894fe8bd5dc28f16d9b45eefc3c216e3878d5420aec877755fc/factor-base-shape-ladder",
+    "sha256": "310449966b2c7894fe8bd5dc28f16d9b45eefc3c216e3878d5420aec877755fc",
+    "bytes": 3731064,
+    "description": "Native application checkpoint support; also included in runtime"
+  },
+  "criu_tool": {
+    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/tools/8dbd38dfe73ac1cbdf7d060e91b8e6bc85a07897c3e880e4df62a545aafc59b5/criu-4.2.1",
+    "sha256": "8dbd38dfe73ac1cbdf7d060e91b8e6bc85a07897c3e880e4df62a545aafc59b5",
+    "bytes": 5961984,
+    "description": "Public upstream CRIU software/source only; no process images"
+  },
+  "criu_source": {
+    "s3_uri": "s3://spot-experiments-runtimebucket-g8acwaz3kewm/tools/feffdf4638125ebb12d2434754f80a1d7bbba85a3e6bee98c216f88fb99a5d96/criu-4.2.1-source.tar.gz",
+    "sha256": "feffdf4638125ebb12d2434754f80a1d7bbba85a3e6bee98c216f88fb99a5d96",
+    "bytes": 1469213,
+    "description": "Public upstream CRIU software/source only; no process images"
   }
 }
