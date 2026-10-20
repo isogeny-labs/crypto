@@ -26,6 +26,21 @@ has trivial intersection with the 3-kernel. The
 witness, component pairings and explicit false flags for quotient and
 transfer execution.
 
+I transcribed the six rational functions for Tian's published source map
+from the original TeX with a [SHA-checked extractor](extract_tian_map.py)
+into a [coefficient fixture](fixtures/tian-cubic-map-v1.json). The native
+[map gate](native/tian_cubic_map_gate.rs) evaluates them on 100 successive
+multiples of the published source point and on its published 1987 multiple.
+Every denominator is nonzero; both coordinate cubics are separable; and
+multiplication by the quartic in their nine-dimensional coordinate algebra
+has rank six, showing that precisely three geometric pairs lie on the
+quartic. A one-unit corruption of the first coefficient fails this check.
+The 101 source points and their coefficients are
+[retained](correctness/tian-cubic-map-gate-v1.jsonl). This validates the
+published divisor cut on these inputs. It does not form the Jacobian class,
+take its Frobenius trace, or establish a source image. It is therefore not
+a transfer DLP or a cost ratio.
+
 The [quartic checker](../../src/bin/tian_quartic_smoothness.rs) derives a unit
 gradient ideal in each affine chart for the copied published \(\mathbf F_{523}\)
 quartic; a deliberately singular quartic fails the same check. This is

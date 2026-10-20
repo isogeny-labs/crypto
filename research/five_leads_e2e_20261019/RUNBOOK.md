@@ -23,6 +23,22 @@ The Smith holdout was selected from the earlier immutable compressed census
 before odd-kernel testing. Its source revision and compressed-file SHA-256
 are embedded in
 [`smith-negative-holdout-v1.json`](fixtures/smith-negative-holdout-v1.json).
+
+The Tian source-map coefficient fixture is reproducibly extracted from the
+original [arXiv v1 source](https://arxiv.org/abs/2012.07173v1). The extractor
+rejects a TeX SHA-256 mismatch; its six function arrays and the denominator
+are then evaluated natively on 101 source points:
+
+```sh
+mkdir -p /tmp/tian2012-source
+curl -L --fail https://export.arxiv.org/src/2012.07173 | tar -xz -C /tmp/tian2012-source
+python3 research/five_leads_e2e_20261019/extract_tian_map.py /tmp/tian2012-source/Cover_attack.tex > research/five_leads_e2e_20261019/fixtures/tian-cubic-map-v1.json
+research/five_leads_e2e_20261019/native/target/release/tian-cubic-map-gate > research/five_leads_e2e_20261019/correctness/tian-cubic-map-gate-v1.jsonl
+```
+
+The map gate checks a separable three-point cut on the quartic and a
+deliberate bad-coefficient control. It does not construct the corresponding
+Jacobian classes or trace them to the base field.
 Re-running its selection requires that archived census:
 
 ```sh
