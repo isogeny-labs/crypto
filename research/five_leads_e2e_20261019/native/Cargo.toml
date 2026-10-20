@@ -13,6 +13,14 @@ name = "tian-cubic-kernel"
 path = "tian_cubic_kernel.rs"
 
 [[bin]]
+name = "tian-quartic-km"
+path = "tian_quartic_km.rs"
+
+[[bin]]
+name = "tian-cubic-rho"
+path = "tian_cubic_rho.rs"
+
+[[bin]]
 name = "mixed-fiber-census"
 path = "mixed_fiber_census.rs"
 
@@ -21,8 +29,28 @@ name = "mixed-fiber-dlp"
 path = "mixed_fiber_dlp.rs"
 
 [[bin]]
+name = "mixed-fiber-dlp-analyze"
+path = "mixed_fiber_dlp_analyze.rs"
+
+[[bin]]
 name = "genus2-model-gate"
 path = "genus2_model_gate.rs"
+
+[[bin]]
+name = "genus2-projective-analyze"
+path = "genus2_projective_analyze.rs"
+
+[[bin]]
+name = "genus2-choice2-analyze"
+path = "genus2_choice2_analyze.rs"
+
+[[bin]]
+name = "tian-km-gate-analyze"
+path = "tian_km_gate_analyze.rs"
+
+[[bin]]
+name = "tian-km-linear-analyze"
+path = "tian_km_linear_analyze.rs"
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }

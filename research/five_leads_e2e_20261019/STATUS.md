@@ -7,11 +7,11 @@ No screening result, draft, map-only check or stage-only gain discharges this.
 
 | Lead | Evidence completed | Required remaining evidence |
 | --- | --- | --- |
-| Cubic odd-torsion transfer | Exact published 3-kernel, product pairings, Frobenius and source order checked; copied quartic smooth | quotient, actual map kernel and transfer; full source-to-answer solving and rho costs |
+| Cubic odd-torsion transfer | Exact published 3-kernel and smooth quartic; native destination Jacobian checks published `T=1987S` and `rS=0`; bounded search recovers 1987 from published `S,T` without scalar input and source-verifies it (51,979.77× optimized rho at representative arithmetic price); five source-rho controls and 12-price grid | quotient, actual source-to-Jacobian map and transfer; proposed genus-3 index-calculus solver and its complete costs |
 | Genus-2 target-rank collector | Two-choice candidate on original 1,260 exact-order targets; complete counts, source scalar checks and full replay | qualified wall timing and external comparison before any speed claim; better rank policy remains a research hypothesis |
-| Genus-2 projective backend | All 42 model conversions, 4,200 divisor samples and 4,200 coordinate-map addition checks passed | projective arithmetic and full 1,260 paired workloads with matched optimized source rho |
+| Genus-2 projective backend | Fraction-free projective numerator chart; all 1,260 original targets, 3,780 verified and independently replayed arm records, exact old-counter matching, full 12×3 price grid; source rho beats chart in every pooled, size and curve pricing cell | complete published projective law and qualified wall/external comparison remain separate work |
 | Genus-3 odd-kernel escape | Published rational T1 checked; quartic smooth; 20 Smith-negative inputs frozen and regenerated | odd-kernel screen on holdout, source/destination maps, complete solving costs |
-| Mixed-fiber PKM | 540 small pair-table oracle solution sets independently enumerated with homogeneous/random controls | polynomial all-roots solver, external F4 comparison, source answer checks and rho costs |
+| Mixed-fiber PKM | 540 source-verified candidate DLP records plus matched rho on nine eligible prime-order curves; native full-price analysis; mixed/rho 3.2222× pooled at representative price | proposed heterogeneous polynomial/F4 all-roots solver and external comparison |
 
 The [report](REPORT.md), [runbook](RUNBOOK.md), frozen protocols, raw session
 archive and replay receipts give the exact boundary of each result. The

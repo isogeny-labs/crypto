@@ -340,6 +340,23 @@ impl Field {
             let v = self.bm((self.p - y) % self.p, inv);
             return u + self.p * v;
         }
+        if self.n == 3 && self.modulus < self.p {
+            // For w^3 + d = 0, multiply by the two Frobenius conjugates.
+            // This leaves one base-field norm inversion instead of expanding
+            // an inversion into hundreds of extension-field multiplications.
+            let (x, y, z) = (a % self.p, a / self.p % self.p, a / (self.p * self.p));
+            let d = self.modulus;
+            let u = (self.bs(x) + self.bm(d, self.bm(y, z))) % self.p;
+            let v = (self.p - (self.bm(x, y) + self.bm(d, self.bs(z))) % self.p) % self.p;
+            let w = (self.bs(y) + self.p - self.bm(x, z)) % self.p;
+            let cross = (self.bm(z, v) + self.bm(y, w)) % self.p;
+            let norm = (self.bm(x, u) + self.p - self.bm(d, cross)) % self.p;
+            let inverse_norm = self.bi(norm);
+            self.count(|c| c.field_adds += 6);
+            return self.bm(u, inverse_norm)
+                + self.p * self.bm(v, inverse_norm)
+                + self.p * self.p * self.bm(w, inverse_norm);
+        }
         // Expanded exponentiation: no extra inversion macro is charged.
         self.pow(a, self.size() - 2)
     }

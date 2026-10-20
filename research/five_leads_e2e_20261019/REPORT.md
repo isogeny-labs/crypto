@@ -2,10 +2,11 @@
 
 This is a follow-up to the five leads in
 [the lead register](../new_leads_20261019/README.md). Each result below names
-the operation that was actually run. The requested end-to-end criterion
-remains open for four leads; the two-choice genus-2 collector has a separate
-full-cohort execution and replay below. All tested curves, points and scalars
-are public synthetic or published fixtures.
+the operation that was actually run. The two genus-2 changes have full-cohort
+execution and replay. Mixed fibers have an end-to-end pair-table DLP control,
+but the proposed polynomial solver has not run. Neither odd-kernel route has
+an end-to-end transfer DLP. All tested curves, points and scalars are public
+synthetic or published fixtures.
 
 ## Cubic odd-torsion transfer
 
@@ -28,9 +29,40 @@ The [quartic checker](../../src/bin/tian_quartic_smoothness.rs) derives a unit
 gradient ideal in each affine chart for the copied published \(\mathbf F_{523}\)
 quartic; a deliberately singular quartic fails the same check. This is
 geometric smoothness of the written equation, not proof that it is the
-quotient of the checked kernel. No source point was mapped, and no DLP was
-solved through this transfer. The executable quotient, its actual kernel,
-rational descent and complete-cost solver remain
+quotient of the checked kernel. A new native
+[evaluation-space Jacobian implementation](native/tian_quartic_km.rs) checks
+the published destination classes \(S,T\), \(T=1987S\), and \(rS=0\) using
+the genus-3 quartic group law. The known 1987 is used for this certificate;
+this is not an attack answer. An independently optimized
+[source rho control](correctness/tian-cubic-rho-v2.jsonl) recovers and
+source-verifies 1987 on five seeds. Its cubic-field inversion charges one
+base-field inversion via the norm formula.
+
+The [arithmetic gate](results/tian-km-arithmetic-gate-summary.json) prices
+the destination group law against those complete rho controls. At
+\(M+0.5S+10I\), one verified destination doubling alone costs 13,318,526
+base-field multiplication equivalents, or **14.04×** the five-seed mean
+source rho cost of 948,415. Across the 12 arithmetic prices, that one
+doubling spans **0.997–16.46×** mean rho. The deliberately known-scalar
+\(1987S\) multiplication costs **212.42×** mean rho at the representative
+price, with a **15.13–249.03×** price band. These are arithmetic diagnostics,
+not transfer DLP ratios.
+
+A separate native [bounded destination search](native/tian_quartic_km.rs)
+received the published \(S,T\) classes but not their scalar. It recovered
+**1987** after 1,987 tested multiples and checked the answer on the source
+curve by recomputing \(1987P=Q\)
+([receipt](correctness/tian-km-linear-dlp-v1.json)). Its cold cost, including
+quartic setup and source verification, is 49,265,606,844 base-field
+multiplications, 20,468 squarings and 3,275,161 inversions. At the same
+representative price this is **51,979.77×** the mean optimized source-rho
+cost; the [native 12-price grid](results/tian-km-linear-dlp-price-grid.csv)
+spans **3,710.83–60,937.36×**. These are cold field-operation costs;
+native logical work is unpriced on both arms. This is a verified DLP on *published
+destination classes* for one unusually small scalar, not an executed
+source-to-Jacobian map or the proposed genus-3 index-calculus solver. No
+source point was mapped through the published quotient. The executable
+quotient, its actual kernel, rational descent and index-calculus costs remain
 [an open problem](../../problems/odd-isogeny-quartic-transfer-execution.md).
 
 ## Genus-2 target-useful relations
@@ -50,7 +82,7 @@ receipts cover all 6,300 arm records and 1,260 paired one-target workloads.
 Every arm recovered and source-verified its scalar, and all 6,300 independent
 replays reproduced the original records with zero audit problems
 ([audit summary](results/replay-audit-summary.json)). The
-[price grid](results/genus2-choice2-price-grid.csv) retains all 12 arithmetic
+[native reanalysis price grid](results/genus2-choice2-native-v3-price-grid.csv) retains all 12 arithmetic
 prices and three native-operation charges, with per-curve as well as
 per-size ratios. At the representative
 \(M+0.5S+10I\) price and 0.1 \(M\) per declared native logical operation:
@@ -76,11 +108,27 @@ price; over the entire frozen price/native grid it ranges from 0.989481 to
 1.006720. The candidate processed 221,270,948 divisors against 223,343,235
 for incumbent. It solved at the first graph cycle on 23 targets, against
 16 for incumbent; 1,237 and 1,244 respectively required later work.
-The [cohort summary](results/genus2-choice2-summary.json) includes all
-verification flags, session digests, cycle counts and logical memory peaks.
+The [native cohort summary](results/genus2-choice2-native-v3-summary.json)
+includes replay checks, session digests and cost bands; the retained
+[original summary](results/genus2-choice2-summary.json) gives cycle counts
+and logical memory peaks.
 These mixed, price-sensitive results do not establish a robust full-cohort
 improvement or a rho crossover. Operation counts are L0 evidence; they do
 not qualify a wall-speed claim.
+
+The dated [operation-cost report source](reports/choice2-operation-costs-20261019/report.tex),
+[SVG graph](reports/choice2-operation-costs-20261019/choice2-operation-cost-ratios.svg),
+[150 dpi PNG graph](reports/choice2-operation-costs-20261019/choice2-operation-cost-ratios.png),
+and [renderer source](reports/choice2-operation-costs-20261019/render.py)
+reproduce the fixed-price, per-size and pooled ratios from the frozen price grid.
+The browsing copy is in
+[`benchmarks/20261019-five-leads-choice2-costs/`](../../benchmarks/20261019-five-leads-choice2-costs/README.md).
+The [inspected PDF](reports/choice2-operation-costs-20261019/report.pdf)
+was rendered from the equivalent Typst source after the offline TeX build
+encountered a missing `tuenc.def` cache file; the
+[build note](reports/choice2-operation-costs-20261019/PDF_BUILD_BLOCKER.md)
+retains that history.
+No timing or performance-history entry is derived from these operation counts.
 
 The next collector test is an explicit target-coefficient rank score from
 the current signed linear system before branch selection. It must charge
@@ -99,10 +147,38 @@ is monic and has no \(u^4\) term, the model required by the published
 The gate validates 100 transferred divisor samples and 100 generator-addition
 commutation checks per model: 4,200 of each.
 The [receipt](correctness/genus2-model-gate-v1.jsonl) records coefficients
-and samples. This establishes applicability of the equation form only.
-Projective addition, inversion/normalization charging, equally optimized
-source rho, and the requested 1,260-target replay are
-[still missing](../../problems/genus2-projective-transfer-backend.md).
+and samples. This establishes applicability of the equation form. A new
+[fraction-free CRT numerator chart](../../src/cryptanalysis/three_leads_followup.rs)
+implements ordinary degree-two divisor additions with one normalization
+inversion and falls back to complete affine Cantor on exceptional inputs.
+It is not the complete projective law from the cited paper.
+
+The [frozen chart protocol](protocols/genus2-projective-chart-v1.md) uses the
+same 21 exact-order curves and all 1,260 original targets as the two-choice
+collector. The corrected cohort completed **3,780 source-verified arm
+records** (projective chart, unchanged affine collector, matched source
+negation rho), with no failure or exhaustion. The native
+[analysis](results/genus2-projective-summary.json) checked that all
+unchanged affine/rho counters exactly match the archived cohort and retained
+all 21 curves and 60 targets each. The seven
+[replay receipts](replay_projective_chart_v2/) independently reproduce every
+record. A first developmental archive was excluded because it added
+zero-valued chart counters and a detail label to the unchanged affine arm;
+the corrected run is the only priced projective archive.
+
+At \(M+0.5S+10I\) and 0.1\(M\) per declared native logical operation, the
+pooled projective/affine ratio is **0.642714×**, while
+projective/source-rho is **2.881445×**. Its complete one-target cost is
+3,137,323,980 source-addition equivalents, versus 4,881,369,517 for affine
+and 1,088,802,370 for rho. Over the full 12×3 price/native grid, chart over
+affine spans **0.5471–0.9760×** and chart over rho spans
+**1.3868–15.1219×**. The chart beats affine in all 36 pooled cells, every
+size's 36 cells, and every curve's 36 cells; it loses to rho in every one of
+those cells. The [price grid](results/genus2-projective-price-grid.csv)
+includes all prices, sizes and curves. There were 221,529,716 ordinary chart
+additions and 483,273 exceptional fallbacks; the relation collector processed
+the same 221,270,948 divisors as affine. These are L0 operation counts,
+without a qualified wall-speed or external-implementation comparison.
 
 ## Odd-kernel exits from Smith-negative inputs
 
@@ -131,7 +207,8 @@ target, the native pair-sum oracle enumerates the complete three-summand
 solution set for homogeneous, mixed and matched random fibers, then compares
 it with an independent exhaustive triple enumeration. All 540 oracle records
 agree ([receipt](correctness/mixed-fiber-census-v1.jsonl)).
-The [cost summary](results/mixed-fiber-summary.json) reports cold pair-table
+The retained historical [cost summary](results/mixed-fiber-summary.json),
+assembled with the earlier Python analysis script, reports cold pair-table
 work, including fiber selection. At the declared
 \(M+0.75S+10I\) price, mixed/homogeneous cost is 1.0191, 1.0052 and
 1.0108 for \(p=97,193,257\), respectively; mixed/random cost is
@@ -139,6 +216,37 @@ work, including fiber selection. At the declared
 They are not costs for heterogeneous polynomial solving or a DLP.
 The complete polynomial all-roots/F4 comparison and source-to-answer run
 remain [open](../../problems/mixed-fiber-pkm-full-solver.md).
+
+A subsequent [native pair-table DLP](native/mixed_fiber_dlp.rs) selected nine
+eligible prime-order curves (three per field) and 20 distinct exact-order
+targets per curve. These are new curves because some of the original oracle
+curves have order five and cannot supply 20 distinct nonzero targets. The
+solver received each target point without its planted scalar, built and
+charged its fibers and pair table, accumulated modular logarithm rows, solved
+for the scalar, and checked every result by recomputing \(kP\). All 540
+candidate records and their matched source-rho controls verified; the
+[replay receipt](correctness/mixed-fiber-dlp-v2-replay.sha256) binds a
+byte-identical rerun. At \(M+0.5S+10I\) with 0.1\(M\) per declared native
+logical operation, the pooled homogeneous, mixed and matched-random costs
+are respectively **3.6435×, 3.2222× and 3.7180×** rho. Mixed fibers beat
+homogeneous in this implementation, but all three lose to rho in every
+pooled pricing cell. Mixed beats rho in 16/36 cells for the \(p=97\) slice and
+none for \(p=193,257\). The
+[full native price grid](results/mixed-fiber-dlp-native-v3-price-grid.csv) retains every
+curve, price and loss. This measures an end-to-end **pair-table oracle**
+variant, not the proposed heterogeneous polynomial/F4 solver, so that
+specific lead remains open.
+
+The [results report PDF](reports/results-20261020/report.pdf) contains the
+quantitative graphs and links the seven individual projective
+[run reports](reports/) to their raw sessions. The corresponding SVG and PNG
+figures are beside the PDF. The
+[benchmark browsing copy](../../benchmarks/20261020-five-leads-followup-operations/)
+contains the PDFs and figures; source records and native analyzers remain
+in this study directory. The canonical index-calculus scoreboard was checked
+and left unchanged because neither new solver beat source rho; the separate
+cubic gate and untested odd-kernel route are not eligible for an end-to-end
+scoreboard entry.
 
 ## Reproduction and qualification
 
@@ -150,8 +258,11 @@ cargo test --release --offline --locked --manifest-path research/five_leads_e2e_
 cargo test --release --offline --locked --lib
 ```
 
-The first command passed 10 tests; the second passed 4,416 tests with 118
-ignored and no failures. The cohort's ecbench audit and independent replay
-receipts are under `replay/`; full raw sessions are preserved in an archive.
+The native crate passed 13 tests
+([log](correctness/native-tests-v3.log)); the full root library passed 4,418
+tests with 118 ignored and zero failures
+([log](correctness/root-lib-tests-v2.log)). The cohort's ecbench audit and
+independent replay receipts are under `replay/` and
+`replay_projective_chart_v2/`; full raw sessions are preserved in archives.
 No L2/A/A isolated timing or fastest external implementation comparison was
 run. This report therefore claims no hardware-speed record.

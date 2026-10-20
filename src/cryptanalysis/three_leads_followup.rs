@@ -363,52 +363,58 @@ fn solve_genus2_with_chart(
         counts: counts() - previous,
     });
     let scalar = ring.counts.get();
+    let mut native = BTreeMap::from([
+        ("rng_draws_uncharged".into(), draws),
+        ("hash_probes_uncharged".into(), probes),
+        ("graph_operations_uncharged".into(), graph.operations),
+        (
+            "component_policy_probes_uncharged".into(),
+            components.probes,
+        ),
+        ("scalar_adds_uncharged".into(), scalar.add),
+        ("scalar_muls_uncharged".into(), scalar.mul),
+        ("scalar_inversions_uncharged".into(), scalar.inv),
+        ("processed_divisors".into(), attempts),
+        ("walk_continuations".into(), continuations),
+        ("split_relations".into(), split),
+        ("graph_cycles".into(), graph.cycles),
+        ("negative_cycles".into(), graph.negative_cycles),
+        ("zero_target_coefficients".into(), graph.zero_coefficient),
+        ("duplicate_relation_divisors".into(), duplicates),
+        ("first_graph_cycle_trial".into(), first_cycle.unwrap_or(0)),
+        ("large_prime_nodes".into(), graph.nodes() as u64),
+        ("walk_cycle_restarts".into(), restarts),
+        (
+            "logical_component_bytes".into(),
+            ((components.parent.capacity() + components.size.capacity())
+                * std::mem::size_of::<usize>()) as u64,
+        ),
+        (
+            "logical_walk_seen_bytes".into(),
+            (max_walk_capacity * std::mem::size_of::<Divisor>()) as u64,
+        ),
+        (
+            "logical_graph_bytes".into(),
+            (graph.nodes() * 64 + nodes.len() * 24) as u64,
+        ),
+    ]);
+    let mut detail = json!({"policy":"two_prospective_jumps_admit_both_relations_choose_connected_or_larger_component","candidate_cap":candidate_cap,"candidate_trials":attempts,"continuations":continuations,"first_cycle_trial":first_cycle,"p":inst.curve.f.p,"r":inst.r,"h":inst.h,"subgroup_map":"tau_pullback_plus_conjugate","dual_composition":"[2]","score_is_rank_heuristic":true,"unique_relations":true});
+    if projective {
+        native.insert("projective_chart_additions".into(), chart.ordinary.get());
+        native.insert(
+            "projective_exceptional_fallbacks".into(),
+            chart.fallback.get(),
+        );
+        detail["addition_backend"] =
+            json!("crt_projective_numerator_chart_with_complete_exceptional_fallback");
+    }
     Outcome {
         recovered,
         exhausted: recovered.is_none(),
         phases,
         counts: counts(),
-        native: BTreeMap::from([
-            ("rng_draws_uncharged".into(), draws),
-            ("hash_probes_uncharged".into(), probes),
-            ("graph_operations_uncharged".into(), graph.operations),
-            (
-                "component_policy_probes_uncharged".into(),
-                components.probes,
-            ),
-            ("scalar_adds_uncharged".into(), scalar.add),
-            ("scalar_muls_uncharged".into(), scalar.mul),
-            ("scalar_inversions_uncharged".into(), scalar.inv),
-            ("processed_divisors".into(), attempts),
-            ("walk_continuations".into(), continuations),
-            ("split_relations".into(), split),
-            ("graph_cycles".into(), graph.cycles),
-            ("negative_cycles".into(), graph.negative_cycles),
-            ("zero_target_coefficients".into(), graph.zero_coefficient),
-            ("duplicate_relation_divisors".into(), duplicates),
-            ("first_graph_cycle_trial".into(), first_cycle.unwrap_or(0)),
-            ("large_prime_nodes".into(), graph.nodes() as u64),
-            ("walk_cycle_restarts".into(), restarts),
-            ("projective_chart_additions".into(), chart.ordinary.get()),
-            (
-                "projective_exceptional_fallbacks".into(),
-                chart.fallback.get(),
-            ),
-            (
-                "logical_component_bytes".into(),
-                ((components.parent.capacity() + components.size.capacity())
-                    * std::mem::size_of::<usize>()) as u64,
-            ),
-            (
-                "logical_walk_seen_bytes".into(),
-                (max_walk_capacity * std::mem::size_of::<Divisor>()) as u64,
-            ),
-            (
-                "logical_graph_bytes".into(),
-                (graph.nodes() * 64 + nodes.len() * 24) as u64,
-            ),
-        ]),
-        detail: json!({"policy":"two_prospective_jumps_admit_both_relations_choose_connected_or_larger_component","candidate_cap":candidate_cap,"candidate_trials":attempts,"continuations":continuations,"first_cycle_trial":first_cycle,"p":inst.curve.f.p,"r":inst.r,"h":inst.h,"subgroup_map":"tau_pullback_plus_conjugate","dual_composition":"[2]","score_is_rank_heuristic":true,"unique_relations":true,"addition_backend":if projective {"crt_projective_numerator_chart_with_complete_exceptional_fallback"} else {"affine_cantor"}}),
+        native,
+        detail,
     }
 }
 
