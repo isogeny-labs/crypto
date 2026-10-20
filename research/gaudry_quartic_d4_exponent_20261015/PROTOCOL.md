@@ -288,3 +288,31 @@ beside the extended fit (`raw/summary-ext.json`, all curves and targets).
 - **X9.** The extended `lp2` linear-algebra slope is in `[1.3, 2.0]`, and its
   `h = 4` crossover is later than the plain arm's.
 - **X10.** Rho's `GAE` slope stays in `[1.6, 2.4]`.
+
+## Amendment 5a (2026-10-20T06:15Z, runtime only; no extension index-calculus record existed)
+
+Queue 5 was launched at 06:05Z with four CPUs. Within a minute the container's
+CPU set fell to one CPU (two later). `ecbench` exits 0 when it cannot pin to a
+CPU outside the set, so every job assigned to CPUs 0, 2 or 3 "ended" in about
+two seconds without a session, and the queue was stopped by hand at about
+06:09Z. What had completed: ten rho-only sessions (`xrho-c2-p{29,37,53,61,101,149,197,293,509}`,
+`xrho-c3-p37`); no index-calculus session. The half-written
+sessions and the failed-launch logs were moved to `sessions-interrupted/`
+(kept, outside `sessions/`). No result had been computed from any extension
+record. Changes, all about running and none about analysis:
+
+1. **Runner.** `run_queue5.sh` now reads the allowed CPUs at each job start,
+   idles workers beyond them, and retries a launch that leaves no complete
+   session (the failure and its log are recorded in `sessions/queue.log` and
+   `sessions-interrupted/`).
+2. **Order.** With one to two CPUs instead of four the job set takes days, and
+   the longest-first order of amendment 5 would spend the budget on the
+   large-prime jobs and could leave the extra curves, the point of the
+   extension, unrun. `jobs_ext2.txt` (same 74 sessions) runs group A first
+   (rho-only, then the plain arm in ascending `p`, targets 0 then 1, chain 2
+   then 3), then group C, then group B.
+3. **Budget.** The start deadline is **72 h from the relaunch** (was 40 h from
+   the first launch), because the CPUs available fell from four to one or two.
+
+Everything else of amendment 5 stands: jobs, specs, binary, analysis,
+predictions X1–X10, audit scope.
