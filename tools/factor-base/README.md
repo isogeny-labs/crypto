@@ -3,8 +3,8 @@
 Native Rust generation, content-addressed archives, bounded relation evaluation,
 and exact bounded binary leading-form regularity. This is a standalone Cargo
 package so the precomputation worker does not need to link the entire research
-library. It uses the same mathematical relation and regularity definitions as
-`examples/factor_base_closure_sweep.rs`; archived historical outputs are unchanged.
+library. Its group-relation policy and homogeneous leading-form regularity
+definition are specified below and covered by the package's replay tests.
 
 ## Build and use
 
@@ -198,3 +198,9 @@ The ignored `write_public_fixtures` utility regenerates checked-in public inputs
 it is not part of the ordinary test suite. Frozen validation data must not be
 silently regenerated. See VALIDATION.md for execution evidence and the separate
 repository-wide gate.
+
+The dedicated [factory CI workflow](../../.github/workflows/factor-base-factory.yml)
+runs on Linux and macOS with Rust 1.93.1. It checks formatting, linting, the package
+tests, every frozen archive, and the saved binary relation receipt. S3 transport
+tests use a local stub; this workflow needs no AWS credentials. Live S3 receipts
+remain a separate part of the validation record.

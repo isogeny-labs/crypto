@@ -74,7 +74,7 @@ approval for the additional S3 upload. Automatic approval review rejected that
 upload as additional source/payload disclosure beyond the factor-base data.
 The catalog's source key is a proposed destination, not an uploaded-object claim.
 
-## Separate repository publication gate
+## Separate repository publication gate — initial checkout
 
 The enclosing repository's required `cargo test --release --lib --offline` was
 started on the unchanged library sources at base commit
@@ -91,3 +91,7 @@ could read repository metadata. The repository's AGENTS.md requires the whole
 release-library gate to pass before pushing. Therefore the implementation is
 committed locally, and PR publication and merge remain blocked by that gate.
 The unrelated library paths were not changed to obtain a passing result.
+
+The subsequent transfer to current main and its validation are recorded in
+[the publication continuation](validation/PUBLICATION.md). That record preserves
+the earlier failed gate and reports the new checks separately.
