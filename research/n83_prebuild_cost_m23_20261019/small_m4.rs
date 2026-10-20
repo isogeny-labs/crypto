@@ -322,6 +322,12 @@ fn run_inner(
     });
     if answer == SolveResult::Sat {
         let part = Instant::now();
+        if cache.is_some() {
+            identity["sat_model_blake3"] =
+                json!(blake3::hash(&serde_json::to_vec(&enc.solver.model())?)
+                    .to_hex()
+                    .to_string());
+        }
         let xs = enc.decode_x_blocks();
         if !enc.verify_model() || xs.len() != 7 || xs[6] != target_x {
             return Err("SAT model failed original-field verification".into());
