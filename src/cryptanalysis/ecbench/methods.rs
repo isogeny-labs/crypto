@@ -139,7 +139,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
         },
         ParamDecl {
             name: "solver",
@@ -2166,7 +2166,28 @@ fn solve_ic_prime(
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
+    // `pkm-semaev` writes its system on the base's own tower, so it reads
+    // the tower from the `prime-kummer` spec and runs on no other base.
+    let mut pkm = match or_name.as_str() {
+        "pkm-semaev" => {
+            if fb_name != "prime-kummer" {
+                return Err(format!(
+                    "oracle `pkm-semaev` needs the prime-kummer base, whose tower it solves on, not `{fb_name}`"
+                ));
+            }
+            let t = spec.factor_base_params.u64("t")? as u32;
+            let g = spec.factor_base_params.u64_or("g", 1)?;
+            let budget = (spec.solver_budget_seconds > 0)
+                .then(|| std::time::Duration::from_secs(spec.solver_budget_seconds));
+            Some(
+                crate::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle::new(ms, t, g)
+                    .with_budget(budget),
+            )
+        }
+        _ => None,
+    };
     let oracle: &mut dyn DecompositionOracle<_> = match or_name.as_str() {
+        "pkm-semaev" => pkm.as_mut().expect("built above"),
         "subtract" => &mut subtract,
         "mitm" => &mut mitm,
         "mitm-prime-batch" => &mut prime_batch,
@@ -3122,6 +3143,82 @@ mod tests {
         assert!(rep.field_ops.is_none(), "unknown is not zero");
         let v = serde_json::to_value(&rep).unwrap();
         assert!(v.get("field_ops").is_none(), "absent, not null");
+    }
+
+    /// `pkm-semaev` solves the ECDLP end to end on a prime curve: F4 on the
+    /// Kummer-tower Semaev system decides every target, the grid reference
+    /// on the same seed issues the same queries and finds the same
+    /// relations, every F4 refutation is grid-checked with no disagreement,
+    /// and F4's multiply-adds are on the record as unpriced solver work.
+    #[test]
+    fn pkm_semaev_solves_on_a_prime_curve_and_matches_the_grid() {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+        // a_minus_3_prime_order_curves 12 3 20261019 3: 8 | p − 1.
+        let spec = CurveSpec::PrimeExplicit {
+            p: 2393,
+            a: 2390,
+            b: 1614,
+            group_order: 2377,
+            r: 2377,
+            gx: 0,
+            gy: 80,
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Prime(prime) = &inst else {
+            unreachable!()
+        };
+        let mut scratch = GroupOps::default();
+        let target = prime.curve.mul(&mut scratch, prime.generator_point(), 1234);
+        let coords = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
+        let run = |base: &str, oracle: &str| {
+            let m = resolve(&MethodSpec {
+                id: "ic.pipeline".into(),
+                params: [
+                    ("factor_base".to_string(), base.to_string()),
+                    ("oracle".to_string(), oracle.to_string()),
+                ]
+                .into_iter()
+                .collect(),
+            })
+            .unwrap();
+            solve(&m, &inst, &facts, &coords, 5)
+        };
+        let f4 = run("prime-kummer:t=2", "pkm-semaev:m=3,crosscheck=1").unwrap();
+        let grid = run("prime-kummer:t=2", "pkm-semaev:m=3,engine=exhaustive").unwrap();
+        assert_eq!(f4.recovered, Some(1234));
+        assert_eq!(grid.recovered, f4.recovered);
+        for key in ["targets_tried", "relations_found", "matrix_rank"] {
+            assert_eq!(f4.counters[key], grid.counters[key], "{key}");
+        }
+        let rel = f4.phases.iter().find(|p| p.name == "relations").unwrap();
+        assert_eq!(
+            rel.native
+                .get("pkm_crosscheck_disagreements")
+                .copied()
+                .unwrap_or(0),
+            0
+        );
+        let solver = f4.solver.as_ref().expect("the F4 block");
+        assert!(solver.ops > 0);
+        assert!(
+            f4.unpriced
+                .iter()
+                .any(|u| u.starts_with("solver_F_p_multiply-adds")),
+            "{:?}",
+            f4.unpriced
+        );
+        assert!(f4
+            .unpriced
+            .contains(&"pkm_system_fp_mults_uncharged".to_string()));
+        assert!(grid
+            .unpriced
+            .contains(&"pkm_grid_fp_mults_uncharged".to_string()));
+        // Every hit is re-added: at least one addition per relation in
+        // the relations phase beyond the target draws.
+        assert!(rel.adds >= f4.counters["relations_found"]);
+        let err = run("prime-abscissa:size=8", "pkm-semaev:m=3").unwrap_err();
+        assert!(err.contains("prime-kummer"), "{err}");
     }
 
     /// `rootfind-subtract` is `subtract`'s search on `prime_fast`'s

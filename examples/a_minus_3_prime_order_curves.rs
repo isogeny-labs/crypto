@@ -1,7 +1,12 @@
 //! Find prime-order curves `y² = x³ − 3x + b` over `F_p` for the
 //! generator-effect study (research/generator_effect_ic_20261019).
 //!
-//! `cargo run --release --example a_minus_3_prime_order_curves -- BITS COUNT SEED`
+//! `cargo run --release --example a_minus_3_prime_order_curves -- BITS COUNT SEED [MIN_V2]`
+//!
+//! With `MIN_V2`, only primes with `2^MIN_V2 | p − 1` are kept, so that the
+//! `prime-kummer` tower of height up to `MIN_V2` exists (experiment E3).
+//! The draws are those of the plain search, filtered: without the argument
+//! the output is unchanged.
 //!
 //! Draws `p` with exactly `BITS` bits and `b` at random, keeps curves with
 //! prime `#E` (cofactor 1), and prints one `ecbench` `prime_explicit` curve
@@ -17,12 +22,13 @@ fn main() {
         .map(|a| a.parse().expect("integer argument"))
         .collect();
     let (bits, count, seed) = (args[0] as u32, args[1] as usize, args[2]);
+    let min_v2 = args.get(3).copied().unwrap_or(0) as u32;
     let mut rng = StdRng::seed_from_u64(seed);
     let mut found = 0;
     while found < count {
         let p = loop {
             let cand = (rng.gen::<u64>() & ((1u64 << bits) - 1)) | (1u64 << (bits - 1)) | 1;
-            if is_prime_u64(cand) {
+            if is_prime_u64(cand) && (cand - 1).trailing_zeros() >= min_v2 {
                 break cand;
             }
         };
