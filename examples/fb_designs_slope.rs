@@ -742,6 +742,18 @@ static STOP_BELOW: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsi
 /// around the targeted points). Children get it with `--target-structure`.
 static TARGET: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
 
+/// Amendment 11, E1: the curve model of the target (0 = short Weierstrass,
+/// as in every earlier run; 1 = twisted Edwards `a·x² + y² = 1 + d·x²y²`, with
+/// the summation polynomial in the `y`-coordinate and the factor base on `y`).
+/// An Edwards curve is carried in a `PrimeCurve` with `a` = `a` and `b` = `d`,
+/// and a point as `(y, x)` so that `.x` is the coordinate the base lives in.
+/// Children get it with `--model`.
+static MODEL: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+
+fn model() -> usize {
+    MODEL.load(std::sync::atomic::Ordering::Relaxed)
+}
+
 fn target_structure() -> usize {
     TARGET.load(std::sync::atomic::Ordering::Relaxed)
 }
@@ -948,6 +960,330 @@ fn plant_x0(p: u64, v: &[u64], m: usize, rng: &mut StdRng) -> (PrimeCurve, Targe
     }
 }
 
+// ── Twisted Edwards curves (Amendment 11, E1) ──────────────────────
+
+/// `a·x² + y² = 1 + d·x²y²`: the sum of two points, `None` when a
+/// denominator vanishes. Points are `(x, y)`.
+fn edwards_add(p: u64, a: u64, d: u64, p1: (u64, u64), p2: (u64, u64)) -> Option<(u64, u64)> {
+    let (x1, y1) = p1;
+    let (x2, y2) = p2;
+    let t = mulm(d, mulm(mulm(x1, x2, p), mulm(y1, y2, p), p), p);
+    let (dx, dy) = (addm(1, t, p), subm(1, t, p));
+    if dx == 0 || dy == 0 {
+        return None;
+    }
+    let x3 = mulm(addm(mulm(x1, y2, p), mulm(y1, x2, p), p), invm(dx, p), p);
+    let y3 = mulm(
+        subm(mulm(y1, y2, p), mulm(a, mulm(x1, x2, p), p), p),
+        invm(dy, p),
+        p,
+    );
+    Some((x3, y3))
+}
+
+/// A random point of the twisted Edwards curve, as `(x, y)`.
+fn edwards_point(p: u64, a: u64, d: u64, rng: &mut StdRng) -> Option<(u64, u64)> {
+    let y = rng.gen_range(0..p);
+    let den = subm(a, mulm(d, mulm(y, y, p), p), p);
+    if den == 0 {
+        return None;
+    }
+    let x2 = mulm(subm(1, mulm(y, y, p), p), invm(den, p), p);
+    let x = (PrimeCurve { p, a: 0, b: 1 }).sqrt(x2)?;
+    Some((if rng.gen::<bool>() { x } else { p - x }, y))
+}
+
+/// An Edwards target curve on which at least `need` elements of `V` are
+/// `y`-coordinates of points (`x² = (1 − y²)/(a − d·y²)` a non-zero square).
+fn edwards_curve(p: u64, v: &[u64], need: usize, rng: &mut StdRng) -> (PrimeCurve, Vec<u64>) {
+    loop {
+        let a = rng.gen_range(1..p);
+        let d = rng.gen_range(1..p);
+        if a == d {
+            continue;
+        }
+        let on: Vec<u64> = v
+            .iter()
+            .copied()
+            .filter(|&y| {
+                let den = subm(a, mulm(d, mulm(y, y, p), p), p);
+                let x2 = subm(1, mulm(y, y, p), p);
+                den != 0
+                    && x2 != 0
+                    && (PrimeCurve { p, a: 0, b: 1 })
+                        .sqrt(mulm(x2, invm(den, p), p))
+                        .is_some()
+            })
+            .collect();
+        if on.len() >= need {
+            return (PrimeCurve { p, a, b: d }, on);
+        }
+    }
+}
+
+/// A planted Edwards target: `m` distinct `y` of `on`, random signs of `x`,
+/// the sum by the Edwards law. `None` when a denominator vanishes or a
+/// partial sum is the neutral point `(0, 1)`. Points are stored as `(y, x)`;
+/// `x_r` is the sum's `y`, and `partial` the `y` of the partial sums.
+fn plant_edwards(curve: &PrimeCurve, m: usize, on: &[u64], rng: &mut StdRng) -> Option<Target> {
+    let (p, a, d) = (curve.p, curve.a, curve.b);
+    let helper = PrimeCurve { p, a: 0, b: 1 };
+    let mut ys: Vec<u64> = Vec::with_capacity(m);
+    while ys.len() < m {
+        let y = on[rng.gen_range(0..on.len())];
+        if !ys.contains(&y) {
+            ys.push(y);
+        }
+    }
+    let pts: Vec<(u64, u64)> = ys
+        .iter()
+        .map(|&y| {
+            let den = subm(a, mulm(d, mulm(y, y, p), p), p);
+            let x = helper
+                .sqrt(mulm(subm(1, mulm(y, y, p), p), invm(den, p), p))
+                .expect("a base point");
+            (if rng.gen::<bool>() { x } else { p - x }, y)
+        })
+        .collect();
+    let on_curve = |(x, y): (u64, u64)| {
+        addm(mulm(a, mulm(x, x, p), p), mulm(y, y, p), p)
+            == addm(1, mulm(d, mulm(mulm(x, x, p), mulm(y, y, p), p), p), p)
+    };
+    assert!(
+        pts.iter().all(|&q| on_curve(q)),
+        "a point is off the Edwards curve"
+    );
+    let mut acc = pts[0];
+    let mut partial = Vec::new();
+    for &q in &pts[1..] {
+        acc = edwards_add(p, a, d, acc, q)?;
+        assert!(on_curve(acc), "a sum is off the Edwards curve");
+        if acc == (0, 1) {
+            return None;
+        }
+        partial.push(acc.1);
+    }
+    Some(Target {
+        x_r: acc.1,
+        r: PrimePoint::affine(acc.1, acc.0),
+        pts: pts.iter().map(|&(x, y)| PrimePoint::affine(y, x)).collect(),
+        partial,
+    })
+}
+
+/// The monomials `y₁^i y₂^j y₃^k`, `i, j, k ≤ 2`, in a fixed order.
+fn edwards_monomials() -> Vec<(usize, usize, usize)> {
+    let mut v = Vec::new();
+    for i in 0..3 {
+        for j in 0..3 {
+            for k in 0..3 {
+                v.push((i, j, k));
+            }
+        }
+    }
+    v
+}
+
+/// The null space of a matrix over `F_p` (rows given), as basis vectors.
+fn nullspace(mut rows: Vec<Vec<u64>>, ncols: usize, p: u64) -> Vec<Vec<u64>> {
+    let mut pivots: Vec<usize> = Vec::new();
+    let mut r = 0usize;
+    for c in 0..ncols {
+        let Some(k) = (r..rows.len()).find(|&i| rows[i][c] != 0) else {
+            continue;
+        };
+        rows.swap(r, k);
+        let inv = invm(rows[r][c], p);
+        for x in rows[r].iter_mut() {
+            *x = mulm(*x, inv, p);
+        }
+        for i in 0..rows.len() {
+            if i != r && rows[i][c] != 0 {
+                let f = rows[i][c];
+                for j in 0..ncols {
+                    let sub = mulm(f, rows[r][j], p);
+                    rows[i][j] = subm(rows[i][j], sub, p);
+                }
+            }
+        }
+        pivots.push(c);
+        r += 1;
+        if r == rows.len() {
+            break;
+        }
+    }
+    let free: Vec<usize> = (0..ncols).filter(|c| !pivots.contains(c)).collect();
+    free.iter()
+        .map(|&f| {
+            let mut v = vec![0u64; ncols];
+            v[f] = 1;
+            for (ri, &pc) in pivots.iter().enumerate() {
+                v[pc] = subm(0, rows[ri][f], p);
+            }
+            v
+        })
+        .collect()
+}
+
+/// The summation polynomial `S₃` of a twisted Edwards curve in the
+/// `y`-coordinate, found as the null space of the monomials of degree at
+/// most 2 in each variable on random triples `(y(P₁), y(P₂), y(P₁ + P₂))`
+/// (`y(−Q) = y(Q)`), normalised to a leading coefficient 1. Returns the
+/// coefficients, in `edwards_monomials` order, and the null-space
+/// dimension (1 when `S₃` is unique at this degree).
+fn edwards_s3_coeffs(p: u64, a: u64, d: u64) -> (Vec<u64>, usize) {
+    let mons = edwards_monomials();
+    let mut rng = StdRng::seed_from_u64(a ^ (d << 20) ^ 0xED_5E_3);
+    let mut rows: Vec<Vec<u64>> = Vec::new();
+    while rows.len() < 3 * mons.len() {
+        let (Some(p1), Some(p2)) = (
+            edwards_point(p, a, d, &mut rng),
+            edwards_point(p, a, d, &mut rng),
+        ) else {
+            continue;
+        };
+        let Some(sum) = edwards_add(p, a, d, p1, p2) else {
+            continue;
+        };
+        let ys = [p1.1, p2.1, sum.1];
+        rows.push(
+            mons.iter()
+                .map(|&(i, j, k)| {
+                    mulm(
+                        mulm(powm(ys[0], i as u64, p), powm(ys[1], j as u64, p), p),
+                        powm(ys[2], k as u64, p),
+                        p,
+                    )
+                })
+                .collect(),
+        );
+    }
+    let ns = nullspace(rows, mons.len(), p);
+    let dim = ns.len();
+    let mut c = ns.into_iter().next().unwrap_or_else(|| vec![0; mons.len()]);
+    if let Some(&lead) = c.iter().find(|&&x| x != 0) {
+        let inv = invm(lead, p);
+        for x in c.iter_mut() {
+            *x = mulm(*x, inv, p);
+        }
+    }
+    (c, dim)
+}
+
+/// The closed form of that polynomial, found from the interpolated tables
+/// and checked against them for every curve `edwards-s3` tries:
+/// `a·S₃ = a − a·Σyᵢ² + d·Σᵢ<ⱼ yᵢ²yⱼ² − 2(d − a)·y₁y₂y₃ − d·y₁²y₂²y₃²`
+/// (not normalised; the monomial order is `edwards_monomials`).
+fn edwards_s3_closed(p: u64, a: u64, d: u64) -> Vec<u64> {
+    let mut c = vec![0u64; 27];
+    let idx = |i: usize, j: usize, k: usize| i * 9 + j * 3 + k;
+    c[idx(0, 0, 0)] = a;
+    for (i, j, k) in [(2, 0, 0), (0, 2, 0), (0, 0, 2)] {
+        c[idx(i, j, k)] = subm(0, a, p);
+    }
+    for (i, j, k) in [(2, 2, 0), (2, 0, 2), (0, 2, 2)] {
+        c[idx(i, j, k)] = d;
+    }
+    c[idx(1, 1, 1)] = subm(0, mulm(2, subm(d, a, p), p), p);
+    c[idx(2, 2, 2)] = subm(0, d, p);
+    c
+}
+
+/// `S₃` on three polynomial arguments.
+fn s3_edwards(coefs: &[u64], y1: &Pol, y2: &Pol, y3: &Pol, p: u64) -> Pol {
+    let n = y1.n;
+    let pows = |y: &Pol| -> [Pol; 3] {
+        let one = Pol::constant(n, 1, p);
+        let sq = y.mul(y, p);
+        [one, y.clone(), sq]
+    };
+    let (p1, p2, p3) = (pows(y1), pows(y2), pows(y3));
+    let mut out = Pol::zero(n);
+    for (&(i, j, k), &c) in edwards_monomials().iter().zip(coefs) {
+        if c != 0 {
+            out = out.add(&p1[i].mul(&p2[j], p).mul(&p3[k], p).scale(c, p), p);
+        }
+    }
+    out
+}
+
+/// `edwards-s3 [--prime p1] [--curves N]`: derive `S₃` for random twisted
+/// Edwards curves and check it, printing one line per curve.
+fn edwards_s3_check(prime: usize, curves: usize) -> bool {
+    let p = prime_of(prime);
+    let mons = edwards_monomials();
+    let mut rng = StdRng::seed_from_u64(0xED6E5);
+    let mut all = true;
+    let mut seen = 0;
+    while seen < curves {
+        let (a, d) = (rng.gen_range(1..p), rng.gen_range(1..p));
+        if a == d {
+            continue;
+        }
+        seen += 1;
+        let (c, dim) = edwards_s3_coeffs(p, a, d);
+        let at = |c: &[u64], ys: [u64; 3]| -> u64 {
+            let mut acc = 0u64;
+            for (&(i, j, k), &co) in mons.iter().zip(c) {
+                let t = mulm(
+                    mulm(powm(ys[0], i as u64, p), powm(ys[1], j as u64, p), p),
+                    mulm(co, powm(ys[2], k as u64, p), p),
+                    p,
+                );
+                acc = addm(acc, t, p);
+            }
+            acc
+        };
+        // Fresh triples, with the points in every order.
+        let (mut vanish, mut total) = (0usize, 0usize);
+        while total < 200 {
+            let (Some(p1), Some(p2)) = (
+                edwards_point(p, a, d, &mut rng),
+                edwards_point(p, a, d, &mut rng),
+            ) else {
+                continue;
+            };
+            let Some(s) = edwards_add(p, a, d, p1, p2) else {
+                continue;
+            };
+            let (y1, y2, y3) = (p1.1, p2.1, s.1);
+            for ys in [[y1, y2, y3], [y3, y1, y2], [y2, y3, y1], [y1, y3, y2]] {
+                total += 1;
+                vanish += usize::from(at(&c, ys) == 0);
+            }
+        }
+        // Symmetry of the coefficient table under the six permutations.
+        let idx = |i: usize, j: usize, k: usize| i * 9 + j * 3 + k;
+        let mut sym = true;
+        for &(i, j, k) in &mons {
+            let v = c[idx(i, j, k)];
+            for (u, w, z) in [(j, i, k), (i, k, j), (k, j, i), (j, k, i), (k, i, j)] {
+                sym &= c[idx(u, w, z)] == v;
+            }
+        }
+        let degree = mons
+            .iter()
+            .zip(&c)
+            .filter(|(_, &co)| co != 0)
+            .map(|(&(i, j, k), _)| i + j + k)
+            .max()
+            .unwrap_or(0);
+        let nz = c.iter().filter(|&&x| x != 0).count();
+        println!(
+            "a = {a}, d = {d}: null space {dim}; vanishes on {vanish} of {total} fresh triples (all orders); \
+             symmetric {sym}; {nz} terms, total degree {degree}"
+        );
+        // The closed form, scaled to the interpolated normalisation.
+        let closed = edwards_s3_closed(p, a, d);
+        let inv_a = invm(a, p);
+        let matches = closed.iter().zip(&c).all(|(&x, &y)| mulm(x, inv_a, p) == y);
+        println!("  closed form equals the interpolated polynomial: {matches}");
+        all &= dim == 1 && vanish == total && sym && matches;
+    }
+    println!("{}", if all { "S3 PASS" } else { "S3 FAIL" });
+    all
+}
+
 // ── Systems ────────────────────────────────────────────────────────
 
 /// `S₃(x_1, x_2, x_R)` at `m = 2`; at `m = 3` the pilot's chain
@@ -955,6 +1291,19 @@ fn plant_x0(p: u64, v: &[u64], m: usize, rng: &mut StdRng) -> (PrimeCurve, Targe
 fn summation(d: &Design, curve: &PrimeCurve, m: usize, n: usize, x_r: u64) -> Vec<Pol> {
     let p = curve.p;
     let (a, b) = (curve.a, curve.b);
+    // Amendment 11, E1: on an Edwards curve (a, b = d) the summation polynomial
+    // is the symmetric one in the y-coordinate.
+    let edwards = if model() == 1 {
+        Some(edwards_s3_closed(p, a, b))
+    } else {
+        None
+    };
+    let s3 = |x1: &Pol, x2: &Pol, x3: &Pol, a: u64, b: u64, p: u64| -> Pol {
+        match &edwards {
+            Some(c) => s3_edwards(c, x1, x2, x3, p),
+            None => s3(x1, x2, x3, a, b, p),
+        }
+    };
     let x = |i: usize| d.x_expr(n, i * d.per, p);
     let xr = Pol::constant(n, x_r, p);
     if m == 2 {
@@ -1699,7 +2048,8 @@ fn merge(into: &mut Value, from: &Value) {
 fn cell_seed(prime: usize, arm: Arm, m: usize, t: usize) -> u64 {
     // Amendment 8: the curve family joins the seed at bit 52 (generic = 0,
     // so every earlier seed is unchanged).
-    SEED ^ ((target_structure() as u64) << 56)
+    SEED ^ ((model() as u64) << 58)
+        ^ ((target_structure() as u64) << 56)
         ^ ((family() as u64) << 52)
         ^ ((prime as u64) << 48)
         ^ (arm.id() << 40)
@@ -1760,7 +2110,12 @@ fn draw_target(
 ) -> (Vec<Pol>, usize, Vec<u64>, Target, Value, PrimeCurve) {
     loop {
         // Amendment 9, Z1: a structured target brings its own curve.
-        let (cur, tg) = if target_structure() == 1 {
+        let (cur, tg) = if model() == 1 {
+            let Some(tg) = plant_edwards(curve, m, on, trng) else {
+                continue;
+            };
+            (curve.clone(), tg)
+        } else if target_structure() == 1 {
             plant_x0(p, &d.v, m, trng)
         } else {
             let Some(tg) = plant(curve, m, on, trng) else {
@@ -1834,7 +2189,16 @@ fn build_system(
         "m = {m} summands need |V| ≥ m distinct abscissae (t = {t} gives {})",
         d.v.len()
     );
-    let (curve, on) = target_curve(p, &d.v, m.max(2), &mut rng);
+    let (curve, on) = if model() == 1 {
+        assert_eq!(
+            arm,
+            Arm::A0,
+            "the Edwards model runs A0 only (Amendment 11)"
+        );
+        edwards_curve(p, &d.v, m.max(2), &mut rng)
+    } else {
+        target_curve(p, &d.v, m.max(2), &mut rng)
+    };
     let ts = target_seed(cs, k);
     // Targets 0 … k in order, each from its own stream. With `distinct`
     // (Amendment 5, G2) a target whose system equals an earlier target's is
@@ -1865,6 +2229,7 @@ fn build_system(
         check_norm_chain(&d, m, p, &mut StdRng::seed_from_u64(ts ^ 0xC4EC));
     }
     let structure_name = ["random", "xr0"][target_structure()];
+    let model_name = ["weierstrass", "edwards"][model()];
     let row = json!({
         "arm": arm.name(),
         "m": m,
@@ -1883,6 +2248,7 @@ fn build_system(
         "curve": {"a": used.a, "b": used.b},
         "curve_family": family_name(family()),
         "target_structure": structure_name,
+        "model": model_name,
         "x_r": target.x_r,
         "planted_x": target.pts.iter().map(|pt| pt.x).collect::<Vec<_>>(),
         "set": d.info,
@@ -1962,6 +2328,9 @@ struct RunArgs {
     distinct: bool,
     /// Amendment 6: measure on the sparse tower engine (A0 only).
     tower: bool,
+    /// Amendment 11: the first target index to run (0 unless a later target
+    /// is run on its own, after an earlier one).
+    first_target: usize,
 }
 
 /// Run one system in a child under `ulimit -v` and a hard wall limit of
@@ -1990,6 +2359,11 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
         .args(a.distinct.then_some("--distinct-targets"))
         .args(if family() > 0 {
             vec!["--family".to_string(), family_name(family()).to_string()]
+        } else {
+            vec![]
+        })
+        .args(if model() > 0 {
+            vec!["--model".to_string(), "edwards".to_string()]
         } else {
             vec![]
         })
@@ -2137,7 +2511,7 @@ fn run(a: &RunArgs) {
             .ok();
             for t in a.t_min..=a.t_max {
                 let mut all_ok = true;
-                for k in 0..a.targets {
+                for k in a.first_target..a.first_target + a.targets {
                     let mut row = run_child(a, arm, m, t, k, &mut log);
                     merge(&mut row, &json!({"git_commit": commit, "host": host}));
                     let line = format!(
@@ -2774,7 +3148,7 @@ fn group_of(file: &str) -> &str {
     match file.get(..3) {
         Some(
             g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-" | "G1-" | "T1-"
-            | "T2-" | "T3-" | "T4-" | "K1-" | "X1-" | "P4-" | "Z1-" | "M5-"),
+            | "T2-" | "T3-" | "T4-" | "K1-" | "X1-" | "P4-" | "Z1-" | "M5-" | "E1-" | "T5-"),
         ) => &g[..2],
         _ => "p1",
     }
@@ -3418,6 +3792,115 @@ fn analyze_a9(dir: &str) {
     }
 }
 
+/// Amendment 11: E1 (A0 on twisted Edwards curves, against A0 on short
+/// Weierstrass curves) and T5 (A0 at `m = 4`, `t = 4` on the tower engine
+/// with a long budget).
+fn analyze_a11(dir: &str) {
+    let rows = read_rows(dir);
+    println!("Factor-base designs, Amendment 11 (E1, T5): rows from {dir}");
+    println!();
+    println!("════ E1: A0 on twisted Edwards curves (S3 in the y-coordinate) against A0 on short Weierstrass curves (the first run), p1, f4_fp");
+    let (mut shared, mut eq, mut gt, mut lt) = (0usize, 0usize, 0usize, 0usize);
+    for m in [2usize, 3] {
+        let e = cells2(&rows, "E1", "A0", m);
+        let w = cells2(&rows, "p1", "A0", m);
+        if e.is_empty() {
+            continue;
+        }
+        println!();
+        println!(
+            "── m = {m}: t   D(Edwards)  D(Weierstrass)   max_cols(Edwards)  max_cols(Weierstrass)"
+        );
+        for c in e.iter().filter(|c| c.complete()) {
+            let Some(g) = find(&w, c.t) else { continue };
+            shared += 1;
+            let (de, dw) = (c.d_mean(), g.d_mean());
+            match de.partial_cmp(&dw) {
+                Some(std::cmp::Ordering::Equal) => eq += 1,
+                Some(std::cmp::Ordering::Greater) => gt += 1,
+                _ => lt += 1,
+            }
+            println!(
+                "  {:<3} {de:<11.1} {dw:<15.1} {:<18.0} {:.0}",
+                c.t,
+                c.cols_mean(),
+                g.cols_mean()
+            );
+        }
+        let missing: Vec<String> = e
+            .iter()
+            .filter(|c| !c.complete())
+            .map(|c| format!("t={}:{}", c.t, c.status.join("/")))
+            .collect();
+        if !missing.is_empty() {
+            println!("  not completed: {}", missing.join(", "));
+        }
+        show_series(&format!("A0 Edwards m = {m} p1"), &e);
+    }
+    println!();
+    println!(
+        "rule: {shared} shared completed cells → {}  (Edwards D above / equal / below: {gt} / {eq} / {lt})",
+        if shared == 0 {
+            "INCONCLUSIVE (no shared cell)"
+        } else if gt == 0 && lt == 0 {
+            "MODEL-INDEPENDENT (D equals the Weierstrass D at every shared cell)"
+        } else {
+            "MODEL-DEPENDENT (a shared D differs)"
+        }
+    );
+    println!();
+    println!("════ T5: A0, m = 4, t = 4, p1, tower engine, budget 21600 s, second target only if the first completes");
+    let t5 = cells2(&rows, "T5", "A0", 4);
+    if t5.is_empty() {
+        println!("T5: no rows.");
+    }
+    for r in rows
+        .iter()
+        .filter(|(f, _)| group_of(f) == "T5")
+        .map(|(_, r)| r)
+    {
+        println!(
+            "  target {}: D {}, degree reached {}, max_cols {}, time {:.0} s, {}  {}",
+            r["target"],
+            r["D"],
+            r["degree_reached"],
+            r["max_cols"],
+            r["time"].as_f64().unwrap_or(f64::NAN),
+            r["status"],
+            r["failure_reason"]
+        );
+    }
+    let base: Vec<Cell2> = cells2(&rows, "F4", "A0", 4)
+        .into_iter()
+        .filter(|c| c.t <= 3)
+        .collect();
+    if !t5.is_empty() {
+        let mut all: Vec<Cell2> = base
+            .iter()
+            .map(|c| Cell2 {
+                t: c.t,
+                b: c.b,
+                d: c.d.clone(),
+                cols: c.cols.clone(),
+                time: c.time.clone(),
+                status: c.status.clone(),
+                shape: c.shape,
+            })
+            .collect();
+        all.extend(t5.iter().map(|c| Cell2 {
+            t: c.t,
+            b: c.b,
+            d: c.d.clone(),
+            cols: c.cols.clone(),
+            time: c.time.clone(),
+            status: c.status.clone(),
+            shape: c.shape,
+        }));
+        all.sort_by_key(|c| c.t);
+        show_series("A0 m = 4, F4 cells and the T5 cell", &all);
+    }
+}
+
 fn analyze2(dir: &str) {
     let rows = read_rows(dir);
     println!("Factor-base designs, Amendment 2 (F1–F4): rows from {dir}");
@@ -3781,6 +4264,7 @@ fn admit_tower(dir: &str, out: &str, prime: usize) -> bool {
             file: String::new(),
             distinct: c["distinct_targets"] == true,
             tower: true,
+            first_target: 0,
         };
         let mut row = run_child(&a, Arm::A0, m, t, k, &mut log);
         let same = row["status"] == "ok"
@@ -3896,6 +4380,7 @@ fn replay(dir: &str, out: &str, groups: &[&str], prime: Option<usize>, only_prim
             // Rebuild the row the way it was drawn (Amendment 5, G2).
             distinct: c["distinct_targets"] == true,
             tower: c["engine"] == "f4_fp_tower",
+            first_target: 0,
         };
         let mut row = run_child(&a, arm, m, t, k, &mut log);
         let fields = ["D", "max_cols", "max_rows", "steps"];
@@ -4457,6 +4942,14 @@ fn main() {
     if let Some(f) = flag(&args, "--family") {
         FAMILY.store(parse_family(&f), std::sync::atomic::Ordering::Relaxed);
     }
+    if let Some(md) = flag(&args, "--model") {
+        let v = match md.as_str() {
+            "weierstrass" => 0,
+            "edwards" => 1,
+            other => panic!("unknown --model `{other}` (weierstrass, edwards)"),
+        };
+        MODEL.store(v, std::sync::atomic::Ordering::Relaxed);
+    }
     if let Some(ts) = flag(&args, "--target-structure") {
         let v = match ts.as_str() {
             "random" => 0,
@@ -4517,6 +5010,7 @@ fn main() {
                 file: flag(&args, "--file").unwrap_or_else(|| "{arm}-m{m}".into()),
                 distinct: args.iter().any(|a| a == "--distinct-targets"),
                 tower: flag(&args, "--engine").is_some_and(|e| e == "tower"),
+                first_target: flag(&args, "--first-target").map_or(0, |s| s.parse().unwrap()),
             };
             assert!(a.t_min >= 2, "t starts at 2");
             let two = (prime_of(a.prime) - 1).trailing_zeros() as usize;
@@ -4534,7 +5028,9 @@ fn main() {
         }
         "analyze" => {
             let dir = args.get(1).expect("a runs directory");
-            if args.iter().any(|a| a == "--a9") {
+            if args.iter().any(|a| a == "--a11") {
+                analyze_a11(dir);
+            } else if args.iter().any(|a| a == "--a9") {
                 analyze_a9(dir);
             } else if args.iter().any(|a| a == "--a8") {
                 analyze_a8(dir);
@@ -4572,6 +5068,32 @@ fn main() {
             let out = flag(&args, "--file").unwrap_or_else(|| "T1-admission".into());
             let prime = flag(&args, "--prime").map_or(0, |s| parse_prime(&s));
             if !admit_tower(dir, &out, prime) {
+                std::process::exit(1);
+            }
+        }
+        "edwards-s3-table" => {
+            // Print the coefficients for given (a, d) (small values show the closed form).
+            let prime = flag(&args, "--prime").map_or(0, |s| parse_prime(&s));
+            let p = prime_of(prime);
+            let a: u64 = flag(&args, "--a").expect("--a").parse().unwrap();
+            let d: u64 = flag(&args, "--d").expect("--d").parse().unwrap();
+            let (c, dim) = edwards_s3_coeffs(p, a, d);
+            println!("a = {a}, d = {d}, p = {p}, null space {dim}");
+            for (&(i, j, k), &co) in edwards_monomials().iter().zip(&c) {
+                if co != 0 {
+                    let signed = if co > p / 2 {
+                        format!("-{}", p - co)
+                    } else {
+                        co.to_string()
+                    };
+                    println!("  y1^{i} y2^{j} y3^{k}: {signed}");
+                }
+            }
+        }
+        "edwards-s3" => {
+            let prime = flag(&args, "--prime").map_or(0, |s| parse_prime(&s));
+            let curves = flag(&args, "--curves").map_or(5, |s| s.parse().unwrap());
+            if !edwards_s3_check(prime, curves) {
                 std::process::exit(1);
             }
         }

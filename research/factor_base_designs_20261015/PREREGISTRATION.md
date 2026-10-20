@@ -705,3 +705,68 @@ ends the series.
 
 **Rule and predictions** are Amendment 9's, for the cells that exist. The
 prediction that every `t ≥ 3` cell constructs and completes is added.
+
+### Amendment 11, 2026-10-20: twisted Edwards curves (E1) and a long tower-engine run for A0 at `m = 4` (T5), before any of their rows
+
+Registered by the experiment lane before any E1 or T5 row exists. It changes
+no committed row, verdict, threshold, decision rule or prediction. Instrument,
+limits, seeds and the completed-cell and σ rules are those of Amendments 1–10,
+except as stated. A curve-model index joins the seed at bit 58 (Weierstrass =
+0, so every earlier seed is unchanged).
+
+**What is left.** Amendment 9's report listed other curve models and A0's
+`m = 4`, `t = 4` cell as not shown. A bigger host cannot be had here: the
+account has one environment (`anthropic_cloud`, the kind this session runs
+on). T5 is the substitute. Binary-field curves stay out (a different field and
+solver).
+
+**E1, A0 on twisted Edwards curves.** The curve is `a·x² + y² = 1 + d·x²y²`
+(`a ≠ d`, `a, d ≠ 0`). The sum of two points is
+`((x₁y₂ + y₁x₂)/(1 + d·x₁x₂y₁y₂), (y₁y₂ − a·x₁x₂)/(1 − d·x₁x₂y₁y₂))`, and
+`y(−Q) = y(Q)`, so the base lives on the `y`-coordinate and the summation
+polynomial is in `y`. *The polynomial was derived and checked before this
+registration* (`fb_designs_slope edwards-s3`, rows in the report): the
+unique polynomial of degree at most 2 in each variable that vanishes on random
+triples `(y(P₁), y(P₂), y(P₁ + P₂))` has a null space of dimension 1 on 5 random
+curves at p₁, 3 at p₂ and 3 at p₃, vanishes on 200 fresh triples per curve in
+every order, is symmetric, and equals
+`S₃ = 1 − Σ yᵢ² + (d/a)·Σᵢ<ⱼ yᵢ²yⱼ² − 2·((d − a)/a)·y₁y₂y₃ − (d/a)·y₁²y₂²y₃²`
+(9 terms, total degree 6). The solver uses the closed form. For `m = 3` the
+chain is `S₃(y₁, y₂, u₀)`, `S₃(u₀, y₃, y_R)` with `u₀ = y(P₁ + P₂)`.
+- *System.* A0's Kummer tower on the `y`-coordinate (the same `V` as A0 for
+  the cell seed's `g` and `ζ`), with this `S₃`. A target curve is drawn
+  (`a`, `d` uniform) until at least `m` elements of `V` are the `y` of a point
+  (`x² = (1 − y²)/(a − d·y²)` a non-zero square). A planted target is `m`
+  distinct such `y`, random signs of `x`, and their sum by the Edwards law,
+  checked on the curve at every step. The planted solution is checked against
+  every equation before F4 runs.
+- *Cells.* A0 only (the other arms are written for Weierstrass), p₁,
+  `f4_fp`, `m = 2` (`t = 2–9`) and `m = 3` (`t = 2–4`), 2 planted targets,
+  300 s budget, hard kill 420 s, `ulimit -v 13000000`. Files
+  `runs/E1-A0-m{m}`. Reference: the first run's A0 rows on p₁.
+- *Rule.* **Model-independent** if the cell D equals the Weierstrass D at
+  every shared completed cell. **Model-dependent** if any differs; the cells
+  and the direction are listed. §1's σ verdict is read for the Edwards series
+  at each `m`. `max_cols` is descriptive.
+- *Predictions, informed by the plumbing test.* The test of the construction
+  on p₃ (outside E1's cells) printed D = 4, 6, 6 at `(m, t) = (2, 3), (3, 2),
+  (3, 3)`, against Weierstrass's 4, 5, 6. So: **model-dependent** (at least one
+  shared cell differs), and **Edwards D ≥ Weierstrass D at every shared
+  cell**. An earlier guess, that Edwards D is at least the input degree 6, is
+  already contradicted by the first of those three cells and is not
+  registered.
+
+**T5, A0 at `m = 4`, `t = 4`, long budget.** The tower engine (admitted for
+A0 by Amendment 6) with no stop, p₁, F4 budget 21600 s (6 h), hard kill
+22200 s, `ulimit -v 15000000`. T2 reached degree 7 in 3600 s at 6–8 GB, so
+neither limit had been reached. Target 0 runs first; target 1 runs only if
+target 0 completes. If both complete, the cell joins A0's `m = 4` series
+(labelled long-budget tower-engine) and §1's σ rule is read with and without
+it. The bound of Amendment 8 applies: a completed cell has D ≥ 7, so
+σ ≥ 0.5. If target 0 does not complete, the reason is recorded and the cell
+does not join.
+- *Prediction.* Target 0 does not complete within 6 h and 15 GB, by timeout
+  or memory.
+
+**Not run:** binary-field curves; Edwards arms other than A0; an Edwards
+analogue of A11's norm chain.
