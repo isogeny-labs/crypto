@@ -1229,7 +1229,7 @@ file is missing on `main`.
   - *Online, Tier 1, K3240 `root21`*
     ([`n83_tier1_final_results_20261014/RESULT.md`](../../../research/n83_tier1_final_results_20261014/RESULT.md),
     PR #1824; five unseen public points, one GitHub Actions allocation):
-    median **rho/IC 54.10**, bootstrap interval **[17.18, 58.90]**, every
+    median **rho/IC 54.10 (SUPERSEDED 2026-10-20, empty-table rho)**, bootstrap interval **[17.18, 58.90]**, every
     relation and scalar replayed. The IC clock starts after base, index and
     factor logs are ready: setup, 580–640 s per process and rebuilt for each
     point, is excluded, against rho's 1.2–5.0 s per solve.
