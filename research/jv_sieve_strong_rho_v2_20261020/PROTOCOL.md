@@ -71,3 +71,14 @@ Every raw run, including any invalid one, with its status; per size, per arm mea
 cross-study comparison with V1 (descriptive only: same sizes, different seeds, different producer).
 Wall time is an observation. The tuned price is a cost model (Karatsuba products, Chung–Hasan
 squarings, adjugate inversion; 24/18/62), not a faster implementation, and credits rho only.
+
+---
+## Amendment log (appended; the sections above are unchanged)
+
+1. **2026-10-20, during the rho phase, before any final analysis.** A dry run of the analyzer on partial
+   data showed that A1 was implemented only for arms that had produced a finished run, so an arm with
+   no finished run at all would have passed silently (and A3 would have passed vacuously). The analyzer
+   now fails A1 for any scheduled arm that is absent (`missing_arms`, unit-tested). This implements A1
+   as written ("every arm and size"); no threshold, window, sample size or decision rule changed. Only
+   `examples/jv_sieve_study_v2.rs` changed; the producer (`jv_cover` binary and `src/`) is the one recorded
+   in `raw/PROVENANCE.json` and was not rebuilt.

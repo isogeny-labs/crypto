@@ -80,6 +80,13 @@ fn expected_n(p: u64, arm: &str) -> u64 {
         _ => 0,
     }
 }
+/// Arms the protocol schedules at `p` that are absent from `present` (A1: every arm, every size).
+fn missing_arms(p: u64, present: &[&str]) -> Vec<&'static str> {
+    ["R0", "R1", "R2", "R3", "R0_aa", "R3_aa"]
+        .into_iter()
+        .filter(|a| expected_n(p, a) > 0 && !present.contains(a))
+        .collect()
+}
 fn expected_seeds(n: u64) -> Vec<u64> {
     (FIRST_SEED..FIRST_SEED + n).collect()
 }
@@ -347,6 +354,13 @@ fn main() {
         }
         let mut e = serde_json::Map::new();
         e.insert("p".into(), json!(p));
+        let present: Vec<&str> = arms.keys().map(|k| k.as_str()).collect();
+        for a in missing_arms(p, &present) {
+            a1 = false;
+            failures.push(format!(
+                "A1: scheduled arm {a} has no finished runs at p={p}"
+            ));
+        }
         let exp16 = expected_seeds(N_SEEDS);
         // ---- A1 for the sieve
         for (nm, rows) in [("sparse", &sparse), ("dense", &dense)] {
@@ -804,6 +818,18 @@ mod tests {
         // a seed present on one side only is not paired
         let c = vec![(17, 1.0), (40, 9.0)];
         assert_eq!(ratio_by_seed(&a, &c, 1)["n"], 1);
+    }
+
+    #[test]
+    fn a_scheduled_arm_with_no_runs_is_reported_missing() {
+        assert_eq!(missing_arms(1823, &["R3"]), vec!["R0"]);
+        assert!(missing_arms(1823, &["R0", "R3"]).is_empty());
+        assert_eq!(missing_arms(251, &["R3"]), vec!["R0", "R1", "R2"]);
+        assert_eq!(
+            missing_arms(1009, &["R0", "R1", "R2", "R3"]),
+            vec!["R0_aa", "R3_aa"]
+        );
+        assert!(missing_arms(503, &["R0", "R1", "R2", "R3"]).is_empty());
     }
 
     #[test]
