@@ -1069,10 +1069,6 @@ async function buildSourceArtifacts() {
       "independent catalog-wide assessment verifier",
     ),
     integrityArtifact(
-      "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
-      "PDF coverage-marker metadata normalization source",
-    ),
-    integrityArtifact(
       "research/cover_transfer_assessment_20261013/README.md",
       "source-linked catalog-wide assessment report",
     ),

@@ -91,5 +91,17 @@ A planned step is not a completed experiment.
 
 ## Resolution and history
 
+### Catalog evidence drift blocking the current PR
+
+The N83 continuation PR also contains earlier catalog maintenance commits.
+Its [CI/provenance record](../research/n83_prebuild_cost_m23_20261019/CI_STATUS_20261020.md)
+identifies failed native count assertions, a removed nonexistent source
+reference, eleven stale artifact digests, and 28 remaining independent
+assessment-verifier problems. These are implementation/validation gaps,
+separate from the natural-yield obstruction. Exit requires a reconciled
+catalog certificate/verifier/report set and successful applicable checks
+at the final PR head, preserving historical evidence. N83 tests alone do
+not close this merge gate.
+
 Unresolved. This record names the missing comparison; it does not close the
 underlying factor-base selection task.
