@@ -1,6 +1,6 @@
 # N83 prebuilt factor-base cost and bounded natural queries
 
-**Evidence status:** D18 export and full-object replay pass; the paired D prebuilt/on-demand m=2 and m=3 finite-query panel is complete; the separate K2048/D12 m=2/m=3 panel completed with one preserved Spot interruption and a frozen retry. The [smaller-base m=4 gate](SMALL_M4_PROTOCOL.md) completed four conflict-capped natural searches with audited progress. The [XOR cache follow-up](XOR_CACHE_PROTOCOL.md) is a separate frozen component diagnostic. All timing here is shared-host L0. `candidate_id: null`; `selected_best_total_runtime: null`. No complete index-calculus or matched-rho runtime is established.
+**Evidence status, 2026-10-20:** D18 export and full-object replay pass; the paired D prebuilt/on-demand m=2 and m=3 finite-query panel is complete; the separate K2048/D12 m=2/m=3 panel completed with one preserved Spot interruption and a frozen retry. The [smaller-base m=4 gate](SMALL_M4_PROTOCOL.md) completed four conflict-capped natural searches with audited progress. The [full-size U/D panel](reports/run-full-m4-natural-20261020/RUN_REPORT.md) completed all eighteen scheduled attempts: thirteen conflict caps and five wall caps, with 329 files independently audited. The [XOR cache follow-up](XOR_CACHE_PROTOCOL.md) is a separate frozen component diagnostic. All timing here is shared-host L0. `candidate_id: null`; `selected_best_total_runtime: null`. No complete index-calculus or matched-rho runtime is established.
 
 ## Exact objects and boundaries
 
@@ -29,6 +29,30 @@ The same SSH host independently reran the unchanged D18 census binary SHA-256 `2
 
 For a derived eight-query budget with the same finite m policy, repeating fresh query processes, charge the one-time census + serialization/export + generic replay = 87.989 s before prebuilt queries. For m=2, one cold prebuilt query is 97.838 s versus 35.131 s on demand; eight prebuilt queries are 166.777 s versus 281.045 s on demand. For m=3, one cold prebuilt query is 96.818 s versus 34.601 s on demand; eight are 158.617 s versus 276.812 s. These sums use same-host L0 observations from different pinned native revisions for the one-time exporter and the paired worker, and repeated-arm means for the query term. They exclude remote upload, persistent storage, any capped or alternative-policy query, rank growth, linear algebra, individual logarithm and scalar verification. They are cost projections for the bounded finite-query event, not an admitted complete-cold crossover. The observed prebuilt worker peak RSS is about 84 MiB higher than on-demand despite lower preparation wall. [Figure data](reports/result-20261019/cost-data.json), [SVG](reports/result-20261019/cost.svg), [150 dpi PNG](reports/result-20261019/cost.png), and [results PDF](reports/result-20261019/RESULT.pdf) show the charged phase split.
 
+## Reuse accounting addendum, 2026-10-20
+
+The [native accounting addendum](reports/reuse-20261020/RUN_REPORT.md)
+completes the frozen `q=1,8,64` calculation from all 833 pinned files
+of the paired finite-query card. It also makes a previously omitted
+interval explicit: fresh per-query receipt replay and the worker
+container boundary outside its internal timer. The original
+worker-interval projections above remain preserved.
+
+Charging setup plus both worker/replay container intervals gives the
+following **derived** budgets in seconds:
+
+| m | q=1, prebuilt / on demand | q=8, prebuilt / on demand | q=64, prebuilt / on demand |
+|---:|---:|---:|---:|
+| 2 | 101.981 / 39.135 | 199.924 / 313.079 | 983.472 / 2,504.633 |
+| 3 | 100.836 / 38.567 | 190.762 / 308.539 | 910.172 / 2,468.314 |
+
+The 64-query panels were not executed. Docker launch/teardown outside
+the containers, remote custody/storage, prior retry history and later
+rank/linear-algebra/individual-logarithm phases remain excluded. This is
+an accounting addition, with no algorithm change or qualified timing
+promotion. The [source-linked PDF](reports/reuse-20261020/RUN_REPORT.pdf)
+and [new graph](reports/reuse-20261020/reuse.svg) retain that boundary.
+
 ## Separate smaller-base finite policies
 
 The [K2048/D12 protocol](SMALL_BASE_PROTOCOL.md) froze m=2 exhaustive first-point complement scans and m=3 `2^20` deterministic pairs on the same eight public targets under one native worker revision. K2048 has 2,048 columns and 339,968 points; D12 has 2,001 columns and 332,166 points. They are distinct retained objects with different point-set hashes and rank dimensions. The [run report](reports/run-small-20261019/RUN_REPORT.md) records nine complete public arms per base and m, 36 passing fresh replays, and five constructed controls that passed separate general-field replay. Every completed host exit was zero. The first D12 target-7 m=3 attempt was stopped by Spot capacity loss and has no worker or exit receipt; the same instance resumed, a new control passed, and a separately named retry and replay completed. Its original partial directory remains preserved.
@@ -54,9 +78,9 @@ container limits, controls, phases and progress, including final counters.
 Natural yield/rank remain null. Recorded XOR elapsed accounts for
 97.508–97.561% of worker wall; the timer measures elapsed intervals rather
 than exclusive CPU time. These are L0 observations on one public point.
-The next implementation hypothesis is caching fully assigned, satisfied
-XOR rows until backjump or matrix rebuild, with correctness and fresh
-cache-off/on measurements required before any improvement claim.
+This baseline motivated caching fully assigned, satisfied XOR rows until
+backjump or matrix rebuild. The separate correctness and fresh
+cache-off/on measurements are recorded below.
 
 ## Open obligations
 
@@ -76,14 +100,23 @@ the shared L0 host. These are component work/timing observations; natural
 yield/rank remain censored and qualified timing remains open. The default
 solver remains cache-off.
 
-The [full-base common-public panel](full-m4-v1/STATUS.md) started at
-**02:06:17 UTC** after all implementation gates passed. Four actual U/D
+The [full-base common-public panel](full-m4-v1/STATUS.md) ran from
+**02:06:17 to 06:48:53 UTC on 2026-10-20**. Four actual U/D
 off/on controls, four independent replays and two native control-pair
 checks passed for the original **16,627-class / 2,760,082-point bases**.
-Its running card schedules eighteen natural attempts over all eight
-public points, with repeated U,D,D,U at target 0 and alternating base
-order thereafter. At the 02:10:07 observation, U target 0 was active.
-This panel's natural results and aggregate useful rank remain pending.
+All eighteen natural attempts over all eight public points completed,
+with U,D,D,U at target 0 and alternating base order thereafter.
+The [329-file native audit](full-m4-v1/final/audit.json) passed:
+D returned nine 10,000-conflict caps; U returned four conflict caps
+and five 1,790-second wall caps. Worker/cap interval sums were
+**2,636.872934 s for D** and **14,284.411736 s for U**. No accepted
+natural row was returned. The retained empty matrices have rank zero;
+natural yield and the complete useful-rank panel remain null. Different
+stopping points prevent a U/D speed ratio. The
+[final report and visual](reports/run-full-m4-natural-20261020/RUN_REPORT.md)
+retain every attempt, durable counters, resource bounds and missing
+wall-cap final cgroup peaks. The later watchdog resource fix is unmeasured
+by this original card.
 
 A concurrent [counter-only reconciliation report](reports/run-20261020T0116Z/RUN_REPORT.md),
 its [graph](reports/run-20261020T0116Z/work-counters.svg), and its
@@ -114,3 +147,22 @@ and their replays passed. Its four natural-arm outcomes remain pending at
 that control boundary; constructed rows are excluded from natural counts.
 
 The K2048 and D12 m=4 resource-feasible policies are frozen in [SMALL_M4_PROTOCOL.md](SMALL_M4_PROTOCOL.md); execution and independent replay determine their status. The completed m=2/m=3 finite events supplied no natural rank, and the earlier U/D m=4 paired SAT card was censored/incomplete. Consequently useful-rank rate beyond these exact events, linear algebra, target verification, complete cold and genuinely amortized IC runtime, same-point matched rho, and any base selection remain open. The [problem record](../../problems/n83-prebuilt-base-quality-m2-m4.md) tracks the exit criteria. No canonical leaderboard row moves on this L0 bounded evidence.
+
+## Original five gates after the full-size card
+
+| Requested gate | Status | Evidence and remaining gap |
+|:--|:--|:--|
+| Export D18 and independently check every point/label | Verified complete | Selected 16,627 classes, all 2,760,082 exported rows generically replayed; exact identities above. |
+| Make capped m=4 search observable | Verified for this card; later resource patch implemented/tested | All 18 attempts have audited phases/progress/final or cap receipts. The original five wall caps lack final cgroup peak; the later watchdog patch adds explicit resource/error fields for future cards. |
+| Common public U/D comparison and smaller feasible arms | Bounded executions complete; useful-rank requirement partial | Full-size 18-attempt card and smaller four-attempt card retained; all capped. No accepted natural rows, no usable natural-yield estimate or full rank panel. |
+| Prebuilt versus on-demand complete cold/reuse cost | Partial | Same D set and native revision in 36 paired finite probes. Setup, worker, replay/container observations and derived q=1,8,64 budgets retained. Full IC phases, custody, all failed setup history, qualified timing, exact IC incumbent and same-point rho remain open. |
+| Separate m=2/m=3 frozen policies | Verified finite policies; broader natural-rank requirement partial | Full-size and K2048/D12 finite public panels and replays complete under their own caps. Zero rows apply to those finite events. A broader or partial-relation policy remains a new frozen experiment. |
+
+The next algorithmic obligation is independently checked natural rank
+growth under a separately frozen oracle policy. Current primary-curve
+stage baselines are named by their exact cards above; no complete verified
+primary-curve IC runtime is available to promote as an incumbent. Results
+from the different a=1 curve do not fill that gap. The
+[catalog reconciliation](../cover_transfer_assessment_20261013/catalog-refresh-20261020.md)
+and [validation logs](merge-release-lib-20261020-2.log) repair the earlier
+local PR gates; current-head GitHub checks remain a separate merge gate.

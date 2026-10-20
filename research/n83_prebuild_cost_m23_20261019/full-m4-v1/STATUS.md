@@ -1,4 +1,22 @@
-# Full-base common-public panel: live execution handoff
+# Full-base common-public panel: completed bounded card
+
+**Final status, 2026-10-20 06:48:53 UTC: `COMPLETE_BOUNDED`.**
+All 18 scheduled natural attempts completed. The
+[native audit](final/audit.json) passes all 329 archived files.
+D returned nine conflict caps; U returned four conflict caps and five
+wall caps. No accepted natural rows were returned; retained empty-matrix
+ranks are zero, while natural yield and the full useful-rank panel remain
+null. [Final report](../reports/run-full-m4-natural-20261020/RUN_REPORT.md),
+[archive and reproduction](final/README.md).
+
+The card is no longer running. The earlier observations and instructions
+below are preserved as a timestamped execution history. Local solver
+merge and catalog reconciliation now pass their relevant validation;
+current-head CI, required review and coordinated benchmark-index updates
+remain separate PR gates. Complete IC cold/reuse cost and matched
+same-point rho remain open.
+
+## Historical running observation and handoff
 
 **Observed 2026-10-20 02:10:07 UTC: running.** Supervisor PID 80393 and
 container `n83-full-m4-t0-u1` were active. The card started at

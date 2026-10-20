@@ -12,6 +12,14 @@ mkdir "$output/host"
 for name in card.log card-start.utc card-end.utc card-status.txt card.pid source-commit.txt inputs.sha256 input-check.log prepare-check.log host.txt host-uptime.txt host-cpu.txt host-containers.txt run-full-m4-card.sh run-full-m4-docker.sh control-pair-U.json control-pair-D.json cache-audit.json prelaunch-image.json; do
     cp "$root/$name" "$output/host/$name"
 done
+cp "$0" "$output/host/collect-full-m4-final.sh"
+date -u +%FT%TZ > "$output/host/collection-start.utc"
+uptime > "$output/host/host-uptime-final.txt"
+sudo -n docker ps --no-trunc --format '{{.ID}} {{.Names}} {{.Image}} {{.Status}}' > "$output/host/host-containers-final.txt"
+sudo -n docker ps -q | while IFS= read -r container; do
+    sudo -n docker inspect --format '{{.Name}} cpuset={{.HostConfig.CpusetCpus}} nano_cpus={{.HostConfig.NanoCpus}} memory={{.HostConfig.Memory}} memory_swap={{.HostConfig.MemorySwap}}' "$container" \
+        || printf 'UNAVAILABLE container=%s (inspect failed during closing snapshot)\n' "$container"
+done > "$output/host/host-container-limits-final.txt"
 cp /home/ec2-user/n83-m23-20261019/inputs/public/public-targets.json "$output/host/public-targets.json"
 cp -R "$root/runs" "$output/runs"
 cd "$output"

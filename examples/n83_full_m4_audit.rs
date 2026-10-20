@@ -531,6 +531,10 @@ fn audit(root: &Path, archive: &str, manifest_hash: &str) -> Result<Value> {
             "cache-audit.json",
             "da7f5df53baaeba77091cb7aea843375b019adaf65533a20a416d634ae71f100",
         ),
+        (
+            "collect-full-m4-final.sh",
+            "acd9c3f252d9853a707cbbb9d8adbe49a086d18c6692e80e5c6e4284965357ef",
+        ),
     ] {
         require(
             sha(&root.join("host").join(p))? == h,
@@ -583,8 +587,9 @@ fn audit(root: &Path, archive: &str, manifest_hash: &str) -> Result<Value> {
             require(!dir.join("worker.json").exists(), "cap/final ambiguity")?;
             let cap = read(&dir.join("worker.json.cap.json"))?;
             core_identity(&cap, arm, cache, target, "natural")?;
+            let elapsed = number(&cap, "elapsed_ms")?;
             require(
-                cap["status"] == "UNKNOWN_budget" && number(&cap, "elapsed_ms")? >= 1790000.0,
+                cap["status"] == "UNKNOWN_budget" && (1790000.0..1800000.0).contains(&elapsed),
                 "wall cap receipt",
             )?;
             let latest = samples.last().ok_or("no cap progress")?;

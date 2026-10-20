@@ -4,7 +4,7 @@
 - **Kind:** empirical bottleneck; natural useful-rank and complete cold-cost measurements absent after bounded m=2/m=3 probes and capped m=4 SAT search
 - **Affected work:** [prebuilt-base review](../research/n83_prebuilt_factor_base_20261016/REVIEW.md), [primary N83 sweep](../research/koblitz_n83_factor_base_sweep_20261008/RESULT.md), [solver gates](../research/koblitz_n83_factor_base_sweep_20261008/SOLVER_GATES.md), [K=16,627 construction](../research/n83_k16627_prebuild_20261017/RUN_REPORT.md), [m=4 model capacity](../research/n83_k16627_m4_capacity_20261017/RUN_REPORT.md), [planted control](../research/n83_k16627_m4_planted_20261017/RUN_REPORT.md), [complete-witness phases](../research/n83_k16627_m4_witness_20261018/RUN_REPORT.md), [root-phase control](../research/n83_k16627_m4_root_phase_20261018/RUN_REPORT.md), [search-progress control](../research/n83_k16627_m4_search_progress_20261018/RUN_REPORT.md), [selector-pinned positive control](../research/n83_k16627_m4_selector_positive_20261018/RUN_REPORT.md), [selector-only control](../research/n83_k16627_m4_selector_only_20261018/RUN_REPORT.md), [bounded natural query](../research/n83_k16627_m4_natural_query_20261018/RESULT.md), [dimension-18 direct-subgroup census](../research/n83_d18_subgroup_orbit_census_20261018/RESULT.md)
 - **Next action owner:** N83 index-calculus workstream
-- **Last updated:** 2026-10-19 UTC; [native D18 export, finite-query panel and cost report](../research/n83_prebuild_cost_m23_20261019/RESULT.md)
+- **Last updated:** 2026-10-20 UTC; [completed full-size U/D panel and native reuse accounting](../research/n83_prebuild_cost_m23_20261019/RESULT.md)
 
 ## Problem
 
@@ -69,7 +69,8 @@ corpus coverage, useful rank and complete cost remain open below.
 - [x] Export the deterministic first 16,627 classes as an exact native point/coefficient object and independently replay all 2,760,082 rows; [export receipts](../research/n83_d18_subgroup_orbit_census_20261018/export-v1/RESULT.md).
 - [x] Freeze common U/D m=2/m=3 finite-query policies on eight public points and record completed relation/rank counts with fresh replay; [finite panel](../research/n83_prebuild_cost_m23_20261019/reports/run-20261019T0536Z/RUN_REPORT.md). These zero counts apply to the exact exhaustive m=2 and `2^20`-pair m=3 events only.
 - [x] Run K2048 and D12 under their separately frozen m=2 exhaustive and m=3 `2^20`-pair policies on eight public points, with 36 complete public receipts, fresh replay, constructed/general-field controls and preserved Spot interruption/retry; [small-base run](../research/n83_prebuild_cost_m23_20261019/reports/run-small-20261019/RUN_REPORT.md). Their finite zero-row/rank outcomes do not order the bases.
-- [ ] Complete a same-host U/D natural m=4 comparison with checked returned relations and useful-rank increments. The [first four-arm card](../research/n83_d18_subgroup_orbit_census_20261018/natural-v1/NATURAL_RESULT.md) was interrupted before U2; U1/D1/D2 were capped, so no m=4 ordering follows.
+- [x] Complete the separately frozen same-host full-size U/D m=4 public-query card, preserving every attempt. The [18-attempt card](../research/n83_prebuild_cost_m23_20261019/reports/run-full-m4-natural-20261020/RUN_REPORT.md) completed and its 329-file audit passed; all attempts were capped.
+- [ ] Obtain independently replayed natural rows and useful-rank increments for U/D. The completed card returned no accepted natural rows; its retained matrices have rank zero and its yield/rank-completion estimates remain null. The [first interrupted four-arm card](../research/n83_d18_subgroup_orbit_census_20261018/natural-v1/NATURAL_RESULT.md) remains preserved.
 - [x] Freeze a resource-feasible natural m=4 policy for K=2,048 and D12, retaining caps, relation/rank receipts and independent replay. The [native smaller-base protocol](../research/n83_prebuild_cost_m23_20261019/SMALL_M4_PROTOCOL.md) was committed before implementation; execution and checked natural rank remain separate open obligations.
 - [x] Pass exact-base m=4 constructed controls for K2048 and D12 with original-field SAT verification, stored-point group/row checks, rank one and separate general-field replay on x86_64 and arm64. The [control report](../research/n83_prebuild_cost_m23_20261019/reports/run-small-m4-controls-20261019/RUN_REPORT.md) records 84,966 / 84,590 model variables and preserved 4 GiB zero-swap host receipts. The common-public-point K1,D1,D2,K2 card entered search after these controls; its natural outcomes are not supplied by the control result.
 - [ ] Measure natural relation yield and useful rank outside the completed finite m=2/m=3 events, or a separately frozen partial-relation event, before selecting a prebuilt IC base.
@@ -81,7 +82,7 @@ best base, asymptotic crossover or transfer to a different curve.
 
 ## Next discriminating step
 
-- **Action or proof obligation:** Obtain checked natural relation and useful-rank increments under a separately frozen m=4 search strategy or a separately defined partial-relation event, then measure rank/linear algebra, individual logarithm, verification and matched same-point rho with full cold/reuse charges. Complete or replace the interrupted U/D m=4 comparison under a new explicit host card; cap receipts remain censored.
+- **Action or proof obligation:** Obtain checked natural relation and useful-rank increments under a separately frozen m=4 search strategy or a separately defined partial-relation event, then measure rank/linear algebra, individual logarithm, verification and matched same-point rho with full cold/reuse charges. The full-size replacement card is complete; its cap receipts remain censored.
 - **Inputs and controls:** Exact primary curve and subgroup above; byte-pinned K=2,048, structured dimension-12 and K=16,627 archives; common public query points and coefficients; duplicate-index and planted relation controls; unchanged baseline and A/A repeats.
 - **Execution limits and stop condition:** Freeze the time, memory, query and solver caps before execution under the repository's admission rules. A cap or infrastructure failure remains a preserved bounded result.
 - **Outcomes and next actions:** A checked natural relation with an independent useful-rank increment would justify a larger common-query rank comparison and complete-cost measurement. A cap with progress but no row identifies solver effort only; it directs one sound propagation or branching change rather than a base ranking. An interrupted arm is repeated only under a newly frozen same-host design. A cap never proves absence of a relation.
@@ -104,13 +105,21 @@ complete IC cost remain open. Both launch failures and their separately
 frozen fixes are retained.
 
 The [full-base common-public panel](../research/n83_prebuild_cost_m23_20261019/full-m4-v1/STATUS.md)
-started at 02:06:17 UTC on 2026-10-20 after four full-base controls,
-four independent replays and two native pair checks passed. Its already
-running card schedules eighteen natural attempts over all eight public
-points for U and D, each with 16,627 columns / 2,760,082 points. This
-addresses the original equal-size comparison; it does not close the
-natural-rank or complete-cost requirements before the actual receipts
-are collected and checked.
+ran from 02:06:17 to 06:48:53 UTC on 2026-10-20 after four full-base
+controls, four independent replays and two native pair checks passed.
+All eighteen natural attempts over eight public points completed, each
+base with 16,627 columns / 2,760,082 points. The 329-file native audit
+passes. D has nine conflict caps; U has four conflict caps and five wall
+caps. Summed worker intervals are 2,636.872934 s and 14,284.411736 s
+respectively; different endpoints do not justify a speed ratio.
+The retained natural-row matrices are empty, with rank zero; useful-rank
+completion and natural yield remain null.
+
+The [reuse addendum](../research/n83_prebuild_cost_m23_20261019/reports/reuse-20261020/RUN_REPORT.md)
+completes q=1,8,64 projections and explicitly charges observed fresh
+replay/container intervals omitted from the earlier worker-only view.
+This is an accounting addition from the retained finite-policy runs;
+no 64-query card was executed. Full cold IC accounting remains open.
 
 ### Catalog evidence drift blocking the current PR
 
@@ -118,11 +127,16 @@ The N83 continuation PR also contains earlier catalog maintenance commits.
 Its [CI/provenance record](../research/n83_prebuild_cost_m23_20261019/CI_STATUS_20261020.md)
 identifies failed native count assertions, a removed nonexistent source
 reference, eleven stale artifact digests, and 28 remaining independent
-assessment-verifier problems. These are implementation/validation gaps,
-separate from the natural-yield obstruction. Exit requires a reconciled
-catalog certificate/verifier/report set and successful applicable checks
-at the final PR head, preserving historical evidence. N83 tests alone do
-not close this merge gate.
+assessment-verifier problems. The
+[versioned reconciliation](../research/cover_transfer_assessment_20261013/catalog-refresh-20261020.md)
+now passes the independent catalog verifier, exact generation replay,
+2,572-model native verification, 77 affected example tests and the
+4,401-pass release-library suite. The catalog transition checks all
+2,098 retained model and 664 retained EC1 identities, with two removed
+non-EC1 models explicitly recorded. Original failed logs remain retained.
+This closes the local reconciliation gap. Successful applicable checks
+and required review at the final PR head remain the merge gate; N83
+tests alone do not substitute for those checks.
 
 Unresolved. This record names the missing comparison; it does not close the
 underlying factor-base selection task.
