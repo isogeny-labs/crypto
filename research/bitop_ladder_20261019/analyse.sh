@@ -3,7 +3,8 @@
 #
 #   research/bitop_ladder_20261019/analyse.sh
 #
-# Writes analysis/: bound fits (bitop/v1) per arm over 16-40 and over the
+# Writes analysis/: bound fits (bitop/v1) per arm per ecbench tier (toy
+# 16-32, medium 33-40; PROTOCOL.md Deviation 3) and over the
 # bitop/v1 ladder's 16-26 range, per-curve `ecbench compare` of every arm
 # against rho-neg, `ecbench table`, the §5a band, `ecbench amortize`, and
 # `ecbench work --counted` over every hold-out session.
@@ -31,10 +32,12 @@ fit() { # name arm lo hi [rule]
 }
 
 for arm in rho-neg rho-neg-aa bsgs-neg kangaroo; do
-  fit "$arm-16-40" "$arm" 16 40
+  fit "$arm-16-32" "$arm" 16 32
+  fit "$arm-33-40" "$arm" 33 40
   fit "$arm-16-26" "$arm" 16 26
 done
-fit ic-pair-rule-16-40 ic-pair-rule 16 40 rule
+fit ic-pair-rule-16-32 ic-pair-rule 16 32 rule
+fit ic-pair-rule-33-40 ic-pair-rule 33 40 rule
 fit ic-pair-rule-16-26 ic-pair-rule 16 26 rule
 fit ic-pair-rule-16-28 ic-pair-rule 16 28 rule
 fit ic-pair-b32-16-28 ic-pair-b32 16 28

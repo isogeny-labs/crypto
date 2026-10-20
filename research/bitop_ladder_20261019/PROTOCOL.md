@@ -146,3 +146,15 @@ about 3,000× the floor and 7 s a run at 32 bits; the fixed-b32 arm stops at
    named `train-P<b>-<arm>-ext<n>.json`, and `select.py` reads the arm from
    the name. Only the file names changed; each extension spec holds the
    values the rule above prescribes.
+3. **Fits per ecbench tier (2026-10-20, after the hold-out ran).**
+   `ecbench bound fit` refuses a fit that spans its toy (field ≤ 32 bits) and
+   medium (33 bits and up) tiers ("tiers are not fungible"). The primary fit
+   "over all hold-out sessions" is therefore two fits per arm, 16–32 bits
+   (17 sizes) and 33–40 bits (8 sizes), and every decision rule is applied to
+   each. The 16–26 and 16–28 fits are unchanged.
+4. **A/A control is degenerate (found in analysis).** `rho-neg-aa` runs the
+   same method with the same per-target algorithm seed as `rho-neg`, so its
+   runs are identical and its paired ratio is exactly 1 on every curve. In
+   counted work it can detect nothing, and the A/A rule above is reported
+   as uninformative, not as passed. (ecbench's A/A arm is a wall-time
+   control; for counts, an A/A control needs a different seed.)

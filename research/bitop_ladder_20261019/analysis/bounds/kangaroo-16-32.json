@@ -1,0 +1,830 @@
+{
+  "admissibility": {
+    "bounded": false,
+    "deterministic": true,
+    "reasons": [],
+    "status": "admissible",
+    "unpriced": []
+  },
+  "bound_id": "ECBND1h5a8d995746c0",
+  "constant": {
+    "declared_ratio_to_floor": 2.256758334191025,
+    "ratio_to_floor": {
+      "ci95": [
+        2.4013608566093767,
+        2.8829074302313042
+      ],
+      "ci_method": "cluster",
+      "value": 2.6142828715688347
+    },
+    "s": {
+      "ci95": [
+        2.116577503880498,
+        2.532415617519427
+      ],
+      "ci_method": "cluster",
+      "value": 2.316847871534253
+    }
+  },
+  "dimensions": {
+    "field_invs": {
+      "ci95": [
+        2.099304695937612,
+        2.5015568795374166
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "field_ops.invs, workload.curve.r",
+      "statistic": "mean field inversions / sqrt(r) over verified runs",
+      "value": 2.2827055258830917
+    },
+    "field_muls": {
+      "ci95": [
+        4.253394918058724,
+        5.082473841631976
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "field_ops.muls, workload.curve.r",
+      "statistic": "mean field multiplications / sqrt(r) over verified runs",
+      "value": 4.628208997337534
+    },
+    "field_sqrs": {
+      "ci95": [
+        2.10763424894453,
+        2.526892515438168
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "field_ops.sqrs, workload.curve.r",
+      "statistic": "mean field squarings / sqrt(r) over verified runs",
+      "value": 2.3036381744068697
+    },
+    "memory": {
+      "ci95": [
+        0.07687538768216567,
+        0.16844566184997015
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "first of counters.inserts_uncharged, counters.table_inserts_uncharged, counters.table_entries, counters.distinguished_points",
+      "statistic": "mean table entries / sqrt(r) over verified runs",
+      "value": 0.1195317842886263
+    },
+    "ops": {
+      "ci95": [
+        2.4013608566093767,
+        2.8829074302313042
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "cost.total_gae, workload.curve.r, automorphisms_available",
+      "statistic": "mean S / sqrt(pi / 2A) over verified runs",
+      "value": 2.6142828715688347
+    },
+    "uncharged": {
+      "ci95": [
+        0.1484453613040564,
+        0.3399564606323714
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "counters.*_uncharged",
+      "statistic": "mean sum of *_uncharged counters / sqrt(r) over verified runs",
+      "value": 0.23984631121941405
+    }
+  },
+  "domain": {
+    "envelope": {
+      "precomputation": "none",
+      "targets": 1,
+      "threads": 1
+    },
+    "family": "prime",
+    "problem": "ecdlp.single_target",
+    "target_kind": "public",
+    "tier": "toy",
+    "unit": "bitop/v1"
+  },
+  "domain_id": "ECDOM1hc0f31e5613e9",
+  "fit": {
+    "alpha": 0.6051066111791719,
+    "alpha_agrees_with_declared": false,
+    "alpha_ci95": [
+      0.5780186965757064,
+      0.6285481017366554
+    ],
+    "alpha_in_additions": 0.4853090509161711,
+    "alpha_in_additions_ci95": [
+      0.46270398534938156,
+      0.5052943807983108
+    ],
+    "ci_method": "cluster",
+    "declared_alpha": 0.5,
+    "log2_c": 13.600957814039282,
+    "model": "bitops = C * r^alpha",
+    "points": 1360,
+    "r_squared": 0.9113299221148142,
+    "scaling_claim": true,
+    "size_parameter": "r",
+    "sizes": 17
+  },
+  "fit_options": {
+    "curves": [],
+    "resamples": 2000,
+    "seed": 20261005,
+    "tier": null,
+    "unit": "bitop/v1"
+  },
+  "improves_on": [],
+  "label": "bitop ladder hold-out: kangaroo, 16-32 bits",
+  "level": "exponent",
+  "method": {
+    "entry": "ecbench::generic::kangaroo",
+    "family": "kangaroo",
+    "id": "kangaroo.vow",
+    "method_id": "ECM1h05c1dc19c164",
+    "params": {
+      "cap_multiple": "64"
+    }
+  },
+  "notes": "",
+  "provenance": {
+    "audits": [],
+    "records": 1360,
+    "sessions": [
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P16",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "09c9be26f975b1233aeacd116a6b72eaab7716a855de229b6a32d04d4e01de72",
+        "role": "baseline",
+        "session_id": "ECBS1h3ea6c6210007",
+        "spec_id": "ECS1h0dffd7c01656",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P17",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "dbb258843a0a064dc693aa49aa10dd66528cae91f9f0108258eec818328cecbe",
+        "role": "baseline",
+        "session_id": "ECBS1hda839157a7ce",
+        "spec_id": "ECS1h2ed7bdc02a3d",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P18",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "036ba0284526400210b22f9294b2528c49600d5874168a7d62fcbe76f8fa1ee8",
+        "role": "baseline",
+        "session_id": "ECBS1hafe4bcff74b3",
+        "spec_id": "ECS1hfa93e5a858a9",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P19",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "90c88ea14d624e9b86cfdd9d5ab276e1c268cb1354d68029d197d5e0e818ba1a",
+        "role": "baseline",
+        "session_id": "ECBS1h6ff34d1a0f43",
+        "spec_id": "ECS1hda13c95f745a",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P20",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "2607e6fc14cc744d211dca9e99ca9c65147470234277b2f8bedd973027ec4ab2",
+        "role": "baseline",
+        "session_id": "ECBS1h5d7dee54ccec",
+        "spec_id": "ECS1h75d06baeaf25",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P21",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "df8c2dac18e89cb4adfabc1b90640fd12ac216407ff7b427940c4e8afa5f22c4",
+        "role": "baseline",
+        "session_id": "ECBS1h09e6225dfe2e",
+        "spec_id": "ECS1h4f802384b500",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P22",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "b4d172188bce47b24699d316afd7eb1b0c3e5852629d73f02f7732b4cf623d7a",
+        "role": "baseline",
+        "session_id": "ECBS1h49ee8e9c5f1d",
+        "spec_id": "ECS1ha56a66b25573",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P23",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "55c0d7ea451df62eb2117e4eb57d3101bc359e24f562efbbc0445bbaab6d19ea",
+        "role": "baseline",
+        "session_id": "ECBS1hb44c23619bb7",
+        "spec_id": "ECS1hf2b5197f4b60",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P24",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "812d17877082dd3cde0a33a0b56e0893c5c90f9686e09bf12caefac52862c833",
+        "role": "baseline",
+        "session_id": "ECBS1hdd2ff85eb833",
+        "spec_id": "ECS1h7a8b6c02225d",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P25",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "5ba5576d642b901d17b07221658cb44cd468af11f100e111c98f7b96f9571855",
+        "role": "baseline",
+        "session_id": "ECBS1h5ee92c1ba874",
+        "spec_id": "ECS1h2c6f240100c6",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P26",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "15b06524052d19eb058d68997662399c617097cdcdcb5f6b979e9ab814e71028",
+        "role": "baseline",
+        "session_id": "ECBS1h6d63acfee355",
+        "spec_id": "ECS1h2f17575e8d13",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P27",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "141dc36263f49ebff69eca056756ba7563babf437df3d3e62c5edf6b7d056184",
+        "role": "baseline",
+        "session_id": "ECBS1hc501014d0c84",
+        "spec_id": "ECS1h361e67639601",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P28",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "84b56a082caefaff1cfd32498525dc977008a90ee0aedc8262dc631c6187494c",
+        "role": "baseline",
+        "session_id": "ECBS1h3cdb973eab87",
+        "spec_id": "ECS1h5cb90099c24e",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P29",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "02bd775e2b197ad0df59e5395f73a70837a2cbd91e1454005cbf2a566c02a4a0",
+        "role": "baseline",
+        "session_id": "ECBS1h414c34f0d8a4",
+        "spec_id": "ECS1h4a31ac3dad67",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P30",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "374ff6e84d7fc4776ab02ada865e7dcd78c3be3515a2120c3efcd5bf2097d4cb",
+        "role": "baseline",
+        "session_id": "ECBS1hdff882348001",
+        "spec_id": "ECS1h6e8edd01822e",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P31",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "e17549bdd41d99bebc1b13da14bcf14eebb066d4485cc9e6cda73b2f3c22ef3a",
+        "role": "baseline",
+        "session_id": "ECBS1hf88e8df5ea4a",
+        "spec_id": "ECS1h3f07c0b6048a",
+        "status": "complete"
+      },
+      {
+        "arm": "kangaroo",
+        "binary_sha256": "372ed2eb2f19c5fd17168188c68cae57abc581edbf4d2a07ad0e3e8a0950a21a",
+        "dir": "research/bitop_ladder_20261019/sessions/holdout-P32",
+        "env_class_id": "ECBENV2he1389885ccd0",
+        "git_commit": "e04fc94bac086af7d8a8f713e9c7d2f48c3da323",
+        "records_sha256": "3c461b9cdb6ccf32b041be3ed58f4a38a638e47599950e9aa265f72d086b5c2d",
+        "role": "baseline",
+        "session_id": "ECBS1h264d82814fd5",
+        "spec_id": "ECS1hd63028a54d87",
+        "status": "complete"
+      }
+    ],
+    "statuses": {
+      "verified": 1360
+    },
+    "verified": 1360
+  },
+  "schema": "ecbench.bound/v1",
+  "sizes": [
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 16,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 15.998039442089441,
+      "mean_gae": 10320404.8,
+      "mean_s": 2.336740215091572,
+      "memory_entries_per_sqrt_r": 0.24469745996699083,
+      "r": 65447,
+      "ratio_to_floor": 2.636728977623617,
+      "runs": 80,
+      "s_ci95": [
+        2.086203311878277,
+        2.592217812249228
+      ],
+      "slug": "icv1-fp16-t73-6dc97f36",
+      "uncharged_per_sqrt_r": 0.49330382504527526,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 17,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 16.995226127119583,
+      "mean_gae": 16509364.1,
+      "mean_s": 2.354828894792076,
+      "memory_entries_per_sqrt_r": 0.2631140825390124,
+      "r": 130639,
+      "ratio_to_floor": 2.6571398669579294,
+      "runs": 80,
+      "s_ci95": [
+        2.1009334832410067,
+        2.6134918935751235
+      ],
+      "slug": "icv1-fp17-t433-f7ba78cd",
+      "uncharged_per_sqrt_r": 0.5289948746735978,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 18,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 18.002413991545005,
+      "mean_gae": 22924725.2625,
+      "mean_s": 2.0660113558476585,
+      "memory_entries_per_sqrt_r": 0.21466408136186801,
+      "r": 262583,
+      "ratio_to_floor": 2.331244172921252,
+      "runs": 80,
+      "s_ci95": [
+        1.866657185498579,
+        2.267101938332023
+      ],
+      "slug": "icv1-fp18-tm443-965d79a1",
+      "uncharged_per_sqrt_r": 0.4312796543724803,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 19,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 18.998841059490484,
+      "mean_gae": 52208088.45,
+      "mean_s": 3.001118506026246,
+      "memory_entries_per_sqrt_r": 0.369463196481255,
+      "r": 523867,
+      "ratio_to_floor": 3.386399600184825,
+      "runs": 80,
+      "s_ci95": [
+        2.710014775285423,
+        3.3008582450861743
+      ],
+      "slug": "icv1-fp19-t421-365a7ecd",
+      "uncharged_per_sqrt_r": 0.740308015723156,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 20,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 19.999467443431033,
+      "mean_gae": 72651829.6,
+      "mean_s": 2.6737810332284697,
+      "memory_entries_per_sqrt_r": 0.14870908533433239,
+      "r": 1048189,
+      "ratio_to_floor": 3.0170388152701197,
+      "runs": 80,
+      "s_ci95": [
+        2.4444365565904698,
+        2.8924020818481786
+      ],
+      "slug": "icv1-fp20-t383-4f71b2c3",
+      "uncharged_per_sqrt_r": 0.29839491342948143,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 21,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 20.999283686442553,
+      "mean_gae": 74587610.175,
+      "mean_s": 1.766192406923258,
+      "memory_entries_per_sqrt_r": 0.09676782878756432,
+      "r": 2096111,
+      "ratio_to_floor": 1.9929347170544847,
+      "runs": 80,
+      "s_ci95": [
+        1.6084025460219284,
+        1.9225899749753217
+      ],
+      "slug": "icv1-fp21-t1033-c52e1dd8",
+      "uncharged_per_sqrt_r": 0.1942263629911712,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 22,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 21.998915069563118,
+      "mean_gae": 156067378.2,
+      "mean_s": 2.388115829906848,
+      "memory_entries_per_sqrt_r": 0.14235087832232401,
+      "r": 4191151,
+      "ratio_to_floor": 2.6947001510778983,
+      "runs": 80,
+      "s_ci95": [
+        2.1531466187624595,
+        2.6220626293638727
+      ],
+      "slug": "icv1-fp22-t3137-6ad861dc",
+      "uncharged_per_sqrt_r": 0.28519022152694135,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 23,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 22.99956395809178,
+      "mean_gae": 215861145.05,
+      "mean_s": 2.14204402791342,
+      "memory_entries_per_sqrt_r": 0.13473922126458635,
+      "r": 8386073,
+      "ratio_to_floor": 2.4170378560988617,
+      "runs": 80,
+      "s_ci95": [
+        1.944201614788901,
+        2.337844910108397
+      ],
+      "slug": "icv1-fp23-t2515-d8810008",
+      "uncharged_per_sqrt_r": 0.26982376169307376,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 24,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 24.000437027707278,
+      "mean_gae": 340702374.225,
+      "mean_s": 2.2001770638322977,
+      "memory_entries_per_sqrt_r": 0.06801643069580522,
+      "r": 16782299,
+      "ratio_to_floor": 2.482633962749739,
+      "runs": 80,
+      "s_ci95": [
+        1.9596159924533618,
+        2.458033804140896
+      ],
+      "slug": "icv1-fp24-tm5099-a6f137c6",
+      "uncharged_per_sqrt_r": 0.13627696504131953,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 25,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 25.00030631157666,
+      "mean_gae": 833245370.9375,
+      "mean_s": 3.514496954092435,
+      "memory_entries_per_sqrt_r": 0.10678405693543276,
+      "r": 33561557,
+      "ratio_to_floor": 3.9656851458185383,
+      "runs": 80,
+      "s_ci95": [
+        3.2162724603268016,
+        3.7793443871916765
+      ],
+      "slug": "icv1-fp25-tm7173-b0644037",
+      "uncharged_per_sqrt_r": 0.21374072903665325,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 26,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 25.999873135719376,
+      "mean_gae": 993065443.6,
+      "mean_s": 2.744355030010541,
+      "memory_entries_per_sqrt_r": 0.08410403958594921,
+      "r": 67102963,
+      "ratio_to_floor": 3.0966730429776748,
+      "runs": 80,
+      "s_ci95": [
+        2.487223234427652,
+        3.00321470764424
+      ],
+      "slug": "icv1-fp26-t5897-9124aa40",
+      "uncharged_per_sqrt_r": 0.16833015485168062,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 27,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 27.000013769295276,
+      "mean_gae": 1094025982.05,
+      "mean_s": 1.9860834941800558,
+      "memory_entries_per_sqrt_r": 0.03202551776350064,
+      "r": 134219009,
+      "ratio_to_floor": 2.241055238945037,
+      "runs": 80,
+      "s_ci95": [
+        1.7729728904632154,
+        2.1931716860496544
+      ],
+      "slug": "icv1-fp27-tm1521-bb102e62",
+      "uncharged_per_sqrt_r": 0.06413735186084266,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 28,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 27.99984812595114,
+      "mean_gae": 1787974808.2,
+      "mean_s": 2.138058655687136,
+      "memory_entries_per_sqrt_r": 0.0312997126192895,
+      "r": 268407199,
+      "ratio_to_floor": 2.4125408451056023,
+      "runs": 80,
+      "s_ci95": [
+        1.920557628301075,
+        2.3651518575523753
+      ],
+      "slug": "icv1-fp28-t28201-65099091",
+      "uncharged_per_sqrt_r": 0.06266046360753161,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 29,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 28.999989995412044,
+      "mean_gae": 2467350912.775,
+      "mean_s": 1.9479963401200309,
+      "memory_entries_per_sqrt_r": 0.030543286387093964,
+      "r": 536867189,
+      "ratio_to_floor": 2.1980784877697475,
+      "runs": 80,
+      "s_ci95": [
+        1.7537046027293197,
+        2.1483213225044304
+      ],
+      "slug": "icv1-fp29-t3691-ef449c0c",
+      "uncharged_per_sqrt_r": 0.0611297312967075,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 30,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 29.999970667254534,
+      "mean_gae": 3917315315.6,
+      "mean_s": 2.0467076099885086,
+      "memory_entries_per_sqrt_r": 0.03202318321059745,
+      "r": 1073719993,
+      "ratio_to_floor": 2.309462228246881,
+      "runs": 80,
+      "s_ci95": [
+        1.8593392032389984,
+        2.2359492207973766
+      ],
+      "slug": "icv1-fp30-t21791-a644ba69",
+      "uncharged_per_sqrt_r": 0.0640768843095618,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 31,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 31.000002679836552,
+      "mean_gae": 6170044487.6625,
+      "mean_s": 2.1378701756302365,
+      "memory_entries_per_sqrt_r": 0.017399551604424343,
+      "r": 2147487637,
+      "ratio_to_floor": 2.412328168135984,
+      "runs": 80,
+      "s_ci95": [
+        1.912962295378431,
+        2.3754009987631637
+      ],
+      "slug": "icv1-fp31-tm3989-ae9db972",
+      "uncharged_per_sqrt_r": 0.03482068237524438,
+      "verified": 80,
+      "workloads": 80
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": 2.256758334191025,
+      "declared_s": 2.0,
+      "field_bits": 32,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 80
+      },
+      "log2_r": 31.99999754017573,
+      "mean_gae": 8433779372.8,
+      "mean_s": 1.9418362228114954,
+      "memory_entries_per_sqrt_r": 0.015338720046623473,
+      "r": 4294959973,
+      "ratio_to_floor": 2.1911275397319314,
+      "runs": 80,
+      "s_ci95": [
+        1.7693369417512388,
+        2.1133590116941625
+      ],
+      "slug": "icv1-fp32-t7319-90da43e9",
+      "uncharged_per_sqrt_r": 0.03069269889531772,
+      "verified": 80,
+      "workloads": 80
+    }
+  ],
+  "stages": [
+    {
+      "alpha": 0.17793349913423376,
+      "alpha_ci95": [
+        0.15968712862210227,
+        0.19140343122115427
+      ],
+      "mean_gae": 2422184.1764705884,
+      "name": "setup",
+      "share_of_gae": 0.0015446076514048887,
+      "sizes_with_work": 17
+    },
+    {
+      "alpha": 0.6137980869282906,
+      "alpha_ci95": [
+        0.5836013223085683,
+        0.642176694534235
+      ],
+      "mean_gae": 1551573560.05,
+      "name": "search",
+      "share_of_gae": 0.9894261616649007,
+      "sizes_with_work": 17
+    },
+    {
+      "alpha": 0.5332269858523049,
+      "alpha_ci95": [
+        0.5080350271084413,
+        0.5579023610371555
+      ],
+      "mean_gae": 14159233.0375,
+      "name": "natives",
+      "share_of_gae": 0.00902923068369444,
+      "sizes_with_work": 17
+    }
+  ],
+  "verdict_id": null
+}
