@@ -115,4 +115,19 @@ curves, and every instance here is a public toy.
 
 ## Deviations
 
-None yet.
+All recorded before any primary row was measured.
+
+1. **The instrument, fixed.**
+   - **The harness:** `8e1ebba8c` adds `examples/hyperelliptic_ic_vs_rho_bitops.rs` and the counters (`src/prime_hyperelliptic/ops.rs`; counting rules in its module docs). It is run with `--arms fb-walk`, which is round seven's configuration, `--ic-trials 5 --rho-trials 40` and the default `--rho-variant full-width`.
+   - **Seeds:** its defaults are round seven's: IC 20260916 and rho `0xC0FFEE` = 12648430.
+   - **The completeness check passed:** under Callgrind, instructions per counted gate on IC/rho were 1.01 (genus 2, `p = 41`, fb-walk), 0.99 (genus 2 baseline) and 1.16 (genus 3, `p = 23`), all below the 2× limit.
+   - **Rows seen while testing the instrument, with 1–2 trials, not used:**
+     - genus 2 at `p = 41`, all three arms;
+     - genus 3 at `p = 23`, fb-walk;
+     - genus 4 at `p = 17` and `23`, fb-walk with one trial. This run checked that the instance rule gives round seven's `N` (5,639 and 30,223, which it does).
+
+     None of these is the primary row.
+2. **Validation reported separately.** The arithmetic validates curves and divisors as it runs (`HyperellipticCurveP::validate`, `MumfordDivisorP::validate`). That work was 39–59% of each arm's counted gates in the instrument tests.
+   - **Primary:** the primary measure counts it, because both arms execute it.
+   - **Secondary:** a declared secondary ratio excludes it, using the JSON's `validation_subset`. It is reported beside the primary, and the verdicts use the primary.
+3. **Analysis in Rust.** The per-row ratios, bootstrap intervals and fits are computed by `examples/hec_bitop_analyse.rs`, not Python (AGENTS.md, "Implementation language").
