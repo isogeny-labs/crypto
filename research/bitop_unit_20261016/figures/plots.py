@@ -69,13 +69,13 @@ ax.axvline(0.5, color=INK2, linewidth=1, linestyle=(0, (3, 3)))
 ax.text(0.505, -0.9, "generic theory: ½", color=INK2, va="top", fontsize=8)
 ax.set_yticks(range(len(rows)))
 ax.set_yticklabels([r[0] for r in reversed(rows)])
-ax.set_xlabel("exponent α of bitops / gates(one addition) = C·r^α, with 95% interval")
+ax.set_xlabel("α of model units / addition weight = C·r^α (95% interval)")
 ax.set_title("Fitted exponents in bitop/v1, in additions\n(sessions ECBS1h3674c4a0b139, ECBS1hef866ef12457)", loc="left", fontsize=9)
 ax.set_ylim(-1.6, len(rows) - 0.5)
 ax.grid(axis="y", visible=False)
 save(fig, "exponents")
 
-# 2. Every run of the prime ladder: gates against r.
+# 2. Every run of the prime ladder: bitop model units against r.
 recs = [json.loads(l) for l in (ROOT / "sessions/prime-ladder/records.jsonl").read_text().splitlines()]
 fig, axes = plt.subplots(1, 2, figsize=(9, 3.6), sharey=True)
 for ax, arms, title in (
@@ -125,7 +125,7 @@ ax.plot(arm_v, ys, "o", color=BLUE, markersize=6, label="index-calculus arm", ma
 ax.set_xscale("log")
 ax.set_yticks(ys)
 ax.set_yticklabels(labels)
-ax.set_xlabel("Callgrind instructions per thousand counted bit operations (log scale)")
+ax.set_xlabel("Callgrind instructions per thousand counted model units (log scale)")
 ax.set_title("Instruction audit: a ratio near rho's means the counters see the work", loc="left", fontsize=9)
 ax.legend(frameon=False, fontsize=8, loc="lower right")
 ax.grid(axis="y", visible=False)

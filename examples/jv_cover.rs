@@ -16,7 +16,9 @@ use std::fs;
 use crypto_lib::cryptanalysis::jv_cover::{
     run_cover_ccov, run_cover_dlp, run_rho_dp, CcovReport, CoverDlpReport, RhoDpReport,
 };
+use crypto_lib::cryptanalysis::jv_rho_strong::{run_strong_rho, StrongOpts, StrongRun};
 use crypto_lib::cryptanalysis::jv_sieve::{run_cover_sieve_dlp, SieveDlpReport};
+use rayon::prelude::*;
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -27,6 +29,7 @@ enum Row {
     Dlp(CoverDlpReport),
     Sieve(SieveDlpReport),
     RhoDp(RhoDpReport),
+    Strong(StrongRun),
 }
 
 fn main() {
@@ -49,6 +52,10 @@ fn main() {
     let mut trace = false;
     let mut dp_bits = 16u32;
     let mut threads = 4usize;
+    let mut run_idx = 0u64;
+    let mut neg = true;
+    let mut batch = 16usize;
+    let mut rwalk = 64usize;
     let mut json: Option<String> = None;
     let mut i = 0;
     while i < args.len() {
@@ -78,6 +85,10 @@ fn main() {
             "--m" => m_override = next(&mut i).parse().expect("--m"),
             "--trace" => trace = true,
             "--dp-bits" => dp_bits = next(&mut i).parse().expect("--dp-bits"),
+            "--run" => run_idx = next(&mut i).parse().expect("--run"),
+            "--neg" => neg = next(&mut i) != "0",
+            "--batch" => batch = next(&mut i).parse().expect("--batch"),
+            "--r" => rwalk = next(&mut i).parse().expect("--r"),
             "--threads" => threads = next(&mut i).parse().expect("--threads"),
             "--oracle-base" => oracle_base = next(&mut i).parse().expect("--oracle-base"),
             "--json" => json = Some(next(&mut i)),
@@ -86,6 +97,37 @@ fn main() {
         i += 1;
     }
     let mut rows: Vec<Row> = Vec::new();
+    if exp == "rhostrong" {
+        // one single-threaded run per instance seed, instances in parallel
+        for &p in &sizes {
+            let opts = StrongOpts {
+                negation: neg,
+                batch,
+                dp_bits,
+                r: rwalk,
+            };
+            let mut rs: Vec<StrongRun> = (first_seed..first_seed + seeds)
+                .into_par_iter()
+                .map(|seed| run_strong_rho(p, seed, run_idx, opts))
+                .collect();
+            rs.sort_by_key(|r| r.seed);
+            for r in rs {
+                println!(
+                    "p={:>5} seed={} l=2^{:.1} neg {} batch {} | steps {:.4e} ({:.3} sqrt l) S harness {:.4} tuned {:.4} | S+ harness {:.4} tuned {:.4} | mul {} sq {} inv {} adds {} dbl {} setup {} | native {} fp_adds {} | restarts {} cycles {} selfcoll {} dps {} | correct {} capped {} | {:.0} s",
+                    r.p, r.seed, (r.l as f64).log2(), r.negation, r.batch, r.steps as f64,
+                    r.steps as f64 / (r.l as f64).sqrt(), r.s_harness, r.s_tuned, r.s_plus_harness, r.s_plus_tuned,
+                    r.ops.mul, r.ops.sq, r.ops.inv, r.ops.walk_adds, r.ops.dbl_adds, r.ops.setup_adds,
+                    r.ops.native(), r.ops.fp_adds, r.restarts, r.cycles_found, r.self_collisions, r.dps,
+                    r.correct, r.capped, r.wall_ms / 1e3
+                );
+                rows.push(Row::Strong(r));
+            }
+            if let Some(path) = &json {
+                fs::write(path, serde_json::to_string_pretty(&rows).unwrap()).expect("write json");
+            }
+        }
+        return;
+    }
     for &p in &sizes {
         for seed in first_seed..first_seed + seeds {
             match exp.as_str() {

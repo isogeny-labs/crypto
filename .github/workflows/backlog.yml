@@ -86,6 +86,8 @@ jobs:
             /problems/
       - name: Materialize compile-time fixture inputs
         run: node .github/scripts/ci-scope.mjs --materialize
+      - name: Draft runner resume and selection controls (mocked ecbench)
+        run: python3 backlog/XP-20261016-prime-base-oracle-tuning/test_runner.py -v
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'
