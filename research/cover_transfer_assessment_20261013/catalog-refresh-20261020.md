@@ -26,10 +26,15 @@ All retained model JSON, slug and ICV1 labels agree. All retained EC1 curve,
 field, generator and model bindings agree. The 977 current representations
 belong to 972 models; five models have two representations.
 
-The removed models are `icv1-fp21-tm700-56b6783a` and
-`icv1-fp21-tm700-7ee99c50`. Neither had an EC1 representation. Both old
-records remain available at the pinned historical revision and in the
-inventory. The transition is not append-only.
+The two removed records are erroneous extraction labels, preserved
+verbatim in the inventory and the
+[prime-model correction records](../../docs/curves/sources/prime-model-corrections.json).
+Quadratic-Weierstrass coefficients had been interpreted as short-Weierstrass
+coefficients. The corrected source models are `icv1-fp21-tm700-d62ba3a6`
+and `icv1-fp21-tm700-07d957b2`; the old labels are not curve-equivalence
+aliases. Neither removed record had an EC1 representation. Both remain
+available at the pinned historical revision and in the inventory.
+The transition is not append-only.
 
 The [first inventory](catalog-transition-20261020.json) is retained.
 Version 2 adds the distinction between EC1 representations and

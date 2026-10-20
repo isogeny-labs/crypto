@@ -1,5 +1,11 @@
 # Prepared index updates awaiting Conductor scope release
 
+**Resolved, 2026-10-20 15:43 UTC:** the owner explicitly approved the two
+benchmark rows. The scope was also available at the fresh check and was
+reserved under T-4563. Both rows below are now applied to
+`benchmarks/README.md`; the earlier problem-index edit remains in place.
+This coordination gate is closed. The historical observations follow.
+
 As of 2026-10-20 06:56 UTC, Conductor blocks these two index edits:
 
 - `benchmarks/README.md`: task **T-4450**, “Review and qualify crypto PR 2281”.
