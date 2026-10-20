@@ -1,0 +1,103 @@
+{
+  "schema": "spot.public-recovery-validation/v1",
+  "operational_identifiers": "omitted; retained privately",
+  "linux_infrastructure_tests": {
+    "passed": 111,
+    "failed": 0,
+    "seconds": 15.195
+  },
+  "unchanged_source_library_revision": "c687cda18f2a0b14255d3f8e14b6d938ee15f3e4",
+  "library_serial_tests": {
+    "passed": 4399,
+    "failed": 0,
+    "ignored": 118,
+    "seconds": 659.43
+  },
+  "initial_parallel_library_failure": {
+    "test": "cryptanalysis::koblitz_groebner::tests::support_local_timers_preserve_rows_and_count_delegation",
+    "expected_calls": 1,
+    "observed_calls": 2,
+    "disposition": "full serial suite passed; shared process-global counters"
+  },
+  "isolated_codex_restore": {
+    "sqlite_integrity_checks_passed": 5,
+    "packaged_executable_started": true,
+    "saved_chat_read": true,
+    "turns_started": 0,
+    "authentication_present": false,
+    "validation_processes_remaining": 0
+  },
+  "experiment_checkpoint": {
+    "full_download_hash_verified": true,
+    "manifest_validated": true,
+    "process_restored": false
+  },
+  "prepared_runtime": {
+    "full_download_hash_verified_with_worker_role": true,
+    "deployed": true
+  },
+  "acceptance": {
+    "ownership_handoff": "passed",
+    "authenticated_agent_migration": "passed",
+    "combined_live_replacement_drill": "passed"
+  },
+  "source_comparison": "All 32 Python files match the Linux-validated source; detailed operational receipts remain private.",
+  "live_handoff": {
+    "workspace_final_batches": 70136,
+    "workspace_copy_errors": 0,
+    "coordination_tasks_preserved": 18,
+    "authenticated_coordination_client": true,
+    "codex_loaded_saved_chats": 11,
+    "codex_previously_active_parents_continued": 3,
+    "empty_unpersisted_idle_tabs_reported": 4,
+    "codex_model_and_tool_progress": true,
+    "authenticated_snapshot_all_hashes_verified": true,
+    "diem_completed_records_preserved": 46,
+    "diem_expected_records": 52,
+    "diem_single_producer_cpu_progress": true,
+    "stable_endpoint_moved": true,
+    "research_namespace_job_access": true,
+    "research_namespace_role_creation_denied": true
+  },
+  "real_spot_replacement": {
+    "aws_fis_action": "aws:ec2:send-spot-instance-interruptions",
+    "actual_spot_status": "instance-terminated-by-experiment",
+    "replacement_from_pinned_launch_template": true,
+    "manual_successor_service_starts": 0,
+    "capacity_gap": "compatible Spot capacity unavailable for approximately five minutes; automatic retries succeeded",
+    "durable_home_identity_verified": true,
+    "coordination_tasks_preserved": 18,
+    "authenticated_coordination_client": true,
+    "single_diem_producer_cpu_ticks": [
+      11208,
+      64021
+    ],
+    "diem_records_before_and_after": [
+      46,
+      46
+    ],
+    "original_diem_deadline_preserved": true,
+    "codex_saved_chats_loaded": 11,
+    "all_three_interrupted_parents_produced_new_model_or_tool_events": true,
+    "one_resumed_turn_completed": true,
+    "new_authenticated_snapshot_files": 944,
+    "new_authenticated_snapshot_all_hashes_verified": true,
+    "new_snapshot_age_seconds_at_verification": 20.54,
+    "snapshot_prune_errors": 0,
+    "codex_diem_node_service_restart_counts": [
+      0,
+      0,
+      0
+    ],
+    "stable_endpoint_automatically_moved": true,
+    "research_cluster_access_verified": true,
+    "cloud_init_errors": []
+  },
+  "limitations": [
+    "Compatible Spot capacity can delay recovery.",
+    "Diem recomputes an interrupted unfinished instance while retaining completed receipts and its original deadline.",
+    "Online Codex recovery is limited to the latest committed generation and reconciles external effects; snapshots are not atomic across all files or live tools.",
+    "Snapshot interval is 60 seconds after each snapshot finishes; total recovery point interval includes snapshot duration.",
+    "Automatic idle shutdown of an enrolled Codex daemon is not established."
+  ]
+}
