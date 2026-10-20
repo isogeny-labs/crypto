@@ -44,6 +44,7 @@
 #   GH_APP_PRIVATE_KEY_FILE             a path to it); tokens are minted per use
 #   GH_SERVICE_TOKEN                    otherwise: a machine-user token (PAT)
 #   GH_SERVICE_HOST                     host the credential is for (github.com)
+#   GH_SERVICE_API                      tests only: a loopback stand-in for its API
 #
 # .claude/hooks/session-start.sh runs this in cloud sessions (docs/CONDUCTOR.md).
 set -uo pipefail   # no -e: one failed component warns and the rest still run
@@ -406,7 +407,21 @@ write_gh_app_token_helper() {
 #   gh-app-token gh-login   (re)log gh in with a fresh token
 set -euo pipefail
 set +x
-api="${GH_SERVICE_API:-https://api.github.com}"
+host="${GH_SERVICE_HOST:-github.com}"
+case "$host" in
+  github.com) trusted="https://api.github.com" ;;
+  *[!A-Za-z0-9.-]*|'') echo "gh-app-token: invalid GH_SERVICE_HOST" >&2; exit 1 ;;
+  *) trusted="https://$host/api/v3" ;;
+esac
+# The signed App JWT goes to this URL, so an override may only name the
+# service host's own API or a loopback server (tests), never anywhere else.
+api="${GH_SERVICE_API:-$trusted}"
+api="${api%/}"
+if [ "$api" != "$trusted" ] \
+    && ! [[ "$api" =~ ^http://(127\.0\.0\.1|localhost|\[::1\])(:[0-9]{1,5})?$ ]]; then
+  echo "gh-app-token: GH_SERVICE_API must be $trusted or a loopback URL" >&2
+  exit 1
+fi
 cache="${XDG_CACHE_HOME:-$HOME/.cache}/gh-app-token"
 umask 077
 

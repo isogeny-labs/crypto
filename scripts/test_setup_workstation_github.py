@@ -185,6 +185,17 @@ class GithubStepTests(unittest.TestCase):
                                 env=env, capture_output=True, text=True)
         self.assertEqual(config.stdout, "")
 
+    def test_untrusted_api_endpoint_never_receives_the_jwt(self):
+        for url in ("https://attacker.example", "http://127.0.0.1.attacker.example",
+                    "https://api.github.com.attacker.example", "http://localhost:80/x"):
+            with self.subTest(url=url):
+                env = dict(self.app_env("111", "10", self.api_a), GH_SERVICE_API=url)
+                result = self.setup(env)
+                self.assertIn("GH_SERVICE_API must be https://api.github.com",
+                              result.stdout + result.stderr)
+                self.assertNotEqual(self.helper(env).returncode, 0)
+        self.assertEqual(self.api_a.requests, 0)
+
     def test_service_token_is_scoped_to_its_host(self):
         env = dict(self.env, GH_SERVICE_TOKEN="ghp_TESTSERVICETOKEN")
         self.assertEqual(self.setup(env).returncode, 0)
