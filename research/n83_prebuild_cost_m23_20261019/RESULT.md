@@ -65,10 +65,9 @@ The opt-in XOR-row cache has passed directed backjump/matrix tests,
 suite (4,403 passed), and four actual N83 controls with independent replay
 and identical off/on model/row digests. The
 [control and launch-history report](reports/run-xor-cache-controls-20261020/RUN_REPORT.md)
-retains a missing-image launch and a fixed shell-label failure. The
-[corrected sixteen-attempt card](xor-cache-v2/STATUS.md) was running at
-01:24:11 UTC on 2026-10-20, with two capped natural attempts complete.
-Its comparison is still pending; the default solver remains cache-off.
+retains a missing-image launch and a fixed shell-label failure. The [corrected sixteen-attempt card](reports/run-20261020T0116Z/RUN_REPORT.md) completed at 02:00:10 UTC on 2026-10-20. All 16 natural attempts reached 10,000 conflicts with `UNKNOWN_search_cap`; in each of four cells, cache-off and cache-on settings match on decisions, conflicts, restarts, XOR passes, row operations, and row scans. Cache-on repivot visits plus cached skips equal the cache-off repivot count. The [full receipts](runs/xor-cache-v2-final.tar.xz) and [updated execution status](xor-cache-v2/STATUS.md) are retained. This is a work-counter result, not a timing claim; natural rank and complete IC cost remain unresolved, and the default solver remains cache-off.
+
+The new study-local [work-counter graph](reports/run-20261020T0116Z/work-counters.svg) records this cache diagnostic. Canonical IC charts, performance history, and `benchmarks/README.md` are unchanged because no natural relation/rank was returned and no wall-time/speedup claim is admitted. The report records the scope and the blocked PDF renderer.
 
 Accounting clarification: the m=4 `process_wall_ms` field is elapsed time
 inside the worker before final receipt serialization. Container start/end
