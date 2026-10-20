@@ -333,6 +333,21 @@ regenerates every degree-eight polynomial and checks the archived verdicts.
 No odd torsion or odd-kernel exit was tested on these inputs. The held-out
 coverage question remains open with the quotient/map work above.
 
+An exact [rational-root and model-conversion gate](correctness/smith-odd-model-gate-v1.json)
+finds 15 of the 20 frozen curves have a rational branch point. For each
+such curve it constructs a monic degree-seven one-infinity equation using
+`z=1/(f'(r)(x-r))` and `w=z^4 y`, checks the root and derivative, and checks
+the polynomial identity at six nonzero coordinates. A second
+[native arithmetic gate](correctness/smith-odd-model-native-gate-v1.json)
+maps one independently selected rational point on each of those 15 curves,
+validates its divisor with the checked Jacobian CLI, and verifies
+`[3]D+[5]D=[8]D` and `[p]D+D=[p+1]D`. It also checks all 12 rational images of old infinity
+points and rejects 15 deliberately corrupted point classes. Five curves
+have no rational branch point and still
+require a two-infinity or extension-field adapter. These 15 arithmetic
+checks do not test 3- or 5-torsion: the requested odd-kernel screen,
+quotient, mapped holdout DLP and cost comparison all remain unexecuted.
+
 ## Mixed-fiber PKM systems
 
 The [small oracle protocol](protocols/mixed-fiber-oracle-v1.md) freezes three

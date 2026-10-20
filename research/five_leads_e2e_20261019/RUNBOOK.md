@@ -24,6 +24,17 @@ before odd-kernel testing. Its source revision and compressed-file SHA-256
 are embedded in
 [`smith-negative-holdout-v1.json`](fixtures/smith-negative-holdout-v1.json).
 
+The rational-root adapter for the exact 20 materialized polynomials is:
+
+```sh
+python3 research/five_leads_e2e_20261019/smith_odd_model_gate.py > research/five_leads_e2e_20261019/correctness/smith-odd-model-gate-v1.json
+python3 research/five_leads_e2e_20261019/smith_odd_model_native_gate.py > research/five_leads_e2e_20261019/correctness/smith-odd-model-native-gate-v1.json
+```
+
+The first command supplies one-infinity equations on 15 curves. The second
+validates a mapped point, `[3]D+[5]D=[8]D` and `[p]D+D=[p+1]D` with the checked native CLI
+on each. Neither performs an odd-kernel screen or isogeny construction.
+
 The Tian source-map coefficient fixture is reproducibly extracted from the
 original [arXiv v1 source](https://arxiv.org/abs/2012.07173v1). The extractor
 rejects a TeX SHA-256 mismatch; its six function arrays and the denominator
