@@ -23,6 +23,7 @@ jobs:
       - name: Build from the frozen dependency lock
         run: |
           cp research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh
           cargo build --release --locked --example koblitz_stage21_independent_replay
       - name: Verify and independently replay all pairs
         run: |
