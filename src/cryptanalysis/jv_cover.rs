@@ -1300,6 +1300,9 @@ pub struct ZeroDimStats {
     pub timed_out: bool,
     /// A root of the minimal polynomial whose eigenspace was not a line.
     pub nonseparating: usize,
+    /// The sparse linear stage gave up (minimal polynomial of `x_n` short of
+    /// `delta`, or an eigen-system not of corank one) and the dense path ran.
+    pub lin_fallback: usize,
     pub f4_ms: f64,
     /// Wall time of everything after F4 in the solver.
     pub lin_ms: f64,
@@ -1359,6 +1362,19 @@ pub fn solve_zero_dim_traced(
     opts: &F4Options,
     rng: &mut StdRng,
     trace: bool,
+) -> (Vec<Vec<u64>>, ZeroDimStats) {
+    solve_zero_dim_mode(input, n, p, opts, rng, trace, lin_mode())
+}
+
+/// [`solve_zero_dim_traced`] with the linear stage chosen explicitly.
+pub fn solve_zero_dim_mode(
+    input: &[f4_fp::Poly],
+    n: usize,
+    p: u64,
+    opts: &F4Options,
+    rng: &mut StdRng,
+    trace: bool,
+    mode: LinMode,
 ) -> (Vec<Vec<u64>>, ZeroDimStats) {
     let mut st = ZeroDimStats::default();
     let r = if !trace {
@@ -1554,93 +1570,292 @@ pub fn solve_zero_dim_traced(
         memo.insert(m, acc.clone());
         Some(acc)
     }
-    // multiplication matrices: column j of M_i is NF(x_i · b_j)
-    let mut mats: Vec<Vec<Vec<u64>>> = Vec::with_capacity(n);
-    for i in 0..n {
-        let mut mi = vec![vec![0u64; delta]; delta];
-        for (j, b) in std_mons.iter().enumerate() {
-            let xb = pack(b) + (1u64 << (8 * i));
-            let Some(col) = nf_mono(xb, delta, p, &index, &bas, &divides_p, &mut memo, &mut cnt)
-            else {
-                st.incomplete = true;
-                return (Vec::new(), st);
-            };
-            for (k, &c) in col.iter().enumerate() {
-                mi[k][j] = c;
-            }
-        }
-        mats.push(mi);
-    }
-    // A random linear form `ℓ = Σ c_i x_i` and the characteristic polynomial of
-    // its matrix (exact, by Hessenberg reduction: a Krylov minimal polynomial
-    // of one random vector misses a root with probability `1/p` per root).  If
-    // some root's eigenspace is not a line, `ℓ` does not separate the points
-    // and a new form is drawn.
+    // ── The linear stage ──
+    // Dense (reference): all n multiplication matrices, the characteristic
+    // polynomial of a random linear form, a 64x64 null space per root.
+    // Sparse (default): only M_{x_n}, whose unit columns are shifts; its
+    // minimal polynomial by Wiedemann + Berlekamp–Massey (degree delta means
+    // it is the characteristic polynomial and x_n separates the points), and
+    // each eigenvector from the shift chains and the dense columns alone.
+    // `L1a`: the same chain recovery with the dense Hessenberg charpoly of M_{x_n}.
     let ring = PolyRing::new(p);
+    let mut lrng = StdRng::seed_from_u64(rng.gen());
     let mut sols: Vec<Vec<u64>> = Vec::new();
-    for _attempt in 0..16 {
-        let coef: Vec<u64> = (0..n).map(|_| rng.gen_range(1..p)).collect();
-        let mut m = vec![vec![0u64; delta]; delta];
-        for i in 0..n {
-            for a in 0..delta {
-                for b in 0..delta {
-                    m[a][b] = am(m[a][b], mm(coef[i], mats[i][a][b], p), p);
+    let mut fast: Option<Vec<Vec<u64>>> = None;
+    if mode != LinMode::Dense && n >= 2 {
+        'fast: {
+            let xn = n - 1;
+            let unit = 1u64 << (8 * xn);
+            // column j of M_xn: a shift target, or the dense normal form (sparse list)
+            let mut target: Vec<Option<usize>> = Vec::with_capacity(delta);
+            let mut nz: Vec<Vec<(usize, u64)>> = Vec::with_capacity(delta);
+            for b in &std_mons {
+                let xb = pack(b) + unit;
+                if let Some(&k) = index.get(&xb) {
+                    target.push(Some(k));
+                    nz.push(Vec::new());
+                    continue;
+                }
+                let Some(col) =
+                    nf_mono(xb, delta, p, &index, &bas, &divides_p, &mut memo, &mut cnt)
+                else {
+                    st.incomplete = true;
+                    return (Vec::new(), st);
+                };
+                target.push(None);
+                nz.push(
+                    col.iter()
+                        .enumerate()
+                        .filter(|(_, &c)| c != 0)
+                        .map(|(k, &c)| (k, c))
+                        .collect(),
+                );
+            }
+            // the chains x_n^e * root and the coordinates
+            let mut chain_of = vec![0usize; delta];
+            let mut e_of = vec![0usize; delta];
+            let mut roots_map: crate::cryptanalysis::fx_hash::FxMap<u64, usize> =
+                Default::default();
+            let mut chain_end: Vec<usize> = Vec::new();
+            for (j, b) in std_mons.iter().enumerate() {
+                let e = b[xn] as usize;
+                let root = pack(b) - (e as u64) * unit;
+                let nc = roots_map.len();
+                let c = *roots_map.entry(root).or_insert(nc);
+                if c == chain_end.len() {
+                    chain_end.push(j);
+                }
+                chain_of[j] = c;
+                e_of[j] = e;
+                if e > e_of[chain_end[c]] {
+                    chain_end[c] = j;
                 }
             }
+            let nchain = chain_end.len();
+            if chain_end.iter().any(|&j| target[j].is_some()) {
+                break 'fast;
+            }
+            let mut coord_idx: Vec<usize> = Vec::with_capacity(n - 1);
+            for i in 0..xn {
+                let Some(&k) = index.get(&(1u64 << (8 * i))) else {
+                    break 'fast;
+                };
+                coord_idx.push(k);
+            }
+            let Some(&one_idx) = index.get(&0u64) else {
+                break 'fast;
+            };
+            // minimal polynomial of M_xn
+            let minpoly: Vec<u64> = if mode == LinMode::L1a {
+                let mut d = vec![vec![0u64; delta]; delta];
+                for j in 0..delta {
+                    match target[j] {
+                        Some(k) => d[k][j] = 1,
+                        None => {
+                            for &(k, c) in &nz[j] {
+                                d[k][j] = c;
+                            }
+                        }
+                    }
+                }
+                charpoly_mod_p(&d, p, &mut cnt)
+            } else {
+                let matvec = |v: &[u64], cnt: &mut u64| -> Vec<u64> {
+                    let mut y = vec![0u64; delta];
+                    for j in 0..delta {
+                        let vj = v[j];
+                        if vj == 0 {
+                            continue;
+                        }
+                        match target[j] {
+                            Some(k) => y[k] = am(y[k], vj, p),
+                            None => {
+                                for &(k, c) in &nz[j] {
+                                    y[k] = am(y[k], mm(c, vj, p), p);
+                                }
+                                *cnt += nz[j].len() as u64;
+                            }
+                        }
+                    }
+                    y
+                };
+                let mut found: Option<Vec<u64>> = None;
+                for _try in 0..4 {
+                    let u: Vec<u64> = (0..delta).map(|_| lrng.gen_range(0..p)).collect();
+                    let mut v: Vec<u64> = (0..delta).map(|_| lrng.gen_range(0..p)).collect();
+                    let mut seq = Vec::with_capacity(2 * delta);
+                    for i in 0..2 * delta {
+                        let mut acc = 0u64;
+                        for k in 0..delta {
+                            acc = am(acc, mm(u[k], v[k], p), p);
+                        }
+                        cnt += delta as u64;
+                        seq.push(acc);
+                        if i + 1 < 2 * delta {
+                            v = matvec(&v, &mut cnt);
+                        }
+                    }
+                    let f = berlekamp_massey_minpoly(&seq, p, &mut cnt);
+                    if f.len() == delta + 1 {
+                        found = Some(f);
+                        break;
+                    }
+                }
+                match found {
+                    Some(f) => f,
+                    None => break 'fast,
+                }
+            };
+            if minpoly.len() != delta + 1 {
+                break 'fast;
+            }
+            let roots = ring.roots(&UPoly(minpoly), &mut lrng);
+            let maxe = *e_of.iter().max().unwrap();
+            let mut round: Vec<Vec<u64>> = Vec::new();
+            for rt in roots {
+                let mut rpow = vec![1u64; maxe + 2];
+                for e in 1..maxe + 2 {
+                    rpow[e] = mm(rpow[e - 1], rt, p);
+                }
+                cnt += (maxe + 1) as u64;
+                let mut a = vec![vec![0u64; nchain]; nchain];
+                for c in 0..nchain {
+                    let je = chain_end[c];
+                    for &(k, val) in &nz[je] {
+                        let ck = chain_of[k];
+                        let t = if e_of[k] == 0 {
+                            val
+                        } else {
+                            cnt += 1;
+                            mm(val, rpow[e_of[k]], p)
+                        };
+                        a[c][ck] = am(a[c][ck], t, p);
+                    }
+                    a[c][c] = sm(a[c][c], rpow[e_of[je] + 1], p);
+                }
+                let mut mc = 0u64;
+                let piv = rref_mod_p_local(&mut a, p, &mut mc);
+                cnt += mc;
+                if piv.len() + 1 != nchain {
+                    break 'fast;
+                }
+                let free = (0..nchain).find(|c| !piv.contains(c)).unwrap();
+                let mut z = vec![0u64; nchain];
+                z[free] = 1;
+                for (ri, &pc) in piv.iter().enumerate() {
+                    z[pc] = (p - a[ri][free]) % p;
+                }
+                let w1 = z[chain_of[one_idx]];
+                if w1 == 0 {
+                    break 'fast;
+                }
+                let wi = inv_mod(w1, p);
+                let mut sol = vec![0u64; n];
+                for i in 0..xn {
+                    sol[i] = mm(z[chain_of[coord_idx[i]]], wi, p);
+                }
+                sol[xn] = rt;
+                cnt += n as u64;
+                if input.iter().all(|f| f4_fp::eval(f, &sol, p) == 0) {
+                    round.push(sol);
+                }
+            }
+            fast = Some(round);
         }
-        cnt += (n * delta * delta) as u64;
-        let cp = charpoly_mod_p(&m, p, &mut cnt);
-        let roots = ring.roots(&UPoly(cp), rng);
-        let mut round: Vec<Vec<u64>> = Vec::new();
-        let mut clean = true;
-        for rt in roots {
-            // null space of Mᵀ − rt·I
-            let mut a: Vec<Vec<u64>> = (0..delta)
-                .map(|i| {
-                    (0..delta)
-                        .map(|j| if i == j { sm(m[j][i], rt, p) } else { m[j][i] })
-                        .collect()
-                })
-                .collect();
-            let mut mc = 0u64;
-            let piv = rref_mod_p_local(&mut a, p, &mut mc);
-            cnt += mc;
-            if piv.len() + 1 != delta {
-                clean = false;
+        if fast.is_none() {
+            st.lin_fallback += 1;
+        }
+    }
+    if let Some(s) = fast {
+        sols = s;
+    } else {
+        // multiplication matrices: column j of M_i is NF(x_i · b_j)
+        let mut mats: Vec<Vec<Vec<u64>>> = Vec::with_capacity(n);
+        for i in 0..n {
+            let mut mi = vec![vec![0u64; delta]; delta];
+            for (j, b) in std_mons.iter().enumerate() {
+                let xb = pack(b) + (1u64 << (8 * i));
+                let Some(col) =
+                    nf_mono(xb, delta, p, &index, &bas, &divides_p, &mut memo, &mut cnt)
+                else {
+                    st.incomplete = true;
+                    return (Vec::new(), st);
+                };
+                for (k, &c) in col.iter().enumerate() {
+                    mi[k][j] = c;
+                }
+            }
+            mats.push(mi);
+        }
+        // A random linear form `ℓ = Σ c_i x_i` and the characteristic polynomial of
+        // its matrix (exact, by Hessenberg reduction: a Krylov minimal polynomial
+        // of one random vector misses a root with probability `1/p` per root).  If
+        // some root's eigenspace is not a line, `ℓ` does not separate the points
+        // and a new form is drawn.
+        for _attempt in 0..16 {
+            let coef: Vec<u64> = (0..n).map(|_| lrng.gen_range(1..p)).collect();
+            let mut m = vec![vec![0u64; delta]; delta];
+            for i in 0..n {
+                for a in 0..delta {
+                    for b in 0..delta {
+                        m[a][b] = am(m[a][b], mm(coef[i], mats[i][a][b], p), p);
+                    }
+                }
+            }
+            cnt += (n * delta * delta) as u64;
+            let cp = charpoly_mod_p(&m, p, &mut cnt);
+            let roots = ring.roots(&UPoly(cp), &mut lrng);
+            let mut round: Vec<Vec<u64>> = Vec::new();
+            let mut clean = true;
+            for rt in roots {
+                // null space of Mᵀ − rt·I
+                let mut a: Vec<Vec<u64>> = (0..delta)
+                    .map(|i| {
+                        (0..delta)
+                            .map(|j| if i == j { sm(m[j][i], rt, p) } else { m[j][i] })
+                            .collect()
+                    })
+                    .collect();
+                let mut mc = 0u64;
+                let piv = rref_mod_p_local(&mut a, p, &mut mc);
+                cnt += mc;
+                if piv.len() + 1 != delta {
+                    clean = false;
+                    break;
+                }
+                let free = (0..delta).find(|c| !piv.contains(c)).unwrap();
+                let mut w = vec![0u64; delta];
+                w[free] = 1;
+                for (ri, &pc) in piv.iter().enumerate() {
+                    w[pc] = (p - a[ri][free]) % p;
+                }
+                let Some(kk) = w.iter().position(|&x| x != 0) else {
+                    continue;
+                };
+                let wi = inv_mod(w[kk], p);
+                let mut sol = vec![0u64; n];
+                for i in 0..n {
+                    // (M_iᵀ w)_kk = Σ_a M_i[a][kk] w_a
+                    let mut acc = 0u64;
+                    for aa in 0..delta {
+                        acc = am(acc, mm(mats[i][aa][kk], w[aa], p), p);
+                    }
+                    sol[i] = mm(acc, wi, p);
+                }
+                cnt += (n * (delta + 1)) as u64;
+                // a genuine solution of the input
+                if input.iter().all(|f| f4_fp::eval(f, &sol, p) == 0) {
+                    round.push(sol);
+                }
+            }
+            if clean {
+                sols = round;
                 break;
             }
-            let free = (0..delta).find(|c| !piv.contains(c)).unwrap();
-            let mut w = vec![0u64; delta];
-            w[free] = 1;
-            for (ri, &pc) in piv.iter().enumerate() {
-                w[pc] = (p - a[ri][free]) % p;
+            st.nonseparating += 1;
+            if _attempt == 15 {
+                st.incomplete = true;
             }
-            let Some(kk) = w.iter().position(|&x| x != 0) else {
-                continue;
-            };
-            let wi = inv_mod(w[kk], p);
-            let mut sol = vec![0u64; n];
-            for i in 0..n {
-                // (M_iᵀ w)_kk = Σ_a M_i[a][kk] w_a
-                let mut acc = 0u64;
-                for aa in 0..delta {
-                    acc = am(acc, mm(mats[i][aa][kk], w[aa], p), p);
-                }
-                sol[i] = mm(acc, wi, p);
-            }
-            cnt += (n * (delta + 1)) as u64;
-            // a genuine solution of the input
-            if input.iter().all(|f| f4_fp::eval(f, &sol, p) == 0) {
-                round.push(sol);
-            }
-        }
-        if clean {
-            sols = round;
-            break;
-        }
-        st.nonseparating += 1;
-        if _attempt == 15 {
-            st.incomplete = true;
         }
     }
     cnt += ring.muls.get();
@@ -1649,6 +1864,75 @@ pub fn solve_zero_dim_traced(
     st.lin_muls = cnt;
     st.lin_ms = t_lin.elapsed().as_secs_f64() * 1e3;
     (sols, st)
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum LinMode {
+    Dense,
+    Sparse,
+    L1a,
+}
+
+/// `JV_LIN=dense|l1a|sparse` (default sparse), read once.
+fn lin_mode() -> LinMode {
+    static MODE: OnceLock<LinMode> = OnceLock::new();
+    *MODE.get_or_init(|| match std::env::var("JV_LIN").as_deref() {
+        Ok("dense") => LinMode::Dense,
+        Ok("l1a") => LinMode::L1a,
+        _ => LinMode::Sparse,
+    })
+}
+
+pub fn lin_mode_name() -> &'static str {
+    match lin_mode() {
+        LinMode::Dense => "dense",
+        LinMode::L1a => "l1a",
+        LinMode::Sparse => "sparse",
+    }
+}
+
+/// Minimal polynomial (monic, low to high, degree = linear complexity `L`) of
+/// a sequence by Berlekamp–Massey; multiplications counted into `cnt`.  The
+/// result is the generator of the whole sequence when `2L <= seq.len()`.
+pub fn berlekamp_massey_minpoly(seq: &[u64], p: u64, cnt: &mut u64) -> Vec<u64> {
+    let mut c: Vec<u64> = vec![1];
+    let mut b: Vec<u64> = vec![1];
+    let mut l = 0usize;
+    let mut m = 1usize;
+    let mut bd = 1u64;
+    for n in 0..seq.len() {
+        let mut d = seq[n];
+        for i in 1..=l.min(c.len() - 1) {
+            d = am(d, mm(c[i], seq[n - i], p), p);
+        }
+        *cnt += l as u64;
+        if d == 0 {
+            m += 1;
+            continue;
+        }
+        let coef = mm(d, inv_mod(bd, p), p);
+        *cnt += 1;
+        let t = c.clone();
+        if c.len() < b.len() + m {
+            c.resize(b.len() + m, 0);
+        }
+        for (i, &bi) in b.iter().enumerate() {
+            c[i + m] = sm(c[i + m], mm(coef, bi, p), p);
+        }
+        *cnt += b.len() as u64;
+        if 2 * l <= n {
+            l = n + 1 - l;
+            b = t;
+            bd = d;
+            m = 1;
+        } else {
+            m += 1;
+        }
+    }
+    c.resize(l + 1, 0);
+    // x^L C(1/x)
+    c.reverse();
+    c
 }
 
 /// Characteristic polynomial (monic, coefficients low to high) of a square
@@ -1936,6 +2220,7 @@ pub struct NagaoCost {
     pub timed_out: bool,
     pub degenerate: bool,
     pub nonseparating: usize,
+    pub lin_fallback: usize,
     pub stopped_at: Option<usize>,
     pub replayed: bool,
     pub trace_mismatch: bool,
@@ -2014,6 +2299,7 @@ pub fn nagao_decompose(
     cost.incomplete = st.incomplete;
     cost.timed_out = st.timed_out;
     cost.nonseparating = st.nonseparating;
+    cost.lin_fallback = st.lin_fallback;
     cost.stopped_at = st.stopped_at;
     cost.replayed = st.replayed;
     cost.trace_mismatch = st.trace_mismatch;
@@ -2485,6 +2771,7 @@ pub struct CcovReport {
     pub incomplete: usize,
     pub timed_out: usize,
     pub nonseparating: usize,
+    pub lin_fallback: usize,
     pub c_cov: CostStatsC,
     pub weil_muls: CostStatsC,
     pub f4_muls: CostStatsC,
@@ -2623,6 +2910,7 @@ pub fn run_cover_ccov(
             rep.timed_out += 1;
         }
         rep.nonseparating += cost.nonseparating;
+        rep.lin_fallback += cost.lin_fallback;
         if cost.stopped_at.is_some() {
             rep.stopped += 1;
         }
@@ -3264,6 +3552,89 @@ mod tests {
         assert_eq!(found_planted, 6);
     }
 
+    /// The sparse and L1a linear stages return exactly the dense stage's
+    /// solution set, on random 4- and 5-variable quadric systems (some with a
+    /// planted point, some with several), and never lose the planted point.
+    #[test]
+    fn sparse_linear_stage_agrees_with_dense() {
+        let mut rng = StdRng::seed_from_u64(77);
+        let opts = jv_options(24, 120.0);
+        let (mut used_fast, mut total) = (0usize, 0usize);
+        for &p in &[53u64, 101] {
+            for &n in &[4usize, 5, 6] {
+                for trial in 0..8 {
+                    let planted: Vec<Vec<u64>> = (0..1 + trial % 3)
+                        .map(|_| (0..n).map(|_| rng.gen_range(0..p)).collect())
+                        .collect();
+                    let mut sys: Vec<f4_fp::Poly> = Vec::new();
+                    for _ in 0..n {
+                        // random quadric, then forced through the planted points
+                        // by a random combination (one point: shift the constant)
+                        let mut terms: Vec<(Vec<u32>, u64)> = Vec::new();
+                        for a in 0..n {
+                            for b in a..n {
+                                let mut e = vec![0u32; n];
+                                e[a] += 1;
+                                e[b] += 1;
+                                terms.push((e, rng.gen_range(0..p)));
+                            }
+                        }
+                        for a in 0..n {
+                            let mut e = vec![0u32; n];
+                            e[a] = 1;
+                            terms.push((e, rng.gen_range(0..p)));
+                        }
+                        let f0 = f4_fp::normalise(&terms, p, F4Ordering::Grevlex);
+                        if planted.len() == 1 {
+                            let v = f4_fp::eval(&f0, &planted[0], p);
+                            terms = f0.clone();
+                            terms.push((vec![0u32; n], (p - v) % p));
+                            sys.push(f4_fp::normalise(&terms, p, F4Ordering::Grevlex));
+                        } else {
+                            sys.push(f0);
+                        }
+                    }
+                    let mut outs = Vec::new();
+                    for mode in [LinMode::Dense, LinMode::Sparse, LinMode::L1a] {
+                        let mut r = StdRng::seed_from_u64(5 + trial as u64);
+                        let (sols, st) =
+                            solve_zero_dim_mode(&sys, n, p, &opts, &mut r, false, mode);
+                        assert!(!st.incomplete, "p={p} n={n} trial={trial} {mode:?}");
+                        if mode == LinMode::Sparse {
+                            total += 1;
+                            used_fast += (st.lin_fallback == 0) as usize;
+                        }
+                        outs.push((sols, st.lin_muls));
+                    }
+                    assert_eq!(outs[0].0, outs[1].0, "sparse p={p} n={n} trial={trial}");
+                    assert_eq!(outs[0].0, outs[2].0, "l1a p={p} n={n} trial={trial}");
+                    if planted.len() == 1 {
+                        assert!(outs[1].0.contains(&planted[0]), "planted lost p={p} n={n}");
+                    }
+                }
+            }
+        }
+        // the sparse path must actually be the one exercised
+        assert!(
+            used_fast * 10 >= total * 8,
+            "fast path used {used_fast}/{total}"
+        );
+    }
+
+    #[test]
+    fn berlekamp_massey_recovers_a_linear_recurrence() {
+        let p = 101u64;
+        // s_{i+3} = 2 s_{i+2} + 5 s_{i+1} + 7 s_i
+        let mut s = vec![3u64, 9, 4];
+        for i in 0..20 {
+            let v = (2 * s[i + 2] + 5 * s[i + 1] + 7 * s[i]) % p;
+            s.push(v);
+        }
+        let mut cnt = 0;
+        let f = berlekamp_massey_minpoly(&s, p, &mut cnt);
+        assert_eq!(f, vec![p - 7, p - 5, p - 2, 1]);
+    }
+
     #[test]
     fn charpoly_satisfies_cayley_hamilton_and_has_the_right_roots() {
         let mut rng = StdRng::seed_from_u64(31);
@@ -3384,7 +3755,9 @@ mod tests {
             assert_eq!(fa, oracle, "full solver vs oracle, residual {k}");
             assert_eq!(fb, oracle, "stopped solver vs oracle, residual {k}");
             assert!(fb.iter().all(|d| verify_dec(&jac, &base, &r, d)));
-            if cb.stopped_at == Some(64) {
+            // at most the Bézout bound: a system with a solution at infinity
+            // has ideal degree below 64 and stops at its own staircase
+            if matches!(cb.stopped_at, Some(s) if s <= 64) {
                 stopped += 1;
             }
             // "no dearer" by the F4 degree and matrix, which are per-run
@@ -3399,7 +3772,10 @@ mod tests {
             }
         }
         assert!(n >= 25, "{n}");
-        assert_eq!(stopped, n, "every system stops at the Bézout staircase");
+        assert_eq!(
+            stopped, n,
+            "every system stops at or below the Bézout staircase"
+        );
         assert_eq!(
             cheaper, n,
             "no stopped run ends at a higher degree or with a larger matrix"
@@ -3443,7 +3819,11 @@ mod tests {
             assert_eq!(fa, oracle, "stopped solver vs oracle, residual {k}");
             assert_eq!(fb, oracle, "replayed solver vs oracle, residual {k}");
             assert!(fb.iter().all(|d| verify_dec(&jac, &base, &r, d)));
-            assert_eq!(cb.stopped_at, Some(64));
+            assert!(
+                matches!(cb.stopped_at, Some(s) if s <= 64),
+                "{:?}",
+                cb.stopped_at
+            );
             if cb.replayed {
                 replayed += 1;
                 // the replay keeps only the rows that produced a pivot, so its
