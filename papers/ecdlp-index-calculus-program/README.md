@@ -1,6 +1,6 @@
 # Index Calculus for the Elliptic-Curve Discrete Logarithm, Measured
 
-`ic_program.tex` (built: [`ic_program.pdf`](ic_program.pdf), 21 pages) is the
+`ic_program.tex` (built: [`ic_program.pdf`](ic_program.pdf), 29 pages) is the
 programme record of the repository's ECDLP index-calculus work from
 2026-07-01 to 2026-10-14: the routes pursued, the measurement infrastructure
 (ecbench, the boundary ledger, claim hygiene), what improved and on which
