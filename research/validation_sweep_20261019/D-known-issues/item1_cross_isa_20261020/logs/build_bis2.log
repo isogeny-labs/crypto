@@ -1,0 +1,53 @@
+   Compiling crypto v0.1.0 (/dev/shm/x/src2245)
+warning: unused import: `ToPrimitive`
+  --> src/cryptanalysis/curve_traits/mod.rs:50:31
+   |
+50 | use num_traits::{One, Signed, ToPrimitive, Zero};
+   |                               ^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+    --> src/cryptanalysis/ic_boundary.rs:1419:13
+     |
+1419 |         let mut consider = |pt: PrimePoint, mu: u64, best: &mut PrimePoint, best_key: &mut u64, best_mu: &mut u64| {
+     |             ----^^^^^^^^
+     |             |
+     |             help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `trace_on` is never used
+    --> src/cryptanalysis/koblitz_groebner.rs:9351:4
+     |
+9351 | fn trace_on() -> bool {
+     |    ^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `trace_cost` is never used
+    --> src/cryptanalysis/koblitz_groebner.rs:9357:4
+     |
+9357 | fn trace_cost(w0: Option<u64>, refuted: bool) {
+     |    ^^^^^^^^^^
+
+warning: function `trace` is never used
+    --> src/cryptanalysis/koblitz_groebner.rs:9371:4
+     |
+9371 | fn trace(f: impl FnOnce(&mut RefutationDegreeTrace)) {
+     |    ^^^^^
+
+warning: `crypto` (lib) generated 5 warnings (run `cargo fix --lib -p crypto` to apply 1 suggestion)
+warning: method `engine` is never used
+   --> src/bin/ecbench/pdp3_koblitz.rs:448:12
+    |
+427 | impl<'i> Pdp3KoblitzOracle<'i> {
+    | ------------------------------ method in this implementation
+...
+448 |     pub fn engine(&self) -> Pdp3Engine {
+    |            ^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `crypto` (bin "ecbench") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 3m 33s
