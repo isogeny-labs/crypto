@@ -94,12 +94,13 @@ sizes and smaller at others.
 | path | what |
 |:--|:--|
 | `curves.jsonl` | the 25 curves (`examples/ic_frontier_prime_curves.rs`) |
-| `specs/` | frozen train, extension and hold-out specs (`make_specs.py`) |
+| `specs/` | frozen train, extension and hold-out specs (`bitop_ladder_analyse specs`; first written by `make_specs.py`) |
 | `sessions/` | 46 train and 25 hold-out sessions, each with `verify.json` |
-| `select/`, `params.json` | Phase A selection (`select.py`) and the frozen bases |
+| `select/`, `params.json` | Phase A selection (`bitop_ladder_analyse select`; first written by `select.py`) and the frozen bases |
 | `cards/` | task cards, receipts and director assessments (AGENTS.md "Model tiers") |
 | `analysis/` | `analyse.sh` outputs: bounds, `compare`, `table`, `band`, `amortize`, `work` |
 | `summary.json` | frozen summary the leaderboard reads |
+| `analysis/gap_to_rho.json`, `summary.json` | `bitop_ladder_analyse gap` and `summary` |
 | `figures/` | SVG/PNG figures and `plots.py`, which reads recorded values only |
 | `logs/` | run and verify logs |
 
@@ -107,3 +108,31 @@ sizes and smaller at others.
 - **Binary:** every session ran the same binary, sha256 `372ed2eb2f19c5fd…`.
 - **Recorded commits:** these move between sessions because documentation commits landed while cards ran. Code was unchanged throughout.
 - **Dirty trees:** twelve extension sessions record a dirty tree. The cause was uncommitted card and assessment files.
+
+## Provenance of the derived files
+
+The study's own computations first ran in Python: `select.py`,
+`make_specs.py`, and two inline scripts for `analysis/gap_to_rho.json` and
+`summary.json`. AGENTS.md ("Implementation language: no Python") does not allow
+that. [`examples/bitop_ladder_analyse.rs`](../../examples/bitop_ladder_analyse.rs)
+replaces all four:
+
+```
+cargo build --release --bin ecbench --example bitop_ladder_analyse
+target/release/examples/bitop_ladder_analyse select | gap | summary
+target/release/examples/bitop_ladder_analyse --specs-out DIR specs train | holdout | ext …
+```
+
+Run again on 2026-10-20 over the committed sessions, it reproduces these files
+**byte for byte**:
+- `params.json`, `select/SELECTION.md` and `select/selection.json`;
+- `analysis/gap_to_rho.json`;
+- all 71 files in `specs/`.
+
+`summary.json` also comes out identical except one value: its recorded
+SHA-256 of `PROTOCOL.md`. The committed value is the hash of the protocol as
+it stood when the summary was built (b1baf7887), before the owner's
+interpretation amendment (608130dec). The committed file is kept as it is.
+The Python files stay in the study as provenance, labelled legacy. The figure
+script `figures/plots.py` only plots recorded values.
+

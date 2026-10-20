@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Legacy, kept as provenance (AGENTS.md "Implementation language: no Python"):
+# examples/bitop_ladder_analyse.rs replaces this script and reproduces its
+# committed outputs byte for byte. Run that instead.
 """Write this study's ecbench specs from curves.jsonl (and params.json).
 
     python3 make_specs.py train            # specs/train-P<b>.json, Phase A

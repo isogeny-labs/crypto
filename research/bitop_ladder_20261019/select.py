@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Legacy, kept as provenance (AGENTS.md "Implementation language: no Python"):
+# examples/bitop_ladder_analyse.rs replaces this script and reproduces its
+# committed outputs byte for byte. Run that instead.
 """Phase A selection rule of PROTOCOL.md, applied to the train sessions.
 
     python3 select.py
