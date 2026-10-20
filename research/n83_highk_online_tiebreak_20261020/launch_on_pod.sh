@@ -28,7 +28,7 @@ printf 'SCREEN_PRODUCER_EXIT %s %s\n' "$screen_code" "$(date -u +%FT%TZ)" > "$ba
 
 verify_code=99
 if [ -d "$base/results" ]; then
-  python3 research/n83_highk_online_tiebreak_20261020/verify_screen.py \
+  python3 -m research.n83_highk_online_tiebreak_20261020.verify_screen \
     "$base/results" > "$base/screen_verify.log" 2>&1
   verify_code=$?
   tar -C "$base" -czf "$base/raw_results.tar.gz" results
