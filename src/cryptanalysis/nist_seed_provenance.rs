@@ -168,6 +168,65 @@ pub fn x962_binary_candidate_b(seed: &[u8; 20], m: u32) -> BigUint {
     b
 }
 
+// ── Prime curves: the `b` the 1997 code took ──────────────────────────
+
+/// The square root of `b² = −27 / r(seed)` that the 1997 generator published
+/// as `b`: `b²^((p+1)/4)` when `p ≡ 3 (mod 4)` (nine curves), and otherwise
+/// the negated Tonelli–Shanks root with the least quadratic non-residue as
+/// `z` (P-224, `z = 11`).  `None` when `b²` is not a square.  The tests
+/// check it against all ten published `b`.
+pub fn x962_b_root(p: &BigUint, b2: &BigUint) -> Option<BigUint> {
+    let one = BigUint::from(1u8);
+    let two = BigUint::from(2u8);
+    let half = (p - &one) >> 1;
+    if b2.modpow(&half, p) != one {
+        return None;
+    }
+    if (p % BigUint::from(4u8)) == BigUint::from(3u8) {
+        return Some(b2.modpow(&((p + &one) >> 2), p));
+    }
+    let mut q = p - &one;
+    let mut s = 0u32;
+    while (&q & &one) == BigUint::from(0u8) {
+        q >>= 1;
+        s += 1;
+    }
+    let mut z = two.clone();
+    while z.modpow(&half, p) == one {
+        z += &one;
+    }
+    let mut m = s;
+    let mut c = z.modpow(&q, p);
+    let mut t = b2.modpow(&q, p);
+    let mut r = b2.modpow(&((&q + &one) >> 1), p);
+    while t != one {
+        let (mut i, mut t2) = (0u32, t.clone());
+        while t2 != one {
+            t2 = &t2 * &t2 % p;
+            i += 1;
+        }
+        let b = c.modpow(&(BigUint::from(1u8) << (m - i - 1)), p);
+        m = i;
+        c = &b * &b % p;
+        t = &t * &c % p;
+        r = &r * &b % p;
+    }
+    Some((p - r) % p)
+}
+
+/// `b² = −27 / r(seed) (mod p)` for a prime-curve seed, `None` in the
+/// degenerate cases `r ≡ 0` and `4r + 27 ≡ 0`.
+pub fn x962_b_squared(seed: &[u8; 20], p: &BigUint) -> Option<BigUint> {
+    let zero = BigUint::from(0u8);
+    let (_, _, r) = x962_candidate_r(seed, p.bits() as u32);
+    let rp = r % p;
+    if rp == zero || (BigUint::from(4u8) * &rp + BigUint::from(27u8)) % p == zero {
+        return None;
+    }
+    let r_inv = rp.modpow(&(p - BigUint::from(2u8)), p);
+    Some((p - BigUint::from(27u8)) * r_inv % p)
+}
+
 // ── The published seeds ───────────────────────────────────────────────
 
 /// A published prime-curve seed with the run that produced it.
@@ -363,6 +422,15 @@ mod tests {
                 .find(|c| c.name == s.name)
                 .expect("curve");
             assert_eq!(s.seed_hex, c.seed_hex, "{}", s.name);
+        }
+    }
+    #[test]
+    fn the_1997_root_rule_gives_every_published_prime_b() {
+        for s in PRIME_SEEDS.iter() {
+            let p = BigUint::parse_bytes(s.p_hex.as_bytes(), 16).unwrap();
+            let b = BigUint::parse_bytes(s.b_hex.as_bytes(), 16).unwrap();
+            let b2 = x962_b_squared(&seed_bytes(s.seed_hex), &p).expect("b² exists");
+            assert_eq!(x962_b_root(&p, &b2), Some(b), "{}", s.name);
         }
     }
 }
