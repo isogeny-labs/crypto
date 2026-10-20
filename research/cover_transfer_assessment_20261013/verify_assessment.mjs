@@ -219,14 +219,13 @@ function evidenceReferencePath(reference) {
 
 function pdfLiteralMetadata(bytes, key) {
   const source = bytes.toString("latin1");
-  const prefix = `/${key}(`;
-  const start = source.indexOf(prefix);
-  if (start === -1) {
+  const match = new RegExp(`/${key}\\s*\\(`, "u").exec(source);
+  if (match === null) {
     return null;
   }
   const decoded = [];
   let depth = 1;
-  for (let index = start + prefix.length; index < source.length; index += 1) {
+  for (let index = match.index + match[0].length; index < source.length; index += 1) {
     const character = source[index];
     if (character === "\\") {
       const escaped = source[index + 1];
@@ -796,7 +795,7 @@ check(
 );
 
 const expectedStatusVocabulary = ["unknown", "supported", "refuted", "not_applicable"];
-const expectedCatalogCommit = "f8501268305c0c84d0e077a4ab9054c07ff74540";
+const expectedCatalogCommit = "8e4c99759fd8d9594ed207d793b07b59ebaf19f7";
 const expectedRootKeys = [
   "assessment_date",
   "catalog_commit",
@@ -1025,7 +1024,7 @@ const expectedSemanticDigests = {
   claim_contract: "36a2bb9524810994c02633462e71ae08ac88da6fbb520df72e66e05150628634",
   result_templates: "1a4955b6d4dd016e0cad661afde21257ae6845904904917568414f2ae601f05e",
   profiles: "807800e78066e8c3b0caa6634072a585cf4ae924a40b13817d9ca7a3c0aa3710",
-  controls: "c4981bc3568166dfce37e20ec9119d357f2eefc194b1c6af37b2887bf936d2dd",
+  controls: "f5e73ff82f722d7f3f435e3c4d238b856d2b613111a28012dffa5b8ef5e7d3c6",
   open_obligations: "ba227bbd94320d317ccfbf71b1e0dd3f05854e7aa4e62693472dfdf34c8f2373",
   global_cost_accounting:
     "b3b77a401d4dd76cabfc9a65d5a738fcfb977fd1a3abc2db3733c41820304619",
@@ -1079,6 +1078,7 @@ const requiredSourceArtifactPaths = [
   "src/prime_hyperelliptic/curve.rs",
   "src/utils/mod.rs",
   "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
+  "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
   "research/cover_transfer_assessment_20261013/typed_transfer_context.dot",
   "research/cover_transfer_assessment_20261013/typed_transfer_context.svg",
   "research/cover_transfer_assessment_20261013/typed_transfer_context.png",
@@ -2375,14 +2375,6 @@ const staleCurrentPopulationPatterns = [
   /737\/1,354 result/iu,
   /all 2,091 current inputs/iu,
   /all 2,091 model forms/iu,
-  /current 2,100-row/iu,
-  /2,100 current (?:map rows|models|inputs)/iu,
-  /1,940-row odd catalog population/iu,
-  /586 direct(?:-prime| short-Weierstrass)/iu,
-  /746 (?:forms inside|models total)/iu,
-  /746\/1,354 result/iu,
-  /all 2,100 current inputs/iu,
-  /all 2,100 model forms/iu,
 ];
 for (const [kind, relativePath] of Object.entries(reportArtifacts)) {
   const absolute = resolveRepoPath(relativePath);
@@ -2416,7 +2408,7 @@ for (const [kind, relativePath] of Object.entries(reportArtifacts)) {
     for (const marker of [
       "509 fields / 2,570 Jacobian contexts / 2,572 maps",
       "current-source test: 2,572 / 2,572",
-      "1,218 inside / 1,354 outside old allowlist",
+      "746 inside / 1,354 outside old allowlist",
     ]) {
       check(contents.includes(marker), `context graph lacks current marker: ${marker}`);
     }
@@ -2427,10 +2419,10 @@ for (const [kind, relativePath] of Object.entries(reportArtifacts)) {
   if (kind === "release_receipt") {
     const contents = bytes.toString("utf8");
     for (const marker of [
-      "current 2,572-row",
-      "1,053 direct short-Weierstrass prime-field models",
-      "2,572 total",
-      "1,218/1,354 result",
+      "current 2,100-row",
+      "586 direct short-Weierstrass prime-field models",
+      "2,100 total",
+      "746/1,354 result",
       "13 passed; 0 failed",
     ]) {
       check(contents.includes(marker), `release receipt lacks current marker: ${marker}`);

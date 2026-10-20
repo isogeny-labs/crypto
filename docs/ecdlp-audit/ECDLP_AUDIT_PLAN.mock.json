@@ -1,7 +1,7 @@
 {
   "schema_version": "ecdlp-audit-plan/v1",
   "record_state": "mock_non_authoritative",
-  "plan_uid": "urn:ecdlp-audit-plan:1:sha256:4f757c385e5dd4df3af8e765ff076b471b2ec627175baa0dae9e44a066a6e412",
+  "plan_uid": "urn:ecdlp-audit-plan:1:sha256:14a9c9cb881f474d232ee3470271d607c31cc08707738c74fbac2b062525e712",
   "title": "Comprehensive elliptic-curve private-key recovery audit",
   "as_of": "2026-10-14",
   "authoritative": false,
@@ -14,7 +14,10 @@
       "public_synthetic",
       "known_answer"
     ],
-    "default_authorization_tiers": ["T0", "T1"],
+    "default_authorization_tiers": [
+      "T0",
+      "T1"
+    ],
     "live_target_execution": false,
     "secret_key_material": false,
     "production_exploitation": false,
@@ -53,7 +56,12 @@
     }
   ],
   "vocabularies": {
-    "claim_status": ["unknown", "supported", "refuted", "not_applicable"],
+    "claim_status": [
+      "unknown",
+      "supported",
+      "refuted",
+      "not_applicable"
+    ],
     "requirement_status": [
       "verified_complete",
       "implemented_unverified",
@@ -61,12 +69,52 @@
       "blocked",
       "not_attempted"
     ],
-    "maturity_levels": ["E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7"],
-    "independence_levels": ["R0", "R1", "R2", "R3", "R4", "R5"],
-    "authorization_tiers": ["T0", "T1", "T2", "T3", "T4"],
-    "cost_status": ["measured", "modeled", "extrapolated", "unknown", "not_applicable"],
-    "execution_outcome": ["complete", "insufficient_relations", "budget", "timeout", "oom", "error"],
-    "review_decision": ["approved", "changes_requested", "pending", "conflicted"]
+    "maturity_levels": [
+      "E0",
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6",
+      "E7"
+    ],
+    "independence_levels": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5"
+    ],
+    "authorization_tiers": [
+      "T0",
+      "T1",
+      "T2",
+      "T3",
+      "T4"
+    ],
+    "cost_status": [
+      "measured",
+      "modeled",
+      "extrapolated",
+      "unknown",
+      "not_applicable"
+    ],
+    "execution_outcome": [
+      "complete",
+      "insufficient_relations",
+      "budget",
+      "timeout",
+      "oom",
+      "error"
+    ],
+    "review_decision": [
+      "approved",
+      "changes_requested",
+      "pending",
+      "conflicted"
+    ]
   },
   "inventory_freeze": {
     "status": "not_frozen",
@@ -88,20 +136,25 @@
         {
           "id": "WS1-D1",
           "kind": "artifact_replay",
-          "description": "Fresh standalone artifact and exact 2,100-input replay receipt.",
+          "description": "Fresh standalone artifact and exact 2,572-input replay receipt.",
           "path": null,
           "artifact_sha256": null,
           "status": "not_attempted",
-          "acceptance_gate_ids": ["WS1-G1", "WS1-G2"]
+          "acceptance_gate_ids": [
+            "WS1-G1",
+            "WS1-G2"
+          ]
         },
         {
           "id": "WS1-D2",
           "kind": "review_receipt",
           "description": "Partial CI, Lean, semantic replay, and review evidence; final closure remains open.",
           "path": "research/cover_transfer_assessment_20261013/README.md",
-          "artifact_sha256": "5c7a1a898638fc627aab560898603b98d261fbb6a78103ebb82d4b32b9d0aae9",
+          "artifact_sha256": "5714653dbd3c82e7515eb6801e7e6d8af71c3afe85bc051db1aa5e12057e1ee2",
           "status": "partial",
-          "acceptance_gate_ids": ["WS1-G3"]
+          "acceptance_gate_ids": [
+            "WS1-G3"
+          ]
         }
       ],
       "acceptance_gates": [
@@ -118,7 +171,7 @@
           "id": "WS1-G2",
           "required": true,
           "claim_status": "unknown",
-          "scope": "The exact fresh artifact replays all 2,100 current cover inputs and retains failures and unsupported results.",
+          "scope": "The exact fresh artifact replays all 2,572 current cover inputs and retains failures and unsupported results.",
           "rationale": "The published package was not replayed against all current inputs.",
           "evidence_refs": [],
           "obligation_id": "catalog-wide-packaged-replay"
@@ -149,7 +202,10 @@
       "slug": "close-cover-transfer-gaps",
       "title": "Close the cover-transfer arithmetic and certificate gaps",
       "requirement_status": "partial",
-      "depends_on": ["WS1", "WS4"],
+      "depends_on": [
+        "WS1",
+        "WS4"
+      ],
       "summary": "Implement balanced two-infinity arithmetic, arbitrary binary norm, subgroup certificates, and an independent reference oracle as separate gated changes.",
       "deliverables": [
         {
@@ -159,7 +215,9 @@
           "path": null,
           "artifact_sha256": null,
           "status": "not_attempted",
-          "acceptance_gate_ids": ["WS2-G1"]
+          "acceptance_gate_ids": [
+            "WS2-G1"
+          ]
         },
         {
           "id": "WS2-D2",
@@ -168,7 +226,9 @@
           "path": "src/binary_ecc/cover_transfer.rs",
           "artifact_sha256": "6e801f14abf087b2a6610aa320faf602d176ac764f5eee8e9d88611cdacfa896",
           "status": "partial",
-          "acceptance_gate_ids": ["WS2-G2"]
+          "acceptance_gate_ids": [
+            "WS2-G2"
+          ]
         },
         {
           "id": "WS2-D3",
@@ -177,7 +237,9 @@
           "path": "problems/catalog-cover-subgroup-certificates-incomplete.md",
           "artifact_sha256": "f987e2bdde5a8e745fb068badcbed931c2ecc23de28c90aa9b6e4413d898135d",
           "status": "partial",
-          "acceptance_gate_ids": ["WS2-G3"]
+          "acceptance_gate_ids": [
+            "WS2-G3"
+          ]
         },
         {
           "id": "WS2-D4",
@@ -186,7 +248,9 @@
           "path": null,
           "artifact_sha256": null,
           "status": "not_attempted",
-          "acceptance_gate_ids": ["WS2-G4"]
+          "acceptance_gate_ids": [
+            "WS2-G4"
+          ]
         }
       ],
       "acceptance_gates": [
@@ -253,7 +317,10 @@
           "path": null,
           "artifact_sha256": null,
           "status": "not_attempted",
-          "acceptance_gate_ids": ["WS3-G1", "WS3-G2"]
+          "acceptance_gate_ids": [
+            "WS3-G1",
+            "WS3-G2"
+          ]
         },
         {
           "id": "WS3-D2",
@@ -262,7 +329,9 @@
           "path": null,
           "artifact_sha256": null,
           "status": "not_attempted",
-          "acceptance_gate_ids": ["WS3-G3"]
+          "acceptance_gate_ids": [
+            "WS3-G3"
+          ]
         },
         {
           "id": "WS3-D3",
@@ -271,7 +340,10 @@
           "path": "docs/ecdlp-audit/ledger/IDENTITY_CANONICALIZATION_AUDIT.md",
           "artifact_sha256": "e6e9e745f204f4d7e57edde86c8627188a9bdcc1532088de52bf687db42be5f0",
           "status": "partial",
-          "acceptance_gate_ids": ["WS3-G1", "WS3-G3"]
+          "acceptance_gate_ids": [
+            "WS3-G1",
+            "WS3-G3"
+          ]
         }
       ],
       "acceptance_gates": [
@@ -319,7 +391,9 @@
       "slug": "enforce-evidence-ladder",
       "title": "Establish and enforce the evidence ladder",
       "requirement_status": "partial",
-      "depends_on": ["WS3"],
+      "depends_on": [
+        "WS3"
+      ],
       "summary": "Turn E0-E7 and weakest-link composition into route-specific, machine-enforced promotion, demotion, staleness, and correction rules.",
       "deliverables": [
         {
@@ -329,7 +403,9 @@
           "path": "docs/ecdlp-audit/evidence/evidence-profile-registry.draft.json",
           "artifact_sha256": "ee712759bec617fd28feb73654c5279509d5ec8a88144d3774011279274ecc31",
           "status": "partial",
-          "acceptance_gate_ids": ["WS4-G1"]
+          "acceptance_gate_ids": [
+            "WS4-G1"
+          ]
         },
         {
           "id": "WS4-D2",
@@ -338,7 +414,9 @@
           "path": "docs/ecdlp-audit/evidence/README.md",
           "artifact_sha256": "24db03086428bccb781fe4aa7f251829a5df57e47a8af548a6f83f42982694e1",
           "status": "partial",
-          "acceptance_gate_ids": ["WS4-G2"]
+          "acceptance_gate_ids": [
+            "WS4-G2"
+          ]
         }
       ],
       "acceptance_gates": [
@@ -377,7 +455,11 @@
       "slug": "sweep-attack-taxonomy",
       "title": "Sweep the complete frozen attack taxonomy",
       "requirement_status": "partial",
-      "depends_on": ["WS3", "WS4", "WS6"],
+      "depends_on": [
+        "WS3",
+        "WS4",
+        "WS6"
+      ],
       "summary": "Assess the five non-overlapping lanes route by route against exact assets, versions, threat models, evidence, controls, costs, and authorization.",
       "deliverables": [
         {
@@ -387,7 +469,9 @@
           "path": "docs/ecdlp-audit/routes/route-registry.seed.json",
           "artifact_sha256": "b19664ca7557a3bd943ad472f8ea645b114a058f1a1557b8822c8177e0140b1b",
           "status": "partial",
-          "acceptance_gate_ids": ["WS5-G1"]
+          "acceptance_gate_ids": [
+            "WS5-G1"
+          ]
         },
         {
           "id": "WS5-D2",
@@ -396,7 +480,9 @@
           "path": "docs/ecdlp-audit/routes/fixtures/valid/coverage-matrix.seed.json",
           "artifact_sha256": "bb031ccf8bb0c74520bb1e4e61526790f6d6a7f9df9d680c6869597e9c7d2447",
           "status": "partial",
-          "acceptance_gate_ids": ["WS5-G2"]
+          "acceptance_gate_ids": [
+            "WS5-G2"
+          ]
         }
       ],
       "acceptance_gates": [
@@ -435,7 +521,9 @@
       "slug": "build-literature-incident-corpus",
       "title": "Build the literature and incident corpus",
       "requirement_status": "partial",
-      "depends_on": ["WS3"],
+      "depends_on": [
+        "WS3"
+      ],
       "summary": "Freeze a systematic search protocol and hash-addressed primary-source, code, standard, advisory, and public-incident corpus with claim-level citations.",
       "deliverables": [
         {
@@ -445,7 +533,9 @@
           "path": "docs/ecdlp-audit/corpus/PROTOCOL.md",
           "artifact_sha256": "a010bc21d6bb9f98e5466e3ef1ff8087be06a45adde5fe73043612e96630ce7d",
           "status": "partial",
-          "acceptance_gate_ids": ["WS6-G1"]
+          "acceptance_gate_ids": [
+            "WS6-G1"
+          ]
         },
         {
           "id": "WS6-D2",
@@ -454,7 +544,9 @@
           "path": "docs/ecdlp-audit/corpus/seed-manifest.json",
           "artifact_sha256": "36cd0772cb1919a25f4df7555f577c40a57be2ef0c8dc62a61b086ba3ec26be2",
           "status": "partial",
-          "acceptance_gate_ids": ["WS6-G2"]
+          "acceptance_gate_ids": [
+            "WS6-G2"
+          ]
         }
       ],
       "acceptance_gates": [
@@ -493,7 +585,10 @@
       "slug": "standardize-experimental-accounting",
       "title": "Standardize experimental accounting",
       "requirement_status": "partial",
-      "depends_on": ["WS3", "WS4"],
+      "depends_on": [
+        "WS3",
+        "WS4"
+      ],
       "summary": "Generalize fail-closed phase, failure, preprocessing, memory, target, baseline, environment, and replay accounting beyond the IC-specific ledgers.",
       "deliverables": [
         {
@@ -503,7 +598,9 @@
           "path": "docs/ecdlp-audit/accounting/cross-route-cost-receipt.schema.json",
           "artifact_sha256": "8cce365693a751a18276035fd3cd8ab291f2b35d6c1c21a8ce7f4a4f22280d89",
           "status": "partial",
-          "acceptance_gate_ids": ["WS7-G1"]
+          "acceptance_gate_ids": [
+            "WS7-G1"
+          ]
         },
         {
           "id": "WS7-D2",
@@ -512,7 +609,9 @@
           "path": "docs/ecdlp-audit/accounting/README.md",
           "artifact_sha256": "7ac9197bed5e634b5354d254fd0d8c0210296c452459ab8b5151ef4b31b9d58e",
           "status": "partial",
-          "acceptance_gate_ids": ["WS7-G2"]
+          "acceptance_gate_ids": [
+            "WS7-G2"
+          ]
         }
       ],
       "acceptance_gates": [
@@ -551,7 +650,11 @@
       "slug": "add-independent-governance",
       "title": "Add independent governance",
       "requirement_status": "partial",
-      "depends_on": ["WS3", "WS4", "WS7"],
+      "depends_on": [
+        "WS3",
+        "WS4",
+        "WS7"
+      ],
       "summary": "Separate authorship, mathematical review, implementation review, evidence replay, and release approval, with auditable correction and external replication paths.",
       "deliverables": [
         {
@@ -561,7 +664,9 @@
           "path": "docs/ecdlp-audit/governance/POLICY.md",
           "artifact_sha256": "f2839037884ddcfb2af1062f8d6114e5e36112b5a8d7fe6bb8112eae99a8a1de",
           "status": "partial",
-          "acceptance_gate_ids": ["WS8-G1"]
+          "acceptance_gate_ids": [
+            "WS8-G1"
+          ]
         },
         {
           "id": "WS8-D2",
@@ -570,7 +675,9 @@
           "path": "docs/ecdlp-audit/governance/README.md",
           "artifact_sha256": "2fe5e0195edc845ae07dd50307144b4ba84fde7948fd36397196e1348bba9907",
           "status": "partial",
-          "acceptance_gate_ids": ["WS8-G2"]
+          "acceptance_gate_ids": [
+            "WS8-G2"
+          ]
         }
       ],
       "acceptance_gates": [
@@ -650,23 +757,125 @@
   "subjects": [],
   "assessments": [],
   "dependencies": [
-    {"from": "WS2", "to": "WS1", "relation": "requires", "status": "active", "rationale": "Current cover evidence and package identity must be stable before broad arithmetic applicability promotion."},
-    {"from": "WS2", "to": "WS4", "relation": "requires", "status": "active", "rationale": "Arithmetic, map, subgroup, and solver claims need separate evidence profiles."},
-    {"from": "WS4", "to": "WS3", "relation": "requires", "status": "active", "rationale": "Evidence profiles require stable unit and assessment identities."},
-    {"from": "WS5", "to": "WS3", "relation": "requires", "status": "active", "rationale": "Taxonomy cells require exact units and frozen denominators."},
-    {"from": "WS5", "to": "WS4", "relation": "requires", "status": "active", "rationale": "Each route needs a route-specific evidence profile."},
-    {"from": "WS5", "to": "WS6", "relation": "requires", "status": "active", "rationale": "The route freeze must be grounded in a cited, searched public corpus."},
-    {"from": "WS6", "to": "WS3", "relation": "requires", "status": "active", "rationale": "Claims and sources need stable content-addressed identities."},
-    {"from": "WS6", "to": "WS5", "relation": "supplies", "status": "planned", "rationale": "The corpus supplies and revises taxonomy candidates without creating a blocking cycle."},
-    {"from": "WS7", "to": "WS3", "relation": "requires", "status": "active", "rationale": "Run receipts bind exact units, implementations, and evidence revisions."},
-    {"from": "WS7", "to": "WS4", "relation": "requires", "status": "active", "rationale": "Cost claims are promoted through explicit evidence gates."},
-    {"from": "WS8", "to": "WS3", "relation": "requires", "status": "active", "rationale": "Governance decisions refer to immutable assessment identities."},
-    {"from": "WS8", "to": "WS4", "relation": "requires", "status": "active", "rationale": "Governance enforces evidence transitions and corrections."},
-    {"from": "WS8", "to": "WS7", "relation": "requires", "status": "active", "rationale": "Performance review requires the shared accounting contract."},
-    {"from": "WS8", "to": "WS1", "relation": "governs", "status": "planned", "rationale": "Current cover evidence promotion uses the independent review roles."},
-    {"from": "WS8", "to": "WS2", "relation": "governs", "status": "planned", "rationale": "Cover arithmetic and subgroup claims require independent role review."},
-    {"from": "WS8", "to": "WS5", "relation": "governs", "status": "planned", "rationale": "Taxonomy completeness and route findings are approved separately."},
-    {"from": "WS8", "to": "WS6", "relation": "governs", "status": "planned", "rationale": "Corpus inclusion, provenance, and comparator decisions are reviewable."}
+    {
+      "from": "WS2",
+      "to": "WS1",
+      "relation": "requires",
+      "status": "active",
+      "rationale": "Current cover evidence and package identity must be stable before broad arithmetic applicability promotion."
+    },
+    {
+      "from": "WS2",
+      "to": "WS4",
+      "relation": "requires",
+      "status": "active",
+      "rationale": "Arithmetic, map, subgroup, and solver claims need separate evidence profiles."
+    },
+    {
+      "from": "WS4",
+      "to": "WS3",
+      "relation": "requires",
+      "status": "active",
+      "rationale": "Evidence profiles require stable unit and assessment identities."
+    },
+    {
+      "from": "WS5",
+      "to": "WS3",
+      "relation": "requires",
+      "status": "active",
+      "rationale": "Taxonomy cells require exact units and frozen denominators."
+    },
+    {
+      "from": "WS5",
+      "to": "WS4",
+      "relation": "requires",
+      "status": "active",
+      "rationale": "Each route needs a route-specific evidence profile."
+    },
+    {
+      "from": "WS5",
+      "to": "WS6",
+      "relation": "requires",
+      "status": "active",
+      "rationale": "The route freeze must be grounded in a cited, searched public corpus."
+    },
+    {
+      "from": "WS6",
+      "to": "WS3",
+      "relation": "requires",
+      "status": "active",
+      "rationale": "Claims and sources need stable content-addressed identities."
+    },
+    {
+      "from": "WS6",
+      "to": "WS5",
+      "relation": "supplies",
+      "status": "planned",
+      "rationale": "The corpus supplies and revises taxonomy candidates without creating a blocking cycle."
+    },
+    {
+      "from": "WS7",
+      "to": "WS3",
+      "relation": "requires",
+      "status": "active",
+      "rationale": "Run receipts bind exact units, implementations, and evidence revisions."
+    },
+    {
+      "from": "WS7",
+      "to": "WS4",
+      "relation": "requires",
+      "status": "active",
+      "rationale": "Cost claims are promoted through explicit evidence gates."
+    },
+    {
+      "from": "WS8",
+      "to": "WS3",
+      "relation": "requires",
+      "status": "active",
+      "rationale": "Governance decisions refer to immutable assessment identities."
+    },
+    {
+      "from": "WS8",
+      "to": "WS4",
+      "relation": "requires",
+      "status": "active",
+      "rationale": "Governance enforces evidence transitions and corrections."
+    },
+    {
+      "from": "WS8",
+      "to": "WS7",
+      "relation": "requires",
+      "status": "active",
+      "rationale": "Performance review requires the shared accounting contract."
+    },
+    {
+      "from": "WS8",
+      "to": "WS1",
+      "relation": "governs",
+      "status": "planned",
+      "rationale": "Current cover evidence promotion uses the independent review roles."
+    },
+    {
+      "from": "WS8",
+      "to": "WS2",
+      "relation": "governs",
+      "status": "planned",
+      "rationale": "Cover arithmetic and subgroup claims require independent role review."
+    },
+    {
+      "from": "WS8",
+      "to": "WS5",
+      "relation": "governs",
+      "status": "planned",
+      "rationale": "Taxonomy completeness and route findings are approved separately."
+    },
+    {
+      "from": "WS8",
+      "to": "WS6",
+      "relation": "governs",
+      "status": "planned",
+      "rationale": "Corpus inclusion, provenance, and comparator decisions are reviewable."
+    }
   ],
   "completion_metrics": {
     "inventory": {
@@ -723,26 +932,166 @@
     "correction_rule": "Corrections append a superseding assessment and preserve old evidence, decisions, and denominators; they never rewrite the frozen record."
   },
   "open_obligations": [
-    {"id": "catalog-artifact-identity", "workstream_id": "WS1", "status": "open", "required": true, "description": "Bind a fresh current-catalog artifact to exact source, build, configuration, dependency, registry, and SBOM identities.", "exit_evidence": "Signed or hashed build manifest plus reproducible artifact receipt."},
-    {"id": "catalog-wide-packaged-replay", "workstream_id": "WS1", "status": "open", "required": true, "description": "Replay all 2,100 current inputs against the exact fresh package.", "exit_evidence": "Per-input manifest, commands, results, failures, resource accounting, and independent replay receipt."},
-    {"id": "cover-final-evidence-gates", "workstream_id": "WS1", "status": "open", "required": true, "description": "Close final CI, Lean, semantic replay, and independent review gates.", "exit_evidence": "Final-revision CI/replay hashes and distinct reviewer approvals."},
-    {"id": "balanced-two-infinity-jacobian", "workstream_id": "WS2", "status": "open", "required": true, "description": "Implement and certify odd-characteristic balanced two-infinity arithmetic and induced maps for the frozen 1,940-row odd catalog population (586 direct prime, 30 normalized prime, and 1,324 extension maps with the WS2-G1 membership hashes).", "exit_evidence": "Exhaustive small-field and all-1,940 catalog fixtures, exceptional cases, map identities, and independent oracle agreement."},
-    {"id": "arbitrary-binary-jacobian-norm", "workstream_id": "WS2", "status": "open", "required": true, "description": "Generalize and independently verify arbitrary valid-class binary Jacobian pushforward from the exact GF(8) fixture to the frozen 160-row binary map population, export exact catalog-style object/map/certificate bindings, and mirror or integrate it at a current aburan28/cryptanalysis revision.", "exit_evidence": "Independent tiny-field oracle agreement; all-160 field/model coverage; shared/nonsplit/repeated support, homomorphism, and composition receipts; EC1/ICV1/HC1/CV1 linkage for the positive fixture and supported rows; and exact current-tip cryptanalysis parity or integration evidence."},
-    {"id": "catalog-subgroup-certificates", "workstream_id": "WS2", "status": "open", "required": true, "description": "Produce exact map-bound subgroup and image certificates for the frozen 664 EC1/curve/map bindings (134 binary and 530 odd with the WS2-G3 membership hashes).", "exit_evidence": "All-664 order/factor, nonzero image, exact image order, kernel intersection, composition, and recovery certificates."},
-    {"id": "independent-divisor-class-oracle", "workstream_id": "WS2", "status": "open", "required": true, "description": "Obtain a non-circular divisor-class and transfer reference implementation for the full fixed-GF(8) fixture and at least one exhaustive balanced odd-prime genus-two fixture with p at most 31.", "exit_evidence": "Pinned independent code/CAS revision and differential replay receipts covering all 486 fixed-F8 classes, transfer identities, and the stated odd fixture including exceptional cases."},
-    {"id": "authoritative-ledger-identity", "workstream_id": "WS3", "status": "open", "required": true, "description": "Define reviewed canonical unit, assessment, evidence, implementation, and correction identities.", "exit_evidence": "Authoritative schema, canonicalization vectors, collision/alias tests, and review decision."},
-    {"id": "master-denominator-freeze", "workstream_id": "WS3", "status": "open", "required": true, "description": "Enumerate and hash the universal in-scope population.", "exit_evidence": "Versioned denominator manifest, memberships, counts, inclusion/exclusion rules, and independent reproduction."},
-    {"id": "master-ledger-semantic-verifier", "workstream_id": "WS3", "status": "open", "required": true, "description": "Generate and fail-closed validate the authoritative additive ledger.", "exit_evidence": "Generator/verifier source, negative fixtures, crosswalk replay, dashboard reconciliation, and CI receipt."},
-    {"id": "evidence-profile-registry", "workstream_id": "WS4", "status": "open", "required": true, "description": "Define route-specific required gates and derived contiguous maturity.", "exit_evidence": "Versioned profile registry with representative proof, performance, bypass, and evidence-integrity profiles."},
-    {"id": "evidence-transition-validator", "workstream_id": "WS4", "status": "open", "required": true, "description": "Enforce promotion, demotion, staleness, weakest-link composition, and additive correction.", "exit_evidence": "Validator plus golden promote/reject/demote/correct/stale fixtures."},
-    {"id": "attack-route-registry-freeze", "workstream_id": "WS5", "status": "open", "required": true, "description": "Promote the candidate families only after freezing a cited, reviewed route population.", "exit_evidence": "Versioned route manifest, source links, non-overlap decisions, typed hybrid edges, denominator digest, and reviewer approval."},
-    {"id": "attack-taxonomy-coverage", "workstream_id": "WS5", "status": "open", "required": true, "description": "Classify every frozen route-by-asset unit with explicit unknowns and not-applicable reasons.", "exit_evidence": "Generated matrix with zero blank cells, exact denominator hashes, semantic replay, and open obligations."},
-    {"id": "corpus-search-protocol", "workstream_id": "WS6", "status": "open", "required": true, "description": "Preregister and review the public literature/incident search protocol.", "exit_evidence": "Frozen databases, queries, dates, languages, inclusion/exclusion, deduplication, citation passes, and limitations."},
-    {"id": "primary-source-incident-corpus", "workstream_id": "WS6", "status": "open", "required": true, "description": "Build the claim-level hash-addressed paper, code, standard, advisory, and public-incident corpus.", "exit_evidence": "Corpus manifest, source hashes where lawful, claim index, retractions/errata, custody, gap report, and comparator matrix."},
-    {"id": "cross-route-accounting-schema", "workstream_id": "WS7", "status": "open", "required": true, "description": "Generalize phase, failure, preprocessing, memory, target, environment, and uncertainty accounting.", "exit_evidence": "Reviewed schema and representative valid receipts for mathematical, protocol, implementation, and evidence routes."},
-    {"id": "cross-route-claim-checker", "workstream_id": "WS7", "status": "open", "required": true, "description": "Reject mixed-boundary, mixed-target, hidden-work, and synthetic-composite claims.", "exit_evidence": "Claim checker, negative fixtures, migration adapters, matched-baseline and replay tests."},
-    {"id": "independent-review-policy", "workstream_id": "WS8", "status": "open", "required": true, "description": "Adopt distinct reviewer roles, conflict rules, promotion/demotion, expiry, and release policy.", "exit_evidence": "Approved governance document, templates, ownership matrix, protected decisions, and release checklist."},
-    {"id": "governance-workflow-drill", "workstream_id": "WS8", "status": "open", "required": true, "description": "Exercise the proposed governance workflows and external replication registry.", "exit_evidence": "Auditable mock promotion, rejection, demotion, additive correction, staleness, and external-replication decisions."}
+    {
+      "id": "catalog-artifact-identity",
+      "workstream_id": "WS1",
+      "status": "open",
+      "required": true,
+      "description": "Bind a fresh current-catalog artifact to exact source, build, configuration, dependency, registry, and SBOM identities.",
+      "exit_evidence": "Signed or hashed build manifest plus reproducible artifact receipt."
+    },
+    {
+      "id": "catalog-wide-packaged-replay",
+      "workstream_id": "WS1",
+      "status": "open",
+      "required": true,
+      "description": "Replay all 2,572 current inputs against the exact fresh package.",
+      "exit_evidence": "Per-input manifest, commands, results, failures, resource accounting, and independent replay receipt."
+    },
+    {
+      "id": "cover-final-evidence-gates",
+      "workstream_id": "WS1",
+      "status": "open",
+      "required": true,
+      "description": "Close final CI, Lean, semantic replay, and independent review gates.",
+      "exit_evidence": "Final-revision CI/replay hashes and distinct reviewer approvals."
+    },
+    {
+      "id": "balanced-two-infinity-jacobian",
+      "workstream_id": "WS2",
+      "status": "open",
+      "required": true,
+      "description": "Implement and certify odd-characteristic balanced two-infinity arithmetic and induced maps for the frozen 1,940-row odd catalog population (586 direct prime, 30 normalized prime, and 1,324 extension maps with the WS2-G1 membership hashes).",
+      "exit_evidence": "Exhaustive small-field and all-1,940 catalog fixtures, exceptional cases, map identities, and independent oracle agreement."
+    },
+    {
+      "id": "arbitrary-binary-jacobian-norm",
+      "workstream_id": "WS2",
+      "status": "open",
+      "required": true,
+      "description": "Generalize and independently verify arbitrary valid-class binary Jacobian pushforward from the exact GF(8) fixture to the frozen 160-row binary map population, export exact catalog-style object/map/certificate bindings, and mirror or integrate it at a current aburan28/cryptanalysis revision.",
+      "exit_evidence": "Independent tiny-field oracle agreement; all-160 field/model coverage; shared/nonsplit/repeated support, homomorphism, and composition receipts; EC1/ICV1/HC1/CV1 linkage for the positive fixture and supported rows; and exact current-tip cryptanalysis parity or integration evidence."
+    },
+    {
+      "id": "catalog-subgroup-certificates",
+      "workstream_id": "WS2",
+      "status": "open",
+      "required": true,
+      "description": "Produce exact map-bound subgroup and image certificates for the frozen 664 EC1/curve/map bindings (134 binary and 530 odd with the WS2-G3 membership hashes).",
+      "exit_evidence": "All-664 order/factor, nonzero image, exact image order, kernel intersection, composition, and recovery certificates."
+    },
+    {
+      "id": "independent-divisor-class-oracle",
+      "workstream_id": "WS2",
+      "status": "open",
+      "required": true,
+      "description": "Obtain a non-circular divisor-class and transfer reference implementation for the full fixed-GF(8) fixture and at least one exhaustive balanced odd-prime genus-two fixture with p at most 31.",
+      "exit_evidence": "Pinned independent code/CAS revision and differential replay receipts covering all 486 fixed-F8 classes, transfer identities, and the stated odd fixture including exceptional cases."
+    },
+    {
+      "id": "authoritative-ledger-identity",
+      "workstream_id": "WS3",
+      "status": "open",
+      "required": true,
+      "description": "Define reviewed canonical unit, assessment, evidence, implementation, and correction identities.",
+      "exit_evidence": "Authoritative schema, canonicalization vectors, collision/alias tests, and review decision."
+    },
+    {
+      "id": "master-denominator-freeze",
+      "workstream_id": "WS3",
+      "status": "open",
+      "required": true,
+      "description": "Enumerate and hash the universal in-scope population.",
+      "exit_evidence": "Versioned denominator manifest, memberships, counts, inclusion/exclusion rules, and independent reproduction."
+    },
+    {
+      "id": "master-ledger-semantic-verifier",
+      "workstream_id": "WS3",
+      "status": "open",
+      "required": true,
+      "description": "Generate and fail-closed validate the authoritative additive ledger.",
+      "exit_evidence": "Generator/verifier source, negative fixtures, crosswalk replay, dashboard reconciliation, and CI receipt."
+    },
+    {
+      "id": "evidence-profile-registry",
+      "workstream_id": "WS4",
+      "status": "open",
+      "required": true,
+      "description": "Define route-specific required gates and derived contiguous maturity.",
+      "exit_evidence": "Versioned profile registry with representative proof, performance, bypass, and evidence-integrity profiles."
+    },
+    {
+      "id": "evidence-transition-validator",
+      "workstream_id": "WS4",
+      "status": "open",
+      "required": true,
+      "description": "Enforce promotion, demotion, staleness, weakest-link composition, and additive correction.",
+      "exit_evidence": "Validator plus golden promote/reject/demote/correct/stale fixtures."
+    },
+    {
+      "id": "attack-route-registry-freeze",
+      "workstream_id": "WS5",
+      "status": "open",
+      "required": true,
+      "description": "Promote the candidate families only after freezing a cited, reviewed route population.",
+      "exit_evidence": "Versioned route manifest, source links, non-overlap decisions, typed hybrid edges, denominator digest, and reviewer approval."
+    },
+    {
+      "id": "attack-taxonomy-coverage",
+      "workstream_id": "WS5",
+      "status": "open",
+      "required": true,
+      "description": "Classify every frozen route-by-asset unit with explicit unknowns and not-applicable reasons.",
+      "exit_evidence": "Generated matrix with zero blank cells, exact denominator hashes, semantic replay, and open obligations."
+    },
+    {
+      "id": "corpus-search-protocol",
+      "workstream_id": "WS6",
+      "status": "open",
+      "required": true,
+      "description": "Preregister and review the public literature/incident search protocol.",
+      "exit_evidence": "Frozen databases, queries, dates, languages, inclusion/exclusion, deduplication, citation passes, and limitations."
+    },
+    {
+      "id": "primary-source-incident-corpus",
+      "workstream_id": "WS6",
+      "status": "open",
+      "required": true,
+      "description": "Build the claim-level hash-addressed paper, code, standard, advisory, and public-incident corpus.",
+      "exit_evidence": "Corpus manifest, source hashes where lawful, claim index, retractions/errata, custody, gap report, and comparator matrix."
+    },
+    {
+      "id": "cross-route-accounting-schema",
+      "workstream_id": "WS7",
+      "status": "open",
+      "required": true,
+      "description": "Generalize phase, failure, preprocessing, memory, target, environment, and uncertainty accounting.",
+      "exit_evidence": "Reviewed schema and representative valid receipts for mathematical, protocol, implementation, and evidence routes."
+    },
+    {
+      "id": "cross-route-claim-checker",
+      "workstream_id": "WS7",
+      "status": "open",
+      "required": true,
+      "description": "Reject mixed-boundary, mixed-target, hidden-work, and synthetic-composite claims.",
+      "exit_evidence": "Claim checker, negative fixtures, migration adapters, matched-baseline and replay tests."
+    },
+    {
+      "id": "independent-review-policy",
+      "workstream_id": "WS8",
+      "status": "open",
+      "required": true,
+      "description": "Adopt distinct reviewer roles, conflict rules, promotion/demotion, expiry, and release policy.",
+      "exit_evidence": "Approved governance document, templates, ownership matrix, protected decisions, and release checklist."
+    },
+    {
+      "id": "governance-workflow-drill",
+      "workstream_id": "WS8",
+      "status": "open",
+      "required": true,
+      "description": "Exercise the proposed governance workflows and external replication registry.",
+      "exit_evidence": "Auditable mock promotion, rejection, demotion, additive correction, staleness, and external-replication decisions."
+    }
   ],
   "report": {
     "record_path": "docs/ecdlp-audit/ECDLP_AUDIT_PLAN.mock.json",
