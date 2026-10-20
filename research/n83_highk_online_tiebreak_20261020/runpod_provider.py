@@ -15,6 +15,7 @@ PRIOR_DISTRIBUTION_POD_ID = "yajulte7twpr9p"
 PRIOR_DISTRIBUTION_CREATED_UTC = "2026-10-20T01:19:40.513Z"
 PRIOR_DISTRIBUTION_RATE_USD_PER_HOUR = Decimal("0.19")
 EARLIER_RESERVED_UPPER_USD = Decimal("3.57")
+FAILED_ALLOCATION_RESERVE_USD = Decimal("0.05")
 
 
 def timestamp(value):
@@ -37,8 +38,12 @@ def verify(snapshot_path, results, head_sha):
     allocation = runpod_runner.read_allocation(allocation_path, trigger_path)
     termination_path = snapshot_path.parent / "prior_distribution_termination.json"
     prior_pods_path = snapshot_path.parent / "prior_pods.json"
+    failed_raw_path = snapshot_path.parent / "failed_allocation_provider_raw.json"
+    failed_termination_path = snapshot_path.parent / "failed_allocation_termination.json"
     termination = json.loads(termination_path.read_text())
     prior_pods = json.loads(prior_pods_path.read_text())
+    failed_raw = json.loads(failed_raw_path.read_text())
+    failed_termination = json.loads(failed_termination_path.read_text())
     if (snapshot.get("schema") != "n83.online-tiebreak-runpod-snapshot/v1" or
             snapshot.get("source_head_sha") != head_sha or
             snapshot.get("controller_sha256") != controller_digest() or
@@ -49,6 +54,14 @@ def verify(snapshot_path, results, head_sha):
             termination.get("pod_id") != PRIOR_DISTRIBUTION_POD_ID or
             snapshot.get("prior_termination_sha256") != prior.digest(termination_path) or
             snapshot.get("prior_pods_sha256") != prior.digest(prior_pods_path) or
+            snapshot.get("failed_allocation_raw_sha256") != prior.digest(failed_raw_path) or
+            snapshot.get("failed_allocation_termination_sha256") !=
+            prior.digest(failed_termination_path) or
+            Decimal(str(snapshot.get("failed_allocation_reserve_usd"))) !=
+            FAILED_ALLOCATION_RESERVE_USD or
+            failed_raw.get("id") != "4akmszhmz3n26c" or
+            failed_termination.get("pod_id") != failed_raw["id"] or
+            failed_termination.get("pod_present") is not False or
             any(pod.get("id") == PRIOR_DISTRIBUTION_POD_ID or
                 pod.get("name") == "n83-online-tiebreak-20261020"
                 for pod in prior_pods.get("pods", [])) or
@@ -76,10 +89,20 @@ def verify(snapshot_path, results, head_sha):
             timestamp(prior_pods["recorded_utc"]) <= recorded):
         raise ValueError("prior Pod termination chronology differs")
     distribution_upper = (PRIOR_DISTRIBUTION_RATE_USD_PER_HOUR *
-                          Decimal(str((recorded - distribution_started).total_seconds())) /
+                          Decimal(str((timestamp(termination["recorded_utc"]) -
+                                       distribution_started).total_seconds())) /
                           Decimal(3600))
+    failed_stopped = timestamp(failed_termination["recorded_utc"])
+    failed_earliest = timestamp(termination["recorded_utc"])
+    failed_upper = (Decimal(str(failed_raw["costPerHr"])) *
+                    Decimal(str((failed_stopped - failed_earliest).total_seconds())) /
+                    Decimal(3600))
     if (distribution_upper <= 0 or
-            prior_spend < EARLIER_RESERVED_UPPER_USD + distribution_upper):
+            not failed_earliest < failed_stopped <=
+            timestamp(prior_pods["recorded_utc"]) or
+            failed_upper <= 0 or failed_upper > FAILED_ALLOCATION_RESERVE_USD or
+            prior_spend < EARLIER_RESERVED_UPPER_USD + distribution_upper +
+            FAILED_ALLOCATION_RESERVE_USD):
         raise ValueError("prior campaign spend upper bound is incomplete")
     projected = (Decimal(str(pod["cost_per_hr"])) *
                  Decimal(str((timestamp(pod["stop_after_utc"]) -
@@ -117,6 +140,7 @@ def verify(snapshot_path, results, head_sha):
             "prior_spend_upper_usd": str(prior_spend),
             "earlier_reserved_upper_usd": str(EARLIER_RESERVED_UPPER_USD),
             "distribution_charge_upper_usd": str(distribution_upper),
+            "failed_allocation_reserve_usd": str(FAILED_ALLOCATION_RESERVE_USD),
             "pod_id": pod["pod_id"], "machine_id": pod["machine_id"],
             "cpu_affinity_ids": pod["cpu_affinity_ids"],
             "allocation_sha256": prior.digest(allocation_path)}

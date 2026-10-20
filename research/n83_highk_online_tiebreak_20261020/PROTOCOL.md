@@ -121,15 +121,22 @@ fixture there, then run the launcher with the allocation and trigger under
 the recorded four-CPU affinity. The runner rejects a changed trigger,
 checkout, price, affinity, or cgroup envelope before it starts a timed child.
 The snapshot must confirm the preceding distribution Pod is terminated.
-The budget verifier charges at least the frozen $3.57 earlier upper bound plus
-that Pod's full allocation-to-snapshot interval at $0.19/hour, then the new
-Pod's entire created-to-stop reservation. This deliberately overcharges any
-idle gap after the preceding Pod terminated.
+The budget verifier charges the frozen $3.57 earlier upper bound plus
+the preceding Pod's allocation-to-recorded-termination interval at
+$0.19/hour, a $0.05 reserve for the failed partial-response allocation,
+and the new Pod's entire created-to-stop reservation. The failed allocation's
+provider response and absent-Pod receipt are copied into the snapshot folder
+and bound by SHA-256; its conservative start is the preceding Pod's recorded
+termination, before the attempted mutation. The resulting upper bound is
+$4.22714 before the new four-hour reservation and $4.98714 after it.
 The allocator takes the key through a hidden terminal prompt and keeps it
 out of files, shell arguments, Pod inputs and result archives. It requires
 the watchdog's prior termination receipt, queries the provider for the
 absence of that Pod, reserves the worst-case new charge before creating a
-Pod, and stops any allocation returned outside the frozen envelope.
+Pod, reads back a delayed provider creation timestamp, and retires any
+allocation whose post-create validation or persistence fails. A lost mutation
+response triggers a provider name lookup and retirement before the allocator
+can return.
 The watcher uses the same hidden prompt, verifies the transferred archive
 hash, calls `podStop` and the provider's `Void` `podTerminate` mutation,
 and records an absent-Pod receipt before the next allocation.

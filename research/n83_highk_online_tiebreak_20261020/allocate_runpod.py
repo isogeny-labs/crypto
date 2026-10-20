@@ -7,6 +7,7 @@ import getpass
 import hashlib
 import importlib
 import json
+import time
 from decimal import Decimal
 from pathlib import Path
 
@@ -25,6 +26,8 @@ POD_NAME = "n83-online-tiebreak-20261020"
 POD_CAP_SECONDS = 4 * 3600
 PRICE_CAP = Decimal("0.19")
 CAMPAIGN_CAP = Decimal("5.00")
+FAILED_ALLOCATION_RESERVE_USD = Decimal("0.05")
+EVIDENCE = Path(__file__).with_name("evidence")
 
 
 def utc_now():
@@ -43,15 +46,34 @@ def digest(path):
     return h.hexdigest()
 
 
-def prior_upper(at):
+def prior_upper(termination):
     created = runpod_provider.timestamp(
         runpod_provider.PRIOR_DISTRIBUTION_CREATED_UTC)
-    seconds = Decimal(str((at - created).total_seconds()))
+    stopped = runpod_provider.timestamp(termination["recorded_utc"])
+    seconds = Decimal(str((stopped - created).total_seconds()))
     if seconds <= 0:
-        raise ValueError("time precedes prior distribution allocation")
+        raise ValueError("prior distribution termination precedes allocation")
     return (runpod_provider.EARLIER_RESERVED_UPPER_USD +
             runpod_provider.PRIOR_DISTRIBUTION_RATE_USD_PER_HOUR *
-            seconds / Decimal(3600))
+            seconds / Decimal(3600) + FAILED_ALLOCATION_RESERVE_USD)
+
+
+def failed_allocation_evidence(at, prior_termination):
+    raw_path = EVIDENCE / "failed_allocation_provider_raw.json"
+    termination_path = EVIDENCE / "failed_allocation_termination.json"
+    raw = json.loads(raw_path.read_text())
+    termination = json.loads(termination_path.read_text())
+    stopped = runpod_provider.timestamp(termination["recorded_utc"])
+    earliest = runpod_provider.timestamp(prior_termination["recorded_utc"])
+    rate = Decimal(str(raw["costPerHr"]))
+    upper = rate * Decimal(str((stopped - earliest).total_seconds())) / Decimal(3600)
+    if (raw.get("id") != "4akmszhmz3n26c" or
+            termination.get("pod_id") != raw["id"] or
+            termination.get("pod_present") is not False or
+            not earliest < stopped <= at or
+            rate <= 0 or upper > FAILED_ALLOCATION_RESERVE_USD):
+        raise ValueError("failed-allocation termination or budget evidence invalid")
+    return raw_path, termination_path
 
 
 def preflight(prior_aggregate, prior_archive, prior_termination, output):
@@ -63,7 +85,8 @@ def preflight(prior_aggregate, prior_archive, prior_termination, output):
             runpod_provider.timestamp(terminated["recorded_utc"]) > utc_now() or
             output.exists()):
         raise ValueError("prior Pod is not proven absent or output already exists")
-    upper = prior_upper(utc_now())
+    failed_allocation_evidence(utc_now(), terminated)
+    upper = prior_upper(terminated)
     if upper + PRICE_CAP * Decimal(POD_CAP_SECONDS) / Decimal(3600) > CAMPAIGN_CAP:
         raise ValueError("conservative combined Pod reservation exceeds $5")
     return trigger
@@ -82,14 +105,16 @@ def provider_pods(key):
     return graphql(query, key)["data"]["myself"]["pods"]
 
 
-def stop_bad_allocation(pod_id, key):
-    for action in ("podStop", "podTerminate"):
-        mutation = ("mutation { " + action + "(input: { podId: " +
-                    json.dumps(pod_id) + " }) { id desiredStatus } }")
-        try:
-            graphql(mutation, key)
-        except Exception:
-            pass
+def allocated_record(pod_id, key, initial):
+    """Read back an allocation whose mutation response omitted createdAt."""
+    if initial.get("createdAt"):
+        return initial
+    for _ in range(6):
+        match = next((p for p in provider_pods(key) if p.get("id") == pod_id), None)
+        if match and match.get("createdAt"):
+            return match
+        time.sleep(2)
+    raise ValueError("allocated Pod has no provider createdAt after readback")
 
 
 def allocate(prior_aggregate, prior_archive, prior_termination, output, key):
@@ -100,19 +125,26 @@ def allocate(prior_aggregate, prior_archive, prior_termination, output, key):
            pod.get("name") == POD_NAME for pod in pods_before):
         raise ValueError("prior or duplicate tie-break Pod still exists")
     now = utc_now()
+    terminated = json.loads(prior_termination.read_text())
     stop = utc_text(now + dt.timedelta(seconds=POD_CAP_SECONDS))
-    if prior_upper(now) + PRICE_CAP * Decimal(4) > CAMPAIGN_CAP:
+    if prior_upper(terminated) + PRICE_CAP * Decimal(4) > CAMPAIGN_CAP:
         raise ValueError("allocation-time combined reservation exceeds $5")
     output.mkdir(parents=True, exist_ok=False)
     trigger_path = output / "trigger.json"
     trigger_path.write_text(json.dumps(trigger, indent=2, sort_keys=True) + "\n")
     termination_copy = output / "prior_distribution_termination.json"
     termination_copy.write_bytes(prior_termination.read_bytes())
+    failed_raw, failed_termination = failed_allocation_evidence(now, terminated)
+    (output / "failed_allocation_provider_raw.json").write_bytes(failed_raw.read_bytes())
+    (output / "failed_allocation_termination.json").write_bytes(
+        failed_termination.read_bytes())
     (output / "prior_pods.json").write_text(
         json.dumps({"recorded_utc": utc_text(now), "pods": pods_before},
                    indent=2, sort_keys=True) + "\n")
     errors = []
     for gpu in GPU_TYPES:
+        allocated_pod_id = None
+        mutation_attempted = False
         query = (
             "mutation { podFindAndDeployOnDemand(input: { name: " +
             json.dumps(POD_NAME) + ", gpuTypeId: " + json.dumps(gpu) +
@@ -124,17 +156,23 @@ def allocate(prior_aggregate, prior_archive, prior_termination, output, key):
             " }) { id name desiredStatus costPerHr machineId memoryInGb "
             "vcpuCount imageName gpuCount createdAt podType } }")
         try:
+            mutation_attempted = True
             raw = graphql(query, key)["data"]["podFindAndDeployOnDemand"]
             if not raw or not raw.get("id"):
                 raise ValueError("provider returned no allocated Pod")
+            allocated_pod_id = raw["id"]
             (output / "provider_api_raw.json").write_text(
+                json.dumps(raw, indent=2, sort_keys=True) + "\n")
+            raw = allocated_record(allocated_pod_id, key, raw)
+            (output / "provider_readback.json").write_text(
                 json.dumps(raw, indent=2, sort_keys=True) + "\n")
             recorded = utc_now()
             price = Decimal(str(raw["costPerHr"]))
             created = runpod_provider.timestamp(raw["createdAt"])
             projected = price * Decimal(str((runpod_provider.timestamp(stop) -
                                              created).total_seconds())) / Decimal(3600)
-            valid = (raw["desiredStatus"] == "RUNNING" and
+            valid = (raw.get("name") == POD_NAME and
+                     raw["desiredStatus"] == "RUNNING" and
                      bool(raw.get("machineId")) and
                      raw.get("memoryInGb", 0) >= 27 and
                      raw.get("vcpuCount", 0) >= 4 and
@@ -142,10 +180,9 @@ def allocate(prior_aggregate, prior_archive, prior_termination, output, key):
                      Decimal(0) < price <= PRICE_CAP and
                      0 < (runpod_provider.timestamp(stop) - created).total_seconds()
                      <= POD_CAP_SECONDS and
-                     prior_upper(recorded) + projected <= CAMPAIGN_CAP)
+                     prior_upper(terminated) + projected <= CAMPAIGN_CAP)
             if not valid:
-                stop_bad_allocation(raw["id"], key)
-                raise ValueError("allocated Pod outside frozen envelope; stop requested")
+                raise ValueError("allocated Pod outside frozen envelope")
             pod = {
                 "stratum": 0, "pod_id": raw["id"],
                 "machine_id": raw["machineId"], "desired_status": "RUNNING",
@@ -167,7 +204,10 @@ def allocate(prior_aggregate, prior_archive, prior_termination, output, key):
                 "prior_distribution_status": "TERMINATED",
                 "prior_termination_sha256": digest(termination_copy),
                 "prior_pods_sha256": digest(output / "prior_pods.json"),
-                "prior_spend_upper_usd": str(prior_upper(recorded)),
+                "prior_spend_upper_usd": str(prior_upper(terminated)),
+                "failed_allocation_reserve_usd": str(FAILED_ALLOCATION_RESERVE_USD),
+                "failed_allocation_raw_sha256": digest(output / "failed_allocation_provider_raw.json"),
+                "failed_allocation_termination_sha256": digest(output / "failed_allocation_termination.json"),
                 "approved_combined_cap_usd": str(CAMPAIGN_CAP),
                 "trigger_receipt_sha256": digest(trigger_path),
                 "trigger_aggregate_sha256": trigger["trigger_aggregate_sha256"],
@@ -190,11 +230,32 @@ def allocate(prior_aggregate, prior_archive, prior_termination, output, key):
             return {"pod_id": pod["pod_id"], "cost_per_hr": raw["costPerHr"],
                     "stop_after_utc": stop,
                     "projected_combined_upper_usd":
-                    str(prior_upper(recorded) + projected)}
+                    str(prior_upper(terminated) + projected)}
         except Exception as error:
             errors.append({"gpu": gpu, "type": type(error).__name__,
                            "message": str(error)[:180]})
-            if (output / "provider_api_raw.json").exists():
+            if mutation_attempted and not allocated_pod_id:
+                try:
+                    matches = [p for p in provider_pods(key)
+                               if p.get("name") == POD_NAME]
+                    if len(matches) == 1:
+                        allocated_pod_id = matches[0]["id"]
+                    elif len(matches) > 1:
+                        errors.append({"gpu": gpu, "type": "AmbiguousAllocation",
+                                       "message": "multiple Pods have the frozen name"})
+                except Exception as discovery_error:
+                    errors.append({"gpu": gpu, "type": "DiscoveryFailure",
+                                   "message": str(discovery_error)[:180]})
+            if allocated_pod_id:
+                from research.n83_highk_online_tiebreak_20261020 import watch_runpod
+                try:
+                    watch_runpod.retire(allocated_pod_id, key, output)
+                except Exception as cleanup_error:
+                    errors.append({"gpu": gpu, "type": "CleanupFailure",
+                                   "message": str(cleanup_error)[:180],
+                                   "pod_id": allocated_pod_id})
+                break
+            if mutation_attempted:
                 break
     (output / "allocation_errors.json").write_text(
         json.dumps(errors, indent=2, sort_keys=True) + "\n")
@@ -214,7 +275,7 @@ def main():
     if args.preflight:
         trigger = preflight(*inputs)
         print(json.dumps({"status": trigger["status"],
-                          "prior_spend_upper_usd": str(prior_upper(utc_now())),
+                          "prior_spend_upper_usd": str(prior_upper(json.loads(args.prior_termination.read_text()))),
                           "new_max_usd": str(PRICE_CAP * Decimal(4))},
                          sort_keys=True))
         return
