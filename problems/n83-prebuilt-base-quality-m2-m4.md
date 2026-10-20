@@ -47,6 +47,15 @@ counting ceiling.
 
 ## What would unblock it
 
+The [completed smaller-base m=4 card](../research/n83_prebuild_cost_m23_20261019/reports/run-small-m4-natural-20261019/RUN_REPORT.md)
+adds four normally exited conflict-capped searches at public target 0.
+K1,D1,D2,K2 all reached 100,000 conflicts with durable final progress;
+the native receipt audit checks 132 archived files. Repeated search
+counters match within each base. Natural yield and rank remain censored.
+Recorded XOR elapsed was 97.508–97.561% of each worker interval, motivating
+a separately tested cache of satisfied, fully assigned XOR rows. Broader
+corpus coverage, useful rank and complete cost remain open below.
+
 - [ ] Freeze one primary-curve query corpus and both retained object hashes, then run a native m=4 oracle on the K=2,048 explicit-orbit base and the 2,001-column dimension-12 closure, preserving all attempts and independently replaying each returned group relation and exact rank increment.
 - [x] Construct the stored K=16,627 object's full-width m=4 orbit-domain model under a hard 4 GiB, zero-swap cap, with a negative variable-cap control.
 - [x] Complete a degree-83 selector-pinned constructed relation positive control on that same object, with a checked group lift and rank receipt. This does not establish natural yield or useful rank.

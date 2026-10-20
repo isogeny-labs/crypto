@@ -1,6 +1,6 @@
 # N83 prebuilt factor-base cost and bounded natural queries
 
-**Evidence status:** D18 export and full-object replay pass; the paired D prebuilt/on-demand m=2 and m=3 finite-query panel is complete; the separate K2048/D12 m=2/m=3 panel completed with one preserved Spot interruption and a frozen retry. The [smaller-base m=4 gate](SMALL_M4_PROTOCOL.md) is now frozen. All timing here is shared-host L0. `candidate_id: null`; `selected_best_total_runtime: null`. No complete index-calculus or matched-rho runtime is established.
+**Evidence status:** D18 export and full-object replay pass; the paired D prebuilt/on-demand m=2 and m=3 finite-query panel is complete; the separate K2048/D12 m=2/m=3 panel completed with one preserved Spot interruption and a frozen retry. The [smaller-base m=4 gate](SMALL_M4_PROTOCOL.md) completed four conflict-capped natural searches with audited progress. The [XOR cache follow-up](XOR_CACHE_PROTOCOL.md) is a separate frozen component diagnostic. All timing here is shared-host L0. `candidate_id: null`; `selected_best_total_runtime: null`. No complete index-calculus or matched-rho runtime is established.
 
 ## Exact objects and boundaries
 
@@ -41,6 +41,22 @@ The [K2048/D12 protocol](SMALL_BASE_PROTOCOL.md) froze m=2 exhaustive first-poin
 | 3 | D12 | 9,437,184 | 0 / 0 | 5.761 [4.954, 7.202] |
 
 The [small-base raw tree](runs/small-base-v1/), [file manifest](runs/small-base-v1.sha256) and transferred package SHA-256 `d0de87f98451af8d2ebf4d84eaa98094fa74f86fd3ca20b575081aafc9d7d5f4` preserve the complete and interrupted attempts. [Figure data](reports/run-small-20261019/small-data.json), [SVG](reports/run-small-20261019/small.svg), [150 dpi PNG](reports/run-small-20261019/small.png), and [run PDF](reports/run-small-20261019/RUN_REPORT.pdf) show the bounded worker costs. These arms use different point sets, rank dimensions and m=2 attempt counts, and their L0 samples straddle a Spot stop. Their zero finite-event yields do not select a base or establish a cost improvement.
+
+## Completed smaller-base m=4 public card
+
+The [K1,D1,D2,K2 public card](reports/run-small-m4-natural-20261019/RUN_REPORT.md)
+finished at 20:48:34 UTC on 2026-10-19. All four natural arms returned
+`UNKNOWN_search_cap` at exactly 100,000 conflicts, normal exit and no OOM.
+Worker walls were 1,702.777036 / 1,750.332048 / 1,676.022754 / 1,697.533479 s.
+Each base's repeated search counters agree. The native
+[receipt audit](small-m4-v1/final/audit.json) checks all 132 archived files,
+container limits, controls, phases and progress, including final counters.
+Natural yield/rank remain null. Recorded XOR elapsed accounts for
+97.508–97.561% of worker wall; the timer measures elapsed intervals rather
+than exclusive CPU time. These are L0 observations on one public point.
+The next implementation hypothesis is caching fully assigned, satisfied
+XOR rows until backjump or matrix rebuild, with correctness and fresh
+cache-off/on measurements required before any improvement claim.
 
 ## Open obligations
 
