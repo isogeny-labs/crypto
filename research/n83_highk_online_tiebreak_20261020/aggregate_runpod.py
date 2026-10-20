@@ -23,8 +23,8 @@ def aggregate(snapshot, results, archive, head_sha, prior_aggregate_path,
     if json.loads((results / "trigger.json").read_text()) != trigger:
         raise ValueError("tie-break trigger differs from prior replay bytes")
     provider = runpod_provider.verify(snapshot, results, head_sha)
-    command = [sys.executable,
-               str(ROOT / "research/n83_highk_online_tiebreak_20261020/verify_screen.py"),
+    command = [sys.executable, "-m",
+               "research.n83_highk_online_tiebreak_20261020.verify_screen",
                str(results)]
     process = subprocess.run(command, cwd=ROOT, text=True,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
