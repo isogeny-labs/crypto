@@ -1,0 +1,48 @@
+{
+  "schema": "n83.k600-natural-xcnf-panel/v1",
+  "status": "FROZEN_BEFORE_1M_CALLS",
+  "scope": "first_ordinary_query_stage_diagnostic",
+  "curve": "icv1-f2m83-tm6151469093347-debefd74",
+  "candidate_id": null,
+  "trial": 0,
+  "public_target": ["1834913121178197242856238", "8797964190732846213981377"],
+  "query_coefficient_a": "1833078656608906180176350",
+  "query_coefficient_b": "163089659398503559150141",
+  "query_point": ["3547082699798970859000627", "6877207017147849837699235"],
+  "plan_sha256": "fbd3fb943bc0f181797d106c41ee9961b8d70768b5c65a5584002e3c1b5e488f",
+  "exporter_source_sha256": "ab57041e488b777942d41eea1bc19989a6c60577ba2bfa706c06645ab83eb69a",
+  "domain_extractor_source_sha256": "bf6b7ac91e7d01565705680e7cfb7294e2adf6375febf115460e55a6c9cfecc5",
+  "arms": [
+    {
+      "role": "gray_pool",
+      "small_orbits": 600,
+      "residual_orbits": 97,
+      "domain_input_sha256": "a5aaf22f077613a3a55dc5a8511b065d21205bd90c815bfe387b75dbd2194a39",
+      "xcnf_sha256": "9522505aaf0fa38f298922faad26a0804aede231764ff1f4c9043a7760d0a3c5",
+      "variables": 95068,
+      "clauses": 431648,
+      "xor_rows": 4980
+    },
+    {
+      "role": "hash_pool",
+      "small_orbits": 600,
+      "residual_orbits": 600,
+      "domain_input_sha256": "42919c21d52b90df022f81ff8600f632f3805774634e8423504d1ac78595ded1",
+      "xcnf_sha256": "98a9d6b7accb111bbcda154e47af45d48eddff022795857af37f095334b253dc",
+      "variables": 97080,
+      "clauses": 518164,
+      "xor_rows": 4980
+    }
+  ],
+  "run_order": ["gray_pool", "hash_pool"],
+  "solver": "CryptoMiniSat 5.14.7",
+  "threads": 1,
+  "conflict_cap_per_arm": 1000000,
+  "solver_wall_cap_seconds_per_arm": 180,
+  "external_watchdog_slack_seconds": 15,
+  "timing_boundary": "local solver process including XCNF input load, excluding export and independent replay",
+  "host_tier": "L0_unisolated_stage_diagnostic",
+  "model_gate": "independently replay every CNF and XOR row and the original-field and curve equations before counting a verified relation",
+  "selection_gate": "complete natural relation yield, useful rank, matrix solve, target descent, and paired same-point rho required",
+  "selected_best_total_runtime": null
+}
