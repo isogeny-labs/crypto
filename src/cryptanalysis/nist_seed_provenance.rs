@@ -30,6 +30,7 @@
 use num_bigint::BigUint;
 
 use super::p256_backdoor_map::x962_candidate_r;
+use crate::hash::sha1::sha1;
 
 // ── The generator ─────────────────────────────────────────────────────
 
@@ -114,6 +115,57 @@ pub fn binary_seed(seedval: u32, n: u32) -> [u8; 20] {
         chunk.copy_from_slice(&g.lrand48().to_be_bytes());
     }
     out
+}
+
+// ── Binary curves: the X9.62 `b` of a seed ────────────────────────────
+
+/// A FIPS 186-2 random binary curve `y² + xy = x³ + x² + b` over
+/// `GF(2^m) = GF(2)[z]/(f)`, with its published seed and `b` (polynomial
+/// basis).  The seed's X9.62 output is `b` in the Gaussian normal basis
+/// of type `gnb_type`; `research/nist_binary_skipped_20261020/` checks the
+/// conversion to the published polynomial-basis `b` for all five curves.
+#[derive(Clone, Copy, Debug)]
+pub struct BinaryCurve {
+    pub name: &'static str,
+    pub m: u32,
+    /// Exponents of the reduction polynomial `f`, highest first.
+    pub poly: &'static [u32],
+    pub seed_hex: &'static str,
+    pub b_hex: &'static str,
+    pub gnb_type: u32,
+}
+
+/// B-163 … B-571, as `docs/curves/standards/parameters.json` records them.
+pub const BINARY_CURVES: [BinaryCurve; 5] = [
+    BinaryCurve { name: "B-163", m: 163, poly: &[163, 7, 6, 3, 0], seed_hex: "85e25bfe5c86226cdb12016f7553f9d0e693a268", b_hex: "20a601907b8c953ca1481eb10512f78744a3205fd", gnb_type: 4 },
+    BinaryCurve { name: "B-233", m: 233, poly: &[233, 74, 0], seed_hex: "74d59ff07f6b413d0ea14b344b20a2db049b50c3", b_hex: "66647ede6c332c7f8c0923bb58213b333b20e9ce4281fe115f7d8f90ad", gnb_type: 2 },
+    BinaryCurve { name: "B-283", m: 283, poly: &[283, 12, 7, 5, 0], seed_hex: "77e2b07370eb0f832a6dd5b62dfc88cd06bb84be", b_hex: "27b680ac8b8596da5a4af8a19a0303fca97fd7645309fa2a581485af6263e313b79a2f5", gnb_type: 6 },
+    BinaryCurve { name: "B-409", m: 409, poly: &[409, 87, 0], seed_hex: "4099b5a457f9d69f79213d094c4bcd4d4262210b", b_hex: "21a5c2c8ee9feb5c4b9a753b7b476b7fd6422ef1f3dd674761fa99d6ac27c8a9a197b272822f6cd57a55aa4f50ae317b13545f", gnb_type: 4 },
+    BinaryCurve { name: "B-571", m: 571, poly: &[571, 10, 5, 2, 0], seed_hex: "2aa058f73a0e33ab486b0f610410c53a7f132310", b_hex: "2f40e7e2221f295de297117b7f3d62f5c6a97ffcb8ceff1cd6ba8ce4a9a18ad84ffabbd8efa59332be7ad6756a66e294afd185a78ff12aa520e4de739baca0c7ffeff7f2955727a", gnb_type: 10 },
+];
+
+/// X9.62 A.3.3.2 (FIPS 186-2 D.1.3): the `b` a seed gives over `GF(2^m)`,
+/// as the integer whose bits, most significant first, are the normal-basis
+/// coordinates of `b` (FIPS 186-2 generated the B-curves in that basis).
+/// `s = ⌊(m − 1)/160⌋`, `h = m − 160s`, `b₀` the rightmost `h` bits of
+/// `SHA-1(seed)`, `W_i = SHA-1((seed + i) mod 2^160)`, and
+/// `b = b₀ ‖ W₁ ‖ … ‖ W_s`.  Unlike the prime-field `r`, no bit is cleared.
+pub fn x962_binary_candidate_b(seed: &[u8; 20], m: u32) -> BigUint {
+    let s = (m - 1) / 160;
+    let h = m - 160 * s;
+    let mask = (BigUint::from(1u8) << h) - BigUint::from(1u8);
+    let mut b = BigUint::from_bytes_be(&sha1(seed)) & mask;
+    let z = BigUint::from_bytes_be(seed);
+    let modulus = BigUint::from(1u8) << 160;
+    for i in 1..=s {
+        let zi_int: BigUint = (&z + BigUint::from(i)) % &modulus;
+        let mut zi = zi_int.to_bytes_be();
+        while zi.len() < 20 {
+            zi.insert(0, 0);
+        }
+        b = (b << 160) | BigUint::from_bytes_be(&sha1(&zi));
+    }
+    b
 }
 
 // ── The published seeds ───────────────────────────────────────────────
@@ -278,6 +330,39 @@ mod tests {
                 "{}",
                 s.name
             );
+        }
+    }
+    #[test]
+    fn the_binary_b_is_not_the_polynomial_basis_value() {
+        // The seed's output is a normal-basis value: read in the polynomial
+        // basis it is not the published b (the GP census converts it).
+        for c in BINARY_CURVES.iter() {
+            let b = BigUint::parse_bytes(c.b_hex.as_bytes(), 16).expect("b hex");
+            let nb = x962_binary_candidate_b(&seed_bytes(c.seed_hex), c.m);
+            assert!(nb.bits() <= c.m as u64, "{}", c.name);
+            assert_ne!(nb, b, "{}", c.name);
+        }
+    }
+
+    #[test]
+    fn the_b233_normal_basis_b_is_pinned() {
+        let c = BINARY_CURVES.iter().find(|c| c.name == "B-233").unwrap();
+        let nb = x962_binary_candidate_b(&seed_bytes(c.seed_hex), c.m);
+        assert_eq!(
+            format!("{nb:x}"),
+            "1a003e0962d4f9a8e407c904a9538163adb825212600c7752ad52233279"
+        );
+    }
+
+    #[test]
+    fn the_drand48_binary_seeds_are_the_published_curves() {
+        // The four lrand48 runs land on four of the five FIPS curves.
+        for s in BINARY_SEEDS.iter() {
+            let c = BINARY_CURVES
+                .iter()
+                .find(|c| c.name == s.name)
+                .expect("curve");
+            assert_eq!(s.seed_hex, c.seed_hex, "{}", s.name);
         }
     }
 }
