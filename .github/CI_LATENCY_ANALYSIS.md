@@ -170,7 +170,7 @@ queue delay, inter-job waits, execution, retries, total runner-minutes, and
 merge-to-publication latency separately. Failure and cancellation rates must
 accompany timing statistics so faster failures do not look like improvement.
 
-## Validation
+## Historical validation before final review
 
 Actionlint passed for all 431 workflows. Exact sparse-checkout fixtures ran
 the reviewer self-test and release publication tests successfully. The existing
@@ -194,6 +194,8 @@ Lean auditor CLI compatibility, formatting/lint issues, and missing IPC
 handling. The final native library run passed 4,418 tests with zero failures
 and 118 existing ignored tests in 727.97 seconds. It is local correctness
 evidence, not a hosted performance measurement. The original evidence JSON
-and historical timing samples remain unchanged. Workflow validation is rerun
-after restoring the source policy, and hosted checks must complete on the
-actual proposed head before merge.
+and historical timing samples remain unchanged. After restoring the source policy, Actionlint passed all 432 workflows,
+the budget checker reported zero violations, 15 budget tests and 29 helper
+tests passed, and publication/performance-counter regressions passed. All nine
+validation workflows were read back as active after enablement. Hosted checks
+must complete on the actual proposed head before merge.

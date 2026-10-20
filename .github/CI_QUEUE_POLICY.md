@@ -14,7 +14,7 @@ separate; a shorter timeout does not establish faster successful validation.
   release packaging.
 - Existing job timeout declarations are retained for every PR workflow. The
   regression policy remains the 25-minute default with named exceptions in
-  `scripts/check-pr-budgets.py`. This includes CodeQL's analysis/preparation
+  `.github/scripts/check-pr-budgets.py`. This includes CodeQL's analysis/preparation
   exceptions and the 45-minute ecbench and archived-producer exceptions added
   by PR #2189. Their longer manual/research budgets are unchanged.
 - The release workflow retains main-push publication and PR packaging checks.
@@ -52,7 +52,9 @@ scheduled-only routing. The owner's subsequent instruction retains those PR
 gates, so those nine must be active for their applicable checks to run. Source
 restoration and live Actions enablement are separate operations: a disabled
 check or an absent run is not a passing result. Current provider state and
-current-head results must be checked before merge.
+current-head results must be checked before merge. On 2026-10-20, all nine
+were re-enabled and independently read back as `active` through the Actions
+API after the owner confirmed this policy.
 
 The historical cleanup also included six separately held workflows. This PR
 does not resolve their ownership or evidence migration:
@@ -108,7 +110,8 @@ does not change those native sources or their frozen inputs.
 
 The policy-restoration review compares every existing PR workflow's event and
 timeout declarations against current main, including #2189's exceptions.
-Actionlint, the budget checker and its 15 tests, CI-scope/frozen-source helper
-tests, publication tests, and performance-counter regressions are rerun on the
-final source. Applicable current-head hosted checks remain necessary before
+Actionlint passed all 432 workflows; the budget checker reported zero
+violations and its 15 tests passed. All 29 CI-scope/frozen-source helper tests,
+publication tests, and six performance-counter regression test methods passed
+on the restored source. Applicable current-head hosted checks remain necessary before
 merge; local validation does not substitute for platform-specific CI.
