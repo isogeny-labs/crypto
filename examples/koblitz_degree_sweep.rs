@@ -35,7 +35,10 @@ fn arg(name: &str, default: u32) -> u32 {
 }
 
 fn is_prime_u32(n: u32) -> bool {
-    n >= 2 && (2..).take_while(|d| d * d <= n).all(|d| n % d != 0)
+    n >= 2
+        && (2..)
+            .take_while(|d| d * d <= n)
+            .all(|d| !n.is_multiple_of(d))
 }
 
 fn order_mod(a: u64, p: u64) -> u64 {
