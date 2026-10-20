@@ -12,21 +12,22 @@ pre-registered hypotheses)
 (ePrint 2020/1315).
 
 **Modular and low-genus carrier follow-up (2026-10-19):**
-[Round11](research/koblitz_modular_ic_20261018/rounds/11/REPORT.md)
-closes the 460 diagonal multiplicity gap by direct characteristic-2 local
-series: 400 supersingular labels have contacts 1, 2, 6, 14 with weighted
-degree 860. The complete diagonal uses a written moduli/deformation bridge;
-actual 11-torsion and quaternion/Velu maps are bound, while explicit
-49-torsion point coordinates remain open. A five-quadric coupled graph has
-certified projective saturation and six charts. The full proper quotient
-embeddings remain open beyond the four explicit affine open F2 models.
-Translated T-fibers, a genus-3 ambient x-sum correspondence and an equal-y
-residual curve are exact, but all seven whole noncuspidal divisors remain
-incomplete; the antidiagonal has degree 1,240 left to enumerate. Ranks stay
-12/1308 and nonzero-image 11 on 1165/1160 columns. Twenty-two new Lean
-results pass, with 168 project theorems audited. Earlier evidence remains
-frozen. See the [construction problem](problems/koblitz-modular-carrier-transfer.md)
-for exact exit criteria. No IC cost is measured or assessed.
+[Round12](research/koblitz_modular_ic_20261018/rounds/12/REPORT.md)
+completes the supersingular closed zero supports and multiplicities of all
+eight coupled functions. The 3,080 source points form 308 degree-10 orbits.
+The antidiagonal splits into supersingular degree 740 and ordinary degree
+500; all seven whole unfinished divisors retain ordinary supports. Every
+supersingular target value is killed by 8, giving zero 11-primary projected
+image. Four full homogenized quotient circuits have explicit false boundary
+points and an intermediate saturation step of 213,120 generated scalar
+linear relations (membership depth at most 5, independence not claimed).
+Complete projective saturation and proper polarized quotient embeddings
+remain open. Twenty-four new named Lean results include eight actual
+boundary-circuit certificates. The written modular/deformation bridges and
+native semantics remain only partially formalized. Relation ranks stay
+12/1308 and nonzero-image 11 on 1165/1160 columns. See the
+[construction problem](problems/koblitz-modular-carrier-transfer.md).
+No IC cost or efficiency verdict is supplied.
 
 ## The setting
 

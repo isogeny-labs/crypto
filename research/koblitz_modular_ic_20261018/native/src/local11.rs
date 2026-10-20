@@ -464,3 +464,6 @@ pub fn verify(dir: &Path) {
         "M16b:{roots} root coefficients,{substitutions} transformation coefficients,degree{total}"
     );
 }
+
+#[path="ss12.rs"]
+pub(crate) mod ss12;

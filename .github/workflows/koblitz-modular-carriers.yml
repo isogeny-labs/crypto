@@ -112,6 +112,13 @@ jobs:
           round=research/koblitz_modular_ic_20261018/rounds/11
           (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
           "$round/REPLAY.sh"
+      - name: Replay round 12 SS divisors and actual boundary saturation
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/12
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          "$round/REPLAY.sh"
       - name: Install pinned Lean
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none

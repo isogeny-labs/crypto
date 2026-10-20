@@ -486,3 +486,37 @@ transition to the retained Kummer atlas. Twenty-two additional Lean
 proofs pass;the full gate checks168 theorems. Native semantics and global
 moduli/deformation geometry remain written obligations. Relation ranks
 and IC assessment are unchanged.
+
+## Round12: complete SS strata; actual circuit saturation step
+
+[Round12](../research/koblitz_modular_ic_20261018/rounds/12/REPORT.md)
+constructs actual coordinates for all56 cyclic49 labels through local
+7-isogeny chains. All3080 supersingular source points form308 closed
+degree10 orbits. Their complete zero degrees for the eight functions are
+1600,760,1540,1020,0,2060,2080,1720. Exact ordinary degrees still requiring
+support are500,1760,1880,2760,0,580,1370,2180. The antidiagonal SS degree
+740 has contacts1,2,4 and leaves ordinary500. All400 old diagonal contacts
+are reproduced,including order14. No whole new principal row is promoted.
+
+All SS target points are killed by8;their11-primary projections vanish.
+Thus these completed strata do not increase nonzero-image rank. The next
+relation exit is an enumerated ordinary support,especially the antidiagonal
+500 or product-plus-one580,with all closed points,local multiplicities
+and projected images. Mere degrees or a finite-field point screen do not
+discharge that exit. All seven whole divisors remain open.
+
+The four full homogenized quotient circuits now have explicit false
+projective points satisfying all1679760 scalar equations but violating
+certified saturated linear relations. Eight kernel-checked Lean results
+verify the actual restricted circuits and missing relations. The defects
+are removable auxiliary constant gates,not a nonexistence obstruction.
+Constant propagation adds592 K-linear relations,or213120 generated scalar
+linear relations,of h-membership depth<=5. They can be redundant. This
+is an intermediate ideal with the same h-chart,not full saturation. The
+proper quotient exit still needs the full boundary charts and polarization.
+
+Twenty-four new named Lean results are supplied. Global moduli/etale
+geometry and native field semantics remain written bridges. Explicit49
+torsion point coordinates are still uncomputed. Failed preliminary bounds
+and censored jets are retained;the protocol expands precision before the
+accepted128/64/16-coefficient construction. No IC efficiency claim is made.

@@ -670,3 +670,6 @@ pub fn expand(dir: &Path) {
     );
     println!("Q8c:72 scalar polynomials expanded and{checks} local gate controls pass");
 }
+
+#[path="boundary12.rs"]
+pub(crate) mod boundary12;

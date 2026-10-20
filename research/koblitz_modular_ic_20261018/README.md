@@ -1,25 +1,24 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [11](rounds/11/README.md), with its
-[report](rounds/11/REPORT.md), [PDF](rounds/11/report.pdf),
-[proof map](rounds/11/PROOF_MAP.md), [ledger](rounds/11/ledger.json)
-and exact replay. The 460 diagonal multiplicity gap is closed: 400
-supersingular labels have contacts 1, 2, 6, 14 with counts 260, 100, 20, 20,
-weighted degree 860. Forty degree-10 closed points form the complete
-noncuspidal diagonal under the written characteristic-2 moduli bridge.
-Actual 11-torsion and quaternion/Velu maps are bound; explicit 49-torsion
-point coordinates remain open.
+The current round is [12](rounds/12/README.md), with its
+[report](rounds/12/REPORT.md), [PDF](rounds/12/report.pdf),
+[proof map](rounds/12/PROOF_MAP.md), [ledger](rounds/12/ledger.json)
+and exact replay. All supersingular zeros of the eight coupled functions
+now have complete closed supports and local multiplicities: 3,080 source
+points in 308 degree-10 orbits. The antidiagonal contributes degree 740
+there, leaving ordinary degree 500. All seven whole unfinished divisors
+still have ordinary supports to construct. All supersingular target
+values are killed by 8 and give zero 11-primary image under the retained
+projections. Relation ranks remain unchanged.
 
-A coupled multiplication/two-inverse graph has an exact five-quadric
-projective saturation and six charts. The four determinant-19 quotient
-affine open models remain available; whole proper quotient saturation,
-boundary gluing and projective embeddings remain open. Translated T-fibers,
-a genus-3 ambient x-sum correspondence and an equal-y residual curve add
-structure to the seven still incomplete noncuspidal divisors. The
-antidiagonal has unresolved degree 1,240. Ranks stay 12/1308 and nonzero
-11 on 1165/1160 columns. Twenty-two new Lean results pass, with 168 project
-theorems audited. Global geometric bridges remain written. No IC cost is
-measured or assessed.
+Each of the four actual full homogenized quotient circuits has a certified
+false boundary point. A native saturation step emits 213,120 generated
+scalar linear relations, with h-membership depth at most 5; they need not
+be independent. The four affine open models remain available. Complete
+projective saturation, proper quotient boundaries and polarized embeddings
+remain open. Twenty-four new named Lean results include eight actual
+boundary-circuit certificates. Modular geometry and native semantics remain
+partially formalized. No IC cost or efficiency verdict is supplied.
 
 Earlier evidence stays frozen:
 
@@ -42,6 +41,8 @@ Earlier evidence stays frozen:
   rational generators and bounded twist/reflection and coupled-function controls.
 - [Round 10](rounds/10/README.md): explicit quadratic F2 open models,
   complete product cusp divisor and the then-unresolved diagonal multiplicity gap.
+- [Round 11](rounds/11/README.md): closes the460 diagonal multiplicity gap
+  using characteristic2 local equations;projective coupled-graph control.
 - [Open construction problem](../../problems/koblitz-modular-carrier-transfer.md):
   current obligations, exact scope, and next discriminating experiments.
 

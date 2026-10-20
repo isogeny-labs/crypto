@@ -80,6 +80,7 @@ mod round08_record;
 mod round09_record;
 mod round10_record;
 mod round11_record;
+mod round12_record;
 mod round_record;
 mod saturation10;
 mod saturation11;
@@ -360,6 +361,30 @@ fn run(out: &std::path::Path) {
 }
 fn main() {
     let args10: Vec<String> = std::env::args().collect();
+    if args10.get(1).map(String::as_str) == Some("--record-round12") {
+        round12_record::record(std::path::Path::new(args10.get(2).expect("fresh round records")));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round12-constant-saturation") {
+        kummer08::descent09::polynomial10::boundary12::constants(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--verify-round12-local") {
+        ss10::local11::ss12::verify(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round12-boundary-lean") {
+        kummer08::descent09::polynomial10::boundary12::certify(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round12-boundary") {
+        kummer08::descent09::polynomial10::boundary12::run(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round12-ss49") {
+        ss10::local11::ss12::run(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        return;
+    }
     if args10.get(1).map(String::as_str) == Some("--record-round11") {
         round11_record::record(std::path::Path::new(
             args10.get(2).expect("fresh round records"),
