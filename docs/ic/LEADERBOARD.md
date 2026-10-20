@@ -209,6 +209,29 @@ The four n37 arms (strong signed-Frobenius rho, K8, K16 and an identical K16 con
 | `icv1-f2m53-tm56619371-dac20a85` | 44.26 | ic-k16-control | 0/80 | — | — | — | A/A control |
 | `icv1-f2m53-tm56619371-dac20a85` | 44.26 | K16 / K8 | — | — | — | — | unknown (0 verified pairs) |
 
+## Linear-algebra engine, outside tables A–C
+
+The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime (class: engineering). Whole solve from relation rows to verified logarithms, median of 3 seeds in one session; ratios are per-seed medians [min, max]. `legacy` is the filter tables A–C were measured with; `CADO-style` is `FilterOptions::cado()` (CADO-NFS's purge and merge, ported), the `ic logs` default since #1861; CADO-NFS ran its own purge + merge-dl + bwc on the same matrices (+1 coefficients). Its share of S in every row above is in the phase table, and no row moves. Study: [research/la_engines_20261014/](../../research/la_engines_20261014/).
+
+| columns | legacy | CADO-style | legacy / CADO-style | CADO-NFS | CADO-NFS / ours | core: legacy → CADO-style (CADO-NFS) |
+|--:|--:|--:|:--|--:|:--|:--|
+| 16,384 | 0.384 s | 0.151 s | 2.48× [2.01, 2.53] | 3.71 s | 20.57× [17.73, 23.09] | 1,675 → 234 (271) |
+| 65,536 | 4.47 s | 1.29 s | 3.49× [3.46, 3.50] | 5.48 s | 4.26× [4.24, 4.50] | 6,743 → 852 (921) |
+| 131,072 | 18.2 s | 3.80 s | 4.72× [4.70, 5.07] | 8.00 s | 2.09× [2.09, 2.19] | 13,369 → 1,652 (1,660) |
+| 262,144 | 86.6 s | 8.35 s | 10.40× [9.99, 11.06] | 14.7 s | 1.93× [1.74, 1.96] | 26,750 → 3,424 (3,512) |
+
+## Pair-table set-up, outside tables A–C
+
+The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-fp32-t7319-90da43e9, three builders of the same table (class: engineering). `scalar` is `mitm:negation_folded=1`, one affine addition per pair into one hash map; `batched` is `mitm-prime-batch`, one batched inversion per row; `blocked` is `mitm-prime-blocked`, the batched arithmetic inserted into cache-sized packed regions. Every arm counts the same additions and recovers the same logarithm (456/456 executions identical), so S and every row above are unchanged. Mean wall per run; ratios Σ blocked / Σ other over (target, round) pairs [per-pair min, max]; A/A 1.02 [0.70, 1.46]. Isolation L1: descriptive. Study: [research/ic_oracle_setup_blocked_20261020/](../../research/ic_oracle_setup_blocked_20261020/).
+
+| N | set-up scalar | set-up batched | set-up blocked | blocked / batched | blocked / scalar | whole run blocked / scalar | peak RSS batched → blocked |
+|--:|--:|--:|--:|:--|:--|:--|:--|
+| 1,024 | 216 ms | 117 ms | 55 ms | 0.47 [0.32, 0.79] | 0.25 [0.15, 0.43] | 0.91 | 0.09 → 0.08 GiB |
+| 2,048 | 1.44 s | 739 ms | 238 ms | 0.32 [0.19, 0.44] | 0.17 [0.13, 0.22] | 0.38 | 0.19 → 0.12 GiB |
+| 4,096 | 8.40 s | 3.82 s | 1.04 s | 0.27 [0.23, 0.32] | 0.12 [0.10, 0.15] | 0.16 | 0.63 → 0.34 GiB |
+| 8,192 | 43.6 s | 20.5 s | 5.29 s | 0.26 [0.24, 0.31] | 0.12 [0.11, 0.15] | 0.13 | 2.37 → 1.25 GiB |
+| 16,384 | 224 s | 117 s | 28.2 s | 0.24 [0.22, 0.26] | 0.13 [0.12, 0.14] | 0.13 | 9.15 → 4.65 GiB |
+
 ## Large-prime conductor-gap counted diagnostics
 
 Copied from native analysis: eight independent one-target workloads per fixed curve; no transported targets. Counted S has unpriced native work. These observations do not enter tables A–C or change a full-cost ranking.
@@ -259,6 +282,7 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
+- `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `765f6e8d05ebbf75…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`

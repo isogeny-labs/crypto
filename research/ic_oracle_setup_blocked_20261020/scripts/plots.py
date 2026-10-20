@@ -51,7 +51,7 @@ for kind in KINDS:
     xs, ys = series(kind, lambda a: a["wall_ms_mean"]["oracle_setup"] / 1e3)
     ax.plot(xs, ys, "o-", color=COL[kind], label=LAB[kind])
     for n, y in zip(xs, ys):
-        ax.annotate(f"{y:.2g} s", (n, y), textcoords="offset points", xytext=(4, -10 if kind == "blocked" else 5), fontsize=7)
+        ax.annotate(f"{y:.3g} s", (n, y), textcoords="offset points", xytext=(4, -10 if kind == "blocked" else 5), fontsize=7)
 ax.set_xscale("log", base=2)
 ax.set_yscale("log")
 ax.set_xlabel("factor-base abscissae N")
@@ -77,22 +77,25 @@ ax.set_ylim(bottom=0)
 fig.text(0.01, 0.005, NOTE, fontsize=5.5)
 save(fig, "setup_ns_per_entry")
 
-# 3. Where each run's wall time goes.
+# 3. Where each run's wall time goes: each phase's share of the three phases.
 fig, ax = plt.subplots(figsize=(7.6, 4.2))
 phases = [("oracle_setup", "oracle set-up (pair table)", "#9bbb59"), ("relations", "relations", "#f79646"), ("linear_algebra", "linear algebra", "#8064a2")]
 names = [f"{k}-{n}" for n in sizes for k in KINDS if f"{k}-{n}" in arms]
 x = range(len(names))
+totals = [sum(arms[nm]["wall_ms_mean"][k] for k, _, _ in phases) for nm in names]
 base = [0.0] * len(names)
 for key, lab, col in phases:
-    vals = [arms[nm]["wall_ms_mean"][key] / 1e3 for nm in names]
+    vals = [100 * arms[nm]["wall_ms_mean"][key] / t for nm, t in zip(names, totals)]
     ax.bar(x, vals, bottom=base, color=col, label=lab)
     base = [b + v for b, v in zip(base, vals)]
+for i, t in zip(x, totals):
+    ax.annotate(f"{t / 1e3:.3g} s", (i, 100), textcoords="offset points", xytext=(0, 2), ha="center", fontsize=6)
 ax.set_xticks(list(x))
 ax.set_xticklabels(names, rotation=45, ha="right", fontsize=7)
-ax.set_yscale("log")
-ax.set_ylabel("wall time per run (s, mean; log scale)")
-ax.set_title("Phase wall time per arm (stacked)", fontsize=9)
-ax.legend(fontsize=7)
+ax.set_ylim(0, 108)
+ax.set_ylabel("share of set-up + relations + LA wall (%)")
+ax.set_title("Where a run's wall time goes (mean per run above each bar)", fontsize=9)
+ax.legend(fontsize=7, loc="lower right")
 fig.text(0.01, 0.005, NOTE, fontsize=5.5)
 save(fig, "phase_wall")
 
@@ -100,12 +103,12 @@ save(fig, "phase_wall")
 fig, ax = plt.subplots(figsize=(6.4, 4.2))
 for kind in KINDS:
     xs, ys = series(kind, lambda a: a["max_rss_kib"]["max"] / 2**20)
-    ax.plot(xs, ys, "o-", color=COL[kind], label=LAB[kind])
+    ax.plot(xs, ys, "o-" if kind != "scalar" else "s--", color=COL[kind], label=LAB[kind], markersize=8 if kind == "scalar" else 6)
 ax.set_xscale("log", base=2)
 ax.set_yscale("log")
 ax.set_xlabel("factor-base abscissae N")
 ax.set_ylabel("peak resident memory per process (GiB, max over runs)")
-ax.set_title("Whole-process peak RSS (not isolated table memory)", fontsize=9)
+ax.set_title("Whole-process peak RSS (not isolated table memory); scalar and batched coincide", fontsize=8)
 ax.legend(fontsize=7)
 ax.grid(alpha=0.3, which="both")
 fig.text(0.01, 0.005, f"Sessions {sids}.", fontsize=5.5)

@@ -618,6 +618,11 @@ def la_component() -> dict:
             "class": "engineering"}
 
 
+def secs(x: float) -> str:
+    """Seconds to three significant figures, trailing zeros kept: 8.00 s, 224 s."""
+    return f"{x:.0f} s" if x >= 100 else f"{x:#.3g} s"
+
+
 def pair_table_component() -> dict:
     """The ic.pipeline oracle set-up (the |F|² pair table) on its own:
     research/ic_oracle_setup_blocked_20261020, copied from its RESULT.json
@@ -1392,8 +1397,7 @@ def markdown(doc: dict) -> str:
           "|--:|--:|--:|:--|--:|:--|:--|"]
 
     def lat(q):
-        x = q["median"]
-        return f"{x:.3g} s" if x < 10 else f"{x:.1f} s"
+        return secs(q["median"])
 
     def lar(q):
         return f"{q['median']:.2f}× [{q['min']:.2f}, {q['max']:.2f}]"
@@ -1418,7 +1422,7 @@ def markdown(doc: dict) -> str:
           "|--:|--:|--:|--:|:--|:--|:--|:--|"]
 
     def pts(ms):
-        return f"{ms:.0f} ms" if ms < 1000 else f"{ms / 1e3:.3g} s"
+        return f"{ms:.0f} ms" if ms < 1000 else secs(ms / 1e3)
 
     def ptr(q):
         return f"{q['sum']:.2f} [{q['min']:.2f}, {q['max']:.2f}]"
@@ -1852,9 +1856,9 @@ def page(doc: dict, standalone: bool) -> str:
     for r in la["rows"]:
         def lq(q):
             return f'{q["median"]:.2f}× <span class="muted">[{q["min"]:.2f}, {q["max"]:.2f}]</span>'
-        P.append(f'<tr><td class="n">{r["columns"]:,}</td><td class="n">{r["legacy_s"]["median"]:.3g} s</td>'
-                 f'<td class="n">{r["cado_style_s"]["median"]:.3g} s</td><td>{lq(r["legacy_over_cado_style"])}</td>'
-                 f'<td class="n">{r["cado_nfs_s"]["median"]:.3g} s</td><td>{lq(r["cado_nfs_over_ours"])}</td>'
+        P.append(f'<tr><td class="n">{r["columns"]:,}</td><td class="n">{secs(r["legacy_s"]["median"])}</td>'
+                 f'<td class="n">{secs(r["cado_style_s"]["median"])}</td><td>{lq(r["legacy_over_cado_style"])}</td>'
+                 f'<td class="n">{secs(r["cado_nfs_s"]["median"])}</td><td>{lq(r["cado_nfs_over_ours"])}</td>'
                  f'<td>{r["core_legacy"]:,} → {r["core_cado_style"]:,} ({r["core_cado_nfs"]:,})</td></tr>')
     P.append('</tbody></table></section>')
     pt = doc["pair_table_component"]
@@ -1877,7 +1881,7 @@ def page(doc: dict, standalone: bool) -> str:
             return f'{q["sum"]:.2f} <span class="muted">[{q["min"]:.2f}, {q["max"]:.2f}]</span>'
 
         def pm(ms):
-            return f"{ms:.0f} ms" if ms < 1000 else f"{ms / 1e3:.3g} s"
+            return f"{ms:.0f} ms" if ms < 1000 else secs(ms / 1e3)
         P.append(f'<tr><td class="n">{r["N"]:,}</td><td class="n">{pm(r["setup_ms"]["scalar"])}</td>'
                  f'<td class="n">{pm(r["setup_ms"]["batch"])}</td><td class="n">{pm(r["setup_ms"]["blocked"])}</td>'
                  f'<td>{pq(r["blocked_over_batch"])}</td><td>{pq(r["blocked_over_scalar"])}</td>'
