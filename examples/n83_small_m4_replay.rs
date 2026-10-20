@@ -43,11 +43,20 @@ fn contract(receipt: &Value) -> Result<(&str, &str, usize, usize)> {
         "natural" => "PASS_NATURAL_PENDING_REPLAY",
         _ => return Err("unsupported mode".into()),
     };
+    let target_allowed = match receipt.get("experiment_policy") {
+        None => receipt["target_index"] == 0,
+        Some(p) => {
+            p == "small-m4-xor-cache/v1"
+                && receipt["xor_decided_cache"].is_boolean()
+                && receipt["conflict_budget"] == 10000
+                && receipt["target_index"].as_u64().is_some_and(|n| n <= 1)
+        }
+    };
     if receipt["schema"] != "n83.small-m4-worker/v1"
         || receipt["status"] != expected
         || receipt["curve_id"] != CURVE
         || receipt["m"] != 4
-        || receipt["target_index"] != 0
+        || !target_allowed
         || receipt["rank"] != 1
         || receipt["group_verified"] != true
         || receipt["changed_target_rejected"] != true
@@ -93,7 +102,8 @@ fn replay(base: &Path, corpus: &Path, receipt_path: &Path, output: &Path) -> Res
     }
     let public: Value = serde_json::from_slice(&public_bytes)?;
     let target = point(&receipt["target"])?;
-    if mode == "natural" && target != point(&public["points"][0])? {
+    let target_index = receipt["target_index"].as_u64().ok_or("target index")? as usize;
+    if mode == "natural" && target != point(&public["points"][target_index])? {
         return Err("natural target differs from corpus".into());
     }
     let indices: Vec<usize> = receipt["point_indices"]
@@ -258,6 +268,16 @@ mod tests {
             "public_corpus_sha256":CORPUS,"columns":2001,"points":332166});
         assert!(contract(&r).is_ok());
         r["status"] = json!("UNKNOWN_budget");
+        assert!(contract(&r).is_err());
+        r["status"] = json!("PASS_NATURAL_PENDING_REPLAY");
+        r["mode"] = json!("natural");
+        r["target_index"] = json!(1);
+        assert!(contract(&r).is_err());
+        r["experiment_policy"] = json!("small-m4-xor-cache/v1");
+        r["xor_decided_cache"] = json!(true);
+        r["conflict_budget"] = json!(10000);
+        assert!(contract(&r).is_ok());
+        r["target_index"] = json!(2);
         assert!(contract(&r).is_err());
         r["status"] = json!("PASS_CONSTRUCTED_PENDING_REPLAY");
         r["mode"] = json!("natural");

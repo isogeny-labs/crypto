@@ -980,6 +980,7 @@ fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().collect();
     match args.get(1).map(String::as_str) {
         Some("small-m4") if args.len()==8 => small_m4::run(&args[2],&args[3],Path::new(&args[4]),Path::new(&args[5]),args[6].parse()?,Path::new(&args[7])),
+        Some("small-m4-cache") if args.len()==9 => small_m4::cache_run(&args[2],&args[3],&args[4],Path::new(&args[5]),Path::new(&args[6]),args[7].parse()?,Path::new(&args[8])),
         Some("targets") if args.len()==4 => targets(Path::new(&args[2]),Path::new(&args[3])),
         Some("setup") if args.len()==5 => setup(&args[2],Path::new(&args[3]),Path::new(&args[4])),
         Some("probe") if args.len()==8 => probe("prebuilt",&args[2],Path::new(&args[3]),Path::new(&args[4]),

@@ -71,9 +71,38 @@ pub(super) fn run(
     target_index: usize,
     output: &Path,
 ) -> Result<()> {
+    run_inner(mode, arm, root, corpus, target_index, output, None)
+}
+
+pub(super) fn cache_run(
+    cache: &str,
+    mode: &str,
+    arm: &str,
+    root: &Path,
+    corpus: &Path,
+    target_index: usize,
+    output: &Path,
+) -> Result<()> {
+    let enabled = match cache {
+        "off" => false,
+        "on" => true,
+        _ => return Err("cache setting must be off or on".into()),
+    };
+    run_inner(mode, arm, root, corpus, target_index, output, Some(enabled))
+}
+
+fn run_inner(
+    mode: &str,
+    arm: &str,
+    root: &Path,
+    corpus: &Path,
+    target_index: usize,
+    output: &Path,
+    cache: Option<bool>,
+) -> Result<()> {
     if !matches!(mode, "preflight" | "positive" | "natural")
         || !matches!(arm, "K2048" | "D12")
-        || target_index != 0
+        || target_index > usize::from(cache.is_some())
     {
         return Err("small m4 request outside frozen protocol".into());
     }
@@ -92,6 +121,12 @@ pub(super) fn run(
         "source_module_blake3":blake3::hash(include_bytes!("small_m4.rs")).to_hex().to_string(),
         "source_worker_blake3":blake3::hash(include_bytes!("../../examples/n83_prebuild_cost_m23.rs")).to_hex().to_string(),
         "candidate_id":Value::Null,"selected_best_total_runtime":Value::Null});
+    let conflict_budget = if cache.is_some() { 10000 } else { 100000 };
+    if let Some(enabled) = cache {
+        identity["experiment_policy"] = json!("small-m4-xor-cache/v1");
+        identity["xor_decided_cache"] = json!(enabled);
+        identity["conflict_budget"] = json!(conflict_budget);
+    }
     let mut phases = OpenOptions::new()
         .create_new(true)
         .write(true)
@@ -223,7 +258,8 @@ pub(super) fn run(
     } else {
         0.0
     });
-    enc.solver.conflict_budget = 100000;
+    enc.solver.conflict_budget = conflict_budget;
+    enc.solver.set_xor_decided_cache(cache.unwrap_or(false));
     enc.solver.deadline = Some(started + Duration::from_secs(1790));
     let progress = Arc::new(SolverProgress::default());
     enc.solver.set_progress_observer(Arc::clone(&progress));
@@ -276,6 +312,9 @@ pub(super) fn run(
         json!({"answer":format!("{answer:?}"),"counters":sample(&progress)}),
     )?;
     identity["counters"] = sample(&progress);
+    if cache.is_some() {
+        identity["xor_decided_skips"] = json!(enc.solver.stats.xor_decided_skips);
+    }
     identity["status"] = json!(match answer {
         SolveResult::Unknown => "UNKNOWN_search_cap",
         SolveResult::Unsat => "UNVERIFIED_MODEL_UNSAT",
