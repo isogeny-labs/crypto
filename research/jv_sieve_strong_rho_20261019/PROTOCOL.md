@@ -56,3 +56,22 @@ K2. If it reaches 1 only in the tuned-rho price or only inside the §5a band, th
 claim is narrowed to the prices where it holds, and unresolved elsewhere.
 K3. The ℓ^{1/3} claim is narrowed if the fitted exponent's interval excludes 1/3.
 Wall time is an observation only.
+
+---
+## Deviations log (appended 2026-10-20; the text above is unchanged and was committed before any data)
+
+1. **Execution only.** The host rebooted whenever the session sat idle, killing the driver
+   several times. `run.sh` was made idempotent and the rho phase was split into one job per
+   (p, arm, seed), four in parallel, with the decisive arms first. Jobs are independent and
+   deterministic in (p, seed, arm, run), so splitting changes no count. Interrupted runs were
+   re-run from the start; no partial run was used. The IC counts are deterministic and were
+   re-run where a reboot interrupted a size (p = 1511 sparse, p = 1823).
+2. **Analysis bug fixed before the final numbers.** The per-size verdict and band-rank fields
+   were written into the per-arm entry instead of the size entry, so rule K2 read a null. The
+   code now reads them from the strong-rho (R3) entry. No data changed.
+3. **Post hoc, not pre-registered:** the exponent fit over p ≥ 1009 only (the sizes where the
+   sieve runs at m = 9) and the comparison against R2 in the tuned price (the cheapest rho in
+   that price, because batching costs more than it saves there). Both are labelled post hoc.
+4. Sample sizes are as registered: 16 per arm, except R0 at p = 1511 (8) and p = 1823 (4).
+5. The pre-registered rules were evaluated by `examples/jv_sieve_study.rs`: K1 and K2 did not
+   fire at any size; the K3 exponent condition did fire (see README.md).

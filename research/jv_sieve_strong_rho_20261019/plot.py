@@ -2,11 +2,15 @@
 """Plots recorded values of summary.json (computed by examples/jv_sieve_study.rs).
 No result is computed here. Usage: plot.py <study dir>"""
 import json, math, sys
+from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 d = sys.argv[1]
+if Path(d).resolve() == Path(__file__).resolve().parent:
+    raise SystemExit("Original figures are archival; use a separate output directory with summary.json.")
+Path(d, "figs").mkdir(parents=True, exist_ok=True)
 sm = json.load(open(f"{d}/summary.json"))
 all_rows = sm.get("sizes", [])
 
