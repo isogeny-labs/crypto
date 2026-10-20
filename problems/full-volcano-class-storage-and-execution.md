@@ -143,6 +143,61 @@ advances conductor identification, not full generation or DLP measurements.
 - [ ] Report min/max/mean with the actual denominators and missing outcomes,
   plus independent replay; no sampled population is labeled graph-wide.
 
+## Full-matrix execution design (2026-10-18)
+
+**Now designed** (draft, not frozen):
+[card protocol](../backlog/XP-20261017-full-volcano-graphwide-ic/PROTOCOL.md)
+and [costed README](../backlog/XP-20261017-full-volcano-graphwide-ic/README.md)
+for the three-class corpus.
+
+- **Matrix.** 24,823 vertices × 12 arms × 8 targets × 5 rounds =
+  11,915,040 measured records (14,297,808 child runs). The arms are exactly
+  `spec(row,"full")`.
+- **Shards.** 256 resumable shards: global queue ordinal mod 256, one driver
+  campaign per shard.
+- **Outcomes and controls.** Explicit treatment of
+  exhausted/timeout/interrupted/not-run/unsupported rows. Controls: gates,
+  matched rho, A/A, the raw-base negative control and the 0/0.1/1 band.
+- **Decision rule and inadmissible changes** are set out in the protocol.
+
+**Sizing probes.** L0, release `ecbench` from `abee07ee7`, vertex 0 of each
+graph, at most 4 CPUs, run 2026-10-18.
+
+- *Derived* cost. Plan A ≈ 14,700 core-h, 97 % of it on `three`, where every
+  IC arm exhausts 10⁶ trials. Plan B (1 round for `three` IC arms) ≈ 3,600
+  core-h.
+- RAM ≤ 0.35 GB per slot.
+- Disk ≈ 100 GB raw sessions, ≈ 119 GB with binaries and archives. The
+  proposed 128 GiB therefore suffices for this corpus.
+- The survey's timeouts all come from the 3 s watchdog against `bsgs`/`rho`
+  on the 45-bit `three` subgroup. The full matrix's 600 s limit is ~14× the
+  slowest probe run (44 s).
+
+**Still needs code.** Paths are under
+`research/full_volcano_graphwide_ic_20261017/execution/` unless given.
+
+- **G1** `driver.rs:339–341`: `run` refuses mode `full` unconditionally.
+- **G2** `driver.rs:131–222`: `plan` has no shard selector over the queue
+  order at lines 165–199.
+- **G3** `driver.rs:409–425`: the driver hard-codes `--cpus auto --wait` and
+  the default lock. `src/cryptanalysis/ecbench/runner.rs:383` holds that lock
+  for a whole session, so parallel shards serialize. `runner.rs:398` and
+  `isolation.rs:766` evict other processes from the reserved core.
+- **G4** `src/cryptanalysis/ecbench/workload.rs:505–540`: the registry is
+  compiled in. The root slugs resolve `registered: true` with `ec1: null`;
+  the other vertices are unregistered. Decision D3: register 24,823 curves
+  (≈ 46 MB) or freeze the `VWI1` input digest as the identity.
+- **G5** `driver.rs:83–113`: `spec()` has one rounds/warmup setting for all
+  arms. Needed only for Plan B.
+- **G6** `summarize.rs:14–26, 238–250`: min/max/mean only. The stratum
+  permutation test and the paired bootstrap are missing.
+- **G7** `Cargo.toml:130–137`: `checkpoint.rs` is not a Cargo bin, so there
+  is no per-shard verifier for `outputs.verify`.
+- **G8** `driver.rs:516–524`: no explicit resume flag for the card format.
+
+Finite-field IC for k = 30,875 / 3,953,777,913,734 / 2,126 is still
+unimplemented. It is recorded as `unsupported` per vertex.
+
 ## Next discriminating step
 
 Use the native per-case `plan` receipts to provision a durable random-access

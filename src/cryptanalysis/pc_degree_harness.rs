@@ -81,6 +81,7 @@ use crate::cryptanalysis::ffd_harness::{
     build_macaulay_rows, choose_irreducible, f2_rank, quad_monomial_index, random_nonzero_f2m,
     weil_descend_s3, F2BoolPoly,
 };
+use crate::cryptanalysis::gf2_elim;
 use rand::rngs::StdRng;
 use rand::SeedableRng;
 
@@ -354,11 +355,24 @@ pub fn e0_in_rowspace(rows: &[Vec<u64>], cols: usize, base_rank: usize) -> bool 
 /// `refutation_scan` previously computed the Macaulay rank with `f2_rank`
 /// and then re-reduced an augmented copy in `e0_in_rowspace` — two full
 /// Gaussian eliminations plus two clones of the (large) row set per degree.
-/// This routine row-reduces `rows` to echelon form **once**, recording the
-/// pivot columns, then reduces the unit vector `e₀` against that basis. The
-/// system is refuted (`1` ∈ row-space) iff `e₀` reduces to zero.
+/// This routine row-reduces `rows` to echelon form **once**, then reduces
+/// the unit vector `e₀` against that basis. The system is refuted (`1` ∈
+/// row-space) iff `e₀` reduces to zero.
 ///
-/// Returns `(rank, refuted)`. Consumes `rows` (reduced in place) — callers
+/// The echelon form comes from [`gf2_elim::echelon_counted`], the Four
+/// Russians kernel, rather than a column-at-a-time loop: that loop spent
+/// its time testing one bit of every remaining row per column and XORing
+/// one pivot at a time into full-width rows.  The test needs only *an*
+/// echelon basis.  Reducing `e₀` in pivot order clears every pivot column
+/// of it, and a nonzero vector of the row space leads at a pivot column,
+/// so `e₀` reduces to zero exactly when it lies in the row space, whichever
+/// basis it is reduced against.  The rank and the pivot columns are fixed
+/// by the row space, so they do not depend on the basis either.
+///
+/// Returns `(rank, refuted)`. Consumes `rows`: on return `rows[..rank]` is a
+/// row echelon basis of the row space (leading columns strictly increasing,
+/// so they are the pivot columns) and the rest are zero.  Which echelon
+/// basis is not specified; it is not the one the column loop left.  Callers
 /// that still need the original matrix should clone first, but the scan does
 /// not, which is the point. Result is identical to
 /// `(f2_rank(rows), e0_in_rowspace(rows, …))`; this is asserted in tests.
@@ -366,50 +380,24 @@ pub fn rank_and_refute(rows: &mut [Vec<u64>], cols: usize) -> (usize, bool) {
     if rows.is_empty() || cols == 0 {
         return (0, false);
     }
-    // Echelon reduction (eliminate the pivot column from rows *below* the
-    // pivot only), recording (pivot_row_index, pivot_col) in pivot order.
-    let mut pivots: Vec<(usize, usize)> = Vec::new();
-    let mut row = 0usize;
-    for col in 0..cols {
-        let word = col / 64;
-        let mask = 1u64 << (col % 64);
-        let mut pivot = None;
-        for r in row..rows.len() {
-            if rows[r][word] & mask != 0 {
-                pivot = Some(r);
-                break;
-            }
-        }
-        let Some(pivot) = pivot else { continue };
-        rows.swap(row, pivot);
-        for r in (row + 1)..rows.len() {
-            if rows[r][word] & mask != 0 {
-                let (lo, hi) = rows.split_at_mut(r);
-                let pr = &lo[row];
-                for (rr, p) in hi[0].iter_mut().zip(pr.iter()) {
-                    *rr ^= *p;
-                }
-            }
-        }
-        pivots.push((row, col));
-        row += 1;
-        if row >= rows.len() {
-            break;
-        }
-    }
-    let rank = pivots.len();
+    let rank = gf2_elim::echelon_counted(rows, cols, &mut 0);
 
     // Reduce e₀ (only column 0 set) against the echelon basis: for each
     // pivot whose column is currently set in the working vector, XOR in the
-    // pivot row. `1` ∈ row-space ⇔ the result is zero.
+    // pivot row. `1` ∈ row-space ⇔ the result is zero.  A pivot row is zero
+    // before its leading word, and the leading words never decrease down the
+    // basis, so each lead is found from the previous one's word and each
+    // XOR starts at its own.
     let words = cols.div_ceil(64);
     let mut w = vec![0u64; words];
     w[0] = 1;
-    for &(prow, pcol) in &pivots {
-        let word = pcol / 64;
-        let mask = 1u64 << (pcol % 64);
-        if w[word] & mask != 0 {
-            for (wi, p) in w.iter_mut().zip(rows[prow].iter()) {
+    let mut word = 0;
+    for row in &rows[..rank] {
+        while row[word] == 0 {
+            word += 1;
+        }
+        if w[word] >> row[word].trailing_zeros() & 1 != 0 {
+            for (wi, p) in w[word..].iter_mut().zip(&row[word..]) {
                 *wi ^= *p;
             }
         }
@@ -592,6 +580,230 @@ mod tests {
         }
         assert!(checked_refute, "test never hit a refuting case");
         assert!(checked_nonrefute, "test never hit a non-refuting case");
+    }
+
+    /// The column-at-a-time echelon loop `rank_and_refute` ran before it
+    /// moved onto `gf2_elim`, kept as the reference: `(rank, refuted,
+    /// pivot columns)`.
+    fn rank_and_refute_by_columns(rows: &mut [Vec<u64>], cols: usize) -> (usize, bool, Vec<usize>) {
+        let mut pivots: Vec<(usize, usize)> = Vec::new();
+        let mut row = 0usize;
+        for col in 0..cols {
+            let (word, mask) = (col / 64, 1u64 << (col % 64));
+            let Some(pivot) = (row..rows.len()).find(|&r| rows[r][word] & mask != 0) else {
+                continue;
+            };
+            rows.swap(row, pivot);
+            for r in (row + 1)..rows.len() {
+                if rows[r][word] & mask != 0 {
+                    let (lo, hi) = rows.split_at_mut(r);
+                    for (rr, p) in hi[0].iter_mut().zip(lo[row].iter()) {
+                        *rr ^= *p;
+                    }
+                }
+            }
+            pivots.push((row, col));
+            row += 1;
+            if row >= rows.len() {
+                break;
+            }
+        }
+        let mut w = vec![0u64; cols.div_ceil(64)];
+        w[0] = 1;
+        for &(prow, pcol) in &pivots {
+            if w[pcol / 64] & (1u64 << (pcol % 64)) != 0 {
+                for (wi, p) in w.iter_mut().zip(rows[prow].iter()) {
+                    *wi ^= *p;
+                }
+            }
+        }
+        let refuted = w.iter().all(|&x| x == 0);
+        (
+            pivots.len(),
+            refuted,
+            pivots.iter().map(|&(_, c)| c).collect(),
+        )
+    }
+
+    /// `rank_and_refute` on the Four Russians kernel returns what the column
+    /// loop did — rank, verdict and pivot columns — on random matrices of
+    /// full and deficient rank, with and without `e₀` in the row space, and
+    /// leaves an echelon basis with those pivots followed by zero rows.
+    #[test]
+    fn rank_and_refute_matches_the_column_loop_on_random_matrices() {
+        use rand::Rng;
+        let mut rng = StdRng::seed_from_u64(0x5EED_0E0);
+        let (mut refuting, mut non_refuting) = (0, 0);
+        for &(n_rows, cols) in &[
+            (1usize, 1usize),
+            (3, 5),
+            (40, 40),
+            (70, 130),
+            (130, 70),
+            (200, 257),
+            (257, 200),
+            (90, 700),
+        ] {
+            let words = cols.div_ceil(64);
+            let random_row = |rng: &mut StdRng, density: f64| {
+                let mut row = vec![0u64; words];
+                for c in 0..cols {
+                    if rng.gen_bool(density) {
+                        row[c / 64] |= 1 << (c % 64);
+                    }
+                }
+                row
+            };
+            for density in [0.02, 0.2, 0.5] {
+                for rank_cap in [n_rows, (n_rows / 3).max(1)] {
+                    // Rows are random sums of a basis of `rank_cap` rows,
+                    // one of which is `e₀` in half the draws.
+                    let mut basis: Vec<Vec<u64>> = (0..rank_cap)
+                        .map(|_| random_row(&mut rng, density))
+                        .collect();
+                    if rng.gen_bool(0.5) {
+                        basis[0] = vec![0u64; words];
+                        basis[0][0] = 1;
+                    }
+                    let m: Vec<Vec<u64>> = (0..n_rows)
+                        .map(|_| {
+                            let mut row = vec![0u64; words];
+                            for b in &basis {
+                                if rng.gen_bool(0.5) {
+                                    for (r, x) in row.iter_mut().zip(b) {
+                                        *r ^= x;
+                                    }
+                                }
+                            }
+                            row
+                        })
+                        .collect();
+                    let mut want = m.clone();
+                    let (rank, refuted, pivots) = rank_and_refute_by_columns(&mut want, cols);
+                    let mut got = m;
+                    assert_eq!(
+                        rank_and_refute(&mut got, cols),
+                        (rank, refuted),
+                        "{n_rows}x{cols} density {density} rank cap {rank_cap}"
+                    );
+                    let leads: Vec<usize> = got[..rank]
+                        .iter()
+                        .map(|row| {
+                            let k = row.iter().position(|&x| x != 0).unwrap();
+                            k * 64 + row[k].trailing_zeros() as usize
+                        })
+                        .collect();
+                    assert_eq!(leads, pivots);
+                    assert!(got[rank..].iter().all(|row| row.iter().all(|&x| x == 0)));
+                    if refuted {
+                        refuting += 1;
+                    } else {
+                        non_refuting += 1;
+                    }
+                }
+            }
+        }
+        assert!(
+            refuting > 5 && non_refuting > 5,
+            "{refuting} / {non_refuting}"
+        );
+    }
+
+    /// The same comparison at the shapes the random test above does not
+    /// reach: widths one either side of a word boundary, a single row, a
+    /// zero matrix, rows that are all `e₀`, duplicated rows, and row counts
+    /// below, at and above the width.  Empty inputs keep their early return.
+    #[test]
+    fn rank_and_refute_agrees_with_the_column_loop_at_word_boundaries() {
+        use rand::Rng;
+        let mut rng = StdRng::seed_from_u64(0xB0DA_5);
+        assert_eq!(rank_and_refute(&mut [], 5), (0, false));
+        assert_eq!(rank_and_refute(&mut [vec![0u64; 1]], 0), (0, false));
+        let (mut refuting, mut non_refuting, mut deficient) = (0, 0, 0);
+        for &cols in &[1usize, 2, 63, 64, 65, 127, 128, 129, 191, 192, 193] {
+            let words = cols.div_ceil(64);
+            for &n_rows in &[1usize, 2, 3, 10, 64, 65, 130, 200] {
+                for kind in 0..6 {
+                    for _ in 0..4 {
+                        let density = [0.01, 0.1, 0.5, 0.95][rng.gen_range(0..4)];
+                        let random_row = |rng: &mut StdRng| {
+                            let mut row = vec![0u64; words];
+                            for c in 0..cols {
+                                if rng.gen_bool(density) {
+                                    row[c / 64] |= 1 << (c % 64);
+                                }
+                            }
+                            row
+                        };
+                        let e0 = {
+                            let mut row = vec![0u64; words];
+                            row[0] = 1;
+                            row
+                        };
+                        let m: Vec<Vec<u64>> = match kind {
+                            0 => (0..n_rows).map(|_| random_row(&mut rng)).collect(),
+                            1 => vec![vec![0u64; words]; n_rows],
+                            2 => vec![e0.clone(); n_rows],
+                            3 => {
+                                let one = random_row(&mut rng);
+                                vec![one; n_rows]
+                            }
+                            4 => {
+                                // each row is a random sum of a few random rows
+                                // and, half the time, of e₀
+                                let basis: Vec<Vec<u64>> =
+                                    (0..3).map(|_| random_row(&mut rng)).collect();
+                                (0..n_rows)
+                                    .map(|_| {
+                                        let mut row = vec![0u64; words];
+                                        for b in basis.iter().chain(std::iter::once(&e0)) {
+                                            if rng.gen_bool(0.5) {
+                                                for (r, x) in row.iter_mut().zip(b) {
+                                                    *r ^= x;
+                                                }
+                                            }
+                                        }
+                                        row
+                                    })
+                                    .collect()
+                            }
+                            _ => {
+                                // e₀ among otherwise random rows
+                                let mut m: Vec<Vec<u64>> =
+                                    (0..n_rows).map(|_| random_row(&mut rng)).collect();
+                                let at = rng.gen_range(0..n_rows);
+                                m[at] = e0.clone();
+                                m
+                            }
+                        };
+                        let mut want = m.clone();
+                        let (rank, refuted, pivots) = rank_and_refute_by_columns(&mut want, cols);
+                        let mut got = m;
+                        assert_eq!(
+                            rank_and_refute(&mut got, cols),
+                            (rank, refuted),
+                            "{n_rows}x{cols} kind {kind}"
+                        );
+                        let leads: Vec<usize> = got[..rank]
+                            .iter()
+                            .map(|row| {
+                                let k = row.iter().position(|&x| x != 0).unwrap();
+                                k * 64 + row[k].trailing_zeros() as usize
+                            })
+                            .collect();
+                        assert_eq!(leads, pivots, "{n_rows}x{cols} kind {kind}");
+                        assert!(got[rank..].iter().all(|r| r.iter().all(|&x| x == 0)));
+                        refuting += refuted as u32;
+                        non_refuting += !refuted as u32;
+                        deficient += (rank < n_rows.min(cols)) as u32;
+                    }
+                }
+            }
+        }
+        assert!(
+            refuting > 50 && non_refuting > 50 && deficient > 50,
+            "{refuting} / {non_refuting} / {deficient}"
+        );
     }
 
     /// The sparse backend (`build_macaulay_rows_sparse` +
