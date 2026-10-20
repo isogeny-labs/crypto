@@ -710,8 +710,16 @@ mod tests {
         assert!(validate_options(base).is_ok());
         assert!(validate_options(StrongOpts { batch: 0, ..base }).is_err());
         assert!(validate_options(StrongOpts { r: 0, ..base }).is_err());
-        assert!(validate_options(StrongOpts { dp_bits: 45, ..base }).is_err());
-        assert!(validate_options(StrongOpts { dp_bits: 44, ..base }).is_ok());
+        assert!(validate_options(StrongOpts {
+            dp_bits: 45,
+            ..base
+        })
+        .is_err());
+        assert!(validate_options(StrongOpts {
+            dp_bits: 44,
+            ..base
+        })
+        .is_ok());
     }
 
     #[test]
