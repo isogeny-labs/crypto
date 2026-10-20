@@ -1929,10 +1929,10 @@ mod wide {
     #[cfg(test)]
     mod root_bloom_table_tests {
         use super::{
-            build_index128_with_symmetry, symmetric_labels_for_ordinal, symmetric_state_prefix,
-            Gf2_128, NormalBasis128, PackedRootLayout, RootBloom, RootOnly11, RootOnly21,
-            RootOnly83, RootSlots128, RootTable128, S3Solver128, State128, State26, State83,
-            StateStore128,
+            build_index128_with_symmetry, indexed5_load80_request, symmetric_labels_for_ordinal,
+            symmetric_state_prefix, Gf2_128, NormalBasis128, PackedRootLayout, RootBloom,
+            RootOnly11, RootOnly21, RootOnly83, RootSlots128, RootTable128, S3Solver128, State128,
+            State26, State83, StateStore128,
         };
         use crate::mix_root_bloom;
         use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse_wide;
@@ -2086,12 +2086,14 @@ mod wide {
                 2445342385696756367155238,
                 5959927424489161220022208,
             ];
-            let full =
-                build_index128_with_symmetry(&gf, &basis, &solver, &reps, false, false, false);
-            let quotient =
-                build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false, false);
+            let full = build_index128_with_symmetry(
+                &gf, &basis, &solver, &reps, false, false, false, false,
+            );
+            let quotient = build_index128_with_symmetry(
+                &gf, &basis, &solver, &reps, true, false, false, false,
+            );
             let batched =
-                build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false, true);
+                build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false, false, true);
             assert_eq!(batched.states.len(), quotient.states.len());
             assert_eq!(batched.table.len, quotient.table.len);
             for index in 0..quotient.states.len() {
@@ -2551,6 +2553,32 @@ mod wide {
             assert_eq!(
                 collided.get_indexed83(second, |_, root| pair_keys[root]),
                 Some((0, 1))
+            );
+        }
+
+        #[test]
+        fn indexed_five_byte_load80_extends_the_same_slot_boundary_exactly() {
+            let states = |k: usize| 83 * k * (k - 1) / 2 + 42 * k;
+            assert!(indexed5_load80_request(states(4549)) <= (1 << 30));
+            assert!(indexed5_load80_request(states(4550)) > (1 << 30));
+            let mut table = RootTable128::with_capacity_indexed83_mode(64, true);
+            table.bloom = None;
+            let keys: Vec<u128> = (0..102u64)
+                .map(|i| ((mix_root_bloom(i) as u128) << 19) | i as u128)
+                .collect();
+            for (i, &key) in keys.iter().enumerate() {
+                table.insert_indexed83(key, i / 2, i % 2, |state, root| keys[2 * state + root]);
+            }
+            assert_eq!(table.len, 102);
+            for (i, &key) in keys.iter().enumerate() {
+                assert_eq!(
+                    table.get_indexed83(key, |state, root| keys[2 * state + root]),
+                    Some((i / 2, i % 2))
+                );
+            }
+            assert_eq!(
+                table.get_indexed83(u128::MAX, |state, root| keys[2 * state + root]),
+                None
             );
         }
 
@@ -3132,6 +3160,7 @@ mod wide {
         indexed5_id30: bool,
         indexed4_table: bool,
         indexed5_load75: bool,
+        indexed5_load80: bool,
         indexed5_fixed30: bool,
         indexed4_fixed30: bool,
         indexed4_fixed31: bool,
@@ -3352,6 +3381,7 @@ mod wide {
     ) -> Index128 {
         let symmetric_states = std::env::var("KIC_SYMMETRIC_S3").as_deref() == Ok("1");
         let indexed5_load75 = std::env::var("KIC_INDEXED5_LOAD75").as_deref() == Ok("1");
+        let indexed5_load80 = std::env::var("KIC_INDEXED5_LOAD80").as_deref() == Ok("1");
         let batch_roots = std::env::var("KIC_INDEX_ROOT_BATCH").as_deref() == Ok("1");
         build_index128_with_symmetry(
             gf,
@@ -3360,8 +3390,17 @@ mod wide {
             reps,
             symmetric_states,
             indexed5_load75,
+            indexed5_load80,
             batch_roots,
         )
+    }
+
+    fn indexed5_load80_request(states: usize) -> usize {
+        states
+            .checked_mul(5)
+            .and_then(|count| count.checked_add(3))
+            .expect("indexed load80 root table request exceeds usize")
+            / 4
     }
 
     fn build_index128_with_symmetry(
@@ -3371,8 +3410,13 @@ mod wide {
         reps: &[u128],
         symmetric_states: bool,
         indexed5_load75: bool,
+        indexed5_load80: bool,
         batch_roots: bool,
     ) -> Index128 {
+        assert!(
+            !(indexed5_load75 && indexed5_load80),
+            "indexed five-byte load75 and load80 requests are mutually exclusive"
+        );
         let n = gf.n as usize;
         assert!(
             !symmetric_states || gf.n == 83,
@@ -3446,14 +3490,16 @@ mod wide {
             assert!(
                 ((std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")
                     && (std::env::var("KIC_INDEXED5_FIXED30").as_deref() == Ok("1")
-                        || indexed5_load75)
+                        || indexed5_load75
+                        || indexed5_load80)
                     && !indexed4_table)
                     || (indexed4_table
                         && indexed4_fixed31
                         && std::env::var("KIC_INDEXED_ROOT5").as_deref() != Ok("1")
-                        && !indexed5_load75))
+                        && !indexed5_load75
+                        && !indexed5_load80))
                     && std::env::var("KIC_PACKED_ROOT_TABLE").as_deref() == Ok("1"),
-                "one-root states require exact indexed fixed30, fixed31, or load75 slots"
+                "one-root states require exact indexed fixed30, fixed31, load75, or load80 slots"
             );
             assert!(
                 max_states.checked_mul(2).unwrap()
@@ -3470,9 +3516,9 @@ mod wide {
             !indexed5_id30
                 || (root_only11
                     && !indexed4_table
-                    && indexed5_load75
+                    && (indexed5_load75 || indexed5_load80)
                     && std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")),
-            "30-bit indexed state IDs require one-root five-byte load75 slots"
+            "30-bit indexed state IDs require one-root five-byte load75 or load80 slots"
         );
         // One-root states insert their exact keys while each second root is
         // still available.  The retained state count is known from the
@@ -3486,6 +3532,8 @@ mod wide {
                     .and_then(|count| count.checked_add(2))
                     .expect("one-root indexed request exceeds usize")
                     / 3
+            } else if indexed5_load80 {
+                indexed5_load80_request(max_states)
             } else {
                 1usize << 29
             }
@@ -3739,8 +3787,15 @@ mod wide {
             "indexed five-byte load75 request requires the indexed table"
         );
         assert!(
+            !indexed5_load80 || indexed5_table,
+            "indexed five-byte load80 request requires the indexed table"
+        );
+        assert!(
             !indexed5_fixed30
-                || (indexed5_table && (root_only21 || root_only11) && !indexed5_load75),
+                || (indexed5_table
+                    && (root_only21 || root_only11)
+                    && !indexed5_load75
+                    && !indexed5_load80),
             "fixed 2^30 root slots require an indexed root-only state layout"
         );
         if indexed5_fixed30 {
@@ -3782,6 +3837,8 @@ mod wide {
                 .and_then(|n| n.checked_add(2))
                 .expect("indexed root table request exceeds usize")
                 / 3
+        } else if indexed5_load80 {
+            indexed5_load80_request(states.len())
         } else if load75_table {
             states
                 .len()
@@ -3845,6 +3902,7 @@ mod wide {
             indexed5_id30,
             indexed4_table,
             indexed5_load75,
+            indexed5_load80,
             indexed5_fixed30,
             indexed4_fixed30,
             indexed4_fixed31,
@@ -4613,6 +4671,7 @@ mod wide {
         summary["root_table_indexed4_enabled"] = json!(index.indexed4_table);
         summary["root_table_indexed5_id30_enabled"] = json!(index.indexed5_id30);
         summary["indexed5_load75_enabled"] = json!(index.indexed5_load75);
+        summary["indexed5_load80_enabled"] = json!(index.indexed5_load80);
         summary["indexed5_fixed30_enabled"] = json!(index.indexed5_fixed30);
         summary["indexed4_fixed31_enabled"] = json!(index.indexed4_fixed31);
         summary["indexed4_fixed30_enabled"] = json!(index.indexed4_fixed30);
