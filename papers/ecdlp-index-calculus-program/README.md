@@ -43,7 +43,9 @@ improvement it reports is *engineering* or *accounting*.
   transport-conservation lemma and the negative results).
 - **Frontier** (§10): a table of every measured improvement by boundary and
   class; cold one-target frontier still rho; one admitted online point
-  (compact-orbit IC at Koblitz `n = 61`, 13.9× [9.8, 19.1] over strong rho,
+  (compact-orbit IC at Koblitz `n = 61`, 13.9× [9.8, 19.1] over strong rho —
+  superseded, corrected 2026-10-20 by validation sweep B (verdict 108.1): rho had an
+  empty table and Bernstein–Lange rho at equal advice is 53–317× faster online —
   64 targets, set-up excluded; 83× rho with set-up charged).
 - **Appendix A**: how to organise the material for publication (below).
 

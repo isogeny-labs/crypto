@@ -187,7 +187,7 @@ the archived Apple record counts 300,531. The committed same-host audit made
 with the measuring binary reports 168/168 identical. Until the cross-host
 counter drift is explained or the method identity is versioned, the root-finder
 study's F4 *stage-count* comparison is historical rather than current-binary
-replay evidence. The root-finder rows themselves replay identically.
+replay evidence. ~~The root-finder rows themselves replay identically.~~ **Corrected 2026-10-20 (validation sweep A, verdict: contradicted):** on current main the root-finder session replays 72/168 identical, with mismatches in all four IC arms including ic-rootfind-m2 and ic-rootfind-m3; open regression (sweep D, PR #2290).
 
 Receipts are preserved under [`audits/`](audits/), including the failed one.
 

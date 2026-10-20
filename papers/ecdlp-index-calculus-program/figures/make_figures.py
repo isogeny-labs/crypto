@@ -130,9 +130,18 @@ def fig_online():
     rows = D["koblitz_online"]["rows"]
     fig, ax = plt.subplots(figsize=(6.4, 2.7))
     for r in rows:
+        sup = r["status"].startswith("SUPERSEDED")
         adm = r["status"].startswith("admitted")
         x = r["n"] + (0.8 if "dense" in r["status"] else 0)
-        if adm:
+        if sup:
+            if "lo" in r:
+                ax.errorbar(x, r["ratio"], yerr=[[r["ratio"] - r["lo"]], [r["hi"] - r["ratio"]]],
+                            fmt="x", color="#b00", ms=6, capsize=3,
+                            label="superseded 2026-10-20 (rho had an empty table)")
+            else:
+                ax.plot(x, r["ratio"], "x", color="#b00", ms=6,
+                        label="superseded 2026-10-20 (rho had an empty table)")
+        elif adm:
             ax.errorbar(x, r["ratio"], yerr=[[r["ratio"] - r["lo"]], [r["hi"] - r["ratio"]]],
                         fmt="s", color=C[2], ms=6, capsize=3, label="admitted (isolated, 64 targets, 95% CI)")
         else:

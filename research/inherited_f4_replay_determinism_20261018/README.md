@@ -1,5 +1,7 @@
 # Inherited-F4 replay determinism (root cause search), 2026-10-18
 
+> **Correction 2026-10-20 (validation sweep A, verdict: contradicted).** The 120/168 replay-all result (48 inherited-F4 rows differing) quoted below is the 2026-10-13 receipt, kept as history. Replay of the same session on current main is 72/168 identical with 96 mismatches across all four IC arms (ic-f4-m2, ic-f4-m3, ic-rootfind-m2, ic-rootfind-m3), an open regression (sweep D, PR #2290). Root-finder rows are not claimed to pass. See `research/ecbench_frontier_20261013/README.md`.
+
 Status: **negative / partial.** The within-host sources of nondeterminism the
 review (`research/ic_leads_review_20261018` section 3.2) asked about are
 excluded by measurement and now pinned by a test. The cross-host drift itself

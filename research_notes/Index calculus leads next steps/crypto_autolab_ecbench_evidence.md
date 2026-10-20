@@ -1,5 +1,7 @@
 # Empirical index-calculus evidence in aburan28/crypto: autolab, ecbench, benchmarks, experiments
 
+> **Correction 2026-10-20 (validation sweep B, verdict 108.1: contradicted).** The n=61 13.9x [9.8, 19.1] and N83 18.5x online ratios below compare against rho with an empty distinguished-point table. They are superseded and are not improvements: Bernstein-Lange rho at equal advice is 53-317x faster online (`benchmarks/20261014-ic-next10-09-equal-advice`) and precomputed rho beats the N83 IC (`benchmarks/20261016-n83-precomputed-rho-control`). The cold conclusion (signed-Frobenius rho remains best) stands. The 120/168 replay-all is likewise superseded: 72/168 identical on current main, 96 mismatches in all four IC arms, an open regression (sweep D, PR #2290).
+
 Scope: local repository `/home/user/crypto` only, read on 2026-10-14. Sources are given as repository-relative paths. Every number below is quoted from a committed record. Arithmetic I did myself is labelled as an inference. Abbreviations: S = counted cost / sqrt(r), where the counted cost is usually ecbench GAE (group-addition equivalents) and sometimes instructions (Ir); r = prime subgroup order; "cold" = one target with all setup charged; "online" = one target after reusable setup is excluded.
 
 ## 1. What the IC autolab does, what it tried, and whether any variant beats rho on a complete solve

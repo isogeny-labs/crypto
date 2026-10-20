@@ -1,6 +1,9 @@
 // Superseded 2026-10-20 (validation sweep B, 104.1): the 7.29x and 12.29x online speedups below used an empty-table rho and are not improvements; see README.md in this directory.
-#set page(width: 21cm, height: 29.7cm, margin: 1.8cm)
+#set page(width: 21cm, height: auto, margin: 1.8cm)
 #set text(size: 10pt)
+
+#block(fill: luma(235), inset: 6pt, width: 100%)[#text(size: 8pt)[Superseded 2026-10-20 (validation sweep B, verdict 104.1: contradicted). The 7.29x and 12.29x below compare against rho with an empty table while the IC 760 s setup was excluded. They are not improvements. Ratio of mean online times is 4.21x (n=71) and 2.80x (n=83); precomputed rho wins by the median paired ratio in every matched comparison (benchmarks/20261016-n83-precomputed-rho-control).]]
+
 
 #align(center)[
   #text(size: 15pt, weight: "bold")[Koblitz compact-orbit single-target panels: n=71 and n=83 hosted isolated reruns]

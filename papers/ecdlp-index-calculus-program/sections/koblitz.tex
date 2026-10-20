@@ -55,14 +55,21 @@ against rho with the automorphism discount on the same point? The ladder
   precompute took 5.1\,h at 57--70 million probes per relation
   (exploratory).
 \item $n=83$, $a=1$: IC online 5.6--7.9\,s against rho 43--71\,s,
-  $8.2\times$; then the dense root index, $18.5\times$ (both exploratory).
+  $8.2\times$; then the dense root index, $18.5\times$ (both exploratory;
+  the $18.5\times$ is superseded, an empty-table rho on one target
+  \footnote{Erratum 2026-10-20 (validation sweep B, verdict 110.1:
+  contradicted): precomputed-table rho wins every matched $n=83$ pair.}).
 \item \textbf{$n=61$, admitted} (12 October): $a=0$, $K=500$ orbit
   columns, $61{,}000$ points, 64 fresh public one-target workloads per
   host, identical candidate manifest on two hosts. Pinned x86\_64:
   median online speed-up $13.94\times$, 95\% $[9.81,19.13]$, claim-check
   64/64; unpinned arm64: $12.87\times$ $[7.30,19.08]$. Set-up of about
   28\,s is outside the window; with it charged, IC costs a median
-  $83.4\times$ rho.
+  $83.4\times$ rho.\footnote{Erratum 2026-10-20 (validation sweep B,
+  verdict 108.1: contradicted). The $13.94\times$ is against rho with an
+  empty distinguished-point table. It is superseded and is not an
+  improvement: Bernstein--Lange rho at equal advice is $53$--$317\times$
+  faster online (\S\ref{sec:ladder}).}
 \end{itemize}
 
 \begin{figure}[t]

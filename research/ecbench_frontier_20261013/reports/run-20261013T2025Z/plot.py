@@ -115,7 +115,7 @@ def online_boundary() -> None:
     ax.set_ylim(0.001, 70)
     ax.set_xticks(x, labels)
     ax.set_ylabel("rho cost / IC cost (log scale; above 1 favours IC)")
-    ax.set_title("Reusable setup reverses the apparent one-target boundary")
+    ax.set_title("Reusable setup reverses the apparent one-target boundary\nSUPERSEDED 2026-10-20 (sweep B 108.1, 110.1): online ratios are against empty-table rho", color="#b00")
     ax.grid(axis="y", which="both", alpha=0.22)
     extra = Patch(facecolor="white", edgecolor="#1B2430", hatch="\\\\", label="exploratory shared-host N83")
     handles, legend_labels = ax.get_legend_handles_labels()
