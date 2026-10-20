@@ -191,6 +191,36 @@ fn sample(progress: &SolverProgress) -> Value {
         "completed_xor_repivots":s.xor_repivots})
 }
 
+fn budget_receipt(mut identity: Value, started: Instant, memory_peak: &Path) -> Value {
+    let memory = fs::read_to_string(memory_peak)
+        .map_err(|e| format!("memory.peak read: {e}"))
+        .and_then(|s| {
+            s.trim()
+                .parse::<u64>()
+                .map_err(|e| format!("memory.peak parse: {e}"))
+        });
+    let (rss, cpu) = resource_usage();
+    identity["status"] = json!("UNKNOWN_budget");
+    identity["elapsed_ms"] = json!(started.elapsed().as_secs_f64() * 1000.0);
+    identity["peak_rss_bytes"] = json!(rss);
+    identity["cpu_seconds"] = json!(cpu);
+    identity["resource_usage_error"] =
+        json!((rss.is_none() || cpu.is_none()).then_some("getrusage value unavailable"));
+    match memory {
+        Ok(peak) => {
+            identity["memory_cgroup_peak_bytes"] = json!(peak);
+            identity["memory_cgroup_peak_error"] = Value::Null;
+        }
+        Err(error) => {
+            identity["memory_cgroup_peak_bytes"] = Value::Null;
+            identity["memory_cgroup_peak_error"] = json!(error);
+        }
+    }
+    identity["resource_accounting_scope"] =
+        json!("Watchdog readings before final receipt serialization; durable solver counters remain in the separate progress stream.");
+    identity
+}
+
 fn cgroup_contract() -> Result<()> {
     // Docker uses a private cgroup namespace with its resource files at the root.
     if fs::read_to_string("/sys/fs/cgroup/memory.max")?.trim() != "4294967296"
@@ -338,11 +368,10 @@ fn run_inner(
     };
     phase("import_entered", identity.clone())?;
     let cap_path = PathBuf::from(format!("{}.cap.json", output.display()));
-    let mut cap = identity.clone();
+    let cap = identity.clone();
     std::thread::spawn(move || {
         std::thread::sleep(Duration::from_secs(1790));
-        cap["status"] = json!("UNKNOWN_budget");
-        cap["elapsed_ms"] = json!(started.elapsed().as_secs_f64() * 1000.0);
+        let cap = budget_receipt(cap, started, Path::new("/sys/fs/cgroup/memory.peak"));
         std::process::exit(if write_new_json(&cap_path, &cap).is_ok() {
             124
         } else {
@@ -587,6 +616,45 @@ fn run_inner(
 #[cfg(test)]
 mod policy_tests {
     use super::*;
+    #[test]
+    fn watchdog_preserves_censor_when_resource_read_or_parse_fails() {
+        let dir = std::env::temp_dir().join(format!(
+            "n83-cap-resource-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir(&dir).unwrap();
+        let peak = dir.join("memory.peak");
+        let identity = json!({"arm":"D","mode":"natural","target_index":7,
+            "candidate_id":null,"selected_best_total_runtime":null});
+        for contents in [None, Some("invalid\n"), Some("1024000\n")] {
+            if let Some(s) = contents {
+                fs::write(&peak, s).unwrap();
+            }
+            let cap = budget_receipt(identity.clone(), Instant::now(), &peak);
+            assert_eq!(cap["status"], "UNKNOWN_budget");
+            assert_eq!(cap["target_index"], 7);
+            assert!(cap["candidate_id"].is_null());
+            assert!(cap.get("rank").is_none());
+            assert!(cap.get("counters").is_none());
+            if contents == Some("1024000\n") {
+                assert_eq!(cap["memory_cgroup_peak_bytes"], 1024000);
+                assert!(cap["memory_cgroup_peak_error"].is_null());
+            } else {
+                assert!(cap["memory_cgroup_peak_bytes"].is_null());
+                assert!(cap["memory_cgroup_peak_error"].is_string());
+            }
+            let output = dir.join(format!("cap-{}.json", contents.unwrap_or("absent").trim()));
+            write_new_json(&output, &cap).unwrap();
+            let retained: Value = serde_json::from_slice(&fs::read(output).unwrap()).unwrap();
+            assert_eq!(retained, cap);
+        }
+        fs::remove_dir_all(dir).unwrap();
+    }
+
     #[test]
     fn full_policy_does_not_expand_old_commands_or_allow_off_natural_queries() {
         for arm in ["U", "D"] {

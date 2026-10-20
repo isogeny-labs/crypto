@@ -24,10 +24,14 @@ branches' exhaustive formula checks and fixed search-trace tests:
 The first release-library build rejected the new tests' incorrect
 backtracking method name before execution. That log is retained; the
 tests now call the solver's actual `backjump` method. The complete
-release-library and affected-example gates are running separately and
-must pass before push. Their eventual status is recorded in
+release-library gate passed: **4,401 passed, zero failed, 118 ignored**,
+exit zero. The affected binary/example gate passed **77 tests across
+twelve targets, zero failed**, exit zero. The command outputs are recorded in
 `merge-release-lib-20261020-2.log` and
-`merge-release-examples-20261020.log` with separate exit files.
+`merge-release-examples-20261020-2.log` with separate exit files. The first
+example build stopped on a tracked parent source omitted from the sparse
+checkout; materializing that directory fixed the include path. Its failed
+log is retained as `merge-release-examples-20261020.log`.
 
 The running full-base experiment remains pinned to source
 `d9ef42301cc3d22f437e1f89304e673836afb6a3` and its frozen worker hash.
