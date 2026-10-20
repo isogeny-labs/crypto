@@ -1,0 +1,54 @@
+name: Workstation setup validation
+
+on:
+  pull_request:
+    paths:
+      - '.claude/hooks/session-start.sh'
+      - 'scripts/cairn-node.sh'
+      - 'scripts/setup-workstation.sh'
+      - 'scripts/test_setup_workstation_go.py'
+      - '.github/workflows/workstation-setup.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.claude/hooks/session-start.sh'
+      - 'scripts/cairn-node.sh'
+      - 'scripts/setup-workstation.sh'
+      - 'scripts/test_setup_workstation_go.py'
+      - '.github/workflows/workstation-setup.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
+
+jobs:
+  linux-installer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.claude/hooks/session-start.sh
+            /scripts/cairn-node.sh
+            /scripts/setup-workstation.sh
+            /scripts/test_setup_workstation_go.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check shell syntax and diagnostics
+        run: |
+          bash -n .claude/hooks/session-start.sh scripts/cairn-node.sh scripts/setup-workstation.sh
+          shellcheck -S warning .claude/hooks/session-start.sh scripts/cairn-node.sh scripts/setup-workstation.sh
+      - name: Exercise native Linux installer transactions
+        run: |
+          command -v flock
+          command -v sha256sum
+          command -v jq
+          mv --version
+          python3 -m unittest discover -s scripts -p test_setup_workstation_go.py -v

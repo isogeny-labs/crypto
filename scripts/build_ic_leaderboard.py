@@ -639,15 +639,17 @@ def latest_frontier_audit() -> dict:
             or effect.get("generated_audit_record_required") is not True
             or cold.get("method") != "rho.signed_frobenius_strong"
             or cold.get("bound_id") != "ECBND1h05a2ea918f3c"
-            or n61.get("status") != "admitted online"
+            or n61.get("status") != "superseded (empty-table rho)"
             or n61.get("targets") != 64
-            or n83.get("status") != "exploratory one point"
+            or n83.get("status") != "superseded (empty-table rho)"
             or n83.get("targets") != 1
             or "not a matched cold ratio" not in n83.get("setup_inclusive_class", "")
             or failed.get("ok") is not False
             or failed.get("replays_identical") != 120
             or failed.get("replays_total") != 168
-            or failed.get("failures") != 48):
+            or failed.get("failures") != 48
+            or failed.get("current_main_replay", {}).get("identical") != 72
+            or failed.get("current_main_replay", {}).get("total") != 168):
         raise SystemExit("review the ECBench frontier audit before updating the leaderboard")
     opt_callgrind = rho_opt.get("callgrind", {})
     opt_session = rho_opt.get("ecbench_session", {})
@@ -709,17 +711,19 @@ def latest_frontier_audit() -> dict:
             "label": n61["label"], "rho_over_ic": n61["online_rho_over_ic"],
             "ci95": n61["online_ci95"], "targets": n61["targets"],
             "setup_seconds_approx": n61["setup_seconds_approx"], "status": n61["status"],
+            "correction": n61["correction"],
         },
         "exploratory_online": {
             "label": n83["label"], "rho_over_ic": n83["online_rho_over_ic"],
             "targets": n83["targets"], "complete_process_seconds": n83["complete_process_seconds"],
             "setup_inclusive_class": n83["setup_inclusive_class"],
             "first_integer_break_even_under_model": n83["first_integer_break_even_under_model"],
-            "status": n83["status"],
+            "status": n83["status"], "correction": n83["correction"],
         },
         "replay_block": {
             "identical": failed["replays_identical"], "total": failed["replays_total"],
             "failures": failed["failures"], "scope": failed["failure_scope"],
+            "current": failed["current_main_replay"],
         },
     }
 
@@ -1195,18 +1199,22 @@ def markdown(doc: dict) -> str:
           f"`{cold['bound_id']}`: {cold['ops_over_floor']:.3f}× floor "
           f"[{cold['ops_ci95'][0]:.3f}, {cold['ops_ci95'][1]:.3f}], "
           f"{cold['runs']} runs at {cold['sizes']} sizes | Standing rho boundary; not an IC row |",
-          f"| Retained-setup online, `{admitted['label']}` | rho/IC "
+          f"| Retained-setup online, `{admitted['label']}` | ~~rho/IC "
           f"{admitted['rho_over_ic']:.1f}× [{admitted['ci95'][0]:.1f}, "
           f"{admitted['ci95'][1]:.1f}], {admitted['targets']} unseen targets; about "
-          f"{admitted['setup_seconds_approx']:.0f} s setup excluded | Admitted online result; "
-          "kept separate from cold ranked rows |",
-          f"| Retained-setup online, `{exploratory['label']}` | rho/IC "
+          f"{admitted['setup_seconds_approx']:.0f} s setup excluded~~ | **Superseded** (rho had an empty "
+          f"table); not an improvement. {admitted['correction']} |",
+          f"| Retained-setup online, `{exploratory['label']}` | ~~rho/IC "
           f"{exploratory['rho_over_ic']:.6f}× on {exploratory['targets']} public point; complete IC "
-          f"process {exploratory['complete_process_seconds']:.3f} s | Exploratory shared-host result; "
-          "no matched cold ratio and no rank promotion |",
-          f"| Current-binary root-finder replay-all | {replay['identical']}/{replay['total']} identical; "
-          f"{replay['failures']} inherited-F4 counter mismatches | Failed replay retained; affected "
-          "stage counters blocked from promotion |", "",
+          f"process {exploratory['complete_process_seconds']:.3f} s~~ | **Superseded** (rho had an empty "
+          f"table); not an improvement. {exploratory['correction']} |",
+          f"| Current-binary root-finder replay-all | current main (2026-10-19): "
+          f"{replay['current']['identical']}/{replay['current']['total']} identical; "
+          f"{replay['current']['failures']} mismatches across all four IC arms; the 2026-10-13 receipt "
+          f"recorded {replay['identical']}/{replay['total']} with {replay['failures']} inherited-F4 "
+          "mismatches | **Open regression** under investigation (sweep D, PR #2290); root-finder rows "
+          "are not claimed to pass; affected stage counters blocked from promotion. "
+          f"{replay['current']['correction']} |", "",
           f"[Latest result data](../../{audit['source']}); "
           f"[prior full synthesis](../../{audit['previous_source']}). {audit['reason']}", ""]
     for code in ("A", "B", "C"):
@@ -1706,17 +1714,20 @@ def page(doc: dict, standalone: bool) -> str:
              f'{acold["ops_ci95"][1]:.3f}], {acold["runs"]} runs at {acold["sizes"]} sizes</td>'
              '<td>Standing rho boundary; not an IC row</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(admitted["label"])}</code></td>'
-             f'<td>rho/IC {admitted["rho_over_ic"]:.1f}× [{admitted["ci95"][0]:.1f}, '
+             f'<td><s>rho/IC {admitted["rho_over_ic"]:.1f}× [{admitted["ci95"][0]:.1f}, '
              f'{admitted["ci95"][1]:.1f}], {admitted["targets"]} unseen targets; about '
-             f'{admitted["setup_seconds_approx"]:.0f} s setup excluded</td>'
-             '<td>Admitted online result; separate from cold ranked rows</td></tr>'
+             f'{admitted["setup_seconds_approx"]:.0f} s setup excluded</s></td>'
+             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(admitted["correction"])}</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(exploratory["label"])}</code></td>'
-             f'<td>rho/IC {exploratory["rho_over_ic"]:.6f}× on {exploratory["targets"]} public point; '
-             f'complete IC process {exploratory["complete_process_seconds"]:.3f} s</td>'
-             '<td>Exploratory shared-host result; no matched cold ratio and no rank promotion</td></tr>'
-             f'<tr><td>Current-binary root-finder replay-all</td><td>{replay["identical"]}/'
-             f'{replay["total"]} identical; {replay["failures"]} inherited-F4 counter mismatches</td>'
-             '<td>Failed replay retained; affected stage counters blocked from promotion</td></tr>'
+             f'<td><s>rho/IC {exploratory["rho_over_ic"]:.6f}× on {exploratory["targets"]} public point; '
+             f'complete IC process {exploratory["complete_process_seconds"]:.3f} s</s></td>'
+             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(exploratory["correction"])}</td></tr>'
+             f'<tr><td>Current-binary root-finder replay-all</td><td>current main (2026-10-19): '
+             f'{replay["current"]["identical"]}/{replay["current"]["total"]} identical; '
+             f'{replay["current"]["failures"]} mismatches across all four IC arms; the 2026-10-13 receipt '
+             f'recorded {replay["identical"]}/{replay["total"]} with {replay["failures"]} inherited-F4 mismatches</td>'
+             '<td><b>Open regression</b> under investigation (sweep D, PR #2290); root-finder rows are not '
+             f'claimed to pass; affected stage counters blocked from promotion. {esc(replay["current"]["correction"])}</td></tr>'
              '</tbody></table></div>'
              f'<p>{esc(audit["reason"])} {gh(audit["source"], "Latest result data")} · '
              f'{gh(audit["previous_source"], "prior full synthesis")}.</p></section>')
