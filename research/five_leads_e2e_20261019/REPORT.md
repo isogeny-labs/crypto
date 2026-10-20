@@ -259,7 +259,8 @@ was partially replayed: a rational divisor \(T_1\) validates and
 \(3T_1=0\) in the repo's hyperelliptic arithmetic
 ([receipt](correctness/tian-genus3-f257-t1-result.json)).
 The copied rational quartic passes the gradient-ideal smoothness check.
-Its extension-field generators, quotient and maps have not been checked.
+Its extension-field generators and quotient-from-kernel construction have
+not been checked.
 
 The original TeX of the same paper has SHA-256
 `46092fc37bc6bac7e0f42c67e6764150557f63ac4292da86d739980268d3eaae`.
@@ -274,8 +275,48 @@ exceptional rank-five cuts at (84,35) and (105,92). Corrupting one printed
 coefficient gives rank nine. Independently, the repo's Jacobian arithmetic
 checks the paper's source relation \(86241[(2,7)-\infty]=[(121,5)-\infty]\)
 ([receipt](correctness/tian-genus3-f257-p1-scalar-result.json)). These
-checks do not establish the induced Jacobian homomorphism or solve a mapped
-DLP; the two rank-five cases require special divisor handling.
+point-cut checks alone do not establish the induced Jacobian homomorphism;
+the two rank-five cases require special divisor handling.
+
+For the two ordinary published points, the [destination transfer
+gate](correctness/tian-genus3-f257-transfer-gate-v1.json) constructs their
+quartic Jacobian classes and checks the 86,241 scalar relation. A separate
+[mapped line sieve](correctness/tian-genus3-f257-line-sieve-mapped-dlp-v1.json)
+evaluates the six corrected map functions on the source inputs, constructs
+both destination classes, collects 2,458 fully split lines over a 250-point
+factor base and obtains rank 249 modulo 172,553. It recovers 86,241 from
+the relation kernel and two rational-divisor descents, lifts over the
+factor-four source subgroup cofactor, and checks the destination and the
+independent source-scalar [receipt](correctness/tian-genus3-f257-p1-scalar-result.json).
+The published scalar is used only after solving. This is a complete mapped
+DLP on **one published F257 pair**, not a Smith-negative holdout result.
+
+The independently counted [source rho runs](correctness/tian-genus3-f257-source-rho-v1.json)
+first certify that the source point has order \(690212=4\cdot172553\),
+then recover and source-check 86,241 on five seeds with a genus-3 Cantor
+law. A negation-normalized birthday-walk control also solves on five seeds;
+the conventional walk has lower mean priced cost at the representative
+price. The [36-cell cost analysis](results/tian-genus3-f257-line-sieve-cost-summary.json)
+includes quartic setup and mapping, curve and scalar-field line relations,
+descent, full-order lift, destination check and source check. Its cold
+count vector is \((519482988 M,36928 S,35740 I,490114430 A)\). At
+\(M+0.5S+10I+0.1A\), the mapped line sieve costs 568,870,295 equivalents
+against 704,665.7 for the faster mean source rho: **807.29× slower**.
+It loses to rho in **36/36** pricing cells (47.40–1004.66×). Even charging
+the rho side for source-order discovery leaves a 433.74× loss at the
+representative price and losses in every cell.
+
+A [bounded mapped BSGS control](correctness/tian-genus3-f257-split-bsgs-twist0.json)
+also recovers the scalar without it as solver input, after 512 baby and
+168 giant steps, using canonical rational-divisor fingerprints. Directly
+hashing evaluation-space matrices [exhausts its fixed interval](correctness/tian-genus3-f257-direct-matrix-hash-control-v1.json)
+because equivalent Jacobian classes can have different matrices; the
+successful collision explicitly has unequal matrices. The line sieve wins
+against the corrected mapped BSGS in 36/36 price cells, but both lose to
+source rho. Counts omit memory, hashing and control flow and are not
+qualified wall-speed measurements. The extension-field kernel generators,
+quotient-from-kernel proof, exceptional point handling and 20-input
+Smith-negative odd-kernel screen remain open.
 
 A [20-input holdout](fixtures/smith-negative-holdout-v1.json) was frozen
 before odd-kernel testing from the prior \(p=2^{31}-1\) Smith census:

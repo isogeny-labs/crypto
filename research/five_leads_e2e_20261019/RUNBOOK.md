@@ -84,6 +84,33 @@ python3 research/five_leads_e2e_20261019/tian_genus3_map_gate.py research/five_l
 target/release/hyperelliptic-cover arithmetic --input research/five_leads_e2e_20261019/fixtures/tian-genus3-f257-p1-scalar.json > research/five_leads_e2e_20261019/correctness/tian-genus3-f257-p1-scalar-result.json
 ```
 
+The published F257 pair then has a complete mapped DLP and counted source
+rho comparison. The line-sieve solver evaluates the map functions from the
+fixture, constructs both quartic Jacobian classes, solves modulo the checked
+172,553 prime factor and verifies the factor-four lift against the
+independent source-scalar receipt. The direct-matrix hash control is an
+intentional exhausted attempt; the corrected BSGS uses rational-divisor
+fingerprints.
+
+```sh
+cargo build --release --offline --locked --manifest-path research/five_leads_e2e_20261019/native/Cargo.toml --bin tian-genus3-quartic-probe --bin tian-genus3-source-rho
+research/five_leads_e2e_20261019/native/target/release/tian-genus3-quartic-probe --f257-transfer-gate > research/five_leads_e2e_20261019/correctness/tian-genus3-f257-transfer-gate-v1.json
+research/five_leads_e2e_20261019/native/target/release/tian-genus3-source-rho > research/five_leads_e2e_20261019/correctness/tian-genus3-f257-source-rho-v1.json
+research/five_leads_e2e_20261019/native/target/release/tian-genus3-quartic-probe --line-sieve-mapped-dlp > research/five_leads_e2e_20261019/correctness/tian-genus3-f257-line-sieve-mapped-dlp-v1.json
+research/five_leads_e2e_20261019/native/target/release/tian-genus3-quartic-probe --f257-split-bsgs-dlp --twist 0 > research/five_leads_e2e_20261019/correctness/tian-genus3-f257-split-bsgs-twist0.json
+research/five_leads_e2e_20261019/native/target/release/tian-genus3-quartic-probe --f257-direct-matrix-hash-control > research/five_leads_e2e_20261019/correctness/tian-genus3-f257-direct-matrix-hash-control-v1.json
+python3 research/five_leads_e2e_20261019/analyze_tian_genus3_f257.py
+python3 research/five_leads_e2e_20261019/analyze_tian_genus3_line_sieve.py
+```
+
+The prime-field relation matrix has 250 columns, rank 249 and 2,458 full
+lines. The full 36-price grid charges the source verification, the source
+rho precomputation and failures, and all counted quartic and scalar-field
+operations. The order-discovery cost is reported as a separate rho
+sensitivity. Memory, hashing, comparisons and control flow are unpriced.
+The experiment remains a single F257 published positive control; none of
+these commands screen the frozen Smith-negative holdout.
+
 For the exact-order collector cohort, the seven specifications were frozen
 from the original fixture specifications and then run once in ascending order.
 The historical Python spec generator is retained for provenance; reproduction
