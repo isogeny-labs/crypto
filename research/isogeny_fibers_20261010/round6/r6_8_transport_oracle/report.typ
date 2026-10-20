@@ -1,19 +1,43 @@
 #set page(margin: 2cm)
 #set text(size: 10pt)
-= R6.8 Transport oracles on factor-base points (Proposition 5′)
-Round-6 lead R6.8. Toy instances (p ≈ 2^18–2^20); no sub-rho claim; no deployed-curve claim. Full proof and tables: `RESULTS.md`.
+= R6.8 Transport-oracle census: corrected status
 
-== Result
-*Proposition 5′ (proved).* An index-calculus-style attacker with transport oracles $T_psi$ on arbitrary formed points is simulated exactly, with the same success probability and no dearer decomposition calls, by an attacker on $E_1$ without oracles whose factor base is the union of pulled-back bases $F union union.big_psi hat(psi)(F'_psi)$, of size at most $(1+|Psi|)|F|$ and independent of the instance. Pullbacks only grow (Thm 4.2, Lemma 5); the degree enters through the fibre size $|M_k| <= deg psi$ and the image index $i <= min(deg psi, h)$. No exponent moves.
+*2026-10-20 review: the proposed general simulation is not established.*
+The previous proof and closure claim are withdrawn. The original PDF and
+source are preserved in `historical-04c3e817/` with SHA-256 hashes.
+The recorded census values and plots are unchanged.
 
-*Falsifier (measured, exact census): did not fire* in 0 of 16 cells (4 curves × |F| ∈ {72, 144} × m ∈ {2, 3}). Union class factor per unknown / best single base: 0.02–0.27, threshold > |Ψ| ∈ {1, 2}.
+== Counterexample to Lemma 5
+In an order-5 cyclic subgroup with generator $P$, take the identity map,
+$S = {O, P}$ and exactly two summands. The original sums are $O$, $P$ and
+$2P$. Removing $O$ from the image base leaves ${P}$ and only the sum $2P$.
+The decomposition $P = O + P$ disappears. Thus the claimed sumset inclusion,
+count monotonicity and size lower bound do not hold as written.
 
-*Measured gains are oracle-free:* pulled-back bases gain the image index (≈3× on j = 0 with ℓ = 3, ≈2× for ℓ = 2 on the 6r curve), matched within 2% by filtering small-x points into ℓE (no oracle). At m = 2 the union costs 0.31–0.44 of plain (derived, §15.2 model), inside the predicted interval [1/(k·i), 1/k]. m = 3 at |F| = 144 is near saturation (D ≈ r), a toy-size effect.
+The executable `review_counterexample.py` checks this enumeration and a
+separate kernel-fiber example. Keeping the identity repairs this example,
+but does not establish the theorem. A corrected proof must also account for
+all lifts, challenge-adaptive transport paths and their complete costs.
 
-*Verdict: confirmed.* No §15.4 row moves.
+== What the census establishes
+Eight raw census files cover four curves, two base sizes and two arities:
+16 cells. The programmed falsifier fires in 0 of 16 cells. Union/best
+class-factor-per-column ratios are 0.02-0.27. These are finite measurements;
+they do not establish the general simulation, its overhead, or a constant-only
+asymptotic effect. The derived cost uses the recorded model, not end-to-end
+wall time. No ledger row is promoted.
 
-#figure(image("class_factor_per_unknown.svg", width: 100%), caption: [Class factor per unknown by arm (exact census, |F| = 144); red dashed: falsifier threshold best single × |Ψ|.])
-#figure(image("cost_ratio.svg", width: 100%), caption: [Derived §15.2 cost relative to the plain base; dotted: 1/k.])
+#figure(image("class_factor_per_unknown.svg", width: 100%), caption: [Unchanged recorded class factors. Finite census only; no general proof follows.])
+#pagebreak()
+= Recorded cost comparison
+#figure(image("cost_ratio.svg", width: 100%), caption: [Unchanged derived model cost relative to the plain base.])
 
-== Limits
-Four toy curves, one seed; class-factor bound (5.2) heuristic; non-IC attackers, transport of non-formed points and the CJ-DLP side are out of scope.
+== Limits and remaining obligations
+Four curves, one seed and two base sizes; some three-term sumsets approach
+subgroup saturation. The class-factor model is heuristic. The unrestricted
+6r image counter is not a subgroup-restricted identity certificate.
+
+A corrected theorem must define identity and kernel handling, fixed versus
+at-most-m decompositions, lift enumeration, adaptive path dependence, and
+complete cost/scaling bounds. Full details and unchanged tables are in
+`RESULTS.md`. The historical report is retained as superseded evidence.
