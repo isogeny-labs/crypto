@@ -187,6 +187,16 @@
      "class": "accounting",
      "anchor": "#lab-volcano-ic",
      "source": "https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json"
+    },
+    {
+     "anchor": "#ic-tool-programme-20261001",
+     "class": "accounting",
+     "date": "2026-10-20",
+     "detail": "Rule v8: ledger section 23's six sizes (2^36.6-2^47.2, 64 public points and four A/A repeats a size, 408/408 rows checked in each of two runs of one binary) against a matched rho, the signed-Frobenius walk with its canonicalisation batched 16 lanes at a time by GFNI and funnel shifts; the control run, the same binary with rho as at rule v7, reads 3.59-11.56x. With the reusable set-up charged the index calculus costs 4.67-18.07x rho cold: 4.669x [4.34, 5.07] at 2^36.6, 18.07x [15.98, 20.58] at 2^47.2. Rho is still faster at every size. The two rho arms take identical walks on 64/64 targets a size; the index calculus's own online time is the same in both runs (0.976-1.033). The distance to rho is larger than rule v7 reported because rho was unmatched, not because the index calculus slowed; the ln-ln slope is 0.168 (t interval 0.128-0.208; rule v3: 0.176), not distinguishable from v3's. No curve with log2 r >= 50 is runnable by this single-word pipeline. Class: accounting (a corrected reference); the batched rho kernel is engineering; no advance.",
+     "label": "Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md",
+     "value": 4.669
     }
    ],
    "role": "emphasis"
