@@ -437,3 +437,8 @@ mixed. `run.sh verify OUT` is the independent check. It re-executes every
 measured run of every session into `OUT/verify/` and checks the selection
 hashes and every measured scalar. A second-host replay
 (`ecbench-independent-runner`) is required before a leaderboard promotion.
+
+Draft runner review (2026-10-20): analysis rechecks the frozen selection,
+requires each canonical holdout and Kummer session to be complete, and excludes
+retained interrupted attempts from band and table inputs. Mocked controls cover
+these cases; this amendment does not execute or freeze the experiment.

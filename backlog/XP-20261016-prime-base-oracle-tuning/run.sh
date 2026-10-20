@@ -170,9 +170,26 @@ stage_audit() { # §6: every measured run re-executed, identical counts required
 
 stage_analyse() { # §7
   A="$OUT/analysis"
-  "$E" band --dir "$OUT"/sessions/holdout-P* --ranks --json "$A/band-holdout.json" > "$A/band-holdout.md"
-  "$E" band --dir "$OUT"/sessions/kummer-P* --ranks --json "$A/band-kummer.json" > "$A/band-kummer.md"
-  "$E" table --dir "$OUT"/sessions/holdout-P* > "$A/table-holdout.md"
+  check_frozen
+  # Canonical session names exclude retained interrupted attempts. Refuse a
+  # current session that has not finished before accepting its analysis.
+  set --
+  for b in $SIZES; do
+    d="$OUT/sessions/holdout-P$b"
+    [ -f "$d/session.json" ] && [ "$(jq -r .status "$d/session.json")" = complete ] || {
+      log "BLOCKED: incomplete holdout P$b"; exit 1;
+    }
+    set -- "$@" "$d"
+  done
+  "$E" band --dir "$@" --ranks --json "$A/band-holdout.json" > "$A/band-holdout.md"
+  "$E" table --dir "$@" > "$A/table-holdout.md"
+  set -- "$OUT/sessions/kummer-P22" "$OUT/sessions/kummer-P24"
+  for d in "$@"; do
+    [ -f "$d/session.json" ] && [ "$(jq -r .status "$d/session.json")" = complete ] || {
+      log "BLOCKED: incomplete Kummer session $d"; exit 1;
+    }
+  done
+  "$E" band --dir "$@" --ranks --json "$A/band-kummer.json" > "$A/band-kummer.md"
   if ! "$E" compare --help | grep -q -- '--weight'; then
     log "BLOCKED: ecbench compare has no --weight (PROTOCOL.md §7.2); paired band intervals not computed"
     exit 3

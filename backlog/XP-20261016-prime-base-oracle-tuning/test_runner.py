@@ -16,10 +16,14 @@ with open(os.environ['MOCK_CALLS'], 'a') as f:
     f.write(json.dumps(args) + '\n')
 def option(name):
     return args[args.index(name) + 1]
-if args[0] == 'verify':
+if args[0] == 'compare':
+    print('--weight' if '--help' in args else '{}')
+elif args[0] == 'table':
+    print('mock table only')
+elif args[0] == 'verify':
     pathlib.Path(option('--out')).write_text('{"ok":false}\n')
     sys.exit(1)
-if args[0] == 'plan':
+elif args[0] == 'plan':
     print('mock plan only')
 elif args[0] == 'run':
     d = pathlib.Path(option('--out'))
@@ -129,7 +133,29 @@ class RunnerControls(unittest.TestCase):
         (self.out / 'select/band-train-P20.json').write_text('{"rows":[]}\n')
         self.run_stage('select', ok=False)
         self.run_stage('holdout', ok=False)
+        self.run_stage('analyse', ok=False)
         self.assertEqual(self.read_calls(), calls)
+
+    def test_analysis_excludes_retained_interrupted_attempts(self):
+        self.session('train-P20')
+        self.run_stage('select')
+        for name in ['holdout-P20', 'kummer-P22', 'kummer-P24']:
+            self.session(name)
+            self.session(name + '.interrupted-old', status='running')
+        self.run_stage('analyse')
+        analysis = [c for c in self.read_calls() if c[0] in ['band', 'table', 'compare']]
+        self.assertFalse(any('.interrupted-' in arg for c in analysis for arg in c))
+        self.assertTrue(any(c[0] == 'table' for c in analysis))
+
+    def test_analysis_rejects_incomplete_current_session(self):
+        self.session('train-P20')
+        self.run_stage('select')
+        self.session('holdout-P20', status='running')
+        self.session('kummer-P22')
+        self.session('kummer-P24')
+        before = self.read_calls()
+        self.run_stage('analyse', ok=False)
+        self.assertEqual(self.read_calls(), before)
 
     def test_incomplete_edge_extension_is_archived_and_retried(self):
         self.session('train-P20')
