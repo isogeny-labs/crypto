@@ -12,9 +12,9 @@ This performance handoff is published beside the curve-by-curve tables. The stan
 |:--|:--|:--|
 | Standing strong-rho implementation | complete-solve Callgrind: optimized / archived baseline 0.804582× and optimized / same-binary legacy 0.802155×; GAE 1.000 [1.000, 1.000] over 240 pairs; 720/720 measured replays identical | Implementation win; operation boundary unchanged. Native wall remained L0 and is not admitted |
 | Canonical medium-tier Koblitz cold operations | `rho.signed_frobenius_strong` / `ECBND1h05a2ea918f3c`: 1.089× floor [0.927, 1.261], 144 runs at 6 sizes | Standing rho boundary; not an IC row |
-| Retained-setup online, `n61 compact orbit` | rho/IC 13.9× [9.8, 19.1], 64 unseen targets; about 28 s setup excluded | Admitted online result; kept separate from cold ranked rows |
-| Retained-setup online, `n83 dense K1798` | rho/IC 18.528377× on 1 public point; complete IC process 339.068 s | Exploratory shared-host result; no matched cold ratio and no rank promotion |
-| Current-binary root-finder replay-all | 120/168 identical; 48 inherited-F4 counter mismatches | Failed replay retained; affected stage counters blocked from promotion |
+| Retained-setup online, `n61 compact orbit` | ~~rho/IC 13.9× [9.8, 19.1], 64 unseen targets; about 28 s setup excluded~~ | **Superseded** (rho had an empty table); not an improvement. Corrected 2026-10-20 by validation sweep (verdict: contradicted), sweep-B row 108.1: ratio is against rho with an empty distinguished-point table; Bernstein-Lange rho at equal advice is 53-317x faster online (benchmarks row 20261014-ic-next10-09-equal-advice). Cold ratio unaffected. |
+| Retained-setup online, `n83 dense K1798` | ~~rho/IC 18.528377× on 1 public point; complete IC process 339.068 s~~ | **Superseded** (rho had an empty table); not an improvement. Corrected 2026-10-20 by validation sweep (verdict: contradicted), sweep-B rows 108.1 and 110.1: empty-table rho, one target, L0 shared host; precomputed-table rho wins every N83 matched pair (benchmarks row 20261016-n83-precomputed-rho-control). Within-IC K1798 vs K1500 comparison unaffected. |
+| Current-binary root-finder replay-all | current main (2026-10-19): 72/168 identical; 96 mismatches across all four IC arms; the 2026-10-13 receipt recorded 120/168 with 48 inherited-F4 mismatches | **Open regression** under investigation (sweep D, PR #2290); root-finder rows are not claimed to pass; affected stage counters blocked from promotion. Corrected 2026-10-20 by validation sweep (verdict: contradicted) |
 
 [Latest result data](../../research/ecbench_rho_optimized_20261014/RESULT.json); [prior full synthesis](../../research/ecbench_frontier_20261013/frontier-data.json). The standing strong-rho method, recovered answers, trajectories, charged GAE and every counter are unchanged. Existing operation ratios and bounds therefore stay fixed. Historical wall ratios remain attached to their measured binaries; this L0 study cannot reprice or promote them.
 
@@ -80,6 +80,25 @@ This performance handoff is published beside the curve-by-curve tables. The stan
 | `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | aimed m = 3 collection, m = 2 descent | 0.241 | 0.0666 | **3.62×** | 0.0275 | 8.76× | ✓ |
 | `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent | 0.261 | 0.0509 | **5.11×** | 0.0242 | 10.8× | ✓ |
 | `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent | 0.488 | 0.0531 | **9.2×** | 0.0225 | 21.7× | ✓ |
+
+## Table D: Joux-Vitse historical study, weak class only
+
+**Comparison withheld.** Curves y^2 = h(x)(x - a)(x - sigma a) over F_{p^6} with full rational 2-torsion whose isogeny class contains a weak curve (about 55-63% of such curves, ledger 18.5). The class never has prime order. The cover's Jacobian has genus 3. Not a statement about any prime-order or generic curve.
+
+The archived report predates corrected hash accounting and executable control acceptance. Its ratios, price-band rankings and exponent estimates are historical observations; K1/K2 and exponent qualification are withheld. Interrupted-attempt costs are incomplete.
+
+[Review qualification](../../research/jv_sieve_strong_rho_20261019/review-20261020/README.md) · [Native analysis](../../research/jv_sieve_strong_rho_20261019/review-20261020/summary.json)
+
+- positive-control acceptance is unresolved: PROTOCOL.md says R0 S≈1.3 without a numeric tolerance
+- A/A acceptance is unresolved: PROTOCOL.md gives no numeric rule for samples differing beyond bootstrap intervals
+
+| p | R3 retained rows | recorded IC / rho correctness | comparison |
+|--:|--:|:--|:--|
+| 251 | 16 | True / True | withheld |
+| 503 | 16 | True / True | withheld |
+| 1009 | 16 | True / True | withheld |
+| 1511 | 16 | True / True | withheld |
+| 1823 | 16 | True / True | withheld |
 
 ## Phases, as a share of S
 
@@ -259,9 +278,10 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
-- `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `765f6e8d05ebbf75…`
+- `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
+- `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
 - `docs/curves/registry.json` — sha256 `584d070fbec7e21f…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `ab4891397fe07fca…`

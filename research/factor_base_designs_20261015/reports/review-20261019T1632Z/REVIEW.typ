@@ -11,7 +11,7 @@
 == Requested scope and what was done
 
 - *Close-out statuses* for every measured prime-field arm: README §2 (table), with κ and the cell count copied from the analysis file.
-- *Amendment 5* appended to #raw("PREREGISTRATION.md"): κ is the primary score for later rounds, with the m − 1 break-even and Amendment 4's thresholds; σ is secondary. It changes no existing verdict.
+- *Amendment 7* appended to #raw("PREREGISTRATION.md"): κ is the primary score for later rounds, with the m − 1 break-even and Amendment 4's thresholds; σ is secondary. It changes no existing verdict.
 - *Owed items:* the novelty audit (#raw("NOVELTY_AUDIT.md"), abstracts and snippets only, no full text read); the Mathlib bridges (not attempted: the cache did not fit the disk before, and it is shared); A0's third m = 4 cell (not run: needs more than 13 GB of memory or isolab credentials, which this container lacks).
 
 == κ against the break-even, per arm
@@ -39,14 +39,14 @@ Observations:
 - A0: κ/(m − 1) = 3.59, 3.73, 3.59 at m = 2, 3, 4 on 8, 3 and 2 cells. A11: 3.995, 4.38, 4.96 on 8, 4 and 3 cells. This is an observation on few cells, one prime for the m = 4 points, with no interval recorded. *Nothing is extrapolated* to m > 4, larger t or deployed sizes.
 - The p#sub[2] κ for A0 and A11 (3.595 and 3.995 at m = 2; 7.468 and 8.742 at m = 3) is within 0.03 of p#sub[1].
 
-== Why κ replaces σ as the primary score (Amendment 5)
+== Why κ replaces σ as the primary score (Amendment 7)
 
 - A1z and A1g sit at D = 8 in every cell (σ = 0.0000, *candidate*), yet their κ (6.050, 5.809 at m = 2; 8.905, 9.189 at m = 3) is above A0's (3.593; 7.468). At m = 3, t = 4 their max_cols are 39 648 and 41 629 against A0's 12 314.
 - A11 has σ = 0.1786 at m = 2 and 0.3000 at m = 3 on p#sub[1] (0.0000 on p#sub[2]), yet κ = 3.995, 8.769 and 14.886 at m = 2, 3, 4, above A0's at m = 2 and 3.
 
 == Limits
 
-- A0 at m = 4 has 2 completed cells; its t = 4 cell exhausts the 13 GB memory limit (C2, 512.8 s and 536.9 s). The third cell is owed and blocked.
+- A0 at m = 4 has 2 completed cells; its t = 4 cell exhausts the 13 GB memory limit (C2, 512.8 s and 536.9 s). The third cell is owed and blocked: it also exhausted memory at 14.5 GB in L1 (Amendment 5, on main).
 - Only A0 and A11 were run at m = 4, so no other arm has a status at m = 4.
 - Verdicts are read at the sizes measured. The Lean break-even is a model statement. The Mathlib bridges behind K7 and K8 remain owed.
 - #raw("NOVELTY_AUDIT.md") rests on abstracts, slides and search snippets. Statuses: A11, A4, H1/H2 partly prior; A1 not found in the sources checked.

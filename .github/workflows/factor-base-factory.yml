@@ -1,0 +1,62 @@
+name: Factor-base factory
+
+on:
+  pull_request:
+    paths:
+      - 'tools/factor-base/**'
+      - 'docs/ic/FACTOR_BASE_FACTORY.md'
+      - '.github/workflows/factor-base-factory.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/factor-base/**'
+      - 'docs/ic/FACTOR_BASE_FACTORY.md'
+      - '.github/workflows/factor-base-factory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: factor-base-factory-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Factory (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: tools/factor-base
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: tools/factor-base
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.93.1'
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tools/factor-base
+      - run: cargo fmt --check
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: cargo test --release --locked
+      - run: cargo build --release --locked
+      - name: Regenerate every frozen archive and replay the relation receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          for manifest in validation/archive/manifests/*.json; do
+            digest="$(basename "$manifest" .json)"
+            target/release/factor-base verify validation/archive "$digest"
+          done
+          target/release/factor-base replay validation/archive \
+            e17f8c9cba841c0af017a66ec04859885d24a5eb7519f05c5090a0f77fbf1c62 \
+            validation/local/evaluation-binary.json

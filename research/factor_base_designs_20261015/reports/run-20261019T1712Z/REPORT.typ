@@ -6,7 +6,7 @@
 
 = E-K1: a Gauss-period window in s = x + 1/x on Koblitz analogues (run-20261019T1712Z)
 
-*Kind:* solver-axis stage diagnostic (AGENTS.md §2). Observations only. Nothing here prices a pipeline, reports S or shows a speedup. The protocol is #raw("PREREGISTRATION.md") Amendment 6 (with its erratum), registered before any row. Amendment 6 follows the rule of Amendment 5 (κ is the primary score): κ = Δlog#sub[2] field_ops / Δb against the break-even m − 1.
+*Kind:* solver-axis stage diagnostic (AGENTS.md §2). Observations only. Nothing here prices a pipeline, reports S or shows a speedup. The protocol is #raw("PREREGISTRATION.md") Amendment 8 (with its erratum), registered before any row. Amendment 8 follows the rule of Amendment 7 (κ is the primary score): κ = Δlog#sub[2] field_ops / Δb against the break-even m − 1.
 
 == Run
 
@@ -14,12 +14,12 @@
   #raw("$B check --n 11 --ell-max 8; $B check --n 23 --ell-max 8") (log #raw("runs/K1-check.txt")) \
   #raw("$B run --arms A --n N --m M --out-dir $R") for A in S, X, XR, U, NS (and PC at M = 3), N in 11, 23, M in 2, 3 \
   #raw("$B replay $R --out K1-replay.jsonl --arm A --n N --m M") after each series \
-  #raw("$B analyze $R --replay K1-replay.jsonl > $R/analysis-amendment6.txt")
+  #raw("$B analyze $R --replay K1-replay.jsonl > $R/analysis-amendment8.txt")
 - *Instrument:* #raw("pq_f4_f2::groebner_basis_f4") (the repository's Boolean F4 over F#sub[2]\[v\]/(v² − v), Gebauer–Möller pairs and field pairs) on the Weil restriction of every system. D = #raw("solving_degree"), field_ops = #raw("word_xors") (64-bit XORs of the row reductions), max_cols = #raw("matrix_cols_max"), max_rows = #raw("matrix_rows_max"). The same engine, 300 s budget, 420 s hard kill and #raw("ulimit -v 13000000") for every arm.
 - *Binary:* built at #raw("b733807e0") (every row records it). The analysis marks for P6–P8 were added afterwards (#raw("6e1b329ce")); no rule changed.
 - *Host:* "vm", Intel Xeon @ 2.80 GHz, 4 cores, 15 GB RAM, a Claude Code cloud container shared with other agents, serialised by the lock; no further isolation. *Window:* 2026-10-19, 17:12Z to 20:28Z.
 - *Field and curve:* K#sub[0] over F#sub[2#super[n]], n = 11 and 23, #raw("find_irreducible_sparse(n)") modulus; ζ of order 2n + 1 = 23, 47; Gauss periods c#sub[i] = ζ#super[i] + ζ#super[−i]. #raw("KoblitzCurve::new") rejects K#sub[0] at n = 11 (#raw("#E = 4·23²")), so the curve is built directly; #raw("#E") = 2116 and 8 383 412 was confirmed by counting every abscissa.
-- *Records:* #raw("runs/K1-{S,X,XR,U,NS}-n{11,23}-m{2,3}.jsonl"), #raw("runs/K1-PC-n{11,23}-m3.jsonl"), each with its #raw(".log"); #raw("runs/K1-replay.jsonl"); #raw("runs/K1-check.txt"); #raw("runs/analysis-amendment6.txt"). 306 rows, 22 of them #raw("no_plant") placeholders (see below).
+- *Records:* #raw("runs/K1-{S,X,XR,U,NS}-n{11,23}-m{2,3}.jsonl"), #raw("runs/K1-PC-n{11,23}-m3.jsonl"), each with its #raw(".log"); #raw("runs/K1-replay.jsonl"); #raw("runs/K1-check.txt"); #raw("runs/analysis-amendment8.txt"). 306 rows, 22 of them #raw("no_plant") placeholders (see below).
 - *Seeds:* #raw("0x454B31 ⊕ n≪48 ⊕ arm≪40 ⊕ m≪32 ⊕ ℓ≪16"); target k from #raw("cell ⊕ (k+1)≪8"). S, X, XR, U, NS, PC = arm 0–5.
 
 == Exact facts checked before any measurement (class: exact computation)
@@ -65,7 +65,7 @@ Cells are completed when both targets are ok. κ and σ are least-squares slopes
 #figure(image("ek1-D-vs-b.svg", width: 100%),
   caption: [Solving degree D (cell mean of 2 targets) against b, same cells. At m = 3 the direct arms have input degree 6 and D = 7 at every completed cell; PC (chained, input degree 3) has D = 4; U (input degree 4) has D = 5–6.])
 
-== Decision rules (analysis-amendment6.txt)
+== Decision rules (analysis-amendment8.txt)
 
 #table(columns: 3, align: (left, left, left), stroke: 0.4pt + gray,
   [*rule*], [*n = 11, m = 2*], [*n = 23, m = 2*],
@@ -87,7 +87,7 @@ At m = 3 every R2–R5 comparison of S has only 2 shared completed cells and is 
 == Predictions scorecard
 
 #table(columns: 3, align: (left, left, left), stroke: 0.4pt + gray,
-  [*prediction (Amendment 6 §9)*], [*result*], [*reading*],
+  [*prediction (Amendment 8 §9)*], [*result*], [*reading*],
   [P1 identity of the s-line polynomial], [held], [exact, checked on the grid],
   [P2 S tied with X in every (n, m)], [*failed*], [D within ±1 everywhere, but |Δκ| = 0.35, 0.37 at m = 2 (m = 3 not evaluable)],
   [P3 no arm cost-favourable], [held], [14 series with ≥ 3 cells, all unfavourable],

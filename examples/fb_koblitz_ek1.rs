@@ -1,6 +1,6 @@
 //! **E-K1: a Gauss-period window in `s = x + 1/x` on Koblitz analogues.**
 //!
-//! Runs the design preregistered in Amendment 6 of
+//! Runs the design preregistered in Amendment 8 of
 //! `research/factor_base_designs_20261015/PREREGISTRATION.md` on the toy
 //! Koblitz curve `K_0` over `F_{2^n}`, `n ∈ {11, 23}` (`2n + 1` prime, `2`
 //! of order `n` mod `2n + 1`, so the Gauss periods `c_i = ζ^i + ζ^{-i}`,
@@ -1794,7 +1794,7 @@ fn analyze(dir: &str, replay_file: Option<&str>) {
         }
     }
     let all = series(&rows, &replay_map);
-    println!("E-K1, Amendment 6: rows from {dir} ({} rows)", rows.len());
+    println!("E-K1, Amendment 8: rows from {dir} ({} rows)", rows.len());
     println!("Instrument: pq_f4_f2::groebner_basis_f4; field_ops = F4Stats::word_xors (64-bit XORs); D = F4Stats::solving_degree.");
     println!("b = log₂ of the exact number of factor-base points; κ = Δlog₂ field_ops/Δb; σ = ΔD/Δb; cells need both targets ok.");
     println!();
@@ -1868,7 +1868,7 @@ fn analyze(dir: &str, replay_file: Option<&str>) {
     }
 
     println!();
-    println!("══ Decision rules (Amendment 6)");
+    println!("══ Decision rules (Amendment 8)");
     let get = |arm: &str, n: u32, m: usize| all.get(&(arm.to_string(), n, m));
     let fit_of = |arm: &str, n: u32, m: usize| fits.get(&(arm.to_string(), n, m));
     let mut p2_all = true;

@@ -75,7 +75,7 @@ status is **cost-unfavourable** at `m = 2, 3` for every arm below, and at
 
 | arm | `m = 2`: κ (cells) vs 1 | `m = 3`: κ (cells) vs 2 | `m = 4`: κ (cells) vs 3 | status |
 |:--|:--|:--|:--|:--|
-| A0 (Kummer tower, incumbent) | 3.593 (8) | 7.468 (3) | 10.773 (2) | cost-unfavourable at `m = 2, 3`; **inconclusive** at `m = 4` (2 cells; its `t = 4` cell exhausts the 13 GB memory limit) |
+| A0 (Kummer tower, incumbent) | 3.593 (8) | 7.468 (3) | 10.773 (2) | cost-unfavourable at `m = 2, 3`; **inconclusive** at `m = 4` (2 cells; its `t = 4` cell exhausts memory at 13 GB (C2) and again at 14.5 GB (L1, Amendment 5)) |
 | N (A0's null) | 3.596 (8) | 7.772 (3) | n/r | cost-unfavourable at `m = 2, 3` |
 | A1z | 6.050 (5) | 8.905 (3) | n/r | cost-unfavourable at `m = 2, 3` |
 | A1g | 5.809 (5) | 9.189 (3) | n/r | cost-unfavourable at `m = 2, 3` |
@@ -87,7 +87,7 @@ status is **cost-unfavourable** at `m = 2, 3` for every arm below, and at
 
 Where σ and κ disagree, κ is the score: A1z and A1g sit at `D = 8` (their
 input degree) and A11 has a flat `D`, yet their κ is at or above A0's
-(Amendment 5). Designs 2, 3, 5–10 and 12–16 were not measured and keep their
+(Amendment 7). Designs 2, 3, 5–10 and 12–16 were not measured and keep their
 "open" status above.
 
 **Observation, not a claim: κ/(m − 1) by arm and arity.** Each quotient was
@@ -109,7 +109,7 @@ size, and the quotients are not a hypothesis test or a fitted law.
 
 | # | design | status | Lean | experiment |
 |:--|:--|:--|:--|:--|
-| 11 | Norm-divisibility chain over a Kummer fibre (prime) | **open: better presentation, no slope change** (§5: replicates on p₂; equals its own shape null; growth per bit no flatter, steeper at `m = 4`) | `chain_sound` (soundness at each root), `pencil_norm_factor` (the `m = 2` norm factorization), `norm_chain_excess` (one more equation than unknown, every `m`) | A11, F1–F4 |
+| 11 | Norm-divisibility chain over a Kummer fibre (prime) | **open: better presentation, no slope change** (§5: replicates on p₂; equals its own shape null; growth per bit no flatter, steeper at `m = 4`; cost-unfavourable on measured `field_ops`; `m = 4`, t ≥ 4 comparison needs > 14 GB, Amendments 5–6) | `chain_sound` (soundness at each root), `pencil_norm_factor` (the `m = 2` norm factorization), `norm_chain_excess` (one more equation than unknown, every `m`) | A11, F1–F4, C1–C4, L1, L2, L2r |
 | 12 | Binary norm chain as an auxiliary-variable solver input (credits `research/nagao_relations/` open item 1) | open | `chain_sound` applies verbatim | E12 |
 | 13 | Algebraic large prime (partial divisibility) | open | — | E13 |
 
@@ -272,6 +272,37 @@ Amendment 4 was registered before any of its rows. Every row now records
   function-and-chain combination, with a steeper per-bit growth. It is not a
   slope change.
 
+### Amendments 5–6: the `m = 4` longer-budget follow-up (run-20261019T1633Z, run-20261019T1740Z)
+
+Rows: `runs/L1-*`, `runs/L2-*` and `runs/L2r-*`, with kernel logs
+`runs/*.dmesg.txt`. Analyses: `runs/analysis-amendment5.txt` and
+`runs/analysis-amendment6.txt`. Reports:
+[`reports/run-20261019T1633Z/REPORT.pdf`](reports/run-20261019T1633Z/REPORT.pdf)
+and [`reports/run-20261019T1740Z/REPORT.pdf`](reports/run-20261019T1740Z/REPORT.pdf).
+Every system was rebuilt from the same seeds as before, and that was checked.
+Each row now records the child's peak RSS.
+
+- **L1, A0 at `m = 4`, `t = 4`, 4 h, `ulimit -v 14.5 GB`:** not measurable.
+  Both systems aborted at 517 s and 540 s, peak RSS 12.8–12.9 GB, about
+  when they died under 13 GB (C2: about 525 s). The extra memory bought
+  essentially no time. **R1:** no cost comparison at `t = 4`. Whether A11's
+  constant factor survives there is still undecided.
+- **L2, A11 at `m = 4`, `t = 5`:** killed by the container's memory-cgroup
+  OOM killer at 97 s and 108 s. The cgroup limit, 14.0 GB, was below the
+  registered 14.5 GB, so the prediction was scored *not decided as
+  registered*.
+- **L2r (Amendment 6), the same cell under `ulimit -v 13.48 GB`,** set below
+  the cgroup limit read in pre-flight. Both systems hit the registered limit
+  (allocation failure at 130 s and 132 s, no kernel OOM kill), so the limit
+  is attributable. **R2:** A11 is not measurable at `t = 5` within 13.48 GB
+  and 4 h. Its 3-cell `m = 4` verdicts stand: κ = 14.9 against 3
+  (cost-unfavourable), σ = 1.5. The prediction that each L2r system would stop
+  before its L2 kill time did not hold.
+- **Reading:** this host cannot measure either open `m = 4` cell. Settling
+  whether A11's constant factor survives at `m = 4`, `t ≥ 4` needs a host
+  with well over 15 GB (the independent lab runner, not reachable from these
+  containers). No recorded verdict changed.
+
 ### Close-out of the prime-field slope line (2026-10-19)
 
 Observations only; no new run. Sources: `runs/analysis-amendment4.txt`,
@@ -283,13 +314,14 @@ Observations only; no new run. Sources: `runs/analysis-amendment4.txt`,
   cost-unfavourable at the sizes measured: `m = 2, 3` for all of them, and
   `m = 4` for A11 (κ = 14.886 vs 3, 3 cells). A0 at `m = 4` is
   **inconclusive** (κ = 10.773, 2 cells).
-- **Amendment 5** makes κ the primary score for every later round, with the
+- **Amendment 7** makes κ the primary score for every later round, with the
   `m − 1` break-even and Amendment 4's thresholds; σ is secondary. It changes
   no verdict here.
 - **Owed, still open:**
-  - A0's third `m = 4` cell (`t = 4`): blocked on a machine with more than
-    13 GB of memory, or lab-runner (isolab) credentials. This container has
-    neither. Until it completes, A0 at `m = 4` stays inconclusive and the
+  - A0's third `m = 4` cell (`t = 4`): it exhausted memory at 13 GB (C2)
+    and again at 14.5 GB in a 4 h budget (L1, Amendment 5). It needs a host
+    with well over 15 GB, i.e. the lab runner (isolab), which these containers
+    cannot reach. Until it completes, A0 at `m = 4` stays inconclusive and the
     A0-versus-A11 comparison at `m = 4` has 2 against 3 cells.
   - The Mathlib cyclicity bridges behind K7 and K8: not attempted. The
     Mathlib cache did not fit the container's disk beside the toolchain
@@ -299,13 +331,13 @@ Observations only; no new run. Sources: `runs/analysis-amendment4.txt`,
     It is a search of the sources it lists, not a proof of absence. Designs
     outside those four were not audited.
 
-### Amendment 6: E-K1, a Gauss-period window in `s = x + 1/x` (run-20261019T1712Z)
+### Amendment 8: E-K1, a Gauss-period window in `s = x + 1/x` (run-20261019T1712Z)
 
 Rows: `runs/K1-*.jsonl` (306). Check log: `runs/K1-check.txt`. Analysis:
-`runs/analysis-amendment6.txt`. Run report:
+`runs/analysis-amendment8.txt`. Run report:
 [`reports/run-20261019T1712Z/REPORT.pdf`](reports/run-20261019T1712Z/REPORT.pdf).
-Amendment 6 was registered before any row and follows the κ-primary rule of
-Amendment 5. Instrument: the repository's Boolean F4
+Amendment 8 was registered before any row and follows the κ-primary rule of
+Amendment 7. Instrument: the repository's Boolean F4
 (`pq_f4_f2::groebner_basis_f4`) on the Weil restriction of each system;
 `field_ops` is its count of 64-bit XORs. Curve `K_0` over `F_{2^n}`,
 `n = 11, 23`; arms S (Gauss window in `s`), X (same window in `x`), XR
@@ -353,7 +385,7 @@ Amendment 5. Instrument: the repository's Boolean F4
 - No design here is shown to reduce any cost. The Lean theorems show that
   presentations are correct, that some designs are empty or neutral in the
   mean, and what the break-even means *within the cost model*. The question
-  that matters, the measured cost (κ, Amendment 5) on real systems, is the experiments' job.
+  that matters, the measured cost (κ, Amendment 7) on real systems, is the experiments' job.
 - "Never seen before" is not claimed. [`NOVELTY_AUDIT.md`](NOVELTY_AUDIT.md)
   (2026-10-19) searched the literature for A11, A1, A4 and H1/H2 from
   abstracts, slides and snippets, with no full text read: A11, A4 and H1/H2
@@ -367,8 +399,9 @@ Amendment 5. Instrument: the repository's Boolean F4
   `m = 4` is inconclusive. Nothing is extrapolated to `m > 4` or deployed
   sizes, and the κ/(m − 1) quotients are an observation, not a claim.
 - **Owed.**
-  - A0's third `m = 4` cell (`t = 4`): needs a machine with more than 13 GB of
-    memory, or lab-runner (isolab) credentials; this container has neither.
+  - A0's third `m = 4` cell (`t = 4`): exhausted memory at 13 GB (C2) and at
+    14.5 GB (L1, Amendment 5); it needs a host with well over 15 GB (the lab
+    runner, isolab), which these containers cannot reach.
   - The Mathlib cyclicity bridges behind K7 and K8 (`F_{2^n}^*` cyclic; a
     group of prime order is cyclic): still owed. The Mathlib cache did not fit
     the container's disk beside the toolchain, and the disk is shared, so it
