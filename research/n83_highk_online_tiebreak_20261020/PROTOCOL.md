@@ -15,6 +15,9 @@ Dispatch only after independent local aggregation of
 `selected_candidate_id: null`. Bind the extension dispatch to the SHA-256 of
 that immutable aggregate and its archive. A failed/noisy/capped screen does
 not trigger this tie-break; retain its disposition and repair that gate first.
+Use `check_trigger.py` on the locally replayed aggregate and raw archive to
+seal their hashes in `n83.online-tiebreak-trigger/v1`. The dispatch must
+recheck those bytes and the trigger receipt before any timed child.
 
 Use `EC1N83Ckb1a1haacb69ee9f37`: `y² + xy = x³ + x² + 1` over
 `F₂[z]/(z⁸³ + z⁷ + z⁴ + z² + 1)`, subgroup order
