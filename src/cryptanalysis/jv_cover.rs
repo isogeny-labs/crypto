@@ -3319,7 +3319,10 @@ mod tests {
         for trial in 0..120 {
             let (r, want) = planted(&jac, &base, &mut rng);
             let (found, cost) = nagao_decompose(&ctx, &base, &by_x, &r, &opts, &mut rng);
-            assert!(!cost.incomplete, "trial {trial}");
+            assert!(
+                !cost.incomplete && !cost.timed_out,
+                "trial {trial}: {cost:?}"
+            );
             assert!(
                 found.contains(&want),
                 "trial {trial}: missed {want:?}, {cost:?}"
@@ -3373,7 +3376,7 @@ mod tests {
             };
             let (fa, ca) = nagao_decompose(&ctx, &base, &by_x, &r, &full, &mut rng);
             let (fb, cb) = nagao_decompose(&ctx, &base, &by_x, &r, &stop, &mut rng);
-            if ca.degenerate || ca.incomplete || cb.incomplete {
+            if ca.degenerate || ca.incomplete || cb.incomplete || ca.timed_out || cb.timed_out {
                 continue;
             }
             n += 1;
@@ -3384,11 +3387,14 @@ mod tests {
             if cb.stopped_at == Some(64) {
                 stopped += 1;
             }
-            // "cheaper" by the F4 degree and matrix the stop saves, which are
-            // per-run facts; `f4_muls` is a difference of the process-wide
-            // counter and interleaves with other tests' F4 runs under
-            // `cargo test`'s parallelism.
-            if cb.degree_reached < ca.degree_reached && cb.max_rows < ca.max_rows {
+            // "no dearer" by the F4 degree and matrix, which are per-run
+            // facts; `f4_muls` is a difference of the process-wide counter and
+            // interleaves with other tests' F4 runs under `cargo test`'s
+            // parallelism.  Since `f4_fp` applies the Gebauer–Möller criteria
+            // the full run no longer reduces redundant pairs past the basis
+            // either, so the stop saves nothing on these systems; it must
+            // still never cost more.
+            if cb.degree_reached <= ca.degree_reached && cb.max_rows <= ca.max_rows {
                 cheaper += 1;
             }
         }
@@ -3396,7 +3402,7 @@ mod tests {
         assert_eq!(stopped, n, "every system stops at the Bézout staircase");
         assert_eq!(
             cheaper, n,
-            "every stopped run ends at a lower degree with a smaller matrix"
+            "no stopped run ends at a higher degree or with a larger matrix"
         );
     }
 
@@ -3429,7 +3435,7 @@ mod tests {
             };
             let (fa, ca) = nagao_decompose(&ctx, &base, &by_x, &r, &stop, &mut rng);
             let (fb, cb) = nagao_decompose(&traced, &base, &by_x, &r, &stop, &mut rng);
-            if ca.degenerate || ca.incomplete || cb.incomplete {
+            if ca.degenerate || ca.incomplete || cb.incomplete || ca.timed_out || cb.timed_out {
                 continue;
             }
             n += 1;

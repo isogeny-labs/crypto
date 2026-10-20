@@ -4,9 +4,10 @@ The candidate places a three-hash Bloom screen before each exact canonical
 normal-basis S3 root-table lookup. The filter is populated only by successful
 table insertions. Its result can reject a lookup; a positive result still uses
 the original open-addressing table and its original value. Set
-`KIC_ROOT_BLOOM=1` to enable the candidate. The default is the unscreened
-reference. The JSON summary records whether the filter was enabled and its
-allocated byte count.
+`KIC_ROOT_BLOOM=0` to disable the screen (since 2026-10-15 the default is
+enabled; before that commit the default was the unscreened reference and
+`KIC_ROOT_BLOOM=1` enabled it). The JSON summary records whether the filter
+was enabled and its allocated byte count.
 
 ## Frozen comparison
 
@@ -53,7 +54,7 @@ in both modes. The candidate allocated 4096 Bloom bytes.
 The required release library suite was attempted on this current-main base.
 It entered its 3923-test run and reported failures in library modules outside
 this example. The exact N71 wide group-law failure was reproduced by itself:
-`K_0/F_2^71 must construct` at `koblitz_fast_arith.rs:1207`. The run was
+`icv1-f2m71-t48653080717-2cafaea3 must construct` at `koblitz_fast_arith.rs:1207`. The run was
 stopped after multiple nonlocal failures. The PR changes neither `src/` nor
 `Cargo.toml` nor `Cargo.lock`; the complete library gate remains open for
 mainline repair and rerun.
