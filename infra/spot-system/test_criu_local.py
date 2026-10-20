@@ -46,6 +46,7 @@ class LocalCriuTests(unittest.TestCase):
             generation = Path(tmp)/'generation'
             generation.mkdir()
             (generation/'backing-paths.json').write_text(json.dumps([str(source/'output')]))
+            (generation/'job.json').write_text(json.dumps({'pid':__import__('os').getpid()}))
             with patch.dict(criu_local.os.environ, {'CRTOOLS_SCRIPT_ACTION':'post-dump'}), patch.object(criu_local.os, 'chown'):
                 criu_local.capture(generation)
             copied = generation/'filesystem'/source.relative_to('/')
