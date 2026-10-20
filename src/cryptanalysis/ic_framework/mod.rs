@@ -66,6 +66,7 @@ pub mod cm_orbit;
 pub mod fiber;
 pub mod large_prime;
 pub mod linalg;
+pub mod pkm_semaev;
 pub mod plugins;
 pub mod prime_tower;
 pub mod residual;
