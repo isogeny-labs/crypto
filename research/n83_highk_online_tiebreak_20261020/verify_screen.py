@@ -75,8 +75,8 @@ def verify(root):
     chosen, choice = arms.choose()
     trigger = runner.validate_trigger(root / "trigger.json")
     if (host.get("schema") != "n83.online-tiebreak-host/v1" or
-            host.get("cgroup_interface") != "v1" or
-            not common.v1_snapshot_consistent(host.get("cgroup_before", {})) or
+            host.get("cgroup_interface") not in ("v1", "v2") or
+            not common.snapshot_consistent(host.get("cgroup_before", {})) or
             not host.get("git_sha") or
             preflight.get("status") != "PASS_CAPACITY_PREFLIGHT" or
             preflight.get("rss_cap_bytes") != runner.RSS_CAP_BYTES or
@@ -147,7 +147,7 @@ def verify(root):
         if usage_path.exists():
             usage = common.read(usage_path)
             finished.append(datetime.fromisoformat(usage["finished_utc"]))
-            snapshots.append(all(common.v1_snapshot_consistent(usage.get(name, {}))
+            snapshots.append(all(common.snapshot_consistent(usage.get(name, {}))
                                  for name in ("cgroup_before", "cgroup_after")))
         else:
             snapshots.append(False)

@@ -60,7 +60,20 @@ def read_allocation(path, trigger_path):
 
 
 def bind_provider(receipt, receipt_path, head_sha):
-    snapshot = prior_adapter.v1_snapshot()
+    original_snapshot = run.parent.cgroup_snapshot
+    if prior_adapter.CPU_V1.joinpath("cpu.stat").exists():
+        snapshot_fn = lambda _group: prior_adapter.v1_snapshot()
+        interface = "v1"
+    else:
+        def snapshot_fn(group):
+            raw = original_snapshot(group)
+            if any(raw.get(name) is None for name in
+                   ("cpu.stat", "cpu.max", "memory.current", "memory.peak",
+                    "memory.max", "memory.events")):
+                raise ValueError("cgroup v2 counters are incomplete")
+            return {**raw, "cgroup_interface": "v2"}
+        interface = "v2"
+    snapshot = snapshot_fn(run.parent.cgroup_root())
     if sorted(os.sched_getaffinity(0)) != receipt["cpu_affinity_ids"]:
         raise ValueError("producer CPU affinity differs from allocation")
     quota, period = snapshot["cpu.max"].split()
@@ -71,7 +84,7 @@ def bind_provider(receipt, receipt_path, head_sha):
     original_write = run.parent.write_json
     adapter_hash = run.parent.digest(Path(__file__))
     allocation_hash = run.parent.digest(receipt_path)
-    run.parent.cgroup_snapshot = lambda _group: prior_adapter.v1_snapshot()
+    run.parent.cgroup_snapshot = snapshot_fn
 
     def host_receipt(group):
         host = original_host(group)
@@ -89,7 +102,7 @@ def bind_provider(receipt, receipt_path, head_sha):
             "runpod_frozen_cpu_affinity": receipt["cpu_affinity_ids"],
             "runpod_allocation_sha256": allocation_hash,
             "runpod_adapter_sha256": adapter_hash,
-            "cgroup_interface": "v1",
+            "cgroup_interface": interface,
         })
         return host
 

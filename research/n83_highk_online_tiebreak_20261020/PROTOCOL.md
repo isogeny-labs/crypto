@@ -99,8 +99,12 @@ most the owner's $5 campaign ceiling. Freeze its provider stop time and
 producer cap in the dispatch: at most four hours from allocation to provider
 stop and 3.5 hours for timed production, leaving at least 30 minutes for
 verification, archive transfer and stop.
-The conditional allocator applies a stricter $0.19/hour cap, matching the
-observed V100 class, so its four-hour worst-case reservation is $0.76.
+After the first allocated Pod exposed cgroup v2, the conditional allocator
+was narrowed to the observed RTX 3070 class at at most $0.13/hour, so its
+four-hour worst-case reservation is $0.52. The v2 adapter reads native
+`cpu.stat`, `cpu.max`, `memory.current`, `memory.peak`, `memory.max`, and
+`memory.events`; the verifier checks those counters and zero throttling/OOM
+deltas. The v1 adapter remains supported on hosts exposing those paths.
 The allocation must not overlap another timed N83 run. Store the raw tree,
 archive SHA-256, provider snapshot and termination receipt. Independently
 replay every base, relation and scalar and recompute the selector from the
@@ -124,11 +128,13 @@ The snapshot must confirm the preceding distribution Pod is terminated.
 The budget verifier charges the frozen $3.57 earlier upper bound plus
 the preceding Pod's allocation-to-recorded-termination interval at
 $0.19/hour, a $0.05 reserve for the failed partial-response allocation,
-and the new Pod's entire created-to-stop reservation. The failed allocation's
-provider response and absent-Pod receipt are copied into the snapshot folder
-and bound by SHA-256; its conservative start is the preceding Pod's recorded
-termination, before the attempted mutation. The resulting upper bound is
-$4.22714 before the new four-hour reservation and $4.98714 after it.
+a further $0.05 reserve for the cgroup-v2 preflight failure, and the new
+Pod's entire created-to-stop reservation. Both failed allocations' provider
+responses and absent-Pod receipts are copied into the snapshot folder and
+bound by SHA-256. The first failed allocation's conservative start is the
+preceding Pod's recorded termination, before the attempted mutation; the
+second allocation has its provider creation timestamp. The resulting upper
+bound is $4.27714 before the new four-hour reservation and $4.79714 after it.
 The allocator takes the key through a hidden terminal prompt and keeps it
 out of files, shell arguments, Pod inputs and result archives. It requires
 the watchdog's prior termination receipt, queries the provider for the

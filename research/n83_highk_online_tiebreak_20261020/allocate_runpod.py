@@ -16,17 +16,14 @@ from research.n83_highk_online_tiebreak_20261020 import runpod_provider
 from research.n83_highk_online_tiebreak_20261020 import runpod_runner
 
 GPU_TYPES = (
-    "NVIDIA GeForce RTX 3070", "NVIDIA RTX A5000", "NVIDIA RTX A4000",
-    "NVIDIA RTX A4500", "NVIDIA RTX 4000 SFF Ada Generation",
-    "NVIDIA GeForce RTX 3080", "NVIDIA GeForce RTX 3080 Ti",
-    "NVIDIA GeForce RTX 4070 Ti", "NVIDIA RTX 4000 Ada Generation",
-    "NVIDIA RTX A2000", "Tesla V100-PCIE-16GB",
+    "NVIDIA GeForce RTX 3070",
 )
 POD_NAME = "n83-online-tiebreak-20261020"
 POD_CAP_SECONDS = 4 * 3600
-PRICE_CAP = Decimal("0.19")
+PRICE_CAP = Decimal("0.13")
 CAMPAIGN_CAP = Decimal("5.00")
 FAILED_ALLOCATION_RESERVE_USD = Decimal("0.05")
+FAILED_V2_RESERVE_USD = Decimal("0.05")
 EVIDENCE = Path(__file__).with_name("evidence")
 
 
@@ -55,7 +52,8 @@ def prior_upper(termination):
         raise ValueError("prior distribution termination precedes allocation")
     return (runpod_provider.EARLIER_RESERVED_UPPER_USD +
             runpod_provider.PRIOR_DISTRIBUTION_RATE_USD_PER_HOUR *
-            seconds / Decimal(3600) + FAILED_ALLOCATION_RESERVE_USD)
+            seconds / Decimal(3600) + FAILED_ALLOCATION_RESERVE_USD +
+            FAILED_V2_RESERVE_USD)
 
 
 def failed_allocation_evidence(at, prior_termination):
@@ -76,6 +74,24 @@ def failed_allocation_evidence(at, prior_termination):
     return raw_path, termination_path
 
 
+def failed_v2_evidence(at):
+    raw_path = EVIDENCE / "failed_v2_allocation_provider.json"
+    termination_path = EVIDENCE / "failed_v2_allocation_termination.json"
+    raw = json.loads(raw_path.read_text())
+    termination = json.loads(termination_path.read_text())
+    created = runpod_provider.timestamp(raw["createdAt"])
+    stopped = runpod_provider.timestamp(termination["recorded_utc"])
+    upper = (Decimal(str(raw["costPerHr"])) *
+             Decimal(str((stopped - created).total_seconds())) / Decimal(3600))
+    if (raw.get("id") != "r0qxup8zfi82po" or
+            termination.get("pod_id") != raw["id"] or
+            termination.get("pod_present") is not False or
+            not created < stopped <= at or
+            upper <= 0 or upper > FAILED_V2_RESERVE_USD):
+        raise ValueError("failed v2 allocation termination or budget evidence invalid")
+    return raw_path, termination_path
+
+
 def preflight(prior_aggregate, prior_archive, prior_termination, output):
     trigger = check_trigger.check(prior_aggregate, prior_archive)
     terminated = json.loads(prior_termination.read_text())
@@ -86,6 +102,7 @@ def preflight(prior_aggregate, prior_archive, prior_termination, output):
             output.exists()):
         raise ValueError("prior Pod is not proven absent or output already exists")
     failed_allocation_evidence(utc_now(), terminated)
+    failed_v2_evidence(utc_now())
     upper = prior_upper(terminated)
     if upper + PRICE_CAP * Decimal(POD_CAP_SECONDS) / Decimal(3600) > CAMPAIGN_CAP:
         raise ValueError("conservative combined Pod reservation exceeds $5")
@@ -138,6 +155,11 @@ def allocate(prior_aggregate, prior_archive, prior_termination, output, key):
     (output / "failed_allocation_provider_raw.json").write_bytes(failed_raw.read_bytes())
     (output / "failed_allocation_termination.json").write_bytes(
         failed_termination.read_bytes())
+    failed_v2_raw, failed_v2_termination = failed_v2_evidence(now)
+    (output / "failed_v2_allocation_provider.json").write_bytes(
+        failed_v2_raw.read_bytes())
+    (output / "failed_v2_allocation_termination.json").write_bytes(
+        failed_v2_termination.read_bytes())
     (output / "prior_pods.json").write_text(
         json.dumps({"recorded_utc": utc_text(now), "pods": pods_before},
                    indent=2, sort_keys=True) + "\n")
@@ -208,6 +230,9 @@ def allocate(prior_aggregate, prior_archive, prior_termination, output, key):
                 "failed_allocation_reserve_usd": str(FAILED_ALLOCATION_RESERVE_USD),
                 "failed_allocation_raw_sha256": digest(output / "failed_allocation_provider_raw.json"),
                 "failed_allocation_termination_sha256": digest(output / "failed_allocation_termination.json"),
+                "failed_v2_reserve_usd": str(FAILED_V2_RESERVE_USD),
+                "failed_v2_raw_sha256": digest(output / "failed_v2_allocation_provider.json"),
+                "failed_v2_termination_sha256": digest(output / "failed_v2_allocation_termination.json"),
                 "approved_combined_cap_usd": str(CAMPAIGN_CAP),
                 "trigger_receipt_sha256": digest(trigger_path),
                 "trigger_aggregate_sha256": trigger["trigger_aggregate_sha256"],

@@ -24,7 +24,7 @@ class AllocationPreflightTest(unittest.TestCase):
         TriggerTest.run_check(self)
 
     def test_worst_case_budget_and_termination_gate(self):
-        at = dt.datetime(2026, 10, 20, 4, 45, tzinfo=dt.timezone.utc)
+        at = dt.datetime(2026, 10, 20, 4, 57, tzinfo=dt.timezone.utc)
         with mock.patch.object(allocate_runpod, "utc_now", return_value=at):
             trigger = allocate_runpod.preflight(
                 self.aggregate, self.archive, self.termination, self.output)
@@ -41,7 +41,7 @@ class AllocationPreflightTest(unittest.TestCase):
                     self.aggregate, self.archive, self.termination, self.output)
 
     def test_failed_allocation_reserve_covers_conservative_interval(self):
-        at = dt.datetime(2026, 10, 20, 4, 45, tzinfo=dt.timezone.utc)
+        at = dt.datetime(2026, 10, 20, 4, 57, tzinfo=dt.timezone.utc)
         with mock.patch.object(allocate_runpod, "utc_now", return_value=at):
             allocate_runpod.preflight(
                 self.aggregate, self.archive, self.termination, self.output)
@@ -49,7 +49,7 @@ class AllocationPreflightTest(unittest.TestCase):
                            Decimal("0.025"))
 
     def test_partial_provider_response_retires_allocated_pod(self):
-        at = dt.datetime(2026, 10, 20, 4, 45, tzinfo=dt.timezone.utc)
+        at = dt.datetime(2026, 10, 20, 4, 57, tzinfo=dt.timezone.utc)
         raw = {"id": "partial123", "createdAt": None, "costPerHr": 0.18}
         with (mock.patch.object(allocate_runpod, "utc_now", return_value=at),
               mock.patch.object(allocate_runpod, "provider_pods", side_effect=[[]] + [[]] * 6),
@@ -66,7 +66,7 @@ class AllocationPreflightTest(unittest.TestCase):
         self.assertTrue((self.output / "provider_api_raw.json").exists())
 
     def test_mutation_error_discovers_and_retires_pod(self):
-        at = dt.datetime(2026, 10, 20, 4, 45, tzinfo=dt.timezone.utc)
+        at = dt.datetime(2026, 10, 20, 4, 57, tzinfo=dt.timezone.utc)
         with (mock.patch.object(allocate_runpod, "utc_now", return_value=at),
               mock.patch.object(allocate_runpod, "provider_pods",
                                 side_effect=[[], [{"id": "late123", "name":
