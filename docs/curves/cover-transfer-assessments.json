@@ -6,8 +6,8 @@
     "refuted",
     "not_applicable"
   ],
-  "assessment_date": "2026-10-14",
-  "catalog_commit": "ff48e2800f62b45c746b3f391540c07b16af4e75",
+  "assessment_date": "2026-10-19",
+  "catalog_commit": "8e4c99759fd8d9594ed207d793b07b59ebaf19f7",
   "source_artifacts": [
     {
       "path": "docs/curves/registry.json",
@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "6bf55d950a86a1427d37dff53c79a9e332e2bc1163bffa56ac6abfd1156b65f1",
+      "sha256": "ea24b54401970d94cf84b61f053ac3c0da5a4dc7daa6eeeff18ca83ac87e71cf",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -208,7 +208,7 @@
     },
     {
       "path": "Cargo.toml",
-      "sha256": "bce1095d381cc258288d3ad51de9597b5c18b2babf428ec210bf8f28af79fc3f",
+      "sha256": "def239e6a4e217a3059fc5b6740d658fa353f6cb023b685aeb2c40e528e94bfc",
       "role": "exact implementation-version dependency: Cargo.toml",
       "freshness": {
         "status": "supported",
@@ -221,7 +221,7 @@
     },
     {
       "path": "Cargo.lock",
-      "sha256": "45223ac12cb2f0d1c2f478342515a4d06fa5d80badfa41f22eeca61dcbb7803b",
+      "sha256": "bf9f2d9eae5f6bfea66b0473d44bf77d63141dcc335fad01b30c420be444ea42",
       "role": "exact implementation-version dependency: Cargo.lock",
       "freshness": {
         "status": "supported",
@@ -234,7 +234,7 @@
     },
     {
       "path": ".github/workflows/curve-covers.yml",
-      "sha256": "6b6fa958684898c17cca1bc821e4678f6a07488d6773a189dd97e283e6e50673",
+      "sha256": "88d4dab40f011416fc254910c0b86a434343d3b65ba5d69eea9f29b79a0ad457",
       "role": "exact implementation-version dependency: .github/workflows/curve-covers.yml",
       "freshness": {
         "status": "supported",
@@ -325,7 +325,7 @@
     },
     {
       "path": "src/cryptanalysis/mod.rs",
-      "sha256": "a2ce25bacbe559f226e857fb3f782c84f8db003661896a6472b23ae4d7e763b7",
+      "sha256": "7e61ca8f24d775034684649ca3314eea5e21f671f3880ce30b26b818527b07d6",
       "role": "exact implementation-version dependency: src/cryptanalysis/mod.rs",
       "freshness": {
         "status": "supported",
@@ -536,7 +536,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
-      "sha256": "3c2487e809350bbe74384952d588f0927a05b1951acac01377069543a9b62951",
+      "sha256": "4c8c50fc9ef002388803f88d2433e3d30c0db5db722560372c804549bc8d4589",
       "role": "independent catalog-wide assessment verifier",
       "freshness": {
         "status": "supported",
@@ -548,8 +548,21 @@
       }
     },
     {
+      "path": "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
+      "sha256": "931ff983a3ee710a23c5d7a1963ddfc878e3b51aa4a88cfedfb71044de80f2e1",
+      "role": "PDF coverage-marker metadata normalization source",
+      "freshness": {
+        "status": "supported",
+        "scope": "byte identity of this assessment artifact at the generated-ledger revision",
+        "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
+        "evidence_refs": [
+          "research/cover_transfer_assessment_20261013/set_pdf_metadata.py"
+        ]
+      }
+    },
+    {
       "path": "research/cover_transfer_assessment_20261013/README.md",
-      "sha256": "6b1183fad884e360aa0cd7205b6c7a953bead4748c37cc1f249e968ca3f99023",
+      "sha256": "5714653dbd3c82e7515eb6801e7e6d8af71c3afe85bc051db1aa5e12057e1ee2",
       "role": "source-linked catalog-wide assessment report",
       "freshness": {
         "status": "supported",
@@ -575,7 +588,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_correspondence.dot",
-      "sha256": "7ce45fc9ec6026def9c6f6ccb9444f488cd21945140c2a7cbdbc76c05b321110",
+      "sha256": "efd88a412ddf59b4a2296f84af2932164346f077faef10af9045e2f91dfbabcd",
       "role": "assessment diagram source",
       "freshness": {
         "status": "supported",
@@ -588,7 +601,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_correspondence.svg",
-      "sha256": "44d5ea3e581cef33013ca40891d858767bceeed1c11476682abec3285dbe8326",
+      "sha256": "7a3401b4a3e7a697633cd53cc59b781ffc96a4f43e077f0a584f3073f33e6029",
       "role": "rendered assessment diagram in SVG format",
       "freshness": {
         "status": "supported",
@@ -601,7 +614,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_correspondence.png",
-      "sha256": "25c216bb488099cbdb06bbbbe00abfab0223748f113c87081e61c59fc6303895",
+      "sha256": "149c947691424b18bf083933a4fb73f4d9d5c1b41b5a772d46f522de8ad82bbe",
       "role": "rendered assessment diagram in PNG format",
       "freshness": {
         "status": "supported",
@@ -614,7 +627,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.dot",
-      "sha256": "896d7c7eeb6a79097e0f244f6db51e5ca96fcd38aa4a1de81a8e1bb13cb5d115",
+      "sha256": "a50bc70c8a5d1e4a6a135242e9c4fadf22d4ffaa62bc7beac43268c076d27104",
       "role": "typed transfer-context diagram source",
       "freshness": {
         "status": "supported",
@@ -627,7 +640,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.svg",
-      "sha256": "2622bea9d64d70ff4f44eaaab36fc02e17c760d9df09cdd64b8553652b40c4bf",
+      "sha256": "06f575e687a9a920bfe40cf48382467191ed852d936b14771259976270ae0319",
       "role": "rendered typed transfer-context diagram in SVG format",
       "freshness": {
         "status": "supported",
@@ -640,7 +653,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.png",
-      "sha256": "009045190603d83eb8705dbfb2617ce0e841b78585d3a01e50c46750becdc6a7",
+      "sha256": "04ffe1afdd1a12fa614cff36539e7b24627b31f9d52c3c2e2343d05e828632fc",
       "role": "rendered typed transfer-context diagram in PNG format",
       "freshness": {
         "status": "supported",
@@ -653,7 +666,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
-      "sha256": "38e69d121cbc0294d0e30ed0b08a1f9a34ec3171768acd4bc1f9177374b0e581",
+      "sha256": "511287c0fcf941b2ace16c3d4bed2d76ce8a65fbc97345936c0556ae3e3635de",
       "role": "rendered catalog-wide assessment PDF",
       "freshness": {
         "status": "supported",
@@ -76082,7 +76095,7 @@
       "control": "odd_degree2_transfer",
       "assessment": {
         "status": "refuted",
-        "scope": "claim that the current one-infinity odd-prime implementation supports the 1,940 even-sextic source models",
+        "scope": "claim that the current one-infinity odd-prime implementation supports the 2,407 even-sextic source models",
         "rationale": "The current model contract and the catalog infinity configuration are structurally incompatible.",
         "evidence_refs": [
           "src/prime_hyperelliptic/curve.rs",
@@ -76096,7 +76109,7 @@
       "assessment": {
         "status": "refuted",
         "scope": "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 2,572 current catalog models",
-        "rationale": "Direct artifact replay covered only its bundled 592-row registry. Static comparison of the pinned source allowlist with the current partition places 165 binary and 1,053 direct prime-field forms inside that syntactic domain, and 1,324 extension-field plus 30 normalized-target forms outside it; this 1,218/1,354 split is not a 2,572-command artifact receipt. Current source adds those paths but has not been published in that artifact.",
+        "rationale": "Direct artifact replay covered only its bundled 592-row registry. The historical static comparison classified 746 of the earlier 2,100 forms as inside the pinned source allowlist (160 binary and 586 direct prime-field) and 1,354 as outside it. That comparison has not been rerun against the expanded catalog and is not a 2,572-command artifact receipt. Current source accepts the new forms, but this artifact does not contain it.",
         "evidence_refs": [
           "research/cover_transfer_assessment_20261013/release_replay.txt",
           "src/bin/hyperelliptic_cover.rs#every_current_catalog_model_reaches_the_standalone_constructor"
@@ -76157,7 +76170,7 @@
     "No search for production targets, private keys, or discrete logarithms was performed.",
     "All 2,572 map rows and all 977 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
     "The 165 catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
-    "The 1,940 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
+    "The 2,407 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
     "Generator checks and [r]G=O do not by themselves prove that every catalog integer r is the exact source order.",
     "Formula-screen outputs in jacobian-transfers.json were not promoted to executable or measured claims.",
     "A full cover-integrated Jacobian index-calculus solver, relation collection, linear algebra, and target decomposition remain a separate deliverable. The bounded odd-prime one-infinity solver library is outside these catalog-cover paths."
