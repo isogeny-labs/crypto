@@ -29,7 +29,7 @@ screen_verify_code=99
 holdout_code=98
 holdout_verify_code=98
 if [ -d "$base/results" ]; then
-  python3 research/n83_highk_online_distribution_20261020/verify_screen.py \
+  python3 -m research.n83_highk_online_distribution_20261020.verify_screen \
     "$base/results" > "$base/screen_verify.log" 2>&1
   screen_verify_code=$?
   if [ "$screen_code" -eq 0 ] && [ "$screen_verify_code" -eq 0 ]; then
@@ -41,7 +41,7 @@ if [ -d "$base/results" ]; then
         --provider-receipt "$allocation" --output "$base/results" \
         > "$base/holdout_run.log" 2>&1
       holdout_code=$?
-      python3 research/n83_highk_online_distribution_20261020/verify_holdout.py \
+      python3 -m research.n83_highk_online_distribution_20261020.verify_holdout \
         "$base/results" > "$base/holdout_verify.log" 2>&1
       holdout_verify_code=$?
     else

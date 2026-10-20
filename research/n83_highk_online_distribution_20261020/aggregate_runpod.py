@@ -51,7 +51,11 @@ def archive_files(archive, results):
 
 
 def replay(module, results, output):
-    command = [sys.executable, str(HERE / module), str(results)]
+    if not module.endswith(".py"):
+        raise ValueError("verifier module name differs")
+    command = [sys.executable, "-m",
+               "research.n83_highk_online_distribution_20261020." +
+               module[:-3], str(results)]
     process = subprocess.run(command, cwd=HERE.parents[1], text=True,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (output / f"{module}.stdout.txt").write_text(process.stdout)
