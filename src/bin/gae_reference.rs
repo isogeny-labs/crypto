@@ -412,10 +412,10 @@ fn run_binary(
 
     let pts = random_multiples(&group, g, 64, bound, &mut rng);
     let (reference, runs) = baseline(&group, &pts);
-    let kernel = if fc.field.folds() && is_x86_feature_detected!("pclmulqdq") {
-        "pclmulqdq fold multiply + batched Fermat inversion"
-    } else {
-        "portable table reduction + batched Fermat inversion"
+    let kernel = match (fc.field.folds(), fc.field.kernel_name()) {
+        (true, "pclmulqdq") => "pclmulqdq fold multiply + batched Fermat inversion",
+        (true, "pmull") => "pmull fold multiply + batched Fermat inversion",
+        _ => "portable table reduction + batched Fermat inversion",
     };
     Ok(report(
         id,
