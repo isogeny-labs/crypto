@@ -85,6 +85,17 @@ public points, with repeated U,D,D,U at target 0 and alternating base
 order thereafter. At the 02:10:07 observation, U target 0 was active.
 This panel's natural results and aggregate useful rank remain pending.
 
+A concurrent [counter-only reconciliation report](reports/run-20261020T0116Z/RUN_REPORT.md),
+its [graph](reports/run-20261020T0116Z/work-counters.svg), and its
+[receipt copy](runs/xor-cache-v2-final.tar.xz) are also preserved. Both
+archive and manifest hashes exactly match the native-audited copy; no
+measurements were selected or discarded to combine the summaries. That
+report does not compare elapsed times. The separate audit report above
+records descriptive L0 intervals without a qualified timing claim and
+adds browsing copies to `benchmarks/`. Canonical qualified-cost charts
+and boundary rows remain unchanged. The reconciliation report's original
+renderer limitation is preserved alongside a later local rendering note.
+
 Accounting clarification: the m=4 `process_wall_ms` field is elapsed time
 inside the worker before final receipt serialization. Container start/end
 receipts preserve the surrounding process interval. A complete cold-cost

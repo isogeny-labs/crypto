@@ -1,54 +1,25 @@
-# XOR cache v2: completed execution
+# XOR cache v2: completed execution record
 
-**Completed 2026-10-20 02:00:10 UTC.** All sixteen natural attempts
-returned `UNKNOWN_search_cap` at exactly 10,000 conflicts with normal
-exits and no OOM. The [native audit](final/audit.json) passes all 294
-archived files and the four matched ABBA cells. Checked row visits fall
-by 82.960–85.361%; the recorded L0 worker off/on ratios are
-1.321160–1.345360. Natural yield/rank remain censored, and the cache
-remains disabled by default. [Complete report](../reports/run-xor-cache-natural-20261020/RUN_REPORT.md).
+**Final status: COMPLETE_BOUNDED.** The existing authorized SSH card ran from 2026-10-20 01:16:34 UTC through 02:00:10 UTC. Migration reconciliation did not start or stop a card.
+
+- All 16 natural attempts (K2048/D12 × public targets 0/1 × A1/B1/B2/A2) reached 10,000 conflicts with `UNKNOWN_search_cap`. No natural relation returned. Capped outcomes do not establish zero yield.
+- In each cell, the two cache-off repetitions match each other and the two cache-on repetitions match each other. Decisions, conflicts, restarts, XOR passes, row operations, and row scans match across settings.
+- Cache-on repivot visits + cached skips exactly equal cache-off repivot visits in all four cells. The counter-only reconciliation report below does not compare elapsed times.
+- Four constructed controls and four independent general-field replays passed. The default solver remains cache-off. Natural useful rank, complete IC cost, and base selection remain unresolved.
+
+Run report: [RUN_REPORT.md](../reports/run-20261020T0116Z/RUN_REPORT.md). The graph and exact cell data are adjacent. Full receipts: [archive](../runs/xor-cache-v2-final.tar.xz) and [per-file manifest](../runs/xor-cache-v2-final.files.sha256). Archive SHA-256: `cf3310c7cb597c144b30a427683ed41d37cf4e2ec2425945d259a1173e776abd`; manifest SHA-256: `55a87e7e0ca6561c48d1ad558ec8b3d8ba385e4cb4c26a6b6188688732eea4ee`.
+
+The [native audit](final/audit.json) independently checks all **294 files**,
+all four matched endpoints and visit conservation. Its archive/manifest
+hashes exactly match the copy above. Checked visits fall by
+82.960–85.361%; the separate [audited report](../reports/run-xor-cache-natural-20261020/RUN_REPORT.md)
+records descriptive L0 worker off/on ratios of 1.321160–1.345360. These
+shared-host intervals do not establish a qualified timing improvement.
+Both reports and both byte-identical archive copies are retained.
+
+The 01:24:11 observation from the previous handoff is historical; this completed card and receipt set supersede it. Frozen [protocol](../XOR_CACHE_PROTOCOL.md), [host card](../XOR_CACHE_HOST_CARD.md), and [driver continuation](../XOR_CACHE_DRIVER_CONTINUATION.md) remain governing records.
 
 The gated [full-base panel](../full-m4-v1/STATUS.md) is the subsequent
-run. This completed card is immutable and must not be restarted.
-
-## Historical live observation, superseded by the final audit
-
-**Observed 2026-10-20 01:24:11 UTC: running.** Supervisor PID 57715 and
-container `n83-xor-cache-K2048-t0-b2` were active on the authorized SSH
-runner. This timestamped observation does not guarantee later liveness.
-The card started at 01:16:34 UTC. Full retained observation:
-[host-status.txt](observation-20261020T0124Z/host-status.txt).
-
-- Four constructed controls and four separate general-field replays
-  passed. Off/on complete SAT-model and row digests agree within each
-  base. The [control report](../reports/run-xor-cache-controls-20261020/RUN_REPORT.md)
-  covers those completed controls and both retained launch failures.
-- Two of sixteen natural attempts completed: K2048 target 0, A1 and B1,
-  both `UNKNOWN_search_cap` at 10,000 conflicts, 37,942 decisions,
-  43 restarts, 101,087 XOR passes, 9,346,237 row operations and
-  302,579,749 row scans. A1 records 59,469,058 repivot visits; B1 records
-  8,705,524 visits and 50,763,534 cached skips. Their sum matches A1.
-  This is one partial pair; no final comparison or improvement is selected.
-- B2 was in progress at a 100,627.424549 ms sample, with 6,400 conflicts.
-  A2 and the other three target/base cells remain scheduled by the same
-  already-running shell card. Target 1 is the fresh m=4 holdout.
-- Natural yield/rank and complete IC cost remain unresolved. Capped
-  attempts retain their status and charged work; no zero-yield inference.
-
-Run root: `/home/ec2-user/n83-m23-20261019/xor-cache-v2`.
-Worker revision: `1de47a9d4186bff08abc84c224a111183e820106`.
-Driver source revision: `f1667c313910a1021daed455c9e48cd03524f42a`.
-Frozen [protocol](../XOR_CACHE_PROTOCOL.md),
-[host card](../XOR_CACHE_HOST_CARD.md), and
-[driver continuation](../XOR_CACHE_DRIVER_CONTINUATION.md).
-
-On completion, collect a new deterministic archive of every attempt,
-audit all final or capped progress and resource receipts, replay returned
-relations, and compare each A1/B1/B2/A2 cell with exact work/model/row
-checks. Preserve the earlier control/failure archives. Stop on incorrect
-results or instrumentation; a Spot interruption or further retry requires
-a new explicit continuation. Do not rerun into this directory.
-
-At that earlier observation the SSH script continued independently of the chat. No automatic chat
-check-in or PR-activity subscription is configured; none was available in
-this session. The PR's catalog evidence gates remain separate blockers.
+run. This completed card must not be restarted. No automatic chat/PR
+check-in is configured. The PR's solver conflict and catalog gates remain
+separate merge blockers.
