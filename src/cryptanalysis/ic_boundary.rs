@@ -1633,6 +1633,14 @@ pub struct SignedFrobeniusClasses {
     lambda_pow: Vec<u64>,
 }
 
+/// Buffers [`SignedFrobeniusClasses::canon_parts_many`] reuses.
+#[derive(Default)]
+struct CanonScratch {
+    xs: Vec<u64>,
+    ys: Vec<u64>,
+    reps: Vec<(u64, u64, u32)>,
+}
+
 impl SignedFrobeniusClasses {
     /// The classes of a Koblitz instance, or `None` for any other curve.
     pub fn new(inst: &BinaryInstance) -> Option<Self> {
@@ -1681,6 +1689,47 @@ impl SignedFrobeniusClasses {
         } else {
             (FastPoint::affine(x, y), t, false)
         }
+    }
+
+    /// Whether [`Self::canon_parts_many`] runs: the batched kernel is
+    /// present (`KIC_RHO_CANON=scalar` selects the per-point tables, the
+    /// same-binary control).
+    fn batched(&self) -> bool {
+        self.canon.frobenius_reps_available()
+    }
+
+    /// [`Self::canon_parts`] of every point of `pts`, sixteen at a time,
+    /// into `out` (cleared first); the same triples, point for point.
+    /// `scratch` holds the buffers between calls.
+    fn canon_parts_many(
+        &self,
+        pts: &[FastPoint],
+        scratch: &mut CanonScratch,
+        out: &mut Vec<(FastPoint, u32, bool)>,
+    ) {
+        scratch.xs.clear();
+        scratch.ys.clear();
+        scratch
+            .xs
+            .extend(pts.iter().map(|p| if p.infinity { 0 } else { p.x }));
+        scratch
+            .ys
+            .extend(pts.iter().map(|p| if p.infinity { 0 } else { p.y }));
+        self.canon
+            .frobenius_reps(&scratch.xs, &scratch.ys, &mut scratch.reps);
+        out.clear();
+        out.extend(pts.iter().zip(&scratch.reps).map(|(p, &(x, y, t))| {
+            if p.infinity {
+                return (*p, 0, false);
+            }
+            // −(x, y) = (x, x + y).
+            let negated = x ^ y;
+            if negated < y {
+                (FastPoint::affine(x, negated), t, true)
+            } else {
+                (FastPoint::affine(x, y), t, false)
+            }
+        }));
     }
 
     /// The multiplier `σλ^t` of [`Self::canon_parts`].
@@ -2825,6 +2874,9 @@ pub struct ParallelRho<'a> {
     setup: GroupOps,
     lanes: usize,
     restart_batch: usize,
+    /// Whether a round's canonicalisations run through the batched
+    /// kernel (eight lanes or more, and the CPU has it).
+    batch_canon: bool,
 }
 
 impl<'a> ParallelRho<'a> {
@@ -2838,6 +2890,7 @@ impl<'a> ParallelRho<'a> {
         dp_bits: Option<u32>,
     ) -> Option<Self> {
         let classes = SignedFrobeniusClasses::new(inst)?;
+        let classes_batched = classes.batched();
         let lanes = lanes.max(1);
         let r = inst.r;
         let n = inst.n as usize;
@@ -2885,7 +2938,18 @@ impl<'a> ParallelRho<'a> {
             setup,
             lanes,
             restart_batch: (lanes / 4).max(1),
+            batch_canon: lanes >= 8 && classes_batched,
         })
+    }
+
+    /// Take the batched canonicalisation on or off.  The walks are the
+    /// same either way (the test compares them step for step); only the
+    /// time a step takes differs.  Default: on when the CPU has the
+    /// kernel and there are eight lanes or more; `KIC_RHO_CANON=scalar`
+    /// turns it off for the whole process.
+    pub fn with_batched_canon(mut self, on: bool) -> Self {
+        self.batch_canon = on && self.lanes >= 8 && self.classes.batched();
+        self
     }
 
     /// One target's floor in steps, `√(πr/2A)` with `A = 2n`.
@@ -3125,6 +3189,9 @@ impl<'a> ParallelRho<'a> {
         let mut stepped: Vec<(usize, usize)> = Vec::with_capacity(self.lanes);
         let mut idle: Vec<usize> = Vec::with_capacity(self.lanes);
         let mut fresh: Vec<FastPoint> = Vec::with_capacity(self.lanes);
+        let batch_canon = self.batch_canon;
+        let mut canon_scratch = CanonScratch::default();
+        let mut parts: Vec<(FastPoint, u32, bool)> = Vec::with_capacity(self.lanes);
         'run: while tally.walk_ops() < max_steps && walks < max_steps {
             // Restart the idle lanes once enough of them wait, or when
             // none is left walking.
@@ -3166,10 +3233,19 @@ impl<'a> ParallelRho<'a> {
             sums.clear();
             fc.add_pairwise(&points, &addends, &mut sums, &mut scratch);
             ops.adds += points.len() as u64;
-            for (&(i, j), &sum) in stepped.iter().zip(&sums) {
+            let batch_round = batch_canon && sums.len() >= 8;
+            if batch_round {
+                self.classes
+                    .canon_parts_many(&sums, &mut canon_scratch, &mut parts);
+            }
+            for (k, (&(i, j), &sum)) in stepped.iter().zip(&sums).enumerate() {
                 let lane = &mut lanes[i];
                 tally.canonicalisations += 1;
-                let (y, t, negated) = self.classes.canon_parts(sum);
+                let (y, t, negated) = if batch_round {
+                    parts[k]
+                } else {
+                    self.classes.canon_parts(sum)
+                };
                 let hy = mix(y.pack());
                 lane.tried += 1;
                 if look_ahead
@@ -9238,6 +9314,57 @@ mod tests {
             }
             let mean = steps / targets as f64 / ParallelRho::expected_steps(&inst);
             assert!((0.4..2.5).contains(&mean), "{lanes} lanes: {mean}");
+        }
+    }
+
+    /// The batched canonicalisation changes the time of a step, not the
+    /// walk: on the same seed and target, with 8, 16, 32 and 64 lanes (a
+    /// ragged last chunk included), every counter and the logarithm match
+    /// the per-point tables'.
+    #[test]
+    fn parallel_rho_batched_canonicalisation_leaves_the_walk_unchanged() {
+        for (a, n) in [(1u8, 43u32), (0, 41), (0, 53)] {
+            let inst = koblitz_instance(a, n).expect("a Koblitz instance");
+            for lanes in [8usize, 16, 24, 32, 64] {
+                let dp = ParallelRho::default_dp_bits(&inst, lanes);
+                let base =
+                    ParallelRho::new(&inst, 91, lanes, Some(dp)).expect("a Koblitz instance");
+                if !base.classes.batched() {
+                    eprintln!("skipped: the CPU lacks the batched kernel");
+                    return;
+                }
+                let on = ParallelRho::new(&inst, 91, lanes, Some(dp))
+                    .expect("a Koblitz instance")
+                    .with_batched_canon(true);
+                let off = base.with_batched_canon(false);
+                for i in 0..4u64 {
+                    let d = 1 + mix(i + 7000 + u64::from(n)) % (inst.r - 1);
+                    let q = inst.fast.mul_u64(inst.generator, d);
+                    let (x, y) = (
+                        on.solve(q, rho_cap(inst.r, 64.0)),
+                        off.solve(q, rho_cap(inst.r, 64.0)),
+                    );
+                    assert_eq!(x.recovered, Some(d), "a = {a}, n = {n}, {lanes} lanes");
+                    assert_eq!(
+                        (
+                            x.recovered,
+                            x.steps,
+                            x.walks,
+                            x.distinguished_points,
+                            x.rounds
+                        ),
+                        (
+                            y.recovered,
+                            y.steps,
+                            y.walks,
+                            y.distinguished_points,
+                            y.rounds
+                        ),
+                        "a = {a}, n = {n}, {lanes} lanes, target {i}"
+                    );
+                    assert_eq!(x.counters, y.counters, "a = {a}, n = {n}, {lanes} lanes");
+                }
+            }
         }
     }
 
