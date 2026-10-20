@@ -363,7 +363,7 @@ fn main() {
             }
             entry.insert("ic_band".into(), json!(band));
             if let Some(dn) = &dense {
-                let pairs = paired_indices(&ic, dn, |r| r.seed, |r| r.seed);
+                let pairs = paired_indices(ic, dn, |r| r.seed, |r| r.seed);
                 let n = pairs.len();
                 let s_d: Vec<f64> = pairs.iter().map(|&(_, j)| dn[j].s).collect();
                 let s_s: Vec<f64> = pairs.iter().map(|&(i, _)| ic[i].s).collect();
