@@ -15,7 +15,16 @@ genuine index-calculus DLP on those same published classes: 11,116 line
 relations, rank 521 on 522 affine points, verified divisor descents and a
 source-verified answer. It loses 561.59× to mean source rho at the stated
 M+0.5S+10I+0.1A price, with 36/36 pricing-cell losses. The source-to-Jacobian
-map remains unexecuted, so this is not a complete transfer-attack cost.
+map is excluded from this published-class control.
+
+The `run-tian-mapped-line-sieve` PDF and graph add the source map. All 101
+tested cubic-source points gave traced quartic Jacobian classes matching their
+source multiples. The line sieve consumed the newly mapped P and Q classes,
+recovered 1987 and verified it on source and destination. Counting formula
+evaluation, trace-class construction, relation solving and verification gives
+**645.65×** mean source rho at the representative price, with 36/36 losses
+and a **47.14–787.55×** price band. This is one published fixture; independent
+quotient-from-kernel certification and growing-size evidence remain open.
 
 The `run-mixed-fiber-polynomial` PDF records 540 source-verified Semaev-S4
 exhaustive-polynomial DLP arms on the same 180 targets as the pair-table

@@ -866,7 +866,7 @@ const R: u64 = 143_069_629;
 // A line section and the fixed hyperplane H have linearly equivalent
 // degree-four divisors.  With P0 on H, every fully split affine line gives
 // four-term relations among the rational-point classes [P-P0].
-fn line_sieve_rank(solve: bool) {
+fn line_sieve_rank(solve: bool, mapped: bool) {
     let f = F::default();
     let mut points = Vec::new();
     for x in 0..P {
@@ -970,14 +970,14 @@ fn line_sieve_rank(solve: bool) {
     }
     let rank = pivots.len();
     let descent = if solve {
-        Some(line_sieve_descent(&points, &h_roots, &pivots))
+        Some(line_sieve_descent(&points, &h_roots, &pivots, mapped))
     } else {
         None
     };
     println!(
         "{}",
         json!({
-            "schema":if solve {"tian-quartic-line-sieve-dlp/v1"} else {"tian-quartic-line-sieve-rank/v1"}, "p":P,"r":R,
+            "schema":if mapped {"tian-quartic-line-sieve-mapped-dlp/v1"} else if solve {"tian-quartic-line-sieve-dlp/v1"} else {"tian-quartic-line-sieve-rank/v1"}, "p":P,"r":R,
             "affine_rational_points":width,"infinity_rational_points":infinity,
             "h_constant":h_constant,"h_roots":h_roots.iter().map(|&i| points[i]).collect::<Vec<_>>(),
             "fully_split_lines":full_lines,"relation_rank":rank,"nullity":width-rank,
@@ -1192,13 +1192,51 @@ fn line_sieve_descent(
     points: &[(u64, u64)],
     h_roots: &[usize],
     pivots: &BTreeMap<usize, Vec<u64>>,
+    mapped: bool,
 ) -> serde_json::Value {
     let km = QuarticKm::new();
     assert_eq!(km.roots.iter().all(|p| points.contains(p)), true);
     assert_eq!(h_roots.len(), 3);
     let moved_cubic = km.cubic_triple_at_p0();
-    let s = km.class_from_cubics([380, 3, 364, 1], [190, 302, 340, 1], &moved_cubic);
-    let t = km.class_from_cubics([25, 158, 205, 1], [491, 424, 108, 1], &moved_cubic);
+    let published_s = km.class_from_cubics([380, 3, 364, 1], [190, 302, 340, 1], &moved_cubic);
+    let published_t = km.class_from_cubics([25, 158, 205, 1], [491, 424, 108, 1], &moved_cubic);
+    let (s, t) = if mapped {
+        let receipt: serde_json::Value = serde_json::from_str(
+            &std::fs::read_to_string(
+                "research/five_leads_e2e_20261019/correctness/tian-cubic-trace-map-pq-v1.json",
+            )
+            .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(receipt["schema"], "tian-cubic-trace-map-pq/v1");
+        assert!(receipt["checked"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|v| v["matched_published_destination"] == true));
+        let parse = |key: &str| -> Class {
+            Class(
+                receipt[key]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|row| {
+                        row.as_array()
+                            .unwrap()
+                            .iter()
+                            .map(|v| v.as_u64().unwrap())
+                            .collect()
+                    })
+                    .collect(),
+            )
+        };
+        let s = parse("mapped_p_class");
+        let t = parse("mapped_q_class");
+        assert!(km.equivalent(&s, &published_s) && km.equivalent(&t, &published_t));
+        (s, t)
+    } else {
+        (published_s, published_t)
+    };
     let evaluator = RationalEvaluator::new(&km, points);
     let fixed = fixed_descent_space(&km);
     let (logs, kernel_multiplications, kernel_additions) = point_log_kernel(pivots, points.len());
@@ -1280,7 +1318,7 @@ fn line_sieve_descent(
         "scalar_recovery_inversions":if recovered.is_some(){2}else{0},
         "scalar_kernel_multiplications":kernel_multiplications,"scalar_kernel_additions":kernel_additions,
         "factor_base_size":logs.len(),"fixed_dimension":fixed.len(),"off_h_evaluation_points":evaluator.points.len(),
-        "source_map_executed":false,"index_calculus_executed":true})
+        "source_map_executed":mapped,"index_calculus_executed":true})
 }
 fn scalar_pow(mut x: u64, mut n: u64) -> u64 {
     let mut y = 1u64;
@@ -1296,12 +1334,179 @@ fn scalar_pow(mut x: u64, mut n: u64) -> u64 {
     y
 }
 fn main() {
+    if std::env::args().any(|arg| arg == "--line-sieve-mapped-dlp") {
+        line_sieve_rank(true, true);
+        return;
+    }
+    let trace_pq_only = std::env::args().any(|arg| arg == "--trace-map-pq");
+    if trace_pq_only || std::env::args().any(|arg| arg == "--trace-map-gate") {
+        let km = QuarticKm::new();
+        let f = &km.f;
+        let e = [60u64, 392, 337, 1];
+        let y_poly = [188u64, 405, 180];
+        assert!((0..P).all(|x| (e[0] + e[1] * x + e[2] * x * x + x * x * x) % P != 0));
+        let multiply = |a: [u64; 3], b: [u64; 3]| -> [u64; 3] {
+            let mut t = [0u64; 5];
+            for i in 0..3 {
+                for j in 0..3 {
+                    t[i + j] = f.a(t[i + j], f.m(a[i], b[j]));
+                }
+            }
+            for i in (3..5).rev() {
+                let high = t[i];
+                for j in 0..3 {
+                    t[i - 3 + j] = f.sub(t[i - 3 + j], f.m(high, e[j]));
+                }
+            }
+            [t[0], t[1], t[2]]
+        };
+        let mut xp = vec![[1, 0, 0]];
+        let mut yp = vec![[1, 0, 0]];
+        for _ in 0..9 {
+            xp.push(multiply(*xp.last().unwrap(), [0, 1, 0]));
+            yp.push(multiply(*yp.last().unwrap(), y_poly));
+        }
+        let mut quartic_at_e = [0u64; 3];
+        for &(i, j, _, c) in &QUARTIC {
+            let term = multiply(xp[i], yp[j]);
+            for k in 0..3 {
+                quartic_at_e[k] = f.a(quartic_at_e[k], f.m(c, term[k]));
+            }
+        }
+        assert_eq!(quartic_at_e, [0; 3]);
+        let osculating = [448u64, 375, 99, 290, 462, 9, 150, 439, 205, 1];
+        let mut cubic_at_e = [0u64; 3];
+        for (idx, &(i, j)) in basis_monomials(3).iter().enumerate() {
+            let term = multiply(xp[i], yp[j]);
+            for k in 0..3 {
+                cubic_at_e[k] = f.a(cubic_at_e[k], f.m(osculating[idx], term[k]));
+            }
+        }
+        assert_eq!(cubic_at_e, [0; 3]);
+        let mut e_constraints = vec![vec![0u64; km.mons.len()]; 3];
+        for (col, &(i, j)) in km.mons.iter().enumerate() {
+            let term = multiply(xp[i], yp[j]);
+            for k in 0..3 {
+                e_constraints[k][col] = term[k];
+            }
+        }
+        let input = std::fs::read_to_string(
+            "research/five_leads_e2e_20261019/correctness/tian-cubic-map-gate-v2.jsonl",
+        )
+        .unwrap();
+        let rows: Vec<serde_json::Value> = input
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect();
+        assert_eq!(rows.len(), 101);
+        let movable = km.cubic_triple_at_p0();
+        let s = km.class_from_cubics([380, 3, 364, 1], [190, 302, 340, 1], &movable);
+        let t = km.class_from_cubics([25, 158, 205, 1], [491, 424, 108, 1], &movable);
+        let mut results = Vec::new();
+        let mut expected = km.identity.clone();
+        let selected: Vec<_> = if trace_pq_only {
+            vec![&rows[0], rows.last().unwrap()]
+        } else {
+            rows.iter().collect()
+        };
+        let mut mapped_p = None;
+        let mut mapped_q = None;
+        for row in selected {
+            let mut constraints: Vec<Vec<u64>> = row["trace_divisor_constraints"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|r| {
+                    r.as_array()
+                        .unwrap()
+                        .iter()
+                        .map(|v| v.as_u64().unwrap())
+                        .collect()
+                })
+                .collect();
+            assert_eq!(constraints.len(), 9);
+            constraints.extend(e_constraints.clone());
+            let coefficients = nullspace(f, constraints, km.mons.len());
+            assert_eq!(coefficients.len(), 22, "trace class constraint rank");
+            let class = Class(row_basis(
+                f,
+                coefficients
+                    .iter()
+                    .map(|c| lincomb(f, c, &km.v, N))
+                    .collect(),
+                N,
+            ));
+            assert_eq!(class.0.len(), 22);
+            let scalar = row["scalar_check_only"].as_u64().unwrap();
+            if scalar <= 100 {
+                expected = km.add(&expected, &s);
+            }
+            let matched = if scalar <= 100 {
+                km.equivalent(&class, &expected)
+            } else {
+                km.equivalent(&class, &t)
+            };
+            if scalar == 1 {
+                mapped_p = Some(class.0.clone());
+            }
+            if scalar == 1987 {
+                mapped_q = Some(class.0.clone());
+            }
+            results.push(json!({"scalar":scalar,"class_dimension":class.0.len(),"matched_published_destination":matched}));
+            assert!(
+                matched,
+                "source trace disagrees with published class for {scalar}"
+            );
+        }
+        println!(
+            "{}",
+            json!({"schema":if trace_pq_only {"tian-cubic-trace-map-pq/v1"} else {"tian-cubic-trace-map-gate/v1"},
+            "residual_cubic":e,"residual_y_poly":y_poly,"osculating_cubic":osculating,
+            "checked":results,"mapped_p_class":mapped_p,"mapped_q_class":mapped_q,
+            "curve_field_counts":km.f.counts()})
+        );
+        return;
+    }
+    if std::env::args().any(|arg| arg == "--osculating9-gate") {
+        let f = F::default();
+        let mons = basis_monomials(3);
+        let vars = local_series(&f, (359, 1, 0), 10, 0, 2);
+        let jets = monomial_jets(&f, &mons, 3, &vars);
+        let kernel = nullspace(&f, jets[..9].to_vec(), mons.len());
+        let mut data = Vec::new();
+        for cubic in &kernel {
+            let mut support = Vec::new();
+            for x in 0..P {
+                for y in 0..P {
+                    if quartic(&f, x, y, 1) == 0 {
+                        let value = mons.iter().enumerate().fold(0, |acc, (j, &(i, k))| {
+                            f.a(
+                                acc,
+                                f.m(cubic[j], f.m(f.pow(x, i as u64), f.pow(y, k as u64))),
+                            )
+                        });
+                        if value == 0 {
+                            support.push((x, y));
+                        }
+                    }
+                }
+            }
+            data.push(
+                json!({"cubic":cubic,"jet9":f.dot(&jets[9],cubic),"rational_support":support}),
+            );
+        }
+        println!(
+            "{}",
+            json!({"schema":"tian-osculating9-gate/v1","kernel_dimension":kernel.len(),"data":data})
+        );
+        return;
+    }
     if std::env::args().any(|arg| arg == "--line-sieve-dlp") {
-        line_sieve_rank(true);
+        line_sieve_rank(true, false);
         return;
     }
     if std::env::args().any(|arg| arg == "--line-sieve-rank") {
-        line_sieve_rank(false);
+        line_sieve_rank(false, false);
         return;
     }
     if std::env::args().any(|arg| arg == "--published-support") {

@@ -33,12 +33,31 @@ are then evaluated natively on 101 source points:
 mkdir -p /tmp/tian2012-source
 curl -L --fail https://export.arxiv.org/src/2012.07173 | tar -xz -C /tmp/tian2012-source
 python3 research/five_leads_e2e_20261019/extract_tian_map.py /tmp/tian2012-source/Cover_attack.tex > research/five_leads_e2e_20261019/fixtures/tian-cubic-map-v1.json
-research/five_leads_e2e_20261019/native/target/release/tian-cubic-map-gate > research/five_leads_e2e_20261019/correctness/tian-cubic-map-gate-v1.jsonl
+research/five_leads_e2e_20261019/native/target/release/tian-cubic-map-gate > research/five_leads_e2e_20261019/correctness/tian-cubic-map-gate-v2.jsonl
 ```
 
 The map gate checks a separable three-point cut on the quartic and a
 deliberate bad-coefficient control. It does not construct the corresponding
-Jacobian classes or trace them to the base field.
+Jacobian classes or trace them to the base field by itself. The following
+commands run that trace, verify 101 mapped source points, solve the mapped
+P/Q DLP, and price all three cold stages:
+
+```sh
+research/five_leads_e2e_20261019/native/target/release/tian-quartic-km --osculating9-gate > research/five_leads_e2e_20261019/correctness/tian-osculating9-gate-v1.json
+research/five_leads_e2e_20261019/native/target/release/tian-quartic-km --trace-map-gate > research/five_leads_e2e_20261019/correctness/tian-cubic-trace-map-gate-v1.json
+research/five_leads_e2e_20261019/native/target/release/tian-quartic-km --trace-map-pq > research/five_leads_e2e_20261019/correctness/tian-cubic-trace-map-pq-v1.json
+research/five_leads_e2e_20261019/native/target/release/tian-quartic-km --line-sieve-mapped-dlp > research/five_leads_e2e_20261019/correctness/tian-quartic-line-sieve-mapped-dlp-v1.json
+research/five_leads_e2e_20261019/native/target/release/tian-line-sieve-mapped-analyze > research/five_leads_e2e_20261019/correctness/tian-line-sieve-mapped-analysis-v1.json
+```
+
+The `--trace-map-pq` mode consumes the P and published Q coordinates from
+the map receipt and stores the resulting Jacobian classes. It checks them
+against Tian's S,T but does not use the planted scalar to form either class.
+The mapped line sieve consumes those classes, not the published classes.
+The price analysis adds P/Q formula and trace-constraint counts, the cold
+trace-class run, and the mapped line-sieve run. Source rho uses the same
+five seeds as the published-class control. Memory and control flow are
+unpriced; the single published fixture gives no asymptotic claim.
 Re-running its selection requires that archived census:
 
 ```sh

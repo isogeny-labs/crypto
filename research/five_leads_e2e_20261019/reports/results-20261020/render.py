@@ -17,6 +17,7 @@ MIXED_F4 = json.loads((STUDY / "results/mixed-fiber-f4-dlp-lower-bound-summary.j
 TIAN = json.loads((STUDY / "results/tian-km-arithmetic-gate-summary.json").read_text())
 LINEAR = json.loads((STUDY / "results/tian-km-linear-dlp-summary.json").read_text())
 SIEVE = json.loads((STUDY / "results/tian-quartic-line-sieve-summary.json").read_text())
+MAPPED = json.loads((STUDY / "results/tian-quartic-line-sieve-mapped-summary.json").read_text())
 
 
 def plot(path, labels, values, title, ylabel, session, horizontal=False):
@@ -130,6 +131,10 @@ def results_report():
          [SIEVE["representative"]["cold_candidate_over_mean_rho"]],
          "Tian F523 destination index calculus · published S,T", "cold operation cost / mean source rho",
          "one source- and destination-verified target · source map unexecuted", horizontal=True)
+    plot(out / "tian-mapped-line-sieve", ["Published-class", "Mapped source classes"],
+         [SIEVE["representative"]["cold_candidate_over_mean_rho"], MAPPED["representative"]["cold_candidate_over_mean_rho"]],
+         "Tian F523 cubic transfer · index calculus DLP", "cold operation cost / mean source rho",
+         "101 source-map class checks · one mapped source- and destination-verified DLP", horizontal=True)
     pooled = next(row for row in PROJECTIVE["summary"] if row["kind"] == "all")
     p = pooled["representative"]
     source = f'''#set page(paper: "a4", margin: 19mm)
@@ -158,15 +163,17 @@ The native F4 solver additionally returned exact rational root sets on 2,290 non
 
 #figure(image("mixed-fiber-f4-lower-bound.svg", width: 76%), caption: [F4-backed DLP lower bounds from counted row-reduction field multiplications; 180 targets per arm.])
 
-== Cubic transfer and odd-kernel escape: unresolved attacks
+== Cubic transfer and genus-3 odd-kernel escape
 
-For Tian's published F523 cubic fixture, the 3-kernel and smooth quartic were checked. Native quartic Jacobian arithmetic verifies T=1987S and rS=0 from published classes; five optimized cubic-field source-rho seeds recover the source scalar. One quartic doubling costs {gate["one_jacobian_double_over_mean_rho"]:.3f}× mean source rho in this implementation. A bounded linear search received the published S,T without their scalar, recovered 1987 and source-verified it; its cold cost is {LINEAR["representative"]["cold_candidate_over_mean_rho"]:.2f}× mean rho. A genuine line-sieve index calculus on those published classes also recovered 1987, verified both rational-divisor relations in the Jacobian, and source-verified the answer. At M+0.5S+10I+0.1A it costs {SIEVE["representative"]["cold_candidate_over_mean_rho"]:.2f}× mean source rho and loses in all 36 price cells. The source-to-Jacobian map was not executed. The 20 Smith-negative genus-3 holdouts were materialized, but odd kernels and end-to-end attacks on them remain untested.
+For Tian's published F523 cubic fixture, the 3-kernel and smooth quartic were checked. The six published map functions were evaluated on 100 successive source multiples and Q; all 101 Frobenius-traced divisor classes match the expected Jacobian multiples. The line sieve recovered 1987 from the mapped P and Q classes and checked the answer on source and destination. Its complete cold cost, including formula evaluation and trace construction, is *{MAPPED["representative"]["cold_candidate_over_mean_rho"]:.2f}×* mean source rho at M+0.5S+10I+0.1A; all 36 price cells lose, spanning {MAPPED["cold_ratio_band"][0]:.2f}–{MAPPED["cold_ratio_band"][1]:.2f}×. The published-class-only line sieve costs {SIEVE["representative"]["cold_candidate_over_mean_rho"]:.2f}×. The 20 Smith-negative genus-3 holdouts were materialized, but odd kernels and end-to-end attacks on them remain untested. An independent quotient-from-kernel proof for the cubic fixture remains open.
 
 #figure(image("tian-arithmetic-gate.svg", width: 76%), caption: [Arithmetic diagnostic only; one quartic doubling and a known-scalar multiplication divided by the mean of five complete source-rho solves.])
 
 #figure(image("tian-linear-dlp.svg", width: 76%), caption: [Cold cost of one verified DLP on published destination classes; no source-to-Jacobian map or index calculus was run.])
 
 #figure(image("tian-line-sieve.svg", width: 76%), caption: [Cold cost of published-class line-sieve index calculus, including all relation and descent attempts. Source map absent; operation pricing includes modular additions.])
+
+#figure(image("tian-mapped-line-sieve.svg", width: 76%), caption: [Mapped source-to-answer line-sieve DLP against five optimized source-rho seeds. The published-class-only control omits source mapping.])
 
 *Evidence:* `REPORT.md`, `results/`, `correctness/`, `sessions_projective_chart_v2.tar.zst`, and the seven linked `reports/run-*` PDFs. Negative outcomes and unexecuted routes remain explicit in the report. Literature: #link("https://arxiv.org/html/2012.07173")[Tian's cubic transfer] and #link("https://arxiv.org/html/2007.03172")[Tian's genus-3 odd-isogeny construction].
 '''
@@ -320,6 +327,27 @@ At M+0.5S+10I+0.1A, the full cold cost is {sieve["cold_candidate_GAE"]:.1f} mult
 *Raw receipt:* `correctness/tian-quartic-line-sieve-dlp-v1.json`. *Full 36-price grid:* `results/tian-quartic-line-sieve-price-grid.csv`. The source-to-Jacobian map was not executed: S,T were direct published inputs, so this is not a complete transferred source attack or a general-size result.
 '''
     compile_report(sieve_out, sieve_source)
+
+    mapped_out = STUDY / "reports/run-20261020T0843Z-tian-mapped-line-sieve"
+    mapped_out.mkdir(parents=True, exist_ok=True)
+    for extension in ("svg", "png"):
+        shutil.copyfile(HERE / f"tian-mapped-line-sieve.{extension}", mapped_out / f"cost-ratio.{extension}")
+    mapped = MAPPED["representative"]
+    mapped_source = f'''#set page(paper: "a4", margin: 22mm)
+#set text(font: "Liberation Sans", size: 10pt)
+= Tian cubic: mapped source-to-answer line-sieve DLP
+
+*Commands:* `tian-cubic-map-gate`, `tian-quartic-km --trace-map-pq`, `tian-quartic-km --line-sieve-mapped-dlp`, `tian-line-sieve-mapped-analyze`. *Host:* shared Intel Xeon 6975P-C; L0 operation counts only.
+
+The published source P and Q coordinates were mapped with Tian's six rational functions; Q was supplied directly, not generated from the planted scalar. Their degree-three cuts were checked on the smooth quartic and their Frobenius traces represented as Jacobian classes. A separate cohort gate matched 100 successive source multiples and Q to destination classes. The line-sieve DLP consumed the mapped P and Q classes, recovered 1987 without it as a solver input, and verified the answer on source and destination.
+
+At M+0.5S+10I+0.1A, the complete cold pipeline costs {mapped["cold_candidate_GAE"]:.1f} multiplication equivalents versus {mapped["mean_source_rho_GAE"]:.2f} for mean source rho, a {mapped["cold_candidate_over_mean_rho"]:.2f}× loss. All 36 price cells lose ({MAPPED["cold_ratio_band"][0]:.2f}–{MAPPED["cold_ratio_band"][1]:.2f}×). The {SIEVE["representative"]["cold_candidate_over_mean_rho"]:.2f}× published-class-only control omits source mapping.
+
+#figure(image("cost-ratio.svg", width: 100%), caption: [Mapped cubic source-to-answer index calculus versus optimized source rho; the published-class-only result is shown for comparison.])
+
+*Evidence:* `correctness/tian-cubic-map-gate-v2.jsonl`, `correctness/tian-cubic-trace-map-pq-v1.json`, `correctness/tian-quartic-line-sieve-mapped-dlp-v1.json`, and `results/tian-quartic-line-sieve-mapped-price-grid.csv`. Memory and control flow are unpriced. This is one published fixture; an independent quotient-from-kernel proof and growing-size comparison remain open.
+'''
+    compile_report(mapped_out, mapped_source)
 
     polynomial_out=STUDY / "reports/run-20261020T0750Z-mixed-fiber-polynomial"
     polynomial_out.mkdir(parents=True,exist_ok=True)

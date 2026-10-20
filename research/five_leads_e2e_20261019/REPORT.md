@@ -5,8 +5,8 @@ This is a follow-up to the five leads in
 the operation that was actually run. The two genus-2 changes have full-cohort
 execution and replay. Mixed fibers have end-to-end pair-table, exhaustive
 summation-polynomial and native F4 DLP controls, but no external msolve
-comparison. Neither odd-kernel route has
-an end-to-end transfer DLP. All tested curves, points and scalars are public
+comparison. The cubic route has one complete mapped source-to-answer run;
+the genus-3 odd-kernel escape remains open. All tested curves, points and scalars are public
 synthetic or published fixtures.
 
 ## Cubic odd-torsion transfer
@@ -36,10 +36,8 @@ multiplication by the quartic in their nine-dimensional coordinate algebra
 has rank six, showing that precisely three geometric pairs lie on the
 quartic. A one-unit corruption of the first coefficient fails this check.
 The 101 source points and their coefficients are
-[retained](correctness/tian-cubic-map-gate-v1.jsonl). This validates the
-published divisor cut on these inputs. It does not form the Jacobian class,
-take its Frobenius trace, or establish a source image. It is therefore not
-a transfer DLP or a cost ratio.
+[retained](correctness/tian-cubic-map-gate-v2.jsonl). This validates the
+published divisor cut on these inputs. The trace and DLP checks are below.
 
 The [quartic checker](../../src/bin/tian_quartic_smoothness.rs) derives a unit
 gradient ideal in each affine chart for the copied published \(\mathbf F_{523}\)
@@ -74,12 +72,9 @@ multiplications, 20,468 squarings and 3,275,161 inversions. At the same
 representative price this is **51,979.77×** the mean optimized source-rho
 cost; the [native 12-price grid](results/tian-km-linear-dlp-price-grid.csv)
 spans **3,710.83–60,937.36×**. These are cold field-operation costs;
-native logical work is unpriced on both arms. This is a verified DLP on *published
-destination classes* for one unusually small scalar, not an executed
-source-to-Jacobian map or the proposed genus-3 index-calculus solver. No
-source point was mapped through the published quotient. The executable
-quotient, its actual kernel, and complete source-transfer cost remain
-[an open problem](../../problems/odd-isogeny-quartic-transfer-execution.md).
+native logical work is unpriced on both arms. This is a verified DLP on
+*published destination classes* for one unusually small scalar. The later
+mapped index-calculus run is the source-transfer comparison.
 
 The new native [line-sieve solver](native/tian_quartic_km.rs) executes an
 index-calculus DLP on the same *published destination classes*. It enumerates
@@ -105,10 +100,41 @@ prices it loses in every cell; the ratio spans **40.85–684.92×**.
 The scalar-field and curve-field M/S/I/addition vectors are in the
 [analysis](results/tian-quartic-line-sieve-summary.json). Allocation,
 comparisons and control flow are unpriced, so this is an operation-cost
-comparison, not a qualified wall-speed result. The published (S,T) are
-still direct inputs: the paper's source-to-Jacobian map and quotient
-construction are not executable here. This result does not give a complete
-source-transfer attack cost or a general-size asymptotic claim.
+comparison, not a qualified wall-speed result. This initial run received
+the published (S,T) directly, so its cost excludes source mapping.
+
+For the mapped run, the native evaluator converts each cubic divisor cut
+into nine base-field linear constraints for its Frobenius trace. A cubic
+with exact ninefold contact at the chosen point at infinity has the
+[verified residual divisor](correctness/tian-osculating9-gate-v1.json)
+given by \(x^3+337x^2+392x+60=0\) and
+\(y=188+405x+180x^2\). Adding that residual to the trace produces a
+degree-twelve divisor in the Jacobian model. The
+[class gate](correctness/tian-cubic-trace-map-gate-v1.json) checks that all
+100 successive source multiples map to the matching multiples of the
+published S, and that the published Q maps to T: **101/101** comparisons
+pass. The [P/Q class receipt](correctness/tian-cubic-trace-map-pq-v1.json)
+stores the actual mapped classes used by the solver. Q's published
+coordinates are the map input; 1987 is used only for the independent
+known-answer checks.
+
+The [mapped line-sieve run](correctness/tian-quartic-line-sieve-mapped-dlp-v1.json)
+consumes those computed classes, recovers **1987** from the line relations
+and descents, and verifies \(1987P=Q\) on the source as well as the
+destination relation. Its [cold 36-price analysis](results/tian-quartic-line-sieve-mapped-summary.json)
+charges the six rational-function evaluations and trace-constraint
+construction for P and Q, the trace classes and checks, the complete
+line-sieve solve, and final verification. At \(M+0.5S+10I+0.1A\), it costs
+**697,039,875.2** multiplication equivalents against **1,079,600.82** for
+mean source rho: a **645.65× loss**. It loses in all 36 cells, spanning
+**47.14–787.55×**. The [grid](results/tian-quartic-line-sieve-mapped-price-grid.csv)
+retains every price. The counted implementation also pays for the published
+S,T comparison as a map check. This establishes an end-to-end result for this single
+published fixture; an independent reconstruction of the quotient from the
+checked 3-kernel, exceptional-input handling and growing-size evidence
+remain [open](../../problems/odd-isogeny-quartic-transfer-execution.md).
+The [replay hashes](correctness/tian-cubic-mapped-pipeline-replay.sha256)
+bind byte-identical repeats of the formula, P/Q trace and mapped DLP stages.
 
 ## Genus-2 target-useful relations
 

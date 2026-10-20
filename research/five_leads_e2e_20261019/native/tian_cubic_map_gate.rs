@@ -2,6 +2,16 @@
 //! This is a support gate, not a source-to-Jacobian group-law certificate.
 use serde_json::{json, Value};
 use std::fs;
+use std::sync::atomic::{AtomicU64, Ordering};
+
+static BASE_M: AtomicU64 = AtomicU64::new(0);
+static BASE_ADD: AtomicU64 = AtomicU64::new(0);
+fn counts() -> [u64; 2] {
+    [
+        BASE_M.load(Ordering::Relaxed),
+        BASE_ADD.load(Ordering::Relaxed),
+    ]
+}
 
 const P: i64 = 523;
 const Q3: u64 = 523 * 523 * 523;
@@ -17,15 +27,19 @@ impl K {
         Self([m(x), 0, 0])
     }
     fn add(self, y: Self) -> Self {
+        BASE_ADD.fetch_add(3, Ordering::Relaxed);
         Self(std::array::from_fn(|i| m(self.0[i] + y.0[i])))
     }
     fn neg(self) -> Self {
+        BASE_ADD.fetch_add(3, Ordering::Relaxed);
         Self(self.0.map(|x| m(-x)))
     }
     fn sub(self, y: Self) -> Self {
         self.add(y.neg())
     }
     fn mul(self, y: Self) -> Self {
+        BASE_M.fetch_add(9, Ordering::Relaxed);
+        BASE_ADD.fetch_add(15, Ordering::Relaxed);
         let mut t = [0; 5];
         for i in 0..3 {
             for j in 0..3 {
@@ -171,7 +185,7 @@ fn powers_mod(relation: &[K; 3], max: usize) -> Vec<[K; 3]> {
 // Multiplication by the quartic in K[x,y]/(cubic_x,cubic_y).
 // Nullity 3 means the cubics cut exactly a degree-three divisor on C,
 // when both coordinate cubics are squarefree.
-fn quartic_rank(c: &[K; 6]) -> usize {
+fn quartic_matrix(c: &[K; 6]) -> [[K; 9]; 9] {
     let xp = powers_mod(&x_relation(c), 6);
     let yp = powers_mod(&y_relation(c), 6);
     const TERMS: [(usize, usize, i64); 15] = [
@@ -204,27 +218,75 @@ fn quartic_rank(c: &[K; 6]) -> usize {
             }
         }
     }
+    matrix
+}
+fn nullspace(mut rows: [[K; 9]; 9]) -> Vec<[K; 9]> {
     let mut rank = 0;
+    let mut pivots = Vec::new();
     for col in 0..9 {
-        let Some(pivot) = (rank..9).find(|&row| matrix[row][col] != K::ZERO) else {
+        let Some(pivot) = (rank..9).find(|&row| rows[row][col] != K::ZERO) else {
             continue;
         };
-        matrix.swap(rank, pivot);
-        let inverse = matrix[rank][col].inv();
+        rows.swap(rank, pivot);
+        let inverse = rows[rank][col].inv();
         for j in col..9 {
-            matrix[rank][j] = matrix[rank][j].mul(inverse);
+            rows[rank][j] = rows[rank][j].mul(inverse);
         }
-        for row in rank + 1..9 {
-            let factor = matrix[row][col];
+        for row in 0..9 {
+            if row == rank {
+                continue;
+            }
+            let factor = rows[row][col];
             if factor != K::ZERO {
                 for j in col..9 {
-                    matrix[row][j] = matrix[row][j].sub(factor.mul(matrix[rank][j]));
+                    rows[row][j] = rows[row][j].sub(factor.mul(rows[rank][j]));
                 }
             }
         }
+        pivots.push(col);
         rank += 1;
     }
-    rank
+    let mut basis = Vec::new();
+    for free in (0..9).filter(|c| !pivots.contains(c)) {
+        let mut v = [K::ZERO; 9];
+        v[free] = K::ONE;
+        for (row, &pivot) in pivots.iter().enumerate() {
+            v[pivot] = rows[row][free].neg();
+        }
+        basis.push(v);
+    }
+    basis
+}
+fn quartic_rank(c: &[K; 6]) -> usize {
+    9 - nullspace(quartic_matrix(c)).len()
+}
+fn trace_constraints(c: &[K; 6]) -> Vec<Vec<u64>> {
+    let matrix = quartic_matrix(c);
+    let transposed = std::array::from_fn(|i| std::array::from_fn(|j| matrix[j][i]));
+    let left = nullspace(transposed);
+    assert_eq!(left.len(), 3);
+    let xp = powers_mod(&x_relation(c), 9);
+    let yp = powers_mod(&y_relation(c), 9);
+    let mut rows = vec![vec![0u64; 34]; 9];
+    let mut col = 0;
+    for ix in 0..=3 {
+        for iy in 0..=9 - ix {
+            for (j, functional) in left.iter().enumerate() {
+                let mut value = K::ZERO;
+                for x in 0..3 {
+                    for y in 0..3 {
+                        value = value.add(functional[3 * x + y].mul(xp[ix][x]).mul(yp[iy][y]));
+                    }
+                }
+                for k in 0..3 {
+                    rows[3 * j + k][col] = value.0[k] as u64;
+                }
+            }
+            col += 1;
+        }
+    }
+    assert_eq!(col, 34);
+    rows
 }
 fn main() {
     let fixture: Value = serde_json::from_str(
@@ -246,12 +308,26 @@ fn main() {
     assert!(on_curve(base) && on_curve(published_q));
     assert_eq!(times(base, 1987), published_q);
     assert_eq!(times(base, 143_069_629), Point::O);
+    let before_pq = counts();
+    let p_coefficients = map_coefficients(&fixture, base).unwrap();
+    let q_coefficients = map_coefficients(&fixture, published_q).unwrap();
+    let p_constraints = trace_constraints(&p_coefficients);
+    let q_constraints = trace_constraints(&q_coefficients);
+    assert_eq!(p_constraints.len(), 9);
+    assert_eq!(q_constraints.len(), 9);
+    let after_pq = counts();
+    let pq_cost = json!({"base_multiplications":after_pq[0]-before_pq[0],
+        "base_additions":after_pq[1]-before_pq[1],"base_inversions":0});
     let mut corrupted = map_coefficients(&fixture, base).unwrap();
     corrupted[0] = corrupted[0].add(K::ONE);
     let corrupted_rank = quartic_rank(&corrupted);
     assert_ne!(corrupted_rank, 6, "corrupted map passed support check");
     for scalar in (1..=100).chain(std::iter::once(1987)) {
-        let point = times(base, scalar);
+        let point = if scalar == 1987 {
+            published_q
+        } else {
+            times(base, scalar)
+        };
         let coefficients = map_coefficients(&fixture, point);
         let (rank, denominator_nonzero, separable) = if let Some(c) = &coefficients {
             let separable = cubic_discriminant(&x_relation(c)) != K::ZERO
@@ -269,12 +345,14 @@ fn main() {
         println!(
             "{}",
             json!({
-                "schema":"tian-cubic-map-gate/v1", "scalar_check_only":scalar,
+                "schema":"tian-cubic-map-gate/v2", "scalar_check_only":scalar,
                 "source_point":[point.x.0,point.y.0],"source_verified":point==times(base,scalar),
                 "denominator_nonzero":denominator_nonzero,"quartic_multiplication_rank":rank,
                 "coordinate_cubics_separable":separable,
                 "corrupted_p_rank_control":corrupted_rank,
                 "map_coefficients":coefficients.map(|a|a.map(|x|x.0)),
+            "trace_divisor_constraints":coefficients.as_ref().map(trace_constraints),
+            "mapped_pq_stage_cost":pq_cost,
                 "jacobian_class_constructed":false,"source_transfer_dlp_executed":false
             })
         );

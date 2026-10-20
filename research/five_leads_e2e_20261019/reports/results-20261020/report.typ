@@ -24,14 +24,16 @@ The native F4 solver additionally returned exact rational root sets on 2,290 non
 
 #figure(image("mixed-fiber-f4-lower-bound.svg", width: 76%), caption: [F4-backed DLP lower bounds from counted row-reduction field multiplications; 180 targets per arm.])
 
-== Cubic transfer and odd-kernel escape: unresolved attacks
+== Cubic transfer and genus-3 odd-kernel escape
 
-For Tian's published F523 cubic fixture, the 3-kernel and smooth quartic were checked. Native quartic Jacobian arithmetic verifies T=1987S and rS=0 from published classes; five optimized cubic-field source-rho seeds recover the source scalar. One quartic doubling costs 14.043× mean source rho in this implementation. A bounded linear search received the published S,T without their scalar, recovered 1987 and source-verified it; its cold cost is 51979.77× mean rho. A genuine line-sieve index calculus on those published classes also recovered 1987, verified both rational-divisor relations in the Jacobian, and source-verified the answer. At M+0.5S+10I+0.1A it costs 561.59× mean source rho and loses in all 36 price cells. The source-to-Jacobian map was not executed. The 20 Smith-negative genus-3 holdouts were materialized, but odd kernels and end-to-end attacks on them remain untested.
+For Tian's published F523 cubic fixture, the 3-kernel and smooth quartic were checked. The six published map functions were evaluated on 100 successive source multiples and Q; all 101 Frobenius-traced divisor classes match the expected Jacobian multiples. The line sieve recovered 1987 from the mapped P and Q classes and checked the answer on source and destination. Its complete cold cost, including formula evaluation and trace construction, is *645.65×* mean source rho at M+0.5S+10I+0.1A; all 36 price cells lose, spanning 47.14–787.55×. The published-class-only line sieve costs 561.59×. The 20 Smith-negative genus-3 holdouts were materialized, but odd kernels and end-to-end attacks on them remain untested. An independent quotient-from-kernel proof for the cubic fixture remains open.
 
 #figure(image("tian-arithmetic-gate.svg", width: 76%), caption: [Arithmetic diagnostic only; one quartic doubling and a known-scalar multiplication divided by the mean of five complete source-rho solves.])
 
 #figure(image("tian-linear-dlp.svg", width: 76%), caption: [Cold cost of one verified DLP on published destination classes; no source-to-Jacobian map or index calculus was run.])
 
 #figure(image("tian-line-sieve.svg", width: 76%), caption: [Cold cost of published-class line-sieve index calculus, including all relation and descent attempts. Source map absent; operation pricing includes modular additions.])
+
+#figure(image("tian-mapped-line-sieve.svg", width: 76%), caption: [Mapped source-to-answer line-sieve DLP against five optimized source-rho seeds. The published-class-only control omits source mapping.])
 
 *Evidence:* `REPORT.md`, `results/`, `correctness/`, `sessions_projective_chart_v2.tar.zst`, and the seven linked `reports/run-*` PDFs. Negative outcomes and unexecuted routes remain explicit in the report. Literature: #link("https://arxiv.org/html/2012.07173")[Tian's cubic transfer] and #link("https://arxiv.org/html/2007.03172")[Tian's genus-3 odd-isogeny construction].
