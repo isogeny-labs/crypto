@@ -31,6 +31,9 @@ struct Row {
     rho_verified: bool,
     ic_validation: f64,
     rho_validation: f64,
+    /// Summed over runs: rho's fixed precomputation, and the IC oracle.
+    rho_precompute: f64,
+    ic_oracle: f64,
     in_situ: Option<f64>,
 }
 
@@ -42,11 +45,17 @@ fn num(v: &Value) -> f64 {
     }
 }
 
-fn validation_total(arm: &Value) -> f64 {
-    arm["validation_subset_summed_over_runs"]
-        .as_object()
-        .map(|phases| phases.values().map(|ph| num(&ph["bitops"])).sum())
+/// One phase's bitop/v1 total summed over runs; the maps carry a `total`
+/// entry of their own, which is the sum of the others.
+fn phase(arm: &Value, map: &str, name: &str) -> f64 {
+    arm[map]
+        .get(name)
+        .map(|ph| num(&ph["bitops"]))
         .unwrap_or(0.0)
+}
+
+fn validation_total(arm: &Value) -> f64 {
+    phase(arm, "validation_subset_summed_over_runs", "total")
 }
 
 fn read_row(v: &Value) -> Row {
@@ -68,6 +77,8 @@ fn read_row(v: &Value) -> Row {
         rho_verified: v["rho"]["verified"].as_bool().unwrap_or(false),
         ic_validation: validation_total(&v["ic"]),
         rho_validation: validation_total(&v["rho"]),
+        rho_precompute: phase(&v["rho"], "phases_summed_over_runs", "precompute"),
+        ic_oracle: phase(&v["ic"], "phases_summed_over_runs", "oracle"),
         in_situ: v["in_situ_reference"].get("s_ic_over_s_rho").map(num),
     }
 }
@@ -124,8 +135,8 @@ fn main() {
     rows.sort_by_key(|r| (r.genus, r.p));
     let mut rng = StdRng::seed_from_u64(SEED);
 
-    println!("| g | p | N | log2 N | IC runs | rho runs | IC/rho bitop/v1 [95%] | excl. validation | in-situ (full-width rho) | verified |");
-    println!("|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|");
+    println!("| g | p | N | log2 N | IC runs | rho runs | IC/rho bitop/v1 [95%] | excl. validation | post hoc: no rho precompute | post hoc: IC oracle ×2 | in-situ (full-width rho) | verified |");
+    println!("|--:|--:|--:|--:|--:|--:|:--|--:|--:|--:|--:|:--|");
     let mut row_json = Vec::new();
     for r in &rows {
         let ratio = mean(&r.ic) / mean(&r.rho);
@@ -136,9 +147,16 @@ fn main() {
         let excl = (r.ic.iter().sum::<f64>() - r.ic_validation)
             / (r.rho.iter().sum::<f64>() - r.rho_validation)
             * (r.rho.len() as f64 / r.ic.len() as f64);
+        // Sensitivities added after the data (labelled so in the report): rho
+        // without its fixed precomputation, and the IC oracle charged twice,
+        // the coverage diagnostic's oracle gap.
+        let (ni, nr) = (r.ic.len() as f64, r.rho.len() as f64);
+        let rho_walk_only = (r.rho.iter().sum::<f64>() - r.rho_precompute) / nr;
+        let no_rho_precompute = mean(&r.ic) / rho_walk_only;
+        let oracle_doubled = (r.ic.iter().sum::<f64>() + r.ic_oracle) / ni / mean(&r.rho);
         let ok = r.ic_verified && r.rho_verified;
         println!(
-            "| {} | {} | {} | {:.2} | {} | {} | {:.4} [{:.4}, {:.4}] | {:.4} | {} | {} |",
+            "| {} | {} | {} | {:.2} | {} | {} | {:.4} [{:.4}, {:.4}] | {:.4} | {:.4} | {:.4} | {} | {} |",
             r.genus,
             r.p,
             r.n,
@@ -149,6 +167,8 @@ fn main() {
             ci[0],
             ci[1],
             excl,
+            no_rho_precompute,
+            oracle_doubled,
             r.in_situ
                 .map(|x| format!("{x:.4}"))
                 .unwrap_or_else(|| "—".into()),
@@ -160,6 +180,9 @@ fn main() {
             "ic_bitops_mean": mean(&r.ic), "rho_bitops_mean": mean(&r.rho),
             "ic_over_rho": ratio, "ic_over_rho_ci95": ci,
             "ic_over_rho_excluding_validation": excl,
+            "post_hoc_ic_over_rho_without_rho_precompute": no_rho_precompute,
+            "post_hoc_ic_over_rho_oracle_doubled": oracle_doubled,
+            "rho_precompute_share": r.rho_precompute / r.rho.iter().sum::<f64>(),
             "in_situ_s_ic_over_s_rho": r.in_situ,
             "verified": ok,
         }));
