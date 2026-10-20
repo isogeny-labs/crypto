@@ -70,7 +70,7 @@ fn main() {
     assert!((2..32).contains(&dp_bits));
     assert!(batch_width > 0 && batch_width <= walkers as usize);
     assert!(checkin_every > 0 && checkin_every <= walkers);
-    assert!(mode == "batch" || batch_width == 1);
+    assert!(\n        (mode == "serial" && batch_width == 1) || (mode == "batch" && batch_width > 1),\n        "serial mode requires width 1 and batch mode requires width > 1"\n    );
 
     let curve = CurveParams::secp256k1();
     let q_hex = required(fixture, "q_hex");
