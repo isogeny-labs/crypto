@@ -104,8 +104,9 @@ archive SHA-256, provider snapshot and termination receipt. Independently
 replay every base, relation and scalar and recompute the selector from the
 archived bytes before promoting a result.
 
-The conditional Pod implementation is `runpod_runner.py` and
-`launch_on_pod.sh`. The controller must run `check_trigger.py` against the
+The conditional Pod implementation is `allocate_runpod.py`,
+`runpod_runner.py`, and `launch_on_pod.sh`. The controller runs
+`check_trigger.py` against the
 locally replayed aggregate and archive immediately before allocation and
 again immediately before dispatch. Its `n83.online-tiebreak-runpod-snapshot/v1`
 records the provider's single Pod, UTC creation and stop times, price,
@@ -122,6 +123,11 @@ The budget verifier charges at least the frozen $3.57 earlier upper bound plus
 that Pod's full allocation-to-snapshot interval at $0.19/hour, then the new
 Pod's entire created-to-stop reservation. This deliberately overcharges any
 idle gap after the preceding Pod terminated.
+The allocator takes the key through a hidden terminal prompt and keeps it
+out of files, shell arguments, Pod inputs and result archives. It requires
+the watchdog's prior termination receipt, queries the provider for the
+absence of that Pod, reserves the worst-case new charge before creating a
+Pod, and stops any allocation returned outside the frozen envelope.
 
 After `DONE`, transfer `results/` and `raw_results.tar.gz`, verify the
 Pod-side SHA-256, stop and terminate the Pod, and retain the provider charge

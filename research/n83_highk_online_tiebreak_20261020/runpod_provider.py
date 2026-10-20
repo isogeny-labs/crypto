@@ -2,6 +2,7 @@
 """Verify the tie-break allocation against its sealed provider snapshot."""
 
 import argparse
+import hashlib
 import json
 from datetime import datetime
 from decimal import Decimal
@@ -23,17 +24,33 @@ def timestamp(value):
     return result
 
 
+def controller_digest():
+    path = Path(__file__).with_name("allocate_runpod.py")
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def verify(snapshot_path, results, head_sha):
     snapshot = json.loads(snapshot_path.read_text())
     trigger_path = results / "trigger.json"
     allocation_path = results / "runpod_allocation.json"
     trigger = runpod_runner.run.validate_trigger(trigger_path)
     allocation = runpod_runner.read_allocation(allocation_path, trigger_path)
+    termination_path = snapshot_path.parent / "prior_distribution_termination.json"
+    prior_pods_path = snapshot_path.parent / "prior_pods.json"
+    termination = json.loads(termination_path.read_text())
+    prior_pods = json.loads(prior_pods_path.read_text())
     if (snapshot.get("schema") != "n83.online-tiebreak-runpod-snapshot/v1" or
             snapshot.get("source_head_sha") != head_sha or
+            snapshot.get("controller_sha256") != controller_digest() or
             snapshot.get("prior_distribution_pod_id") !=
             PRIOR_DISTRIBUTION_POD_ID or
             snapshot.get("prior_distribution_status") != "TERMINATED" or
+            termination.get("pod_present") is not False or
+            snapshot.get("prior_termination_sha256") != prior.digest(termination_path) or
+            snapshot.get("prior_pods_sha256") != prior.digest(prior_pods_path) or
+            any(pod.get("id") == PRIOR_DISTRIBUTION_POD_ID or
+                pod.get("name") == "n83-online-tiebreak-20261020"
+                for pod in prior_pods.get("pods", [])) or
             snapshot.get("trigger_receipt_sha256") != prior.digest(trigger_path) or
             snapshot.get("trigger_aggregate_sha256") !=
             trigger["trigger_aggregate_sha256"] or
@@ -54,6 +71,9 @@ def verify(snapshot_path, results, head_sha):
     campaign_cap = Decimal(str(snapshot["approved_combined_cap_usd"]))
     recorded = timestamp(snapshot["recorded_utc"])
     distribution_started = timestamp(PRIOR_DISTRIBUTION_CREATED_UTC)
+    if not (distribution_started <= timestamp(termination["recorded_utc"]) <=
+            timestamp(prior_pods["recorded_utc"]) <= recorded):
+        raise ValueError("prior Pod termination chronology differs")
     distribution_upper = (PRIOR_DISTRIBUTION_RATE_USD_PER_HOUR *
                           Decimal(str((recorded - distribution_started).total_seconds())) /
                           Decimal(3600))
