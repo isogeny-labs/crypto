@@ -12,8 +12,8 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph
 def main():
     root = Path(__file__).resolve().parent
     styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle("ReviewBody", fontName="Helvetica", fontSize=10,
-                              leading=14, spaceAfter=9, alignment=TA_LEFT))
+    styles.add(ParagraphStyle("ReviewBody", fontName="Helvetica", fontSize=9.5,
+                              leading=12.5, spaceAfter=8, alignment=TA_LEFT))
     story = []
     for block in (root / "README.md").read_text().split("\n\n"):
         block = block.strip()

@@ -18,7 +18,7 @@ The protocol deviations record host reboots, killed attempts and runs restarted 
 
 ## Validation and publication
 
-The corrected library passed 4,405 release tests with 118 ignored; the log contains the new collision/counting tests. The standalone rho module passed 4 tests, the analyzer passed 7, and the touched jv_cover example compiled and ran its empty test suite. Original native-summary replay had zero structural differences. The current leaderboard consumes the qualified summary and displays the withheld status, while the original PDF, plots and tables remain an immutable historical record. The original prose and layout scripts are copied here before the current entrypoints are qualified. A future prospective protocol and complete accounting would be needed to establish a comparative result.
+After integrating main `8448be6708e9a473b2f03007f594d6de82c7e92c` and preserving the later author correction, the corrected library passed 4,420 release tests with 118 ignored; the log contains the new collision/counting tests. The standalone rho module passed 4 tests, the analyzer passed 7, and the touched jv_cover example compiled and ran its empty test suite. Original native-summary replay had zero structural differences. The current leaderboard consumes the qualified summary and displays the withheld status, while the original PDF, plots and tables remain an immutable historical record. The original prose and layout scripts are copied here before the current entrypoints are qualified. A future prospective protocol and complete accounting would be needed to establish a comparative result.
 
 ## Later author correction
 
