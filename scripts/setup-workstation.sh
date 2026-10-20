@@ -414,8 +414,14 @@ b64url() { openssl base64 -A | tr '+/' '-_' | tr -d '='; }
 
 mint() {
   if [ -n "${GH_APP_ID:-}" ] && [ -n "${GH_APP_INSTALLATION_ID:-}" ]; then
-    mkdir -p "$cache"
-    local tok="$cache/token" exp="$cache/expires" now
+    # One cache per identity: a token minted for one API host, App or
+    # installation must never be handed out for another.
+    local id dir_id
+    id=$(printf '%s\n%s\n%s' "$api" "$GH_APP_ID" "$GH_APP_INSTALLATION_ID" \
+      | { sha256sum 2>/dev/null || shasum -a 256; } | cut -c1-32)
+    dir_id="$cache/$id"
+    mkdir -p "$dir_id"
+    local tok="$dir_id/token" exp="$dir_id/expires" now
     now=$(date +%s)
     if [ -s "$tok" ] && [ -s "$exp" ] && [ "$(cat "$exp")" -gt $((now + 300)) ]; then
       cat "$tok"; return
