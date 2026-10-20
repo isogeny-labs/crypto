@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Install frozen dependency lock
-        run: cp research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock Cargo.lock
+        run: cp research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock Cargo.lock && bash .github/scripts/frozen-lock-source.sh
       - name: Test Stage-25 control plane
         run: |
           python3 scripts/test_koblitz_stage25_single_core.py -v
