@@ -433,13 +433,6 @@ in aburan28/crypto-autoresearcher.
   The director's assessment says only whether the run executed as specified
   and the relay was verbatim. What the numbers mean is decided by the
   frontier or core tier under the measurement rules below.
-- **Measure what the relay costs.** After a relay, the main session runs
-  `python3 tools/token_usage.py session --units <cards> --unit-name card`:
-  tokens and list-price cost per agent and tier, cache hit ratio, the share
-  of output produced below the reasoning tiers, and cost per card.
-  `autofix-queue.yml` records each attempt the same way. Metrics and the
-  transcript accounting traps are in
-  [`docs/token-efficiency.md`](docs/token-efficiency.md).
 
 ## Default workflow: open the PR, check in, and land it
 
