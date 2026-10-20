@@ -20,6 +20,7 @@ if str(ROOT) not in sys.path:
 
 from research.n83_highk_online_distribution_20261020 import run as runner
 from research.n83_highk_online_distribution_20261020 import check_dispatch
+from research.n83_highk_online_distribution_20261020 import runpod_provider
 
 
 CPU_V1 = Path('/sys/fs/cgroup/cpu')
@@ -91,9 +92,7 @@ def read_provider(path, expected_stratum):
             not 0 < receipt['cost_per_hr'] <= 0.20 or
             receipt.get('cloud_type') != 'COMMUNITY' or
             receipt.get('compute_type') != 'GPU' or
-            receipt.get('gpu_type_id') not in
-            ('NVIDIA RTX A2000', 'Tesla V100-PCIE-16GB',
-             'Tesla V100-SXM2-16GB') or
+            receipt.get('gpu_type_id') not in runpod_provider.GPU_TYPES or
             receipt.get('gpu_count') != 1 or
             not isinstance(receipt.get('cpu_affinity_ids'), list) or
             len(receipt['cpu_affinity_ids']) != 4 or

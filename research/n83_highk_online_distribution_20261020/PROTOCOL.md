@@ -106,8 +106,14 @@ sample mean minus `2.3646242510103 * sample_sd / sqrt(8)` as that lower bound.
 The new Community Pod must expose at least four CPUs with four CPUs of quota,
 at least 24 GiB plus 256 MiB of cgroup memory, and enough disk for all raw
 receipts. Pin the lowest four exposed logical CPUs, cap each IC child at
-24 GiB RSS, and record the exact GPU/CPU class and topology. Accept a V100
-PCIe/SXM2 or RTX A2000 class at no more than `$0.20/hour`. Cap the provider
+24 GiB RSS, and record the exact GPU/CPU class and topology. Accept the
+eleven GPU type IDs in `runpod_provider.GPU_TYPES`: RTX A2000, V100 PCIe,
+RTX 3070/3080/3080 Ti/4070 Ti, RTX 4000 Ada/4000 SFF Ada, and RTX
+A4000/A4500/A5000. All arithmetic is on the four frozen CPUs; the GPU is
+an allocation class. The selected Pod must cost no more than `$0.20/hour`.
+The first three class requests returned no eligible Pod on 2026-10-20; this
+pre-dispatch amendment broadens capacity without changing the source,
+targets, CPU/memory envelope, or statistical gate. Cap the provider
 allocation at seven hours and the producer at six hours 40 minutes. Reserve
 at most `$1.40` for this allocation, `$2.07` for the completed high-K Pod,
 and `$1.50` for earlier attempts; their conservative combined upper bound is
