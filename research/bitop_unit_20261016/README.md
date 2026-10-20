@@ -18,8 +18,10 @@ What the study measured:
   - MITM with a 32-point base: 0.766 [0.600, 0.909].
   - Root-finding with m = 3: 0.925 [0.873, 0.973].
 
-  At 26 bits they cost 30× and 112× the generic floor; rho with negation
-  costs 1.42×.
+  At 26 bits they cost 93× and 383× the generic floor, mean of the eight
+  runs (`ecbench work`); rho with negation costs 1.3×. (Correction,
+  2026-10-20: this line first gave 30×, 112× and 1.42×, which are the
+  bounds' fitted constants over all eleven sizes, not the 26-bit cost.)
 - **The old unit understated algebraic index calculus by up to three orders
   of magnitude.** Each pair is the same execution's committed ratio to the
   floor, then its bit-op ratio:
