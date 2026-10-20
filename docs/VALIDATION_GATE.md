@@ -15,6 +15,16 @@ the IC leaderboard (`docs/ic/LEADERBOARD.md`, `docs/ic/leaderboard.json`,
 The gate decides what may be *shown* as a result. It does not forbid recording a
 null or negative result in a research directory.
 
+An unvalidated benchmark row may be removed from the admitted `benchmarks/README.md`
+table only with an archival disposition in `benchmarks/ARCHIVE.json`. The archive
+preserves the exact former row text and digest, a reason (`incomplete`, `censored`,
+`documentary`, or `superseded`), and repository paths to supporting provenance.
+The CI check requires each row removed from the base table to have that exact
+disposition, rejects archive additions that do not match a base row, and prevents
+existing archive entries from being changed or dropped.
+An archive record never validates a row: if the row remains in the admitted table,
+the ordinary validation gate applies. See [`benchmarks/ARCHIVE.md`](../benchmarks/ARCHIVE.md).
+
 ## `VALIDATION.json`
 
 Lives in the row's evidence directory: for a leaderboard row, the directory of its

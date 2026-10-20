@@ -13,12 +13,14 @@ carries a `VALIDATION.json` that points to three artifacts:
    fold), priced in the same unit and the same binary or process, with the
    AGENTS.md section 5a band at 0, 0.1 and 1 GAE.
 
-Existing rows are never deleted.  Rows frozen in `docs/ic/validation/PRE_GATE.json`
-and `benchmarks/PRE_GATE.json` (a digest per row) render as "unvalidated
-(pre-gate)" until a validation sweep verdict or a VALIDATION.json validates them.
-A row that is not frozen, or whose digest no longer matches the frozen one (it was
-added or changed after the gate), must be validated or the builder refuses it and
-the CI check fails.
+Leaderboard rows are never deleted. Benchmark rows removed from the admitted
+table require an exact, provenance-bearing archival disposition in
+`benchmarks/ARCHIVE.json`; the archive never grants validation. Rows frozen in
+`docs/ic/validation/PRE_GATE.json` and `benchmarks/PRE_GATE.json` (a digest per
+row) render as "unvalidated (pre-gate)" until a validation sweep verdict or a
+VALIDATION.json validates them. A row that is not frozen, or whose digest no
+longer matches the frozen one (it was added or changed after the gate), must be
+validated or the builder refuses it and the CI check fails.
 
     python3 scripts/validation_gate.py check [--base REF]    # the CI check
     python3 scripts/validation_gate.py freeze                # (re)write the pre-gate files
@@ -45,6 +47,7 @@ PRE_GATE_LEADERBOARD = "docs/ic/validation/PRE_GATE.json"
 PRE_GATE_BENCHMARKS = "benchmarks/PRE_GATE.json"
 LEADERBOARD_JSON = "docs/ic/leaderboard.json"
 BENCHMARKS_README = "benchmarks/README.md"
+BENCHMARKS_ARCHIVE = "benchmarks/ARCHIVE.json"
 SWEEP_DIR = "research/validation_sweep_20261019"
 SWEEPS = {"leaderboard": f"{SWEEP_DIR}/A-leaderboard/verdicts.jsonl",
           "benchmarks": f"{SWEEP_DIR}/B-benchmarks/verdicts.jsonl"}
@@ -377,6 +380,86 @@ def judge_benchmark_row(directory: str, line: str, verdicts: dict, pre_gate: dic
     return {"status": st, "evidence_dir": f"benchmarks/{directory}", "reasons": why}
 
 
+ARCHIVE_SCHEMA = "validation-gate-archive/v1"
+ARCHIVE_DISPOSITIONS = {"censored", "documentary", "incomplete", "superseded"}
+
+
+def benchmark_archive_errors(repo: Path, admitted: dict[str, str], base: str | None = None) -> list[str]:
+    """Check archival records. Archived rows remain historical; they never validate admission."""
+    path = repo / BENCHMARKS_ARCHIVE
+    if not path.is_file():
+        archive = {"schema": ARCHIVE_SCHEMA, "rows": []}
+    else:
+        try:
+            archive = json.loads(path.read_text())
+        except ValueError as exc:
+            return [f"{BENCHMARKS_ARCHIVE} is not JSON ({exc})"]
+    errors: list[str] = []
+    if not isinstance(archive, dict) or archive.get("schema") != ARCHIVE_SCHEMA:
+        return [f"{BENCHMARKS_ARCHIVE} schema is not {ARCHIVE_SCHEMA}"]
+    records = archive.get("rows")
+    if not isinstance(records, list):
+        return [f"{BENCHMARKS_ARCHIVE} rows must be a list"]
+    seen: set[str] = set()
+    known: dict[str, str] = {}
+    for i, record in enumerate(records):
+        label = f"{BENCHMARKS_ARCHIVE} rows[{i}]"
+        if not isinstance(record, dict):
+            errors.append(f"{label} must be an object")
+            continue
+        directory, line = record.get("directory"), record.get("row")
+        if not isinstance(directory, str) or not directory or not isinstance(line, str):
+            errors.append(f"{label} needs directory and exact row text")
+            continue
+        if directory in seen:
+            errors.append(f"{label} duplicates directory {directory}")
+        seen.add(directory)
+        parsed = benchmark_rows(line)
+        if len(parsed) != 1 or parsed[0] != (directory, line):
+            errors.append(f"{label} row does not parse to directory {directory}")
+        digest = hashlib.sha256(line.strip().encode()).hexdigest()
+        if record.get("sha256") != digest:
+            errors.append(f"{label} sha256 does not match exact row text")
+        if record.get("disposition") not in ARCHIVE_DISPOSITIONS:
+            errors.append(f"{label} disposition is not one of {sorted(ARCHIVE_DISPOSITIONS)}")
+        if not isinstance(record.get("reason"), str) or not record["reason"].strip():
+            errors.append(f"{label} needs a non-empty reason")
+        provenance = record.get("provenance")
+        if not isinstance(provenance, list) or not provenance or any(
+                not isinstance(p, str) or not p.strip() for p in provenance):
+            errors.append(f"{label} needs non-empty provenance paths")
+        else:
+            for source in provenance:
+                p = (repo / source).resolve()
+                if not p.is_relative_to(repo.resolve()) or not p.is_file():
+                    errors.append(f"{label} provenance {source!r} is not a repository file")
+        if directory in admitted:
+            errors.append(f"{label} is still admitted in {BENCHMARKS_README}")
+        known[directory] = line
+
+    if base:
+        old_readme = git_show(base, BENCHMARKS_README)
+        if old_readme is not None:
+            old_rows = benchmark_groups(old_readme)
+            for directory, old_line in old_rows.items():
+                if directory not in admitted and known.get(directory) != old_line:
+                    errors.append(f"removed benchmark {directory} lacks an exact archival disposition")
+            for directory, line in known.items():
+                if directory not in old_rows:
+                    errors.append(f"archival record for {directory} does not match a row from the base table")
+        old_archive = git_show(base, BENCHMARKS_ARCHIVE)
+        if old_archive:
+            try:
+                old_records = json.loads(old_archive).get("rows", [])
+                old_by_dir = {r.get("directory"): r.get("row") for r in old_records if isinstance(r, dict)}
+                for directory, line in old_by_dir.items():
+                    if known.get(directory) != line:
+                        errors.append(f"archival history for {directory} was removed or changed")
+            except (ValueError, AttributeError, TypeError):
+                errors.append(f"{BENCHMARKS_ARCHIVE} on base is malformed")
+    return errors
+
+
 # ---------------------------------------------------------------------------
 # The CI check.
 # ---------------------------------------------------------------------------
@@ -406,10 +489,12 @@ def check(repo: Path = REPO, base: str | None = None, digest_of=None) -> list[st
                             f"{r.get('validation', {}).get('status')!r} is not {res['status']!r}; "
                             "run scripts/build_ic_leaderboard.py")
     bv, bg = load_verdicts("benchmarks", repo), load_pre_gate(PRE_GATE_BENCHMARKS, repo)
-    for d, line in benchmark_groups((repo / BENCHMARKS_README).read_text()).items():
+    admitted = benchmark_groups((repo / BENCHMARKS_README).read_text())
+    for d, line in admitted.items():
         res = judge_benchmark_row(d, line, bv, bg, repo)
         if res["status"] in (UNVALIDATED, FAILED):
             problems.append(f"benchmarks {d}: {res['status']}: " + "; ".join(res["reasons"]))
+    problems.extend(benchmark_archive_errors(repo, admitted, base))
     if base:
         # The freeze can only shrink: a PR may not launder a new or changed row into it.
         for rel in (PRE_GATE_LEADERBOARD, PRE_GATE_BENCHMARKS):

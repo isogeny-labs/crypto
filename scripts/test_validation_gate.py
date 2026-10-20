@@ -17,6 +17,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import unittest.mock
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -281,6 +282,72 @@ class CiCheck(Scratch):
         groups = g.benchmark_groups("\n" + two + "\n")
         self.assertEqual(list(groups), ["20261019-toy"])
         self.assertEqual(groups["20261019-toy"].count("\n"), 1)
+
+    def archive(self, row_text=None, directory="20261019-toy", disposition="incomplete"):
+        row_text = row_text or self.LINE
+        provenance = self.repo / "research/example/README.md"
+        provenance.parent.mkdir(parents=True, exist_ok=True)
+        provenance.write_text("Source evidence index.\n")
+        obj = {"directory": directory, "row": row_text,
+               "sha256": g.hashlib.sha256(row_text.strip().encode()).hexdigest(),
+               "disposition": disposition, "reason": "Evidence is incomplete; claims remain unvalidated.",
+               "provenance": ["research/example/README.md"]}
+        dump(self.repo / g.BENCHMARKS_ARCHIVE,
+             {"schema": g.ARCHIVE_SCHEMA, "rows": [obj]})
+        return obj
+
+    def test_archived_row_is_not_admitted_and_preserves_exact_row(self):
+        self.tree([], [])
+        row = self.archive()
+        self.assertEqual(g.benchmark_archive_errors(self.repo, {}), [])
+        self.assertEqual(row["row"], self.LINE)
+
+    def test_archive_cannot_bypass_admission_for_active_row(self):
+        self.tree([], [self.LINE])
+        self.archive()
+        problems = g.check(self.repo)
+        self.assertTrue(any("still admitted" in p for p in problems))
+        self.assertTrue(any("unvalidated" in p for p in problems))
+
+    def test_removed_row_requires_exact_archival_disposition(self):
+        self.tree([], [])
+        old_readme = "# Benchmarks\n" + self.LINE + "\n"
+        with unittest.mock.patch.object(g, "git_show", return_value=old_readme):
+            # The base readme is the old dated row; absence from the admitted table
+            # is permitted only when that exact line is carried in the archive.
+            errors = g.benchmark_archive_errors(self.repo, {}, base="base")
+        self.assertTrue(any("lacks an exact archival disposition" in e for e in errors))
+        self.archive()
+        with unittest.mock.patch.object(g, "git_show", side_effect=lambda ref, path:
+                                        old_readme if path == g.BENCHMARKS_README else None):
+            self.assertEqual(g.benchmark_archive_errors(self.repo, {}, base="base"), [])
+
+    def test_archive_row_hash_and_provenance_are_required(self):
+        self.tree([], [])
+        row = self.archive()
+        row["sha256"] = "0" * 64
+        row["provenance"] = []
+        dump(self.repo / g.BENCHMARKS_ARCHIVE, {"schema": g.ARCHIVE_SCHEMA, "rows": [row]})
+        errors = g.benchmark_archive_errors(self.repo, {})
+        self.assertTrue(any("sha256" in e for e in errors))
+        self.assertTrue(any("provenance" in e for e in errors))
+
+    def test_archive_history_cannot_be_silently_removed(self):
+        self.tree([], [])
+        old = {"schema": g.ARCHIVE_SCHEMA, "rows": [{"directory": "20261019-toy", "row": self.LINE}]}
+        with unittest.mock.patch.object(g, "git_show", side_effect=lambda ref, path:
+                                        json.dumps(old) if path == g.BENCHMARKS_ARCHIVE else None):
+            errors = g.benchmark_archive_errors(self.repo, {}, base="base")
+        self.assertTrue(any("archival history" in e for e in errors))
+
+    def test_new_archive_entry_must_match_a_base_row(self):
+        self.tree([], [])
+        self.archive()
+        old_readme = "# Benchmarks\n"
+        with unittest.mock.patch.object(g, "git_show", side_effect=lambda ref, path:
+                                        old_readme if path == g.BENCHMARKS_README else None):
+            errors = g.benchmark_archive_errors(self.repo, {}, base="base")
+        self.assertTrue(any("does not match a row from the base table" in e for e in errors))
 
     def test_freeze_may_only_shrink(self):
         self.assertEqual(g.grown({"a": "1", "b": "2"}, {"a": "1", "b": "2"}), [])
