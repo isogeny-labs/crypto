@@ -179,4 +179,4 @@ them.
 
 ## Deviations
 
-(none yet)
+None. The sessions, the f4cost runs and the aggregation followed the text above.

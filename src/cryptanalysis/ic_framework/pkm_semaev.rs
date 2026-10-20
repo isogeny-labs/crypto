@@ -94,7 +94,7 @@ impl Pol {
     }
     fn constant(n: usize, c: u64, p: u64) -> Self {
         let mut f = Pol::zero(n);
-        if c % p != 0 {
+        if !c.is_multiple_of(p) {
             f.terms.insert(vec![0; n], c % p);
         }
         f
