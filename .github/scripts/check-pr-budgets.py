@@ -55,6 +55,13 @@ NAMED_BUDGET_EXCEPTIONS = {
         # were cancelled at the 25-minute cap on several PRs (2026-10-17).
         "reason": "CodeQL Rust queries over the whole repository",
     },
+    (".github/workflows/codeql.yml", "warm-rust-cache"): {
+        "timeout": 45,
+        # Type inference over the merged tree passed 25 minutes and was
+        # cancelled mid-evaluation (run 39226121956, 2026-10-19); an
+        # interrupted evaluation leaves no reusable cache.
+        "reason": "CodeQL Rust type-inference cache warming over the whole repository",
+    },
     (".github/workflows/koblitz-sota-reproduction.yml", "reproduce-toy-controls"): {
         "timeout": 45,
         # The workflow's pull_request budget expression evaluates to 45.
