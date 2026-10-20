@@ -635,7 +635,9 @@ fn ladder_summary(files: &[String]) -> (Value, String) {
             .and_then(|(k1, c1)| {
                 let distance = row.k.abs_diff(*k1);
                 if distance > 0 {
-                    Some((mpb? / (*c1)?).powf(1.0 / distance as f64))
+                    let (current, previous) = (mpb?, (*c1)?);
+                    (current > 0.0 && previous > 0.0)
+                        .then(|| (current / previous).powf(1.0 / distance as f64))
                 } else {
                     None
                 }
@@ -804,6 +806,32 @@ mod ladder_tests {
         assert_eq!(row["censored_runs"], 1);
         assert!(row["mean_xors_per_branch"].is_null());
         assert!(row["growth_per_unknown_vs_previous_k"].is_null());
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn zero_work_keeps_growth_undefined() {
+        let dir = fixture_dir();
+        let file = dir.join("ell11.jsonl");
+        let rows = [
+            run(7, 8, 0, true, 0),
+            run(8, 8, 100, true, 0),
+            run(9, 8, 0, true, 0),
+        ];
+        fs::write(
+            &file,
+            rows.iter()
+                .map(Value::to_string)
+                .collect::<Vec<_>>()
+                .join("\n")
+                + "\n",
+        )
+        .unwrap();
+        let (summary, table) = ladder_summary(&[file.to_string_lossy().into_owned()]);
+        let rows = summary["rows"].as_array().unwrap();
+        assert!(rows[1]["growth_per_unknown_vs_previous_k"].is_null());
+        assert!(rows[2]["growth_per_unknown_vs_previous_k"].is_null());
+        assert!(table.contains("—"));
         fs::remove_dir_all(dir).unwrap();
     }
 }
