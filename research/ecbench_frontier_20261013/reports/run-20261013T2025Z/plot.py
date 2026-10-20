@@ -67,73 +67,64 @@ def cold_ops_gap() -> None:
 
 def online_boundary() -> None:
     rows = DATA["online_boundary"]
+    ctl = DATA["precomputed_rho_control"]
     labels = ["n61 compact orbit\n64 unseen targets", "n83 dense K1798\none public target"]
     x = [0, 1]
-    width = 0.34
+    width = 0.26
     online = [row["online_rho_over_ic"] for row in rows]
     cold = [row["setup_inclusive_rho_over_ic"] for row in rows]
+    # precomputed (Bernstein-Lange) rho cost / IC cost = 1 / stored IC-over-BL ratio
+    bl = [1.0 / ctl["n61"]["ic_K360_over_bl_level0_ratio_of_means"],
+          1.0 / ctl["n83"]["ic_over_bl_a_time_matched_median_of_paired_ratios"]]
+    bl_text = [
+        f"BL rho {ctl['n61']['ic_K360_over_bl_level0_ratio_of_means']:.3g}x faster\n(K360; K256 {ctl['n61']['ic_K256_over_bl_level0_ratio_of_means']:.3g}x)",
+        f"BL rho {ctl['n83']['ic_over_bl_a_time_matched_median_of_paired_ratios']:.3g}x faster\n(time-matched, K3300 control;\nmemory-matched {ctl['n83']['ic_over_bl_b_memory_matched_median_of_paired_ratios']:.3g}x)",
+    ]
 
-    fig, ax = plt.subplots(figsize=(9.8, 6.2))
-    online_bars = ax.bar([p - width / 2 for p in x], online, width, color="#2A9D6F", edgecolor="#1B2430", label="online rho / IC")
-    cold_bars = ax.bar(
-        [p + width / 2 for p in x],
-        cold,
-        width,
-        color="#D1495B",
-        edgecolor="#1B2430",
-        label="cold / setup-inclusive diagnostic",
-    )
-    online_bars[1].set_hatch("\\\\")
+    fig, ax = plt.subplots(figsize=(12.5, 6.4))
+    sup = [str(row["status"]).startswith("superseded") for row in rows]
+    online_bars = ax.bar([p - width for p in x], online, width, facecolor="none", edgecolor="#777777",
+                         hatch="..", linestyle="--", label="online rho / IC (superseded: empty-table rho)")
+    cold_bars = ax.bar([p for p in x], cold, width, color="#D1495B", edgecolor="#1B2430",
+                       label="cold / setup-inclusive diagnostic (not superseded)")
+    bl_bars = ax.bar([p + width for p in x], bl, width, color="#3969ac", edgecolor="#1B2430",
+                     label="precomputed (Bernstein-Lange) rho / IC, online")
     cold_bars[1].set_hatch("\\\\")
 
     ci = rows[0]["online_ci95"]
-    ax.errorbar(
-        x[0] - width / 2,
-        online[0],
-        yerr=[[online[0] - ci[0]], [ci[1] - online[0]]],
-        fmt="none",
-        ecolor="#1B2430",
-        capsize=5,
-        linewidth=1.2,
-    )
+    ax.errorbar(x[0] - width, online[0], yerr=[[online[0] - ci[0]], [ci[1] - online[0]]],
+                fmt="none", ecolor="#777777", capsize=5, linewidth=1.0, linestyle=":")
 
-    for bar, value in zip(online_bars, online):
-        ax.text(bar.get_x() + bar.get_width() / 2, value * 1.16, f"{value:.3g}x", ha="center", va="bottom", fontsize=10)
+    for bar, value, flag in zip(online_bars, online, sup):
+        ax.text(bar.get_x() + bar.get_width() / 2, value * 1.16, f"{value:.3g}x\nSUPERSEDED" if flag else f"{value:.3g}x",
+                ha="center", va="bottom", fontsize=8, color="#b00" if flag else "#1B2430")
     for bar, value, row in zip(cold_bars, cold, rows):
-        ax.text(
-            bar.get_x() + bar.get_width() / 2,
-            value / 1.45,
-            f"1/{row['setup_inclusive_ic_over_rho']:.1f}",
-            ha="center",
-            va="top",
-            fontsize=9,
-        )
+        ax.text(bar.get_x() + bar.get_width() / 2, value * 1.25, f"cold 1/{row['setup_inclusive_ic_over_rho']:.1f}",
+                ha="center", va="bottom", fontsize=8)
+    for bar, value, t in zip(bl_bars, bl, bl_text):
+        ax.text(bar.get_x() + bar.get_width() / 2, value * 3.2, t, ha="center", va="bottom", fontsize=7, color="#1f3f73")
 
     ax.axhline(1.0, color="#1B2430", linewidth=1.4, linestyle="--")
     ax.text(1.45, 1.1, "parity", fontsize=9)
     ax.set_yscale("log")
-    ax.set_ylim(0.001, 70)
+    ax.set_ylim(0.0003, 70)
     ax.set_xticks(x, labels)
     ax.set_ylabel("rho cost / IC cost (log scale; above 1 favours IC)")
     ax.set_title("Reusable setup reverses the apparent one-target boundary\nSUPERSEDED 2026-10-20 (sweep B 108.1, 110.1): online ratios are against empty-table rho", color="#b00")
     ax.grid(axis="y", which="both", alpha=0.22)
     extra = Patch(facecolor="white", edgecolor="#1B2430", hatch="\\\\", label="exploratory shared-host N83")
     handles, legend_labels = ax.get_legend_handles_labels()
-    ax.legend(
-        handles + [extra],
-        legend_labels + [extra.get_label()],
-        loc="upper left",
-        bbox_to_anchor=(1.01, 1.0),
-        frameon=False,
-    )
+    ax.legend(handles + [extra], legend_labels + [extra.get_label()], loc="upper left",
+              bbox_to_anchor=(1.01, 1.0), frameon=False, fontsize=8)
     fig.text(
         0.01,
         0.005,
-        "n61 online: admitted isolated 95% interval [9.8, 19.1]; cold IC/rho median 83.4. "
-        "n83: one-point exploratory online ratio; hatched setup diagnostic = reported rho online / complete IC process, not matched cold.",
-        fontsize=8,
+        "n61 online: admitted isolated 95% interval [9.8, 19.1] (superseded); cold IC/rho median 83.4. "
+        "n83: one-point exploratory online ratio; hatched setup diagnostic = reported rho online / complete IC process, not matched cold. "
+        "Precomputed-rho bars: n61 from ic_next10 item 9, n83 from the K3300 control (different index than K1798).",
+        fontsize=7, wrap=True,
     )
-    fig.tight_layout(rect=(0, 0.045, 0.79, 1))
+    fig.tight_layout(rect=(0, 0.06, 0.8, 1))
     save(fig, "online_boundary")
 
 
