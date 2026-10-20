@@ -10,7 +10,9 @@
 - **Use regular PRs.** Create pull requests with `draft=false` and mark an
   existing draft ready for review when you update it. Record pending CI,
   review, and follow-up work in the PR description; draft status is not a
-  holding queue. Use a draft only when the user explicitly asks for one.
+  holding queue. Ready for review invites review; it does not authorize a
+  merge. All validation, evidence, review, and merge gates below still apply.
+  Use a draft only when the user explicitly asks for one.
 - **Verify before pushing:** run `cargo test --release --lib`, the touched
   examples' tests, and the relevant Python suites (for example
   `research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py`)
