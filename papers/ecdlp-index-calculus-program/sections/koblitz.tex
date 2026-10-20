@@ -56,9 +56,7 @@ against rho with the automorphism discount on the same point? The ladder
   (exploratory).
 \item $n=83$, $a=1$: IC online 5.6--7.9\,s against rho 43--71\,s,
   $8.2\times$; then the dense root index, $18.5\times$ (both exploratory;
-  the $18.5\times$ is superseded, an empty-table rho on one target
-  \footnote{Erratum 2026-10-20 (validation sweep B, verdict 110.1:
-  contradicted): precomputed-table rho wins every matched $n=83$ pair.}).
+  both retired on 20 October, \S\ref{sec:ladder2}).
 \item \textbf{$n=61$, panel (13.9x online point superseded 2026-10-20)} (12 October): $a=0$, $K=500$ orbit
   columns, $61{,}000$ points, 64 fresh public one-target workloads per
   host, identical candidate manifest on two hosts. Pinned x86\_64:
@@ -101,8 +99,11 @@ ladder compares index calculus with a retained table against rho with
 none. Given a distinguished-point table of equal or smaller size,
 Bernstein--Lange preprocessing rho~\cite{bl2012} is $53$--$317\times$
 faster online than the compact-orbit arm on the same 64 targets at $n=41$,
-53 and 61 (\S\ref{sec:ladder}). The ladder therefore measures what a
-table buys, and generic rho buys more per byte.
+53 and 61 (\S\ref{sec:ladder}); at $n=83$, rho with a table matched to
+the index calculus's set-up time or memory wins every matched pair
+(\S\ref{sec:ladder2}), which also voids the $q^*=306$ what-if above. The
+ladder therefore measures what a table buys, and generic rho buys more per
+byte.
 
 \subsection{ECC2K-130}\label{sec:ecc2k130}
 

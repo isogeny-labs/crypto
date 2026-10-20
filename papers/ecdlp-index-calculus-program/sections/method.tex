@@ -184,13 +184,10 @@ must be read.
   inherited-F4 rows differed in solver word-XOR counts (e.g.\ 301{,}961
   versus 300{,}531), with every scalar, trial count and charged GAE
   unchanged. The failed receipt is kept; the F4 stage comparison is
-  historical until the drift is explained.\footnote{Erratum 2026-10-20
-  (validation sweep A, verdict: contradicted). The 120/168 figure is the
-  2026-10-13 receipt. Replaying the same session on current main gives
-  72/168 identical, with 96 mismatches in all four IC arms (ic-f4-m2,
-  ic-f4-m3, ic-rootfind-m2, ic-rootfind-m3); this is an open regression
-  (sweep D, PR~\#2290), and the root-finder rows are not claimed to
-  pass.}
+  historical until the drift is explained. A replay of the same session on
+  current \texttt{main} (20 October) matches only 72/168, with mismatches
+  in all four IC arms, root finding included; that regression is open, and
+  the session's root-finder rows rest on the original receipt.
 \item \emph{A soundness bug} (\art{docs/ic/GROEBNER_F4F5F6_AUDIT_20261010.md}
   \S2.1): a degree-bounded \texttt{f4\_fp::solve} could certify solutions
   of an inconsistent system (over $\FF_5$, $\{x^3+1,xy-1,x+y\}$ returned

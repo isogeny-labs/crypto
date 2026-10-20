@@ -269,7 +269,7 @@ Filter + Wiedemann LA, $D=2^{18}$ & E & $1/10.40$; $1/1.93$ vs CADO-NFS & LA is 
 \end{tabularx}
 \end{table}
 
-\paragraph{Genus three: the one exponent below rho's.} The cubic GHS
+\paragraph{Genus three: an exponent below rho's.} The cubic GHS
 transfer~\cite{ghs2002} maps the DLP in $E_0(\FF_{q^3})$ to the Jacobian
 of a genus-3 hyperelliptic curve over $\FF_q$, where double-large-prime
 index calculus~\cite{gtthd2007} costs $\tilde O(q^{2-2/g})=\tilde O(q^{4/3})$
@@ -280,9 +280,9 @@ against the planted scalar). Adding double large primes changed the
 exponent from $q^{1.910}$ to $q^{1.385}$ $[1.379,1.391]$, and keeping the large
 primes as columns, merging them with structured Gaussian elimination and
 finishing with Wiedemann moved it to $q^{1.380}$ and the constant to
-$0.653\times$. This is the only index-calculus family in the programme whose
-fitted exponent lies below rho's, and the only one where measured
-IC beats a rho arm: the item-7 rho, which walks at $1.75\sqrt\ell$ steps,
+$0.653\times$. This was the first index-calculus family in the programme whose fitted
+exponent lies below rho's (the $k=4$ binary family of \S\ref{sec:ladder2}
+is the second), and the only one where measured IC beats a rho arm: the item-7 rho, which walks at $1.75\sqrt\ell$ steps,
 at $q=2^{15}$ ($0.69$ $[0.55,0.83]$). Two further
 rounds kept going. A frozen schedule for the factor-base fraction $\kappa(q)$
 plus block Wiedemann brought the whole solve to $0.605\times$ the first
@@ -364,6 +364,156 @@ solve to $0.961$--$0.970$ (derived; not rolled out). Neither is yet in a
 campaign arm. A comparison against a rho that has not adopted them would
 overstate index calculus's position by that much.
 
+\subsection{The ladder continued, 16--20 October}\label{sec:ladder2}
+
+Work that reached \texttt{main} between 16 and 20 October, after the survey
+was first assembled (some of it measured on 14--15 October), added a
+genus-3 round, two $k=4$ oracles, a long binary-oracle ladder, Gr\"obner-engine work and a
+repository-wide validation sweep (Figure~\ref{fig:ladder2},
+Table~\ref{tab:ladder2}). The reading rules of \S\ref{sec:ladder} apply:
+each row is against its own incumbent, on its study's boundary, unpriced
+across the band.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-ladder2.pdf}
+\caption[]{Candidate over incumbent for the changes that landed 16--20 October, as in
+Figure~\ref{fig:ladder}. Values:
+\art{papers/ecdlp-index-calculus-program/figures/ladder2.tsv}; sources in
+Table~\ref{tab:ladder2}.}
+\label{fig:ladder2}
+\end{figure}
+
+\begin{table}[p]
+\centering\small
+\caption[]{Changes that landed 16--20 October 2026, against their own
+incumbents; columns and classes as in Table~\ref{tab:ladder}. Sources under
+\art{research/}: \texttt{ic\_improve4\_20261015/},
+\texttt{ic\_improve\_20261014/04b-genus3-2lp-rebalance/},
+\texttt{gaudry\_quartic\_d4\_cost\_20261014/},
+\texttt{gaudry\_quartic\_d4\_char2\_20261015/},
+\texttt{joux\_vitse\_n1\_20261015/}, \texttt{binary\_mitm\_oracle\_l9\_l10\_20261015/},
+\texttt{binary\_mitm\_oracle\_l11\_l12\_20261016/},
+\texttt{ic\_m3\_algebraic\_vs\_mitm\_20261014/}, \texttt{secg\_small\_x\_20261014/},
+\texttt{greedy\_factor\_base\_yield\_20261014/}, \texttt{f6\_gate\_first\_x86\_20261016/},
+\texttt{pdp\_shape\_replay\_20261015/}, \texttt{f4\_fp\_blocked\_pairs\_20261016/},
+\texttt{ic\_linalg\_pipeline\_20261019/}, \texttt{k\_conversion\_20261018/}.}
+\label{tab:ladder2}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}Xl>{\raggedright}p{3.6cm}>{\raggedright\arraybackslash}p{3.2cm}@{}}
+\toprule
+Change & Cl. & Ratio [95\%] & To rho \\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Genus 3 after the cubic GHS transfer}}\\
+Lucas splitting test (round 4, C1) & Ie & $0.756$ $[0.755,0.756]$ at $2^{22}$; local $1.408\to1.364$ & no rho arm since round 2 \\
+C1 + 32 walks per inversion & Ic & $0.715$ at $2^{22}$; local $1.356$ & as above \\
+Factor base retuned per size (04b) & Ic & $0.961$ at $2^{20}$ & $0.16\times$ rho on $\mathrm{Jac}(C)$ at $2^{14}$, not on $E_0$ \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{$k=4$ over $\FF_{p^4}$ and $\FF_{(2^m)^4}$}}\\
+$D_4$ oracle: pivots, weighted form, replay, $p=269$ & E & $1/370$ $[1/371.6,1/367.9]$ & --- \\
+Same oracle, ecbench $S$ & Ic & $1/402$ $[1/406,1/398]$ & $1.39\cdot10^6\times$ rho \\
+Frobenius-reduced $D_4$ form, characteristic 2, $m=8$ & E & $1/481$ $[1/483,1/479]$ & --- \\
+Same, ecbench $S$ ($m=6$) & Ic & $0.0057$ & $6.1\times$ rho model, $4.3\times$ measured, at $n\approx2^{56}$ \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Koblitz and binary oracles}}\\
+F6-IC gate-first order & E & $1/1.73$--$1/1.34$ word XORs & default on \\
+Greedy coverage base, $K_0/2^{13}$ & Ic & $0.843$ (expected trials) & gain $1.000$ at $r=2^{39}$ \\
+Inherited-F4 root-shape replay & R & $1.015$--$1.328$ & switch stays off \\
+Binary MITM oracle, $\ell=9..12$ & E & $1/4{,}244$--$1/928$ per target & relation collection $\Theta(2^n)$ \\
+Algebraic $m=3,4$ oracles vs MITM floor & R & slope $0.53$--$0.81$ vs $0.21$--$0.36$ & $3\cdot10^2$--$3\cdot10^4\times$ floor \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Prime fields and shared stages}}\\
+\texttt{f4\_fp} blocked pair reduction & E & $0.78$--$0.89$ (wall, quad $n10,11$) & beats msolve there \\
+Sparse-CADO LA inside ecbench & E & $S$ $1.000$; LA wall $0.25$--$0.72$ & $149\times$ rho \\
+$S_3$ solve on SECG small-$x$ bases & --- & table $2{,}600$--$313{,}000\times$ cheaper & $52$--$280$ bits over rho \\
+Column-touch conversion $K$ (ECC2K-130 $m=4$) & A & $+7.62/+10.32\to+9.78/+12.48$ bits & accounting \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{Genus three, round four.} A field-level splitting test (a Lucas
+ladder on the Cardano resolvent's cubic character, with the same relations)
+removes most of the per-trial log factor (9.75 to 2.71 units per bit) and
+moves the whole solve to $0.756\times$ at $q=2^{22}$; with 32 walks sharing
+one inversion, to $0.715\times$, with local exponent $1.356$ (fitted
+$1.368$ over $2^{16}$--$2^{22}$), $0.023$ above $4/3$. Chained with round
+three, the whole solve is about $0.44\times$ the second round's at
+$q=2^{22}$ (derived, in the inversion-charging unit). Rounds three and four
+ran no rho arm, so the last matched distance is still $1.15\times$ at
+$q=2^{20}$; and re-tuning $\kappa$ on training again steepened the schedule
+and raised the exponent. A separate rebalance study measured IC at
+$0.16\times$ ($0.25\times$ renormalised) a rho on $\mathrm{Jac}(C)$ at
+$q=2^{14}$: that rho walks on the Jacobian (four walks per size, at
+$1.6$--$2.8$ steps per $\sqrt\ell$ against an ideal $1.25$), not on
+$E_0(\FF_{q^3})$, so it is not the matched reference and the ratio is not
+a distance to rho.
+Memory now limits the ladder: $q=2^{22}$ peaks at 3.9\,GB of a 4.5\,GB cap.
+
+\paragraph{$k=4$: two oracles and a closing gap.} Over $\FF_{p^4}$, sparsest
+pivots, the weighted grading $\sigma_4=\pi^2$ and shape replay cut one $D_4$
+decomposition from $2.55\cdot10^{10}$ to $6.89\cdot10^7$ $\FF_p$
+multiplications ($370\times$; 648/648 solves exact) and ecbench $S$ by
+$398$--$406\times$; index calculus is still $1.39\cdot10^6\times$ rho at
+the measured sizes and the model handover moves from $2^{135}$ to $2^{103}$.
+In characteristic two, a Frobenius-reduced form of the same system
+(weights $(2,2,1,1)$, Macaulay degree 11, a $384\times448$ matrix) is
+$481\times$ below the plain form. End to end on $E(\FF_{(2^m)^4})$ the
+ratio of IC to the negation-map rho model falls from $5{,}080$ at $m=6$ to
+$6.06$ at $m=14$ ($n\approx2^{56}$; $4.3\times$ a measured rho), with fitted
+slope $-0.248$ in $\log_2 n$---Gaudry's $n^{-1/4}$---and an extrapolated
+crossover near $n\approx2^{68}$ ($2^{63}$--$2^{69}$ under the model).
+After genus three, this is the nearest any index calculus in the programme
+has come to rho, and its extrapolated crossover lies where rho itself takes
+about $2^{34}$ steps, so the extrapolation can be tested directly. A Joux--Vitse
+$(n-1)$-decomposition at $n=5$ on $E(\FF_{p^5})$ completed verified DLPs at
+$4.5\cdot10^7$--$1.8\cdot10^8\times$ rho, with a crossover extrapolated to
+groups near $2^{291}$.
+
+\paragraph{Binary oracles and their floor.} The MITM pair-table oracle on a
+non-Koblitz curve reached $\ell=12$ over $\FF_{2^{37}}$
+($2{,}474$--$4{,}244\times$ over pairs-and-solve at $\ell=9,10$;
+$928$--$2{,}187\times$ at $\ell=11,12$; 0 disagreements on 256 targets).
+Against that floor, no algebraic oracle (inherited F4, F6-IC, SAT, split
+$\Sem4$ hybrids, a wide chained $\Sem3$ solver) grows more slowly in $n$:
+the cheapest is $3\cdot10^2\times$ the floor at $n=13$ and $3.8\cdot10^4\times$
+at $n=31$ for $m=3$, and the $m=4$ chain grows at slope $0.805$ against the
+floor's $0.333$. A greedy coverage base needs $1.08$--$1.18\times$ fewer
+trials on small Koblitz curves, but its gain falls to $1.0000$ at
+$r=2^{39}$. On the 33 SECG curves an $\Sem3$ solve over a small-$x$ base,
+with no table, is $52$--$280$ bits over rho.
+
+\paragraph{The reference moved again.} The strong signed-Frobenius rho of
+every Koblitz comparison now executes 718 instructions per walk step, down
+from 1{,}196 (three rounds, outputs identical; steps per ideal
+$0.92$--$0.99$ on 400 fixtures), and ecbench's standing
+\texttt{rho.signed\_frobenius\_strong} runs at $0.802\times$ its former
+instruction count with identical GAE. On hyperelliptic Jacobians the
+programme's rho was slow at large $N$ until full-width branch coefficients
+brought $S_\text{walk}$ from $2.10$ to $1.48$; the negation fold saves only
+$0.97\times$ at $N\ge10^5$. Counted-unit comparisons ($S$) are unaffected
+by the instruction counts; wall-time comparisons against the older rho
+overstate index calculus by up to the same factor.
+
+\paragraph{Corrections from the validation sweep.} A repository-wide
+validation sweep (19--20 October) contradicted five recorded results, all
+now struck through in their sources with dated notes. Three bear on this
+paper. (i) The one-point $n=83$ online ratio ($18.5\times$,
+\S\ref{sec:rootfinding}) and the hosted $n=71$/$n=83$ panels ($7.3\times$,
+$12.3\times$) compared against rho with an empty table; with a
+Bernstein--Lange table matched to the index calculus's set-up time or
+memory, precomputed rho is faster in every matched $n=83$ pair
+($3.7\times$ time-matched and $40.6\times$ memory-matched against $K=3300$;
+$82$--$396\times$ against $K=600$). They join the $n=61$ point as retired.
+(ii) The root-finder session's replay-all, recorded as 120/168 identical with
+the 48 mismatches confined to inherited F4, replays 72/168 on current
+\texttt{main}, with mismatches in all four IC arms, root finding included;
+the cause is open. Its root-finder rows are therefore not relied on here
+beyond the recorded receipt. (iii) The equal-bytes preprocessing control at
+$n=73$ and $n=83$ is built and frozen but not run.
+\emph{Next improvement} (from the 18 October leads review): a large-memory
+host. The two exponent-level questions left---the Weil-descent cell
+$(m,\ell)=(4,6)$, about 70\,GB dense, and the PKM tower at $m=3$, $N=21$ to
+$m=4$, $N=20$, 256--512\,GB---are blocked on memory, not on instruments.
+
 \subsection{Three frontiers}
 
 \paragraph{Cold, one target, set-up included.} Unchanged: generic rho.
@@ -372,20 +522,28 @@ Every measured index-calculus arm is above its matched rho
 at $1.55\times$ strong signed-Frobenius rho at $n=13$; the closest
 lower-bound arms are $1.08\times$ (compact orbit with a counted Frobenius
 table) and $6.97\times$ (matrix F4/F5 against rho-negation at K13).
-Prime-field arms are $12$--$239\times$ rho and diverge with size.
+Prime-field arms are $12$--$239\times$ rho and diverge with size. Off the
+prime and prime-degree binary fields, two families are within a single-digit
+factor: genus three after cubic GHS ($1.15\times$ a measured rho at
+$q=2^{20}$, with $0.44\times$ of further improvement not yet matched
+against rho) and $k=4$ over $\FF_{(2^m)^4}$ ($4.3\times$ a measured rho at
+$n\approx2^{56}$, closing as $n^{-1/4}$).
 
 \paragraph{Online, after retained set-up.} Generic again: Bernstein--Lange
 preprocessing rho. The compact-orbit point at Koblitz $n=61$ (admitted when measured, now
 superseded, erratum 2026-10-20, validation sweep B, verdict 108.1),
 $13.9\times$ $[9.8,19.1]$ over strong rho without a table (cold median
 $83.4\times$ rho), is $53$--$317\times$ slower online than preprocessing rho
-given equal or less advice (\S\ref{sec:ladder}).
+given equal or less advice (\S\ref{sec:ladder}), and the $n=83$ points
+lose every pair matched on set-up time or memory (\S\ref{sec:ladder2}).
 
 \paragraph{Stage.} Moved substantially: the decomposition oracle is two to
 five orders of magnitude cheaper than at the start of the programme on the
 workloads where root finding applies, the $\FF_p$ F4 is at msolve parity,
 the Boolean F4 family is one to two orders of magnitude cheaper in counted
-matrix work, and the $k=4$ extension-field solve is $48\times$ cheaper.
+matrix work, and the $k=4$ extension-field solve is $48\times$ and then a
+further $370\times$ cheaper over $\FF_{p^4}$ ($481\times$ below the plain
+form in characteristic two).
 None of this, by itself, moves the cold frontier: the stages it leaves
 untouched---relation yield, factor-base size, linear algebra, table
 set-up---now dominate.
@@ -412,6 +570,12 @@ the inherited-F4 cross-host counter drift before using that counter in a
 bound; (iii) run a four-size native challenge against the standing rho
 bound---two sizes cannot establish an exponent; (iv) obtain an isolated
 cold session at $n=83$ with every set-up phase and retained byte charged;
-(v) price F6-IC's batched geometry with a pinned conversion. A result in
-the cold domain that beats rho at four sizes would be the first
+(v) price F6-IC's batched geometry with a pinned conversion. Since then
+three items have moved to the front: (vi) run $k=4$ over
+$\FF_{(2^m)^4}$ at $m=15$--$17$ against a measured negation-map rho, where
+the fitted trend predicts parity near $n\approx2^{68}$; (vii) measure the
+matched rho on $E_0(\FF_{q^3})$ in the genus-3 rounds' unit, so that the
+last two rounds' $0.44\times$ has a distance; (viii) obtain a
+large-memory host for the $(4,6)$ Weil-descent cell and the PKM tower.
+A result in the cold domain that beats rho at four sizes would be the first
 \cls{advance} of the programme.
