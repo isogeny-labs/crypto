@@ -64,7 +64,7 @@ jobs:
   # within the 25-minute PR budget (.github/scripts/check-pr-budgets.py).
   traits:
     runs-on: ubuntu-24.04
-    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (github.event_name == 'pull_request' && 25 || 45) || 15 }}
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
     strategy:
       fail-fast: false
       matrix:

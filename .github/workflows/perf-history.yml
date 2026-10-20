@@ -1,7 +1,6 @@
-# Expensive work runs on schedule/manual dispatch; keep the push/PR queue short.
 name: perf history
 
-# One snapshot per daily schedule: callgrind instruction counts (and a wall-time
+# One snapshot per push to main: callgrind instruction counts (and a wall-time
 # reading) of every quick perfbench kernel and of the frozen ecbench children in
 # docs/perf/ecbench-children.json, appended to the `perf-history` branch together
 # with the rendered HISTORY.md, history.svg and history.json
@@ -21,6 +20,45 @@ name: perf history
 # or at https://github.com/aburan28/crypto/blob/perf-history/docs/perf/HISTORY.md
 
 on:
+  merge_group:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'examples/perfbench/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'scripts/perf/perfhistory.py'
+      - 'scripts/perf/perfindex.py'
+      - 'docs/perf/ecbench-children.json'
+      - 'docs/perf/ic-factor-base-j0.spec.json'
+      - 'docs/perf/weights.json'
+      - 'docs/perf/groebner-groups.json'
+      - 'docs/perf/f4-f5-allocation-history.json'
+      - 'tools/groebner-history/**'
+      - 'scripts/perf/render_groebner_history.py'
+      - 'scripts/perf/groebner-render-requirements.txt'
+      - '.github/workflows/perf-history.yml'
+  pull_request:
+    paths:
+      - 'build.rs'
+      - '.cargo/**'
+      - 'rust-toolchain*'
+      - 'src/**'
+      - 'examples/perfbench/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'scripts/perf/perfhistory.py'
+      - 'scripts/perf/perfindex.py'
+      - 'docs/perf/ecbench-children.json'
+      - 'docs/perf/ic-factor-base-j0.spec.json'
+      - 'docs/perf/weights.json'
+      - 'docs/perf/groebner-groups.json'
+      - 'docs/perf/f4-f5-allocation-history.json'
+      - 'tools/groebner-history/**'
+      - 'scripts/perf/render_groebner_history.py'
+      - 'scripts/perf/groebner-render-requirements.txt'
+      - '.github/workflows/perf-history.yml'
   workflow_dispatch:
     inputs:
       check_only:
@@ -36,15 +74,12 @@ on:
         required: false
         default: ''
 
-  schedule:
-    - cron: '19 8 * * *'
-
 permissions:
   contents: read
 
 concurrency:
-  group: perf-history-main
-  cancel-in-progress: false
+  group: perf-history-${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'main' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   CARGO_TERM_COLOR: always
@@ -53,7 +88,7 @@ env:
 
 jobs:
   record:
-    # Append one snapshot for the scheduled (or dispatched) revision.
+    # Append one snapshot for the pushed (or dispatched) revision.
     if: github.event_name != 'pull_request' && github.event_name != 'merge_group' && !inputs.check_only
     runs-on: ubuntu-24.04
     timeout-minutes: 120

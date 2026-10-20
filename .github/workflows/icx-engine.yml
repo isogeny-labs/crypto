@@ -57,7 +57,7 @@ jobs:
           - runner: macos-14
             arch: macos-arm64
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (github.event_name == 'pull_request' && 25 || 30) || 15 }}
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -146,7 +146,7 @@ jobs:
   gpu-fes-cuda:
     name: GPU FES CUDA compile-check
     runs-on: ubuntu-24.04
-    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (github.event_name == 'pull_request' && 25 || 30) || 15 }}
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     env:
       CUDA_PKG_VERSION: 12-8
       CUDA_DIR_VERSION: "12.8"

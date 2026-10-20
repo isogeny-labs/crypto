@@ -30,7 +30,7 @@ concurrency:
 jobs:
   all-line-replay:
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (github.event_name == 'pull_request' && 25 || 45) || 15 }}
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
     env:
       PR_DRAFT: ${{ github.event.pull_request.draft }}
     steps:

@@ -62,7 +62,7 @@ jobs:
     needs: scope
     if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.rust_root != 'false')
     runs-on: ubuntu-24.04
-    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (25) || 15 }}
+    timeout-minutes: 25
     permissions:
       contents: read
     steps:

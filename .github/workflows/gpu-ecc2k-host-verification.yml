@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-24.04
     # Most of this is one `cargo build --release` to generate the
     # vectors; the C++ itself is seconds.
-    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (github.event_name == 'pull_request' && 25 || 30) || 15 }}
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     permissions:
       contents: read
     steps:
@@ -108,7 +108,7 @@ jobs:
   # with warnings as errors.  Compile only: no GPU, no driver.
   nvcc-compile:
     runs-on: ubuntu-24.04
-    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (20) || 15 }}
+    timeout-minutes: 20
     permissions:
       contents: read
     steps:

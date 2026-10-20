@@ -1,18 +1,39 @@
-# Expensive work runs on schedule/manual dispatch; keep the push/PR queue short.
 name: Release
 
-# The nightly schedule publishes a rolling build from main. The tag uses the crate's
+# Every merge to main publishes a rolling build. The tag uses the crate's
 # major/minor version and patch + run number, giving ReleaseMe a distinct
 # stable version per run so /releases/latest remains the newest main build.
 on:
+  push:
+    branches: [main]
+  # Start the dry run for every pull request. The scope job then selects only
+  # affected build/package lanes, including compile-time inputs discovered
+  # recursively; an event-level path list cannot safely anticipate that set.
+  # The `release` job is skipped for pull requests, so nothing is published.
+  pull_request:
+    paths:
+      - '.github/workflows/release.yml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      # `cargo build --bins` consumes the library and every binary target.
+      # Exercise the cross-platform packaging path whenever any Rust source
+      # changes, including the cover/Jacobian command-line tools.
+      - 'src/**'
+      - 'tests/fixtures/ecbench_manifest_small.json'
+      - 'ecc2k130/Makefile'
+      - 'tools/isogeny-cli/**'
+      - 'tools/volcano-cli/**'
+      - 'isogeny_algos/**'
+      - 'research/p192_p224_large_degree_isogenies_20261009/**'
+      - 'docs/curves/registry.json'
+  merge_group:
   workflow_dispatch:
-
-  schedule:
-    - cron: '47 11 * * *'
 
 concurrency:
   group: release-${{ github.ref }}
-  cancel-in-progress: false
+  # Main releases finish their uploads. Superseded PR dry runs cannot
+  # publish and may be cancelled so the latest head gets tested promptly.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -557,7 +578,7 @@ jobs:
     # The ref test is not redundant with the event test: workflow_dispatch
     # can be started from any branch, and a release tagged `-main.` that
     # was not built from main would still become /releases/latest.
-    if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

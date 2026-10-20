@@ -70,7 +70,7 @@ jobs:
 
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && ((github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 40) || 15 }}
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 40 }}
     needs: standard
     steps:
       - uses: actions/checkout@v4

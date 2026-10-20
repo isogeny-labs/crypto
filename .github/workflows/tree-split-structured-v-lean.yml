@@ -43,7 +43,7 @@ concurrency:
 jobs:
   lean:
     runs-on: ubuntu-24.04
-    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (github.event_name == 'pull_request' && 25 || 60) || 15 }}
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 60 }}
     defaults:
       run:
         working-directory: research/ic_tree_split_structured_v_20261011

@@ -1,4 +1,3 @@
-# Expensive work runs on schedule/manual dispatch; keep the push/PR queue short.
 name: ecbench
 # The native ECDLP measurement harness (docs/ecbench/README.md).
 #
@@ -39,16 +38,16 @@ name: ecbench
 # bit for bit, so a change that alters what a registered method counts
 # fails here.
 on:
+  pull_request:
+  merge_group:
   workflow_dispatch:
   schedule:
     - cron: "37 1 * * 0"
-
 permissions:
   contents: read
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
-  cancel-in-progress: false
-
+  group: ecbench-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 defaults:
   run:
     shell: bash
@@ -99,8 +98,8 @@ jobs:
     needs: scope
     runs-on: ubuntu-24.04
     # Keep the exhaustive scientific audit's existing 300-minute budget in
-    # the weekly/manual lane; ordinary PR validation is bounded at 25 minutes.
-    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 300 }}
+    # the weekly/manual lane; ordinary PR validation is bounded at 45 minutes.
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 300 }}
     steps:
       - name: Require successful scope classification
         if: needs.scope.result != 'success'

@@ -29,7 +29,7 @@ concurrency:
 jobs:
   paired-f5:
     runs-on: ubuntu-24.04
-    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (github.event_name == 'pull_request' && 25 || 75) || 15 }}
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 75 }}
     strategy:
       fail-fast: false
       matrix:

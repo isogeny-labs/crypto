@@ -18,7 +18,7 @@ concurrency:
 jobs:
   pencil-and-four-cell:
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (github.event_name == 'workflow_dispatch' && 45 || 25) || 15 }}
+    timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 45 || 25 }}
     defaults:
       run:
         working-directory: research/p192_extension_cover_20261012/lean

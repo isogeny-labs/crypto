@@ -140,7 +140,7 @@ jobs:
     # 35 min so the index-only fallback plus a stretch of hour-chunk
     # backfill (300 s each, resumed next run) plus history merge and Pages
     # deploy still fit. Later runs read the rollup and finish in the old 15.
-    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (35) || 15 }}
+    timeout-minutes: 35
     permissions:
       contents: read
       pages: write

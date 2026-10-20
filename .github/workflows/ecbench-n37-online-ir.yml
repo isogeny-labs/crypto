@@ -32,7 +32,7 @@ concurrency:
 jobs:
   profile:
     runs-on: ubuntu-24.04
-    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && ((github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 60) || 15 }}
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 60 }}
     steps:
       - uses: actions/checkout@v4
         with:

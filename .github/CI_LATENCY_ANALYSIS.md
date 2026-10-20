@@ -5,7 +5,9 @@ speed up the jobs, and appropriate concurrency increases. This analysis extends
 [PR #2303](https://github.com/aburan28/crypto/pull/2303) and the
 [queue policy](CI_QUEUE_POLICY.md). The principal observed problem is admission
 delay. There is also a concrete Windows release failure, expensive repeated
-checkout/build work, and a release-cadence tradeoff in the earlier patch.
+checkout/build work. The owner subsequently chose to retain existing PR
+checks, timeout exceptions, and the original release triggers; this document
+keeps the earlier measurements as historical evidence.
 
 ## Evidence and measurement boundary
 
@@ -49,13 +51,13 @@ routing, rather than treating a timeout change as an optimization.
 **Repeated queue admission.** Rust lint first queues a scope job, then queues
 its matrix; both clippy matrix entries allocate runners even when all their
 substantive steps are inapplicable. All-targets has another scope job. CodeQL's
-old automatic path queues scope, database building, cache warming, and analysis
+automatic path queues scope, database building, cache warming, and analysis
 separately. In [run 39289916896](https://github.com/aburan28/crypto/actions/runs/39289916896),
 scope ended at 18:11:52 UTC; database building started at 19:59:05 and ended at
 20:16:38; warming did not start until 22:01:12. The two intermediate gaps alone
 were 107m 13s and 104m 34s. Increasing matrix parallelism cannot remove these
-dependency waits. The earlier scheduled routing removes this path from PRs
-once it lands; existing runs still use their original definition.
+dependency waits. The retained PR gates continue to exercise this path;
+reducing repeated admission requires a separately validated workflow change.
 
 **Checkout.** The audited tree has 115,127 tracked files with 7.87 GB of
 uncompressed blob contents. This is not a network-transfer measurement. There
@@ -112,11 +114,10 @@ That check result establishes neither a completed model review nor review
 coverage. The sparse checkout removes most of its unnecessary payload;
 configure a provider if this check is intended to supply actual review.
 
-**Cadence.** PR #2303 currently changes binary publication to daily at 11:47 UTC,
-with manual dispatch retained. That reduces background load but adds up to
-24 hours of schedule delay, before queueing/building. It is containment, not
-the desired fast-deployment design. Status Pages already has its own push and
-scheduled publisher and is not controlled by the binary release schedule.
+**Cadence.** The earlier daily-only publication proposal would have added up
+to 24 hours of schedule delay before queueing/building. That proposal has been
+withdrawn: #2303 retains main-push binary publication and PR packaging checks.
+Status Pages has its separate push and scheduled publisher.
 
 ## Changes implemented in this follow-up
 
@@ -139,18 +140,19 @@ to confirm cache hit rates, cleanup and restoration, and actual time saved.
 | Priority | Change | Acceptance evidence |
 | --- | --- | --- |
 | P0 | Fix the Windows checkpoint compilation failure while preserving private-file behavior. Add a fast platform compilation check before packaging. | Windows build passes, checkpoint contract tests pass, publisher succeeds with every intended asset. |
-| P0 | Land #2303, then re-enable the nine scheduled workflows only after their new triggers are on main. Keep the named exceptions disabled pending migration. | Inspect main workflow definitions and workflow states; measure arrival rate and oldest queue age afterward. |
+| P0 | Retain all existing PR gates and documented timeout exceptions in #2303; restore the nine validation workflows to active state. Keep separate ownership/evidence holds explicit. | Verify source triggers and budgets, live workflow state, and all applicable current-head checks; measure arrival rate and oldest queue age afterward. |
 | P1 | Consolidate lightweight checks into one fast PR job and run source classification once; use a dynamic set of applicable build jobs. Move no-op conditions to job admission. | Compare selected checks against the existing dependency-aware classifier, including missing-base/failure behavior; preserve a stable aggregate required check. |
 | P1 | Give routine PR validation and publication capacity separate from scheduled research, and verify account-wide slot usage. Request a hosted concurrency increase if saturation remains. | PR p95 admission below two minutes during measured load; research scheduling cannot consume the entire reserved PR pool. |
 | P1 | Seed and retain compatible main-branch Rust caches; share keys only for matching toolchain, target, profile, features and flags. Reduce duplicate large Lean caches after measuring their hit/transfer cost. | Record restore hit, restore/save seconds, compile seconds and cache size across at least 20 comparable runs. |
-| P1 | Replace nightly-only publication with coalesced main-branch release preparation plus a serialized final publisher. Keep full research replay scheduled. | Latest eligible main reaches publication within the agreed budget; provenance identifies the exact built commit; cancelled preparation cannot interrupt or roll back publication. |
+| P1 | Evaluate coalesced main-branch release preparation plus a serialized final publisher as a separate design, retaining current PR validation. | Latest eligible main reaches publication within the agreed budget; provenance identifies the exact built commit; cancelled preparation cannot interrupt or roll back publication. |
 | P2 | Consolidate same-configuration Rust compilation and reuse same-run binaries/artifacts for related tests. Profile and split the large crate only where compile timings justify it. | Compare total runner-minutes and complete PR elapsed time, retaining all applicable tests and artifact/source identity. |
 
 The main-branch release design needs an explicit product decision about whether
 every commit must publish or only the latest eligible commit. A latest-only
 queue is appropriate for rolling releases but is a semantic change. This
-follow-up leaves the earlier scheduled trigger in place rather than silently
-restoring long automatic builds before that design is validated.
+patch preserves existing main-push publication while that separate design
+is evaluated. The owner explicitly retained existing PR checks and timeout
+exceptions.
 
 [GitHub concurrency limits](https://docs.github.com/en/actions/reference/limits)
 are account/plan capacity, not a numeric setting in workflow concurrency groups.
@@ -181,3 +183,17 @@ The fresh `cargo test --release --lib` run passed: 4,399 passed, zero failed,
 `/Volumes/SSD990-2/crypto-actions-queue-target` (build preparation 0.29s) and ran
 with localhost socket permissions. This local timing is not a hosted benchmark.
 No hosted speedup is claimed before these changes land and execute.
+
+
+### Final review qualification — 2026-10-20
+
+The owner-selected policy retains existing PR checks and their documented
+timeout exceptions, including the ecbench/archived-producer 45-minute limits
+from #2189. The final review additionally fixes frozen-source replay setup,
+Lean auditor CLI compatibility, formatting/lint issues, and missing IPC
+handling. The final native library run passed 4,418 tests with zero failures
+and 118 existing ignored tests in 727.97 seconds. It is local correctness
+evidence, not a hosted performance measurement. The original evidence JSON
+and historical timing samples remain unchanged. Workflow validation is rerun
+after restoring the source policy, and hosted checks must complete on the
+actual proposed head before merge.

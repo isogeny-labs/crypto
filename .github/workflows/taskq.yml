@@ -83,7 +83,7 @@ jobs:
           terraform test
   ephemeral-cli:
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (20) || 15 }}
+    timeout-minutes: 20
     permissions:
       contents: read
     defaults:
