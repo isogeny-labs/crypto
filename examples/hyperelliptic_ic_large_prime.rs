@@ -30,7 +30,9 @@ use crypto_lib::prime_hyperelliptic::{FpPoly, HyperellipticCurveP, MumfordDiviso
 
 /// Genus 2: `y² = x⁵ + 3x³ + 2x² + x + c`.  Genus 3: `y² = x⁷ + x³ + cx + 1`.
 /// Genus 4: `y² = x⁹ + x³ + cx + 1`.  As in round seven.
-fn curve_over(p: u64, c: u64, genus: u32) -> HyperellipticCurveP {
+/// `None` when `f` is not squarefree: `HyperellipticCurveP::new` now
+/// panics on such a model, and the instance rule skips it anyway.
+fn curve_over(p: u64, c: u64, genus: u32) -> Option<HyperellipticCurveP> {
     let p = BigUint::from(p);
     let coeffs = match genus {
         2 => vec![
@@ -66,7 +68,7 @@ fn curve_over(p: u64, c: u64, genus: u32) -> HyperellipticCurveP {
         g => panic!("no model for genus {g}; degree must be 2g+1"),
     };
     let f = FpPoly::from_coeffs(coeffs, p.clone());
-    HyperellipticCurveP::new(p, f, genus)
+    HyperellipticCurveP::try_new(p, f, genus).ok()
 }
 
 fn is_squarefree(curve: &HyperellipticCurveP) -> bool {
@@ -94,7 +96,9 @@ fn pick_instance(
     genus: u32,
 ) -> Option<(HyperellipticCurveP, MumfordDivisorP, BigUint, u64)> {
     for c in 1..p.min(60) {
-        let curve = curve_over(p, c, genus);
+        let Some(curve) = curve_over(p, c, genus) else {
+            continue;
+        };
         if !is_squarefree(&curve) {
             continue;
         }
