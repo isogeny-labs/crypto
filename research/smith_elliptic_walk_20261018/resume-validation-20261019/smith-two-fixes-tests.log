@@ -1,0 +1,33 @@
+   Compiling smith-resume-validation v0.1.0 (/Volumes/SSD990-2/research-resume-2026-10-19/smith-native-validation)
+    Finished `release` profile [optimized] target(s) in 7.70s
+     Running unittests src/lib.rs (/Volumes/SSD990-2/research-resume-2026-10-19/smith-native-target/release/deps/smith_resume_validation-7860455e07c7a49b)
+
+running 11 tests
+test cryptanalysis::smith_elliptic_walk::tests::field_axioms_and_frobenius ... ok
+test cryptanalysis::smith_elliptic_walk::tests::sqrt_roundtrip_and_chi ... ok
+test cryptanalysis::smith_elliptic_walk::tests::quartic_jacobian_has_same_count ... ok
+test cryptanalysis::smith_elliptic_walk::tests::step_matches_scan_and_keeps_trace ... ok
+test cryptanalysis::smith_elliptic_walk::tests::jv_models_match_the_node_class_and_descend ... ok
+
+thread 'cryptanalysis::smith_elliptic_walk::tests::jv_descent_has_the_expected_l_polynomial' (4082550) panicked at src/cryptanalysis/smith_elliptic_walk.rs:1942:13:
+assertion failed: kinds.iter().all(|&c| c > 0)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cryptanalysis::smith_elliptic_walk::tests::jv_descent_has_the_expected_l_polynomial ... FAILED
+test cryptanalysis::smith_elliptic_walk::tests::velu_preserves_point_count ... ok
+test cryptanalysis::smith_elliptic_walk::tests::descended_cycle_types_match_the_record ... ok
+test cryptanalysis::smith_elliptic_walk::tests::exhaustive_p7_controls ... ok
+
+thread 'cryptanalysis::smith_elliptic_walk::tests::walk_reaches_a_weak_curve_at_small_p' (4082557) panicked at src/cryptanalysis/smith_elliptic_walk.rs:2075:9:
+WalkResult { steps: 399996, reflects: 199997, nodes_tested: 200000, jv_weak_hits: 0, models_tried: 0, smith_calls: 0, smith_ns: 0, passed: false, censored: true, cost_step: Cost { mults: 512794754, invs: 0, ns: 760511810 }, cost_test: Cost { mults: 22800000, invs: 0, ns: 22109391 }, cost_descent: Cost { mults: 0, invs: 0, ns: 0 }, max_distinct_sigs: 0, hits_all_fail: 0 }
+test cryptanalysis::smith_elliptic_walk::tests::walk_reaches_a_weak_curve_at_small_p ... FAILED
+test cryptanalysis::smith_elliptic_walk::tests::unreduced_enumeration_agrees_with_reduced_at_p7 ... ok
+
+failures:
+
+failures:
+    cryptanalysis::smith_elliptic_walk::tests::jv_descent_has_the_expected_l_polynomial
+    cryptanalysis::smith_elliptic_walk::tests::walk_reaches_a_weak_curve_at_small_p
+
+test result: FAILED. 9 passed; 2 failed; 0 ignored; 0 measured; 17 filtered out; finished in 4.96s
+
+error: test failed, to rerun pass `--lib`

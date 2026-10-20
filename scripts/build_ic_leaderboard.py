@@ -72,6 +72,7 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -618,6 +619,25 @@ def la_component() -> dict:
             "class": "engineering"}
 
 
+def secs(x: float) -> str:
+    """Seconds to three significant figures, trailing zeros kept: 8.00 s, 224 s."""
+    return f"{x:.0f} s" if x >= 100 else f"{x:#.3g} s"
+
+
+def pair_table_component() -> dict:
+    """The ic.pipeline oracle set-up (the |F|² pair table) on its own:
+    research/ic_oracle_setup_blocked_20261020, copied from its RESULT.json
+    (means and per-pair ratio ranges computed there by scripts/analyze.jq from
+    the session records). A component speed-up: every arm counts the same
+    additions and recovers the same logarithm, so no row of tables A-C moves."""
+    res = load(SOURCES["pair_table_setup"])
+    if res.get("schema") != "ic_oracle_setup_blocked.result/v1" or not res.get("equality_all_identical"):
+        raise SystemExit("pair-table set-up result: unexpected schema or an equality failure")
+    return {**res, "study": "research/ic_oracle_setup_blocked_20261020/",
+            "report": "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
+            "class": "engineering"}
+
+
 def latest_frontier_audit() -> dict:
     """Copy the latest performance handoff into the generated board.
 
@@ -639,15 +659,17 @@ def latest_frontier_audit() -> dict:
             or effect.get("generated_audit_record_required") is not True
             or cold.get("method") != "rho.signed_frobenius_strong"
             or cold.get("bound_id") != "ECBND1h05a2ea918f3c"
-            or n61.get("status") != "admitted online"
+            or n61.get("status") != "superseded (empty-table rho)"
             or n61.get("targets") != 64
-            or n83.get("status") != "exploratory one point"
+            or n83.get("status") != "superseded (empty-table rho)"
             or n83.get("targets") != 1
             or "not a matched cold ratio" not in n83.get("setup_inclusive_class", "")
             or failed.get("ok") is not False
             or failed.get("replays_identical") != 120
             or failed.get("replays_total") != 168
-            or failed.get("failures") != 48):
+            or failed.get("failures") != 48
+            or failed.get("current_main_replay", {}).get("identical") != 72
+            or failed.get("current_main_replay", {}).get("total") != 168):
         raise SystemExit("review the ECBench frontier audit before updating the leaderboard")
     opt_callgrind = rho_opt.get("callgrind", {})
     opt_session = rho_opt.get("ecbench_session", {})
@@ -709,17 +731,19 @@ def latest_frontier_audit() -> dict:
             "label": n61["label"], "rho_over_ic": n61["online_rho_over_ic"],
             "ci95": n61["online_ci95"], "targets": n61["targets"],
             "setup_seconds_approx": n61["setup_seconds_approx"], "status": n61["status"],
+            "correction": n61["correction"],
         },
         "exploratory_online": {
             "label": n83["label"], "rho_over_ic": n83["online_rho_over_ic"],
             "targets": n83["targets"], "complete_process_seconds": n83["complete_process_seconds"],
             "setup_inclusive_class": n83["setup_inclusive_class"],
             "first_integer_break_even_under_model": n83["first_integer_break_even_under_model"],
-            "status": n83["status"],
+            "status": n83["status"], "correction": n83["correction"],
         },
         "replay_block": {
             "identical": failed["replays_identical"], "total": failed["replays_total"],
             "failures": failed["failures"], "scope": failed["failure_scope"],
+            "current": failed["current_main_replay"],
         },
     }
 
@@ -1113,6 +1137,7 @@ def build() -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "pair_table_component": pair_table_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -1195,18 +1220,22 @@ def markdown(doc: dict) -> str:
           f"`{cold['bound_id']}`: {cold['ops_over_floor']:.3f}× floor "
           f"[{cold['ops_ci95'][0]:.3f}, {cold['ops_ci95'][1]:.3f}], "
           f"{cold['runs']} runs at {cold['sizes']} sizes | Standing rho boundary; not an IC row |",
-          f"| Retained-setup online, `{admitted['label']}` | rho/IC "
+          f"| Retained-setup online, `{admitted['label']}` | ~~rho/IC "
           f"{admitted['rho_over_ic']:.1f}× [{admitted['ci95'][0]:.1f}, "
           f"{admitted['ci95'][1]:.1f}], {admitted['targets']} unseen targets; about "
-          f"{admitted['setup_seconds_approx']:.0f} s setup excluded | Admitted online result; "
-          "kept separate from cold ranked rows |",
-          f"| Retained-setup online, `{exploratory['label']}` | rho/IC "
+          f"{admitted['setup_seconds_approx']:.0f} s setup excluded~~ | **Superseded** (rho had an empty "
+          f"table); not an improvement. {admitted['correction']} |",
+          f"| Retained-setup online, `{exploratory['label']}` | ~~rho/IC "
           f"{exploratory['rho_over_ic']:.6f}× on {exploratory['targets']} public point; complete IC "
-          f"process {exploratory['complete_process_seconds']:.3f} s | Exploratory shared-host result; "
-          "no matched cold ratio and no rank promotion |",
-          f"| Current-binary root-finder replay-all | {replay['identical']}/{replay['total']} identical; "
-          f"{replay['failures']} inherited-F4 counter mismatches | Failed replay retained; affected "
-          "stage counters blocked from promotion |", "",
+          f"process {exploratory['complete_process_seconds']:.3f} s~~ | **Superseded** (rho had an empty "
+          f"table); not an improvement. {exploratory['correction']} |",
+          f"| Current-binary root-finder replay-all | current main (2026-10-19): "
+          f"{replay['current']['identical']}/{replay['current']['total']} identical; "
+          f"{replay['current']['failures']} mismatches across all four IC arms; the 2026-10-13 receipt "
+          f"recorded {replay['identical']}/{replay['total']} with {replay['failures']} inherited-F4 "
+          "mismatches | **Open regression** under investigation (sweep D, PR #2290); root-finder rows "
+          "are not claimed to pass; affected stage counters blocked from promotion. "
+          f"{replay['current']['correction']} |", "",
           f"[Latest result data](../../{audit['source']}); "
           f"[prior full synthesis](../../{audit['previous_source']}). {audit['reason']}", ""]
     for code in ("A", "B", "C"):
@@ -1453,6 +1482,53 @@ def markdown(doc: dict) -> str:
                      f"{a['folded_columns'] if a['folded_columns'] is not None else '—'} | {s_txt} | "
                      f"{qmd(q) if q else ('reference' if a['arm'] == 'rho-strong' else 'A/A control')} |")
         L.append(f"| `{c['curve']}` | {c['log2_r']:.2f} | K16 / K8 | — | — | — | — | {qmd(c['k16_over_k8'])} |")
+    L.append("")
+    la = doc["linear_algebra_component"]
+    L += ["## Linear-algebra engine, outside tables A–C", "",
+          "The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime "
+          "(class: engineering). Whole solve from relation rows to verified logarithms, median of 3 "
+          "seeds in one session; ratios are per-seed medians [min, max]. `legacy` is the filter tables "
+          "A–C were measured with; `CADO-style` is `FilterOptions::cado()` (CADO-NFS's purge and merge, "
+          "ported), the `ic logs` default since #1861; CADO-NFS ran its own purge + merge-dl + bwc on "
+          "the same matrices (+1 coefficients). Its share of S in every row above is in the phase table, "
+          f"and no row moves. Study: [{la['study']}](../../{la['study']}).", "",
+          "| columns | legacy | CADO-style | legacy / CADO-style | CADO-NFS | CADO-NFS / ours | core: legacy → CADO-style (CADO-NFS) |",
+          "|--:|--:|--:|:--|--:|:--|:--|"]
+
+    def lat(q):
+        return secs(q["median"])
+
+    def lar(q):
+        return f"{q['median']:.2f}× [{q['min']:.2f}, {q['max']:.2f}]"
+    for r in la["rows"]:
+        L.append(f"| {r['columns']:,} | {lat(r['legacy_s'])} | {lat(r['cado_style_s'])} | "
+                 f"{lar(r['legacy_over_cado_style'])} | {lat(r['cado_nfs_s'])} | {lar(r['cado_nfs_over_ours'])} | "
+                 f"{r['core_legacy']:,} → {r['core_cado_style']:,} ({r['core_cado_nfs']:,}) |")
+    L.append("")
+    pt = doc["pair_table_component"]
+    L += ["## Pair-table set-up, outside tables A–C", "",
+          f"The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on {pt['curve']}, "
+          "three builders of the same table (class: engineering). `scalar` is `mitm:negation_folded=1`, "
+          "one affine addition per pair into one hash map; `batched` is `mitm-prime-batch`, one batched "
+          "inversion per row; `blocked` is `mitm-prime-blocked`, the batched arithmetic inserted into "
+          "cache-sized packed regions. Every arm counts the same additions and recovers the same "
+          f"logarithm ({pt['identical_executions']}/{pt['executions']} executions identical), so S and "
+          "every row above are unchanged. Mean wall per run; ratios Σ blocked / Σ other over "
+          f"(target, round) pairs [per-pair min, max]; A/A {pt['aa_setup_ratio_sum']:.2f} "
+          f"[{pt['aa_setup_pair_ratio'][0]:.2f}, {pt['aa_setup_pair_ratio'][1]:.2f}]. "
+          f"Isolation {pt['isolation']}: descriptive. Study: [{pt['study']}](../../{pt['study']}).", "",
+          "| N | set-up scalar | set-up batched | set-up blocked | blocked / batched | blocked / scalar | whole run blocked / scalar | peak RSS batched → blocked |",
+          "|--:|--:|--:|--:|:--|:--|:--|:--|"]
+
+    def pts(ms):
+        return f"{ms:.0f} ms" if ms < 1000 else secs(ms / 1e3)
+
+    def ptr(q):
+        return f"{q['sum']:.2f} [{q['min']:.2f}, {q['max']:.2f}]"
+    for r in pt["rows"]:
+        L.append(f"| {r['N']:,} | {pts(r['setup_ms']['scalar'])} | {pts(r['setup_ms']['batch'])} | "
+                 f"{pts(r['setup_ms']['blocked'])} | {ptr(r['blocked_over_batch'])} | {ptr(r['blocked_over_scalar'])} | "
+                 f"{r['run_blocked_over_scalar']:.2f} | {r['rss_gib']['batch']:.2f} → {r['rss_gib']['blocked']:.2f} GiB |")
     L.append("")
     L += ["## Large-prime conductor-gap counted diagnostics", "",
           "Copied from native analysis: eight independent one-target workloads per fixed curve; "
@@ -1706,17 +1782,20 @@ def page(doc: dict, standalone: bool) -> str:
              f'{acold["ops_ci95"][1]:.3f}], {acold["runs"]} runs at {acold["sizes"]} sizes</td>'
              '<td>Standing rho boundary; not an IC row</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(admitted["label"])}</code></td>'
-             f'<td>rho/IC {admitted["rho_over_ic"]:.1f}× [{admitted["ci95"][0]:.1f}, '
+             f'<td><s>rho/IC {admitted["rho_over_ic"]:.1f}× [{admitted["ci95"][0]:.1f}, '
              f'{admitted["ci95"][1]:.1f}], {admitted["targets"]} unseen targets; about '
-             f'{admitted["setup_seconds_approx"]:.0f} s setup excluded</td>'
-             '<td>Admitted online result; separate from cold ranked rows</td></tr>'
+             f'{admitted["setup_seconds_approx"]:.0f} s setup excluded</s></td>'
+             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(admitted["correction"])}</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(exploratory["label"])}</code></td>'
-             f'<td>rho/IC {exploratory["rho_over_ic"]:.6f}× on {exploratory["targets"]} public point; '
-             f'complete IC process {exploratory["complete_process_seconds"]:.3f} s</td>'
-             '<td>Exploratory shared-host result; no matched cold ratio and no rank promotion</td></tr>'
-             f'<tr><td>Current-binary root-finder replay-all</td><td>{replay["identical"]}/'
-             f'{replay["total"]} identical; {replay["failures"]} inherited-F4 counter mismatches</td>'
-             '<td>Failed replay retained; affected stage counters blocked from promotion</td></tr>'
+             f'<td><s>rho/IC {exploratory["rho_over_ic"]:.6f}× on {exploratory["targets"]} public point; '
+             f'complete IC process {exploratory["complete_process_seconds"]:.3f} s</s></td>'
+             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(exploratory["correction"])}</td></tr>'
+             f'<tr><td>Current-binary root-finder replay-all</td><td>current main (2026-10-19): '
+             f'{replay["current"]["identical"]}/{replay["current"]["total"]} identical; '
+             f'{replay["current"]["failures"]} mismatches across all four IC arms; the 2026-10-13 receipt '
+             f'recorded {replay["identical"]}/{replay["total"]} with {replay["failures"]} inherited-F4 mismatches</td>'
+             '<td><b>Open regression</b> under investigation (sweep D, PR #2290); root-finder rows are not '
+             f'claimed to pass; affected stage counters blocked from promotion. {esc(replay["current"]["correction"])}</td></tr>'
              '</tbody></table></div>'
              f'<p>{esc(audit["reason"])} {gh(audit["source"], "Latest result data")} · '
              f'{gh(audit["previous_source"], "prior full synthesis")}.</p></section>')
@@ -1863,6 +1942,53 @@ def page(doc: dict, standalone: bool) -> str:
                      f'<td>{qhtml(q) if q else ("reference" if a["arm"] == "rho-strong" else "A/A control")}</td></tr>')
         P.append(f'<tr><td><code>{esc(c["curve"])}</code></td><td class="n">{c["log2_r"]:.2f}</td><td>K16 / K8</td>'
                  f'<td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td>{qhtml(c["k16_over_k8"])}</td></tr>')
+    P.append('</tbody></table></section>')
+
+    la = doc["linear_algebra_component"]
+    P.append('<section class="card" id="linear-algebra-component"><h2>Linear-algebra engine, outside the priced tables</h2>'
+             '<p>The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime '
+             '(class: engineering). Whole solve from relation rows to verified logarithms, median of 3 seeds '
+             'in one session; ratios are per-seed medians [min, max]. <code>legacy</code> is the filter the '
+             'priced tables were measured with; <code>CADO-style</code> is CADO-NFS&#39;s purge and merge, '
+             'ported, the <code>ic logs</code> default; CADO-NFS ran its own pipeline on the same matrices. '
+             f'No row moves. <a href="https://github.com/aburan28/crypto/blob/main/{esc(la["study"])}">Study</a>.</p>')
+    P.append('<table><thead><tr><th class="n">Columns</th><th class="n">legacy</th><th class="n">CADO-style</th>'
+             '<th>legacy / CADO-style</th><th class="n">CADO-NFS</th><th>CADO-NFS / ours</th>'
+             '<th>Core: legacy → CADO-style (CADO-NFS)</th></tr></thead><tbody>')
+    for r in la["rows"]:
+        def lq(q):
+            return f'{q["median"]:.2f}× <span class="muted">[{q["min"]:.2f}, {q["max"]:.2f}]</span>'
+        P.append(f'<tr><td class="n">{r["columns"]:,}</td><td class="n">{secs(r["legacy_s"]["median"])}</td>'
+                 f'<td class="n">{secs(r["cado_style_s"]["median"])}</td><td>{lq(r["legacy_over_cado_style"])}</td>'
+                 f'<td class="n">{secs(r["cado_nfs_s"]["median"])}</td><td>{lq(r["cado_nfs_over_ours"])}</td>'
+                 f'<td>{r["core_legacy"]:,} → {r["core_cado_style"]:,} ({r["core_cado_nfs"]:,})</td></tr>')
+    P.append('</tbody></table></section>')
+    pt = doc["pair_table_component"]
+    P.append('<section class="card" id="pair-table-component"><h2>Pair-table set-up, outside the priced tables</h2>'
+             f'<p>The <code>ic.pipeline</code> oracle set-up (the negation-folded |F|² pair table) on '
+             f'<code>{esc(pt["curve"])}</code>, three builders of the same table (class: engineering): '
+             '<code>scalar</code> (<code>mitm:negation_folded=1</code>), <code>batched</code> '
+             '(<code>mitm-prime-batch</code>) and <code>blocked</code> (<code>mitm-prime-blocked</code>, '
+             'cache-sized packed regions). Every arm counts the same additions and recovers the same logarithm '
+             f'({pt["identical_executions"]}/{pt["executions"]} executions identical), so S and every row above '
+             'are unchanged. Mean wall per run; ratios Σ blocked / Σ other [per-pair min, max]; A/A '
+             f'{pt["aa_setup_ratio_sum"]:.2f} [{pt["aa_setup_pair_ratio"][0]:.2f}, {pt["aa_setup_pair_ratio"][1]:.2f}]. '
+             f'Isolation {esc(pt["isolation"])}: descriptive. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(pt["study"])}">Study</a>.</p>')
+    P.append('<table><thead><tr><th class="n">N</th><th class="n">scalar</th><th class="n">batched</th>'
+             '<th class="n">blocked</th><th>blocked / batched</th><th>blocked / scalar</th>'
+             '<th class="n">whole run blocked / scalar</th><th>peak RSS batched → blocked</th></tr></thead><tbody>')
+    for r in pt["rows"]:
+        def pq(q):
+            return f'{q["sum"]:.2f} <span class="muted">[{q["min"]:.2f}, {q["max"]:.2f}]</span>'
+
+        def pm(ms):
+            return f"{ms:.0f} ms" if ms < 1000 else secs(ms / 1e3)
+        P.append(f'<tr><td class="n">{r["N"]:,}</td><td class="n">{pm(r["setup_ms"]["scalar"])}</td>'
+                 f'<td class="n">{pm(r["setup_ms"]["batch"])}</td><td class="n">{pm(r["setup_ms"]["blocked"])}</td>'
+                 f'<td>{pq(r["blocked_over_batch"])}</td><td>{pq(r["blocked_over_scalar"])}</td>'
+                 f'<td class="n">{r["run_blocked_over_scalar"]:.2f}</td>'
+                 f'<td>{r["rss_gib"]["batch"]:.2f} → {r["rss_gib"]["blocked"]:.2f} GiB</td></tr>')
     P.append('</tbody></table></section>')
 
     head_cells = ('<th class="n">#</th><th>curve</th><th class="n">log₂ r</th><th>recipe</th>'
