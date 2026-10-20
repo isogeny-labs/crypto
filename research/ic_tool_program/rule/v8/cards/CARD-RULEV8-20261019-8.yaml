@@ -1,0 +1,40 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-RULEV8-20261019-8
+experiment_id: rule-v8
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: f0d4b271b4d66fd2ee952295a1d1bbd206aa9697
+receipt: research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-8.receipt.json
+binds:
+  - {path: research/ic_tool_program/rule/v8/PROTOCOL.md, sha256: 29e3a34e1aad9b3bb773f41ae3b9d4d99ecc7488e54f1eede408635db921b37c}
+  - {path: research/ic_tool_program/rule/v8/run.sh, sha256: 2af693345bbdb28f300e5ace050ea0bdcf11db1fa8f7c522b0a61c332796f33d}
+  - {path: research/ic_tool_program/rule/v8/history.json, sha256: 34184736d1e151311f1b95e48c21f9e13671aa87a0162ff15841200717f72dc1}
+  - {path: research/ic_tool_program/rule/v8c/PROTOCOL.md, sha256: 2886dc81b02bb19d778781102c6300e0b86cd90f41d36f44b56c8720768638e6}
+  - {path: /tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/icprog, sha256: 15e4a84352563b59efe2eda2aa28a997ba5e3034f22699ce218de0888d1c16e7}
+  - {path: /tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/ic, sha256: 3500e56bcb8d62caaa733e35deb0e7cb5d622ab19058dc1cffac00770c582982}
+  - {path: /tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/isolated_bench, sha256: 1bc76f0a599ceaa7a379255d838307a55229085574244534e1ebcffa4f09b410}
+  - {path: /tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/koblitz_rho_fixture, sha256: 22617a9971c1548f1f82c719aff512e981aa60b20eae98b2dc6af1561c8760cd}
+commands:
+  - id: v8c-manifest
+    argv: [/tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/icprog, rule, manifest, --comparison, v8c, --ic, /tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/ic, --ic-commit, 370e19193f6f30bf04ca2e82a2c3626932dc069e, --isolate, /tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/isolated_bench]
+    timeout_seconds: 7000
+    success_exit_codes: [0]
+    env: {KIC_RHO_CANON: scalar}
+    stdout: research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-8.v8c-manifest.stdout
+    stderr: research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-8.v8c-manifest.stderr
+  - id: v8c-all
+    argv: [/tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/icprog, rule, all, --comparison, v8c, --ic, /tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/ic, --ic-commit, 370e19193f6f30bf04ca2e82a2c3626932dc069e, --isolate, /tmp/claude-0/-home-user-crypto/d151e4fa-4939-59fc-93de-eb36719fcd93/scratchpad/rule8/bin/isolated_bench]
+    timeout_seconds: 7000
+    success_exit_codes: [0]
+    env: {KIC_RHO_CANON: scalar}
+    stdout: research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-8.v8c-all.stdout
+    stderr: research/ic_tool_program/rule/v8/cards/CARD-RULEV8-20261019-8.v8c-all.stderr
+bus_address: executor-mechanical-rulev8-8
+background: true
+write_scope: [research/ic_tool_program/rule/v8/, research/ic_tool_program/rule/v8c/]
+stop_when:
+  - Any command exits with a status other than 0.
+  - A command is stopped by its timeout.
+notes: >-
+  Nothing else may run on this host while this card executes: the runner waits on host pressure (PSI) and any other load makes it refuse or re-run rows. Run from the repository root. This card sets KIC_RHO_CANON=scalar on every command and nothing else. The runner resumes what the run tree holds (this card has no must_not_exist); receipts are write-once, so a repeat run needs a new card id. Commands copy run.sh for comparison v8c.

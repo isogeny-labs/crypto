@@ -23,6 +23,11 @@
       "Type": "String",
       "Default": "eipalloc-00c2a8a867901bf7d"
     },
+    "ProtectedSource": {
+      "Type": "String",
+      "Default": "i-01f85a6c905181498",
+      "AllowedPattern": "(i-[a-f0-9]+|)"
+    },
     "LifecycleEnabled": {
       "Type": "String",
       "Default": "false",
@@ -39,7 +44,7 @@
     },
     "RuntimeDigest": {
       "Type": "String",
-      "Default": "4e9e3899571becd92a001dd545bfadca6aa26419c4b7b24f2d0bfc611b447eb2",
+      "Default": "fb8949d0ebe04eefffd0bbaa3a987468c497a92d49314b242814d8638a7f1932",
       "AllowedPattern": "([a-f0-9]{64}|unpublished)"
     },
     "NodeProject": {
@@ -89,6 +94,18 @@
           "Fn::Equals": [
             {
               "Ref": "AlarmTopicArn"
+            },
+            ""
+          ]
+        }
+      ]
+    },
+    "LegacyProtection": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "ProtectedSource"
             },
             ""
           ]
@@ -337,14 +354,48 @@
                 {
                   "Effect": "Allow",
                   "Action": "s3:GetObject",
+                  "Resource": [
+                    {
+                      "Fn::Sub": "${RuntimeBucket.Arn}/runtime/*"
+                    },
+                    {
+                      "Fn::Sub": "${RuntimeBucket.Arn}/checkpoints/criu/*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:PutObject",
+                    "s3:AbortMultipartUpload"
+                  ],
                   "Resource": {
-                    "Fn::Sub": "${RuntimeBucket.Arn}/runtime/*"
+                    "Fn::Sub": "${RuntimeBucket.Arn}/checkpoints/criu/*"
                   }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "ec2:DescribeInstances",
+                  "Resource": "*"
                 },
                 {
                   "Effect": "Allow",
                   "Action": "autoscaling:DescribeAutoScalingInstances",
                   "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "cloudformation:DescribeStacks",
+                  "Resource": {
+                    "Ref": "AWS::StackId"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "lambda:InvokeFunction",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-Lifecycle-*"
+                  }
                 },
                 {
                   "Effect": "Allow",
@@ -359,7 +410,25 @@
                     "ForAllValues:StringLike": {
                       "dynamodb:LeadingKeys": [
                         "activity#*",
-                        "lifecycle-lock"
+                        "lifecycle-lock",
+                        "legacy-owner*"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "dynamodb:UpdateItem",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "ControllerLock",
+                      "Arn"
+                    ]
+                  },
+                  "Condition": {
+                    "ForAllValues:StringLike": {
+                      "dynamodb:LeadingKeys": [
+                        "legacy-owner*"
                       ]
                     }
                   }
@@ -377,7 +446,8 @@
                     "ForAllValues:StringLike": {
                       "dynamodb:LeadingKeys": [
                         "control",
-                        "activity#*"
+                        "activity#*",
+                        "legacy-owner*"
                       ]
                     }
                   }
@@ -413,7 +483,8 @@
                     },
                     "ForAllValues:StringEquals": {
                       "aws:TagKeys": [
-                        "SpotReady"
+                        "SpotReady",
+                        "LegacyReady"
                       ]
                     }
                   }
@@ -475,7 +546,7 @@
           ],
           "UserData": {
             "Fn::Base64": {
-              "Fn::Sub": "#!/bin/bash\nset -euo pipefail\n# AL2023 supplies /usr/bin/aws in the AMI; there is no awscli2 RPM.\ncommand -v aws\ndnf install -y amazon-efs-utils python3 postgresql17-server\nmkdir -p /srv/experiments\necho '${FileSystem}:/ /srv/experiments efs _netdev,tls,iam,noresvport 0 0' >> /etc/fstab\nmount /srv/experiments\nchown ec2-user:ec2-user /srv/experiments\n# Fail closed if the operator has not finished durable migration and the job manifest.\ntest -f '${WorkRoot}/jobs.json'\naws s3 cp 's3://${RuntimeBucket}/runtime/${RuntimeDigest}.tar.gz' /tmp/spot-runtime.tar.gz --region '${AWS::Region}'\necho '${RuntimeDigest}  /tmp/spot-runtime.tar.gz' | sha256sum -c -\nmkdir -p /opt/spot\ntar -xzf /tmp/spot-runtime.tar.gz -C /opt/spot\n# Reusing existing private host keys requires explicit operator authorization.\n# The default keeps each replacement's own keys; verify fingerprints through SSM.\nif [ '${PreserveHostKeys}' = 'true' ]; then\n  test -f /srv/experiments/ssh-host-keys/ssh_host_ed25519_key\n  cp -a /srv/experiments/ssh-host-keys/ssh_host_* /etc/ssh/\n  restorecon -R /etc/ssh\n  systemctl restart sshd\nfi\nmkdir -p '${NodeProject}'\nchown ec2-user:ec2-user '${NodeProject}'\nrunuser -u ec2-user -- python3 /opt/spot/runner.py --root '${WorkRoot}' --validate\n# Prove durable checkpoint selection/restore before publishing readiness.\n# The private temporary workspace is separate from registered workloads.\nrunuser -u ec2-user -- env SPOT_SELFTEST_RUNTIME=/opt/spot SPOT_SELFTEST_PARENT='${WorkRoot}' /opt/spot/bin/checkpoint-selftest --exact supervisor_restores_a_discovered_generation_after_abrupt_worker_death --nocapture > /var/log/spot-checkpoint-selftest.log 2>&1\nrunuser -u ec2-user -- env SPOT_NATIVE_TEST_PARENT='${WorkRoot}' /opt/spot/bin/solver-checkpoint-selftest --exact cryptanalysis::koblitz_groebner::checkpoint::tests::real_solver_recovers_after_sigkill_and_rejects_corruption --nocapture > /var/log/spot-native-checkpoint-selftest.log 2>&1\n# Future jobs reference this immutable runtime path, not the live legacy binary.\nmkdir -p '${WorkRoot}/bin/${RuntimeDigest}'\ninstall -m 755 /opt/spot/bin/factor-base-shape-ladder '${WorkRoot}/bin/${RuntimeDigest}/factor_base_shape_ladder'\npython3 /opt/spot/install_services.py --root '${WorkRoot}' --project '${NodeProject}' --table '${ControllerLock}' --region '${AWS::Region}'\nnode_ready=0\nfor attempt in $(seq 150); do\n  if curl -fsS --max-time 2 http://127.0.0.1:9180/health >/dev/null && curl -fsS --max-time 2 http://127.0.0.1:8080/ >/dev/null; then\n    node_ready=1\n    break\n  fi\n  sleep 2\ndone\ntest \"$node_ready\" -eq 1\nsystemctl is-active --quiet sshd\nsystemctl is-active --quiet spot-experiments\nsystemctl is-active --quiet spot-activity\nsystemctl is-active --quiet spot-checkpoint-discovery.timer\nTOKEN=$(curl -fsS --max-time 3 -X PUT -H 'X-aws-ec2-metadata-token-ttl-seconds: 60' http://169.254.169.254/latest/api/token)\nINSTANCE=$(curl -fsS --max-time 3 -H \"X-aws-ec2-metadata-token: $TOKEN\" http://169.254.169.254/latest/meta-data/instance-id)\naws ec2 create-tags --region '${AWS::Region}' --resources \"$INSTANCE\" --tags Key=SpotReady,Value=true\n"
+              "Fn::Sub": "#!/bin/bash\nset -euo pipefail\n# AL2023 supplies /usr/bin/aws in the AMI; there is no awscli2 RPM.\ncommand -v aws\ndnf install -y amazon-efs-utils python3 postgresql17-server zstd libnet libnl3 protobuf-c libaio git gcc make openssl-devel pkgconf-pkg-config\nmkdir -p /srv/experiments\necho '${FileSystem}:/ /srv/experiments efs _netdev,tls,iam,noresvport 0 0' >> /etc/fstab\nmount /srv/experiments\nchown ec2-user:ec2-user /srv/experiments\n# Fail closed if the operator has not finished durable migration and the job manifest.\ntest -f '${WorkRoot}/jobs.json'\naws s3 cp 's3://${RuntimeBucket}/runtime/${RuntimeDigest}.tar.gz' /tmp/spot-runtime.tar.gz --region '${AWS::Region}'\necho '${RuntimeDigest}  /tmp/spot-runtime.tar.gz' | sha256sum -c -\nmkdir -p /opt/spot\ntar -xzf /tmp/spot-runtime.tar.gz -C /opt/spot\nmkdir -p /opt/spot-criu\nfor module in criu_local.py criu_export.py legacy_recovery.py; do\n  install -m 700 \"/opt/spot/$module\" \"/opt/spot-criu/$module\"\ndone\ninstall -m 700 /opt/spot/bin/criu-4.2.1 /opt/spot-criu/criu\ninstall -m 644 /opt/spot/spot-legacy-backup.service /opt/spot/spot-legacy-backup.timer /opt/spot/spot-diem-backup.service /opt/spot/spot-diem-backup.timer /etc/systemd/system/\n# Both producers use the same reviewed modules on replacements.\nmkdir -p /opt/spot-criu-diem\nfor module in criu_local.py criu_export.py legacy_recovery.py; do\n  ln -sf \"/opt/spot-criu/$module\" \"/opt/spot-criu-diem/$module\"\ndone\n# Reusing existing private host keys requires explicit operator authorization.\n# The default keeps each replacement's own keys; verify fingerprints through SSM.\nif [ '${PreserveHostKeys}' = 'true' ]; then\n  test -f /srv/experiments/ssh-host-keys/ssh_host_ed25519_key\n  cp -a /srv/experiments/ssh-host-keys/ssh_host_* /etc/ssh/\n  restorecon -R /etc/ssh\n  systemctl restart sshd\nfi\nmkdir -p '${NodeProject}'\nchown ec2-user:ec2-user '${NodeProject}'\n# Preserve durable checkouts. Populate a new empty workspace without fetching\n# historical research blobs; no checkout is overwritten during replacement.\nif [ ! -d '${NodeProject}/.git' ]; then\n  test -z \"$(ls -A '${NodeProject}')\"\n  runuser -u ec2-user -- git clone --filter=blob:none --depth 1 --sparse --no-checkout https://github.com/aburan28/crypto.git '${NodeProject}'\n  runuser -u ec2-user -- git -C '${NodeProject}' fetch --depth 1 origin fa8948a7f90b05c1fb127a908ac083ef5be69208\n  runuser -u ec2-user -- git -C '${NodeProject}' sparse-checkout set src examples benches .cargo .agents scripts docs assets problems tests\n  runuser -u ec2-user -- git -C '${NodeProject}' checkout --detach fa8948a7f90b05c1fb127a908ac083ef5be69208\nfi\nif [ ! -x /home/ec2-user/.cargo/bin/cargo ]; then\n  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o /tmp/spot-rustup.sh\n  runuser -u ec2-user -- sh /tmp/spot-rustup.sh -y --profile minimal --default-toolchain 1.99.1\nfi\nrunuser -u ec2-user -- python3 /opt/spot/runner.py --root '${WorkRoot}' --validate\n# Prove durable checkpoint selection/restore before publishing readiness.\n# The private temporary workspace is separate from registered workloads.\nrunuser -u ec2-user -- env SPOT_SELFTEST_RUNTIME=/opt/spot SPOT_SELFTEST_PARENT='${WorkRoot}' /opt/spot/bin/checkpoint-selftest --exact supervisor_restores_a_discovered_generation_after_abrupt_worker_death --nocapture > /var/log/spot-checkpoint-selftest.log 2>&1\nrunuser -u ec2-user -- env SPOT_NATIVE_TEST_PARENT='${WorkRoot}' /opt/spot/bin/solver-checkpoint-selftest --exact cryptanalysis::koblitz_groebner::checkpoint::tests::real_solver_recovers_after_sigkill_and_rejects_corruption --nocapture > /var/log/spot-native-checkpoint-selftest.log 2>&1\n# Future jobs reference this immutable runtime path, not the live legacy binary.\nmkdir -p '${WorkRoot}/bin/${RuntimeDigest}'\ninstall -m 755 /opt/spot/bin/factor-base-shape-ladder '${WorkRoot}/bin/${RuntimeDigest}/factor_base_shape_ladder'\npython3 /opt/spot/install_services.py --root '${WorkRoot}' --project '${NodeProject}' --table '${ControllerLock}' --region '${AWS::Region}' --legacy-origin '${ProtectedSource}' --stack '${AWS::StackName}'\nnode_ready=0\nfor attempt in $(seq 150); do\n  if curl -fsS --max-time 2 http://127.0.0.1:9180/health >/dev/null && curl -fsS --max-time 2 http://127.0.0.1:8080/ >/dev/null; then\n    node_ready=1\n    break\n  fi\n  sleep 2\ndone\ntest \"$node_ready\" -eq 1\nsystemctl is-active --quiet sshd\nsystemctl is-active --quiet spot-experiments\nsystemctl is-active --quiet spot-activity\nsystemctl is-active --quiet spot-checkpoint-discovery.timer\nTOKEN=$(curl -fsS --max-time 3 -X PUT -H 'X-aws-ec2-metadata-token-ttl-seconds: 60' http://169.254.169.254/latest/api/token)\nINSTANCE=$(curl -fsS --max-time 3 -H \"X-aws-ec2-metadata-token: $TOKEN\" http://169.254.169.254/latest/meta-data/instance-id)\naws ec2 create-tags --region '${AWS::Region}' --resources \"$INSTANCE\" --tags Key=SpotReady,Value=true\n"
             }
           }
         }
@@ -530,14 +601,22 @@
                     "Max": 0
                   },
                   "LocalStorage": "excluded",
-                  "AllowedInstanceTypes": [
-                    "m6i.*",
-                    "m6a.*",
-                    "m7i.*",
-                    "m7a.*",
-                    "m8i.*",
-                    "m8a.*"
-                  ],
+                  "AllowedInstanceTypes": {
+                    "Fn::If": [
+                      "LegacyProtection",
+                      [
+                        "m8i.*"
+                      ],
+                      [
+                        "m6i.*",
+                        "m6a.*",
+                        "m7i.*",
+                        "m7a.*",
+                        "m8i.*",
+                        "m8a.*"
+                      ]
+                    ]
+                  },
                   "MaxSpotPriceAsPercentageOfOptimalOnDemandPrice": {
                     "Ref": "PriceProtectionPercent"
                   }
@@ -591,6 +670,7 @@
                 {
                   "Effect": "Allow",
                   "Action": [
+                    "dynamodb:GetItem",
                     "dynamodb:PutItem",
                     "dynamodb:DeleteItem"
                   ],
@@ -599,6 +679,33 @@
                       "ControllerLock",
                       "Arn"
                     ]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "dynamodb:UpdateItem",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "ControllerLock",
+                      "Arn"
+                    ]
+                  },
+                  "Condition": {
+                    "ForAllValues:StringLike": {
+                      "dynamodb:LeadingKeys": [
+                        "legacy-owner*"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "autoscaling:SetDesiredCapacity",
+                    "autoscaling:UpdateAutoScalingGroup"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:autoscaling:${AWS::Region}:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/${Group}"
                   }
                 },
                 {
@@ -688,11 +795,15 @@
             },
             "LOCK_TABLE": {
               "Ref": "ControllerLock"
-            }
+            },
+            "PROTECTED_SOURCE": {
+              "Ref": "ProtectedSource"
+            },
+            "LEGACY_OWNER_KEYS": "legacy-owner,legacy-owner-diem"
           }
         },
         "Code": {
-          "ZipFile": "\"\"\"Scheduled Elastic IP reconciliation. AWS Lambda supplies boto3.\"\"\"\nimport logging\nimport os\nimport time\n\nlog = logging.getLogger(__name__)\nlog.setLevel(logging.INFO)\n\n\ndef reconcile(ec2, autoscaling, group, allocation, enabled):\n    if not enabled:\n        return {\"state\": \"staged\"}\n    groups = autoscaling.describe_auto_scaling_groups(\n        AutoScalingGroupNames=[group])[\"AutoScalingGroups\"]\n    if len(groups) != 1:\n        raise RuntimeError(\"Expected exactly one Auto Scaling group\")\n    ids = [i[\"InstanceId\"] for i in groups[0][\"Instances\"]\n           if i[\"LifecycleState\"] == \"InService\" and i[\"HealthStatus\"] == \"Healthy\"]\n    if not ids:\n        return {\"state\": \"waiting-for-capacity\"}\n    instances = [i for r in ec2.describe_instances(InstanceIds=ids)[\"Reservations\"]\n                 for i in r[\"Instances\"]]\n    statuses = ec2.describe_instance_status(InstanceIds=ids)[\"InstanceStatuses\"]\n    healthy = {s[\"InstanceId\"] for s in statuses\n               if s[\"SystemStatus\"][\"Status\"] == \"ok\"\n               and s[\"InstanceStatus\"][\"Status\"] == \"ok\"}\n    ready = [i for i in instances if i[\"InstanceId\"] in healthy\n             and i[\"State\"][\"Name\"] == \"running\"\n             and {t[\"Key\"]: t[\"Value\"] for t in i.get(\"Tags\", [])}.get(\"SpotReady\") == \"true\"]\n    if not ready:\n        return {\"state\": \"waiting-for-bootstrap\"}\n    newest = max(ready, key=lambda i: (i[\"LaunchTime\"], i[\"InstanceId\"]))\n    address = ec2.describe_addresses(AllocationIds=[allocation])[\"Addresses\"][0]\n    target = newest[\"InstanceId\"]\n    if address.get(\"InstanceId\") == target:\n        return {\"state\": \"attached\", \"instance\": target}\n    ec2.associate_address(AllocationId=allocation, InstanceId=target, AllowReassociation=True)\n    log.info(\"Moved address %s to ready instance %s\", allocation, target)\n    return {\"state\": \"moved\", \"instance\": target}\n\n\ndef handler(event, context):\n    import boto3\n    if os.environ.get(\"ENABLED\") != \"true\":\n        return {\"state\": \"staged\"}\n    db = boto3.client(\"dynamodb\")\n    now = int(time.time())\n    key = {\"Id\": {\"S\": \"ip-controller\"}}\n    try:\n        db.put_item(TableName=os.environ[\"LOCK_TABLE\"],\n                    Item={**key, \"Owner\": {\"S\": context.aws_request_id},\n                          \"Expires\": {\"N\": str(now + 90)}},\n                    ConditionExpression=\"attribute_not_exists(Id) OR Expires < :now\",\n                    ExpressionAttributeValues={\":now\": {\"N\": str(now)}})\n    except db.exceptions.ConditionalCheckFailedException:\n        return {\"state\": \"another-controller-active\"}\n    try:\n        return reconcile(boto3.client(\"ec2\"), boto3.client(\"autoscaling\"),\n                         os.environ[\"GROUP\"], os.environ[\"ALLOCATION\"], True)\n    finally:\n        db.delete_item(TableName=os.environ[\"LOCK_TABLE\"], Key=key,\n                       ConditionExpression=\"#owner = :owner\",\n                       ExpressionAttributeNames={\"#owner\": \"Owner\"},\n                       ExpressionAttributeValues={\":owner\": {\"S\": context.aws_request_id}})\n"
+          "ZipFile": "\"\"\"Scheduled Elastic IP reconciliation. AWS Lambda supplies boto3.\"\"\"\nimport logging\nimport os\nimport re\nimport time\n\nlog = logging.getLogger(__name__)\nlog.setLevel(logging.INFO)\n\n\ndef release_legacy_cpu_restriction(autoscaling, group, complete=True):\n    current = autoscaling.describe_auto_scaling_groups(AutoScalingGroupNames=[group])['AutoScalingGroups'][0]\n    policy = current.get('MixedInstancesPolicy', {})\n    overrides = policy.get('LaunchTemplate', {}).get('Overrides', [])\n    desired=['m6i.*','m6a.*','m7i.*','m7a.*','m8i.*','m8a.*'] if complete else ['m8i.*']\n    if len(overrides)==1 and overrides[0].get('InstanceRequirements') and overrides[0]['InstanceRequirements'].get('AllowedInstanceTypes')!=desired:\n        requirements = overrides[0]['InstanceRequirements']\n        requirements['AllowedInstanceTypes'] = desired\n        requirements['CpuManufacturers'] = ['intel','amd']\n        specification = policy['LaunchTemplate']['LaunchTemplateSpecification']\n        if specification.get('LaunchTemplateId'):\n            specification.pop('LaunchTemplateName', None)\n        autoscaling.update_auto_scaling_group(AutoScalingGroupName=group, MixedInstancesPolicy=policy)\n\n\ndef source_state(ec2, source, ownership):\n    if ownership.get('OriginTerminated', {}).get('BOOL') is True:\n        return 'terminated'\n    if (ownership.get('OriginReleased', {}).get('BOOL') is True\n            and re.fullmatch(r'[0-9a-f]{64}', ownership.get('ReleaseReceipt', {}).get('S', ''))):\n        return 'released'\n    instances = [i for r in ec2.describe_instances(InstanceIds=[source])['Reservations'] for i in r['Instances']]\n    if len(instances) != 1:\n        raise RuntimeError('Protected source state is unknown')\n    return instances[0]['State']['Name']\n\n\ndef retain_confirmed_termination(db, ec2, table, source, records):\n    \"\"\"Keep irreversible death evidence through long Spot capacity gaps.\n\n    Missing/expired heartbeats and missing EC2 records are not death evidence.\n    Conditional writes cannot attach an old owner's death to its successor.\n    \"\"\"\n    confirmed = {'OriginTerminated': {'BOOL': any(\n        record.get('OriginTerminated', {}).get('BOOL') is True for record in records.values())}}\n    released = [r for r in records.values() if origin_released(r, source)]\n    if released and all(r.get('Complete', {}).get('BOOL') is True or\n                        origin_released(r, source) for r in records.values()):\n        confirmed.update(OriginReleased={'BOOL':True}, ReleaseReceipt=released[0]['ReleaseReceipt'])\n    original_state = source_state(ec2, source, confirmed)\n    if original_state not in {'terminated', 'released'}:\n        return\n    states = {source: original_state}\n    for key, record in records.items():\n        if not record:\n            continue\n        if record.get('Origin', {}).get('S') != source:\n            raise ValueError('Legacy ownership origin mismatch')\n        owner = record['Owner']['S']\n        dead = record.get('OwnerTerminated', {}).get('BOOL') is True\n        if not dead:\n            if owner not in states:\n                states[owner] = source_state(ec2, owner, {})\n            dead = states[owner] == 'terminated'\n        changes = {}\n        if original_state == 'terminated' and record.get('OriginTerminated', {}).get('BOOL') is not True:\n            changes['OriginTerminated'] = {'BOOL': True}\n        if dead and record.get('OwnerTerminated', {}).get('BOOL') is not True:\n            changes['OwnerTerminated'] = {'BOOL': True}\n        if changes:\n            values = {':'+name:value for name,value in changes.items()}\n            db.update_item(TableName=table, Key={'Id': {'S': key}},\n                UpdateExpression='SET '+', '.join(name+' = :'+name for name in changes),\n                ConditionExpression='#owner = :owner AND #origin = :origin',\n                ExpressionAttributeNames={'#owner':'Owner', '#origin':'Origin'},\n                ExpressionAttributeValues={**values, ':owner':{'S':owner}, ':origin':{'S':source}})\n            record.update(changes)\n\n\ndef origin_released(record, source):\n    return (record.get('Origin', {}).get('S') == source\n            and record.get('OriginReleased', {}).get('BOOL') is True\n            and re.fullmatch(r'[0-9a-f]{64}', record.get('ReleaseReceipt', {}).get('S', '')) is not None)\n\n\ndef reconcile(ec2, autoscaling, group, allocation, enabled, source='', ownership=None):\n    if not enabled:\n        return {\"state\": \"staged\"}\n    owners=ownership if isinstance(ownership,list) else [ownership or {}]\n    if source and any(o and o.get('Origin',{}).get('S',source)!=source for o in owners):\n        raise ValueError('Legacy ownership origin mismatch')\n    ownership={'OriginTerminated':{'BOOL':any(o.get('OriginTerminated',{}).get('BOOL') is True for o in owners)},\n               'Complete':{'BOOL':all(o.get('Complete',{}).get('BOOL') is True for o in owners)}}\n    released = [o for o in owners if origin_released(o, source)]\n    if released and all(o.get('Complete',{}).get('BOOL') is True or\n                        origin_released(o, source) for o in owners):\n        ownership.update(OriginReleased={'BOOL':True}, ReleaseReceipt=released[0]['ReleaseReceipt'])\n    if source:\n        if source_state(ec2, source, ownership) not in {'terminated', 'released'}:\n            return {'state':'protected-source-active','instance':source}\n        if ownership.get('Complete', {}).get('BOOL') is not True:\n            # Demand persists through Spot capacity gaps; root recovery uses the\n            # same irreversible-death ownership fence before running an image.\n            autoscaling.set_desired_capacity(AutoScalingGroupName=group,\n                                            DesiredCapacity=1, HonorCooldown=False)\n    groups = autoscaling.describe_auto_scaling_groups(\n        AutoScalingGroupNames=[group])[\"AutoScalingGroups\"]\n    if len(groups) != 1:\n        raise RuntimeError(\"Expected exactly one Auto Scaling group\")\n    ids = [i[\"InstanceId\"] for i in groups[0][\"Instances\"]\n           if i[\"LifecycleState\"] == \"InService\" and i[\"HealthStatus\"] == \"Healthy\"]\n    if not ids:\n        return {\"state\": \"waiting-for-capacity\"}\n    instances = [i for r in ec2.describe_instances(InstanceIds=ids)[\"Reservations\"]\n                 for i in r[\"Instances\"]]\n    statuses = ec2.describe_instance_status(InstanceIds=ids)[\"InstanceStatuses\"]\n    healthy = {s[\"InstanceId\"] for s in statuses\n               if s[\"SystemStatus\"][\"Status\"] == \"ok\"\n               and s[\"InstanceStatus\"][\"Status\"] == \"ok\"}\n    ready = [i for i in instances if i[\"InstanceId\"] in healthy\n             and i[\"State\"][\"Name\"] == \"running\"\n             and {t[\"Key\"]: t[\"Value\"] for t in i.get(\"Tags\", [])}.get(\"SpotReady\") == \"true\"]\n    if source and ownership.get('Complete', {}).get('BOOL') is not True:\n        ready = [i for i in ready if all(o.get('Complete',{}).get('BOOL') is True or\n                 (i['InstanceId']==o.get('Owner',{}).get('S') and o.get('Ready',{}).get('BOOL') is True) for o in owners)\n                 and {t['Key']:t['Value'] for t in i.get('Tags', [])}.get('LegacyReady') == 'true']\n    if not ready:\n        return {\"state\": \"waiting-for-bootstrap\"}\n    newest = max(ready, key=lambda i: (i[\"LaunchTime\"], i[\"InstanceId\"]))\n    address = ec2.describe_addresses(AllocationIds=[allocation])[\"Addresses\"][0]\n    target = newest[\"InstanceId\"]\n    if address.get(\"InstanceId\") == target:\n        return {\"state\": \"attached\", \"instance\": target}\n    ec2.associate_address(AllocationId=allocation, InstanceId=target, AllowReassociation=True)\n    log.info(\"Moved address %s to ready instance %s\", allocation, target)\n    return {\"state\": \"moved\", \"instance\": target}\n\n\ndef handler(event, context):\n    import boto3\n    if os.environ.get(\"ENABLED\") != \"true\":\n        return {\"state\": \"staged\"}\n    db = boto3.client(\"dynamodb\")\n    now = int(time.time())\n    key = {\"Id\": {\"S\": \"ip-controller\"}}\n    try:\n        db.put_item(TableName=os.environ[\"LOCK_TABLE\"],\n                    Item={**key, \"Owner\": {\"S\": context.aws_request_id},\n                          \"Expires\": {\"N\": str(now + 90)}},\n                    ConditionExpression=\"attribute_not_exists(Id) OR Expires < :now\",\n                    ExpressionAttributeValues={\":now\": {\"N\": str(now)}})\n    except db.exceptions.ConditionalCheckFailedException:\n        return {\"state\": \"another-controller-active\"}\n    try:\n        owner_keys = os.environ.get('LEGACY_OWNER_KEYS','legacy-owner').split(',')\n        records = {name:db.get_item(TableName=os.environ['LOCK_TABLE'],Key={'Id':{'S':name}},\n            ConsistentRead=True).get('Item',{}) for name in [*owner_keys,'legacy-owner-host']} if os.environ.get('PROTECTED_SOURCE') else {}\n        # Codex is optional. Once enrolled, its ownership must also retain\n        # confirmed successor death across long capacity gaps and gate cutover.\n        if records:\n            codex = db.get_item(TableName=os.environ['LOCK_TABLE'],\n                Key={'Id':{'S':'legacy-owner-codex'}}, ConsistentRead=True).get('Item',{})\n            if codex:\n                records['legacy-owner-codex'] = codex\n        ec2 = boto3.client('ec2')\n        if records:\n            retain_confirmed_termination(db, ec2, os.environ['LOCK_TABLE'], os.environ['PROTECTED_SOURCE'], records)\n        ownership = [records[name] for name in owner_keys] if records else []\n        autoscaling = boto3.client('autoscaling')\n        if os.environ.get('PROTECTED_SOURCE'):\n            release_legacy_cpu_restriction(autoscaling, os.environ['GROUP'], all(o.get('Complete',{}).get('BOOL') is True for o in ownership))\n        if 'legacy-owner-codex' in records:\n            ownership.append(records['legacy-owner-codex'])\n        return reconcile(ec2, autoscaling,\n                         os.environ[\"GROUP\"], os.environ[\"ALLOCATION\"], True,\n                         os.environ.get('PROTECTED_SOURCE',''), ownership)\n    finally:\n        db.delete_item(TableName=os.environ[\"LOCK_TABLE\"], Key=key,\n                       ConditionExpression=\"#owner = :owner\",\n                       ExpressionAttributeNames={\"#owner\": \"Owner\"},\n                       ExpressionAttributeValues={\":owner\": {\"S\": context.aws_request_id}})\n"
         }
       }
     },
@@ -785,6 +896,32 @@
                   "Resource": {
                     "Fn::Sub": "arn:${AWS::Partition}:autoscaling:${AWS::Region}:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/${Group}"
                   }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "ssm:SendCommand",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}::document/AWS-RunShellScript"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "ssm:SendCommand",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:instance/*"
+                  },
+                  "Condition": {
+                    "StringEquals": {
+                      "ssm:resourceTag/SpotSystem": {
+                        "Ref": "AWS::StackName"
+                      }
+                    }
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "ssm:GetCommandInvocation",
+                  "Resource": "*"
                 }
               ]
             }
@@ -805,7 +942,7 @@
           ]
         },
         "Code": {
-          "ZipFile": "\"\"\"IAM-invoked wake requests and fail-closed 30-minute idle scale-down.\"\"\"\nimport os\nimport time\n\n\ndef read(db, table, key):\n    return db.get_item(TableName=table, Key={\"Id\": {\"S\": key}},\n                       ConsistentRead=True).get(\"Item\", {})\n\n\ndef number(item, name, default=0):\n    return int(item.get(name, {}).get(\"N\", str(default)))\n\n\ndef run(db, autoscaling, event, owner, now, table, group, enabled, idle_seconds=1800):\n    action = event.get(\"action\", \"tick\")\n    if action not in {\"wake\", \"tick\", \"status\", \"release\"}:\n        raise ValueError(\"Unsupported lifecycle action\")\n    if action == \"status\":\n        return {\"state\": \"enabled\" if enabled else \"staged\",\n                \"control\": read(db, table, \"control\")}\n    if not enabled:\n        return {\"state\": \"staged\", \"reason\": \"Managed worker lifecycle is not enabled\"}\n    if action == 'release':\n        return {'state': 'idle-timer-managed', 'idle_seconds': idle_seconds}\n    key = {\"Id\": {\"S\": \"lifecycle-lock\"}}\n    try:\n        db.put_item(TableName=table, Item={**key, \"Owner\": {\"S\": owner},\n                    \"Expires\": {\"N\": str(now + 90)}},\n                    ConditionExpression=\"attribute_not_exists(Id) OR Expires < :now\",\n                    ExpressionAttributeValues={\":now\": {\"N\": str(now)}})\n    except db.exceptions.ConditionalCheckFailedException:\n        return {\"state\": \"busy\", \"retry\": True}\n    try:\n        state = read(db, table, \"control\") or {\"Id\": {\"S\": \"control\"}}\n        if action == \"wake\":\n            # Persist demand first: the next tick retries scaling if the API fails.\n            state[\"WakeUntil\"] = {\"N\": str(now + idle_seconds)}\n            state.pop(\"IdleSince\", None)\n            state.pop(\"StoppingAt\", None)\n            db.put_item(TableName=table, Item=state)\n            autoscaling.set_desired_capacity(AutoScalingGroupName=group,\n                                              DesiredCapacity=1, HonorCooldown=False)\n            return {\"state\": \"starting\", \"wake_until\": now + idle_seconds}\n        groups = autoscaling.describe_auto_scaling_groups(\n            AutoScalingGroupNames=[group])[\"AutoScalingGroups\"]\n        if len(groups) != 1:\n            raise RuntimeError(\"Expected exactly one worker group\")\n        current = groups[0]\n        desired = current[\"DesiredCapacity\"]\n        wake_until = number(state, \"WakeUntil\")\n        if desired == 0:\n            if wake_until > now:\n                autoscaling.set_desired_capacity(AutoScalingGroupName=group,\n                                                  DesiredCapacity=1, HonorCooldown=False)\n                return {\"state\": \"starting\"}\n            return {\"state\": \"asleep\"}\n        workers = [i for i in current[\"Instances\"]\n                   if not i[\"LifecycleState\"].startswith((\"Terminating\", \"Detached\"))]\n        reports = [read(db, table, \"activity#\" + i[\"InstanceId\"]) for i in workers]\n        safe_idle = bool(workers) and all(i[\"LifecycleState\"] == \"InService\" for i in workers)\n        for report in reports:\n            safe_idle = safe_idle and (\n                0 <= now - number(report, \"Observed\", -10000) <= 90\n                and report.get(\"Busy\", {}).get(\"BOOL\") is False\n                and report.get(\"Unknown\", {}).get(\"BOOL\") is False\n                and number(report, \"Pending\", -1) == 0)\n        if not safe_idle:\n            state.pop(\"IdleSince\", None)\n            db.put_item(TableName=table, Item=state)\n            return {\"state\": \"working-or-unconfirmed\"}\n        since = max(number(state, \"IdleSince\", now),\n                    max(number(report, 'LastBusy', now) for report in reports))\n        state[\"IdleSince\"] = {\"N\": str(since)}\n        db.put_item(TableName=table, Item=state)\n        remaining = max(since + idle_seconds, wake_until) - now\n        if remaining > 0:\n            return {\"state\": \"idle\", \"remaining_seconds\": remaining}\n        # Wake uses the same lease. A concurrent prompt either renews before this\n        # check or scales up after it; demand is never overwritten by a stale tick.\n        state['StoppingAt'] = {'N': str(now)}\n        db.put_item(TableName=table, Item=state)\n        autoscaling.set_desired_capacity(AutoScalingGroupName=group,\n                                          DesiredCapacity=0, HonorCooldown=False)\n        state.pop(\"IdleSince\", None)\n        db.put_item(TableName=table, Item=state)\n        return {\"state\": \"scaled-to-zero\"}\n    finally:\n        db.delete_item(TableName=table, Key=key, ConditionExpression=\"#owner = :owner\",\n                       ExpressionAttributeNames={\"#owner\": \"Owner\"},\n                       ExpressionAttributeValues={\":owner\": {\"S\": owner}})\n\n\ndef handler(event, context):\n    import boto3\n    result = run(boto3.client(\"dynamodb\"), boto3.client(\"autoscaling\"), event,\n               context.aws_request_id, int(time.time()), os.environ[\"TABLE\"],\n               os.environ[\"GROUP\"], os.environ.get(\"ENABLED\") == \"true\",\n               int(os.environ.get(\"IDLE_SECONDS\", \"1800\")))\n    if event.get('action') == 'status' and result['state'] == 'enabled':\n        group = boto3.client('autoscaling').describe_auto_scaling_groups(\n            AutoScalingGroupNames=[os.environ['GROUP']])['AutoScalingGroups'][0]\n        ids = [i['InstanceId'] for i in group['Instances'] if i['LifecycleState'] == 'InService']\n        result['desired'] = group['DesiredCapacity']\n        ec2 = boto3.client('ec2')\n        address = ec2.describe_addresses(AllocationIds=[os.environ['ALLOCATION']])['Addresses'][0]\n        target = address.get('InstanceId')\n        instances = [i for r in ec2.describe_instances(InstanceIds=ids)['Reservations'] for i in r['Instances']] if ids else []\n        ready = [i for i in instances if i.get('State', {}).get('Name') == 'running' and\n                 {t['Key']: t['Value'] for t in i.get('Tags', [])}.get('SpotReady') == 'true']\n        result['compute_ready'] = bool(ready)\n        result['ready_instance_ids'] = [i['InstanceId'] for i in ready]\n        result['cutover_enabled'] = os.environ.get('CUTOVER') == 'true'\n        result['ssh_endpoint_ready'] = target in result['ready_instance_ids']\n        if result['ssh_endpoint_ready']:\n            result['state'] = 'ready'\n    return result\n"
+          "ZipFile": "\"\"\"IAM-invoked wake requests and fail-closed 30-minute idle scale-down.\"\"\"\nimport os\nimport time\n\n\ndef read(db, table, key):\n    return db.get_item(TableName=table, Key={\"Id\": {\"S\": key}},\n                       ConsistentRead=True).get(\"Item\", {})\n\n\ndef number(item, name, default=0):\n    return int(item.get(name, {}).get(\"N\", str(default)))\n\n\ndef run(db, autoscaling, event, owner, now, table, group, enabled, idle_seconds=1800):\n    action = event.get(\"action\", \"tick\")\n    if action not in {\"wake\", \"tick\", \"status\", \"release\"}:\n        raise ValueError(\"Unsupported lifecycle action\")\n    if action == \"status\":\n        return {\"state\": \"enabled\" if enabled else \"staged\",\n                \"control\": read(db, table, \"control\")}\n    if not enabled:\n        return {\"state\": \"staged\", \"reason\": \"Managed worker lifecycle is not enabled\"}\n    if action == 'release':\n        return {'state': 'idle-timer-managed', 'idle_seconds': idle_seconds}\n    key = {\"Id\": {\"S\": \"lifecycle-lock\"}}\n    try:\n        db.put_item(TableName=table, Item={**key, \"Owner\": {\"S\": owner},\n                    \"Expires\": {\"N\": str(now + 90)}},\n                    ConditionExpression=\"attribute_not_exists(Id) OR Expires < :now\",\n                    ExpressionAttributeValues={\":now\": {\"N\": str(now)}})\n    except db.exceptions.ConditionalCheckFailedException:\n        return {\"state\": \"busy\", \"retry\": True}\n    try:\n        state = read(db, table, \"control\") or {\"Id\": {\"S\": \"control\"}}\n        if action == \"wake\":\n            # Persist demand first: the next tick retries scaling if the API fails.\n            state[\"WakeUntil\"] = {\"N\": str(now + idle_seconds)}\n            state.pop(\"IdleSince\", None)\n            state.pop(\"StoppingAt\", None)\n            db.put_item(TableName=table, Item=state)\n            autoscaling.set_desired_capacity(AutoScalingGroupName=group,\n                                              DesiredCapacity=1, HonorCooldown=False)\n            return {\"state\": \"starting\", \"wake_until\": now + idle_seconds}\n        groups = autoscaling.describe_auto_scaling_groups(\n            AutoScalingGroupNames=[group])[\"AutoScalingGroups\"]\n        if len(groups) != 1:\n            raise RuntimeError(\"Expected exactly one worker group\")\n        current = groups[0]\n        desired = current[\"DesiredCapacity\"]\n        wake_until = number(state, \"WakeUntil\")\n        if desired == 0:\n            if wake_until > now:\n                autoscaling.set_desired_capacity(AutoScalingGroupName=group,\n                                                  DesiredCapacity=1, HonorCooldown=False)\n                return {\"state\": \"starting\"}\n            return {\"state\": \"asleep\"}\n        workers = [i for i in current[\"Instances\"]\n                   if not i[\"LifecycleState\"].startswith((\"Terminating\", \"Detached\"))]\n        reports = [read(db, table, \"activity#\" + i[\"InstanceId\"]) for i in workers]\n        safe_idle = bool(workers) and all(i[\"LifecycleState\"] == \"InService\" for i in workers)\n        for report in reports:\n            safe_idle = safe_idle and (\n                0 <= now - number(report, \"Observed\", -10000) <= 90\n                and report.get(\"Busy\", {}).get(\"BOOL\") is False\n                and report.get(\"Unknown\", {}).get(\"BOOL\") is False\n                and number(report, \"Pending\", -1) == 0)\n        if not safe_idle:\n            state.pop(\"IdleSince\", None)\n            db.put_item(TableName=table, Item=state)\n            return {\"state\": \"working-or-unconfirmed\"}\n        since = max(number(state, \"IdleSince\", now),\n                    max(number(report, 'LastBusy', now) for report in reports))\n        state[\"IdleSince\"] = {\"N\": str(since)}\n        db.put_item(TableName=table, Item=state)\n        remaining = max(since + idle_seconds, wake_until) - now\n        if remaining > 0:\n            return {\"state\": \"idle\", \"remaining_seconds\": remaining}\n        # Wake uses the same lease. A concurrent prompt either renews before this\n        # check or scales up after it; demand is never overwritten by a stale tick.\n        state['StoppingAt'] = {'N': str(now)}\n        db.put_item(TableName=table, Item=state)\n        autoscaling.set_desired_capacity(AutoScalingGroupName=group,\n                                          DesiredCapacity=0, HonorCooldown=False)\n        state.pop(\"IdleSince\", None)\n        db.put_item(TableName=table, Item=state)\n        return {\"state\": \"scaled-to-zero\"}\n    finally:\n        db.delete_item(TableName=table, Key=key, ConditionExpression=\"#owner = :owner\",\n                       ExpressionAttributeNames={\"#owner\": \"Owner\"},\n                       ExpressionAttributeValues={\":owner\": {\"S\": owner}})\n\n\ndef handler(event, context):\n    import boto3\n    if (os.environ.get('PROTECTED_SOURCE') and event.get('action') == 'wake'\n            and event.get('managed_work') is not True):\n        status = handler({'action':'status'}, context)\n        if status.get('protected_source_active'):\n            return {'state':'ready','endpoint_instance_id':status['endpoint_instance_id'],'protected_source_active':True}\n    if event.get('action') == 'ssh-key':\n        status = handler({'action':'status'}, context)\n        if status.get('state') != 'ready':\n            return {'state':'waiting-for-endpoint'}\n        target = status['endpoint_instance_id']\n        ssm = boto3.client('ssm')\n        command = ssm.send_command(InstanceIds=[target], DocumentName='AWS-RunShellScript',\n            Parameters={'commands':['cat /etc/ssh/ssh_host_ed25519_key.pub']},\n            Comment='Read public SSH host key for fixed-IP authentication')['Command']['CommandId']\n        for _ in range(10):\n            try:\n                response = ssm.get_command_invocation(CommandId=command, InstanceId=target)\n                if response['Status'] == 'Success':\n                    key = response['StandardOutputContent'].strip().split()\n                    if len(key) < 2 or key[0] != 'ssh-ed25519':\n                        raise RuntimeError('Unexpected public SSH host key')\n                    return {'state':'ready','instance_id':target,'host_key':' '.join(key[:2])}\n                if response['Status'] in {'Failed','Cancelled','TimedOut'}:\n                    raise RuntimeError('Could not read the public SSH host key')\n            except ssm.exceptions.InvocationDoesNotExist:\n                pass\n            time.sleep(.5)\n        return {'state':'waiting-for-host-key'}\n    result = run(boto3.client(\"dynamodb\"), boto3.client(\"autoscaling\"), event,\n               context.aws_request_id, int(time.time()), os.environ[\"TABLE\"],\n               os.environ[\"GROUP\"], os.environ.get(\"ENABLED\") == \"true\",\n               int(os.environ.get(\"IDLE_SECONDS\", \"1800\")))\n    if event.get('action') == 'status' and result['state'] == 'enabled':\n        group = boto3.client('autoscaling').describe_auto_scaling_groups(\n            AutoScalingGroupNames=[os.environ['GROUP']])['AutoScalingGroups'][0]\n        ids = [i['InstanceId'] for i in group['Instances'] if i['LifecycleState'] == 'InService']\n        result['desired'] = group['DesiredCapacity']\n        ec2 = boto3.client('ec2')\n        address = ec2.describe_addresses(AllocationIds=[os.environ['ALLOCATION']])['Addresses'][0]\n        target = address.get('InstanceId')\n        instances = [i for r in ec2.describe_instances(InstanceIds=ids)['Reservations'] for i in r['Instances']] if ids else []\n        ready = [i for i in instances if i.get('State', {}).get('Name') == 'running' and\n                 {t['Key']: t['Value'] for t in i.get('Tags', [])}.get('SpotReady') == 'true']\n        result['compute_ready'] = bool(ready)\n        result['ready_instance_ids'] = [i['InstanceId'] for i in ready]\n        result['cutover_enabled'] = os.environ.get('CUTOVER') == 'true'\n        result['ssh_endpoint_ready'] = target in result['ready_instance_ids']\n        source = os.environ.get('PROTECTED_SOURCE')\n        if source and target == source:\n            original = [i for r in ec2.describe_instances(InstanceIds=[source])['Reservations'] for i in r['Instances']]\n            if len(original) == 1 and original[0]['State']['Name'] == 'running':\n                result['ssh_endpoint_ready'] = True\n                result['endpoint_instance_id'] = source\n                result['protected_source_active'] = True\n        elif result['ssh_endpoint_ready']:\n            result['endpoint_instance_id'] = target\n        if result['ssh_endpoint_ready']:\n            result['state'] = 'ready'\n    return result\n"
         },
         "Environment": {
           "Variables": {
@@ -823,6 +960,9 @@
             },
             "CUTOVER": {
               "Ref": "Cutover"
+            },
+            "PROTECTED_SOURCE": {
+              "Ref": "ProtectedSource"
             },
             "ENABLED": {
               "Fn::If": [
