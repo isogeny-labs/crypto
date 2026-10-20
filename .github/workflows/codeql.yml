@@ -365,7 +365,10 @@ jobs:
     name: Warm cache (rust)
     if: needs.scope.outputs.rust != 'false' && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
     needs: [scope, build-rust-database]
-    timeout-minutes: 25
+    # Type inference over the merged tree passed 25 minutes on 2026-10-19
+    # (run 39226121956 was cancelled mid-evaluation); 45 leaves headroom.
+    # check-pr-budgets.py names this job as a budget exception.
+    timeout-minutes: 45
     runs-on: ubuntu-24.04-arm
     permissions:
       packages: read

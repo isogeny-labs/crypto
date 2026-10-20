@@ -55,6 +55,7 @@ jobs:
         if: steps.state.outputs.archived != 'true'
         run: |
           cp research/sat_factor_base_review_20260908/autolab_combined_l384_certified_coldbase_n53_20260925/Cargo.lock Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh
           cargo test --locked --release --example koblitz_s5_sat_instance legacy_selection -- --nocapture
           python3 -m unittest discover -s research/sat_factor_base_review_20260908/autolab_combined_l384_certified_coldbase_n53_20260925 -p test_materializer_gate.py
       - name: Replay the archived outcome with its sealed verifier, at the commit it ran from
@@ -115,6 +116,7 @@ jobs:
       - name: Build both frozen producers
         run: |
           cp research/sat_factor_base_review_20260908/autolab_combined_l384_certified_coldbase_n53_20260925/Cargo.lock Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh
           test "$(sha256sum Cargo.lock | cut -d' ' -f1)" = "$(sha256sum research/sat_factor_base_review_20260908/autolab_combined_l384_certified_coldbase_n53_20260925/Cargo.lock | cut -d' ' -f1)"
           rustc --version | grep '^rustc 1.93.1 '
           cargo --version | grep '^cargo 1.93.1 '

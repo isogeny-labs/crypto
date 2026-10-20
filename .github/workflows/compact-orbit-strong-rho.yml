@@ -47,9 +47,11 @@ jobs:
             src
             examples/koblitz_rho_batch_ks_v3.rs
             research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
+            .github/scripts/frozen-lock-source.sh
+            .github/scripts/frozen-lock-source.files
             research/notes/ecc2k130/compact_orbit_point_panel_20260929/test_point_mode.py
       - uses: Swatinem/rust-cache@v2
-      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
+      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock && bash .github/scripts/frozen-lock-source.sh
       - run: cargo build --release --locked --example koblitz_rho_batch_ks_v3
       - run: cargo test --release --locked --example koblitz_rho_batch_ks_v3
       - run: python3 research/notes/ecc2k130/compact_orbit_point_panel_20260929/test_point_mode.py target/release/examples/koblitz_rho_batch_ks_v3
@@ -80,6 +82,8 @@ jobs:
             examples/koblitz_rho_batch_ks_v2_n61.rs
             examples/koblitz_rho_batch_ks_v3.rs
             research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
+            .github/scripts/frozen-lock-source.sh
+            .github/scripts/frozen-lock-source.files
             research/notes/ecc2k130/compact_orbit_rank_evidence_20260929/verify_rank.py
             research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924/independent_replay.py
             research/notes/ecc2k130/compact_orbit_point_panel_20260929/run_panel.py
@@ -88,7 +92,7 @@ jobs:
             research/notes/ecc2k130/compact_orbit_strong_rho_20260929
             .github/workflows/compact-orbit-strong-rho.yml
       - uses: Swatinem/rust-cache@v2
-      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
+      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock && bash .github/scripts/frozen-lock-source.sh
       - run: cargo build --release --locked --example koblitz_rho_batch_ks_v2_n61 --example koblitz_rho_batch_ks_v3 --example koblitz_orbit_dlp_fast
       - name: Run four alternating cold arms on the same public points
         if: github.event_name != 'pull_request'

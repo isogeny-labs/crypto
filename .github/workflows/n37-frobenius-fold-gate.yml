@@ -50,6 +50,8 @@ jobs:
             docs/ic/calibration.json
             docs/ic/boundary_targets.json
             research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock
+            .github/scripts/frozen-lock-source.sh
+            .github/scripts/frozen-lock-source.files
             research/notes/ecc2k130/n37_four_policy_support_20261003/RESULT.json.gz
             research/notes/ecc2k130/n37_four_policy_pdp_20261003/RESULT_CI_FIXED.json.gz
             research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b03.points.jsonl
@@ -57,7 +59,7 @@ jobs:
             research/notes/ecc2k130/n37_frobenius_fold_gate_20261003
       - uses: Swatinem/rust-cache@v2
       - name: Use frozen lockfile
-        run: cp research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock Cargo.lock
+        run: cp research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock Cargo.lock && bash .github/scripts/frozen-lock-source.sh
       - name: Check frozen source hashes and formatting
         run: |
           printf '%s  %s\n' \
