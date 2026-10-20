@@ -37,7 +37,7 @@ with Pollard rho unfair:
   work that does not speed up by as much costs more tuned-GAE. Re-pricing the
   recorded Table B recipes under the tuned unit raises IC's S by 2 to 19 percent
   and **widens the gap to the matched rho on all 13 instances** (for example
-  6.34 to 6.49 at `bench-10bit`, 38.21 to 45.59 at `random-binary-n27`).
+  6.34 to 6.49 at `icv1-fp10-t5-192cb216`, 38.21 to 45.59 at `random-binary-n27`).
 - **This is an accounting correction, not an improvement.** Under the repository's
   success criterion ("Relabelling and accounting changes are not improvements") it
   is recorded honestly and is not reported as progress. It is *proposed*, not
@@ -91,7 +91,7 @@ with Pollard rho unfair:
 
 ![Fig. 1](figures/fig1_ns_per_add.svg)
 
-Prime, ns per add reference / tuned: bench-10bit 3.16x (71.5 / 22.6 ns) rising to generated-24bit 4.93x (113.0 / 22.9 ns). Binary 8.68x (Koblitz K_1, 11
+Prime, ns per add reference / tuned: icv1-fp10-t5-192cb216 3.16x (71.5 / 22.6 ns) rising to generated-24bit 4.93x (113.0 / 22.9 ns). Binary 8.68x (Koblitz K_1, 11
 bits) to 21.69x (the 41-bit random binary curve). The tuned time is flat in
 field size (about 15 to 25 ns); the reference time grows with it. Each tuned bar in
 Fig. 1 is the min to max over 15 passes; the reference is the median of 3.
@@ -113,7 +113,7 @@ where F is below 1 they use 1 (`F: 1.0` beside `F_measured: 0.86` in
 
 R is the row's reference / tuned addition ratio (section 4.1). A unit that does not
 get faster is a larger fraction of a faster addition, which is why every class (b)
-and (c) price rises. Example (read): `bench-10bit` Legendre 0.257 to 0.814 GAE;
+and (c) price rises. Example (read): `icv1-fp10-t5-192cb216` Legendre 0.257 to 0.814 GAE;
 `random-binary-n27` S4 pair 3.09 to 50.05 GAE.
 
 ### 4.3 Table B re-priced (Fig. 2; `reprice/table_b.json`, recorded derived)
@@ -125,19 +125,19 @@ Best legacy recipe per instance, S in GAE per solve, gap = IC S over the matched
 
 | instance | recipe | S legacy | S tuned | x | gap legacy | gap tuned |
 |:--|:--|--:|--:|--:|--:|--:|
-| bench-10bit | mitm_m2_negfold_walk_balanced | 22.85 | 23.41 | 1.025 | 6.34 | 6.49 |
-| bench-12bit | mitm_m2_negfold_walk | 15.62 | 16.72 | 1.071 | 5.47 | 5.86 |
-| bench-14bit | mitm_m2_negfold_walk_balanced | 13.07 | 13.91 | 1.064 | 6.43 | 6.84 |
-| bench-16bit | mitm_m2_negfold_walk_balanced | 11.68 | 13.67 | 1.170 | 6.71 | 7.86 |
-| bench-18bit | mitm_m2_negfold_walk_balanced | 8.41 | 9.12 | 1.085 | 5.82 | 6.31 |
-| bench-20bit | mitm_m2_negfold_walk_balanced | 10.72 | 11.55 | 1.078 | 8.30 | 8.94 |
-| generated-22bit-3290411 | mitm_m2_negfold_walk_balanced | 12.77 | 13.92 | 1.090 | 10.50 | 11.45 |
-| generated-24bit-10935329 | mitm_m2_negfold_walk_balanced | 13.97 | 15.53 | 1.112 | 13.46 | 14.96 |
-| random-binary-n15-b524b | mitm_m2_negfold_walk | 26.31 | 27.39 | 1.041 | 13.07 | 13.60 |
-| random-binary-n18-b6507 | mitm_m2_negfold_walk_balanced | 21.30 | 23.91 | 1.122 | 10.62 | 11.92 |
-| random-binary-n21-b1b6f3b | mitm_m2_negfold_walk_balanced | 24.39 | 28.52 | 1.169 | 17.99 | 21.03 |
-| random-binary-n24-b5fc9da | mitm_m2_negfold_walk_balanced | 27.24 | 31.73 | 1.165 | 23.03 | 26.82 |
-| random-binary-n27-b845462 | mitm_m2_negfold_walk_balanced | 36.93 | 44.06 | 1.193 | 38.21 | 45.59 |
+| icv1-fp10-t5-192cb216 | mitm_m2_negfold_walk_balanced | 22.85 | 23.41 | 1.025 | 6.34 | 6.49 |
+| icv1-fp12-t19-d4a315df | mitm_m2_negfold_walk | 15.62 | 16.72 | 1.071 | 5.47 | 5.86 |
+| icv1-fp14-tm43-158b6914 | mitm_m2_negfold_walk_balanced | 13.07 | 13.91 | 1.064 | 6.43 | 6.84 |
+| icv1-fp16-t351-d433f24e | mitm_m2_negfold_walk_balanced | 11.68 | 13.67 | 1.170 | 6.71 | 7.86 |
+| icv1-fp18-t175-45770ebc | mitm_m2_negfold_walk_balanced | 8.41 | 9.12 | 1.085 | 5.82 | 6.31 |
+| icv1-fp20-t1293-3c2999ba | mitm_m2_negfold_walk_balanced | 10.72 | 11.55 | 1.078 | 8.30 | 8.94 |
+| icv1-fp22-tm1267-a5acaf6d | mitm_m2_negfold_walk_balanced | 12.77 | 13.92 | 1.090 | 10.50 | 11.45 |
+| icv1-fp24-t1577-77336155 | mitm_m2_negfold_walk_balanced | 13.97 | 15.53 | 1.112 | 13.46 | 14.96 |
+| icv1-f2m15-t131-ed7256f0 | mitm_m2_negfold_walk | 26.31 | 27.39 | 1.041 | 13.07 | 13.60 |
+| icv1-f2m18-t393-d2c04152 | mitm_m2_negfold_walk_balanced | 21.30 | 23.91 | 1.122 | 10.62 | 11.92 |
+| icv1-f2m21-t2591-de54d72e | mitm_m2_negfold_walk_balanced | 24.39 | 28.52 | 1.169 | 17.99 | 21.03 |
+| icv1-f2m24-tm3047-2d0c0e8c | mitm_m2_negfold_walk_balanced | 27.24 | 31.73 | 1.165 | 23.03 | 26.82 |
+| icv1-f2m27-t12543-569dca8b | mitm_m2_negfold_walk_balanced | 36.93 | 44.06 | 1.193 | 38.21 | 45.59 |
 
 The x column is `tuned_over_legacy` as recorded for the legacy-best recipe. At
 `random-binary-n21` the best recipe *under the tuned unit* is `mitm_m2_negfold_walk`
