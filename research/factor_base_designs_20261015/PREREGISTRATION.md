@@ -679,3 +679,29 @@ run: its function-and-chain form is written for `m ≤ 4`. One cell gives no
   instrument.
 - *Other structured targets* (an `x_R` other than 0, or `R` of small order)
   and primes with a 2-adic valuation below 8 are not run here.
+
+### Amendment 10, 2026-10-20: Z1 at `m = 2` from `t = 3`, before any of those rows
+
+Registered after Amendment 9's runs and before any Z1 row at `m = 2` and
+`t ≥ 3` exists. It changes no rule, prediction or committed row.
+
+**What happened.** Z1's `m = 2` series stopped at `t = 2`. All four systems
+there (A0 and A11, 2 targets each) aborted in the target construction, not in
+the solver: `plant_x0` stopped after 50 331 712 trials with no target. At
+`t = 2`, `V` has 4 elements and so 6 pairs `{x₁, x₂}`, and the construction
+needs `x₁ + x₂` to be a non-zero square. For the `V` this cell seed draws, no
+pair qualifies, and the pair does not depend on the random `y₁`, so the
+search cannot succeed. The 4 aborted rows are committed as recorded. Under
+Amendment 1 item 5 a failing cell ends its series, so `m = 2` produced no
+completed cell. `m = 3` is not affected: its 12 systems (`t = 2–4`) completed.
+
+**The change.** Z1 at `m = 2` is run again for `t = 3` to `t = 9` (the largest
+`t` the generic family completed), with every other Amendment 9 setting
+unchanged. At `t = 3`, `V` has 8 elements and 28 pairs, so a `V` with no
+qualifying pair is a 2⁻²⁸ event. The `t = 2` cell is recorded as *not
+constructible for this `V`* and is excluded from the shared cells and the fit.
+If a later cell also cannot be constructed, it is reported the same way and
+ends the series.
+
+**Rule and predictions** are Amendment 9's, for the cells that exist. The
+prediction that every `t ≥ 3` cell constructs and completes is added.
