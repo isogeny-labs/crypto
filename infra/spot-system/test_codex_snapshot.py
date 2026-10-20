@@ -42,6 +42,20 @@ class SnapshotTests(unittest.TestCase):
         snapshot.restore(self.root,self.base/'restored')
         self.assertEqual((self.base/'restored'/'auth.json').read_text(),'private test fixture')
 
+    def test_agent_policy_and_generated_artifacts_survive_without_shell_environment(self):
+        for name in ['rules/default.rules', 'visualizations/run/plot.svg',
+                     'shell_snapshots/old-environment.sh']:
+            path=self.home/name
+            path.parent.mkdir(parents=True,exist_ok=True)
+            path.write_text(name)
+        snapshot.snapshot(self.home,self.root,[])
+        target=self.base/'restored'
+        snapshot.restore(self.root,target)
+        for name in ['rules/default.rules','visualizations/run/plot.svg']:
+            self.assertEqual((target/name).read_text(),name)
+        self.assertFalse((target/'shell_snapshots').exists())
+        self.assertFalse((target/'auth.json').exists())
+
     def test_corrupt_generation_is_rejected_before_destination_changes(self):
         snapshot.snapshot(self.home,self.root,[])
         directory,_ = snapshot.load_generation(self.root)

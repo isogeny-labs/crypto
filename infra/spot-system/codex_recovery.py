@@ -10,9 +10,11 @@ import os
 from pathlib import Path
 import signal
 import socket as sockets
+import sqlite3
 import subprocess
 import threading
 import time
+import urllib.request
 
 from codex_rpc import Client
 from codex_snapshot import load_generation, restore, snapshot
@@ -26,6 +28,30 @@ def resumable(thread):
             and not thread['status'].get('activeFlags'))
 
 
+def persisted_parents(local, threads, manifest):
+    with sqlite3.connect('file:' + str(local / 'state_5.sqlite') + '?mode=ro', uri=True) as db:
+        persisted = {row[0] for row in db.execute('SELECT id FROM threads')}
+    parents, empty = [], []
+    for thread in threads:
+        if not isinstance(thread.get('source'), str):
+            continue
+        if thread['id'] not in persisted:
+            has_rollout = any(thread['id'] in name for name in manifest['files'])
+            if thread.get('status', {}).get('type') == 'idle' and not has_rollout:
+                empty.append(thread['id'])
+                continue
+            raise ValueError('Enrolled work has no persisted thread: ' + thread['id'])
+        parents.append(thread)
+    return parents, empty
+
+
+def dependency_ready(status, now):
+    # A preserved research deadline is terminal, not an agent startup failure.
+    # The agent must be able to reconcile and report the incomplete workload.
+    return (status.get('state') in {'running', 'complete', 'deadline-expired'}
+            and 0 <= now - status.get('observed', 0) < 90)
+
+
 def notify_ready():
     """Release dependent experiment services only after the home mount is ready."""
     address = os.environ.get('NOTIFY_SOCKET')
@@ -37,12 +63,22 @@ def notify_ready():
             sock.sendall(b'READY=1')
 
 
-def prepare_home(durable, local):
+def public_ip():
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    base = 'http://169.254.169.254/latest/'
+    request = urllib.request.Request(base+'api/token', method='PUT',
+        headers={'X-aws-ec2-metadata-token-ttl-seconds':'60'})
+    token = opener.open(request, timeout=3).read().decode()
+    request = urllib.request.Request(base+'meta-data/public-ipv4',
+        headers={'X-aws-ec2-metadata-token':token})
+    return opener.open(request, timeout=3).read().decode().strip()
+
+
+def prepare_home(durable, local, home=Path('/home/ec2-user')):
     """Keep SQLite and sockets local, while workspaces survive worker loss."""
     workspace = durable / 'home'
     if not workspace.is_dir() or workspace.is_symlink():
         raise ValueError('Durable workspace is missing')
-    home = Path('/home/ec2-user')
     if not os.path.ismount(home):
         # Preserve only the public access key installed by EC2's launch keypair.
         # No source SSH private keys are migrated.
@@ -56,8 +92,9 @@ def prepare_home(durable, local):
             os.chown(directory,1000,1000)
             os.chown(directory/'authorized_keys',1000,1000)
         subprocess.run(['mount', '--bind', str(workspace), str(home)], check=True)
-    expected = subprocess.check_output(['findmnt', '-n', '-o', 'FSROOT', '-T', str(home)], text=True).strip()
-    if not expected.endswith('/agent-migration/home'):
+    # NFS can report a bind's SOURCE as server:/subdirectory with FSROOT=/.
+    # Compare the actual filesystem/inode identity instead of display strings.
+    if not os.path.ismount(home) or not os.path.samefile(home, workspace):
         raise ValueError('User home is not the enrolled durable workspace')
     codex_home = home / '.codex'
     if codex_home.is_symlink():
@@ -122,6 +159,7 @@ def main(args):
     environment = os.environ.copy()
     environment.update(HOME='/home/ec2-user', CODEX_HOME='/home/ec2-user/.codex')
     process = subprocess.Popen(['runuser', '-u', 'ec2-user', '--', str(binary),
+                                *config.get('codex_arguments', []),
                                 'app-server', '--listen', 'unix://'], env=environment,
                                cwd='/home/ec2-user')
     socket = local/'app-server-control/app-server-control.sock'
@@ -138,13 +176,49 @@ def main(args):
                 stop.wait(1)
         if client is None:
             raise TimeoutError('Codex app-server did not become ready')
+        # Dependent experiment recovery needs the home mount before it can
+        # start. Release that ordering barrier before continuing agent turns.
+        notify_ready()
+        for required in config.get('wait_for_recovery_status', []):
+            while not stop.is_set():
+                try:
+                    ready = json.loads(Path(required).read_text())
+                    if dependency_ready(ready, time.time()):
+                        break
+                except (OSError, ValueError):
+                    pass
+                stop.wait(2)
+            if stop.is_set():
+                return
+        if config.get('wait_for_public_ip'):
+            # The research API can restrict access to the stable Elastic IP.
+            # Signal server readiness so the fenced controller can move it,
+            # then wait for attachment before continuing any agent work.
+            api('dynamodb', 'update-item', table_name=table, key={'Id':{'S':'legacy-owner-codex'}},
+                update_expression='SET Ready = :yes', condition_expression='#owner = :owner',
+                expression_attribute_names={'#owner':'Owner'},
+                expression_attribute_values={':yes':{'BOOL':True}, ':owner':{'S':owner}})
+            while not stop.is_set():
+                try:
+                    if public_ip() == config['wait_for_public_ip']:
+                        break
+                except OSError:
+                    pass
+                report('waiting-for-endpoint')
+                stop.wait(5)
+            if stop.is_set():
+                return
+        parents, omitted_empty = persisted_parents(local, threads, manifest)
         resumed = []
-        for thread in threads:
+        for thread in parents:
             # Spawned children belong to their original parent; starting them
             # independently could duplicate tools when the parent reconciles.
             if not isinstance(thread.get('source'), str):
                 continue
-            current = client.request('thread/resume', {'threadId': thread['id']})['thread']
+            # Histories can exceed the RPC frame limit. Resume the original
+            # persisted chat while requesting only metadata in the response.
+            current = client.request('thread/resume', {'threadId': thread['id'],
+                                                       'excludeTurns': True})['thread']
             resumed.append(thread['id'])
             if resumable(thread) and current.get('status', {}).get('type') != 'active':
                 client.request('turn/start', {'threadId': thread['id'], 'input': [{'type':'text',
@@ -152,7 +226,8 @@ def main(args):
                            'First reconcile saved artifacts and any external jobs or side effects '
                            'before repeating interrupted work. Preserve the original scope, budgets, '
                            'approval rules, and completion criteria. If it already completed, '
-                           'report that evidence without starting new work.'}]})
+                           'report that evidence without starting new work. '
+                           + config.get('migration_context', '')}]})
         api('dynamodb', 'update-item', table_name=table, key={'Id':{'S':'legacy-owner-codex'}},
             update_expression='SET Ready = :yes', condition_expression='#owner = :owner',
             expression_attribute_names={'#owner':'Owner'},
@@ -164,7 +239,7 @@ def main(args):
             active = client.inventory()
             saved = snapshot(local, root, active, include_auth=True)
             report('running', pending=any(t.get('status',{}).get('type') == 'active' for t in active),
-                   loaded=len(active), resumed=len(resumed), server_pid=process.pid,
+                   loaded=len(active), resumed=len(resumed), omitted_empty=omitted_empty, server_pid=process.pid,
                    snapshot_prune_errors=saved['prune_errors'])
             stop.wait(config.get('snapshot_interval_seconds', 60))
         # Retain a final committed generation before the OS stops the process.

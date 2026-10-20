@@ -266,6 +266,10 @@ def restore(record, contract, criu):
 
 
 def run(args):
+    native = Path('/srv/experiments/agent-migration/diem.json')
+    if args.owner_key == 'legacy-owner-diem' and native.is_file():
+        from diem_native_recovery import run as native_run
+        return native_run(args, native)
     owner = instance_id()
     root = args.root
     root.mkdir(parents=True, exist_ok=True, mode=0o700)

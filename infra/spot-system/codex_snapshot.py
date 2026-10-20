@@ -19,7 +19,8 @@ import uuid
 
 from criu_local import atomic_json, digest
 
-TREES = ('sessions', 'archived_sessions', 'attachments', 'skills', 'plugins', 'packages')
+TREES = ('sessions', 'archived_sessions', 'attachments', 'skills', 'plugins', 'packages',
+         'rules', 'visualizations')
 FILES = ('config.toml', 'installation_id', 'session_index.jsonl', '.sandbox_migration', 'hooks.json')
 
 

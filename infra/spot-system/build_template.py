@@ -20,7 +20,8 @@ def build():
 set -euo pipefail
 # AL2023 supplies /usr/bin/aws in the AMI; there is no awscli2 RPM.
 command -v aws
-dnf install -y amazon-efs-utils python3 postgresql17-server zstd libnet libnl3 protobuf-c libaio git gcc make openssl-devel pkgconf-pkg-config
+dnf install -y amazon-efs-utils python3 postgresql17-server zstd libnet libnl3 protobuf-c libaio git gcc make openssl-devel pkgconf-pkg-config docker jq
+systemctl enable --now docker
 mkdir -p /srv/experiments
 echo '${FileSystem}:/ /srv/experiments efs _netdev,tls,iam,noresvport 0 0' >> /etc/fstab
 mount /srv/experiments
@@ -32,7 +33,7 @@ echo '${RuntimeDigest}  /tmp/spot-runtime.tar.gz' | sha256sum -c -
 mkdir -p /opt/spot
 tar -xzf /tmp/spot-runtime.tar.gz -C /opt/spot
 mkdir -p /opt/spot-criu
-for module in criu_local.py criu_export.py legacy_recovery.py; do
+for module in criu_local.py criu_export.py legacy_recovery.py diem_native_recovery.py; do
   install -m 700 "/opt/spot/$module" "/opt/spot-criu/$module"
 done
 install -m 700 /opt/spot/bin/criu-4.2.1 /opt/spot-criu/criu

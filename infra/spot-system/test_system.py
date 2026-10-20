@@ -13,7 +13,7 @@ from types import SimpleNamespace
 from build_template import build
 from controller import handler, reconcile, retain_confirmed_termination
 from runner import read_jobs
-from install_services import discovery_units, units
+from install_services import discovery_units, units, preserve_database_ipc
 
 
 class AddressTests(unittest.TestCase):
@@ -260,10 +260,22 @@ class ResumeTests(unittest.TestCase):
 
 
 class DeploymentTests(unittest.TestCase):
+    def test_database_ipc_survives_session_logout_and_setup_is_idempotent(self):
+        with tempfile.TemporaryDirectory() as directory, patch('install_services.subprocess.run') as run:
+            root = Path(directory) / 'logind.conf.d'
+            preserve_database_ipc(root)
+            self.assertEqual((root/'60-spot-postgresql.conf').read_text(), '[Login]\nRemoveIPC=no\n')
+            run.assert_called_once_with(['systemctl', 'restart', 'systemd-logind'], check=True)
+            preserve_database_ipc(root)
+            self.assertEqual(run.call_count, 1)
+
     def test_legacy_restore_waits_for_codex_workspace_readiness(self):
         services=units(Path('/opt/spot'),Path('/opt/spot/bin'),Path('/srv/experiments/work'),legacy_origin='i-source')
         self.assertIn('Type=notify',services['spot-codex-recovery'])
         self.assertIn('ConditionPathExists=/srv/experiments/agent-migration/agent.json',services['spot-codex-recovery'])
+        self.assertIn('ExecStartPost=/usr/bin/systemctl start --no-block spot-legacy-recovery.service spot-diem-recovery.service',services['spot-codex-recovery'])
+        standalone=units(Path('/opt/spot'),Path('/opt/spot/bin'),Path('/srv/experiments/work'))
+        self.assertNotIn('ExecStartPost=',standalone['spot-codex-recovery'])
         for name in ['spot-legacy-recovery','spot-diem-recovery']:
             self.assertIn('After=network-online.target spot-codex-recovery.service',services[name])
             self.assertIn('Requires=spot-codex-recovery.service',services[name])

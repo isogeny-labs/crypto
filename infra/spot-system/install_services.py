@@ -7,6 +7,17 @@ import pwd
 import subprocess
 
 
+def preserve_database_ipc(directory=Path('/etc/systemd/logind.conf.d')):
+    # PostgreSQL runs as the existing workspace user. logind must not remove
+    # its shared memory when the last interactive/runuser session exits.
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / '60-spot-postgresql.conf'
+    body = '[Login]\nRemoveIPC=no\n'
+    if not path.exists() or path.read_text() != body:
+        path.write_text(body)
+        subprocess.run(['systemctl', 'restart', 'systemd-logind'], check=True)
+
+
 def units(runtime, binaries, project, table='', region='us-east-2', root=Path('/srv/experiments'), legacy_origin=''):
     common = '[Unit]\nAfter=network-online.target\nRequiresMountsFor=/srv/experiments\n[Service]\nUser=ec2-user\n'
     node = common + f'''RuntimeDirectory=spot-postgresql
@@ -58,6 +69,11 @@ KillMode=control-group
 WantedBy=multi-user.target
 '''
     if legacy_origin:
+        # A failed initial notify start cancels dependent start jobs. Queue them
+        # again after every successful retry, without waiting on their After=.
+        result['spot-codex-recovery'] = result['spot-codex-recovery'].replace(
+            'Restart=on-failure',
+            'ExecStartPost=/usr/bin/systemctl start --no-block spot-legacy-recovery.service spot-diem-recovery.service\nRestart=on-failure')
         result['spot-legacy-recovery'] = f'''[Unit]
 After=network-online.target spot-codex-recovery.service
 Requires=spot-codex-recovery.service
@@ -137,6 +153,7 @@ if __name__ == '__main__':
         raise SystemExit('Worker root must be a directory within the durable mount')
     identity = pwd.getpwnam('ec2-user')
     if not a.discovery_only:
+        preserve_database_ipc()
         node_root = a.root / 'nodes'
         node_root.mkdir(exist_ok=True, mode=0o700)
         os.chown(node_root, identity.pw_uid, identity.pw_gid)

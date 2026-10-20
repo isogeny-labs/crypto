@@ -2,6 +2,7 @@ import json
 import os
 from pathlib import Path
 import socket
+import sqlite3
 import tempfile
 from types import SimpleNamespace
 import unittest
@@ -11,6 +12,48 @@ import codex_recovery as recovery
 
 
 class EnrollmentTests(unittest.TestCase):
+    def test_empty_idle_tabs_are_omitted_but_missing_work_fails_closed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            local = Path(tmp)
+            with sqlite3.connect(local/'state_5.sqlite') as db:
+                db.execute('CREATE TABLE threads (id TEXT)')
+                db.execute("INSERT INTO threads VALUES ('saved')")
+            saved = {'id':'saved','source':'vscode','status':{'type':'active'}}
+            empty = {'id':'empty','source':'vscode','status':{'type':'idle'}}
+            manifest = {'files':{}}
+            self.assertEqual(recovery.persisted_parents(local,[saved,empty],manifest),([saved],['empty']))
+            for status in ['active','systemError']:
+                with self.assertRaises(ValueError):
+                    recovery.persisted_parents(local,[dict(empty,status={'type':status})],manifest)
+            with self.assertRaises(ValueError):
+                recovery.persisted_parents(local,[empty],{'files':{'sessions/rollout-empty.jsonl':{}}})
+
+    def test_mounted_workspace_uses_directory_identity(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            durable=Path(tmp)/'durable';workspace=durable/'home'
+            local=Path(tmp)/'local';workspace.mkdir(parents=True);local.mkdir()
+            with patch.object(recovery.os.path,'ismount',return_value=True):
+                recovery.prepare_home(durable,local,home=workspace)
+            self.assertEqual((workspace/'.codex').resolve(),local.resolve())
+
+    def test_unrelated_mount_is_rejected_before_state_link(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            durable=Path(tmp)/'durable';workspace=durable/'home'
+            other=Path(tmp)/'other';local=Path(tmp)/'local'
+            workspace.mkdir(parents=True);other.mkdir();local.mkdir()
+            with patch.object(recovery.os.path,'ismount',return_value=True):
+                with self.assertRaises(ValueError):
+                    recovery.prepare_home(durable,local,home=other)
+            self.assertFalse((other/'.codex').exists())
+
+    def test_preserved_deadline_does_not_block_agent_recovery(self):
+        for state in ['running', 'complete', 'deadline-expired']:
+            self.assertTrue(recovery.dependency_ready({'state': state, 'observed': 100}, 101))
+            self.assertFalse(recovery.dependency_ready({'state': state, 'observed': 1}, 101))
+        for state in ['waiting-for-source', 'error']:
+            self.assertFalse(recovery.dependency_ready({'state': state, 'observed': 100}, 101))
+        self.assertFalse(recovery.dependency_ready({'state': 'running', 'observed': 102}, 101))
+
     def test_readiness_is_explicitly_sent_to_systemd(self):
         with tempfile.TemporaryDirectory() as tmp:
             path=str(Path(tmp)/'notify.sock')
