@@ -39,4 +39,12 @@ Factor-base designs, Amendment 11 (E1, T5): rows from research/factor_base_desig
 rule: 11 shared completed cells → MODEL-DEPENDENT (a shared D differs)  (Edwards D above / equal / below: 1 / 8 / 2)
 
 ════ T5: A0, m = 4, t = 4, p1, tower engine, budget 21600 s, second target only if the first completes
-T5: no rows.
+  target 0: D 7, degree reached 8, max_cols 170363, time 4730 s, "ok"  null
+  target 1: D 7, degree reached 8, max_cols 170036, time 4721 s, "ok"  null
+
+── A0 m = 4, F4 cells and the T5 cell
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  2   2.000  10     11     [6, 6]        1911,1911            0.3,0.3               ok,ok
+  3   3.000  14     15     [7, 7]        21619,21619          96.4,93.8             ok,ok
+  4   4.000  18     19     [7, 7]        170363,170036        4730.0,4721.2         ok,ok
+  completed cells 3: σ = 0.5000  →  no middle ground at this arity (σ ≥ 0.5);  Δlog₂ max_cols/Δb = 3.238 (secondary, descriptive)
