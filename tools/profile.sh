@@ -495,12 +495,16 @@ do_topdown() {
     fi
     [ -s "$out/topdown.csv" ] || profiler_failed "perf stat wrote nothing; see command.stderr"
     # -x, rows: value,unit,event,run-time,pct-running,metric-value,metric-unit
-    grep -v '^#' "$out/topdown.csv" | grep -v '^$' | jq -Rsc --arg grp "${grp:---topdown}" '
+    { grep -v '^#' "$out/topdown.csv" | grep -v '^$' || true; } | jq -Rsc --arg grp "${grp:---topdown}" '
         split("\n") | map(select(length > 0) | split(",")) |
         {schema: "profile/v1", kind: "topdown", group: $grp,
          events: map({event: .[2], value: (.[0] | tonumber? // .[0]), running_pct: (.[4] | tonumber? // null)}),
          metrics: map(select((.[6] // "") != "") | {metric: .[6], value: (.[5] | tonumber? // null)}),
          multiplexed: map(select((.[4] | tonumber? // 100) < 100) | .[2])}' > "$out/topdown.json"
+    # perf writes its "# started on" header even when the metric group cannot
+    # be scheduled, so an empty table means perf failed, not the command.
+    [ "$(jq '.events | length' "$out/topdown.json")" -gt 0 ] ||
+        profiler_failed "perf stat counted nothing for ${grp:---topdown}: $(grep -m1 -v '^[[:space:]]*$' "$out/command.stderr" || echo 'no message')"
     write_manifest "$([ "$rc" = 0 ] && echo ok || echo command_failed)" "" '{}'
     render "$out"
     [ "$rc" = 0 ] || exit 4

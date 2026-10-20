@@ -69,6 +69,12 @@ grep -q '<polyline' "$tmp/smi/smi.svg" && grep -q '#cf222e' "$tmp/smi/smi.svg" &
 rm "$tmp/ncu/summary.md" "$tmp/ncu/sol.svg"
 "$P" report "$tmp/ncu" > /dev/null 2>&1 && [ -s "$tmp/ncu/sol.svg" ] && ok "report re-renders" || bad "report re-renders"
 
+# perf with a PMU whose top-down group fails: a clean profiler failure, not a
+# crash (the GitHub runner case).
+rc=0; PERF="$fx/perf-topdown-fails" "$P" topdown --out "$tmp/td-fail" -- true > /dev/null 2>&1 || rc=$?
+expect_rc "topdown when perf cannot schedule the group" 6 "$rc"
+check "topdown: perf's own message in the reason" '.status == "profiler_failed" and (.reason | test("Cannot find metric"))' "$tmp/td-fail/manifest.json"
+
 # Usage errors.
 "$P" cpu -- true > /dev/null 2>&1; expect_rc "cpu without --out" 2 $?
 "$P" ncu --out "$tmp/x" > /dev/null 2>&1; expect_rc "ncu without a command" 2 $?
@@ -87,9 +93,17 @@ if [ -n "$cc" ] && "$cc" -O2 -g -fno-omit-frame-pointer "$fx/hot.c" -o "$tmp/hot
         check "cpu: s.e. present and consistent" '.hotspots[0] | .se_pct > 0 and .se_pct < .self_pct' "$h"
         grep -q 'sq_chain;gf2_mul' "$tmp/cpu/folded.txt" && ok "cpu: dwarf stacks keep the leaf's caller" || bad "cpu: dwarf stacks"
         grep -q '<rect' "$tmp/cpu/flame.svg" && ok "cpu: flame graph" || bad "cpu: flame graph"
+        # Whether top-down works depends on the host's PMU (a VM may expose
+        # cycles but not the top-down events), so the check is that every
+        # outcome is a clean one: profiled, unsupported or profiler failed,
+        # each with a manifest that says which.
         rc=0; PERF=$perf "$P" topdown --out "$tmp/td" -- true > /dev/null 2>&1 || rc=$?
-        if jq -e '.host.hardware_pmu' "$tmp/td/manifest.json" > /dev/null 2>&1; then expect_rc "topdown with a PMU" 0 "$rc"
-        else expect_rc "topdown without a PMU" 3 "$rc"; fi
+        case $rc in
+            0) check "topdown: profiled" '.status == "ok"' "$tmp/td/manifest.json" ;;
+            3) check "topdown: unsupported, with a reason" '.status == "unsupported" and (.reason | length > 0)' "$tmp/td/manifest.json" ;;
+            6) check "topdown: profiler failure, with a reason" '.status == "profiler_failed" and (.reason | length > 0)' "$tmp/td/manifest.json" ;;
+            *) bad "topdown exits $rc, want 0, 3 or 6" ;;
+        esac
     else
         skip=$((skip + 1)); echo "skip cpu sampling: no perf that can sample here"
     fi
