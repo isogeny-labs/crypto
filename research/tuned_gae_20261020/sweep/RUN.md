@@ -18,3 +18,12 @@ Timestamps (UTC, date -u):
 
 Host line: vm (Linux vm 6.18.44-fc-v139 #1 SMP PREEMPT_DYNAMIC @0 x86_64 x86_64 x86_64 GNU/Linux)
 CPU: Intel(R) Xeon(R) Processor @ 2.80GHz
+
+## Field speedups, tables and Table B re-pricing (same host)
+
+5. ./target/release/gae-reference field --from-calibration > research/tuned_gae_20261020/sweep/field.jsonl 2> research/tuned_gae_20261020/sweep/field.stderr
+   exit code: 0 (field_exit_code.txt); 33 lines; 44 s; started 2026-10-20 16:50 UTC
+6. ./target/release/gae-reference retable
+   writes docs/ic/calibration_tuned.json (25 rows) and src/cryptanalysis/ecbench/full_prices_tuned.json (8 rows)
+7. ./target/release/gae-reference reprice-ledger
+   writes research/tuned_gae_20261020/reprice/table_b.json; legacy S reproduced for every recipe at 1e-9

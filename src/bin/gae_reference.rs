@@ -54,6 +54,11 @@
 //!
 //! One JSON object per curve on stdout; skipped rows are reported on stderr.
 
+#[path = "gae_reference/field.rs"]
+mod field;
+#[path = "gae_reference/tables.rs"]
+mod tables;
+
 use std::time::Instant;
 
 use num_bigint::BigUint;
@@ -503,12 +508,36 @@ fn binary_spec(label: &str, inst: BinaryInstance) -> Spec {
 /// The instance a `docs/ic/calibration.json` key names, rebuilt by the
 /// constructor the ledger used (`BoundaryConfig::default().seed`).
 fn resolve_calibration(key: &str) -> Result<Spec, String> {
+    resolve_calibration_inst(key).map(Inst::into_spec)
+}
+
+/// A resolved curve with its instance kept whole (the `field` command
+/// needs the instance's field, subgroup order and calibrators, not only
+/// the curve).
+pub enum Inst {
+    Prime(
+        String,
+        Box<crypto_lib::cryptanalysis::ic_boundary::PrimeInstance>,
+    ),
+    Binary(String, Box<BinaryInstance>),
+}
+
+impl Inst {
+    fn into_spec(self) -> Spec {
+        match self {
+            Inst::Prime(label, inst) => prime_spec(&label, &inst),
+            Inst::Binary(label, inst) => binary_spec(&label, *inst),
+        }
+    }
+}
+
+fn resolve_calibration_inst(key: &str) -> Result<Inst, String> {
     let seed = BoundaryConfig::default().seed;
     let num = |s: &str| s.parse::<u32>().map_err(|e| format!("{key}: {e}"));
     if let Some(rest) = key.strip_prefix("prime/bench-") {
         let bits = num(rest.trim_end_matches("bit"))?;
         let inst = roster_prime_instance(bits).ok_or(format!("{key}: no roster curve"))?;
-        return Ok(prime_spec(key, &inst));
+        return Ok(Inst::Prime(key.to_string(), Box::new(inst)));
     }
     if let Some(rest) = key.strip_prefix("prime/generated-") {
         let (bits, tag) = rest.split_once("bit-").ok_or(format!("{key}: odd name"))?;
@@ -516,7 +545,7 @@ fn resolve_calibration(key: &str) -> Result<Spec, String> {
         let inst = find_prime_order_curve(bits, seed);
         let want: u64 = tag.parse().map_err(|_| format!("{key}: odd tag"))?;
         return if inst.curve.p == want {
-            Ok(prime_spec(key, &inst))
+            Ok(Inst::Prime(key.to_string(), Box::new(inst)))
         } else {
             Err(format!(
                 "{key}: find_prime_order_curve({bits}, ledger seed) gives p = {}, not {want}",
@@ -529,7 +558,7 @@ fn resolve_calibration(key: &str) -> Result<Spec, String> {
         let n = num(n)?;
         let inst = random_binary_instance(n, seed, 8).ok_or(format!("{key}: no curve found"))?;
         return if format!("{:x}", inst.b) == tag {
-            Ok(binary_spec(key, inst))
+            Ok(Inst::Binary(key.to_string(), Box::new(inst)))
         } else {
             Err(format!(
                 "{key}: random_binary_instance gives b = {:x}, not {tag}",
@@ -544,7 +573,7 @@ fn resolve_calibration(key: &str) -> Result<Spec, String> {
         let a: u8 = a.parse().map_err(|_| format!("{key}: odd a"))?;
         let n = num(rest.trim_end_matches(')'))?;
         let inst = koblitz_instance(a, n).ok_or(format!("{key}: no usable subgroup"))?;
-        return Ok(binary_spec(key, inst));
+        return Ok(Inst::Binary(key.to_string(), Box::new(inst)));
     }
     Err(format!("{key}: no resolver for this row"))
 }
@@ -553,6 +582,10 @@ fn resolve_calibration(key: &str) -> Result<Spec, String> {
 /// that degree, or the ledger's random binary curve, whose rebuilt ICV1
 /// identity equals the slug.
 fn resolve_slug(slug: &str) -> Result<Spec, String> {
+    resolve_slug_inst(slug).map(Inst::into_spec)
+}
+
+fn resolve_slug_inst(slug: &str) -> Result<Inst, String> {
     let n = curve_id::binary_degree(slug).ok_or(format!("{slug}: no degree in the slug"))?;
     let mut candidates: Vec<BinaryInstance> = Vec::new();
     candidates.extend(koblitz_instance(0, n));
@@ -562,7 +595,7 @@ fn resolve_slug(slug: &str) -> Result<Spec, String> {
     }
     for inst in candidates {
         if curve_id::same_curve(&inst.curve_id().slug, slug) {
-            return Ok(binary_spec(slug, inst));
+            return Ok(Inst::Binary(slug.to_string(), Box::new(inst)));
         }
     }
     Err(format!(
@@ -670,6 +703,12 @@ fn emit(spec: Result<Spec, String>, cfg: &Cfg, failed: &mut bool) {
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
+    match args.first().map(String::as_str) {
+        Some("field") => std::process::exit(field::run(&args[1..])),
+        Some("retable") => std::process::exit(tables::retable_cli(&args[1..])),
+        Some("reprice-ledger") => std::process::exit(tables::reprice_cli(&args[1..])),
+        _ => {}
+    }
     let mut cfg = Cfg::default();
     let (mut prime, mut binary, mut from_cal, mut list) = (None, None, false, false);
     let mut only: Option<String> = None;
