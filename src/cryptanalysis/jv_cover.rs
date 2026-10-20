@@ -31,7 +31,7 @@ use rayon::prelude::*;
 use serde::Serialize;
 
 use super::f4_fp::{self, F4Options, F4Trace, Ordering as F4Ordering};
-use super::gaudry_cubic::{am, mm, sm, square_core, wiedemann_u64, PolyRing, SparseRel, UPoly};
+use super::gaudry_cubic::{PolyRing, SparseRel, UPoly, am, mm, sm, square_core, wiedemann_u64};
 use super::residual_walk::{inv_mod, is_prime_u64, mix64, pow_mod};
 use std::sync::{Arc, Mutex, OnceLock};
 
@@ -2303,8 +2303,8 @@ pub fn rho_e(spec: &Spec, seed: u64) -> RhoRunE {
 /// steps restarts from a new random point.  Every group operation of every
 /// walker is charged, the walk's multipliers once per walker.
 pub fn rho_e_dp(spec: &Spec, seed: u64, dp_bits: u32, threads: usize) -> RhoRunE {
-    use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
     use std::sync::Mutex;
+    use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
     let n = spec.l;
     let r = 32usize;
     let scalars: Vec<(u64, u64)> = {
@@ -2587,7 +2587,17 @@ pub fn run_cover_ccov(
     trace: bool,
 ) -> CcovReport {
     let mode = stop.map_or(StopMode::Full, StopMode::Staircase);
-    run_cover_ccov_mode(p, seed, random, constructed, max_degree, budget_secs, oracle_up_to_base, mode, trace)
+    run_cover_ccov_mode(
+        p,
+        seed,
+        random,
+        constructed,
+        max_degree,
+        budget_secs,
+        oracle_up_to_base,
+        mode,
+        trace,
+    )
 }
 
 /// [`run_cover_ccov`] with any [`StopMode`].
@@ -3098,9 +3108,15 @@ pub fn run_stop_study(
         o.max_pairs_per_step = Some(c);
         modes.push((format!("stop64_chunk{c}"), o));
     }
-    modes.push(("hilbert".into(), jv_options(24, 300.0).stopping_by_hilbert(usize::MAX)));
+    modes.push((
+        "hilbert".into(),
+        jv_options(24, 300.0).stopping_by_hilbert(usize::MAX),
+    ));
     for &c in chunks {
-        modes.push((format!("hilbert_chunk{c}"), jv_options(24, 300.0).stopping_by_hilbert(c)));
+        modes.push((
+            format!("hilbert_chunk{c}"),
+            jv_options(24, 300.0).stopping_by_hilbert(c),
+        ));
     }
     for (_, opts) in &mut modes {
         *opts = opts.clone().capturing_run_log();
@@ -3144,7 +3160,8 @@ pub fn run_stop_study(
         let mut ref_fp = 0usize;
         for (name, opts) in &modes {
             let _ = f4_fp::take_run_log();
-            let mut lrng = StdRng::seed_from_u64(seed ^ (k as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            let mut lrng =
+                StdRng::seed_from_u64(seed ^ (k as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15));
             let (found, cost) = nagao_decompose(&ctx, &base, &by_x, r, opts, &mut lrng);
             let log = f4_fp::take_run_log();
             if ref_found.is_none() {
@@ -3614,7 +3631,6 @@ mod tests {
         );
     }
 
-
     #[test]
     fn hilbert_stop_agrees_with_the_full_solver_and_the_oracle() {
         let (spec, ctx, base, by_x, mut rng) = small_ctx(53, 7);
@@ -3639,14 +3655,23 @@ mod tests {
             let oracle = mitm6(&jac, &t, &r);
             assert_eq!(fa, oracle, "full solver vs oracle, residual {k}");
             assert_eq!(fb, oracle, "Hilbert-stopped solver vs oracle, residual {k}");
-            assert_eq!(ca.fp_solutions, cb.fp_solutions, "F_p solutions, residual {k}");
+            assert_eq!(
+                ca.fp_solutions, cb.fp_solutions,
+                "F_p solutions, residual {k}"
+            );
             assert_eq!(ca.delta, cb.delta, "staircase, residual {k}");
-            assert!(cb.hilbert_applied != cb.hilbert_fallback, "exactly one path");
+            assert!(
+                cb.hilbert_applied != cb.hilbert_fallback,
+                "exactly one path"
+            );
             applied += cb.hilbert_applied as usize;
             fallbacks += cb.hilbert_fallback as usize;
         }
         assert!(n >= 30, "{n}");
-        assert!(applied >= n - 3, "applied {applied} fallbacks {fallbacks} of {n}");
+        assert!(
+            applied >= n - 3,
+            "applied {applied} fallbacks {fallbacks} of {n}"
+        );
     }
 
     #[test]

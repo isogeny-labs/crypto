@@ -6,7 +6,8 @@ use std::fs;
 
 fn main() {
     let a: Vec<String> = env::args().skip(1).collect();
-    let (mut sizes, mut residuals, mut constructed, mut threads) = (vec![101u64], 100usize, 20usize, 2usize);
+    let (mut sizes, mut residuals, mut constructed, mut threads) =
+        (vec![101u64], 100usize, 20usize, 2usize);
     let mut chunks = vec![1usize, 2, 4, 8];
     let mut json: Option<String> = None;
     let mut i = 0;
@@ -23,7 +24,10 @@ fn main() {
         }
         i += 2;
     }
-    rayon::ThreadPoolBuilder::new().num_threads(threads).build_global().ok();
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(threads)
+        .build_global()
+        .ok();
     let mut all = Vec::new();
     for &p in &sizes {
         let rows = run_stop_study(p, 1, residuals, constructed, &chunks);
