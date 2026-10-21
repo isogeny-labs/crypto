@@ -24,7 +24,10 @@ jobs:
           filter: blob:none
           sparse-checkout: |
             scripts/check-large-files.sh
+            scripts/test-check-large-files.sh
             .github/large-files-allowed.txt
           sparse-checkout-cone-mode: false
+      - name: Reject unavailable changed blobs
+        run: scripts/test-check-large-files.sh
       - name: New files at most 5 MB outside the allow list
         run: scripts/check-large-files.sh "origin/${{ github.base_ref }}" HEAD

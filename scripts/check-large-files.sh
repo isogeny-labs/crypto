@@ -29,10 +29,25 @@ git diff --raw --abbrev=40 --no-renames --diff-filter=ACMRT -z "$base" "$head_re
 [ -s "$changes" ] || { echo "check-large-files: no changed files"; exit 0; }
 
 if [ "$(git config --bool remote.origin.promisor 2>/dev/null)" = true ]; then
-  # One request for every changed blob; sizing them one by one would fetch each alone.
-  cut -f1 "$changes" | sort -u |
-    git fetch -q --no-tags --no-write-fetch-head --filter=blob:none --stdin origin ||
-    echo "check-large-files: batched fetch failed; sizing blobs one at a time" >&2
+  # Fetch the changed blobs in one request when possible; sparse/blobless
+  # checkouts may need a direct fallback for objects the batch request misses.
+  mapfile -t blobs < <(cut -f1 "$changes" | sort -u)
+  mapfile -t missing < <(printf '%s\n' "${blobs[@]}" |
+    git cat-file --batch-check='%(objectname) %(objecttype)' |
+    awk '$2 == "missing" { print $1 }')
+  if [ "${#missing[@]}" -gt 0 ] && ! printf '%s\n' "${missing[@]}" |
+      git fetch -q --no-tags --no-write-fetch-head --filter=blob:none --stdin origin; then
+    echo "check-large-files: batched fetch failed; checking and retrying missing blobs directly" >&2
+    git fetch -q --no-tags --no-write-fetch-head --filter=blob:none origin "${missing[@]}" ||
+      echo "check-large-files: direct blob request failed; the size check will reject any missing object" >&2
+    mapfile -t missing < <(printf '%s\n' "${blobs[@]}" |
+      git cat-file --batch-check='%(objectname) %(objecttype)' |
+      awk '$2 == "missing" { print $1 }')
+    for blob in "${missing[@]}"; do
+      git fetch -q --no-tags --no-write-fetch-head --filter=blob:none origin "$blob" ||
+        echo "check-large-files: unable to fetch $blob; the size check will reject it if still missing" >&2
+    done
+  fi
 fi
 
 patterns=()
