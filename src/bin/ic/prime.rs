@@ -25,6 +25,8 @@ use serde::Serialize;
 use serde_json::{json, Value};
 use std::time::Instant;
 
+use super::params;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum PrimeBase {
