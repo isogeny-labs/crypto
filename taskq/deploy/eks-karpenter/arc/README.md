@@ -8,14 +8,23 @@ separate from the `cpu-spot` Iso Lab measurement pool.
 
 | Scale set / `runs-on` | Pod request | Pod memory limit | Maximum runners |
 | --- | --- | --- | --- |
-| `crypto-eks-linux` | 2.8 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 11 |
-| `crypto-eks-highmem` | 16 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 1 |
+| `crypto-eks-linux` | 2.8 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 8 |
+| `crypto-eks-highmem` | 14 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 1 |
 
-The base NodePool admits x86-64 M/R instances with 8, 16 or 32 vCPUs and caps
-aggregate provisioning at 128 vCPUs and 1 TiB. An additional R-family pool
-admits 16-vCPU nodes and caps at 32 vCPUs and 256 GiB. The pool names and the
-`gha.dev/pool=on-demand` scheduling label are legacy; the Karpenter
-`karpenter.sh/capacity-type=spot` requirement controls the actual EC2 capacity.
+The two general CI pools each cap provisioning at 16 vCPUs and 128 GiB,
+using x86-64 R instances (8/16 vCPUs in the base pool, 16 in the extra pool).
+The `gha-gates` pool reserves another 16 vCPUs and 128 GiB for the high-memory
+queue through `gha.dev/pool=gates`. Its runner requests 14 CPUs plus the
+0.5-CPU Docker sidecar, fitting a 16-vCPU R node after node reservations.
+The general pool names and `gha.dev/pool=on-demand` label are legacy;
+all three pools require `karpenter.sh/capacity-type=spot`.
+
+Together these CI pools cap at 48 vCPUs. With the current 32-vCPU harness host,
+4-vCPU system group, and one 8-vCPU benchmark worker, the planned allocation
+is 92 of the account's 96 Standard Spot vCPUs in us-east-2. Recalculate this
+budget when other Spot consumers change. The benchmark pool retains its own
+64-vCPU cap; account-wide capacity still limits concurrent launches.
+
 Both ARC scale sets have `minRunners: 0`. With no queued or running jobs, ARC
 removes its ephemeral runner pods and Karpenter removes empty runner nodes after
 five minutes. The managed system node group has a two-node floor for the ARC and
@@ -171,7 +180,24 @@ The ordinary Linux scale set requests 2.8 CPUs per runner (its 4-CPU limit
 is unchanged). With the 0.5-CPU Docker sidecar, two runner pods request 6.6
 CPUs and 56 GiB, fitting an 8-vCPU R node after kube/system reservations and
 DaemonSets. The previous 4-CPU request allowed only one runner per node,
-even when more than half of its RAM was free. The live 11-runner limit is
+even when more than half of its RAM was free. The 8-runner limit is
 recorded in `linux-values.yaml`. Existing running pods keep their original
 resources; replacement pods adopt the new requests. This changes CI capacity
 only, never the dedicated benchmark pod's Guaranteed resources.
+
+## CI gates within the 96-vCPU quota
+
+`gate-workflows.txt` records ordinary CI workflows routed to the separate
+high-memory queue so research jobs cannot fill its only runner slot. Apply
+these names to `CRYPTO_EKS_HIGHMEM_WORKFLOWS`, preserving any existing entries.
+The existing routing expressions keep fork PRs and `pull_request_target` on
+GitHub-hosted runners. CodeQL's ARM and language matrix jobs also retain their
+existing runners. No checks, path filters, or review gates are disabled.
+
+When migrating from the old M-family nodes, cordon them and let active jobs
+finish. Lowering a NodePool limit does not remove its existing nodes. Verify
+that the old nodes have become empty and terminated before counting their
+vCPUs as available; do not drain active experiment jobs. Reduce the general
+scale set to eight runners after its active count falls to eight or fewer.
+The checked-in values describe the final allocation. All queues idle at zero
+and all empty CI nodes consolidate after five minutes.

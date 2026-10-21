@@ -69,21 +69,21 @@ spec:
           values: [spot]
         - key: karpenter.k8s.aws/instance-category
           operator: In
-          values: [m, r]
+          values: [r]
         - key: karpenter.k8s.aws/instance-generation
           operator: Gt
           values: ["5"]
         - key: karpenter.k8s.aws/instance-cpu
           operator: In
-          values: ["8", "16", "32"]
+          values: ["8", "16"]
         - key: karpenter.k8s.aws/instance-family
           operator: NotIn
           values: [m7i-flex, m8i-flex]
       expireAfter: Never
       terminationGracePeriod: 6h
   limits:
-    cpu: "128"
-    memory: 1Ti
+    cpu: "16"
+    memory: 128Gi
   disruption:
     consolidationPolicy: WhenEmpty
     consolidateAfter: 5m
@@ -135,8 +135,60 @@ spec:
       expireAfter: Never
       terminationGracePeriod: 6h
   limits:
-    cpu: "32"
-    memory: 256Gi
+    cpu: "16"
+    memory: 128Gi
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 5m
+    budgets:
+      - nodes: "0"
+        reasons: [Drifted]
+      - nodes: "100%"
+        reasons: [Empty]
+---
+# Reserve one memory-rich Spot node for CI checks within the 96-vCPU account quota.
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: gha-gates
+spec:
+  template:
+    metadata:
+      labels:
+        gha.dev/pool: gates
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: gha
+      taints:
+        - key: gha.dev/workload
+          value: runner
+          effect: NoSchedule
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: [amd64]
+        - key: kubernetes.io/os
+          operator: In
+          values: [linux]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: [spot]
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values: [r]
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values: ["5"]
+        - key: karpenter.k8s.aws/instance-cpu
+          operator: In
+          values: ["16"]
+      expireAfter: Never
+      terminationGracePeriod: 6h
+  limits:
+    cpu: "16"
+    memory: 128Gi
   disruption:
     consolidationPolicy: WhenEmpty
     consolidateAfter: 5m

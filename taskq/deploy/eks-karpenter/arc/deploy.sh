@@ -19,6 +19,7 @@ kubectl apply -f nodepool.yaml
 kubectl wait --for=condition=Ready ec2nodeclass/gha --timeout=5m
 kubectl wait --for=condition=Ready nodepool/gha-on-demand --timeout=5m
 kubectl wait --for=condition=Ready nodepool/gha-on-demand-extra --timeout=5m
+kubectl wait --for=condition=Ready nodepool/gha-gates --timeout=5m
 
 chart=oci://ghcr.io/actions/actions-runner-controller-charts
 version=0.15.0
