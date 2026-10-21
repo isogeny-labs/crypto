@@ -60,6 +60,8 @@ on:
       - 'research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json'
       - 'research/la_engines_20261014/summary.json'
       - 'research/ic_oracle_setup_blocked_20261020/RESULT.json'
+      - 'research/ic_planner_validation_20261020/analysis/summary.json'
+      - 'research/ic_planner_validation_20261020/specs/*.json'
       - '.github/workflows/ic-leaderboard.yml'
       - 'scripts/build_lab_browser.py'
       - 'docs/browser/**'
@@ -115,6 +117,8 @@ on:
       - 'research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json'
       - 'research/la_engines_20261014/summary.json'
       - 'research/ic_oracle_setup_blocked_20261020/RESULT.json'
+      - 'research/ic_planner_validation_20261020/analysis/summary.json'
+      - 'research/ic_planner_validation_20261020/specs/*.json'
       - '.github/workflows/ic-leaderboard.yml'
       - 'scripts/build_lab_browser.py'
       - 'docs/browser/**'
@@ -136,7 +140,7 @@ concurrency:
 
 jobs:
   current:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-leaderboard.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-leaderboard.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
