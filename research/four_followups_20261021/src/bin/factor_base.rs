@@ -536,11 +536,8 @@ fn run_row(row: Value, bits: u64, policy: Policy) -> Value {
     } else {
         false
     };
-    assert!(
-        verified,
-        "source verification failed for {}",
-        w["workload_id"]
-    );
+    // Preserve an incorrect recovery or cap exhaustion as an explicit row;
+    // one bad target must not erase the rest of the cohort.
     let instrument = inst.fresh();
     let twice = instrument.curve.mul(instrument.generator, 2);
     instrument.curve.f.reset();
