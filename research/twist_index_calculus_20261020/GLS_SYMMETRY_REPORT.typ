@@ -37,7 +37,9 @@ All raw relation sets are identical across arms. Every witness has a four-elemen
 
 The chart shows flat/folded recorded $F_(p^2)$ multiplication-count ratios for the cold one-target v2 solves. There are three target scalars per cell; setup and collection follow one deterministic trajectory per cell. Ratios on $p=211$ are 1.638, 1.317, and 1.117 for $B=12,24,36$. At $p=101$ and $p=307$, base and table construction dominate and the ratio is approximately one. Rho uses fewer recorded $F_(p^2)$ multiplications in every cell.
 
-The v2 wall times are shared-host L0 descriptions, not isolated benchmark verdicts. Counted group additions contain field multiplications and inversions; summing these counters would double-count. Field additions, inner base-field arithmetic, hashing and allocations are not exhaustively priced. The required complete group-addition-equivalent cost model, isolated timing, polynomial-system solver, external fastest-implementation comparison, and scalable cryptanalytic claim remain open.
+The v2 wall times are shared-host L0 descriptions, not isolated benchmark verdicts. Counted group additions contain field multiplications and inversions; summing these counters would double-count. Field additions, inner base-field arithmetic, hashing and allocations are not exhaustively priced. The required complete group-addition-equivalent cost model, isolated timing, polynomial-system solver, external fastest-implementation comparison, and scalable cryptanalytic claim remain open. Visual copies remain in `benchmarks/20261021-gls-twist-index-calculus/`, but this study is held out of the admitted benchmark table under the current `VALIDATION.json` gate.
+
+The toy producer finds $lambda$ by a charged linear scan for $x^2=-1 mod r$ and checks the subgroup action. At large prime order, an implementation should compute the modular square roots and test both; that implementation was not benchmarked here.
 
 == Consequences for relation finding
 - Folding reduces unknown logs from $B$ to $B/2$ in this GLS subgroup. It does not increase the number of raw hits at fixed physical base.

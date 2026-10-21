@@ -171,10 +171,24 @@ protocol's stronger requirement to price every unpriced operation in
 group-addition equivalents is therefore **not met**; this is an open
 measurement requirement. The L0 timings also lack CPU isolation and an
 external fastest-implementation baseline. No speedup claim or canonical
-IC leaderboard promotion follows. We checked
+IC leaderboard promotion follows. The [visual benchmark copies](../../benchmarks/20261021-gls-twist-index-calculus/)
+remain available, but the current `VALIDATION.json` admission rule excludes
+this study from the `benchmarks/README.md` results table until independent
+headline recomputation and a fully priced strongest-rho reference exist.
+The earlier [mixed-study copies](../../benchmarks/20261021-twist-mixed-ic/)
+are held out for the same reason. We checked
 `docs/index-calculus-scoreboard.html`, `docs/ic/progress-timeline.json`,
 `docs/ic-leaderboard.html` and study-local graphs; their published
 performance conclusions do not change.
+
+The v2 producer identifies `lambda` by scanning `x=1..r−1` for
+`x²=-1 mod r` and then checking `[x]G=psi(G)`. Its modular-square tests
+and scalar checks are charged in the toy cold run, but this **linear scan
+is not a scalable eigenvalue algorithm**. A large-prime implementation
+would compute the two square roots of `−1 mod r` using modular square-root
+arithmetic, then test both on `G`. That implementation and its map/setup
+cost are not benchmarked here; the toy ratios must not be extrapolated
+to large `r` on the basis of this code.
 
 ## Other twist routes, with discriminating conditions
 
