@@ -1,0 +1,110 @@
+{
+  "schema": "nist-factorization-provenance/v1",
+  "run_id": "nist-factor-continuation-20261021T1424Z",
+  "date": "2026-10-21",
+  "input_repository_commit": "975ead8681008d4e1bbe88f910ea39030af21f2c",
+  "upstream_dissect_commit": "8edc3030fb91411a55aa6c07d050507d840c5e55",
+  "fixture_matches_external_bundle": true,
+  "runtimes": {
+    "pari": "2.17.2 (GMP 6.3.0)",
+    "gmp_ecm": "7.0.6",
+    "lean": "4.35.0",
+    "gp_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+    "ecm_sha256": "5136926764cca2f2667007ebee094c2afc67e59cbefa38cceaef91831d3a1ef5",
+    "lean_sha256": "bf8d54e4714cc4b03d3f6bb34c83b7202b87e49c8bfcbff6895c085bb90ceb38"
+  },
+  "host": {
+    "kernel": "Linux 6.18.55",
+    "architecture": "x86_64",
+    "cpu_limit": 4,
+    "memory_limit_bytes": "17179869184",
+    "isolation": "L0; shared unisolated container",
+    "simultaneous_factor_workers": 2
+  },
+  "source_hashes": [
+    {
+      "path": "backlog/XP-20261021-nist-skipped-curves/curves.json",
+      "sha256": "0c91017518ccc206a3955cacb93c68991f3d44ae3fc64031fd9ab55b862d3072"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/certify_parts.gp",
+      "sha256": "8fa2314f768785c88763f14f3bf5bba376b55254f25dda99150f94f3f79ca420"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/factor_one.gp",
+      "sha256": "3ffd462317acdeb6f44fafae0342bba4b36ece4b576f0ff750a4c763932d7d54"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/targets.gp",
+      "sha256": "478892296ed8084015bd4a7a123a9a4e1c8261444452123150f922ae7ce3a043"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/verify_factors.gp",
+      "sha256": "d68c735ace5fb4b1ffbc6609d38686678de2abbbc714f87e297b280b617fcde2"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/write_lean.gp",
+      "sha256": "402023105c3e2bda607e1ec32d4a66ee624f44126008d54abb53f0b45e3b1b71"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/continue_ecm.sh",
+      "sha256": "fef70e83fe5c1639c688f090963abf82f14de99340e543aaa1394a29a21b7e46"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/replay_results.sh",
+      "sha256": "271c06d95c501214877e870c52ad5eae2a849067fb1e507260ea6cf1ee72b750"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/run_ecm.sh",
+      "sha256": "26b31abe2a79b9c44b0bf77345bf06cf6b319386e94c3439a102e1ac188157d3"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/run_factor.sh",
+      "sha256": "427a75844431848a353cb89843562e9eb8715699e06909f90581a458f2a2fa46"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/identity_records.rs",
+      "sha256": "7a24f3087fcb7cdd8312f9c756ebb5b4fd7efbbda7890f7e3d08916adf42d24f"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/ProductIdentities.lean",
+      "sha256": "08ea7fe409e20e00b91ac5d21932309207668cba88b9ee31121a75f1edd731a2"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/lean-toolchain",
+      "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/PROTOCOL-ERRATUM.md",
+      "sha256": "a6c4e703d5021b2a97c419703808f008352bf0108c4eb1b82971d7f2073f9403"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/PROTOCOL-ESCALATION-3M.md",
+      "sha256": "ea29cd2eb8828f31b3909cad534d9d26b2e828eaa59a9c5ae681a86f00c60747"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/PROTOCOL-ESCALATION.md",
+      "sha256": "9323fd47285dabaf4a6fb1e01aa5d26f5126b42a2db579d92e93c668b58e4719"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/PROTOCOL.md",
+      "sha256": "7fed14872098168e662af855399a617a2bbfd13649caaa86734de67f44596ddb"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/inputs/upstream-dissect.zip",
+      "sha256": "1f1d54be2a8b5755f5e61ef93f5be520e4cd6efa401360d6891ee8b5cf77c662"
+    },
+    {
+      "path": "research/nist_skipped_curve_dissection_20261021/factorization/targets.jsonl",
+      "sha256": "6858325de8cbf2e4877b65bbf81d342c239e32559408d063278ba2f603467506"
+    }
+  ],
+  "large_integer_encoding": "decimal strings; native exact arithmetic only",
+  "formalization_scope": "nine product equalities over Nat; no Lean primality theorem",
+  "primality_scope": "PARI primecertisvalid plus separate isprime replay",
+  "lean4checker": "not installed",
+  "manual_workflow_dispatched": false,
+  "remote_factor_queries": "read-only hints; no submissions",
+  "conductor": "unavailable; documented fallback",
+  "local_source_history": "runs/source-history.bundle; verify with git bundle verify and fetch if needed"
+}
