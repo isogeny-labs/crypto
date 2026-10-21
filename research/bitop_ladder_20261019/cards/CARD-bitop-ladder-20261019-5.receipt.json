@@ -1,0 +1,80 @@
+{
+  "card_id": "CARD-bitop-ladder-20261019-5",
+  "card_path": "research/bitop_ladder_20261019/cards/CARD-bitop_ladder-20261019-5.yaml",
+  "card_sha256": "76a2c91c4923a3cf23eee59866b541199b8be5d24cfff800b03d79d0860bb533",
+  "commands": [
+    {
+      "argv": [
+        "./run_sessions.sh",
+        "specs/train-P26-rf3-ext2.json",
+        "specs/train-P27-rf3-ext2.json",
+        "specs/train-P28-rf3-ext2.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.929,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": "research/bitop_ladder_20261019",
+      "exit_code": 0,
+      "id": "train-panel",
+      "index": 1,
+      "outputs": {
+        "research/bitop_ladder_20261019/sessions/train-P26-rf3-ext2/verify.json": "e2984d5c5ae4bc3220b17b541ea158cb388cce66cf260fe11f34831ed7e10983",
+        "research/bitop_ladder_20261019/sessions/train-P27-rf3-ext2/verify.json": "fad3306062f291c40c87575cc3d716fd7306a0cf4eaa51dd299189dfcd53b035",
+        "research/bitop_ladder_20261019/sessions/train-P28-rf3-ext2/verify.json": "d448c355dd2d1b0911bdc5ab98f5471f67d914f73cb912a319e4795915a9783a"
+      },
+      "seconds": 2.929,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "b430761eefd0bdd1d62ecc14563f856866842d66543cc5c41c983258c7640c4c",
+      "stdout_tail": [
+        "DONE train-P27-rf3-ext2",
+        "DONE train-P26-rf3-ext2",
+        "DONE train-P28-rf3-ext2"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 1,
+  "commit": "5175f9f1e06656fd379c1202e1abaa5255104fe3",
+  "dirty_after": [
+    "research/bitop_ladder_20261019/cards/CARD-bitop-ladder-20261019-4.assessment.yaml",
+    "research/bitop_ladder_20261019/cards/CARD-bitop-ladder-20261019-5.run.stdout",
+    "research/bitop_ladder_20261019/cards/CARD-bitop_ladder-20261019-5.yaml",
+    "research/bitop_ladder_20261019/logs/train-P26-rf3-ext2.run.log",
+    "research/bitop_ladder_20261019/logs/train-P26-rf3-ext2.verify.log",
+    "research/bitop_ladder_20261019/logs/train-P27-rf3-ext2.run.log",
+    "research/bitop_ladder_20261019/logs/train-P27-rf3-ext2.verify.log",
+    "research/bitop_ladder_20261019/logs/train-P28-rf3-ext2.run.log",
+    "research/bitop_ladder_20261019/logs/train-P28-rf3-ext2.verify.log",
+    "research/bitop_ladder_20261019/sessions/train-P26-rf3-ext2/host.json",
+    "research/bitop_ladder_20261019/sessions/train-P26-rf3-ext2/plan.json",
+    "research/bitop_ladder_20261019/sessions/train-P26-rf3-ext2/records.jsonl",
+    "research/bitop_ladder_20261019/sessions/train-P26-rf3-ext2/session.json",
+    "research/bitop_ladder_20261019/sessions/train-P26-rf3-ext2/spec.json",
+    "research/bitop_ladder_20261019/sessions/train-P26-rf3-ext2/verify.json",
+    "research/bitop_ladder_20261019/sessions/train-P27-rf3-ext2/host.json",
+    "research/bitop_ladder_20261019/sessions/train-P27-rf3-ext2/plan.json",
+    "research/bitop_ladder_20261019/sessions/train-P27-rf3-ext2/records.jsonl",
+    "research/bitop_ladder_20261019/sessions/train-P27-rf3-ext2/session.json",
+    "research/bitop_ladder_20261019/sessions/train-P27-rf3-ext2/spec.json",
+    "research/bitop_ladder_20261019/sessions/train-P27-rf3-ext2/verify.json",
+    "research/bitop_ladder_20261019/sessions/train-P28-rf3-ext2/host.json",
+    "research/bitop_ladder_20261019/sessions/train-P28-rf3-ext2/plan.json",
+    "research/bitop_ladder_20261019/sessions/train-P28-rf3-ext2/records.jsonl",
+    "research/bitop_ladder_20261019/sessions/train-P28-rf3-ext2/session.json",
+    "research/bitop_ladder_20261019/sessions/train-P28-rf3-ext2/spec.json",
+    "research/bitop_ladder_20261019/sessions/train-P28-rf3-ext2/verify.json"
+  ],
+  "dirty_before": [
+    "research/bitop_ladder_20261019/cards/CARD-bitop-ladder-20261019-4.assessment.yaml",
+    "research/bitop_ladder_20261019/cards/CARD-bitop_ladder-20261019-5.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

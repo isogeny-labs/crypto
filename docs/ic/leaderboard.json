@@ -102,6 +102,10 @@
    "path": "research/la_engines_20261014/summary.json",
    "sha256": "b34650a95c5f106c8302dc5311194d8e1ffb798dff59b2669cda59818712f533"
   },
+  "bitop_ladder": {
+   "path": "research/bitop_ladder_20261019/summary.json",
+   "sha256": "c7f5dd2ed72c77d6cca26fc4dfedb2407cdbbfa51c1cdc8079bfba9b8aac638f"
+  },
   "hec_bitop": {
    "path": "research/hec_bitop_20261020/analysis/analysis.json",
    "sha256": "87615d6925b4ed8ecf997b88c84699726feed5c17402f838c126e626e79ab4d9"
@@ -49457,6 +49461,623 @@
   "study": "research/la_engines_20261014/",
   "report": "research/la_engines_20261014/REPORT.pdf",
   "class": "engineering"
+ },
+ "bitop_prime_ladder": {
+  "fits": [
+   {
+    "arm": "rho-neg",
+    "bits": "16-26",
+    "tier": "toy",
+    "sizes": 11,
+    "runs": 880,
+    "alpha_additions": 0.412769633907,
+    "alpha_additions_ci95": [
+     0.388269025726,
+     0.447153819814
+    ],
+    "alpha_bitops": 0.547569719336,
+    "alpha_bitops_ci95": [
+     0.528036998056,
+     0.57585784653
+    ],
+    "ratio_to_floor": 1.46602002946,
+    "ratio_to_floor_ci95": [
+     1.30362336439,
+     1.65946262746
+    ],
+    "bound_id": "ECBND1h955234ecf4fd"
+   },
+   {
+    "arm": "rho-neg",
+    "bits": "16-32",
+    "tier": "toy",
+    "sizes": 17,
+    "runs": 1360,
+    "alpha_additions": 0.439692432776,
+    "alpha_additions_ci95": [
+     0.41839181246,
+     0.461565419058
+    ],
+    "alpha_bitops": 0.559489993039,
+    "alpha_bitops_ci95": [
+     0.543239713149,
+     0.575671018543
+    ],
+    "ratio_to_floor": 1.32829522653,
+    "ratio_to_floor_ci95": [
+     1.19409320625,
+     1.48060670452
+    ],
+    "bound_id": "ECBND1h3fa1f7c64fb6"
+   },
+   {
+    "arm": "rho-neg",
+    "bits": "33-40",
+    "tier": "medium",
+    "sizes": 8,
+    "runs": 640,
+    "alpha_additions": 0.504323122597,
+    "alpha_additions_ci95": [
+     0.449079670334,
+     0.574865073688
+    ],
+    "alpha_bitops": 0.582085711394,
+    "alpha_bitops_ci95": [
+     0.527205415975,
+     0.650533404549
+    ],
+    "ratio_to_floor": 1.04847665099,
+    "ratio_to_floor_ci95": [
+     0.981132872457,
+     1.11585694026
+    ],
+    "bound_id": "ECBND1h0b2e17edf289"
+   },
+   {
+    "arm": "bsgs-neg",
+    "bits": "16-26",
+    "tier": "toy",
+    "sizes": 11,
+    "runs": 880,
+    "alpha_additions": 0.491517860831,
+    "alpha_additions_ci95": [
+     0.479205223782,
+     0.506852489547
+    ],
+    "alpha_bitops": 0.626317946261,
+    "alpha_bitops_ci95": [
+     0.609439715292,
+     0.646693158062
+    ],
+    "ratio_to_floor": 1.17340150968,
+    "ratio_to_floor_ci95": [
+     1.14274703783,
+     1.20389204128
+    ],
+    "bound_id": "ECBND1he674257c7cf1"
+   },
+   {
+    "arm": "bsgs-neg",
+    "bits": "16-32",
+    "tier": "toy",
+    "sizes": 17,
+    "runs": 1360,
+    "alpha_additions": 0.495296093643,
+    "alpha_additions_ci95": [
+     0.488993039643,
+     0.501388902087
+    ],
+    "alpha_bitops": 0.615093653906,
+    "alpha_bitops_ci95": [
+     0.605701051227,
+     0.623250816679
+    ],
+    "ratio_to_floor": 1.16607108533,
+    "ratio_to_floor_ci95": [
+     1.14329186587,
+     1.19183816202
+    ],
+    "bound_id": "ECBND1h20800462b4d7"
+   },
+   {
+    "arm": "bsgs-neg",
+    "bits": "33-40",
+    "tier": "medium",
+    "sizes": 8,
+    "runs": 640,
+    "alpha_additions": 0.49657714399,
+    "alpha_additions_ci95": [
+     0.475477987921,
+     0.519617136996
+    ],
+    "alpha_bitops": 0.574339732788,
+    "alpha_bitops_ci95": [
+     0.551973762742,
+     0.59895631254
+    ],
+    "ratio_to_floor": 1.14689834469,
+    "ratio_to_floor_ci95": [
+     1.11411922689,
+     1.1801636239
+    ],
+    "bound_id": "ECBND1hc671214a4bce"
+   },
+   {
+    "arm": "kangaroo",
+    "bits": "16-26",
+    "tier": "toy",
+    "sizes": 11,
+    "runs": 880,
+    "alpha_additions": 0.526169482443,
+    "alpha_additions_ci95": [
+     0.46244756163,
+     0.578081031258
+    ],
+    "alpha_bitops": 0.660969567873,
+    "alpha_bitops_ci95": [
+     0.601041531987,
+     0.711218799462
+    ],
+    "ratio_to_floor": 2.78892875534,
+    "ratio_to_floor_ci95": [
+     2.4894993189,
+     3.1211189286
+    ],
+    "bound_id": "ECBND1h08cd56a70221"
+   },
+   {
+    "arm": "kangaroo",
+    "bits": "16-32",
+    "tier": "toy",
+    "sizes": 17,
+    "runs": 1360,
+    "alpha_additions": 0.485309050916,
+    "alpha_additions_ci95": [
+     0.462703985349,
+     0.505294380798
+    ],
+    "alpha_bitops": 0.605106611179,
+    "alpha_bitops_ci95": [
+     0.578018696576,
+     0.628548101737
+    ],
+    "ratio_to_floor": 2.61428287157,
+    "ratio_to_floor_ci95": [
+     2.40136085661,
+     2.88290743023
+    ],
+    "bound_id": "ECBND1h5a8d995746c0"
+   },
+   {
+    "arm": "kangaroo",
+    "bits": "33-40",
+    "tier": "medium",
+    "sizes": 8,
+    "runs": 640,
+    "alpha_additions": 0.491348944781,
+    "alpha_additions_ci95": [
+     0.401334669468,
+     0.576004902353
+    ],
+    "alpha_bitops": 0.569111533578,
+    "alpha_bitops_ci95": [
+     0.478377610775,
+     0.654321450439
+    ],
+    "ratio_to_floor": 2.6006285239,
+    "ratio_to_floor_ci95": [
+     2.27270209685,
+     2.94187627554
+    ],
+    "bound_id": "ECBND1h7020831f73d6"
+   },
+   {
+    "arm": "ic-pair-rule",
+    "bits": "16-26",
+    "tier": "toy",
+    "sizes": 11,
+    "runs": 880,
+    "alpha_additions": 0.558183210541,
+    "alpha_additions_ci95": [
+     0.529600187217,
+     0.588496758973
+    ],
+    "alpha_bitops": 0.692983295971,
+    "alpha_bitops_ci95": [
+     0.671860503596,
+     0.714792185616
+    ],
+    "ratio_to_floor": 14.9277415789,
+    "ratio_to_floor_ci95": [
+     13.7040483186,
+     16.2716201226
+    ],
+    "bound_id": "ECBND1h71d5967b81fe"
+   },
+   {
+    "arm": "ic-pair-rule",
+    "bits": "16-28",
+    "tier": "toy",
+    "sizes": 13,
+    "runs": 1040,
+    "alpha_additions": 0.572559652911,
+    "alpha_additions_ci95": [
+     0.549021406387,
+     0.599719207729
+    ],
+    "alpha_bitops": 0.701902652307,
+    "alpha_bitops_ci95": [
+     0.686180505178,
+     0.721451249684
+    ],
+    "ratio_to_floor": 16.1053632494,
+    "ratio_to_floor_ci95": [
+     14.3755946673,
+     18.0581463742
+    ],
+    "bound_id": "ECBND1h3659e1f72071"
+   },
+   {
+    "arm": "ic-pair-rule",
+    "bits": "16-32",
+    "tier": "toy",
+    "sizes": 17,
+    "runs": 1360,
+    "alpha_additions": 0.595306619217,
+    "alpha_additions_ci95": [
+     0.575805804181,
+     0.616727500822
+    ],
+    "alpha_bitops": 0.71510417948,
+    "alpha_bitops_ci95": [
+     0.702925960327,
+     0.729075881231
+    ],
+    "ratio_to_floor": 19.5537992267,
+    "ratio_to_floor_ci95": [
+     16.4273788404,
+     22.9674380543
+    ],
+    "bound_id": "ECBND1h050a8f714c76"
+   },
+   {
+    "arm": "ic-pair-rule",
+    "bits": "33-40",
+    "tier": "medium",
+    "sizes": 8,
+    "runs": 640,
+    "alpha_additions": 0.646221794881,
+    "alpha_additions_ci95": [
+     0.628904175506,
+     0.658553743696
+    ],
+    "alpha_bitops": 0.723984383678,
+    "alpha_bitops_ci95": [
+     0.707079915632,
+     0.736329158314
+    ],
+    "ratio_to_floor": 59.8451272546,
+    "ratio_to_floor_ci95": [
+     50.2736210749,
+     70.0578474457
+    ],
+    "bound_id": "ECBND1h06f15b921d25"
+   },
+   {
+    "arm": "ic-pair-b32",
+    "bits": "16-26",
+    "tier": "toy",
+    "sizes": 11,
+    "runs": 880,
+    "alpha_additions": 0.792360708671,
+    "alpha_additions_ci95": [
+     0.696320359974,
+     0.888060300529
+    ],
+    "alpha_bitops": 0.9271607941,
+    "alpha_bitops_ci95": [
+     0.839747976769,
+     1.01475197866
+    ],
+    "ratio_to_floor": 33.8369259057,
+    "ratio_to_floor_ci95": [
+     19.4054424509,
+     50.8564988062
+    ],
+    "bound_id": "ECBND1heedbb8c159c9"
+   },
+   {
+    "arm": "ic-pair-b32",
+    "bits": "16-28",
+    "tier": "toy",
+    "sizes": 13,
+    "runs": 1040,
+    "alpha_additions": 0.837545389112,
+    "alpha_additions_ci95": [
+     0.763989932102,
+     0.920984493684
+    ],
+    "alpha_bitops": 0.966888388508,
+    "alpha_bitops_ci95": [
+     0.902427076294,
+     1.04170612449
+    ],
+    "ratio_to_floor": 54.5548790521,
+    "ratio_to_floor_ci95": [
+     28.0179814141,
+     87.1974175755
+    ],
+    "bound_id": "ECBND1h7012123462e5"
+   },
+   {
+    "arm": "ic-rootfind-m3-rule",
+    "bits": "16-28",
+    "tier": "toy",
+    "sizes": 13,
+    "runs": 1040,
+    "alpha_additions": 0.643900579419,
+    "alpha_additions_ci95": [
+     0.628752658797,
+     0.66292982594
+    ],
+    "alpha_bitops": 0.773243578815,
+    "alpha_bitops_ci95": [
+     0.763551666847,
+     0.784377348952
+    ],
+    "ratio_to_floor": 39.7521571289,
+    "ratio_to_floor_ci95": [
+     32.0453966197,
+     48.4760286652
+    ],
+    "bound_id": "ECBND1h702e0306cf0d"
+   }
+  ],
+  "gap_to_rho": {
+   "arms": [
+    "rho-neg",
+    "bsgs-neg",
+    "kangaroo",
+    "ic-pair-rule",
+    "ic-pair-b32",
+    "ic-rootfind-m3-rule"
+   ],
+   "rows": [
+    [
+     16,
+     1.0,
+     0.557858967802,
+     1.23058958788,
+     6.23085677751,
+     6.49448961928,
+     10.1152603698
+    ],
+    [
+     17,
+     1.0,
+     0.660303332016,
+     1.45486031524,
+     7.562459716,
+     6.87374642028,
+     13.6511365912
+    ],
+    [
+     18,
+     1.0,
+     0.68912371331,
+     1.40077368407,
+     7.3362942752,
+     7.60404969808,
+     14.4098046177
+    ],
+    [
+     19,
+     1.0,
+     0.868261380797,
+     2.41914478273,
+     9.45190911146,
+     10.1049812704,
+     18.5980208028
+    ],
+    [
+     20,
+     1.0,
+     0.792213136652,
+     2.04983316887,
+     9.42941456412,
+     11.6982541652,
+     20.9816510299
+    ],
+    [
+     21,
+     1.0,
+     0.808359875364,
+     1.39095586809,
+     9.43213523966,
+     14.1071226172,
+     21.5244150778
+    ],
+    [
+     22,
+     1.0,
+     0.853258630469,
+     1.9435892311,
+     10.5330869828,
+     18.9015364234,
+     24.2595744499
+    ],
+    [
+     23,
+     1.0,
+     0.97169597849,
+     1.89660455003,
+     11.8383517904,
+     27.8752381522,
+     32.7442062391
+    ],
+    [
+     24,
+     1.0,
+     0.96020963319,
+     2.07292121807,
+     14.0766133407,
+     42.6870516119,
+     36.4650098781
+    ],
+    [
+     25,
+     1.0,
+     0.933627994527,
+     3.3454612712,
+     15.1411084934,
+     60.4757438926,
+     41.0417208087
+    ],
+    [
+     26,
+     1.0,
+     0.997397183857,
+     2.70555434811,
+     17.2220621542,
+     84.7169349245,
+     47.8000737292
+    ],
+    [
+     27,
+     1.0,
+     1.09631732581,
+     2.06805749006,
+     19.7203684638,
+     127.225957601,
+     59.064266206
+    ],
+    [
+     28,
+     1.0,
+     1.06214276209,
+     2.33477768313,
+     23.02757554,
+     192.719731584,
+     69.7109451746
+    ],
+    [
+     29,
+     1.0,
+     1.01773311672,
+     1.95855166053,
+     22.8465635944,
+     null,
+     null
+    ],
+    [
+     30,
+     1.0,
+     1.18605758469,
+     2.34023461643,
+     28.9074874116,
+     null,
+     null
+    ],
+    [
+     31,
+     1.0,
+     1.04641027167,
+     2.19600216178,
+     29.6662059557,
+     null,
+     null
+    ],
+    [
+     32,
+     1.0,
+     1.03354442136,
+     1.93873847937,
+     32.1083156847,
+     null,
+     null
+    ],
+    [
+     33,
+     1.0,
+     1.02979796586,
+     2.40783557086,
+     36.98864878,
+     null,
+     null
+    ],
+    [
+     34,
+     1.0,
+     1.09275922378,
+     2.15990334543,
+     42.6718432084,
+     null,
+     null
+    ],
+    [
+     35,
+     1.0,
+     1.21099736187,
+     3.54517050721,
+     52.4882392372,
+     null,
+     null
+    ],
+    [
+     36,
+     1.0,
+     1.19766839664,
+     2.14471171183,
+     58.6770368783,
+     null,
+     null
+    ],
+    [
+     37,
+     1.0,
+     1.04234539245,
+     2.62966674178,
+     51.4467961888,
+     null,
+     null
+    ],
+    [
+     38,
+     1.0,
+     1.13577845371,
+     2.03938972002,
+     67.2691777699,
+     null,
+     null
+    ],
+    [
+     39,
+     1.0,
+     1.03725717605,
+     2.65532627173,
+     69.513841807,
+     null,
+     null
+    ],
+    [
+     40,
+     1.0,
+     1.03646527745,
+     2.28644690982,
+     78.2607808828,
+     null,
+     null
+    ]
+   ],
+   "note": "mean bitop/v1 per arm over mean bitop/v1 of rho-neg, per curve, from analysis/work.jsonl (ecbench work --counted)"
+  },
+  "before_arm": "ic-pair-b32",
+  "after_arm": "ic-pair-rule",
+  "unit": "bitop/v1",
+  "study": "research/bitop_ladder_20261019/",
+  "source": "research/bitop_ladder_20261019/summary.json",
+  "protocol": "research/bitop_ladder_20261019/PROTOCOL.md",
+  "class": "parameter selection (base size per size, chosen on a separate train panel in bitop/v1)"
  },
  "hyperelliptic_bitop_reprice": {
   "rows": [

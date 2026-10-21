@@ -1,0 +1,55 @@
+{
+  "card_id": "CARD-bitop-ladder-20261019-2",
+  "card_path": "research/bitop_ladder_20261019/cards/CARD-bitop_ladder-20261019-2.yaml",
+  "card_sha256": "0e7a15c10fb86e139bfa085bb6f7e5052131d12009931a5de263bc288609e10c",
+  "commands": [
+    {
+      "argv": [
+        "./run_sessions.sh",
+        "specs/train-P35.json",
+        "specs/train-P38.json",
+        "specs/train-P39.json",
+        "specs/train-P40.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 5575.943,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": "research/bitop_ladder_20261019",
+      "exit_code": 0,
+      "id": "train-panel",
+      "index": 1,
+      "outputs": {
+        "research/bitop_ladder_20261019/sessions/train-P35/verify.json": "7af8867c8499daed1483d10ccce0b61a76ba106cf939ef61daacaeaa3b7a2d11",
+        "research/bitop_ladder_20261019/sessions/train-P38/verify.json": "ae11c81dae6096ca1341730a3286bbc74a0930f247622a3095d69aec8d75fca4",
+        "research/bitop_ladder_20261019/sessions/train-P39/verify.json": "e45b793bef778e76603e3cf5548e1b307e7ad064a18037ab410790ec5b44def8",
+        "research/bitop_ladder_20261019/sessions/train-P40/verify.json": "ffbd3332f2525ead0d873302096f4739edf48ffbd7d530062810be1eb3d5bd4d"
+      },
+      "seconds": 5575.943,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "44c51de7931058b1ca6cac2b4db194386a04730e84835c0cbd612001b129cd68",
+      "stdout_tail": [
+        "DONE train-P35",
+        "DONE train-P38",
+        "DONE train-P39",
+        "DONE train-P40"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 1,
+  "commit": "73b1e2e0841ee2a4fea103f4f0946f12ab6b1a22",
+  "dirty_after": [],
+  "dirty_before": [
+    "research/bitop_ladder_20261019/cards/CARD-bitop_ladder-20261019-2.yaml",
+    "research/bitop_ladder_20261019/cards/CARD-bitop_ladder-20261019-3.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
