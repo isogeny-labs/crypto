@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 root11 high-K Bloom factor-base screen
 
 on:
-  push:
-    branches: [codex/n83-root11-highk-20261015]
-    paths:
-      - .github/workflows/n83-root11-highk.yml
-      - research/n83_root11_highk_20261015/**
   workflow_dispatch:
 
 permissions:

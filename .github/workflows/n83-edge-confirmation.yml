@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 frozen fresh-point edge confirmation
 
 on:
-  push:
-    branches: [codex/n83-final-tournament-20261015]
-    paths:
-      - .github/workflows/n83-edge-confirmation.yml
-      - research/n83_edge_confirmation_20261015/admission.json
   workflow_dispatch:
 
 permissions:

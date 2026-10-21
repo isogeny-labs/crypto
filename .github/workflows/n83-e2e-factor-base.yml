@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 one-target cold factor-base grid
 
 on:
-  push:
-    branches: [codex/n83-e2e-factor-base-20261016]
-    paths:
-      - .github/workflows/n83-e2e-factor-base.yml
-      - research/n83_e2e_factor_base_20261016/**
   workflow_dispatch:
 
 permissions:

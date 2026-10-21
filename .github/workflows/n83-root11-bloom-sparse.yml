@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 K3300 root11 sparse and Bloom sealed replay
 
 on:
-  push:
-    branches: [codex/n83-root11-bloom-sparse-20261015]
-    paths:
-      - .github/workflows/n83-root11-bloom-sparse.yml
-      - research/n83_root11_bloom_sparse_20261015/**
-      - research/n83_root11_bloom_sparse_results_20261015/**
   workflow_dispatch:
 
 permissions:

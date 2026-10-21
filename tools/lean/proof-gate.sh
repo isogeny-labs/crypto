@@ -28,6 +28,7 @@ here=$(cd "$(dirname "$0")" && pwd)
 root=$(git rev-parse --show-toplevel) || exit 3
 audit="$here/AuditAxioms.lean"
 trusted="${LEAN_GATE_TRUSTED:-$root/tools/lean/trusted-native.txt}"
+case "$trusted" in /*) ;; *) trusted="$PWD/$trusted" ;; esac
 trust_args=()
 [ -f "$trusted" ] && trust_args=(--trusted "$trusted")
 out=""
@@ -87,7 +88,7 @@ run_target() {
         | sed 's|^\./||; s|\.olean$||; s|/|.|g' | sort | tr '\n' ' ')
       if [ -z "$mods" ]; then
         status=FAIL_no_modules
-      elif ! (cd "$root/$t" && lake env lean --run "$audit" "${trust_args[@]}" $mods) > "$log/audit.log" 2>&1; then
+      elif ! (cd "$root/$t" && lake env lean --run "$audit" -- "${trust_args[@]}" $mods) > "$log/audit.log" 2>&1; then
         status=FAIL_audit
       fi
     fi
@@ -100,7 +101,7 @@ run_target() {
     toolchain=$(cat "$(dirname "$root/$t")/lean-toolchain" 2>/dev/null || true)
     if ! (cd "$(dirname "$root/$t")" && lean -o "$dir/$mod.olean" "$root/$t") > "$log/build.log" 2>&1; then
       status=FAIL_build
-    elif ! LEAN_PATH="$dir:${LEAN_PATH:-}" lean --run "$audit" "${trust_args[@]}" "$mod" > "$log/audit.log" 2>&1; then
+    elif ! (cd "$(dirname "$root/$t")" && LEAN_PATH="$dir:${LEAN_PATH:-}" lean --run "$audit" -- "${trust_args[@]}" "$mod") > "$log/audit.log" 2>&1; then
       status=FAIL_audit
     fi
     [ -n "$toolchain" ] && echo "toolchain pin: $toolchain" >> "$log/build.log"

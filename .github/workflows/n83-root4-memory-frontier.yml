@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 root4 standard Bloom memory-frontier screen
 
 on:
-  push:
-    branches: [codex/n83-root4-memory-frontier-20261015]
-    paths:
-      - .github/workflows/n83-root4-memory-frontier.yml
-      - research/n83_root4_memory_frontier_20261015/**
   workflow_dispatch:
 
 permissions:

@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 Bloom-on K3300 Tier 1 sealed paired IC versus rho
 
 on:
-  push:
-    branches: [codex/n83-tier1-bloom-20261015]
-    paths:
-      - .github/workflows/n83-tier1-bloom-reserve.yml
-      - research/n83_tier1_bloom_reserve_20261015/**
-      - research/n83_tier1_bloom_reserve_results_20261015/**
   workflow_dispatch:
 
 permissions:

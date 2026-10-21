@@ -322,8 +322,19 @@ jobs:
       # Keep Cargo output outside the package tree while it is fingerprinted.
       # `runner.temp` is not available in job-level `env`, so set it per job.
       - name: Keep Cargo output outside the package tree
+        id: target-paths
         shell: bash
-        run: echo "CARGO_TARGET_DIR=$RUNNER_TEMP/isogeny-target" >> "$GITHUB_ENV"
+        run: |
+          echo "CARGO_TARGET_DIR=$RUNNER_TEMP/isogeny-target" >> "$GITHUB_ENV"
+          # rust-cache joins targets to the workspace; it requires relative paths.
+          node <<'JS' >> "$GITHUB_OUTPUT"
+          const path = require('node:path');
+          const root = path.join(process.env.GITHUB_WORKSPACE, 'tools/isogeny-cli');
+          for (const [key, dir] of [['native', 'isogeny-target'], ['soft', 'isogeny-software-hash']]) {
+            const relative = path.relative(root, path.join(process.env.RUNNER_TEMP, dir));
+            console.log(`${key}=${relative.split(path.sep).join('/')}`);
+          }
+          JS
       - name: Require successful scope classification
         if: needs.scope.result != 'success' || needs.meta.result != 'success'
         run: |
@@ -344,8 +355,14 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         with:
-          workspaces: tools/isogeny-cli
-          cache-targets: false
+          # Both build variants keep outputs outside the fingerprinted source
+          # tree. Cache dependencies there, including the software-hash build.
+          # Leave workspace-crate caching off so source-bound executables rebuild.
+          workspaces: |
+            tools/isogeny-cli -> ${{ steps.target-paths.outputs.native }}
+            tools/isogeny-cli -> ${{ steps.target-paths.outputs.soft }}
+          key: isogeny-deps-v1-${{ matrix.target }}
+          save-if: ${{ github.ref == 'refs/heads/main' }}
       - name: Build and test the dedicated executable
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         env:
@@ -651,6 +668,12 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/scripts/publish_release_assets.sh
+            /.github/scripts/test_publish_release_assets.sh
       - name: Test binary asset publication
         run: |
           bash -n .github/scripts/publish_release_assets.sh .github/scripts/test_publish_release_assets.sh

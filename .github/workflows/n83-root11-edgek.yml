@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 root11 K3500 K3550 capacity-edge screen
 
 on:
-  push:
-    branches: [codex/n83-final-tournament-20261015]
-    paths:
-      - .github/workflows/n83-root11-edgek.yml
-      - research/n83_root11_edgek_20261015/**
   workflow_dispatch:
 
 permissions:

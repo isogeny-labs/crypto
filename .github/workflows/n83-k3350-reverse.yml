@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 K3350 first reversed-order sealed replay
 
 on:
-  push:
-    branches: [codex/n83-k3350-reverse-20261015]
-    paths:
-      - .github/workflows/n83-k3350-reverse.yml
-      - research/n83_k3350_reverse_20261015/**
-      - research/n83_k3350_reverse_results_20261015/**
   workflow_dispatch:
 
 permissions:

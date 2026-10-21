@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 sparse plus Bloom K3300 Tier 1 sealed paired IC versus rho
 
 on:
-  push:
-    branches: [codex/n83-tier1-combined-20261015]
-    paths:
-      - .github/workflows/n83-tier1-combined.yml
-      - research/n83_tier1_combined_20261015/**
-      - research/n83_tier1_combined_results_20261015/**
   workflow_dispatch:
 
 permissions:

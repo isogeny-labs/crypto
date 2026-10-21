@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 root22 root21 four-pipeline challenger screen
 
 on:
-  push:
-    branches: [codex/n83-legacy-challenger-20261015]
-    paths:
-      - .github/workflows/n83-legacy-challenger.yml
-      - research/n83_legacy_challenger_20261015/**
   workflow_dispatch:
 
 permissions:

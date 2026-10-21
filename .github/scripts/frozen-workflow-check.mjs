@@ -120,7 +120,7 @@ function applyPinnedInputView({ cwd, view, manifest }) {
 }
 
 export function withFrozenWorkflow({ cwd = process.cwd(), workflow, revision, manifest, inputViewManifest,
-  roots = [], command }) {
+  manifestFormat = 'files-relative', roots = [], command }) {
   workflow = relative(workflow);
   manifest = relative(manifest);
   roots = roots.map(relative);
@@ -133,13 +133,24 @@ export function withFrozenWorkflow({ cwd = process.cwd(), workflow, revision, ma
   const manifestBytes = readFileSync(path.join(cwd, manifest));
   if (!manifestBytes.equals(fromGit(manifest))) throw new Error('original frozen manifest changed');
   const frozen = JSON.parse(manifestBytes.toString('utf8'));
+  if (!['files-relative', 'sha256-root'].includes(manifestFormat)) {
+    throw new Error('unsupported frozen manifest format');
+  }
+  // Both layouts retain the original manifest and every original input digest.
+  // Root-relative sha256 maps occur in the native-m3 archive; opting in changes
+  // path interpretation only, never the bytes admitted by the historical gate.
+  const digests = manifestFormat === 'sha256-root' ? frozen.sha256 : frozen.files;
+  if (!digests || typeof digests !== 'object' || Array.isArray(digests)) {
+    throw new Error('invalid frozen input digest map');
+  }
   const workflowBytes = fromGit(workflow);
-  if (!/^[0-9a-f]{64}$/.test(frozen.files?.[workflow] ?? '') || sha(workflowBytes) !== frozen.files[workflow]) {
+  if (!/^[0-9a-f]{64}$/.test(digests[workflow] ?? '') || sha(workflowBytes) !== digests[workflow]) {
     throw new Error('historical workflow does not match its frozen digest');
   }
   const liveWorkflowSha = sha(readFileSync(path.join(cwd, workflow)));
-  const ownInputs = Object.entries(frozen.files).map(([name, digest]) => {
-    const file = relative(name.startsWith('.github/') ? name : path.posix.join(path.posix.dirname(manifest), name));
+  const ownInputs = Object.entries(digests).map(([name, digest]) => {
+    const file = relative(manifestFormat === 'sha256-root' || name.startsWith('.github/')
+      ? name : path.posix.join(path.posix.dirname(manifest), name));
     if (!/^[0-9a-f]{64}$/.test(digest)) throw new Error(`invalid frozen digest: ${name}`);
     return { file, digest };
   });
@@ -182,12 +193,13 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   try {
     while (args.length && args[0] !== '--') {
       const flag = args.shift();
-      if (!['--workflow', '--revision', '--manifest', '--input-view-manifest', '--root'].includes(flag) || !args.length) {
+      if (!['--workflow', '--revision', '--manifest', '--manifest-format', '--input-view-manifest', '--root'].includes(flag) || !args.length) {
         throw new Error(`unknown or incomplete argument: ${flag}`);
       }
       const value = args.shift();
       if (flag === '--root') options.roots.push(value);
       else if (flag === '--input-view-manifest') options.inputViewManifest = value;
+      else if (flag === '--manifest-format') options.manifestFormat = value;
       else options[flag.slice(2)] = value;
     }
     if (args.shift() !== '--') throw new Error('expected -- before the validator command');

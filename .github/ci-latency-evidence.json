@@ -1,0 +1,1088 @@
+{
+  "schema_version": 1,
+  "repository": "aburan28/crypto",
+  "source_head": "a1468cd5ffe10505bbe944e31cd658dd6bcb3c50",
+  "source_main": "d67bb0dac6e8edf907765f6527291508c9e94325",
+  "collected_at_utc": "2026-10-19T22:27:11.689813+00:00",
+  "methodology": "Purposive completed-job samples from the latest 100 successful runs plus prior expensive-workflow samples. Not fleet percentiles. Job started_at/completed_at measure execution; workflow created_at to first actual job start measures initial admission delay. Queued job started_at values are not treated as actual execution. API snapshots are non-atomic.",
+  "queue": {
+    "workflow_runs": 296,
+    "oldest_created_at": "2026-10-19T16:49:28Z",
+    "counts_by_name": {
+      "Rust lint": 42,
+      "Rust all targets compile": 37,
+      "curve-names": 28,
+      "Workflow syntax": 13,
+      "Workflow files parse": 11,
+      "ECC2K-130 status pages": 11,
+      "Free LLM pull-request review": 11,
+      "ic-leaderboard": 7,
+      "Lean proof gate": 7,
+      "ic research framework": 6,
+      "backlog": 6,
+      "CodeQL Advanced": 5,
+      "n37 Frobenius-folded pair-table gate": 4,
+      "Koblitz unknown-scalar panel": 4,
+      "Bounded bielliptic quartic diagnostic": 4,
+      "n37 complete-table floor replay": 4,
+      "ic programme harness": 4,
+      "ecbench n37 target-only instruction profile": 4,
+      "jacobian-transfers": 4,
+      "IC dashboard presentation": 4,
+      "ic-semantic-metadata": 3,
+      "Conductor-gap native controls": 3,
+      "curve-traits": 3,
+      "Jacobian polarization certificates": 3,
+      "SEA formal verification": 3,
+      "Compact orbit independent rank replay": 3,
+      "IC autolab integration": 3,
+      "n53 L384 cold-base matched repeat": 2,
+      "n53 L384 certified cold-base repeat": 2,
+      "n53 native-cyclic L384 two-arm cold comparison": 2,
+      "n37 four-policy PDP replay": 2,
+      "taskq": 2,
+      "P-192 geometry collector Lean proofs": 2,
+      "ISO-1 theorem and exact census replay": 2,
+      "isogeny_algos": 2,
+      "icx engine (multi-arch)": 2,
+      "GPU ecc2k host verification": 2,
+      "curve-identities": 2,
+      "Private workspace startup": 2,
+      "Elliptic-curve surface tools": 2,
+      "ecbench": 2,
+      "ECC2K-130 base-window generator controls": 1,
+      "Groebner comparison protocol": 1,
+      "Curve algebra fixtures": 1,
+      "Tree-split structured-V Lean checks": 1,
+      "Compact-orbit n61 isolated batch panel": 1,
+      "Compact-orbit complete instruction ledger": 1,
+      "IC generic backend qualification v3": 1,
+      "Conductor-gap Lean proofs": 1,
+      "Strong rho formal checks": 1,
+      "ECC2K local certification gates": 1,
+      "isolab": 1,
+      "ECC2K upload gateway and worker image": 1,
+      "spotlab": 1,
+      "Factor-base designs Lean proofs": 1,
+      "Native F5 registration custody": 1,
+      "Boolean F5 support-aware batch": 1,
+      "PKM tower pilot": 1,
+      "n37 sparse four-policy PDP replay": 1,
+      "Compact-orbit n61 isolated single-target panel": 1,
+      "Compact shared-log archive replay": 1,
+      "Root-finding S3Roots Lean proof": 1,
+      "ECC2K130 orbit-disjoint v2 compact cold CPU panel": 1,
+      "Compact Ir matched cold native gap": 1,
+      "ECC2K-130 leaf m10 support outcome replay": 1,
+      "ECC2K130 orbit-disjoint v2 cold outcome replay": 1,
+      "Eigen-Seta research KEM": 1,
+      "validation-gate": 1,
+      "ECC2K-130 PDP difficulty input freeze": 1,
+      "autofix-queue": 1,
+      "Release": 1,
+      "Degree diagnostic reporting": 1
+    }
+  },
+  "cache": {
+    "usage_api": {
+      "full_name": "aburan28/crypto",
+      "active_caches_size_in_bytes": 30003626872,
+      "active_caches_count": 64
+    },
+    "list_count": 69,
+    "list_total_bytes": 30361432037,
+    "pr_count": 64,
+    "pr_bytes": 25029075189,
+    "main_count": 3,
+    "main_bytes": 149855243,
+    "lean_count": 9,
+    "lean_bytes": 23311982544,
+    "configured_capacity_bytes": null,
+    "capacity_lookup_status": 404
+  },
+  "completed_samples": [
+    {
+      "run_id": 39320319770,
+      "workflow": "Rust all targets compile",
+      "created_at": "2026-10-19T20:33:38Z",
+      "url": "https://github.com/aburan28/crypto/actions/runs/39320319770",
+      "jobs": [
+        {
+          "id": 118292377192,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T22:06:03Z",
+          "completed_at": "2026-10-19T22:06:29Z",
+          "steps": [
+            {
+              "name": "Run node .github/scripts/ci-scope.mjs",
+              "conclusion": "success",
+              "started_at": "2026-10-19T22:06:10Z",
+              "completed_at": "2026-10-19T22:06:27Z"
+            }
+          ]
+        },
+        {
+          "id": 118334082211,
+          "name": "check",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-19T22:06:29Z",
+          "completed_at": "2026-10-19T22:06:29Z",
+          "steps": []
+        }
+      ]
+    },
+    {
+      "run_id": 39320314133,
+      "workflow": "Rust all targets compile",
+      "created_at": "2026-10-19T20:33:36Z",
+      "url": "https://github.com/aburan28/crypto/actions/runs/39320314133",
+      "jobs": [
+        {
+          "id": 118292360474,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T22:08:12Z",
+          "completed_at": "2026-10-19T22:08:29Z",
+          "steps": []
+        },
+        {
+          "id": 118334874568,
+          "name": "check",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-19T22:08:30Z",
+          "completed_at": "2026-10-19T22:08:29Z",
+          "steps": []
+        }
+      ]
+    },
+    {
+      "run_id": 39322366822,
+      "workflow": "curve-names",
+      "created_at": "2026-10-19T20:48:18Z",
+      "url": "https://github.com/aburan28/crypto/actions/runs/39322366822",
+      "jobs": [
+        {
+          "id": 118299378202,
+          "name": "names",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T22:11:48Z",
+          "completed_at": "2026-10-19T22:14:10Z",
+          "steps": [
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success",
+              "started_at": "2026-10-19T22:11:50Z",
+              "completed_at": "2026-10-19T22:14:01Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": 39320319912,
+      "workflow": "curve-names",
+      "created_at": "2026-10-19T20:33:38Z",
+      "url": "https://github.com/aburan28/crypto/actions/runs/39320319912",
+      "jobs": [
+        {
+          "id": 118292377781,
+          "name": "names",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T22:06:49Z",
+          "completed_at": "2026-10-19T22:09:14Z",
+          "steps": [
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success",
+              "started_at": "2026-10-19T22:06:51Z",
+              "completed_at": "2026-10-19T22:09:03Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": 39320320032,
+      "workflow": "Workflow syntax",
+      "created_at": "2026-10-19T20:33:38Z",
+      "url": "https://github.com/aburan28/crypto/actions/runs/39320320032",
+      "jobs": [
+        {
+          "id": 118292377276,
+          "name": "parse",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T22:09:53Z",
+          "completed_at": "2026-10-19T22:10:05Z",
+          "steps": []
+        }
+      ]
+    },
+    {
+      "run_id": 39315800185,
+      "workflow": "Workflow syntax",
+      "created_at": "2026-10-19T20:01:20Z",
+      "url": "https://github.com/aburan28/crypto/actions/runs/39315800185",
+      "jobs": [
+        {
+          "id": 118276821264,
+          "name": "parse",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T21:52:15Z",
+          "completed_at": "2026-10-19T21:52:27Z",
+          "steps": []
+        }
+      ]
+    },
+    {
+      "run_id": 39323416567,
+      "workflow": "Workflow files parse",
+      "created_at": "2026-10-19T20:56:00Z",
+      "url": "https://github.com/aburan28/crypto/actions/runs/39323416567",
+      "jobs": [
+        {
+          "id": 118303001854,
+          "name": "parse",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T22:14:39Z",
+          "completed_at": "2026-10-19T22:14:55Z",
+          "steps": []
+        }
+      ]
+    },
+    {
+      "run_id": 39320319853,
+      "workflow": "Workflow files parse",
+      "created_at": "2026-10-19T20:33:38Z",
+      "url": "https://github.com/aburan28/crypto/actions/runs/39320319853",
+      "jobs": [
+        {
+          "id": 118292376550,
+          "name": "parse",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T22:09:15Z",
+          "completed_at": "2026-10-19T22:09:30Z",
+          "steps": []
+        }
+      ]
+    },
+    {
+      "run_id": 39323410632,
+      "workflow": "Free LLM pull-request review",
+      "created_at": "2026-10-19T20:55:57Z",
+      "url": "https://github.com/aburan28/crypto/actions/runs/39323410632",
+      "jobs": [
+        {
+          "id": 118302975938,
+          "name": "review",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T22:16:20Z",
+          "completed_at": "2026-10-19T22:18:23Z",
+          "steps": [
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success",
+              "started_at": "2026-10-19T22:16:21Z",
+              "completed_at": "2026-10-19T22:18:19Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": 39320346137,
+      "workflow": "Free LLM pull-request review",
+      "created_at": "2026-10-19T20:33:50Z",
+      "url": "https://github.com/aburan28/crypto/actions/runs/39320346137",
+      "jobs": [
+        {
+          "id": 118292465104,
+          "name": "review",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T22:12:32Z",
+          "completed_at": "2026-10-19T22:14:16Z",
+          "steps": [
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success",
+              "started_at": "2026-10-19T22:12:34Z",
+              "completed_at": "2026-10-19T22:14:13Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": 39315712603,
+      "workflow": "ECC2K-130 status pages",
+      "created_at": "2026-10-19T20:00:44Z",
+      "url": "https://github.com/aburan28/crypto/actions/runs/39315712603",
+      "jobs": [
+        {
+          "id": 118277639419,
+          "name": "test",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T21:57:45Z",
+          "completed_at": "2026-10-19T21:59:32Z",
+          "steps": [
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:57:47Z",
+              "completed_at": "2026-10-19T21:59:17Z"
+            }
+          ]
+        },
+        {
+          "id": 118277704929,
+          "name": "publish",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-19T20:03:11Z",
+          "completed_at": "2026-10-19T20:03:03Z",
+          "steps": []
+        }
+      ]
+    },
+    {
+      "run_id": 39315119668,
+      "workflow": "ECC2K-130 status pages",
+      "created_at": "2026-10-19T19:56:21Z",
+      "url": "https://github.com/aburan28/crypto/actions/runs/39315119668",
+      "jobs": [
+        {
+          "id": 118274576640,
+          "name": "publish",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T22:03:48Z",
+          "completed_at": "2026-10-19T22:05:54Z",
+          "steps": [
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success",
+              "started_at": "2026-10-19T22:03:52Z",
+              "completed_at": "2026-10-19T22:05:18Z"
+            }
+          ]
+        },
+        {
+          "id": 118274578940,
+          "name": "test",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-19T19:56:37Z",
+          "completed_at": "2026-10-19T19:56:37Z",
+          "steps": []
+        }
+      ]
+    },
+    {
+      "run_id": 39294211255,
+      "workflow": "Release",
+      "created_at": null,
+      "url": "https://github.com/aburan28/crypto/actions/runs/39294211255",
+      "jobs": [
+        {
+          "id": 118202403354,
+          "name": "meta",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T19:05:04Z",
+          "completed_at": "2026-10-19T19:05:09Z",
+          "steps": []
+        },
+        {
+          "id": 118202403684,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T19:03:09Z",
+          "completed_at": "2026-10-19T19:03:33Z",
+          "steps": []
+        },
+        {
+          "id": 118202404009,
+          "name": "release-assets",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T19:12:39Z",
+          "completed_at": "2026-10-19T19:14:12Z",
+          "steps": [
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success",
+              "started_at": "2026-10-19T19:12:40Z",
+              "completed_at": "2026-10-19T19:14:09Z"
+            }
+          ]
+        },
+        {
+          "id": 118249923173,
+          "name": "native",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T21:04:23Z",
+          "completed_at": "2026-10-19T21:04:25Z",
+          "steps": []
+        },
+        {
+          "id": 118249923213,
+          "name": "rust (aarch64-apple-darwin, macos-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T21:10:57Z",
+          "completed_at": "2026-10-19T21:23:05Z",
+          "steps": [
+            {
+              "name": "Materialize compile-time inputs without research archives",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:11:08Z",
+              "completed_at": "2026-10-19T21:11:25Z"
+            },
+            {
+              "name": "Build release binaries with source provenance",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:11:41Z",
+              "completed_at": "2026-10-19T21:22:23Z"
+            },
+            {
+              "name": "Stage the archive",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:22:24Z",
+              "completed_at": "2026-10-19T21:22:55Z"
+            }
+          ]
+        },
+        {
+          "id": 118249923251,
+          "name": "cuda",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T21:03:32Z",
+          "completed_at": "2026-10-19T21:03:36Z",
+          "steps": []
+        },
+        {
+          "id": 118249923260,
+          "name": "rust (x86_64-unknown-linux-gnu, ubuntu-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T21:05:00Z",
+          "completed_at": "2026-10-19T21:12:06Z",
+          "steps": [
+            {
+              "name": "Materialize compile-time inputs without research archives",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:05:09Z",
+              "completed_at": "2026-10-19T21:05:26Z"
+            },
+            {
+              "name": "Build release binaries with source provenance",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:05:38Z",
+              "completed_at": "2026-10-19T21:11:42Z"
+            },
+            {
+              "name": "Stage the archive",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:11:43Z",
+              "completed_at": "2026-10-19T21:12:02Z"
+            }
+          ]
+        },
+        {
+          "id": 118249923302,
+          "name": "rust (x86_64-pc-windows-msvc, windows-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T19:43:58Z",
+          "completed_at": "2026-10-19T19:55:33Z",
+          "steps": [
+            {
+              "name": "Materialize compile-time inputs without research archives",
+              "conclusion": "success",
+              "started_at": "2026-10-19T19:44:15Z",
+              "completed_at": "2026-10-19T19:44:34Z"
+            },
+            {
+              "name": "Build release binaries with source provenance",
+              "conclusion": "success",
+              "started_at": "2026-10-19T19:44:51Z",
+              "completed_at": "2026-10-19T19:54:54Z"
+            },
+            {
+              "name": "Stage the archive",
+              "conclusion": "success",
+              "started_at": "2026-10-19T19:54:54Z",
+              "completed_at": "2026-10-19T19:55:17Z"
+            }
+          ]
+        },
+        {
+          "id": 118249923397,
+          "name": "isogeny (x86_64-unknown-linux-gnu, ubuntu-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T21:12:33Z",
+          "completed_at": "2026-10-19T21:20:09Z",
+          "steps": [
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:12:35Z",
+              "completed_at": "2026-10-19T21:14:15Z"
+            },
+            {
+              "name": "Build and test the dedicated executable",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:14:26Z",
+              "completed_at": "2026-10-19T21:17:39Z"
+            },
+            {
+              "name": "Check the portable receipt-hash fallback",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:17:39Z",
+              "completed_at": "2026-10-19T21:19:51Z"
+            }
+          ]
+        },
+        {
+          "id": 118249923549,
+          "name": "isogeny (x86_64-unknown-linux-musl, ubuntu-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T21:08:41Z",
+          "completed_at": "2026-10-19T21:18:00Z",
+          "steps": [
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:08:43Z",
+              "completed_at": "2026-10-19T21:10:16Z"
+            },
+            {
+              "name": "Build and test the dedicated executable",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:10:39Z",
+              "completed_at": "2026-10-19T21:14:48Z"
+            },
+            {
+              "name": "Check the portable receipt-hash fallback",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:14:48Z",
+              "completed_at": "2026-10-19T21:17:37Z"
+            },
+            {
+              "name": "Test the installed executable without a checkout",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:17:37Z",
+              "completed_at": "2026-10-19T21:17:55Z"
+            }
+          ]
+        },
+        {
+          "id": 118249923610,
+          "name": "isogeny (aarch64-apple-darwin, macos-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T21:12:14Z",
+          "completed_at": "2026-10-19T21:27:00Z",
+          "steps": [
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:12:17Z",
+              "completed_at": "2026-10-19T21:15:33Z"
+            },
+            {
+              "name": "Build and test the dedicated executable",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:15:48Z",
+              "completed_at": "2026-10-19T21:22:27Z"
+            },
+            {
+              "name": "Check the portable receipt-hash fallback",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:22:27Z",
+              "completed_at": "2026-10-19T21:26:32Z"
+            },
+            {
+              "name": "Test the installed executable without a checkout",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:26:32Z",
+              "completed_at": "2026-10-19T21:26:49Z"
+            }
+          ]
+        },
+        {
+          "id": 118249923663,
+          "name": "isogeny (x86_64-pc-windows-msvc, windows-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T19:45:15Z",
+          "completed_at": "2026-10-19T20:03:59Z",
+          "steps": [
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success",
+              "started_at": "2026-10-19T19:45:19Z",
+              "completed_at": "2026-10-19T19:47:21Z"
+            },
+            {
+              "name": "Build and test the dedicated executable",
+              "conclusion": "success",
+              "started_at": "2026-10-19T19:47:37Z",
+              "completed_at": "2026-10-19T19:57:25Z"
+            },
+            {
+              "name": "Check the portable receipt-hash fallback",
+              "conclusion": "success",
+              "started_at": "2026-10-19T19:57:25Z",
+              "completed_at": "2026-10-19T20:03:30Z"
+            }
+          ]
+        },
+        {
+          "id": 118317256874,
+          "name": "release",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-19T21:27:00Z",
+          "completed_at": "2026-10-19T21:27:00Z",
+          "steps": []
+        }
+      ]
+    }
+  ],
+  "codeql_stages": [
+    {
+      "run_id": 39302635287,
+      "created_at": "2026-10-19T18:27:22Z",
+      "jobs": [
+        {
+          "id": 118231504340,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T20:15:49Z",
+          "completed_at": "2026-10-19T20:16:08Z",
+          "steps": []
+        },
+        {
+          "id": 118283997147,
+          "name": "Build database (rust)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T22:01:30Z",
+          "completed_at": "2026-10-19T22:18:29Z",
+          "steps": [
+            {
+              "name": "Finalize the complete Rust database",
+              "conclusion": "success",
+              "started_at": "2026-10-19T22:01:54Z",
+              "completed_at": "2026-10-19T22:17:50Z"
+            },
+            {
+              "name": "Bundle complete Rust database for the query job",
+              "conclusion": "success",
+              "started_at": "2026-10-19T22:17:50Z",
+              "completed_at": "2026-10-19T22:18:21Z"
+            }
+          ]
+        },
+        {
+          "id": 118284000087,
+          "name": "analyze-rust-long",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-19T20:16:09Z",
+          "completed_at": "2026-10-19T20:16:08Z",
+          "steps": []
+        },
+        {
+          "id": 118338815537,
+          "name": "Warm cache (rust)",
+          "status": "queued",
+          "conclusion": null,
+          "started_at": "2026-10-19T22:18:30Z",
+          "completed_at": null,
+          "steps": []
+        }
+      ]
+    },
+    {
+      "run_id": 39292055003,
+      "created_at": "2026-10-19T17:12:01Z",
+      "jobs": [
+        {
+          "id": 118194967790,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T18:19:20Z",
+          "completed_at": "2026-10-19T18:19:44Z",
+          "steps": [
+            {
+              "name": "Run node .github/scripts/ci-scope.mjs",
+              "conclusion": "success",
+              "started_at": "2026-10-19T18:19:27Z",
+              "completed_at": "2026-10-19T18:19:43Z"
+            }
+          ]
+        },
+        {
+          "id": 118227837924,
+          "name": "Build database (rust)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T20:02:36Z",
+          "completed_at": "2026-10-19T20:19:31Z",
+          "steps": [
+            {
+              "name": "Finalize the complete Rust database",
+              "conclusion": "success",
+              "started_at": "2026-10-19T20:03:02Z",
+              "completed_at": "2026-10-19T20:18:51Z"
+            },
+            {
+              "name": "Bundle complete Rust database for the query job",
+              "conclusion": "success",
+              "started_at": "2026-10-19T20:18:51Z",
+              "completed_at": "2026-10-19T20:19:23Z"
+            }
+          ]
+        },
+        {
+          "id": 118227841027,
+          "name": "analyze-rust-long",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-19T18:19:45Z",
+          "completed_at": "2026-10-19T18:19:45Z",
+          "steps": []
+        },
+        {
+          "id": 118285606813,
+          "name": "Warm cache (rust)",
+          "status": "in_progress",
+          "conclusion": null,
+          "started_at": "2026-10-19T22:01:27Z",
+          "completed_at": null,
+          "steps": [
+            {
+              "name": "Set up CodeQL for the finalized Rust database",
+              "conclusion": "success",
+              "started_at": "2026-10-19T22:01:30Z",
+              "completed_at": "2026-10-19T22:01:50Z"
+            },
+            {
+              "name": "Download this workflow attempt's finalized database",
+              "conclusion": "success",
+              "started_at": "2026-10-19T22:01:50Z",
+              "completed_at": "2026-10-19T22:02:44Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": 39289916896,
+      "created_at": "2026-10-19T16:57:04Z",
+      "jobs": [
+        {
+          "id": 118187577145,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T18:11:25Z",
+          "completed_at": "2026-10-19T18:11:52Z",
+          "steps": [
+            {
+              "name": "Run node .github/scripts/ci-scope.mjs",
+              "conclusion": "success",
+              "started_at": "2026-10-19T18:11:32Z",
+              "completed_at": "2026-10-19T18:11:50Z"
+            }
+          ]
+        },
+        {
+          "id": 118224150160,
+          "name": "Build database (rust)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T19:59:05Z",
+          "completed_at": "2026-10-19T20:16:38Z",
+          "steps": [
+            {
+              "name": "Checkout complete Rust source",
+              "conclusion": "success",
+              "started_at": "2026-10-19T19:59:07Z",
+              "completed_at": "2026-10-19T19:59:23Z"
+            },
+            {
+              "name": "Finalize the complete Rust database",
+              "conclusion": "success",
+              "started_at": "2026-10-19T19:59:34Z",
+              "completed_at": "2026-10-19T20:15:57Z"
+            },
+            {
+              "name": "Bundle complete Rust database for the query job",
+              "conclusion": "success",
+              "started_at": "2026-10-19T20:15:57Z",
+              "completed_at": "2026-10-19T20:16:28Z"
+            }
+          ]
+        },
+        {
+          "id": 118224152886,
+          "name": "analyze-rust-long",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-19T18:11:53Z",
+          "completed_at": "2026-10-19T18:11:53Z",
+          "steps": []
+        },
+        {
+          "id": 118284240092,
+          "name": "Warm cache (rust)",
+          "status": "in_progress",
+          "conclusion": null,
+          "started_at": "2026-10-19T22:01:12Z",
+          "completed_at": null,
+          "steps": [
+            {
+              "name": "Set up CodeQL for the finalized Rust database",
+              "conclusion": "success",
+              "started_at": "2026-10-19T22:01:14Z",
+              "completed_at": "2026-10-19T22:01:34Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": 39289652482,
+      "created_at": "2026-10-19T16:55:17Z",
+      "jobs": [
+        {
+          "id": 118186669495,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T18:22:13Z",
+          "completed_at": "2026-10-19T18:22:30Z",
+          "steps": []
+        },
+        {
+          "id": 118229151475,
+          "name": "Build database (rust)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T20:05:45Z",
+          "completed_at": "2026-10-19T20:22:51Z",
+          "steps": [
+            {
+              "name": "Finalize the complete Rust database",
+              "conclusion": "success",
+              "started_at": "2026-10-19T20:06:08Z",
+              "completed_at": "2026-10-19T20:22:13Z"
+            },
+            {
+              "name": "Bundle complete Rust database for the query job",
+              "conclusion": "success",
+              "started_at": "2026-10-19T20:22:13Z",
+              "completed_at": "2026-10-19T20:22:44Z"
+            }
+          ]
+        },
+        {
+          "id": 118229153556,
+          "name": "analyze-rust-long",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-19T18:22:31Z",
+          "completed_at": "2026-10-19T18:22:30Z",
+          "steps": []
+        },
+        {
+          "id": 118287192441,
+          "name": "Warm cache (rust)",
+          "status": "in_progress",
+          "conclusion": null,
+          "started_at": "2026-10-19T21:59:45Z",
+          "completed_at": null,
+          "steps": [
+            {
+              "name": "Set up CodeQL for the finalized Rust database",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:59:48Z",
+              "completed_at": "2026-10-19T22:00:08Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": 39287548856,
+      "created_at": "2026-10-19T16:41:35Z",
+      "jobs": [
+        {
+          "id": 118178926817,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T18:04:51Z",
+          "completed_at": "2026-10-19T18:05:14Z",
+          "steps": [
+            {
+              "name": "Run node .github/scripts/ci-scope.mjs",
+              "conclusion": "success",
+              "started_at": "2026-10-19T18:04:56Z",
+              "completed_at": "2026-10-19T18:05:12Z"
+            }
+          ]
+        },
+        {
+          "id": 118220960534,
+          "name": "Build database (rust)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-19T19:56:11Z",
+          "completed_at": "2026-10-19T20:13:04Z",
+          "steps": [
+            {
+              "name": "Finalize the complete Rust database",
+              "conclusion": "success",
+              "started_at": "2026-10-19T19:56:37Z",
+              "completed_at": "2026-10-19T20:12:24Z"
+            },
+            {
+              "name": "Bundle complete Rust database for the query job",
+              "conclusion": "success",
+              "started_at": "2026-10-19T20:12:24Z",
+              "completed_at": "2026-10-19T20:12:56Z"
+            }
+          ]
+        },
+        {
+          "id": 118220962996,
+          "name": "analyze-rust-long",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-19T18:05:14Z",
+          "completed_at": "2026-10-19T18:05:14Z",
+          "steps": []
+        },
+        {
+          "id": 118282528358,
+          "name": "Warm cache (rust)",
+          "status": "in_progress",
+          "conclusion": null,
+          "started_at": "2026-10-19T21:55:18Z",
+          "completed_at": null,
+          "steps": [
+            {
+              "name": "Set up CodeQL for the finalized Rust database",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:55:20Z",
+              "completed_at": "2026-10-19T21:55:42Z"
+            },
+            {
+              "name": "Download this workflow attempt's finalized database",
+              "conclusion": "success",
+              "started_at": "2026-10-19T21:55:42Z",
+              "completed_at": "2026-10-19T21:56:00Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "release_failure": {
+    "run_id": 39289773329,
+    "job_id": 118235694291,
+    "url": "https://github.com/aburan28/crypto/actions/runs/39289773329/job/118235694291",
+    "compiler_errors": [
+      "E0433: std::os::unix unavailable in src/cryptanalysis/koblitz_groebner/checkpoint.rs:12",
+      "E0599: OpenOptions.mode unavailable in src/cryptanalysis/koblitz_groebner/checkpoint.rs:85"
+    ],
+    "log_sha256": "a0a4dec8075488adde4e8fdfc34546ef9fd7f7b3b786a723019d247d0a51acfe",
+    "publication_job_conclusion": "skipped"
+  },
+  "latest_release": {
+    "assets": [
+      {
+        "name": "crypto-v0.1.2954-aarch64-apple-darwin.tar.gz",
+        "size": 23710647
+      },
+      {
+        "name": "crypto-v0.1.2954-x86_64-pc-windows-msvc.zip",
+        "size": 22530007
+      },
+      {
+        "name": "crypto-v0.1.2954-x86_64-unknown-linux-gnu.tar.gz",
+        "size": 30304604
+      },
+      {
+        "name": "ecc2k130-cpu-v0.1.2954-x86_64-linux.tar.gz",
+        "size": 511360
+      },
+      {
+        "name": "ecc2k130-cuda-v0.1.2954-x86_64-linux.tar.gz",
+        "size": 13055791
+      },
+      {
+        "name": "isogeny-v0.1.2954-aarch64-apple-darwin.tar.gz",
+        "size": 9695645
+      },
+      {
+        "name": "isogeny-v0.1.2954-x86_64-pc-windows-msvc.zip",
+        "size": 9221205
+      },
+      {
+        "name": "isogeny-v0.1.2954-x86_64-unknown-linux-gnu.tar.gz",
+        "size": 10115124
+      },
+      {
+        "name": "isogeny-v0.1.2954-x86_64-unknown-linux-musl.tar.gz",
+        "size": 10153810
+      },
+      {
+        "name": "SHA256SUMS",
+        "size": 1011
+      }
+    ],
+    "html_url": "https://github.com/aburan28/crypto/releases/tag/v0.1.2954",
+    "published_at": "2026-10-18T20:03:23Z",
+    "tag_name": "v0.1.2954",
+    "target_commitish": "refs/heads/main"
+  },
+  "tree": {
+    "tracked_files": 115127,
+    "tracked_blob_bytes": 7871935613,
+    "reviewer_script_bytes": 8868,
+    "asset_test_script_bytes": 5210,
+    "note": "Uncompressed tracked blob sizes, not measured transfer bytes."
+  },
+  "review_observation": {
+    "run_id": 39323410632,
+    "job_id": 118302975938,
+    "provider_configured": false,
+    "warning": "No reviewer provider is configured.",
+    "log_sha256": "da63b7890e98d90b715612503ad651e8cf3c6edcf419a6e3dfbb62239b0d7444"
+  }
+}

@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 K3300 K3350 balanced-order sealed replay
 
 on:
-  push:
-    branches: [codex/n83-k-abba-20261015]
-    paths:
-      - .github/workflows/n83-k-abba.yml
-      - research/n83_k_abba_20261015/**
-      - research/n83_k_abba_results_20261015/**
   workflow_dispatch:
 
 permissions:

@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 100-point factor-base selection panel
 
 on:
-  push:
-    branches: [codex/n83-factor-base-100-20261014]
-    paths:
-      - .github/workflows/n83-factor-base-100.yml
-      - research/n83_factor_base_100_20261014/**
-      - examples/koblitz_orbit_dlp_fast.rs
   workflow_dispatch:
 
 permissions:

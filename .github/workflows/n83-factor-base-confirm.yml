@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 fresh 4000-point K3300 versus K3100 factor-base confirmation
 
 on:
-  push:
-    branches: [codex/n83-factor-base-confirm-20261015]
-    paths:
-      - .github/workflows/n83-factor-base-confirm.yml
-      - research/n83_factor_base_confirm_20261015/**
-      - research/n83_factor_base_confirm_results_20261015/**
   workflow_dispatch:
 
 permissions:

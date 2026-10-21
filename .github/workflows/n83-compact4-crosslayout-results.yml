@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 compact4 cross-layout sealed result replay
 
 on:
-  push:
-    branches: [codex/n83-compact4-crosslayout-20261016]
-    paths:
-      - .github/workflows/n83-compact4-crosslayout-results.yml
-      - research/n83_compact4_crosslayout_results_20261016/**
   workflow_dispatch:
 
 permissions:

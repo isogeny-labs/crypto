@@ -1,16 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 indexed five-byte load75 Tier 1 capacity gate
 
 on:
-  push:
-    branches: [codex/n83-indexed5-load75-20261013]
-    paths:
-      - .github/workflows/n83-indexed5-load75-tier1.yml
-      - examples/koblitz_orbit_dlp_fast.rs
-      - research/n83_indexed5_load75_20261013/DenseCapacity.lean
-      - research/n83_indexed5_load75_20261013/PROTOCOL.md
-      - research/n83_indexed5_load75_20261013/AMENDMENT.md
-      - research/n83_indexed5_load75_20261013/run.py
-      - research/n83_indexed5_load75_20261013/verify.py
   workflow_dispatch:
 
 permissions:

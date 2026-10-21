@@ -1,16 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 four-byte exact root-slot Tier 1 capacity gate
 
 on:
-  push:
-    branches: [codex/n83-root4-20261014]
-    paths:
-      - .github/workflows/n83-root4-tier1.yml
-      - examples/koblitz_orbit_dlp_fast.rs
-      - research/n83_root4_20261014/RootFour.lean
-      - research/n83_root4_20261014/PROOF_MAP.md
-      - research/n83_root4_20261014/PROTOCOL.md
-      - research/n83_root4_20261014/run.py
-      - research/n83_root4_20261014/verify.py
   workflow_dispatch:
 
 permissions:

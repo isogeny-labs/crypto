@@ -1,13 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 mirrored online finalist rescreen
 
 on:
-  push:
-    branches: [codex/n83-online-range-20261016]
-    paths:
-      - .github/workflows/n83-online-rescreen.yml
-      - research/n83_online_rescreen_20261016/PROTOCOL.md
-      - research/n83_online_rescreen_20261016/run.py
-      - research/n83_online_rescreen_20261016/verify.py
   workflow_dispatch:
 
 permissions:

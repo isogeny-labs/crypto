@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 indexed5 Tier 1 capacity gate
 
 on:
-  push:
-    branches: [codex/n83-indexed5-tier1-20261013]
-    paths:
-      - .github/workflows/n83-indexed5-tier1.yml
-      - research/n83_indexed5_tier1_20261013/**
   workflow_dispatch:
 
 permissions:

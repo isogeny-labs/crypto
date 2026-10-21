@@ -1,17 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 dynamic one-root exact index cold screen
 
 on:
-  push:
-    branches: [codex/n83-root11-dynamic-20261016]
-    paths:
-      - .github/workflows/n83-root11-dynamic.yml
-      - examples/koblitz_orbit_dlp_fast.rs
-      - research/n83_root11_dynamic_20261016/PROTOCOL.md
-      - research/n83_root11_dynamic_20261016/run.py
-      - research/n83_root11_dynamic_20261016/verify.py
-      - research/n83_root11_dynamic_20261016/Root11DynamicCapacity.lean
-      - research/n83_root11_dynamic_20261016/lean-toolchain
-      - research/n83_root11_dynamic_20261016/proof_check.log
   workflow_dispatch:
 
 permissions:

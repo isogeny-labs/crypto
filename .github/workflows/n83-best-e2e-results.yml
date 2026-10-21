@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 direct factor-base sealed result replay
 
 on:
-  push:
-    branches: [codex/n83-final-tournament-20261015]
-    paths:
-      - .github/workflows/n83-best-e2e-results.yml
-      - research/n83_best_e2e_results_20261015/**
   workflow_dispatch:
 
 permissions:

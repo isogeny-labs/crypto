@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 four-byte root index with 21-byte states
 
 on:
-  push:
-    branches: [codex/n83-root4-fixed30-20261014]
-    paths:
-      - .github/workflows/n83-root4-fixed30.yml
-      - research/n83_root4_fixed30_20261014/**
-      - examples/koblitz_orbit_dlp_fast.rs
   workflow_dispatch:
 
 permissions:

@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 K3300 root11 sparse canonical sealed replay
 
 on:
-  push:
-    branches: [codex/n83-sparse-canonical-20261015]
-    paths:
-      - .github/workflows/n83-sparse-canonical.yml
-      - research/n83_sparse_canonical_20261015/**
-      - research/n83_sparse_canonical_results_20261015/**
   workflow_dispatch:
 
 permissions:

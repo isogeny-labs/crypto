@@ -1,14 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 precomputed-table rho control against IC K3300 and K600
 
 on:
-  push:
-    branches: [research/n83-precomputed-rho-control]
-    paths:
-      - .github/workflows/n83-precomputed-rho-control.yml
-      - examples/n83_precomputed_rho.rs
-      - examples/n83_precomputed_rho_analyze.rs
-      - research/20261016-n83-precomputed-rho-control/run_job.sh
-      - research/20261016-n83-precomputed-rho-control/configs/**
   workflow_dispatch:
 
 permissions:

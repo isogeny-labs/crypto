@@ -1,12 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 same-point Tier 1 sealed result replay
 
 on:
-  push:
-    branches: [codex/n83-final-tournament-20261015]
-    paths:
-      - research/n83_unresolved_tier1_results_20261015/records_index.json
-      - research/n83_unresolved_tier1_results_20261015/result.json
-      - research/n83_unresolved_tier1_results_20261015/measurements.json.gz
   workflow_dispatch:
 
 permissions:

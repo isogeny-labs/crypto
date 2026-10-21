@@ -1,3 +1,4 @@
+# Long research runs require explicit manual dispatch.
 name: Launch ECC2K-130 rho fleet
 
 # Spot-first g7e fleet sized for ~100 B iterations/s aggregate
@@ -5,11 +6,6 @@ name: Launch ECC2K-130 rho fleet
 # Mirrors ecc2k130/aws/README.md runbook: infra → push_source → fleet up.
 
 on:
-  push:
-    branches:
-      - cursor/launch-rho-fleet-ccb7
-    paths:
-      - '.github/workflows/launch-ecc2k130-fleet.yml'
   workflow_dispatch:
     inputs:
       gpus:

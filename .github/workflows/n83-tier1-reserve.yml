@@ -1,11 +1,7 @@
+# Long research runs require explicit manual dispatch.
 name: N83 selected K2940 reserve-point Tier 1 paired IC versus rho
 
 on:
-  push:
-    branches: [codex/n83-tier1-reserve-20261014]
-    paths:
-      - .github/workflows/n83-tier1-reserve.yml
-      - research/n83_tier1_reserve_20261014/**
   workflow_dispatch:
 
 permissions:
