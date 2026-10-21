@@ -1812,9 +1812,9 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
     {
      "date": "2026-10-17",
      "value": 0.252,
-     "reference": "matched",
-     "label": "Genus-3 GHS IC-2LP rebuilt baseline at q = 2^14 (04b)",
-     "detail": "Rebuilt IC-2LP baseline (kappa = 2, tree-cycle elimination + Lanczos) against rho on the same Jac(C)[ell] at q = 2^14: 0.252x with rho renormalised to sqrt(pi/2) (0.162x raw; rho walks 0.49-3.48 steps per sqrt(ell), n = 4). Cost exponent over 2^14-2^20: 1.383 (99% [1.382, 1.384]) against rho's 3/2 and GTTD's 4/3; relation phase 1.332, linear algebra 1.447. Retuning the factor base gives 1.373; structured Gaussian elimination before Lanczos gives 1.419 while cheaper by 9-22%. The original study this follows up is not in the repository; this is a rebuild. Toy sizes; not an ECDLP crossover, since rho on E0(F_q^3) is not measured.",
+     "reference": "unmatched",
+     "label": "Genus-3 GHS IC-2LP rebuild at q = 2^14 (04b; rho reference unmatched to the R10 E0 track)",
+     "detail": "Historical rebuild: 0.252x against rho on Jac(C)[ell] at q = 2^14 (0.162x raw; rho walks 0.49-3.48 steps per sqrt(ell), n = 4). R10 marks this reference MEASURED-UNMATCHED to the pinned E0 rho track; this value is not a matched E0-rho crossover. Cost exponent over 2^14-2^20: 1.383 (99% [1.382, 1.384]) against rho's 3/2 and GTTD's 4/3; relation phase 1.332, linear algebra 1.447. Retuning the factor base gives 1.373; structured Gaussian elimination before Lanczos gives 1.419 while cheaper by 9-22%. The original study this follows up is not in the repository; this is a rebuild. Toy sizes; not an ECDLP crossover, since rho on E0(F_q^3) is not measured.",
      "class": "engineering",
      "anchor": "#genus-crossover",
      "source": "https://github.com/aburan28/crypto/blob/main/research/ic_improve_20261014/04b-genus3-2lp-rebalance/README.md"
