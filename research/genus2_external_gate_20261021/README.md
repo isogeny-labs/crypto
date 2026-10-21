@@ -76,6 +76,9 @@ is charged. All **1,260 recovered scalars verified**; failures and
 exhaustions: **0**. The [paired analyzer](analyze.py) requires exact workload
 hashes, seeds, caps, source-addition units and planted answers, and
 independently reproduces the frozen rho and projective control totals.
+It reads those controls directly from the committed
+`research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst`
+archive with `tar --zstd`; no extracted session directory is required.
 
 Complete cold one-target cost at `M + 0.5S + 10I` and **0.1 GAE per native
 logical operation** is:

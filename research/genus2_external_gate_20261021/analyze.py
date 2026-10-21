@@ -3,17 +3,29 @@
 import csv
 import json
 import math
+import subprocess
 import sys
 from collections import defaultdict
 from pathlib import Path
 
 BITS = (16, 20, 24, 28, 32, 36, 40)
-BASE = Path("research/five_leads_e2e_20261019/sessions_projective_chart_v2")
+CONTROL_ARCHIVE = Path("research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst")
 ARMS = ("external", "genus_projective", "rho_neg")
 
 
 def read_rows(path):
     return [json.loads(line) for line in Path(path).read_text().splitlines()]
+
+
+def read_frozen_rows(bits):
+    member = f"sessions_projective_chart_v2/order-genus-{bits}/records.jsonl"
+    archived = subprocess.run(
+        ["tar", "--zstd", "-xOf", str(CONTROL_ARCHIVE), member],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    return [json.loads(line) for line in archived.splitlines()]
 
 
 def logical(counters):
@@ -44,7 +56,7 @@ def main():
     for bits in BITS:
         fresh = read_rows(result_dir / f"order-genus-{bits}.jsonl")
         assert len(fresh) == 180
-        frozen = read_rows(BASE / f"order-genus-{bits}" / "records.jsonl")
+        frozen = read_frozen_rows(bits)
         by_arm = {arm: {r["workload"]["workload_id"]: r for r in frozen if r["arm"] == arm} for arm in ARMS[1:]}
         assert all(len(rows) == 180 for rows in by_arm.values())
         for row in fresh:
