@@ -1,15 +1,17 @@
 ---
 title: "Catalog-wide curve-cover transfer assessment"
-subtitle: "All 2,572 current maps and all 977 EC1 bindings"
-date: "2026-10-19"
-subject: "cover-transfer-assessments/v2; catalog_maps=2572; unique_cover_models=2570; geometry_verified_maps=2572; ec1_representations=977; assessed_maps=2572; unassessed_maps=0; assessed_subgroups=977; unassessed_subgroups=0"
+subtitle: "All 2,576 current maps and all 977 EC1 bindings"
+date: "2026-10-21"
+subject: "cover-transfer-assessments/v2; catalog_maps=2576; unique_cover_models=2574; geometry_verified_maps=2576; ec1_representations=977; assessed_maps=2576; unassessed_maps=0; assessed_subgroups=977; unassessed_subgroups=0"
 geometry: margin=0.8in
 fontsize: 10pt
 ---
 
-<!-- cover-transfer-assessments/v2; catalog_maps=2572; unique_cover_models=2570; geometry_verified_maps=2572; ec1_representations=977; assessed_maps=2572; unassessed_maps=0; assessed_subgroups=977; unassessed_subgroups=0 -->
+<!-- cover-transfer-assessments/v2; catalog_maps=2576; unique_cover_models=2574; geometry_verified_maps=2576; ec1_representations=977; assessed_maps=2576; unassessed_maps=0; assessed_subgroups=977; unassessed_subgroups=0 -->
 
 # Outcome
+
+This refresh binds the catalog already committed at `c590f4efbbfc505b22a56c2f48a3988dde769222`. Relative to snapshot `8e4c99759fd8d9594ed207d793b07b59ebaf19f7`, four direct-prime census models were added: `icv1-fp18-t857-6ed1b1af`, `icv1-fp19-tm169-e87dee41`, `icv1-fp20-t1847-1a56b6c7`, and `icv1-fp21-t1842-89bf7f00`. Existing model identities and all 977 EC1 bindings are retained. The additions introduce three declared fields, four maps and four cover contexts; they carry no EC1 subgroup binding. This is a catalog consistency repair and does not promote transfer or performance claims.
 
 Every current cover map and every linked EC1 representation now has an
 explicit v2 assessment. Classification is complete; implementation support is
@@ -18,7 +20,7 @@ Jacobian-transfer pipeline.
 
 The main results are:
 
-- all 2,572 explicit cover formulas replay over their declared fields, subject
+- all 2,576 explicit cover formulas replay over their declared fields, subject
   to the field-validity assumptions stated below;
 - all 165 binary maps have the implemented one-infinity genus-three Jacobian
   arithmetic and bounded rational-point-class transfer;
@@ -29,7 +31,7 @@ The main results are:
   all-element composition, injectivity, or image-order equality on the full
   generated subgroup; only the retained order-29 overlay has the stronger
   narrow exact-order and image-order certificate;
-- all 2,407 odd-characteristic covers have verified genus-two geometry, but
+- all 2,411 odd-characteristic covers have verified genus-two geometry, but
   their even sextics have two rational infinity points and are outside the
   current one-infinity odd-characteristic Jacobian implementation;
 - arbitrary-class Jacobian pushforward remains unsupported for all 165
@@ -92,11 +94,11 @@ the fixed-`GF(8)` order or all-class transfer results.
 | Primary theorem and exact hypotheses | verified | Xarles v1, Corollary 3; same base field, characteristic not 2 or 3, higher genus at most 5, two independent maps |
 | Audit crypto PR #1389 and cryptanalysis PR #290 | verified historical audit | pinned heads and matching `quartic-ic` source hashes below; this is a non-hyperelliptic norm-projection experiment |
 | Separate supported input models | implemented with explicit boundaries | binary and odd-characteristic constructors are separate; unsupported infinity configurations return a structured result |
-| Constructive covers | supported for the two fixed catalog families | all 2,572 formulas are explicit and replayed; this is not a theorem-complete Xarles constructor |
-| Genuine Jacobian arithmetic | partial | binary one-infinity sources are supported; all 2,407 odd two-infinity catalog sources remain outside the current backend |
+| Constructive covers | supported for the two fixed catalog families | all 2,576 formulas are explicit and replayed; this is not a theorem-complete Xarles constructor |
+| Genuine Jacobian arithmetic | partial | binary one-infinity sources are supported; all 2,411 odd two-infinity catalog sources remain outside the current backend |
 | Pullback, pushforward, and subgroup transfer | partial | bounded binary point-class domains and 140 generator checks; exhaustive arbitrary-class pushforward exists only for the non-catalog exact fixed-`GF(8)` fixture; catalog-general binary norm and all odd induced maps remain open |
-| EC1/ICV1 catalog evidence | partial | exact memberships, typed object bindings, hashes, statuses, and four narrow overlays cover the 2,572 catalog geometry rows; the positive fixed-GF(8) source/target/Jacobian/map fixture is non-catalog and has no EC1/ICV1/HC1/CV1 export or transfer-certificate binding |
-| Standalone executable | source verified; packaged scope incomplete | current-source tests cover 2,572 inputs; the published artifact was replayed on its bundled 592-row registry, not on all current inputs |
+| EC1/ICV1 catalog evidence | partial | exact memberships, typed object bindings, hashes, statuses, and four narrow overlays cover the 2,576 catalog geometry rows; the positive fixed-GF(8) source/target/Jacobian/map fixture is non-catalog and has no EC1/ICV1/HC1/CV1 export or transfer-certificate binding |
+| Standalone executable | source verified; packaged scope incomplete | current-source tests cover 2,576 inputs; the published artifact was replayed on its bundled 592-row registry, not on all current inputs |
 | Validation and shipping | partial | deterministic checks and native tests exist; independent divisor-class replay, local Lean kernel receipt, fresh package, and final CI gates remain open |
 | Full Jacobian index-calculus solver | separate and not delivered | no cover-integrated or catalog-supported solver/run for these binary and even-sextic sources; the existing tiny odd-prime one-infinity relation/linear-algebra/recovery library is outside this assessment and is not a general solver |
 
@@ -110,13 +112,13 @@ than count-only.
 | Map profile | Maps | Source / map | What is established |
 |---|---:|---|---|
 | Binary cubic, same field | 165 | genus 3, degree 3 | geometry, one-infinity arithmetic, bounded typed transfer |
-| Direct odd prime field | 1,053 | genus 2, degree 2 | cover geometry only |
+| Direct odd prime field | 1,057 | genus 2, degree 2 | cover geometry only |
 | Normalized odd prime field | 30 | genus 2, degree 2 plus degree-one target normalization | cover and normalization geometry only |
 | Odd extension field | 1,324 | genus 2, degree 2 over the declared `GF(p^k)` | cover geometry over that field only |
-| **Total** | **2,572** | **2,570 unique HC1 cover models** | **every map classified** |
+| **Total** | **2,576** | **2,574 unique HC1 cover models** | **every map classified** |
 
 The two repeated cover objects are intentional shared models, not duplicate
-assessment rows. The 2,407 odd-characteristic rows comprise 1,083 prime-field
+assessment rows. The 2,411 odd-characteristic rows comprise 1,087 prime-field
 rows and 1,324 extension-field rows.
 
 | Subgroup profile | EC1 bindings | Established catalog-wide facts | Still open |
@@ -133,8 +135,8 @@ maps, and no count of classified claims implies that the claims are supported.
 
 ## Typed identity bindings are contexts, not capability claims
 
-The ledger's explicit `typed_bindings` materialize 509 content-addressed
-declared-field records, 2,570 Jacobian contexts, and 2,572 typed curve-map
+The ledger's explicit `typed_bindings` materialize 512 content-addressed
+declared-field records, 2,574 Jacobian contexts, and 2,576 typed curve-map
 bindings. A map binding joins the exact target ICV1 slug and model hash to its
 source-cover UID, source-Jacobian UID, and declared-field relationship. A
 Jacobian context records `Picard_degree_zero`, its dimension, its cover and
@@ -206,7 +208,7 @@ generators, or EC1 subgroup parameters.
 
 The independent semantic replay in
 [`verify_assessment.mjs`](verify_assessment.mjs) checks every content join,
-profile predicate, membership hash, and all 2,572 finite-field map formulas.
+profile predicate, membership hash, and all 2,576 finite-field map formulas.
 It does not independently prove odd `p` primality, extension-modulus
 irreducibility without that assumption, EC1 subgroup orders, or computational
 advantage.
@@ -376,7 +378,7 @@ rational infinity points. The current
 requires a monic polynomial of degree `2g+1` and one rational infinity.
 Consequently:
 
-- the claim that the current backend supports these 2,407 sources is
+- the claim that the current backend supports these 2,411 sources is
   `refuted`;
 - balanced/two-infinity divisor arithmetic, pullback, pushforward, and
   `phi_*phi^*=[2]` remain `unknown`; and
@@ -411,8 +413,8 @@ screen is not imported as a map, order, or recovery certificate.
 
 The current source allowlist accepts all four catalog input profiles. The
 catalog-wide constructor test exercises the standalone `construct` path for
-all 2,572 models in catalog snapshot
-[8e4c9975](https://github.com/aburan28/crypto/commit/8e4c99759fd8d9594ed207d793b07b59ebaf19f7). That commit pins the three
+all 2,576 models in catalog snapshot
+[c590f4ef](https://github.com/aburan28/crypto/commit/c590f4efbbfc505b22a56c2f48a3988dde769222). That commit pins the three
 catalog files; the test assertion is part of the current source. This is
 source-level evidence, not a published-artifact claim.
 
@@ -424,7 +426,7 @@ source allowlist with the earlier 2,100-row model partition placed 746 forms
 inside its syntactic domain (160 binary and 586 direct-prime) and 1,354
 outside: the latter were 1,324 extension-field rows and 30 normalized
 Montgomery/Edwards rows. That historical classification has not been rerun
-against the expanded 2,572-row catalog. No exact batch receipt ran all current
+against the expanded 2,576-row catalog. No exact batch receipt ran all current
 inputs against the archived executable. The artifact is therefore **not**
 evidence of a catalog-wide current binary. Exact asset hashes, directly
 executed commands, and the historical static-classification boundary are
@@ -432,7 +434,7 @@ preserved in
 [`release_replay.txt`](release_replay.txt).
 
 The generated curve browser has been refreshed to the current catalog
-snapshot. Its 2,572 cards use this geometry status:
+snapshot. Its 2,576 cards use this geometry status:
 
 ```text
 verified_over_declared_field
@@ -456,13 +458,13 @@ new norm or CLI changes.
 
 | Control | Status | Scope and limit |
 |---|---|---|
-| Exact identity joins | `supported` | all 2,572 map UIDs and 977 EC1/curve/map triples; identity alone claims no arithmetic |
-| Cover geometry | `supported` | all 2,572 fixed-family rows; equations, smoothness, genus, degree, separability, and infinity behavior, conditional on the declared odd base-prime assumptions described above |
-| Internal Jacobian arithmetic | `supported` on stated models | binary and separate odd-prime one-infinity fixtures; not the 2,407 odd two-infinity cover sources |
+| Exact identity joins | `supported` | all 2,576 map UIDs and 977 EC1/curve/map triples; identity alone claims no arithmetic |
+| Cover geometry | `supported` | all 2,576 fixed-family rows; equations, smoothness, genus, degree, separability, and infinity behavior, conditional on the declared odd base-prime assumptions described above |
+| Internal Jacobian arithmetic | `supported` on stated models | binary and separate odd-prime one-infinity fixtures; not the 2,411 odd two-infinity cover sources |
 | Independent arithmetic/map oracle | `unknown` | no separate CAS or independently implemented divisor-class replay across the catalog |
 | Binary catalog generators | `supported` on tested generators | all 140 triples pass the listed membership, annihilation, pullback, composition, and inverse-degree checks; no subgroup-wide promotion |
-| Odd cover/backend compatibility | `refuted` as a current implementation claim | the one-infinity backend cannot accept the 2,407 even-sextic sources; mathematical induced maps remain `unknown` |
-| Published artifact on all current inputs | `refuted` as evidence claim | only its bundled 592 rows were directly replayed; 746/1,354 is a historical static allowlist classification, not a 2,572-command receipt |
+| Odd cover/backend compatibility | `refuted` as a current implementation claim | the one-infinity backend cannot accept the 2,411 even-sextic sources; mathematical induced maps remain `unknown` |
+| Published artifact on all current inputs | `refuted` as evidence claim | only its bundled 592 rows were directly replayed; 746/1,354 is a historical static allowlist classification, not a 2,576-command receipt |
 | Historical cross-repository core parity | `supported` on the pinned receipt snapshot | offline rerun verified exactly seven bindings; CLI, Cargo, catalogs, schema, ledger, workflows, packages, and actual-HEAD binding are excluded |
 | Current fixed-F8 norm mirror | `unknown` | retained parity binds old `cover_transfer.rs` digest `67b94112…`, not current `6e801f14…`; no current-tip cryptanalysis mirror receipt is attached |
 | Coordinate commutation and proper-subfield descent | `unknown` | normalization geometry is checked, but induced-divisor commutation and descent are not |
@@ -571,6 +573,7 @@ dot -Tpng -Gdpi=150 typed_transfer_context.dot \
   -o typed_transfer_context.png
 pandoc README.md \
   --from=markdown+tex_math_single_backslash \
+  --lua-filter=wrap-code.lua \
   --pdf-engine=tectonic \
   -o cover_transfer_assessment_20261013.pdf
 python3 -m pip install pypdf==6.0.0
@@ -595,7 +598,7 @@ assessment into a solver or advantage result.
 4. Replay map additivity and composition through an independent divisor-class
    implementation.
 5. Add coordinate-isomorphism commutation and proper-subfield descent controls.
-6. Publish and replay a standalone artifact that accepts all 2,572 current
+6. Publish and replay a standalone artifact that accepts all 2,576 current
    model forms.
 7. Refresh the legacy formula inventory without promoting modeled routes to
    certificates.
