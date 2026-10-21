@@ -278,6 +278,7 @@ fn audit_separates_scaled_duplicates_dependencies_and_false_equations() {
     assert_eq!(matrix.audit.duplicate_rows, 1);
     assert_eq!(matrix.audit.base_rank, 2);
     useful_rank::replay(&ctx, &fb, &matrix.audit).unwrap();
+    let complete = matrix.audit.clone();
     let mut truncated = matrix.audit.clone();
     truncated.transcript_complete = false;
     assert!(useful_rank::replay(&ctx, &fb, &truncated).is_err());
@@ -299,6 +300,11 @@ fn audit_separates_scaled_duplicates_dependencies_and_false_equations() {
     assert_eq!(matrix.audit.independent_rows, 3);
     assert_eq!(matrix.audit.rank, 3);
     assert!(matrix.audit.receipts.len() < matrix.audit.rows_seen as usize);
+    let mut oversized = fb;
+    oversized.columns = usize::MAX;
+    assert!(useful_rank::replay(&ctx, &oversized, &complete)
+        .unwrap_err()
+        .contains("1..4096 columns"));
 }
 
 #[test]

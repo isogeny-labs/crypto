@@ -54,6 +54,9 @@ pub fn replay<G: CountedGroup>(
     if !report.transcript_complete {
         return Err("rank transcript is truncated".into());
     }
+    if fb.columns == 0 || fb.columns > 4096 {
+        return Err("rank audit requires 1..4096 columns".into());
+    }
     let inner = Box::new(IncrementalGauss::new(fb.columns + 1, ctx.r));
     let mut matrix = AuditedMatrix::new(ctx, fb, inner)?;
     for receipt in &report.receipts {
