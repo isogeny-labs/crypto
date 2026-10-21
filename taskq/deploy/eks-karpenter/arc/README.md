@@ -82,9 +82,10 @@ The high-memory list takes precedence. Remove a filename to roll that workflow
 back. The routing script is `route_workflows.py`; it prepares new direct x64
 `runs-on` lines and is idempotent.
 
-`first-wave-workflows.txt` records the 392 workflow filenames enabled in the
+`first-wave-workflows.txt` records the 391 workflow filenames enabled in the
 initial rollout. It excludes workloads requiring specialized GPU, Sage, Lean,
-perf, release or measurement hosts; the 38 deferred filenames are recorded in
+perf, release or measurement hosts, or a browser (`ic-dashboard.yml`, which
+needs Chrome); the 39 deferred filenames are recorded in
 `deferred-workflows.txt` for individual validation. To restore the rollout
 variable after an accidental reset:
 
