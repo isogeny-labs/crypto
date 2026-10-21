@@ -218,7 +218,7 @@ pub(crate) fn inv_binary_u64(a: u64, m: u64) -> Option<u64> {
     // halving of an odd coefficient exact as `(x + m) / 2`.
     let (mut u, mut v) = (a, m);
     let (mut x1, mut x2) = (1u64, 0u64);
-    let half = |x: u64| if x % 2 == 0 { x / 2 } else { x / 2 + m / 2 + 1 };
+    let half = |x: u64| if x.is_multiple_of(2) { x / 2 } else { x / 2 + m / 2 + 1 };
     let sub = |x: u64, y: u64| if x >= y { x - y } else { x + (m - y) };
     loop {
         if u == 1 {
@@ -259,7 +259,7 @@ pub(crate) fn jacobi_u64(mut a: u64, mut n: u64) -> i32 {
     let mut result = 1i32;
     a %= n;
     while a != 0 {
-        while a % 2 == 0 {
+        while a.is_multiple_of(2) {
             a /= 2;
             if n % 8 == 3 || n % 8 == 5 {
                 result = -result;
