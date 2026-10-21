@@ -13,7 +13,9 @@ export PYTHONDONTWRITEBYTECODE=1
 export CARGO_TARGET_DIR=/workspace/n83_fixed31_target
 
 python3 -c 'import subprocess,sys; from pathlib import Path; from research.n83_highk_beyond4405_20261021.runpod_runner import read_allocation; from research.n83_highk_beyond4405_20261021.run import digest; p=read_allocation(Path(sys.argv[1])); assert subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip()==p["source_head_sha"]; assert digest(Path("examples/koblitz_orbit_dlp_fast.rs"))==p["source_sha256"]' "$fixed31_allocation" || exit 77
-python3 -c 'import datetime as d,json,sys; from pathlib import Path; from research.n83_highk_beyond4405_20261021.run import digest; from research.n83_highk_beyond4405_20261021.runpod_runner import read_allocation,timestamp; a=Path(sys.argv[1]); p=read_allocation(a); w=json.loads(Path(sys.argv[2]).read_text()); t=d.datetime.now(d.timezone.utc); assert w["schema"]=="n83.fixed31-watchdog-ready/v1" and w["pod_id"]==p["pod_id"] and w["allocation_sha256"]==digest(a) and timestamp(w["recorded_utc"])<=t and (t-timestamp(w["recorded_utc"])).total_seconds()<=1800 and timestamp(w["retire_at_utc"])==timestamp(p["stop_after_utc"])-d.timedelta(minutes=5)' "$fixed31_allocation" "$fixed31_watchdog_ready" || exit 79
+python3 -m research.n83_highk_beyond4405_20261021.verify_watchdog_ready \
+  --allocation "$fixed31_allocation" \
+  --ready "$fixed31_watchdog_ready" || exit 79
 cp "$fixed31_watchdog_ready" "$fixed31_root/watchdog_ready.json" || exit 80
 
 python3 -m research.n83_highk_beyond4405_20261021.run --fixture-preflight \

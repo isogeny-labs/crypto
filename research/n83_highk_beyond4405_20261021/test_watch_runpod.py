@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest import mock
 
 from research.n83_highk_beyond4405_20261021 import watch_runpod as watch
+from research.n83_highk_beyond4405_20261021 import verify_watchdog_ready
 
 
 ALLOCATION = {"pod_id": "abc123", "machine_id": "machine-a",
@@ -18,6 +19,20 @@ POD = {"id": "abc123", "machineId": "machine-a", "costPerHr": 0.2,
 
 
 class WatchRunpodTest(unittest.TestCase):
+    def test_pod_launch_requires_fresh_bound_readiness(self):
+        at = datetime(2030, 1, 1, 1, tzinfo=timezone.utc)
+        ready = {"schema": "n83.fixed31-watchdog-ready/v1",
+                 "pod_id": "abc123", "allocation_sha256": "a" * 64,
+                 "recorded_utc": "2030-01-01T00:59:00Z",
+                 "retire_at_utc": "2030-01-01T09:55:00Z"}
+        verify_watchdog_ready.verify(ALLOCATION, ready, "a" * 64, at)
+        with self.assertRaises(ValueError):
+            verify_watchdog_ready.verify(ALLOCATION,
+                                          {**ready, "pod_id": "other"},
+                                          "a" * 64, at)
+        with self.assertRaises(ValueError):
+            verify_watchdog_ready.verify(ALLOCATION, ready, "b" * 64, at)
+
     def test_done_transfers_verified_archive_and_retires(self):
         with tempfile.TemporaryDirectory() as temp:
             output = Path(temp) / "result"
