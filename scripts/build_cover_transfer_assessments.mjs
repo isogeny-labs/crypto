@@ -8,8 +8,8 @@ import { dirname, resolve } from "node:path";
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(SCRIPT_DIR, "..");
 const OUTPUT_PATH = "docs/curves/cover-transfer-assessments.json";
-const ASSESSMENT_DATE = "2026-10-19";
-const CATALOG_COMMIT = "8e4c99759fd8d9594ed207d793b07b59ebaf19f7";
+const ASSESSMENT_DATE = "2026-10-21";
+const CATALOG_COMMIT = "520f0261c2c7dfd28c937a974120def470b76c35";
 const MAP_HASH_DOMAIN = "cover-transfer-assessments/v2/map_base";
 const SUBGROUP_HASH_DOMAIN = "cover-transfer-assessments/v2/subgroup_base";
 
