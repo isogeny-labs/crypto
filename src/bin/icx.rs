@@ -71,6 +71,8 @@ enum Action {
     SolvePrime(prime_external::PrimeArgs),
     /// Solve a specified public target over a bounded cubic extension field.
     SolveCubic(cubic_external::CubicArgs),
+    /// Enumerate bounded rational j-neighbours over an exact cubic field.
+    CubicGraph(cubic_route::GraphArgs),
     /// Solve a quadratic Boolean system with the FES kernel (CPU or GPU worker).
     Fes(FesArgs),
 }
@@ -616,6 +618,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Run(a)) => run_cmd(a, cli.json),
         Some(Action::SolvePrime(a)) => prime_external::solve(a),
         Some(Action::SolveCubic(a)) => cubic_external::solve(a),
+        Some(Action::CubicGraph(a)) => cubic_route::enumerate_j(a),
         Some(Action::Fes(a)) => fes_cmd(a),
         None => {
             let name = cli

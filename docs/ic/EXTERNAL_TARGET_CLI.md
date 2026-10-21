@@ -135,6 +135,41 @@ and replayed scalar 5, verified the object in S3, and removed only its isolated
 acceptance object. Its nine checks are recorded in
 [`CUBIC_ROUTE_S3_ACCEPTANCE_20261020.json`](../store/CUBIC_ROUTE_S3_ACCEPTANCE_20261020.json).
 
+### Cubic-field j graph numeration
+
+Both CLIs can enumerate distinct rational j-invariant neighbours from a
+specified cubic-field curve using independently evaluated modular
+polynomials:
+
+```sh
+ic cubic-graph --p 7 --c 2 --a 3 6 4 --b 4 4 6 \
+  --max-ell 5 --max-nodes 32 --seed 1 --json
+icx cubic-graph --p 7 --c 2 --a 3 6 4 --b 4 4 6 \
+  --max-ell 5 --max-nodes 32 --seed 1 --json
+```
+
+The field must be exactly `F_p[t]/(t³-c)` with canonical coefficients,
+prime `p` in `7..=101` (necessarily `p ≡ 1 mod 3`), and noncube `c`. Supported odd prime degrees are
+3, 5, and 7 when `p > degree + 1`. `--max-nodes` is bounded to 1–64;
+`truncated` records when that limit omits a discovered neighbour. Nodes
+are distinct j-invariants in the exact cubic field. Edges record distinct
+target j-invariants per degree and pass a second modular-polynomial
+evaluation. This numeration does not include edge multiplicities or kernel
+generators. To transport an IC target, supply a separately certified
+`--route-file` as described above.
+
+The public p=7 command above completed without truncation: 6 j nodes and
+18 distinct degree-labelled directed edges. Both `ic` and `icx` returned
+the same JSON data. A separate exhaustive test evaluated every candidate
+target j over all 343 field elements for both degrees and found exactly the
+reported neighbours. The frozen CLI output is
+[`cubic_f7_j_graph_public_20261021.json`](fixtures/cubic_f7_j_graph_public_20261021.json),
+SHA-256 `4e07e7c2fc117ecf8deec4916ac9d0178325f5118464ae5881c980c0ab2069de`.
+A p=97, c=2 run with degree 3 and a two-node cap completed in 1.144 seconds
+on the local host and correctly marked its output truncated; that check
+validates command execution at the upper prime range, not complete graph
+coverage there.
+
 The prime and cubic commands return `bounded_unknown` with a nonzero exit
 status if their configured IC budget ends without a verified scalar. These
 finite input ranges describe the implemented solvers; they do not certify

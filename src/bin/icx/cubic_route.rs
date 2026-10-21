@@ -1,14 +1,130 @@
 //! Checked odd-degree Vélu routes over the exact cubic field supplied to IC.
 
+use clap::Args;
 use crypto_lib::cryptanalysis::gaudry_cubic::{Curve3, Fp3, Pt3, E3};
 use crypto_lib::hash::sha256::sha256;
 use isogeny_algos::curve::{self, Curve, Isogeny, Pt};
-use isogeny_algos::field::{Field, Rng};
+use isogeny_algos::field::{Field, Rng, Zp};
 use isogeny_algos::kernel::velu::velu_from_point;
+use isogeny_algos::path::graph::{self, PhiCache};
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
+
+#[derive(Args, Clone)]
+pub(super) struct GraphArgs {
+    /// Prime characteristic in 7..=101 with p congruent to 1 modulo 3.
+    #[arg(long)]
+    p: u64,
+    /// A non-cube in F_p defining t^3 = c.
+    #[arg(long)]
+    c: u64,
+    /// Three coefficients of the source curve's a parameter.
+    #[arg(long, num_args = 3)]
+    a: Vec<u64>,
+    /// Three coefficients of the source curve's b parameter.
+    #[arg(long, num_args = 3)]
+    b: Vec<u64>,
+    /// Include odd-prime isogeny degrees through this value (3..=7).
+    #[arg(long, default_value_t = 5)]
+    max_ell: usize,
+    /// Maximum distinct j-invariants to retain (1..=64).
+    #[arg(long, default_value_t = 32)]
+    max_nodes: usize,
+    /// Deterministic polynomial-root search seed.
+    #[arg(long, default_value_t = 1)]
+    seed: u64,
+}
+
+/// Enumerate distinct F_{p^3}-rational j-neighbours by modular polynomial.
+/// This is a graph of j-invariants; explicit point transport requires a
+/// separately certified route of curve models and kernel generators.
+pub(super) fn enumerate_j(args: &GraphArgs) -> Result<Value, String> {
+    if !(7..=101).contains(&args.p)
+        || !prime(args.p)
+        || !(3..=7).contains(&args.max_ell)
+        || !(1..=64).contains(&args.max_nodes)
+    {
+        return Err(
+            "cubic graph requires prime p in 7..=101, max-ell in 3..=7, max-nodes in 1..=64".into(),
+        );
+    }
+    if args.a.len() != 3
+        || args.b.len() != 3
+        || args.c >= args.p
+        || args.a.iter().chain(&args.b).any(|&v| v >= args.p)
+    {
+        return Err("cubic graph field coefficients must be canonical triples".into());
+    }
+    let _checked_field = Fp3::with_cube_nonresidue(args.p, args.c)?;
+    let f = CubicField {
+        p: args.p,
+        c: args.c,
+    };
+    let source = Curve::new(
+        E3([args.a[0], args.a[1], args.a[2]]),
+        E3([args.b[0], args.b[1], args.b[2]]),
+    );
+    if !curve::is_smooth(&f, &source) {
+        return Err("cubic graph source curve is singular".into());
+    }
+    let degrees: Vec<usize> = [3, 5, 7]
+        .into_iter()
+        .filter(|&ell| ell <= args.max_ell && ell + 1 < args.p as usize)
+        .collect();
+    if degrees.is_empty() {
+        return Err("no supported degree below the field characteristic".into());
+    }
+    let prime_cache = PhiCache::new(&Zp::new(args.p), &degrees);
+    let cache = prime_cache.lift(|v| E3([v, 0, 0]));
+    let mut nodes = vec![curve::jinv(&f, &source)];
+    let mut index = HashMap::new();
+    index.insert(nodes[0], 0usize);
+    let mut edges = Vec::new();
+    let mut rng = Rng::new(args.seed);
+    let mut expanded = 0usize;
+    let mut truncated = false;
+    while expanded < nodes.len() {
+        let source_id = expanded;
+        let j = nodes[source_id];
+        let mut neighbors = graph::neighbors(&f, &cache, &degrees, j, &mut rng);
+        neighbors.sort_unstable_by_key(|(ell, jn)| (*ell, jn.0));
+        neighbors.dedup();
+        for (ell, next_j) in neighbors {
+            if cache.get(ell).eval(&f, j, next_j) != f.zero() {
+                return Err("modular-polynomial neighbour failed independent evaluation".into());
+            }
+            let target_id = if let Some(&id) = index.get(&next_j) {
+                id
+            } else {
+                if nodes.len() == args.max_nodes {
+                    truncated = true;
+                    continue;
+                }
+                let id = nodes.len();
+                nodes.push(next_j);
+                index.insert(next_j, id);
+                id
+            };
+            edges.push(json!({"source":source_id,"target":target_id,"degree":ell}));
+        }
+        expanded += 1;
+    }
+    Ok(json!({
+        "schema_version":1,
+        "graph_kind":"cubic-rational-j-neighbours",
+        "field_characteristic":args.p,
+        "cubic_nonresidue":args.c,
+        "source_curve":{"a":args.a,"b":args.b},
+        "degrees":degrees,
+        "nodes":nodes.iter().enumerate().map(|(id,j)| json!({"id":id,"j":j.0})).collect::<Vec<_>>(),
+        "edges":edges,
+        "nodes_expanded":expanded,
+        "truncated":truncated,
+        "seed":args.seed
+    }))
+}
 
 /// A counter-free field adapter. `Fp3` uses `Cell` to charge IC arithmetic;
 /// isogeny verification instead uses this `Send + Sync` field implementation.
@@ -317,6 +433,61 @@ pub(super) fn transport(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn public_f7_j_graph_matches_exhaustive_field_roots() {
+        let args = GraphArgs {
+            p: 7,
+            c: 2,
+            a: vec![3, 6, 4],
+            b: vec![4, 4, 6],
+            max_ell: 5,
+            max_nodes: 32,
+            seed: 1,
+        };
+        let report = enumerate_j(&args).unwrap();
+        assert_eq!(report["truncated"], false);
+        assert_eq!(report["nodes"].as_array().unwrap().len(), 6);
+        assert_eq!(report["edges"].as_array().unwrap().len(), 18);
+        let nodes: Vec<E3> = report["nodes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|n| E3(serde_json::from_value(n["j"].clone()).unwrap()))
+            .collect();
+        let actual: HashSet<_> = report["edges"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|edge| {
+                let source = edge["source"].as_u64().unwrap() as usize;
+                let target = edge["target"].as_u64().unwrap() as usize;
+                (
+                    source,
+                    edge["degree"].as_u64().unwrap() as usize,
+                    nodes[target],
+                )
+            })
+            .collect();
+        let f = CubicField { p: 7, c: 2 };
+        let cache = PhiCache::new(&Zp::new(7), &[3, 5]).lift(|v| E3([v, 0, 0]));
+        let mut expected = HashSet::new();
+        for (source, &j) in nodes.iter().enumerate() {
+            for ell in [3, 5] {
+                for x2 in 0..7 {
+                    for x1 in 0..7 {
+                        for x0 in 0..7 {
+                            let candidate = E3([x0, x1, x2]);
+                            if cache.get(ell).eval(&f, j, candidate) == Fp3::ZERO {
+                                expected.insert((source, ell, candidate));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        assert_eq!(actual, expected);
+    }
 
     #[test]
     fn public_f7_route_transports_the_same_scalar() {

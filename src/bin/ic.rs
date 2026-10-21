@@ -119,6 +119,8 @@ enum Action {
     SolvePrime(prime_external::PrimeArgs),
     /// Run bounded EC index calculus on an explicit cubic-field public target.
     SolveCubic(cubic_external::CubicArgs),
+    /// Enumerate bounded rational j-neighbours over an exact cubic field.
+    CubicGraph(cubic_route::GraphArgs),
 }
 #[derive(Args)]
 #[group(required = true, multiple = false)]
@@ -176,6 +178,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Prime(args)) => prime::run(args.clone()),
         Some(Action::SolvePrime(args)) => prime_external::solve(args),
         Some(Action::SolveCubic(args)) => cubic_external::solve(args),
+        Some(Action::CubicGraph(args)) => cubic_route::enumerate_j(args),
         Some(Action::Run(args)) => experiment::run(args.clone(), cli.json),
         None => {
             if let Some(name) = &cli.profile {
