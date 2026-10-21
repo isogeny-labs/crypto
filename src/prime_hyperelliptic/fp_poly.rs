@@ -361,18 +361,28 @@ impl PartialEq for FpPoly {
 
 impl Eq for FpPoly {}
 
-/// Modular inverse `a^{-1} mod p` via Fermat's little theorem.
+/// Modular inverse `a^{-1} mod p` by an extended Euclidean algorithm.
 /// Returns `None` for `a ≡ 0 (mod p)`.
+///
+/// On a word-sized odd `p` this is the binary extended Euclid, the
+/// algorithm `bitop/v1` prices a `field_inv` as; off the word size it is
+/// the division-based Euclid of [`crate::utils::mod_inverse`].  It used
+/// to be a Fermat exponentiation, which `num-bigint` computes with a
+/// fixed 4-bit window over whole limbs (about 90 products whatever the
+/// size of `p`), so the executed work was some 40× what was charged.
 pub fn fp_inv(a: &BigUint, p: &BigUint) -> Option<BigUint> {
     let a = a % p;
     if a.is_zero() {
         return None;
     }
-    // One inversion; the Fermat exponentiation below is how this
-    // implementation computes it, and `bitop/v1` prices the inversion.
+    // One inversion, charged as the one priced primitive it executes.
     ops::fp_inv(1);
-    let exp = p - BigUint::from(2u32);
-    Some(a.modpow(&exp, p))
+    match (a.to_u64_digits().as_slice(), p.to_u64_digits().as_slice()) {
+        ([x], [m]) if *m % 2 == 1 && *m < 1 << 63 => {
+            crate::utils::inv_binary_u64(*x, *m).map(BigUint::from)
+        }
+        _ => crate::utils::mod_inverse(&a, p),
+    }
 }
 
 #[cfg(test)]

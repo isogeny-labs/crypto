@@ -300,10 +300,8 @@ impl HyperellipticCurveP {
                 continue;
             }
             // y² = y_sq: two roots if QR, zero if non-QR.
-            // QR test via Euler's criterion: y_sq^((p-1)/2).
-            let exp = (&self.p - BigUint::one()) >> 1;
-            let chi = y_sq.modpow(&exp, &self.p);
-            if chi == BigUint::one() {
+            // QR test: a Jacobi symbol on a word-sized p.
+            if quadratic_residue(&y_sq, &self.p) {
                 count += 2u32;
             }
         }
@@ -647,9 +645,7 @@ pub fn brute_force_jac_order(curve: &HyperellipticCurveP) -> BigUint {
         if y_sq.is_zero() {
             count += 1;
         } else {
-            let exp = (p - BigUint::one()) >> 1;
-            let chi = y_sq.modpow(&exp, p);
-            if chi == BigUint::one() {
+            if quadratic_residue(&y_sq, p) {
                 count += 2;
             }
         }
@@ -816,6 +812,16 @@ pub fn fast_point_counts(curve: &HyperellipticCurveP, p_u: u64) -> (u64, u64) {
         }
     }
     (n1, n2)
+}
+
+/// Whether a non-zero `a` is a square mod the odd prime `p`: the Jacobi
+/// symbol on a word-sized `p` (the gcd-style test `bitop/v1` prices as a
+/// `legendre`), Euler's criterion otherwise.
+fn quadratic_residue(a: &BigUint, p: &BigUint) -> bool {
+    match (a.to_u64_digits().as_slice(), p.to_u64_digits().as_slice()) {
+        ([x], [m]) if *m % 2 == 1 => crate::utils::jacobi_u64(*x, *m) == 1,
+        _ => a.modpow(&((p - BigUint::one()) >> 1), p) == BigUint::one(),
+    }
 }
 
 fn mulmod_u64(a: u64, b: u64, p: u64) -> u64 {

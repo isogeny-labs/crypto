@@ -99,6 +99,7 @@ fn arm_json(
     phases: &PhaseTally,
     validation: &PhaseTally,
     per_run: &[u128],
+    algorithm_per_run: &[u128],
     runs: usize,
     seeds: Vec<u64>,
     correct: bool,
@@ -113,6 +114,11 @@ fn arm_json(
         "validation_subset_summed_over_runs": phases_json(validation, w),
         "bitops_per_run": per_run.iter().map(|v| v.to_string()).collect::<Vec<_>>(),
         "bitops_mean": mean,
+        // Without the checked arithmetic's operand re-validation: the cost
+        // the self-check policy compares (docs/units/BITOPS.md).
+        "algorithm_bitops_per_run": algorithm_per_run.iter().map(|v| v.to_string()).collect::<Vec<_>>(),
+        "algorithm_bitops_mean": algorithm_per_run.iter().map(|&x| x as f64).sum::<f64>()
+            / algorithm_per_run.len().max(1) as f64,
     })
 }
 
@@ -158,6 +164,7 @@ fn row_json(
             &row.ic_bitop_phases,
             &row.ic_bitop_validation,
             &row.ic_bitops_per_run,
+            &row.ic_algorithm_bitops_per_run,
             row.ic_runs,
             ic_seeds,
             row.ic_correct,
@@ -167,6 +174,7 @@ fn row_json(
             &row.rho_bitop_phases,
             &row.rho_bitop_validation,
             &row.rho_bitops_per_run,
+            &row.rho_algorithm_bitops_per_run,
             row.rho_runs,
             rho_seeds,
             row.rho_correct,

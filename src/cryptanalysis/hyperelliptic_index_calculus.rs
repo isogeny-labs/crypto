@@ -121,10 +121,18 @@ fn tonelli_nonresidue_tests(p: &BigUint) -> u64 {
     }
     CACHE.with(|c| {
         *c.borrow_mut().entry(p.to_u64_digits()).or_insert_with(|| {
+            let mut tests = 1u64;
+            if let [m] = p.to_u64_digits().as_slice() {
+                let mut z = 2u64;
+                while crate::utils::jacobi_u64(z, *m) != -1 {
+                    z += 1;
+                    tests += 1;
+                }
+                return tests;
+            }
             let p_minus_one = p - BigUint::one();
             let half = &p_minus_one >> 1;
             let mut z = BigUint::from(2u32);
-            let mut tests = 1u64;
             while z.modpow(&half, p) != p_minus_one {
                 z += BigUint::one();
                 tests += 1;
@@ -470,7 +478,7 @@ fn resultant(a: &FpPoly, b: &FpPoly, ops: &mut usize) -> BigUint {
     if db == 0 {
         *ops += da;
         ops::charge_pow(&BigUint::from(da as u64));
-        return b.lead().modpow(&BigUint::from(da as u64), p);
+        return pow_fp(&b.lead(), da as u64, p);
     }
     let r = a.rem(b);
     *ops += (da.saturating_sub(db) + 1) * (db + 1);
@@ -484,7 +492,7 @@ fn resultant(a: &FpPoly, b: &FpPoly, ops: &mut usize) -> BigUint {
         return BigUint::zero();
     }
     ops::charge_pow(&BigUint::from((da - dr) as u64));
-    let factor = b.lead().modpow(&BigUint::from((da - dr) as u64), p);
+    let factor = pow_fp(&b.lead(), (da - dr) as u64, p);
     *ops += da - dr + 1;
     ops::fp_mul(1);
     value = (value * factor) % p;
@@ -511,14 +519,43 @@ fn discriminant(u: &FpPoly, p: &BigUint, ops: &mut usize) -> BigUint {
     }
 }
 
-/// Is `a` a square in `F_p`?  One Euler exponentiation.
+/// Is `a` a square in `F_p`?  One quadratic-residue test: a Jacobi
+/// symbol on a word-sized `p`, Euler's criterion otherwise.
 fn is_square_mod(a: &BigUint, p: &BigUint, ops: &mut usize) -> bool {
     if a.is_zero() {
         return true;
     }
     *ops += (p.bits() as usize * 3) / 2;
     ops::legendre(1);
-    a.modpow(&((p - BigUint::one()) >> 1), p) == BigUint::one()
+    match (a.to_u64_digits().as_slice(), p.to_u64_digits().as_slice()) {
+        ([x], [m]) if *m % 2 == 1 => crate::utils::jacobi_u64(*x, *m) == 1,
+        _ => a.modpow(&((p - BigUint::one()) >> 1), p) == BigUint::one(),
+    }
+}
+
+/// `base^e mod p` for a small public `e`, by square-and-multiply on
+/// words when `p` is word-sized (what [`ops::charge_pow`] charges), else
+/// `modpow`.
+fn pow_fp(base: &BigUint, e: u64, p: &BigUint) -> BigUint {
+    match (
+        base.to_u64_digits().as_slice(),
+        p.to_u64_digits().as_slice(),
+    ) {
+        ([b], [m]) if *b < *m => {
+            let mul = |x: u64, y: u64| ((x as u128 * y as u128) % *m as u128) as u64;
+            let (mut acc, mut b, mut e) = (1u64, *b, e);
+            while e > 0 {
+                if e & 1 == 1 {
+                    acc = mul(acc, b);
+                }
+                b = mul(b, b);
+                e >>= 1;
+            }
+            BigUint::from(acc)
+        }
+        ([], _) if e > 0 => BigUint::zero(),
+        _ => base.modpow(&BigUint::from(e), p),
+    }
 }
 
 fn split_by_gcd(u: &FpPoly, p: &BigUint, ops: &mut usize) -> Option<Vec<(BigUint, usize)>> {

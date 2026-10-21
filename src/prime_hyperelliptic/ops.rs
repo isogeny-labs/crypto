@@ -37,7 +37,8 @@
 //! * `field_inv` — one inversion mod `p` (`fp_inv`, `mod_inverse(·, p)`).
 //! * `field_sqrt` — one Tonelli–Shanks square root that found a root
 //!   (`sqrt_mod_p` charges its Euler test as a `legendre` first).
-//! * `legendre` — one Euler-criterion quadratic-residue test.
+//! * `legendre` — one quadratic-residue test (a Jacobi symbol, the gcd-type
+//!   loop `bitop/v1` prices it as; Euler's criterion only off the word size).
 //! * `modpow` with a public exponent `e` other than the above — charged as
 //!   left-to-right square-and-multiply: `bits(e) − 1` squarings and
 //!   `popcount(e) − 1` products ([`charge_pow`]).

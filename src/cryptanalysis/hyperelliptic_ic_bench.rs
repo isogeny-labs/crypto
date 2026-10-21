@@ -1142,6 +1142,11 @@ pub struct HeadToHeadRow {
     /// Each run's `bitop/v1` total, in run order.
     pub ic_bitops_per_run: Vec<u128>,
     pub rho_bitops_per_run: Vec<u128>,
+    /// Each run's total without the checked arithmetic's operand
+    /// re-validation: the cost the self-check policy compares
+    /// (`docs/units/BITOPS.md`, "Self-check work").
+    pub ic_algorithm_bitops_per_run: Vec<u128>,
+    pub rho_algorithm_bitops_per_run: Vec<u128>,
 }
 
 impl HeadToHeadRow {
@@ -1250,6 +1255,7 @@ pub fn head_to_head(
     let mut ic_bitop_phases = PhaseTally::default();
     let mut ic_bitop_validation = PhaseTally::default();
     let mut ic_bitops_per_run = Vec::new();
+    let mut ic_algorithm_bitops_per_run = Vec::new();
 
     let ic_runs = trials.ic.max(1);
     let mut ic_relation_ops = 0f64;
@@ -1275,9 +1281,16 @@ pub fn head_to_head(
         let (ic_k, rep) = hec_index_calculus_dlp(curve, d1, d2, n, &params);
         ic_wall_ms += ic_start.elapsed().as_secs_f64() * 1e3;
         let run = ops::snapshot().since(&tally0);
-        ic_bitop_validation.add(&ops::snapshot_validation().since(&valid0));
-        ic_bitops_per_run.push(
-            run.total()
+        let checks = ops::snapshot_validation().since(&valid0);
+        ic_bitop_validation.add(&checks);
+        let all = run
+            .total()
+            .bitops(&widths)
+            .expect("prime-field primitives all have a bitop/v1 price");
+        ic_bitops_per_run.push(all);
+        ic_algorithm_bitops_per_run.push(
+            all - checks
+                .total()
                 .bitops(&widths)
                 .expect("prime-field primitives all have a bitop/v1 price"),
         );
@@ -1320,6 +1333,7 @@ pub fn head_to_head(
     let mut rho_bitop_phases = PhaseTally::default();
     let mut rho_bitop_validation = PhaseTally::default();
     let mut rho_bitops_per_run = Vec::new();
+    let mut rho_algorithm_bitops_per_run = Vec::new();
     for t in 0..rho_runs {
         let (tally0, valid0) = (ops::snapshot(), ops::snapshot_validation());
         let r = pollard_rho_jacobian_with(
@@ -1332,9 +1346,16 @@ pub fn head_to_head(
             rho_variant,
         );
         let run = ops::snapshot().since(&tally0);
-        rho_bitop_validation.add(&ops::snapshot_validation().since(&valid0));
-        rho_bitops_per_run.push(
-            run.total()
+        let checks = ops::snapshot_validation().since(&valid0);
+        rho_bitop_validation.add(&checks);
+        let all = run
+            .total()
+            .bitops(&widths)
+            .expect("prime-field primitives all have a bitop/v1 price");
+        rho_bitops_per_run.push(all);
+        rho_algorithm_bitops_per_run.push(
+            all - checks
+                .total()
                 .bitops(&widths)
                 .expect("prime-field primitives all have a bitop/v1 price"),
         );
@@ -1444,6 +1465,8 @@ pub fn head_to_head(
         rho_bitop_validation,
         ic_bitops_per_run,
         rho_bitops_per_run,
+        ic_algorithm_bitops_per_run,
+        rho_algorithm_bitops_per_run,
     }
 }
 
@@ -1881,6 +1904,11 @@ mod tests {
             assert_eq!(a.ic_bitop_validation, b.ic_bitop_validation);
             assert_eq!(a.ic_bitops_per_run, b.ic_bitops_per_run);
             assert_eq!(a.rho_bitops_per_run, b.rho_bitops_per_run);
+            assert_eq!(a.ic_algorithm_bitops_per_run, b.ic_algorithm_bitops_per_run);
+            assert_eq!(
+                a.rho_algorithm_bitops_per_run,
+                b.rho_algorithm_bitops_per_run
+            );
         }
     }
 

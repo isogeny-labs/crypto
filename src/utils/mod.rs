@@ -199,10 +199,144 @@ pub(crate) fn mod_inverse_u64(a: u64, m: u64) -> Option<u64> {
     Some(if odd { s0 } else { m - s0 })
 }
 
+/// Inverse of `a` modulo an odd `m < 2^63` by the binary extended
+/// Euclidean algorithm: at most `2·bits(m)` steps, each a shift or a
+/// subtraction and a select, which is the algorithm `bitop/v1` prices a
+/// `field_inv` as (`docs/units/BITOPS.md`).  `None` when `gcd(a, m) ≠ 1`.
+///
+/// Variable-time, like [`mod_inverse_u64`].
+pub(crate) fn inv_binary_u64(a: u64, m: u64) -> Option<u64> {
+    debug_assert!(
+        m >= 3 && m % 2 == 1 && m < 1 << 63,
+        "inv_binary_u64 needs an odd modulus in [3, 2^63)"
+    );
+    let a = a % m;
+    if a == 0 {
+        return None;
+    }
+    // `x1·a ≡ u` and `x2·a ≡ v (mod m)` throughout; `m` odd keeps every
+    // halving of an odd coefficient exact as `(x + m) / 2`.
+    let (mut u, mut v) = (a, m);
+    let (mut x1, mut x2) = (1u64, 0u64);
+    let half = |x: u64| if x % 2 == 0 { x / 2 } else { x / 2 + m / 2 + 1 };
+    let sub = |x: u64, y: u64| if x >= y { x - y } else { x + (m - y) };
+    loop {
+        if u == 1 {
+            return Some(x1);
+        }
+        if v == 1 {
+            return Some(x2);
+        }
+        while u % 2 == 0 {
+            u /= 2;
+            x1 = half(x1);
+        }
+        while v % 2 == 0 {
+            v /= 2;
+            x2 = half(x2);
+        }
+        match u.cmp(&v) {
+            std::cmp::Ordering::Greater => {
+                u -= v;
+                x1 = sub(x1, x2);
+            }
+            std::cmp::Ordering::Less => {
+                v -= u;
+                x2 = sub(x2, x1);
+            }
+            // u = v > 1 is the gcd: no inverse.
+            std::cmp::Ordering::Equal => return None,
+        }
+    }
+}
+
+/// The Jacobi symbol `(a / n)` for odd `n`: `1`, `−1`, or `0` when
+/// `gcd(a, n) > 1`.  A gcd-style loop, which is what `bitop/v1` prices a
+/// `legendre` as; for a prime `n` it is the Legendre symbol, so `1` says
+/// `a` is a non-zero square mod `n`.
+pub(crate) fn jacobi_u64(mut a: u64, mut n: u64) -> i32 {
+    debug_assert!(n % 2 == 1, "jacobi_u64 needs an odd modulus");
+    let mut result = 1i32;
+    a %= n;
+    while a != 0 {
+        while a % 2 == 0 {
+            a /= 2;
+            if n % 8 == 3 || n % 8 == 5 {
+                result = -result;
+            }
+        }
+        std::mem::swap(&mut a, &mut n);
+        if a % 4 == 3 && n % 4 == 3 {
+            result = -result;
+        }
+        a %= n;
+    }
+    if n == 1 {
+        result
+    } else {
+        0
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use num_bigint::RandBigInt;
+
+    /// The binary extended Euclid agrees with the division-based one on
+    /// every unit of some small odd moduli, prime or not, and refuses
+    /// non-units.
+    #[test]
+    fn inv_binary_u64_matches_mod_inverse_u64() {
+        for m in [
+            3u64,
+            5,
+            7,
+            9,
+            15,
+            61,
+            251,
+            255,
+            65_519,
+            1_000_003,
+            (1u64 << 61) - 1,
+        ] {
+            let step = (m / 97).max(1);
+            for a in (0..m).step_by(step as usize).chain([m - 1, 1]) {
+                assert_eq!(
+                    inv_binary_u64(a, m),
+                    mod_inverse_u64(a, m),
+                    "a = {a}, m = {m}"
+                );
+                if let Some(x) = inv_binary_u64(a, m) {
+                    assert_eq!((a as u128 * x as u128) % m as u128, 1);
+                }
+            }
+        }
+    }
+
+    /// The Jacobi symbol agrees with Euler's criterion on every residue of
+    /// some small primes.
+    #[test]
+    fn jacobi_u64_matches_euler_criterion() {
+        for p in [3u64, 5, 7, 11, 13, 17, 41, 61, 101, 251, 65_519] {
+            for a in 0..p.min(400) {
+                let euler = mod_pow(
+                    &BigUint::from(a),
+                    &BigUint::from((p - 1) / 2),
+                    &BigUint::from(p),
+                );
+                let expected = if a == 0 {
+                    0
+                } else if euler == BigUint::one() {
+                    1
+                } else {
+                    -1
+                };
+                assert_eq!(jacobi_u64(a, p), expected, "a = {a}, p = {p}");
+            }
+        }
+    }
     use num_integer::Integer;
     use rand::rngs::StdRng;
     use rand::{Rng, SeedableRng};
