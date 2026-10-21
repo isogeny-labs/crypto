@@ -515,6 +515,12 @@ fn prime_curves(v: &mut Vec<CatalogCurve>) {
             "GOST R 34.10-2012 (512)",
             CurveParams::gost_tc26_512_b,
         ),
+        (
+            "eccp-131",
+            &["eccp131"],
+            "Certicom ECC Challenge",
+            CurveParams::certicom_eccp131,
+        ),
     ];
     for (name, aliases, std, ctor) in zoo {
         v.push(CatalogCurve {
