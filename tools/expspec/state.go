@@ -2,8 +2,10 @@ package main
 
 import (
 	"bufio"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"math"
 	"os"
 	"os/exec"
@@ -218,6 +220,26 @@ func spend(spec *Spec, st *State) float64 {
 
 var pathPartRE = regexp.MustCompile(`[^.\[\]]+|\[\d+\]`)
 
+func readJSONLines(stream io.Reader) ([]any, error) {
+	var rows []any
+	sc := bufio.NewScanner(stream)
+	sc.Buffer(make([]byte, 1<<20), 1<<28)
+	for sc.Scan() {
+		if strings.TrimSpace(sc.Text()) == "" {
+			continue
+		}
+		var v any
+		if err := json.Unmarshal(sc.Bytes(), &v); err != nil {
+			return nil, err
+		}
+		rows = append(rows, v)
+	}
+	if err := sc.Err(); err != nil {
+		return nil, err
+	}
+	return rows, nil
+}
+
 func jsonValue(ref *JSONRef, ctx ctxMap) (any, error) {
 	file, err := render(ref.File, ctx)
 	if err != nil {
@@ -229,18 +251,9 @@ func jsonValue(ref *JSONRef, ctx ctxMap) (any, error) {
 	}
 	var docs []any
 	if strings.HasSuffix(file, ".jsonl") {
-		var rows []any
-		sc := bufio.NewScanner(strings.NewReader(string(raw)))
-		sc.Buffer(make([]byte, 1<<20), 1<<28)
-		for sc.Scan() {
-			if strings.TrimSpace(sc.Text()) == "" {
-				continue
-			}
-			var v any
-			if err := json.Unmarshal(sc.Bytes(), &v); err != nil {
-				return nil, err
-			}
-			rows = append(rows, v)
+		rows, err := readJSONLines(strings.NewReader(string(raw)))
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", file, err)
 		}
 		if len(rows) == 0 {
 			return nil, fmt.Errorf("%s: empty", file)
@@ -390,17 +403,29 @@ func runCheck(c Check, ctx ctxMap, paths map[string]string) (bool, string) {
 		if err != nil || len(raw) == 0 {
 			return false, p + " missing"
 		}
-		for _, line := range strings.Split(string(raw), "\n") {
-			f := strings.Fields(line)
-			if len(f) < 2 {
+		entries := 0
+		for lineNumber, line := range strings.Split(string(raw), "\n") {
+			if strings.TrimSpace(line) == "" {
 				continue
 			}
-			name := strings.TrimPrefix(strings.Join(f[1:], " "), "*")
+			f := strings.Fields(line)
+			if len(f) < 2 {
+				return false, fmt.Sprintf("%s:%d: incomplete checksum entry", p, lineNumber+1)
+			}
+			digest, err := hex.DecodeString(f[0])
+			if err != nil || len(digest) != 32 {
+				return false, fmt.Sprintf("%s:%d: invalid SHA-256 digest", p, lineNumber+1)
+			}
+			name := strings.TrimPrefix(strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(line), f[0])), "*")
 			target := filepath.Join(filepath.Dir(repoPath(p)), name)
 			got, err := sha256File(target)
-			if err != nil || got != f[0] {
+			if err != nil || !strings.EqualFold(got, f[0]) {
 				return false, name + " does not verify"
 			}
+			entries++
+		}
+		if entries == 0 {
+			return false, p + " contains no checksum entries"
 		}
 		return true, p + " verifies"
 	case "status_token":
@@ -453,8 +478,12 @@ func runCheck(c Check, ctx ctxMap, paths map[string]string) (bool, string) {
 }
 
 func statusHas(text, token string) bool {
+	if token == "" {
+		return false
+	}
 	for _, line := range strings.Split(text, "\n") {
-		if strings.HasSuffix(strings.TrimRight(line, " \t\r"), token) {
+		line = strings.TrimRight(line, " \t\r")
+		if line == token || strings.HasSuffix(line, " "+token) || strings.HasSuffix(line, "\t"+token) {
 			return true
 		}
 	}
