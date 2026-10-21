@@ -1,5 +1,5 @@
 //! Observed corpora for the explicitly reduced-round AES analysis models.
-use crypto_lib::cryptanalysis::aes::{differential, linear, reduced::ReducedAes128};
+use crypto_lib::cryptanalysis::aes::{differential, linear, mitm, reduced::ReducedAes128};
 use serde::Deserialize;
 use serde_json::json;
 use std::{collections::HashMap, fs, path::Path};
@@ -33,6 +33,59 @@ struct LinearInput {
     pairs: Vec<Pair2>,
     #[serde(default)]
     verification_pairs: Vec<Pair2>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct MitmInput {
+    pairs: Vec<Pair2>,
+}
+
+/// Analyze a complete, canonically indexed chosen-plaintext delta set.
+pub fn mitm(input: &Path) -> Result<(), String> {
+    let data: MitmInput = serde_json::from_slice(&read(input)?).map_err(|e| e.to_string())?;
+    if data.pairs.len() != 256 {
+        return Err("MITM requires exactly 256 plaintext/ciphertext pairs".into());
+    }
+    let mut ciphertexts = [[0u8; 16]; 256];
+    let mut seen = [false; 256];
+    for (index, pair) in data.pairs.iter().enumerate() {
+        let plaintext = block(&pair.plaintext_hex)?;
+        if plaintext[1..].iter().any(|&byte| byte != 0) {
+            return Err(format!(
+                "pair {index} is outside the (i, 0, ..., 0) delta set"
+            ));
+        }
+        let active = plaintext[0] as usize;
+        if seen[active] {
+            return Err(format!("duplicate delta-set plaintext byte {active}"));
+        }
+        seen[active] = true;
+        ciphertexts[active] = block(&pair.ciphertext_hex)?;
+    }
+    let candidates = mitm::mitm_recover_two_round_observed(&ciphertexts)?;
+    let status = match candidates.len() {
+        0 => "no_candidate",
+        1 => "unique_partial_candidate",
+        _ => "ambiguous_partial_candidates",
+    };
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&json!({
+            "schema_version":1,
+            "model":"aes-128-reduced-two-round-no-final-mixcolumns",
+            "method":"delta-set-two-key-byte-sequence-consistency",
+            "status":status,
+            "pairs_used":256,
+            "candidates":candidates.iter().map(|(k0,k2,m)| json!({
+                "round_0_key_byte_0_hex":format!("{k0:02x}"),
+                "round_2_key_byte_0_hex":format!("{k2:02x}"),
+                "intermediate_constant_hex":format!("{m:02x}")
+            })).collect::<Vec<_>>()
+        }))
+        .map_err(|e| e.to_string())?
+    );
+    Ok(())
 }
 
 fn read(input: &Path) -> Result<Vec<u8>, String> {
@@ -245,6 +298,32 @@ pub fn linear_parity(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn observed_mitm_checks_complete_delta_set() {
+        let key = [0x51u8; 16];
+        let cipher = ReducedAes128::new(&key, 2, false);
+        let path = std::env::temp_dir().join(format!(
+            "aes-mitm-observed-{}-{}.json",
+            std::process::id(),
+            line!()
+        ));
+        let mut pairs: Vec<_> = (0..=255u8)
+            .map(|active| {
+                let mut plaintext = [0u8; 16];
+                plaintext[0] = active;
+                json!({"plaintext_hex":hex::encode(plaintext),
+                    "ciphertext_hex":hex::encode(cipher.encrypt(&plaintext))})
+            })
+            .collect();
+        pairs.reverse();
+        fs::write(&path, json!({"pairs":pairs}).to_string()).unwrap();
+        assert!(mitm(&path).is_ok());
+        pairs[1]["plaintext_hex"] = pairs[0]["plaintext_hex"].clone();
+        fs::write(&path, json!({"pairs":pairs}).to_string()).unwrap();
+        assert!(mitm(&path).unwrap_err().contains("duplicate"));
+        fs::remove_file(path).unwrap();
+    }
 
     #[test]
     fn observed_corpora_and_independent_replay() {

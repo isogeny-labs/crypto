@@ -355,6 +355,12 @@ enum CryptanalysisOp {
         #[arg(long)]
         input: PathBuf,
     },
+    /// Recover two round-key bytes from an observed 256-pair two-round AES delta set.
+    AesMitmObserved {
+        /// JSON with pairs of plaintext_hex and ciphertext_hex; plaintexts cover (i, 0, ..., 0).
+        #[arg(long)]
+        input: PathBuf,
+    },
     /// Analyze caller-supplied known pairs for the one-round AES linear model.
     AesLinearObserved {
         /// JSON with known pairs and optional independent verification pairs.
@@ -2177,6 +2183,12 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
         }
         CryptanalysisOp::AesDifferentialObserved { input } => {
             if let Err(e) = cli_aes_observed::differential(&input) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesMitmObserved { input } => {
+            if let Err(e) = cli_aes_observed::mitm(&input) {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }
