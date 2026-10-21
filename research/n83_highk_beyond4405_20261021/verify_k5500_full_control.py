@@ -37,13 +37,24 @@ def check(condition: bool, message: str) -> None:
 
 
 def replay(output: Path) -> dict:
-    launch = read(output / "launch.json")
-    receipt = read(output / "receipt.json")
+    try:
+        receipt = read(output / "receipt.json")
+    except FileNotFoundError:
+        return {"schema": "n83.k5500-current-source-full-replay/v1",
+                "status": "BOUNDED_UNKNOWN", "process_status": "NO_RECEIPT"}
+    except (OSError, ValueError, TypeError) as error:
+        return {"schema": "n83.k5500-current-source-full-replay/v1",
+                "status": "VERIFICATION_FAILED", "error": str(error)}
+    if not isinstance(receipt, dict):
+        return {"schema": "n83.k5500-current-source-full-replay/v1",
+                "status": "VERIFICATION_FAILED",
+                "error": "receipt must be a JSON object"}
     if receipt.get("status") != "PROCESS_EXITED" or receipt.get("exit_code") != 0:
         return {"schema": "n83.k5500-current-source-full-replay/v1",
                 "status": "BOUNDED_UNKNOWN", "process_status": receipt.get("status"),
                 "receipt": receipt}
     try:
+        launch = read(output / "launch.json")
         command = launch["command"]
         check(launch["schema"] ==
               "n83.k5500-current-source-full-control-launch/v1" and
