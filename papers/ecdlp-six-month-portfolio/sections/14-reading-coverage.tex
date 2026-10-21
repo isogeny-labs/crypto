@@ -1,0 +1,94 @@
+\section{Full-text reading coverage and the outstanding requirement}\label{app:reading}
+
+\subsection{What a reading receipt means}
+
+The instruction to read everything is not satisfied by the repository
+inventory. A separate ledger enumerates every tracked entry in the
+nineteen pinned trees and records the source revision, Git object,
+content hash, source-line intervals and an explicit acknowledgement of
+what was read. A bounded text emission is not acknowledged automatically;
+truncated or unacknowledged output cannot establish a full read. An exact
+duplicate blob can inherit content coverage, but its surrounding local
+context need not be the same.
+
+The frozen ledger records 94 distinct files read in full, comprising
+1,117,504 bytes. Fifty other cited sources retain the earlier status
+``prior focused review only'': they were used selectively, without a
+complete line-by-line reading receipt. The other 305,223 tracked entries
+have no retained reading receipt. This last label does not assert that
+no earlier human or model ever read them. It states what this review can
+document. Machine parsing, indexing, hashing, compilation and test passes
+are separate operations and never fill a reading interval.
+
+\begin{table}[htbp]\small
+\caption{Receipt coverage of pinned tracked entries. File counts include
+repeated artifacts and configuration; they are not fractions of scientific
+knowledge or independently audited experiments.}
+\begin{tabularx}{\linewidth}{@{}Yrrr@{}}\toprule
+Source class & Full read & Prior focused & No receipt \\\midrule
+Narrative or manuscript & 49 & 46 & 21,153 \\
+Implementation or script & 2 & 0 & 30,107 \\
+Formal proof source & 2 & 0 & 265 \\
+Structured record or configuration & 41 & 3 & 125,195 \\
+Table, log or plain text & 0 & 1 & 87,436 \\
+Other or binary & 0 & 0 & 41,067 \\\midrule
+Total & 94 & 50 & 305,223 \\\bottomrule
+\end{tabularx}
+\end{table}
+
+The following bounded groups do have complete full-text receipts at
+their pinned revisions: fifteen crypto root research notes (the fourteen
+\file{RESEARCH_*.md} files plus \file{SPARSE_ALGEBRA_FOLLOWUP.md});
+all twenty-one pinned ML Markdown files; nineteen ten-lead claim statements;
+and ten lead descriptions. These groups overlap the totals above. They
+do not include all ML code, feature branches, private evidence packets
+or every underlying raw run. Two complete implementation reads cover
+\file{koblitz_fast_arith.rs} and \file{semaev_s3_cost.rs}; the former
+includes every test through its final line. Reading a test is not running it.
+
+\subsection{Content outside the pinned-tree denominator}
+
+Eight additional Drive texts were read in their entirety as returned by
+the connector: two delivery guides, the later volcano report, the
+original-C diagnostic, the Prime61 continuation/certificate report, a
+field-effects audit and two communication drafts. Their external ledger
+records provider identities, modification metadata and retained-text
+hashes. PDF extraction does not independently inspect every visual or
+certify that an embedded artifact is complete. Those external texts are
+not silently counted as pinned Git files.
+
+Two post-snapshot Git sources were reviewed separately when integrating
+main at \path{8e4c99759fd8d9594ed207d793b07b59ebaf19f7}: the 529-line
+R6.10 literature report in full, and lines 1,352--1,794 of the
+hyperelliptic rho note (its appended rounds, not the whole 1,794-line
+file). Their separate \file{evidence/post-integration-reading.json}
+retains hashes and exact ranges. They do not change the frozen
+nineteen-tree denominator or its ninety-four full-read receipts.
+
+The earlier 2,935-vertex archive, later 7,937-vertex archive and separate C
+archive have 29,409, 79,462 and 125 checked manifest entries respectively.
+Hash-checking all those entries does not mean all archive content has been
+read or mathematically replayed. Likewise, the 5,144 captured branch heads
+have metadata coverage, not exhaustive tree or historical-blob reading.
+The 51-GB-class historical Autolab mirror and private source packets
+remain unavailable as raw evidence in this workspace. A search returning
+no result is not proof that an artifact does not exist elsewhere.
+
+\subsection{The remaining work is an open obligation}
+
+The comprehensive synthesis and the exhaustive-reading requirement have
+different completion states. The latter remains open in
+\file{problems/ecdlp-portfolio-reading-coverage.md}, linked from the
+repository problem index. Its exit criteria require closing the reading
+ledger over the accessible source corpus, reconciling source/code/raw-run
+chains, accounting for branch and historical content separately, and
+obtaining or explicitly documenting inaccessible artifacts. A missing
+receipt cannot be converted to a full read by relabelling a directory or
+accepting a summary. No execution or spending cap is invented here.
+
+The companion \file{evidence/reading-coverage.tar.xz} contains the
+file-by-file CSV, acknowledged reading events, definitions and collection
+script, with member and outer hashes. Its summary is also available as
+\file{evidence/reading-coverage-summary.json}. This appendix makes the
+unfinished scope inspectable; it does not waive it or claim that merging
+the paper completes the underlying audit.

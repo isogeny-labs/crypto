@@ -8,8 +8,8 @@ import { dirname, resolve } from "node:path";
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(SCRIPT_DIR, "..");
 const OUTPUT_PATH = "docs/curves/cover-transfer-assessments.json";
-const ASSESSMENT_DATE = "2026-10-14";
-const CATALOG_COMMIT = "ff48e2800f62b45c746b3f391540c07b16af4e75";
+const ASSESSMENT_DATE = "2026-10-19";
+const CATALOG_COMMIT = "8e4c99759fd8d9594ed207d793b07b59ebaf19f7";
 const MAP_HASH_DOMAIN = "cover-transfer-assessments/v2/map_base";
 const SUBGROUP_HASH_DOMAIN = "cover-transfer-assessments/v2/subgroup_base";
 
@@ -1069,6 +1069,10 @@ async function buildSourceArtifacts() {
       "independent catalog-wide assessment verifier",
     ),
     integrityArtifact(
+      "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
+      "PDF coverage-marker metadata normalization source",
+    ),
+    integrityArtifact(
       "research/cover_transfer_assessment_20261013/README.md",
       "source-linked catalog-wide assessment report",
     ),
@@ -1549,7 +1553,7 @@ async function buildLedger() {
         control: "odd_degree2_transfer",
         assessment: freshness(
           "refuted",
-          "claim that the current one-infinity odd-prime implementation supports the 1,940 even-sextic source models",
+          "claim that the current one-infinity odd-prime implementation supports the 2,407 even-sextic source models",
           "The current model contract and the catalog infinity configuration are structurally incompatible.",
           ["src/prime_hyperelliptic/curve.rs", "docs/curves/covers.json"],
         ),
@@ -1560,7 +1564,7 @@ async function buildLedger() {
         assessment: freshness(
           "refuted",
           "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 2,572 current catalog models",
-          "Direct artifact replay covered only its bundled 592-row registry. Static comparison of the pinned source allowlist with the current partition places 165 binary and 1,053 direct prime-field forms inside that syntactic domain, and 1,324 extension-field plus 30 normalized-target forms outside it; this 1,218/1,354 split is not a 2,572-command artifact receipt. Current source adds those paths but has not been published in that artifact.",
+          "Direct artifact replay covered only its bundled 592-row registry. The historical static comparison classified 746 of the earlier 2,100 forms as inside the pinned source allowlist (160 binary and 586 direct prime-field) and 1,354 as outside it. That comparison has not been rerun against the expanded catalog and is not a 2,572-command artifact receipt. Current source accepts the new forms, but this artifact does not contain it.",
           [
             "research/cover_transfer_assessment_20261013/release_replay.txt",
             "src/bin/hyperelliptic_cover.rs#every_current_catalog_model_reaches_the_standalone_constructor",
@@ -1620,7 +1624,7 @@ async function buildLedger() {
       "No search for production targets, private keys, or discrete logarithms was performed.",
       "All 2,572 map rows and all 977 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
       "The 165 catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
-      "The 1,940 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
+      "The 2,407 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
       "Generator checks and [r]G=O do not by themselves prove that every catalog integer r is the exact source order.",
       "Formula-screen outputs in jacobian-transfers.json were not promoted to executable or measured claims.",
       "A full cover-integrated Jacobian index-calculus solver, relation collection, linear algebra, and target decomposition remain a separate deliverable. The bounded odd-prime one-infinity solver library is outside these catalog-cover paths.",
