@@ -73,6 +73,15 @@ Scaling group purchase settings. Review those launch paths separately when
 adding infrastructure; the Karpenter admission policy and Spot EKS node group
 cover this deployment.
 
+The [2026-10-21 restart authorization receipt](validation/spot-restart-20261021.json)
+matches the committed policy to the live version and confirms those attachments.
+For `coreuser`, IAM simulation allows `StartInstances` with Spot market context
+and explicitly denies it with On-Demand context. A real EC2 Spot dry run returns
+`DryRunOperation`; no instance was started. The running/stopped inventory in
+`us-east-2` contained no On-Demand instance, so the On-Demand restart case is
+simulation evidence only. These checks establish authorization behavior, not a
+successful restart or coverage of other launch paths.
+
 The upstream Karpenter CloudFormation template is vendored unmodified from
 release v1.15.0; SHA-256:
 `8ee49d6de4f2397797aea5c961706c90491a291b6a961268000cb2daadbd958f`.
