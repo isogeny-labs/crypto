@@ -689,6 +689,9 @@ pub struct FrobeniusCanon {
     /// `gfni[i]`'s lane `k` is the 8 × 8 block from byte `i` of the field
     /// element to byte `k` of its coordinates.
     gfni: [[u64; 8]; 8],
+    /// The inverse map, normal coordinates to field element, as GFNI
+    /// affine matrices in the same layout, for [`Self::frobenius_reps`].
+    gfni_back: [[u64; 8]; 8],
 }
 
 impl FrobeniusCanon {
@@ -702,6 +705,7 @@ impl FrobeniusCanon {
         let mask = (1u64 << n) - 1;
         // A normal element: one whose Frobenius orbit is a basis.
         let mut inverse = None;
+        let mut basis_columns: Vec<u64> = Vec::new();
         let mut candidate = 2u64;
         for _ in 0..4096 {
             candidate = candidate.wrapping_mul(0x9e37_79b9_7f4a_7c15) ^ (candidate >> 29);
@@ -720,6 +724,7 @@ impl FrobeniusCanon {
                 .collect();
             if let Some(inv) = invert_f2(&columns, n) {
                 inverse = Some(inv);
+                basis_columns = columns;
                 break;
             }
         }
@@ -747,11 +752,26 @@ impl FrobeniusCanon {
             })
             .collect();
         let gfni = gfni_blocks(&tables);
+        // Normal coordinates back to the field element: the XOR of the
+        // basis elements `β^{2^j}` whose coordinate bit is set.
+        let back_tables: Vec<[u64; 256]> = (0..bytes)
+            .map(|bi| {
+                let mut table = [0u64; 256];
+                for (b, slot) in table.iter_mut().enumerate() {
+                    *slot = (0..8)
+                        .filter(|t| (b >> t) & 1 == 1 && bi * 8 + t < n as usize)
+                        .fold(0u64, |acc, t| acc ^ basis_columns[bi * 8 + t]);
+                }
+                table
+            })
+            .collect();
+        let gfni_back = gfni_blocks(&back_tables);
         Some(Self {
             n,
             mask,
             tables,
             gfni,
+            gfni_back,
         })
     }
 
@@ -800,6 +820,227 @@ impl FrobeniusCanon {
             out.as_mut_ptr().add(8).cast(),
             _mm512_permutexvar_epi8(transpose, acc_b),
         );
+    }
+
+    /// A basis change by GFNI blocks (`gfni` or `gfni_back`) of sixteen
+    /// words: [`Self::coords16_gfni`] with the matrix as a parameter.
+    ///
+    /// # Safety
+    ///
+    /// The CPU must support AVX-512F, AVX-512BW, AVX-512 VBMI and GFNI;
+    /// `blocks` must be a map from `bytes` bytes.
+    #[cfg(target_arch = "x86_64")]
+    #[target_feature(enable = "avx512f,avx512bw,avx512vbmi,gfni")]
+    unsafe fn map16_gfni(blocks: &[[u64; 8]; 8], bytes: usize, xs: &[u64; 16]) -> [u64; 16] {
+        use std::arch::x86_64::*;
+        let transpose = _mm512_loadu_si512(TRANSPOSE_8X8_BYTES.as_ptr().cast());
+        let ta = _mm512_permutexvar_epi8(transpose, _mm512_loadu_si512(xs.as_ptr().cast()));
+        let tb = _mm512_permutexvar_epi8(transpose, _mm512_loadu_si512(xs.as_ptr().add(8).cast()));
+        let (mut acc_a, mut acc_b) = (_mm512_setzero_si512(), _mm512_setzero_si512());
+        for (i, block) in blocks.iter().enumerate().take(bytes) {
+            let m = _mm512_loadu_si512(block.as_ptr().cast());
+            let lane = _mm512_set1_epi64(i as i64);
+            let (ba, bb) = (
+                _mm512_permutexvar_epi64(lane, ta),
+                _mm512_permutexvar_epi64(lane, tb),
+            );
+            acc_a = _mm512_xor_si512(acc_a, _mm512_gf2p8affine_epi64_epi8::<0>(ba, m));
+            acc_b = _mm512_xor_si512(acc_b, _mm512_gf2p8affine_epi64_epi8::<0>(bb, m));
+        }
+        let mut out = [0u64; 16];
+        _mm512_storeu_si512(
+            out.as_mut_ptr().cast(),
+            _mm512_permutexvar_epi8(transpose, acc_a),
+        );
+        _mm512_storeu_si512(
+            out.as_mut_ptr().add(8).cast(),
+            _mm512_permutexvar_epi8(transpose, acc_b),
+        );
+        out
+    }
+
+    /// For sixteen points, the Frobenius representative a signed-Frobenius
+    /// rho walk steps on: `t` the least-rotation shift of `x` (the smallest
+    /// `t` that reaches the least rotation, exactly as
+    /// [`Self::canon_with_shift`]), and `φ^t(x)`, `φ^t(y)`.
+    ///
+    /// In a normal basis `φ` is a cyclic rotation of the coordinates, so
+    /// all of it stays in coordinates: GFNI takes `x` and `y` to them,
+    /// the least rotation of `x` and its shift come from `n − 1` funnel
+    /// shifts compared under the window's top `n` bits (a strict
+    /// compare in increasing `t`, so ties keep the smallest `t`), `y` is
+    /// rotated by that `t`, and GFNI takes both back.  No Frobenius-power
+    /// table is read.
+    ///
+    /// # Safety
+    ///
+    /// The CPU must support AVX-512F, BW, VBMI, VBMI2 and GFNI, and
+    /// `2 ≤ n ≤ 63`.
+    #[cfg(target_arch = "x86_64")]
+    #[target_feature(enable = "avx512f,avx512bw,avx512vbmi,avx512vbmi2,gfni")]
+    unsafe fn reps16(&self, xs: &[u64; 16], ys: &[u64; 16]) -> ([u64; 16], [u64; 16], [u64; 16]) {
+        use std::arch::x86_64::*;
+        let n = self.n;
+        let bytes = self.tables.len();
+        let cx = Self::map16_gfni(&self.gfni, bytes, xs);
+        let cy = Self::map16_gfni(&self.gfni, bytes, ys);
+        let count = |s: u32| _mm_cvtsi64_si128(i64::from(s));
+        let doubled = |v: __m512i| -> (__m512i, __m512i) {
+            if n > 32 {
+                (
+                    _mm512_or_si512(
+                        _mm512_sll_epi64(v, count(64 - n)),
+                        _mm512_srl_epi64(v, count(2 * n - 64)),
+                    ),
+                    _mm512_sll_epi64(v, count(128 - 2 * n)),
+                )
+            } else {
+                (
+                    _mm512_sll_epi64(
+                        _mm512_or_si512(_mm512_sll_epi64(v, count(n)), v),
+                        count(64 - 2 * n),
+                    ),
+                    _mm512_setzero_si512(),
+                )
+            }
+        };
+        // The window's top `n` bits are the rotation; the rest are other
+        // bits of the doubled word and are cleared, so equal rotations
+        // compare equal and the first (smallest `t`) wins.
+        let high = _mm512_set1_epi64((!0u64 << (64 - n)) as i64);
+        let (hi_a, lo_a) = doubled(_mm512_loadu_si512(cx.as_ptr().cast()));
+        let (hi_b, lo_b) = doubled(_mm512_loadu_si512(cx.as_ptr().add(8).cast()));
+        let (mut best_a, mut best_b) = (_mm512_and_si512(hi_a, high), _mm512_and_si512(hi_b, high));
+        let (mut at_a, mut at_b) = (_mm512_setzero_si512(), _mm512_setzero_si512());
+        macro_rules! rotations {
+            ($($t:literal)*) => {$(
+                if $t < n {
+                    let tv = _mm512_set1_epi64($t);
+                    let ca = _mm512_and_si512(_mm512_shldi_epi64::<$t>(hi_a, lo_a), high);
+                    let cb = _mm512_and_si512(_mm512_shldi_epi64::<$t>(hi_b, lo_b), high);
+                    let ka = _mm512_cmplt_epu64_mask(ca, best_a);
+                    let kb = _mm512_cmplt_epu64_mask(cb, best_b);
+                    best_a = _mm512_mask_mov_epi64(best_a, ka, ca);
+                    best_b = _mm512_mask_mov_epi64(best_b, kb, cb);
+                    at_a = _mm512_mask_mov_epi64(at_a, ka, tv);
+                    at_b = _mm512_mask_mov_epi64(at_b, kb, tv);
+                }
+            )*};
+        }
+        rotations!(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
+            31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59
+            60 61 62);
+        let down = count(64 - n);
+        let mut best = [0u64; 16];
+        let mut at = [0u64; 16];
+        _mm512_storeu_si512(best.as_mut_ptr().cast(), _mm512_srl_epi64(best_a, down));
+        _mm512_storeu_si512(
+            best.as_mut_ptr().add(8).cast(),
+            _mm512_srl_epi64(best_b, down),
+        );
+        _mm512_storeu_si512(at.as_mut_ptr().cast(), at_a);
+        _mm512_storeu_si512(at.as_mut_ptr().add(8).cast(), at_b);
+        // y's coordinates rotated by the same `t`.
+        let mask = _mm512_set1_epi64(self.mask as i64);
+        let nv = _mm512_set1_epi64(i64::from(n));
+        let rot = |v: __m512i, t: __m512i| {
+            _mm512_and_si512(
+                _mm512_or_si512(
+                    _mm512_sllv_epi64(v, t),
+                    _mm512_srlv_epi64(v, _mm512_sub_epi64(nv, t)),
+                ),
+                mask,
+            )
+        };
+        let mut cyr = [0u64; 16];
+        _mm512_storeu_si512(
+            cyr.as_mut_ptr().cast(),
+            rot(_mm512_loadu_si512(cy.as_ptr().cast()), at_a),
+        );
+        _mm512_storeu_si512(
+            cyr.as_mut_ptr().add(8).cast(),
+            rot(_mm512_loadu_si512(cy.as_ptr().add(8).cast()), at_b),
+        );
+        (
+            Self::map16_gfni(&self.gfni_back, bytes, &best),
+            Self::map16_gfni(&self.gfni_back, bytes, &cyr),
+            at,
+        )
+    }
+
+    /// The element with the given normal coordinates, by search over the
+    /// forward byte tables' linear map (test use: `n` ≤ 63, bit by bit).
+    #[cfg(test)]
+    fn element_of_coords(&self, word: u64) -> u64 {
+        // coords is a bijective F_2-linear map; invert it by Gaussian
+        // elimination on the images of the unit vectors.
+        let n = self.n as usize;
+        let mut rows: Vec<(u64, u64)> = (0..n)
+            .map(|j| (self.coords(1u64 << j), 1u64 << j))
+            .collect();
+        let mut basis: Vec<(u64, u64)> = Vec::new();
+        for (mut img, mut pre) in rows.drain(..) {
+            for &(bi, bp) in &basis {
+                if img ^ bi < img {
+                    img ^= bi;
+                    pre ^= bp;
+                }
+            }
+            if img != 0 {
+                basis.push((img, pre));
+                basis.sort_by_key(|a| std::cmp::Reverse(a.0));
+            }
+        }
+        let (mut w, mut x) = (word, 0u64);
+        for &(bi, bp) in &basis {
+            if w ^ bi < w {
+                w ^= bi;
+                x ^= bp;
+            }
+        }
+        debug_assert_eq!(w, 0);
+        x
+    }
+
+    /// Whether [`Self::frobenius_reps`] runs: AVX-512 F, BW, VBMI, VBMI2
+    /// and GFNI are present, `2 ≤ n ≤ 63`, and `KIC_RHO_CANON=scalar` has
+    /// not asked for the per-point tables, which stay as the same-binary
+    /// control.
+    pub fn frobenius_reps_available(&self) -> bool {
+        #[cfg(target_arch = "x86_64")]
+        {
+            static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+            return self.n >= 2
+                && *ON.get_or_init(|| {
+                    is_x86_feature_detected!("avx512f")
+                        && is_x86_feature_detected!("avx512bw")
+                        && is_x86_feature_detected!("avx512vbmi")
+                        && is_x86_feature_detected!("avx512vbmi2")
+                        && is_x86_feature_detected!("gfni")
+                        && std::env::var("KIC_RHO_CANON").as_deref() != Ok("scalar")
+                });
+        }
+        #[allow(unreachable_code)]
+        false
+    }
+
+    /// For every point `(xs[i], ys[i])`: `(φ^t(x), φ^t(y), t)` with `t`
+    /// as [`Self::canon_with_shift`] gives it for `x`.  The same values
+    /// as the per-point tables, sixteen at a time; call only when
+    /// [`Self::frobenius_reps_available`].  `out` is cleared first.
+    pub fn frobenius_reps(&self, xs: &[u64], ys: &[u64], out: &mut Vec<(u64, u64, u32)>) {
+        assert_eq!(xs.len(), ys.len());
+        assert!(self.frobenius_reps_available());
+        out.clear();
+        #[cfg(target_arch = "x86_64")]
+        for (cx, cy) in xs.chunks(16).zip(ys.chunks(16)) {
+            let (mut bx, mut by) = ([0u64; 16], [0u64; 16]);
+            bx[..cx.len()].copy_from_slice(cx);
+            by[..cy.len()].copy_from_slice(cy);
+            // SAFETY: `frobenius_reps_available` checked the features.
+            let (rx, ry, t) = unsafe { self.reps16(&bx, &by) };
+            out.extend((0..cx.len()).map(|i| (rx[i], ry[i], t[i] as u32)));
+        }
     }
 
     /// The normal coordinates of a field element.
@@ -1947,6 +2188,7 @@ mod tests {
                 mask,
                 tables: Vec::new(),
                 gfni: [[0; 8]; 8],
+                gfni_back: [[0; 8]; 8],
             };
             let mut words = vec![0, mask, 1, 1 << (n - 1), mask ^ 1, mask >> 1];
             for period in 1..=n.min(12) {
@@ -2015,6 +2257,7 @@ mod tests {
                 mask,
                 tables: Vec::new(),
                 gfni: [[0; 8]; 8],
+                gfni_back: [[0; 8]; 8],
             };
             let mut words = vec![0, mask, 1, 1 << (n - 1), mask ^ 1, mask >> 1];
             for period in 1..=n.min(12) {
@@ -2219,6 +2462,59 @@ mod tests {
                 for (g, &x) in got.iter().zip(block) {
                     assert_eq!(*g, canon.coords(x), "n = {n}, x = {x:#x}");
                 }
+            }
+        }
+    }
+
+    /// The batched Frobenius representatives are the per-point ones:
+    /// `(φ^t(x), φ^t(y), t)` from the tables, for every degree, over
+    /// random pairs, zero, the all-ones coordinate word, periodic
+    /// coordinate words whose rotations tie, and a ragged tail.
+    #[cfg(target_arch = "x86_64")]
+    #[test]
+    fn the_batched_frobenius_representatives_match_the_tables() {
+        for n in 2u32..=63 {
+            let Some(irreducible) =
+                crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse(n)
+            else {
+                continue;
+            };
+            let f = Gf2::new(&irreducible);
+            let canon = FrobeniusCanon::new(&f, n).unwrap();
+            if !canon.frobenius_reps_available() {
+                eprintln!("skipped: no AVX-512 F, BW, VBMI, VBMI2, GFNI");
+                return;
+            }
+            let powers = FrobeniusPowers::new(&f, n);
+            let mask = (1u64 << n) - 1;
+            let mut rng = StdRng::seed_from_u64(0x7265_7073 + n as u64);
+            let mut xs: Vec<u64> = vec![0, 1, mask];
+            // Field elements whose coordinate words are periodic: the
+            // back map of a repeated pattern.
+            for period in 1..n {
+                if n % period == 0 {
+                    let pattern = rng.gen::<u64>() & ((1u64 << period) - 1);
+                    let mut word = 0u64;
+                    for k in 0..n / period {
+                        word |= pattern << (k * period);
+                    }
+                    let x = canon.element_of_coords(word);
+                    xs.push(x);
+                }
+            }
+            xs.extend((0..1003).map(|_| rng.gen::<u64>() & mask));
+            let ys: Vec<u64> = xs.iter().map(|_| rng.gen::<u64>() & mask).collect();
+            let mut got = Vec::new();
+            canon.frobenius_reps(&xs, &ys, &mut got);
+            assert_eq!(got.len(), xs.len());
+            for ((&x, &y), &(gx, gy, gt)) in xs.iter().zip(&ys).zip(&got) {
+                let (_, t) = canon.canon_with_shift(x);
+                let (wx, wy) = if t == 0 {
+                    (x, y)
+                } else {
+                    (powers.apply(t, x), powers.apply(t, y))
+                };
+                assert_eq!((gx, gy, gt), (wx, wy, t), "n = {n}, x = {x:#x}, y = {y:#x}");
             }
         }
     }
