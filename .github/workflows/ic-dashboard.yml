@@ -27,7 +27,7 @@ concurrency:
 
 jobs:
   overview:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-dashboard.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-dashboard.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -36,8 +36,13 @@ jobs:
           node-version: '22'
       - name: Check frozen evidence pins and generated overview
         run: node tools/render_ic_dashboard.mjs --check
+      - uses: browser-actions/setup-chrome@v2
+        id: setup-chrome
+        with:
+          install-dependencies: true
       - name: Check actual desktop and mobile rendering
         env:
+          IC_DASHBOARD_CHROME: ${{ steps.setup-chrome.outputs.chrome-path }}
           IC_DASHBOARD_SCREENSHOTS: /tmp/ic-dashboard-screenshots
         run: node tools/check_ic_dashboard_browser.mjs
       - uses: actions/upload-artifact@v4
