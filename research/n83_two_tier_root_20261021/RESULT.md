@@ -121,3 +121,11 @@ It wrote no target row. Its [frozen input](runs/k4405_monolithic_local_7200/inpu
 preserve the censored attempt. The K128 chart is unchanged because this
 full-size timeout produced no index-build interval to plot. The split
 full-size control and Tier 1 paired online comparison remain pending.
+
+The four-thread K128 index construction passed
+[`PASS_EXACT_SERIAL_PARALLEL_INDEX`](runs/k128_root_threads4/verification.json)
+against the prior serial shared-Bloom controls for both monolithic and split
+tables. The base, state, exact-table, allocation, and root-entry fields
+matched. This validates the four-CPU index-construction policy frozen for
+the planned K5086 Tier 1 arm; the local builds used different executable
+profiles, so their wall intervals are not a thread-count comparison.

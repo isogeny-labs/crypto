@@ -40,3 +40,19 @@ The separate [K5086 capacity calculation](CAPACITY.md) is illustrated by
 [capacity.svg](capacity.svg) and its [PNG render](capacity.png). It is shown
 on the second page of [RESULT.pdf](RESULT.pdf) with measured K128 timing kept
 on the first page.
+
+## Four-thread root-construction control
+
+The [four-thread K128 run](runs/k128_root_threads4/result.json) used the
+same source and target as the serial shared-Bloom control, a release
+executable, and `KIC_INDEX_ROOT_THREADS=4`. Its monolithic and split arms
+passed the index-stage control. The independent
+[serial/parallel replay](runs/k128_root_threads4/verification.json) matched
+the base hash, all 680,000 states, both exact-table digests, all 1,359,488
+root entries, split allocation, and Bloom bytes for each layout. The
+four-thread result SHA-256 is
+`573e666233744f093a2808180d6f4ef0b03d8c2b7a605b1116a72bf2c35577ca`.
+The prior serial executable used a debug profile and the host was shared,
+so these runs establish deterministic index output rather than a calibrated
+thread-count speedup. The [runner](run_index_smoke.py) and
+[verifier](verify_root_threads.py) are versioned.

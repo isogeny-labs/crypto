@@ -25,7 +25,11 @@ enumerated, subgroup filtered, hashed, and independently replayed.
   `KIC_ROOT_BLOOM_PROFILE=wide3`,
   `KIC_INDEXED5_SPLIT_SHARED_BLOOM=0`, with the frozen guided-rank,
   batch-root, target-cancel, and target-thread policies from the K4405
-  controls. Record every flag in the candidate manifest.
+  controls. Set `KIC_INDEX_ROOT_THREADS=4` for all three Pod arms to use
+  the same four-CPU index-construction policy; replay a small index against
+  serial construction before the full-size stage gate. Record every flag
+  in each new candidate manifest. The older K4300/K4405 manifest IDs do
+  not identify these new source and load80 configurations.
 - Tier 1 requires one frozen Pod allocation with at least four exposed CPUs,
   four CPUs of quota, and 48 GiB cgroup memory. Pin four CPUs and cap each
   child at 40 GiB sampled RSS. Cap K4300 and K4405 screen children at

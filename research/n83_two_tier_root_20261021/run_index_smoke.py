@@ -38,6 +38,7 @@ def run_arm(name, args, common):
     output.mkdir(parents=True, exist_ok=False)
     env = {key: value for key, value in os.environ.items() if not key.startswith("KIC_")}
     env.update(FLAGS)
+    env["KIC_INDEX_ROOT_THREADS"] = str(args.root_threads)
     if name == "split":
         env["KIC_INDEXED5_SPLIT_AT"] = str(args.split)
         if args.shared_bloom:
@@ -81,6 +82,7 @@ def main():
     parser.add_argument("--timeout-seconds", type=int, default=900)
     parser.add_argument("--split-first", action="store_true")
     parser.add_argument("--shared-bloom", action="store_true")
+    parser.add_argument("--root-threads", type=int, choices=range(1, 9), default=1)
     args = parser.parse_args()
     args.binary = args.binary.resolve(strict=True)
     args.target = args.target.resolve(strict=True)
@@ -92,6 +94,7 @@ def main():
               "split_at": args.split, "timeout_seconds": args.timeout_seconds,
               "order": ["split", "monolithic"] if args.split_first else ["monolithic", "split"],
               "shared_bloom": args.shared_bloom,
+              "root_threads": args.root_threads,
               "runner_sha256": sha256(args.output / "runner.py"),
               "source_sha256": sha256(source), "binary_sha256": sha256(args.binary),
               "target_sha256": sha256(args.target)}

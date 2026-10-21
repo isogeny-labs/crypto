@@ -168,7 +168,11 @@ make_pdf(OUT / 'RUN.pdf', 'N83 K128 split root index: run record', [
     'used one union filter. Local shared macOS timing is a stage diagnostic.',
     'Source revision and executable hashes are frozen in each input.json. '
     'Raw results are in the study directory, and independent exact-root unit '
-    'controls passed in the example test suite (22 tests).'
+    'controls passed in the example test suite (22 tests).',
+    'A further K128 control set KIC_INDEX_ROOT_THREADS=4. Its two layouts '
+    'matched the serial base, state, exact-table, root-entry, allocation, and '
+    'Bloom fields under independent replay. The four-thread release binary '
+    'and prior serial debug binary are used for output identity only.'
 ], rows)
 
 make_pdf(OUT / 'RESULT.pdf', 'N83 K128 split root index: result', [
@@ -183,7 +187,10 @@ make_pdf(OUT / 'RESULT.pdf', 'N83 K128 split root index: result', [
     'table bytes against monolithic.',
     'Status: STAGE_DIAGNOSTIC_ONLY. Candidate ID and single-target online '
     'speedup remain unset. A full-size K4405 same-target scalar replay and '
-    'Tier 1 paired measurement are the next qualification steps.'
+    'Tier 1 paired measurement are the next qualification steps.',
+    'The four-thread K128 replay passed exact index identity for both layouts. '
+    'Its result and verification receipt are under runs/k128_root_threads4. '
+    'The Tier 1 K5086 protocol freezes four index-construction threads.'
 ], rows, capacity=True)
 
 print(json.dumps({'pdfs': ['RUN.pdf','RESULT.pdf'], 'svg': 'index_build.svg',
