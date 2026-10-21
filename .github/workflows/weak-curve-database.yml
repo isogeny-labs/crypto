@@ -271,7 +271,7 @@ jobs:
           auto-config: false
           use-mathlib-cache: true
           build: true
-          build-args: 'UnorderedSupport ThreePivotSupport'
+          build-args: 'UnorderedSupport ThreePivotSupport ThreePivotGuided'
           test: false
           lint: false
           leanchecker: true
@@ -279,8 +279,10 @@ jobs:
       - name: Fresh-check unordered-support and third-pivot axioms
         run: |
           lake env leanchecker --fresh --verbose UnorderedSupport
+          lake env leanchecker --fresh --verbose ThreePivotGuided
           lake env lean UnorderedSupport.lean
           lake env lean ThreePivotSupport.lean
+          lake env lean ThreePivotGuided.lean
   p192-three-pivot-replay:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 20
@@ -290,7 +292,10 @@ jobs:
         run: |
           python3 -B research/p192_extension_cover_20261012/verify_residual_pivot002_cross.py
           python3 -B research/p192_extension_cover_20261012/verify_three_pivot_union.py
+          python3 -B research/p192_extension_cover_20261012/verify_pivot002_reduced_receipt.py
+          python3 -B research/p192_extension_cover_20261012/verify_three_pivot_guided_coverage.py
           sha256sum -c research/p192_extension_cover_20261012/reports/run-20261017T2055Z/ARTIFACTS.sha256
+          sha256sum -c research/p192_extension_cover_20261012/reports/run-20261017T2119Z/ARTIFACTS.sha256
   leaderboard-lean-proof:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
