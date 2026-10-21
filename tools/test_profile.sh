@@ -64,6 +64,20 @@ rc=$(gpu smi --out "$tmp/smi" --interval-ms 50 -- sleep 0.6)
 expect_rc "smi fixture" 0 "$rc"
 check "smi: samples and the limited one" '.samples >= 8 and .sm_clock_mhz.min == 2100 and .clock_reason_masks["0x0000000000000004"] == 1' "$tmp/smi/smi-summary.json"
 grep -q '<polyline' "$tmp/smi/smi.svg" && grep -q '#cf222e' "$tmp/smi/smi.svg" && ok "smi: line graph marks the limited sample" || bad "smi: graph"
+check "smi: defaults to physical GPU 0" '.smi.gpu_index == 0' "$tmp/smi/manifest.json"
+rc=$(gpu smi --out "$tmp/smi-1" --gpu-index 1 --interval-ms 50 -- sleep 0.2)
+expect_rc "smi selected GPU" 0 "$rc"
+check "smi: selected GPU alone contributes" '.gpu_index == 1 and .sm_clock_mhz.min == 900 and .sm_clock_mhz.max == 900' "$tmp/smi-1/smi-summary.json"
+grep -q 'GPU 1 SM clock' "$tmp/smi-1/smi.svg" && ok "smi: graph labels selected GPU" || bad "smi: graph GPU identity"
+rc=$(STUB_SMI_EMPTY=1 gpu smi --out "$tmp/smi-empty" -- true)
+expect_rc "smi empty sample stream" 6 "$rc"
+check "smi: no samples cannot be successful" '.status == "profiler_failed"' "$tmp/smi-empty/manifest.json"
+
+# Existing evidence must survive even if the caller chooses the same path.
+before=$(sha256sum "$tmp/smi/manifest.json")
+rc=$(gpu smi --out "$tmp/smi" -- touch "$tmp/should-not-run")
+expect_rc "existing output directory" 2 "$rc"
+[ ! -e "$tmp/should-not-run" ] && [ "$before" = "$(sha256sum "$tmp/smi/manifest.json")" ] && ok "existing evidence and command preserved" || bad "output directory reused"
 
 # report re-renders from JSON alone.
 rm "$tmp/ncu/summary.md" "$tmp/ncu/sol.svg"
@@ -74,6 +88,16 @@ rm "$tmp/ncu/summary.md" "$tmp/ncu/sol.svg"
 rc=0; PERF="$fx/perf-topdown-fails" "$P" topdown --out "$tmp/td-fail" -- true > /dev/null 2>&1 || rc=$?
 expect_rc "topdown when perf cannot schedule the group" 6 "$rc"
 check "topdown: perf's own message in the reason" '.status == "profiler_failed" and (.reason | test("Cannot find metric"))' "$tmp/td-fail/manifest.json"
+
+# A failed perf probe must never be mistaken for readable hardware counters.
+PERF="$fx/perf-denied-counters" "$P" probe --out "$tmp/probe-denied" > /dev/null 2>&1
+expect_rc "probe with denied hardware counters" 0 $?
+check "probe: software timers remain available" '.capabilities.cpu_hardware_counters == false and .capabilities.cpu_sampling_software == true and .capabilities.topdown == false' "$tmp/probe-denied/probe.json"
+rc=0; PERF="$fx/perf-denied-counters" "$P" topdown --out "$tmp/td-denied" -- true > /dev/null 2>&1 || rc=$?
+expect_rc "topdown with denied hardware counters" 3 "$rc"
+rc=0; PERF="$fx/perf-denied-counters" "$P" cpu --out "$tmp/cpu-denied" -- true > /dev/null 2>&1 || rc=$?
+expect_rc "CPU fixture stops after selecting event" 6 "$rc"
+grep -qx cpu-clock "$tmp/cpu-denied/command.stdout" && ok "cpu: fallback selects software timer" || bad "cpu: failed hardware probe chose cycles"
 
 # Usage errors.
 "$P" cpu -- true > /dev/null 2>&1; expect_rc "cpu without --out" 2 $?

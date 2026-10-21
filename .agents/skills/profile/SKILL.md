@@ -248,16 +248,23 @@ ncu settings and failures:
 **Did the clock hold during a real run?**
 
 ```sh
-tools/profile.sh smi --out .../<slug>-smi --interval-ms 100 -- <unprofiled throughput command>
+tools/profile.sh smi --out .../<slug>-smi --gpu-index 0 --interval-ms 100 -- <unprofiled throughput command>
 ```
 
 This samples SM clock, memory clock, power, temperature, utilization and the
-clock-limit reason mask during the command. `smi.svg` plots clock and power
+clock-limit reason mask during the command. `--gpu-index` selects one physical
+NVIDIA GPU index (default 0, independent of `CUDA_VISIBLE_DEVICES`). The manifest,
+summary and graph identify that device; samples from other devices are excluded.
+An empty sample stream is a profiler failure. `smi.svg` plots clock and power
 over time, with limited samples marked red. A GPU rate measured while the
 power or thermal limit was active is a measurement of the limit, not the
 kernel. Report it beside every GPU throughput number.
 
 ## 6. Comparing builds with profiles
+
+Each `--out` directory must be new, including for `probe`. Existing output is
+rejected before the command runs, preserving earlier evidence. Use `report DIR`
+to regenerate a report from an existing run.
 
 1. **Same settings on both sides.** Profile both builds with identical
    flags, inputs, launch selection and clock control. Run the two arms

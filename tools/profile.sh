@@ -20,7 +20,7 @@
 #                           [--source] [--force-version] -- COMMAND...
 #   tools/profile.sh nsys   --out DIR [--trace LIST] [--cpu-sample]
 #                           [--gpu-metrics] [--top N] -- COMMAND...
-#   tools/profile.sh smi    --out DIR [--interval-ms MS] -- COMMAND...
+#   tools/profile.sh smi    --out DIR [--gpu-index N] [--interval-ms MS] -- COMMAND...
 #   tools/profile.sh report DIR        (re-render summary.md, SVG and report.typ)
 #
 # Environment: PERF, NCU, NSYS (binaries), ISOLATED_BENCH (for --isolate),
@@ -39,6 +39,7 @@ out="" label="" isolate=0 top=25
 mode=auto event="" freq=999 callgraph=fp level=1
 kernel="" lskip=0 lcount=1 nset="" sections=() metrics="" clock=base source=0 force_version=0
 trace="cuda,nvtx,osrt" cpusample=0 gpumetrics=0 interval=100 gpucontrol=0
+gpu_index=0
 report_dir=""
 while [ $# -gt 0 ]; do
     case $1 in
@@ -64,6 +65,7 @@ while [ $# -gt 0 ]; do
         --cpu-sample) cpusample=1; shift ;;
         --gpu-metrics) gpumetrics=1; shift ;;
         --interval-ms) interval=$2; shift 2 ;;
+        --gpu-index) gpu_index=$2; shift 2 ;;
         --gpu-control) gpucontrol=1; shift ;;
         --) shift; break ;;
         -*) die "unknown option $1" ;;
@@ -82,6 +84,13 @@ find_perf() {
         [ -n "$p" ] && [ -x "$p" ] && "$p" --version > /dev/null 2>&1 && { echo "$p"; return 0; }
     done
     return 1
+}
+# Both exit status and counter output matter: perf can exit successfully
+# with an uncounted event, or fail without a particular error phrase.
+perf_counts() {
+    local counts
+    counts=$("$1" stat -x, -e "$2" -- true 2>&1) || return 1
+    ! grep -qE '<not supported>|<not counted>' <<< "$counts"
 }
 # Newest Nsight binary: $VAR, PATH, then NVIDIA's versioned install trees.
 # Ubuntu's unversioned nsight-compute package is 2022.4, which predates
@@ -112,7 +121,7 @@ host_json() {
     [ -n "$cpu" ] || cpu=$(grep -m1 -i 'CPU part' /proc/cpuinfo 2>/dev/null | cut -d: -f2- | sed 's/^ *//' || echo unknown)
     flags=$(grep -m1 -E '^(flags|Features)' /proc/cpuinfo 2>/dev/null | cut -d: -f2- | tr ' ' '\n' \
         | grep -xE 'popcnt|avx2|avx512f|avx512ifma|vpclmulqdq|pclmulqdq|bmi2|adx|sha_ni|gfni|aes|pmull|sha2|asimd|sve|sve2' | sort -u | tr '\n' ' ' || true)
-    pmus=$(ls /sys/bus/event_source/devices 2>/dev/null | tr '\n' ' ')
+    pmus=$(ls /sys/bus/event_source/devices 2>/dev/null | tr '\n' ' ' || true)
     jq -nc --arg cpu "$cpu" --arg flags "$flags" --arg kernel "$(uname -r)" --arg arch "$(uname -m)" \
         --arg pmus "$pmus" --arg paranoid "$(cat /proc/sys/kernel/perf_event_paranoid 2>/dev/null || echo unknown)" \
         --arg kptr "$(cat /proc/sys/kernel/kptr_restrict 2>/dev/null || echo unknown)" \
@@ -182,7 +191,12 @@ profiler_failed() { # reason [extra]
 setup_out() {
     [ -n "$out" ] || die "$sub needs --out DIR"
     [ ${#cmd[@]} -gt 0 ] || die "$sub needs a command after --"
-    mkdir -p "$out"
+    create_out
+}
+
+create_out() {
+    mkdir -p "$(dirname "$out")"
+    mkdir "$out" || die "output directory must be new: $out"
     out=$(cd "$out" && pwd)
 }
 
@@ -291,14 +305,14 @@ svg_flame() { # folded-file title caption
 
 # SM clock and power over the run (SVG line chart) from the smi CSV; samples
 # with a clock-limit reason other than none/idle are marked red.
-svg_smi() { # smi.csv interval-ms caption
-    gawk -F', ' -v iv="$2" -v cap="$3" '
+svg_smi() { # smi.csv interval-ms caption gpu-index
+    gawk -F', ' -v iv="$2" -v cap="$3" -v gpu="$4" '
         function esc(s) { gsub(/&/, "\\&amp;", s); gsub(/</, "\\&lt;", s); return s }
         NF >= 10 && $3 ~ /^[0-9]/ { n++; c[n] = $3 + 0; p[n] = $5 + 0; r[n] = $10; gsub(/ /, "", r[n])
             if (c[n] > cmax) cmax = c[n]; if (p[n] > pmax) pmax = p[n] }
         END {
             W = 820; H = 200; x0 = 60; printf "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"590\" viewBox=\"0 0 900 590\" font-family=\"DejaVu Sans, Helvetica, Arial, sans-serif\" font-size=\"12\">\n<rect width=\"900\" height=\"590\" fill=\"#ffffff\"/>\n"
-            printf "<text x=\"16\" y=\"26\" font-size=\"15\" font-weight=\"bold\">GPU 0 SM clock and power during the run</text>\n"
+            printf "<text x=\"16\" y=\"26\" font-size=\"15\" font-weight=\"bold\">GPU %s SM clock and power during the run</text>\n", esc(gpu)
             if (n < 2) { printf "<text x=\"16\" y=\"60\">fewer than two samples</text></svg>\n"; exit }
             panel(c, cmax, 50, "SM clock (MHz)", "#2f6fb0"); panel(p, pmax, 300, "power (W)", "#b0502f")
             printf "<text x=\"%d\" y=\"560\" text-anchor=\"middle\" fill=\"#59636e\">time (s), %d samples</text>\n", x0 + W / 2, n
@@ -322,11 +336,12 @@ svg_smi() { # smi.csv interval-ms caption
 # ---------------------------------------------------------------- probe
 
 do_probe() {
+    if [ -n "$out" ]; then create_out; fi
     local perf pv="" ncu nv="" nsys sv="" vg="" sw=null hw=null ctl=null
     if perf=$(find_perf); then
         pv=$("$perf" --version 2>/dev/null)
         "$perf" stat -e task-clock -- true > /dev/null 2>&1 && sw=true || sw=false
-        if "$perf" stat -x, -e cycles:u,instructions:u -- true 2>&1 | grep -qE '<not supported>|<not counted>|rror'; then hw=false; else hw=true; fi
+        if perf_counts "$perf" cycles:u,instructions:u; then hw=true; else hw=false; fi
         add_tool perf "$perf" "$pv"
     fi
     if command -v valgrind > /dev/null; then vg=$(valgrind --version); add_tool valgrind "$(command -v valgrind)" "$vg"; fi
@@ -351,7 +366,7 @@ do_probe() {
            nvidia_profiling_admin_only: (if $admin == "" then null else ($admin == "1") end),
            ncu_control_kernel: $ctl,
            inferno_flamegraph: ($inferno != "")}}')
-    if [ -n "$out" ]; then mkdir -p "$out"; printf '%s\n' "$rec" | jq . > "$out/probe.json"; fi
+    if [ -n "$out" ]; then printf '%s\n' "$rec" | jq . > "$out/probe.json"; fi
     jq . <<< "$rec"
     jq -r '.capabilities | "profile: cpu sampling: \(.cpu_sampling); topdown: \(.topdown); callgrind: \(.callgrind); gpu: \(.gpu_present); ncu: \(.ncu); nsys: \(.nsys)"' <<< "$rec" >&2
 }
@@ -404,7 +419,7 @@ fold_perf_script() { # perf data -> folded stacks on stdout
 
 cpu_sample() { # perf
     local perf=$1 hw ev cg
-    hw=1; "$perf" stat -x, -e cycles:u -- true 2>&1 | grep -qE '<not supported>|<not counted>' && hw=0
+    if perf_counts "$perf" cycles:u; then hw=1; else hw=0; fi
     ev=${event:-$([ "$hw" = 1 ] && echo cycles:u || echo cpu-clock)}
     case $callgraph in fp) cg=fp ;; dwarf) cg=dwarf,16384 ;; lbr) cg=lbr ;; *) die "--call-graph fp|dwarf|lbr" ;; esac
     run_profiled "$perf" record -F "$freq" -e "$ev" --call-graph "$cg" -o "$out/perf.data" -- "${cmd[@]}"
@@ -484,8 +499,8 @@ do_topdown() {
     local perf
     perf=$(find_perf) || unsupported "no working perf binary"
     add_tool perf "$perf" "$("$perf" --version)"
-    "$perf" stat -x, -e cycles:u -- true 2>&1 | grep -qE '<not supported>|<not counted>' &&
-        unsupported "no hardware PMU: top-down needs core counters (event sources: $(ls /sys/bus/event_source/devices | tr '\n' ' '))"
+    perf_counts "$perf" cycles:u ||
+        unsupported "hardware counters unavailable: top-down needs readable core counters"
     local grp="TopdownL$level"
     "$perf" list metricgroup 2> /dev/null | grep -q "$grp" || grp=""
     if [ -n "$grp" ]; then
@@ -650,13 +665,14 @@ do_nsys() {
 # ---------------------------------------------------------------- smi
 
 do_smi() {
+    [[ "$gpu_index" =~ ^[0-9]+$ ]] || die "--gpu-index must be a nonnegative integer"
     setup_out
     command -v nvidia-smi > /dev/null || unsupported "no nvidia-smi"
     add_tool nvidia-smi "$(command -v nvidia-smi)" "$(nvidia-smi --version 2>/dev/null | grep -m1 -i 'smi version' || true)"
     local q="timestamp,index,clocks.sm,clocks.mem,power.draw,temperature.gpu,utilization.gpu,utilization.memory,pstate"
     local reasons=clocks_event_reasons.active
-    nvidia-smi --query-gpu=$reasons --format=csv,noheader > /dev/null 2>&1 || reasons=clocks_throttle_reasons.active
-    nvidia-smi --query-gpu="$q,$reasons" --format=csv,noheader,nounits -lms "$interval" > "$out/smi.csv" 2> "$out/smi.stderr" &
+    nvidia-smi --id="$gpu_index" --query-gpu=$reasons --format=csv,noheader > /dev/null 2>&1 || reasons=clocks_throttle_reasons.active
+    nvidia-smi --id="$gpu_index" --query-gpu="$q,$reasons" --format=csv,noheader,nounits -lms "$interval" > "$out/smi.csv" 2> "$out/smi.stderr" &
     local spid=$!
     sleep 0.3
     run_profiled "${cmd[@]}"
@@ -671,7 +687,10 @@ do_smi() {
               printf "\"sm_clock_mhz\":{\"median\":%s,\"min\":%s,\"max\":%s},", med(sm, n), (min == "" ? "null" : min), (n ? max : "null")
               printf "\"power_w\":{\"median\":%s,\"max\":%s},\"gpu_util_pct_median\":%s,\"temperature_c_max\":%s,", med(pw, n), (n ? pmax : "null"), med(ut, n), (n ? tmax : "null")
               printf "\"clock_reason_masks\":{"; c = 0; for (r in seen) printf "%s\"%s\":%d", (c++ ? "," : ""), r, seen[r]; print "}}" }' "$out/smi.csv" > "$out/smi-summary.json"
-    write_manifest "$([ "$rc" = 0 ] && echo ok || echo command_failed)" "" "$(jq -nc --arg r "$reasons" --argjson i "$interval" '{smi: {interval_ms: $i, reason_field: $r}}')"
+    [ "$(jq .samples "$out/smi-summary.json")" -gt 0 ] || profiler_failed "nvidia-smi returned no samples for GPU $gpu_index; see smi.stderr"
+    jq --arg g "$gpu_index" '. + {gpu_index: ($g | tonumber)}' "$out/smi-summary.json" > "$out/smi-summary.tmp"
+    mv "$out/smi-summary.tmp" "$out/smi-summary.json"
+    write_manifest "$([ "$rc" = 0 ] && echo ok || echo command_failed)" "" "$(jq -nc --arg r "$reasons" --arg g "$gpu_index" --argjson i "$interval" '{smi: {gpu_index: ($g | tonumber), interval_ms: $i, reason_field: $r}}')"
     render "$out"
     [ "$rc" = 0 ] || exit 4
 }
@@ -796,14 +815,20 @@ render() { # dir
     fi
     if [ -s "$d/smi-summary.json" ]; then
         jq -r '"## nvidia-smi during the run\n\n\(.samples) samples every \(.interval_ms) ms: SM clock median \(.sm_clock_mhz.median) MHz (min \(.sm_clock_mhz.min), max \(.sm_clock_mhz.max)), power median \(.power_w.median) W (max \(.power_w.max)), GPU utilisation median \(.gpu_util_pct_median)%, max temperature \(.temperature_c_max) °C. Clock-limit reason masks seen (sample counts): \(.clock_reason_masks | to_entries | map("\(.key)×\(.value)") | join(", ")). A mask other than 0x0000000000000000 or 0x0000000000000001 (idle) means the clock was limited (power, thermal, or application clocks)."' "$d/smi-summary.json" >> "$d/summary.md"
-        svg_smi "$d/smi.csv" "$(jq .interval_ms "$d/smi-summary.json")" "nvidia-smi every $(jq .interval_ms "$d/smi-summary.json") ms; red marks: a clock-limit reason was active; run $id" > "$d/smi.svg"
+        svg_smi "$d/smi.csv" "$(jq .interval_ms "$d/smi-summary.json")" "nvidia-smi every $(jq .interval_ms "$d/smi-summary.json") ms; red marks: a clock-limit reason was active; run $id" "$(jq -r '.gpu_index // "unspecified"' "$d/smi-summary.json")" > "$d/smi.svg"
         graphs+=(smi.svg)
     fi
     {
         echo
         echo "## Files"
         echo
-        (cd "$d" && ls -1 | grep -vE '^(summary\.md|report\.typ)$' | sed 's/^/- `/; s/$/`/')
+        local entry name
+        for entry in "$d"/*; do
+            [ -e "$entry" ] || continue
+            name=${entry##*/}
+            case "$name" in summary.md|report.typ) continue ;; esac
+            printf -- '- `%s`\n' "$name"
+        done
         echo
         echo "Raw profiler output (perf.data, *.ncu-rep, *.nsys-rep, callgrind.out) is large: push it with \`crypto store push\` (AGENTS.md section 13) rather than committing it."
     } >> "$d/summary.md"
