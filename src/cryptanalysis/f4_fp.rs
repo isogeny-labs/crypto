@@ -120,6 +120,52 @@ fn notify_progress(progress: F4Progress) {
 /// loops.
 static FIELD_OPS: AtomicU64 = AtomicU64::new(0);
 
+/// Per-step diagnostics of the most recent F4 run on this thread (taken with
+/// [`take_run_log`]): they cost nothing in the counted multiplications.
+#[derive(Clone, Debug, Default)]
+pub struct StepStat {
+    pub degree: u32,
+    pub pairs: usize,
+    /// Pair rows, and all rows of the step's matrix (pairs plus reducers).
+    pub rows: usize,
+    pub all_rows: usize,
+    pub ops: u64,
+    pub new_polys: usize,
+    pub staircase: usize,
+}
+#[derive(Clone, Debug, Default)]
+pub struct RunLog {
+    pub steps: Vec<StepStat>,
+    pub dropped_pairs: usize,
+    pub violated: bool,
+}
+thread_local! {
+    static RUN_LOG: std::cell::RefCell<RunLog> = std::cell::RefCell::new(RunLog::default());
+}
+pub fn take_run_log() -> RunLog {
+    RUN_LOG.with(|l| std::mem::take(&mut *l.borrow_mut()))
+}
+/// Degree-`d` monomials in `n` variables divisible by no leading monomial.
+fn uncovered_in_degree(lms: &[&[u32]], n: usize, d: u32) -> usize {
+    fn rec(k: usize, left: u32, mono: &mut Vec<u32>, lms: &[&[u32]], cnt: &mut usize) {
+        if k + 1 == mono.len() {
+            mono[k] = left;
+            if !lms.iter().any(|l| divides(l, mono)) {
+                *cnt += 1;
+            }
+            return;
+        }
+        for e in 0..=left {
+            mono[k] = e;
+            rec(k + 1, left - e, mono, lms, cnt);
+        }
+    }
+    let mut cnt = 0;
+    let mut mono = vec![0u32; n];
+    rec(0, d, &mut mono, lms, &mut cnt);
+    cnt
+}
+
 fn field_ops_now() -> u64 {
     FIELD_OPS.load(AtomicOrdering::Relaxed)
 }
@@ -367,6 +413,18 @@ pub struct F4Options {
     /// the reduced rows are those of the whole matrix.  A step with a
     /// mixed row falls back to the plain reduction.
     pub weights: Option<Vec<u8>>,
+    /// Hilbert-driven stop (opt-in, `Some(chunk)`); see [`F4Options::stopping_by_hilbert`].
+    pub stop_hilbert: Option<usize>,
+    /// Set by the Hilbert guard once the input is certified: the standard
+    /// monomials per degree of the leading-term ideal.
+    hilbert_expect: Option<Vec<usize>>,
+    /// Process at most this many pairs of the lowest degree per step (the
+    /// rest wait, in increasing lcm).  `None`: all of them, one matrix per
+    /// degree.  With [`F4Options::stop_staircase`] it lets the staircase
+    /// check run between batches of one degree.
+    pub max_pairs_per_step: Option<usize>,
+    /// Collect per-step diagnostics for explicit research runs. Disabled by default.
+    pub capture_run_log: bool,
 }
 
 impl F4Options {
@@ -377,6 +435,10 @@ impl F4Options {
             deadline: None,
             stop_staircase: None,
             weights: None,
+            stop_hilbert: None,
+            hilbert_expect: None,
+            max_pairs_per_step: None,
+            capture_run_log: false,
         }
     }
     /// Block-aware reduction by the given `Z/3`-weights.
@@ -391,6 +453,30 @@ impl F4Options {
     /// See [`F4Options::stop_staircase`].
     pub fn stopping_below(mut self, standard_monomials: usize) -> Self {
         self.stop_staircase = Some(standard_monomials);
+        self
+    }
+    /// Hilbert-driven early stop, sound for square systems whose leading
+    /// forms are a regular sequence (checked, with a fallback to the plain
+    /// run when it fails).
+    ///
+    /// When `f_1..f_n` in `n` variables have leading forms `h_i` of degrees
+    /// `d_i` forming a regular sequence, `LT(I) = LT((h))` has the standard
+    /// monomials of the complete intersection `R/(h)`, with Hilbert series
+    /// `prod (1-t^d_i)/(1-t)^n`.  The run then (a) takes at most `chunk`
+    /// pairs of the lowest degree per step, in increasing lcm, and (b) drops
+    /// every pending pair of degree `<= d` once the leading monomials found
+    /// leave exactly the Hilbert function's standard monomials in every
+    /// degree `<= d`: each such pair reduces to zero (README, Lemma 2).
+    /// The regularity check is an F4 run on the leading forms; its
+    /// multiplications, and those of a fallback run, are in `field_ops`.
+    /// `F4Report::hilbert` says which path ran.  Not combined with traces.
+    pub fn stopping_by_hilbert(mut self, chunk: usize) -> Self {
+        self.stop_hilbert = Some(chunk.max(1));
+        self
+    }
+    /// Record the next F4 run's per-step research diagnostics.
+    pub fn capturing_run_log(mut self) -> Self {
+        self.capture_run_log = true;
         self
     }
 }
@@ -635,6 +721,24 @@ pub struct F4Report {
     pub blocked_steps: usize,
     /// A replay found leading monomials other than the recorded ones.
     pub trace_mismatch: bool,
+    /// Outcome of [`F4Options::stopping_by_hilbert`].
+    pub hilbert: HilbertStop,
+    /// Multiplications of the regularity check (inside `field_ops`).
+    pub hilbert_check_ops: u64,
+}
+
+/// What [`F4Options::stopping_by_hilbert`] did.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum HilbertStop {
+    /// Not requested.
+    Off,
+    /// The leading forms were certified regular and the Hilbert rule ran.
+    Applied,
+    /// The certification failed (or the input is not square): plain run.
+    CheckFailed,
+    /// The Hilbert rule saw fewer standard monomials than the Hilbert
+    /// function allows (impossible after certification): plain run.
+    Violated,
 }
 
 fn z3_weight(e: &[u32], w: &[u8]) -> u8 {
@@ -1840,7 +1944,11 @@ pub fn f4(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> F4Report {
         field_multiplications: 0,
         elapsed_ms: 0.0,
     });
-    let report = f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), TraceMode::Off);
+    let report = if let Some(chunk) = opts.stop_hilbert {
+        f4_hilbert_guarded(input, n_vars, p, opts, chunk)
+    } else {
+        f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), TraceMode::Off)
+    };
     notify_progress(F4Progress {
         event: "complete",
         variables: n_vars,
@@ -1853,6 +1961,108 @@ pub fn f4(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> F4Report {
         elapsed_ms: report.ms,
     });
     report
+}
+
+/// The Hilbert function `prod_i (1 + t + ... + t^(d_i - 1))` of a complete
+/// intersection of forms of degrees `d_i`, as coefficients `h[0..=sum(d_i-1)]`.
+pub fn complete_intersection_hilbert(degrees: &[u32]) -> Vec<usize> {
+    let mut h = vec![1usize];
+    for &d in degrees {
+        let mut next = vec![0usize; h.len() + d as usize - 1];
+        for (i, &c) in h.iter().enumerate() {
+            for e in 0..d as usize {
+                next[i + e] += c;
+            }
+        }
+        h = next;
+    }
+    h
+}
+
+/// [`F4Options::stopping_by_hilbert`]: certify that the leading forms are a
+/// regular sequence, run the Hilbert rule, and fall back to the plain run
+/// when the certificate fails.
+fn f4_hilbert_guarded(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    chunk: usize,
+) -> F4Report {
+    let ops0 = field_ops_now();
+    let t0 = Instant::now();
+    let degs: Vec<u32> = input
+        .iter()
+        .map(|f| f.iter().map(|(e, _)| total_degree(e)).max().unwrap_or(0))
+        .collect();
+    let mut plain = opts.clone();
+    plain.stop_hilbert = None;
+    let mut check_ops = 0u64;
+    let mut status = HilbertStop::CheckFailed;
+    if input.len() == n_vars
+        && degs.iter().all(|&d| d >= 1)
+        && matches!(opts.order, Ordering::Grevlex)
+    {
+        // F4 on the leading forms.  A finite staircase of any subset of the
+        // ideal `(h)` makes `R/(h)` finite-dimensional, so the `n` forms in
+        // `n` variables are a regular sequence (Lemma 1); the Macaulay
+        // degree `sum(d_i - 1) + 1` bounds the degrees that matter.
+        let lead: Vec<Poly> = input
+            .iter()
+            .zip(&degs)
+            .map(|(f, &d)| {
+                let t: Vec<(Vec<u32>, u64)> = f
+                    .iter()
+                    .filter(|(e, _)| total_degree(e) == d)
+                    .cloned()
+                    .collect();
+                normalise(&t, p, opts.order)
+            })
+            .collect();
+        let bound: usize = degs.iter().map(|&d| d as usize).product();
+        let dreg: u32 = degs.iter().map(|d| d - 1).sum::<u32>() + 1;
+        let mut co = F4Options::new(opts.order, dreg.min(opts.max_degree));
+        co.deadline = opts.deadline;
+        co.stop_staircase = Some(bound);
+        // Which pairs the check skips does not matter for its soundness, only
+        // that the staircase it ends with is finite; skipping by the Hilbert
+        // function is a heuristic here that makes the check cheap.
+        co.hilbert_expect = Some(complete_intersection_hilbert(&degs));
+        co.max_pairs_per_step = Some(chunk);
+        let r = f4_with_arithmetic(&lead, n_vars, p, &co, arithmetic_mode(), TraceMode::Off);
+        check_ops = r.field_ops;
+        let lms: Vec<&[u32]> = r.basis.iter().map(|g| g[0].0.as_slice()).collect();
+        if !r.timed_out
+            && !r.inconsistent
+            && lead.iter().all(|f| !f.is_empty())
+            && staircase_at_most(&lms, n_vars, bound).is_some()
+        {
+            status = HilbertStop::Applied;
+        }
+    }
+    if status == HilbertStop::Applied {
+        let mut o = plain.clone();
+        o.hilbert_expect = Some(complete_intersection_hilbert(&degs));
+        o.max_pairs_per_step = Some(chunk);
+        let r = f4_with_arithmetic(input, n_vars, p, &o, arithmetic_mode(), TraceMode::Off);
+        if r.hilbert == HilbertStop::Applied {
+            return F4Report {
+                field_ops: field_ops_now() - ops0,
+                ms: t0.elapsed().as_secs_f64() * 1e3,
+                hilbert_check_ops: check_ops,
+                ..r
+            };
+        }
+        status = HilbertStop::Violated;
+    }
+    let r = f4_with_arithmetic(input, n_vars, p, &plain, arithmetic_mode(), TraceMode::Off);
+    F4Report {
+        field_ops: field_ops_now() - ops0,
+        ms: t0.elapsed().as_secs_f64() * 1e3,
+        hilbert: status,
+        hilbert_check_ops: check_ops,
+        ..r
+    }
 }
 
 fn f4_with_arithmetic(
@@ -1938,6 +2148,8 @@ fn f4_with_arithmetic(
             field_ops: field_ops_now() - ops0,
             blocked_steps: bs,
             trace_mismatch: false,
+            hilbert: HilbertStop::Off,
+            hilbert_check_ops: 0,
         }
     };
 
@@ -2065,8 +2277,44 @@ fn f4_with_arithmetic(
     // (solving_degree_max, max_cols_to_solution, steps_to_solution)
     let mut learned = (0u32, 0usize, 0usize);
     let mut staircase_at_stop: Option<usize> = None;
+    let mut hilbert_violated = false;
+    RUN_LOG.with(|l| *l.borrow_mut() = RunLog::default());
 
     loop {
+        if let (Some(h), false) = (&opts.hilbert_expect, hilbert_violated) {
+            while let Some(d) = pairs.iter().map(|pr| pr.degree).min() {
+                let lms: Vec<&[u32]> = basis
+                    .iter()
+                    .zip(&alive)
+                    .filter(|(_, &a)| a)
+                    .map(|(f, _)| f[0].0.as_slice())
+                    .collect();
+                let want = |k: u32| h.get(k as usize).copied().unwrap_or(0);
+                let mut met = true;
+                for k in 0..=d {
+                    let unc = uncovered_in_degree(&lms, n_vars, k);
+                    if unc < want(k) {
+                        // fewer standard monomials than the complete
+                        // intersection allows: the certificate was wrong
+                        hilbert_violated = true;
+                        RUN_LOG.with(|l| l.borrow_mut().violated = true);
+                        met = false;
+                        break;
+                    }
+                    met &= unc == want(k);
+                }
+                if !met {
+                    break;
+                }
+                let before = pairs.len();
+                if (d as usize..h.len()).all(|k| h[k] == 0) {
+                    pairs.clear();
+                } else {
+                    pairs.retain(|pr| pr.degree != d);
+                }
+                RUN_LOG.with(|l| l.borrow_mut().dropped_pairs += before - pairs.len());
+            }
+        }
         if let TraceMode::Replay(t) = &trace {
             if replay_step >= t.steps.len() {
                 // the recorded run's end: the recorded staircase, or the
@@ -2119,6 +2367,7 @@ fn f4_with_arithmetic(
                 );
             }
         }
+        let ops_step0 = opts.capture_run_log.then(field_ops_now);
         let tp0 = Instant::now();
         // symbolic preprocessing
         let mut rows_poly: Vec<(usize, Vec<u32>)> = Vec::new(); // (basis index, multiplier)
@@ -2163,6 +2412,13 @@ fn f4_with_arithmetic(
             let (selected, rest): (Vec<Pair>, Vec<Pair>) =
                 pairs.drain(..).partition(|pr| pr.degree == d);
             pairs = rest;
+            let mut selected = selected;
+            if let Some(c) = opts.max_pairs_per_step {
+                if selected.len() > c {
+                    selected.sort_by(|a, b| cmp_monomial(&a.lcm, &b.lcm, ord));
+                    pairs.extend(selected.split_off(c));
+                }
+            }
             selected_len = selected.len();
             for pr in &selected {
                 for &idx in &[pr.i, pr.j] {
@@ -2599,6 +2855,7 @@ fn f4_with_arithmetic(
             learned = (learned.0.max(d), max_cols, steps);
         }
         let learned_now = !new_polys.is_empty();
+        let learned_new = new_polys.len();
         match &mut trace {
             TraceMode::Record(t) => {
                 // the pair rows that the new pivots are combinations of
@@ -2648,6 +2905,26 @@ fn f4_with_arithmetic(
                 gm,
                 lm_packed.as_mut(),
             );
+        }
+        if let Some(ops_step0) = ops_step0 {
+            let lms: Vec<&[u32]> = basis
+                .iter()
+                .zip(&alive)
+                .filter(|(_, &a)| a)
+                .map(|(f, _)| f[0].0.as_slice())
+                .collect();
+            let sc = staircase_at_most(&lms, n_vars, usize::MAX).unwrap_or(0);
+            RUN_LOG.with(|l| {
+                l.borrow_mut().steps.push(StepStat {
+                    degree: d,
+                    pairs: selected_len,
+                    rows: n_pair_rows,
+                    all_rows: sparse.len(),
+                    ops: field_ops_now() - ops_step0,
+                    new_polys: learned_new,
+                    staircase: sc,
+                })
+            });
         }
         if debug {
             eprintln!(
@@ -2705,6 +2982,16 @@ fn f4_with_arithmetic(
         field_ops: field_ops_now() - ops0,
         blocked_steps,
         trace_mismatch: mismatch,
+        hilbert: if opts.hilbert_expect.is_some() {
+            if hilbert_violated {
+                HilbertStop::Violated
+            } else {
+                HilbertStop::Applied
+            }
+        } else {
+            HilbertStop::Off
+        },
+        hilbert_check_ops: 0,
     }
 }
 
@@ -3647,6 +3934,144 @@ mod tests {
         assert_eq!(staircase_at_most(&[x2, y2, xy], 2, 10), Some(3));
         assert_eq!(staircase_at_most(&[x2, y2], 2, 3), None);
         assert_eq!(staircase_at_most(&[x2, xy], 2, 100), None);
+    }
+
+    // A tiny deterministic generator for the Hilbert-stop tests.
+    fn lcg(s: &mut u64) -> u64 {
+        *s = s
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
+        *s >> 33
+    }
+
+    /// `n` random polynomials of degree 2 in `n` variables over `F_p`.
+    fn random_quadrics(n: usize, p: u64, seed: u64) -> Vec<Poly> {
+        let mut s = seed;
+        let mut monos: Vec<Vec<u32>> = vec![vec![0; n]];
+        for i in 0..n {
+            let mut e = vec![0; n];
+            e[i] = 1;
+            monos.push(e);
+            for j in i..n {
+                let mut e = vec![0; n];
+                e[i] += 1;
+                e[j] += 1;
+                monos.push(e);
+            }
+        }
+        (0..n)
+            .map(|_| {
+                let t: Vec<(Vec<u32>, u64)> =
+                    monos.iter().map(|m| (m.clone(), lcg(&mut s) % p)).collect();
+                normalise(&t, p, Ordering::Grevlex)
+            })
+            .collect()
+    }
+
+    fn sorted(mut b: Vec<Poly>) -> Vec<Poly> {
+        b.sort();
+        b
+    }
+
+    #[test]
+    fn hilbert_function_of_a_complete_intersection() {
+        assert_eq!(
+            complete_intersection_hilbert(&[2; 6]),
+            vec![1, 6, 15, 20, 15, 6, 1]
+        );
+        assert_eq!(complete_intersection_hilbert(&[2, 3]), vec![1, 2, 2, 1]);
+        assert_eq!(
+            complete_intersection_hilbert(&[3, 3, 2])
+                .iter()
+                .sum::<usize>(),
+            18
+        );
+    }
+
+    #[test]
+    fn run_log_is_opt_in() {
+        let sys = random_quadrics(3, 101, 19);
+        let _ = take_run_log();
+        let _ = f4(&sys, 3, 101, &F4Options::new(Ordering::Grevlex, 16));
+        assert!(take_run_log().steps.is_empty());
+
+        let _ = f4(
+            &sys,
+            3,
+            101,
+            &F4Options::new(Ordering::Grevlex, 16).capturing_run_log(),
+        );
+        assert!(!take_run_log().steps.is_empty());
+    }
+
+    #[test]
+    fn hilbert_stop_gives_the_same_reduced_basis_as_the_plain_run() {
+        let p = 101;
+        let (mut applied, mut cheaper) = (0, 0);
+        for n in [3usize, 4, 5, 6] {
+            for seed in 0..6u64 {
+                let sys = random_quadrics(n, p, 1000 * n as u64 + seed);
+                let plain = f4(&sys, n, p, &F4Options::new(Ordering::Grevlex, 24));
+                for chunk in [1usize, 3, usize::MAX] {
+                    let h = f4(
+                        &sys,
+                        n,
+                        p,
+                        &F4Options::new(Ordering::Grevlex, 24).stopping_by_hilbert(chunk),
+                    );
+                    assert_eq!(
+                        sorted(h.basis.clone()),
+                        sorted(plain.basis.clone()),
+                        "n = {n}, seed {seed}, chunk {chunk}, outcome {:?}",
+                        h.hilbert
+                    );
+                    if h.hilbert == HilbertStop::Applied {
+                        applied += 1;
+                        assert!(h.hilbert_check_ops > 0 && h.hilbert_check_ops <= h.field_ops);
+                        if chunk == 1 && h.field_ops < plain.field_ops {
+                            cheaper += 1;
+                        }
+                    }
+                }
+            }
+        }
+        // random quadrics are regular with overwhelming probability
+        assert!(applied >= 60, "{applied}");
+        assert!(cheaper >= 20, "{cheaper}");
+    }
+
+    #[test]
+    fn hilbert_stop_falls_back_when_the_leading_forms_are_not_regular() {
+        let p = 101;
+        // two conics with the same leading form xy: a solution at infinity
+        let f1: Poly = normalise(&[(vec![1, 1], 1), (vec![0, 0], 1)], p, Ordering::Grevlex);
+        let f2: Poly = normalise(
+            &[(vec![1, 1], 1), (vec![1, 0], 1), (vec![0, 0], 2)],
+            p,
+            Ordering::Grevlex,
+        );
+        let sys = vec![f1, f2];
+        let plain = f4(&sys, 2, p, &F4Options::new(Ordering::Grevlex, 12));
+        let h = f4(
+            &sys,
+            2,
+            p,
+            &F4Options::new(Ordering::Grevlex, 12).stopping_by_hilbert(1),
+        );
+        assert_eq!(h.hilbert, HilbertStop::CheckFailed);
+        assert_eq!(sorted(h.basis), sorted(plain.basis));
+        // a non-square system is never certified
+        let mut three = random_quadrics(2, p, 5);
+        three.push(random_quadrics(2, p, 6).remove(0));
+        let plain = f4(&three, 2, p, &F4Options::new(Ordering::Grevlex, 12));
+        let h = f4(
+            &three,
+            2,
+            p,
+            &F4Options::new(Ordering::Grevlex, 12).stopping_by_hilbert(1),
+        );
+        assert_eq!(h.hilbert, HilbertStop::CheckFailed);
+        assert_eq!(sorted(h.basis), sorted(plain.basis));
     }
 
     #[test]

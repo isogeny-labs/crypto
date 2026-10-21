@@ -1,0 +1,184 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Ephemeral VPC launcher for Iso Lab experiments, with GitHub OIDC
+Parameters:
+  ClusterName:
+    Type: String
+  ResultsBucket:
+    Type: String
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  PrivateSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+  ClusterSecurityGroup:
+    Type: AWS::EC2::SecurityGroup::Id
+  LauncherKey:
+    Type: String
+    AllowedPattern: 'inputs/launchers/[a-f0-9]{64}\.zip'
+  LauncherVersion:
+    Type: String
+  ProjectName:
+    Type: String
+    Default: isolab-experiment-launcher
+  GitHubSubject:
+    Type: String
+    Description: Exact GitHub OIDC subject, restricted to the trusted default branch
+  GitHubOidcProviderArn:
+    Type: String
+Resources:
+  LauncherSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Iso Lab launcher outbound HTTPS, no inbound connections
+      VpcId: !Ref VpcId
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+  ClusterIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref ClusterSecurityGroup
+      SourceSecurityGroupId: !Ref LauncherSecurityGroup
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      Description: Private Kubernetes API from experiment launcher
+  Logs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/codebuild/${ProjectName}
+      RetentionInDays: 7
+  LauncherRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: {Service: codebuild.amazonaws.com}
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnEquals:
+                aws:SourceArn: !Sub arn:${AWS::Partition}:codebuild:${AWS::Region}:${AWS::AccountId}:project/${ProjectName}
+      Policies:
+        - PolicyName: launcher
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: eks:DescribeCluster
+                Resource: !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${ClusterName}
+              - Effect: Allow
+                Action: [s3:GetObject, s3:GetObjectVersion]
+                Resource:
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/inputs/launchers/*
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/inputs/requests/*
+                  - !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*
+              - Effect: Allow
+                Action: s3:PutObject
+                Resource: !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/launcher/*
+              - Effect: Allow
+                Action: [s3:GetBucketLocation, s3:GetBucketAcl]
+                Resource: !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}
+              - Effect: Allow
+                Action: s3:ListBucket
+                Resource: !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}
+                Condition:
+                  StringLike:
+                    s3:prefix: ['runs/*', 'inputs/requests/*', 'inputs/launchers/*']
+              - Effect: Allow
+                Action: [logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !GetAtt Logs.Arn
+              - Effect: Allow
+                Action: [ec2:CreateNetworkInterface, ec2:DeleteNetworkInterface]
+                Resource: '*'
+              - Effect: Allow
+                Action: [ec2:DescribeNetworkInterfaces, ec2:DescribeSecurityGroups, ec2:DescribeSubnets, ec2:DescribeVpcs, ec2:DescribeDhcpOptions]
+                Resource: '*'
+              - Effect: Allow
+                Action: ec2:CreateNetworkInterfacePermission
+                Resource: !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:network-interface/*
+                Condition:
+                  StringEquals:
+                    ec2:AuthorizedService: codebuild.amazonaws.com
+  Access:
+    Type: AWS::EKS::AccessEntry
+    Properties:
+      ClusterName: !Ref ClusterName
+      PrincipalArn: !GetAtt LauncherRole.Arn
+      Type: STANDARD
+      KubernetesGroups: [isolab:submitters]
+  Project:
+    Type: AWS::CodeBuild::Project
+    DependsOn: [Access, ClusterIngress]
+    Properties:
+      Name: !Ref ProjectName
+      Description: Submit audited L2 Kubernetes jobs; measured work runs on EKS
+      ServiceRole: !GetAtt LauncherRole.Arn
+      ConcurrentBuildLimit: 2
+      TimeoutInMinutes: 70
+      QueuedTimeoutInMinutes: 10
+      Artifacts: {Type: NO_ARTIFACTS}
+      Source:
+        Type: S3
+        Location: !Sub ${ResultsBucket}/${LauncherKey}
+        BuildSpec: remote/buildspec.yml
+      SourceVersion: !Ref LauncherVersion
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        PrivilegedMode: false
+        EnvironmentVariables:
+          - {Name: ISOLAB_CLUSTER, Value: !Ref ClusterName}
+          - {Name: ISOLAB_BUCKET, Value: !Ref ResultsBucket}
+          - {Name: ISOLAB_REQUEST_KEY, Value: ''}
+      VpcConfig:
+        VpcId: !Ref VpcId
+        Subnets: !Ref PrivateSubnets
+        SecurityGroupIds: [!Ref LauncherSecurityGroup]
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+          GroupName: !Ref Logs
+  GitHubRole:
+    Type: AWS::IAM::Role
+    Properties:
+      MaxSessionDuration: 7200
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: {Federated: !Ref GitHubOidcProviderArn}
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                token.actions.githubusercontent.com:sub: !Ref GitHubSubject
+      Policies:
+        - PolicyName: trigger
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: codebuild:StartBuild
+                Resource: !GetAtt Project.Arn
+              - Effect: Allow
+                Action: [codebuild:BatchGetBuilds, codebuild:StopBuild]
+                Resource: !GetAtt Project.Arn
+              - Effect: Allow
+                Action: s3:PutObject
+                Resource: !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/inputs/requests/*
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub arn:${AWS::Partition}:s3:::${ResultsBucket}/runs/*/launcher/*
+Outputs:
+  ProjectName:
+    Value: !Ref Project
+  TriggerRoleArn:
+    Value: !GetAtt GitHubRole.Arn
+  LauncherRoleArn:
+    Value: !GetAtt LauncherRole.Arn
