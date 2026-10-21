@@ -21,3 +21,8 @@ The original cloud verifier stopped at its module lookup error before
 independent relation and scalar replay. Cold setup, index construction,
 rank work, resources, and per-point statuses remain in the raw archives
 listed in `PROVIDER_ARCHIVES.md`.
+
+
+## Calibration reconciliation
+
+The producer-side calibration spreads reported above (K3072 12.471%; K2816 13.355%) do not match the corrected independent replay in [STRATUM3_CENSORED.md](STRATUM3_CENSORED.md) and canonical [stratum3_analysis.json](stratum3_analysis.json): that replay reports K2816 12.519% and K3072 11.739%. The summaries remain unreconciled. Use the corrected replay for the admission gate; both sets exceed the frozen 10% threshold, so stratum 3 remains NOT_ADMITTED and the full selector remains BOUNDED_UNKNOWN. Do not use the producer diagnostic spreads to promote the cloud result.
