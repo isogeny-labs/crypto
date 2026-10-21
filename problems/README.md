@@ -11,7 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
-| [EKS resumable L2 experiments](eks-resumable-l2-experiments.md) | investigating | automatic CRIU/EBS recovery and fresh L2 epochs through the harness | durable recovery controller and versioned API, fenced worker-loss test, fresh warmup/L2/A/A and verified S3 results |
+| [EKS resumable L2 experiments](eks-resumable-l2-experiments.md) | partially resolved | main-only GitHub recovery execution and broader runtime coverage | automatic AWS harness worker-loss/L2/S3 proof passed; finish exact-head CI/review/merges, main Action and additional workload qualification |
 | [Running legacy Spot process recovery](legacy-spot-process-recovery.md) | implemented; client activation remains | enrolled legacy process recovery | private recurring backups, fenced two-hop recovery and Diem copy restore passed; laptop installation/trust needs client access |
 | [Photographed-volcano checkpoints unavailable](photo-volcano-checkpoints-unavailable.md) | open | resuming and independently auditing the original 46-curve, 100-problem-per-curve campaign | exact original archives, manifest and checkpoint verification, durable immutable readback, then resume-path validation |
 | [Generalized rootfinding complete all-roots8x qualification](generalized-rootfinding-all-roots-8x.md) | open | novel qualified8x over matched genuine all-roots F4/F5/F6 across requested fields | native complete-output integration, independent replay, strongest external references and the unchanged hard gate |

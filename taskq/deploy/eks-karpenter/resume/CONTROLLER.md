@@ -1,16 +1,18 @@
 # Resumable EKS submission implementation contract
 
-Implementation work in progress. This document does not enable recovery in v1.
-The shared skill must continue to reject claims of automatic recovery until the
-controller and failure-injection checks below have actually passed.
+The deployed native controller implements the separate resumable contract.
+Automatic worker-loss and controller-restart qualification E passed, including
+native computation replay and a distinct fresh L2/S3 epoch. See the
+[qualification report](validation/20261021-controller/REPORT.md) for exact runtime
+pins, final-runtime retest and coverage limits. Ordinary v1 remains non-resumable.
 
-The portable `isolab.eks.resumable/v1` request will bind a logical run name,
+The portable `isolab.eks.resumable/v1` request binds a logical run name,
 original absolute UTC deadline, immutable source/binary/image identity, the
 original L2 ecbench spec, checkpoint interval and bounded recovery count. Initially
 only the qualified c8a.2xlarge CPU class is admitted. Ordinary v1 fresh jobs retain
 their broader x86 Spot placement policy and zero measurement retries.
 
-A dedicated VPC CodeBuild controller will own one durable Kubernetes ConfigMap
+A dedicated VPC CodeBuild controller owns one durable Kubernetes ConfigMap
 per logical run. A different controller may take ownership only after AWS reports
 the prior CodeBuild execution terminal, using a resource-version guarded update.
 An unchanged request is idempotent; changing its contents under the same run name
@@ -27,7 +29,9 @@ restore-via-create path remains disabled.
 Each periodic generation leaves the complete process tree stopped, flushes all
 mutable files to the PVC, takes a CSI EBS snapshot, and verifies a private
 versioned encrypted S3 archive by downloading and hashing it before committing.
-Only then does computation continue. Two committed generations are retained.
+Only then does computation continue. The latest two committed generations remain
+eligible for restore. Older EBS snapshots and S3 versions are physically retained
+until explicit operator cleanup; this implementation does not garbage-collect them.
 An interrupted or corrupt new generation cannot replace a known-good generation.
 Original source/image/spec/deadline and runtime compatibility remain bound to every
 attempt. Every failed checkpoint, restore and verification is retained.

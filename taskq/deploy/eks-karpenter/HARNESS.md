@@ -248,7 +248,7 @@ References: [GitHub OIDC with AWS](https://docs.github.com/en/actions/how-tos/se
 
 `isolab.eks.resumable/v1` is implemented by the native recovery controller in
 [`resume/`](resume/README.md), with its strict [request schema](resume/request.schema.json).
-It is undergoing automatic worker-loss qualification; ordinary
+It has passed scoped automatic worker-loss qualification; ordinary
 `isolab.eks.request/v1` and custom command jobs remain non-resumable.
 
 The new request uses an absolute original deadline and binds both the tested

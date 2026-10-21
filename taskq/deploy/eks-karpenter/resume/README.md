@@ -1,10 +1,14 @@
 # EKS CRIU and EBS snapshot recovery
 
-The operator recovery test in [validation/20261021](validation/20261021/REPORT.md)
-passed a replacement-worker restore. **Ordinary Iso Lab v1 jobs, MCP submissions
-and the GitHub Action do not yet perform automatic checkpoint/resume.** Their
-`/work` remains temporary. The [integration record](../../../../problems/eks-resumable-l2-experiments.md)
-tracks the remaining implementation and acceptance criteria.
+The native `isolab.eks.resumable/v1` path automatically checkpoints computation
+and restores it on a compatible replacement worker. The
+[controller qualification](validation/20261021-controller/REPORT.md) exercised
+controller restart, dedicated Spot-worker loss, resumed native crypto progress
+and a distinct fresh L2 epoch with complete S3 verification. **Ordinary Iso Lab
+v1 jobs remain non-resumable** and use temporary `/work`. Full main-branch GitHub
+Action verification remains blocked on the PR merge/checks; the
+[integration record](../../../../problems/eks-resumable-l2-experiments.md) tracks
+that and the remaining qualification limits.
 
 The selected policy is to resume computation, retain the interrupted epoch as
 invalid for timing, and start a fresh benchmark epoch with new warmup, L2
@@ -99,11 +103,9 @@ untrusted user code.
    new epochs separate; a cryptographic computation resuming successfully is
    not evidence about its uninterrupted wall time.
 
-For unattended operation these steps need a durable, concurrency-safe controller
-with periodic checkpoints, original deadlines, fenced ownership, retained
-generations and workload qualification. Those are not supplied by this runbook.
-Do not add unsupported `resume` fields to `isolab.eks.request/v1` or present this
-manual test as an automatic failover service.
+These manual steps explain the mechanism. The native controller below automates
+it for the qualified workload class. Do not add unsupported `resume` fields to
+`isolab.eks.request/v1`; use the separate resumable schema.
 
 ## Replay the public fixture
 
@@ -142,8 +144,11 @@ the first step is checked against a separately generated OpenSSL reference.
 The separate [request schema](request.schema.json), native
 [controller](controller/src/cloud.rs), and [trusted supervisor](controller/src/supervisor.rs)
 implement the policy in [CONTROLLER.md](CONTROLLER.md). The ordinary v1 route is
-unchanged. Automatic worker-loss acceptance remains in progress; the short
-zero-restore path already passed computation replay, a fresh L2 epoch and S3.
+unchanged. Automatic worker-loss test E preserved a 1,140-record checkpoint prefix
+and completed 1,806 computations after restoration. Its fresh epoch passed 1,806
+L2 observations, 1,800 native replays, 600 A/A pairs and 19 S3 hashes. The report
+records the final-runtime retest and differentiates live tests from offline
+failure-path tests.
 
 The [real ecbench operator qualification](validation/20261021-ecbench/REPORT.md)
 adds actual native parent/child restore, corrected empty supplementary groups,
@@ -151,7 +156,7 @@ adds actual native parent/child restore, corrected empty supplementary groups,
 [PDF](validation/20261021-ecbench/report.pdf) retains the unsupported 36-bit
 request, perf-descriptor dump failure and first restore's group mismatch.
 
-Build or install the trusted native client on a host with AWS identity:
+Build or install the trusted native client on a Linux x86-64 host with AWS identity:
 
 ```bash
 cargo +1.99.1 build --locked --release --manifest-path \
@@ -167,6 +172,11 @@ For the approved release client, `fetch-client /absolute/install/path` verifies
 the private content-addressed runtime package before installation. `publish-runtime
 BASE-IMAGE.json OUTPUT.json` composes those trusted tools over the tested image.
 It rejects image ONBUILD hooks and executes no tested code during publication.
+The [request example](request.example.json) deliberately contains invalid
+placeholders: replace the source/binary/image identities and set an absolute
+deadline 180..86,400 seconds in the future before validation. Preserve those
+bytes on retries. For MCP, install the recovery client on the server's PATH as
+well as `isolab-eks-mcp`, restart the connection and inspect its live tool list.
 
 The request binds a logical name, exact base image/source/binary, exact recovery
 image, original L2 spec, c8a.2xlarge, checkpoint interval (30..900 seconds), maximum

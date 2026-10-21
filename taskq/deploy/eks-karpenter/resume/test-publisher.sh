@@ -38,12 +38,12 @@ chmod +x "$work/tools/"*
 export PATH="$work/tools:$PATH" TEST_PACKAGE="$work/package.tar.gz" TEST_DOCKER_LOG="$work/docker.log" TMPDIR="$work/temp"
 "$work/control/publish-runtime" "$work/base.json" "$work/result.json" > "$work/stdout" 2> "$work/stderr"
 jq -e '.runtime_image_uri|endswith("0000000000000000000000000000000000000000000000000000000000000002")' "$work/result.json" >/dev/null
-[[ $(rg -c '^build ' "$work/docker.log") == 1 ]]
+[[ $(grep -c '^build ' "$work/docker.log") == 1 ]]
 "$work/control/fetch-client" "$work/client" > "$work/client.stdout" 2> "$work/client.stderr"
 cmp "$work/client/isolab-eks-recovery" "$work/package/runtime/isolab-eks-recovery"
 : > "$work/docker.log"
 if TEST_CORRUPT=1 "$work/control/publish-runtime" "$work/base.json" "$work/bad.json" > "$work/bad.stdout" 2> "$work/bad.stderr"; then echo 'Corrupt runtime accepted' >&2; exit 1; fi
 [[ ! -s "$work/docker.log" ]]
 if TEST_ONBUILD=1 "$work/control/publish-runtime" "$work/base.json" "$work/bad.json" > "$work/hook.stdout" 2> "$work/hook.stderr"; then echo 'ONBUILD hook accepted' >&2; exit 1; fi
-if rg -q '^build ' "$work/docker.log"; then echo 'Build reached after ONBUILD rejection' >&2; exit 1; fi
+if grep -q '^build ' "$work/docker.log"; then echo 'Build reached after ONBUILD rejection' >&2; exit 1; fi
 printf 'Recovery publisher verifies runtime bytes, pins image digest, rejects ONBUILD hooks, and never runs downloaded code.\n'

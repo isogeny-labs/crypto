@@ -14,9 +14,9 @@ caller's configured identity without copying credentials into requests or Git.
 The lab's recovery policy is **CRIU plus EBS volume snapshots**. Preserve
 computation progress after a Spot interruption, invalidate the interrupted
 timing interval, and start a new benchmark epoch with fresh warmup, L2 checks
-and A/A controls. Read [recovery requirements](references/recovery.md) before
-promising resumability: the ordinary v1 submission paths below do not yet
-automate this policy. A successful manual recovery test is not that integration.
+and A/A controls. Use the separate `isolab.eks.resumable/v1` contract for this
+policy; ordinary v1 jobs are fresh, non-resumable jobs. Read
+[recovery requirements and commands](references/recovery.md) before launch.
 
 ## Select the submission path
 
@@ -28,6 +28,11 @@ automate this policy. A successful manual recovery test is not that integration.
 - **AWS identity, callers anywhere:** validate an `isolab.eks.request/v1` document
   and run `taskq/deploy/eks-karpenter/remote/launch-remote request.json`. The
   CodeBuild launcher supplies the private EKS network route.
+- **Resumable native CPU computation:** use the native AWS-only recovery client
+  with `isolab.eks.resumable/v1`, a digest-pinned recovery image and an original
+  absolute deadline. The deployed controller has passed worker-loss recovery
+  followed by a separate L2/S3 epoch on c8a.2xlarge. Follow the recovery reference;
+  this does not qualify arbitrary commands or cross-family restoration.
 - **An installed EKS MCP connection:** start with `isolab_k8s_overview`, then
   `isolab_k8s_benchmark` for ecbench measurements or `isolab_k8s_run` for an
   authorized arbitrary command. Read the live tool schema first. Benchmark

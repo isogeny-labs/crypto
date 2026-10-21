@@ -1,17 +1,63 @@
 # Checkpoint and resume admission
 
 The owner selected CRIU process checkpoints plus EBS volume snapshots, with
-computation resumed and a fresh benchmark epoch after interruption. The current
-deployed EKS v1 job path uses temporary `/work` storage and does not automate
-this policy. Its normal Job retry is not resume.
+computation resumed and a fresh benchmark epoch after interruption. The native
+`isolab.eks.resumable/v1` controller implements this policy on c8a.2xlarge. The
+ordinary EKS v1 job path uses temporary `/work` and remains non-resumable.
+
+## Submit from Claude, Codex or another harness
+
+Use a Linux x86-64 caller with AWS CLI, jq and the configured Iso Lab identity.
+The caller needs AWS API access; CodeBuild supplies the private EKS route.
+From the repository root:
+
+```bash
+install_dir="$HOME/.local/bin"
+taskq/deploy/eks-karpenter/resume/fetch-client "$install_dir"
+client="$install_dir/isolab-eks-recovery"
+"$client" validate /absolute/path/recovery-request.json
+"$client" submit /absolute/path/recovery-request.json /absolute/path/receipts
+"$client" remote-status /absolute/path/recovery-request.json /absolute/path/receipts
+"$client" wait /absolute/path/recovery-request.json /absolute/path/receipts
+```
+
+Build locally instead if needed, using the controller README. The strict
+[JSON schema](../../../../taskq/deploy/eks-karpenter/resume/request.schema.json)
+and [request example](../../../../taskq/deploy/eks-karpenter/resume/request.example.json)
+define all fields. Replace the example's placeholders before validation. Use
+`publish-runtime BASE-IMAGE.json OUTPUT.json` to compose the pinned recovery
+tools over the tested digest; record that returned runtime image in the request.
+Never substitute an unrelated default image for the requested source commit.
+The pinned client is a Linux x86-64 binary. On another operating system, use
+the GitHub route once merged, or invoke the client on the configured Linux lab
+host; do not try to execute the Linux binary directly on macOS or Windows.
+
+Retain the identical request file and original deadline on any retry. A timeout
+after submit is ambiguous: inspect the original run/status before retrying.
+The controller currently admits one active CodeBuild execution. A definitive
+concurrency rejection started no controller; retry that same request after the
+slot becomes free. Do not extend its deadline or rename it to bypass a failure.
+
+`wait` succeeds only after computation replay and the distinct fresh benchmark's
+L2, native replay, A/A and complete downloaded S3 manifest checks pass. Preserve
+`result.json`, the request hash, build ID, both epoch identities and S3 locations.
+Computation records are always L0/timing-invalid, even when no restore occurred.
+
+The maintained MCP binary also exposes `isolab_k8s_resumable_submit` and
+`isolab_k8s_recovery_status` when this native client is installed on its PATH.
+Inspect the live schema: older installed servers do not have these tools.
+The GitHub workflow has optional `resumable`, `checkpoint_seconds`, and
+`max_restores` inputs in this branch. Its full main-branch OIDC execution remains
+pending the parent and recovery PR merges; do not claim it was verified by the
+AWS-only qualification.
 
 An operator-controlled EKS test on 2026-10-21 did restore a UID-1000 Rust SHA-256
 process from CRIU 4.2.1 and an encrypted EBS CSI snapshot onto a new c8a.2xlarge
 Spot instance in another availability zone. It continued from iteration 48,128
 through 1,048,576, with one process start and native replay of every recorded
 hash. Read the [tested procedure and evidence](../../../../taskq/deploy/eks-karpenter/resume/README.md).
-This qualifies that fixture and configuration, not arbitrary commands, ordinary
-MCP/GitHub jobs, or unattended Spot recovery. Track the remaining integration in
+This earlier test qualifies that fixture and configuration. The automatic native
+qualification below adds the controller path. Track remaining coverage in
 [the problem record](../../../../problems/eks-resumable-l2-experiments.md).
 
 The standalone Spot host's CRIU recovery in `infra/spot-system/CRIU_LOCAL.md`
@@ -57,7 +103,7 @@ S3 prefix linked to the same logical experiment. If the computation itself
 resumes, label its crossing interval as computational progress only. Do not
 turn a failed A/A or correctness check into an infrastructure retry.
 
-Use the live recovery request/status schema once implemented. Do not add an
+Use the separate recovery request/status schema. Do not add an
 unrecognized `resume` field to `isolab.eks.request/v1`; its validator deliberately
 rejects unknown fields. A requested resumable experiment must fail admission when
 its checkpoint/restore capability is missing, not silently run without recovery.
@@ -73,10 +119,18 @@ the supervisor's groups fixed it. Both failures are retained in the
 A separate fresh epoch passed 36 L2 observations, 30 replays, 10 A/A pairs and all
 19 S3 payload hashes. These are scoped operator proofs, not automatic failover.
 
-The native controller and separate `isolab.eks.resumable/v1` request are now
-implemented under `resume/controller`. AWS-only submission is available through
-`isolab-eks-recovery submit REQUEST OUTPUT_DIRECTORY`, with `remote-status` and
-`wait` for the same immutable request. The short automatic path has passed the
-computation-to-fresh-epoch transition. Automatic worker-loss qualification is
-still in progress: check the controller report/runtime qualification before
-presenting that capability as ready.
+Automatic qualification E then passed a controller restart and termination of
+only its dedicated Spot worker. The restored session preserved its 1,140-record
+checkpoint prefix and completed 1,806 records. The distinct fresh epoch passed
+1,806 L2 observations, 1,800 native replays, 600 A/A pairs and all 19 S3 payload
+hashes. A duplicate terminal request created no second epoch. Final runtime F
+also passed worker loss, 1,147→1,806 continued records, unprivileged replay and
+the same fresh L2/replay/A-A/S3 counts. Its exact pins are recorded in the
+[controller report](../../../../taskq/deploy/eks-karpenter/resume/validation/20261021-controller/REPORT.md).
+
+This is trusted native CPU workload support. Network sessions, GPU/ARM state,
+arbitrary commands and cross-family restore remain unqualified. The supervisor
+is privileged and is not a sandbox for untrusted code. Private CRIU archives may
+contain process memory; never copy them into Git or GitHub artifacts. Two recent
+generations are eligible for automatic restore; older EBS snapshots and S3
+versions are retained until explicitly cleaned up by the operator.

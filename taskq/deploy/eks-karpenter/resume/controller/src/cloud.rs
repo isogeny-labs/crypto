@@ -1138,6 +1138,79 @@ pub fn wait(req: Request, dir: &Path) -> Result<Value, String> {
 mod tests {
     use super::*;
     #[test]
+    fn checkpoint_readback_rejects_corruption_version_and_manifest_changes() {
+        // Isolate PATH changes in a child test process; the parent test suite may
+        // run other tests concurrently. No AWS credentials or network are used.
+        const CHILD: &str = "ISOLAB_ARCHIVE_TEST_CHILD";
+        if std::env::var_os(CHILD).is_none() {
+            let status = Command::new(std::env::current_exe().unwrap())
+                .args(["--exact", "cloud::tests::checkpoint_readback_rejects_corruption_version_and_manifest_changes"])
+                .env(CHILD, "1")
+                .status().unwrap();
+            assert!(status.success());
+            return;
+        }
+        use std::os::unix::fs::PermissionsExt;
+        let dir = std::env::temp_dir().join(format!("isolab-archive-test-{}", std::process::id()));
+        fs::create_dir_all(dir.join("generations/g1")).unwrap();
+        let manifest = b"{\"committed\":true}\n";
+        fs::write(dir.join("generations/g1/manifest.json"), manifest).unwrap();
+        let archive = dir.join("source.tar");
+        assert!(Command::new("tar")
+            .arg("-cf")
+            .arg(&archive)
+            .arg("-C")
+            .arg(&dir)
+            .arg("generations")
+            .status()
+            .unwrap()
+            .success());
+        fs::write(dir.join("aws"), b"#!/bin/bash\nset -eu\ncp \"$ISOLAB_TEST_ARCHIVE\" \"${@: -1}\"\nprintf '%s\\n' '{\"VersionId\":\"v1\",\"ServerSideEncryption\":\"AES256\"}'\n").unwrap();
+        fs::set_permissions(dir.join("aws"), fs::Permissions::from_mode(0o755)).unwrap();
+        std::env::set_var(
+            "PATH",
+            format!("{}:{}", dir.display(), std::env::var("PATH").unwrap()),
+        );
+        std::env::set_var("ISOLAB_TEST_ARCHIVE", &archive);
+        let (sha, bytes) = sha_file(&archive).unwrap();
+        let good = Generation {
+            number: 1,
+            request_sha256: "a".repeat(64),
+            snapshot_name: "snapshot".into(),
+            snapshot_id: "snap-test".into(),
+            archive_key: "test/checkpoint.tar".into(),
+            archive_version: "v1".into(),
+            archive_sha256: sha,
+            archive_bytes: bytes,
+            manifest_sha256: digest(manifest),
+            source_instance: "i-old".into(),
+            source_pod_uid: "pod-old".into(),
+            committed_unix_seconds: 1000,
+            snapshot_ready: true,
+            encrypted: true,
+            readback_verified: true,
+        };
+        verify_archive(&good, &dir).unwrap();
+        let mut wrong_version = good.clone();
+        wrong_version.archive_version = "v2".into();
+        assert!(verify_archive(&wrong_version, &dir).is_err());
+        let mut wrong_manifest = good.clone();
+        wrong_manifest.manifest_sha256 = "f".repeat(64);
+        assert!(verify_archive(&wrong_manifest, &dir).is_err());
+        let original = fs::read(&archive).unwrap();
+        let mut corrupt = original.clone();
+        corrupt[100] ^= 1;
+        fs::write(&archive, corrupt).unwrap();
+        assert!(verify_archive(&good, &dir).is_err());
+        fs::write(&archive, &original[..original.len() / 2]).unwrap();
+        assert!(verify_archive(&good, &dir).is_err());
+        // An intact older committed archive remains eligible after rejecting
+        // the failed readbacks; no generation is relabelled or repaired.
+        fs::write(&archive, original).unwrap();
+        verify_archive(&good, &dir).unwrap();
+        fs::remove_dir_all(dir).unwrap();
+    }
+    #[test]
     fn runtime_class_requires_all_fields_and_exact_container_runtime() {
         let good = json!({"status":{"nodeInfo":{"kernelVersion":"kernel1","containerRuntimeVersion":"containerd://2.3.5","osImage":"AL2023","architecture":"amd64"}}});
         let class = node_runtime(&good).unwrap();
