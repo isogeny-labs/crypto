@@ -183,8 +183,11 @@ candidate is a GLS curve: twisting a base-field curve over `F_{p²}`
 gives a transported `p`-Frobenius endomorphism. On a suitable large
 prime-order subgroup its square acts as `[-1]`, so a stable factor base
 may be quotiented by its orbits. The cited GLS paper establishes this
-sort of gain for an associated Weil-descent Jacobian; we did not measure
-the elliptic-curve relation pipeline here.
+sort of gain for an associated Weil-descent Jacobian. We subsequently
+measured an exact toy elliptic-curve relation pipeline on three GLS twists
+in [the GLS symmetry study](GLS_SYMMETRY_REPORT.md). It verifies orbit
+column folding and one-target solves, while leaving polynomial-system
+solving and a calibrated full-cost speed claim open.
 
 For the `d*y²=f(x)` model used here, the twist isomorphism preserves `x`;
 its Semaev polynomial in these coordinates is the *same polynomial*.
