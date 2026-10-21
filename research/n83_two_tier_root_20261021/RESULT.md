@@ -53,6 +53,12 @@ performance and single-target online performance remain unresolved.
 
 ## Frozen receipts
 
+The source-linked [run report](RUN.md), [run PDF](RUN.pdf),
+[result PDF](RESULT.pdf), and [editable index-build chart](index_build.svg)
+summarize the four paired stage controls. The matching
+[PNG render](index_build.png) and all PDFs are reproduced by
+[render_report.py](render_report.py) from the committed raw receipts.
+
 - [First-order raw inputs and results](runs/k128_a/input.json) and
   [result](runs/k128_a/result.json): result SHA-256
   `94b656624a08b3e22a08a3b669cbd464bcc65aaada416b2d3f81cb13070cfe5c`.
