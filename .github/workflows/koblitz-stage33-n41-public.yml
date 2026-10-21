@@ -24,7 +24,7 @@ jobs:
         run: |
           python3 -m py_compile scripts/run_koblitz_stage33_n41_unknown_scalar.py
           python3 scripts/run_koblitz_stage33_n41_unknown_scalar.py self-test
-          cp research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock Cargo.lock
+          test -f research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock
           RUSTFLAGS=-Awarnings cargo test --locked --test ic_framework \
             workflow_runs_in_stages_and_resumes_without_redoing_work -- --exact
           rm Cargo.lock
@@ -52,7 +52,7 @@ jobs:
           mkdir "$RUNNER_TEMP/stage33-archive"
           tar -xzf research/sat_factor_base_review_20260908/continuation-05-sota-gates/koblitz-stage33-n41-public-evidence-34653116265.tar.gz \
             -C "$RUNNER_TEMP/stage33-archive"
-          cp research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock Cargo.lock
+          test -f research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock
           RUSTFLAGS=-Awarnings cargo build --release --locked --bin ic
           cp -R "$RUNNER_TEMP/stage33-archive/koblitz-stage33-n41-public-34653116265/stage33-run/workflow" \
             "$RUNNER_TEMP/stage33-replay"

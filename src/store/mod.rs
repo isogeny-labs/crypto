@@ -437,7 +437,7 @@ impl Store {
                 false
             }
             None => {
-                remote.put(&key, file, &sha256)?;
+                let created = remote.put(&key, file, &sha256)?;
                 let after = remote
                     .head(&key)?
                     .ok_or_else(|| format!("{key}: absent from the remote right after upload"))?;
@@ -453,7 +453,7 @@ impl Store {
                         after.sha256
                     ));
                 }
-                true
+                created
             }
         };
         let mut cached = false;

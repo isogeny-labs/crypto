@@ -97,7 +97,7 @@ pub(super) fn transport(
         return Err("route root curve differs from the supplied curve".into());
     }
     let order = super::count_curve_order(args.p, args.a, args.b);
-    if order % args.n != 0 {
+    if !order.is_multiple_of(args.n) {
         return Err("supplied subgroup order does not divide the counted curve order".into());
     }
     let cofactor = order / args.n;

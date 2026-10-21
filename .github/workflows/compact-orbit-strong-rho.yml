@@ -38,6 +38,7 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            Cargo.lock
             Cargo.toml
             tools/volcano-cli/
             isogeny_algos/
@@ -51,7 +52,7 @@ jobs:
             research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
             research/notes/ecc2k130/compact_orbit_point_panel_20260929/test_point_mode.py
       - uses: Swatinem/rust-cache@v2
-      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
+      - run: test -f research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
       - run: cargo build --release --locked --example koblitz_rho_batch_ks_v3
       - run: cargo test --release --locked --example koblitz_rho_batch_ks_v3
       - run: python3 research/notes/ecc2k130/compact_orbit_point_panel_20260929/test_point_mode.py target/release/examples/koblitz_rho_batch_ks_v3
@@ -69,6 +70,7 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            Cargo.lock
             Cargo.toml
             tools/volcano-cli/
             isogeny_algos/
@@ -90,7 +92,7 @@ jobs:
             research/notes/ecc2k130/compact_orbit_strong_rho_20260929
             .github/workflows/compact-orbit-strong-rho.yml
       - uses: Swatinem/rust-cache@v2
-      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
+      - run: test -f research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
       - run: cargo build --release --locked --example koblitz_rho_batch_ks_v2_n61 --example koblitz_rho_batch_ks_v3 --example koblitz_orbit_dlp_fast
       - name: Run four alternating cold arms on the same public points
         if: github.event_name != 'pull_request'

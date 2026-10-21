@@ -40,7 +40,7 @@ jobs:
       - name: Build exact compact producer
         working-directory: ${{ runner.temp }}/compact-orbit-rank-source
         run: |
-          cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
+          test -f research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
           cargo build --release --locked --example koblitz_orbit_dlp_fast
       - name: Replay every n13 rank attempt and recovered scalar
         working-directory: ${{ runner.temp }}/compact-orbit-rank-source

@@ -111,7 +111,7 @@ pub fn solve(args: &PrimeArgs) -> Result<Value, String> {
         return Err("singular curve: discriminant is zero modulo p".into());
     }
     let curve_order = count_curve_order(args.p, args.a, args.b);
-    if curve_order % args.n != 0 {
+    if !curve_order.is_multiple_of(args.n) {
         return Err("subgroup order does not divide the counted curve order".into());
     }
     let curve = CurveParams {

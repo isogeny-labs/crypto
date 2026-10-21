@@ -3608,7 +3608,10 @@ pub fn run_gaudry_opts(
     let curve = &inst.curve;
     let n = curve.n;
     let h = opts.cofactor;
-    assert!(h > 0 && h % n != 0, "cofactor must be invertible modulo n");
+    assert!(
+        h > 0 && !h.is_multiple_of(n),
+        "cofactor must be invertible modulo n"
+    );
     let mut rng = StdRng::seed_from_u64(seed ^ 0x9A0D);
     curve.reset();
     let start = Instant::now();

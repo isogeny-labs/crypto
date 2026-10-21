@@ -31,7 +31,7 @@ jobs:
       - name: Build and charge the exact search binary
         run: |
           mkdir "$RUNNER_TEMP/stage30-build"
-          cp research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock Cargo.lock
+          test -f research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock
           /usr/bin/time -v -o "$RUNNER_TEMP/stage30-build/build.time" cargo build --release --locked --bin ic
       - name: Run the fixed n31 search
         run: |

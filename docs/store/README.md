@@ -106,17 +106,21 @@ Transport is the AWS CLI, as in `ecc2k-merge` and `isogeny_walk::store`, so
 credentials, regions, SSO and retries are the CLI's and this crate links no
 HTTP stack. Uploads follow the `isogeny_walk::store` conventions:
 
-* **Write-once.** `put-object --if-none-match '*'`: an existing key is never
-  overwritten. If a concurrent writer stored the key first, the store accepts
-  it only after checking the size and digest match.
+* **Write-once.** Single PUT and multipart completion use
+  `--if-none-match '*'`. A concurrent writer's object is accepted only after
+  checking its size and recorded digest; the push report says whether this
+  invocation created the object.
 * **Checked on arrival.** The upload declares `--checksum-sha256`, which S3
   verifies against the bytes it receives, and the reply's checksum is
   compared again.
-* **Large objects.** Past 4 GiB a single PUT is not possible, so the upload
-  is multipart through `aws s3 cp`, with the digest in user metadata. S3
-  can return a composite SHA-256 for multipart HEAD requests, so the store
-  uses its recorded full-object digest metadata for HEAD comparisons. The
-  byte-level guarantee for those objects rests on the hash taken on download.
+* **Large objects.** Past 4 GiB, the store uses explicit multipart creation,
+  SHA-256 checked parts, and conditional completion. It hashes the entire
+  source during upload and aborts an incomplete upload on failure. The full
+  digest travels as user metadata because S3's multipart SHA-256 is
+  composite. A fresh download is hashed against the index before caching.
+  `CRYPTO_STORE_MULTIPART_THRESHOLD_BYTES` and
+  `CRYPTO_STORE_MULTIPART_PART_BYTES` can lower the threshold and part size
+  for bounded acceptance runs; defaults are 4 GiB and 64 MiB.
 * **Checked on download.** Every object is hashed as it enters the cache, and
   a mismatch is discarded.
 
@@ -125,10 +129,12 @@ matching HEAD response is an existence and metadata check; a missing digest
 is reported as a mismatch. `push` likewise refuses to accept an existing
 object without the indexed digest. Use `store pull` into a fresh cache to
 hash the downloaded bytes against the index. The file-backed remote hashes
-its bytes directly for HEAD and remote verification.
+its bytes directly for HEAD and remote verification, and creates
+content-addressed keys atomically.
 
-The IAM permissions needed are `s3:GetObject`, `s3:PutObject` and
-`s3:ListBucket` on the bucket and prefix. S3 answers `403` rather than `404`
+The IAM permissions needed are `s3:GetObject`, `s3:PutObject`,
+`s3:AbortMultipartUpload`, and `s3:ListBucket` on the bucket and prefix.
+S3 answers `403` rather than `404`
 for an absent key when `s3:ListBucket` is missing; the error says so.
 
 ## Naming
@@ -213,13 +219,16 @@ reproduces the bytes with `crypto store pull sha256:<digest>`.
 
 ## What this does not do
 
-* **Live S3 scope is small artifacts.** The argument vectors are unit-tested,
-  and the whole flow also runs through a stand-in `aws` that models 404s,
-  `If-None-Match` and checksum rejection (`tests/store_cli.rs`). A 79-byte
-  single-PUT round trip and a three-file isogeny-walk publish/fetch on
-  `setec-astronomy-artifacts` passed; the receipts above record the exact
-  keys, checksums, fresh downloads and cleanup.
-  Multipart upload and large-object recovery remain unverified on live S3.
+* **Live S3 scope is bounded.** The single-PUT and isogeny-walk receipts
+  above record their keys and cleanup. A 9 MiB object exercised the same
+  explicit conditional multipart path selected for files above 4 GiB,
+  using the threshold and part-size overrides. Its two checked parts,
+  conditional completion, composite HEAD, remote verification, fresh
+  download, and cleanup passed. Competing-writer runs rejected different
+  bytes and accepted a checksum-declared matching object. The receipt is
+  [`CONDITIONAL_MULTIPART_S3_ACCEPTANCE_20261020.json`](CONDITIONAL_MULTIPART_S3_ACCEPTANCE_20261020.json).
+  An actual file above 4 GiB and interrupted-upload recovery have not had
+  live acceptance runs.
 * **No migration of existing large files.** Files already in Git history stay
   there; moving them out is a separate, history-visible decision.
 * **No remote deletion, versioning policy or lifecycle rules.** Those belong

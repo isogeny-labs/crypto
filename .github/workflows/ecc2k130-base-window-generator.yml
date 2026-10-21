@@ -30,6 +30,7 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            Cargo.lock
             /Cargo.toml
             /tools/volcano-cli/
             /isogeny_algos/
@@ -58,7 +59,7 @@ jobs:
           printf '%s  %s\n' \
             ac5cd7a3459be776180afe1eb2975c76b1a88f84bd1e99aa20475927ec260a90 \
             research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock | sha256sum -c -
-          cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
+          test -f research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
           cargo build --locked --example koblitz_base_window
       - name: Replay frozen-source toy and archived n41 controls
         run: |

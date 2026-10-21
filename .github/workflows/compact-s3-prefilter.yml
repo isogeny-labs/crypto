@@ -33,6 +33,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            Cargo.lock
             Cargo.toml
             tools/volcano-cli/
             isogeny_algos/
@@ -74,7 +75,7 @@ jobs:
         run: |
           python3 -m py_compile research/notes/ecc2k130/compact_s3_prefilter_20260930/*.py
           python3 -c 'import sys; sys.path.insert(0, "research/notes/ecc2k130/compact_s3_prefilter_20260930"); from verify_panel import freeze; freeze()'
-      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
+      - run: test -f research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
         working-directory: ${{ runner.temp }}/s3-prefilter-frozen-src
       - name: Build and test the exact evaluation source
         working-directory: ${{ runner.temp }}/s3-prefilter-frozen-src

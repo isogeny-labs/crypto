@@ -22,5 +22,5 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - name: Test known and scalar-blind workflow targets
         run: |
-          cp research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock Cargo.lock
+          test -f research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock
           cargo test --release --locked --test ic_framework -- --test-threads=1

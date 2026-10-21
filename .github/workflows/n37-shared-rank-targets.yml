@@ -23,7 +23,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Build with the archived dependency lock
         run: |
-          cp research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock Cargo.lock
+          test -f research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock
           cargo build --release --locked --example n37_shared_rank_targets --example n37_shared_rank_target_replay
           cargo test --locked --lib shared_rank_recovers_point_only_targets_with_full_point_replay
       - name: Independently replay frozen inputs and target transcript

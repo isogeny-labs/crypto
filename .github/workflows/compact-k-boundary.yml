@@ -40,6 +40,7 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            Cargo.lock
             Cargo.toml
             tools/volcano-cli/
             isogeny_algos/
@@ -60,7 +61,7 @@ jobs:
             research/notes/ecc2k130/compact_k_boundary_20260929
             .github/workflows/compact-k-boundary.yml
       - uses: Swatinem/rust-cache@v2
-      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
+      - run: test -f research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
       - run: cargo build --release --locked --example koblitz_rho_batch_ks_v3 --example koblitz_orbit_dlp_fast
       - name: Run five balanced cold arms on the same public points
         if: github.event_name != 'pull_request'

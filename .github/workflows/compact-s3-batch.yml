@@ -34,6 +34,7 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            Cargo.lock
             Cargo.toml
             tools/volcano-cli/
             isogeny_algos/
@@ -66,7 +67,7 @@ jobs:
           cargo run --release --locked --quiet --manifest-path research/notes/ecc2k130/compact_frozen_source_replay_20260929/frozen-materialize/Cargo.toml -- materialize \
             --freeze research/notes/ecc2k130/compact_s3_batch_20260929/FROZEN.json \
             --dest "${{ runner.temp }}/frozen-src"
-      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
+      - run: test -f research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
         working-directory: ${{ runner.temp }}/frozen-src
       - run: cargo build --release --locked --example koblitz_rho_batch_ks_v3 --example koblitz_orbit_dlp_s3_batch
         working-directory: ${{ runner.temp }}/frozen-src

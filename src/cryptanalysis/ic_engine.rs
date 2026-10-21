@@ -23,7 +23,7 @@ use crate::cryptanalysis::matmul_exponent::{
 };
 
 /// Largest subgroup-order bit length demonstrated with the framework
-/// (a 48-bit subgroup of `K_0/F_{2^61}`; see `docs/ic/runs/`). This does not
+/// (a 48-bit subgroup of `icv1-f2m61-t158598901-ab42b6c5`; see `docs/ic/runs/`). This does not
 /// enable named-curve execution in `icx run`, which always uses an analogue.
 pub const ATTACK_ENVELOPE_BITS: u64 = 48;
 

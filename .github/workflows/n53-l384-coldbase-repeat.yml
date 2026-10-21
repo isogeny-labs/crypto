@@ -106,8 +106,8 @@ jobs:
           test ! -e research/sat_factor_base_review_20260908/autolab_combined_l384_coldbase_n53_20260925/evidence/archive_manifest.json
       - name: Build both frozen producers
         run: |
-          cp research/sat_factor_base_review_20260908/autolab_combined_l384_coldbase_n53_20260925/Cargo.lock Cargo.lock
-          test "$(sha256sum Cargo.lock | cut -d' ' -f1)" = "$(sha256sum research/sat_factor_base_review_20260908/autolab_combined_l384_coldbase_n53_20260925/Cargo.lock | cut -d' ' -f1)"
+          test -f research/sat_factor_base_review_20260908/autolab_combined_l384_coldbase_n53_20260925/Cargo.lock
+          test "$(sha256sum research/sat_factor_base_review_20260908/autolab_combined_l384_coldbase_n53_20260925/Cargo.lock | cut -d' ' -f1)" = ac5cd7a3459be776180afe1eb2975c76b1a88f84bd1e99aa20475927ec260a90
           rustc --version | grep '^rustc 1.93.1 '
           cargo --version | grep '^cargo 1.93.1 '
           cargo build --locked --release --example koblitz_s5_sat_instance --example koblitz_rho_batch_ks

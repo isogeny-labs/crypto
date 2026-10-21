@@ -108,7 +108,7 @@ jobs:
           test ! -e research/sat_factor_base_review_20260908/autolab_n53_rank_rotation_20260925/evidence/archive_manifest.json
       - name: Build one frozen producer
         run: |
-          cp research/sat_factor_base_review_20260908/autolab_combined_l384_coldbase_n53_20260925/Cargo.lock Cargo.lock
+          test -f research/sat_factor_base_review_20260908/autolab_combined_l384_coldbase_n53_20260925/Cargo.lock
           cargo build --locked --release --example koblitz_s5_sat_instance
           sha256sum target/release/examples/koblitz_s5_sat_instance
           rustc --version

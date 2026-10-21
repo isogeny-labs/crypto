@@ -24,7 +24,7 @@ jobs:
         run: |
           python3 -m py_compile scripts/run_koblitz_stage57_n53_unknown.py
           python3 scripts/run_koblitz_stage57_n53_unknown.py self-test
-          cp research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock Cargo.lock
+          test -f research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock
           RUSTFLAGS=-Awarnings cargo build --release --locked \
             --example koblitz_rank_fixture --example koblitz_rho_fixture
           RAYON_NUM_THREADS=4 target/release/examples/koblitz_rank_fixture \

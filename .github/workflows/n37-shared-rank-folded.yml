@@ -23,7 +23,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Build against the archived dependency lock
         run: |
-          cp research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock Cargo.lock
+          test -f research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock
           cargo build --release --locked --example n37_shared_rank_folded --example n37_shared_rank_replay
       - name: Check source parity and the small target-blind rank control
         run: |

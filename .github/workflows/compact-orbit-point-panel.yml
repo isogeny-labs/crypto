@@ -37,6 +37,7 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            Cargo.lock
             Cargo.toml
             tools/volcano-cli/
             isogeny_algos/
@@ -50,7 +51,7 @@ jobs:
             research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
             research/notes/ecc2k130/compact_orbit_point_panel_20260929/test_point_mode.py
       - uses: Swatinem/rust-cache@v2
-      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
+      - run: test -f research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
       - run: cargo build --release --locked --example koblitz_rho_batch_ks_v2_n61
       - run: cargo test --release --locked --example koblitz_rho_batch_ks_v2_n61
       - run: python3 research/notes/ecc2k130/compact_orbit_point_panel_20260929/test_point_mode.py target/release/examples/koblitz_rho_batch_ks_v2_n61
@@ -68,6 +69,7 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            Cargo.lock
             Cargo.toml
             tools/volcano-cli/
             isogeny_algos/
@@ -85,7 +87,7 @@ jobs:
             research/notes/ecc2k130/compact_orbit_point_panel_20260929
             .github/workflows/compact-orbit-point-panel.yml
       - uses: Swatinem/rust-cache@v2
-      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
+      - run: test -f research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
       - run: cargo build --release --locked --example koblitz_rho_batch_ks_v2_n61 --example koblitz_orbit_dlp_fast
       - name: Run five alternating cold pairs and disjoint L1 tuning
         if: github.event_name != 'pull_request'
@@ -125,6 +127,7 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            Cargo.lock
             Cargo.toml
             tools/volcano-cli/
             isogeny_algos/
@@ -142,7 +145,7 @@ jobs:
             research/notes/ecc2k130/compact_orbit_point_panel_20260929
             .github/workflows/compact-orbit-point-panel.yml
       - uses: Swatinem/rust-cache@v2
-      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
+      - run: test -f research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
       - run: cp research/notes/ecc2k130/compact_orbit_point_panel_20260929/rho_baseline_0839.rs examples/koblitz_rho_backend_baseline.rs
       - run: cargo build --release --locked --example koblitz_rho_backend_baseline --example koblitz_rho_batch_ks_v2_n61
       - name: Pair frozen baseline and corrected rho backend
