@@ -182,6 +182,7 @@ result_unit_err = "allow"
 chunks_exact_to_as_chunks = "allow"
 
 [dependencies]
+factor-base = { path = "tools/factor-base" }
 volcano-cli = { path = "tools/volcano-cli" }
 # Durable per-vertex IC campaign checkpoints; matches volcano-cli's backend.
 rusqlite = { version = "0.32", features = ["bundled"] }

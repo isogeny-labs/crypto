@@ -4,6 +4,8 @@ on:
     paths:
       - "src/bin/ic.rs"
       - "src/bin/ic/**"
+      - "src/cryptanalysis/ic_framework/**"
+      - "tools/factor-base/**"
       - "tests/ic_*.rs"
       - "Cargo.toml"
       - "docs/ic/**"
@@ -31,6 +33,8 @@ jobs:
         run: cargo build --release --bin ic
       - name: Parameter and synthetic pipeline checks
         run: cargo test --release --test ic_framework --test ic_progress
+      - name: Archive import, row replay and frozen protocol checks
+        run: cargo test --release --lib ic_framework::archive::tests
       - name: Inspect supplied example documents
         run: |
           target/release/ic inspect --file docs/ic/prime-example.json --json

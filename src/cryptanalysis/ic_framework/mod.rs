@@ -62,6 +62,7 @@
 //! worked example of adding a solver, how to run a sweep, and how to
 //! report what comes out.
 
+pub mod archive;
 pub mod cm_orbit;
 pub mod fiber;
 pub mod large_prime;
@@ -73,6 +74,7 @@ pub mod rootfind;
 pub mod shared_rank;
 pub mod solvers;
 pub mod stages;
+pub mod useful_rank;
 
 use std::time::Instant;
 
@@ -235,6 +237,11 @@ pub struct RunReport {
     pub factor_base: FactorBaseReport,
     pub decomposition: DecompositionReport,
     pub linear_algebra: LinearAlgebraReport,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub useful_rank: Option<useful_rank::RankAudit>,
+    /// Missing prices prevent total-cost or speedup admission.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cost_qualification: Option<String>,
     pub verify: PhaseCost,
     /// The recovered logarithm, and whether it is the planted one.
     pub recovered: Option<u64>,
@@ -343,6 +350,27 @@ pub fn run_pipeline<G: CountedGroup>(
     let mut fb_ops = GroupOps::default();
     let fb_started = Instant::now();
     let fb = base_builder.build(ctx, &spec.factor_base_params, &mut fb_ops)?;
+    let archive_import = base_builder.name() == "archive";
+    let audit_enabled = archive_import || spec.oracle_params.flag("audit_rank");
+    if audit_enabled && (fb.columns == 0 || fb.columns > 4096) {
+        return Err("rank audit requires 1..4096 columns".into());
+    }
+    let linalg_name = if spec.linalg.is_empty() {
+        "incremental-gauss"
+    } else {
+        spec.linalg.as_str()
+    };
+    if audit_enabled
+        && !matches!(
+            linalg_name,
+            "incremental-gauss"
+                | "incremental-gauss-full-rank"
+                | "incremental-gauss-full-rank-checked"
+                | "structured-gauss"
+        )
+    {
+        return Err("rank audit requires an incremental Gaussian solver".into());
+    }
     let mut fb_cost = fb.cost.clone();
     fb_cost.group_ops.merge(fb_ops);
     fb_cost.wall_ns = fb_cost.wall_ns.max(fb_started.elapsed().as_nanos() as u64);
@@ -368,12 +396,21 @@ pub fn run_pipeline<G: CountedGroup>(
     // the collision guards and the verification are the audited ones,
     // so a framework row is comparable with a ledger row rather than
     // merely similar to it.
-    let linalg_name = if spec.linalg.is_empty() {
-        "incremental-gauss"
+    let mut plain = Some(matrix_by_name(linalg_name, fb.columns + 1, ctx.r)?);
+    let mut audited = if audit_enabled {
+        Some(useful_rank::AuditedMatrix::new(
+            ctx,
+            &fb,
+            plain.take().unwrap(),
+        )?)
     } else {
-        spec.linalg.as_str()
+        None
     };
-    let mut matrix: Box<dyn RelationSolver> = matrix_by_name(linalg_name, fb.columns + 1, ctx.r)?;
+    let matrix: &mut dyn RelationSolver = if let Some(m) = &mut audited {
+        m
+    } else {
+        plain.as_mut().unwrap().as_mut()
+    };
     let source = match spec.targets {
         Targets::Random => TargetSource::Random,
         Targets::Stride => TargetSource::Stride,
@@ -441,7 +478,7 @@ pub fn run_pipeline<G: CountedGroup>(
             &fb,
             spec.seed,
             spec.max_trials,
-            matrix.as_mut(),
+            matrix,
         )
     } else {
         // `decompose_relations` is `decompose` for every oracle without
@@ -459,7 +496,7 @@ pub fn run_pipeline<G: CountedGroup>(
             spec.max_trials,
             source,
             RestartPool::Lazy,
-            matrix.as_mut(),
+            matrix,
             completion,
             |ops, counters, point, a, b| {
                 oracle.decompose_relations(ctx, &fb, ops, counters, point, a, b)
@@ -474,10 +511,26 @@ pub fn run_pipeline<G: CountedGroup>(
     // verified full-rank solution solely from the target-point check.
     if checked_full_rank && outcome.verified {
         measurement::mark(measurement::Phase::RecoveryCheck);
-        outcome.verified =
-            check_full_rank_base_columns(ctx, &fb, matrix.as_ref(), &mut outcome.verify);
+        outcome.verified = check_full_rank_base_columns(ctx, &fb, matrix, &mut outcome.verify);
     }
     measurement::end_online();
+    let (work, work_unit) = matrix.work();
+    let useful_rank = audited.map(|audit| {
+        outcome.linear_algebra.group_ops.merge(audit.cost.group_ops);
+        for (name, value) in audit.cost.native {
+            outcome.linear_algebra.count(&name, value);
+        }
+        outcome.linear_algebra.wall_ns += audit.setup_ns;
+        outcome.verified &= audit.audit.invalid_rows == 0;
+        audit.audit
+    });
+    let cost_qualification = audit_enabled.then(|| {
+        if archive_import {
+            "partial_counted_cost: archive creation, transfer, hashing, recipe replay, indexing and rank normalization are unpriced; total-cost and speedup unknown".to_string()
+        } else {
+            "partial_counted_cost: rank normalization is unpriced; total-cost and speedup unknown".to_string()
+        }
+    });
 
     // ── The report ─────────────────────────────────────────────────
     let mut fb_phase = fb_cost;
@@ -575,8 +628,6 @@ pub fn run_pipeline<G: CountedGroup>(
     let sqrt_r = (ctx.r as f64).sqrt();
     let s = total_gae / sqrt_r;
 
-    let (work, work_unit) = matrix.work();
-
     Ok(RunReport {
         instance: ctx.name.clone(),
         log2_r: (ctx.r as f64).log2(),
@@ -615,13 +666,17 @@ pub fn run_pipeline<G: CountedGroup>(
             work_unit: work_unit.into(),
             cost: la,
         },
+        useful_rank,
+        cost_qualification: cost_qualification.clone(),
         verify: ver,
         recovered: outcome.recovered,
         verified: outcome.verified && outcome.recovered == Some(planted),
         total_gae,
         s,
         rho_s,
-        s_over_rho: rho_s.map(|rho| s / rho),
+        s_over_rho: rho_s
+            .filter(|_| cost_qualification.is_none())
+            .map(|rho| s / rho),
         wall_seconds: started.elapsed().as_secs_f64(),
         exhausted: outcome.recovered.is_none(),
     })
@@ -630,6 +685,9 @@ pub fn run_pipeline<G: CountedGroup>(
 /// The table a sweep prints.
 pub fn format_markdown(rows: &[RunReport]) -> String {
     let mut out = String::new();
+    if rows.iter().any(|r| r.cost_qualification.is_some()) {
+        out.push_str("Archive/rank-audit rows report partial counted cost only. Original generation/transfer and unpriced work prevent total-cost or speedup claims.\n\n");
+    }
     out.push_str(
         "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n",
     );

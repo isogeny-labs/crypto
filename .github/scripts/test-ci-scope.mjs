@@ -224,3 +224,12 @@ test('external Rust path modules and includes are followed recursively', () => {
     }
   } finally { rmSync(cwd, { recursive: true, force: true }); }
 });
+
+test('shared factor-base crate selects root compilation and release checks', () => {
+  for (const file of ['tools/factor-base/Cargo.toml', 'tools/factor-base/src/lib.rs', 'tools/factor-base/src/store.rs']) {
+    const scope = classify([file]);
+    assert.equal(scope.rust_root, true, file);
+    assert.equal(scope.release_rust, true, file);
+    assert.equal(scope.ecbench_replay, true, file);
+  }
+});

@@ -15,6 +15,9 @@
 //! See `docs/ic/FRAMEWORK.md`.
 
 use clap::Args;
+use crypto_lib::cryptanalysis::ic_framework::archive::{
+    self, ArchiveInstance, BinaryArchiveBase, PrimeArchiveBase,
+};
 use serde_json::{json, Value};
 
 use crypto_lib::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFamily};
@@ -47,6 +50,15 @@ pub struct BenchArgs {
     /// each plug-in reads, and exit.
     #[arg(long)]
     pub list: bool,
+    /// Verified local factory cache (populate with factor-base fetch).
+    #[arg(long, requires = "archive_manifest", conflicts_with_all = ["bits", "char2_degree", "koblitz_degree", "sweep", "model_b", "koblitz_a"])]
+    pub archive_store: Option<std::path::PathBuf>,
+    /// Content-addressed manifest: supplies the exact curve and generator.
+    #[arg(long, requires = "archive_store")]
+    pub archive_manifest: Option<String>,
+    /// Verify every relation and retain useful-rank receipts (automatic for archives).
+    #[arg(long)]
+    pub audit_rank: bool,
     /// Prime-field instance of this subgroup bit length.
     #[arg(long)]
     pub bits: Option<u32>,
@@ -224,6 +236,8 @@ fn listing() -> Value {
                 "trait": "FactorBaseBuilder",
                 "what_it_chooses": "which points relations are written over, and which unknown each point contributes to",
                 "plugins": [
+                    {"name": "archive", "regimes": ["prime", "char2", "koblitz"],
+                     "parameters": [{"name": "store", "means": "local verified factory cache"}, {"name": "manifest", "means": "immutable SHA-256 manifest"}]},
                     {"name": "prime-abscissa", "regimes": ["prime"],
                      "parameters": [{"name": "size", "means": "abscissae in the base; the family optimum is about #E^(1/3)"}]},
                     {"name": "glv-orbit", "regimes": ["prime"],
@@ -531,7 +545,9 @@ fn run_prime(
     let or_name = spec.oracle.as_str();
     let abscissa = PrimeAbscissaBase { instance: inst };
     let orbit = GlvOrbitBase { instance: inst };
+    let archive = PrimeArchiveBase { instance: inst };
     let base: &dyn FactorBaseBuilder<_> = match fb_name {
+        "archive" => &archive,
         "prime-abscissa" => &abscissa,
         "glv-orbit" => &orbit,
         other => {
@@ -589,6 +605,7 @@ fn run_binary(
     let fb_name = spec.factor_base.as_str();
     let or_name = spec.oracle.as_str();
     let g = BinaryGroup(&inst.fast);
+    let archive = BinaryArchiveBase { instance: inst };
     let subspace = BinarySubspaceBase { instance: inst };
     let orbit = KoblitzOrbitBase { instance: inst };
     let trace_zero = KoblitzTraceZeroBase { instance: inst };
@@ -596,6 +613,7 @@ fn run_binary(
     let compact_orbit = CompactOrbitScanBase { instance: inst };
     let closure = KoblitzClosureBase { instance: inst };
     let base: &dyn FactorBaseBuilder<BinaryGroup> = match fb_name {
+        "archive" => &archive,
         "koblitz-closure" => &closure,
         "binary-subspace" => &subspace,
         "koblitz-orbit" => &orbit,
@@ -760,6 +778,7 @@ fn spec_from(
         .get("factor_base")
         .cloned()
         .or_else(|| defaults.factor_base.clone())
+        .or_else(|| defaults.archive_manifest.as_ref().map(|_| "archive".into()))
         .ok_or("a configuration needs a `factor_base`")?;
     let or = cfg
         .get("oracle")
@@ -770,8 +789,17 @@ fn spec_from(
         .get("targets")
         .cloned()
         .unwrap_or_else(|| defaults.targets.clone());
-    let (fb_name, fb_params) = parse_plugin(&fb)?;
+    let (fb_name, mut fb_params) = parse_plugin(&fb)?;
     let (or_name, mut or_params) = parse_plugin(&or)?;
+    if fb_name == "archive" {
+        if let (Some(root), Some(id)) = (&defaults.archive_store, &defaults.archive_manifest) {
+            fb_params.set("store", root.to_string_lossy().into_owned());
+            fb_params.set("manifest", id.clone());
+        }
+    }
+    if defaults.audit_rank {
+        or_params.set("audit_rank", "true");
+    }
     // The large-prime flags are defaults for the Frobenius table oracle;
     // a configuration that names them itself wins.
     if or_name == "mitm-frobenius" {
@@ -864,14 +892,15 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             )
         }
         None => {
-            let (regime, degree) = match (args.bits, args.char2_degree, args.koblitz_degree) {
-                (Some(b), None, None) => ("prime".to_string(), b),
-                (None, Some(n), None) => ("char2".to_string(), n),
-                (None, None, Some(n)) => ("koblitz".to_string(), n),
-                _ => return Err(
-                    "choose exactly one of --bits, --char2-degree, --koblitz-degree, or --sweep"
-                        .into(),
-                ),
+            let (regime, degree) = if args.archive_manifest.is_some() {
+                ("archive".to_string(), 0)
+            } else {
+                match (args.bits, args.char2_degree, args.koblitz_degree) {
+                    (Some(b), None, None) => ("prime".to_string(), b),
+                    (None, Some(n), None) => ("char2".to_string(), n),
+                    (None, None, Some(n)) => ("koblitz".to_string(), n),
+                    _ => return Err("choose exactly one curve source (see ic bench --help)".into()),
+                }
             };
             let mut one = std::collections::BTreeMap::new();
             if let Some(v) = &args.factor_base {
@@ -903,8 +932,16 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         .map(|cfg| spec_from(cfg, &args))
         .collect::<Result<Vec<_>, _>>()?;
 
-    let (regime, degree) = instance_spec;
+    let (mut regime, degree) = instance_spec;
     let instance = match regime.as_str() {
+        "archive" => {
+            let root = args.archive_store.as_deref().ok_or("archive store required")?;
+            let id = args.archive_manifest.as_deref().ok_or("archive manifest required")?;
+            match archive::instance(root, id)? {
+                ArchiveInstance::Prime(i) => Instance::Prime(i),
+                ArchiveInstance::Binary(i) => Instance::Binary(*i),
+            }
+        }
         "prime" => Instance::Prime(match CmFamily::parse(&args.family)? {
             CmFamily::Generic => roster_prime_instance(degree)
                 .ok_or_else(|| format!("no prime instance at {degree} bits"))?,
@@ -938,6 +975,13 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         }
     };
 
+    if regime == "archive" {
+        regime = match &instance {
+            Instance::Prime(_) => "prime",
+            Instance::Binary(_) => "char2",
+        }
+        .into();
+    }
     let (calib, pins) = match &instance {
         Instance::Prime(i) => {
             calibration_for(&i.curve, &sample_prime_points(i), "prime", &i.name, i.r)
@@ -1013,7 +1057,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             .map_err(|e| format!("cannot create {}: {e}", path.display()))?;
         serde_json::to_writer_pretty(file, &doc).map_err(|e| e.to_string())?;
     }
-    let all_verified = !rows.is_empty() && rows.iter().all(|r| r.verified);
+    let all_verified = failures.is_empty() && !rows.is_empty() && rows.iter().all(|r| r.verified);
     let markdown = format_markdown(&rows);
     if !json_only {
         eprintln!("\n{markdown}");
@@ -1025,9 +1069,10 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         "schema_version": 1,
         "operation": "bench",
         "status": if all_verified { "complete" } else { "incomplete" },
-        "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with every stage's cost in group-addition equivalents and the total divided by sqrt(r).",
+        "cost_qualification": rows.iter().find_map(|r| r.cost_qualification.as_ref()),
+        "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
         "what_this_is_not": [
-            "not a speed claim: a configuration on a toy instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+            "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
             "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
             "not a claim about any deployed curve"
         ],
@@ -1065,6 +1110,40 @@ mod tests {
 
     fn bench_args(flags: &[&str]) -> BenchArgs {
         Cli::parse_from(std::iter::once("ic-bench").chain(flags.iter().copied())).bench
+    }
+
+    #[test]
+    fn archive_flags_bind_instance_and_base_without_parsing_the_path_as_a_plugin() {
+        let args = bench_args(&[
+            "--archive-store",
+            "/tmp/cache,with spaces",
+            "--archive-manifest",
+            "abc",
+            "--oracle",
+            "subtract",
+        ]);
+        let spec = spec_from(&Default::default(), &args).unwrap();
+        assert_eq!(spec.factor_base, "archive");
+        assert_eq!(
+            spec.factor_base_params.get("store"),
+            Some("/tmp/cache,with spaces")
+        );
+        assert_eq!(spec.factor_base_params.get("manifest"), Some("abc"));
+    }
+
+    #[test]
+    fn archive_flags_require_a_pair_and_reject_generated_instance_flags() {
+        assert!(Cli::try_parse_from(["ic-bench", "--archive-manifest", "abc"]).is_err());
+        assert!(Cli::try_parse_from([
+            "ic-bench",
+            "--archive-store",
+            "/tmp/cache",
+            "--archive-manifest",
+            "abc",
+            "--bits",
+            "16"
+        ])
+        .is_err());
     }
 
     /// `--model-b` without `--koblitz-a` is refused when the instance is

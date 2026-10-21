@@ -23,6 +23,7 @@ on:
       - 'ecc2k130/Makefile'
       - 'tools/isogeny-cli/**'
       - 'tools/volcano-cli/**'
+      - 'tools/factor-base/**'
       - 'isogeny_algos/**'
       - 'research/p192_p224_large_degree_isogenies_20261009/**'
       - 'docs/curves/registry.json'
@@ -148,6 +149,7 @@ jobs:
           sparse-checkout: |
             /Cargo.toml
             /tools/volcano-cli/
+            /tools/factor-base/
             /isogeny_algos/
             /Cargo.lock
             /.gitattributes
