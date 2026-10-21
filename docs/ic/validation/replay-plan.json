@@ -3,7 +3,7 @@
  "note": "Sessions whose counters the leaderboard cites, replayed by .github/workflows/ic-leaderboard-replay.yml with `ecbench verify`.  `expect` is what a replay on current main must show: `identical` (every replay reproduces) or `drift` (some replay differs, with the reason and the evidence).  The workflow fails when an `identical` session drifts (new drift), when a `drift` session becomes identical (a stale entry), and when a cited session is missing from this file.  `replay` is `all` or a number of measured runs.",
  "sessions": [
   {"dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n13", "replay": "all", "expect": "drift",
-   "reason": "inherited-F4 and F6-IC counters changed after the session was recorded; first changing commit: see research/leaderboard_rigor_20261021/bisect/bisect.log",
+   "reason": "inherited-F4 and F6-IC counters changed after the session was recorded; replays 72/72 at the recording commit 03ac2e467 and 24/72 from main 16e74770d; good at 7ab28103d; main did not compile in between, so the first changing commit is not isolated (bisect.log); #1646 word-wise inherited-F4 rewrite is in the window",
    "evidence": "research/leaderboard_rigor_20261021/bisect/summary.jsonl"},
   {"dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n19", "replay": "all", "expect": "drift",
    "reason": "same counters as n13", "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all"},

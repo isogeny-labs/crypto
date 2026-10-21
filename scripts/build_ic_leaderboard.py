@@ -140,12 +140,15 @@ FAMILIES = {
                     "compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v3/README.md).",
         "reference": "One-target rho on the same point, measured as built (its set-up plus its walk), "
                      "in the same unit and the same process; its answer replayed and verified (§23; rule v3 at baseline v3). "
-                     "Kernel caveat (validation sweep, slice A, 2026-10-19): the unit is a 1,024-lane batched "
-                     "addition while this rho walks 32 lanes, so it pays more per step than the canonical step; "
-                     "priced at the canonical step the × reference is 1.7–2.0 times larger "
-                     "(`research/validation_sweep_20261019/A-leaderboard/raw/recompute_A_haiku.json`, "
-                     "`xref_canonical_step`). Rho also gained 20% in instructions after this table was measured "
-                     "(`research/ecbench_rho_optimized_20261014`).",
+                     "Step-cost caveat (validation sweep, slice A, 2026-10-19; corrected 2026-10-21): this rho costs "
+                     "9.7–11.8 units a step against a canonical step (one batched addition plus the table "
+                     "canonicalisation, a model) of 4.6–5.4. A lane sweep (32 to 1,024 lanes, n = 47, 53, 61; "
+                     "`research/leaderboard_rigor_20261021/rho_lanes/`) leaves the walk at 8.4–12.5 units a step "
+                     "and the table's × reference unchanged within the run-to-run spread, so the lane count is not "
+                     "the cause and no implemented rho reaches the canonical step; priced at the canonical step the "
+                     "× reference would be 1.7–2.0 times larger (`research/validation_sweep_20261019/A-leaderboard/raw/"
+                     "recompute_A_haiku.json`, `xref_canonical_step`). Rho also gained 20% in instructions after this "
+                     "table was measured (`research/ecbench_rho_optimized_20261014`).",
         "floor": "√(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed "
                  "Frobenius and negation, n the extension degree. Stated in steps and not rescaled to "
                  "units, so × floor here divides units by steps.",
@@ -198,8 +201,11 @@ NOTE_N41 = ("Validation sweep: the K16 mean S and the quotient above are means o
             "n = 53, so they are survivor means, not costs; `ecbench band` calls every IC-vs-rho pair 'incomplete'.")
 NOTE_REPLAY = ("Validation sweep and replay-all on current main: the inherited-F4 and F6-IC counters of this session do "
                "not reproduce (F6-IC ladder 24/72 at m = 13, 19 and 23; cross-family 16/48, 16/32, 24/40, 8/24). "
-               "A replay on the commit that recorded the ladder reproduces 72/72, so the counters changed in code "
-               "afterwards (bisect: research/leaderboard_rigor_20261021/bisect/). The recovered scalars verify; "
+               "A replay on the commit that recorded the ladder reproduces 72/72 on the same host, so the counters changed "
+               "in code afterwards: good at main 7ab28103d (2026-10-10), failing at 16e74770d (2026-10-11), inside a "
+               "stretch where main did not compile, so it cannot be narrowed further by building "
+               "(research/leaderboard_rigor_20261021/bisect/); #1646's word-wise inherited-F4 rewrite is in that window. "
+               "The recovered scalars verify; "
                "read the counter columns as historical, not current-binary evidence.")
 
 def rng(lo: float, hi: float) -> str:

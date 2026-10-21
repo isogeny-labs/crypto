@@ -7,7 +7,7 @@
    "rho_paths": [
     "src/cryptanalysis/koblitz_strong_rho.rs"
    ],
-   "assessment": "Rule v3 priced rho as built (32 lanes). 13 commits changed the standing strong rho afterwards; research/ecbench_rho_optimized_20261014 measured the largest, 0.8046x solve instructions (a 1.25x faster rho), so Table A's x reference is against a slower rho than the standing one. The 32-lane versus 1024-lane kernel effect is in research/validation_sweep_20261019/A-leaderboard/raw/recompute_A_haiku.json (xref_canonical_step) and the lane sweep in research/leaderboard_rigor_20261021/rho_lanes/. No re-measurement of Table A at the current rho exists yet.",
+   "assessment": "Rule v3 priced rho as built (32 lanes). 13 commits changed the standing strong rho afterwards; research/ecbench_rho_optimized_20261014 measured the largest, 0.8046x solve instructions (a 1.25x faster rho), so Table A's x reference is against a slower rho than the standing one. The step-cost gap to the canonical step is in research/validation_sweep_20261019/A-leaderboard/raw/recompute_A_haiku.json (xref_canonical_step); the lane sweep in research/leaderboard_rigor_20261021/rho_lanes/ shows it is not a lane-count effect. No re-measurement of Table A at the current rho exists yet.",
    "evidence": [
     "research/ecbench_rho_optimized_20261014/RESULT.json",
     "research/validation_sweep_20261019/A-leaderboard/raw/recompute_A_haiku.json"
