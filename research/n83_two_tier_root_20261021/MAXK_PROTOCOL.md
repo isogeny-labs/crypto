@@ -107,6 +107,10 @@ allocation receipt. The dispatch gate will require an eligible live Pod at
 no more than $0.35/hour, verify at least 48 GiB actual cgroup memory and
 four CPUs of quota, and cap provider lifetime at 12 hours. At that ceiling,
 the projected 12-hour provider charge is at most $4.20; the independent
-watchdog will request termination before a separately approved $5 ceiling
-and verify provider absence. If the eligible Pod is unavailable, the
+watchdog in [runpod_guard.py](runpod_guard.py) will request termination
+10 minutes before the earlier provider-lifetime or approved-spend deadline
+and verify provider absence through both direct lookup and Pod inventory.
+Its API key is entered without echo and is not included in its receipt.
+The guard has a local mock-provider deletion/absence control; no Pod has
+been allocated with it. If the eligible Pod is unavailable, the
 dispatch stays pending without substituting a weaker memory envelope.
