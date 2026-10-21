@@ -64,8 +64,31 @@ earlier $5 ceiling, giving a combined conservative bound of $7.960216 if
 the new envelope is fully used. This new ceiling requires owner approval
 before any paid allocation. A quote above the rate cap, missing creation
 timestamp, stale predecessor Pod, or inability to confirm termination aborts
-dispatch. The watchdog terminates the Pod by the 10-hour deadline and records
-a provider absent-Pod receipt.
+dispatch. Start `watch_runpod.py` in an independent controller session
+immediately after sealing the allocation receipt. It reads the live Pod
+identity, rate and provider creation time, then writes `watchdog_ready.json`.
+Copy that file to `/tmp/n83_fixed31_watchdog_ready.json` on the Pod before
+starting `launch_on_pod.sh`; the launcher checks its allocation hash, Pod ID,
+freshness and five-minute retirement margin. The controller transfers the raw
+archive on producer completion or at the margin, verifies its checksum,
+issues the provider termination mutation even if transfer or verification
+failed, and records `provider_post_terminate.json` after the Pod is absent.
+It retires the Pod at least five minutes before the 10-hour provider deadline.
+An absent termination receipt or failed provider deletion leaves spend and
+the Tier 1 result unadmitted.
+Run the controller from outside the Pod in a persistent terminal or service:
+
+```sh
+python3 -m research.n83_highk_beyond4405_20261021.watch_runpod \
+  --allocation /absolute/path/to/runpod_allocation.json \
+  --ssh-host POD_SSH_HOST --ssh-port POD_SSH_PORT \
+  --output /absolute/path/to/local_archive
+```
+
+It prompts for the RunPod API key without writing it to the command line or
+artifact. Wait for `local_archive/watchdog_ready.json`, transfer that file to
+the Pod path above, then start the producer. Retain the controller until its
+provider absence receipt is written.
 
 Run the four arms on screen points 0–767 in table order and 768–1,535 in
 reverse order, with empty setup caches for each child. Include base building,

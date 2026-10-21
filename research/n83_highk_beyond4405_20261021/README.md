@@ -100,6 +100,12 @@ stops before the ten-hour producer limit. Its fixture preflight passed with
 `runpod_runner.py` binds the producer to a quoted Pod, four pinned CPUs,
 the recorded cgroup envelope, source commit and ten-hour cost limit. It keeps
 the allocation receipt with the raw results.
+`watch_runpod.py` is the separate provider controller: it checks the live Pod,
+emits a readiness receipt required by the Pod launcher, transfers the archive,
+terminates the Pod with five minutes of budget margin, and confirms absence.
+Its tested failure paths still issue termination when transfer fails or the
+watchdog starts late. A live provider absence receipt is required for
+measured Tier 1 admission.
 `launch_on_pod.sh` checks the checkout and fixture, builds both release
 examples on the Pod, runs the screen under the pinned affinity and provider
 deadline, then seals an archive with the raw child receipts and build logs.
