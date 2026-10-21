@@ -1,0 +1,22 @@
+{
+  "card_id": "CARD-native-allocation-profile-k4096-p22",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "outcome": "executed_as_specified",
+  "stopped_at_step": null,
+  "recommendation": "proceed_to_analysis",
+  "reasons": [
+    "Native runner-v22 card-check exit 0: record_digests_verified=true, relay_verbatim=true, status=completed. Exact stdout/stderr/status saved beside assessment.",
+    "Actual relay and original receipt byte-identical, SHA256 6d32f93a890c5a4aad92214fd3da123840438bba66f3d0a34694b3e6586c202f. Card unchanged; one exact specified argv attempt, exit 0, timed_out=false, seconds=1731.917490259. All fifteen declared output digests verified.",
+    "lock-wait.json records requested_seconds=600, acquired=true, elapsed_seconds=0.000012404, error=null, lock_path=/tmp/crypto-bench.lock, before CPU planning/eviction/container creation/worker timing. Config records lock_wait_seconds=600 and lock_wait_blake3. No substantial actual queue wait occurred and no SAT retry is recorded.",
+    "Startup synchronization held worker until owned unit property and kernel swap limit zero; kernel memory.max=8589934592, cpu.max=100000 100000, cpuset=14. READY binds synchronization digest matching outer. All 29 retained memory samples record memory.max=8589934592 and memory.swap.max=0; no claim about unsampled intervals.",
+    "outer.json records exit_code=0, wall_censored=false, cleanup_verified=true, systemd_runtime_cleanup_verified=true. Final inspect exited 0, OOMKilled=false, configured Memory/MemorySwap=8589934592. Owned runtime file absent on read-only check; final isolation output exists with verified digest.",
+    "Recorded audit PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY; terminal conflicts=450000, models=0, relations=0, rank=0. Full native memory/storage-prefix analysis remains a separate root obligation, not assessed here.",
+    "Frozen HEAD 7e8ae96c4af60ac63311b4c3c29efcb83321861e verified; receipt dirty_before/dirty_after empty; independent git status output zero bytes. Director performed no tracked edit, HEAD move, further compilation or workload."
+  ],
+  "interpretation": "not_assessed",
+  "commit": "7e8ae96c4af60ac63311b4c3c29efcb83321861e",
+  "receipt_sha256": "6d32f93a890c5a4aad92214fd3da123840438bba66f3d0a34694b3e6586c202f",
+  "relay_sha256": "6d32f93a890c5a4aad92214fd3da123840438bba66f3d0a34694b3e6586c202f",
+  "card_check_exit_code": 0
+}

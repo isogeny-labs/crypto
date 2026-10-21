@@ -104,3 +104,31 @@ gate, and verifies runtime-property cleanup. Native smoke and30+7guard tests
 pass; fresh4409library/118ignored,19exporter and2model-checker checks pass.
 Both new1M arms are planned, not yet completed. No allocator/minimum-memory
 claim or retrospective admission of rejected profiles.
+
+2026-10-21UTC ownership update: the original final K2048-v20/K4096-v20 arms
+subsequently completed1M/zero, with compliant sampled8GiB/swap0 profiles and
+freshS3 native replay; their [publication](../research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/PUBLICATION.md)
+preserves earlier rejected/interrupted attempts. Historical planned statements
+above remain dated history, not current execution status.
+
+A separate [native ownership diagnostic](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261021T1617Z/REPORT.md)
+now completes450K per base:47 storage snapshots and451 matching retained conflict
+signatures each. Native exact24-component capacity sums and arena partitions pass.
+Terminal arena requested capacities are4294967296bytes each, shares of total
+requested solver capacities0.9314084803637385/0.9190381907719638. K2048 logical arena
+used2263844356bytes includes1787792088 detached bytes (190400clauses). K4096 used
+2399593924bytes with zero detached clauses before its first reduction threshold.
+Actual worker RSS2763960320/3151409152bytes is independently recorded; capacities,
+logical bytes, allocator totals and residency must not be equated. No exact
+resident-page or original4GiB OOM attribution follows.
+
+K2048 shell-parent and K4096 nonwaiting-lock failures remain unadmitted. A new
+explicit bounded native lock queue precedes CPU reservation and preserves the
+same lock identity/policy; the separately frozen K4096 repeat completes. Both
+actual workers have compliant29-sample profiles and verified startup/cleanup.
+Next: preregister reclamation at a reduction boundary, preserving clause order,
+forgetting schedule, all live reasons/watchers, export and incremental semantics;
+require CNF/XOR/reason/model tests plus observed same-input search-signature
+agreement before measuring memory. K4096 at450K has no demonstrated reclamation
+opportunity. No candidate or higher cap has run; minimum-memory and useful-yield
+obligations remain open. Original failures are never retrospectively admitted.

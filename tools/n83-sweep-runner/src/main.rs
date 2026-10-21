@@ -8,6 +8,7 @@ mod native_isolation;
 #[allow(dead_code)]
 #[path = "../../../src/cryptanalysis/ecbench/signals.rs"]
 pub mod native_signals;
+mod storage_summary;
 mod systemd_scope;
 mod cryptanalysis {
     pub mod ecbench {
@@ -306,7 +307,8 @@ fn memory_limit(v: &Value) -> R<u64> {
         Some(n) => n.as_u64().ok_or("invalid memory limit")?,
     };
     let extended = [2048, 4096].iter().any(|&k| v["columns"] == k)
-        && ((v["conflicts"] == 800000u64 && v["wall_seconds"] == 4800u64)
+        && ((v["conflicts"] == 450000u64 && v["wall_seconds"] == 2400u64)
+            || (v["conflicts"] == 800000u64 && v["wall_seconds"] == 4800u64)
             || (v["conflicts"] == 1000000u64 && v["wall_seconds"] == 6000u64))
         && !v["external_solver"].is_string()
         && !v["external_solver_blake3"].is_string();
@@ -321,6 +323,8 @@ fn memory_limit(v: &Value) -> R<u64> {
 fn explicit_memory_extension_keeps_legacy_and_control_limits() {
     assert_eq!(memory_limit(&json!({})).unwrap(), 4u64 << 30);
     for (k, conflicts, wall) in [
+        (2048, 450000, 2400),
+        (4096, 450000, 2400),
         (2048, 800000, 4800),
         (4096, 800000, 4800),
         (2048, 1000000, 6000),
@@ -547,6 +551,21 @@ fn audit(dir: &Path) -> R<Value> {
         hash(dir.join("spec.json"))? == text(&cfg, "spec_blake3")?,
         "spec changed",
     )?;
+    if let Some(digest) = cfg.get("lock_wait_blake3").filter(|v| !v.is_null()) {
+        let record = read(dir.join("lock-wait.json"))?;
+        let seconds =
+            reservation::lock_wait_seconds(read(dir.join("spec.json"))?.get("lock_wait_seconds"))?;
+        require(
+            digest.as_str() == Some(hash(dir.join("lock-wait.json"))?.as_str())
+                && record["schema"] == "n83.lock-wait/v1"
+                && record["lock_path"] == native_isolation::DEFAULT_LOCK
+                && record["acquired"] == true
+                && record["error"].is_null()
+                && record["requested_seconds"] == seconds
+                && cfg["lock_wait_seconds"] == seconds,
+            "lock queue custody/policy differs",
+        )?;
+    }
     require(
         memory_limit(&read(dir.join("spec.json"))?)? == memory_limit(&cfg)?,
         "memory limit differs from frozen spec",
@@ -1127,12 +1146,18 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         image.starts_with("sha256:") && image.len() == 71,
         "immutable image required",
     )?;
+    let lock_wait_seconds = reservation::lock_wait_seconds(s.get("lock_wait_seconds"))?;
+    require(
+        s["isolate"] == true || lock_wait_seconds == 0,
+        "lock wait requires isolation",
+    )?;
     fs::create_dir(dir)?;
     let dir = fs::canonicalize(dir)?;
     let reservation = if s["isolate"] == true {
         Some(reservation::Reservation::acquire(
             &dir,
             s.get("cpu_reservation"),
+            lock_wait_seconds,
         )?)
     } else {
         None
@@ -1153,7 +1178,7 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         std::process::id(),
         SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos()
     );
-    let cfg = json!({"schema":"n83.native-run-config/v1","control_variant":s["control_variant"],"columns":columns,"conflicts":conflicts,"wall_seconds":wall,"memory_limit_bytes":memory,"panel":panel,"fixtures":fixtures,"worker":worker,"image":image,"source_commit":commit,"panel_blake3":inventory(&panel)?,"fixtures_blake3":inventory(&fixtures)?,"source_blake3":inventory(&source)?,"worker_blake3":hash(&worker)?,"runner_blake3":hash(std::env::current_exe()?)?,"spec_blake3":hash(spec)?,"container_name":name,"isolate":s["isolate"],"xor_engine":s["xor_engine"],"external_solver_blake3":s["external_solver_blake3"],"systemd_swap_sync":true});
+    let cfg = json!({"lock_wait_seconds":lock_wait_seconds,"lock_wait_blake3":if reservation.is_some() {Some(hash(dir.join("lock-wait.json"))?)}else{None},"schema":"n83.native-run-config/v1","control_variant":s["control_variant"],"columns":columns,"conflicts":conflicts,"wall_seconds":wall,"memory_limit_bytes":memory,"panel":panel,"fixtures":fixtures,"worker":worker,"image":image,"source_commit":commit,"panel_blake3":inventory(&panel)?,"fixtures_blake3":inventory(&fixtures)?,"source_blake3":inventory(&source)?,"worker_blake3":hash(&worker)?,"runner_blake3":hash(std::env::current_exe()?)?,"spec_blake3":hash(spec)?,"container_name":name,"isolate":s["isolate"],"xor_engine":s["xor_engine"],"external_solver_blake3":s["external_solver_blake3"],"systemd_swap_sync":true});
     write(dir.join("config.json"), &cfg)?;
     write(
         dir.join("custody.json"),
@@ -1372,6 +1397,9 @@ fn main() -> R<()> {
         }
         Some("summarize-memory") if a.len() == 4 => {
             memory_profile::summarize(Path::new(&a[2]), Path::new(&a[3]))
+        }
+        Some("summarize-storage") if a.len() == 5 => {
+            storage_summary::summarize(Path::new(&a[2]), Path::new(&a[3]), Path::new(&a[4]))
         }
         Some("summarize-xor") if a.len() == 4 => {
             xor_summary::summarize(Path::new(&a[2]), Path::new(&a[3]))
