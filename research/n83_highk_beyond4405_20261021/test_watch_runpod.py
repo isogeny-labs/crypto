@@ -120,6 +120,23 @@ class WatchRunpodTest(unittest.TestCase):
             self.assertEqual(code, 2)
             terminate.assert_called_once_with("abc123", "secret", None)
 
+    def test_initial_receipt_write_failure_still_attempts_termination(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "result"
+            with (mock.patch.object(watch.runpod_runner, "read_allocation",
+                                    return_value=ALLOCATION),
+                  mock.patch.object(watch.provider, "digest", return_value="a" * 64),
+                  mock.patch.object(watch, "now",
+                                    return_value=datetime(2030, 1, 1, 1,
+                                                          tzinfo=timezone.utc)),
+                  mock.patch.object(watch, "write",
+                                    side_effect=OSError("disk full")),
+                  mock.patch.object(watch, "terminate") as terminate):
+                code = watch.watch(Path("allocation"), "127.0.0.1", 22,
+                                   output, "secret")
+            self.assertEqual(code, 2)
+            terminate.assert_called_once_with("abc123", "secret", output)
+
     def test_terminate_uses_void_mutation_and_requires_absence(self):
         with tempfile.TemporaryDirectory() as temp:
             output = Path(temp)
