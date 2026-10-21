@@ -10,8 +10,7 @@ import matplotlib.pyplot as plt
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.utils import ImageReader
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageBreak
 
 
 ROOT = Path(__file__).resolve().parent
@@ -52,12 +51,54 @@ fig.savefig(OUT / 'index_build.svg')
 fig.savefig(OUT / 'index_build.png', dpi=150)
 plt.close(fig)
 
+def states(k):
+    return 83 * k * (k - 1) // 2 + 42 * k
+
+def request(n):
+    return (5 * n + 3) // 4
+
+def next_power_of_two(n):
+    return 1 << (n - 1).bit_length()
+
+def table_bytes(k, split=None):
+    parts = (states(k),) if split is None else (states(split), states(k) - states(split))
+    return 5 * sum(next_power_of_two(2 * request(part)) for part in parts)
+
+def bloom_bytes(k):
+    return next_power_of_two(16 * request(states(k))) // 8
+
+configs = [('K4405 mono', 4405, None), ('K5086 mono', 5086, None),
+           ('K5086 split4300', 5086, 4300), ('K5086 split4549', 5086, 4549)]
+assert table_bytes(5086, 4549) == 13421772800
+assert bloom_bytes(5086) == 4294967296
+assert 11 * states(5086) == 11808494247
+fig, ax = plt.subplots(figsize=(9.5, 4.5))
+xpos = list(range(len(configs)))
+state_gib = [11 * states(k) / 2**30 for _, k, _ in configs]
+table_gib = [table_bytes(k, split) / 2**30 for _, k, split in configs]
+bloom_gib = [bloom_bytes(k) / 2**30 for _, k, _ in configs]
+ax.bar(xpos, state_gib, color='#647d9c', label='11-byte states')
+ax.bar(xpos, table_gib, bottom=state_gib, color='#dc9750', label='Exact table')
+ax.bar(xpos, bloom_gib, bottom=[a+b for a,b in zip(state_gib,table_gib)],
+       color='#77a888', label='wide3 Bloom')
+ax.set_xticks(xpos, [name.replace(' ', '\n') for name, _, _ in configs])
+ax.set_ylabel('Calculated allocation (GiB)')
+ax.set_ylim(0, 42)
+ax.legend(frameon=False, ncol=3, loc='upper left')
+ax.set_title('N83 root-index capacity calculation; excludes other memory')
+ax.grid(axis='y', alpha=.25)
+ax.set_axisbelow(True)
+fig.tight_layout()
+fig.savefig(OUT / 'capacity.svg')
+fig.savefig(OUT / 'capacity.png', dpi=150)
+plt.close(fig)
+
 styles = getSampleStyleSheet()
 small = styles['BodyText']
 small.fontSize = 9
 small.leading = 13
 
-def make_pdf(path, title, paragraphs, table_rows, figure=True):
+def make_pdf(path, title, paragraphs, table_rows, capacity=False):
     doc = SimpleDocTemplate(str(path), pagesize=letter, leftMargin=47,
                             rightMargin=47, topMargin=45, bottomMargin=45)
     story = [Paragraph(title, styles['Title']), Spacer(1, 12)]
@@ -73,12 +114,34 @@ def make_pdf(path, title, paragraphs, table_rows, figure=True):
         ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
     ]))
     story.extend([table, Spacer(1, 14)])
-    if figure:
-        image = Image(str(OUT / 'index_build.png'), width=500, height=237)
-        story.extend([image, Spacer(1, 8)])
+    image = Image(str(OUT / 'index_build.png'), width=500, height=237)
+    story.extend([image, Spacer(1, 8)])
     story.append(Paragraph('Source: research/n83_two_tier_root_20261021/runs/'
                            '{k128_a,k128_b,k128_shared_a,k128_shared_b}/result.json; '
                            'same study directory contains inputs, stderr, stdout, and runner copies.', small))
+    if capacity:
+        story.extend([
+            PageBreak(), Paragraph('Calculated K5086 split capacity', styles['Title']),
+            Spacer(1, 12),
+            Paragraph('The 30-bit state-ID arithmetic admits K5086 and excludes '
+                      'K5087 and above. With primary-first lookup, K4549 is the '
+                      'unique split point meeting the 2^31 primary and 2^29 '
+                      'extension slot capacities. Five-byte table storage is '
+                      '12.5 GiB, versus 15 GiB at split K4300 and 20 GiB '
+                      'monolithic. The K5086 point-count formula projects '
+                      '844,276 points; enumeration and subgroup checks remain '
+                      'to be run.', small), Spacer(1, 12),
+            Image(str(OUT / 'capacity.png'), width=500, height=237),
+            Spacer(1, 10),
+            Paragraph('Calculated arrays only. The 11-byte states, five-byte '
+                      'table, and wide3 union Bloom total 27.50 GiB at '
+                      'K5086/K4549. Other memory and peak RSS are excluded. '
+                      'No K5086 timing or target result is inferred.', small),
+            Spacer(1, 8),
+            Paragraph('Source and proof map: research/n83_two_tier_root_20261021/'
+                      'CAPACITY.md and Capacity.lean; Rust source: examples/'
+                      'koblitz_orbit_dlp_fast.rs.', small),
+        ])
     doc.build(story)
 
 rows = [['Order', 'Mode', 'Mono (s)', 'Split (s)', 'Faster stage']]
@@ -113,7 +176,8 @@ make_pdf(OUT / 'RESULT.pdf', 'N83 K128 split root index: result', [
     'Status: STAGE_DIAGNOSTIC_ONLY. Candidate ID and single-target online '
     'speedup remain unset. A full-size K4405 same-target scalar replay and '
     'Tier 1 paired measurement are the next qualification steps.'
-], rows)
+], rows, capacity=True)
 
 print(json.dumps({'pdfs': ['RUN.pdf','RESULT.pdf'], 'svg': 'index_build.svg',
-                  'png': 'index_build.png', 'mono_s': mono, 'split_s': split}))
+                  'png': 'index_build.png', 'capacity_svg': 'capacity.svg',
+                  'capacity_png': 'capacity.png', 'mono_s': mono, 'split_s': split}))

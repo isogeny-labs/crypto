@@ -35,3 +35,8 @@ the frozen layout calculation predicts a 128 MiB Bloom saving and
 671,088,640 additional table bytes. Those K4405 values are capacity
 calculations; [RESULT.md](RESULT.md) retains the qualification boundary and
 the next full-size control.
+
+The separate [K5086 capacity calculation](CAPACITY.md) is illustrated by
+[capacity.svg](capacity.svg) and its [PNG render](capacity.png). It is shown
+on the second page of [RESULT.pdf](RESULT.pdf) with measured K128 timing kept
+on the first page.

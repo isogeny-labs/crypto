@@ -47,6 +47,12 @@ full-base request. At K4405 and the `wide3` profile, the separate filters
 would allocate 2 GiB plus 128 MiB; the shared filter allocates 2 GiB. The
 table-byte increment remains 671,088,640.
 
+The same opt-in split path also permits a calculated K5086/K4549 layout at
+the current 30-bit state-ID boundary. [CAPACITY.md](CAPACITY.md) gives the
+exact sizing formulas, Lean-checked bound and split implication, memory
+diagram, and missing execution checks. The projected 844,276-point count is
+not an enumerated factor base; `candidate_id` stays `null`.
+
 1. Run the exact-root unit control: real N83 S3 roots are partitioned at a
    small prefix, compared with a core-first reference map, and probed for
    missing keys and duplicate witnesses.

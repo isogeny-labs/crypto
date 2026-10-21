@@ -51,6 +51,22 @@ gives a 128 MiB Bloom saving. The table increment remains 671,088,640 bytes
 at K4405. The two local timing orders again disagree, so index-build
 performance and single-target online performance remain unresolved.
 
+## Largest current state-ID capacity
+
+The [capacity calculation and proof map](CAPACITY.md) identify K5086 as the
+largest orbit-column count admitted by the current 30-bit state ID. A K4549
+primary split uses 12.5 GiB of five-byte tables, versus 15 GiB for a K4300
+split at K5086 and 20 GiB monolithic. The `wide3` union Bloom is 4 GiB and
+the 11-byte state array is 11.00 GiB; these three calculated arrays total
+27.50 GiB. The [capacity diagram](capacity.svg) shows the allocations and
+its [PNG render](capacity.png) is copied into `benchmarks/`. Lean 4.34.1
+checked the ID bound, oriented split uniqueness, and arithmetic in
+[Capacity.lean](Capacity.lean); [axiom output](Capacity.check.txt) is
+versioned. K5086 base enumeration, peak RSS, exact-root construction,
+relation/scalar replay, and online timing remain pending. The projected
+166 × 5086 point count is not an actual enumerated `fb` count, so
+`candidate_id` remains `null`.
+
 ## Frozen receipts
 
 The source-linked [run report](RUN.md), [run PDF](RUN.pdf),
@@ -58,6 +74,8 @@ The source-linked [run report](RUN.md), [run PDF](RUN.pdf),
 summarize the four paired stage controls. The matching
 [PNG render](index_build.png) and all PDFs are reproduced by
 [render_report.py](render_report.py) from the committed raw receipts.
+The second result-PDF page and the capacity chart use the exact sizing
+formulas documented in [CAPACITY.md](CAPACITY.md).
 
 - [First-order raw inputs and results](runs/k128_a/input.json) and
   [result](runs/k128_a/result.json): result SHA-256
