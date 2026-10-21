@@ -1400,3 +1400,35 @@ mod tests {
         assert!(CurveSpec::Koblitz { a: 0, n: 17 }.build().is_err());
     }
 }
+
+#[cfg(test)]
+mod merged_variant_tests {
+    use super::*;
+    #[test]
+    fn distinct_quartic_constructors_keep_their_metadata_and_generators() {
+        let specs = [
+            CurveSpec::Fp4Translation { p: 29, seed: 1 },
+            CurveSpec::Fp4Torsion {
+                p: 29,
+                seed: 1,
+                max_cofactor: 16,
+            },
+            CurveSpec::F2m4Torsion {
+                m: 4,
+                seed: 1,
+                max_cofactor: 16,
+            },
+        ];
+        for spec in specs {
+            let i = spec.build().unwrap();
+            let facts = i.facts(&spec);
+            assert!(facts.r > 2);
+            assert_eq!(i.mul_generator_hex(1).unwrap(), facts.generator);
+            assert!(i.mul_generator_hex(i.r()).is_none());
+            assert_eq!(
+                serde_json::from_str::<CurveSpec>(&serde_json::to_string(&spec).unwrap()).unwrap(),
+                spec
+            );
+        }
+    }
+}
