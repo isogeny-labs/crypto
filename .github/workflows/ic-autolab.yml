@@ -16,6 +16,10 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+env:
+  # Runtime registrations hash the interpreter's existing stdlib bytecode.
+  # Keep the test controller from creating new caches after that snapshot.
+  PYTHONDONTWRITEBYTECODE: '1'
 concurrency:
   group: ic-autolab-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -35,7 +39,7 @@ jobs:
       - name: Install calibrated profiler
         run: |
           sudo apt-get update
-          sudo apt-get install -y valgrind
+          sudo apt-get install -y valgrind zstd
           test "$(valgrind --version)" = valgrind-3.22.0
       - name: Freeze dependency resolution
         run: |
@@ -114,7 +118,7 @@ jobs:
       - name: Install calibrated profiler
         run: |
           sudo apt-get update
-          sudo apt-get install -y valgrind
+          sudo apt-get install -y valgrind zstd
           test "$(valgrind --version)" = valgrind-3.22.0
       - name: Freeze dependency resolution
         run: cargo fetch --locked
