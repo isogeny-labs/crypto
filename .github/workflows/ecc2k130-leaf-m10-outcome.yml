@@ -40,6 +40,16 @@ jobs:
           git diff --exit-code -- research/notes/ecc2k130/leaf_m10_support_outcome_20260930/ANALYSIS.json
       - name: Replay all 294912 rows and 264 point images again
         run: |
+          # Replay against the exact historical workflow recorded by CONFIG and
+          # FROZEN; current runner routing is not part of that archived input.
+          source_commit=1f69d4b034a50abb2be4d724454f66d0327a4f56
+          workflow=.github/workflows/ecc2k130-leaf-m10-support.yml
+          git fetch --no-tags --depth=1 origin "$source_commit"
+          git show "$source_commit:$workflow" > "$RUNNER_TEMP/leaf-m10-frozen-workflow.yml"
+          echo '23d9704a830cb053ed85dd365e9d87b4be9d1d8d8397f7170f196baf24e3bed1  '"$RUNNER_TEMP/leaf-m10-frozen-workflow.yml" | sha256sum --check
+          cp "$workflow" "$RUNNER_TEMP/leaf-m10-current-workflow.yml"
+          trap 'cp "$RUNNER_TEMP/leaf-m10-current-workflow.yml" "$workflow"' EXIT
+          cp "$RUNNER_TEMP/leaf-m10-frozen-workflow.yml" "$workflow"
           python3 research/notes/ecc2k130/leaf_m10_support_20260930/verify.py \
             --evidence research/notes/ecc2k130/leaf_m10_support_20260930/evidence \
             --out "${{ runner.temp }}/replay.json"

@@ -55,7 +55,10 @@ jobs:
           GIT_DIR: ${{ github.workspace }}/.git
           GIT_WORK_TREE: ${{ github.workspace }}
         run: |
-          python3 -m unittest discover \
+          # Frozen watchdog tests intentionally remove loader environment
+          # variables. Ubuntu's system interpreter works with that exact contract.
+          env -i /usr/bin/python3 -I -S -B -c 'import sys; assert sys.version_info[:2] == (3, 12), sys.version'
+          /usr/bin/python3 -m unittest discover \
             -s "$RUNNER_TEMP/n53-historical-source/research/sat_factor_base_review_20260908/autolab_n53_native_cyclic_l384_20260929" \
             -p 'test_*.py' -v
           python3 - <<'PY'
