@@ -274,7 +274,7 @@ func cmdAnswer(args []string) (int, error) {
 	}
 	word := map[bool]string{true: "yes", false: "no"}[*yes]
 	g.Result, g.At, g.By = "answered_"+word, now(), *by
-	if st.BlockedOn != nil && *st.BlockedOn == *gate {
+	if st.BlockedOn != nil && *st.BlockedOn == *gate && st.Status != "stopped" {
 		st.Status, st.BlockedOn = "running", nil
 	}
 	st.event("answer", fmt.Sprintf("%s: %s by %s", *gate, word, *by))

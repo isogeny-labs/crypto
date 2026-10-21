@@ -449,6 +449,9 @@ func ingestPending(spec *Spec, st *State, paths map[string]string, cellsByID map
 			// a wait_until refresh card
 			inst.Status = map[bool]string{true: "done", false: "failed"}[ok]
 			st.event("ingest", key+": "+rc.Status)
+			if !ok {
+				problems = append(problems, fmt.Sprintf("refresh %s failed (%s, exit %s)", key, rc.Status, exit))
+			}
 			continue
 		}
 		if ok {
@@ -467,30 +470,6 @@ func ingestPending(spec *Spec, st *State, paths map[string]string, cellsByID map
 		}
 		st.event("ingest", fmt.Sprintf("%s: %s (%s)", key, inst.Status, rc.Status))
 		switch inst.Status {
-		case "done":
-			var cell *Cell
-			if inst.Cell != nil {
-				cell = cellsByID[*inst.Cell]
-			}
-			hidx := st.hostIndex()
-			var host *Host
-			if hidx >= 0 {
-				host = spec.host(st.Hosts[hidx].Candidate)
-			}
-			ctx := context(spec, paths, cell, host, hidx, st.Vars, false)
-			if s.Gates != nil {
-				for _, gid := range s.Gates.After {
-					g := spec.gate(gid)
-					passed, detail := allChecks(g, ctx, paths)
-					st.Gates[gid+":"+key] = &GateState{Result: map[bool]string{true: "pass", false: "fail"}[passed],
-						At: now(), Detail: detail}
-					if !passed {
-						if p := applyFail(st, g, inst, fmt.Sprintf("gate %s after %s: %s", gid, key, detail)); p != "" {
-							problems = append(problems, p)
-						}
-					}
-				}
-			}
 		case "failed":
 			if p := applyOnFailure(st, s, inst, key); p != "" {
 				problems = append(problems, p)
@@ -527,9 +506,9 @@ func applyFail(st *State, g *Gate, inst *Instance, text string) string {
 		status := "not_attempted"
 		if mode == "void_cell" {
 			status = "void"
-			inst.Status = "void"
 		}
 		markCell(st, *inst.Cell, status, text)
+		inst.Status, inst.Reason = status, sp(text)
 		st.event(mode, text)
 		return ""
 	}

@@ -154,15 +154,18 @@ func (s *sandbox) state(rel string) *State {
 	return &st
 }
 
-// drive plays the main session until a terminal action and returns every action.
-func (s *sandbox) drive(rel, answer string) []map[string]any {
+func always(ans string) func(string) string { return func(string) string { return ans } }
+
+// drive plays the main session until a terminal action and returns every
+// action. answer picks --yes or --no for each gate id.
+func (s *sandbox) drive(rel string, answer func(gate string) string) []map[string]any {
 	var actions []map[string]any
 	statePath := filepath.Join(s.dir, strings.TrimSuffix(rel, ".yaml")+".state.yaml")
 	for n := 0; n < 60; n++ {
-		out, _ := s.expspec("next", rel)
+		out, code := s.expspec("next", rel)
 		var a map[string]any
 		if err := json.Unmarshal([]byte(out), &a); err != nil {
-			s.t.Fatalf("next printed non-JSON: %s", out)
+			s.t.Fatalf("next printed non-JSON (exit %d): %s", code, out)
 		}
 		actions = append(actions, a)
 		switch a["action"] {
@@ -181,7 +184,7 @@ func (s *sandbox) drive(rel, answer string) []map[string]any {
 			if st.BlockedOn == nil {
 				return actions
 			}
-			if out, code := s.expspec("answer", rel, "--gate", *st.BlockedOn, answer, "--by", "test-owner"); code != 0 {
+			if out, code := s.expspec("answer", rel, "--gate", *st.BlockedOn, answer(*st.BlockedOn), "--by", "test-owner"); code != 0 {
 				s.t.Fatalf("answer: %s", out)
 			}
 		case "wait":
@@ -257,7 +260,7 @@ func TestDraftRefusesToRun(t *testing.T) {
 
 func TestLocalRunsToDone(t *testing.T) {
 	s := smokeBox(t)
-	actions := s.drive(smokeRel, "--yes")
+	actions := s.drive(smokeRel, always("--yes"))
 	if last := actions[len(actions)-1]; last["action"] != "done" {
 		t.Fatalf("last action %v", last)
 	}
@@ -302,7 +305,7 @@ func TestResumeSkipsDoneCells(t *testing.T) {
 	out := filepath.Join(s.dir, "research/expspec_smoke_20261020/out")
 	_ = os.MkdirAll(out, 0o755)
 	_ = os.WriteFile(filepath.Join(out, "cell-n10.json"), []byte(`{"n": 10, "value": 55, "ok": true}`+"\n"), 0o644)
-	actions := s.drive(smokeRel, "--yes")
+	actions := s.drive(smokeRel, always("--yes"))
 	for _, k := range keysOf(actions, "run_card", "key") {
 		if k == "measure@n10" {
 			t.Fatal("measure@n10 ran although its output existed")
@@ -327,7 +330,7 @@ func batchBox(t *testing.T) *sandbox {
 
 func TestBatchTwoHostsToDone(t *testing.T) {
 	s := batchBox(t)
-	actions := s.drive(batchRel, "--yes")
+	actions := s.drive(batchRel, always("--yes"))
 	if last := actions[len(actions)-1]; last["action"] != "done" {
 		t.Fatalf("last action %v", actions[len(actions)-3:])
 	}
@@ -377,7 +380,7 @@ func TestBatchTwoHostsToDone(t *testing.T) {
 
 func TestBatchNoToLaunchStops(t *testing.T) {
 	s := batchBox(t)
-	actions := s.drive(batchRel, "--no")
+	actions := s.drive(batchRel, always("--no"))
 	if last := actions[len(actions)-1]; last["action"] != "stopped" {
 		t.Fatalf("last action %v", last)
 	}
@@ -399,5 +402,175 @@ func TestSchemaRejectsGateOnBatchHostStep(t *testing.T) {
 	out, _ := cmd.CombinedOutput()
 	if !strings.Contains(string(out), "a batch host runs its steps by itself") {
 		t.Fatalf("gate on a batch host step was accepted: %s", out)
+	}
+}
+
+// editSpec rewrites a sandbox spec through a generic map and commits it.
+func (s *sandbox) editSpec(rel, msg string, edit func(spec map[string]any)) {
+	p := filepath.Join(s.dir, rel)
+	b, _ := os.ReadFile(p)
+	var spec map[string]any
+	if err := yaml.Unmarshal(b, &spec); err != nil {
+		s.t.Fatal(err)
+	}
+	edit(spec)
+	out, _ := yaml.Marshal(spec)
+	if err := os.WriteFile(p, out, 0o644); err != nil {
+		s.t.Fatal(err)
+	}
+	s.commit(msg)
+}
+
+func stepAt(spec map[string]any, i int) map[string]any {
+	return spec["steps"].([]any)[i].(map[string]any)
+}
+
+func addGate(spec map[string]any, g map[string]any) {
+	spec["gates"] = append(spec["gates"].([]any), g)
+}
+
+func TestHumanAfterGateRequiresAnswerBeforeMoreWork(t *testing.T) {
+	s := smokeBox(t)
+	s.editSpec(smokeRel, "add after gate", func(spec map[string]any) {
+		addGate(spec, map[string]any{"id": "owner-after", "kind": "human", "description": "review output",
+			"ask": "Continue after this output.", "on_fail": "stop"})
+		g := stepAt(spec, 1)["gates"].(map[string]any)
+		g["after"] = append(g["after"].([]any), "owner-after")
+	})
+	actions := s.drive(smokeRel, always("--no"))
+	if last := actions[len(actions)-1]; last["action"] != "stopped" {
+		t.Fatalf("last %v", last)
+	}
+	if asks := strings.Join(keysOf(actions, "ask", "gate"), " "); asks != "owner-after:measure@n3" {
+		t.Fatalf("asks %q", asks)
+	}
+	for _, k := range keysOf(actions, "run_card", "key") {
+		if k == "measure@n10" {
+			t.Fatal("work scheduled past an unanswered after-gate")
+		}
+	}
+	if st := s.state(smokeRel); st.Status != "stopped" {
+		t.Fatalf("status %s", st.Status)
+	}
+}
+
+func TestRefreshReceiptResumesWaitGate(t *testing.T) {
+	s := smokeBox(t)
+	s.editSpec(smokeRel, "add refresh gate", func(spec map[string]any) {
+		addGate(spec, map[string]any{"id": "refresh-host", "kind": "wait_until", "description": "host metadata",
+			"checks":  []any{map[string]any{"kind": "file_exists", "path": "{{paths.out}}/host.json"}},
+			"refresh": stepAt(spec, 0)["argv"], "every_s": 60, "max_wait_s": 60, "on_fail": "stop"})
+		stepAt(spec, 0)["gates"] = map[string]any{"before": []any{"refresh-host"}}
+	})
+	actions := s.drive(smokeRel, always("--yes"))
+	if last := actions[len(actions)-1]; last["action"] != "done" {
+		t.Fatalf("last %v", last)
+	}
+	if got := s.state(smokeRel).Instances["_refresh-refresh-host"].Status; got != "done" {
+		t.Fatalf("refresh instance is %s", got)
+	}
+}
+
+func TestWaitAfterGateRefreshesBeforeDependentWork(t *testing.T) {
+	s := smokeBox(t)
+	s.editSpec(smokeRel, "add wait after gate", func(spec map[string]any) {
+		refresh := append([]any{}, stepAt(spec, 0)["argv"].([]any)...)
+		refresh[len(refresh)-1] = "{{paths.out}}/after"
+		addGate(spec, map[string]any{"id": "after-ready", "kind": "wait_until", "description": "after metadata",
+			"checks":  []any{map[string]any{"kind": "file_exists", "path": "{{paths.out}}/after/host.json"}},
+			"refresh": refresh, "every_s": 60, "max_wait_s": 120, "on_fail": "stop"})
+		stepAt(spec, 0)["gates"] = map[string]any{"after": []any{"after-ready"}}
+	})
+	actions := s.drive(smokeRel, always("--yes"))
+	if last := actions[len(actions)-1]; last["action"] != "done" {
+		t.Fatalf("last %v", last)
+	}
+	keys := keysOf(actions, "run_card", "key")
+	idx := func(k string) int {
+		for i, x := range keys {
+			if x == k {
+				return i
+			}
+		}
+		return -1
+	}
+	if r, m := idx("_refresh-after-ready"), idx("measure@n3"); r < 0 || m < 0 || r > m {
+		t.Fatalf("refresh at %d, measure@n3 at %d: %v", r, m, keys)
+	}
+}
+
+func TestResumeStillValidatesCachedOutput(t *testing.T) {
+	s := smokeBox(t)
+	out := filepath.Join(s.dir, "research/expspec_smoke_20261020/out")
+	_ = os.MkdirAll(out, 0o755)
+	_ = os.WriteFile(filepath.Join(out, "cell-n10.json"), []byte(`{"n": 10, "value": 55, "ok": false}`+"\n"), 0o644)
+	s.drive(smokeRel, always("--yes"))
+	if got := s.state(smokeRel).Instances["measure@n10"].Status; got != "void" {
+		t.Fatalf("measure@n10 is %s, want void", got)
+	}
+}
+
+func TestBatchNoToRunningHostGateTearsDownAndStaysStopped(t *testing.T) {
+	s := batchBox(t)
+	actions := s.drive(batchRel, func(g string) string {
+		if strings.HasPrefix(g, "launch-") {
+			return "--yes"
+		}
+		return "--no"
+	})
+	if last := actions[len(actions)-1]; last["action"] != "stopped" {
+		t.Fatalf("last %v", last)
+	}
+	st := s.state(batchRel)
+	if st.Status != "stopped" || len(st.Hosts) != 1 || st.Hosts[0].State != "torn_down" {
+		t.Fatalf("status %s hosts %+v", st.Status, st.Hosts)
+	}
+	if _, err := os.Stat(filepath.Join(s.dir, ".fakehost", *st.Hosts[0].Handle, "TERMINATED")); err != nil {
+		t.Fatal("host not terminated")
+	}
+	out, _ := s.expspec("next", batchRel)
+	if !strings.Contains(out, `"stopped"`) {
+		t.Fatalf("a stopped run resumed: %s", out)
+	}
+}
+
+func TestBatchFailedStepStopSurvivesTeardown(t *testing.T) {
+	s := batchBox(t)
+	s.editSpec(batchRel, "stop on failed score", func(spec map[string]any) {
+		score := stepAt(spec, 2)
+		score["argv"] = []any{"false"}
+		score["outputs"] = []any{}
+		score["on_failure"] = "stop"
+	})
+	actions := s.drive(batchRel, always("--yes"))
+	if last := actions[len(actions)-1]; last["action"] != "stopped" {
+		t.Fatalf("last %v", last)
+	}
+	st := s.state(batchRel)
+	if st.Status != "stopped" || len(st.Hosts) != 1 || st.Hosts[0].State != "torn_down" {
+		t.Fatalf("status %s hosts %+v", st.Status, st.Hosts)
+	}
+}
+
+func TestBatchTeardownPermissionAskPreservesStop(t *testing.T) {
+	s := batchBox(t)
+	s.editSpec(batchRel, "ask before teardown", func(spec map[string]any) {
+		spec["agent"].(map[string]any)["autonomy"].(map[string]any)["terminate_own_hosts"] = "ask"
+	})
+	actions := s.drive(batchRel, func(g string) string {
+		if strings.HasPrefix(g, "go:") {
+			return "--no"
+		}
+		return "--yes"
+	})
+	if last := actions[len(actions)-1]; last["action"] != "stopped" {
+		t.Fatalf("last %v", last)
+	}
+	if !strings.Contains(strings.Join(keysOf(actions, "ask", "gate"), " "), "teardown-0") {
+		t.Fatalf("no teardown ask: %v", keysOf(actions, "ask", "gate"))
+	}
+	st := s.state(batchRel)
+	if st.Status != "stopped" || len(st.Hosts) != 1 || st.Hosts[0].State != "torn_down" {
+		t.Fatalf("status %s hosts %+v", st.Status, st.Hosts)
 	}
 }

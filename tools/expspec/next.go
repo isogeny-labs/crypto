@@ -48,7 +48,10 @@ func (r *runner) humanGate(gid, question string) Action {
 		}
 	}
 	r.st.Gates[gid] = &GateState{Result: "asked", At: now(), Detail: question}
-	r.st.Status, r.st.BlockedOn = "blocked", sp(gid)
+	if r.st.Status != "stopped" {
+		r.st.Status = "blocked"
+	}
+	r.st.BlockedOn = sp(gid)
 	return act("ask", "gate", gid, "question", question,
 		"record", "expspec answer <spec> --gate "+gid+" --yes|--no --by <owner>")
 }
@@ -141,9 +144,31 @@ func (r *runner) teardownOr(fallback Action) (Action, error) {
 			h.State, h.EndedAt = "torn_down", sp(now())
 			continue
 		}
-		if r.spec.Agent.permission("terminate_own_hosts") == "never" {
+		handle := strOr(h.Handle, "none")
+		switch r.spec.Agent.permission("terminate_own_hosts") {
+		case "never":
 			return act("escalate", "reason", fmt.Sprintf("host %s (handle %s) needs teardown and terminate_own_hosts is never",
-				h.Candidate, strOr(h.Handle, "none"))), nil
+				h.Candidate, handle)), nil
+		case "ask":
+			if a := r.humanGate(fmt.Sprintf("teardown-%d", hidx),
+				fmt.Sprintf("Terminate own host %s (handle %s).", h.Candidate, handle)); a != nil {
+				if a["action"] == "stopped" {
+					return act("escalate", "reason", fmt.Sprintf("teardown declined for %s; handle %s remains active",
+						h.Candidate, handle)), nil
+				}
+				return a, nil
+			}
+		}
+		key := fmt.Sprintf("_teardown#%d", hidx)
+		if prev := r.st.Instances[key]; prev != nil {
+			switch prev.Status {
+			case "carded":
+				card := prev.Attempts[len(prev.Attempts)-1].Card
+				return runCardAction(key, card, host.Lifecycle.Teardown.TimeoutS > 600, false), nil
+			case "failed":
+				return act("escalate", "reason", fmt.Sprintf("teardown of %s failed; terminate handle %s by hand",
+					h.Candidate, handle)), nil
+			}
 		}
 		return r.lifecycleCard(hidx, host, "teardown")
 	}
@@ -171,7 +196,9 @@ func (r *runner) lifecycleCard(hidx int, host *Host, phase string) (Action, erro
 	if err != nil {
 		return nil, err
 	}
-	r.st.Status = "running"
+	if r.st.Status != "stopped" {
+		r.st.Status = "running"
+	}
 	return runCardAction(key, card, c.background, false), nil
 }
 
@@ -253,24 +280,43 @@ func shortHash(s string) string {
 	return hex.EncodeToString(h[:])[:10]
 }
 
-func (r *runner) next() (Action, error) {
+func (r *runner) step() (Action, error) {
 	r.depth++
 	if r.depth > 50 {
 		return act("escalate", "reason", "internal: next did not settle"), nil
 	}
 	spec, st := r.spec, r.st
-	if st.Status == "stopped" {
-		return act("stopped", "reason", strOr(st.BlockedOn, "")), nil
-	}
-
 	problems := ingestPending(spec, st, r.paths, r.cellsByID)
 	if st.Status == "stopped" {
-		return r.teardownOr(act("stopped", "reason", strOr(st.BlockedOn, "")))
+		return act("stopped", "reason", strOr(st.BlockedOn, "")), nil
 	}
 	for _, p := range problems {
 		if a := r.escalation("esc-"+shortHash(p), p,
 			"ESCALATION: "+p+". Answer yes to continue past it, no to stop the experiment."); a != nil {
 			return a, nil
+		}
+	}
+
+	// Complete after-gates before scheduling dependent work. A receipt says
+	// the command finished; it does not answer a human gate.
+	for _, key := range sortedInstanceKeys(st) {
+		inst := st.Instances[key]
+		s := r.stepOf(inst)
+		if !okDone[inst.Status] || s == nil || s.Gates == nil || len(s.Gates.After) == 0 {
+			continue
+		}
+		var cell *Cell
+		if inst.Cell != nil {
+			cell = r.cellsByID[*inst.Cell]
+		}
+		hidx, host := -1, (*Host)(nil)
+		if inst.Host != nil {
+			hidx = *inst.Host
+			host = spec.host(st.Hosts[hidx].Candidate)
+		}
+		ctx := context(spec, r.paths, cell, host, hidx, st.Vars, false)
+		if a, err := r.evaluateGates(s.Gates.After, "after", key, inst, ctx); a != nil || err != nil {
+			return a, err
 		}
 	}
 
@@ -289,8 +335,7 @@ func (r *runner) next() (Action, error) {
 	// Budget.
 	used, capUSD := spend(spec, st), spec.Budget.MaxCostUSD
 	if used > capUSD || (capUSD > 0 && used >= capUSD) {
-		st.Status, st.BlockedOn = "stopped", sp(fmt.Sprintf("budget cap reached: $%g of $%g", used, capUSD))
-		return r.teardownOr(act("stopped", "reason", *st.BlockedOn))
+		return act("stopped", "reason", fmt.Sprintf("budget cap reached: $%g of $%g", used, capUSD)), nil
 	}
 	frac := spec.Budget.EscalateAtFraction
 	if frac == 0 {
@@ -310,8 +355,7 @@ func (r *runner) next() (Action, error) {
 	}
 	if first != nil {
 		if hours := clock().Sub(parseTS(*first)).Hours(); hours >= spec.Budget.MaxWallHours {
-			st.Status, st.BlockedOn = "stopped", sp(fmt.Sprintf("max_wall_hours reached (%.1f h)", hours))
-			return r.teardownOr(act("stopped", "reason", *st.BlockedOn))
+			return act("stopped", "reason", fmt.Sprintf("max_wall_hours reached (%.1f h)", hours)), nil
 		}
 	}
 
@@ -392,14 +436,8 @@ func (r *runner) next() (Action, error) {
 			}
 			ctx := context(spec, r.paths, cell, host, hidx, st.Vars, false)
 			if s.Gates != nil {
-				for _, gid := range s.Gates.Before {
-					a, err := r.gateBefore(spec.gate(gid), key, inst, ctx)
-					if err != nil || a != nil {
-						return a, err
-					}
-					if inst.Status != "pending" {
-						break
-					}
+				if a, err := r.evaluateGates(s.Gates.Before, "before", key, inst, ctx); a != nil || err != nil {
+					return a, err
 				}
 			}
 			if inst.Status != "pending" {
@@ -430,6 +468,9 @@ func (r *runner) next() (Action, error) {
 			card, err := writeCard(spec, st, r.paths, key, c)
 			if err != nil {
 				return nil, err
+			}
+			if hidx >= 0 {
+				inst.Host = ip(hidx)
 			}
 			st.Status, st.BlockedOn = "running", nil
 			return runCardAction(key, card, c.background, s.Evidence), nil
@@ -489,7 +530,7 @@ func (r *runner) next() (Action, error) {
 				}
 				return r.lifecycleCard(hidx, host, "poll")
 			}
-			return r.next()
+			return r.step()
 		}
 		pendingHere := false
 		for _, i := range st.Instances {
@@ -505,7 +546,7 @@ func (r *runner) next() (Action, error) {
 			if a != nil || err != nil {
 				return a, err
 			}
-			return r.next()
+			return r.step()
 		}
 	} else if host != nil {
 		pendingHere := false
@@ -517,7 +558,7 @@ func (r *runner) next() (Action, error) {
 		if !pendingHere {
 			st.Hosts[hidx].State, st.Hosts[hidx].EndedAt = "torn_down", sp(now())
 			st.event("host", "released "+host.ID)
-			return r.next()
+			return r.step()
 		}
 	}
 
@@ -534,7 +575,7 @@ func (r *runner) next() (Action, error) {
 			for _, i := range waiting {
 				i.Status, i.Reason = "not_attempted", sp("no host candidate available")
 			}
-			return r.next()
+			return r.step()
 		}
 		if cand.paid() && cand.Backend != "local" {
 			life := 0.0
@@ -560,7 +601,7 @@ func (r *runner) next() (Action, error) {
 		st.event("host", "selected "+cand.ID)
 		if cand.Backend == "local" || cand.Backend == "ssh" {
 			st.Hosts[hidx].State = "up"
-			return r.next()
+			return r.step()
 		}
 		return r.lifecycleCard(hidx, cand, "provision")
 	}
@@ -597,9 +638,25 @@ func (r *runner) next() (Action, error) {
 	return act("escalate", "reason", fmt.Sprintf("no runnable instance; pending with unmet needs: %v", blocked)), nil
 }
 
-// gateBefore evaluates one before-gate. A non-nil action is returned to the
-// caller; a nil action with the instance still pending means the gate passed.
-func (r *runner) gateBefore(g *Gate, key string, inst *Instance, ctx ctxMap) (Action, error) {
+// evaluateGates applies the same human, polling and failure rules on either
+// side of a step. A non-nil action goes back to the caller; nil with the
+// instance status unchanged means every gate passed.
+func (r *runner) evaluateGates(ids []string, side, key string, inst *Instance, ctx ctxMap) (Action, error) {
+	before := inst.Status
+	for _, gid := range ids {
+		a, err := r.gateOne(r.spec.gate(gid), side, key, inst, ctx)
+		if a != nil || err != nil {
+			return a, err
+		}
+		if inst.Status != before {
+			break
+		}
+	}
+	return nil, nil
+}
+
+// gateOne evaluates one gate for one instance.
+func (r *runner) gateOne(g *Gate, side, key string, inst *Instance, ctx ctxMap) (Action, error) {
 	st := r.st
 	gkey := g.ID + ":" + key
 	if g.Kind == "human" {
@@ -648,9 +705,9 @@ func (r *runner) gateBefore(g *Gate, key string, inst *Instance, ctx ctxMap) (Ac
 		return act("wait", "until", after(g.EveryS, nil), "reason", "gate "+g.ID+": "+detail), nil
 	}
 	st.Gates[gkey] = &GateState{Result: "fail", FirstAt: firstAt, At: now(), Detail: detail}
-	msg := applyFail(st, g, inst, fmt.Sprintf("gate %s before %s: %s", g.ID, key, detail))
+	msg := applyFail(st, g, inst, fmt.Sprintf("gate %s %s %s: %s", g.ID, side, key, detail))
 	if strings.HasPrefix(msg, "stopped") {
-		return r.teardownOr(act("stopped", "reason", msg))
+		return act("stopped", "reason", msg), nil
 	}
 	if msg != "" {
 		if a := r.escalation("esc-"+gkey, msg, "ESCALATION: "+msg+". Answer yes to skip this instance and continue, no to stop."); a != nil {
@@ -659,4 +716,15 @@ func (r *runner) gateBefore(g *Gate, key string, inst *Instance, ctx ctxMap) (Ac
 		inst.Status, inst.Reason = "not_attempted", sp(msg)
 	}
 	return nil, nil
+}
+
+// next is one `expspec next`: whatever step decides, a stop is recorded and
+// every host still up is torn down before the stop is reported.
+func (r *runner) next() (Action, error) {
+	a, err := r.step()
+	if err != nil || a == nil || a["action"] != "stopped" {
+		return a, err
+	}
+	r.st.Status, r.st.BlockedOn = "stopped", sp(fmt.Sprint(a["reason"]))
+	return r.teardownOr(a)
 }
