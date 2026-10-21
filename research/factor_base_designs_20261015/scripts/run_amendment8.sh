@@ -70,6 +70,14 @@ oom_kills() {
 }
 oom_before=$(oom_kills)
 
+# Read a baseline without clearing the shared node kernel ring buffer.
+kernel_tmp=$(mktemp -d)
+trap 'rm -rf "$kernel_tmp"' EXIT
+kernel_baseline_readable=no
+if dmesg > "$kernel_tmp/before" 2>/dev/null; then
+    kernel_baseline_readable=yes
+fi
+
 {
     echo "cell $name"
     echo "date $(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -93,7 +101,7 @@ oom_before=$(oom_kills)
     grep -m1 '^model name' /proc/cpuinfo
 } | tee "$pre"
 
-dmesg -c > /dev/null 2>&1 || true
+# Do not clear the node-wide kernel ring buffer; use a read-only delta below.
 "$bin" run --arms "$arm" --m 4 --t-min "$t" --t-max "$t" \
     --budget 14400 --grace 600 --vmem-kb "$v_kb" \
     --file "$cell-{arm}-m4-t$t" --out-dir "$out"
@@ -103,15 +111,17 @@ dmesg -c > /dev/null 2>&1 || true
 {
     echo "cgroup_oom_kill_before $oom_before"
     echo "cgroup_oom_kill_after $(oom_kills)"
-    if dmesg > /dev/null 2>&1; then
-        oom=$(dmesg | grep -E 'invoked oom-killer|memory: usage|Memory cgroup out of memory|Out of memory' || true)
+    if [ "$kernel_baseline_readable" = yes ] && dmesg > "$kernel_tmp/after" 2>/dev/null; then
+        oom=$(awk 'FILENAME == ARGV[1] { baseline[$0]++; next } { if (baseline[$0] > 0) baseline[$0]--; else print }' \
+            "$kernel_tmp/before" "$kernel_tmp/after" |
+            grep -E 'invoked oom-killer|memory: usage|Memory cgroup out of memory|Out of memory' || true)
         if [ -n "$oom" ]; then
             printf '%s\n' "$oom"
         else
-            echo "no kernel OOM lines"
+            echo "no new kernel OOM lines"
         fi
     else
-        echo "kernel log unreadable"
+        echo "kernel log unreadable or baseline unavailable"
     fi
     echo "checked $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 } > "$out/$name.oom.txt"
