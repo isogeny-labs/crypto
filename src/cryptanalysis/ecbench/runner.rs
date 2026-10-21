@@ -36,6 +36,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use crate::cryptanalysis::ecbench::canonical::{sha256_hex, short_id};
+use crate::cryptanalysis::ecbench::fbm::{self, INSTRUMENT_IC_PIPELINE};
 use crate::cryptanalysis::ecbench::host::{capture, HostCapsule};
 use crate::cryptanalysis::ecbench::isolation::{
     allowed_cpus, conditions, evict, leave_reserved, plan_cpus, preflight, ticks_per_second,
@@ -49,7 +50,7 @@ use crate::cryptanalysis::ecbench::record::{
 };
 use crate::cryptanalysis::ecbench::signals;
 use crate::cryptanalysis::ecbench::spec::{plan, Execution, Plan, Spec};
-use crate::cryptanalysis::ecbench::workload::{CurveSpec, Workload};
+use crate::cryptanalysis::ecbench::workload::Workload;
 
 pub const SESSION_SCHEMA: &str = "ecbench.session/v1";
 
@@ -560,7 +561,7 @@ fn execute_session(
             let inst = p.instance(ex.workload);
             let input = ChildInput {
                 schema: CHILD_INPUT_SCHEMA.into(),
-                curve: CurveSpec::explicit(inst).unwrap_or_else(|| w.curve_spec.clone()),
+                curve: w.curve_spec.for_child(inst),
                 target_seed: w.target_seed,
                 target_index: w.target_index,
                 target_kind: w.kind(),
@@ -809,6 +810,13 @@ fn assemble(
             .map(|r| r.counters.clone())
             .unwrap_or_default(),
         factor_base: report.as_ref().and_then(|r| r.factor_base.clone()),
+        fbm_id: report.as_ref().and_then(|r| {
+            let fb = r.factor_base.as_ref()?;
+            fbm::config_from_ic_method(&w.curve.slug, fb, &arm.method, INSTRUMENT_IC_PIPELINE)
+                .seal()
+                .ok()
+                .map(|id| id.fbm_id)
+        }),
         detail: report
             .as_ref()
             .map(|r| r.detail.clone())

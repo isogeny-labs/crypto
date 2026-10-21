@@ -33,7 +33,7 @@ concurrency:
 
 jobs:
   replay:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n37-frobenius-fold-gate.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n37-frobenius-fold-gate.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     steps:
       - uses: actions/checkout@v4
@@ -41,12 +41,14 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             Cargo.toml
+            Cargo.lock
             tools/volcano-cli/
             isogeny_algos/
             src
             examples/n37_frobenius_fold_gate.rs
             examples/n37_frobenius_fold_replay.rs
             docs/curves/registry.json
+            docs/curves/standards/parameters.json
             docs/ecbench/schema.sql
             docs/ic/calibration.json
             docs/ic/boundary_targets.json
@@ -55,16 +57,40 @@ jobs:
             research/notes/ecc2k130/n37_four_policy_pdp_20261003/RESULT_CI_FIXED.json.gz
             research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b03.points.jsonl
             research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b04.points.jsonl
+            research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json
+            research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz
             research/notes/ecc2k130/n37_frobenius_fold_gate_20261003
+      # This byte-matching historical source snapshot is checked separately
+      # from current-tree producer/parity checks below.
+      - uses: actions/checkout@v4
+        with:
+          ref: 56331ecbb1c35ba162e6b87b408ac9f200dedb45
+          path: historical-frobenius-fold
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            Cargo.toml
+            src
+            examples/n37_frobenius_fold_gate.rs
+            examples/n37_frobenius_fold_replay.rs
+            docs/curves/registry.json
+            docs/curves/standards/parameters.json
+            docs/ecbench/schema.sql
+            docs/ic/calibration.json
+            docs/ic/boundary_targets.json
+            research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock
+            research/notes/ecc2k130/n37_four_policy_support_20261003/SOURCE42.jsonl
+            research/notes/ecc2k130/n37_four_policy_support_20261003/RESULT.json.gz
+            research/notes/ecc2k130/n37_four_policy_pdp_20261003/RESULT_CI_FIXED.json.gz
+            research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b03.points.jsonl
+            research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b04.points.jsonl
+            research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json
+            research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz
       - uses: Swatinem/rust-cache@v2
-      - name: Use frozen lockfile
-        run: cp research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock Cargo.lock
       - name: Check frozen source hashes and formatting
         run: |
           printf '%s  %s\n' \
             'ed66c80bc96eb576e006fb220eb914b4aae73e56348fb9c13b2df2a8005bffd2' examples/n37_frobenius_fold_gate.rs \
             '792a118ae3fb5a86ea6c1657c50f59013679307bf65f96c75b72f0b24f3eec93' examples/n37_frobenius_fold_replay.rs \
-            'ac5cd7a3459be776180afe1eb2975c76b1a88f84bd1e99aa20475927ec260a90' Cargo.lock \
             | sha256sum --check
           rustfmt --edition 2021 --check examples/n37_frobenius_fold_gate.rs examples/n37_frobenius_fold_replay.rs
       - name: Build native producer and independent replay
@@ -103,6 +129,29 @@ jobs:
           jq -Sc 'del(.policies[].table.build_wall_ns_descriptive, .policies[].summary.query_wall_ns_descriptive)' "$RUNNER_TEMP/Linux.json" > "$RUNNER_TEMP/Linux.canonical"
           cmp "$RUNNER_TEMP/Linux.canonical" "$RUNNER_TEMP/A.canonical"
           target/release/examples/n37_frobenius_fold_replay "$RUNNER_TEMP/Linux.json" "$RUNNER_TEMP/Linux.replay.json"
+      - name: Build and replay with the original Frobenius source and lock
+        working-directory: historical-frobenius-fold
+        run: |
+          printf '%s  %s\n' \
+            'f1b3abc246c4971b48b377d5696bc96594deb729320348c4277307e42ed61721' Cargo.toml \
+            'ed66c80bc96eb576e006fb220eb914b4aae73e56348fb9c13b2df2a8005bffd2' examples/n37_frobenius_fold_gate.rs \
+            '792a118ae3fb5a86ea6c1657c50f59013679307bf65f96c75b72f0b24f3eec93' examples/n37_frobenius_fold_replay.rs \
+            'b28d3c2d81146a40d00df85f45c6460d9e2bc5c26875307a06cfd15efff99365' research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock \
+            '0a32de24a5680ff46baf9543e8bf8e32447323491e2a2adedce2548c14a25f75' research/notes/ecc2k130/n37_four_policy_support_20261003/SOURCE42.jsonl \
+            '8eac2ae4b8d8f0fc452b7cd7c8edbd3183558e55454abbd67349665bd64610d5' research/notes/ecc2k130/n37_four_policy_support_20261003/RESULT.json.gz \
+            'c84066a521137cfa61a2f490ed18a3a957b79da6e27f587ad1579b350cb9764a' research/notes/ecc2k130/n37_four_policy_pdp_20261003/RESULT_CI_FIXED.json.gz \
+            '84400a2914f06e4a001d0f113f0195952f692634d4ff8285e23ade2599e2bde2' research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b03.points.jsonl \
+            '72c5b5361a0b846c9626269ce3928820cb7d420aae479d31dc26f5cbf7e78aa6' research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b04.points.jsonl \
+            'bd4bd8af982bcc65234ae1fae1ad52eb0ed41a1c203bf4d2556fd8e87f788a4c' research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json \
+            'eb4773d556886672e8b80735fc486c16b73765fd5069ff81133100bfc3eafa90' research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz \
+            | sha256sum --check
+          cp research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock Cargo.lock
+          cargo build --release --locked --example n37_frobenius_fold_gate --example n37_frobenius_fold_replay
+          note="$GITHUB_WORKSPACE/research/notes/ecc2k130/n37_frobenius_fold_gate_20261003"
+          target/release/examples/n37_frobenius_fold_replay "$RUNNER_TEMP/A.json" "$RUNNER_TEMP/historical-A.replay.json" research/notes/ecc2k130/n37_four_policy_support_20261003/RESULT.json.gz
+          target/release/examples/n37_frobenius_fold_replay "$RUNNER_TEMP/B.json" "$RUNNER_TEMP/historical-B.replay.json" research/notes/ecc2k130/n37_four_policy_support_20261003/RESULT.json.gz
+          cmp "$RUNNER_TEMP/historical-A.replay.json" "$note/REPLAY_A.json"
+          cmp "$RUNNER_TEMP/historical-B.replay.json" "$note/REPLAY_B.json"
       - name: Retain Linux receipts
         if: always()
         uses: actions/upload-artifact@v4

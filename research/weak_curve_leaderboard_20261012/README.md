@@ -108,6 +108,8 @@ nominal factor-base and relation-query stages behind the two exact-invariant
 degree bound 15 and 48,921,052 nominal half-split base places for both
 `c2pnb176w1` and `c2pnb272w1`; actual cover places, relations, and rank are
 separate witness gates in the binary GHS criterion.
+The [2026-10-19 model refresh](reports/review-refresh-20261019/REPORT.md), with its [current graph](reports/review-refresh-20261019/cost-sweep.svg) and [PDF](reports/review-refresh-20261019/report.pdf), updates the two conditional prices to 74.834885 and 74.879405 log2 bit operations under the measured-operation model.
+
 The [run report and cost graph](reports/run-20261015T0854Z/REPORT.md)
 show the full conditional sweep and its missing measurement stages.
 The [source-lock refresh](reports/run-20261015T0929Z/REPORT.md) records the

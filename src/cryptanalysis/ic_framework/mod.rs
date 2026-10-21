@@ -62,6 +62,7 @@
 //! worked example of adding a solver, how to run a sweep, and how to
 //! report what comes out.
 
+pub mod cm_orbit;
 pub mod fiber;
 pub mod large_prime;
 pub mod linalg;
@@ -99,7 +100,8 @@ pub struct PipelineSpec {
     pub targets: Targets,
     /// The matrix and stop rule: `incremental-gauss`,
     /// `incremental-gauss-full-rank`, its `-checked` variant,
-    /// `structured-gauss`, or `sparse-cado` (full-rank rule).
+    /// `structured-gauss`, or a deferred sparse solver (`sparse-cado`,
+    /// `filter+wiedemann`, `filter+lanczos`, `wiedemann`, `lanczos`; full-rank rule).
     pub linalg: String,
     /// Cap on targets drawn before the run gives up.
     pub max_trials: u64,
@@ -259,6 +261,17 @@ pub struct RunReport {
 /// inherited-F4 / pdp3 qualifier
 /// `word XORs (elimination, specialisation and linear elimination only)`
 /// both count; `vector XORs` / `word operations (…)` do not.
+///
+/// Accounting, not an algorithm change: before PR #1774 (merge `cd226d0ce`,
+/// 2026-10-14) only the bare unit matched, so inherited-F4 / pdp3 records
+/// left their word XORs unpriced (`solver_word_XORs_(…)_uncharged`,
+/// `lower_bound: true`) even where `docs/ic/calibration.json` pins
+/// `ns_per_word_xor`.  Since then those curves charge them (K_0/GF(2^13):
+/// 0.002304 GAE per word XOR, e.g. `ic-f4-m3` target 0 671 → 24,415 GAE at
+/// that merge, same word-XOR count),
+/// while curves without a pinned ratio still record a lower bound.  Do not
+/// compare an F4 `S` from before that merge with one after it, or a priced
+/// curve with an unpriced one: `research/f4_pricing_jump_20261018/`.
 fn is_word_xor_op_unit(op_unit: &str) -> bool {
     op_unit == "word XORs" || op_unit.starts_with("word XORs (")
 }
@@ -406,7 +419,7 @@ pub fn run_pipeline<G: CountedGroup>(
     // rank, so it runs under the full-rank rule.
     let completion = if linalg_name == "incremental-gauss-full-rank"
         || checked_full_rank
-        || linalg_name == "sparse-cado"
+        || linalg::is_deferred_sparse(linalg_name)
     {
         CompletionRule::FullRank
     } else {
@@ -515,6 +528,22 @@ pub fn run_pipeline<G: CountedGroup>(
                     },
                     Some(ns),
                 ),
+                // Field multiplications counted by the same field whose
+                // additions the group charges (the `gaudry-d4` oracle on
+                // `E(F_{p⁴})`, `gaudry-d4-bin` on `E(F_{q⁴})`, `q = 2^m`):
+                // priced by count at the curve's own multiplications per
+                // addition, which the oracle reports.
+                (_, _)
+                    if (t.op_unit == "F_p multiplications"
+                        || t.op_unit == "F_q multiplications")
+                        && t.extra.get("fp_muls_per_add").is_some_and(|&v| v > 0) =>
+                {
+                    (
+                        t.ops as f64 / t.extra["fp_muls_per_add"] as f64,
+                        "counted",
+                        None,
+                    )
+                }
                 _ if calib.ns_per_add > 0.0 => {
                     (t.wall_ns as f64 / calib.ns_per_add, "measured", wall_per_op)
                 }
@@ -1399,6 +1428,14 @@ mod tests {
             .unwrap()
         };
         let dense = run(&spec);
+        for name in ["wiedemann", "lanczos", "filter+lanczos", "filter+wiedemann"] {
+            spec.linalg = name.into();
+            let other = run(&spec);
+            assert!(other.verified, "{name}");
+            assert_eq!(other.recovered, dense.recovered, "{name}");
+            assert_eq!(other.linear_algebra.work_unit, "row_ops", "{name}");
+            assert!(other.linear_algebra.work > 0, "{name}");
+        }
         spec.linalg = "sparse-cado".into();
         let sparse = run(&spec);
         assert!(dense.verified && sparse.verified);

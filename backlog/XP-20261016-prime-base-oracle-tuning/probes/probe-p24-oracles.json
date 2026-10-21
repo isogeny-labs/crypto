@@ -1,0 +1,26 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "XP-20261016-prime-base-oracle-tuning sizing probe A: every prime exact oracle at N=162 on the frontier 24-bit rung",
+  "description": "Pre-freeze sizing probe only (PROTOCOL.md section 10): does each oracle run, which unpriced counters it emits with counts, wall and RSS per run. Frontier P24 curve, probe target seed disjoint from every protocol seed. Not a measurement; not decision-bearing.",
+  "workloads": {
+    "targets_per_curve": 2,
+    "target_seed": 20261018901,
+    "target_kind": "public",
+    "curves": [
+      {"kind": "prime_explicit", "p": 16777199, "a": 16777196, "b": 31, "group_order": 16782299, "r": 16782299, "gx": 2, "gy": 5412647}
+    ]
+  },
+  "arms": [
+    {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "o1-mitm2", "role": "baseline", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=162", "oracle": "mitm:negation_folded=1", "max_trials": "4243777"}}},
+    {"name": "o2-batch2", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=162", "oracle": "mitm-prime-batch:m=2", "max_trials": "4243777"}}},
+    {"name": "o3-mitm3", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=162", "oracle": "mitm:m=3,negation_folded=1", "max_trials": "4243777"}}},
+    {"name": "o4-rfmitm3", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=162", "oracle": "rootfind-mitm:m=3", "max_trials": "4243777"}}},
+    {"name": "o5-rfsub3", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=162", "oracle": "rootfind-subtract:m=3", "max_trials": "4243777"}}},
+    {"name": "o6-rfsub2", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=162", "oracle": "rootfind-subtract:m=2", "max_trials": "4243777"}}},
+    {"name": "o7-sub", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=162", "oracle": "subtract", "max_trials": "4243777"}}},
+    {"name": "o8-rfpairs3", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=162", "oracle": "rootfind-pairs:m=3", "max_trials": "4243777"}}},
+    {"name": "c1-stride", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=162,stride=7919", "oracle": "mitm:negation_folded=1", "max_trials": "4243777"}}}
+  ],
+  "measurement": {"rounds": 1, "warmup": 0, "order": "alternate", "seed": 20261018902, "isolation_required": "L0", "timeout_seconds": 600}
+}

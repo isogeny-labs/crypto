@@ -27,6 +27,10 @@ name = "crypto"
 path = "src/main.rs"
 
 [[bin]]
+name = "ecdlp-audit"
+path = "src/bin/ecdlp_audit.rs"
+
+[[bin]]
 name = "ic"
 path = "src/bin/ic.rs"
 
@@ -209,6 +213,7 @@ rayon = "1.10"
 # BLAKE3 is kept as a crate: its Merkle-tree construction is too complex to
 # reimplement educationally without obscuring the learning goal.
 blake3 = "1.5"
+sha2 = "0.10"
 # DEFLATE compression. Used only by the cryptopals Set-7 CRIME demo
 # (challenge 51): the attack treats compressed-output length as a
 # side channel, so we need a real LZ77-style compressor for the
@@ -227,3 +232,19 @@ harness = false
 name = "pqc_split"
 path = "benches/pqc_split.rs"
 harness = false
+
+[[example]]
+name = "conductor_gap_study"
+path = "research/conductor_gap_cm_orbits_20261015/native/study.rs"
+
+[[example]]
+name = "conductor_gap_ecbench"
+path = "research/conductor_gap_cm_orbits_20261015/native/ecbench_next.rs"
+
+[[example]]
+name = "conductor_gap_followups"
+path = "research/conductor_gap_followups_20261016/native/followups.rs"
+
+[[example]]
+name = "conductor_gap_followup_posthoc"
+path = "research/conductor_gap_followups_20261016/native/posthoc.rs"

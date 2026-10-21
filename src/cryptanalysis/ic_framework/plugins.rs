@@ -14,6 +14,7 @@
 //! | `koblitz-orbit` | Koblitz | the same, each signed Frobenius orbit folded onto one column |
 //! | `compact-orbit-scan` | Koblitz | deterministic raw-abscissa scan, subgroup projection and signed Frobenius closure |
 //! | `cyclotomic` | Koblitz, `2n+1` prime | the γ-weight-`w` abscissae `Σ_{k∈S} γ^k` (lead A2), projected and folded like `compact-orbit-scan` |
+//! | `onb-weight` | Koblitz, `2n+1` prime | ONB Hamming-weight-`w` abscissae, projected and folded like `cyclotomic` (low-HW D\* hypothesis) |
 //! | `glv-orbit` | prime | the closure of the smallest abscissae under the curve's automorphism group, each orbit folded onto one column (`j = 0`: 6 points a column, `j = 1728`: 4, generic: 2) |
 //! | `gls-line` | GLS over `F_{p²}` | the `ψ`-stable line `x ∈ u·s·F_p`, each `⟨−1, ψ⟩`-orbit folded onto one column (4 points a column) |
 //!
@@ -31,6 +32,7 @@
 //! | `subtract` | 2 | test `R − P ∈ F` for every signed base point; no table |
 //! | `mitm` | 2 or 3 | a pair table probed once per target, or once per `R − P` |
 //! | `mitm-prime-batch` | 2 | the same folded prime pair table, built with one batched inversion per abscissa row and x-only sums |
+//! | `mitm-prime-blocked` | 2 | the same table and sums again, inserted in cache-sized pieces (many small maps, each block grouped by map) |
 //! | `mitm-frobenius` | 2 or 3 | the same on a Frobenius-folded table (Koblitz) |
 //! | `mitm-frobenius-counted` | 2 or 3 | the same table and probe, with native table setup counters |
 //! | `rootfind-subtract` | 2 or 3 | prime curves: `prime_fast`'s direct-subtraction root finding, every `x(R ∓ F_i)` of a target from one Montgomery batched inversion, then a lookup (`m = 2`) or a probe of the negation-folded pair table (`m = 3`) |
@@ -1126,6 +1128,149 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CyclotomicBase<'_> {
     }
 }
 
+/// Projected signed Frobenius orbits of the ONB Hamming-weight-`w`
+/// abscissae. Same fold as [`CyclotomicBase`]; the generator set is the
+/// normal basis rather than powers of γ. Spec: `onb-weight:w=W[,columns=N]`.
+pub struct OnbWeightBase<'i> {
+    pub instance: &'i BinaryInstance,
+}
+
+impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for OnbWeightBase<'_> {
+    fn name(&self) -> &str {
+        "onb-weight"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "projected signed Frobenius orbits of the ONB Hamming-weight-{} abscissae",
+            params.get("w").unwrap_or("?")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "w",
+                "ONB Hamming weight of the abscissae; the set has C(n, w) elements before curve filtering",
+            ),
+            (
+                "columns",
+                "optional cap on the number of distinct projected signed orbits, in canonical abscissa order; 0 or absent takes them all",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<FastPoint>, String> {
+        use crate::cryptanalysis::cyclotomic_factor_base::CyclotomicField;
+        let inst = self.instance;
+        let kc = inst
+            .koblitz
+            .as_ref()
+            .ok_or("onb-weight requires a Koblitz curve")?;
+        if ctx.r != inst.r || ctx.cofactor != inst.cofactor || ctx.field_degree != Some(inst.n) {
+            return Err("onb-weight context does not match its binary instance".into());
+        }
+        let w = usize::try_from(params.u64("w")?).map_err(|_| "w does not fit in usize")?;
+        let column_cap = match params.get("columns") {
+            None => 0usize,
+            Some(_) => usize::try_from(params.u64("columns")?)
+                .map_err(|_| "columns does not fit in usize")?,
+        };
+        if inst.n == 0 || inst.n >= 64 || inst.n.is_multiple_of(2) {
+            return Err("onb-weight requires an odd degree < 64".into());
+        }
+        let field = CyclotomicField::new(&inst.irreducible, inst.n)?;
+        let abscissae = field.onb_weight_set(w)?;
+        let lambda = kc
+            .lambda
+            .to_u64()
+            .ok_or("Frobenius eigenvalue does not fit in u64")?;
+        let g = ctx.group;
+        let mut seen = HashSet::new();
+        let mut points = Vec::new();
+        let mut col_of = Vec::new();
+        let mut coef_of = Vec::new();
+        let (mut lifts, mut projected, mut frobenius_maps) = (0u64, 0u64, 0u64);
+        'outer: for x in &abscissae {
+            let raw_x = x.raw_bits().first().copied().unwrap_or(0);
+            for point in inst.points_with_x(raw_x) {
+                lifts += 1;
+                let seed = g.mul(ops, point, ctx.cofactor);
+                if g.is_identity(&seed) {
+                    continue;
+                }
+                projected += 1;
+                let mut xk = seed.x;
+                let mut key = xk;
+                for _ in 1..inst.n {
+                    xk = inst.gf.sqr(xk);
+                    key = key.min(xk);
+                }
+                if !seen.insert(key) {
+                    continue;
+                }
+                if !g.is_identity(&g.mul(ops, seed, ctx.r)) {
+                    return Err(format!("projected point from x {raw_x} has wrong order"));
+                }
+                let column = seen.len() - 1;
+                let mut member = seed;
+                let mut coefficient = 1u64;
+                for _ in 0..inst.n {
+                    if !inst.fast.is_on_curve(member) {
+                        return Err(format!("Frobenius image from x {raw_x} is off curve"));
+                    }
+                    points.push(member);
+                    col_of.push(column);
+                    coef_of.push(coefficient);
+                    points.push(g.neg(member));
+                    col_of.push(column);
+                    coef_of.push((ctx.r - coefficient) % ctx.r);
+                    member = inst.fast.frobenius_k(member, 1);
+                    frobenius_maps += 1;
+                    coefficient = ((coefficient as u128 * lambda as u128) % ctx.r as u128) as u64;
+                }
+                if member != seed || coefficient != 1 {
+                    return Err(format!("Frobenius orbit from x {raw_x} is not closed"));
+                }
+                if column_cap > 0 && seen.len() == column_cap {
+                    break 'outer;
+                }
+            }
+        }
+        let columns = seen.len();
+        if columns == 0 {
+            return Err(format!(
+                "no ONB weight-{w} abscissa carries a subgroup point on {}",
+                inst.name
+            ));
+        }
+        let mut fb = FactorBase::from_column_map(
+            format!(
+                "{columns} projected signed Frobenius orbits of the {} ONB weight-{w} abscissae",
+                abscissae.len()
+            ),
+            points,
+            col_of,
+            coef_of,
+            columns,
+            |p| p.pack(),
+            |p| inst.fast.neg(*p).pack(),
+            |p| p.x,
+        )?;
+        fb.cost
+            .count("abscissae_enumerated_uncharged", abscissae.len() as u64);
+        fb.cost.count("point_lifts_uncharged", lifts);
+        fb.cost.count("cofactor_projected_points", projected);
+        fb.cost.count("frobenius_maps", frobenius_maps);
+        Ok(fb)
+    }
+}
+
 /// The prime-field analogue of `koblitz-orbit`: the `size` smallest
 /// abscissae, closed under the curve's automorphism group and folded
 /// one orbit to a column.  `group` picks the group (`auto` takes what
@@ -1340,14 +1485,35 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
 }
 
 /// The two-summand prime MITM search with the same probe and table keys as
-/// `mitm`, but a batched-inversion, x-only table construction.
+/// `mitm`, but a batched-inversion, x-only table construction.  The
+/// `blocked` form (`mitm-prime-blocked`) builds the same table in
+/// cache-sized pieces ([`PairTable::build_negation_folded_prime_blocked`]).
 pub struct PrimeBatchMitmOracle {
+    blocked: bool,
     table: Option<PairTable>,
 }
 
 impl PrimeBatchMitmOracle {
     pub fn new() -> Self {
-        Self { table: None }
+        Self {
+            blocked: false,
+            table: None,
+        }
+    }
+
+    pub fn blocked() -> Self {
+        Self {
+            blocked: true,
+            table: None,
+        }
+    }
+
+    fn name_str(&self) -> &'static str {
+        if self.blocked {
+            "mitm-prime-blocked"
+        } else {
+            "mitm-prime-batch"
+        }
     }
 }
 
@@ -1359,7 +1525,7 @@ impl Default for PrimeBatchMitmOracle {
 
 impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
     fn name(&self) -> &str {
-        "mitm-prime-batch"
+        self.name_str()
     }
 
     fn summands(&self) -> u32 {
@@ -1367,8 +1533,14 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
     }
 
     fn describe(&self, _params: &Params) -> String {
-        "negation-folded pair table built with batched prime-field inversions; identical MITM probe"
-            .into()
+        if self.blocked {
+            "negation-folded pair table built with batched prime-field inversions, \
+             inserted in cache-sized pieces; identical MITM probe"
+                .into()
+        } else {
+            "negation-folded pair table built with batched prime-field inversions; identical MITM probe"
+                .into()
+        }
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
@@ -1383,9 +1555,13 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
         ops: &mut GroupOps,
     ) -> Result<(), String> {
         if params.u64_or("m", 2)? != 2 || params.0.keys().any(|key| key != "m") {
-            return Err("mitm-prime-batch accepts only m=2".into());
+            return Err(format!("{} accepts only m=2", self.name_str()));
         }
-        let table = PairTable::build_negation_folded_prime_batch(ctx.group, fb)?;
+        let table = if self.blocked {
+            PairTable::build_negation_folded_prime_blocked(ctx.group, fb)?
+        } else {
+            PairTable::build_negation_folded_prime_batch(ctx.group, fb)?
+        };
         ops.merge(table.build_ops);
         self.table = Some(table);
         Ok(())

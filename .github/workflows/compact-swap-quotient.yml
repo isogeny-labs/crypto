@@ -24,7 +24,7 @@ concurrency:
 # Fresh timing panels and their result gates run only after merge or by manual dispatch.
 jobs:
   paired-swap-grid:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|compact-swap-quotient.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|compact-swap-quotient.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 90 }}
     strategy:
       fail-fast: false
@@ -42,12 +42,15 @@ jobs:
             docs/ic/boundary_targets.json
             docs/ecbench/schema.sql
             docs/curves/registry.json
+            docs/curves/standards/parameters.json
             src
             examples/koblitz_orbit_dlp_fast.rs
             examples/koblitz_orbit_dlp_swap.rs
             examples/koblitz_rho_batch_ks_v2_n61.rs
             examples/koblitz_rho_batch_ks_v3.rs
             research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
+            .github/scripts/frozen-lock-source.sh
+            .github/scripts/frozen-lock-source.files
             research/notes/ecc2k130/compact_orbit_rank_evidence_20260929/verify_rank.py
             research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924/independent_replay.py
             research/notes/ecc2k130/compact_orbit_point_panel_20260929/run_panel.py
@@ -65,6 +68,8 @@ jobs:
           cargo run --release --locked --quiet --manifest-path research/notes/ecc2k130/compact_frozen_source_replay_20260929/frozen-materialize/Cargo.toml -- materialize \
             --freeze research/notes/ecc2k130/compact_swap_quotient_20260929/FROZEN.json \
             --dest "${{ runner.temp }}/frozen-src"
+      # The materializer already restored the pinned source and manifest.
+      # This tree has no Git metadata and must not receive another source overlay.
       - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
         working-directory: ${{ runner.temp }}/frozen-src
       - run: cargo build --release --locked --example koblitz_rho_batch_ks_v3 --example koblitz_orbit_dlp_fast --example koblitz_orbit_dlp_swap

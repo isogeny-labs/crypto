@@ -95,6 +95,8 @@ entry, rather than a completed attack comparison.
 
 ## Genus-128 binary GHS cost-stage audit
 
+**Historical prices below.** The [2026-10-19 refresh](reports/review-refresh-20261019/REPORT.md) reconciles the current measured-operation model: the two totals are 74.834885 and 74.879405 log2 modeled bit operations. The table below preserves the earlier quadratic-price results. The [previous receipt](reports/review-refresh-20261019/previous-audit.json) retains those values; the [current receipt](ghs_genus128_cost_audit.json) and website mirrors use the refreshed model.
+
 The exact-invariant `GF(4)` routes for `c2pnb176w1` and `c2pnb272w1` have
 magic number eight, Type II, and projected genus 128. An [independent
 integer audit](src/bin/ghs_genus128_cost_audit.rs) of the transfer registry's
@@ -102,7 +104,7 @@ conditional Enge–Gaudry smoothness model optimizes the factor-base degree
 over all 84 bounds examined. Both routes select degree bound 15. The count
 uses `I_d=(1/d)∑_{e|d} μ(e)4^(d/e)` monic irreducibles of degree `d` and
 counts degree-128 monic polynomials with all factors of degree at most 15.
-The [frozen receipt](ghs_genus128_cost_audit.json) pins the registry, cost-model, and native producer hashes,
+The [historical receipt](reports/review-refresh-20261019/previous-audit.json) pins the registry, cost-model, and native producer hashes,
 the exact polynomial counts, all degree-bound prices, and the two subgroup
 parameters.
 The [run report](reports/run-20261015T0854Z/REPORT.md),
