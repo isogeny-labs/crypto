@@ -24,3 +24,10 @@ nonadmission README. No fake validation certificate or archive exception.
 Both experimental freezes674d/7e8ae96c, measured values, original failures, native
 replays, PDF and S3 bytes are unchanged. Separate integrated release checks/source
 history/publication receipts cover the combined code, not a rerun or higher cap.
+
+Combined source d5aac8e9 subsequently passes4481library tests/0fail/119ignored,
+19exporter,2independent model-checker,38guard unit+7card tests. A separate608144byte
+S3 supplement SHA99aeb0c37f3d585368be87a66787102ccc154aa1b2e818e573ebe8600bb65c53
+retains actual logs/source history with freshGET/payload/bundle/repack PASS.
+See the proof's PUBLICATION.md. The frozen PDF's4471/119 remains the earlier
+experimental-source validation, not a claim about the combined main tree.

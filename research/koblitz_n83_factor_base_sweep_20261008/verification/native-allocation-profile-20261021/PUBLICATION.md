@@ -92,3 +92,20 @@ A late independent main merge at05ec85b5287ebf137f1b1e16c8e91705d48cf77f was
 preserved after the leased publication guard stopped. Original source/archives
 stay immutable. See INTEGRATION.md and the dated report CLARIFICATION.md for
 current canonical-graph/benchmark-admission status and separate integrated checks.
+
+## Integrated-code supplement, after concurrent main merge
+
+A seventh native name is now recorded:
+`evidence/n83/allocation-profile-20261021/integration-verification.tar.xz`,
+**608,144 bytes**,21payloads plus manifest, SHA256
+`99aeb0c37f3d585368be87a66787102ccc154aa1b2e818e573ebe8600bb65c53`.
+Key `store/sha256/99/99aeb0c37f3d585368be87a66787102ccc154aa1b2e818e573ebe8600bb65c53`.
+Manifest SHA256 `81f0762d91a4d33617e48b89e2553ef112052d8b23135dba135975d3827159a1`.
+Fresh PUT/HEAD/GET, all payloads, exact integrated source bundle, validation logs
+and byte-identical repack pass. See integration-proof/ and INTEGRATION.md.
+Combined code source d5aac8e9 passes4481library/119ignored,19exporter,2model-checker,
+38guard unit+7card checks. Its SOURCE-INTEGRATED.bundle requires preserved
+remote05ec85b5; original experiment bundles retain their original prerequisites.
+No new SAT worker or cap. Prior six objects/indices and all remote store entries
+remain preserved. Final publication metadata/index additions are external to
+their own archives. Native validation does not resolve exact-head CI/review.
