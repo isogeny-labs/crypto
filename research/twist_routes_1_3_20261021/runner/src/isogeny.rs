@@ -6,10 +6,7 @@ use crate::{
     write_json, Fixture, Result,
 };
 use serde_json::{json, Value};
-use std::{
-    collections::{BTreeMap, BTreeSet},
-    path::Path,
-};
+use std::{collections::BTreeMap, path::Path};
 #[derive(Clone)]
 struct Velu {
     h: Vec<u64>,

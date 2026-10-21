@@ -13,6 +13,31 @@ use std::{
         Mutex,
     },
 };
+fn cas_render(poly: &f4::Poly, names: &[String], p: u64) -> String {
+    if poly.is_empty() {
+        return "0".into();
+    }
+    poly.iter()
+        .map(|(powers, c)| {
+            let mut factors = vec![(c % p).to_string()];
+            for (i, e) in powers.iter().enumerate() {
+                if *e != 0 {
+                    factors.push(if *e == 1 {
+                        names[i].clone()
+                    } else {
+                        format!("{}^{e}", names[i])
+                    });
+                }
+            }
+            factors.join("*")
+        })
+        .collect::<Vec<_>>()
+        .join("+")
+}
+fn write_compact(path: &Path, value: &impl serde::Serialize) -> Result<()> {
+    fs::write(path, serde_json::to_vec(value)?)?;
+    Ok(())
+}
 fn add_x(e: Quad, a: Option<u64>, b: u64) -> Vec<Option<u64>> {
     let Some(a) = a else { return vec![Some(b)] };
     let p = e.p;
@@ -192,7 +217,7 @@ fn worker(input: &Path, output: &Path, order: &str) -> Result<()> {
     assert_eq!(invalid, 0, "Groebner basis removed a genuine assignment");
     let complete =
         !report.timed_out && report.pairs_above_bound == 0 && report.staircase_at_stop.is_none();
-    write_json(
+    write_compact(
         output,
         &json!({"schema":"twist.f4-cell/v1","complete_by_engine":complete,"timed_out":report.timed_out,"pairs_above_bound":report.pairs_above_bound,"field_multiplications_in_row_reduction":report.field_ops,"max_rows":report.max_rows,"max_columns":report.max_cols,"solving_degree_max":report.solving_degree_max,"degree_reached":report.degree_reached,"all_expected_assignments_retained":true,"expected_affine_assignments":evaluated,"basis":report.basis,"steps":log.steps.iter().map(|s|json!({"degree":s.degree,"rows":s.rows,"all_rows":s.all_rows,"field_multiplications":s.ops})).collect::<Vec<_>>(),"wall_time_admitted":false}),
     )?;
@@ -242,7 +267,7 @@ fn bounded(
     let mut cmd = Command::new("/bin/sh");
     cmd.args([
         "-c",
-        "ulimit -v 786432; exec \"$@\"",
+        "ulimit -c 0; ulimit -v 786432; exec \"$@\"",
         "twist-bounded",
         "/usr/bin/timeout",
         "--signal=TERM",
@@ -293,7 +318,7 @@ fn execute(j: &Job, exe: &Path) -> Result<Value> {
     let rendered: Vec<_> = c
         .equations
         .iter()
-        .map(|p| f4::render(p, &c.names, c.p))
+        .map(|p| cas_render(p, &c.names, c.p))
         .collect();
     fs::write(
         &ms_input,
@@ -354,7 +379,7 @@ fn execute(j: &Job, exe: &Path) -> Result<Value> {
         } else {
             basis
                 .iter()
-                .map(|p| f4::render(p, &c.names, c.p))
+                .map(|p| cas_render(p, &c.names, c.p))
                 .collect::<Vec<_>>()
                 .join(",")
         };
@@ -491,6 +516,20 @@ pub fn main(args: &[String]) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn external_serialization_is_ascii_and_preserves_all_models() {
+        for encoding in ["product", "chain", "bits", "symmetric"] {
+            let c = alg::build(59, 1, 13, 7, &[1, 3, 5, 8], 4, encoding);
+            for polynomial in &c.equations {
+                let text = cas_render(polynomial, &c.names, c.p);
+                assert!(text.is_ascii());
+                assert_eq!(
+                    parse_poly(&text, &c.names, c.p).unwrap(),
+                    f4::normalise(polynomial, c.p, f4::Ordering::Grevlex)
+                );
+            }
+        }
+    }
     #[test]
     fn x_only_law_matches_independent_full_group() {
         let e = Quad::new(59, 1, 13);

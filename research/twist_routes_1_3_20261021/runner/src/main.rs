@@ -4,6 +4,7 @@ mod conditional;
 mod covers;
 mod isogeny;
 mod jacobian;
+mod pari;
 mod solver;
 #[path = "../../../../src/ecc/curve.rs"]
 pub mod source_curve;
@@ -359,7 +360,7 @@ fn main() -> Result<()> {
             );
             Ok(())
         }
-        Some("transfer") => {
+        Some("transfer" | "pari") => {
             let manifest: Value =
                 serde_json::from_slice(&fs::read(args.get(2).ok_or("missing fixtures")?)?)?;
             let fixtures: Vec<Fixture> = serde_json::from_value(manifest["fixtures"].clone())?;
@@ -370,7 +371,11 @@ fn main() -> Result<()> {
                 return Err("transfer requires a fresh directory".into());
             }
             fs::create_dir_all(out)?;
-            let rows = covers::transfer(&fixtures, &selected, out)?;
+            let rows = if args[1] == "transfer" {
+                covers::transfer(&fixtures, &selected, out)?
+            } else {
+                pari::run(&fixtures, &selected, out)?
+            };
             println!(
                 "{}",
                 json!({"status":"finished-transfer","rows":rows.len(),"output":out})
