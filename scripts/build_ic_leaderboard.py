@@ -225,7 +225,11 @@ def curve_records() -> dict:
     status) from the file's fixed two-space layout, and refuses to build if
     the layout is not the one it expects.
     """
-    lines = (REPO / SOURCES["curves_yaml"]).read_text().splitlines()
+    return parse_curve_records((REPO / SOURCES["curves_yaml"]).read_text().splitlines())
+
+
+def parse_curve_records(lines: list[str]) -> tuple[dict, int]:
+    """Parse the leaderboard fields from curves.yaml: (records by ICV1 slug, total)."""
     if "schema_version: 1" not in lines or "curves:" not in lines:
         raise SystemExit(f"{SOURCES['curves_yaml']}: expected schema_version 1 with a top-level curves map")
     recs, cur, in_icv1, in_refs = [], None, False, False
@@ -240,7 +244,7 @@ def curve_records() -> dict:
             continue
         if cur is None:
             continue
-        if re.fullmatch(r"    [A-Za-z_]+:.*", line):
+        if re.fullmatch(r"    [A-Za-z0-9_]+:.*", line):
             in_icv1 = line == "    icv1_identity:"
             in_refs = False
             m = re.fullmatch(r"    factor_base_refs:(.*)", line)
@@ -261,7 +265,15 @@ def curve_records() -> dict:
             cur["factor_base_refs"].append(m.group(1).strip().strip("'\""))
     if not recs or any(r["factor_base_refs"] is None or r["factor_base_link_status"] is None for r in recs):
         raise SystemExit(f"{SOURCES['curves_yaml']}: every record needs factor_base_refs and factor_base_link_status")
-    return {r["slug"]: r for r in recs if r["slug"]}, len(recs)
+    by_slug = {}
+    for record in recs:
+        slug = record["slug"]
+        if not slug:
+            continue
+        if slug in by_slug:
+            raise SystemExit(f"{SOURCES['curves_yaml']}: duplicate ICV1 slug {slug}")
+        by_slug[slug] = record
+    return by_slug, len(recs)
 
 
 def curve_record(records: dict, slug: str) -> dict:
@@ -276,6 +288,27 @@ def curve_record(records: dict, slug: str) -> dict:
 def ec1_of(c: dict) -> str | None:
     reps = c.get("representations") or []
     return reps[0]["ec1"] if reps else None
+
+
+def preserve_frozen_curve_metadata(board: list[dict], pre_gate: dict[str, str]) -> None:
+    """Retain the old missing-link metadata only for an exact frozen payload.
+
+    The earlier reader missed the digit in icv1_identity, so its board rows
+    recorded no registry link. Current registry links belong in the separate
+    registry overview. No measurement change can use this compatibility path:
+    the complete candidate row must still match its original admission hash.
+    """
+    for row in board:
+        historical = {
+            **row,
+            "curve_record": curve_record({}, row["slug"]),
+            "factor_base": {**row["factor_base"], "refs": [],
+                            "link_status": "no_curves_yaml_record"},
+        }
+        expected = pre_gate.get(gate.board_key(row))
+        if expected is not None and gate.row_digest(stable(historical)) == expected:
+            row["curve_record"] = historical["curve_record"]
+            row["factor_base"] = historical["factor_base"]
 
 
 # ---------------------------------------------------------------------------
@@ -1110,6 +1143,7 @@ def build(allow_unvalidated: bool = False) -> dict:
                             "link_status": r["curve_record"]["factor_base_link_status"]}
     # The validation gate (AGENTS.md, owner rule 2026-10-19): a row is validated,
     # frozen as unvalidated (pre-gate), or refused.
+    preserve_frozen_curve_metadata(board, gate.load_pre_gate(gate.PRE_GATE_LEADERBOARD, REPO))
     gate.annotate_board(board, lambda r: gate.row_digest(stable(r)),
                         allow_unvalidated=allow_unvalidated)
     leaders = {}
@@ -1161,6 +1195,7 @@ def build(allow_unvalidated: bool = False) -> dict:
             "aa_controls": n83_holdout["aa_controls"],
         },
         "curve_records": {
+            "current_board_records": {slug: curve_record(records, slug) for slug in sorted(measured)},
             "registry": SOURCES["registry"], "schema": SOURCES["curves_schema"], "yaml": SOURCES["curves_yaml"],
             "yaml_records": n_records,
             "board_curves": len(measured),
@@ -1370,11 +1405,16 @@ def markdown(doc: dict) -> str:
           f"[`{cr['schema']}`](../../{cr['schema']}), records [`{cr['yaml']}`](../../{cr['yaml']}) "
           f"({cr['yaml_records']} records). {cr['board_curves_in_yaml']} of the {cr['board_curves']} board curves "
           f"have a record there; {cr['board_curves_factor_base_reconciled']} have a reconciled factor base.", "",
+          "The registry overview below uses current links. Frozen measurement rows retain their "
+          "original link metadata; refreshing registry links does not change their validation status.", "",
           "| table | curve | curves.yaml record | factor base (points, recipe) | factor-base source | refs |",
           "|:--|:--|:--|:--|:--|:--|"]
     for code in ("A", "B", "C"):
         for r in (r for r in doc["board"] if r["family"] == code):
-            fb, key = r["factor_base"], r["curve_record"]["curves_yaml_key"]
+            record = cr["current_board_records"][r["slug"]]
+            fb = {**r["factor_base"], "refs": record["factor_base_refs"],
+                  "link_status": record["factor_base_link_status"]}
+            key = record["curves_yaml_key"]
             L.append(f"| {code} | `{r['slug']}` | {('`' + key + '`') if key else 'none'} | "
                      f"{fb['points']:,}, {fb['variant'] or fb['recipe']} | `{fb['source']}` | "
                      + (", ".join(f"`{x}`" for x in fb["refs"]) or f"none ({fb['link_status']})") + " |")
@@ -2352,7 +2392,8 @@ def page(doc: dict, standalone: bool) -> str:
              f'({cr["yaml_records"]} records), which carries each curve\'s <code>factor_base_refs</code> and '
              f'<code>factor_base_link_status</code>. {cr["board_curves_in_yaml"]} of the {cr["board_curves"]} curves '
              f'on the board have a record there, and {cr["board_curves_factor_base_reconciled"]} have a reconciled '
-             'factor base; each board row shows its own record and the factor base its source file used.</p>')
+             'factor base. This registry overview uses current links. Frozen measurement rows retain '
+             'their original link metadata; registry updates do not change their validation status.</p>')
     for fam in fam_order:
         rows = [c for c in doc["roster"] if c["family"] == fam]
         if not rows:

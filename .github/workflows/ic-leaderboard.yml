@@ -19,6 +19,7 @@ on:
       - 'scripts/build_ic_leaderboard.py'
       - 'scripts/check_ic_leaderboard_paths.py'
       - 'scripts/test_check_ic_leaderboard_paths.py'
+      - 'scripts/test_build_ic_leaderboard.py'
       - 'scripts/curve_id.py'
       - 'docs/ic-leaderboard.html'
       - 'docs/ic/LEADERBOARD.md'
@@ -79,6 +80,7 @@ on:
       - 'scripts/build_ic_leaderboard.py'
       - 'scripts/check_ic_leaderboard_paths.py'
       - 'scripts/test_check_ic_leaderboard_paths.py'
+      - 'scripts/test_build_ic_leaderboard.py'
       - 'scripts/curve_id.py'
       - 'docs/ic-leaderboard.html'
       - 'docs/ic/LEADERBOARD.md'
@@ -155,6 +157,8 @@ jobs:
           python-version: '3.11'
       - name: The path check's own tests
         run: python3 scripts/test_check_ic_leaderboard_paths.py
+      - name: Curve-record parser tests
+        run: python3 scripts/test_build_ic_leaderboard.py
       - name: This workflow's path filter covers every file the builder reads
         run: python3 scripts/check_ic_leaderboard_paths.py
       - name: The leaderboard is current with its sources and the ledger

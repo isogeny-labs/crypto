@@ -158,7 +158,8 @@ pub fn read_walk(spec: &SourceSpec, text: &str) -> Result<Vec<RegistryCurve>, St
 // ── A YAML subset ─────────────────────────────────────────────────────
 
 /// Parse the block-style YAML subset the crosswalk is written in: nested
-/// mappings, `- scalar` sequences, `[]`/`{}`, `#` comments, plain or
+/// mappings, `- scalar` and `- key: value` sequences, `[]`/`{}`, `#`
+/// comments, plain or
 /// single/double-quoted scalars.  Every scalar but `null`, `true` and
 /// `false` is kept as a string, so large integers stay exact.  Anything
 /// outside the subset is an error, never a silent misreading.  A key
@@ -257,8 +258,9 @@ fn block(
                 ));
             }
             if !quoted && (item.contains(": ") || item.ends_with(':')) {
-                // A mapping item: `- key: value`, with the item's other keys at the
-                // column of its first key.  Items are not otherwise nested.
+                // A mapping item: `- key: value`; its remaining keys use the
+                // indentation of the first key. Preserve an item index in duplicate
+                // paths while allowing nested mappings and sequences in values.
                 let key_col = ind + (c.len() - c.trim_start_matches('-').trim_start().len());
                 let mut map = serde_json::Map::new();
                 let item_path = format!("{path}{}.", seq.len());
@@ -443,6 +445,7 @@ mod tests {
         assert!(v["f"].is_null());
         assert!(parse_yaml("a: |\n  x\n").is_err());
         assert!(parse_yaml("a:\n  -\n    b: 1\n").is_err());
+        assert!(parse_yaml("a:\n  -\n").is_err());
     }
 
     #[test]
@@ -463,5 +466,36 @@ mod tests {
         assert_eq!(v["s"][0]["k"], "1");
         assert!(parse_yaml("s:\n  - a: 1\n    b:\n      - c: 2\n").is_ok());
         assert!(parse_yaml("s:\n  -\n    a: 1\n").is_err());
+    }
+
+    #[test]
+    fn nested_factor_base_sources_stay_nested_and_preserve_identity() {
+        let (v, dups) = parse_yaml(
+            "curves:\n  p256: \n    icv1_identity:\n      slug: p256\n    factor_base_sources:\n      - table: CurveA\n        points: 5264\n        icv1_identity:\n          slug: injected\n        curves:\n          forged: record\n      - table: CurveB\n        source: archive\n",
+        )
+        .unwrap();
+        assert!(dups.is_empty());
+        assert_eq!(v["curves"].as_object().unwrap().len(), 1);
+        assert_eq!(v["curves"]["p256"]["icv1_identity"]["slug"], "p256");
+        let sources = v["curves"]["p256"]["factor_base_sources"]
+            .as_array()
+            .unwrap();
+        assert_eq!(sources.len(), 2);
+        assert_eq!(sources[0]["table"], "CurveA");
+        assert_eq!(sources[0]["points"], "5264");
+        assert_eq!(sources[0]["icv1_identity"]["slug"], "injected");
+        assert_eq!(sources[0]["curves"]["forged"], "record");
+        assert_eq!(sources[1]["table"], "CurveB");
+        assert_eq!(sources[1]["source"], "archive");
+        assert!(v["curves"].get("injected").is_none());
+    }
+
+    #[test]
+    fn nested_mapping_duplicates_are_reported_and_malformed_items_fail() {
+        let (v, dups) = parse_yaml("sources:\n  - table: first\n    table: second\n").unwrap();
+        assert_eq!(v["sources"][0]["table"], "first");
+        assert_eq!(dups, ["sources.0.table"]);
+        assert!(parse_yaml("sources:\n  -\n").is_err());
+        assert!(parse_yaml("sources:\n  - table: first\n      unexpected: value\n").is_err());
     }
 }
