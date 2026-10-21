@@ -397,6 +397,8 @@ clone_repo() {
   local limit="${CLONE_BLOB_LIMIT:-1m}"
   run git clone --filter="blob:limit=$limit" --no-checkout "$url" "$dir" \
     || { warn "clone of $name failed"; return 1; }
+  # A dry run has no clone to inspect or configure.
+  [ "$DRY_RUN" = 1 ] && return 0
   local skipped
   skipped="$(join <(git -C "$dir" rev-list --objects --missing=print -1 HEAD | sed -n 's/^?//p' | sort) \
       <(git -C "$dir" ls-tree -r HEAD --format='%(objectname) %(path)' | sort) | cut -d' ' -f2-)" || true
