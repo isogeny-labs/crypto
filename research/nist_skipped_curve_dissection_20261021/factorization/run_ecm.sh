@@ -10,7 +10,9 @@ mkdir -p "$out"
 [[ -z $(find "$out" -mindepth 1 -maxdepth 1 -print -quit) ]] || { echo 'Choose a fresh attempt directory' >&2; exit 1; }
 printf '%s\n' "$number" > "$out/input.txt"
 date -u +%FT%TZ > "$out/started.txt"
-argv=("${ECM_BIN:-ecm}" -one -c "$curves" -maxmem 1024 -save "$out/residues.txt" "$b1")
+argv=("${ECM_BIN:-ecm}" -one -c "$curves" -maxmem 1024 -save "$out/residues.txt")
+if [[ -n ${ECM_SIGMA:-} ]]; then argv+=(-sigma "$ECM_SIGMA"); fi
+argv+=("$b1")
 printf '%q ' "${argv[@]}" > "$out/command.txt"
 printf '\n' >> "$out/command.txt"
 "${ECM_BIN:-ecm}" -printconfig > "$out/version.txt" 2>&1
@@ -19,7 +21,10 @@ timeout --kill-after=10s 600 "${argv[@]}" < "$out/input.txt" > "$out/stdout.txt"
 status=$?
 set -e
 date -u +%FT%TZ > "$out/finished.txt"
-awk '/Factor found in step/ {print $NF}' "$out/stdout.txt" > "$out/candidate-factors.txt"
+awk '/Factor found in step/ {print $NF}' "$out/stdout.txt" > "$out/reported-factors.txt"
+# A reported input N is a failed curve, not a proper factor. Prefixes force
+# exact string comparisons even for integers larger than awk's numeric type.
+awk -v original="$number" '"x" $0 != "x" original && "x" $0 != "x1"' "$out/reported-factors.txt" > "$out/candidate-factors.txt"
 count=$(awk '/^Step 2 took / {n++} END {print n+0}' "$out/stdout.txt")
 jq -n --arg n "$number" --argjson b1 "$b1" --argjson curves "$curves" --argjson completed "$count" --argjson status "$status" \
   '{schema:"nist-factor-ecm-attempt/v1",input:$n,b1:$b1,requested_curves:$curves,completed_stage2:$completed,exit_status:$status,
