@@ -94,3 +94,14 @@ required before allocation; the cost cap and Pod identity remain unfilled.
 No Pod is allocated by this protocol. The current local K4405 split run is a correctness control
 and has its own 7,200-second wall, 26 GiB RSS, and 8 GiB internal-disk
 free-space guards; its result is recorded separately from Tier 1 selection.
+
+The [RunPod GPU Models price page](https://www.runpod.io/gpu-models), checked
+2026-10-21, lists a Community Cloud RTX 3090 with 125 GB host RAM, 16 vCPUs,
+and a $0.22/hour displayed rate. This is a capacity and price lead, not an
+allocation receipt. The dispatch gate will require an eligible live Pod at
+no more than $0.35/hour, verify at least 48 GiB actual cgroup memory and
+four CPUs of quota, and cap provider lifetime at 12 hours. At that ceiling,
+the projected 12-hour provider charge is at most $4.20; the independent
+watchdog will request termination before a separately approved $5 ceiling
+and verify provider absence. If the eligible Pod is unavailable, the
+dispatch stays pending without substituting a weaker memory envelope.
