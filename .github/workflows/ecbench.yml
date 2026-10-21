@@ -53,7 +53,7 @@ defaults:
     shell: bash
 jobs:
   scope:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 5
     permissions:
       contents: read
@@ -96,10 +96,10 @@ jobs:
   harness:
     if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
     needs: scope
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     # Keep the exhaustive scientific audit's existing 300-minute budget in
-    # the weekly/manual lane; ordinary PR validation is bounded at 25 minutes.
-    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 300 }}
+    # the weekly/manual lane; ordinary PR validation is bounded at 45 minutes.
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 300 }}
     steps:
       - name: Require successful scope classification
         if: needs.scope.result != 'success'
@@ -436,7 +436,7 @@ jobs:
   evidence_audit_pr:
     if: (github.event_name == 'pull_request' || github.event_name == 'merge_group') && needs.scope.outputs.ecbench_replay != 'false'
     needs: [scope, harness]
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4

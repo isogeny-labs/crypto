@@ -1,7 +1,13 @@
 //! Find curves `y² = x³ − 3x + b` over `F_p` with `#E = h·r`, `r` prime,
 //! for the generator-effect study (research/generator_effect_ic_20261019).
 //!
-//! `cargo run --release --example a_minus_3_prime_order_curves -- BITS COUNT SEED [H]`
+//! `cargo run --release --example a_minus_3_prime_order_curves -- BITS COUNT SEED [H] [MIN_V2]`
+//!
+//! `H` selects the cofactor (default 1). `MIN_V2` filters for primes with
+//! `2^MIN_V2 | p − 1`, so that a `prime-kummer` tower of that height exists
+//! (experiment E3); it defaults to 0. The frozen E3 four-argument invocation
+//! ending in `6` remains an alias for `MIN_V2 = 6`; to request cofactor 6,
+//! pass `6 0`.
 //!
 //! Draws `p` with exactly `BITS` bits and `b` at random, keeps curves with
 //! `#E = H·r` for a prime `r > H` (default `H = 1`, prime `#E`), and prints
@@ -15,19 +21,29 @@ use crypto_lib::cryptanalysis::challenge_ladder::is_prime_u64;
 use crypto_lib::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
 use rand::{rngs::StdRng, Rng, SeedableRng};
 
+fn generation_options(extra: &[u64]) -> (u64, u32) {
+    match extra {
+        [] => (1, 0),
+        // E3 froze this positional invocation before the cofactor option existed.
+        [6] => (1, 6),
+        [h] => (*h, 0),
+        [h, min_v2, ..] => (*h, *min_v2 as u32),
+    }
+}
+
 fn main() {
     let args: Vec<u64> = std::env::args()
         .skip(1)
         .map(|a| a.parse().expect("integer argument"))
         .collect();
     let (bits, count, seed) = (args[0] as u32, args[1] as usize, args[2]);
-    let h = args.get(3).copied().unwrap_or(1);
+    let (h, min_v2) = generation_options(args.get(3..).unwrap_or_default());
     let mut rng = StdRng::seed_from_u64(seed);
     let mut found = 0;
     while found < count {
         let p = loop {
             let cand = (rng.gen::<u64>() & ((1u64 << bits) - 1)) | (1u64 << (bits - 1)) | 1;
-            if is_prime_u64(cand) {
+            if is_prime_u64(cand) && (cand - 1).trailing_zeros() >= min_v2 {
                 break cand;
             }
         };
@@ -92,4 +108,19 @@ fn hasse_order(curve: &PrimeCurve) -> Option<u64> {
         acc = curve.add(&mut ops, acc, pt);
     }
     hit
+}
+
+#[cfg(test)]
+mod tests {
+    use super::generation_options;
+
+    #[test]
+    fn cofactor_and_kummer_filter_options_keep_both_call_forms() {
+        assert_eq!(generation_options(&[]), (1, 0));
+        assert_eq!(generation_options(&[4]), (4, 0));
+        assert_eq!(generation_options(&[16]), (16, 0));
+        assert_eq!(generation_options(&[6]), (1, 6));
+        assert_eq!(generation_options(&[6, 0]), (6, 0));
+        assert_eq!(generation_options(&[4, 6]), (4, 6));
+    }
 }
