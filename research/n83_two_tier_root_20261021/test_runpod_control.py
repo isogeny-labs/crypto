@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from research.n83_two_tier_root_20261021 import runpod_control as control
 
@@ -74,6 +75,109 @@ class CreateControl(unittest.TestCase):
 
     def test_ambiguous_create_uses_inventory_without_second_post(self):
         self.run_case(POD, True, ambiguous=True)
+
+    def test_missing_price_deleted(self):
+        self.run_case({**POD, "costPerHr": None}, False)
+
+    def test_malformed_price_deleted(self):
+        self.run_case({**POD, "costPerHr": "unavailable"}, False)
+
+    def test_post_create_failures_clean_up_identified_pod(self):
+        for failure in ("inventory", "detail", "create_receipt",
+                        "detail_receipt", "allocation_receipt", "guard"):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as folder:
+                calls = []
+
+                def request(_key, method, path, _body=None):
+                    calls.append((method, path))
+                    if method == "POST":
+                        return 201, POD
+                    if path == "/pods":
+                        if calls.count(("GET", "/pods")) == 1:
+                            return 200, []
+                        if failure == "inventory":
+                            raise OSError("inventory unavailable")
+                        return 200, [POD]
+                    if failure == "detail":
+                        raise OSError("detail unavailable")
+                    return 200, POD
+
+                original_save = control.save_new
+
+                def save(path, data):
+                    if path.name == {"create_receipt": "create.json",
+                                     "detail_receipt": "post_create.json",
+                                     "allocation_receipt": "allocation.json"}.get(failure):
+                        raise OSError("receipt disk unavailable")
+                    original_save(path, data)
+
+                with patch.object(control, "request", request), \
+                        patch.object(control, "save_new", save), \
+                        patch.object(control, "delete_until_absent") as delete, \
+                        patch.object(control.runpod_guard, "run",
+                                     side_effect=OSError("guard unavailable")):
+                    with self.assertRaises((OSError, RuntimeError)):
+                        control.create_and_guard("unused", Path(folder) / "allocation",
+                                                 "n83-maxk-control", "ssh-ed25519 PUBLIC",
+                                                 Decimal("5"), 43200)
+                    delete.assert_called_once_with(
+                        "unused", "abc123", "n83-maxk-control",
+                        Path(folder) / "allocation" / "guard.jsonl")
+                self.assertEqual(calls.count(("POST", "/pods")), 1)
+
+    def test_delete_retries_network_and_receipt_failures_until_absent(self):
+        with patch.object(control.runpod_guard, "observe", side_effect=[
+                ("POD_PRESENT", {}), ("POD_PRESENT", {}), ("POD_ABSENT", {})]), \
+                patch.object(control.runpod_guard, "request",
+                             side_effect=[OSError("transient network failure"), (204, None)]) as request, \
+                patch.object(control.runpod_guard, "write_receipt",
+                             side_effect=OSError("disk unavailable")), \
+                patch.object(control.time, "sleep"):
+            control.delete_until_absent("unused", "abc123", "n83-maxk-control",
+                                        Path("unused-receipt"))
+            self.assertEqual(request.call_count, 2)
+
+    def test_ambiguous_create_waits_for_inventory_visibility_without_reposting(self):
+        responses = [(200, []), OSError("response lost"), (200, []),
+                     (200, [POD]), (200, POD)]
+        with tempfile.TemporaryDirectory() as folder, \
+                patch.object(control, "request", side_effect=responses) as request, \
+                patch.object(control.time, "sleep") as sleep, \
+                patch.object(control.runpod_guard, "run", return_value=0), \
+                patch.object(control, "delete_until_absent") as delete:
+            self.assertEqual(control.create_and_guard(
+                "unused", Path(folder) / "allocation", "n83-maxk-control",
+                "ssh-ed25519 PUBLIC", Decimal("5"), 43200), 0)
+            self.assertEqual(sum(call.args[1] == "POST" for call in request.call_args_list), 1)
+            sleep.assert_called_once_with(10)
+            delete.assert_not_called()
+
+    def test_unsuccessful_guard_exit_still_cleans_up(self):
+        with tempfile.TemporaryDirectory() as folder, \
+                patch.object(control, "request", side_effect=[
+                    (200, []), (201, POD), (200, [POD]), (200, POD)]), \
+                patch.object(control.runpod_guard, "run", return_value=2), \
+                patch.object(control, "delete_until_absent") as delete:
+            with self.assertRaisesRegex(RuntimeError, "without verified Pod absence"):
+                control.create_and_guard(
+                    "unused", Path(folder) / "allocation", "n83-maxk-control",
+                    "ssh-ed25519 PUBLIC", Decimal("5"), 43200)
+            delete.assert_called_once()
+
+    def test_ambiguous_multiple_new_pods_are_cleaned_up(self):
+        other = {**POD, "id": "abc456"}
+        with tempfile.TemporaryDirectory() as folder, \
+                patch.object(control, "request", side_effect=[
+                    (200, []), (201, POD), (200, [POD, other])]), \
+                patch.object(control.runpod_guard, "run") as guard, \
+                patch.object(control, "delete_until_absent") as delete:
+            with self.assertRaisesRegex(RuntimeError, "identity unresolved"):
+                control.create_and_guard(
+                    "unused", Path(folder) / "allocation", "n83-maxk-control",
+                    "ssh-ed25519 PUBLIC", Decimal("5"), 43200)
+            self.assertEqual([call.args[1] for call in delete.call_args_list],
+                             ["abc123", "abc456"])
+            guard.assert_not_called()
 
 
 if __name__ == "__main__":

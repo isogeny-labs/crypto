@@ -3,10 +3,11 @@
 
 import argparse
 from datetime import datetime, timezone
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 import getpass
 import hashlib
 import json
+import sys
 from pathlib import Path
 import time
 import urllib.error
@@ -93,6 +94,14 @@ def pod_body(name, public_key):
             "dockerStartCmd": [boot], "env": {"PUBLIC_KEY": public_key}}
 
 
+def cleanup_receipt(path, event):
+    # A full or unavailable evidence disk must not stop resource cleanup.
+    try:
+        runpod_guard.write_receipt(path, event)
+    except OSError as error:
+        print("cleanup receipt unavailable: " + type(error).__name__, file=sys.stderr)
+
+
 def delete_until_absent(key, pod_id, name, receipt):
     while True:
         try:
@@ -100,11 +109,14 @@ def delete_until_absent(key, pod_id, name, receipt):
         except (OSError, ValueError) as error:
             status, detail = "API_ERROR", {"error_type": type(error).__name__}
         if status == "POD_ABSENT":
-            runpod_guard.write_receipt(receipt, {"at_utc": now(), "status":
+            cleanup_receipt(receipt, {"at_utc": now(), "status":
                                                      "VERIFIED_POD_ABSENT", **detail})
             return
-        code, _ = runpod_guard.request(key, "DELETE", "/pods/" + pod_id)
-        runpod_guard.write_receipt(receipt, {"at_utc": now(),
+        try:
+            code, _ = runpod_guard.request(key, "DELETE", "/pods/" + pod_id)
+        except (OSError, ValueError):
+            code = "API_ERROR"
+        cleanup_receipt(receipt, {"at_utc": now(),
                                              "status": "DELETE_REQUESTED",
                                              "pod_id": pod_id, "http": code,
                                              "observed": status})
@@ -130,78 +142,103 @@ def create_and_guard(key, run_dir, name, public_key, approved_cap, max_seconds):
         create_code, response = request(key, "POST", "/pods", body)
     except (OSError, ValueError) as error:
         create_code, response = "AMBIGUOUS", {"error_type": type(error).__name__}
-    # A failed or ambiguous POST is resolved by inventory, never retried.
-    while True:
-        try:
-            after_code, after = request(key, "GET", "/pods")
-        except (OSError, ValueError):
-            after_code, after = "API_ERROR", None
-        if after_code == 200 and isinstance(after, list):
-            break
-        print("post-create inventory unavailable; retrying to resolve Pod identity",
-              flush=True)
-        time.sleep(10)
-    named = ([safe_pod(pod) for pod in after if pod.get("name") == name]
-             if after_code == 200 and isinstance(after, list) else [])
-    receipt = {"schema": "n83.maxk-runpod-create/v1",
-               "started_utc": started, "completed_utc": now(),
-               "name": name, "image": IMAGE, "gpu_type": GPU,
-               "public_key_sha256": hashlib.sha256(public_key.encode()).hexdigest(),
-               "request_sha256": hashlib.sha256(json.dumps(body, sort_keys=True,
-                                                    separators=(",", ":")).encode()).hexdigest(),
-               "approved_cap_usd": str(approved_cap),
-               "max_lifetime_seconds": max_seconds,
-               "inventory_before_ids": [pod.get("id") for pod in before],
-               "create_http": create_code,
-               "create_response": (safe_pod(response) if isinstance(response, dict)
-                                   else None),
-               "inventory_after_http": after_code, "matching_after": named}
-    save_new(run_dir / "create.json", receipt)
-    ids = {pod.get("id") for pod in named if pod.get("id")}
-    if isinstance(response, dict) and response.get("id"):
-        ids.add(response["id"])
-    if len(ids) != 1:
-        raise RuntimeError("Pod identity unresolved; inspect inventory before another create")
-    pod_id = ids.pop()
-    detail_code, detail = request(key, "GET", "/pods/" + pod_id + "?includeMachine=true")
-    pod = safe_pod(detail) if detail_code == 200 and isinstance(detail, dict) else {}
-    save_new(run_dir / "post_create.json",
-             {"at_utc": now(), "http": detail_code, "pod": pod})
+    before_ids = {pod.get("id") for pod in before}
+    owned_ids = set()
+    response_id = response.get("id") if isinstance(response, dict) else None
+    if (isinstance(response_id, str) and response_id.isalnum()
+            and response_id not in before_ids):
+        owned_ids.add(response_id)
+    # Once creation identifies a new Pod, every later exception must retain
+    # cleanup responsibility, including receipt writes and guard startup.
     try:
-        rate = Decimal(str(pod.get("costPerHr")))
-    except (ValueError, TypeError):
-        rate = Decimal("Infinity")
-    eligible = (pod.get("id") == pod_id and pod.get("name") == name and
-                pod.get("desiredStatus") == "RUNNING" and
-                pod.get("cloudType") == "COMMUNITY" and
-                pod.get("gpuTypeId") == GPU and pod.get("gpuCount") == 1 and
-                isinstance(pod.get("memoryInGb"), (int, float)) and
-                pod["memoryInGb"] >= 48 and
-                isinstance(pod.get("vcpuCount"), (int, float)) and
-                pod["vcpuCount"] >= 4 and
-                rate.is_finite() and Decimal("0") < rate <=
-                runpod_guard.MAX_RATE and
-                rate * Decimal(max_seconds) / Decimal(3600) <= approved_cap)
-    if not eligible:
-        delete_until_absent(key, pod_id, name, run_dir / "guard.jsonl")
-        raise RuntimeError("created Pod failed price or capacity gate and was deleted")
-    allocation = {"schema": "n83.maxk-runpod-allocation/v1",
-                  "pod_id": pod_id, "pod_name": name,
-                  "created_utc": started,
-                  "cost_per_hr_usd": str(rate),
-                  "approved_cap_usd": str(approved_cap),
-                  "max_lifetime_seconds": max_seconds,
-                  "machine_id": pod.get("machineId"),
-                  "provider_memory_gb": pod["memoryInGb"],
-                  "provider_vcpu_count": pod["vcpuCount"],
-                  "image": IMAGE, "gpu_type": GPU,
-                  "create_receipt_sha256": hashlib.sha256(
-                      (run_dir / "create.json").read_bytes()).hexdigest()}
-    save_new(run_dir / "allocation.json", allocation)
-    print(json.dumps({"status": "ALLOCATED_GUARD_ACTIVE", "pod_id": pod_id,
-                      "machine_id": pod.get("machineId"), "rate_usd_hr": str(rate),
-                      "allocation": str(run_dir / "allocation.json")}), flush=True)
-    return runpod_guard.run(allocation, run_dir / "guard.jsonl", key, 30)
+        # A failed or ambiguous POST is resolved by inventory, never retried.
+        while True:
+            try:
+                after_code, after = request(key, "GET", "/pods")
+            except (OSError, ValueError):
+                after_code, after = "API_ERROR", None
+            if after_code == 200 and isinstance(after, list):
+                for candidate in after:
+                    candidate_id = candidate.get("id")
+                    if (candidate.get("name") == name and isinstance(candidate_id, str)
+                            and candidate_id.isalnum() and candidate_id not in before_ids):
+                        owned_ids.add(candidate_id)
+                # An ambiguous response followed by an empty inventory does not
+                # establish that creation failed: the inventory may lag creation.
+                if owned_ids or (isinstance(create_code, int) and 400 <= create_code < 500):
+                    break
+            elif owned_ids:
+                raise RuntimeError("post-create inventory unavailable; cleaning up identified Pod")
+            print("post-create inventory unavailable; retrying to resolve Pod identity",
+                  flush=True)
+            time.sleep(10)
+        named = ([safe_pod(pod) for pod in after if pod.get("name") == name]
+                 if after_code == 200 and isinstance(after, list) else [])
+        receipt = {"schema": "n83.maxk-runpod-create/v1",
+                   "started_utc": started, "completed_utc": now(),
+                   "name": name, "image": IMAGE, "gpu_type": GPU,
+                   "public_key_sha256": hashlib.sha256(public_key.encode()).hexdigest(),
+                   "request_sha256": hashlib.sha256(json.dumps(body, sort_keys=True,
+                                                        separators=(",", ":")).encode()).hexdigest(),
+                   "approved_cap_usd": str(approved_cap),
+                   "max_lifetime_seconds": max_seconds,
+                   "inventory_before_ids": [pod.get("id") for pod in before],
+                   "create_http": create_code,
+                   "create_response": (safe_pod(response) if isinstance(response, dict)
+                                       else None),
+                   "inventory_after_http": after_code, "matching_after": named}
+        save_new(run_dir / "create.json", receipt)
+        if len(owned_ids) != 1:
+            raise RuntimeError("Pod identity unresolved; inspect inventory before another create")
+        pod_id = next(iter(owned_ids))
+        detail_code, detail = request(key, "GET", "/pods/" + pod_id + "?includeMachine=true")
+        pod = safe_pod(detail) if detail_code == 200 and isinstance(detail, dict) else {}
+        save_new(run_dir / "post_create.json",
+                 {"at_utc": now(), "http": detail_code, "pod": pod})
+        try:
+            rate = Decimal(str(pod.get("costPerHr")))
+        except (InvalidOperation, ValueError, TypeError):
+            rate = Decimal("Infinity")
+        eligible = (pod.get("id") == pod_id and pod.get("name") == name and
+                    pod.get("desiredStatus") == "RUNNING" and
+                    pod.get("cloudType") == "COMMUNITY" and
+                    pod.get("gpuTypeId") == GPU and pod.get("gpuCount") == 1 and
+                    isinstance(pod.get("memoryInGb"), (int, float)) and
+                    pod["memoryInGb"] >= 48 and
+                    isinstance(pod.get("vcpuCount"), (int, float)) and
+                    pod["vcpuCount"] >= 4 and
+                    rate.is_finite() and Decimal("0") < rate <=
+                    runpod_guard.MAX_RATE and
+                    rate * Decimal(max_seconds) / Decimal(3600) <= approved_cap)
+        if not eligible:
+            delete_until_absent(key, pod_id, name, run_dir / "guard.jsonl")
+            owned_ids.clear()
+            raise RuntimeError("created Pod failed price or capacity gate and was deleted")
+        allocation = {"schema": "n83.maxk-runpod-allocation/v1",
+                      "pod_id": pod_id, "pod_name": name,
+                      "created_utc": started,
+                      "cost_per_hr_usd": str(rate),
+                      "approved_cap_usd": str(approved_cap),
+                      "max_lifetime_seconds": max_seconds,
+                      "machine_id": pod.get("machineId"),
+                      "provider_memory_gb": pod["memoryInGb"],
+                      "provider_vcpu_count": pod["vcpuCount"],
+                      "image": IMAGE, "gpu_type": GPU,
+                      "create_receipt_sha256": hashlib.sha256(
+                          (run_dir / "create.json").read_bytes()).hexdigest()}
+        save_new(run_dir / "allocation.json", allocation)
+        print(json.dumps({"status": "ALLOCATED_GUARD_ACTIVE", "pod_id": pod_id,
+                          "machine_id": pod.get("machineId"), "rate_usd_hr": str(rate),
+                          "allocation": str(run_dir / "allocation.json")}), flush=True)
+        result = runpod_guard.run(allocation, run_dir / "guard.jsonl", key, 30)
+        if result != 0:
+            raise RuntimeError("allocation guard exited without verified Pod absence")
+        owned_ids.clear()  # The guard returns zero only after verified absence.
+        return result
+
+    finally:
+        for owned_id in sorted(owned_ids):
+            delete_until_absent(key, owned_id, name, run_dir / "guard.jsonl")
 
 
 def main():
