@@ -85,3 +85,10 @@ Both native arms and all requested raw records are stored and verified within
 the exact declared diagnostic scope. Full-grid search, reclamation optimization,
 higher conflict caps, minimum memory and complete historical cold accounting
 remain open; no task or timed worker continues after publication of this result.
+
+## Concurrent PR integration
+
+A late independent main merge at05ec85b5287ebf137f1b1e16c8e91705d48cf77f was
+preserved after the leased publication guard stopped. Original source/archives
+stay immutable. See INTEGRATION.md and the dated report CLARIFICATION.md for
+current canonical-graph/benchmark-admission status and separate integrated checks.
