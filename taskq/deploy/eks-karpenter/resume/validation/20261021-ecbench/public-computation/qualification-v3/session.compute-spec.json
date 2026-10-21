@@ -1,0 +1,47 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "rho.plain"
+      },
+      "name": "rho-plain",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg-aa",
+      "role": "control"
+    }
+  ],
+  "description": "Isolation and correctness validation, not an algorithm performance claim.",
+  "label": "CRIU computation only: all timing invalid for benchmark admission",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 5,
+    "seed": 1,
+    "timeout_seconds": 120,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "bits": 32,
+        "kind": "prime_search",
+        "seed": 59297
+      }
+    ],
+    "target_seed": 20261002,
+    "targets_per_curve": 2
+  }
+}

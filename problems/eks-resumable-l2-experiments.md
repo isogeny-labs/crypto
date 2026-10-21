@@ -80,3 +80,18 @@ Unresolved. 2026-10-21: installed the EBS snapshot controller and class, validat
 the manual CRIU/CSI replacement-worker mechanism, and made the shared skill
 distinguish that proof from unavailable automatic harness recovery. Merging the
 skill or this record does not close the integration requirement.
+
+2026-10-21 implementation update: the real native ecbench qualification restored
+36 records and replayed all 30 measured records after clearing inherited
+supplementary groups; a normal perf-enabled process failed CRIU dump, so the
+new native computational launcher deliberately disables perf and forces L0.
+The [report](../taskq/deploy/eks-karpenter/resume/validation/20261021-ecbench/REPORT.md)
+retains both failures and the fresh L2/S3 epoch.
+
+A native controller, separate request/status contract, CodeBuild deployment,
+MCP adapters and optional GitHub Action recovery input are now implemented.
+Automatic zero-restore submission has passed computation replay and its separate
+36-record L2/30-replay/10-A-A/19-S3-hash epoch. Worker-loss and controller-restart
+qualification is running; this record remains unresolved until that evidence
+and the failure-path checks pass. The shared inherited validation gate still
+blocks the parent commit-image PR and full main-branch Action verification.

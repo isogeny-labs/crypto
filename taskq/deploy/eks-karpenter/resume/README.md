@@ -136,3 +136,67 @@ the first step is checked against a separately generated OpenSSL reference.
   describe CPU capability and cgroup handling.
 - [EKS CSI snapshot controller](https://docs.aws.amazon.com/eks/latest/userguide/csi-snapshot-controller.html)
   documents the managed addon and CSI storage requirement.
+
+## Native controller implementation
+
+The separate [request schema](request.schema.json), native
+[controller](controller/src/cloud.rs), and [trusted supervisor](controller/src/supervisor.rs)
+implement the policy in [CONTROLLER.md](CONTROLLER.md). The ordinary v1 route is
+unchanged. Automatic worker-loss acceptance remains in progress; the short
+zero-restore path already passed computation replay, a fresh L2 epoch and S3.
+
+The [real ecbench operator qualification](validation/20261021-ecbench/REPORT.md)
+adds actual native parent/child restore, corrected empty supplementary groups,
+30 independently reproduced records and a fresh 36-record L2 epoch. Its
+[PDF](validation/20261021-ecbench/report.pdf) retains the unsupported 36-bit
+request, perf-descriptor dump failure and first restore's group mismatch.
+
+Build or install the trusted native client on a host with AWS identity:
+
+```bash
+cargo +1.99.1 build --locked --release --manifest-path \
+  taskq/deploy/eks-karpenter/resume/controller/Cargo.toml
+client=taskq/deploy/eks-karpenter/resume/controller/target/release/isolab-eks-recovery
+"$client" validate /absolute/path/request.json
+"$client" submit /absolute/path/request.json /absolute/path/receipts
+"$client" remote-status /absolute/path/request.json /absolute/path/receipts
+"$client" wait /absolute/path/request.json /absolute/path/receipts
+```
+
+For the approved release client, `fetch-client /absolute/install/path` verifies
+the private content-addressed runtime package before installation. `publish-runtime
+BASE-IMAGE.json OUTPUT.json` composes those trusted tools over the tested image.
+It rejects image ONBUILD hooks and executes no tested code during publication.
+
+The request binds a logical name, exact base image/source/binary, exact recovery
+image, original L2 spec, c8a.2xlarge, checkpoint interval (30..900 seconds), maximum
+restores (1..5), and the original absolute UTC deadline. Computation is UID/GID
+1000 without capabilities or supplementary groups. Timing is forced to L0 and
+cannot pass the ordinary L2 gate. It is replayed for correctness before exactly
+one distinct fresh benchmark epoch. Supported workloads are trusted native CPU
+experiments; arbitrary networking, GPUs, ARM and cross-family restore are not
+qualified. The private privileged supervisor is not an untrusted-code boundary.
+
+The controller owns a resourceVersion-guarded ConfigMap and requires AWS to
+confirm a previous CodeBuild owner terminal before takeover. It requires the
+exact previous EC2 worker to be **terminated** before restoring; a missing Node,
+expired heartbeat or stopped instance is insufficient. It never terminates
+workers itself. Original deadlines and immutable requests cannot change during
+recovery. A permanent S3 request marker prevents silently restarting a deleted
+logical run; a crash before its initial ConfigMap exists needs explicit operator
+reconciliation, not automatic restart from zero.
+
+Each committed generation combines a frozen process tree, flushed filesystem,
+encrypted CSI EBS snapshot, private versioned S3 archive and complete hash
+readback. The two most recent verified generations are eligible for automatic
+rollback; older S3 evidence and Retain-class EBS snapshots remain for explicit
+retention management. PVCs also remain until their evidence is collected; do not
+mistake Kubernetes Pod completion for storage cleanup. Interrupted generations
+and failed measurements are retained and cannot replace a good measurement.
+
+Deploy `namespace.yaml`, `rbac.yaml`, and `bridge.yaml` with `deploy-controller`
+from an authorized administrator identity. It packages native binaries and binds
+the CodeBuild source to an S3 version. The role has no EC2 termination permission.
+The project admits one controller at a time; the pool cap stays 64 vCPUs and the
+account quota 96. The controller can restore only after a complete generation;
+loss before the first committed checkpoint fails visibly instead of starting over.

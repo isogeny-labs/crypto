@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Compose the trusted, content-addressed recovery tools over a tested image.
+# No RUN instruction and no tested executable is invoked with publisher credentials.
+set -euo pipefail
+[[ $# == 2 ]] || { echo 'Usage: publish-runtime BASE-IMAGE.json OUTPUT.json' >&2; exit 2; }
+here=$(cd "$(dirname "$0")" && pwd)
+[[ $(aws sts get-caller-identity --query Account --output text) == 104186811093 ]] || exit 2
+base=$(jq -er .image_uri "$1")
+[[ "$base" =~ ^104186811093\.dkr\.ecr\.us-east-2\.amazonaws\.com/isolab/tasks@sha256:[a-f0-9]{64}$ ]] || exit 2
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+bucket=$(jq -er .bucket "$here/runtime.json")
+key=$(jq -er .key "$here/runtime.json")
+version=$(jq -er .version "$here/runtime.json")
+hash=$(jq -er .sha256 "$here/runtime.json")
+[[ "$bucket" == isolab-results-104186811093-us-east-2 && "$key" == "inputs/recovery-runtime/$hash.tar.gz" && "$hash" =~ ^[a-f0-9]{64}$ ]] || exit 2
+aws s3api get-object --region us-east-2 --bucket "$bucket" --key "$key" --version-id "$version" "$work/runtime.tar.gz" >/dev/null
+printf '%s  %s\n' "$hash" "$work/runtime.tar.gz" | sha256sum -c - >&2
+tar --no-same-owner -xzf "$work/runtime.tar.gz" -C "$work"
+(cd "$work/runtime" && sha256sum -c SHA256SUMS) >&2
+tag="recovery-$(printf '%s\n%s\n' "$base" "$hash" | sha256sum | cut -c1-40)"
+repo=104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks
+aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin "${repo%%/*}" >&2
+docker pull "$base" >&2
+docker image inspect "$base" | jq -e '.[0].Config.OnBuild==null or .[0].Config.OnBuild==[]' >/dev/null
+docker build --build-arg "BASE_IMAGE=$base" -f "$here/Dockerfile.runtime" -t "$repo:$tag" "$work" >&2
+docker push "$repo:$tag" >&2
+digest=$(aws ecr describe-images --region us-east-2 --repository-name isolab/tasks --image-ids "imageTag=$tag" --query 'imageDetails[0].imageDigest' --output text)
+[[ "$digest" =~ ^sha256:[a-f0-9]{64}$ ]] || exit 2
+jq -n --arg image "$repo@$digest" --arg base "$base" --arg runtime "$hash" '{runtime_image_uri:$image,base_image_uri:$base,runtime_archive_sha256:$runtime}' > "$2"

@@ -61,3 +61,22 @@ Use the live recovery request/status schema once implemented. Do not add an
 unrecognized `resume` field to `isolab.eks.request/v1`; its validator deliberately
 rejects unknown fields. A requested resumable experiment must fail admission when
 its checkpoint/restore capability is missing, not silently run without recovery.
+
+## Native implementation and current qualification
+
+The operator qualification now also covers real native ecbench: 36 computations
+continued after CRIU/EBS replacement, with 30 independent replays. Its first dump
+failed on an open perf_event descriptor; the new computation launcher explicitly
+forces L0 and denies perf creation. The first restore inherited group 0; clearing
+the supervisor's groups fixed it. Both failures are retained in the
+[native qualification report](../../../../taskq/deploy/eks-karpenter/resume/validation/20261021-ecbench/REPORT.md).
+A separate fresh epoch passed 36 L2 observations, 30 replays, 10 A/A pairs and all
+19 S3 payload hashes. These are scoped operator proofs, not automatic failover.
+
+The native controller and separate `isolab.eks.resumable/v1` request are now
+implemented under `resume/controller`. AWS-only submission is available through
+`isolab-eks-recovery submit REQUEST OUTPUT_DIRECTORY`, with `remote-status` and
+`wait` for the same immutable request. The short automatic path has passed the
+computation-to-fresh-epoch transition. Automatic worker-loss qualification is
+still in progress: check the controller report/runtime qualification before
+presenting that capability as ready.

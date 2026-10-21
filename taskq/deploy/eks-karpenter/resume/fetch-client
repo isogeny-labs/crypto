@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Install only the hash-bound native client; never fetch a tested executable here.
+set -euo pipefail
+[[ $# == 1 && "$1" == /* ]] || { echo 'Usage: fetch-client ABSOLUTE-OUTPUT-DIRECTORY' >&2; exit 2; }
+here=$(cd "$(dirname "$0")" && pwd)
+mkdir -p "$1"
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+hash=$(jq -er .sha256 "$here/runtime.json")
+key=$(jq -er .key "$here/runtime.json")
+version=$(jq -er .version "$here/runtime.json")
+[[ "$hash" =~ ^[a-f0-9]{64}$ && "$key" == "inputs/recovery-runtime/$hash.tar.gz" ]] || exit 2
+aws s3api get-object --region us-east-2 --bucket isolab-results-104186811093-us-east-2 --key "$key" --version-id "$version" "$work/runtime.tar.gz" >/dev/null
+printf '%s  %s\n' "$hash" "$work/runtime.tar.gz" | sha256sum -c - >&2
+tar --no-same-owner -xzf "$work/runtime.tar.gz" -C "$work" runtime/isolab-eks-recovery runtime/SHA256SUMS
+(cd "$work/runtime" && sha256sum --ignore-missing -c SHA256SUMS) >&2
+install -m755 "$work/runtime/isolab-eks-recovery" "$1/isolab-eks-recovery"

@@ -1,0 +1,23 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://github.com/aburan28/crypto/isolab.eks.resumable.v1.schema.json",
+  "title":"Trusted resumable native ecbench computation and one fresh L2 epoch",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schema","run_name","deadline_unix_seconds","build","runtime_image_uri","spec","instance_type","checkpoint_interval_seconds","max_restores"],
+  "properties":{
+    "schema":{"const":"isolab.eks.resumable/v1"},
+    "run_name":{"type":"string","maxLength":32,"pattern":"^[a-z](?:[a-z0-9-]*[a-z0-9])?$"},
+    "deadline_unix_seconds":{"type":"integer","minimum":1,"description":"Original absolute UTC deadline; never reset by retries. New runs need 180..86400 seconds."},
+    "build":{"type":"object","additionalProperties":false,"required":["image_uri","source_revision","ecbench_sha256"],"properties":{
+      "image_uri":{"type":"string","pattern":"^104186811093\\.dkr\\.ecr\\.us-east-2\\.amazonaws\\.com/isolab/tasks@sha256:[a-f0-9]{64}$"},
+      "source_revision":{"type":"string","pattern":"^[a-f0-9]{40}$"},
+      "ecbench_sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"}
+    }},
+    "runtime_image_uri":{"type":"string","pattern":"^104186811093\\.dkr\\.ecr\\.us-east-2\\.amazonaws\\.com/isolab/tasks@sha256:[a-f0-9]{64}$","description":"Trusted recovery layer over the build image. The native binary hash must match build.ecbench_sha256."},
+    "spec":{"type":"object","description":"Original ecbench.spec/v1 requiring L2, warmup >=1, rounds >=5, reference and matching A/A. Native controller and ecbench apply semantic validation."},
+    "instance_type":{"const":"c8a.2xlarge"},
+    "checkpoint_interval_seconds":{"type":"integer","minimum":30,"maximum":900},
+    "max_restores":{"type":"integer","minimum":1,"maximum":5}
+  }
+}
