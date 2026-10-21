@@ -152,6 +152,10 @@ enum Cmd {
         spec: PathBuf,
         #[arg(long)]
         json: bool,
+        /// Print the session's `plan.json` document, byte for byte as `run`
+        /// writes it.
+        #[arg(long, conflicts_with = "json")]
+        doc: bool,
     },
     /// Run a session.
     Run {
@@ -812,10 +816,22 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 }
             }
         }
-        Cmd::Plan { spec: path, json } => {
+        Cmd::Plan {
+            spec: path,
+            json,
+            doc,
+        } => {
             let text = read(&path)?;
             let p = spec::plan(spec::Spec::from_json(&text)?)?;
-            if json {
+            if doc {
+                print_json(&runner::PlanDoc {
+                    schema: "ecbench.plan/v1".into(),
+                    spec_id: p.spec_id.clone(),
+                    arms: p.arms.clone(),
+                    workloads: p.workloads.clone(),
+                    executions: p.executions.clone(),
+                })?;
+            } else if json {
                 print_json(&serde_json::json!({
                     "spec_id": p.spec_id, "spec_sha256": p.spec_sha256,
                     "arms": p.arms, "workloads": p.workloads, "executions": p.executions.len(),

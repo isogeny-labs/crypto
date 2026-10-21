@@ -14,8 +14,10 @@
 //!    the edge maps to every curve, so each curve holds the same discrete
 //!    log `k` (`ℓ ∤ n`, so every map is injective on `⟨P⟩`).  Every edge is
 //!    checked: image on the codomain, `φ(P + Q) = φ(P) + φ(Q)`, `n·φ(P) = O`.
-//! 4. Run single-walker distinguished-point Pollard rho (32-adding walk,
-//!    no negation map) on every curve with the same trial seeds, plus
+//! 4. Run single-walker distinguished-point Pollard rho (32-adding walk on
+//!    the classes `{R, −R}`: the negation map with the Wiener–Zuccherato
+//!    look-ahead and short-cycle escape by doubling; `--negation off` walks
+//!    on points as before 2026-10-20) on every curve with the same trial seeds, plus
 //!    isomorphic re-scalings of the root as a representation control, and
 //!    record group operations and wall time per solve.
 //!
@@ -500,9 +502,175 @@ struct Instance {
 
 struct Solve {
     k: Option<u64>,
+    /// Group additions of the walk, the look-ahead's discarded additions and
+    /// the escapes' doublings included.
     iters: u64,
     restarts: u32,
     ns: u128,
+    look_ahead: u64,
+    escapes: u64,
+}
+
+/// The walk the native engine runs: [`rho_neg`] or, with `--negation off`,
+/// [`rho`] on points.
+fn rho_native(
+    f: &Fp,
+    inst: &Instance,
+    n: u64,
+    seed: u64,
+    dp_bits: u32,
+    lens: &Lens,
+    negation: bool,
+) -> Solve {
+    if negation {
+        rho_neg(f, inst, n, seed, dp_bits, lens)
+    } else {
+        rho(f, inst, n, seed, dp_bits, lens)
+    }
+}
+
+/// Points of a short cycle the negation walk watches for.
+const CYCLE_WINDOW: usize = 16;
+
+/// [`rho`] on the classes `{R, −R}` (`A = 2`, about `√(πn/4)` steps).  The
+/// class representative is the one whose lens image has `y ≤ (p − 1)/2`;
+/// every lens map is a group homomorphism, so `read(−R) = −read(R)` and
+/// the choice is one sign test on the coordinates the walk already reads.
+/// The jump index and the distinguished-point test read only `x`, which the
+/// two share.  As in `ic_boundary::RhoWalk::negation()`, a step whose
+/// result was flipped and would take the same jump again (the fruitless
+/// 2-cycle) takes the next jump instead, and a repeat among the last
+/// [`CYCLE_WINDOW`] points is left by doubling the cycle's member of
+/// smallest `x`; a walk that meets the same cycle twice restarts.  Both
+/// guards' additions count as iterations.
+fn rho_neg(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) -> Solve {
+    let e = &inst.curve;
+    let (p, q) = (Some(inst.p), Some(inst.q));
+    let half = (f.p - 1) / 2;
+    let mut rng = SmallRng::seed_from_u64(seed);
+    let t0 = Instant::now();
+    let steps: Vec<(u64, u64, (u64, u64))> = (0..32)
+        .map(|_| loop {
+            let (a, b) = (rng.gen_range(0..n), rng.gen_range(0..n));
+            if let Some(r) = e.add(f, e.mul(f, p, a), e.mul(f, q, b)) {
+                break (a, b, r);
+            }
+        })
+        .collect();
+    let jump = |x: u64| (x.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 59) as usize;
+    // The representative of {x, −x} and its coefficients, read through the lens.
+    let canon = |x: (u64, u64), a: u64, b: u64| {
+        let c = lens.read(f, x);
+        if c.1 > half {
+            (
+                (x.0, f.neg(x.1)),
+                (c.0, f.neg(c.1)),
+                (n - a) % n,
+                (n - b) % n,
+                true,
+            )
+        } else {
+            (x, c, a, b, false)
+        }
+    };
+    let found = |k: u64, iters, restarts, look_ahead, escapes| Solve {
+        k: Some(k),
+        iters,
+        restarts,
+        ns: t0.elapsed().as_nanos(),
+        look_ahead,
+        escapes,
+    };
+    let mut table: HashMap<u64, (u64, u64, u64)> = HashMap::new();
+    let (mut iters, mut restarts, mut look_ahead, mut escapes) = (0u64, 0u32, 0u64, 0u64);
+    let dp_mask = (1u64 << dp_bits) - 1;
+    let max_run = 40u64 << dp_bits;
+    'restart: loop {
+        let (a0, b0) = (rng.gen_range(0..n), rng.gen_range(0..n));
+        let Some(x0) = e.add(f, e.mul(f, p, a0), e.mul(f, q, b0)) else {
+            restarts += 1;
+            continue;
+        };
+        let (mut x, mut c, mut a, mut b, _) = canon(x0, a0, b0);
+        let mut run = 0u64;
+        let mut recent: VecDeque<(u64, (u64, u64), u64, u64)> = VecDeque::new();
+        let mut last_escape: Option<u64> = None;
+        loop {
+            let mut j = jump(c.0);
+            let mut tried = 0usize;
+            loop {
+                let s = &steps[j];
+                iters += 1;
+                run += 1;
+                tried += 1;
+                let (na, nb) = ((a + s.0) % n, (b + s.1) % n);
+                let Some(nx) = e.add(f, Some(x), Some(s.2)) else {
+                    // naP + nbQ = O.
+                    if nb != 0 {
+                        let k = mulmod(n - na % n, inv_mod(nb, n), n) % n;
+                        return found(k, iters, restarts, look_ahead, escapes);
+                    }
+                    restarts += 1;
+                    continue 'restart;
+                };
+                let (yx, yc, ya, yb, flipped) = canon(nx, na, nb);
+                if flipped && tried < steps.len() && jump(yc.0) == j {
+                    look_ahead += 1;
+                    j = (j + 1) % steps.len();
+                    continue;
+                }
+                (x, c, a, b) = (yx, yc, ya, yb);
+                break;
+            }
+            // A short cycle: this point is one of the last CYCLE_WINDOW.
+            if let Some(pos) = recent.iter().position(|r| r.0 == c.0) {
+                let &(mk, mx, ma, mb) = recent
+                    .iter()
+                    .skip(pos)
+                    .min_by_key(|r| r.0)
+                    .expect("a cycle has members");
+                if last_escape == Some(mk) {
+                    restarts += 1;
+                    continue 'restart;
+                }
+                last_escape = Some(mk);
+                iters += 1;
+                escapes += 1;
+                let Some(d) = e.add(f, Some(mx), Some(mx)) else {
+                    restarts += 1;
+                    continue 'restart;
+                };
+                (x, c, a, b, _) = canon(d, (ma + ma) % n, (mb + mb) % n);
+                recent.clear();
+            }
+            recent.push_back((c.0, x, a, b));
+            if recent.len() > CYCLE_WINDOW {
+                recent.pop_front();
+            }
+            if c.0.wrapping_mul(0xC2B2_AE3D_27D4_EB4F) >> 40 & dp_mask == 0 {
+                if let Some(&(y2, a2, b2)) = table.get(&c.0) {
+                    // Same point: (a − a2)P = (b2 − b)Q; opposite: (a + a2)P = −(b + b2)Q.
+                    let (num, den) = if y2 == c.1 {
+                        ((a + n - a2) % n, (b2 + n - b) % n)
+                    } else {
+                        ((n - (a + a2) % n) % n, (b + b2) % n)
+                    };
+                    if den != 0 {
+                        let k = mulmod(num, inv_mod(den, n), n);
+                        return found(k, iters, restarts, look_ahead, escapes);
+                    }
+                    restarts += 1;
+                    continue 'restart;
+                }
+                table.insert(c.0, (c.1, a, b));
+                run = 0;
+            }
+            if run > max_run {
+                restarts += 1;
+                continue 'restart;
+            }
+        }
+    }
 }
 
 fn rho(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) -> Solve {
@@ -550,6 +718,8 @@ fn rho(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) ->
                             iters,
                             restarts,
                             ns: t0.elapsed().as_nanos(),
+                            look_ahead: 0,
+                            escapes: 0,
                         };
                     }
                     restarts += 1;
@@ -571,6 +741,8 @@ fn rho(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) ->
                             iters,
                             restarts,
                             ns: t0.elapsed().as_nanos(),
+                            look_ahead: 0,
+                            escapes: 0,
                         };
                     }
                     restarts += 1;
@@ -617,6 +789,8 @@ fn rho_ca(ca: &str, extra: &[String], f: &Fp, inst: &Instance, n: u64, seed: u64
         iters: v["ops"].as_u64().unwrap_or(0),
         restarts: 0,
         ns: (v["seconds"].as_f64().unwrap_or(0.0) * 1e9) as u128,
+        look_ahead: 0,
+        escapes: 0,
     }
 }
 
@@ -902,7 +1076,7 @@ fn instance_study(
                 };
                 let q = e0.mul(f, Some(p), k).expect("1 <= k < n");
                 let inst = Instance { curve: e0, p, q };
-                let s = rho(f, &inst, n, walk, dp_bits, &lens);
+                let s = rho_native(f, &inst, n, walk, dp_bits, &lens, args.negation);
                 (walk, k, p, s)
             })
             .collect();
@@ -951,13 +1125,18 @@ fn instance_study(
             "welch_z": (m - bm) / se, "ks_d": d, "ks_p": p,
         });
     }
-    let expected = (std::f64::consts::PI * n as f64 / 2.0).sqrt();
+    let expected = (std::f64::consts::PI * n as f64 / if args.negation { 4.0 } else { 2.0 }).sqrt();
     let result = json!({
         "schema": "volcano-rho.instance-study/v1",
         "curve": {"p": f.p, "a": e0.a, "b": e0.b, "order": n * cof, "n": n},
         "P": [p0.0, p0.1], "k": k0, "seed": args.seed, "trials_per_arm": args.trials,
         "fixed_walk_seed": fixed_walk, "dp_bits": dp_bits,
-        "rho": {"walk": "native single-walker 32-adding DP, no negation map",
+        "rho": {"walk": if args.negation {
+                    "native single-walker 32-adding DP on {R, -R}: negation map, look-ahead, short-cycle escape by doubling"
+                } else {
+                    "native single-walker 32-adding DP, no negation map"
+                },
+                "negation": args.negation,
                 "expected_iters": expected,
                 "expected_iters_r32": expected / (1.0 - 1.0 / 32.0f64).sqrt()},
         "arms": out_arms, "seconds": t0.elapsed().as_secs_f64(),
@@ -1002,6 +1181,9 @@ struct Args {
     /// `native` (each curve hashes its own x) or `pullback` (every curve
     /// hashes the root's canonical point, so walks coincide across curves).
     walk: String,
+    /// The native walk runs on `{R, −R}` (`--negation on`, the default) or on
+    /// points (`--negation off`, the walk before 2026-10-20).
+    negation: bool,
     ca: String,
     ca_args: Vec<String>,
     controls: usize,
@@ -1038,6 +1220,7 @@ fn parse_args() -> Args {
         order: None,
         engine: "native".into(),
         walk: "native".into(),
+        negation: true,
         ca: "ca".into(),
         ca_args: Vec::new(),
         controls: 3,
@@ -1123,6 +1306,13 @@ fn parse_args() -> Args {
             "--ca" => a.ca = val.clone(),
             "--ca-arg" => a.ca_args.push(val.clone()),
             "--controls" => a.controls = val.parse().unwrap(),
+            "--negation" => {
+                a.negation = match val.as_str() {
+                    "on" => true,
+                    "off" => false,
+                    _ => die("--negation takes on or off"),
+                }
+            }
             "--out" => a.out = PathBuf::from(val),
             "-h" | "--help" => {
                 println!(
@@ -1134,13 +1324,15 @@ Pollard rho measured on each curve.
                             [--max-cofactor 64] [options]
 
 options: [--ell 3] [--seed 1] [--trials 100] [--per-level 10] [--controls 3]
-         [--dp-bits auto] [--engine native|ca] [--walk native|pullback] [--ca PATH] [--ca-arg ARG]... [--out DIR]
+         [--dp-bits auto] [--engine native|ca] [--walk native|pullback] [--negation on|off] [--ca PATH] [--ca-arg ARG]... [--out DIR]
          [--instance-study] [--ecbench DIR [--models 1] [--targets 64] [--ic-size 32]]
 
 --curve takes y^2 = x^3 + Ax + B over F_P, P prime < 2^62, in decimal. The
 generator (cofactor times a seeded random point) and the secret k are drawn
 from --seed. --engine ca runs `ca solve --alg rho` from the cryptanalysis
 repository on every curve (--ca-arg passes extra options, e.g. --no-negation).
+The native walk runs on {{R, -R}} (negation map, look-ahead, short-cycle escape
+by doubling); --negation off walks on points, as before 2026-10-20.
 Writes results.json, trials.csv and instances.jsonl to --out.
 
 --instance-study skips the walk and measures the root curve alone, --trials
@@ -1762,7 +1954,15 @@ fn main() {
             let r = if args.engine == "ca" {
                 rho_ca(&args.ca, &args.ca_args, &f, inst, n, seed_base ^ s)
             } else {
-                rho(&f, inst, n, seed_base ^ s, dp_bits, &arms[a].lens)
+                rho_native(
+                    &f,
+                    inst,
+                    n,
+                    seed_base ^ s,
+                    dp_bits,
+                    &arms[a].lens,
+                    args.negation,
+                )
             };
             (a, s, r)
         })
@@ -1882,7 +2082,7 @@ fn main() {
         "command": std::env::args().collect::<Vec<_>>().join(" "),
         "params": {"bits": args.bits, "ell": ell, "depth": args.depth, "seed": args.seed, "crater": args.crater,
                    "curve": args.curve.map(|(p, a, b)| [p, a, b]), "order": args.order,
-                   "engine": args.engine, "walk": args.walk, "ca": (args.engine == "ca").then_some(&args.ca), "ca_args": args.ca_args,
+                   "engine": args.engine, "walk": args.walk, "negation": args.negation, "ca": (args.engine == "ca").then_some(&args.ca), "ca_args": args.ca_args,
                    "trials": args.trials, "per_level": args.per_level, "dp_bits": dp_bits,
                    "max_cofactor": args.max_cofactor, "controls": args.controls},
         "host": {"cpu": host, "threads": rayon::current_num_threads()},
@@ -1898,9 +2098,14 @@ fn main() {
                      "seeds_identical_on_every_curve": identical_seeds, "seeds": seed_iters.len()},
         "rho": {"walk": if args.engine == "ca" {
                     "ca solve --alg rho (cryptanalysis repository; its defaults plus ca_args); iters = its reported ops, time = its reported seconds"
+                } else if args.negation {
+                    "32-adding (Teske), single walker, distinguished points, on {R, -R}: negation map with look-ahead and short-cycle escape by doubling"
                 } else {
                     "32-adding (Teske), single walker, distinguished points, no negation map"
                 },
+                "negation": args.engine != "ca" && args.negation,
+                "look_ahead_adds": results.iter().map(|r| r.2.look_ahead).sum::<u64>(),
+                "escapes": results.iter().map(|r| r.2.escapes).sum::<u64>(),
                 "expected_iters_sqrt_pi_n_over_2": expected,
                 "expected_iters_negation_sqrt_pi_n_over_4": (std::f64::consts::PI * n as f64 / 4.0).sqrt(), "solves": results.len(),
                 "all_correct": wrong == 0, "wall_s": rho_s},
@@ -1960,4 +2165,69 @@ fn main() {
         row("CTRL", "iso~".into(), &out["controls"]);
     }
     eprintln!("wrote {}", args.out.display());
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The registered prime-order curve `find_prime_order_curve(16, 59297)`.
+    fn instance(k: u64) -> (Fp, Instance, u64) {
+        let f = Fp { p: 53411 };
+        let curve = Curve { a: 4589, b: 186 };
+        let p = (43982, 22687);
+        let q = curve.mul(&f, Some(p), k).expect("1 <= k < n");
+        (f, Instance { curve, p, q }, 53117)
+    }
+
+    #[test]
+    fn both_walks_recover_the_logarithm() {
+        for k in [1, 2, 777, 31_337, 53_116] {
+            let (f, inst, n) = instance(k);
+            for seed in 0..8 {
+                for negation in [true, false] {
+                    let s = rho_native(&f, &inst, n, seed, 2, &Lens::native(), negation);
+                    assert_eq!(
+                        s.k,
+                        Some(k),
+                        "k = {k}, seed = {seed}, negation = {negation}"
+                    );
+                    if !negation {
+                        assert_eq!((s.look_ahead, s.escapes), (0, 0));
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn the_negation_walk_is_shorter_on_average() {
+        // A 28-bit prime-order curve (research/rho_negation_audit_20261020,
+        // #E counted by this binary): the 32-jump negation walk needs a group
+        // well above 2^16 before its look-ahead and escapes stop showing.
+        let f = Fp { p: 259_182_139 };
+        let curve = Curve {
+            a: 256_310_742,
+            b: 86_097_094,
+        };
+        let (g, n) = ((45_628_166, 174_691_488), 259_206_671);
+        let (mut neg, mut plain) = (0u64, 0u64);
+        for seed in 0..200u64 {
+            let k = 1 + seed.wrapping_mul(0x9E37_79B9) % (n - 1);
+            let q = curve.mul(&f, Some(g), k).expect("1 <= k < n");
+            let inst = Instance { curve, p: g, q };
+            let (a, b) = (
+                rho_native(&f, &inst, n, seed, 6, &Lens::native(), true),
+                rho_native(&f, &inst, n, seed, 6, &Lens::native(), false),
+            );
+            assert_eq!((a.k, b.k), (Some(k), Some(k)));
+            neg += a.iters;
+            plain += b.iters;
+        }
+        // Expected ratio sqrt(2); 200 paired solves put it well above 1.15.
+        assert!(
+            plain as f64 / neg as f64 > 1.15,
+            "plain {plain}, negation {neg}"
+        );
+    }
 }
