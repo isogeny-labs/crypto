@@ -66,3 +66,22 @@ admitted or overwritten. This raw cannot contain its own upload receipts.
 Verification sidecar is sealed after this proof commit; final sidecar receipts
 are appended outside that sidecar. Broader PR2036 base reconciliation/CI/review
 remains HOLD independently of native correctness/publication checks.
+
+## Final verification sidecar
+
+Native name `evidence/n83/allocation-profile-20261021/verification.tar.xz`:
+**633,232 bytes**,153payload files plus manifest, SHA256
+`fdf07b855f097ecb3afb5a331ae3440b43746ff2a4e53ff588d06cdec135f76e`.
+Key `store/sha256/fd/fdf07b855f097ecb3afb5a331ae3440b43746ff2a4e53ff588d06cdec135f76e`.
+Manifest SHA256 `a08412086fa8bbc8494346d1011b2e7cd7594701a3d0d57424f4ac74c71b90db`.
+Fresh PUT/HEAD/GET, every payload, both source bundles and byte-identical repack
+pass; [external receipts](sidecar-proof/). Sidecar SOURCE-PUBLICATION.bundle
+retains the post-raw-publication commit, in addition to both experimental
+freezes; prerequisite remains published37679b35. Final sidecar receipts and store
+index update are outside that archive, avoiding recursive hashes. Shared
+store/index.json includes all six new names, preserving all prior entries.
+
+Both native arms and all requested raw records are stored and verified within
+the exact declared diagnostic scope. Full-grid search, reclamation optimization,
+higher conflict caps, minimum memory and complete historical cold accounting
+remain open; no task or timed worker continues after publication of this result.

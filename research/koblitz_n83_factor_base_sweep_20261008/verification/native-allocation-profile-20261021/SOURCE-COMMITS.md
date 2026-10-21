@@ -16,3 +16,9 @@ this bundle into a fresh branch. Raw SOURCE.bundle contains this same ancestry.
 Verification sidecar SOURCE-PUBLICATION.bundle additionally retains post-raw
 publication metadata. Final upload/remote snapshot receipts remain external to
 their own archives. No experimental source ID or old1M evidence is rewritten.
+
+Final verification sidecar SHA256
+fdf07b855f097ecb3afb5a331ae3440b43746ff2a4e53ff588d06cdec135f76e additionally
+contains SOURCE-PUBLICATION.bundle through the raw-proof commit recorded in
+sidecar-proof/source.txt. Both source bundles verify from fresh downloaded bytes.
+Its own final upload receipts and six-name index promotion are external metadata.
