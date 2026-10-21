@@ -54,7 +54,7 @@ pub struct BenchArgs {
     #[arg(long)]
     pub list: bool,
     /// Verified local factory cache (populate with factor-base fetch).
-    #[arg(long, requires = "archive_manifest", conflicts_with_all = ["bits", "char2_degree", "koblitz_degree", "sweep", "model_b", "koblitz_a"])]
+    #[arg(long, requires = "archive_manifest", conflicts_with_all = ["bits", "char2_degree", "koblitz_degree", "sweep", "model_b", "koblitz_a", "auto"])]
     pub archive_store: Option<std::path::PathBuf>,
     /// Content-addressed manifest: supplies the exact curve and generator.
     #[arg(long, requires = "archive_store")]
@@ -904,6 +904,9 @@ fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instanc
 }
 
 pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
+    if args.auto && args.archive_manifest.is_some() {
+        return Err("--auto cannot be combined with an archive source".into());
+    }
     if args.list {
         let l = listing();
         if !json_only {
@@ -1242,6 +1245,25 @@ mod tests {
             "16"
         ])
         .is_err());
+    }
+
+    #[test]
+    fn auto_cannot_replace_an_explicit_archive() {
+        let flags = [
+            "--archive-store",
+            "/nonexistent-cache",
+            "--archive-manifest",
+            "abc",
+        ];
+        assert!(
+            Cli::try_parse_from(std::iter::once("ic-bench").chain(flags).chain(["--auto"]))
+                .is_err()
+        );
+        // Check callers that construct BenchArgs without clap as well, before
+        // any archive lookup or calibration can occur.
+        let mut args = bench_args(&flags);
+        args.auto = true;
+        assert!(run(args, true).unwrap_err().contains("archive source"));
     }
 
     /// `--model-b` without `--koblitz-a` is refused when the instance is

@@ -25,8 +25,9 @@ run again during import. The manifest retains the factory's validation status:
 an asserted group order does not become independently proved by importing it.
 
 `--archive-store` and `--archive-manifest` construct the exact native instance
-from the manifest. They cannot be combined with generated-instance flags or a
-sweep file. To compare a native control on that same instance, supply its
+from the manifest. They cannot be combined with generated-instance flags, a
+sweep file or `--auto`: automatic planning could replace the selected archive.
+Choose the oracle and relation matrix explicitly. To compare a native control on that same instance, supply its
 `--factor-base` explicitly and enable `--audit-rank`.
 
 The adapter preserves signed-point order and folds negation into columns with
