@@ -5,6 +5,7 @@
 //! ic bench --bits 16 --factor-base prime-abscissa:size=24 \
 //!          --oracle mitm:negation_folded=1 --targets walk
 //! ic bench --sweep sweep.json --out docs/ic/runs/sweep-YYYY-MM-DD.json
+//! ic bench --bits 24 --auto             the stages `ic plan` picks for the curve
 //! ```
 //!
 //! A configuration is a choice at each stage.  The table it prints
@@ -26,10 +27,12 @@ use crypto_lib::cryptanalysis::ic_boundary::{
     RhoResult,
 };
 use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
+use crypto_lib::cryptanalysis::ic_framework::planner::{self, CurveProfile, PlanOptions};
 use crypto_lib::cryptanalysis::ic_framework::plugins::{
     BinarySubspaceBase, CompactOrbitScanBase, DescentAlgebraicOracle, FrobeniusMitmOracle,
     GlvOrbitBase, KoblitzClosureBase, KoblitzOrbitBase, KoblitzSymmetrisedBase,
-    KoblitzTraceZeroBase, MitmOracle, PrimeAbscissaBase, SubtractOracle, SymmetrisedOracle,
+    KoblitzTraceZeroBase, MitmOracle, PrimeAbscissaBase, PrimeBatchMitmOracle,
+    RootfindSubtractOracle, SubtractOracle, SymmetrisedOracle,
 };
 use crypto_lib::cryptanalysis::ic_framework::solvers::{
     solver_by_name, solver_registry, validate_solver_params,
@@ -47,6 +50,17 @@ pub struct BenchArgs {
     /// each plug-in reads, and exit.
     #[arg(long)]
     pub list: bool,
+    /// Let the planner (`ic plan`) choose every stage this command line
+    /// leaves at its default: factor base and size, oracle, relation
+    /// matrix and target source, from the measured evidence for this
+    /// curve.  A stage given explicitly (a non-default `--targets` or
+    /// `--linalg`, any `--factor-base` or `--oracle`) wins.  Not with
+    /// `--sweep`.
+    #[arg(long)]
+    pub auto: bool,
+    /// With `--auto`: memory the planned pair table may take, in GiB.
+    #[arg(long, default_value_t = 8.0)]
+    pub max_table_gib: f64,
     /// Prime-field instance of this subgroup bit length.
     #[arg(long)]
     pub bits: Option<u32>,
@@ -561,12 +575,19 @@ fn run_prime(
         let m = spec.oracle_params.u64_or("m", 2)? as u32;
         let mut subtract = SubtractOracle;
         let mut mitm = MitmOracle::new(m);
+        let mut batch = PrimeBatchMitmOracle::new();
+        let mut blocked = PrimeBatchMitmOracle::blocked();
+        let mut rootfind = RootfindSubtractOracle::new(m, inst);
         let oracle: &mut dyn DecompositionOracle<_> = match or_name {
             "subtract" => &mut subtract,
             "mitm" => &mut mitm,
+            "mitm-prime-batch" => &mut batch,
+            "mitm-prime-blocked" => &mut blocked,
+            "rootfind-subtract" => &mut rootfind,
             other => {
                 return Err(format!(
-                    "oracle `{other}` is not available on a prime-field curve; try subtract or mitm"
+                    "oracle `{other}` is not available on a prime-field curve; try subtract, mitm, \
+                     mitm-prime-batch, mitm-prime-blocked or rootfind-subtract"
                 ))
             }
         };
@@ -644,6 +665,7 @@ fn run_binary(
         let mut subtract = SubtractOracle;
         let mut mitm = MitmOracle::new(m);
         let mut frob = FrobeniusMitmOracle::new(m, inst);
+        let mut frob_counted = FrobeniusMitmOracle::new_counted(m, inst);
         let mut symmetrised = match or_name {
             "symmetrised" => Some(SymmetrisedOracle::new(m, inst)),
             _ => None,
@@ -670,6 +692,7 @@ fn run_binary(
             "subtract" => &mut subtract,
             "mitm" => &mut mitm,
             "mitm-frobenius" => &mut frob,
+            "mitm-frobenius-counted" => &mut frob_counted,
             "descent-algebraic" => algebraic.as_mut().expect("built above"),
             "symmetrised" => symmetrised.as_mut().expect("built above"),
             other => return Err(format!("oracle `{other}` is not available here")),
@@ -807,6 +830,43 @@ fn spec_from(
     })
 }
 
+/// The instance `--bits`, `--char2-degree` or `--koblitz-degree` names.
+fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instance, String> {
+    Ok(match regime {
+        "prime" => Instance::Prime(match CmFamily::parse(&args.family)? {
+            CmFamily::Generic => roster_prime_instance(degree)
+                .ok_or_else(|| format!("no prime instance at {degree} bits"))?,
+            family => generate_cm_instance(family, degree, args.seed, args.max_cofactor)?,
+        }),
+        "char2" => Instance::Binary(
+            random_binary_instance(degree, args.seed, args.max_cofactor).ok_or_else(|| {
+                format!(
+                    "no random binary instance at degree {degree} with cofactor at most {}",
+                    args.max_cofactor
+                )
+            })?,
+        ),
+        "koblitz" => Instance::Binary(match (args.koblitz_a, args.model_b) {
+            (Some(a), Some(b)) => koblitz_floor_instance(a, degree, b).ok_or_else(|| {
+                format!(
+                    "no curve y^2 + xy = x^3 + {a}x^2 + b with b = {b:#x} of the K_{a} class at degree {degree} (b is a bitmask in the sparse modulus)"
+                )
+            })?,
+            (None, Some(_)) => return Err("--model-b needs --koblitz-a".into()),
+            (Some(a), None) => koblitz_instance(a, degree)
+                .ok_or_else(|| format!("no Koblitz instance K_{a} at degree {degree}"))?,
+            (None, None) => koblitz_instance(1, degree)
+                .or_else(|| koblitz_instance(0, degree))
+                .ok_or_else(|| format!("no Koblitz instance at degree {degree}"))?,
+        }),
+        other => {
+            return Err(format!(
+                "unknown regime `{other}`; try prime, char2 or koblitz"
+            ))
+        }
+    })
+}
+
 pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
     if args.list {
         let l = listing();
@@ -885,6 +945,72 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         }
     };
 
+    // `--auto`: the instance first, then the planner's stages for it.
+    let mut early_instance = None;
+    let mut plan_report = Value::Null;
+    let (configs, args) = if args.auto {
+        if args.sweep.is_some() {
+            return Err(
+                "--auto plans one configuration for one curve; it does not combine with --sweep"
+                    .into(),
+            );
+        }
+        let (regime, degree) = &instance_spec;
+        let inst = build_instance(regime, *degree, &args)?;
+        let profile = match &inst {
+            Instance::Prime(i) => CurveProfile::of_prime(i),
+            Instance::Binary(i) => CurveProfile::of_binary(i),
+        };
+        let plan = planner::plan(
+            &profile,
+            &PlanOptions {
+                max_table_bytes: args.max_table_gib * (1u64 << 30) as f64,
+                ..PlanOptions::default()
+            },
+        );
+        let mut a = args.clone();
+        let chosen = |stage: &str| plan.get(stage).map(str::to_string);
+        if a.factor_base.is_none() {
+            a.factor_base = chosen("factor_base");
+        }
+        if a.oracle.is_none() {
+            a.oracle = chosen("oracle");
+        }
+        if a.targets == "walk" {
+            a.targets = chosen("targets").unwrap_or(a.targets);
+        }
+        if a.linalg == "incremental-gauss" {
+            a.linalg = chosen("linalg").unwrap_or(a.linalg);
+        }
+        if !json_only {
+            eprintln!("  plan ({}): {}", planner::PLANNER_VERSION, plan.verdict);
+            for c in &plan.choices {
+                eprintln!(
+                    "    {:<12} {}  [{} · {:?}]",
+                    c.stage, c.value, c.rule, c.support
+                );
+            }
+            for w in &plan.warnings {
+                eprintln!("    warning: {w}");
+            }
+        }
+        if a.factor_base.is_none() || a.oracle.is_none() {
+            return Err(format!(
+                "no index-calculus recipe for this curve: {}",
+                plan.verdict
+            ));
+        }
+        let mut one = std::collections::BTreeMap::new();
+        one.insert("factor_base".to_string(), a.factor_base.clone().unwrap());
+        one.insert("oracle".to_string(), a.oracle.clone().unwrap());
+        one.insert("targets".to_string(), a.targets.clone());
+        plan_report = serde_json::to_value(&plan).unwrap_or(Value::Null);
+        early_instance = Some(inst);
+        (vec![one], a)
+    } else {
+        (configs, args)
+    };
+
     // A sweep may override the CLI default solver per configuration.
     // Reject malformed SAT encoding before calibrations, rho or a target.
     for cfg in &configs {
@@ -904,38 +1030,9 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         .collect::<Result<Vec<_>, _>>()?;
 
     let (regime, degree) = instance_spec;
-    let instance = match regime.as_str() {
-        "prime" => Instance::Prime(match CmFamily::parse(&args.family)? {
-            CmFamily::Generic => roster_prime_instance(degree)
-                .ok_or_else(|| format!("no prime instance at {degree} bits"))?,
-            family => generate_cm_instance(family, degree, args.seed, args.max_cofactor)?,
-        }),
-        "char2" => Instance::Binary(
-            random_binary_instance(degree, args.seed, args.max_cofactor).ok_or_else(|| {
-                format!(
-                    "no random binary instance at degree {degree} with cofactor at most {}",
-                    args.max_cofactor
-                )
-            })?,
-        ),
-        "koblitz" => Instance::Binary(match (args.koblitz_a, args.model_b) {
-            (Some(a), Some(b)) => koblitz_floor_instance(a, degree, b).ok_or_else(|| {
-                format!(
-                    "no curve y^2 + xy = x^3 + {a}x^2 + b with b = {b:#x} of the K_{a} class at degree {degree} (b is a bitmask in the sparse modulus)"
-                )
-            })?,
-            (None, Some(_)) => return Err("--model-b needs --koblitz-a".into()),
-            (Some(a), None) => koblitz_instance(a, degree)
-                .ok_or_else(|| format!("no Koblitz instance K_{a} at degree {degree}"))?,
-            (None, None) => koblitz_instance(1, degree)
-                .or_else(|| koblitz_instance(0, degree))
-                .ok_or_else(|| format!("no Koblitz instance at degree {degree}"))?,
-        }),
-        other => {
-            return Err(format!(
-                "unknown regime `{other}`; try prime, char2 or koblitz"
-            ))
-        }
+    let instance = match early_instance {
+        Some(i) => i,
+        None => build_instance(&regime, degree, &args)?,
     };
 
     let (calib, pins) = match &instance {
@@ -1049,6 +1146,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         "elapsed_seconds": started.elapsed().as_secs_f64(),
         "markdown": markdown,
         "rows": rows,
+        "plan": plan_report,
     }))
 }
 
@@ -1093,5 +1191,54 @@ mod tests {
         flags.extend(["--oracle", "mitm-frobenius:m=2"]);
         let err = run(bench_args(&flags), true).unwrap_err();
         assert!(err.contains("stray token `2`"), "{err}");
+    }
+
+    /// `--auto` fills every stage from the planner and runs it.
+    #[test]
+    fn auto_runs_the_planned_configuration() {
+        let report = run(
+            bench_args(&["--bits", "14", "--auto", "--repeats", "1"]),
+            true,
+        )
+        .unwrap();
+        assert_eq!(report["plan"]["planner"], planner::PLANNER_VERSION);
+        let row = &report["rows"][0];
+        let label = row["label"].as_str().unwrap_or_default().to_string();
+        assert!(label.contains("mitm-prime-blocked"), "{label}");
+        assert!(label.contains("prime-abscissa"), "{label}");
+        assert_eq!(row["verified"], true);
+    }
+
+    /// A stage named on the command line wins over the plan.
+    #[test]
+    fn auto_keeps_an_explicit_stage() {
+        let flags = [
+            "--bits",
+            "14",
+            "--auto",
+            "--repeats",
+            "1",
+            "--oracle",
+            "mitm:m=2,negation_folded=1",
+        ];
+        let report = run(bench_args(&flags), true).unwrap();
+        let label = report["rows"][0]["label"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string();
+        assert!(
+            label.contains("mitm[") && !label.contains("blocked"),
+            "{label}"
+        );
+    }
+
+    #[test]
+    fn auto_refuses_a_sweep() {
+        let err = run(
+            bench_args(&["--auto", "--sweep", "/nonexistent.json"]),
+            true,
+        )
+        .unwrap_err();
+        assert!(err.contains("sweep"), "{err}");
     }
 }
