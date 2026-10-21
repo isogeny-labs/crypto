@@ -9,8 +9,16 @@ witness. It changes the early table request from `2^30` to `2^29` entries,
 which the constructor doubles to `2^30` four-byte slots. The mode keeps the
 29-bit state-ID and complete-root capacity guards.
 
-The corrected seven-arm execution uses IC Rust source SHA-256
+The prior seven-arm attempt's recorded IC Rust source SHA-256 was
 `3112f5617548d68dab023d8dd9133cd68a1d07fd89e05311c3a2f4b532990c74`.
+It failed preflight because that source pin and the inherited `Cargo.lock`
+pin did not match the checked-out inputs. The repaired runner pins the current
+IC Rust source SHA-256
+`2bc406d489946c363fb25b201d0a57a508521137624f6bf973b74755c760e42c` and
+`Cargo.lock` SHA-256
+`bf9f2d9eae5f6bfea66b0473d44bf77d63141dcc335fad01b30c420be444ea42`.
+The workflow must rerun all seven arms and produce a new receipt before any
+corrected execution result is reported.
 The first execution used source SHA-256
 `5281bfc1c370255d8c03851fe85b4b35499ee55c066ba460b5de414b59d202a3`.
 Its direct 21-byte control has the indexed-insertion error recorded in the

@@ -9,7 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 BASE = ROOT / "research/n83_root4_fixed30_20261014/run.py"
-SOURCE_SHA256 = "3112f5617548d68dab023d8dd9133cd68a1d07fd89e05311c3a2f4b532990c74"
+SOURCE_SHA256 = "2bc406d489946c363fb25b201d0a57a508521137624f6bf973b74755c760e42c"
+LOCK_SHA256 = "bf9f2d9eae5f6bfea66b0473d44bf77d63141dcc335fad01b30c420be444ea42"
 ARMS = ((3300, "root4f30r11", 1200), (3300, "root11", 1200),
         (3300, "root4f30", 1200), (3350, "root4f30r11", 1200),
         (3400, "root4f30r11", 1200), (3450, "root4f30r11", 1200),
@@ -19,6 +20,7 @@ spec = importlib.util.spec_from_file_location("n83_fixed30_parent", BASE)
 base = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(base)
 base.parent.EXPECTED[base.parent.SOURCE] = SOURCE_SHA256
+base.parent.EXPECTED[base.parent.LOCK] = LOCK_SHA256
 
 
 def frozen_inputs():
