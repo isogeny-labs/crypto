@@ -173,7 +173,7 @@ pub fn solve_genus2_choice2(
     seed: u64,
     candidate_cap: u64,
 ) -> Outcome {
-    solve_genus2_with_chart(inst, target, seed, candidate_cap, false)
+    solve_genus2_with_chart(inst, target, seed, candidate_cap, false, false)
 }
 
 pub fn solve_genus2_projective(
@@ -182,7 +182,18 @@ pub fn solve_genus2_projective(
     seed: u64,
     candidate_cap: u64,
 ) -> Outcome {
-    solve_genus2_with_chart(inst, target, seed, candidate_cap, true)
+    solve_genus2_with_chart(inst, target, seed, candidate_cap, true, false)
+}
+
+/// Projective two-choice collector whose continuation is chosen by the
+/// signed graph's actual target-coefficient rank effect.
+pub fn solve_genus2_target_rank(
+    inst: &StudyInstance,
+    target: Point,
+    seed: u64,
+    candidate_cap: u64,
+) -> Outcome {
+    solve_genus2_with_chart(inst, target, seed, candidate_cap, true, true)
 }
 
 fn solve_genus2_with_chart(
@@ -191,6 +202,7 @@ fn solve_genus2_with_chart(
     seed: u64,
     candidate_cap: u64,
     projective: bool,
+    rank_policy: bool,
 ) -> Outcome {
     assert_eq!(inst.family, "scholten");
     assert!(inst.curve.valid(target));
@@ -254,6 +266,8 @@ fn solve_genus2_with_chart(
     let mut first_cycle = None;
     let mut recovered = None;
     let mut max_walk_capacity = 0;
+    let mut rank_policy_probes = 0;
+    let mut rank_policy_scores = [0u64; 4];
     'walk: while attempts < candidate_cap {
         continuations += 1;
         probes += 1;
@@ -316,7 +330,9 @@ fn solve_genus2_with_chart(
                             assert_eq!(f.sq(y), evaluate(f, &s.j.polynomial, x));
                             probes += 1;
                             let node = *nodes.entry(x).or_insert_with(|| {
-                                components.node();
+                                if !rank_policy {
+                                    components.node();
+                                }
                                 graph.node()
                             });
                             edge.push((node, if y <= f.p / 2 { 1 } else { -1 }));
@@ -325,10 +341,20 @@ fn solve_genus2_with_chart(
                             edge.push((0, 1));
                         }
                         split += 1;
-                        priority = components.score(edge[0].0, edge[1].0);
+                        if rank_policy {
+                            rank_policy_probes += 1;
+                            let score = graph
+                                .target_rank_score(edge[0].0, edge[0].1, edge[1].0, edge[1].1, nb);
+                            rank_policy_scores[score as usize] += 1;
+                            priority = (score > 0, score as usize);
+                        } else {
+                            priority = components.score(edge[0].0, edge[1].0);
+                        }
                         let cycles = graph.cycles;
                         recovered = graph.edge(edge[0].0, edge[0].1, edge[1].0, edge[1].1, na, nb);
-                        components.join(edge[0].0, edge[1].0);
+                        if !rank_policy {
+                            components.join(edge[0].0, edge[1].0);
+                        }
                         if graph.cycles > cycles && first_cycle.is_none() {
                             first_cycle = Some(attempts);
                         }
@@ -407,6 +433,16 @@ fn solve_genus2_with_chart(
         );
         detail["addition_backend"] =
             json!("crt_projective_numerator_chart_with_complete_exceptional_fallback");
+    }
+    if rank_policy {
+        native.insert("rank_policy_probes_uncharged".into(), rank_policy_probes);
+        for (score, count) in rank_policy_scores.iter().enumerate() {
+            native.insert(format!("rank_policy_score_{score}"), *count);
+        }
+        detail["policy"] = json!("two_prospective_jumps_admit_both_relations_choose_signed_target_coefficient_rank_effect");
+        detail["score_uses_exact_target_coefficient"] = json!(true);
+        detail["rank_score_definition"] =
+            json!("0=target_free,1=target_bearing_merge,2=target_bearing_anchor,3=target_equation");
     }
     Outcome {
         recovered,
@@ -526,5 +562,47 @@ mod tests {
         let u = graph.node();
         assert_eq!(graph.edge(u, 1, u, 1, 20, 2), None);
         assert_eq!(graph.negative_cycles, 1);
+    }
+    #[test]
+    fn target_rank_preview_tracks_signed_target_coefficients() {
+        let ring = Ring::new(101);
+        let mut graph = SignedGraph::new(ring);
+        let u = graph.node();
+        let v = graph.node();
+        assert_eq!(graph.target_rank_score(u, 1, v, 1, 0), 0);
+        assert_eq!(graph.target_rank_score(u, 1, v, 1, 1), 1);
+        assert_eq!(graph.target_rank_score(0, 1, u, 1, 1), 2);
+        assert_eq!(graph.edge(0, 1, u, 1, 0, 1), None);
+        assert_eq!(graph.target_rank_score(0, 1, u, 1, 1), 0);
+        assert_eq!(graph.target_rank_score(0, 1, u, 1, 2), 3);
+    }
+    #[test]
+    fn target_rank_collector_recovers_source_scalars() {
+        for p in [19, 31, 43, 59] {
+            let Some(inst) = scholten_instance(p, 20261021 + p) else {
+                continue;
+            };
+            for k in 1..8 {
+                let target = inst.curve.mul(inst.generator, k);
+                if target.inf {
+                    continue;
+                }
+                let out = solve_genus2_target_rank(&inst, target, 20261021 + k, 100 * p + 10000);
+                assert_eq!(out.recovered, Some(k % inst.r));
+                assert_eq!(
+                    inst.curve.mul(inst.generator, out.recovered.unwrap()),
+                    target
+                );
+                assert!(
+                    out.native["rank_policy_probes_uncharged"] <= out.native["split_relations"]
+                );
+                assert_eq!(
+                    out.phases
+                        .iter()
+                        .fold(Counts::default(), |c, p| c + p.counts),
+                    out.counts
+                );
+            }
+        }
     }
 }

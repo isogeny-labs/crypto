@@ -1545,6 +1545,49 @@ impl SignedGraph {
             }
         }
     }
+    /// Rank effect of an edge after reducing its target coefficient against
+    /// the current signed potentials. This performs counted `find` and ring
+    /// operations, but does not insert the edge. Scores are: 0 target-free,
+    /// 1 target-bearing merge, 2 target-bearing anchor, 3 target equation.
+    pub fn target_rank_score(&mut self, u: usize, su: i8, v: usize, sv: i8, b: u64) -> u8 {
+        let (ru, pu) = self.find(u);
+        let (rv, pv) = self.find(v);
+        let cu = su * pu.s;
+        let cv = sv * pv.s;
+        let b = self.ring.sub(
+            self.ring.sub(b, self.ring.signed(su, pu.b)),
+            self.ring.signed(sv, pv.b),
+        );
+        if ru == rv {
+            if cu + cv == 0 {
+                return u8::from(b != 0) * 3;
+            }
+            if let Some((_, fixed_b)) = self.fixed[ru] {
+                let doubled = self.ring.mul(2, fixed_b);
+                return u8::from(b != self.ring.signed(cu, doubled)) * 3;
+            }
+            return u8::from(b != 0) * 2;
+        }
+        let residual = if let Some((_, fixed_b)) = self.fixed[ru] {
+            self.ring.sub(b, self.ring.signed(cu, fixed_b))
+        } else {
+            b
+        };
+        let residual = if let Some((_, fixed_b)) = self.fixed[rv] {
+            self.ring.sub(residual, self.ring.signed(cv, fixed_b))
+        } else {
+            residual
+        };
+        if residual == 0 {
+            0
+        } else if self.fixed[ru].is_some() && self.fixed[rv].is_some() {
+            3
+        } else if self.fixed[ru].is_some() || self.fixed[rv].is_some() {
+            2
+        } else {
+            1
+        }
+    }
     /// Edge su*xu+sv*xv=a+b*k, all coefficients reduced modulo the subgroup order.
     pub fn edge(&mut self, u: usize, su: i8, v: usize, sv: i8, a: u64, b: u64) -> Option<u64> {
         let (ru, pu) = self.find(u);
