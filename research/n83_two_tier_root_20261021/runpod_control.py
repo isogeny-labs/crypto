@@ -77,7 +77,7 @@ def pod_body(name, public_key):
         "set -euo pipefail",
         "export DEBIAN_FRONTEND=noninteractive",
         "apt-get update -qq",
-        "apt-get install -y -qq --no-install-recommends openssh-server git build-essential pkg-config ca-certificates",
+        "apt-get install -y -qq --no-install-recommends openssh-server git build-essential pkg-config libssl-dev ca-certificates",
         "mkdir -p /run/sshd /root/.ssh",
         "printf '%s\\n' \"$PUBLIC_KEY\" > /root/.ssh/authorized_keys",
         "chmod 700 /root/.ssh",

@@ -38,8 +38,11 @@ enumerated, subgroup filtered, hashed, and independently replayed.
   at 30 seconds. Record Pod and
   machine IDs, image, architecture, CPU model, affinity, cgroup limits,
   throttling, steal time, memory pressure, and before/after same-seed
-  calibration. Retain noisy, failed, timeout, and OOM rows. The provider
-  watchdog must verify Pod absence independently after termination.
+  calibration. Retain noisy, failed, timeout, and OOM rows. The independent
+  guard must verify Pod absence after termination.
+  Run [probe_pod.py](probe_pod.py) before the first child and retain its raw
+  cgroup and `/proc/stat` counters; reject a Pod with fewer than four CPUs
+  of quota or less than 48 GiB effective memory.
 
 ## Stage gate before candidate selection
 
