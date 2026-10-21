@@ -14,7 +14,7 @@ $2P$. Removing $O$ from the image base leaves ${P}$ and only the sum $2P$.
 The decomposition $P = O + P$ disappears. Thus the claimed sumset inclusion,
 count monotonicity and size lower bound do not hold as written.
 
-The executable `review_counterexample.py` checks this enumeration and a
+The executable `review_counterexample.rs` checks this enumeration and a
 separate kernel-fiber example. Keeping the identity repairs this example,
 but does not establish the theorem. A corrected proof must also account for
 all lifts, challenge-adaptive transport paths and their complete costs.

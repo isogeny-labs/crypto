@@ -26,7 +26,7 @@ sumset inclusion and D_m monotonicity fail, whether or not the count excludes
 the zero target. The size lower bound also fails: the identity has kernel
 size 1, but |S-star| = 1 < |S| = 2.
 
-`python3 review_counterexample.py` exhaustively enumerates the multisets and
+`rustc review_counterexample.rs -o /tmp/transport-review && /tmp/transport-review` exhaustively enumerates the multisets and
 checks this failure. The script also checks that retaining O restores the
 sumset in this example. That local repair does not establish the full theorem.
 
