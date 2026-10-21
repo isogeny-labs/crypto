@@ -1698,4 +1698,40 @@ mod tests {
             }
         }
     }
+
+    /// Row counts from which `table_bits` reaches its largest value (512
+    /// rows and more), where every table has 256 entries and a block of
+    /// 32 pivots fills the four tables, and shapes a word either side of
+    /// a boundary: the reduced form matches the textbook's and the
+    /// echelon form has its rank and row space, for every configuration.
+    #[test]
+    fn largest_tables_and_boundary_widths_match_the_textbook() {
+        let mut rng = StdRng::seed_from_u64(31);
+        for &(rows, cols) in &[(520, 130), (700, 257), (1100, 65), (600, 63), (2, 129)] {
+            for density in [0.01, 0.5] {
+                let m = random_matrix(&mut rng, rows, cols, density);
+                let mut want = m.clone();
+                let rank = naive_rref(&mut want, cols);
+                for config in configs() {
+                    let what = format!("{rows}x{cols} d={density} {config:?}");
+                    let mut got = m.clone();
+                    let mut ops = 0;
+                    assert_eq!(
+                        eliminate(&mut got, cols, true, config, &mut ops),
+                        rank,
+                        "{what}"
+                    );
+                    assert_eq!(got, want, "{what}");
+                    let mut echelon = m.clone();
+                    assert_eq!(
+                        eliminate(&mut echelon, cols, false, config, &mut ops),
+                        rank,
+                        "{what}"
+                    );
+                    naive_rref(&mut echelon, cols);
+                    assert_eq!(echelon, want, "{what}");
+                }
+            }
+        }
+    }
 }
