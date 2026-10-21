@@ -197,6 +197,16 @@
      "source": "https://github.com/aburan28/crypto/blob/70fad47cb9736b33e4dfb971b460ce918261c03b/research/n83_padd_rank_20261019/RESULT.md",
      "unit": "cold wall ratio IC / rho",
      "value": 52.8
+    },
+    {
+     "anchor": "#lab-planner-validation",
+     "class": "engineering",
+     "date": "2026-10-21",
+     "detail": "ic plan / ic bench --auto (ic-planner/1) checked on six prime curves outside its evidence, each plan against every alternative one change away from it (ecbench, 24 verified runs per arm and curve, audits OK). Best cold one-target cell on a registered curve: icv1-fp24-tm5099-a6f137c6 (log2 r 24.00), S(plan)/S(rho.negation) 14.39 [11.63, 18.45], planner prediction 12.23. Rho is cheaper on all six curves (12.6-25.8x). At w = 0 every alternative costs more than the plan; the doubled base is not separated across the band (below 1 at w = 1). Tooling validation: the plan is the existing best recipe chosen automatically; no advance, no leaderboard row moves.",
+     "label": "Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md",
+     "value": 14.39
     }
    ],
    "role": "emphasis"
