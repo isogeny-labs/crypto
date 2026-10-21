@@ -79,3 +79,23 @@ Add `--shared-bloom` to control the shared-filter variant, and
 Its `PASS_INDEX_STAGE_CONTROL` status checks the identical base hash, state
 digest, and split allocation receipts. It is an index-construction control;
 the full K4405 target and Tier 1 online gates above remain separate.
+
+The local full-size correctness control is prepared as a capped successor to
+the monolithic load80 run. It takes the same public target point and records
+the independently known fixture scalar outside the executable's input. It
+monitors sampled RSS and writes a terminal process receipt on success,
+failure, timeout, or a memory-cap stop:
+
+```sh
+python3 research/n83_two_tier_root_20261021/run_full_control.py \
+  --binary /absolute/path/to/release/koblitz_orbit_dlp_fast \
+  --target /absolute/path/to/one_public_target.jsonl \
+  --expected-scalar 8171303969165027 \
+  --output /absolute/path/to/new_receipt_directory \
+  --variant shared --cap-seconds 7200 --rss-cap-gib 26
+```
+
+Run this only after the current monolithic control terminates, so the two
+large indices do not compete for host memory. `PASS_PROCESS` is a process
+outcome; an independent group, relation, and scalar replay must then pass
+before entering a correctness row.
