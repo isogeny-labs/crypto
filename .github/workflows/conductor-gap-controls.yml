@@ -141,6 +141,12 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: /research/conductor_gap_cm_orbits_20261015/lean/
+      - name: Install Lean archive decompressor
+        run: |
+          if ! command -v zstd >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends zstd
+          fi
       - name: Install hash-pinned Lean 4.34.1
         shell: bash
         run: |
