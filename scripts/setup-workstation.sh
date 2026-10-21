@@ -398,9 +398,8 @@ clone_repo() {
   run git clone --filter="blob:limit=$limit" --no-checkout "$url" "$dir" \
     || { warn "clone of $name failed"; return 1; }
   local skipped
-  skipped="$(git -C "$dir" ls-tree -r HEAD --format='%(objectname) %(path)' |
-    GIT_NO_LAZY_FETCH=1 git -C "$dir" cat-file --batch-check='%(objectname) %(rest)' 2>/dev/null |
-    awk '$2 == "missing" { sub(/^[^ ]+ missing /, ""); print }')" || true
+  skipped="$(join <(git -C "$dir" rev-list --objects --missing=print -1 HEAD | sed -n 's/^?//p' | sort) \
+      <(git -C "$dir" ls-tree -r HEAD --format='%(objectname) %(path)' | sort) | cut -d' ' -f2-)" || true
   { echo '/*'; [ -n "$skipped" ] && printf '%s\n' "$skipped" | sed 's/[][*?!#\\]/\\&/g; s#^#!/#'; } |
     git -C "$dir" sparse-checkout set --no-cone --stdin \
     && run git -C "$dir" checkout -q \

@@ -23,16 +23,16 @@ base=$(git merge-base "$base_ref" "$head_ref") || { echo "check-large-files: no 
 changes=$(mktemp)
 trap 'rm -f "$changes"' EXIT
 # Added, copied, modified, renamed or retyped regular files: "<blob>\t<path>".
-git diff --raw --no-renames --diff-filter=ACMRT -z "$base" "$head_ref" |
+git diff --raw --abbrev=40 --no-renames --diff-filter=ACMRT -z "$base" "$head_ref" |
   tr '\0' '\n' | paste - - |
   awk -F'\t' '{ split($1, m, " "); if (m[2] ~ /^100/) print m[4] "\t" $2 }' > "$changes"
 [ -s "$changes" ] || { echo "check-large-files: no changed files"; exit 0; }
 
 if [ "$(git config --bool remote.origin.promisor 2>/dev/null)" = true ]; then
+  # One request for every changed blob; sizing them one by one would fetch each alone.
   cut -f1 "$changes" | sort -u |
-    git cat-file --batch-check='%(objectname)' 2>/dev/null | awk '$2 == "missing" { print $1 }' |
-    git -c fetch.negotiationAlgorithm=noop fetch -q --no-tags --no-write-fetch-head \
-      --filter=blob:none --stdin origin 2>/dev/null || true
+    git fetch -q --no-tags --no-write-fetch-head --filter=blob:none --stdin origin ||
+    echo "check-large-files: batched fetch failed; sizing blobs one at a time" >&2
 fi
 
 patterns=()
