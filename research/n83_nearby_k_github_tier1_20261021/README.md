@@ -3,12 +3,15 @@
 This experiment measures the complete one-target online interval for the
 current-source K1104, K1107 and K1120 factor bases on the same sealed N83
 public point. It also records each cold process interval and a same-point rho
-reference. The input is holdout point 0 from the fixed31 fixture, workload
-`f3f41cbb7544`, and its scalar sidecar stays outside every child input.
+reference. The input is a separate deterministic point, workload
+`e88fa8e34255`, and its scalar sidecar stays outside every child input.
+`generate_fixture.py` checked that point against 35,154 distinct earlier
+public points, including the fixed31 screen and all 16 of its reserved
+holdout points. `exclusion_audit.json` records zero overlap.
 
 The frozen source SHA-256 is
 `58e3ee492093de5f6b760b96e3aba819fa479cdecd22b1adee94f0ecb26026d8`.
-`protocol.py` binds all three canonical candidate manifests, the fixture,
+`protocol.py` binds all three canonical candidate manifests, the independent fixture,
 rho source and config, process caps, and exact event order before timing.
 Five rounds alternate K1104 and K1120 around two K1107 A/A controls. A
 same-point rho solve opens and closes each round. This is one target with
@@ -32,7 +35,7 @@ remain separate required evidence for the absolute factor-base objective.
 
 | Requirement | Evidence after the hosted job |
 | --- | --- |
-| Exact N83 curve, source, three bases and unseen point | `source.json`, manifests, `target.jsonl`, verifier |
+| Exact N83 curve, source, three bases and independent point | `source.json`, manifests, `target.jsonl`, `exclusion_audit.json`, verifier |
 | Full one-target online and cold IC intervals | Each `runs/*/stdout.jsonl`, `targets_result.jsonl`, `usage.json` |
 | Same-point rho and A/A controls | Ten rho `receipt.json` files, `independent_replay.json` |
 | Tier 1 host and noise envelope | `host.json`, each `host_telemetry.json`, cgroup snapshots |
@@ -43,6 +46,11 @@ Run the frozen fixture check with:
 ```sh
 python3 -m research.n83_nearby_k_github_tier1_20261021.run --preflight
 ```
+
+The first prepared version reused fixed31 holdout point 0. It was cancelled
+while queued, before any child started, because using that point to select a
+nearby-K base would contaminate the later cross-family holdout. This version
+uses the separate workload above; the fixed31 holdout remains reserved.
 
 The workflow builds and tests the exact producers on Linux, runs the sealed
 schedule, independently replays it, and uploads all raw receipts even if a

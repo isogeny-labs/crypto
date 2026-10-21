@@ -10,6 +10,16 @@ from research.n83_nearby_k_github_tier1_20261021 import protocol, run, verify
 
 
 class GateTests(unittest.TestCase):
+    def test_independent_point_is_outside_fixed31_holdout(self):
+        _line, point, _scalar = run.fixture()
+        reserved = {tuple(int(x) for x in json.loads(line)) for line in
+                    (protocol.FRESH / "holdout_targets.jsonl").read_text().splitlines()}
+        self.assertEqual(len(reserved), 16)
+        self.assertNotIn(point, reserved)
+        audit = json.loads(protocol.EXCLUSION_AUDIT.read_text())
+        self.assertEqual(audit["status"], "PASS_ZERO_OVERLAP")
+        self.assertEqual(audit["overlap_count"], 0)
+
     def test_schedule_is_paired_and_alternates_challengers(self):
         events = protocol.events()
         self.assertEqual(len(events), 30)

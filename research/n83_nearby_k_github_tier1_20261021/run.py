@@ -41,24 +41,52 @@ def fixture():
                 (spec.ROOT / "Cargo.lock", spec.LOCK_SHA256),
                 (spec.TARGETS, spec.TARGETS_SHA256),
                 (spec.ANSWERS, spec.ANSWERS_SHA256),
+                (spec.FIXTURE_MANIFEST, spec.FIXTURE_MANIFEST_SHA256),
+                (spec.EXCLUSION_AUDIT, spec.EXCLUSION_AUDIT_SHA256),
+                (spec.WORKLOAD, spec.WORKLOAD_SHA256),
+                (spec.GENERATOR, spec.GENERATOR_SHA256),
                 (spec.RHO_CONFIG, spec.RHO_CONFIG_SHA256))
     for path, sha in expected:
         if parent.digest(path) != sha:
             raise ValueError(f"frozen input changed: {path}")
-    point_line = spec.TARGETS.read_text().splitlines()[0] + "\n"
-    workload = json.loads((spec.FRESH / "workloads.json").read_text())[
-        "holdout_one_target"][0]
+    point_line = spec.TARGETS.read_text()
+    workload = json.loads(spec.WORKLOAD.read_text())
+    frozen = json.loads(spec.FIXTURE_MANIFEST.read_text())
+    audit = json.loads(spec.EXCLUSION_AUDIT.read_text())
     if (workload["workload_id"] != spec.WORKLOAD_ID or
             workload["target_stream_sha256"] != spec.ONE_TARGET_SHA256 or
+            workload["target_domain"] != spec.TARGET_DOMAIN or
+            workload["target_count"] != 1 or
+            workload["curve_id"] != "EC1N83Ckb1a1haacb69ee9f37" or
+            hashlib.sha256(json.dumps({key: value for key, value in workload.items()
+                if key != "workload_id"}, sort_keys=True, separators=(",", ":"),
+                ensure_ascii=False).encode()).hexdigest()[:12] != spec.WORKLOAD_ID or
+            frozen["status"] != "SEALED_UNMEASURED" or
+            frozen["domain"] != spec.TARGET_DOMAIN or
+            frozen["target_sha256"] != spec.TARGETS_SHA256 or
+            frozen["answer_sha256"] != spec.ANSWERS_SHA256 or
+            frozen["exclusion_audit_sha256"] != spec.EXCLUSION_AUDIT_SHA256 or
+            frozen["workload_sha256"] != spec.WORKLOAD_SHA256 or
+            frozen["generator_sha256"] != spec.GENERATOR_SHA256 or
+            audit["status"] != "PASS_ZERO_OVERLAP" or
+            audit["overlap_count"] != 0 or
+            audit["new_point"] != json.loads(point_line) or
             hashlib.sha256(point_line.encode()).hexdigest() !=
             spec.ONE_TARGET_SHA256):
-        raise ValueError("canonical one-target workload differs")
+        raise ValueError("independent one-target workload differs")
     answer = json.loads(spec.ANSWERS.read_text().splitlines()[0])
     point = group.point_from_json(json.loads(point_line))
     scalar = int(answer["scalar"])
-    if (answer["fixture_index"] != 0 or not 0 < scalar < group.R or
+    seed = hashlib.sha256(spec.TARGET_DOMAIN.encode() + (0).to_bytes(
+        4, "little")).digest()
+    expected_scalar = 1 + int.from_bytes(seed, "little") % (group.R - 1)
+    if (answer["fixture_index"] != 0 or answer["seed_sha256"] != seed.hex() or
+            scalar != expected_scalar or
+            workload["target_generation_seed_sha256"] != seed.hex() or
+            workload["target_point"] != json.loads(point_line) or
+            not 0 < scalar < group.R or
             group.multiply(group.G, scalar) != point):
-        raise ValueError("fresh point 0 fails independent scalar replay")
+        raise ValueError("independent point fails scalar replay")
     for k in spec.CANDIDATES:
         manifest(k)
     return point_line, point, scalar
@@ -128,8 +156,12 @@ def execute(binary, rho_binary, output):
         "rho_binary_sha256": parent.digest(rho_copy),
         "target_sha256": parent.digest(target),
         "workload_id": spec.WORKLOAD_ID,
-        "full_fixture_sha256": spec.TARGETS_SHA256,
+        "fixture_target_sha256": spec.TARGETS_SHA256,
         "answer_sidecar_sha256": spec.ANSWERS_SHA256,
+        "fixture_manifest_sha256": spec.FIXTURE_MANIFEST_SHA256,
+        "exclusion_audit_sha256": spec.EXCLUSION_AUDIT_SHA256,
+        "workload_sha256": spec.WORKLOAD_SHA256,
+        "generator_sha256": spec.GENERATOR_SHA256,
         "rho_config_sha256": spec.RHO_CONFIG_SHA256,
         "candidate_ids": {str(k): value[0] for k, value in spec.CANDIDATES.items()},
         "candidate_manifest_sha256": {str(k): value[1] for k, value in spec.CANDIDATES.items()},

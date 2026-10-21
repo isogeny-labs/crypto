@@ -191,8 +191,14 @@ def verify(output):
                  parent.digest(output / "executed_bins/n83_rho_optimization_eval") and
                  source.get("target_sha256") == parent.digest(target_file) and
                  source.get("workload_id") == spec.WORKLOAD_ID and
-                 source.get("full_fixture_sha256") == spec.TARGETS_SHA256 and
+                 source.get("fixture_target_sha256") == spec.TARGETS_SHA256 and
                  source.get("answer_sidecar_sha256") == spec.ANSWERS_SHA256 and
+                 source.get("fixture_manifest_sha256") ==
+                 spec.FIXTURE_MANIFEST_SHA256 and
+                 source.get("exclusion_audit_sha256") ==
+                 spec.EXCLUSION_AUDIT_SHA256 and
+                 source.get("workload_sha256") == spec.WORKLOAD_SHA256 and
+                 source.get("generator_sha256") == spec.GENERATOR_SHA256 and
                  source.get("rho_config_sha256") == spec.RHO_CONFIG_SHA256 and
                  source.get("caps") == {
                      "ic_seconds": spec.IC_CAP_SECONDS,
