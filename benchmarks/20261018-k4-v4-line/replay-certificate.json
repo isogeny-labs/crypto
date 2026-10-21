@@ -1,0 +1,2292 @@
+{
+ "schema": "replay-certificate/v1",
+ "row": "benchmarks/README.md, row 20261018-k4-v4-line (E19 against E24)",
+ "date": "2026-10-21",
+ "validator": "validator subagent (review-adversarial policy), independent of the session that produced E19 and E24: fresh build, fresh runs, own comparison and own instance checks",
+ "repository": {
+  "commit": "edea86713a3ab729a1d74353d2b253fea5271cb4",
+  "branch": "claude/glv-endomorphism-index-calculus-pe7ige",
+  "working_tree": "clean (git status --short empty) at build and at replay start"
+ },
+ "recorded_binaries": {
+  "e19": "4e5810598540749fff976e3ba7287a11262b67be (experiments/27_quartic_pipeline_d4/binary_commit.txt)",
+  "e24": "854acdbc65c1bdddeb074a054fc559f79d14e2c9 (experiments/29_quartic_pipeline_v4/binary_commit.txt)"
+ },
+ "code_drift": "the replay binaries were built from edea86713, not the recorded commits. Over the pipeline path (quartic_folds.rs, klein_v4.rs, d4_weighted_s5.rs, gaudry_quartic.rs, gaudry_quartic_d4.rs, the drivers, Cargo.lock) git diff --stat reports 4,632 insertions and 209 deletions since 4e5810598 and 2,565 insertions and 110 deletions since 854acdbc6 (E25/E26 additions and the report struct's new fields). Every deterministic field of every record nevertheless replays identically, so the drift preserves behaviour on these runs. The fields the newer struct adds (matched_fold, rho_negation_muls, rho_negation_steps) are cross-checked: matched_fold = Negation and the two means equal the committed rho_matched_muls and rho_matched_steps.",
+ "build": {
+  "command": "cargo build --release --example quartic_pipeline_d4 --example quartic_pipeline_v4 --example quartic_pipeline_gls",
+  "toolchain": "rustc 1.94.1 (e408947bf 2026-03-25), cargo 1.94.1",
+  "binaries": [
+   {
+    "name": "quartic_pipeline_d4",
+    "sha256": "2be98ac0780263f3492a11556036729fe27a4fed31583b9578ebef0f2b383065"
+   },
+   {
+    "name": "quartic_pipeline_v4",
+    "sha256": "940318da1d59cd2399808f44030b34a72e5d5a9f745ad15d6e2c3d6d8e06789c"
+   }
+  ]
+ },
+ "environment": {
+  "host": "Intel(R) Xeon(R) Processor @ 2.80GHz, 4 vCPU, Linux 6.18.44, 15 GiB",
+  "RAYON_NUM_THREADS": 4,
+  "determinism_note": "collect_and_solve draws each round's targets (2 x rayon threads of them) from the run's single seeded RNG, which also chooses each target's row and feeds Wiedemann, so the thread count is part of the trajectory; the recorded host had 4 vCPUs (rayon default 4) and 4 threads reproduce every record. Field counters are per-instance Cell<u64>, not shared across threads.",
+  "concurrency": "the E19 stream ran beside the E25 and E24 replays on the same 4 vCPUs for its first part; only wall-clock fields are affected"
+ },
+ "command": "RAYON_NUM_THREADS=4 quartic_pipeline_d4 --sizes P --first-seed S --seeds 1 --rho-runs 16 --json OUT (E19, experiments/27_quartic_pipeline_d4/run_all.sh's arguments, default --max-residuals 200000) and RAYON_NUM_THREADS=4 quartic_pipeline_v4 --sizes P --first-seed S --seeds 1 --rho-runs 16 --max-residuals 5000000 --json OUT (E24, experiments/29_quartic_pipeline_v4/run_all.sh's arguments); OUT in scratch, then copied to replay/e19/ and replay/e24/; replay/replay.sh",
+ "comparison": "replay/replay_compare.py: every field of every committed record compared with the replay leaf by leaf, integers and floats exactly; wall_ms and solve_ms are wall-clock and are reported, not compared",
+ "scalar_verification": "For every run the replayed binary recovered x by Wiedemann, checked [x]G = Q by double-and-add on the curve, and set correct = (x == d) for the instance's planted d (quartic_folds.rs Arm::attempt); every replay reports solved = true and correct = true, so x = d on all 22 runs. The committed JSON records correct = true but not x, so x is tied to the committed run through the instance: the replay regenerates it from (p, seed) and its n, #E and h equal the committed ones, and every deterministic counter (targets, decompositions, relations, Wiedemann operations, every walk's steps and F_p multiplications) is identical, which a different instance or a different row system would not give. Independently of the repository code (replay/harness/check_instances.py: own F_{p^4} and curve arithmetic), each regenerated instance satisfies G, Q on E, n prime, [n]G = O, [d]G = Q and #E = h n killing random points, and its j-invariant lies outside F_{p^2}. Each of the 704 walks (16 negation and 16 unfolded per curve) also recovered d (correct = true) and replays identically.",
+ "instance_checks": [
+  {
+   "experiment": "e19",
+   "p": 53,
+   "seed": 1,
+   "n": 1973011,
+   "group_order": 7892044,
+   "cofactor": 4,
+   "planted_d": 431858,
+   "j": [
+    34,
+    18,
+    9,
+    1
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e19",
+   "p": 53,
+   "seed": 2,
+   "n": 1972591,
+   "group_order": 7890364,
+   "cofactor": 4,
+   "planted_d": 1361806,
+   "j": [
+    2,
+    46,
+    8,
+    24
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e19",
+   "p": 101,
+   "seed": 1,
+   "n": 26013293,
+   "group_order": 104053172,
+   "cofactor": 4,
+   "planted_d": 11007453,
+   "j": [
+    18,
+    5,
+    90,
+    59
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e19",
+   "p": 101,
+   "seed": 2,
+   "n": 26011747,
+   "group_order": 104046988,
+   "cofactor": 4,
+   "planted_d": 24324382,
+   "j": [
+    56,
+    36,
+    53,
+    66
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e19",
+   "p": 149,
+   "seed": 1,
+   "n": 123227833,
+   "group_order": 492911332,
+   "cofactor": 4,
+   "planted_d": 45391030,
+   "j": [
+    145,
+    104,
+    133,
+    77
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e19",
+   "p": 149,
+   "seed": 2,
+   "n": 123218327,
+   "group_order": 492873308,
+   "cofactor": 4,
+   "planted_d": 113243821,
+   "j": [
+    123,
+    95,
+    70,
+    34
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e19",
+   "p": 197,
+   "seed": 1,
+   "n": 376516429,
+   "group_order": 1506065716,
+   "cofactor": 4,
+   "planted_d": 331047546,
+   "j": [
+    96,
+    156,
+    68,
+    49
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e19",
+   "p": 197,
+   "seed": 2,
+   "n": 376538171,
+   "group_order": 1506152684,
+   "cofactor": 4,
+   "planted_d": 191637020,
+   "j": [
+    40,
+    14,
+    174,
+    176
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e19",
+   "p": 269,
+   "seed": 1,
+   "n": 1309055701,
+   "group_order": 5236222804,
+   "cofactor": 4,
+   "planted_d": 350173466,
+   "j": [
+    193,
+    30,
+    123,
+    9
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e19",
+   "p": 269,
+   "seed": 2,
+   "n": 1309011919,
+   "group_order": 5236047676,
+   "cofactor": 4,
+   "planted_d": 934481687,
+   "j": [
+    142,
+    137,
+    220,
+    35
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e24",
+   "p": 101,
+   "seed": 1,
+   "n": 26013913,
+   "group_order": 104055652,
+   "cofactor": 4,
+   "planted_d": 4448698,
+   "j": [
+    86,
+    41,
+    49,
+    84
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e24",
+   "p": 101,
+   "seed": 2,
+   "n": 26016373,
+   "group_order": 104065492,
+   "cofactor": 4,
+   "planted_d": 25391763,
+   "j": [
+    25,
+    19,
+    62,
+    60
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e24",
+   "p": 149,
+   "seed": 1,
+   "n": 123227309,
+   "group_order": 492909236,
+   "cofactor": 4,
+   "planted_d": 72898577,
+   "j": [
+    120,
+    16,
+    8,
+    136
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e24",
+   "p": 149,
+   "seed": 2,
+   "n": 123225301,
+   "group_order": 492901204,
+   "cofactor": 4,
+   "planted_d": 55905994,
+   "j": [
+    25,
+    91,
+    144,
+    107
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e24",
+   "p": 197,
+   "seed": 1,
+   "n": 376526417,
+   "group_order": 1506105668,
+   "cofactor": 4,
+   "planted_d": 318192845,
+   "j": [
+    1,
+    48,
+    3,
+    171
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e24",
+   "p": 197,
+   "seed": 2,
+   "n": 376531021,
+   "group_order": 1506124084,
+   "cofactor": 4,
+   "planted_d": 113158094,
+   "j": [
+    94,
+    142,
+    147,
+    54
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e24",
+   "p": 269,
+   "seed": 1,
+   "n": 1309004569,
+   "group_order": 5236018276,
+   "cofactor": 4,
+   "planted_d": 1223824752,
+   "j": [
+    240,
+    65,
+    138,
+    158
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e24",
+   "p": 269,
+   "seed": 2,
+   "n": 1308995893,
+   "group_order": 5235983572,
+   "cofactor": 4,
+   "planted_d": 467000226,
+   "j": [
+    56,
+    261,
+    72,
+    168
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e24",
+   "p": 397,
+   "seed": 1,
+   "n": 6210159541,
+   "group_order": 24840638164,
+   "cofactor": 4,
+   "planted_d": 956750776,
+   "j": [
+    218,
+    340,
+    279,
+    15
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e24",
+   "p": 397,
+   "seed": 2,
+   "n": 6210124541,
+   "group_order": 24840498164,
+   "cofactor": 4,
+   "planted_d": 3059412718,
+   "j": [
+    87,
+    272,
+    58,
+    289
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e24",
+   "p": 521,
+   "seed": 1,
+   "n": 18419994001,
+   "group_order": 73679976004,
+   "cofactor": 4,
+   "planted_d": 3458567944,
+   "j": [
+    174,
+    246,
+    371,
+    316
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  },
+  {
+   "experiment": "e24",
+   "p": 521,
+   "seed": 2,
+   "n": 18420098357,
+   "group_order": 73680393428,
+   "cofactor": 4,
+   "planted_d": 743731013,
+   "j": [
+    267,
+    236,
+    343,
+    252
+   ],
+   "j_in_fp": false,
+   "j_in_fp2": false,
+   "j_is_0_or_1728": false,
+   "checks": {
+    "G_on_curve": true,
+    "Q_on_curve": true,
+    "n_prime": true,
+    "nG_is_O": true,
+    "dG_eq_Q": true,
+    "order_eq_h_n": true,
+    "order_in_hasse": true,
+    "order_kills_random_points": true,
+    "matches_committed_n_order_h": true
+   },
+   "all_checks_pass": true
+  }
+ ],
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "runs_total": 22,
+ "runs_matched": 22,
+ "runs": [
+  {
+   "experiment": "e19",
+   "p": 53,
+   "seed": 1,
+   "arm": null,
+   "committed": {
+    "path": "experiments/27_quartic_pipeline_d4/p53s1.json",
+    "sha256": "496fccf85793ad0519a5259166286af549f8a3cb1c2e291ebb0ac12e3596668e"
+   },
+   "replay_output": {
+    "path": "replay/e19/p53s1.json",
+    "sha256": "b650a707b4d432954c5e0663528d2b12958ab5f81faef72eaa17381b9f0bce61"
+   },
+   "replayed": true,
+   "fields_compared": 292,
+   "fields_identical": 292,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 8697571.08024399,
+     "replay": 2431789.550377
+    },
+    "wall_ms": {
+     "committed": 2439243.107102,
+     "replay": 703524.2038210001
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 431858,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 1498,
+    "unsolved": 2,
+    "decompositions": 98,
+    "total_muls": 2407067766353,
+    "solve_muls": 2407010508766,
+    "la_fp_muls": 52784,
+    "macaulay_entries": 26055232560,
+    "rho_matched_muls": 339829.0,
+    "rho_matched_steps": 1236.0,
+    "ratio": 7083173.49712061
+   },
+   "relations": 16,
+   "columns": 15,
+   "la_ops": 3299,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e19",
+   "p": 53,
+   "seed": 2,
+   "arm": null,
+   "committed": {
+    "path": "experiments/27_quartic_pipeline_d4/p53s2.json",
+    "sha256": "fc79faeb2361829bf0ccd428d44549dc40c6598caed55c333d2d8533feb0af29"
+   },
+   "replay_output": {
+    "path": "replay/e19/p53s2.json",
+    "sha256": "126eb678f030c4d0710754ec7fa1eca89f359e92799512268b36b6a0ee6c1ece"
+   },
+   "replayed": true,
+   "fields_compared": 292,
+   "fields_identical": 292,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 7682690.322409011,
+     "replay": 3013915.698054
+    },
+    "wall_ms": {
+     "committed": 2111821.154364,
+     "replay": 866427.581735
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 1361806,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 1926,
+    "unsolved": 5,
+    "decompositions": 76,
+    "total_muls": 3000443671554,
+    "solve_muls": 3000376192600,
+    "la_fp_muls": 59952,
+    "macaulay_entries": 33266375240,
+    "rho_matched_muls": 342846.4375,
+    "rho_matched_steps": 1274.0625,
+    "ratio": 8751567.300605245
+   },
+   "relations": 14,
+   "columns": 13,
+   "la_ops": 3747,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e19",
+   "p": 101,
+   "seed": 1,
+   "arm": null,
+   "committed": {
+    "path": "experiments/27_quartic_pipeline_d4/p101s1.json",
+    "sha256": "87c92013961300b98c65e4190050bccd886e7ee2a68019f847752d0b5e4065df"
+   },
+   "replay_output": {
+    "path": "replay/e19/p101s1.json",
+    "sha256": "8fc966d8030d85367967c5a3cd04a647788d0133e26982993f5c83708eef9f59"
+   },
+   "replayed": true,
+   "fields_compared": 291,
+   "fields_identical": 291,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 9704600.63536799,
+     "replay": 3917996.1108549936
+    },
+    "wall_ms": {
+     "committed": 2613992.3581990004,
+     "replay": 1097175.5723930001
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 11007453,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 2608,
+    "unsolved": 0,
+    "decompositions": 156,
+    "total_muls": 3908781090118,
+    "solve_muls": 3908690583182,
+    "la_fp_muls": 150576,
+    "macaulay_entries": 44381996400,
+    "rho_matched_muls": 617568.75,
+    "rho_matched_steps": 3612.3125,
+    "ratio": 6329305.18281244
+   },
+   "relations": 24,
+   "columns": 23,
+   "la_ops": 9411,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e19",
+   "p": 101,
+   "seed": 2,
+   "arm": null,
+   "committed": {
+    "path": "experiments/27_quartic_pipeline_d4/p101s2.json",
+    "sha256": "975d8e0b16ae82a2e8363ec89c2bbe983f1d25995b28c0c2aafd1bffc778b891"
+   },
+   "replay_output": {
+    "path": "replay/e19/p101s2.json",
+    "sha256": "f7f3bafce19a867ff0c95b7eceb8d36509ead886a0d250392f925d3e976b38bc"
+   },
+   "replayed": true,
+   "fields_compared": 291,
+   "fields_identical": 291,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 9885333.713161008,
+     "replay": 4078192.929057
+    },
+    "wall_ms": {
+     "committed": 2661897.203389,
+     "replay": 1141329.605926
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 24324382,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 2701,
+    "unsolved": 0,
+    "decompositions": 174,
+    "total_muls": 4011456028895,
+    "solve_muls": 4011363046793,
+    "la_fp_muls": 154864,
+    "macaulay_entries": 45904288920,
+    "rho_matched_muls": 686294.1875,
+    "rho_matched_steps": 4315.0,
+    "ratio": 5845096.901531022
+   },
+   "relations": 24,
+   "columns": 23,
+   "la_ops": 9679,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e19",
+   "p": 149,
+   "seed": 1,
+   "arm": null,
+   "committed": {
+    "path": "experiments/27_quartic_pipeline_d4/p149s1.json",
+    "sha256": "c8a9604e8949dbea9d08d8005bc7688834178b3db66cd46f363c42c50459796b"
+   },
+   "replay_output": {
+    "path": "replay/e19/p149s1.json",
+    "sha256": "4f7c4d543fcc9ba3d7780a304f20ed55741355abaeab482fab7f9c3b2c38e9d2"
+   },
+   "replayed": true,
+   "fields_compared": 291,
+   "fields_identical": 291,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 12927647.528753998,
+     "replay": 4813889.725395989
+    },
+    "wall_ms": {
+     "committed": 3456232.621942,
+     "replay": 1347358.806175
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 45391030,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 3525,
+    "unsolved": 0,
+    "decompositions": 256,
+    "total_muls": 5264676237357,
+    "solve_muls": 5264555231692,
+    "la_fp_muls": 427312,
+    "macaulay_entries": 59775844240,
+    "rho_matched_muls": 1287447.6875,
+    "rho_matched_steps": 10060.4375,
+    "ratio": 4089235.072207157
+   },
+   "relations": 38,
+   "columns": 37,
+   "la_ops": 26707,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e19",
+   "p": 149,
+   "seed": 2,
+   "arm": null,
+   "committed": {
+    "path": "experiments/27_quartic_pipeline_d4/p149s2.json",
+    "sha256": "df714b1d2ef879288cc912ac0befe902e197495c9c000f046dbf5fca8535c989"
+   },
+   "replay_output": {
+    "path": "replay/e19/p149s2.json",
+    "sha256": "972ad8c696f9458cb1e9df501d63591642ed843ba9b8c2682b8e95a41a1dd199"
+   },
+   "replayed": true,
+   "fields_compared": 291,
+   "fields_identical": 291,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 11269149.672105974,
+     "replay": 3940730.1219910057
+    },
+    "wall_ms": {
+     "committed": 3028126.402838,
+     "replay": 1103455.751234
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 113243821,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 2868,
+    "unsolved": 0,
+    "decompositions": 320,
+    "total_muls": 4299648656880,
+    "solve_muls": 4299544563404,
+    "la_fp_muls": 460224,
+    "macaulay_entries": 48673889600,
+    "rho_matched_muls": 1264778.6875,
+    "rho_matched_steps": 9857.625,
+    "ratio": 3399526.4937447803
+   },
+   "relations": 42,
+   "columns": 41,
+   "la_ops": 28764,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e19",
+   "p": 197,
+   "seed": 1,
+   "arm": null,
+   "committed": {
+    "path": "experiments/27_quartic_pipeline_d4/p197s1.json",
+    "sha256": "6e60b454b5b1af323e75de6dfd85b33c37823434ebabc53585b567c986014a8e"
+   },
+   "replay_output": {
+    "path": "replay/e19/p197s1.json",
+    "sha256": "6b35c48d7412b94b553168eea055d1a39c0c6e60467be7816f15c5bec314587e"
+   },
+   "replayed": true,
+   "fields_compared": 291,
+   "fields_identical": 291,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 43018213.81652007,
+     "replay": 6720940.313791013
+    },
+    "wall_ms": {
+     "committed": 11365449.345575,
+     "replay": 1850393.393321
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 331047546,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 7061,
+    "unsolved": 0,
+    "decompositions": 376,
+    "total_muls": 10367983542993,
+    "solve_muls": 10367757867263,
+    "la_fp_muls": 647984,
+    "macaulay_entries": 119155912960,
+    "rho_matched_muls": 2112553.125,
+    "rho_matched_steps": 18125.625,
+    "ratio": 4907797.782833508
+   },
+   "relations": 49,
+   "columns": 48,
+   "la_ops": 40499,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e19",
+   "p": 197,
+   "seed": 2,
+   "arm": null,
+   "committed": {
+    "path": "experiments/27_quartic_pipeline_d4/p197s2.json",
+    "sha256": "151649dbd5daef50ff126bd9642e965d5f41beaef0ebfcfa5ef81cec72fcf40c"
+   },
+   "replay_output": {
+    "path": "replay/e19/p197s2.json",
+    "sha256": "ad3dfdd04ce32d4e1790ef22b868fa605726ccab8db2a4a41d1bfc5c9409ed16"
+   },
+   "replayed": true,
+   "fields_compared": 291,
+   "fields_identical": 291,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 15430779.388844017,
+     "replay": 3766216.2071029847
+    },
+    "wall_ms": {
+     "committed": 4115495.413585,
+     "replay": 1040448.8354499999
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 191637020,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 4306,
+    "unsolved": 0,
+    "decompositions": 386,
+    "total_muls": 6286128911926,
+    "solve_muls": 6285980333526,
+    "la_fp_muls": 723344,
+    "macaulay_entries": 72609743360,
+    "rho_matched_muls": 2224313.375,
+    "rho_matched_steps": 19270.5625,
+    "ratio": 2826098.5985960723
+   },
+   "relations": 54,
+   "columns": 53,
+   "la_ops": 45209,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e19",
+   "p": 269,
+   "seed": 1,
+   "arm": null,
+   "committed": {
+    "path": "experiments/27_quartic_pipeline_d4/p269s1.json",
+    "sha256": "1665c4ff2f842f2a17fb8c2ff55c3fbcd39779c16da05396613711835e65d146"
+   },
+   "replay_output": {
+    "path": "replay/e19/p269s1.json",
+    "sha256": "e7f274dfb0d4c70a074e6c5dd8baf3ed6fb3c932096f101890b4bf700bb491c3"
+   },
+   "replayed": true,
+   "fields_compared": 291,
+   "fields_identical": 291,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 8776976.40015298,
+     "replay": 9449335.036799988
+    },
+    "wall_ms": {
+     "committed": 2398860.7602020004,
+     "replay": 2620025.44269
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 350173466,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 11975,
+    "unsolved": 0,
+    "decompositions": 436,
+    "total_muls": 17447130005767,
+    "solve_muls": 17446757932972,
+    "la_fp_muls": 857728,
+    "macaulay_entries": 201740318920,
+    "rho_matched_muls": 3166678.625,
+    "rho_matched_steps": 28471.4375,
+    "ratio": 5509599.195834721
+   },
+   "relations": 59,
+   "columns": 58,
+   "la_ops": 53608,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e19",
+   "p": 269,
+   "seed": 2,
+   "arm": null,
+   "committed": {
+    "path": "experiments/27_quartic_pipeline_d4/p269s2.json",
+    "sha256": "e3ca5ea3708645b0e94705f33eb84caa4988d0a19ba7f85a49ca8bf055d458cc"
+   },
+   "replay_output": {
+    "path": "replay/e19/p269s2.json",
+    "sha256": "2e9dfb0f89c514f02fc946f9eab554b3b3eef0b1c9fea9b90de2153caeeb3c92"
+   },
+   "replayed": true,
+   "fields_compared": 291,
+   "fields_identical": 291,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 4405289.143987006,
+     "replay": 4801561.81783799
+    },
+    "wall_ms": {
+     "committed": 1199009.570595,
+     "replay": 1318898.9611300002
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 934481687,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 6200,
+    "unsolved": 0,
+    "decompositions": 502,
+    "total_muls": 9005460641452,
+    "solve_muls": 9005251502071,
+    "la_fp_muls": 1207280,
+    "macaulay_entries": 104304432400,
+    "rho_matched_muls": 3500194.625,
+    "rho_matched_steps": 31822.0,
+    "ratio": 2572845.686102955
+   },
+   "relations": 68,
+   "columns": 67,
+   "la_ops": 75455,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e24",
+   "p": 101,
+   "seed": 1,
+   "arm": null,
+   "committed": {
+    "path": "experiments/29_quartic_pipeline_v4/p101s1.json",
+    "sha256": "8b74a39be2c903ec98ff1f65ea22d83db5e8a9d293a8c4edfea197c8c1c8dedc"
+   },
+   "replay_output": {
+    "path": "replay/e24/p101s1.json",
+    "sha256": "e1efbd2b99bdd56d89762d354744038f21a86c19e4707973ca9da4993e078857"
+   },
+   "replayed": true,
+   "fields_compared": 292,
+   "fields_identical": 292,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 876797.7544380006,
+     "replay": 506534.86318800744
+    },
+    "wall_ms": {
+     "committed": 304666.651495,
+     "replay": 210121.723818
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 4448698,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 77960,
+    "unsolved": 9,
+    "decompositions": 320,
+    "total_muls": 128204040747,
+    "solve_muls": 127127795783,
+    "la_fp_muls": 22768,
+    "macaulay_entries": 13827799104,
+    "rho_matched_muls": 757296.1875,
+    "rho_matched_steps": 5011.25,
+    "ratio": 169291.8079651629
+   },
+   "relations": 10,
+   "columns": 9,
+   "la_ops": 1423,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e24",
+   "p": 101,
+   "seed": 2,
+   "arm": null,
+   "committed": {
+    "path": "experiments/29_quartic_pipeline_v4/p101s2.json",
+    "sha256": "2040d66fc4be2130c8b3c40b286579ed2b1802587789dba17b064ff8217ec090"
+   },
+   "replay_output": {
+    "path": "replay/e24/p101s2.json",
+    "sha256": "ba82d94e901688dc38613721b492243807ec3e2864baee0e937d548fcb57d0a4"
+   },
+   "replayed": true,
+   "fields_compared": 292,
+   "fields_identical": 292,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 177808.66638899996,
+     "replay": 103404.69775999998
+    },
+    "wall_ms": {
+     "committed": 62763.369744999996,
+     "replay": 43398.081968
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 25391763,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 15387,
+    "unsolved": 5,
+    "decompositions": 604,
+    "total_muls": 25529343540,
+    "solve_muls": 25312805956,
+    "la_fp_muls": 42512,
+    "macaulay_entries": 2732253888,
+    "rho_matched_muls": 744347.75,
+    "rho_matched_steps": 4883.9375,
+    "ratio": 34297.60288789749
+   },
+   "relations": 14,
+   "columns": 13,
+   "la_ops": 2657,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e24",
+   "p": 149,
+   "seed": 1,
+   "arm": null,
+   "committed": {
+    "path": "experiments/29_quartic_pipeline_v4/p149s1.json",
+    "sha256": "0e71ea84d34888ee7d99588a866a6e01e7c2ef8f929d2a4f0685880ddb6afaab"
+   },
+   "replay_output": {
+    "path": "replay/e24/p149s1.json",
+    "sha256": "1997f0ef91bb7b5d94dbf9f6a72725531604972cb62c3b8e4fa0f7ea158192da"
+   },
+   "replayed": true,
+   "fields_compared": 292,
+   "fields_identical": 292,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 357778.41229499836,
+     "replay": 201645.79134100128
+    },
+    "wall_ms": {
+     "committed": 125531.251036,
+     "replay": 85661.41887000001
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 72898577,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 31225,
+    "unsolved": 4,
+    "decompositions": 888,
+    "total_muls": 51973400831,
+    "solve_muls": 51512372574,
+    "la_fp_muls": 89968,
+    "macaulay_entries": 5527945920,
+    "rho_matched_muls": 1367934.9375,
+    "rho_matched_steps": 10873.3125,
+    "ratio": 37994.05907855906
+   },
+   "relations": 17,
+   "columns": 16,
+   "la_ops": 5623,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e24",
+   "p": 149,
+   "seed": 2,
+   "arm": null,
+   "committed": {
+    "path": "experiments/29_quartic_pipeline_v4/p149s2.json",
+    "sha256": "8f7ada1c1ae1e58a30360cb87fb784385dc6986edce50544cfddcb155dd69fce"
+   },
+   "replay_output": {
+    "path": "replay/e24/p149s2.json",
+    "sha256": "6b46b666f416c3c73e4606835c606306af74ae59b5807791a9e525d3819a5535"
+   },
+   "replayed": true,
+   "fields_compared": 292,
+   "fields_identical": 292,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 518715.8862650016,
+     "replay": 297436.9039590002
+    },
+    "wall_ms": {
+     "committed": 181457.390005,
+     "replay": 125085.20027199999
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 55905994,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 45343,
+    "unsolved": 2,
+    "decompositions": 824,
+    "total_muls": 75127679424,
+    "solve_muls": 74463343239,
+    "la_fp_muls": 79552,
+    "macaulay_entries": 8026279296,
+    "rho_matched_muls": 1355677.875,
+    "rho_matched_steps": 10766.625,
+    "ratio": 55417.057996908006
+   },
+   "relations": 16,
+   "columns": 15,
+   "la_ops": 4972,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e24",
+   "p": 197,
+   "seed": 1,
+   "arm": null,
+   "committed": {
+    "path": "experiments/29_quartic_pipeline_v4/p197s1.json",
+    "sha256": "fa85a9b61469fb4d2048257f739a84f9593ebc01089ad039dced4e50c339deed"
+   },
+   "replay_output": {
+    "path": "replay/e24/p197s1.json",
+    "sha256": "a0ad34856523653b70c5ba5a659ff0ae535a0e9de864fb45f844d069531366fb"
+   },
+   "replayed": true,
+   "fields_compared": 292,
+   "fields_identical": 292,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 1660739.9868880415,
+     "replay": 997397.4254159929
+    },
+    "wall_ms": {
+     "committed": 579278.427916,
+     "replay": 408747.900937
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 318192845,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 142361,
+    "unsolved": 10,
+    "decompositions": 1040,
+    "total_muls": 237298780852,
+    "solve_muls": 235141320476,
+    "la_fp_muls": 111792,
+    "macaulay_entries": 25165909440,
+    "rho_matched_muls": 1700928.625,
+    "rho_matched_steps": 14024.5,
+    "ratio": 139511.31009509586
+   },
+   "relations": 20,
+   "columns": 19,
+   "la_ops": 6987,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e24",
+   "p": 197,
+   "seed": 2,
+   "arm": null,
+   "committed": {
+    "path": "experiments/29_quartic_pipeline_v4/p197s2.json",
+    "sha256": "845c7aae63a681ec03257c542c6d796c45fa013866724d29d30340bfaef6ab57"
+   },
+   "replay_output": {
+    "path": "replay/e24/p197s2.json",
+    "sha256": "b338d1b91dde2fdd16599cea78e933054454b3fda4ab8b27d1fd940a69012cf3"
+   },
+   "replayed": true,
+   "fields_compared": 292,
+   "fields_identical": 292,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 866940.8314699995,
+     "replay": 509827.07837599824
+    },
+    "wall_ms": {
+     "committed": 301227.16365299997,
+     "replay": 209528.064986
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 113158094,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 74345,
+    "unsolved": 7,
+    "decompositions": 1128,
+    "total_muls": 123602929617,
+    "solve_muls": 122476403656,
+    "la_fp_muls": 135984,
+    "macaulay_entries": 13140833664,
+    "rho_matched_muls": 2272012.5625,
+    "rho_matched_steps": 19744.9375,
+    "ratio": 54402.39708929866
+   },
+   "relations": 22,
+   "columns": 21,
+   "la_ops": 8499,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e24",
+   "p": 269,
+   "seed": 1,
+   "arm": null,
+   "committed": {
+    "path": "experiments/29_quartic_pipeline_v4/p269s1.json",
+    "sha256": "1a03816c5a11107c8f3273cd2931c82fbc5280a2ccf270102e3cd1ba3548e330"
+   },
+   "replay_output": {
+    "path": "replay/e24/p269s1.json",
+    "sha256": "f59a5bc743bee3fa73863e53d44689b38cfbb9f086c7b256225cfb8c161f8a71"
+   },
+   "replayed": true,
+   "fields_compared": 291,
+   "fields_identical": 291,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 240217.38457999966,
+     "replay": 293874.90537399787
+    },
+    "wall_ms": {
+     "committed": 105469.990346,
+     "replay": 122213.416995
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 1223824752,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 44281,
+    "unsolved": 0,
+    "decompositions": 1896,
+    "total_muls": 73848388611,
+    "solve_muls": 73144772372,
+    "la_fp_muls": 340464,
+    "macaulay_entries": 7819158144,
+    "rho_matched_muls": 3214273.25,
+    "rho_matched_steps": 28949.4375,
+    "ratio": 22975.14332703357
+   },
+   "relations": 34,
+   "columns": 33,
+   "la_ops": 21279,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e24",
+   "p": 269,
+   "seed": 2,
+   "arm": null,
+   "committed": {
+    "path": "experiments/29_quartic_pipeline_v4/p269s2.json",
+    "sha256": "57dacf5e26a09f7dac4e5d276e22ac976fb1d82c24b9cce3ec538a3a4ed4f0fc"
+   },
+   "replay_output": {
+    "path": "replay/e24/p269s2.json",
+    "sha256": "b56664a7727353acdb0f2dcb1210724ecb2352501a014c2eeb0fcd096205e9e9"
+   },
+   "replayed": true,
+   "fields_compared": 292,
+   "fields_identical": 292,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 261297.27090199993,
+     "replay": 328963.4574029988
+    },
+    "wall_ms": {
+     "committed": 115677.146787,
+     "replay": 137702.35194
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 467000226,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 50040,
+    "unsolved": 1,
+    "decompositions": 2192,
+    "total_muls": 83696794084,
+    "solve_muls": 82899604203,
+    "la_fp_muls": 346864,
+    "macaulay_entries": 8838002880,
+    "rho_matched_muls": 3584383.0,
+    "rho_matched_steps": 32673.0,
+    "ratio": 23350.40482113658
+   },
+   "relations": 38,
+   "columns": 37,
+   "la_ops": 21679,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e24",
+   "p": 397,
+   "seed": 1,
+   "arm": null,
+   "committed": {
+    "path": "experiments/29_quartic_pipeline_v4/p397s1.json",
+    "sha256": "537200f9949cbd2798c6b9def634fbbc4cb45bdba613d3dab4586e89f646e457"
+   },
+   "replay_output": {
+    "path": "replay/e24/p397s1.json",
+    "sha256": "fff465219b5655fccc6d4244a0dbc78a748c776e1817f6b22e4cd6497096c2b1"
+   },
+   "replayed": true,
+   "fields_compared": 292,
+   "fields_identical": 292,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 792765.9203550011,
+     "replay": 838470.9581830042
+    },
+    "wall_ms": {
+     "committed": 277066.672202,
+     "replay": 295985.208819
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 956750776,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 66981,
+    "unsolved": 1,
+    "decompositions": 3232,
+    "total_muls": 112657248598,
+    "solve_muls": 111537139545,
+    "la_fp_muls": 672656,
+    "macaulay_entries": 11815957440,
+    "rho_matched_muls": 8610069.25,
+    "rho_matched_steps": 82650.875,
+    "ratio": 13084.360337519933
+   },
+   "relations": 53,
+   "columns": 52,
+   "la_ops": 42041,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e24",
+   "p": 397,
+   "seed": 2,
+   "arm": null,
+   "committed": {
+    "path": "experiments/29_quartic_pipeline_v4/p397s2.json",
+    "sha256": "86a6c2d2d1ae73e075b6cb9b62a99c138caf2a653a3828e0fdd44ce607bd36ab"
+   },
+   "replay_output": {
+    "path": "replay/e24/p397s2.json",
+    "sha256": "3cf3966f7cc7eb70681699c3c6b812e6d44dc0caeb36c9f6669d4cfe5c044e3b"
+   },
+   "replayed": true,
+   "fields_compared": 292,
+   "fields_identical": 292,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 1042214.4960120072,
+     "replay": 1102846.6500539922
+    },
+    "wall_ms": {
+     "committed": 363058.659359,
+     "replay": 389049.113131
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 3059412718,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 89424,
+    "unsolved": 2,
+    "decompositions": 2872,
+    "total_muls": 149957831692,
+    "solve_muls": 148470392296,
+    "la_fp_muls": 585424,
+    "macaulay_entries": 15772964928,
+    "rho_matched_muls": 9481819.25,
+    "rho_matched_steps": 91356.6875,
+    "ratio": 15815.30165658874
+   },
+   "relations": 48,
+   "columns": 47,
+   "la_ops": 36589,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e24",
+   "p": 521,
+   "seed": 1,
+   "arm": null,
+   "committed": {
+    "path": "experiments/29_quartic_pipeline_v4/p521s1.json",
+    "sha256": "daecb7981e72ff3b7c0e1768b6f3ae058b90a26ea5e35e1b3e58d3544931954f"
+   },
+   "replay_output": {
+    "path": "replay/e24/p521s1.json",
+    "sha256": "3ca0ec4f6d41d26bd1d67afb1eae9a29dbc1e7bc78d5610ba00affcdee700439"
+   },
+   "replayed": true,
+   "fields_compared": 292,
+   "fields_identical": 292,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 1531574.670575993,
+     "replay": 1649773.0167589884
+    },
+    "wall_ms": {
+     "committed": 532720.5204340001,
+     "replay": 579976.7440320001
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 3458567944,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 131952,
+    "unsolved": 1,
+    "decompositions": 3744,
+    "total_muls": 221265446636,
+    "solve_muls": 219009163137,
+    "la_fp_muls": 1103552,
+    "macaulay_entries": 23264497536,
+    "rho_matched_muls": 11748821.8125,
+    "rho_matched_steps": 113831.0,
+    "ratio": 18832.99024933612
+   },
+   "relations": 61,
+   "columns": 60,
+   "la_ops": 68972,
+   "scalar_verified": true
+  },
+  {
+   "experiment": "e24",
+   "p": 521,
+   "seed": 2,
+   "arm": null,
+   "committed": {
+    "path": "experiments/29_quartic_pipeline_v4/p521s2.json",
+    "sha256": "a9f5d7231f7965eb88c683635df7b3ccd34dd8e4fc0a80a5eaf7b7b84469f825"
+   },
+   "replay_output": {
+    "path": "replay/e24/p521s2.json",
+    "sha256": "8cbbfadc0e30c2ee025f4866336cbd45268df388ad84ec896fc7e4e544133f9f"
+   },
+   "replayed": true,
+   "fields_compared": 292,
+   "fields_identical": 292,
+   "mismatches": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 1627802.9048659864,
+     "replay": 1858183.0254520127
+    },
+    "wall_ms": {
+     "committed": 563629.2904010001,
+     "replay": 655707.784243
+    }
+   },
+   "fields_added_in_replay_binary": [
+    "matched_fold",
+    "rho_negation_muls",
+    "rho_negation_steps"
+   ],
+   "added_field_cross_checks": {
+    "rho_negation_muls == committed rho_matched_muls": true,
+    "rho_negation_steps == committed rho_matched_steps": true,
+    "matched_fold == Negation": true
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "committed_correct": true,
+    "planted_d": 743731013,
+    "independent_dG_eq_Q": true,
+    "independent_instance_checks_pass": true
+   },
+   "walks": {
+    "count": 32,
+    "by_fold": {
+     "None": 16,
+     "Negation": 16
+    },
+    "all_correct": true,
+    "identical_to_committed": true
+   },
+   "counters": {
+    "residuals": 142487,
+    "unsolved": 1,
+    "decompositions": 3516,
+    "total_muls": 238932284636,
+    "solve_muls": 236498717104,
+    "la_fp_muls": 954704,
+    "macaulay_entries": 25129974912,
+    "rho_matched_muls": 11108759.1875,
+    "rho_matched_steps": 107463.75,
+    "ratio": 21508.458379839194
+   },
+   "relations": 59,
+   "columns": 58,
+   "la_ops": 59669,
+   "scalar_verified": true
+  }
+ ]
+}

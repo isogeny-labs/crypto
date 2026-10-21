@@ -1,0 +1,439 @@
+{
+ "evidence_dir": "benchmarks/20261018-k4-gls-v4",
+ "instances": "benchmarks/20261018-k4-gls-v4/replay/harness/instance_checks.json",
+ "experiments": [
+  {
+   "id": "e25",
+   "committed_dir": "experiments/30_gls_v4",
+   "replay_dir": "benchmarks/20261018-k4-gls-v4/replay/e25",
+   "runs": [
+    [
+     101,
+     1
+    ],
+    [
+     101,
+     2
+    ],
+    [
+     149,
+     1
+    ],
+    [
+     149,
+     2
+    ],
+    [
+     197,
+     1
+    ],
+    [
+     197,
+     2
+    ],
+    [
+     269,
+     1
+    ],
+    [
+     269,
+     2
+    ],
+    [
+     397,
+     1
+    ],
+    [
+     397,
+     2
+    ]
+   ]
+  },
+  {
+   "id": "e25-stage-a",
+   "whole_file": true,
+   "committed": "experiments/30_gls_v4/stage_a.json",
+   "replay": "benchmarks/20261018-k4-gls-v4/replay/e25_stage_a/stage_a.json",
+   "command": "gls_stage_a --sizes 29,37,41,53,61,89,97,101,109,113,149,197,269,397 --seeds 4 --json OUT",
+   "note": "the gate run (G2.32): 56 curves; its stderr log replays line for line identical to experiments/30_gls_v4/stage_a.log (replay/e25_stage_a/stage_a.log adds the shell's timing lines)"
+  }
+ ],
+ "extra": {
+  "schema": "replay-certificate/v1",
+  "row": "benchmarks/README.md, row 20261018-k4-gls-v4 (E25)",
+  "date": "2026-10-21",
+  "validator": "validator subagent (review-adversarial policy), independent of the session that produced E25: fresh build, fresh runs, own comparison and own instance checks",
+  "repository": {
+   "commit": "edea86713a3ab729a1d74353d2b253fea5271cb4",
+   "branch": "claude/glv-endomorphism-index-calculus-pe7ige",
+   "working_tree": "clean (git status --short empty) at build and at replay start"
+  },
+  "recorded_binary": "46202dc97 (experiments/30_gls_v4/binary_commit.txt; run.log: built from the identical tree before that commit)",
+  "code_drift": "git diff 46202dc97..edea86713 over the pipeline path (quartic_folds.rs, klein_v4.rs, gaudry_quartic*.rs, d4_weighted_s5.rs, gaudry_cubic.rs, residual_walk.rs, the driver, Cargo.lock): +96 lines in quartic_folds.rs (E26's census, additive) and +1 in Cargo.lock; every deterministic field replays identically",
+  "build": {
+   "command": "cargo build --release --example quartic_pipeline_d4 --example quartic_pipeline_v4 --example quartic_pipeline_gls; cargo build --release --example gls_stage_a",
+   "toolchain": "rustc 1.94.1 (e408947bf 2026-03-25), cargo 1.94.1",
+   "binaries": [
+    {
+     "name": "quartic_pipeline_gls",
+     "sha256": "04553025e6bfd76b02f0dd26821ce60d08cae271f5e9dd9a44a0672ca3a0b5c6"
+    },
+    {
+     "name": "gls_stage_a",
+     "sha256": "bc412b9974a66fcfdf45192db6e6d3157ee9f31239a4f51f606adf6544a67a87"
+    }
+   ]
+  },
+  "environment": {
+   "host": "Intel(R) Xeon(R) Processor @ 2.80GHz, 4 vCPU, Linux 6.18.44, 15 GiB",
+   "RAYON_NUM_THREADS": 4,
+   "determinism_note": "collect_and_solve draws each round's targets (2 x rayon threads of them) from the run's single seeded RNG, which also chooses each target's row and feeds Wiedemann, so the thread count is part of the trajectory; the recorded host had 4 vCPUs (rayon default 4) and 4 threads reproduce every record. Field counters are per-instance Cell<u64>, not shared across threads.",
+   "concurrency": "the E25 replays ran beside the E19 replay stream on the same 4 vCPUs; only wall-clock fields are affected"
+  },
+  "command": "RAYON_NUM_THREADS=4 quartic_pipeline_gls --sizes P --first-seed S --seeds 1 --rho-runs 16 --max-residuals 5000000 --json OUT (experiments/30_gls_v4/run_all.sh's arguments; OUT in scratch, then copied to replay/e25/); replay/replay.sh",
+  "comparison": "replay/replay_compare.py: every field of every committed record compared with the replay leaf by leaf, integers and floats exactly; wall_ms and solve_ms are wall-clock and are reported, not compared",
+  "scalar_verification": "For every run and both arms the replayed binary recovered x by Wiedemann, checked [x]G = Q by double-and-add on the curve, and set correct = (x == d) for the instance's planted d (quartic_folds.rs Arm::attempt); every replay reports solved = true and correct = true, so x = d on all 20 arm runs. The committed JSON records correct = true but not x, so x is tied to the committed run through the instance: the replay regenerates it from (p, seed) and its n, #E and h equal the committed ones, and every deterministic counter (targets, decompositions, relations, Wiedemann operations, every walk's steps and F_p multiplications) is identical, which a different instance or a different row system would not give. Independently of the repository code (replay/harness/check_instances.py: own F_{p^4} and curve arithmetic), the regenerated instance satisfies G, Q on E, n prime, [n]G = O, [d]G = Q, #E = h n killing random points, psi^2(G) = -G and psi(G) = [lambda]G with lambda^2 = -1 mod n. Each of the 480 walks per arm set (16 <\u00b1psi>, 16 negation, 16 unfolded per curve, identical across the two arms) also recovered d (correct = true) and replays identically.",
+  "instance_checks": [
+   {
+    "experiment": "e25",
+    "p": 101,
+    "seed": 1,
+    "n": 6503869,
+    "group_order": 104061904,
+    "cofactor": 16,
+    "planted_d": 1538068,
+    "j": [
+     100,
+     0,
+     42,
+     0
+    ],
+    "j_in_fp": false,
+    "j_in_fp2": true,
+    "j_is_0_or_1728": false,
+    "checks": {
+     "G_on_curve": true,
+     "Q_on_curve": true,
+     "n_prime": true,
+     "nG_is_O": true,
+     "dG_eq_Q": true,
+     "order_eq_h_n": true,
+     "order_in_hasse": true,
+     "order_kills_random_points": true,
+     "psi_G_on_curve": true,
+     "psi2_G_eq_minus_G": true,
+     "lambda2_eq_minus1_mod_n": true,
+     "psi_G_eq_lambda_G": true,
+     "matches_committed_n_order_h": true
+    },
+    "all_checks_pass": true
+   },
+   {
+    "experiment": "e25",
+    "p": 101,
+    "seed": 2,
+    "n": 6502501,
+    "group_order": 104040016,
+    "cofactor": 16,
+    "planted_d": 557533,
+    "j": [
+     34,
+     0,
+     95,
+     0
+    ],
+    "j_in_fp": false,
+    "j_in_fp2": true,
+    "j_is_0_or_1728": false,
+    "checks": {
+     "G_on_curve": true,
+     "Q_on_curve": true,
+     "n_prime": true,
+     "nG_is_O": true,
+     "dG_eq_Q": true,
+     "order_eq_h_n": true,
+     "order_in_hasse": true,
+     "order_kills_random_points": true,
+     "psi_G_on_curve": true,
+     "psi2_G_eq_minus_G": true,
+     "lambda2_eq_minus1_mod_n": true,
+     "psi_G_eq_lambda_G": true,
+     "matches_committed_n_order_h": true
+    },
+    "all_checks_pass": true
+   },
+   {
+    "experiment": "e25",
+    "p": 149,
+    "seed": 1,
+    "n": 30804181,
+    "group_order": 492866896,
+    "cofactor": 16,
+    "planted_d": 4914788,
+    "j": [
+     38,
+     0,
+     130,
+     0
+    ],
+    "j_in_fp": false,
+    "j_in_fp2": true,
+    "j_is_0_or_1728": false,
+    "checks": {
+     "G_on_curve": true,
+     "Q_on_curve": true,
+     "n_prime": true,
+     "nG_is_O": true,
+     "dG_eq_Q": true,
+     "order_eq_h_n": true,
+     "order_in_hasse": true,
+     "order_kills_random_points": true,
+     "psi_G_on_curve": true,
+     "psi2_G_eq_minus_G": true,
+     "lambda2_eq_minus1_mod_n": true,
+     "psi_G_eq_lambda_G": true,
+     "matches_committed_n_order_h": true
+    },
+    "all_checks_pass": true
+   },
+   {
+    "experiment": "e25",
+    "p": 149,
+    "seed": 2,
+    "n": 30802501,
+    "group_order": 492840016,
+    "cofactor": 16,
+    "planted_d": 2874927,
+    "j": [
+     36,
+     0,
+     62,
+     0
+    ],
+    "j_in_fp": false,
+    "j_in_fp2": true,
+    "j_is_0_or_1728": false,
+    "checks": {
+     "G_on_curve": true,
+     "Q_on_curve": true,
+     "n_prime": true,
+     "nG_is_O": true,
+     "dG_eq_Q": true,
+     "order_eq_h_n": true,
+     "order_in_hasse": true,
+     "order_kills_random_points": true,
+     "psi_G_on_curve": true,
+     "psi2_G_eq_minus_G": true,
+     "lambda2_eq_minus1_mod_n": true,
+     "psi_G_eq_lambda_G": true,
+     "matches_committed_n_order_h": true
+    },
+    "all_checks_pass": true
+   },
+   {
+    "experiment": "e25",
+    "p": 197,
+    "seed": 1,
+    "n": 94129093,
+    "group_order": 1506065488,
+    "cofactor": 16,
+    "planted_d": 79622603,
+    "j": [
+     48,
+     0,
+     195,
+     0
+    ],
+    "j_in_fp": false,
+    "j_in_fp2": true,
+    "j_is_0_or_1728": false,
+    "checks": {
+     "G_on_curve": true,
+     "Q_on_curve": true,
+     "n_prime": true,
+     "nG_is_O": true,
+     "dG_eq_Q": true,
+     "order_eq_h_n": true,
+     "order_in_hasse": true,
+     "order_kills_random_points": true,
+     "psi_G_on_curve": true,
+     "psi2_G_eq_minus_G": true,
+     "lambda2_eq_minus1_mod_n": true,
+     "psi_G_eq_lambda_G": true,
+     "matches_committed_n_order_h": true
+    },
+    "all_checks_pass": true
+   },
+   {
+    "experiment": "e25",
+    "p": 197,
+    "seed": 2,
+    "n": 94128829,
+    "group_order": 1506061264,
+    "cofactor": 16,
+    "planted_d": 7399960,
+    "j": [
+     11,
+     0,
+     69,
+     0
+    ],
+    "j_in_fp": false,
+    "j_in_fp2": true,
+    "j_is_0_or_1728": false,
+    "checks": {
+     "G_on_curve": true,
+     "Q_on_curve": true,
+     "n_prime": true,
+     "nG_is_O": true,
+     "dG_eq_Q": true,
+     "order_eq_h_n": true,
+     "order_in_hasse": true,
+     "order_kills_random_points": true,
+     "psi_G_on_curve": true,
+     "psi2_G_eq_minus_G": true,
+     "lambda2_eq_minus1_mod_n": true,
+     "psi_G_eq_lambda_G": true,
+     "matches_committed_n_order_h": true
+    },
+    "all_checks_pass": true
+   },
+   {
+    "experiment": "e25",
+    "p": 269,
+    "seed": 1,
+    "n": 327253141,
+    "group_order": 5236050256,
+    "cofactor": 16,
+    "planted_d": 270725152,
+    "j": [
+     252,
+     0,
+     203,
+     0
+    ],
+    "j_in_fp": false,
+    "j_in_fp2": true,
+    "j_is_0_or_1728": false,
+    "checks": {
+     "G_on_curve": true,
+     "Q_on_curve": true,
+     "n_prime": true,
+     "nG_is_O": true,
+     "dG_eq_Q": true,
+     "order_eq_h_n": true,
+     "order_in_hasse": true,
+     "order_kills_random_points": true,
+     "psi_G_on_curve": true,
+     "psi2_G_eq_minus_G": true,
+     "lambda2_eq_minus1_mod_n": true,
+     "psi_G_eq_lambda_G": true,
+     "matches_committed_n_order_h": true
+    },
+    "all_checks_pass": true
+   },
+   {
+    "experiment": "e25",
+    "p": 269,
+    "seed": 2,
+    "n": 327248941,
+    "group_order": 5235983056,
+    "cofactor": 16,
+    "planted_d": 309622187,
+    "j": [
+     194,
+     0,
+     8,
+     0
+    ],
+    "j_in_fp": false,
+    "j_in_fp2": true,
+    "j_is_0_or_1728": false,
+    "checks": {
+     "G_on_curve": true,
+     "Q_on_curve": true,
+     "n_prime": true,
+     "nG_is_O": true,
+     "dG_eq_Q": true,
+     "order_eq_h_n": true,
+     "order_in_hasse": true,
+     "order_kills_random_points": true,
+     "psi_G_on_curve": true,
+     "psi2_G_eq_minus_G": true,
+     "lambda2_eq_minus1_mod_n": true,
+     "psi_G_eq_lambda_G": true,
+     "matches_committed_n_order_h": true
+    },
+    "all_checks_pass": true
+   },
+   {
+    "experiment": "e25",
+    "p": 397,
+    "seed": 1,
+    "n": 1552521829,
+    "group_order": 24840349264,
+    "cofactor": 16,
+    "planted_d": 1275612762,
+    "j": [
+     19,
+     0,
+     382,
+     0
+    ],
+    "j_in_fp": false,
+    "j_in_fp2": true,
+    "j_is_0_or_1728": false,
+    "checks": {
+     "G_on_curve": true,
+     "Q_on_curve": true,
+     "n_prime": true,
+     "nG_is_O": true,
+     "dG_eq_Q": true,
+     "order_eq_h_n": true,
+     "order_in_hasse": true,
+     "order_kills_random_points": true,
+     "psi_G_on_curve": true,
+     "psi2_G_eq_minus_G": true,
+     "lambda2_eq_minus1_mod_n": true,
+     "psi_G_eq_lambda_G": true,
+     "matches_committed_n_order_h": true
+    },
+    "all_checks_pass": true
+   },
+   {
+    "experiment": "e25",
+    "p": 397,
+    "seed": 2,
+    "n": 1552521829,
+    "group_order": 24840349264,
+    "cofactor": 16,
+    "planted_d": 1421554453,
+    "j": [
+     149,
+     0,
+     126,
+     0
+    ],
+    "j_in_fp": false,
+    "j_in_fp2": true,
+    "j_is_0_or_1728": false,
+    "checks": {
+     "G_on_curve": true,
+     "Q_on_curve": true,
+     "n_prime": true,
+     "nG_is_O": true,
+     "dG_eq_Q": true,
+     "order_eq_h_n": true,
+     "order_in_hasse": true,
+     "order_kills_random_points": true,
+     "psi_G_on_curve": true,
+     "psi2_G_eq_minus_G": true,
+     "lambda2_eq_minus1_mod_n": true,
+     "psi_G_eq_lambda_G": true,
+     "matches_committed_n_order_h": true
+    },
+    "all_checks_pass": true
+   }
+  ]
+ }
+}
