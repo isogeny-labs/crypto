@@ -127,7 +127,9 @@ and this post-termination custody gate must both pass before a Tier 1 result
 is promoted. Its `final_primary_status` is read from the immutable archive and
 remains `BOUNDED_UNKNOWN` unless the archived screen and point-0 cross-family
 replay both passed. `final_cold_cost_status` separately requires the archived
-16-pair setup-inclusive selector. The custody check can be rerun independently:
+16-pair setup-inclusive selector, which the controller recomputes from the
+archived one-target rows before promotion. The custody check can be rerun
+independently:
 
 ```sh
 python3 -m research.n83_highk_beyond4405_20261021.verify_provider_custody \

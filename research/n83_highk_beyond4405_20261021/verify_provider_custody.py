@@ -9,6 +9,7 @@ from pathlib import Path
 import tarfile
 
 from research.n83_highk_beyond4405_20261021 import run, runpod_runner
+from research.n83_highk_beyond4405_20261021 import verify_holdout
 from research.n83_highk_beyond4405_20261021 import watch_runpod as watch
 
 
@@ -23,6 +24,7 @@ def validate(allocation_path: Path, archive_dir: Path) -> dict:
         "final_primary_status": "BOUNDED_UNKNOWN",
         "final_cold_cost_status": "BOUNDED_UNKNOWN",
         "checks": {},
+        "scientific_checks": {},
     }
     receipt = runpod_runner.read_allocation(allocation_path)
     pod_id = receipt["pod_id"]
@@ -89,17 +91,35 @@ def validate(allocation_path: Path, archive_dir: Path) -> dict:
                         members["results/screen_analysis.json"]))
                     holdout = json.load(tar.extractfile(
                         members["results/holdout/analysis.json"]))
+                    candidate = holdout.get("candidate_id")
+                    rows = holdout.get("rows")
+                    reported_cold = holdout.get("cold_cost_selector")
+                    cold_replay = None
+                    if (isinstance(candidate, str) and isinstance(rows, list)
+                            and all(isinstance(row, dict) for row in rows)):
+                        try:
+                            cold_replay = verify_holdout.cross_family_cold_select(
+                                rows, candidate)
+                        except (KeyError, ValueError, TypeError, OverflowError,
+                                ZeroDivisionError):
+                            pass
+                    result["scientific_checks"]["cold_selector_replay"] = (
+                        cold_replay is not None and
+                        cold_replay == reported_cold)
                     result["archived_scientific_status"] = {
                         "screen": screen.get("status"),
                         "primary": holdout.get("primary_status"),
                         "cross_family_selector": holdout.get(
                             "cross_family_selector", {}).get("status"),
-                        "cold_cost_selector": holdout.get(
-                            "cold_cost_selector", {}).get("status"),
+                        "cold_cost_selector": (
+                            cold_replay.get("status") if
+                            result["scientific_checks"]["cold_selector_replay"]
+                            else None),
                     }
         else:
             result["checks"]["archive_identity"] = False
-    except (OSError, KeyError, ValueError, TypeError, tarfile.TarError) as error:
+    except (OSError, KeyError, ValueError, TypeError, AttributeError,
+            tarfile.TarError) as error:
         result["error_type"] = type(error).__name__
     if result["checks"] and all(result["checks"].values()):
         result["status"] = "PASS_PROVIDER_CUSTODY"
@@ -109,7 +129,8 @@ def validate(allocation_path: Path, archive_dir: Path) -> dict:
                 "PASS_VERIFIED_CROSS_FAMILY_TIER1"):
             result["final_primary_status"] = (
                 "PASS_VERIFIED_CROSS_FAMILY_TIER1")
-            if scientific.get("cold_cost_selector") == "SELECTED":
+            if (result["scientific_checks"].get("cold_selector_replay") and
+                    scientific.get("cold_cost_selector") == "SELECTED"):
                 result["final_cold_cost_status"] = "SELECTED_TWO_FAMILIES_TIER1"
     result["pod_id"] = pod_id
     result["allocation_sha256"] = allocation_hash
@@ -127,6 +148,7 @@ def main() -> int:
     print(json.dumps({"status": result["status"],
                       "final_primary_status": result["final_primary_status"],
                       "final_cold_cost_status": result["final_cold_cost_status"],
+                      "scientific_checks": result["scientific_checks"],
                       "checks": result["checks"]}, sort_keys=True))
     return 0 if result["status"] == "PASS_PROVIDER_CUSTODY" else 2
 
