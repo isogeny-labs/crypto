@@ -349,6 +349,15 @@ class CiCheck(Scratch):
             errors = g.benchmark_archive_errors(self.repo, {}, base="base")
         self.assertTrue(any("does not match a row from the base table" in e for e in errors))
 
+    def test_existing_archive_row_may_outlive_base_table_row(self):
+        self.tree([], [])
+        existing = self.archive()
+        old_readme = "# Benchmarks\n"
+        old_archive = json.dumps({"schema": g.ARCHIVE_SCHEMA, "rows": [existing]})
+        with unittest.mock.patch.object(g, "git_show", side_effect=lambda ref, path:
+                                        old_readme if path == g.BENCHMARKS_README else old_archive):
+            self.assertEqual(g.benchmark_archive_errors(self.repo, {}, base="base"), [])
+
     def test_freeze_may_only_shrink(self):
         self.assertEqual(g.grown({"a": "1", "b": "2"}, {"a": "1", "b": "2"}), [])
         self.assertEqual(g.grown({"a": "1"}, {"a": "1", "b": "2"}), [])
