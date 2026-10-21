@@ -208,6 +208,11 @@ matching repeat skip, S3 HEAD, remote verification, fresh-cache download,
 SHA-256 check, exact-object deletion, and final HEAD 404. Its binary hash and
 unique key are in
 [`FINAL_MERGED_S3_ACCEPTANCE_20261018.json`](FINAL_MERGED_S3_ACCEPTANCE_20261018.json).
+The current `crypto` CLI head repeated that sequence on 2026-10-21 under a
+new isolated acceptance prefix. S3 HEAD with checksum mode enabled matched
+the content SHA-256, and the exact-object cleanup ended at HEAD 404. Its
+source head, release binary hash, object key, and checks are in
+[`FINAL_CRYPTO_CLI_S3_ACCEPTANCE_20261021.json`](FINAL_CRYPTO_CLI_S3_ACCEPTANCE_20261021.json).
 
 ## For evidence
 
