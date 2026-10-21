@@ -106,6 +106,10 @@
    "path": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
    "sha256": "c86743775097e0e17e264d878021e30ce34c9231d572c1b16a679526d208b372"
   },
+  "lazy_columns2": {
+   "path": "research/ecbench_lazy_columns2_20261018/figures/ratios.json",
+   "sha256": "e97bc0f02c39695a1191c931267ba618c178059dbfc641dca12858d571b6fad4"
+  },
   "pair_table_setup": {
    "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
    "sha256": "e6f6f56f9db4c125e23e22009247e80e60386238108db8822f20efc2e1fdd8aa"
@@ -49990,6 +49994,302 @@
   "study": "research/ecbench_lazy_orbit_members_20261018/",
   "report": "research/ecbench_lazy_orbit_members_20261018/REPORT.pdf",
   "source": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
+  "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates."
+ },
+ "lazy_columns2_component": {
+  "rows": [
+   {
+    "session": "a0-n13",
+    "session_id": "ECBS1h5f7f47653898",
+    "curve": "icv1-f2m13-t181-515ee569",
+    "a": 0,
+    "n": 13,
+    "log2_r": 10.9679467058,
+    "frozen_c": 1,
+    "frozen_over_c2": {
+     "ratio": 0.636896087905,
+     "ci95": [
+      0.629789296785,
+      0.644575386648
+     ],
+     "pairs": 96
+    },
+    "c2_over_rho_strong": {
+     "ratio": 0.50998046639,
+     "ci95": [
+      0.503050575893,
+      0.516470657149
+     ],
+     "pairs": 96
+    },
+    "frozen_over_rho_strong": {
+     "ratio": 0.324804563952,
+     "ci95": [
+      0.319090164526,
+      0.330241133811
+     ],
+     "pairs": 96
+    },
+    "c2_over_rho_frob": {
+     "ratio": 3.81573724948,
+     "ci95": [
+      3.64393917057,
+      3.9740520556
+     ],
+     "pairs": 96
+    },
+    "frozen_over_rho_frob": {
+     "ratio": 2.43022812667,
+     "ci95": [
+      2.31545364616,
+      2.53757517826
+     ],
+     "pairs": 96
+    },
+    "rho_frob_aa": {
+     "ratio": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "pairs": 96
+    }
+   },
+   {
+    "session": "a1-n17",
+    "session_id": "ECBS1had6c4dfa75fc",
+    "curve": "icv1-f2m17-tm101-00378d4e",
+    "a": 1,
+    "n": 17,
+    "log2_r": 16.0011222661,
+    "frozen_c": 1,
+    "frozen_over_c2": {
+     "ratio": 1.17572082728,
+     "ci95": [
+      1.06277329249,
+      1.29707433232
+     ],
+     "pairs": 96
+    },
+    "c2_over_rho_strong": {
+     "ratio": 0.511734338321,
+     "ci95": [
+      0.490020140251,
+      0.535069544563
+     ],
+     "pairs": 96
+    },
+    "frozen_over_rho_strong": {
+     "ratio": 0.601656719597,
+     "ci95": [
+      0.544520264428,
+      0.665322595277
+     ],
+     "pairs": 96
+    },
+    "c2_over_rho_frob": {
+     "ratio": 1.83042162861,
+     "ci95": [
+      1.39694844279,
+      2.25469410282
+     ],
+     "pairs": 96
+    },
+    "frozen_over_rho_frob": {
+     "ratio": 2.15206483145,
+     "ci95": [
+      1.59239278855,
+      2.7516930363
+     ],
+     "pairs": 96
+    },
+    "rho_frob_aa": {
+     "ratio": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "pairs": 96
+    }
+   },
+   {
+    "session": "a0-n23",
+    "session_id": "ECBS1h88a016cfa7c0",
+    "curve": "icv1-f2m23-t5197-69e76b73",
+    "a": 0,
+    "n": 23,
+    "log2_r": 20.9991061013,
+    "frozen_c": 3,
+    "frozen_over_c2": {
+     "ratio": 0.777586332877,
+     "ci95": [
+      0.694733921418,
+      0.874141508596
+     ],
+     "pairs": 96
+    },
+    "c2_over_rho_strong": {
+     "ratio": 1.40286585673,
+     "ci95": [
+      1.23614604978,
+      1.57799138452
+     ],
+     "pairs": 96
+    },
+    "frozen_over_rho_strong": {
+     "ratio": 1.09084931705,
+     "ci95": [
+      1.00897044893,
+      1.17550430858
+     ],
+     "pairs": 96
+    },
+    "c2_over_rho_frob": {
+     "ratio": 3.56935111784,
+     "ci95": [
+      2.84832359553,
+      4.49683186678
+     ],
+     "pairs": 96
+    },
+    "frozen_over_rho_frob": {
+     "ratio": 2.77547864647,
+     "ci95": [
+      2.25152006255,
+      3.40797717676
+     ],
+     "pairs": 96
+    },
+    "rho_frob_aa": {
+     "ratio": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "pairs": 96
+    }
+   },
+   {
+    "session": "a1-n29",
+    "session_id": "ECBS1h486ae2ee8d06",
+    "curve": "icv1-f2m29-tm40309-30c52b96",
+    "a": 1,
+    "n": 29,
+    "log2_r": 15.373714814,
+    "frozen_c": 1,
+    "frozen_over_c2": {
+     "ratio": 0.644299928345,
+     "ci95": [
+      0.625499432714,
+      0.665226490564
+     ],
+     "pairs": 96
+    },
+    "c2_over_rho_strong": {
+     "ratio": 0.614597523228,
+     "ci95": [
+      0.602499175506,
+      0.626555535846
+     ],
+     "pairs": 96
+    },
+    "frozen_over_rho_strong": {
+     "ratio": 0.395985140177,
+     "ci95": [
+      0.38109084355,
+      0.411455958748
+     ],
+     "pairs": 96
+    },
+    "c2_over_rho_frob": {
+     "ratio": 1.99813532067,
+     "ci95": [
+      1.51091311126,
+      2.61179398637
+     ],
+     "pairs": 96
+    },
+    "frozen_over_rho_frob": {
+     "ratio": 1.28739844393,
+     "ci95": [
+      0.970937999359,
+      1.68573887584
+     ],
+     "pairs": 96
+    },
+    "rho_frob_aa": {
+     "ratio": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "pairs": 96
+    }
+   },
+   {
+    "session": "a0-n37",
+    "session_id": "ECBS1hbef0622fd5f3",
+    "curve": "icv1-f2m37-tm534059-32aad96b",
+    "a": 0,
+    "n": 37,
+    "log2_r": 27.7808370855,
+    "frozen_c": 8,
+    "frozen_over_c2": {
+     "ratio": 0.24625385151,
+     "ci95": [
+      0.199508853042,
+      0.308763597864
+     ],
+     "pairs": 48
+    },
+    "c2_over_rho_strong": {
+     "ratio": 15.4220948531,
+     "ci95": [
+      12.279506012,
+      18.6140269665
+     ],
+     "pairs": 48
+    },
+    "frozen_over_rho_strong": {
+     "ratio": 3.79775025592,
+     "ci95": [
+      3.26600854834,
+      4.40288490349
+     ],
+     "pairs": 48
+    },
+    "c2_over_rho_frob": {
+     "ratio": 18.426463631,
+     "ci95": [
+      14.4275226309,
+      23.2254483978
+     ],
+     "pairs": 48
+    },
+    "frozen_over_rho_frob": {
+     "ratio": 4.53758763885,
+     "ci95": [
+      3.75207637744,
+      5.49671153356
+     ],
+     "pairs": 48
+    },
+    "rho_frob_aa": {
+     "ratio": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "pairs": 48
+    }
+   }
+  ],
+  "unit": "ecbench.gae, paired by target, cluster-bootstrap 95% CI",
+  "class": "engineering",
+  "note": "Copied from sessions/*/comparisons; ratio = cost of the numerator arm over the denominator arm, <1 means the numerator is cheaper. frozen_over_c2 > 1 means two columns is cheaper than the column count frozen on 2026-10-14.",
+  "study": "research/ecbench_lazy_columns2_20261018/",
+  "report": "research/ecbench_lazy_columns2_20261018/REPORT.pdf",
+  "source": "research/ecbench_lazy_columns2_20261018/figures/ratios.json",
   "validation": "Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates."
  },
  "pair_table_component": {
