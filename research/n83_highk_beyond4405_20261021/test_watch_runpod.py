@@ -107,6 +107,19 @@ class WatchRunpodTest(unittest.TestCase):
                                         .read_text())["reason"],
                              "LATE_WATCHDOG_START")
 
+    def test_output_setup_failure_still_attempts_termination(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "result"
+            with (mock.patch.object(watch.runpod_runner, "read_allocation",
+                                    return_value=ALLOCATION),
+                  mock.patch.object(watch.Path, "mkdir",
+                                    side_effect=OSError("disk full")),
+                  mock.patch.object(watch, "terminate") as terminate):
+                code = watch.watch(Path("allocation"), "127.0.0.1", 22,
+                                   output, "secret")
+            self.assertEqual(code, 2)
+            terminate.assert_called_once_with("abc123", "secret", None)
+
     def test_terminate_uses_void_mutation_and_requires_absence(self):
         with tempfile.TemporaryDirectory() as temp:
             output = Path(temp)
