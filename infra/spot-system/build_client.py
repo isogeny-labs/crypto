@@ -9,7 +9,7 @@ import tarfile
 
 def build(function, destination, region='us-east-2'):
     here = Path(__file__).resolve().parent
-    files = {name: (here/name).read_bytes() for name in ['install_hooks.py', 'wake.py']}
+    files = {name: (here/name).read_bytes() for name in ['install_hooks.py', 'wake.py', 'ssh_proxy.py', 'install_client.sh']}
     files['deployment.json'] = json.dumps({'function': function, 'region': region}, indent=2).encode()
     files['caller-policy.json'] = json.dumps({'Version':'2012-10-17', 'Statement':[
         {'Effect':'Allow', 'Action':'lambda:InvokeFunction', 'Resource':function}]}, indent=2).encode()
