@@ -38,6 +38,11 @@ The SHA-256 domains, scalar rule, answer-sidecar hashes and curve checks are in
 against 33,602 earlier public points and between the new streams. Keep answer
 sidecars outside the timed worker input. Any target, source, binary, base or
 manifest mismatch aborts admission and stays in the result log.
+`workloads.json` seals two secondary 768-point block workloads and 16
+individual one-target workloads. Point 0 has workload ID `f3f41cbb7544`.
+Every measured IC row uses its exact candidate ID, workload ID and a run ID
+formed as `<candidate-id>W<workload-id>R1`; repeated runs increment the final
+number. Keep the screen block IDs separate from the one-target IDs.
 
 ## Tier 1 allocation and secondary screen
 

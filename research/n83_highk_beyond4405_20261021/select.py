@@ -48,6 +48,8 @@ def select(data: dict, dispatch: dict) -> dict:
     if (data.get("schema") != "n83.fixed31-screen-validated/v1" or
             data.get("source_sha256") != dispatch["source_sha256"] or
             data.get("screen_targets_sha256") != dispatch["screen_targets_sha256"] or
+            data.get("workload_manifest_sha256") !=
+            dispatch["workload_manifest_sha256"] or
             data.get("candidate_ids") != all_ids or
             data.get("evidence_status") != "PASS_INDEPENDENT_REPLAY" or
             data.get("layout_control_status") !=

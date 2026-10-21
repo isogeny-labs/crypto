@@ -79,6 +79,10 @@ replay and fixture exclusion before writing the immutable `dispatch.json`.
 The dispatch pins the four arms, alternating screen blocks, one-target holdout,
 Tier 1 resource limits and proposed allocation ceiling. Its current status is
 `AWAITING_OWNER_BUDGET_APPROVAL`; it is a prepared experiment, not an allocation.
+`seal_workloads.py` records two exact secondary block workloads and 16
+separate one-target workloads. The preregistered point-0 workload ID is
+`f3f41cbb7544`; verifier rows use candidate/workload/run IDs under the
+repository naming contract.
 `run.py` verifies all 1,552 public points against the sealed scalar sidecars,
 then schedules eight cold IC children with three rho A/A calibrations on each
 side. It keeps the sidecars out of child inputs, records every capped child and
@@ -94,6 +98,13 @@ deadline, then seals an archive with the raw child receipts and build logs.
 with the independent N83 group model, checks exact base/rank/index and phase
 accounting, preserves failed child rows, checks the Pod envelope and rho A/A
 noise, and emits the validated matrix consumed by `select.py`.
+`holdout.py` schedules the selected base against same-point rho, placing
+preregistered point 0 first and alternating IC/rho order across 16 individual
+points. `verify_holdout.py` independently replays every answer and produces
+the point-0 online wall-time ratio only when its Tier 1, resource, noise and
+correctness gates pass. The Pod launcher runs this phase only after the
+screen selector admits a unique fixed31 base and time remains before the
+provider deadline.
 `select.py` admits a fixed31 winner only from a complete independently replayed
 Tier 1 matrix, a passing same-base layout control, and all three pairwise
 exact sign tests at the Bonferroni threshold of 1/60.

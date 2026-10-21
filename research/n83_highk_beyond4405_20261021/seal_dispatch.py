@@ -5,9 +5,13 @@ from decimal import Decimal
 import hashlib
 import json
 from pathlib import Path
+import sys
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from research.n83_highk_beyond4405_20261021 import seal_workloads
 SOURCE_SHA256 = "58e3ee492093de5f6b760b96e3aba819fa479cdecd22b1adee94f0ecb26026d8"
 
 
@@ -21,6 +25,7 @@ def canonical(value: object) -> bytes:
 
 
 def seal() -> dict:
+    seal_workloads.seal()
     catalog = json.loads((HERE / "identities/catalog.json").read_text())
     fixture = json.loads((HERE / "fresh_manifest.json").read_text())
     audit = json.loads((HERE / "fresh_exclusion_audit_v2.json").read_text())
@@ -84,6 +89,7 @@ def seal() -> dict:
         "exclusion_audit_sha256": digest(HERE / "fresh_exclusion_audit_v2.json"),
         "screen_targets_sha256": fixture["screen"]["targets_sha256"],
         "holdout_targets_sha256": fixture["holdout"]["targets_sha256"],
+        "workload_manifest_sha256": digest(HERE / "workloads.json"),
         "screen_target_count": 1536,
         "holdout_target_count": 16,
         "primary_holdout_index": 0,

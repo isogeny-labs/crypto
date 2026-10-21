@@ -115,6 +115,7 @@ def layout_control(children: dict, output: Path) -> str:
 
 def verify(output: Path) -> int:
     dispatch, streams = run.fixture()
+    workloads = read(HERE / "workloads.json")
     arms = dispatch["arms"]
     ids = [arm["candidate_id"] for arm in arms]
     events = run.events(dispatch)
@@ -144,6 +145,8 @@ def verify(output: Path) -> int:
         source.get("cargo_lock_sha256") == dispatch["cargo_lock_sha256"] and
         source.get("runner_sha256") == run.digest(HERE / "run.py") and
         source.get("dispatch_sha256") == run.digest(HERE / "dispatch.json") and
+        source.get("workload_manifest_sha256") ==
+        dispatch["workload_manifest_sha256"] and
         source.get("runpod_adapter_sha256") ==
         run.digest(HERE / "runpod_runner.py") and
         source.get("runpod_allocation_sha256") ==
@@ -193,12 +196,17 @@ def verify(output: Path) -> int:
             result = common.replay_ic(folder, arm_tuple(arm),
                                       points[start:start+768],
                                       answers[start:start+768])
+            workload_id = workloads["screen_blocks"][event["block"]]["workload_id"]
+            result["workload_id"] = workload_id
+            result["run_id"] = arm["candidate_id"] + "W" + workload_id + "R1"
             children[event["name"]] = result
             target_rows = result.get("targets", [])
             for local in range(768):
                 row = target_rows[local] if len(target_rows) == 768 else {}
                 point_rows[start+local]["arms"].append({
                     "candidate_id": arm["candidate_id"],
+                    "workload_id": workload_id,
+                    "run_id": result["run_id"],
                     "status": row.get("status", result["status"]),
                     "resource_status": result.get("resources", {}).get("status"),
                     "one_target_online_ms": row.get("one_target_online_ms"),
@@ -274,6 +282,7 @@ def verify(output: Path) -> int:
         "schema": "n83.fixed31-screen-validated/v1",
         "source_sha256": dispatch["source_sha256"],
         "screen_targets_sha256": dispatch["screen_targets_sha256"],
+        "workload_manifest_sha256": dispatch["workload_manifest_sha256"],
         "candidate_ids": ids,
         "evidence_status": analysis["evidence_status"],
         "layout_control_status": layout,
