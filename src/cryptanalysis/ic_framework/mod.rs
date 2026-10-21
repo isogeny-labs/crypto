@@ -95,6 +95,7 @@ pub struct PipelineSpec {
     pub factor_base: String,
     pub factor_base_params: Params,
     pub oracle: String,
+    /// `audit_rank` is a runner flag, removed before oracle callbacks.
     pub oracle_params: Params,
     /// The polynomial solver, for oracles that use one.
     pub solver: Option<String>,
@@ -383,8 +384,12 @@ pub fn run_pipeline<G: CountedGroup>(
     // one in the first frozen solver sweep.
     measurement::mark(measurement::Phase::Precompute);
     let mut prep_ops = GroupOps::default();
+    let mut oracle_params = std::borrow::Cow::Borrowed(&spec.oracle_params);
+    if oracle_params.get("audit_rank").is_some() {
+        oracle_params.to_mut().0.remove("audit_rank");
+    }
     let prep_started = Instant::now();
-    oracle.prepare(ctx, &fb, &spec.oracle_params, &mut prep_ops)?;
+    oracle.prepare(ctx, &fb, oracle_params.as_ref(), &mut prep_ops)?;
     let mut prep_cost = PhaseCost::default();
     prep_cost.group_ops.merge(prep_ops);
     prep_cost.native = oracle.setup_native();
@@ -647,7 +652,7 @@ pub fn run_pipeline<G: CountedGroup>(
         decomposition: DecompositionReport {
             name: oracle.name().to_string(),
             summands: oracle.summands(),
-            description: oracle.describe(&spec.oracle_params),
+            description: oracle.describe(oracle_params.as_ref()),
             targets_tried: outcome.trials,
             relations_found: outcome.relations_found,
             hit_rate: outcome.relations_found as f64 / outcome.trials.max(1) as f64,

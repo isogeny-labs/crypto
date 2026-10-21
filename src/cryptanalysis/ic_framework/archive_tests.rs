@@ -4,7 +4,7 @@ use crate::cryptanalysis::ic_boundary::{
 };
 use crate::cryptanalysis::ic_framework::{
     archive::{self, ArchiveInstance, BinaryArchiveBase, PrimeArchiveBase},
-    plugins::SubtractOracle,
+    plugins::{PrimeAbscissaBase, PrimeBatchMitmOracle, SubtractOracle},
     run_pipeline,
     stages::{FactorBaseBuilder, InstanceCtx, Params, Targets},
     useful_rank::{self, AuditedMatrix},
@@ -338,4 +338,43 @@ fn comparison_protocol_hash_and_holdout_are_frozen() {
     assert!(!confirmation.is_empty());
     assert!(confirmation.iter().all(|seed| !discovery.contains(seed)));
     assert!(protocol["total_runtime_winner"].is_null());
+}
+
+#[test]
+fn audit_flag_is_not_forwarded_to_strict_oracle_parameters() {
+    let i = roster_prime_instance(16).unwrap();
+    let g = i.generator_point();
+    let mut ops = GroupOps::default();
+    let ctx = InstanceCtx {
+        group: &i.curve,
+        generator: g,
+        target: i.curve.mul(&mut ops, g, 17),
+        r: i.r,
+        cofactor: i.cofactor,
+        group_order: i.group_order,
+        name: i.name.clone(),
+        field_degree: None,
+    };
+    let mut spec = PipelineSpec {
+        factor_base: "prime-abscissa".into(),
+        oracle: "mitm-prime-batch".into(),
+        targets: Targets::Random,
+        max_trials: 0,
+        ..Default::default()
+    };
+    spec.factor_base_params.set("size", "4");
+    spec.oracle_params.set("audit_rank", "true");
+    let report = run_pipeline(
+        &ctx,
+        &spec,
+        &PrimeAbscissaBase { instance: &i },
+        &mut PrimeBatchMitmOracle::new(),
+        17,
+        &Calibration::default(),
+        None,
+    )
+    .unwrap();
+    assert_eq!(report.useful_rank.unwrap().rows_seen, 0);
+    assert!(report.cost_qualification.is_some());
+    assert!(!report.verified);
 }
