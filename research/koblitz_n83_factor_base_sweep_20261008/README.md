@@ -1,5 +1,13 @@
 # Factor-base sweep for degree-83 Koblitz index calculus
 
+Latest diagnostic: [native SAT storage ownership, 21 October](reports/run-20261021T1617Z/REPORT.md).
+K2048/K4096 each complete a separately declared 450K-conflict profile after the
+[original 1M arms](reports/run-20261020T1546Z/REPORT.md). Native storage and retained
+search-prefix checks pass. Clause arenas account for 93.14%/91.90% of requested
+solver buffer capacities; K2048 retains 1.788 GB of detached learned clauses.
+Reclamation is the next untested change; no higher-cap or speedup claim follows.
+Raw evidence and fresh S3 replay are linked in the diagnostic publication.
+
 Latest control: [native free-selector witness verified](verification/native-selector-export-20261019/RESULT.md),
 787 conflicts / 167.34 s worker wall, actual model selectors and original
 group sum independently replayed. XOR propagation dominates this control;
