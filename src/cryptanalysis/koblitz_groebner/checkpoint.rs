@@ -9,6 +9,7 @@ use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, BufReader, BufWriter, Read, Write};
+#[cfg(unix)]
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -79,11 +80,12 @@ fn write_file(
     name: &str,
     write: impl FnOnce(&mut BufWriter<HashWriter>) -> io::Result<()>,
 ) -> io::Result<Entry> {
-    let file = OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .mode(0o600)
-        .open(dir.join(name))?;
+    let mut options = OpenOptions::new();
+    options.write(true).create_new(true);
+    // Owner-only where the platform has Unix permissions.
+    #[cfg(unix)]
+    options.mode(0o600);
+    let file = options.open(dir.join(name))?;
     let hash_writer = HashWriter {
         file,
         hash: Sha256::new(),

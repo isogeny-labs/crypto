@@ -1,0 +1,75 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: isolab
+  region: us-east-2
+  version: "1.36"
+  tags:
+    project: isolab
+    managed-by: eksctl
+    karpenter.sh/discovery: isolab
+availabilityZones: [us-east-2a, us-east-2b, us-east-2c]
+vpc:
+  cidr: 10.84.0.0/16
+  nat:
+    gateway: Single
+  clusterEndpoints:
+    privateAccess: true
+    publicAccess: true
+  publicAccessCIDRs: [3.134.144.201/32]
+iam:
+  withOIDC: true
+  serviceAccounts:
+    - metadata:
+        name: karpenter
+        namespace: kube-system
+      roleName: isolab-karpenter
+      roleOnly: true
+      attachPolicyARNs:
+        - arn:aws:iam::104186811093:policy/KarpenterControllerNodeLifecyclePolicy-isolab
+        - arn:aws:iam::104186811093:policy/KarpenterControllerIAMIntegrationPolicy-isolab
+        - arn:aws:iam::104186811093:policy/KarpenterControllerEKSIntegrationPolicy-isolab
+        - arn:aws:iam::104186811093:policy/KarpenterControllerInterruptionPolicy-isolab
+        - arn:aws:iam::104186811093:policy/KarpenterControllerResourceDiscoveryPolicy-isolab
+        - arn:aws:iam::104186811093:policy/KarpenterControllerZonalShiftPolicy-isolab
+accessConfig:
+  authenticationMode: API_AND_CONFIG_MAP
+  accessEntries:
+    - principalARN: arn:aws:iam::104186811093:role/KarpenterNodeRole-isolab
+      type: EC2_LINUX
+managedNodeGroups:
+  - name: system
+    instanceType: t3.medium
+    amiFamily: AmazonLinux2023
+    privateNetworking: true
+    minSize: 2
+    desiredCapacity: 2
+    maxSize: 2
+    volumeSize: 30
+    volumeType: gp3
+    volumeEncrypted: true
+    disableIMDSv1: true
+    disablePodIMDS: true
+    labels:
+      isolab.dev/role: system
+    tags:
+      project: isolab
+addons:
+  - name: vpc-cni
+    version: v1.22.4-eksbuild.3
+    attachPolicyARNs: [arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy]
+    configurationValues: '{"enableNetworkPolicy":"true"}'
+  - name: coredns
+    version: v1.14.7-eksbuild.11
+  - name: kube-proxy
+    version: v1.36.0-eksbuild.48
+  - name: aws-ebs-csi-driver
+    version: v1.67.0-eksbuild.1
+    wellKnownPolicies:
+      ebsCSIController: true
+  - name: metrics-server
+    version: v0.9.0-eksbuild.13
+cloudWatch:
+  clusterLogging:
+    enableTypes: [api, audit, authenticator, controllerManager, scheduler]
+    logRetentionInDays: 7

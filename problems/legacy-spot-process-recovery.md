@@ -1,72 +1,42 @@
 # Recovery of running legacy Spot processes
 
-- **Status:** investigating
-- **Kind:** automatic recovery/ownership implementation and validation gap
-- **Affected work:** [Spot runtime](../infra/spot-system/README.md), [native checkpoints](../infra/spot-system/NATIVE_CHECKPOINTS.md)
-- **Next action owner:** Spot deployment task
+- **Status:** implemented and validated for the enrolled workload; laptop activation remains
+- **Kind:** bounded process recovery and deployment
+- **Affected work:** [Spot runtime](../infra/spot-system/README.md)
 - **Last updated:** 2026-10-19
 
-## Problem
+The five original factor-base processes predate native checkpoints. Their images
+were exported to authorized private encrypted S3, and all five restored as copies
+on a compatible separate m8i. They subsequently finished normally. Recurring
+future memory exports, including inherited credentials, are now explicitly
+authorized and enabled at 15-minute boundaries. A sixth running Diem generator
+has its own registry/prefix/ownership key and a successful four-thread copy restore.
 
-The five already-running factor-base processes predate native checkpoint
-support. Their five current CRIU images have now been exported to authorized
-private S3 and restored successfully as copies on a compatible separate worker.
-Automatic fenced recovery and fixed-IP handoff remain unimplemented for those
-legacy processes. Native recovery tests do not discharge this requirement.
+Automatic recovery is deployed. EC2-confirmed predecessor/source termination and
+conditional DynamoDB ownership fence restoration; heartbeat expiry never permits
+stealing. All unfinished groups share one replacement owner, and each must be
+ready before guarded IP handoff. Kernel, libraries, CPU, archive integrity,
+backing files, clocks and original deadlines are verified/enforced.
 
-## Evidence and uncertainty
+A disposable-source/first-owner/second-owner rehearsal passed automatic recovery,
+new-owner encrypted backups and a second restore from the newer time-namespace
+image. The actual source and IP were untouched. Raw failures and earlier manual
+copy evidence remain retained; later success does not remove that history.
 
-- **Observed:** CRIU 4.2.1 successfully dumped PIDs 6656, 6657, 6665, 6696 and
-  6704 with `--leave-running`; all five continued. Measured freezes and source
-  identities are in [the redacted report](../infra/spot-system/validation/live-criu-snapshots.json).
-- **Observed:** a credential-free disposable counter was dumped, killed and
-  restored on the same host. Packaged CRIU 3.17.1 had failed with `sys_rseq -22`.
-- **Observed:** new native solver checkpoints survived a real worker termination
-  and restore on its automatic replacement with the reference answer unchanged.
-- **Observed:** after automatic approval review initially blocked export, the
-  user explicitly authorized these five memory snapshots in the private bucket.
-  All five archives passed AES256, size, metadata and full-download SHA-256
-  checks; [receipt](../infra/spot-system/validation/private-criu-export.json).
-- **Observed:** all five restored on a separate `m8i.8xlarge`, with matching
-  kernel/libraries and `--cpu-cap=all`. Each copy had two healthy threads and
-  advancing CPU ticks during a 10-second check. Only copies were stopped;
-  [evidence](../infra/spot-system/validation/legacy-criu-cross-host-restore.json).
-- **Authorization gap:** review separately rejected recurring future uploads as
-  outside the five-current-image grant. A separate recurring grant is pending;
-  recurring export is disabled and local snapshots continue.
-- **Missing capability:** source failure detection, fenced ownership and
-  coordinated automatic restore of the old live-program images. A successful
-  manual restore alone does not establish automatic recovery.
-- **Not established:** transparent migration of arbitrary experiments, clock
-  accounting across boots, exactly-once outputs, or safe CPU-family switching
-  for CPU/process images. No such claim is made.
+- [x] Explicit recurring sensitive-image authorization and verified private S3 export.
+- [x] Compatible-host restore of all five original images and the Diem image.
+- [x] Automatic ownership transfer after confirmed death; no duplicate live-owner restore.
+- [x] Saved monotonic/boottime recovery across two hops; UTC deadlines retained.
+- [x] Completion receipts prevent replay; expired deadlines produce failure receipts.
+- [x] Applied guarded controller and worker services; source IP remains unchanged.
+- [ ] Execute laptop installer and review/trust Codex hooks; no laptop access is available.
 
-## What would unblock it
+Evidence: [automatic failover](../infra/spot-system/validation/automatic-failover.json),
+[Diem copy restore](../infra/spot-system/validation/diem-copy-restore.json),
+[recurring backups](../infra/spot-system/validation/recurring-private-backups.json),
+and [full requirement status](../infra/spot-system/VALIDATION.md).
 
-- [x] Resolve explicit authorization and verify private S3 export of these five images.
-- [x] Verify image integrity and all required backing files on an isolated
-  compatible worker, without replacing the original running process.
-- [x] Restore all five copies, verify CPU progress/thread health and isolate outputs;
-  stop only that validation copy after the check.
-- [ ] Obtain separate authorization before enabling recurring future memory exports.
-- [ ] Validate fenced ownership and original-host failure detection before
-  enabling automatic legacy restore or moving the fixed IP.
-- [ ] Validate monotonic-clock handling, original launcher deadlines and durable
-  completion receipts before replaying saved processes automatically. The
-  10-second CPU-progress probes do not establish correct timing accounting or
-  prevent replay of a job that completed after its snapshot.
-
-## Next discriminating step
-
-Build and validate source-failure fencing and restoration ownership with
-disposable replicas before enabling automatic legacy restore. Treat CPU/kernel
-and backing-file equality as admission requirements; the successful m8i probes
-do not establish cross-family memory-image portability. Preserve original
-processes and IP throughout validation. Current legacy snapshots are not
-registered as native supervisor jobs.
-
-## Resolution and history
-
-Unresolved. The original host remains outside the managed Auto Scaling group,
-and fixed-IP cutover stays disabled. The local producer refreshes only the
-explicitly registered processes and never restores, restarts or terminates them.
+This resolves the enrolled workload's automatic recovery gap. It does not establish
+transparent recovery of arbitrary programs, CPU-family/kernel portability of RAM
+images, exactly-once external side effects or partition-safe database failover.
+New arbitrary processes require explicit enrollment and a tested restore contract.
