@@ -1,0 +1,36 @@
+{
+  "schema": "validation-gate/v1",
+  "replay_certificate": {
+    "path": "replay-certificate.json",
+    "sha256": "6ac52ff4f3df051321af21c231111af47c17fb411049bc681a3e14469bb0a781"
+  },
+  "validator_report": {
+    "path": "validator-report.json",
+    "sha256": "d50aeb1056e87c70cffbc336441131c9c6ba34362e3c2a37beac54687dac5af7"
+  },
+  "rho_reference": {
+    "kind": "negation",
+    "protocol": "research/four_followups_20261021/PROTOCOL.md; 21 exact-order models x 60 targets each, five candidate arms, same-process source negation rho",
+    "unit": "GAE",
+    "binary_or_process": "research/four_followups_20261021/target/release/factor-base; same invocation and source-cost instrumentation",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "gae_band": {
+      "0": {
+        "ic": 1238998572.3809526,
+        "rho": 174617698.3333333
+      },
+      "0.1": {
+        "ic": 2664487777.7809534,
+        "rho": 1088802370.3333328
+      },
+      "1": {
+        "ic": 15493890626.380945,
+        "rho": 9316464418.333332
+      }
+    },
+    "order_holds_across_band": true
+  }
+}

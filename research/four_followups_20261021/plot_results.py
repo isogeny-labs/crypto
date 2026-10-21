@@ -7,7 +7,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 BASE = Path("research/four_followups_20261021")
-summary = json.loads((BASE / "results/summary.json").read_text())
+summary = json.loads((BASE / "results/matched/summary.json").read_text())
 assert summary["baseline_replayed"] == 1260
 rows = summary["summary"]
 bits = [16, 20, 24, 28, 32, 36, 40]
@@ -34,11 +34,13 @@ for axis in (ax, bx):
 handles, labels = ax.get_legend_handles_labels()
 fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 0.095), ncol=3, fontsize=9)
 fig.suptitle("Frozen factor-base / jump sweep · 21 curves × 60 targets per arm")
-fig.text(0.5, 0.015, "Run 20261021T1523Z · M + 0.5S + 10I; 0.1 GAE per native logical operation · 180 verified targets at each bit size", ha="center", fontsize=8)
+fig.text(0.5, 0.015, "Matched run 20261021T1546Z · M + 0.5S + 10I; 0.1 GAE per native logical operation · 180 paired targets at each bit size", ha="center", fontsize=8)
 fig.tight_layout(rect=[0, 0.24, 1, 0.94])
 for suffix in ("svg", "png"):
     fig.savefig(BASE / f"factor-base-grid.{suffix}", dpi=150, bbox_inches="tight")
 plt.close(fig)
+svg = BASE / "factor-base-grid.svg"
+svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
 
 # A diagram of the exact Kummer ambiguity; each of the 21 raw witnesses is
 # retained in results/kummer-ambiguity.jsonl rather than recomputed here.
@@ -68,3 +70,5 @@ fig.tight_layout(rect=[0, 0.07, 1, 0.94])
 for suffix in ("svg", "png"):
     fig.savefig(BASE / f"kummer-ambiguity.{suffix}", dpi=150, bbox_inches="tight")
 plt.close(fig)
+svg = BASE / "kummer-ambiguity.svg"
+svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")

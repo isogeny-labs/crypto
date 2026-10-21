@@ -1,0 +1,28 @@
+{
+  "schema": "four-followups-evidence/v1",
+  "date": "2026-10-21",
+  "cohort": {
+    "curves": 21,
+    "targets_per_curve": 60,
+    "targets_per_arm": 1260,
+    "arms": 5,
+    "candidate_solves": 6300,
+    "source_rho_solves": 6300
+  },
+  "input_archive_sha256": "550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339",
+  "external_summary_sha256": "fda030afc0a791a841a258f52cd223c9912a8fc738aa8b2d9169b7ca92cf0f80",
+  "protocol": "../PROTOCOL.md",
+  "raw_glob": "matched/fb*-bits*.jsonl",
+  "price_grid": "matched/price-grid.csv",
+  "joined_targets": "matched/targets.jsonl",
+  "summary": "matched/summary.json",
+  "validator": "matched/validator-report.json",
+  "kummer_witnesses": "kummer-ambiguity.jsonl",
+  "checksum_manifest": "../SHA256SUMS",
+  "status": {
+    "factor_base": "complete_frozen_five_arms",
+    "complete_law": "not_implemented",
+    "point_driven_pencil": "not_full_cohort",
+    "kummer": "ordinary_addition_gate_only"
+  }
+}
