@@ -436,13 +436,9 @@ class WorkflowTests(unittest.TestCase):
         with open(path, encoding="utf-8") as fh:
             text = fh.read()
         publish = text.split("\n  publish:\n", 1)[1]
-        # Scheduled/manual backfills retain 35 minutes; automatic pushes use
-        # the repository's 15-minute execution budget.
-        self.assertIn(
-            "timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || "
-            "github.event_name == 'schedule') && (35) || 15 }}",
-            publish,
-        )
+        # Every publication can need the same bounded backfill. Retain the
+        # existing publication budget on main pushes as well as scheduled runs.
+        self.assertIn("timeout-minutes: 35", publish)
         fetch = os.path.join(HERE, "fetch_via_walker.sh")
         with open(fetch, encoding="utf-8") as fh:
             script = fh.read()
