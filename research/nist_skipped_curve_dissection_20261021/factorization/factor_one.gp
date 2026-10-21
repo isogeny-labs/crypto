@@ -1,6 +1,5 @@
 \\ Native factor search and proof generation, driven by a frozen task file.
 default(nbthreads,1);
-default(parisizemax,2000000000);
 default(factor_proven,1);
 check(ok,msg)=if(!ok,error(msg));
 qstr(n)=Str("\"",n,"\"");
