@@ -276,6 +276,34 @@ fn summarize(session: &Path, output: &Path) -> Result<(), String> {
         .map(|line| serde_json::from_str(line).map_err(|e| e.to_string()))
         .collect::<Result<_, _>>()?;
     let pricing = band::band(&records, &band::DEFAULT_WEIGHTS)?;
+    let mut ratios = Vec::new();
+    for candidate in pricing
+        .rows
+        .iter()
+        .filter(|r| matches!(r.arm.as_str(), "known-log" | "transported"))
+    {
+        for reference in ["abscissa", "projected", "rho-neg"] {
+            if let Some(base) = pricing
+                .rows
+                .iter()
+                .find(|r| r.curve == candidate.curve && r.arm == reference)
+            {
+                let ratios_at_weights: Vec<_> = base
+                    .mean_s
+                    .iter()
+                    .zip(&candidate.mean_s)
+                    .map(|(a, b)| match (a, b) {
+                        (Some(a), Some(b)) if *b > 0.0 => Some(a / b),
+                        _ => None,
+                    })
+                    .collect();
+                ratios.push(json!({"curve":candidate.curve,"candidate":candidate.arm,"reference":reference,
+                    "ratio_reference_over_candidate":ratios_at_weights,
+                    "all_runs_verified":candidate.runs == candidate.verified && base.runs == base.verified,
+                    "native_counts_complete":candidate.uncounted.is_empty() && base.uncounted.is_empty()}));
+            }
+        }
+    }
     let mut groups: BTreeMap<(String, String), Vec<&Record>> = BTreeMap::new();
     for r in records.iter().filter(|r| !r.warmup) {
         groups
@@ -329,13 +357,14 @@ fn summarize(session: &Path, output: &Path) -> Result<(), String> {
             "curve":r.workload.curve,"target":r.workload.target,"rounds":rows.len(),
             "statuses":statuses,"priced_gae_totals":priced_totals,"phase_gae_totals":phase_gae,
             "counters":counters,"native_unpriced_totals":native,"online_complete":online_complete,
+            "first_run_counters":r.counters,
             "online_wall_ns_sum_descriptive":online_wall,"factor_base_point_hashes":fb_hashes}));
     }
     write(
         output,
         &json!({"schema":"known-log-study.summary/v1",
         "records_sha256":sha256_hex(&bytes),"session":session.to_string_lossy(),
-        "weights":band::DEFAULT_WEIGHTS,"band":pricing,"workloads":workloads}),
+        "weights":band::DEFAULT_WEIGHTS,"band":pricing,"ratios":ratios,"workloads":workloads}),
     )
 }
 

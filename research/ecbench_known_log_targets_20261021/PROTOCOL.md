@@ -88,6 +88,12 @@ retain SHA-256 replay receipts. Recompute per-target and per-curve totals from
 the sealed records with the native summarizer. A same-host replay is identified
 as such; independent host validation remains a separate gate.
 
+Positive correctness controls exhaust every nonzero target on small prime and
+Koblitz groups using known answers held outside the solver API. Negative controls
+exercise a one-query exhaustion and refusal of invalid sizes and table budgets.
+The generator-transport test holds the point set, query seed and public target
+fixed and checks the required scalar-coordinate conversion.
+
 ## Decision and stop conditions
 
 A measured improvement against the existing IC baseline requires every paired
