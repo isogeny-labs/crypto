@@ -288,30 +288,53 @@ const oldFront = between(page, START, END);
 const historical = section(oldFront, 'lab-best');
 const progressRaw = readFileSync(resolve(ROOT,'docs/ic/progress-timeline.json'));
 // GHS-weak E0/F_{q^3} plane-quartic panel: rendered from the committed frozen
-// summaries only (no arithmetic beyond formatting).
+// summaries only (no arithmetic beyond formatting). Iteration 1 is
+// research/quartic_n4_20261019 (arms A0r, B0); iteration 2 is
+// research/quartic_n4_la_20261021 (arms B0n, B1, B2 and the paired ratios).
+// B2 is the current best recipe, B0 is kept as the was.
 function ghsWeakPanel() {
   const read = rel => readFileSync(resolve(ROOT, rel), 'utf8').split('\n').filter(Boolean).map(line => JSON.parse(line));
   const allRel = 'research/quartic_n4_20261019/results/summary_all.json';
   const primRel = 'research/quartic_n4_20261019/results/summary_primary.json';
-  const all = read(allRel), prim = read(primRel);
-  const rows = all.filter(r => r.arm && r.q !== undefined && r.arm !== 'A0');
-  const fits = [...all.filter(r => r.fit), ...prim.filter(r => r.fit)];
+  const all2Rel = 'research/quartic_n4_la_20261021/results/summary_all.json';
+  const prim2Rel = 'research/quartic_n4_la_20261021/results/summary_primary.json';
+  const all = read(allRel), all2 = read(all2Rel), prim2 = read(prim2Rel);
+  const armRows = recs => recs.filter(r => r.arm && r.q !== undefined);
+  const oldRows = armRows(all).filter(r => r.arm !== 'A0');
+  const newRows = armRows(all2).filter(r => r.arm !== 'B0');
+  assert.deepStrictEqual(armRows(all).filter(r => r.arm === 'B0'), armRows(all2).filter(r => r.arm === 'B0'), 'Iteration 2 re-recorded B0 rows differ from iteration 1');
+  const role = {A0r:'iteration 1 baseline', B0:'was (iteration 1 best)', B2:'current best recipe (iteration 2)', B1:'not adopted (stage trade)', B0n:'control'};
+  const rows = [...oldRows, ...newRows];
+  const oldFitArms = new Set(all.filter(r => r.fit).map(r => r.fit));
+  const fits = [...all.filter(r => r.fit && r.fit !== 'A0').map(f => [f, 'all sizes']),
+    ...all2.filter(r => r.fit && !oldFitArms.has(r.fit)).map(f => [f, 'all sizes']),
+    ...prim2.filter(r => r.fit).map(f => [f, 'primary range q &ge; 4051'])];
+  const paired = all2.filter(r => r.cmp);
   const g3 = v => Number(v).toPrecision(3);
   const cell = (r, i) => `${g3(r.ratio[i])} [${g3(r.ratio_lo[i])}, ${g3(r.ratio_hi[i])}]`;
+  const pcell = r => `${g3(r.ratio)} [${g3(r.lo)}, ${g3(r.hi)}]`;
   const gh = rel => `https://github.com/aburan28/crypto/blob/main/${rel}`;
-  const body = rows.map(r => `<tr><td>${escape(r.arm)}</td><td class="n">${r.q}</td><td class="n">${r.units_ok}/${r.units}</td><td class="n">${r.rho_runs}</td><td>${cell(r,0)}</td><td>${cell(r,1)}</td><td>${cell(r,2)}</td><td>${escape(r.resolved)}</td></tr>`).join('');
-  const fitRows = fits.map((f, i) => `<tr><td>${escape(f.fit)}</td><td>${i < all.filter(r => r.fit).length ? 'all sizes' : 'primary range q &ge; 4051'}</td><td class="n">${f.sizes}</td><td>${g3(f.ic_exp_w0[0])} [${g3(f.ic_exp_w0[1])}, ${g3(f.ic_exp_w0[2])}]</td><td>${g3(f.rho_exp_w0[0])} [${g3(f.rho_exp_w0[1])}, ${g3(f.rho_exp_w0[2])}]</td><td>${g3(f.gap_w0[0])} [${g3(f.gap_w0[1])}, ${g3(f.gap_w0[2])}]</td></tr>`).join('');
-  const big = rows.filter(r => r.arm === 'B0').at(-1);
+  const body = rows.map(r => `<tr><td>${escape(r.arm)}</td><td>${escape(role[r.arm] || '')}</td><td class="n">${r.q}</td><td class="n">${r.units_ok}/${r.units}</td><td class="n">${r.rho_runs}</td><td>${cell(r,0)}</td><td>${cell(r,1)}</td><td>${cell(r,2)}</td><td>${escape(r.resolved)}</td></tr>`).join('');
+  const pairedBody = paired.map(r => `<tr><td>${escape(r.cmp)}</td><td class="n">${r.q}</td><td class="n">${r.nx}</td><td class="n">${r.ny}</td><td>${pcell(r)}</td></tr>`).join('');
+  const fitRows = fits.map(([f, range]) => `<tr><td>${escape(f.fit)}</td><td>${range}</td><td class="n">${f.sizes}</td><td>${g3(f.ic_exp_w0[0])} [${g3(f.ic_exp_w0[1])}, ${g3(f.ic_exp_w0[2])}]</td><td>${g3(f.rho_exp_w0[0])} [${g3(f.rho_exp_w0[1])}, ${g3(f.rho_exp_w0[2])}]</td><td>${g3(f.gap_w0[0])} [${g3(f.gap_w0[1])}, ${g3(f.gap_w0[2])}]</td></tr>`).join('');
+  const big = rows.filter(r => r.arm === 'B2').at(-1);
+  const was = rows.filter(r => r.arm === 'B0').at(-1);
+  const pc = (name, q) => paired.find(r => r.cmp === name && r.q === q);
+  const pf = name => prim2.find(r => r.fit === name);
+  const f3 = v => Number(v).toFixed(3);
+  const e = f => `${f3(f.ic_exp_w0[0])} [${f3(f.ic_exp_w0[1])}, ${f3(f.ic_exp_w0[2])}]`;
+  const b2f = pf('B2'), b0f = pf('B0');
   return `<section class="dash-section" id="ghs-weak-n4-20261019" aria-labelledby="ghs-weak-n4-title" data-collapse="open">
-<div class="dash-section-head"><div><p class="dash-kicker">GHS-weak family E0/F<sub>q<sup>3</sup></sub> with 4 | #E0(K) / plane-quartic index calculus / one target cold</p><h2 id="ghs-weak-n4-title">Below matched rho on one special family, with a smaller exponent.</h2><p class="panel-summary">IC/rho reads ${cell(big,0)} at q = ${big.q} (w = 0), down from above 1 at small q; all IC units verified and the order holds across 0, 0.1 and 1 GAE per unpriced operation for q &ge; 4051. Restricted to this GHS-weak family; not generic curves, not prime-order E/F<sub>q<sup>3</sup></sub>, not a standard curve.</p></div><span class="status good">Advance · special family only</span></div>
-<p class="dash-section-intro">Relation collection with a reduced factor base and one large prime, Lanczos modulo ell, and descent by canonical Pic<sup>0</sup> arithmetic, with no subgroup enumeration. The reference is a matched plain Pollard rho (no negation map) on the same E0(K) subgroup, in F<sub>q</sub>-multiplication equivalents, one cold target, shared 4-core VM with L0 isolation. Arm A0r (all rational points as the factor base) is the baseline for the improvement. Intervals are 95% bootstrap.</p>
-<div class="scroll"><table><caption>IC over matched rho, from the frozen summary.</caption><thead><tr><th>arm</th><th>q</th><th>units ok</th><th>rho runs</th><th>IC/rho, w = 0</th><th>w = 0.1</th><th>w = 1</th><th>resolved</th></tr></thead><tbody>${body}</tbody></table></div>
+<div class="dash-section-head"><div><p class="dash-kicker">GHS-weak family E0/F<sub>q<sup>3</sup></sub> with 4 | #E0(K) / plane-quartic index calculus / one target cold / iteration 2</p><h2 id="ghs-weak-n4-title">Below matched rho on one special family, and double large primes cut the cost again.</h2><p class="panel-summary">Arm B2 (double large primes) is the new baseline: IC/rho reads ${cell(big,0)} at q = ${big.q} (w = 0), the largest size, with all ${big.units_ok}/${big.units} IC units at that size verified; the old arm B0 read ${cell(was,0)} at q = ${was.q} and is kept as the was. The paired cost ratio B2/B0 is ${pcell(pc('B2/B0',4051))} at q = 4051, ${g3(pc('B2/B0',65479).ratio)} at q = 65479 and ${g3(pc('B2/B0',262111).ratio)} at q = 262111; the primary-range exponent is ${e(b2f)} against rho ${f3(b2f.rho_exp_w0[0])} (B0 was ${f3(b0f.ic_exp_w0[0])}). Restricted to this GHS-weak family; not generic curves, not prime-order E/F<sub>q<sup>3</sup></sub>, not a standard curve, no key recovery, no deployed-curve claim.</p></div><span class="status good">Engineering · special family only</span></div>
+<p class="dash-section-intro" id="ghs-weak-n4-20261021">Relation collection with a reduced factor base, Lanczos modulo ell, and descent by canonical Pic<sup>0</sup> arithmetic, with no subgroup enumeration. Iteration 1 (B0) used one large prime; iteration 2 adds double large primes (B2), which is the new baseline. Arm B1 (structured elimination) is a stage trade and is not adopted; arm B0n is the control. The reference is a matched plain Pollard rho (no negation map) on the same E0(K) subgroup, in F<sub>q</sub>-multiplication equivalents, one cold target, shared 4-core VM with L0 isolation. Class: engineering (an improvement of the baseline on the same instances; no floor change). Intervals are 95% bootstrap.</p>
+<div class="scroll"><table><caption>IC over matched rho, from the frozen summaries.</caption><thead><tr><th>arm</th><th>role</th><th>q</th><th>units ok</th><th>rho runs</th><th>IC/rho, w = 0</th><th>w = 0.1</th><th>w = 1</th><th>resolved</th></tr></thead><tbody>${body}</tbody></table></div>
+<div class="scroll"><table><caption>Paired cost ratios X/Y of iteration 2 (same instances; below 1 means X is cheaper).</caption><thead><tr><th>X / Y</th><th>q</th><th>X units</th><th>Y units</th><th>cost ratio X/Y</th></tr></thead><tbody>${pairedBody}</tbody></table></div>
 <div class="scroll"><table><caption>Fitted cost exponents.</caption><thead><tr><th>arm</th><th>range</th><th>sizes</th><th>IC exponent (w = 0)</th><th>rho exponent (w = 0)</th><th>gap rho &minus; IC</th></tr></thead><tbody>${fitRows}</tbody></table></div>
-<p><a href="${gh('research/quartic_n4_20261019/README.md')}">Report</a> &middot; <a href="${gh(allRel)}">Frozen summary, all sizes</a> &middot; <a href="${gh(primRel)}">primary range</a> &middot; <a href="ic-leaderboard.html#ghs-weak-n4-20261019">Leaderboard section</a></p>
+<p><a href="${gh('research/quartic_n4_la_20261021/README.md')}">Iteration 2 report</a> &middot; <a href="${gh(all2Rel)}">Frozen summary, all sizes</a> &middot; <a href="${gh(prim2Rel)}">primary range</a> &middot; <a href="${gh('research/quartic_n4_20261019/README.md')}">Iteration 1 report</a> &middot; <a href="${gh(allRel)}">iteration 1 summary</a> &middot; <a href="${gh(primRel)}">primary</a> &middot; <a href="ic-leaderboard.html#ghs-weak-n4-20261019">Leaderboard section</a></p>
 </section>`;
 }
 const retainedPanels = [
-  ['ghs-weak-n4-20261019','GHS-weak family: plane-quartic index calculus against matched rho · 19 October 2026'],
+  ['ghs-weak-n4-20261019','GHS-weak family: plane-quartic index calculus against matched rho · iteration 2, 21 October 2026 (iteration 1, 19 October 2026)'],
   ['conductor-gap-native-20261015','Conductor-gap native controls: paired solves and generic recurrence · 15 October 2026'],
   ['cold-compact-orbit-20261003','Historical compact-orbit cold-cost panel'],
   ['full-rank-compact-orbit-20261003','Historical compact-orbit full-rank panel'],

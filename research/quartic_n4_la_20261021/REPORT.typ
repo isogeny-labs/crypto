@@ -4,7 +4,7 @@
 = N4 iteration 2: double large primes (B2) and structured elimination (B1) vs the recorded B0
 2026-10-21. Branch `claude/quartic-ic-n4-la-20261021`, protocol commit eab1bdfacd, records `results/`. Descriptive run report; interpretation in `README.md`. Cost in F\_q-multiplication equivalents (M-eq); every IC unit verified kG = Q.
 == Result in brief
-B2 verified on 51 of 51 units (first attempts retried and charged) and costs IC/rho = 0.024 at q = 1048507. Exponent on q >= 4051: B2 1.045 [1.037, 1.052], rho 1.476 [1.438, 1.508]; the recorded B0 baseline had 1.083. B1 (structured elimination) is a small stage gain and a regression at q = 262111. B2 is the new baseline. GHS-weak family only; plain rho; shared VM.
+B2 verified on 57 of 57 units (first attempts retried and charged) and costs IC/rho = 0.024 at q = 1048507. Exponent on q >= 4051: B2 1.045 [1.037, 1.052], rho 1.476 [1.438, 1.508]; the recorded B0 baseline had 1.083. B1 (structured elimination) is a small stage gain and a regression at q = 262111. B2 is the new baseline. GHS-weak family only; plain rho; shared VM.
 == B2 against the matched rho
 #table(columns: 7, align: right, [q],[units ok],[rho runs],[B2 M-eq],[rho M-eq],[B2/rho w=0 (95%)],[resolved],
 [223],[5/5],[150],[8.01e+05],[2.08e+05],[3.848 (2.665-5.251)],[rho lower],

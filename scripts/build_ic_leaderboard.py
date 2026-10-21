@@ -74,6 +74,8 @@ SOURCES = {
     "la_engines": "research/la_engines_20261014/summary.json",
     "ghs_weak_n4": "research/quartic_n4_20261019/results/summary_all.json",
     "ghs_weak_n4_primary": "research/quartic_n4_20261019/results/summary_primary.json",
+    "ghs_weak_n4_i2": "research/quartic_n4_la_20261021/results/summary_all.json",
+    "ghs_weak_n4_i2_primary": "research/quartic_n4_la_20261021/results/summary_primary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -623,27 +625,61 @@ def _jsonl(rel: str) -> list[dict]:
     return [json.loads(x) for x in (REPO / rel).read_text().splitlines() if x.strip()]
 
 
+GHS_ARM_ROLE = {
+    "A0": "iteration 1 baseline (not adopted)", "A0r": "iteration 1 baseline",
+    "B0": "was (iteration 1 best, 2026-10-19)",
+    "B2": "current best recipe (iteration 2, 2026-10-21)",
+    "B1": "not adopted (stage trade)", "B0n": "control",
+}
+
+
 def ghs_weak_n4() -> dict:
     """Plane-quartic (Diem/GHS) index calculus on the GHS-weak family
-    E0/F_{q^3} with 4 | #E0(K), from research/quartic_n4_20261019. Copied from
-    its frozen summaries (rows, fits and phase exponents are computed there).
-    A whole-method cold one-target measurement against a matched plain rho on
-    one special family only; it is not a generic-curve or standard-curve row and
-    enters none of tables A-C. Prices are in F_q-multiplication equivalents at
-    0, 0.1 and 1 GAE per unpriced operation."""
-    recs = _jsonl(SOURCES["ghs_weak_n4"])
-    prim = _jsonl(SOURCES["ghs_weak_n4_primary"])
-    rows = [{"arm": r["arm"], "q": r["q"], "units_ok": r["units_ok"], "units": r["units"],
-             "rho_runs": r["rho_runs"], "ic_meq": r["ic_meq"], "rho_meq": r["rho_meq"],
-             "ratio": r["ratio"], "ratio_lo": r["ratio_lo"], "ratio_hi": r["ratio_hi"],
-             "resolved": r["resolved"]} for r in recs if "arm" in r and "q" in r]
-    fits = {"all_sizes": [r for r in recs if "fit" in r],
-            "all_sizes_phase_exponents": [r for r in recs if "phase_exponents" in r],
-            "primary_range": [r for r in prim if "fit" in r],
-            "primary_range_phase_exponents": [r for r in prim if "phase_exponents" in r]}
-    return {"rows": rows, "fits": fits, "class": "advance (restricted to the GHS-weak family)",
+    E0/F_{q^3} with 4 | #E0(K). Iteration 1 is research/quartic_n4_20261019
+    (arms A0, A0r, B0); iteration 2 is research/quartic_n4_la_20261021 (arms
+    B0n, B1, B2 and the paired cost ratios). Copied from the frozen summaries
+    (rows, fits, phase exponents and ratios are computed there). Arm B2 is the
+    current best recipe; arm B0 is kept as the was, and its rows are checked
+    equal to the ones iteration 2 re-recorded. A whole-method cold one-target
+    measurement against a matched plain rho on one special family only; it is
+    not a generic-curve or standard-curve row and enters none of tables A-C.
+    Prices are in F_q-multiplication equivalents at 0, 0.1 and 1 GAE per
+    unpriced operation."""
+    old = _jsonl(SOURCES["ghs_weak_n4"])
+    old_prim = _jsonl(SOURCES["ghs_weak_n4_primary"])
+    new = _jsonl(SOURCES["ghs_weak_n4_i2"])
+    new_prim = _jsonl(SOURCES["ghs_weak_n4_i2_primary"])
+
+    def arm_rows(recs):
+        return [r for r in recs if "arm" in r and "q" in r]
+
+    old_rows, new_rows = arm_rows(old), arm_rows(new)
+    if [r for r in old_rows if r["arm"] == "B0"] != [r for r in new_rows if r["arm"] == "B0"]:
+        raise SystemExit("ghs_weak_n4: iteration 2 re-recorded B0 rows differ from iteration 1")
+    keep = ("arm", "q", "units_ok", "units", "rho_runs", "ic_meq", "rho_meq",
+            "ratio", "ratio_lo", "ratio_hi", "resolved")
+    rows = [dict({k: r[k] for k in keep}, iteration=1) for r in old_rows]
+    rows += [dict({k: r[k] for k in keep}, iteration=2) for r in new_rows if r["arm"] != "B0"]
+    old_fit_arms = {r["fit"] for r in old if "fit" in r}
+    old_b0p = [r for r in old_prim if r.get("fit") == "B0"]
+    if old_b0p != [r for r in new_prim if r.get("fit") == "B0"]:
+        raise SystemExit("ghs_weak_n4: iteration 2 primary B0 fit differs from iteration 1")
+    fits = {"all_sizes": [r for r in old if "fit" in r] + [r for r in new if "fit" in r and r["fit"] not in old_fit_arms],
+            "all_sizes_phase_exponents": [r for r in old if "phase_exponents" in r]
+                + [r for r in new if "phase_exponents" in r and r["arm"] not in old_fit_arms],
+            "primary_range": [r for r in new_prim if "fit" in r],
+            "primary_range_phase_exponents": [r for r in new_prim if "phase_exponents" in r]}
+    paired = [r for r in new if "cmp" in r]
+    best_rows = [r for r in rows if r["arm"] == "B2"]
+    was_rows = [r for r in rows if r["arm"] == "B0"]
+    return {"rows": rows, "fits": fits, "paired": paired,
+            "current_best": {"arm": "B2", "largest": best_rows[-1], "was_arm": "B0", "was_largest": was_rows[-1]},
+            "class": "iteration 1: advance (restricted to the GHS-weak family); iteration 2: engineering "
+                     "(improvement of the baseline on the same instances; no floor change)",
             "baseline_arm": "A0r", "study": "research/quartic_n4_20261019/",
-            "report": "research/quartic_n4_20261019/README.md"}
+            "study_i2": "research/quartic_n4_la_20261021/",
+            "report": "research/quartic_n4_20261019/README.md",
+            "report_i2": "research/quartic_n4_la_20261021/README.md"}
 
 
 def latest_frontier_audit() -> dict:
@@ -1146,21 +1182,59 @@ def _ghs_cells(r: dict) -> list[str]:
     return out
 
 
+def _ghs_paired_cell(r: dict) -> str:
+    return f"{r['ratio']:.3g} [{r['lo']:.3g}, {r['hi']:.3g}]"
+
+
+def _ghs_headline(g: dict) -> tuple[str, str]:
+    """Plain-text and HTML sentences about the current best arm, from the rows."""
+    cb = g["current_best"]
+    big, was = cb["largest"], cb["was_largest"]
+    c = _ghs_cells(big)
+    cw = _ghs_cells(was)
+    pc = {(r["cmp"], r["q"]): r for r in g["paired"]}
+    pr = {f["fit"]: f for f in g["fits"]["primary_range"]}
+    b2, b0 = pr[cb["arm"]], pr[cb["was_arm"]]
+    txt = (f"Iteration 2 (2026-10-21): arm {cb['arm']} (double large primes) is the current best recipe, "
+           f"IC/rho {c[0]} at q = {big['q']} (w = 0), the largest size; {big['units_ok']}/{big['units']} units "
+           f"verified at that size. Arm {cb['was_arm']} (iteration 1) is kept as the was: {cw[0]} at "
+           f"q = {was['q']}. Paired cost ratio {cb['arm']}/{cb['was_arm']} "
+           f"{_ghs_paired_cell(pc[('B2/B0', 4051)])} at q = 4051, {pc[('B2/B0', 65479)]['ratio']:.3g} at q = 65479, "
+           f"{pc[('B2/B0', 262111)]['ratio']:.3g} at q = 262111. Exponent on the primary range q >= 4051: "
+           f"{cb['arm']} {b2['ic_exp_w0'][0]:.3f} [{b2['ic_exp_w0'][1]:.3f}, {b2['ic_exp_w0'][2]:.3f}] against rho "
+           f"{b2['rho_exp_w0'][0]:.3f} [{b2['rho_exp_w0'][1]:.3f}, {b2['rho_exp_w0'][2]:.3f}]; "
+           f"{cb['was_arm']} was {b0['ic_exp_w0'][0]:.3f}. Class: engineering. One special family only; "
+           f"no generic-curve claim.")
+    return txt, esc(txt)
+
+
+GHS_SCOPE_MD = ("**Restricted to one special GHS-weak family** (E0 over F_{q^3}, #E0(K) = 4*ell): "
+                "not generic curves, not prime-order E/F_{q^3}, not any standard curve, no key recovery, "
+                "no deployed-curve claim.")
+
+
 def ghs_md(g: dict) -> list[str]:
+    head, _ = _ghs_headline(g)
     L = ["", "## GHS-weak E0/F_{q^3} with 4 | #E0(K): plane-quartic index calculus against matched rho", "",
          "Whole method, cold, one target, no subgroup enumeration, in F_q-multiplication equivalents; "
-         "copied from the frozen summaries of `research/quartic_n4_20261019/`. **Restricted to one "
-         "special GHS-weak family** (E0 over F_{q^3}, #E0(K) = 4*ell): not generic curves, not "
-         "prime-order E/F_{q^3}, not any standard curve. Matched reference: plain Pollard rho "
-         "(no negation map) on the same E0(K) subgroup. Class: " + g["class"] + ". Baseline for the "
-         "improvement: arm A0r (all rational points as factor base). It moves no row of tables A–C. "
+         "copied from the frozen summaries of `research/quartic_n4_20261019/` (iteration 1) and "
+         "`research/quartic_n4_la_20261021/` (iteration 2). " + GHS_SCOPE_MD + " Matched reference: plain "
+         "Pollard rho (no negation map) on the same E0(K) subgroup. Class: " + g["class"] + ". Baseline for "
+         "iteration 1: arm A0r (all rational points as factor base). It moves no row of tables A–C. "
          "Columns give IC/rho with 95% bootstrap interval at 0, 0.1 and 1 GAE per unpriced operation.", "",
-         "| arm | q | units ok | rho runs | IC/rho (w=0) | IC/rho (w=0.1) | IC/rho (w=1) | resolved |",
-         "|:--|--:|--:|--:|:--|:--|:--|:--|"]
+         "<a id=\"ghs-weak-n4-20261021\"></a>**" + head + "**", "",
+         "| arm | role | q | units ok | rho runs | IC/rho (w=0) | IC/rho (w=0.1) | IC/rho (w=1) | resolved |",
+         "|:--|:--|--:|--:|--:|:--|:--|:--|:--|"]
     for r in g["rows"]:
         c = _ghs_cells(r)
-        L.append(f"| {r['arm']} | {r['q']} | {r['units_ok']}/{r['units']} | {r['rho_runs']} | "
-                 f"{c[0]} | {c[1]} | {c[2]} | {r['resolved']} |")
+        L.append(f"| {r['arm']} | {GHS_ARM_ROLE.get(r['arm'], '')} | {r['q']} | {r['units_ok']}/{r['units']} | "
+                 f"{r['rho_runs']} | {c[0]} | {c[1]} | {c[2]} | {r['resolved']} |")
+    L += ["", "Paired cost ratios X/Y of iteration 2 (same instances, 95% bootstrap; below 1 means X is cheaper). "
+          "B2/B0 is the improvement over the was; B1/B0 is the structured-elimination trade (B1 not adopted); "
+          "B0n/B0 is the control; B2/B1 compares the two new recipes.", "",
+          "| X / Y | q | X units | Y units | cost ratio X/Y |", "|:--|--:|--:|--:|:--|"]
+    for r in g["paired"]:
+        L.append(f"| {r['cmp']} | {r['q']} | {r['nx']} | {r['ny']} | {_ghs_paired_cell(r)} |")
     L += ["", "Fitted exponents (frozen summaries):", ""]
     for f in g["fits"]["all_sizes"]:
         L.append(f"- all sizes, {_ghs_fit_line(f)}")
@@ -1171,28 +1245,43 @@ def ghs_md(g: dict) -> list[str]:
 
 
 def ghs_html(g: dict) -> str:
+    _, head = _ghs_headline(g)
     P = ['<section id="ghs-weak-n4-20261019"><h2>GHS-weak E0/F<sub>q<sup>3</sup></sub>, 4 | #E0(K): '
          'plane-quartic index calculus against matched rho</h2>'
          '<p>Whole method, cold, one target, no subgroup enumeration, in F<sub>q</sub>-multiplication '
          'equivalents. <strong>Restricted to one special GHS-weak family</strong> (E0 over F<sub>q^3</sub> '
          'with #E0(K) = 4&middot;ell): not generic curves, not prime-order E/F<sub>q^3</sub>, not any '
-         'standard curve. Matched reference: plain Pollard rho (no negation map) on the same E0(K) '
-         'subgroup. Class: ' + esc(g["class"]) + '. Baseline: arm A0r. It moves no row of tables A&ndash;C. '
+         'standard curve, no key recovery, no deployed-curve claim. Matched reference: plain Pollard rho '
+         '(no negation map) on the same E0(K) subgroup. Class: ' + esc(g["class"]) + '. Iteration 1 baseline: '
+         'arm A0r. It moves no row of tables A&ndash;C. '
          'Intervals are 95% bootstrap at 0, 0.1 and 1 GAE per unpriced operation.</p>'
-         '<div class="scroll"><table><thead><tr><th>arm</th><th>q</th><th>units ok</th><th>rho runs</th>'
+         '<p id="ghs-weak-n4-20261021"><strong>' + head + '</strong></p>'
+         '<div class="scroll"><table><thead><tr><th>arm</th><th>role</th><th>q</th><th>units ok</th><th>rho runs</th>'
          '<th>IC/rho (w=0)</th><th>IC/rho (w=0.1)</th><th>IC/rho (w=1)</th><th>resolved</th></tr></thead><tbody>']
     for r in g["rows"]:
         c = _ghs_cells(r)
-        P.append(f'<tr><td>{esc(r["arm"])}</td><td class="n">{r["q"]}</td><td class="n">{r["units_ok"]}/{r["units"]}</td>'
+        P.append(f'<tr><td>{esc(r["arm"])}</td><td>{esc(GHS_ARM_ROLE.get(r["arm"], ""))}</td><td class="n">{r["q"]}</td>'
+                 f'<td class="n">{r["units_ok"]}/{r["units"]}</td>'
                  f'<td class="n">{r["rho_runs"]}</td><td>{c[0]}</td><td>{c[1]}</td><td>{c[2]}</td>'
                  f'<td>{esc(r["resolved"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             '<p>Paired cost ratios X/Y of iteration 2 (same instances, 95% bootstrap; below 1 means X is cheaper). '
+             'B2/B0 is the improvement over the was; B1/B0 is the structured-elimination trade (B1 not adopted); '
+             'B0n/B0 is the control; B2/B1 compares the two new recipes.</p>'
+             '<div class="scroll"><table><thead><tr><th>X / Y</th><th>q</th><th>X units</th><th>Y units</th>'
+             '<th>cost ratio X/Y</th></tr></thead><tbody>')
+    for r in g["paired"]:
+        P.append(f'<tr><td>{esc(r["cmp"])}</td><td class="n">{r["q"]}</td><td class="n">{r["nx"]}</td>'
+                 f'<td class="n">{r["ny"]}</td><td>{_ghs_paired_cell(r)}</td></tr>')
     P.append('</tbody></table></div><ul>')
     for f in g["fits"]["all_sizes"]:
         P.append(f'<li>all sizes, {esc(_ghs_fit_line(f))}</li>')
     for f in g["fits"]["primary_range"]:
         P.append(f'<li>primary range q &ge; 4051, {esc(_ghs_fit_line(f))}</li>')
-    P.append('</ul>' + gh(SOURCES["ghs_weak_n4"], 'Frozen summary (all sizes)') + ' ' +
-             gh(SOURCES["ghs_weak_n4_primary"], 'Frozen summary (primary range)') + '</section>')
+    P.append('</ul>' + gh(SOURCES["ghs_weak_n4"], 'Iteration 1 summary (all sizes)') + ' ' +
+             gh(SOURCES["ghs_weak_n4_primary"], 'Iteration 1 summary (primary range)') + ' ' +
+             gh(SOURCES["ghs_weak_n4_i2"], 'Iteration 2 summary (all sizes)') + ' ' +
+             gh(SOURCES["ghs_weak_n4_i2_primary"], 'Iteration 2 summary (primary range)') + '</section>')
     return "".join(P)
 
 

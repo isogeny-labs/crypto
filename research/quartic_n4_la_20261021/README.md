@@ -9,12 +9,12 @@ Rust; Python only lays out the figures.
 
 ## Answer in one paragraph
 
-B2 (double large primes) is a **measured improvement over the B0 baseline**: every one of its 51 units verified
+B2 (double large primes) is a **measured improvement over the B0 baseline**: every one of its 57 units verified
 (`kG = Q`), and the paired cost ratio B2/B0 is 0.355 [0.324, 0.392] at q = 4051, 0.224 [0.222, 0.227] at 65479 and
 0.297 [0.295, 0.299] at 262111, with the interval below 1 at every q >= 4051. Against the matched rho the distance
 shrinks to IC/rho = 0.26 [0.23, 0.29] at q = 4051, 0.05 at 65479 and **0.024 (0.02 to 0.03) at q = 1 048 507**
 (`ell` about 2.8e17), band-resolved below rho for every q >= 991; the exponent on the primary range q >= 4051 is
-**1.045 [1.037, 1.052] against rho's 1.475 [1.437, 1.508]**. B1 (structured elimination) is a small stage gain
+**1.045 [1.037, 1.052] against rho's 1.476 [1.438, 1.508]**. B1 (structured elimination) is a small stage gain
 (B1/B0 = 0.81 to 0.91 up to q = 65479) and a regression at q = 262111 (1.53); it is recorded as a trade, not adopted. B2 becomes the new
 baseline. Scope as before: GHS-weak family only, plain rho, shared VM, no generic or prime-order claim.
 

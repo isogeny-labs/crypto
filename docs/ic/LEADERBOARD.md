@@ -220,38 +220,106 @@ Copied from native analysis: eight independent one-target workloads per fixed cu
 
 ## GHS-weak E0/F_{q^3} with 4 | #E0(K): plane-quartic index calculus against matched rho
 
-Whole method, cold, one target, no subgroup enumeration, in F_q-multiplication equivalents; copied from the frozen summaries of `research/quartic_n4_20261019/`. **Restricted to one special GHS-weak family** (E0 over F_{q^3}, #E0(K) = 4*ell): not generic curves, not prime-order E/F_{q^3}, not any standard curve. Matched reference: plain Pollard rho (no negation map) on the same E0(K) subgroup. Class: advance (restricted to the GHS-weak family). Baseline for the improvement: arm A0r (all rational points as factor base). It moves no row of tables A–C. Columns give IC/rho with 95% bootstrap interval at 0, 0.1 and 1 GAE per unpriced operation.
+Whole method, cold, one target, no subgroup enumeration, in F_q-multiplication equivalents; copied from the frozen summaries of `research/quartic_n4_20261019/` (iteration 1) and `research/quartic_n4_la_20261021/` (iteration 2). **Restricted to one special GHS-weak family** (E0 over F_{q^3}, #E0(K) = 4*ell): not generic curves, not prime-order E/F_{q^3}, not any standard curve, no key recovery, no deployed-curve claim. Matched reference: plain Pollard rho (no negation map) on the same E0(K) subgroup. Class: iteration 1: advance (restricted to the GHS-weak family); iteration 2: engineering (improvement of the baseline on the same instances; no floor change). Baseline for iteration 1: arm A0r (all rational points as factor base). It moves no row of tables A–C. Columns give IC/rho with 95% bootstrap interval at 0, 0.1 and 1 GAE per unpriced operation.
 
-| arm | q | units ok | rho runs | IC/rho (w=0) | IC/rho (w=0.1) | IC/rho (w=1) | resolved |
-|:--|--:|--:|--:|:--|:--|:--|:--|
-| A0 | 223 | 3/3 | 90 | 10.7 [9.7, 11.9] | 10.7 [9.72, 11.9] | 10.8 [9.81, 12] | rho lower |
-| A0 | 499 | 3/3 | 90 | 14.6 [13.4, 15.8] | 14.7 [13.6, 16] | 15.5 [14.3, 16.9] | rho lower |
-| A0 | 991 | 2/3 | 90 | 21.3 [19.3, 23.7] | 21.6 [19.6, 24] | 23.1 [20.9, 25.7] | rho lower |
-| A0 | 2011 | 1/3 | 90 | 27.9 [25.1, 31.1] | 28.4 [25.5, 31.7] | 30.6 [27.5, 34.2] | rho lower |
-| A0 | 4051 | 1/3 | 90 | 37.5 [34, 41.9] | 38.3 [34.6, 42.8] | 41.6 [37.7, 46.5] | rho lower |
-| A0r | 223 | 3/3 | 90 | 10.2 [9.33, 11.3] | 10.3 [9.38, 11.3] | 10.5 [9.59, 11.7] | rho lower |
-| A0r | 499 | 3/3 | 90 | 14.5 [13.4, 15.8] | 14.7 [13.5, 16] | 15.5 [14.2, 16.9] | rho lower |
-| A0r | 991 | 3/3 | 90 | 20.7 [18.8, 22.9] | 21.1 [19.1, 23.3] | 22.8 [20.6, 25.3] | rho lower |
-| A0r | 2011 | 3/3 | 90 | 49.9 [25.9, 91.8] | 50.4 [26.3, 92.3] | 52.8 [28.5, 94.7] | rho lower |
-| A0r | 4051 | 3/3 | 90 | 37.7 [34.1, 42.2] | 38.4 [34.8, 43] | 41.7 [37.7, 46.7] | rho lower |
-| B0 | 223 | 5/5 | 150 | 4.22 [3.55, 4.92] | 4.01 [3.38, 4.67] | 2.94 [2.55, 3.36] | rho lower |
-| B0 | 499 | 5/5 | 150 | 2.75 [2.24, 3.19] | 2.62 [2.14, 3.02] | 1.97 [1.69, 2.22] | rho lower |
-| B0 | 991 | 5/5 | 150 | 1.69 [1.49, 1.91] | 1.62 [1.44, 1.83] | 1.32 [1.19, 1.45] | rho lower |
-| B0 | 2011 | 5/5 | 150 | 1.08 [0.966, 1.21] | 1.05 [0.94, 1.17] | 0.901 [0.822, 0.992] | unresolved |
-| B0 | 4051 | 5/5 | 150 | 0.735 [0.662, 0.816] | 0.72 [0.65, 0.799] | 0.655 [0.596, 0.721] | IC lower |
-| B0 | 8191 | 5/5 | 120 | 0.477 [0.438, 0.522] | 0.473 [0.435, 0.518] | 0.455 [0.418, 0.498] | IC lower |
-| B0 | 16363 | 5/5 | 120 | 0.384 [0.347, 0.425] | 0.381 [0.346, 0.422] | 0.372 [0.34, 0.41] | IC lower |
-| B0 | 32719 | 5/5 | 80 | 0.334 [0.302, 0.374] | 0.334 [0.302, 0.374] | 0.335 [0.302, 0.375] | IC lower |
-| B0 | 65479 | 5/5 | 80 | 0.222 [0.197, 0.249] | 0.223 [0.198, 0.251] | 0.23 [0.204, 0.258] | IC lower |
-| B0 | 131071 | 3/3 | 24 | 0.186 [0.117, 0.291] | 0.193 [0.121, 0.302] | 0.223 [0.14, 0.349] | IC lower |
-| B0 | 262111 | 3/3 | 18 | 0.122 [0.0987, 0.157] | 0.126 [0.102, 0.162] | 0.144 [0.117, 0.185] | IC lower |
+<a id="ghs-weak-n4-20261021"></a>**Iteration 2 (2026-10-21): arm B2 (double large primes) is the current best recipe, IC/rho 0.0242 [0.0194, 0.031] at q = 1048507 (w = 0), the largest size; 3/3 units verified at that size. Arm B0 (iteration 1) is kept as the was: 0.122 [0.0987, 0.157] at q = 262111. Paired cost ratio B2/B0 0.355 [0.324, 0.392] at q = 4051, 0.224 at q = 65479, 0.297 at q = 262111. Exponent on the primary range q >= 4051: B2 1.045 [1.037, 1.052] against rho 1.476 [1.438, 1.508]; B0 was 1.083. Class: engineering. One special family only; no generic-curve claim.**
+
+| arm | role | q | units ok | rho runs | IC/rho (w=0) | IC/rho (w=0.1) | IC/rho (w=1) | resolved |
+|:--|:--|--:|--:|--:|:--|:--|:--|:--|
+| A0 | iteration 1 baseline (not adopted) | 223 | 3/3 | 90 | 10.7 [9.7, 11.9] | 10.7 [9.72, 11.9] | 10.8 [9.81, 12] | rho lower |
+| A0 | iteration 1 baseline (not adopted) | 499 | 3/3 | 90 | 14.6 [13.4, 15.8] | 14.7 [13.6, 16] | 15.5 [14.3, 16.9] | rho lower |
+| A0 | iteration 1 baseline (not adopted) | 991 | 2/3 | 90 | 21.3 [19.3, 23.7] | 21.6 [19.6, 24] | 23.1 [20.9, 25.7] | rho lower |
+| A0 | iteration 1 baseline (not adopted) | 2011 | 1/3 | 90 | 27.9 [25.1, 31.1] | 28.4 [25.5, 31.7] | 30.6 [27.5, 34.2] | rho lower |
+| A0 | iteration 1 baseline (not adopted) | 4051 | 1/3 | 90 | 37.5 [34, 41.9] | 38.3 [34.6, 42.8] | 41.6 [37.7, 46.5] | rho lower |
+| A0r | iteration 1 baseline | 223 | 3/3 | 90 | 10.2 [9.33, 11.3] | 10.3 [9.38, 11.3] | 10.5 [9.59, 11.7] | rho lower |
+| A0r | iteration 1 baseline | 499 | 3/3 | 90 | 14.5 [13.4, 15.8] | 14.7 [13.5, 16] | 15.5 [14.2, 16.9] | rho lower |
+| A0r | iteration 1 baseline | 991 | 3/3 | 90 | 20.7 [18.8, 22.9] | 21.1 [19.1, 23.3] | 22.8 [20.6, 25.3] | rho lower |
+| A0r | iteration 1 baseline | 2011 | 3/3 | 90 | 49.9 [25.9, 91.8] | 50.4 [26.3, 92.3] | 52.8 [28.5, 94.7] | rho lower |
+| A0r | iteration 1 baseline | 4051 | 3/3 | 90 | 37.7 [34.1, 42.2] | 38.4 [34.8, 43] | 41.7 [37.7, 46.7] | rho lower |
+| B0 | was (iteration 1 best, 2026-10-19) | 223 | 5/5 | 150 | 4.22 [3.55, 4.92] | 4.01 [3.38, 4.67] | 2.94 [2.55, 3.36] | rho lower |
+| B0 | was (iteration 1 best, 2026-10-19) | 499 | 5/5 | 150 | 2.75 [2.24, 3.19] | 2.62 [2.14, 3.02] | 1.97 [1.69, 2.22] | rho lower |
+| B0 | was (iteration 1 best, 2026-10-19) | 991 | 5/5 | 150 | 1.69 [1.49, 1.91] | 1.62 [1.44, 1.83] | 1.32 [1.19, 1.45] | rho lower |
+| B0 | was (iteration 1 best, 2026-10-19) | 2011 | 5/5 | 150 | 1.08 [0.966, 1.21] | 1.05 [0.94, 1.17] | 0.901 [0.822, 0.992] | unresolved |
+| B0 | was (iteration 1 best, 2026-10-19) | 4051 | 5/5 | 150 | 0.735 [0.662, 0.816] | 0.72 [0.65, 0.799] | 0.655 [0.596, 0.721] | IC lower |
+| B0 | was (iteration 1 best, 2026-10-19) | 8191 | 5/5 | 120 | 0.477 [0.438, 0.522] | 0.473 [0.435, 0.518] | 0.455 [0.418, 0.498] | IC lower |
+| B0 | was (iteration 1 best, 2026-10-19) | 16363 | 5/5 | 120 | 0.384 [0.347, 0.425] | 0.381 [0.346, 0.422] | 0.372 [0.34, 0.41] | IC lower |
+| B0 | was (iteration 1 best, 2026-10-19) | 32719 | 5/5 | 80 | 0.334 [0.302, 0.374] | 0.334 [0.302, 0.374] | 0.335 [0.302, 0.375] | IC lower |
+| B0 | was (iteration 1 best, 2026-10-19) | 65479 | 5/5 | 80 | 0.222 [0.197, 0.249] | 0.223 [0.198, 0.251] | 0.23 [0.204, 0.258] | IC lower |
+| B0 | was (iteration 1 best, 2026-10-19) | 131071 | 3/3 | 24 | 0.186 [0.117, 0.291] | 0.193 [0.121, 0.302] | 0.223 [0.14, 0.349] | IC lower |
+| B0 | was (iteration 1 best, 2026-10-19) | 262111 | 3/3 | 18 | 0.122 [0.0987, 0.157] | 0.126 [0.102, 0.162] | 0.144 [0.117, 0.185] | IC lower |
+| B0n | control | 4051 | 3/3 | 90 | 0.689 [0.623, 0.771] | 0.677 [0.612, 0.757] | 0.622 [0.563, 0.697] | IC lower |
+| B0n | control | 8191 | 3/3 | 72 | 0.505 [0.45, 0.573] | 0.499 [0.446, 0.568] | 0.476 [0.426, 0.541] | IC lower |
+| B0n | control | 16363 | 3/3 | 72 | 0.374 [0.333, 0.424] | 0.372 [0.331, 0.421] | 0.363 [0.325, 0.411] | IC lower |
+| B0n | control | 32719 | 3/3 | 48 | 0.321 [0.279, 0.377] | 0.321 [0.278, 0.377] | 0.32 [0.277, 0.375] | IC lower |
+| B0n | control | 65479 | 3/3 | 48 | 0.212 [0.184, 0.249] | 0.214 [0.185, 0.251] | 0.221 [0.191, 0.259] | IC lower |
+| B1 | not adopted (stage trade) | 4051 | 5/5 | 150 | 0.635 [0.579, 0.7] | 0.63 [0.574, 0.693] | 0.605 [0.555, 0.663] | IC lower |
+| B1 | not adopted (stage trade) | 8191 | 5/5 | 120 | 0.429 [0.39, 0.473] | 0.429 [0.391, 0.472] | 0.431 [0.395, 0.472] | IC lower |
+| B1 | not adopted (stage trade) | 16363 | 5/5 | 120 | 0.307 [0.28, 0.339] | 0.312 [0.285, 0.344] | 0.334 [0.305, 0.367] | IC lower |
+| B1 | not adopted (stage trade) | 32719 | 5/5 | 80 | 0.281 [0.254, 0.314] | 0.286 [0.258, 0.319] | 0.308 [0.279, 0.345] | IC lower |
+| B1 | not adopted (stage trade) | 65479 | 5/5 | 80 | 0.183 [0.163, 0.206] | 0.188 [0.167, 0.212] | 0.21 [0.187, 0.237] | IC lower |
+| B1 | not adopted (stage trade) | 131071 | 3/3 | 24 | 0.157 [0.133, 0.187] | 0.159 [0.135, 0.19] | 0.169 [0.143, 0.201] | IC lower |
+| B1 | not adopted (stage trade) | 262111 | 3/3 | 18 | 0.183 [0.149, 0.236] | 0.182 [0.148, 0.234] | 0.175 [0.142, 0.226] | IC lower |
+| B2 | current best recipe (iteration 2, 2026-10-21) | 223 | 5/5 | 150 | 3.85 [2.67, 5.25] | 3.62 [2.53, 4.93] | 2.51 [1.85, 3.3] | rho lower |
+| B2 | current best recipe (iteration 2, 2026-10-21) | 499 | 5/5 | 150 | 1.4 [1.08, 1.79] | 1.3 [1.01, 1.66] | 0.854 [0.685, 1.06] | unresolved |
+| B2 | current best recipe (iteration 2, 2026-10-21) | 991 | 5/5 | 150 | 0.791 [0.71, 0.881] | 0.743 [0.664, 0.832] | 0.524 [0.451, 0.618] | IC lower |
+| B2 | current best recipe (iteration 2, 2026-10-21) | 2011 | 5/5 | 150 | 0.434 [0.388, 0.485] | 0.406 [0.365, 0.454] | 0.283 [0.256, 0.313] | IC lower |
+| B2 | current best recipe (iteration 2, 2026-10-21) | 4051 | 5/5 | 150 | 0.257 [0.231, 0.288] | 0.243 [0.218, 0.271] | 0.176 [0.159, 0.194] | IC lower |
+| B2 | current best recipe (iteration 2, 2026-10-21) | 8191 | 5/5 | 120 | 0.153 [0.139, 0.168] | 0.144 [0.132, 0.158] | 0.107 [0.0981, 0.117] | IC lower |
+| B2 | current best recipe (iteration 2, 2026-10-21) | 16363 | 5/5 | 120 | 0.103 [0.0941, 0.114] | 0.0979 [0.0893, 0.108] | 0.074 [0.0676, 0.0813] | IC lower |
+| B2 | current best recipe (iteration 2, 2026-10-21) | 32719 | 5/5 | 80 | 0.0817 [0.0738, 0.0914] | 0.0776 [0.0701, 0.0868] | 0.0591 [0.0534, 0.0661] | IC lower |
+| B2 | current best recipe (iteration 2, 2026-10-21) | 65479 | 5/5 | 80 | 0.0489 [0.0435, 0.0551] | 0.0465 [0.0413, 0.0524] | 0.0358 [0.0318, 0.0403] | IC lower |
+| B2 | current best recipe (iteration 2, 2026-10-21) | 131071 | 3/3 | 24 | 0.0352 [0.0298, 0.0418] | 0.0334 [0.0283, 0.0397] | 0.0252 [0.0213, 0.03] | IC lower |
+| B2 | current best recipe (iteration 2, 2026-10-21) | 262111 | 3/3 | 18 | 0.0356 [0.0288, 0.0458] | 0.0334 [0.0271, 0.0431] | 0.0238 [0.0193, 0.0307] | IC lower |
+| B2 | current best recipe (iteration 2, 2026-10-21) | 524287 | 3/3 | 18 | 0.0244 [0.0189, 0.0334] | 0.023 [0.0178, 0.0314] | 0.0162 [0.0125, 0.0222] | IC lower |
+| B2 | current best recipe (iteration 2, 2026-10-21) | 1048507 | 3/3 | 12 | 0.0242 [0.0194, 0.031] | 0.0227 [0.0181, 0.0291] | 0.0158 [0.0126, 0.0202] | IC lower |
+
+Paired cost ratios X/Y of iteration 2 (same instances, 95% bootstrap; below 1 means X is cheaper). B2/B0 is the improvement over the was; B1/B0 is the structured-elimination trade (B1 not adopted); B0n/B0 is the control; B2/B1 compares the two new recipes.
+
+| X / Y | q | X units | Y units | cost ratio X/Y |
+|:--|--:|--:|--:|:--|
+| B2/B0 | 223 | 5 | 5 | 0.932 [0.63, 1.3] |
+| B2/B0 | 499 | 5 | 5 | 0.517 [0.385, 0.693] |
+| B2/B0 | 991 | 5 | 5 | 0.475 [0.422, 0.536] |
+| B2/B0 | 2011 | 5 | 5 | 0.407 [0.359, 0.459] |
+| B2/B0 | 4051 | 5 | 5 | 0.355 [0.324, 0.392] |
+| B2/B0 | 8191 | 5 | 5 | 0.324 [0.313, 0.336] |
+| B2/B0 | 16363 | 5 | 5 | 0.273 [0.261, 0.285] |
+| B2/B0 | 32719 | 5 | 5 | 0.248 [0.245, 0.252] |
+| B2/B0 | 65479 | 5 | 5 | 0.224 [0.222, 0.227] |
+| B2/B0 | 131071 | 3 | 3 | 0.197 [0.124, 0.282] |
+| B2/B0 | 262111 | 3 | 3 | 0.297 [0.295, 0.299] |
+| B1/B0 | 4051 | 5 | 5 | 0.876 [0.82, 0.941] |
+| B1/B0 | 8191 | 5 | 5 | 0.912 [0.871, 0.949] |
+| B1/B0 | 16363 | 5 | 5 | 0.813 [0.777, 0.845] |
+| B1/B0 | 32719 | 5 | 5 | 0.853 [0.837, 0.87] |
+| B1/B0 | 65479 | 5 | 5 | 0.842 [0.832, 0.851] |
+| B1/B0 | 131071 | 3 | 3 | 0.875 [0.55, 1.25] |
+| B1/B0 | 262111 | 3 | 3 | 1.53 [1.52, 1.55] |
+| B0n/B0 | 4051 | 3 | 5 | 0.983 [0.919, 1.05] |
+| B0n/B0 | 8191 | 3 | 5 | 1.04 [1.02, 1.06] |
+| B0n/B0 | 16363 | 3 | 5 | 1.01 [0.965, 1.06] |
+| B0n/B0 | 32719 | 3 | 5 | 1.03 [1.01, 1.05] |
+| B0n/B0 | 65479 | 3 | 5 | 1.01 [1, 1.02] |
+| B2/B1 | 4051 | 5 | 5 | 0.405 [0.374, 0.441] |
+| B2/B1 | 8191 | 5 | 5 | 0.356 [0.338, 0.376] |
+| B2/B1 | 16363 | 5 | 5 | 0.336 [0.324, 0.349] |
+| B2/B1 | 32719 | 5 | 5 | 0.291 [0.286, 0.296] |
+| B2/B1 | 65479 | 5 | 5 | 0.267 [0.263, 0.27] |
+| B2/B1 | 131071 | 3 | 3 | 0.225 [0.222, 0.227] |
+| B2/B1 | 262111 | 3 | 3 | 0.194 [0.192, 0.196] |
 
 Fitted exponents (frozen summaries):
 
 - all sizes, A0: 5 sizes; IC exponent 1.889 [1.868, 1.903], rho exponent 1.451 [1.410, 1.489], gap rho-IC -0.438 [-0.483, -0.395] (w=0); w=1: IC 1.955 [1.943, 1.962], rho 1.485
 - all sizes, A0r: 5 sizes; IC exponent 1.986 [1.894, 2.072], rho exponent 1.451 [1.407, 1.492], gap rho-IC -0.534 [-0.626, -0.422] (w=0); w=1: IC 2.038 [1.957, 2.123], rho 1.484
 - all sizes, B0: 11 sizes; IC exponent 0.998 [0.971, 1.023], rho exponent 1.486 [1.464, 1.505], gap rho-IC 0.487 [0.455, 0.521] (w=0); w=1: IC 1.086 [1.061, 1.110], rho 1.496
+- all sizes, B0n: 5 sizes; IC exponent 1.109 [1.101, 1.118], rho exponent 1.513 [1.454, 1.574], gap rho-IC 0.404 [0.345, 0.465] (w=0); w=1: IC 1.159 [1.154, 1.163], rho 1.514
+- all sizes, B1: 7 sizes; IC exponent 1.167 [1.159, 1.174], rho exponent 1.488 [1.440, 1.528], gap rho-IC 0.322 [0.273, 0.363] (w=0); w=1: IC 1.178 [1.174, 1.182], rho 1.489
+- all sizes, B2: 13 sizes; IC exponent 0.895 [0.878, 0.915], rho exponent 1.482 [1.462, 1.499], gap rho-IC 0.587 [0.558, 0.612] (w=0); w=1: IC 0.910 [0.895, 0.927], rho 1.489
 - primary range q >= 4051, B0: 7 sizes; IC exponent 1.083 [1.040, 1.129], rho exponent 1.485 [1.437, 1.525], gap rho-IC 0.402 [0.335, 0.468] (w=0); w=1: IC 1.154 [1.114, 1.201], rho 1.486
+- primary range q >= 4051, B0n: 5 sizes; IC exponent 1.109 [1.101, 1.118], rho exponent 1.513 [1.454, 1.574], gap rho-IC 0.404 [0.345, 0.465] (w=0); w=1: IC 1.159 [1.154, 1.163], rho 1.514
+- primary range q >= 4051, B1: 7 sizes; IC exponent 1.167 [1.159, 1.174], rho exponent 1.488 [1.440, 1.528], gap rho-IC 0.322 [0.273, 0.363] (w=0); w=1: IC 1.178 [1.174, 1.182], rho 1.489
+- primary range q >= 4051, B2: 9 sizes; IC exponent 1.045 [1.037, 1.052], rho exponent 1.476 [1.438, 1.508], gap rho-IC 0.430 [0.391, 0.463] (w=0); w=1: IC 1.033 [1.028, 1.039], rho 1.476
 
 
 ## N83 Tier 1 one-target cold factor-base holdout
@@ -297,6 +365,8 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/quartic_n4_20261019/results/summary_all.json` — sha256 `fd5598a2860d965c…`
 - `research/quartic_n4_20261019/results/summary_primary.json` — sha256 `1742d1a6b54f5874…`
+- `research/quartic_n4_la_20261021/results/summary_all.json` — sha256 `270f30a7a7c7f0bf…`
+- `research/quartic_n4_la_20261021/results/summary_primary.json` — sha256 `7995e92a3eada074…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `765f6e8d05ebbf75…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`

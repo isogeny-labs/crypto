@@ -12,7 +12,7 @@ t=['#set page(margin: 1.6cm)\n#set text(size: 9.5pt)\n#set heading(numbering: "1
 t.append('= N4 iteration 2: double large primes (B2) and structured elimination (B1) vs the recorded B0\n')
 t.append('2026-10-21. Branch `claude/quartic-ic-n4-la-20261021`, protocol commit eab1bdfacd, records `results/`. Descriptive run report; interpretation in `README.md`. Cost in F_q-multiplication equivalents (M-eq); every IC unit verified kG = Q.\n')
 t.append('== Result in brief\n')
-t.append('B2 verified on 51 of 51 units (first attempts retried and charged) and costs IC/rho = %.3f at q = %d. Exponent on q >= 4051: B2 %.3f [%.3f, %.3f], rho %.3f [%.3f, %.3f]; the recorded B0 baseline had %.3f. B1 (structured elimination) is a small stage gain and a regression at q = 262111. B2 is the new baseline. GHS-weak family only; plain rho; shared VM.\n'%(B2[-1]['ratio'][0],B2[-1]['q'],*pf2['ic_exp_w0'],*pf2['rho_exp_w0'],pf0['ic_exp_w0'][0]))
+t.append('B2 verified on 57 of 57 units (first attempts retried and charged) and costs IC/rho = %.3f at q = %d. Exponent on q >= 4051: B2 %.3f [%.3f, %.3f], rho %.3f [%.3f, %.3f]; the recorded B0 baseline had %.3f. B1 (structured elimination) is a small stage gain and a regression at q = 262111. B2 is the new baseline. GHS-weak family only; plain rho; shared VM.\n'%(B2[-1]['ratio'][0],B2[-1]['q'],*pf2['ic_exp_w0'],*pf2['rho_exp_w0'],pf0['ic_exp_w0'][0]))
 t.append('== B2 against the matched rho\n')
 t.append('#table(columns: 7, align: right, [q],[units ok],[rho runs],[B2 M-eq],[rho M-eq],[B2/rho w=0 (95%)],[resolved],\n')
 for r in B2:

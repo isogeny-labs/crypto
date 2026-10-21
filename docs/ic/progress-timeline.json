@@ -930,11 +930,21 @@
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/research/quartic_n4_20261019/README.md",
      "value": 0.122
+    },
+    {
+     "anchor": "#ghs-weak-n4-20261021",
+     "class": "engineering",
+     "date": "2026-10-21",
+     "detail": "B2 (double large primes, iteration 2) IC/rho 0.0242 [0.0194, 0.031] at q = 1048507 (w = 0, largest size, ell about 2.8e17), 0.0227 at 0.1 GAE and 0.0158 at 1 GAE per unpriced operation (band-resolved, IC lower); 0.257 [0.231, 0.288] at q = 4051 and 0.0489 at q = 65479. Paired cost ratio B2/B0 0.355 [0.324, 0.392] at q = 4051, 0.224 at q = 65479, 0.297 at q = 262111; B2 is the new baseline and the 2026-10-19 point (B0, 0.122 at q = 262111) is kept as the was. Measured cost exponent over the primary range q >= 4051 (9 sizes): B2 1.045 [1.037, 1.052] against rho 1.476 [1.438, 1.508]; B0 was 1.083. Over all 13 sizes B2 0.895 [0.878, 0.915]. All 57/57 IC units verified (kG = Q). Class: engineering (improvement of the baseline on the same instances; no floor change). Arm B1 (structured elimination) is a stage trade and is not adopted; arm B0n is the control. Special GHS-weak family only (4 | #E0(K), E0/F_{q^3}); plain rho without the negation map; shared 4-core VM, L0 isolation; no generic-curve, prime-order, key-recovery or deployed-curve claim.",
+     "label": "GHS-weak E0/F_{q^3}, 4 | #E0(K), plane-quartic IC, double large primes (B2), at q = 1048507",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/quartic_n4_la_20261021/README.md",
+     "value": 0.0242
     }
    ],
    "role": "context"
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-10-19"
+ "updated": "2026-10-21"
 }
