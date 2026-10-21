@@ -77,3 +77,22 @@ Raw records and tables: `experiments/27_quartic_pipeline_d4/` (E19), `experiment
 runners `examples/quartic_pipeline_{d4,v4}.rs`, `examples/klein_stage_{a,b}.rs`,
 `examples/d4_replay.rs`, the ladder's `--arms d4dlp`. Tables:
 `examples/glv_invariant_experiment_tables.rs`.
+
+= Errata (2026-10-21)
+
+An independent validator replayed every E19 and E24 run (field-identical apart from wall time,
+every logarithm confirmed) and recomputed the numbers above from the raw JSON
+(`benchmarks/20261018-k4-v4-line/validator-report.json`). The text above is left as written; these
+values supersede it. No verdict changes. Full list: the note's §9.19.
+
+#table(
+  columns: 3,
+  align: (left, left, left),
+  [*where*], [*written*], [*raw data*],
+  [E19 / E24, $p = 101$ seed 2], [$171 times$], [$170 times$ ($170.4$; 171 came from dividing rounded values)],
+  [G2.12, $p = 53$ seed 1], [0.495], [0.494 ($0.49448$)],
+)
+
+At 0 GAE per unpriced native operation the E19-to-E24 factor is $35$–$240 times$. Pricing one GAE
+(97 $F_p$ multiplications) per Macaulay-matrix entry and per walk step, it is $19$–$132 times$ at
+0.1 GAE and $6.5$–$45 times$ at 1 GAE; E24 stays below E19 on every curve at every price.

@@ -2702,3 +2702,44 @@ exact statement about the family.  The GLS lever on the `V₄` line ends at §9.
 the full `V₄` symmetry (E19's single-`τ_T` line, where `h = 4` is not excluded by this argument but
 the solve costs `≈ 820×` more per call), and GLS-type endomorphisms of higher order (quartic or sextic
 twists of `j = 1728` and `j = 0`), which act on the 2-torsion differently and are not covered here.
+
+### 9.19 Errata found by the validation gate (§9.6, §9.14, §9.16)
+
+*2026-10-21.*  The validation gate (`docs/VALIDATION_GATE.md`) had an independent validator replay
+every recorded run of E19, E24 and E25 and recompute the claimed numbers from the raw JSON
+(`benchmarks/20261018-k4-v4-line/` and `benchmarks/20261018-k4-gls-v4/`: `replay-certificate.json`,
+`validator-report.json`, `validate.py`).  Every run replayed field-identical (wall time aside)
+and every logarithm was confirmed; no result, verdict or ranking changes.  The note's text had
+seven errors, corrected here.  The sections above are left as written; where they differ, this
+section is the record.
+
+| where | written | raw data gives | effect |
+|:--|:--|:--|:--|
+| §9.14 table, `p = 521` seed 1, matched rho | `1.18·10⁷` | `1.1749·10⁷` → **`1.17·10⁷`** | none (the ratio column, `1.88·10⁴`, was computed from the unrounded value) |
+| §9.14 and G2.29, E19 / E24 at `p = 101` seed 2 | `171×` | **`170×`** (`170.4`); `171` came from dividing the rounded `5.85·10⁶` by `3.43·10⁴` | none: the range stays `35`–`240×`, G2.29 holds |
+| §9.14, kept rows re-added to `O` | `381` | **`392`** (all twelve curves; `0` failures) | none |
+| §9.14 and G2.28, unsolved targets per curve | `≤ 0.012 %` | **`≤ 0.033 %`**: `5 / 15,387` at `p = 101` seed 2 and `0.0128 %` at `p = 149` seed 1; `0.0047 %` pooled | none: G2.28 registered `≤ 1 %` and holds |
+| §9.6 G2.12, `p = 53` seed 1, measured / registered | `0.495` | **`0.494`** (`0.49448`, with the registered `C = 1.3·10⁹`) | none: still a hair outside `×2`; per size holds |
+| §9.6 G2.12, rho's `S` per `√n` (explanatory) | "`242` at `p = 53` against `92` at `p = 269`" | **`243`** against **`92`**, both the mean of the two curves (seed 1 alone: `241.9` and `87.5`); the written pair mixed a single curve with a mean | none: the explanation stands |
+| §9.16 G2.36, why the improvement exceeds the band at `p ≤ 149` (explanatory) | "below `n ≈ 2^{25}` a walk is `≤ 3,000` steps" | false at `p = 149` (`n ≈ 2^{24.9}`): the `⟨±ψ⟩` walk averages **`4,057`** and **`3,965`** steps; at `p = 101` (`n ≈ 2^{22.6}`) it averages `2,007` and `1,192` | the mechanism stands (walk set-up and the `±ψ` step's extra multiplications dominate at these sizes), but the `3,000`-step threshold is wrong; the measured improvement and the "falsified high" verdict are unchanged |
+
+The same `171` and `0.495` appear in `research/glv_k4_pipeline_d4_20261017/REPORT.typ`, which now
+carries an errata section with these values; its PDF is rebuilt there and in
+`benchmarks/20261018-k4-v4-line/REPORT.pdf`.
+
+The validator also recorded these limitations of the evidence, which the earlier sections did not
+state:
+
+- **Thread count.**  Each round draws `2 ×` (worker threads) targets from one seeded stream, so a
+  replay must fix `RAYON_NUM_THREADS=4`, the recording host's count.  Another thread count gives
+  different, still valid, runs.
+- **`⟨±ψ⟩` walk overhead.**  The walk applies `ψ` to both coordinates on every step (`152`–`154`
+  against `109` multiplications per step at `p = 397`).  Comparing abscissae first would save about
+  `6 %` (the validator's estimate, not measured), so E25's distance to rho leans about that much in
+  the index calculus's favour.
+- **Partial pairing in E25.**  Arms A and B share the target stream only until B's first
+  linear-algebra attempt.  This adds noise, not bias, to the per-curve `S_A / S_B`.
+- **Price band.**  The `35`–`240×` E19-to-E24 factor holds at `0` GAE per unpriced native
+  operation.  Pricing one GAE (`97` `F_p` multiplications, the measured cost of an affine addition)
+  per Macaulay-matrix entry and per walk step, it is `19`–`132×` at `0.1` GAE and `6.5`–`45×` at
+  `1` GAE (recomputed from the raw JSON); E24 stays below E19 on every curve at every price.
