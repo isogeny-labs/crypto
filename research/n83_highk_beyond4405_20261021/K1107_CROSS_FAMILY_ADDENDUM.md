@@ -53,3 +53,9 @@ index, rank, target, and independent replay gate before any campaign-wide
 N83 factor-base selection. The fixed31 screen selects only within its frozen
 monolithic frontier; this addendum adds a direct K1107 comparison to the
 same sealed one-target workload.
+
+The Pod-side selector is provisional until the external controller transfers
+the SHA-256 checked raw archive, terminates the Pod, and records confirmed
+provider absence. `verify_provider_custody.py` binds these local receipts to
+the same allocation and checks the five-minute retirement margin. Promote a
+Tier 1 row only when both scientific replay and provider custody pass.

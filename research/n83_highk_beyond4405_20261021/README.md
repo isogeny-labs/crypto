@@ -113,7 +113,19 @@ emits a readiness receipt required by the Pod launcher, transfers the archive,
 terminates the Pod with five minutes of budget margin, and confirms absence.
 Its tested failure paths still issue termination when transfer fails or the
 watchdog starts late. A live provider absence receipt is required for
-measured Tier 1 admission.
+measured Tier 1 admission. After termination, it writes
+`provider_custody_validation.json` through `verify_provider_custody.py`.
+That local gate matches the allocation, watchdog chronology, archive SHA-256,
+embedded allocation and confirmed Pod absence; it returns `BOUNDED_UNKNOWN`
+when any receipt is missing or inconsistent. The Pod-side scientific selector
+and this post-termination custody gate must both pass before a Tier 1 result
+is promoted. The custody check can be rerun independently:
+
+```sh
+python3 -m research.n83_highk_beyond4405_20261021.verify_provider_custody \
+  --allocation /absolute/path/to/runpod_allocation.json \
+  --archive-dir /absolute/path/to/local_archive
+```
 `launch_on_pod.sh` checks the checkout and fixture, builds both release
 examples on the Pod, runs the screen under the pinned affinity and provider
 deadline, then seals an archive with the raw child receipts and build logs.
@@ -152,8 +164,13 @@ run. That serial full-suite run finished with 4,157 passed, 117 ignored and
 five `cryptopro_b_chain_set` failures because this sparse worktree had omitted
 its tracked frozen input file. The raw result is in
 `rust-lib-tests-serial.log`. After materializing the exact committed fixture,
-all five failed tests passed in a focused serial rerun. A new full serial run
-with the fixture present is pending in `rust-lib-tests-serial-with-fixture.log`.
+all five failed tests passed in a focused serial rerun. The full serial binary
+rerun with the fixture present passed **4,162 tests, zero failures, 117
+ignored** in 1,310.28 seconds. Its raw output is
+`rust-lib-tests-serial-with-fixture.log.gz` (raw SHA-256
+`92d148a7a4c827431f2f8d56a342ac544cf16ead33205476b7671621310f59ca`).
+The release library command gate is
+recorded separately in `rust-lib-tests-cargo-serial.log`.
 The previous RunPod campaign's conservative upper charge was $5.710216
 against its $5 ceiling, so this preparation launches no paid instance. A new
 bounded allocation needs its own reviewed budget and protocol.

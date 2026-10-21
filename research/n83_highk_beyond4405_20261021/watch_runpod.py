@@ -204,8 +204,16 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     key = getpass.getpass("RunPod API key: ")
-    return watch(args.allocation.resolve(strict=True), args.ssh_host,
-                 args.ssh_port, args.output.resolve(), key)
+    allocation = args.allocation.resolve(strict=True)
+    output = args.output.resolve()
+    code = watch(allocation, args.ssh_host, args.ssh_port, output, key)
+    if output.is_dir():
+        from research.n83_highk_beyond4405_20261021 import verify_provider_custody
+        validation = verify_provider_custody.validate(allocation, output)
+        write(output / "provider_custody_validation.json", validation)
+        if validation["status"] != "PASS_PROVIDER_CUSTODY":
+            code = 2
+    return code
 
 
 if __name__ == "__main__":
