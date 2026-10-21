@@ -161,7 +161,8 @@ jobs:
       - name: Install nvcc (compiler + CUDA headers only)
         run: |
           distro="ubuntu$(lsb_release -rs | tr -d .)"
-          curl -fsSL -o /tmp/cuda-keyring.deb \
+          curl -fsSL --retry 3 --retry-all-errors --connect-timeout 15 --max-time 90 \
+            -o /tmp/cuda-keyring.deb \
             "https://developer.download.nvidia.com/compute/cuda/repos/$distro/x86_64/cuda-keyring_1.1-1_all.deb"
           sudo dpkg -i /tmp/cuda-keyring.deb
           sudo apt-get update -qq
