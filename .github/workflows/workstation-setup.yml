@@ -8,6 +8,7 @@ on:
       - 'scripts/setup-workstation.sh'
       - 'scripts/test_setup_workstation_go.py'
       - 'scripts/test_setup_workstation_github.py'
+      - 'scripts/test_setup_workstation_github_helper.py'
       - '.github/workflows/workstation-setup.yml'
   push:
     branches: [main]
@@ -17,6 +18,7 @@ on:
       - 'scripts/setup-workstation.sh'
       - 'scripts/test_setup_workstation_go.py'
       - 'scripts/test_setup_workstation_github.py'
+      - 'scripts/test_setup_workstation_github_helper.py'
       - '.github/workflows/workstation-setup.yml'
   workflow_dispatch:
 
@@ -41,6 +43,7 @@ jobs:
             /scripts/setup-workstation.sh
             /scripts/test_setup_workstation_go.py
             /scripts/test_setup_workstation_github.py
+            /scripts/test_setup_workstation_github_helper.py
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
