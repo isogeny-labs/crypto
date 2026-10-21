@@ -61,9 +61,18 @@ theorem k5086_table_bytes : 5 * (2 ^ 31 + 2 ^ 29) = 13421772800 := by decide
 theorem k5086_wide3_bloom_bucket :
     2 ^ 34 < 16 * request (states 5086) ∧
     16 * request (states 5086) ≤ 2 ^ 35 := by decide
+theorem k5086_primary_wide3_bloom_bucket :
+    2 ^ 33 < 16 * request (states 4549) ∧
+    16 * request (states 4549) ≤ 2 ^ 34 := by decide
+theorem k5086_extension_wide3_bloom_bucket :
+    2 ^ 31 < 16 * request (states 5086 - states 4549) ∧
+    16 * request (states 5086 - states 4549) ≤ 2 ^ 32 := by decide
 theorem k5086_state_bytes : 11 * states 5086 = 11808494247 := by decide
 theorem k5086_three_array_bytes :
     11 * states 5086 + 5 * (2 ^ 31 + 2 ^ 29) + 2 ^ 32 = 29525234343 := by decide
+theorem k5086_dual_bloom_bytes : 2 ^ 31 + 2 ^ 29 = 2684354560 := by decide
+theorem k5086_dual_three_array_bytes :
+    11 * states 5086 + 6 * (2 ^ 31 + 2 ^ 29) = 27914621607 := by decide
 
 #print axioms states_monotone
 #print axioms request_monotone
@@ -81,6 +90,10 @@ theorem k5086_three_array_bytes :
 #print axioms k5086_point_count_formula
 #print axioms k5086_table_bytes
 #print axioms k5086_wide3_bloom_bucket
+#print axioms k5086_primary_wide3_bloom_bucket
+#print axioms k5086_extension_wide3_bloom_bucket
 #print axioms k5086_state_bytes
 #print axioms k5086_three_array_bytes
+#print axioms k5086_dual_bloom_bytes
+#print axioms k5086_dual_three_array_bytes
 end N83SplitCapacity

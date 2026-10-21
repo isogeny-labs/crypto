@@ -64,24 +64,29 @@ def table_bytes(k, split=None):
     parts = (states(k),) if split is None else (states(split), states(k) - states(split))
     return 5 * sum(next_power_of_two(2 * request(part)) for part in parts)
 
-def bloom_bytes(k):
-    return next_power_of_two(16 * request(states(k))) // 8
+def bloom_bytes(k, split=None, shared=True):
+    parts = (states(k),) if split is None or shared else (states(split), states(k)-states(split))
+    return sum(next_power_of_two(16 * request(part)) // 8 for part in parts)
 
-configs = [('K4405 mono', 4405, None), ('K5086 mono', 5086, None),
-           ('K5086 split4300', 5086, 4300), ('K5086 split4549', 5086, 4549)]
+configs = [('K4405 mono', 4405, None, True),
+           ('K5086 mono', 5086, None, True),
+           ('K5086 split4300 shared', 5086, 4300, True),
+           ('K5086 split4549 shared', 5086, 4549, True),
+           ('K5086 split4549 dual', 5086, 4549, False)]
 assert table_bytes(5086, 4549) == 13421772800
 assert bloom_bytes(5086) == 4294967296
+assert bloom_bytes(5086, 4549, False) == 2684354560
 assert 11 * states(5086) == 11808494247
 fig, ax = plt.subplots(figsize=(9.5, 4.5))
 xpos = list(range(len(configs)))
-state_gib = [11 * states(k) / 2**30 for _, k, _ in configs]
-table_gib = [table_bytes(k, split) / 2**30 for _, k, split in configs]
-bloom_gib = [bloom_bytes(k) / 2**30 for _, k, _ in configs]
+state_gib = [11 * states(k) / 2**30 for _, k, _, _ in configs]
+table_gib = [table_bytes(k, split) / 2**30 for _, k, split, _ in configs]
+bloom_gib = [bloom_bytes(k, split, shared) / 2**30 for _, k, split, shared in configs]
 ax.bar(xpos, state_gib, color='#647d9c', label='11-byte states')
 ax.bar(xpos, table_gib, bottom=state_gib, color='#dc9750', label='Exact table')
 ax.bar(xpos, bloom_gib, bottom=[a+b for a,b in zip(state_gib,table_gib)],
        color='#77a888', label='wide3 Bloom')
-ax.set_xticks(xpos, [name.replace(' ', '\n') for name, _, _ in configs])
+ax.set_xticks(xpos, [name.replace(' ', '\n') for name, _, _, _ in configs])
 ax.set_ylabel('Calculated allocation (GiB)')
 ax.set_ylim(0, 42)
 ax.legend(frameon=False, ncol=3, loc='upper left')
@@ -128,14 +133,17 @@ def make_pdf(path, title, paragraphs, table_rows, capacity=False):
                       'unique split point meeting the 2^31 primary and 2^29 '
                       'extension slot capacities. Five-byte table storage is '
                       '12.5 GiB, versus 15 GiB at split K4300 and 20 GiB '
-                      'monolithic. The K5086 point-count formula projects '
+                      'monolithic. Separate wide3 filters save 1.5 GiB '
+                      'against the union filter at K5086. The K5086 '
+                      'point-count formula projects '
                       '844,276 points; enumeration and subgroup checks remain '
                       'to be run.', small), Spacer(1, 12),
             Image(str(OUT / 'capacity.png'), width=500, height=237),
             Spacer(1, 10),
             Paragraph('Calculated arrays only. The 11-byte states, five-byte '
-                      'table, and wide3 union Bloom total 27.50 GiB at '
-                      'K5086/K4549. Other memory and peak RSS are excluded. '
+                      'table, and separate wide3 Blooms total 26.00 GiB at '
+                      'K5086/K4549; a union Bloom raises this to 27.50 GiB. '
+                      'Other memory and peak RSS are excluded. '
                       'No K5086 timing or target result is inferred.', small),
             Spacer(1, 8),
             Paragraph('Source and proof map: research/n83_two_tier_root_20261021/'

@@ -56,9 +56,10 @@ performance and single-target online performance remain unresolved.
 The [capacity calculation and proof map](CAPACITY.md) identify K5086 as the
 largest orbit-column count admitted by the current 30-bit state ID. A K4549
 primary split uses 12.5 GiB of five-byte tables, versus 15 GiB for a K4300
-split at K5086 and 20 GiB monolithic. The `wide3` union Bloom is 4 GiB and
-the 11-byte state array is 11.00 GiB; these three calculated arrays total
-27.50 GiB. The [capacity diagram](capacity.svg) shows the allocations and
+split at K5086 and 20 GiB monolithic. Separate `wide3` Blooms total 2.5 GiB
+at K4549, 1.5 GiB less than one union Bloom; with the 11-byte state array,
+the three calculated allocations total 26.00 GiB. The
+[capacity diagram](capacity.svg) shows the allocations and
 its [PNG render](capacity.png) is copied into `benchmarks/`. Lean 4.34.1
 checked the ID bound, oriented split uniqueness, and arithmetic in
 [Capacity.lean](Capacity.lean); [axiom output](Capacity.check.txt) is
