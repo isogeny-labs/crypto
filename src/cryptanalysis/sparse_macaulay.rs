@@ -110,72 +110,124 @@ pub fn xor_sorted(a: &[u32], b: &[u32]) -> Vec<u32> {
 /// `rows` must be ascending and duplicate-free per row; empty rows are
 /// allowed and counted as vanished.
 pub fn eliminate_high_columns(
-    mut rows: Vec<Vec<u32>>,
+    rows: Vec<Vec<u32>>,
     n_cols: usize,
     low_start: usize,
 ) -> SparseElimination {
-    let mut out = SparseElimination {
-        max_weight: rows.iter().map(|r| r.len()).max().unwrap_or(0),
-        ..Default::default()
-    };
+    let mut state = SparseProgress::new(rows, n_cols, low_start);
+    state
+        .finish(|_| Ok::<_, std::convert::Infallible>(()))
+        .unwrap()
+}
 
-    // Bucket every row under its leading (minimum) column.
-    let mut buckets: Vec<Vec<usize>> = vec![Vec::new(); n_cols.max(1)];
-    for (i, r) in rows.iter().enumerate() {
-        match r.first() {
-            Some(&lead) => buckets[lead as usize].push(i),
-            None => out.vanished += 1,
-        }
-    }
+/// A safe point between complete pivot columns. Buckets retain their exact
+/// order, including equal-weight pivot tie breaks, across a restore.
+#[derive(Clone, Debug)]
+pub struct SparseProgress {
+    pub rows: Vec<Vec<u32>>,
+    pub buckets: Vec<Vec<usize>>,
+    pub is_pivot: Vec<bool>,
+    pub next_column: usize,
+    pub n_cols: usize,
+    pub low_start: usize,
+    pub high_rank: usize,
+    pub vanished: usize,
+    pub max_weight: usize,
+}
 
-    let mut is_pivot = vec![false; rows.len()];
-    for c in 0..low_start.min(n_cols) {
-        let bucket = take(&mut buckets[c]);
-        if bucket.is_empty() {
-            continue;
-        }
-        // Lowest weight wins: the cheapest row to add into the others is
-        // the one that introduces the fewest new nonzeros.
-        let piv = *bucket
-            .iter()
-            .min_by_key(|&&i| rows[i].len())
-            .expect("bucket is non-empty");
-        is_pivot[piv] = true;
-        out.high_rank += 1;
+impl SparseProgress {
+    pub fn new(rows: Vec<Vec<u32>>, n_cols: usize, low_start: usize) -> Self {
+        let mut out = SparseElimination {
+            max_weight: rows.iter().map(|r| r.len()).max().unwrap_or(0),
+            ..Default::default()
+        };
 
-        let pivot_row = rows[piv].clone();
-        for i in bucket {
-            if i == piv {
-                continue;
-            }
-            let reduced = xor_sorted(&rows[i], &pivot_row);
-            out.max_weight = out.max_weight.max(reduced.len());
-            match reduced.first() {
-                Some(&lead) => {
-                    debug_assert!(
-                        lead as usize > c,
-                        "reduction must advance the leading column"
-                    );
-                    buckets[lead as usize].push(i);
-                }
+        // Bucket every row under its leading (minimum) column.
+        let mut buckets: Vec<Vec<usize>> = vec![Vec::new(); n_cols.max(1)];
+        for (i, r) in rows.iter().enumerate() {
+            match r.first() {
+                Some(&lead) => buckets[lead as usize].push(i),
                 None => out.vanished += 1,
             }
-            rows[i] = reduced;
+        }
+
+        let is_pivot = vec![false; rows.len()];
+        Self {
+            rows,
+            buckets,
+            is_pivot,
+            next_column: 0,
+            n_cols,
+            low_start,
+            high_rank: 0,
+            vanished: out.vanished,
+            max_weight: out.max_weight,
         }
     }
 
-    // Everything still bucketed at or past the boundary spans the low
-    // columns alone; so does any non-pivot row whose leading index was
-    // already there.
-    for (i, r) in rows.into_iter().enumerate() {
-        if is_pivot[i] || r.is_empty() {
-            continue;
+    /// Calls `safe_point` after each column, including empty columns. An error
+    /// leaves this state resumable at the next column; no pivot is half applied.
+    pub fn finish<E>(
+        &mut self,
+        mut safe_point: impl FnMut(&Self) -> Result<(), E>,
+    ) -> Result<SparseElimination, E> {
+        for c in self.next_column..self.low_start.min(self.n_cols) {
+            let bucket = take(&mut self.buckets[c]);
+            self.next_column = c + 1;
+            if bucket.is_empty() {
+                safe_point(self)?;
+                continue;
+            }
+            // Lowest weight wins: the cheapest row to add into the others is
+            // the one that introduces the fewest new nonzeros.
+            let piv = *bucket
+                .iter()
+                .min_by_key(|&&i| self.rows[i].len())
+                .expect("bucket is non-empty");
+            self.is_pivot[piv] = true;
+            self.high_rank += 1;
+
+            let pivot_row = self.rows[piv].clone();
+            for i in bucket {
+                if i == piv {
+                    continue;
+                }
+                let reduced = xor_sorted(&self.rows[i], &pivot_row);
+                self.max_weight = self.max_weight.max(reduced.len());
+                match reduced.first() {
+                    Some(&lead) => {
+                        debug_assert!(
+                            lead as usize > c,
+                            "reduction must advance the leading column"
+                        );
+                        self.buckets[lead as usize].push(i);
+                    }
+                    None => self.vanished += 1,
+                }
+                self.rows[i] = reduced;
+            }
+            safe_point(self)?;
         }
-        if r[0] as usize >= low_start {
-            out.linear_rows.push(r);
+
+        // Everything still bucketed at or past the boundary spans the low
+        // columns alone; so does any non-pivot row whose leading index was
+        // already there.
+        let mut out = SparseElimination {
+            high_rank: self.high_rank,
+            vanished: self.vanished,
+            max_weight: self.max_weight,
+            ..Default::default()
+        };
+        for (i, r) in take(&mut self.rows).into_iter().enumerate() {
+            if self.is_pivot[i] || r.is_empty() {
+                continue;
+            }
+            if r[0] as usize >= self.low_start {
+                out.linear_rows.push(r);
+            }
         }
+        Ok(out)
     }
-    out
 }
 
 /// [`eliminate_high_columns`] with a dense finish: the columns before
