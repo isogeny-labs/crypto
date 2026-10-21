@@ -113,3 +113,47 @@ that writes another shape needs the reader in `scripts/validation_gate.py`
 4. Regenerate: `python3 scripts/build_ic_leaderboard.py`. If the new
    `VALIDATION.json` is read by the builder, `scripts/check_ic_leaderboard_paths.py`
    will tell you which path the `ic-leaderboard` workflow filter must add.
+
+## Keeping the board rigorous and current
+
+The gate above decides what may be *shown*. Four further checks keep what is shown true and fresh.
+They came out of the 2026-10-19 validation sweep (slice A,
+`research/validation_sweep_20261019/A-leaderboard/REPORT.md`), whose findings were: every published
+number recomputed, but the standing rho had changed under Tables A and C, six sessions' counters no
+longer replayed, and nothing in CI would have noticed either.
+
+| layer | what it catches | where | cost |
+|:--|:--|:--|:--|
+| Recompute | a board number that does not follow from its raw records | `scripts/ic_audit/check_board_recompute.sh`, workflow `ic-leaderboard-recompute` (every PR, every push to main) | jq, 5 s |
+| Reference currency | the standing rho changed after a table's reference was measured and nobody assessed it | `scripts/ic_audit/check_reference_currency.sh`, `docs/ic/validation/reference-currency.json`, same workflow | git, 1 s |
+| Replay plan | a cited session whose counters stop replaying on main (new drift), a planned drift that has healed, or a cited session missing from the plan | `scripts/ic_audit/replay_plan.sh`, `check_plan_coverage.sh`, `docs/ic/validation/replay-plan.json`, workflow `ic-leaderboard-replay` (daily, on dispatch) | one release build, minutes |
+| Expiry | rows that stay "unvalidated (pre-gate)" for ever | optional `"expires": "YYYY-MM-DD"` in either `PRE_GATE.json`; after that date every row still only frozen fails `validation_gate.py check` | none |
+
+**Recompute check.** It reruns `recompute_A.sh`, `recompute_B.sh` and `recompute_C.sh` (jq, sharing no
+code with the Python builder) and compares S (IC), S (reference), x reference and x floor of every
+Table A, B and C row with `docs/ic/leaderboard.json`, relative tolerance 1e-8. It also fails when the
+number of recomputed rows differs from the number of board rows. `test_check_board_recompute.sh`
+proves it catches a 1% change of each compared field in each table and a deleted row.
+
+**Reference currency.** A table's rho reference was measured at a commit (`measured_at`). The entry
+records the git blob of each rho source file at the time its effect on the table was last assessed
+(`assessed_blobs`) and the assessment itself. Change the rho source and the check fails until the entry
+is updated, which means writing down either a re-measurement or a measured estimate of the effect.
+Blob hashes, not commit hashes, so squash merges cannot break it.
+
+**Replay plan.** `ecbench verify --replay-all` on each session the board cites, run daily on current
+main. Each session is planned as `identical` or as `drift` with a reason. A drift entry is a visible,
+dated debt, not a pass. When a session drifts that was planned as identical, or heals when it was
+planned as drift, or a newly cited session has no entry, the workflow fails.
+
+**A row cannot be both validated and unreplayable.** Until a session's counters replay on main, any
+board row that depends on them stays out of the validated standing; the sweep verdicts of slice A
+(`verdicts.jsonl`) record which rows those are.
+
+### What each standing needs, for the rows on the board today
+
+| table | replay | validator | rho reference with the 5a band | standing |
+|:--|:--|:--|:--|:--|
+| B | native re-execution of the ladder, 13 of 13 instances identical | recompute from per-run gae | negation map, band computed for 13 instances | validated: `docs/ic/runs/VALIDATION.json` |
+| A | native replay of sampled runs identical | recompute from the 64 R1 files | **band not available**: the unit is wall-clock and the price files record no per-operation counts for the IC arm | pre-gate, until a counted band exists |
+| C | native replay of sampled runs identical | recompute from the pair files | **band not available**, and the reference is S20's, not measured with the IC figure | pre-gate, until both exist |

@@ -1,0 +1,17 @@
+{
+ "schema": "ic-replay-plan/v1",
+ "note": "Sessions whose counters the leaderboard cites, replayed by .github/workflows/ic-leaderboard-replay.yml with `ecbench verify`.  `expect` is what a replay on current main must show: `identical` (every replay reproduces) or `drift` (some replay differs, with the reason and the evidence).  The workflow fails when an `identical` session drifts (new drift), when a `drift` session becomes identical (a stale entry), and when a cited session is missing from this file.  `replay` is `all` or a number of measured runs.",
+ "sessions": [
+  {"dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n13", "replay": "all", "expect": "drift",
+   "reason": "inherited-F4 and F6-IC counters changed after the session was recorded; first changing commit: see research/leaderboard_rigor_20261021/bisect/bisect.log",
+   "evidence": "research/leaderboard_rigor_20261021/bisect/summary.jsonl"},
+  {"dir": "research/f6_ic_ecbench_ladder_20261005/sessions/n19", "replay": "all", "expect": "drift",
+   "reason": "same counters as n13", "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all"},
+  {"dir": "research/f4_f5_f6_cross_family_20261011/sessions/K13", "replay": "all", "expect": "drift",
+   "reason": "same counters as the ladder; matrix F4 and F5 rows also differ at K13", "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all"},
+  {"dir": "research/f4_f5_f6_cross_family_20261011/sessions/K19", "replay": "all", "expect": "drift",
+   "reason": "same counters as the ladder", "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all"},
+  {"dir": "research/ecbench_rootfind_engine_20261012/sessions/claim-n13", "replay": "all", "expect": "drift",
+   "reason": "the four IC arms (inherited F4 and root-finder, m2 and m3) differ; the rho rows reproduce", "evidence": "research/validation_sweep_20261019/A-leaderboard/raw/replay_all"}
+ ]
+}

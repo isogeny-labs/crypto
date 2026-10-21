@@ -31,9 +31,11 @@ Stdlib only.  The schema is documented in docs/VALIDATION_GATE.md.
 from __future__ import annotations
 
 import argparse
+import datetime
 import hashlib
 import json
 import math
+import os
 import re
 import subprocess
 import sys
@@ -474,6 +476,32 @@ def grown(now: dict[str, str], before: dict[str, str]) -> list[str]:
     return sorted(k for k, d in now.items() if before.get(k) != d)
 
 
+def today() -> str:
+    """ISO date the expiry is judged against; VALIDATION_GATE_TODAY overrides it (tests)."""
+    return os.environ.get("VALIDATION_GATE_TODAY") or datetime.date.today().isoformat()
+
+
+def expired_freeze_problems(repo, board, lb_v, lb_g, admitted, bv, bg, digest_of) -> list[str]:
+    """A pre-gate freeze file may carry `"expires": "YYYY-MM-DD"`.  After that date every row that is
+    still only frozen (never validated) fails the gate, so the unvalidated remainder cannot stay on the
+    board indefinitely: validate it, archive it (benchmarks), or remove it.  No `expires`, no effect."""
+    out: list[str] = []
+    for rel, rows in ((PRE_GATE_LEADERBOARD, [(board_key(r), judge_board_row(r, digest_of(r), lb_v, lb_g, repo))
+                                              for r in board]),
+                      (PRE_GATE_BENCHMARKS, [(d, judge_benchmark_row(d, line, bv, bg, repo))
+                                             for d, line in admitted.items()])):
+        p = repo / rel
+        if not p.is_file():
+            continue
+        exp = json.loads(p.read_text()).get("expires")
+        if exp and today() > exp:
+            left = [k for k, res in rows if res["status"] == PRE_GATE]
+            if left:
+                out.append(f"{rel} expired on {exp}: {len(left)} row(s) are still only frozen pre-gate "
+                           f"(first: {left[0]}); validate, archive or remove them")
+    return out
+
+
 def check(repo: Path = REPO, base: str | None = None, digest_of=None) -> list[str]:
     """Problems with the committed leaderboard.json and benchmarks/README.md (empty = pass)."""
     problems: list[str] = []
@@ -495,6 +523,7 @@ def check(repo: Path = REPO, base: str | None = None, digest_of=None) -> list[st
         if res["status"] in (UNVALIDATED, FAILED):
             problems.append(f"benchmarks {d}: {res['status']}: " + "; ".join(res["reasons"]))
     problems.extend(benchmark_archive_errors(repo, admitted, base))
+    problems.extend(expired_freeze_problems(repo, doc["board"], lb_v, lb_g, admitted, bv, bg, digest_of))
     if base:
         # The freeze can only shrink: a PR may not launder a new or changed row into it.
         for rel in (PRE_GATE_LEADERBOARD, PRE_GATE_BENCHMARKS):

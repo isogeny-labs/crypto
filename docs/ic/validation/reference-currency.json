@@ -1,0 +1,34 @@
+{
+ "schema": "ic-reference-currency/v1",
+ "note": "A leaderboard table's rho reference was measured at a commit.  When the strong-rho implementation changes after that, the table's x reference describes a rho that is no longer the standing one.  scripts/ic_audit/check_reference_currency.sh fails when a table's rho source files are not the version (git blob) an entry here has assessed, so each change of the standing rho needs either a re-measurement or a dated, measured assessment of its effect on the table.",
+ "tables": {
+  "A": {
+   "measured_at": "995ea2071cc7453877a503d30eb561ae82cddab9",
+   "rho_paths": [
+    "src/cryptanalysis/koblitz_strong_rho.rs"
+   ],
+   "assessment": "Rule v3 priced rho as built (32 lanes). 13 commits changed the standing strong rho afterwards; research/ecbench_rho_optimized_20261014 measured the largest, 0.8046x solve instructions (a 1.25x faster rho), so Table A's x reference is against a slower rho than the standing one. The 32-lane versus 1024-lane kernel effect is in research/validation_sweep_20261019/A-leaderboard/raw/recompute_A_haiku.json (xref_canonical_step) and the lane sweep in research/leaderboard_rigor_20261021/rho_lanes/. No re-measurement of Table A at the current rho exists yet.",
+   "evidence": [
+    "research/ecbench_rho_optimized_20261014/RESULT.json",
+    "research/validation_sweep_20261019/A-leaderboard/raw/recompute_A_haiku.json"
+   ],
+   "assessed_blobs": {
+    "src/cryptanalysis/koblitz_strong_rho.rs": "d7ea6788834ad3ebb0f11419ab748139cb04d3e5"
+   }
+  },
+  "C": {
+   "measured_at": "57e7ce3a3",
+   "rho_paths": [
+    "src/cryptanalysis/koblitz_strong_rho.rs"
+   ],
+   "assessment": "Table C's rho S is S20's (2026-09-26) batch rho priced at the canonical step. The standing strong rho has changed since (see Table A); S20's counts were re-verified equal at n = 41 only. No re-measurement of Table C's reference at the current rho exists yet.",
+   "evidence": [
+    "research/ic_descent_20260930/analysis-isolated.json",
+    "research/ecbench_rho_optimized_20261014/RESULT.json"
+   ],
+   "assessed_blobs": {
+    "src/cryptanalysis/koblitz_strong_rho.rs": "d7ea6788834ad3ebb0f11419ab748139cb04d3e5"
+   }
+  }
+ }
+}

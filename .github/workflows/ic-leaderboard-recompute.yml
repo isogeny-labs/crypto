@@ -1,0 +1,42 @@
+name: ic-leaderboard-recompute
+
+# Every number of Tables A, B and C of the IC leaderboard must recompute from its raw records
+# (docs/VALIDATION_GATE.md, "Recompute check").  Cheap (jq, seconds), so it runs on every pull
+# request and on main with no paths filter: a filter would let a row change through a file the
+# filter forgot.  The checkout is sparse because the raw records are all it reads.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  recompute:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout: |
+            docs/ic
+            research/ic_tool_program/rule
+            research/ic_descent_20260930
+            research/ic_exponent_20260926
+            research/ic_rho_reference_20260923
+            scripts/ic_audit
+      - name: The check catches a tampered row and a missing row
+        run: bash scripts/ic_audit/test_check_board_recompute.sh
+      - name: Every board row recomputes from raw records
+        run: bash scripts/ic_audit/check_board_recompute.sh
+      - name: The standing rho has not changed since a table was assessed
+        run: bash scripts/ic_audit/check_reference_currency.sh

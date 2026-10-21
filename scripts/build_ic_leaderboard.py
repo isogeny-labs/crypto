@@ -139,7 +139,13 @@ FAMILIES = {
                     "unit, which is 2.3–3.2 times cheaper at baseline v3 than in §23's processes, so S here is not "
                     "compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v3/README.md).",
         "reference": "One-target rho on the same point, measured as built (its set-up plus its walk), "
-                     "in the same unit and the same process; its answer replayed and verified (§23; rule v3 at baseline v3).",
+                     "in the same unit and the same process; its answer replayed and verified (§23; rule v3 at baseline v3). "
+                     "Kernel caveat (validation sweep, slice A, 2026-10-19): the unit is a 1,024-lane batched "
+                     "addition while this rho walks 32 lanes, so it pays more per step than the canonical step; "
+                     "priced at the canonical step the × reference is 1.7–2.0 times larger "
+                     "(`research/validation_sweep_20261019/A-leaderboard/raw/recompute_A_haiku.json`, "
+                     "`xref_canonical_step`). Rho also gained 20% in instructions after this table was measured "
+                     "(`research/ecbench_rho_optimized_20261014`).",
         "floor": "√(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed "
                  "Frobenius and negation, n the extension degree. Stated in steps and not rescaled to "
                  "units, so × floor here divides units by steps.",
@@ -170,8 +176,11 @@ FAMILIES = {
                     "and divides by this unit (§20, §22 isolated re-run).",
         "reference": "Batch rho on the same 32 targets (signed Frobenius and negation), its counted "
                      "operations priced at the canonical step, one batched addition plus the table "
-                     "canonicalisation, in the same process (§20). Collisions shared across the 32 "
-                     "targets are in its cost per target.",
+                     "canonicalisation (§20). Collisions shared across the 32 targets are in its cost per "
+                     "target. Source caveat (validation sweep, slice A): the rho S is §20's own measurement "
+                     "(2026-09-26), not measured in the process of the §22 isolated IC figure; the isolated "
+                     "re-run re-priced rho at one size only (n = 41, set M1: counts equal §20's, priced S "
+                     "0.0600 against 0.0610), and the IC S is the baseline S divided by a wall-time speedup.",
         "floor": "L(32)·√(π/4n) steps per √r per target, with L(32) = 0.19869: the one-target floor of "
                  "table A times Kuhn–Struik's batch share. Stated in steps and not rescaled to units, "
                  "and a smaller object than table A's floor, so × floor in C and in A do not compare.",
@@ -179,6 +188,19 @@ FAMILIES = {
     },
 }
 
+
+# Disclosures from the validation sweep (slice A, 2026-10-19) and the replays that followed; text only, no data.
+NOTE_N37 = ("Validation sweep: `ecbench band` marks every IC pair of this session 'unrankable (uncounted unpriced "
+            "work)' (field arithmetic, hashing and modular combination are named but not counted), so K16/K42 and "
+            "IC/rho are quotients of lower bounds that AGENTS.md section 5a does not let anyone rank.")
+NOTE_N41 = ("Validation sweep: the K16 mean S and the quotient above are means over the runs that finished "
+            "(23 of 80 at n = 41; 57 exhausted), ic-k8 produced no answer in 80 of 80 and no IC run verified at "
+            "n = 53, so they are survivor means, not costs; `ecbench band` calls every IC-vs-rho pair 'incomplete'.")
+NOTE_REPLAY = ("Validation sweep and replay-all on current main: the inherited-F4 and F6-IC counters of this session do "
+               "not reproduce (F6-IC ladder 24/72 at m = 13, 19 and 23; cross-family 16/48, 16/32, 24/40, 8/24). "
+               "A replay on the commit that recorded the ladder reproduces 72/72, so the counters changed in code "
+               "afterwards (bisect: research/leaderboard_rigor_20261021/bisect/). The recovered scalars verify; "
+               "read the counter columns as historical, not current-binary evidence.")
 
 def rng(lo: float, hi: float) -> str:
     return g3(lo) if lo == hi else f"{g3(lo)}–{g3(hi)}"
@@ -1388,6 +1410,7 @@ def markdown(doc: dict) -> str:
           f"{d['cold_counted_over_rho_diagnostic']:.3f} and K16/K42 is "
           f"{d['cold_counted_over_k42_diagnostic']:.3f}. Native work is unpriced "
           "for both arms, and L0 timing cannot establish an online speedup. "
+          + NOTE_N37 + " "
           "This row is intentionally outside the three fully priced unit families; "
           f"read the [frozen decision](../../{d['source']}).", ""]
     c = doc["n37_k8_k16_confirmation"]
@@ -1467,7 +1490,7 @@ def markdown(doc: dict) -> str:
           "IC `S` is a lower bound: the solver's word XORs are counted but unpriced, and "
           "F6-IC's geometric point additions are charged. The F6-IC word-XOR saving "
           "vanishes once the base exceeds #1333's 256-point closure cap; charging its "
-          "geometry makes the trade a relabelling. "
+          "geometry makes the trade a relabelling. " + NOTE_REPLAY + " "
           f"Decision: {y['decision']} (m = 31 incomplete). "
           f"Read the [analysis](../../{y['source']}).", "",
           "| m | curve | targets | rho S | F4 S/rho (lower bound) | F6-IC S/rho (lower bound) | median log2(W4/W6) |",
@@ -1485,7 +1508,7 @@ def markdown(doc: dict) -> str:
           "Matrix F4, matrix F5, inherited F4 and F6-IC through `pdp3-binary` on eight public "
           "one-target workloads per cell, beside same-target rho. IC `S` is a lower bound "
           "(solver word XORs unpriced; F6-IC's geometric additions charged). `W` is counted "
-          "solver word XORs. Prime curves have no algebraic oracle in `ecbench`. "
+          "solver word XORs. Prime curves have no algebraic oracle in `ecbench`. " + NOTE_REPLAY + " "
           f"Read the [analysis](../../{y['source']}).", "",
           "| family | m | curve | base points | rho-negation S | strong rho S | inherited F4 S | F6-IC S "
           "| W F5/F4 | W F4 matrix/inherited | median log2(W inh/W F6) |",
@@ -1509,7 +1532,7 @@ def markdown(doc: dict) -> str:
           "method parameters unchanged) ran on 16 new public one-target workloads on each of the next "
           "two registered sizes, five paired rounds each, on macOS at L0. Counted cold IC/rho is a "
           "quotient of two lower bounds (native work unpriced); a cell whose arm never verifies under "
-          "the frozen parameters is unknown, not a cost. "
+          "the frozen parameters is unknown, not a cost. " + NOTE_N41 + " "
           f"{v['measured_verified_runs']} of {v['measured_runs']} measured runs verified; "
           f"decision `{v['decision']}`; the L2 host run is pending. "
           f"Read the [frozen decision](../../{v['source']}).", "",
@@ -1874,7 +1897,7 @@ def page(doc: dict, standalone: bool) -> str:
              f'bound; its counted IC/rho quotient is {d["cold_counted_over_rho_diagnostic"]:.3f}, '
              f'and K16/K42 is {d["cold_counted_over_k42_diagnostic"]:.3f}. Both arms leave native '
              'work unpriced, and L0 timing gives no admitted online speedup. These figures are not '
-             'comparable to tables A–C. '
+             'comparable to tables A–C. ' + esc(NOTE_N37) + ' '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(d["source"])}">Frozen decision</a>. '
              'A separate whole-solve Callgrind census finds K16/K42 = 0.367 and K16/rho = 4.461 '
              'in simulated instructions on eight paired points; native wall and online speed remain unknown. '
@@ -1949,7 +1972,7 @@ def page(doc: dict, standalone: bool) -> str:
              'beside same-target strong rho on eight public one-target workloads per size. IC S is a '
              'lower bound: the solver\'s word XORs are counted but unpriced, and F6-IC\'s geometric point '
              'additions are charged. The F6-IC word-XOR saving vanishes once the base exceeds #1333\'s '
-             '256-point closure cap; charging its geometry makes the trade a relabelling. '
+             '256-point closure cap; charging its geometry makes the trade a relabelling. ' + esc(NOTE_REPLAY) + ' '
              f'Decision: {esc(y["decision"])} (m = 31 incomplete). '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(y["source"])}">Analysis</a>.</p>')
     P.append('<table><thead><tr><th>m</th><th>Curve</th><th>Targets</th><th>Rho S</th>'
@@ -1967,7 +1990,7 @@ def page(doc: dict, standalone: bool) -> str:
              '<p>Matrix F4, matrix F5, inherited F4 and F6-IC through <code>pdp3-binary</code> on eight public '
              'one-target workloads per cell, beside same-target rho. IC S is a lower bound: solver word XORs '
              'are unpriced and F6-IC\'s geometric additions are charged. W is counted solver word XORs. '
-             'Prime curves have no algebraic oracle in <code>ecbench</code>. '
+             'Prime curves have no algebraic oracle in <code>ecbench</code>. ' + esc(NOTE_REPLAY) + ' '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(y["source"])}">Analysis</a>.</p>')
     P.append('<table><thead><tr><th>Family</th><th>m</th><th>Curve</th><th>Base points</th><th>Rho-negation S</th>'
              '<th>Strong rho S</th><th>Inherited F4 S</th><th>F6-IC S</th><th>W F5/F4</th>'
@@ -1990,7 +2013,7 @@ def page(doc: dict, standalone: bool) -> str:
              '<p>The four n37 arms, method parameters unchanged, on 16 new public one-target workloads '
              'on each of the next two registered sizes, five paired rounds each, on macOS at L0. '
              'Counted cold IC/rho is a quotient of two lower bounds with native work unpriced; a cell '
-             'whose arm never verifies under the frozen parameters is unknown, not a cost. '
+             'whose arm never verifies under the frozen parameters is unknown, not a cost. ' + esc(NOTE_N41) + ' '
              f'{v["measured_verified_runs"]} of {v["measured_runs"]} measured runs verified; decision '
              f'<code>{esc(v["decision"])}</code>; the L2 host run is pending. '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(v["source"])}">Frozen decision</a>.</p>')
