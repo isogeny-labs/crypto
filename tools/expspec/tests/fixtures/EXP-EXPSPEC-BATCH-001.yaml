@@ -1,0 +1,79 @@
+# Test fixture: two batch hosts (each fits one cell), a paid-launch ask, a
+# human gate per cell on the controller step, remote steps tracked by STATUS tokens, a controller
+# step per cell, collect and teardown. COMMIT and FSHA are filled by the test.
+schema: crypto.experiment/v1
+id: EXP-EXPSPEC-BATCH-001
+version: 1
+title: batch-host path test with a fake launcher
+status: approved
+owner: test
+created: 2026-10-20
+approval: {decision: decisions/DEC-TEST.yaml, approved_by: owner, approved_at: '2026-10-20T20:00:00Z'}
+question: {summary: test, questions: [{id: Q1, text: test}]}
+source:
+  repo: aburan28/crypto
+  ref: main
+  commit: COMMIT
+  frozen: [{path: research/expspec_batch_test/fake_spot.py, sha256: FSHA}]
+paths: {root: research/expspec_batch_test, out: research/expspec_batch_test/out}
+cells:
+  - {id: a1, params: {n: 15}, requires: {memory_gb: 64}}
+  - {id: a2, params: {n: 16}, requires: {memory_gb: 400}, priority: -1}
+steps:
+  - {id: build, scope: per_host, runs_on: host, status_done: BUILT, status_failed: [BUILD_FAILED]}
+  - id: measure
+    scope: per_cell
+    runs_on: host
+    needs: [build]
+    status_done: "MEASURED {{cell.id}}"
+    evidence: true
+  - id: score
+    scope: per_cell
+    runs_on: controller
+    needs: [measure]
+    gates: {before: [go]}
+    argv: [python3, research/expspec_batch_test/score.py, "{{paths.collected}}/out/{{cell.id}}.json", "{{paths.out}}/{{cell.id}}.score.json"]
+    timeout_s: 60
+    outputs: ["{{paths.out}}/{{cell.id}}.score.json"]
+gates:
+  - {id: go, kind: human, description: owner go per cell, ask: "Score cell {{cell.id}} (n={{cell.n}}) now.", on_fail: stop}
+hosts:
+  selection: ordered
+  candidates:
+    - id: small
+      backend: batch
+      launcher: aws_spot
+      provides: {vcpus: 32, memory_gb: 256}
+      timing_valid: false
+      preemptible: true
+      est_hourly_usd: 2.0
+      cells: [a1]
+      lifecycle:
+        provision: {argv: [python3, research/expspec_batch_test/fake_spot.py, run, small, a1], timeout_s: 60, capture: {handle: {json_key: id}}}
+        poll: {argv: [python3, research/expspec_batch_test/fake_spot.py, fetch, "{{vars.handle}}", "{{paths.collected}}"], timeout_s: 60}
+        collect: {argv: [python3, research/expspec_batch_test/fake_spot.py, fetch, "{{vars.handle}}", "{{paths.collected}}"], timeout_s: 60}
+        teardown: {argv: [python3, research/expspec_batch_test/fake_spot.py, terminate, "{{vars.handle}}"], timeout_s: 60}
+        poll_every_s: 300
+        lifetime_s: 3600
+    - id: big
+      backend: batch
+      launcher: aws_spot
+      provides: {vcpus: 64, memory_gb: 512}
+      timing_valid: false
+      preemptible: true
+      est_hourly_usd: 5.0
+      cells: [a2]
+      lifecycle:
+        provision: {argv: [python3, research/expspec_batch_test/fake_spot.py, run, big, a2], timeout_s: 60, capture: {handle: {json_key: id}}}
+        poll: {argv: [python3, research/expspec_batch_test/fake_spot.py, fetch, "{{vars.handle}}", "{{paths.collected}}"], timeout_s: 60}
+        collect: {argv: [python3, research/expspec_batch_test/fake_spot.py, fetch, "{{vars.handle}}", "{{paths.collected}}"], timeout_s: 60}
+        teardown: {argv: [python3, research/expspec_batch_test/fake_spot.py, terminate, "{{vars.handle}}"], timeout_s: 60}
+        poll_every_s: 300
+        lifetime_s: 3600
+budget: {max_cost_usd: 50, max_wall_hours: 2}
+outcome: {decision_rules: [{id: R1, about: [Q1], when: x, verdict: y}], censoring: [OOM is censored]}
+reporting: {results_file: research/expspec_batch_test/RESULTS.md, required_artifacts: ["{{paths.out}}/{{cell.id}}.score.json"]}
+agent:
+  executor_model: claude-haiku-5-5
+  autonomy: {launch_paid_host: ask, spend_without_asking_usd: 0, terminate_own_hosts: allowed}
+  escalate_on: [gate_failed, step_failed]

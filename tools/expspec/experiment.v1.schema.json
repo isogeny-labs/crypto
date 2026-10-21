@@ -1,0 +1,1538 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "crypto.experiment/v1",
+  "title": "Experiment spec v1",
+  "description": "One YAML file per experiment at experiments/specs/<id>.yaml. The author (frontier/core tier) writes it; once status is approved it is frozen. tools/expspec/expspec.py compiles it, one step at a time, into mechanical task cards (tools/task_card.py) that executor-mechanical runs, and records progress in experiments/specs/<id>.state.yaml. Strings may contain {{var}} templates; tools/expspec/README.md lists the variables.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "id",
+    "version",
+    "title",
+    "status",
+    "owner",
+    "created",
+    "question",
+    "source",
+    "paths",
+    "steps",
+    "hosts",
+    "budget",
+    "outcome",
+    "reporting",
+    "agent"
+  ],
+  "properties": {
+    "schema": {
+      "const": "crypto.experiment/v1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^EXP-[A-Z0-9]+(-[A-Z0-9]+)*-[0-9]{3}$"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Bumped by every amendment. A state file is bound to one version and its sha256."
+    },
+    "amends": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "reason",
+        "before_any_run"
+      ],
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "reason": {
+          "type": "string"
+        },
+        "before_any_run": {
+          "type": "boolean",
+          "description": "false: the amendment was written after evidence was seen. The report must say so."
+        }
+      }
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 160
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "approved",
+        "retired"
+      ],
+      "description": "Spec lifecycle. draft: editable; `plan` works, `card` refuses. approved: frozen and runnable. retired: never run. Run progress is in the state file, not here."
+    },
+    "owner": {
+      "type": "string"
+    },
+    "created": {
+      "type": "string",
+      "format": "date"
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision",
+        "approved_by",
+        "approved_at"
+      ],
+      "properties": {
+        "decision": {
+          "type": "string",
+          "description": "Repo path of the committed coordinator_decision YAML (decision: approve, target_ids contains this id). tools/task_card.py lint checks it on every card."
+        },
+        "approved_by": {
+          "type": "string"
+        },
+        "approved_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/slug"
+      }
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocol": {
+          "type": "string",
+          "description": "Prose pre-registration (PROTOCOL.md). List it in source.frozen as well."
+        },
+        "results": {
+          "type": "string"
+        },
+        "predecessors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "prs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[\\w.-]+/[\\w.-]+#[0-9]+$"
+          }
+        }
+      }
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "questions"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "text"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/label"
+              },
+              "text": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "predictions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "text"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/label"
+              },
+              "about": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/label"
+                }
+              },
+              "text": {
+                "type": "string"
+              },
+              "confidence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "ref"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "pattern": "^[\\w.-]+/[\\w.-]+$"
+        },
+        "ref": {
+          "type": "string",
+          "description": "Branch a remote host clones."
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "Required once approved: the commit the code and frozen inputs come from. Every card pins the current HEAD, which must be this commit or descend from it."
+        },
+        "allow_drift": {
+          "type": "boolean",
+          "default": false,
+          "description": "false: commits after `commit` may touch only experiments/specs/, the approval decision's directory and paths.cards/collected/out. true: any descendant (host records, draws committed mid-run). Frozen files are hash-checked either way."
+        },
+        "frozen": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          },
+          "description": "Bound into every card. Protocol, run scripts, committed inputs."
+        }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "description": "Repo-relative directories (no leading /, no ..). root: the experiment's directory. out: outputs. cards: task cards and receipts (default {{paths.root}}/cards). collected: where remote outputs are fetched (default {{paths.root}}/collected). Add any other names.",
+      "required": [
+        "root",
+        "out"
+      ],
+      "additionalProperties": {
+        "$ref": "#/$defs/relpath"
+      },
+      "properties": {
+        "root": {
+          "$ref": "#/$defs/relpath"
+        },
+        "out": {
+          "$ref": "#/$defs/relpath"
+        },
+        "cards": {
+          "$ref": "#/$defs/relpath"
+        },
+        "collected": {
+          "$ref": "#/$defs/relpath"
+        },
+        "ckpt": {
+          "$ref": "#/$defs/relpath"
+        }
+      }
+    },
+    "env": {
+      "$ref": "#/$defs/env"
+    },
+    "resources": {
+      "$ref": "#/$defs/resources"
+    },
+    "cells": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/cell"
+      }
+    },
+    "matrix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "axes",
+        "id_template"
+      ],
+      "description": "Generates cells as the product of axes, appended after `cells`.",
+      "properties": {
+        "axes": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1
+          }
+        },
+        "id_template": {
+          "type": "string",
+          "description": "e.g. n{{n}}-l{{l}}; must yield unique slugs."
+        },
+        "exclude": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "A generated cell whose params match every key of one entry is dropped."
+        },
+        "defaults": {
+          "type": "object",
+          "description": "Cell fields (role, priority, optional, requires) applied to every generated cell."
+        }
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resume"
+      ],
+      "properties": {
+        "resume": {
+          "enum": [
+            "none",
+            "rerun_step",
+            "from_ckpt"
+          ],
+          "description": "none: a step lost to preemption is recorded censored and not re-run. rerun_step: run it again from scratch. from_ckpt: run it again; its command continues from paths.ckpt."
+        },
+        "interval_s": {
+          "type": "integer",
+          "minimum": 30
+        },
+        "grace_s": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "transport": {
+          "enum": [
+            "none",
+            "spotlab",
+            "git_push",
+            "http_pull",
+            "rsync"
+          ],
+          "description": "How checkpoints leave a preemptible host. none on a preemptible host means resume must be none or rerun_step."
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/step"
+      },
+      "description": "In order. `next` returns the first ready instance; cell priority breaks ties between per_cell instances."
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/gate"
+      }
+    },
+    "hosts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selection",
+        "candidates"
+      ],
+      "properties": {
+        "selection": {
+          "enum": [
+            "ordered",
+            "cheapest_fit"
+          ],
+          "description": "ordered: first candidate that fits the next cell. cheapest_fit: lowest est_hourly_usd that fits. A candidate whose provision fails is marked unavailable and the next one is taken."
+        },
+        "candidates": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/host"
+          }
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_cost_usd",
+        "max_wall_hours"
+      ],
+      "properties": {
+        "max_cost_usd": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Hard cap. Spend is estimated as est_hourly_usd x host hours (provision to teardown)."
+        },
+        "max_wall_hours": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_attempts_per_step": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3,
+          "default": 2
+        },
+        "escalate_at_fraction": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/slug"
+          },
+          "description": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "counted",
+              "timing",
+              "memory",
+              "derived",
+              "boolean"
+            ],
+            "description": "timing: evidence only from a timing_valid host; elsewhere `facts` labels it descriptive."
+          },
+          "source": {
+            "$ref": "#/$defs/json_ref"
+          },
+          "primary": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision_rules",
+        "censoring"
+      ],
+      "description": "Read by the reasoning tier after the run. expspec reports facts against `checks`; it never writes a verdict.",
+      "properties": {
+        "decision_rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "about",
+              "when",
+              "verdict"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/label"
+              },
+              "about": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/label"
+                }
+              },
+              "cells": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/slug"
+                }
+              },
+              "when": {
+                "type": "string"
+              },
+              "checks": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/check"
+                }
+              },
+              "verdict": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "invalidation": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "censoring": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "reporting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "results_file",
+        "required_artifacts"
+      ],
+      "properties": {
+        "results_file": {
+          "type": "string"
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "required_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Templated paths. A path containing {{cell.*}} is required per attempted cell."
+        },
+        "visuals": {
+          "type": "boolean",
+          "default": true,
+          "description": "AGENTS.md: every run leaves a report, a graph and a PDF (research-visuals skill)."
+        },
+        "benchmarks_dir": {
+          "type": "string",
+          "description": "benchmarks/<YYYYMMDD>-<slug>/ when the result is a performance measurement."
+        },
+        "progress_every_minutes": {
+          "type": "integer",
+          "minimum": 5
+        }
+      }
+    },
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executor_model",
+        "autonomy"
+      ],
+      "properties": {
+        "executor_model": {
+          "type": "string",
+          "description": "Runs cards. claude-haiku-5-5 (executor-mechanical)."
+        },
+        "director_model": {
+          "type": "string",
+          "description": "Assesses receipts. claude-sonnet-5-5 (experiment-director)."
+        },
+        "autonomy": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "launch_paid_host": {
+              "$ref": "#/$defs/permission"
+            },
+            "spend_without_asking_usd": {
+              "type": "number",
+              "minimum": 0,
+              "default": 0
+            },
+            "terminate_own_hosts": {
+              "$ref": "#/$defs/permission"
+            },
+            "retry_failed_step": {
+              "$ref": "#/$defs/permission"
+            },
+            "git_commit": {
+              "$ref": "#/$defs/permission"
+            },
+            "git_push": {
+              "$ref": "#/$defs/permission"
+            },
+            "open_pr": {
+              "$ref": "#/$defs/permission"
+            }
+          }
+        },
+        "escalate_on": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "gate_failed",
+              "budget_fraction",
+              "step_failed",
+              "step_censored",
+              "host_unavailable",
+              "spec_drift",
+              "missing_output",
+              "any_error"
+            ]
+          }
+        },
+        "instructions": {
+          "type": "string",
+          "description": "Experiment-specific notes for the main session. Not copied into cards."
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "approved"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "approval"
+        ],
+        "properties": {
+          "source": {
+            "required": [
+              "commit",
+              "frozen"
+            ],
+            "properties": {
+              "frozen": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,47}$",
+      "description": "Same alphabet as task-card command ids."
+    },
+    "label": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,31}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "relpath": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$"
+    },
+    "env": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "propertyNames": {
+        "pattern": "^[A-Z_][A-Z0-9_]*$"
+      }
+    },
+    "permission": {
+      "enum": [
+        "never",
+        "ask",
+        "allowed"
+      ]
+    },
+    "argv": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "No shell: |, &&, ;, > as tokens are refused by card lint."
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "vcpus": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "memory_gb": {
+          "type": "number",
+          "minimum": 0
+        },
+        "disk_gb": {
+          "type": "number",
+          "minimum": 0
+        },
+        "arch": {
+          "enum": [
+            "x86_64",
+            "aarch64",
+            "any"
+          ]
+        },
+        "cpu_flags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gpus": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "gpu_model": {
+          "type": "string"
+        },
+        "est_hours": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "params"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/slug"
+        },
+        "params": {
+          "type": "object",
+          "description": "Templates read them as {{cell.<key>}}."
+        },
+        "role": {
+          "enum": [
+            "measure",
+            "control",
+            "calibration",
+            "smoke"
+          ],
+          "default": "measure"
+        },
+        "priority": {
+          "type": "integer",
+          "default": 0
+        },
+        "optional": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skipped for budget or host fit is recorded not_attempted, never failed."
+        },
+        "requires": {
+          "$ref": "#/$defs/resources",
+          "description": "Minimum host. A host below it records the cell not_attempted."
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "scope",
+        "runs_on"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/slug"
+        },
+        "title": {
+          "type": "string"
+        },
+        "scope": {
+          "enum": [
+            "once",
+            "per_host",
+            "per_cell"
+          ],
+          "description": "once: one instance. per_host: again on every newly provisioned host (build, host record). per_cell: one instance per selected cell."
+        },
+        "runs_on": {
+          "enum": [
+            "controller",
+            "host"
+          ],
+          "description": "controller: a task card in this checkout. host: on the provisioned host; with a local or ssh host it is still a card, with a batch host the host's job entrypoint runs it and reports through STATUS tokens."
+        },
+        "cells": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slug"
+          }
+        },
+        "cell_roles": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "measure",
+              "control",
+              "calibration",
+              "smoke"
+            ]
+          }
+        },
+        "needs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slug"
+          },
+          "description": "per_cell needing per_cell: same cell. Anything needing once/per_host: that step done (on the current host for per_host)."
+        },
+        "argv": {
+          "$ref": "#/$defs/argv"
+        },
+        "cwd": {
+          "$ref": "#/$defs/relpath"
+        },
+        "env": {
+          "$ref": "#/$defs/env"
+        },
+        "timeout_s": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "background": {
+          "type": "boolean",
+          "description": "Default: timeout_s > 600."
+        },
+        "retry_exit_codes": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Infrastructure exit codes the card itself retries (max 3 attempts). Never to change a result."
+        },
+        "success_exit_codes": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "default": [
+            0
+          ]
+        },
+        "censored_exit_codes": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "e.g. 124 timeout, 137 kill: recorded censored, not failed."
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Templated paths that exist and are non-empty after success; checked by ingest."
+        },
+        "must_not_exist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Paths the step claims fresh (an ecbench OUT_DIR)."
+        },
+        "capture": {
+          "$ref": "#/$defs/capture"
+        },
+        "status_done": {
+          "type": "string",
+          "description": "runs_on host with a batch host: the STATUS token that marks this instance done. May use {{cell.id}}."
+        },
+        "status_failed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "done_when": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/check"
+          },
+          "description": "All pass: already done (resume); record skipped_done without running."
+        },
+        "gates": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "before": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/slug"
+              }
+            },
+            "after": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/slug"
+              }
+            }
+          }
+        },
+        "evidence": {
+          "type": "boolean",
+          "default": false,
+          "description": "Outputs are measurements. Once done, never re-run to change them."
+        },
+        "on_failure": {
+          "enum": [
+            "stop",
+            "skip_cell",
+            "continue",
+            "escalate"
+          ],
+          "default": "escalate"
+        },
+        "write_scope": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relpath"
+          },
+          "description": "Extra repo paths this step writes besides paths.* (e.g. target/ for cargo build)."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "runs_on": {
+                "const": "controller"
+              }
+            },
+            "required": [
+              "runs_on"
+            ]
+          },
+          "then": {
+            "required": [
+              "argv",
+              "timeout_s"
+            ]
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "properties": {
+                "scope": {
+                  "const": "per_cell"
+                }
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "cells"
+                  ]
+                },
+                {
+                  "required": [
+                    "cell_roles"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "capture": {
+      "type": "object",
+      "description": "Values read from this step's stdout into state.vars, usable later as {{vars.<name>}}. Each entry: {json_key: k} (first stdout line that is a JSON object with key k) or {regex: r} (group 1 of the first match).",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "maxProperties": 1,
+        "properties": {
+          "json_key": {
+            "type": "string"
+          },
+          "regex": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "json_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": ".json, or .jsonl (see line)."
+        },
+        "path": {
+          "type": "string",
+          "description": "Dotted path with [i] indexes, e.g. degrees[4].closure_refuted. Empty: whole document."
+        },
+        "line": {
+          "enum": [
+            "last",
+            "first",
+            "all"
+          ],
+          "default": "last",
+          "description": "jsonl only. all: the value is the list over lines."
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "file_exists",
+            "sha256",
+            "sha256_manifest",
+            "json",
+            "status_token",
+            "command"
+          ]
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "json": {
+          "$ref": "#/$defs/json_ref"
+        },
+        "op": {
+          "enum": [
+            "eq",
+            "ne",
+            "lt",
+            "le",
+            "gt",
+            "ge",
+            "in",
+            "exists",
+            "truthy",
+            "all_true",
+            "count_ge"
+          ]
+        },
+        "value": {},
+        "token": {
+          "type": "string",
+          "description": "status_token: a line of {{paths.collected}}/STATUS ends with this token."
+        },
+        "argv": {
+          "$ref": "#/$defs/argv"
+        },
+        "timeout_s": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 120
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "file_exists"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "sha256"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "path",
+              "sha256"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "sha256_manifest"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "json"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "json",
+              "op"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "status_token"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "token"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "command"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "argv"
+            ]
+          }
+        }
+      ]
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "description",
+        "on_fail"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/slug"
+        },
+        "description": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "checks",
+            "wait_until",
+            "human"
+          ],
+          "description": "checks: evaluated by expspec now. wait_until: re-evaluated at each `next` until it passes or max_wait_s has passed since first evaluation. human: the main session asks the owner `ask` and records the answer with `expspec answer`."
+        },
+        "checks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/check"
+          }
+        },
+        "refresh": {
+          "$ref": "#/$defs/argv",
+          "description": "wait_until: a card command run before each re-evaluation (e.g. git pull --ff-only)."
+        },
+        "every_s": {
+          "type": "integer",
+          "minimum": 60
+        },
+        "max_wait_s": {
+          "type": "integer",
+          "minimum": 60
+        },
+        "ask": {
+          "type": "string"
+        },
+        "on_fail": {
+          "enum": [
+            "stop",
+            "skip_cell",
+            "void_cell",
+            "escalate"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "checks",
+                  "wait_until"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "checks"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "wait_until"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "every_s",
+              "max_wait_s"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "human"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "ask"
+            ]
+          }
+        }
+      ]
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provision",
+        "poll",
+        "collect",
+        "teardown"
+      ],
+      "description": "Controller-side commands for a batch host. Templates may use {{vars.handle}} (captured by provision), {{paths.*}}, {{host.*}}.",
+      "properties": {
+        "provision": {
+          "$ref": "#/$defs/lifecycle_cmd"
+        },
+        "poll": {
+          "$ref": "#/$defs/lifecycle_cmd",
+          "description": "Must leave the host's STATUS file at {{paths.collected}}/STATUS."
+        },
+        "collect": {
+          "$ref": "#/$defs/lifecycle_cmd"
+        },
+        "teardown": {
+          "$ref": "#/$defs/lifecycle_cmd"
+        },
+        "poll_every_s": {
+          "type": "integer",
+          "minimum": 300,
+          "default": 1800
+        },
+        "lifetime_s": {
+          "type": "integer",
+          "minimum": 60,
+          "description": "The host's own hard cap (shutdown -h). Spend is estimated to this when teardown never ran."
+        }
+      }
+    },
+    "lifecycle_cmd": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "argv",
+        "timeout_s"
+      ],
+      "properties": {
+        "argv": {
+          "$ref": "#/$defs/argv"
+        },
+        "env": {
+          "$ref": "#/$defs/env"
+        },
+        "timeout_s": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "retry_exit_codes": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "capture": {
+          "$ref": "#/$defs/capture"
+        }
+      }
+    },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "backend",
+        "provides",
+        "timing_valid",
+        "preemptible"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/slug"
+        },
+        "backend": {
+          "enum": [
+            "local",
+            "ssh",
+            "batch"
+          ],
+          "description": "local: this checkout. ssh: host steps become cards running `ssh <host> -- <argv>` in config.workdir. batch: a launched machine (EC2 spot via PR #2228 aws_spot.py, RunPod, spotlab, isolab) driven only through `lifecycle`."
+        },
+        "launcher": {
+          "enum": [
+            "none",
+            "aws_spot",
+            "runpod",
+            "spotlab",
+            "isolab",
+            "other"
+          ],
+          "default": "none",
+          "description": "Informational for batch hosts."
+        },
+        "provides": {
+          "$ref": "#/$defs/resources"
+        },
+        "timing_valid": {
+          "type": "boolean",
+          "description": "Wall times measured here are evidence (isolab, dedicated bare metal). Shared or spot cloud: false."
+        },
+        "preemptible": {
+          "type": "boolean"
+        },
+        "paid": {
+          "type": "boolean",
+          "default": true,
+          "description": "false only for machines with no marginal cost (this laptop, an owned box)."
+        },
+        "est_hourly_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cells": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slug"
+          }
+        },
+        "config": {
+          "type": "object",
+          "description": "ssh: {host, workdir}. batch: free-form record of what the launcher was given (instance type, region, max price, boot script)."
+        },
+        "lifecycle": {
+          "$ref": "#/$defs/lifecycle"
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "backend": {
+                "const": "ssh"
+              }
+            },
+            "required": [
+              "backend"
+            ]
+          },
+          "then": {
+            "required": [
+              "config"
+            ],
+            "properties": {
+              "config": {
+                "required": [
+                  "host",
+                  "workdir"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "backend": {
+                "const": "batch"
+              }
+            },
+            "required": [
+              "backend"
+            ]
+          },
+          "then": {
+            "required": [
+              "lifecycle",
+              "est_hourly_usd"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "launcher": {
+                "const": "isolab"
+              }
+            },
+            "required": [
+              "launcher"
+            ]
+          },
+          "then": {
+            "properties": {
+              "timing_valid": {
+                "const": true
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

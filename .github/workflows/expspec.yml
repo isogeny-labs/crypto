@@ -1,0 +1,32 @@
+name: Experiment specs (expspec)
+on:
+  pull_request:
+    paths:
+      - tools/expspec/**
+      - tools/task_card.py
+      - experiments/specs/**
+      - research/expspec_smoke_20261020/**
+      - .github/workflows/expspec.yml
+  push:
+    branches: [main]
+    paths:
+      - tools/expspec/**
+      - tools/task_card.py
+      - experiments/specs/**
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  expspec:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pyyaml jsonschema
+      - name: Every spec validates
+        run: python tools/expspec/expspec.py validate experiments/specs/EXP-*[0-9].yaml
+      - name: Compile-and-run loop, local and batch hosts
+        run: python -m unittest discover -s tools/expspec/tests -v

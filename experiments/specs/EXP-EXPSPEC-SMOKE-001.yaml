@@ -1,0 +1,97 @@
+# Minimal spec: the smallest thing that exercises every part of the loop on
+# this machine (per_host build, per_cell steps, a gate after, a once step,
+# a matrix, required artifacts). No claim rides on it.
+schema: crypto.experiment/v1
+id: EXP-EXPSPEC-SMOKE-001
+version: 1
+title: expspec smoke test on the local checkout
+status: draft          # approve with a committed coordinator decision, then set approval + source.commit
+owner: adam
+created: 2026-10-20
+tags: [tooling, smoke]
+
+question:
+  summary: Does a spec compile into lint-clean task cards and track a run to completion.
+  questions:
+    - {id: Q1, text: Every cell's output exists and the after-gate passes.}
+
+source:
+  repo: aburan28/crypto
+  ref: main
+  frozen:
+    - {path: research/expspec_smoke_20261020/run.py, sha256: 08f1db12456193225c23c20c0065ad74d212735a4a376bffbc676eca77faa586}
+
+paths:
+  root: research/expspec_smoke_20261020
+  out: research/expspec_smoke_20261020/out
+
+matrix:
+  axes: {n: [3, 10, 100]}
+  id_template: n{{n}}
+
+steps:
+  - id: host
+    scope: per_host
+    runs_on: host
+    argv: [python3, research/expspec_smoke_20261020/run.py, host, --out, "{{paths.out}}"]
+    timeout_s: 60
+    outputs: ["{{paths.out}}/host.json"]
+    on_failure: stop
+  - id: measure
+    scope: per_cell
+    runs_on: host
+    needs: [host]
+    argv: [python3, research/expspec_smoke_20261020/run.py, measure, --n, "{{cell.n}}", --out, "{{paths.out}}/cell-{{cell.id}}.json"]
+    timeout_s: 60
+    outputs: ["{{paths.out}}/cell-{{cell.id}}.json"]
+    done_when: [{kind: file_exists, path: "{{paths.out}}/cell-{{cell.id}}.json"}]
+    capture: {last_cell: {json_key: cell_done}}
+    gates: {after: [cell-ok]}
+    evidence: true
+    on_failure: skip_cell
+  - id: summarize
+    scope: once
+    runs_on: controller
+    needs: [measure]
+    argv: [python3, research/expspec_smoke_20261020/run.py, summarize, --dir, "{{paths.out}}", --out, "{{paths.out}}/summary.json"]
+    timeout_s: 60
+    outputs: ["{{paths.out}}/summary.json"]
+
+gates:
+  - id: cell-ok
+    kind: checks
+    description: the cell's JSON says ok
+    checks: [{kind: json, json: {file: "{{paths.out}}/cell-{{cell.id}}.json", path: ok}, op: eq, value: true}]
+    on_fail: void_cell
+
+hosts:
+  selection: ordered
+  candidates:
+    - id: laptop
+      backend: local
+      paid: false
+      provides: {vcpus: 4, memory_gb: 8, arch: any}
+      timing_valid: false
+      preemptible: false
+
+budget: {max_cost_usd: 0, max_wall_hours: 1}
+
+metrics:
+  - {id: value, kind: counted, description: triangular number, source: {file: "{{paths.out}}/cell-{{cell.id}}.json", path: value}, primary: true}
+
+outcome:
+  decision_rules:
+    - {id: R1, about: [Q1], when: every cell done and cell-ok passed, verdict: the loop works,
+       checks: [{kind: json, json: {file: "{{paths.out}}/summary.json", path: all_ok}, op: eq, value: true}]}
+  censoring: [none expected]
+
+reporting:
+  results_file: research/expspec_smoke_20261020/RESULTS.md
+  required_artifacts: ["{{paths.out}}/cell-{{cell.id}}.json", "{{paths.out}}/summary.json"]
+  visuals: false
+
+agent:
+  executor_model: claude-haiku-5-5
+  director_model: claude-sonnet-5-5
+  autonomy: {launch_paid_host: never, terminate_own_hosts: allowed, git_commit: never, git_push: never, open_pr: never}
+  escalate_on: [gate_failed, step_failed, spec_drift, any_error]
