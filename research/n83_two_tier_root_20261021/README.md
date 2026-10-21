@@ -99,3 +99,16 @@ Run this only after the current monolithic control terminates, so the two
 large indices do not compete for host memory. `PASS_PROCESS` is a process
 outcome; an independent group, relation, and scalar replay must then pass
 before entering a correctness row.
+
+After a terminal process receipt, run:
+
+```sh
+python3 research/n83_two_tier_root_20261021/verify_full_control.py \
+  /absolute/path/to/new_receipt_directory
+```
+
+The verifier uses the versioned N83 group implementation and K4405 candidate
+manifest to check the exact base dump, relation sum, recovered scalar,
+single-target phase accounting, and split-table allocation. A capped process
+returns `BOUNDED_UNKNOWN`; only `PASS_INDEPENDENT_REPLAY` qualifies the local
+correctness control.
