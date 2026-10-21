@@ -2696,7 +2696,7 @@ pub(crate) fn build_inherited_macaulay_support_local(
     quadratic_generators: bool,
 ) -> Option<(Vec<u64>, Vec<Vec<u64>>)> {
     use std::sync::atomic::Ordering::Relaxed;
-    let profiling = F4_SUPPORT_LOCAL_PROFILE_ENABLED.load(Relaxed);
+    let profiling = F4_SUPPORT_LOCAL_PROFILE_ENABLED.with(std::cell::Cell::get);
     if profiling {
         support_local_counters::CALLS.fetch_add(1, Relaxed);
     }
@@ -3426,8 +3426,12 @@ static F4_SUPPORT_LOCAL_STREAM: std::sync::atomic::AtomicBool =
     std::sync::atomic::AtomicBool::new(false);
 static F4_SUPPORT_LOCAL_BITMAP_COLUMNS: std::sync::atomic::AtomicBool =
     std::sync::atomic::AtomicBool::new(false);
-static F4_SUPPORT_LOCAL_PROFILE_ENABLED: std::sync::atomic::AtomicBool =
-    std::sync::atomic::AtomicBool::new(false);
+thread_local! {
+    // The profile API is for a single-threaded solve. A process-global flag
+    // also counted unrelated solves running on other test/worker threads.
+    static F4_SUPPORT_LOCAL_PROFILE_ENABLED: std::cell::Cell<bool> =
+        std::cell::Cell::new(false);
+}
 static F4_INHERITED_BASIS_PROFILE_ENABLED: std::sync::atomic::AtomicBool =
     std::sync::atomic::AtomicBool::new(false);
 mod inherited_basis_counters {
@@ -3644,7 +3648,7 @@ pub fn set_f4_support_local_bitmap_columns(enabled: bool) {
 
 /// Enable nested support-local build timers before a single-threaded solve.
 pub fn set_f4_support_local_profile(enabled: bool) {
-    F4_SUPPORT_LOCAL_PROFILE_ENABLED.store(enabled, std::sync::atomic::Ordering::Relaxed);
+    F4_SUPPORT_LOCAL_PROFILE_ENABLED.with(|flag| flag.set(enabled));
 }
 
 pub fn support_local_build_profile_reset() {
@@ -6940,6 +6944,13 @@ mod tests {
         let original = build_inherited_macaulay_support_local(&polys, n_vars, 3, mask, false);
         set_f4_support_local_profile(true);
         support_local_build_profile_reset();
+        let other_polys = polys.clone();
+        std::thread::spawn(move || {
+            build_inherited_macaulay_support_local(&other_polys, n_vars, 3, mask, false)
+        })
+        .join()
+        .unwrap();
+        assert_eq!(support_local_build_profile().calls, 0);
         let profiled = build_inherited_macaulay_support_local(&polys, n_vars, 3, mask, false);
         assert_eq!(original, profiled);
         let p = support_local_build_profile();
