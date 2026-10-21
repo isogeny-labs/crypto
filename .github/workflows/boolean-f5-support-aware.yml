@@ -64,6 +64,8 @@ jobs:
         run: |
           python3 tools/isolated_bench.py busy -- cargo test --release --locked --manifest-path research/boolean_f5_support_aware_20261002/Cargo.toml -- --test-threads=1
           python3 tools/isolated_bench.py busy -- cargo test --lib word_aligned_prefix_then_resume_matches_fresh_echelon
+      - name: Install rustfmt (the runner toolchain ships without it)
+        run: rustup component add rustfmt
       - name: Rust formatting
         run: cargo fmt --manifest-path research/boolean_f5_support_aware_20261002/Cargo.toml --check
       - name: Development exact-output processes
