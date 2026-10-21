@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# Means over the recorded lines of run.sh's raw files (awk only).
+# Aggregate retained records; F4 totals are normalized by declared systems.
 set -euo pipefail
 OUT=${1:?outdir}
+SYSTEMS=${2:?number of F4 systems (seeds times residuals)}
+[[ "$SYSTEMS" =~ ^[1-9][0-9]*$ ]] || { echo "systems must be a positive integer" >&2; exit 2; }
 R="$OUT/raw"
-awk '{d=$5+0; R[d]+=$8; P[d]+=$13; n[d]++}
-  END{print "degree systems rows pivots zero"; for(d=2;d<=12;d++) if(n[d]) printf "%d %d %.2f %.2f %.2f\n",d,n[d],R[d]/n[d],P[d]/n[d],(R[d]-P[d])/n[d]}' \
+awk -v systems="$SYSTEMS" '{d=$5+0; R[d]+=$8; P[d]+=$13; n[d]++}
+  END{print "degree step_records rows pivots zero"; for(d=2;d<=12;d++) if(n[d]) printf "%d %d %.2f %.2f %.2f\n",d,n[d],R[d]/systems,P[d]/systems,(R[d]-P[d])/systems}' \
   "$R/f4steps.txt" > "$OUT/f4_by_degree.txt"
 grep '^LEADS' "$R/lin_breakdown_p101.log" | awk '
   $2 ~ /^nf=/ {split($2,a,"="); nf+=a[2]; n1++; s=$0; sub(/.*\[/,"",s); sub(/\].*/,"",s); m=split(s,v,", "); for(k=1;k<=m;k++) dc[k]+=v[k]}

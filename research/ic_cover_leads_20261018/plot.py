@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker
 
 RUN = Path(sys.argv[1])
-RUN_ID = RUN.name
+RUN_ID = sys.argv[2] if len(sys.argv) > 2 else RUN.name
 OUT = Path(__file__).parent
 BLUE, ORANGE, GREEN, GREY, INK = "#2a78d6", "#eb6834", "#1baf7a", "#c3c2b7", "#1a1a19"
 plt.rcParams.update({"font.size": 9, "axes.edgecolor": "#898781", "axes.labelcolor": INK,
@@ -31,6 +31,8 @@ def table(name):
 def save(fig, stem):
     fig.tight_layout()
     fig.savefig(OUT / f"{stem}.svg")
+    svg = OUT / f"{stem}.svg"
+    svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
     fig.savefig(OUT / f"{stem}.png", dpi=150)
     plt.close(fig)
 
@@ -66,8 +68,8 @@ f = table("f4_by_degree.txt")
 fig, ax = plt.subplots(figsize=(6.0, 2.9))
 d = [r["degree"] for r in f]
 ax.bar(d, [r["pivots"] for r in f], color=BLUE, width=0.6, label="rows that give a pivot")
-ax.bar(d, [r["zero"] for r in f], bottom=[r["pivots"] + 2 for r in f], color=ORANGE, width=0.6,
-       label="rows reducing to zero (F5 removes these)")
+ax.bar(d, [r["zero"] for r in f], bottom=[r["pivots"] for r in f], color=ORANGE, width=0.6,
+       label="rows reducing to zero (recorded F4 trace)")
 for r in f:
     if r["zero"]:
         ax.text(r["degree"], r["rows"] + 6, f"{r['zero']:.0f}", ha="center", fontsize=8, color=INK)
@@ -82,7 +84,7 @@ for s in ("top", "right"):
     ax.spines[s].set_visible(False)
 save(fig, "f4_by_degree")
 
-# 3. Non-unit columns of each multiplication matrix.
+# 3. Columns with more than one nonzero entry.
 lb = kv("lin_breakdown.txt")
 fig, ax = plt.subplots(figsize=(6.0, 2.6))
 xs = [f"x{k}" for k in range(1, 7)]
@@ -93,7 +95,7 @@ for x, v in zip(xs, vals):
 ax.axhline(64, color="#898781", lw=1, ls="--")
 ax.text(5.45, 64, "δ = 64", va="bottom", ha="right", fontsize=8, color=INK)
 ax.set_ylim(0, 75)
-ax.set_ylabel("non-unit columns of M_xi (of δ)")
+ax.set_ylabel("columns with >1 nonzero in M_xi (of δ)")
 ax.set_title(f"Multiplication matrices: M_x6 (green, last grevlex variable) is the sparse one\n"
              f"p = 101, {lb['systems']:.0f} systems, {RUN_ID}", fontsize=8.5)
 for s in ("top", "right"):
