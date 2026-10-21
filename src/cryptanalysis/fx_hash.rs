@@ -10,8 +10,31 @@
 use std::collections::{HashMap, HashSet};
 use std::hash::{BuildHasherDefault, Hasher};
 
-#[derive(Default, Clone, Copy)]
+/// Hash salt.  Zero in every non-test build, so production hashing is
+/// unchanged; tests set it to prove that no counted quantity depends on
+/// hash layout (and so on the table implementation of a given ISA).
+#[cfg(test)]
+pub(crate) static TEST_SALT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+#[inline]
+fn diag_salt() -> u64 {
+    #[cfg(test)]
+    {
+        TEST_SALT.load(std::sync::atomic::Ordering::Relaxed)
+    }
+    #[cfg(not(test))]
+    {
+        0
+    }
+}
+
+#[derive(Clone, Copy)]
 pub(crate) struct FxHasher(u64);
+impl Default for FxHasher {
+    fn default() -> Self {
+        FxHasher(diag_salt())
+    }
+}
 
 impl Hasher for FxHasher {
     #[inline]
@@ -55,8 +78,13 @@ pub(crate) type FxSet<K> = HashSet<K, FxBuild>;
 /// run.  The splitmix64 finaliser spreads every input bit over every output
 /// bit.  It is the hasher the inherited engine's cached column layouts have
 /// always used; a lookup returns what it would under any other hash.
-#[derive(Default, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub(crate) struct MaskHasher(u64);
+impl Default for MaskHasher {
+    fn default() -> Self {
+        MaskHasher(diag_salt())
+    }
+}
 
 impl Hasher for MaskHasher {
     #[inline]
@@ -74,7 +102,7 @@ impl Hasher for MaskHasher {
 
     #[inline]
     fn write_u64(&mut self, value: u64) {
-        let mut mixed = value.wrapping_add(0x9e3779b97f4a7c15);
+        let mut mixed = value.wrapping_add(0x9e3779b97f4a7c15).wrapping_add(self.0);
         mixed = (mixed ^ (mixed >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
         mixed = (mixed ^ (mixed >> 27)).wrapping_mul(0x94d049bb133111eb);
         self.0 = mixed ^ (mixed >> 31);

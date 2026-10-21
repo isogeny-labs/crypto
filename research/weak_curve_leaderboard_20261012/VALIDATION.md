@@ -504,3 +504,7 @@ The new Lean module proves unique extension for every assignment of the old
 logarithms. The validator now checks 26 indexed criteria and 38 WAM1
 research checks; this is a registry and static-site-data update, not a new
 hosted deployment.
+
+## Merged-tree artifact hashes
+
+The canonical `ARTIFACTS.sha256` now checks the merged tree. The exact manifests from the two merge parents are retained as `ARTIFACTS.pr-2116-head-11f29e2.sha256` and `ARTIFACTS.target-2d84f819.sha256`; their original file contents are also preserved in their respective parent commits.
