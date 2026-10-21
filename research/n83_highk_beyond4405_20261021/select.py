@@ -128,12 +128,12 @@ def select(data: dict, dispatch: dict) -> dict:
                     mean_log - margin, mean_log + margin],
             })
     fastest = min(fixed_ids, key=geometric.__getitem__)
-    selected = all(
+    selected = all(row["significant_at_one_over_60"]
+                   for row in comparisons) and all(
         ((row["first"] == fastest and
           row["first_wins"] > row["second_wins"]) or
          (row["second"] == fastest and
-          row["second_wins"] > row["first_wins"])) and
-        row["significant_at_one_over_60"]
+          row["second_wins"] > row["first_wins"]))
         for row in comparisons if fastest in (row["first"], row["second"])
     )
     result.update({
