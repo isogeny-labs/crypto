@@ -91,6 +91,9 @@ Each of these was found in real transcripts, and each changes the answer:
   unknown, not free. If any ledger record is unpriced, the summary reports
   only a known subtotal and leaves total cost and cost per accepted outcome
   null, including when the unpriced record was a rejected attempt.
+- Model prices match exact IDs, optionally followed by an eight-digit dated
+  snapshot suffix and/or `[1m]`. Other version or preview suffixes remain
+  unpriced even when they share a prefix with a known model.
 
 ## Tests
 

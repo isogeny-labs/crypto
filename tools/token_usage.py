@@ -34,6 +34,7 @@ import glob
 from html import escape
 import json
 import os
+import re
 import sys
 from dataclasses import dataclass, field
 
@@ -54,7 +55,7 @@ def price_entry(prices: dict, model: str) -> dict | None:
         return models[model]
     # Tolerate suffixes such as "[1m]" or a dated snapshot of a known id.
     for mid in sorted(models, key=len, reverse=True):
-        if model.startswith(mid):
+        if model.startswith(mid) and re.fullmatch(r"(?:-[0-9]{8})?(?:\[1m\])?", model[len(mid):]):
             return models[mid]
     return None
 

@@ -117,6 +117,18 @@ class SessionTests(unittest.TestCase):
 
 
 class PricingTests(unittest.TestCase):
+    def test_unknown_model_version_is_not_a_known_prefix(self):
+        for model in ("claude-opus-5-6", "claude-opus-50", "claude-haiku-5-5-preview"):
+            with self.subTest(model=model):
+                self.assertIsNone(tu.price_entry(PRICES, model))
+                self.assertIsNone(tu.request_cost(PRICES, model, tu.Usage(input=100)))
+
+    def test_dated_snapshot_and_context_suffix_remain_priced(self):
+        model = "claude-opus-5-5"
+        for suffix in ("-20261006", "[1m]", "-20261006[1m]"):
+            with self.subTest(suffix=suffix):
+                self.assertEqual(tu.price_entry(PRICES, model + suffix), PRICES["models"][model])
+
     def test_haiku_long_context_per_request(self):
         small = tu.request_cost(PRICES, "claude-haiku-5-5", tu.Usage(input=100_000, output=1_000))
         big = tu.request_cost(PRICES, "claude-haiku-5-5", tu.Usage(input=100_001, output=1_000))
