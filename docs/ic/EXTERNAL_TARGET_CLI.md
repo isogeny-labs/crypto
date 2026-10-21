@@ -147,6 +147,8 @@ not a claim against the repository's full IC-versus-rho measurement gates.
 crypto cryptanalysis aes-attack --technique differential
 crypto cryptanalysis aes-attack --technique linear
 crypto cryptanalysis aes-attack --technique square
+crypto cryptanalysis aes-differential-observed --input chosen-pairs.json
+crypto cryptanalysis aes-linear-observed --input known-pairs.json
 crypto cryptanalysis aes-distinguisher --technique impossible --samples 4096
 crypto cryptanalysis aes-distinguisher --technique yoyo --samples 4096
 crypto cryptanalysis aes-distinguisher --technique mixture --samples 4096
@@ -173,6 +175,31 @@ analysis key; the S-box check concerns the public substitution table. Each
 command reports the configured sample count and its observed structural
 check. These are distinct input models and do not imply an attack on
 full-round AES.
+
+`aes-differential-observed` accepts caller-supplied data for the reduced
+two-round cipher (the last round omits MixColumns):
+
+```json
+{"alpha":115,"pairs":[{"p0_hex":"00112233445566778899aabbccddeeff","p1_hex":"73112233445566778899aabbccddeeff","c0_hex":"<32 hex digits>","c1_hex":"<32 hex digits>"}]}
+```
+
+Supply at least two and at most 100,000 pairs. Each pair must change only
+plaintext byte zero by `alpha`, and its ciphertext difference must have
+exactly active positions 0, 7, 10, and 13. The result contains four
+last-round key-byte candidates at those positions and reports
+`partial_candidate`; this does not identify a whole AES-128 key.
+
+`aes-linear-observed` accepts `{"pairs":[{"plaintext_hex":"<32 hex
+digits>","ciphertext_hex":"<32 hex digits>"}],"verification_pairs":[...]}`.
+It requires 16–100,000 training pairs and permits up to 100,000 independent
+verification pairs. The one-round model omits final MixColumns. The current
+byte recovery routine enumerates S-box input-byte candidates and checks a
+constant output XOR across observations; its output is not a LAT-derived
+multi-round linear attack. It reports `candidate` without holdout data and
+`verified` only when the recovered input key reproduces every distinct
+verification pair with the reduced-round cipher. A mismatch reports
+`verification_failed` and exits unsuccessfully. Both observed-data commands
+accept local files or checked store references.
 
 `aes-cpa` accepts JSON with `plaintexts` as 16-byte hex strings and
 `traces_per_byte` as sixteen equal-length arrays of finite measured values.

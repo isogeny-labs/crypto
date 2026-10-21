@@ -16,6 +16,7 @@
 //!   mlwe    <attack>  ...              — ML-KEM / ML-DSA cryptanalysis
 
 mod cli_mlwe;
+mod cli_aes_observed;
 mod cli_pqc;
 mod cli_pqc_fast;
 
@@ -343,6 +344,18 @@ enum CryptanalysisOp {
         /// Minimum observations for each plaintext high-nibble bucket.
         #[arg(long, default_value_t = 4)]
         min_samples_per_bucket: usize,
+    },
+    /// Analyze caller-supplied chosen pairs for the two-round AES differential model.
+    AesDifferentialObserved {
+        /// JSON with alpha and chosen plaintext/ciphertext pairs.
+        #[arg(long)]
+        input: PathBuf,
+    },
+    /// Analyze caller-supplied known pairs for the one-round AES linear model.
+    AesLinearObserved {
+        /// JSON with known pairs and optional independent verification pairs.
+        #[arg(long)]
+        input: PathBuf,
     },
     /// Reverse an established AES-128 10th-round key to the master key.
     AesDfaSchedule {
@@ -2086,6 +2099,18 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
             min_samples_per_bucket,
         } => {
             if let Err(e) = cmd_aes_cache_timing(&input, min_samples_per_bucket) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesDifferentialObserved { input } => {
+            if let Err(e) = cli_aes_observed::differential(&input) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesLinearObserved { input } => {
+            if let Err(e) = cli_aes_observed::linear(&input) {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }
