@@ -9,6 +9,16 @@ upper load is at most 80% of the existing 2³¹-slot table. The K4405 measured
 process reached 22,355,877,888 bytes peak RSS in the independently replayed
 1,536-point Tier 1 screen; its online selector remained `BOUNDED_UNKNOWN`.
 
+The capacity proof is checked in `Capacity.lean` with the pinned Lean 4.35.0
+toolchain. `maxStates` is the producer's symmetric N83 state bound:
+`83 * (K * (K - 1) / 2) + 42 * K`. `maxStates_mono` proves this bound is
+monotone on natural K. `max_k_load75` proves any K with worst-case two-root
+load at most 75% of 2³¹ slots is at most 4405; `load75_4405` proves the
+boundary is attained. `max_k_load80` and `load80_4549` give the corresponding
+80% boundary. `lean-check.log` records a successful module build and
+`#print axioms` reports only `propext` and `Quot.sound`. `lean4checker --fresh`
+was unavailable on this host.
+
 The next implementation will add an opt-in fixed 2³¹-slot five-byte layout
 with a declared 80% upper-load limit. It must preserve exact-key reconstruction,
 first-witness semantics, root collision handling, and the CPU fallback. The
