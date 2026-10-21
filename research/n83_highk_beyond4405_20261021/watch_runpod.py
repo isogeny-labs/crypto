@@ -9,6 +9,8 @@ import json
 from pathlib import Path
 import subprocess
 import time
+from urllib import error as url_error
+from urllib import request as url_request
 
 from research.n83_highk_beyond4405_20261021 import runpod_runner
 from research.n83_highk_online_tiebreak_20261020 import watch_runpod as provider
@@ -26,10 +28,28 @@ def write(path: Path, value: dict) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
 
 
+def graphql(query: str, key: str) -> dict:
+    payload = json.dumps({"query": query}).encode()
+    request = url_request.Request(
+        "https://api.runpod.io/graphql", data=payload,
+        headers={"Content-Type": "application/json",
+                 "Authorization": "Bearer " + key}, method="POST")
+    try:
+        with url_request.urlopen(request, timeout=30) as response:
+            result = json.load(response)
+    except url_error.HTTPError as error:
+        raise ValueError(f"RunPod API HTTP {error.code}") from None
+    if result.get("errors"):
+        raise ValueError("RunPod GraphQL response contains errors")
+    if not isinstance(result.get("data"), dict):
+        raise ValueError("RunPod GraphQL response lacks data")
+    return result
+
+
 def pod_status(pod_id: str, key: str) -> dict | None:
     query = ("query { myself { pods { id desiredStatus costPerHr machineId "
              "createdAt } } }")
-    pods = provider.graphql(query, key)["data"]["myself"]["pods"]
+    pods = graphql(query, key)["data"]["myself"]["pods"]
     return next((pod for pod in pods if pod.get("id") == pod_id), None)
 
 
@@ -71,7 +91,7 @@ def terminate(pod_id: str, key: str, output: Path) -> None:
     if before is not None:
         query = ("mutation { podTerminate(input: { podId: " +
                  json.dumps(pod_id) + " }) }")
-        response = provider.graphql(query, key)
+        response = graphql(query, key)
         write(output / "provider_terminate.json", {
             "recorded_utc": now().isoformat(), "pod_id": pod_id,
             "response": response})

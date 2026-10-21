@@ -1,5 +1,6 @@
 """Cost deadline and provider deletion controls for the fixed31 Pod."""
 
+import io
 import json
 import tempfile
 import unittest
@@ -19,6 +20,18 @@ POD = {"id": "abc123", "machineId": "machine-a", "costPerHr": 0.2,
 
 
 class WatchRunpodTest(unittest.TestCase):
+    def test_graphql_uses_bearer_header_without_sdk(self):
+        response = io.BytesIO(b'{"data":{"myself":{"pods":[]}}}')
+        with mock.patch.object(watch.url_request, "urlopen",
+                               return_value=response) as urlopen:
+            result = watch.graphql("query { myself { pods { id } } }",
+                                   "dummy-secret")
+        self.assertEqual(result["data"]["myself"]["pods"], [])
+        request = urlopen.call_args.args[0]
+        self.assertEqual(request.get_header("Authorization"),
+                         "Bearer dummy-secret")
+        self.assertEqual(urlopen.call_args.kwargs["timeout"], 30)
+
     def test_pod_launch_requires_fresh_bound_readiness(self):
         at = datetime(2030, 1, 1, 1, tzinfo=timezone.utc)
         ready = {"schema": "n83.fixed31-watchdog-ready/v1",
@@ -99,7 +112,7 @@ class WatchRunpodTest(unittest.TestCase):
             output = Path(temp)
             with (mock.patch.object(watch, "pod_status",
                                     side_effect=(POD, None)),
-                  mock.patch.object(watch.provider, "graphql",
+                  mock.patch.object(watch, "graphql",
                                     return_value={"data": {"podTerminate": None}})
                   as graphql):
                 watch.terminate("abc123", "secret", output)
