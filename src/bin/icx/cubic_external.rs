@@ -14,6 +14,12 @@ pub struct CubicArgs {
     /// JSON file or store:NAME/sha256:DIGEST reference with p, c, a, b, n, gx, gy, qx, qy.
     #[arg(long)]
     input: PathBuf,
+    /// Checked cubic-field isogeny graph JSON or store:NAME/sha256:DIGEST reference.
+    #[arg(long, requires = "route_id")]
+    route_file: Option<PathBuf>,
+    /// Root-origin route identifier in --route-file.
+    #[arg(long, requires = "route_file")]
+    route_id: Option<String>,
     #[arg(long, default_value_t = 1)]
     seed: u64,
     #[arg(long, default_value_t = 100_000)]
@@ -69,6 +75,9 @@ fn count_curve_order3(field: &Fp3, a: &E3, b: &E3) -> u64 {
 }
 
 pub fn solve(args: &CubicArgs) -> Result<Value, String> {
+    if args.route_file.is_some() != args.route_id.is_some() {
+        return Err("--route-file and --route-id must be supplied together".into());
+    }
     let resolved = crypto_lib::store::resolve_path(&args.input)?;
     let bytes = std::fs::read(&resolved)
         .map_err(|e| format!("cannot read {}: {e}", args.input.display()))?;
@@ -131,7 +140,35 @@ pub fn solve(args: &CubicArgs) -> Result<Value, String> {
     }
     // `d` is used only for generated known-answer reports. External input is
     // verified by replay of the recovered scalar, without a planted answer.
-    let inst = Instance3 { curve, q, d: 0 };
+    let source = Instance3 { curve, q, d: 0 };
+    let (inst, route) = if let (Some(path), Some(id)) = (&args.route_file, &args.route_id) {
+        let transport = super::cubic_route::transport(&source.curve, q, path, id)?;
+        let destination_order = count_curve_order3(
+            &transport.curve.field,
+            &transport.curve.a,
+            &transport.curve.b,
+        );
+        if destination_order != curve_order {
+            return Err("cubic route destination has a different counted curve order".into());
+        }
+        (
+            Instance3 {
+                curve: transport.curve,
+                q: transport.target,
+                d: 0,
+            },
+            Some(transport.receipt),
+        )
+    } else {
+        (
+            Instance3 {
+                curve: source.curve.clone(),
+                q,
+                d: 0,
+            },
+            None,
+        )
+    };
     let mut rng = StdRng::seed_from_u64(args.seed);
     let base = SubspaceBase::build(&inst, &mut rng);
     if base.is_empty() {
@@ -158,25 +195,25 @@ pub fn solve(args: &CubicArgs) -> Result<Value, String> {
             ..GaudryOptions::default()
         },
     );
-    let verified = report
-        .recovered_scalar
-        .is_some_and(|d| inst.curve.mul(&g, d) == q);
+    let verified = report.recovered_scalar.is_some_and(|d| {
+        inst.curve.mul(&inst.curve.g, d) == inst.q && source.curve.mul(&g, d) == q
+    });
     let mut ic = serde_json::to_value(&report).map_err(|e| e.to_string())?;
     ic.as_object_mut().unwrap().remove("correct");
     ic["verified"] = json!(verified);
     let rho = if args.skip_rho {
         None
     } else {
-        let rr = run_rho3(&inst, args.seed ^ 0x3141_5926);
+        let rr = run_rho3(&source, args.seed ^ 0x3141_5926);
         let rho_verified = rr
             .recovered_scalar
-            .is_some_and(|d| inst.curve.mul(&g, d) == q);
+            .is_some_and(|d| source.curve.mul(&g, d) == q);
         let mut row = serde_json::to_value(&rr).map_err(|e| e.to_string())?;
         row.as_object_mut().unwrap().remove("correct");
         row["verified"] = json!(rho_verified);
         Some(row)
     };
-    Ok(json!({
+    let mut result = json!({
         "schema_version": 1,
         "operation": "solve-cubic",
         "status": if verified { "complete" } else { "bounded_unknown" },
@@ -190,7 +227,11 @@ pub fn solve(args: &CubicArgs) -> Result<Value, String> {
         "config": {"seed": args.seed, "max_residuals": args.max_residuals, "cofactor": cofactor},
         "ic": ic,
         "rho": rho,
-    }))
+    });
+    if let Some(receipt) = route {
+        result["route"] = receipt;
+    }
+    Ok(result)
 }
 
 #[cfg(test)]
@@ -219,6 +260,8 @@ mod tests {
         };
         let report = solve(&CubicArgs {
             input: fixture("cubic_f7_cofactor12_public_target.json"),
+            route_file: None,
+            route_id: None,
             seed: 1,
             max_residuals: 1_000,
             skip_rho: true,
@@ -232,11 +275,31 @@ mod tests {
 
         let rejected = solve(&CubicArgs {
             input: fixture("cubic_f7_cofactor8_input.json"),
+            route_file: None,
+            route_id: None,
             seed: 1,
             max_residuals: 100,
             skip_rho: true,
         })
         .unwrap_err();
         assert!(rejected.contains("factor base projects entirely to the identity"));
+    }
+
+    #[test]
+    fn cubic_isogeny_route_recovers_source_scalar() {
+        let fixtures = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("docs/ic/fixtures");
+        let report = solve(&CubicArgs {
+            input: fixtures.join("cubic_f7_cofactor12_public_target.json"),
+            route_file: Some(fixtures.join("cubic_f7_cofactor12_isogeny_route.json")),
+            route_id: Some("root-to-velu3".into()),
+            seed: 1,
+            max_residuals: 1_000,
+            skip_rho: true,
+        })
+        .unwrap();
+        assert_eq!(report["route"]["nodes_verified"], 2);
+        assert_eq!(report["route"]["edges_verified"], 1);
+        assert_eq!(report["ic"]["recovered_scalar"], 5);
+        assert_eq!(report["verified"], true);
     }
 }

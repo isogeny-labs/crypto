@@ -23,6 +23,8 @@ use serde_json::{json, Value};
 
 #[path = "icx/cubic_external.rs"]
 mod cubic_external;
+#[path = "icx/cubic_route.rs"]
+mod cubic_route;
 #[path = "icx/parameters.rs"]
 mod parameters;
 #[path = "icx/prime_external.rs"]

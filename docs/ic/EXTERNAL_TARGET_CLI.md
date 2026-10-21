@@ -105,6 +105,36 @@ A separate live S3 test fetched this input into a fresh cache through the
 and cleanup receipt is
 [`CUBIC_TARGET_S3_ACCEPTANCE_20261018.json`](../store/CUBIC_TARGET_S3_ACCEPTANCE_20261018.json).
 
+### Checked cubic-field isogeny route
+
+The cofactor-12 input also has a rational order-3 kernel over its specified
+cubic field. Both `ic` and `icx` can verify the corresponding graph and
+transport the public generator and target before collecting relations:
+
+```sh
+ic solve-cubic \
+  --input docs/ic/fixtures/cubic_f7_cofactor12_public_target.json \
+  --route-file docs/ic/fixtures/cubic_f7_cofactor12_isogeny_route.json \
+  --route-id root-to-velu3 --seed 1 --max-residuals 1000 --skip-rho --json
+```
+
+The route file can also be an indexed `store:NAME` or `sha256:DIGEST`
+reference. Its schema fixes `field_characteristic` and `cubic_nonresidue`,
+lists bounded short-Weierstrass `curve_nodes` with canonical three-coefficient
+`a` and `b`, and records each edge's source, target, odd prime degree in
+`3..=31`, and affine `kernel_generator`. Each route is a root-origin sequence
+of edge IDs. The command verifies every node, edge, and route, checks each
+kernel's exact prime order, independently reconstructs the Vélu codomain,
+checks the transported point map against doubling and subgroup order, and
+counts the destination curve order. A recovered scalar is replayed on both
+the destination and the caller's original `G,Q` pair. The rho reference stays
+on that original pair. The JSON `route` receipt records the graph hash,
+verification counts, destination model, and transported points.
+A live run resolved this route through `store:` from an empty cache, recovered
+and replayed scalar 5, verified the object in S3, and removed only its isolated
+acceptance object. Its nine checks are recorded in
+[`CUBIC_ROUTE_S3_ACCEPTANCE_20261020.json`](../store/CUBIC_ROUTE_S3_ACCEPTANCE_20261020.json).
+
 The prime and cubic commands return `bounded_unknown` with a nonzero exit
 status if their configured IC budget ends without a verified scalar. These
 finite input ranges describe the implemented solvers; they do not certify

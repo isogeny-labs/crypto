@@ -7,6 +7,8 @@ mod boundary;
 mod corpus;
 #[path = "icx/cubic_external.rs"]
 mod cubic_external;
+#[path = "icx/cubic_route.rs"]
+mod cubic_route;
 #[path = "ic/descent.rs"]
 mod descent;
 #[path = "ic/experiment.rs"]

@@ -43,8 +43,10 @@ const HW_INSTRUCTIONS: u64 = 1;
 const SW_TASK_CLOCK: u64 = 1;
 const SW_PAGE_FAULTS: u64 = 2;
 /// `read_format`: TOTAL_TIME_ENABLED | TOTAL_TIME_RUNNING.
+#[cfg(target_os = "linux")]
 const READ_FORMAT: u64 = 0b11;
 /// `attr.flags` bits: disabled, inherit, exclude_kernel, exclude_hv.
+#[cfg(target_os = "linux")]
 const FLAGS: u64 = 1 | 1 << 1 | 1 << 5 | 1 << 6;
 const IOC_ENABLE: libc::c_ulong = 0x2400;
 const IOC_DISABLE: libc::c_ulong = 0x2401;
@@ -94,6 +96,7 @@ struct Counters {
     selftest: bool,
 }
 
+#[cfg(target_os = "linux")]
 fn open_event(type_: u32, config: u64) -> Result<libc::c_int, i32> {
     let attr = PerfEventAttr {
         type_,
@@ -119,6 +122,11 @@ fn open_event(type_: u32, config: u64) -> Result<libc::c_int, i32> {
     } else {
         Ok(fd as libc::c_int)
     }
+}
+
+#[cfg(not(target_os = "linux"))]
+fn open_event(_type: u32, _config: u64) -> Result<libc::c_int, i32> {
+    Err(libc::ENOSYS)
 }
 
 impl Counters {
