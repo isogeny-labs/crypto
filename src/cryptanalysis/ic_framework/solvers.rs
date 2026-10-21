@@ -134,6 +134,103 @@ fn verified(points: Vec<u64>, system: &BooleanSystem, tests: &mut u64) -> Vec<u6
         .collect()
 }
 
+/// The cost record of one F2 F4 run: elimination word XORs as `ops`,
+/// every [`F4Stats`] counter in `extra`.
+fn f4_cost(st: &crate::cryptanalysis::pq_f4_f2::F4Stats) -> SolverCost {
+    let mut extra = BTreeMap::new();
+    for (k, v) in [
+        ("steps", st.steps),
+        ("pairs_reduced", st.pairs_reduced),
+        ("field_pairs_reduced", st.field_pairs_reduced),
+        ("pairs_product_skipped", st.pairs_product_skipped),
+        ("pairs_chain_skipped", st.pairs_chain_skipped),
+        ("pair_dense_select_calls", st.pair_dense_select_calls),
+        (
+            "pair_quadratic_select_calls",
+            st.pair_quadratic_select_calls,
+        ),
+        ("pair_candidate_visits", st.pair_candidate_visits),
+        ("pair_lcm_groups", st.pair_lcm_groups),
+        ("pair_cover_lookups", st.pair_cover_lookups),
+        (
+            "pair_dense_scratch_bytes_max",
+            st.pair_dense_scratch_bytes_max,
+        ),
+        (
+            "inner_build_parallel_disabled_calls",
+            st.inner_build_parallel_disabled_calls,
+        ),
+        ("reducer_rows", st.reducer_rows),
+        ("matrix_rows_max", st.matrix_rows_max),
+        ("matrix_cols_max", st.matrix_cols_max),
+        ("matrix_rows_sum", st.matrix_rows_sum),
+        ("word_xors_performed", st.word_xors_performed),
+        ("divisor_tests", st.divisor_tests),
+        ("new_elements", st.new_elements),
+        ("max_poly_degree", u64::from(st.max_poly_degree)),
+        ("basis_len", st.basis_len),
+        ("peak_matrix_bytes", st.peak_matrix_bytes),
+        ("peak_table_bytes", st.peak_table_bytes),
+        ("full_m4ri_matrices", st.full_m4ri_matrices),
+        ("full_m4ri_blocks", st.full_m4ri_blocks),
+        ("full_m4ri_table_word_xors", st.full_m4ri_table_word_xors),
+        ("build_ns", st.build_ns),
+        ("eliminate_ns", st.eliminate_ns),
+        ("f4_wall_ns", st.wall_ns),
+        ("pairs_left", st.pairs_left),
+        ("oversize", st.oversize as u64),
+    ] {
+        extra.insert(k.to_string(), v);
+    }
+    for (index, label) in [
+        "lt256",
+        "r256_511",
+        "r512_1023",
+        "r1024_2047",
+        "r2048_4095",
+        "ge4096",
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        for (metric, value) in [
+            ("count", st.matrix_profile_counts[index]),
+            ("rows_sum", st.matrix_profile_rows_sum[index]),
+            ("cols_sum", st.matrix_profile_cols_sum[index]),
+            ("eliminate_ns", st.matrix_profile_eliminate_ns[index]),
+            ("logical_xors", st.matrix_profile_logical_xors[index]),
+            ("performed_xors", st.matrix_profile_performed_xors[index]),
+            ("full_m4ri_count", st.matrix_profile_full_m4ri_counts[index]),
+        ] {
+            extra.insert(format!("matrix_profile_{label}_{metric}"), value);
+        }
+    }
+    for (metric, value) in [
+        ("eliminate_ns", st.matrix_profile_unbinned_eliminate_ns),
+        ("logical_xors", st.matrix_profile_unbinned_logical_xors),
+        ("performed_xors", st.matrix_profile_unbinned_performed_xors),
+    ] {
+        extra.insert(format!("matrix_profile_unbinned_{metric}"), value);
+    }
+    SolverCost {
+        ops: st.word_xors,
+        op_unit: "word XORs (elimination only)".into(),
+        wall_ns: 0,
+        // Tables and their matrix are simultaneously live.  Summing
+        // their individually observed maxima is a conservative
+        // per-call upper bound and avoids silently omitting the table
+        // storage from charged memory.
+        peak_bytes: st
+            .peak_matrix_bytes
+            .saturating_add(st.peak_table_bytes)
+            .saturating_add(st.pair_dense_scratch_bytes_max),
+        degree_reached: Some(st.degree_reached),
+        solving_degree: Some(st.solving_degree),
+        timed_out: st.timed_out,
+        extra,
+    }
+}
+
 // ── F4 ─────────────────────────────────────────────────────────────
 
 /// Faugère's F4 over the boolean ring, computing the full reduced basis
@@ -165,98 +262,7 @@ impl SystemSolver for F4F2 {
         let started = Instant::now();
         let (gb, st) = groebner_basis_f4(system.equations.clone(), system.n_vars, budget);
         let mut tests = 0u64;
-        let mut extra = BTreeMap::new();
-        for (k, v) in [
-            ("steps", st.steps),
-            ("pairs_reduced", st.pairs_reduced),
-            ("field_pairs_reduced", st.field_pairs_reduced),
-            ("pairs_product_skipped", st.pairs_product_skipped),
-            ("pairs_chain_skipped", st.pairs_chain_skipped),
-            ("pair_dense_select_calls", st.pair_dense_select_calls),
-            (
-                "pair_quadratic_select_calls",
-                st.pair_quadratic_select_calls,
-            ),
-            ("pair_candidate_visits", st.pair_candidate_visits),
-            ("pair_lcm_groups", st.pair_lcm_groups),
-            ("pair_cover_lookups", st.pair_cover_lookups),
-            (
-                "pair_dense_scratch_bytes_max",
-                st.pair_dense_scratch_bytes_max,
-            ),
-            (
-                "inner_build_parallel_disabled_calls",
-                st.inner_build_parallel_disabled_calls,
-            ),
-            ("reducer_rows", st.reducer_rows),
-            ("matrix_rows_max", st.matrix_rows_max),
-            ("matrix_cols_max", st.matrix_cols_max),
-            ("matrix_rows_sum", st.matrix_rows_sum),
-            ("word_xors_performed", st.word_xors_performed),
-            ("divisor_tests", st.divisor_tests),
-            ("new_elements", st.new_elements),
-            ("max_poly_degree", u64::from(st.max_poly_degree)),
-            ("basis_len", st.basis_len),
-            ("peak_matrix_bytes", st.peak_matrix_bytes),
-            ("peak_table_bytes", st.peak_table_bytes),
-            ("full_m4ri_matrices", st.full_m4ri_matrices),
-            ("full_m4ri_blocks", st.full_m4ri_blocks),
-            ("full_m4ri_table_word_xors", st.full_m4ri_table_word_xors),
-            ("build_ns", st.build_ns),
-            ("eliminate_ns", st.eliminate_ns),
-            ("f4_wall_ns", st.wall_ns),
-            ("pairs_left", st.pairs_left),
-            ("oversize", st.oversize as u64),
-        ] {
-            extra.insert(k.to_string(), v);
-        }
-        for (index, label) in [
-            "lt256",
-            "r256_511",
-            "r512_1023",
-            "r1024_2047",
-            "r2048_4095",
-            "ge4096",
-        ]
-        .into_iter()
-        .enumerate()
-        {
-            for (metric, value) in [
-                ("count", st.matrix_profile_counts[index]),
-                ("rows_sum", st.matrix_profile_rows_sum[index]),
-                ("cols_sum", st.matrix_profile_cols_sum[index]),
-                ("eliminate_ns", st.matrix_profile_eliminate_ns[index]),
-                ("logical_xors", st.matrix_profile_logical_xors[index]),
-                ("performed_xors", st.matrix_profile_performed_xors[index]),
-                ("full_m4ri_count", st.matrix_profile_full_m4ri_counts[index]),
-            ] {
-                extra.insert(format!("matrix_profile_{label}_{metric}"), value);
-            }
-        }
-        for (metric, value) in [
-            ("eliminate_ns", st.matrix_profile_unbinned_eliminate_ns),
-            ("logical_xors", st.matrix_profile_unbinned_logical_xors),
-            ("performed_xors", st.matrix_profile_unbinned_performed_xors),
-        ] {
-            extra.insert(format!("matrix_profile_unbinned_{metric}"), value);
-        }
-        let mut cost = SolverCost {
-            ops: st.word_xors,
-            op_unit: "word XORs (elimination only)".into(),
-            wall_ns: 0,
-            // Tables and their matrix are simultaneously live.  Summing
-            // their individually observed maxima is a conservative
-            // per-call upper bound and avoids silently omitting the table
-            // storage from charged memory.
-            peak_bytes: st
-                .peak_matrix_bytes
-                .saturating_add(st.peak_table_bytes)
-                .saturating_add(st.pair_dense_scratch_bytes_max),
-            degree_reached: Some(st.degree_reached),
-            solving_degree: Some(st.solving_degree),
-            timed_out: st.timed_out,
-            extra,
-        };
+        let mut cost = f4_cost(&st);
         let verdict = if st.timed_out || st.oversize {
             SolverVerdict::BudgetExceeded
         } else {
@@ -276,6 +282,80 @@ impl SystemSolver for F4F2 {
             }
         };
         cost.extra.insert("extraction_tests".into(), tests);
+        cost.wall_ns = started.elapsed().as_nanos() as u64;
+        (verdict, cost)
+    }
+}
+
+/// [`F4F2`] that stops early: after the first degree step at which the
+/// basis's degree-1 elements leave at most `free` variables unpinned, it
+/// enumerates the `2^free` points of that affine space and checks each
+/// against the original equations, instead of finishing the pairs and
+/// interreducing.  Same ideal, so the same solutions (round 6, lead 1 of
+/// `research/isogeny_conductor_gap_round5_20261012/`).  Its `ops` charge
+/// the extraction too, one per monomial test and per word XOR of the
+/// affine elimination; [`F4F2`]'s `ops` leave its extraction tests in
+/// `extra`.
+pub struct F4F2Early;
+
+impl SystemSolver for F4F2Early {
+    fn name(&self) -> &str {
+        "f4-f2-early"
+    }
+
+    fn describe(&self) -> String {
+        "F4 over F_2[v]/(v²−v) stopped once its affine elements leave at most `free` variables unpinned, then 2^free points checked against the equations"
+            .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[(
+            "free",
+            "unpinned variables at which F4 stops and enumerates (default 8, at most 24)",
+        )]
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= 64
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        use crate::cryptanalysis::pq_f4_f2::{groebner_basis_f4_until, solutions_from_linear_part};
+        let started = Instant::now();
+        let free = (params.u64_or("free", 8).unwrap_or(8) as usize).min(24);
+        let (basis, st) =
+            groebner_basis_f4_until(system.equations.clone(), system.n_vars, budget, Some(free));
+        let mut tests = 0u64;
+        let mut xors = 0u64;
+        let mut cost = f4_cost(&st);
+        let verdict = if st.timed_out || st.oversize {
+            SolverVerdict::BudgetExceeded
+        } else {
+            match solutions_from_linear_part(
+                &basis,
+                &system.equations,
+                system.n_vars,
+                24,
+                &mut tests,
+                &mut xors,
+            ) {
+                None => SolverVerdict::BudgetExceeded,
+                Some(points) if points.is_empty() => SolverVerdict::Unsatisfiable,
+                Some(points) => SolverVerdict::Solved(points),
+            }
+        };
+        cost.ops = st.word_xors + tests + xors;
+        cost.op_unit = "word XORs (elimination, plus extraction monomial tests and affine elimination counted one each)".into();
+        cost.extra.insert("extraction_tests".into(), tests);
+        cost.extra.insert("extraction_xors".into(), xors);
+        cost.extra
+            .insert("early_stopped".into(), st.early_stopped as u64);
+        cost.extra.insert("free_at_stop".into(), st.free_at_stop);
         cost.wall_ns = started.elapsed().as_nanos() as u64;
         (verdict, cost)
     }
@@ -1031,6 +1111,7 @@ impl SystemSolver for Exhaustive {
 pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
     vec![
         Box::new(F4F2),
+        Box::new(F4F2Early),
         Box::new(BuchbergerF2),
         Box::new(HybridF4 {
             kind: HybridKind::MatrixF4,

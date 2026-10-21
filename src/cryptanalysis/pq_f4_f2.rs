@@ -201,6 +201,12 @@ pub struct F4Stats {
     /// A matrix would have exceeded [`MAX_MATRIX_WORDS`].
     pub oversize: bool,
     pub pairs_left: u64,
+    /// [`groebner_basis_f4_until`] stopped once the basis's degree-1
+    /// elements left at most its `max_free` variables unpinned; the
+    /// returned set is then not a Gröbner basis.
+    pub early_stopped: bool,
+    /// Variables no degree-1 element pinned when the run ended.
+    pub free_at_stop: u64,
 }
 
 /// The largest matrix a step may build, in 64-bit words (1 GiB).
@@ -1579,6 +1585,32 @@ pub fn groebner_basis_f4(
     n_vars: usize,
     budget: Option<Duration>,
 ) -> (Vec<F2BoolPoly>, F4Stats) {
+    groebner_basis_f4_until(initial, n_vars, budget, None)
+}
+
+/// The variables the degree-1 elements of `polys` pin: one bit per
+/// distinct leading variable.  Under a degree ordering an element whose
+/// leading monomial is a variable is affine, so each such element fixes
+/// its leading variable once the smaller ones are fixed.
+fn pinned_variables(lm: &[u64], active: &[bool]) -> u64 {
+    lm.iter()
+        .zip(active)
+        .filter(|(m, a)| **a && m.count_ones() == 1)
+        .fold(0u64, |acc, (m, _)| acc | m)
+}
+
+/// [`groebner_basis_f4`], stopping after the first step at which the
+/// degree-1 elements of the basis leave at most `max_free` variables
+/// unpinned (`None` never stops early).  The ideal is unchanged, so its
+/// solutions all lie on the affine space those elements cut out; a
+/// caller enumerates `2^free` points there and checks each against the
+/// original equations ([`solutions_from_linear_part`]).
+pub fn groebner_basis_f4_until(
+    initial: Vec<F2BoolPoly>,
+    n_vars: usize,
+    budget: Option<Duration>,
+    max_free: Option<usize>,
+) -> (Vec<F2BoolPoly>, F4Stats) {
     static BATCH_INSERTS: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     let batch_inserts =
         *BATCH_INSERTS.get_or_init(|| std::env::var("F4_F2_BATCH_INSERTS").as_deref() != Ok("0"));
@@ -1893,8 +1925,24 @@ pub fn groebner_basis_f4(
                 s.insert(p, &mut st);
             }
         }
+        if let Some(k) = max_free {
+            let pinned = pinned_variables(&s.lm, &s.active);
+            let free = n_vars as u64 - u64::from(pinned.count_ones());
+            if free <= k as u64 {
+                st.early_stopped = true;
+                st.free_at_stop = free;
+                break;
+            }
+        }
     }
     st.pairs_left = s.pairs.len() as u64;
+    if st.early_stopped && !st.timed_out && !st.oversize {
+        let basis: Vec<F2BoolPoly> = (0..s.polys.len())
+            .filter(|&g| s.active[g])
+            .map(|g| s.polys[g].clone())
+            .collect();
+        return finish(basis, st);
+    }
     if st.timed_out || st.oversize {
         let basis: Vec<F2BoolPoly> = (0..s.polys.len())
             .filter(|&g| s.active[g])
@@ -2070,12 +2118,169 @@ pub fn solutions_from_reduced_basis(
     Some(out)
 }
 
+/// Every solution of `equations` on the affine space the degree-1
+/// elements of `basis` cut out, `basis` any generating set of the same
+/// ideal (an early-stopped F4 run): Gauss–Jordan on the affine elements,
+/// then each of the `2^free` points checked against `equations`.
+/// Returns `None` above `max_free` free variables.  Sound and complete:
+/// every zero of the ideal satisfies the affine elements, and every point
+/// returned satisfies `equations`.
+///
+/// `tests` counts monomial tests, one per term evaluated; `xors` counts
+/// the word XORs of the elimination.
+pub fn solutions_from_linear_part(
+    basis: &[F2BoolPoly],
+    equations: &[F2BoolPoly],
+    n_vars: usize,
+    max_free: usize,
+    tests: &mut u64,
+    xors: &mut u64,
+) -> Option<Vec<u64>> {
+    if basis.iter().any(is_one) {
+        return Some(Vec::new());
+    }
+    // Rows: (variable mask, constant).  Reduce to one pivot per variable.
+    let mut rows: Vec<(u64, u64)> = Vec::new();
+    for g in basis {
+        if degree(g) > 1 {
+            continue;
+        }
+        let mut mask = 0u64;
+        let mut c = 0u64;
+        for t in &g.terms {
+            if t.mask == 0 {
+                c ^= 1;
+            } else {
+                mask ^= t.mask;
+            }
+        }
+        rows.push((mask, c));
+    }
+    let mut pivots: Vec<(usize, u64, u64)> = Vec::new();
+    for (mut mask, mut c) in rows {
+        for &(v, pm, pc) in &pivots {
+            if (mask >> v) & 1 == 1 {
+                mask ^= pm;
+                c ^= pc;
+                *xors += 1;
+            }
+        }
+        if mask == 0 {
+            if c == 1 {
+                return Some(Vec::new());
+            }
+            continue;
+        }
+        let v = mask.trailing_zeros() as usize;
+        for p in pivots.iter_mut() {
+            if (p.1 >> v) & 1 == 1 {
+                p.1 ^= mask;
+                p.2 ^= c;
+                *xors += 1;
+            }
+        }
+        pivots.push((v, mask, c));
+    }
+    let pinned = pivots.iter().fold(0u64, |acc, p| acc | (1u64 << p.0));
+    let free: Vec<usize> = (0..n_vars).filter(|&v| (pinned >> v) & 1 == 0).collect();
+    if free.len() > max_free {
+        return None;
+    }
+    let mut out = Vec::new();
+    for a in 0u64..(1u64 << free.len()) {
+        let mut point = 0u64;
+        for (bit, &v) in free.iter().enumerate() {
+            if (a >> bit) & 1 == 1 {
+                point |= 1u64 << v;
+            }
+        }
+        // Each pivot row is v + (free variables) + c, fully reduced.
+        for &(v, m, c) in &pivots {
+            *tests += 1;
+            let rest = m & !(1u64 << v);
+            if ((point & rest).count_ones() as u64 + c) & 1 == 1 {
+                point |= 1u64 << v;
+            }
+        }
+        let mut ok = true;
+        for e in equations {
+            *tests += e.terms.len() as u64;
+            if e.eval(point) != 0 {
+                ok = false;
+                break;
+            }
+        }
+        if ok {
+            out.push(point);
+        }
+    }
+    Some(out)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::cryptanalysis::pq_groebner_f2::{groebner_basis_f2, reduce, spoly};
     use rand::rngs::StdRng;
     use rand::{Rng, SeedableRng};
+
+    /// **Stopping early and enumerating the affine part finds the full
+    /// run's solutions**: on random dense quadratic systems with planted
+    /// and without planted solutions, for every stopping threshold.
+    #[test]
+    fn early_stopped_f4_finds_the_full_runs_solutions() {
+        let mut rng = StdRng::seed_from_u64(29);
+        for case in 0..40 {
+            let n = 8 + case % 7;
+            let planted = (case % 3 != 0).then(|| rng.gen::<u64>() & ((1u64 << n) - 1));
+            let m = n + 2 + case % 4;
+            let eqs: Vec<F2BoolPoly> = (0..m)
+                .map(|_| {
+                    let mut masks = Vec::new();
+                    for a in 0..n {
+                        for b in a..n {
+                            if rng.gen_bool(0.5) {
+                                masks.push((1u64 << a) | (1u64 << b));
+                            }
+                        }
+                    }
+                    if rng.gen_bool(0.5) {
+                        masks.push(0);
+                    }
+                    let mut p = F2BoolPoly::from_monos(
+                        masks.iter().map(|&m| F2BoolMono::from_mask(m)).collect(),
+                        n,
+                    );
+                    if let Some(x) = planted {
+                        if p.eval(x) == 1 {
+                            p = p.add(&F2BoolPoly::one(n));
+                        }
+                    }
+                    p
+                })
+                .collect();
+            let (gb, _) = groebner_basis_f4(eqs.clone(), n, None);
+            let mut t = 0;
+            let mut full = solutions_from_reduced_basis(&gb, n, 24, &mut t).unwrap();
+            full.retain(|&v| eqs.iter().all(|e| e.eval(v) == 0));
+            full.sort_unstable();
+            if let Some(x) = planted {
+                assert!(full.contains(&x), "case {case}: the planted point solves");
+            }
+            for k in [0usize, 2, 5, 8] {
+                let (part, st) = groebner_basis_f4_until(eqs.clone(), n, None, Some(k));
+                let (mut tests, mut xors) = (0, 0);
+                let mut got = solutions_from_linear_part(&part, &eqs, n, 24, &mut tests, &mut xors)
+                    .expect("at most 24 free variables");
+                got.sort_unstable();
+                assert_eq!(
+                    got, full,
+                    "case {case}, free {k}, early {}",
+                    st.early_stopped
+                );
+            }
+        }
+    }
 
     #[test]
     fn monomial_bitmap_matches_hash_set() {
