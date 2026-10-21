@@ -1,0 +1,44 @@
+# Source compilation has no Docker daemon, privileged sidecar or AWS OIDC.
+githubConfigUrl: https://github.com/aburan28/crypto
+githubConfigSecret: arc-github-auth
+runnerScaleSetName: crypto-isolab-build
+minRunners: 0
+maxRunners: 1
+controllerServiceAccount:
+  namespace: arc-system
+  name: arc-gha-rs-controller
+listenerTemplate:
+  spec:
+    nodeSelector:
+      isolab.dev/role: system
+    containers:
+      - name: listener
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            memory: 256Mi
+template:
+  spec:
+    automountServiceAccountToken: false
+    nodeSelector:
+      gha.dev/pool: on-demand
+    tolerations:
+      - key: gha.dev/workload
+        operator: Equal
+        value: runner
+        effect: NoSchedule
+    containers:
+      - name: runner
+        image: 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/gha-runner@sha256:71692163462dc305dc4a8f312143e704938b5929b84256bec9d30a5b27e6e7bf
+        command: ["/home/runner/run.sh"]
+        resources:
+          requests:
+            cpu: 1500m
+            memory: 12Gi
+            ephemeral-storage: 10Gi
+          limits:
+            cpu: "2"
+            memory: 16Gi
+            ephemeral-storage: 80Gi

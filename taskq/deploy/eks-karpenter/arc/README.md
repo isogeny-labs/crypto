@@ -132,9 +132,11 @@ Sources: [GitHub ARC deployment](https://docs.github.com/en/actions/how-tos/mana
 
 ## Iso Lab build queue
 
-`isolab-values.yaml` defines `crypto-isolab`, a separate one-job ARC queue on
+`isolab-build-values.yaml` defines `crypto-isolab-build` for contract checks and
+source compilation, without a Docker daemon or privileged sidecar.
+`isolab-values.yaml` defines `crypto-isolab` for publishing. Each is a one-job ARC queue on
 the existing runner nodes. Its runner requests 1.5 CPUs and 12 GiB (limits
-2 CPUs/16 GiB); the Docker sidecar uses the namespace defaults. This can use
+2 CPUs/16 GiB); the publisher Docker sidecar uses the namespace defaults. This can use
 spare CPU on the memory-rich runner nodes without joining the general CI
 backlog. `minRunners: 0` allows it to idle at zero. It does not reserve EC2
 capacity or change the benchmark pool's 64-vCPU cap.
@@ -142,15 +144,20 @@ capacity or change the benchmark pool's 64-vCPU cap.
 Install this scale set separately, without resetting other live runner settings:
 
 ```sh
+helm upgrade --install crypto-isolab-build \
+  oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set \
+  --version 0.15.0 --namespace arc-runners --atomic --wait --timeout 10m \
+  -f taskq/deploy/eks-karpenter/arc/isolab-build-values.yaml
 helm upgrade --install crypto-isolab \
   oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set \
   --version 0.15.0 --namespace arc-runners --atomic --wait --timeout 10m \
   -f taskq/deploy/eks-karpenter/arc/isolab-values.yaml
+gh variable set ISOLAB_BUILD_RUNNER --repo aburan28/crypto --body crypto-isolab-build
 gh variable set ISOLAB_ACTIONS_RUNNER --repo aburan28/crypto --body crypto-isolab
 ```
 
-The Iso Lab workflow uses this queue for manual runs and same-repository PRs;
-fork PRs retain the hosted runner. Delete the variable to restore hosted
+The Iso Lab workflow uses these queues for manual runs and same-repository PRs;
+fork PRs retain the hosted runner. Delete the variables to restore hosted
 routing. Existing queued jobs retain their original routing. The builder has
 no AWS OIDC permission; only the main-branch publishing job obtains AWS
 credentials. Benchmark pods still use the dedicated `cpu-spot` nodes and
