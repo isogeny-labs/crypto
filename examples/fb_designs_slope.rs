@@ -1515,6 +1515,11 @@ fn build_system(
 // ── The driver: one child process per system ───────────────────────
 
 fn git_commit() -> String {
+    // A binary run outside a checkout (a remote host) is stamped by the
+    // runner script, which also records the binary's sha256.
+    if let Ok(c) = std::env::var("FB_DESIGNS_COMMIT") {
+        return c;
+    }
     let head = Command::new("git")
         .args(["rev-parse", "HEAD"])
         .output()
