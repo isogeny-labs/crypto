@@ -54,3 +54,13 @@ root-index construction. This is a censored local correctness attempt: the
 index completion, exact output, capacity, and performance of load80 remain
 unknown. It neither promotes K4500/K4549 nor changes the earlier measured
 load75 candidate identities.
+
+The [run report](reports/run-20261020T1604Z/report.pdf),
+[editable source](reports/run-20261020T1604Z/report.typ), and
+[stage diagram](reports/run-20261020T1604Z/stages.svg) document this censored
+attempt. Its [provenance manifest](reports/run-20261020T1604Z/provenance.json)
+binds seven retained raw files, copied byte for byte from the original local
+paths and verified against the hashes already pinned in the receipt. The
+historical source and local executable hashes also match. The executable
+remains external. These checks establish retained-byte provenance, without
+rerunning the computation or promoting an incomplete output.
