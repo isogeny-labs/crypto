@@ -8,8 +8,8 @@ import { dirname, resolve } from "node:path";
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(SCRIPT_DIR, "..");
 const OUTPUT_PATH = "docs/curves/cover-transfer-assessments.json";
-const ASSESSMENT_DATE = "2026-10-18";
-const CATALOG_COMMIT = "f8501268305c0c84d0e077a4ab9054c07ff74540";
+const ASSESSMENT_DATE = "2026-10-19";
+const CATALOG_COMMIT = "8e4c99759fd8d9594ed207d793b07b59ebaf19f7";
 const MAP_HASH_DOMAIN = "cover-transfer-assessments/v2/map_base";
 const SUBGROUP_HASH_DOMAIN = "cover-transfer-assessments/v2/subgroup_base";
 
@@ -1069,6 +1069,10 @@ async function buildSourceArtifacts() {
       "independent catalog-wide assessment verifier",
     ),
     integrityArtifact(
+      "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
+      "PDF coverage-marker metadata normalization source",
+    ),
+    integrityArtifact(
       "research/cover_transfer_assessment_20261013/README.md",
       "source-linked catalog-wide assessment report",
     ),
@@ -1560,7 +1564,7 @@ async function buildLedger() {
         assessment: freshness(
           "refuted",
           "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 2,572 current catalog models",
-          "Direct artifact replay covered only its bundled 592-row registry. Static comparison of the pinned source allowlist with the current partition places 165 binary and 1,053 direct prime-field forms inside that syntactic domain, and 1,324 extension-field plus 30 normalized-target forms outside it; this 1,218/1,354 split is not a 2,572-command artifact receipt. Current source adds those paths but has not been published in that artifact.",
+          "Direct artifact replay covered only its bundled 592-row registry. The historical static comparison classified 746 of the earlier 2,100 forms as inside the pinned source allowlist (160 binary and 586 direct prime-field) and 1,354 as outside it. That comparison has not been rerun against the expanded catalog and is not a 2,572-command artifact receipt. Current source accepts the new forms, but this artifact does not contain it.",
           [
             "research/cover_transfer_assessment_20261013/release_replay.txt",
             "src/bin/hyperelliptic_cover.rs#every_current_catalog_model_reaches_the_standalone_constructor",

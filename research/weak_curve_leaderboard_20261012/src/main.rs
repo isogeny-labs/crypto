@@ -240,7 +240,6 @@ fn named_curves() -> Result<Vec<Value>> {
                         && r["evidence"] == "exact_invariant"
                         && r["invariants"]["relative_degree"] == 5
                 })
-                .filter(|r| r["cost"]["log2_total"].as_f64().is_some())
                 .min_by(|a, b| {
                     a["cost"]["log2_total"]
                         .as_f64()

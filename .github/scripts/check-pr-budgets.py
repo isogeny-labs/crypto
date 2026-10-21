@@ -43,11 +43,24 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # Named jobs whose routine PR budget is longer than 25 minutes, each with the
 # reason. Exact on workflow path, job name and timeout; nothing else matches.
 NAMED_BUDGET_EXCEPTIONS = {
+    (".github/workflows/curve-covers.yml", "certificates"): {
+        "timeout": 45,
+        # Job 118198334025 exhausted 25 minutes while replaying the expanded
+        # 2,572-model catalog after its library and binary-transfer tests passed.
+        "reason": "Complete curve-cover certificate and expanded catalog replay",
+    },
     (".github/workflows/codeql.yml", "analyze"): {
         "timeout": 60,
         # CodeQL's Rust queries cover every Rust source in the repository and
         # were cancelled at the 25-minute cap on several PRs (2026-10-17).
         "reason": "CodeQL Rust queries over the whole repository",
+    },
+    (".github/workflows/codeql.yml", "warm-rust-cache"): {
+        "timeout": 45,
+        # Type inference over the merged tree passed 25 minutes and was
+        # cancelled mid-evaluation (run 39226121956, 2026-10-19); an
+        # interrupted evaluation leaves no reusable cache.
+        "reason": "CodeQL Rust type-inference cache warming over the whole repository",
     },
     (".github/workflows/koblitz-sota-reproduction.yml", "reproduce-toy-controls"): {
         "timeout": 45,
@@ -57,10 +70,6 @@ NAMED_BUDGET_EXCEPTIONS = {
     (".github/workflows/polynomial-reuse.yml", "correctness"): {
         "timeout": 30,
         "reason": "Polynomial-reuse correctness job; 15-minute runs that hit the 25-minute cap on slow shared runners (2026-10-17)",
-    },
-    (".github/workflows/codeql.yml", "warm-rust-cache"): {
-        "timeout": 45,
-        "reason": "Whole-library Rust type-inference warm-up; cancelled at the 25-minute cap on #2149 and #2153 (2026-10-18)",
     },
     (".github/workflows/ecbench.yml", "harness"): {
         "timeout": 45,
