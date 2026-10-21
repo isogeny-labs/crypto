@@ -1229,6 +1229,14 @@ Historical autolab, tournament and ICMS evidence keeps its own protocols.
 
 ### 13. Large files go through the store
 
+"Too big for Git" means over 5 MB (5,000,000 bytes). The `large-files` CI
+check (`scripts/check-large-files.sh`) fails a PR that adds or rewrites a
+larger file whose path `.github/large-files-allowed.txt` does not name; that
+list holds files the repository regenerates or compiles in (catalogs,
+fixtures), never raw evidence, and an entry is added only in a reviewed PR.
+Every clone downloads every file at HEAD, so each byte committed is paid again
+by every session and CI job.
+
 A factor base, relation table or raw evidence file too big for Git is pushed
 with `crypto store push` (or `ecbench store push`) and referred to by name,
 not by a local path or a one-off bucket URL: `store:<name>`, accepted

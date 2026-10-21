@@ -72,8 +72,16 @@ scripts/sparse-checkout.sh patterns --profile minimal | git sparse-checkout set 
 
 ## The harness profile
 
-`harness` (the default for `apply`) is everything except the 18 largest
-`research/` directories, plus the same Rust references inside them. It keeps
+`harness` (the default for `apply`) is everything except the `research/`
+directories holding 20 MB or more at HEAD (`HEAVY_MB`), plus the same Rust
+references inside them. The list is computed from HEAD on every `apply`, so a
+new large study drops out without a code change (39 directories on
+2026-10-20, up from the 18 the hand-written list of 2026-10-09 named). A
+partial clone cannot size a blob without downloading it, so there the script
+reads `scripts/sparse-heavy-dirs.txt`, a snapshot `heavy --write` refreshes
+from a full clone; `heavy` prints the list in use. On a cold page cache the
+computation reads the pack headers once (81 s on a 3 GB pack here, 0.4 s
+warm). It keeps
 all other studies and new `research/<topic>_<date>/` directories, where ecbench
 sessions land, so `git add` accepts them without naming them first.
 
@@ -104,9 +112,30 @@ example `create_session` when one session starts another):
   examples. When it is set, `blob_limit_kb` is ignored; prefer it when the
   task's directories are known.
 
+On 2026-10-20 a session started without either setting downloaded the whole
+of HEAD: a 3.17 GB pack for 7.5 GB on disk, of which 42 MB was blobs that only
+older commits hold. History is not the cost; the files at HEAD are. A local
+depth-1 clone of the same commit fetched 3.9 MB with `blob:none`, 167 MB with
+`blob:limit=100k` and 488 MB with `blob:limit=1m`, but a full checkout of the
+`blob:limit=1m` clone then fetched every skipped blob back (`.git` 3.0 GB). A
+filter only saves the download when the skipped files also stay off disk: use
+`blob_limit_kb` for sessions that read no large research file, and
+`sparse_checkout_paths` (or a profile) otherwise. Whether a session started
+from the claude.ai web UI can set either is an environment setting this
+document has not checked.
+
 `CRYPTO_SPARSE_PROFILE=harness` (or `minimal`) in the environment's variables
 makes `.claude/hooks/session-start.sh` apply that profile after the clone.
 That frees disk, not download time.
+
+## Sibling repositories
+
+`scripts/setup-workstation.sh` (run by the session hook) clones the missing
+sibling repositories, `cryptanalysis` by default, as partial clones: files over
+`CLONE_BLOB_LIMIT` (1m) stay on the server, and a sparse rule per file keeps
+them off disk so checkout does not fetch them back. `git ls-files` still lists
+them; `git sparse-checkout disable` fetches them all. `CLONE_FULL=1` clones
+everything.
 
 ## Off disk is not absent
 
@@ -129,6 +158,21 @@ every one that names a tracked path still matches; the 97 that match nothing
 are optional root files that do not exist (`/build.rs`, `/rustfmt.toml`,
 `/clippy.toml`, `/rust-toolchain*`, `/.cargo/`, `/LICENSE*`, `/*.rs`) and
 `/docs/ic/measurement/reports/`, which `reports-s3.yml` fills at run time.
+
+Every checkout that asks for the full history (`fetch-depth: 0`) without a
+sparse list also sets `filter: blob:none` (86 checkouts in 76 workflows on
+2026-10-20): commits and trees come in full, file contents only for HEAD, and
+any older blob a step reads (`git show <rev>:<path>`) is fetched on demand.
+Their history uses were `git merge-base`, `git cat-file -t/-e` and diffs
+against the working tree, which need no old blobs.
+
+The `large-files` workflow runs on every pull request with a blobless,
+two-file sparse checkout and fails when the PR adds or rewrites a file over
+5 MB that `.github/large-files-allowed.txt` does not name (AGENTS.md §13).
+Replayed over the last 60 merges to `main` before it landed: 55 passed, 4
+passed only through the allow list (catalog regenerations), and 1 would have
+failed (`papers/ecdlp-six-month-portfolio/evidence/catalogue.tar.xz`, 13.3 MB,
+and `reading-coverage.tar.xz`, 7.4 MB).
 
 ## New evidence: archives, and a proposal for Git LFS
 
@@ -154,6 +198,5 @@ contents on demand. Trade-offs to decide first:
 - a blobless clone with a sparse profile already avoids downloading large
   blobs a task does not read, so LFS mainly helps full clones.
 
-The alternative that needs no new service: tighten AGENTS.md §13 so any new
-file over a threshold (say 10 MB, after compression) goes through
-`crypto store push` with only its `store/index.json` entry committed.
+The alternative that needs no new service is now in force: AGENTS.md §13 sets
+the threshold at 5 MB and the `large-files` check enforces it (see CI above).

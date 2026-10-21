@@ -1,0 +1,30 @@
+name: large-files
+
+# AGENTS.md §13: no file a pull request adds or rewrites may exceed 5 MB
+# unless .github/large-files-allowed.txt names it; larger evidence goes through
+# the store. scripts/check-large-files.sh compares the PR head with its merge
+# base. The checkout is blobless and holds only the script and the allow list,
+# so the job downloads commits, trees and the changed blobs, not the 3 GB of
+# research files at HEAD.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout: |
+            scripts/check-large-files.sh
+            .github/large-files-allowed.txt
+          sparse-checkout-cone-mode: false
+      - name: New files at most 5 MB outside the allow list
+        run: scripts/check-large-files.sh "origin/${{ github.base_ref }}" HEAD

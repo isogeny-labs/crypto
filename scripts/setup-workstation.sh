@@ -386,7 +386,26 @@ clone_repo() {
   if [ -n "$free_kb" ] && [ "$free_kb" -lt 5242880 ]; then
     warn "<5 GiB free under $WORKSPACE, not cloning $name"; return 1
   fi
-  run git clone "https://github.com/$GITHUB_OWNER/$name.git" "$dir" || { warn "clone of $name failed"; return 1; }
+  local url="https://github.com/$GITHUB_OWNER/$name.git"
+  if [ "${CLONE_FULL:-0}" = 1 ]; then
+    run git clone "$url" "$dir" || { warn "clone of $name failed"; return 1; }
+    return 0
+  fi
+  # Partial clone: files over CLONE_BLOB_LIMIT stay on the server and off disk
+  # (sparse, skip-worktree) until a command needs them; `git sparse-checkout
+  # disable` fetches them all. CLONE_FULL=1 clones everything.
+  local limit="${CLONE_BLOB_LIMIT:-1m}"
+  run git clone --filter="blob:limit=$limit" --no-checkout "$url" "$dir" \
+    || { warn "clone of $name failed"; return 1; }
+  local skipped
+  skipped="$(git -C "$dir" ls-tree -r HEAD --format='%(objectname) %(path)' |
+    GIT_NO_LAZY_FETCH=1 git -C "$dir" cat-file --batch-check='%(objectname) %(rest)' 2>/dev/null |
+    awk '$2 == "missing" { sub(/^[^ ]+ missing /, ""); print }')" || true
+  { echo '/*'; [ -n "$skipped" ] && printf '%s\n' "$skipped" | sed 's/[][*?!#\\]/\\&/g; s#^#!/#'; } |
+    git -C "$dir" sparse-checkout set --no-cone --stdin \
+    && run git -C "$dir" checkout -q \
+    || { warn "checkout of $name failed"; return 1; }
+  ok "$name cloned; $(printf '%s' "$skipped" | grep -c . || true) files over $limit left on the server (git sparse-checkout disable fetches them)"
 }
 
 setup_crypto() {

@@ -1,0 +1,14 @@
+# Paths that may carry a file over 5 MB in Git (scripts/check-large-files.sh,
+# AGENTS.md §13). One bash glob per line (`*` also matches `/`). Each entry is
+# a file the repository regenerates or compiles in, not raw evidence; raw
+# evidence over the cap goes through the store.
+
+# Catalogs rebuilt by the metadata tools (.gitattributes: linguist-generated).
+docs/browser/data.json
+docs/curves/cover-links.yaml
+docs/curves/cover-transfer-assessments.json
+docs/curves/jacobian-transfers.json
+docs/curves/traits.json
+docs/curves/registry.json
+docs/curves/covers.json
+docs/ic/leaderboard.json
