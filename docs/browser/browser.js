@@ -585,7 +585,7 @@
       { key: "verified", label: "Verified", numeric: true, sort: function (s) { return s.status_counts.verified || 0; }, cell: function (s) { return tdText(String(s.status_counts.verified || 0), "n"); } },
       { key: "curves", label: "Curves", numeric: true, sort: function (s) { return s.curves.length; }, cell: function (s) { return tdText(String(s.curves.length), "n"); } },
       { key: "arms", label: "Arms", numeric: true, sort: function (s) { return s.arms.length; }, cell: function (s) { return tdText(String(s.arms.length), "n"); } },
-      { key: "dir", label: "Directory", cell: function (s) { return el("td", { class: "mono" }, [repoLink(s.dir, s.dir.replace("research/", ""))]); } }
+      { key: "dir", label: "Evidence", cell: function (s) { return el("td", { class: "mono" }, [repoLink(s.archive_path || s.dir, s.archive_path ? s.archive_member + " (archive)" : s.dir.replace("research/", ""))]); } }
     ], DATA.sessions, { sortKey: "dir" }));
   }
   function sessionDetail(id) {
@@ -597,7 +597,8 @@
     view.appendChild(el("dl", { class: "facts" }, [
       fact("Status", s.status), fact("Records", s.records), fact("By status", paramsText(s.status_counts), true), fact("Spec", s.spec_id, true),
       fact("Host class", s.env_class_id, true), fact("Binary SHA-256", s.binary_sha256, true), fact("Commit", s.git_commit, true),
-      fact("Directory", repoLink(s.dir), true)
+      fact("Evidence", repoLink(s.archive_path || s.dir), true),
+      s.archive_path ? fact("Archive member", s.archive_member, true) : null
     ]));
     view.appendChild(el("h2", { text: "Arms" }));
     view.appendChild(table([

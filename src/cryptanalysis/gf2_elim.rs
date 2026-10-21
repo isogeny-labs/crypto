@@ -54,11 +54,166 @@
 
 use rayon::prelude::*;
 
+/// Explicit per-caller policy for harnesses whose method identity binds the
+/// kernel configuration. It never changes environment variables or defaults.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct KernelPolicy {
+    pub single_write: bool,
+    pub vector_tables: bool,
+    pub serial_one_worker: bool,
+}
+
+thread_local! {
+    static KERNEL_POLICY: std::cell::Cell<Option<KernelPolicy>> = const { std::cell::Cell::new(None) };
+}
+
+/// Scope a policy to synchronous work on this thread; nested scopes and panic
+/// unwinding restore the previous value. Rayon workers retain their own policy.
+pub fn with_kernel_policy<T>(policy: KernelPolicy, work: impl FnOnce() -> T) -> T {
+    struct Restore(Option<KernelPolicy>);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            KERNEL_POLICY.with(|slot| slot.set(self.0));
+        }
+    }
+    let _restore = Restore(KERNEL_POLICY.with(|slot| slot.replace(Some(policy))));
+    work()
+}
+
 /// Whether table buffers are reused across pivot blocks (see the module
 /// documentation); off unless `KIC_GF2_REUSE_TABLE=1`.
 fn reuse_table_enabled() -> bool {
     static REUSE_TABLE: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *REUSE_TABLE.get_or_init(|| std::env::var("KIC_GF2_REUSE_TABLE").as_deref() == Ok("1"))
+}
+
+/// Experimental single-write table construction. Instruction counts can
+/// establish less initialization work, but cannot establish native speed;
+/// retain the historical default until isolated runtime comparisons exist.
+fn write_table_once_enabled() -> bool {
+    if let Some(policy) = KERNEL_POLICY.with(std::cell::Cell::get) {
+        return policy.single_write;
+    }
+    static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ENABLED.get_or_init(|| std::env::var("KIC_GF2_WRITE_TABLE_ONCE").as_deref() == Ok("1"))
+}
+
+fn vector_tables_enabled() -> bool {
+    if let Some(policy) = KERNEL_POLICY.with(std::cell::Cell::get) {
+        return policy.vector_tables;
+    }
+    static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ENABLED.get_or_init(|| std::env::var("KIC_GF2_VECTOR_TABLES").as_deref() == Ok("1"))
+}
+
+/// Experimental removal of parallel iterator plumbing with an explicitly
+/// configured one-worker process. Avoid querying/initializing the global
+/// registry in multiworker configurations; nested pools are checked below.
+fn serial_clear_enabled() -> bool {
+    if let Some(policy) = KERNEL_POLICY.with(std::cell::Cell::get) {
+        return policy.serial_one_worker;
+    }
+    static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ENABLED.get_or_init(|| {
+        let one_worker = std::env::var("RAYON_NUM_THREADS").as_deref() == Ok("1");
+        let enabled = std::env::var("KIC_GF2_SERIAL_CLEAR").as_deref() == Ok("1");
+        one_worker && enabled
+    })
+}
+
+/// Build only addressable entries, initializing each exactly once. The
+/// previous entry `g & (g - 1)` is always below `g`, so every read observes
+/// an initialized entry. The last table can be shorter than `table_size`:
+/// its selectors contain only as many bits as its remaining pivots.
+fn build_tables_once(
+    matrix: &[Vec<u64>],
+    block_start: usize,
+    pivots: usize,
+    bits: usize,
+    range: std::ops::Range<usize>,
+    table: &mut Vec<u64>,
+    word_ops: &mut u64,
+    simd: SimdKind,
+) {
+    let suffix = range.len();
+    let table_size = 1usize << bits;
+    let n_tables = pivots.div_ceil(bits);
+    let last_bits = pivots - (n_tables - 1) * bits;
+    let len = ((n_tables - 1) * table_size + (1usize << last_bits)) * suffix;
+    table.clear();
+    table.reserve(len);
+    let out = table.as_mut_ptr();
+    for t in 0..n_tables {
+        let group_len = bits.min(pivots - t * bits);
+        let base = t * table_size * suffix;
+        // SAFETY: reserve provides `len` writable slots. Entry zero is
+        // initialized here; every nonzero entry is written in full below.
+        unsafe { std::ptr::write_bytes(out.add(base), 0, suffix) };
+        for g in 1usize..(1 << group_len) {
+            let prev = g & (g - 1);
+            let src = &matrix[block_start + t * bits + g.trailing_zeros() as usize][range.clone()];
+            // SAFETY: `prev < g` is initialized, the destination is disjoint,
+            // and reserve covers both entries. ISA was checked by simd_kind.
+            // The output remains raw storage until every word is written.
+            unsafe {
+                let dst = out.add(base + g * suffix);
+                let previous = out.add(base + prev * suffix);
+                write_table_entry(dst, previous, src, simd);
+            }
+            *word_ops += suffix as u64;
+        }
+    }
+    // SAFETY: all `len` entries have been initialized. No unused tail
+    // entries are included in the vector or in the slice handed to clears.
+    unsafe { table.set_len(len) };
+}
+
+/// Initialize an entry without forming a reference to uninitialized u64s.
+unsafe fn write_table_entry(dst: *mut u64, previous: *const u64, src: &[u64], simd: SimdKind) {
+    #[cfg(target_arch = "x86_64")]
+    match simd {
+        SimdKind::Avx512 => return write_table_entry_avx512(dst, previous, src),
+        SimdKind::Avx2 => return write_table_entry_avx2(dst, previous, src),
+        SimdKind::Scalar => {}
+    }
+    let _ = simd;
+    for (i, &word) in src.iter().enumerate() {
+        dst.add(i).write(previous.add(i).read() ^ word);
+    }
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn write_table_entry_avx2(dst: *mut u64, previous: *const u64, src: &[u64]) {
+    use std::arch::x86_64::*;
+    let mut i = 0;
+    while i + 4 <= src.len() {
+        let a = _mm256_loadu_si256(previous.add(i).cast());
+        let b = _mm256_loadu_si256(src.as_ptr().add(i).cast());
+        _mm256_storeu_si256(dst.add(i).cast(), _mm256_xor_si256(a, b));
+        i += 4;
+    }
+    while i < src.len() {
+        dst.add(i).write(previous.add(i).read() ^ src[i]);
+        i += 1;
+    }
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx512f")]
+unsafe fn write_table_entry_avx512(dst: *mut u64, previous: *const u64, src: &[u64]) {
+    use std::arch::x86_64::*;
+    let mut i = 0;
+    while i + 8 <= src.len() {
+        let a = _mm512_loadu_si512(previous.add(i).cast());
+        let b = _mm512_loadu_si512(src.as_ptr().add(i).cast());
+        _mm512_storeu_si512(dst.add(i).cast(), _mm512_xor_si512(a, b));
+        i += 8;
+    }
+    while i < src.len() {
+        dst.add(i).write(previous.add(i).read() ^ src[i]);
+        i += 1;
+    }
 }
 
 /// Largest pattern width of one Gray-code table.
@@ -718,13 +873,31 @@ fn clear_block(
     let suffix = end_word - first_word;
     let n_tables = b.div_ceil(bits);
     let table_size = 1usize << bits;
-    if !reuse_table {
-        table.clear();
+    let write_once = write_table_once_enabled();
+    if write_once {
+        build_tables_once(
+            matrix,
+            block_start,
+            b,
+            bits,
+            first_word..end_word,
+            table,
+            word_ops,
+            if vector_tables_enabled() {
+                simd
+            } else {
+                SimdKind::Scalar
+            },
+        );
+    } else {
+        if !reuse_table {
+            table.clear();
+        }
+        table.resize(n_tables * table_size * suffix, 0);
     }
-    table.resize(n_tables * table_size * suffix, 0);
     // Gray-code tables: entry g of table t is the XOR of the pivots whose
     // bits within the table's group are set in g.
-    for t in 0..n_tables {
+    for t in 0..if write_once { 0 } else { n_tables } {
         let group = &pivot_cols[t * bits..((t + 1) * bits).min(b)];
         let base = t * table_size * suffix;
         if reuse_table {
@@ -773,7 +946,9 @@ fn clear_block(
     } else {
         &mut []
     };
-    if (above.len() + below.len()) * suffix >= config.parallel_words {
+    if (above.len() + below.len()) * suffix >= config.parallel_words
+        && !(serial_clear_enabled() && rayon::current_num_threads() == 1)
+    {
         *word_ops += above
             .par_iter_mut()
             .chain(below.par_iter_mut())
@@ -998,8 +1173,98 @@ pub fn simd_available() -> bool {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn explicit_kernel_policy_is_nested_thread_local_and_unwind_safe() {
+        use super::*;
+        let off = KernelPolicy {
+            single_write: false,
+            vector_tables: false,
+            serial_one_worker: false,
+        };
+        let on = KernelPolicy {
+            single_write: true,
+            vector_tables: true,
+            serial_one_worker: true,
+        };
+        assert!(KERNEL_POLICY.with(std::cell::Cell::get).is_none());
+        with_kernel_policy(off, || {
+            assert!(
+                !write_table_once_enabled() && !vector_tables_enabled() && !serial_clear_enabled()
+            );
+            with_kernel_policy(on, || {
+                assert!(
+                    write_table_once_enabled() && vector_tables_enabled() && serial_clear_enabled()
+                );
+                std::thread::spawn(|| assert!(KERNEL_POLICY.with(std::cell::Cell::get).is_none()))
+                    .join()
+                    .unwrap();
+            });
+            let _ = std::panic::catch_unwind(|| with_kernel_policy(on, || panic!("scope test")));
+            assert_eq!(KERNEL_POLICY.with(std::cell::Cell::get), Some(off));
+        });
+        assert!(KERNEL_POLICY.with(std::cell::Cell::get).is_none());
+    }
     use super::*;
     use rand::{rngs::StdRng, Rng, SeedableRng};
+
+    #[test]
+    fn single_write_tables_match_subset_xors_with_partial_groups_and_reused_storage() {
+        let mut rng = StdRng::seed_from_u64(0x47_ab_901);
+        let mut table = vec![u64::MAX; 200_000];
+        for bits in 1..=8 {
+            for pivots in 1..=4 * bits {
+                for suffix in [1, 2, 3, 4, 5, 7, 8, 9, 15, 16, 17, 31, 32, 33, 133] {
+                    let matrix: Vec<Vec<u64>> = (0..pivots + 3)
+                        .map(|_| (0..suffix + 4).map(|_| rng.gen()).collect())
+                        .collect();
+                    let mut ops = 17;
+                    let mut variants = vec![SimdKind::Scalar];
+                    #[cfg(target_arch = "x86_64")]
+                    {
+                        if std::is_x86_feature_detected!("avx2") {
+                            variants.push(SimdKind::Avx2);
+                        }
+                        if std::is_x86_feature_detected!("avx512f") {
+                            variants.push(SimdKind::Avx512);
+                        }
+                    }
+                    for simd in variants {
+                        build_tables_once(
+                            &matrix,
+                            3,
+                            pivots,
+                            bits,
+                            2..suffix + 2,
+                            &mut table,
+                            &mut ops,
+                            simd,
+                        );
+                        let tables = pivots.div_ceil(bits);
+                        let size = 1usize << bits;
+                        let expected_len =
+                            ((tables - 1) * size + (1 << (pivots - (tables - 1) * bits))) * suffix;
+                        assert_eq!(table.len(), expected_len);
+                        let mut expected_ops = 17;
+                        for t in 0..tables {
+                            let group = bits.min(pivots - t * bits);
+                            for g in 0..1usize << group {
+                                for i in 0..suffix {
+                                    let expected = (0..group)
+                                        .filter(|&j| g >> j & 1 != 0)
+                                        .fold(0, |acc, j| acc ^ matrix[3 + t * bits + j][i + 2]);
+                                    assert_eq!(table[(t * size + g) * suffix + i], expected);
+                                }
+                            }
+                            expected_ops += ((1u64 << group) - 1) * suffix as u64;
+                        }
+                        assert_eq!(ops, expected_ops);
+                        table.fill(u64::MAX);
+                        ops = 17;
+                    }
+                }
+            }
+        }
+    }
 
     #[test]
     fn branchless_strip_matches_conditional_clear() {

@@ -1,0 +1,122 @@
+{
+  "schema": "boolean-perf-instructions/v1",
+  "runtime_eligible": false,
+  "rows": [
+    {
+      "candidate_median_ir": 77495461.0,
+      "candidate_samples": 1,
+      "case": [
+        "matrix-f4",
+        17,
+        230,
+        false
+      ],
+      "reduction_percent": 14.481987334316388,
+      "reference_median_ir": 90618875.0,
+      "reference_over_candidate": 1.1693442923063584,
+      "reference_samples": 1
+    },
+    {
+      "candidate_median_ir": 487814530.0,
+      "candidate_samples": 5,
+      "case": [
+        "matrix-f4",
+        23,
+        230,
+        false
+      ],
+      "reduction_percent": 18.325555184798255,
+      "reference_median_ir": 597267029.0,
+      "reference_over_candidate": 1.224373183390007,
+      "reference_samples": 5
+    },
+    {
+      "candidate_median_ir": 488323296.0,
+      "candidate_samples": 1,
+      "case": [
+        "matrix-f4",
+        23,
+        231,
+        false
+      ],
+      "reduction_percent": 18.307682254762344,
+      "reference_median_ir": 597759140.0,
+      "reference_over_candidate": 1.2241053107570767,
+      "reference_samples": 1
+    },
+    {
+      "candidate_median_ir": 488039852.0,
+      "candidate_samples": 1,
+      "case": [
+        "matrix-f4",
+        23,
+        232,
+        false
+      ],
+      "reduction_percent": 18.31622610299079,
+      "reference_median_ir": 597474662.0,
+      "reference_over_candidate": 1.2242333480586336,
+      "reference_samples": 1
+    },
+    {
+      "candidate_median_ir": 80347039.0,
+      "candidate_samples": 1,
+      "case": [
+        "matrix-f5",
+        17,
+        230,
+        false
+      ],
+      "reduction_percent": 14.0730716374979,
+      "reference_median_ir": 93506239.0,
+      "reference_over_candidate": 1.1637795264614543,
+      "reference_samples": 1
+    },
+    {
+      "candidate_median_ir": 498549578.0,
+      "candidate_samples": 5,
+      "case": [
+        "matrix-f5",
+        23,
+        230,
+        false
+      ],
+      "reduction_percent": 17.99693274549796,
+      "reference_median_ir": 607964549.0,
+      "reference_over_candidate": 1.2194665803127007,
+      "reference_samples": 5
+    },
+    {
+      "candidate_median_ir": 499947602.0,
+      "candidate_samples": 1,
+      "case": [
+        "matrix-f5",
+        23,
+        231,
+        false
+      ],
+      "reduction_percent": 17.956454658006514,
+      "reference_median_ir": 609368598.0,
+      "reference_over_candidate": 1.2188649281690125,
+      "reference_samples": 1
+    },
+    {
+      "candidate_median_ir": 499064876.0,
+      "candidate_samples": 1,
+      "case": [
+        "matrix-f5",
+        23,
+        232,
+        false
+      ],
+      "reduction_percent": 17.983210920070015,
+      "reference_median_ir": 608491117.0,
+      "reference_over_candidate": 1.2192625573593763,
+      "reference_samples": 1
+    }
+  ],
+  "scope": "Complete degree-4 Boolean matrix calls, K1 n17/n19/n23 (primary: 22 variables). Callgrind 3.19 merged workers (AVX2). Opt-in single-write tables; native runtime qualification separate.",
+  "class": "engineering; instruction count only",
+  "study": "research/f4_f5_boolean_perf_20261018/",
+  "report": "research/f4_f5_boolean_perf_20261018/REPORT.pdf"
+}

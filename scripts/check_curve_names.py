@@ -66,6 +66,16 @@ ARCHIVED_LABELS = {
             "K_1 / 2^17": "icv1-f2m17-tm101-00378d4e",
         },
     },
+    # A frozen source snapshot retains these literal legacy fixtures. Its
+    # digest is recorded in the study's frozen-baseline.sha256 manifest.
+    "research/f4_f5_boolean_runtime_20261019/frozen-baseline/src/cryptanalysis/ic_boundary.rs": {
+        "sha256": "4d3f66663e1b5ca72053461957e5448a68553828692bab47d91287be7a226fc1",
+        "labels": {
+            "K_0/F_2^15": "icv1-f2m15-tm275-2d22ff5d",
+            "bench-12bit": "icv1-fp12-t19-d4a315df",
+            "generated-24bit-10935329": "icv1-fp24-t1577-77336155",
+        },
+    },
 }
 
 

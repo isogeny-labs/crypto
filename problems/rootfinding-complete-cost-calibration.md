@@ -60,3 +60,24 @@ Later 2026-10-13: The one-lane native walk matched every paired relation and ans
 2026-10-14: The synchronized 4/8/16-lane collector and fixed-stride B48 coverage controls completed five frozen L0 sessions, all verified and replayed. The train-selected B48 did not establish a holdout B optimum, and the stride panels did not resolve a coverage bias against exact uniform occupancy. Missing sealed field-operation counters, unequal target-pinned probe budgets, inaccessible L2 workers and absent independent-host replay keep the stated exit criteria open. The prior kernel-only and one-lane observations remain immutable historical records.
 
 Later 2026-10-14: The equal-prefix addendum first measured a reused-target exploratory panel, then a separately frozen eight-fresh-target confirmation. Both showed an early stride-23 independent-rank surplus; the fresh primary effect was smaller and diminished by 8,192 probes. The exact equal-probe control now exists, while complete native pricing, isolated wall and independent-host replay remain open.
+
+2026-10-19: The [F4/F5 and recursive-root continuation](../research/f4_f5_ecbench_20261019/README.md)
+now executes complete cold one-target ecbench recovery on dedicated native
+hosts, including F6, generalized roots, both Semaev table backends and the
+strong matched rho reference. The initial sessions each verify528 records
+(including88 warmups) and reproduce440 measured records. Timing admission is
+reported per arm; a verified record below L2 does not acquire an admitted
+clock. These small registered Koblitz fixtures address a bounded native-wall
+access/measurement gap, not full pricing of every native unit or independent
+host qualification of the earlier rational-lane study. The initial prepared
+schedule regresses full DLP recovery; its measurements remain unchanged,
+with the corrected adaptive policy frozen as a separate experiment. Complete
+pricing, coverage and independent-host exit criteria stay open.
+
+The corrected adaptive source completes the full native and cold-DLP panels.
+At n23 the F4/F5 paired candidate/baseline solve ratios are0.6309/0.6532,
+with40 L2 pairs each; complete child clocks are retained separately. Every
+record verifies and measured replay reproduces. Some short reference/table
+clocks remain below L2, and native work is partly priced. This establishes
+a bounded F4/F5 branch wall improvement, not a complete-cost resolution or
+a transfer of qualification to the earlier rational-lane study.

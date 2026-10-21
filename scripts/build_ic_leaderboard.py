@@ -73,6 +73,9 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "boolean_solver_component": "research/f4_f5_boolean_perf_20261018/component.json",
+    "boolean_native_solver_component": "research/f4_f5_boolean_runtime_20261019/component.json",
+    "boolean_recursive_solver_component": "research/f4_f5_ecbench_20261019/component.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
@@ -1178,6 +1181,9 @@ def build(allow_unvalidated: bool = False) -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "boolean_solver_component": load(SOURCES["boolean_solver_component"]),
+        "boolean_native_solver_component": load(SOURCES["boolean_native_solver_component"]),
+        "boolean_recursive_solver_component": load(SOURCES["boolean_recursive_solver_component"]),
         "pair_table_component": pair_table_component(),
         "planner_component": planner_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
@@ -1229,17 +1235,107 @@ def rich(s) -> str:
     return re.sub(r"`([^`]+)`", r"<code>\1</code>", esc(s))
 
 
+def native_ratio_text(comparison: dict) -> str:
+    return (f"{comparison['reference_over_candidate']:.4f}"
+            if "reference_over_candidate" in comparison else "inconclusive")
+
+
+def recursive_tables(component: dict) -> list:
+    """Format Rust-prepared observations without recomputing admission or results."""
+    tables = []
+    tables.append(("Latest complete roots and decomposition: n23 cold native milliseconds",
+        ["Boundary", "Method", "Target", "Median ms", "Min ms", "Max ms", "Samples"],
+        [[r["boundary"], r["arm"], "generator" if r["random"] else "planted",
+          *[f"{r['cold'][k]:.4f}" if r["cold"].get(k) is not None else "missing"
+            for k in ["median_ms", "min_ms", "max_ms"]], str(r["cold"]["n"])]
+         for r in component["costs_n23"]]))
+    tables.append(("Matched F4/F5 baseline versus final opt-in policy",
+        ["Method", "Field degree", "Target", "Before ms", "Candidate ms", "Paired ratio", "Decision"],
+        [[r["arm"], str(r["n"]), "generator" if r["random"] else "planted",
+          *[f"{r[k]['median_ms']:.4f}" if r[k].get("median_ms") is not None else "missing"
+            for k in ["before", "candidate"]], native_ratio_text(r["comparison"]),
+          r["comparison"]["decision"]] for r in component["improvements"]]))
+    tables.append(("Four-worker unchanged-path controls",
+        ["Method", "Field degree", "Before ms", "Candidate ms", "Paired ratio", "Decision"],
+        [[r["arm"], str(r["n"]),
+          *[f"{r[k]['median_ms']:.4f}" if r[k].get("median_ms") is not None else "missing" for k in ["before", "after"]],
+          native_ratio_text(r["comparison"]),
+          r["comparison"]["decision"]] for r in component["four_worker_controls"]]))
+    tables.append(("Full Semaev table: four-worker cold-call controls",
+        ["Method", "Field degree", "Before ms", "Candidate ms", "Paired ratio", "Decision"],
+        [[r["arm"], str(r["n"]),
+          *[f"{r[k]['median_ms']:.4f}" if r[k].get("median_ms") is not None else "missing" for k in ["before", "after"]],
+          native_ratio_text(r["comparison"]), r["comparison"]["decision"]]
+         for r in component.get("full_table_four_worker_controls", [])]))
+    for session in component["ecbench"]:
+        tables.append((f"Full cold DLP recovery through ecbench: n{session['n']}",
+            ["Method", "Solve median ms", "Process median ms", "Admitted / requested", "Charged S", "S / rho diagnostic", "Partly priced"],
+            [[a["name"],
+              *[f"{a[k]['median_ms']:.4f}" if a[k].get("median_ms") is not None else "missing"
+                for k in ["cold_solve", "process"]],
+              f"{a['admitted']} / {a['requested']}", g3(a["s_charged_mean"]),
+              g3(a["s_over_rho_diagnostic"]), str(a["lower_bound"])] for a in session["arms"]]))
+        tables.append((f"ecbench n{session['n']} native comparison admission (B / A elapsed time)",
+            ["Pair", "Admission", "Outside A/A noise", "B / A", "95% interval", "Pairs / below L2"],
+            [[c["pair"], str(wall.get("status", "missing")),
+              str(wall.get("outside_noise", "missing")),
+              g3(wall.get("median_ratio")), str(wall.get("ci95", "missing")),
+              f'{wall.get("pairs", "missing")} / {wall.get("pairs_below_level", "missing")}'] for c in session["comparisons"] for wall in [c.get("wall") or {}]]))
+    return tables
+
+
 def markdown(doc: dict) -> str:
     fams = doc["families"]
     L = ["# Index-calculus leaderboard", "",
          "Generated by `scripts/build_ic_leaderboard.py` from frozen evidence; the page is "
          "[`docs/ic-leaderboard.html`](../ic-leaderboard.html).  Curves are named by ICV1 slug "
-         "([`docs/curves/ICV1.md`](../curves/ICV1.md)).  No row is below its reference.", "",
+         "([`docs/curves/ICV1.md`](../curves/ICV1.md)).  No ranked IC row is below its rho reference.", "",
          "**There is no single unit on this page.**  The board is three tables, A, B and C.  Each is "
          "priced in its own unit, against its own reference and floor, stated at its head.  `S`, "
          "`× reference` and `× floor` are comparable within a table and nowhere else.  The same slug "
          "can appear in two tables with different `S`, because the unit, the reference and the number "
          "of targets differ.", ""]
+    recursive = doc["boolean_recursive_solver_component"]
+    L += ["## Latest F4/F5 recursion and full ecbench recovery", "", recursive["scope"], "",
+          "Cold solver time includes algorithm setup. ecbench solve time includes all DLP phases; "
+          "process time additionally includes common workload construction and startup. "
+          "Only admitted native comparisons establish paired improvements. S and S/rho remain "
+          "partly priced diagnostics; they do not rank these methods in tables A–C.", ""]
+    for title, headers, rows in recursive_tables(recursive):
+        L += ["### " + title, "", "| " + " | ".join(headers) + " |",
+              "| " + " | ".join([":--"] * len(headers)) + " |"]
+        L += ["| " + " | ".join(row) + " |" for row in rows]
+        L.append("")
+    L += [recursive["limits"], "", f"[Latest report](../../{recursive['report']}) · "
+          f"[Raw evidence and four-worker controls](../../{recursive['study']})", ""]
+    native = doc["boolean_native_solver_component"]
+    L += ["## Native Boolean solvers, outside tables A–C", "", native["scope"], "",
+          "All values below are native cold milliseconds, five admitted samples per method. "
+          "Complete-root enumeration and first-witness decomposition are separate boundaries. "
+          "The generator control is fixed, not a random sample; Semaev table preparation is charged.", "",
+          "| boundary | method | target | median ms | min ms | max ms | n |", "|:--|:--|:--|--:|--:|--:|--:|"]
+    for row in native["costs_n23"]:
+        c = row["cold"]
+        L.append(f"| {row['boundary']} | {row['arm']} | {'generator' if row['random'] else 'planted'} | "
+                 f"{c['median_ms']:.4f} | {c['min_ms']:.4f} | {c['max_ms']:.4f} | {c['n']} |")
+    L += ["", "| measured change | target | before ms | candidate ms | paired ratio | decision |", "|:--|:--|--:|--:|--:|:--|"]
+    for row in native["improvements"]:
+        c = row["comparison"]
+        L.append(f"| {row['change']} | {row['target']} | {row['before']['median_ms']:.4f} | "
+                 f"{row['after']['median_ms']:.4f} | {native_ratio_text(c)} | {c['decision']} |")
+    L += ["", native["defaults"], "", f"[Native evidence and controls](../../{native['study']}) · "
+          f"[report](../../{native['report']}). Matrix, generalized and Semaev before/after data "
+          "are preserved in the component JSON; different hosts are not pooled. No whole-IC/rho rank changes.", ""]
+    component = doc["boolean_solver_component"]
+    L += ["## Boolean F4/F5 instruction work, outside tables A–C", "", component["scope"], "",
+          "| engine | field degree | seed | before Ir | candidate Ir | before/candidate | samples per arm |",
+          "|:--|--:|--:|--:|--:|--:|:--|"]
+    for row in component["rows"]:
+        L.append(f"| {row['case'][0]} | {row['case'][1]} | {row['case'][2]} | {row['reference_median_ir']:,.0f} | "
+                 f"{row['candidate_median_ir']:,.0f} | {row['reference_over_candidate']:.4f} | "
+                 f"{row['reference_samples']}/{row['candidate_samples']} |")
+    L += ["", f"[Native solver and complete evidence](../../{component['study']}) · "
+          f"[report](../../{component['report']}). The default kernel is unchanged; no whole-pipeline row moves.", ""]
     audit = doc["latest_frontier_audit"]
     cold = audit["cold"]
     admitted = audit["admitted_online"]
@@ -2421,10 +2517,53 @@ def page(doc: dict, standalone: bool) -> str:
              'operation-unit S rankings.</p>' +
              gh(n83["source"], 'Frozen IC1 rows and candidate identities') + '</section>')
 
+    recursive = doc["boolean_recursive_solver_component"]
+    P.append('<section id="boolean-recursive-solvers"><h2>Latest F4/F5 recursion and full ecbench recovery</h2><p>'
+             + esc(recursive["scope"]) + '</p><p>Cold solver time includes setup. ecbench solve time includes all DLP phases; '
+             'process time also includes common workload construction and startup. S/rho is a partly priced diagnostic, '
+             'outside tables A–C. Paired native admission is authoritative.</p>')
+    for title, headers, rows in recursive_tables(recursive):
+        P.append('<h3>' + esc(title) + '</h3><div class="scroll"><table><thead><tr>'
+                 + ''.join('<th>' + esc(h) + '</th>' for h in headers) + '</tr></thead><tbody>'
+                 + ''.join('<tr>' + ''.join('<td>' + esc(cell) + '</td>' for cell in row) + '</tr>' for row in rows)
+                 + '</tbody></table></div>')
+    P.append('<p>' + esc(recursive["limits"]) + ' ' + gh(recursive["report"], 'Latest report and complete controls') + '</p></section>')
+    native = doc["boolean_native_solver_component"]
+    native_rows = "".join(
+        f"<tr><td>{esc(r['boundary'])}</td><td>{esc(r['arm'])}</td>"
+        f"<td>{'generator' if r['random'] else 'planted'}</td>"
+        f"<td>{r['cold']['median_ms']:.4f}</td><td>{r['cold']['min_ms']:.4f}</td>"
+        f"<td>{r['cold']['max_ms']:.4f}</td><td>{r['cold']['n']}</td></tr>" for r in native["costs_n23"])
+    improvement_rows = "".join(
+        f"<tr><td>{esc(r['change'])}</td><td>{esc(r['target'])}</td>"
+        f"<td>{r['before']['median_ms']:.4f}</td><td>{r['after']['median_ms']:.4f}</td>"
+        f"<td>{native_ratio_text(r['comparison'])}</td>"
+        f"<td>{esc(r['comparison']['decision'])}</td></tr>" for r in native["improvements"])
+    P.append('<section id="boolean-native-solvers"><h2>Native Boolean solver comparisons</h2><p>'
+             + esc(native["scope"]) + '</p><p>n23, five samples per method; cold native milliseconds. '
+             'Complete roots and first-witness decomposition are separate boundaries. Generator is a fixed control. '
+             'Semaev table setup is charged.</p><div class="scroll"><table><thead><tr><th>Boundary</th>'
+             '<th>Method</th><th>Target</th><th>Median ms</th><th>Min ms</th><th>Max ms</th><th>n</th>'
+             '</tr></thead><tbody>' + native_rows + '</tbody></table></div><table><thead><tr><th>Measured change</th><th>Target</th>'
+             '<th>Before ms</th><th>Candidate ms</th><th>Paired ratio</th><th>Decision</th></tr></thead><tbody>'
+             + improvement_rows + '</tbody></table><p>' + esc(native["defaults"])
+             + ' Different hosts are not pooled; no whole-IC/rho rank changes. '
+             + gh(native["report"], 'Native report, paired improvements and controls') + '</p></section>')
+    component = doc["boolean_solver_component"]
+    rows = "".join(f"<tr><td>{esc(row['case'][0])}</td><td>{row['case'][1]}</td><td>{row['case'][2]}</td>"
+                   f"<td>{row['reference_median_ir']:,.0f}</td><td>{row['candidate_median_ir']:,.0f}</td>"
+                   f"<td>{row['reference_over_candidate']:.4f}</td>"
+                   f"<td>{row['reference_samples']}/{row['candidate_samples']}</td></tr>" for row in component["rows"])
+    P.append('<section id="boolean-solver-component"><h2>Boolean F4/F5 instruction work</h2><p>'
+             + esc(component["scope"]) + '</p><table><thead><tr><th>Engine</th><th>Field degree</th><th>Seed</th><th>Before Ir</th>'
+             '<th>Candidate Ir</th><th>Before/candidate</th><th>Samples per arm</th></tr></thead><tbody>'
+             + rows + '</tbody></table><p>Outside tables A–C; default kernel unchanged. '
+             + gh(component["report"], 'Complete solver and comparison report') + '</p></section>')
+
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '
-             'here was measured for this page, and nothing is a speedup. Records kept in other units, wall-clock '
-             'panels and batched producers awaiting independent replay, are in '
+             'here was measured for this page. Native component gains apply to their stated solver boundaries; '
+             'other wall-clock panels and batched producers awaiting independent replay are in '
              '<a href="https://github.com/aburan28/crypto/blob/main/docs/ic/BOUNDARY_TARGETS.md">docs/ic/BOUNDARY_TARGETS.md</a>; the canonical page is the '
              '<a href="https://aburan28.github.io/crypto/scoreboard/">index-calculus scoreboard</a>. No IC pipeline has been priced '
              'end to end on ECC2K-130 or on the m = 83 confidence gate (AGENTS.md §8a).</p>'

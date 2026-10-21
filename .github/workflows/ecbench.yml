@@ -150,6 +150,20 @@ jobs:
               echo "$d" >> "$list"
             fi
           done
+          # This continuation follows AGENTS.md 13a: its sealed raw tree
+          # is one deterministic archive. Discover its sessions too, so
+          # ordinary integrity checks and weekly exhaustive replay cover
+          # the same evidence as sessions materialized directly in Git.
+          study=research/f4_f5_ecbench_20261019
+          if git cat-file -e "HEAD:$study/runs.tar.xz" 2>/dev/null; then
+            printf '/%s/\n' "$study" | git sparse-checkout add --stdin
+            (cd "$study" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz)
+            while IFS= read -r session; do
+              if jq -e '.schema == "ecbench.session/v1"' "$session" > /dev/null; then
+                dirname "$session" >> "$list"
+              fi
+            done < <(find "$study/runs" -type f -name session.json | sort)
+          fi
           test -s "$list" || { echo '::error::no committed ecbench sessions found'; exit 1; }
           echo "$(wc -l < "$list") committed ecbench sessions (by schema)" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Materialize compile-time inputs without unrelated archives
@@ -160,6 +174,13 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
         run: |
           git fetch --no-tags --depth=1 origin "$BASE"
+          study=research/f4_f5_ecbench_20261019
+          if git cat-file -e "$BASE:$study/runs.tar.xz" 2>/dev/null; then
+            if ! git diff --quiet "$BASE" HEAD -- "$study/runs.tar.xz" "$study/runs.tar.xz.sha256"; then
+              echo '::error::committed sealed study archives are immutable; add a new study instead'
+              exit 1
+            fi
+          fi
           mapfile -t sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
           # Every session directory by schema, plus any session.json or
           # records.jsonl removed or renamed anywhere (a deleted session
@@ -422,6 +443,20 @@ jobs:
             # integrity check applies to it, only completeness does not.
             ./target/release/ecbench verify --dir "$d" --replay-all --allow-interrupted --exit-code > /dev/null
           done
+          frozen_screens=()
+          while IFS= read -r d; do
+            case "$d" in
+              research/f4_f5_ecbench_20261019/runs/adaptive-screen-retry1/*)
+                frozen_screens+=("$d")
+                ;;
+              research/f4_f5_ecbench_20261019/runs/*)
+                ./target/release/ecbench verify --dir "$d" --replay-all --allow-interrupted --exit-code > /dev/null
+                ;;
+            esac
+          done < "$RUNNER_TEMP/ecbench-sessions.txt"
+          if [ "${#frozen_screens[@]}" -gt 0 ]; then
+            bash research/f4_f5_ecbench_20261019/replay-frozen-screen.sh "$RUNNER_TEMP/frozen-adaptive-screen" "${frozen_screens[@]}"
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

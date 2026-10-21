@@ -163,6 +163,7 @@ pub struct RootfindMitmOracle<E> {
     m: u32,
     table: Option<PairTable>,
     reps: Option<Reps<E>>,
+    batch_setup: bool,
 }
 
 impl<E> RootfindMitmOracle<E> {
@@ -171,6 +172,7 @@ impl<E> RootfindMitmOracle<E> {
             m,
             table: None,
             reps: None,
+            batch_setup: false,
         }
     }
 }
@@ -204,6 +206,10 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
                 "full_table",
                 "1 to build every i ≤ j pair instead of one pair per orbit under negation",
             ),
+            (
+                "batch_setup",
+                "1 to batch256 additions while building the folded pair table",
+            ),
         ]
     }
 
@@ -217,8 +223,16 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
         if !matches!(self.m, 2 | 3) {
             return Err(format!("rootfind-mitm runs at m = 2 or 3, not {}", self.m));
         }
+        self.batch_setup = !params.flag("full_table")
+            && (params.flag("batch_setup")
+                || std::env::var("KIC_ROOTFIND_BATCH_SETUP").as_deref() == Ok("1"));
         let table = if params.flag("full_table") {
             PairTable::build(ctx.group, fb)
+        } else if self.batch_setup {
+            let mut counters = OracleCounters::default();
+            PairTable::build_negation_folded_with(ctx.group, fb, |ops, p, qs, out| {
+                ctx.group.add_many(ops, &mut counters, p, qs, out);
+            })
         } else {
             PairTable::build_negation_folded(ctx.group, fb)
         };
@@ -230,6 +244,9 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
 
     fn setup_native(&self) -> BTreeMap<String, u64> {
         let mut counts = BTreeMap::new();
+        if self.batch_setup {
+            counts.insert("pair_table_batch_setup".into(), 1);
+        }
         if let Some(table) = &self.table {
             counts.insert("pair_table_entries".into(), table.entries);
         }
@@ -381,10 +398,22 @@ mod tests {
         let mut ops = GroupOps::default();
         let mut mitm = MitmOracle::new(3);
         let mut rf_mitm = RootfindMitmOracle::new(3);
+        let mut rf_batch = RootfindMitmOracle::new(3);
+        let mut scalar_m2 = RootfindMitmOracle::new(2);
+        let mut batch_m2 = RootfindMitmOracle::new(2);
         let mut rf_pairs = RootfindPairsOracle::new(3);
         let (_, folded) = Params::parse_spec("mitm:negation_folded=1").unwrap();
         mitm.prepare(ctx, fb, &folded, &mut ops).unwrap();
         rf_mitm.prepare(ctx, fb, &params, &mut ops).unwrap();
+        let (_, batch_params) = Params::parse_spec("rootfind-mitm:batch_setup=1").unwrap();
+        rf_batch.prepare(ctx, fb, &batch_params, &mut ops).unwrap();
+        scalar_m2.prepare(ctx, fb, &params, &mut ops).unwrap();
+        batch_m2.prepare(ctx, fb, &batch_params, &mut ops).unwrap();
+        assert_eq!(
+            <RootfindMitmOracle<G::Elt> as DecompositionOracle<G>>::setup_native(&rf_batch)
+                ["pair_table_batch_setup"],
+            1
+        );
         rf_pairs.prepare(ctx, fb, &params, &mut ops).unwrap();
         let (mut found, mut refuted) = (0, 0);
         for &t in targets {
@@ -401,6 +430,19 @@ mod tests {
             let a = mitm.decompose(ctx, fb, &mut o1, &mut c1, t);
             let b = rf_mitm.decompose(ctx, fb, &mut o2, &mut c2, t);
             let c = rf_pairs.decompose(ctx, fb, &mut o3, &mut c3, t);
+            let (mut ob, mut cb) = (GroupOps::default(), OracleCounters::default());
+            let d = rf_batch.decompose(ctx, fb, &mut ob, &mut cb, t);
+            assert_eq!(b, d, "batch preparation must preserve the exact m3 witness");
+            assert_eq!(o2.adds, ob.adds, "query additions must stay identical");
+            let (mut os, mut cs) = (GroupOps::default(), OracleCounters::default());
+            let (mut ot, mut ct) = (GroupOps::default(), OracleCounters::default());
+            let m2a = scalar_m2.decompose(ctx, fb, &mut os, &mut cs, t);
+            let m2b = batch_m2.decompose(ctx, fb, &mut ot, &mut ct, t);
+            assert_eq!(
+                m2a, m2b,
+                "batch preparation must preserve the exact m2 witness"
+            );
+            assert_eq!(os.adds, ot.adds);
             assert_eq!(a.is_some(), b.is_some(), "verdicts differ on a target");
             assert_eq!(a.is_some(), c.is_some(), "the memoryless verdict differs");
             for w in [a.as_ref(), b.as_ref(), c.as_ref()].into_iter().flatten() {

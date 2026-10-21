@@ -1945,6 +1945,17 @@ fn ic_report(
     // (`audit::legacy_solver_rounding` reproduces those records).
     let mut total = rep.total_gae;
     if let Some(s) = &rep.decomposition.solver {
+        // New opt-in Boolean variants retain their exact Gray search work
+        // separately from calibrated Macaulay word XORs. A reduction in the
+        // latter must not silently price the tail enumeration at zero.
+        for name in [
+            "quadratic_tail_assignments_uncharged",
+            "generalized_assignments_uncharged",
+        ] {
+            if let Some(&count) = s.extra.get(name).filter(|&&count| count > 0) {
+                phases[2].native.insert(name.into(), count);
+            }
+        }
         // `counted` (field multiplications priced at the curve's own
         // multiplications per addition, `gaudry-d4`) is a count, like
         // `pinned`, and stays in the total.

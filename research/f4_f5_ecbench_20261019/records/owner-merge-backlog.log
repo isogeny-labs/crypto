@@ -1,0 +1,156 @@
+   Compiling crypto v0.1.0 (/home/ec2-user/crypto-boolean-perf)
+    Finished `release` profile [optimized] target(s) in 1m 51s
+     Running tests/backlog_cli.rs (/home/ec2-user/crypto-boolean-perf-target/release/deps/backlog_cli-e3e9eb6f18bd8c73)
+
+running 15 tests
+test an_unsupported_cairn_version_is_refused ... FAILED
+test list_orders_by_funding_then_id_including_unfunded_drafts ... ok
+test the_p192_cards_checker_pins_t_48 ... ok
+test new_scaffolds_a_draft_that_validates_and_refuses_to_leave_draft_with_todos ... ok
+test ids_are_checked_on_every_subcommand ... ok
+test cairn_post_refuses_plain_http_nodes ... ok
+test cairn_post_is_a_dry_run_by_default_and_refuses_a_blocked_checker_or_a_lab_task ... ok
+test the_committed_cards_validate ... FAILED
+test the_checker_binary_exit_codes ... ok
+test the_stop_rule_fails_closed_on_a_missing_lab ... FAILED
+test publish_claim_exec_release_and_status_round_trip ... FAILED
+test every_seed_card_publishes_unchanged ... FAILED
+test first_success_found_is_set_only_on_a_checked_published_artifact ... FAILED
+test concurrent_claims_resolve_to_one_holder_after_sync ... FAILED
+test a_conflicted_found_still_stops_every_runner ... FAILED
+
+failures:
+
+---- an_unsupported_cairn_version_is_refused stdout ----
+
+thread 'an_unsupported_cairn_version_is_refused' (3573) panicked at tests/backlog_cli.rs:1152:5:
+assertion failed: String::from_utf8_lossy(&o.stderr).contains("outside the supported range")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- the_committed_cards_validate stdout ----
+"/home/ec2-user/crypto-boolean-perf-target/release/backlog" "--root" "/home/ec2-user/crypto-boolean-perf" "validate" "--all" "--no-git" exited Some(1)
+stdout:
+XP-20261015-conductor-96-point-maps: ok
+XP-20261015-conductor-complete-cost: ok
+XP-20261015-conductor-coordinate-seeds: ok
+XP-20261015-conductor-d43-replication: ok
+XP-20261015-conductor-original96-floor: ok
+XP-20261015-conductor-prime-field-pdp: ok
+XP-20261015-kummer-p224-depth: ok
+XP-20261015-p192-isogeny-aux-search-t48: ok
+XP-20261015-pkm-m3-n21-m4-n20: ok
+XP-20261015-shape-g1-frozen-cells: ok
+XP-20261016-conductor-dose-response: ok
+XP-20261016-conductor-interleaved-crossover: ok
+XP-20261016-conductor-orbit-overlap: ok
+XP-20261016-conductor-rho-partition-control: ok
+XP-20261016-conductor-yield-distribution: ok
+XP-20261016-prime-base-oracle-tuning: ok
+  warning: cairn.env.recipe: still TODO
+  warning: run.argv[0]: still TODO
+XP-20261016-prime61-horizontal-class: ok
+XP-20261016-screenshot-factor-base-port: ok
+XP-20261017-full-volcano-graphwide-ic: ok
+  warning: cairn.env.recipe: still TODO
+XP-20261017-quintic-support-frobenius: FAILED
+  error: outputs.verify: placeholder {artifact} in "{artifact}" has no value
+1 of 20 cards failed
+
+stderr:
+
+
+thread 'the_committed_cards_validate' (3590) panicked at tests/backlog_cli.rs:67:5:
+XP-20261015-conductor-96-point-maps: ok
+XP-20261015-conductor-complete-cost: ok
+XP-20261015-conductor-coordinate-seeds: ok
+XP-20261015-conductor-d43-replication: ok
+XP-20261015-conductor-original96-floor: ok
+XP-20261015-conductor-prime-field-pdp: ok
+XP-20261015-kummer-p224-depth: ok
+XP-20261015-p192-isogeny-aux-search-t48: ok
+XP-20261015-pkm-m3-n21-m4-n20: ok
+XP-20261015-shape-g1-frozen-cells: ok
+XP-20261016-conductor-dose-response: ok
+XP-20261016-conductor-interleaved-crossover: ok
+XP-20261016-conductor-orbit-overlap: ok
+XP-20261016-conductor-rho-partition-control: ok
+XP-20261016-conductor-yield-distribution: ok
+XP-20261016-prime-base-oracle-tuning: ok
+  warning: cairn.env.recipe: still TODO
+  warning: run.argv[0]: still TODO
+XP-20261016-prime61-horizontal-class: ok
+XP-20261016-screenshot-factor-base-port: ok
+XP-20261017-full-volcano-graphwide-ic: ok
+  warning: cairn.env.recipe: still TODO
+XP-20261017-quintic-support-frobenius: FAILED
+  error: outputs.verify: placeholder {artifact} in "{artifact}" has no value
+1 of 20 cards failed
+
+
+---- the_stop_rule_fails_closed_on_a_missing_lab stdout ----
+
+thread 'the_stop_rule_fails_closed_on_a_missing_lab' (3592) panicked at tests/backlog_cli.rs:825:5:
+assertion failed: String::from_utf8_lossy(&o.stderr).contains("no lab at")
+
+---- publish_claim_exec_release_and_status_round_trip stdout ----
+"/home/ec2-user/crypto-boolean-perf-target/release/backlog" "--root" "/home/ec2-user/crypto-boolean-perf" "cairn-publish" "XP-20261015-kummer-p224-depth" "--lab" "/home/ec2-user/crypto-boolean-validation-20261019/tmp/backlog-it-3571-publish/A" "--identity" "/home/ec2-user/crypto-boolean-validation-20261019/tmp/backlog-it-3571-publish/one.identity.json" exited Some(2)
+stdout:
+
+stderr:
+backlog: cairn 12.1.0 is outside the supported range 8.0.0 <= v < 10.0.0 (backlog/README.md)
+
+
+thread 'publish_claim_exec_release_and_status_round_trip' (3585) panicked at tests/backlog_cli.rs:432:5:
+
+
+---- every_seed_card_publishes_unchanged stdout ----
+"/home/ec2-user/crypto-boolean-perf-target/release/backlog" "--root" "/home/ec2-user/crypto-boolean-perf" "cairn-publish" "XP-20261015-conductor-96-point-maps" "--lab" "/home/ec2-user/crypto-boolean-validation-20261019/tmp/backlog-it-3571-publish-all/A" "--identity" "/home/ec2-user/crypto-boolean-validation-20261019/tmp/backlog-it-3571-publish-all/one.identity.json" exited Some(2)
+stdout:
+
+stderr:
+backlog: cairn 12.1.0 is outside the supported range 8.0.0 <= v < 10.0.0 (backlog/README.md)
+
+
+thread 'every_seed_card_publishes_unchanged' (3577) panicked at tests/backlog_cli.rs:847:9:
+XP-20261015-conductor-96-point-maps
+
+---- first_success_found_is_set_only_on_a_checked_published_artifact stdout ----
+
+thread 'first_success_found_is_set_only_on_a_checked_published_artifact' (3578) panicked at tests/backlog_cli.rs:890:5:
+assertion `left == right` failed: backlog: cairn 12.1.0 is outside the supported range 8.0.0 <= v < 10.0.0 (backlog/README.md)
+
+  left: Some(2)
+ right: Some(0)
+
+---- concurrent_claims_resolve_to_one_holder_after_sync stdout ----
+"/home/ec2-user/crypto-boolean-perf-target/release/backlog" "--root" "/home/ec2-user/crypto-boolean-perf" "cairn-status" "XP-20261015-pkm-m3-n21-m4-n20" "--lab" "/home/ec2-user/crypto-boolean-validation-20261019/tmp/backlog-it-3571-race/A" exited Some(2)
+stdout:
+
+stderr:
+backlog: cairn 12.1.0 is outside the supported range 8.0.0 <= v < 10.0.0 (backlog/README.md)
+
+
+thread 'concurrent_claims_resolve_to_one_holder_after_sync' (3576) panicked at tests/backlog_cli.rs:389:9:
+assertion failed: out.status.success()
+
+---- a_conflicted_found_still_stops_every_runner stdout ----
+
+thread 'a_conflicted_found_still_stops_every_runner' (3572) panicked at tests/backlog_cli.rs:1112:9:
+assertion `left == right` failed: 
+  left: Some(2)
+ right: Some(3)
+
+
+failures:
+    a_conflicted_found_still_stops_every_runner
+    an_unsupported_cairn_version_is_refused
+    concurrent_claims_resolve_to_one_holder_after_sync
+    every_seed_card_publishes_unchanged
+    first_success_found_is_set_only_on_a_checked_published_artifact
+    publish_claim_exec_release_and_status_round_trip
+    the_committed_cards_validate
+    the_stop_rule_fails_closed_on_a_missing_lab
+
+test result: FAILED. 7 passed; 8 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+error: test failed, to rerun pass `--test backlog_cli`

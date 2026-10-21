@@ -1435,6 +1435,74 @@ enum F4PackedMatrix {
     Flat(FlatF2Matrix),
 }
 
+/// Explicit, identity-bound matrix implementation, leaving historical defaults
+/// untouched. Baseline includes the three previously qualified GF2 switches;
+/// Prepared/QuadraticTail retain the initial all-width scheduling for replay.
+/// Adaptive variants keep cheap early degrees below sixteen variables.
+/// The quadratic-tail variants additionally finish bounded recursive branches.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum MatrixRuntime {
+    Baseline,
+    Prepared,
+    QuadraticTail,
+    AdaptivePrepared,
+    AdaptiveQuadraticTail,
+}
+
+thread_local! {
+    static MATRIX_RUNTIME: std::cell::Cell<Option<MatrixRuntime>> = const { std::cell::Cell::new(None) };
+}
+
+impl MatrixRuntime {
+    pub fn parse(value: &str) -> Result<Self, String> {
+        match value {
+            "baseline" => Ok(Self::Baseline),
+            "prepared" => Ok(Self::Prepared),
+            "quadratic-tail" => Ok(Self::QuadraticTail),
+            "adaptive-prepared" => Ok(Self::AdaptivePrepared),
+            "adaptive-quadratic-tail" => Ok(Self::AdaptiveQuadraticTail),
+            _ => Err(format!(
+                "unknown matrix runtime `{value}`; expected baseline, prepared, quadratic-tail, adaptive-prepared or adaptive-quadratic-tail"
+            )),
+        }
+    }
+}
+
+fn prepared_matrix_runtime() -> bool {
+    MATRIX_RUNTIME.with(|slot| {
+        matches!(
+            slot.get(),
+            Some(
+                MatrixRuntime::Prepared
+                    | MatrixRuntime::QuadraticTail
+                    | MatrixRuntime::AdaptivePrepared
+                    | MatrixRuntime::AdaptiveQuadraticTail
+            )
+        )
+    })
+}
+
+/// Run synchronously with an explicit policy, restoring both matrix and GF2
+/// settings after nested calls or panics. No process-wide tuning mutation.
+pub fn with_matrix_runtime<T>(policy: MatrixRuntime, work: impl FnOnce() -> T) -> T {
+    struct Restore(Option<MatrixRuntime>);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            MATRIX_RUNTIME.with(|slot| slot.set(self.0));
+        }
+    }
+    let _restore = Restore(MATRIX_RUNTIME.with(|slot| slot.replace(Some(policy))));
+    crate::cryptanalysis::gf2_elim::with_kernel_policy(
+        crate::cryptanalysis::gf2_elim::KernelPolicy {
+            single_write: true,
+            vector_tables: true,
+            serial_one_worker: std::env::var("RAYON_NUM_THREADS").as_deref() == Ok("1"),
+        },
+        work,
+    )
+}
+
 impl F4PackedMatrix {
     fn rows(&self) -> usize {
         match self {
@@ -1456,11 +1524,12 @@ fn matrix_f4_f2_counted_impl(
     }
     let t_build = std::time::Instant::now();
     let active_multipliers = decisive_only
-        && match std::env::var("KIC_F4_ACTIVE_MULTIPLIERS").as_deref() {
-            Ok("1") => true,
-            Ok("0") => false,
-            _ => n_vars >= 24,
-        };
+        && (prepared_matrix_runtime()
+            || match std::env::var("KIC_F4_ACTIVE_MULTIPLIERS").as_deref() {
+                Ok("1") => true,
+                Ok("0") => false,
+                _ => n_vars >= 24,
+            });
     let multiplier_mask = if active_multipliers {
         occurring_vars(polys)
     } else {
@@ -1473,17 +1542,19 @@ fn matrix_f4_f2_counted_impl(
     // systems on the historical full RREF path and expose both sides for
     // retained controls.
     let use_linear_tail = decisive_only
-        && match std::env::var("KIC_F4_SOLVER_LINEAR_TAIL").as_deref() {
-            Ok("1") => true,
-            Ok("0") => false,
-            _ => n_vars >= 24,
-        };
+        && (prepared_matrix_runtime()
+            || match std::env::var("KIC_F4_SOLVER_LINEAR_TAIL").as_deref() {
+                Ok("1") => true,
+                Ok("0") => false,
+                _ => n_vars >= 24,
+            });
     let use_flat = use_linear_tail
-        && match std::env::var("KIC_F4_FLAT_MATRIX").as_deref() {
-            Ok("1") => true,
-            Ok("0") => false,
-            _ => n_vars >= 24,
-        };
+        && (prepared_matrix_runtime()
+            || match std::env::var("KIC_F4_FLAT_MATRIX").as_deref() {
+                Ok("1") => true,
+                Ok("0") => false,
+                _ => n_vars >= 24,
+            });
     let built = if use_flat {
         build_macaulay_flat_with_multiplier_mask(
             polys,
@@ -3278,6 +3349,7 @@ fn build_macaulay_with_multiplier_mask(
         reuse_layout,
         criterion,
         pack_rows_with_layout,
+        None,
     )
 }
 
@@ -3293,6 +3365,7 @@ fn build_macaulay_flat_with_multiplier_mask(
     // layout, so it applies only to the plain row set: the F5 criterion
     // selects rows through `build_macaulay_packed` and must go that way.
     let fused = reuse_layout
+        && !prepared_matrix_runtime()
         && criterion == RowCriterion::None
         && std::env::var("KIC_F4_DISABLE_FUSED_PACK").as_deref() != Ok("1");
     if fused {
@@ -3323,7 +3396,131 @@ fn build_macaulay_flat_with_multiplier_mask(
         reuse_layout,
         criterion,
         pack_rows_flat_with_layout,
+        prepared_matrix_runtime()
+            .then_some(pack_polynomials_flat_direct as F4DirectPacker<FlatF2Matrix>),
     )
+}
+
+type F4DirectPacker<P> =
+    fn(&[F2BoolPoly], usize, u32, u64, &F4ColumnLayout, Option<&F5Criterion>) -> Option<P>;
+
+/// Cached-layout construction shared by F4 and criterion-selected F5. XOR
+/// products directly into the final row; only surviving bits count as column
+/// support. Missing or disappearing support rejects this cache hit, so the
+/// ordinary builder still determines the exact layout and admission caps.
+fn pack_polynomials_flat_direct(
+    polys: &[F2BoolPoly],
+    n_vars: usize,
+    degree: u32,
+    multiplier_mask: u64,
+    layout: &F4ColumnLayout,
+    criterion: Option<&F5Criterion>,
+) -> Option<FlatF2Matrix> {
+    // Select the representation once, not once for each term of every
+    // product. The three monomorphisations preserve the same exact-support
+    // rejection and ordinary-builder fallback.
+    let columns = layout.columns.len();
+    match &layout.index {
+        F4ColumnIndex::Standard(index) => pack_polynomials_flat_lookup(
+            polys,
+            n_vars,
+            degree,
+            multiplier_mask,
+            columns,
+            criterion,
+            |mask| index.get(&mask).copied(),
+        ),
+        F4ColumnIndex::Fast(F4FastColumnIndex::Hashed(index)) => pack_polynomials_flat_lookup(
+            polys,
+            n_vars,
+            degree,
+            multiplier_mask,
+            columns,
+            criterion,
+            |mask| index.get(&mask).copied(),
+        ),
+        F4ColumnIndex::Fast(F4FastColumnIndex::Dense(index)) => pack_polynomials_flat_lookup(
+            polys,
+            n_vars,
+            degree,
+            multiplier_mask,
+            columns,
+            criterion,
+            |mask| {
+                index
+                    .get(usize::try_from(mask).ok()?)
+                    .copied()
+                    .filter(|&column| column != u16::MAX)
+                    .map(usize::from)
+            },
+        ),
+    }
+}
+
+fn pack_polynomials_flat_lookup(
+    polys: &[F2BoolPoly],
+    n_vars: usize,
+    degree: u32,
+    multiplier_mask: u64,
+    columns: usize,
+    criterion: Option<&F5Criterion>,
+    lookup: impl Fn(u64) -> Option<usize>,
+) -> Option<FlatF2Matrix> {
+    let words = columns.div_ceil(64);
+    if words == 0 {
+        return None;
+    }
+    let mut schedules: Vec<Option<std::rc::Rc<[u64]>>> = vec![None; degree as usize + 1];
+    let mut seen = vec![false; columns];
+    let mut data = Vec::new();
+    let mut rows = 0;
+    let row_cap = max_f4_rows();
+    for (i, polynomial) in polys.iter().enumerate() {
+        let pdeg = polynomial
+            .terms
+            .iter()
+            .map(|t| t.degree())
+            .max()
+            .unwrap_or(0);
+        if pdeg > degree {
+            continue;
+        }
+        let gap = (degree - pdeg) as usize;
+        let multipliers = schedules[gap]
+            .get_or_insert_with(|| cached_monomials_up_to_mask(multiplier_mask, gap as u32));
+        for &multiplier in multipliers.iter() {
+            if criterion.is_some_and(|c| c.prunes(i, multiplier)) {
+                continue;
+            }
+            let start = data.len();
+            data.resize(start + words, 0u64);
+            let row = &mut data[start..];
+            for term in &polynomial.terms {
+                let column = lookup(term.mask | multiplier)?;
+                row[column / 64] ^= 1u64 << (column % 64);
+            }
+            if row.iter().all(|word| *word == 0) {
+                data.truncate(start);
+                continue;
+            }
+            if rows == row_cap {
+                return None;
+            }
+            for (word_index, &word) in row.iter().enumerate() {
+                let mut bits = word;
+                while bits != 0 {
+                    seen[word_index * 64 + bits.trailing_zeros() as usize] = true;
+                    bits &= bits - 1;
+                }
+            }
+            rows += 1;
+        }
+    }
+    if seen.iter().any(|present| !present) {
+        return None;
+    }
+    let _ = n_vars; // The explicit multiplier mask owns the schedule.
+    Some(FlatF2Matrix { data, rows, words })
 }
 
 fn build_macaulay_packed<P: Default>(
@@ -3334,6 +3531,7 @@ fn build_macaulay_packed<P: Default>(
     reuse_layout: bool,
     criterion: RowCriterion,
     pack: impl Fn(&[Vec<u64>], &F4ColumnLayout, bool) -> Option<P>,
+    direct: Option<F4DirectPacker<P>>,
 ) -> Option<BuiltMacaulay<P>> {
     let subprofile = std::env::var("KIC_F4_BUILD_SUBPROFILE").as_deref() == Ok("1");
     let rows_started = subprofile.then(std::time::Instant::now);
@@ -3348,6 +3546,27 @@ fn build_macaulay_packed<P: Default>(
         .as_ref()
         .map(|c| (c.pruned_count(), c.word_ops()))
         .unwrap_or((0, 0));
+    if reuse_layout {
+        if let Some(direct) = direct {
+            let key = (multiplier_mask, degree, criterion == RowCriterion::F5);
+            if let Some(layout) = cached_f4_layout(key) {
+                if let Some(matrix) =
+                    direct(polys, n_vars, degree, multiplier_mask, &layout, f5.as_ref())
+                {
+                    F4_LAYOUT_HITS.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                    return Some(BuiltMacaulay {
+                        columns: layout.columns.clone(),
+                        matrix,
+                        rows_pruned,
+                        criterion_word_ops,
+                    });
+                }
+                F4_LAYOUTS.with(|layouts| {
+                    layouts.borrow_mut().remove(&key);
+                });
+            }
+        }
+    }
     let rows_monos =
         macaulay_rows_monos_with_mask(polys, n_vars, degree, multiplier_mask, f5.as_ref())?;
     if let Some(started) = rows_started {
@@ -4890,7 +5109,13 @@ impl SolverEngine {
                 _ => None,
             }
         });
-        let highest_only = forced.unwrap_or(n_vars >= 24);
+        let highest_only = (matches!(self, Self::MatrixF4 { .. } | Self::MatrixF5 { .. })
+            && prepared_matrix_runtime()
+            // Tiny overdetermined Semaev systems usually refute at degree
+            // two. Paying for degree three on every relation query regresses
+            // the complete pipeline, even when wider complete-root calls win.
+            && (n_vars >= 16 || MATRIX_RUNTIME.with(|slot| matches!(slot.get(), Some(MatrixRuntime::Prepared | MatrixRuntime::QuadraticTail)))))
+            || forced.unwrap_or(n_vars >= 24);
         let first = if highest_only { top } else { base };
         Some(first..=top)
     }
@@ -6298,6 +6523,7 @@ pub fn solve_boolean_system_with_node_oracle(
         InheritPolicy::resolve(opts.engine),
         accept,
         node_oracle,
+        false,
     )
 }
 
@@ -6311,9 +6537,15 @@ fn solve_with_policy(
     policy: InheritPolicy,
     accept: impl FnMut(u64) -> bool,
 ) -> (Vec<u64>, SolveStats) {
-    solve_with_policy_and_oracle(equations, n_vars, opts, policy, accept, |_, _| {
-        NodeOracleDecision::Continue
-    })
+    solve_with_policy_and_oracle(
+        equations,
+        n_vars,
+        opts,
+        policy,
+        accept,
+        |_, _| NodeOracleDecision::Continue,
+        true,
+    )
 }
 
 fn solve_with_policy_and_oracle(
@@ -6323,6 +6555,7 @@ fn solve_with_policy_and_oracle(
     policy: InheritPolicy,
     mut accept: impl FnMut(u64) -> bool,
     mut node_oracle: impl FnMut(&[Option<bool>], u64) -> NodeOracleDecision,
+    tail_allowed: bool,
 ) -> (Vec<u64>, SolveStats) {
     let mut stats = SolveStats::default();
     let mut out = Vec::new();
@@ -6339,6 +6572,7 @@ fn solve_with_policy_and_oracle(
         n_vars,
         opts,
         policy,
+        tail_allowed,
         &mut stats,
         &mut out,
         &mut accept,
@@ -6357,6 +6591,88 @@ fn early_oracle_enabled() -> bool {
     *ENABLED.get_or_init(|| std::env::var("KIC_F4_EARLY_ORACLE").as_deref() != Ok("0"))
 }
 
+/// Exact bounded quadratic completion, in the same low-variable-first DFS
+/// order as the matrix solver. Unsupported degrees/widths simply recurse.
+fn quadratic_tail_roots(
+    equations: &[F2BoolPoly],
+    assignment: &[Option<bool>],
+) -> Option<(Vec<usize>, Vec<u64>)> {
+    use crate::cryptanalysis::mq_fes::{gray_incremental_find_all, QuadraticForm};
+    let variables: Vec<_> = assignment
+        .iter()
+        .enumerate()
+        .filter_map(|(v, value)| value.is_none().then_some(v))
+        .collect();
+    if assignment.len() > 64 || variables.is_empty() || variables.len() > 16 || equations.len() > 64
+    {
+        return None;
+    }
+    let mut local = [u8::MAX; 64];
+    let mut false_mask = 0u64;
+    let mut true_mask = 0u64;
+    for (v, value) in assignment.iter().enumerate() {
+        match value {
+            Some(false) => false_mask |= 1u64 << v,
+            Some(true) => true_mask |= 1u64 << v,
+            None => {}
+        }
+    }
+    for (i, &v) in variables.iter().enumerate() {
+        local[v] = i as u8;
+    }
+    let forms: Option<Vec<_>> = equations
+        .iter()
+        .map(|p| {
+            let mut form = QuadraticForm {
+                n: variables.len(),
+                constant: false,
+                linear: vec![false; variables.len()],
+                quad: (0..variables.len()).map(|i| vec![false; i]).collect(),
+            };
+            for term in &p.terms {
+                if term.mask & false_mask != 0 {
+                    continue;
+                }
+                let mut mask = term.mask & !true_mask;
+                let degree = mask.count_ones();
+                if degree > 2 {
+                    return None;
+                }
+                if mask == 0 {
+                    form.constant ^= true;
+                    continue;
+                }
+                let a = local[mask.trailing_zeros() as usize] as usize;
+                if a >= variables.len() {
+                    return None;
+                }
+                mask &= mask - 1;
+                if mask == 0 {
+                    form.linear[a] ^= true;
+                } else {
+                    let b = local[mask.trailing_zeros() as usize] as usize;
+                    if b >= variables.len() {
+                        return None;
+                    }
+                    form.quad[a.max(b)][a.min(b)] ^= true;
+                }
+            }
+            Some(form)
+        })
+        .collect();
+    let forms = forms?;
+    let count = 1usize << variables.len();
+    let mut roots = if forms.is_empty() {
+        (0..count as u64).collect()
+    } else {
+        gray_incremental_find_all(&forms, count)?
+    };
+    // Lowest free variable is the outer DFS branch, hence the most
+    // significant position in the root-order key, not the numeric mask.
+    roots.sort_unstable_by_key(|root| root.reverse_bits());
+    Some((variables, roots))
+}
+
 #[allow(clippy::too_many_arguments)]
 fn solve_rec(
     system: Vec<F2BoolPoly>,
@@ -6366,6 +6682,7 @@ fn solve_rec(
     n_vars: usize,
     opts: &SolveOptions,
     policy: InheritPolicy,
+    tail_allowed: bool,
     stats: &mut SolveStats,
     out: &mut Vec<u64>,
     accept: &mut impl FnMut(u64) -> bool,
@@ -6466,6 +6783,42 @@ fn solve_rec(
         if system.iter().any(is_constant_one) {
             stats.infeasible_branches += 1;
             return;
+        }
+        if tail_allowed
+            && parent.is_some()
+            && opts.split_rule == SplitRule::LowestFree
+            && matches!(
+                opts.engine,
+                SolverEngine::MatrixF4 { .. } | SolverEngine::MatrixF5 { .. }
+            )
+            && MATRIX_RUNTIME.with(|slot| {
+                matches!(
+                    slot.get(),
+                    Some(MatrixRuntime::QuadraticTail | MatrixRuntime::AdaptiveQuadraticTail)
+                )
+            })
+        {
+            if let Some((variables, roots)) = quadratic_tail_roots(&system, &assignment) {
+                stats.tail_enumerations += 1;
+                stats.tail_assignments_tested += 1usize << variables.len();
+                for root in roots {
+                    let mut complete = assignment.clone();
+                    for (bit, &variable) in variables.iter().enumerate() {
+                        complete[variable] = Some((root >> bit) & 1 != 0);
+                    }
+                    let point = point_with_definitions(&complete, &defined);
+                    if original.iter().all(|equation| equation.eval(point) == 0) {
+                        out.push(point);
+                        if accept(point) {
+                            *stop = true;
+                        }
+                        if *stop || out.len() >= opts.max_solutions {
+                            return;
+                        }
+                    }
+                }
+                return;
+            }
         }
         if policy.linear_elimination {
             let mut word_ops = 0u64;
@@ -6681,6 +7034,7 @@ fn solve_rec(
                     n_vars,
                     opts,
                     policy,
+                    tail_allowed,
                     stats,
                     out,
                     accept,
@@ -6700,6 +7054,254 @@ fn solve_rec(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn matrix_runtime_direct_packing_matches_f4_and_f5_rows() {
+        for n in 2..=7 {
+            let equations: Vec<_> = (0..4)
+                .map(|salt| {
+                    F2BoolPoly::from_monos(
+                        (0..1u64 << n)
+                            .filter(|mask| {
+                                mask.count_ones() <= 2 && (mask.wrapping_mul(13) + salt) % 5 < 2
+                            })
+                            .map(F2BoolMono::from_mask)
+                            .collect(),
+                        n,
+                    )
+                })
+                .collect();
+            for degree in 2..=4 {
+                for criterion in [RowCriterion::None, RowCriterion::F5] {
+                    let mask = occurring_vars(&equations);
+                    let f5 = (criterion == RowCriterion::F5)
+                        .then(|| F5Criterion::new(&equations, n, degree, mask));
+                    let rows =
+                        macaulay_rows_monos_with_mask(&equations, n, degree, mask, f5.as_ref())
+                            .unwrap();
+                    let columns = macaulay_columns(&rows).unwrap();
+                    if columns.is_empty() {
+                        continue;
+                    }
+                    let layout = F4ColumnLayout::new(columns.clone());
+                    let want = pack_rows_flat_with_layout(&rows, &layout, false).unwrap();
+                    let got = pack_polynomials_flat_direct(
+                        &equations,
+                        n,
+                        degree,
+                        mask,
+                        &layout,
+                        f5.as_ref(),
+                    )
+                    .unwrap();
+                    assert_eq!(got.data, want.data);
+                    assert_eq!((got.rows, got.words), (want.rows, want.words));
+                    for index in [
+                        F4ColumnIndex::Standard(
+                            columns.iter().enumerate().map(|(i, &m)| (m, i)).collect(),
+                        ),
+                        F4ColumnIndex::Fast(F4FastColumnIndex::Hashed(
+                            columns.iter().enumerate().map(|(i, &m)| (m, i)).collect(),
+                        )),
+                    ] {
+                        let layout = F4ColumnLayout {
+                            columns: columns.clone(),
+                            index,
+                        };
+                        let got = pack_polynomials_flat_direct(
+                            &equations,
+                            n,
+                            degree,
+                            mask,
+                            &layout,
+                            f5.as_ref(),
+                        )
+                        .unwrap();
+                        assert_eq!(got.data, want.data);
+                        assert_eq!((got.rows, got.words), (want.rows, want.words));
+                    }
+                    let stale = F4ColumnLayout::new(columns[1..].to_vec());
+                    assert!(pack_polynomials_flat_direct(
+                        &equations,
+                        n,
+                        degree,
+                        mask,
+                        &stale,
+                        f5.as_ref()
+                    )
+                    .is_none());
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn matrix_runtime_small_systems_keep_cheap_degree_ladder() {
+        for runtime in [
+            MatrixRuntime::AdaptivePrepared,
+            MatrixRuntime::AdaptiveQuadraticTail,
+        ] {
+            with_matrix_runtime(runtime, || {
+                for engine in [
+                    SolverEngine::MatrixF4 { max_degree: 3 },
+                    SolverEngine::MatrixF5 { max_degree: 3 },
+                ] {
+                    for n in [8, 10, 12, 15] {
+                        assert_eq!(engine.degree_ladder(2, n).unwrap(), 2..=3);
+                    }
+                    for n in [16, 22] {
+                        assert_eq!(engine.degree_ladder(2, n).unwrap(), 3..=3);
+                    }
+                }
+                assert_eq!(
+                    SolverEngine::InheritedF4 { max_degree: 3 }
+                        .degree_ladder(2, 12)
+                        .unwrap(),
+                    2..=3
+                );
+            });
+        }
+        // Previously recorded method identities retain their exact ladder.
+        for runtime in [MatrixRuntime::Prepared, MatrixRuntime::QuadraticTail] {
+            with_matrix_runtime(runtime, || {
+                assert_eq!(
+                    SolverEngine::MatrixF4 { max_degree: 3 }
+                        .degree_ladder(2, 12)
+                        .unwrap(),
+                    3..=3
+                );
+                assert_eq!(
+                    SolverEngine::MatrixF5 { max_degree: 3 }
+                        .degree_ladder(2, 10)
+                        .unwrap(),
+                    3..=3
+                );
+            });
+        }
+    }
+
+    #[test]
+    fn matrix_runtime_direct_lookup_handles_high_variable_masks() {
+        let high = 1u64 << 63;
+        let equations = [F2BoolPoly::from_monos(
+            vec![
+                F2BoolMono::from_mask(high | 1),
+                F2BoolMono::from_mask(high),
+                F2BoolMono::from_mask(1),
+            ],
+            64,
+        )];
+        for criterion in [RowCriterion::None, RowCriterion::F5] {
+            let f5 = (criterion == RowCriterion::F5)
+                .then(|| F5Criterion::new(&equations, 64, 3, high | 1));
+            let rows =
+                macaulay_rows_monos_with_mask(&equations, 64, 3, high | 1, f5.as_ref()).unwrap();
+            let columns = macaulay_columns(&rows).unwrap();
+            let layout = F4ColumnLayout::new(columns);
+            let want = pack_rows_flat_with_layout(&rows, &layout, false).unwrap();
+            let got =
+                pack_polynomials_flat_direct(&equations, 64, 3, high | 1, &layout, f5.as_ref())
+                    .unwrap();
+            assert_eq!(got.data, want.data);
+            assert_eq!((got.rows, got.words), (want.rows, want.words));
+        }
+    }
+
+    #[test]
+    fn matrix_runtime_quadratic_tails_preserve_all_roots_and_caps() {
+        for n in 2..=8 {
+            let systems = [
+                Vec::new(),
+                vec![F2BoolPoly::from_monos(
+                    vec![F2BoolMono::from_mask(3), F2BoolMono::from_mask(0)],
+                    n,
+                )],
+                (0..n)
+                    .map(|i| F2BoolPoly::from_monos(vec![F2BoolMono::from_mask(1 << i)], n))
+                    .collect(),
+                (0..n)
+                    .map(|i| {
+                        F2BoolPoly::from_monos(
+                            vec![
+                                F2BoolMono::from_mask(1 << i),
+                                F2BoolMono::from_mask(1 << ((i + 1) % n)),
+                            ],
+                            n,
+                        )
+                    })
+                    .collect(),
+            ];
+            for system in systems {
+                let mut literal: Vec<_> = (0..1u64 << n)
+                    .filter(|p| system.iter().all(|e| e.eval(*p) == 0))
+                    .collect();
+                literal.sort_unstable_by_key(|p| p.reverse_bits());
+                for engine in [
+                    SolverEngine::MatrixF4 { max_degree: 3 },
+                    SolverEngine::MatrixF5 { max_degree: 3 },
+                ] {
+                    for cap in [1, 3, 1usize << n] {
+                        let opts = SolveOptions {
+                            engine,
+                            max_solutions: cap,
+                            node_budget: 100_000,
+                            split_rule: SplitRule::LowestFree,
+                        };
+                        let (want, _) = with_matrix_runtime(MatrixRuntime::Baseline, || {
+                            solve_boolean_system(&system, n, &opts)
+                        });
+                        for runtime in [
+                            MatrixRuntime::QuadraticTail,
+                            MatrixRuntime::AdaptiveQuadraticTail,
+                        ] {
+                            let (got, stats) = with_matrix_runtime(runtime, || {
+                                solve_boolean_system(&system, n, &opts)
+                            });
+                            assert!(!stats.exhausted);
+                            assert_eq!(got, want);
+                            assert_eq!(got, literal.iter().take(cap).copied().collect::<Vec<_>>());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn matrix_runtime_tail_fallbacks_budget_and_custom_oracle() {
+        let cubic = F2BoolPoly::from_monos(vec![F2BoolMono::from_mask(7)], 4);
+        assert!(quadratic_tail_roots(&[cubic], &[None; 4]).is_none());
+        assert!(quadratic_tail_roots(&[], &[None; 17]).is_none());
+        let opts = SolveOptions {
+            engine: SolverEngine::MatrixF4 { max_degree: 2 },
+            max_solutions: 4,
+            node_budget: 0,
+            split_rule: SplitRule::LowestFree,
+        };
+        let (roots, stats) = with_matrix_runtime(MatrixRuntime::QuadraticTail, || {
+            solve_boolean_system(&[], 4, &opts)
+        });
+        assert!(roots.is_empty() && stats.exhausted);
+        let opts = SolveOptions {
+            node_budget: 1000,
+            ..opts
+        };
+        let (_, stats) = with_matrix_runtime(MatrixRuntime::QuadraticTail, || {
+            solve_boolean_system_with_node_oracle(
+                &[],
+                4,
+                &opts,
+                |_| false,
+                |_, _| NodeOracleDecision::Continue,
+            )
+        });
+        assert_eq!(stats.tail_enumerations, 0);
+        assert!(!prepared_matrix_runtime());
+        let _ = std::panic::catch_unwind(|| {
+            with_matrix_runtime(MatrixRuntime::Prepared, || panic!("scope test"))
+        });
+        assert!(!prepared_matrix_runtime());
+    }
 
     #[test]
     fn direct_fused_pack_matches_sorted_parity_and_exact_layout() {

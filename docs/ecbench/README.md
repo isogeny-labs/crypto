@@ -453,6 +453,26 @@ frozen-source replays rebuild it against pre-F6 snapshots of
 evaluations, and the tournament admits no root build script. It also
 refuses to run while a `KIC_*`, `F4_*` or `SOLVER_*` tuning override is set.
 
+The opt-in continuation binds implementation policies in the oracle spec:
+`matrix_runtime=baseline|prepared|quadratic-tail` on `matrix-f4`/`matrix-f5`.
+Baseline enables the previously qualified GF2 single-write/vector/one-worker
+kernels; prepared additionally uses active-variable layouts, one top-degree
+matrix, exact linear-tail reduction and direct cached F4/F5 parity packing.
+Quadratic-tail finishes branches with at most16 free variables after the
+root reduction, using complete bounded Gray enumeration and original-root
+verification. Defaults and old method identities remain unchanged. The
+thread-local policies restore after nested calls and unwinding; no tuning
+environment is mutated. F6/inherited callers may explicitly select only the
+kernel profile through `kernel_runtime=native-v1`.
+
+`pdp3-binary:m=2,engine=generalized,work_budget=W` runs the typed complete
+Boolean quadratic solver on the same standard-subspace ANF and lifts its
+roots through the counted group. At most32 Boolean variables are supported;
+`degree`/`node_budget` are refused. Exhaustion stays a failed solver call.
+Both bounded-tail and generalized assignment counts are exported as unpriced
+native work, separate from calibrated Macaulay word XORs. Their cold wall
+costs remain inside the full pipeline; partially priced S is a lower bound.
+
 `prime-kummer:t=T[,g=G]` and `prime-isogeny:t=T[,seed=S]` are Petit,
 Kosters and Messeng's tower bases for prime curves
 (`ic_framework::prime_tower`): every point whose abscissa lies in a set `V`

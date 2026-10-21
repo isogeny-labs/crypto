@@ -25,11 +25,13 @@ import contextlib
 import fnmatch
 import glob
 import hashlib
+import io
 import json
 import os
 import re
 import subprocess
 import sys
+import tarfile
 from collections import Counter, defaultdict
 from functools import lru_cache
 
@@ -43,7 +45,8 @@ COVER_LINKS = "docs/curves/cover-links.yaml"
 STANDARDS_COVERAGE = "docs/curves/standards/coverage.json"
 LEADERBOARD = "docs/ic/leaderboard.json"
 TOURNAMENT_RUNS = "research/ic_candidate_tournament_20260915/runs"
-ECBENCH_SESSIONS_GLOBS = ("research/ecbench_*/sessions/*", "research/isogeny_conductor_gap_*/sessions/*", "research/fiber_ic_scaling_*/sessions/*", "research/full_volcano_graphwide_ic_*/execution/campaigns/*/sessions/*")
+ECBENCH_SESSIONS_GLOBS = ("research/ecbench_*/sessions/*", "research/isogeny_conductor_gap_*/sessions/*", "research/fiber_ic_scaling_*/sessions/*", "research/full_volcano_graphwide_ic_*/execution/campaigns/*/sessions/*", "research/f4_f5_ecbench_20261019/runs/**")
+ECBENCH_ARCHIVES = ("research/f4_f5_ecbench_20261019/runs.tar.xz",)
 IC1_SCAN_GLOBS = (
     "docs/ic/**/*.json",
     "docs/ic/**/*.md",
@@ -282,6 +285,63 @@ class RepositoryInputs:
         return self.read_bytes(path).decode("utf-8", errors)
 
 
+class ArchivedStudyInputs(RepositoryInputs):
+    """Index sealed sessions directly from checksum-bound committed archives.
+
+    This is a read-only site input adapter. It never extracts an archive or
+    runs an experiment; stale local extraction cannot shadow recorded bytes.
+    """
+
+    def __init__(self, root: str):
+        self.archived_files = {}
+        self.archive_of = {}
+        super().__init__(root)
+        for archive in ECBENCH_ARCHIVES:
+            if not self.exists(archive):
+                continue
+            raw = self.read_bytes(archive)
+            expected = self.read_text(archive + ".sha256").split()[0]
+            if hashlib.sha256(raw).hexdigest() != expected:
+                raise ValueError(f"archive checksum mismatch: {archive}")
+            base = os.path.dirname(archive)
+            with tarfile.open(fileobj=io.BytesIO(raw), mode="r:xz") as tree:
+                for member in tree:
+                    if os.path.basename(member.name) not in ("session.json", "spec.json", "records.jsonl"):
+                        continue
+                    parts = member.name.split("/")
+                    if parts[0] != "runs" or ".." in parts or not member.isfile():
+                        raise ValueError(f"invalid session archive member: {member.name}")
+                    path = base + "/" + member.name
+                    if path in self.tracked_files or path in self.archived_files:
+                        raise ValueError(f"duplicate session archive member: {path}")
+                    self.archived_files[path] = tree.extractfile(member).read()
+                    self.archive_of[path] = archive
+            self.tracked_files.update(self.archived_files)
+
+    def exists(self, path: str) -> bool:
+        return self._relative(path) in self.archived_files or super().exists(path)
+
+    def glob_files(self, pattern: str) -> list[str]:
+        pattern = self._relative(pattern)
+        return sorted(set(super().glob_files(pattern)) | {
+            path for path in self.archived_files if _glob_match(path, pattern)
+        })
+
+    def size(self, path: str) -> int:
+        relative = self._relative(path)
+        return len(self.archived_files[relative]) if relative in self.archived_files else super().size(path)
+
+    @contextlib.contextmanager
+    def open_binary(self, path: str):
+        relative = self._relative(path)
+        if relative in self.archived_files:
+            with io.BytesIO(self.archived_files[relative]) as fh:
+                yield fh
+        else:
+            with super().open_binary(path) as fh:
+                yield fh
+
+
 def load_file(path: str, source: RepositoryInputs | None = None):
     if source is not None:
         return json.loads(source.read_text(path))
@@ -473,6 +533,8 @@ def ecbench_sessions(
             {
                 "session_id": s["session_id"],
                 "dir": sdir,
+                **({"archive_path": source.archive_of[records_path], "archive_member": os.path.relpath(sdir, os.path.dirname(source.archive_of[records_path]))}
+                   if records_path in getattr(source, "archive_of", {}) else {}),
                 "label": s.get("label") or spec.get("label"),
                 "status": s.get("status"),
                 "spec_id": s.get("spec_id"),
@@ -712,7 +774,7 @@ def attach_covers(
 
 
 def build() -> dict:
-    source = RepositoryInputs(ROOT)
+    source = ArchivedStudyInputs(ROOT)
     registry = load(REGISTRY, source)
     leaderboard = load(LEADERBOARD, source)
     curves = curve_rows(registry, leaderboard)
@@ -749,6 +811,7 @@ def build() -> dict:
         COVER_LINKS: sha256_file(COVER_LINKS, source),
         STANDARDS_COVERAGE: sha256_file(STANDARDS_COVERAGE, source),
         LEADERBOARD: sha256_file(LEADERBOARD, source),
+        **{archive: sha256_file(archive, source) for archive in ECBENCH_ARCHIVES if source.exists(archive)},
         **{
             os.path.join(s["dir"], "records.jsonl"): sha256_file(
                 os.path.join(s["dir"], "records.jsonl"), source

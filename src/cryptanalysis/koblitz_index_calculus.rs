@@ -4836,6 +4836,23 @@ impl PairSumTable {
         fb: &FrobeniusFactorBase,
         byte_budget: u128,
     ) -> Option<Self> {
+        // A one-worker resource contract does not benefit from handing both
+        // construction and sorting to another thread on the same CPU.
+        // Keep all other configurations on the existing parallel path.
+        Self::build_full_within_runtime(
+            kc,
+            fb,
+            byte_budget,
+            std::env::var("RAYON_NUM_THREADS").as_deref() == Ok("1"),
+        )
+    }
+
+    fn build_full_within_runtime(
+        kc: &KoblitzCurve,
+        fb: &FrobeniusFactorBase,
+        byte_budget: u128,
+        serial: bool,
+    ) -> Option<Self> {
         if fb.points.len() > u32::MAX as usize {
             return None;
         }
@@ -4846,18 +4863,27 @@ impl PairSumTable {
         let points: Vec<FastPoint> = fb.points.iter().map(|p| curve.lift(p)).collect();
         let negated: Vec<FastPoint> = points.iter().map(|&p| curve.neg(p)).collect();
         let (negated_x, negated_y) = coordinate_slices(&negated);
-        let mut entries: Vec<(u64, u32, u32)> = (0..points.len())
-            .into_par_iter()
-            .flat_map_iter(|i| {
-                let mut sums = Vec::with_capacity(points.len() - i);
-                let mut scratch = BatchScratch::default();
-                curve.add_many(points[i], &points[i..], &mut sums, &mut scratch);
-                sums.into_iter()
-                    .enumerate()
-                    .map(move |(offset, sum)| (sum.pack(), i as u32, (i + offset) as u32))
-            })
-            .collect();
-        entries.par_sort_unstable();
+        let make_row = |i: usize| {
+            let mut sums = Vec::with_capacity(points.len() - i);
+            let mut scratch = BatchScratch::default();
+            curve.add_many(points[i], &points[i..], &mut sums, &mut scratch);
+            sums.into_iter()
+                .enumerate()
+                .map(move |(offset, sum)| (sum.pack(), i as u32, (i + offset) as u32))
+        };
+        let mut entries: Vec<(u64, u32, u32)> = if serial {
+            (0..points.len()).flat_map(make_row).collect()
+        } else {
+            (0..points.len())
+                .into_par_iter()
+                .flat_map_iter(make_row)
+                .collect()
+        };
+        if serial {
+            entries.sort_unstable();
+        } else {
+            entries.par_sort_unstable();
+        }
         if entries.len() > u32::MAX as usize {
             return None;
         }
@@ -14888,6 +14914,36 @@ mod tests {
         assert_eq!(cost, again);
         let (_, other) = build_subgroup_orbit_factor_base_with_cost(&kc, 6, 400).unwrap();
         assert_ne!(cost.abscissae_drawn, other.abscissae_drawn);
+    }
+
+    #[test]
+    fn full_pair_table_single_worker_matches_parallel_entries_and_budgets() {
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(4)
+            .build()
+            .unwrap();
+        for (a, n) in [(0, 19), (1, 11), (1, 23)] {
+            let kc = KoblitzCurve::new(a, n).unwrap();
+            let fb = build_subgroup_orbit_factor_base(&kc, 7, 32).unwrap();
+            let bytes = PairSumTable::byte_size(fb.points.len());
+            let serial = PairSumTable::build_full_within_runtime(&kc, &fb, bytes, true).unwrap();
+            let parallel = pool.install(|| {
+                PairSumTable::build_full_within_runtime(&kc, &fb, bytes, false).unwrap()
+            });
+            assert_eq!(serial.entries, parallel.entries);
+            assert_eq!(serial.bucket_start, parallel.bucket_start);
+            assert_eq!(serial.bucket_shift, parallel.bucket_shift);
+            assert_eq!(serial.present, parallel.present);
+            assert_eq!(serial.present_mask, parallel.present_mask);
+            for &(key, _, _) in &parallel.entries {
+                assert_eq!(serial.lookup(key), parallel.lookup(key));
+            }
+            for serial in [false, true] {
+                assert!(
+                    PairSumTable::build_full_within_runtime(&kc, &fb, bytes - 1, serial).is_none()
+                );
+            }
+        }
     }
 
     #[test]
