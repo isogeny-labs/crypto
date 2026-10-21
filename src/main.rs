@@ -9,13 +9,14 @@
 //!   ecdh    <privkey-hex> <pubkey-hex> — ECDH shared secret
 //!   rsa     keygen                     — Generate an RSA key pair (slow)
 //!   rsa     sign <priv-json> <msg>     — RSA sign
-//!   aes     encrypt <key-hex> <nonce-hex> <msg>
+//!   aes     gcm-encrypt|gcm-decrypt --key-file PATH --nonce-hex HEX --file PATH
 //!   chacha  encrypt <key-hex> <nonce-hex> <msg>
 //!   hkdf    <ikm-hex> <salt-hex> <info> <length>
 //!   pqc                                — PQC demos (ML-KEM, ML-DSA, SQIsign, toy Kyber)
 //!   pqc-fast <module> --op ...         — the speed-oriented implementations
 //!   mlwe    <attack>  ...              — ML-KEM / ML-DSA cryptanalysis
 
+mod cli_aes_gcm;
 mod cli_aes_observed;
 mod cli_mlwe;
 mod cli_pqc;
@@ -137,8 +138,11 @@ enum Cmd {
         #[command(subcommand)]
         op: RsaOp,
     },
-    /// AES-GCM encrypt / decrypt demo
-    Aes,
+    /// AES-GCM encrypt / decrypt with caller-supplied inputs; bare command runs the demo.
+    Aes {
+        #[command(subcommand)]
+        op: Option<cli_aes_gcm::AesOp>,
+    },
     /// ChaCha20-Poly1305 encrypt / decrypt demo
     Chacha,
     /// HKDF key derivation demo
@@ -758,7 +762,15 @@ fn main() {
         Cmd::Ecdsa { op } => cmd_ecdsa(op),
         Cmd::Ecdh => cmd_ecdh(),
         Cmd::Rsa { op } => cmd_rsa(op),
-        Cmd::Aes => cmd_aes(),
+        Cmd::Aes { op } => match op {
+            Some(op) => {
+                if let Err(error) = cli_aes_gcm::run(op) {
+                    eprintln!("aes: {error}");
+                    std::process::exit(2);
+                }
+            }
+            None => cmd_aes(),
+        },
         Cmd::Chacha => cmd_chacha(),
         Cmd::Hkdf => cmd_hkdf(),
         Cmd::Pqc { op } => cli_pqc::run(op),
