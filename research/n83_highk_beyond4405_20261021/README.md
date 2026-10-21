@@ -59,6 +59,11 @@ The separate split-index campaign has already enumerated and independently
 replayed a K5500 base with 913,000 usable points. This fixed31 study tests the
 largest monolithic ID30 table configurations within its 2³¹-slot capacity;
 K5500's index, rank and target measurements remain a separate frontier gate.
+The [previously Lean-checked K5500 split layout](../n83_two_tier_root_20261021/CAPACITY.md)
+calculates 33,136,508,082
+bytes (30.86 GiB) for its state, two exact tables and two Bloom filters
+alone, above this run's 26 GiB child RSS cap. Its full comparison needs the
+separately prepared larger-memory resource envelope.
 The current source now reproduces the exact archived K1107 and K5500 ordered
 base dumps. K1107 received fresh independent arithmetic replay and an exact
 K4405 prefix check; K5500's current output is byte-identical to its prior

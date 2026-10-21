@@ -109,7 +109,8 @@ def cross_family_select(rows: list[dict], candidate_id: str) -> dict:
     highk_wins = sum(a < b for a, b in zip(highk_times, k1107_times))
     k1107_wins = sum(b < a for a, b in zip(highk_times, k1107_times))
     p_value = selector.exact_two_sided_sign_p(highk_wins, k1107_wins)
-    logs = [math.log(b / a) for a, b in zip(highk_times, k1107_times)]
+    logs = [math.log(b) - math.log(a)
+            for a, b in zip(highk_times, k1107_times)]
     mean_log = statistics.mean(logs)
     margin = 1.96 * statistics.stdev(logs) / math.sqrt(16)
     highk_geo = statistics.geometric_mean(highk_times)

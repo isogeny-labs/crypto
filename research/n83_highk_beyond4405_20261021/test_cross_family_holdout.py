@@ -88,6 +88,12 @@ class CrossFamilyHoldoutTests(unittest.TestCase):
         self.assertEqual(verify_holdout.cross_family_select(data, HIGHK_ID)
                          ["status"], "BOUNDED_UNKNOWN")
 
+    def test_extreme_finite_intervals_do_not_overflow_log_ratio(self):
+        data = rows([1e-300] * 16, [1e300] * 16)
+        selected = verify_holdout.cross_family_select(data, HIGHK_ID)
+        self.assertEqual(selected["status"], "SELECTED")
+        self.assertEqual(selected["selected_candidate_id"], HIGHK_ID)
+
 
 if __name__ == "__main__":
     unittest.main()
