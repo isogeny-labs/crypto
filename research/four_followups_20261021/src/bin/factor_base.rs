@@ -11,6 +11,7 @@ use serde_json::{json, Value};
 use std::cell::Cell;
 use std::collections::{BTreeMap, BTreeSet, HashSet};
 use std::fs;
+use std::process::Command;
 
 #[derive(Clone, Copy)]
 struct Policy {
@@ -578,8 +579,30 @@ fn main() {
     assert!([8, 16, 32].contains(&policy.jump_count));
     assert!([16, 20, 24, 28, 32, 36, 40].contains(&bits));
     let path=format!("research/five_leads_e2e_20261019/sessions_projective_chart_v2/order-genus-{bits}/records.jsonl");
-    let rows: Vec<Value> = fs::read_to_string(path)
-        .unwrap()
+    let extracted = if std::env::var_os("FOUR_FOLLOWUPS_ARCHIVE_INPUT").is_some() {
+        None
+    } else {
+        fs::read_to_string(&path).ok()
+    };
+    let input = extracted.unwrap_or_else(|| {
+        let member = format!("sessions_projective_chart_v2/order-genus-{bits}/records.jsonl");
+        let out = Command::new("tar")
+            .args([
+                "--zstd",
+                "-xOf",
+                "research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst",
+                &member,
+            ])
+            .output()
+            .expect("read committed input archive");
+        assert!(
+            out.status.success(),
+            "tar failed: {}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        String::from_utf8(out.stdout).expect("UTF-8 records")
+    });
+    let rows: Vec<Value> = input
         .lines()
         .map(|line| serde_json::from_str(line).unwrap())
         .filter(|r: &Value| r["arm"] == "genus_projective")
