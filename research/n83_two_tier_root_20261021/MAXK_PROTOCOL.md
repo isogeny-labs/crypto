@@ -107,14 +107,20 @@ free-space guards; its result is recorded separately from Tier 1 selection.
 The [RunPod GPU Models price page](https://www.runpod.io/gpu-models), checked
 2026-10-21, lists a Community Cloud RTX 3090 with 125 GB host RAM, 16 vCPUs,
 and a $0.22/hour displayed rate. This is a capacity and price lead, not an
-allocation receipt. The dispatch gate will require an eligible live Pod at
+allocation receipt. The [allocation controller](runpod_control.py) uses the
+[RunPod Pod API](https://rest.runpod.io/v1/openapi.json), creates only one
+campaign-named Pod, resolves ambiguous creation by inventory instead of
+repeating the POST, and immediately deletes an ineligible Pod. Its API key
+is entered without echo and is excluded from receipts. The dispatch gate
+will require an eligible live Pod at
 no more than $0.35/hour, verify at least 48 GiB actual cgroup memory and
-four CPUs of quota, and cap provider lifetime at 12 hours. At that ceiling,
+four CPUs of quota, and bound Pod lifetime to 12 hours. At that ceiling,
 the projected 12-hour provider charge is at most $4.20; the independent
 watchdog in [runpod_guard.py](runpod_guard.py) will request termination
 10 minutes before the earlier provider-lifetime or approved-spend deadline
 and verify provider absence through both direct lookup and Pod inventory.
-Its API key is entered without echo and is not included in its receipt.
-The guard has a local mock-provider deletion/absence control; no Pod has
-been allocated with it. If the eligible Pod is unavailable, the
+Provider automatic expiry is a supplementary check because the previous
+provider timer did not terminate its Pod. The controller and guard have
+local mock-provider creation, deletion, and absence controls; no Pod has
+been allocated with them. If the eligible Pod is unavailable, the
 dispatch stays pending without substituting a weaker memory envelope.
