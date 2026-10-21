@@ -11,6 +11,7 @@ on:
       - 'src/bin/curve_cover_check.rs'
       - 'src/bin/curve_cover_check/**'
       - 'src/bin/hyperelliptic_cover.rs'
+      - 'examples/cover_catalog_transition_audit.rs'
       - 'src/bin/ecdlp_audit.rs'
       - 'src/bin/ecdlp_audit/**'
       - 'src/binary_ecc/**'
@@ -51,6 +52,7 @@ on:
       - 'src/bin/curve_cover_check.rs'
       - 'src/bin/curve_cover_check/**'
       - 'src/bin/hyperelliptic_cover.rs'
+      - 'examples/cover_catalog_transition_audit.rs'
       - 'src/bin/ecdlp_audit.rs'
       - 'src/bin/ecdlp_audit/**'
       - 'src/binary_ecc/**'
@@ -102,6 +104,11 @@ jobs:
           toolchain: '1.98'
       - uses: Swatinem/rust-cache@v2
       - run: cargo test --bin curve_cover_check --bin curve_standards
+      - name: Replay exact catalog transition inventory
+        run: |
+          cargo test --example cover_catalog_transition_audit
+          cargo run --example cover_catalog_transition_audit -- "$RUNNER_TEMP/catalog-transition.json"
+          cmp "$RUNNER_TEMP/catalog-transition.json" research/cover_transfer_assessment_20261013/catalog-transition-20261020-v2.json
       - name: Cover, Jacobian, transfer, and CLI controls
         run: |
           cargo test --lib hyperelliptic
@@ -145,6 +152,8 @@ jobs:
         run: node scripts/build_cover_transfer_assessments.mjs --check
       - name: Validate the assessment schema
         run: python -m jsonschema -i docs/curves/cover-transfer-assessments.json docs/curves/cover-transfer-assessment.schema.json
+      - name: Install native PDF metadata reader
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils
       - name: Verify typed map, subgroup, and evidence bindings
         run: node research/cover_transfer_assessment_20261013/verify_assessment.mjs
 
