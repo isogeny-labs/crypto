@@ -2383,8 +2383,33 @@ mod wide {
                 2445342385696756367155238,
                 5959927424489161220022208,
             ];
-            let full = build_index128_with_symmetry(&gf, &basis, &solver, &reps, false, false);
-            let quotient = build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false);
+            let full =
+                build_index128_with_symmetry(&gf, &basis, &solver, &reps, false, false, false);
+            let quotient =
+                build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false, false);
+            let batched =
+                build_index128_with_symmetry(&gf, &basis, &solver, &reps, true, false, true);
+            assert_eq!(batched.states.len(), quotient.states.len());
+            assert_eq!(batched.table.len, quotient.table.len);
+            for index in 0..quotient.states.len() {
+                let scalar = quotient.states.get(index);
+                let batch = batched.states.get(index);
+                assert_eq!(
+                    (batch.left, batch.right, batch.relative),
+                    (scalar.left, scalar.right, scalar.relative)
+                );
+                assert_eq!(batch.normal_roots, scalar.normal_roots);
+                for root in scalar.normal_roots {
+                    let key = basis.canonical_selected(root).0;
+                    assert_eq!(
+                        batched.table.get_with_context(key, &batched.states, &basis),
+                        quotient
+                            .table
+                            .get_with_context(key, &quotient.states, &basis),
+                        "batched index changed the first witness for key {key}",
+                    );
+                }
+            }
             assert!(quotient.states.len() < full.states.len());
             assert_eq!(quotient.table.len, full.table.len);
             assert_eq!(
@@ -3454,6 +3479,7 @@ mod wide {
         target: FastPoint128,
         start: usize,
         threads: usize,
+        cancel_early: bool,
     ) -> (Option<Relation128>, u128) {
         let n_states = index.states.len();
         if threads <= 1 || n_states == 0 {
@@ -3478,10 +3504,12 @@ mod wide {
         let n_u32 = gf.n;
         let chunk = n_states.div_ceil(threads);
         let (sender, receiver) = std::sync::mpsc::channel::<(usize, Relation128, u128)>();
+        let cancelled = std::sync::atomic::AtomicBool::new(false);
         std::thread::scope(|scope| {
             let mut handles = Vec::with_capacity(threads);
             for thread in 0..threads {
                 let sender = sender.clone();
+                let cancelled = &cancelled;
                 handles.push(scope.spawn(move || {
                     let pos_lo = thread * chunk;
                     let pos_hi = ((thread + 1) * chunk).min(n_states);
@@ -3497,6 +3525,9 @@ mod wide {
                     let mut scan = StateScan128::new(n_u32);
                     let mut lift_scratch = LiftScratch128::default();
                     for offset in 0..length {
+                        if cancel_early && cancelled.load(std::sync::atomic::Ordering::Acquire) {
+                            break;
+                        }
                         let state = index.states.get((state_lo + offset) % n_states);
                         if let Some(relation) = scan_state128(
                             gf,
@@ -3514,9 +3545,13 @@ mod wide {
                             &mut relation_check_ns,
                         ) {
                             let position = pos_lo + offset;
-                            sender
-                                .send((position, relation, relation_check_ns))
-                                .expect("target receiver is alive");
+                            if !cancel_early
+                                || !cancelled.swap(true, std::sync::atomic::Ordering::AcqRel)
+                            {
+                                sender
+                                    .send((position, relation, relation_check_ns))
+                                    .expect("target receiver is alive");
+                            }
                             break;
                         }
                     }
@@ -3616,7 +3651,16 @@ mod wide {
     ) -> Index128 {
         let symmetric_states = std::env::var("KIC_SYMMETRIC_S3").as_deref() == Ok("1");
         let indexed5_load75 = std::env::var("KIC_INDEXED5_LOAD75").as_deref() == Ok("1");
-        build_index128_with_symmetry(gf, basis, solver, reps, symmetric_states, indexed5_load75)
+        let batch_roots = std::env::var("KIC_INDEX_ROOT_BATCH").as_deref() == Ok("1");
+        build_index128_with_symmetry(
+            gf,
+            basis,
+            solver,
+            reps,
+            symmetric_states,
+            indexed5_load75,
+            batch_roots,
+        )
     }
 
     fn build_index128_with_symmetry(
@@ -3626,6 +3670,7 @@ mod wide {
         reps: &[u128],
         symmetric_states: bool,
         indexed5_load75: bool,
+        batch_roots: bool,
     ) -> Index128 {
         let n = gf.n as usize;
         assert!(
@@ -3777,13 +3822,31 @@ mod wide {
             Vec::new()
         };
         let mut states_wide = Vec::new();
+        let mut root_batch = RootBatch128::with_capacity(n);
+        let mut root_inputs = Vec::with_capacity(n);
         for left in 0..reps.len() {
             for right in 0..reps.len() {
-                for relative in 0..n {
-                    if symmetric_states && (left > right || (left == right && relative > n / 2)) {
-                        continue;
+                if symmetric_states && left > right {
+                    continue;
+                }
+                let relative_count = if symmetric_states && left == right {
+                    n / 2 + 1
+                } else {
+                    n
+                };
+                if batch_roots {
+                    root_inputs.clear();
+                    for relative in 0..relative_count {
+                        root_inputs.push((shifted[left][0], shifted[right][relative]));
                     }
-                    let roots = solver.roots(gf, basis, shifted[left][0], shifted[right][relative]);
+                    root_batch.solve(gf, basis, solver, &root_inputs);
+                }
+                for relative in 0..relative_count {
+                    let roots = if batch_roots {
+                        root_batch.results[relative]
+                    } else {
+                        solver.roots(gf, basis, shifted[left][0], shifted[right][relative])
+                    };
                     if root_only83 || root_only21 || root_only11 {
                         assert!(
                             roots.is_some(),
@@ -4495,6 +4558,49 @@ mod wide {
         let index = build_index128(&gf, &basis, &solver, &reps);
         let index_ms = index_started.elapsed().as_secs_f64() * 1000.0;
         let setup_ms = setup_started.elapsed().as_secs_f64() * 1000.0;
+        if std::env::var("KIC_INDEX_BUILD_ONLY").as_deref() == Ok("1") {
+            let state_digest = match &index.states {
+                StateStore128::RootOnly11 { states, .. } => {
+                    let mut hasher = blake3::Hasher::new();
+                    for state in states {
+                        hasher.update(&state.root0);
+                    }
+                    Some(hasher.finalize().to_hex().to_string())
+                }
+                _ => None,
+            };
+            let table_digest = match &index.table.slots {
+                RootSlots128::Indexed83(slots) => {
+                    let mut hasher = blake3::Hasher::new();
+                    for slot in slots {
+                        hasher.update(slot);
+                    }
+                    Some(hasher.finalize().to_hex().to_string())
+                }
+                _ => None,
+            };
+            println!(
+                "{}",
+                json!({
+                    "kind": "compact_orbit_index_stage",
+                    "status": "STAGE_DIAGNOSTIC_ONLY",
+                    "n": gf.n,
+                    "base_hash": base_hash,
+                    "orbit_columns": base.columns,
+                    "factor_base_points": base.points.len(),
+                    "regular_states": index.states.len(),
+                    "root_table_entries": index.table.len,
+                    "state_digest_blake3": state_digest,
+                    "table_digest_blake3": table_digest,
+                    "batch_roots": std::env::var("KIC_INDEX_ROOT_BATCH").as_deref() == Ok("1"),
+                    "base_load_ms": base_load_ms,
+                    "normal_basis_and_selftest_ms": basis_ms,
+                    "index_build_ms": index_ms,
+                    "setup_total_ms": setup_ms,
+                })
+            );
+            std::process::exit(0);
+        }
 
         let rank_started = Instant::now();
         let mut echelon = super::Echelon {
@@ -4651,6 +4757,7 @@ mod wide {
             .and_then(|value| value.trim().parse::<usize>().ok())
             .filter(|&threads| threads > 0)
             .unwrap_or(1);
+        let target_cancel = std::env::var("KIC_TARGET_CANCEL").as_deref() == Ok("1");
         let mut solved = 0usize;
         let mut failed = 0usize;
         let mut target_query_ms = Vec::with_capacity(target_inputs.len());
@@ -4687,6 +4794,7 @@ mod wide {
                 target,
                 start,
                 target_threads,
+                target_cancel,
             );
             let target_decomposition_total_ms = target_pdp_started.elapsed().as_secs_f64() * 1000.0;
             let target_relation_check_ms = target_relation_check_ns as f64 / 1_000_000.0;
@@ -4803,6 +4911,7 @@ mod wide {
             "target_threads":target_threads,
             "scope":"public synthetic Koblitz fixtures; shared-factor-log DLP with every stage timed in one process; no external points or key recovery",
         });
+        summary["target_cancel"] = json!(target_cancel);
         summary["root_bloom_profile"] = json!(index
             .table
             .bloom
