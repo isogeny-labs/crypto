@@ -25,6 +25,13 @@ of verified theorems or experiments.
   infrastructure classification; that CI run made no theorem verdict. A
   subsequent local run of the exact repository gate passed all five theorems
   on pinned Lean 4.34.1, with no axioms or trusted declarations.
+* The cancelled `research/ic_tree_split_structured_v_20261011/lean` job failed
+  during Git checkout (`curl 56` connection reset and `index-pack` failure),
+  before installing Lean or checking a theorem. The [checkout log](evidence/ci-tree-checkout-cancelled.log)
+  records that infrastructure event. A later local run of the exact gate on
+  pinned Lean 4.34.1 passed 24 declarations with one manifest-registered
+  `native_decide` proof. That proof uses compiler trust; the gate reports it
+  separately from kernel-checked declarations.
 
 The gate now passes its existing trust manifest through the
 `LEAN_AUDIT_TRUSTED_FILE` environment variable, leaving module names as the
@@ -43,6 +50,7 @@ boundary and both observed failure modes.
 | `lean tools/lean/AuditAxioms.lean` | Compiled on pinned Lean 4.19.0 and 4.34.1 | Auditor source is accepted by both versions; this alone does not audit a theorem. |
 | `tools/lean/proof-gate.sh --out ... research/sea_point_count_20261016/lean` | **PASS**, 20 theorem declarations, 0 failed, 0 compiler-trusted | The [build log](evidence/local-sea-build.log) and [axiom log](evidence/local-sea-audit.log) are retained. The theorem count includes generated `GroupOps` declarations. |
 | `tools/lean/proof-gate.sh --out ... research/n83_indexed5_load75_20261013/DenseCapacity.lean` | **PASS**, 5 theorem declarations, 0 failed, 0 compiler-trusted | The [build log](evidence/local-dense-build.log), [axiom log](evidence/local-dense-audit.log), and [gate summary](evidence/local-dense-gate.log) are retained. These are arithmetic bounds, not a benchmark replay. |
+| `tools/lean/proof-gate.sh --out ... research/ic_tree_split_structured_v_20261011/lean` | **PASS**, 24 theorem declarations, 0 failed, **1 compiler-trusted** | The [build log](evidence/local-tree-build.log), [axiom log](evidence/local-tree-audit.log), [gate summary](evidence/local-tree-gate.log), and [status](evidence/local-tree-status.txt) are retained. `TreeSplit.Replay.replay_ok` uses manifest-registered `native_decide`, so this is not a wholly kernel-only proof set. |
 | `ELAN_TOOLCHAIN=leanprover/lean4:v4.34.1 tools/lean/selftest/run.sh` | Seven of seven expected controls passed | The [self-test log](evidence/selftest-v434.log) records plain proofs and the reviewed `native_decide` fixture passing; custom axiom, `sorry`, unlisted native proof, empty audit, and build-error fixtures fail for their expected reasons. |
 | Lean 4.19 negative/positive controls | Custom axiom rejected; registered native proof reported `1 trusted` | [Negative](evidence/v419-negative.stdout) and [trusted](evidence/v419-trusted.stdout) logs show the forbidden-axiom check and trust manifest were retained. |
 | `cargo test --release --lib` | **PASS:** 4,464 passed, 0 failed, 119 ignored | This validates the library test suite in this checkout, not historical experiment outputs. The [compressed raw log](evidence/cargo-test-release-lib.log.gz) is retained. |
@@ -73,7 +81,7 @@ its committed gzip has SHA-256
 | User requirement | Status at this change |
 |:--|:--|
 | Retrofit all prior experiments across three repositories with faithful Lean proofs | **Partial.** This repair makes one existing proof project's axiom gate usable again. A source-to-claim review and missing lemmas remain for the rest of the corpus. |
-| Validate code and archived numerical results | **Partial.** The gate implementation, SEA model, DenseCapacity arithmetic bounds, and Rust library suite were tested; historical numerical results were not replayed here. |
+| Validate code and archived numerical results | **Partial.** The gate implementation, SEA model, DenseCapacity arithmetic bounds, tree-split Lean target, and Rust library suite were tested; historical numerical results were not replayed here. |
 | Refresh graphs and performance dashboards | **Not attempted in this change.** There was no new performance measurement or corrected performance datum. No canonical performance graph should move on the basis of this CI repair. |
 | All results good to go | **Not established.** The full crypto proof matrix and cross-repository scientific claims still require their own evidence and semantic review. The companion autoresearcher workspace was built and its 62 present targets machine-verified separately; semantic review remains pending. |
 
@@ -88,6 +96,7 @@ elan run leanprover/lean4:v4.19.0 lean tools/lean/AuditAxioms.lean
 elan run leanprover/lean4:v4.34.1 lean tools/lean/AuditAxioms.lean
 tools/lean/proof-gate.sh --out /tmp/crypto-sea-gate research/sea_point_count_20261016/lean
 tools/lean/proof-gate.sh --out /tmp/crypto-dense-gate research/n83_indexed5_load75_20261013/DenseCapacity.lean
+tools/lean/proof-gate.sh --out /tmp/crypto-tree-gate research/ic_tree_split_structured_v_20261011/lean
 ELAN_TOOLCHAIN=leanprover/lean4:v4.34.1 tools/lean/selftest/run.sh
 ```
 
@@ -95,6 +104,8 @@ The audited `SeaProofs.lean` SHA-256 is
 `0c18e419b033bb577d9afea5c1cc18b77f28c427ed1fbed2afa89dcb9ecf6daf`.
 The audited `DenseCapacity.lean` SHA-256 is
 `dc848680be90d5f173f7b5e4a88c243826f3badd95c735333d212e01cb44fe18`.
+The audited `TreeSplit/Replay.lean` SHA-256 is
+`d2393d666481f24276b9a3cb0a5f2f324bdcf4320c442a53207514292e55f054`.
 The repaired auditor and gate script SHA-256 values at this report revision
 are `7bbe3fdd3adff99f13d0bc17c9e26b242fe93a08698a37d4c164ab08a0cda1eb`
 and `b5f0a43c6e35ad736ef2c9933f5c303d509883dd81cfb467d55b5a1214f125cc`.

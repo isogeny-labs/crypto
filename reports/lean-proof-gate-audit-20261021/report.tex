@@ -29,6 +29,10 @@ before the separate axiom audit. This was a gate implementation failure, not a
 counterexample. The DenseCapacity target failed in that CI run while downloading
 Lean 4.34.1 because of a TLS connection error; that run produced no theorem
 verdict. A later local run of the repository gate passed its five theorems.
+The cancelled tree-split job failed during Git checkout (connection reset and
+\mono{index-pack} failure), before Lean ran. The later local tree-split gate
+passed 24 declarations; one registered \mono{native\_decide} proof uses
+compiler trust and is counted separately.
 
 The repaired gate passes the unchanged trust manifest through
 \mono{LEAN\_AUDIT\_TRUSTED\_FILE}; the auditor receives only module names as
@@ -55,6 +59,7 @@ Check & Observed result \\ \hline
 Auditor source under Lean 4.19.0 and 4.34.1 & Both compile. This is a compatibility check, not a theorem audit. \\ \hline
 SEA project proof gate & PASS; 20 theorem declarations, 0 failed, 0 compiler-trusted. The count includes generated GroupOps declarations. \\ \hline
 DenseCapacity proof gate & PASS; 5 arithmetic-bound theorems, 0 failed, 0 compiler-trusted. \\ \hline
+Tree-split proof gate & PASS; 24 declarations, 0 failed, 1 manifest-registered compiler-trusted \mono{native\_decide} proof. \\ \hline
 Gate self-test & Seven of seven expected positive and negative controls passed. \\ \hline
 Lean 4.19 controls & Custom axiom rejected; registered native proof reported as one trusted proof. \\ \hline
 Rust library tests & PASS: 4,464 passed, 0 failed, 119 ignored. The compressed raw log is retained with the report. \\ \hline
@@ -78,16 +83,14 @@ logs are retained. The successful raw test log SHA-256 is
 \begin{tabular}{|p{0.42\linewidth}|p{0.48\linewidth}|}\hline
 Requirement & Status in this change \\ \hline
 Faithful Lean proofs for all prior experiments across three repos & Partial: this repair restores one proof project's axiom gate; other source-to-claim reviews and lemmas remain. \\ \hline
-Code and numerical result validation & Partial: gate, SEA model, DenseCapacity bounds, and Rust library tested; historical results not replayed. \\ \hline
+Code and numerical result validation & Partial: gate, SEA model, DenseCapacity bounds, tree-split target, and Rust library tested; historical results not replayed. \\ \hline
 Performance graphs and dashboards & Not attempted: no new performance datum or correction. Canonical performance figures should not move for a CI repair. \\ \hline
 All results good to go & Not established: full crypto proof matrix and cross-repository semantic reviews remain. The separate autoresearcher workspace build passed. \\ \hline
 \end{tabular}
 
-The separate \mono{diagram.svg} depicts these observed gate states. It is not
-a performance graph. Reproduce locally with
-\mono{tools/lean/proof-gate.sh --out /tmp/crypto-sea-gate research/sea\_point\_count\_20261016/lean}
-and \mono{ELAN\_TOOLCHAIN=leanprover/lean4:v4.34.1 tools/lean/selftest/run.sh}.
-The audited SeaProofs source SHA-256 is
-\mono{0c18e419b033bb577d9afea5c1cc18b77f28c427ed1fbed2afa89dcb9ecf6daf}.
+The separate \mono{diagram.svg} depicts observed gate states; it is not a
+performance graph. The companion Markdown report gives exact reproduction
+commands, retained logs, and audited source SHA-256 values for the SEA,
+DenseCapacity, and tree-split targets.
 
 \end{document}
