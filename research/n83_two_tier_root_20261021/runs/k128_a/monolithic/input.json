@@ -1,0 +1,35 @@
+{
+  "arm": "monolithic",
+  "binary_sha256": "92601fa8824daf14afbd248c799de897fca6b76eb663aa697f708e443cd565fd",
+  "command": [
+    "/private/tmp/n83_two_tier_target_20261021/debug/examples/koblitz_orbit_dlp_fast",
+    "construct:83:1:128",
+    "/Volumes/data/cryptanalysis/n83_load80_k4405_7200_20261020/target.jsonl",
+    "29",
+    "/Volumes/data/cryptanalysis/n83_two_tier_k128_a_20261021/monolithic/targets_result.jsonl"
+  ],
+  "environment_flags": {
+    "KIC_INDEXED5_ID30": "1",
+    "KIC_INDEXED5_LOAD80": "1",
+    "KIC_INDEXED_ROOT5": "1",
+    "KIC_INDEX_BUILD_ONLY": "1",
+    "KIC_INDEX_ROOT_BATCH": "1",
+    "KIC_PACKED_ROOT_TABLE": "1",
+    "KIC_ROOT_BLOOM": "1",
+    "KIC_ROOT_BLOOM_PROFILE": "wide3",
+    "KIC_ROOT_ONLY11": "1",
+    "KIC_SPARSE_CANONICAL": "1",
+    "KIC_SYMMETRIC_S3": "1"
+  },
+  "k": 128,
+  "order": [
+    "monolithic",
+    "split"
+  ],
+  "runner_sha256": "ed464d0e405c515e1f5fb63634f64f28ca580aef2516749c7d6c3bd86471ea84",
+  "schema": "n83.split-index-smoke/v1",
+  "source_sha256": "14834b41b4bb5ee041efc246acd03d5bab32449c90d80818d47af4bb15edbae9",
+  "split_at": 64,
+  "target_sha256": "1c9b53960953fd252d09af08afbfdff9229fbeca151285e698b3e90cb79cd656",
+  "timeout_seconds": 900
+}
