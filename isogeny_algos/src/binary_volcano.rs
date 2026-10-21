@@ -52,9 +52,9 @@ pub fn factor_abs(n: u128) -> (Vec<(u64, u32)>, Option<u128>) {
     let mut out: Vec<(u64, u32)> = vec![];
     let mut p = 2u64;
     while p <= 1_000_000 && (p as u128) * (p as u128) <= m {
-        if m % (p as u128) == 0 {
+        if m.is_multiple_of(p as u128) {
             let mut e = 0;
-            while m % (p as u128) == 0 {
+            while m.is_multiple_of(p as u128) {
                 m /= p as u128;
                 e += 1;
             }
@@ -795,8 +795,8 @@ mod tests {
                 while let Some(j) = queue.pop_front() {
                     let d = dist[&j];
                     for &x in &nbrs[&j] {
-                        if !dist.contains_key(&x) {
-                            dist.insert(x, d + 1);
+                        if let std::collections::hash_map::Entry::Vacant(entry) = dist.entry(x) {
+                            entry.insert(d + 1);
                             queue.push_back(x);
                         }
                     }

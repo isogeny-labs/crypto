@@ -35,6 +35,8 @@ use super::suite::{self, Row};
 /// §23's sizes, `(a, n)` in the order of `r`.
 pub const SIZES: [(u8, u32); 6] = [(1, 47), (0, 57), (0, 41), (0, 53), (1, 59), (0, 61)];
 const TARGET_SEED_BASE: i128 = 23000;
+mod matched;
+
 const BOOT: usize = 10_000;
 const BOOT_SEED: u128 = 2_309_300;
 const BL_PRODUCT: f64 = 1.93 * 1.21;
@@ -84,6 +86,10 @@ pub struct Constants {
     /// (`e2b865e4`, 2026-10-13); the comparisons before it reproduce
     /// their frozen claims without them.
     pub stage_fields: bool,
+    /// Whether the pin accepts counters the earlier comparison's output
+    /// lacks (main added `row_ops` and others after 2026-09-30): every
+    /// counter it had must still match exactly.
+    pub pin_allows_added_counters: bool,
 }
 
 const S23_IC_SOURCES: &[&str] = &[
@@ -131,6 +137,7 @@ pub const S23: Constants = Constants {
     reference_check: false,
     frozen: true,
     stage_fields: false,
+    pin_allows_added_counters: false,
 };
 
 /// The rule's comparison at baseline v2 (`research/ic_tool_program/rule/v2`):
@@ -157,6 +164,7 @@ pub const V2: Constants = Constants {
     reference_check: true,
     frozen: false,
     stage_fields: false,
+    pin_allows_added_counters: false,
 };
 
 /// The rule's comparison at baseline v3 (`research/ic_tool_program/rule/v3`):
@@ -183,6 +191,7 @@ pub const V3: Constants = Constants {
     reference_check: true,
     frozen: false,
     stage_fields: false,
+    pin_allows_added_counters: false,
 };
 
 /// The rule's comparison at baseline v6 (`research/ic_tool_program/rule/v6`):
@@ -209,6 +218,7 @@ pub const V6: Constants = Constants {
     reference_check: true,
     frozen: false,
     stage_fields: true,
+    pin_allows_added_counters: false,
 };
 
 /// The rule's comparison at baseline v7 (`research/ic_tool_program/rule/v7`):
@@ -220,6 +230,39 @@ pub const V7: Constants = Constants {
         analysis: "research/ic_single_target_20260930/analysis.json",
         key: "s23_then_v7",
     },
+    ..V6
+};
+
+/// The rule's comparison at baseline v8 (`research/ic_tool_program/rule/v8`):
+/// rule v7's protocol on v8's index calculus (R12) with the matched rho:
+/// the signed-Frobenius walk's canonicalisation batched sixteen lanes at a
+/// time by GFNI and funnel shifts, as the index calculus's scan key is
+/// (`FrobeniusCanon::frobenius_reps`).  The walks are the same walks; only
+/// the time a step takes changes.
+pub const V8: Constants = Constants {
+    what_this_is:
+        "The rule's comparison at baseline v8, rho matched: §23's figures, from the checked rows.",
+    against: Against::Earlier {
+        analysis: "research/ic_single_target_20260930/analysis.json",
+        key: "s23_then_v8",
+    },
+    pin_allows_added_counters: true,
+    process: "one process: the index calculus, then rho with its canonicalisation batched \
+              (the default), both rebuilt each repetition",
+    ..V6
+};
+
+/// Rule v8's same-binary control: the rho arm of rule v7, whose
+/// canonicalisation reads per-point tables (`KIC_RHO_CANON=scalar`).
+pub const V8C: Constants = Constants {
+    what_this_is: "The rule's comparison at baseline v8, rho as at rule v7: §23's figures, from the checked rows.",
+    against: Against::Earlier {
+        analysis: "research/ic_single_target_20260930/analysis.json",
+        key: "s23_then_v8c",
+    },
+    pin_allows_added_counters: true,
+    process: "one process: the index calculus, then rho with its canonicalisation by per-point \
+              tables (KIC_RHO_CANON=scalar, as rule v7), both rebuilt each repetition",
     ..V6
 };
 
@@ -1322,6 +1365,29 @@ fn fit(points: &[(f64, f64)]) -> J {
     ])
 }
 
+/// Whether `new` holds every value `old` holds, at the same place and equal;
+/// the keys only `new` has are appended to `added` (by path).
+fn superset(new: &J, old: &J, path: &str, added: &mut Vec<String>) -> bool {
+    match (new, old) {
+        (J::Obj(n), J::Obj(o)) => {
+            let mut ok = true;
+            for (k, v) in o {
+                match n.iter().find(|(k2, _)| k2 == k) {
+                    Some((_, w)) => ok &= superset(w, v, &format!("{path}.{k}"), added),
+                    None => ok = false,
+                }
+            }
+            for (k, _) in n {
+                if !o.iter().any(|(k2, _)| k2 == k) {
+                    added.push(format!("{path}.{k}"));
+                }
+            }
+            ok
+        }
+        _ => json::py_eq(new, old),
+    }
+}
+
 /// A checked row, with its target and run.
 struct Checked {
     claim: J,
@@ -2143,10 +2209,17 @@ impl Comparison {
                     .join(format!("k{a}n{n}/T01-R1.price.json")),
             )?;
             let (x, y) = (pin::outputs(&new), pin::outputs(&old));
+            let mut added = Vec::new();
             let mut differs: Vec<&str> = x
                 .iter()
                 .zip(&y)
-                .filter(|((_, p), (_, q))| !json::py_eq(p, q))
+                .filter(|((k, p), (_, q))| {
+                    if *k == "counts" && self.constants.pin_allows_added_counters {
+                        // `q` is the earlier output: every counter it has must match.
+                        return !superset(p, q, "counts", &mut added);
+                    }
+                    !json::py_eq(p, q)
+                })
                 .map(|((k, _), _)| *k)
                 .collect();
             differs.sort_unstable();
@@ -2155,6 +2228,10 @@ impl Comparison {
                 ("row", J::Str(format!("{slug}/T01"))),
                 ("slug", J::Str(slug.clone())),
                 ("equal", J::Bool(differs.is_empty())),
+                (
+                    "counters_added_since_the_earlier_output",
+                    J::Arr(added.iter().cloned().map(J::Str).collect()),
+                ),
                 (
                     "differs_in",
                     J::Arr(differs.iter().map(|k| J::Str((*k).into())).collect()),
