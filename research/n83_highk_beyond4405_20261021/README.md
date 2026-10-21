@@ -19,18 +19,27 @@ boundary is attained. `max_k_load80` and `load80_4549` give the corresponding
 `#print axioms` reports only `propext` and `Quot.sound`. `lean4checker --fresh`
 was unavailable on this host.
 
-The next implementation will add an opt-in fixed 2³¹-slot five-byte layout
-with a declared 80% upper-load limit. It must preserve exact-key reconstruction,
-first-witness semantics, root collision handling, and the CPU fallback. The
-initial comparison will include the exact K4300 and K4405 controls, plus
-K4500 and K4549 under the new layout, with actual usable base counts, hashes,
-source and binary identity, memory, setup, rank, one-target online intervals,
-same-point rho, and independent arithmetic replay recorded per run. The new
-layout is a different candidate even when K and base points match.
+The opt-in `KIC_INDEXED5_FIXED31=1` mode in
+`examples/koblitz_orbit_dlp_fast.rs` fixes the five-byte table at 2³¹ slots
+and rejects a worst-case two-root load above 80% before allocation. It
+requires the exact N83 one-root, ID30 and five-byte index modes, and excludes
+the existing load75 and fixed30 sizing modes. The slot encoder and exact-key
+reconstruction are shared with the checked ID30 path. The new mode has a
+separate result flag; the earlier source and candidate identities are
+unchanged. The initial comparison will include exact K4300 and K4405 controls,
+K4405 under both sizing flags as a same-layout control, then K4500 and K4549
+under fixed31. Record actual usable base counts, hashes, source and binary
+identity, memory, setup, rank, one-target online intervals, same-point rho,
+and independent arithmetic replay per run.
 
 This directory is a capacity analysis and experiment preparation. New candidate
-IDs and measured costs remain null until the implementation, exact manifests,
-frozen public targets, resource envelope, dispatch, and replay gates are ready.
+IDs and measured costs remain null until exact manifests, frozen public
+targets, resource envelope, dispatch, and replay gates are ready. The local
+release example suite passed 22/22 tests with Rust 1.93.1; its command and
+output are retained in `rust-example-tests.log`. The capacity model, Lean
+module, `rustfmt --check`, and `actionlint` passed. The branch workflow
+repeats the capacity, Lean, and Rust example checks with Rust 1.99.1 on its
+exact head. A full K4500 or K4549 process has not yet been measured.
 The previous RunPod campaign's conservative upper charge was $5.710216
 against its $5 ceiling, so this preparation launches no paid instance. A new
 bounded allocation needs its own reviewed budget and protocol.

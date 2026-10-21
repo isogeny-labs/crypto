@@ -3133,6 +3133,7 @@ mod wide {
         indexed4_table: bool,
         indexed5_load75: bool,
         indexed5_fixed30: bool,
+        indexed5_fixed31: bool,
         indexed4_fixed30: bool,
         indexed4_fixed31: bool,
         root_table_request_entries: usize,
@@ -3344,6 +3345,20 @@ mod wide {
         columns: usize,
     }
 
+    fn indexed5_fixed31_capacity_ok(max_states: usize) -> bool {
+        max_states < (1usize << 30)
+            && max_states
+                .checked_mul(5)
+                .is_some_and(|bound| bound <= (1usize << 31) * 2)
+    }
+
+    #[test]
+    fn indexed5_fixed31_accepts_exact_eighty_percent_boundary() {
+        let states = |k: usize| k * (k - 1) / 2 * 83 + k * 42;
+        assert!(indexed5_fixed31_capacity_ok(states(4549)));
+        assert!(!indexed5_fixed31_capacity_ok(states(4550)));
+    }
+
     fn build_index128(
         gf: &Gf2_128,
         basis: &NormalBasis128,
@@ -3396,6 +3411,7 @@ mod wide {
         let root_only21 = std::env::var("KIC_ROOT_ONLY21").as_deref() == Ok("1");
         let root_only11 = std::env::var("KIC_ROOT_ONLY11").as_deref() == Ok("1");
         let indexed5_id30 = std::env::var("KIC_INDEXED5_ID30").as_deref() == Ok("1");
+        let indexed5_fixed31 = std::env::var("KIC_INDEXED5_FIXED31").as_deref() == Ok("1");
         let indexed4_table = std::env::var("KIC_INDEXED_ROOT4").as_deref() == Ok("1");
         let indexed4_fixed30 = std::env::var("KIC_INDEXED4_FIXED30").as_deref() == Ok("1");
         let indexed4_fixed31 = std::env::var("KIC_INDEXED4_FIXED31").as_deref() == Ok("1");
@@ -3446,7 +3462,8 @@ mod wide {
             assert!(
                 ((std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")
                     && (std::env::var("KIC_INDEXED5_FIXED30").as_deref() == Ok("1")
-                        || indexed5_load75)
+                        || indexed5_load75
+                        || indexed5_fixed31)
                     && !indexed4_table)
                     || (indexed4_table
                         && indexed4_fixed31
@@ -3470,15 +3487,28 @@ mod wide {
             !indexed5_id30
                 || (root_only11
                     && !indexed4_table
-                    && indexed5_load75
+                    && (indexed5_load75 || indexed5_fixed31)
                     && std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")),
-            "30-bit indexed state IDs require one-root five-byte load75 slots"
+            "30-bit indexed state IDs require one-root five-byte load75 or fixed31 slots"
+        );
+        assert!(
+            !indexed5_fixed31
+                || (root_only11
+                    && indexed5_id30
+                    && !indexed4_table
+                    && !indexed5_load75
+                    && std::env::var("KIC_INDEXED5_FIXED30").as_deref() != Ok("1")
+                    && std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")
+                    && indexed5_fixed31_capacity_ok(max_states)),
+            "fixed31 five-byte slots require one-root ID30 states and at most 80% upper load"
         );
         // One-root states insert their exact keys while each second root is
         // still available.  The retained state count is known from the
         // symmetric traversal, so load75 can size this early table exactly.
         let root11_request_entries = root_only11.then(|| {
             if indexed4_table {
+                1usize << 30
+            } else if indexed5_fixed31 {
                 1usize << 30
             } else if indexed5_load75 {
                 max_states
@@ -3739,6 +3769,10 @@ mod wide {
             "indexed five-byte load75 request requires the indexed table"
         );
         assert!(
+            !indexed5_fixed31 || (indexed5_table && root_only11 && indexed5_id30),
+            "indexed five-byte fixed31 request requires one-root ID30 states"
+        );
+        assert!(
             !indexed5_fixed30
                 || (indexed5_table && (root_only21 || root_only11) && !indexed5_load75),
             "fixed 2^30 root slots require an indexed root-only state layout"
@@ -3846,6 +3880,7 @@ mod wide {
             indexed4_table,
             indexed5_load75,
             indexed5_fixed30,
+            indexed5_fixed31,
             indexed4_fixed30,
             indexed4_fixed31,
             root_table_request_entries,
@@ -4614,6 +4649,7 @@ mod wide {
         summary["root_table_indexed5_id30_enabled"] = json!(index.indexed5_id30);
         summary["indexed5_load75_enabled"] = json!(index.indexed5_load75);
         summary["indexed5_fixed30_enabled"] = json!(index.indexed5_fixed30);
+        summary["indexed5_fixed31_enabled"] = json!(index.indexed5_fixed31);
         summary["indexed4_fixed31_enabled"] = json!(index.indexed4_fixed31);
         summary["indexed4_fixed30_enabled"] = json!(index.indexed4_fixed30);
         summary["root_only11_enabled"] =
