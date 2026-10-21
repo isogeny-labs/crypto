@@ -10,6 +10,25 @@ def states (k : Nat) : Nat := 83 * k * (k - 1) / 2 + 42 * k
 
 def request (n : Nat) : Nat := (5 * n + 3) / 4
 
+def id31Slot (state selector fingerprint : Nat) : Nat :=
+  fingerprint * 2 ^ 32 + (state + 1) * 2 + selector
+
+theorem id31_slot_roundtrip (state selector fingerprint : Nat)
+    (hstate : state + 1 < 2 ^ 31) (hselector : selector < 2) :
+    ((id31Slot state selector fingerprint % 2 ^ 32) / 2 - 1 = state) ∧
+    ((id31Slot state selector fingerprint % 2 ^ 32) % 2 = selector) ∧
+    (id31Slot state selector fingerprint / 2 ^ 32 = fingerprint) := by
+  unfold id31Slot
+  omega
+
+theorem id31_slot_nonzero_five_bytes (state selector fingerprint : Nat)
+    (hstate : state + 1 < 2 ^ 31) (hselector : selector < 2)
+    (hfingerprint : fingerprint < 2 ^ 8) :
+    0 < id31Slot state selector fingerprint ∧
+    id31Slot state selector fingerprint < 2 ^ 40 := by
+  unfold id31Slot
+  omega
+
 theorem states_monotone {a b : Nat} (h : a ≤ b) : states a ≤ states b := by
   have hmul : a * (a - 1) ≤ b * (b - 1) :=
     Nat.mul_le_mul h (Nat.sub_le_sub_right h 1)
@@ -74,8 +93,30 @@ theorem k5086_dual_bloom_bytes : 2 ^ 31 + 2 ^ 29 = 2684354560 := by decide
 theorem k5086_dual_three_array_bytes :
     11 * states 5086 + 6 * (2 ^ 31 + 2 ^ 29) = 27914621607 := by decide
 
+-- The opt-in ID31 slot keeps exact-key verification while assigning 31 bits
+-- to a state ID, one to the root selector, and eight to the fingerprint.
+theorem k7193_state_fits_id31 : states 7193 < 2 ^ 31 := by decide
+theorem k7194_state_crosses_id31 : 2 ^ 31 ≤ states 7194 := by decide
+theorem k7193_id31_max : ∀ k, 7194 ≤ k → 2 ^ 31 ≤ states k := by
+  intro k hk
+  exact Nat.le_trans k7194_state_crosses_id31 (states_monotone hk)
+theorem k5500_state_fits_id31 : states 5500 < 2 ^ 31 := by decide
+theorem k5500_root_bound_id31 : 2 * states 5500 < 2 ^ 32 := by decide
+theorem k5500_core_request :
+    2 ^ 29 < request (states 4549) ∧
+    request (states 4549) ≤ 2 ^ 30 := by decide
+theorem k5500_extension_request :
+    2 ^ 28 < request (states 5500 - states 4549) ∧
+    request (states 5500 - states 4549) ≤ 2 ^ 29 := by decide
+theorem k5500_state_count : states 5500 = 1255377750 := by decide
+theorem k5500_point_count_formula : 166 * 5500 = 913000 := by decide
+theorem k5500_dual_three_array_bytes :
+    11 * states 5500 + 6 * (2 ^ 31 + 2 ^ 30) = 33136508082 := by decide
+
 #print axioms states_monotone
 #print axioms request_monotone
+#print axioms id31_slot_roundtrip
+#print axioms id31_slot_nonzero_five_bytes
 #print axioms k5086_state_fits
 #print axioms k5087_state_crosses
 #print axioms k5086_max
@@ -96,4 +137,14 @@ theorem k5086_dual_three_array_bytes :
 #print axioms k5086_three_array_bytes
 #print axioms k5086_dual_bloom_bytes
 #print axioms k5086_dual_three_array_bytes
+#print axioms k7193_state_fits_id31
+#print axioms k7194_state_crosses_id31
+#print axioms k7193_id31_max
+#print axioms k5500_state_fits_id31
+#print axioms k5500_root_bound_id31
+#print axioms k5500_core_request
+#print axioms k5500_extension_request
+#print axioms k5500_state_count
+#print axioms k5500_point_count_formula
+#print axioms k5500_dual_three_array_bytes
 end N83SplitCapacity

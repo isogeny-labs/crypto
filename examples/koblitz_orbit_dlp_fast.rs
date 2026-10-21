@@ -1494,6 +1494,7 @@ mod wide {
         bloom: Option<RootBloom>,
         packed_layout: Option<PackedRootLayout>,
         indexed83_id30: bool,
+        indexed83_id31: bool,
     }
 
     impl RootTable128 {
@@ -1511,6 +1512,21 @@ mod wide {
             indexed83_id30: bool,
             bloom_enabled: bool,
         ) -> Self {
+            Self::with_capacity_indexed83_mode_bloom_id31(
+                entries,
+                indexed83_id30,
+                false,
+                bloom_enabled,
+            )
+        }
+
+        fn with_capacity_indexed83_mode_bloom_id31(
+            entries: usize,
+            indexed83_id30: bool,
+            indexed83_id31: bool,
+            bloom_enabled: bool,
+        ) -> Self {
+            assert!(!(indexed83_id30 && indexed83_id31));
             let slots = entries
                 .checked_mul(2)
                 .expect("indexed root table request exceeds usize")
@@ -1523,6 +1539,7 @@ mod wide {
                 bloom: bloom_enabled.then(|| RootBloom::with_capacity(entries)),
                 packed_layout: None,
                 indexed83_id30,
+                indexed83_id31,
             }
         }
 
@@ -1539,6 +1556,7 @@ mod wide {
                 bloom: root_bloom_enabled().then(|| RootBloom::with_capacity(entries)),
                 packed_layout: None,
                 indexed83_id30: false,
+                indexed83_id31: false,
             }
         }
 
@@ -1603,6 +1621,36 @@ mod wide {
         }
 
         #[inline(always)]
+        fn indexed83_id31_encode(
+            state_index: usize,
+            root_selector: usize,
+            fingerprint: u64,
+        ) -> [u8; 5] {
+            assert!(
+                state_index + 1 < 1 << 31,
+                "indexed root state id exceeds 31 bits"
+            );
+            assert!(root_selector < 2);
+            let word = ((fingerprint & 0xff) << 32)
+                | (((state_index + 1) as u64) << 1)
+                | root_selector as u64;
+            let bytes = word.to_le_bytes();
+            [bytes[0], bytes[1], bytes[2], bytes[3], bytes[4]]
+        }
+
+        #[inline(always)]
+        fn indexed83_id31_decode(bytes: [u8; 5]) -> (usize, usize, u64) {
+            let word =
+                u64::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], 0, 0, 0]);
+            let token = word & ((1 << 32) - 1);
+            (
+                ((token >> 1) - 1) as usize,
+                (token & 1) as usize,
+                word >> 32,
+            )
+        }
+
+        #[inline(always)]
         fn indexed83_four_encode(
             state_index: usize,
             root_selector: usize,
@@ -1647,6 +1695,7 @@ mod wide {
                 bloom: root_bloom_enabled().then(|| RootBloom::with_capacity(entries)),
                 packed_layout,
                 indexed83_id30: false,
+                indexed83_id31: false,
             }
         }
 
@@ -1668,7 +1717,9 @@ mod wide {
                     slots.len() * std::mem::size_of::<u128>(),
                 ),
                 RootSlots128::Indexed83(slots) => (
-                    if self.indexed83_id30 {
+                    if self.indexed83_id31 {
+                        "indexed83_5byte_exact_id31"
+                    } else if self.indexed83_id30 {
                         "indexed83_5byte_exact_id30"
                     } else {
                         "indexed83_5byte_exact"
@@ -1727,7 +1778,15 @@ mod wide {
                 }
             }
             let id30 = self.indexed83_id30;
-            let fingerprint = fingerprint & if id30 { 0x1ff } else { 0x3ff };
+            let id31 = self.indexed83_id31;
+            let fingerprint = fingerprint
+                & if id31 {
+                    0xff
+                } else if id30 {
+                    0x1ff
+                } else {
+                    0x3ff
+                };
             let mask = match &self.slots {
                 RootSlots128::Indexed83(slots) => slots.len() - 1,
                 _ => unreachable!("indexed insertion needs five-byte slots"),
@@ -1739,7 +1798,9 @@ mod wide {
             loop {
                 let existing = slots[slot];
                 if existing == [0; 5] {
-                    slots[slot] = if id30 {
+                    slots[slot] = if id31 {
+                        Self::indexed83_id31_encode(state_index, root_selector, fingerprint)
+                    } else if id30 {
                         Self::indexed83_id30_encode(state_index, root_selector, fingerprint)
                     } else {
                         Self::indexed83_encode(state_index, root_selector, fingerprint)
@@ -1754,7 +1815,9 @@ mod wide {
                     }
                     return;
                 }
-                let (old_state, old_root, old_fingerprint) = if id30 {
+                let (old_state, old_root, old_fingerprint) = if id31 {
+                    Self::indexed83_id31_decode(existing)
+                } else if id30 {
                     Self::indexed83_id30_decode(existing)
                 } else {
                     Self::indexed83_decode(existing)
@@ -1800,14 +1863,24 @@ mod wide {
             };
             let mask = slots.len() - 1;
             let id30 = self.indexed83_id30;
-            let fingerprint = Self::indexed83_fingerprint(key) & if id30 { 0x1ff } else { 0x3ff };
+            let id31 = self.indexed83_id31;
+            let fingerprint = Self::indexed83_fingerprint(key)
+                & if id31 {
+                    0xff
+                } else if id30 {
+                    0x1ff
+                } else {
+                    0x3ff
+                };
             let mut slot = self.slot(key);
             loop {
                 let existing = slots[slot];
                 if existing == [0; 5] {
                     return None;
                 }
-                let (state_index, root_selector, old_fingerprint) = if id30 {
+                let (state_index, root_selector, old_fingerprint) = if id31 {
+                    Self::indexed83_id31_decode(existing)
+                } else if id30 {
                     Self::indexed83_id30_decode(existing)
                 } else {
                     Self::indexed83_decode(existing)
@@ -2657,6 +2730,79 @@ mod wide {
         }
 
         #[test]
+        fn indexed_five_byte_id31_preserves_large_ids_and_exact_keys() {
+            let boundary = RootTable128::indexed83_id31_encode((1 << 31) - 2, 1, 0xff);
+            assert_eq!(
+                RootTable128::indexed83_id31_decode(boundary),
+                ((1 << 31) - 2, 1, 0xff)
+            );
+            assert_eq!(boundary, [0xff; 5]);
+            let mut table =
+                RootTable128::with_capacity_indexed83_mode_bloom_id31(64, false, true, false);
+            assert_eq!(
+                table.layout_receipt(),
+                ("indexed83_5byte_exact_id31", 5, 640)
+            );
+            let keys: Vec<u128> = (0..96u64)
+                .map(|i| (mix_root_bloom(i) as u128) << 19 | i as u128)
+                .collect();
+            for (i, &key) in keys.iter().enumerate() {
+                table.insert_indexed83(key, i / 2, i % 2, |state, root| keys[2 * state + root]);
+            }
+            table.insert_indexed83(keys[0], 48, 0, |state, root| {
+                if state == 48 {
+                    keys[0]
+                } else {
+                    keys[2 * state + root]
+                }
+            });
+            assert_eq!(table.len, keys.len());
+            for (i, &key) in keys.iter().enumerate() {
+                assert_eq!(
+                    table.get_indexed83(key, |state, root| keys[2 * state + root]),
+                    Some((i / 2, i % 2))
+                );
+            }
+            assert_eq!(
+                table.get_indexed83(u128::MAX, |state, root| keys[2 * state + root]),
+                None
+            );
+
+            // The shorter fingerprint must still compare the reconstructed full key.
+            let mut seen = std::collections::HashMap::new();
+            let mut pair = None;
+            for i in 1..20_000u64 {
+                let key = (mix_root_bloom(i) as u128) << 19 | i as u128;
+                let signature = (
+                    table.slot(key),
+                    RootTable128::indexed83_fingerprint(key) & 0xff,
+                );
+                if let Some(&prior) = seen.get(&signature) {
+                    if prior != key {
+                        pair = Some((prior, key));
+                        break;
+                    }
+                } else {
+                    seen.insert(signature, key);
+                }
+            }
+            let (first, second) = pair.expect("deterministic ID31 slot/fingerprint collision");
+            let pair_keys = [first, second];
+            let mut collided =
+                RootTable128::with_capacity_indexed83_mode_bloom_id31(64, false, true, false);
+            collided.insert_indexed83(first, 0, 0, |_, root| pair_keys[root]);
+            collided.insert_indexed83(second, 0, 1, |_, root| pair_keys[root]);
+            assert_eq!(
+                collided.get_indexed83(first, |_, root| pair_keys[root]),
+                Some((0, 0))
+            );
+            assert_eq!(
+                collided.get_indexed83(second, |_, root| pair_keys[root]),
+                Some((0, 1))
+            );
+        }
+
+        #[test]
         fn indexed_five_byte_load80_extends_the_same_slot_boundary_exactly() {
             let states = |k: usize| 83 * k * (k - 1) / 2 + 42 * k;
             assert!(indexed5_load80_request(states(4549)) <= (1 << 30));
@@ -3266,6 +3412,7 @@ mod wide {
         load75_table: bool,
         indexed5_table: bool,
         indexed5_id30: bool,
+        indexed5_id31: bool,
         indexed4_table: bool,
         indexed5_load75: bool,
         indexed5_load80: bool,
@@ -3583,6 +3730,11 @@ mod wide {
         let root_only21 = std::env::var("KIC_ROOT_ONLY21").as_deref() == Ok("1");
         let root_only11 = std::env::var("KIC_ROOT_ONLY11").as_deref() == Ok("1");
         let indexed5_id30 = std::env::var("KIC_INDEXED5_ID30").as_deref() == Ok("1");
+        let indexed5_id31 = std::env::var("KIC_INDEXED5_ID31").as_deref() == Ok("1");
+        assert!(
+            !(indexed5_id30 && indexed5_id31),
+            "select one five-byte state-ID width"
+        );
         let split_at = std::env::var("KIC_INDEXED5_SPLIT_AT")
             .ok()
             .map(|value| value.parse::<usize>().expect("split K must be an integer"));
@@ -3630,7 +3782,7 @@ mod wide {
                     && core < k
                     && root_only11
                     && symmetric_states
-                    && indexed5_id30
+                    && (indexed5_id30 || indexed5_id31)
                     && indexed5_load80,
                 "split root index needs 0 < core < K and symmetric one-root indexed5 load80"
             );
@@ -3681,7 +3833,9 @@ mod wide {
             assert!(
                 max_states.checked_mul(2).unwrap()
                     < (1usize
-                        << if indexed4_table || indexed5_id30 {
+                        << if indexed5_id31 {
+                            32
+                        } else if indexed4_table || indexed5_id30 {
                             31
                         } else {
                             30
@@ -3696,6 +3850,14 @@ mod wide {
                     && (indexed5_load75 || indexed5_load80)
                     && std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")),
             "30-bit indexed state IDs require one-root five-byte load75 or load80 slots"
+        );
+        assert!(
+            !indexed5_id31
+                || (root_only11
+                    && !indexed4_table
+                    && (indexed5_load75 || indexed5_load80)
+                    && std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")),
+            "31-bit indexed state IDs require one-root five-byte load75 or load80 slots"
         );
         // One-root states insert their exact keys while each second root is
         // still available.  The retained state count is known from the
@@ -3719,17 +3881,19 @@ mod wide {
             if indexed4_table {
                 RootTable128::with_capacity_indexed83_four(entries)
             } else {
-                RootTable128::with_capacity_indexed83_mode_bloom(
+                RootTable128::with_capacity_indexed83_mode_bloom_id31(
                     entries,
                     indexed5_id30,
+                    indexed5_id31,
                     !shared_bloom_requested && root_bloom_enabled(),
                 )
             }
         });
         let mut early_overflow_table = overflow_request_entries.map(|entries| {
-            RootTable128::with_capacity_indexed83_mode_bloom(
+            RootTable128::with_capacity_indexed83_mode_bloom_id31(
                 entries,
                 indexed5_id30,
+                indexed5_id31,
                 !shared_bloom_requested && root_bloom_enabled(),
             )
         });
@@ -4060,7 +4224,12 @@ mod wide {
         } else if indexed4_table {
             RootTable128::with_capacity_indexed83_four(root_table_request_entries)
         } else if indexed5_table {
-            RootTable128::with_capacity_indexed83_mode(root_table_request_entries, indexed5_id30)
+            RootTable128::with_capacity_indexed83_mode_bloom_id31(
+                root_table_request_entries,
+                indexed5_id30,
+                indexed5_id31,
+                root_bloom_enabled(),
+            )
         } else {
             RootTable128::with_capacity(root_table_request_entries, gf.n, reps.len(), packed)
         };
@@ -4108,6 +4277,7 @@ mod wide {
             load75_table,
             indexed5_table,
             indexed5_id30,
+            indexed5_id31,
             indexed4_table,
             indexed5_load75,
             indexed5_load80,
@@ -4554,6 +4724,7 @@ mod wide {
                     "overflow_table_allocated_bytes": index.overflow_table.as_ref().map_or(0, |t| t.layout_receipt().2),
                     "root_table_allocated_bytes": index.table.layout_receipt().2 + index.overflow_table.as_ref().map_or(0, |t| t.layout_receipt().2),
                     "indexed5_split_at": index.split_at,
+                    "indexed5_state_id_bits": if index.indexed5_id31 { 31 } else if index.indexed5_id30 { 30 } else { 29 },
                     "shared_bloom_enabled": index.shared_bloom.is_some(),
                     "shared_bloom_bytes": index.shared_bloom.as_ref().map_or(0, RootBloom::bytes),
                     "root_bloom_bytes": index.table.bloom.as_ref().map_or(0, RootBloom::bytes) + index.overflow_table.as_ref().and_then(|t| t.bloom.as_ref()).map_or(0, RootBloom::bytes) + index.shared_bloom.as_ref().map_or(0, RootBloom::bytes),
@@ -4907,6 +5078,7 @@ mod wide {
         summary["symmetric_s3_states_enabled"] = json!(index.symmetric_states);
         summary["root_table_indexed4_enabled"] = json!(index.indexed4_table);
         summary["root_table_indexed5_id30_enabled"] = json!(index.indexed5_id30);
+        summary["root_table_indexed5_id31_enabled"] = json!(index.indexed5_id31);
         summary["indexed5_load75_enabled"] = json!(index.indexed5_load75);
         summary["indexed5_load80_enabled"] = json!(index.indexed5_load80);
         summary["indexed5_fixed30_enabled"] = json!(index.indexed5_fixed30);

@@ -68,6 +68,30 @@ relation/scalar replay, and online timing remain pending. The projected
 166 × 5086 point count is not an actual enumerated `fb` count, so
 `candidate_id` remains `null`.
 
+## Five-byte ID31 extension
+
+The opt-in `KIC_INDEXED5_ID31=1` layout encodes a 31-bit state ID, one root
+selector bit, and eight fingerprint bits in each five-byte slot. Exact
+reconstructed-root comparison remains the collision decision. The pinned
+Lean proof establishes `S(7193) < 2^31 ≤ S(7194)` for the symmetric N83
+state formula. The calculated K5500/K4549 dual-filter layout needs
+33,136,508,082 bytes (30.86 GiB) for its state array, two exact tables,
+and two Blooms. This extends the format's capacity beyond the K5086
+ID30 ceiling while retaining the same slot width. The actual K5500 base,
+peak RSS, rank, natural-target yield, and online time are open measurements;
+the [capacity proof map](CAPACITY.md) keeps `candidate_id: null`.
+
+The current-source example suite passes 23/23 tests, including an ID31
+maximum-index roundtrip, duplicate first-witness retention, and a full-key
+check for equal-slot/equal-fingerprint collisions. The
+[K128 ID31 stage replay](runs/k128_id31/result.json) passed both monolithic
+and K64 split arms with four construction threads. Its base hash, 680,000
+state digest, 1,359,488 exact-root entry count, and per-table counts match
+the earlier ID30 control. Packed-table digests differ by format; this
+count-and-state control does not replace a full-size exact-root or target
+replay. The result receipt SHA-256 is
+`a330adee412481992c57cd91f14219738c591b4e8fd2bccd75aa9013ac21dd12`.
+
 ## Frozen receipts
 
 The source-linked [run report](RUN.md), [run PDF](RUN.pdf),
@@ -120,7 +144,14 @@ It wrote no target row. Its [frozen input](runs/k4405_monolithic_local_7200/inpu
 [terminal receipt](runs/k4405_monolithic_local_7200/process_result.json)
 preserve the censored attempt. The K128 chart is unchanged because this
 full-size timeout produced no index-build interval to plot. The split
-full-size control and Tier 1 paired online comparison remain pending.
+full-size control stopped at 5,098.402 seconds when its independent
+scratch-disk guard saw less than 8 GiB free. The raw runner marked the
+signal exit `FAILED_PROCESS`; [verification](runs/k4405_split_shared_local_7200/verification.json)
+records `BOUNDED_UNKNOWN` with reason `DISK_GUARD_STOP`, preserving the
+[process](runs/k4405_split_shared_local_7200/process_result.json) and
+[guard](runs/k4405_split_shared_local_7200/n83_split_k4405_disk_guard_result.json)
+receipts. It produced no target row or index-stage interval. The Tier 1
+paired online comparison remains pending.
 
 The four-thread K128 index construction passed
 [`PASS_EXACT_SERIAL_PARALLEL_INDEX`](runs/k128_root_threads4/verification.json)

@@ -84,7 +84,11 @@ python3 research/n83_two_tier_root_20261021/run_index_smoke.py \
 ```
 
 Add `--shared-bloom` to control the shared-filter variant, and
-`--split-first` to reverse the execution order.
+`--split-first` to reverse the execution order. `--id-bits 31` exercises
+the opt-in five-byte 31-bit state-ID format on the same small-prefix
+control. The [K128 ID31 replay](runs/k128_id31/result.json) passed both
+stage arms. Its [capacity proof and K5500 proposal](CAPACITY.md) are separate
+from the sealed K5086 comparison.
 
 Its `PASS_INDEX_STAGE_CONTROL` status checks the identical base hash, state
 digest, and split allocation receipts. It is an index-construction control;

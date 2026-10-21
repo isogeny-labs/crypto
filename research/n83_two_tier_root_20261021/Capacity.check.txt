@@ -1,7 +1,10 @@
-Command: lean Capacity.lean
+$ elan run leanprover/lean4:v4.34.1 lean --version
 Lean (version 4.34.1, arm64-apple-darwin24.6.0, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)
+$ elan run leanprover/lean4:v4.34.1 lean research/n83_two_tier_root_20261021/Capacity.lean
 'N83SplitCapacity.states_monotone' depends on axioms: [propext]
 'N83SplitCapacity.request_monotone' depends on axioms: [propext]
+'N83SplitCapacity.id31_slot_roundtrip' depends on axioms: [propext, Classical.choice, Quot.sound]
+'N83SplitCapacity.id31_slot_nonzero_five_bytes' depends on axioms: [propext, Classical.choice, Quot.sound]
 'N83SplitCapacity.k5086_state_fits' does not depend on any axioms
 'N83SplitCapacity.k5087_state_crosses' does not depend on any axioms
 'N83SplitCapacity.k5086_max' depends on axioms: [propext]
@@ -22,3 +25,13 @@ Lean (version 4.34.1, arm64-apple-darwin24.6.0, commit 5045d0056413266e57c625dcd
 'N83SplitCapacity.k5086_three_array_bytes' does not depend on any axioms
 'N83SplitCapacity.k5086_dual_bloom_bytes' does not depend on any axioms
 'N83SplitCapacity.k5086_dual_three_array_bytes' does not depend on any axioms
+'N83SplitCapacity.k7193_state_fits_id31' does not depend on any axioms
+'N83SplitCapacity.k7194_state_crosses_id31' does not depend on any axioms
+'N83SplitCapacity.k7193_id31_max' depends on axioms: [propext]
+'N83SplitCapacity.k5500_state_fits_id31' does not depend on any axioms
+'N83SplitCapacity.k5500_root_bound_id31' does not depend on any axioms
+'N83SplitCapacity.k5500_core_request' does not depend on any axioms
+'N83SplitCapacity.k5500_extension_request' does not depend on any axioms
+'N83SplitCapacity.k5500_state_count' does not depend on any axioms
+'N83SplitCapacity.k5500_point_count_formula' does not depend on any axioms
+'N83SplitCapacity.k5500_dual_three_array_bytes' does not depend on any axioms

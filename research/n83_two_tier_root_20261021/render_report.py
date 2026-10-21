@@ -72,11 +72,13 @@ configs = [('K4405 mono', 4405, None, True),
            ('K5086 mono', 5086, None, True),
            ('K5086 split4300 shared', 5086, 4300, True),
            ('K5086 split4549 shared', 5086, 4549, True),
-           ('K5086 split4549 dual', 5086, 4549, False)]
+           ('K5086 split4549 dual', 5086, 4549, False),
+           ('K5500 ID31 split4549 dual', 5500, 4549, False)]
 assert table_bytes(5086, 4549) == 13421772800
 assert bloom_bytes(5086) == 4294967296
 assert bloom_bytes(5086, 4549, False) == 2684354560
 assert 11 * states(5086) == 11808494247
+assert 11 * states(5500) + table_bytes(5500, 4549) + bloom_bytes(5500, 4549, False) == 33136508082
 fig, ax = plt.subplots(figsize=(9.5, 4.5))
 xpos = list(range(len(configs)))
 state_gib = [11 * states(k) / 2**30 for _, k, _, _ in configs]
@@ -126,7 +128,7 @@ def make_pdf(path, title, paragraphs, table_rows, capacity=False):
                            'same study directory contains inputs, stderr, stdout, and runner copies.', small))
     if capacity:
         story.extend([
-            PageBreak(), Paragraph('Calculated K5086 split capacity', styles['Title']),
+            PageBreak(), Paragraph('Calculated N83 split-index capacity', styles['Title']),
             Spacer(1, 12),
             Paragraph('The 30-bit state-ID arithmetic admits K5086 and excludes '
                       'K5087 and above. With primary-first lookup, K4549 is the '
@@ -145,6 +147,12 @@ def make_pdf(path, title, paragraphs, table_rows, capacity=False):
                       'K5086/K4549; a union Bloom raises this to 27.50 GiB. '
                       'Other memory and peak RSS are excluded. '
                       'No K5086 timing or target result is inferred.', small),
+            Spacer(1, 6),
+            Paragraph('An opt-in 31-bit state ID extends the five-byte format. '
+                      'The K5500/K4549 separate-filter three-array calculation '
+                      'is 30.86 GiB; base enumeration, peak RSS, rank, and '
+                      'online time remain to be measured. The pinned Lean '
+                      'module checks the ID31 formula bound and byte sum.', small),
             Spacer(1, 8),
             Paragraph('Source and proof map: research/n83_two_tier_root_20261021/'
                       'CAPACITY.md and Capacity.lean; Rust source: examples/'
@@ -186,8 +194,9 @@ make_pdf(OUT / 'RESULT.pdf', 'N83 K128 split root index: result', [
     '128 MiB of Bloom space against separate filters and adds 671,088,640 '
     'table bytes against monolithic.',
     'Status: STAGE_DIAGNOSTIC_ONLY. Candidate ID and single-target online '
-    'speedup remain unset. A full-size K4405 same-target scalar replay and '
-    'Tier 1 paired measurement are the next qualification steps.',
+    'speedup remain unset. The local full-size K4405 monolithic run reached '
+    'its wall cap, and the split run stopped at its scratch-disk guard '
+    'before an online row. Tier 1 paired measurement is the next gate.',
     'The four-thread K128 replay passed exact index identity for both layouts. '
     'Its result and verification receipt are under runs/k128_root_threads4. '
     'The Tier 1 K5086 protocol freezes four index-construction threads.'

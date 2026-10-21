@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import math
+import subprocess
 import sys
 from pathlib import Path
 
@@ -32,14 +33,35 @@ def replay(root):
         return {"status": "RUN_PENDING"}
     process = json.loads(process_file.read_text())
     if process["status"] != "PASS_PROCESS" or process["exit_code"] != 0:
+        guard_path = root / "n83_split_k4405_disk_guard_result.json"
+        if guard_path.exists():
+            guard = json.loads(guard_path.read_text())
+            guard_script = root / "n83_disk_guard.py"
+            if (guard_script.exists() and
+                    sha256(guard_script) ==
+                    "a625fb2eab1e2aa3b77f89b54768df03fac35b2cb3a2a3f5c934fce94eb772b7" and
+                    guard.get("schema") == "n83.local-disk-guard/v1" and
+                    guard.get("status") == "DISK_GUARD_STOP" and
+                    guard.get("min_free_bytes") == 8 * 1024**3 and
+                    isinstance(guard.get("observed_free_bytes"), int) and
+                    guard["observed_free_bytes"] < guard["min_free_bytes"] and
+                    process["status"] == "FAILED_PROCESS" and
+                    process["exit_code"] == -15):
+                return {"status": "BOUNDED_UNKNOWN",
+                        "reason": "DISK_GUARD_STOP", "process": process,
+                        "disk_guard": guard}
         status = ("BOUNDED_UNKNOWN" if process["status"].startswith("TIMEOUT_")
                   or process["status"] == "RSS_CAP" else "PRODUCER_FAILURE")
         return {"status": status, "process": process}
     try:
         if process["sampled_peak_rss_bytes"] > input_record["rss_cap_bytes"]:
             raise ValueError("sampled RSS exceeded frozen cap")
-        for name, path in (("source_sha256", REPO / "examples/koblitz_orbit_dlp_fast.rs"),
-                           ("binary_sha256", Path(input_record["command"][0])),
+        committed_source = subprocess.check_output(
+            ["git", "show", input_record["source_head"] +
+             ":examples/koblitz_orbit_dlp_fast.rs"], cwd=REPO)
+        if hashlib.sha256(committed_source).hexdigest() != input_record["source_sha256"]:
+            raise ValueError("source_sha256 differs from frozen source commit")
+        for name, path in (("binary_sha256", Path(input_record["command"][0])),
                            ("runner_sha256", root / "runner.py"),
                            ("target_sha256", root / "target.jsonl")):
             if sha256(path) != input_record[name]:
@@ -68,7 +90,22 @@ def replay(root):
                 summary.get("root_bloom_profile") != "wide3"):
             raise ValueError("curve, base, rank, split layout or target count differs")
         arm = next(arm for arm in arms.ARMS if arm[0] == "k4405_wide3")
-        _, manifest = arms.manifest(arm)
+        candidate_id = arm[3]
+        manifest_path = ("research/n83_root4_frontier_current_20261018/"
+                         "highk_20261019/identities/k4405_wide3_identity/"
+                         f"candidate_{candidate_id}.json")
+        manifest = json.loads(subprocess.check_output(
+            ["git", "show", input_record["source_head"] + ":" + manifest_path],
+            cwd=REPO))
+        stripped = {key: value for key, value in manifest.items()
+                    if key != "candidate_id"}
+        digest = hashlib.sha256(json.dumps(stripped, sort_keys=True,
+                                          separators=(",", ":"),
+                                          ensure_ascii=False).encode()).hexdigest()[:12]
+        if (manifest["candidate_id"] != candidate_id or
+                not candidate_id.endswith("h" + digest) or
+                manifest["factor_base"]["actual_usable_points"] != 166 * 4405):
+            raise ValueError("frozen K4405 candidate identity differs")
         base_file = root / "base_dump.jsonl"
         if (summary["base_hash"] !=
                 manifest["factor_base"]["source_base_hash_blake3"] or
