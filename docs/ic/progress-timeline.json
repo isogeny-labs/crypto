@@ -145,37 +145,47 @@
      "value": 1.566
     },
     {
-     "anchor": "#rho-parity-ledger",
-     "class": "accounting",
      "date": "2026-10-15",
-     "detail": "Native complete DLPs paired with rho on the same target in F_p multiplications: 6.8e7x at p = 31 (6,688 trials, 19 relations), 4.5e7x and 1.8e8x at p = 11; one trial 5.9-9.2e9 flat in p over a 12-rung ladder (p = 11-241), about 25p trials per relation; every trial agrees with a meet-in-the-middle oracle and every answer verified; parity extrapolated at q = 2^58.2 (group 2^291). A reproduction of a published route; no ecbench session (no F_{p^k} instance on main).",
-     "label": "Joux-Vitse (n - 1)-decomposition at n = 5, E(F_{p^5}), complete DLP at p = 31 (ell = 2^24.8), F4 trace replay",
+     "value": 68183174.19,
      "reference": "matched",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md",
      "unit": "F_p multiplications",
-     "value": 68183174.19
-    },
-    {
-     "anchor": "#n83-tier1-cold-20261016",
-     "class": "engineering",
-     "date": "2026-10-16",
-     "detail": "On five sealed public points, 25/25 IC and 5/5 same-point rho arms replayed. K1120 mean cold process 119.826 s divided by mean rho online 2.164 s gives 55.368. K1120 saves 2.645 s [2.085, 3.205] against K1152; its 0.401 s advantage over K1104 has interval [-0.236, 1.038], so the frozen selection remains BOUNDED_UNKNOWN. Tier 1 GitHub cloud instance, A/A and topology gates passed.",
-     "label": "n83 K1120 five-point cold factor-base holdout, selected ID null",
-     "reference": "matched",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/n83_e2e_holdout_20261016/RESULT.md",
-     "unit": "Tier 1 cloud-instance cold IC / same-point rho online wall",
-     "value": 55.36777360324759
-    },
-    {
-     "anchor": "#lab-volcano-ic",
+     "label": "Joux-Vitse (n - 1)-decomposition at n = 5, E(F_{p^5}), complete DLP at p = 31 (ell = 2^24.8), F4 trace replay",
+     "detail": "Native complete DLPs paired with rho on the same target in F_p multiplications: 6.8e7x at p = 31 (6,688 trials, 19 relations), 4.5e7x and 1.8e8x at p = 11; one trial 5.9-9.2e9 flat in p over a 12-rung ladder (p = 11-241), about 25p trials per relation; every trial agrees with a meet-in-the-middle oracle and every answer verified; parity extrapolated at q = 2^58.2 (group 2^291). A reproduction of a published route; no ecbench session (no F_{p^k} instance on main).",
      "class": "accounting",
-     "date": "2026-10-17",
-     "detail": "Projected size-16 MITM on icv1-fp57-t536870914-6cabb0c9, two public one-target attempts, one round, L0/debug. Both IC and rho have unpriced work. The ratio is a quotient of incomplete lower bounds, not a direction-of-cost or speedup claim. Full graph-wide completion and exact representations remain open.",
-     "label": "Volcano projected-base control/pilot; best bounded IC cell",
+     "anchor": "#rho-parity-ledger",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
+    },
+    {
+     "date": "2026-10-16",
+     "value": 55.36777360324759,
      "reference": "matched",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json",
+     "unit": "Tier 1 cloud-instance cold IC / same-point rho online wall",
+     "label": "n83 K1120 five-point cold factor-base holdout, selected ID null",
+     "detail": "On five sealed public points, 25/25 IC and 5/5 same-point rho arms replayed. K1120 mean cold process 119.826 s divided by mean rho online 2.164 s gives 55.368. K1120 saves 2.645 s [2.085, 3.205] against K1152; its 0.401 s advantage over K1104 has interval [-0.236, 1.038], so the frozen selection remains BOUNDED_UNKNOWN. Tier 1 GitHub cloud instance, A/A and topology gates passed.",
+     "class": "engineering",
+     "anchor": "#n83-tier1-cold-20261016",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/n83_e2e_holdout_20261016/RESULT.md"
+    },
+    {
+     "date": "2026-10-17",
+     "value": 19.214979195561725,
+     "reference": "matched",
      "unit": "quotient of incomplete cold GAE lower bounds; diagnostic",
-     "value": 19.214979195561725
+     "label": "Volcano projected-base control/pilot; best bounded IC cell",
+     "detail": "Projected size-16 MITM on icv1-fp57-t536870914-6cabb0c9, two public one-target attempts, one round, L0/debug. Both IC and rho have unpriced work. The ratio is a quotient of incomplete lower bounds, not a direction-of-cost or speedup claim. Full graph-wide completion and exact representations remain open.",
+     "class": "accounting",
+     "anchor": "#lab-volcano-ic",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json"
+    },
+    {
+     "anchor": "#ic-tool-programme-20261001",
+     "class": "accounting",
+     "date": "2026-10-20",
+     "detail": "Rule v8: ledger section 23's six sizes (2^36.6-2^47.2, 64 public points and four A/A repeats a size, 408/408 rows checked in each of two runs of one binary) against a matched rho, the signed-Frobenius walk with its canonicalisation batched 16 lanes at a time by GFNI and funnel shifts; the control run, the same binary with rho as at rule v7, reads 3.59-11.56x. With the reusable set-up charged the index calculus costs 4.67-18.07x rho cold: 4.669x [4.34, 5.07] at 2^36.6, 18.07x [15.98, 20.58] at 2^47.2. Rho is still faster at every size. The two rho arms take identical walks on 64/64 targets a size; the index calculus's own online time is the same in both runs (0.976-1.033). The distance to rho is larger than rule v7 reported because rho was unmatched, not because the index calculus slowed; the ln-ln slope is 0.168 (t interval 0.128-0.208; rule v3: 0.176), not distinguishable from v3's. No curve with log2 r >= 50 is runnable by this single-word pipeline. Class: accounting (a corrected reference); the batched rho kernel is engineering; no advance.",
+     "label": "Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md",
+     "value": 4.669
     }
    ],
    "role": "emphasis"
@@ -394,15 +404,15 @@
      "value": 45.08273811955142
     },
     {
-     "anchor": "#rootfinding-buffers-20261014",
-     "class": "engineering",
      "date": "2026-10-14",
-     "detail": "Same-session candidate batch-8 IC / rho-negation cold counted-cost ratio 6.8747 [5.6689, 8.4198] over 24 matched measured pairs on eight public targets. The cross-session baseline/candidate counted-cost ratio is exactly 1.000 over 24 pairs. Native field work remains unpriced; wall comparisons are L0 diagnostics and cross-session ecbench wall comparison is refused.",
-     "label": "Prime rootfinding B48 batch-8 buffer reuse, registered 20-bit subgroup",
+     "value": 6.8746893347260745,
      "reference": "matched",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_rootfinding_alloc_20261014/REPORT.md",
      "unit": "counted GAE lower-bound diagnostic",
-     "value": 6.8746893347260745
+     "label": "Prime rootfinding B48 batch-8 buffer reuse, registered 20-bit subgroup",
+     "detail": "Same-session candidate batch-8 IC / rho-negation cold counted-cost ratio 6.8747 [5.6689, 8.4198] over 24 matched measured pairs on eight public targets. The cross-session baseline/candidate counted-cost ratio is exactly 1.000 over 24 pairs. Native field work remains unpriced; wall comparisons are L0 diagnostics and cross-session ecbench wall comparison is refused.",
+     "class": "engineering",
+     "anchor": "#rootfinding-buffers-20261014",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_rootfinding_alloc_20261014/REPORT.md"
     },
     {
      "anchor": "#three-leads-e2e-0",
@@ -918,60 +928,60 @@
   {
    "id": "genus3-ghs-2lp",
    "label": "Not an elliptic curve: genus-3 Jacobian of a GHS cubic cover, double large primes",
+   "role": "context",
    "note": "Index calculus with double large primes on Jac(C) of hyperelliptic GHS cubic covers (m = 3, r = 5) over prime F_q, q = 2^10-2^20, counted F_q plus mod-ell multiplications, one target cold, 12 paired instances per size. Rho is measured on the same Jac(C)[ell] in the same unit at q <= 2^14 only (4 single walks per size, renormalised to sqrt(pi/2)); it is not rho on the elliptic curve E0(F_q^3). The exponent result (total q^1.383 against GTTD's 4/3) is in the genus-crossover panel.",
    "points": [
     {
-     "anchor": "#genus-crossover",
-     "class": "engineering",
-     "date": "2026-10-15",
-     "detail": "Rebuilt IC-2LP baseline (kappa = 2, tree-cycle elimination + Lanczos) against rho on the same Jac(C)[ell] at q = 2^14: 0.252x with rho renormalised to sqrt(pi/2) (0.162x raw; rho walks 0.49-3.48 steps per sqrt(ell), n = 4). Cost exponent over 2^14-2^20: 1.383 (99% [1.382, 1.384]) against rho's 3/2 and GTTD's 4/3; relation phase 1.332, linear algebra 1.447. Retuning the factor base gives 1.373; structured Gaussian elimination before Lanczos gives 1.419 while cheaper by 9-22%. The original study this follows up is not in the repository; this is a rebuild. Toy sizes; not an ECDLP crossover, since rho on E0(F_q^3) is not measured.",
-     "label": "Genus-3 GHS IC-2LP rebuilt baseline at q = 2^14 (04b)",
+     "date": "2026-10-17",
+     "value": 0.252,
      "reference": "matched",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_improve_20261014/04b-genus3-2lp-rebalance/README.md",
-     "value": 0.252
+     "label": "Genus-3 GHS IC-2LP rebuilt baseline at q = 2^14 (04b)",
+     "detail": "Rebuilt IC-2LP baseline (kappa = 2, tree-cycle elimination + Lanczos) against rho on the same Jac(C)[ell] at q = 2^14: 0.252x with rho renormalised to sqrt(pi/2) (0.162x raw; rho walks 0.49-3.48 steps per sqrt(ell), n = 4). Cost exponent over 2^14-2^20: 1.383 (99% [1.382, 1.384]) against rho's 3/2 and GTTD's 4/3; relation phase 1.332, linear algebra 1.447. Retuning the factor base gives 1.373; structured Gaussian elimination before Lanczos gives 1.419 while cheaper by 9-22%. The original study this follows up is not in the repository; this is a rebuild. Toy sizes; not an ECDLP crossover, since rho on E0(F_q^3) is not measured.",
+     "class": "engineering",
+     "anchor": "#genus-crossover",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_improve_20261014/04b-genus3-2lp-rebalance/README.md"
     }
-   ],
-   "role": "context"
+   ]
   },
   {
    "id": "binary-decomp-oracle",
    "label": "Binary decomposition-oracle stage (non-Koblitz, l=8..12)",
+   "role": "context",
    "note": "Per-target oracle work of the sub-2^(2l) binary decomposition-oracle ladder, in counted point-additions divided by the pairs-and-solve pair count on the same 64 targets per rung (non-Koblitz curve y^2+xy=x^3+z*x^2+1 over F_(2^25)/F_(2^27)/F_(2^31)). The 2^(2l)-entry pair tables are target-independent and charged to the factor-base stage; relation collection stays Theta(2^n) overall, so these are stage diagnostics, not attacks or crossovers. FFD unmeasured with reason (group-law oracle).",
    "points": [
     {
-     "anchor": "#rho-parity-ledger",
-     "class": "engineering",
      "date": "2026-10-15",
-     "detail": "Max 1,068 counted point-adds (both signs) against 32,896 quartic solves per refuting target; median wall 0.120-0.155 ms vs 11.7-42.8 ms across three runs (94x-277x; the ledger's <=-half gate passes by 47x-138x). Table: 32,896 sums, ~1 MiB, ~21 ms build, materialized and charged to the factor-base stage. Exhaustive n=15 l=5 control agrees with complete triple enumeration and pairs-and-solve on 200 targets. Class: engineering; no exponent, no vs_rho, no key recovery.",
+     "value": 0.0325,
+     "reference": "stage",
      "label": "First sub-2^(2l) binary decomposition oracle at l=8: MITM pair table vs pairs-and-solve",
-     "reference": "stage",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l8_20261015/REPORT.typ",
-     "value": 0.0325
+     "detail": "Max 1,068 counted point-adds (both signs) against 32,896 quartic solves per refuting target; median wall 0.120-0.155 ms vs 11.7-42.8 ms across three runs (94x-277x; the ledger's <=-half gate passes by 47x-138x). Table: 32,896 sums, ~1 MiB, ~21 ms build, materialized and charged to the factor-base stage. Exhaustive n=15 l=5 control agrees with complete triple enumeration and pairs-and-solve on 200 targets. Class: engineering; no exponent, no vs_rho, no key recovery.",
+     "class": "engineering",
+     "anchor": "#rho-parity-ledger",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l8_20261015/REPORT.typ"
     },
     {
-     "anchor": "#rho-parity-ledger",
-     "class": "engineering",
      "date": "2026-10-15",
-     "detail": "The l=9 rung over F_(2^27) (519 points, 134,594-sum table) reads median 0.293 ms vs 724.9 ms (2,473.9x, gate passes 1,236x) and l=10 over F_(2^31) (1,053 points, 554,304-sum table) 0.735 ms vs 3,119.2 ms (4,244.2x, gate passes 2,122x); 0 disagreements with pairs-and-solve on all 128 targets, all witnesses group-verified. Counted ops 2,076 and 4,212 point-adds against 2^l(2^l+1)/2 quartic solves: the 2^l-fold gap holds and the wall ratio widens. Class: engineering; no exponent, no vs_rho, no key recovery. Value plotted: max counted MITM ops at l=10 divided by its pairs count (4,212 / 525,312 = 0.0080).",
-     "label": "MITM oracle ladder to l=10: 2,076 ops at l=9, 4,212 at l=10 against 134,912 / 525,312 quartic solves",
+     "value": 0.008,
      "reference": "stage",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l9_l10_20261015/REPORT.typ",
-     "value": 0.008
+     "label": "MITM oracle ladder to l=10: 2,076 ops at l=9, 4,212 at l=10 against 134,912 / 525,312 quartic solves",
+     "detail": "The l=9 rung over F_(2^27) (519 points, 134,594-sum table) reads median 0.293 ms vs 724.9 ms (2,473.9x, gate passes 1,236x) and l=10 over F_(2^31) (1,053 points, 554,304-sum table) 0.735 ms vs 3,119.2 ms (4,244.2x, gate passes 2,122x); 0 disagreements with pairs-and-solve on all 128 targets, all witnesses group-verified. Counted ops 2,076 and 4,212 point-adds against 2^l(2^l+1)/2 quartic solves: the 2^l-fold gap holds and the wall ratio widens. Class: engineering; no exponent, no vs_rho, no key recovery. Value plotted: max counted MITM ops at l=10 divided by its pairs count (4,212 / 525,312 = 0.0080).",
+     "class": "engineering",
+     "anchor": "#rho-parity-ledger",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l9_l10_20261015/REPORT.typ"
     },
     {
-     "anchor": "#rho-parity-ledger",
-     "class": "engineering",
      "date": "2026-10-16",
-     "detail": "The l=11 rung over F_(2^33) (2,017 points, 2,033,876-sum table, 65 MB) reads median 1.746 ms vs 1.62 s (928.0x) and l=12 over F_(2^37) (4,023 points, 8,092,016-sum table, 259 MB) 8.566 ms vs 18.7 s (2,187.2x); 0 disagreements with pairs-and-solve on all 128 targets, all witnesses group-verified. l=12 is the largest rung at which pairs-and-solve was historically usable, decided by the MITM arm for at most 16,092 counted point additions. Class: engineering; no exponent, no vs_rho, no key recovery. Value plotted: max counted MITM ops at l=12 divided by its pairs count (16,092 / 8,390,656 = 0.0019).",
-     "label": "MITM oracle ladder to l=12: 8,068 ops at l=11, 16,092 at l=12 against 2,098,176 / 8,390,656 quartic solves",
+     "value": 0.0019,
      "reference": "stage",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l11_l12_20261016/REPORT.typ",
-     "value": 0.0019
+     "label": "MITM oracle ladder to l=12: 8,068 ops at l=11, 16,092 at l=12 against 2,098,176 / 8,390,656 quartic solves",
+     "detail": "The l=11 rung over F_(2^33) (2,017 points, 2,033,876-sum table, 65 MB) reads median 1.746 ms vs 1.62 s (928.0x) and l=12 over F_(2^37) (4,023 points, 8,092,016-sum table, 259 MB) 8.566 ms vs 18.7 s (2,187.2x); 0 disagreements with pairs-and-solve on all 128 targets, all witnesses group-verified. l=12 is the largest rung at which pairs-and-solve was historically usable, decided by the MITM arm for at most 16,092 counted point additions. Class: engineering; no exponent, no vs_rho, no key recovery. Value plotted: max counted MITM ops at l=12 divided by its pairs count (16,092 / 8,390,656 = 0.0019).",
+     "class": "engineering",
+     "anchor": "#rho-parity-ledger",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l11_l12_20261016/REPORT.typ"
     }
-   ],
-   "role": "context"
+   ]
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-10-19"
+ "updated": "2026-10-20"
 }

@@ -1,0 +1,11 @@
+# Author correction preserved for review
+
+Commit `f462a760ae2f7d8a4a90990dfe3fb3efe5f9588a` supplied 28 changed files after the initial review. The manifest binds every changed blob, its Git object, length and SHA-256. This commit remains the second parent of the reconciliation merge. Sixteen study and implementation files are also copied into this directory; duplicate benchmark copies and generated site views remain available through the pinned Git objects.
+
+The native Rust analyzer from this commit reproduces its own updated summary exactly, including floating-point values. All six pages of the revised PDF were inspected. The raw 268 rho records are unchanged, and each has steps equal to ops.dp_check. Against the original producer source, the added one or three hashes per completed step reconstruct that specific omitted counter scope for these retained rows. This is derived accounting, not new measured execution or complete cross-attempt accounting.
+
+The current qualified summary continues to withhold comparisons and K1/K2/exponent qualification. The updated author analysis chooses interval-containment control criteria after the measurements; the frozen protocol did not specify those numeric decisions. It checks sample counts without verifying the exact scheduled seed inventory and still pairs some samples by position. The reviewed current analyzer retains identity-based pairing, missing/duplicate-seed detection, unavailable-interval handling and the existing seven regression tests.
+
+The revised report's statement that correct final outcomes prove every recorded walk was unaffected by the collision bug is not adopted. No execution trace replay under the repaired engine was supplied. The current implementation retains the reviewed opposite-point collision handling, wide intermediate arithmetic, call-site hash accounting and associated regressions. Historical producer outputs are not relabelled as repaired-source runs.
+
+The original pre-correction protocol, summary, report and figures at the study root remain byte-identical to the first reviewed author version. Both historical report versions must be read together with the parent review qualification. No new scientific campaign was executed in this reconciliation.
