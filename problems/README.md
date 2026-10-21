@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Twist trace constraint and solver comparison](twist-trace-constraint-and-solver-gap.md) | open | establishing a twist-assisted IC improvement for NIST prime-field P-curves | explicit restricted family or cover, verified projection/maps, equivalent native encodings, frozen controls and independent complete-cost replay |
 | [Running legacy Spot process recovery](legacy-spot-process-recovery.md) | implemented; client activation remains | enrolled legacy process recovery | private recurring backups, fenced two-hop recovery and Diem copy restore passed; laptop installation/trust needs client access |
 | [Photographed-volcano checkpoints unavailable](photo-volcano-checkpoints-unavailable.md) | open | resuming and independently auditing the original 46-curve, 100-problem-per-curve campaign | exact original archives, manifest and checkpoint verification, durable immutable readback, then resume-path validation |
 | [Generalized rootfinding complete all-roots8x qualification](generalized-rootfinding-all-roots-8x.md) | open | novel qualified8x over matched genuine all-roots F4/F5/F6 across requested fields | native complete-output integration, independent replay, strongest external references and the unchanged hard gate |

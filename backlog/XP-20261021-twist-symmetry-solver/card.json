@@ -1,0 +1,96 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261021-twist-symmetry-solver",
+  "title": "Twist route 3: equivalent polynomial encodings and Frobenius symmetry",
+  "created": "2026-10-21",
+  "authors": [
+    "research-planning lane"
+  ],
+  "status": "blocked",
+  "status_note": "Concrete experiment designs and protocol blob recorded; missing native point/solver/transfer drivers, exact admitted fixtures, calibration and independent replay still block readiness. E00 is a separate polynomial preflight only; false remains the fail-closed execution sentinel.",
+  "blocked_on": [
+    "problem:problems/twist-trace-constraint-and-solver-gap.md",
+    "xp:XP-20261021-twist-trace-factor-base"
+  ],
+  "links": {
+    "lead": "research/notes/index-calculus/RESEARCH_TWIST_IC_ROUTES_1_3.md#route-3-frobenius-symmetry-and-auxiliary-equations",
+    "notes": [
+      "problems/twist-trace-constraint-and-solver-gap.md",
+      "research/notes/index-calculus/RESEARCH_TWIST_IC_ROUTES_1_3.md",
+      "research/twist_routes_1_3_20261021/EXPERIMENTS.md"
+    ],
+    "prs": [
+      2368,
+      2380
+    ]
+  },
+  "question": "Can a native auxiliary-variable encoding lower actual solver cost per independent projected relation compared with an equivalent untwisted addition-witness formulation?",
+  "decision_value": "Projected solution-set equality determines whether the candidate computes the same task. Only then can a paired cost reduction count as a solver-stage improvement; lower displayed polynomial degree, extra kernel solutions or a favorable variable order alone cannot establish a pipeline gain.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "12255af6313c7fd383e3ce233fa6c2968d340a50"
+  },
+  "code": {
+    "repo": "aburan28/crypto",
+    "commit": null,
+    "branch": "codex/twist-ic-routes-1-3-20261021",
+    "build": []
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 4,
+    "disk_gb": 1,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Nominal metadata envelope only, not a measured requirement or a requested allocation. The route design protocol exists; its native driver, admitted fixtures and cost calibration remain pending, so runtime/cost estimates must be derived before ready."
+  },
+  "run": {
+    "argv": [
+      "false"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 1
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "Pending the native route driver and admitted fixture/cost protocol; the separate E00 arithmetic schema does not cover this route.",
+    "verify": [],
+    "land": "research/twist_routes_1_3_20261021/route3"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261021-twist-symmetry-solver"
+    ],
+    "ttl_s": 3600,
+    "env": {
+      "name": "unassigned-native-rust",
+      "recipe": "Not executable: implement and pin the native driver before selecting a lab environment."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 4096,
+      "timeout_s": 1,
+      "sandbox": "auto",
+      "sandbox_reason": "",
+      "publish": "runs/XP-20261021-twist-symmetry-solver"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Blocked planning card, below the existing funded seed cards (131072 to 1000000 units); zero avoids reprioritizing runnable work. Funding is proposed only and must be reviewed before readiness or posting."
+    },
+    "notes": "No lab publication, lease, objective, run, remote allocation or funding transaction is authorized or performed by adding this card."
+  },
+  "owner_hint": "unassigned"
+}

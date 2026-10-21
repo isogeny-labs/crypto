@@ -1,0 +1,41 @@
+# Twist route 3: equivalent polynomial encodings and Frobenius symmetry
+
+- **Status:** blocked; tracking only, no run launched.
+- **Tracker:** [routes 1–3](../../research/notes/index-calculus/RESEARCH_TWIST_IC_ROUTES_1_3.md).
+- **Blocker:** [missing constraint and solver comparison](../../problems/twist-trace-constraint-and-solver-gap.md).
+- **Prior work:** [PR #2368](https://github.com/aburan28/crypto/pull/2368), unmerged when this card was prepared.
+
+## Question and decision value
+
+Can a native auxiliary-variable encoding lower actual solver cost per independent projected relation compared with an equivalent untwisted addition-witness formulation?
+
+Projected solution-set equality determines whether the candidate computes the same task. Only then can a paired cost reduction count as a solver-stage improvement; lower displayed polynomial degree, extra kernel solutions or a favorable variable order alone cannot establish a pipeline gain.
+
+## Prerequisites and next step
+
+A concrete restricted point set or separately frozen explicit control, native system builders and an independent equivalence checker are missing.
+
+Build both polynomial encodings with exceptional branches, verify identical projected solutions on complete toy instances, then freeze paired solver configurations, controls and held-out fixtures.
+
+Controls: Untwisted low-degree addition-witness chain; same projected base and targets; v != 0 saturation and separate v = 0/O branches; signs, multiplicities, target-row span; strongest available external CAS.
+
+## Cost and resources
+
+No executed pilot or native driver supports a runtime estimate, so core-hours and wall-hours are null. The one-CPU, 4-GB RAM, 1-GB disk fields are nominal card metadata, not a sizing claim or an allocation. Replace them with a justified envelope and a resumable command before readiness. The one-second timeout and `false` command deliberately fail closed; they do not describe a scientific run.
+
+Proposed funding is zero, below the existing funded seed cards. Nothing is posted to cairn and no spending or execution priority is changed.
+
+## What done means
+
+- [ ] Exact fixtures, curve/twist identities, subgroup, baseline and candidate frozen in a committed protocol.
+- [ ] Native driver and independent checker implemented and pinned to a merged commit.
+- [ ] Exceptional cases, controls, heldouts, resumable execution, resources, stop conditions and verification defined.
+- [ ] Code/protocol pins, checkpoint fields and output schema filled; the failing sentinel replaced; native backlog validation passed before ready.
+- [ ] Preregistered run completed or its bounded failure preserved, with correctness and complete accounting for every compared arm.
+- [ ] Result, independent replay and required report/visual/PDF artifacts landed by linked PR; tracker and problem record updated.
+
+A null result closes only the frozen candidate/question. A stage gain does not establish a complete IC improvement or applicability at NIST size. Merging this card does not mark its experiment done.
+
+## Expanded experiment design
+
+[Route protocol](PROTOCOL.md) now defines the owned experiments, controls, falsifiers, dependencies and readiness conditions. The [18-experiment program](../../research/twist_routes_1_3_20261021/EXPERIMENTS.md) also contains the coupled trace/solver and cover/pipeline panels. No broader experiment has been launched merely by recording its design.
