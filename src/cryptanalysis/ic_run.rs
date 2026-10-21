@@ -34,8 +34,8 @@ use crate::cryptanalysis::ic_boundary::{
 };
 use crate::cryptanalysis::ic_engine::{classify, Regime};
 use crate::cryptanalysis::ic_framework::plugins::{
-    BinarySubspaceBase, DescentAlgebraicOracle, KoblitzOrbitBase, KoblitzTraceZeroBase, MitmOracle,
-    PrimeAbscissaBase, SubtractOracle,
+    BinarySubspaceBase, DescentAlgebraicOracle, KnownLogBase, KoblitzOrbitBase,
+    KoblitzTraceZeroBase, MitmOracle, PrimeAbscissaBase, SubtractOracle,
 };
 use crate::cryptanalysis::ic_framework::solvers::solver_by_name;
 use crate::cryptanalysis::ic_framework::stages::{
@@ -209,7 +209,7 @@ fn build_spec(family: Family, cfg: &RunConfig, r: u64, field_degree: Option<u32>
                 .factor_base
                 .clone()
                 .unwrap_or_else(|| "prime-abscissa".to_string());
-            if spec.factor_base == "prime-abscissa"
+            if matches!(spec.factor_base.as_str(), "prime-abscissa" | "known-log")
                 && !spec.factor_base_params.0.contains_key("size")
             {
                 spec.factor_base_params
@@ -299,13 +299,23 @@ fn run_prime_analogue(
     let rho = rho_ref_for(&inst.curve, g0, inst.r, cfg.seed, cfg.repeats, cfg.rho_runs);
     let rho_s = rho.as_ref().map(|r| r.mean_s);
 
-    let base = PrimeAbscissaBase { instance: inst };
+    let abscissa = PrimeAbscissaBase { instance: inst };
+    let known_log = KnownLogBase;
     let mut reports = Vec::new();
     let mut label = String::new();
     for rep in 0..cfg.repeats.max(1) {
         let mut spec = build_spec(Family::Prime, cfg, inst.r, None);
         spec.seed = cfg.seed.wrapping_add(rep as u64 * 0x9E37);
         label = spec.label();
+        let base: &dyn FactorBaseBuilder<_> = match spec.factor_base.as_str() {
+            "prime-abscissa" => &abscissa,
+            "known-log" => &known_log,
+            other => {
+                return Err(format!(
+                    "factor base `{other}` is not available here on a prime-field curve; try prime-abscissa or known-log"
+                ))
+            }
+        };
         let g = inst.generator_point();
         let planted = planted_log(spec.seed, 0, inst.r);
         let mut ops = GroupOps::default();
@@ -333,7 +343,7 @@ fn run_prime_analogue(
             }
         };
         progress.stage_begin("Index calculus", None, &spec.label());
-        let report = run_pipeline(&ctx, &spec, &base, oracle, planted, &calib, rho_s)?;
+        let report = run_pipeline(&ctx, &spec, base, oracle, planted, &calib, rho_s)?;
         report_progress(progress, &report);
         reports.push(report);
     }
