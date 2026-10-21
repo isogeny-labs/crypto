@@ -364,6 +364,16 @@ class CiCheck(Scratch):
             errors = g.benchmark_archive_errors(self.repo, {}, base="base")
         self.assertTrue(any("does not match a row from the base table" in e for e in errors))
 
+    def test_inherited_archive_entry_survives_after_base_row_was_removed(self):
+        self.tree([], [])
+        record = self.archive()
+        old_archive = json.dumps({"schema": g.ARCHIVE_SCHEMA, "rows": [record]})
+        with unittest.mock.patch.object(g, "git_show", side_effect=lambda ref, path:
+                                        "# Benchmarks\n" if path == g.BENCHMARKS_README
+                                        else old_archive if path == g.BENCHMARKS_ARCHIVE
+                                        else None):
+            self.assertEqual(g.benchmark_archive_errors(self.repo, {}, base="base"), [])
+
     def test_freeze_may_only_shrink(self):
         self.assertEqual(g.grown({"a": "1", "b": "2"}, {"a": "1", "b": "2"}), [])
         self.assertEqual(g.grown({"a": "1"}, {"a": "1", "b": "2"}), [])
