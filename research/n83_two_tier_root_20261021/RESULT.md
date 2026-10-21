@@ -92,7 +92,13 @@ summarize the four paired stage controls. The matching
 Build the exact K4405 base with K4300 split point, then independently replay
 the same public target and its relation and scalar for both layouts. Compare
 the one-target online interval with alternating Tier 1 same-instance pairs
-only after a fresh cloud allocation is authorized. A capped local K4405
-load80 monolithic correctness control is already running separately; its
-terminal receipt and replay determine whether the full-size path is feasible
-on this host.
+only after a fresh cloud allocation is authorized.
+
+The capped local K4405 monolithic load80 control reached `TIMEOUT_7200S` at
+7,202.184 seconds wall time, with 10,739,417,088 sampled peak RSS bytes.
+It wrote no target row. Its [frozen input](runs/k4405_monolithic_local_7200/input.json),
+[runner](runs/k4405_monolithic_local_7200/runner.py), and
+[terminal receipt](runs/k4405_monolithic_local_7200/process_result.json)
+preserve the censored attempt. The K128 chart is unchanged because this
+full-size timeout produced no index-build interval to plot. The split
+full-size control and Tier 1 paired online comparison remain pending.

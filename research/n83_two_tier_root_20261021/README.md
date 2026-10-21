@@ -95,8 +95,9 @@ python3 research/n83_two_tier_root_20261021/run_full_control.py \
   --variant shared --cap-seconds 7200 --rss-cap-gib 26
 ```
 
-Run this only after the current monolithic control terminates, so the two
-large indices do not compete for host memory. `PASS_PROCESS` is a process
+The monolithic control terminated at its 7,200-second cap; its receipt is
+linked from [RESULT.md](RESULT.md). Run the split control only when no other
+large index is active on the host. `PASS_PROCESS` is a process
 outcome; an independent group, relation, and scalar replay must then pass
 before entering a correctness row.
 
