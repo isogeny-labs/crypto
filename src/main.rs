@@ -392,11 +392,14 @@ enum CryptanalysisOp {
     /// --ignored --nocapture` but accessible from the CLI.)
     Bench,
     /// Run applicable length-extension, truncated birthday, and
-    /// differential-bias checks for md4, md5, sha1, sha256, or SHA-3 fixed-output variants.
+    /// differential-bias checks for MD4, MD5, SHA-1, SHA-256, SHA-3, or SHAKE.
     HashAuto {
-        /// Hash identifier: md4, md5, sha1, sha256, or sha3-{224,256,384,512}.
+        /// Hash identifier: md4, md5, sha1, sha256, sha3-{224,256,384,512}, shake128, or shake256.
         #[arg(long)]
         hash: String,
+        /// Required SHAKE output length in bytes (1..=64 for bounded analysis).
+        #[arg(long)]
+        output_bytes: Option<usize>,
     },
     /// Length-extension attack demo against a Merkle-Damgård hash.
     LengthExtension {
@@ -2165,9 +2168,9 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
             println!("{}", report);
         }
         CryptanalysisOp::RhoCollab { op } => cmd_rho_collab(op),
-        CryptanalysisOp::HashAuto { hash } => {
-            use crypto_lib::cryptanalysis::hash_attacks::auto_hash_attack;
-            match auto_hash_attack(&hash) {
+        CryptanalysisOp::HashAuto { hash, output_bytes } => {
+            use crypto_lib::cryptanalysis::hash_attacks::auto_hash_attack_with_output_bytes;
+            match auto_hash_attack_with_output_bytes(&hash, output_bytes) {
                 Ok(md) => println!("{}", md),
                 Err(e) => {
                     eprintln!("error: {}", e);

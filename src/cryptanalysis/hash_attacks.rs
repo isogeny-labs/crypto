@@ -7,7 +7,7 @@
 //! ## What's here
 //!
 //! 1. [`HashFunction`] — minimal trait every hash exposes: name,
-//!    output bytes, block bytes (compression-function input width),
+//!    output bytes, block bytes (compression block or sponge rate),
 //!    and `hash(&[u8]) -> Vec<u8>`.  Hashes with a Merkle–Damgård
 //!    structure additionally implement [`MerkleDamgardHash`] to
 //!    expose the state and compression function used by length-
@@ -30,10 +30,9 @@
 //!    does **not** provide `2^(n/2)` security against
 //!    multicollisions, only against single collisions.
 //!
-//! 5. [`differential_bias`] — XOR `Δ` into one input bit position,
-//!    measure the empirical bias `|Pr[bit_i(H(x)) = bit_i(H(x⊕Δ))]
-//!    − 1/2|` per output bit.  An ideal hash gives bias ≈ 0; reduced-
-//!    round MD4/MD5/SHA-1 give a clear non-zero signal.
+//! 5. [`differential_bias`] — XOR `Δ` into the input and measure
+//!    `|Pr[H(x)_i = H(x⊕Δ)_i] − 1/256|` for each output byte. An ideal
+//!    hash gives bias near zero at this sample size.
 
 use rand::rngs::StdRng;
 use rand::{Rng, RngCore, SeedableRng};
@@ -44,8 +43,8 @@ pub trait HashFunction: Send + Sync {
     fn name(&self) -> &'static str;
     /// Digest length in bytes.
     fn output_bytes(&self) -> usize;
-    /// Compression-function block width in bytes (typically 64 for
-    /// MD-class, 128 for SHA-512-class).
+    /// Compression block width for Merkle-Damgård hashes or absorb rate
+    /// for sponge hashes, in bytes.
     fn block_bytes(&self) -> usize;
     /// Hash an arbitrary-length message.
     fn hash(&self, message: &[u8]) -> Vec<u8>;
@@ -265,6 +264,40 @@ sha3_adapter!(Sha3_256, "SHA-3-256", 32, 136, crate::hash::sha3_256);
 sha3_adapter!(Sha3_384, "SHA-3-384", 48, 104, crate::hash::sha3_384);
 sha3_adapter!(Sha3_512, "SHA-3-512", 64, 72, crate::hash::sha3_512);
 
+/// A SHAKE XOF fixed at one output length for bounded generic analysis.
+pub struct Shake128(pub usize);
+impl HashFunction for Shake128 {
+    fn name(&self) -> &'static str {
+        "SHAKE128"
+    }
+    fn output_bytes(&self) -> usize {
+        self.0
+    }
+    fn block_bytes(&self) -> usize {
+        168
+    }
+    fn hash(&self, message: &[u8]) -> Vec<u8> {
+        crate::hash::shake128(message, self.0)
+    }
+}
+
+/// SHAKE256 with an explicit output length; its Keccak rate is 136 bytes.
+pub struct Shake256(pub usize);
+impl HashFunction for Shake256 {
+    fn name(&self) -> &'static str {
+        "SHAKE256"
+    }
+    fn output_bytes(&self) -> usize {
+        self.0
+    }
+    fn block_bytes(&self) -> usize {
+        136
+    }
+    fn hash(&self, message: &[u8]) -> Vec<u8> {
+        crate::hash::shake256(message, self.0)
+    }
+}
+
 // ── Attack 1: length extension ───────────────────────────────────────
 
 /// **Length-extension attack** on an MD-Damgård hash.  Given
@@ -477,8 +510,37 @@ pub fn differential_bias<H: HashFunction>(
 /// `cryptanalysis::auto_attack` for block ciphers.  Returns a Markdown
 /// report.
 pub fn auto_hash_attack(hash_name: &str) -> Result<String, String> {
+    auto_hash_attack_with_output_bytes(hash_name, None)
+}
+
+/// Run the bounded report. SHAKE needs an explicit output length of 1..=64
+/// bytes so the per-byte measurement has a predictable cost.
+pub fn auto_hash_attack_with_output_bytes(
+    hash_name: &str,
+    output_bytes: Option<usize>,
+) -> Result<String, String> {
+    let is_xof = matches!(hash_name, "shake128" | "shake256");
+    let xof_len = if is_xof {
+        match output_bytes {
+            Some(length @ 1..=64) => length,
+            _ => return Err("SHAKE hash-auto requires --output-bytes in 1..=64".into()),
+        }
+    } else {
+        if output_bytes.is_some() {
+            return Err("--output-bytes applies only to SHAKE128 and SHAKE256".into());
+        }
+        0
+    };
     let mut md = String::new();
-    md.push_str(&format!("# Auto-hash-cryptanalysis: `{}`\n\n", hash_name));
+    md.push_str(&format!(
+        "# Auto-hash-cryptanalysis: `{}`{}\n\n",
+        hash_name,
+        if is_xof {
+            format!(" ({} output bytes)", xof_len)
+        } else {
+            String::new()
+        }
+    ));
 
     // ── Length-extension (MD-Damgård only) ────────────────────────
     let lex_result: String;
@@ -510,9 +572,11 @@ pub fn auto_hash_attack(hash_name: &str) -> Result<String, String> {
         "sha3" | "sha3-256" => md.push_str(&run_sponge(&Sha3_256)),
         "sha3-384" => md.push_str(&run_sponge(&Sha3_384)),
         "sha3-512" => md.push_str(&run_sponge(&Sha3_512)),
+        "shake128" => md.push_str(&run_sponge(&Shake128(xof_len))),
+        "shake256" => md.push_str(&run_sponge(&Shake256(xof_len))),
         _ => {
             return Err(format!(
-                "unknown hash '{}'; try one of: md4, md5, sha1, sha256, sha3-224, sha3-256, sha3-384, sha3-512",
+                "unknown hash '{}'; try one of: md4, md5, sha1, sha256, sha3-224, sha3-256, sha3-384, sha3-512, shake128, shake256",
                 hash_name
             ));
         }
@@ -525,7 +589,11 @@ fn run_sponge<H: HashFunction>(hash: &H) -> String {
         "## Length extension\n\n{} uses a sponge construction; Merkle-Damgård length extension does not apply.\n\n",
         hash.name()
     );
-    report.push_str(&run_birthday(hash, 32, 200_000));
+    report.push_str(&run_birthday(
+        hash,
+        (hash.output_bytes() * 8).min(32) as u32,
+        200_000,
+    ));
     report.push_str(&run_differential(hash));
     report
 }
@@ -707,6 +775,33 @@ mod tests {
             hex(&Sha3_512.hash(b"abc")),
             "b751850b1a57168a5693cd924b6b096e08f621827444f70d884f5d0240d2712e10e116e9192af3c91a7ec57647e3934057340b4cf408d5a56592f8274eec53f0"
         );
+    }
+
+    #[test]
+    fn shake_adapters_match_public_vectors_and_rates() {
+        let shake128 = Shake128(32);
+        let shake256 = Shake256(32);
+        assert_eq!(shake128.block_bytes(), 168);
+        assert_eq!(shake256.block_bytes(), 136);
+        assert_eq!(shake128.output_bytes(), 32);
+        assert_eq!(shake256.output_bytes(), 32);
+        assert_eq!(
+            hex(&shake128.hash(b"")),
+            "7f9c2ba4e88f827d616045507605853ed73b8093f6efbc88eb1a6eacfa66ef26"
+        );
+        assert_eq!(
+            hex(&shake256.hash(b"abc")),
+            "483366601360a8771c6863080cc4114d8db44530f8f1e1ee4f94ea37e78b5739"
+        );
+        assert_eq!(Shake128(1).hash(b""), shake128.hash(b"")[..1]);
+    }
+
+    #[test]
+    fn shake_auto_requires_bounded_explicit_length() {
+        assert!(auto_hash_attack("shake128").is_err());
+        assert!(auto_hash_attack_with_output_bytes("shake256", Some(0)).is_err());
+        assert!(auto_hash_attack_with_output_bytes("shake256", Some(65)).is_err());
+        assert!(auto_hash_attack_with_output_bytes("sha3-256", Some(32)).is_err());
     }
 
     /// Birthday-attack on 24-bit-truncated MD5 finds a collision in

@@ -392,6 +392,10 @@ crypto cryptanalysis hash-auto --hash sha3-224
 crypto cryptanalysis hash-auto --hash sha3-256
 crypto cryptanalysis hash-auto --hash sha3-384
 crypto cryptanalysis hash-auto --hash sha3-512
+crypto hash shake128 --output-bytes 32 --hex 000102ff
+crypto hash shake256 --output-bytes 32 --hex 000102ff
+crypto cryptanalysis hash-auto --hash shake128 --output-bytes 32
+crypto cryptanalysis hash-auto --hash shake256 --output-bytes 32
 ```
 
 `hash-auto` runs a bounded 32-bit-truncated birthday search and a 4,096-trial
@@ -401,4 +405,8 @@ they do not establish collisions or differential weaknesses for the full
 digests. SHA-3 uses a sponge, so the command records that the
 Merkle-Damgård length-extension method does not apply. SHA-256 has a
 separate length-extension adapter with explicit prefix length and digest
-input. SHAKE output-length-specific attack adapters are not yet exposed.
+input. SHAKE128 and SHAKE256 require an explicit `--output-bytes` value in
+`1..=64` for `hash-auto`. The bounded analysis treats that many output bytes
+as the digest, truncating the birthday search to at most 32 bits, and reports
+per-byte differential measurements. The standalone `crypto hash` command
+supports longer SHAKE outputs independently.
