@@ -44,6 +44,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck
       - name: Check shell syntax and diagnostics
         run: |
           bash -n .claude/hooks/session-start.sh scripts/cairn-node.sh scripts/setup-workstation.sh
