@@ -66,7 +66,7 @@ Status vocabulary:
 
 | # | design | status | Lean | experiment |
 |:--|:--|:--|:--|:--|
-| 11 | Norm-divisibility chain over a Kummer fibre (prime) | **open: better presentation, no slope change** (§5: replicates on p₂; equals its own shape null; growth per bit no flatter, steeper at `m = 4`; cost-unfavourable on measured `field_ops`; `m = 4`, t ≥ 4 comparison needs > 14 GB, Amendments 5–6) | `chain_sound` (soundness at each root), `pencil_norm_factor` (the `m = 2` norm factorization), `norm_chain_excess` (one more equation than unknown, every `m`) | A11, F1–F4, C1–C4, L1, L2, L2r |
+| 11 | Norm-divisibility chain over a Kummer fibre (prime) | **open: better presentation, no slope change** (§5: replicates on p₂; equals its own shape null; growth per bit no flatter, steeper at `m = 4`; cost-unfavourable on measured `field_ops`; `m = 4`, t ≥ 4 comparison needs > 64 GB, Amendments 5–7) | `chain_sound` (soundness at each root), `pencil_norm_factor` (the `m = 2` norm factorization), `norm_chain_excess` (one more equation than unknown, every `m`) | A11, F1–F4, C1–C4, L1, L2, L2r, X1, X2 |
 | 12 | Binary norm chain as an auxiliary-variable solver input (credits `research/nagao_relations/` open item 1) | open | `chain_sound` applies verbatim | E12 |
 | 13 | Algebraic large prime (partial divisibility) | open | — | E13 |
 
@@ -258,7 +258,33 @@ Each row now records the child's peak RSS.
 - **Reading:** this host cannot measure either open `m = 4` cell. Settling
   whether A11's constant factor survives at `m = 4`, `t ≥ 4` needs a host
   with well over 15 GB (the independent lab runner, not reachable from these
-  containers). No recorded verdict changed.
+  containers). No recorded verdict changed. Amendment 7, below, reran both
+  cells on 64 GiB hosts.
+
+### Amendment 7: the two `m = 4` cells on a 64 GiB host (run-20261021T0056Z)
+
+Rows: `runs/X1-*` and `runs/X2-*`, with pre-flight, kernel-log and instance
+logs beside them. Analysis: `runs/analysis-amendment7.txt`. Report:
+[`reports/run-20261021T0056Z/REPORT.pdf`](reports/run-20261021T0056Z/REPORT.pdf).
+Hosts: two AWS EC2 `r7i.2xlarge` (64 GiB, 8 vCPU), one per cell, with no
+memory cgroup, so `ulimit -v` V = 64.25 GB (4.4–4.8 × the earlier limits).
+Same systems as before (checked). Runner:
+`scripts/run_amendment7.sh`, which needs no checkout.
+
+- **X1, A0 at `m = 4`, `t = 4`:** not measurable. Both systems hit the
+  registered limit (allocation failure at 1916 s and 1874 s, peak RSS
+  60.7 GB, no kernel OOM kill). **R1:** still no cost comparison at
+  `t = 4`; A0's working set there exceeds 64 GB. The prediction (time, not
+  memory, would bind) did not hold.
+- **X2, A11 at `m = 4`, `t = 5`:** not measurable. Both systems hit the
+  registered limit (allocation failure at 6011 s and 6024 s, peak RSS
+  62.9 GB, no kernel OOM kill). **R2:** the 3-cell `m = 4` verdicts stand
+  (κ = 14.9 against 3, cost-unfavourable; σ = 1.5). The prediction (memory
+  binds) held, though memory grew far more slowly than predicted.
+- **Reading:** memory, not the 4 h budget, stops both open cells at 64 GB
+  too. No recorded verdict changed. Settling either cell needs a host whose
+  memory exceeds a working set this study has not measured, and even then
+  extrapolated cost (about 2·10¹⁴ and 2·10¹⁶ field ops) may exceed 4 h.
 
 ## 6. What this round does not establish
 

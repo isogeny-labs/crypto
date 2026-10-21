@@ -22,18 +22,21 @@ plt.rcParams.update({"font.size": 8.5, "axes.edgecolor": "#888", "xtick.color": 
 fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.1), sharey=True)
 for ax, (title, series) in zip(axes, cells):
     limits = set()
-    for label, f, col in series:
+    for i, (label, f, col) in enumerate(series):
         rows = load(f)
+        left = i == 0 and len(series) == 3  # L2 sits just left of L2r: label it on its left
         for r in rows:
             stop = "cgroup OOM kill" if "signal: 9" in (r.get("failure_reason") or "") else "ulimit -v malloc failure"
             ax.scatter(r["time"], r["peak_rss_kb"] / GB, color=col, s=36, zorder=3,
                        label=f"{label}: {stop}" if r["target"] == 0 else None)
             ax.annotate(f"t{r['target']}  {r['time']:.0f} s", (r["time"], r["peak_rss_kb"] / GB),
-                        textcoords="offset points", xytext=(6, -3 - 7 * r["target"]), fontsize=6.3, color="#444")
+                        textcoords="offset points", xytext=(-6 if left else 6, -3 - 7 * r["target"]),
+                        ha="right" if left else "left", fontsize=6.3, color="#444")
             limits.add((r["ulimit_v_kb"], col))
-    for v, col in sorted(limits):
+    for j, (v, col) in enumerate(sorted(limits)):
         ax.axhline(v / GB, color=col, ls="--", lw=0.9, alpha=0.8)
-        ax.text(0.02, v / GB + 0.6, f"ulimit -v {v:,}".replace(",", " "),
+        below = j == 0 and len(limits) == 3  # the lowest of three close limits goes under its line
+        ax.text(0.45 if below else 0.02, v / GB + (-2.6 if below else 0.6), f"ulimit -v {v:,}".replace(",", " "),
                 fontsize=6.3, color=col, transform=ax.get_yaxis_transform())
     ax.set_xscale("log")
     ax.set_xlim(50, 20000)
