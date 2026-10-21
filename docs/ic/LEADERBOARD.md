@@ -35,6 +35,8 @@ The Frobenius-folded pair table no longer names `σ^t(P_i)` for every base point
 
 [Report](../../research/ecbench_lazy_orbit_members_20261018/REPORT.pdf) · [study](../../research/ecbench_lazy_orbit_members_20261018/) · [data](../../research/ecbench_lazy_orbit_members_20261018/figures/ratios.json). Distance to rho is reported, not a gate; no ranking against rho is claimed.
 
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
+
 ## Table A: Koblitz, one target (§23, re-run at baseline v3)
 
 - **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, which is 2.3–3.2 times cheaper at baseline v3 than in §23's processes, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v3/README.md).
