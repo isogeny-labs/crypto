@@ -251,36 +251,18 @@ The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-f
 | 8,192 | 43.6 s | 20.5 s | 5.29 s | 0.26 [0.24, 0.31] | 0.12 [0.11, 0.15] | 0.13 | 2.37 → 1.25 GiB |
 | 16,384 | 224 s | 117 s | 28.2 s | 0.24 [0.22, 0.26] | 0.13 [0.12, 0.14] | 0.13 | 9.15 → 4.65 GiB |
 
-## Tuned GAE unit (proposed, not canonical), outside tables A–C
+## Planner validation, outside tables A–C
 
-Definition `tuned-batched-affine-add/v1`: the group-addition equivalent is re-timed against a tuned affine addition (Montgomery u64 / pclmulqdq GF(2^n), 256-lane batched inversion, cross-checked addition by addition) instead of the untuned `CountedGroup::add`. The recorded operation counts do not change; each native unit is re-priced at the tuned ratio. Tables A–C above keep the legacy unit. **This is an accounting correction, not an improvement: every gap to the matched rho widens.** Each row is the legacy-best recipe of Table B re-priced; legacy S is reproduced from the ledger for every recipe (within 1e-9). The matched rho is unchanged (it counts group operations only). Cross-host assumption: the ratios were measured on this repository's Xeon @ 2.80 GHz, not on the host of the legacy table. Study: [research/tuned_gae_20261020/](../../research/tuned_gae_20261020/).
+`ic plan` / `ic bench --auto` (ic-planner/1) chooses every `ic.pipeline` stage of a prime-field run; here its plan runs against every alternative one change away from it on six prime curves outside its evidence (class: engineering). The plan is the existing best recipe, chosen automatically, so no row above moves. Cells are S(alternative) / S(plan), ecbench `compare`, paired, cluster 95% interval, at w = 0; the band column is the ratio at w = 0, 0.1 and 1 GAE per unpriced native operation (AGENTS.md §5a). Supplementary curves are `prime_search` curves outside the registry, named by tag. Study: [research/ic_planner_validation_20261020/](../../research/ic_planner_validation_20261020/).
 
-| instance | recipe | S legacy | S tuned | tuned / legacy | gap to rho, legacy | gap to rho, tuned |
-|:--|:--|--:|--:|--:|--:|--:|
-| bench-10bit | mitm_m2_negfold_walk_balanced | 22.85 | 23.41 | 1.025 | 6.34× | 6.49× |
-| bench-12bit | mitm_m2_negfold_walk | 15.62 | 16.72 | 1.071 | 5.47× | 5.86× |
-| bench-14bit | mitm_m2_negfold_walk_balanced | 13.07 | 13.91 | 1.064 | 6.43× | 6.84× |
-| bench-16bit | mitm_m2_negfold_walk_balanced | 11.68 | 13.67 | 1.170 | 6.71× | 7.86× |
-| bench-18bit | mitm_m2_negfold_walk_balanced | 8.41 | 9.12 | 1.085 | 5.82× | 6.31× |
-| bench-20bit | mitm_m2_negfold_walk_balanced | 10.72 | 11.55 | 1.078 | 8.30× | 8.94× |
-| generated-22bit-3290411 | mitm_m2_negfold_walk_balanced | 12.77 | 13.92 | 1.090 | 10.50× | 11.45× |
-| generated-24bit-10935329 | mitm_m2_negfold_walk_balanced | 13.97 | 15.53 | 1.112 | 13.46× | 14.96× |
-| random-binary-n15-b524b | mitm_m2_negfold_walk | 26.31 | 27.39 | 1.041 | 13.07× | 13.60× |
-| random-binary-n18-b6507 | mitm_m2_negfold_walk_balanced | 21.30 | 23.91 | 1.122 | 10.62× | 11.92× |
-| random-binary-n21-b1b6f3b | mitm_m2_negfold_walk_balanced | 24.39 | 28.52 | 1.169 | 17.99× | 21.03× |
-| random-binary-n24-b5fc9da | mitm_m2_negfold_walk_balanced | 27.24 | 31.73 | 1.165 | 23.03× | 26.82× |
-| random-binary-n27-b845462 | mitm_m2_negfold_walk_balanced | 36.93 | 44.06 | 1.193 | 38.21× | 45.59× |
-
-### rho.prime_fast, the prime wall reference
-
-`rho.prime_fast` (`prime_fast::rho_parallel` with `RhoConfig::tuned`) against `rho.negation` on four prime-order curves, session `ECBS1h522578c510c4`, 1024/1024 records verified per arm, L0 (`--cpus none --allow-busy`). Operations (GAE, lower bound: canonicalisations unpriced on both): fast / negation = 1.027 [0.983, 1.075] over 1,024 pairs; mean S 0.937 vs 0.963. Wall, as the harness admitted at L0: median fast / negation = 0.218 (the recorded 95% interval is degenerate at that value). A speed-up of the rho reference implementation at equal counted work, class engineering; it moves no index-calculus row. Comparison: [research/tuned_gae_20261020/sessions/rho_prime_fast_v2_n256/comparisons/rho-neg__rho-fast.json](../../research/tuned_gae_20261020/sessions/rho_prime_fast_v2_n256/comparisons/rho-neg__rho-fast.json).
-
-| curve | log₂ r | pairs | ops fast / negation | 95% interval |
-|:--|--:|--:|--:|:--|
-| icv1-fp28-tm24531-24294e5d | 27.95 | 256 | 1.036 | [0.948, 1.126] |
-| icv1-fp32-t93403-ef655380 | 31.76 | 256 | 1.036 | [0.942, 1.140] |
-| icv1-fp36-t360541-9f646956 | 35.21 | 256 | 0.985 | [0.901, 1.078] |
-| icv1-fp40-tm62443-8b49d5b3 | 39.73 | 256 | 1.054 | [0.967, 1.156] |
+| curve | log₂ r | plan base | half-base | double-base | rootfind | full-rank | random-targets | double base across the band | S(plan) / S(rho) measured | predicted |
+|:--|--:|:--|:--|:--|:--|:--|:--|:--|:--|--:|
+| `icv1-fp24-tm5099-a6f137c6` | 24.00 | `prime-abscissa:size=128` | 1.56 [1.35, 1.77] | 1.51 [1.4, 1.64] | 171 [164, 176] | 3.64 [3.24, 4.14] | 44.8 [39, 50.6] | 1.51 / 1.38 / 0.92 (not separated across the band) | 14.4 [11.6, 18.4] | 12.2 |
+| `icv1-fp26-tm1775-7e8fb6df` | 25.35 | `prime-abscissa:size=175` | 1.55 [1.41, 1.69] | 1.6 [1.5, 1.7] | 233 [226, 239] | 3.84 [3.43, 4.21] | 49.1 [43.7, 54] | 1.60 / 1.47 / 0.98 (not separated across the band) | 14.6 [11.2, 19.6] | 14.5 |
+| `icv1-fp28-t28201-65099091` | 28.00 | `prime-abscissa:size=323` | 1.43 [1.28, 1.6] | 1.57 [1.49, 1.68] | 439 [424, 450] | 4.56 [4.1, 5.12] | 51.5 [43.8, 58.5] | 1.57 / 1.44 / 0.93 (not separated across the band) | 21.7 [17, 28.3] | 20.1 |
+| c24 (supplementary) | 23.47 | `prime-abscissa:size=113` | 1.53 [1.33, 1.76] | 1.49 [1.37, 1.65] | 150 [142, 156] | 3.3 [2.97, 3.68] | 41.5 [35.2, 48.3] | 1.49 / 1.37 / 0.91 (not separated across the band) | 12.6 [9.75, 16.5] | 11.5 |
+| c28 (supplementary) | 27.69 | `prime-abscissa:size=300` | 1.47 [1.34, 1.61] | 1.54 [1.44, 1.68] | 413 [395, 425] | 4.15 [3.62, 4.78] | 54.1 [49.8, 58.9] | 1.54 / 1.41 / 0.93 (not separated across the band) | 21.8 [17, 29.8] | 19.3 |
+| c30 (supplementary) | 29.62 | `prime-abscissa:size=469` | 1.36 [1.2, 1.53] | 1.6 [1.52, 1.7] | 637 [616, 651] | 4.81 [4.3, 5.4] | 58.7 [52.1, 64.8] | 1.60 / 1.46 / 0.96 (not separated across the band) | 25.8 [19.9, 35.2] | 24.5 |
 
 ## Large-prime conductor-gap counted diagnostics
 
@@ -333,12 +315,11 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
-- `research/tuned_gae_20261020/reprice/table_b.json` — sha256 `631cca6dd754a0ca…`
-- `research/tuned_gae_20261020/sessions/rho_prime_fast_v2_n256/comparisons/rho-neg__rho-fast.json` — sha256 `aadcee6f5f3db1e5…`
+- `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
-- `docs/curves/registry.json` — sha256 `f3761749946fcfc0…`
+- `docs/curves/registry.json` — sha256 `584d070fbec7e21f…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `ab4891397fe07fca…`
