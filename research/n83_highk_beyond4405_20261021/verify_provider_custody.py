@@ -21,6 +21,7 @@ def validate(allocation_path: Path, archive_dir: Path) -> dict:
         "schema": "n83.fixed31-provider-custody/v1",
         "status": "BOUNDED_UNKNOWN",
         "final_primary_status": "BOUNDED_UNKNOWN",
+        "final_cold_cost_status": "BOUNDED_UNKNOWN",
         "checks": {},
     }
     receipt = runpod_runner.read_allocation(allocation_path)
@@ -93,6 +94,8 @@ def validate(allocation_path: Path, archive_dir: Path) -> dict:
                         "primary": holdout.get("primary_status"),
                         "cross_family_selector": holdout.get(
                             "cross_family_selector", {}).get("status"),
+                        "cold_cost_selector": holdout.get(
+                            "cold_cost_selector", {}).get("status"),
                     }
         else:
             result["checks"]["archive_identity"] = False
@@ -106,6 +109,8 @@ def validate(allocation_path: Path, archive_dir: Path) -> dict:
                 "PASS_VERIFIED_CROSS_FAMILY_TIER1"):
             result["final_primary_status"] = (
                 "PASS_VERIFIED_CROSS_FAMILY_TIER1")
+            if scientific.get("cold_cost_selector") == "SELECTED":
+                result["final_cold_cost_status"] = "SELECTED_TWO_FAMILIES_TIER1"
     result["pod_id"] = pod_id
     result["allocation_sha256"] = allocation_hash
     return result
@@ -121,6 +126,7 @@ def main() -> int:
     output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
     print(json.dumps({"status": result["status"],
                       "final_primary_status": result["final_primary_status"],
+                      "final_cold_cost_status": result["final_cold_cost_status"],
                       "checks": result["checks"]}, sort_keys=True))
     return 0 if result["status"] == "PASS_PROVIDER_CUSTODY" else 2
 

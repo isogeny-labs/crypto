@@ -126,7 +126,8 @@ when any receipt is missing or inconsistent. The Pod-side scientific selector
 and this post-termination custody gate must both pass before a Tier 1 result
 is promoted. Its `final_primary_status` is read from the immutable archive and
 remains `BOUNDED_UNKNOWN` unless the archived screen and point-0 cross-family
-replay both passed. The custody check can be rerun independently:
+replay both passed. `final_cold_cost_status` separately requires the archived
+16-pair setup-inclusive selector. The custody check can be rerun independently:
 
 ```sh
 python3 -m research.n83_highk_beyond4405_20261021.verify_provider_custody \
@@ -148,7 +149,9 @@ the point-0 cross-family online wall-time ratio only when both Tier 1,
 resource, noise and correctness gates pass. Its 16-point paired selector
 retains `BOUNDED_UNKNOWN` for incomplete or conflicting evidence. The
 [cross-family addendum](K1107_CROSS_FAMILY_ADDENDUM.md) freezes its event
-order and selection rule. The Pod launcher runs this phase only after the
+order and selection rule. A separate 16-pair cold-process selector ranks
+setup-inclusive one-target IC cost, retaining setup, rank, target and residual
+phase accounting. The Pod launcher runs this phase only after the
 screen selector admits a unique fixed31 base and time remains before the
 provider deadline.
 `select.py` admits a fixed31 winner only from a complete independently replayed

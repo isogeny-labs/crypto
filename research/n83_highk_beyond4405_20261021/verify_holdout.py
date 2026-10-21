@@ -144,6 +144,42 @@ def cross_family_select(rows: list[dict], candidate_id: str) -> dict:
     return result
 
 
+def cross_family_cold_select(rows: list[dict], candidate_id: str) -> dict:
+    """Rank complete one-target IC processes, including reusable preparation."""
+    cold_rows = [{**row, "ic_online_ms": row.get("ic_cold_process_ms")}
+                 for row in rows]
+    result = cross_family_select(cold_rows, candidate_id)
+    result["schema"] = "n83.fixed31-cross-family-cold-selector/v1"
+    result["metric"] = "ic_process_total_ms"
+    phase_keys = ("setup", "rank_stage", "targets_total", "unattributed")
+    phase_ok = len(rows) == 32
+    for row in rows:
+        phases = row.get("ic_cold_phases_ms")
+        total = row.get("ic_cold_process_ms")
+        if (not isinstance(phases, dict) or
+                any(not isinstance(phases.get(key), (int, float)) or
+                    isinstance(phases.get(key), bool) or
+                    not math.isfinite(phases[key]) or phases[key] < 0
+                    for key in phase_keys) or
+                not isinstance(total, (int, float)) or
+                isinstance(total, bool) or not math.isfinite(total) or
+                total <= 0 or
+                abs(math.fsum(phases[key] for key in phase_keys) - total) > 1):
+            phase_ok = False
+            break
+    result["cold_phase_accounting_status"] = "PASS" if phase_ok else "INCOMPLETE"
+    if not phase_ok:
+        result["status"] = "BOUNDED_UNKNOWN"
+        result["selected_candidate_id"] = None
+    if "geometric_mean_online_ms" in result:
+        result["geometric_mean_cold_process_ms"] = result.pop(
+            "geometric_mean_online_ms")
+    if "paired_ic_online_ms" in result:
+        result["paired_ic_cold_process_ms"] = result.pop(
+            "paired_ic_online_ms")
+    return result
+
+
 def verify(output: Path) -> int:
     dispatch, streams = run.fixture()
     workloads = read(HERE / "workloads.json")
@@ -317,6 +353,12 @@ def verify(output: Path) -> int:
                 "ic_online_phases_ms": (ic_targets[0]["online_phases_ms"]
                                         if passed else None),
                 "ic_cold_process_ms": ic.get("cold_process_ms"),
+                "ic_cold_phases_ms": ({
+                    "setup": ic["setup_ms"],
+                    "rank_stage": ic["rank_stage_ms"],
+                    "targets_total": ic["targets_total_ms"],
+                    "unattributed": ic["cold_unattributed_ms"],
+                } if ic.get("status") == "PASS_INDEPENDENT_REPLAY" else None),
                 "calibration": calibration,
                 "target_match": target_ok,
                 "event_order": order_ok,
@@ -355,8 +397,14 @@ def verify(output: Path) -> int:
         "k1107_online_ms_over_highk_online_ms":
             rows[1]["ic_online_ms"] / rows[0]["ic_online_ms"]
             if paired[0] else None,
+        "k1107_cold_process_ms_over_highk_cold_process_ms":
+            rows[1]["ic_cold_process_ms"] / rows[0]["ic_cold_process_ms"]
+            if (paired[0] and rows[0]["ic_cold_phases_ms"] is not None and
+                rows[1]["ic_cold_phases_ms"] is not None and
+                rows[0]["ic_cold_process_ms"] > 0) else None,
     }
     cross_family = cross_family_select(rows, candidate_id)
+    cold_family = cross_family_cold_select(rows, candidate_id)
     analysis = {
         "schema": "n83.fixed31-cross-family-one-target-analysis/v2",
         "candidate_id": candidate_id,
@@ -366,6 +414,7 @@ def verify(output: Path) -> int:
         "primary_status": primary["status"],
         "verified_replication_count": sum(paired[1:]),
         "cross_family_selector": cross_family,
+        "cold_cost_selector": cold_family,
         "producer_stop": (read(holdout_dir / "producer_stop.json")
                           if (holdout_dir / "producer_stop.json").exists() else None),
         "rows": rows,
@@ -379,6 +428,8 @@ def verify(output: Path) -> int:
         json.dumps(primary, indent=2, sort_keys=True) + "\n")
     (holdout_dir / "cross_family_selection.json").write_text(
         json.dumps(cross_family, indent=2, sort_keys=True) + "\n")
+    (holdout_dir / "cross_family_cold_selection.json").write_text(
+        json.dumps(cold_family, indent=2, sort_keys=True) + "\n")
     print(json.dumps({"primary_status": primary["status"],
                       "verified_replication_count":
                       analysis["verified_replication_count"],
