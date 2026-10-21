@@ -1633,6 +1633,14 @@ pub struct SignedFrobeniusClasses {
     lambda_pow: Vec<u64>,
 }
 
+/// Buffers [`SignedFrobeniusClasses::canon_parts_many`] reuses.
+#[derive(Default)]
+struct CanonScratch {
+    xs: Vec<u64>,
+    ys: Vec<u64>,
+    reps: Vec<(u64, u64, u32)>,
+}
+
 impl SignedFrobeniusClasses {
     /// The classes of a Koblitz instance, or `None` for any other curve.
     pub fn new(inst: &BinaryInstance) -> Option<Self> {
@@ -1681,6 +1689,47 @@ impl SignedFrobeniusClasses {
         } else {
             (FastPoint::affine(x, y), t, false)
         }
+    }
+
+    /// Whether [`Self::canon_parts_many`] runs: the batched kernel is
+    /// present (`KIC_RHO_CANON=scalar` selects the per-point tables, the
+    /// same-binary control).
+    fn batched(&self) -> bool {
+        self.canon.frobenius_reps_available()
+    }
+
+    /// [`Self::canon_parts`] of every point of `pts`, sixteen at a time,
+    /// into `out` (cleared first); the same triples, point for point.
+    /// `scratch` holds the buffers between calls.
+    fn canon_parts_many(
+        &self,
+        pts: &[FastPoint],
+        scratch: &mut CanonScratch,
+        out: &mut Vec<(FastPoint, u32, bool)>,
+    ) {
+        scratch.xs.clear();
+        scratch.ys.clear();
+        scratch
+            .xs
+            .extend(pts.iter().map(|p| if p.infinity { 0 } else { p.x }));
+        scratch
+            .ys
+            .extend(pts.iter().map(|p| if p.infinity { 0 } else { p.y }));
+        self.canon
+            .frobenius_reps(&scratch.xs, &scratch.ys, &mut scratch.reps);
+        out.clear();
+        out.extend(pts.iter().zip(&scratch.reps).map(|(p, &(x, y, t))| {
+            if p.infinity {
+                return (*p, 0, false);
+            }
+            // −(x, y) = (x, x + y).
+            let negated = x ^ y;
+            if negated < y {
+                (FastPoint::affine(x, negated), t, true)
+            } else {
+                (FastPoint::affine(x, y), t, false)
+            }
+        }));
     }
 
     /// The multiplier `σλ^t` of [`Self::canon_parts`].
@@ -2825,6 +2874,9 @@ pub struct ParallelRho<'a> {
     setup: GroupOps,
     lanes: usize,
     restart_batch: usize,
+    /// Whether a round's canonicalisations run through the batched
+    /// kernel (eight lanes or more, and the CPU has it).
+    batch_canon: bool,
 }
 
 impl<'a> ParallelRho<'a> {
@@ -2838,6 +2890,7 @@ impl<'a> ParallelRho<'a> {
         dp_bits: Option<u32>,
     ) -> Option<Self> {
         let classes = SignedFrobeniusClasses::new(inst)?;
+        let classes_batched = classes.batched();
         let lanes = lanes.max(1);
         let r = inst.r;
         let n = inst.n as usize;
@@ -2885,7 +2938,18 @@ impl<'a> ParallelRho<'a> {
             setup,
             lanes,
             restart_batch: (lanes / 4).max(1),
+            batch_canon: lanes >= 8 && classes_batched,
         })
+    }
+
+    /// Take the batched canonicalisation on or off.  The walks are the
+    /// same either way (the test compares them step for step); only the
+    /// time a step takes differs.  Default: on when the CPU has the
+    /// kernel and there are eight lanes or more; `KIC_RHO_CANON=scalar`
+    /// turns it off for the whole process.
+    pub fn with_batched_canon(mut self, on: bool) -> Self {
+        self.batch_canon = on && self.lanes >= 8 && self.classes.batched();
+        self
     }
 
     /// One target's floor in steps, `√(πr/2A)` with `A = 2n`.
@@ -3125,6 +3189,9 @@ impl<'a> ParallelRho<'a> {
         let mut stepped: Vec<(usize, usize)> = Vec::with_capacity(self.lanes);
         let mut idle: Vec<usize> = Vec::with_capacity(self.lanes);
         let mut fresh: Vec<FastPoint> = Vec::with_capacity(self.lanes);
+        let batch_canon = self.batch_canon;
+        let mut canon_scratch = CanonScratch::default();
+        let mut parts: Vec<(FastPoint, u32, bool)> = Vec::with_capacity(self.lanes);
         'run: while tally.walk_ops() < max_steps && walks < max_steps {
             // Restart the idle lanes once enough of them wait, or when
             // none is left walking.
@@ -3166,10 +3233,19 @@ impl<'a> ParallelRho<'a> {
             sums.clear();
             fc.add_pairwise(&points, &addends, &mut sums, &mut scratch);
             ops.adds += points.len() as u64;
-            for (&(i, j), &sum) in stepped.iter().zip(&sums) {
+            let batch_round = batch_canon && sums.len() >= 8;
+            if batch_round {
+                self.classes
+                    .canon_parts_many(&sums, &mut canon_scratch, &mut parts);
+            }
+            for (k, (&(i, j), &sum)) in stepped.iter().zip(&sums).enumerate() {
                 let lane = &mut lanes[i];
                 tally.canonicalisations += 1;
-                let (y, t, negated) = self.classes.canon_parts(sum);
+                let (y, t, negated) = if batch_round {
+                    parts[k]
+                } else {
+                    self.classes.canon_parts(sum)
+                };
                 let hy = mix(y.pack());
                 lane.tried += 1;
                 if look_ahead
@@ -4850,10 +4926,222 @@ pub struct TableCost {
     pub native: Vec<(&'static str, u64)>,
 }
 
+/// Sums one block of the cache-blocked pair table groups before
+/// inserting them.
+const TABLE_BLOCK: usize = 1 << 18;
+
+/// Entries one map of the cache-blocked pair table is sized for: about
+/// 600 KiB of buckets, inside a core's L2.
+const TABLE_PART_ENTRIES: usize = 1 << 15;
+
+/// Which map of a cache-blocked pair table holds `key`: the top bits of a
+/// multiplier other than [`MixHasher`]'s, so a map's own buckets and tags
+/// stay spread.
+#[inline]
+fn table_part(key: u64, shift: u32) -> usize {
+    if shift >= 64 {
+        0
+    } else {
+        (key.wrapping_mul(0xD6E8_FEB8_6659_FD93) >> shift) as usize
+    }
+}
+
+/// The batched prime table's arithmetic: every pair of the folded table
+/// (the first point above each abscissa against every signed point above
+/// a later abscissa, plus its own double), as the key `x + 1` of the sum
+/// and the pair's indices, in the scalar builder's order.  One inversion
+/// per abscissa row; the counted operations go to `ops`.
+fn for_each_folded_prime_sum(
+    g: &PrimeCurve,
+    fb: &FactorBase<PrimePoint>,
+    ops: &mut GroupOps,
+    mut emit: impl FnMut(u64, u32, u32),
+) -> Result<(), String> {
+    if g.p < 5 || g.p & 1 == 0 || g.p >= (1u64 << crate::cryptanalysis::prime_fast::MAX_BITS) {
+        return Err("batched prime table requires odd 3 < p < 2^62".into());
+    }
+    let f = Fp64::new(g.p);
+    let groups: Vec<&Vec<usize>> = fb
+        .abscissa_list
+        .iter()
+        .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+        .collect();
+    let a = groups.len();
+    let pts: Vec<(u64, u64)> = fb
+        .points
+        .iter()
+        .map(|pt| (f.to_mont(pt.x), f.to_mont(pt.y)))
+        .collect();
+    ops.field_ops.muls += 2 * pts.len() as u64;
+    let am = f.to_mont(g.a);
+    ops.field_ops.muls += 1;
+    let mut denominators = Vec::with_capacity(a);
+    let mut scratch = Vec::with_capacity(a);
+    for ai in 0..a {
+        let i = groups[ai][0];
+        let (xi, yi) = pts[i];
+        if yi == 0 {
+            return Err("batched prime table does not accept a 2-torsion base point".into());
+        }
+        denominators.clear();
+        denominators.push(f.add(yi, yi));
+        for group in groups.iter().skip(ai + 1) {
+            let d = f.sub(pts[group[0]].0, xi);
+            if d == 0 {
+                return Err("batched prime table requires distinct abscissae".into());
+            }
+            denominators.push(d);
+        }
+        let k = denominators.len();
+        f.batch_inv(&mut denominators, &mut scratch);
+        ops.field_ops.invs += 1;
+        // batch_inv performs k prefix products, 2k backward products,
+        // and one Montgomery conversion in its inverse.
+        ops.field_ops.muls += 3 * k as u64 + 1;
+        for (offset, group) in groups.iter().skip(ai).enumerate() {
+            for &j in group.iter() {
+                // Preserve the generic table's abstract group-operation
+                // charge, including the zero-work P + (-P) case.
+                ops.adds += 1;
+                if offset == 0 && j != i {
+                    continue;
+                }
+                let lambda = if offset == 0 {
+                    let x2 = f.sqr(xi);
+                    ops.field_ops.sqrs += 1;
+                    f.mul(f.add(f.add(x2, x2), f.add(x2, am)), denominators[0])
+                } else {
+                    f.mul(f.sub(pts[j].1, yi), denominators[offset])
+                };
+                let x_sum = f.sub(f.sub(f.sqr(lambda), xi), pts[j].0);
+                let x = f.from_mont(x_sum);
+                ops.field_ops.muls += 2;
+                ops.field_ops.sqrs += 1;
+                emit(x + 1, i as u32, j as u32);
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Entries one region of a [`PackedPairTable`] is sized for: about
+/// 256 KiB of words at its load, inside a core's L2.
+const PACKED_PART_ENTRIES: usize = 1 << 14;
+
+/// **The cache-blocked pair table in one word per entry.**  The key
+/// (`x + 1 < 2^32`) in the high half and the witness `(i, j)`, 16 bits
+/// each, in the low half; `0` is an empty slot, since no key is `0`.
+/// [`table_part`] picks a region, and each region is an open-addressed
+/// (linear-probing) table at most three-quarters full.  The sums are
+/// first gathered by region in their original order, then each region
+/// is filled in one pass, so the first pair to reach a key keeps it.
+struct PackedPairTable {
+    slots: Vec<u64>,
+    /// Region `k` is `slots[base[k]..base[k] + mask[k] + 1]`.
+    base: Vec<usize>,
+    mask: Vec<usize>,
+    shift: u32,
+    entries: u64,
+}
+
+impl PackedPairTable {
+    fn build(
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+    ) -> Result<Self, String> {
+        let expected = fb.abscissa_list.len().pow(2) + 1;
+        let bits = (expected / PACKED_PART_ENTRIES)
+            .max(1)
+            .next_power_of_two()
+            .trailing_zeros();
+        let shift = 64 - bits;
+        let count = 1usize << bits;
+        let reserve = expected / count + expected / count / 8 + 64;
+        let mut pending: Vec<Vec<u64>> = (0..count).map(|_| Vec::with_capacity(reserve)).collect();
+        for_each_folded_prime_sum(g, fb, ops, |key, i, j| {
+            pending[table_part(key, shift)].push(key << 32 | u64::from(i) << 16 | u64::from(j));
+        })?;
+        let mut base = Vec::with_capacity(count);
+        let mut mask = Vec::with_capacity(count);
+        let mut total = 0usize;
+        for part in &pending {
+            let size = (part.len() * 4 / 3 + 1).next_power_of_two();
+            base.push(total);
+            mask.push(size - 1);
+            total += size;
+        }
+        let mut slots = vec![0u64; total];
+        let mut entries = 0u64;
+        for (k, part) in pending.iter_mut().enumerate() {
+            let region = &mut slots[base[k]..=base[k] + mask[k]];
+            for &word in part.iter() {
+                let key = word >> 32;
+                let mut s = slot_of(key, mask[k]);
+                loop {
+                    let held = region[s];
+                    if held == 0 {
+                        region[s] = word;
+                        entries += 1;
+                        break;
+                    }
+                    if held >> 32 == key {
+                        break;
+                    }
+                    s = (s + 1) & mask[k];
+                }
+            }
+            *part = Vec::new();
+        }
+        Ok(Self {
+            slots,
+            base,
+            mask,
+            shift,
+            entries,
+        })
+    }
+
+    #[inline]
+    fn get(&self, key: u64) -> Option<(u32, u32)> {
+        if key == 0 || key > u64::from(u32::MAX) {
+            return None;
+        }
+        let k = table_part(key, self.shift);
+        let region = &self.slots[self.base[k]..=self.base[k] + self.mask[k]];
+        let mut s = slot_of(key, self.mask[k]);
+        loop {
+            let held = region[s];
+            if held == 0 {
+                return None;
+            }
+            if held >> 32 == key {
+                return Some((((held >> 16) & 0xffff) as u32, (held & 0xffff) as u32));
+            }
+            s = (s + 1) & self.mask[k];
+        }
+    }
+}
+
+/// A key's home slot in a packed region: the low bits of a third
+/// multiplier, independent of the region choice's high bits.
+#[inline]
+fn slot_of(key: u64, mask: usize) -> usize {
+    (key.wrapping_mul(0x9FB2_1C65_1E98_DF25) >> 20) as usize & mask
+}
+
 /// A table of all pair sums of a base, keyed by the sum's abscissa so
 /// `S` and `−S` share one entry; the probe checks which it found.
 pub struct PairTable {
     map: FastMap<(u32, u32)>,
+    /// The cache-blocked layout ([`Self::build_negation_folded_prime_blocked`]):
+    /// the same entries split over small maps by [`table_part`]; empty for
+    /// every other builder, which keeps everything in `map`.
+    parts: Vec<FastMap<(u32, u32)>>,
+    part_shift: u32,
+    /// The packed form of the cache-blocked layout, when keys fit 32 bits
+    /// and indices 16 ([`PackedPairTable`]); `parts` is then empty.
+    packed: Option<PackedPairTable>,
     /// `full` (every `i ≤ j`) or `negation_folded` (one pair per orbit
     /// under negation).
     pub kind: &'static str,
@@ -4881,6 +5169,9 @@ impl PairTable {
             kind: "full",
             entries: map.len() as u64,
             map,
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
         }
@@ -4919,6 +5210,9 @@ impl PairTable {
             kind: "negation_folded",
             entries: map.len() as u64,
             map,
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
         }
@@ -4932,80 +5226,137 @@ impl PairTable {
         g: &PrimeCurve,
         fb: &FactorBase<PrimePoint>,
     ) -> Result<Self, String> {
-        if g.p < 5 || g.p & 1 == 0 || g.p >= (1u64 << crate::cryptanalysis::prime_fast::MAX_BITS) {
-            return Err("batched prime table requires odd 3 < p < 2^62".into());
-        }
         let start = Instant::now();
-        let f = Fp64::new(g.p);
-        let groups: Vec<&Vec<usize>> = fb
-            .abscissa_list
-            .iter()
-            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
-            .collect();
-        let a = groups.len();
         let mut ops = GroupOps::default();
-        let mut map: FastMap<(u32, u32)> = fast_map(a * a + 1);
-        let pts: Vec<(u64, u64)> = fb
-            .points
-            .iter()
-            .map(|pt| (f.to_mont(pt.x), f.to_mont(pt.y)))
-            .collect();
-        ops.field_ops.muls += 2 * pts.len() as u64;
-        let am = f.to_mont(g.a);
-        ops.field_ops.muls += 1;
-        let mut denominators = Vec::with_capacity(a);
-        let mut scratch = Vec::with_capacity(a);
-        for ai in 0..a {
-            let i = groups[ai][0];
-            let (xi, yi) = pts[i];
-            if yi == 0 {
-                return Err("batched prime table does not accept a 2-torsion base point".into());
-            }
-            denominators.clear();
-            denominators.push(f.add(yi, yi));
-            for group in groups.iter().skip(ai + 1) {
-                let d = f.sub(pts[group[0]].0, xi);
-                if d == 0 {
-                    return Err("batched prime table requires distinct abscissae".into());
-                }
-                denominators.push(d);
-            }
-            let k = denominators.len();
-            f.batch_inv(&mut denominators, &mut scratch);
-            ops.field_ops.invs += 1;
-            // batch_inv performs k prefix products, 2k backward products,
-            // and one Montgomery conversion in its inverse.
-            ops.field_ops.muls += 3 * k as u64 + 1;
-            for (offset, group) in groups.iter().skip(ai).enumerate() {
-                for &j in group.iter() {
-                    // Preserve the generic table's abstract group-operation
-                    // charge, including the zero-work P + (-P) case.
-                    ops.adds += 1;
-                    if offset == 0 && j != i {
-                        continue;
-                    }
-                    let lambda = if offset == 0 {
-                        let x2 = f.sqr(xi);
-                        ops.field_ops.sqrs += 1;
-                        f.mul(f.add(f.add(x2, x2), f.add(x2, am)), denominators[0])
-                    } else {
-                        f.mul(f.sub(pts[j].1, yi), denominators[offset])
-                    };
-                    let x_sum = f.sub(f.sub(f.sqr(lambda), xi), pts[j].0);
-                    let x = f.from_mont(x_sum);
-                    ops.field_ops.muls += 2;
-                    ops.field_ops.sqrs += 1;
-                    map.entry(x + 1).or_insert((i as u32, j as u32));
-                }
-            }
-        }
+        let mut map: FastMap<(u32, u32)> = fast_map(fb.abscissa_list.len().pow(2) + 1);
+        for_each_folded_prime_sum(g, fb, &mut ops, |key, i, j| {
+            map.entry(key).or_insert((i, j));
+        })?;
         Ok(Self {
             kind: "negation_folded_prime_batch",
             entries: map.len() as u64,
             map,
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
         })
+    }
+
+    /// **The batched table, built in cache-sized pieces.**  The same sums
+    /// in the same order as [`Self::build_negation_folded_prime_batch`],
+    /// but the entries are spread over many small maps by a second hash
+    /// of the key ([`table_part`]), and each block of
+    /// [`TABLE_BLOCK`] sums is grouped by map (a stable counting sort)
+    /// before it is inserted.  A map is small enough to stay in cache
+    /// while its share of a block goes in, where one large map takes a
+    /// cache miss on nearly every insertion once it outgrows the cache.
+    ///
+    /// Within each map the sums arrive in the original order, so the
+    /// first pair to reach a key keeps it, as in every other builder:
+    /// the keys and witnesses are the batched table's, and so are the
+    /// probe's answers and the counted operations.
+    ///
+    /// When every key fits 32 bits (`p < 2^32`) and every index 16 bits,
+    /// an entry is one word and the pieces are open-addressed regions of
+    /// one array ([`PackedPairTable`]): each piece's sums are gathered
+    /// first and inserted in one pass, a quarter of the memory of the
+    /// maps.  Larger fields keep the small maps.
+    pub fn build_negation_folded_prime_blocked(
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+    ) -> Result<Self, String> {
+        let start = Instant::now();
+        let mut ops = GroupOps::default();
+        if g.p <= u64::from(u32::MAX) && fb.points.len() <= 1 << 16 {
+            let packed = PackedPairTable::build(g, fb, &mut ops)?;
+            return Ok(Self {
+                kind: "negation_folded_prime_blocked",
+                entries: packed.entries,
+                map: fast_map(0),
+                parts: Vec::new(),
+                part_shift: 0,
+                packed: Some(packed),
+                build_ops: ops,
+                build_wall_ns: start.elapsed().as_nanos() as u64,
+            });
+        }
+        Self::build_negation_folded_prime_blocked_maps(g, fb, start, ops)
+    }
+
+    /// The small-maps form of the cache-blocked table, for keys or
+    /// indices too wide for [`PackedPairTable`].
+    fn build_negation_folded_prime_blocked_maps(
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        start: Instant,
+        mut ops: GroupOps,
+    ) -> Result<Self, String> {
+        let expected = fb.abscissa_list.len().pow(2) + 1;
+        let bits = (expected / TABLE_PART_ENTRIES)
+            .max(1)
+            .next_power_of_two()
+            .trailing_zeros();
+        let part_shift = 64 - bits;
+        let count = 1usize << bits;
+        let mut parts: Vec<FastMap<(u32, u32)>> = (0..count)
+            .map(|_| fast_map(expected / count + expected / count / 8 + 64))
+            .collect();
+        let mut block: Vec<(u64, u32, u32)> = Vec::with_capacity(TABLE_BLOCK);
+        let mut sorted: Vec<(u64, u32, u32)> = vec![(0, 0, 0); TABLE_BLOCK];
+        let mut offsets = vec![0usize; count + 1];
+        let mut flush = |block: &mut Vec<(u64, u32, u32)>, parts: &mut [FastMap<(u32, u32)>]| {
+            offsets.iter_mut().for_each(|o| *o = 0);
+            for &(key, _, _) in block.iter() {
+                offsets[table_part(key, part_shift) + 1] += 1;
+            }
+            for k in 0..count {
+                offsets[k + 1] += offsets[k];
+            }
+            let mut next = offsets.clone();
+            for &entry in block.iter() {
+                let k = table_part(entry.0, part_shift);
+                sorted[next[k]] = entry;
+                next[k] += 1;
+            }
+            for (k, part) in parts.iter_mut().enumerate() {
+                for &(key, i, j) in &sorted[offsets[k]..offsets[k + 1]] {
+                    part.entry(key).or_insert((i, j));
+                }
+            }
+            block.clear();
+        };
+        for_each_folded_prime_sum(g, fb, &mut ops, |key, i, j| {
+            block.push((key, i, j));
+            if block.len() == TABLE_BLOCK {
+                flush(&mut block, &mut parts);
+            }
+        })?;
+        flush(&mut block, &mut parts);
+        Ok(Self {
+            kind: "negation_folded_prime_blocked",
+            entries: parts.iter().map(|m| m.len() as u64).sum(),
+            map: fast_map(0),
+            parts,
+            part_shift,
+            packed: None,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+        })
+    }
+
+    /// The witness stored under a key, in whichever layout the table has.
+    fn get(&self, key: u64) -> Option<(u32, u32)> {
+        if let Some(packed) = &self.packed {
+            packed.get(key)
+        } else if self.parts.is_empty() {
+            self.map.get(&key).copied()
+        } else {
+            self.parts[table_part(key, self.part_shift)]
+                .get(&key)
+                .copied()
+        }
     }
 
     pub fn cost(&self) -> TableCost {
@@ -5029,7 +5380,7 @@ impl PairTable {
         target: G::Elt,
     ) -> Option<(usize, usize)> {
         *lookups += 1;
-        let &(i, j) = self.map.get(&(g.key(&target) >> 1))?;
+        let (i, j) = self.get(g.key(&target) >> 1)?;
         let (i, j) = (i as usize, j as usize);
         let s = g.add(ops, fb.points[i], fb.points[j]);
         if s == target {
@@ -5047,7 +5398,7 @@ impl PairTable {
         let start = Instant::now();
         let mut hits = 0u64;
         for i in 0..samples {
-            if self.map.contains_key(&keys[(i % 1024) as usize]) {
+            if self.get(keys[(i % 1024) as usize]).is_some() {
                 hits += 1;
             }
         }
@@ -9043,6 +9394,57 @@ mod tests {
         }
     }
 
+    /// The batched canonicalisation changes the time of a step, not the
+    /// walk: on the same seed and target, with 8, 16, 32 and 64 lanes (a
+    /// ragged last chunk included), every counter and the logarithm match
+    /// the per-point tables'.
+    #[test]
+    fn parallel_rho_batched_canonicalisation_leaves_the_walk_unchanged() {
+        for (a, n) in [(1u8, 43u32), (0, 41), (0, 53)] {
+            let inst = koblitz_instance(a, n).expect("a Koblitz instance");
+            for lanes in [8usize, 16, 24, 32, 64] {
+                let dp = ParallelRho::default_dp_bits(&inst, lanes);
+                let base =
+                    ParallelRho::new(&inst, 91, lanes, Some(dp)).expect("a Koblitz instance");
+                if !base.classes.batched() {
+                    eprintln!("skipped: the CPU lacks the batched kernel");
+                    return;
+                }
+                let on = ParallelRho::new(&inst, 91, lanes, Some(dp))
+                    .expect("a Koblitz instance")
+                    .with_batched_canon(true);
+                let off = base.with_batched_canon(false);
+                for i in 0..4u64 {
+                    let d = 1 + mix(i + 7000 + u64::from(n)) % (inst.r - 1);
+                    let q = inst.fast.mul_u64(inst.generator, d);
+                    let (x, y) = (
+                        on.solve(q, rho_cap(inst.r, 64.0)),
+                        off.solve(q, rho_cap(inst.r, 64.0)),
+                    );
+                    assert_eq!(x.recovered, Some(d), "a = {a}, n = {n}, {lanes} lanes");
+                    assert_eq!(
+                        (
+                            x.recovered,
+                            x.steps,
+                            x.walks,
+                            x.distinguished_points,
+                            x.rounds
+                        ),
+                        (
+                            y.recovered,
+                            y.steps,
+                            y.walks,
+                            y.distinguished_points,
+                            y.rounds
+                        ),
+                        "a = {a}, n = {n}, {lanes} lanes, target {i}"
+                    );
+                    assert_eq!(x.counters, y.counters, "a = {a}, n = {n}, {lanes} lanes");
+                }
+            }
+        }
+    }
+
     /// The default shape: more lanes and sparser distinguished points as
     /// the floor grows.
     #[test]
@@ -10119,6 +10521,110 @@ mod tests {
         assert_eq!(batch.build_ops.doubles, scalar.build_ops.doubles);
         assert_eq!(batch.build_ops.field_ops.invs, fb.abscissae as u64);
         assert!(batch.build_ops.field_ops.invs < scalar.build_ops.field_ops.invs);
+    }
+
+    #[test]
+    fn prime_blocked_table_matches_batch_table_across_blocks_and_parts() {
+        let inst = prime_instance_for(20, 59297);
+        // 600 abscissae: about 360,000 sums, so more than one block and
+        // several maps.
+        let fb = prime_factor_base(&inst, 600);
+        let batch = PairTable::build_negation_folded_prime_batch(&inst.curve, &fb).unwrap();
+        let blocked = PairTable::build_negation_folded_prime_blocked(&inst.curve, &fb).unwrap();
+        assert!(batch.build_ops.adds as usize > TABLE_BLOCK);
+        let packed = blocked
+            .packed
+            .as_ref()
+            .expect("a 20-bit curve takes the packed layout");
+        assert!(packed.base.len() > 1);
+        assert_eq!(blocked.entries, batch.entries);
+        for (key, witness) in &batch.map {
+            assert_eq!(blocked.get(*key), Some(*witness), "key {key}");
+        }
+        assert_eq!(blocked.build_ops.adds, batch.build_ops.adds);
+        assert_eq!(blocked.build_ops.doubles, batch.build_ops.doubles);
+        assert_eq!(
+            blocked.build_ops.field_ops.muls,
+            batch.build_ops.field_ops.muls
+        );
+        assert_eq!(
+            blocked.build_ops.field_ops.sqrs,
+            batch.build_ops.field_ops.sqrs
+        );
+        assert_eq!(
+            blocked.build_ops.field_ops.invs,
+            batch.build_ops.field_ops.invs
+        );
+        // The small-maps form that fields of 2^32 and more take.
+        let maps = PairTable::build_negation_folded_prime_blocked_maps(
+            &inst.curve,
+            &fb,
+            Instant::now(),
+            GroupOps::default(),
+        )
+        .unwrap();
+        assert!(maps.packed.is_none() && maps.parts.len() > 1);
+        assert_eq!(maps.entries, batch.entries);
+        for (key, witness) in &batch.map {
+            assert_eq!(maps.get(*key), Some(*witness), "key {key}");
+        }
+        assert_eq!(maps.build_ops.adds, batch.build_ops.adds);
+        assert_eq!(
+            maps.build_ops.field_ops.muls,
+            batch.build_ops.field_ops.muls
+        );
+        // Misses agree too: every key below the field, held or not.
+        for key in 0..=inst.curve.p + 1 {
+            let want = batch.map.get(&key).copied();
+            assert_eq!(blocked.get(key), want, "packed, key {key}");
+            assert_eq!(maps.get(key), want, "maps, key {key}");
+        }
+    }
+
+    /// Wall time of the folded prime table's arithmetic alone and of the
+    /// two batched layouts, on the 32-bit curve of
+    /// `research/ic_linalg_pipeline_20261019`.  A diagnostic: not a
+    /// measurement record.
+    #[test]
+    #[ignore]
+    fn profile_prime_pair_table_build_layouts() {
+        let curve = PrimeCurve {
+            p: 4_294_967_291,
+            a: 4_294_967_288,
+            b: 31,
+        };
+        let inst = PrimeInstance {
+            name: "icv1-fp32-t7319-90da43e9".into(),
+            curve,
+            group_order: 4_294_959_973,
+            r: 4_294_959_973,
+            cofactor: 1,
+            generator: (2, 2_120_051_858),
+        };
+        for size in [1024usize, 4096] {
+            let fb = prime_factor_base(&inst, size);
+            let t = Instant::now();
+            let mut ops = GroupOps::default();
+            let mut acc = 0u64;
+            for_each_folded_prime_sum(&inst.curve, &fb, &mut ops, |k, i, j| {
+                acc = acc.wrapping_add(k ^ ((i as u64) << 32 | j as u64));
+            })
+            .unwrap();
+            std::hint::black_box(acc);
+            let arith = t.elapsed();
+            let t = Instant::now();
+            let batch = PairTable::build_negation_folded_prime_batch(&inst.curve, &fb).unwrap();
+            let batch_t = t.elapsed();
+            drop(batch);
+            let t = Instant::now();
+            let blocked = PairTable::build_negation_folded_prime_blocked(&inst.curve, &fb).unwrap();
+            let blocked_t = t.elapsed();
+            println!(
+                "size={size} sums={} arithmetic={arith:?} batch={batch_t:?} blocked={blocked_t:?} slots={}",
+                ops.adds,
+                blocked.packed.as_ref().map_or(0, |p| p.slots.len())
+            );
+        }
     }
 
     #[test]
