@@ -120,7 +120,7 @@
   },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
-   "sha256": "765f6e8d05ebbf75e7a3dddcbb886015274311589352b9107746976fb2a670d7"
+   "sha256": "0bc0d0f4401846519ff915db5cfb1f90ee638ba46555736de8a29e9e2888be7b"
   },
   "n83_tier1_cold_holdout": {
    "path": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
@@ -141,6 +141,14 @@
   "n83_precomp_rho_k3300_run2": {
    "path": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k3300/analysis.json",
    "sha256": "fc4981fe5e7a99ca3a5c0440506f704e25bd47fe4dfdf96afc76fed303710d68"
+  },
+  "pair_table_setup": {
+   "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
+   "sha256": "e6f6f56f9db4c125e23e22009247e80e60386238108db8822f20efc2e1fdd8aa"
+  },
+  "jv_sieve_strong_rho": {
+   "path": "research/jv_sieve_strong_rho_20261019/review-20261020/summary.json",
+   "sha256": "8e4ff99df6a4ee539d6f8f02c5c768d0255538ddcb95eab97f1416ac388b9273"
   },
   "registry": {
    "path": "docs/curves/registry.json",
@@ -5939,6 +5947,1671 @@
    "fully_priced_cold_speedup": null
   }
  ],
+ "jv_sieve_weak_class": {
+  "source": "research/jv_sieve_strong_rho_20261019/review-20261020/summary.json",
+  "comparison_status": "withheld",
+  "comparison_blockers": [
+   "positive-control acceptance is unresolved: PROTOCOL.md says R0 S≈1.3 without a numeric tolerance",
+   "A/A acceptance is unresolved: PROTOCOL.md gives no numeric rule for samples differing beyond bootstrap intervals"
+  ],
+  "qualification": "research/jv_sieve_strong_rho_20261019/review-20261020/README.md",
+  "class": "historical measurement with comparison withheld; weak curve class only",
+  "scope": "Curves y^2 = h(x)(x - a)(x - sigma a) over F_{p^6} with full rational 2-torsion whose isogeny class contains a weak curve (about 55-63% of such curves, ledger 18.5). The class never has prime order. The cover's Jacobian has genus 3. Not a statement about any prime-order or generic curve.",
+  "rows": [
+   {
+    "p": 251,
+    "log2_l": 45.8292613842,
+    "ic_all_correct": true,
+    "ic_S": {
+     "ci95": [
+      4.63373776228,
+      34.6158912385
+     ],
+     "mean": 15.283757347,
+     "n": 16,
+     "sd": 37.3774619886
+    },
+    "ic_S_plus": {
+     "ci95": [
+      11.886846881,
+      78.9442578063
+     ],
+     "mean": 35.8428389216,
+     "n": 16,
+     "sd": 83.0058028457
+    },
+    "ic_wall_s": {
+     "ci95": [
+      26.2329069489,
+      160.356207599
+     ],
+     "mean": 74.6205832423,
+     "n": 16,
+     "sd": 165.073983431
+    },
+    "rho_S_harness": {
+     "ci95": [
+      0.635586020185,
+      1.01753253477
+     ],
+     "mean": 0.82736681204,
+     "n": 16,
+     "sd": 0.399752294921
+    },
+    "rho_S_tuned": {
+     "ci95": [
+      0.266621685998,
+      0.420773140416
+     ],
+     "mean": 0.344123174666,
+     "n": 16,
+     "sd": 0.166348638728
+    },
+    "rho_S_plus_harness": {
+     "ci95": [
+      0.742886826133,
+      1.19052645326
+     ],
+     "mean": 0.974923981909,
+     "n": 16,
+     "sd": 0.471141913524
+    },
+    "rho_S_plus_tuned": {
+     "ci95": [
+      0.379020671329,
+      0.60345208286
+     ],
+     "mean": 0.491680344536,
+     "n": 16,
+     "sd": 0.237738257334
+    },
+    "rho_steps_over_sqrt_l": {
+     "ci95": [
+      0.625917532232,
+      1.00637073562
+     ],
+     "mean": 0.822004294214,
+     "n": 16,
+     "sd": 0.399846976165
+    },
+    "rho_wall_s": {
+     "ci95": [
+      1.48107684556,
+      2.33013651981
+     ],
+     "mean": 1.90449585175,
+     "n": 16,
+     "sd": 0.896931481248
+    },
+    "rho_all_correct": true,
+    "ic_over_rho": {
+     "S_harness": {
+      "ci95": [
+       5.34543088804,
+       46.6030867547
+      ],
+      "n": 16,
+      "ratio": 18.4727706316
+     },
+     "S_plus_harness": {
+      "ci95": [
+       11.7093375167,
+       88.5613105092
+      ],
+      "n": 16,
+      "ratio": 36.7647525209
+     },
+     "S_plus_tuned": {
+      "ci95": [
+       22.9261143737,
+       175.647977124
+      ],
+      "n": 16,
+      "ratio": 72.8986613355
+     },
+     "S_tuned": {
+      "ci95": [
+       12.8580615881,
+       108.539955397
+      ],
+      "n": 16,
+      "ratio": 44.4136241676
+     }
+    },
+    "n_rho": 16,
+    "verdict": {
+     "reason": "frozen control acceptance criteria are not numerically executable",
+     "status": "withheld"
+    },
+    "band_ratio": [
+     {
+      "A_harness": {
+       "ci95": [
+        5.36913796274,
+        46.0259500778
+       ],
+       "n": 16,
+       "ratio": 18.4727706483
+      },
+      "A_tuned": {
+       "ci95": [
+        12.8110815856,
+        109.054945312
+       ],
+       "n": 16,
+       "ratio": 44.4136242077
+      },
+      "B_harness": {
+       "ci95": [
+        5.33035726111,
+        44.8490282379
+       ],
+       "n": 16,
+       "ratio": 18.4727706483
+      },
+      "B_tuned": {
+       "ci95": [
+        13.0975301873,
+        109.831490496
+       ],
+       "n": 16,
+       "ratio": 44.4136242077
+      },
+      "w": 0.0
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        44.0551751869,
+        291.758335357
+       ],
+       "n": 16,
+       "ratio": 126.118490936
+      },
+      "A_tuned": {
+       "ci95": [
+        47.8900393782,
+        314.614617698
+       ],
+       "n": 16,
+       "ratio": 137.775503827
+      },
+      "B_harness": {
+       "ci95": [
+        5.90187672821,
+        35.295344897
+       ],
+       "n": 16,
+       "ratio": 15.9488968843
+      },
+      "B_tuned": {
+       "ci95": [
+        7.98349979523,
+        47.3980134598
+       ],
+       "n": 16,
+       "ratio": 21.1169132481
+      },
+      "w": 0.1
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        49.8596797449,
+        328.601738446
+       ],
+       "n": 16,
+       "ratio": 142.256642625
+      },
+      "A_tuned": {
+       "ci95": [
+        50.097575815,
+        327.558397324
+       ],
+       "n": 16,
+       "ratio": 143.65430154
+      },
+      "B_harness": {
+       "ci95": [
+        6.26571094052,
+        29.3944078559
+       ],
+       "n": 16,
+       "ratio": 14.4208942997
+      },
+      "B_tuned": {
+       "ci95": [
+        6.65442372114,
+        31.0999200946
+       ],
+       "n": 16,
+       "ratio": 15.0106632166
+      },
+      "w": 1.0
+     }
+    ],
+    "ranked_across_band": {
+     "reason": "frozen control acceptance criteria unresolved",
+     "status": "withheld"
+    },
+    "dense_vs_sparse": {
+     "S_dense": 15.4943871385,
+     "S_dense_over_sparse": {
+      "ci95": [
+       1.00455445411,
+       1.04661596491
+      ],
+      "n": 16,
+      "ratio": 1.01378128341
+     },
+     "S_sparse": 15.283757347,
+     "descent_muls_dense_over_sparse": {
+      "ci95": [
+       1.28244667442,
+       1.28989603719
+      ],
+      "n": 16,
+      "ratio": 1.28576895729
+     },
+     "identical_descent_digest": 16,
+     "identical_outcome": 16,
+     "linear_stage_dense_over_sparse": {
+      "ci95": [
+       2.18827426565,
+       2.21910095304
+      ],
+      "n": 16,
+      "ratio": 2.20210332993
+     },
+     "paired_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+     ],
+     "pairs": 16,
+     "sparse_fallbacks_per_run": 7.5
+    },
+    "rho_arms": {
+     "R0": {
+      "ci95": [
+       1.03891875276,
+       1.76129189609
+      ],
+      "mean": 1.39571993418,
+      "n": 16,
+      "sd": 0.765041578829
+     },
+     "R1": {
+      "ci95": [
+       0.936336416452,
+       1.53826378182
+      ],
+      "mean": 1.24140338096,
+      "n": 16,
+      "sd": 0.635044581924
+     },
+     "R2": {
+      "ci95": [
+       0.81364247952,
+       1.23351937037
+      ],
+      "mean": 1.01833480338,
+      "n": 16,
+      "sd": 0.448801621211
+     },
+     "R3": {
+      "ci95": [
+       0.635586020185,
+       1.01753253477
+      ],
+      "mean": 0.82736681204,
+      "n": 16,
+      "sd": 0.399752294921
+     }
+    }
+   },
+   {
+    "p": 503,
+    "log2_l": 51.84648754,
+    "ic_all_correct": true,
+    "ic_S": {
+     "ci95": [
+      0.264396921526,
+      0.470774787291
+     ],
+     "mean": 0.362538359142,
+     "n": 16,
+     "sd": 0.220337913132
+    },
+    "ic_S_plus": {
+     "ci95": [
+      0.839353310137,
+      1.58948286234
+     ],
+     "mean": 1.19529066679,
+     "n": 16,
+     "sd": 0.799596397753
+    },
+    "ic_wall_s": {
+     "ci95": [
+      13.8302924154,
+      25.9153111411
+     ],
+     "mean": 19.4679645838,
+     "n": 16,
+     "sd": 12.7168534732
+    },
+    "rho_S_harness": {
+     "ci95": [
+      0.595965459284,
+      0.905184963686
+     ],
+     "mean": 0.758044693333,
+     "n": 16,
+     "sd": 0.326097778338
+    },
+    "rho_S_tuned": {
+     "ci95": [
+      0.250475166441,
+      0.376816498637
+     ],
+     "mean": 0.31542068819,
+     "n": 16,
+     "sd": 0.135698731206
+    },
+    "rho_S_plus_harness": {
+     "ci95": [
+      0.704164257971,
+      1.0724289994
+     ],
+     "mean": 0.893388120665,
+     "n": 16,
+     "sd": 0.384332056235
+    },
+    "rho_S_plus_tuned": {
+     "ci95": [
+      0.355148383913,
+      0.539423853848
+     ],
+     "mean": 0.450764115522,
+     "n": 16,
+     "sd": 0.193933009107
+    },
+    "rho_steps_over_sqrt_l": {
+     "ci95": [
+      0.594282240578,
+      0.90558900433
+     ],
+     "mean": 0.757434887146,
+     "n": 16,
+     "sd": 0.326171510068
+    },
+    "rho_wall_s": {
+     "ci95": [
+      11.2853505224,
+      17.2998890852
+     ],
+     "mean": 14.4129950135,
+     "n": 16,
+     "sd": 6.28370871861
+    },
+    "rho_all_correct": true,
+    "ic_over_rho": {
+     "S_harness": {
+      "ci95": [
+       0.348206185663,
+       0.639845477213
+      ],
+      "n": 16,
+      "ratio": 0.478254596768
+     },
+     "S_plus_harness": {
+      "ci95": [
+       0.934911574148,
+       1.82031524534
+      ],
+      "n": 16,
+      "ratio": 1.3379298864
+     },
+     "S_plus_tuned": {
+      "ci95": [
+       1.85271400939,
+       3.6241852519
+      ],
+      "n": 16,
+      "ratio": 2.65169880571
+     },
+     "S_tuned": {
+      "ci95": [
+       0.841773147983,
+       1.53207841054
+      ],
+      "n": 16,
+      "ratio": 1.14938040755
+     }
+    },
+    "n_rho": 16,
+    "verdict": {
+     "reason": "frozen control acceptance criteria are not numerically executable",
+     "status": "withheld"
+    },
+    "band_ratio": [
+     {
+      "A_harness": {
+       "ci95": [
+        0.351693064554,
+        0.639923797637
+       ],
+       "n": 16,
+       "ratio": 0.478254597405
+      },
+      "A_tuned": {
+       "ci95": [
+        0.838163210191,
+        1.52739955903
+       ],
+       "n": 16,
+       "ratio": 1.14938040908
+      },
+      "B_harness": {
+       "ci95": [
+        0.348582166847,
+        0.63442665516
+       ],
+       "n": 16,
+       "ratio": 0.478254597405
+      },
+      "B_tuned": {
+       "ci95": [
+        0.838815418748,
+        1.5363674759
+       ],
+       "n": 16,
+       "ratio": 1.14938040908
+      },
+      "w": 0.0
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        4.12445002607,
+        7.97342678867
+       ],
+       "n": 16,
+       "ratio": 5.81437198282
+      },
+      "A_tuned": {
+       "ci95": [
+        4.47498656525,
+        8.60940404547
+       ],
+       "n": 16,
+       "ratio": 6.35106144612
+      },
+      "B_harness": {
+       "ci95": [
+        0.485499164261,
+        0.926052290027
+       ],
+       "n": 16,
+       "ratio": 0.685997249901
+      },
+      "B_tuned": {
+       "ci95": [
+        0.640162861052,
+        1.23225912614
+       ],
+       "n": 16,
+       "ratio": 0.907234883907
+      },
+      "w": 0.1
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        4.68955068698,
+        9.07198335876
+       ],
+       "n": 16,
+       "ratio": 6.61348877371
+      },
+      "A_tuned": {
+       "ci95": [
+        4.70296982489,
+        9.05660034039
+       ],
+       "n": 16,
+       "ratio": 6.67837512198
+      },
+      "B_harness": {
+       "ci95": [
+        0.564988215946,
+        1.10094607456
+       ],
+       "n": 16,
+       "ratio": 0.811107997738
+      },
+      "B_tuned": {
+       "ci95": [
+        0.587199254977,
+        1.15404345769
+       ],
+       "n": 16,
+       "ratio": 0.844088287265
+      },
+      "w": 1.0
+     }
+    ],
+    "ranked_across_band": {
+     "reason": "frozen control acceptance criteria unresolved",
+     "status": "withheld"
+    },
+    "dense_vs_sparse": {
+     "S_dense": 0.383848601929,
+     "S_dense_over_sparse": {
+      "ci95": [
+       1.04288742838,
+       1.07871479019
+      ],
+      "n": 16,
+      "ratio": 1.05878065658
+     },
+     "S_sparse": 0.362538359142,
+     "descent_muls_dense_over_sparse": {
+      "ci95": [
+       1.28306452985,
+       1.28868573239
+      ],
+      "n": 16,
+      "ratio": 1.28572576417
+     },
+     "identical_descent_digest": 16,
+     "identical_outcome": 16,
+     "linear_stage_dense_over_sparse": {
+      "ci95": [
+       2.13854289348,
+       2.16005913077
+      ],
+      "n": 16,
+      "ratio": 2.14865942155
+     },
+     "paired_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+     ],
+     "pairs": 16,
+     "sparse_fallbacks_per_run": 3.75
+    },
+    "rho_arms": {
+     "R0": {
+      "ci95": [
+       0.901121058702,
+       1.45351488394
+      ],
+      "mean": 1.17072805147,
+      "n": 16,
+      "sd": 0.572777059864
+     },
+     "R1": {
+      "ci95": [
+       0.996766402656,
+       1.63254733901
+      ],
+      "mean": 1.31579475509,
+      "n": 16,
+      "sd": 0.670500106222
+     },
+     "R2": {
+      "ci95": [
+       0.712834662168,
+       1.23540772564
+      ],
+      "mean": 0.974414870393,
+      "n": 16,
+      "sd": 0.552714765745
+     },
+     "R3": {
+      "ci95": [
+       0.595965459284,
+       0.905184963686
+      ],
+      "mean": 0.758044693333,
+      "n": 16,
+      "sd": 0.326097778338
+     }
+    }
+   },
+   {
+    "p": 1009,
+    "log2_l": 57.8722627571,
+    "ic_all_correct": true,
+    "ic_S": {
+     "ci95": [
+      0.0160739220316,
+      0.0231315238903
+     ],
+     "mean": 0.0195420229402,
+     "n": 16,
+     "sd": 0.00742927257574
+    },
+    "ic_S_plus": {
+     "ci95": [
+      0.0553863612362,
+      0.0711028178631
+     ],
+     "mean": 0.0634631218254,
+     "n": 16,
+     "sd": 0.016579724719
+    },
+    "ic_wall_s": {
+     "ci95": [
+      6.00737008112,
+      8.19881644094
+     ],
+     "mean": 7.11640697387,
+     "n": 16,
+     "sd": 2.31086532834
+    },
+    "rho_S_harness": {
+     "ci95": [
+      0.694879600001,
+      0.939779050282
+     ],
+     "mean": 0.807747520699,
+     "n": 16,
+     "sd": 0.259932904778
+    },
+    "rho_S_tuned": {
+     "ci95": [
+      0.288652600241,
+      0.391128650478
+     ],
+     "mean": 0.336123949959,
+     "n": 16,
+     "sd": 0.108165632472
+    },
+    "rho_S_plus_harness": {
+     "ci95": [
+      0.817935940583,
+      1.10493875986
+     ],
+     "mean": 0.951989868877,
+     "n": 16,
+     "sd": 0.306351091332
+    },
+    "rho_S_plus_tuned": {
+     "ci95": [
+      0.411369514018,
+      0.559873941937
+     ],
+     "mean": 0.480366298137,
+     "n": 16,
+     "sd": 0.154583819025
+    },
+    "rho_steps_over_sqrt_l": {
+     "ci95": [
+      0.692193884169,
+      0.938013551551
+     ],
+     "mean": 0.80782483734,
+     "n": 16,
+     "sd": 0.259992391935
+    },
+    "rho_wall_s": {
+     "ci95": [
+      102.562808729,
+      138.889348148
+     ],
+     "mean": 119.706105314,
+     "n": 16,
+     "sd": 39.1469706475
+    },
+    "rho_all_correct": true,
+    "ic_over_rho": {
+     "S_harness": {
+      "ci95": [
+       0.0184848206841,
+       0.0310814246754
+      ],
+      "n": 16,
+      "ratio": 0.0241932317208
+     },
+     "S_plus_harness": {
+      "ci95": [
+       0.0531650680859,
+       0.0837222714141
+      ],
+      "n": 16,
+      "ratio": 0.0666636525242
+     },
+     "S_plus_tuned": {
+      "ci95": [
+       0.104700974695,
+       0.164831832441
+      ],
+      "n": 16,
+      "ratio": 0.132114018139
+     },
+     "S_tuned": {
+      "ci95": [
+       0.0444276445702,
+       0.074126114672
+      ],
+      "n": 16,
+      "ratio": 0.0581393350356
+     }
+    },
+    "n_rho": 16,
+    "verdict": {
+     "reason": "frozen control acceptance criteria are not numerically executable",
+     "status": "withheld"
+    },
+    "band_ratio": [
+     {
+      "A_harness": {
+       "ci95": [
+        0.0183953013422,
+        0.0309734270063
+       ],
+       "n": 16,
+       "ratio": 0.0241932317024
+      },
+      "A_tuned": {
+       "ci95": [
+        0.0444792515449,
+        0.0747372126216
+       ],
+       "n": 16,
+       "ratio": 0.0581393349914
+      },
+      "B_harness": {
+       "ci95": [
+        0.0183749344882,
+        0.0310719314541
+       ],
+       "n": 16,
+       "ratio": 0.0241932317024
+      },
+      "B_tuned": {
+       "ci95": [
+        0.0445228092287,
+        0.0742649652008
+       ],
+       "n": 16,
+       "ratio": 0.0581393349914
+      },
+      "w": 0.0
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        0.253797316864,
+        0.401515712069
+       ],
+       "n": 16,
+       "ratio": 0.320250474411
+      },
+      "A_tuned": {
+       "ci95": [
+        0.277967522544,
+        0.441312709087
+       ],
+       "n": 16,
+       "ratio": 0.349804592873
+      },
+      "B_harness": {
+       "ci95": [
+        0.0246317479938,
+        0.03801100498
+       ],
+       "n": 16,
+       "ratio": 0.0306575261218
+      },
+      "B_tuned": {
+       "ci95": [
+        0.0327860394041,
+        0.0501635154361
+       ],
+       "n": 16,
+       "ratio": 0.0405373796747
+      },
+      "w": 0.1
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        0.289054819031,
+        0.457133292663
+       ],
+       "n": 16,
+       "ratio": 0.364579381477
+      },
+      "A_tuned": {
+       "ci95": [
+        0.292722020489,
+        0.46431698631
+       ],
+       "n": 16,
+       "ratio": 0.368155567199
+      },
+      "B_harness": {
+       "ci95": [
+        0.0280824192659,
+        0.0427006091564
+       ],
+       "n": 16,
+       "ratio": 0.0345473594716
+      },
+      "B_tuned": {
+       "ci95": [
+        0.0292787113284,
+        0.0443118695297
+       ],
+       "n": 16,
+       "ratio": 0.0359508059562
+      },
+      "w": 1.0
+     }
+    ],
+    "ranked_across_band": {
+     "reason": "frozen control acceptance criteria unresolved",
+     "status": "withheld"
+    },
+    "dense_vs_sparse": {
+     "S_dense": 0.0219970310115,
+     "S_dense_over_sparse": {
+      "ci95": [
+       1.09938078259,
+       1.1484536126
+      ],
+      "n": 16,
+      "ratio": 1.12562712053
+     },
+     "S_sparse": 0.0195420229402,
+     "descent_muls_dense_over_sparse": {
+      "ci95": [
+       1.28029006386,
+       1.28542626286
+      ],
+      "n": 16,
+      "ratio": 1.28281525479
+     },
+     "identical_descent_digest": 16,
+     "identical_outcome": 16,
+     "linear_stage_dense_over_sparse": {
+      "ci95": [
+       2.08201950652,
+       2.09963172018
+      ],
+      "n": 16,
+      "ratio": 2.09063756869
+     },
+     "paired_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+     ],
+     "pairs": 16,
+     "sparse_fallbacks_per_run": 1.75
+    },
+    "rho_arms": {
+     "R0": {
+      "ci95": [
+       1.02953721523,
+       1.55395477924
+      ],
+      "mean": 1.29056980048,
+      "n": 16,
+      "sd": 0.553212566117
+     },
+     "R0_aa": {
+      "ci95": [
+       0.952417555452,
+       1.55685502138
+      ],
+      "mean": 1.24700852993,
+      "n": 16,
+      "sd": 0.633815357836
+     },
+     "R1": {
+      "ci95": [
+       1.06200906695,
+       1.56572596688
+      ],
+      "mean": 1.30106506736,
+      "n": 16,
+      "sd": 0.529043333774
+     },
+     "R2": {
+      "ci95": [
+       0.646794759328,
+       0.997603998831
+      ],
+      "mean": 0.821763992479,
+      "n": 16,
+      "sd": 0.369239659821
+     },
+     "R3": {
+      "ci95": [
+       0.694879600001,
+       0.939779050282
+      ],
+      "mean": 0.807747520699,
+      "n": 16,
+      "sd": 0.259932904778
+     },
+     "R3_aa": {
+      "ci95": [
+       0.576402643511,
+       1.09253961491
+      ],
+      "mean": 0.823493237466,
+      "n": 16,
+      "sd": 0.557092615544
+     }
+    }
+   },
+   {
+    "p": 1511,
+    "log2_l": 61.3677276715,
+    "ic_all_correct": true,
+    "ic_S": {
+     "ci95": [
+      0.00613004458383,
+      0.00819291351534
+     ],
+     "mean": 0.00704276448216,
+     "n": 16,
+     "sd": 0.00219854765334
+    },
+    "ic_S_plus": {
+     "ci95": [
+      0.0236331866856,
+      0.0273178420616
+     ],
+     "mean": 0.025401846726,
+     "n": 16,
+     "sd": 0.00390720301306
+    },
+    "ic_wall_s": {
+     "ci95": [
+      8.41531397569,
+      10.6324055796
+     ],
+     "mean": 9.38263730594,
+     "n": 16,
+     "sd": 2.33456889126
+    },
+    "rho_S_harness": {
+     "ci95": [
+      0.598186504916,
+      0.962503575386
+     ],
+     "mean": 0.780416912256,
+     "n": 16,
+     "sd": 0.374401509956
+    },
+    "rho_S_tuned": {
+     "ci95": [
+      0.250728866363,
+      0.399222355765
+     ],
+     "mean": 0.324753143991,
+     "n": 16,
+     "sd": 0.155799362392
+    },
+    "rho_S_plus_harness": {
+     "ci95": [
+      0.712134225225,
+      1.12930127456
+     ],
+     "mean": 0.91978140283,
+     "n": 16,
+     "sd": 0.441261574362
+    },
+    "rho_S_plus_tuned": {
+     "ci95": [
+      0.358360506357,
+      0.569030676367
+     ],
+     "mean": 0.464117634566,
+     "n": 16,
+     "sd": 0.222659426798
+    },
+    "rho_steps_over_sqrt_l": {
+     "ci95": [
+      0.599008247232,
+      0.9579616778
+     ],
+     "mean": 0.78056238234,
+     "n": 16,
+     "sd": 0.374487787446
+    },
+    "rho_wall_s": {
+     "ci95": [
+      287.732038112,
+      457.695843467
+     ],
+     "mean": 372.904558771,
+     "n": 16,
+     "sd": 178.637938188
+    },
+    "rho_all_correct": true,
+    "ic_over_rho": {
+     "S_harness": {
+      "ci95": [
+       0.00702865299935,
+       0.0120307140481
+      ],
+      "n": 16,
+      "ratio": 0.00902436168612
+     },
+     "S_plus_harness": {
+      "ci95": [
+       0.0221376798421,
+       0.0359757711066
+      ],
+      "n": 16,
+      "ratio": 0.0276172649804
+     },
+     "S_plus_tuned": {
+      "ci95": [
+       0.0439218027442,
+       0.0712933721269
+      ],
+      "n": 16,
+      "ratio": 0.0547314836459
+     },
+     "S_tuned": {
+      "ci95": [
+       0.0168572943572,
+       0.0289052367956
+      ],
+      "n": 16,
+      "ratio": 0.021686516705
+     }
+    },
+    "n_rho": 16,
+    "verdict": {
+     "reason": "frozen control acceptance criteria are not numerically executable",
+     "status": "withheld"
+    },
+    "band_ratio": [
+     {
+      "A_harness": {
+       "ci95": [
+        0.00702214256245,
+        0.0121531358983
+       ],
+       "n": 16,
+       "ratio": 0.00902436168457
+      },
+      "A_tuned": {
+       "ci95": [
+        0.0169316123483,
+        0.0287784404309
+       ],
+       "n": 16,
+       "ratio": 0.0216865167013
+      },
+      "B_harness": {
+       "ci95": [
+        0.00701680780092,
+        0.012054939756
+       ],
+       "n": 16,
+       "ratio": 0.00902436168457
+      },
+      "B_tuned": {
+       "ci95": [
+        0.016849344428,
+        0.029135731735
+       ],
+       "n": 16,
+       "ratio": 0.0216865167013
+      },
+      "w": 0.0
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        0.10932516224,
+        0.178721063457
+       ],
+       "n": 16,
+       "ratio": 0.136479225782
+      },
+      "A_tuned": {
+       "ci95": [
+        0.119723927826,
+        0.194407009471
+       ],
+       "n": 16,
+       "ratio": 0.149073837515
+      },
+      "B_harness": {
+       "ci95": [
+        0.0102256693264,
+        0.0166429222368
+       ],
+       "n": 16,
+       "ratio": 0.0127502036781
+      },
+      "B_tuned": {
+       "ci95": [
+        0.01352704413,
+        0.0219881760994
+       ],
+       "n": 16,
+       "ratio": 0.0168588391907
+      },
+      "w": 0.1
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        0.124627132218,
+        0.2037302692
+       ],
+       "n": 16,
+       "ratio": 0.155562793797
+      },
+      "A_tuned": {
+       "ci95": [
+        0.126207255064,
+        0.20482383598
+       ],
+       "n": 16,
+       "ratio": 0.157088684338
+      },
+      "B_harness": {
+       "ci95": [
+        0.0120388892318,
+        0.0194828856895
+       ],
+       "n": 16,
+       "ratio": 0.0149920080469
+      },
+      "B_tuned": {
+       "ci95": [
+        0.0125370880168,
+        0.0203609365197
+       ],
+       "n": 16,
+       "ratio": 0.0156009846438
+      },
+      "w": 1.0
+     }
+    ],
+    "ranked_across_band": {
+     "reason": "frozen control acceptance criteria unresolved",
+     "status": "withheld"
+    },
+    "dense_vs_sparse": {
+     "S_dense": 0.00793346324381,
+     "S_dense_over_sparse": {
+      "ci95": [
+       1.10339308925,
+       1.14695791799
+      ],
+      "n": 16,
+      "ratio": 1.12647004794
+     },
+     "S_sparse": 0.00704276448216,
+     "descent_muls_dense_over_sparse": {
+      "ci95": [
+       1.28324952755,
+       1.28608523627
+      ],
+      "n": 16,
+      "ratio": 1.28453627079
+     },
+     "identical_descent_digest": 16,
+     "identical_outcome": 16,
+     "linear_stage_dense_over_sparse": {
+      "ci95": [
+       2.07260791109,
+       2.08446078267
+      ],
+      "n": 16,
+      "ratio": 2.07813071417
+     },
+     "paired_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+     ],
+     "pairs": 16,
+     "sparse_fallbacks_per_run": 1.1875
+    },
+    "rho_arms": {
+     "R0": {
+      "ci95": [
+       0.907974566714,
+       1.37553281204
+      ],
+      "mean": 1.13690139598,
+      "n": 8,
+      "sd": 0.354715234
+     },
+     "R3": {
+      "ci95": [
+       0.598186504916,
+       0.962503575386
+      ],
+      "mean": 0.780416912256,
+      "n": 16,
+      "sd": 0.374401509956
+     }
+    }
+   },
+   {
+    "p": 1823,
+    "log2_l": 62.9925930763,
+    "ic_all_correct": true,
+    "ic_S": {
+     "ci95": [
+      0.00322759255574,
+      0.00433733430838
+     ],
+     "mean": 0.00376125356831,
+     "n": 16,
+     "sd": 0.00118477059355
+    },
+    "ic_S_plus": {
+     "ci95": [
+      0.0147965296597,
+      0.017357804385
+     ],
+     "mean": 0.0160476269915,
+     "n": 16,
+     "sd": 0.00272127154773
+    },
+    "ic_wall_s": {
+     "ci95": [
+      8.07697088644,
+      10.3336058745
+     ],
+     "mean": 9.16816843025,
+     "n": 16,
+     "sd": 2.35488143691
+    },
+    "rho_S_harness": {
+     "ci95": [
+      0.699827723776,
+      1.07099698055
+     ],
+     "mean": 0.886825414925,
+     "n": 16,
+     "sd": 0.387331513643
+    },
+    "rho_S_tuned": {
+     "ci95": [
+      0.290591373988,
+      0.446993290211
+     ],
+     "mean": 0.369033244307,
+     "n": 16,
+     "sd": 0.161179907065
+    },
+    "rho_S_plus_harness": {
+     "ci95": [
+      0.828619051045,
+      1.2671572371
+     ],
+     "mean": 1.04519254447,
+     "n": 16,
+     "sd": 0.456500519663
+    },
+    "rho_S_plus_tuned": {
+     "ci95": [
+      0.416625306609,
+      0.635553571414
+     ],
+     "mean": 0.527400373855,
+     "n": 16,
+     "sd": 0.230348913085
+    },
+    "rho_steps_over_sqrt_l": {
+     "ci95": [
+      0.706253949883,
+      1.07298236104
+     ],
+     "mean": 0.88700947175,
+     "n": 16,
+     "sd": 0.387420571791
+    },
+    "rho_wall_s": {
+     "ci95": [
+      599.715532929,
+      926.230802927
+     ],
+     "mean": 759.684175876,
+     "n": 16,
+     "sd": 344.670017955
+    },
+    "rho_all_correct": true,
+    "ic_over_rho": {
+     "S_harness": {
+      "ci95": [
+       0.00323848632741,
+       0.0057532873714
+      ],
+      "n": 16,
+      "ratio": 0.00424125595073
+     },
+     "S_plus_harness": {
+      "ci95": [
+       0.0124591853002,
+       0.0195920345786
+      ],
+      "n": 16,
+      "ratio": 0.015353751877
+     },
+     "S_plus_tuned": {
+      "ci95": [
+       0.0248613047443,
+       0.0384296764008
+      ],
+      "n": 16,
+      "ratio": 0.0304277884262
+     },
+     "S_tuned": {
+      "ci95": [
+       0.00779003049017,
+       0.0138113474237
+      ],
+      "n": 16,
+      "ratio": 0.0101921808572
+     }
+    },
+    "n_rho": 16,
+    "verdict": {
+     "reason": "frozen control acceptance criteria are not numerically executable",
+     "status": "withheld"
+    },
+    "band_ratio": [
+     {
+      "A_harness": {
+       "ci95": [
+        0.00323569470188,
+        0.00577265027918
+       ],
+       "n": 16,
+       "ratio": 0.00424125595059
+      },
+      "A_tuned": {
+       "ci95": [
+        0.00778214747364,
+        0.013868398441
+       ],
+       "n": 16,
+       "ratio": 0.0101921808569
+      },
+      "B_harness": {
+       "ci95": [
+        0.00325560690106,
+        0.00581786744188
+       ],
+       "n": 16,
+       "ratio": 0.00424125595059
+      },
+      "B_tuned": {
+       "ci95": [
+        0.007767469752,
+        0.0138644770256
+       ],
+       "n": 16,
+       "ratio": 0.0101921808569
+      },
+      "w": 0.0
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        0.0619131326559,
+        0.0972011091114
+       ],
+       "n": 16,
+       "ratio": 0.0761411252289
+      },
+      "A_tuned": {
+       "ci95": [
+        0.0676999745133,
+        0.106127123593
+       ],
+       "n": 16,
+       "ratio": 0.0831675701174
+      },
+      "B_harness": {
+       "ci95": [
+        0.00579828351288,
+        0.00904354268246
+       ],
+       "n": 16,
+       "ratio": 0.007079558707
+      },
+      "B_tuned": {
+       "ci95": [
+        0.00764003146118,
+        0.0119181803886
+       ],
+       "n": 16,
+       "ratio": 0.00936084257908
+      },
+      "w": 0.1
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        0.0706740939536,
+        0.110917557444
+       ],
+       "n": 16,
+       "ratio": 0.0869065168436
+      },
+      "A_tuned": {
+       "ci95": [
+        0.0714719665374,
+        0.111947023722
+       ],
+       "n": 16,
+       "ratio": 0.0877589651744
+      },
+      "B_harness": {
+       "ci95": [
+        0.00728760574326,
+        0.0110584545166
+       ],
+       "n": 16,
+       "ratio": 0.00878730698525
+      },
+      "B_tuned": {
+       "ci95": [
+        0.00755018756937,
+        0.0114564969003
+       ],
+       "n": 16,
+       "ratio": 0.00914424074593
+      },
+      "w": 1.0
+     }
+    ],
+    "ranked_across_band": {
+     "reason": "frozen control acceptance criteria unresolved",
+     "status": "withheld"
+    },
+    "dense_vs_sparse": {
+     "S_dense": 0.00412074628188,
+     "S_dense_over_sparse": {
+      "ci95": [
+       1.06722484667,
+       1.12058634233
+      ],
+      "n": 16,
+      "ratio": 1.09557789897
+     },
+     "S_sparse": 0.00376125356831,
+     "descent_muls_dense_over_sparse": {
+      "ci95": [
+       1.28426342935,
+       1.2882852997
+      ],
+      "n": 16,
+      "ratio": 1.28634386446
+     },
+     "identical_descent_digest": 16,
+     "identical_outcome": 16,
+     "linear_stage_dense_over_sparse": {
+      "ci95": [
+       2.10789416749,
+       2.12341213227
+      ],
+      "n": 16,
+      "ratio": 2.11602036864
+     },
+     "paired_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+     ],
+     "pairs": 16,
+     "sparse_fallbacks_per_run": 0.4375
+    },
+    "rho_arms": {
+     "R0": {
+      "ci95": [
+       0.820795815768,
+       2.09082441752
+      ],
+      "mean": 1.4480314983,
+      "n": 4,
+      "sd": 0.803356938192
+     },
+     "R3": {
+      "ci95": [
+       0.699827723776,
+       1.07099698055
+      ],
+      "mean": 0.886825414925,
+      "n": 16,
+      "sd": 0.387331513643
+     }
+    }
+   }
+  ],
+  "exponent_ic": {
+   "ci95": [
+    -0.164913929408,
+    -0.0843498911977
+   ],
+   "slope": -0.122311955561
+  },
+  "exponent_rho_harness": {
+   "ci95": [
+    0.479516711319,
+    0.53774065291
+   ],
+   "slope": 0.507742327818
+  },
+  "exponent_rho_tuned": {
+   "ci95": [
+    0.480288109862,
+    0.537986005049
+   ],
+   "slope": 0.507797446866
+  },
+  "local_exponents_ic": [
+   {
+    "from_l": 62514727414000.0,
+    "ic": -0.397044857034,
+    "to_l": 4049001339970000.0
+   },
+   {
+    "from_l": 4049001339970000.0,
+    "ic": -0.199243131171,
+    "to_l": 2.63807419771e+17
+   },
+   {
+    "from_l": 2.63807419771e+17,
+    "ic": 0.0787781851172,
+    "to_l": 2.97527281887e+18
+   },
+   {
+    "from_l": 2.97527281887e+18,
+    "ic": -0.0569250628701,
+    "to_l": 9.17613978124e+18
+   }
+  ],
+  "K1_killed_at_p": null,
+  "K2_narrowed_at_p": null
+ },
  "n37_k8_k16_confirmation": {
   "curve": "icv1-f2m37-tm534059-32aad96b",
   "source": "research/ecbench_n37_k8_k16_20261004/DECISION.json",
@@ -6189,10 +7862,11 @@
    ],
    "targets": 64,
    "setup_seconds_approx": 28.0,
-   "status": "admitted online",
+   "status": "superseded (empty-table rho)",
    "precomputed_rho": {
     "status": "not run: no Bernstein-Lange precomputed-rho control exists for the n61 instance"
-   }
+   },
+   "correction": "Corrected 2026-10-20 by validation sweep (verdict: contradicted), sweep-B row 108.1: ratio is against rho with an empty distinguished-point table; Bernstein-Lange rho at equal advice is 53-317x faster online (benchmarks row 20261014-ic-next10-09-equal-advice). Cold ratio unaffected."
   },
   "exploratory_online": {
    "label": "n83 dense K1798",
@@ -6201,7 +7875,8 @@
    "complete_process_seconds": 339.068,
    "setup_inclusive_class": "diagnostic: complete IC process divided by reported rho online time; not a matched cold ratio",
    "first_integer_break_even_under_model": 306,
-   "status": "exploratory one point",
+   "status": "superseded (empty-table rho)",
+   "correction": "Corrected 2026-10-20 by validation sweep (verdict: contradicted), sweep-B rows 108.1 and 110.1: empty-table rho, one target, L0 shared host; precomputed-table rho wins every N83 matched pair (benchmarks row 20261016-n83-precomputed-rho-control). Within-IC K1798 vs K1500 comparison unaffected.",
    "precomputed_rho": {
     "status": "not run for K1798: the n83 control measured K3300 and K600, a different factor base and a different run, so neither is a matched reference for this row"
    }
@@ -6286,7 +7961,16 @@
    "identical": 120,
    "total": 168,
    "failures": 48,
-   "scope": "all inherited-F4 rows differ in solver phase counts; root-finder and rho rows identical"
+   "scope": "2026-10-13 receipt, preserved: 48 mismatches in solver phase counts. The earlier scope text 'all inherited-F4 rows differ; root-finder and rho rows identical' is withdrawn: Corrected 2026-10-20 by validation sweep (verdict: contradicted)",
+   "current": {
+    "date": "2026-10-19",
+    "identical": 72,
+    "total": 168,
+    "failures": 96,
+    "scope": "mismatches in all four IC arms (ic-f4-m2, ic-f4-m3, ic-rootfind-m2, ic-rootfind-m3; 24 rows each); open regression under investigation (sweep D, PR #2290); root-finder and rho rows are not claimed to pass",
+    "source": "claude/validation-sweep-a-leaderboard-20261019:research/validation_sweep_20261019/A-leaderboard/verdicts.jsonl (row S:frontier:rootfinder-replay-block)",
+    "correction": "Corrected 2026-10-20 by validation sweep (verdict: contradicted)"
+   }
   }
  },
  "n83_tier1_cold_holdout": {
@@ -48639,6 +50323,273 @@
   ],
   "report": "docs/ic/perf/F4_GF2_PORT_COMPARISON_20261018.md",
   "study": "benchmarks/20261018-f4-gf2-port/"
+ },
+ "pair_table_component": {
+  "schema": "ic_oracle_setup_blocked.result/v1",
+  "curve": "icv1-fp32-t7319-90da43e9",
+  "sessions": [
+   "ECBS1h9e263e582e51",
+   "ECBS1h90cd7a0dc213"
+  ],
+  "isolation": "L1",
+  "executions": 456,
+  "identical_executions": 456,
+  "equality_all_identical": true,
+  "aa_setup_ratio_sum": 1.01829543954,
+  "aa_setup_pair_ratio": [
+   0.695697834157,
+   1.45744483678
+  ],
+  "rows": [
+   {
+    "N": 1024,
+    "pairs": 40,
+    "setup_ms": {
+     "scalar": 216.4847054,
+     "batch": 117.47991105,
+     "blocked": 55.15085525
+    },
+    "run_ms": {
+     "scalar": 963.481533975,
+     "batch": 850.69512705,
+     "blocked": 873.593559375
+    },
+    "blocked_over_batch": {
+     "sum": 0.469449242488,
+     "min": 0.321818180008,
+     "max": 0.793568175276
+    },
+    "blocked_over_scalar": {
+     "sum": 0.254756358645,
+     "min": 0.150561326607,
+     "max": 0.43226066603
+    },
+    "batch_over_scalar": {
+     "sum": 0.542670720469,
+     "min": 0.307906329625,
+     "max": 1.0304893353
+    },
+    "run_blocked_over_batch": 1.02691731926,
+    "run_blocked_over_scalar": 0.906705036443,
+    "rss_gib": {
+     "scalar": 0.0927238464355,
+     "batch": 0.0927124023438,
+     "blocked": 0.0751457214355
+    },
+    "S_ratio_blocked_over_batch": {
+     "w0": 1,
+     "w0_1": 1,
+     "w1": 1
+    },
+    "S_w0": 31.8508644792,
+    "setup_gae": 1049600,
+    "gae": 2087376.475,
+    "gap_to_rho": {
+     "w0": 32.9550679408,
+     "w0_1": 32.9595038415,
+     "w1": 32.9795284417
+    }
+   },
+   {
+    "N": 2048,
+    "pairs": 40,
+    "setup_ms": {
+     "scalar": 1435.2949661,
+     "batch": 739.252516225,
+     "blocked": 237.94795745
+    },
+    "run_ms": {
+     "scalar": 1834.63993237,
+     "batch": 1136.57745603,
+     "blocked": 695.6308297
+    },
+    "blocked_over_batch": {
+     "sum": 0.321876425481,
+     "min": 0.189835324922,
+     "max": 0.444046344011
+    },
+    "blocked_over_scalar": {
+     "sum": 0.165783314977,
+     "min": 0.130079627338,
+     "max": 0.21936454013
+    },
+    "batch_over_scalar": {
+     "sum": 0.51505267815,
+     "min": 0.415550259353,
+     "max": 0.795597843775
+    },
+    "run_blocked_over_batch": 0.612039967899,
+    "run_blocked_over_scalar": 0.379164770931,
+    "rss_gib": {
+     "scalar": 0.185779571533,
+     "batch": 0.185802459717,
+     "blocked": 0.115337371826
+    },
+    "S_ratio_blocked_over_batch": {
+     "w0": 1,
+     "w0_1": 1,
+     "w1": 1
+    },
+    "S_w0": 71.8158040978,
+    "setup_gae": 4196352,
+    "gae": 4706516.525,
+    "gap_to_rho": {
+     "w0": 74.3055091899,
+     "w0_1": 69.0684556607,
+     "w1": 45.4272809988
+    }
+   },
+   {
+    "N": 4096,
+    "pairs": 40,
+    "setup_ms": {
+     "scalar": 8398.39837657,
+     "batch": 3816.77474975,
+     "blocked": 1036.5267769
+    },
+    "run_ms": {
+     "scalar": 8744.91070788,
+     "batch": 4148.2377343,
+     "blocked": 1429.26834437
+    },
+    "blocked_over_batch": {
+     "sum": 0.271571377632,
+     "min": 0.233611415973,
+     "max": 0.320110100836
+    },
+    "blocked_over_scalar": {
+     "sum": 0.123419577213,
+     "min": 0.10139178612,
+     "max": 0.154436621947
+    },
+    "batch_over_scalar": {
+     "sum": 0.454464598916,
+     "min": 0.348703846702,
+     "max": 0.546648591415
+    },
+    "run_blocked_over_batch": 0.344548320497,
+    "run_blocked_over_scalar": 0.163440015813,
+    "rss_gib": {
+     "scalar": 0.625324249268,
+     "batch": 0.625858306885,
+     "blocked": 0.34440612793
+    },
+    "S_ratio_blocked_over_batch": {
+     "w0": 1,
+     "w0_1": 1,
+     "w1": 1
+    },
+    "S_w0": 260.011478071,
+    "setup_gae": 16781312,
+    "gae": 17040097.7,
+    "gap_to_rho": {
+     "w0": 269.02553715,
+     "w0_1": 245.491008172,
+     "w1": 139.25113358
+    }
+   },
+   {
+    "N": 8192,
+    "pairs": 40,
+    "setup_ms": {
+     "scalar": 43599.3239527,
+     "batch": 20484.9251067,
+     "blocked": 5294.20863355
+    },
+    "run_ms": {
+     "scalar": 44203.583243,
+     "batch": 21102.5724954,
+     "blocked": 5918.8731119
+    },
+    "blocked_over_batch": {
+     "sum": 0.258444129328,
+     "min": 0.237098376072,
+     "max": 0.312811108428
+    },
+    "blocked_over_scalar": {
+     "sum": 0.121428686355,
+     "min": 0.108553280908,
+     "max": 0.14512823434
+    },
+    "batch_over_scalar": {
+     "sum": 0.469845017069,
+     "min": 0.423799287497,
+     "max": 0.522994618625
+    },
+    "run_blocked_over_batch": 0.280481117323,
+    "run_blocked_over_scalar": 0.133900301235,
+    "rss_gib": {
+     "scalar": 2.37266540527,
+     "batch": 2.37275314331,
+     "blocked": 1.24766540527
+    },
+    "S_ratio_blocked_over_batch": {
+     "w0": 1,
+     "w0_1": 1,
+     "w1": 1
+    },
+    "S_w0": 1026.13937386,
+    "setup_gae": 67117056,
+    "gae": 67249012.675,
+    "gap_to_rho": {
+     "w0": 1061.71349931,
+     "w0_1": 966.210545185,
+     "w1": 535.08987653
+    }
+   },
+   {
+    "N": 16384,
+    "pairs": 8,
+    "setup_ms": {
+     "scalar": 224141.725429,
+     "batch": 116518.995317,
+     "blocked": 28200.8154826
+    },
+    "run_ms": {
+     "scalar": 227916.430309,
+     "batch": 120399.147004,
+     "blocked": 29947.6510742
+    },
+    "blocked_over_batch": {
+     "sum": 0.2420276231,
+     "min": 0.220284488139,
+     "max": 0.260486706223
+    },
+    "blocked_over_scalar": {
+     "sum": 0.125816892989,
+     "min": 0.115080639339,
+     "max": 0.135882048543
+    },
+    "batch_over_scalar": {
+     "sum": 0.519845178735,
+     "min": 0.493623198288,
+     "max": 0.544789629813
+    },
+    "run_blocked_over_batch": 0.248736405693,
+    "run_blocked_over_scalar": 0.131397508436,
+    "rss_gib": {
+     "scalar": 9.1459197998,
+     "batch": 9.14622879028,
+     "blocked": 4.64671325684
+    },
+    "S_ratio_blocked_over_batch": {
+     "w0": 1,
+     "w0_1": 1,
+     "w1": 1
+    },
+    "S_w0": 4097.22600994,
+    "setup_gae": 268451840,
+    "gae": 268515574.875,
+    "gap_to_rho": {
+     "w0": 5110.28730377,
+     "w0_1": 4649.31623181,
+     "w1": 2567.06029454
+    }
+   }
+  ],
+  "study": "research/ic_oracle_setup_blocked_20261020/",
+  "report": "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
+  "class": "engineering"
  },
  "phases": [
   {
