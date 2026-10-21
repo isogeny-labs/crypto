@@ -172,7 +172,17 @@ ignored** in 1,310.28 seconds. Its raw output is
 `rust-lib-tests-serial-with-fixture.log.gz` (raw SHA-256
 `92d148a7a4c827431f2f8d56a342ac544cf16ead33205476b7671621310f59ca`).
 The release library command gate is
-recorded separately in `rust-lib-tests-cargo-serial.log`.
+recorded separately. A rebase removed that tracked fixture from the earlier
+ad hoc sparse worktree materialization. The exact Cargo command then recorded
+4,157 passes and the same five missing-fixture failures in
+`rust-lib-tests-cargo-serial.log.gz` (raw SHA-256
+`6a6acd8efe85265c9e4dc3b6a981fdc0a0ec9a968b8c0fe753ffca08681b581e`).
+The sparse profile now includes
+`research/cryptopro_b_chain_sweep_20261006/frozen_inputs`; all five tests
+passed through Cargo in `rust-lib-tests-cryptopro-fixture-focused.log.gz`.
+The touched release example suite passed 24/24 again in
+`rust-example-tests-current-head.log.gz`. The stable-profile full Cargo rerun
+is recorded in `rust-lib-tests-cargo-serial-stable.log`.
 The previous RunPod campaign's conservative upper charge was $5.710216
 against its $5 ceiling, so this preparation launches no paid instance. A new
 bounded allocation needs its own reviewed budget and protocol.
