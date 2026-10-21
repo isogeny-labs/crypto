@@ -176,6 +176,27 @@ fn binary_archive_runs_and_replays_useful_rank() {
         name: loaded.name.clone(),
         field_degree: Some(loaded.n),
     };
+    let ArchiveInstance::Binary(mut wrong) = archive::instance(&cache.0, &id).unwrap() else {
+        panic!()
+    };
+    wrong.fast.a ^= 1;
+    let wrong_group = BinaryGroup(&wrong.fast);
+    let wrong_ctx = InstanceCtx {
+        group: &wrong_group,
+        generator: ctx.generator,
+        target: ctx.target,
+        r: ctx.r,
+        cofactor: ctx.cofactor,
+        group_order: ctx.group_order,
+        name: ctx.name.clone(),
+        field_degree: ctx.field_degree,
+    };
+    let wrong_builder = BinaryArchiveBase { instance: &wrong };
+    assert!(wrong_builder
+        .build(&wrong_ctx, &cache.params(&id), &mut ops)
+        .err()
+        .unwrap()
+        .contains("native binary curve mismatch"));
     let builder = BinaryArchiveBase { instance: &loaded };
     let spec = PipelineSpec {
         factor_base: "archive".into(),

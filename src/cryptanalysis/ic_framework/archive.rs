@@ -316,10 +316,23 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinaryArchiveBase<'_> {
         p: &Params,
         ops: &mut GroupOps,
     ) -> Result<FactorBase<FastPoint>, String> {
-        let c = &self.instance.fast;
-        let g = ctx.group.0;
-        if (g.n, g.field.irr, g.a, g.b) != (c.n, c.field.irr, c.a, c.b) {
-            return Err("native binary curve mismatch".into());
+        let i = self.instance;
+        if i.n < 2
+            || i.n > FastCurve::MAX_DEGREE
+            || i.irreducible.degree != i.n
+            || i.irreducible.low_terms.iter().any(|&bit| bit >= i.n)
+        {
+            return Err("unsupported native binary field representation".into());
+        }
+        let modulus = i
+            .irreducible
+            .low_terms
+            .iter()
+            .fold(1u64 << i.n, |m, bit| m | (1u64 << bit));
+        for g in [&i.fast, ctx.group.0] {
+            if (g.n, g.field.n, g.field.irr, g.a, g.b) != (i.n, i.n, modulus, i.a, i.b) {
+                return Err("native binary curve mismatch".into());
+            }
         }
         import(
             ctx,
