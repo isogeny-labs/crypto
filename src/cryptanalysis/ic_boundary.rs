@@ -5354,6 +5354,10 @@ pub struct FrobeniusPairTable {
     canon: FrobeniusCanon,
     /// `member_of[i·n + t]`: the base index of `σ^t(P_i)`.
     member_of: Vec<u32>,
+    /// `true` when `member_of` was left empty at build: a probe hit then
+    /// resolves `σ^t(P)` itself and charges the Frobenius maps and the
+    /// index lookup to the relation phase ([`Self::build_lazy`]).
+    lazy: bool,
     n: u32,
     pub entries: u64,
     pub representatives: u64,
@@ -5371,6 +5375,16 @@ impl FrobeniusPairTable {
         Self::build_filtered(inst, fb, |_, _| true)
     }
 
+    /// [`build`](Self::build) without the orbit-member index.  The eager
+    /// table spends `|F|·(n−1)` Frobenius maps and as many hash lookups
+    /// naming `σ^t(P_i)` for every base point, though only a probe that
+    /// hits reads one.  The lazy table names the two summands of a hit
+    /// when it happens and charges that work then; entries, keys and
+    /// recovered pairs are those of `build`.
+    pub fn build_lazy(inst: &BinaryInstance, fb: &FactorBase<FastPoint>) -> Option<Self> {
+        Self::build_inner(inst, fb, |_, _| true, true)
+    }
+
     /// [`build`](Self::build) over the pairs `keep(rep, j)` admits, where
     /// `rep` is an orbit representative's base index and `j` the other
     /// member's.  The large-prime collector uses this to leave the
@@ -5382,6 +5396,15 @@ impl FrobeniusPairTable {
         fb: &FactorBase<FastPoint>,
         keep: impl Fn(usize, usize) -> bool,
     ) -> Option<Self> {
+        Self::build_inner(inst, fb, keep, false)
+    }
+
+    fn build_inner(
+        inst: &BinaryInstance,
+        fb: &FactorBase<FastPoint>,
+        keep: impl Fn(usize, usize) -> bool,
+        lazy: bool,
+    ) -> Option<Self> {
         let start = Instant::now();
         let g = BinaryGroup(&inst.fast);
         let n = inst.n as usize;
@@ -5390,9 +5413,9 @@ impl FrobeniusPairTable {
             return None;
         }
         let canon = FrobeniusCanon::new(&inst.gf, inst.n)?;
-        let mut member_of = vec![0u32; f * n];
+        let mut member_of = if lazy { Vec::new() } else { vec![0u32; f * n] };
         let (mut frob, mut lookups) = (0u64, 0u64);
-        for i in 0..f {
+        for i in 0..if lazy { 0 } else { f } {
             let mut p = fb.points[i];
             member_of[i * n] = i as u32;
             for t in 1..n {
@@ -5448,6 +5471,7 @@ impl FrobeniusPairTable {
             map,
             canon,
             member_of,
+            lazy,
             n: inst.n,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
@@ -5478,8 +5502,17 @@ impl FrobeniusPairTable {
         // canon = rotl^{t_u}(coords(x_u)) = rotl^{t_r}(coords(x_R)) and the
         // Frobenius is rotl by one, so x_R = σ^t(x_u) with t = t_u − t_r.
         let t = ((t_u + n - t_r) % n) as usize;
-        let i2 = self.member_of[i as usize * n as usize + t] as usize;
-        let j2 = self.member_of[j * n as usize + t] as usize;
+        let (i2, j2) = if self.lazy {
+            (
+                self.resolve_member(g, fb, ctr, i as usize, t)?,
+                self.resolve_member(g, fb, ctr, j, t)?,
+            )
+        } else {
+            (
+                self.member_of[i as usize * n as usize + t] as usize,
+                self.member_of[j * n as usize + t] as usize,
+            )
+        };
         let s = g.add(ops, fb.points[i2], fb.points[j2]);
         if s == target {
             Some((i2, j2))
@@ -5489,6 +5522,26 @@ impl FrobeniusPairTable {
             ctr.frobfold_mismatches += 1;
             None
         }
+    }
+
+    /// The base index of `σ^t(P_idx)` for a lazy table: `t` Frobenius
+    /// maps and one index lookup, both charged to `ctr` (the eager table
+    /// charged one map and one lookup per step of `t` at build).
+    fn resolve_member(
+        &self,
+        g: &BinaryGroup,
+        fb: &FactorBase<FastPoint>,
+        ctr: &mut OracleCounters,
+        idx: usize,
+        t: usize,
+    ) -> Option<usize> {
+        if t == 0 {
+            return Some(idx);
+        }
+        let p = g.0.frobenius_k(fb.points[idx], t as u32);
+        ctr.frobenius_maps += t as u64;
+        ctr.lookups += 1;
+        fb.point_index.get(&p.pack()).copied()
     }
 
     /// The canonical (least normal-basis rotation) name of an abscissa:
@@ -5610,6 +5663,8 @@ pub struct OracleCounters {
     pub unliftable_systems: u64,
     /// Frobenius-orbit canonicalisations of a target abscissa.
     pub canonicalisations: u64,
+    /// Frobenius maps a lazy folded table applied to name a hit's summands.
+    pub frobenius_maps: u64,
     /// Folded-table hits whose recovered pair summed to neither `±R`;
     /// a rotation-direction bug would show here, so it must stay zero.
     pub frobfold_mismatches: u64,
@@ -6692,6 +6747,9 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
     rel.count("unliftable_systems", ctr.unliftable_systems);
     rel.count("canonicalisations", ctr.canonicalisations);
     rel.count("frobfold_mismatches", ctr.frobfold_mismatches);
+    if ctr.frobenius_maps > 0 {
+        rel.count("frobenius_maps", ctr.frobenius_maps);
+    }
     rel.count("direct_relations_skipped", direct_skipped);
     rel.count("repeated_targets_skipped", repeats_skipped);
     rel.count("target_guard_probes", guard_probes);
@@ -10690,6 +10748,49 @@ mod tests {
         }
         assert_eq!(ctr.frobfold_mismatches, 0);
         assert!(table.calibrate_canon(10_000) > 0.0);
+    }
+
+    #[test]
+    fn lazy_frobenius_table_returns_the_eager_pairs_and_charges_the_resolution() {
+        let inst = koblitz_instance_best(17).expect("K_a / 2^17");
+        let (frob, desc) = choose_koblitz_base(&inst, 1, 6000).expect("base");
+        let folded =
+            koblitz_factor_base(&inst, &frob, ColumnFold::SignedFrobeniusOrbit, desc).unwrap();
+        let g = BinaryGroup(&inst.fast);
+        let eager = FrobeniusPairTable::build(&inst, &folded).expect("eager table");
+        let lazy = FrobeniusPairTable::build_lazy(&inst, &folded).expect("lazy table");
+        // The same entries and the same additions; the member index alone is gone.
+        assert_eq!(eager.entries, lazy.entries);
+        assert_eq!(eager.representatives, lazy.representatives);
+        assert_eq!(eager.build_ops.adds, lazy.build_ops.adds);
+        assert_eq!(eager.build_canonicalisations, lazy.build_canonicalisations);
+        assert!(eager.build_frobenius_maps > 0 && eager.build_lookups > 0);
+        assert_eq!((lazy.build_frobenius_maps, lazy.build_lookups), (0, 0));
+        let mut ops = GroupOps::default();
+        let (mut ce, mut cl) = (OracleCounters::default(), OracleCounters::default());
+        let mut hits = 0u64;
+        for i in 0..folded.points.len() {
+            for j in i..folded.points.len() {
+                let s = g.add(&mut ops, folded.points[i], folded.points[j]);
+                if s.infinity {
+                    continue;
+                }
+                let a = eager.probe(&g, &folded, &mut ops, &mut ce, s);
+                let b = lazy.probe(&g, &folded, &mut ops, &mut cl, s);
+                assert_eq!(a, b, "pair ({i}, {j})");
+                hits += u64::from(b.is_some());
+            }
+        }
+        assert!(hits > 0);
+        assert_eq!(cl.frobfold_mismatches, 0);
+        assert_eq!(
+            ce.frobenius_maps, 0,
+            "the eager table charges its maps at build"
+        );
+        assert!(cl.frobenius_maps > 0);
+        // Resolution costs at most 2 maps-and-lookups per hit.
+        assert!(cl.lookups <= ce.lookups + 2 * hits);
+        assert!(cl.frobenius_maps <= 2 * hits * (inst.n as u64 - 1));
     }
 
     #[test]

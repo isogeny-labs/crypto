@@ -178,6 +178,17 @@
      "source": "https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json"
     },
     {
+     "date": "2026-10-18",
+     "value": 1.272,
+     "reference": "matched",
+     "unit": "S",
+     "label": "Lazy orbit-member index, fully priced (*_full), stride-renew, vs rho-frob: best cell icv1-f2m29-tm40309-30c52b96 (r = 2^15.4)",
+     "detail": "The frozen Frobenius-orbit IC with its pair table's orbit-member index resolved on a hit instead of built for every base point (same table, relations, rank and logarithms: 856/856 run pairs identical). Paired against the fully priced signed-Frobenius rho on 32 targets x 3 rounds per curve: 1.272 [0.770, 1.803] at the best cell (interval includes 1), was 1.566 [0.992, 2.347] with the eager table on other seeds. Against rho-strong the lazy arm is cheaper at n = 13, 17, 19, 29, a tie at n = 31 (0.985 [0.908, 1.062], was 1.221) and above it at n = 23, 37, 41. Eager / lazy 1.12-1.44x on seven curves, 1.014x at n = 41. L0, counts only.",
+     "class": "engineering",
+     "anchor": "#lazy-orbit-members-20261018",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_lazy_orbit_members_20261018/REPORT.pdf"
+    },
+    {
      "anchor": "#ic-tool-programme-20261001",
      "class": "accounting",
      "date": "2026-10-20",

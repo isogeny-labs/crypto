@@ -35,6 +35,7 @@
 //! | `mitm-prime-blocked` | 2 | the same table and sums again, inserted in cache-sized pieces (many small maps, each block grouped by map) |
 //! | `mitm-frobenius` | 2 or 3 | the same on a Frobenius-folded table (Koblitz) |
 //! | `mitm-frobenius-counted` | 2 or 3 | the same table and probe, with native table setup counters |
+//! | `mitm-frobenius-lazy-counted` | 2 or 3 | the same entries and probe; a hit names its summands' orbit members then, not every base point at build |
 //! | `rootfind-subtract` | 2 or 3 | prime curves: `prime_fast`'s direct-subtraction root finding, every `x(R ∓ F_i)` of a target from one Montgomery batched inversion, then a lookup (`m = 2`) or a probe of the negation-folded pair table (`m = 3`) |
 //!
 //! The pair table is where memory buys time, and `mitm`'s
@@ -1852,6 +1853,7 @@ pub struct FrobeniusMitmOracle<'i> {
     table: Option<FrobeniusPairTable>,
     large: Option<LargePrimeCollector<'i>>,
     count_setup: bool,
+    lazy_members: bool,
 }
 
 impl<'i> FrobeniusMitmOracle<'i> {
@@ -1862,6 +1864,7 @@ impl<'i> FrobeniusMitmOracle<'i> {
             table: None,
             large: None,
             count_setup: false,
+            lazy_members: false,
         }
     }
 
@@ -1872,6 +1875,18 @@ impl<'i> FrobeniusMitmOracle<'i> {
             table: None,
             large: None,
             count_setup: true,
+            lazy_members: false,
+        }
+    }
+
+    /// [`new_counted`](Self::new_counted) over a table that names the
+    /// orbit members of a hit when it happens
+    /// ([`FrobeniusPairTable::build_lazy`]) instead of for every base
+    /// point at build.  The same entries and relations; less set-up work.
+    pub fn new_lazy_counted(m: u32, instance: &'i BinaryInstance) -> Self {
+        Self {
+            lazy_members: true,
+            ..Self::new_counted(m, instance)
         }
     }
 
@@ -1888,7 +1903,9 @@ impl<'i> FrobeniusMitmOracle<'i> {
 
 impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
     fn name(&self) -> &str {
-        if self.count_setup {
+        if self.lazy_members {
+            "mitm-frobenius-lazy-counted"
+        } else if self.count_setup {
             "mitm-frobenius-counted"
         } else {
             "mitm-frobenius"
@@ -1938,6 +1955,9 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
             if self.m != 3 {
                 return Err("large_primes needs the three-summand probe loop (m=3)".into());
             }
+            if self.lazy_members {
+                return Err("large_primes is not implemented for the lazy-member table".into());
+            }
             // The collector builds the classic table itself (its direct
             // path is the plain probe) and the large table beside it.
             self.large = Some(LargePrimeCollector::new(
@@ -1950,8 +1970,12 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
             self.table = None;
             return Ok(());
         }
-        let table = FrobeniusPairTable::build(self.instance, fb)
-            .ok_or("this instance has no Koblitz structure to fold by")?;
+        let table = if self.lazy_members {
+            FrobeniusPairTable::build_lazy(self.instance, fb)
+        } else {
+            FrobeniusPairTable::build(self.instance, fb)
+        }
+        .ok_or("this instance has no Koblitz structure to fold by")?;
         ops.merge(table.build_ops);
         self.table = Some(table);
         Ok(())

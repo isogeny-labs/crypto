@@ -18,6 +18,25 @@ This performance handoff is published beside the curve-by-curve tables. The stan
 
 [Latest result data](../../research/ecbench_rho_optimized_20261014/RESULT.json); [prior full synthesis](../../research/ecbench_frontier_20261013/frontier-data.json). The standing strong-rho method, recovered answers, trajectories, charged GAE and every counter are unchanged. Existing operation ratios and bounds therefore stay fixed. Historical wall ratios remain attached to their measured binaries; this L0 study cannot reprice or promote them.
 
+## Component improvement: lazy orbit-member index (2026-10-18, engineering)
+
+The Frobenius-folded pair table no longer names `σ^t(P_i)` for every base point at build; a hitting probe names its two summands when it happens. Same table, relations, rank and recovered logarithm (856/856 run pairs identical); it moves no row of tables A–C, which keep the oracle each was measured with. ecbench.gae, paired by target, cluster-bootstrap 95% CI; 95 % intervals; below 1 the numerator is cheaper.
+
+| curve | log₂ r | eager ÷ lazy (before ÷ after) | eager ÷ rho-strong (was) | lazy ÷ rho-strong (now) |
+|:--|--:|:--|:--|:--|
+| `icv1-f2m13-t181-515ee569` | 11.0 | **1.273 [1.267, 1.278]** | 0.409 [0.400, 0.419] | 0.322 [0.314, 0.330] |
+| `icv1-f2m29-tm40309-30c52b96` | 15.4 | **1.441 [1.427, 1.455]** | 0.577 [0.562, 0.593] | 0.401 [0.387, 0.415] |
+| `icv1-f2m17-tm101-00378d4e` | 16.0 | **1.132 [1.116, 1.151]** | 0.719 [0.642, 0.806] | 0.635 [0.558, 0.722] |
+| `icv1-f2m19-t797-b6cf2467` | 17.0 | **1.295 [1.283, 1.308]** | 0.745 [0.716, 0.777] | 0.575 [0.549, 0.605] |
+| `icv1-f2m31-tm90707-c95f16f5` | 20.5 | **1.240 [1.223, 1.259]** | 1.221 [1.142, 1.300] | 0.985 [0.908, 1.062] |
+| `icv1-f2m23-t5197-69e76b73` | 21.0 | **1.203 [1.189, 1.217]** | 1.342 [1.250, 1.449] | 1.116 [1.028, 1.218] |
+| `icv1-f2m37-tm534059-32aad96b` | 27.8 | **1.116 [1.106, 1.127]** | 4.260 [3.774, 4.823] | 3.818 [3.367, 4.345] |
+| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | **1.014 [1.013, 1.015]** | 16.090 [11.706, 22.265] | 15.868 [11.525, 21.979] |
+
+[Report](../../research/ecbench_lazy_orbit_members_20261018/REPORT.pdf) · [study](../../research/ecbench_lazy_orbit_members_20261018/) · [data](../../research/ecbench_lazy_orbit_members_20261018/figures/ratios.json). Distance to rho is reported, not a gate; no ranking against rho is claimed.
+
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
+
 ## Table A: Koblitz, one target (§23, re-run at baseline v3)
 
 - **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, which is 2.3–3.2 times cheaper at baseline v3 than in §23's processes, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v3/README.md).
@@ -314,6 +333,7 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
+- `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
