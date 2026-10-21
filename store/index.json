@@ -75,6 +75,54 @@
       ],
       "provenance": "Native tools/isogeny-cli/tests/challenge_cli.rs release integration test executable from source9bb7cbce2b84151eff6846b02da842a8ef019343; ISOGENY_CHALLENGE_BINARY override selects the separately pinned frontier executable"
     },
+    "evidence/n83-root4-frontier_20261019/cargo_lib_pr.log.gz": {
+      "sha256": "5a0c56c433ce28310085fb5020657c2fd78c88dad1f9829ce516167a33dfc6b9",
+      "bytes": 68144,
+      "description": "Preserved nonpassing PR-branch release-library verification attempt",
+      "provenance": "N83 high-K PR branch release library verification: sparse-fixture or intermittent test failure; see highk_20261019/verification_receipt.json"
+    },
+    "evidence/n83-root4-frontier_20261019/cargo_lib_pr_final.log.gz": {
+      "sha256": "e289da386fd8f8f604a8d67318f912ad73b77d10a5d0999873d1a6476d561831",
+      "bytes": 66692,
+      "description": "Passed PR-branch Rust release library suite, 4162 passed, 117 ignored",
+      "provenance": "TMPDIR=/Volumes/SSD990-2/tmp CARGO_TARGET_DIR=/Volumes/SSD990-2/tmp/n83_id30_current_build cargo test --release --offline --lib -- --test-threads=2; source commit c4f8154e; raw SHA-256 1c0831c7f2e0b8f5017c51b802dd83292e7f5e819e144e2c7e84df29fbc738ad"
+    },
+    "evidence/n83-root4-frontier_20261019/cargo_lib_pr_rerun.log.gz": {
+      "sha256": "c4d7704cae8e2312852b1457266cd6ee28e34f898b72917e2b082a69d5fc4b9a",
+      "bytes": 67445,
+      "description": "Preserved nonpassing PR-branch release-library verification attempt",
+      "provenance": "N83 high-K PR branch release library verification: sparse-fixture or intermittent test failure; see highk_20261019/verification_receipt.json"
+    },
+    "evidence/n83-root4-frontier_20261019/cargo_lib_sparse_failure.log.gz": {
+      "sha256": "2ca470cf2b59ce82b53c2ef1a43ef7f4904bc6af23d9574b2257f1be44690fa4",
+      "bytes": 1582,
+      "description": "Preserved nonpassing PR-branch release-library verification attempt",
+      "provenance": "N83 high-K PR branch release library verification: sparse-fixture or intermittent test failure; see highk_20261019/verification_receipt.json"
+    },
+    "evidence/n83-root4-frontier_20261019/k4096_base_dump.jsonl.gz": {
+      "sha256": "ca24c2cbeaac2dc81035b254922e2e29cc25bcfa84f26fceebfe995e268a23e4",
+      "bytes": 16295315,
+      "description": "Replayed K4096 ID30 N83 factor-base dump, gzip mtime zero",
+      "provenance": "pilot_k4096_16.py construct:83:1:4096; source 08660bd57ae1ea79f1d2d34639a0d3d36d0286fa; raw SHA-256 cb56c16620afc771d377102f9c4dc53d285cb9c5c2b38606d8cb202782fe39ed"
+    },
+    "evidence/n83-root4-frontier_20261019/k4300_base_dump.jsonl.gz": {
+      "sha256": "43274cecad77b29806f15404109bb7ae9beb07214b5d470f651704be4048d7f6",
+      "bytes": 17107799,
+      "description": "Replayed K4300 ID30 N83 factor-base dump, gzip mtime zero",
+      "provenance": "pilot_k4300_16.py construct:83:1:4300; source 08660bd57ae1ea79f1d2d34639a0d3d36d0286fa; raw SHA-256 06cf0ee56506c5674afac988b2809e1287d6be86de4cb0d8738e8dc989d1fd72"
+    },
+    "evidence/n83-root4-frontier_20261019/k4405_base_dump.jsonl.gz": {
+      "sha256": "7e9009da4315ca14445184c4830a9c9e640ecba4d5151a5dc713b930ef15858b",
+      "bytes": 17525461,
+      "description": "Replayed K4405 ID30 N83 factor-base dump shared by standard and wide3, gzip mtime zero",
+      "provenance": "pilot_k4405.py and pilot_k4405_wide3.py construct:83:1:4405; source 08660bd57ae1ea79f1d2d34639a0d3d36d0286fa; raw SHA-256 d5e172ea5ac62e99770607a1470ea95c52d8a53dedbd5cfced7b2a3173421e9e"
+    },
+    "evidence/n83-wide3-fresh4096_20261019/k4250_base_dump.jsonl.gz": {
+      "sha256": "6f56a7ea520e8f5fd965a105231220b3b4f919707dc0e26193310f97d58604be",
+      "bytes": 16851506,
+      "description": "K4250 wide3 N83 independently replayed ordered factor base",
+      "provenance": "construct:83:1:4250 source SHA-256 4a94e4e570f0cc4e39ba5c0846e411a6c43820c28119f7b9802e549023596507"
+    },
     "factor-bases/icv1-f2m11-t67-05f5aa36/FB1h5862f57f8b31.json": {
       "sha256": "861f6cc20ba939db435cd220411cfe86eb1722d12e04456494130745340c7d80",
       "bytes": 3051,
