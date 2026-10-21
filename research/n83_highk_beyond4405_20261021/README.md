@@ -79,6 +79,17 @@ replay and fixture exclusion before writing the immutable `dispatch.json`.
 The dispatch pins the four arms, alternating screen blocks, one-target holdout,
 Tier 1 resource limits and proposed allocation ceiling. Its current status is
 `AWAITING_OWNER_BUDGET_APPROVAL`; it is a prepared experiment, not an allocation.
+`run.py` verifies all 1,552 public points against the sealed scalar sidecars,
+then schedules eight cold IC children with three rho A/A calibrations on each
+side. It keeps the sidecars out of child inputs, records every capped child and
+stops before the ten-hour producer limit. Its fixture preflight passed with
+1,536 screen points, 16 holdout points and 56 screen events.
+`runpod_runner.py` binds the producer to a quoted Pod, four pinned CPUs,
+the recorded cgroup envelope, source commit and ten-hour cost limit. It keeps
+the allocation receipt with the raw results.
+`select.py` admits a fixed31 winner only from a complete independently replayed
+Tier 1 matrix, a passing same-base layout control, and all three pairwise
+exact sign tests at the Bonferroni threshold of 1/60.
 
 The merged source release example suite passed 24/24 tests with Rust 1.93.1;
 its command and output are retained in `rust-example-tests-merged-source.log`.
