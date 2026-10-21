@@ -304,7 +304,7 @@ to large `r` on the basis of this code.
 | Weil descent or trace-zero representation | A lower-dimensional polynomial system over a subfield | Separate extension-degree and target-family assumptions; no inference from this quadratic GLS panel. |
 
 The relevant primary literature includes the original
-[GLS construction](https://eprint.iacr.org/2008/117),
+[GLS construction](https://eprint.iacr.org/2008/194),
 [subfield-curve index calculus](https://pure.royalholloway.ac.uk/files/39395430/Accepted_Manuscript.pdf),
 [summation-polynomial symmetries](https://eprint.iacr.org/2014/806.pdf),
 and [GLS with GHS Weil descent](https://arxiv.org/abs/2106.09967).
