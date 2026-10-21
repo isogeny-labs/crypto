@@ -116,7 +116,10 @@ fn affine_points(curve: &PrimeCurve) -> Vec<PrimePoint> {
 }
 
 fn prime(n: u64) -> bool {
-    n >= 2 && (2..).take_while(|d| d * d <= n).all(|d| !n.is_multiple_of(d))
+    n >= 2
+        && (2..)
+            .take_while(|d| d * d <= n)
+            .all(|d| !n.is_multiple_of(d))
 }
 
 fn selected_pairs() -> Vec<(u64, u64)> {
