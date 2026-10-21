@@ -73,6 +73,7 @@ SOURCES = {
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
+    "s5_c4_component": "research/s5_plain_c4_options_20261019/raw/summary_r13.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -638,6 +639,41 @@ def pair_table_component() -> dict:
             "class": "engineering"}
 
 
+def s5_c4_component() -> dict:
+    """The plain-S5 C4 solver-stage improvement, separate from full-pipeline rows."""
+    summary = load(SOURCES["s5_c4_component"])
+    arms = {row.get("arm"): row for row in summary.get("arms", [])}
+    before = arms.get("committed", {})
+    after = arms.get("sparsest+chains+replay", {})
+    if (before.get("n") != 13 or before.get("solves") != 13
+            or after.get("n") != 12 or after.get("solves") != 13
+            or after.get("agree") != 13 or after.get("replays", []).count("Replayed") != 11
+            or after.get("replays", []).count("FellBack") != 1):
+        raise SystemExit("plain-S5 C4 component summary is incomplete or changed")
+    ratio = after["ratio_of_means"]
+    if not after["paired_min"] <= ratio <= after["paired_max"]:
+        raise SystemExit("plain-S5 C4 ratio of means is outside its paired range")
+    return {
+        "before_muls": before["mean"]["total_muls"],
+        "before_n": before["n"],
+        "after_muls": after["mean"]["total_muls"],
+        "after_n": after["n"],
+        "executions": after["solves"],
+        "oracle_equal": after["agree"],
+        "shape_replays": after["replays"].count("Replayed"),
+        "fallbacks": after["replays"].count("FellBack"),
+        "ratio": ratio,
+        "paired_min": after["paired_min"],
+        "paired_max": after["paired_max"],
+        "log2_before": before["log2_mean_c4"],
+        "log2_after": after["log2_mean_c4"],
+        "study": "research/s5_plain_c4_options_20261019/",
+        "report": "research/s5_plain_c4_options_20261019/REPORT.pdf",
+        "source": SOURCES["s5_c4_component"],
+        "class": "engineering",
+    }
+
+
 def latest_frontier_audit() -> dict:
     """Copy the latest performance handoff into the generated board.
 
@@ -1138,6 +1174,7 @@ def build() -> dict:
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
         "pair_table_component": pair_table_component(),
+        "s5_c4_component": s5_c4_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -1530,6 +1567,18 @@ def markdown(doc: dict) -> str:
                  f"{pts(r['setup_ms']['blocked'])} | {ptr(r['blocked_over_batch'])} | {ptr(r['blocked_over_scalar'])} | "
                  f"{r['run_blocked_over_scalar']:.2f} | {r['rss_gib']['batch']:.2f} → {r['rss_gib']['blocked']:.2f} GiB |")
     L.append("")
+    c4 = doc["s5_c4_component"]
+    L += ["## Plain-S₅ C₄ solver stage, outside tables A–C", "",
+          f"On §11.17's same instances, adding sparsest pivots, chain eigensteps and shape replay "
+          f"reduces the plain-S₅ solve's mean C₄ from {c4['before_muls']:.3e} to "
+          f"{c4['after_muls']:.3e} counted Fₚ multiplications ({c4['ratio']:.2f}×; class: "
+          f"{c4['class']}). The committed arm covers {c4['before_n']} solves; the replay arm's "
+          f"mean covers {c4['after_n']} later solves, with {c4['executions']} total outputs "
+          f"oracle-equal. It includes {c4['shape_replays']} shape replays and {c4['fallbacks']} "
+          f"fallback. Paired ratios are {c4['ratio']:.2f}× by ratio of means and "
+          f"[{c4['paired_min']:.2f}, {c4['paired_max']:.2f}] across paired instances. "
+          f"This is a solver-stage change: no full-pipeline row or curve verdict changes. "
+          f"Study: [{c4['study']}](../../{c4['study']}); [report](../../{c4['report']}).", ""]
     L += ["## Large-prime conductor-gap counted diagnostics", "",
           "Copied from native analysis: eight independent one-target workloads per fixed curve; "
           "no transported targets. Counted S has unpriced native work. These observations do "
@@ -1990,6 +2039,17 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td class="n">{r["run_blocked_over_scalar"]:.2f}</td>'
                  f'<td>{r["rss_gib"]["batch"]:.2f} → {r["rss_gib"]["blocked"]:.2f} GiB</td></tr>')
     P.append('</tbody></table></section>')
+    c4 = doc["s5_c4_component"]
+    P.append('<section class="card" id="s5-c4-solver-component"><h2>Plain-S₅ C₄ solver stage, outside the priced tables</h2>'
+             f'<p>On §11.17&#39;s same instances, sparsest pivots, chain eigensteps and shape replay reduce the '
+             f'plain-S₅ solve from {c4["before_muls"]:.3e} to {c4["after_muls"]:.3e} counted F<sub>p</sub> '
+             f'multiplications ({c4["ratio"]:.2f}×; class: {esc(c4["class"])}). The committed mean covers '
+             f'{c4["before_n"]} solves; the replay arm mean covers {c4["after_n"]} later solves, with '
+             f'{c4["executions"]} total outputs oracle-equal. The replay arm has {c4["shape_replays"]} shape '
+             f'replays and {c4["fallbacks"]} fallback. Paired ratios span [{c4["paired_min"]:.2f}, '
+             f'{c4["paired_max"]:.2f}]. This is a solver-stage change; no full-pipeline row or curve verdict '
+             f'changes. <a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["study"])}">Study</a>; '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(c4["report"])}">report</a>.</p></section>')
 
     head_cells = ('<th class="n">#</th><th>curve</th><th class="n">log₂ r</th><th>recipe</th>'
                   '<th class="n">m</th><th class="n">|F|</th><th class="n">K</th><th class="n">S, IC</th>'
