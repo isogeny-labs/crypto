@@ -2,6 +2,7 @@
 use serde_json::{json, Value};
 mod card;
 mod memory_profile;
+mod storage_summary;
 #[allow(dead_code)]
 #[path = "../../../src/cryptanalysis/ecbench/isolation.rs"]
 mod native_isolation;
@@ -306,7 +307,8 @@ fn memory_limit(v: &Value) -> R<u64> {
         Some(n) => n.as_u64().ok_or("invalid memory limit")?,
     };
     let extended = [2048, 4096].iter().any(|&k| v["columns"] == k)
-        && ((v["conflicts"] == 800000u64 && v["wall_seconds"] == 4800u64)
+        && ((v["conflicts"] == 450000u64 && v["wall_seconds"] == 2400u64)
+            || (v["conflicts"] == 800000u64 && v["wall_seconds"] == 4800u64)
             || (v["conflicts"] == 1000000u64 && v["wall_seconds"] == 6000u64))
         && !v["external_solver"].is_string()
         && !v["external_solver_blake3"].is_string();
@@ -321,6 +323,8 @@ fn memory_limit(v: &Value) -> R<u64> {
 fn explicit_memory_extension_keeps_legacy_and_control_limits() {
     assert_eq!(memory_limit(&json!({})).unwrap(), 4u64 << 30);
     for (k, conflicts, wall) in [
+        (2048, 450000, 2400),
+        (4096, 450000, 2400),
         (2048, 800000, 4800),
         (4096, 800000, 4800),
         (2048, 1000000, 6000),
@@ -1372,6 +1376,9 @@ fn main() -> R<()> {
         }
         Some("summarize-memory") if a.len() == 4 => {
             memory_profile::summarize(Path::new(&a[2]), Path::new(&a[3]))
+        }
+        Some("summarize-storage") if a.len() == 5 => {
+            storage_summary::summarize(Path::new(&a[2]), Path::new(&a[3]), Path::new(&a[4]))
         }
         Some("summarize-xor") if a.len() == 4 => {
             xor_summary::summarize(Path::new(&a[2]), Path::new(&a[3]))

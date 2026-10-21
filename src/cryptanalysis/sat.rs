@@ -84,6 +84,15 @@
 /// index (0-based internally; 1-based in DIMACS).
 pub type Lit = i32;
 
+fn capacity_bytes<T>(buffer: &Vec<T>) -> u64 {
+    buffer.capacity() as u64 * std::mem::size_of::<T>() as u64
+}
+
+fn storage_snapshot_due(phase: &str, conflicts: u64) -> bool {
+    matches!(phase, "solve_enter" | "solve_return")
+        || (phase == "conflict_snapshot" && conflicts.is_multiple_of(10_000))
+}
+
 #[inline]
 fn var_of(lit: Lit) -> u32 {
     lit.unsigned_abs() - 1
@@ -1886,10 +1895,134 @@ impl Solver {
         outcome
     }
 
+    /// Exact buffer ownership at this point, excluding allocator overhead and
+    /// everything outside this solver. Capacity bytes are not resident bytes.
+    /// The glibc/process observations are captured before allocating the JSON.
+    fn storage_inventory(&self) -> serde_json::Value {
+        #[cfg(all(target_os = "linux", target_env = "gnu"))]
+        let allocator = {
+            // SAFETY: mallinfo2 takes no pointers and returns process allocator
+            // counters by value. This does not inspect or modify allocations.
+            let info = unsafe { libc::mallinfo2() };
+            serde_json::json!({"backend":"glibc_mallinfo2",
+                "arena_bytes":info.arena,"in_use_arena_bytes":info.uordblks,
+                "mmap_bytes":info.hblkhd,"free_arena_bytes":info.fordblks})
+        };
+        #[cfg(not(all(target_os = "linux", target_env = "gnu")))]
+        let allocator = serde_json::Value::Null;
+        let process_status: Option<Vec<String>> = std::fs::read_to_string("/proc/self/status")
+            .ok()
+            .map(|raw| {
+                raw.lines()
+                    .filter(|line| {
+                        [
+                            "VmSize:", "VmRSS:", "VmHWM:", "RssAnon:", "RssFile:", "VmSwap:",
+                        ]
+                        .iter()
+                        .any(|prefix| line.starts_with(prefix))
+                    })
+                    .map(str::to_owned)
+                    .collect()
+            });
+        let components = std::collections::BTreeMap::from([
+            ("clause_arena", capacity_bytes(&self.arena)),
+            ("clause_offsets", capacity_bytes(&self.clause_at)),
+            ("detached_flags", capacity_bytes(&self.detached)),
+            ("watch_headers", capacity_bytes(&self.watches)),
+            (
+                "watch_entries",
+                self.watches.iter().map(capacity_bytes).sum(),
+            ),
+            ("xor_row_headers", capacity_bytes(&self.xors)),
+            (
+                "xor_row_masks",
+                self.xors.iter().map(|row| capacity_bytes(&row.mask)).sum(),
+            ),
+            ("xor_matrix", capacity_bytes(&self.matrix)),
+            ("xor_matrix_rhs", capacity_bytes(&self.matrix_rhs)),
+            ("xor_support_headers", capacity_bytes(&self.matrix_support)),
+            (
+                "xor_support_words",
+                self.matrix_support.iter().map(capacity_bytes).sum(),
+            ),
+            (
+                "xor_support_scratch",
+                capacity_bytes(&self.xor_support_src) + capacity_bytes(&self.xor_support_merge),
+            ),
+            ("xor_reason_headers", capacity_bytes(&self.xor_reason)),
+            (
+                "xor_reason_literals",
+                self.xor_reason.iter().map(capacity_bytes).sum(),
+            ),
+            ("xor_conflict", capacity_bytes(&self.xor_conflict)),
+            ("xor_pivots", capacity_bytes(&self.pivot)),
+            ("xor_row_scratch", capacity_bytes(&self.xor_src)),
+            ("literal_values", capacity_bytes(&self.values)),
+            (
+                "assignment_bitsets",
+                capacity_bytes(&self.assigned_w) + capacity_bytes(&self.value_w),
+            ),
+            (
+                "levels_and_reasons",
+                capacity_bytes(&self.level) + capacity_bytes(&self.reason),
+            ),
+            (
+                "phase_and_activity",
+                capacity_bytes(&self.saved_phase) + capacity_bytes(&self.activity),
+            ),
+            (
+                "trail",
+                capacity_bytes(&self.trail) + capacity_bytes(&self.trail_lim),
+            ),
+            (
+                "analysis_scratch",
+                capacity_bytes(&self.seen)
+                    + capacity_bytes(&self.seen_stack)
+                    + capacity_bytes(&self.redundant_stack)
+                    + capacity_bytes(&self.learnt_buf),
+            ),
+            (
+                "branch_heap",
+                capacity_bytes(&self.order.heap)
+                    + capacity_bytes(&self.order.pos)
+                    + capacity_bytes(&self.branch_priority)
+                    + capacity_bytes(&self.heap_key),
+            ),
+        ]);
+        let mut original_words = 0u64;
+        let mut active_learnt_words = 0u64;
+        let mut detached_learnt_words = 0u64;
+        let mut detached_learnt_clauses = 0u64;
+        for (index, &offset) in self.clause_at.iter().enumerate() {
+            let words = 1 + clause_in(&self.arena, offset).len() as u64;
+            if index < self.n_orig_clauses {
+                original_words += words;
+            } else if self.detached.get(index).copied().unwrap_or(false) {
+                detached_learnt_words += words;
+                detached_learnt_clauses += 1;
+            } else {
+                active_learnt_words += words;
+            }
+        }
+        serde_json::json!({"schema":"n83.sat-storage/v1",
+            "scope":"owned Vec buffer capacities, not RSS or allocator usable sizes; allocator/process counters include non-solver storage",
+            "components_capacity_bytes":components,
+            "owned_capacity_bytes":components.values().sum::<u64>(),
+            "arena_used_words":self.arena.len(),"arena_capacity_words":self.arena.capacity(),
+            "literal_word_bytes":std::mem::size_of::<Lit>(),
+            "original_clause_words":original_words,"active_learnt_clause_words":active_learnt_words,
+            "detached_learnt_clause_words":detached_learnt_words,
+            "stored_clauses":self.clause_at.len(),"original_clauses":self.n_orig_clauses,
+            "detached_learnt_clauses":detached_learnt_clauses,
+            "allocator":allocator,"worker_pid_in_namespace":std::process::id(),
+            "worker_process_status":process_status})
+    }
+
     /// Opt-in diagnostic snapshots. Timers and counters are cumulative for this
     /// solver instance; elapsed time is relative to this particular solve call.
     /// Writing only at boundaries and every 1,000 conflicts avoids a per-step
-    /// trace cost. A killed worker's last snapshot is not a terminal counter.
+    /// trace cost. Ownership snapshots add a read-only scan at solve boundaries
+    /// and every 10,000 conflicts. A killed worker's last snapshot is not terminal.
     fn trace_solve_phase(
         &self,
         started: Option<std::time::Instant>,
@@ -1898,6 +2031,8 @@ impl Solver {
     ) {
         if let Some(started) = started {
             use std::io::Write;
+            let storage =
+                storage_snapshot_due(phase, self.stats.conflicts).then(|| self.storage_inventory());
             let record = serde_json::json!({
                 "schema":"n83.sat-phase/v1", "phase":phase,
                 "elapsed_ms":started.elapsed().as_secs_f64()*1000.0,
@@ -1910,6 +2045,7 @@ impl Solver {
                 "ns_propagate_xors":self.stats.ns_propagate_xors,
                 "ns_analyze":self.stats.ns_analyze, "ns_minimize":self.stats.ns_minimize,
                 "ns_reduce_db":self.stats.ns_reduce_db,
+                "storage":storage,
             });
             let mut stderr = std::io::stderr().lock();
             let _ = writeln!(stderr, "{record}");
@@ -2406,6 +2542,70 @@ pub fn check_model(clauses: &[Vec<Lit>], model: &[bool]) -> bool {
 mod tests {
     use super::*;
     use std::collections::HashSet;
+
+    #[test]
+    fn storage_inventory_partitions_clause_words_and_nested_buffers() {
+        let mut s = Solver::new(8);
+        s.add_clause(vec![1, 2, 3]);
+        s.add_clause(vec![-1, 4]);
+        let originals = s.arena.len() as u64;
+        s.push_clause(&[2, 4, 5, 6]);
+        s.push_clause(&[-2, 7]);
+        s.detached.resize(s.clause_at.len(), false);
+        s.detached[s.n_orig_clauses] = true;
+        s.xor_reason[0] = Vec::with_capacity(19);
+        let inventory = s.storage_inventory();
+        assert_eq!(inventory["original_clause_words"], originals);
+        assert_eq!(inventory["active_learnt_clause_words"], 3);
+        assert_eq!(inventory["detached_learnt_clause_words"], 5);
+        assert_eq!(inventory["detached_learnt_clauses"], 1);
+        assert_eq!(inventory["arena_used_words"], originals + 8);
+        let components = inventory["components_capacity_bytes"].as_object().unwrap();
+        assert_eq!(components["clause_arena"], capacity_bytes(&s.arena));
+        assert_eq!(components["xor_reason_literals"], 19 * 4);
+        assert_eq!(
+            inventory["owned_capacity_bytes"].as_u64().unwrap(),
+            components
+                .values()
+                .map(|v| v.as_u64().unwrap())
+                .sum::<u64>()
+        );
+    }
+
+    #[test]
+    fn storage_observation_leaves_the_search_and_model_unchanged() {
+        let clauses = [vec![1, 2], vec![-1, 3], vec![-2, -3]];
+        let build = || {
+            let mut solver = Solver::new(4);
+            for clause in &clauses {
+                solver.add_clause(clause.clone());
+            }
+            solver.add_xor(&[2, 3, 4], true);
+            solver
+        };
+        let mut observed = build();
+        let mut reference = build();
+        let before_arena = observed.arena.clone();
+        let before_capacity = observed.arena.capacity();
+        let _ = observed.storage_inventory();
+        assert_eq!(observed.arena, before_arena);
+        assert_eq!(observed.arena.capacity(), before_capacity);
+        assert_eq!(observed.solve(), reference.solve());
+        assert_eq!(observed.model(), reference.model());
+        assert_eq!(observed.stats.conflicts, reference.stats.conflicts);
+        assert_eq!(observed.stats.decisions, reference.stats.decisions);
+        assert_eq!(observed.stats.propagations, reference.stats.propagations);
+        assert!(check_model(&clauses, &observed.model()));
+    }
+
+    #[test]
+    fn storage_sampling_is_limited_to_boundaries_and_ten_thousand_conflicts() {
+        assert!(storage_snapshot_due("solve_enter", 0));
+        assert!(storage_snapshot_due("solve_return", 450_000));
+        assert!(storage_snapshot_due("conflict_snapshot", 10_000));
+        assert!(!storage_snapshot_due("conflict_snapshot", 1_000));
+        assert!(!storage_snapshot_due("initial_propagation_complete", 0));
+    }
 
     // ── native XOR reasoning ────────────────────────────────────────
 
