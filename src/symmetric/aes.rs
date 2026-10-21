@@ -122,6 +122,7 @@ fn inv_sbox_ct(x: u8) -> u8 {
 /// AES key variants.
 pub enum AesKey {
     Aes128([u8; 16]),
+    Aes192([u8; 24]),
     Aes256([u8; 32]),
 }
 
@@ -129,6 +130,7 @@ impl AesKey {
     pub fn key_len(&self) -> usize {
         match self {
             AesKey::Aes128(_) => 16,
+            AesKey::Aes192(_) => 24,
             AesKey::Aes256(_) => 32,
         }
     }
@@ -141,14 +143,13 @@ impl AesKey {
     pub fn as_bytes(&self) -> &[u8] {
         match self {
             AesKey::Aes128(k) => k,
+            AesKey::Aes192(k) => k,
             AesKey::Aes256(k) => k,
         }
     }
 
-    /// Construct an `AesKey` from a raw byte slice.  Accepts 16 (AES-128)
-    /// or 32 (AES-256) bytes; returns `Err` for any other length.
-    /// AES-192 is intentionally not supported (24-byte variant has no
-    /// strong reason to ship at the educational scale).
+    /// Construct an `AesKey` from a raw byte slice. Accepts 16, 24, or 32
+    /// bytes for AES-128, AES-192, or AES-256, respectively.
     pub fn new(bytes: &[u8]) -> Result<Self, &'static str> {
         match bytes.len() {
             16 => {
@@ -156,12 +157,17 @@ impl AesKey {
                 k.copy_from_slice(bytes);
                 Ok(AesKey::Aes128(k))
             }
+            24 => {
+                let mut k = [0u8; 24];
+                k.copy_from_slice(bytes);
+                Ok(AesKey::Aes192(k))
+            }
             32 => {
                 let mut k = [0u8; 32];
                 k.copy_from_slice(bytes);
                 Ok(AesKey::Aes256(k))
             }
-            _ => Err("AES key must be 16 or 32 bytes"),
+            _ => Err("AES key must be 16, 24, or 32 bytes"),
         }
     }
 }
@@ -585,6 +591,17 @@ mod tests {
         assert_eq!(decrypt_block(&ct, &key), pt);
     }
 
+    #[test]
+    fn aes192_fips197_appendix_c2() {
+        let key = AesKey::new(&h("000102030405060708090a0b0c0d0e0f1011121314151617")).unwrap();
+        assert_eq!(key.key_len(), 24);
+        assert_eq!(key.nr(), 12);
+        let pt: [u8; 16] = h("00112233445566778899aabbccddeeff").try_into().unwrap();
+        let ct = encrypt_block(&pt, &key);
+        assert_eq!(&ct, h("dda97ca4864cdfe06eaf70a0ec0d7191").as_slice());
+        assert_eq!(decrypt_block(&ct, &key), pt);
+    }
+
     // ── AES-256 single-block KAT (FIPS 197 §C.3) ─────────────────────────────
 
     #[test]
@@ -602,7 +619,7 @@ mod tests {
 
     #[test]
     fn aes_decrypt_inverse() {
-        // Roundtrip AES-128 and AES-256 over many random-ish blocks.
+        // Roundtrip all three AES key sizes over many deterministic blocks.
         for seed in 0..16u8 {
             let mut k128 = [0u8; 16];
             for (i, b) in k128.iter_mut().enumerate() {
@@ -614,6 +631,13 @@ mod tests {
                 *b = seed.wrapping_add((i * 7) as u8);
             }
             assert_eq!(decrypt_block(&encrypt_block(&pt, &key128), &key128), pt);
+
+            let mut k192 = [0u8; 24];
+            for (i, b) in k192.iter_mut().enumerate() {
+                *b = seed.wrapping_mul(i as u8 + 2);
+            }
+            let key192 = AesKey::Aes192(k192);
+            assert_eq!(decrypt_block(&encrypt_block(&pt, &key192), &key192), pt);
 
             let mut k256 = [0u8; 32];
             for (i, b) in k256.iter_mut().enumerate() {

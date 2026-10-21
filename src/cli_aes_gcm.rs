@@ -22,10 +22,10 @@ pub struct GcmArgs {
     /// Read plaintext or ciphertext followed by its tag from a file.
     #[arg(long)]
     file: Option<PathBuf>,
-    /// Read 16 or 32 raw AES key bytes from a file.
+    /// Read 16, 24, or 32 raw AES key bytes from a file.
     #[arg(long, conflicts_with = "key_hex")]
     key_file: Option<PathBuf>,
-    /// Hex-encoded 16 or 32 byte key, useful for public test vectors.
+    /// Hex-encoded 16, 24, or 32 byte key, useful for public test vectors.
     #[arg(long)]
     key_hex: Option<String>,
     /// Unique 12-byte nonce for this encryption key, encoded as 24 hex digits.
@@ -126,6 +126,18 @@ mod tests {
         let decoded =
             transform(&args(None, Some(&hex::encode(encrypted)), Some(key)), true).unwrap();
         assert_eq!(decoded, [0u8; 16]);
+
+        let key192 = "00".repeat(24);
+        assert_eq!(
+            hex::encode(transform(&args(None, Some(""), Some(&key192)), false).unwrap()),
+            "cd33b28ac773f74ba00ed1f312572435"
+        );
+        assert_eq!(
+            hex::encode(
+                transform(&args(None, Some(&"00".repeat(16)), Some(&key192)), false).unwrap()
+            ),
+            "98e7247c07f0fe411c267e4384b0f6002ff58d80033927ab8ef4d4587514f0fb"
+        );
     }
 
     #[test]
@@ -150,7 +162,7 @@ mod tests {
     fn rejects_invalid_inputs() {
         assert!(transform(&args(None, None, Some(&"00".repeat(16))), false).is_err());
         assert!(transform(&args(None, Some("0"), Some(&"00".repeat(16))), false).is_err());
-        assert!(transform(&args(None, Some(""), Some(&"00".repeat(24))), false).is_err());
+        assert!(transform(&args(None, Some(""), Some(&"00".repeat(20))), false).is_err());
         let mut input = args(None, Some(""), Some(&"00".repeat(16)));
         input.nonce_hex = "00".into();
         assert!(transform(&input, false).is_err());
