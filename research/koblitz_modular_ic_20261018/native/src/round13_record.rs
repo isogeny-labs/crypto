@@ -3,6 +3,8 @@ use crate::{identity_certificate as ic, round02, round04::read, sha256_impl};
 use ic::Expr as E;
 use serde_json::json;
 use std::{collections::BTreeMap, path::Path};
+#[path = "round14_record.rs"]
+pub(crate) mod round14;
 fn hash(p: &Path) -> String {
     hex::encode(sha256_impl::sha256(&std::fs::read(p).unwrap()))
 }

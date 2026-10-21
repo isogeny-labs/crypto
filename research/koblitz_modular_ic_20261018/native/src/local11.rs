@@ -465,5 +465,5 @@ pub fn verify(dir: &Path) {
     );
 }
 
-#[path="ss12.rs"]
+#[path = "ss12.rs"]
 pub(crate) mod ss12;

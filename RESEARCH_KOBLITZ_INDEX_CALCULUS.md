@@ -11,24 +11,25 @@ pre-registered hypotheses)
 *On index calculus algorithms for subfield curves*, SAC 2020
 (ePrint 2020/1315).
 
-**Modular and low-genus carrier follow-up (2026-10-19):**
-[Round13](research/koblitz_modular_ic_20261018/rounds/13/REPORT.md)
-exhausts the ordinary antidiagonal500 as two simple degree250 closed
-points and product-plus-one580 as four simple degree145 points. Actual
-7/11 kernel transport checks24 commuting squares; the exported degree5
-fiber algebras are reparsed. All six images vanish in both retained
-projections by the integral C5 deck norm, under the written modular,
-pairing and descent bridges. No new whole principal row is assembled.
+**Modular and low-genus carrier follow-up (2026-10-20):**
+[Round14](research/koblitz_modular_ic_20261018/rounds/14/REPORT.md)
+completes the five remaining ordinary components:57 simple closed points
+of total degrees1760,1880,2760,1370,2180, with both images checked under
+the written global bridges. Forty fresh split columns have35 even and30
+odd nonzero images. The joined coupled principal rows give rank16/1348
+and nonzero-image ranks15/15. Eight separate deck-fiber rows raise these
+to20/1348 and18/17 on1200/1190 nonzero columns. They are not principal rows.
+All eight F2 closed signed divisors are complete under written Tate/moduli
+bridges:44 cusp orbits exhaust480 labels and reproduce the old product divisor.
 
-The four actual quotient circuits have counterpoints after constants,
-inverse cancellation, shared-factor and four-leaf Q14 repairs. Five
-characteristic-two square relations per graph give another certified
-step. Nonzero points survive that repair; this alone does not prove
-incomplete saturation. Full h-saturation and proper polarized F2 closed
-embeddings remain open. Other ordinary supports have degrees1760,1880,
-2760,1370,2180. Sixty-three new named Lean results include32 actual-circuit
-certificates; global geometry and native semantics remain partial.
-Ranks stay12/1308 and nonzero-image11 on1165/1160 columns. See the
+Q16/Q17 add98 linear products and288 coefficient quadrics per graph,
+without a new separating scalar boundary model. Full h-saturation remains
+open; surviving models alone do not prove failure. The canonical6lambda
+target is P^7775, with actual polarization pullbacks and corrected Cartier
+character Frobenius2M^-transpose. Global section bases, descent blocks and
+proper equations remain uncomputed. Sixty-five new named Lean results
+include actual F32 row checks and identity-minor ranks, with global geometry
+and native semantics still partial. See the
 [construction problem](problems/koblitz-modular-carrier-transfer.md).
 No IC cost or efficiency verdict is supplied.
 

@@ -1,6 +1,8 @@
 //! Ordinary middle points and full-level kernel fibers over exact residue fields.
 use super::*;
 use std::collections::BTreeSet;
+#[path = "ordinary14_lift.rs"]
+pub(crate) mod round14;
 type P = Vec<B>;
 fn pt(mut a: P) -> P {
     while a.last().is_some_and(|x| x.is_empty()) {
@@ -844,7 +846,10 @@ pub fn verify(dir: &Path) {
         let mid = decodepoint(&lift["middle"]);
         assert!(valid(&k, &mid));
         let jm = triple(&k, &mid);
-        assert_ne!(jm[0], jm[2], "distinct endpoint j-invariants certify nonbacktracking of this 49-chain");
+        assert_ne!(
+            jm[0], jm[2],
+            "distinct endpoint j-invariants certify nonbacktracking of this 49-chain"
+        );
         let b = ki(&k, &jm[0]);
         let b7 = ki(&k, &jm[1]);
         let dec = |z: &serde_json::Value| {

@@ -21,7 +21,7 @@ permissions:
 jobs:
   replay:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -126,6 +126,15 @@ jobs:
           round=research/koblitz_modular_ic_20261018/rounds/13
           (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
           "$round/REPLAY.sh"
+      - name: Replay round 14 ordinary images, closed divisors and polarized target
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/14
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          (cd "$round" && sha256sum -c validation-runs.tar.xz.sha256 && tar -xJf validation-runs.tar.xz && sha256sum -c validation-runs.sha256)
+          "$round/REPLAY.sh"
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round14-verify-sources "$round"
       - name: Install pinned Lean
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none

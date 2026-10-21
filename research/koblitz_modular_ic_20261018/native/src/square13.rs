@@ -1,5 +1,7 @@
 //! Characteristic-two squares of actual DAG linear forms, with explicit h-depth.
 use super::*;
+#[path = "products14.rs"]
+pub(crate) mod products14;
 #[derive(Clone)]
 struct Form {
     terms: BTreeMap<usize, E>,

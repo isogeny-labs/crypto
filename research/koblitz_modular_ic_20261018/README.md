@@ -1,24 +1,23 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [13](rounds/13/README.md), with its
-[report](rounds/13/REPORT.md), [PDF](rounds/13/report.pdf),
-[proof map](rounds/13/PROOF_MAP.md), [ledger](rounds/13/ledger.json)
-and exact replay. The ordinary antidiagonal500 consists of two simple
-degree250 closed points; product-plus-one580 consists of four simple
-degree145 points. Both retained projected images vanish for all six,
-under the written modular norm, pairing and descent bridges. Full source
-fiber algebras and24 commuting squares are exported and reparsed.
-No rank or whole principal row is promoted.
+The current round is [14](rounds/14/README.md), with its
+[report](rounds/14/REPORT.md), [PDF](rounds/14/report.pdf),
+[proof map](rounds/14/PROOF_MAP.md), [ledger](rounds/14/ledger.json)
+and exact replay. The five remaining ordinary components have57 simple
+closed points and complete even/odd images under the written global bridges.
+Forty fresh split columns contain35 even and30 odd nonzero images.
+The joined coupled principal rows have rank16/1348 and nonzero-image
+rank15/15. Adding eight separate deck-fiber rows gives rank20/1348 and
+nonzero-image ranks18/17 on1200/1190 columns. Deck rows are not principal.
 
-All four actual quotient circuits now have certified counterpoints after
-constants, inverse cancellations, shared-factor quadrics and four-leaf
-Q14 repairs. Characteristic-two square forms add five linear relations
-per circuit; nonzero boundary models still survive, which alone does not
-prove failure of saturation. Complete h-saturation, proper polarized F2
-closed embeddings, whole row assembly and five other ordinary components
-remain open. Sixty-three new named Lean results include32 actual-circuit
-certificates. Full native semantics and modular geometry remain partly
-formalized. No IC cost or efficiency verdict is supplied.
+All eight F2 closed signed divisors are complete under written bridges:
+O28 enumerates44 closed cusp orbits and reproduces the old product divisor. Q16/Q17
+add98 linear products and288 coefficient quadrics per circuit without a
+new separating scalar witness. Full h-saturation remains uncomputed.
+The canonical6lambda polarized target is P^7775, with actual pullback
+and corrected Cartier character data; global sections and proper equations
+remain open. Sixty-five new named Lean results retain explicit geometric
+and implementation limits. No IC cost or efficiency verdict is supplied.
 
 Earlier evidence stays frozen:
 
@@ -43,6 +42,10 @@ Earlier evidence stays frozen:
   complete product cusp divisor and the then-unresolved diagonal multiplicity gap.
 - [Round 11](rounds/11/README.md): closes the460 diagonal multiplicity gap
   using characteristic2 local equations;projective coupled-graph control.
+- [Round 12](rounds/12/README.md): complete SS strata and actual false
+  quotient boundary points with certified constant repairs.
+- [Round 13](rounds/13/README.md): ordinary500/580 supports and zero
+  deck images; inverse/shared/four-leaf/square saturation repairs.
 - [Open construction problem](../../problems/koblitz-modular-carrier-transfer.md):
   current obligations, exact scope, and next discriminating experiments.
 

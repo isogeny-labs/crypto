@@ -563,3 +563,57 @@ Neither finite Boolean restriction nor the existing round08 Kummer
 atlas suffices. Thirty-two actual-circuit certificates and structural
 identities are included among63 new named Lean theorems. No IC
 efficiency assessment or rank promotion is made.
+
+## Round14: all ordinary images, projected principal rows and deck relations
+
+[Round14](../research/koblitz_modular_ic_20261018/rounds/14/REPORT.md)
+completes the five ordinary components of degrees1760,1880,2760,1370,2180
+as16,10,15,13,3 simple closed points. Their25 pushed points and every
+scalar factor are exported and reparsed. Seventeen whole-deck points
+have zero images; all40 split points are directly evaluated in fields
+through degree560, with old-pairing/F32 alignment, cyclic kernels,
+commuting squares, normalized Frobenius and target order checks. There
+are35 even and30 odd nonzero fresh columns. Distinct actual base keys,
+scalar factors and disjoint old/new degree sets verify the catalog join.
+A separate u32 F32 checker rechecks points and row sums, and BigInt/u64
+rank calculations agree.
+
+All eight projected coupled principal rows are now complete under the
+written global bridges. Added to the retained catalog they give rank16/1348
+and nonzero-image ranks15/15. Eight separate C5 deck-fiber divisor relations
+give the larger joined ranks20/1348 and18/17 on1200/1190 nonzero columns.
+They are not called principal divisors. The all-eight geometric signed
+zero/pole divisors have exact degree balances, and all63 ordinary closed
+points across the old/new components have both images. O28 now constructs
+all44 actual normalized Frobenius cusp orbits, with multiplicities, covering
+all480 labels. The old22-point product divisor agrees exactly. Together
+with the SS and ordinary supports this completes all8 F2 closed signed
+divisors under the written Tate/moduli bridge. O27 remains a frozen earlier
+stage. The global moduli and native-field semantics are still partially formalized.
+
+Q16 generates98 linear product relations per actual circuit and Q17 gives
+288 coefficient quadrics. Neither family yields a new separating scalar
+model; no query hits the100000-node limit. Nonzero boundary models pass
+all repairs in Lean. This neither proves full saturation nor proves that
+the surviving points are false. The new Localization.Away theorem and
+containment/h-regularity criterion specify a full equality certificate,
+but no such certificate for the four complete ideals is produced.
+
+The proper polarized target is now specified intrinsically by the
+canonical Poincare bundle for lambda_A: its cube represents6lambda_A,
+has7776 sections and embeds in P^7775. Actual pullback matrices and
+Cartier character actions are checked. A first linear-dual-only action
+was preserved and corrected to2M^-transpose. Character permutations do
+not supply the section block matrices. The next constructive exit is a
+basis of the actual invariant global sections, its semilinear descent,
+coordinate multiplication relations and verified boundary/polarization
+identification, or a full saturation computation with that identification.
+The existing K-atlas and dimension counts alone do not discharge it.
+
+Sixty-five named Lean results include actual F32 row checks, identity
+minors and their ranks, fresh-coordinate independence, scalar deck
+augmentation, actual cusp orbit certificates and a genuine ideal-localization criterion. Global modular
+geometry, cusp descent and native field semantics remain partially formal.
+All source/raw hashes, failures, capped fibers, the cyclotomic correction,
+replay and final audit receipts are retained. No IC efficiency conclusion
+is supplied; the user's assessment remains separate from these exact ranks.

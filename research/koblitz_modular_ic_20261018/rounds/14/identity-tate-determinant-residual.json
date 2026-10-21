@@ -1,0 +1,187 @@
+{
+  "id": "IDC1ha34a7bddb759a0b1",
+  "independence": "native issuer plus128 extra checks;source-bound universal Lean theorem",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound14Cusps.lean",
+    "sha256": "1a58185820ab769fa0500846a5e56555af3b8f9b2defaf4fce6025a865af76cd"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610210104,
+  "statement": {
+    "degree_bound": 3,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": 2,
+                      "op": "const"
+                    },
+                    {
+                      "args": "a",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "i",
+                      "op": "var"
+                    },
+                    {
+                      "args": "d",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "b",
+                      "op": "var"
+                    },
+                    {
+                      "args": "c",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": [
+            {
+              "args": -1,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "a",
+                      "op": "var"
+                    },
+                    {
+                      "args": "d",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": -1,
+                      "op": "const"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "b",
+                          "op": "var"
+                        },
+                        {
+                          "args": "c",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "name": "tate-determinant-residual",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": "a",
+              "op": "var"
+            },
+            {
+              "args": "d",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": 2,
+                  "op": "const"
+                },
+                {
+                  "args": "i",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": 1,
+                  "op": "const"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "mul"
+    },
+    "source": "KoblitzRound14Cusps.tate_determinant_residual",
+    "variables": [
+      "a",
+      "b",
+      "c",
+      "d",
+      "i"
+    ]
+  },
+  "value_digest": "0aa29a4dbdb60fe40d153c5b7e200587da293bd4ea28fbd7ae4a188682aaebbc"
+}

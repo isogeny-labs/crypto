@@ -43,6 +43,7 @@ mod census;
 mod cofactor07;
 mod collision10;
 mod controls09;
+mod cusps14;
 mod delpezzo;
 mod delpezzo_conic;
 mod divisors10;
@@ -66,6 +67,7 @@ mod quotients06;
 mod quotients07;
 mod relations08;
 mod relations11;
+mod relations14;
 mod reverse06;
 mod round02;
 mod round03_record;
@@ -366,6 +368,125 @@ fn main() {
     if args10.get(1).map(String::as_str) == Some("--record-round13") {
         round13_record::record(std::path::Path::new(
             args10.get(2).expect("round13 complete receipts"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--record-round14") {
+        round13_record::round14::record(std::path::Path::new(
+            args10.get(2).expect("round14 completed evidence"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-sha256") {
+        round13_record::round14::digest(std::path::Path::new(args10.get(2).expect("file to hash")));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-check-identities") {
+        round13_record::round14::check_identities(std::path::Path::new(
+            args10.get(2).expect("round14 identity records"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-validation-manifest") {
+        round13_record::round14::validation_manifest(std::path::Path::new(
+            args10.get(2).expect("round14 validation directory"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-verify-sources") {
+        round13_record::round14::verify_sources(std::path::Path::new(
+            args10.get(2).expect("round14 source ledger"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-relations") {
+        relations14::run(std::path::Path::new(
+            args10
+                .get(2)
+                .expect("round14 complete images and old catalog"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-cusps") {
+        cusps14::run(std::path::Path::new(
+            args10
+                .get(2)
+                .expect("round14 actual cusp and divisor inputs"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-norms") {
+        ordinary13::factor::ordinary14::norms(std::path::Path::new(
+            args10.get(2).expect("fresh round14 output"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-middles") {
+        ordinary13::factor::lift::round14::middles(std::path::Path::new(
+            args10.get(2).expect("round14 supports"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-products") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::square13::products14::run(
+            std::path::Path::new(args10.get(2).expect("round14 circuit inputs")),
+        );
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-quadrics") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::square13::products14::quadrics(
+            std::path::Path::new(args10.get(2).expect("round14 circuit inputs")),
+        );
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-geometry") {
+        quotients06::geometry14::run(std::path::Path::new(
+            args10.get(2).expect("round14 actual graph inputs"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-boundary-lean") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::square13::products14::certify(
+            std::path::Path::new(args10.get(2).expect("round14 boundary data")),
+        );
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-fiber") {
+        ordinary13::factor::lift::round14::fiber(
+            std::path::Path::new(args10.get(2).expect("round14 middles")),
+            args10.get(3).expect("point index").parse().unwrap(),
+        );
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-verify-point") {
+        ordinary13::factor::lift::round14::verify_point(
+            std::path::Path::new(args10.get(2).expect("round14 fiber inputs")),
+            args10.get(3).expect("index").parse().unwrap(),
+        );
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-assemble") {
+        ordinary13::factor::lift::round14::assemble(std::path::Path::new(
+            args10.get(2).expect("round14 complete parsed outputs"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-images7") {
+        ordinary13::factor::lift::round14::images14::run(std::path::Path::new(
+            args10.get(2).expect("round14 split degree7 fiber"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-images-point") {
+        ordinary13::factor::lift::round14::images14::generic(
+            std::path::Path::new(args10.get(2).expect("round14 split fiber")),
+            args10.get(3).expect("index").parse().unwrap(),
+        );
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round14-supports") {
+        ordinary13::factor::ordinary14::supports(std::path::Path::new(
+            args10.get(2).expect("round14 norm inputs"),
         ));
         return;
     }
