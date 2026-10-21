@@ -21,6 +21,7 @@ CAP_SECONDS = 14400
 RSS_CAP_BYTES = 40 * 1024**3
 MIN_FREE_BYTES = 8 * 1024**3
 POLL_SECONDS = 2
+RSS_SAMPLE_TIMEOUT_SECONDS = 5
 FLAGS = {
     "KIC_INDEXED5_ID31": "1",
     "KIC_INDEXED5_LOAD80": "1",
@@ -53,10 +54,48 @@ def terminate_group(pid: int, sig: signal.Signals) -> None:
 
 
 def rss_bytes(pid: int) -> int | None:
-    sample = subprocess.run(["ps", "-o", "rss=", "-p", str(pid)],
-                            capture_output=True, text=True, check=False)
+    try:
+        sample = subprocess.run(["ps", "-o", "rss=", "-p", str(pid)],
+                                capture_output=True, text=True, check=False,
+                                timeout=RSS_SAMPLE_TIMEOUT_SECONDS)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
     value = sample.stdout.strip()
     return int(value) * 1024 if sample.returncode == 0 and value.isdigit() else None
+
+
+def supervise(child: subprocess.Popen, output: Path,
+              began: float) -> tuple[int, str | None, int]:
+    peak = 0
+    reason = None
+    try:
+        while child.poll() is None:
+            current = rss_bytes(child.pid)
+            if current is None:
+                if child.poll() is not None:
+                    break
+                reason = "RSS_SAMPLE_FAILED"
+            else:
+                peak = max(peak, current)
+                if current > RSS_CAP_BYTES:
+                    reason = "RSS_CAP"
+            if time.monotonic() - began > CAP_SECONDS:
+                reason = "TIMEOUT"
+            elif shutil.disk_usage(output).free < MIN_FREE_BYTES:
+                reason = "DISK_GUARD_STOP"
+            if reason:
+                break
+            time.sleep(POLL_SECONDS)
+    finally:
+        # Monitoring errors and keyboard interrupts must also retire the child.
+        if child.poll() is None:
+            terminate_group(child.pid, signal.SIGTERM)
+        try:
+            code = child.wait(timeout=30)
+        except subprocess.TimeoutExpired:
+            terminate_group(child.pid, signal.SIGKILL)
+            code = child.wait()
+    return code, reason, peak
 
 
 def checked_fixture() -> tuple[dict, dict]:
@@ -118,32 +157,12 @@ def run(binary: Path, output: Path, preflight_only: bool = False) -> int:
     environment.update(launch["environment_flags"])
     environment["TMPDIR"] = str(scratch)
     began = time.monotonic()
-    peak = 0
-    reason = None
     with (output / "stdout.jsonl").open("wb") as stdout, \
          (output / "stderr.log").open("wb") as stderr:
         child = subprocess.Popen(launch["command"], cwd=ROOT, env=environment,
                                  stdout=stdout, stderr=stderr,
                                  start_new_session=True)
-        while child.poll() is None:
-            current = rss_bytes(child.pid)
-            if current is not None:
-                peak = max(peak, current)
-            if current is not None and current > RSS_CAP_BYTES:
-                reason = "RSS_CAP"
-            elif time.monotonic() - began > CAP_SECONDS:
-                reason = "TIMEOUT"
-            elif shutil.disk_usage(output).free < MIN_FREE_BYTES:
-                reason = "DISK_GUARD_STOP"
-            if reason:
-                terminate_group(child.pid, signal.SIGTERM)
-                break
-            time.sleep(POLL_SECONDS)
-        try:
-            code = child.wait(timeout=30)
-        except subprocess.TimeoutExpired:
-            terminate_group(child.pid, signal.SIGKILL)
-            code = child.wait()
+        code, reason, peak = supervise(child, output, began)
     receipt = {
         "schema": "n83.k5500-current-source-full-control-receipt/v1",
         "status": reason or ("PROCESS_EXITED" if code == 0 else "PROCESS_FAILED"),
