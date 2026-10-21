@@ -1155,6 +1155,14 @@ conditions both sides ran under.  Before changing code for speed:
   tool's reach. Expect ±5–10% residual wall noise on cloud containers and
   CI runners, and measure it with an A/A run. Fix the thread count
   explicitly (`RAYON_NUM_THREADS=1`), and report the pinned CPUs.
+- **Profile to find the cost, then measure the change.** Before tuning a CPU
+  loop or a CUDA kernel, find where the time goes with `tools/profile.sh`
+  (the [profile skill](.agents/skills/profile/SKILL.md)). It covers `perf`
+  sampling, Callgrind, top-down, `nsys`, `ncu` and `nvidia-smi`, and records
+  the host, the tool versions and the binary hash. Profilers perturb what
+  they observe (ncu replays each launch at locked clocks), so a profile
+  explains a cost but never establishes a speedup. The measurement below
+  does.
 - **Measure the noise floor, then interleave.** Run the baseline against a
   copy of itself (A/A) to see the spread, then alternate baseline and
   candidate (ABAB…, at least five rounds) and report median and minimum.
