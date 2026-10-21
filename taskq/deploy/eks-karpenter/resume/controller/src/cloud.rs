@@ -475,15 +475,12 @@ fn checkpoint(stored: &mut Stored, st: &Status, dir: &Path) -> Result<(), String
         return Ok(());
     }
     if st.phase == "running" {
-        if st
-            .generation
-            .is_some_and(|n| s.generations.iter().any(|g| g.number == n))
-        {
-            s.phase = Phase::Running;
+        if s.checkpoint_resumed(st.generation)? {
+            s.finish_checkpoint();
             stored.save()?;
             return Ok(());
         }
-        rpc(s, "checkpoint", s.next_generation, None)?;
+        rpc(s, "checkpoint", s.intended_checkpoint()?, None)?;
         return Ok(());
     }
     if st.phase == "checkpointing" {
@@ -498,9 +495,12 @@ fn checkpoint(stored: &mut Stored, st: &Status, dir: &Path) -> Result<(), String
     let n = st
         .generation
         .ok_or("stopped checkpoint generation missing")?;
+    if n != s.intended_checkpoint()? {
+        return Err("stopped generation is not the intended generation".into());
+    }
     if let Some(g) = s.generations.iter().find(|g| g.number == n) {
         rpc(s, "continue", n, Some(g.manifest_sha256.clone()))?;
-        s.phase = Phase::Running;
+        s.finish_checkpoint();
         stored.save()?;
         return Ok(());
     }
@@ -914,7 +914,7 @@ fn tick(stored: &mut Stored, dir: &Path) -> Result<(), String> {
                     >= stored.state.last_checkpoint_at
                         + stored.state.request.checkpoint_interval_seconds
             {
-                stored.state.phase = Phase::Checkpointing;
+                stored.state.begin_checkpoint()?;
                 stored.save()?;
             }
         }

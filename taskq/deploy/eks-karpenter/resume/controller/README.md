@@ -13,6 +13,16 @@ EC2 `terminated` is the separate old-writer fence. An expiring heartbeat grants
 neither. API errors preserve state for bounded infrastructure retries. Failed
 correctness, runtime compatibility or benchmark admission is terminal.
 
+Before requesting a checkpoint, the controller persists the intended generation
+with its `Checkpointing` phase. That intent survives committing the generation
+and sending SIGCONT, until `Running` is persisted. A supervisor still reporting
+the previous generation therefore cannot complete a newly scheduled checkpoint.
+Restart reconciliation uses the persisted intent rather than the incremented
+next-generation counter. Older running states can acquire this field on their
+next checkpoint; an older state already in `Checkpointing` without an intent
+fails explicitly instead of guessing whether SIGCONT or a new checkpoint was
+pending.
+
 The supervisor has no service-account token or AWS credentials. It drops the
 payload's UID/GID, groups and capabilities before exec; the separate native
 progress launcher forces L0 and denies perf descriptors. CRIU restores with
@@ -31,6 +41,9 @@ a new Job name or another measurement attempt.
 Tests exercise immutable request binding, original deadlines, ambiguous owner
 and worker fences, incomplete generation retention, failed-measurement refusal,
 credential restoration, completion/checkpoint races and runtime identity.
+They also cover consecutive checkpoint generations and serialized controller
+restarts before and after SIGCONT. These transition tests do not replace a live
+multi-generation CRIU recovery qualification.
 Actual qualification evidence lives beside `resume/validation/` and determines
 which paths may be described as tested; unit tests alone do not prove recovery.
 

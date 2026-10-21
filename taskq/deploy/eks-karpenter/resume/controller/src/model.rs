@@ -66,6 +66,8 @@ pub struct State {
     pub attempt: u32,
     pub restores: u32,
     pub next_generation: u64,
+    #[serde(default)]
+    pub checkpoint_generation: Option<u64>,
     pub current_pod_uid: Option<String>,
     pub current_instance: Option<String>,
     #[serde(default)]
@@ -94,6 +96,7 @@ impl State {
             attempt: 0,
             restores: 0,
             next_generation: 1,
+            checkpoint_generation: None,
             current_pod_uid: None,
             current_instance: None,
             original_node_runtime: None,
@@ -150,6 +153,7 @@ impl State {
     }
     pub fn commit(&mut self, g: Generation) -> Result<(), String> {
         if self.phase != Phase::Checkpointing
+            || self.checkpoint_generation != Some(g.number)
             || g.number != self.next_generation
             || !g.eligible(&self.request_sha256)
             || self.current_instance.as_deref() != Some(g.source_instance.as_str())
@@ -165,6 +169,31 @@ impl State {
         }
         // Running is not persisted until the backend has reconciled SIGCONT.
         Ok(())
+    }
+    pub fn begin_checkpoint(&mut self) -> Result<(), String> {
+        if self.phase != Phase::Running {
+            return Err("checkpoint requires a running computation".into());
+        }
+        self.checkpoint_generation = Some(self.next_generation);
+        self.phase = Phase::Checkpointing;
+        Ok(())
+    }
+    pub fn intended_checkpoint(&self) -> Result<u64, String> {
+        if self.phase != Phase::Checkpointing {
+            return Err("checkpoint reconciliation requires checkpointing phase".into());
+        }
+        self.checkpoint_generation
+            .ok_or_else(|| "checkpoint intent is missing; refusing ambiguous reconciliation".into())
+    }
+    /// A running supervisor retains its last generation after SIGCONT. Only
+    /// the generation requested by this transition can complete this intent.
+    pub fn checkpoint_resumed(&self, observed: Option<u64>) -> Result<bool, String> {
+        let intended = self.intended_checkpoint()?;
+        Ok(observed == Some(intended) && self.generations.iter().any(|g| g.number == intended))
+    }
+    pub fn finish_checkpoint(&mut self) {
+        self.phase = Phase::Running;
+        self.checkpoint_generation = None;
     }
     pub fn confirm_terminated(
         &mut self,
@@ -203,6 +232,7 @@ impl State {
         self.current_pod_uid = None;
         self.current_instance = None;
         self.selected_generation = Some(generation);
+        self.checkpoint_generation = None;
         self.phase = Phase::Restoring;
         Ok(())
     }
@@ -244,10 +274,54 @@ mod tests {
     }
     fn committing() -> State {
         let mut s = state();
-        s.phase = Phase::Checkpointing;
+        s.phase = Phase::Running;
+        s.begin_checkpoint().unwrap();
         s.current_instance = Some("i-old".into());
         s.current_pod_uid = Some("pod-old".into());
         s
+    }
+    #[test]
+    fn periodic_checkpoints_survive_restart_on_both_sides_of_continue() {
+        fn restart(s: &State) -> State {
+            serde_json::from_slice(&serde_json::to_vec(s).unwrap()).unwrap()
+        }
+        let mut s = committing();
+        assert_eq!(s.intended_checkpoint().unwrap(), 1);
+        assert!(!s.checkpoint_resumed(None).unwrap());
+        s.commit(generation(&s)).unwrap();
+        s = restart(&s); // committed, before the continue RPC
+        assert_eq!(s.intended_checkpoint().unwrap(), 1);
+        assert_eq!(s.next_generation, 2);
+        assert!(s.checkpoint_resumed(Some(1)).unwrap());
+        s = restart(&s); // continue succeeded, Running save was lost
+        assert!(s.checkpoint_resumed(Some(1)).unwrap());
+        s.finish_checkpoint();
+        s = restart(&s);
+        s.begin_checkpoint().unwrap(); // the next interval expired
+        s = restart(&s); // persisted intent, before checkpoint RPC
+        assert_eq!(s.intended_checkpoint().unwrap(), 2);
+        assert!(!s.checkpoint_resumed(Some(1)).unwrap());
+        s.commit(generation(&s)).unwrap();
+        assert_eq!(s.generations.len(), 2);
+        assert_eq!(s.next_generation, 3);
+        s = restart(&s);
+        assert!(!s.checkpoint_resumed(Some(1)).unwrap());
+        assert!(s.checkpoint_resumed(Some(2)).unwrap());
+        s.finish_checkpoint();
+        assert_eq!(s.phase, Phase::Running);
+        assert_eq!(s.checkpoint_generation, None);
+    }
+    #[test]
+    fn legacy_checkpoint_state_without_intent_is_not_guessed() {
+        let s = committing();
+        let mut value = serde_json::to_value(&s).unwrap();
+        value
+            .as_object_mut()
+            .unwrap()
+            .remove("checkpoint_generation");
+        let legacy: State = serde_json::from_value(value).unwrap();
+        assert!(legacy.intended_checkpoint().is_err());
+        assert!(legacy.checkpoint_resumed(Some(1)).is_err());
     }
     #[test]
     fn ambiguous_controller_ownership_is_not_a_lease_expiry() {
