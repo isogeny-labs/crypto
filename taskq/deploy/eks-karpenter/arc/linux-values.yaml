@@ -32,7 +32,7 @@ template:
         effect: NoSchedule
     containers:
       - name: runner
-        image: ghcr.io/actions/actions-runner:2.338.0
+        image: 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/gha-runner@sha256:71692163462dc305dc4a8f312143e704938b5929b84256bec9d30a5b27e6e7bf
         command: ["/home/runner/run.sh"]
         resources:
           requests:
