@@ -38,7 +38,7 @@ bx.set(xlabel="Base field p", ylabel="Modular row updates per target",
        title="Online elimination volume")
 fig.suptitle("Point-driven pencil: completed pilot curves")
 fig.text(0.5, 0.02,
-         f"Run 20261021T1620Z · {sum(r['targets'] for r in rows)} source-verified candidate/rho pairs · M+0.5S+10I, 0.1 GAE/native operation",
+         f"2026-10-21 · {sum(r['targets'] for r in rows)} source-verified candidate/rho pairs · M+0.5S+10I, 0.1 GAE/native operation",
          ha="center", fontsize=8)
 fig.tight_layout(rect=[0, 0.07, 1, 0.93])
 for suffix in ("svg", "png"):

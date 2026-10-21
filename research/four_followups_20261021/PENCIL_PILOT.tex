@@ -7,11 +7,11 @@
 \date{21 October 2026}
 \begin{document}
 \maketitle
-\noindent\textbf{Scope.} Seven exact-order Scholten models, 60 public targets
-per model: one 16-bit, three 20-bit and three 24-bit source subgroups. Every
+\noindent\textbf{Scope.} Nine exact-order Scholten models, 60 public targets
+per model: three 16-bit, three 20-bit and three 24-bit source subgroups. Every
 candidate and same-process source-negation-rho scalar was recomputed on the
 source curve by the producer. The independent replay and source validator has
-completed all 420 targets across the seven raw files.
+completed all 540 targets across the nine raw files.
 The full 21-model, 1,260-target requirement is still open. This document
 reports measured counts, not a conclusion for the unrun sizes.
 
@@ -28,6 +28,8 @@ logical operation:
 $p$ & Verified targets & Verified relations & Row updates & Pencil/rho \\
 \midrule
 739 & 60/60 & 21,550 & 6,288,519 & 12.931178 \\
+1,151 & 60/60 & 33,703 & 20,344,734 & 28.666756 \\
+1,187 & 60/60 & 34,726 & 23,112,414 & 31.080921 \\
 3,371 & 60/60 & 98,666 & 442,470,426 & 246.117110 \\
 3,527 & 60/60 & 103,256 & 499,795,794 & 267.374941 \\
 3,931 & 60/60 & 114,989 & 690,243,338 & 332.187349 \\
@@ -37,10 +39,9 @@ $p$ & Verified targets & Verified relations & Row updates & Pencil/rho \\
 \bottomrule
 \end{tabular}
 \end{center}
-
-\begin{center}
-\includegraphics[width=0.85\linewidth]{pencil-pilot-cost.png}
-\end{center}
+Across the nine models and 36 price cells each, 0/324 pencil cells are below
+matched rho; cell ratios range from 7.870218 to 5,104.745253. The independent
+validator recomputed candidate, rho and ratio in all 324 cells from raw rows.
 
 \noindent\textbf{Accounting.} The direct prime-field modular arithmetic is
 recorded separately from the Jacobian backend. For each base-field inversion
@@ -52,9 +53,18 @@ the declared native rate. All 36 pricing cells per model are in
 native counters match the earlier frozen rho controls on every target.
 
 The F739 port reproduces all 61 earlier setup/target records after removing
-wall-clock fields. The sparse-row collector then recovered all 420 public
-scalars across these seven models. The raw JSONL and Rust analyzer are under
+wall-clock fields. The sparse-row collector then recovered all 540 public
+scalars across these nine models. The raw JSONL and Rust analyzer are under
 \path{results/pencil-pilot/} and \path{src/bin/analyze_pencil.rs}. One
 algorithm seed per target was used; no uncertainty interval or qualified
 wall-speed measurement was made.
+
+\clearpage
+\begin{center}
+\includegraphics[width=0.98\linewidth]{pencil-pilot-cost.png}
+\end{center}
+\noindent\textbf{Figure.} Complete cold one-target pencil/rho ratio and
+modular row updates per target on the nine fully replayed curve slices.
+Values are from the native summary; one seed was used per target and no
+uncertainty interval was measured.
 \end{document}

@@ -2,9 +2,9 @@
 
 - **Status:** `open`
 - **Kind:** implementation and measurement gap
-- **Affected work:** [five-leads follow-up](../research/five_leads_e2e_20261019/STATUS.md), L5
-- **Next action owner:** unassigned follow-up
-- **Last updated:** 2026-10-19
+- **Affected work:** [five-leads follow-up](../research/five_leads_e2e_20261019/STATUS.md), L5; [four follow-ups](../research/four_followups_20261021/REPORT.md)
+- **Next action owner:** PR #2304 follow-up
+- **Last updated:** 2026-10-21
 
 ## Problem
 
@@ -42,3 +42,13 @@ operation-model cost. The third qualifies a hardware-speed claim.
 ## Resolution and history
 
 2026-10-19: Formula-model compatibility checked; arithmetic and cohort replay unresolved.
+
+2026-10-21: [The branch gate](../research/four_followups_20261021/results/complete-law-branches.jsonl)
+now matches Cantor on 13,608 sampled 1+1, 12,096 sampled 1+2, and 6,551
+sampled 2+2 cases across the 21 exact-order models. These include 1,175
+targeted exceptional 2+2 cases, with a byte-identical second run. The
+formulas are still a standalone arithmetic gate: exceptional branch coverage
+is not exhaustive, the inversion-free law is not integrated into the
+collector, and zero of the 1,260 required DLP solves used it. An affine
+normalization with inversions is used only at the comparison boundary. The
+original completion conditions remain open.

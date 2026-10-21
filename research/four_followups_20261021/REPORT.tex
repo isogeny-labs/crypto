@@ -9,7 +9,7 @@
 \maketitle
 \noindent\textbf{Scope.} The frozen protocol covers four leads on 21 exact-order
 Scholten models, 60 separate targets per model. This report contains completed
-factor-base and jump experiments, a 420-target pencil pilot, checked branches of
+factor-base and jump experiments, a 540-target pencil pilot, checked branches of
 the published complete law, and an exact Kummer applicability gate. The full inversion-free law and full-cohort
 pencil collector remain open.
 All costs are cold one-target operation-count prices, not wall-speed claims.
@@ -48,7 +48,19 @@ interval or isolated wall-time result was measured.
 \end{center}
 
 \clearpage
-\section*{Kummer ordinary-addition gate}
+\section*{Kummer model and ordinary-addition gates}
+All 21 transferred quintics have five distinct finite rational Weierstrass
+roots. Exhaustive evaluation over each base field, derivative checks and
+reconstruction from the linear factors passed on 21/21 models. The six
+Weierstrass points including infinity are rational, giving full rational
+two-torsion on these models. This meets the field-of-definition condition
+for the fast-Kummer construction in
+\url{https://eprint.iacr.org/2005/314/}. The exact roots are in
+\path{results/kummer-model-gate.jsonl}; a fresh rerun matched byte-for-byte.
+\begin{center}
+\includegraphics[width=0.98\linewidth]{kummer-model-roots.png}
+\end{center}
+
 Set $P=\tau(G)$ and $Q=2P$. The unsigned quotient gives $K(Q)=K(-Q)$,
 but $K(P+Q)=K(3P)$ and $K(P-Q)=K(P)$ differ for order $r>4$.
 The source-order, Jacobian-arithmetic and distinct-output checks passed on
@@ -62,10 +74,10 @@ or priced.
 
 \clearpage
 \section*{Point-driven pencil pilot}
-Seven original models, $p=739,3371,3527,3931,11731,11887,12143$, each ran
-60 separate targets. All 420 candidate and same-process rho scalars passed
-source multiplication. The independent validator recomputed all 420 scalar
-pairs; their replay matched every non-wall field in seven raw files.
+Nine original models, $p=739,1151,1187,3371,3527,3931,11731,11887,12143$, each ran
+60 separate targets. All 540 candidate and same-process rho scalars passed
+source multiplication. The independent validator recomputed all 540 scalar
+pairs; their replay matched every non-wall field in nine raw files.
 The direct F739 port also reproduced all 61 prior records after removing wall
 fields. Full measured setup cost is charged to each cold one-target solve.
 \begin{center}\small
@@ -74,6 +86,8 @@ fields. Full measured setup cost is charged to each cold one-target solve.
 $p$ & Verified & Relations & Modular row updates & Pencil/rho \\
 \midrule
 739 & 60/60 & 21,550 & 6,288,519 & 12.931178 \\
+1,151 & 60/60 & 33,703 & 20,344,734 & 28.666756 \\
+1,187 & 60/60 & 34,726 & 23,112,414 & 31.080921 \\
 3,371 & 60/60 & 98,666 & 442,470,426 & 246.117110 \\
 3,527 & 60/60 & 103,256 & 499,795,794 & 267.374941 \\
 3,931 & 60/60 & 114,989 & 690,243,338 & 332.187349 \\
@@ -83,10 +97,20 @@ $p$ & Verified & Relations & Modular row updates & Pencil/rho \\
 \bottomrule
 \end{tabular}
 \end{center}
+Across the nine models and 36 pricing cells each, 0/324 pencil cells are below
+matched rho; cell ratios range from 7.870218 to 5,104.745253. The independent
+validator recomputed all three values in all 324 cells from raw rows.
 The price is $M+0.5S+10I$ plus 0.1 GAE per native logical operation; the
-independent validator recomputed 21 headline values from all seven models;
-the analyzer matched fresh rho counters to frozen controls on all seven. The 36-cell price grid and per-target
+independent validator recomputed 29 headline values from all nine models;
+the analyzer matched fresh rho counters to frozen controls on all nine. The 36-cell price grid and per-target
 JSONL are in \path{results/pencil-pilot/}. Upper-size runs are still open.
+One exploratory 28-bit target at $p=48{,}383$ also solved with both scalars
+source-verified. It recorded 20,814,919,424 modular row updates and a
+96,957.132823 pencil/rho ratio at the representative price. Its independent
+replay matched every non-wall field; an independent validator checked both
+source scalars and all 36 pricing cells. Their ratios range from 26.422722
+to 113,636.290374, with 0/36 below rho. See \texttt{PENCIL\_ONE\_TARGET.pdf}; this single target
+is separate from the seven complete curves.
 \begin{center}
 \includegraphics[width=0.98\linewidth]{pencil-pilot-cost.png}
 \end{center}
@@ -99,10 +123,12 @@ projective scales, 13,608/13,608 degree-one-pair additions matched Cantor:
 760 inverse pairs, 752 doublings and 12,096 distinct-point additions.
 All 12,096 sampled 1+2 cases matched Cantor: 9,492 generic disjoint,
 1,304 inverse-support cancellations, 1,258 repeated-support additions
-with a distinct remaining point, and 42 triplings. Generic distinct 2+2
-addition matched Cantor on 5,040 sampled cases and nonexceptional doubling
-on 336. Other 2+2 exceptional branches and the full DLP cohort remain
-unexecuted.
+with a distinct remaining point, and 42 triplings. Across 6,551 sampled
+2+2 additions, 5,040 were generic, 336 ordinary doublings, 483 degree-drop
+additions, 336 inverses, 294 shared-support additions, 42 same-polynomial
+mixed-sign additions, 13 special-point doublings and 7 degree-drop
+doublings. Every evaluated output matched Cantor. This does not prove
+exhaustive branch coverage; the full DLP cohort remains unexecuted.
 \begin{center}
 \includegraphics[width=0.98\linewidth]{complete-law-gate.png}
 \end{center}
@@ -110,16 +136,17 @@ unexecuted.
 \includegraphics[width=0.67\linewidth]{complete-law-2plus2.png}
 \end{center}
 
+\clearpage
 \section*{Open requirements and evidence}
 The published complete inversion-free genus-2 formulas are only partly
 implemented and have not run the 1,260 targets. The point-driven pencil collector
-has 420 new complete target solves but no full-cohort result here. A differential
+has 540 new complete target solves but no full-cohort result here. A differential
 Kummer collector remains unimplemented. These are open requirements, not
 negative end-to-end verdicts.
 
 The machine record consists of 35 raw matched JSONL arm files, 6,300 paired
 candidate/rho target rows, the full 36-cell price grid, summary JSON, 21
-Kummer witnesses, seven complete pencil JSONL files with a 36-cell-per-model
+Kummer witnesses and 21 model factorizations, nine complete pencil JSONL files with a 36-cell-per-model
 price grid, and a checksum manifest under
 \path{research/four_followups_20261021/}.
 The native analyzer pairs workload hashes, seeds, caps and source scalars;

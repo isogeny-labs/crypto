@@ -54,7 +54,70 @@ fn price_rho(row: &Value, square: f64, inversion: f64, native: f64) -> f64 {
         + native * (logical(&row["rho"]["native"]) + n(c, "field_adds") + n(c, "bit_ops"))
 }
 fn main() {
-    let files: Vec<String> = std::env::args().skip(1).collect();
+    let mut files: Vec<String> = std::env::args().skip(1).collect();
+    if files.first().map(String::as_str) == Some("--single") {
+        assert_eq!(
+            files.len(),
+            2,
+            "usage: analyze-pencil --single TWO_ROW_FILE.jsonl"
+        );
+        let path = files.pop().unwrap();
+        let input: Vec<Value> = BufReader::new(File::open(&path).unwrap())
+            .lines()
+            .map(|line| serde_json::from_str(&line.unwrap()).unwrap())
+            .collect();
+        assert_eq!(input.len(), 2, "single setup plus target");
+        assert_eq!(input[0]["schema"], "pencil-cohort-setup/v1");
+        let row = &input[1];
+        assert_eq!(row["schema"], "pencil-cohort-target/v1");
+        assert_eq!(row["verified"], true);
+        assert_eq!(row["rho"]["verified"], true);
+        assert_eq!(row["recovered"], row["planted"]);
+        assert_eq!(row["rho"]["recovered"], row["planted"]);
+        let p = row["p"].as_u64().unwrap();
+        let bits = row["bits"].as_u64().unwrap();
+        let csv_path = format!("{OUT}/f{p}-one-target-price-grid.csv");
+        let mut grid = File::create(&csv_path).unwrap();
+        writeln!(grid,"bits,p,target_index,S_per_M,I_per_M,native_GAE_per_logical,pencil_GAE,rho_GAE,pencil_over_rho").unwrap();
+        let mut representative = Value::Null;
+        let mut min_ratio = f64::INFINITY;
+        let mut max_ratio = f64::NEG_INFINITY;
+        let mut cells_below_rho = 0u64;
+        for square in [0.0, 0.5, 1.0] {
+            for inversion in [1.0, 10.0, 100.0, 1000.0] {
+                for native in [0.0, 0.1, 1.0] {
+                    let candidate = price_pencil(row, square, inversion, native);
+                    let rho = price_rho(row, square, inversion, native);
+                    let ratio = candidate / rho;
+                    min_ratio = min_ratio.min(ratio);
+                    max_ratio = max_ratio.max(ratio);
+                    cells_below_rho += u64::from(ratio < 1.0);
+                    writeln!(grid,"{bits},{p},{},{square},{inversion},{native},{candidate:.12},{rho:.12},{ratio:.12}",
+                        row["target_index"].as_u64().unwrap()).unwrap();
+                    if square == 0.5 && inversion == 10.0 && native == 0.1 {
+                        representative = json!({"pencil_GAE":candidate,"rho_GAE":rho,
+                            "pencil_over_rho":ratio});
+                    }
+                }
+            }
+        }
+        let summary = json!({"schema":"pencil-single-priced/v1","status":"single_target_exploratory",
+            "bits":bits,"p":p,"target_index":row["target_index"],
+            "candidate_source_verified":true,"rho_source_verified":true,
+            "verified_relations":row["verified_relations"],
+            "solver_row_updates":row["solver_row_updates"],
+            "stored_nonzero_coefficients":row["solver_stored_nonzero_coefficients"],
+            "representative":representative,"raw_path":path,"price_grid":csv_path,
+            "pricing_cell_count":36,"price_cells_below_rho":cells_below_rho,
+            "min_price_cell_ratio":min_ratio,"max_price_cell_ratio":max_ratio});
+        fs::write(
+            format!("{OUT}/f{p}-one-target-summary.json"),
+            serde_json::to_vec_pretty(&summary).unwrap(),
+        )
+        .unwrap();
+        println!("{}", serde_json::to_string_pretty(&summary).unwrap());
+        return;
+    }
     assert!(!files.is_empty(), "usage: analyze-pencil FILE.jsonl ...");
     let mut summaries = Vec::new();
     let mut grid = File::create(format!("{OUT}/price-grid.csv")).unwrap();
@@ -108,6 +171,9 @@ fn main() {
             .map(|r| r["solver_stored_nonzero_coefficients"].as_u64().unwrap())
             .sum();
         let mut representative = Value::Null;
+        let mut min_ratio = f64::INFINITY;
+        let mut max_ratio = f64::NEG_INFINITY;
+        let mut cells_below_rho = 0u64;
         for square in [0.0, 0.5, 1.0] {
             for inversion in [1.0, 10.0, 100.0, 1000.0] {
                 for native in [0.0, 0.1, 1.0] {
@@ -120,6 +186,9 @@ fn main() {
                         .map(|r| price_rho(r, square, inversion, native))
                         .sum();
                     let ratio = pencil / rho;
+                    min_ratio = min_ratio.min(ratio);
+                    max_ratio = max_ratio.max(ratio);
+                    cells_below_rho += u64::from(ratio < 1.0);
                     writeln!(grid, "{bits},{p},60,60,0,{square},{inversion},{native},{pencil:.12},{rho:.12},{ratio:.12},{relations},{updates},{stored}").unwrap();
                     if square == 0.5 && inversion == 10.0 && native == 0.1 {
                         representative =
@@ -131,10 +200,17 @@ fn main() {
         summaries.push(
             json!({"bits":bits,"p":p,"targets":60,"candidate_verified":60,
             "rho_verified":60,"verified_relations":relations,"solver_row_updates":updates,
-            "stored_nonzero_coefficients":stored,"representative":representative,"raw_path":path}),
+            "stored_nonzero_coefficients":stored,"representative":representative,"raw_path":path,
+            "pricing_cell_count":36,"price_cells_below_rho":cells_below_rho,
+            "min_price_cell_ratio":min_ratio,"max_price_cell_ratio":max_ratio}),
         );
     }
-    let summary = json!({"schema":"pencil-pilot-priced/v1","pricing":"full setup charged to every one-target solve; base inverse exponentiation multiplications removed when I is charged; scalar modular arithmetic and sparse-map updates charged as native logical work","slices":summaries});
+    let summary = json!({"schema":"pencil-pilot-priced/v1","pricing":"full setup charged to every one-target solve; base inverse exponentiation multiplications removed when I is charged; scalar modular arithmetic and sparse-map updates charged as native logical work",
+        "price_grid_summary":{"pricing_cell_count":summaries.len()*36,
+            "price_cells_below_rho":summaries.iter().map(|v|v["price_cells_below_rho"].as_u64().unwrap()).sum::<u64>(),
+            "min_price_cell_ratio":summaries.iter().map(|v|v["min_price_cell_ratio"].as_f64().unwrap()).fold(f64::INFINITY,f64::min),
+            "max_price_cell_ratio":summaries.iter().map(|v|v["max_price_cell_ratio"].as_f64().unwrap()).fold(f64::NEG_INFINITY,f64::max)},
+        "slices":summaries});
     fs::write(
         Path::new(OUT).join("summary.json"),
         serde_json::to_vec_pretty(&summary).unwrap(),

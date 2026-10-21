@@ -2,7 +2,7 @@
   "schema": "four-followups-combined-validator/v1",
   "status": "pass",
   "independent": true,
-  "method": "separate native factor-base and pencil validators; direct raw-row arithmetic and source checks",
+  "method": "separate native factor-base, nine-curve pencil, and single-target pencil validators; direct raw-row arithmetic and source checks",
   "raw_data": [
     {
       "path": "../../research/four_followups_20261021/results/matched/summary.json"
@@ -116,7 +116,19 @@
       "path": "../../research/four_followups_20261021/results/pencil-pilot/summary.json"
     },
     {
-      "path": "../../research/four_followups_20261021/results/pencil-pilot/f739-cohort.jsonl"
+      "path": "../../research/four_followups_20261021/results/pencil-pilot/f1151-cohort.jsonl"
+    },
+    {
+      "path": "../../research/four_followups_20261021/results/pencil-pilot/f11731-cohort.jsonl"
+    },
+    {
+      "path": "../../research/four_followups_20261021/results/pencil-pilot/f1187-cohort.jsonl"
+    },
+    {
+      "path": "../../research/four_followups_20261021/results/pencil-pilot/f11887-cohort.jsonl"
+    },
+    {
+      "path": "../../research/four_followups_20261021/results/pencil-pilot/f12143-cohort.jsonl"
     },
     {
       "path": "../../research/four_followups_20261021/results/pencil-pilot/f3371-cohort.jsonl"
@@ -128,13 +140,10 @@
       "path": "../../research/four_followups_20261021/results/pencil-pilot/f3931-cohort.jsonl"
     },
     {
-      "path": "../../research/four_followups_20261021/results/pencil-pilot/f11731-cohort.jsonl"
+      "path": "../../research/four_followups_20261021/results/pencil-pilot/f739-cohort.jsonl"
     },
     {
-      "path": "../../research/four_followups_20261021/results/pencil-pilot/f11887-cohort.jsonl"
-    },
-    {
-      "path": "../../research/four_followups_20261021/results/pencil-pilot/f12143-cohort.jsonl"
+      "path": "../../research/four_followups_20261021/results/pencil-pilot/f48383-one-target.jsonl"
     }
   ],
   "headline": [
@@ -229,21 +238,93 @@
       "rel_tol": 1E-11
     },
     {
-      "claimed": 4321445.680952382,
-      "name": "p739_pencil_GAE",
-      "recomputed": 4321445.680952382,
+      "claimed": 9500341.576190474,
+      "name": "p1151_pencil_GAE",
+      "recomputed": 9500341.576190474,
       "rel_tol": 1E-10
     },
     {
-      "claimed": 334188.08095238096,
-      "name": "p739_rho_GAE",
-      "recomputed": 334188.08095238096,
+      "claimed": 331406.22857142857,
+      "name": "p1151_rho_GAE",
+      "recomputed": 331406.22857142857,
       "rel_tol": 1E-10
     },
     {
-      "claimed": 12.931178361110227,
-      "name": "p739_pencil_over_rho",
-      "recomputed": 12.931178361110229,
+      "claimed": 28.66675625603955,
+      "name": "p1151_pencil_over_rho",
+      "recomputed": 28.66675625603955,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 5194614290.299999,
+      "name": "p11731_pencil_GAE",
+      "recomputed": 5194614290.299999,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 1199303.0095238094,
+      "name": "p11731_rho_GAE",
+      "recomputed": 1199303.0095238094,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 4331.361006391998,
+      "name": "p11731_pencil_over_rho",
+      "recomputed": 4331.361006391998,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 10460759.852380952,
+      "name": "p1187_pencil_GAE",
+      "recomputed": 10460759.852380952,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 336565.3095238096,
+      "name": "p1187_rho_GAE",
+      "recomputed": 336565.3095238096,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 31.08092116558711,
+      "name": "p1187_pencil_over_rho",
+      "recomputed": 31.080921165587114,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 5320809226.771431,
+      "name": "p11887_pencil_GAE",
+      "recomputed": 5320809226.771431,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 1379792.5285714285,
+      "name": "p11887_rho_GAE",
+      "recomputed": 1379792.5285714285,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 3856.238613119861,
+      "name": "p11887_pencil_over_rho",
+      "recomputed": 3856.2386131198605,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 5758653952.380952,
+      "name": "p12143_pencil_GAE",
+      "recomputed": 5758653952.380952,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 1354947.1380952382,
+      "name": "p12143_rho_GAE",
+      "recomputed": 1354947.1380952382,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 4250.094922873795,
+      "name": "p12143_pencil_over_rho",
+      "recomputed": 4250.094922873795,
       "rel_tol": 1E-10
     },
     {
@@ -301,62 +382,71 @@
       "rel_tol": 1E-10
     },
     {
-      "claimed": 5194614290.299999,
-      "name": "p11731_pencil_GAE",
-      "recomputed": 5194614290.299999,
+      "claimed": 4321445.680952382,
+      "name": "p739_pencil_GAE",
+      "recomputed": 4321445.680952382,
       "rel_tol": 1E-10
     },
     {
-      "claimed": 1199303.0095238094,
-      "name": "p11731_rho_GAE",
-      "recomputed": 1199303.0095238094,
+      "claimed": 334188.08095238096,
+      "name": "p739_rho_GAE",
+      "recomputed": 334188.08095238096,
       "rel_tol": 1E-10
     },
     {
-      "claimed": 4331.361006391998,
-      "name": "p11731_pencil_over_rho",
-      "recomputed": 4331.361006391998,
+      "claimed": 12.931178361110227,
+      "name": "p739_pencil_over_rho",
+      "recomputed": 12.931178361110229,
       "rel_tol": 1E-10
     },
     {
-      "claimed": 5320809226.771431,
-      "name": "p11887_pencil_GAE",
-      "recomputed": 5320809226.771431,
+      "claimed": 7.870218318986723,
+      "name": "min_price_cell_ratio",
+      "recomputed": 7.870218318986723,
       "rel_tol": 1E-10
     },
     {
-      "claimed": 1379792.5285714285,
-      "name": "p11887_rho_GAE",
-      "recomputed": 1379792.5285714285,
+      "claimed": 5104.745253402847,
+      "name": "max_price_cell_ratio",
+      "recomputed": 5104.745253402847,
       "rel_tol": 1E-10
     },
     {
-      "claimed": 3856.238613119861,
-      "name": "p11887_pencil_over_rho",
-      "recomputed": 3856.2386131198605,
+      "claimed": 6245360741.028572,
+      "name": "pencil_GAE",
+      "recomputed": 6245360741.028572,
       "rel_tol": 1E-10
     },
     {
-      "claimed": 5758653952.380952,
-      "name": "p12143_pencil_GAE",
-      "recomputed": 5758653952.380952,
+      "claimed": 64413.62857142858,
+      "name": "rho_GAE",
+      "recomputed": 64413.62857142858,
       "rel_tol": 1E-10
     },
     {
-      "claimed": 1354947.1380952382,
-      "name": "p12143_rho_GAE",
-      "recomputed": 1354947.1380952382,
+      "claimed": 96957.13282326676,
+      "name": "pencil_over_rho",
+      "recomputed": 96957.13282326677,
       "rel_tol": 1E-10
     },
     {
-      "claimed": 4250.094922873795,
-      "name": "p12143_pencil_over_rho",
-      "recomputed": 4250.094922873795,
+      "claimed": 26.422722479491743,
+      "name": "min_price_cell_ratio",
+      "recomputed": 26.422722479491746,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 113636.29037361444,
+      "name": "max_price_cell_ratio",
+      "recomputed": 113636.29037361445,
       "rel_tol": 1E-10
     }
   ],
+  "pencil_price_grid_cells_recomputed": 324,
+  "pencil_single_price_grid_cells_recomputed": 36,
   "subreports": [
     "factor-validator-report.json",
-    "pencil-validator-report.json"
+    "pencil-validator-report.json",
+    "pencil-single-validator-report.json"
   ]
 }

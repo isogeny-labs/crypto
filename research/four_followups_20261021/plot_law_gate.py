@@ -54,13 +54,21 @@ ax3.barh(y, [r["generic_2plus2_checked"] for r in rows],
 ax3.barh(y, [r["doubling_2plus2_checked"] for r in rows],
          left=[r["generic_2plus2_checked"] for r in rows],
          color="#f58518", height=0.76, label="doubling")
+targeted = [sum(r[key] for key in (
+    "degenerate_2plus2_checked", "inverse_2plus2_checked",
+    "shared_negative_2plus2_checked", "shared_positive_2plus2_checked",
+    "same_u_mixed_2plus2_checked", "special_doubling_2plus2_checked",
+    "degree_drop_doubling_2plus2_checked")) for r in rows]
+ax3.barh(y, targeted,
+         left=[r["generic_2plus2_checked"] + r["doubling_2plus2_checked"] for r in rows],
+         color="#4c78a8", height=0.76, label="targeted exceptional")
 ax3.set_yticks(y, [str(r["p"]) for r in rows])
 ax3.invert_yaxis()
-ax3.set_xlim(0, 270)
-ax3.set_xlabel("Cases matching Cantor per curve (16 × 16 ordered pairs)")
+ax3.set_xlim(0, 330)
+ax3.set_xlabel("Checks matching Cantor per curve (256 ordered pairs + targeted cases)")
 ax3.set_ylabel("Base-field prime p")
-ax3.set_title("2+2 sampled generic and doubling: 5,376 / 5,376 match")
-ax3.legend(ncol=2, loc="upper center", bbox_to_anchor=(0.5, -0.11), frameon=False)
+ax3.set_title("2+2: 6,551 checked additions match Cantor")
+ax3.legend(ncol=3, loc="upper center", bbox_to_anchor=(0.5, -0.11), frameon=False)
 ax3.spines[["top", "right"]].set_visible(False)
 fig2.tight_layout(pad=1.5)
 for ext in ("svg", "png"):

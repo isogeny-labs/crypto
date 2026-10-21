@@ -1,8 +1,7 @@
-//! Independent implementation of selected Ozbay Gurler–Hisil projective
-//! branches: 1+1 (equations 13/14), cancellation 1+2 (equation 15),
-//! and generic disjoint 1+2 (equation 18).
+//! Independent projective branch implementation from Ozbay Gurler–Hisil:
+//! sampled 1+1 and 1+2 formulas, generic 2+2, and targeted 2+2 exceptions.
 //! https://doi.org/10.1007/s13389-024-00351-7 (CC BY 4.0 article).
-//! This is an arithmetic gate, not the complete 1+2/2+2 law or a DLP run.
+//! This is an arithmetic gate, not an exhaustively checked complete law or DLP run.
 use five_leads_study::three_leads::{Divisor, Field, Jacobian, Scholten};
 use serde_json::json;
 
@@ -23,10 +22,64 @@ enum ResultPoint {
     DegreeOne(D1),
     DegreeTwo([u64; 6]),
 }
-fn add22_generic(a: Divisor, b: Divisor, f: &Field) -> Option<ResultPoint> {
+fn add22_shared(a: Divisor, b: Divisor, curve: &[u64], f: &Field) -> Option<ResultPoint> {
+    // Equation (21): recover the common and remaining points projectively.
+    let [r1, q1, _] = a.u;
+    let [t1, s1] = a.v;
+    let [r2, q2, _] = b.u;
+    let [t2, s2] = b.v;
+    let k = f.sub(q1, q2);
+    if k == 0 {
+        return None;
+    }
+    let k2 = f.sq(k);
+    let k3 = f.mul(k2, k);
+    let k5 = f.mul(k3, k2);
+    let x = f.mul(f.sub(r2, r1), k);
+    let point = |xx: u64, ss: u64, tt: u64| D1 {
+        x: xx,
+        y: f.add(f.mul(ss, f.mul(xx, k3)), f.mul(tt, k5)),
+        z: k,
+        w: 1,
+    };
+    let p1 = point(x, s1, t1);
+    let p3 = point(x, s2, t2);
+    let p2 = point(f.sub(f.neg(f.mul(q1, k2)), x), s1, t1);
+    let p4 = point(f.sub(f.neg(f.mul(q2, k2)), x), s2, t2);
+    if p1.y == f.neg(p3.y) {
+        return Some(add11(p2, p4, curve, f).0);
+    }
+    if p1.y != p3.y {
+        return None;
+    }
+    let ResultPoint::DegreeTwo(twice) = dbl(p1, curve, f) else {
+        unreachable!()
+    };
+    let ResultPoint::DegreeTwo(plus_p2) = add12_weighted_generic(p2, twice, curve, f)? else {
+        return None;
+    };
+    add12_weighted_generic(p4, plus_p2, curve, f)
+}
+fn add22_generic(a: Divisor, b: Divisor, curve: &[u64], f: &Field) -> Option<ResultPoint> {
     // Equations (10) and (12), with denominators cleared into output weights.
     assert_eq!(a.degree, 2);
     assert_eq!(b.degree, 2);
+    if a.u == b.u && b.v == [f.neg(a.v[0]), f.neg(a.v[1])] {
+        return Some(ResultPoint::Identity);
+    }
+    if a.u == b.u && a.v != b.v {
+        // Equation (20) specialized to affine inputs, then equation (13).
+        let k = f.sub(b.v[1], a.v[1]);
+        if k == 0 {
+            return None;
+        }
+        let k2 = f.sq(k);
+        let k3 = f.mul(k2, k);
+        let k5 = f.mul(k3, k2);
+        let x = f.mul(f.sub(a.v[0], b.v[0]), k);
+        let y = f.add(f.mul(a.v[1], f.mul(x, k3)), f.mul(a.v[0], k5));
+        return Some(dbl(D1 { x, y, z: k, w: 1 }, curve, f));
+    }
     let [r1, q1, _] = a.u;
     let [t1, s1] = a.v;
     let [r2, q2, _] = b.u;
@@ -39,8 +92,27 @@ fn add22_generic(a: Divisor, b: Divisor, f: &Field) -> Option<ResultPoint> {
     let aa = f.sub(f.mul(dt, common), f.mul(r2, f.mul(dq, ds)));
     let bb = f.sub(f.mul(dr, common), f.mul(r2, f.sq(dq)));
     let cc = f.sub(f.mul(dq, dt), f.mul(dr, ds));
-    if bb == 0 || cc == 0 {
-        return None;
+    if bb == 0 {
+        return add22_shared(a, b, curve, f);
+    }
+    if cc == 0 {
+        // Equation (11): the 2+2 output is a degree-one divisor.
+        let b2 = f.sq(bb);
+        let b3 = f.mul(b2, bb);
+        let b4 = f.sq(b2);
+        let b5 = f.mul(b4, bb);
+        let x = f.add(f.mul(f.add(q1, q2), b2), f.sq(aa));
+        let y = f.sub(
+            f.add(
+                f.sub(
+                    f.mul(x, f.mul(f.add(f.mul(q1, b2), x), aa)),
+                    f.mul(x, f.mul(s1, b3)),
+                ),
+                f.mul(r1, f.mul(aa, b4)),
+            ),
+            f.mul(t1, b5),
+        );
+        return Some(ResultPoint::DegreeOne(D1 { x, y, z: bb, w: 1 }));
     }
     let c2 = f.sq(cc);
     let c3 = f.mul(c2, cc);
@@ -84,8 +156,35 @@ fn double22_generic(a: Divisor, curve: &[u64], f: &Field) -> Option<ResultPoint>
     let aa = f.add(f.mul(common, qs_t), f.mul(common2, f.mul(r, s)));
     let bb = f.sub(f.mul(2, f.mul(qs_t, t)), f.mul(2, f.mul(r, f.sq(s))));
     let cc = f.add(f.mul(common, s), f.mul(common2, t));
-    if bb == 0 || cc == 0 {
-        return None;
+    if bb == 0 {
+        if s == 0 {
+            return Some(ResultPoint::Identity);
+        }
+        // Equation (19), then degree-one doubling (13).
+        let x = f.neg(f.mul(f.sub(f.mul(q, s), t), s));
+        let s2 = f.sq(s);
+        let s4 = f.sq(s2);
+        let y = f.mul(f.add(f.mul(s, t), x), s4);
+        return Some(dbl(D1 { x, y, z: s, w: 1 }, curve, f));
+    }
+    if cc == 0 {
+        // Equation (8): exceptional degree-one output of 2+2 doubling.
+        let b2 = f.sq(bb);
+        let b3 = f.mul(b2, bb);
+        let b4 = f.sq(b2);
+        let b5 = f.mul(b4, bb);
+        let x = f.add(f.mul(2, f.mul(q, b2)), f.sq(aa));
+        let y = f.sub(
+            f.add(
+                f.sub(
+                    f.mul(x, f.mul(f.add(f.mul(q, b2), x), aa)),
+                    f.mul(x, f.mul(s, b3)),
+                ),
+                f.mul(r, f.mul(aa, b4)),
+            ),
+            f.mul(t, b5),
+        );
+        return Some(ResultPoint::DegreeOne(D1 { x, y, z: bb, w: 1 }));
     }
     let c2 = f.sq(cc);
     let c3 = f.mul(c2, cc);
@@ -557,7 +656,7 @@ fn main() {
                 let output = if a == b {
                     double22_generic(a, &j.polynomial, &j.f)
                 } else {
-                    add22_generic(a, b, &j.f)
+                    add22_generic(a, b, &j.polynomial, &j.f)
                 };
                 if let Some(output) = output {
                     let got = normalize(output, &j.f);
@@ -572,6 +671,119 @@ fn main() {
                 }
             }
         }
+        let mut degenerate22 = 0;
+        let mut inverse22 = 0;
+        for &a in &d2_generic {
+            let b = j.neg(a);
+            assert_eq!(
+                normalize(
+                    add22_generic(a, b, &j.polynomial, &j.f).expect("inverse branch"),
+                    &j.f
+                ),
+                j.add(a, b)
+            );
+            inverse22 += 1;
+        }
+        for &a in d2_generic.iter().take(4) {
+            for &(x, y) in points.iter().take(6) {
+                let b = j.add(j.point(x, y), j.neg(a));
+                if b.degree != 2 {
+                    continue;
+                }
+                let Some(output) = add22_generic(a, b, &j.polynomial, &j.f) else {
+                    continue;
+                };
+                if !matches!(output, ResultPoint::DegreeOne(_)) {
+                    continue;
+                }
+                assert_eq!(
+                    normalize(output, &j.f),
+                    j.point(x, y),
+                    "2+2 degree drop p={p}"
+                );
+                degenerate22 += 1;
+            }
+        }
+        let mut shared_negative22 = 0;
+        let mut shared_positive22 = 0;
+        let mut shared_unchecked22 = 0;
+        let mut same_u_mixed22 = 0;
+        let mut special_doubling22 = 0;
+        let mut degree_drop_doubling22 = 0;
+        let (x0, y0) = points[0];
+        let (x1, y1) = points[2];
+        let a = j.add(j.point(x0, y0), j.point(x1, y1));
+        assert_eq!(a.degree, 2);
+        for b in [
+            j.add(j.point(x0, j.f.neg(y0)), j.point(x1, y1)),
+            j.add(j.point(x0, y0), j.point(x1, j.f.neg(y1))),
+        ] {
+            assert_eq!(a.u, b.u);
+            assert_ne!(a.v, b.v);
+            assert_ne!(a.v, j.neg(b).v);
+            let output = add22_generic(a, b, &j.polynomial, &j.f).expect("same-u mixed branch");
+            assert_eq!(normalize(output, &j.f), j.add(a, b), "same-u mixed p={p}");
+            same_u_mixed22 += 1;
+        }
+        if let Some(root_x) = (0..p.min(20_000)).find(|&x| evaluate(&j.f, &j.polynomial, x) == 0) {
+            for &(x, y) in &points {
+                if x == root_x {
+                    continue;
+                }
+                let special = j.add(j.point(root_x, 0), j.point(x, y));
+                if special.degree != 2 {
+                    continue;
+                }
+                let output = double22_generic(special, &j.polynomial, &j.f)
+                    .expect("special doubling branch");
+                assert_eq!(
+                    normalize(output, &j.f),
+                    j.add(special, special),
+                    "special doubling p={p}"
+                );
+                special_doubling22 += 1;
+                break;
+            }
+        }
+        for k in 1..=3000 {
+            let d = j.mul(seed, k);
+            if d.degree != 2 {
+                continue;
+            }
+            let expected = j.add(d, d);
+            if expected.degree != 1 {
+                continue;
+            }
+            let Some(output) = double22_generic(d, &j.polynomial, &j.f) else {
+                continue;
+            };
+            assert_eq!(
+                normalize(output, &j.f),
+                expected,
+                "2+2 degree-drop doubling p={p}"
+            );
+            degree_drop_doubling22 += 1;
+            break;
+        }
+        for &(x2, y2) in points.iter().step_by(2).skip(2) {
+            for negative in [true, false] {
+                let shared_y = if negative { j.f.neg(y0) } else { y0 };
+                let b = j.add(j.point(x0, shared_y), j.point(x2, y2));
+                if b.degree != 2 {
+                    continue;
+                }
+                if let Some(output) = add22_generic(a, b, &j.polynomial, &j.f) {
+                    assert_eq!(normalize(output, &j.f), j.add(a, b), "shared 2+2 p={p}");
+                    if negative {
+                        shared_negative22 += 1;
+                    } else {
+                        shared_positive22 += 1;
+                    }
+                } else {
+                    shared_unchecked22 += 1;
+                }
+            }
+        }
         println!(
             "{}",
             json!({"schema":"complete-law-branches-gate/v2","p":p,
@@ -582,6 +794,14 @@ fn main() {
             "tripling_1plus2_checked":tripling12,
             "exceptional_1plus2_unchecked":exceptional12,
             "generic_2plus2_checked":generic22,"doubling_2plus2_checked":doubling22,
+            "degenerate_2plus2_checked":degenerate22,
+            "inverse_2plus2_checked":inverse22,
+            "shared_negative_2plus2_checked":shared_negative22,
+            "shared_positive_2plus2_checked":shared_positive22,
+            "shared_2plus2_unchecked":shared_unchecked22,
+            "same_u_mixed_2plus2_checked":same_u_mixed22,
+            "special_doubling_2plus2_checked":special_doubling22,
+            "degree_drop_doubling_2plus2_checked":degree_drop_doubling22,
             "exceptional_2plus2_unchecked":exceptional22})
         );
     }
