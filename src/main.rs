@@ -2,6 +2,7 @@
 //!
 //! Commands:
 //!   hash    <algorithm> [message|--hex HEX|--file PATH] — Compute a hash
+//!   mac     <algorithm> --key-file PATH [message|--hex HEX|--file PATH]
 //!   ecc     keygen                     — Generate an ECC key pair
 //!   ecdsa   sign <privkey-hex> <msg>   — ECDSA sign
 //!   ecdsa   verify <pubkey-hex> <msg> <r-hex> <s-hex>
@@ -32,9 +33,11 @@ use crypto_lib::{
         point::Point,
     },
     hash::{
-        blake2b, blake2s, blake3_hash, md4, md5, ripemd160, sha1, sha224, sha256, sha384, sha3_224,
-        sha3_256, sha3_384, sha3_512, sha512, sha512_224, sha512_256, shake128, shake256,
-        skein1024, skein256, skein512, sm3, streebog_256, streebog_512, tiger, tiger2, whirlpool,
+        blake2b, blake2b_keyed, blake2s, blake2s_keyed, blake3_hash, blake3_keyed, hmac_sha1,
+        hmac_sha256, hmac_sha384, hmac_sha512, kmac128, kmac256, kmacxof128, kmacxof256, md4, md5,
+        ripemd160, sha1, sha224, sha256, sha384, sha3_224, sha3_256, sha3_384, sha3_512, sha512,
+        sha512_224, sha512_256, shake128, shake256, siphash, skein1024, skein256, skein512, sm3,
+        streebog_256, streebog_512, tiger, tiger2, whirlpool, SipKey,
     },
     kdf::hkdf::hkdf,
     pqc::kyber::{kyber_decapsulate, kyber_encapsulate, kyber_keygen},
@@ -81,6 +84,31 @@ enum Cmd {
         /// Required for SHAKE; optional for BLAKE2 and Skein.
         #[arg(long)]
         output_bytes: Option<usize>,
+    },
+    /// Compute a built-in keyed digest or message authentication code.
+    Mac {
+        algorithm: String,
+        /// UTF-8 message; use --hex or --file for arbitrary bytes.
+        #[arg(conflicts_with_all = ["hex", "file"])]
+        message: Option<String>,
+        /// Hex-encoded message bytes.
+        #[arg(long, conflicts_with = "file")]
+        hex: Option<String>,
+        /// Read message bytes from a file.
+        #[arg(long)]
+        file: Option<PathBuf>,
+        /// Read the raw key bytes from a file; avoids placing the key in argv.
+        #[arg(long, conflicts_with = "key_hex")]
+        key_file: Option<PathBuf>,
+        /// Hex-encoded key bytes, useful for public test vectors.
+        #[arg(long)]
+        key_hex: Option<String>,
+        /// Required output length for KMAC/XOF; optional for keyed BLAKE2.
+        #[arg(long)]
+        output_bytes: Option<usize>,
+        /// KMAC customization string as hex-encoded bytes.
+        #[arg(long)]
+        custom_hex: Option<String>,
     },
     /// ECC operations (keygen)
     Ecc {
@@ -662,6 +690,35 @@ fn main() {
                 std::process::exit(2);
             }
         },
+        Cmd::Mac {
+            algorithm,
+            message,
+            hex,
+            file,
+            key_file,
+            key_hex,
+            output_bytes,
+            custom_hex,
+        } => {
+            let result = load_hash_input(message.as_deref(), hex.as_deref(), file.as_deref())
+                .and_then(|bytes| {
+                    let key = load_mac_key(key_file.as_deref(), key_hex.as_deref())?;
+                    let custom = custom_hex
+                        .as_deref()
+                        .map(|hex| {
+                            from_hex(hex).map_err(|e| format!("invalid customization hex: {e}"))
+                        })
+                        .transpose()?;
+                    cmd_mac(&algorithm, &key, &bytes, output_bytes, custom.as_deref())
+                });
+            match result {
+                Ok(tag) => println!("{tag}"),
+                Err(error) => {
+                    eprintln!("mac: {error}");
+                    std::process::exit(2);
+                }
+            }
+        }
         Cmd::Ecc { op: EccOp::Keygen } => cmd_ecc_keygen(),
         Cmd::Ecdsa { op } => cmd_ecdsa(op),
         Cmd::Ecdh => cmd_ecdh(),
@@ -2594,6 +2651,81 @@ fn cmd_hash(alg: &str, bytes: &[u8], output_bytes: Option<usize>) -> Result<Stri
     Ok(digest)
 }
 
+fn load_mac_key(key_file: Option<&Path>, key_hex: Option<&str>) -> Result<Vec<u8>, String> {
+    match (key_file, key_hex) {
+        (Some(path), None) => {
+            std::fs::read(path).map_err(|e| format!("cannot read key file {}: {e}", path.display()))
+        }
+        (None, Some(hex)) => from_hex(hex).map_err(|e| format!("invalid key hex: {e}")),
+        _ => Err("provide exactly one of --key-file or --key-hex".into()),
+    }
+}
+
+fn cmd_mac(
+    alg: &str,
+    key: &[u8],
+    bytes: &[u8],
+    output_bytes: Option<usize>,
+    custom: Option<&[u8]>,
+) -> Result<String, String> {
+    if key.is_empty() {
+        return Err("MAC key must be nonempty".into());
+    }
+    if custom.is_some() && !matches!(alg, "kmac128" | "kmac256" | "kmacxof128" | "kmacxof256") {
+        return Err("--custom-hex applies only to KMAC".into());
+    }
+    let length = match alg {
+        "blake2b" => match output_bytes.unwrap_or(64) {
+            length @ 1..=64 if key.len() <= 64 => length,
+            _ => {
+                return Err(
+                    "keyed BLAKE2b requires a key of at most 64 bytes and output in 1..=64".into(),
+                )
+            }
+        },
+        "blake2s" => match output_bytes.unwrap_or(32) {
+            length @ 1..=32 if key.len() <= 32 => length,
+            _ => {
+                return Err(
+                    "keyed BLAKE2s requires a key of at most 32 bytes and output in 1..=32".into(),
+                )
+            }
+        },
+        "kmac128" | "kmac256" | "kmacxof128" | "kmacxof256" => match output_bytes {
+            Some(length @ 1..=1_048_576) => length,
+            _ => return Err("KMAC requires --output-bytes in 1..=1048576".into()),
+        },
+        _ => {
+            if output_bytes.is_some() {
+                return Err("--output-bytes applies only to keyed BLAKE2 and KMAC".into());
+            }
+            0
+        }
+    };
+    let tag = match alg {
+        "hmac-sha1" => to_hex(&hmac_sha1(key, bytes)),
+        "hmac-sha256" => to_hex(&hmac_sha256(key, bytes)),
+        "hmac-sha384" => to_hex(&hmac_sha384(key, bytes)),
+        "hmac-sha512" => to_hex(&hmac_sha512(key, bytes)),
+        "blake2b" => to_hex(&blake2b_keyed(key, bytes, length)),
+        "blake2s" => to_hex(&blake2s_keyed(key, bytes, length)),
+        "blake3" => {
+            let key: [u8; 32] = key.try_into().map_err(|_| "BLAKE3 key must be exactly 32 bytes")?;
+            to_hex(&blake3_keyed(&key, bytes))
+        }
+        "kmac128" => to_hex(&kmac128(key, bytes, custom.unwrap_or_default(), length)),
+        "kmac256" => to_hex(&kmac256(key, bytes, custom.unwrap_or_default(), length)),
+        "kmacxof128" => to_hex(&kmacxof128(key, bytes, custom.unwrap_or_default(), length)),
+        "kmacxof256" => to_hex(&kmacxof256(key, bytes, custom.unwrap_or_default(), length)),
+        "siphash24" => {
+            let key: [u8; 16] = key.try_into().map_err(|_| "SipHash key must be exactly 16 bytes")?;
+            format!("{:016x}", siphash(&SipKey(key), bytes))
+        }
+        _ => return Err(format!("unknown MAC algorithm {alg:?}; use hmac-sha1, hmac-sha256, hmac-sha384, hmac-sha512, blake2b, blake2s, blake3, kmac128, kmac256, kmacxof128, kmacxof256, or siphash24")),
+    };
+    Ok(tag)
+}
+
 fn cmd_ecc_keygen() {
     let curve = CurveParams::secp256k1();
     let kp = EccKeyPair::generate(&curve);
@@ -3004,7 +3136,7 @@ fn cmd_visual(op: VisualOp) {
 
 #[cfg(test)]
 mod hash_cli_tests {
-    use super::{cmd_hash, load_hash_input};
+    use super::{cmd_hash, cmd_mac, load_hash_input, load_mac_key};
 
     #[test]
     fn sha_variants_match_independent_abc_vectors() {
@@ -3088,5 +3220,44 @@ mod hash_cli_tests {
         assert!(load_hash_input(None, None, None).is_err());
         assert!(load_hash_input(Some("abc"), Some("616263"), None).is_err());
         assert!(load_hash_input(None, Some("0"), None).is_err());
+    }
+
+    #[test]
+    fn mac_cli_matches_published_vectors() {
+        assert_eq!(
+            cmd_mac("hmac-sha256", &[0x0b; 20], b"Hi There", None, None).unwrap(),
+            "b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7"
+        );
+        let key: Vec<u8> = (0x40..=0x5f).collect();
+        assert_eq!(
+            cmd_mac("kmac128", &key, &[0, 1, 2, 3], Some(32), None).unwrap(),
+            "e5780b0d3ea6f7d3a429c5706aa43a00fadbd7d49628839e3187243f456ee14e"
+        );
+        let sip_key: Vec<u8> = (0..16).collect();
+        assert_eq!(
+            cmd_mac("siphash24", &sip_key, b"", None, None).unwrap(),
+            "726fdb47dd0e0e31"
+        );
+        assert_eq!(
+            cmd_mac("blake2b", b"mykey", b"abc", None, None).unwrap(),
+            "49f1213c9db8d0b3018d2d4b0152ac7c2df055abc7d4409c1074186dc8d8d782884b95b152c30a5cae63405277147aca9f111b09e021520919d3ea53194015be"
+        );
+    }
+
+    #[test]
+    fn mac_cli_checks_key_and_algorithm_specific_inputs() {
+        assert!(cmd_mac("hmac-sha256", b"", b"abc", None, None).is_err());
+        assert!(cmd_mac("hmac-sha256", b"key", b"abc", Some(32), None).is_err());
+        assert!(cmd_mac("blake2s", &[7; 33], b"abc", None, None).is_err());
+        assert!(cmd_mac("blake3", &[7; 31], b"abc", None, None).is_err());
+        assert!(cmd_mac("siphash24", &[7; 15], b"abc", None, None).is_err());
+        assert!(cmd_mac("kmac256", b"key", b"abc", None, None).is_err());
+        assert!(cmd_mac("hmac-sha256", b"key", b"abc", None, Some(b"domain")).is_err());
+        assert!(load_mac_key(None, None).is_err());
+        assert!(load_mac_key(None, Some("0")).is_err());
+        let path = std::env::temp_dir().join(format!("crypto-mac-key-{}", std::process::id()));
+        std::fs::write(&path, [0, 255, 1, 128]).unwrap();
+        assert_eq!(load_mac_key(Some(&path), None).unwrap(), [0, 255, 1, 128]);
+        std::fs::remove_file(&path).unwrap();
     }
 }
