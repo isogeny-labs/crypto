@@ -438,16 +438,8 @@ def benchmark_archive_errors(repo: Path, admitted: dict[str, str], base: str | N
         known[directory] = line
 
     if base:
-        old_readme = git_show(base, BENCHMARKS_README)
-        if old_readme is not None:
-            old_rows = benchmark_groups(old_readme)
-            for directory, old_line in old_rows.items():
-                if directory not in admitted and known.get(directory) != old_line:
-                    errors.append(f"removed benchmark {directory} lacks an exact archival disposition")
-            for directory, line in known.items():
-                if directory not in old_rows:
-                    errors.append(f"archival record for {directory} does not match a row from the base table")
         old_archive = git_show(base, BENCHMARKS_ARCHIVE)
+        old_by_dir: dict[str, str] = {}
         if old_archive:
             try:
                 old_records = json.loads(old_archive).get("rows", [])
@@ -457,6 +449,15 @@ def benchmark_archive_errors(repo: Path, admitted: dict[str, str], base: str | N
                         errors.append(f"archival history for {directory} was removed or changed")
             except (ValueError, AttributeError, TypeError):
                 errors.append(f"{BENCHMARKS_ARCHIVE} on base is malformed")
+        old_readme = git_show(base, BENCHMARKS_README)
+        if old_readme is not None:
+            old_rows = benchmark_groups(old_readme)
+            for directory, old_line in old_rows.items():
+                if directory not in admitted and known.get(directory) != old_line:
+                    errors.append(f"removed benchmark {directory} lacks an exact archival disposition")
+            for directory, line in known.items():
+                if directory not in old_rows and old_by_dir.get(directory) != line:
+                    errors.append(f"archival record for {directory} does not match a row from the base table")
     return errors
 
 
