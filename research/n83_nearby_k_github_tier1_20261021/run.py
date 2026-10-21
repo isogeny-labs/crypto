@@ -149,6 +149,7 @@ def execute(binary, rho_binary, output):
     parent.write_json(output / "preflight.json", {"status": "PASS_HOST_ENVELOPE"})
     began = time.monotonic()
     completed = 0
+    all_passed = True
     try:
         for event in schedule:
             cap = (spec.IC_CAP_SECONDS if event["kind"] == "ic"
@@ -174,6 +175,7 @@ def execute(binary, rho_binary, output):
                   f"{usage['wall_seconds']:.3f}s", flush=True)
             completed += 1
             if usage["status"] != "PASS_PRODUCER":
+                all_passed = False
                 parent.write_json(output / "producer_stop.json", {
                     "status": "CHILD_FAILED", "event": event,
                     "child_status": usage["status"]})
@@ -184,9 +186,10 @@ def execute(binary, rho_binary, output):
         parent.write_json(output / "producer_summary.json", {
             "schema": "n83.nearby-k-github-tier1-producer-summary/v1",
             "completed_events": completed, "scheduled_events": len(schedule),
-            "status": "ALL_CHILDREN_EXITED" if completed == len(schedule)
+            "status": "ALL_CHILDREN_PASSED" if all_passed and
+                      completed == len(schedule)
                       else "INCOMPLETE"})
-    return 0 if completed == len(schedule) else 2
+    return 0 if all_passed and completed == len(schedule) else 2
 
 
 def main():
