@@ -76,8 +76,9 @@ coordinates and curve order were also computed independently with direct
 extension-field arithmetic and point enumeration. The command requires prime
 `p` in `7..=101`, a noncube `c<p`, prime `n` in `3..=2000000`, a nonsingular
 curve, and valid subgroup points. It counts `#E(F_{p³})`, requires `n` to
-divide that order, and supports a cofactor `h = #E/n` up to 64 when `h` is
-invertible modulo `n`. It samples cofactor components, verifies relations in
+divide that order, and requires the cofactor `h = #E/n` to be invertible modulo
+`n`. There is no separate cofactor size limit within the stated field and
+subgroup bounds. It samples cofactor components, verifies relations in
 the full group, then projects each relation by `[h]` before linear algebra.
 The projected factor base must contain a nonidentity subgroup point.
 `--input` also accepts `store:NAME` or `sha256:DIGEST`; the artifact store
@@ -104,6 +105,14 @@ A separate live S3 test fetched this input into a fresh cache through the
 `solve-cubic` command and verified scalar 5; its upload, HEAD, remote check,
 and cleanup receipt is
 [`CUBIC_TARGET_S3_ACCEPTANCE_20261018.json`](../store/CUBIC_TARGET_S3_ACCEPTANCE_20261018.json).
+
+The public order-3 subgroup input
+[`cubic_f7_cofactor116_public_target.json`](fixtures/cubic_f7_cofactor116_public_target.json)
+uses the same order-348 curve and a coprime cofactor of 116. With seed 1 and
+1,000 residuals, `ic solve-cubic --skip-rho` recovers scalar 2, verifies four
+relations, and replays the scalar on the supplied points. This exercises the
+former 64-cofactor boundary; larger instances remain subject to the field,
+subgroup, and relation budget bounds above.
 
 ### Checked cubic-field isogeny route
 

@@ -133,9 +133,9 @@ pub fn solve(args: &CubicArgs) -> Result<Value, String> {
         ));
     }
     let cofactor = curve_order / input.n;
-    if cofactor > 64 || cofactor.is_multiple_of(input.n) {
+    if cofactor.is_multiple_of(input.n) {
         return Err(format!(
-            "Gaudry cubic cofactor must be at most 64 and invertible modulo n; counted cofactor = {cofactor}"
+            "Gaudry cubic cofactor must be invertible modulo n; counted cofactor = {cofactor}"
         ));
     }
     // `d` is used only for generated known-answer reports. External input is
@@ -283,6 +283,25 @@ mod tests {
         })
         .unwrap_err();
         assert!(rejected.contains("factor base projects entirely to the identity"));
+    }
+
+    #[test]
+    fn coprime_cofactor_above_64_recovers_and_replays_external_target() {
+        let report = solve(&CubicArgs {
+            input: PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("docs/ic/fixtures/cubic_f7_cofactor116_public_target.json"),
+            route_file: None,
+            route_id: None,
+            seed: 1,
+            max_residuals: 1_000,
+            skip_rho: true,
+        })
+        .unwrap();
+        assert_eq!(report["input"]["curve_order"], 348);
+        assert_eq!(report["input"]["cofactor"], 116);
+        assert_eq!(report["ic"]["recovered_scalar"], 2);
+        assert_eq!(report["ic"]["relations_verified"], 4);
+        assert_eq!(report["verified"], true);
     }
 
     #[test]
