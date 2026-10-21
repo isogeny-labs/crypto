@@ -444,6 +444,7 @@ mod tests {
         assert_eq!(v["b"]["263"]["level"], "1");
         assert!(v["f"].is_null());
         assert!(parse_yaml("a: |\n  x\n").is_err());
+        assert!(parse_yaml("a:\n  -\n    b: 1\n").is_err());
         assert!(parse_yaml("a:\n  -\n").is_err());
     }
 
