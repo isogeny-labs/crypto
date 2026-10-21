@@ -102,6 +102,10 @@
    "path": "research/la_engines_20261014/summary.json",
    "sha256": "b34650a95c5f106c8302dc5311194d8e1ffb798dff59b2669cda59818712f533"
   },
+  "f4_fp_ic_effect": {
+   "path": "research/f4_fp_ic_effect_20261018/summary.json",
+   "sha256": "7eff13424e0e9b1a9dca5117f7598d797bb2a27366b60ecf7c61aadc45c13a60"
+  },
   "pair_table_setup": {
    "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
    "sha256": "e6f6f56f9db4c125e23e22009247e80e60386238108db8822f20efc2e1fdd8aa"
@@ -49656,6 +49660,203 @@
   "study": "research/la_engines_20261014/",
   "report": "research/la_engines_20261014/REPORT.pdf",
   "class": "engineering"
+ },
+ "f4_fp_component": {
+  "study": "research/f4_fp_ic_effect_20261018",
+  "run": "run-20261018T1548Z",
+  "pipeline": "examples/jv_cover.rs (Nagao decompositions on a genus-2 cover of E(F_{p^6}); every decomposition one f4_fp solve)",
+  "change": "f4_fp as on main before #1717 (4b6e09b78) against after #1717",
+  "class": "engineering",
+  "unit": "S counted by jv_cover (field multiplications priced in group additions); unpriced native work is not emitted by either arm, so S/rho is a lower-bound comparison",
+  "ccov": [
+   {
+    "p": 53,
+    "tests": 120,
+    "planted_found": [
+     20,
+     20
+    ],
+    "constructed": 20,
+    "c_cov_before": 6157721.75,
+    "c_cov_after": 1224314.95833,
+    "f4_muls_before": 5671366.45833,
+    "f4_muls_after": 737959.666667,
+    "lin_muls": [
+     482158.808333,
+     482158.808333
+    ],
+    "f4_degree": [
+     9.95833333333,
+     7.95833333333
+    ],
+    "max_rows": [
+     769.166666667,
+     234.583333333
+    ],
+    "total_ms": [
+     22.9666666667,
+     10.825
+    ],
+    "c_cov_ratio": 5.02952423156,
+    "f4_ratio": 7.68519841193
+   },
+   {
+    "p": 101,
+    "tests": 120,
+    "planted_found": [
+     20,
+     20
+    ],
+    "constructed": 20,
+    "c_cov_before": 6172092.33333,
+    "c_cov_after": 1222626.66667,
+    "f4_muls_before": 5686392.225,
+    "f4_muls_after": 736926.558333,
+    "lin_muls": [
+     481526.158333,
+     481526.158333
+    ],
+    "f4_degree": [
+     9.95833333333,
+     7.98333333333
+    ],
+    "max_rows": [
+     766.583333333,
+     231.283333333
+    ],
+    "total_ms": [
+     23.5583333333,
+     8.85833333333
+    ],
+    "c_cov_ratio": 5.04822322431,
+    "f4_ratio": 7.71636218114
+   },
+   {
+    "p": 251,
+    "tests": 120,
+    "planted_found": [
+     20,
+     20
+    ],
+    "constructed": 20,
+    "c_cov_before": 6252565.74167,
+    "c_cov_after": 1284448.725,
+    "f4_muls_before": 5712778.63333,
+    "f4_muls_after": 744661.616667,
+    "lin_muls": [
+     534854.541667,
+     534854.541667
+    ],
+    "f4_degree": [
+     9.95,
+     7.975
+    ],
+    "max_rows": [
+     766.566666667,
+     231.216666667
+    ],
+    "total_ms": [
+     23.725,
+     9.06666666667
+    ],
+    "c_cov_ratio": 4.86789828194,
+    "f4_ratio": 7.67164374458
+   }
+  ],
+  "dlp": [
+   {
+    "p": 53,
+    "seed": 1,
+    "bits": 32.367524182,
+    "residuals": 19020,
+    "relations": 31,
+    "solved": [
+     true,
+     true
+    ],
+    "correct": [
+     true,
+     true
+    ],
+    "s_before": 4734.31642876,
+    "s_after": 936.893173124,
+    "s_ratio": 5.05320837484,
+    "rho_s_mean": 1.10181839577,
+    "rho_s_sd": 0.203886577414,
+    "rho_runs": 4,
+    "s_over_rho_before": 4296.82100694,
+    "s_over_rho_after": 850.315421057
+   },
+   {
+    "p": 53,
+    "seed": 2,
+    "bits": 32.367516421,
+    "residuals": 8486,
+    "relations": 33,
+    "solved": [
+     true,
+     true
+    ],
+    "correct": [
+     true,
+     true
+    ],
+    "s_before": 2120.62816189,
+    "s_after": 425.190667611,
+    "s_ratio": 4.98747579245,
+    "rho_s_mean": 1.15071081783,
+    "rho_s_sd": 0.68853994202,
+    "rho_runs": 4,
+    "s_over_rho_before": 1842.8853966,
+    "s_over_rho_after": 369.502624833
+   },
+   {
+    "p": 101,
+    "seed": 1,
+    "bits": 37.9492681424,
+    "residuals": 40100,
+    "relations": 53,
+    "solved": [
+     true,
+     true
+    ],
+    "correct": [
+     true,
+     true
+    ],
+    "s_before": 1454.61532544,
+    "s_after": 287.523438271,
+    "s_ratio": 5.05911912497,
+    "rho_s_mean": 1.48264380916,
+    "rho_s_sd": 0.521461378759,
+    "rho_runs": 4,
+    "s_over_rho_before": 981.095605333,
+    "s_over_rho_after": 193.926171948
+   },
+   {
+    "p": 101,
+    "seed": 2,
+    "bits": 37.9492710976,
+    "residuals": 65422,
+    "relations": 50,
+    "solved": [
+     true,
+     true
+    ],
+    "correct": [
+     true,
+     true
+    ],
+    "s_before": 2370.4731038,
+    "s_after": 466.435697425,
+    "s_ratio": 5.08210052722,
+    "rho_s_mean": 1.24943925903,
+    "rho_s_sd": 0.577182217748,
+    "rho_runs": 4,
+    "s_over_rho_before": 1897.22956653,
+    "s_over_rho_after": 373.316024814
+   }
+  ]
  },
  "pair_table_component": {
   "schema": "ic_oracle_setup_blocked.result/v1",

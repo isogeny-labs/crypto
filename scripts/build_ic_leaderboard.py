@@ -73,6 +73,7 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "f4_fp_ic_effect": "research/f4_fp_ic_effect_20261018/summary.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
@@ -1178,6 +1179,9 @@ def build(allow_unvalidated: bool = False) -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        # A component speed-up (the F_p Gröbner engine) copied from its study's
+        # frozen summary; it moves no row of tables A-C.
+        "f4_fp_component": load(SOURCES["f4_fp_ic_effect"]),
         "pair_table_component": pair_table_component(),
         "planner_component": planner_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
@@ -1606,6 +1610,17 @@ def markdown(doc: dict) -> str:
         observed = session["arms"]["ic-mitm"]["cross_curve"]
         L.append(f"| {session['ell']} | {observed['ratio_floor_over_crater']:.6f} | "
                  f"{observed['ci99'][0]:.6f} to {observed['ci99'][1]:.6f} |")
+    fp = doc["f4_fp_component"]
+    L += ["", "## F_p Gröbner engine (`f4_fp`) in the Jacobian-cover IC", "",
+          f"Component speed-up, class {fp['class']}: `f4_fp` before and after #1717 in "
+          f"{fp['pipeline']}, same seeds and the same relations, every DLP solved and verified "
+          f"by both builds (`{fp['study']}`, {fp['run']}). It moves no row of tables A–C. "
+          "S/rho is a lower-bound comparison (unpriced native work is not emitted).", "",
+          "| p | seed | relations | S before | S after | before ÷ after | S/rho before | S/rho after (distance to rho) |",
+          "|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    for r in fp["dlp"]:
+        L.append(f"| {r['p']} | {r['seed']} | {r['relations']} | {r['s_before']:.4g} | {r['s_after']:.4g} | "
+                 f"{r['s_ratio']:.2f} | {r['s_over_rho_before']:.0f} | {r['s_over_rho_after']:.0f} |")
     n83 = doc["n83_tier1_cold_holdout"]
     ab = n83["paired_intervals"]["k1120|k1152"]
     close = n83["paired_intervals"]["k1120|k1104"]
@@ -2383,6 +2398,20 @@ def page(doc: dict, standalone: bool) -> str:
         P.append(f'<tr><td>{session["ell"]}</td><td>{observed["ratio_floor_over_crater"]:.6f}</td>'
                  f'<td>{observed["ci99"][0]:.6f} to {observed["ci99"][1]:.6f}</td></tr>')
     P.append('</tbody></table>' + gh(SOURCES["conductor_gap_counts"], 'Native analysis and source records') + '</section>')
+
+    fp = doc["f4_fp_component"]
+    P.append('<section id="f4-fp-component"><h2>F<sub>p</sub> Gröbner engine (<code>f4_fp</code>) in the Jacobian-cover IC</h2>'
+             f'<p>Component speed-up, class {esc(fp["class"])}: <code>f4_fp</code> before and after #1717 in '
+             f'{esc(fp["pipeline"])}, same seeds and the same relations, every DLP solved and verified by both '
+             'builds. It moves no row of tables A–C. S/rho is a lower-bound comparison (unpriced native work '
+             'is not emitted); the after column is the distance remaining to rho.</p>'
+             '<table><thead><tr><th>p</th><th>seed</th><th>relations</th><th>S before</th><th>S after</th>'
+             '<th>before ÷ after</th><th>S/rho before</th><th>S/rho after</th></tr></thead><tbody>')
+    for r in fp["dlp"]:
+        P.append(f'<tr><td>{r["p"]}</td><td>{r["seed"]}</td><td>{r["relations"]}</td><td>{r["s_before"]:.4g}</td>'
+                 f'<td>{r["s_after"]:.4g}</td><td>{r["s_ratio"]:.2f}</td><td>{r["s_over_rho_before"]:.0f}</td>'
+                 f'<td>{r["s_over_rho_after"]:.0f}</td></tr>')
+    P.append('</tbody></table>' + gh(fp["study"], 'Study, run report and raw records') + '</section>')
 
     n83 = doc["n83_tier1_cold_holdout"]
     baseline = n83["paired_intervals"]["k1120|k1152"]
