@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "85119ac435526fa2e25b4efff00523e87559e321b64d8a4da2ceab4df73acc55",
+      "sha256": "35ffcd45513292e70bd3ede08cc1245ad1b927b553e21decf78d580628bd8bbf",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -234,7 +234,7 @@
     },
     {
       "path": ".github/workflows/curve-covers.yml",
-      "sha256": "24d68c9c56a3f7cabc19eea4132d665a891001938c97af7bcf58549edd01b26a",
+      "sha256": "76efb47bebbf31d77c41c4a7b708bc2ff6e4c777d29a914648618030a7eeb0c3",
       "role": "exact implementation-version dependency: .github/workflows/curve-covers.yml",
       "freshness": {
         "status": "supported",
@@ -247,7 +247,7 @@
     },
     {
       "path": ".github/workflows/release.yml",
-      "sha256": "357376e0a9f1036af36e1e7baddad8a9025552b8985de985dd15471a5faf8ae5",
+      "sha256": "7e975ddc129c8fbe9aa484393bab0619690e86ab785c34502594e0d19963579c",
       "role": "exact implementation-version dependency: .github/workflows/release.yml",
       "freshness": {
         "status": "supported",
@@ -325,7 +325,7 @@
     },
     {
       "path": "src/cryptanalysis/mod.rs",
-      "sha256": "a2ce25bacbe559f226e857fb3f782c84f8db003661896a6472b23ae4d7e763b7",
+      "sha256": "9243f2a6bef62a20f899a3295bd7326960437a0a3cbe07bd03f8537429a44a6a",
       "role": "exact implementation-version dependency: src/cryptanalysis/mod.rs",
       "freshness": {
         "status": "supported",
@@ -536,7 +536,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
-      "sha256": "1564f7f9417cc61743c6de90b8c51a651226ebb394dc337e7aac35b33bb0eaf5",
+      "sha256": "105c8129d55e4dfbc6b81aa1a508e764f79d8941f0a4661becba72bb1efe2d17",
       "role": "independent catalog-wide assessment verifier",
       "freshness": {
         "status": "supported",
@@ -548,8 +548,21 @@
       }
     },
     {
+      "path": "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
+      "sha256": "931ff983a3ee710a23c5d7a1963ddfc878e3b51aa4a88cfedfb71044de80f2e1",
+      "role": "PDF coverage-marker metadata normalization source",
+      "freshness": {
+        "status": "supported",
+        "scope": "byte identity of this assessment artifact at the generated-ledger revision",
+        "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
+        "evidence_refs": [
+          "research/cover_transfer_assessment_20261013/set_pdf_metadata.py"
+        ]
+      }
+    },
+    {
       "path": "research/cover_transfer_assessment_20261013/README.md",
-      "sha256": "4e7487df3020487a4f91fe77cd79aa2f0ee8c10ebe9333050c16688678569233",
+      "sha256": "78d569c55990be95d6e7ade7deee6c3e314cc89726b9e15431dde8c0bc4b69f5",
       "role": "source-linked catalog-wide assessment report",
       "freshness": {
         "status": "supported",
@@ -692,7 +705,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
-      "sha256": "f4cbec1abe99e4c8085673829a3cc7c107d86abf67f9f4908d166073199c0556",
+      "sha256": "1f6cde8011714af43814bd28aca117e048f3d6cf3f58eba9c444712328cbed8e",
       "role": "rendered catalog-wide assessment PDF",
       "freshness": {
         "status": "supported",

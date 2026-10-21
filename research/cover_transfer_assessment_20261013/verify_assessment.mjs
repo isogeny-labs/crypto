@@ -219,14 +219,13 @@ function evidenceReferencePath(reference) {
 
 function pdfLiteralMetadata(bytes, key) {
   const source = bytes.toString("latin1");
-  const prefix = `/${key}(`;
-  const start = source.indexOf(prefix);
-  if (start === -1) {
+  const match = new RegExp(`/${key}\\s*\\(`, "u").exec(source);
+  if (match === null) {
     return null;
   }
   const decoded = [];
   let depth = 1;
-  for (let index = start + prefix.length; index < source.length; index += 1) {
+  for (let index = match.index + match[0].length; index < source.length; index += 1) {
     const character = source[index];
     if (character === "\\") {
       const escaped = source[index + 1];
@@ -1079,6 +1078,7 @@ const requiredSourceArtifactPaths = [
   "src/prime_hyperelliptic/curve.rs",
   "src/utils/mod.rs",
   "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
+  "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
   "research/cover_transfer_assessment_20261013/typed_transfer_context.dot",
   "research/cover_transfer_assessment_20261013/typed_transfer_context.svg",
   "research/cover_transfer_assessment_20261013/typed_transfer_context.png",

@@ -1,0 +1,11 @@
+--- /tmp/orig_f4.rs	2026-10-20 06:16:10.719593973 +0000
++++ /dev/shm/x/src2245/src/cryptanalysis/inherited_f4.rs	2026-10-20 06:11:48.624526780 +0000
+@@ -698,7 +698,7 @@
+         }
+         #[cfg(target_arch = "x86_64")]
+         {
+-            std::arch::is_x86_feature_detected!("bmi2")
++            false /* bisect: BMI2 wordwise rewrite off */
+         }
+         #[cfg(not(target_arch = "x86_64"))]
+         {

@@ -58,8 +58,8 @@ def identity(pid, proc=Path('/proc')):
     # Fields after the final ') ' begin at field 3; starttime is field 22.
     start = p.joinpath('stat').read_text().rsplit(') ', 1)[1].split()[19]
     executable = p.joinpath('exe').resolve(strict=True)
-    if executable != EXECUTABLE:
-        raise ValueError('Only the explicitly supported factor-base executable may be registered')
+    if not executable.is_absolute() or not stat.S_ISREG(p.joinpath('exe').stat().st_mode):
+        raise ValueError('Registered executable must be an absolute regular file')
     return {'pid': int(pid), 'start_ticks': start, 'executable': str(executable),
             'command_sha256': hashlib.sha256(p.joinpath('cmdline').read_bytes()).hexdigest(),
             'cwd': str(p.joinpath('cwd').resolve(strict=True))}
@@ -72,9 +72,10 @@ def same_process(job):
         return False
 
 
-def backing_paths(job, proc=Path('/proc')):
+def backing_paths(job, proc=Path('/proc'), extra_outputs=()):
     p = proc / str(job['pid'])
-    paths = {EXECUTABLE.resolve(strict=True)}
+    executable = Path(job['executable'])
+    paths = {executable.resolve(strict=True)}
     cwd = Path(job['cwd'])
     for line in p.joinpath('maps').read_text().splitlines():
         fields = line.split(None, 5)
@@ -82,14 +83,15 @@ def backing_paths(job, proc=Path('/proc')):
             continue
         path = Path(fields[5])
         resolved = path.resolve(strict=True)
-        if resolved != EXECUTABLE and not any(resolved.is_relative_to(root.resolve()) for root in LIBRARIES):
+        if resolved != executable and not any(resolved.is_relative_to(root.resolve()) for root in LIBRARIES):
             raise ValueError('Mapped backing file is outside the executable/library allowlist')
         paths.add(resolved)
     for fd in p.joinpath('fd').iterdir():
         path = Path(os.readlink(fd))
         if path == Path('/dev/null'):
             continue
-        if fd.name not in {'1', '2'} or not path.is_absolute() or not path.resolve().is_relative_to(cwd):
+        if (fd.name not in {'1', '2'} or not path.is_absolute()
+                or not (path.resolve().is_relative_to(cwd) or str(path.resolve()) in extra_outputs)):
             raise ValueError('Unsupported external descriptor; do not guess restore requirements')
         resolved = path.resolve(strict=True)
         if not resolved.is_file():
@@ -119,6 +121,24 @@ def capture(directory):
         info = source.stat()
         os.chown(target, info.st_uid, info.st_gid)
     atomic_json(directory / 'backing-directories.json', directories)
+    job = json.loads((directory / 'job.json').read_text())
+    for name in [job.get('cwd'), *json.loads((directory/'extra-directories.json').read_text())] if (directory/'extra-directories.json').exists() else [job.get('cwd')]:
+        if not name:
+            continue
+        for parent in [Path(name), *Path(name).parents]:
+            target = directory/'filesystem'/parent.relative_to('/')
+            target.mkdir(parents=True,exist_ok=True)
+            info=parent.stat();shutil.copystat(parent,target);os.chown(target,info.st_uid,info.st_gid)
+            directories[str(parent)]={'mode':stat.S_IMODE(info.st_mode),'uid':info.st_uid,'gid':info.st_gid}
+    atomic_json(directory/'backing-directories.json',directories)
+    offsets = {}
+    for line in Path('/proc', str(job['pid']), 'timens_offsets').read_text().splitlines():
+        clock, seconds, nanos = line.split()
+        offsets[clock] = int(seconds) * 1000000000 + int(nanos)
+    atomic_json(directory / 'clocks.json', {
+        'monotonic_ns': time.clock_gettime_ns(time.CLOCK_MONOTONIC) + offsets.get('monotonic', 0),
+        'boottime_ns': time.clock_gettime_ns(time.CLOCK_BOOTTIME) + offsets.get('boottime', 0),
+        'realtime_ns': time.time_ns(), 'restore_policy': 'resume-saved-monotonic-time-excluding-downtime'})
 
 
 def validate_generation(directory):
@@ -171,7 +191,11 @@ def snapshot(root, criu):
             directory = parent / ('gen-' + str(time.time_ns()))
             directory.mkdir(mode=0o700)
             (directory / 'images').mkdir(mode=0o700)
-            atomic_json(directory / 'backing-paths.json', backing_paths(job))
+            atomic_json(directory / 'job.json', job)
+            recovery=json.loads((root/'recovery.json').read_text()) if (root/'recovery.json').exists() else {}
+            contract=recovery.get('contracts',{}).get(str(job['pid']),{})
+            atomic_json(directory/'extra-directories.json',contract.get('required_directories',[]))
+            atomic_json(directory / 'backing-paths.json', backing_paths(job,extra_outputs=[contract.get('stdout'),contract.get('stderr')]))
             action = directory / 'capture.sh'
             action.write_text('#!/bin/bash\nset -eu\nexec /usr/bin/python3 ' +
                 shlex.quote(str(Path(__file__).resolve())) + ' post-dump --root ' + shlex.quote(str(directory)) + '\n')
@@ -201,6 +225,7 @@ def main():
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--pid', type=int, action='append', default=[])
     parser.add_argument('--criu', type=Path, default=Path('/home/ec2-user/.local/bin/criu-4.2.1'))
+    parser.add_argument('--executable',type=Path,action='append',default=[])
     args = parser.parse_args()
     if os.geteuid() != 0:
         parser.error('Root is required; process memory images must stay private')
@@ -214,8 +239,12 @@ def main():
     if args.action == 'register':
         if not args.pid or (args.root / 'registry.json').exists():
             parser.error('Register explicit PIDs once; use a new root for another set')
+        jobs=[identity(pid) for pid in args.pid]
+        allowed={str(p.resolve()) for p in args.executable} if args.executable else {str(EXECUTABLE)}
+        if any(j['executable'] not in allowed for j in jobs):
+            parser.error('Every non-default executable requires explicit --executable registration')
         atomic_json(args.root / 'registry.json', {'schema': 'spot.criu-registry/v1',
-                    'jobs': [identity(pid) for pid in args.pid], 'off_host_export': False})
+                    'jobs': jobs, 'off_host_export': False})
     elif args.action == 'snapshot':
         snapshot(args.root, args.criu)
     elif args.action == 'verify':
