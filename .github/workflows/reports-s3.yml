@@ -38,7 +38,7 @@ concurrency:
 jobs:
   upload:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|reports-s3.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|reports-s3.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
-    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (45) || 15 }}
+    timeout-minutes: 45
     env:
       BUCKET: ${{ vars.REPORTS_S3_BUCKET || 'crypto-autoresearcher' }}
       AWS_REGION: ${{ vars.REPORTS_AWS_REGION || 'us-west-2' }}

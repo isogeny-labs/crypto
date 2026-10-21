@@ -20,6 +20,9 @@ separate; a shorter timeout does not establish faster successful validation.
 - The release workflow retains main-push publication and PR packaging checks.
   Performance history retains its existing main-push behavior. This patch does
   not replace either with daily publication.
+- Report uploads retain their 45-minute budget. Taskq image publication retains
+  its 20-minute budget and shared per-ref serialization across push and manual
+  runs; a newer main push cannot cancel an in-progress image publication.
 - 65 long research workflows formerly triggered by pushes to experiment
   branches now require `workflow_dispatch`. Their inputs and execution steps
   remain available on the intended research branch.
