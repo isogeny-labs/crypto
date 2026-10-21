@@ -4,6 +4,11 @@
 
 **Status:** exact toy-field experiments and an algebraic obstruction; no end-to-end speed claim
 
+**Follow-up (2026-10-21):** [Mixed-component extension-field experiment](MIXED_REPORT.md)
+adds exhaustive width-three relation censuses, matrix ranks, recovered
+one-target logarithms, complete standalone costs, and same-target controls.
+The rest of this note records the original 2026-10-20 experiment.
+
 **Conductor task:** T-69
 
 **Base revision:** `b4f056101a` (`origin/main` when this experiment began)
