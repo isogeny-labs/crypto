@@ -33,8 +33,8 @@
 //! iteration budget.  Costs are stated as expected group additions, never
 //! as security claims about deployed parameters.
 //!
-//! Certicom binary challenge parameters and their published targets are also
-//! accepted. Persistent GPU campaign support for the full set is tracked in
+//! Certicom challenge parameters (the binary curves and ECCp-131) and their
+//! published targets are also accepted. Persistent GPU campaign support for the full set is tracked in
 //! `problems/certicom-binary-gpu-rho-integration.md`.
 
 use num_bigint::{BigInt, BigUint};
@@ -119,11 +119,13 @@ pub const NIST_CURVES: &[(&str, &str, Family)] = &[
     ("B-571", "sect571r1", Family::BinaryRandom),
 ];
 
-/// Published Certicom binary-field challenge groups. The display suffix is
-/// the subgroup bit size; it is not always the field degree.
+/// Published Certicom challenge groups: the binary-field curves and the
+/// 131-bit prime-field ECCp-131. The display suffix is the subgroup bit
+/// size; it is not always the field degree.
 pub const CERTICOM_CURVES: &[(&str, &str, Family)] = &[
     ("ECC2K-130", "ecc2k-130", Family::Koblitz),
     ("ECC2-131", "ecc2-131", Family::BinaryRandom),
+    ("ECCp-131", "eccp-131", Family::Prime),
     ("ECC2K-163", "ecc2k-163", Family::Koblitz),
     ("ECC2-163", "ecc2-163", Family::BinaryRandom),
     ("ECC2-191", "ecc2-191", Family::BinaryRandom),
@@ -967,6 +969,30 @@ mod tests {
         assert_eq!(fams[&Family::Prime], 5);
         assert_eq!(fams[&Family::Koblitz], 5);
         assert_eq!(fams[&Family::BinaryRandom], 5);
+    }
+
+    /// ECCp-131 resolves by its Certicom name and catalog slug, is a
+    /// 131-bit prime-field curve of prime order, and its published target
+    /// parses as a point of the generator's subgroup.
+    #[test]
+    fn eccp131_resolves_and_its_target_validates() {
+        for name in ["ECCp-131", "eccp131", "eccp-131"] {
+            let c = curve_by_name(name).unwrap_or_else(|e| panic!("{name}: {e}"));
+            assert_eq!(c.name, "ECCp-131");
+            assert_eq!(c.family, Family::Prime);
+            assert_eq!(c.field_bits, 131);
+            assert!(c.cofactor.is_one());
+            assert!(is_prime(c.order()));
+            let g = c.generator();
+            assert!(c.is_identity(&c.mul(&g, c.order()).unwrap()));
+        }
+        let c = curve_by_name("ECCp-131").unwrap();
+        let (x, y) = crate::ecc::curve::CurveParams::certicom_eccp131_target();
+        let q = c
+            .parse_point(&x.to_str_radix(16), &y.to_str_radix(16))
+            .expect("published target on curve");
+        assert!(c.is_identity(&c.mul(&q, c.order()).unwrap()));
+        assert!(certicom_curves().iter().any(|c| c.name == "ECCp-131"));
     }
 
     #[test]
