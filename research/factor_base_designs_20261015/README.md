@@ -263,28 +263,40 @@ Each row now records the child's peak RSS.
 
 ### Amendment 7: the two `m = 4` cells on a 64 GiB host (run-20261021T0056Z)
 
-Rows: `runs/X1-*` and `runs/X2-*`, with pre-flight, kernel-log and instance
-logs beside them. Analysis: `runs/analysis-amendment7.txt`. Report:
-[`reports/run-20261021T0056Z/REPORT.pdf`](reports/run-20261021T0056Z/REPORT.pdf).
-Hosts: two AWS EC2 `r7i.2xlarge` (64 GiB, 8 vCPU), one per cell, with no
-memory cgroup, so `ulimit -v` V = 64.25 GB (4.4–4.8 × the earlier limits).
-Same systems as before (checked). Runner:
-`scripts/run_amendment7.sh`, which needs no checkout.
+Frozen rows, pre-flight files, kernel-log sentinel files and instance logs are in
+`runs/X1-*` and `runs/X2-*`. The original analysis and
+[historical report](reports/run-20261021T0056Z/REPORT.pdf) are preserved.
+The [2026-10-21 review correction](reports/review-20261021/README.md) supersedes
+their kernel-log attribution and resident-working-set claims.
 
-- **X1, A0 at `m = 4`, `t = 4`:** not measurable. Both systems hit the
-  registered limit (allocation failure at 1916 s and 1874 s, peak RSS
-  60.7 GB, no kernel OOM kill). **R1:** still no cost comparison at
-  `t = 4`; A0's working set there exceeds 64 GB. The prediction (time, not
-  memory, would bind) did not hold.
-- **X2, A11 at `m = 4`, `t = 5`:** not measurable. Both systems hit the
-  registered limit (allocation failure at 6011 s and 6024 s, peak RSS
-  62.9 GB, no kernel OOM kill). **R2:** the 3-cell `m = 4` verdicts stand
-  (κ = 14.9 against 3, cost-unfavourable; σ = 1.5). The prediction (memory
-  binds) held, though memory grew far more slowly than predicted.
-- **Reading:** memory, not the 4 h budget, stops both open cells at 64 GB
-  too. No recorded verdict changed. Settling either cell needs a host whose
-  memory exceeds a working set this study has not measured, and even then
-  extrapolated cost (about 2·10¹⁴ and 2·10¹⁶ field ops) may exceed 4 h.
+Both cells ran on AWS EC2 `r7i.2xlarge` hosts (64 GiB, 8 vCPU). Their pre-flight
+records report an unlimited leaf memory cgroup and `ulimit -v` of approximately
+64,250,012 KiB (X1) and 64,250,008 KiB (X2), about 61.27 GiB.
+These are virtual-address-space caps (the Linux records label KiB as `kB`).
+
+- **X1, A0 at `m = 4`, `t = 4`:** both processes reported allocation failure
+  and SIGABRT at 1916 s and 1874 s; observed peak RSS was
+  60,667,848 and 60,713,840 KiB.
+- **X2, A11 at `m = 4`, `t = 5`:** both processes reported allocation failure
+  and SIGABRT at 6011 s and 6024 s; observed peak RSS was
+  62,919,616 and 62,849,712 KiB.
+- **Evidence limit:** the historical runner suppressed kernel-log read errors.
+  Its “no kernel OOM lines” sentinels do not establish successful capture.
+  Strict R1/R2 attribution and the prediction scorecard therefore remain
+  undecided under the registered kernel-log control. The allocation failures,
+  timings and RSS observations remain recorded; no cost comparison is available.
+- **Interpretation:** exhausting a virtual-address-space cap does not prove that
+  the minimum resident working set exceeds 64 GB. Required address space and
+  required resident memory remain distinct and unmeasured. The prior completed
+  cells' recorded verdicts are unchanged.
+
+The repaired `scripts/run_amendment7.sh` requires readable kernel logs before
+starting, retains the before/after captures and errors, preserves a producer's
+failure status, and refuses an existing cell's evidence prefix. `analyze7`
+requires a successful-capture marker and rejects every recorded OOM event,
+including events without a “Killed process” line. The full captured ring is
+retained, so an earlier OOM event can conservatively withhold attribution.
+No new host allocation or experimental execution was made for this correction.
 
 ### Amendment 8: registered, not yet run (EKS high-memory runner)
 

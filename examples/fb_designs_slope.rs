@@ -3754,6 +3754,62 @@ fn analyze6(dir: &str) {
     );
 }
 
+// A legacy "no OOM lines" sentinel does not prove that dmesg succeeded.
+fn verified_kernel_capture(text: &str) -> bool {
+    text.lines().next() == Some("capture_status ok")
+}
+
+fn kernel_oom_lines(text: &str) -> Vec<&str> {
+    text.lines()
+        .filter(|line| {
+            let line = line.to_ascii_lowercase();
+            [
+                "killed process",
+                "oom-killer",
+                "oom-kill",
+                "out of memory",
+                "memory: usage",
+            ]
+            .iter()
+            .any(|marker| line.contains(marker))
+        })
+        .collect()
+}
+
+#[cfg(test)]
+mod kernel_capture_tests {
+    use super::{kernel_oom_lines, verified_kernel_capture};
+
+    #[test]
+    fn rejects_missing_failed_and_legacy_capture_receipts() {
+        for text in [
+            "",
+            "capture_status failed\n",
+            "no kernel OOM lines for X1\n",
+            "[1.0] booted\n",
+        ] {
+            assert!(!verified_kernel_capture(text));
+        }
+        assert!(verified_kernel_capture("capture_status ok\n[1.0] booted\n"));
+    }
+
+    #[test]
+    fn recognizes_oom_events_without_a_killed_process_line() {
+        for message in [
+            "invoked oom-killer",
+            "Memory cgroup out of memory",
+            "Out of memory",
+            "oom-kill: constraint=CONSTRAINT_MEMCG",
+            "memory: usage 100 limit 100",
+            "Killed process 42",
+        ] {
+            let text = format!("capture_status ok\n{message}\n");
+            assert_eq!(kernel_oom_lines(&text).len(), 1, "{message}");
+        }
+        assert!(kernel_oom_lines("capture_status ok\n[1.0] booted\n").is_empty());
+    }
+}
+
 /// One re-run of the two open m = 4 cells on a larger host: Amendment 7 (X1,
 /// X2 on a 64 GiB EC2 host) and Amendment 8 (E1, E2 on the EKS high-memory
 /// runner).
@@ -3876,12 +3932,9 @@ fn analyze_m4_host(dir: &str, sp: &M4Host) {
         }
         let ext = sp.oom_ext;
         let dmesg = read(&format!("{name}.{ext}"));
-        let mut kills: Vec<String> = dmesg
-            .as_deref()
-            .unwrap_or("")
-            .lines()
-            .filter(|l| l.contains("Killed process"))
-            .map(String::from)
+        let mut kills: Vec<String> = kernel_oom_lines(dmesg.as_deref().unwrap_or(""))
+            .iter()
+            .map(|line| (*line).to_string())
             .collect();
         // The job cgroup's OOM-kill counter, before and after the run.
         let counter = |key: &str| -> Option<u64> {
@@ -3898,6 +3951,13 @@ fn analyze_m4_host(dir: &str, sp: &M4Host) {
             (Some(b), Some(a)) => Some(a.saturating_sub(b)),
             _ => None,
         };
+        // Amendment 7 records a verified dmesg sentinel. Amendment 8 records
+        // the job cgroup counters even when the node kernel log is unreadable.
+        let capture_ok = if ext == "oom.txt" {
+            cgroup.is_some()
+        } else {
+            dmesg.as_deref().is_some_and(verified_kernel_capture)
+        };
         if let Some(n) = cgroup.filter(|n| *n > 0) {
             kills.push(format!(
                 "job cgroup memory.events: {n} oom_kill during the run"
@@ -3912,7 +3972,11 @@ fn analyze_m4_host(dir: &str, sp: &M4Host) {
             },
             match &dmesg {
                 None => "MISSING".to_string(),
-                Some(_) => format!("{} OOM kills", kills.len()),
+                Some(_) => format!(
+                    "{} OOM events; capture {}",
+                    kills.len(),
+                    if capture_ok { "verified" } else { "UNVERIFIED" }
+                ),
             }
         );
         if ext == "oom.txt" {
@@ -3935,7 +3999,7 @@ fn analyze_m4_host(dir: &str, sp: &M4Host) {
             let ok = r["status"] == "ok";
             let malloc = why.contains(&format!("memory allocation failed under ulimit -v {v}"));
             let timeout = r["status"] == "timeout";
-            let attr = dmesg.is_some() && kills.is_empty() && (ok || timeout || malloc);
+            let attr = capture_ok && kills.is_empty() && (ok || timeout || malloc);
             all_attr &= attr;
             let lim = if ok {
                 "none (completed)"
