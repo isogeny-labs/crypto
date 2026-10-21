@@ -53,6 +53,9 @@ this host because Node was absent. This audit does not establish an
 end-to-end cryptanalytic speedup, a current public deployment, or a clean
 repository-wide validation gate.
 
+The `perf history` pull-request check now runs the native checker when this
+page, its frozen source records, the checker, or relevant Rust code changes.
+
 The existing [SVG chart](../../../../docs/performance-gains/summary.svg),
 [PNG](../../../../docs/performance-gains/summary.png),
 [chart PDF](../../../../docs/performance-gains/summary.pdf), and
