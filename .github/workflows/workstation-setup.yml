@@ -7,6 +7,8 @@ on:
       - 'scripts/cairn-node.sh'
       - 'scripts/setup-workstation.sh'
       - 'scripts/test_setup_workstation_go.py'
+      - 'scripts/test_setup_workstation_github.py'
+      - 'scripts/test_setup_workstation_github_helper.py'
       - '.github/workflows/workstation-setup.yml'
   push:
     branches: [main]
@@ -15,6 +17,8 @@ on:
       - 'scripts/cairn-node.sh'
       - 'scripts/setup-workstation.sh'
       - 'scripts/test_setup_workstation_go.py'
+      - 'scripts/test_setup_workstation_github.py'
+      - 'scripts/test_setup_workstation_github_helper.py'
       - '.github/workflows/workstation-setup.yml'
   workflow_dispatch:
 
@@ -38,9 +42,15 @@ jobs:
             /scripts/cairn-node.sh
             /scripts/setup-workstation.sh
             /scripts/test_setup_workstation_go.py
+            /scripts/test_setup_workstation_github.py
+            /scripts/test_setup_workstation_github_helper.py
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck
       - name: Check shell syntax and diagnostics
         run: |
           bash -n .claude/hooks/session-start.sh scripts/cairn-node.sh scripts/setup-workstation.sh
@@ -51,4 +61,4 @@ jobs:
           command -v sha256sum
           command -v jq
           mv --version
-          python3 -m unittest discover -s scripts -p test_setup_workstation_go.py -v
+          python3 -m unittest discover -s scripts -p 'test_setup_workstation_*.py' -v
