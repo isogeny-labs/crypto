@@ -75,7 +75,7 @@ figure stays visible as the "was".
 | `store info <spec>` | one entry in full |
 | `store push <file> --name N` | upload (skipped if the remote already holds the bytes), cache, index |
 | `store pull <spec> [--out P]` | make available locally, print the path |
-| `store verify [names] [--remote]` | re-hash cached objects; with `--remote`, check existence, size, and required digest metadata through S3 HEAD, or re-hash a file-backed remote |
+| `store verify [names] [--remote] [--download]` | re-hash cached objects; `--remote` checks existence, size, and digest metadata through S3 HEAD; `--download` also downloads and hashes the remote bytes in a temporary file |
 | `store gc [--apply]` | drop cached objects the index no longer names (dry run by default) |
 | `store rm <name>` | remove a name from the index |
 
@@ -120,6 +120,13 @@ HTTP stack. Uploads follow the `isogeny_walk::store` conventions:
   composite. A fresh download is hashed against the index before caching.
   `CRYPTO_STORE_MULTIPART_THRESHOLD_BYTES` and
   `CRYPTO_STORE_MULTIPART_PART_BYTES` can lower the threshold and part size
+
+`crypto store verify --download NAME` is the byte-level remote check. It
+downloads the named object to a temporary file, compares its SHA-256 and byte
+count to the index, and removes that file afterward. It does not use an
+existing cached copy as evidence. This is useful for multipart objects because
+their S3 HEAD checksum is composite and their full-file digest is recorded in
+metadata. `--remote` remains a faster HEAD-only check.
   for bounded acceptance runs; defaults are 4 GiB and 64 MiB.
 * **Checked on download.** Every object is hashed as it enters the cache, and
   a mismatch is discarded.

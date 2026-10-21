@@ -190,6 +190,7 @@ pub enum CacheState {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum RemoteState {
     Ok,
+    BytesOk,
     Absent,
     Mismatch(String),
 }
@@ -480,6 +481,21 @@ impl Store {
     /// Check indexed objects: re-hash the cached copy and, with `remote`,
     /// confirm the remote object exists with the indexed size.
     pub fn verify(&self, names: &[String], remote: bool) -> Result<Vec<VerifyRow>, String> {
+        self.verify_selected(names, remote, false)
+    }
+
+    /// Verify remote bytes independently of the local cache and remote HEAD
+    /// metadata. Downloads are temporary and are never entered into the cache.
+    pub fn verify_download(&self, names: &[String]) -> Result<Vec<VerifyRow>, String> {
+        self.verify_selected(names, true, true)
+    }
+
+    fn verify_selected(
+        &self,
+        names: &[String],
+        remote: bool,
+        download: bool,
+    ) -> Result<Vec<VerifyRow>, String> {
         let chosen: Vec<(&String, &Entry)> = if names.is_empty() {
             self.index.entries.iter().collect()
         } else {
@@ -506,7 +522,8 @@ impl Store {
             };
             let remote_state = if remote {
                 let be = self.remote()?;
-                Some(match be.head(&object_key(&e.sha256)?)? {
+                let key = object_key(&e.sha256)?;
+                let head_state = match be.head(&key)? {
                     None => RemoteState::Absent,
                     Some(m) if m.bytes != e.bytes => {
                         RemoteState::Mismatch(format!("{} bytes, index says {}", m.bytes, e.bytes))
@@ -516,7 +533,31 @@ impl Store {
                         Some(s) => RemoteState::Mismatch(format!("recorded digest {s}")),
                         None => RemoteState::Mismatch("remote has no recorded digest".into()),
                     },
-                })
+                };
+                if download && head_state == RemoteState::Ok {
+                    let tmp = self.cfg.cache_dir.join("tmp").join(format!(
+                        "verify-{}-{}",
+                        e.sha256,
+                        unique_suffix()
+                    ));
+                    let checked = (|| -> Result<RemoteState, String> {
+                        be.get(&key, &tmp)?;
+                        let (digest, bytes) = hash_file(&tmp)?;
+                        if digest == e.sha256 && bytes == e.bytes {
+                            Ok(RemoteState::BytesOk)
+                        } else {
+                            Ok(RemoteState::Mismatch(format!(
+                                "downloaded bytes hash to {digest} ({bytes} bytes)"
+                            )))
+                        }
+                    })();
+                    let _ = fs::remove_file(&tmp);
+                    Some(checked.unwrap_or_else(|err| {
+                        RemoteState::Mismatch(format!("download failed: {err}"))
+                    }))
+                } else {
+                    Some(head_state)
+                }
             } else {
                 None
             };
@@ -601,6 +642,33 @@ pub fn resolve_path(arg: &Path) -> Result<PathBuf, String> {
 mod tests {
     use super::*;
     use std::sync::atomic::{AtomicU32, Ordering};
+
+    struct StaleHead {
+        path: PathBuf,
+        digest: String,
+        bytes: u64,
+    }
+
+    impl Backend for StaleHead {
+        fn describe(&self) -> String {
+            "test-stale-head".into()
+        }
+        fn head(&self, _: &str) -> Result<Option<Meta>, String> {
+            Ok(Some(Meta {
+                bytes: self.bytes,
+                sha256: Some(self.digest.clone()),
+            }))
+        }
+        fn put(&self, _: &str, _: &Path, _: &str) -> Result<bool, String> {
+            Err("unused in verification test".into())
+        }
+        fn get(&self, _: &str, dest: &Path) -> Result<(), String> {
+            backend::copy_into(&self.path, dest)
+        }
+        fn list(&self, _: &str) -> Result<Vec<(String, u64)>, String> {
+            Err("unused in verification test".into())
+        }
+    }
 
     static N: AtomicU32 = AtomicU32::new(0);
 
@@ -744,6 +812,34 @@ mod tests {
         assert!(!t.cache_path(&r.sha256).exists());
         assert!(t.gc(false).unwrap().is_empty(), "no partial file left over");
         let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn downloaded_verification_catches_bytes_hidden_by_stale_head_metadata() {
+        let (root, mut s) = scratch();
+        let src = file(&root, "source", b"original");
+        let report = s.push("evidence/item", &src, PushMeta::default()).unwrap();
+        let remote_path = root
+            .join("remote")
+            .join(object_key(&report.sha256).unwrap());
+        fs::remove_file(&remote_path).unwrap();
+        fs::write(&remote_path, b"tampered").unwrap();
+        s.backend = Some(Box::new(StaleHead {
+            path: remote_path,
+            digest: report.sha256,
+            bytes: report.bytes,
+        }));
+        assert_eq!(
+            s.verify(&[], true).unwrap()[0].remote,
+            Some(RemoteState::Ok)
+        );
+        let deep = s.verify_download(&[]).unwrap();
+        assert!(matches!(deep[0].remote, Some(RemoteState::Mismatch(_))));
+        assert!(fs::read_dir(s.cfg.cache_dir.join("tmp"))
+            .unwrap()
+            .next()
+            .is_none());
+        let _ = fs::remove_dir_all(root);
     }
 
     #[test]

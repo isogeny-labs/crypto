@@ -57,11 +57,14 @@ pub enum StoreCmd {
         #[arg(long)]
         out: Option<PathBuf>,
     },
-    /// Re-hash cached objects; with --remote also check the remote has each.
+    /// Re-hash cached objects; --remote checks HEAD, --download hashes remote bytes.
     Verify {
         names: Vec<String>,
         #[arg(long)]
         remote: bool,
+        /// Download each remote object temporarily and verify its SHA-256.
+        #[arg(long)]
+        download: bool,
     },
     /// Drop cached objects the index no longer names (dry run unless --apply).
     /// The remote is never touched.
@@ -241,8 +244,16 @@ pub fn run(args: &StoreArgs) -> Result<(), String> {
                 println!("{}", got.path.display());
             }
         }
-        StoreCmd::Verify { names, remote } => {
-            let rows = store.verify(names, *remote)?;
+        StoreCmd::Verify {
+            names,
+            remote,
+            download,
+        } => {
+            let rows = if *download {
+                store.verify_download(names)?
+            } else {
+                store.verify(names, *remote)?
+            };
             let mut bad = 0;
             for r in &rows {
                 let cache = match &r.cache {
@@ -256,6 +267,7 @@ pub fn run(args: &StoreArgs) -> Result<(), String> {
                 let remote = match &r.remote {
                     None => String::new(),
                     Some(RemoteState::Ok) => ", remote ok".to_string(),
+                    Some(RemoteState::BytesOk) => ", remote bytes ok".to_string(),
                     Some(RemoteState::Absent) => {
                         bad += 1;
                         ", REMOTE ABSENT".to_string()
