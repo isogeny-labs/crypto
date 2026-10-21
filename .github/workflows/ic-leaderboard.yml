@@ -65,6 +65,8 @@ on:
       - 'research/f4_f5_ecbench_20261019/runs.tar.xz'
       - 'research/f4_f5_ecbench_20261019/runs.tar.xz.sha256'
       - 'research/ic_oracle_setup_blocked_20261020/RESULT.json'
+      - 'research/ic_planner_validation_20261020/analysis/summary.json'
+      - 'research/ic_planner_validation_20261020/specs/*.json'
       - '.github/workflows/ic-leaderboard.yml'
       - 'scripts/build_lab_browser.py'
       - 'scripts/test_build_lab_browser.py'
@@ -74,6 +76,9 @@ on:
       - 'research/full_volcano_graphwide_ic_*/execution/campaigns/**'
       - 'research/ic_candidate_tournament_20260915/runs/**'
       - 'docs/ic/**'
+      - 'scripts/validation_gate.py'
+      - 'research/**/VALIDATION.json'
+      - 'research/validation_sweep_20261019/**'
       - 'research/notes/ecc2k130/**'
   push:
     branches: [main]
@@ -127,6 +132,8 @@ on:
       - 'research/f4_f5_ecbench_20261019/runs.tar.xz'
       - 'research/f4_f5_ecbench_20261019/runs.tar.xz.sha256'
       - 'research/ic_oracle_setup_blocked_20261020/RESULT.json'
+      - 'research/ic_planner_validation_20261020/analysis/summary.json'
+      - 'research/ic_planner_validation_20261020/specs/*.json'
       - '.github/workflows/ic-leaderboard.yml'
       - 'scripts/build_lab_browser.py'
       - 'scripts/test_build_lab_browser.py'
@@ -136,6 +143,9 @@ on:
       - 'research/full_volcano_graphwide_ic_*/execution/campaigns/**'
       - 'research/ic_candidate_tournament_20260915/runs/**'
       - 'docs/ic/**'
+      - 'scripts/validation_gate.py'
+      - 'research/**/VALIDATION.json'
+      - 'research/validation_sweep_20261019/**'
       - 'research/notes/ecc2k130/**'
   workflow_dispatch:
 
