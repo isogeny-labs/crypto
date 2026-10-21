@@ -5,7 +5,7 @@
   "class": "engineering (same algorithm, same probes and relations; native code generation only)",
   "branch": "t22-inline-clmul, stacked on t21-wide-producer-arithmetic (PR #2329) on t20-n73-k600-rerun (PR #2318)",
   "hypothesis_check_before_freeze": "disassembly of the T21-head binary's reduce_fold (first-ret slice, 171 instructions): three out-of-line calls to clmul_u64 (indirect, relocated), six push/pop pairs, no pclmulqdq inside; the callee is a #[target_feature(enable=\"pclmulqdq\")] function without #[inline]. Not a timing, a code reading; asm instruction counts after the change are NOT used (the first-ret slice ends at the sparse early-return path).",
-  "change": "one attribute: #[inline] on the x86_64 clmul_u64 in src/cryptanalysis/semaev_decomp.rs (aarch64 unchanged and unmeasured). 31 semaev_decomp unit tests pass, including the fold-vs-table equality tests for n = 65..127.",
+  "change": "one attribute: #[inline] on the x86_64 clmul_u64 in src/cryptanalysis/semaev_decomp.rs (aarch64 unchanged and unmeasured). 31 semaev_decomp unit tests pass, including the fold-vs-table equality tests for the tested n between 65 and 127.",
   "binaries": {
     "old": "/home/user/wt/t22/old_bin sha256 ea4faa51604db1330805bbc0329016999edea8f89b5cbe09ef766b60427745f0 (built from this branch's parent tree, T21 head b0b716242, rustc 1.97.0)",
     "new": "target/release/examples/koblitz_orbit_dlp_fast sha256 9988639a57a7c7d6c98d35ac78ede1aa95f2017ecd9f16e5aabaa2fb53c0fc67 (same tree plus the one attribute)",
