@@ -92,3 +92,57 @@ spec:
         reasons: [Drifted]
       - nodes: "100%"
         reasons: [Empty]
+---
+# The base pool is memory-bound at eight 24-GiB runners on two M-family nodes.
+# One R-family 16-vCPU node adds three runners while staying below the current
+# regional 96-vCPU On-Demand quota (64 existing node vCPUs + 4 system + 16 here).
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: gha-on-demand-extra
+spec:
+  template:
+    metadata:
+      labels:
+        gha.dev/pool: on-demand
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: gha
+      taints:
+        - key: gha.dev/workload
+          value: runner
+          effect: NoSchedule
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: [amd64]
+        - key: kubernetes.io/os
+          operator: In
+          values: [linux]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: [on-demand]
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values: [r]
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values: ["5"]
+        - key: karpenter.k8s.aws/instance-cpu
+          operator: In
+          values: ["16"]
+      expireAfter: Never
+      terminationGracePeriod: 6h
+  limits:
+    cpu: "16"
+    memory: 128Gi
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 5m
+    budgets:
+      - nodes: "0"
+        reasons: [Drifted]
+      - nodes: "100%"
+        reasons: [Empty]
