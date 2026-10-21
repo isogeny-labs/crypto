@@ -18,6 +18,8 @@ The published #link("https://www.certicom.com/en/curves-list")[Certicom curve li
 - `ca-icx inspect eccp-131` passed; its estimate identified a scaled IC regime. `crax ecdlp --analyze-only` accepted the published point for structural analysis.
 - The ECC2K-130 fixed-parameter status command exited 0 with `status: stopped`, zero saved relations, and no logarithm database. Its #link("ecc2k130-status.json")[raw JSON] and #link("ecc2k130-status.sqlite3")[SQLite state] are retained. The command was a workflow check; its operation counters are not used as an attack-cost comparison.
 - `crypto` implementation commit `07dd1d97fa`: the exact-group bounded BSGS release test passed. The first full release library run ended with 4,445 passed, 11 failed, and 119 ignored. Seven failures came from a sparse-checkout fixture omission; all affected tests passed once its tracked files were present. Four unchanged time-limited `jv_cover` cases passed in isolation after reruns, with one intermediate sample-count failure. The failed full run remains recorded in #link("REPORT.md")[the source report].
+- The release `ecdlp-nist` CLI verified planted scalar 12345 on each exact group. Importing the published ECCp-131 point with a 64-bit BSGS interval exited with the stated 1,048,576-entry cap before group operations. The three #link("REPORT.md")[raw JSON command outputs] are retained with hashes.
+- The release `ic inspect --curve eccp-131 --json` command reported `checks_passed` for both published points' curve-equation and subgroup checks. General prime-field point counting remained `not_checked`; the raw JSON is retained.
 
 == Boundary and next check
 
