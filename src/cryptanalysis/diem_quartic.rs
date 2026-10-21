@@ -93,32 +93,25 @@ pub struct Fq {
 impl Fq {
     pub fn new(p: u64) -> Fq {
         assert!(p % 2 == 1 && p < (1 << 31));
-        Fq { p, muls: Cell::new(0), invs: Cell::new(0), sqrts: Cell::new(0) }
+        Fq {
+            p,
+            muls: Cell::new(0),
+            invs: Cell::new(0),
+            sqrts: Cell::new(0),
+        }
     }
     #[inline]
     pub fn add(&self, a: u64, b: u64) -> u64 {
         let s = a + b;
-        if s >= self.p {
-            s - self.p
-        } else {
-            s
-        }
+        if s >= self.p { s - self.p } else { s }
     }
     #[inline]
     pub fn sub(&self, a: u64, b: u64) -> u64 {
-        if a >= b {
-            a - b
-        } else {
-            a + self.p - b
-        }
+        if a >= b { a - b } else { a + self.p - b }
     }
     #[inline]
     pub fn neg(&self, a: u64) -> u64 {
-        if a == 0 {
-            0
-        } else {
-            self.p - a
-        }
+        if a == 0 { 0 } else { self.p - a }
     }
     #[inline]
     pub fn mul(&self, a: u64, b: u64) -> u64 {
@@ -175,11 +168,7 @@ impl Fq {
             return Some(0);
         }
         let r = self.pow(a, (self.p + 1) / 4);
-        if self.mul(r, r) == a {
-            Some(r)
-        } else {
-            None
-        }
+        if self.mul(r, r) == a { Some(r) } else { None }
     }
     pub fn counts(&self) -> (u64, u64) {
         (self.muls.get(), self.invs.get())
@@ -192,7 +181,7 @@ pub fn is_prime_u64(n: u64) -> bool {
         return false;
     }
     for &p in &[2u64, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
-        if n % p == 0 {
+        if n.is_multiple_of(p) {
             return n == p;
         }
     }
@@ -270,17 +259,18 @@ impl Mont {
         let ninv = inv.wrapping_neg();
         let r = ((1u128 << 64) % n as u128) as u64;
         let r2 = ((r as u128 * r as u128) % n as u128) as u64;
-        Mont { n, ninv, r2, one: r }
+        Mont {
+            n,
+            ninv,
+            r2,
+            one: r,
+        }
     }
     #[inline]
     fn redc(&self, t: u128) -> u64 {
         let m = (t as u64).wrapping_mul(self.ninv);
         let u = ((t + m as u128 * self.n as u128) >> 64) as u64;
-        if u >= self.n {
-            u - self.n
-        } else {
-            u
-        }
+        if u >= self.n { u - self.n } else { u }
     }
     #[inline]
     pub fn mul(&self, a: u64, b: u64) -> u64 {
@@ -289,27 +279,15 @@ impl Mont {
     #[inline]
     pub fn add(&self, a: u64, b: u64) -> u64 {
         let s = a + b;
-        if s >= self.n {
-            s - self.n
-        } else {
-            s
-        }
+        if s >= self.n { s - self.n } else { s }
     }
     #[inline]
     pub fn sub(&self, a: u64, b: u64) -> u64 {
-        if a >= b {
-            a - b
-        } else {
-            a + self.n - b
-        }
+        if a >= b { a - b } else { a + self.n - b }
     }
     #[inline]
     pub fn neg(&self, a: u64) -> u64 {
-        if a == 0 {
-            0
-        } else {
-            self.n - a
-        }
+        if a == 0 { 0 } else { self.n - a }
     }
     /// Plain residue -> Montgomery form.
     #[inline]
@@ -449,7 +427,18 @@ pub fn roots_fq(f: &Fq, poly: &[u64]) -> Vec<u64> {
     }
     d[1] = f.sub(d[1], 1);
     ptrim(&mut d);
-    let g = if d.is_empty() { { let mut m = p.clone(); let li = f.inv(*m.last().unwrap()); for c in m.iter_mut() { *c = f.mul(*c, li); } m } } else { pgcd(f, &p, &d) };
+    let g = if d.is_empty() {
+        {
+            let mut m = p.clone();
+            let li = f.inv(*m.last().unwrap());
+            for c in m.iter_mut() {
+                *c = f.mul(*c, li);
+            }
+            m
+        }
+    } else {
+        pgcd(f, &p, &d)
+    };
     let mut out = vec![];
     split_roots(f, &g, &mut out, 1);
     out.sort_unstable();
@@ -476,7 +465,11 @@ fn split_roots(f: &Fq, g: &[u64], out: &mut Vec<u64>, shift: u64) {
         }
         hm[0] = f.sub(hm[0], 1);
         ptrim(&mut hm);
-        let a = if hm.is_empty() { g.to_vec() } else { pgcd(f, g, &hm) };
+        let a = if hm.is_empty() {
+            g.to_vec()
+        } else {
+            pgcd(f, g, &hm)
+        };
         let da = a.len() - 1;
         if da > 0 && da < d {
             // other factor: g / a
@@ -546,7 +539,13 @@ impl Kf {
                 aa += 1;
             }
         }
-        let mut kf = Kf { f, a: aa, b: bb, gq: [0; 3], gq2: [0; 3] };
+        let mut kf = Kf {
+            f,
+            a: aa,
+            b: bb,
+            gq: [0; 3],
+            gq2: [0; 3],
+        };
         let g: K = [0, 1, 0];
         kf.gq = kf.pow(g, q as u128);
         kf.gq2 = kf.mul(&kf.gq, &kf.gq); // (g^2)^q = (g^q)^2
@@ -572,11 +571,19 @@ impl Kf {
     }
     #[inline]
     pub fn add(&self, x: &K, y: &K) -> K {
-        [self.f.add(x[0], y[0]), self.f.add(x[1], y[1]), self.f.add(x[2], y[2])]
+        [
+            self.f.add(x[0], y[0]),
+            self.f.add(x[1], y[1]),
+            self.f.add(x[2], y[2]),
+        ]
     }
     #[inline]
     pub fn sub(&self, x: &K, y: &K) -> K {
-        [self.f.sub(x[0], y[0]), self.f.sub(x[1], y[1]), self.f.sub(x[2], y[2])]
+        [
+            self.f.sub(x[0], y[0]),
+            self.f.sub(x[1], y[1]),
+            self.f.sub(x[2], y[2]),
+        ]
     }
     #[inline]
     pub fn neg(&self, x: &K) -> K {
@@ -591,7 +598,10 @@ impl Kf {
         let f = &self.f;
         let c0 = f.mul(x[0], y[0]);
         let c1 = f.add(f.mul(x[0], y[1]), f.mul(x[1], y[0]));
-        let c2 = f.add(f.add(f.mul(x[0], y[2]), f.mul(x[1], y[1])), f.mul(x[2], y[0]));
+        let c2 = f.add(
+            f.add(f.mul(x[0], y[2]), f.mul(x[1], y[1])),
+            f.mul(x[2], y[0]),
+        );
         let c3 = f.add(f.mul(x[1], y[2]), f.mul(x[2], y[1]));
         let c4 = f.mul(x[2], y[2]);
         // g^3 = -a g - b ; g^4 = -a g^2 - b g
@@ -602,7 +612,11 @@ impl Kf {
     }
     /// Scalar (`F_q`) multiple: 3 counted mults.
     pub fn scale(&self, x: &K, c: u64) -> K {
-        [self.f.mul(x[0], c), self.f.mul(x[1], c), self.f.mul(x[2], c)]
+        [
+            self.f.mul(x[0], c),
+            self.f.mul(x[1], c),
+            self.f.mul(x[2], c),
+        ]
     }
     pub fn pow(&self, x: K, mut e: u128) -> K {
         let (mut r, mut b) = (self.one(), x);
@@ -713,7 +727,9 @@ pub const MON4: [(u8, u8, u8); 15] = [
 ];
 
 pub fn mon4_index(e: (u8, u8, u8)) -> usize {
-    MON4.iter().position(|&m| m == e).expect("degree-4 monomial")
+    MON4.iter()
+        .position(|&m| m == e)
+        .expect("degree-4 monomial")
 }
 
 type Mono = (u8, u8, u8);
@@ -758,9 +774,18 @@ type M3 = [[K; 3]; 3];
 
 fn det3(kf: &Kf, a: &M3) -> K {
     let m = |x: &K, y: &K| kf.mul(x, y);
-    let t0 = m(&a[0][0], &kf.sub(&m(&a[1][1], &a[2][2]), &m(&a[1][2], &a[2][1])));
-    let t1 = m(&a[0][1], &kf.sub(&m(&a[1][0], &a[2][2]), &m(&a[1][2], &a[2][0])));
-    let t2 = m(&a[0][2], &kf.sub(&m(&a[1][0], &a[2][1]), &m(&a[1][1], &a[2][0])));
+    let t0 = m(
+        &a[0][0],
+        &kf.sub(&m(&a[1][1], &a[2][2]), &m(&a[1][2], &a[2][1])),
+    );
+    let t1 = m(
+        &a[0][1],
+        &kf.sub(&m(&a[1][0], &a[2][2]), &m(&a[1][2], &a[2][0])),
+    );
+    let t2 = m(
+        &a[0][2],
+        &kf.sub(&m(&a[1][0], &a[2][1]), &m(&a[1][1], &a[2][0])),
+    );
     kf.add(&kf.sub(&t0, &t1), &t2)
 }
 
@@ -774,7 +799,10 @@ fn inv3(kf: &Kf, a: &M3) -> Option<M3> {
     for i in 0..3 {
         for j in 0..3 {
             let (i1, i2, j1, j2) = ((i + 1) % 3, (i + 2) % 3, (j + 1) % 3, (j + 2) % 3);
-            let cof = kf.sub(&kf.mul(&a[i1][j1], &a[i2][j2]), &kf.mul(&a[i1][j2], &a[i2][j1]));
+            let cof = kf.sub(
+                &kf.mul(&a[i1][j1], &a[i2][j2]),
+                &kf.mul(&a[i1][j2], &a[i2][j1]),
+            );
             r[j][i] = kf.mul(&di, &cof);
         }
     }
@@ -871,7 +899,10 @@ impl Inst {
             None => true,
             Some((x, y)) => {
                 let kf = &self.kf;
-                let rhs = kf.add(&kf.add(&kf.mul(x, &kf.mul(x, x)), &kf.mul(&self.ea, x)), &self.eb);
+                let rhs = kf.add(
+                    &kf.add(&kf.mul(x, &kf.mul(x, x)), &kf.mul(&self.ea, x)),
+                    &self.eb,
+                );
                 kf.mul(y, y) == rhs
             }
         }
@@ -880,7 +911,10 @@ impl Inst {
         let kf = &self.kf;
         loop {
             let x = kf.rand(rng);
-            let rhs = kf.add(&kf.add(&kf.mul(&x, &kf.mul(&x, &x)), &kf.mul(&self.ea, &x)), &self.eb);
+            let rhs = kf.add(
+                &kf.add(&kf.mul(&x, &kf.mul(&x, &x)), &kf.mul(&self.ea, &x)),
+                &self.eb,
+            );
             if let Some(y) = kf.sqrt(&rhs) {
                 if !kf.is_zero(&y) {
                     return Some((x, y));
@@ -934,7 +968,11 @@ impl Inst {
         let t = kf.mul(&s1, &kf.inv(&s0));
         // u(t)
         let ut = kf.add(&kf.add(&kf.mul(&t, &t), &kf.mul(&self.ub, &t)), &self.uc);
-        let y0 = if kf.is_zero(&z) { kf.zero() } else { kf.mul(&ut, &kf.mul(&y, &kf.inv(&z))) };
+        let y0 = if kf.is_zero(&z) {
+            kf.zero()
+        } else {
+            kf.mul(&ut, &kf.mul(&y, &kf.inv(&z)))
+        };
         // f(t) = u(t) u''(t) is verified via the Weierstrass equation below; also check y0^2 = f(t)
         let u2 = kf.frob(&kf.frob(&self.ub));
         let c2 = kf.frob(&kf.frob(&self.uc));
@@ -948,7 +986,10 @@ impl Inst {
         let bh = kf.scale(&self.wb, half);
         let inner = kf.add(&kf.add(&kf.add(&y0, &tt), &kf.mul(&bh, &t)), &self.ws);
         let xw = kf.add(&inner, &inner);
-        let yp = kf.add(&kf.add(&kf.mul(&kf.add(&xw, &xw), &t), &kf.mul(&bh, &xw)), &self.walpha);
+        let yp = kf.add(
+            &kf.add(&kf.mul(&kf.add(&xw, &xw), &t), &kf.mul(&bh, &xw)),
+            &self.walpha,
+        );
         Some(short(&xw, &yp))
     }
 }
@@ -1021,7 +1062,10 @@ fn build_core(kf: &Kf, ub: &K, uc: &K) -> Result<Core, Reject> {
     let cb = quad(&be, &be); // Y^4
     let cc = quad(&ga, &ga); // Z^4
     let cross = |p: &Vec<K>, q: &Vec<K>| -> K {
-        kf.sub(&mm(&two, &mm(&p[1], &q[1])), &kf.add(&mm(&p[0], &q[2]), &mm(&p[2], &q[0])))
+        kf.sub(
+            &mm(&two, &mm(&p[1], &q[1])),
+            &kf.add(&mm(&p[0], &q[2]), &mm(&p[2], &q[0])),
+        )
     };
     let cd = cross(&al, &be); // X^2 Y^2
     let ce = cross(&be, &ga); // Y^2 Z^2
@@ -1062,7 +1106,11 @@ fn build_core(kf: &Kf, ub: &K, uc: &K) -> Result<Core, Reject> {
         p
     };
     let (lx, ly, lz) = (lin(&omi[0]), lin(&omi[1]), lin(&omi[2]));
-    let (sx, sy, sz) = (poly3_mul(kf, &lx, &lx), poly3_mul(kf, &ly, &ly), poly3_mul(kf, &lz, &lz));
+    let (sx, sy, sz) = (
+        poly3_mul(kf, &lx, &lx),
+        poly3_mul(kf, &ly, &ly),
+        poly3_mul(kf, &lz, &lz),
+    );
     let mut g = Poly3::new();
     for (coef, p1, p2) in [
         (&ca, &sx, &sx),
@@ -1113,7 +1161,10 @@ fn build_core(kf: &Kf, ub: &K, uc: &K) -> Result<Core, Reject> {
     }
     let beta = kf.sub(&e_, &kf.mul(&s, &s));
     let a2c = kf.sub(&b3sq, &kf.scale(&s, kf.f.int(16)));
-    let a4c = kf.sub(&kf.scale(&kf.mul(&b3, &alpha), 2), &kf.scale(&beta, kf.f.int(8)));
+    let a4c = kf.sub(
+        &kf.scale(&kf.mul(&b3, &alpha), 2),
+        &kf.scale(&beta, kf.f.int(8)),
+    );
     let a2 = kf.scale(&a2c, inv4);
     let a4 = kf.scale(&a4c, inv2);
     let a6 = kf.mul(&alpha, &alpha);
@@ -1126,7 +1177,17 @@ fn build_core(kf: &Kf, ub: &K, uc: &K) -> Result<Core, Reject> {
         &kf.scale(&kf.mul(&a2sq, &a2), kf.f.int(2) * inv27 % kf.q()),
     );
     let _ = is_square_ratio_ok(kf);
-    Ok(Core { quartic, omi, rmat, ea, eb, wb: b3, ws: s, walpha: alpha, wshift: shift })
+    Ok(Core {
+        quartic,
+        omi,
+        rmat,
+        ea,
+        eb,
+        wb: b3,
+        ws: s,
+        walpha: alpha,
+        wshift: shift,
+    })
 }
 
 /// `#E0(K)` by baby-step giant-step on the Hasse interval, using several random points
@@ -1258,7 +1319,10 @@ pub fn gen_instance(k: u32, idx: u32) -> Inst {
         for h in 1..=16u64 {
             if n % h == 0 {
                 let l = n / h;
-                if is_prime_u64(l) && l < (1u64 << 63) && (l as u128) * (l as u128) > (q as u128).pow(5) {
+                if is_prime_u64(l)
+                    && l < (1u64 << 63)
+                    && (l as u128) * (l as u128) > (q as u128).pow(5)
+                {
                     chosen = Some((h, l));
                     break;
                 }
@@ -1300,7 +1364,10 @@ pub fn eval_g(f: &Fq, g: &[u64; 15], p: &[u64; 3]) -> u64 {
     let mut s = 0u64;
     for (i, m) in MON4.iter().enumerate() {
         if g[i] != 0 {
-            let t = f.mul(g[i], f.mul(px[m.0 as usize], f.mul(py[m.1 as usize], pz[m.2 as usize])));
+            let t = f.mul(
+                g[i],
+                f.mul(px[m.0 as usize], f.mul(py[m.1 as usize], pz[m.2 as usize])),
+            );
             s = f.add(s, t);
         }
     }
@@ -1408,7 +1475,10 @@ pub fn taylor_data(f: &Fq, g: &[u64; 15], p: &[u64; 3]) -> ([u64; 3], [u64; 6]) 
             if ex.iter().any(|&v| v < 0) {
                 return 0;
             }
-            f.mul(pp[0][ex[0] as usize], f.mul(pp[1][ex[1] as usize], pp[2][ex[2] as usize]))
+            f.mul(
+                pp[0][ex[0] as usize],
+                f.mul(pp[1][ex[1] as usize], pp[2][ex[2] as usize]),
+            )
         };
         for a in 0..3 {
             if e[a] == 0 {
@@ -1457,7 +1527,12 @@ pub fn make_fb_pt(f: &Fq, g: &[u64; 15], c: [u64; 3]) -> FbPt {
 /// c2 l m + c3 m^2)` in `G(lambda P1 + mu P2)`.
 #[inline]
 pub fn line_coeffs(f: &Fq, p1: &FbPt, p2: &FbPt) -> (u64, u64, u64) {
-    let dot = |a: &[u64; 3], b: &[u64; 3]| f.add(f.add(f.mul(a[0], b[0]), f.mul(a[1], b[1])), f.mul(a[2], b[2]));
+    let dot = |a: &[u64; 3], b: &[u64; 3]| {
+        f.add(
+            f.add(f.mul(a[0], b[0]), f.mul(a[1], b[1])),
+            f.mul(a[2], b[2]),
+        )
+    };
     let c1 = dot(&p1.grad, &p2.c);
     let c3 = dot(&p2.grad, &p1.c);
     let v = &p2.c;
@@ -1465,7 +1540,10 @@ pub fn line_coeffs(f: &Fq, p1: &FbPt, p2: &FbPt) -> (u64, u64, u64) {
     let (xy, xz, yz) = (f.mul(v[0], v[1]), f.mul(v[0], v[2]), f.mul(v[1], v[2]));
     let h = &p1.hess;
     let c2 = f.add(
-        f.add(f.add(f.mul(h[0], x2), f.mul(h[1], y2)), f.add(f.mul(h[2], z2), f.mul(h[3], xy))),
+        f.add(
+            f.add(f.mul(h[0], x2), f.mul(h[1], y2)),
+            f.add(f.mul(h[2], z2), f.mul(h[3], xy)),
+        ),
         f.add(f.mul(h[4], xz), f.mul(h[5], yz)),
     );
     (c1, c2, c3)
@@ -1519,7 +1597,13 @@ fn recover_lm(f: &Fq, p1: &[u64; 3], p2: &[u64; 3], r: &[u64; 3]) -> Option<(u64
 /// Independent verification of a line relation: the four points, with multiplicity, are
 /// exactly the zero divisor of `G` restricted to the line through `P1`, `P2`.
 /// `pts` are normalised coordinates. Returns true if verified.
-pub fn verify_line(f: &Fq, g: &[u64; 15], p1: &[u64; 3], p2: &[u64; 3], pts: &[[u64; 3]; 4]) -> bool {
+pub fn verify_line(
+    f: &Fq,
+    g: &[u64; 15],
+    p1: &[u64; 3],
+    p2: &[u64; 3],
+    pts: &[[u64; 3]; 4],
+) -> bool {
     // binary quartic F(l, m) = sum c_k l^{4-k} m^k by evaluation at five points of the pencil
     let ev = |l: u64, m: u64| -> u64 {
         let pt = comb(f, l, m, p1, p2);
@@ -1607,7 +1691,16 @@ impl Perm {
         if bits % 2 == 1 {
             bits += 1;
         }
-        Perm { n, bits, keys: [rng.next_u64(), rng.next_u64(), rng.next_u64(), rng.next_u64()] }
+        Perm {
+            n,
+            bits,
+            keys: [
+                rng.next_u64(),
+                rng.next_u64(),
+                rng.next_u64(),
+                rng.next_u64(),
+            ],
+        }
     }
     fn enc(&self, x: u64) -> u64 {
         let h = self.bits / 2;
@@ -1639,7 +1732,12 @@ pub fn pair_of_index(idx: u64, f: u64) -> (usize, usize) {
     // idx in [0, f(f-1)/2): row i has (f-1-i) entries
     // find largest i with i*(2f - i - 1)/2 <= idx
     let ff = f as f64;
-    let mut i = ((2.0 * ff - 1.0 - ((2.0 * ff - 1.0).powi(2) - 8.0 * idx as f64).max(0.0).sqrt()) / 2.0) as u64;
+    let mut i = ((2.0 * ff
+        - 1.0
+        - ((2.0 * ff - 1.0).powi(2) - 8.0 * idx as f64)
+            .max(0.0)
+            .sqrt())
+        / 2.0) as u64;
     let start = |i: u64| i * (2 * f - i - 1) / 2;
     while i > 0 && start(i) > idx {
         i -= 1;
@@ -1683,7 +1781,6 @@ pub struct Rel {
     /// the two factor-base points (indices into the FB) that define the line
     pub line: (u32, u32),
 }
-
 
 /// Counters emitted by the relation phase (all arms).
 #[derive(Clone, Debug, Default)]
@@ -1730,9 +1827,24 @@ pub struct LpGraph {
     pub ops: u64,
 }
 
+impl Default for LpGraph {
+    fn default() -> Self {
+        Self {
+            parent: vec![0],
+            parity: vec![0],
+            sink: vec![true],
+            odd: vec![false],
+            edges: 0,
+            verts: 0,
+            bip: 0,
+            ops: 0,
+        }
+    }
+}
+
 impl LpGraph {
     pub fn new() -> LpGraph {
-        LpGraph { parent: vec![0], parity: vec![0], sink: vec![true], odd: vec![false], edges: 0, verts: 0, bip: 0, ops: 0 }
+        Self::default()
     }
     fn find(&mut self, mut v: u32) -> (u32, u8) {
         let mut path = vec![];
@@ -1793,7 +1905,13 @@ impl LpGraph {
 
 /// Build the factor base for an arm. FULL: all rational points (sorted by key). Reduced:
 /// `size` uniform random rational points (with `W2 != 0`), deduplicated.
-pub fn build_fb(inst: &Inst, arm: Arm, kappa: f64, rng: &mut SplitMix64, ctr: &mut IcCounters) -> Vec<FbPt> {
+pub fn build_fb(
+    inst: &Inst,
+    arm: Arm,
+    kappa: f64,
+    rng: &mut SplitMix64,
+    ctr: &mut IcCounters,
+) -> Vec<FbPt> {
     let f = inst.f();
     let g = &inst.quartic;
     let size = arm.fb_size(inst.q, kappa) as usize;
@@ -1802,7 +1920,7 @@ pub fn build_fb(inst: &Inst, arm: Arm, kappa: f64, rng: &mut SplitMix64, ctr: &m
         pts = enumerate_points(f, g);
         assert_eq!(pts.len() as u64, inst.q + 1, "N1 != q + 1");
         pts = pts.iter().map(|p| normalize_pt(f, p)).collect();
-        pts.sort_by_key(|p| pt_key(p));
+        pts.sort_by_key(pt_key);
     } else {
         let mut seen: FxSet<u64> = FxSet::default();
         pts = Vec::with_capacity(size);
@@ -1905,7 +2023,12 @@ impl<'a> Collector<'a> {
 
     /// Process lines until `available() >= target` (true) or the pairs are exhausted, the
     /// line budget is hit or the deadline passes (false).
-    pub fn run_until(&mut self, target: i64, max_lines: u64, deadline: Option<std::time::Instant>) -> bool {
+    pub fn run_until(
+        &mut self,
+        target: i64,
+        max_lines: u64,
+        deadline: Option<std::time::Instant>,
+    ) -> bool {
         let inst = self.inst;
         let f = inst.f();
         let g = inst.quartic;
@@ -1921,7 +2044,7 @@ impl<'a> Collector<'a> {
             if self.ctr.lines >= max_lines {
                 return false;
             }
-            if self.ctr.lines % 4096 == 0 {
+            if self.ctr.lines.is_multiple_of(4096) {
                 if let Some(d) = deadline {
                     if std::time::Instant::now() > d {
                         return false;
@@ -2034,7 +2157,11 @@ impl<'a> Collector<'a> {
                 self.ctr.rel_dlp += 1;
             }
         }
-        self.rels.push(Rel { fb: fbs, lp: lpv, line: (i as u32, j as u32) });
+        self.rels.push(Rel {
+            fb: fbs,
+            lp: lpv,
+            line: (i as u32, j as u32),
+        });
     }
 
     pub fn finish_counters(&mut self) {
@@ -2105,7 +2232,13 @@ fn row_coef(row: &SRow, c: u32) -> u64 {
 /// (weight 1: row dropped; weight 2: the two rows merged; general weight: Markowitz-style
 /// pivot on the shortest row). Returns FB-only rows. All mod-ell work is counted in
 /// `ops` / `entries`.
-pub fn eliminate_lp(mont: &Mont, nfb: usize, rows_in: Vec<SRow>, ops: &mut u64, entries: &mut u64) -> Vec<SRow> {
+pub fn eliminate_lp(
+    mont: &Mont,
+    nfb: usize,
+    rows_in: Vec<SRow>,
+    ops: &mut u64,
+    entries: &mut u64,
+) -> Vec<SRow> {
     use std::cmp::Reverse;
     let mut rows: Vec<Option<SRow>> = rows_in.into_iter().map(Some).collect();
     let mut colset: FxMap<u32, FxSet<u32>> = FxMap::default();
@@ -2117,7 +2250,8 @@ pub fn eliminate_lp(mont: &Mont, nfb: usize, rows_in: Vec<SRow>, ops: &mut u64, 
             }
         }
     }
-    let mut heap: BinaryHeap<Reverse<(usize, u32)>> = colset.iter().map(|(&c, s)| Reverse((s.len(), c))).collect();
+    let mut heap: BinaryHeap<Reverse<(usize, u32)>> =
+        colset.iter().map(|(&c, s)| Reverse((s.len(), c))).collect();
     while let Some(Reverse((w, c))) = heap.pop() {
         let cur = colset.get(&c).map(|s| s.len()).unwrap_or(0);
         if cur == 0 {
@@ -2128,7 +2262,10 @@ pub fn eliminate_lp(mont: &Mont, nfb: usize, rows_in: Vec<SRow>, ops: &mut u64, 
             heap.push(Reverse((cur, c)));
             continue;
         }
-        let pr = *colset[&c].iter().min_by_key(|&&r| (rows[r as usize].as_ref().unwrap().len(), r)).unwrap();
+        let pr = *colset[&c]
+            .iter()
+            .min_by_key(|&&r| (rows[r as usize].as_ref().unwrap().len(), r))
+            .unwrap();
         let mut prow = rows[pr as usize].take().unwrap();
         for &(cc, _) in &prow {
             if cc as usize >= nfb {
@@ -2142,7 +2279,10 @@ pub fn eliminate_lp(mont: &Mont, nfb: usize, rows_in: Vec<SRow>, ops: &mut u64, 
             e.1 = mont.mul(e.1, inv);
         }
         *ops += prow.len() as u64;
-        let mut others: Vec<u32> = colset.get(&c).map(|s| s.iter().cloned().collect()).unwrap_or_default();
+        let mut others: Vec<u32> = colset
+            .get(&c)
+            .map(|s| s.iter().cloned().collect())
+            .unwrap_or_default();
         others.sort_unstable();
         for r in others {
             let row = rows[r as usize].take().unwrap();
@@ -2170,7 +2310,10 @@ pub fn eliminate_lp(mont: &Mont, nfb: usize, rows_in: Vec<SRow>, ops: &mut u64, 
         }
         colset.remove(&c);
     }
-    rows.into_iter().flatten().filter(|r| !r.is_empty()).collect()
+    rows.into_iter()
+        .flatten()
+        .filter(|r| !r.is_empty())
+        .collect()
 }
 
 /// Dense rank of the rows over `F_ell` (cross-check only; not part of any attack cost).
@@ -2276,8 +2419,26 @@ pub struct LaResult {
 
 /// Solve `A v = 0` with `v[0] = 1` by Wiedemann on `M = A'^T D A'` (`A'` = `A` without column 0).
 /// The last `holdout` rows are not used in the solve and checked afterwards, as are all rows.
-pub fn wiedemann_solve(mont: &Mont, rows: &[SRow], ncols: usize, holdout: usize, seed: u64, deadline: Option<std::time::Instant>) -> LaResult {
-    let mut res = LaResult { ok: false, fail: "", v: vec![], wied_ops: 0, bm_ops: 0, matvecs: 0, deg: 0, rows_used: 0, holdout, holdout_ok: false };
+pub fn wiedemann_solve(
+    mont: &Mont,
+    rows: &[SRow],
+    ncols: usize,
+    holdout: usize,
+    seed: u64,
+    deadline: Option<std::time::Instant>,
+) -> LaResult {
+    let mut res = LaResult {
+        ok: false,
+        fail: "",
+        v: vec![],
+        wied_ops: 0,
+        bm_ops: 0,
+        matvecs: 0,
+        deg: 0,
+        rows_used: 0,
+        holdout,
+        holdout_ok: false,
+    };
     let nc = ncols - 1;
     if rows.len() < holdout + nc {
         res.fail = "too_few_rows";
@@ -2307,30 +2468,31 @@ pub fn wiedemann_solve(mont: &Mont, rows: &[SRow], ncols: usize, holdout: usize,
     let mut ops = 0u64;
     let mut mv = 0u64;
     let mut tmp = vec![0u64; m];
-    let matvec = |x: &[u64], out: &mut Vec<u64>, tmp: &mut Vec<u64>, ops: &mut u64, mv: &mut u64| {
-        for r in 0..m {
-            let mut acc = 0u64;
-            for p in ptr[r]..ptr[r + 1] {
-                acc = mont.add(acc, mont.mul(vals[p], x[cols[p] as usize]));
+    let matvec =
+        |x: &[u64], out: &mut Vec<u64>, tmp: &mut Vec<u64>, ops: &mut u64, mv: &mut u64| {
+            for r in 0..m {
+                let mut acc = 0u64;
+                for p in ptr[r]..ptr[r + 1] {
+                    acc = mont.add(acc, mont.mul(vals[p], x[cols[p] as usize]));
+                }
+                tmp[r] = mont.mul(acc, diag[r]);
             }
-            tmp[r] = mont.mul(acc, diag[r]);
-        }
-        for o in out.iter_mut() {
-            *o = 0;
-        }
-        for r in 0..m {
-            let t = tmp[r];
-            if t == 0 {
-                continue;
+            for o in out.iter_mut() {
+                *o = 0;
             }
-            for p in ptr[r]..ptr[r + 1] {
-                let c = cols[p] as usize;
-                out[c] = mont.add(out[c], mont.mul(vals[p], t));
+            for r in 0..m {
+                let t = tmp[r];
+                if t == 0 {
+                    continue;
+                }
+                for p in ptr[r]..ptr[r + 1] {
+                    let c = cols[p] as usize;
+                    out[c] = mont.add(out[c], mont.mul(vals[p], t));
+                }
             }
-        }
-        *ops += 2 * nnz + m as u64;
-        *mv += 1;
-    };
+            *ops += 2 * nnz + m as u64;
+            *mv += 1;
+        };
     // b = A'^T D r
     let mut b = vec![0u64; nc];
     for r in 0..m {
@@ -2358,7 +2520,7 @@ pub fn wiedemann_solve(mont: &Mont, rows: &[SRow], ncols: usize, holdout: usize,
         matvec(&cur, &mut nxt, &mut tmp, &mut ops, &mut mv);
         std::mem::swap(&mut cur, &mut nxt);
         if let Some(dl) = deadline {
-            if mv % 64 == 0 && std::time::Instant::now() > dl {
+            if mv.is_multiple_of(64) && std::time::Instant::now() > dl {
                 res.fail = "timeout";
                 res.wied_ops = ops;
                 res.matvecs = mv;
@@ -2394,7 +2556,7 @@ pub fn wiedemann_solve(mont: &Mont, rows: &[SRow], ncols: usize, holdout: usize,
             std::mem::swap(&mut cur, &mut nxt);
         }
         if let Some(dl) = deadline {
-            if mv % 64 == 0 && std::time::Instant::now() > dl {
+            if mv.is_multiple_of(64) && std::time::Instant::now() > dl {
                 res.fail = "timeout";
                 res.wied_ops = ops;
                 res.matvecs = mv;
@@ -2457,18 +2619,22 @@ pub struct KFast {
 
 impl KFast {
     pub fn new(kf: &Kf) -> KFast {
-        KFast { q: kf.q(), a: kf.a, b: kf.b, gq: kf.gq, gq2: kf.gq2, fqm: Cell::new(0), fqi: Cell::new(0) }
+        KFast {
+            q: kf.q(),
+            a: kf.a,
+            b: kf.b,
+            gq: kf.gq,
+            gq2: kf.gq2,
+            fqm: Cell::new(0),
+            fqi: Cell::new(0),
+        }
     }
     #[inline]
     pub fn add(&self, x: &K, y: &K) -> K {
         let q = self.q;
         let r = |a: u64, b: u64| {
             let s = a + b;
-            if s >= q {
-                s - q
-            } else {
-                s
-            }
+            if s >= q { s - q } else { s }
         };
         [r(x[0], y[0]), r(x[1], y[1]), r(x[2], y[2])]
     }
@@ -2490,7 +2656,11 @@ impl KFast {
         // g^3 = -a g - b, g^4 = -a g^2 - b g
         let nb = q - self.b;
         let na = q - self.a;
-        [(c0 + nb * c3) % q, (c1 + na * c3 + nb * c4) % q, (c2 + na * c4) % q]
+        [
+            (c0 + nb * c3) % q,
+            (c1 + na * c3 + nb * c4) % q,
+            (c2 + na * c4) % q,
+        ]
     }
     #[inline]
     fn scale(&self, x: &K, c: u64) -> K {
@@ -2530,7 +2700,9 @@ impl KFast {
 
 #[inline]
 fn kmix(x: &K) -> u64 {
-    let mut h = x[0].wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ x[1].wrapping_mul(0xBF58_476D_1CE4_E5B9).rotate_left(21) ^ x[2].wrapping_mul(0x94D0_49BB_1331_11EB).rotate_left(42);
+    let mut h = x[0].wrapping_mul(0x9E37_79B9_7F4A_7C15)
+        ^ x[1].wrapping_mul(0xBF58_476D_1CE4_E5B9).rotate_left(21)
+        ^ x[2].wrapping_mul(0x94D0_49BB_1331_11EB).rotate_left(42);
     h ^= h >> 31;
     h = h.wrapping_mul(0xD6E8_FEB8_6659_FD93);
     h ^= h >> 32;
@@ -2580,7 +2752,11 @@ fn lin_comb(inst: &Inst, g0: &EPt, qq: &EPt, a: u64, b: u64) -> EPt {
 pub fn rho_run(inst: &Inst, seed: u64, deadline: Option<std::time::Instant>) -> RhoOut {
     let t0 = std::time::Instant::now();
     let ell = inst.ell;
-    let mut out = RhoOut { m: RHO_M, r: RHO_R, ..Default::default() };
+    let mut out = RhoOut {
+        m: RHO_M,
+        r: RHO_R,
+        ..Default::default()
+    };
     let mut rng = SplitMix64::new(seed ^ 0x52_48_4F_00_00_00_00_00);
     let f = inst.f();
     let (sm0, si0) = f.counts();
@@ -2614,7 +2790,13 @@ pub fn rho_run(inst: &Inst, seed: u64, deadline: Option<std::time::Instant>) -> 
     let mut py: Vec<K> = vec![[0; 3]; nw];
     let mut wa = vec![0u64; nw];
     let mut wb = vec![0u64; nw];
-    let mut start_walker = |i: usize, rng: &mut SplitMix64, px: &mut Vec<K>, py: &mut Vec<K>, wa: &mut Vec<u64>, wb: &mut Vec<u64>, out: &mut RhoOut| {
+    let start_walker = |i: usize,
+                        rng: &mut SplitMix64,
+                        px: &mut Vec<K>,
+                        py: &mut Vec<K>,
+                        wa: &mut Vec<u64>,
+                        wb: &mut Vec<u64>,
+                        out: &mut RhoOut| {
         loop {
             let (a, b) = (rng.below(ell), rng.below(ell));
             out.rng_draws += 2;
@@ -2664,11 +2846,7 @@ pub fn rho_run(inst: &Inst, seed: u64, deadline: Option<std::time::Instant>) -> 
             special[i] = dd == [0; 3];
             den[i] = if special[i] { one } else { dd };
             pre[i] = run;
-            if i + 1 < nw {
-                run = kf.mul(&run, &den[i]);
-            } else {
-                run = kf.mul(&run, &den[i]);
-            }
+            run = kf.mul(&run, &den[i]);
         }
         // run = product of all den; invert once, sweep back
         let mut inv_run = kf.inv(&run);
@@ -2700,19 +2878,11 @@ pub fn rho_run(inst: &Inst, seed: u64, deadline: Option<std::time::Instant>) -> 
             }
             wa[i] = {
                 let t = wa[i] + mj;
-                if t >= ell {
-                    t - ell
-                } else {
-                    t
-                }
+                if t >= ell { t - ell } else { t }
             };
             wb[i] = {
                 let t = wb[i] + nj;
-                if t >= ell {
-                    t - ell
-                } else {
-                    t
-                }
+                if t >= ell { t - ell } else { t }
             };
         }
         out.steps += nw as u64;
@@ -2724,7 +2894,14 @@ pub fn rho_run(inst: &Inst, seed: u64, deadline: Option<std::time::Instant>) -> 
             out.dp_checks += 1;
             if hs[i] & mask == 0 {
                 out.dps += 1;
-                let key = [px[i][0] as u32, px[i][1] as u32, px[i][2] as u32, py[i][0] as u32, py[i][1] as u32, py[i][2] as u32];
+                let key = [
+                    px[i][0] as u32,
+                    px[i][1] as u32,
+                    px[i][2] as u32,
+                    py[i][0] as u32,
+                    py[i][1] as u32,
+                    py[i][2] as u32,
+                ];
                 out.dp_lookups += 1;
                 let mut solved = None;
                 let mut solved_none_cycle = false;
@@ -2803,9 +2980,15 @@ pub fn measure_rho_inv(q: u64, samples: u64) -> f64 {
 
 /// Tiny JSON-object builder (numbers via `Display`, strings escaped minimally).
 pub struct J(pub String);
+impl Default for J {
+    fn default() -> Self {
+        Self(String::from("{"))
+    }
+}
+
 impl J {
     pub fn new() -> J {
-        J(String::from("{"))
+        Self::default()
     }
     fn sep(&mut self) {
         if self.0.len() > 1 {
@@ -2815,13 +2998,21 @@ impl J {
     pub fn n<T: std::fmt::Display>(&mut self, k: &str, v: T) -> &mut J {
         self.sep();
         let s = format!("{}", v);
-        let s = if s == "NaN" || s == "inf" || s == "-inf" { "null".to_string() } else { s };
+        let s = if s == "NaN" || s == "inf" || s == "-inf" {
+            "null".to_string()
+        } else {
+            s
+        };
         self.0.push_str(&format!("\"{}\":{}", k, s));
         self
     }
     pub fn s(&mut self, k: &str, v: &str) -> &mut J {
         self.sep();
-        self.0.push_str(&format!("\"{}\":\"{}\"", k, v.replace('\\', "\\\\").replace('"', "\\\"")));
+        self.0.push_str(&format!(
+            "\"{}\":\"{}\"",
+            k,
+            v.replace('\\', "\\\\").replace('"', "\\\"")
+        ));
         self
     }
     pub fn raw(&mut self, k: &str, v: &str) -> &mut J {
@@ -2887,7 +3078,8 @@ impl IcCell {
     /// mod-ell weight `w_ell`: relation phase (incl. FB construction, excl. verification) +
     /// linear algebra.
     pub fn cost_rel(&self, rinv: f64) -> f64 {
-        (self.ctr.fq_mul_collect + self.ctr.fq_mul_fb) as f64 + rinv * (self.ctr.fq_inv_collect + self.ctr.fq_inv_fb) as f64
+        (self.ctr.fq_mul_collect + self.ctr.fq_mul_fb) as f64
+            + rinv * (self.ctr.fq_inv_collect + self.ctr.fq_inv_fb) as f64
     }
     pub fn lops(&self) -> u64 {
         self.ctr.elim_ops + self.ctr.wied_ops + self.ctr.bm_ops
@@ -2895,21 +3087,63 @@ impl IcCell {
     pub fn to_json(&self) -> String {
         let c = &self.ctr;
         let mut j = J::new();
-        j.n("k", self.k).n("idx", self.idx).s("arm", self.arm).n("kappa", self.kappa).n("q", self.q).n("ell", self.ell).n("h", self.h);
-        j.n("nfb", self.nfb).n("ncols", self.ncols).s("status", &self.status).n("rounds", self.rounds).n("target_final", self.target_final);
-        j.n("rows_collected", self.rows_collected).n("rows_after_elim", self.rows_after_elim);
-        j.n("lines", c.lines).n("split", c.split).n("rel_full", c.rel_full).n("rel_slp", c.rel_slp).n("rel_dlp", c.rel_dlp).n("dups", c.dups);
-        j.n("verified", c.verified).n("verify_failed", c.verify_failed);
-        j.n("fq_mul_collect", c.fq_mul_collect).n("fq_inv_collect", c.fq_inv_collect).n("fq_mul_fb", c.fq_mul_fb).n("fq_inv_fb", c.fq_inv_fb);
-        j.n("fq_mul_verify", c.fq_mul_verify).n("fq_inv_verify", c.fq_inv_verify);
-        j.n("elim_ops", c.elim_ops).n("elim_entries", c.elim_entries).n("wied_ops", c.wied_ops).n("bm_ops", c.bm_ops).n("matvecs", c.matvecs);
+        j.n("k", self.k)
+            .n("idx", self.idx)
+            .s("arm", self.arm)
+            .n("kappa", self.kappa)
+            .n("q", self.q)
+            .n("ell", self.ell)
+            .n("h", self.h);
+        j.n("nfb", self.nfb)
+            .n("ncols", self.ncols)
+            .s("status", &self.status)
+            .n("rounds", self.rounds)
+            .n("target_final", self.target_final);
+        j.n("rows_collected", self.rows_collected)
+            .n("rows_after_elim", self.rows_after_elim);
+        j.n("lines", c.lines)
+            .n("split", c.split)
+            .n("rel_full", c.rel_full)
+            .n("rel_slp", c.rel_slp)
+            .n("rel_dlp", c.rel_dlp)
+            .n("dups", c.dups);
+        j.n("verified", c.verified)
+            .n("verify_failed", c.verify_failed);
+        j.n("fq_mul_collect", c.fq_mul_collect)
+            .n("fq_inv_collect", c.fq_inv_collect)
+            .n("fq_mul_fb", c.fq_mul_fb)
+            .n("fq_inv_fb", c.fq_inv_fb);
+        j.n("fq_mul_verify", c.fq_mul_verify)
+            .n("fq_inv_verify", c.fq_inv_verify);
+        j.n("elim_ops", c.elim_ops)
+            .n("elim_entries", c.elim_entries)
+            .n("wied_ops", c.wied_ops)
+            .n("bm_ops", c.bm_ops)
+            .n("matvecs", c.matvecs);
         j.n("lops", self.lops());
-        j.n("hash_lookups", c.hash_lookups).n("hash_inserts", c.hash_inserts).n("rng_draws", c.rng_draws).n("uf_ops", c.uf_ops).n("root_calls", c.root_calls).n("norm_calls", c.norm_calls);
-        j.n("rel_wall_s", self.rel_wall_s).n("la_wall_s", self.la_wall_s);
-        j.n("la_ok", self.la_ok as u32).s("la_fail", &self.la_fail).n("la_deg", self.la_deg).n("holdout", self.holdout).n("holdout_ok", self.holdout_ok as u32);
-        j.n("coverage", self.coverage as u32).n("cross_pairs", self.cross_pairs).n("cross_ok", self.cross_ok);
-        j.n("push_checked", self.push_checked).n("push_fail", self.push_fail);
-        let rp: Vec<String> = self.rank_profile.iter().map(|(f, t, r, k)| format!("[{},{},{},{}]", f, t, r, k)).collect();
+        j.n("hash_lookups", c.hash_lookups)
+            .n("hash_inserts", c.hash_inserts)
+            .n("rng_draws", c.rng_draws)
+            .n("uf_ops", c.uf_ops)
+            .n("root_calls", c.root_calls)
+            .n("norm_calls", c.norm_calls);
+        j.n("rel_wall_s", self.rel_wall_s)
+            .n("la_wall_s", self.la_wall_s);
+        j.n("la_ok", self.la_ok as u32)
+            .s("la_fail", &self.la_fail)
+            .n("la_deg", self.la_deg)
+            .n("holdout", self.holdout)
+            .n("holdout_ok", self.holdout_ok as u32);
+        j.n("coverage", self.coverage as u32)
+            .n("cross_pairs", self.cross_pairs)
+            .n("cross_ok", self.cross_ok);
+        j.n("push_checked", self.push_checked)
+            .n("push_fail", self.push_fail);
+        let rp: Vec<String> = self
+            .rank_profile
+            .iter()
+            .map(|(f, t, r, k)| format!("[{},{},{},{}]", f, t, r, k))
+            .collect();
         j.raw("rank_profile", &format!("[{}]", rp.join(",")));
         j.done()
     }
@@ -2921,14 +3155,34 @@ fn ceil_i(x: f64) -> i64 {
 
 /// Execute one IC cell: relation phase, structured elimination, Wiedemann, with the
 /// protocol's verification and ell-part tests. `wall_cap_s` bounds relation + LA wall time.
-pub fn run_ic_cell(inst: &Inst, arm: Arm, kappa: f64, seed: u64, wall_cap_s: f64, do_rank_profile: bool, skip_la: bool) -> IcCell {
+pub fn run_ic_cell(
+    inst: &Inst,
+    arm: Arm,
+    kappa: f64,
+    seed: u64,
+    wall_cap_s: f64,
+    do_rank_profile: bool,
+    skip_la: bool,
+) -> IcCell {
     let start = std::time::Instant::now();
     let deadline = start + std::time::Duration::from_secs_f64(wall_cap_s);
     let mont = Mont::new(inst.ell);
     let mut col = Collector::new(inst, arm, kappa, seed);
     let nfb = col.fb.len();
     let ncols = nfb;
-    let mut cell = IcCell { k: inst.k, idx: inst.idx, arm: arm.name(), kappa, q: inst.q, ell: inst.ell, h: inst.h, nfb, ncols, rounds: 1, ..Default::default() };
+    let mut cell = IcCell {
+        k: inst.k,
+        idx: inst.idx,
+        arm: arm.name(),
+        kappa,
+        q: inst.q,
+        ell: inst.ell,
+        h: inst.h,
+        nfb,
+        ncols,
+        rounds: 1,
+        ..Default::default()
+    };
     let mut target = ceil_i(1.1 * (nfb as f64 + 1.0) + 20.0);
     let mut la_best: Option<LaResult> = None;
     let mut rows_final: Vec<SRow> = vec![];
@@ -2937,10 +3191,21 @@ pub fn run_ic_cell(inst: &Inst, arm: Arm, kappa: f64, seed: u64, wall_cap_s: f64
         let ok = col.run_until(target, u64::MAX, Some(deadline));
         cell.rel_wall_s += t.elapsed().as_secs_f64();
         if std::env::var("DQ_DEBUG").is_ok() {
-            eprintln!("[dq] rel done ok={} lines={} rels={} avail={} t={:.2}", ok, col.ctr.lines, col.rels.len(), col.available(), cell.rel_wall_s);
+            eprintln!(
+                "[dq] rel done ok={} lines={} rels={} avail={} t={:.2}",
+                ok,
+                col.ctr.lines,
+                col.rels.len(),
+                col.available(),
+                cell.rel_wall_s
+            );
         }
         if !ok {
-            cell.status = if col.exhausted { "pairs_exhausted".into() } else { "timeout_relations".into() };
+            cell.status = if col.exhausted {
+                "pairs_exhausted".into()
+            } else {
+                "timeout_relations".into()
+            };
             break;
         }
         let t = std::time::Instant::now();
@@ -2958,10 +3223,22 @@ pub fn run_ic_cell(inst: &Inst, arm: Arm, kappa: f64, seed: u64, wall_cap_s: f64
             break;
         }
         if std::env::var("DQ_DEBUG").is_ok() {
-            eprintln!("[dq] elim done rows={} ops={} t={:.2}", rows.len(), eo, t.elapsed().as_secs_f64());
+            eprintln!(
+                "[dq] elim done rows={} ops={} t={:.2}",
+                rows.len(),
+                eo,
+                t.elapsed().as_secs_f64()
+            );
         }
         let holdout = ((rows.len() / 20).max(20)).min(rows.len());
-        let la = wiedemann_solve(&mont, &rows, ncols, holdout, seed ^ 0x4C41 ^ cell.rounds as u64, Some(deadline));
+        let la = wiedemann_solve(
+            &mont,
+            &rows,
+            ncols,
+            holdout,
+            seed ^ 0x4C41 ^ cell.rounds as u64,
+            Some(deadline),
+        );
         cell.la_wall_s += t.elapsed().as_secs_f64();
         col.ctr.wied_ops += la.wied_ops;
         col.ctr.bm_ops += la.bm_ops;
@@ -2996,7 +3273,11 @@ pub fn run_ic_cell(inst: &Inst, arm: Arm, kappa: f64, seed: u64, wall_cap_s: f64
     {
         let mut rng = SplitMix64::new(seed ^ 0x5055_5348);
         let n = col.rels.len();
-        let idxs: Vec<usize> = if inst.k <= 12 || n <= 2000 { (0..n).collect() } else { (0..2000).map(|_| rng.below(n as u64) as usize).collect() };
+        let idxs: Vec<usize> = if inst.k <= 12 || n <= 2000 {
+            (0..n).collect()
+        } else {
+            (0..2000).map(|_| rng.below(n as u64) as usize).collect()
+        };
         let mut first: Option<EPt> = None;
         for &i in &idxs {
             let s = pushforward_sum(inst, &col, &col.rels[i]);
@@ -3038,7 +3319,10 @@ pub fn run_ic_cell(inst: &Inst, arm: Arm, kappa: f64, seed: u64, wall_cap_s: f64
         for _ in 0..20 {
             let a = rng.below(lim) as usize;
             let b = rng.below(lim) as usize;
-            let (va, vb) = (if a == 0 { 0 } else { la.v[a] }, if b == 0 { 0 } else { la.v[b] });
+            let (va, vb) = (
+                if a == 0 { 0 } else { la.v[a] },
+                if b == 0 { 0 } else { la.v[b] },
+            );
             let l = inst.e_mul(&tvec[b], va as u128);
             let r = inst.e_mul(&tvec[a], vb as u128);
             cell.cross_pairs += 1;
@@ -3053,7 +3337,11 @@ pub fn run_ic_cell(inst: &Inst, arm: Arm, kappa: f64, seed: u64, wall_cap_s: f64
         for &fct in &[1.0f64, 1.05, 1.1, 1.25, 1.5] {
             let mut c2 = Collector::new(inst, arm, kappa, seed);
             let tgt = ceil_i(fct * ncols as f64);
-            if !c2.run_until(tgt, u64::MAX, Some(deadline + std::time::Duration::from_secs(600))) {
+            if !c2.run_until(
+                tgt,
+                u64::MAX,
+                Some(deadline + std::time::Duration::from_secs(600)),
+            ) {
                 break;
             }
             let rows0 = build_rows(&mont, nfb, &c2.rels);
@@ -3069,14 +3357,36 @@ pub fn run_ic_cell(inst: &Inst, arm: Arm, kappa: f64, seed: u64, wall_cap_s: f64
 /// One rho measurement as a JSON line (raw counters; pricing is done by the analysis).
 pub fn rho_json(inst: &Inst, run: u32, o: &RhoOut, rinv: f64) -> String {
     let mut j = J::new();
-    j.n("k", inst.k).n("idx", inst.idx).n("run", run).n("q", inst.q).n("ell", inst.ell).n("h", inst.h);
-    j.n("ok", o.ok as u32).n("verified", o.verified as u32).n("timeout", o.timeout as u32);
-    j.n("steps", o.steps).n("dps", o.dps).n("dp_lookups", o.dp_lookups).n("dp_inserts", o.dp_inserts).n("dp_checks", o.dp_checks);
-    j.n("part_hashes", o.part_hashes).n("rng_draws", o.rng_draws).n("modl_adds", o.modl_adds).n("canon", o.canon);
+    j.n("k", inst.k)
+        .n("idx", inst.idx)
+        .n("run", run)
+        .n("q", inst.q)
+        .n("ell", inst.ell)
+        .n("h", inst.h);
+    j.n("ok", o.ok as u32)
+        .n("verified", o.verified as u32)
+        .n("timeout", o.timeout as u32);
+    j.n("steps", o.steps)
+        .n("dps", o.dps)
+        .n("dp_lookups", o.dp_lookups)
+        .n("dp_inserts", o.dp_inserts)
+        .n("dp_checks", o.dp_checks);
+    j.n("part_hashes", o.part_hashes)
+        .n("rng_draws", o.rng_draws)
+        .n("modl_adds", o.modl_adds)
+        .n("canon", o.canon);
     j.n("restarts", o.restarts).n("fallbacks", o.fallbacks);
-    j.n("fq_mul", o.fq_mul).n("fq_inv", o.fq_inv).n("setup_fq_mul", o.setup_fq_mul).n("setup_fq_inv", o.setup_fq_inv);
-    j.n("restart_fq_mul", o.restart_fq_mul).n("restart_fq_inv", o.restart_fq_inv);
-    j.n("d", o.d).n("m", o.m).n("r", o.r).n("wall_s", o.wall_s).n("rho_inv", rinv);
+    j.n("fq_mul", o.fq_mul)
+        .n("fq_inv", o.fq_inv)
+        .n("setup_fq_mul", o.setup_fq_mul)
+        .n("setup_fq_inv", o.setup_fq_inv);
+    j.n("restart_fq_mul", o.restart_fq_mul)
+        .n("restart_fq_inv", o.restart_fq_inv);
+    j.n("d", o.d)
+        .n("m", o.m)
+        .n("r", o.r)
+        .n("wall_s", o.wall_s)
+        .n("rho_inv", rinv);
     j.done()
 }
 
