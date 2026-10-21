@@ -46,3 +46,9 @@ K3072 target-cancellation combination tests whether two cooperative workers
 lower target-online time on the current best measured local base. The
 four-byte ID30 K4096 layout tests whether reducing root-table allocation
 changes the larger-base result.
+
+The [two-page report](../reports/run-20261017T1610Z/report.pdf) and
+[recorded-value graph](../reports/run-20261017T1610Z/observations.svg) preserve
+the complete, censored and unrun outcomes. The report includes exact small
+receipt copies and full raw-file hashes; [benchmark browsing copies](../../../benchmarks/20261017-n83-id30-screen/)
+use identical rendered bytes.
