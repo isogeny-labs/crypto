@@ -3,7 +3,7 @@
 //! carried into a monic odd-degree model over the declared F_(p^6), with
 //! pullback and norm maps transported through that chart. No real-model
 //! Mumford formulas are applied to the sextic.
-use crate::field::*;
+use crate::toy_field::*;
 use serde::Serialize;
 pub type Poly = Vec<S>;
 #[derive(Copy, Clone)]

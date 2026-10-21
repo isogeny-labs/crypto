@@ -158,6 +158,7 @@ pub mod eds_residue;
 pub mod eds_tate;
 pub mod ext_curve;
 pub mod f4_fp;
+pub mod twist_ic_algebra;
 pub mod f4_fp_tower;
 pub mod f4_tower_generic;
 pub mod f6_wide_geometry;

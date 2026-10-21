@@ -2,15 +2,48 @@
 #![allow(dead_code)]
 mod conditional;
 mod covers;
-mod field;
+mod isogeny;
 mod jacobian;
+mod solver;
+#[path = "../../../../src/ecc/curve.rs"]
+pub mod source_curve;
+#[path = "../../../../src/ecc/field.rs"]
+pub mod source_field;
+#[path = "../../../../src/ecc/point.rs"]
+pub mod source_point;
 #[path = "../../../../src/hash/sha256.rs"]
 mod source_sha256;
+#[path = "field.rs"]
+mod toy_field;
 mod trace;
-use field::*;
+#[path = "../../../../src/utils/mod.rs"]
+pub mod utils;
+pub use source_curve as curve;
+pub use source_field as field;
+pub use source_point as point;
+pub mod ecc {
+    pub use crate::source_curve as curve;
+    pub use crate::source_field as field;
+    pub use crate::source_point as point;
+}
+#[path = "../../../../src/cryptanalysis/f4_fp.rs"]
+pub mod f4_fp;
+#[path = "../../../../src/cryptanalysis/fx_hash.rs"]
+pub mod fx_hash;
+#[path = "../../../../src/cryptanalysis/groebner_f4.rs"]
+pub mod groebner_f4;
+#[path = "../../../../src/cryptanalysis/symmetrized_semaev.rs"]
+pub mod source_symmetrized;
+#[path = "../../../../src/cryptanalysis/twist_ic_algebra.rs"]
+pub mod twist_ic_algebra;
+pub mod cryptanalysis {
+    pub use crate::f4_fp;
+    pub use crate::source_symmetrized as symmetrized_semaev;
+}
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{collections::BTreeMap, fs, path::Path};
+use toy_field::*;
 type Error = Box<dyn std::error::Error>;
 type Result<T> = std::result::Result<T, Error>;
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -293,7 +326,8 @@ fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
     match args.get(1).map(String::as_str) {
         Some("prepare") => prepare(Path::new(args.get(2).ok_or("missing output directory")?)),
-        Some("run" | "trace" | "geometry" | "conditional") => {
+        Some("solver" | "f4-worker") => solver::main(&args[1..]),
+        Some("run" | "trace" | "geometry" | "conditional" | "isogeny") => {
             let manifest = fs::read(args.get(2).ok_or("missing fixture manifest")?)?;
             let v: Value = serde_json::from_slice(&manifest)?;
             let fixtures: Vec<Fixture> = serde_json::from_value(v["fixtures"].clone())?;
@@ -311,6 +345,9 @@ fn main() -> Result<()> {
             }
             if args[1] == "run" || args[1] == "conditional" {
                 statuses.extend(conditional::run(&fixtures, out)?);
+            }
+            if args[1] == "isogeny" {
+                statuses.extend(isogeny::run(&fixtures, out)?);
             }
             write_json(
                 out.join("SUMMARY.json"),

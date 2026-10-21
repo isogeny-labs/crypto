@@ -1,4 +1,4 @@
-use crate::{field::*, write_json, Fixture, Result};
+use crate::{toy_field::*, write_json, Fixture, Result};
 use num_bigint::BigUint;
 use num_integer::Integer;
 use num_traits::One;

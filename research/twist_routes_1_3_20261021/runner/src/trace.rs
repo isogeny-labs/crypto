@@ -1,4 +1,4 @@
-use crate::{digest, field::*, write_json, Fixture, Result};
+use crate::{digest, toy_field::*, write_json, Fixture, Result};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{
