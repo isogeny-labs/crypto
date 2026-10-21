@@ -30,7 +30,7 @@ use std::time::Instant;
 
 use crypto_lib::cryptanalysis::gaudry_quartic::{
     base_quadruples, factor_base, mitm_decompositions, solve_s5_subspace_with, solve_system4_with,
-    Curve4, PlainOptions, Pt4, QuarticSolve, ShapeTrace, SymmetrisedS5,
+    Curve4, PlainOptions, Pt4, QuarticSolve, ShapeTrace, SymmetrisedS5, E4,
 };
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -143,6 +143,313 @@ fn generic_system(d: u8, seed: u64, p: u64) -> (Vec<HashMap<[u8; 4], u64>>, [u64
     (comps, root, rng)
 }
 
+// ── The matched rho reference (`--rho N`) ─────────────────────────────────
+
+#[derive(Serialize)]
+struct RhoRun {
+    seed: u64,
+    steps: u64,
+    /// Group operations of the walk, its 32 precomputed steps and the
+    /// look-ahead retries included; the final check excluded.
+    group_ops: u64,
+    /// `F_p` multiplications of the same, counted as `C₄` is.
+    fp_muls: u64,
+    fruitless_lookaheads: u64,
+    restarts: u64,
+    s: f64,
+    verified: bool,
+}
+
+#[derive(Serialize)]
+struct RhoReport {
+    p: u64,
+    seed: u64,
+    group_order: u64,
+    subgroup_order: u64,
+    cofactor: u64,
+    setup_fp_muls: u64,
+    runs: Vec<RhoRun>,
+    mean_fp_muls: f64,
+    mean_steps: f64,
+    mean_s: f64,
+    all_verified: bool,
+}
+
+/// The order of `pt`, from a multiple `m` of it.
+fn exact_order(curve: &Curve4, pt: &Pt4, mut m: u64) -> u64 {
+    let mut q = 2u64;
+    let mut rest = m;
+    while q * q <= rest {
+        while rest % q == 0 {
+            rest /= q;
+            while m % q == 0 && curve.mul(pt, m / q).inf {
+                m /= q;
+            }
+        }
+        q += 1;
+    }
+    if rest > 1 && m % rest == 0 && curve.mul(pt, m / rest).inf {
+        m /= rest;
+    }
+    m
+}
+
+/// A multiple of `pt`'s order in the Hasse interval `q + 1 ± 2p²`, by
+/// baby-step giant-step.
+fn hasse_multiple(curve: &Curve4, pt: &Pt4, p: u64) -> u64 {
+    let q = p.pow(4);
+    let lo = q + 1 - 2 * p * p;
+    let width = 4 * p * p;
+    let steps = (width as f64).sqrt() as u64 + 1;
+    let mut table: HashMap<(E4, E4), u64> = HashMap::new();
+    let mut jp = Pt4::INF;
+    for j in 0..steps {
+        if !jp.inf {
+            table.entry((jp.x, jp.y)).or_insert(j);
+        }
+        jp = curve.add(&jp, pt);
+    }
+    let giant = curve.mul(pt, steps);
+    let mut t = curve.mul(pt, lo);
+    let mut i = 0u64;
+    loop {
+        if t.inf {
+            return lo + i * steps;
+        }
+        let neg = curve.neg(&t);
+        if let Some(&j) = table.get(&(neg.x, neg.y)) {
+            return lo + i * steps + j;
+        }
+        t = curve.add(&t, &giant);
+        i += 1;
+        assert!(
+            i * steps <= width + 2 * steps,
+            "no multiple in the Hasse interval"
+        );
+    }
+}
+
+fn gcd(a: u64, b: u64) -> u64 {
+    if b == 0 {
+        a
+    } else {
+        gcd(b, a % b)
+    }
+}
+
+fn mulmod(a: u64, b: u64, n: u64) -> u64 {
+    ((a as u128 * b as u128) % n as u128) as u64
+}
+
+fn invmod(a: u64, n: u64) -> u64 {
+    let (mut t, mut nt, mut r, mut nr) = (0i128, 1i128, n as i128, a as i128);
+    while nr != 0 {
+        let qq = r / nr;
+        (t, nt) = (nt, t - qq * nt);
+        (r, nr) = (nr, r - qq * nr);
+    }
+    (t.rem_euclid(n as i128)) as u64
+}
+
+/// `±R` represented by the point whose `y` is the smaller of `y`, `−y`;
+/// `true` when that is `−R`.
+fn canon(curve: &Curve4, pt: &Pt4) -> (Pt4, bool) {
+    if pt.inf {
+        return (*pt, false);
+    }
+    let ny = curve.f.neg(&pt.y);
+    if ny < pt.y {
+        (
+            Pt4 {
+                x: pt.x,
+                y: ny,
+                inf: false,
+            },
+            true,
+        )
+    } else {
+        (*pt, false)
+    }
+}
+
+fn class_index(pt: &Pt4) -> usize {
+    let h = pt.x.0[0]
+        ^ pt.x.0[1].wrapping_mul(0x9E37_79B9)
+        ^ pt.x.0[2].rotate_left(17)
+        ^ pt.x.0[3].rotate_left(41);
+    let mut z = h.wrapping_add(0x9E37_79B9_7F4A_7C15);
+    z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+    ((z ^ (z >> 31)) % 32) as usize
+}
+
+/// Pollard rho on `±`-classes with an r-adding walk (r = 32), exhaustive
+/// storage, and look-ahead past the fruitless 2-cycles the negation map
+/// creates; every group operation and `F_p` multiplication counted.
+fn rho_negation(curve: &Curve4, g: &Pt4, q: &Pt4, n: u64, d: u64, seed: u64) -> RhoRun {
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x5E6A_7104);
+    let f = &curve.f;
+    curve.reset_ops();
+    f.reset_muls();
+    let mults: Vec<(u64, u64, Pt4)> = (0..32)
+        .map(|_| {
+            let al = rng.gen_range(0..n);
+            let be = rng.gen_range(0..n);
+            (al, be, curve.add(&curve.mul(g, al), &curve.mul(q, be)))
+        })
+        .collect();
+    let mut table: HashMap<Pt4, (u64, u64)> = HashMap::new();
+    let (mut steps, mut lookaheads, mut restarts) = (0u64, 0u64, 0u64);
+    let mut found = None;
+    'outer: loop {
+        let mut a = rng.gen_range(0..n);
+        let mut b = rng.gen_range(1..n);
+        let start = curve.add(&curve.mul(g, a), &curve.mul(q, b));
+        let (mut r, neg) = canon(curve, &start);
+        if neg {
+            a = (n - a) % n;
+            b = (n - b) % n;
+        }
+        loop {
+            steps += 1;
+            if let Some(&(a2, b2)) = table.get(&r) {
+                let db = (b + n - b2) % n;
+                if db != 0 {
+                    found = Some(mulmod((a2 + n - a) % n, invmod(db, n), n));
+                    break 'outer;
+                }
+                restarts += 1;
+                break;
+            }
+            table.insert(r, (a, b));
+            // Look-ahead: a step that lands, negated, on a class choosing the
+            // same multiplier would return to `r` (a fruitless 2-cycle).
+            let mut j = class_index(&r);
+            let (next, flip) = loop {
+                let s = curve.add(&r, &mults[j].2);
+                let (c, flip) = canon(curve, &s);
+                if !(flip && class_index(&c) == j) {
+                    break (c, flip);
+                }
+                lookaheads += 1;
+                j = (j + 1) % 32;
+            };
+            a = (a + mults[j].0) % n;
+            b = (b + mults[j].1) % n;
+            if flip {
+                a = (n - a) % n;
+                b = (n - b) % n;
+            }
+            r = next;
+            if steps > 64 * (n as f64).sqrt() as u64 + 1_000_000 {
+                break 'outer;
+            }
+        }
+    }
+    let ops = curve.ops();
+    let muls = f.muls();
+    let verified = found == Some(d) && curve.mul(g, d) == *q;
+    RhoRun {
+        seed,
+        steps,
+        group_ops: ops,
+        fp_muls: muls,
+        fruitless_lookaheads: lookaheads,
+        restarts,
+        s: ops as f64 / (n as f64).sqrt(),
+        verified,
+    }
+}
+
+/// The rho reference on the measured curve itself: `#E` from point orders
+/// in the Hasse interval, its largest prime factor `ℓ`, and `runs` one-target
+/// negation-rho solves in the subgroup of order `ℓ`.
+fn rho_reference(curve: &Curve4, p: u64, seed: u64, runs: u64, json: Option<&str>) {
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x0DE5_0F11);
+    let f = &curve.f;
+    f.reset_muls();
+    let q = p.pow(4);
+    let (lo, hi) = (q + 1 - 2 * p * p, q + 1 + 2 * p * p);
+    let mut l = 1u64;
+    let mut pts = Vec::new();
+    // Orders of random points until their lcm has one multiple in the interval.
+    let order = loop {
+        let pt = loop {
+            let x = f.random(&mut rng);
+            if let Some(pt) = curve.lift_x(&x, &mut rng) {
+                break pt;
+            }
+        };
+        let o = exact_order(curve, &pt, hasse_multiple(curve, &pt, p));
+        l = l / gcd(l, o) * o;
+        pts.push(pt);
+        let first = lo.div_ceil(l) * l;
+        if first <= hi && first + l > hi {
+            break first;
+        }
+        assert!(pts.len() < 64, "group order not determined");
+    };
+    let mut ell = 1u64;
+    let mut rest = order;
+    let mut k = 2u64;
+    while k * k <= rest {
+        while rest % k == 0 {
+            ell = ell.max(k);
+            rest /= k;
+        }
+        k += 1;
+    }
+    ell = ell.max(rest);
+    let cof = order / ell;
+    let g = loop {
+        let x = f.random(&mut rng);
+        if let Some(pt) = curve.lift_x(&x, &mut rng) {
+            let g = curve.mul(&pt, cof);
+            if !g.inf {
+                assert!(curve.mul(&g, ell).inf);
+                break g;
+            }
+        }
+    };
+    let setup = f.muls();
+    println!(
+        "p={p} seed={seed}: #E = {order} = {cof} · {ell} (ℓ prime, {:.2} bits), setup {setup} F_p muls",
+        (ell as f64).log2()
+    );
+    let mut out = Vec::new();
+    for s in 0..runs {
+        let d = rng.gen_range(1..ell);
+        let qpt = curve.mul(&g, d);
+        let run = rho_negation(curve, &g, &qpt, ell, d, seed * 1000 + s);
+        println!(
+            "rho run {s}: steps {} ops {} F_p muls {} S {:.3} lookaheads {} restarts {} verified {}",
+            run.steps, run.group_ops, run.fp_muls, run.s, run.fruitless_lookaheads, run.restarts, run.verified
+        );
+        out.push(run);
+    }
+    let m = out.len() as f64;
+    let rep = RhoReport {
+        p,
+        seed,
+        group_order: order,
+        subgroup_order: ell,
+        cofactor: cof,
+        setup_fp_muls: setup,
+        mean_fp_muls: out.iter().map(|r| r.fp_muls as f64).sum::<f64>() / m,
+        mean_steps: out.iter().map(|r| r.steps as f64).sum::<f64>() / m,
+        mean_s: out.iter().map(|r| r.s).sum::<f64>() / m,
+        all_verified: out.iter().all(|r| r.verified),
+        runs: out,
+    };
+    println!(
+        "mean F_p muls {:.4e}, mean S {:.3}, all verified {}",
+        rep.mean_fp_muls, rep.mean_s, rep.all_verified
+    );
+    if let Some(path) = json {
+        fs::write(path, serde_json::to_string_pretty(&rep).unwrap()).expect("write");
+    }
+}
+
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
     let mut p = 269u64;
@@ -151,6 +458,7 @@ fn main() {
     let mut constructed_n = 1usize;
     let mut json: Option<String> = None;
     let mut generic_degrees: Option<Vec<u8>> = None;
+    let mut rho_runs: Option<u64> = None;
     let mut arms: Vec<Arm> = vec![parse_arm("committed"), parse_arm("sparsest")];
     let mut i = 0;
     while i < args.len() {
@@ -178,6 +486,10 @@ fn main() {
             "--arms" => {
                 i += 1;
                 arms = args[i].split(',').map(parse_arm).collect();
+            }
+            "--rho" => {
+                i += 1;
+                rho_runs = Some(args[i].parse().expect("--rho"));
             }
             "--generic" => {
                 i += 1;
@@ -241,6 +553,10 @@ fn main() {
 
     let mut rng = StdRng::seed_from_u64(seed);
     let curve = Curve4::random(p, &mut rng);
+    if let Some(runs) = rho_runs {
+        rho_reference(&curve, p, seed, runs, json.as_deref());
+        return;
+    }
     let f = &curve.f;
     let base = factor_base(&curve, &mut rng);
     let fp_per_add = {
