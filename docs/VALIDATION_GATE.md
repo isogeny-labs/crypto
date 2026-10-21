@@ -20,9 +20,11 @@ table only with an archival disposition in `benchmarks/ARCHIVE.json`. The archiv
 preserves the exact former row text and digest, a reason (`incomplete`, `censored`,
 `documentary`, or `superseded`), and repository paths to supporting provenance.
 The CI check requires each row removed from the base table to have that exact
-disposition, requires new archive entries to match a base row, and prevents
-existing archive entries from being changed or dropped. Existing archive history
-may remain after its former row has left the current table.
+disposition, rejects new archive additions that do not match a base row, and
+prevents existing archive entries from being changed or dropped. An archive
+record already present on the base is historical: it remains valid even when its
+row was removed from the base table when it was archived. Only records newly
+added to the archive must match a row still present in the base table.
 An archive record never validates a row: if the row remains in the admitted table,
 the ordinary validation gate applies. See [`benchmarks/ARCHIVE.md`](../benchmarks/ARCHIVE.md).
 
