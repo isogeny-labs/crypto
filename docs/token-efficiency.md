@@ -85,6 +85,12 @@ Each of these was found in real transcripts, and each changes the answer:
 - On the claude-code-action path, `modelUsage` has no cache TTL split, so
   cache writes there are priced at the 5-minute rate when per-response usage
   is missing.
+- Aggregated usage cannot determine whether individual requests crossed a
+  long-context pricing threshold. Such costs remain unknown when the total
+  prompt exceeds that threshold. Sanitized files with no usage are also
+  unknown, not free. If any ledger record is unpriced, the summary reports
+  only a known subtotal and leaves total cost and cost per accepted outcome
+  null, including when the unpriced record was a rejected attempt.
 
 ## Tests
 

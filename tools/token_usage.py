@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import argparse
 import glob
+from html import escape
 import json
 import os
 import sys
@@ -112,6 +113,10 @@ def request_cost(prices: dict, model: str, u: Usage, per_request: bool = True) -
         return None
     scale_in = scale_out = 1.0
     lc = p.get("long_context")
+    if lc and not per_request and u.prompt > lc["threshold_prompt_tokens"]:
+        # The same aggregate can contain many short requests or one expensive
+        # long-context request. Its price cannot be recovered from totals.
+        return None
     if lc and per_request and u.prompt > lc["threshold_prompt_tokens"]:
         scale_in, scale_out = lc["input"] / p["input"], lc["output"] / p["output"]
     if u.speed == "fast":
@@ -191,7 +196,7 @@ def build_record(prices: dict, source: dict, groups: list[Group], outcome: dict 
     rows = []
     tot_tokens = {k: 0 for k in COMPONENTS + ["thinking"]}
     tot_cost = {k: 0.0 for k in COMPONENTS + ["uncached_prompt"]}
-    tot_req, all_priced, lower = 0, True, 0
+    tot_req, all_priced, lower = 0, bool(groups), 0
     for g in sorted(groups, key=lambda g: (TIER_ORDER.index(g.tier), g.agent, g.model)):
         rows.append({
             "agent": g.agent, "agent_type": g.agent_type, "model": g.model, "tier": g.tier,
@@ -398,6 +403,8 @@ def action_record(prices: dict, path: str, label: str | None = None,
             else:
                 n = max(g.requests if g else 1, 1)
             ng.add_totals(prices, tot, n)
+            if not ng.priced and price_entry(prices, model):
+                notes.append(f"{model}: aggregate usage cannot determine per-request long-context pricing; cost is unknown")
             per_model[model] = ng
     groups = list(per_model.values())
 
@@ -452,14 +459,17 @@ def summarize(records: list[dict]) -> dict:
         })
     accepted = [r for r in records if (r.get("outcome") or {}).get("result") == "accepted"]
     spent = [r["total"]["cost_usd"] for r in records if r["total"]["cost_usd"] is not None]
+    unpriced = len(records) - len(spent)
     return {
         "schema": SCHEMA + ":summary",
         "records": len(records),
         "rows": rows,
-        "total_cost_usd": round(sum(spent), 6),
+        "known_cost_subtotal_usd": round(sum(spent), 6),
+        "unpriced_records": unpriced,
+        "total_cost_usd": round(sum(spent), 6) if not unpriced else None,
         "accepted": len(accepted),
         # Every run's spend, failures included, divided by the runs that produced something.
-        "cost_usd_per_accepted": round(sum(spent) / len(accepted), 6) if accepted else None,
+        "cost_usd_per_accepted": round(sum(spent) / len(accepted), 6) if accepted and not unpriced else None,
     }
 
 
@@ -522,6 +532,10 @@ def summary_markdown(s: dict) -> str:
                      f"{_fmt_int(r['prompt_tokens'])} | {_fmt_pct(r['cache_hit_ratio'])} | {_fmt_int(r['output_tokens'])} | "
                      f"{_fmt_usd(r['cost_usd'])} | {_fmt_usd(r['cost_usd_per_run'])} |")
     lines += ["", f"- {s['records']} records, {_fmt_usd(s['total_cost_usd'])} in all."]
+    if s["unpriced_records"]:
+        lines.append(f"- {s['unpriced_records']} record(s) have unknown cost; "
+                     f"{_fmt_usd(s['known_cost_subtotal_usd'])} is the known subtotal only. "
+                     "Total cost and cost per accepted outcome remain unknown.")
     if s["cost_usd_per_accepted"] is not None:
         lines.append(f"- {s['accepted']} accepted: {_fmt_usd(s['cost_usd_per_accepted'])} per accepted outcome, "
                      "counting the spend of every run, rejected ones included.")
@@ -544,11 +558,11 @@ def svg(rec: dict) -> str:
            'font-family="system-ui, sans-serif" font-size="12">',
            '<rect width="100%" height="100%" fill="#ffffff"/>',
            f'<text x="12" y="22" font-size="14" font-weight="600">Cost by component (USD, list prices as of '
-           f'{rec["prices"]["as_of"]})</text>']
+           f'{escape(str(rec["prices"]["as_of"]))})</text>']
     for i, g in enumerate(rows):
         y = top + i * (bar + gap)
         label = f'{g["agent_type"]} · {g["model"].replace("claude-", "")}'
-        out.append(f'<text x="{left - 8}" y="{y + bar * 0.7}" text-anchor="end">{label}</text>')
+        out.append(f'<text x="{left - 8}" y="{y + bar * 0.7}" text-anchor="end">{escape(label)}</text>')
         x = left
         for k in COMPONENTS:
             w = width * g["cost_usd_by_component"][k] / vmax

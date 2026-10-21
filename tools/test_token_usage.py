@@ -124,7 +124,9 @@ class PricingTests(unittest.TestCase):
         self.assertAlmostEqual(big["input"], 100_001 * 0.50e-6)
         self.assertAlmostEqual(big["output"], 1_000 * 2.50e-6)
         agg = tu.request_cost(PRICES, "claude-haiku-5-5", tu.Usage(input=500_000), per_request=False)
-        self.assertAlmostEqual(agg["input"], 500_000 * 0.10e-6)
+        self.assertIsNone(agg)
+        bounded = tu.request_cost(PRICES, "claude-haiku-5-5", tu.Usage(input=100_000), per_request=False)
+        self.assertAlmostEqual(bounded["input"], 100_000 * 0.10e-6)
 
     def test_fast_mode(self):
         c = tu.request_cost(PRICES, "claude-opus-5-5", tu.Usage(output=1_000, speed="fast"))
@@ -200,6 +202,42 @@ class ActionTests(unittest.TestCase):
 
     def test_cli_missing_file(self):
         self.assertEqual(tu.main(["action", os.path.join(self.tmp.name, "nope.json"), "--label", "h"]), 0)
+
+    def test_unknown_rejected_cost_keeps_ledger_total_unknown(self):
+        known = self.write([{"type": "assistant", "message": {
+            "id": "known", "model": "claude-sonnet-5-5", "usage": usage(out=100)}}])
+        accepted = tu.action_record(PRICES, known, outcome={"result": "accepted"})
+        unknown = self.write([{"type": "assistant", "message": {
+            "id": "unknown", "model": "unpriced-model", "usage": usage(out=500)}}])
+        rejected = tu.action_record(PRICES, unknown, outcome={"result": "rejected"})
+        result = tu.summarize([accepted, rejected])
+        self.assertEqual(result["accepted"], 1)
+        self.assertEqual(result["unpriced_records"], 1)
+        self.assertEqual(result["known_cost_subtotal_usd"], accepted["total"]["cost_usd"])
+        self.assertIsNone(result["total_cost_usd"])
+        self.assertIsNone(result["cost_usd_per_accepted"])
+        self.assertIn("remain unknown", tu.summary_markdown(result))
+
+    def test_empty_usage_is_unknown_not_free(self):
+        record = tu.action_record(PRICES, self.write([{"type": "result", "modelUsage": {}}]))
+        self.assertIsNone(record["total"]["cost_usd"])
+        self.assertEqual(tu.summarize([record])["unpriced_records"], 1)
+
+    def test_aggregate_long_context_price_is_unknown(self):
+        path = self.write([{"type": "result", "modelUsage": {
+            "claude-haiku-5-5": {"inputTokens": 500_000, "outputTokens": 1000}}}])
+        record = tu.action_record(PRICES, path)
+        self.assertEqual(record["total"]["prompt_tokens"], 500_000)
+        self.assertIsNone(record["total"]["cost_usd"])
+        self.assertTrue(any("long-context" in note for note in record["notes"]))
+
+    def test_svg_escapes_agent_label(self):
+        import xml.etree.ElementTree as ET
+        path = self.write([{"type": "assistant", "message": {
+            "id": "x", "model": "claude-sonnet-5-5", "usage": usage(out=100)}}])
+        record = tu.action_record(PRICES, path, label="director & <worker>")
+        root = ET.fromstring(tu.svg(record))
+        self.assertTrue(any("director & <worker>" in (node.text or "") for node in root.iter()))
 
 
 if __name__ == "__main__":
