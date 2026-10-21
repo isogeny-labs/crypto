@@ -36,6 +36,7 @@ relation and LA phases are carried on their own fitted power laws.
 
 - Tuned D₄ + 2LP overtakes D₄ only at **#E ≈ 2^128.9**, once LA is about
   half of D₄'s cost.
+  - **Annotation 2026-10-19 ([R10 ledger](../../ic_tool_program/ledger/r10-20261019/README.md)):** DERIVED on a superseded input. The handover is priced at C₄ = 2.54e10; #1792 measured the D₄ solve 311–370× cheaper, so absolute S and gaps to rho would be about 310–370× smaller (an estimate, not measured). Against today's pin `d4-ed` the tuned D₄ + 2LP arm is 1.048×.
 - The Gaudry-α arm overtakes it at #E ≈ 2^184.3.
 - The model also crosses at 2^28.4 and 2^22.5. Both lie at or below the
   smallest measured size, where the measured tuned ratio is exactly 1.000,
