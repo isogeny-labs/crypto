@@ -34,24 +34,49 @@ otherwise. Results in [cohort.json](cohort.json):
 | Wrapped panics | **0** |
 
 This is a bounded correctness gate on deterministic pools, not a proof of
-the law on every divisor or a performance comparison. In particular, the
-wrapper's equality branch has not yet been included in the full 1,260-target
-index-calculus collector, and no speed or rho ratio is claimed. The
-published complete inversion-free law remains a separate implementation
-path. The observed upstream failure is recorded without modifying upstream
-source.
+the law on every divisor. The observed upstream failure is recorded without
+modifying upstream source.
+
+## Same-model arithmetic gate
+
+The independent [cost harness](src/bin/cost.rs) repeats all 85,764 ordered
+pair additions on the same 21 normalized exact-order models. A counted field
+wrapper records the external law's actual branch-dependent field operations,
+including `double` for all 1,342 equal-input calls. Every output is compared
+with complete native Cantor; mismatches: **0**. Both sides exclude pool
+construction and count one field inversion as `I`; subtraction counts as two
+field additions to match native `Field::sub`. Equality checks and dispatch are
+logical operations, not field operations.
+
+| Across 85,764 calls | M | S | I | field additions |
+| --- | ---: | ---: | ---: | ---: |
+| Wrapped external law | 1,296,196 | 192,984 | 79,324 | 2,716,897 |
+| Complete native Cantor | 7,213,146 | 112,768 | 270,321 | 12,719,421 |
+
+At `M + 0.5S + 10I`, the wrapped external law costs 2,185,928 versus
+9,972,740 field-price units, a **0.219190×** stage ratio. Across all 12
+arithmetic pricing cells (`S/M = 0, 0.5, 1`; `I/M = 1, 10, 100, 1000`),
+its ratio is **0.183808–0.291065×**. These pools weight branch types
+differently from a live collector; this is **not** an end-to-end cost or a
+ratio against rho. The inversion-free published law remains a separate path.
+
+The stage result warrants an end-to-end collector test. That test must move
+the transferred divisors into the checked normalized model once, charge the
+coordinate change, use the wrapped law for every walk and initialization
+addition, retain the complete signed relation solver, and run all 1,260
+original targets before claiming a rho comparison. The equality dispatch and
+all exceptional branches must remain charged.
 
 Reproduce from the repository root:
 
 ```sh
 cargo run --release --locked --manifest-path research/genus2_external_gate_20261021/Cargo.toml --bin genus2-external-gate > /tmp/genus2-external-receipt.json
 cargo run --release --locked --manifest-path research/genus2_external_gate_20261021/Cargo.toml --bin cohort > /tmp/genus2-external-cohort.json
+cargo run --release --locked --manifest-path research/genus2_external_gate_20261021/Cargo.toml --bin cost > /tmp/genus2-external-cost.json
 cmp /tmp/genus2-external-receipt.json research/genus2_external_gate_20261021/receipt.json
 cmp /tmp/genus2-external-cohort.json research/genus2_external_gate_20261021/cohort.json
+cmp /tmp/genus2-external-cost.json research/genus2_external_gate_20261021/cost.json
 ```
 
-The next discriminating experiment is a same-host operation-count and
-isolated wall comparison of the wrapped external backend, the existing
-projective chart, and complete affine Cantor on the 21 curves, followed by
-the original 1,260-target cohort if it improves a stage. Every exceptional
-input and wrapper dispatch must be charged.
+Raw per-model counts and zero-mismatch attestations are in
+[cost.json](cost.json). Wall time is not used for ranking on this shared host.
