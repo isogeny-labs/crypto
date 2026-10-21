@@ -126,8 +126,8 @@ Phase shares of B2 at q >= 262 111: linear algebra 62 to 67%, relations 32 to 37
 * P4 (B1/B0 >= 0.6): holds (0.81 to 0.91), with a regression to 1.53 at q = 262 111.
 * P5 (B0n/B0 in [0.9, 1.1]): holds (0.98 to 1.04), the new build did not change B0.
 * P6 (B2 band-resolved below rho for q >= 2011): holds, and from q = 991 (unresolved at 499: 1.40 at w = 0, 0.85 at w = 1).
-* Controls: 80 sampled relations per unit (full, one-prime and **graph-edge**) sum to one class through the canonical `Pic^0`
-  group law (`relations_bad = 0`); instance control at q = 524287 and 1048507 (`results/instance_checks_ext.txt`, 4 of 4);
+* Controls: up to 80 sampled relations per unit (full, one-prime and **graph-edge**) sum to one class through the canonical `Pic^0`
+  group law (`relations_bad = 0`). Of the 57 accepted B2 units, 53 checked 80 relations, two checked 79 and two checked 76; every checked relation matched. ( instance control at q = 524287 and 1048507 (`results/instance_checks_ext.txt`, 4 of 4);
   rho calibration steps/sqrt(ell) 1.29, 1.38 and 1.06 at 262111, 524287 and 1048507 (criterion [1.0, 1.5]), every rho run verified.
 * Wall time (practicality note, same shared VM): at q = 1 048 507 B2 takes 14.0 s per solve and rho 241.9 s (ratio 0.058);
   at 262 111 3.2 s against 18.9 s (0.17).
