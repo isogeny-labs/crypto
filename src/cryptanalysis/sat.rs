@@ -271,9 +271,11 @@ pub struct SolverStats {
     /// Literals implied by a parity row.
     pub xor_propagations: u64,
     pub xor_conflicts: u64,
-    /// Times a row had to choose a new pivot, the only work the
-    /// incremental matrix does beyond a popcount per row.
+    /// Visits to rows without an intact unassigned pivot, including
+    /// fully assigned rows whose residual is checked again.
     pub xor_repivots: u64,
+    /// Satisfied, fully assigned rows skipped by the opt-in cache.
+    pub xor_decided_skips: u64,
     pub learnt_clauses: u64,
 
     // ── work counters ───────────────────────────────────────────────
@@ -591,6 +593,10 @@ pub struct Solver {
     /// `pivot[i]` is row `i`'s basic variable; `None` once the row has
     /// no unassigned variable left.
     pivot: Vec<Option<u32>>,
+    /// Boolean invalidation policy used by `set_xor_decided_cache`.
+    /// At most one of the two explicit cache policies is enabled.
+    cache_decided_xors: bool,
+    xor_decided: Vec<bool>,
     /// Opt-in: a fully assigned and satisfied row remains decided while the
     /// assignment only grows. Backjumping invalidates these certificates.
     decided_xor_row_cache: bool,
@@ -718,6 +724,8 @@ impl Solver {
             matrix: Vec::new(),
             matrix_rhs: Vec::new(),
             pivot: Vec::new(),
+            cache_decided_xors: false,
+            xor_decided: Vec::new(),
             decided_xor_row_cache: false,
             xor_assignment_generation: 0,
             decided_xor_row_generation: Vec::new(),
@@ -735,12 +743,33 @@ impl Solver {
         }
     }
 
+    /// Skip rechecking satisfied, fully assigned XOR rows until an
+    /// unassignment or matrix mutation. Disabled by default. Changing the
+    /// setting invalidates every cached row, including during incremental use.
+    /// Enabling this policy disables the generation-based policy.
+    pub fn set_xor_decided_cache(&mut self, enabled: bool) {
+        self.cache_decided_xors = enabled;
+        self.xor_decided.clear();
+        if enabled {
+            self.decided_xor_row_cache = false;
+            self.decided_xor_row_generation.clear();
+            self.xor_decided.resize(self.matrix_rhs.len(), false);
+        }
+        self.xor_epoch = u64::MAX;
+    }
+
     /// Skip rechecking satisfied XOR rows until an assignment is undone.
     /// Default-off so existing solver traces and callers keep their behavior.
     /// Call before search; switching modes clears every cached certificate.
+    /// Enabling this generation-based policy disables the boolean policy.
     pub fn set_decided_xor_row_cache(&mut self, enabled: bool) {
         self.decided_xor_row_cache = enabled;
         self.decided_xor_row_generation = vec![None; self.matrix_rhs.len()];
+        if enabled {
+            self.cache_decided_xors = false;
+            self.xor_decided.clear();
+        }
+        self.xor_epoch = u64::MAX;
     }
 
     /// Install an observer before search. Existing counters are copied so a
@@ -1271,6 +1300,10 @@ impl Solver {
         // the `O(rows² × words)` of re-eliminating from scratch.
         let mut step = XorStep::Fixpoint;
         for i in 0..rows {
+            if self.cache_decided_xors && self.xor_decided[i] {
+                self.stats.xor_decided_skips += 1;
+                continue;
+            }
             let intact = match self.pivot[i] {
                 Some(p) => self.var_value(p as usize).is_none(),
                 None => {
@@ -1295,6 +1328,12 @@ impl Solver {
                         self.xor_conflict = buf;
                         self.stats.xor_conflicts += 1;
                         return XorStep::Conflict;
+                    }
+                    if self.cache_decided_xors {
+                        // All row variables are assigned and its residual is
+                        // false. Further assignments cannot change this row.
+                        // Backjump and every matrix mutation invalidate it.
+                        self.xor_decided[i] = true;
                     }
                     if self.decided_xor_row_cache {
                         self.decided_xor_row_generation[i] = Some(self.xor_assignment_generation);
@@ -1324,6 +1363,9 @@ impl Solver {
                             continue;
                         }
                         row_ops += 1;
+                        if self.cache_decided_xors {
+                            self.xor_decided[j] = false;
+                        }
                         matrix_rhs[j] ^= src_rhs;
                         xor_into(&mut matrix[j * words..(j + 1) * words], &src);
                     }
@@ -1416,6 +1458,10 @@ impl Solver {
         }
         self.pivot.clear();
         self.pivot.resize(self.matrix_rhs.len(), None);
+        self.xor_decided.clear();
+        if self.cache_decided_xors {
+            self.xor_decided.resize(self.matrix_rhs.len(), false);
+        }
         if self.decided_xor_row_cache {
             self.decided_xor_row_generation = vec![None; self.matrix_rhs.len()];
         }
@@ -1425,6 +1471,8 @@ impl Solver {
     fn clear_matrix(&mut self) {
         self.matrix.clear();
         self.matrix_rhs.clear();
+        self.xor_decided.clear();
+        self.decided_xor_row_generation.clear();
     }
 
     /// `rhs ⊕ parity(assigned-true variables of the row)` — zero when a
@@ -1825,6 +1873,7 @@ impl Solver {
             return;
         }
         let target = self.trail_lim[level];
+        self.xor_decided.fill(false);
         while self.trail.len() > target {
             let l = self.trail.pop().unwrap();
             let v = var_of(l) as usize;
@@ -2607,6 +2656,59 @@ mod tests {
     }
 
     #[test]
+    fn xor_cache_policy_switch_rechecks_existing_matrix() {
+        let mut s = Solver::new(3);
+        assert!(s.add_xor(&[1, 2], false));
+        s.set_xor_decided_cache(true);
+        s.trail_lim.push(s.trail.len());
+        s.assign(1, Reason::Decision);
+        s.assign(2, Reason::Decision);
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert_eq!(s.xor_decided, vec![true]);
+
+        s.set_decided_xor_row_cache(true);
+        assert!(!s.cache_decided_xors);
+        assert!(s.xor_decided.is_empty());
+        assert!(s.decided_xor_row_cache);
+        assert_eq!(s.decided_xor_row_generation, vec![None]);
+        let visits = s.stats.xor_repivots;
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert_eq!(s.stats.xor_repivots, visits + 1);
+
+        s.set_xor_decided_cache(true);
+        assert!(!s.decided_xor_row_cache);
+        assert!(s.decided_xor_row_generation.is_empty());
+        assert_eq!(s.xor_decided, vec![false]);
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert_eq!(s.stats.xor_repivots, visits + 2);
+        s.backjump(0);
+        s.trail_lim.push(s.trail.len());
+        s.assign(1, Reason::Decision);
+        s.assign(-2, Reason::Decision);
+        assert!(matches!(s.propagate_xors(), XorStep::Conflict));
+    }
+
+    #[test]
+    fn generation_xor_cache_wraparound_cannot_reuse_old_certificate() {
+        let mut s = Solver::new(3);
+        s.set_decided_xor_row_cache(true);
+        assert!(s.add_xor(&[1, 2], false));
+        s.trail_lim.push(s.trail.len());
+        s.assign(1, Reason::Decision);
+        s.assign(2, Reason::Decision);
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert_eq!(s.decided_xor_row_generation, vec![Some(0)]);
+        s.xor_assignment_generation = u64::MAX;
+        s.backjump(0);
+        assert_eq!(s.xor_assignment_generation, 0);
+        assert_eq!(s.decided_xor_row_generation, vec![None]);
+        s.trail_lim.push(s.trail.len());
+        s.assign(1, Reason::Decision);
+        s.assign(-2, Reason::Decision);
+        assert!(matches!(s.propagate_xors(), XorStep::Conflict));
+    }
+
+    #[test]
     fn decided_xor_cache_skips_only_until_unassignment_or_rebuild() {
         let mut s = Solver::new(4);
         s.set_decided_xor_row_cache(true);
@@ -2920,6 +3022,104 @@ mod tests {
                     );
                 }
             }
+        }
+    }
+
+    #[test]
+    fn decided_xor_cache_invalidates_on_backjump_and_matrix_changes() {
+        let mut s = Solver::new(3);
+        s.set_xor_decided_cache(true);
+        assert!(s.add_xor(&[1, 2], false));
+        s.trail_lim.push(0);
+        s.enqueue(1, Reason::Decision).unwrap();
+        s.enqueue(2, Reason::Decision).unwrap();
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert_eq!(s.xor_decided, vec![true]);
+        s.enqueue(3, Reason::Decision).unwrap();
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert_eq!(s.stats.xor_decided_skips, 1);
+        s.backjump(0);
+        assert_eq!(s.xor_decided, vec![false]);
+        s.trail_lim.push(0);
+        s.enqueue(1, Reason::Decision).unwrap();
+        s.enqueue(-2, Reason::Decision).unwrap();
+        assert!(matches!(s.propagate_xors(), XorStep::Conflict));
+        s.backjump(0);
+        s.rebuild_matrix();
+        assert_eq!(s.xor_decided, vec![false]);
+        s.add_vars(2);
+        assert!(s.xor_decided.is_empty());
+        assert!(s.add_xor(&[4, 5], true));
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+        assert_eq!(s.xor_decided.len(), 2);
+        s.set_xor_decided_cache(false);
+        assert!(s.xor_decided.is_empty());
+        assert!(matches!(s.propagate_xors(), XorStep::Fixpoint));
+    }
+
+    #[test]
+    fn decided_xor_cache_matches_mixed_cnf_xor_truth_tables() {
+        let mut state = 0x2718_2818_2845_9045u64;
+        let mut next = || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state
+        };
+        for trial in 0..400 {
+            let mut a = Solver::new(8);
+            let mut b = Solver::new(8);
+            b.set_xor_decided_cache(true);
+            let mut rows = Vec::new();
+            let mut clauses = Vec::new();
+            for _ in 0..6 {
+                let vars: Vec<u32> = (1..=8).filter(|_| next() & 1 == 1).collect();
+                let rhs = next() & 1 == 1;
+                assert_eq!(a.add_xor(&vars, rhs), b.add_xor(&vars, rhs));
+                rows.push((vars, rhs));
+            }
+            for _ in 0..16 {
+                let lits: Vec<Lit> = (0..3)
+                    .map(|_| {
+                        let v = (next() % 8 + 1) as Lit;
+                        if next() & 1 == 1 {
+                            v
+                        } else {
+                            -v
+                        }
+                    })
+                    .collect();
+                assert_eq!(a.add_clause(lits.clone()), b.add_clause(lits.clone()));
+                clauses.push(lits);
+            }
+            let brute = (0..256u32).any(|bits| {
+                rows.iter().all(|(vs, rhs)| {
+                    vs.iter().filter(|&&v| bits & (1 << (v - 1)) != 0).count() % 2 == *rhs as usize
+                }) && clauses.iter().all(|c| {
+                    c.iter()
+                        .any(|&l| ((bits & (1 << (l.unsigned_abs() - 1))) != 0) == (l > 0))
+                })
+            });
+            let x = a.solve();
+            let y = b.solve();
+            assert_eq!(x, y, "trial {trial}");
+            assert_eq!(x == SolveResult::Sat, brute, "trial {trial}");
+            if x == SolveResult::Sat {
+                assert_eq!(a.model(), b.model(), "trial {trial}");
+                assert!(b.check_xors(&b.model()));
+                assert!(clauses
+                    .iter()
+                    .all(|c| c.iter().any(|&l| b.lit_value(l) == Some(true))));
+            }
+            assert_eq!(a.stats.decisions, b.stats.decisions);
+            assert_eq!(a.stats.conflicts, b.stats.conflicts);
+            assert_eq!(a.stats.xor_passes, b.stats.xor_passes);
+            assert_eq!(a.stats.xor_row_ops, b.stats.xor_row_ops);
+            assert_eq!(a.stats.xor_row_scans, b.stats.xor_row_scans);
+            assert_eq!(
+                a.stats.xor_repivots,
+                b.stats.xor_repivots + b.stats.xor_decided_skips
+            );
         }
     }
 

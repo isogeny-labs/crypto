@@ -1,0 +1,27 @@
+   Compiling crypto v0.1.0 (/var/tmp/n83-xor-cache-source)
+    Finished `release` profile [optimized] target(s) in 2.65s
+     Running unittests examples/n83_prebuild_cost_m23.rs (/home/ec2-user/n83-m23-20261019/target-small-m4/release/examples/n83_prebuild_cost_m23-239d5659e4289b70)
+
+running 3 tests
+test tests::rank_rejects_a_scaled_duplicate ... ok
+test tests::deterministic_pairs_are_distinct_and_stable ... ok
+test small_m4::tests::lift_checks_signs_membership_and_exact_target ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/n83_small_m4_audit.rs (/home/ec2-user/n83-m23-20261019/target-small-m4/release/examples/n83_small_m4_audit-9a5ec1514ab8e89e)
+
+running 2 tests
+test tests::rejects_censored_progress_promotion_or_counter_drift ... ok
+test tests::rejects_manifest_escape ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/n83_small_m4_replay.rs (/home/ec2-user/n83-m23-20261019/target-small-m4/release/examples/n83_small_m4_replay-0c7174c991ff7338)
+
+running 2 tests
+test tests::point_parser_rejects_noncanonical_and_outside_field_coordinates ... ok
+test tests::capped_control_and_wrong_mode_cannot_pass_replay_contract ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
