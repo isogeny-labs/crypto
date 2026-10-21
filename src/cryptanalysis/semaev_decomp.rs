@@ -168,8 +168,12 @@ fn spread32(x: u64) -> u64 {
     x
 }
 
+// `#[inline]`: without it LLVM leaves this target-feature function as a
+// call from the wide field's folds (three per `Gf2_128::reduce_fold`, with
+// the operands shuffled through general registers around each), T22.
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "pclmulqdq")]
+#[inline]
 unsafe fn clmul_u64(a: u64, b: u64) -> u128 {
     use std::arch::x86_64::*;
     let x = _mm_set_epi64x(0, a as i64);
