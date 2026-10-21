@@ -298,6 +298,17 @@ including events without a “Killed process” line. The full captured ring is
 retained, so an earlier OOM event can conservatively withhold attribution.
 No new host allocation or experimental execution was made for this correction.
 
+### Amendment 8: registered, not yet run (EKS high-memory runner)
+
+Amendment 8 registers both cells again (E1, E2) on the repository's
+`crypto-eks-highmem` GitHub Actions runner (Karpenter Spot node, 120 GiB pod
+limit, so V ≈ 125.3 GB). It is started by hand with
+`.github/workflows/fb-designs-m4-highmem.yml` (`workflow_dispatch`) when a
+high-memory Spot node is available. The runner is
+`scripts/run_amendment8.sh`, and the analysis is `analyze --amendment8`.
+Predictions: E1 memory-bound near 3450 s, E2 a timeout at 14 400 s near
+90 GB. No E row exists yet.
+
 ## 6. What this round does not establish
 
 - No design here is shown to reduce any cost. The Lean theorems show that
