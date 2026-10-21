@@ -66,6 +66,7 @@ pub mod cm_orbit;
 pub mod fiber;
 pub mod large_prime;
 pub mod linalg;
+pub mod pkm_semaev;
 pub mod planner;
 pub mod plugins;
 pub mod prime_tower;
@@ -81,7 +82,8 @@ use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
     collect_and_solve_relations, price_phase, Calibration, CompletionRule, CountedGroup,
-    FactorBase, GroupOps, PhaseCost, PipelineOutcome, RelationSolver, RestartPool, TargetSource,
+    FactorBase, GroupOps, KnownLogSolver, PhaseCost, PipelineOutcome, RelationSolver, RestartPool,
+    TargetSource,
 };
 use crate::cryptanalysis::ic_framework::residual as residual_mod;
 use crate::cryptanalysis::ic_measurement as measurement;
@@ -369,12 +371,21 @@ pub fn run_pipeline<G: CountedGroup>(
     // the collision guards and the verification are the audited ones,
     // so a framework row is comparable with a ledger row rather than
     // merely similar to it.
-    let linalg_name = if spec.linalg.is_empty() {
+    // A base whose column logarithms are known has nothing to eliminate:
+    // the relation's own row names the target, so the matrix is the
+    // direct reader and the run completes on the first verified relation.
+    let known = fb.known_logs.is_some();
+    let linalg_name = if known {
+        "known-logs"
+    } else if spec.linalg.is_empty() {
         "incremental-gauss"
     } else {
         spec.linalg.as_str()
     };
-    let mut matrix: Box<dyn RelationSolver> = matrix_by_name(linalg_name, fb.columns + 1, ctx.r)?;
+    let mut matrix: Box<dyn RelationSolver> = match &fb.known_logs {
+        Some(logs) => Box::new(KnownLogSolver::new(logs.clone(), ctx.r)),
+        None => matrix_by_name(linalg_name, fb.columns + 1, ctx.r)?,
+    };
     let source = match spec.targets {
         Targets::Random => TargetSource::Random,
         Targets::Stride => TargetSource::Stride,
@@ -707,6 +718,180 @@ mod tests {
             },
             planted,
         )
+    }
+
+    fn known_log_spec(size: u64) -> PipelineSpec {
+        let mut spec = PipelineSpec {
+            factor_base: "known-log".into(),
+            oracle: "mitm".into(),
+            targets: Targets::Walk,
+            max_trials: 2_000_000,
+            seed: 11,
+            ..Default::default()
+        };
+        spec.factor_base_params.set("size", size.to_string());
+        spec.oracle_params.set("negation_folded", "1");
+        spec
+    }
+
+    /// **The known-log base recovers the planted logarithm on a 24-bit
+    /// prime-order curve with no linear algebra at all**: the matrix phase
+    /// does no group operation and no row operation, and every column's
+    /// stored logarithm is the one the point has.
+    #[test]
+    fn known_log_base_recovers_logs_with_zero_linear_algebra() {
+        use super::plugins::KnownLogBase;
+        use crate::cryptanalysis::ic_boundary::prime_instance_for;
+        let inst = prime_instance_for(24, 5);
+        assert_eq!(inst.cofactor, 1);
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let spec = known_log_spec(300);
+        let mut ops = GroupOps::default();
+        let fb = KnownLogBase
+            .build(&ctx, &spec.factor_base_params, &mut ops)
+            .unwrap();
+        assert_eq!(ops.adds, 299, "B − 1 incremental additions, charged");
+        assert_eq!(fb.columns, 300);
+        assert_eq!(fb.points.len(), 600);
+        let logs = fb.known_logs.as_ref().expect("known logs");
+        for (i, (&col, &coef)) in fb.col_of.iter().zip(&fb.coef_of).enumerate() {
+            let e = ((coef as u128 * logs[col] as u128) % inst.r as u128) as u64;
+            let mut scratch = GroupOps::default();
+            let expect = CountedGroup::mul(&inst.curve, &mut scratch, ctx.generator, e);
+            assert_eq!(fb.points[i], expect, "point {i} is [coef·log]G");
+        }
+        let mut oracle = MitmOracle::new(2);
+        let report = run_pipeline(
+            &ctx,
+            &spec,
+            &KnownLogBase,
+            &mut oracle,
+            planted,
+            &Calibration::default(),
+            None,
+        )
+        .expect("the configuration should run");
+        assert!(report.verified, "did not recover the planted logarithm");
+        assert_eq!(report.recovered, Some(planted));
+        assert_eq!(report.factor_base.cost.group_ops.adds, 299);
+        let la = &report.linear_algebra;
+        assert_eq!(la.name, "known-logs");
+        assert_eq!(la.work, 0);
+        assert_eq!(la.cost.group_ops.adds, 0);
+        assert_eq!(la.cost.group_ops.doubles, 0);
+        assert_eq!(la.cost.group_ops.scalar_mults, 0);
+        assert_eq!(la.cost.get("row_ops"), 0);
+        assert_eq!(la.cost.gae, 0.0);
+        assert_eq!(la.rank, 1);
+        assert_eq!(report.decomposition.relations_found, 1);
+    }
+
+    /// **`scalars=random`**: `B` seeded uniform scalars, charged as scalar
+    /// multiplications, every column's stored log is the scalar, the same
+    /// seed gives the same base, and the pipeline recovers `k` with zero
+    /// linear-algebra operations.
+    #[test]
+    fn known_log_random_scalars_recover_logs_with_zero_linear_algebra() {
+        use super::plugins::KnownLogBase;
+        use crate::cryptanalysis::ic_boundary::prime_instance_for;
+        let inst = prime_instance_for(24, 5);
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let mut spec = known_log_spec(120);
+        spec.factor_base_params.set("scalars", "random");
+        let mut ops = GroupOps::default();
+        let fb = KnownLogBase
+            .build(&ctx, &spec.factor_base_params, &mut ops)
+            .unwrap();
+        let logs = fb.known_logs.clone().expect("known logs");
+        assert_eq!(logs.len(), 120);
+        assert_eq!(ops.scalar_mults, 120, "B scalar multiplications, charged");
+        assert!(
+            logs.iter().any(|&s| s > 120),
+            "uniform scalars, not a progression"
+        );
+        for (i, (&col, &coef)) in fb.col_of.iter().zip(&fb.coef_of).enumerate() {
+            let e = ((coef as u128 * logs[col] as u128) % inst.r as u128) as u64;
+            let mut scratch = GroupOps::default();
+            let expect = CountedGroup::mul(&inst.curve, &mut scratch, ctx.generator, e);
+            assert_eq!(fb.points[i], expect, "point {i} is [coef·log]G");
+        }
+        let mut ops2 = GroupOps::default();
+        let fb2 = KnownLogBase
+            .build(&ctx, &spec.factor_base_params, &mut ops2)
+            .unwrap();
+        assert_eq!(fb2.known_logs, fb.known_logs, "same seed, same base");
+        let mut oracle = MitmOracle::new(2);
+        let report = run_pipeline(
+            &ctx,
+            &spec,
+            &KnownLogBase,
+            &mut oracle,
+            planted,
+            &Calibration::default(),
+            None,
+        )
+        .expect("the configuration should run");
+        assert!(report.verified);
+        assert_eq!(report.recovered, Some(planted));
+        assert_eq!(report.linear_algebra.work, 0);
+        assert_eq!(report.linear_algebra.cost.get("row_ops"), 0);
+        assert_eq!(report.linear_algebra.cost.group_ops.adds, 0);
+    }
+
+    /// The base is a function of `G` and `B` alone: the same `G` gives the
+    /// same point set, another `G` another one.
+    #[test]
+    fn known_log_base_digest_is_identical_for_the_same_generator() {
+        use super::plugins::KnownLogBase;
+        use crate::cryptanalysis::ic_boundary::prime_instance_for;
+        let inst = prime_instance_for(24, 5);
+        let (ctx, _) = ctx_and_planted(&inst);
+        let spec = known_log_spec(200);
+        let digest = |ctx: &InstanceCtx<'_, crate::cryptanalysis::ic_boundary::PrimeCurve>| {
+            let mut ops = GroupOps::default();
+            let fb = KnownLogBase
+                .build(ctx, &spec.factor_base_params, &mut ops)
+                .unwrap();
+            let mut keys: Vec<u64> = fb.points.iter().map(|p| inst.curve.key(p)).collect();
+            keys.sort_unstable();
+            keys
+        };
+        assert_eq!(digest(&ctx), digest(&ctx));
+        let mut ops = GroupOps::default();
+        let g2 = CountedGroup::mul(&inst.curve, &mut ops, ctx.generator, 7);
+        let ctx2 = InstanceCtx {
+            generator: g2,
+            ..ctx_and_planted(&inst).0
+        };
+        assert_ne!(digest(&ctx), digest(&ctx2), "another G, another set");
+    }
+
+    /// `±[i]G` is closed under negation, column by column, and the
+    /// negation index points at the negated point.
+    #[test]
+    fn known_log_base_is_closed_under_negation() {
+        use super::plugins::KnownLogBase;
+        use crate::cryptanalysis::ic_boundary::prime_instance_for;
+        let inst = prime_instance_for(24, 5);
+        let (ctx, _) = ctx_and_planted(&inst);
+        let spec = known_log_spec(64);
+        let mut ops = GroupOps::default();
+        let fb = KnownLogBase
+            .build(&ctx, &spec.factor_base_params, &mut ops)
+            .unwrap();
+        for i in 0..fb.points.len() {
+            let j = fb.neg_index[i];
+            assert_eq!(fb.points[j], CountedGroup::neg(&inst.curve, fb.points[i]));
+            assert_eq!(fb.neg_index[j], i);
+            assert_eq!(fb.col_of[i], fb.col_of[j]);
+            assert_eq!((fb.coef_of[i] + fb.coef_of[j]) % inst.r, 0);
+        }
+        let too_big = {
+            let mut p = Params::default();
+            p.set("size", inst.r.to_string());
+            p
+        };
+        assert!(KnownLogBase.build(&ctx, &too_big, &mut ops).is_err());
     }
 
     /// **A configuration must recover the planted logarithm.**  A

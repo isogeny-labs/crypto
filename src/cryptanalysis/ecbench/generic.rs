@@ -150,8 +150,22 @@ pub fn bsgs_negation<G: CountedGroup>(
     target: G::Elt,
     r: u64,
 ) -> GenericOutcome {
+    bsgs_negation_table(g, gen, target, r, ceil_sqrt(r).div_ceil(2).max(1))
+}
+
+/// [`bsgs_negation`] with the baby table's half-width `m` given: the table
+/// holds `jG` for `0 ≤ j ≤ m` (so `m + 1` classes covering `±j`) and the
+/// giant stride is `2m + 1`.  `m = ⌈√r / 2⌉` is `bsgs_negation`; a smaller
+/// `m` is the equal-memory comparator for a known-log base.
+pub fn bsgs_negation_table<G: CountedGroup>(
+    g: &G,
+    gen: G::Elt,
+    target: G::Elt,
+    r: u64,
+    m: u64,
+) -> GenericOutcome {
     let mut out = GenericOutcome::default();
-    let m = ceil_sqrt(r).div_ceil(2).max(1);
+    let m = m.max(1);
     let mut table: std::collections::HashMap<u64, (u64, u64)> =
         std::collections::HashMap::with_capacity(m as usize + 1);
     let mut p = g.identity();
