@@ -86,7 +86,7 @@ only)`, so the match failed. The term was priced at wall time instead, and
 `ecbench` (`methods.rs`, `ic_report`) removes wall-priced solver terms and
 lists them as `solver_word_XORs_(…)_uncharged` with `lower_bound: true`.
 The commit matches by prefix (`is_word_xor_op_unit`), so the pinned ratio in
-`docs/ic/calibration.json` now applies. For icv1-f2m13-t181-515ee569 (its `koblitz` row) that
+`docs/ic/calibration.json` now applies. For `koblitz/icv1-f2m13-t181-515ee569` that
 ratio is 0.002304 GAE per word XOR, unchanged since before `2245b75`.
 
 Evidence that this is accounting only. Across this merge, every F4 row has
