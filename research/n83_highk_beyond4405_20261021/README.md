@@ -119,7 +119,9 @@ That local gate matches the allocation, watchdog chronology, archive SHA-256,
 embedded allocation and confirmed Pod absence; it returns `BOUNDED_UNKNOWN`
 when any receipt is missing or inconsistent. The Pod-side scientific selector
 and this post-termination custody gate must both pass before a Tier 1 result
-is promoted. The custody check can be rerun independently:
+is promoted. Its `final_primary_status` is read from the immutable archive and
+remains `BOUNDED_UNKNOWN` unless the archived screen and point-0 cross-family
+replay both passed. The custody check can be rerun independently:
 
 ```sh
 python3 -m research.n83_highk_beyond4405_20261021.verify_provider_custody \

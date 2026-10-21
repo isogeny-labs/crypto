@@ -53,6 +53,11 @@ def fixture(root: Path) -> tuple[Path, Path]:
             (archive / "results" / "runpod_allocation.json").read_bytes(),
         "results/source.json": b"{}\n",
         "results/host.json": b"{}\n",
+        "results/screen_analysis.json":
+            b'{"status":"SCREEN_ADMITTED"}\n',
+        "results/holdout/analysis.json":
+            b'{"primary_status":"PASS_VERIFIED_CROSS_FAMILY_TIER1",'
+            b'"cross_family_selector":{"status":"SELECTED"}}\n',
     }
     tar_path = archive / "raw_results.tar.gz"
     with tarfile.open(tar_path, "w:gz") as tar:
@@ -75,6 +80,8 @@ class ProviderCustodyTests(unittest.TestCase):
                 result = verify_provider_custody.validate(allocation, archive)
         self.assertEqual(result["status"], "PASS_PROVIDER_CUSTODY")
         self.assertTrue(all(result["checks"].values()))
+        self.assertEqual(result["final_primary_status"],
+                         "PASS_VERIFIED_CROSS_FAMILY_TIER1")
 
     def test_missing_absence_or_modified_archive_is_unknown(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -84,6 +91,8 @@ class ProviderCustodyTests(unittest.TestCase):
                                    "read_allocation", return_value=RECEIPT):
                 missing = verify_provider_custody.validate(allocation, archive)
             self.assertEqual(missing["status"], "BOUNDED_UNKNOWN")
+            self.assertEqual(missing["final_primary_status"],
+                             "BOUNDED_UNKNOWN")
             write(archive / "provider_post_terminate.json", {
                 "pod_id": "pod123", "recorded_utc": "2030-01-01T02:01:00Z",
                 "pod_present": False})
