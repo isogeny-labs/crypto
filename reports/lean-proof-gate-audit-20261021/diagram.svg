@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1120" height="490" viewBox="0 0 1120 490" role="img" aria-labelledby="title desc">
   <title id="title">Crypto Lean proof gate: observed failure and repaired audit path</title>
-  <desc id="desc">The old Lean 4.19 path built SEA but rejected the trusted-manifest option before axiom review. The repaired path passes the manifest through an environment variable and audits 20 theorems. A separate Lean download TLS failure remains an infrastructure event with bounded setup retries.</desc>
+  <desc id="desc">The old Lean 4.19 path built SEA but rejected the trusted-manifest option before axiom review. The repaired path passes the manifest through an environment variable and audits 20 theorems. A separate Lean download TLS failure was an infrastructure event; a later local gate passed five DenseCapacity theorems.</desc>
   <rect width="1120" height="490" fill="#f7f9fc"/>
   <text x="44" y="48" font-family="Arial,sans-serif" font-size="25" font-weight="700" fill="#172338">Lean proof gate: build, audit, and infrastructure</text>
   <text x="44" y="76" font-family="Arial,sans-serif" font-size="15" fill="#4a5b72">Observed CI run 39459394168; local replay on pinned Lean 4.19.0</text>
@@ -21,7 +21,7 @@
     <text x="660" y="313" font-weight="700">Local axiom audit passed</text>
     <text x="660" y="340">20 theorems · 0 failed · 0 trusted</text>
     <rect x="44" y="417" width="1026" height="45" rx="10" fill="#fff1d8" stroke="#c18c29" stroke-width="2"/>
-    <text x="62" y="446">Separate DenseCapacity failure: TLS toolchain download; setup retries only, with no theorem verdict.</text>
+    <text x="62" y="446">Prior DenseCapacity CI: TLS download error. Local pinned Lean 4.34.1 gate: 5 theorems pass.</text>
   </g>
   <g stroke="#65778e" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
     <path d="M272 161 H338"/><path d="M571 161 H637"/><path d="M457 205 V276"/><path d="M571 329 H637"/>

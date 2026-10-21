@@ -26,8 +26,9 @@ verified theorems or experiments.
 The SEA project built \mono{SeaProofs.lean}, including its theorem axiom
 printouts, but Lean 4.19 rejected the gate's \mono{--trusted} program argument
 before the separate axiom audit. This was a gate implementation failure, not a
-counterexample. The DenseCapacity target failed while downloading Lean 4.34.1
-because of a TLS connection error; it produced no theorem verdict.
+counterexample. The DenseCapacity target failed in that CI run while downloading
+Lean 4.34.1 because of a TLS connection error; that run produced no theorem
+verdict. A later local run of the repository gate passed its five theorems.
 
 The repaired gate passes the unchanged trust manifest through
 \mono{LEAN\_AUDIT\_TRUSTED\_FILE}; the auditor receives only module names as
@@ -44,7 +45,7 @@ $\longrightarrow$ \fbox{Old CLI: \mono{--trusted} rejected}\\[0.8em]
 \hspace*{1.2em}$\Downarrow$\hspace*{1.2em}
 \fbox{Manifest via environment} $\longrightarrow$
 \fbox{Local audit: 20 theorems, 0 failed, 0 trusted}\\[0.8em]
-\fbox{Separate TLS download error: setup retries only; no theorem verdict}
+\fbox{Prior Dense TLS error; local Lean 4.34.1 gate passed 5 theorems}
 \end{minipage}}
 \end{center}
 
@@ -53,6 +54,7 @@ $\longrightarrow$ \fbox{Old CLI: \mono{--trusted} rejected}\\[0.8em]
 Check & Observed result \\ \hline
 Auditor source under Lean 4.19.0 and 4.34.1 & Both compile. This is a compatibility check, not a theorem audit. \\ \hline
 SEA project proof gate & PASS; 20 theorem declarations, 0 failed, 0 compiler-trusted. The count includes generated GroupOps declarations. \\ \hline
+DenseCapacity proof gate & PASS; 5 arithmetic-bound theorems, 0 failed, 0 compiler-trusted. \\ \hline
 Gate self-test & Seven of seven expected positive and negative controls passed. \\ \hline
 Lean 4.19 controls & Custom axiom rejected; registered native proof reported as one trusted proof. \\ \hline
 Rust library tests & PASS: 4,464 passed, 0 failed, 119 ignored. The compressed raw log is retained with the report. \\ \hline
@@ -76,9 +78,9 @@ logs are retained. The successful raw test log SHA-256 is
 \begin{tabular}{|p{0.42\linewidth}|p{0.48\linewidth}|}\hline
 Requirement & Status in this change \\ \hline
 Faithful Lean proofs for all prior experiments across three repos & Partial: this repair restores one proof project's axiom gate; other source-to-claim reviews and lemmas remain. \\ \hline
-Code and numerical result validation & Partial: gate and SEA model tested; historical numerical results not replayed here. \\ \hline
+Code and numerical result validation & Partial: gate, SEA model, DenseCapacity bounds, and Rust library tested; historical results not replayed. \\ \hline
 Performance graphs and dashboards & Not attempted: no new performance datum or correction. Canonical performance figures should not move for a CI repair. \\ \hline
-All results good to go & Not established: full proof matrices, autoresearcher workspace, and semantic reviews remain. \\ \hline
+All results good to go & Not established: full crypto proof matrix and cross-repository semantic reviews remain. The separate autoresearcher workspace build passed. \\ \hline
 \end{tabular}
 
 The separate \mono{diagram.svg} depicts these observed gate states. It is not
