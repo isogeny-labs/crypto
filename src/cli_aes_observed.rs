@@ -41,6 +41,51 @@ struct MitmInput {
     pairs: Vec<Pair2>,
 }
 
+/// Compute the Square integral balance over a caller-supplied λ-set.
+pub fn integral(input: &Path) -> Result<(), String> {
+    let data: MitmInput = serde_json::from_slice(&read(input)?).map_err(|e| e.to_string())?;
+    if data.pairs.len() != 256 {
+        return Err("integral analysis requires exactly 256 plaintext/ciphertext pairs".into());
+    }
+    let mut seen = [false; 256];
+    let mut fixed: Option<[u8; 15]> = None;
+    let mut xor_sum = [0u8; 16];
+    for (index, pair) in data.pairs.iter().enumerate() {
+        let plaintext = block(&pair.plaintext_hex)?;
+        let other: [u8; 15] = plaintext[1..].try_into().expect("fixed slice length");
+        if fixed.is_some_and(|value| value != other) {
+            return Err(format!("pair {index} changes a fixed plaintext byte"));
+        }
+        fixed = Some(other);
+        let active = plaintext[0] as usize;
+        if seen[active] {
+            return Err(format!("duplicate lambda-set plaintext byte {active}"));
+        }
+        seen[active] = true;
+        let ciphertext = block(&pair.ciphertext_hex)?;
+        for byte in 0..16 {
+            xor_sum[byte] ^= ciphertext[byte];
+        }
+    }
+    let balanced = xor_sum.iter().filter(|&&byte| byte == 0).count();
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&json!({
+            "schema_version":1,
+            "method":"square-integral-xor-balance",
+            "hypothesis":"aes-128-reduced-three-full-rounds-with-final-mixcolumns",
+            "status":if balanced == 16 {"balanced"} else {"not_balanced"},
+            "pairs_used":256,
+            "active_plaintext_byte_position":0,
+            "fixed_other_plaintext_hex":hex::encode(fixed.expect("nonempty corpus")),
+            "xor_sum_hex":hex::encode(xor_sum),
+            "balanced_output_bytes":balanced
+        }))
+        .map_err(|e| e.to_string())?
+    );
+    Ok(())
+}
+
 /// Analyze a complete, canonically indexed chosen-plaintext delta set.
 pub fn mitm(input: &Path) -> Result<(), String> {
     let data: MitmInput = serde_json::from_slice(&read(input)?).map_err(|e| e.to_string())?;
@@ -298,6 +343,46 @@ pub fn linear_parity(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn observed_integral_checks_lambda_set_and_balance() {
+        let key = [0x51u8; 16];
+        let path = std::env::temp_dir().join(format!(
+            "aes-integral-observed-{}-{}.json",
+            std::process::id(),
+            line!()
+        ));
+        let cipher = ReducedAes128::new(&key, 3, true);
+        let mut xor = [0u8; 16];
+        let mut pairs: Vec<_> = (0..=255u8)
+            .map(|active| {
+                let mut plaintext = [0x42u8; 16];
+                plaintext[0] = active;
+                let ciphertext = cipher.encrypt(&plaintext);
+                for byte in 0..16 {
+                    xor[byte] ^= ciphertext[byte];
+                }
+                json!({"plaintext_hex":hex::encode(plaintext),
+                    "ciphertext_hex":hex::encode(ciphertext)})
+            })
+            .collect();
+        assert_eq!(xor, [0u8; 16]);
+        pairs.reverse();
+        fs::write(&path, json!({"pairs":pairs}).to_string()).unwrap();
+        assert!(integral(&path).is_ok());
+        pairs[1]["plaintext_hex"] = pairs[0]["plaintext_hex"].clone();
+        fs::write(&path, json!({"pairs":pairs}).to_string()).unwrap();
+        assert!(integral(&path).unwrap_err().contains("duplicate"));
+        pairs[1]["plaintext_hex"] = json!(hex::encode({
+            let mut p = [0x42u8; 16];
+            p[0] = 254;
+            p[1] = 0x43;
+            p
+        }));
+        fs::write(&path, json!({"pairs":pairs}).to_string()).unwrap();
+        assert!(integral(&path).unwrap_err().contains("fixed"));
+        fs::remove_file(path).unwrap();
+    }
 
     #[test]
     fn observed_mitm_checks_complete_delta_set() {

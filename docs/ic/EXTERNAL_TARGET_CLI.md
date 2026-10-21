@@ -233,6 +233,8 @@ crypto cryptanalysis aes-distinguisher --technique boomerang --samples 4096 \
 crypto cryptanalysis aes-distinguisher --technique zero-correlation
 crypto cryptanalysis aes-cpa --input traces.json
 crypto cryptanalysis aes-cache-timing --input isolated-lookup-timings.json
+crypto cryptanalysis aes-mitm-observed --input two-round-delta-set.json
+crypto cryptanalysis aes-integral-observed --input lambda-set.json
 crypto cryptanalysis aes-dfa --input fault-pairs.json
 crypto cryptanalysis aes-dfa-schedule --last-round-key-hex 13111d7fe3944a17f307a78b4d2b30c5
 ```
@@ -261,6 +263,21 @@ AES S-box off-diagonal BCT maximum plus the empirical return count for that
 fixed delta under the declared two-round model. A zero return count is a
 valid measurement, not evidence of key recovery. The command does not choose
 each delta from the ciphertexts it just observed.
+
+`aes-mitm-observed` accepts 256 plaintext/ciphertext pairs as
+`{"pairs":[{"plaintext_hex":"<32 hex digits>","ciphertext_hex":"<32 hex digits>"},...]}`.
+The plaintexts must cover `(i, 0, ..., 0)` for every byte value `i`, in any
+order. It applies the two-round AES-128 (last round without MixColumns)
+sequence-consistency attack and reports candidates for input-key byte zero,
+round-two key byte zero, and the intermediate constant. These are partial
+key-byte candidates, not a recovered AES-128 master key.
+
+`aes-integral-observed` uses the same pair schema. Its 256 plaintexts must
+cover byte zero exactly once while keeping the other 15 bytes equal across
+the corpus. It reports the XOR sum of all 256 ciphertexts and the number of
+zero output bytes. A zero XOR sum is the Square integral balance expected
+after three full AES rounds with MixColumns in the last round; the command
+reports an observed balance, not proof of the underlying cipher or its key.
 
 `aes-differential-observed` accepts caller-supplied data for the reduced
 two-round cipher (the last round omits MixColumns):

@@ -361,6 +361,12 @@ enum CryptanalysisOp {
         #[arg(long)]
         input: PathBuf,
     },
+    /// Measure Square integral balance on an observed 256-pair AES lambda set.
+    AesIntegralObserved {
+        /// JSON pairs with plaintext byte 0 covering 0..=255 and all other bytes fixed.
+        #[arg(long)]
+        input: PathBuf,
+    },
     /// Analyze caller-supplied known pairs for the one-round AES linear model.
     AesLinearObserved {
         /// JSON with known pairs and optional independent verification pairs.
@@ -2189,6 +2195,12 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
         }
         CryptanalysisOp::AesMitmObserved { input } => {
             if let Err(e) = cli_aes_observed::mitm(&input) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesIntegralObserved { input } => {
+            if let Err(e) = cli_aes_observed::integral(&input) {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }
