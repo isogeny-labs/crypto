@@ -1,94 +1,111 @@
-# Local backups for the existing factor-base processes
+# Private legacy memory backups and recovery
 
-The five original processes were started from an executable without native
-checkpoint support. The user explicitly authorized brief CRIU snapshot pauses.
-CRIU 4.2.1 produced leave-running dumps of all five; the first measured freezes
-were 0.46–1.29 seconds. All sources continued. This does not yet establish
-automatic legacy failover. On 2026-10-19, copies of all five images restored on
-a separate `m8i.8xlarge` with matching kernel and library hashes. Both threads
-of each copy ran and its CPU ticks advanced during a 10-second check; only the
-copies were stopped. See [the cross-host evidence](validation/legacy-criu-cross-host-restore.json).
+Recurring private S3 memory exports are authorized and enabled, including future
+images that may contain inherited credentials. No process-memory archive is in
+GitHub or the software release. The original instance remains running and holds
+`3.134.144.201`; it is never terminated by the managed idle controller.
 
-`criu_local.py` is a generic infrastructure producer for those explicitly
-registered PIDs. It checks the executable, process start ticks, command digest
-and cwd before each snapshot. It supports the known regular stdout/stderr files
-and mapped executable/system libraries; other external descriptors are refused.
-It never reads process environment values through procfs and never starts,
-restarts, restores or terminates an experiment.
+## Protected experiments and backup schedule
 
-The `post-dump` action copies backing files while the process is still frozen.
-It preserves directory mode/ownership as well as file bytes and metadata. State
-files are fsynced and checksummed before committing `manifest.json`. The root
-directory and metadata are private; two committed generations per PID remain.
-Partial attempts are retained as failure evidence. The 15-minute timer starts
-its next interval after a run finishes; dump, hash and fsync time add to that
-interval. Larger states and storage failures can increase the lost-work window.
+The five original `factor_base_shape_ladder` processes (6656, 6657, 6665, 6696,
+6704) all finished normally. Their complete terminal summaries were exported;
+their `legacy-owner` completion receipt remains intact. A sixth, still-running
+`diem_quartic_study gen` process, PID 400334, has a separate registry, S3 prefix
+and ownership key. Its in-memory generation work has no native checkpoint.
 
-On the original host:
+| Group | Private source registry | S3 prefix | Ownership key | Timer |
+| --- | --- | --- | --- | --- |
+| Original five | `/var/lib/spot-criu-managed` | `checkpoints/criu/` | `legacy-owner` | `spot-legacy-backup.timer` |
+| Diem generator | `/var/lib/spot-criu-diem` | `checkpoints/criu/diem/` | `legacy-owner-diem` | `spot-diem-backup.timer` |
+
+Both timers use `OnCalendar=*:0/15`, with persistent catch-up. Each oneshot first
+takes a leave-running snapshot, then exports it. The old separate snapshot/export
+timers are disabled to avoid racing producers. If a run exceeds an interval,
+systemd does not overlap it. The nominal interval is 15 minutes; dump/upload time,
+failed backups and capacity gaps can increase the recovery window. Brief snapshot
+freezes were authorized; the initial five measured 0.46–1.29 seconds.
+
+`criu_local.py` binds an explicitly registered executable, PID start time, command
+digest and cwd. It refuses unsupported external descriptors. The frozen post-dump
+hook copies executable/library/output backing files, cwd and required directory
+metadata, and records monotonic/boottime offsets. A complete, fsynced SHA-256
+manifest commits the generation. Two local generations per PID remain.
+
+`criu_export.py` copies a verified generation under the producer lock, then
+compresses/uploads outside that lock. It requires a root-owned, private grant
+bound to the bucket and exact identities. Every archive passes full S3 download
+SHA-256, size, metadata and AES256 checks before index/pointer commit. Discovery
+retains three index candidates for fallback. S3 archives and old versions remain.
+
+Completion requires the registered process to have departed and the expected
+terminal records to exist: exact per-instance factor summaries, or a new Diem
+JSONL file with 52 records. The latter is an infrastructure completion signal,
+not verification of the mathematical contents. Outputs are included in the
+private committed index; no old image is replayed after a verified completion.
+
+## Automatic recovery and fencing
+
+`legacy_recovery.py` runs as root on replacements. Each group has an independent
+namespace; a shared host ownership key co-locates all unfinished groups. Takeover
+requires EC2-confirmed **termination** of the previous owner, a confirmed original
+termination, and a conditional DynamoDB write. A stopped instance, missing
+heartbeat, expired timestamp or uncertain API response cannot authorize takeover.
+The controller durably records confirmed origin/owner deaths with an owner-bound
+conditional write, so a long Spot gap does not depend on an expired EC2 record.
+A missing EC2 record alone never proves termination. The source refuses to acquire
+its own work. No existing process is killed to make
+a restore PID available.
+
+Before restore, the daemon verifies the full selected batch, all hashes, safe tar
+members, registered identity, exact kernel, system-library bytes and CRIU CPU
+compatibility. Unsupported/mismatched states fail closed. It restores private
+local backing files, runs CRIU in a saved time namespace, and checks the restored
+process identity. Monotonic downtime is excluded; UTC launcher deadlines remain
+enforced outside the time namespace. An expired original deadline creates a
+private terminal failure receipt instead of restarting work with a fresh budget.
+The Diem generator had no declared deadline, so none is invented.
+
+A replacement writes per-group readiness only after restore, enables that group's
+15-minute backup timer and publishes new generations. The IP controller requires
+all unfinished groups to be owned and ready on the same healthy worker. While
+any legacy image remains unfinished, new placement is restricted to m8i; the
+native runtime opens the six-family Intel/AMD pool after completion. CRIU images
+are not assumed portable across CPU families or kernel upgrades.
+
+## Executed validation
+
+All five original images restored as copies on a separate compatible m8i. A later
+automatic rehearsal used a disposable logical source, two successive recovery
+workers and separate S3/DynamoDB namespaces. Each successor waited while its
+predecessor was alive, restored automatically only after termination, advanced
+CPU work, and produced a new encrypted backup. The second worker restored that
+newer time-namespace image. All rehearsal hosts were then terminated. The original
+source was untouched throughout.
+
+A copy of the new Diem snapshot also restored on the idle managed standby: four
+threads, CPU ticks 4 → 1506 over five seconds. Only that copy was stopped. See
+[failover evidence](validation/automatic-failover.json),
+[Diem copy restore](validation/diem-copy-restore.json), and
+[latest backup receipts](validation/recurring-private-backups.json).
+
+For checks on the source (metadata only):
 
 ```bash
+sudo systemctl list-timers spot-legacy-backup.timer spot-diem-backup.timer
 sudo python3 /opt/spot-criu/criu_local.py list --root /var/lib/spot-criu-managed
-sudo python3 /opt/spot-criu/criu_local.py discover \
-  --root /var/lib/spot-criu-managed --pid 6656
-sudo systemctl status spot-legacy-checkpoint.timer
+sudo python3 /opt/spot-criu-diem/criu_local.py list --root /var/lib/spot-criu-diem
 ```
 
-Discovery checks each candidate's complete file inventory, SHA-256/size, safe
-paths and registered process identity, selecting the newest valid generation
-with fallback. It reports `application_restore_verified: false`: file integrity
-alone is not a successful process restore. The first local restore probe exposed
-directory-permission mismatches, which the producer now fixes. Later private
-PID/mount/network-namespace probes stalled at CRIU's restoration barrier. Their
-namespaces were cleaned up; original processes were never stopped or replaced.
-[The remaining recovery obligation](../../problems/legacy-spot-process-recovery.md)
-tracks clocks, ownership, automatic recovery and cutover. Subsequent direct
-restores on the separate compatible worker passed; the earlier namespace
-failures remain recorded and their cause is not established.
+New arbitrary processes require explicit enrollment and a tested restore contract;
+this is not transparent recovery for every program, external socket, GPU or side
+effect. New supported solver runs should use the native durable checkpoint
+interface. File discovery alone never proves application recoverability.
 
-Local snapshots remain on the original retained EBS volume. A new host does not
-automatically attach that volume. The user explicitly authorized export of the
-five current memory images, including possible inherited credentials, to the
-private bucket `spot-experiments-runtimebucket-g8acwaz3kewm`. All five archives
-were uploaded under `checkpoints/criu/20261019T011736Z-7bad660db8bb/`, with AES256
-server-side encryption, SHA-256 metadata and full download/hash verification.
-The 6,923,934,633-byte batch commits its index after verifying every archive.
-`checkpoints/criu/latest.json` points to the verified index. See
-[the export receipt](validation/private-criu-export.json).
+## Tool and retained failures
 
-`criu_export.py` takes a private copy of the newest fully verified generations
-under the producer lock, then releases that lock before compression and upload.
-It requires a root-owned private authorization file bound to the bucket and
-registered process identities. A one-time grant also binds exact generation
-names; future generations require separate recurring authorization. An index
-and discovery pointer are published only after every archive passes encryption,
-size, metadata and full-download SHA-256 checks. Failed staging stays private
-for diagnosis. Completed staging is removed; S3 archives are retained.
-
-Automatic approval review initially blocked memory export; the user's explicit
-grant resolved the one-time export. Review separately rejected enabling future
-scheduled exports because it interpreted that grant as covering only the five
-current images. Recurring permission has been requested. The export service
-and timer are provided for review but are not installed or enabled. The existing
-15-minute local snapshot timer continues. No memory image is in GitHub or the
-software deployment bundle; credentials and snapshots must never enter public Git.
-
-## Reproduce installation
-
-Use the pinned CRIU 4.2.1 tool/source from the software artifact manifest (or
-the [official release](https://github.com/checkpoint-restore/criu/releases/tag/v4.2.1)).
-AL2023's packaged 3.17.1 failed the disposable restore with `sys_rseq -22`.
-Build dependencies used for 4.2.1 were `gcc`, `make`, `libnet-devel`,
-`libnl3-devel`, `libcap-devel`, `libuuid-devel`, `protobuf-c-devel`,
-`protobuf-c-compiler`, `protobuf-devel`, `protobuf-compiler`, `python3-protobuf`
-and `libaio-devel`; build with `make -j4`. The source artifact includes the
-upstream license. The tool is dynamically linked against AL2023 libraries.
-
-Install the reviewed producer and tool root-owned under `/opt/spot-criu`, and
-the two `spot-legacy-checkpoint.*` units under `/etc/systemd/system`. Register
-only the currently authorized PIDs into a new private root, take the first
-snapshot and verify it, then enable the timer. Registration is explicit and
-cannot overwrite an existing registry. The original five-PID deployment is
-already installed; do not register a duplicate producer for it.
-
-This producer is infrastructure orchestration and file integrity checking. The
-actual mathematical checkpoint implementation and tests remain native Rust.
+CRIU 4.2.1 is pinned in `artifacts.json`; its software/source are public upstream
+artifacts, not memory images. AL2023's CRIU 3.17.1 failed the disposable restore
+with `sys_rseq -22`. Initial directory-permission and private namespace restore
+failures remain in the earlier evidence archives; later direct compatible-host
+restores and time-namespace failover passed. This is generic process/storage
+orchestration; application algorithms/checkpoint serialization remain native Rust.
