@@ -21,7 +21,7 @@ concurrency:
 # Fresh timing panels and their result gates run only after merge or by manual dispatch.
 jobs:
   paired-prefilter:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|compact-s3-prefilter.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|compact-s3-prefilter.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 90 }}
     strategy:
       fail-fast: false
@@ -33,7 +33,6 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            Cargo.lock
             Cargo.toml
             tools/volcano-cli/
             isogeny_algos/
@@ -47,6 +46,8 @@ jobs:
             examples/koblitz_rho_batch_ks_v2_n61.rs
             examples/koblitz_rho_batch_ks_v3.rs
             research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
+            .github/scripts/frozen-lock-source.sh
+            .github/scripts/frozen-lock-source.files
             research/notes/ecc2k130/compact_orbit_rank_evidence_20260929/verify_rank.py
             research/notes/ecc2k130/compact_orbit_point_panel_20260929/run_panel.py
             research/notes/ecc2k130/compact_orbit_point_panel_20260929/verify_panel.py
@@ -75,7 +76,9 @@ jobs:
         run: |
           python3 -m py_compile research/notes/ecc2k130/compact_s3_prefilter_20260930/*.py
           python3 -c 'import sys; sys.path.insert(0, "research/notes/ecc2k130/compact_s3_prefilter_20260930"); from verify_panel import freeze; freeze()'
-      - run: test -f research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
+      # The materializer already restored the pinned source and manifest.
+      # This tree has no Git metadata and must not receive another source overlay.
+      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
         working-directory: ${{ runner.temp }}/s3-prefilter-frozen-src
       - name: Build and test the exact evaluation source
         working-directory: ${{ runner.temp }}/s3-prefilter-frozen-src

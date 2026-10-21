@@ -30,14 +30,13 @@ concurrency:
 # Fresh timing panels and their result gates run only after merge or by manual dispatch.
 jobs:
   point-contract:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|compact-orbit-point-panel.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|compact-orbit-point-panel.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            Cargo.lock
             Cargo.toml
             tools/volcano-cli/
             isogeny_algos/
@@ -49,15 +48,17 @@ jobs:
             src
             examples/koblitz_rho_batch_ks_v2_n61.rs
             research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
+            .github/scripts/frozen-lock-source.sh
+            .github/scripts/frozen-lock-source.files
             research/notes/ecc2k130/compact_orbit_point_panel_20260929/test_point_mode.py
       - uses: Swatinem/rust-cache@v2
-      - run: test -f research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
+      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock && bash .github/scripts/frozen-lock-source.sh
       - run: cargo build --release --locked --example koblitz_rho_batch_ks_v2_n61
       - run: cargo test --release --locked --example koblitz_rho_batch_ks_v2_n61
       - run: python3 research/notes/ecc2k130/compact_orbit_point_panel_20260929/test_point_mode.py target/release/examples/koblitz_rho_batch_ks_v2_n61
 
   paired-panel:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|compact-orbit-point-panel.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|compact-orbit-point-panel.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 90 }}
     strategy:
       fail-fast: false
@@ -69,7 +70,6 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            Cargo.lock
             Cargo.toml
             tools/volcano-cli/
             isogeny_algos/
@@ -82,12 +82,14 @@ jobs:
             examples/koblitz_orbit_dlp_fast.rs
             examples/koblitz_rho_batch_ks_v2_n61.rs
             research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
+            .github/scripts/frozen-lock-source.sh
+            .github/scripts/frozen-lock-source.files
             research/notes/ecc2k130/compact_orbit_rank_evidence_20260929/verify_rank.py
             research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924/independent_replay.py
             research/notes/ecc2k130/compact_orbit_point_panel_20260929
             .github/workflows/compact-orbit-point-panel.yml
       - uses: Swatinem/rust-cache@v2
-      - run: test -f research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
+      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock && bash .github/scripts/frozen-lock-source.sh
       - run: cargo build --release --locked --example koblitz_rho_batch_ks_v2_n61 --example koblitz_orbit_dlp_fast
       - name: Run five alternating cold pairs and disjoint L1 tuning
         if: github.event_name != 'pull_request'
@@ -114,7 +116,7 @@ jobs:
           retention-days: 90
 
   rho-backend-ab:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|compact-orbit-point-panel.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|compact-orbit-point-panel.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
     strategy:
       fail-fast: false
@@ -127,7 +129,6 @@ jobs:
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            Cargo.lock
             Cargo.toml
             tools/volcano-cli/
             isogeny_algos/
@@ -140,12 +141,14 @@ jobs:
             examples/koblitz_orbit_dlp_fast.rs
             examples/koblitz_rho_batch_ks_v2_n61.rs
             research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
+            .github/scripts/frozen-lock-source.sh
+            .github/scripts/frozen-lock-source.files
             research/notes/ecc2k130/compact_orbit_rank_evidence_20260929/verify_rank.py
             research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924/independent_replay.py
             research/notes/ecc2k130/compact_orbit_point_panel_20260929
             .github/workflows/compact-orbit-point-panel.yml
       - uses: Swatinem/rust-cache@v2
-      - run: test -f research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
+      - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock && bash .github/scripts/frozen-lock-source.sh
       - run: cp research/notes/ecc2k130/compact_orbit_point_panel_20260929/rho_baseline_0839.rs examples/koblitz_rho_backend_baseline.rs
       - run: cargo build --release --locked --example koblitz_rho_backend_baseline --example koblitz_rho_batch_ks_v2_n61
       - name: Pair frozen baseline and corrected rho backend

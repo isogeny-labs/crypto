@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   validate:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|compact-ir-ledger.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|compact-ir-ledger.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     steps:
       - uses: actions/checkout@v4
@@ -21,7 +21,6 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            Cargo.lock
             Cargo.toml
             tools/volcano-cli/
             isogeny_algos/
@@ -57,7 +56,7 @@ jobs:
       - name: Build exact-source release examples
         working-directory: ${{ runner.temp }}/compact-ir-frozen-src
         run: |
-          test -f research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
+          cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
           cargo build --release --locked --example koblitz_orbit_dlp_s3_batch --example koblitz_rho_batch_ks_v3
       - name: Native n37 one-target integration smoke and independent replay
         run: |
@@ -82,7 +81,7 @@ jobs:
   measure:
     if: github.event_name == 'workflow_dispatch'
     needs: validate
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|compact-ir-ledger.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|compact-ir-ledger.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 120
     strategy:
       fail-fast: false
@@ -94,7 +93,6 @@ jobs:
           ref: ${{ github.sha }}
           sparse-checkout-cone-mode: false
           sparse-checkout: |
-            Cargo.lock
             Cargo.toml
             tools/volcano-cli/
             isogeny_algos/

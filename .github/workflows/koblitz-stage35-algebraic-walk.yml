@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   validate-control:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage35-algebraic-walk.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage35-algebraic-walk.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -26,10 +26,11 @@ jobs:
         run: |
           python3 -m py_compile scripts/run_koblitz_stage35_algebraic_walk.py
           python3 scripts/run_koblitz_stage35_algebraic_walk.py self-test
-          test -f research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock
+          cp research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh
           RUSTFLAGS=-Awarnings cargo test --locked --test ic_framework \
             workflow_runs_in_stages_and_resumes_without_redoing_work -- --exact
-          rm Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh --restore
           if test -f research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-35-algebraic-walk-result-20260912/verification.json; then
             python3 scripts/verify_koblitz_stage35_result.py verify \
               > "$RUNNER_TEMP/stage35-retained-verification.json"
@@ -47,7 +48,7 @@ jobs:
 
   replay-retained-result:
     if: ${{ github.event_name == 'pull_request' }}
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage35-algebraic-walk.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage35-algebraic-walk.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -60,7 +61,8 @@ jobs:
           mkdir "$RUNNER_TEMP/stage35-archive"
           tar -xzf research/sat_factor_base_review_20260908/continuation-05-sota-gates/koblitz-stage35-algebraic-walk-evidence-34693802792.tar.gz \
             -C "$RUNNER_TEMP/stage35-archive"
-          test -f research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock
+          cp research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh
           RUSTFLAGS=-Awarnings cargo build --release --locked --bin ic
           cp -R "$RUNNER_TEMP/stage35-archive/koblitz-stage35-algebraic-walk-34693802792/stage35-run/workflow" \
             "$RUNNER_TEMP/stage35-replay"
@@ -83,14 +85,14 @@ jobs:
           assert baseline["claim_boundary"] == "public_hash_unknown_scalar"
           assert baseline["ic"]["verified"] == baseline["rho"]["verified"] == 5
           PY
-          rm Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh --restore
           python3 scripts/verify_koblitz_stage35_result.py verify \
             > "$RUNNER_TEMP/stage35-static-verification.json"
 
   algebraic-walk:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     needs: validate-control
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage35-algebraic-walk.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage35-algebraic-walk.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4

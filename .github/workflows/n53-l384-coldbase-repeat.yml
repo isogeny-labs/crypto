@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   hash-only:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n53-l384-coldbase-repeat.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n53-l384-coldbase-repeat.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 360 }}
     steps:
       - uses: actions/checkout@v4
@@ -67,7 +67,7 @@ jobs:
   outcome:
     if: github.event.action == 'labeled' && github.event.label.name == 'run-n53-coldbase-once' && github.event.pull_request.head.repo.full_name == github.repository
     needs: hash-only
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n53-l384-coldbase-repeat.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n53-l384-coldbase-repeat.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 58
     concurrency:
       group: n53-l384-coldbase-${{ github.event.pull_request.number }}
@@ -106,8 +106,9 @@ jobs:
           test ! -e research/sat_factor_base_review_20260908/autolab_combined_l384_coldbase_n53_20260925/evidence/archive_manifest.json
       - name: Build both frozen producers
         run: |
-          test -f research/sat_factor_base_review_20260908/autolab_combined_l384_coldbase_n53_20260925/Cargo.lock
-          test "$(sha256sum research/sat_factor_base_review_20260908/autolab_combined_l384_coldbase_n53_20260925/Cargo.lock | cut -d' ' -f1)" = ac5cd7a3459be776180afe1eb2975c76b1a88f84bd1e99aa20475927ec260a90
+          cp research/sat_factor_base_review_20260908/autolab_combined_l384_coldbase_n53_20260925/Cargo.lock Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh
+          test "$(sha256sum Cargo.lock | cut -d' ' -f1)" = "$(sha256sum research/sat_factor_base_review_20260908/autolab_combined_l384_coldbase_n53_20260925/Cargo.lock | cut -d' ' -f1)"
           rustc --version | grep '^rustc 1.93.1 '
           cargo --version | grep '^cargo 1.93.1 '
           cargo build --locked --release --example koblitz_s5_sat_instance --example koblitz_rho_batch_ks
