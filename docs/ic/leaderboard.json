@@ -106,6 +106,14 @@
    "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
    "sha256": "e6f6f56f9db4c125e23e22009247e80e60386238108db8822f20efc2e1fdd8aa"
   },
+  "tuned_gae_table_b": {
+   "path": "research/tuned_gae_20261020/reprice/table_b.json",
+   "sha256": "631cca6dd754a0ca02acb4efcb7d4b44c4b016454f8bd24afa7c113893838373"
+  },
+  "tuned_gae_rho_prime_fast": {
+   "path": "research/tuned_gae_20261020/sessions/rho_prime_fast_v2_n256/comparisons/rho-neg__rho-fast.json",
+   "sha256": "aadcee6f5f3db1e50079acbfdba3243dfe3f1b59df1df476406ed09710581077"
+  },
   "planner_validation": {
    "path": "research/ic_planner_validation_20261020/analysis/summary.json",
    "sha256": "c8fb751cea39e55ebd1b322245c95a958ae8b47d393c6b6918abddcd2d4234fc"
@@ -128,7 +136,7 @@
   },
   "registry": {
    "path": "docs/curves/registry.json",
-   "sha256": "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf"
+   "sha256": "f3761749946fcfc0f034ddf2c535b65dd15d337f4082df3ba314a191d24d86ae"
   },
   "curves_schema": {
    "path": "docs/curves/ic/curves.schema.json",
@@ -17297,6 +17305,20 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp28-tm24531-24294e5d",
+   "family": "prime",
+   "field": "GF(p), p = 259182139",
+   "coefficients": "a = 256310742, b = 86097094",
+   "order_bits": 28,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp28-t28201-65099091",
    "family": "prime",
    "field": "GF(p), p = 268435399",
@@ -17927,6 +17949,20 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp32-t93403-ef655380",
+   "family": "prime",
+   "field": "GF(p), p = 3642104651",
+   "coefficients": "a = 3608834951, b = 2170327929",
+   "order_bits": 32,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp32-t7319-90da43e9",
    "family": "prime",
    "field": "GF(p), p = 4294967291",
@@ -17950,6 +17986,20 @@
    "family": "prime",
    "field": "GF(p), p = 39615550291",
    "coefficients": "a = 0, b = 22620405809",
+   "order_bits": 36,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp36-t360541-9f646956",
+   "family": "prime",
+   "field": "GF(p), p = 39688394183",
+   "coefficients": "a = 18505017641, b = 23501859795",
    "order_bits": 36,
    "standard": [],
    "ec1": [],
@@ -18067,6 +18117,20 @@
    "family": "prime",
    "field": "GF(p), p = 775471435903",
    "coefficients": "a = 0, b = 654254041891",
+   "order_bits": 40,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp40-tm62443-8b49d5b3",
+   "family": "prime",
+   "field": "GF(p), p = 909903817187",
+   "coefficients": "a = 567284737849, b = 258589946179",
    "order_bits": 40,
    "standard": [],
    "ec1": [],
@@ -49720,6 +49784,292 @@
   "study": "research/ic_oracle_setup_blocked_20261020/",
   "report": "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
   "class": "engineering"
+ },
+ "tuned_gae_component": {
+  "source": "research/tuned_gae_20261020/reprice/table_b.json",
+  "rho_source": "research/tuned_gae_20261020/sessions/rho_prime_fast_v2_n256/comparisons/rho-neg__rho-fast.json",
+  "gae_definition": "tuned-batched-affine-add/v1",
+  "status": "proposed, not canonical",
+  "class": "unit: accounting (widens every gap; not an improvement); rho.prime_fast: engineering on the rho reference",
+  "rows": [
+   {
+    "instance": "bench-10bit",
+    "regime": "prime",
+    "r": 823,
+    "matched_rho_s": 3.604878385,
+    "variant": "mitm_m2_negfold_walk_balanced",
+    "legacy_s": 22.8490996547,
+    "tuned_s": 23.4104028901,
+    "legacy_gap": 6.33838293956,
+    "tuned_gap": 6.4940895059,
+    "tuned_over_legacy": 1.02456566096,
+    "tuned_best_variant": "mitm_m2_negfold_walk_balanced",
+    "tuned_best_s": 23.4104028901,
+    "tuned_best_gap": 6.4940895059
+   },
+   {
+    "instance": "bench-12bit",
+    "regime": "prime",
+    "r": 3889,
+    "matched_rho_s": 2.85497743163,
+    "variant": "mitm_m2_negfold_walk",
+    "legacy_s": 15.6178084892,
+    "tuned_s": 16.7197854562,
+    "legacy_gap": 5.4703789656,
+    "tuned_gap": 5.85636344127,
+    "tuned_over_legacy": 1.07055900114,
+    "tuned_best_variant": "mitm_m2_negfold_walk",
+    "tuned_best_s": 16.7197854562,
+    "tuned_best_gap": 5.85636344127
+   },
+   {
+    "instance": "bench-14bit",
+    "regime": "prime",
+    "r": 16231,
+    "matched_rho_s": 2.03360610562,
+    "variant": "mitm_m2_negfold_walk_balanced",
+    "legacy_s": 13.0749405408,
+    "tuned_s": 13.906717038,
+    "legacy_gap": 6.42943611579,
+    "tuned_gap": 6.83845165473,
+    "tuned_over_legacy": 1.06361608259,
+    "tuned_best_variant": "mitm_m2_negfold_walk_balanced",
+    "tuned_best_s": 13.906717038,
+    "tuned_best_gap": 6.83845165473
+   },
+   {
+    "instance": "bench-16bit",
+    "regime": "prime",
+    "r": 65003,
+    "matched_rho_s": 1.74000025562,
+    "variant": "mitm_m2_negfold_walk_balanced",
+    "legacy_s": 11.6834008019,
+    "tuned_s": 13.6728155904,
+    "legacy_gap": 6.71459717554,
+    "tuned_gap": 7.85793884008,
+    "tuned_over_legacy": 1.17027702998,
+    "tuned_best_variant": "mitm_m2_negfold_walk_balanced",
+    "tuned_best_s": 13.6728155904,
+    "tuned_best_gap": 7.85793884008
+   },
+   {
+    "instance": "bench-18bit",
+    "regime": "prime",
+    "r": 261673,
+    "matched_rho_s": 1.44579813081,
+    "variant": "mitm_m2_negfold_walk_balanced",
+    "legacy_s": 8.41371864675,
+    "tuned_s": 9.12485745501,
+    "legacy_gap": 5.81942836101,
+    "tuned_gap": 6.31129426754,
+    "tuned_over_legacy": 1.08452134402,
+    "tuned_best_variant": "mitm_m2_negfold_walk_balanced",
+    "tuned_best_s": 9.12485745501,
+    "tuned_best_gap": 6.31129426754
+   },
+   {
+    "instance": "bench-20bit",
+    "regime": "prime",
+    "r": 1046999,
+    "matched_rho_s": 1.29190608779,
+    "variant": "mitm_m2_negfold_walk_balanced",
+    "legacy_s": 10.7228719576,
+    "tuned_s": 11.5549861415,
+    "legacy_gap": 8.30003980861,
+    "tuned_gap": 8.94413785236,
+    "tuned_over_legacy": 1.07760180175,
+    "tuned_best_variant": "mitm_m2_negfold_walk_balanced",
+    "tuned_best_s": 11.5549861415,
+    "tuned_best_gap": 8.94413785236
+   },
+   {
+    "instance": "generated-22bit-3290411",
+    "regime": "prime",
+    "r": 3291679,
+    "matched_rho_s": 1.21605771181,
+    "variant": "mitm_m2_negfold_walk_balanced",
+    "legacy_s": 12.7702224719,
+    "tuned_s": 13.9179538974,
+    "legacy_gap": 10.5013292937,
+    "tuned_gap": 11.4451425801,
+    "tuned_over_legacy": 1.08987560146,
+    "tuned_best_variant": "mitm_m2_negfold_walk_balanced",
+    "tuned_best_s": 13.9179538974,
+    "tuned_best_gap": 11.4451425801
+   },
+   {
+    "instance": "generated-24bit-10935329",
+    "regime": "prime",
+    "r": 10933753,
+    "matched_rho_s": 1.03794226057,
+    "variant": "mitm_m2_negfold_walk_balanced",
+    "legacy_s": 13.9656576304,
+    "tuned_s": 15.5258230451,
+    "legacy_gap": 13.4551392317,
+    "tuned_gap": 14.9582723769,
+    "tuned_over_legacy": 1.1117144252,
+    "tuned_best_variant": "mitm_m2_negfold_walk_balanced",
+    "tuned_best_s": 15.5258230451,
+    "tuned_best_gap": 14.9582723769
+   },
+   {
+    "instance": "random-binary-n15-b524b",
+    "regime": "char2",
+    "r": 16319,
+    "matched_rho_s": 2.01343801469,
+    "variant": "mitm_m2_negfold_walk",
+    "legacy_s": 26.3139455942,
+    "tuned_s": 27.3922811335,
+    "legacy_gap": 13.0691610083,
+    "tuned_gap": 13.604730284,
+    "tuned_over_legacy": 1.04097962183,
+    "tuned_best_variant": "mitm_m2_negfold_walk",
+    "tuned_best_s": 27.3922811335,
+    "tuned_best_gap": 13.604730284
+   },
+   {
+    "instance": "random-binary-n18-b6507",
+    "regime": "char2",
+    "r": 32719,
+    "matched_rho_s": 2.00589025176,
+    "variant": "mitm_m2_negfold_walk_balanced",
+    "legacy_s": 21.304700076,
+    "tuned_s": 23.9095096312,
+    "legacy_gap": 10.6210696509,
+    "tuned_gap": 11.9196499461,
+    "tuned_over_legacy": 1.12226454941,
+    "tuned_best_variant": "mitm_m2_negfold_walk_balanced",
+    "tuned_best_s": 23.9095096312,
+    "tuned_best_gap": 11.9196499461
+   },
+   {
+    "instance": "random-binary-n21-b1b6f3b",
+    "regime": "char2",
+    "r": 1047281,
+    "matched_rho_s": 1.3560622421,
+    "variant": "mitm_m2_negfold_walk_balanced",
+    "legacy_s": 24.3906271263,
+    "tuned_s": 28.5246388052,
+    "legacy_gap": 17.9863625497,
+    "tuned_gap": 21.0349037969,
+    "tuned_over_legacy": 1.16949181575,
+    "tuned_best_variant": "mitm_m2_negfold_walk",
+    "tuned_best_s": 27.2548579398,
+    "tuned_best_gap": 20.0985302103
+   },
+   {
+    "instance": "random-binary-n24-b5fc9da",
+    "regime": "char2",
+    "r": 2097533,
+    "matched_rho_s": 1.18306494449,
+    "variant": "mitm_m2_negfold_walk_balanced",
+    "legacy_s": 27.2403642967,
+    "tuned_s": 31.7275616311,
+    "legacy_gap": 23.0252484646,
+    "tuned_gap": 26.8181064605,
+    "tuned_over_legacy": 1.16472603984,
+    "tuned_best_variant": "mitm_m2_negfold_walk_balanced",
+    "tuned_best_s": 31.7275616311,
+    "tuned_best_gap": 26.8181064605
+   },
+   {
+    "instance": "random-binary-n27-b845462",
+    "regime": "char2",
+    "r": 22367531,
+    "matched_rho_s": 0.966465514038,
+    "variant": "mitm_m2_negfold_walk_balanced",
+    "legacy_s": 36.929397567,
+    "tuned_s": 44.0586873169,
+    "legacy_gap": 38.2107763087,
+    "tuned_gap": 45.587438638,
+    "tuned_over_legacy": 1.19305188331,
+    "tuned_best_variant": "mitm_m2_negfold_walk_balanced",
+    "tuned_best_s": 44.0586873169,
+    "tuned_best_gap": 45.587438638
+   }
+  ],
+  "rho": {
+   "comparison_id": "ECC1hdcae8d76b124",
+   "session_id": "ECBS1h522578c510c4",
+   "neg_mean_s": 0.937136184758,
+   "fast_mean_s": 0.962509608664,
+   "ops": {
+    "status": "ok",
+    "unit": "ecbench.gae",
+    "ratio_b_over_a": 1.02707549267,
+    "ci95": [
+     0.982668176091,
+     1.07473856513
+    ],
+    "ci_method": "cluster",
+    "pairs": 1024,
+    "unpaired_runs": 0,
+    "same_seeds": true,
+    "same_session": true,
+    "pooled_curves": 4,
+    "bounded": true,
+    "resamples": 4000
+   },
+   "wall": {
+    "status": "admitted",
+    "reasons": [],
+    "required_level": "L0",
+    "pairs": 1024,
+    "pairs_below_level": 0,
+    "median_ratio": 0.217500368358,
+    "ci95": [
+     0.217500368358,
+     0.217500368358
+    ],
+    "aa_arms": null,
+    "aa_pairs": 0,
+    "aa_median_ratio": null,
+    "aa_ci95": null,
+    "outside_noise": null
+   },
+   "curves": [
+    {
+     "slug": "icv1-fp28-tm24531-24294e5d",
+     "log2_r": 27.9495276073,
+     "ratio": 1.03590804293,
+     "ci95": [
+      0.948252204461,
+      1.12632315234
+     ]
+    },
+    {
+     "slug": "icv1-fp32-t93403-ef655380",
+     "log2_r": 31.7620882323,
+     "ratio": 1.03625829539,
+     "ci95": [
+      0.94164076866,
+      1.13952249406
+     ]
+    },
+    {
+     "slug": "icv1-fp36-t360541-9f646956",
+     "log2_r": 35.2079850342,
+     "ratio": 0.985053779253,
+     "ci95": [
+      0.900960353243,
+      1.07823932263
+     ]
+    },
+    {
+     "slug": "icv1-fp40-tm62443-8b49d5b3",
+     "log2_r": 39.7269231938,
+     "ratio": 1.05430326138,
+     "ci95": [
+      0.967386046031,
+      1.15561159372
+     ]
+    }
+   ],
+   "measured": 1024,
+   "verified": 1024
+  },
+  "study": "research/tuned_gae_20261020/",
+  "report": "research/tuned_gae_20261020/REPORT.pdf"
  },
  "planner_component": {
   "rows": [
