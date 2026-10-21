@@ -44,3 +44,13 @@ one-target online intervals, same-point rho, and independent base, relation,
 and scalar replay. Use the repository's Tier 1 cloud-instance gate for any
 wall-time ordering. Until those receipts exist, the new arms have
 `candidate_id: null` and `selected_best_total_runtime: null`.
+
+A second local K4405 load80 control used the release binary and the same
+public target with a 3,600-second cap. Its retained
+[`receipt`](k4405_load80_local_3600_20261020.json) records
+`TIMEOUT_3600S`, sampled peak RSS 13,126,172,672 bytes, and empty index and
+target outputs. A five-second process sample at 16:24:07 UTC was still in
+root-index construction. This is a censored local correctness attempt: the
+index completion, exact output, capacity, and performance of load80 remain
+unknown. It neither promotes K4500/K4549 nor changes the earlier measured
+load75 candidate identities.

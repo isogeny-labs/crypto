@@ -2,8 +2,10 @@
 
 This protocol measures the same-point online time of K4405, K4500, and K4549
 load80 factor bases against a separately verified rho reference on the exact
-a=1 curve `EC1N83Ckb1a1haacb69ee9f37`. K4500 joins after its completed
-capacity control reported 0.855501 ms on the earlier public p00 point; the
+a=1 curve `EC1N83Ckb1a1haacb69ee9f37`. A separate K4500 capacity control
+reported 0.855501 ms on an earlier public p00 point; its complete receipt is
+not included in this frozen package, so that report does not satisfy this
+protocol's admission gate. The
 two points in this protocol were sealed before that result and remain unseen
 by these solvers. The primary result is each arm's first-point
 `rho_online_ms / IC_online_ms`. K4500 and K4549 reverse order on the second
@@ -36,6 +38,14 @@ IC child and outside its target online interval.
   bound.
 
 ## Admission and interpretation
+
+This frozen dispatch refers to a Pod whose provider absence was confirmed at
+`2026-10-20T15:58:56.317004Z` in the merged N83 tie-break result. The
+controller's deadline check therefore rejects a new dispatch from these
+bytes. The separately retained local K4405 load80 control ended at
+`TIMEOUT_3600S` before an index or target receipt. Any new cloud comparison
+requires a new allocation and protocol identity, a newly authorized budget,
+the complete capacity receipts, and an external provider-absence watchdog.
 
 Dispatch occurs only after the six-run capacity diagnostic records a complete
 summary and its K4405/K4500/K4549 load80 p00 controls have passed process,
