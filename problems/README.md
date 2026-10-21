@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [NIST candidate selection weakness hypotheses](nist-candidate-selection-weakness-hypotheses.md) | investigating | establishing a published-curve attack or a weakness explaining the skipped eligible candidates | an applicable verified attack contract or a predictive held-out selection rule |
 | [Supplied-curve Fp² twist factorizations](supplied-curve-fp2-twist-factorizations.md) | open | two complete extension-field quadratic-twist prime factorizations | factor the exact 327-bit and 444-bit composite residuals, prove every prime factor and verify both products |
 | [Running legacy Spot process recovery](legacy-spot-process-recovery.md) | implemented; client activation remains | enrolled legacy process recovery | private recurring backups, fenced two-hop recovery and Diem copy restore passed; laptop installation/trust needs client access |
 | [Photographed-volcano checkpoints unavailable](photo-volcano-checkpoints-unavailable.md) | open | resuming and independently auditing the original 46-curve, 100-problem-per-curve campaign | exact original archives, manifest and checkpoint verification, durable immutable readback, then resume-path validation |

@@ -1,5 +1,12 @@
 # Supplied curve candidates: ICV1 and DiSSECT assessment
 
+**Follow-up:** [selected-versus-skipped weakness hypotheses](hypotheses/REPORT.md)
+connects these four candidates to the existing seed census and compares them
+with the published P-224 and P-256 curves using a native C++/PARI diagnostic.
+The [supplement PDF](hypotheses/HYPOTHESES.pdf), exact inputs, six native
+records and prospective protocol accompany it. Both weakness hypotheses
+remain unresolved; the original external assessment below is preserved.
+
 This PR archives the completed external assessment of four supplied curve
 parameter sets. The [PDF](REPORT.pdf) includes the exact input parameters,
 full canonical ICV1 identities, certified arithmetic findings, the recorded
